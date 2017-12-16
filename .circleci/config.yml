@@ -24,7 +24,6 @@ aliases:
     |
       yarn install --ignore-engines --non-interactive --cache-folder ~/.cache/yarn
 defaults: &defaults
-  working_directory: ~/neo-one
   docker:
     - image: circleci/node:8.9
 
@@ -32,11 +31,15 @@ version: 2
 jobs:
   test:
     <<: *defaults
+    working_directory: ~/neo-one
     steps:
       - checkout
       - restore-cache: *restore-yarn-cache
       - run: *yarn
       - save-cache: *save-yarn-cache
+      - run:
+          name: Build
+          command: yarn build
       - run:
           name: Check Prettier
           command: yarn nit
@@ -47,14 +50,15 @@ jobs:
           name: Check Flow
           command: yarn flow
       - run:
-          name: Tests`
+          name: Tests
           command: yarn test
 
   deploy-website:
     <<: *defaults
+    working_directory: ~/neo-one/website
     steps:
-      - checkout
-      - run: cd website
+      - checkout:
+        path: ~/neo-one
       - restore-cache: *restore-yarn-cache
       - run: *yarn
       - save-cache: *save-yarn-cache
