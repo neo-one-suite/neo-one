@@ -87,7 +87,9 @@
     "through2": "^2.0.3"
   },
   "resolutions": {
-    "bn.js": "^4.11.8"
+    "ajv": "^6.0.0-rc.1",
+    "bn.js": "^4.11.8",
+    "grpc": "^1.8.0"
   },
   "jest": {
     "collectCoverageFrom": [
