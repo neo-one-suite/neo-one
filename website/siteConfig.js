@@ -17,7 +17,7 @@ const siteConfig = {
   headerLinks: [
     { doc: 'contributing', label: 'Contributing' },
     { page: 'help', label: 'Help' },
-    { blog: true, label: 'Blog' },
+    // { blog: true, label: 'Blog' },
   ],
   users,
   headerIcon: 'img/docusaurus.svg',
