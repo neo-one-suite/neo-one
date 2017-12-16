@@ -22,7 +22,7 @@ aliases:
 
   - &yarn
     |
-      yarn install --non-interactive --cache-folder ~/.cache/yarn
+      yarn install --ignore-engines --non-interactive --cache-folder ~/.cache/yarn
 defaults: &defaults
   working_directory: ~/neo-one
   docker:
@@ -54,6 +54,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - run: cd website
       - restore-cache: *restore-yarn-cache
       - run: *yarn
       - save-cache: *save-yarn-cache
@@ -67,7 +68,7 @@ jobs:
             git config --global user.name "Alex DiCarlo"
             echo "machine github.com login dicarlo2 password $GITHUB_TOKEN" > ~/.netrc
             echo "Deploying website..."
-            cd website && GIT_USER=dicarlo2 yarn run publish-gh-pages
+            GIT_USER=dicarlo2 yarn run publish-gh-pages
 
 workflows:
   version: 2
