@@ -41,16 +41,16 @@ jobs:
           name: Build
           command: yarn build
       - run:
-          name: Check Prettier
+          name: Prettier
           command: yarn nit
       - run:
-          name: Check ESLint
+          name: ESLint
           command: yarn lint
       - run:
-          name: Check Flow
+          name: Flow
           command: yarn flow
       - run:
-          name: Tests
+          name: Test
           command: yarn test
 
   deploy-website:
@@ -58,7 +58,7 @@ jobs:
     working_directory: ~/neo-one/website
     steps:
       - checkout:
-        path: ~/neo-one
+          path: ~/neo-one
       - restore-cache: *restore-yarn-cache
       - run: *yarn
       - save-cache: *save-yarn-cache
