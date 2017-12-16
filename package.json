@@ -1,7 +1,7 @@
 {
   "name": "neo-one",
   "version": "0.0.2",
-  "description": "NEO ONE is a suite of tools and frameworks for developing dapps on the NEO blockchain.",
+  "description": "NEO•ONE is a suite of tools and frameworks for developing dapps on the NEO blockchain.",
   "repository": "https://github.com/neo-one-suite/neo-one",
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
@@ -38,8 +38,7 @@
     "pretest-coverage": "babel-node ./scripts/test/pretest.js",
     "posttest-coverage": "babel-node ./scripts/test/posttest.js",
     "test": "jest",
-    "test-coverage": "yarn test --coverage",
-    "neo-one": "node ./packages/@neo-one/cli/dist/bin/neo-one"
+    "test-coverage": "yarn test --coverage"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.35",

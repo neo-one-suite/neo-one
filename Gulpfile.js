@@ -2,4 +2,4 @@
 require('@babel/register');
 require('@babel/polyfill');
 
-require('./scripts/gulp.js');
+require('./gulp.js');

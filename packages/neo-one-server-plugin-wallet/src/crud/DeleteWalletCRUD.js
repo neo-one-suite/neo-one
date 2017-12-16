@@ -18,7 +18,7 @@ export default class DeleteWalletCRUD extends DeleteCRUD<
       resourceType,
       help:
         'Deletes the wallet called <name>. This permanently deletes ' +
-        'the wallet from NEO ONE, there is no way to recover it.',
+        'the wallet from NEO•ONE, there is no way to recover it.',
       options: common.options,
     });
   }

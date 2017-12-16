@@ -24,7 +24,7 @@ export default class CLI {
     vorpal.version(pkg.version);
 
     const { log, config$: logConfig$, shutdownFuncs, shutdown } = setupCLI({
-      logConsole: true,
+      logConsole: false,
       vorpal,
       debug: this._debug,
     });

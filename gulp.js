@@ -17,7 +17,7 @@ import { rollup, watch } from 'rollup';
 import sourcemaps from 'rollup-plugin-sourcemaps';
 import through from 'through2';
 
-import getBabelConfigBase from './getBabelConfig';
+import getBabelConfigBase from './scripts/getBabelConfig';
 
 gulp.task('default', ['build']);
 

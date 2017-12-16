@@ -13,13 +13,15 @@
     "neo one suite",
     "NEO ONE",
     "NEO ONE suite",
+    "NEO•ONE",
+    "NEO•ONE suite",
     "neo blockchain",
     "NEO Blockchain",
     "NEO blockchain",
     "dapp",
     "dapps"
   ],
-  "description": "NEO ONE client APIs for interacting with the NEO blockchain.",
+  "description": "NEO•ONE client APIs for interacting with the NEO blockchain.",
   "repository": "https://github.com/neo-one-suite/neo-one",
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
@@ -27,7 +29,7 @@
   "module": "./dist/es.js",
   "engines": {
     "node": ">=8.9.0"
-  },  
+  },
   "dependencies": {
     "bignumber.js": "^5.0.0",
     "bn.js": "^4.11.8",

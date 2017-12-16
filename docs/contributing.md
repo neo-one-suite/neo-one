@@ -1,91 +1,48 @@
-# Contributing to NEO•ONE
+---
+id: contributing
+title: How to Contribute
+---
 
-Welcome to the NEO•ONE community! We're always looking for more contributors and are happy to have you.
+Welcome to the NEO•ONE community! We're always looking for more contributors and are happy to have you. This document should help make the process for contributing clear and answer some questions that you may have.
 
-## [Code of Conduct](./CODE_OF_CODUNCT.md)
+Please take a moment to review this document in order to make the contribution process easy and effective for everyone involved.
+
+Following these guidelines helps to communicate that you respect the time of the developers managing and developing this open source project. In return, they should reciprocate that respect in addressing your issue, assessing changes, and helping you finalize your pull requests.
+
+This project and everyone participating in it is governed by the [Code of Conduct](code-of-conduct.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [contact@neo-one.io](mailto:contact@neo-one.io).
 
 ## How Can I Contribute?
 
+NEO•ONE is an open source project and we love to receive contributions from our community — you! There are many ways to contribute, from writing tutorials or blog posts, improving the documentation, submitting bug reports and feature requests or writing code which can be incorporated into NEO•ONE itself.
+
+Please, don't use the issue tracker for support questions. The [Help](https://neo-one.io/help.html) page is the best place to start for getting support.
+
 ### Reporting Bugs
 
-Well-written bug reports with consistently reproducible steps are invaluable to the development of NEO•ONE. Bugs are tracked as [GitHub issues]. Before creating an issue, please perform a [cursory search] to see if the problem has already been reported. After you've determined a bug does not already exist, create an issue by filling in [the template].
+Well-written bug reports with consistently reproducible steps are invaluable to the development of NEO•ONE. Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/). Before creating an issue, please perform a [search](https://github.com/neo-one-suite/neo-one/issues?q=is%3Aopen+is%3Aissue+label%3Abug) to see if the problem has already been reported. After you've determined a bug does not already exist, create an issue and fill in the template.
 
 ### Suggesting Enhancements
 
-
+Feature requests are welcome. But take a moment to find out whether your idea fits with the scope and aims of the project. It's up to you to make a strong case to convince the project's developers of the merits of this feature. Please provide as much detail and context as possible.
 
 ### Your First Code Contribution
 
-Documentation (like the text you are reading now) can always use improvement! Adding test coverage is also a great way to get familiar with the codebase.
+Unsure where to begin contributing to NEO•ONE? Here are some great ways to get started:
 
-We recommend that you work on an existing issue before attempting to develop a new feature.
+- Documentation (like the text you are reading now) can always use improvement! All pages on this website include an edit button which you can click to modify the documentation.
+- Adding test coverage is a great way to get familiar with the codebase.
+- Find an existing issue with the [help wanted and good first issue](https://github.com/neo-one-suite/neo-one/issues?utf8=%E2%9C%93&q=is%3Aopen+label%3Ahelp%20wanted+label%3Agood%20first%20issue) labels.
 
-Start by finding an existing issue with the [help wanted and good first issue] labels. These issues are well suited for new contributors. Respond on the issue thread expressing interest in working on it. This helps other people know that the issue is active, and hopefully prevents duplicated efforts.
+Once you've had your first pull request approved and merged, find existing issues marked with [help wanted](https://github.com/neo-one-suite/neo-one/issues?utf8=%E2%9C%93&q=is%3Aopen+label%3Ahelp%20wanted) labels to continue contributing or suggest an enhancement. Respond on the issue thread expressing interest in working on it. This helps other people know that the issue is active, and hopefully prevents duplicated efforts.
 
-### Pull Requests
+## Pull Requests
 
-- Follow the process outlined in [GitHub Standard Fork & Pull Request Workflow] when submitting a pull request.
-- Fill in [the required template].
-- Pre-commit hooks will run [flow], [eslint], [prettier] and [jest] automatically.
+- Follow the process outlined in [GitHub Standard Fork & Pull Request Workflow](https://gist.github.com/Chaser324/ce0505fbed06b947d962) when submitting a pull request.
+- Fill in the pull request template.
+- Pre-commit hooks will run [Flow](https://flow.org/), [ESLint](https://eslint.org/), [Prettier](https://prettier.io/) and [Jest](https://facebook.github.io/jest/) automatically.
 - Pull requests should typically be accompanied with tests. Your reviewers will request tests when appropriate if they are missing.
-
-## Environment Setup
-
-NEO•ONE is organized as a typical JavaScript/[Node] mono-repo using [lerna] and [yarn] workspaces. This means that you need to:
-
-1. Install [Node] >= 8.9.0
-  - Linux and Mac: We recommend using [Node Version Manager].
-  - Windows: We recommend using [Chocolatey].
-2. Install [yarn] - https://yarnpkg.com/en/docs/install
-3. `yarn install --ignore-engines` (#1)
-4. `yarn build`
-  - While developing, you can use `yarn watch` to continuously rebuild.
-
-At this point you should have a locally built version of NEO•ONE. What you do next depends on what you are working on:
-
-- Run tests with `yarn test`
-- Run [@neo-one/cli] with `node ./packages/neo-one-cli/dist/bin/neo-one`. Note that you should not use `yarn run neo-one` (TODO: link issue)
-  - Typically easiest to manually test other components like the NEO node implementation via [@neo-one/cli].
-
-
-## Working on a New Feature
-
-If you want to start a new feature or change, please follow these steps:
-
-1. Open an issue describing your proposed change
-2. Repo owners will respond to your issue promptly
-3. If your proposed change is accepted, start work in your fork
-4. Submit a pull request containing a tested change
-
-## Code Conventions
-
-- 2 spaces for indentation (no tabs).
-- 80 character line length strongly preferred.
-- Prefer `'` over `"`.
-- ES6 syntax
-- Use [Flow types](http://flowtype.org/).
-- Use semicolons;
-- Trailing commas,
-- Avd abbr wrds.
 
 ## License
 
 By contributing to NEO•ONE, you agree that your contributions will be licensed
 under its MIT license.
-
-[Node]: https://nodejs.org/en/
-[Node Version Manager]: https://github.com/creationix/nvm
-[Chocolatey]: https://chocolatey.org/
-[flow]: https://flow.org/
-[eslint]: https://eslint.org/
-[prettier]: https://prettier.io/
-[jest]: https://facebook.github.io/jest/
-[lerna]: https://github.com/lerna/lerna
-[yarn]: https://yarnpkg.com/en/
-[GitHub Standard Fork & Pull Request Workflow]: https://gist.github.com/Chaser324/ce0505fbed06b947d962
-[help wanted and good first issue]: https://github.com/neo-one-suite/neo-one/issues?utf8=%E2%9C%93&q=is%3Aopen+label%3Ahelp%20wanted+label%3Agood%20first%20issue
-[help wanted]: https://github.com/neo-one-suite/neo-one/issues?q=is%3Aopen+is%3Aissue+label%3Ahelp%20wanted
-[cursory search]: https://github.com/neo-one-suite/neo-one/issues?q=is%3Aopen+is%3Aissue+label%3Abug
-[GitHub issues]: https://guides.github.com/features/issues/
-[the template]:
-[the required template]:

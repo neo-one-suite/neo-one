@@ -1,5 +1,5 @@
 /* @flow */
 export default {
-  title: 'NEO ONE',
+  title: 'NEO•ONE',
   cli: 'neo-one',
 };
