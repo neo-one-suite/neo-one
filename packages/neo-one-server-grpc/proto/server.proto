@@ -1,0 +1,163 @@
+syntax = "proto3";
+
+service Server {
+  rpc getVersion(GetVersionRequest) returns (GetVersionResponse) {}
+  rpc getDebug(GetDebugRequest) returns (GetDebugResponse) {}
+  rpc getAllPlugins(GetAllPluginsRequest) returns (GetAllPluginsResponse) {}
+  rpc getPlugins(stream GetPluginsRequest) returns (stream GetPluginsResponse) {}
+  rpc getAllResources(stream GetAllResourcesRequest) returns (stream GetAllResourcesResponse) {}
+  rpc getResources(stream GetResourcesRequest) returns (stream GetResourcesResponse) {}
+  rpc getResource(stream GetResourceRequest) returns (stream GetResourceResponse) {}
+  rpc createResource(stream CreateResourceRequest) returns (stream CreateResourceResponse) {}
+  rpc deleteResource(stream DeleteResourceRequest) returns (stream DeleteResourceResponse) {}
+  rpc startResource(stream StartResourceRequest) returns (stream StartResourceResponse) {}
+  rpc stopResource(stream StopResourceRequest) returns (stream StopResourceResponse) {}
+}
+
+message GetVersionRequest {
+}
+
+message GetVersionResponse {
+  string version = 1;
+}
+
+message GetDebugRequest {
+}
+
+message GetDebugResponse {
+  string debug = 1;
+}
+
+message GetAllPluginsRequest {
+}
+
+message GetAllPluginsResponse {
+  repeated string plugins = 1;
+}
+
+message GetPluginsRequest {
+  string type = 1;
+}
+
+message GetPluginsResponseMessage {
+  string plugin = 1;
+}
+
+message GetPluginsResponse {
+  string type = 1;
+  string code = 2;
+  string message = 3;
+  GetPluginsResponseMessage response = 4;
+}
+
+message GetAllResourcesRequest {
+  string type = 1;
+}
+
+message GetAllResourcesResponseMessage {
+  string resources = 1;
+}
+
+message GetAllResourcesResponse {
+  string type = 1;
+  string code = 2;
+  string message = 3;
+  GetAllResourcesResponseMessage response = 4;
+}
+
+message GetResourcesRequest {
+  string type = 1;
+  string plugin = 2;
+  string resourceType = 3;
+  string options = 4;
+}
+
+message GetResourcesResponseMessage {
+  string resources = 1;
+}
+
+message GetResourcesResponse {
+  string type = 1;
+  string code = 2;
+  string message = 3;
+  GetResourcesResponseMessage response = 4;
+}
+
+message GetResourceRequest {
+  string type = 1;
+  string plugin = 2;
+  string resourceType = 3;
+  string name = 4;
+  string options = 5;
+}
+
+message GetResourceResponseMessage {
+  string resource = 1;
+}
+
+message GetResourceResponse {
+  string type = 1;
+  string code = 2;
+  string message = 3;
+  GetResourceResponseMessage response = 4;
+}
+
+message CreateResourceRequest {
+  string type = 1;
+  string plugin = 2;
+  string resourceType = 3;
+  string name = 4;
+  string options = 5;
+}
+
+message CreateResourceResponse {
+  string type = 1;
+  bool persist = 2;
+  string message = 3;
+  string code = 4;
+}
+
+message DeleteResourceRequest {
+  string type = 1;
+  string plugin = 2;
+  string resourceType = 3;
+  string name = 4;
+  string options = 5;
+}
+
+message DeleteResourceResponse {
+  string type = 1;
+  bool persist = 2;
+  string message = 3;
+  string code = 4;
+}
+
+message StartResourceRequest {
+  string type = 1;
+  string plugin = 2;
+  string resourceType = 3;
+  string name = 4;
+  string options = 5;
+}
+
+message StartResourceResponse {
+  string type = 1;
+  bool persist = 2;
+  string message = 3;
+  string code = 4;
+}
+
+message StopResourceRequest {
+  string type = 1;
+  string plugin = 2;
+  string resourceType = 3;
+  string name = 4;
+  string options = 5;
+}
+
+message StopResourceResponse {
+  string type = 1;
+  bool persist = 2;
+  string message = 3;
+  string code = 4;
+}

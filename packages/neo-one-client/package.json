@@ -1,0 +1,43 @@
+{
+  "name": "@neo-one/client",
+  "version": "0.0.1",
+  "keywords": [
+    "neo",
+    "NEO",
+    "one",
+    "ONE",
+    "blockchain",
+    "neo-one",
+    "neo-one-suite",
+    "neo one",
+    "neo one suite",
+    "NEO ONE",
+    "NEO ONE suite",
+    "neo blockchain",
+    "NEO Blockchain",
+    "NEO blockchain",
+    "dapp",
+    "dapps"
+  ],
+  "description": "NEO ONE client APIs for interacting with the NEO blockchain.",
+  "repository": "https://github.com/neo-one-suite/neo-one",
+  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/es.js",
+  "engines": {
+    "node": ">=8.9.0"
+  },  
+  "dependencies": {
+    "bignumber.js": "^5.0.0",
+    "bn.js": "^4.11.8",
+    "dataloader": "^1.3.0",
+    "fast-stable-stringify": "^1.0.0",
+    "isomorphic-fetch": "^2.2.1",
+    "ix": "^2.3.4",
+    "lodash": "^4.17.4",
+    "@neo-one/core": "^0.0.1",
+    "@neo-one/neo-settings": "^0.0.1",
+    "@neo-one/utils": "^0.0.1"
+  }
+}

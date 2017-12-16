@@ -1,0 +1,52 @@
+{
+  "name": "@neo-one/server",
+  "version": "0.0.1",
+  "keywords": [
+    "neo",
+    "NEO",
+    "one",
+    "ONE",
+    "blockchain",
+    "neo-one",
+    "neo-one-suite",
+    "neo one",
+    "neo one suite",
+    "NEO ONE",
+    "NEO ONE suite",
+    "neo blockchain",
+    "NEO Blockchain",
+    "NEO blockchain",
+    "dapp",
+    "dapps"
+  ],
+  "description": "NEO ONE Server that NEO ONE CLI and other clients connect to.",
+  "repository": "https://github.com/neo-one-suite/neo-one",
+  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/es.js",
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "dependencies": {
+    "@neo-one/server-common": "^0.0.1",
+    "@neo-one/server-grpc": "^0.0.1",
+    "@neo-one/server-plugin-network": "^0.0.1",
+    "@neo-one/server-plugin-wallet": "^0.0.1",
+    "@neo-one/utils": "^0.0.1",
+    "ajv": "^6.0.0-rc.1",
+    "chokidar": "^1.7.0",
+    "env-paths": "^1.0.0",
+    "fs-extra": "^5.0.0",
+    "grpc": "^1.8.0",
+    "grpc-error": "^1.0.0",
+    "lodash": "^4.17.4",
+    "mali": "^0.4.1",
+    "mali-compose": "^1.0.0",
+    "mali-onerror": "^0.1.1",
+    "rxjs": "^5.5.5",
+    "seamless-immutable": "^7.1.2",
+    "toposort": "^1.0.6",
+    "uuid": "^3.1.0"
+  }
+}

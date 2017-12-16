@@ -1,0 +1,44 @@
+/* @flow */
+import { type CLIArgs, type InteractiveCommand } from '@neo-one/server-common';
+import { type ResourceType, Plugin } from '@neo-one/server';
+
+import NetworkResourceType from './NetworkResourceType';
+
+import activateNetwork from './activateNetwork';
+import constants from './constants';
+import deactivateNetwork from './deactivateNetwork';
+import startNode from './startNode';
+
+export default class NetworkPlugin extends Plugin {
+  networkResourceType = new NetworkResourceType({ plugin: this });
+
+  get name(): string {
+    return constants.PLUGIN;
+  }
+
+  get names(): {|
+    capital: string,
+    capitalPlural: string,
+    lower: string,
+    lowerPlural: string,
+  |} {
+    return {
+      capital: 'Network',
+      capitalPlural: 'Networks',
+      lower: 'network',
+      lowerPlural: 'networks',
+    };
+  }
+
+  get resourceTypes(): Array<ResourceType<*, *>> {
+    return [this.networkResourceType];
+  }
+
+  get commands(): Array<(cliArgs: CLIArgs) => void> {
+    return [startNode];
+  }
+
+  get interactive(): Array<InteractiveCommand> {
+    return [activateNetwork(this), deactivateNetwork(this)];
+  }
+}

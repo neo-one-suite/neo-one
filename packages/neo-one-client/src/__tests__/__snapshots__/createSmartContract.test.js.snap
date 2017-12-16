@@ -1,0 +1,169 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BaseClient error cases failed constant invoke 1`] = `"Unknown Script Execution Error"`;
+
+exports[`BasicClient no params no parameters 1`] = `
+Object {
+  "attributes": undefined,
+  "gas": undefined,
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "inputs": undefined,
+  "method": "test",
+  "outputs": undefined,
+  "params": Array [],
+  "privateKey": "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
+  "scripts": undefined,
+}
+`;
+
+exports[`BasicClient.smartContract NEP5 balanceOf 1`] = `undefined`;
+
+exports[`BasicClient.smartContract NEP5 balanceOf 2`] = `
+Object {
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "method": "balanceOf",
+  "params": Array [
+    "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  ],
+}
+`;
+
+exports[`BasicClient.smartContract NEP5 balanceOf 3`] = `"d10136143775292229eccdf904f16fff8e83e7cffdc0f0ce51c10962616c616e63654f66673775292229eccdf904f16fff8e83e7cffdc0f0ce000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a0000000141407870cf08dbb1509d9347a81eccb56f31f84c5e0b73adf0da5619c0200d643babd1dabd3354727896dae555655da6afb8d4621d638de529fc15af2766dfb747c9232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac"`;
+
+exports[`BasicClient.smartContract NEP5 decimals 1`] = `"4"`;
+
+exports[`BasicClient.smartContract NEP5 decimals 2`] = `
+Object {
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "method": "decimals",
+  "params": Array [],
+}
+`;
+
+exports[`BasicClient.smartContract NEP5 decimals 3`] = `"00c108646563696d616c73673775292229eccdf904f16fff8e83e7cffdc0f0ce"`;
+
+exports[`BasicClient.smartContract NEP5 name 1`] = `"foobar"`;
+
+exports[`BasicClient.smartContract NEP5 name 2`] = `
+Object {
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "method": "name",
+  "params": Array [],
+}
+`;
+
+exports[`BasicClient.smartContract NEP5 name 3`] = `"00c1046e616d65673775292229eccdf904f16fff8e83e7cffdc0f0ce"`;
+
+exports[`BasicClient.smartContract NEP5 symbol 1`] = `"foobar"`;
+
+exports[`BasicClient.smartContract NEP5 symbol 2`] = `
+Object {
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "method": "symbol",
+  "params": Array [],
+}
+`;
+
+exports[`BasicClient.smartContract NEP5 symbol 3`] = `"00c10673796d626f6c673775292229eccdf904f16fff8e83e7cffdc0f0ce"`;
+
+exports[`BasicClient.smartContract NEP5 totalSupply 1`] = `"0.0004"`;
+
+exports[`BasicClient.smartContract NEP5 totalSupply 2`] = `
+Object {
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "method": "totalSupply",
+  "params": Array [],
+}
+`;
+
+exports[`BasicClient.smartContract NEP5 totalSupply 3`] = `"00c10b746f74616c537570706c79673775292229eccdf904f16fff8e83e7cffdc0f0ce"`;
+
+exports[`BasicClient.smartContract NEP5 transfer 1`] = `undefined`;
+
+exports[`BasicClient.smartContract NEP5 transfer 2`] = `
+Object {
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "method": "transfer",
+  "params": Array [
+    "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    "35b20010db73bf86371075ddfba4e6596f1ff35d",
+    "100000",
+  ],
+}
+`;
+
+exports[`BasicClient.smartContract NEP5 transfer 3`] = `"d1014f04a08601001435b20010db73bf86371075ddfba4e6596f1ff35d143775292229eccdf904f16fff8e83e7cffdc0f0ce53c1087472616e73666572673775292229eccdf904f16fff8e83e7cffdc0f0ce000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a0000000141405ef82d19b68be431da727d829a5a95b2c82e39d8fc72279e952f6f11ad0be1e7b5e238a05dff84468d24900a8fddaa6d94f791b04fb70cac9a8f4cb2c8aba339232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac"`;
+
+exports[`Client array Client Array param 1`] = `
+Object {
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "method": "test",
+  "params": Array [
+    Array [
+      "foo",
+      "bar",
+    ],
+  ],
+}
+`;
+
+exports[`Client integer param no decimals 1`] = `
+Object {
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "method": "test",
+  "params": Array [
+    "10",
+  ],
+}
+`;
+
+exports[`Client no params no parameters 1`] = `
+Object {
+  "attributes": undefined,
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "method": "test",
+  "params": Array [],
+  "privateKey": "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
+  "transfers": undefined,
+}
+`;
+
+exports[`Client.smartContract NEP5 balanceOf 1`] = `
+Object {
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "method": "balanceOf",
+  "params": Array [
+    "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  ],
+}
+`;
+
+exports[`Client.smartContract NEP5 balanceOf 2`] = `
+Object {
+  "attributes": undefined,
+  "privateKey": "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
+  "script": "143775292229eccdf904f16fff8e83e7cffdc0f0ce51c10962616c616e63654f66673775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "transfers": undefined,
+}
+`;
+
+exports[`Client.smartContract NEP5 transfer 1`] = `
+Object {
+  "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "method": "transfer",
+  "params": Array [
+    "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    "35b20010db73bf86371075ddfba4e6596f1ff35d",
+    "100000",
+  ],
+}
+`;
+
+exports[`Client.smartContract NEP5 transfer 2`] = `
+Object {
+  "attributes": undefined,
+  "privateKey": "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
+  "script": "04a08601001435b20010db73bf86371075ddfba4e6596f1ff35d143775292229eccdf904f16fff8e83e7cffdc0f0ce53c1087472616e73666572673775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "transfers": undefined,
+}
+`;

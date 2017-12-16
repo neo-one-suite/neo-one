@@ -1,0 +1,19 @@
+#! /usr/bin/env node
+/* @flow */
+import '@babel/polyfill';
+import { InteractiveCLI, CLI } from '../';
+
+const debugIdx = process.argv.indexOf('--debug');
+let { argv } = process;
+const debug = debugIdx !== -1
+if (debug) {
+  argv = process.argv.slice(0, debugIdx).concat(
+    process.argv.slice(debugIdx + 1),
+  );
+}
+
+if (argv.length !== 2) {
+  new CLI({ debug }).start(argv);
+} else {
+  new InteractiveCLI({ debug }).start();
+}

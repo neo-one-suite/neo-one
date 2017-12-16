@@ -1,0 +1,372 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Client _issueGASFee 1`] = `"500"`;
+
+exports[`Client _issueGASFee 2`] = `"5"`;
+
+exports[`Client claimAll 1`] = `
+Object {
+  "attributes": undefined,
+  "claims": Array [
+    Object {
+      "txid": "0xca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f70",
+      "vout": 0,
+    },
+    Object {
+      "txid": "0xca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f71",
+      "vout": 1,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "asset": "0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+      "value": "10.1",
+    },
+  ],
+  "privateKey": "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
+}
+`;
+
+exports[`Client invoke 1`] = `
+Array [
+  Object {
+    "__$type": "InvocationTransaction",
+    "attributes": Array [
+      Object {
+        "__$type": "UInt160Attribute",
+        "size": 21,
+        "usage": 32,
+        "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      },
+      Object {
+        "__$type": "BufferAttribute",
+        "size": 4,
+        "usage": 240,
+        "value": "0a00",
+      },
+    ],
+    "gas": "0",
+    "inputs": Array [
+      Object {
+        "__$type": "Input",
+        "hash": "718fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+        "index": 1,
+        "size": 34,
+      },
+    ],
+    "outputs": Array [
+      Object {
+        "__$type": "Output",
+        "address": "35b20010db73bf86371075ddfba4e6596f1ff35d",
+        "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+        "size": 54,
+        "value": "2100000000",
+      },
+    ],
+    "script": "00",
+    "scripts": Array [],
+    "type": 209,
+    "version": 1,
+  },
+  Object {
+    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    "sign": [Function],
+  },
+  [Function],
+]
+`;
+
+exports[`Client invoke 2`] = `"d1010100000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a0001718fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500752b7d0000000035b20010db73bf86371075ddfba4e6596f1ff35d010100232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac"`;
+
+exports[`Client invoke 3`] = `
+Object {
+  "attributes": undefined,
+  "inputs": Array [
+    Object {
+      "txid": "718fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "vout": 1,
+    },
+    Object {
+      "txid": "758fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "vout": 4,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "address": "35b20010db73bf86371075ddfba4e6596f1ff35d",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "value": "21",
+    },
+    Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "value": "5",
+    },
+  ],
+  "privateKey": Object {
+    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    "sign": [Function],
+  },
+  "script": "00",
+}
+`;
+
+exports[`Client invoke with gas 1`] = `"0x92f01b77c9fd024fa8b444c8332d315242d13625b72c49339aa9d007cd4e296f"`;
+
+exports[`Client invoke with gas 2`] = `
+Array [
+  Object {
+    "__$type": "InvocationTransaction",
+    "attributes": Array [
+      Object {
+        "__$type": "UInt160Attribute",
+        "size": 21,
+        "usage": 32,
+        "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      },
+      Object {
+        "__$type": "BufferAttribute",
+        "size": 4,
+        "usage": 240,
+        "value": "0a00",
+      },
+    ],
+    "gas": "1000000000",
+    "inputs": Array [
+      Object {
+        "__$type": "Input",
+        "hash": "718fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+        "index": 1,
+        "size": 34,
+      },
+      Object {
+        "__$type": "Input",
+        "hash": "758fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+        "index": 4,
+        "size": 34,
+      },
+    ],
+    "outputs": Array [
+      Object {
+        "__$type": "Output",
+        "address": "35b20010db73bf86371075ddfba4e6596f1ff35d",
+        "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+        "size": 54,
+        "value": "2100000000",
+      },
+      Object {
+        "__$type": "Output",
+        "address": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+        "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+        "size": 54,
+        "value": "500000000",
+      },
+    ],
+    "script": "00",
+    "scripts": Array [],
+    "type": 209,
+    "version": 1,
+  },
+  Object {
+    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    "sign": [Function],
+  },
+  [Function],
+]
+`;
+
+exports[`Client invoke with gas 3`] = `"d101010000ca9a3b0000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a0002718fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100758fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0400029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500752b7d0000000035b20010db73bf86371075ddfba4e6596f1ff35de72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600065cd1d000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010100232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac"`;
+
+exports[`Client invoke with gas 4`] = `"d101010000ca9a3b0000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a0002718fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100758fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0400029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500752b7d0000000035b20010db73bf86371075ddfba4e6596f1ff35de72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600065cd1d000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010100232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac"`;
+
+exports[`Client invokeMethod 1`] = `"d10175209b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a000000010100232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac"`;
+
+exports[`Client invokeMethod 2`] = `
+Object {
+  "attributes": undefined,
+  "inputs": Array [
+    Object {
+      "txid": "758fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "vout": 4,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "value": "5",
+    },
+  ],
+  "privateKey": Object {
+    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    "sign": [Function],
+  },
+  "script": "209b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce",
+}
+`;
+
+exports[`Client issue 1`] = `
+Object {
+  "attributes": undefined,
+  "inputs": Array [
+    Object {
+      "txid": "758fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "vout": 4,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "value": "10",
+    },
+    Object {
+      "address": "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+      "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "value": "33",
+    },
+  ],
+  "privateKey": "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
+}
+`;
+
+exports[`Client provider methods _getActions 1`] = `
+Array [
+  Object {
+    "scriptHash": undefined,
+  },
+]
+`;
+
+exports[`Client provider methods _getActions 2`] = `
+Array [
+  Object {
+    "scriptHash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  },
+]
+`;
+
+exports[`Client provider methods _getAllStorage 1`] = `
+Array [
+  "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+]
+`;
+
+exports[`Client provider methods _testInvocation 1`] = `
+Array [
+  "00",
+]
+`;
+
+exports[`Client provider methods getClaimAmount 1`] = `
+Array [
+  Object {
+    "__$type": "Input",
+    "hash": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+    "index": 0,
+    "size": 34,
+  },
+]
+`;
+
+exports[`Client provider methods getOutput 1`] = `
+Array [
+  Object {
+    "__$type": "Input",
+    "hash": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+    "index": 0,
+    "size": 34,
+  },
+]
+`;
+
+exports[`Client publish 1`] = `"0xcb9f3b7c6fb1cf2c13a40637c189bdd066a272b4"`;
+
+exports[`Client publish 2`] = `
+Object {
+  "attributes": undefined,
+  "privateKey": "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
+  "script": "06666f6f6261720d7465737440746573742e636f6d047465737403302e31045465737451510207050068134e656f2e436f6e74726163742e437265617465",
+}
+`;
+
+exports[`Client register 1`] = `
+Object {
+  "attributes": undefined,
+  "privateKey": "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
+  "script": "143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465",
+}
+`;
+
+exports[`Client testInvoke 1`] = `
+Object {
+  "attributes": undefined,
+  "gas": undefined,
+  "privateKey": "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
+  "script": "00",
+  "transfers": undefined,
+}
+`;
+
+exports[`Client testInvokeMethod 1`] = `
+Object {
+  "attributes": undefined,
+  "privateKey": "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
+  "script": "00c103666f6f673775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "transfers": undefined,
+}
+`;
+
+exports[`Client transfer 1`] = `
+Object {
+  "attributes": undefined,
+  "inputs": Array [
+    Object {
+      "txid": "718fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "vout": 1,
+    },
+    Object {
+      "txid": "758fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "vout": 5,
+    },
+    Object {
+      "txid": "758fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "vout": 4,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "address": "35b20010db73bf86371075ddfba4e6596f1ff35d",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "value": "22",
+    },
+    Object {
+      "address": "35b20010db73bf86371075ddfba4e6596f1ff35d",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "value": "1",
+    },
+    Object {
+      "address": "9847e26135152874355e324afd5cc99f002acb33",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "value": "1",
+    },
+    Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "value": "7",
+    },
+    Object {
+      "address": "9847e26135152874355e324afd5cc99f002acb33",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "value": "0.2",
+    },
+    Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "value": "14.8",
+    },
+  ],
+  "privateKey": "7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344",
+}
+`;

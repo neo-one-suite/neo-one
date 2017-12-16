@@ -1,0 +1,3533 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BasicClientBase claimRaw-attributes-pk 1`] = `"0xe01c52794fb4a93ad09b08907a6ca32b8915c64882efef78d1b5b18a99fb2cf0"`;
+
+exports[`BasicClientBase claimRaw-attributes-pk 2`] = `
+Object {
+  "__$type": "ClaimTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "claims": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "inputs": Array [],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [],
+  "type": 2,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase claimRaw-attributes-pk 3`] = `
+Array [
+  "020002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba000010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6400019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc014140ca98206ed1c93294d0687a507d8b9edc4027e632617efa9aa9cd620bc65dd095d121ef4d32a6e94c1dab30a8f660e913614f37d8cf10d797c24c44836ae5a9d6232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase claimRaw-attributes-sign 1`] = `"0xe01c52794fb4a93ad09b08907a6ca32b8915c64882efef78d1b5b18a99fb2cf0"`;
+
+exports[`BasicClientBase claimRaw-attributes-sign 2`] = `
+Object {
+  "__$type": "ClaimTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "claims": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "inputs": Array [],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [],
+  "type": 2,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase claimRaw-attributes-sign 3`] = `
+Array [
+  "020002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba000010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6400019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc012120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase claimRaw-simple-pk 1`] = `"0x27592c06f99a8a28181675c27b1aca8176eca061c41947f6c3ec11b7576986de"`;
+
+exports[`BasicClientBase claimRaw-simple-pk 2`] = `
+Object {
+  "__$type": "ClaimTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+  ],
+  "claims": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "inputs": Array [],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 2,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase claimRaw-simple-pk 3`] = `
+Array [
+  "020002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010004205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f6261720001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de74140a86886e86387dd81d911aa7c1eca74f2510f5963de74d5434a343cbf6813290c88a89d48148df58abafdc0f618f97c0e526a67effb8f5e7fa4ba28e6f8f7dd72232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase claimRaw-simple-sign 1`] = `"0x27592c06f99a8a28181675c27b1aca8176eca061c41947f6c3ec11b7576986de"`;
+
+exports[`BasicClientBase claimRaw-simple-sign 2`] = `
+Object {
+  "__$type": "ClaimTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+  ],
+  "claims": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "inputs": Array [],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 2,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase claimRaw-simple-sign 3`] = `
+Array [
+  "020002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010004205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f6261720001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de72120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeMethodRaw-attributes-pk 1`] = `"0x1b98caec866aff84dac7660d4bd7113a9eb76d66088f518333f2f33aa1759711"`;
+
+exports[`BasicClientBase invokeMethodRaw-attributes-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "gas": "10000000",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "20e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeMethodRaw-attributes-pk 3`] = `
+Array [
+  "d1017520e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce809698000000000010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc014140e1fed93dfb0c24b2a359193b2ba5386b10d635bf191b89b6d775aab3c14312b15c18f2a7f2ab285aaa9510576ab461b9af9becb817f05a391045559599557594232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeMethodRaw-attributes-sign 1`] = `"0x1b98caec866aff84dac7660d4bd7113a9eb76d66088f518333f2f33aa1759711"`;
+
+exports[`BasicClientBase invokeMethodRaw-attributes-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "gas": "10000000",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "20e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeMethodRaw-attributes-sign 3`] = `
+Array [
+  "d1017520e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce809698000000000010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc012120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeMethodRaw-empty-pk 1`] = `"0xb38e3e1604872e74e0e34eb8a64aa8f55f12e72348041a078e90284051db25b3"`;
+
+exports[`BasicClientBase invokeMethodRaw-empty-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 240,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [],
+  "outputs": Array [],
+  "script": "20e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeMethodRaw-empty-pk 3`] = `
+Array [
+  "d1017520e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a00000001414044289e0b30ad07d722b7cd16f2e49dad0898a8394c8df00a32b91f7b0028d6f088e2e10bd23c1969af40184b1439dab21e982ca832461b342201a30b735e9712232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeMethodRaw-empty-sign 1`] = `"0xb38e3e1604872e74e0e34eb8a64aa8f55f12e72348041a078e90284051db25b3"`;
+
+exports[`BasicClientBase invokeMethodRaw-empty-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 240,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [],
+  "outputs": Array [],
+  "script": "20e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeMethodRaw-empty-sign 3`] = `
+Array [
+  "d1017520e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a000000012120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeMethodRaw-simple-pk 1`] = `"0x2f394d049c0ace77fb0f2709d8be2388e3213b515ede4a25c5bec5c2c81b9fad"`;
+
+exports[`BasicClientBase invokeMethodRaw-simple-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 241,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 242,
+      "value": "0a00",
+    },
+  ],
+  "gas": "1000000000",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "20e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeMethodRaw-simple-pk 3`] = `
+Array [
+  "d1017520e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce00ca9a3b0000000006205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f626172f1020a00f2020a0002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de74140ab7df4eee9944d85cf40cfc7d12f9e318e03cd73432bbf1ce1346d1d6339db2660cc38a699eac574ff639ddb6f79740e080b21c86e6922b703b5b93f32c46fff232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeMethodRaw-simple-sign 1`] = `"0x2f394d049c0ace77fb0f2709d8be2388e3213b515ede4a25c5bec5c2c81b9fad"`;
+
+exports[`BasicClientBase invokeMethodRaw-simple-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 241,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 242,
+      "value": "0a00",
+    },
+  ],
+  "gas": "1000000000",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "20e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeMethodRaw-simple-sign 3`] = `
+Array [
+  "d1017520e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce00ca9a3b0000000006205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f626172f1020a00f2020a0002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de72120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeRaw-attributes-pk 1`] = `"0x43ad9619c89f0aeece317e9768332cb2c0072ff09d24360f4a12eaaa893c96cc"`;
+
+exports[`BasicClientBase invokeRaw-attributes-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "gas": "10000000",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeRaw-attributes-pk 3`] = `
+Array [
+  "d10120602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7809698000000000010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc0141402ffd0e791e80d7c2c4027f55b29aa310798ad2980efc25c5358a6dc00cac413441be7ec04fa8843722efc6553ab4bba95b561012ad7b4f1249b02a004f033884232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeRaw-attributes-sign 1`] = `"0x43ad9619c89f0aeece317e9768332cb2c0072ff09d24360f4a12eaaa893c96cc"`;
+
+exports[`BasicClientBase invokeRaw-attributes-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "gas": "10000000",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeRaw-attributes-sign 3`] = `
+Array [
+  "d10120602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7809698000000000010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc012120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeRaw-empty-pk 1`] = `"0x34362b0fa901c0018f877faf0e4af9830f6ff52baf5c9833e7eeeb4022cdddc1"`;
+
+exports[`BasicClientBase invokeRaw-empty-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 240,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [],
+  "outputs": Array [],
+  "script": "00",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeRaw-empty-pk 3`] = `
+Array [
+  "d1010100000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a000000014140b15c1570f2dd47ac1842edbacd74f843c85200ae87764d08be0e57258183ca66b1205e3f0b5e5f1fea14f4507f11f53771b18a9e91c83a169e81d0c2dd370ea6232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeRaw-empty-sign 1`] = `"0x34362b0fa901c0018f877faf0e4af9830f6ff52baf5c9833e7eeeb4022cdddc1"`;
+
+exports[`BasicClientBase invokeRaw-empty-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 240,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [],
+  "outputs": Array [],
+  "script": "00",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeRaw-empty-sign 3`] = `
+Array [
+  "d1010100000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a000000012120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeRaw-simple-pk 1`] = `"0x8ebc78bb7d5e69f135771efb2821e07247171bf0860e62b03ffab2baceb319db"`;
+
+exports[`BasicClientBase invokeRaw-simple-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 241,
+      "value": "0a00",
+    },
+  ],
+  "gas": "1000000000",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeRaw-simple-pk 3`] = `
+Array [
+  "d10120c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b00ca9a3b0000000005205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f626172f1020a0002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de741409dbd5e46d52642fb3ae5e3d15a2c8bdf386da109cef3ce91b329d388cbeb3044ce7fbe77c909ddaac2003fef8a98d0f0b3294eceeafcf697419abb7770f7d79e232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase invokeRaw-simple-sign 1`] = `"0x8ebc78bb7d5e69f135771efb2821e07247171bf0860e62b03ffab2baceb319db"`;
+
+exports[`BasicClientBase invokeRaw-simple-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 241,
+      "value": "0a00",
+    },
+  ],
+  "gas": "1000000000",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase invokeRaw-simple-sign 3`] = `
+Array [
+  "d10120c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b00ca9a3b0000000005205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f626172f1020a0002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de72120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase issueRaw-attributes-pk 1`] = `"0x5b5f3262d4f70c383d44f7a8fbb27d6e287e676cef791630d09c77a17671c53c"`;
+
+exports[`BasicClientBase issueRaw-attributes-pk 2`] = `
+Object {
+  "__$type": "IssueTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [],
+  "type": 1,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase issueRaw-attributes-pk 3`] = `
+Array [
+  "010010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc014140da3c2342518f432b94573e7fafd1b53ecb6cfd252f296832ba38c98dc603c90f6d7aed544e349eace425011e73914f935dc1b3e5cf31200ac292e598ea96baba232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase issueRaw-attributes-sign 1`] = `"0x5b5f3262d4f70c383d44f7a8fbb27d6e287e676cef791630d09c77a17671c53c"`;
+
+exports[`BasicClientBase issueRaw-attributes-sign 2`] = `
+Object {
+  "__$type": "IssueTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [],
+  "type": 1,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase issueRaw-attributes-sign 3`] = `
+Array [
+  "010010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc012120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase issueRaw-simple-pk 1`] = `"0x9ece03a4a4d7758f7c3c5fe944e43b34f595004823c6197ca21fd89c813f60eb"`;
+
+exports[`BasicClientBase issueRaw-simple-pk 2`] = `
+Object {
+  "__$type": "IssueTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 241,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 242,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 243,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 244,
+      "value": "0a00",
+    },
+  ],
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 1,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase issueRaw-simple-pk 3`] = `
+Array [
+  "010008205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f626172f1020a00f2020a00f3020a00f4020a0002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de741403f1bb0e8e4f539e648096285c8cd1f787a08b5894e0ea2ca252555a0cbfbea65cf06266f670c708ddddb01598b39d25c1f7679cb1849cb2a91960056a8a4110d232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase issueRaw-simple-sign 1`] = `"0x9ece03a4a4d7758f7c3c5fe944e43b34f595004823c6197ca21fd89c813f60eb"`;
+
+exports[`BasicClientBase issueRaw-simple-sign 2`] = `
+Object {
+  "__$type": "IssueTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 241,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 242,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 243,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 244,
+      "value": "0a00",
+    },
+  ],
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 1,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase issueRaw-simple-sign 3`] = `
+Array [
+  "010008205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f626172f1020a00f2020a00f3020a00f4020a0002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de72120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase provider methods _sendTransactionRaw 1`] = `
+Array [
+  "",
+]
+`;
+
+exports[`BasicClientBase provider methods getAccount 1`] = `
+Array [
+  "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+]
+`;
+
+exports[`BasicClientBase provider methods getAsset 1`] = `
+Array [
+  "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+]
+`;
+
+exports[`BasicClientBase provider methods getBestBlockHash 1`] = `Array []`;
+
+exports[`BasicClientBase provider methods getBlock 1`] = `
+Array [
+  "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+]
+`;
+
+exports[`BasicClientBase provider methods getBlock 2`] = `
+Array [
+  0,
+]
+`;
+
+exports[`BasicClientBase provider methods getBlockCount 1`] = `Array []`;
+
+exports[`BasicClientBase provider methods getContract 1`] = `
+Array [
+  "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+]
+`;
+
+exports[`BasicClientBase provider methods getMemPool 1`] = `Array []`;
+
+exports[`BasicClientBase provider methods getStorage 1`] = `
+Array [
+  "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+  "12",
+]
+`;
+
+exports[`BasicClientBase provider methods getTransaction 1`] = `
+Array [
+  "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+]
+`;
+
+exports[`BasicClientBase provider methods getUnspentOutput 1`] = `
+Array [
+  Object {
+    "__$type": "Input",
+    "hash": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+    "index": 0,
+    "size": 34,
+  },
+]
+`;
+
+exports[`BasicClientBase provider methods testInvokeRaw 1`] = `
+Array [
+  "12",
+]
+`;
+
+exports[`BasicClientBase publishRaw-attributes-pk 1`] = `
+Object {
+  "hash": "0xef2370dca90c838cd55747299de963b90cf07eb4",
+  "txid": "0x7870e4476a24664f6d76d024e1dd0cb4e625e7788be715a75d878f830f82e232",
+}
+`;
+
+exports[`BasicClientBase publishRaw-attributes-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase publishRaw-attributes-pk 3`] = `
+Array [
+  "d1015e06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465000000000000000010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc0141406e48053eb8926b0f5e270bb44d335bbe361f7e82ffb78b11060bfbcafaa4c7d66faf39218b57980970875b593136550e26118a310456b903d06a409841f50c19232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase publishRaw-attributes-sign 1`] = `
+Object {
+  "hash": "0xef2370dca90c838cd55747299de963b90cf07eb4",
+  "txid": "0x7870e4476a24664f6d76d024e1dd0cb4e625e7788be715a75d878f830f82e232",
+}
+`;
+
+exports[`BasicClientBase publishRaw-attributes-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase publishRaw-attributes-sign 3`] = `
+Array [
+  "d1015e06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465000000000000000010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc012120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase publishRaw-empty-pk 1`] = `
+Object {
+  "hash": "0xef2370dca90c838cd55747299de963b90cf07eb4",
+  "txid": "0x702737492ab91e9d6f95ce0293d7ba6fd91680eea1b190da2c978373811b069f",
+}
+`;
+
+exports[`BasicClientBase publishRaw-empty-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 240,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [],
+  "outputs": Array [],
+  "script": "06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase publishRaw-empty-pk 3`] = `
+Array [
+  "d1015e06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a000000014140379410cadacb29c1727ae2ce4bb3e3df6945b2bd779f25ed8592acaf377eecf8b55b93a66215937ab500f04dc8be5f8f27b08b98c2547ae840232531a1ee4bb6232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase publishRaw-empty-sign 1`] = `
+Object {
+  "hash": "0xef2370dca90c838cd55747299de963b90cf07eb4",
+  "txid": "0x702737492ab91e9d6f95ce0293d7ba6fd91680eea1b190da2c978373811b069f",
+}
+`;
+
+exports[`BasicClientBase publishRaw-empty-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 240,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [],
+  "outputs": Array [],
+  "script": "06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase publishRaw-empty-sign 3`] = `
+Array [
+  "d1015e06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a000000012120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase publishRaw-simple-pk 1`] = `
+Object {
+  "hash": "0xef2370dca90c838cd55747299de963b90cf07eb4",
+  "txid": "0xf10e5491d5326203c7dd75f4b772972e3506f99618c1ca053bc99c7f0a3846de",
+}
+`;
+
+exports[`BasicClientBase publishRaw-simple-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 241,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 242,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 243,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465",
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase publishRaw-simple-pk 3`] = `
+Array [
+  "d1015e06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465000000000000000007205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f626172f1020a00f2020a00f3020a0002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de74140cdb1c707e3b3f45648336b3f0e3006d3750c626d2ba5601a7c9c82ce9a13b382501d29a1e7475c273705b4014c29af118d982ce66238b137d0d58d6e9005a11d232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase publishRaw-simple-sign 1`] = `
+Object {
+  "hash": "0xef2370dca90c838cd55747299de963b90cf07eb4",
+  "txid": "0xf10e5491d5326203c7dd75f4b772972e3506f99618c1ca053bc99c7f0a3846de",
+}
+`;
+
+exports[`BasicClientBase publishRaw-simple-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 241,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 242,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 243,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465",
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase publishRaw-simple-sign 3`] = `
+Array [
+  "d1015e06666f6f6261720d7465737440746573742e636f6d047465737403302e310454657374515102070520c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b68134e656f2e436f6e74726163742e437265617465000000000000000007205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f626172f1020a00f2020a00f3020a0002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de72120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase registerRaw-attributes-pk 1`] = `"0x552e9bf2e08b3eb599b3e585a32b355162dc5fc7c47af10c24ef1763432f5de3"`;
+
+exports[`BasicClientBase registerRaw-attributes-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase registerRaw-attributes-pk 3`] = `
+Array [
+  "d1016f143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465000000000000000010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc014140ce53c5963e7bd31f04e3b6fa4620cfd78048b17230a0332107f524cd3681756b62f410d4aad68dcf9cfe3b200fca2a48ede4545cff176a45351787924294c483232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase registerRaw-attributes-sign 1`] = `"0x552e9bf2e08b3eb599b3e585a32b355162dc5fc7c47af10c24ef1763432f5de3"`;
+
+exports[`BasicClientBase registerRaw-attributes-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase registerRaw-attributes-sign 3`] = `
+Array [
+  "d1016f143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465000000000000000010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc012120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase registerRaw-empty-pk 1`] = `"0x669f7e98becf82f4b0f071247a9eac717561e74652fff9ceaf3df1aed1c5a403"`;
+
+exports[`BasicClientBase registerRaw-empty-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 240,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [],
+  "outputs": Array [],
+  "script": "143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase registerRaw-empty-pk 3`] = `
+Array [
+  "d1016f143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a0000000141408436efeb55bbe43a33388a073e607a446d6818e145bb0a8523267a5fbca6832a24cadef1f10bb2a962d04a80e9048ec5411d5cc456712076021e7277f69ffd47232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase registerRaw-empty-sign 1`] = `"0x669f7e98becf82f4b0f071247a9eac717561e74652fff9ceaf3df1aed1c5a403"`;
+
+exports[`BasicClientBase registerRaw-empty-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 240,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [],
+  "outputs": Array [],
+  "script": "143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465",
+  "scripts": Array [],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase registerRaw-empty-sign 3`] = `
+Array [
+  "d1016f143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465000000000000000002203775292229eccdf904f16fff8e83e7cffdc0f0cef0020a000000012120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase registerRaw-simple-pk 1`] = `"0x33c68f56cd6365fee29a658b54d17a50151ebe9f64ce7e28278d69daabdcd4c0"`;
+
+exports[`BasicClientBase registerRaw-simple-pk 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 241,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 242,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 243,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 244,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465",
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase registerRaw-simple-pk 3`] = `
+Array [
+  "d1016f143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465000000000000000008205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f626172f1020a00f2020a00f3020a00f4020a0002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de741404460445befb29e04848e81c4a3545f14f3e0abc74c512256f4785fad710bcc42b3f681c34b1da86f0ca30f973143ad433b6bbdb77e8ba47b165fecb191475d98232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase registerRaw-simple-sign 1`] = `"0x33c68f56cd6365fee29a658b54d17a50151ebe9f64ce7e28278d69daabdcd4c0"`;
+
+exports[`BasicClientBase registerRaw-simple-sign 2`] = `
+Object {
+  "__$type": "InvocationTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 241,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 242,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 243,
+      "value": "0a00",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 4,
+      "usage": 244,
+      "value": "0a00",
+    },
+  ],
+  "gas": "0",
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "script": "143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465",
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 209,
+  "version": 1,
+}
+`;
+
+exports[`BasicClientBase registerRaw-simple-sign 3`] = `
+Array [
+  "d1016f143775292229eccdf904f16fff8e83e7cffdc0f0ce143775292229eccdf904f16fff8e83e7cffdc0f0ce2102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef540700a0724e180900045465737402600068104e656f2e41737365742e437265617465000000000000000008205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f626172f1020a00f2020a00f3020a00f4020a0002798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de72120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase testInvokeMethodRaw calls testInvokeRaw 1`] = `
+Array [
+  "20e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600a01010101010101010101143775292229eccdf904f16fff8e83e7cffdc0f0ce02640004a08601005a083078666f6f62617257c10a666f6f62617246756e63673775292229eccdf904f16fff8e83e7cffdc0f0ce",
+]
+`;
+
+exports[`BasicClientBase transferRaw-attributes-pk 1`] = `"0x9edb7ea9eb94cbf011a7ac3f3df723b59e7e48772a67a23a1aa8daf00b9ec03d"`;
+
+exports[`BasicClientBase transferRaw-attributes-pk 2`] = `
+Object {
+  "__$type": "ContractTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [],
+  "type": 128,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase transferRaw-attributes-pk 3`] = `
+Array [
+  "800010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc0141400b439ac3f94010964aff957f53baa852a9df8b957135059475c6ded823031175f6bd3e46fa1d9f59e64883a41f42b3888dfeccd0068dac916d9e26a6495a7482232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase transferRaw-attributes-sign 1`] = `"0x9edb7ea9eb94cbf011a7ac3f3df723b59e7e48772a67a23a1aa8daf00b9ec03d"`;
+
+exports[`BasicClientBase transferRaw-attributes-sign 2`] = `
+Object {
+  "__$type": "ContractTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 240,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 241,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 242,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 243,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 244,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 245,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 246,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 247,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 248,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 249,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 250,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 251,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 252,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 253,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 254,
+      "value": "48656c6c6f20576f726c64",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 13,
+      "usage": 255,
+      "value": "48656c6c6f20576f726c64",
+    },
+  ],
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 1,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "f41cdd4b7ec41847443fa36bf8dde0009d7ecebc",
+      "asset": "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [],
+  "type": 128,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase transferRaw-attributes-sign 3`] = `
+Array [
+  "800010f00b48656c6c6f20576f726c64f10b48656c6c6f20576f726c64f20b48656c6c6f20576f726c64f30b48656c6c6f20576f726c64f40b48656c6c6f20576f726c64f50b48656c6c6f20576f726c64f60b48656c6c6f20576f726c64f70b48656c6c6f20576f726c64f80b48656c6c6f20576f726c64f90b48656c6c6f20576f726c64fa0b48656c6c6f20576f726c64fb0b48656c6c6f20576f726c64fc0b48656c6c6f20576f726c64fd0b48656c6c6f20576f726c64fe0b48656c6c6f20576f726c64ff0b48656c6c6f20576f726c6402798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0100798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba0000019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b00000000f41cdd4b7ec41847443fa36bf8dde0009d7ecebc012120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase transferRaw-simple-pk 1`] = `"0x805299673ce06f2fa09d59a42588d0d407c334c3cabfe958460ca96d65af30a4"`;
+
+exports[`BasicClientBase transferRaw-simple-pk 2`] = `
+Object {
+  "__$type": "ContractTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+  ],
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 128,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase transferRaw-simple-pk 3`] = `
+Array [
+  "800004205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f62617202798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de741405effee4b18ea9d31c4a14815fada2c9b5146f2577babc8b202a81362787210aa848be37563856a5da5103810de8357c3140b62a4a5da2c5ecc4534173c08e152232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
+
+exports[`BasicClientBase transferRaw-simple-sign 1`] = `"0x805299673ce06f2fa09d59a42588d0d407c334c3cabfe958460ca96d65af30a4"`;
+
+exports[`BasicClientBase transferRaw-simple-sign 2`] = `
+Object {
+  "__$type": "ContractTransaction",
+  "attributes": Array [
+    Object {
+      "__$type": "UInt160Attribute",
+      "size": 21,
+      "usage": 32,
+      "value": "5fa99d93303775fe50ca119c327759313eccfa1c",
+    },
+    Object {
+      "__$type": "ECPointAttribute",
+      "size": 34,
+      "usage": 2,
+      "value": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+    },
+    Object {
+      "__$type": "UInt256Attribute",
+      "size": 33,
+      "usage": 161,
+      "value": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+    },
+    Object {
+      "__$type": "BufferAttribute",
+      "size": 8,
+      "usage": 240,
+      "value": "666f6f626172",
+    },
+  ],
+  "inputs": Array [
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+      "index": 0,
+      "size": 34,
+    },
+    Object {
+      "__$type": "Input",
+      "hash": "798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba",
+      "index": 1,
+      "size": 34,
+    },
+  ],
+  "outputs": Array [
+    Object {
+      "__$type": "Output",
+      "address": "5fa99d93303775fe50ca119c327759313eccfa1c",
+      "asset": "e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60",
+      "size": 54,
+      "value": "1000000000",
+    },
+  ],
+  "scripts": Array [
+    Object {
+      "__$type": "Witness",
+      "invocation": "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "verification": "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+    },
+  ],
+  "type": 128,
+  "version": 0,
+}
+`;
+
+exports[`BasicClientBase transferRaw-simple-sign 3`] = `
+Array [
+  "800004205fa99d93303775fe50ca119c327759313eccfa1c02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efa1e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60f006666f6f62617202798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca0000798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ba010001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000005fa99d93303775fe50ca119c327759313eccfa1c0220c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b20602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de72120ca89ef9d5d6ca6543ffec4aa1a1d8ee9fcf050f9243cb89a4c7e43f3e4b98f79232102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699efac",
+]
+`;
