@@ -41,6 +41,7 @@ const siteConfig = {
   gaTrackingId: 'UA-92599752-3',
   facebookAppId: 1764807046864916,
   twitter: true,
+  cname: 'neo-one.io',
 };
 
 module.exports = siteConfig;

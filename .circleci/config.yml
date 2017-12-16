@@ -1,0 +1,81 @@
+aliases:
+  - &restore-yarn-cache
+    keys:
+      - v1-yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      # Fallback in case checksum fails
+      - v1-yarn-{{ .Branch }}-
+
+  - &save-yarn-cache
+    paths:
+      - node_modules
+      - ~/.cache/yarn
+    key: v1-yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
+
+  - &filter-only-master
+    branches:
+      only:
+        - master
+
+  - &filter-ignore-gh-pages
+    branches:
+      ignore: gh-pages
+
+  - &yarn
+    |
+      yarn install --non-interactive --cache-folder ~/.cache/yarn
+defaults: &defaults
+  working_directory: ~/neo-one
+  docker:
+    - image: circleci/node:8.9
+
+version: 2
+jobs:
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore-cache: *restore-yarn-cache
+      - run: *yarn
+      - save-cache: *save-yarn-cache
+      - run:
+          name: Check Prettier
+          command: yarn nit
+      - run:
+          name: Check ESLint
+          command: yarn lint
+      - run:
+          name: Check Flow
+          command: yarn flow
+      - run:
+          name: Tests`
+          command: yarn test
+
+  deploy-website:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore-cache: *restore-yarn-cache
+      - run: *yarn
+      - save-cache: *save-yarn-cache
+      - run:
+          name: Install Dependencies
+          command: sudo apt install rsync
+      - run:
+          name: Deploy Website
+          command: |
+            git config --global user.email "dicarlo2@users.noreply.github.com"
+            git config --global user.name "Alex DiCarlo"
+            echo "machine github.com login dicarlo2 password $GITHUB_TOKEN" > ~/.netrc
+            echo "Deploying website..."
+            cd website && GIT_USER=dicarlo2 yarn run publish-gh-pages
+
+workflows:
+  version: 2
+  website:
+    jobs:
+      - deploy-website:
+          filters: *filter-only-master
+  test:
+    jobs:
+      - test:
+          filters: *filter-only-master

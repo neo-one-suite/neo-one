@@ -14,19 +14,18 @@
   },
   "lint-staged": {
     "packages/*/src/**/*.js": [
-      "prettier --write --single-quote --trailing-comma all",
+      "prettier --write --config .prettierrc",
       "git add",
       "eslint",
       "yarn test --findRelatedTests"
     ],
     "scripts/**/*.js": [
-      "prettier --write --single-quote --trailing-comma all",
+      "prettier --write --config .prettierrc",
       "git add",
       "eslint"
     ]
   },
   "scripts": {
-    "lint": "eslint packages/*/src/**",
     "flow": "flow",
     "lint-staged": "lint-staged",
     "flow:coverage": "flow-coverage-report -i 'packages/*/src/**/*.js' -t html",
@@ -38,7 +37,13 @@
     "pretest-coverage": "babel-node ./scripts/test/pretest.js",
     "posttest-coverage": "babel-node ./scripts/test/posttest.js",
     "test": "jest",
-    "test-coverage": "yarn test --coverage"
+    "test-coverage": "yarn test --coverage",
+    "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.js\"",
+    "nit:scripts": "prettier --config .prettierrc --list-different \"scripts/**/*.js\"",
+    "nit": "yarn nit:source && yarn nit:scripts",
+    "lint:source": "eslint packages/*/src/**",
+    "lint:scripts": "eslint scripts/**",
+    "lint": "yarn lint:source && yarn lint:scripts"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.35",
