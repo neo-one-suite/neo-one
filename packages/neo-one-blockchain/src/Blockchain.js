@@ -15,7 +15,6 @@ import {
   type Transaction,
   type VerifyScriptOptions,
   InvocationTransaction,
-  ScriptBuilder,
   common,
   crypto,
   utils,
@@ -413,13 +412,7 @@ export default class Blockchain {
     hash,
     witness,
   }: VerifyScriptOptions): Promise<void> => {
-    let { verification } = witness;
-    if (verification.length === 0) {
-      const builder = new ScriptBuilder();
-      builder.emitAppCallVerification(hash);
-      verification = builder.build();
-    }
-    if (!common.uInt160Equal(hash, crypto.toScriptHash(verification))) {
+    if (!common.uInt160Equal(hash, crypto.toScriptHash(witness.verification))) {
       throw new WitnessVerifyError();
     }
 
@@ -436,6 +429,10 @@ export default class Blockchain {
       gas: utils.ZERO,
       onStep: this._onStep,
     });
+
+    if (blockchain.getChangeSet().length !== 0) {
+      throw new ScriptVerifyError();
+    }
 
     const { stack } = result;
     if (stack.length !== 1) {
