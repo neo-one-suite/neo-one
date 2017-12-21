@@ -210,7 +210,7 @@ export default class InteractiveCLI {
               const { pid } = await startServer({
                 port,
                 dataPath,
-                binary: process.argv.join(' '),
+                binary: process.argv,
                 onStart: () => {
                   if (prevPID == null) {
                     spinner = ora(

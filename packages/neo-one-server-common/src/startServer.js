@@ -48,7 +48,7 @@ export default async ({
 }: {|
   port: number,
   dataPath: string,
-  binary: string,
+  binary: Array<string>,
   onStart?: () => void,
 |}): Promise<{| pid: number, started: boolean |}> => {
   const pidPath = getServerPIDPath({ dataPath });
@@ -62,7 +62,7 @@ export default async ({
   }
 
   // eslint-disable-next-line
-  const [cmd0, cmd1, ...args] = binary.split(' ');
+  const [cmd0, cmd1, ...args] = binary;
   const child = spawn(cmd0, [cmd1, 'start', 'server'], {
     detached: true,
     stdio: 'ignore',
