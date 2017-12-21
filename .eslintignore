@@ -1,3 +1,4 @@
 packages/*/dist/**
-packages/neo-one-core/src/utils/AsyncIteratorBase.flow.js
+packages/neo-one-core/src/utils/AsyncIteratorBase.js.flow
 **/__generated__/**
+migrate/**

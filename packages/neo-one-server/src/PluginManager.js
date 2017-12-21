@@ -30,7 +30,8 @@ import ResourcesManager from './ResourcesManager';
 
 import pluginsUtil from './plugins';
 
-const MANAGERS_PATH = 'managers';
+const MANAGER_PATH = 'manager';
+const MASTER_PATH = 'master';
 const PLUGINS_READY_PATH = 'ready';
 
 type ResourcesManagers = {
@@ -168,15 +169,25 @@ export default class PluginManager {
     this._resourcesManagers[plugin.name] = {};
     const resourcesManagers = await Promise.all(
       plugin.resourceTypes.map(async resourceType => {
+        const masterResourceAdapter = await resourceType.createMasterResourceAdapter(
+          {
+            pluginManager: this,
+            dataPath: this._getMasterResourceAdapterDataPath({
+              plugin: plugin.name,
+              resourceType: resourceType.name,
+            }),
+            binary: this._binary,
+            portAllocator: this._portAllocator,
+          },
+        );
         const resourcesManager = new ResourcesManager({
           log: this._log,
-          pluginManager: this,
           dataPath: this._getResourcesManagerDataPath({
             plugin: plugin.name,
             resourceType: resourceType.name,
           }),
-          binary: this._binary,
           resourceType,
+          masterResourceAdapter,
           portAllocator: this._portAllocator,
         });
         await resourcesManager.init();
@@ -214,7 +225,21 @@ export default class PluginManager {
     return this._resourcesManagers[pluginName][resourceTypeName];
   }
 
-  _getResourcesManagerDataPath({
+  _getResourcesManagerDataPath(options: {|
+    plugin: string,
+    resourceType: string,
+  |}): string {
+    return path.resolve(this._getPluginPath(options), MANAGER_PATH);
+  }
+
+  _getMasterResourceAdapterDataPath(options: {|
+    plugin: string,
+    resourceType: string,
+  |}): string {
+    return path.resolve(this._getPluginPath(options), MASTER_PATH);
+  }
+
+  _getPluginPath({
     plugin,
     resourceType,
   }: {|
@@ -223,7 +248,6 @@ export default class PluginManager {
   |}): string {
     return path.resolve(
       this._dataPath,
-      MANAGERS_PATH,
       pluginsUtil.cleanPluginName({ pluginName: plugin }),
       resourceType,
     );

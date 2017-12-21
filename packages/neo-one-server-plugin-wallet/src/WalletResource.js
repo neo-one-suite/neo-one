@@ -8,85 +8,73 @@ import {
   constants as networkConstants,
 } from '@neo-one/server-plugin-network';
 import type { Observable } from 'rxjs/Observable';
-import type { Log, PluginManager } from '@neo-one/server';
+import type { PluginManager } from '@neo-one/server';
+import {
+  type LocalWallet,
+  type Network as ClientNetwork,
+  type NetworkType as ClientNetworkType,
+  createPrivateKey,
+  networks,
+  privateKeyToWIF,
+} from '@neo-one/client';
 
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { concatMap, map, shareReplay, take } from 'rxjs/operators';
 import fs from 'fs-extra';
-import mainClient, { Client, testClient } from '@neo-one/client';
 import path from 'path';
-import { of as _of } from 'rxjs/observable/of';
 import { timer } from 'rxjs/observable/timer';
 import { utils } from '@neo-one/utils';
 
+import { NetworkRequiredError } from './errors';
+import type { WalletClient } from './types';
 import type WalletResourceType, { Coin, Wallet } from './WalletResourceType';
 
-const getNetworkType = ({
-  networkName,
-  network,
-}: {|
-  networkName: string,
-  network?: ?Network,
-|}): NetworkType => {
+import { getClientNetwork } from './utils';
+
+const getRPCURL = (network?: ?Network): ?string => {
   if (network == null) {
-    if (networkName === networkConstants.NETWORK_NAME.MAIN) {
-      return networkConstants.NETWORK_TYPE.MAIN;
-    } else if (networkName === networkConstants.NETWORK_NAME.TEST) {
-      return networkConstants.NETWORK_TYPE.TEST;
-    }
-
-    return networkConstants.NETWORK_TYPE.PRIVATE;
-  }
-
-  return network.type;
-};
-
-const makeClient = ({
-  networkName,
-  network,
-}: {|
-  networkName: string,
-  network?: ?Network,
-|}): {| client: Client, ready: boolean |} => {
-  const networkType = getNetworkType({ networkName, network });
-  const returnNotReadyClient = () => {
-    if (networkType === networkConstants.NETWORK_TYPE.MAIN) {
-      return { client: mainClient, ready: true };
-    } else if (networkType === networkConstants.NETWORK_TYPE.TEST) {
-      return { client: testClient, ready: true };
-    }
-
-    return { client: mainClient, ready: false };
-  };
-
-  if (network == null) {
-    if (networkType === networkConstants.NETWORK_TYPE.PRIVATE) {
-      throw new Error(`Private network ${networkName} does not exist.`);
-    }
-    return returnNotReadyClient();
+    return null;
   }
 
   if (network.state === 'started') {
     const readyNode = network.nodes.find(node => node.ready);
-    if (readyNode == null) {
-      return returnNotReadyClient();
+    if (readyNode != null) {
+      return readyNode.rpcAddress;
     }
-
-    let type = 'main';
-    if (network.type === networkConstants.NETWORK_TYPE.TEST) {
-      type = 'test';
-    }
-
-    return {
-      client: new Client({
-        url: readyNode.rpcAddress,
-        type,
-      }),
-      ready: true,
-    };
   }
 
-  return returnNotReadyClient();
+  return network.nodes[0].rpcAddress;
+};
+
+const updateClient = ({
+  networkName,
+  network,
+  client,
+}: {|
+  networkName: string,
+  network?: ?Network,
+  client: WalletClient,
+|}) => {
+  const rpcURL = getRPCURL(network);
+  if (rpcURL == null) {
+    if (networkName === networkConstants.NETWORK_NAME.MAIN) {
+      client.userAccountProvider.provider.addNetwork({
+        network: networks.MAIN,
+        rpcURL: networks.MAIN_URL,
+      });
+    } else if (networkName === networkConstants.NETWORK_NAME.TEST) {
+      client.userAccountProvider.provider.addNetwork({
+        network: networks.TEST,
+        rpcURL: networks.TEST_URL,
+      });
+    }
+  } else {
+    const clientNetwork = getClientNetwork(networkName);
+    client.userAccountProvider.provider.addNetwork({
+      network: clientNetwork,
+      rpcURL,
+    });
+  }
 };
 
 const getNetwork$ = ({
@@ -112,23 +100,20 @@ const getNetwork$ = ({
 };
 
 type WalletResourceOptions = {|
+  client: WalletClient,
   pluginManager: PluginManager,
   resourceType: WalletResourceType,
   name: string,
   baseName: string,
   networkName: string,
-  networkType: NetworkType,
-  networkExists: boolean,
   address: string,
-  privateKey?: string,
-  nep2?: string,
-  publicKey: string,
-  scriptHash: string,
   dataPath: string,
   walletPath: string,
+  clientNetwork: ClientNetwork,
 |};
 
 type NewWalletResourceOptions = {|
+  client: WalletClient,
   pluginManager: PluginManager,
   resourceType: WalletResourceType,
   name: string,
@@ -138,36 +123,26 @@ type NewWalletResourceOptions = {|
 |};
 
 type ExistingWalletResourceOptions = {|
+  client: WalletClient,
   pluginManager: PluginManager,
   resourceType: WalletResourceType,
   name: string,
   dataPath: string,
 |};
 
-type SavedWallet = {|
-  address: string,
-  privateKey?: string,
-  nep2?: string,
-  publicKey: string,
-  scriptHash: string,
-|};
-
 const WALLET_PATH = 'wallet.json';
 
 export default class WalletResource {
+  _client: WalletClient;
   _resourceType: WalletResourceType;
   _name: string;
   _baseName: string;
   _networkName: string;
   _networkType: NetworkType;
-  _networkExists: boolean;
   _address: string;
-  _privateKey: ?string;
-  _nep2: ?string;
-  _publicKey: string;
-  _scriptHash: string;
   _dataPath: string;
   _walletPath: string;
+  _clientNetwork: ClientNetwork;
 
   _deleted: boolean;
   _neoBalance: ?BigNumber;
@@ -178,34 +153,34 @@ export default class WalletResource {
   resource$: Observable<Wallet>;
 
   constructor({
+    client,
     pluginManager,
     resourceType,
     name,
     baseName,
     networkName,
-    networkType,
-    networkExists,
     address,
-    privateKey,
-    nep2,
-    publicKey,
-    scriptHash,
     dataPath,
     walletPath,
+    clientNetwork,
   }: WalletResourceOptions) {
+    this._client = client;
     this._resourceType = resourceType;
     this._name = name;
     this._baseName = baseName;
     this._networkName = networkName;
-    this._networkType = networkType;
-    this._networkExists = networkExists;
     this._address = address;
-    this._privateKey = privateKey;
-    this._nep2 = nep2;
-    this._publicKey = publicKey;
-    this._scriptHash = scriptHash;
     this._dataPath = dataPath;
     this._walletPath = walletPath;
+    this._clientNetwork = clientNetwork;
+
+    if (networkName === networkConstants.NETWORK_NAME.MAIN) {
+      this._networkType = networkConstants.NETWORK_TYPE.MAIN;
+    } else if (networkName === networkConstants.NETWORK_NAME.TEST) {
+      this._networkType = networkConstants.NETWORK_TYPE.TEST;
+    } else {
+      this._networkType = networkConstants.NETWORK_TYPE.PRIVATE;
+    }
 
     this._deleted = false;
     this._neoBalance = null;
@@ -213,12 +188,7 @@ export default class WalletResource {
     this._balance = [];
 
     this._network$ = getNetwork$({ pluginManager, networkName });
-    let timer$ = timer(0, 5000);
-    if (networkExists) {
-      timer$ = _of(null);
-    }
-
-    this.resource$ = combineLatest(this._network$, timer$).pipe(
+    this.resource$ = combineLatest(this._network$, timer(0, 5000)).pipe(
       concatMap(async value => {
         await this._update(value[0]);
         return this._toResource();
@@ -228,70 +198,61 @@ export default class WalletResource {
   }
 
   static async createNew({
+    client,
     pluginManager,
     resourceType,
     name,
-    privateKey: privateKeyIn,
+    privateKey,
     password,
     dataPath,
   }: NewWalletResourceOptions): Promise<WalletResource> {
     const { name: baseName, names: [networkName] } = compoundName.extract(name);
 
-    const network = await getNetwork$({
-      pluginManager,
-      networkName,
-    })
+    const network = await getNetwork$({ networkName, pluginManager })
       .pipe(take(1))
       .toPromise();
-    const networkType = getNetworkType({ networkName, network });
-    const { client } = makeClient({
-      networkName,
-      network,
-    });
-
-    let privateKey =
-      privateKeyIn == null ? client.createPrivateKey() : privateKeyIn;
-    const publicKey = client.privateKeyToPublicKey(privateKey);
-    const scriptHash = client.publicKeyToScriptHash(publicKey);
-    const address = client.scriptHashToAddress(scriptHash);
-
-    let nep2;
-    if (networkType === networkConstants.NETWORK_TYPE.MAIN) {
-      if (password == null) {
-        throw new Error('Password is required for MainNet wallets.');
-      }
-      nep2 = await client.encryptNEP2({
-        privateKey,
-        password,
-      });
-      privateKey = undefined;
+    if (
+      network == null &&
+      !(
+        networkName === networkConstants.NETWORK_NAME.MAIN ||
+        networkName === networkConstants.NETWORK_NAME.TEST
+      )
+    ) {
+      throw new NetworkRequiredError();
     }
 
+    updateClient({ networkName, network, client });
+    const clientNetwork = getClientNetwork(networkName);
+    const wallet = await client.userAccountProvider.keystore.addAccount({
+      network: clientNetwork,
+      name: baseName,
+      privateKey: privateKey == null ? createPrivateKey() : privateKey,
+      password,
+    });
+    const { address } = wallet.account;
+
     const walletPath = this._getWalletPath(dataPath);
+    await fs.ensureDir(path.dirname(walletPath));
+    await fs.writeJSON(walletPath, { address });
+
     const walletResource = new WalletResource({
+      client,
       pluginManager,
       resourceType,
       name,
       baseName,
       networkName,
-      networkType,
-      networkExists: network != null,
       address,
-      privateKey,
-      nep2,
-      publicKey,
-      scriptHash,
       dataPath,
       walletPath,
+      clientNetwork,
     });
-
-    await fs.ensureDir(path.dirname(walletPath));
-    await walletResource._save({ throwError: true });
 
     return walletResource;
   }
 
   static async createExisting({
+    client,
     pluginManager,
     resourceType,
     name,
@@ -299,114 +260,82 @@ export default class WalletResource {
   }: ExistingWalletResourceOptions): Promise<WalletResource> {
     const { name: baseName, names: [networkName] } = compoundName.extract(name);
 
-    const network = await getNetwork$({
-      pluginManager,
-      networkName,
-    })
+    const network = await getNetwork$({ networkName, pluginManager })
       .pipe(take(1))
       .toPromise();
-    const networkType = getNetworkType({ networkName, network });
+    updateClient({ networkName, network, client });
+    const clientNetwork = getClientNetwork(networkName);
 
     const walletPath = this._getWalletPath(dataPath);
-    const savedWallet = await this._loadSavedWallet(
-      resourceType.plugin.log,
-      walletPath,
-    );
+    const { address } = await fs.readJSON(walletPath);
 
     return new WalletResource({
+      client,
       pluginManager,
       resourceType,
       name,
       baseName,
       networkName,
-      networkType,
-      networkExists: network != null,
-      address: savedWallet.address,
-      privateKey: savedWallet.privateKey,
-      nep2: savedWallet.nep2,
-      publicKey: savedWallet.publicKey,
-      scriptHash: savedWallet.scriptHash,
+      address,
       dataPath,
       walletPath,
+      clientNetwork,
     });
   }
 
   async delete(): Promise<void> {
     this._deleted = true;
+    await this._client.userAccountProvider.keystore.deleteAccount(
+      this.walletID,
+    );
     await fs.remove(this._dataPath);
   }
 
   async _update(network?: Network): Promise<void> {
-    // eslint-disable-next-line
-    const { client, ready } = makeClient({
+    updateClient({
       networkName: this._networkName,
       network,
+      client: this._client,
     });
-    if (ready) {
-      // TODO: Updates
-    }
   }
 
-  async _save(optionsIn?: {| throwError?: boolean |}): Promise<void> {
-    if (this._deleted) {
-      return;
-    }
-
-    const { throwError } = optionsIn || {};
-    const savedWallet = this._getSavedWallet();
-    try {
-      await fs.writeFile(this._walletPath, JSON.stringify(savedWallet));
-    } catch (error) {
-      if (throwError) {
-        throw error;
-      }
-    }
-  }
-
-  _getSavedWallet(): SavedWallet {
+  get walletID(): {|
+    networkType: ClientNetworkType,
+    address: string,
+  |} {
     return {
+      networkType: this._clientNetwork.type,
       address: this._address,
-      privateKey:
-        this._networkType === networkConstants.NETWORK_TYPE.MAIN ||
-        this._privateKey == null
-          ? undefined
-          : this._privateKey,
-      nep2: this._nep2 == null ? undefined : this._nep2,
-      publicKey: this._publicKey,
-      scriptHash: this._scriptHash,
     };
   }
 
+  get wallet(): LocalWallet {
+    return this._client.userAccountProvider.keystore.getWallet(this.walletID);
+  }
+
   get unlocked(): boolean {
-    return this._privateKey != null;
+    return this.wallet.privateKey != null;
   }
 
   async unlock({ password }: {| password: string |}): Promise<void> {
-    const client = await this.getClient();
-    const nep2 = this._nep2;
-    if (nep2 == null) {
-      throw new Error('Wallet does not have an encrypted key');
-    }
-
-    this._privateKey = await client.decryptNEP2({
-      encryptedKey: nep2,
+    await this._client.userAccountProvider.keystore.unlockWallet({
+      id: this.walletID,
       password,
     });
   }
 
   lock(): void {
-    if (this._nep2 != null) {
-      this._privateKey = null;
-    }
+    this._client.userAccountProvider.keystore.lockWallet(this.walletID);
   }
 
-  async getClient(): Promise<Client> {
-    const network = await this._network$.pipe(take(1)).toPromise();
-    const { client } = makeClient({
-      networkName: this._networkName,
-      network,
+  get wif(): ?string {
+    if (this.wallet.privateKey == null) {
+      return null;
+    }
+    return privateKeyToWIF({
+      privateKey: this.wallet.privateKey,
+      privateKeyVersion: this._clientNetwork.privateKeyVersion,
     });
-    return client;
   }
 
   _toResource(): Wallet {
@@ -423,28 +352,12 @@ export default class WalletResource {
         this._neoBalance == null ? 'Unknown' : this._neoBalance.toString(),
       gasBalance:
         this._gasBalance == null ? 'Unknown' : this._gasBalance.toString(),
-      privateKey: this._privateKey,
-      nep2: this._nep2,
-      publicKey: this._publicKey,
-      scriptHash: this._scriptHash,
+      privateKey: this.wif,
+      nep2: this.wallet.nep2,
+      publicKey: this.wallet.account.publicKey,
+      scriptHash: this.wallet.account.scriptHash,
       balance: this._balance,
     };
-  }
-
-  static async _loadSavedWallet(
-    log: Log,
-    walletPath: string,
-  ): Promise<SavedWallet> {
-    try {
-      const savedWallet = await fs.readFile(walletPath, 'utf8');
-      return JSON.parse(savedWallet);
-    } catch (error) {
-      log({
-        event: 'WALLET_RESOURCE_LOAD_SAVED_WALLET_ERROR',
-        error,
-      });
-      throw error;
-    }
   }
 
   static _getWalletPath(dataPath: string): string {

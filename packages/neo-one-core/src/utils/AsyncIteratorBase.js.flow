@@ -1,0 +1,6 @@
+/* @flow */
+/* eslint-disable */
+declare export default class AsyncIteratorBase<+Yield, +Return, -Next> extends $AsyncIterator<Yield, Return, Next> {
+  constructor(): AsyncIteratorBase<Yield, Return, Next>;
+  @@asyncIterator(): $AsyncIterator<Yield,Return,Next>;
+}

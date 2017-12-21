@@ -14,7 +14,6 @@ import Header, { type HeaderKey } from './Header';
 import { SCRIPT_CONTAINER_TYPE } from './ScriptContainer';
 import {
   TRANSACTION_TYPE,
-  type BasicTransactionJSON,
   type FeeContext,
   type Input,
   type Output,
@@ -72,11 +71,6 @@ export type BlockVerifyOptions = {|
 export type BlockJSON = {|
   ...BlockBaseJSON,
   tx: Array<TransactionJSON>,
-|};
-
-export type BasicBlockJSON = {|
-  ...BlockBaseJSON,
-  tx: Array<BasicTransactionJSON>,
 |};
 
 export default class Block extends BlockBase

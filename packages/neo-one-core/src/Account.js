@@ -43,7 +43,7 @@ export type AccountUpdate = {|
   unclaimed?: Array<Input>,
 |};
 
-export type BasicAccountJSON = {|
+export type AccountJSON = {|
   version: number,
   script_hash: string,
   frozen: boolean,
@@ -52,10 +52,6 @@ export type BasicAccountJSON = {|
     asset: string,
     value: string,
   |}>,
-|};
-
-export type AccountJSON = {|
-  ...BasicAccountJSON,
   unspent: Array<InputJSON>,
   unclaimed: Array<InputJSON>,
 |};

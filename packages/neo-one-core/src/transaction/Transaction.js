@@ -26,10 +26,7 @@ import type { EnrollmentTransactionJSON } from './EnrollmentTransaction';
 import type { RegisterTransactionJSON } from './RegisterTransaction';
 import type { ContractTransactionJSON } from './ContractTransaction';
 import type { PublishTransactionJSON } from './PublishTransaction';
-import type {
-  BasicInvocationTransactionJSON,
-  InvocationTransactionJSON,
-} from './InvocationTransaction';
+import type { InvocationTransactionJSON } from './InvocationTransaction';
 
 export type Transaction =
   | MinerTransaction
@@ -41,16 +38,6 @@ export type Transaction =
   | PublishTransaction
   | InvocationTransaction;
 
-export type BasicTransactionJSON =
-  | MinerTransactionJSON
-  | IssueTransactionJSON
-  | ClaimTransactionJSON
-  | EnrollmentTransactionJSON
-  | RegisterTransactionJSON
-  | ContractTransactionJSON
-  | PublishTransactionJSON
-  | BasicInvocationTransactionJSON;
-
 export type TransactionJSON =
   | MinerTransactionJSON
   | IssueTransactionJSON
@@ -60,6 +47,12 @@ export type TransactionJSON =
   | ContractTransactionJSON
   | PublishTransactionJSON
   | InvocationTransactionJSON;
+
+export type TransactionReceiptJSON = {|
+  blockIndex: number,
+  blockHash: string,
+  transactionIndex: number,
+|};
 
 export type TransactionKey = {| hash: UInt256 |};
 

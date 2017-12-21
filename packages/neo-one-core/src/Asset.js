@@ -63,10 +63,10 @@ export type AssetUpdate = {|
 
 export type AssetNameJSON =
   | string
-  | {|
+  | Array<{|
       lang: string,
       name: string,
-    |};
+    |}>;
 
 export type AssetJSON = {|
   version: number,

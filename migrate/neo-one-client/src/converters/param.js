@@ -32,6 +32,7 @@ const tryConvertHash256 = (param: ParamLike): ?Param => {
 
 const convert = (client: ClientBase, param: ParamLike): Param => {
   if (Array.isArray(param)) {
+    // $FlowFixMe
     return param.map(value => convert(client, value));
   }
 

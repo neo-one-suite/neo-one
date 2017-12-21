@@ -18,6 +18,8 @@ export type {
 } from './CRUDResourceBase';
 export type { ResourceAdapter } from './ResourceAdapter';
 export type {
+  MasterResourceAdapter,
   ResourceAdapterOptions,
   ResourceAdapterReady,
-} from './ResourceType';
+} from './MasterResourceAdapter';
+export type { MasterResourceAdapterOptions } from './ResourceType';

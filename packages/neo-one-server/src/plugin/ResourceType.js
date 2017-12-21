@@ -5,30 +5,16 @@ import type {
   Client,
   DescribeTable,
   ListTable,
-  Progress,
 } from '@neo-one/server-common';
 import type { Observable } from 'rxjs/Observable';
 
 import { map } from 'rxjs/operators';
 
 import CRUD from './CRUD';
-import type PortAllocator from '../PortAllocator';
 import type Plugin from './Plugin';
+import type PortAllocator from '../PortAllocator';
 import type PluginManager from '../PluginManager';
-import type { ResourceAdapter } from './ResourceAdapter';
-
-export type ResourceAdapterOptions = {|
-  // PluginManager
-  pluginManager: PluginManager,
-  // Full name of the resource.
-  name: string,
-  // Data path to store all data for the resource.
-  dataPath: string,
-  // Binary to use to execute commands, e.g. added by Plugin#commands
-  binary: Binary,
-  // Allocate ports for the resource.
-  portAllocator: PortAllocator,
-|};
+import type { MasterResourceAdapter } from './MasterResourceAdapter';
 
 export type ResourceTypeOptions = {|
   +plugin: Plugin,
@@ -48,13 +34,15 @@ export type ResourceTypeOptions = {|
   |},
 |};
 
-export type ResourceAdapterReady<
-  Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
-> = {|
-  type: 'ready',
-  resourceAdapter: ResourceAdapter<Resource, ResourceOptions>,
+export type MasterResourceAdapterOptions = {|
+  // PluginManager
+  pluginManager: PluginManager,
+  // Data path to store all data for the master adapter.
+  dataPath: string,
+  // Binary to use to execute commands, e.g. added by Plugin#commands
+  binary: Binary,
+  // Allocate ports for the resource.
+  portAllocator: PortAllocator,
 |};
 
 export default class ResourceType<
@@ -106,21 +94,11 @@ export default class ResourceType<
       .pipe(map(resource => (resource: $FlowFixMe)));
   }
 
-  // ResourceAdapter for this ResourceType.
-  initResourceAdapter(
+  createMasterResourceAdapter(
     // eslint-disable-next-line
-    options: ResourceAdapterOptions,
-  ): Promise<ResourceAdapter<Resource, ResourceOptions>> {
+    options: MasterResourceAdapterOptions,
+  ): Promise<MasterResourceAdapter<Resource, ResourceOptions>> {
     return Promise.reject(new Error('Not Implemented'));
-  }
-
-  createResourceAdapter$(
-    // eslint-disable-next-line
-    adapterOptions: ResourceAdapterOptions,
-    // eslint-disable-next-line
-    options: ResourceOptions,
-  ): Observable<Progress | ResourceAdapterReady<Resource, ResourceOptions>> {
-    throw new Error('Not Implemented');
   }
 
   // CRUD for this ResourceType.

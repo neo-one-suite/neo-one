@@ -35,6 +35,7 @@ declare module 'bignumber.js' {
     toFormat(dp?: number): string;
     toNumber(): number;
     toString(base?: Base): string;
+    isBigNumber: boolean;
   }
   declare module.exports: Class<BigNumber>;
 }

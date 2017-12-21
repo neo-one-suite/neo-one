@@ -3,8 +3,10 @@ import type { Action } from './action';
 import type Asset from './Asset';
 import type Contract from './Contract';
 import { BinaryReader, BinaryWriter } from './utils';
+import type { ECPoint, UInt160 } from './common';
 import type { InvocationResult } from './invocationResult';
 import type { FeeContext, InvocationTransaction } from './transaction';
+import type Validator from './Validator';
 
 export type DeserializeWireContext = {|
   messageMagic: number,
@@ -52,15 +54,19 @@ export function createDeserializeWire<T>(
 export type InvocationData = {|
   asset: ?Asset,
   contracts: Array<Contract>,
-  actions: Array<Action>,
+  deletedContractHashes: Array<UInt160>,
+  migratedContractHashes: Array<[UInt160, UInt160]>,
+  voteUpdates: Array<[UInt160, Array<ECPoint>]>,
+  validators: Array<Validator>,
   result: InvocationResult,
+  actions: Array<Action>,
 |};
 export type SerializeJSONContext = {|
   addressVersion: number,
   feeContext: FeeContext,
-  getInvocationData: (
+  tryGetInvocationData: (
     transaction: InvocationTransaction,
-  ) => Promise<InvocationData>,
+  ) => Promise<?InvocationData>,
 |};
 
 export type SerializeJSON<TJSON> = (

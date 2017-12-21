@@ -1,16 +1,16 @@
 /* @flow */
 import type {
-  BasicAccount,
-  BasicBlock,
+  Account,
+  Block,
   BasicClientProvider,
-  BasicInvocationResult,
-  BasicTransaction,
+  InvocationResult,
+  Transaction,
 } from '../types';
 import JSONRPCBasicClientBaseProvider from './JSONRPCBasicClientBaseProvider';
 
 export default class JSONRPCBasicClientProvider extends JSONRPCBasicClientBaseProvider<
-  BasicBlock,
-  BasicTransaction,
-  BasicAccount,
-  BasicInvocationResult,
+  Block,
+  Transaction,
+  Account,
+  InvocationResult,
 > implements BasicClientProvider {}

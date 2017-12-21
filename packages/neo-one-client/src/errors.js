@@ -1,20 +1,7 @@
 /* @flow */
 import type BigNumber from 'bignumber.js';
 
-import type {
-  ContractParameter,
-  ContractParameterType,
-  NotificationAction,
-} from './types';
-
-export class UnknownBlockError extends Error {
-  code: string;
-
-  constructor() {
-    super('Unknown block');
-    this.code = 'UNKNOWN_BLOCK';
-  }
-}
+import type { ContractParameter, ContractParameterType } from './types'; // eslint-disable-line
 
 export class InvalidContractParameterError extends Error {
   parameter: ContractParameter;
@@ -38,27 +25,26 @@ export class InvalidContractParameterError extends Error {
 export class InvalidArgumentError extends Error {
   code: string;
 
-  constructor(name: string, argument: mixed) {
-    super(`Invalid argument for ${name}: ${String(argument)}`);
-    this.code = 'INVALID_ARGUMENT';
-  }
-}
-
-export class InvalidParamError extends Error {
-  code: string;
-
   constructor(message: string) {
     super(message);
     this.code = 'INVALID_ARGUMENT';
   }
 }
 
-export class SendTransactionError extends Error {
+export class InvalidNamedArgumentError extends InvalidArgumentError {
   code: string;
 
-  constructor() {
-    super('Something went wrong!');
-    this.code = 'SEND_TRANSACTION';
+  constructor(name: string, argument: mixed) {
+    super(`Invalid argument for ${name}: ${String(argument)}`);
+  }
+}
+
+export class InvalidEventError extends Error {
+  code: string;
+
+  constructor(message: string) {
+    super(message);
+    this.code = 'INVALID_EVENT';
   }
 }
 
@@ -98,6 +84,24 @@ export class NothingToTransferError extends Error {
   }
 }
 
+export class NoAccountError extends Error {
+  code: string;
+
+  constructor() {
+    super('No account exists.');
+    this.code = 'NO_ACCOUNT';
+  }
+}
+
+export class InvalidTransactionError extends Error {
+  code: string;
+
+  constructor(message: string) {
+    super(message);
+    this.code = 'INVALID_TRANSACTION';
+  }
+}
+
 export class InvokeError extends Error {
   code: string;
   constructor(message: string) {
@@ -106,13 +110,56 @@ export class InvokeError extends Error {
   }
 }
 
-export class NotificationMissingEventError extends Error {
-  notification: NotificationAction;
+export class UnknownBlockError extends Error {
   code: string;
 
-  constructor(notification: NotificationAction) {
-    super(`Notification missing event.`);
-    this.notification = notification;
-    this.code = 'NOTIFICATION_MISSING_EVENT';
+  constructor() {
+    super('Unknown block');
+    this.code = 'UNKNOWN_BLOCK';
+  }
+}
+
+export class RelayTransactionError extends Error {
+  code: string;
+
+  constructor() {
+    super('Transaction relay failed.');
+    this.code = 'RELAY_TRANSACTION';
+  }
+}
+
+export class UnknownNetworkError extends Error {
+  code: string;
+
+  constructor(name: string) {
+    super(`Unknown network ${name}`);
+    this.code = 'UNKNOWN_NETWORK';
+  }
+}
+
+export class UnknownAccountError extends Error {
+  code: string;
+
+  constructor(address: string) {
+    super(`Unknown account ${address}`);
+    this.code = 'UNKNOWN_ACCOUNT';
+  }
+}
+
+export class LockedAccountError extends Error {
+  code: string;
+
+  constructor(address: string) {
+    super(`Account ${address} is locked`);
+    this.code = 'LOCKED_ACCOUNT';
+  }
+}
+
+export class PasswordRequiredError extends Error {
+  code: string;
+
+  constructor() {
+    super('A password is required when creating accounts on the MainNet.');
+    this.code = 'PASSWORD_REQUIRED';
   }
 }

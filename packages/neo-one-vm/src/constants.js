@@ -4,9 +4,11 @@ import {
   type ExecutionAction,
   type TriggerType,
   type VMContext,
+  type VMListeners,
   type WriteBlockchain,
 } from '@neo-one/node-core';
 import {
+  type Block,
   type OpCode,
   type ScriptContainer,
   type SysCallName,
@@ -46,6 +48,9 @@ export type ExecutionInit = {|
   action: ExecutionAction,
   // eslint-disable-next-line
   onStep?: (input: {| context: VMContext, opCode: OpCode |}) => void,
+  listeners: VMListeners,
+  skipWitnessVerify: boolean,
+  persistingBlock?: Block,
 |};
 type CreatedContracts = { [hash: UInt160Hex]: UInt160 };
 export type Options = {|

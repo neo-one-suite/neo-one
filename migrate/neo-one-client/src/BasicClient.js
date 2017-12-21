@@ -1,12 +1,12 @@
 /* @flow */
 import type {
   ABI,
-  BasicAccount,
-  BasicBlock,
+  Account,
+  Block,
   BasicClientProvider,
-  BasicInvocationResult,
+  InvocationResult,
   BasicSmartContract,
-  BasicTransaction,
+  Transaction,
 } from './types';
 import BasicClientBase from './BasicClientBase';
 import { JSONRPCBasicClientProvider, JSONRPCHTTPProvider } from './json';
@@ -20,10 +20,10 @@ export type BasicClientOptions = {|
 |};
 
 export default class BasicClient extends BasicClientBase<
-  BasicBlock,
-  BasicTransaction,
-  BasicAccount,
-  BasicInvocationResult,
+  Block,
+  Transaction,
+  Account,
+  InvocationResult,
   BasicSmartContract,
   BasicClientProvider,
 > {

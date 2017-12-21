@@ -1,20 +1,20 @@
 /* @flow */
 import {
-  type ResourceAdapter,
-  type ResourceAdapterOptions,
-  type ResourceAdapterReady,
+  type MasterResourceAdapter,
+  type MasterResourceAdapterOptions,
   CRUD,
   ResourceType,
 } from '@neo-one/server';
-import type { Observable } from 'rxjs/Observable';
 import {
   type DescribeTable,
   type ListTable,
-  type Progress,
   type ResourceState,
 } from '@neo-one/server-common';
+import { LocalFileStore } from '@neo-one/client-node';
 
 import _ from 'lodash';
+import { localClient } from '@neo-one/client';
+import path from 'path';
 
 import {
   StartWalletCRUD,
@@ -24,10 +24,8 @@ import {
   GetWalletCRUD,
   DescribeWalletCRUD,
 } from './crud';
+import MasterWalletResourceAdapter from './MasterWalletResourceAdapter';
 import type WalletPlugin from './WalletPlugin';
-import WalletResourceAdapter, {
-  type WalletResourceAdapterInitOptions,
-} from './WalletResourceAdapter';
 
 export type Coin = {|
   asset: string,
@@ -56,6 +54,8 @@ export type WalletResourceOptions = {|
   privateKey?: string,
 |};
 
+const WALLETS_PATH = 'wallets';
+
 export default class WalletResourceType extends ResourceType<
   Wallet,
   WalletResourceOptions,
@@ -73,35 +73,22 @@ export default class WalletResourceType extends ResourceType<
     });
   }
 
-  initResourceAdapter(
-    options: ResourceAdapterOptions,
-  ): Promise<ResourceAdapter<Wallet, WalletResourceOptions>> {
-    return WalletResourceAdapter.init(this._getResourceAdapterOptions(options));
-  }
-
-  createResourceAdapter$(
-    adapterOptions: ResourceAdapterOptions,
-    options: WalletResourceOptions,
-  ): Observable<
-    Progress | ResourceAdapterReady<Wallet, WalletResourceOptions>,
-  > {
-    return WalletResourceAdapter.create$(
-      this._getResourceAdapterOptions(adapterOptions),
-      options,
-    );
-  }
-
-  _getResourceAdapterOptions({
+  async createMasterResourceAdapter({
     pluginManager,
-    name,
     dataPath,
-  }: ResourceAdapterOptions): WalletResourceAdapterInitOptions {
-    return {
+  }: MasterResourceAdapterOptions): Promise<
+    MasterResourceAdapter<Wallet, WalletResourceOptions>,
+  > {
+    const client = await localClient({
+      store: new LocalFileStore({
+        dataPath: path.resolve(dataPath, WALLETS_PATH),
+      }),
+    });
+    return new MasterWalletResourceAdapter({
+      client,
       pluginManager,
-      name,
-      dataPath,
       resourceType: this,
-    };
+    });
   }
 
   getCRUD(): CRUD<Wallet, WalletResourceOptions> {

@@ -77,6 +77,7 @@ export default {
       throw new InvalidParamError(`Expected Array: ${String(param)}`);
     }
 
+    // $FlowFixMe
     return param.map(value => converters.param(client, value));
   },
   // eslint-disable-next-line

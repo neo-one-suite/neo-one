@@ -2,6 +2,7 @@
 import type BN from 'bn.js';
 
 import { TRANSACTION_TYPE } from './TransactionType';
+import { type Attribute } from './attribute';
 import type { ActionJSON } from '../action';
 import type { AssetJSON } from '../Asset';
 import type { ContractJSON } from '../Contract';
@@ -17,8 +18,10 @@ import TransactionBase, {
   type TransactionVerifyOptions,
 } from './TransactionBase';
 import { InvalidFormatError, VerifyError } from '../errors';
+import type { ValidatorJSON } from '../Validator';
 import type Witness from '../Witness';
 
+import common from '../common';
 import utils, { type BinaryWriter, IOHelper, JSONHelper } from '../utils';
 
 export type InvocationTransactionAdd = {|
@@ -27,19 +30,24 @@ export type InvocationTransactionAdd = {|
   script: Buffer,
 |};
 
-export type BasicInvocationTransactionJSON = {|
+export type InvocationDataJSON = {|
+  result: InvocationResultJSON,
+  asset?: AssetJSON,
+  contracts: Array<ContractJSON>,
+  deletedContractHashes: Array<string>,
+  migratedContractHashes: Array<[string, string]>,
+  voteUpdates: Array<[string, Array<string>]>,
+  validators: Array<ValidatorJSON>,
+  actions: Array<ActionJSON>,
+|};
+
+export type InvocationTransactionJSON = {|
   ...TransactionBaseJSON,
   type: 'InvocationTransaction',
   script: string,
   gas: string,
-|};
-
-export type InvocationTransactionJSON = {|
-  ...BasicInvocationTransactionJSON,
-  result: InvocationResultJSON,
-  asset?: AssetJSON,
-  contracts: Array<ContractJSON>,
-  actions: Array<ActionJSON>,
+  // TODO: Pull this out
+  data?: InvocationDataJSON,
 |};
 
 export default class InvocationTransaction extends TransactionBase<
@@ -100,13 +108,19 @@ export default class InvocationTransaction extends TransactionBase<
     return this.__size();
   }
 
-  clone(scripts: Array<Witness>): this {
+  clone({
+    scripts,
+    attributes,
+  }: {|
+    scripts?: Array<Witness>,
+    attributes?: Array<Attribute>,
+  |}): this {
     return new this.constructor({
       version: this.version,
-      attributes: this.attributes,
+      attributes: attributes || this.attributes,
       inputs: this.inputs,
       outputs: this.outputs,
-      scripts,
+      scripts: scripts || this.scripts,
       gas: this.gas,
       script: this.script,
     });
@@ -165,12 +179,44 @@ export default class InvocationTransaction extends TransactionBase<
       context,
     );
 
-    const {
-      asset,
-      contracts,
-      actions,
-      result,
-    } = await context.getInvocationData(this);
+    const data = await context.tryGetInvocationData(this);
+    let dataJSON;
+    if (data != null) {
+      const {
+        asset,
+        contracts,
+        deletedContractHashes,
+        migratedContractHashes,
+        voteUpdates,
+        actions,
+        result,
+        validators,
+      } = data;
+      dataJSON = {
+        result: result.serializeJSON(context),
+        asset: asset == null ? undefined : asset.serializeJSON(context),
+        contracts: contracts.map(contract => contract.serializeJSON(context)),
+        deletedContractHashes: deletedContractHashes.map(hash =>
+          common.uInt160ToString(hash),
+        ),
+        migratedContractHashes: migratedContractHashes.map(([from, to]) => [
+          common.uInt160ToString(from),
+          common.uInt160ToString(to),
+        ]),
+        voteUpdates: voteUpdates.map(([address, votes]) => [
+          common.uInt160ToString(address),
+          votes.map(vote => common.ecPointToString(vote)),
+        ]),
+        actions: actions.map(action => action.serializeJSON(context)),
+        validators: validators.map(validator =>
+          validator.serializeJSON(context),
+        ),
+      };
+
+      if (dataJSON.asset == null) {
+        delete dataJSON.asset;
+      }
+    }
 
     const json = {
       type: 'InvocationTransaction',
@@ -185,13 +231,10 @@ export default class InvocationTransaction extends TransactionBase<
       net_fee: transactionBaseJSON.net_fee,
       script: JSONHelper.writeBuffer(this.script),
       gas: JSONHelper.writeFixed8(this.gas),
-      result: result.serializeJSON(context),
-      asset: asset == null ? undefined : asset.serializeJSON(context),
-      contracts: contracts.map(contract => contract.serializeJSON(context)),
-      actions: actions.map(action => action.serializeJSON(context)),
+      data: dataJSON,
     };
-    if (asset == null) {
-      delete json.asset;
+    if (json.data == null) {
+      delete json.data;
     }
 
     return json;

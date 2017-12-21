@@ -194,24 +194,27 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
   }
 
   // eslint-disable-next-line
-  clone(scripts: Array<Witness>): this {
+  clone(options: {|
+    scripts?: Array<Witness>,
+    attributes?: Array<Attribute>,
+  |}): this {
     throw new Error('Not Implemented');
   }
 
   sign(key: PrivateKey): this {
-    return this.clone(
-      this.scripts.concat([
+    return this.clone({
+      scripts: this.scripts.concat([
         crypto.createWitness(this.serializeUnsigned(), key),
       ]),
-    );
+    });
   }
 
   signWithSignature(signature: Buffer, publicKey: ECPoint): this {
-    return this.clone(
-      this.scripts.concat([
+    return this.clone({
+      scripts: this.scripts.concat([
         crypto.createWitnessForSignature(signature, publicKey),
       ]),
-    );
+    });
   }
 
   equals: Equals = utils.equals(this.constructor, other =>

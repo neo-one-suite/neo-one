@@ -6,10 +6,12 @@ import {
   type ExecuteScriptsResult,
   type TriggerType,
   type VMContext,
+  type VMListeners,
   type WriteBlockchain,
 } from '@neo-one/node-core';
 import {
   VM_STATE,
+  type Block,
   type ScriptContainer,
   type OpCode,
   crypto,
@@ -273,6 +275,9 @@ export default async ({
   action,
   gas: gasIn,
   onStep,
+  listeners,
+  skipWitnessVerify,
+  persistingBlock,
 }: {|
   scripts: Array<Script>,
   blockchain: WriteBlockchain,
@@ -281,12 +286,18 @@ export default async ({
   action: ExecutionAction,
   gas: BN,
   onStep?: (input: {| context: VMContext, opCode: OpCode |}) => void,
+  listeners?: VMListeners,
+  skipWitnessVerify?: boolean,
+  persistingBlock?: Block,
 |}): Promise<ExecuteScriptsResult> => {
   const init = {
     scriptContainer,
     triggerType,
     action,
     onStep,
+    listeners: listeners || {},
+    skipWitnessVerify: skipWitnessVerify || false,
+    persistingBlock,
   };
 
   let context;

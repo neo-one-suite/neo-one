@@ -7,6 +7,7 @@
 .*/packages/.*/dist/es.js.map
 .*/node_modules/protobufjs/src/bower.json
 .*/node_modules/dataloader/index.js.flow
+<PROJECT_ROOT>/migrate/.*
 
 [include]
 

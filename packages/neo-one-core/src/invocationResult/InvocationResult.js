@@ -10,15 +10,9 @@ import InvocationResultSuccess from './InvocationResultSuccess';
 import InvocationResultError from './InvocationResultError';
 
 import type { InvocationResultSuccessJSON } from './InvocationResultSuccess';
-import type {
-  BasicInvocationResultErrorJSON,
-  InvocationResultErrorJSON,
-} from './InvocationResultError';
+import type { InvocationResultErrorJSON } from './InvocationResultError';
 
 export type InvocationResult = InvocationResultSuccess | InvocationResultError;
-export type BasicInvocationResultJSON =
-  | InvocationResultSuccessJSON
-  | BasicInvocationResultErrorJSON;
 export type InvocationResultJSON =
   | InvocationResultSuccessJSON
   | InvocationResultErrorJSON;

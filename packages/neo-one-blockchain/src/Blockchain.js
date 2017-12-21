@@ -30,6 +30,7 @@ import {
 } from '@neo-one/node-core';
 import { type Log, utils as commonUtils } from '@neo-one/utils';
 import PriorityQueue from 'js-priority-queue';
+import { Subject } from 'rxjs/Subject';
 
 import _ from 'lodash';
 import { filter, map, toArray } from 'rxjs/operators';
@@ -105,6 +106,8 @@ export default class Blockchain {
   _running: boolean;
   _doneRunningResolve: ?() => void;
 
+  block$: Subject<Block>;
+
   constructor(options: BlockchainOptions) {
     this._storage = options.storage;
     this._currentBlock = options.currentBlock;
@@ -153,8 +156,10 @@ export default class Blockchain {
     this.serializeJSONContext = {
       addressVersion: this.settings.addressVersion,
       feeContext: this.feeContext,
-      getInvocationData: this._getInvocationData,
+      tryGetInvocationData: this._tryGetInvocationData,
     };
+
+    this.block$ = new Subject();
   }
 
   static async create({
@@ -322,6 +327,7 @@ export default class Blockchain {
         action: NULL_ACTION,
         gas: transaction.gas,
         onStep: this._onStep,
+        skipWitnessVerify: true,
       }),
     );
   }
@@ -346,6 +352,7 @@ export default class Blockchain {
         // eslint-disable-next-line
         await this._persistBlock(entry.block, entry.unsafe);
         entry.resolve();
+        this.block$.next(entry.block);
         const duration = performance.now() - start;
         this.log({
           event: 'PERSIST_BLOCK_SUCCESS',
@@ -418,8 +425,7 @@ export default class Blockchain {
       const builder = new ScriptBuilder();
       builder.emitAppCallVerification(hash);
       verification = builder.build();
-    }
-    if (!common.uInt160Equal(hash, crypto.toScriptHash(verification))) {
+    } else if (!common.uInt160Equal(hash, crypto.toScriptHash(verification))) {
       throw new WitnessVerifyError();
     }
 
@@ -677,13 +683,17 @@ export default class Blockchain {
     });
   }
 
-  _getInvocationData = async (
+  _tryGetInvocationData = async (
     transaction: InvocationTransaction,
-  ): Promise<SerializableInvocationData> => {
-    const data = await this._storage.invocationData.get({
+  ): Promise<?SerializableInvocationData> => {
+    const data = await this._storage.invocationData.tryGet({
       hash: transaction.hash,
     });
-    const [asset, contracts, actions] = await Promise.all([
+    if (data == null) {
+      return null;
+    }
+
+    const [asset, contracts, actions, validators] = await Promise.all([
       data.assetHash == null
         ? Promise.resolve(null)
         : this._storage.asset.get({ hash: data.assetHash }),
@@ -702,9 +712,23 @@ export default class Blockchain {
         })
         .pipe(toArray())
         .toPromise(),
+      Promise.all(
+        data.validatorPublicKeys.map(publicKey =>
+          this._storage.validator.get({ publicKey }),
+        ),
+      ),
     ]);
 
-    return { asset, contracts, actions, result: data.result };
+    return {
+      asset,
+      contracts,
+      deletedContractHashes: data.deletedContractHashes,
+      migratedContractHashes: data.migratedContractHashes,
+      voteUpdates: data.voteUpdates,
+      validators,
+      result: data.result,
+      actions,
+    };
   };
 
   _onStep = ({ context, opCode }: OnStepInput) => {

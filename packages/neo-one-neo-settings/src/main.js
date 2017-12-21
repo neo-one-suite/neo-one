@@ -51,6 +51,7 @@ export default (options?: {|
     },
     messageMagic: 7630401,
     addressVersion: common.NEO_ADDRESS_VERSION,
+    privateKeyVersion: common.NEO_PRIVATE_KEY_VERSION,
     standbyValidators,
     vm: {
       storageContext: {

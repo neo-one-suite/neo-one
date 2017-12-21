@@ -107,6 +107,7 @@ export type Blockchain = {
   +currentBlock: Block,
   +currentHeader: Header,
   +currentBlockIndex: number,
+  +block$: Observable<Block>,
 
   +account: ReadAllStorage<AccountKey, Account>,
   +action: ReadGetAllStorage<ActionKey, ActionsKey, Action>,

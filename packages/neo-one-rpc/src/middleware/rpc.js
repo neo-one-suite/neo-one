@@ -1,6 +1,7 @@
 /* @flow */
 // flowlint untyped-import:off
 import {
+  type Block,
   Account,
   Input,
   InvocationTransaction,
@@ -10,7 +11,6 @@ import {
   deserializeTransactionWire,
 } from '@neo-one/core';
 import { type Blockchain, type Node } from '@neo-one/node-core';
-import type { GetActionsFilter } from '@neo-one/client';
 import { utils } from '@neo-one/utils';
 import { type Context } from 'koa';
 
@@ -18,7 +18,7 @@ import _ from 'lodash';
 import compose from 'koa-compose';
 import compress from 'koa-compress';
 import connect from 'koa-connect';
-import { filter, toArray } from 'rxjs/operators';
+import { filter, map, take, timeout, toArray } from 'rxjs/operators';
 import jayson from 'jayson/promise';
 import mount from 'koa-mount';
 
@@ -26,6 +26,21 @@ import { RPCError, RPCUnknownError } from '../errors';
 
 import bodyParser from './bodyParser';
 import { simpleMiddleware } from './common';
+
+const getTransactionReceipt = (value: Block, hash: string) => {
+  const transactionIndex = value.transactions
+    .map(transaction => transaction.hashHex)
+    .indexOf(hash);
+  if (transactionIndex === -1) {
+    return null;
+  }
+
+  return {
+    blockIndex: value.index,
+    blockHash: JSONHelper.writeUInt256(value.hash),
+    transactionIndex,
+  };
+};
 
 export default ({
   blockchain,
@@ -74,12 +89,42 @@ export default ({
         hashOrIndex = JSONHelper.readUInt256(args[0]);
       }
 
-      const block = await blockchain.block.tryGet({ hashOrIndex });
-      if (block == null) {
-        throw server.error(-100, 'Unknown block');
+      let watchTimeoutMS;
+      if (
+        args[1] != null &&
+        typeof args[1] === 'object' &&
+        args[1].type === 'watch'
+      ) {
+        watchTimeoutMS = args[1].timeoutMS;
+      } else if (
+        args[2] != null &&
+        typeof args[2] === 'object' &&
+        args[2].type === 'watch'
+      ) {
+        watchTimeoutMS = args[2].timeoutMS;
       }
 
-      if (args[1]) {
+      let block = await blockchain.block.tryGet({ hashOrIndex });
+      if (block == null) {
+        if (watchTimeoutMS == null) {
+          throw server.error(-100, 'Unknown block');
+        }
+        try {
+          block = await blockchain.block$
+            .pipe(
+              filter(
+                value => value.hashHex === args[0] || value.index === args[0],
+              ),
+              take(1),
+              timeout(new Date(Date.now() + watchTimeoutMS)),
+            )
+            .toPromise();
+        } catch (error) {
+          throw server.error(-100, 'Unknown block');
+        }
+      }
+
+      if (args[1] === true || args[1] === 1) {
         const json = await block.serializeJSON(blockchain.serializeJSONContext);
         return json;
       }
@@ -127,7 +172,7 @@ export default ({
         throw server.error(-100, 'Unknown transaction');
       }
 
-      if (args[1]) {
+      if (args[1] === true || args[1] === 1) {
         const json = await transaction.serializeJSON(
           blockchain.serializeJSONContext,
         );
@@ -203,6 +248,22 @@ export default ({
       throw server.error(-101, 'Not implemented');
     },
     // Extended
+    relaytransaction: async args => {
+      const transaction = deserializeTransactionWire({
+        context: blockchain.deserializeWireContext,
+        buffer: JSONHelper.readBuffer(args[0]),
+      });
+      try {
+        // eslint-disable-next-line
+        const [_, transactionJSON] = await Promise.all([
+          node.relayTransaction(transaction),
+          transaction.serializeJSON(blockchain.serializeJSONContext),
+        ]);
+        return transactionJSON;
+      } catch (error) {
+        throw server.error(-110, 'Relay transaction failed.');
+      }
+    },
     getoutput: async args => {
       const hash = JSONHelper.readUInt256(args[0]);
       const index = args[1];
@@ -223,37 +284,10 @@ export default ({
             index,
           }),
         ]);
-        return JSONHelper.writeFixed8(value);
+        return common.fixed8ToDecimal(value).toString();
       } catch (error) {
         throw server.error(-102, error.message);
       }
-    },
-    getactions: async (
-      args: [
-        {
-          ...GetActionsFilter,
-          scriptHash: string,
-        },
-      ],
-    ) => {
-      let actionsObservable = blockchain.action.getAll({
-        blockIndexStart: args[0].blockIndexStart,
-        transactionIndexStart: args[0].transactionIndexStart,
-        indexStart: args[0].indexStart,
-        blockIndexStop: args[0].blockIndexStop,
-        transactionIndexStop: args[0].transactionIndexStop,
-        indexStop: args[0].indexStop,
-      });
-      if (args[0].scriptHash != null) {
-        const scriptHash = JSONHelper.readUInt160(args[0].scriptHash);
-        actionsObservable = actionsObservable.pipe(
-          filter(action => common.uInt160Equal(action.scriptHash, scriptHash)),
-        );
-      }
-      const actions = await actionsObservable.pipe(toArray()).toPromise();
-      return actions.map(action =>
-        action.serializeJSON(blockchain.serializeJSONContext),
-      );
     },
     getallstorage: async args => {
       const hash = JSONHelper.readUInt160(args[0]);
@@ -276,6 +310,65 @@ export default ({
       }
 
       throw server.error(-103, 'Invalid InvocationTransaction');
+    },
+    gettransactionreceipt: async args => {
+      const spentCoins = await blockchain.transactionSpentCoins.tryGet({
+        hash: JSONHelper.readUInt256(args[0]),
+      });
+
+      let watchTimeoutMS;
+      if (
+        args[1] != null &&
+        typeof args[1] === 'object' &&
+        args[1].type === 'watch'
+      ) {
+        watchTimeoutMS = args[1].timeoutMS;
+      }
+
+      let result;
+      if (spentCoins == null) {
+        if (watchTimeoutMS == null) {
+          throw server.error(-100, 'Unknown transaction');
+        }
+
+        result = await blockchain.block$
+          .pipe(
+            map(value => getTransactionReceipt(value, args[0])),
+            filter(receipt => receipt != null),
+            take(1),
+            timeout(new Date(Date.now() + watchTimeoutMS)),
+          )
+          .toPromise();
+      } else {
+        const block = await blockchain.block.get({
+          hashOrIndex: spentCoins.startHeight,
+        });
+        result = getTransactionReceipt(block, args[0]);
+      }
+
+      return result;
+    },
+    getinvocationdata: async args => {
+      const transaction = await blockchain.transaction.get({
+        hash: JSONHelper.readUInt256(args[0]),
+      });
+
+      const result = await transaction.serializeJSON(
+        blockchain.serializeJSONContext,
+      );
+      if (result.data == null) {
+        throw server.error(-103, 'Invalid InvocationTransaction');
+      }
+
+      return result.data;
+    },
+    getvalidators: async () => {
+      const validators = await blockchain.validator.all
+        .pipe(toArray())
+        .toPromise();
+      return validators.map(validator =>
+        validator.serializeJSON(blockchain.serializeJSONContext),
+      );
     },
   };
   server = jayson.server(

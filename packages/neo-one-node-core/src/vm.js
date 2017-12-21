@@ -1,7 +1,9 @@
 /* @flow */
 import type BN from 'bn.js';
 import {
+  type Block,
   type ContractParameter,
+  type ECPoint,
   type OpCode,
   type ScriptContainer,
   type UInt160,
@@ -56,6 +58,10 @@ export type VMContext = {|
 |};
 export type OnStepInput = {| context: VMContext, opCode: OpCode |};
 export type OnStep = (input: OnStepInput) => void;
+export type VMListeners = {|
+  onMigrateContract?: (options: {| from: UInt160, to: UInt160 |}) => void,
+  onSetVotes?: (options: {| address: UInt160, votes: Array<ECPoint> |}) => void,
+|};
 export type ExecuteScripts = (input: {|
   scripts: Array<Script>,
   blockchain: WriteBlockchain,
@@ -65,6 +71,9 @@ export type ExecuteScripts = (input: {|
   gas: BN,
   // eslint-disable-next-line
   onStep?: OnStep,
+  listeners?: VMListeners,
+  skipWitnessVerify?: boolean,
+  persistingBlock?: Block,
 |}) => Promise<ExecuteScriptsResult>;
 
 export type VM = {|

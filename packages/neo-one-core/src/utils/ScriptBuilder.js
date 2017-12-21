@@ -50,7 +50,7 @@ export type Param =
   | string
   | Buffer
   | boolean
-  | Array<Param>;
+  | Array<?Param>;
 
 export default class ScriptBuilder {
   buffers: Array<Buffer>;
@@ -138,8 +138,10 @@ export default class ScriptBuilder {
     return this;
   }
 
-  emitPushParam(param: Param): this {
-    if (Array.isArray(param)) {
+  emitPushParam(param: ?Param): this {
+    if (param == null) {
+      return this.emitPush(Buffer.alloc(0, 0));
+    } else if (Array.isArray(param)) {
       return this.emitPushArray(param);
     } else if (common.isUInt160(param)) {
       return this.emitPushUInt160(common.asUInt160(param));
@@ -160,20 +162,20 @@ export default class ScriptBuilder {
     throw new InvalidParamError();
   }
 
-  emitPushParams(...params: Array<Param>): this {
+  emitPushParams(...params: Array<?Param>): this {
     for (let i = params.length - 1; i >= 0; i -= 1) {
       this.emitPushParam(params[i]);
     }
     return this;
   }
 
-  emitPushArray(params: Array<Param>): this {
+  emitPushArray(params: Array<?Param>): this {
     this.emitPushParams(...params);
     this.emitPushParam(params.length);
     return this.emitOp('PACK');
   }
 
-  emitAppCallInvocation(operation: string, ...params: Array<Param>): this {
+  emitAppCallInvocation(operation: string, ...params: Array<?Param>): this {
     this.emitPushArray(params);
     return this.emitPushParam(operation);
   }
@@ -185,13 +187,13 @@ export default class ScriptBuilder {
   emitAppCall(
     scriptHash: UInt160,
     operation: string,
-    ...params: Array<Param>
+    ...params: Array<?Param>
   ): this {
     this.emitAppCallInvocation(operation, ...params);
     return this.emitAppCallVerification(scriptHash);
   }
 
-  emitSysCall(sysCall: SysCallName, ...params: Array<Param>): this {
+  emitSysCall(sysCall: SysCallName, ...params: Array<?Param>): this {
     this.emitPushParams(...params);
     const sysCallBuffer = Buffer.from(sysCall, 'ascii');
     const writer = new BinaryWriter();

@@ -5,25 +5,25 @@ import _ from 'lodash';
 import { toArray } from 'ix/asynciterable/toarray';
 
 import AsyncBlockIterator from '../AsyncBlockIterator';
-import Client from '../Client';
 import { UnknownBlockError } from '../errors';
 
 const blockCount = 10;
 const blocks = _.range(blockCount).map(() => ({}));
 const filter = {
-  indexStop: blockCount - 1,
+  indexStop: blockCount,
 };
-let client = new Client();
+let client = ({}: $FlowFixMe);
 let blockIterator = new AsyncBlockIterator({
   client,
   filter,
 });
+const FETCH_TIMEOUT_MS = 100;
 beforeEach(() => {
-  client = new Client();
+  client = ({}: $FlowFixMe);
   blockIterator = new AsyncBlockIterator({
     client,
     filter,
-    pollMS: 100,
+    fetchTimeoutMS: FETCH_TIMEOUT_MS,
   });
   // $FlowFixMe
   client.getBlockCount = jest.fn(() => Promise.resolve(blockCount));

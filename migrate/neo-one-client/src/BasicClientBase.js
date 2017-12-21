@@ -27,7 +27,6 @@ import {
   type AttributeUsageBuffer,
   type Asset,
   type BasicClientBaseProvider,
-  type BasicInvocationResult,
   type BlockFilter,
   type Contract,
   type ContractLike,
@@ -96,7 +95,7 @@ export type BasicClientBaseOptions<
   TBlock,
   TTransaction,
   TAccount,
-  TInvocationResult: InvocationResult | BasicInvocationResult,
+  TInvocationResult: InvocationResult,
   TProvider: BasicClientBaseProvider<
     TBlock,
     TTransaction,
@@ -113,7 +112,7 @@ export default class BasicClientBase<
   TBlock,
   TTransaction,
   TAccount,
-  TInvocationResult: InvocationResult | BasicInvocationResult,
+  TInvocationResult: InvocationResult,
   TSmartContract,
   TProvider: BasicClientBaseProvider<
     TBlock,

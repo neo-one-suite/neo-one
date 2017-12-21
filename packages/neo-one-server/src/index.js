@@ -32,6 +32,8 @@ export type { PortAllocator };
 export type {
   ExecCLIOptions,
   GetCLIAutocompleteOptions,
+  MasterResourceAdapter,
+  MasterResourceAdapterOptions,
   ResourceAdapter,
   ResourceAdapterOptions,
   ResourceAdapterReady,

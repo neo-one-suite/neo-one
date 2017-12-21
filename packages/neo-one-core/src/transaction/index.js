@@ -37,7 +37,10 @@ export type { EnrollmentTransactionJSON } from './EnrollmentTransaction';
 export type { RegisterTransactionJSON } from './RegisterTransaction';
 export type { ContractTransactionJSON } from './ContractTransaction';
 export type { PublishTransactionJSON } from './PublishTransaction';
-export type { InvocationTransactionJSON } from './InvocationTransaction';
+export type {
+  InvocationDataJSON,
+  InvocationTransactionJSON,
+} from './InvocationTransaction';
 export type { InputJSON } from './Input';
 export type { OutputJSON } from './Output';
 
@@ -53,9 +56,9 @@ export type {
 export type { FeeContext } from './TransactionBase';
 export type { OutputKey } from './Output';
 export type {
-  BasicTransactionJSON,
   Transaction,
   TransactionJSON,
+  TransactionReceiptJSON,
   TransactionKey,
 } from './Transaction';
 export type { TransactionType } from './TransactionType';

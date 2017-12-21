@@ -13,6 +13,7 @@ module.exports = ({ modules, useBuiltIns }) => ({
     '@babel/transform-flow-strip-types',
     '@babel/proposal-class-properties',
     '@babel/proposal-object-rest-spread',
+    '@babel/plugin-proposal-export-namespace-from',
   ].filter(Boolean),
 });
 

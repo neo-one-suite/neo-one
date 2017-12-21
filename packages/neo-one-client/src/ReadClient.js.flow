@@ -1,0 +1,50 @@
+/* @flow */
+import type {
+  ABI,
+  Account,
+  Action,
+  AddressString,
+  Asset,
+  Block,
+  BlockFilter,
+  BufferString,
+  Contract,
+  DataProvider,
+  GetOptions,
+  Hash160String,
+  Hash256String,
+  ReadSmartContract,
+  StorageItem,
+  Transaction,
+  Validator,
+} from './types';
+
+declare export default class ReadClient<TDataProvider: DataProvider> {
+  +dataProvider: TDataProvider;
+  constructor(dataProvider: TDataProvider): ReadClient<TDataProvider>;
+
+  getAccount(address: AddressString): Promise<Account>;
+
+  getAsset(hash: Hash256String): Promise<Asset>;
+
+  getBlock(hash: Hash256String): Promise<Block>;
+  getBlock(index: number, options?: GetOptions): Promise<Block>;
+  iterBlocks(filter?: BlockFilter): AsyncIterable<Block>;
+
+  getBestBlockHash(): Promise<Hash256String>;
+  getBlockCount(): Promise<number>;
+
+  getContract(hash: Hash160String): Promise<Contract>;
+
+  getMemPool(): Promise<Array<Hash256String>>;
+
+  getTransaction(hash: Hash256String): Promise<Transaction>;
+
+  getValidators(): Promise<Array<Validator>>;
+
+  smartContract(abi: ABI): ReadSmartContract;
+
+  _getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem>;
+  _iterStorage(hash: Hash160String): AsyncIterable<StorageItem>;
+  _iterActions(filterIn?: BlockFilter): AsyncIterable<Action>;
+}

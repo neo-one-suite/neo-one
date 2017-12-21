@@ -1,29 +1,24 @@
 /* @flow */
 import {
-  type ResourceAdapter,
-  type ResourceAdapterOptions,
-  type ResourceAdapterReady,
+  type MasterResourceAdapter,
+  type MasterResourceAdapterOptions,
   CRUD,
   DescribeCRUD,
   GetCRUD,
   ResourceType,
   StopCRUD,
 } from '@neo-one/server';
-import type { Observable } from 'rxjs/Observable';
 import {
   type DescribeTable,
   type ListTable,
-  type Progress,
   type ResourceState,
 } from '@neo-one/server-common';
 
 import _ from 'lodash';
 
 import { CreateNetworkCRUD, DeleteNetworkCRUD, StartNetworkCRUD } from './crud';
+import MasterNetworkResourceAdapter from './MasterNetworkResourceAdapter';
 import type NetworkPlugin from './NetworkPlugin';
-import NetworkResourceAdapter, {
-  type NetworkResourceAdapterInitOptions,
-} from './NetworkResourceAdapter';
 import { type Node } from './node';
 import type { NetworkType } from './types';
 
@@ -59,36 +54,17 @@ export default class NetworkResourceType extends ResourceType<
     });
   }
 
-  initResourceAdapter(
-    options: ResourceAdapterOptions,
-  ): Promise<ResourceAdapter<Network, NetworkResourceOptions>> {
-    return NetworkResourceAdapter.init(
-      this._getResourceAdapterOptions(options),
-    );
-  }
-
-  createResourceAdapter$(
-    adapterOptions: ResourceAdapterOptions,
-    options: NetworkResourceOptions,
-  ): Observable<
-    Progress | ResourceAdapterReady<Network, NetworkResourceOptions>,
+  async createMasterResourceAdapter({
+    binary,
+    portAllocator,
+  }: MasterResourceAdapterOptions): Promise<
+    MasterResourceAdapter<Network, NetworkResourceOptions>,
   > {
-    return NetworkResourceAdapter.create$(
-      this._getResourceAdapterOptions(adapterOptions),
-      options,
-    );
-  }
-
-  _getResourceAdapterOptions(
-    options: ResourceAdapterOptions,
-  ): NetworkResourceAdapterInitOptions {
-    return {
-      name: options.name,
-      dataPath: options.dataPath,
-      binary: options.binary,
-      portAllocator: options.portAllocator,
+    return new MasterNetworkResourceAdapter({
       resourceType: this,
-    };
+      binary,
+      portAllocator,
+    });
   }
 
   getCRUD(): CRUD<Network, NetworkResourceOptions> {

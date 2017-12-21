@@ -1510,6 +1510,36 @@ const OPCODE_PAIRS = [
       }),
     ],
     [
+      0xc7,
+      createOp({
+        name: 'APPEND',
+        in: 2,
+        invoke: ({ context, args }: OpInvokeArgs) => {
+          let newItem = args[0];
+          if (newItem instanceof StructStackItem) {
+            newItem = newItem.clone();
+          }
+          const value = args[1].asArray();
+          value.push(newItem);
+
+          return { context };
+        },
+      }),
+    ],
+    [
+      0xc8,
+      createOp({
+        name: 'REVERSE',
+        in: 1,
+        invoke: ({ context, args }: OpInvokeArgs) => {
+          const value = args[0].asArray();
+          value.reverse();
+
+          return { context };
+        },
+      }),
+    ],
+    [
       0xf0,
       createOp({
         name: 'THROW',

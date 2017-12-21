@@ -4,7 +4,6 @@ import { type Log, onComplete, utils } from '@neo-one/utils';
 import {
   type AbortSignal,
   type BaseResource,
-  type Binary,
   type DescribeTable,
   type ModifyResourceResponse,
   AbortController,
@@ -24,8 +23,12 @@ import fs from 'fs-extra';
 import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
 
-import type { Plugin, ResourceAdapter, ResourceType } from './plugin';
-import type PluginManager from './PluginManager';
+import type {
+  MasterResourceAdapter,
+  Plugin,
+  ResourceAdapter,
+  ResourceType,
+} from './plugin';
 import type PortAllocator from './PortAllocator';
 import Ready from './Ready';
 
@@ -58,10 +61,9 @@ export default class ResourcesManager<
   ResourceOptions: Object,
 > {
   _log: Log;
-  _pluginManager: PluginManager;
   _dataPath: string;
-  _binary: Binary;
   _resourceType: ResourceType<Resource, ResourceOptions>;
+  _masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>;
   _portAllocator: PortAllocator;
   _plugin: Plugin;
   _resourceAdapters: ResourceAdapters<Resource, ResourceOptions>;
@@ -87,24 +89,21 @@ export default class ResourcesManager<
 
   constructor({
     log,
-    pluginManager,
     dataPath,
-    binary,
     resourceType,
+    masterResourceAdapter,
     portAllocator,
   }: {|
     log: Log,
-    pluginManager: PluginManager,
     dataPath: string,
-    binary: Binary,
     resourceType: ResourceType<Resource, ResourceOptions>,
+    masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>,
     portAllocator: PortAllocator,
   |}) {
     this._log = log;
-    this._pluginManager = pluginManager;
     this._dataPath = dataPath;
-    this._binary = binary;
     this._resourceType = resourceType;
+    this._masterResourceAdapter = masterResourceAdapter;
     this._portAllocator = portAllocator;
     this._plugin = this._resourceType.plugin;
     this._resourceAdapters = {};
@@ -374,13 +373,10 @@ export default class ResourcesManager<
       )} already exists.`,
     });
     if (this._resourceAdapters[name] == null) {
-      const resourceAdapter$ = this._resourceType.createResourceAdapter$(
+      const resourceAdapter$ = this._masterResourceAdapter.createResourceAdapter$(
         {
-          pluginManager: this._pluginManager,
           name,
-          binary: this._binary,
           dataPath: path.resolve(this._resourcesPath, name),
-          portAllocator: this._portAllocator,
         },
         options,
       );
@@ -1031,12 +1027,9 @@ export default class ResourcesManager<
       async () => {
         this._resourceAdapters[
           name
-        ] = await this._resourceType.initResourceAdapter({
-          pluginManager: this._pluginManager,
+        ] = await this._masterResourceAdapter.initResourceAdapter({
           name,
           dataPath: path.resolve(this._resourcesPath, name),
-          binary: this._binary,
-          portAllocator: this._portAllocator,
         });
       },
     );

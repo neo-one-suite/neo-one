@@ -36,4 +36,5 @@ export type {
   TriggerType,
   VM,
   VMContext,
+  VMListeners,
 } from './vm';

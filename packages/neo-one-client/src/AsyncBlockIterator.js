@@ -3,45 +3,47 @@ import { AsyncIteratorBase } from '@neo-one/core';
 
 import _ from 'lodash';
 
-import { type BlockFilter } from './types';
-import type BasicClientBase from './BasicClientBase';
+import { type Block, type BlockFilter, type GetOptions } from './types'; // eslint-disable-line
 
-type Item<TBlock> =
-  | {| type: 'value', value: TBlock |}
+type Item =
+  | {| type: 'value', value: Block |}
   | {| type: 'error', error: Error |};
-type Resolver<TBlock> = {|
-  resolve: (value: IteratorResult<TBlock, void>) => void,
+type Resolver = {|
+  resolve: (value: IteratorResult<Block, void>) => void,
   reject: (reason: Error) => void,
 |};
 
-type AsyncBlockIteratorOptions<TBlock> = {|
-  // flowlint-next-line unclear-type:off
-  client: BasicClientBase<TBlock, any, any, any, any, any>,
+type Client = {
+  +getBlockCount: () => Promise<number>,
+  +getBlock: (index: number, options?: GetOptions) => Promise<Block>,
+};
+
+type AsyncBlockIteratorOptions = {|
+  client: Client,
   filter: BlockFilter,
-  pollMS?: number,
+  fetchTimeoutMS?: number,
 |};
 
-const FETCH_ONE_POLL_MS = 5000;
+const FETCH_TIMEOUT_MS = 20000;
 const QUEUE_SIZE = 1000;
 const BATCH_SIZE = 50;
 
-export default class AsyncBlockIterator<TBlock> extends AsyncIteratorBase<
-  TBlock,
+export default class AsyncBlockIterator extends AsyncIteratorBase<
+  Block,
   void,
   void,
 > {
-  // flowlint-next-line unclear-type:off
-  _client: BasicClientBase<TBlock, any, any, any, any, any>;
-  _items: Array<Item<TBlock>>;
-  _resolvers: Array<Resolver<TBlock>>;
+  _client: Client;
+  _items: Array<Item>;
+  _resolvers: Array<Resolver>;
   __done: boolean;
   _currentIndex: number;
   _fetching: boolean;
   _startHeight: ?number;
   _indexStop: ?number;
-  _pollMS: number;
+  _fetchTimeoutMS: number;
 
-  constructor({ client, filter, pollMS }: AsyncBlockIteratorOptions<TBlock>) {
+  constructor({ client, filter, fetchTimeoutMS }: AsyncBlockIteratorOptions) {
     super();
     this._client = client;
     this._items = [];
@@ -51,10 +53,11 @@ export default class AsyncBlockIterator<TBlock> extends AsyncIteratorBase<
     this._fetching = false;
     this._startHeight = null;
     this._indexStop = filter.indexStop;
-    this._pollMS = pollMS == null ? FETCH_ONE_POLL_MS : pollMS;
+    this._fetchTimeoutMS =
+      fetchTimeoutMS == null ? FETCH_TIMEOUT_MS : fetchTimeoutMS;
   }
 
-  next(): Promise<IteratorResult<TBlock, void>> {
+  next(): Promise<IteratorResult<Block, void>> {
     if (!this.__done) {
       this._fetch();
     }
@@ -76,7 +79,7 @@ export default class AsyncBlockIterator<TBlock> extends AsyncIteratorBase<
     });
   }
 
-  _write(value: TBlock): void {
+  _write(value: Block): void {
     this._push({ type: 'value', value });
   }
 
@@ -84,7 +87,7 @@ export default class AsyncBlockIterator<TBlock> extends AsyncIteratorBase<
     this._push({ type: 'error', error });
   }
 
-  _push(item: Item<TBlock>): void {
+  _push(item: Item): void {
     if (this.__done) {
       throw new Error('AsyncBlockIterator already ended');
     }
@@ -131,7 +134,7 @@ export default class AsyncBlockIterator<TBlock> extends AsyncIteratorBase<
     }
 
     const index = this._currentIndex;
-    if (this._indexStop != null && index > this._indexStop) {
+    if (this._indexStop != null && index >= this._indexStop) {
       this._done();
     } else if (index >= startHeight) {
       const [block, newStartHeight] = await Promise.all([
@@ -148,12 +151,12 @@ export default class AsyncBlockIterator<TBlock> extends AsyncIteratorBase<
         startHeight - index,
       );
       if (this._indexStop != null) {
-        toFetch = Math.min(toFetch, this._indexStop - index + 1);
+        toFetch = Math.min(toFetch, this._indexStop - index);
       }
       for (const chunk of _.chunk(_.range(0, toFetch), BATCH_SIZE)) {
         // eslint-disable-next-line
         const blocks = await Promise.all(
-          chunk.map(offset => this._fetchOne(index + offset)),
+          chunk.map(offset => this._fetchOne(index + offset, true)),
         );
         this._currentIndex += chunk.length;
         blocks.forEach(block => this._write(block));
@@ -161,18 +164,16 @@ export default class AsyncBlockIterator<TBlock> extends AsyncIteratorBase<
     }
   }
 
-  async _fetchOne(index: number): Promise<TBlock> {
+  async _fetchOne(index: number, isBatch?: boolean): Promise<Block> {
     try {
-      const block = await this._client.getBlock(index);
+      const block = await this._client.getBlock(
+        index,
+        isBatch ? undefined : { timeoutMS: this._fetchTimeoutMS },
+      );
       return block;
     } catch (error) {
       if (error.code === 'UNKNOWN_BLOCK') {
-        return new Promise((resolve, reject) => {
-          setTimeout(
-            () => this._fetchOne(index).then(resolve, reject),
-            this._pollMS,
-          );
-        });
+        return this._fetchOne(index, isBatch);
       }
 
       throw error;

@@ -1,0 +1,1076 @@
+/* @flow */
+import BigNumber from 'bignumber.js';
+import {
+  ATTRIBUTE_USAGE,
+  CONTRACT_PROPERTY_STATE,
+  type Attribute as AttributeModel,
+  type Input as InputModel,
+  type Output as OutputModel,
+  type Param as ScriptBuilderParam,
+  type Transaction as TransactionModel,
+  type UInt160Attribute,
+  Contract as ContractModel,
+  ClaimTransaction,
+  ContractTransaction,
+  InvocationTransaction,
+  IssueTransaction,
+  ScriptBuilder,
+  Witness as WitnessModel,
+  assertAssetTypeJSON,
+  assertContractParameterTypeJSON,
+  toAssetType,
+  toContractParameterType,
+  common,
+  crypto,
+  utils,
+} from '@neo-one/core';
+import type { Observable } from 'rxjs/Observable';
+
+import _ from 'lodash';
+import { take } from 'rxjs/operators';
+import { utils as commonUtils } from '@neo-one/utils';
+
+import type {
+  AddressString,
+  AssetRegister,
+  Attribute,
+  ContractRegister,
+  GetOptions,
+  Hash160String,
+  Hash256String,
+  Transfer,
+  Network,
+  TransactionOptions,
+  PublicKeyString,
+  PublishReceipt,
+  RegisterAssetReceipt,
+  RegisterValidatorReceipt,
+  TransactionReceipt,
+  TransactionResult,
+  Input,
+  InvokeReceiptInternal,
+  RawInvocationData,
+  InvocationResultError,
+  InvocationResultSuccess,
+  RawInvocationResult,
+  RawInvocationResultError,
+  RawInvocationResultSuccess,
+  InvokeTransactionOptions,
+  Output,
+  Param,
+  ParamInternal,
+  ParamJSON,
+  Transaction,
+  UnspentOutput,
+  UserAccount,
+  UserAccountProvider,
+  Witness,
+} from '../types'; // eslint-disable-line
+import {
+  InsufficientFundsError,
+  InvalidTransactionError,
+  InvokeError,
+  NoAccountError,
+  NothingToClaimError,
+  NothingToTransferError,
+  UnknownNetworkError,
+} from '../errors';
+
+import * as clientUtils from '../utils';
+import converters from './converters';
+
+export type KeyStore = {
+  +currentAccount$: Observable<?UserAccount>,
+  +accounts$: Observable<Array<UserAccount>>,
+  +sign: (options: {|
+    account: UserAccount,
+    message: string,
+  |}) => Promise<Witness>,
+};
+
+export type Provider = {
+  +networks$: Observable<Array<Network>>,
+  +getUnclaimed: (
+    network: Network,
+    address: AddressString,
+  ) => Promise<{| unclaimed: Array<Input>, amount: BigNumber |}>,
+  +getUnspentOutputs: (
+    network: Network,
+    address: AddressString,
+  ) => Promise<Array<UnspentOutput>>,
+  +relayTransaction: (
+    network: Network,
+    transaction: string,
+  ) => Promise<Transaction>,
+  +getTransactionReceipt: (
+    network: Network,
+    hash: Hash256String,
+    options?: GetOptions,
+  ) => Promise<TransactionReceipt>,
+  +getInvocationData: (
+    network: Network,
+    hash: Hash256String,
+  ) => Promise<RawInvocationData>,
+  +testInvoke: (
+    network: Network,
+    transaction: string,
+  ) => Promise<RawInvocationResult>,
+};
+
+type TransactionOptionsFull = {|
+  from: UserAccount,
+  network: Network,
+  attributes: Array<Attribute>,
+  networkFee: BigNumber,
+|};
+
+const GAS_ASSET_HASH =
+  '0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7';
+
+const NEO_ONE_ATTRIBUTE = {
+  usage: 'Remark15',
+  data: Buffer.from('neo-one', 'utf8').toString('hex'),
+};
+
+export default class LocalUserAccountProvider<
+  TKeyStore: KeyStore,
+  TProvider: Provider,
+> implements UserAccountProvider {
+  +currentAccount$: Observable<?UserAccount>;
+  +accounts$: Observable<Array<UserAccount>>;
+  +networks$: Observable<Array<Network>>;
+
+  +keystore: TKeyStore;
+  +provider: TProvider;
+
+  constructor({
+    keystore,
+    provider,
+  }: {|
+    keystore: TKeyStore,
+    provider: TProvider,
+  |}) {
+    this.keystore = keystore;
+    this.provider = provider;
+
+    this.currentAccount$ = keystore.currentAccount$;
+    this.accounts$ = keystore.accounts$;
+    this.networks$ = provider.networks$;
+  }
+
+  async transfer(
+    transfers: Array<Transfer>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>> {
+    const {
+      from,
+      network,
+      attributes,
+      networkFee,
+    } = await this._getTransactionOptions(options);
+    const { inputs, outputs } = await this._getTransfersInputOutputs({
+      transfers,
+      network,
+      from,
+      gas: networkFee,
+    });
+
+    if (inputs.length === 0) {
+      throw new NothingToTransferError();
+    }
+
+    const transaction = new ContractTransaction({
+      inputs: this._convertInputs(inputs),
+      outputs: this._convertOutputs(network.addressVersion, outputs),
+      attributes: this._convertAttributes(attributes),
+    });
+    return this._sendTransaction({
+      from,
+      network,
+      transaction,
+      onConfirm: async ({ receipt }) => receipt,
+    });
+  }
+
+  async claim(
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>> {
+    const {
+      from,
+      network,
+      attributes,
+      networkFee,
+    } = await this._getTransactionOptions(options);
+
+    const [{ unclaimed, amount }, { inputs, outputs }] = await Promise.all([
+      this.provider.getUnclaimed(network, from.address),
+      this._getTransfersInputOutputs({ from, network, gas: networkFee }),
+    ]);
+    if (unclaimed.length === 0) {
+      throw new NothingToClaimError();
+    }
+
+    const transaction = new ClaimTransaction({
+      inputs: this._convertInputs(inputs),
+      claims: this._convertInputs(unclaimed),
+      outputs: this._convertOutputs(
+        network.addressVersion,
+        outputs.concat([
+          {
+            address: from.address,
+            asset: GAS_ASSET_HASH,
+            value: amount,
+          },
+        ]),
+      ),
+      attributes: this._convertAttributes(attributes),
+    });
+    return this._sendTransaction({
+      from,
+      network,
+      transaction,
+      onConfirm: async ({ receipt }) => receipt,
+    });
+  }
+
+  publish(
+    contractIn: ContractRegister,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<PublishReceipt>> {
+    let contractProperties = CONTRACT_PROPERTY_STATE.NO_PROPERTY;
+    if (contractIn.properties.storage && contractIn.properties.dynamicInvoke) {
+      contractProperties = CONTRACT_PROPERTY_STATE.HAS_STORAGE_DYNAMIC_INVOKE;
+    } else if (contractIn.properties.storage) {
+      contractProperties = CONTRACT_PROPERTY_STATE.HAS_STORAGE;
+    } else if (contractIn.properties.dynamicInvoke) {
+      contractProperties = CONTRACT_PROPERTY_STATE.HAS_DYNAMIC_INVOKE;
+    }
+    const contract = new ContractModel({
+      script: Buffer.from(contractIn.script, 'hex'),
+      parameterList: contractIn.parameters.map(parameter =>
+        toContractParameterType(assertContractParameterTypeJSON(parameter)),
+      ),
+      returnType: toContractParameterType(
+        assertContractParameterTypeJSON(contractIn.returnType),
+      ),
+      name: contractIn.name,
+      codeVersion: contractIn.codeVersion,
+      author: contractIn.author,
+      email: contractIn.email,
+      description: contractIn.description,
+      contractProperties,
+    });
+
+    const sb = new ScriptBuilder();
+    sb.emitSysCall(
+      'Neo.Contract.Create',
+      contract.script,
+      Buffer.from(contract.parameterList),
+      contract.returnType,
+      contract.hasStorage,
+      contract.name,
+      contract.codeVersion,
+      contract.author,
+      contract.email,
+      contract.description,
+    );
+
+    return this._invokeRaw({
+      script: sb.build(),
+      options,
+      onConfirm: ({ receipt, data }): PublishReceipt => {
+        let result;
+        if (data.result.state === 'FAULT') {
+          result = this._getInvocationResultError(data.result);
+        } else {
+          const [createdContract] = data.contracts[0];
+          if (createdContract == null) {
+            throw new InvalidTransactionError(
+              'Something went wrong! Expected a contract to have been created, ' +
+                'but none was found',
+            );
+          }
+
+          result = this._getInvocationResultSuccess(
+            data.result,
+            createdContract,
+          );
+        }
+
+        return {
+          blockIndex: receipt.blockIndex,
+          blockHash: receipt.blockHash,
+          transactionIndex: receipt.transactionIndex,
+          result,
+        };
+      },
+    });
+  }
+
+  registerAsset(
+    asset: AssetRegister,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<RegisterAssetReceipt>> {
+    return this._invokeRaw({
+      script: network => {
+        const sb = new ScriptBuilder();
+        sb.emitSysCall(
+          'Neo.Asset.Create',
+          toAssetType(assertAssetTypeJSON(asset.assetType)),
+          asset.name,
+          clientUtils.bigNumberToBN(asset.amount, 8),
+          asset.precision,
+          common.stringToECPoint(asset.owner),
+          crypto.addressToScriptHash({
+            address: asset.admin,
+            addressVersion: network.addressVersion,
+          }),
+          crypto.addressToScriptHash({
+            address: asset.issuer,
+            addressVersion: network.addressVersion,
+          }),
+        );
+        return sb.build();
+      },
+      options,
+      onConfirm: ({ receipt, data }): RegisterAssetReceipt => {
+        let result;
+        if (data.result.state === 'FAULT') {
+          result = this._getInvocationResultError(data.result);
+        } else {
+          const createdAsset = data.asset;
+          if (createdAsset == null) {
+            throw new InvalidTransactionError(
+              'Something went wrong! Expected a asset to have been created, ' +
+                'but none was found',
+            );
+          }
+
+          result = this._getInvocationResultSuccess(data.result, createdAsset);
+        }
+
+        return {
+          blockIndex: receipt.blockIndex,
+          blockHash: receipt.blockHash,
+          transactionIndex: receipt.transactionIndex,
+          result,
+        };
+      },
+    });
+  }
+
+  async issue(
+    transfers: Array<Transfer>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>> {
+    const {
+      from,
+      network,
+      attributes,
+      networkFee,
+    } = await this._getTransactionOptions(options);
+    const { inputs, outputs } = await this._getTransfersInputOutputs({
+      transfers: [],
+      from,
+      network,
+      gas: networkFee.plus(network.issueGASFee),
+    });
+
+    if (inputs.length === 0) {
+      throw new NothingToTransferError();
+    }
+
+    const transaction = new IssueTransaction({
+      inputs: this._convertInputs(inputs),
+      outputs: this._convertOutputs(network.addressVersion, outputs),
+      attributes: this._convertAttributes(attributes),
+    });
+    return this._sendTransaction({
+      from,
+      network,
+      transaction,
+      onConfirm: async ({ receipt }) => receipt,
+    });
+  }
+
+  // eslint-disable-next-line
+  experimental_registerValidator(
+    publicKey: PublicKeyString,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<RegisterValidatorReceipt>> {
+    const sb = new ScriptBuilder();
+    sb.emitSysCall('Neo.Validator.Register', common.stringToECPoint(publicKey));
+
+    return this._invokeRaw({
+      script: sb.build(),
+      options,
+      onConfirm: ({ receipt, data }): RegisterValidatorReceipt => {
+        let result;
+        if (data.result.state === 'FAULT') {
+          result = this._getInvocationResultError(data.result);
+        } else {
+          const [registeredValidator] = data.validators;
+          if (registeredValidator == null) {
+            throw new InvalidTransactionError(
+              'Something went wrong! Expected a validator to have been registered, ' +
+                'but none was found',
+            );
+          }
+
+          result = this._getInvocationResultSuccess(
+            data.result,
+            registeredValidator,
+          );
+        }
+
+        return {
+          blockIndex: receipt.blockIndex,
+          blockHash: receipt.blockHash,
+          transactionIndex: receipt.transactionIndex,
+          result,
+        };
+      },
+    });
+  }
+
+  _invoke(
+    contract: Hash160String,
+    method: string,
+    params: Array<?ParamInternal>,
+    paramsZipped: Array<[string, ?Param]>,
+    optionsIn?: InvokeTransactionOptions,
+  ): Promise<TransactionResult<InvokeReceiptInternal>> {
+    const options = optionsIn || {};
+    return this._invokeRaw({
+      script: this._getInvokeMethodScript({
+        hash: contract,
+        method,
+        params,
+      }),
+      options: {
+        from: options.from,
+        attributes: (options.attributes || []).concat([
+          {
+            usage: 'Remark14',
+            data: Buffer.from(
+              `neo-one-invoke:${this._getInvokeAttributeTag(
+                contract,
+                method,
+                paramsZipped,
+              )}`,
+              'utf8',
+            ).toString('hex'),
+          },
+          ({
+            usage: 'Script',
+            data: contract,
+          }: $FlowFixMe),
+        ]),
+        networkFee: options.networkFee,
+        transfers: options.transfers,
+      },
+      onConfirm: ({ receipt, data }): InvokeReceiptInternal => ({
+        blockIndex: receipt.blockIndex,
+        blockHash: receipt.blockHash,
+        transactionIndex: receipt.transactionIndex,
+        result: data.result,
+        actions: data.actions,
+      }),
+      scripts: [
+        new WitnessModel({
+          invocation: this._getInvokeMethodInvocationScript({
+            method,
+            params,
+          }),
+          verification: Buffer.alloc(0, 0),
+        }),
+      ],
+    });
+  }
+
+  async _call(
+    contract: Hash160String,
+    method: string,
+    params: Array<?ParamInternal>,
+    options?: TransactionOptions,
+  ): Promise<RawInvocationResult> {
+    const {
+      from,
+      network,
+      attributes,
+      networkFee,
+    } = await this._getTransactionOptions(options);
+
+    const transfers = (options || {}).transfers || [];
+    const { inputs, outputs } = await this._getTransfersInputOutputs({
+      transfers,
+      from,
+      network,
+      gas: networkFee,
+    });
+    const testTransaction = new InvocationTransaction({
+      version: 1,
+      inputs: this._convertInputs(inputs),
+      outputs: this._convertOutputs(network.addressVersion, outputs),
+      attributes: this._convertAttributes(attributes),
+      gas: utils.ZERO,
+      script: this._getInvokeMethodScript({
+        hash: contract,
+        method,
+        params,
+      }),
+    });
+    return this.provider.testInvoke(
+      network,
+      testTransaction.serializeWire().toString('hex'),
+    );
+  }
+
+  async _getTransactionOptions(
+    optionsIn?: TransactionOptions | InvokeTransactionOptions,
+  ): Promise<TransactionOptionsFull> {
+    const options = optionsIn || {};
+    // $FlowFixMe
+    const attributes = (options.attributes || []: Array<Attribute>);
+
+    const { from: fromAddress } = options;
+    let fromIn;
+    if (fromAddress == null) {
+      fromIn = await this.currentAccount$.pipe(take(1)).toPromise();
+    } else {
+      const accounts = await this.accounts$.pipe(take(1)).toPromise();
+      fromIn = accounts.find(account => account.address === fromAddress);
+    }
+
+    const from = fromIn;
+    if (from == null) {
+      throw new NoAccountError();
+    }
+
+    const networks = await this.networks$.pipe(take(1)).toPromise();
+    const network = networks.find(net => net.type === from.networkType);
+    if (network == null) {
+      throw new UnknownNetworkError(from.networkType);
+    }
+
+    return {
+      from,
+      network,
+      attributes: attributes.concat(NEO_ONE_ATTRIBUTE),
+      networkFee: options.networkFee || utils.ZERO_BIG_NUMBER,
+    };
+  }
+
+  _getInvocationResultError(
+    result: RawInvocationResultError,
+  ): InvocationResultError {
+    return {
+      state: result.state,
+      gasConsumed: result.gasConsumed,
+      message: result.message,
+    };
+  }
+
+  _getInvocationResultSuccess<T>(
+    result: RawInvocationResultSuccess,
+    value: T,
+  ): InvocationResultSuccess<T> {
+    return {
+      state: result.state,
+      gasConsumed: result.gasConsumed,
+      value,
+    };
+  }
+
+  async _invokeRaw<T>({
+    script: scriptIn,
+    options,
+    onConfirm,
+    scripts: scriptsIn,
+  }: {|
+    script: Buffer | ((network: Network) => Buffer),
+    options?: TransactionOptions | InvokeTransactionOptions,
+    onConfirm: (options: {|
+      transaction: Transaction,
+      data: RawInvocationData,
+      receipt: TransactionReceipt,
+    |}) => Promise<T> | T,
+    scripts?: Array<WitnessModel>,
+  |}): Promise<TransactionResult<T>> {
+    const {
+      from,
+      network,
+      attributes: attributesIn,
+      networkFee,
+    } = await this._getTransactionOptions(options);
+
+    const script = scriptIn instanceof Buffer ? scriptIn : scriptIn(network);
+
+    const transfers = (options || {}).transfers || [];
+    const {
+      inputs: testInputs,
+      outputs: testOutputs,
+    } = await this._getTransfersInputOutputs({
+      transfers,
+      from,
+      network,
+      gas: networkFee,
+    });
+
+    const attributes = attributesIn.concat({
+      usage: 'Remark15',
+      data: `${utils.randomUInt()}`,
+    });
+
+    const scripts = scriptsIn || [];
+
+    const testTransaction = new InvocationTransaction({
+      version: 1,
+      inputs: this._convertInputs(testInputs),
+      outputs: this._convertOutputs(network.addressVersion, testOutputs),
+      attributes: this._convertAttributes(attributes),
+      gas: utils.ZERO,
+      script,
+      scripts,
+    });
+    const result = await this.provider.testInvoke(
+      network,
+      testTransaction.serializeWire().toString('hex'),
+    );
+    if (result.state === 'FAULT') {
+      throw new InvokeError(result.message);
+    }
+    const { inputs, outputs } = await this._getTransfersInputOutputs({
+      transfers,
+      from,
+      network,
+      gas: networkFee.plus(result.gasConsumed),
+    });
+
+    const invokeTransaction = new InvocationTransaction({
+      version: 1,
+      inputs: this._convertInputs(inputs),
+      outputs: this._convertOutputs(network.addressVersion, outputs),
+      attributes: this._convertAttributes(attributes),
+      gas: clientUtils.bigNumberToBN(result.gasConsumed, 8),
+      script,
+      scripts,
+    });
+
+    return this._sendTransaction({
+      from,
+      network,
+      transaction: invokeTransaction,
+      onConfirm: async ({ transaction, receipt }) => {
+        const data = await this.provider.getInvocationData(
+          network,
+          transaction.txid,
+        );
+        const res = await onConfirm({ transaction, receipt, data });
+        return res;
+      },
+    });
+  }
+
+  async _sendTransaction<T>({
+    transaction: transactionUnsignedIn,
+    from,
+    network,
+    onConfirm,
+  }: {|
+    transaction: TransactionModel,
+    from: UserAccount,
+    network: Network,
+    onConfirm: (options: {|
+      transaction: Transaction,
+      receipt: TransactionReceipt,
+    |}) => Promise<T>,
+  |}): Promise<TransactionResult<T>> {
+    let transactionUnsigned = transactionUnsignedIn;
+    if (
+      transactionUnsigned.inputs.length === 0 &&
+      (transactionUnsigned.claims == null ||
+        !Array.isArray(transactionUnsigned.claims) ||
+        transactionUnsigned.claims.length === 0)
+    ) {
+      transactionUnsigned = transactionUnsigned.clone({
+        attributes: transactionUnsigned.attributes.concat(
+          this._convertAttributes([
+            {
+              usage: 'Script',
+              data: from.scriptHash,
+            },
+          ]),
+        ),
+      });
+    }
+
+    const witness = await this.keystore.sign({
+      account: from,
+      message: transactionUnsigned.serializeUnsigned().toString('hex'),
+    });
+
+    const transaction = await this.provider.relayTransaction(
+      network,
+      this._addWitness({
+        transaction: transactionUnsigned,
+        scriptHash: from.scriptHash,
+        witness: this._convertWitness(witness),
+      })
+        .serializeWire()
+        .toString('hex'),
+    );
+
+    return {
+      transaction,
+      confirmed: async (options?: GetOptions): Promise<T> => {
+        const receipt = await this.provider.getTransactionReceipt(
+          network,
+          transaction.txid,
+          options,
+        );
+
+        return onConfirm({ transaction, receipt });
+      },
+    };
+  }
+
+  /*
+    This function returns one of two options:
+      1. For invocations -> 2 witnesses
+      2. All else -> 1 witness
+    We do some basic verification to make sure our assumptions at this point are
+    correct, that is:
+      - If we have 2 script attributes:
+        - 1 of them is = to scriptHash
+        - We have 1 witness
+      - If we have 1 script attribute and it is = to script hash
+        - We have 0 witness
+      - If we have 1 script attribute and it is != to script hash
+        - We have 1 witness
+  */
+  _addWitness({
+    transaction,
+    scriptHash,
+    witness,
+  }: {|
+    transaction: TransactionModel,
+    scriptHash: Hash160String,
+    witness: WitnessModel,
+  |}): TransactionModel {
+    // $FlowFixMe
+    const scriptAttributes = (transaction.attributes.filter(
+      attribute => attribute.usage === ATTRIBUTE_USAGE.SCRIPT,
+    ): Array<UInt160Attribute>);
+    const scriptHashes = scriptAttributes.map(attribute =>
+      common.uInt160ToString(attribute.value),
+    );
+
+    if (
+      scriptHashes.length === 2 ||
+      (scriptHashes.length === 1 && scriptHashes[0] !== scriptHash)
+    ) {
+      let otherHash = scriptHashes[0];
+      if (scriptHashes.length === 2) {
+        const [first, second] = scriptHashes;
+        if (!(first === scriptHash || second === scriptHash)) {
+          throw new InvalidTransactionError('Something went wrong!');
+        }
+
+        otherHash = first === scriptHash ? second : first;
+      }
+
+      const otherScript = transaction.scripts[0];
+      if (otherScript == null || transaction.scripts.length !== 1) {
+        throw new InvalidTransactionError('Something went wrong!');
+      }
+
+      return transaction.clone({
+        scripts: _.sortBy(
+          [[scriptHash, witness], [otherHash, otherScript]],
+          value => value[0],
+        ).map(value => value[1]),
+      });
+    } else if (
+      scriptHashes.length === 0 ||
+      (scriptHashes.length === 1 && scriptHashes[0] === scriptHash)
+    ) {
+      if (transaction.scripts.length !== 0) {
+        throw new InvalidTransactionError('Something went wrong!');
+      }
+
+      return transaction.clone({ scripts: [witness] });
+    }
+
+    throw new InvalidTransactionError('Something went wrong!');
+  }
+
+  async _getTransfersInputOutputs({
+    from,
+    network,
+    transfers: transfersIn,
+    gas: gasIn,
+  }: {|
+    from: UserAccount,
+    network: Network,
+    transfers?: Array<Transfer>,
+    gas?: BigNumber,
+  |}): Promise<{| outputs: Array<Output>, inputs: Array<Input> |}> {
+    const transfers = ((transfersIn || []).map(transfer => ({
+      to: transfer.to,
+      asset: transfer.asset,
+      amount: transfer.amount,
+    })): Array<{|
+      to?: AddressString,
+      asset: Hash256String,
+      amount: BigNumber,
+    |}>);
+
+    const gas = gasIn || utils.ZERO_BIG_NUMBER;
+    if (transfers.length === 0 && gas.lte(utils.ZERO_BIG_NUMBER)) {
+      return { inputs: [], outputs: [] };
+    }
+
+    const allOutputs = await this.provider.getUnspentOutputs(
+      network,
+      from.address,
+    );
+    return commonUtils
+      .values(
+        _.groupBy(
+          gas == null
+            ? transfers
+            : transfers.concat({
+                amount: gas,
+                asset: GAS_ASSET_HASH,
+              }),
+          ({ asset }) => asset,
+        ),
+      )
+      .reduce(
+        (acc, toByAsset) => {
+          const { asset } = toByAsset[0];
+          const assetResults = toByAsset.reduce(
+            (
+              { remaining, remainingOutputs, inputs, outputs },
+              { amount, to },
+            ) => {
+              const result = this._getTransferInputOutputs({
+                from: from.address,
+                to,
+                asset,
+                amount,
+                remainingOutputs,
+                remaining,
+              });
+
+              return {
+                remaining: result.remaining,
+                remainingOutputs: result.remainingOutputs,
+                inputs: inputs.concat(result.inputs),
+                outputs: outputs.concat(result.outputs),
+              };
+            },
+            {
+              remaining: utils.ZERO_BIG_NUMBER,
+              remainingOutputs: allOutputs.filter(
+                output => output.asset === asset,
+              ),
+              inputs: ([]: Array<Input>),
+              outputs: ([]: Array<Output>),
+            },
+          );
+
+          const outputs = acc.outputs.concat(assetResults.outputs);
+          if (assetResults.remaining.gt(utils.ZERO_BIG_NUMBER)) {
+            outputs.push(
+              ({
+                address: from.address,
+                asset,
+                value: assetResults.remaining,
+              }: Output),
+            );
+          }
+
+          return {
+            inputs: acc.inputs.concat(assetResults.inputs),
+            outputs,
+          };
+        },
+        { inputs: ([]: Array<Input>), outputs: ([]: Array<Output>) },
+      );
+  }
+
+  _getTransferInputOutputs({
+    to,
+    amount: originalAmount,
+    asset,
+    remainingOutputs,
+    remaining,
+  }: {|
+    from: AddressString,
+    to?: AddressString,
+    amount: BigNumber,
+    asset: Hash256String,
+    remainingOutputs: Array<UnspentOutput>,
+    remaining: BigNumber,
+  |}): {|
+    inputs: Array<Input>,
+    outputs: Array<Output>,
+    remainingOutputs: Array<UnspentOutput>,
+    remaining: BigNumber,
+  |} {
+    const amount = originalAmount.minus(remaining);
+
+    const outputs =
+      to == null
+        ? ([]: Array<Output>)
+        : [
+            {
+              address: to,
+              asset,
+              value: originalAmount,
+            },
+          ];
+    if (amount.lte(utils.ZERO_BIG_NUMBER)) {
+      return {
+        inputs: [],
+        outputs,
+        remainingOutputs,
+        remaining: remaining.minus(originalAmount),
+      };
+    }
+
+    const outputsOrdered = remainingOutputs
+      .sort((coinA, coinB) => coinA.value.cmp(coinB.value))
+      .reverse();
+
+    const sum = outputsOrdered.reduce(
+      (acc, coin) => acc.plus(coin.value),
+      utils.ZERO_BIG_NUMBER,
+    );
+
+    if (sum.lt(amount)) {
+      throw new InsufficientFundsError(sum, amount);
+    }
+
+    // find input coins
+    let k = 0;
+    let amountRemaining = amount.plus(utils.ZERO_BIG_NUMBER);
+    while (outputsOrdered[k].value.lte(amountRemaining)) {
+      amountRemaining = amountRemaining.minus(outputsOrdered[k].value);
+      if (amountRemaining.equals(utils.ZERO_BIG_NUMBER)) {
+        break;
+      }
+      k += 1;
+    }
+
+    let coinAmount = utils.ZERO_BIG_NUMBER;
+    const inputs = ([]: Array<Input>);
+    for (let i = 0; i < k + 1; i += 1) {
+      coinAmount = coinAmount.plus(outputsOrdered[i].value);
+      inputs.push({
+        txid: outputsOrdered[i].txid,
+        vout: outputsOrdered[i].vout,
+      });
+    }
+
+    return {
+      inputs,
+      outputs,
+      remainingOutputs: outputsOrdered.slice(k + 1),
+      remaining: coinAmount.minus(amount),
+    };
+  }
+
+  _getInvokeAttributeTag(
+    contract: Hash160String,
+    method: string,
+    paramsZipped: Array<[string, ?Param]>,
+  ): string {
+    return JSON.stringify({
+      contract,
+      method,
+      params: paramsZipped.map(([name, param]) => [
+        name,
+        this._paramToJSON(param),
+      ]),
+    });
+  }
+
+  _paramToJSON(param: ?Param): ?ParamJSON {
+    if (param == null) {
+      return param;
+    }
+
+    if (Array.isArray(param)) {
+      return param.map(value => this._paramToJSON(value));
+    }
+
+    if (
+      param instanceof BigNumber ||
+      (typeof param === 'object' && param.isBigNumber === true)
+    ) {
+      return param.toString();
+    }
+
+    return (param: $FlowFixMe);
+  }
+
+  _getInvokeMethodInvocationScript({
+    method,
+    params,
+  }: {|
+    method: string,
+    params: Array<?ParamInternal>,
+  |}): Buffer {
+    const sb = new ScriptBuilder();
+    sb.emitAppCallInvocation(method, ...this._convertParams(params));
+
+    return sb.build();
+  }
+
+  _getInvokeMethodScript({
+    hash,
+    method,
+    params,
+  }: {|
+    hash: Hash160String,
+    method: string,
+    params: Array<?ParamInternal>,
+  |}): Buffer {
+    const sb = new ScriptBuilder();
+    sb.emitAppCall(
+      common.stringToUInt160(hash),
+      method,
+      ...this._convertParams(params),
+    );
+
+    return sb.build();
+  }
+
+  _convertAttributes(attributes?: Array<Attribute>): Array<AttributeModel> {
+    return (attributes || []).map(attribute => converters.attribute(attribute));
+  }
+
+  _convertInputs(inputs?: Array<Input>): Array<InputModel> {
+    return (inputs || []).map(input => converters.input(input));
+  }
+
+  _convertOutputs(
+    addressVersion: number,
+    outputs?: Array<Output>,
+  ): Array<OutputModel> {
+    return (outputs || []).map(output =>
+      converters.output(output, addressVersion),
+    );
+  }
+
+  _convertWitness(script: Witness): WitnessModel {
+    return converters.witness(script);
+  }
+
+  _convertParams(params?: Array<?ParamInternal>): Array<?ScriptBuilderParam> {
+    return (params || []).map(param => converters.param(param));
+  }
+}

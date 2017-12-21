@@ -154,7 +154,11 @@ const checkWitness = async ({
   context: ExecutionContext,
   hash: UInt160,
 |}) => {
-  const { scriptContainer } = context.init;
+  const { scriptContainer, skipWitnessVerify } = context.init;
+  if (skipWitnessVerify) {
+    return true;
+  }
+
   let scriptHashesForVerifiying;
   switch (scriptContainer.type) {
     case 0x00:
@@ -390,6 +394,25 @@ export const SYSCALLS = {
           ...context,
           actionIndex: context.actionIndex + 1,
         },
+      };
+    },
+  }),
+  'Neo.Runtime.GetTime': createSysCall({
+    name: 'Neo.Runtime.GetTime',
+    out: 1,
+    invoke: async ({ context }: OpInvokeArgs) => {
+      const { persistingBlock } = context.init;
+      let time;
+      if (persistingBlock == null) {
+        time =
+          context.blockchain.currentBlock.timestamp +
+          context.blockchain.settings.secondsPerBlock;
+      } else {
+        time = persistingBlock.timestamp;
+      }
+      return {
+        context,
+        results: [new IntegerStackItem(new BN(time))],
       };
     },
   }),
@@ -977,6 +1000,9 @@ export const SYSCALLS = {
       const newAccount = await context.blockchain.account.update(account, {
         votes,
       });
+      if (context.init.listeners.onSetVotes != null) {
+        context.init.listeners.onSetVotes({ address, votes });
+      }
       if (newAccount.isDeletable()) {
         await context.blockchain.account.delete({ hash: address });
       }
@@ -1157,6 +1183,14 @@ export const SYSCALLS = {
         }
 
         await destroyContract(options);
+
+        if (context.init.listeners.onMigrateContract != null) {
+          context.init.listeners.onMigrateContract({
+            from: context.scriptHash,
+            to: contract.hash,
+          });
+        }
+
         return {
           context,
           results: [new ContractStackItem(contract)],

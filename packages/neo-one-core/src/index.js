@@ -75,12 +75,7 @@ export {
   ScriptBuilder,
 } from './utils';
 
-export type {
-  BasicAccountJSON,
-  AccountJSON,
-  AccountKey,
-  AccountUpdate,
-} from './Account';
+export type { AccountJSON, AccountKey, AccountUpdate } from './Account';
 export type {
   Action,
   ActionJSON,
@@ -93,7 +88,7 @@ export type {
 } from './action';
 export type { AssetJSON, AssetKey, AssetNameJSON, AssetUpdate } from './Asset';
 export type { AssetType, AssetTypeJSON } from './AssetType';
-export type { BasicBlockJSON, BlockJSON, BlockKey } from './Block';
+export type { BlockJSON, BlockKey } from './Block';
 export type { BlockBaseAdd } from './BlockBase';
 export type { ContractJSON, ContractKey } from './Contract';
 export type { ContractPropertyState } from './ContractPropertyState';
@@ -113,18 +108,19 @@ export type {
   TransactionKey,
   TransactionType,
   AttributeJSON,
-  BasicTransactionJSON,
   ClaimTransactionJSON,
   ContractTransactionJSON,
   EnrollmentTransactionJSON,
   InputJSON,
   IssueTransactionJSON,
+  InvocationDataJSON,
   InvocationTransactionJSON,
   MinerTransactionJSON,
   OutputJSON,
   PublishTransactionJSON,
   RegisterTransactionJSON,
   TransactionJSON,
+  TransactionReceiptJSON,
   FeeContext,
 } from './transaction';
 export type { ValidatorJSON, ValidatorKey } from './Validator';
@@ -183,7 +179,6 @@ export type {
 } from './contractParameter';
 export type { Equatable, Equals } from './Equatable';
 export type {
-  BasicInvocationResultJSON,
   InvocationResult,
   InvocationResultJSON,
   InvocationResultSuccessJSON,

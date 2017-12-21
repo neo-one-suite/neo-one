@@ -2,6 +2,7 @@
 import type BN from 'bn.js';
 
 import type { AssetNameJSON } from '../Asset';
+import { type Attribute } from './attribute';
 import {
   ASSET_TYPE,
   type AssetType,
@@ -124,13 +125,19 @@ export default class RegisterTransaction extends TransactionBase<
     return this.__size();
   }
 
-  clone(scripts: Array<Witness>): this {
+  clone({
+    scripts,
+    attributes,
+  }: {|
+    scripts?: Array<Witness>,
+    attributes?: Array<Attribute>,
+  |}): this {
     return new this.constructor({
       version: this.version,
-      attributes: this.attributes,
+      attributes: attributes || this.attributes,
       inputs: this.inputs,
       outputs: this.outputs,
-      scripts,
+      scripts: scripts || this.scripts,
       hash: this.hash,
       asset: this.asset,
     });

@@ -184,6 +184,8 @@ export type OpCode =
   | 'SETITEM'
   | 'NEWARRAY'
   | 'NEWSTRUCT'
+  | 'APPEND'
+  | 'REVERSE'
   | 'THROW'
   | 'THROWIFNOT';
 
@@ -359,6 +361,8 @@ export type ByteCode =
   | 0xc4
   | 0xc5
   | 0xc6
+  | 0xc8
+  | 0xc9
   | 0xf0
   | 0xf1;
 
@@ -462,6 +466,8 @@ const OPCODE_PAIRS = [[0x00, 'PUSH0'], [0x01, 'PUSHBYTES1']]
     [0xc4, 'SETITEM'],
     [0xc5, 'NEWARRAY'],
     [0xc6, 'NEWSTRUCT'],
+    [0xc8, 'APPEND'],
+    [0xc9, 'REVERSE'],
     [0xf0, 'THROW'],
     [0xf1, 'THROWIFNOT'],
   ]);
@@ -477,6 +483,7 @@ export const SYS_CALL_NAME = {
   RUNTIME_CHECK_WITNESS: 'Neo.Runtime.CheckWitness',
   RUNTIME_NOTIFY: 'Neo.Runtime.Notify',
   RUNTIME_LOG: 'Neo.Runtime.Log',
+  RUNTIME_GET_TIME: 'Neo.Runtime.GetTime',
   BLOCKCHAIN_GET_HEIGHT: 'Neo.Blockchain.GetHeight',
   BLOCKCHAIN_GET_HEADER: 'Neo.Blockchain.GetHeader',
   BLOCKCHAIN_GET_BLOCK: 'Neo.Blockchain.GetBlock',
@@ -560,6 +567,7 @@ export type SysCallName =
   | 'Neo.Runtime.CheckWitness'
   | 'Neo.Runtime.Notify'
   | 'Neo.Runtime.Log'
+  | 'Neo.Runtime.GetTime'
   | 'Neo.Blockchain.GetHeight'
   | 'Neo.Blockchain.GetHeader'
   | 'Neo.Blockchain.GetBlock'
@@ -632,6 +640,8 @@ export const assertSysCallName = (value: string): SysCallName => {
       return SYS_CALL_NAME.RUNTIME_NOTIFY;
     case SYS_CALL_NAME.RUNTIME_LOG:
       return SYS_CALL_NAME.RUNTIME_LOG;
+    case SYS_CALL_NAME.RUNTIME_GET_TIME:
+      return SYS_CALL_NAME.RUNTIME_GET_TIME;
     case SYS_CALL_NAME.BLOCKCHAIN_GET_HEIGHT:
       return SYS_CALL_NAME.BLOCKCHAIN_GET_HEIGHT;
     case SYS_CALL_NAME.BLOCKCHAIN_GET_HEADER:

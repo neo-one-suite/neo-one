@@ -21,14 +21,10 @@ export type InvocationResultErrorAdd = {|
   message: string,
 |};
 
-export type BasicInvocationResultErrorJSON = {|
+export type InvocationResultErrorJSON = {|
   state: VMStateFault,
   gas_consumed: string,
   stack: Array<ContractParameterJSON>,
-|};
-
-export type InvocationResultErrorJSON = {|
-  ...BasicInvocationResultErrorJSON,
   message: string,
 |};
 

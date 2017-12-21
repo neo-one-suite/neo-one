@@ -9,7 +9,6 @@ import {
 import {
   type Asset,
   type BasicClientBaseProvider,
-  type BasicInvocationResult,
   type Contract,
   type InvocationResult,
   type Output,
@@ -22,7 +21,7 @@ export default class JSONRPCBasicClientBaseProvider<
   TBlock,
   TTransaction,
   TAccount,
-  TInvocationResult: InvocationResult | BasicInvocationResult,
+  TInvocationResult: InvocationResult,
 >
   implements BasicClientBaseProvider<
       TBlock,

@@ -8,6 +8,7 @@ import { concatAll } from 'rxjs/operators';
 import { defer } from 'rxjs/observable/defer';
 import { of as _of } from 'rxjs/observable/of';
 
+import type { WalletClient } from './types';
 import type WalletResourceType, {
   Wallet,
   WalletResourceOptions,
@@ -15,6 +16,7 @@ import type WalletResourceType, {
 import WalletResource from './WalletResource';
 
 export type WalletResourceAdapterInitOptions = {|
+  client: WalletClient,
   pluginManager: PluginManager,
   resourceType: WalletResourceType,
   name: string,
@@ -44,12 +46,14 @@ export default class WalletResourceAdapter {
   }
 
   static async init({
+    client,
     pluginManager,
     resourceType,
     name,
     dataPath,
   }: WalletResourceAdapterInitOptions): Promise<WalletResourceAdapter> {
     const walletResource = await WalletResource.createExisting({
+      client,
       pluginManager,
       resourceType,
       name,
@@ -68,6 +72,7 @@ export default class WalletResourceAdapter {
 
   static create$(
     {
+      client,
       pluginManager,
       resourceType,
       name,
@@ -84,6 +89,7 @@ export default class WalletResourceAdapter {
       }),
       defer(async () => {
         const walletResource = await WalletResource.createNew({
+          client,
           pluginManager,
           resourceType,
           name,

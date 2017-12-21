@@ -136,6 +136,7 @@ declare class rxjs$AnonymousSubject<T> extends rxjs$Subject<T> {
 declare class rxjs$BehaviorSubject<T> extends rxjs$Subject<T> {
   constructor(initialValue: T): void;
 
+  get value(): T;
   getValue(): T;
 }
 
@@ -472,6 +473,7 @@ declare module 'rxjs/operators' {
   declare export function startWith<T>(...array: Array<T | rxjs$SchedulerClass>): rxjs$OperatorFunction<T, T>;
   declare export function switchMap<T, R>(project: (value: T, index: number) => rxjs$ObservableInput<R>): rxjs$OperatorFunction<T, R>;
   declare export function take<T>(count: number): rxjs$OperatorFunction<T, T>;
+  declare export function timeout<T>(due: number | Date, scheduler?: rxjs$SchedulerClass): rxjs$OperatorFunction<T, T>;
   declare export function toArray<T>(): rxjs$OperatorFunction<T, Array<T>>
   declare export function publishReplay<T, R>(bufferSize?: number, windowTime?: number, selector?: rxjs$OperatorFunction<T, R>, scheduler?: rxjs$SchedulerClass): rxjs$OperatorFunction<T, R>;
   declare export function repeatWhen<T>(notifier: (notifications: rxjs$Observable<any>) => rxjs$Observable<any>): rxjs$OperatorFunction<T, T>;

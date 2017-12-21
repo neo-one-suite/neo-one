@@ -1,0 +1,726 @@
+/* @flow */
+import type BN from 'bn.js';
+import type BigNumber from 'bignumber.js';
+import type { Observable } from 'rxjs/Observable';
+
+// A NEO address string, e.g. APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR
+export type AddressString = string;
+// Hex PublicKey, e.g. 02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef
+export type PublicKeyString = string;
+// Hex PrivateKey
+export type PrivateKeyString = string;
+// Hex Buffer, e.g. 02028a99826ed
+export type BufferString = string;
+// NEO Hash160 string, e.g. 0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9
+export type Hash160String = string;
+// NEO Hash256 string, e.g. 0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c
+export type Hash256String = string;
+
+export type ContractParameterType =
+  | 'Signature'
+  | 'Boolean'
+  | 'Integer'
+  | 'Hash160'
+  | 'Hash256'
+  | 'ByteArray'
+  | 'PublicKey'
+  | 'String'
+  | 'Array'
+  | 'InteropInterface'
+  | 'Void';
+export type SignatureContractParameter = {|
+  type: 'Signature',
+  value: BufferString,
+|};
+export type BooleanContractParameter = {|
+  type: 'Boolean',
+  value: boolean,
+|};
+export type IntegerContractParameter = {|
+  type: 'Integer',
+  value: BN,
+|};
+export type Hash160ContractParameter = {|
+  type: 'Hash160',
+  value: Hash160String,
+|};
+export type Hash256ContractParameter = {|
+  type: 'Hash256',
+  value: Hash256String,
+|};
+export type ByteArrayContractParameter = {|
+  type: 'ByteArray',
+  value: BufferString,
+|};
+export type PublicKeyContractParameter = {|
+  type: 'PublicKey',
+  value: PublicKeyString,
+|};
+export type StringContractParameter = {|
+  type: 'String',
+  value: string,
+|};
+export type ArrayContractParameter = {|
+  type: 'Array',
+  // eslint-disable-next-line
+  value: Array<ContractParameter>,
+|};
+export type InteropInterfaceContractParameter = {|
+  type: 'InteropInterface',
+|};
+export type VoidContractParameter = {|
+  type: 'Void',
+|};
+
+export type ContractParameter =
+  | SignatureContractParameter
+  | BooleanContractParameter
+  | IntegerContractParameter
+  | Hash160ContractParameter
+  | Hash256ContractParameter
+  | ByteArrayContractParameter
+  | PublicKeyContractParameter
+  | StringContractParameter
+  | ArrayContractParameter
+  | InteropInterfaceContractParameter
+  | VoidContractParameter;
+
+export type ActionBase = {|
+  version: number,
+  blockIndex: number,
+  blockHash: Hash256String,
+  transactionIndex: number,
+  transactionHash: Hash256String,
+  index: number,
+  scriptHash: Hash160String,
+|};
+export type NotificationAction = {|
+  ...ActionBase,
+  type: 'Notification',
+  args: Array<ContractParameter>,
+|};
+export type LogAction = {|
+  ...ActionBase,
+  type: 'Log',
+  message: string,
+|};
+export type Action = NotificationAction | LogAction;
+
+export type Account = {|
+  address: AddressString,
+  frozen: boolean,
+  votes: Array<PublicKeyString>,
+  balances: {|
+    [asset: Hash256String]: BigNumber,
+  |},
+|};
+
+export type AssetType =
+  | 'CreditFlag'
+  | 'DutyFlag'
+  | 'GoverningToken'
+  | 'UtilityToken'
+  | 'Currency'
+  | 'Share'
+  | 'Invoice'
+  | 'Token';
+export type Asset = {|
+  hash: Hash256String,
+  type: AssetType,
+  name: string,
+  amount: BigNumber,
+  available: BigNumber,
+  precision: number,
+  owner: PublicKeyString,
+  admin: AddressString,
+  issuer: AddressString,
+  expiration: number,
+  frozen: boolean,
+|};
+
+export type AttributeUsageBuffer =
+  | 'DescriptionUrl'
+  | 'Description'
+  | 'Remark'
+  | 'Remark1'
+  | 'Remark2'
+  | 'Remark3'
+  | 'Remark4'
+  | 'Remark5'
+  | 'Remark6'
+  | 'Remark7'
+  | 'Remark8'
+  | 'Remark9'
+  | 'Remark10'
+  | 'Remark11'
+  | 'Remark12'
+  | 'Remark13'
+  | 'Remark14'
+  | 'Remark15';
+export type AttributeUsagePublicKey = 'ECDH02' | 'ECDH03';
+export type AttributeUsageHash160 = 'Script';
+export type AttributeUsageHash256 =
+  | 'ContractHash'
+  | 'Vote'
+  | 'Hash1'
+  | 'Hash2'
+  | 'Hash3'
+  | 'Hash4'
+  | 'Hash5'
+  | 'Hash6'
+  | 'Hash7'
+  | 'Hash8'
+  | 'Hash9'
+  | 'Hash10'
+  | 'Hash11'
+  | 'Hash12'
+  | 'Hash13'
+  | 'Hash14'
+  | 'Hash15';
+export type AttributeArg =
+  | {|
+      usage: AttributeUsageBuffer,
+      data: BufferString,
+    |}
+  | {|
+      usage: AttributeUsagePublicKey,
+      data: PublicKeyString,
+    |}
+  | {|
+      usage: AttributeUsageHash256,
+      data: Hash256String,
+    |};
+export type Attribute =
+| AttributeArg
+// Not allowed as an arg because adding arbitrary scripts will cause the
+// transaction to be invalid.
+| {|
+    usage: AttributeUsageHash160,
+    data: Hash160String,
+  |};
+
+export type Contract = {|
+  version: number,
+  hash: Hash160String,
+  script: BufferString,
+  parameters: Array<ContractParameterType>,
+  returntype: ContractParameterType,
+  name: string,
+  codeVersion: string,
+  author: string,
+  email: string,
+  description: string,
+  properties: {|
+    storage: boolean,
+    dynamicInvoke: boolean,
+  |},
+|};
+
+export type RawInvocationResultSuccess = {|
+  state: 'HALT',
+  gasConsumed: BigNumber,
+  stack: Array<ContractParameter>,
+|};
+export type RawInvocationResultError = {|
+  state: 'FAULT',
+  gasConsumed: BigNumber,
+  stack: Array<ContractParameter>,
+  message: string,
+|};
+export type RawInvocationResult =
+  RawInvocationResultSuccess |
+  RawInvocationResultError;
+
+export type StorageItem = {|
+  hash: Hash160String,
+  key: BufferString,
+  value: BufferString,
+|};
+
+export type Validator = {|
+  version: number,
+  publicKey: PublicKeyString,
+|};
+
+export type Input = {|
+  txid: Hash256String,
+  vout: number,
+|};
+
+export type Output = {|
+  asset: Hash256String,
+  value: BigNumber,
+  address: AddressString,
+|};
+
+export type UnspentOutput = {|
+  asset: Hash256String,
+  value: BigNumber,
+  address: AddressString,
+  txid: Hash256String,
+  vout: number,
+|};
+
+export type Witness = {|
+  invocation: BufferString,
+  verification: BufferString,
+|};
+
+export type RawInvocationData = {|
+  result: RawInvocationResult,
+  asset?: Asset,
+  contracts: Array<Contract>,
+  deletedContractHashes: Array<Hash160String>,
+  migratedContractHashes: Array<[Hash160String, Hash160String]>,
+  voteUpdates: Array<[AddressString, Array<PublicKeyString>]>,
+  validators: Array<Validator>,
+  actions: Array<Action>,
+|};
+
+type TransactionBase = {|
+  version: number,
+  txid: Hash256String,
+  size: number,
+  attributes: Array<Attribute>,
+  vin: Array<Input>,
+  vout: Array<Output>,
+  scripts: Array<Witness>,
+  systemFee: BigNumber,
+  networkFee: BigNumber,
+|};
+export type ClaimTransaction = {|
+  ...TransactionBase,
+  type: 'ClaimTransaction',
+  claims: Array<Input>,
+|};
+export type ContractTransaction = {|
+  ...TransactionBase,
+  type: 'ContractTransaction',
+|};
+export type EnrollmentTransaction = {|
+  ...TransactionBase,
+  type: 'EnrollmentTransaction',
+  publicKey: PublicKeyString,
+|};
+export type IssueTransaction = {|
+  ...TransactionBase,
+  type: 'IssueTransaction',
+|};
+export type InvocationTransaction = {|
+  ...TransactionBase,
+  type: 'InvocationTransaction',
+  script: BufferString,
+  gas: BigNumber,
+|};
+export type ConfirmedInvocationTransaction = {|
+  ...InvocationTransaction,
+  data: RawInvocationData,
+|};
+export type MinerTransaction = {|
+  ...TransactionBase,
+  type: 'MinerTransaction',
+  nonce: number,
+|};
+export type PublishTransaction = {|
+  ...TransactionBase,
+  type: 'PublishTransaction',
+  contract: Contract,
+|};
+export type RegisterTransaction = {|
+  ...TransactionBase,
+  type: 'RegisterTransaction',
+  asset: {|
+    type: AssetType,
+    name: string,
+    amount: BigNumber,
+    precision: number,
+    owner: PublicKeyString,
+    admin: AddressString,
+  |},
+|};
+export type CommonTransaction =
+  | MinerTransaction
+  | IssueTransaction
+  | ClaimTransaction
+  | EnrollmentTransaction
+  | RegisterTransaction
+  | ContractTransaction
+  | PublishTransaction;
+export type Transaction =
+  | CommonTransaction
+  | InvocationTransaction;
+export type ConfirmedTransaction =
+  | CommonTransaction
+  | ConfirmedInvocationTransaction;
+
+export type Header = {|
+  version: number,
+  hash: Hash256String,
+  previousBlockHash: Hash256String,
+  merkleroot: Hash256String,
+  time: number,
+  index: number,
+  nonce: string,
+  nextConsensus: AddressString,
+  script: Witness,
+  size: number,
+|};
+export type Block = {|
+  ...Header,
+  transactions: Array<ConfirmedTransaction>,
+|};
+
+export type AssetRegister = {|
+  assetType: AssetType,
+  name: string,
+  amount: BigNumber,
+  precision: number,
+  owner: PublicKeyString,
+  admin: AddressString,
+  issuer: AddressString,
+|};
+
+export type ContractRegister = {|
+  script: BufferString,
+  parameters: Array<ContractParameterType>,
+  returnType: ContractParameterType,
+  name: string,
+  codeVersion: string,
+  author: string,
+  email: string,
+  description: string,
+  properties: {|
+    storage: boolean,
+    dynamicInvoke: boolean,
+  |},
+|};
+
+export type Transfer = {|
+  amount: BigNumber,
+  asset: Hash256String,
+  to: AddressString,
+|};
+
+export type Param =
+  | BigNumber
+  | BufferString
+  | Hash160String
+  | Hash256String
+  | AddressString
+  | PublicKeyString
+  | boolean
+  | Array<?Param>;
+
+export type ParamJSON =
+  | string
+  | BufferString
+  | Hash160String
+  | Hash256String
+  | AddressString
+  | PublicKeyString
+  | boolean
+  | Array<?ParamJSON>;
+
+export type ParamInternal =
+  | BN
+  | BufferString
+  | Hash160String
+  | Hash256String
+  | AddressString
+  | PublicKeyString
+  | boolean
+  | Array<?ParamInternal>;
+
+export type EventParameters = { [name: string]: ?Param };
+export type Event = {|
+  ...ActionBase,
+  type: 'Event',
+  name: string,
+  parameters: EventParameters,
+|};
+
+export type Log = {|
+  ...ActionBase,
+  type: 'Log',
+  message: string,
+|};
+
+export type NetworkType = 'main' | 'test' | string;
+export type Network = {|
+  type: NetworkType,
+  addressVersion: number,
+  privateKeyVersion: number,
+  issueGASFee: BigNumber,
+|};
+
+export type UserAccount = {|
+  // UserAccountProvider defined string.
+  type: string,
+  networkType: NetworkType,
+  addressVersion: number,
+  name: string,
+  address: AddressString,
+  scriptHash: Hash160String,
+  publicKey: PublicKeyString,
+|};
+
+export type TransactionOptions = {|
+  from?: AddressString,
+  attributes?: Array<AttributeArg>,
+  networkFee?: BigNumber,
+|};
+
+export type InvokeTransactionOptions = {|
+  ...TransactionOptions,
+  transfers?: Array<Transfer>,
+|};
+
+export type TransactionReceipt = {|
+  blockIndex: number,
+  blockHash: Hash256String,
+  transactionIndex: number,
+|};
+
+export type InvokeReceiptInternal = {|
+  ...TransactionReceipt,
+  result: RawInvocationResult,
+  actions: Array<Action>,
+|};
+
+export type InvocationResultSuccess<TValue> = {|
+  state: 'HALT',
+  gasConsumed: BigNumber,
+  value: TValue,
+|};
+export type InvocationResultError = {|
+  state: 'FAULT',
+  gasConsumed: BigNumber,
+  message: string,
+|};
+export type InvocationResult<TValue> =
+  InvocationResultSuccess<TValue> |
+  InvocationResultError;
+
+export type InvokeReceipt = {|
+  ...TransactionReceipt,
+  result: InvocationResult<?Param>,
+  events: Array<Event>,
+  logs: Array<Log>,
+|};
+
+export type PublishReceipt = {|
+  ...TransactionReceipt,
+  result: InvocationResult<Contract>,
+|};
+
+export type RegisterAssetReceipt = {|
+  ...TransactionReceipt,
+  result: InvocationResult<Asset>,
+|};
+
+export type RegisterValidatorReceipt = {|
+  ...TransactionReceipt,
+  result: InvocationResult<Validator>,
+|};
+
+export type GetOptions = {|
+  timeoutMS?: number,
+|};
+
+export type TransactionResult<TTransactionReceipt> = {|
+  transaction: Transaction,
+  confirmed: (options?: GetOptions) => Promise<TTransactionReceipt>,
+|};
+
+// Indices are inclusive start, exclusive end.
+export type BlockFilter = {|
+  indexStart?: number,
+  indexStop?: number,
+|};
+
+export interface UserAccountProvider {
+  +currentAccount$: Observable<?UserAccount>;
+  +accounts$: Observable<Array<UserAccount>>;
+  +networks$: Observable<Array<Network>>;
+
+  transfer(
+    transfers: Array<Transfer>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
+
+  claim(
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
+
+  publish(
+    contract: ContractRegister,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<PublishReceipt>>;
+
+  registerAsset(
+    asset: AssetRegister,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<RegisterAssetReceipt>>;
+
+  issue(
+    transfers: Array<Transfer>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
+
+  // NOTE: This API is subject to change and is not bound by SEMVER.
+  experimental_registerValidator(
+    publicKey: PublicKeyString,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<RegisterValidatorReceipt>>;
+
+  _invoke(
+    contract: Hash160String,
+    method: string,
+    params: Array<?ParamInternal>,
+    paramsZipped: Array<[string, ?Param]>,
+    options?: InvokeTransactionOptions,
+  ): Promise<TransactionResult<InvokeReceiptInternal>>;
+  _call(
+    contract: Hash160String,
+    method: string,
+    params: Array<?ParamInternal>,
+    options?: TransactionOptions,
+  ): Promise<RawInvocationResult>;
+}
+
+export interface DataProvider {
+  +network: Network;
+
+  getAccount(address: AddressString): Promise<Account>;
+
+  getAsset(hash: Hash256String): Promise<Asset>;
+
+  getBlock(hash: Hash256String): Promise<Block>;
+  getBlock(index: number, options?: GetOptions): Promise<Block>;
+  iterBlocks(filter?: BlockFilter): AsyncIterable<Block>;
+
+  getBestBlockHash(): Promise<Hash256String>;
+  getBlockCount(): Promise<number>;
+
+  getContract(hash: Hash160String): Promise<Contract>;
+
+  getMemPool(): Promise<Array<Hash256String>>;
+
+  getTransaction(hash: Hash256String): Promise<Transaction>;
+
+  getValidators(): Promise<Array<Validator>>;
+
+  _getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem>;
+  _iterStorage(hash: Hash160String): AsyncIterable<StorageItem>;
+  _iterActions(filterIn?: BlockFilter): AsyncIterable<Action>;
+}
+
+
+export type SignatureABIReturn =
+  {| type: 'Signature' |};
+export type BooleanABIReturn =
+  {| type: 'Boolean' |};
+export type Hash160ABIReturn =
+  {| type: 'Hash160' |};
+export type Hash256ABIReturn =
+  {| type: 'Hash256' |};
+export type ByteArrayABIReturn =
+  {| type: 'ByteArray' |};
+export type PublicKeyABIReturn =
+  {| type: 'PublicKey' |};
+export type StringABIReturn =
+  {| type: 'String' |};
+export type InteropInterfaceABIReturn =
+  {| type: 'InteropInterface' |};
+export type VoidABIReturn =
+  {| type: 'Void' |};
+export type IntegerABIReturn =
+  {| type: 'Integer', decimals: number |};
+
+export type SignatureABIParameter =
+  {| name: string, type: 'Signature' |};
+export type BooleanABIParameter =
+  {| name: string, type: 'Boolean' |};
+export type Hash160ABIParameter =
+  {| name: string, type: 'Hash160' |};
+export type Hash256ABIParameter =
+  {| name: string, type: 'Hash256' |};
+export type ByteArrayABIParameter =
+  {| name: string, type: 'ByteArray' |};
+export type PublicKeyABIParameter =
+  {| name: string, type: 'PublicKey' |};
+export type StringABIParameter =
+  {| name: string, type: 'String' |};
+export type InteropInterfaceABIParameter =
+  {| name: string, type: 'InteropInterface' |};
+export type VoidABIParameter =
+  {| name: string, type: 'Void' |};
+export type IntegerABIParameter =
+  {| name: string, type: 'Integer', decimals: number |};
+
+export type ABIReturn =
+  | SignatureABIReturn
+  | BooleanABIReturn
+  | Hash160ABIReturn
+  | Hash256ABIReturn
+  | ByteArrayABIReturn
+  | PublicKeyABIReturn
+  | StringABIReturn
+  | {| type: 'Array', value: ABIReturn |}
+  | InteropInterfaceABIReturn
+  | VoidABIReturn
+  | IntegerABIReturn;
+export type ABIParameter =
+  | SignatureABIParameter
+  | BooleanABIParameter
+  | Hash160ABIParameter
+  | Hash256ABIParameter
+  | ByteArrayABIParameter
+  | PublicKeyABIParameter
+  | StringABIParameter
+  | {| name: string, type: 'Array', value: ABIReturn |}
+  | InteropInterfaceABIParameter
+  | VoidABIParameter
+  | IntegerABIParameter;
+
+export type ArrayABI =
+  {| type: 'Array', value: ABIReturn |} |
+  {| name: string, type: 'Array', value: ABIReturn |};
+export type SignatureABI = SignatureABIParameter | SignatureABIReturn;
+export type BooleanABI = BooleanABIParameter | BooleanABIReturn;
+export type Hash160ABI = Hash160ABIParameter | Hash160ABIReturn;
+export type Hash256ABI = Hash256ABIParameter | Hash256ABIReturn;
+export type ByteArrayABI = ByteArrayABIParameter | ByteArrayABIReturn;
+export type PublicKeyABI = PublicKeyABIParameter | PublicKeyABIReturn;
+export type StringABI = StringABIParameter | StringABIReturn;
+export type InteropInterfaceABI = InteropInterfaceABIParameter | InteropInterfaceABIReturn;
+export type VoidABI = VoidABIParameter | VoidABIReturn;
+export type IntegerABI = IntegerABIParameter | IntegerABIReturn;
+
+export type ABIFunction = {|
+  name: string,
+  constant?: boolean,
+  parameters?: Array<ABIParameter>,
+  returnType: ABIReturn,
+|};
+export type ABIEvent = {|
+  name: string,
+  parameters: Array<ABIParameter>,
+|};
+export type ABI = {|
+  hash: Hash160String,
+  functions: Array<ABIFunction>,
+  events?: Array<ABIEvent>,
+|};
+
+export type SmartContract = {|
+  // flowlint-next-line unclear-type:off
+  [key: string]: any
+|};
+
+export type ReadSmartContract = {|
+  iterEvents: (filter?: BlockFilter) => AsyncIterable<Event>,
+  iterLogs: (filter?: BlockFilter) => AsyncIterable<Log>,
+  iterActions: (filter?: BlockFilter) => AsyncIterable<Event | Log>,
+  iterStorage: () => AsyncIterable<StorageItem>,
+|};

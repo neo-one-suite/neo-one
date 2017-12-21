@@ -1,5 +1,6 @@
 /* @flow */
 import { TRANSACTION_TYPE } from './TransactionType';
+import { type Attribute } from './attribute';
 import {
   type DeserializeWireBaseOptions,
   type SerializeJSONContext,
@@ -83,13 +84,19 @@ export default class EnrollmentTransaction extends TransactionBase<
     return this.__size();
   }
 
-  clone(scripts: Array<Witness>): this {
+  clone({
+    scripts,
+    attributes,
+  }: {|
+    scripts?: Array<Witness>,
+    attributes?: Array<Attribute>,
+  |}): this {
     return new this.constructor({
       version: this.version,
-      attributes: this.attributes,
+      attributes: attributes || this.attributes,
       inputs: this.inputs,
       outputs: this.outputs,
-      scripts,
+      scripts: scripts || this.scripts,
       publicKey: this.publicKey,
     });
   }

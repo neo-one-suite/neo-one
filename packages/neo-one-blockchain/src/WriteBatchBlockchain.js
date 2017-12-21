@@ -470,6 +470,8 @@ export default class WriteBatchBlockchain {
         onStep: this._onStep,
         getValidators: this.getValidators,
       });
+      const migratedContractHashes = [];
+      const voteUpdates = [];
       const result = await wrapExecuteScripts(() =>
         this._vm.executeScripts({
           scripts: [{ code: transaction.script }],
@@ -487,6 +489,15 @@ export default class WriteBatchBlockchain {
           },
           gas: transaction.gas,
           onStep: this._onStep,
+          listeners: {
+            onMigrateContract: ({ from, to }) => {
+              migratedContractHashes.push([from, to]);
+            },
+            onSetVotes: ({ address, votes }) => {
+              voteUpdates.push([address, votes]);
+            },
+          },
+          persistingBlock: block,
         }),
       );
       if (result instanceof InvocationResultSuccess) {
@@ -505,6 +516,23 @@ export default class WriteBatchBlockchain {
             change =>
               change.type === 'add' && change.change.type === 'contract'
                 ? change.change.value.hash
+                : null,
+          )
+          .filter(Boolean);
+        const deletedContractHashes = contractsChangeSet
+          .map(
+            change =>
+              change.type === 'delete' && change.change.type === 'contract'
+                ? change.change.key.hash
+                : null,
+          )
+          .filter(Boolean);
+        const validatorsChangeSet = temporaryBlockchain.validator.getChangeSet();
+        const validatorPublicKeys = validatorsChangeSet
+          .map(
+            change =>
+              change.type === 'add' && change.change.type === 'validator'
+                ? change.change.value.publicKey
                 : null,
           )
           .filter(Boolean);
@@ -528,6 +556,10 @@ export default class WriteBatchBlockchain {
               hash: transaction.hash,
               assetHash,
               contractHashes,
+              deletedContractHashes,
+              migratedContractHashes,
+              validatorPublicKeys,
+              voteUpdates,
               blockIndex: block.index,
               transactionIndex,
               result,
@@ -540,6 +572,10 @@ export default class WriteBatchBlockchain {
             hash: transaction.hash,
             assetHash: undefined,
             contractHashes: [],
+            deletedContractHashes: [],
+            migratedContractHashes: [],
+            voteUpdates: [],
+            validatorPublicKeys: [],
             blockIndex: block.index,
             transactionIndex,
             result,

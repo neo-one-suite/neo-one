@@ -1,0 +1,106 @@
+/* @flow */
+import type BigNumber from 'bignumber.js';
+import type { Observable } from 'rxjs/Observable';
+
+import type {
+  ABI,
+  AddressString,
+  AssetRegister,
+  ContractRegister,
+  Hash160String,
+  Hash256String,
+  RawInvocationResult,
+  InvokeTransactionOptions,
+  Param,
+  ParamInternal,
+  Transfer,
+  Network,
+  TransactionOptions,
+  PublicKeyString,
+  PublishReceipt,
+  RegisterAssetReceipt,
+  RegisterValidatorReceipt,
+  SmartContract,
+  TransactionReceipt,
+  TransactionResult,
+  InvokeReceiptInternal,
+  UserAccount,
+  UserAccountProvider,
+} from './types'; // eslint-disable-line
+
+declare export default class Client<
+  TUserAccountProvider: UserAccountProvider
+> {
+  constructor(
+    userAccountProvider: TUserAccountProvider,
+  ): Client<TUserAccountProvider>;
+
+  +userAccountProvider: TUserAccountProvider;
+
+  +currentAccount$: Observable<?UserAccount>;
+  getCurrentAccount(): Promise<?UserAccount>;
+
+  +accounts$: Observable<Array<UserAccount>>;
+  getAccounts(): Promise<Array<UserAccount>>;
+
+  +networks$: Observable<Array<Network>>;
+  getNetworks(): Promise<Array<Network>>;
+
+  transfer(
+    amount: BigNumber,
+    asset: Hash256String,
+    to: AddressString,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
+  transfer(
+    transfers: Array<Transfer>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
+
+  claim(
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
+
+  publish(
+    contract: ContractRegister,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<PublishReceipt>>;
+
+  registerAsset(
+    asset: AssetRegister,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<RegisterAssetReceipt>>;
+
+  issue(
+    asset: Hash256String,
+    amount: BigNumber,
+    to: AddressString,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
+  issue(
+    transfers: Array<Transfer>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
+
+  smartContract(abi: ABI): SmartContract;
+
+  // NOTE: This API is subject to change and is not bound by semver.
+  experimental_registerValidator(
+    publicKey: PublicKeyString,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<RegisterValidatorReceipt>>;
+
+  _invoke(
+    contract: Hash160String,
+    method: string,
+    params: Array<?ParamInternal>,
+    paramsZipped: Array<[string, ?Param]>,
+    options?: InvokeTransactionOptions,
+  ): Promise<TransactionResult<InvokeReceiptInternal>>;
+  _call(
+    contract: Hash160String,
+    method: string,
+    params: Array<?ParamInternal>,
+    options?: TransactionOptions,
+  ): Promise<RawInvocationResult>;
+}

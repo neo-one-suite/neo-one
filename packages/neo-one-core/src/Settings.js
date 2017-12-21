@@ -21,6 +21,7 @@ export type Settings = {|
   +fees: { [transactionType: TransactionType]: BN },
   +messageMagic: number,
   +addressVersion: number,
+  +privateKeyVersion: number,
   +standbyValidators: Array<ECPoint>,
   +vm: VMSettings,
   +secondsPerBlock: number,

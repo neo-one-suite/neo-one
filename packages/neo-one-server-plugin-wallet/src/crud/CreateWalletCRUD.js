@@ -6,8 +6,8 @@ import {
 } from '@neo-one/server';
 import { type InteractiveCLI, compoundName } from '@neo-one/server-common';
 
-import client from '@neo-one/client';
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
+import { decryptNEP2, isNEP2, wifToPrivateKey } from '@neo-one/client';
 
 import type WalletResourceType, {
   Wallet,
@@ -15,6 +15,7 @@ import type WalletResourceType, {
 } from '../WalletResourceType';
 
 import common from './common';
+import { getClientNetwork } from '../utils';
 
 const ENCRYPT_MESSAGE = 'Enter a password to encrypt your private key: ';
 
@@ -60,16 +61,21 @@ export default class CreateWalletCRUD extends CreateCRUD<
   |}): Promise<WalletResourceOptions> {
     const { network } = await common.getCLIResourceOptions({ cli, options });
     let password;
-    let { privateKey } = options;
-    if (privateKey == null && network === networkConstants.NETWORK_NAME.MAIN) {
+    const { privateKey: wif } = options;
+    let privateKey;
+    const clientNetwork = getClientNetwork(network);
+    if (wif == null && network === networkConstants.NETWORK_NAME.MAIN) {
       password = await common.promptPassword({
         cli,
         prompt: ENCRYPT_MESSAGE,
       });
-    } else if (privateKey != null) {
+    } else if (wif != null) {
       let valid = false;
       try {
-        client.wifToPrivateKey(privateKey);
+        privateKey = wifToPrivateKey({
+          wif,
+          privateKeyVersion: clientNetwork.privateKeyVersion,
+        });
         valid = true;
       } catch (error) {
         valid = false;
@@ -82,14 +88,15 @@ export default class CreateWalletCRUD extends CreateCRUD<
             prompt: ENCRYPT_MESSAGE,
           });
         }
-      } else if (client.isNEP2(privateKey)) {
+      } else if (isNEP2(wif)) {
         password = await common.promptPassword({
           cli,
           prompt: 'Enter password: ',
         });
-        privateKey = await client.decryptNEP2({
-          encryptedKey: privateKey,
+        privateKey = await decryptNEP2({
+          encryptedKey: wif,
           password,
+          addressVersion: clientNetwork.addressVersion,
         });
       } else if (network === networkConstants.NETWORK_NAME.MAIN) {
         throw new Error(
