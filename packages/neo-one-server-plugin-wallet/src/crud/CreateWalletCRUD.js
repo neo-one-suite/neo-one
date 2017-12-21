@@ -61,7 +61,7 @@ export default class CreateWalletCRUD extends CreateCRUD<
   |}): Promise<WalletResourceOptions> {
     const { network } = await common.getCLIResourceOptions({ cli, options });
     let password;
-    const { privateKey: wif } = options;
+    const wif = options['private-key'];
     let privateKey;
     const clientNetwork = getClientNetwork(network);
     if (wif == null && network === networkConstants.NETWORK_NAME.MAIN) {

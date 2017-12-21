@@ -1,6 +1,5 @@
 /* @flow */
 // flowlint untyped-import:off
-import BigNumber from 'bignumber.js';
 import { type DescribeTable, compoundName } from '@neo-one/server-common';
 import {
   type Network,
@@ -16,7 +15,9 @@ import {
   createPrivateKey,
   networks,
   privateKeyToWIF,
+  createReadClient,
 } from '@neo-one/client';
+import { common } from '@neo-one/core';
 
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { concatMap, map, shareReplay, take } from 'rxjs/operators';
@@ -26,7 +27,7 @@ import { timer } from 'rxjs/observable/timer';
 import { utils } from '@neo-one/utils';
 
 import { NetworkRequiredError } from './errors';
-import type { WalletClient } from './types';
+import type { ReadWalletClient, WalletClient } from './types';
 import type WalletResourceType, { Coin, Wallet } from './WalletResourceType';
 
 import { getClientNetwork } from './utils';
@@ -54,27 +55,30 @@ const updateClient = ({
   networkName: string,
   network?: ?Network,
   client: WalletClient,
-|}) => {
-  const rpcURL = getRPCURL(network);
+|}): ReadWalletClient => {
+  let rpcURL = getRPCURL(network);
   if (rpcURL == null) {
     if (networkName === networkConstants.NETWORK_NAME.MAIN) {
-      client.userAccountProvider.provider.addNetwork({
-        network: networks.MAIN,
-        rpcURL: networks.MAIN_URL,
-      });
+      rpcURL = networks.MAIN_URL;
     } else if (networkName === networkConstants.NETWORK_NAME.TEST) {
-      client.userAccountProvider.provider.addNetwork({
-        network: networks.TEST,
-        rpcURL: networks.TEST_URL,
-      });
+      rpcURL = networks.TEST_URL;
     }
-  } else {
-    const clientNetwork = getClientNetwork(networkName);
-    client.userAccountProvider.provider.addNetwork({
-      network: clientNetwork,
-      rpcURL,
-    });
   }
+
+  if (rpcURL == null) {
+    throw new NetworkRequiredError();
+  }
+
+  const clientNetwork = getClientNetwork(networkName);
+  client.userAccountProvider.provider.addNetwork({
+    network: clientNetwork,
+    rpcURL,
+  });
+
+  return createReadClient({
+    network: clientNetwork,
+    rpcURL,
+  });
 };
 
 const getNetwork$ = ({
@@ -101,6 +105,7 @@ const getNetwork$ = ({
 
 type WalletResourceOptions = {|
   client: WalletClient,
+  readClient: ReadWalletClient,
   pluginManager: PluginManager,
   resourceType: WalletResourceType,
   name: string,
@@ -134,6 +139,7 @@ const WALLET_PATH = 'wallet.json';
 
 export default class WalletResource {
   _client: WalletClient;
+  _readClient: ReadWalletClient;
   _resourceType: WalletResourceType;
   _name: string;
   _baseName: string;
@@ -145,8 +151,8 @@ export default class WalletResource {
   _clientNetwork: ClientNetwork;
 
   _deleted: boolean;
-  _neoBalance: ?BigNumber;
-  _gasBalance: ?BigNumber;
+  _neoBalance: ?string;
+  _gasBalance: ?string;
   _balance: Array<Coin>;
 
   _network$: Observable<?Network>;
@@ -154,6 +160,7 @@ export default class WalletResource {
 
   constructor({
     client,
+    readClient,
     pluginManager,
     resourceType,
     name,
@@ -165,6 +172,7 @@ export default class WalletResource {
     clientNetwork,
   }: WalletResourceOptions) {
     this._client = client;
+    this._readClient = readClient;
     this._resourceType = resourceType;
     this._name = name;
     this._baseName = baseName;
@@ -221,7 +229,7 @@ export default class WalletResource {
       throw new NetworkRequiredError();
     }
 
-    updateClient({ networkName, network, client });
+    const readClient = updateClient({ networkName, network, client });
     const clientNetwork = getClientNetwork(networkName);
     const wallet = await client.userAccountProvider.keystore.addAccount({
       network: clientNetwork,
@@ -237,6 +245,7 @@ export default class WalletResource {
 
     const walletResource = new WalletResource({
       client,
+      readClient,
       pluginManager,
       resourceType,
       name,
@@ -263,7 +272,7 @@ export default class WalletResource {
     const network = await getNetwork$({ networkName, pluginManager })
       .pipe(take(1))
       .toPromise();
-    updateClient({ networkName, network, client });
+    const readClient = updateClient({ networkName, network, client });
     const clientNetwork = getClientNetwork(networkName);
 
     const walletPath = this._getWalletPath(dataPath);
@@ -271,6 +280,7 @@ export default class WalletResource {
 
     return new WalletResource({
       client,
+      readClient,
       pluginManager,
       resourceType,
       name,
@@ -292,11 +302,58 @@ export default class WalletResource {
   }
 
   async _update(network?: Network): Promise<void> {
-    updateClient({
-      networkName: this._networkName,
-      network,
-      client: this._client,
-    });
+    if (network != null && network.nodes.some(node => node.ready)) {
+      this._readClient = updateClient({
+        networkName: this._networkName,
+        network,
+        client: this._client,
+      });
+
+      try {
+        const account = await this._readClient.getAccount(this._address);
+
+        let neoBalance = '0';
+        let gasBalance = '0';
+        this._balance = await Promise.all(
+          utils.entries(account.balances).map(async ([assetHash, amount]) => {
+            const asset = await this._readClient.getAsset(assetHash);
+            let { name } = asset;
+            // TODO: Is this going to cause problems somewhere else?
+            // GAS asset hash is different because we have 200m amount instead
+            // of 100m. So we hack it a bit here to translate names..
+            if (
+              (this._networkType === 'private' && name === 'AntShare') ||
+              (this._networkType !== 'private' &&
+                asset.hash === common.NEO_ASSET_HASH)
+            ) {
+              name = 'NEO';
+              neoBalance = amount.toString();
+            }
+            if (
+              (this._networkType === 'private' && name === 'AntCoin') ||
+              (this._networkType !== 'private' &&
+                asset.hash === common.GAS_ASSET_HASH)
+            ) {
+              name = 'GAS';
+              gasBalance = amount.toString();
+            }
+            return {
+              assetName: name,
+              asset: assetHash,
+              amount: amount.toString(),
+            };
+          }),
+        );
+        this._neoBalance = neoBalance;
+        this._gasBalance = gasBalance;
+      } catch (error) {
+        this._resourceType.plugin.log({
+          event: 'WALLET_RESOURCE_UPDATE_WALLET_ERROR',
+          address: this._address,
+          error,
+        });
+      }
+    }
   }
 
   get walletID(): {|
@@ -348,10 +405,8 @@ export default class WalletResource {
       network: this._networkName,
       address: this._address,
       unlocked: this.unlocked,
-      neoBalance:
-        this._neoBalance == null ? 'Unknown' : this._neoBalance.toString(),
-      gasBalance:
-        this._gasBalance == null ? 'Unknown' : this._gasBalance.toString(),
+      neoBalance: this._neoBalance == null ? 'Unknown' : this._neoBalance,
+      gasBalance: this._gasBalance == null ? 'Unknown' : this._gasBalance,
       privateKey: this.wif,
       nep2: this.wallet.nep2,
       publicKey: this.wallet.account.publicKey,

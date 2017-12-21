@@ -11,7 +11,7 @@ import {
   type Plugin,
 } from '@neo-one/server';
 
-import { concatMap, map, switchMap, take } from 'rxjs/operators';
+import { concatMap, filter, map, switchMap, take } from 'rxjs/operators';
 import { defer } from 'rxjs/observable/defer';
 import { empty } from 'rxjs/observable/empty';
 import logUpdate from 'log-update';
@@ -104,7 +104,7 @@ const createResource = ({
                           client: cli.client,
                           options,
                         })
-                        .pipe(take(1))
+                        .pipe(filter(value => value != null), take(1))
                         .toPromise();
                       if (resource != null) {
                         cli.printDescribe(

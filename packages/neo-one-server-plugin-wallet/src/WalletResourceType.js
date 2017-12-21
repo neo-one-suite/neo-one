@@ -28,6 +28,7 @@ import MasterWalletResourceAdapter from './MasterWalletResourceAdapter';
 import type WalletPlugin from './WalletPlugin';
 
 export type Coin = {|
+  assetName: string,
   asset: string,
   amount: string,
 |};
@@ -133,10 +134,11 @@ export default class WalletResourceType extends ResourceType<
         'Balance',
         {
           type: 'list',
-          table: [['Asset', 'Amount']].concat(
+          table: [['Asset', 'Amount', 'Hash']].concat(
             _.sortBy(resource.balance, coin => coin.asset).map(coin => [
-              coin.asset,
+              coin.assetName,
               coin.amount,
+              coin.asset,
             ]),
           ),
         },

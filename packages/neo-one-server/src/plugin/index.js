@@ -22,4 +22,5 @@ export type {
   ResourceAdapterOptions,
   ResourceAdapterReady,
 } from './MasterResourceAdapter';
+export type { CLIHookConfig } from './Plugin';
 export type { MasterResourceAdapterOptions } from './ResourceType';

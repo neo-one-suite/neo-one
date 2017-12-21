@@ -1,6 +1,6 @@
 /* @flow */
 import { type InteractiveCommand } from '@neo-one/server-common';
-import { type ResourceType, Plugin } from '@neo-one/server';
+import { type CLIHookConfig, type ResourceType, Plugin } from '@neo-one/server';
 
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 
@@ -43,5 +43,27 @@ export default class WalletPlugin extends Plugin {
 
   get interactive(): Array<InteractiveCommand> {
     return [activateWallet(this), deactivateWallet(this)];
+  }
+
+  get cliPostHooks(): Array<CLIHookConfig> {
+    return [
+      {
+        name: 'create network',
+        hook: async ({ cli, args }) => {
+          const { name: networkName } = args;
+          if (
+            !(
+              networkName === networkConstants.NETWORK_NAME.MAIN ||
+              networkName === networkConstants.NETWORK_NAME.TEST
+            )
+          ) {
+            await cli.exec(
+              `create wallet master --network ${networkName} --private-key ` +
+                `${networkConstants.PRIVATE_NET_PRIVATE_KEY}`,
+            );
+          }
+        },
+      },
+    ];
   }
 }

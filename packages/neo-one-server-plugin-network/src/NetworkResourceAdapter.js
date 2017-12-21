@@ -396,6 +396,13 @@ export default class NetworkResourceAdapter {
   static _getPrivateNetSettings(
     options: NetworkResourceAdapterStaticOptions,
   ): Array<[string, NodeSettings]> {
+    const primaryPrivateKey = crypto.wifToPrivateKey(
+      constants.PRIVATE_NET_PRIVATE_KEY,
+      common.NEO_PRIVATE_KEY_VERSION,
+    );
+    const primaryAddress = common.uInt160ToString(
+      crypto.privateKeyToScriptHash(primaryPrivateKey),
+    );
     const configuration = _.range(0, 7).map(idx => {
       const { privateKey, publicKey } = crypto.createKeyPair();
       const name = `${options.name}-${idx}`;
@@ -427,6 +434,7 @@ export default class NetworkResourceAdapter {
         utilityTokenAmount,
         secondsPerBlock,
         standbyValidators,
+        address: primaryAddress,
         consensus: {
           enabled: true,
           options: {

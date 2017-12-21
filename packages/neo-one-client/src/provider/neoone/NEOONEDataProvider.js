@@ -151,7 +151,7 @@ export default class NEOONEDataProvider implements DataProvider {
       address: this._scriptHashToAddress(account.script_hash),
       frozen: account.frozen,
       votes: account.votes,
-      balances: account.balances.reduce((acc, [asset, value]) => {
+      balances: account.balances.reduce((acc, { asset, value }) => {
         acc[asset] = new BigNumber(value);
         return acc;
       }, {}),
@@ -551,16 +551,31 @@ export default class NEOONEDataProvider implements DataProvider {
   }
 
   _convertAsset(asset: AssetJSON): Asset {
+    const assetName = asset.name;
+    let name;
+    if (Array.isArray(assetName)) {
+      const enName = assetName.find(({ lang }) => lang === 'en');
+      if (enName == null) {
+        // eslint-disable-next-line
+        name = assetName[0].name;
+      } else {
+        // eslint-disable-next-line
+        name = enName.name;
+      }
+    } else {
+      // eslint-disable-next-line
+      name = assetName;
+    }
     return {
       hash: asset.id,
       type: asset.type,
-      name: Array.isArray(asset.name) ? asset.name[0].name : asset.name,
+      name,
       amount: new BigNumber(asset.amount),
       available: new BigNumber(asset.available),
       precision: asset.precision,
       owner: asset.owner,
-      admin: this._scriptHashToAddress(asset.admin),
-      issuer: this._scriptHashToAddress(asset.issuer),
+      admin: asset.admin,
+      issuer: asset.issuer,
       expiration: asset.expiration,
       frozen: asset.frozen,
     };

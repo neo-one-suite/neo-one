@@ -66,7 +66,7 @@ export const testReadClient = (optionsIn?: {|
   );
 };
 
-export const readClient = ({
+export const createReadClient = ({
   network,
   rpcURL,
   iterBlocksFetchTimeoutMS,

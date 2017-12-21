@@ -12,6 +12,7 @@ export { default as paths } from './paths';
 export { default as plugins } from './plugins';
 
 export {
+  CLIHookConfig,
   CreateCRUD,
   CRUDBase,
   CRUDResource,

@@ -124,9 +124,6 @@ type TransactionOptionsFull = {|
   networkFee: BigNumber,
 |};
 
-const GAS_ASSET_HASH =
-  '0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7';
-
 const NEO_ONE_ATTRIBUTE = {
   usage: 'Remark15',
   data: Buffer.from('neo-one', 'utf8').toString('hex'),
@@ -218,7 +215,7 @@ export default class LocalUserAccountProvider<
         outputs.concat([
           {
             address: from.address,
-            asset: GAS_ASSET_HASH,
+            asset: common.GAS_ASSET_HASH,
             value: amount,
           },
         ]),
@@ -842,7 +839,7 @@ export default class LocalUserAccountProvider<
             ? transfers
             : transfers.concat({
                 amount: gas,
-                asset: GAS_ASSET_HASH,
+                asset: common.GAS_ASSET_HASH,
               }),
           ({ asset }) => asset,
         ),
