@@ -17,7 +17,7 @@
       "prettier --write --config .prettierrc",
       "git add",
       "eslint",
-      "yarn test --findRelatedTests --ci"
+      "yarn test --findRelatedTests --ci --passWithNoTests"
     ],
     "scripts/**/*.js": [
       "prettier --write --config .prettierrc",

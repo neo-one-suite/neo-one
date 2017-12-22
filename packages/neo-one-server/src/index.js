@@ -12,7 +12,6 @@ export { default as paths } from './paths';
 export { default as plugins } from './plugins';
 
 export {
-  CLIHookConfig,
   CreateCRUD,
   CRUDBase,
   CRUDResource,
@@ -31,6 +30,7 @@ export type { Log } from '@neo-one/utils';
 export type { PluginManager };
 export type { PortAllocator };
 export type {
+  CLIHookConfig,
   ExecCLIOptions,
   GetCLIAutocompleteOptions,
   MasterResourceAdapter,
