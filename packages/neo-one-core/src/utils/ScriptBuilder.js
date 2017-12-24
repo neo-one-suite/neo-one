@@ -173,14 +173,22 @@ export default class ScriptBuilder {
     return this.emitOp('PACK');
   }
 
+  emitAppCallInvocation(operation: string, ...params: Array<Param>): this {
+    this.emitPushArray(params);
+    return this.emitPushParam(operation);
+  }
+
+  emitAppCallVerification(scriptHash: UInt160): this {
+    return this.emitOp('APPCALL', common.uInt160ToBuffer(scriptHash));
+  }
+
   emitAppCall(
     scriptHash: UInt160,
     operation: string,
     ...params: Array<Param>
   ): this {
-    this.emitPushArray(params);
-    this.emitPushParam(operation);
-    return this.emitOp('APPCALL', common.uInt160ToBuffer(scriptHash));
+    this.emitAppCallInvocation(operation, ...params);
+    return this.emitAppCallVerification(scriptHash);
   }
 
   emitSysCall(sysCall: SysCallName, ...params: Array<Param>): this {
