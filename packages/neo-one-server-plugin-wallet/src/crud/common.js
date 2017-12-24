@@ -1,5 +1,5 @@
 /* @flow */
-import { type InteractiveCLI, compoundName } from '@neo-one/server-common';
+import { type InteractiveCLI, compoundName } from '@neo-one/server-plugin';
 
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 

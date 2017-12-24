@@ -1,13 +1,16 @@
 /* @flow */
 // flowlint untyped-import:off
-import { type DescribeTable, compoundName } from '@neo-one/server-common';
+import {
+  type DescribeTable,
+  type PluginManager,
+  compoundName,
+} from '@neo-one/server-plugin';
 import {
   type Network,
   type NetworkType,
   constants as networkConstants,
 } from '@neo-one/server-plugin-network';
 import type { Observable } from 'rxjs/Observable';
-import type { PluginManager } from '@neo-one/server';
 import {
   type LocalWallet,
   type Network as ClientNetwork,

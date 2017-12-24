@@ -1,5 +1,5 @@
 /* @flow */
-import type { CLIArgs } from '@neo-one/server-common';
+import type { CLIArgs } from '@neo-one/server-plugin';
 
 import { createMain, createTest } from '@neo-one/neo-settings';
 import { createProfile } from '@neo-one/utils';

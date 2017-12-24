@@ -1,15 +1,13 @@
 /* @flow */
 import {
+  type DescribeTable,
+  type ListTable,
+  type ResourceState,
   type MasterResourceAdapter,
   type MasterResourceAdapterOptions,
   CRUD,
   ResourceType,
-} from '@neo-one/server';
-import {
-  type DescribeTable,
-  type ListTable,
-  type ResourceState,
-} from '@neo-one/server-common';
+} from '@neo-one/server-plugin';
 import { LocalFileStore } from '@neo-one/client-node';
 
 import _ from 'lodash';

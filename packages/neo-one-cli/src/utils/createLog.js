@@ -1,7 +1,7 @@
 /* @flow */
 import { Subject } from 'rxjs/Subject';
 import type { Log, LogMessage } from '@neo-one/utils';
-import type { LogConfig } from '@neo-one/server-common';
+import type { LogConfig } from '@neo-one/server-plugin';
 
 import { createLogger, format, transports } from 'winston';
 import fs from 'fs-extra';

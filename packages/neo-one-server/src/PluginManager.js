@@ -1,16 +1,14 @@
 /* @flow */
 // flowlint untyped-import:off
 import { type Log, utils } from '@neo-one/utils';
+import type { Observable } from 'rxjs/Observable';
 import {
   type AllResources,
   type Binary,
   type DescribeTable,
-  PluginDependencyNotMetError,
-  PluginNotInstalledError,
-  UnknownPluginResourceType,
+  type Plugin,
   pluginResourceTypeUtil,
-} from '@neo-one/server-common';
-import type { Observable } from 'rxjs/Observable';
+} from '@neo-one/server-plugin';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { Subject } from 'rxjs/Subject';
 
@@ -23,7 +21,11 @@ import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
 import toposort from 'toposort';
 
-import type { Plugin } from './plugin';
+import {
+  PluginDependencyNotMetError,
+  PluginNotInstalledError,
+  UnknownPluginResourceType,
+} from './errors';
 import type PortAllocator from './PortAllocator';
 import Ready from './Ready';
 import ResourcesManager from './ResourcesManager';

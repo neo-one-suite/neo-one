@@ -1,10 +1,11 @@
 /* @flow */
 // flowlint untyped-import:off
-import { createServerConfig, plugins as pluginsUtil } from '@neo-one/server';
-import { type CLIArgs, Client } from '@neo-one/server-common';
+import { Client, createServerConfig } from '@neo-one/server-client';
+import { type CLIArgs } from '@neo-one/server-plugin';
 import Vorpal from 'vorpal';
 
 import { map, take } from 'rxjs/operators';
+import { plugins as pluginsUtil } from '@neo-one/server';
 
 import commands from './commands';
 import pkg from '../package.json';

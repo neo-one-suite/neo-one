@@ -1,6 +1,6 @@
 /* @flow */
 import type { Log } from '@neo-one/utils';
-import type { Plugin } from './plugin';
+import type { Plugin } from '@neo-one/server-plugin';
 
 const DEFAULT_PLUGINS = [
   '@neo-one/server-plugin-network',

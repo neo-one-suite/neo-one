@@ -1,5 +1,5 @@
 /* @flow */
-import { type InteractiveCLIArgs, compoundName } from '@neo-one/server-common';
+import { type InteractiveCLIArgs, compoundName } from '@neo-one/server-plugin';
 
 import { take } from 'rxjs/operators';
 

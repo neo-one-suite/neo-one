@@ -1,7 +1,7 @@
 /* @flow */
 import type Vorpal from 'vorpal';
 import { type Log, finalize } from '@neo-one/utils';
-import type { LogConfig } from '@neo-one/server-common';
+import type { LogConfig } from '@neo-one/server-plugin';
 import type { Subject } from 'rxjs/Subject';
 
 import createLog from './createLog';

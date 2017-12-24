@@ -3,11 +3,12 @@
 import {
   type Binary,
   type DescribeTable,
+  type PortAllocator,
   type Progress,
+  type ResourceAdapterReady,
   type ResourceState,
-} from '@neo-one/server-common';
+} from '@neo-one/server-plugin';
 import { Observable } from 'rxjs/Observable';
-import { type PortAllocator, type ResourceAdapterReady } from '@neo-one/server';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import type { Subject } from 'rxjs/Subject';
 

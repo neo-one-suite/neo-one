@@ -2,9 +2,10 @@
 import {
   type ExecCLIOptions,
   type GetCLIAutocompleteOptions,
+  type InteractiveCLI,
   StartCRUD,
-} from '@neo-one/server';
-import { type InteractiveCLI, compoundName } from '@neo-one/server-common';
+  compoundName,
+} from '@neo-one/server-plugin';
 
 import type WalletResourceType, {
   Wallet,

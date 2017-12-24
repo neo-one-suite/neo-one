@@ -1,5 +1,5 @@
 /* @flow */
-import { type ExecCLIOptions, CreateCRUD } from '@neo-one/server';
+import { type ExecCLIOptions, CreateCRUD } from '@neo-one/server-plugin';
 
 import type NetworkResourceType, {
   Network,

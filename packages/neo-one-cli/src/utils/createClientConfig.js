@@ -1,5 +1,5 @@
 /* @flow */
-import { Config, paths } from '@neo-one/server';
+import { Config, paths } from '@neo-one/server-plugin';
 import type { Log } from '@neo-one/utils';
 
 export type ClientConfig = {|

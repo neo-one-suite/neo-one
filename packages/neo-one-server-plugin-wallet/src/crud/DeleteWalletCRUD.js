@@ -1,6 +1,9 @@
 /* @flow */
-import { type ExecCLIOptions, DeleteCRUD } from '@neo-one/server';
-import { type InteractiveCLI } from '@neo-one/server-common';
+import {
+  type ExecCLIOptions,
+  type InteractiveCLI,
+  DeleteCRUD,
+} from '@neo-one/server-plugin';
 
 import type WalletResourceType, {
   Wallet,

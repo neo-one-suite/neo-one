@@ -1,6 +1,6 @@
 /* @flow */
 // flowlint untyped-import:off
-import type { Plugin } from '@neo-one/server';
+import type { Plugin } from '@neo-one/server-plugin';
 
 import ora from 'ora';
 

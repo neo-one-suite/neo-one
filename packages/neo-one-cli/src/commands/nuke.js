@@ -1,13 +1,8 @@
 /* @flow */
-import {
-  type CLIArgs,
-  getServerPID,
-  getServerPIDPath,
-  killServer,
-} from '@neo-one/server-common';
+import { type CLIArgs, name } from '@neo-one/server-plugin';
+import { ServerManager } from '@neo-one/server-client';
 
 import fs from 'fs-extra';
-import { name } from '@neo-one/server';
 import ora from 'ora';
 import { take } from 'rxjs/operators';
 import { utils } from '@neo-one/utils';
@@ -22,13 +17,8 @@ export default (args: CLIArgs) => {
       const { serverConfig, shutdown } = setupServer('nuke', args);
       const spinner = ora(`Shutting down ${name.title} server`).start();
       const config = await serverConfig.config$.pipe(take(1)).toPromise();
-      const pid = await getServerPID({
-        pidPath: getServerPIDPath({ dataPath: config.paths.data }),
-      });
-
-      if (pid != null) {
-        await killServer({ pid });
-      }
+      const manager = new ServerManager({ dataPath: config.paths.data });
+      await manager.kill();
 
       spinner.succeed(`${name.title} server shutdown`);
 

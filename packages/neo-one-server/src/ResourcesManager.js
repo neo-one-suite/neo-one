@@ -1,15 +1,16 @@
 /* @flow */
 // flowlint untyped-import:off
-import { type Log, onComplete, utils } from '@neo-one/utils';
+import { type Log, logInvoke, onComplete, utils } from '@neo-one/utils';
 import {
-  type AbortSignal,
   type BaseResource,
   type DescribeTable,
+  type MasterResourceAdapter,
   type ModifyResourceResponse,
-  AbortController,
+  type Plugin,
+  type ResourceAdapter,
+  type ResourceType,
   compoundName,
-  logInvoke,
-} from '@neo-one/server-common';
+} from '@neo-one/server-plugin';
 import type { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import type { Subject } from 'rxjs/Subject';
@@ -23,12 +24,7 @@ import fs from 'fs-extra';
 import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
 
-import type {
-  MasterResourceAdapter,
-  Plugin,
-  ResourceAdapter,
-  ResourceType,
-} from './plugin';
+import { type AbortSignal, AbortController } from './utils';
 import type PortAllocator from './PortAllocator';
 import Ready from './Ready';
 

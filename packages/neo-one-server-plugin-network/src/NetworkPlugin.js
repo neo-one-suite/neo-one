@@ -1,6 +1,10 @@
 /* @flow */
-import { type CLIArgs, type InteractiveCommand } from '@neo-one/server-common';
-import { type ResourceType, Plugin } from '@neo-one/server';
+import {
+  type CLIArgs,
+  type InteractiveCommand,
+  type ResourceType,
+  Plugin,
+} from '@neo-one/server-plugin';
 
 import NetworkResourceType from './NetworkResourceType';
 

@@ -1,6 +1,10 @@
 /* @flow */
-import { type PluginManager, type ResourceAdapterReady } from '@neo-one/server';
-import { type DescribeTable, type Progress } from '@neo-one/server-common';
+import {
+  type DescribeTable,
+  type PluginManager,
+  type Progress,
+  type ResourceAdapterReady,
+} from '@neo-one/server-plugin';
 import { Observable } from 'rxjs/Observable';
 
 import { concat } from 'rxjs/observable/concat';

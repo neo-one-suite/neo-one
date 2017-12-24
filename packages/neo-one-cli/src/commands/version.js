@@ -1,7 +1,5 @@
 /* @flow */
-import { type CLIArgs } from '@neo-one/server-common';
-
-import { name } from '@neo-one/server';
+import { type CLIArgs, name } from '@neo-one/server-plugin';
 
 import pkg from '../../package.json';
 

@@ -1,5 +1,8 @@
 /* @flow */
 import {
+  type DescribeTable,
+  type ListTable,
+  type ResourceState,
   type MasterResourceAdapter,
   type MasterResourceAdapterOptions,
   CRUD,
@@ -7,12 +10,7 @@ import {
   GetCRUD,
   ResourceType,
   StopCRUD,
-} from '@neo-one/server';
-import {
-  type DescribeTable,
-  type ListTable,
-  type ResourceState,
-} from '@neo-one/server-common';
+} from '@neo-one/server-plugin';
 
 import _ from 'lodash';
 

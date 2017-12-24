@@ -1,6 +1,5 @@
 /* @flow */
-import { GetCRUD } from '@neo-one/server';
-import { type InteractiveCLI } from '@neo-one/server-common';
+import { type InteractiveCLI, GetCRUD } from '@neo-one/server-plugin';
 
 import type WalletResourceType, {
   Wallet,

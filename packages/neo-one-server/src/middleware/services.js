@@ -1,13 +1,11 @@
 /* @flow */
 import {
-  type AbortSignal,
   type CRUDRequest,
   type CRUDRequestStart,
   type ModifyResourceResponse,
   type ReadResponse,
   type ReadRequest,
-  AbortController,
-} from '@neo-one/server-common';
+} from '@neo-one/server-plugin';
 // flowlint-next-line untyped-type-import:off
 import type { Context } from 'mali';
 import { Observable } from 'rxjs/Observable';
@@ -15,6 +13,7 @@ import { Observable } from 'rxjs/Observable';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { of as _of } from 'rxjs/observable/of';
 
+import { type AbortSignal, AbortController } from '../utils';
 import type ResourcesManager from '../ResourcesManager';
 import type Server from '../Server';
 

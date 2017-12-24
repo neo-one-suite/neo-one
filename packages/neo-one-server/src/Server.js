@@ -2,53 +2,24 @@
 import {
   type Binary,
   type DescribeTable,
-  checkServer,
-  getServerPIDPath,
-} from '@neo-one/server-common';
+  Config,
+} from '@neo-one/server-plugin';
 import { type Log, finalize } from '@neo-one/utils';
 import Mali from 'mali';
 import type { Observable } from 'rxjs/Observable';
+import type { ServerConfig } from '@neo-one/server-client';
+import { ServerManager } from '@neo-one/server-client';
 
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { defer } from 'rxjs/observable/defer';
 import { distinct, map, mergeScan, switchMap } from 'rxjs/operators';
-import fs from 'fs-extra';
 import path from 'path';
 import proto from '@neo-one/server-grpc';
 
-import type Config from './Config';
 import PluginManager from './PluginManager';
 import PortAllocator from './PortAllocator';
 import { ServerRunningError } from './errors';
-import {
-  type ServicesConfig,
-  context,
-  logger,
-  services as servicesMiddleware,
-} from './middleware';
-
-export type ServerConfig = {|
-  paths: {|
-    data: string,
-    config: string,
-    cache: string,
-    log: string,
-    temp: string,
-  |},
-  server: {|
-    port: number,
-  |},
-  services: ServicesConfig,
-  log: {|
-    level: string,
-    maxSize: number,
-    maxFiles: number,
-  |},
-  ports: {|
-    min: number,
-    max: number,
-  |},
-|};
+import { context, logger, services as servicesMiddleware } from './middleware';
 
 const PLUGIN_PATH = 'plugin';
 
@@ -154,18 +125,14 @@ export default class Server {
         (prevApp, [serverConfig, servicesConfig]) =>
           defer(async () => {
             if (prevApp == null) {
-              const pidPath = getServerPIDPath({ dataPath: this.dataPath });
-              this._serverDebug.pidPath = pidPath;
+              const manager = new ServerManager({ dataPath: this.dataPath });
+              this._serverDebug.pidPath = manager.pidPath;
 
-              const pid = await checkServer({
-                port: serverConfig.port,
-                pidPath,
-              });
+              const pid = await manager.checkAlive(serverConfig.port);
               if (pid == null) {
                 this._serverDebug.pid = process.pid;
 
-                await fs.ensureDir(path.dirname(pidPath));
-                await fs.writeFile(pidPath, `${process.pid}`);
+                manager.writePID(process.pid);
               } else if (pid !== process.pid) {
                 throw new ServerRunningError(pid);
               }

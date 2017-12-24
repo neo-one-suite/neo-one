@@ -9,7 +9,7 @@ import {
   type DescribeCRUD,
   type GetCRUD,
   type Plugin,
-} from '@neo-one/server';
+} from '@neo-one/server-plugin';
 
 import { concatMap, filter, map, switchMap, take } from 'rxjs/operators';
 import { defer } from 'rxjs/observable/defer';

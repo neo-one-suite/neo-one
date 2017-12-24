@@ -1,11 +1,9 @@
 /* @flow */
-import { type DescribeTable } from '@neo-one/server-common';
+import { Config, type DescribeTable } from '@neo-one/server-plugin';
 import { type Log, utils } from '@neo-one/utils';
 
 import _ from 'lodash';
 import { take } from 'rxjs/operators';
-
-import Config from './Config';
 
 type Ports = {
   [plugin: string]: {

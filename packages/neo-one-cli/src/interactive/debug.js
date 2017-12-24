@@ -1,5 +1,5 @@
 /* @flow */
-import { name } from '@neo-one/server';
+import { name } from '@neo-one/server-plugin';
 
 import type InteractiveCLI from '../InteractiveCLI';
 

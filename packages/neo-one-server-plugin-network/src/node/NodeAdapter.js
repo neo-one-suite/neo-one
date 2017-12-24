@@ -1,12 +1,16 @@
 /* @flow */
-import type { Binary, DescribeTable } from '@neo-one/server-common';
-import type { Log, PortAllocator } from '@neo-one/server';
+import {
+  type Binary,
+  type Log,
+  type DescribeTable,
+  type PortAllocator,
+  logInvoke,
+} from '@neo-one/server-plugin';
 import type { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import type { Subject } from 'rxjs/Subject';
 
 import { defer } from 'rxjs/observable/defer';
-import { logInvoke } from '@neo-one/server-common';
 import { map, shareReplay, switchMap } from 'rxjs/operators';
 import { timer } from 'rxjs/observable/timer';
 

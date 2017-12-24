@@ -2,20 +2,18 @@
 // flowlint untyped-import:off
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import {
+  Client,
+  ServerManager,
+  createServerConfig,
+} from '@neo-one/server-client';
+import {
+  type Config,
   type CLIHook,
   type DescribeTable,
   type ListTable,
   type Session,
-  Client,
-  killServer,
-  startServer,
-} from '@neo-one/server-common';
-import {
-  type Config,
-  createServerConfig,
   name,
-  plugins as pluginsUtil,
-} from '@neo-one/server';
+} from '@neo-one/server-plugin';
 import type { Log, LogMessage } from '@neo-one/utils';
 import type { Observable } from 'rxjs/Observable';
 import Table from 'cli-table2';
@@ -33,6 +31,7 @@ import {
   take,
 } from 'rxjs/operators';
 import ora from 'ora';
+import { plugins as pluginsUtil } from '@neo-one/server';
 
 import { type ClientConfig, createClientConfig, setupCLI } from './utils';
 
@@ -200,19 +199,22 @@ export default class InteractiveCLI {
       serverConfig.config$.pipe(map(conf => conf.server.port), distinct()),
     ).pipe(
       mergeScan(
-        (prevPID, [dataPath, port]) =>
+        (managerIn, [dataPath, port]) =>
           defer(async () => {
-            if (prevPID != null) {
-              await killServer({ pid: prevPID });
+            let manager = managerIn;
+            const first = manager == null;
+            if (manager != null) {
+              await manager.kill();
             }
+            manager = new ServerManager({ dataPath });
+
             let spinner;
             try {
-              const { pid } = await startServer({
+              const { pid } = await manager.start({
                 port,
-                dataPath,
                 binary: process.argv,
                 onStart: () => {
-                  if (prevPID == null) {
+                  if (first) {
                     spinner = ora(
                       `Starting ${name.title} server... This can take ~15 ` +
                         'seconds on initial startup.',
@@ -224,7 +226,7 @@ export default class InteractiveCLI {
                 spinner.succeed(`Started ${name.title} server (pid=${pid})`);
               }
               this.client = new Client({ port });
-              return pid;
+              return manager;
             } catch (error) {
               if (spinner != null) {
                 spinner.fail(

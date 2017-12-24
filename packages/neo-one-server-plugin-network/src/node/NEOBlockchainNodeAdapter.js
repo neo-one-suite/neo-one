@@ -1,14 +1,19 @@
 /* @flow */
 // flowlint untyped-import:off
 import { type ChildProcess, spawn } from 'child_process';
-import type { Binary, DescribeTable } from '@neo-one/server-common';
-import { Config, type Log, type PortAllocator } from '@neo-one/server';
+import {
+  type Binary,
+  type DescribeTable,
+  type Log,
+  type PortAllocator,
+  Config,
+  killProcess,
+} from '@neo-one/server-plugin';
 import type { FullNodeEnvironment, FullNodeOptions } from '@neo-one/full-node';
 
 import _ from 'lodash';
 import fetch from 'node-fetch';
 import fs from 'fs-extra';
-import { killServer } from '@neo-one/server-common';
 import path from 'path';
 import { take } from 'rxjs/operators';
 
@@ -290,7 +295,7 @@ export default class NEOBlockchainNodeAdapter extends NodeAdapter {
     const child = this._process;
     this._process = null;
     if (child != null) {
-      await killServer({ pid: child.pid });
+      await killProcess(child.pid);
     }
   }
 

@@ -1,5 +1,5 @@
 /* @flow */
-import { type ExecCLIOptions, DeleteCRUD } from '@neo-one/server';
+import { type ExecCLIOptions, DeleteCRUD } from '@neo-one/server-plugin';
 
 import type NetworkResourceType, {
   Network,

@@ -2,9 +2,10 @@
 import {
   type ExecCLIOptions,
   type GetCLIAutocompleteOptions,
+  type InteractiveCLI,
   CreateCRUD,
-} from '@neo-one/server';
-import { type InteractiveCLI, compoundName } from '@neo-one/server-common';
+  compoundName,
+} from '@neo-one/server-plugin';
 
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 import { decryptNEP2, isNEP2, wifToPrivateKey } from '@neo-one/client';

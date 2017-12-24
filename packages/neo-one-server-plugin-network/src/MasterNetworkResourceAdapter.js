@@ -1,12 +1,13 @@
 /* @flow */
 import {
+  type Binary,
   type PortAllocator,
+  type Progress,
   type ResourceAdapter,
   type ResourceAdapterOptions,
   type ResourceAdapterReady,
-} from '@neo-one/server';
+} from '@neo-one/server-plugin';
 import type { Observable } from 'rxjs/Observable';
-import { type Binary, type Progress } from '@neo-one/server-common';
 
 import NetworkResourceAdapter, {
   type NetworkResourceAdapterInitOptions,

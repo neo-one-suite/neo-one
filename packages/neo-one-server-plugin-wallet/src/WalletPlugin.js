@@ -1,6 +1,10 @@
 /* @flow */
-import { type InteractiveCommand } from '@neo-one/server-common';
-import { type CLIHookConfig, type ResourceType, Plugin } from '@neo-one/server';
+import {
+  type CLIHookConfig,
+  type InteractiveCommand,
+  type ResourceType,
+  Plugin,
+} from '@neo-one/server-plugin';
 
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 

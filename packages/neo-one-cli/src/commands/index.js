@@ -1,7 +1,7 @@
 /* @flow */
 import nuke from './nuke';
-import start from './start';
-import stop from './stop';
+import startServer from './startServer';
+import stopServer from './stopServer';
 import version from './version';
 
-export default start.concat(stop).concat([nuke, version]);
+export default [nuke, startServer, stopServer, version];

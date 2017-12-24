@@ -1,0 +1,42 @@
+{
+  "name": "@neo-one/server-client",
+  "version": "0.0.1",
+  "keywords": [
+    "neo",
+    "NEO",
+    "one",
+    "ONE",
+    "blockchain",
+    "neo-one",
+    "neo-one-suite",
+    "neo one",
+    "neo one suite",
+    "NEO ONE",
+    "NEO ONE suite",
+    "NEO•ONE",
+    "NEO•ONE suite",
+    "neo blockchain",
+    "NEO Blockchain",
+    "NEO blockchain",
+    "dapp",
+    "dapps"
+  ],
+  "description": "NEO•ONE Server client api.",
+  "repository": "https://github.com/neo-one-suite/neo-one",
+  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/es.js",
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "dependencies": {
+    "@neo-one/server-grpc": "^0.0.1",
+    "@neo-one/server-plugin": "^0.0.1",
+    "@neo-one/utils": "^0.0.1",
+    "fs-extra": "^5.0.0",
+    "grpc": "^1.8.0",
+    "is-running": "^2.1.0",
+    "rxjs": "^5.5.5"
+  }
+}
