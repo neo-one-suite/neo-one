@@ -6,6 +6,7 @@
 .*/packages/.*/dist/es.js
 .*/packages/.*/dist/es.js.map
 .*/node_modules/protobufjs/src/bower.json
+.*/node_modules/dataloader/index.js.flow
 
 [include]
 
