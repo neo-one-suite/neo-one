@@ -27,8 +27,16 @@ export type CRUDResourceOptions<
   resourceType: ResourceType<Resource, ResourceOptions>,
   help: string,
   aliases?: Array<string>,
+  extraArgs?: Array<string>,
   options?: Array<CLIOption>,
   autocomplete?: Array<string>,
+|};
+
+// flowlint-next-line unclear-type:off
+export type GetCLINameOptions<ResourceOptions: Object> = {|
+  baseName: string,
+  cli: InteractiveCLI,
+  options: ResourceOptions,
 |};
 
 export default class CRUDResourceBase<
@@ -42,13 +50,18 @@ export default class CRUDResourceBase<
     resourceType,
     help,
     aliases,
+    extraArgs,
     options,
     autocomplete,
   }: CRUDResourceOptions<Resource, ResourceOptions>) {
+    let command = `${name} ${resourceType.name} <name>`;
+    if (extraArgs != null) {
+      command += ` ${extraArgs.join(' ')}`;
+    }
     super({
       name,
       names,
-      command: `${name} ${resourceType.name} <name>`,
+      command,
       resourceType,
       help,
       aliases,
@@ -59,11 +72,7 @@ export default class CRUDResourceBase<
 
   getCLIName({
     baseName,
-  }: {|
-    baseName: string,
-    cli: InteractiveCLI,
-    options: ResourceOptions,
-  |}): Promise<string> {
+  }: GetCLINameOptions<ResourceOptions>): Promise<string> {
     return Promise.resolve(baseName);
   }
 
@@ -98,7 +107,7 @@ export default class CRUDResourceBase<
   getCLIAutocompleteResourceOptions({
     cli,
   }: GetCLIAutocompleteOptions): Promise<ResourceOptions> {
-    return this.getCLIResourceOptions({ cli, options: {} });
+    return this.getCLIResourceOptions({ cli, args: {}, options: {} });
   }
 
   // Function to execute before the command. Useful if you want to do things

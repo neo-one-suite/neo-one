@@ -21,6 +21,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) => {
     .action(async args => {
       const options = await describe.getCLIResourceOptions({
         cli,
+        args,
         options: args.options,
       });
       const name = await describe.getCLIName({

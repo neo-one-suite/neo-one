@@ -5,6 +5,7 @@ import type { Plugin } from '@neo-one/server-plugin';
 const DEFAULT_PLUGINS = [
   '@neo-one/server-plugin-network',
   '@neo-one/server-plugin-wallet',
+  '@neo-one/server-plugin-compiler',
 ];
 
 const getPlugin = ({

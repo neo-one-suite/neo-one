@@ -1,5 +1,10 @@
 /* @flow */
-import { type InteractiveCLI, compoundName } from '@neo-one/server-plugin';
+import {
+  type GetCLINameOptions,
+  type GetCLIResourceOptions,
+  type InteractiveCLI,
+  compoundName,
+} from '@neo-one/server-plugin';
 
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 
@@ -8,11 +13,7 @@ import type { WalletResourceOptions } from '../WalletResourceType';
 const getCLIName = ({
   baseName,
   options,
-}: {|
-  baseName: string,
-  cli: InteractiveCLI,
-  options: WalletResourceOptions,
-|}): Promise<string> =>
+}: GetCLINameOptions<WalletResourceOptions>): Promise<string> =>
   Promise.resolve(
     compoundName.make({ name: baseName, names: [options.network] }),
   );
@@ -20,11 +21,7 @@ const getCLIName = ({
 const getCLIResourceOptions = async ({
   cli,
   options,
-}: {|
-  cli: InteractiveCLI,
-  // flowlint-next-line unclear-type:off
-  options: Object,
-|}): Promise<WalletResourceOptions> => {
+}: GetCLIResourceOptions): Promise<WalletResourceOptions> => {
   const { network: networkName } = options;
   if (networkName != null && typeof networkName === 'string') {
     return { network: networkName };

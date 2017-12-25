@@ -45,6 +45,13 @@ export type MasterResourceAdapterOptions = {|
   portAllocator: PortAllocator,
 |};
 
+// flowlint-next-line unclear-type:off
+export type GetResource$Options<ResourceOptions: Object> = {|
+  name: string,
+  client: Client,
+  options: ResourceOptions,
+|};
+
 export default class ResourceType<
   Resource: BaseResource,
   // flowlint-next-line unclear-type:off
@@ -79,11 +86,7 @@ export default class ResourceType<
     name,
     client,
     options,
-  }: {|
-    name: string,
-    client: Client,
-    options: ResourceOptions,
-  |}): Observable<?Resource> {
+  }: GetResource$Options<ResourceOptions>): Observable<?Resource> {
     return client
       .getResource$({
         plugin: this.plugin.name,

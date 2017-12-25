@@ -14,6 +14,12 @@ export type ExecCLIOptions<ResourceOptions: Object> = {|
   options: ResourceOptions,
 |};
 
+// flowlint-next-line unclear-type:off
+export type GetResources$Options<ResourceOptions: Object> = {|
+  client: Client,
+  options: ResourceOptions,
+|};
+
 export type GetCRUDOptions<
   Resource: BaseResource,
   // flowlint-next-line unclear-type:off
@@ -64,10 +70,7 @@ export default class GetCRUD<
   getResources$({
     client,
     options,
-  }: {|
-    client: Client,
-    options: ResourceOptions,
-  |}): Observable<Array<Resource>> {
+  }: GetResources$Options<ResourceOptions>): Observable<Array<Resource>> {
     return client
       .getResources$({
         plugin: this.resourceType.plugin.name,

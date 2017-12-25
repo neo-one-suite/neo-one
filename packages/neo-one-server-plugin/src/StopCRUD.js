@@ -1,9 +1,9 @@
 /* @flow */
 import type { Observable } from 'rxjs/Observable';
 
-import type { BaseResource, Client, ModifyResourceResponse } from './types';
+import type { BaseResource, ModifyResourceResponse } from './types';
 import type { CLIOption } from './CRUDBase';
-import CRUDResource from './CRUDResource';
+import CRUDResource, { type Request$Options } from './CRUDResource';
 import type ResourceType from './ResourceType';
 
 export type StopCRUDOptions<
@@ -61,12 +61,7 @@ export default class StopCRUD<
     cancel$,
     options,
     client,
-  }: {|
-    name: string,
-    cancel$: Observable<void>,
-    options: ResourceOptions,
-    client: Client,
-  |}): Observable<ModifyResourceResponse> {
+  }: Request$Options<ResourceOptions>): Observable<ModifyResourceResponse> {
     return client.stopResource$({
       plugin: this.resourceType.plugin.name,
       resourceType: this.resourceType.name,

@@ -1,9 +1,9 @@
 /* @flow */
 import type { Observable } from 'rxjs/Observable';
 
-import type { BaseResource, Client, ModifyResourceResponse } from './types';
+import type { BaseResource, ModifyResourceResponse } from './types';
 import type { CLIOption } from './CRUDBase';
-import CRUDResource from './CRUDResource';
+import CRUDResource, { type Request$Options } from './CRUDResource';
 import type { GetCLIAutocompleteOptions } from './CRUDResourceBase';
 import type ResourceType from './ResourceType';
 
@@ -15,6 +15,7 @@ export type CreateCRUDOptions<
   resourceType: ResourceType<Resource, ResourceOptions>,
   help?: string,
   aliases?: Array<string>,
+  extraArgs?: Array<string>,
   options?: Array<CLIOption>,
   autocomplete?: Array<string>,
 |};
@@ -28,6 +29,7 @@ export default class CreateCRUD<
     resourceType,
     help,
     aliases,
+    extraArgs,
     options,
     autocomplete,
   }: CreateCRUDOptions<Resource, ResourceOptions>) {
@@ -39,6 +41,7 @@ export default class CreateCRUD<
           ? `Creates a ${resourceType.names.lower} called <name>`
           : help,
       aliases,
+      extraArgs,
       options,
       autocomplete,
     });
@@ -56,12 +59,7 @@ export default class CreateCRUD<
     cancel$,
     options,
     client,
-  }: {|
-    name: string,
-    cancel$: Observable<void>,
-    options: ResourceOptions,
-    client: Client,
-  |}): Observable<ModifyResourceResponse> {
+  }: Request$Options<ResourceOptions>): Observable<ModifyResourceResponse> {
     return client.createResource$({
       plugin: this.resourceType.plugin.name,
       resourceType: this.resourceType.name,

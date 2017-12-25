@@ -24,7 +24,9 @@ export { logInvoke } from '@neo-one/utils';
 export type {
   ExecCLIOptions,
   GetCLIAutocompleteOptions,
+  GetCLINameOptions,
 } from './CRUDResourceBase';
+export type { GetCLIResourceOptions } from './CRUDBase';
 export type { ResourceAdapter } from './ResourceAdapter';
 export type {
   MasterResourceAdapter,

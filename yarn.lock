@@ -607,6 +607,14 @@
   dependencies:
     lodash "^4.17.4"
 
+"@neo-one/boa@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/@neo-one/boa/-/boa-0.0.2.tgz#a9dac47fd7f77b70bc7b96d968fc48b84cc56bd0"
+
+"@neo-one/csharp@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.npmjs.org/@neo-one/csharp/-/csharp-0.0.1.tgz#d102376bef6737d58d8159badb589306124a7d3e"
+
 "@types/node@*":
   version "8.5.2"
   resolved "https://registry.npmjs.org/@types/node/-/node-8.5.2.tgz#83b8103fa9a2c2e83d78f701a9aa7c9539739aa5"

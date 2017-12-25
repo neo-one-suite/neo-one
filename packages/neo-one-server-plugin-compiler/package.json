@@ -1,0 +1,39 @@
+{
+  "name": "@neo-one/server-plugin-compiler",
+  "version": "0.0.1",
+  "keywords": [
+    "neo",
+    "NEO",
+    "one",
+    "ONE",
+    "blockchain",
+    "neo-one",
+    "neo-one-suite",
+    "neo one",
+    "neo one suite",
+    "NEO ONE",
+    "NEO ONE suite",
+    "NEO•ONE",
+    "NEO•ONE suite",
+    "neo blockchain",
+    "NEO Blockchain",
+    "NEO blockchain",
+    "dapp",
+    "dapps"
+  ],
+  "description": "NEO•ONE Server compiler plugin.",
+  "repository": "https://github.com/neo-one-suite/neo-one",
+  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/es.js",
+  "dependencies": {
+    "fs-extra": "^5.0.0",
+    "lodash": "^4.17.4",
+    "@neo-one/boa": "^0.0.2",
+    "@neo-one/client": "^0.0.1",
+    "@neo-one/csharp": "^0.0.1",
+    "@neo-one/server-plugin": "^0.0.1",
+    "rxjs": "^5.5.5"
+  }
+}

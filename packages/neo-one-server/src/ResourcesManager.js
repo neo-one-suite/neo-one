@@ -27,6 +27,7 @@ import path from 'path';
 import { type AbortSignal, AbortController } from './utils';
 import type PortAllocator from './PortAllocator';
 import Ready from './Ready';
+import { ResourceNoStartError, ResourceNoStopError } from './errors';
 
 const RESOURCES_PATH = 'resources';
 const RESOURCES_READY_PATH = 'ready';
@@ -469,7 +470,7 @@ export default class ResourcesManager<
     const startAbortController = this._startAbortControllers[name];
     const stop$ = this._stops$[name];
     const started = this._resourceAdaptersStarted[name];
-    if (start$ != null && startAbortController != null) {
+    if (start != null && start$ != null && startAbortController != null) {
       initial$ = concat(
         initial$,
         _of({
@@ -647,6 +648,19 @@ export default class ResourcesManager<
     });
 
     const { start, stop } = this._resourceType.getCRUD();
+    if (start == null) {
+      throw new ResourceNoStartError({
+        plugin: this._plugin.name,
+        resourceType: this._resourceType.names.lower,
+      });
+    }
+    if (stop == null) {
+      throw new ResourceNoStopError({
+        plugin: this._plugin.name,
+        resourceType: this._resourceType.names.lower,
+      });
+    }
+
     const stop$ = this._stops$[name];
     const stopAbortController = this._stopAbortControllers[name];
     let initial$ = ((empty(): $FlowFixMe): Observable<ModifyResourceResponse>);
@@ -776,6 +790,13 @@ export default class ResourcesManager<
     options: ResourceOptions,
   ): Observable<ModifyResourceResponse> {
     const { create, start } = this._resourceType.getCRUD();
+    if (start == null) {
+      throw new ResourceNoStartError({
+        plugin: this._plugin.name,
+        resourceType: this._resourceType.names.lower,
+      });
+    }
+
     let start$ = _of({
       type: 'error',
       code: DOES_NOT_EXIST,
@@ -852,6 +873,18 @@ export default class ResourcesManager<
     });
 
     const { start, stop } = this._resourceType.getCRUD();
+    if (start == null) {
+      throw new ResourceNoStartError({
+        plugin: this._plugin.name,
+        resourceType: this._resourceType.names.lower,
+      });
+    }
+    if (stop == null) {
+      throw new ResourceNoStopError({
+        plugin: this._plugin.name,
+        resourceType: this._resourceType.names.lower,
+      });
+    }
 
     const start$ = this._starts$[name];
     const startAbortController = this._startAbortControllers[name];
@@ -967,6 +1000,12 @@ export default class ResourcesManager<
     noDone?: boolean,
   ): Observable<ModifyResourceResponse> {
     const { stop } = this._resourceType.getCRUD();
+    if (stop == null) {
+      throw new ResourceNoStopError({
+        plugin: this._plugin.name,
+        resourceType: this._resourceType.names.lower,
+      });
+    }
     let stop$ = _of({
       type: 'error',
       code: DOES_NOT_EXIST,

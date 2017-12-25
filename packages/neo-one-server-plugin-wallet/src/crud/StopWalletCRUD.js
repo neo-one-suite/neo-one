@@ -1,7 +1,8 @@
 /* @flow */
 import {
   type ExecCLIOptions,
-  type InteractiveCLI,
+  type GetCLINameOptions,
+  type GetCLIResourceOptions,
   StopCRUD,
 } from '@neo-one/server-plugin';
 
@@ -28,19 +29,15 @@ export default class StopWalletCRUD extends StopCRUD<
     });
   }
 
-  getCLIName(options: {|
-    baseName: string,
-    cli: InteractiveCLI,
-    options: WalletResourceOptions,
-  |}): Promise<string> {
+  getCLIName(
+    options: GetCLINameOptions<WalletResourceOptions>,
+  ): Promise<string> {
     return common.getCLIName(options);
   }
 
-  getCLIResourceOptions(options: {|
-    cli: InteractiveCLI,
-    // flowlint-next-line unclear-type:off
-    options: Object,
-  |}): Promise<WalletResourceOptions> {
+  getCLIResourceOptions(
+    options: GetCLIResourceOptions,
+  ): Promise<WalletResourceOptions> {
     return common.getCLIResourceOptions(options);
   }
 

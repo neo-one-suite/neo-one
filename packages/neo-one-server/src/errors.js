@@ -50,3 +50,37 @@ export class UnknownPluginResourceType extends Error {
     this.code = 'UNKNOWN_PLUGIN_RESOURCE_TYPE';
   }
 }
+
+export class ResourceNoStartError extends Error {
+  code: string;
+
+  constructor({
+    plugin,
+    resourceType,
+  }: {|
+    plugin: string,
+    resourceType: string,
+  |}) {
+    super(
+      `Plugin ${plugin} resource type ${resourceType} does not support starting`,
+    );
+    this.code = 'RESOURCE_NO_STOP';
+  }
+}
+
+export class ResourceNoStopError extends Error {
+  code: string;
+
+  constructor({
+    plugin,
+    resourceType,
+  }: {|
+    plugin: string,
+    resourceType: string,
+  |}) {
+    super(
+      `Plugin ${plugin} resource type ${resourceType} does not support stopping`,
+    );
+    this.code = 'RESOURCE_NO_STOP';
+  }
+}

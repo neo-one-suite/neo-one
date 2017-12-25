@@ -70,6 +70,7 @@ const createResource = ({
       try {
         const options = await crud.getCLIResourceOptions({
           cli,
+          args,
           options: args.options,
         });
         const name = await crud.getCLIName({
@@ -183,6 +184,7 @@ const createGet = ({
     .action(async args => {
       const options = await crud.getCLIResourceOptions({
         cli,
+        args,
         options: args.options,
       });
 
@@ -238,6 +240,7 @@ const createDescribe = ({
     .action(async args => {
       const options = await crud.getCLIResourceOptions({
         cli,
+        args,
         options: args.options,
       });
       const name = await crud.getCLIName({
@@ -297,8 +300,12 @@ export default ({ cli, plugin }: {| cli: InteractiveCLI, plugin: Plugin |}) => {
     const crud = resourceType.getCRUD();
     commands.push(createResource({ cli, crud: crud.create }));
     commands.push(createResource({ cli, crud: crud.delete }));
-    commands.push(createResource({ cli, crud: crud.start }));
-    commands.push(createResource({ cli, crud: crud.stop }));
+    if (crud.start != null) {
+      commands.push(createResource({ cli, crud: crud.start }));
+    }
+    if (crud.stop != null) {
+      commands.push(createResource({ cli, crud: crud.stop }));
+    }
     commands.push(createGet({ cli, crud: crud.get }));
     commands.push(createDescribe({ cli, crud: crud.describe }));
   }

@@ -1,5 +1,5 @@
 /* @flow */
-import { type InteractiveCLI, GetCRUD } from '@neo-one/server-plugin';
+import { type GetCLIResourceOptions, GetCRUD } from '@neo-one/server-plugin';
 
 import type WalletResourceType, {
   Wallet,
@@ -19,11 +19,9 @@ export default class GetWalletCRUD extends GetCRUD<
     });
   }
 
-  getCLIResourceOptions(options: {|
-    cli: InteractiveCLI,
-    // flowlint-next-line unclear-type:off
-    options: Object,
-  |}): Promise<WalletResourceOptions> {
+  getCLIResourceOptions(
+    options: GetCLIResourceOptions,
+  ): Promise<WalletResourceOptions> {
     return common.getCLIResourceOptions(options);
   }
 }

@@ -2,7 +2,8 @@
 import {
   type ExecCLIOptions,
   type GetCLIAutocompleteOptions,
-  type InteractiveCLI,
+  type GetCLINameOptions,
+  type GetCLIResourceOptions,
   CreateCRUD,
   compoundName,
 } from '@neo-one/server-plugin';
@@ -38,29 +39,23 @@ export default class CreateWalletCRUD extends CreateCRUD<
     });
   }
 
-  getCLIName(options: {|
-    baseName: string,
-    cli: InteractiveCLI,
-    options: WalletResourceOptions,
-  |}): Promise<string> {
+  getCLIName(
+    options: GetCLINameOptions<WalletResourceOptions>,
+  ): Promise<string> {
     return common.getCLIName(options);
   }
 
   getCLIAutocompleteResourceOptions({
     cli,
   }: GetCLIAutocompleteOptions): Promise<WalletResourceOptions> {
-    return common.getCLIResourceOptions({ cli, options: {} });
+    return common.getCLIResourceOptions({ cli, args: {}, options: {} });
   }
 
-  async getCLIResourceOptions({
-    cli,
-    options,
-  }: {|
-    cli: InteractiveCLI,
-    // flowlint-next-line unclear-type:off
-    options: Object,
-  |}): Promise<WalletResourceOptions> {
-    const { network } = await common.getCLIResourceOptions({ cli, options });
+  async getCLIResourceOptions(
+    optionsIn: GetCLIResourceOptions,
+  ): Promise<WalletResourceOptions> {
+    const { cli, options } = optionsIn;
+    const { network } = await common.getCLIResourceOptions(optionsIn);
     let password;
     const wif = options['private-key'];
     let privateKey;

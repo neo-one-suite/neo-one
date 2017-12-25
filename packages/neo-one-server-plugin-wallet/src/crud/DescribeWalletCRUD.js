@@ -1,5 +1,9 @@
 /* @flow */
-import { type InteractiveCLI, DescribeCRUD } from '@neo-one/server-plugin';
+import {
+  type GetCLINameOptions,
+  type GetCLIResourceOptions,
+  DescribeCRUD,
+} from '@neo-one/server-plugin';
 
 import type WalletResourceType, {
   Wallet,
@@ -19,19 +23,15 @@ export default class DescribeWalletCRUD extends DescribeCRUD<
     });
   }
 
-  getCLIName(options: {|
-    baseName: string,
-    cli: InteractiveCLI,
-    options: WalletResourceOptions,
-  |}): Promise<string> {
+  getCLIName(
+    options: GetCLINameOptions<WalletResourceOptions>,
+  ): Promise<string> {
     return common.getCLIName(options);
   }
 
-  getCLIResourceOptions(options: {|
-    cli: InteractiveCLI,
-    // flowlint-next-line unclear-type:off
-    options: Object,
-  |}): Promise<WalletResourceOptions> {
+  getCLIResourceOptions(
+    options: GetCLIResourceOptions,
+  ): Promise<WalletResourceOptions> {
     return common.getCLIResourceOptions(options);
   }
 }

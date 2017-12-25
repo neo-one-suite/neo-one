@@ -38,6 +38,14 @@ export type CRUDBaseOptions<
   autocomplete?: Array<string>,
 |};
 
+export type GetCLIResourceOptions = {|
+  cli: InteractiveCLI,
+  // flowlint-next-line unclear-type:off
+  args: Object,
+  // flowlint-next-line unclear-type:off
+  options: Object,
+|};
+
 export default class CRUDBase<
   Resource: BaseResource,
   // flowlint-next-line unclear-type:off
@@ -81,11 +89,7 @@ export default class CRUDBase<
 
   getCLIResourceOptions({
     options,
-  }: {|
-    cli: InteractiveCLI,
-    // flowlint-next-line unclear-type:off
-    options: Object,
-  |}): Promise<ResourceOptions> {
+  }: GetCLIResourceOptions): Promise<ResourceOptions> {
     return Promise.resolve((options: $FlowFixMe));
   }
 }
