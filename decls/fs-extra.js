@@ -1,5 +1,5 @@
 /* @flow */
-import type fs, { Stats } from "fs";
+import type { Stats } from "fs";
 
 declare module 'fs-extra' {
   declare export interface PathEntry {
@@ -62,9 +62,11 @@ declare module 'fs-extra' {
   declare function readFile(file: string | Buffer | number, options: { flag?: string; } | { encoding: string; flag?: string; }): Promise<string>;
   declare function readFile(file: string | Buffer | number, encoding: string): Promise<string>;
   declare function readFile(file: string | Buffer | number): Promise<Buffer>;
+  declare function readFileSync(file: string | Buffer | number, options: { flag?: string; } | { encoding: string; flag?: string; }): string;
+  declare function readFileSync(file: string | Buffer | number, encoding: string): string;
+  declare function readFileSync(file: string | Buffer | number): Buffer;
 
   declare module.exports: {
-    ...fs,
     constants: Object,
     copy(src: string, dest: string, options?: CopyOptions): Promise<void>;
     copySync(src: string, dest: string, options?: CopyOptions): void;
@@ -162,8 +164,10 @@ declare module 'fs-extra' {
     read(fd: number, buffer: Buffer, offset: number, length: number, position: number | null): Promise<ReadResult>;
 
     readFile: typeof readFile;
+    readFileSync: typeof readFileSync;
 
-    readdir(path: string | Buffer): Promise<string[]>;
+    readdir(path: string | Buffer): Promise<Array<string>>;
+    readdirSync(path: string | Buffer): Array<string>;
 
     readlink(path: string | Buffer): Promise<string>;
 
@@ -188,6 +192,7 @@ declare module 'fs-extra' {
     write(fd: number, data: any, offset: number, encoding?: string): Promise<WriteResult>;
 
     writeFile(file: string | Buffer | number, data: any, options?: WriteFileOptions | string): Promise<void>;
+    writeFileSync(file: string | Buffer | number, data: any, options?: WriteFileOptions | string): void;
 
     mkdtemp(prefix: string): Promise<string>;
   }

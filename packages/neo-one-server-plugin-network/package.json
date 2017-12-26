@@ -28,14 +28,14 @@
   "main": "./dist/index.js",
   "module": "./dist/es.js",
   "dependencies": {
-    "fs-extra": "^5.0.0",
-    "lodash": "^4.17.4",
     "@neo-one/core": "^0.0.1",
     "@neo-one/full-node": "^0.0.1",
     "@neo-one/neo-settings": "^0.0.1",
     "@neo-one/server-plugin": "^0.0.1",
     "@neo-one/utils": "^0.0.1",
+    "fs-extra": "^5.0.0",
+    "lodash": "^4.17.4",
     "node-fetch": "^1.7.3",
-    "rxjs": "^5.5.5"
+    "rxjs": "^5.5.6"
   }
 }

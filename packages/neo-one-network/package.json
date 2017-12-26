@@ -30,11 +30,11 @@
     "node": ">=8.9.0"
   },
   "dependencies": {
-    "lodash": "^4.17.4",
     "@neo-one/core": "^0.0.1",
     "@neo-one/node-core": "^0.0.1",
     "@neo-one/utils": "^0.0.1",
-    "rxjs": "^5.5.5",
+    "lodash": "^4.17.4",
+    "rxjs": "^5.5.6",
     "through": "^2.3.8"
   }
 }

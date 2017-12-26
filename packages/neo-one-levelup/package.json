@@ -31,9 +31,9 @@
     "node": ">=8.9.0"
   },
   "dependencies": {
-    "bytewise": "^1.1.0",
     "@neo-one/core": "^0.0.1",
     "@neo-one/node-core": "^0.0.1",
-    "rxjs": "^5.5.5"
+    "bytewise": "^1.1.0",
+    "rxjs": "^5.5.6"
   }
 }

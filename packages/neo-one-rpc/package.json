@@ -31,6 +31,10 @@
     "node": ">=8.9.0"
   },
   "dependencies": {
+    "@neo-one/client": "^0.0.1",
+    "@neo-one/core": "^0.0.1",
+    "@neo-one/node-core": "^0.0.1",
+    "@neo-one/utils": "^0.0.1",
     "jayson": "^2.0.5",
     "koa": "^2.4.1",
     "koa-better-body": "^3.0.4",
@@ -41,11 +45,7 @@
     "koa-cors": "^0.0.16",
     "koa-mount": "^3.0.0",
     "lodash": "^4.17.4",
-    "@neo-one/client": "^0.0.1",
-    "@neo-one/core": "^0.0.1",
-    "@neo-one/node-core": "^0.0.1",
-    "@neo-one/utils": "^0.0.1",
     "node-fetch": "^1.7.3",
-    "rxjs": "^5.5.5"
+    "rxjs": "^5.5.6"
   }
 }

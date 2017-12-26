@@ -31,8 +31,8 @@
     "node": ">=8.9.0"
   },
   "dependencies": {
-    "@neo-one/server-grpc": "^0.0.1",
     "@neo-one/server-client": "^0.0.1",
+    "@neo-one/server-grpc": "^0.0.1",
     "@neo-one/server-plugin": "^0.0.1",
     "@neo-one/server-plugin-compiler": "^0.0.1",
     "@neo-one/server-plugin-network": "^0.0.1",
@@ -45,7 +45,7 @@
     "mali": "^0.5.0",
     "mali-compose": "^1.0.0",
     "mali-onerror": "^0.1.1",
-    "rxjs": "^5.5.5",
+    "rxjs": "^5.5.6",
     "toposort": "^1.0.6",
     "uuid": "^3.1.0"
   }
