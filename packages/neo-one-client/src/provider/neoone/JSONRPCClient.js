@@ -7,6 +7,7 @@ import {
   type InputJSON,
   type InvocationDataJSON,
   type InvocationResultJSON,
+  type NetworkSettingsJSON,
   type OutputJSON,
   type StorageItemJSON,
   type TransactionJSON,
@@ -190,6 +191,12 @@ export default class JSONRPCClient {
   getValidators(): Promise<Array<ValidatorJSON>> {
     return this._provider.request({
       method: 'getvalidators',
+    });
+  }
+
+  getNetworkSettings(): Promise<NetworkSettingsJSON> {
+    return this._provider.request({
+      method: 'getnetworksettings',
     });
   }
 }

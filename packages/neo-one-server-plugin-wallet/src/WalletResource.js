@@ -13,7 +13,6 @@ import {
 import type { Observable } from 'rxjs/Observable';
 import {
   type LocalWallet,
-  type Network as ClientNetwork,
   type NetworkType as ClientNetworkType,
   createPrivateKey,
   networks,
@@ -33,7 +32,7 @@ import { NetworkRequiredError } from './errors';
 import type { ReadWalletClient, WalletClient } from './types';
 import type WalletResourceType, { Coin, Wallet } from './WalletResourceType';
 
-import { getClientNetwork } from './utils';
+import { getClientNetworkType } from './utils';
 
 const getRPCURL = (network?: ?Network): ?string => {
   if (network == null) {
@@ -72,14 +71,14 @@ const updateClient = ({
     throw new NetworkRequiredError();
   }
 
-  const clientNetwork = getClientNetwork(networkName);
+  const clientNetworkType = getClientNetworkType(networkName);
   client.userAccountProvider.provider.addNetwork({
-    network: clientNetwork,
+    network: clientNetworkType,
     rpcURL,
   });
 
   return createReadClient({
-    network: clientNetwork,
+    network: clientNetworkType,
     rpcURL,
   });
 };
@@ -117,7 +116,7 @@ type WalletResourceOptions = {|
   address: string,
   dataPath: string,
   walletPath: string,
-  clientNetwork: ClientNetwork,
+  clientNetworkType: ClientNetworkType,
 |};
 
 type NewWalletResourceOptions = {|
@@ -151,7 +150,7 @@ export default class WalletResource {
   _address: string;
   _dataPath: string;
   _walletPath: string;
-  _clientNetwork: ClientNetwork;
+  _clientNetworkType: ClientNetworkType;
 
   _deleted: boolean;
   _neoBalance: ?string;
@@ -172,7 +171,7 @@ export default class WalletResource {
     address,
     dataPath,
     walletPath,
-    clientNetwork,
+    clientNetworkType,
   }: WalletResourceOptions) {
     this._client = client;
     this._readClient = readClient;
@@ -183,7 +182,7 @@ export default class WalletResource {
     this._address = address;
     this._dataPath = dataPath;
     this._walletPath = walletPath;
-    this._clientNetwork = clientNetwork;
+    this._clientNetworkType = clientNetworkType;
 
     if (networkName === networkConstants.NETWORK_NAME.MAIN) {
       this._networkType = networkConstants.NETWORK_TYPE.MAIN;
@@ -233,9 +232,9 @@ export default class WalletResource {
     }
 
     const readClient = updateClient({ networkName, network, client });
-    const clientNetwork = getClientNetwork(networkName);
+    const clientNetworkType = getClientNetworkType(networkName);
     const wallet = await client.userAccountProvider.keystore.addAccount({
-      network: clientNetwork,
+      network: clientNetworkType,
       name: baseName,
       privateKey: privateKey == null ? createPrivateKey() : privateKey,
       password,
@@ -257,7 +256,7 @@ export default class WalletResource {
       address,
       dataPath,
       walletPath,
-      clientNetwork,
+      clientNetworkType,
     });
 
     return walletResource;
@@ -276,7 +275,7 @@ export default class WalletResource {
       .pipe(take(1))
       .toPromise();
     const readClient = updateClient({ networkName, network, client });
-    const clientNetwork = getClientNetwork(networkName);
+    const clientNetworkType = getClientNetworkType(networkName);
 
     const walletPath = this._getWalletPath(dataPath);
     const { address } = await fs.readJSON(walletPath);
@@ -292,7 +291,7 @@ export default class WalletResource {
       address,
       dataPath,
       walletPath,
-      clientNetwork,
+      clientNetworkType,
     });
   }
 
@@ -349,11 +348,11 @@ export default class WalletResource {
   }
 
   get walletID(): {|
-    networkType: ClientNetworkType,
+    network: ClientNetworkType,
     address: string,
   |} {
     return {
-      networkType: this._clientNetwork.type,
+      network: this._clientNetworkType,
       address: this._address,
     };
   }
@@ -381,10 +380,7 @@ export default class WalletResource {
     if (this.wallet.privateKey == null) {
       return null;
     }
-    return privateKeyToWIF({
-      privateKey: this.wallet.privateKey,
-      privateKeyVersion: this._clientNetwork.privateKeyVersion,
-    });
+    return privateKeyToWIF(this.wallet.privateKey);
   }
 
   _toResource(): Wallet {

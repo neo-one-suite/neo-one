@@ -10,7 +10,6 @@ import { utils } from '@neo-one/utils';
 import type {
   BufferString,
   UserAccount,
-  Network,
   NetworkType,
   Witness,
 } from '../../types'; // eslint-disable-line
@@ -45,7 +44,7 @@ export type Store = {
 
 type WalletID = {|
   address: string,
-  networkType: NetworkType,
+  network: NetworkType,
 |};
 
 export default class LocalKeyStore {
@@ -85,10 +84,10 @@ export default class LocalKeyStore {
   static async create({ store }: {| store: Store |}): Promise<LocalKeyStore> {
     const walletsList = await store.getWallets();
     const wallets = walletsList.reduce((acc, wallet) => {
-      if (acc[wallet.account.networkType] == null) {
-        acc[wallet.account.networkType] = {};
+      if (acc[wallet.account.network] == null) {
+        acc[wallet.account.network] = {};
       }
-      acc[wallet.account.networkType][wallet.account.address] = wallet;
+      acc[wallet.account.network][wallet.account.address] = wallet;
       return acc;
     }, {});
 
@@ -119,8 +118,8 @@ export default class LocalKeyStore {
     this._currentAccount$.next(account);
   }
 
-  getWallet({ address, networkType }: WalletID): Wallet {
-    const wallets = this.wallets[networkType];
+  getWallet({ address, network }: WalletID): Wallet {
+    const wallets = this.wallets[network];
     if (wallets == null) {
       throw new UnknownAccountError(address);
     }
@@ -139,7 +138,7 @@ export default class LocalKeyStore {
     name,
     password,
   }: {|
-    network: Network,
+    network: NetworkType,
     privateKey: BufferString,
     name?: string,
     password?: string,
@@ -149,20 +148,16 @@ export default class LocalKeyStore {
     let privateKey = privateKeyIn;
     const publicKey = privateKeyToPublicKey(privateKey);
     const scriptHash = publicKeyToScriptHash(publicKey);
-    const address = scriptHashToAddress({
-      addressVersion: network.addressVersion,
-      scriptHash,
-    });
+    const address = scriptHashToAddress(scriptHash);
 
     let nep2;
-    if (network.type === networks.MAIN.type || password != null) {
+    if (network === networks.MAIN || password != null) {
       if (password == null) {
         throw new PasswordRequiredError();
       }
       nep2 = await encryptNEP2({
         privateKey,
         password,
-        addressVersion: network.addressVersion,
       });
       privateKey = undefined;
     }
@@ -170,8 +165,7 @@ export default class LocalKeyStore {
     const wallet = {
       account: {
         type: 'file',
-        networkType: network.type,
-        addressVersion: network.addressVersion,
+        network,
         name: name == null ? address : name,
         address,
         scriptHash,
@@ -183,14 +177,12 @@ export default class LocalKeyStore {
 
     await this._store.saveWallet(wallet);
 
-    if (this.wallets[wallet.account.networkType] == null) {
-      this.wallets[wallet.account.networkType] = {};
+    if (this.wallets[wallet.account.network] == null) {
+      this.wallets[wallet.account.network] = {};
     }
 
-    if (
-      this.wallets[wallet.account.networkType][wallet.account.address] == null
-    ) {
-      this.wallets[wallet.account.networkType][wallet.account.address] = wallet;
+    if (this.wallets[wallet.account.network][wallet.account.address] == null) {
+      this.wallets[wallet.account.network][wallet.account.address] = wallet;
       this._updateAccounts$();
     }
 
@@ -204,19 +196,19 @@ export default class LocalKeyStore {
   async deleteAccount(id: WalletID): Promise<void> {
     const { account } = this.getWallet(id);
     await this._store.deleteWallet(
-      this.wallets[account.networkType][account.address],
+      this.wallets[account.network][account.address],
     );
 
-    delete this.wallets[account.networkType][account.address];
-    if (_.isEmpty(this.wallets[account.networkType])) {
-      delete this.wallets[account.networkType];
+    delete this.wallets[account.network][account.address];
+    if (_.isEmpty(this.wallets[account.network])) {
+      delete this.wallets[account.network];
     }
 
     this._updateAccounts$();
 
     if (
       this._currentAccount != null &&
-      this._currentAccount.networkType === account.networkType &&
+      this._currentAccount.network === account.network &&
       this._currentAccount.address === account.address
     ) {
       this._newCurrentAccount$();
@@ -240,12 +232,11 @@ export default class LocalKeyStore {
     }
 
     const privateKey = await decryptNEP2({
-      addressVersion: wallet.account.addressVersion,
       encryptedKey: wallet.nep2,
       password,
     });
 
-    this.wallets[wallet.account.networkType][wallet.account.address] = {
+    this.wallets[wallet.account.network][wallet.account.address] = {
       account: wallet.account,
       privateKey,
       nep2: wallet.nep2,
@@ -259,7 +250,7 @@ export default class LocalKeyStore {
       return;
     }
 
-    this.wallets[wallet.account.networkType][wallet.account.address] = {
+    this.wallets[wallet.account.network][wallet.account.address] = {
       account: wallet.account,
       privateKey: null,
       nep2: wallet.nep2,
@@ -269,7 +260,7 @@ export default class LocalKeyStore {
 
   _getPrivateKey(account: UserAccount): BufferString {
     const wallet = this.getWallet({
-      networkType: account.networkType,
+      network: account.network,
       address: account.address,
     });
 

@@ -11,7 +11,7 @@ import {
   NEOONEDataProvider,
   NEOONEProvider,
 } from './provider';
-import type { Network } from './types'; // eslint-disable-line
+import type { NetworkType } from './types';
 import ReadClient from './ReadClient';
 
 import * as networks from './networks';
@@ -71,7 +71,7 @@ export const createReadClient = ({
   rpcURL,
   iterBlocksFetchTimeoutMS,
 }: {|
-  network: Network,
+  network: NetworkType,
   rpcURL: string,
   iterBlocksFetchTimeoutMS?: number,
 |}) =>

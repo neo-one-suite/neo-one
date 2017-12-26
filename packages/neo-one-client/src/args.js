@@ -2,7 +2,7 @@
 import type BigNumber from 'bignumber.js';
 
 import _ from 'lodash';
-import { common, crypto } from '@neo-one/core';
+import { common } from '@neo-one/core';
 
 import type {
   ABI,
@@ -22,6 +22,7 @@ import type {
 } from './types'; // eslint-disable-line
 import { InvalidArgumentError, InvalidNamedArgumentError } from './errors';
 
+import { addressToScriptHash } from './helpers';
 import converters from './user/converters';
 
 export const assertString = (name: string, param: mixed): string => {
@@ -42,13 +43,7 @@ export const assertNullableString = (name: string, param?: mixed): ?string => {
   return assertString(name, param);
 };
 
-export const assertAddress = ({
-  addressVersion,
-  address,
-}: {|
-  addressVersion: number,
-  address: mixed,
-|}): AddressString => {
+export const assertAddress = (address: mixed): AddressString => {
   if (address == null || typeof address !== 'string') {
     throw new InvalidArgumentError(
       `Address argument was not a string: ${String(address)}`,
@@ -56,7 +51,7 @@ export const assertAddress = ({
   }
 
   try {
-    crypto.addressToScriptHash({ addressVersion, address });
+    addressToScriptHash(address);
   } catch (error) {
     throw new InvalidArgumentError(`Invalid address: ${address}`);
   }

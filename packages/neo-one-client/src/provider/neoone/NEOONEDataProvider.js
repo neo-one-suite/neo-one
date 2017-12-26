@@ -12,6 +12,7 @@ import {
   type InvocationResultJSON,
   type InvocationTransactionJSON,
   type OutputJSON,
+  type NetworkSettingsJSON,
   type TransactionJSON,
   JSONHelper,
   utils,
@@ -44,7 +45,8 @@ import type {
   InvocationTransaction,
   RawInvocationData,
   RawInvocationResult,
-  Network,
+  NetworkSettings,
+  NetworkType,
   Output,
   StorageItem,
   Transaction,
@@ -57,13 +59,13 @@ import JSONRPCClient from './JSONRPCClient';
 import JSONRPCHTTPProvider from './JSONRPCHTTPProvider';
 
 export type NEOONEDataProviderOptions = {|
-  network: Network,
+  network: NetworkType,
   rpcURL: string,
   iterBlocksFetchTimeoutMS?: number,
 |};
 
 export default class NEOONEDataProvider implements DataProvider {
-  network: Network;
+  network: NetworkType;
 
   _client: JSONRPCClient;
   _iterBlocksFetchTimeoutMS: ?number;
@@ -206,6 +208,11 @@ export default class NEOONEDataProvider implements DataProvider {
 
   getValidators(): Promise<Array<Validator>> {
     return this._client.getValidators();
+  }
+
+  async getNetworkSettings(): Promise<NetworkSettings> {
+    const settings = await this._client.getNetworkSettings();
+    return this._convertNetworkSettings(settings);
   }
 
   _getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem> {
@@ -572,5 +579,11 @@ export default class NEOONEDataProvider implements DataProvider {
 
   _getAccount(address: AddressString): Promise<AccountJSON> {
     return this._client.getAccount(address);
+  }
+
+  _convertNetworkSettings(settings: NetworkSettingsJSON): NetworkSettings {
+    return {
+      issueGASFee: new BigNumber(settings.issueGASFee),
+    };
   }
 }

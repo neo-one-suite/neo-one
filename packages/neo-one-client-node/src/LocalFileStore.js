@@ -27,7 +27,7 @@ export default class LocalFileStore {
     await fs.remove(this._getWalletPath(wallet));
   }
 
-  _getWalletPath({ account: { networkType, address } }: LocalWallet): string {
-    return path.resolve(this._dataPath, `${networkType}-${address}.json`);
+  _getWalletPath({ account: { network, address } }: LocalWallet): string {
+    return path.resolve(this._dataPath, `${network}-${address}.json`);
   }
 }

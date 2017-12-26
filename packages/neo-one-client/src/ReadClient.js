@@ -30,10 +30,7 @@ export default class ReadClient<TDataProvider: DataProvider> {
   }
 
   getAccount(address: AddressString): Promise<Account> {
-    args.assertAddress({
-      address,
-      addressVersion: this.dataProvider.network.addressVersion,
-    });
+    args.assertAddress(address);
     return this.dataProvider.getAccount(address);
   }
 

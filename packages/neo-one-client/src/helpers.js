@@ -13,60 +13,60 @@ export const publicKeyToScriptHash = (publicKey: PublicKeyString): string =>
     crypto.publicKeyToScriptHash(common.stringToECPoint(publicKey)),
   );
 
-export const publicKeyToAddress = ({
-  addressVersion,
-  publicKey,
-}: {|
-  addressVersion: number,
+export const publicKeyToAddress = (
   publicKey: PublicKeyString,
-|}): AddressString =>
+  addressVersion?: number,
+): AddressString =>
   crypto.scriptHashToAddress({
-    addressVersion,
+    addressVersion:
+      addressVersion == null ? common.NEO_ADDRESS_VERSION : addressVersion,
     scriptHash: crypto.publicKeyToScriptHash(common.stringToECPoint(publicKey)),
   });
 
-export const scriptHashToAddress = ({
-  addressVersion,
-  scriptHash,
-}: {|
-  addressVersion: number,
+export const scriptHashToAddress = (
   scriptHash: Hash160String,
-|}): AddressString =>
+  addressVersion?: number,
+): AddressString =>
   crypto.scriptHashToAddress({
-    addressVersion,
+    addressVersion:
+      addressVersion == null ? common.NEO_ADDRESS_VERSION : addressVersion,
     scriptHash: common.stringToUInt160(scriptHash),
   });
 
-export const addressToScriptHash = ({
-  addressVersion,
-  address,
-}: {|
-  addressVersion: number,
+export const addressToScriptHash = (
   address: AddressString,
-|}): Hash160String =>
+  addressVersion?: number,
+): Hash160String =>
   common.uInt160ToString(
-    crypto.addressToScriptHash({ addressVersion, address }),
+    crypto.addressToScriptHash({
+      addressVersion:
+        addressVersion == null ? common.NEO_ADDRESS_VERSION : addressVersion,
+      address,
+    }),
   );
 
-export const wifToPrivateKey = ({
-  wif,
-  privateKeyVersion,
-}: {|
+export const wifToPrivateKey = (
   wif: string,
-  privateKeyVersion: number,
-|}): PrivateKeyString =>
-  common.privateKeyToString(crypto.wifToPrivateKey(wif, privateKeyVersion));
+  privateKeyVersion?: number,
+): PrivateKeyString =>
+  common.privateKeyToString(
+    crypto.wifToPrivateKey(
+      wif,
+      privateKeyVersion == null
+        ? common.NEO_PRIVATE_KEY_VERSION
+        : privateKeyVersion,
+    ),
+  );
 
-export const privateKeyToWIF = ({
-  privateKey,
-  privateKeyVersion,
-}: {|
+export const privateKeyToWIF = (
   privateKey: PrivateKeyString,
-  privateKeyVersion: number,
-|}): string =>
+  privateKeyVersion?: number,
+): string =>
   crypto.privateKeyToWIF(
     common.stringToPrivateKey(privateKey),
-    privateKeyVersion,
+    privateKeyVersion == null
+      ? common.NEO_PRIVATE_KEY_VERSION
+      : privateKeyVersion,
   );
 
 export const privateKeyToScriptHash = (
@@ -76,15 +76,13 @@ export const privateKeyToScriptHash = (
     crypto.privateKeyToScriptHash(common.stringToPrivateKey(privateKey)),
   );
 
-export const privateKeyToAddress = ({
-  privateKey,
-  addressVersion,
-}: {|
+export const privateKeyToAddress = (
   privateKey: PrivateKeyString,
-  addressVersion: number,
-|}): AddressString =>
+  addressVersion?: number,
+): AddressString =>
   crypto.privateKeyToAddress({
-    addressVersion,
+    addressVersion:
+      addressVersion == null ? common.NEO_ADDRESS_VERSION : addressVersion,
     privateKey: common.stringToPrivateKey(privateKey),
   });
 
@@ -105,10 +103,11 @@ export const encryptNEP2 = ({
 }: {|
   password: string,
   privateKey: PrivateKeyString,
-  addressVersion: number,
+  addressVersion?: number,
 |}): Promise<string> =>
   crypto.encryptNEP2({
-    addressVersion,
+    addressVersion:
+      addressVersion == null ? common.NEO_ADDRESS_VERSION : addressVersion,
     privateKey: common.stringToPrivateKey(privateKey),
     password,
   });
@@ -120,10 +119,11 @@ export const decryptNEP2 = async ({
 }: {|
   password: string,
   encryptedKey: string,
-  addressVersion: number,
+  addressVersion?: number,
 |}): Promise<string> => {
   const privateKey = await crypto.decryptNEP2({
-    addressVersion,
+    addressVersion:
+      addressVersion == null ? common.NEO_ADDRESS_VERSION : addressVersion,
     encryptedKey,
     password,
   });

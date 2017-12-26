@@ -13,7 +13,7 @@ import type {
   Param,
   ParamInternal,
   Transfer,
-  Network,
+  NetworkType,
   TransactionOptions,
   InvokeTransactionOptions,
   PublicKeyString,
@@ -36,7 +36,7 @@ export default class Client<TUserAccountProvider: UserAccountProvider> {
   +userAccountProvider: TUserAccountProvider;
   +currentAccount$: Observable<?UserAccount>;
   +accounts$: Observable<Array<UserAccount>>;
-  +networks$: Observable<Array<Network>>;
+  +networks$: Observable<Array<NetworkType>>;
 
   constructor(userAccountProvider: TUserAccountProvider) {
     this.userAccountProvider = userAccountProvider;
@@ -53,7 +53,7 @@ export default class Client<TUserAccountProvider: UserAccountProvider> {
     return this.accounts$.pipe(take(1)).toPromise();
   }
 
-  getNetworks(): Promise<Array<Network>> {
+  getNetworks(): Promise<Array<NetworkType>> {
     return this.networks$.pipe(take(1)).toPromise();
   }
 

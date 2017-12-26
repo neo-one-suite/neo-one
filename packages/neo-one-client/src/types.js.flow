@@ -446,18 +446,14 @@ export type Log = {|
 |};
 
 export type NetworkType = 'main' | 'test' | string;
-export type Network = {|
-  type: NetworkType,
-  addressVersion: number,
-  privateKeyVersion: number,
+export type NetworkSettings = {|
   issueGASFee: BigNumber,
 |};
 
 export type UserAccount = {|
   // UserAccountProvider defined string.
   type: string,
-  networkType: NetworkType,
-  addressVersion: number,
+  network: NetworkType,
   name: string,
   address: AddressString,
   scriptHash: Hash160String,
@@ -541,7 +537,7 @@ export type BlockFilter = {|
 export interface UserAccountProvider {
   +currentAccount$: Observable<?UserAccount>;
   +accounts$: Observable<Array<UserAccount>>;
-  +networks$: Observable<Array<Network>>;
+  +networks$: Observable<Array<NetworkType>>;
 
   transfer(
     transfers: Array<Transfer>,
@@ -589,7 +585,7 @@ export interface UserAccountProvider {
 }
 
 export interface DataProvider {
-  +network: Network;
+  +network: NetworkType;
 
   getAccount(address: AddressString): Promise<Account>;
 

@@ -17,7 +17,6 @@ import type WalletResourceType, {
 } from '../../WalletResourceType';
 
 import common from './common';
-import { getClientNetwork } from '../../utils';
 
 const ENCRYPT_MESSAGE = 'Enter a password to encrypt your private key: ';
 
@@ -59,7 +58,6 @@ export default class CreateWalletCRUD extends CreateCRUD<
     let password;
     const wif = options['private-key'];
     let privateKey;
-    const clientNetwork = getClientNetwork(network);
     if (wif == null && network === networkConstants.NETWORK_NAME.MAIN) {
       password = await common.promptPassword({
         cli,
@@ -68,10 +66,7 @@ export default class CreateWalletCRUD extends CreateCRUD<
     } else if (wif != null) {
       let valid = false;
       try {
-        privateKey = wifToPrivateKey({
-          wif,
-          privateKeyVersion: clientNetwork.privateKeyVersion,
-        });
+        privateKey = wifToPrivateKey(wif);
         valid = true;
       } catch (error) {
         valid = false;
@@ -92,7 +87,6 @@ export default class CreateWalletCRUD extends CreateCRUD<
         privateKey = await decryptNEP2({
           encryptedKey: wif,
           password,
-          addressVersion: clientNetwork.addressVersion,
         });
       } else if (network === networkConstants.NETWORK_NAME.MAIN) {
         throw new Error(

@@ -21,7 +21,6 @@ import {
   toAssetType,
   toContractParameterType,
   common,
-  crypto,
   utils,
 } from '@neo-one/core';
 import type { Observable } from 'rxjs/Observable';
@@ -39,7 +38,6 @@ import type {
   Hash160String,
   Hash256String,
   Transfer,
-  Network,
   TransactionOptions,
   PublicKeyString,
   PublishReceipt,
@@ -56,6 +54,8 @@ import type {
   RawInvocationResultError,
   RawInvocationResultSuccess,
   InvokeTransactionOptions,
+  NetworkSettings,
+  NetworkType,
   Output,
   Param,
   ParamInternal,
@@ -73,9 +73,9 @@ import {
   NoAccountError,
   NothingToClaimError,
   NothingToTransferError,
-  UnknownNetworkError,
 } from '../errors';
 
+import { addressToScriptHash } from '../helpers';
 import * as clientUtils from '../utils';
 import converters from './converters';
 
@@ -89,37 +89,37 @@ export type KeyStore = {
 };
 
 export type Provider = {
-  +networks$: Observable<Array<Network>>,
+  +networks$: Observable<Array<NetworkType>>,
   +getUnclaimed: (
-    network: Network,
+    network: NetworkType,
     address: AddressString,
   ) => Promise<{| unclaimed: Array<Input>, amount: BigNumber |}>,
   +getUnspentOutputs: (
-    network: Network,
+    network: NetworkType,
     address: AddressString,
   ) => Promise<Array<UnspentOutput>>,
   +relayTransaction: (
-    network: Network,
+    network: NetworkType,
     transaction: string,
   ) => Promise<Transaction>,
   +getTransactionReceipt: (
-    network: Network,
+    network: NetworkType,
     hash: Hash256String,
     options?: GetOptions,
   ) => Promise<TransactionReceipt>,
   +getInvocationData: (
-    network: Network,
+    network: NetworkType,
     hash: Hash256String,
   ) => Promise<RawInvocationData>,
   +testInvoke: (
-    network: Network,
+    network: NetworkType,
     transaction: string,
   ) => Promise<RawInvocationResult>,
+  +getNetworkSettings: (network: NetworkType) => Promise<NetworkSettings>,
 };
 
 type TransactionOptionsFull = {|
   from: UserAccount,
-  network: Network,
   attributes: Array<Attribute>,
   networkFee: BigNumber,
 |};
@@ -135,7 +135,7 @@ export default class LocalUserAccountProvider<
 > implements UserAccountProvider {
   +currentAccount$: Observable<?UserAccount>;
   +accounts$: Observable<Array<UserAccount>>;
-  +networks$: Observable<Array<Network>>;
+  +networks$: Observable<Array<NetworkType>>;
 
   +keystore: TKeyStore;
   +provider: TProvider;
@@ -159,15 +159,11 @@ export default class LocalUserAccountProvider<
     transfers: Array<Transfer>,
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>> {
-    const {
-      from,
-      network,
-      attributes,
-      networkFee,
-    } = await this._getTransactionOptions(options);
+    const { from, attributes, networkFee } = await this._getTransactionOptions(
+      options,
+    );
     const { inputs, outputs } = await this._getTransfersInputOutputs({
       transfers,
-      network,
       from,
       gas: networkFee,
     });
@@ -178,12 +174,11 @@ export default class LocalUserAccountProvider<
 
     const transaction = new ContractTransaction({
       inputs: this._convertInputs(inputs),
-      outputs: this._convertOutputs(network.addressVersion, outputs),
+      outputs: this._convertOutputs(outputs),
       attributes: this._convertAttributes(attributes),
     });
     return this._sendTransaction({
       from,
-      network,
       transaction,
       onConfirm: async ({ receipt }) => receipt,
     });
@@ -192,16 +187,13 @@ export default class LocalUserAccountProvider<
   async claim(
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>> {
-    const {
-      from,
-      network,
-      attributes,
-      networkFee,
-    } = await this._getTransactionOptions(options);
+    const { from, attributes, networkFee } = await this._getTransactionOptions(
+      options,
+    );
 
     const [{ unclaimed, amount }, { inputs, outputs }] = await Promise.all([
-      this.provider.getUnclaimed(network, from.address),
-      this._getTransfersInputOutputs({ from, network, gas: networkFee }),
+      this.provider.getUnclaimed(from.network, from.address),
+      this._getTransfersInputOutputs({ from, gas: networkFee }),
     ]);
     if (unclaimed.length === 0) {
       throw new NothingToClaimError();
@@ -211,7 +203,6 @@ export default class LocalUserAccountProvider<
       inputs: this._convertInputs(inputs),
       claims: this._convertInputs(unclaimed),
       outputs: this._convertOutputs(
-        network.addressVersion,
         outputs.concat([
           {
             address: from.address,
@@ -224,7 +215,6 @@ export default class LocalUserAccountProvider<
     });
     return this._sendTransaction({
       from,
-      network,
       transaction,
       onConfirm: async ({ receipt }) => receipt,
     });
@@ -308,27 +298,20 @@ export default class LocalUserAccountProvider<
     asset: AssetRegister,
     options?: TransactionOptions,
   ): Promise<TransactionResult<RegisterAssetReceipt>> {
+    const sb = new ScriptBuilder();
+    sb.emitSysCall(
+      'Neo.Asset.Create',
+      toAssetType(assertAssetTypeJSON(asset.assetType)),
+      asset.name,
+      clientUtils.bigNumberToBN(asset.amount, 8),
+      asset.precision,
+      common.stringToECPoint(asset.owner),
+      addressToScriptHash(asset.admin),
+      addressToScriptHash(asset.issuer),
+    );
+
     return this._invokeRaw({
-      script: network => {
-        const sb = new ScriptBuilder();
-        sb.emitSysCall(
-          'Neo.Asset.Create',
-          toAssetType(assertAssetTypeJSON(asset.assetType)),
-          asset.name,
-          clientUtils.bigNumberToBN(asset.amount, 8),
-          asset.precision,
-          common.stringToECPoint(asset.owner),
-          crypto.addressToScriptHash({
-            address: asset.admin,
-            addressVersion: network.addressVersion,
-          }),
-          crypto.addressToScriptHash({
-            address: asset.issuer,
-            addressVersion: network.addressVersion,
-          }),
-        );
-        return sb.build();
-      },
+      script: sb.build(),
       options,
       onConfirm: ({ receipt, data }): RegisterAssetReceipt => {
         let result;
@@ -360,17 +343,14 @@ export default class LocalUserAccountProvider<
     transfers: Array<Transfer>,
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>> {
-    const {
-      from,
-      network,
-      attributes,
-      networkFee,
-    } = await this._getTransactionOptions(options);
+    const { from, attributes, networkFee } = await this._getTransactionOptions(
+      options,
+    );
+    const settings = await this.provider.getNetworkSettings(from.network);
     const { inputs, outputs } = await this._getTransfersInputOutputs({
       transfers: [],
       from,
-      network,
-      gas: networkFee.plus(network.issueGASFee),
+      gas: networkFee.plus(settings.issueGASFee),
     });
 
     if (inputs.length === 0) {
@@ -379,12 +359,11 @@ export default class LocalUserAccountProvider<
 
     const transaction = new IssueTransaction({
       inputs: this._convertInputs(inputs),
-      outputs: this._convertOutputs(network.addressVersion, outputs),
+      outputs: this._convertOutputs(outputs),
       attributes: this._convertAttributes(attributes),
     });
     return this._sendTransaction({
       from,
-      network,
       transaction,
       onConfirm: async ({ receipt }) => receipt,
     });
@@ -491,24 +470,20 @@ export default class LocalUserAccountProvider<
     params: Array<?ParamInternal>,
     options?: TransactionOptions,
   ): Promise<RawInvocationResult> {
-    const {
-      from,
-      network,
-      attributes,
-      networkFee,
-    } = await this._getTransactionOptions(options);
+    const { from, attributes, networkFee } = await this._getTransactionOptions(
+      options,
+    );
 
     const transfers = (options || {}).transfers || [];
     const { inputs, outputs } = await this._getTransfersInputOutputs({
       transfers,
       from,
-      network,
       gas: networkFee,
     });
     const testTransaction = new InvocationTransaction({
       version: 1,
       inputs: this._convertInputs(inputs),
-      outputs: this._convertOutputs(network.addressVersion, outputs),
+      outputs: this._convertOutputs(outputs),
       attributes: this._convertAttributes(attributes),
       gas: utils.ZERO,
       script: this._getInvokeMethodScript({
@@ -518,7 +493,7 @@ export default class LocalUserAccountProvider<
       }),
     });
     return this.provider.testInvoke(
-      network,
+      from.network,
       testTransaction.serializeWire().toString('hex'),
     );
   }
@@ -544,15 +519,8 @@ export default class LocalUserAccountProvider<
       throw new NoAccountError();
     }
 
-    const networks = await this.networks$.pipe(take(1)).toPromise();
-    const network = networks.find(net => net.type === from.networkType);
-    if (network == null) {
-      throw new UnknownNetworkError(from.networkType);
-    }
-
     return {
       from,
-      network,
       attributes: attributes.concat(NEO_ONE_ATTRIBUTE),
       networkFee: options.networkFee || utils.ZERO_BIG_NUMBER,
     };
@@ -580,12 +548,12 @@ export default class LocalUserAccountProvider<
   }
 
   async _invokeRaw<T>({
-    script: scriptIn,
+    script,
     options,
     onConfirm,
     scripts: scriptsIn,
   }: {|
-    script: Buffer | ((network: Network) => Buffer),
+    script: Buffer,
     options?: TransactionOptions | InvokeTransactionOptions,
     onConfirm: (options: {|
       transaction: Transaction,
@@ -596,12 +564,9 @@ export default class LocalUserAccountProvider<
   |}): Promise<TransactionResult<T>> {
     const {
       from,
-      network,
       attributes: attributesIn,
       networkFee,
     } = await this._getTransactionOptions(options);
-
-    const script = scriptIn instanceof Buffer ? scriptIn : scriptIn(network);
 
     const transfers = (options || {}).transfers || [];
     const {
@@ -610,7 +575,6 @@ export default class LocalUserAccountProvider<
     } = await this._getTransfersInputOutputs({
       transfers,
       from,
-      network,
       gas: networkFee,
     });
 
@@ -624,14 +588,14 @@ export default class LocalUserAccountProvider<
     const testTransaction = new InvocationTransaction({
       version: 1,
       inputs: this._convertInputs(testInputs),
-      outputs: this._convertOutputs(network.addressVersion, testOutputs),
+      outputs: this._convertOutputs(testOutputs),
       attributes: this._convertAttributes(attributes),
       gas: utils.ZERO,
       script,
       scripts,
     });
     const result = await this.provider.testInvoke(
-      network,
+      from.network,
       testTransaction.serializeWire().toString('hex'),
     );
     if (result.state === 'FAULT') {
@@ -640,14 +604,13 @@ export default class LocalUserAccountProvider<
     const { inputs, outputs } = await this._getTransfersInputOutputs({
       transfers,
       from,
-      network,
       gas: networkFee.plus(result.gasConsumed),
     });
 
     const invokeTransaction = new InvocationTransaction({
       version: 1,
       inputs: this._convertInputs(inputs),
-      outputs: this._convertOutputs(network.addressVersion, outputs),
+      outputs: this._convertOutputs(outputs),
       attributes: this._convertAttributes(attributes),
       gas: clientUtils.bigNumberToBN(result.gasConsumed, 8),
       script,
@@ -656,11 +619,10 @@ export default class LocalUserAccountProvider<
 
     return this._sendTransaction({
       from,
-      network,
       transaction: invokeTransaction,
       onConfirm: async ({ transaction, receipt }) => {
         const data = await this.provider.getInvocationData(
-          network,
+          from.network,
           transaction.txid,
         );
         const res = await onConfirm({ transaction, receipt, data });
@@ -672,12 +634,10 @@ export default class LocalUserAccountProvider<
   async _sendTransaction<T>({
     transaction: transactionUnsignedIn,
     from,
-    network,
     onConfirm,
   }: {|
     transaction: TransactionModel,
     from: UserAccount,
-    network: Network,
     onConfirm: (options: {|
       transaction: Transaction,
       receipt: TransactionReceipt,
@@ -708,7 +668,7 @@ export default class LocalUserAccountProvider<
     });
 
     const transaction = await this.provider.relayTransaction(
-      network,
+      from.network,
       this._addWitness({
         transaction: transactionUnsigned,
         scriptHash: from.scriptHash,
@@ -726,7 +686,7 @@ export default class LocalUserAccountProvider<
           options.timeoutMS = 120000;
         }
         const receipt = await this.provider.getTransactionReceipt(
-          network,
+          from.network,
           transaction.txid,
           options,
         );
@@ -808,12 +768,10 @@ export default class LocalUserAccountProvider<
 
   async _getTransfersInputOutputs({
     from,
-    network,
     transfers: transfersIn,
     gas: gasIn,
   }: {|
     from: UserAccount,
-    network: Network,
     transfers?: Array<Transfer>,
     gas?: BigNumber,
   |}): Promise<{| outputs: Array<Output>, inputs: Array<Input> |}> {
@@ -833,7 +791,7 @@ export default class LocalUserAccountProvider<
     }
 
     const allOutputs = await this.provider.getUnspentOutputs(
-      network,
+      from.network,
       from.address,
     );
     return commonUtils
@@ -1058,13 +1016,8 @@ export default class LocalUserAccountProvider<
     return (inputs || []).map(input => converters.input(input));
   }
 
-  _convertOutputs(
-    addressVersion: number,
-    outputs?: Array<Output>,
-  ): Array<OutputModel> {
-    return (outputs || []).map(output =>
-      converters.output(output, addressVersion),
-    );
+  _convertOutputs(outputs?: Array<Output>): Array<OutputModel> {
+    return (outputs || []).map(output => converters.output(output));
   }
 
   _convertWitness(script: Witness): WitnessModel {

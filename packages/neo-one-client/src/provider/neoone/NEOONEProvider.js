@@ -10,7 +10,8 @@ import type {
   Input,
   RawInvocationData,
   RawInvocationResult,
-  Network,
+  NetworkSettings,
+  NetworkType,
   Transaction,
   TransactionReceipt,
   UnspentOutput,
@@ -21,13 +22,13 @@ import { UnknownNetworkError } from '../../errors';
 import * as networkConfigs from '../../networks';
 
 export type ProviderOptions = {|
-  network: Network,
+  network: NetworkType,
   rpcURL: string,
 |};
 
 export default class NEOONEProvider {
-  networks$: Observable<Array<Network>>;
-  _networks$: BehaviorSubject<Array<Network>>;
+  networks$: Observable<Array<NetworkType>>;
+  _networks$: BehaviorSubject<Array<NetworkType>>;
 
   _providers: { [type: string]: NEOONEDataProvider };
 
@@ -47,15 +48,15 @@ export default class NEOONEProvider {
     let hasMain = false;
     let hasTest = false;
     const networks = (options || []).map(({ network, rpcURL }) => {
-      if (network.type === networkConfigs.MAIN.type) {
+      if (network === networkConfigs.MAIN) {
         hasMain = true;
       }
 
-      if (network.type === networkConfigs.TEST.type) {
+      if (network === networkConfigs.TEST) {
         hasTest = true;
       }
 
-      this._providers[network.type] = new NEOONEDataProvider({
+      this._providers[network] = new NEOONEDataProvider({
         network,
         rpcURL,
       });
@@ -90,47 +91,40 @@ export default class NEOONEProvider {
     network,
     rpcURL,
   }: {|
-    network: Network,
+    network: NetworkType,
     rpcURL: string,
   |}): void {
-    this._providers[network.type] = new NEOONEDataProvider({
-      network,
-      rpcURL,
-    });
-    if (
-      !this._networks$.value.some(net => networkConfigs.isEqual(network, net))
-    ) {
-      const networks = this._networks$.value.filter(
-        net => network.type !== net.type,
-      );
+    if (!this._networks$.value.some(net => network === net)) {
+      this._providers[network] = new NEOONEDataProvider({ network, rpcURL });
+      const networks = [...this._networks$.value];
       networks.push(network);
       this._networks$.next(networks);
     }
   }
 
   getUnclaimed(
-    network: Network,
+    network: NetworkType,
     address: AddressString,
   ): Promise<{| unclaimed: Array<Input>, amount: BigNumber |}> {
     return this._getProvider(network).getUnclaimed(address);
   }
 
   getUnspentOutputs(
-    network: Network,
+    network: NetworkType,
     address: AddressString,
   ): Promise<Array<UnspentOutput>> {
     return this._getProvider(network).getUnspentOutputs(address);
   }
 
   relayTransaction(
-    network: Network,
+    network: NetworkType,
     transaction: string,
   ): Promise<Transaction> {
     return this._getProvider(network).relayTransaction(transaction);
   }
 
   getTransactionReceipt(
-    network: Network,
+    network: NetworkType,
     hash: Hash256String,
     options?: GetOptions,
   ): Promise<TransactionReceipt> {
@@ -138,23 +132,27 @@ export default class NEOONEProvider {
   }
 
   getInvocationData(
-    network: Network,
+    network: NetworkType,
     hash: Hash256String,
   ): Promise<RawInvocationData> {
     return this._getProvider(network).getInvocationData(hash);
   }
 
   testInvoke(
-    network: Network,
+    network: NetworkType,
     transaction: string,
   ): Promise<RawInvocationResult> {
     return this._getProvider(network).testInvoke(transaction);
   }
 
-  _getProvider(network: Network): NEOONEDataProvider {
-    const provider = this._providers[network.type];
+  getNetworkSettings(network: NetworkType): Promise<NetworkSettings> {
+    return this._getProvider(network).getNetworkSettings();
+  }
+
+  _getProvider(network: NetworkType): NEOONEDataProvider {
+    const provider = this._providers[network];
     if (provider == null) {
-      throw new UnknownNetworkError(network.type);
+      throw new UnknownNetworkError(network);
     }
 
     return provider;

@@ -1,6 +1,7 @@
 /* @flow */
 // flowlint untyped-import:off
 import {
+  TRANSACTION_TYPE,
   type Block,
   Account,
   Input,
@@ -360,6 +361,14 @@ export default ({
       return validators.map(validator =>
         validator.serializeJSON(blockchain.serializeJSONContext),
       );
+    },
+    getnetworksettings: async () => {
+      const issueGASFee = common.fixed8ToDecimal(
+        blockchain.settings.fees[TRANSACTION_TYPE.ISSUE],
+      );
+      return {
+        issueGASFee: issueGASFee.toString(),
+      };
     },
   };
   server = jayson.server(

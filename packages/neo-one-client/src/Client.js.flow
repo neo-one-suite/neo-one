@@ -14,7 +14,7 @@ import type {
   Param,
   ParamInternal,
   Transfer,
-  Network,
+  NetworkType,
   TransactionOptions,
   PublicKeyString,
   PublishReceipt,
@@ -43,8 +43,8 @@ declare export default class Client<
   +accounts$: Observable<Array<UserAccount>>;
   getAccounts(): Promise<Array<UserAccount>>;
 
-  +networks$: Observable<Array<Network>>;
-  getNetworks(): Promise<Array<Network>>;
+  +networks$: Observable<Array<NetworkType>>;
+  getNetworks(): Promise<Array<NetworkType>>;
 
   transfer(
     amount: BigNumber,

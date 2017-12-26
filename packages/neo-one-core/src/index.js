@@ -207,3 +207,7 @@ export type {
   VerifyScriptOptions,
   VMState,
 } from './vm';
+
+export type NetworkSettingsJSON = {|
+  issueGASFee: string,
+|};
