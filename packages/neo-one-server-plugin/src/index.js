@@ -30,6 +30,7 @@ export type { GetCLIResourceOptions } from './CRUDBase';
 export type { ResourceAdapter } from './ResourceAdapter';
 export type {
   MasterResourceAdapter,
+  ResourceDependency,
   ResourceAdapterOptions,
   ResourceAdapterReady,
 } from './MasterResourceAdapter';

@@ -188,6 +188,7 @@ export default class PluginManager {
             plugin: plugin.name,
             resourceType: resourceType.name,
           }),
+          pluginManager: this,
           resourceType,
           masterResourceAdapter,
           portAllocator: this._portAllocator,

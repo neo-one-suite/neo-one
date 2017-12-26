@@ -76,6 +76,15 @@ export default class WalletPlugin extends Plugin {
           }
         },
       },
+      {
+        name: 'deactivate network',
+        hook: async ({ cli }) => {
+          const { wallet } = await cli.getSession(constants.PLUGIN);
+          if (wallet != null) {
+            await cli.exec('deactivate wallet');
+          }
+        },
+      },
     ];
   }
 }

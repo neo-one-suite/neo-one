@@ -11,6 +11,12 @@ export type ResourceAdapterOptions = {|
   dataPath: string,
 |};
 
+export type ResourceDependency = {|
+  plugin: string,
+  resourceType: string,
+  name: string,
+|};
+
 export type ResourceAdapterReady<
   Resource: BaseResource,
   // flowlint-next-line unclear-type:off
@@ -18,6 +24,7 @@ export type ResourceAdapterReady<
 > = {|
   type: 'ready',
   resourceAdapter: ResourceAdapter<Resource, ResourceOptions>,
+  dependencies?: Array<ResourceDependency>,
 |};
 
 export type MasterResourceAdapter<

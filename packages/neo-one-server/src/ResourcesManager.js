@@ -8,6 +8,7 @@ import {
   type ModifyResourceResponse,
   type Plugin,
   type ResourceAdapter,
+  type ResourceDependency,
   type ResourceType,
   compoundName,
 } from '@neo-one/server-plugin';
@@ -22,15 +23,22 @@ import { defer } from 'rxjs/observable/defer';
 import { empty } from 'rxjs/observable/empty';
 import fs from 'fs-extra';
 import { of as _of } from 'rxjs/observable/of';
+import { merge } from 'rxjs/observable/merge';
 import path from 'path';
 
 import { type AbortSignal, AbortController } from './utils';
+import type PluginManager from './PluginManager';
 import type PortAllocator from './PortAllocator';
 import Ready from './Ready';
-import { ResourceNoStartError, ResourceNoStopError } from './errors';
+import {
+  ResourceNoStartError,
+  ResourceNoStopError,
+  RethrownError,
+} from './errors';
 
 const RESOURCES_PATH = 'resources';
 const RESOURCES_READY_PATH = 'ready';
+const DEPENDENCIES_PATH = 'dependencies';
 
 const DOES_NOT_EXIST = 'DOES_NOT_EXIST';
 const DUPLICATE_OPERATION = 'DUPLICATE_OPERATION';
@@ -59,14 +67,17 @@ export default class ResourcesManager<
 > {
   _log: Log;
   _dataPath: string;
+  _pluginManager: PluginManager;
   _resourceType: ResourceType<Resource, ResourceOptions>;
   masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>;
   _portAllocator: PortAllocator;
   _plugin: Plugin;
   _resourceAdapters: ResourceAdapters<Resource, ResourceOptions>;
+  _resourceDependents: { [name: string]: Array<ResourceDependency> };
 
   _resourcesPath: string;
   _resourcesReady: Ready;
+  _dependenciesPath: string;
 
   _createAbortControllers: AbortControllers;
   _creation$: ModifyResources;
@@ -87,28 +98,33 @@ export default class ResourcesManager<
   constructor({
     log,
     dataPath,
+    pluginManager,
     resourceType,
     masterResourceAdapter,
     portAllocator,
   }: {|
     log: Log,
     dataPath: string,
+    pluginManager: PluginManager,
     resourceType: ResourceType<Resource, ResourceOptions>,
     masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>,
     portAllocator: PortAllocator,
   |}) {
     this._log = log;
     this._dataPath = dataPath;
+    this._pluginManager = pluginManager;
     this._resourceType = resourceType;
     this.masterResourceAdapter = masterResourceAdapter;
     this._portAllocator = portAllocator;
     this._plugin = this._resourceType.plugin;
     this._resourceAdapters = {};
+    this._resourceDependents = {};
 
     this._resourcesPath = path.resolve(dataPath, RESOURCES_PATH);
     this._resourcesReady = new Ready({
       dir: path.resolve(dataPath, RESOURCES_READY_PATH),
     });
+    this._dependenciesPath = path.resolve(dataPath, DEPENDENCIES_PATH);
 
     this._createAbortControllers = {};
     this._creation$ = {};
@@ -150,6 +166,7 @@ export default class ResourcesManager<
         await Promise.all([
           fs.ensureDir(this._resourcesPath),
           fs.ensureDir(this._resourcesReady.dir),
+          fs.ensureDir(this._dependenciesPath),
         ]);
         const resources = await this._resourcesReady.getAll();
 
@@ -169,7 +186,25 @@ export default class ResourcesManager<
         const results = await Promise.all(
           resources.map(async (name: string): Promise<?InitError> => {
             try {
-              await this._init(name);
+              // eslint-disable-next-line
+              const [_, dependencies] = await Promise.all([
+                this._init(name),
+                (async () => {
+                  try {
+                    const deps = await fs.readJSON(
+                      this._getDependenciesPath(name),
+                    );
+                    return deps;
+                  } catch (error) {
+                    if (error.code === 'ENOENT') {
+                      return [];
+                    }
+
+                    throw error;
+                  }
+                })(),
+              ]);
+              this._addDependents({ name, dependencies });
               return null;
             } catch (error) {
               return {
@@ -286,6 +321,11 @@ export default class ResourcesManager<
           if (createAbortSignal != null) {
             createAbortSignal.check();
           }
+        } else if (response.type === 'error') {
+          throw new RethrownError({
+            code: response.code,
+            message: response.message,
+          });
         }
 
         return response;
@@ -301,6 +341,14 @@ export default class ResourcesManager<
 
         if (error.code === 'ABORT') {
           return _of({ type: 'aborted' });
+        }
+
+        if (error.rethrown === true) {
+          return _of({
+            type: 'error',
+            code: (error.code: $FlowFixMe),
+            message: error.message,
+          });
         }
 
         return _of({
@@ -384,8 +432,17 @@ export default class ResourcesManager<
         resourceType: this._resourceType.name,
         name,
       });
+      let dependencies;
       const persist$ = defer(async () => {
-        await this._resourcesReady.write(name);
+        if (dependencies == null) {
+          throw new Error('Something went wrong.');
+        }
+        await Promise.all([
+          this._resourcesReady.write(name),
+          fs.writeJSON(this._getDependenciesPath(name), dependencies),
+        ]);
+        this._addDependents({ name, dependencies });
+
         return {
           type: 'progress',
           persist: true,
@@ -406,6 +463,7 @@ export default class ResourcesManager<
             }
 
             this._resourceAdapters[name] = response.resourceAdapter;
+            dependencies = response.dependencies || [];
             return empty();
           }),
         ),
@@ -434,6 +492,7 @@ export default class ResourcesManager<
     name: string,
     options: ResourceOptions,
     abortSignal: AbortSignal,
+    noDone?: boolean,
   ): Observable<ModifyResourceResponse> {
     this._log({
       event: 'RESOURCES_MANAGER_DELETE',
@@ -505,13 +564,18 @@ export default class ResourcesManager<
     });
     const saveDelete = this._deletion$[name] == null;
     if (saveDelete) {
-      delete$ = defer(() => this._delete$(name, options));
+      delete$ = defer(() => this._delete$(name, options, abortSignal, noDone));
     }
 
     delete$ = concat(initial$, delete$).pipe(
       map(response => {
         if (response.type === 'progress') {
           abortSignal.check();
+        } else if (response.type === 'error') {
+          throw new RethrownError({
+            code: response.code,
+            message: response.message,
+          });
         }
 
         return response;
@@ -527,6 +591,14 @@ export default class ResourcesManager<
 
         if (error.code === 'ABORT') {
           return _of({ type: 'aborted' });
+        }
+
+        if (error.rethrown === true) {
+          return _of({
+            type: 'error',
+            code: (error.code: $FlowFixMe),
+            message: error.message,
+          });
         }
 
         return _of({
@@ -574,6 +646,8 @@ export default class ResourcesManager<
   _delete$(
     name: string,
     options: ResourceOptions,
+    abortSignal: AbortSignal,
+    noDone?: boolean,
   ): Observable<ModifyResourceResponse> {
     const { delete: del } = this._resourceType.getCRUD();
     let delete$ = _of({
@@ -592,6 +666,33 @@ export default class ResourcesManager<
         name,
       });
 
+      const dependents = this._resourceDependents[name];
+      let init$ = empty();
+      if (dependents != null && dependents.length > 0) {
+        const deletes$ = merge(
+          ...dependents.map(({ plugin, resourceType, name: dependentName }) =>
+            this._pluginManager
+              .getResourcesManager({
+                plugin,
+                resourceType,
+              })
+              .delete$(dependentName, {}, abortSignal, true),
+          ),
+        );
+        init$ = concat(
+          _of({
+            type: 'progress',
+            message: 'Deleting dependent resources',
+          }),
+          deletes$,
+          _of({
+            type: 'progress',
+            persist: true,
+            message: 'Deleted dependent resources',
+          }),
+        );
+      }
+
       const destroy$ = defer(async () => {
         await this._destroy(name, resourceAdapter);
         this._portAllocator.releasePort({
@@ -599,7 +700,11 @@ export default class ResourcesManager<
           resourceType: this._resourceType.name,
           resource: name,
         });
-        await this._resourcesReady.delete(name);
+        await Promise.all([
+          this._resourcesReady.delete(name),
+          fs.remove(this._getDependenciesPath(name)),
+        ]);
+        delete this._resourceDependents[name];
         return {
           type: 'progress',
           persist: true,
@@ -607,6 +712,7 @@ export default class ResourcesManager<
         };
       });
       delete$ = concat(
+        init$,
         _of({
           type: 'progress',
           message: `${del.names.ingUpper} ${
@@ -628,8 +734,11 @@ export default class ResourcesManager<
             this._resourceType.names.lower
           } ${this._getSimpleName(name)}`,
         }),
-        _of({ type: 'done' }),
       );
+
+      if (!noDone) {
+        delete$ = concat(delete$, _of({ type: 'done' }));
+      }
     }
 
     return delete$;
@@ -715,6 +824,11 @@ export default class ResourcesManager<
           if (startAbortSignal != null) {
             startAbortSignal.check();
           }
+        } else if (response.type === 'error') {
+          throw new RethrownError({
+            code: response.code,
+            message: response.message,
+          });
         }
 
         return response;
@@ -730,6 +844,14 @@ export default class ResourcesManager<
 
         if (error.code === 'ABORT') {
           return _of({ type: 'aborted' });
+        }
+
+        if (error.rethrown === true) {
+          return _of({
+            type: 'error',
+            code: (error.code: $FlowFixMe),
+            message: error.message,
+          });
         }
 
         return _of({
@@ -923,9 +1045,17 @@ export default class ResourcesManager<
       this._stopAbortControllers[name] = abortController;
       stopAbortSignal = abortController.signal;
 
-      stop$ = defer(() => this._stop$(name, options, noDone));
+      stop$ = defer(() =>
+        this._stop$(
+          name,
+          options,
+          AbortController.combineSignals(abortSignal, stopAbortSignal),
+          noDone,
+        ),
+      );
     }
 
+    let completed = false;
     stop$ = concat(initial$, stop$).pipe(
       map(response => {
         if (response.type === 'progress') {
@@ -933,6 +1063,11 @@ export default class ResourcesManager<
           if (stopAbortSignal != null) {
             stopAbortSignal.check();
           }
+        } else if (response.type === 'error') {
+          throw new RethrownError({
+            code: response.code,
+            message: response.message,
+          });
         }
 
         return response;
@@ -948,6 +1083,14 @@ export default class ResourcesManager<
 
         if (error.code === 'ABORT') {
           return _of({ type: 'aborted' });
+        }
+
+        if (error.rethrown === true) {
+          return _of({
+            type: 'error',
+            code: (error.code: $FlowFixMe),
+            message: error.message,
+          });
         }
 
         return _of({
@@ -983,11 +1126,12 @@ export default class ResourcesManager<
         });
         delete this._stopAbortControllers[name];
         delete this._stops$[name];
+        completed = true;
         this._update$.next();
       }),
       shareReplay(),
     );
-    if (saveStop) {
+    if (saveStop && !completed) {
       this._stops$[name] = stop$;
     }
 
@@ -997,6 +1141,7 @@ export default class ResourcesManager<
   _stop$(
     name: string,
     options: ResourceOptions,
+    abortSignal: AbortSignal,
     noDone?: boolean,
   ): Observable<ModifyResourceResponse> {
     const { stop } = this._resourceType.getCRUD();
@@ -1022,6 +1167,33 @@ export default class ResourcesManager<
         name,
       });
 
+      const dependents = this._resourceDependents[name];
+      let init$ = empty();
+      if (dependents != null && dependents.length > 0) {
+        const stops$ = merge(
+          ...dependents.map(({ plugin, resourceType, name: dependentName }) =>
+            this._pluginManager
+              .getResourcesManager({
+                plugin,
+                resourceType,
+              })
+              .stop$(dependentName, {}, abortSignal, true),
+          ),
+        );
+        init$ = concat(
+          _of({
+            type: 'progress',
+            message: 'Stopping dependent resources',
+          }),
+          stops$,
+          _of({
+            type: 'progress',
+            persist: true,
+            message: 'Stopped dependent resources',
+          }),
+        );
+      }
+
       const clear$ = defer(() => {
         this._resourceAdaptersStarted[name] = false;
         return _of({
@@ -1033,6 +1205,7 @@ export default class ResourcesManager<
         });
       });
       stop$ = concat(
+        init$,
         _of({
           type: 'progress',
           message: `${stop.names.ingUpper} ${
@@ -1092,6 +1265,38 @@ export default class ResourcesManager<
   _getSimpleName(nameIn: string): string {
     const { name } = compoundName.extract(nameIn);
     return name;
+  }
+
+  _getDependenciesPath(name: string): string {
+    return path.resolve(this._dependenciesPath, `${name}.json`);
+  }
+
+  _addDependents({
+    name: nameIn,
+    dependencies,
+  }: {|
+    name: string,
+    dependencies: Array<ResourceDependency>,
+  |}): void {
+    dependencies.forEach(({ plugin, resourceType, name }) => {
+      this._pluginManager
+        .getResourcesManager({
+          plugin,
+          resourceType,
+        })
+        .addDependent(name, {
+          plugin: this._plugin.name,
+          resourceType: this._resourceType.name,
+          name: nameIn,
+        });
+    });
+  }
+
+  addDependent(name: string, dependent: ResourceDependency): void {
+    if (this._resourceDependents[name] == null) {
+      this._resourceDependents[name] = [];
+    }
+    this._resourceDependents[name].push(dependent);
   }
 
   getResourceAdapter(name: string): ResourceAdapter<Resource, ResourceOptions> {

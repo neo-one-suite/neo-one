@@ -4,11 +4,13 @@ import {
   type PluginManager,
   type Progress,
   type ResourceAdapterReady,
+  compoundName,
 } from '@neo-one/server-plugin';
 import { Observable } from 'rxjs/Observable';
 
 import { concat } from 'rxjs/observable/concat';
 import { concatAll } from 'rxjs/operators';
+import { constants as networkConstants } from '@neo-one/server-plugin-network';
 import { defer } from 'rxjs/observable/defer';
 import { of as _of } from 'rxjs/observable/of';
 
@@ -103,6 +105,7 @@ export default class SmartContractResourceAdapter {
           hash,
           dataPath,
         });
+        const { names: [networkName] } = compoundName.extract(name);
         return concat(
           _of({
             type: 'progress',
@@ -115,6 +118,13 @@ export default class SmartContractResourceAdapter {
               resourceType,
               smartContractResource,
             }),
+            dependencies: [
+              {
+                plugin: networkConstants.PLUGIN,
+                resourceType: networkConstants.NETWORK_RESOURCE_TYPE,
+                name: networkName,
+              },
+            ],
           }),
         );
       }).pipe(concatAll()),

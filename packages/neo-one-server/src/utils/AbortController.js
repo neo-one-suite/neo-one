@@ -11,11 +11,19 @@ export class AbortError extends Error {
 }
 
 export class AbortSignal extends EventEmitter {
-  aborted: boolean;
+  _aborted: boolean;
 
   constructor() {
     super();
-    this.aborted = false;
+    this._aborted = false;
+  }
+
+  get aborted(): boolean {
+    return this._aborted;
+  }
+
+  set aborted(value: boolean) {
+    this._aborted = value;
   }
 
   check(): void {
@@ -31,6 +39,40 @@ export class AbortSignal extends EventEmitter {
   // $FlowFixMe
   get [Symbol.toStringTag]() {
     return 'AbortSignal';
+  }
+}
+
+export class CombinedAbortSignal extends AbortSignal {
+  signals: Array<AbortSignal>;
+
+  constructor(signals: Array<AbortSignal>) {
+    super();
+    this.signals = signals;
+  }
+
+  get aborted(): boolean {
+    return this._aborted || this.signals.some(signal => signal.aborted);
+  }
+
+  set aborted(value: boolean) {
+    this._aborted = value;
+    this.signals.forEach(signal => {
+      // eslint-disable-next-line
+      signal.aborted = value;
+    });
+  }
+
+  check(): void {
+    this.signals.forEach(signal => signal.check());
+  }
+
+  toString() {
+    return '[object CombinedAbortSignal]';
+  }
+
+  // $FlowFixMe
+  get [Symbol.toStringTag]() {
+    return 'CombinedAbortSignal';
   }
 }
 
@@ -53,5 +95,12 @@ export class AbortController {
   // $FlowFixMe
   get [Symbol.toStringTag]() {
     return 'AbortController';
+  }
+
+  static combineSignals(
+    signal: AbortSignal,
+    ...signals: Array<AbortSignal>
+  ): AbortSignal {
+    return new CombinedAbortSignal([signal].concat(signals));
   }
 }
