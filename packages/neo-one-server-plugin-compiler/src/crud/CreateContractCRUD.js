@@ -5,21 +5,18 @@ import fs from 'fs-extra';
 import path from 'path';
 
 import { ABIRequiredError } from '../errors';
-import type CompiledSmartContractResourceType, {
-  CompiledSmartContract,
-  CompiledSmartContractResourceOptions,
-} from '../CompiledSmartContractResourceType';
+import type ContractResourceType, {
+  Contract,
+  ContractResourceOptions,
+} from '../ContractResourceType';
 
-export default class CreateCompiledSmartContractCRUD extends CreateCRUD<
-  CompiledSmartContract,
-  CompiledSmartContractResourceOptions,
+export default class CreateContractCRUD extends CreateCRUD<
+  Contract,
+  ContractResourceOptions,
 > {
-  constructor({
-    resourceType,
-  }: {|
-    resourceType: CompiledSmartContractResourceType,
-  |}) {
+  constructor({ resourceType }: {| resourceType: ContractResourceType |}) {
     super({
+      name: 'compile',
       resourceType,
       extraArgs: ['<smartContractPath>'],
       options: [
@@ -42,7 +39,7 @@ export default class CreateCompiledSmartContractCRUD extends CreateCRUD<
   async getCLIResourceOptions({
     args,
     options,
-  }: GetCLIResourceOptions): Promise<CompiledSmartContractResourceOptions> {
+  }: GetCLIResourceOptions): Promise<ContractResourceOptions> {
     const { smartContractPath } = args;
     const { abi: abiPath } = options;
 

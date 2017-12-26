@@ -15,13 +15,13 @@ import {
 
 import _ from 'lodash';
 
-import { CreateCompiledSmartContractCRUD } from './crud';
-import MasterCompiledSmartContractResourceAdapter from './MasterCompiledSmartContractResourceAdapter';
+import { CreateContractCRUD } from './crud';
+import MasterContractResourceAdapter from './MasterContractResourceAdapter';
 import type CompilerPlugin from './CompilerPlugin';
 
 import constants from './constants';
 
-export type CompiledSmartContract = {|
+export type Contract = {|
   plugin: string,
   resourceType: string,
   name: string,
@@ -33,26 +33,26 @@ export type CompiledSmartContract = {|
   hasStorage: boolean,
   hasDynamicInvoke: boolean,
 |};
-export type CompiledSmartContractResourceOptions = {|
+export type ContractResourceOptions = {|
   scPath?: string,
   abi?: ABI,
   hasStorage: boolean,
   hasDynamicInvoke: boolean,
 |};
 
-export default class CompiledSmartContractResourceType extends ResourceType<
-  CompiledSmartContract,
-  CompiledSmartContractResourceOptions,
+export default class ContractResourceType extends ResourceType<
+  Contract,
+  ContractResourceOptions,
 > {
   constructor({ plugin }: {| plugin: CompilerPlugin |}) {
     super({
       plugin,
-      name: constants.COMPILED_SMART_CONTRACT_RESOURCE_TYPE,
+      name: constants.CONTRACT_RESOURCE_TYPE,
       names: {
-        capital: 'Compiled smart contract',
-        capitalPlural: 'Compiled smart contracts',
-        lower: 'compiled smart contract',
-        lowerPlural: 'compiled smart contracts',
+        capital: 'Contract',
+        capitalPlural: 'Contracts',
+        lower: 'contract',
+        lowerPlural: 'contracts',
       },
     });
   }
@@ -61,24 +61,21 @@ export default class CompiledSmartContractResourceType extends ResourceType<
     binary,
     portAllocator,
   }: MasterResourceAdapterOptions): Promise<
-    MasterResourceAdapter<
-      CompiledSmartContract,
-      CompiledSmartContractResourceOptions,
-    >,
+    MasterResourceAdapter<Contract, ContractResourceOptions>,
   > {
-    return new MasterCompiledSmartContractResourceAdapter({
+    return new MasterContractResourceAdapter({
       resourceType: this,
       binary,
       portAllocator,
     });
   }
 
-  getCRUD(): CRUD<CompiledSmartContract, CompiledSmartContractResourceOptions> {
+  getCRUD(): CRUD<Contract, ContractResourceOptions> {
     return new CRUD({
       resourceType: this,
       start: null,
       stop: null,
-      create: new CreateCompiledSmartContractCRUD({ resourceType: this }),
+      create: new CreateContractCRUD({ resourceType: this }),
       delete: new DeleteCRUD({
         resourceType: this,
         aliases: ['delete csc'],
@@ -94,7 +91,7 @@ export default class CompiledSmartContractResourceType extends ResourceType<
     });
   }
 
-  getListTable(resources: Array<CompiledSmartContract>): ListTable {
+  getListTable(resources: Array<Contract>): ListTable {
     return [['Name', 'Smart Contract']].concat(
       _.sortBy(resources, resource => resource.name).map(resource => [
         resource.name,
@@ -103,7 +100,7 @@ export default class CompiledSmartContractResourceType extends ResourceType<
     );
   }
 
-  getDescribeTable(resource: CompiledSmartContract): DescribeTable {
+  getDescribeTable(resource: Contract): DescribeTable {
     return [
       ['Name', resource.name],
       ['Smart Contract', resource.avmPath],

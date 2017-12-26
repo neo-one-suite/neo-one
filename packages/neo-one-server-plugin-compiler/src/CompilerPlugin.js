@@ -5,13 +5,13 @@ import {
   Plugin,
 } from '@neo-one/server-plugin';
 
-import CompiledSmartContractResourceType from './CompiledSmartContractResourceType';
+import ContractResourceType from './ContractResourceType';
 
 import constants from './constants';
 import { compileCSharp, compilePython } from './commands';
 
 export default class CompilerPlugin extends Plugin {
-  compilerResourceType = new CompiledSmartContractResourceType({
+  compilerResourceType = new ContractResourceType({
     plugin: this,
   });
 

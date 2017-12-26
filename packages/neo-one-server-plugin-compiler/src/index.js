@@ -5,6 +5,4 @@ export { default as constants } from './constants';
 
 export default CompilerPlugin;
 
-export type {
-  CompiledSmartContract,
-} from './CompiledSmartContractResourceType';
+export type { Contract } from './ContractResourceType';

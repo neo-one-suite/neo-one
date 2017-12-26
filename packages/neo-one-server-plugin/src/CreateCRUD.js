@@ -13,6 +13,7 @@ export type CreateCRUDOptions<
   ResourceOptions: Object,
 > = {|
   resourceType: ResourceType<Resource, ResourceOptions>,
+  name?: string,
   help?: string,
   aliases?: Array<string>,
   extraArgs?: Array<string>,
@@ -27,18 +28,21 @@ export default class CreateCRUD<
 > extends CRUDResource<Resource, ResourceOptions> {
   constructor({
     resourceType,
+    name: nameIn,
     help,
     aliases,
     extraArgs,
     options,
     autocomplete,
   }: CreateCRUDOptions<Resource, ResourceOptions>) {
+    const name = nameIn == null ? 'create' : nameIn;
+    const nameUpper = `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
     super({
-      name: 'create',
+      name: name || 'create',
       resourceType,
       help:
         help == null
-          ? `Creates a ${resourceType.names.lower} called <name>`
+          ? `${nameUpper}s a ${resourceType.names.lower} called <name>`
           : help,
       aliases,
       extraArgs,

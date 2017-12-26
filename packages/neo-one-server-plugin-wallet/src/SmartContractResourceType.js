@@ -86,9 +86,10 @@ export default class SmartContractResourceType extends ResourceType<
   }
 
   getListTable(resources: Array<SmartContract>): ListTable {
-    return [['Name', 'Hash']].concat(
+    return [['Network', 'Name', 'Hash']].concat(
       _.sortBy(resources, resource => resource.name).map(resource => [
-        resource.name,
+        resource.network,
+        resource.baseName,
         resource.hash,
       ]),
     );
@@ -96,7 +97,8 @@ export default class SmartContractResourceType extends ResourceType<
 
   getDescribeTable(resource: SmartContract): DescribeTable {
     return [
-      ['Name', resource.name],
+      ['Network', resource.network],
+      ['Name', resource.baseName],
       ['Hash', resource.hash],
       ['ABI', JSON.stringify(resource.abi, null, 2)],
     ];

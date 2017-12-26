@@ -30,6 +30,7 @@ export default class CreateSmartContractCRUD extends CreateCRUD<
 > {
   constructor({ resourceType }: {| resourceType: SmartContractResourceType |}) {
     super({
+      name: 'deploy',
       resourceType,
       options: common.options.concat([
         {
@@ -82,7 +83,7 @@ export default class CreateSmartContractCRUD extends CreateCRUD<
       const compiledContract = await (cli.client
         .getResource$({
           plugin: compilerConstants.PLUGIN,
-          resourceType: compilerConstants.COMPILED_SMART_CONTRACT_RESOURCE_TYPE,
+          resourceType: compilerConstants.CONTRACT_RESOURCE_TYPE,
           name: options.contract,
           options: {},
         })

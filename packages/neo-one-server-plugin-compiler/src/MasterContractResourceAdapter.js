@@ -9,16 +9,16 @@ import {
 } from '@neo-one/server-plugin';
 import type { Observable } from 'rxjs/Observable';
 
-import CompiledSmartContractResourceAdapter, {
-  type CompiledSmartContractResourceAdapterInitOptions,
-} from './CompiledSmartContractResourceAdapter';
-import type CompiledSmartContractResourceType, {
-  CompiledSmartContract,
-  CompiledSmartContractResourceOptions,
-} from './CompiledSmartContractResourceType';
+import ContractResourceAdapter, {
+  type ContractResourceAdapterInitOptions,
+} from './ContractResourceAdapter';
+import type ContractResourceType, {
+  Contract,
+  ContractResourceOptions,
+} from './ContractResourceType';
 
-export default class MasterCompiledSmartContractResourceAdapter {
-  _resourceType: CompiledSmartContractResourceType;
+export default class MasterContractResourceAdapter {
+  _resourceType: ContractResourceType;
   _binary: Binary;
   _portAllocator: PortAllocator;
 
@@ -27,7 +27,7 @@ export default class MasterCompiledSmartContractResourceAdapter {
     binary,
     portAllocator,
   }: {|
-    resourceType: CompiledSmartContractResourceType,
+    resourceType: ContractResourceType,
     binary: Binary,
     portAllocator: PortAllocator,
   |}) {
@@ -38,28 +38,19 @@ export default class MasterCompiledSmartContractResourceAdapter {
 
   initResourceAdapter(
     options: ResourceAdapterOptions,
-  ): Promise<
-    ResourceAdapter<
-      CompiledSmartContract,
-      CompiledSmartContractResourceOptions,
-    >,
-  > {
-    return CompiledSmartContractResourceAdapter.init(
+  ): Promise<ResourceAdapter<Contract, ContractResourceOptions>> {
+    return ContractResourceAdapter.init(
       this._getResourceAdapterOptions(options),
     );
   }
 
   createResourceAdapter$(
     adapterOptions: ResourceAdapterOptions,
-    options: CompiledSmartContractResourceOptions,
+    options: ContractResourceOptions,
   ): Observable<
-    | Progress
-    | ResourceAdapterReady<
-        CompiledSmartContract,
-        CompiledSmartContractResourceOptions,
-      >,
+    Progress | ResourceAdapterReady<Contract, ContractResourceOptions>,
   > {
-    return CompiledSmartContractResourceAdapter.create$(
+    return ContractResourceAdapter.create$(
       this._getResourceAdapterOptions(adapterOptions),
       options,
     );
@@ -67,7 +58,7 @@ export default class MasterCompiledSmartContractResourceAdapter {
 
   _getResourceAdapterOptions(
     options: ResourceAdapterOptions,
-  ): CompiledSmartContractResourceAdapterInitOptions {
+  ): ContractResourceAdapterInitOptions {
     return {
       name: options.name,
       dataPath: options.dataPath,

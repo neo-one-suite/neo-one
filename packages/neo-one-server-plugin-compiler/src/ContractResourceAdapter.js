@@ -19,10 +19,10 @@ import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
 
 import { ABIRequiredError } from './errors';
-import type CompiledSmartContractResourceType, {
-  CompiledSmartContract,
-  CompiledSmartContractResourceOptions,
-} from './CompiledSmartContractResourceType';
+import type ContractResourceType, {
+  Contract,
+  ContractResourceOptions,
+} from './ContractResourceType';
 
 import compileSmartContract from './compileSmartContract';
 
@@ -30,33 +30,33 @@ const ABI_PATH = 'abi.json';
 const AVM_PATH = 'sc.avm';
 const CONFIG_PATH = 'sc.json';
 
-export type CompiledSmartContractResourceAdapterInitOptions = {|
+export type ContractResourceAdapterInitOptions = {|
   name: string,
   dataPath: string,
   binary: Binary,
-  resourceType: CompiledSmartContractResourceType,
+  resourceType: ContractResourceType,
 |};
 
-export type CompiledSmartContractResourceAdapterStaticOptions = {|
-  ...CompiledSmartContractResourceAdapterInitOptions,
+export type ContractResourceAdapterStaticOptions = {|
+  ...ContractResourceAdapterInitOptions,
   avmPath: string,
   abiPath: string,
   configPath: string,
 |};
 
-export type CompiledSmartContractResourceAdapterOptions = {|
-  ...CompiledSmartContractResourceAdapterStaticOptions,
+export type ContractResourceAdapterOptions = {|
+  ...ContractResourceAdapterStaticOptions,
   script: string,
   abi: ABI,
   hasStorage: boolean,
   hasDynamicInvoke: boolean,
 |};
 
-export default class CompiledSmartContractResourceAdapter {
+export default class ContractResourceAdapter {
   _name: string;
   _dataPath: string;
   _binary: Binary;
-  _resourceType: CompiledSmartContractResourceType;
+  _resourceType: ContractResourceType;
   _avmPath: string;
   _abiPath: string;
   _configPath: string;
@@ -67,7 +67,7 @@ export default class CompiledSmartContractResourceAdapter {
 
   _update$: Subject<void>;
 
-  resource$: Observable<CompiledSmartContract>;
+  resource$: Observable<Contract>;
 
   constructor({
     name,
@@ -81,7 +81,7 @@ export default class CompiledSmartContractResourceAdapter {
     abi,
     hasStorage,
     hasDynamicInvoke,
-  }: CompiledSmartContractResourceAdapterOptions) {
+  }: ContractResourceAdapterOptions) {
     this._name = name;
     this._dataPath = dataPath;
     this._binary = binary;
@@ -116,8 +116,8 @@ export default class CompiledSmartContractResourceAdapter {
   }
 
   static async init(
-    options: CompiledSmartContractResourceAdapterInitOptions,
-  ): Promise<CompiledSmartContractResourceAdapter> {
+    options: ContractResourceAdapterInitOptions,
+  ): Promise<ContractResourceAdapter> {
     const staticOptions = this._getStaticOptions(options);
     const [abi, script, { hasStorage, hasDynamicInvoke }] = await Promise.all([
       fs.readJSON(staticOptions.abiPath),
@@ -141,8 +141,8 @@ export default class CompiledSmartContractResourceAdapter {
   }
 
   static _getStaticOptions(
-    options: CompiledSmartContractResourceAdapterInitOptions,
-  ): CompiledSmartContractResourceAdapterStaticOptions {
+    options: ContractResourceAdapterInitOptions,
+  ): ContractResourceAdapterStaticOptions {
     return {
       name: options.name,
       binary: options.binary,
@@ -159,14 +159,10 @@ export default class CompiledSmartContractResourceAdapter {
   }
 
   static create$(
-    adapterOptions: CompiledSmartContractResourceAdapterInitOptions,
-    options: CompiledSmartContractResourceOptions,
+    adapterOptions: ContractResourceAdapterInitOptions,
+    options: ContractResourceOptions,
   ): Observable<
-    | Progress
-    | ResourceAdapterReady<
-        CompiledSmartContract,
-        CompiledSmartContractResourceOptions,
-      >,
+    Progress | ResourceAdapterReady<Contract, ContractResourceOptions>,
   > {
     const staticOptions = this._getStaticOptions(adapterOptions);
     return concat(
@@ -265,7 +261,7 @@ export default class CompiledSmartContractResourceAdapter {
   }
 
   // eslint-disable-next-line
-  delete$(options: CompiledSmartContractResourceOptions): Observable<Progress> {
+  delete$(options: ContractResourceOptions): Observable<Progress> {
     return concat(
       defer(() =>
         _of({
@@ -293,12 +289,12 @@ export default class CompiledSmartContractResourceAdapter {
   }
 
   // eslint-disable-next-line
-  start$(options: CompiledSmartContractResourceOptions): Observable<Progress> {
+  start$(options: ContractResourceOptions): Observable<Progress> {
     throw new Error('Cannot be started');
   }
 
   // eslint-disable-next-line
-  stop$(options: CompiledSmartContractResourceOptions): Observable<Progress> {
+  stop$(options: ContractResourceOptions): Observable<Progress> {
     throw new Error('Cannot be stopped');
   }
 
