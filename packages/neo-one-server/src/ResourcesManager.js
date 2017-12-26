@@ -60,7 +60,7 @@ export default class ResourcesManager<
   _log: Log;
   _dataPath: string;
   _resourceType: ResourceType<Resource, ResourceOptions>;
-  _masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>;
+  masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>;
   _portAllocator: PortAllocator;
   _plugin: Plugin;
   _resourceAdapters: ResourceAdapters<Resource, ResourceOptions>;
@@ -100,7 +100,7 @@ export default class ResourcesManager<
     this._log = log;
     this._dataPath = dataPath;
     this._resourceType = resourceType;
-    this._masterResourceAdapter = masterResourceAdapter;
+    this.masterResourceAdapter = masterResourceAdapter;
     this._portAllocator = portAllocator;
     this._plugin = this._resourceType.plugin;
     this._resourceAdapters = {};
@@ -370,7 +370,7 @@ export default class ResourcesManager<
       )} already exists.`,
     });
     if (this._resourceAdapters[name] == null) {
-      const resourceAdapter$ = this._masterResourceAdapter.createResourceAdapter$(
+      const resourceAdapter$ = this.masterResourceAdapter.createResourceAdapter$(
         {
           name,
           dataPath: path.resolve(this._resourcesPath, name),
@@ -1062,7 +1062,7 @@ export default class ResourcesManager<
       async () => {
         this._resourceAdapters[
           name
-        ] = await this._masterResourceAdapter.initResourceAdapter({
+        ] = await this.masterResourceAdapter.initResourceAdapter({
           name,
           dataPath: path.resolve(this._resourcesPath, name),
         });
@@ -1092,6 +1092,16 @@ export default class ResourcesManager<
   _getSimpleName(nameIn: string): string {
     const { name } = compoundName.extract(nameIn);
     return name;
+  }
+
+  getResourceAdapter(name: string): ResourceAdapter<Resource, ResourceOptions> {
+    const adapter = this._resourceAdapters[name];
+    if (adapter == null) {
+      throw new Error(
+        `${this._resourceType.names.capital} ${name} does not exist`,
+      );
+    }
+    return adapter;
   }
 
   getDebug(): DescribeTable {

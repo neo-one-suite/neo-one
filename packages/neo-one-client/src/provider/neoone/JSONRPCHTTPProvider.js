@@ -156,11 +156,10 @@ export default class JSONRPCHTTPProvider implements JSONRPCProvider {
       response = await watchSingle({
         endpoint: this.endpoint,
         request: {
+          jsonrpc: '2.0',
+          id: 1,
           method: req.method,
-          params: (req.params || []).concat({
-            type: 'watch',
-            timeoutMS: watchTimeoutMS,
-          }),
+          params: (req.params || []).concat([watchTimeoutMS]),
         },
         timeoutMS: watchTimeoutMS,
       });

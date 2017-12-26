@@ -28,11 +28,16 @@ export type CompiledSmartContract = {|
   baseName: string,
   state: ResourceState,
   avmPath: string,
+  script: string,
   abi: ABI,
+  hasStorage: boolean,
+  hasDynamicInvoke: boolean,
 |};
 export type CompiledSmartContractResourceOptions = {|
   scPath?: string,
   abi?: ABI,
+  hasStorage: boolean,
+  hasDynamicInvoke: boolean,
 |};
 
 export default class CompiledSmartContractResourceType extends ResourceType<
@@ -102,6 +107,8 @@ export default class CompiledSmartContractResourceType extends ResourceType<
     return [
       ['Name', resource.name],
       ['Smart Contract', resource.avmPath],
+      ['Storage', resource.hasStorage ? 'Yes' : 'No'],
+      ['Dynamic Invoke', resource.hasDynamicInvoke ? 'Yes' : 'No'],
       ['ABI', JSON.stringify(resource.abi, null, 2)],
     ];
   }

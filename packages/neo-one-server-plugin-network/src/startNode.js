@@ -48,7 +48,7 @@ export default ({
             map(config => config.settings),
             map(config => {
               const options = {
-                utilityTokenAmount: config.utilityTokenAmount,
+                privateNet: config.privateNet,
                 secondsPerBlock: config.secondsPerBlock,
                 standbyValidators: [...config.standbyValidators],
                 address: config.address,

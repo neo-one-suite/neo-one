@@ -280,7 +280,7 @@ export default class LocalUserAccountProvider<
         if (data.result.state === 'FAULT') {
           result = this._getInvocationResultError(data.result);
         } else {
-          const [createdContract] = data.contracts[0];
+          const [createdContract] = data.contracts;
           if (createdContract == null) {
             throw new InvalidTransactionError(
               'Something went wrong! Expected a contract to have been created, ' +
@@ -720,7 +720,11 @@ export default class LocalUserAccountProvider<
 
     return {
       transaction,
-      confirmed: async (options?: GetOptions): Promise<T> => {
+      confirmed: async (optionsIn?: GetOptions): Promise<T> => {
+        const options = optionsIn || ({}: $FlowFixMe);
+        if (options.timeoutMS == null) {
+          options.timeoutMS = 120000;
+        }
         const receipt = await this.provider.getTransactionReceipt(
           network,
           transaction.txid,

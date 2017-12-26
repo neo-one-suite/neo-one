@@ -1,30 +1,24 @@
 /* @flow */
 import {
-  type ExecCLIOptions,
   type GetCLINameOptions,
   type GetCLIResourceOptions,
-  StopCRUD,
+  DescribeCRUD,
 } from '@neo-one/server-plugin';
 
 import type WalletResourceType, {
   Wallet,
   WalletResourceOptions,
-} from '../WalletResourceType';
+} from '../../WalletResourceType';
 
 import common from './common';
 
-export default class StopWalletCRUD extends StopCRUD<
+export default class DescribeWalletCRUD extends DescribeCRUD<
   Wallet,
   WalletResourceOptions,
 > {
   constructor({ resourceType }: {| resourceType: WalletResourceType |}) {
     super({
-      name: 'close',
       resourceType,
-      help:
-        'Closes the wallet called <name>. Only applies to MainNet ' +
-        'wallets. Closing the wallet locks it and removes unencrypted ' +
-        'private key.',
       options: common.options,
     });
   }
@@ -39,11 +33,5 @@ export default class StopWalletCRUD extends StopCRUD<
     options: GetCLIResourceOptions,
   ): Promise<WalletResourceOptions> {
     return common.getCLIResourceOptions(options);
-  }
-
-  async postExecCLI({
-    cli,
-  }: ExecCLIOptions<WalletResourceOptions>): Promise<void> {
-    await cli.exec(`deactivate wallet`);
   }
 }

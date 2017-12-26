@@ -9,7 +9,7 @@ import {
 import type WalletResourceType, {
   Wallet,
   WalletResourceOptions,
-} from '../WalletResourceType';
+} from '../../WalletResourceType';
 
 import common from './common';
 

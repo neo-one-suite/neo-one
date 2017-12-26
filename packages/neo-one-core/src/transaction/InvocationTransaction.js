@@ -22,6 +22,7 @@ import type { ValidatorJSON } from '../Validator';
 import type Witness from '../Witness';
 
 import common from '../common';
+import crypto from '../crypto';
 import utils, { type BinaryWriter, IOHelper, JSONHelper } from '../utils';
 
 export type InvocationTransactionAdd = {|
@@ -204,7 +205,10 @@ export default class InvocationTransaction extends TransactionBase<
           common.uInt160ToString(to),
         ]),
         voteUpdates: voteUpdates.map(([address, votes]) => [
-          common.uInt160ToString(address),
+          crypto.scriptHashToAddress({
+            addressVersion: context.addressVersion,
+            scriptHash: address,
+          }),
           votes.map(vote => common.ecPointToString(vote)),
         ]),
         actions: actions.map(action => action.serializeJSON(context)),

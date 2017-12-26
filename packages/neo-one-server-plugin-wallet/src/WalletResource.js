@@ -321,22 +321,11 @@ export default class WalletResource {
           utils.entries(account.balances).map(async ([assetHash, amount]) => {
             const asset = await this._readClient.getAsset(assetHash);
             let { name } = asset;
-            // TODO: Is this going to cause problems somewhere else?
-            // GAS asset hash is different because we have 200m amount instead
-            // of 100m. So we hack it a bit here to translate names..
-            if (
-              (this._networkType === 'private' && name === 'AntShare') ||
-              (this._networkType !== 'private' &&
-                asset.hash === common.NEO_ASSET_HASH)
-            ) {
+            if (asset.hash === common.NEO_ASSET_HASH) {
               name = 'NEO';
               neoBalance = amount.toString();
             }
-            if (
-              (this._networkType === 'private' && name === 'AntCoin') ||
-              (this._networkType !== 'private' &&
-                asset.hash === common.GAS_ASSET_HASH)
-            ) {
+            if (asset.hash === common.GAS_ASSET_HASH) {
               name = 'GAS';
               gasBalance = amount.toString();
             }

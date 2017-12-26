@@ -4,7 +4,7 @@ export type NetworkType = 'main' | 'test' | 'private';
 export type NodeSettings = {|
   type: NetworkType,
   isTestNet: boolean,
-  utilityTokenAmount?: number,
+  privateNet?: boolean,
   secondsPerBlock?: number,
   standbyValidators?: Array<string>,
   address?: string,

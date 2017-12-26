@@ -45,6 +45,7 @@ const dependencies = [
 ].concat([
   'child_process',
   'crypto',
+  'events',
   'fs',
   'http',
   'https',

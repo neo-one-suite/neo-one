@@ -14,8 +14,6 @@ import {
   type OutputJSON,
   type TransactionJSON,
   JSONHelper,
-  common,
-  crypto,
   utils,
 } from '@neo-one/core';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
@@ -148,7 +146,7 @@ export default class NEOONEDataProvider implements DataProvider {
   async getAccount(address: AddressString): Promise<Account> {
     const account = await this._getAccount(address);
     return {
-      address: this._scriptHashToAddress(account.script_hash),
+      address,
       frozen: account.frozen,
       votes: account.votes,
       balances: account.balances.reduce((acc, { asset, value }) => {
@@ -252,7 +250,7 @@ export default class NEOONEDataProvider implements DataProvider {
       time: block.time,
       index: block.index,
       nonce: block.nonce,
-      nextConsensus: this._scriptHashToAddress(block.nextconsensus),
+      nextConsensus: block.nextconsensus,
       script: block.script,
       size: block.size,
       transactions: block.tx.map(transaction =>
@@ -416,10 +414,7 @@ export default class NEOONEDataProvider implements DataProvider {
             amount: new BigNumber(transaction.asset.amount),
             precision: transaction.asset.precision,
             owner: transaction.asset.owner,
-            admin: crypto.scriptHashToAddress({
-              addressVersion: this.network.addressVersion,
-              scriptHash: common.stringToUInt160(transaction.asset.admin),
-            }),
+            admin: transaction.asset.admin,
           },
         };
       default:
@@ -443,10 +438,7 @@ export default class NEOONEDataProvider implements DataProvider {
   _convertOutput(output: OutputJSON): Output {
     return {
       asset: output.asset,
-      address: crypto.scriptHashToAddress({
-        addressVersion: this.network.addressVersion,
-        scriptHash: common.stringToUInt160(output.address),
-      }),
+      address: output.address,
       value: new BigNumber(output.value),
     };
   }
@@ -479,10 +471,7 @@ export default class NEOONEDataProvider implements DataProvider {
       ),
       deletedContractHashes: data.deletedContractHashes,
       migratedContractHashes: data.migratedContractHashes,
-      voteUpdates: data.voteUpdates.map(([scriptHash, votes]) => [
-        this._scriptHashToAddress(scriptHash),
-        votes,
-      ]),
+      voteUpdates: data.voteUpdates,
       validators: data.validators,
       actions: data.actions.map(action => this._convertAction(action)),
     };
@@ -583,21 +572,5 @@ export default class NEOONEDataProvider implements DataProvider {
 
   _getAccount(address: AddressString): Promise<AccountJSON> {
     return this._client.getAccount(address);
-  }
-
-  _scriptHashToAddress(scriptHash: string): AddressString {
-    return crypto.scriptHashToAddress({
-      addressVersion: this.network.addressVersion,
-      scriptHash: JSONHelper.readUInt160(scriptHash),
-    });
-  }
-
-  _addressToScriptHash(address: AddressString): string {
-    return JSONHelper.writeUInt160(
-      crypto.addressToScriptHash({
-        addressVersion: this.network.addressVersion,
-        address,
-      }),
-    );
   }
 }

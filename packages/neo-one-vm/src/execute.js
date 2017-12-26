@@ -60,6 +60,8 @@ const createVMContext = (context: ExecutionContext): VMContext => ({
   gasLeft: context.gasLeft,
 });
 
+const getErrorMessage = (error: Error) => `${error.message}\n${error.stack}`;
+
 const executeNext = async ({
   context: contextIn,
 }: {|
@@ -201,7 +203,7 @@ const run = async ({
     } catch (error) {
       context = {
         state: VM_STATE.FAULT,
-        errorMessage: error.message,
+        errorMessage: getErrorMessage(error),
         blockchain: context.blockchain,
         init: context.init,
         engine: context.engine,
@@ -345,7 +347,7 @@ export default async ({
       gas = context.gasLeft;
     }
   } catch (error) {
-    errorMessage = error.message;
+    errorMessage = getErrorMessage(error);
   }
 
   const finalContext = context;

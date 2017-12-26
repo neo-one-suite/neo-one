@@ -8,7 +8,7 @@ import {
 
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 
-import type { WalletResourceOptions } from '../WalletResourceType';
+import type { WalletResourceOptions } from '../../WalletResourceType';
 
 const getCLIName = ({
   baseName,

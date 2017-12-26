@@ -1,10 +1,11 @@
 /* @flow */
-import type { ABI } from '@neo-one/client';
 import type { Binary } from '@neo-one/server-plugin';
 
 import { execFile } from 'child_process';
 
-export default async ({
+import type { CompileResult } from './index';
+
+export default ({
   scPath,
   avmPath,
   binary,
@@ -12,7 +13,7 @@ export default async ({
   scPath: string,
   avmPath: string,
   binary: Binary,
-|}): Promise<?ABI> =>
+|}): Promise<CompileResult> =>
   new Promise((resolve, reject) => {
     execFile(
       binary.cmd,
@@ -21,7 +22,7 @@ export default async ({
         if (err) {
           reject(new Error(`C# compilation failed: ${stdout}`));
         } else {
-          resolve(null);
+          resolve(({}: $FlowFixMe));
         }
       },
     );

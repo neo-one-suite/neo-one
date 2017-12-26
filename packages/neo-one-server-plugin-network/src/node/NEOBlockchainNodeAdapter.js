@@ -28,7 +28,7 @@ export type NodeConfig = {|
   |},
   settings: {|
     test: boolean,
-    utilityTokenAmount?: number,
+    privateNet?: boolean,
     secondsPerBlock?: number,
     standbyValidators?: Array<string>,
     address?: string,
@@ -121,7 +121,7 @@ export const createNodeConfig = ({
           required: ['test'],
           properties: {
             test: { type: 'boolean' },
-            utilityTokenAmount: { type: 'number' },
+            privateNet: { type: 'boolean' },
             secondsPerBlock: { type: 'number' },
             standbyValidators: { type: 'array', items: { type: 'string' } },
           },
@@ -365,7 +365,7 @@ export default class NEOBlockchainNodeAdapter extends NodeAdapter {
       },
       settings: {
         test: settings.isTestNet,
-        utilityTokenAmount: settings.utilityTokenAmount,
+        privateNet: settings.privateNet,
         secondsPerBlock: settings.secondsPerBlock,
         standbyValidators: settings.standbyValidators,
         address: settings.address,

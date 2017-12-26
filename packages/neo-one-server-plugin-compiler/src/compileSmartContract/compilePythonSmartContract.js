@@ -1,8 +1,9 @@
 /* @flow */
-import type { ABI } from '@neo-one/client';
 import type { Binary } from '@neo-one/server-plugin';
 
 import { execFile } from 'child_process';
+
+import type { CompileResult } from './index';
 
 export default ({
   scPath,
@@ -12,7 +13,7 @@ export default ({
   scPath: string,
   avmPath: string,
   binary: Binary,
-|}): Promise<?ABI> =>
+|}): Promise<CompileResult> =>
   new Promise((resolve, reject) => {
     execFile(
       binary.cmd,
@@ -21,7 +22,7 @@ export default ({
         if (err) {
           reject(new Error(`Python compilation failed: ${stdout}`));
         } else {
-          resolve(null);
+          resolve(({}: $FlowFixMe));
         }
       },
     );

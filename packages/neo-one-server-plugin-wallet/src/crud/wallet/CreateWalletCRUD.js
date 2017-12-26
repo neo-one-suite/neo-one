@@ -14,10 +14,10 @@ import { decryptNEP2, isNEP2, wifToPrivateKey } from '@neo-one/client';
 import type WalletResourceType, {
   Wallet,
   WalletResourceOptions,
-} from '../WalletResourceType';
+} from '../../WalletResourceType';
 
 import common from './common';
-import { getClientNetwork } from '../utils';
+import { getClientNetwork } from '../../utils';
 
 const ENCRYPT_MESSAGE = 'Enter a password to encrypt your private key: ';
 

@@ -28,6 +28,7 @@ import compileSmartContract from './compileSmartContract';
 
 const ABI_PATH = 'abi.json';
 const AVM_PATH = 'sc.avm';
+const CONFIG_PATH = 'sc.json';
 
 export type CompiledSmartContractResourceAdapterInitOptions = {|
   name: string,
@@ -40,11 +41,15 @@ export type CompiledSmartContractResourceAdapterStaticOptions = {|
   ...CompiledSmartContractResourceAdapterInitOptions,
   avmPath: string,
   abiPath: string,
+  configPath: string,
 |};
 
 export type CompiledSmartContractResourceAdapterOptions = {|
   ...CompiledSmartContractResourceAdapterStaticOptions,
+  script: string,
   abi: ABI,
+  hasStorage: boolean,
+  hasDynamicInvoke: boolean,
 |};
 
 export default class CompiledSmartContractResourceAdapter {
@@ -54,7 +59,11 @@ export default class CompiledSmartContractResourceAdapter {
   _resourceType: CompiledSmartContractResourceType;
   _avmPath: string;
   _abiPath: string;
+  _configPath: string;
+  _script: string;
   _abi: ABI;
+  _hasStorage: boolean;
+  _hasDynamicInvoke: boolean;
 
   _update$: Subject<void>;
 
@@ -67,7 +76,11 @@ export default class CompiledSmartContractResourceAdapter {
     resourceType,
     avmPath,
     abiPath,
+    configPath,
+    script,
     abi,
+    hasStorage,
+    hasDynamicInvoke,
   }: CompiledSmartContractResourceAdapterOptions) {
     this._name = name;
     this._dataPath = dataPath;
@@ -75,7 +88,11 @@ export default class CompiledSmartContractResourceAdapter {
     this._resourceType = resourceType;
     this._avmPath = avmPath;
     this._abiPath = abiPath;
+    this._configPath = configPath;
+    this._script = script;
     this._abi = abi;
+    this._hasStorage = hasStorage;
+    this._hasDynamicInvoke = hasDynamicInvoke;
 
     this._update$ = new ReplaySubject(1);
     this.resource$ = this._update$.pipe(
@@ -87,7 +104,10 @@ export default class CompiledSmartContractResourceAdapter {
           baseName: this._name,
           state: 'stopped',
           avmPath: this._avmPath,
+          script: this._script,
           abi: this._abi,
+          hasStorage: this._hasStorage,
+          hasDynamicInvoke: this._hasDynamicInvoke,
         }),
       ),
       shareReplay(1),
@@ -99,7 +119,11 @@ export default class CompiledSmartContractResourceAdapter {
     options: CompiledSmartContractResourceAdapterInitOptions,
   ): Promise<CompiledSmartContractResourceAdapter> {
     const staticOptions = this._getStaticOptions(options);
-    const abi = await fs.readJSON(staticOptions.abiPath);
+    const [abi, script, { hasStorage, hasDynamicInvoke }] = await Promise.all([
+      fs.readJSON(staticOptions.abiPath),
+      fs.readFile(staticOptions.avmPath, 'utf8'),
+      fs.readJSON(staticOptions.configPath),
+    ]);
 
     return new this({
       name: staticOptions.name,
@@ -108,7 +132,11 @@ export default class CompiledSmartContractResourceAdapter {
       resourceType: staticOptions.resourceType,
       abiPath: staticOptions.abiPath,
       avmPath: staticOptions.avmPath,
+      configPath: staticOptions.configPath,
       abi,
+      script,
+      hasStorage,
+      hasDynamicInvoke,
     });
   }
 
@@ -122,6 +150,7 @@ export default class CompiledSmartContractResourceAdapter {
       resourceType: options.resourceType,
       abiPath: path.resolve(options.dataPath, ABI_PATH),
       avmPath: path.resolve(options.dataPath, AVM_PATH),
+      configPath: path.resolve(options.dataPath, CONFIG_PATH),
     };
   }
 
@@ -163,7 +192,7 @@ export default class CompiledSmartContractResourceAdapter {
             'Something went wrong, smart contract path was null.',
           );
         }
-        let abi = await compileSmartContract({
+        let { abi, hasStorage, hasDynamicInvoke } = await compileSmartContract({
           scPath: options.scPath,
           avmPath: staticOptions.avmPath,
           binary: staticOptions.binary,
@@ -177,6 +206,18 @@ export default class CompiledSmartContractResourceAdapter {
           throw new ABIRequiredError();
         }
 
+        if (hasStorage == null) {
+          // eslint-disable-next-line
+          hasStorage = options.hasStorage;
+        }
+
+        if (hasDynamicInvoke == null) {
+          // eslint-disable-next-line
+          hasDynamicInvoke = options.hasDynamicInvoke;
+        }
+
+        const script = await fs.readFile(staticOptions.avmPath, 'utf8');
+
         return concat(
           _of({
             type: 'progress',
@@ -185,15 +226,21 @@ export default class CompiledSmartContractResourceAdapter {
           }),
           _of({
             type: 'progress',
-            message: 'Saving ABI',
+            message: 'Saving ABI and configuration',
           }),
           defer(async () => {
-            await fs.writeJSON(staticOptions.abiPath, abi);
+            await Promise.all([
+              fs.writeJSON(staticOptions.abiPath, abi),
+              fs.writeJSON(staticOptions.configPath, {
+                hasDynamicInvoke,
+                hasStorage,
+              }),
+            ]);
 
             return {
               type: 'progress',
               persist: true,
-              message: 'Saved ABI',
+              message: 'Saved ABI and configuration',
             };
           }),
           _of({
@@ -205,7 +252,11 @@ export default class CompiledSmartContractResourceAdapter {
               resourceType: staticOptions.resourceType,
               abiPath: staticOptions.abiPath,
               avmPath: staticOptions.avmPath,
+              configPath: staticOptions.configPath,
+              script,
               abi,
+              hasStorage,
+              hasDynamicInvoke,
             }),
           }),
         );
@@ -256,6 +307,9 @@ export default class CompiledSmartContractResourceAdapter {
       ['Data Path', this._dataPath],
       ['AVM Path', this._avmPath],
       ['ABI Path', this._abiPath],
+      ['Config Path', this._configPath],
+      ['Storage', this._hasStorage ? 'Yes' : 'No'],
+      ['Dynamic Invoke', this._hasDynamicInvoke ? 'Yes' : 'No'],
       ['ABI', JSON.stringify(this._abi, null, 2)],
     ];
   }

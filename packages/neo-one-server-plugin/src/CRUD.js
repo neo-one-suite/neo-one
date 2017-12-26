@@ -46,8 +46,9 @@ export default class CRUD<
     describe,
   }: CRUDOptions<Resource, ResourceOptions>) {
     this.resourceType = resourceType;
-    this.start = start === null ? null : new StartCRUD({ resourceType });
-    this.stop = stop === null ? null : new StopCRUD({ resourceType });
+    this.start =
+      start === null ? null : start || new StartCRUD({ resourceType });
+    this.stop = stop === null ? null : stop || new StopCRUD({ resourceType });
     this.delete = del || new DeleteCRUD({ resourceType });
     this.create = create || new CreateCRUD({ resourceType });
     this.get = get || new GetCRUD({ resourceType });

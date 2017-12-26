@@ -38,13 +38,13 @@ export type WalletResourceAdapterOptions = {|
 
 export default class WalletResourceAdapter {
   _resourceType: WalletResourceType;
-  _walletResource: WalletResource;
+  walletResource: WalletResource;
 
   resource$: Observable<Wallet>;
 
   constructor({ resourceType, walletResource }: WalletResourceAdapterOptions) {
     this._resourceType = resourceType;
-    this._walletResource = walletResource;
+    this.walletResource = walletResource;
 
     this.resource$ = walletResource.resource$;
   }
@@ -128,7 +128,7 @@ export default class WalletResourceAdapter {
       }),
       defer(async () => {
         try {
-          await this._walletResource.delete();
+          await this.walletResource.delete();
           return {
             type: 'progress',
             persist: true,
@@ -146,7 +146,7 @@ export default class WalletResourceAdapter {
   }
 
   start$({ password }: WalletResourceOptions): Observable<Progress> {
-    if (this._walletResource.unlocked) {
+    if (this.walletResource.unlocked) {
       return _of({
         type: 'progress',
         persist: true,
@@ -164,7 +164,7 @@ export default class WalletResourceAdapter {
           throw new Error('Password is required to unlock a wallet.');
         }
         try {
-          await this._walletResource.unlock({ password });
+          await this.walletResource.unlock({ password });
         } catch (error) {
           this._resourceType.plugin.log({
             event: 'WALLET_RESOURCE_ADAPTER_START_ERROR',
@@ -183,7 +183,7 @@ export default class WalletResourceAdapter {
 
   // eslint-disable-next-line
   stop$(options: WalletResourceOptions): Observable<Progress> {
-    this._walletResource.lock();
+    this.walletResource.lock();
     return _of({
       type: 'progress',
       persist: true,
@@ -192,6 +192,6 @@ export default class WalletResourceAdapter {
   }
 
   getDebug(): DescribeTable {
-    return this._walletResource.getDebug();
+    return this.walletResource.getDebug();
   }
 }

@@ -90,18 +90,12 @@ export default ({
       }
 
       let watchTimeoutMS;
-      if (
-        args[1] != null &&
-        typeof args[1] === 'object' &&
-        args[1].type === 'watch'
-      ) {
-        watchTimeoutMS = args[1].timeoutMS;
-      } else if (
-        args[2] != null &&
-        typeof args[2] === 'object' &&
-        args[2].type === 'watch'
-      ) {
-        watchTimeoutMS = args[2].timeoutMS;
+      if (args[1] != null && typeof args[1] === 'number' && args[1] !== 1) {
+        // eslint-disable-next-line
+        watchTimeoutMS = args[1];
+      } else if (args[2] != null && typeof args[2] === 'number') {
+        // eslint-disable-next-line
+        watchTimeoutMS = args[2];
       }
 
       let block = await blockchain.block.tryGet({ hashOrIndex });
@@ -317,12 +311,9 @@ export default ({
       });
 
       let watchTimeoutMS;
-      if (
-        args[1] != null &&
-        typeof args[1] === 'object' &&
-        args[1].type === 'watch'
-      ) {
-        watchTimeoutMS = args[1].timeoutMS;
+      if (args[1] != null && typeof args[1] === 'number') {
+        // eslint-disable-next-line
+        watchTimeoutMS = args[1];
       }
 
       let result;

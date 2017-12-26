@@ -36,6 +36,7 @@
     "@neo-one/client-node": "^0.0.1",
     "@neo-one/core": "^0.0.1",
     "@neo-one/server-plugin": "^0.0.1",
+    "@neo-one/server-plugin-compiler": "^0.0.1",
     "@neo-one/server-plugin-network": "^0.0.1",
     "@neo-one/utils": "^0.0.1",
     "rxjs": "^5.5.5"

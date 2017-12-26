@@ -51,7 +51,7 @@ declare module 'vorpal' {
 
   declare class CommandInstance {
     log(value: string, ...values: Array<string>): void;
-    prompt(prompt: Object): Promise<Object>;
+    prompt(prompt: Object | Array<Object>): Promise<Object>;
     delimiter(value: string): void;
   }
 

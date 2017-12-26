@@ -4,13 +4,13 @@ import { TRANSACTION_TYPE, type Settings, common } from '@neo-one/core';
 import createCommon from './common';
 
 export default (options?: {|
-  utilityTokenAmount?: number,
+  privateNet?: boolean,
   secondsPerBlock?: number,
   standbyValidators?: Array<string>,
   address?: string,
 |}): Settings => {
   const {
-    utilityTokenAmount,
+    privateNet,
     secondsPerBlock,
     standbyValidators: standbyValidatorsIn,
     address,
@@ -28,8 +28,8 @@ export default (options?: {|
     ]
   ).map(value => common.stringToECPoint(value));
   const commonSettings = createCommon({
+    privateNet,
     standbyValidators,
-    utilityTokenAmount,
     address: address == null ? undefined : common.stringToUInt160(address),
   });
   return {

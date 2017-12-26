@@ -27,6 +27,14 @@ export default class CreateCompiledSmartContractCRUD extends CreateCRUD<
           option: '--abi <path>',
           description: 'Path to JSON file containing ABI. ',
         },
+        {
+          option: '--storage',
+          description: 'Does the Smart Contract use storage?',
+        },
+        {
+          option: '--dynamic-invoke',
+          description: 'Does the Smart Contract use dynamic invocations?',
+        },
       ],
     });
   }
@@ -48,6 +56,11 @@ export default class CreateCompiledSmartContractCRUD extends CreateCRUD<
       abi = await fs.readJSON(abiPath);
     }
 
-    return { scPath: smartContractPath, abi };
+    return {
+      scPath: smartContractPath,
+      abi,
+      hasStorage: !!options.storage,
+      hasDynamicInvoke: !!options['dynamic-invoke'],
+    };
   }
 }

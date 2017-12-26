@@ -4,6 +4,8 @@ import type { Observable } from 'rxjs/Observable';
 import type { Subject } from 'rxjs/Subject';
 import type Vorpal, { Args, Command } from 'vorpal';
 
+import type { ResourceAdapter } from './ResourceAdapter';
+
 export type ListTable = Array<Array<string>>;
 export type DescribeTable = Array<
   [
@@ -210,6 +212,9 @@ export type ResourcesManager<
     name: string,
     options: ResourceOptions,
   |}): Observable<?Resource>,
+  getResourceAdapter(name: string): ResourceAdapter<Resource, ResourceOptions>,
+  // flowlint-next-line unclear-type:off
+  masterResourceAdapter: any,
 };
 
 export type PluginManager = {

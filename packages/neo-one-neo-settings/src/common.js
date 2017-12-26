@@ -40,14 +40,16 @@ export const GENERATION_AMOUNT = [
   1,
   1,
 ];
+export const GENERATION_AMOUNT_PRIVATE = [8, 7, 6];
+export const ISSUE_AMOUNT_PRIVATE = common.fixed8FromDecimal(58000000);
 export const DECREMENT_INTERVAL = 2000000;
 export const SECONDS_PER_BLOCK = 15;
 export const MAX_TRANSACTION_PER_BLOCK = 500;
 
 type Options = {|
   standbyValidators: Array<ECPoint>,
-  utilityTokenAmount?: number,
   address?: UInt160,
+  privateNet?: boolean,
 |};
 
 const ONE_HUNDRED_MILLION = common.fixed8FromDecimal(100000000);
@@ -70,21 +72,15 @@ const getGoverningToken = () => {
   });
 };
 
-const getUtilityToken = ({ amount: amountIn }: {| amount?: number |}) => {
+const getUtilityToken = () => {
   const scriptBuilder = new ScriptBuilder();
   scriptBuilder.emitOp('PUSH0');
-  const amount =
-    amountIn == null ? ONE_HUNDRED_MILLION : common.fixed8FromDecimal(amountIn);
-  if (amount.lt(ONE_HUNDRED_MILLION)) {
-    throw new Error('Amount must be greater than 100 million.');
-  }
-
   const admin = crypto.toScriptHash(scriptBuilder.build());
   return new RegisterTransaction({
     asset: {
       type: ASSET_TYPE.UTILITY_TOKEN,
       name: '[{"lang":"zh-CN","name":"小蚁币"},{"lang":"en","name":"AntCoin"}]',
-      amount,
+      amount: ONE_HUNDRED_MILLION,
       precision: 8,
       owner: common.ECPOINT_INFINITY,
       admin,
@@ -93,6 +89,7 @@ const getUtilityToken = ({ amount: amountIn }: {| amount?: number |}) => {
 };
 
 const getGenesisBlock = ({
+  privateNet,
   standbyValidators,
   governingToken,
   utilityToken,
@@ -141,12 +138,12 @@ const getGenesisBlock = ({
           }),
         ],
       }),
-      utilityToken.asset.amount.gt(ONE_HUNDRED_MILLION)
+      privateNet
         ? new IssueTransaction({
             outputs: [
               new Output({
                 asset: utilityToken.hash,
-                value: utilityToken.asset.amount.sub(ONE_HUNDRED_MILLION),
+                value: ISSUE_AMOUNT_PRIVATE,
                 address,
               }),
             ],
@@ -165,9 +162,10 @@ const getGenesisBlock = ({
 export default (optionsIn?: Options) => {
   const options = optionsIn || {};
   const governingToken = getGoverningToken();
-  const utilityToken = getUtilityToken({ amount: options.utilityTokenAmount });
+  const utilityToken = getUtilityToken();
   return {
     genesisBlock: getGenesisBlock({
+      privateNet: options.privateNet,
       standbyValidators: options.standbyValidators,
       governingToken,
       utilityToken,
@@ -176,7 +174,9 @@ export default (optionsIn?: Options) => {
     governingToken,
     utilityToken,
     decrementInterval: DECREMENT_INTERVAL,
-    generationAmount: GENERATION_AMOUNT,
+    generationAmount: options.privateNet
+      ? GENERATION_AMOUNT_PRIVATE
+      : GENERATION_AMOUNT,
     secondsPerBlock: SECONDS_PER_BLOCK,
     maxTransactionsPerBlock: MAX_TRANSACTION_PER_BLOCK,
   };

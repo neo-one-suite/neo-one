@@ -8,47 +8,45 @@ import {
 } from '@neo-one/server-plugin';
 import type { Observable } from 'rxjs/Observable';
 
-import WalletResourceAdapter, {
-  type WalletResourceAdapterInitOptions,
-} from './WalletResourceAdapter';
-import type WalletResourceType, {
-  Wallet,
-  WalletResourceOptions,
-} from './WalletResourceType';
-import type { WalletClient } from './types';
+import SmartContractResourceAdapter, {
+  type SmartContractResourceAdapterInitOptions,
+} from './SmartContractResourceAdapter';
+import type SmartContractResourceType, {
+  SmartContract,
+  SmartContractResourceOptions,
+} from './SmartContractResourceType';
 
-export default class MasterWalletResourceAdapter {
-  client: WalletClient;
+export default class MasterSmartContractResourceAdapter {
   _pluginManager: PluginManager;
-  _resourceType: WalletResourceType;
+  _resourceType: SmartContractResourceType;
 
   constructor({
-    client,
     pluginManager,
     resourceType,
   }: {|
-    client: WalletClient,
     pluginManager: PluginManager,
-    resourceType: WalletResourceType,
+    resourceType: SmartContractResourceType,
   |}) {
-    this.client = client;
     this._pluginManager = pluginManager;
     this._resourceType = resourceType;
   }
 
   initResourceAdapter(
     options: ResourceAdapterOptions,
-  ): Promise<ResourceAdapter<Wallet, WalletResourceOptions>> {
-    return WalletResourceAdapter.init(this._getResourceAdapterOptions(options));
+  ): Promise<ResourceAdapter<SmartContract, SmartContractResourceOptions>> {
+    return SmartContractResourceAdapter.init(
+      this._getResourceAdapterOptions(options),
+    );
   }
 
   createResourceAdapter$(
     adapterOptions: ResourceAdapterOptions,
-    options: WalletResourceOptions,
+    options: SmartContractResourceOptions,
   ): Observable<
-    Progress | ResourceAdapterReady<Wallet, WalletResourceOptions>,
+    | Progress
+    | ResourceAdapterReady<SmartContract, SmartContractResourceOptions>,
   > {
-    return WalletResourceAdapter.create$(
+    return SmartContractResourceAdapter.create$(
       this._getResourceAdapterOptions(adapterOptions),
       options,
     );
@@ -57,9 +55,8 @@ export default class MasterWalletResourceAdapter {
   _getResourceAdapterOptions({
     name,
     dataPath,
-  }: ResourceAdapterOptions): WalletResourceAdapterInitOptions {
+  }: ResourceAdapterOptions): SmartContractResourceAdapterInitOptions {
     return {
-      client: this.client,
       pluginManager: this._pluginManager,
       name,
       dataPath,

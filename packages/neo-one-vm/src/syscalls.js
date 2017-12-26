@@ -283,9 +283,10 @@ const checkStorage = async ({
 };
 
 function getContractFee<T>(
-  func: (fee: BN) => T,
+  func: (args: CreateSysCallArgs, fee: BN) => T,
 ): (args: CreateSysCallArgs) => T {
-  return ({ context: contextIn }: CreateSysCallArgs) => {
+  return (args: CreateSysCallArgs) => {
+    const { context: contextIn } = args;
     const contractProperties = assertContractPropertyState(
       contextIn.stack[3].asBigInteger().toNumber(),
     );
@@ -298,7 +299,7 @@ function getContractFee<T>(
       fee = fee.add(FEES.FIVE_HUNDRED);
     }
 
-    return func(fee);
+    return func(args, fee);
   };
 }
 
@@ -1121,7 +1122,7 @@ export const SYSCALLS = {
       },
     })({ context: contextIn });
   },
-  'Neo.Contract.Create': getContractFee(fee =>
+  'Neo.Contract.Create': getContractFee((argsIn, fee) =>
     createSysCall({
       name: 'Neo.Contract.Create',
       in: 9,
@@ -1142,9 +1143,9 @@ export const SYSCALLS = {
           results: [result],
         };
       },
-    }),
+    })(argsIn),
   ),
-  'Neo.Contract.Migrate': getContractFee(fee =>
+  'Neo.Contract.Migrate': getContractFee((argsIn, fee) =>
     createSysCall({
       name: 'Neo.Contract.Migrate',
       in: 9,
@@ -1196,7 +1197,7 @@ export const SYSCALLS = {
           results: [new ContractStackItem(contract)],
         };
       },
-    }),
+    })(argsIn),
   ),
   'Neo.Contract.GetStorageContext': createSysCall({
     name: 'Neo.Contract.GetStorageContext',

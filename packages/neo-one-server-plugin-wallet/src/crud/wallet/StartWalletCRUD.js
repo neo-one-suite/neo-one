@@ -11,10 +11,10 @@ import {
 import type WalletResourceType, {
   Wallet,
   WalletResourceOptions,
-} from '../WalletResourceType';
+} from '../../WalletResourceType';
 
 import common from './common';
-import constants from '../constants';
+import constants from '../../constants';
 
 export default class StartWalletCRUD extends StartCRUD<
   Wallet,

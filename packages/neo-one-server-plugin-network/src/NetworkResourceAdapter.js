@@ -415,7 +415,6 @@ export default class NetworkResourceAdapter {
         publicKey,
       };
     });
-    const utilityTokenAmount = 200000000;
     const secondsPerBlock = 5;
     const standbyValidators = configuration.map(({ publicKey }) =>
       common.ecPointToString(publicKey),
@@ -432,7 +431,7 @@ export default class NetworkResourceAdapter {
         isTestNet: false,
         rpcPort,
         listenTCPPort,
-        utilityTokenAmount,
+        privateNet: true,
         secondsPerBlock,
         standbyValidators,
         address: primaryAddress,

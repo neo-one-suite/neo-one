@@ -6,8 +6,10 @@ import {
   Plugin,
 } from '@neo-one/server-plugin';
 
+import { constants as compilerConstants } from '@neo-one/server-plugin-compiler';
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 
+import SmartContractResourceType from './SmartContractResourceType';
 import WalletResourceType from './WalletResourceType';
 
 import activateWallet from './activateWallet';
@@ -18,6 +20,11 @@ export default class WalletPlugin extends Plugin {
   walletResourceType: WalletResourceType = new WalletResourceType({
     plugin: this,
   });
+  smartContractResourceType: SmartContractResourceType = new SmartContractResourceType(
+    {
+      plugin: this,
+    },
+  );
 
   get name(): string {
     return constants.PLUGIN;
@@ -38,11 +45,12 @@ export default class WalletPlugin extends Plugin {
   }
 
   get dependencies(): Array<string> {
-    return [networkConstants.PLUGIN];
+    return [networkConstants.PLUGIN, compilerConstants.PLUGIN];
   }
 
-  get resourceTypes(): Array<ResourceType<*, *>> {
-    return [this.walletResourceType];
+  // flowlint-next-line unclear-type:off
+  get resourceTypes(): Array<ResourceType<any, any>> {
+    return [this.walletResourceType, this.smartContractResourceType];
   }
 
   get interactive(): Array<InteractiveCommand> {

@@ -9,6 +9,12 @@ import { UnknownSmartContractFormatError } from '../errors';
 import compileCSharpSmartContract from './compileCSharpSmartContract';
 import compilePythonSmartContract from './compilePythonSmartContract';
 
+export type CompileResult = {|
+  abi?: ?ABI,
+  hasStorage?: ?boolean,
+  hasDynamicInvoke?: ?boolean,
+|};
+
 export default async ({
   scPath,
   avmPath,
@@ -17,7 +23,7 @@ export default async ({
   scPath: string,
   avmPath: string,
   binary: Binary,
-|}): Promise<?ABI> => {
+|}): Promise<CompileResult> => {
   const ext = path.extname(scPath);
   switch (ext) {
     case '.py':
