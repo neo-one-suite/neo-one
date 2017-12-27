@@ -143,17 +143,14 @@ export default class Client {
     options: Object,
     cancel$: Observable<void>,
   |}): Observable<ModifyResourceResponse> {
-    return this._makeCancellable(
-      this._client.createResource(),
-      {
-        type: 'start',
-        plugin,
-        resourceType,
-        name,
-        options: JSON.stringify(options),
-      },
+    return this._makeCRUD({
+      call: this._client.createResource(),
+      plugin,
+      resourceType,
+      name,
+      options,
       cancel$,
-    );
+    });
   }
 
   deleteResource$({
@@ -169,17 +166,14 @@ export default class Client {
     options: Object,
     cancel$: Observable<void>,
   |}): Observable<ModifyResourceResponse> {
-    return this._makeCancellable(
-      this._client.deleteResource(),
-      {
-        type: 'start',
-        plugin,
-        resourceType,
-        name,
-        options: JSON.stringify(options),
-      },
+    return this._makeCRUD({
+      call: this._client.deleteResource(),
+      plugin,
+      resourceType,
+      name,
+      options,
       cancel$,
-    );
+    });
   }
 
   startResource$({
@@ -195,17 +189,14 @@ export default class Client {
     options: Object,
     cancel$: Observable<void>,
   |}): Observable<ModifyResourceResponse> {
-    return this._makeCancellable(
-      this._client.startResource(),
-      {
-        type: 'start',
-        plugin,
-        resourceType,
-        name,
-        options: JSON.stringify(options),
-      },
+    return this._makeCRUD({
+      call: this._client.startResource(),
+      plugin,
+      resourceType,
+      name,
+      options,
       cancel$,
-    );
+    });
   }
 
   stopResource$({
@@ -221,8 +212,33 @@ export default class Client {
     options: Object,
     cancel$: Observable<void>,
   |}): Observable<ModifyResourceResponse> {
+    return this._makeCRUD({
+      call: this._client.stopResource(),
+      plugin,
+      resourceType,
+      name,
+      options,
+      cancel$,
+    });
+  }
+
+  _makeCRUD({
+    call,
+    plugin,
+    resourceType,
+    name,
+    options,
+    cancel$,
+  }: {|
+    call: any,
+    plugin: string,
+    resourceType: string,
+    name: string,
+    options: Object,
+    cancel$: Observable<void>,
+  |}): Observable<ModifyResourceResponse> {
     return this._makeCancellable(
-      this._client.stopResource(),
+      call,
       {
         type: 'start',
         plugin,
@@ -231,6 +247,14 @@ export default class Client {
         options: JSON.stringify(options),
       },
       cancel$,
+    ).pipe(
+      map(response => {
+        if (response.options != null && response.options !== '') {
+          return { ...response, options: JSON.parse(response.options) };
+        }
+
+        return response;
+      }),
     );
   }
 

@@ -20,6 +20,7 @@ export default class CreateNetworkCRUD extends CreateCRUD<
         '<name>.',
       aliases: ['create net'],
       autocomplete: ['main', 'test'],
+      startOnCreate: true,
     });
   }
 
@@ -27,6 +28,6 @@ export default class CreateNetworkCRUD extends CreateCRUD<
     name,
     cli,
   }: ExecCLIOptions<NetworkResourceOptions>): Promise<void> {
-    await cli.exec(`start network ${name}`);
+    await cli.exec(`activate network ${name}`);
   }
 }

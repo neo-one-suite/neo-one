@@ -3,7 +3,9 @@
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import {
   Client,
+  PluginNotInstalledError,
   ServerManager,
+  UnknownPluginResourceType,
   createServerConfig,
 } from '@neo-one/server-client';
 import {
@@ -11,6 +13,8 @@ import {
   type CLIHook,
   type DescribeTable,
   type ListTable,
+  type Plugin,
+  type ResourceType,
   type Session,
   name,
 } from '@neo-one/server-plugin';
@@ -79,6 +83,7 @@ export default class InteractiveCLI {
   _postHooks: { [command: string]: Array<CLIHook> };
   _delimiter: Array<{| key: string, name: string |}>;
   _log: ?Log;
+  _plugins: { [name: string]: Plugin };
 
   _logPath: ?string;
 
@@ -91,6 +96,7 @@ export default class InteractiveCLI {
     this._postHooks = {};
     this._delimiter = [];
     this._log = null;
+    this._plugins = {};
 
     this._logPath = null;
   }
@@ -192,7 +198,6 @@ export default class InteractiveCLI {
       .subscribe(logConfig$);
     shutdownFuncs.push(() => logSubscription.unsubscribe());
 
-    const plugins = new Set();
     const serverConfig = createServerConfig({ log });
     const start$ = combineLatest(
       serverConfig.config$.pipe(map(conf => conf.paths.data), distinct()),
@@ -242,11 +247,14 @@ export default class InteractiveCLI {
       switchMap(() =>
         this.client.getPlugins$().pipe(
           map(pluginName => {
-            if (!plugins.has(pluginName)) {
-              plugins.add(pluginName);
+            if (this._plugins[pluginName] == null) {
+              this._plugins[pluginName] = pluginsUtil.getPlugin({
+                log,
+                pluginName,
+              });
               createPlugin({
                 cli: this,
-                plugin: pluginsUtil.getPlugin({ log, pluginName }),
+                plugin: this._plugins[pluginName],
               });
             }
           }),
@@ -348,6 +356,30 @@ export default class InteractiveCLI {
 
   printList(listTable: ListTable, log?: (value: string) => void) {
     this._getLog(log)(this._getList(listTable));
+  }
+
+  getResourceType({
+    plugin: pluginName,
+    resourceType: resourceTypeName,
+  }: {|
+    plugin: string,
+    resourceType: string,
+    // flowlint-next-line unclear-type:off
+  |}): ResourceType<any, any> {
+    const plugin = this._plugins[pluginName];
+    if (plugin == null) {
+      throw new PluginNotInstalledError(pluginName);
+    }
+
+    const resourceType = plugin.resourceTypeByName[resourceTypeName];
+    if (resourceType == null) {
+      throw new UnknownPluginResourceType({
+        plugin: pluginName,
+        resourceType: resourceTypeName,
+      });
+    }
+
+    return resourceType;
   }
 
   _getList(listTable: ListTable): string {

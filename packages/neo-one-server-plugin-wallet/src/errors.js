@@ -3,7 +3,7 @@ export class NetworkRequiredError extends Error {
   code: string;
 
   constructor() {
-    super('Wallets required a network');
+    super('Wallets require a network');
     this.code = 'NETWORK_REQUIRED';
   }
 }

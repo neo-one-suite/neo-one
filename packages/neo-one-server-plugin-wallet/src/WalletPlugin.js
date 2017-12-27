@@ -1,13 +1,17 @@
 /* @flow */
 import {
   type CLIHookConfig,
+  type CreateHookConfig,
   type InteractiveCommand,
   type ResourceType,
   Plugin,
+  compoundName,
 } from '@neo-one/server-plugin';
 
 import { constants as compilerConstants } from '@neo-one/server-plugin-compiler';
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
+import { empty } from 'rxjs/observable/empty';
+import { wifToPrivateKey } from '@neo-one/client';
 
 import SmartContractResourceType from './SmartContractResourceType';
 import WalletResourceType from './WalletResourceType';
@@ -57,6 +61,42 @@ export default class WalletPlugin extends Plugin {
     return [activateWallet(this), deactivateWallet(this)];
   }
 
+  get createHooks(): Array<CreateHookConfig> {
+    return [
+      {
+        plugin: networkConstants.PLUGIN,
+        resourceType: networkConstants.NETWORK_RESOURCE_TYPE,
+        hook: ({ name, pluginManager, abortSignal }) => {
+          if (
+            !(
+              name === networkConstants.NETWORK_NAME.MAIN ||
+              name === networkConstants.NETWORK_NAME.TEST
+            )
+          ) {
+            return pluginManager
+              .getResourcesManager({
+                plugin: constants.PLUGIN,
+                resourceType: constants.WALLET_RESOURCE_TYPE,
+              })
+              .create$(
+                compoundName.make({ names: [name], name: 'master' }),
+                {
+                  network: name,
+                  privateKey: wifToPrivateKey(
+                    networkConstants.PRIVATE_NET_PRIVATE_KEY,
+                  ),
+                },
+                abortSignal,
+                true,
+              );
+          }
+
+          return empty();
+        },
+      },
+    ];
+  }
+
   get cliPostHooks(): Array<CLIHookConfig> {
     return [
       {
@@ -69,10 +109,7 @@ export default class WalletPlugin extends Plugin {
               networkName === networkConstants.NETWORK_NAME.TEST
             )
           ) {
-            await cli.exec(
-              `create wallet master --network ${networkName} --private-key ` +
-                `${networkConstants.PRIVATE_NET_PRIVATE_KEY}`,
-            );
+            await cli.exec(`activate wallet master`);
           }
         },
       },

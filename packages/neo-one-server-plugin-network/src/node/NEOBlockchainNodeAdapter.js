@@ -299,7 +299,7 @@ export default class NEOBlockchainNodeAdapter extends NodeAdapter {
     }
   }
 
-  async _getNodeStatus(): Promise<NodeStatus> {
+  _getNodeStatus(): NodeStatus {
     return {
       rpcAddress: this._getAddress('/rpc'),
       tcpAddress: `localhost:${this._settings.listenTCPPort}`,

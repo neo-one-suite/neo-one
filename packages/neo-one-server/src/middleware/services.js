@@ -1,10 +1,12 @@
 /* @flow */
 import {
+  type AbortSignal,
   type CRUDRequest,
   type CRUDRequestStart,
   type ModifyResourceResponse,
   type ReadResponse,
   type ReadRequest,
+  AbortController,
 } from '@neo-one/server-plugin';
 // flowlint-next-line untyped-type-import:off
 import type { Context } from 'mali';
@@ -13,7 +15,6 @@ import { Observable } from 'rxjs/Observable';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { of as _of } from 'rxjs/observable/of';
 
-import { type AbortSignal, AbortController } from '../utils';
 import type ResourcesManager from '../ResourcesManager';
 import type Server from '../Server';
 
@@ -90,7 +91,14 @@ export const middleware = ({
               });
           }
         }),
-        map((response: ModifyResourceResponse) => {
+        map((responseIn: ModifyResourceResponse) => {
+          let response = responseIn;
+          if (response.options != null) {
+            response = {
+              ...response,
+              options: JSON.stringify(response.options),
+            };
+          }
           ctx.res.write(response);
           if (
             response.type === 'done' ||

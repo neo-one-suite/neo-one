@@ -9,6 +9,10 @@ import {
   type Plugin,
   pluginResourceTypeUtil,
 } from '@neo-one/server-plugin';
+import {
+  PluginNotInstalledError,
+  UnknownPluginResourceType,
+} from '@neo-one/server-client';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { Subject } from 'rxjs/Subject';
 
@@ -21,11 +25,7 @@ import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
 import toposort from 'toposort';
 
-import {
-  PluginDependencyNotMetError,
-  PluginNotInstalledError,
-  UnknownPluginResourceType,
-} from './errors';
+import { PluginDependencyNotMetError } from './errors';
 import type PortAllocator from './PortAllocator';
 import Ready from './Ready';
 import ResourcesManager from './ResourcesManager';
@@ -197,6 +197,14 @@ export default class PluginManager {
 
         return { resourceType: resourceType.name, resourcesManager };
       }),
+    );
+    plugin.createHooks.forEach(
+      ({ plugin: pluginName, resourceType: resourceTypeName, hook }) => {
+        this.getResourcesManager({
+          plugin: pluginName,
+          resourceType: resourceTypeName,
+        }).addCreateHook(hook);
+      },
     );
     await this._ready.write(plugin.name);
     resourcesManagers.forEach(({ resourceType, resourcesManager }) => {

@@ -51,6 +51,38 @@ const addCommon = ({
 
 const fail = (message: string) => ora(message).fail();
 
+const printCreated = async ({
+  cli,
+  plugin,
+  resourceType,
+  name,
+  options,
+}: {|
+  cli: InteractiveCLI,
+  plugin: string,
+  resourceType: string,
+  name: string,
+  // flowlint-next-line unclear-type:off
+  options: Object,
+|}) => {
+  const createdResourceType = cli.getResourceType({
+    plugin,
+    resourceType,
+  });
+
+  const resource = await createdResourceType
+    .getResource$({
+      name,
+      client: cli.client,
+      options,
+    })
+    .pipe(filter(value => value != null), take(1))
+    .toPromise();
+  if (resource != null) {
+    cli.printDescribe(createdResourceType.getDescribeTable(resource));
+  }
+};
+
 const createResource = ({
   cli,
   crud,
@@ -59,12 +91,10 @@ const createResource = ({
   crud: CRUDResource<*, *>,
 |}) => {
   let cancel$ = new ReplaySubject();
-  const { resourceType } = crud;
   const command = cli.vorpal
     .command(crud.command, crud.help)
     .action(async args => {
       let spinner;
-      let resource;
       cancel$ = new ReplaySubject();
 
       try {
@@ -98,21 +128,15 @@ const createResource = ({
                       spinner.stop();
                     }
                     cancel$.complete();
-                    if (crud.name === 'create') {
-                      resource = await resourceType
-                        .getResource$({
-                          name,
-                          client: cli.client,
-                          options,
-                        })
-                        .pipe(filter(value => value != null), take(1))
-                        .toPromise();
-                      if (resource != null) {
-                        cli.printDescribe(
-                          resourceType.getDescribeTable(resource),
-                        );
-                      }
-                    }
+                    break;
+                  case 'created':
+                    await printCreated({
+                      cli,
+                      plugin: event.plugin,
+                      resourceType: event.resourceType,
+                      name: event.name,
+                      options: event.options,
+                    });
                     break;
                   case 'progress':
                     if (spinner == null) {

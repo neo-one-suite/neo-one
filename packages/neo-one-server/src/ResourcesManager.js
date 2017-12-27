@@ -2,7 +2,9 @@
 // flowlint untyped-import:off
 import { type Log, logInvoke, onComplete, utils } from '@neo-one/utils';
 import {
+  type AbortSignal,
   type BaseResource,
+  type CreateHook,
   type DescribeTable,
   type MasterResourceAdapter,
   type ModifyResourceResponse,
@@ -10,6 +12,7 @@ import {
   type ResourceAdapter,
   type ResourceDependency,
   type ResourceType,
+  AbortController,
   compoundName,
 } from '@neo-one/server-plugin';
 import type { Observable } from 'rxjs/Observable';
@@ -26,7 +29,6 @@ import { of as _of } from 'rxjs/observable/of';
 import { merge } from 'rxjs/observable/merge';
 import path from 'path';
 
-import { type AbortSignal, AbortController } from './utils';
 import type PluginManager from './PluginManager';
 import type PortAllocator from './PortAllocator';
 import Ready from './Ready';
@@ -74,6 +76,7 @@ export default class ResourcesManager<
   _plugin: Plugin;
   _resourceAdapters: ResourceAdapters<Resource, ResourceOptions>;
   _resourceDependents: { [name: string]: Array<ResourceDependency> };
+  _createHooks: Array<CreateHook>;
 
   _resourcesPath: string;
   _resourcesReady: Ready;
@@ -119,6 +122,7 @@ export default class ResourcesManager<
     this._plugin = this._resourceType.plugin;
     this._resourceAdapters = {};
     this._resourceDependents = {};
+    this._createHooks = [];
 
     this._resourcesPath = path.resolve(dataPath, RESOURCES_PATH);
     this._resourcesReady = new Ready({
@@ -280,6 +284,7 @@ export default class ResourcesManager<
     name: string,
     options: ResourceOptions,
     abortSignal: AbortSignal,
+    noDone?: boolean,
   ): Observable<ModifyResourceResponse> {
     this._log({
       event: 'RESOURCES_MANAGER_CREATE',
@@ -305,7 +310,14 @@ export default class ResourcesManager<
       this._createAbortControllers[name] = abortController;
       createAbortSignal = abortController.signal;
 
-      create$ = defer(() => this._create$(name, options));
+      create$ = defer(() =>
+        this._create$(
+          name,
+          options,
+          AbortController.combineSignals(abortSignal, createAbortSignal),
+          noDone,
+        ),
+      );
     }
 
     const cleanup = () => {
@@ -381,7 +393,7 @@ export default class ResourcesManager<
               .toPromise()
               .catch(() => {});
           }
-        } else if (response.type === 'done') {
+        } else if (response.type === 'done' || response.type === 'created') {
           this._update$.next();
         }
 
@@ -408,6 +420,8 @@ export default class ResourcesManager<
   _create$(
     name: string,
     options: ResourceOptions,
+    abortSignal: AbortSignal,
+    noDone?: boolean,
   ): Observable<ModifyResourceResponse> {
     const { create } = this._resourceType.getCRUD();
     let create$ = _of({
@@ -449,6 +463,26 @@ export default class ResourcesManager<
           message: 'Completed final setup',
         };
       });
+
+      let start$ = empty();
+      if (create.startOnCreate) {
+        start$ = this.start$(name, options, abortSignal, true);
+      }
+
+      let createHooks$ = empty();
+      if (this._createHooks.length > 0) {
+        createHooks$ = merge(
+          ...this._createHooks.map(hook =>
+            hook({
+              name,
+              options,
+              abortSignal,
+              pluginManager: this._pluginManager,
+            }),
+          ),
+        );
+      }
+
       create$ = concat(
         _of({
           type: 'progress',
@@ -481,8 +515,20 @@ export default class ResourcesManager<
             this._resourceType.names.lower
           } ${this._getSimpleName(name)}`,
         }),
-        _of({ type: 'done' }),
+        _of({
+          type: 'created',
+          plugin: this._plugin.name,
+          resourceType: this._resourceType.name,
+          name,
+          options,
+        }),
+        start$,
+        createHooks$,
       );
+
+      if (!noDone) {
+        create$ = concat(create$, _of({ type: 'done' }));
+      }
     }
 
     return create$;
@@ -748,6 +794,7 @@ export default class ResourcesManager<
     name: string,
     options: ResourceOptions,
     abortSignal: AbortSignal,
+    noDone?: boolean,
   ): Observable<ModifyResourceResponse> {
     this._log({
       event: 'RESOURCES_MANAGER_START',
@@ -807,7 +854,7 @@ export default class ResourcesManager<
       this._startAbortControllers[name] = abortController;
       startAbortSignal = abortController.signal;
 
-      start$ = defer(() => this._start$(name, options));
+      start$ = defer(() => this._start$(name, options, noDone));
     }
 
     const started = this._resourceAdaptersStarted[name];
@@ -910,6 +957,7 @@ export default class ResourcesManager<
   _start$(
     name: string,
     options: ResourceOptions,
+    noDone?: boolean,
   ): Observable<ModifyResourceResponse> {
     const { create, start } = this._resourceType.getCRUD();
     if (start == null) {
@@ -973,8 +1021,11 @@ export default class ResourcesManager<
           }),
           resourceAdapter.start$(options),
           set$,
-          _of({ type: 'done' }),
         );
+
+        if (!noDone) {
+          start$ = concat(start$, _of({ type: 'done' }));
+        }
       }
     }
 
@@ -1297,6 +1348,10 @@ export default class ResourcesManager<
       this._resourceDependents[name] = [];
     }
     this._resourceDependents[name].push(dependent);
+  }
+
+  addCreateHook(hook: CreateHook): void {
+    this._createHooks.push(hook);
   }
 
   getResourceAdapter(name: string): ResourceAdapter<Resource, ResourceOptions> {

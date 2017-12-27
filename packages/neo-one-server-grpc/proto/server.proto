@@ -115,6 +115,10 @@ message CreateResourceResponse {
   bool persist = 2;
   string message = 3;
   string code = 4;
+  string plugin = 5;
+  string resourceType = 6;
+  string name = 7;
+  string options = 8;
 }
 
 message DeleteResourceRequest {
@@ -130,6 +134,10 @@ message DeleteResourceResponse {
   bool persist = 2;
   string message = 3;
   string code = 4;
+  string plugin = 5;
+  string resourceType = 6;
+  string name = 7;
+  string options = 8;
 }
 
 message StartResourceRequest {
@@ -145,6 +153,10 @@ message StartResourceResponse {
   bool persist = 2;
   string message = 3;
   string code = 4;
+  string plugin = 5;
+  string resourceType = 6;
+  string name = 7;
+  string options = 8;
 }
 
 message StopResourceRequest {
@@ -160,4 +172,8 @@ message StopResourceResponse {
   bool persist = 2;
   string message = 3;
   string code = 4;
+  string plugin = 5;
+  string resourceType = 6;
+  string name = 7;
+  string options = 8;
 }

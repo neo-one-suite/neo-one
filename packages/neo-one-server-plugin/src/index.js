@@ -19,6 +19,7 @@ export { default as name } from './name';
 export { default as paths } from './paths';
 export { default as pluginResourceTypeUtil } from './pluginResourceTypeUtil';
 
+export { AbortController, AbortSignal } from './AbortController';
 export { logInvoke } from '@neo-one/utils';
 
 export type {
@@ -34,7 +35,7 @@ export type {
   ResourceAdapterOptions,
   ResourceAdapterReady,
 } from './MasterResourceAdapter';
-export type { CLIHookConfig } from './Plugin';
+export type { CLIHookConfig, CreateHookConfig } from './Plugin';
 export type { MasterResourceAdapterOptions } from './ResourceType';
 export type {
   AllResources,
@@ -42,6 +43,7 @@ export type {
   Binary,
   CLIArgs,
   CLIHook,
+  CreateHook,
   CRUDRequest,
   CRUDRequestStart,
   DescribeTable,

@@ -19,6 +19,7 @@ export type CreateCRUDOptions<
   extraArgs?: Array<string>,
   options?: Array<CLIOption>,
   autocomplete?: Array<string>,
+  startOnCreate?: boolean,
 |};
 
 export default class CreateCRUD<
@@ -26,6 +27,8 @@ export default class CreateCRUD<
   // flowlint-next-line unclear-type:off
   ResourceOptions: Object,
 > extends CRUDResource<Resource, ResourceOptions> {
+  startOnCreate: boolean;
+
   constructor({
     resourceType,
     name: nameIn,
@@ -34,6 +37,7 @@ export default class CreateCRUD<
     extraArgs,
     options,
     autocomplete,
+    startOnCreate,
   }: CreateCRUDOptions<Resource, ResourceOptions>) {
     const name = nameIn == null ? 'create' : nameIn;
     const nameUpper = `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
@@ -49,6 +53,7 @@ export default class CreateCRUD<
       options,
       autocomplete,
     });
+    this.startOnCreate = startOnCreate == null ? false : startOnCreate;
   }
 
   getAutocomplete(

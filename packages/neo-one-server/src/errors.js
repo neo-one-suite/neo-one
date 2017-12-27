@@ -16,15 +16,6 @@ export class PluginDependencyNotMetError extends Error {
   }
 }
 
-export class PluginNotInstalledError extends Error {
-  code: string;
-
-  constructor(nameIn: string) {
-    super(`Plugin ${nameIn} is not installed`);
-    this.code = 'PLUGIN_NOT_INSTALLED';
-  }
-}
-
 export class ServerRunningError extends Error {
   code: string;
   exitCode: number;
@@ -33,21 +24,6 @@ export class ServerRunningError extends Error {
     super(`${name.title} running at pid ${pid}`);
     this.code = 'SERVER_RUNNING_ERROR';
     this.exitCode = 11;
-  }
-}
-
-export class UnknownPluginResourceType extends Error {
-  code: string;
-
-  constructor({
-    plugin,
-    resourceType,
-  }: {|
-    plugin: string,
-    resourceType: string,
-  |}) {
-    super(`Plugin ${plugin} does not have resource ${resourceType}`);
-    this.code = 'UNKNOWN_PLUGIN_RESOURCE_TYPE';
   }
 }
 

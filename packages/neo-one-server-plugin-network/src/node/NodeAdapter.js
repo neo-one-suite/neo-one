@@ -10,8 +10,10 @@ import type { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import type { Subject } from 'rxjs/Subject';
 
+import { concat } from 'rxjs/observable/concat';
 import { defer } from 'rxjs/observable/defer';
 import { map, shareReplay, switchMap } from 'rxjs/operators';
+import { of as _of } from 'rxjs/observable/of';
 import { timer } from 'rxjs/observable/timer';
 
 import type { NodeSettings } from '../types';
@@ -64,30 +66,41 @@ export default class NodeAdapter {
     this._settings = settings;
 
     this._update$ = new ReplaySubject(1);
-    this.node$ = this._update$.pipe(
-      switchMap(() => defer(() => this._getNodeStatus())),
-      switchMap(config =>
-        timer(0, 5000).pipe(
-          switchMap(() =>
-            defer(async () => {
-              const [ready, live] = await Promise.all([
-                this._isReady(),
-                this._isLive(),
-              ]);
-              return { ready, live };
+    const { rpcAddress, tcpAddress } = this._getNodeStatus();
+    this.node$ = concat(
+      _of({
+        name: this.name,
+        ready: false,
+        live: false,
+        rpcAddress,
+        tcpAddress,
+      }),
+      this._update$.pipe(
+        switchMap(() =>
+          timer(0, 5000).pipe(
+            switchMap(() =>
+              defer(async () => {
+                const [ready, live] = await Promise.all([
+                  this._isReady(),
+                  this._isLive(),
+                ]);
+                return { ready, live };
+              }),
+            ),
+            map(({ ready, live }) => {
+              const config = this._getNodeStatus();
+              return {
+                name: this.name,
+                ready,
+                live,
+                rpcAddress: config.rpcAddress,
+                tcpAddress: config.tcpAddress,
+              };
             }),
           ),
-          map(({ ready, live }) => ({
-            name: this.name,
-            ready,
-            live,
-            rpcAddress: config.rpcAddress,
-            tcpAddress: config.tcpAddress,
-          })),
         ),
       ),
-      shareReplay(1),
-    );
+    ).pipe(shareReplay(1));
     this._update$.next();
   }
 
@@ -158,7 +171,7 @@ export default class NodeAdapter {
     throw new Error('Not Implemented');
   }
 
-  async _getNodeStatus(): Promise<NodeStatus> {
+  _getNodeStatus(): NodeStatus {
     throw new Error('Not Implemented');
   }
 

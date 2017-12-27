@@ -1,7 +1,12 @@
 /* @flow */
 import type { Log } from '@neo-one/utils';
 
-import { type CLIArgs, type CLIHook, type InteractiveCommand } from './types';
+import {
+  type CLIArgs,
+  type CLIHook,
+  type CreateHook,
+  type InteractiveCommand,
+} from './types';
 import type ResourceType from './ResourceType';
 
 export type PluginOptions = {|
@@ -11,6 +16,12 @@ export type PluginOptions = {|
 export type CLIHookConfig = {|
   name: string,
   hook: CLIHook,
+|};
+
+export type CreateHookConfig = {|
+  plugin: string,
+  resourceType: string,
+  hook: CreateHook,
 |};
 
 export default class Plugin {
@@ -64,6 +75,11 @@ export default class Plugin {
 
   // Add additional interactive commands
   get interactive(): Array<InteractiveCommand> {
+    return [];
+  }
+
+  // Hook into other plugin's create resource lifecycle
+  get createHooks(): Array<CreateHookConfig> {
     return [];
   }
 

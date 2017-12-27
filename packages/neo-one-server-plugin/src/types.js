@@ -4,8 +4,10 @@ import type { Observable } from 'rxjs/Observable';
 import type { Subject } from 'rxjs/Subject';
 import type Vorpal, { Args, Command } from 'vorpal';
 
+import type { AbortSignal } from './AbortController';
 import type { ResourceAdapter } from './ResourceAdapter';
 import type { ResourceDependency } from './MasterResourceAdapter';
+import type ResourceType from './ResourceType';
 
 export type ListTable = Array<Array<string>>;
 export type DescribeTable = Array<
@@ -43,6 +45,14 @@ export type ModifyResourceResponse =
       type: 'error',
       code: string,
       message: string,
+    |}
+  | {|
+      type: 'created',
+      plugin: string,
+      resourceType: string,
+      name: string,
+      // flowlint-next-line unclear-type:off
+      options: Object,
     |}
   | {|
       type: 'aborted',
@@ -175,6 +185,11 @@ export type InteractiveCLI = {
     log?: (value: string) => void,
   ) => void,
   +printList: (listTable: ListTable, log?: (value: string) => void) => void,
+  +getResourceType: (options: {|
+    plugin: string,
+    resourceType: string,
+    // flowlint-next-line unclear-type:off
+  |}) => ResourceType<any, any>,
 };
 
 export type InteractiveCLIArgs = {|
@@ -217,6 +232,12 @@ export type ResourcesManager<
   // flowlint-next-line unclear-type:off
   masterResourceAdapter: any,
   addDependent(name: string, dependent: ResourceDependency): void,
+  create$(
+    name: string,
+    options: ResourceOptions,
+    abortSignal: AbortSignal,
+    noDone?: boolean,
+  ): Observable<ModifyResourceResponse>,
 };
 
 export type PluginManager = {
@@ -225,3 +246,11 @@ export type PluginManager = {
     resourceType: string,
   |}): ResourcesManager<*, *>,
 };
+
+export type CreateHook = (options: {|
+  name: string,
+  // flowlint-next-line unclear-type:off
+  options: Object,
+  abortSignal: AbortSignal,
+  pluginManager: PluginManager,
+|}) => Observable<ModifyResourceResponse>;
