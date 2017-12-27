@@ -220,10 +220,7 @@ export default class InteractiveCLI {
                 binary: process.argv,
                 onStart: () => {
                   if (first) {
-                    spinner = ora(
-                      `Starting ${name.title} server... This can take ~15 ` +
-                        'seconds on initial startup.',
-                    ).start();
+                    spinner = ora(`Starting ${name.title} server...`).start();
                   }
                 },
               });
