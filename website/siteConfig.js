@@ -7,21 +7,27 @@ const users = [
   },
 ];
 
+const repoUrl = 'https://github.com/neo-one-suite/neo-one';
+
 const siteConfig = {
   title: 'NEO•ONE',
-  tagline: 'The One suite of tools for developing NEO dapps',
+  tagline: 'Delightful NEO Decentralized App Development',
   url: 'https://neo-one.io',
   baseUrl: '/',
   organizationName: 'neo-one-suite',
   projectName: 'neo-one',
   headerLinks: [
+    { doc: 'cli-installation', label: 'Getting Started' },
     { doc: 'contributing', label: 'Contributing' },
     { page: 'help', label: 'Help' },
-    // { blog: true, label: 'Blog' },
+    { blog: true, label: 'Blog' },
+    { languages: true },
+    // { search: true },
+    { href: repoUrl, label: 'GitHub' },
   ],
   users,
-  headerIcon: 'img/docusaurus.svg',
-  footerIcon: 'img/docusaurus.svg',
+  headerIcon: 'img/neo.svg',
+  footerIcon: 'img/neo.svg',
   favicon: 'img/favicon.png',
   colors: {
     primaryColor: '#2E8555',
@@ -36,8 +42,8 @@ const siteConfig = {
     theme: 'default',
   },
   scripts: ['https://buttons.github.io/buttons.js'],
-  repoUrl: 'https://github.com/neo-one-suite/neo-one',
-  editUrl: 'https://github.com/neo-one-suite/neo-one/edit/master/docs/',
+  repoUrl,
+  editUrl: repoUrl + '/edit/master/docs/',
   gaTrackingId: 'UA-92599752-3',
   facebookAppId: 1764807046864916,
   twitter: true,

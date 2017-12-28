@@ -10,7 +10,6 @@ This section will guide you through setting up your environment.
   - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
 - [yarn](https://yarnpkg.com/docs/install)
-- [Docker](https://www.docker.com/community-edition)
 
 ## Fork
 

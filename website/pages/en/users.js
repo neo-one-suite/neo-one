@@ -10,6 +10,8 @@ const React = require('react');
 const CompLibrary = require('../../core/CompLibrary.js');
 const Container = CompLibrary.Container;
 
+const translate = require('../../server/translate.js').translate;
+
 const siteConfig = require(process.cwd() + '/siteConfig.js');
 
 class Users extends React.Component {
@@ -24,19 +26,21 @@ class Users extends React.Component {
 
     return (
       <div className="mainContainer">
-        <Container padding={['bottom', 'top']}>
+        <Container padding={['bottom']}>
           <div className="showcaseSection">
             <div className="prose">
-              <h1>Who's Using This?</h1>
-              <p>This project is used by many folks</p>
+              <h1><translate>Who's Using NEO•ONE?</translate></h1>
+              <p><translate>NEO•ONE powers decentralized apps and NEO blockchain integrations for projects of all sizes.</translate></p>
             </div>
             <div className="logos">{showcase}</div>
-            <p>Are you using this project?</p>
-            <a
-              href="https://github.com/facebook/docusaurus/edit/master/website/siteConfig.js"
-              className="button">
-              Add your company
-            </a>
+            <div className="prose">
+              <p><translate>Is your project using NEO•ONE?</translate></p>
+              <a
+                href={siteConfig.repoUrl + '/edit/master/website/siteConfig.js'}
+                className="button">
+                <translate>Add your project</translate>
+              </a>
+            </div>
           </div>
         </Container>
       </div>

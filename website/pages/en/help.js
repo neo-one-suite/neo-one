@@ -11,23 +11,47 @@ const CompLibrary = require('../../core/CompLibrary.js');
 const Container = CompLibrary.Container;
 const GridBlock = CompLibrary.GridBlock;
 
+const translate = require('../../server/translate.js').translate;
+
 const siteConfig = require(process.cwd() + '/siteConfig.js');
 
 class Help extends React.Component {
   render() {
     const supportLinks = [
       {
+        content: (
+          <translate>
+            Find what you're looking for in our detailed documentation and
+            guides.\n\n- Learn how to [get
+            started](/cli-installation.md).
+          </translate>
+        ),
+        title: <translate>Browse the docs</translate>,
+      },
+      {
+        content: (
+          <translate>
+            Ask questions and find answers from other NEO•ONE users.\n\n-
+            Join the
+            [#support](https://discordapp.com/channels/391302767781740545/391303802088849409)
+            channel on the NEO•ONE Discord community.\n- Many members of the community use Stack Overflow. Read
+            through [existing
+            questions](https://stackoverflow.com/questions/tagged/neo-one) tagged
+            with **neo-one** or [ask your
+            own](https://stackoverflow.com/questions/ask)!
+          </translate>
+        ),
+        title: <translate>Join the community</translate>,
+      },
+      {
         content:
-          'Learn more using the [documentation on this site.](/test-site/docs/en/doc1.html)',
-        title: 'Browse Docs',
-      },
-      {
-        content: 'Ask questions about the documentation and project',
-        title: 'Join the community',
-      },
-      {
-        content: "Find out what's new with this project",
-        title: 'Stay up to date',
+        <translate>
+          Find out what's new with NEO•ONE.\n\n- Follow
+          [NEO•ONE](https://twitter.com/neo_one_suite) on Twitter.\n- Subscribe to the
+          [NEO•ONE blog](/blog/).\n- Look at the
+          [changelog](https://github.com/neo-one-suite/neo-one/blob/master/CHANGELOG.md).
+        </translate>,
+        title: <translate>Stay up to date</translate>,
       },
     ];
 
@@ -36,9 +60,15 @@ class Help extends React.Component {
         <Container className="mainContainer documentContainer postContainer">
           <div className="post">
             <header className="postHeader">
-              <h2>Need help?</h2>
+              <h2>
+                <translate>Need help?</translate>
+              </h2>
             </header>
-            <p>This project is maintained by a dedicated group of people.</p>
+            <p>
+              <translate desc="statement made to reader">
+                NEO•ONE is developed by community members just like you. Contributors are often around and available for questions.
+              </translate>
+            </p>
             <GridBlock contents={supportLinks} layout="threeColumn" />
           </div>
         </Container>
@@ -46,5 +76,9 @@ class Help extends React.Component {
     );
   }
 }
+
+Help.defaultProps = {
+  language: 'en',
+};
 
 module.exports = Help;

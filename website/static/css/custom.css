@@ -20,3 +20,16 @@ body > div.navPusher > div > div.container.mainContainer > div > div.post > arti
   font-size: 24px;
   font-weight: 300;
 }
+
+.installCallout {
+  display: inline-block;
+  text-align: left;
+}
+
+.installCallout > div {
+  display: inline-block;
+}
+
+.installCallout pre code {
+  margin: 0;
+}

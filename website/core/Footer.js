@@ -28,27 +28,9 @@ class Footer extends React.Component {
                 this.props.config.baseUrl +
                 'docs/' +
                 this.props.language +
-                '/doc1.html'
+                '/cli-installation.html'
               }>
-              Getting Started (or other categories)
-            </a>
-            <a
-              href={
-                this.props.config.baseUrl +
-                'docs/' +
-                this.props.language +
-                '/doc2.html'
-              }>
-              Guides (or other categories)
-            </a>
-            <a
-              href={
-                this.props.config.baseUrl +
-                'docs/' +
-                this.props.language +
-                '/doc3.html'
-              }>
-              API Reference (or other categories)
+              Getting Started
             </a>
           </div>
           <div>
@@ -60,24 +42,24 @@ class Footer extends React.Component {
               User Showcase
             </a>
             <a
-              href="http://stackoverflow.com/questions/tagged/"
+              href="http://stackoverflow.com/questions/tagged/neo-one"
               target="_blank">
               Stack Overflow
             </a>
-            <a href="https://discordapp.com/">Project Chat</a>
-            <a href="https://twitter.com/" target="_blank">
+            <a href="https://discordapp.com/channels/391302767781740545/391302768234594314">NEO•ONE Chat</a>
+            <a href="https://twitter.com/neo_one_suite" target="_blank">
               Twitter
             </a>
           </div>
           <div>
             <h5>More</h5>
             <a href={this.props.config.baseUrl + 'blog'}>Blog</a>
-            <a href="https://github.com/">GitHub</a>
+            <a href={this.props.config.repoUrl}>GitHub</a>
             <a
               className="github-button"
               href={this.props.config.repoUrl}
               data-icon="octicon-star"
-              data-count-href="/facebook/docusaurus/stargazers"
+              data-count-href="/neo-one-suite/neo-one/stargazers"
               data-show-count={true}
               data-count-aria-label="# stargazers on GitHub"
               aria-label="Star this project on GitHub">
@@ -85,20 +67,8 @@ class Footer extends React.Component {
             </a>
           </div>
         </section>
-
-        <a
-          href="https://code.facebook.com/projects/"
-          target="_blank"
-          className="fbOpenSource">
-          <img
-            src={this.props.config.baseUrl + 'img/oss_logo.png'}
-            alt="Facebook Open Source"
-            width="170"
-            height="45"
-          />
-        </a>
         <section className="copyright">
-          Copyright &copy; {currentYear} Facebook Inc.
+          Copyright &copy; {currentYear} NEO ONE.
         </section>
       </footer>
     );
