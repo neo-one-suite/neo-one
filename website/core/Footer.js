@@ -28,9 +28,18 @@ class Footer extends React.Component {
                 this.props.config.baseUrl +
                 'docs/' +
                 this.props.language +
-                '/cli-installation.html'
+                '/installation.html'
               }>
               Getting Started
+            </a>
+            <a
+              href={
+                this.props.config.baseUrl +
+                'docs/' +
+                this.props.language +
+                '/contributing.html'
+              }>
+              Contributing
             </a>
           </div>
           <div>

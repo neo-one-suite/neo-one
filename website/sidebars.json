@@ -7,9 +7,9 @@
       "code-of-conduct"
     ]
   },
-  "cli-installation": {
+  "docs": {
     "Getting Started": [
-      "cli-installation"
+      "installation"
     ]
   }
 }

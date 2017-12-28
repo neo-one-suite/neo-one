@@ -23,7 +23,7 @@ class Help extends React.Component {
           <translate>
             Find what you're looking for in our detailed documentation and
             guides.\n\n- Learn how to [get
-            started](/cli-installation.md).
+            started](/docs/en/installation.html).
           </translate>
         ),
         title: <translate>Browse the docs</translate>,
