@@ -1,10 +1,10 @@
 <!--
 
-Have you read NEO•ONE's Code of Conduct? By filing an Issue, you are expected to comply with it, including treating everyone with respect: https://neo-one.io/docs/code-of-conduct.html
+Have you read NEO•ONE's Code of Conduct? By filing an Issue, you are expected to comply with it, including treating everyone with respect: https://neo-one.io/docs/en/code-of-conduct.html
 
-Do you want to ask a question? Are you looking for support? The help page is the best place to start for getting support: https://neo-one.io/help.html
+Do you want to ask a question? Are you looking for support? The help page is the best place to start for getting support: https://neo-one.io/en/help.html
 
-Please also review the documentation at https://neo-one.io/docs/contributing.html#reporting-bugs before reporting a bug.
+Please also review the documentation at https://neo-one.io/docs/en/contributing.html#reporting-bugs before reporting a bug.
 
 -->
 

@@ -12,7 +12,7 @@ Install NEO•ONE using [`npm`](https://www.npm.js.com/):
 npm install -g @neo-one/cli
 ```
 
-Or via [`yarn`](https://yarnpkg.com/en/package/jest):
+Or via [`yarn`](https://yarnpkg.com/):
 
 ```
 yarn global add @neo-one/cli
