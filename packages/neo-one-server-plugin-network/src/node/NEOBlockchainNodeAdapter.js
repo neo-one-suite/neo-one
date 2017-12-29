@@ -284,6 +284,7 @@ export default class NEOBlockchainNodeAdapter extends NodeAdapter {
         this._binary.cmd,
         [this._binary.firstArg, 'start', 'node', this._dataPath],
         {
+          detached: true,
           stdio: 'ignore',
         },
       );
