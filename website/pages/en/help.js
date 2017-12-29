@@ -33,7 +33,7 @@ class Help extends React.Component {
           <translate>
             Ask questions and find answers from other NEO•ONE users.\n\n-
             Join the
-            [#support](https://discordapp.com/channels/391302767781740545/391303802088849409)
+            [#support](https://discord.gg/S86PqDE)
             channel on the NEO•ONE Discord community.\n- Many members of the community use Stack Overflow. Read
             through [existing
             questions](https://stackoverflow.com/questions/tagged/neo-one) tagged
