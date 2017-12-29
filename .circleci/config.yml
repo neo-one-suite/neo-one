@@ -83,4 +83,4 @@ workflows:
   test:
     jobs:
       - test:
-          filters: *filter-only-master
+          filters: *filter-ignore-gh-pages
