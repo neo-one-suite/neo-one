@@ -111,14 +111,7 @@ message CreateResourceRequest {
 }
 
 message CreateResourceResponse {
-  string type = 1;
-  bool persist = 2;
-  string message = 3;
-  string code = 4;
-  string plugin = 5;
-  string resourceType = 6;
-  string name = 7;
-  string options = 8;
+  string tasks = 1;
 }
 
 message DeleteResourceRequest {
@@ -130,14 +123,7 @@ message DeleteResourceRequest {
 }
 
 message DeleteResourceResponse {
-  string type = 1;
-  bool persist = 2;
-  string message = 3;
-  string code = 4;
-  string plugin = 5;
-  string resourceType = 6;
-  string name = 7;
-  string options = 8;
+  string tasks = 1;
 }
 
 message StartResourceRequest {
@@ -149,14 +135,7 @@ message StartResourceRequest {
 }
 
 message StartResourceResponse {
-  string type = 1;
-  bool persist = 2;
-  string message = 3;
-  string code = 4;
-  string plugin = 5;
-  string resourceType = 6;
-  string name = 7;
-  string options = 8;
+  string tasks = 1;
 }
 
 message StopResourceRequest {
@@ -168,12 +147,5 @@ message StopResourceRequest {
 }
 
 message StopResourceResponse {
-  string type = 1;
-  bool persist = 2;
-  string message = 3;
-  string code = 4;
-  string plugin = 5;
-  string resourceType = 6;
-  string name = 7;
-  string options = 8;
+  string tasks = 1;
 }

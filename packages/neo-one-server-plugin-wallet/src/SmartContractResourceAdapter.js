@@ -2,17 +2,12 @@
 import {
   type DescribeTable,
   type PluginManager,
-  type Progress,
-  type ResourceAdapterReady,
+  TaskList,
   compoundName,
 } from '@neo-one/server-plugin';
 import { Observable } from 'rxjs/Observable';
 
-import { concat } from 'rxjs/observable/concat';
-import { concatAll } from 'rxjs/operators';
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
-import { defer } from 'rxjs/observable/defer';
-import { of as _of } from 'rxjs/observable/of';
 
 import type SmartContractResourceType, {
   SmartContract,
@@ -77,7 +72,7 @@ export default class SmartContractResourceAdapter {
     // eslint-disable-next-line
   }
 
-  static create$(
+  static create(
     {
       pluginManager,
       resourceType,
@@ -85,85 +80,64 @@ export default class SmartContractResourceAdapter {
       dataPath,
     }: SmartContractResourceAdapterInitOptions,
     { wallet, abi, contract, hash }: SmartContractResourceOptions,
-  ): Observable<
-    | Progress
-    | ResourceAdapterReady<SmartContract, SmartContractResourceOptions>,
-  > {
-    return concat(
-      _of({
-        type: 'progress',
-        message: 'Deploying smart contract',
-      }),
-      defer(async () => {
-        const smartContractResource = await SmartContractResource.createNew({
-          pluginManager,
-          resourceType,
-          name,
-          wallet,
-          abi,
-          contract,
-          hash,
-          dataPath,
-        });
-        const { names: [networkName] } = compoundName.extract(name);
-        return concat(
-          _of({
-            type: 'progress',
-            persist: true,
-            message: 'Deployed smart contract',
-          }),
-          _of({
-            type: 'ready',
-            resourceAdapter: new this({
+  ): TaskList {
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Deploy smart contract',
+          task: async ctx => {
+            const smartContractResource = await SmartContractResource.createNew(
+              {
+                pluginManager,
+                resourceType,
+                name,
+                wallet,
+                abi,
+                contract,
+                hash,
+                dataPath,
+              },
+            );
+
+            const { names: [networkName] } = compoundName.extract(name);
+            ctx.resourceAdapter = new this({
               resourceType,
               smartContractResource,
-            }),
-            dependencies: [
+            });
+            ctx.dependencies = [
               {
                 plugin: networkConstants.PLUGIN,
                 resourceType: networkConstants.NETWORK_RESOURCE_TYPE,
                 name: networkName,
               },
-            ],
-          }),
-        );
-      }).pipe(concatAll()),
-    );
+            ];
+          },
+        },
+      ],
+    });
   }
 
   // eslint-disable-next-line
-  delete$(options: SmartContractResourceOptions): Observable<Progress> {
-    return concat(
-      _of({
-        type: 'progress',
-        message: 'Cleaning up local files',
-      }),
-      defer(async () => {
-        try {
-          await this._smartContractResource.delete();
-          return {
-            type: 'progress',
-            persist: true,
-            message: 'Cleaned up local files',
-          };
-        } catch (error) {
-          this._resourceType.plugin.log({
-            event: 'SMART_CONTRACT_RESOURCE_ADAPTER_DELETE_ERROR',
-            error,
-          });
-          throw error;
-        }
-      }),
-    );
+  delete(options: SmartContractResourceOptions): TaskList {
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Clean local files',
+          task: async () => {
+            await this._smartContractResource.delete();
+          },
+        },
+      ],
+    });
   }
 
   // eslint-disable-next-line
-  start$(options: SmartContractResourceOptions): Observable<Progress> {
+  start(options: SmartContractResourceOptions): TaskList {
     throw new Error('Cannot be started');
   }
 
   // eslint-disable-next-line
-  stop$(options: SmartContractResourceOptions): Observable<Progress> {
+  stop(options: SmartContractResourceOptions): TaskList {
     throw new Error('Cannot be stopped');
   }
 

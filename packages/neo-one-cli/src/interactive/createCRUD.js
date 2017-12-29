@@ -9,15 +9,27 @@ import {
   type DescribeCRUD,
   type GetCRUD,
   type Plugin,
+  type TaskStatus,
+  getTasksError,
+  areTasksDone,
 } from '@neo-one/server-plugin';
 
-import { concatMap, filter, map, switchMap, take } from 'rxjs/operators';
-import { defer } from 'rxjs/observable/defer';
+import chalk from 'chalk';
+import cliTruncate from 'cli-truncate';
+import elegantSpinner from 'elegant-spinner';
+import figures from 'figures';
+import indentString from 'indent-string';
+import logSymbols from 'log-symbols';
+import { map, switchMap, take } from 'rxjs/operators';
+import stripAnsi from 'strip-ansi';
 import { empty } from 'rxjs/observable/empty';
 import logUpdate from 'log-update';
-import ora from 'ora';
+import { timer } from 'rxjs/observable/timer';
 
 import type InteractiveCLI from '../InteractiveCLI';
+
+const pointer = chalk.yellow(figures.pointer);
+const skipped = chalk.yellow(figures.arrowDown);
 
 const addCommonResource = ({
   cli,
@@ -49,38 +61,93 @@ const addCommon = ({
   });
 };
 
-const fail = (message: string) => ora(message).fail();
+// flowlint-next-line unclear-type:off
+type Spinners = Object;
 
-const printCreated = async ({
-  cli,
-  plugin,
-  resourceType,
-  name,
-  options,
-}: {|
-  cli: InteractiveCLI,
-  plugin: string,
-  resourceType: string,
-  name: string,
-  // flowlint-next-line unclear-type:off
-  options: Object,
-|}) => {
-  const createdResourceType = cli.getResourceType({
-    plugin,
-    resourceType,
-  });
-
-  const resource = await createdResourceType
-    .getResource$({
-      name,
-      client: cli.client,
-      options,
-    })
-    .pipe(filter(value => value != null), take(1))
-    .toPromise();
-  if (resource != null) {
-    cli.printDescribe(createdResourceType.getDescribeTable(resource));
+const getSymbol = (task: TaskStatus, spinners: Spinners) => {
+  if (spinners[task.id] == null) {
+    // eslint-disable-next-line
+    spinners[task.id] = elegantSpinner();
   }
+
+  const hasSubtasks = task.subtasks != null && task.subtasks.length > 0;
+  if (task.pending) {
+    return hasSubtasks ? pointer : chalk.yellow(spinners[task.id]());
+  }
+
+  if (task.complete) {
+    return logSymbols.success;
+  }
+
+  if (task.error != null) {
+    return hasSubtasks ? pointer : logSymbols.error;
+  }
+
+  if (task.skipped != null) {
+    return skipped;
+  }
+
+  return ' ';
+};
+
+const renderTasks = (
+  tasks: Array<TaskStatus>,
+  spinners: Spinners,
+  level: number = 0,
+) => {
+  let output = [];
+
+  for (const task of tasks) {
+    const skippedStr = task.skipped != null ? ` ${chalk.dim('[skipped]')}` : '';
+
+    output.push(
+      indentString(
+        ` ${getSymbol(task, spinners)} ${task.title}${skippedStr}`,
+        level,
+        '  ',
+      ),
+    );
+
+    if (
+      (task.pending && task.message != null) ||
+      task.skipped !== false ||
+      task.error != null
+    ) {
+      let data = task.error;
+      if (data == null && task.skipped !== false) {
+        if (typeof task.skipped === 'string') {
+          data = task.skipped;
+        }
+      } else if (data == null) {
+        data = task.message;
+      }
+
+      if (data != null) {
+        data = stripAnsi(
+          data
+            .trim()
+            .split('\n')
+            .filter(Boolean)
+            .pop(),
+        );
+        const out = indentString(`${figures.arrowRight} ${data}`, level, '  ');
+        output.push(
+          // $FlowFixMe
+          `   ${chalk.gray(cliTruncate(out, process.stdout.columns - 3))}`,
+        );
+      }
+    }
+
+    if (
+      (task.pending || task.error != null) &&
+      task.subtasks != null &&
+      task.subtasks.length > 0
+    ) {
+      output = output.concat(renderTasks(task.subtasks, spinners, level + 1));
+    }
+  }
+
+  return output.join('\n');
 };
 
 const createResource = ({
@@ -94,93 +161,53 @@ const createResource = ({
   const command = cli.vorpal
     .command(crud.command, crud.help)
     .action(async args => {
-      let spinner;
       cancel$ = new ReplaySubject();
 
-      try {
-        const options = await crud.getCLIResourceOptions({
-          cli,
-          args,
-          options: args.options,
-        });
-        const name = await crud.getCLIName({
-          baseName: args.name,
-          cli,
-          options,
-        });
+      const options = await crud.getCLIResourceOptions({
+        cli,
+        args,
+        options: args.options,
+      });
+      const name = await crud.getCLIName({
+        baseName: args.name,
+        cli,
+        options,
+      });
 
-        const response$ = crud.request$({
-          name,
-          cancel$,
-          options,
-          client: cli.client,
-        });
+      const response$ = crud.request$({
+        name,
+        cancel$,
+        options,
+        client: cli.client,
+      });
 
-        await crud.preExecCLI({ name, cli, options });
+      await crud.preExecCLI({ name, cli, options });
 
-        await response$
-          .pipe(
-            concatMap(event =>
-              defer(async () => {
-                switch (event.type) {
-                  case 'done':
-                    if (spinner != null) {
-                      spinner.stop();
-                    }
-                    cancel$.complete();
-                    break;
-                  case 'created':
-                    await printCreated({
-                      cli,
-                      plugin: event.plugin,
-                      resourceType: event.resourceType,
-                      name: event.name,
-                      options: event.options,
-                    });
-                    break;
-                  case 'progress':
-                    if (spinner == null) {
-                      spinner = ora();
-                    }
+      const spinners = {};
+      await response$
+        .pipe(
+          switchMap(({ tasks }) => {
+            if (areTasksDone(tasks)) {
+              logUpdate(renderTasks(tasks, spinners));
+              logUpdate.done();
+              cancel$.complete();
+              const error = getTasksError(tasks);
+              if (error != null) {
+                throw new Error(error);
+              }
+              return empty();
+            }
 
-                    if (event.persist) {
-                      spinner.succeed(event.message);
-                      spinner = null;
-                    } else {
-                      spinner.start(event.message);
-                    }
-                    break;
-                  case 'error':
-                    if (spinner != null) {
-                      spinner.fail();
-                      spinner = null;
-                    }
-                    cancel$.complete();
-                    throw new Error(event.message);
-                  case 'aborted':
-                    if (spinner != null) {
-                      spinner.fail();
-                      spinner = null;
-                    }
-                    cancel$.complete();
-
-                    throw new Error('Aborted');
-                  default:
-                    // eslint-disable-next-line
-                    (event.type: empty);
-                }
+            return timer(0, 50).pipe(
+              map(() => {
+                logUpdate(renderTasks(tasks, spinners));
               }),
-            ),
-          )
-          .toPromise();
+            );
+          }),
+        )
+        .toPromise();
 
-        await crud.postExecCLI({ name, cli, options });
-      } catch (error) {
-        if (spinner != null) {
-          spinner.fail();
-        }
-        throw error;
-      }
+      await crud.postExecCLI({ name, cli, options });
     })
     .cancel(() => {
       cancel$.next();
@@ -201,7 +228,6 @@ const createGet = ({
 |}) => {
   let cancel$ = new ReplaySubject();
   const { resourceType } = crud;
-  const log = logUpdate.create(process.stdout);
   const command = cli.vorpal
     .command(crud.command, crud.help)
     .option('-w, --watch', 'Watch for changes')
@@ -216,7 +242,7 @@ const createGet = ({
         .getResources$({ client: cli.client, options })
         .pipe(
           map(resources =>
-            cli.printList(resourceType.getListTable(resources), log),
+            cli.printList(resourceType.getListTable(resources), logUpdate),
           ),
         );
 
@@ -236,7 +262,7 @@ const createGet = ({
 
       await crud.postExecCLI({ cli, options });
 
-      log.done();
+      logUpdate.done();
     })
     .cancel(() => {
       cancel$.next('cancel');
@@ -257,7 +283,6 @@ const createDescribe = ({
 |}) => {
   let cancel$ = new ReplaySubject();
   const { resourceType } = crud;
-  const log = logUpdate.create(process.stdout);
   const command = cli.vorpal
     .command(crud.command, crud.help)
     .option('-w, --watch', 'Watch for changes')
@@ -282,9 +307,14 @@ const createDescribe = ({
         .pipe(
           map(resource => {
             if (resource == null) {
-              fail(`${resourceType.names.capital} ${args.name} does not exist`);
+              throw new Error(
+                `${resourceType.names.capital} ${args.name} does not exist`,
+              );
             } else {
-              cli.printDescribe(resourceType.getDescribeTable(resource), log);
+              cli.printDescribe(
+                resourceType.getDescribeTable(resource),
+                logUpdate,
+              );
             }
           }),
         );
@@ -305,7 +335,7 @@ const createDescribe = ({
 
       await crud.postExecCLI({ name, cli, options });
 
-      log.done();
+      logUpdate.done();
     })
     .cancel(() => {
       cancel$.next('cancel');

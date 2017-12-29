@@ -1,66 +1,51 @@
 /* @flow */
 // flowlint untyped-import:off
-import { type Log, logInvoke, onComplete, utils } from '@neo-one/utils';
+import { type Log, logInvoke, utils } from '@neo-one/utils';
 import {
-  type AbortSignal,
   type BaseResource,
   type CreateHook,
   type DescribeTable,
   type MasterResourceAdapter,
-  type ModifyResourceResponse,
   type Plugin,
   type ResourceAdapter,
   type ResourceDependency,
   type ResourceType,
-  AbortController,
+  TaskList,
   compoundName,
 } from '@neo-one/server-plugin';
 import type { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import type { Subject } from 'rxjs/Subject';
 
-import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
+import { map, shareReplay, switchMap } from 'rxjs/operators';
 import { combineLatest } from 'rxjs/observable/combineLatest';
-import { concat } from 'rxjs/observable/concat';
-import { defer } from 'rxjs/observable/defer';
-import { empty } from 'rxjs/observable/empty';
 import fs from 'fs-extra';
 import { of as _of } from 'rxjs/observable/of';
-import { merge } from 'rxjs/observable/merge';
 import path from 'path';
-
 import type PluginManager from './PluginManager';
 import type PortAllocator from './PortAllocator';
 import Ready from './Ready';
-import {
-  ResourceNoStartError,
-  ResourceNoStopError,
-  RethrownError,
-} from './errors';
+import { ResourceNoStartError, ResourceNoStopError } from './errors';
 
 const RESOURCES_PATH = 'resources';
 const RESOURCES_READY_PATH = 'ready';
 const DEPENDENCIES_PATH = 'dependencies';
-
-const DOES_NOT_EXIST = 'DOES_NOT_EXIST';
-const DUPLICATE_OPERATION = 'DUPLICATE_OPERATION';
-const SOMETHING_WENT_WRONG = 'SOMETHING_WENT_WRONG';
 
 type ResourceAdapters<
   Resource: BaseResource,
   // flowlint-next-line unclear-type:off
   ResourceOptions: Object,
 > = { [resource: string]: ResourceAdapter<Resource, ResourceOptions> };
-type AbortControllers = { [resource: string]: AbortController };
-type ModifyResources = {
-  [resource: string]: Observable<ModifyResourceResponse>,
-};
 
 export type InitError = {|
   resourceType: string,
   resource: string,
   error: Error,
 |};
+
+type TaskLists = {
+  [resource: string]: TaskList,
+};
 
 export default class ResourcesManager<
   Resource: BaseResource,
@@ -70,7 +55,7 @@ export default class ResourcesManager<
   _log: Log;
   _dataPath: string;
   _pluginManager: PluginManager;
-  _resourceType: ResourceType<Resource, ResourceOptions>;
+  resourceType: ResourceType<Resource, ResourceOptions>;
   masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>;
   _portAllocator: PortAllocator;
   _plugin: Plugin;
@@ -82,16 +67,10 @@ export default class ResourcesManager<
   _resourcesReady: Ready;
   _dependenciesPath: string;
 
-  _createAbortControllers: AbortControllers;
-  _creation$: ModifyResources;
-
-  _deletion$: ModifyResources;
-
-  _startAbortControllers: AbortControllers;
-  _starts$: ModifyResources;
-
-  _stopAbortControllers: AbortControllers;
-  _stops$: ModifyResources;
+  _createTaskList: TaskLists;
+  _deleteTaskList: TaskLists;
+  _startTaskList: TaskLists;
+  _stopTaskList: TaskLists;
 
   _resourceAdaptersStarted: { [resource: string]: boolean };
 
@@ -116,10 +95,10 @@ export default class ResourcesManager<
     this._log = log;
     this._dataPath = dataPath;
     this._pluginManager = pluginManager;
-    this._resourceType = resourceType;
+    this.resourceType = resourceType;
     this.masterResourceAdapter = masterResourceAdapter;
     this._portAllocator = portAllocator;
-    this._plugin = this._resourceType.plugin;
+    this._plugin = this.resourceType.plugin;
     this._resourceAdapters = {};
     this._resourceDependents = {};
     this._createHooks = [];
@@ -130,16 +109,10 @@ export default class ResourcesManager<
     });
     this._dependenciesPath = path.resolve(dataPath, DEPENDENCIES_PATH);
 
-    this._createAbortControllers = {};
-    this._creation$ = {};
-
-    this._deletion$ = {};
-
-    this._startAbortControllers = {};
-    this._starts$ = {};
-
-    this._stopAbortControllers = {};
-    this._stops$ = {};
+    this._createTaskList = {};
+    this._deleteTaskList = {};
+    this._startTaskList = {};
+    this._stopTaskList = {};
 
     this._resourceAdaptersStarted = {};
 
@@ -164,7 +137,7 @@ export default class ResourcesManager<
       'RESOURCES_MANAGER_INIT',
       {
         plugin: this._plugin.name,
-        resourceType: this._resourceType.name,
+        resourceType: this.resourceType.name,
       },
       async () => {
         await Promise.all([
@@ -212,7 +185,7 @@ export default class ResourcesManager<
               return null;
             } catch (error) {
               return {
-                resourceType: this._resourceType.name,
+                resourceType: this.resourceType.name,
                 resource: name,
                 error,
               };
@@ -233,7 +206,7 @@ export default class ResourcesManager<
       'RESOURCES_MANAGER_DESTROY',
       {
         plugin: this._plugin.name,
-        resourceType: this._resourceType.name,
+        resourceType: this.resourceType.name,
       },
       async () => {
         await Promise.all(
@@ -252,12 +225,12 @@ export default class ResourcesManager<
     this._log({
       event: 'RESOURCES_MANAGER_GET_RESOURCES',
       plugin: this._plugin.name,
-      resourceType: this._resourceType.name,
+      resourceType: this.resourceType.name,
       options,
     });
 
     return this.resources$.pipe(
-      map(resources => this._resourceType.filterResources(resources, options)),
+      map(resources => this.resourceType.filterResources(resources, options)),
     );
   }
 
@@ -271,7 +244,7 @@ export default class ResourcesManager<
     this._log({
       event: 'RESOURCES_MANAGER_GET_RESOURCE',
       plugin: this._plugin.name,
-      resourceType: this._resourceType.name,
+      resourceType: this.resourceType.name,
       options,
     });
 
@@ -280,998 +253,450 @@ export default class ResourcesManager<
     );
   }
 
-  create$(
-    name: string,
-    options: ResourceOptions,
-    abortSignal: AbortSignal,
-    noDone?: boolean,
-  ): Observable<ModifyResourceResponse> {
+  create(name: string, options: ResourceOptions): TaskList {
     this._log({
       event: 'RESOURCES_MANAGER_CREATE',
       plugin: this._plugin.name,
-      resourceType: this._resourceType.name,
+      resourceType: this.resourceType.name,
       name,
       options,
     });
 
-    const { create } = this._resourceType.getCRUD();
+    const { create, start } = this.resourceType.getCRUD();
+    if (this._createTaskList[name] == null) {
+      const resourceAdapter = this._resourceAdapters[name];
+      const skip = () => resourceAdapter != null;
 
-    let create$ = _of({
-      type: 'error',
-      code: DUPLICATE_OPERATION,
-      message: `${this._resourceType.names.capital} ${this._getSimpleName(
-        name,
-      )} is being ${create.names.ed}.`,
-    });
-    let createAbortSignal;
-    const saveCreate = this._creation$[name] == null;
-    if (saveCreate) {
-      const abortController = new AbortController();
-      this._createAbortControllers[name] = abortController;
-      createAbortSignal = abortController.signal;
-
-      create$ = defer(() =>
-        this._create$(
-          name,
-          options,
-          AbortController.combineSignals(abortSignal, createAbortSignal),
-          noDone,
-        ),
-      );
-    }
-
-    const cleanup = () => {
-      delete this._createAbortControllers[name];
-      delete this._creation$[name];
-    };
-
-    const exists = this._resourceAdapters[name] != null;
-    create$ = create$.pipe(
-      map(response => {
-        if (response.type === 'progress') {
-          abortSignal.check();
-          if (createAbortSignal != null) {
-            createAbortSignal.check();
-          }
-        } else if (response.type === 'error') {
-          throw new RethrownError({
-            code: response.code,
-            message: response.message,
-          });
-        }
-
-        return response;
-      }),
-      catchError((error): Observable<ModifyResourceResponse> => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_ERROR',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-          error,
-        });
-
-        if (error.code === 'ABORT') {
-          return _of({ type: 'aborted' });
-        }
-
-        if (error.rethrown === true) {
-          return _of({
-            type: 'error',
-            code: (error.code: $FlowFixMe),
-            message: error.message,
-          });
-        }
-
-        return _of({
-          type: 'error',
-          code:
-            error.code == null || typeof error.code !== 'string'
-              ? SOMETHING_WENT_WRONG
-              : error.code,
-          message:
-            `Something went wrong while ${create.names.ing} ` +
-            `${this._resourceType.names.lower} ${this._getSimpleName(name)}: ${
-              error.message
-            }`,
-        });
-      }),
-      map(response => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_RESPONSE',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-          response: { ...response },
-        });
-
-        if (response.type === 'aborted' || response.type === 'error') {
-          cleanup();
-          const controller = new AbortController();
-          if (!exists) {
-            this.delete$(name, options, controller.signal)
-              .toPromise()
-              .catch(() => {});
-          }
-        } else if (response.type === 'done' || response.type === 'created') {
-          this._update$.next();
-        }
-
-        return response;
-      }),
-      onComplete(() => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_COMPLETE',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-        });
-        cleanup();
-      }),
-      shareReplay(),
-    );
-    if (saveCreate) {
-      this._creation$[name] = create$;
-    }
-
-    return create$;
-  }
-
-  _create$(
-    name: string,
-    options: ResourceOptions,
-    abortSignal: AbortSignal,
-    noDone?: boolean,
-  ): Observable<ModifyResourceResponse> {
-    const { create } = this._resourceType.getCRUD();
-    let create$ = _of({
-      type: 'error',
-      code: 'RESOURCE_EXIST',
-      message: `${this._resourceType.names.capital} ${this._getSimpleName(
-        name,
-      )} already exists.`,
-    });
-    if (this._resourceAdapters[name] == null) {
-      const resourceAdapter$ = this.masterResourceAdapter.createResourceAdapter$(
-        {
-          name,
-          dataPath: path.resolve(this._resourcesPath, name),
-        },
-        options,
-      );
-
-      this._log({
-        event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE',
-        plugin: this._plugin.name,
-        resourceType: this._resourceType.name,
-        name,
-      });
-      let dependencies;
-      const persist$ = defer(async () => {
-        if (dependencies == null) {
-          throw new Error('Something went wrong.');
-        }
-        await Promise.all([
-          this._resourcesReady.write(name),
-          fs.writeJSON(this._getDependenciesPath(name), dependencies),
-        ]);
-        this._addDependents({ name, dependencies });
-
-        return {
-          type: 'progress',
-          persist: true,
-          message: 'Completed final setup',
+      let startTask = null;
+      if (start != null) {
+        startTask = {
+          title: `${start.names.upper} ${
+            this.resourceType.names.lower
+          } ${this._getSimpleName(name)}`,
+          skip,
+          enabled: () => create.startOnCreate,
+          task: () => this.start(name, options),
         };
+      }
+      this._createTaskList[name] = new TaskList({
+        tasks: [
+          {
+            title: `${create.names.upper} ${
+              this.resourceType.names.lower
+            } ${this._getSimpleName(name)}`,
+            skip: () =>
+              resourceAdapter != null
+                ? `${this.resourceType.names.capital} ${this._getSimpleName(
+                    name,
+                  )} already exists.`
+                : false,
+            task: () =>
+              this.masterResourceAdapter.createResourceAdapter(
+                {
+                  name,
+                  dataPath: path.resolve(this._resourcesPath, name),
+                },
+                options,
+              ),
+          },
+          {
+            title: 'Execute final setup',
+            skip,
+            task: async ctx => {
+              this._resourceAdapters[name] = ctx.resourceAdapter;
+              await Promise.all([
+                this._resourcesReady.write(name),
+                fs.writeJSON(this._getDependenciesPath(name), ctx.dependencies),
+              ]);
+              this._addDependents({ name, dependencies: ctx.dependencies });
+              this._update$.next();
+            },
+          },
+          startTask,
+          {
+            title: 'Execute plugin hooks',
+            skip,
+            enabled: () => this._createHooks.length > 0,
+            task: () =>
+              new TaskList({
+                tasks: this._createHooks.map(hook =>
+                  hook({
+                    name,
+                    options,
+                    pluginManager: this._pluginManager,
+                  }),
+                ),
+                concurrent: true,
+              }),
+          },
+        ].filter(Boolean),
+        onError: error => {
+          this._log({
+            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_ERROR',
+            plugin: this._plugin.name,
+            resourceType: this.resourceType.name,
+            name,
+            error,
+          });
+
+          this.delete(name, options)
+            .toPromise()
+            .catch(() => {});
+        },
+        onComplete: () => {
+          this._log({
+            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_COMPLETE',
+            plugin: this._plugin.name,
+            resourceType: this.resourceType.name,
+            name,
+          });
+        },
+        onDone: () => {
+          delete this._createTaskList[name];
+        },
       });
-
-      let start$ = empty();
-      if (create.startOnCreate) {
-        start$ = this.start$(name, options, abortSignal, true);
-      }
-
-      let createHooks$ = empty();
-      if (this._createHooks.length > 0) {
-        createHooks$ = merge(
-          ...this._createHooks.map(hook =>
-            hook({
-              name,
-              options,
-              abortSignal,
-              pluginManager: this._pluginManager,
-            }),
-          ),
-        );
-      }
-
-      create$ = concat(
-        _of({
-          type: 'progress',
-          message: `${create.names.ingUpper} ${
-            this._resourceType.names.lower
-          } ${this._getSimpleName(name)}`,
-        }),
-        resourceAdapter$.pipe(
-          switchMap(response => {
-            if (response.type === 'progress') {
-              return _of(response);
-            }
-
-            this._resourceAdapters[name] = response.resourceAdapter;
-            dependencies = response.dependencies || [];
-            return empty();
-          }),
-        ),
-        _of({
-          type: 'progress',
-          message:
-            `Executing final setup of ${this._resourceType.names.lower} ` +
-            `${this._getSimpleName(name)}`,
-        }),
-        persist$,
-        _of({
-          type: 'progress',
-          persist: true,
-          message: `${create.names.edUpper} ${
-            this._resourceType.names.lower
-          } ${this._getSimpleName(name)}`,
-        }),
-        _of({
-          type: 'created',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-          options,
-        }),
-        start$,
-        createHooks$,
-      );
-
-      if (!noDone) {
-        create$ = concat(create$, _of({ type: 'done' }));
-      }
     }
 
-    return create$;
+    return this._createTaskList[name];
   }
 
-  delete$(
-    name: string,
-    options: ResourceOptions,
-    abortSignal: AbortSignal,
-    noDone?: boolean,
-  ): Observable<ModifyResourceResponse> {
+  delete(name: string, options: ResourceOptions): TaskList {
     this._log({
       event: 'RESOURCES_MANAGER_DELETE',
       plugin: this._plugin.name,
-      resourceType: this._resourceType.name,
+      resourceType: this.resourceType.name,
       name,
     });
 
-    const { create, delete: del, start } = this._resourceType.getCRUD();
-    const create$ = this._creation$[name];
-    const createAbortController = this._createAbortControllers[name];
-    let initial$ = ((empty(): $FlowFixMe): Observable<ModifyResourceResponse>);
-    if (create$ != null && createAbortController != null) {
-      initial$ = concat(
-        _of({
-          type: 'progress',
-          message: `${this._resourceType.names.lower} ${this._getSimpleName(
-            name,
-          )} is ${create.names.ing}, aborting`,
-        }),
-        defer(async () => {
-          createAbortController.abort();
-          await create$.toPromise();
-          return {
-            type: 'progress',
-            persist: true,
-            message: `Aborted ${create.name}`,
-          };
-        }),
-      );
-    }
-
-    const start$ = this._starts$[name];
-    const startAbortController = this._startAbortControllers[name];
-    const stop$ = this._stops$[name];
-    const started = this._resourceAdaptersStarted[name];
-    if (start != null && start$ != null && startAbortController != null) {
-      initial$ = concat(
-        initial$,
-        _of({
-          type: 'progress',
-          message: `${this._resourceType.names.capital} ${this._getSimpleName(
-            name,
-          )} is ${start.names.ing}, aborting`,
-        }),
-        defer(async () => {
-          startAbortController.abort();
-          await start$.toPromise();
-          return {
-            type: 'progress',
-            persist: true,
-            message: `Aborted ${start.name}`,
-          };
-        }),
-      );
-    } else if (started) {
-      initial$ = concat(
-        initial$,
-        stop$ == null ? this.stop$(name, options, abortSignal, true) : stop$,
-      );
-    }
-
-    let delete$ = _of({
-      type: 'error',
-      code: DUPLICATE_OPERATION,
-      message: `${this._resourceType.names.capital} ${this._getSimpleName(
-        name,
-      )} is being ${del.names.ed}.`,
-    });
-    const saveDelete = this._deletion$[name] == null;
-    if (saveDelete) {
-      delete$ = defer(() => this._delete$(name, options, abortSignal, noDone));
-    }
-
-    delete$ = concat(initial$, delete$).pipe(
-      map(response => {
-        if (response.type === 'progress') {
-          abortSignal.check();
-        } else if (response.type === 'error') {
-          throw new RethrownError({
-            code: response.code,
-            message: response.message,
-          });
-        }
-
-        return response;
-      }),
-      catchError((error): Observable<ModifyResourceResponse> => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE_ERROR',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-          error,
+    if (this._deleteTaskList[name] == null) {
+      const { create, start, stop, delete: del } = this.resourceType.getCRUD();
+      const startTaskList = this._startTaskList[name];
+      const startStopTasks = [];
+      if (start != null) {
+        startStopTasks.push({
+          title: `Abort ${start.names.ing} ${
+            this.resourceType.names.lower
+          } ${this._getSimpleName(name)}`,
+          enabled: () => startTaskList != null,
+          task: () => startTaskList.abort(),
         });
-
-        if (error.code === 'ABORT') {
-          return _of({ type: 'aborted' });
-        }
-
-        if (error.rethrown === true) {
-          return _of({
-            type: 'error',
-            code: (error.code: $FlowFixMe),
-            message: error.message,
-          });
-        }
-
-        return _of({
-          type: 'error',
-          code:
-            error.code == null || typeof error.code !== 'string'
-              ? SOMETHING_WENT_WRONG
-              : error.code,
-          message:
-            `Something went wrong while ${del.names.ing} ` +
-            `${this._resourceType.names.lower} ${this._getSimpleName(name)}: ${
-              error.message
-            }`,
+      }
+      if (stop != null) {
+        startStopTasks.push({
+          title: `${stop.names.upper} ${
+            this.resourceType.names.lower
+          } ${this._getSimpleName(name)}`,
+          enabled: () => this._resourceAdaptersStarted[name],
+          task: () => this.stop(name, options),
         });
-      }),
-      map((response: ModifyResourceResponse) => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE_RESPONSE',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-          response: { ...response },
-        });
-        return response;
-      }),
-      onComplete(() => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE_COMPLETE',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-        });
-        delete this._deletion$[name];
-        this._update$.next();
-      }),
-      shareReplay(),
-    );
-    if (saveDelete) {
-      this._deletion$[name] = delete$;
-    }
-
-    return delete$;
-  }
-
-  _delete$(
-    name: string,
-    options: ResourceOptions,
-    abortSignal: AbortSignal,
-    noDone?: boolean,
-  ): Observable<ModifyResourceResponse> {
-    const { delete: del } = this._resourceType.getCRUD();
-    let delete$ = _of({
-      type: 'error',
-      code: DOES_NOT_EXIST,
-      message: `${this._resourceType.names.capital} ${this._getSimpleName(
-        name,
-      )} does not exist.`,
-    });
-    const resourceAdapter = this._resourceAdapters[name];
-    if (resourceAdapter != null) {
-      this._log({
-        event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE',
-        plugin: this._plugin.name,
-        resourceType: this._resourceType.name,
-        name,
-      });
-
+      }
+      const createTaskList = this._createTaskList[name];
+      const resourceAdapter = this._resourceAdapters[name];
+      const skip = () => resourceAdapter == null;
       const dependents = this._resourceDependents[name];
-      let init$ = empty();
-      if (dependents != null && dependents.length > 0) {
-        const deletes$ = merge(
-          ...dependents.map(({ plugin, resourceType, name: dependentName }) =>
-            this._pluginManager
-              .getResourcesManager({
-                plugin,
-                resourceType,
-              })
-              .delete$(dependentName, {}, abortSignal, true),
-          ),
-        );
-        init$ = concat(
-          _of({
-            type: 'progress',
-            message: 'Deleting dependent resources',
-          }),
-          deletes$,
-          _of({
-            type: 'progress',
-            persist: true,
-            message: 'Deleted dependent resources',
-          }),
-        );
-      }
+      this._deleteTaskList[name] = new TaskList({
+        tasks: [
+          {
+            title: `Abort ${create.names.ing} ${
+              this.resourceType.names.lower
+            } ${this._getSimpleName(name)}`,
+            enabled: () => createTaskList != null,
+            task: () => createTaskList.abort(),
+          },
+        ]
+          .concat(startStopTasks)
+          .concat([
+            {
+              title: 'Delete dependent resources',
+              enabled: () => dependents != null && dependents.length > 0,
+              skip,
+              task: () =>
+                new TaskList({
+                  tasks: dependents.map(
+                    ({ plugin, resourceType, name: dependentName }) => {
+                      const manager = this._pluginManager.getResourcesManager({
+                        plugin,
+                        resourceType,
+                      });
+                      const dependentResourceType = manager.resourceType;
 
-      const destroy$ = defer(async () => {
-        await this._destroy(name, resourceAdapter);
-        this._portAllocator.releasePort({
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          resource: name,
-        });
-        await Promise.all([
-          this._resourcesReady.delete(name),
-          fs.remove(this._getDependenciesPath(name)),
-        ]);
-        delete this._resourceDependents[name];
-        return {
-          type: 'progress',
-          persist: true,
-          message: 'Completed final cleanup',
-        };
+                      return {
+                        title: `${
+                          dependentResourceType.getCRUD().delete.names.upper
+                        } ${
+                          dependentResourceType.names.lower
+                        } ${this._getSimpleName(dependentName)}`,
+                        task: () => manager.delete(dependentName, {}),
+                      };
+                    },
+                  ),
+                  concurrent: true,
+                }),
+            },
+            {
+              title: `${del.names.upper} ${
+                this.resourceType.names.lower
+              } ${this._getSimpleName(name)}`,
+              skip: () =>
+                resourceAdapter == null
+                  ? `${this.resourceType.names.capital} ${this._getSimpleName(
+                      name,
+                    )} does not exist.`
+                  : false,
+              task: () => resourceAdapter.delete(options),
+            },
+            {
+              title: 'Execute final cleanup',
+              skip,
+              task: async () => {
+                await this._destroy(name, resourceAdapter);
+                this._portAllocator.releasePort({
+                  plugin: this._plugin.name,
+                  resourceType: this.resourceType.name,
+                  resource: name,
+                });
+                await Promise.all([
+                  this._resourcesReady.delete(name),
+                  fs.remove(this._getDependenciesPath(name)),
+                ]);
+                delete this._resourceDependents[name];
+              },
+            },
+          ]),
+        onError: error => {
+          this._log({
+            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE_ERROR',
+            plugin: this._plugin.name,
+            resourceType: this.resourceType.name,
+            name,
+            error,
+          });
+        },
+        onComplete: () => {
+          this._log({
+            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE_COMPLETE',
+            plugin: this._plugin.name,
+            resourceType: this.resourceType.name,
+            name,
+          });
+        },
+        onDone: () => {
+          delete this._deleteTaskList[name];
+          this._update$.next();
+        },
       });
-      delete$ = concat(
-        init$,
-        _of({
-          type: 'progress',
-          message: `${del.names.ingUpper} ${
-            this._resourceType.names.lower
-          } ${this._getSimpleName(name)}`,
-        }),
-        resourceAdapter.delete$(options),
-        _of({
-          type: 'progress',
-          message:
-            `Executing final cleanup of ${this._resourceType.names.lower} ` +
-            `${this._getSimpleName(name)}`,
-        }),
-        destroy$,
-        _of({
-          type: 'progress',
-          persist: true,
-          message: `${del.names.edUpper} ${
-            this._resourceType.names.lower
-          } ${this._getSimpleName(name)}`,
-        }),
-      );
-
-      if (!noDone) {
-        delete$ = concat(delete$, _of({ type: 'done' }));
-      }
     }
 
-    return delete$;
+    return this._deleteTaskList[name];
   }
 
-  start$(
-    name: string,
-    options: ResourceOptions,
-    abortSignal: AbortSignal,
-    noDone?: boolean,
-  ): Observable<ModifyResourceResponse> {
+  start(name: string, options: ResourceOptions): TaskList {
     this._log({
       event: 'RESOURCES_MANAGER_START',
       plugin: this._plugin.name,
-      resourceType: this._resourceType.name,
+      resourceType: this.resourceType.name,
       name,
     });
 
-    const { start, stop } = this._resourceType.getCRUD();
+    const { create, start, stop } = this.resourceType.getCRUD();
     if (start == null) {
       throw new ResourceNoStartError({
         plugin: this._plugin.name,
-        resourceType: this._resourceType.names.lower,
+        resourceType: this.resourceType.names.lower,
       });
     }
     if (stop == null) {
       throw new ResourceNoStopError({
         plugin: this._plugin.name,
-        resourceType: this._resourceType.names.lower,
+        resourceType: this.resourceType.names.lower,
       });
     }
 
-    const stop$ = this._stops$[name];
-    const stopAbortController = this._stopAbortControllers[name];
-    let initial$ = ((empty(): $FlowFixMe): Observable<ModifyResourceResponse>);
-    if (stop$ != null && stopAbortController != null) {
-      initial$ = concat(
-        _of({
-          type: 'progress',
-          message: `${this._resourceType.names.lower} ${this._getSimpleName(
-            name,
-          )} is ${stop.names.ing}, aborting`,
-        }),
-        defer(async () => {
-          stopAbortController.abort();
-          await stop$.toPromise();
-          return {
-            type: 'progress',
-            persist: true,
-            message: `Aborted ${stop.name}`,
-          };
-        }),
-      );
-    }
-
-    let start$ = _of({
-      type: 'error',
-      code: DUPLICATE_OPERATION,
-      message: `${this._resourceType.names.capital} ${this._getSimpleName(
-        name,
-      )} is ${start.names.ing}.`,
-    });
-    let startAbortSignal;
-    const saveStart = this._starts$[name] == null;
-    if (saveStart) {
-      const abortController = new AbortController();
-      this._startAbortControllers[name] = abortController;
-      startAbortSignal = abortController.signal;
-
-      start$ = defer(() => this._start$(name, options, noDone));
-    }
-
-    const started = this._resourceAdaptersStarted[name];
-
-    const cleanup = () => {
-      delete this._startAbortControllers[name];
-      delete this._starts$[name];
-    };
-
-    start$ = concat(initial$, start$).pipe(
-      map(response => {
-        if (response.type === 'progress') {
-          abortSignal.check();
-          if (startAbortSignal != null) {
-            startAbortSignal.check();
-          }
-        } else if (response.type === 'error') {
-          throw new RethrownError({
-            code: response.code,
-            message: response.message,
-          });
-        }
-
-        return response;
-      }),
-      catchError((error): Observable<ModifyResourceResponse> => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START_ERROR',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-          error,
-        });
-
-        if (error.code === 'ABORT') {
-          return _of({ type: 'aborted' });
-        }
-
-        if (error.rethrown === true) {
-          return _of({
-            type: 'error',
-            code: (error.code: $FlowFixMe),
-            message: error.message,
-          });
-        }
-
-        return _of({
-          type: 'error',
-          code:
-            error.code == null || typeof error.code !== 'string'
-              ? SOMETHING_WENT_WRONG
-              : error.code,
-          message:
-            `Something went wrong while ${start.names.ing} ` +
-            `${this._resourceType.names.lower} ${this._getSimpleName(name)}: ${
-              error.message
-            }`,
-        });
-      }),
-      map(response => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START_RESPONSE',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-          response: { ...response },
-        });
-
-        if (response.type === 'aborted' || response.type === 'error') {
-          cleanup();
-          const controller = new AbortController();
-          if (!started) {
-            this.stop$(name, options, controller.signal)
-              .toPromise()
-              .catch(() => {});
-          }
-        } else if (response.type === 'done') {
-          this._update$.next();
-        }
-        return response;
-      }),
-      onComplete(() => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START_COMPLETE',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-        });
-        cleanup();
-      }),
-      shareReplay(),
-    );
-    if (saveStart) {
-      this._starts$[name] = start$;
-    }
-
-    return start$;
-  }
-
-  _start$(
-    name: string,
-    options: ResourceOptions,
-    noDone?: boolean,
-  ): Observable<ModifyResourceResponse> {
-    const { create, start } = this._resourceType.getCRUD();
-    if (start == null) {
-      throw new ResourceNoStartError({
-        plugin: this._plugin.name,
-        resourceType: this._resourceType.names.lower,
-      });
-    }
-
-    let start$ = _of({
-      type: 'error',
-      code: DOES_NOT_EXIST,
-      message:
-        `${this._resourceType.names.capital} ${this._getSimpleName(
-          name,
-        )} does not exist. ` +
-        `Try ${create.names.ing} it first. From the command line: ` +
-        `${create.name} ${this._resourceType.name} <name>`,
-    });
-
-    this._log({
-      event: 'RESOURCES_MANAGER_START',
-      plugin: this._plugin.name,
-      resourceType: this._resourceType.name,
-      name,
-    });
-    const resourceAdapter = this._resourceAdapters[name];
-    if (resourceAdapter != null) {
-      start$ = _of({
-        type: 'error',
-        code: DUPLICATE_OPERATION,
-        message: `${this._resourceType.names.capital} ${this._getSimpleName(
-          name,
-        )} has already been ${start.names.ed}`,
-      });
+    if (this._startTaskList[name] == null) {
+      const stopTaskList = this._stopTaskList[name];
+      const resourceAdapter = this._resourceAdapters[name];
       const started = this._resourceAdaptersStarted[name];
-      if (!started) {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-        });
-
-        const set$ = defer(() => {
-          this._resourceAdaptersStarted[name] = true;
-          return _of({
-            type: 'progress',
-            persist: true,
-            message: `${start.names.edUpper} ${
-              this._resourceType.names.lower
+      this._startTaskList[name] = new TaskList({
+        tasks: [
+          {
+            title: `Abort ${stop.names.ing} ${
+              this.resourceType.names.lower
             } ${this._getSimpleName(name)}`,
+            enabled: () => stopTaskList != null,
+            task: () => stopTaskList.abort(),
+          },
+          {
+            title: `${start.names.upper} ${
+              this.resourceType.names.lower
+            } ${this._getSimpleName(name)}`,
+            skip: () => {
+              if (resourceAdapter == null) {
+                return (
+                  `${this.resourceType.names.capital} ${this._getSimpleName(
+                    name,
+                  )} does not exist. ` +
+                  `Try ${create.names.ing} it first. From the command line: ` +
+                  `${create.name} ${this.resourceType.name} <name>`
+                );
+              }
+
+              if (started) {
+                return `${
+                  this.resourceType.names.capital
+                } ${this._getSimpleName(name)} has already been ${
+                  start.names.ed
+                }`;
+              }
+
+              return false;
+            },
+            task: () => resourceAdapter.start(options),
+          },
+        ],
+        onError: error => {
+          this._log({
+            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START_ERROR',
+            plugin: this._plugin.name,
+            resourceType: this.resourceType.name,
+            name,
+            error,
           });
-        });
-        start$ = concat(
-          _of({
-            type: 'progress',
-            message: `${start.names.ingUpper} ${
-              this._resourceType.names.lower
-            } ${this._getSimpleName(name)}`,
-          }),
-          resourceAdapter.start$(options),
-          set$,
-        );
-
-        if (!noDone) {
-          start$ = concat(start$, _of({ type: 'done' }));
-        }
-      }
+          this.stop(name, options)
+            .toPromise()
+            .catch(() => {});
+        },
+        onComplete: () => {
+          this._log({
+            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START_COMPLETE',
+            plugin: this._plugin.name,
+            resourceType: this.resourceType.name,
+            name,
+          });
+          this._resourceAdaptersStarted[name] = true;
+        },
+        onDone: () => {
+          delete this._startTaskList[name];
+          this._update$.next();
+        },
+      });
     }
 
-    return start$;
+    return this._startTaskList[name];
   }
 
-  stop$(
-    name: string,
-    options: ResourceOptions,
-    abortSignal: AbortSignal,
-    noDone?: boolean,
-  ): Observable<ModifyResourceResponse> {
+  stop(name: string, options: ResourceOptions): TaskList {
     this._log({
       event: 'RESOURCES_MANAGER_STOP',
       plugin: this._plugin.name,
-      resourceType: this._resourceType.name,
+      resourceType: this.resourceType.name,
       name,
     });
 
-    const { start, stop } = this._resourceType.getCRUD();
+    const { start, stop } = this.resourceType.getCRUD();
     if (start == null) {
       throw new ResourceNoStartError({
         plugin: this._plugin.name,
-        resourceType: this._resourceType.names.lower,
+        resourceType: this.resourceType.names.lower,
       });
     }
     if (stop == null) {
       throw new ResourceNoStopError({
         plugin: this._plugin.name,
-        resourceType: this._resourceType.names.lower,
+        resourceType: this.resourceType.names.lower,
       });
     }
 
-    const start$ = this._starts$[name];
-    const startAbortController = this._startAbortControllers[name];
-    let initial$ = ((empty(): $FlowFixMe): Observable<ModifyResourceResponse>);
-    if (start$ != null && startAbortController != null) {
-      initial$ = concat(
-        _of({
-          type: 'progress',
-          message: `${this._resourceType.names.lower} ${this._getSimpleName(
+    if (this._stopTaskList[name] == null) {
+      const startTaskList = this._startTaskList[name];
+      const resourceAdapter = this._resourceAdapters[name];
+      const skip = () => resourceAdapter == null;
+      const dependents = (this._resourceDependents[name] || []).filter(
+        ({ plugin, resourceType }) =>
+          this._pluginManager
+            .getResourcesManager({
+              plugin,
+              resourceType,
+            })
+            .resourceType.getCRUD().stop != null,
+      );
+      this._stopTaskList[name] = new TaskList({
+        tasks: [
+          {
+            title: `Abort ${start.names.ing} ${
+              this.resourceType.names.lower
+            } ${this._getSimpleName(name)}`,
+            enabled: () => startTaskList != null,
+            task: () => startTaskList.abort(),
+          },
+          {
+            title: 'Stop dependent resources',
+            enabled: () => dependents.length > 0,
+            skip: () =>
+              resourceAdapter == null
+                ? `${this.resourceType.names.capital} ${this._getSimpleName(
+                    name,
+                  )} does not exist.`
+                : false,
+            task: () =>
+              new TaskList({
+                tasks: dependents.map(
+                  ({ plugin, resourceType, name: dependentName }) => {
+                    const manager = this._pluginManager.getResourcesManager({
+                      plugin,
+                      resourceType,
+                    });
+                    const dependentResourceType = manager.resourceType;
+
+                    const { stop: depStop } = dependentResourceType.getCRUD();
+                    if (depStop == null) {
+                      throw new Error('For Flow');
+                    }
+
+                    return {
+                      title: `${depStop.names.upper} ${
+                        dependentResourceType.names.lower
+                      } ${this._getSimpleName(dependentName)}`,
+                      task: () => manager.stop(dependentName, {}),
+                    };
+                  },
+                ),
+                concurrent: true,
+              }),
+          },
+          {
+            title: `${stop.names.upper} ${
+              this.resourceType.names.lower
+            } ${this._getSimpleName(name)}`,
+            skip,
+            task: () => resourceAdapter.stop(options),
+          },
+        ],
+        onError: error => {
+          this._log({
+            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP_ERROR',
+            plugin: this._plugin.name,
+            resourceType: this.resourceType.name,
             name,
-          )} is ${start.names.ing}, aborting`,
-        }),
-        defer(async () => {
-          startAbortController.abort();
-          await start$.toPromise();
-          return {
-            type: 'progress',
-            persist: true,
-            message: `Aborted ${start.name}`,
-          };
-        }),
-      );
-    }
-
-    let stop$ = _of({
-      type: 'error',
-      code: DUPLICATE_OPERATION,
-      message: `${this._resourceType.names.capital} ${this._getSimpleName(
-        name,
-      )} is being ${stop.names.ed}.`,
-    });
-    let stopAbortSignal;
-    const saveStop = this._stops$[name] == null;
-    if (saveStop) {
-      const abortController = new AbortController();
-      this._stopAbortControllers[name] = abortController;
-      stopAbortSignal = abortController.signal;
-
-      stop$ = defer(() =>
-        this._stop$(
-          name,
-          options,
-          AbortController.combineSignals(abortSignal, stopAbortSignal),
-          noDone,
-        ),
-      );
-    }
-
-    let completed = false;
-    stop$ = concat(initial$, stop$).pipe(
-      map(response => {
-        if (response.type === 'progress') {
-          abortSignal.check();
-          if (stopAbortSignal != null) {
-            stopAbortSignal.check();
-          }
-        } else if (response.type === 'error') {
-          throw new RethrownError({
-            code: response.code,
-            message: response.message,
+            error,
           });
-        }
-
-        return response;
-      }),
-      catchError((error): Observable<ModifyResourceResponse> => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP_ERROR',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-          error,
-        });
-
-        if (error.code === 'ABORT') {
-          return _of({ type: 'aborted' });
-        }
-
-        if (error.rethrown === true) {
-          return _of({
-            type: 'error',
-            code: (error.code: $FlowFixMe),
-            message: error.message,
+        },
+        onComplete: () => {
+          this._log({
+            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP_COMPLETE',
+            plugin: this._plugin.name,
+            resourceType: this.resourceType.name,
+            name,
           });
-        }
-
-        return _of({
-          type: 'error',
-          code:
-            error.code == null || typeof error.code !== 'string'
-              ? SOMETHING_WENT_WRONG
-              : error.code,
-          message:
-            `Something went wrong while ${stop.names.ing} ` +
-            `${this._resourceType.names.lower} ${this._getSimpleName(name)}: ${
-              error.message
-            }`,
-        });
-      }),
-      map(response => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP_RESPONSE',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-          response: { ...response },
-        });
-
-        return response;
-      }),
-      onComplete(() => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP_COMPLETE',
-          plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
-          name,
-        });
-        delete this._stopAbortControllers[name];
-        delete this._stops$[name];
-        completed = true;
-        this._update$.next();
-      }),
-      shareReplay(),
-    );
-    if (saveStop && !completed) {
-      this._stops$[name] = stop$;
-    }
-
-    return stop$;
-  }
-
-  _stop$(
-    name: string,
-    options: ResourceOptions,
-    abortSignal: AbortSignal,
-    noDone?: boolean,
-  ): Observable<ModifyResourceResponse> {
-    const { stop } = this._resourceType.getCRUD();
-    if (stop == null) {
-      throw new ResourceNoStopError({
-        plugin: this._plugin.name,
-        resourceType: this._resourceType.names.lower,
+          this._resourceAdaptersStarted[name] = false;
+        },
+        onDone: () => {
+          delete this._stopTaskList[name];
+          this._update$.next();
+        },
       });
     }
-    let stop$ = _of({
-      type: 'error',
-      code: DOES_NOT_EXIST,
-      message: `${this._resourceType.names.capital} ${this._getSimpleName(
-        name,
-      )} does not exist.`,
-    });
-    const resourceAdapter = this._resourceAdapters[name];
-    if (resourceAdapter != null) {
-      this._log({
-        event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP',
-        plugin: this._plugin.name,
-        resourceType: this._resourceType.name,
-        name,
-      });
 
-      const dependents = this._resourceDependents[name];
-      let init$ = empty();
-      if (dependents != null && dependents.length > 0) {
-        const stops$ = merge(
-          ...dependents.map(({ plugin, resourceType, name: dependentName }) =>
-            this._pluginManager
-              .getResourcesManager({
-                plugin,
-                resourceType,
-              })
-              .stop$(dependentName, {}, abortSignal, true),
-          ),
-        );
-        init$ = concat(
-          _of({
-            type: 'progress',
-            message: 'Stopping dependent resources',
-          }),
-          stops$,
-          _of({
-            type: 'progress',
-            persist: true,
-            message: 'Stopped dependent resources',
-          }),
-        );
-      }
-
-      const clear$ = defer(() => {
-        this._resourceAdaptersStarted[name] = false;
-        return _of({
-          type: 'progress',
-          persist: true,
-          message: `${stop.names.edUpper} ${
-            this._resourceType.names.lower
-          } ${this._getSimpleName(name)}`,
-        });
-      });
-      stop$ = concat(
-        init$,
-        _of({
-          type: 'progress',
-          message: `${stop.names.ingUpper} ${
-            this._resourceType.names.lower
-          } ${this._getSimpleName(name)}`,
-        }),
-        resourceAdapter.stop$(options),
-        clear$,
-      );
-      if (!noDone) {
-        stop$ = concat(stop$, _of({ type: 'done' }));
-      }
-    }
-
-    return stop$;
+    return this._stopTaskList[name];
   }
 
   async _init(name: string): Promise<void> {
@@ -1280,7 +705,7 @@ export default class ResourcesManager<
       'RESOURCES_MANAGER_RESOURCE_ADAPTER_INIT',
       {
         plugin: this._plugin.name,
-        resourceType: this._resourceType.name,
+        resourceType: this.resourceType.name,
         name,
       },
       async () => {
@@ -1303,7 +728,7 @@ export default class ResourcesManager<
       'RESOURCES_MANAGER_RESOURCE_ADAPTER_DESTROY',
       {
         plugin: this._plugin.name,
-        resourceType: this._resourceType.name,
+        resourceType: this.resourceType.name,
         name,
       },
       async () => {
@@ -1337,7 +762,7 @@ export default class ResourcesManager<
         })
         .addDependent(name, {
           plugin: this._plugin.name,
-          resourceType: this._resourceType.name,
+          resourceType: this.resourceType.name,
           name: nameIn,
         });
     });
@@ -1358,7 +783,7 @@ export default class ResourcesManager<
     const adapter = this._resourceAdapters[name];
     if (adapter == null) {
       throw new Error(
-        `${this._resourceType.names.capital} ${name} does not exist`,
+        `${this.resourceType.names.capital} ${name} does not exist`,
       );
     }
     return adapter;

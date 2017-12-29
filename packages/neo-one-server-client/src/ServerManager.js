@@ -38,8 +38,6 @@ const waitRunning = async ({ pid }: {| pid: number |}) => {
   }
 };
 
-// TODO: Figure out why this takes so long when we are the ones that spawned
-//       the process.
 const waitReachable = async ({ port }: {| port: number |}) => {
   const client = new Client({ port });
   const startTime = utils.nowSeconds();

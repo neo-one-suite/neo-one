@@ -1,12 +1,10 @@
 /* @flow */
 import {
   type PluginManager,
-  type Progress,
   type ResourceAdapter,
   type ResourceAdapterOptions,
-  type ResourceAdapterReady,
+  type TaskList,
 } from '@neo-one/server-plugin';
-import type { Observable } from 'rxjs/Observable';
 
 import SmartContractResourceAdapter, {
   type SmartContractResourceAdapterInitOptions,
@@ -39,14 +37,11 @@ export default class MasterSmartContractResourceAdapter {
     );
   }
 
-  createResourceAdapter$(
+  createResourceAdapter(
     adapterOptions: ResourceAdapterOptions,
     options: SmartContractResourceOptions,
-  ): Observable<
-    | Progress
-    | ResourceAdapterReady<SmartContract, SmartContractResourceOptions>,
-  > {
-    return SmartContractResourceAdapter.create$(
+  ): TaskList {
+    return SmartContractResourceAdapter.create(
       this._getResourceAdapterOptions(adapterOptions),
       options,
     );

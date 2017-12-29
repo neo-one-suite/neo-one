@@ -1,7 +1,8 @@
 /* @flow */
 import type { Observable } from 'rxjs/Observable';
 
-import type { BaseResource, DescribeTable, Progress } from './types';
+import type { BaseResource, DescribeTable } from './types';
+import type TaskList from './TaskList';
 
 // Note that all call orders are user initiated unless otherwise specified.
 export type ResourceAdapter<
@@ -41,18 +42,18 @@ export type ResourceAdapter<
   //    stop$ error
   // When the resource should be purged and completely cleaned up. Note that
   // cleaning up port allocations are handled automatically.
-  +delete$: (options: ResourceOptions) => Observable<Progress>,
+  +delete: (options: ResourceOptions) => TaskList,
   // Called after
   //    create$
   //    init
   //    stop$
   // When the resource should be started.
-  +start$: (options: ResourceOptions) => Observable<Progress>,
+  +start: (options: ResourceOptions) => TaskList,
   // Called after
   //    start$
   //    start$ error (immediately)
   // When the resource should be stopped.
-  +stop$: (options: ResourceOptions) => Observable<Progress>,
+  +stop: (options: ResourceOptions) => TaskList,
   +resource$: Observable<Resource>,
 
   +getDebug: () => DescribeTable,

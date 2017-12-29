@@ -1,8 +1,7 @@
 /* @flow */
-import type { Observable } from 'rxjs/Observable';
-
-import type { BaseResource, Progress } from './types';
+import type { BaseResource } from './types';
 import type { ResourceAdapter } from './ResourceAdapter';
+import type TaskList from './TaskList';
 
 export type ResourceAdapterOptions = {|
   // Full name of the resource.
@@ -17,16 +16,6 @@ export type ResourceDependency = {|
   name: string,
 |};
 
-export type ResourceAdapterReady<
-  Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
-> = {|
-  type: 'ready',
-  resourceAdapter: ResourceAdapter<Resource, ResourceOptions>,
-  dependencies?: Array<ResourceDependency>,
-|};
-
 export type MasterResourceAdapter<
   Resource: BaseResource,
   // flowlint-next-line unclear-type:off
@@ -38,10 +27,10 @@ export type MasterResourceAdapter<
     options: ResourceAdapterOptions,
   ): Promise<ResourceAdapter<Resource, ResourceOptions>>,
 
-  createResourceAdapter$(
+  createResourceAdapter(
     // eslint-disable-next-line
     adapterOptions: ResourceAdapterOptions,
     // eslint-disable-next-line
     options: ResourceOptions,
-  ): Observable<Progress | ResourceAdapterReady<Resource, ResourceOptions>>,
+  ): TaskList,
 };

@@ -2,12 +2,10 @@
 import {
   type Binary,
   type PortAllocator,
-  type Progress,
   type ResourceAdapter,
   type ResourceAdapterOptions,
-  type ResourceAdapterReady,
+  type TaskList,
 } from '@neo-one/server-plugin';
-import type { Observable } from 'rxjs/Observable';
 
 import ContractResourceAdapter, {
   type ContractResourceAdapterInitOptions,
@@ -44,13 +42,11 @@ export default class MasterContractResourceAdapter {
     );
   }
 
-  createResourceAdapter$(
+  createResourceAdapter(
     adapterOptions: ResourceAdapterOptions,
     options: ContractResourceOptions,
-  ): Observable<
-    Progress | ResourceAdapterReady<Contract, ContractResourceOptions>,
-  > {
-    return ContractResourceAdapter.create$(
+  ): TaskList {
+    return ContractResourceAdapter.create(
       this._getResourceAdapterOptions(adapterOptions),
       options,
     );

@@ -4,10 +4,10 @@ import type { Observable } from 'rxjs/Observable';
 import type { Subject } from 'rxjs/Subject';
 import type Vorpal, { Args, Command } from 'vorpal';
 
-import type { AbortSignal } from './AbortController';
 import type { ResourceAdapter } from './ResourceAdapter';
 import type { ResourceDependency } from './MasterResourceAdapter';
 import type ResourceType from './ResourceType';
+import type TaskList, { Task } from './TaskList';
 
 export type ListTable = Array<Array<string>>;
 export type DescribeTable = Array<
@@ -31,32 +31,19 @@ export type BaseResource = {
 };
 export type GetResourceResponse = {| resources: Array<BaseResource> |};
 export type DescribeResourceResponse = {| resource: BaseResource |};
-export type Progress = {|
-  type: 'progress',
-  persist?: boolean,
-  message: string,
+export type TaskStatus = {
+  id: string,
+  title: string,
+  message?: string,
+  subtasks?: Array<TaskStatus>,
+  pending?: boolean,
+  skipped?: string | boolean,
+  complete?: boolean,
+  error?: string,
+};
+export type ModifyResourceResponse = {|
+  tasks: Array<TaskStatus>,
 |};
-export type ModifyResourceResponse =
-  | Progress
-  | {|
-      type: 'done',
-    |}
-  | {|
-      type: 'error',
-      code: string,
-      message: string,
-    |}
-  | {|
-      type: 'created',
-      plugin: string,
-      resourceType: string,
-      name: string,
-      // flowlint-next-line unclear-type:off
-      options: Object,
-    |}
-  | {|
-      type: 'aborted',
-    |};
 export type ReadRequest = { type: 'start' | 'abort' };
 export type ReadResponse =
   | {|
@@ -232,12 +219,7 @@ export type ResourcesManager<
   // flowlint-next-line unclear-type:off
   masterResourceAdapter: any,
   addDependent(name: string, dependent: ResourceDependency): void,
-  create$(
-    name: string,
-    options: ResourceOptions,
-    abortSignal: AbortSignal,
-    noDone?: boolean,
-  ): Observable<ModifyResourceResponse>,
+  create(name: string, options: ResourceOptions): TaskList,
 };
 
 export type PluginManager = {
@@ -251,6 +233,5 @@ export type CreateHook = (options: {|
   name: string,
   // flowlint-next-line unclear-type:off
   options: Object,
-  abortSignal: AbortSignal,
   pluginManager: PluginManager,
-|}) => Observable<ModifyResourceResponse>;
+|}) => Task;

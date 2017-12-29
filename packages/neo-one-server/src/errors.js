@@ -60,14 +60,3 @@ export class ResourceNoStopError extends Error {
     this.code = 'RESOURCE_NO_STOP';
   }
 }
-
-export class RethrownError extends Error {
-  code: string;
-  rethrown: boolean;
-
-  constructor({ code, message }: {| code: string, message: string |}) {
-    super(message);
-    this.code = code;
-    this.rethrown = true;
-  }
-}

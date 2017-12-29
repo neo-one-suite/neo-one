@@ -1,12 +1,12 @@
 /* @flow */
 import {
-  type AbortSignal,
   type CRUDRequest,
   type CRUDRequestStart,
-  type ModifyResourceResponse,
   type ReadResponse,
   type ReadRequest,
-  AbortController,
+  type TaskList,
+  type TaskStatus,
+  areTasksDone,
 } from '@neo-one/server-plugin';
 // flowlint-next-line untyped-type-import:off
 import type { Context } from 'mali';
@@ -54,57 +54,37 @@ export const middleware = ({
     TStartRequest: CRUDRequestStart,
   >(
     ctx: Context,
-    createObservable$: (
+    createTaskList: (
       request: TStartRequest,
-      signal: AbortSignal,
       resourcesManager: ResourcesManager<*, *>,
-    ) => Observable<ModifyResourceResponse>,
+    ) => TaskList,
   ): Promise<void> {
     const requests$ = makeObservable(ctx);
-    const abortController = new AbortController();
-    const aborted$ = _of({ type: 'aborted' });
-    let observable$;
+    let taskList;
     await requests$
       .pipe(
         switchMap((request: TRequest) => {
           switch (request.type) {
             case 'start':
-              if (observable$ == null && !abortController.signal.aborted) {
-                observable$ = createObservable$(
+              if (taskList == null) {
+                taskList = createTaskList(
                   (request: $FlowFixMe),
-                  abortController.signal,
                   server.pluginManager.getResourcesManager({
                     plugin: request.plugin,
                     resourceType: request.resourceType,
                   }),
                 );
               }
-              return observable$ || aborted$;
+              return taskList.status$;
             case 'abort':
-              abortController.abort();
-              return observable$ || aborted$;
+              return taskList.abort$();
             default:
-              return _of({
-                type: 'error',
-                code: 'UNKNOWN_REQUEST',
-                message: `Unknown request: ${request.type}`,
-              });
+              throw new Error(`Unknown request: ${request.type}`);
           }
         }),
-        map((responseIn: ModifyResourceResponse) => {
-          let response = responseIn;
-          if (response.options != null) {
-            response = {
-              ...response,
-              options: JSON.stringify(response.options),
-            };
-          }
-          ctx.res.write(response);
-          if (
-            response.type === 'done' ||
-            response.type === 'error' ||
-            response.type === 'aborted'
-          ) {
+        map((tasks: Array<TaskStatus>) => {
+          ctx.res.write({ tasks: JSON.stringify(tasks) });
+          if (areTasksDone(tasks)) {
             ctx.res.end();
           }
         }),
@@ -211,47 +191,23 @@ export const middleware = ({
       );
     },
     createResource: async (ctx: Context) => {
-      await handleCRUD(
-        ctx,
-        (request: CRUDRequestStart, signal, resourceManager) =>
-          resourceManager.create$(
-            request.name,
-            JSON.parse(request.options),
-            signal,
-          ),
+      await handleCRUD(ctx, (request: CRUDRequestStart, resourceManager) =>
+        resourceManager.create(request.name, JSON.parse(request.options)),
       );
     },
     deleteResource: async (ctx: Context) => {
-      await handleCRUD(
-        ctx,
-        (request: CRUDRequestStart, signal, resourceManager) =>
-          resourceManager.delete$(
-            request.name,
-            JSON.parse(request.options),
-            signal,
-          ),
+      await handleCRUD(ctx, (request: CRUDRequestStart, resourceManager) =>
+        resourceManager.delete(request.name, JSON.parse(request.options)),
       );
     },
     startResource: async (ctx: Context) => {
-      await handleCRUD(
-        ctx,
-        (request: CRUDRequestStart, signal, resourceManager) =>
-          resourceManager.start$(
-            request.name,
-            JSON.parse(request.options),
-            signal,
-          ),
+      await handleCRUD(ctx, (request: CRUDRequestStart, resourceManager) =>
+        resourceManager.start(request.name, JSON.parse(request.options)),
       );
     },
     stopResource: async (ctx: Context) => {
-      await handleCRUD(
-        ctx,
-        (request: CRUDRequestStart, signal, resourceManager) =>
-          resourceManager.stop$(
-            request.name,
-            JSON.parse(request.options),
-            signal,
-          ),
+      await handleCRUD(ctx, (request: CRUDRequestStart, resourceManager) =>
+        resourceManager.stop(request.name, JSON.parse(request.options)),
       );
     },
   };

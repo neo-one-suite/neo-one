@@ -4,9 +4,8 @@ import {
   type Binary,
   type DescribeTable,
   type PortAllocator,
-  type Progress,
-  type ResourceAdapterReady,
   type ResourceState,
+  TaskList,
 } from '@neo-one/server-plugin';
 import { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
@@ -15,11 +14,8 @@ import type { Subject } from 'rxjs/Subject';
 import _ from 'lodash';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { common, crypto } from '@neo-one/core';
-import { concat } from 'rxjs/observable/concat';
-import { concatAll, map, shareReplay, switchMap } from 'rxjs/operators';
-import { defer } from 'rxjs/observable/defer';
+import { map, shareReplay, switchMap } from 'rxjs/operators';
 import fs from 'fs-extra';
-import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
 
 import { type NodeAdapter, NEOBlockchainNodeAdapter } from './node';
@@ -168,77 +164,73 @@ export default class NetworkResourceAdapter {
     this._nodes = [];
   }
 
-  static create$(
+  static create(
     adapterOptions: NetworkResourceAdapterInitOptions,
     options: NetworkResourceOptions,
-  ): Observable<
-    Progress | ResourceAdapterReady<Network, NetworkResourceOptions>,
-  > {
+  ): TaskList {
     const staticOptions = this._getStaticOptions(adapterOptions);
-    return concat(
-      _of({
-        type: 'progress',
-        message: 'Creating data directories',
-      }),
-      defer(async () => {
-        await Promise.all([
-          fs.ensureDir(staticOptions.nodesPath),
-          fs.ensureDir(staticOptions.nodesOptionsPath),
-        ]);
-        return {
-          type: 'progress',
-          persist: true,
-          message: 'Created data directories',
-        };
-      }),
-      _of({
-        type: 'progress',
-        message: 'Creating nodes',
-      }),
-      defer(async () => {
-        let type;
-        let nodeSettings;
-        if (staticOptions.name === constants.NETWORK_NAME.MAIN) {
-          type = constants.NETWORK_TYPE.MAIN;
-          nodeSettings = [
-            [staticOptions.name, this._getMainSettings(staticOptions)],
-          ];
-        } else if (staticOptions.name === constants.NETWORK_NAME.TEST) {
-          type = constants.NETWORK_TYPE.TEST;
-          nodeSettings = [
-            [staticOptions.name, this._getTestSettings(staticOptions)],
-          ];
-        } else {
-          type = constants.NETWORK_TYPE.PRIVATE;
-          nodeSettings = this._getPrivateNetSettings(staticOptions);
-        }
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Create data directories',
+          task: async () => {
+            await Promise.all([
+              fs.ensureDir(staticOptions.nodesPath),
+              fs.ensureDir(staticOptions.nodesOptionsPath),
+            ]);
+          },
+        },
+        {
+          title: 'Create nodes',
+          task: ctx => {
+            let type;
+            let nodeSettings;
+            if (staticOptions.name === constants.NETWORK_NAME.MAIN) {
+              type = constants.NETWORK_TYPE.MAIN;
+              nodeSettings = [
+                [staticOptions.name, this._getMainSettings(staticOptions)],
+              ];
+            } else if (staticOptions.name === constants.NETWORK_NAME.TEST) {
+              type = constants.NETWORK_TYPE.TEST;
+              nodeSettings = [
+                [staticOptions.name, this._getTestSettings(staticOptions)],
+              ];
+            } else {
+              type = constants.NETWORK_TYPE.PRIVATE;
+              nodeSettings = this._getPrivateNetSettings(staticOptions);
+            }
+            ctx.nodeSettings = nodeSettings;
+            ctx.nodes = [];
 
-        const nodes = await Promise.all(
-          nodeSettings.map(async ([name, settings]) => {
-            const nodeOptions = {
-              type,
-              name,
-              dataPath: path.resolve(staticOptions.nodesPath, name),
-              settings,
-              options,
-            };
-            const node = this._createNodeAdapter(staticOptions, nodeOptions);
+            return new TaskList({
+              tasks: nodeSettings.map(([name, settings]) => ({
+                title: `Create node ${name}`,
+                task: async () => {
+                  const nodeOptions = {
+                    type,
+                    name,
+                    dataPath: path.resolve(staticOptions.nodesPath, name),
+                    settings,
+                    options,
+                  };
+                  const node = this._createNodeAdapter(
+                    staticOptions,
+                    nodeOptions,
+                  );
 
-            await this._writeNodeOptions(staticOptions, nodeOptions);
-            await node.create();
-
-            return node;
-          }),
-        );
-        return concat(
-          _of({
-            type: 'progress',
-            persist: true,
-            message: 'Created nodes',
-          }),
-          _of({
-            type: 'ready',
-            resourceAdapter: new this({
+                  await this._writeNodeOptions(staticOptions, nodeOptions);
+                  await node.create();
+                  ctx.nodes.push(node);
+                },
+              })),
+              concurrent: true,
+            });
+          },
+        },
+        {
+          title: 'Create network',
+          task: ctx => {
+            ctx.resourceAdapter = new this({
               name: staticOptions.name,
               binary: staticOptions.binary,
               dataPath: staticOptions.dataPath,
@@ -246,80 +238,70 @@ export default class NetworkResourceAdapter {
               resourceType: staticOptions.resourceType,
               nodesPath: staticOptions.nodesPath,
               nodesOptionsPath: staticOptions.nodesOptionsPath,
-              type: nodeSettings[0][1].type,
-              nodes,
+              type: ctx.nodeSettings[0][1].type,
+              nodes: ctx.nodes,
+            });
+            ctx.dependencies = [];
+          },
+        },
+      ],
+    });
+  }
+
+  // eslint-disable-next-line
+  delete(options: NetworkResourceOptions): TaskList {
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Clean up local files',
+          task: async () => {
+            await fs.remove(this._dataPath);
+          },
+        },
+      ],
+    });
+  }
+
+  // eslint-disable-next-line
+  start(options: NetworkResourceOptions): TaskList {
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Start nodes',
+          task: () =>
+            new TaskList({
+              tasks: this._nodes.map(node => ({
+                title: `Start node ${node.name}`,
+                task: async () => {
+                  await node.start();
+                },
+              })),
+              concurrent: true,
             }),
-          }),
-        );
-      }).pipe(concatAll()),
-    );
+        },
+      ],
+    });
   }
 
   // eslint-disable-next-line
-  delete$(options: NetworkResourceOptions): Observable<Progress> {
-    return concat(
-      defer(() => {
-        this._nodes = [];
-        return _of({
-          type: 'progress',
-          message: 'Cleaning up local files',
-        });
-      }),
-      defer(async () => {
-        try {
-          await fs.remove(this._dataPath);
-          return {
-            type: 'progress',
-            persist: true,
-            message: 'Cleaned up local files',
-          };
-        } catch (error) {
-          this._resourceType.plugin.log({
-            event: 'NETWORK_RESOURCE_ADAPTER_DELETE_ERROR',
-            error,
-          });
-          throw error;
-        }
-      }),
-    );
-  }
-
-  // eslint-disable-next-line
-  start$(options: NetworkResourceOptions): Observable<Progress> {
-    return concat(
-      _of({
-        type: 'progress',
-        message: 'Starting nodes',
-      }),
-      defer(async () => {
-        await Promise.all(this._nodes.map(node => node.start()));
-        this._state = 'started';
-        return {
-          type: 'progress',
-          persist: true,
-          message: 'Started nodes',
-        };
-      }),
-    );
-  }
-
-  // eslint-disable-next-line
-  stop$(options: NetworkResourceOptions): Observable<Progress> {
-    return concat(
-      _of({
-        type: 'progress',
-        message: 'Stopping nodes',
-      }),
-      defer(async () => {
-        await Promise.all(this._nodes.map(node => node.stop()));
-        this._state = 'stopped';
-        return {
-          type: 'progress',
-          persist: true,
-          message: 'Stopped nodes',
-        };
-      }),
-    );
+  stop(options: NetworkResourceOptions): TaskList {
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Stop nodes',
+          task: () =>
+            new TaskList({
+              tasks: this._nodes.map(node => ({
+                title: `Stop node ${node.name}`,
+                task: async () => {
+                  await node.stop();
+                },
+              })),
+              concurrent: true,
+            }),
+        },
+      ],
+    });
   }
 
   static _getMainSettings(

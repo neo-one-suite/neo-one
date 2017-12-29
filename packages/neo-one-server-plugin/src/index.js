@@ -12,6 +12,7 @@ export { default as Plugin } from './Plugin';
 export { default as ResourceType } from './ResourceType';
 export { default as StartCRUD } from './StartCRUD';
 export { default as StopCRUD } from './StopCRUD';
+export { default as TaskList } from './TaskList';
 
 export { default as compoundName } from './compoundName';
 export { default as killProcess } from './killProcess';
@@ -20,6 +21,7 @@ export { default as paths } from './paths';
 export { default as pluginResourceTypeUtil } from './pluginResourceTypeUtil';
 
 export { AbortController, AbortSignal } from './AbortController';
+export { getTasksError, areTasksDone, skipAllTasks } from './tasks';
 export { logInvoke } from '@neo-one/utils';
 
 export type {
@@ -33,7 +35,6 @@ export type {
   MasterResourceAdapter,
   ResourceDependency,
   ResourceAdapterOptions,
-  ResourceAdapterReady,
 } from './MasterResourceAdapter';
 export type { CLIHookConfig, CreateHookConfig } from './Plugin';
 export type { MasterResourceAdapterOptions } from './ResourceType';
@@ -55,11 +56,11 @@ export type {
   ModifyResourceResponse,
   PluginManager,
   PortAllocator,
-  Progress,
   ReadResponse,
   ReadRequest,
   ResourceState,
   Session,
+  TaskStatus,
 } from './types';
 
 export type { Log } from '@neo-one/utils';

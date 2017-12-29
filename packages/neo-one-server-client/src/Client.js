@@ -247,15 +247,7 @@ export default class Client {
         options: JSON.stringify(options),
       },
       cancel$,
-    ).pipe(
-      map(response => {
-        if (response.options != null && response.options !== '') {
-          return { ...response, options: JSON.parse(response.options) };
-        }
-
-        return response;
-      }),
-    );
+    ).pipe(map(response => ({ tasks: JSON.parse(response.tasks) })));
   }
 
   _makeCancellable(

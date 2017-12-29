@@ -2,12 +2,10 @@
 import {
   type Binary,
   type PortAllocator,
-  type Progress,
   type ResourceAdapter,
   type ResourceAdapterOptions,
-  type ResourceAdapterReady,
+  type TaskList,
 } from '@neo-one/server-plugin';
-import type { Observable } from 'rxjs/Observable';
 
 import NetworkResourceAdapter, {
   type NetworkResourceAdapterInitOptions,
@@ -44,13 +42,11 @@ export default class MasterNetworkResourceAdapter {
     );
   }
 
-  createResourceAdapter$(
+  createResourceAdapter(
     adapterOptions: ResourceAdapterOptions,
     options: NetworkResourceOptions,
-  ): Observable<
-    Progress | ResourceAdapterReady<Network, NetworkResourceOptions>,
-  > {
-    return NetworkResourceAdapter.create$(
+  ): TaskList {
+    return NetworkResourceAdapter.create(
       this._getResourceAdapterOptions(adapterOptions),
       options,
     );

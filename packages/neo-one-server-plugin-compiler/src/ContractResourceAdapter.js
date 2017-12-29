@@ -4,16 +4,13 @@ import type { ABI } from '@neo-one/client';
 import {
   type Binary,
   type DescribeTable,
-  type Progress,
-  type ResourceAdapterReady,
+  TaskList,
 } from '@neo-one/server-plugin';
 import { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import type { Subject } from 'rxjs/Subject';
 
-import { concat } from 'rxjs/observable/concat';
-import { concatAll, shareReplay, switchMap } from 'rxjs/operators';
-import { defer } from 'rxjs/observable/defer';
+import { shareReplay, switchMap } from 'rxjs/operators';
 import fs from 'fs-extra';
 import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
@@ -158,73 +155,67 @@ export default class ContractResourceAdapter {
     // eslint-disable-next-line
   }
 
-  static create$(
+  static create(
     adapterOptions: ContractResourceAdapterInitOptions,
     options: ContractResourceOptions,
-  ): Observable<
-    Progress | ResourceAdapterReady<Contract, ContractResourceOptions>,
-  > {
+  ): TaskList {
     const staticOptions = this._getStaticOptions(adapterOptions);
-    return concat(
-      _of({
-        type: 'progress',
-        message: 'Creating data directory',
-      }),
-      defer(async () => {
-        await fs.ensureDir(staticOptions.dataPath);
-        return {
-          type: 'progress',
-          persist: true,
-          message: 'Created data directory',
-        };
-      }),
-      _of({
-        type: 'progress',
-        message: 'Compiling smart contract',
-      }),
-      defer(async () => {
-        if (options.scPath == null) {
-          throw new Error(
-            'Something went wrong, smart contract path was null.',
-          );
-        }
-        let { abi, hasStorage, hasDynamicInvoke } = await compileSmartContract({
-          scPath: options.scPath,
-          avmPath: staticOptions.avmPath,
-          binary: staticOptions.binary,
-        });
-        if (abi == null) {
-          // eslint-disable-next-line
-          abi = options.abi;
-        }
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Create data directory',
+          task: async () => {
+            await fs.ensureDir(staticOptions.dataPath);
+          },
+        },
+        {
+          title: 'Compile smart contract',
+          task: async ctx => {
+            if (options.scPath == null) {
+              throw new Error(
+                'Something went wrong, smart contract path was null.',
+              );
+            }
+            let {
+              abi,
+              hasStorage,
+              hasDynamicInvoke,
+            } = await compileSmartContract({
+              scPath: options.scPath,
+              avmPath: staticOptions.avmPath,
+              binary: staticOptions.binary,
+            });
+            if (abi == null) {
+              // eslint-disable-next-line
+              abi = options.abi;
+            }
 
-        if (abi == null) {
-          throw new ABIRequiredError();
-        }
+            if (abi == null) {
+              throw new ABIRequiredError();
+            }
 
-        if (hasStorage == null) {
-          // eslint-disable-next-line
-          hasStorage = options.hasStorage;
-        }
+            if (hasStorage == null) {
+              // eslint-disable-next-line
+              hasStorage = options.hasStorage;
+            }
 
-        if (hasDynamicInvoke == null) {
-          // eslint-disable-next-line
-          hasDynamicInvoke = options.hasDynamicInvoke;
-        }
+            if (hasDynamicInvoke == null) {
+              // eslint-disable-next-line
+              hasDynamicInvoke = options.hasDynamicInvoke;
+            }
 
-        const script = await fs.readFile(staticOptions.avmPath, 'utf8');
+            const script = await fs.readFile(staticOptions.avmPath, 'utf8');
 
-        return concat(
-          _of({
-            type: 'progress',
-            persist: true,
-            message: 'Compiled smart contract',
-          }),
-          _of({
-            type: 'progress',
-            message: 'Saving ABI and configuration',
-          }),
-          defer(async () => {
+            ctx.abi = abi;
+            ctx.hasDynamicInvoke = hasDynamicInvoke;
+            ctx.hasStorage = hasStorage;
+            ctx.script = script;
+          },
+        },
+        {
+          title: 'Save ABI and configuration',
+          task: async ctx => {
+            const { abi, hasDynamicInvoke, hasStorage, script } = ctx;
             await Promise.all([
               fs.writeJSON(staticOptions.abiPath, abi),
               fs.writeJSON(staticOptions.configPath, {
@@ -233,15 +224,7 @@ export default class ContractResourceAdapter {
               }),
             ]);
 
-            return {
-              type: 'progress',
-              persist: true,
-              message: 'Saved ABI and configuration',
-            };
-          }),
-          _of({
-            type: 'ready',
-            resourceAdapter: new this({
+            ctx.resourceAdapter = new this({
               name: staticOptions.name,
               binary: staticOptions.binary,
               dataPath: staticOptions.dataPath,
@@ -253,48 +236,35 @@ export default class ContractResourceAdapter {
               abi,
               hasStorage,
               hasDynamicInvoke,
-            }),
-          }),
-        );
-      }).pipe(concatAll()),
-    );
+            });
+            ctx.dependencies = [];
+          },
+        },
+      ],
+    });
   }
 
   // eslint-disable-next-line
-  delete$(options: ContractResourceOptions): Observable<Progress> {
-    return concat(
-      defer(() =>
-        _of({
-          type: 'progress',
-          message: 'Cleaning up local files',
-        }),
-      ),
-      defer(async () => {
-        try {
-          await fs.remove(this._dataPath);
-          return {
-            type: 'progress',
-            persist: true,
-            message: 'Cleaned up local files',
-          };
-        } catch (error) {
-          this._resourceType.plugin.log({
-            event: 'NETWORK_RESOURCE_ADAPTER_DELETE_ERROR',
-            error,
-          });
-          throw error;
-        }
-      }),
-    );
+  delete(options: ContractResourceOptions): TaskList {
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Clean local files',
+          task: async () => {
+            await fs.remove(this._dataPath);
+          },
+        },
+      ],
+    });
   }
 
   // eslint-disable-next-line
-  start$(options: ContractResourceOptions): Observable<Progress> {
+  start(options: ContractResourceOptions): TaskList {
     throw new Error('Cannot be started');
   }
 
   // eslint-disable-next-line
-  stop$(options: ContractResourceOptions): Observable<Progress> {
+  stop(options: ContractResourceOptions): TaskList {
     throw new Error('Cannot be stopped');
   }
 

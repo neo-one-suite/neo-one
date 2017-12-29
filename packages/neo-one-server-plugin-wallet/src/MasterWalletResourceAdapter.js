@@ -1,12 +1,10 @@
 /* @flow */
 import {
   type PluginManager,
-  type Progress,
   type ResourceAdapter,
   type ResourceAdapterOptions,
-  type ResourceAdapterReady,
+  type TaskList,
 } from '@neo-one/server-plugin';
-import type { Observable } from 'rxjs/Observable';
 
 import WalletResourceAdapter, {
   type WalletResourceAdapterInitOptions,
@@ -42,13 +40,11 @@ export default class MasterWalletResourceAdapter {
     return WalletResourceAdapter.init(this._getResourceAdapterOptions(options));
   }
 
-  createResourceAdapter$(
+  createResourceAdapter(
     adapterOptions: ResourceAdapterOptions,
     options: WalletResourceOptions,
-  ): Observable<
-    Progress | ResourceAdapterReady<Wallet, WalletResourceOptions>,
-  > {
-    return WalletResourceAdapter.create$(
+  ): TaskList {
+    return WalletResourceAdapter.create(
       this._getResourceAdapterOptions(adapterOptions),
       options,
     );

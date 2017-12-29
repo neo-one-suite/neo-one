@@ -2,7 +2,7 @@
 import { take } from 'rxjs/operators';
 
 import type { BaseResource, InteractiveCLI } from './types';
-import CRUDBase, { type CLIOption, type Names } from './CRUDBase';
+import CRUDBase, { type CLIOption, type NamesIn } from './CRUDBase';
 import type ResourceType from './ResourceType';
 
 // flowlint-next-line unclear-type:off
@@ -23,7 +23,7 @@ export type CRUDResourceOptions<
   ResourceOptions: Object,
 > = {|
   name: string,
-  names?: Names,
+  names?: NamesIn,
   resourceType: ResourceType<Resource, ResourceOptions>,
   help: string,
   aliases?: Array<string>,

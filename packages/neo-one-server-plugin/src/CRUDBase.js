@@ -7,13 +7,19 @@ export type CLIOption = {|
   description: string,
 |};
 
-export type Names = {|
+export type NamesIn = {|
   // Customize 'ing' verb - e.g. opening instead of starting
   ing: string,
   ingUpper: string,
   // Customize 'ed' verb - e.g. opened instead of started
   ed: string,
   edUpper: string,
+|};
+
+export type Names = {|
+  ...NamesIn,
+  lower: string,
+  upper: string,
 |};
 
 export type CRUDBaseOptions<
@@ -23,7 +29,7 @@ export type CRUDBaseOptions<
 > = {|
   // CRUD name
   name: string,
-  names?: Names,
+  names?: NamesIn,
   // CLI command
   command: string,
   resourceType: ResourceType<Resource, ResourceOptions>,
@@ -62,7 +68,7 @@ export default class CRUDBase<
 
   constructor({
     name: nameIn,
-    names,
+    names: namesIn,
     command,
     resourceType,
     help,
@@ -73,11 +79,19 @@ export default class CRUDBase<
     this.name = nameIn;
     const name = nameIn.endsWith('e') ? nameIn.slice(0, -1) : nameIn;
     const nameUpper = `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
-    this.names = names || {
+    const names = namesIn || {
       ing: `${name}ing`,
       ingUpper: `${nameUpper}ing`,
       ed: `${name}ed`,
       edUpper: `${nameUpper}ed`,
+    };
+    this.names = {
+      lower: nameIn,
+      upper: `${nameIn.charAt(0).toUpperCase()}${nameIn.slice(1)}`,
+      ing: names.ing,
+      ingUpper: names.ingUpper,
+      ed: names.ed,
+      edUpper: names.edUpper,
     };
     this.command = command;
     this.resourceType = resourceType;

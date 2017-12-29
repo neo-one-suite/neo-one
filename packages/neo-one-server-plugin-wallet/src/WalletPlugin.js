@@ -10,7 +10,6 @@ import {
 
 import { constants as compilerConstants } from '@neo-one/server-plugin-compiler';
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
-import { empty } from 'rxjs/observable/empty';
 import { wifToPrivateKey } from '@neo-one/client';
 
 import SmartContractResourceType from './SmartContractResourceType';
@@ -66,33 +65,31 @@ export default class WalletPlugin extends Plugin {
       {
         plugin: networkConstants.PLUGIN,
         resourceType: networkConstants.NETWORK_RESOURCE_TYPE,
-        hook: ({ name, pluginManager, abortSignal }) => {
-          if (
-            !(
+        hook: ({ name, pluginManager }) => ({
+          title: 'Create master wallet',
+          skip: () => {
+            if (
               name === networkConstants.NETWORK_NAME.MAIN ||
               name === networkConstants.NETWORK_NAME.TEST
-            )
-          ) {
-            return pluginManager
+            ) {
+              return 'Master wallets are only created for private networks';
+            }
+
+            return false;
+          },
+          task: () =>
+            pluginManager
               .getResourcesManager({
                 plugin: constants.PLUGIN,
                 resourceType: constants.WALLET_RESOURCE_TYPE,
               })
-              .create$(
-                compoundName.make({ names: [name], name: 'master' }),
-                {
-                  network: name,
-                  privateKey: wifToPrivateKey(
-                    networkConstants.PRIVATE_NET_PRIVATE_KEY,
-                  ),
-                },
-                abortSignal,
-                true,
-              );
-          }
-
-          return empty();
-        },
+              .create(compoundName.make({ names: [name], name: 'master' }), {
+                network: name,
+                privateKey: wifToPrivateKey(
+                  networkConstants.PRIVATE_NET_PRIVATE_KEY,
+                ),
+              }),
+        }),
       },
     ];
   }

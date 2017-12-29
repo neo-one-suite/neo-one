@@ -2,17 +2,12 @@
 import {
   type DescribeTable,
   type PluginManager,
-  type Progress,
-  type ResourceAdapterReady,
+  TaskList,
   compoundName,
 } from '@neo-one/server-plugin';
 import { Observable } from 'rxjs/Observable';
 
-import { concat } from 'rxjs/observable/concat';
-import { concatAll } from 'rxjs/operators';
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
-import { defer } from 'rxjs/observable/defer';
-import { of as _of } from 'rxjs/observable/of';
 
 import type { WalletClient } from './types';
 import type WalletResourceType, {
@@ -76,7 +71,7 @@ export default class WalletResourceAdapter {
     // eslint-disable-next-line
   }
 
-  static create$(
+  static create(
     {
       client,
       pluginManager,
@@ -85,119 +80,86 @@ export default class WalletResourceAdapter {
       dataPath,
     }: WalletResourceAdapterInitOptions,
     { privateKey, password }: WalletResourceOptions,
-  ): Observable<
-    Progress | ResourceAdapterReady<Wallet, WalletResourceOptions>,
-  > {
-    return concat(
-      _of({
-        type: 'progress',
-        message: 'Creating wallet resource',
-      }),
-      defer(async () => {
-        const walletResource = await WalletResource.createNew({
-          client,
-          pluginManager,
-          resourceType,
-          name,
-          privateKey,
-          password,
-          dataPath,
-        });
-        const { names: [networkName] } = compoundName.extract(name);
-        return concat(
-          _of({
-            type: 'progress',
-            persist: true,
-            message: 'Created wallet resource',
-          }),
-          _of({
-            type: 'ready',
-            resourceAdapter: new this({
+  ): TaskList {
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Create wallet resource',
+          task: async ctx => {
+            const walletResource = await WalletResource.createNew({
+              client,
+              pluginManager,
+              resourceType,
+              name,
+              privateKey,
+              password,
+              dataPath,
+            });
+
+            const { names: [networkName] } = compoundName.extract(name);
+            ctx.resourceAdapter = new this({
               resourceType,
               walletResource,
-            }),
-            dependencies: [
+            });
+            ctx.dependencies = [
               {
                 plugin: networkConstants.PLUGIN,
                 resourceType: networkConstants.NETWORK_RESOURCE_TYPE,
                 name: networkName,
               },
-            ],
-          }),
-        );
-      }).pipe(concatAll()),
-    );
+            ];
+          },
+        },
+      ],
+    });
   }
 
   // eslint-disable-next-line
-  delete$(options: WalletResourceOptions): Observable<Progress> {
-    return concat(
-      _of({
-        type: 'progress',
-        message: 'Cleaning up local files',
-      }),
-      defer(async () => {
-        try {
-          await this.walletResource.delete();
-          return {
-            type: 'progress',
-            persist: true,
-            message: 'Cleaned up local files',
-          };
-        } catch (error) {
-          this._resourceType.plugin.log({
-            event: 'WALLET_RESOURCE_ADAPTER_DELETE_ERROR',
-            error,
-          });
-          throw error;
-        }
-      }),
-    );
+  delete(options: WalletResourceOptions): TaskList {
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Clean up local files',
+          task: async () => {
+            await this.walletResource.delete();
+          },
+        },
+      ],
+    });
   }
 
-  start$({ password }: WalletResourceOptions): Observable<Progress> {
-    if (this.walletResource.unlocked) {
-      return _of({
-        type: 'progress',
-        persist: true,
-        message: 'Wallet unlocked',
-      });
-    }
+  start({ password }: WalletResourceOptions): TaskList {
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Unlock wallet',
+          task: async () => {
+            if (this.walletResource.unlocked) {
+              return;
+            }
 
-    return concat(
-      _of({
-        type: 'progress',
-        message: 'Unlocking wallet',
-      }),
-      defer(async () => {
-        if (password == null) {
-          throw new Error('Password is required to unlock a wallet.');
-        }
-        try {
-          await this.walletResource.unlock({ password });
-        } catch (error) {
-          this._resourceType.plugin.log({
-            event: 'WALLET_RESOURCE_ADAPTER_START_ERROR',
-            error,
-          });
-          throw error;
-        }
-        return {
-          type: 'progress',
-          persist: true,
-          message: 'Wallet unlocked',
-        };
-      }),
-    );
+            if (password == null) {
+              throw new Error('Password is required to unlock a wallet.');
+            }
+
+            await this.walletResource.unlock({ password });
+          },
+        },
+      ],
+    });
   }
 
   // eslint-disable-next-line
-  stop$(options: WalletResourceOptions): Observable<Progress> {
-    this.walletResource.lock();
-    return _of({
-      type: 'progress',
-      persist: true,
-      message: 'Wallet locked',
+  stop(options: WalletResourceOptions): TaskList {
+    return new TaskList({
+      tasks: [
+        {
+          title: 'Lock wallet',
+          task: () => {
+            this.walletResource.lock();
+          },
+        },
+      ],
     });
   }
 
