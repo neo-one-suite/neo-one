@@ -292,7 +292,7 @@ export default class ResourcesManager<
     };
 
     let startTask = null;
-    if (start != null) {
+    if (create.startOnCreate && start != null) {
       startTask = {
         title: `${start.names.upper} ${
           this.resourceType.names.lower
@@ -302,8 +302,23 @@ export default class ResourcesManager<
         task: () => this.start(name, options),
       };
     }
+
+    let set = false;
+    const setFromContext = ctx => {
+      if (!set) {
+        set = true;
+        this._resourceAdapters[name] = ctx.resourceAdapter;
+        const dependencies = ctx.dependencies || [];
+        const dependents = ctx.dependents || [];
+        this._directResourceDependents[name] = dependents;
+        this._addDependents({ name, dependencies });
+        this._update$.next();
+      }
+    };
+
     const createTaskList = new TaskList({
       freshContext: true,
+      collapse: false,
       tasks: [
         {
           title: `${create.names.upper} ${
@@ -323,7 +338,7 @@ export default class ResourcesManager<
           title: 'Execute final setup',
           skip,
           task: async ctx => {
-            this._resourceAdapters[name] = ctx.resourceAdapter;
+            setFromContext(ctx);
             const dependencies = ctx.dependencies || [];
             const dependents = ctx.dependents || [];
             await Promise.all([
@@ -331,9 +346,6 @@ export default class ResourcesManager<
               fs.writeJSON(this._getDependenciesPath(name), dependencies),
               fs.writeJSON(this._getDirectDependentsPath(name), dependents),
             ]);
-            this._directResourceDependents[name] = dependents;
-            this._addDependents({ name, dependencies });
-            this._update$.next();
           },
         },
         startTask,
@@ -354,7 +366,7 @@ export default class ResourcesManager<
             }),
         },
       ].filter(Boolean),
-      onError: error => {
+      onError: (error, ctx) => {
         this._log({
           event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_ERROR',
           plugin: this._plugin.name,
@@ -363,9 +375,9 @@ export default class ResourcesManager<
           error,
         });
 
-        this.delete(name, options)
-          .toPromise()
-          .catch(() => {});
+        if (!shouldSkip) {
+          setFromContext(ctx);
+        }
       },
       onComplete: () => {
         this._log({
@@ -375,8 +387,15 @@ export default class ResourcesManager<
           name,
         });
       },
-      onDone: () => {
-        delete this._createTaskList[name];
+      onDone: (failed: boolean) => {
+        if (!shouldSkip) {
+          delete this._createTaskList[name];
+          if (failed) {
+            this.delete(name, options)
+              .toPromise()
+              .catch(() => {});
+          }
+        }
       },
     });
     if (!shouldSkip) {
@@ -441,6 +460,7 @@ export default class ResourcesManager<
     );
     const deleteTaskList = new TaskList({
       freshContext: true,
+      collapse: false,
       tasks: [
         {
           title: `Abort ${create.names.ing} ${
@@ -503,7 +523,9 @@ export default class ResourcesManager<
         });
       },
       onDone: () => {
-        delete this._deleteTaskList[name];
+        if (!shouldSkip) {
+          delete this._deleteTaskList[name];
+        }
         this._update$.next();
       },
     });
@@ -565,6 +587,7 @@ export default class ResourcesManager<
     );
     const startTaskList = new TaskList({
       freshContext: true,
+      collapse: false,
       tasks: [
         {
           title: `Abort ${stop.names.ing} ${
@@ -620,9 +643,6 @@ export default class ResourcesManager<
           name,
           error,
         });
-        this.stop(name, options)
-          .toPromise()
-          .catch(() => {});
       },
       onComplete: () => {
         this._log({
@@ -631,10 +651,17 @@ export default class ResourcesManager<
           resourceType: this.resourceType.name,
           name,
         });
-        this._resourceAdaptersStarted[name] = true;
       },
-      onDone: () => {
-        delete this._startTaskList[name];
+      onDone: failed => {
+        if (!shouldSkip) {
+          this._resourceAdaptersStarted[name] = true;
+          delete this._startTaskList[name];
+          if (failed) {
+            this.stop(name, options)
+              .toPromise()
+              .catch(() => {});
+          }
+        }
         this._update$.next();
       },
     });
@@ -729,6 +756,7 @@ export default class ResourcesManager<
     );
     const stopTaskList = new TaskList({
       freshContext: true,
+      collapse: false,
       tasks: [
         {
           title: `Abort ${start.names.ing} ${
@@ -777,7 +805,9 @@ export default class ResourcesManager<
         this._resourceAdaptersStarted[name] = false;
       },
       onDone: () => {
-        delete this._stopTaskList[name];
+        if (!shouldSkip) {
+          delete this._stopTaskList[name];
+        }
         this._update$.next();
       },
     });

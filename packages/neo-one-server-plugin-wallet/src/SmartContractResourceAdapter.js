@@ -111,6 +111,8 @@ export default class SmartContractResourceAdapter {
                 name: networkName,
               },
             ];
+
+            await smartContractResource.create();
           },
         },
       ],

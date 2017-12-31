@@ -176,40 +176,46 @@ export default class ContractResourceAdapter {
                 'Something went wrong, smart contract path was null.',
               );
             }
-            let {
-              abi,
-              hasStorage,
-              hasDynamicInvoke,
-            } = await compileSmartContract({
-              scPath: options.scPath,
-              avmPath: staticOptions.avmPath,
-              binary: staticOptions.binary,
-            });
-            if (abi == null) {
-              // eslint-disable-next-line
-              abi = options.abi;
+            try {
+              let {
+                abi,
+                hasStorage,
+                hasDynamicInvoke,
+              } = await compileSmartContract({
+                scPath: options.scPath,
+                avmPath: staticOptions.avmPath,
+                binary: staticOptions.binary,
+              });
+
+              if (abi == null) {
+                // eslint-disable-next-line
+                abi = options.abi;
+              }
+
+              if (abi == null) {
+                throw new ABIRequiredError();
+              }
+
+              if (hasStorage == null) {
+                // eslint-disable-next-line
+                hasStorage = options.hasStorage;
+              }
+
+              if (hasDynamicInvoke == null) {
+                // eslint-disable-next-line
+                hasDynamicInvoke = options.hasDynamicInvoke;
+              }
+
+              const script = await fs.readFile(staticOptions.avmPath, 'utf8');
+
+              ctx.abi = abi;
+              ctx.hasDynamicInvoke = hasDynamicInvoke;
+              ctx.hasStorage = hasStorage;
+              ctx.script = script;
+            } catch (error) {
+              await fs.remove(staticOptions.dataPath);
+              throw error;
             }
-
-            if (abi == null) {
-              throw new ABIRequiredError();
-            }
-
-            if (hasStorage == null) {
-              // eslint-disable-next-line
-              hasStorage = options.hasStorage;
-            }
-
-            if (hasDynamicInvoke == null) {
-              // eslint-disable-next-line
-              hasDynamicInvoke = options.hasDynamicInvoke;
-            }
-
-            const script = await fs.readFile(staticOptions.avmPath, 'utf8');
-
-            ctx.abi = abi;
-            ctx.hasDynamicInvoke = hasDynamicInvoke;
-            ctx.hasStorage = hasStorage;
-            ctx.script = script;
           },
         },
         {

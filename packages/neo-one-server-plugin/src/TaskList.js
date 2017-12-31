@@ -15,6 +15,8 @@ import { getTaskError, getTasksError, isTaskDone } from './tasks';
 export type TaskContext = Object;
 type SkipFn = (ctx: TaskContext) => string | boolean;
 type EnabledFn = (ctx: TaskContext) => boolean;
+type OnErrorFn = (error: Error, ctx: TaskContext) => void;
+type OnDoneFn = (failed: boolean) => void;
 export type Task = {|
   skip?: SkipFn,
   enabled?: EnabledFn,
@@ -28,11 +30,12 @@ export type Task = {|
 export type TaskListOptions = {|
   tasks: Array<Task>,
   concurrent?: boolean,
-  onError?: (error: Error) => void,
+  onError?: OnErrorFn,
   onComplete?: () => void,
-  onDone?: () => void,
+  onDone?: OnDoneFn,
   initialContext?: TaskContext,
   freshContext?: boolean,
+  collapse?: boolean,
 |};
 
 class TaskWrapper {
@@ -41,21 +44,32 @@ class TaskWrapper {
 
   _skip: SkipFn;
   _enabled: EnabledFn;
+  _aborted: boolean;
 
   status$: BehaviorSubject<?TaskStatus>;
 
-  constructor(task: Task, taskList: TaskList) {
+  constructor({
+    task,
+    taskList,
+    collapse,
+  }: {|
+    task: Task,
+    taskList: TaskList,
+    collapse: boolean,
+  |}) {
     this._task = task;
     this._taskList = taskList;
     this.status$ = new BehaviorSubject({
       id: task.title,
       title: task.title,
+      collapse,
     });
 
     // eslint-disable-next-line
     this._skip = task.skip || ((ctx: TaskContext) => false);
     // eslint-disable-next-line
     this._enabled = task.enabled || ((ctx: TaskContext) => true);
+    this._aborted = false;
   }
 
   check(ctx: TaskContext): void {
@@ -84,10 +98,16 @@ class TaskWrapper {
   }
 
   abort(): void {
+    this._aborted = true;
     const status = this.status$.getValue();
     if (status != null) {
       this.status$.next({ ...status, skipped: 'Aborted' });
     }
+    this.status$.complete();
+  }
+
+  complete(): void {
+    this.status$.complete();
   }
 
   async run(ctx: TaskContext): Promise<void> {
@@ -96,22 +116,34 @@ class TaskWrapper {
       this.status$.complete();
       return;
     }
-    const status = { ...statusIn, pending: true };
+    if (this._aborted) {
+      return;
+    }
+
+    let status = { ...statusIn, pending: true };
+
+    const onError = (error: Error) => {
+      this._taskList.onError(error, ctx);
+      this._taskList.superOnError(error);
+    };
 
     try {
       const skip = this._skip(ctx);
       if (skip !== false) {
-        this.status$.next({ ...status, pending: false, skipped: skip });
+        status = { ...status, pending: false, skipped: skip };
+        this.status$.next(status);
       } else {
         this.status$.next(status);
 
         const result = this._task.task(ctx);
 
+        let error;
         if (result instanceof Observable) {
           await result
             .pipe(
               map(message => {
-                this.status$.next({ ...status, message });
+                status = { ...status, message };
+                this.status$.next(status);
               }),
             )
             .toPromise();
@@ -119,20 +151,28 @@ class TaskWrapper {
           await result;
           // eslint-disable-next-line
         } else if (result instanceof TaskList) {
-          result.setOnError(this._taskList.onError);
+          result.setSuperOnError(onError);
           result._run(ctx);
-          await result.status$
+          const finalSubtasks = await result.status$
             .pipe(
               map(subtasks => {
-                this.status$.next({ ...status, subtasks });
+                status = { ...status, subtasks };
+                this.status$.next(status);
+                return subtasks;
               }),
             )
             .toPromise();
+          error = getTasksError(finalSubtasks);
         }
-        this.status$.next({ ...status, pending: false, complete: true });
+
+        this.status$.next({
+          ...status,
+          pending: false,
+          complete: error == null,
+          error: error == null ? undefined : error,
+        });
       }
     } catch (error) {
-      this._taskList.onError(error);
       this.status$.next({
         ...status,
         pending: false,
@@ -141,6 +181,7 @@ class TaskWrapper {
             ? 'Something went wrong.'
             : error.message,
       });
+      onError(error);
     }
 
     this.status$.complete();
@@ -150,15 +191,16 @@ class TaskWrapper {
 export default class TaskList {
   _tasks: Array<TaskWrapper>;
   _concurrent: boolean;
-  onError: (error: Error) => void;
+  onError: OnErrorFn;
   _onComplete: () => void;
-  _onDone: () => void;
+  _onDone: OnDoneFn;
   _initialContext: TaskContext;
   _freshContext: boolean;
+  _collapse: boolean;
+  superOnError: (error: Error) => void;
 
   _status$: ReplaySubject<Array<TaskStatus>>;
   _subscription: ?Subscription;
-  _aborted: boolean;
 
   constructor({
     tasks,
@@ -168,20 +210,31 @@ export default class TaskList {
     onDone,
     initialContext,
     freshContext,
+    collapse: collapseIn,
   }: TaskListOptions) {
-    this._tasks = tasks.map(task => new TaskWrapper(task, this));
+    const collapse = collapseIn == null ? true : collapseIn;
+    this._tasks = tasks.map(
+      task =>
+        new TaskWrapper({
+          task,
+          taskList: this,
+          collapse,
+        }),
+    );
     this._concurrent = concurrent || false;
     // eslint-disable-next-line
-    this.onError = onError || ((error: Error) => {});
+    this.onError = onError || ((error: Error, ctx: TaskContext) => {});
     this._onComplete = onComplete || (() => {});
-    this._onDone = onDone || (() => {});
+    // eslint-disable-next-line
+    this._onDone = onDone || ((failed: boolean) => {});
     this._initialContext = initialContext || {};
     this._freshContext = freshContext || false;
+    // eslint-disable-next-line
+    this.superOnError = (error: Error) => {};
 
     this._status$ = new ReplaySubject(1);
 
     this._subscription = null;
-    this._aborted = false;
   }
 
   get status$(): Observable<Array<TaskStatus>> {
@@ -198,12 +251,14 @@ export default class TaskList {
   }
 
   abort$(): Observable<Array<TaskStatus>> {
-    this._aborted = true;
-    return this._status$;
+    for (const task of this._tasks) {
+      task.abort();
+    }
+    return this.status$;
   }
 
-  setOnError(onError: (error: Error) => void): void {
-    this.onError = onError;
+  setSuperOnError(onError: (error: Error) => void): void {
+    this.superOnError = onError;
   }
 
   async _run(ctxIn?: TaskContext): Promise<void> {
@@ -232,23 +287,23 @@ export default class TaskList {
     if (err == null) {
       this._onComplete();
     }
-    this._onDone();
+    this._onDone(err != null);
   }
 
   async _runTasks(ctx: TaskContext): Promise<void> {
     if (this._concurrent) {
       await Promise.all(this._tasks.map(task => task.run(ctx)));
     } else {
+      let error;
       for (const task of this._tasks) {
-        if (this._aborted) {
-          task.abort();
-        } else {
+        if (error == null) {
           // eslint-disable-next-line
           await task.run(ctx);
-          if (task.error != null) {
-            break;
-          }
+        } else {
+          task.complete();
         }
+        // eslint-disable-next-line
+        error = task.error;
       }
     }
   }

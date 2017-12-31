@@ -195,13 +195,8 @@ export default class SmartContractResource {
       hash = hashIn;
     }
 
-    await fs.ensureDir(dataPath);
     const configPath = this._getConfigPath(dataPath);
     const abiPath = this._getABIPath(dataPath);
-    await Promise.all([
-      fs.writeJSON(configPath, { hash, contractName }),
-      fs.writeJSON(abiPath, JSON.stringify(abi)),
-    ]);
 
     return new SmartContractResource({
       resourceType,
@@ -243,6 +238,17 @@ export default class SmartContractResource {
       hash,
       abi,
     });
+  }
+
+  async create(): Promise<void> {
+    await fs.ensureDir(this._dataPath);
+    await Promise.all([
+      fs.writeJSON(this._configPath, {
+        hash: this._hash,
+        contractName: this._contractName,
+      }),
+      fs.writeJSON(this._abiPath, JSON.stringify(this._abi)),
+    ]);
   }
 
   async delete(): Promise<void> {

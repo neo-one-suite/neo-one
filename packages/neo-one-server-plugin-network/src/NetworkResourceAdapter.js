@@ -169,7 +169,49 @@ export default class NetworkResourceAdapter {
     options: NetworkResourceOptions,
   ): TaskList {
     const staticOptions = this._getStaticOptions(adapterOptions);
+    let type;
+    let nodeSettings;
+    if (staticOptions.name === constants.NETWORK_NAME.MAIN) {
+      type = constants.NETWORK_TYPE.MAIN;
+      nodeSettings = [
+        [staticOptions.name, this._getMainSettings(staticOptions)],
+      ];
+    } else if (staticOptions.name === constants.NETWORK_NAME.TEST) {
+      type = constants.NETWORK_TYPE.TEST;
+      nodeSettings = [
+        [staticOptions.name, this._getTestSettings(staticOptions)],
+      ];
+    } else {
+      type = constants.NETWORK_TYPE.PRIVATE;
+      nodeSettings = this._getPrivateNetSettings(staticOptions);
+    }
+    const nodeOptionss = nodeSettings.map(([name, settings]) => ({
+      type,
+      name,
+      dataPath: path.resolve(staticOptions.nodesPath, name),
+      settings,
+      options,
+    }));
+    const nodeOptionsAndNodes = nodeOptionss.map(nodeOptions => [
+      nodeOptions,
+      this._createNodeAdapter(staticOptions, nodeOptions),
+    ]);
+
     return new TaskList({
+      initialContext: {
+        resourceAdapter: new this({
+          name: staticOptions.name,
+          binary: staticOptions.binary,
+          dataPath: staticOptions.dataPath,
+          portAllocator: staticOptions.portAllocator,
+          resourceType: staticOptions.resourceType,
+          nodesPath: staticOptions.nodesPath,
+          nodesOptionsPath: staticOptions.nodesOptionsPath,
+          type: nodeSettings[0][1].type,
+          nodes: nodeOptionsAndNodes.map(value => value[1]),
+        }),
+        dependencies: [],
+      },
       tasks: [
         {
           title: 'Create data directories',
@@ -182,67 +224,17 @@ export default class NetworkResourceAdapter {
         },
         {
           title: 'Create nodes',
-          task: ctx => {
-            let type;
-            let nodeSettings;
-            if (staticOptions.name === constants.NETWORK_NAME.MAIN) {
-              type = constants.NETWORK_TYPE.MAIN;
-              nodeSettings = [
-                [staticOptions.name, this._getMainSettings(staticOptions)],
-              ];
-            } else if (staticOptions.name === constants.NETWORK_NAME.TEST) {
-              type = constants.NETWORK_TYPE.TEST;
-              nodeSettings = [
-                [staticOptions.name, this._getTestSettings(staticOptions)],
-              ];
-            } else {
-              type = constants.NETWORK_TYPE.PRIVATE;
-              nodeSettings = this._getPrivateNetSettings(staticOptions);
-            }
-            ctx.nodeSettings = nodeSettings;
-            ctx.nodes = [];
-
-            return new TaskList({
-              tasks: nodeSettings.map(([name, settings]) => ({
-                title: `Create node ${name}`,
+          task: () =>
+            new TaskList({
+              tasks: nodeOptionsAndNodes.map(([nodeOptions, node]) => ({
+                title: `Create node ${nodeOptions.name}`,
                 task: async () => {
-                  const nodeOptions = {
-                    type,
-                    name,
-                    dataPath: path.resolve(staticOptions.nodesPath, name),
-                    settings,
-                    options,
-                  };
-                  const node = this._createNodeAdapter(
-                    staticOptions,
-                    nodeOptions,
-                  );
-
                   await this._writeNodeOptions(staticOptions, nodeOptions);
                   await node.create();
-                  ctx.nodes.push(node);
                 },
               })),
               concurrent: true,
-            });
-          },
-        },
-        {
-          title: 'Create network',
-          task: ctx => {
-            ctx.resourceAdapter = new this({
-              name: staticOptions.name,
-              binary: staticOptions.binary,
-              dataPath: staticOptions.dataPath,
-              portAllocator: staticOptions.portAllocator,
-              resourceType: staticOptions.resourceType,
-              nodesPath: staticOptions.nodesPath,
-              nodesOptionsPath: staticOptions.nodesOptionsPath,
-              type: ctx.nodeSettings[0][1].type,
-              nodes: ctx.nodes,
-            });
-            ctx.dependencies = [];
-          },
+            }),
         },
       ],
     });

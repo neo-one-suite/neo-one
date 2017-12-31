@@ -36,5 +36,6 @@ export const skipAllTasks = (
       subtasks:
         task.subtasks == null ? undefined : skipAllTasks(task.subtasks, reason),
       skipped: reason,
+      collapse: task.collapse,
     };
   });

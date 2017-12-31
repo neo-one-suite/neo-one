@@ -108,6 +108,8 @@ export default class WalletResourceAdapter {
                 name: networkName,
               },
             ];
+
+            await walletResource.create();
           },
         },
       ],

@@ -38,6 +38,7 @@ export type {
 } from './MasterResourceAdapter';
 export type { CLIHookConfig, CreateHookConfig } from './Plugin';
 export type { MasterResourceAdapterOptions } from './ResourceType';
+export type { TaskContext } from './TaskList';
 export type {
   AllResources,
   BaseResource,

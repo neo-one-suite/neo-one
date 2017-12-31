@@ -42,6 +42,7 @@ export type TaskStatus = {
   skipped?: string | boolean,
   complete?: boolean,
   error?: string,
+  collapse: boolean,
 };
 export type ModifyResourceResponse = {|
   tasks: Array<TaskStatus>,

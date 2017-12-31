@@ -139,7 +139,7 @@ const renderTasks = (
     }
 
     if (
-      (task.pending || task.error != null) &&
+      (task.pending || task.error != null || !task.collapse) &&
       task.subtasks != null &&
       task.subtasks.length > 0
     ) {

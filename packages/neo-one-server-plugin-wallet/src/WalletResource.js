@@ -16,6 +16,7 @@ import {
   type NetworkType as ClientNetworkType,
   createPrivateKey,
   networks,
+  privateKeyToAddress,
   privateKeyToWIF,
   createReadClient,
 } from '@neo-one/client';
@@ -105,6 +106,11 @@ const getNetwork$ = ({
   );
 };
 
+type InitialOptions = {|
+  privateKey: string,
+  password?: string,
+|};
+
 type WalletResourceOptions = {|
   client: WalletClient,
   readClient: ReadWalletClient,
@@ -117,6 +123,7 @@ type WalletResourceOptions = {|
   dataPath: string,
   walletPath: string,
   clientNetworkType: ClientNetworkType,
+  initial?: InitialOptions,
 |};
 
 type NewWalletResourceOptions = {|
@@ -151,6 +158,7 @@ export default class WalletResource {
   _dataPath: string;
   _walletPath: string;
   _clientNetworkType: ClientNetworkType;
+  _initial: ?InitialOptions;
 
   _deleted: boolean;
   _neoBalance: ?string;
@@ -172,6 +180,7 @@ export default class WalletResource {
     dataPath,
     walletPath,
     clientNetworkType,
+    initial,
   }: WalletResourceOptions) {
     this._client = client;
     this._readClient = readClient;
@@ -183,6 +192,7 @@ export default class WalletResource {
     this._dataPath = dataPath;
     this._walletPath = walletPath;
     this._clientNetworkType = clientNetworkType;
+    this._initial = initial;
 
     if (networkName === networkConstants.NETWORK_NAME.MAIN) {
       this._networkType = networkConstants.NETWORK_TYPE.MAIN;
@@ -212,7 +222,7 @@ export default class WalletResource {
     pluginManager,
     resourceType,
     name,
-    privateKey,
+    privateKey: privateKeyIn,
     password,
     dataPath,
   }: NewWalletResourceOptions): Promise<WalletResource> {
@@ -233,17 +243,10 @@ export default class WalletResource {
 
     const readClient = updateClient({ networkName, network, client });
     const clientNetworkType = getClientNetworkType(networkName);
-    const wallet = await client.userAccountProvider.keystore.addAccount({
-      network: clientNetworkType,
-      name: baseName,
-      privateKey: privateKey == null ? createPrivateKey() : privateKey,
-      password,
-    });
-    const { address } = wallet.account;
+    const privateKey = privateKeyIn == null ? createPrivateKey() : privateKeyIn;
+    const address = privateKeyToAddress(privateKey);
 
     const walletPath = this._getWalletPath(dataPath);
-    await fs.ensureDir(path.dirname(walletPath));
-    await fs.writeJSON(walletPath, { address });
 
     const walletResource = new WalletResource({
       client,
@@ -257,6 +260,10 @@ export default class WalletResource {
       dataPath,
       walletPath,
       clientNetworkType,
+      initial: {
+        privateKey,
+        password,
+      },
     });
 
     return walletResource;
@@ -293,6 +300,22 @@ export default class WalletResource {
       walletPath,
       clientNetworkType,
     });
+  }
+
+  async create(): Promise<void> {
+    if (this._initial == null) {
+      throw new Error('Something went wrong.');
+    }
+    const { privateKey, password } = this._initial;
+    await this._client.userAccountProvider.keystore.addAccount({
+      network: this._clientNetworkType,
+      name: this._baseName,
+      privateKey,
+      password,
+    });
+    this._initial = null;
+    await fs.ensureDir(path.dirname(this._walletPath));
+    await fs.writeJSON(this._walletPath, { address: this._address });
   }
 
   async delete(): Promise<void> {

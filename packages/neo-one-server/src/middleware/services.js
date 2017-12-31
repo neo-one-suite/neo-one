@@ -61,6 +61,7 @@ export const middleware = ({
   ): Promise<void> {
     const requests$ = makeObservable(ctx);
     let taskList;
+    let done = false;
     await requests$
       .pipe(
         switchMap((request: TRequest) => {
@@ -83,9 +84,12 @@ export const middleware = ({
           }
         }),
         map((tasks: Array<TaskStatus>) => {
-          ctx.res.write({ tasks: JSON.stringify(tasks) });
-          if (areTasksDone(tasks)) {
-            ctx.res.end();
+          if (!done) {
+            ctx.res.write({ tasks: JSON.stringify(tasks) });
+            if (areTasksDone(tasks)) {
+              done = true;
+              ctx.res.end();
+            }
           }
         }),
       )

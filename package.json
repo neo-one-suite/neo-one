@@ -116,7 +116,8 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "<rootDir>/packages/neo-one-neo-settings/src/test.js",
-      "<rootDir>/migrate/.*"
+      "<rootDir>/migrate/.*",
+      "<rootDir>/packages/neo-one-simulation-ico-tour/template/.*"
     ],
     "snapshotSerializers": [
       "./scripts/serializers/blockchain.js",
