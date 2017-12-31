@@ -50,3 +50,6 @@ flow-coverage/
 
 # OSX Files
 .DS_Store
+
+# Template lock files
+/packages/*/template/yarn.lock
