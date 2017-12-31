@@ -1,0 +1,41 @@
+{
+  "name": "@neo-one/simulation-utils",
+  "version": "0.0.1",
+  "keywords": [
+    "neo",
+    "NEO",
+    "one",
+    "ONE",
+    "blockchain",
+    "neo-one",
+    "neo-one-suite",
+    "neo one",
+    "neo one suite",
+    "NEO ONE",
+    "NEO ONE suite",
+    "NEO•ONE",
+    "NEO•ONE suite",
+    "neo blockchain",
+    "NEO Blockchain",
+    "NEO blockchain",
+    "dapp",
+    "dapps",
+    "simulation",
+    "neo-one simulation",
+    "NEO-ONE simulation",
+    "neo one simulation",
+    "NEO ONE simulation"
+  ],
+  "description": "NEO•ONE Simulation utils.",
+  "repository": "https://github.com/neo-one-suite/neo-one",
+  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/es.js",
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "dependencies": {
+    "cross-spawn": "^5.1.0"
+  }
+}

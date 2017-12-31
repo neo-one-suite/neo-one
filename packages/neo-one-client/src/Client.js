@@ -93,8 +93,8 @@ export default class Client<TUserAccountProvider: UserAccountProvider> {
     return this.userAccountProvider.transfer(transfers, options);
   }
 
-  smartContract(abi: ABI): SmartContract {
-    return createSmartContract({ abi, client: (this: $FlowFixMe) });
+  smartContract(hash: Hash160String, abi: ABI): SmartContract {
+    return createSmartContract({ hash, abi, client: (this: $FlowFixMe) });
   }
 
   // NOTE: This API is subject to change and is not bound by semver.

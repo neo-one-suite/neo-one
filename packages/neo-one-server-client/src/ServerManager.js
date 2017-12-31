@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import { killProcess } from '@neo-one/server-plugin';
 import isRunning from 'is-running';
 import path from 'path';
-import { spawn } from 'child_process';
+import spawn from 'cross-spawn';
 import { utils } from '@neo-one/utils';
 
 import Client from './Client';

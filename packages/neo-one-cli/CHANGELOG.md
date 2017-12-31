@@ -10,3 +10,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Network management plugin
 - Wallet plugin
 - Smart contract compiler plugin
+- Simulation plugin

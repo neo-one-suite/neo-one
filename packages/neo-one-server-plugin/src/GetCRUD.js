@@ -3,27 +3,29 @@ import type { Observable } from 'rxjs/Observable';
 
 import { map } from 'rxjs/operators';
 
-import type { BaseResource, Client, InteractiveCLI } from './types';
+import type {
+  BaseResource,
+  BaseResourceOptions,
+  Client,
+  InteractiveCLI,
+} from './types';
 import CRUDBase from './CRUDBase';
 import type { CLIOption } from './CRUDBase';
 import type ResourceType from './ResourceType';
 
-// flowlint-next-line unclear-type:off
-export type ExecCLIOptions<ResourceOptions: Object> = {|
+export type ExecCLIOptions<ResourceOptions: BaseResourceOptions> = {|
   cli: InteractiveCLI,
   options: ResourceOptions,
 |};
 
-// flowlint-next-line unclear-type:off
-export type GetResources$Options<ResourceOptions: Object> = {|
+export type GetResources$Options<ResourceOptions: BaseResourceOptions> = {|
   client: Client,
   options: ResourceOptions,
 |};
 
 export type GetCRUDOptions<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = {|
   resourceType: ResourceType<Resource, ResourceOptions>,
   help?: string,
@@ -34,8 +36,7 @@ export type GetCRUDOptions<
 
 export default class GetCRUD<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > extends CRUDBase<Resource, ResourceOptions> {
   constructor({
     resourceType,

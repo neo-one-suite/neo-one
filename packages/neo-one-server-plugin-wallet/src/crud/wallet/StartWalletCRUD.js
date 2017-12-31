@@ -5,7 +5,6 @@ import {
   type GetCLINameOptions,
   type GetCLIResourceOptions,
   StartCRUD,
-  compoundName,
 } from '@neo-one/server-plugin';
 
 import type WalletResourceType, {
@@ -67,11 +66,8 @@ export default class StartWalletCRUD extends StartCRUD<
   async postExecCLI({
     name,
     cli,
-    options,
   }: ExecCLIOptions<WalletResourceOptions>): Promise<void> {
-    const { name: originalName } = compoundName.extract(name);
-    await cli.exec(
-      `activate wallet ${originalName} --network ${options.network}`,
-    );
+    const { name: originalName, network } = constants.extractWallet(name);
+    await cli.exec(`activate wallet ${originalName} --network ${network}`);
   }
 }

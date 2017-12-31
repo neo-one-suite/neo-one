@@ -12,8 +12,24 @@ if (debug) {
   );
 }
 
-if (argv.length !== 2) {
-  new CLI({ debug }).start(argv);
+argv = argv.map((arg, idx) => {
+  if (idx === 0) {
+    return arg;
+  }
+
+  if (arg.includes(' ')) {
+    return `"${arg}"`;
+  }
+
+  return arg;
+});
+
+const createSimulation =
+  process.argv[2] === 'create' &&
+  process.argv[3] === 'simulation';
+
+if (createSimulation || argv.length === 2) {
+  new InteractiveCLI({ debug }).start(argv.slice(2));
 } else {
-  new InteractiveCLI({ debug }).start();
+  new CLI({ debug }).start(argv);
 }

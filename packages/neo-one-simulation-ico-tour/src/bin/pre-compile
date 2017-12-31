@@ -1,0 +1,44 @@
+#! /usr/bin/env node
+/* @flow */
+import '@babel/polyfill';
+import fs from 'fs-extra';
+import nunjucks from 'nunjucks';
+import path from 'path';
+
+const nowSeconds = () => Math.round(Date.now() / 1000);
+const LIMITED_ROUND_DURATION = 60 * 60; // 1 hour
+
+const FILE = 'onetoken.py';
+
+const run = async () => {
+  const config = await fs.readJSON('neo-one.json');
+  const templatesDir = config.contractsDir;
+  const env = new nunjucks.Environment(
+    new nunjucks.FileSystemLoader(templatesDir),
+    { throwOnUndefined: true, autoescape: false },
+  );
+  const icoCoinPath = path.resolve(
+    process.cwd(),
+    config.contractsDir,
+    'ico',
+    'coin',
+  );
+  const inputPath = path.resolve(icoCoinPath, `${FILE}.njk`);
+  const relativePath = path.relative(templatesDir, inputPath);
+  const outputPath = path.resolve(icoCoinPath, FILE);
+  const blockSaleStart = nowSeconds();
+  const result = env.render(relativePath, {
+    blockSaleStart,
+    limitedRoundEnd: blockSaleStart + LIMITED_ROUND_DURATION,
+  });
+  await fs.writeFile(outputPath, result);
+  await fs.remove(inputPath);
+};
+
+run().then(() => {
+  process.exit(0);
+}).catch(error => {
+  // eslint-disable-next-line
+  console.log(error.message);
+  process.exit(1);
+})

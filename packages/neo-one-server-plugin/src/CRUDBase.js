@@ -1,5 +1,9 @@
 /* @flow */
-import type { BaseResource, InteractiveCLI } from './types';
+import type {
+  BaseResource,
+  BaseResourceOptions,
+  InteractiveCLI,
+} from './types';
 import type ResourceType from './ResourceType';
 
 export type CLIOption = {|
@@ -24,8 +28,7 @@ export type Names = {|
 
 export type CRUDBaseOptions<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = {|
   // CRUD name
   name: string,
@@ -54,8 +57,7 @@ export type GetCLIResourceOptions = {|
 
 export default class CRUDBase<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > {
   name: string;
   names: Names;

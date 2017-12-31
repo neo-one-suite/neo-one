@@ -704,7 +704,6 @@ export type ABIEvent = {|
   parameters: Array<ABIParameter>,
 |};
 export type ABI = {|
-  hash: Hash160String,
   functions: Array<ABIFunction>,
   events?: Array<ABIEvent>,
 |};

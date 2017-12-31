@@ -82,7 +82,7 @@ declare export default class Client<
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>>;
 
-  smartContract(abi: ABI): SmartContract;
+  smartContract(hash: Hash160String, abi: ABI): SmartContract;
 
   // NOTE: This API is subject to change and is not bound by semver.
   experimental_registerValidator(

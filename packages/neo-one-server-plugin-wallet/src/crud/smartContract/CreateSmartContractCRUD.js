@@ -1,5 +1,4 @@
 /* @flow */
-import type { ContractRegister } from '@neo-one/client';
 import {
   type GetCLIAutocompleteOptions,
   type GetCLINameOptions,
@@ -9,13 +8,12 @@ import {
   name,
 } from '@neo-one/server-plugin';
 
-import { constants as compilerConstants } from '@neo-one/server-plugin-compiler';
 import fs from 'fs-extra';
-import { take } from 'rxjs/operators';
 
 import { ABIRequiredError, ContractOrHashRequiredError } from '../../errors';
 import type SmartContractResourceType, {
   SmartContract,
+  SmartContractRegister,
   SmartContractResourceOptions,
 } from '../../SmartContractResourceType';
 
@@ -80,36 +78,14 @@ export default class CreateSmartContractCRUD extends CreateCRUD<
         throw new ContractOrHashRequiredError(CONTRACT_OR_HASH_MESSAGE);
       }
 
-      const compiledContract = await (cli.client
-        .getResource$({
-          plugin: compilerConstants.PLUGIN,
-          resourceType: compilerConstants.CONTRACT_RESOURCE_TYPE,
-          name: options.contract,
-          options: {},
-        })
-        .pipe(take(1))
-        // flowlint-next-line unclear-type:off
-        .toPromise(): Promise<any>);
-      if (compiledContract == null) {
-        throw new ContractOrHashRequiredError(
-          `Contract ${
-            options.contract
-          } does not exist. ${CONTRACT_OR_HASH_MESSAGE}`,
-        );
-      }
       const register = await this._promptRegister({
         cli,
-        name: compiledContract.baseName,
-        script: compiledContract.script,
-        hasStorage: compiledContract.hasStorage,
-        hasDynamicInvoke: compiledContract.hasDynamicInvoke,
+        name: options.contract,
       });
       contract = {
         name: options.contract,
         register,
       };
-      // eslint-disable-next-line
-      abi = compiledContract.abi;
     } else {
       if (options.abi == null) {
         throw new ABIRequiredError(
@@ -128,16 +104,10 @@ export default class CreateSmartContractCRUD extends CreateCRUD<
   async _promptRegister({
     cli,
     name: nameIn,
-    script,
-    hasStorage,
-    hasDynamicInvoke,
   }: {|
     cli: InteractiveCLI,
     name: string,
-    script: string,
-    hasStorage: boolean,
-    hasDynamicInvoke: boolean,
-  |}): Promise<ContractRegister> {
+  |}): Promise<SmartContractRegister> {
     const {
       contractName,
       codeVersion,
@@ -178,18 +148,11 @@ export default class CreateSmartContractCRUD extends CreateCRUD<
     ]);
 
     return {
-      script,
-      parameters: ['String', 'Array'],
-      returnType: 'ByteArray',
       name: contractName,
       codeVersion,
       author,
       email,
       description,
-      properties: {
-        storage: hasStorage,
-        dynamicInvoke: hasDynamicInvoke,
-      },
     };
   }
 }

@@ -1,15 +1,18 @@
 /* @flow */
 import type { Observable } from 'rxjs/Observable';
 
-import type { BaseResource, ModifyResourceResponse } from './types';
+import type {
+  BaseResource,
+  BaseResourceOptions,
+  ModifyResourceResponse,
+} from './types';
 import type { CLIOption } from './CRUDBase';
 import CRUDResource, { type Request$Options } from './CRUDResource';
 import type ResourceType from './ResourceType';
 
 export type StartCRUDOptions<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = {|
   name?: string,
   resourceType: ResourceType<Resource, ResourceOptions>,
@@ -21,8 +24,7 @@ export type StartCRUDOptions<
 
 export default class StartCRUD<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > extends CRUDResource<Resource, ResourceOptions> {
   constructor({
     name: nameIn,

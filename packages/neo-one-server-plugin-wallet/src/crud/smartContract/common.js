@@ -2,22 +2,25 @@
 import {
   type GetCLINameOptions,
   type GetCLIResourceOptions,
-  compoundName,
 } from '@neo-one/server-plugin';
 
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 
+import { NetworkRequiredError } from '../../errors';
 import type { SmartContractResourceOptions } from '../../SmartContractResourceType';
 
 import constants from '../../constants';
 
 const getCLIName = ({
   baseName,
-  options,
-}: GetCLINameOptions<SmartContractResourceOptions>): Promise<string> =>
-  Promise.resolve(
-    compoundName.make({ name: baseName, names: [options.network] }),
-  );
+  options: { network },
+}: GetCLINameOptions<SmartContractResourceOptions>): Promise<string> => {
+  if (network == null) {
+    throw new NetworkRequiredError();
+  }
+
+  return Promise.resolve(constants.makeWallet({ name: baseName, network }));
+};
 
 const getNetworkName = async ({ cli, options }: GetCLIResourceOptions) => {
   const { network: networkName } = options;

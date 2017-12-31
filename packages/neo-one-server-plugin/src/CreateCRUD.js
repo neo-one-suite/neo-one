@@ -1,7 +1,11 @@
 /* @flow */
 import type { Observable } from 'rxjs/Observable';
 
-import type { BaseResource, ModifyResourceResponse } from './types';
+import type {
+  BaseResource,
+  BaseResourceOptions,
+  ModifyResourceResponse,
+} from './types';
 import type { CLIOption } from './CRUDBase';
 import CRUDResource, { type Request$Options } from './CRUDResource';
 import type { GetCLIAutocompleteOptions } from './CRUDResourceBase';
@@ -9,8 +13,7 @@ import type ResourceType from './ResourceType';
 
 export type CreateCRUDOptions<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = {|
   resourceType: ResourceType<Resource, ResourceOptions>,
   name?: string,
@@ -24,8 +27,7 @@ export type CreateCRUDOptions<
 
 export default class CreateCRUD<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > extends CRUDResource<Resource, ResourceOptions> {
   startOnCreate: boolean;
 

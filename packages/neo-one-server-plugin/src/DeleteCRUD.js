@@ -1,15 +1,18 @@
 /* @flow */
 import type { Observable } from 'rxjs/Observable';
 
-import type { BaseResource, ModifyResourceResponse } from './types';
+import type {
+  BaseResource,
+  BaseResourceOptions,
+  ModifyResourceResponse,
+} from './types';
 import type { CLIOption } from './CRUDBase';
 import CRUDResource, { type Request$Options } from './CRUDResource';
 import type ResourceType from './ResourceType';
 
 export type DeleteCRUDOptions<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = {|
   resourceType: ResourceType<Resource, ResourceOptions>,
   help?: string,
@@ -20,8 +23,7 @@ export type DeleteCRUDOptions<
 
 export default class DeleteCRUD<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > extends CRUDResource<Resource, ResourceOptions> {
   constructor({
     resourceType,

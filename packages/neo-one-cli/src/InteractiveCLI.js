@@ -158,7 +158,7 @@ export default class InteractiveCLI {
     }
   }
 
-  async start(): Promise<void> {
+  async start(argv: Array<string>): Promise<void> {
     const {
       log,
       config$: logConfig$,
@@ -242,20 +242,9 @@ export default class InteractiveCLI {
         1,
       ),
       switchMap(() =>
-        this.client.getPlugins$().pipe(
-          map(pluginName => {
-            if (this._plugins[pluginName] == null) {
-              this._plugins[pluginName] = pluginsUtil.getPlugin({
-                log,
-                pluginName,
-              });
-              createPlugin({
-                cli: this,
-                plugin: this._plugins[pluginName],
-              });
-            }
-          }),
-        ),
+        this.client
+          .getPlugins$()
+          .pipe(map(pluginName => this._registerPlugin(log, pluginName))),
       ),
       publishReplay(1),
       refCount(),
@@ -278,11 +267,30 @@ export default class InteractiveCLI {
     });
     shutdownFuncs.push(() => subscription.unsubscribe());
     await start$.pipe(take(1)).toPromise();
+    const plugins = await this.client.getAllPlugins();
+    plugins.forEach(plugin => this._registerPlugin(log, plugin));
 
     if (!isShutdown) {
       commands.forEach(command => command(this));
       this.resetDelimiter();
       this.vorpal.history(name.cli).show();
+
+      if (argv.length > 0) {
+        await this.vorpal.execSync(argv.join(' '));
+      }
+    }
+  }
+
+  _registerPlugin(log: Log, pluginName: string): void {
+    if (this._plugins[pluginName] == null) {
+      this._plugins[pluginName] = pluginsUtil.getPlugin({
+        log,
+        pluginName,
+      });
+      createPlugin({
+        cli: this,
+        plugin: this._plugins[pluginName],
+      });
     }
   }
 

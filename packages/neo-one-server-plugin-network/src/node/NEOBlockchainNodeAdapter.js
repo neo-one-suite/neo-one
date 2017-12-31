@@ -1,6 +1,6 @@
 /* @flow */
 // flowlint untyped-import:off
-import { type ChildProcess, spawn } from 'child_process';
+import { type ChildProcess } from 'child_process';
 import {
   type Binary,
   type DescribeTable,
@@ -15,6 +15,7 @@ import _ from 'lodash';
 import fetch from 'node-fetch';
 import fs from 'fs-extra';
 import path from 'path';
+import spawn from 'cross-spawn';
 import { take } from 'rxjs/operators';
 
 import NodeAdapter, { type NodeStatus } from './NodeAdapter';

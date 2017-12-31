@@ -78,9 +78,10 @@ export default class ReadClient<TDataProvider: DataProvider> {
     return this.dataProvider.getValidators();
   }
 
-  smartContract(abi: ABI): ReadSmartContract {
+  smartContract(hash: Hash160String, abi: ABI): ReadSmartContract {
+    args.assertHash160(hash);
     args.assertABI(abi);
-    return createReadSmartContract({ abi, client: (this: $FlowFixMe) });
+    return createReadSmartContract({ hash, abi, client: (this: $FlowFixMe) });
   }
 
   _getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem> {

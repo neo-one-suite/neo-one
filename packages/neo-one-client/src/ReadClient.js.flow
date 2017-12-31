@@ -42,7 +42,7 @@ declare export default class ReadClient<TDataProvider: DataProvider> {
 
   getValidators(): Promise<Array<Validator>>;
 
-  smartContract(abi: ABI): ReadSmartContract;
+  smartContract(hash: Hash160String, abi: ABI): ReadSmartContract;
 
   _getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem>;
   _iterStorage(hash: Hash160String): AsyncIterable<StorageItem>;

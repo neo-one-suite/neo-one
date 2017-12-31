@@ -161,10 +161,12 @@ const filterLogs = (actions: Array<Event | Log>): Array<Log> =>
     .filter(Boolean);
 
 const createInvoke = ({
+  hash,
   abi,
   client,
   func: { name, parameters, returnType },
 }: {|
+  hash: Hash160String,
   abi: ABI,
   client: Client<*>,
   func: ABIFunction,
@@ -177,7 +179,7 @@ const createInvoke = ({
     args,
   });
   const result = await client._invoke(
-    abi.hash,
+    hash,
     name,
     params,
     paramsZipped,
@@ -204,9 +206,11 @@ const createInvoke = ({
 };
 
 export default ({
+  hash,
   abi,
   client,
 }: {|
+  hash: Hash160String,
   abi: ABI,
   client: Client<*>,
 |}): SmartContract => {
@@ -215,12 +219,13 @@ export default ({
   abi.functions.forEach(func => {
     if (func.constant) {
       smartContract[func.name] = createCall({
-        hash: abi.hash,
+        hash,
         client,
         func,
       });
     } else {
       smartContract[func.name] = createInvoke({
+        hash,
         abi,
         client,
         func,

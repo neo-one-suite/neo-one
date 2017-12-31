@@ -395,7 +395,7 @@ export default class WalletResource {
       unlocked: this.unlocked,
       neoBalance: this._neoBalance == null ? 'Unknown' : this._neoBalance,
       gasBalance: this._gasBalance == null ? 'Unknown' : this._gasBalance,
-      privateKey: this.wif,
+      wif: this.wif,
       nep2: this.wallet.nep2,
       publicKey: this.wallet.account.publicKey,
       scriptHash: this.wallet.account.scriptHash,

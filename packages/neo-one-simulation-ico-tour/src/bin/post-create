@@ -1,0 +1,12 @@
+#! /usr/bin/env node
+/* @flow */
+import '@babel/polyfill';
+import { npm } from '@neo-one/simulation-utils';
+
+npm.install().then(() => {
+  process.exit(0);
+}).catch(error => {
+  // eslint-disable-next-line
+  console.error(error.message);
+  process.exit(1);
+})

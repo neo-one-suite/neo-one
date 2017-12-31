@@ -36,8 +36,8 @@ export type Contract = {|
 export type ContractResourceOptions = {|
   scPath?: string,
   abi?: ABI,
-  hasStorage: boolean,
-  hasDynamicInvoke: boolean,
+  hasStorage?: boolean,
+  hasDynamicInvoke?: boolean,
 |};
 
 export default class ContractResourceType extends ResourceType<

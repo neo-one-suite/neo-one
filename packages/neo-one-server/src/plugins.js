@@ -6,6 +6,7 @@ const DEFAULT_PLUGINS = [
   '@neo-one/server-plugin-network',
   '@neo-one/server-plugin-wallet',
   '@neo-one/server-plugin-compiler',
+  '@neo-one/server-plugin-simulation',
 ];
 
 const getPlugin = ({

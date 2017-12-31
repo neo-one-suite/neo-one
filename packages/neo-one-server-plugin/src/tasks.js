@@ -8,7 +8,7 @@ export const getTaskError = (task: TaskStatus): ?string =>
     : task.error;
 
 export const getTasksError = (tasks: Array<TaskStatus>): ?string =>
-  tasks.map(task => getTaskError(task)).filter(Boolean)[0];
+  tasks.map(task => getTaskError(task)).filter(value => value != null)[0];
 
 export const isTaskDone = (task: TaskStatus): boolean =>
   getTaskError(task) != null || task.skipped != null || task.complete === true;

@@ -6,13 +6,12 @@ import DeleteCRUD from './DeleteCRUD';
 import CreateCRUD from './CreateCRUD';
 import DescribeCRUD from './DescribeCRUD';
 
-import type { BaseResource } from './types';
+import type { BaseResource, BaseResourceOptions } from './types';
 import type ResourceType from './ResourceType';
 
 export type CRUDOptions<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = {|
   resourceType: ResourceType<Resource, ResourceOptions>,
   start?: ?StartCRUD<Resource, ResourceOptions>,
@@ -25,8 +24,7 @@ export type CRUDOptions<
 
 export default class CRUD<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > {
   resourceType: ResourceType<Resource, ResourceOptions>;
   start: ?StartCRUD<Resource, ResourceOptions>;

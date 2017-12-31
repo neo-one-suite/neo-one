@@ -1,5 +1,5 @@
 /* @flow */
-import type { ABI, ContractRegister } from '@neo-one/client';
+import type { ABI } from '@neo-one/client';
 import {
   type DescribeTable,
   type ListTable,
@@ -34,13 +34,20 @@ export type SmartContract = {|
   hash: string,
   abi: ABI,
 |};
+export type SmartContractRegister = {|
+  name: string,
+  codeVersion: string,
+  author: string,
+  email: string,
+  description: string,
+|};
 export type SmartContractResourceOptions = {|
-  network: string,
+  network?: string,
   wallet?: string,
   abi?: ABI,
   contract?: {|
     name: string,
-    register: ContractRegister,
+    register: SmartContractRegister,
   |},
   hash?: string,
 |};

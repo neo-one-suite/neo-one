@@ -1,6 +1,6 @@
 /* @flow */
 // flowlint untyped-import:off
-import { type ABI, type ContractRegister } from '@neo-one/client';
+import { type ABI } from '@neo-one/client';
 import {
   type DescribeTable,
   type PluginManager,
@@ -9,7 +9,8 @@ import {
 import type { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 
-import { map, shareReplay } from 'rxjs/operators';
+import { constants as compilerConstants } from '@neo-one/server-plugin-compiler';
+import { map, shareReplay, take } from 'rxjs/operators';
 import fs from 'fs-extra';
 import path from 'path';
 import { utils } from '@neo-one/utils';
@@ -21,6 +22,7 @@ import {
 } from './errors';
 import type SmartContractResourceType, {
   SmartContract,
+  SmartContractRegister,
 } from './SmartContractResourceType';
 
 import { getWallet } from './utils';
@@ -45,7 +47,7 @@ type NewSmartContractResourceOptions = {|
   abi?: ABI,
   contract?: {|
     name: string,
-    register: ContractRegister,
+    register: SmartContractRegister,
   |},
   hash?: string,
   wallet?: string,
@@ -111,7 +113,7 @@ export default class SmartContractResource {
     pluginManager,
     resourceType,
     name,
-    abi,
+    abi: abiIn,
     contract,
     hash: hashIn,
     wallet: walletName,
@@ -120,9 +122,7 @@ export default class SmartContractResource {
     const { name: baseName, names: [networkName] } = compoundName.extract(name);
 
     let hash = hashIn;
-    if (abi == null) {
-      throw new ABIRequiredError();
-    }
+    let abi = abiIn;
 
     let contractName;
     if (contract != null) {
@@ -130,14 +130,48 @@ export default class SmartContractResource {
         throw new WalletRequiredError();
       }
 
+      const compiledContract = await (pluginManager
+        .getResourcesManager({
+          plugin: compilerConstants.PLUGIN,
+          resourceType: compilerConstants.CONTRACT_RESOURCE_TYPE,
+        })
+        .getResource$({
+          name: contract.name,
+          options: {},
+        })
+        .pipe(take(1))
+        // flowlint-next-line unclear-type:off
+        .toPromise(): Promise<any>);
+      if (compiledContract == null) {
+        throw new ContractOrHashRequiredError(
+          `Contract ${contract.name} does not exist.`,
+        );
+      }
+
       const { client, wallet } = await getWallet({
         pluginManager,
         walletName,
       });
 
-      const result = await client.publish(contract.register, {
-        from: wallet.address,
-      });
+      const result = await client.publish(
+        {
+          script: compiledContract.script,
+          parameters: ['String', 'Array'],
+          returnType: 'ByteArray',
+          name: contract.register.name,
+          codeVersion: contract.register.codeVersion,
+          author: contract.register.author,
+          email: contract.register.email,
+          description: contract.register.description,
+          properties: {
+            storage: compiledContract.hasStorage,
+            dynamicInvoke: compiledContract.hasDynamicInvoke,
+          },
+        },
+        {
+          from: wallet.address,
+        },
+      );
       const receipt = await result.confirmed();
       if (receipt.result.state === 'HALT') {
         // eslint-disable-next-line
@@ -147,9 +181,15 @@ export default class SmartContractResource {
       }
 
       contractName = contract.name;
+      // eslint-disable-next-line
+      abi = compiledContract.abi;
     } else {
       if (hashIn == null) {
         throw new ContractOrHashRequiredError();
+      }
+
+      if (abi == null) {
+        throw new ABIRequiredError();
       }
 
       hash = hashIn;

@@ -41,14 +41,14 @@ export type Wallet = {|
   unlocked: boolean,
   neoBalance: string,
   gasBalance: string,
-  privateKey: ?string,
+  wif: ?string,
   nep2: ?string,
   publicKey: string,
   scriptHash: string,
   balance: Array<Coin>,
 |};
 export type WalletResourceOptions = {|
-  network: string,
+  network?: string,
   password?: string,
   privateKey?: string,
 |};
@@ -120,10 +120,7 @@ export default class WalletResourceType extends ResourceType<
       ['Network', resource.network],
       ['Name', resource.baseName],
       ['Unlocked', resource.unlocked ? 'Yes' : 'No'],
-      [
-        'Private Key',
-        resource.privateKey == null ? 'Locked' : resource.privateKey,
-      ],
+      ['Private Key', resource.wif == null ? 'Locked' : resource.wif],
       resource.nep2 == null ? null : ['NEP2', resource.nep2],
       ['Public Key', resource.publicKey],
       ['Address', resource.address],

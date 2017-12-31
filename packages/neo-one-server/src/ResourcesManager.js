@@ -17,6 +17,7 @@ import type { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import type { Subject } from 'rxjs/Subject';
 
+import _ from 'lodash';
 import { map, shareReplay, switchMap } from 'rxjs/operators';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import fs from 'fs-extra';
@@ -29,6 +30,7 @@ import { ResourceNoStartError, ResourceNoStopError } from './errors';
 
 const RESOURCES_PATH = 'resources';
 const RESOURCES_READY_PATH = 'ready';
+const DIRECT_DEPENDENTS_PATH = 'dependents';
 const DEPENDENCIES_PATH = 'dependencies';
 
 type ResourceAdapters<
@@ -60,11 +62,13 @@ export default class ResourcesManager<
   _portAllocator: PortAllocator;
   _plugin: Plugin;
   _resourceAdapters: ResourceAdapters<Resource, ResourceOptions>;
+  _directResourceDependents: { [name: string]: Array<ResourceDependency> };
   _resourceDependents: { [name: string]: Array<ResourceDependency> };
   _createHooks: Array<CreateHook>;
 
   _resourcesPath: string;
   _resourcesReady: Ready;
+  _directDependentsPath: string;
   _dependenciesPath: string;
 
   _createTaskList: TaskLists;
@@ -100,6 +104,7 @@ export default class ResourcesManager<
     this._portAllocator = portAllocator;
     this._plugin = this.resourceType.plugin;
     this._resourceAdapters = {};
+    this._directResourceDependents = {};
     this._resourceDependents = {};
     this._createHooks = [];
 
@@ -107,6 +112,7 @@ export default class ResourcesManager<
     this._resourcesReady = new Ready({
       dir: path.resolve(dataPath, RESOURCES_READY_PATH),
     });
+    this._directDependentsPath = path.resolve(dataPath, DIRECT_DEPENDENTS_PATH);
     this._dependenciesPath = path.resolve(dataPath, DEPENDENCIES_PATH);
 
     this._createTaskList = {};
@@ -143,6 +149,7 @@ export default class ResourcesManager<
         await Promise.all([
           fs.ensureDir(this._resourcesPath),
           fs.ensureDir(this._resourcesReady.dir),
+          fs.ensureDir(this._directDependentsPath),
           fs.ensureDir(this._dependenciesPath),
         ]);
         const resources = await this._resourcesReady.getAll();
@@ -164,23 +171,12 @@ export default class ResourcesManager<
           resources.map(async (name: string): Promise<?InitError> => {
             try {
               // eslint-disable-next-line
-              const [_, dependencies] = await Promise.all([
+              const [_, dependencies, dependents] = await Promise.all([
                 this._init(name),
-                (async () => {
-                  try {
-                    const deps = await fs.readJSON(
-                      this._getDependenciesPath(name),
-                    );
-                    return deps;
-                  } catch (error) {
-                    if (error.code === 'ENOENT') {
-                      return [];
-                    }
-
-                    throw error;
-                  }
-                })(),
+                this._readDeps(this._getDependenciesPath(name)),
+                this._readDeps(this._getDirectDependentsPath(name)),
               ]);
+              this._directResourceDependents[name] = dependents;
               this._addDependents({ name, dependencies });
               return null;
             } catch (error) {
@@ -198,6 +194,19 @@ export default class ResourcesManager<
     );
 
     return result;
+  }
+
+  async _readDeps(depsPath: string): Promise<Array<ResourceDependency>> {
+    try {
+      const deps = await fs.readJSON(depsPath);
+      return deps;
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return [];
+      }
+
+      throw error;
+    }
   }
 
   async destroy(): Promise<void> {
@@ -263,101 +272,118 @@ export default class ResourcesManager<
     });
 
     const { create, start } = this.resourceType.getCRUD();
-    if (this._createTaskList[name] == null) {
-      const resourceAdapter = this._resourceAdapters[name];
-      const skip = () => resourceAdapter != null;
+    const shouldSkip = this._createTaskList[name] != null;
+    const resourceAdapter = this._resourceAdapters[name];
+    const skip = () => shouldSkip || resourceAdapter != null;
+    const mainSkip = () => {
+      if (shouldSkip) {
+        return `${this.resourceType.names.capital} ${this._getSimpleName(
+          name,
+        )} is already being ${create.names.ed}.`;
+      }
 
-      let startTask = null;
-      if (start != null) {
-        startTask = {
-          title: `${start.names.upper} ${
+      if (resourceAdapter != null) {
+        return `${this.resourceType.names.capital} ${this._getSimpleName(
+          name,
+        )} already exists.`;
+      }
+
+      return false;
+    };
+
+    let startTask = null;
+    if (start != null) {
+      startTask = {
+        title: `${start.names.upper} ${
+          this.resourceType.names.lower
+        } ${this._getSimpleName(name)}`,
+        skip,
+        enabled: () => create.startOnCreate,
+        task: () => this.start(name, options),
+      };
+    }
+    const createTaskList = new TaskList({
+      freshContext: true,
+      tasks: [
+        {
+          title: `${create.names.upper} ${
             this.resourceType.names.lower
           } ${this._getSimpleName(name)}`,
+          skip: mainSkip,
+          task: () =>
+            this.masterResourceAdapter.createResourceAdapter(
+              {
+                name,
+                dataPath: path.resolve(this._resourcesPath, name),
+              },
+              options,
+            ),
+        },
+        {
+          title: 'Execute final setup',
           skip,
-          enabled: () => create.startOnCreate,
-          task: () => this.start(name, options),
-        };
-      }
-      this._createTaskList[name] = new TaskList({
-        tasks: [
-          {
-            title: `${create.names.upper} ${
-              this.resourceType.names.lower
-            } ${this._getSimpleName(name)}`,
-            skip: () =>
-              resourceAdapter != null
-                ? `${this.resourceType.names.capital} ${this._getSimpleName(
-                    name,
-                  )} already exists.`
-                : false,
-            task: () =>
-              this.masterResourceAdapter.createResourceAdapter(
-                {
+          task: async ctx => {
+            this._resourceAdapters[name] = ctx.resourceAdapter;
+            const dependencies = ctx.dependencies || [];
+            const dependents = ctx.dependents || [];
+            await Promise.all([
+              this._resourcesReady.write(name),
+              fs.writeJSON(this._getDependenciesPath(name), dependencies),
+              fs.writeJSON(this._getDirectDependentsPath(name), dependents),
+            ]);
+            this._directResourceDependents[name] = dependents;
+            this._addDependents({ name, dependencies });
+            this._update$.next();
+          },
+        },
+        startTask,
+        {
+          title: 'Execute plugin hooks',
+          skip,
+          enabled: () => this._createHooks.length > 0,
+          task: () =>
+            new TaskList({
+              tasks: this._createHooks.map(hook =>
+                hook({
                   name,
-                  dataPath: path.resolve(this._resourcesPath, name),
-                },
-                options,
+                  options,
+                  pluginManager: this._pluginManager,
+                }),
               ),
-          },
-          {
-            title: 'Execute final setup',
-            skip,
-            task: async ctx => {
-              this._resourceAdapters[name] = ctx.resourceAdapter;
-              await Promise.all([
-                this._resourcesReady.write(name),
-                fs.writeJSON(this._getDependenciesPath(name), ctx.dependencies),
-              ]);
-              this._addDependents({ name, dependencies: ctx.dependencies });
-              this._update$.next();
-            },
-          },
-          startTask,
-          {
-            title: 'Execute plugin hooks',
-            skip,
-            enabled: () => this._createHooks.length > 0,
-            task: () =>
-              new TaskList({
-                tasks: this._createHooks.map(hook =>
-                  hook({
-                    name,
-                    options,
-                    pluginManager: this._pluginManager,
-                  }),
-                ),
-                concurrent: true,
-              }),
-          },
-        ].filter(Boolean),
-        onError: error => {
-          this._log({
-            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_ERROR',
-            plugin: this._plugin.name,
-            resourceType: this.resourceType.name,
-            name,
-            error,
-          });
+              concurrent: true,
+            }),
+        },
+      ].filter(Boolean),
+      onError: error => {
+        this._log({
+          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_ERROR',
+          plugin: this._plugin.name,
+          resourceType: this.resourceType.name,
+          name,
+          error,
+        });
 
-          this.delete(name, options)
-            .toPromise()
-            .catch(() => {});
-        },
-        onComplete: () => {
-          this._log({
-            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_COMPLETE',
-            plugin: this._plugin.name,
-            resourceType: this.resourceType.name,
-            name,
-          });
-        },
-        onDone: () => {
-          delete this._createTaskList[name];
-        },
-      });
+        this.delete(name, options)
+          .toPromise()
+          .catch(() => {});
+      },
+      onComplete: () => {
+        this._log({
+          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_COMPLETE',
+          plugin: this._plugin.name,
+          resourceType: this.resourceType.name,
+          name,
+        });
+      },
+      onDone: () => {
+        delete this._createTaskList[name];
+      },
+    });
+    if (!shouldSkip) {
+      this._createTaskList[name] = createTaskList;
     }
 
-    return this._createTaskList[name];
+    return createTaskList;
   }
 
   delete(name: string, options: ResourceOptions): TaskList {
@@ -368,126 +394,144 @@ export default class ResourcesManager<
       name,
     });
 
-    if (this._deleteTaskList[name] == null) {
-      const { create, start, stop, delete: del } = this.resourceType.getCRUD();
-      const startTaskList = this._startTaskList[name];
-      const startStopTasks = [];
-      if (start != null) {
-        startStopTasks.push({
-          title: `Abort ${start.names.ing} ${
-            this.resourceType.names.lower
-          } ${this._getSimpleName(name)}`,
-          enabled: () => startTaskList != null,
-          task: () => startTaskList.abort(),
-        });
-      }
-      if (stop != null) {
-        startStopTasks.push({
-          title: `${stop.names.upper} ${
-            this.resourceType.names.lower
-          } ${this._getSimpleName(name)}`,
-          enabled: () => this._resourceAdaptersStarted[name],
-          task: () => this.stop(name, options),
-        });
-      }
-      const createTaskList = this._createTaskList[name];
-      const resourceAdapter = this._resourceAdapters[name];
-      const skip = () => resourceAdapter == null;
-      const dependents = this._resourceDependents[name];
-      this._deleteTaskList[name] = new TaskList({
-        tasks: [
-          {
-            title: `Abort ${create.names.ing} ${
-              this.resourceType.names.lower
-            } ${this._getSimpleName(name)}`,
-            enabled: () => createTaskList != null,
-            task: () => createTaskList.abort(),
-          },
-        ]
-          .concat(startStopTasks)
-          .concat([
-            {
-              title: 'Delete dependent resources',
-              enabled: () => dependents != null && dependents.length > 0,
-              skip,
-              task: () =>
-                new TaskList({
-                  tasks: dependents.map(
-                    ({ plugin, resourceType, name: dependentName }) => {
-                      const manager = this._pluginManager.getResourcesManager({
-                        plugin,
-                        resourceType,
-                      });
-                      const dependentResourceType = manager.resourceType;
-
-                      return {
-                        title: `${
-                          dependentResourceType.getCRUD().delete.names.upper
-                        } ${
-                          dependentResourceType.names.lower
-                        } ${this._getSimpleName(dependentName)}`,
-                        task: () => manager.delete(dependentName, {}),
-                      };
-                    },
-                  ),
-                  concurrent: true,
-                }),
-            },
-            {
-              title: `${del.names.upper} ${
-                this.resourceType.names.lower
-              } ${this._getSimpleName(name)}`,
-              skip: () =>
-                resourceAdapter == null
-                  ? `${this.resourceType.names.capital} ${this._getSimpleName(
-                      name,
-                    )} does not exist.`
-                  : false,
-              task: () => resourceAdapter.delete(options),
-            },
-            {
-              title: 'Execute final cleanup',
-              skip,
-              task: async () => {
-                await this._destroy(name, resourceAdapter);
-                this._portAllocator.releasePort({
-                  plugin: this._plugin.name,
-                  resourceType: this.resourceType.name,
-                  resource: name,
-                });
-                await Promise.all([
-                  this._resourcesReady.delete(name),
-                  fs.remove(this._getDependenciesPath(name)),
-                ]);
-                delete this._resourceDependents[name];
-              },
-            },
-          ]),
-        onError: error => {
-          this._log({
-            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE_ERROR',
-            plugin: this._plugin.name,
-            resourceType: this.resourceType.name,
-            name,
-            error,
-          });
-        },
-        onComplete: () => {
-          this._log({
-            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE_COMPLETE',
-            plugin: this._plugin.name,
-            resourceType: this.resourceType.name,
-            name,
-          });
-        },
-        onDone: () => {
-          delete this._deleteTaskList[name];
-          this._update$.next();
-        },
+    const shouldSkip = this._deleteTaskList[name] != null;
+    const { create, start, stop, delete: del } = this.resourceType.getCRUD();
+    const startTaskList = this._startTaskList[name];
+    const startStopTasks = [];
+    if (start != null) {
+      startStopTasks.push({
+        title: `Abort ${start.names.ing} ${
+          this.resourceType.names.lower
+        } ${this._getSimpleName(name)}`,
+        enabled: () => startTaskList != null,
+        task: () => startTaskList.abort(),
       });
     }
+    if (stop != null) {
+      startStopTasks.push({
+        title: `${stop.names.upper} ${
+          this.resourceType.names.lower
+        } ${this._getSimpleName(name)}`,
+        enabled: () => this._resourceAdaptersStarted[name],
+        task: () => this.stop(name, options),
+      });
+    }
+    const createTaskList = this._createTaskList[name];
+    const resourceAdapter = this._resourceAdapters[name];
+    const skip = () => shouldSkip || resourceAdapter == null;
+    const mainSkip = () => {
+      if (shouldSkip) {
+        return `${this.resourceType.names.capital} ${this._getSimpleName(
+          name,
+        )} is already being ${del.names.ed}.`;
+      }
 
-    return this._deleteTaskList[name];
+      if (resourceAdapter == null) {
+        return `${this.resourceType.names.capital} ${this._getSimpleName(
+          name,
+        )} does not exist.`;
+      }
+
+      return false;
+    };
+    const dependents = this._uniqueDeps(
+      (this._resourceDependents[name] || []).concat(
+        this._directResourceDependents[name] || [],
+      ),
+    );
+    const deleteTaskList = new TaskList({
+      freshContext: true,
+      tasks: [
+        {
+          title: `Abort ${create.names.ing} ${
+            this.resourceType.names.lower
+          } ${this._getSimpleName(name)}`,
+          enabled: () => createTaskList != null,
+          task: () => createTaskList.abort(),
+        },
+      ]
+        .concat(startStopTasks)
+        .concat([
+          {
+            title: 'Delete dependent resources',
+            enabled: () => dependents.length > 0,
+            skip,
+            task: () => this._deleteDeps(dependents),
+          },
+          {
+            title: `${del.names.upper} ${
+              this.resourceType.names.lower
+            } ${this._getSimpleName(name)}`,
+            skip,
+            task: () => resourceAdapter.delete(options),
+          },
+          {
+            title: 'Execute final cleanup',
+            skip: mainSkip,
+            task: async () => {
+              await this._destroy(name, resourceAdapter);
+              this._portAllocator.releasePort({
+                plugin: this._plugin.name,
+                resourceType: this.resourceType.name,
+                resource: name,
+              });
+              await Promise.all([
+                this._resourcesReady.delete(name),
+                fs.remove(this._getDependenciesPath(name)),
+                fs.remove(this._getDirectDependentsPath(name)),
+              ]);
+              delete this._resourceDependents[name];
+              delete this._directResourceDependents[name];
+            },
+          },
+        ]),
+      onError: error => {
+        this._log({
+          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE_ERROR',
+          plugin: this._plugin.name,
+          resourceType: this.resourceType.name,
+          name,
+          error,
+        });
+      },
+      onComplete: () => {
+        this._log({
+          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE_COMPLETE',
+          plugin: this._plugin.name,
+          resourceType: this.resourceType.name,
+          name,
+        });
+      },
+      onDone: () => {
+        delete this._deleteTaskList[name];
+        this._update$.next();
+      },
+    });
+    if (!shouldSkip) {
+      this._deleteTaskList[name] = deleteTaskList;
+    }
+
+    return deleteTaskList;
+  }
+
+  _deleteDeps(deps: Array<ResourceDependency>): TaskList {
+    return new TaskList({
+      tasks: deps.map(({ plugin, resourceType, name: dependentName }) => {
+        const manager = this._pluginManager.getResourcesManager({
+          plugin,
+          resourceType,
+        });
+        const dependentResourceType = manager.resourceType;
+
+        return {
+          title: `${dependentResourceType.getCRUD().delete.names.upper} ${
+            dependentResourceType.names.lower
+          } ${this._getSimpleName(dependentName)}`,
+          task: () => manager.delete(dependentName, {}),
+        };
+      }),
+      concurrent: true,
+    });
   }
 
   start(name: string, options: ResourceOptions): TaskList {
@@ -512,76 +556,130 @@ export default class ResourcesManager<
       });
     }
 
-    if (this._startTaskList[name] == null) {
-      const stopTaskList = this._stopTaskList[name];
-      const resourceAdapter = this._resourceAdapters[name];
-      const started = this._resourceAdaptersStarted[name];
-      this._startTaskList[name] = new TaskList({
-        tasks: [
-          {
-            title: `Abort ${stop.names.ing} ${
-              this.resourceType.names.lower
-            } ${this._getSimpleName(name)}`,
-            enabled: () => stopTaskList != null,
-            task: () => stopTaskList.abort(),
-          },
-          {
-            title: `${start.names.upper} ${
-              this.resourceType.names.lower
-            } ${this._getSimpleName(name)}`,
-            skip: () => {
-              if (resourceAdapter == null) {
-                return (
-                  `${this.resourceType.names.capital} ${this._getSimpleName(
-                    name,
-                  )} does not exist. ` +
-                  `Try ${create.names.ing} it first. From the command line: ` +
-                  `${create.name} ${this.resourceType.name} <name>`
-                );
-              }
+    const shouldSkip = this._startTaskList[name] != null;
+    const stopTaskList = this._stopTaskList[name];
+    const resourceAdapter = this._resourceAdapters[name];
+    const started = this._resourceAdaptersStarted[name];
+    const directDependents = this._getStartDeps(
+      this._directResourceDependents[name],
+    );
+    const startTaskList = new TaskList({
+      freshContext: true,
+      tasks: [
+        {
+          title: `Abort ${stop.names.ing} ${
+            this.resourceType.names.lower
+          } ${this._getSimpleName(name)}`,
+          skip: () => shouldSkip,
+          enabled: () => stopTaskList != null,
+          task: () => stopTaskList.abort(),
+        },
+        {
+          title: 'Start created resources',
+          enabled: () => directDependents.length > 0,
+          skip: () => shouldSkip || resourceAdapter == null || started,
+          task: () => this._startDeps(directDependents),
+        },
+        {
+          title: `${start.names.upper} ${
+            this.resourceType.names.lower
+          } ${this._getSimpleName(name)}`,
+          skip: () => {
+            if (shouldSkip) {
+              return `${this.resourceType.names.capital} ${this._getSimpleName(
+                name,
+              )} is already being ${start.names.ed}.`;
+            }
 
-              if (started) {
-                return `${
-                  this.resourceType.names.capital
-                } ${this._getSimpleName(name)} has already been ${
-                  start.names.ed
-                }`;
-              }
+            if (resourceAdapter == null) {
+              return (
+                `${this.resourceType.names.capital} ${this._getSimpleName(
+                  name,
+                )} does not exist. ` +
+                `Try ${create.names.ing} it first. From the command line: ` +
+                `${create.name} ${this.resourceType.name} <name>`
+              );
+            }
 
-              return false;
-            },
-            task: () => resourceAdapter.start(options),
+            if (started) {
+              return `${this.resourceType.names.capital} ${this._getSimpleName(
+                name,
+              )} has already been ${start.names.ed}`;
+            }
+
+            return false;
           },
-        ],
-        onError: error => {
-          this._log({
-            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START_ERROR',
-            plugin: this._plugin.name,
-            resourceType: this.resourceType.name,
-            name,
-            error,
-          });
-          this.stop(name, options)
-            .toPromise()
-            .catch(() => {});
+          task: () => resourceAdapter.start(options),
         },
-        onComplete: () => {
-          this._log({
-            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START_COMPLETE',
-            plugin: this._plugin.name,
-            resourceType: this.resourceType.name,
-            name,
-          });
-          this._resourceAdaptersStarted[name] = true;
-        },
-        onDone: () => {
-          delete this._startTaskList[name];
-          this._update$.next();
-        },
-      });
+      ],
+      onError: error => {
+        this._log({
+          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START_ERROR',
+          plugin: this._plugin.name,
+          resourceType: this.resourceType.name,
+          name,
+          error,
+        });
+        this.stop(name, options)
+          .toPromise()
+          .catch(() => {});
+      },
+      onComplete: () => {
+        this._log({
+          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START_COMPLETE',
+          plugin: this._plugin.name,
+          resourceType: this.resourceType.name,
+          name,
+        });
+        this._resourceAdaptersStarted[name] = true;
+      },
+      onDone: () => {
+        delete this._startTaskList[name];
+        this._update$.next();
+      },
+    });
+    if (!shouldSkip) {
+      this._startTaskList[name] = startTaskList;
     }
 
-    return this._startTaskList[name];
+    return startTaskList;
+  }
+
+  _getStartDeps(deps: ?Array<ResourceDependency>): Array<ResourceDependency> {
+    return (deps || []).filter(
+      ({ plugin, resourceType }) =>
+        this._pluginManager
+          .getResourcesManager({
+            plugin,
+            resourceType,
+          })
+          .resourceType.getCRUD().start != null,
+    );
+  }
+
+  _startDeps(deps: Array<ResourceDependency>): TaskList {
+    return new TaskList({
+      tasks: deps.map(({ plugin, resourceType, name: dependentName }) => {
+        const manager = this._pluginManager.getResourcesManager({
+          plugin,
+          resourceType,
+        });
+        const dependentResourceType = manager.resourceType;
+
+        const { start: depStart } = dependentResourceType.getCRUD();
+        if (depStart == null) {
+          throw new Error('For Flow');
+        }
+
+        return {
+          title: `${depStart.names.upper} ${
+            dependentResourceType.names.lower
+          } ${this._getSimpleName(dependentName)}`,
+          task: () => manager.start(dependentName, {}),
+        };
+      }),
+      concurrent: false,
+    });
   }
 
   stop(name: string, options: ResourceOptions): TaskList {
@@ -606,97 +704,125 @@ export default class ResourcesManager<
       });
     }
 
-    if (this._stopTaskList[name] == null) {
-      const startTaskList = this._startTaskList[name];
-      const resourceAdapter = this._resourceAdapters[name];
-      const skip = () => resourceAdapter == null;
-      const dependents = (this._resourceDependents[name] || []).filter(
-        ({ plugin, resourceType }) =>
-          this._pluginManager
-            .getResourcesManager({
-              plugin,
-              resourceType,
-            })
-            .resourceType.getCRUD().stop != null,
-      );
-      this._stopTaskList[name] = new TaskList({
-        tasks: [
-          {
-            title: `Abort ${start.names.ing} ${
-              this.resourceType.names.lower
-            } ${this._getSimpleName(name)}`,
-            enabled: () => startTaskList != null,
-            task: () => startTaskList.abort(),
-          },
-          {
-            title: 'Stop dependent resources',
-            enabled: () => dependents.length > 0,
-            skip: () =>
-              resourceAdapter == null
-                ? `${this.resourceType.names.capital} ${this._getSimpleName(
-                    name,
-                  )} does not exist.`
-                : false,
-            task: () =>
-              new TaskList({
-                tasks: dependents.map(
-                  ({ plugin, resourceType, name: dependentName }) => {
-                    const manager = this._pluginManager.getResourcesManager({
-                      plugin,
-                      resourceType,
-                    });
-                    const dependentResourceType = manager.resourceType;
+    const shouldSkip = this._stopTaskList[name] != null;
+    const startTaskList = this._startTaskList[name];
+    const resourceAdapter = this._resourceAdapters[name];
+    const skip = () => shouldSkip || resourceAdapter == null;
+    const mainSkip = () => {
+      if (shouldSkip) {
+        return `${this.resourceType.names.capital} ${this._getSimpleName(
+          name,
+        )} is already being ${stop.names.ed}.`;
+      }
 
-                    const { stop: depStop } = dependentResourceType.getCRUD();
-                    if (depStop == null) {
-                      throw new Error('For Flow');
-                    }
+      if (resourceAdapter == null) {
+        return `${this.resourceType.names.capital} ${this._getSimpleName(
+          name,
+        )} does not exist.`;
+      }
 
-                    return {
-                      title: `${depStop.names.upper} ${
-                        dependentResourceType.names.lower
-                      } ${this._getSimpleName(dependentName)}`,
-                      task: () => manager.stop(dependentName, {}),
-                    };
-                  },
-                ),
-                concurrent: true,
-              }),
-          },
-          {
-            title: `${stop.names.upper} ${
-              this.resourceType.names.lower
-            } ${this._getSimpleName(name)}`,
-            skip,
-            task: () => resourceAdapter.stop(options),
-          },
-        ],
-        onError: error => {
-          this._log({
-            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP_ERROR',
-            plugin: this._plugin.name,
-            resourceType: this.resourceType.name,
-            name,
-            error,
-          });
+      return false;
+    };
+    const dependents = this._getStopDeps(this._resourceDependents[name]);
+    const directDependents = this._getStopDeps(
+      this._directResourceDependents[name],
+    );
+    const stopTaskList = new TaskList({
+      freshContext: true,
+      tasks: [
+        {
+          title: `Abort ${start.names.ing} ${
+            this.resourceType.names.lower
+          } ${this._getSimpleName(name)}`,
+          skip,
+          enabled: () => startTaskList != null,
+          task: () => startTaskList.abort(),
         },
-        onComplete: () => {
-          this._log({
-            event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP_COMPLETE',
-            plugin: this._plugin.name,
-            resourceType: this.resourceType.name,
-            name,
-          });
-          this._resourceAdaptersStarted[name] = false;
+        {
+          title: 'Stop dependent resources',
+          enabled: () => dependents.length > 0,
+          skip: mainSkip,
+          task: () => this._stopDeps(dependents),
         },
-        onDone: () => {
-          delete this._stopTaskList[name];
-          this._update$.next();
+        {
+          title: `${stop.names.upper} ${
+            this.resourceType.names.lower
+          } ${this._getSimpleName(name)}`,
+          skip,
+          task: () => resourceAdapter.stop(options),
         },
-      });
+        {
+          title: 'Stop created resources',
+          enabled: () => directDependents.length > 0,
+          skip,
+          task: () => this._stopDeps(directDependents),
+        },
+      ],
+      onError: error => {
+        this._log({
+          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP_ERROR',
+          plugin: this._plugin.name,
+          resourceType: this.resourceType.name,
+          name,
+          error,
+        });
+      },
+      onComplete: () => {
+        this._log({
+          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP_COMPLETE',
+          plugin: this._plugin.name,
+          resourceType: this.resourceType.name,
+          name,
+        });
+        this._resourceAdaptersStarted[name] = false;
+      },
+      onDone: () => {
+        delete this._stopTaskList[name];
+        this._update$.next();
+      },
+    });
+    if (!shouldSkip) {
+      this._stopTaskList[name] = stopTaskList;
     }
 
-    return this._stopTaskList[name];
+    return stopTaskList;
+  }
+
+  _getStopDeps(deps: ?Array<ResourceDependency>): Array<ResourceDependency> {
+    return (deps || []).filter(
+      ({ plugin, resourceType }) =>
+        this._pluginManager
+          .getResourcesManager({
+            plugin,
+            resourceType,
+          })
+          .resourceType.getCRUD().stop != null,
+    );
+  }
+
+  _stopDeps(deps: Array<ResourceDependency>): TaskList {
+    return new TaskList({
+      tasks: deps.map(({ plugin, resourceType, name: dependentName }) => {
+        const manager = this._pluginManager.getResourcesManager({
+          plugin,
+          resourceType,
+        });
+        const dependentResourceType = manager.resourceType;
+
+        const { stop: depStop } = dependentResourceType.getCRUD();
+        if (depStop == null) {
+          throw new Error('For Flow');
+        }
+
+        return {
+          title: `${depStop.names.upper} ${
+            dependentResourceType.names.lower
+          } ${this._getSimpleName(dependentName)}`,
+          task: () => manager.stop(dependentName, {}),
+        };
+      }),
+      concurrent: true,
+    });
   }
 
   async _init(name: string): Promise<void> {
@@ -743,6 +869,10 @@ export default class ResourcesManager<
     return name;
   }
 
+  _getDirectDependentsPath(name: string): string {
+    return path.resolve(this._directDependentsPath, `${name}.json`);
+  }
+
   _getDependenciesPath(name: string): string {
     return path.resolve(this._dependenciesPath, `${name}.json`);
   }
@@ -766,6 +896,13 @@ export default class ResourcesManager<
           name: nameIn,
         });
     });
+  }
+
+  _uniqueDeps(deps: Array<ResourceDependency>): Array<ResourceDependency> {
+    return _.uniqBy(
+      deps,
+      ({ plugin, resourceType, name }) => `${plugin}:${resourceType}:${name}`,
+    );
   }
 
   addDependent(name: string, dependent: ResourceDependency): void {

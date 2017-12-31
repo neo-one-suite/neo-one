@@ -1,13 +1,12 @@
 /* @flow */
-import type { BaseResource } from './types';
+import type { BaseResource, BaseResourceOptions } from './types';
 import type { CLIOption } from './CRUDBase';
 import CRUDResourceBase from './CRUDResourceBase';
 import type ResourceType from './ResourceType';
 
 export type DescribeCRUDOptions<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = {|
   resourceType: ResourceType<Resource, ResourceOptions>,
   help?: string,
@@ -18,8 +17,7 @@ export type DescribeCRUDOptions<
 
 export default class DescribeCRUD<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > extends CRUDResourceBase<Resource, ResourceOptions> {
   constructor({
     resourceType,

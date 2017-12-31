@@ -1,12 +1,15 @@
 /* @flow */
 import { take } from 'rxjs/operators';
 
-import type { BaseResource, InteractiveCLI } from './types';
+import type {
+  BaseResource,
+  BaseResourceOptions,
+  InteractiveCLI,
+} from './types';
 import CRUDBase, { type CLIOption, type NamesIn } from './CRUDBase';
 import type ResourceType from './ResourceType';
 
-// flowlint-next-line unclear-type:off
-export type ExecCLIOptions<ResourceOptions: Object> = {|
+export type ExecCLIOptions<ResourceOptions: BaseResourceOptions> = {|
   // Full name of the resource
   name: string,
   cli: InteractiveCLI,
@@ -19,8 +22,7 @@ export type GetCLIAutocompleteOptions = {|
 
 export type CRUDResourceOptions<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = {|
   name: string,
   names?: NamesIn,
@@ -32,8 +34,7 @@ export type CRUDResourceOptions<
   autocomplete?: Array<string>,
 |};
 
-// flowlint-next-line unclear-type:off
-export type GetCLINameOptions<ResourceOptions: Object> = {|
+export type GetCLINameOptions<ResourceOptions: BaseResourceOptions> = {|
   baseName: string,
   cli: InteractiveCLI,
   options: ResourceOptions,
@@ -41,8 +42,7 @@ export type GetCLINameOptions<ResourceOptions: Object> = {|
 
 export default class CRUDResourceBase<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > extends CRUDBase<Resource, ResourceOptions> {
   constructor({
     name,

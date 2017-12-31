@@ -29,6 +29,8 @@ export type BaseResource = {
   baseName: string,
   state: ResourceState,
 };
+// flowlint-next-line unclear-type:off
+export type BaseResourceOptions = Object;
 export type GetResourceResponse = {| resources: Array<BaseResource> |};
 export type DescribeResourceResponse = {| resource: BaseResource |};
 export type TaskStatus = {
@@ -81,46 +83,40 @@ export type Client = {
   getResources$(options: {|
     plugin: string,
     resourceType: string,
-    // flowlint-next-line unclear-type:off
-    options: Object,
+    options: BaseResourceOptions,
   |}): Observable<Array<BaseResource>>,
   getResource$(options: {|
     plugin: string,
     resourceType: string,
     name: string,
-    // flowlint-next-line unclear-type:off
-    options: Object,
+    options: BaseResourceOptions,
   |}): Observable<?BaseResource>,
   createResource$(options: {|
     plugin: string,
     resourceType: string,
     name: string,
-    // flowlint-next-line unclear-type:off
-    options: Object,
+    options: BaseResourceOptions,
     cancel$: Observable<void>,
   |}): Observable<ModifyResourceResponse>,
   deleteResource$(options: {|
     plugin: string,
     resourceType: string,
     name: string,
-    // flowlint-next-line unclear-type:off
-    options: Object,
+    options: BaseResourceOptions,
     cancel$: Observable<void>,
   |}): Observable<ModifyResourceResponse>,
   startResource$(options: {|
     plugin: string,
     resourceType: string,
     name: string,
-    // flowlint-next-line unclear-type:off
-    options: Object,
+    options: BaseResourceOptions,
     cancel$: Observable<void>,
   |}): Observable<ModifyResourceResponse>,
   stopResource$(options: {|
     plugin: string,
     resourceType: string,
     name: string,
-    // flowlint-next-line unclear-type:off
-    options: Object,
+    options: BaseResourceOptions,
     cancel$: Observable<void>,
   |}): Observable<ModifyResourceResponse>,
 };
@@ -232,6 +228,6 @@ export type PluginManager = {
 export type CreateHook = (options: {|
   name: string,
   // flowlint-next-line unclear-type:off
-  options: Object,
+  options: BaseResourceOptions,
   pluginManager: PluginManager,
 |}) => Task;

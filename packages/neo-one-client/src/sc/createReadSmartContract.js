@@ -7,6 +7,7 @@ import type {
   ABI,
   BlockFilter,
   Event,
+  Hash160String,
   Log,
   ReadSmartContract,
   StorageItem,
@@ -16,9 +17,11 @@ import type ReadClient from '../ReadClient';
 import * as common from './common';
 
 export default ({
+  hash,
   abi,
   client,
 }: {|
+  hash: Hash160String,
   abi: ABI,
   client: ReadClient<*>,
 |}): ReadSmartContract => {
@@ -30,7 +33,7 @@ export default ({
   const iterActions = (filterIn?: BlockFilter): AsyncIterable<Event | Log> => {
     const blockFilter = filterIn || {};
     return AsyncIterableX.from(client._iterActions(blockFilter)).pipe(
-      filter(action => action.scriptHash === abi.hash),
+      filter(action => action.scriptHash === hash),
       map(action => common.convertAction({ action, events })),
     );
   };
@@ -60,7 +63,7 @@ export default ({
     );
 
   const iterStorage = (): AsyncIterable<StorageItem> =>
-    client._iterStorage(abi.hash);
+    client._iterStorage(hash);
 
   return { iterActions, iterEvents, iterLogs, iterStorage };
 };

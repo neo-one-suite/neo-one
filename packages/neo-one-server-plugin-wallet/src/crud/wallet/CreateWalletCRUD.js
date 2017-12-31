@@ -5,7 +5,6 @@ import {
   type GetCLINameOptions,
   type GetCLIResourceOptions,
   CreateCRUD,
-  compoundName,
 } from '@neo-one/server-plugin';
 
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
@@ -17,6 +16,7 @@ import type WalletResourceType, {
 } from '../../WalletResourceType';
 
 import common from './common';
+import constants from '../../constants';
 
 const ENCRYPT_MESSAGE = 'Enter a password to encrypt your private key: ';
 
@@ -110,8 +110,8 @@ export default class CreateWalletCRUD extends CreateCRUD<
     cli,
     options,
   }: ExecCLIOptions<WalletResourceOptions>): Promise<void> {
-    const { name: originalName } = compoundName.extract(name);
-    let command = `open wallet ${originalName} --network ${options.network}`;
+    const { name: originalName, network } = constants.extractWallet(name);
+    let command = `open wallet ${originalName} --network ${network}`;
     if (options.password != null) {
       command += ` --password ${options.password}`;
     }

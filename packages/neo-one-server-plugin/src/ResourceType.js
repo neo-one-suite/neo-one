@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 
 import type {
   BaseResource,
+  BaseResourceOptions,
   Binary,
   Client,
   DescribeTable,
@@ -45,8 +46,7 @@ export type MasterResourceAdapterOptions = {|
   portAllocator: PortAllocator,
 |};
 
-// flowlint-next-line unclear-type:off
-export type GetResource$Options<ResourceOptions: Object> = {|
+export type GetResource$Options<ResourceOptions: BaseResourceOptions> = {|
   name: string,
   client: Client,
   options: ResourceOptions,
@@ -54,8 +54,7 @@ export type GetResource$Options<ResourceOptions: Object> = {|
 
 export default class ResourceType<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > {
   +plugin: Plugin;
   +name: string;

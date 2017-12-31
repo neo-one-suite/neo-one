@@ -44,19 +44,7 @@ export default class CLI {
     };
     commands.forEach(command => command(cliArgs));
 
-    const args = argv.slice(2).map((arg, idx) => {
-      if (idx === 0) {
-        return arg;
-      }
-
-      if (arg.includes(' ')) {
-        return `"${arg}"`;
-      }
-
-      return arg;
-    });
-
-    const cmd = args.join(' ');
+    const cmd = argv.slice(2).join(' ');
     let command = vorpal.find(cmd);
     if (command == null) {
       this._installDefaultPlugins(cliArgs);

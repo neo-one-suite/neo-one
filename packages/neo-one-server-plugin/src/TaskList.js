@@ -31,6 +31,8 @@ export type TaskListOptions = {|
   onError?: (error: Error) => void,
   onComplete?: () => void,
   onDone?: () => void,
+  initialContext?: TaskContext,
+  freshContext?: boolean,
 |};
 
 class TaskWrapper {
@@ -96,12 +98,13 @@ class TaskWrapper {
     }
     const status = { ...statusIn, pending: true };
 
-    const skip = this._skip(ctx);
-    if (skip !== false) {
-      this.status$.next({ ...status, pending: false, skipped: skip });
-    } else {
-      this.status$.next(status);
-      try {
+    try {
+      const skip = this._skip(ctx);
+      if (skip !== false) {
+        this.status$.next({ ...status, pending: false, skipped: skip });
+      } else {
+        this.status$.next(status);
+
         const result = this._task.task(ctx);
 
         if (result instanceof Observable) {
@@ -127,10 +130,17 @@ class TaskWrapper {
             .toPromise();
         }
         this.status$.next({ ...status, pending: false, complete: true });
-      } catch (error) {
-        this._taskList.onError(error);
-        this.status$.next({ ...status, pending: false, error: error.message });
       }
+    } catch (error) {
+      this._taskList.onError(error);
+      this.status$.next({
+        ...status,
+        pending: false,
+        error:
+          error.message == null || error.message === ''
+            ? 'Something went wrong.'
+            : error.message,
+      });
     }
 
     this.status$.complete();
@@ -143,6 +153,8 @@ export default class TaskList {
   onError: (error: Error) => void;
   _onComplete: () => void;
   _onDone: () => void;
+  _initialContext: TaskContext;
+  _freshContext: boolean;
 
   _status$: ReplaySubject<Array<TaskStatus>>;
   _subscription: ?Subscription;
@@ -154,6 +166,8 @@ export default class TaskList {
     onError,
     onComplete,
     onDone,
+    initialContext,
+    freshContext,
   }: TaskListOptions) {
     this._tasks = tasks.map(task => new TaskWrapper(task, this));
     this._concurrent = concurrent || false;
@@ -161,6 +175,8 @@ export default class TaskList {
     this.onError = onError || ((error: Error) => {});
     this._onComplete = onComplete || (() => {});
     this._onDone = onDone || (() => {});
+    this._initialContext = initialContext || {};
+    this._freshContext = freshContext || false;
 
     this._status$ = new ReplaySubject(1);
 
@@ -195,7 +211,14 @@ export default class TaskList {
       return;
     }
 
-    const ctx = ctxIn || {};
+    let ctx = ctxIn || {};
+    if (this._freshContext) {
+      ctx = {};
+    }
+
+    for (const key of Object.keys(this._initialContext)) {
+      ctx[key] = this._initialContext[key];
+    }
     this._checkAll(ctx);
 
     this._subscription = combineLatest(this._tasks.map(task => task.status$))

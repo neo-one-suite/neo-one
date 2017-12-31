@@ -3,20 +3,25 @@ import {
   type GetCLINameOptions,
   type GetCLIResourceOptions,
   type InteractiveCLI,
-  compoundName,
 } from '@neo-one/server-plugin';
 
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 
+import { NetworkRequiredError } from '../../errors';
 import type { WalletResourceOptions } from '../../WalletResourceType';
+
+import constants from '../../constants';
 
 const getCLIName = ({
   baseName,
-  options,
-}: GetCLINameOptions<WalletResourceOptions>): Promise<string> =>
-  Promise.resolve(
-    compoundName.make({ name: baseName, names: [options.network] }),
-  );
+  options: { network },
+}: GetCLINameOptions<WalletResourceOptions>): Promise<string> => {
+  if (network == null) {
+    throw new NetworkRequiredError();
+  }
+
+  return Promise.resolve(constants.makeWallet({ name: baseName, network }));
+};
 
 const getCLIResourceOptions = async ({
   cli,
