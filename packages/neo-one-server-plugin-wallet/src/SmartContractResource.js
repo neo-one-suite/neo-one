@@ -171,7 +171,7 @@ export default class SmartContractResource {
           },
         },
         {
-          from: wallet.address,
+          from: wallet.accountID,
         },
       );
       const receipt = await result.confirmed();

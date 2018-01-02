@@ -26,7 +26,6 @@ import {
 import type { Observable } from 'rxjs/Observable';
 
 import _ from 'lodash';
-import { take } from 'rxjs/operators';
 import { utils as commonUtils } from '@neo-one/utils';
 
 import type {
@@ -82,7 +81,9 @@ import converters from './converters';
 
 export type KeyStore = {
   +currentAccount$: Observable<?UserAccount>,
+  +getCurrentAccount: () => ?UserAccount,
   +accounts$: Observable<Array<UserAccount>>,
+  +getAccounts: () => Array<UserAccount>,
   +sign: (options: {|
     account: UserAccountID,
     message: string,
@@ -91,6 +92,7 @@ export type KeyStore = {
 
 export type Provider = {
   +networks$: Observable<Array<NetworkType>>,
+  +getNetworks: () => Array<NetworkType>,
   +getUnclaimed: (
     network: NetworkType,
     address: AddressString,
@@ -120,7 +122,7 @@ export type Provider = {
 };
 
 type TransactionOptionsFull = {|
-  from: UserAccount,
+  from: UserAccountID,
   attributes: Array<Attribute>,
   networkFee: BigNumber,
 |};
@@ -154,6 +156,18 @@ export default class LocalUserAccountProvider<
     this.currentAccount$ = keystore.currentAccount$;
     this.accounts$ = keystore.accounts$;
     this.networks$ = provider.networks$;
+  }
+
+  getCurrentAccount(): ?UserAccount {
+    return this.keystore.getCurrentAccount();
+  }
+
+  getAccounts(): Array<UserAccount> {
+    return this.keystore.getAccounts();
+  }
+
+  getNetworks(): Array<NetworkType> {
+    return this.provider.getNetworks();
   }
 
   async transfer(
@@ -193,7 +207,7 @@ export default class LocalUserAccountProvider<
     );
 
     const [{ unclaimed, amount }, { inputs, outputs }] = await Promise.all([
-      this.provider.getUnclaimed(from.id.network, from.id.address),
+      this.provider.getUnclaimed(from.network, from.address),
       this._getTransfersInputOutputs({ from, gas: networkFee }),
     ]);
     if (unclaimed.length === 0) {
@@ -206,7 +220,7 @@ export default class LocalUserAccountProvider<
       outputs: this._convertOutputs(
         outputs.concat([
           {
-            address: from.id.address,
+            address: from.address,
             asset: common.GAS_ASSET_HASH,
             value: amount,
           },
@@ -347,7 +361,7 @@ export default class LocalUserAccountProvider<
     const { from, attributes, networkFee } = await this._getTransactionOptions(
       options,
     );
-    const settings = await this.provider.getNetworkSettings(from.id.network);
+    const settings = await this.provider.getNetworkSettings(from.network);
     const { inputs, outputs } = await this._getTransfersInputOutputs({
       transfers: [],
       from,
@@ -494,7 +508,7 @@ export default class LocalUserAccountProvider<
       }),
     });
     return this.provider.testInvoke(
-      from.id.network,
+      from.network,
       testTransaction.serializeWire().toString('hex'),
     );
   }
@@ -506,18 +520,14 @@ export default class LocalUserAccountProvider<
     // $FlowFixMe
     const attributes = (options.attributes || []: Array<Attribute>);
 
-    const { from: fromAddress } = options;
-    let fromIn;
-    if (fromAddress == null) {
-      fromIn = await this.currentAccount$.pipe(take(1)).toPromise();
-    } else {
-      const accounts = await this.accounts$.pipe(take(1)).toPromise();
-      fromIn = accounts.find(account => account.id.address === fromAddress);
-    }
-
-    const from = fromIn;
+    const { from: fromIn } = options;
+    let from = fromIn;
     if (from == null) {
-      throw new NoAccountError();
+      const fromAccount = this.getCurrentAccount();
+      if (fromAccount == null) {
+        throw new NoAccountError();
+      }
+      from = fromAccount.id;
     }
 
     return {
@@ -596,7 +606,7 @@ export default class LocalUserAccountProvider<
       scripts,
     });
     const result = await this.provider.testInvoke(
-      from.id.network,
+      from.network,
       testTransaction.serializeWire().toString('hex'),
     );
     if (result.state === 'FAULT') {
@@ -623,7 +633,7 @@ export default class LocalUserAccountProvider<
       transaction: invokeTransaction,
       onConfirm: async ({ transaction, receipt }) => {
         const data = await this.provider.getInvocationData(
-          from.id.network,
+          from.network,
           transaction.txid,
         );
         const res = await onConfirm({ transaction, receipt, data });
@@ -638,13 +648,14 @@ export default class LocalUserAccountProvider<
     onConfirm,
   }: {|
     transaction: TransactionModel,
-    from: UserAccount,
+    from: UserAccountID,
     onConfirm: (options: {|
       transaction: Transaction,
       receipt: TransactionReceipt,
     |}) => Promise<T>,
   |}): Promise<TransactionResult<T>> {
     let transactionUnsigned = transactionUnsignedIn;
+    const scriptHash = addressToScriptHash(from.address);
     if (
       transactionUnsigned.inputs.length === 0 &&
       (transactionUnsigned.claims == null ||
@@ -656,7 +667,7 @@ export default class LocalUserAccountProvider<
           this._convertAttributes([
             {
               usage: 'Script',
-              data: from.scriptHash,
+              data: scriptHash,
             },
           ]),
         ),
@@ -664,15 +675,15 @@ export default class LocalUserAccountProvider<
     }
 
     const witness = await this.keystore.sign({
-      account: from.id,
+      account: from,
       message: transactionUnsigned.serializeUnsigned().toString('hex'),
     });
 
     const transaction = await this.provider.relayTransaction(
-      from.id.network,
+      from.network,
       this._addWitness({
         transaction: transactionUnsigned,
-        scriptHash: from.scriptHash,
+        scriptHash,
         witness: this._convertWitness(witness),
       })
         .serializeWire()
@@ -687,7 +698,7 @@ export default class LocalUserAccountProvider<
           options.timeoutMS = 120000;
         }
         const receipt = await this.provider.getTransactionReceipt(
-          from.id.network,
+          from.network,
           transaction.txid,
           options,
         );
@@ -772,7 +783,7 @@ export default class LocalUserAccountProvider<
     transfers: transfersIn,
     gas: gasIn,
   }: {|
-    from: UserAccount,
+    from: UserAccountID,
     transfers?: Array<Transfer>,
     gas?: BigNumber,
   |}): Promise<{| outputs: Array<Output>, inputs: Array<Input> |}> {
@@ -792,8 +803,8 @@ export default class LocalUserAccountProvider<
     }
 
     const allOutputs = await this.provider.getUnspentOutputs(
-      from.id.network,
-      from.id.address,
+      from.network,
+      from.address,
     );
     return commonUtils
       .values(
@@ -816,7 +827,7 @@ export default class LocalUserAccountProvider<
               { amount, to },
             ) => {
               const result = this._getTransferInputOutputs({
-                from: from.id.address,
+                from: from.address,
                 to,
                 asset,
                 amount,
@@ -845,7 +856,7 @@ export default class LocalUserAccountProvider<
           if (assetResults.remaining.gt(utils.ZERO_BIG_NUMBER)) {
             outputs.push(
               ({
-                address: from.id.address,
+                address: from.address,
                 asset,
                 value: assetResults.remaining,
               }: Output),

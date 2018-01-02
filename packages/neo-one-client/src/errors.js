@@ -93,6 +93,15 @@ export class NoAccountError extends Error {
   }
 }
 
+export class NoContractDeployedError extends Error {
+  code: string;
+
+  constructor(networkType: string) {
+    super(`Contract has not been deployed to network ${networkType}`);
+    this.code = 'NO_CONTRACT_DEPLOYED';
+  }
+}
+
 export class InvalidTransactionError extends Error {
   code: string;
 

@@ -2,7 +2,6 @@
 import _ from 'lodash';
 
 import type {
-  ABI,
   Action,
   ABIEvent,
   ABIFunction,
@@ -18,10 +17,15 @@ import type {
   Param,
   ParamInternal,
   SmartContract,
+  SmartContractDefinition,
   TransactionResult,
 } from '../types'; // eslint-disable-line
 import type Client from '../Client';
-import { InvalidArgumentError } from '../errors';
+import {
+  InvalidArgumentError,
+  NoAccountError,
+  NoContractDeployedError,
+} from '../errors';
 
 import * as common from './common';
 import paramCheckers from './params';
@@ -55,24 +59,26 @@ const convertParams = ({
 };
 
 const getParamsAndOptions = ({
+  definition: { networks },
   parameters,
   args,
+  client,
 }: {|
+  definition: SmartContractDefinition,
   parameters: Array<ABIParameter>,
   args: Array<any>,
+  client: Client<*>,
 |}): {|
   params: Array<?ParamInternal>,
   paramsZipped: Array<[string, ?Param]>,
   options: any,
+  hash: Hash160String,
 |} => {
-  if (args.length === 0) {
-    return { params: [], paramsZipped: [], options: undefined };
-  }
-
   const finalArg = args[args.length - 1];
   let params = args;
-  let options;
+  let options = {};
   if (
+    finalArg != null &&
     typeof finalArg === 'object' &&
     !Array.isArray(finalArg) &&
     finalArg.isBigNumber !== true
@@ -81,11 +87,28 @@ const getParamsAndOptions = ({
     options = finalArg;
   }
 
+  if (options.from == null) {
+    const from = client.getCurrentAccount();
+    if (from == null) {
+      throw new NoAccountError();
+    }
+    options = {
+      ...options,
+      from: from.id,
+    };
+  }
+
+  const contractNetwork = networks[options.from.network];
+  if (contractNetwork == null) {
+    throw new NoContractDeployedError(options.from.network);
+  }
+
   const { converted, zipped } = convertParams({ params, parameters });
   return {
     params: converted,
     paramsZipped: zipped,
     options: options || {},
+    hash: contractNetwork.hash,
   };
 };
 
@@ -132,17 +155,19 @@ const convertActions = ({
 };
 
 const createCall = ({
+  definition,
   client,
-  hash,
   func: { name, parameters, returnType },
 }: {|
+  definition: SmartContractDefinition,
   client: Client<*>,
-  hash: Hash160String,
   func: ABIFunction,
 |}) => async (...args: Array<any>): Promise<InvocationResult<?Param>> => {
-  const { params, options } = getParamsAndOptions({
+  const { params, options, hash } = getParamsAndOptions({
+    definition,
     parameters: parameters || [],
     args,
+    client,
   });
   const result = await client._call(hash, name, params, options);
   return convertInvocationResult({ returnType, result });
@@ -158,22 +183,23 @@ const filterLogs = (actions: Array<Event | Log>): Array<Log> =>
     .filter(Boolean);
 
 const createInvoke = ({
-  hash,
-  abi,
+  definition,
   client,
   func: { name, parameters, returnType },
 }: {|
-  hash: Hash160String,
-  abi: ABI,
+  definition: SmartContractDefinition,
   client: Client<*>,
   func: ABIFunction,
 |}) => async (
   ...args: Array<any>
 ): Promise<TransactionResult<InvokeReceipt>> => {
-  const { params, paramsZipped, options } = getParamsAndOptions({
+  const { params, paramsZipped, options, hash } = getParamsAndOptions({
+    definition,
     parameters: parameters || [],
     args,
+    client,
   });
+
   const result = await client._invoke(
     hash,
     name,
@@ -187,7 +213,7 @@ const createInvoke = ({
       const receipt = await result.confirmed(getOptions);
       const actions = convertActions({
         actions: receipt.actions,
-        events: abi.events || [],
+        events: definition.abi.events || [],
       });
       return {
         blockIndex: receipt.blockIndex,
@@ -202,26 +228,23 @@ const createInvoke = ({
 };
 
 export default ({
-  hash,
-  abi,
+  definition,
   client,
 }: {|
-  hash: Hash160String,
-  abi: ABI,
+  definition: SmartContractDefinition,
   client: Client<*>,
 |}): SmartContract => {
   const smartContract = ({}: Object);
-  abi.functions.forEach(func => {
+  definition.abi.functions.forEach(func => {
     if (func.constant) {
       smartContract[func.name] = createCall({
-        hash,
+        definition,
         client,
         func,
       });
     } else {
       smartContract[func.name] = createInvoke({
-        hash,
-        abi,
+        definition,
         client,
         func,
       });

@@ -1,10 +1,7 @@
 /* @flow */
 import type { Observable } from 'rxjs/Observable';
 
-import { take } from 'rxjs/operators';
-
 import type {
-  ABI,
   AssetRegister,
   ContractRegister,
   Hash160String,
@@ -20,6 +17,7 @@ import type {
   RegisterAssetReceipt,
   RegisterValidatorReceipt,
   SmartContract,
+  SmartContractDefinition,
   TransactionReceipt,
   TransactionResult,
   InvokeReceiptInternal,
@@ -30,7 +28,6 @@ import type {
 import * as argAssertions from './args';
 import { createSmartContract } from './sc';
 
-// TODO: Add assertions for everything
 export default class Client<TUserAccountProvider: UserAccountProvider> {
   +userAccountProvider: TUserAccountProvider;
   +currentAccount$: Observable<?UserAccount>;
@@ -44,16 +41,16 @@ export default class Client<TUserAccountProvider: UserAccountProvider> {
     this.networks$ = userAccountProvider.networks$;
   }
 
-  getCurrentAccount(): Promise<?UserAccount> {
-    return this.currentAccount$.pipe(take(1)).toPromise();
+  getCurrentAccount(): ?UserAccount {
+    return this.userAccountProvider.getCurrentAccount();
   }
 
-  getAccounts(): Promise<Array<UserAccount>> {
-    return this.accounts$.pipe(take(1)).toPromise();
+  getAccounts(): Array<UserAccount> {
+    return this.userAccountProvider.getAccounts();
   }
 
-  getNetworks(): Promise<Array<NetworkType>> {
-    return this.networks$.pipe(take(1)).toPromise();
+  getNetworks(): Array<NetworkType> {
+    return this.userAccountProvider.getNetworks();
   }
 
   transfer(
@@ -92,8 +89,8 @@ export default class Client<TUserAccountProvider: UserAccountProvider> {
     return this.userAccountProvider.transfer(transfers, options);
   }
 
-  smartContract(hash: Hash160String, abi: ABI): SmartContract {
-    return createSmartContract({ hash, abi, client: (this: $FlowFixMe) });
+  smartContract(definition: SmartContractDefinition): SmartContract {
+    return createSmartContract({ definition, client: (this: $FlowFixMe) });
   }
 
   // NOTE: This API is subject to change and is not bound by semver.

@@ -3,7 +3,6 @@ import type BigNumber from 'bignumber.js';
 import type { Observable } from 'rxjs/Observable';
 
 import type {
-  ABI,
   AddressString,
   AssetRegister,
   ContractRegister,
@@ -21,6 +20,7 @@ import type {
   RegisterAssetReceipt,
   RegisterValidatorReceipt,
   SmartContract,
+  SmartContractDefinition,
   TransactionReceipt,
   TransactionResult,
   InvokeReceiptInternal,
@@ -38,13 +38,12 @@ declare export default class Client<
   +userAccountProvider: TUserAccountProvider;
 
   +currentAccount$: Observable<?UserAccount>;
-  getCurrentAccount(): Promise<?UserAccount>;
-
   +accounts$: Observable<Array<UserAccount>>;
-  getAccounts(): Promise<Array<UserAccount>>;
-
   +networks$: Observable<Array<NetworkType>>;
-  getNetworks(): Promise<Array<NetworkType>>;
+
+  getCurrentAccount(): ?UserAccount;
+  getAccounts(): Array<UserAccount>;
+  getNetworks(): Array<NetworkType>;
 
   transfer(
     amount: BigNumber,
@@ -82,7 +81,7 @@ declare export default class Client<
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>>;
 
-  smartContract(hash: Hash160String, abi: ABI): SmartContract;
+  smartContract(definition: SmartContractDefinition): SmartContract;
 
   // NOTE: This API is subject to change and is not bound by semver.
   experimental_registerValidator(

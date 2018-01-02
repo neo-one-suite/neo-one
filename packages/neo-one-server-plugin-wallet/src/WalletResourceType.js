@@ -9,9 +9,9 @@ import {
   ResourceType,
 } from '@neo-one/server-plugin';
 import { LocalFileStore } from '@neo-one/client-node';
+import { type UserAccountID, localClient } from '@neo-one/client';
 
 import _ from 'lodash';
-import { localClient } from '@neo-one/client';
 import path from 'path';
 
 import {
@@ -37,6 +37,7 @@ export type Wallet = {|
   baseName: string,
   state: ResourceState,
   network: string,
+  accountID: UserAccountID,
   address: string,
   unlocked: boolean,
   neoBalance: string,

@@ -55,6 +55,7 @@ export default class LocalKeyStore {
   +wallets$: Observable<Array<Wallet>>;
 
   _currentAccount$: BehaviorSubject<?UserAccount>;
+  _accounts$: BehaviorSubject<Array<UserAccount>>;
   _wallets$: BehaviorSubject<Wallets>;
 
   _store: Store;
@@ -68,9 +69,11 @@ export default class LocalKeyStore {
       map(wallets => flattenWallets(wallets)),
     );
 
-    this.accounts$ = this.wallets$.pipe(
-      map(wallets => wallets.map(({ account }) => account)),
-    );
+    this._accounts$ = new BehaviorSubject([]);
+    this.wallets$
+      .pipe(map(wallets => wallets.map(({ account }) => account)))
+      .subscribe(this._accounts$);
+    this.accounts$ = this._accounts$;
 
     this._currentAccount$ = new BehaviorSubject(null);
     this.currentAccount$ = this._currentAccount$.pipe(distinct());
@@ -78,6 +81,14 @@ export default class LocalKeyStore {
     this._store = store;
 
     this._initPromise = this._init();
+  }
+
+  getCurrentAccount(): ?UserAccount {
+    return this._currentAccount$.getValue();
+  }
+
+  getAccounts(): Array<UserAccount> {
+    return this._accounts$.getValue();
   }
 
   async _init(): Promise<void> {

@@ -464,7 +464,7 @@ export type UserAccount = {|
 |};
 
 export type TransactionOptions = {|
-  from?: AddressString,
+  from?: UserAccountID,
   attributes?: Array<AttributeArg>,
   networkFee?: BigNumber,
 |};
@@ -541,6 +541,10 @@ export interface UserAccountProvider {
   +currentAccount$: Observable<?UserAccount>;
   +accounts$: Observable<Array<UserAccount>>;
   +networks$: Observable<Array<NetworkType>>;
+
+  getCurrentAccount(): ?UserAccount;
+  getAccounts(): Array<UserAccount>;
+  getNetworks(): Array<NetworkType>;  
 
   transfer(
     transfers: Array<Transfer>,
@@ -709,6 +713,16 @@ export type ABIEvent = {|
 export type ABI = {|
   functions: Array<ABIFunction>,
   events?: Array<ABIEvent>,
+|};
+
+export type SmartContractNetworkDefinition = {|
+  hash: Hash160String,
+|};
+export type SmartContractDefinition = {|
+  networks: {|
+    [type: NetworkType]: SmartContractNetworkDefinition,
+  |},
+  abi: ABI,
 |};
 
 export type SmartContract = {|

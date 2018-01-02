@@ -87,6 +87,10 @@ export default class NEOONEProvider {
     this._networks$.next(networks);
   }
 
+  getNetworks(): Array<NetworkType> {
+    return this._networks$.getValue();
+  }
+
   addNetwork({
     network,
     rpcURL,

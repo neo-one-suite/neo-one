@@ -414,6 +414,10 @@ export default class WalletResource {
       baseName: this._baseName,
       state: this.unlocked ? 'started' : 'stopped',
       network: this._networkName,
+      accountID: {
+        network: this._networkName,
+        address: this._address,
+      },
       address: this._address,
       unlocked: this.unlocked,
       neoBalance: this._neoBalance == null ? 'Unknown' : this._neoBalance,
