@@ -37,7 +37,12 @@ import {
 import ora from 'ora';
 import { plugins as pluginsUtil } from '@neo-one/server';
 
-import { type ClientConfig, createClientConfig, setupCLI } from './utils';
+import {
+  type ClientConfig,
+  createBinary,
+  createClientConfig,
+  setupCLI,
+} from './utils';
 
 import commands, { createPlugin } from './interactive';
 import pkg from '../package.json';
@@ -217,7 +222,7 @@ export default class InteractiveCLI {
             try {
               const { pid } = await manager.start({
                 port,
-                binary: process.argv,
+                binary: createBinary(argv),
                 onStart: () => {
                   if (first) {
                     spinner = ora(`Starting ${name.title} server...`).start();
@@ -272,11 +277,13 @@ export default class InteractiveCLI {
 
     if (!isShutdown) {
       commands.forEach(command => command(this));
-      this.resetDelimiter();
-      this.vorpal.history(name.cli).show();
-
-      if (argv.length > 0) {
-        await this.vorpal.execSync(argv.join(' '));
+      const args = argv.slice(2);
+      if (args.length > 0) {
+        await this.vorpal.exec(args.join(' '));
+        shutdown({ exitCode: 0 });
+      } else {
+        this.resetDelimiter();
+        this.vorpal.history(name.cli).show();
       }
     }
   }

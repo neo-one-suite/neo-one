@@ -17,7 +17,7 @@ export default ({
   new Promise((resolve, reject) => {
     execFile(
       binary.cmd,
-      [binary.firstArg, 'compile', 'csharp', scPath, avmPath],
+      binary.firstArgs.concat(['compile', 'csharp', scPath, avmPath]),
       (err, stdout) => {
         if (err) {
           reject(new Error(`C# compilation failed: ${stdout}`));

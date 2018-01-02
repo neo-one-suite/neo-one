@@ -1,6 +1,7 @@
 /* @flow */
+import { type Binary, killProcess } from '@neo-one/server-plugin';
+
 import fs from 'fs-extra';
-import { killProcess } from '@neo-one/server-plugin';
 import isRunning from 'is-running';
 import path from 'path';
 import spawn from 'cross-spawn';
@@ -128,7 +129,7 @@ export default class ServerManager {
     onStart,
   }: {|
     port: number,
-    binary: Array<string>,
+    binary: Binary,
     onStart?: () => void,
   |}): Promise<{| pid: number, started: boolean |}> {
     const pid = await this.checkAlive(port);
@@ -140,12 +141,14 @@ export default class ServerManager {
       onStart();
     }
 
-    // eslint-disable-next-line
-    const [cmd0, cmd1, ...args] = binary;
-    const child = spawn(cmd0, [cmd1, 'start', 'server'], {
-      detached: true,
-      stdio: 'ignore',
-    });
+    const child = spawn(
+      binary.cmd,
+      binary.firstArgs.concat(['start', 'server']),
+      {
+        detached: true,
+        stdio: 'ignore',
+      },
+    );
     child.unref();
 
     await waitRunning({ pid: child.pid });

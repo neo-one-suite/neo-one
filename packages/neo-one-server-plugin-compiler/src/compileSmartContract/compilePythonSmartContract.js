@@ -17,7 +17,7 @@ export default ({
   new Promise((resolve, reject) => {
     execFile(
       binary.cmd,
-      [binary.firstArg, 'compile', 'python', scPath, avmPath],
+      binary.firstArgs.concat(['compile', 'python', scPath, avmPath]),
       (err, stdout) => {
         if (err) {
           reject(new Error(`Python compilation failed: ${stdout}`));

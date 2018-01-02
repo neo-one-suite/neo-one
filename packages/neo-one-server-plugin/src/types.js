@@ -123,7 +123,7 @@ export type Client = {
 
 export type Binary = {|
   cmd: string,
-  firstArg: string,
+  firstArgs: Array<string>,
 |};
 
 export type LogConfig = {|

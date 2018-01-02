@@ -266,7 +266,7 @@ export default class PluginManager {
 
   getDebug(): DescribeTable {
     return [
-      ['Binary', `${this._binary.cmd} ${this._binary.firstArg}`],
+      ['Binary', `${this._binary.cmd} ${this._binary.firstArgs.join(' ')}`],
       [
         'Port Allocator',
         { type: 'describe', table: this._portAllocator.getDebug() },

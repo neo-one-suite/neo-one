@@ -1,15 +1,19 @@
 #! /usr/bin/env node
 /* @flow */
 import '@babel/polyfill';
-import { InteractiveCLI, CLI } from '../';
+import { STATIC_NEO_ONE_OPTION, InteractiveCLI, CLI } from '../';
 
-const debugIdx = process.argv.indexOf('--debug');
 let { argv } = process;
+const debugIdx = argv.indexOf('--debug');
 const debug = debugIdx !== -1
 if (debug) {
-  argv = process.argv.slice(0, debugIdx).concat(
-    process.argv.slice(debugIdx + 1),
-  );
+  argv = argv.slice(0, debugIdx).concat(argv.slice(debugIdx + 1));
+}
+
+const staticIdx = argv.indexOf(STATIC_NEO_ONE_OPTION);
+const isStatic = staticIdx !== -1;
+if (isStatic) {
+  argv = argv.slice(0, staticIdx).concat(argv.slice(staticIdx + 1));
 }
 
 argv = argv.map((arg, idx) => {
@@ -24,12 +28,8 @@ argv = argv.map((arg, idx) => {
   return arg;
 });
 
-const createSimulation =
-  process.argv[2] === 'create' &&
-  process.argv[3] === 'simulation';
-
-if (createSimulation || argv.length === 2) {
-  new InteractiveCLI({ debug }).start(argv.slice(2));
-} else {
+if (isStatic) {
   new CLI({ debug }).start(argv);
+} else {
+  new InteractiveCLI({ debug }).start(argv);
 }

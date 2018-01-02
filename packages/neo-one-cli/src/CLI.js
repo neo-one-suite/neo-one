@@ -9,7 +9,7 @@ import { plugins as pluginsUtil } from '@neo-one/server';
 
 import commands from './commands';
 import pkg from '../package.json';
-import { setupCLI } from './utils';
+import { createBinary, setupCLI } from './utils';
 
 export default class CLI {
   _debug: boolean;
@@ -34,10 +34,7 @@ export default class CLI {
       log,
       vorpal,
       debug: this._debug,
-      binary: {
-        cmd: argv[0],
-        firstArg: argv[1],
-      },
+      binary: createBinary(argv),
       shutdown,
       shutdownFuncs,
       logConfig$,

@@ -283,7 +283,7 @@ export default class NEOBlockchainNodeAdapter extends NodeAdapter {
       // eslint-disable-next-line
       const child = spawn(
         this._binary.cmd,
-        [this._binary.firstArg, 'start', 'node', this._dataPath],
+        this._binary.firstArgs.concat(['start', 'node', this._dataPath]),
         {
           windowsHide: true,
           stdio: 'ignore',
