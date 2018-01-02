@@ -29,7 +29,6 @@ export type BaseResource = {
   baseName: string,
   state: ResourceState,
 };
-// flowlint-next-line unclear-type:off
 export type BaseResourceOptions = Object;
 export type GetResourceResponse = {| resources: Array<BaseResource> |};
 export type DescribeResourceResponse = {| resource: BaseResource |};
@@ -148,7 +147,6 @@ export type CLIArgs = {|
   binary: Binary,
 |};
 
-// flowlint-next-line unclear-type:off
 export type Session = Object;
 
 export type InteractiveCLI = {
@@ -172,7 +170,6 @@ export type InteractiveCLI = {
   +getResourceType: (options: {|
     plugin: string,
     resourceType: string,
-    // flowlint-next-line unclear-type:off
   |}) => ResourceType<any, any>,
 };
 
@@ -204,8 +201,7 @@ export type PortAllocator = {
 
 export type ResourcesManager<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = {
   getResources$(options: ResourceOptions): Observable<Array<Resource>>,
   getResource$(options: {|
@@ -213,7 +209,6 @@ export type ResourcesManager<
     options: ResourceOptions,
   |}): Observable<?Resource>,
   getResourceAdapter(name: string): ResourceAdapter<Resource, ResourceOptions>,
-  // flowlint-next-line unclear-type:off
   masterResourceAdapter: any,
   addDependent(name: string, dependent: ResourceDependency): void,
   create(name: string, options: ResourceOptions): TaskList,
@@ -228,7 +223,6 @@ export type PluginManager = {
 
 export type CreateHook = (options: {|
   name: string,
-  // flowlint-next-line unclear-type:off
   options: BaseResourceOptions,
   pluginManager: PluginManager,
 |}) => Task;

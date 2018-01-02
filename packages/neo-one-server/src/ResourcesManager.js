@@ -3,6 +3,7 @@
 import { type Log, logInvoke, utils } from '@neo-one/utils';
 import {
   type BaseResource,
+  type BaseResourceOptions,
   type CreateHook,
   type DescribeTable,
   type MasterResourceAdapter,
@@ -35,8 +36,7 @@ const DEPENDENCIES_PATH = 'dependencies';
 
 type ResourceAdapters<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = { [resource: string]: ResourceAdapter<Resource, ResourceOptions> };
 
 export type InitError = {|
@@ -51,8 +51,7 @@ type TaskLists = {
 
 export default class ResourcesManager<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > {
   _log: Log;
   _dataPath: string;

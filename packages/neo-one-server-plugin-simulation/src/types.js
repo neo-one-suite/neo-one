@@ -83,7 +83,6 @@ export type SimulationConfig = {|
   templateDir: string,
   // Additional CLI prompts. Will be output in SimulationOutputConfig#options.
   // All Prompts must have default values. See inquirer.js for prompt format.
-  // flowlint-next-line unclear-type:off
   options?: Array<Object>,
   // Set to true if your simulation does not want a network to be automatically
   // created
@@ -94,7 +93,6 @@ export type SimulationPreCompileOutputConfig = {|
   language: string,
   contractsDir: string,
   contractConfig: LanguageContractConfig,
-  // flowlint-next-line unclear-type:off
   options: Object,
 |};
 
@@ -155,6 +153,5 @@ export type SimulationOutputConfig = {|
   language?: string,
   // Additional CLI prompt inputs as specified by SimulationConfig#options
   // Contains default values if user chose not to configure.
-  // flowlint-next-line unclear-type:off
   options: Object,
 |};

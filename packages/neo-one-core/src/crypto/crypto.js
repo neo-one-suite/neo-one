@@ -20,7 +20,6 @@ import common, {
   type UInt256,
 } from '../common';
 
-// flowlint-next-line unclear-type:off
 type KeyPair = any;
 
 const ec = new EC('p256');

@@ -1,6 +1,5 @@
 /* @flow */
 /* eslint import/no-extraneous-dependencies: ['error', {'devDependencies': true}] */
-// flowlint unclear-type:off
 // flowlint untyped-import:off
 import babel from 'rollup-plugin-babel';
 import fs from 'fs-extra';
@@ -31,12 +30,12 @@ const dependencies = [
       (acc, source) =>
         acc.concat(
           Object.keys(
-            JSON.parse(
+            (JSON.parse(
               fs.readFileSync(
                 path.resolve('./packages', source, './package.json'),
                 'utf-8',
               ),
-            ).dependencies,
+            ).dependencies || {}),
           ),
         ),
       [],

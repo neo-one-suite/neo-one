@@ -435,7 +435,6 @@ export default class WalletResource {
       ['Data Path', this._dataPath],
       ['Wallet Path', this._walletPath],
     ].concat(
-      // flowlint-next-line unclear-type:off
       utils.entries((this._toResource(): Object)).map(([key, val]) => {
         if (val == null) {
           return [key, 'null'];

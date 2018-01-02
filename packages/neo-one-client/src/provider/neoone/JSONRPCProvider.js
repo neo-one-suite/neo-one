@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint unclear-type:off
 export type JSONRPCRequest = {|
   method: string,
   params?: any,

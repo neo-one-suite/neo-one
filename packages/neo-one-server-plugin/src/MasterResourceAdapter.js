@@ -1,5 +1,5 @@
 /* @flow */
-import type { BaseResource } from './types';
+import type { BaseResource, BaseResourceOptions } from './types';
 import type { ResourceAdapter } from './ResourceAdapter';
 import type TaskList from './TaskList';
 
@@ -18,8 +18,7 @@ export type ResourceDependency = {|
 
 export type MasterResourceAdapter<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = {
   // ResourceAdapter for this ResourceType.
   initResourceAdapter(

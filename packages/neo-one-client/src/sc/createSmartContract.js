@@ -59,12 +59,10 @@ const getParamsAndOptions = ({
   args,
 }: {|
   parameters: Array<ABIParameter>,
-  // flowlint-next-line unclear-type:off
   args: Array<any>,
 |}): {|
   params: Array<?ParamInternal>,
   paramsZipped: Array<[string, ?Param]>,
-  // flowlint-next-line unclear-type:off
   options: any,
 |} => {
   if (args.length === 0) {
@@ -141,7 +139,6 @@ const createCall = ({
   client: Client<*>,
   hash: Hash160String,
   func: ABIFunction,
-  // flowlint-next-line unclear-type:off
 |}) => async (...args: Array<any>): Promise<InvocationResult<?Param>> => {
   const { params, options } = getParamsAndOptions({
     parameters: parameters || [],
@@ -171,7 +168,6 @@ const createInvoke = ({
   client: Client<*>,
   func: ABIFunction,
 |}) => async (
-  // flowlint-next-line unclear-type:off
   ...args: Array<any>
 ): Promise<TransactionResult<InvokeReceipt>> => {
   const { params, paramsZipped, options } = getParamsAndOptions({
@@ -214,7 +210,6 @@ export default ({
   abi: ABI,
   client: Client<*>,
 |}): SmartContract => {
-  // flowlint-next-line unclear-type:off
   const smartContract = ({}: Object);
   abi.functions.forEach(func => {
     if (func.constant) {

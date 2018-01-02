@@ -1,5 +1,5 @@
 /* @flow */
-import { type ABI } from '@neo-one/client';
+import { type ABI, disassembleByteCode } from '@neo-one/client';
 import {
   type DescribeTable,
   type ListTable,
@@ -107,6 +107,12 @@ export default class ContractResourceType extends ResourceType<
       ['Storage', resource.hasStorage ? 'Yes' : 'No'],
       ['Dynamic Invoke', resource.hasDynamicInvoke ? 'Yes' : 'No'],
       ['ABI', JSON.stringify(resource.abi, null, 2)],
+      [
+        'Contract',
+        `\n${disassembleByteCode(Buffer.from(resource.script, 'hex')).join(
+          '\n',
+        )}`,
+      ],
     ];
   }
 }

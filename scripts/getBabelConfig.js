@@ -1,7 +1,7 @@
 module.exports = ({ modules, useBuiltIns }) => ({
   presets: [
     [
-      '@babel/env',
+      '@babel/preset-env',
       {
         useBuiltIns: useBuiltIns == null ? false : useBuiltIns,
         modules,

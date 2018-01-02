@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@babel/cli@^7.0.0-beta.36":
+"@babel/cli@^7.0.0-beta.35":
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/cli/-/cli-7.0.0-beta.36.tgz#6337a5f1b031778b0f40fe772f0fa62eb7a3b25e"
   dependencies:
@@ -41,7 +41,7 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
-"@babel/core@^7.0.0-beta.36":
+"@babel/core@^7.0.0-beta.35":
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/core/-/core-7.0.0-beta.36.tgz#2f9dbcc64b998a5534b3458c45d5477d78dc0382"
   dependencies:
@@ -214,7 +214,7 @@
     "@babel/traverse" "7.0.0-beta.36"
     "@babel/types" "7.0.0-beta.36"
 
-"@babel/node@^7.0.0-beta.36":
+"@babel/node@^7.0.0-beta.35":
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/node/-/node-7.0.0-beta.36.tgz#4626995d10284ce24b7aaac7aea34ae6986fb024"
   dependencies:
@@ -230,27 +230,27 @@
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/plugin-check-constants/-/plugin-check-constants-7.0.0-beta.36.tgz#03aba1e17029f4d55f9bc9c13e1e82f289ab4773"
 
-"@babel/plugin-proposal-async-generator-functions@7.0.0-beta.36", "@babel/plugin-proposal-async-generator-functions@^7.0.0-beta.36":
+"@babel/plugin-proposal-async-generator-functions@7.0.0-beta.36", "@babel/plugin-proposal-async-generator-functions@^7.0.0-beta.35":
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/plugin-proposal-async-generator-functions/-/plugin-proposal-async-generator-functions-7.0.0-beta.36.tgz#a38ddc53a9861e9d9143f8b87dd3785bf764a0f6"
   dependencies:
     "@babel/helper-remap-async-to-generator" "7.0.0-beta.36"
     "@babel/plugin-syntax-async-generators" "7.0.0-beta.36"
 
-"@babel/plugin-proposal-class-properties@^7.0.0-beta.36":
+"@babel/plugin-proposal-class-properties@^7.0.0-beta.35":
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/plugin-proposal-class-properties/-/plugin-proposal-class-properties-7.0.0-beta.36.tgz#be236de98ff7ccdf650b7282e8e1f5bda808017d"
   dependencies:
     "@babel/helper-function-name" "7.0.0-beta.36"
     "@babel/plugin-syntax-class-properties" "7.0.0-beta.36"
 
-"@babel/plugin-proposal-export-namespace-from@^7.0.0-beta.36":
+"@babel/plugin-proposal-export-namespace-from@^7.0.0-beta.35":
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/plugin-proposal-export-namespace-from/-/plugin-proposal-export-namespace-from-7.0.0-beta.36.tgz#77146d4ad0929bd61d2fac4b1aa926fc03beffba"
   dependencies:
     "@babel/plugin-syntax-export-namespace-from" "7.0.0-beta.36"
 
-"@babel/plugin-proposal-object-rest-spread@7.0.0-beta.36", "@babel/plugin-proposal-object-rest-spread@^7.0.0-beta.36":
+"@babel/plugin-proposal-object-rest-spread@7.0.0-beta.36", "@babel/plugin-proposal-object-rest-spread@^7.0.0-beta.35":
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/plugin-proposal-object-rest-spread/-/plugin-proposal-object-rest-spread-7.0.0-beta.36.tgz#9712585326ee8b1c0bd069af6583d3511d4bf66f"
   dependencies:
@@ -350,7 +350,7 @@
   dependencies:
     "@babel/helper-builder-binary-assignment-operator-visitor" "7.0.0-beta.36"
 
-"@babel/plugin-transform-flow-strip-types@^7.0.0-beta.36":
+"@babel/plugin-transform-flow-strip-types@^7.0.0-beta.35":
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/plugin-transform-flow-strip-types/-/plugin-transform-flow-strip-types-7.0.0-beta.36.tgz#dc7b6d8f8e15f8a2f1bea67871bd1a274649fa12"
   dependencies:
@@ -449,14 +449,14 @@
     "@babel/helper-regex" "7.0.0-beta.36"
     regexpu-core "^4.1.3"
 
-"@babel/polyfill@7.0.0-beta.36", "@babel/polyfill@^7.0.0-beta.36":
+"@babel/polyfill@7.0.0-beta.36", "@babel/polyfill@^7.0.0-beta.35":
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/polyfill/-/polyfill-7.0.0-beta.36.tgz#c37320d0e38f2cb6da3a78889b380cb529c7a957"
   dependencies:
     core-js "^2.4.0"
     regenerator-runtime "^0.11.1"
 
-"@babel/preset-env@^7.0.0-beta.36":
+"@babel/preset-env@^7.0.0-beta.35":
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/preset-env/-/preset-env-7.0.0-beta.36.tgz#73a2cc5db2534d0f4c557cef1baaf622555146dc"
   dependencies:
@@ -499,7 +499,7 @@
     invariant "^2.2.2"
     semver "^5.3.0"
 
-"@babel/register@7.0.0-beta.36", "@babel/register@^7.0.0-beta.36":
+"@babel/register@7.0.0-beta.36", "@babel/register@^7.0.0-beta.35":
   version "7.0.0-beta.36"
   resolved "https://registry.npmjs.org/@babel/register/-/register-7.0.0-beta.36.tgz#dc3b32c0f70d3a11fc49402626a585147e114831"
   dependencies:

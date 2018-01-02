@@ -1,5 +1,5 @@
 {
-  "name": "@neo-one/simulation-ico-tour",
+  "name": "@neo-one/simulation-react",
   "version": "0.0.1",
   "keywords": [
     "neo",
@@ -26,7 +26,7 @@
     "neo one simulation",
     "NEO ONE simulation"
   ],
-  "description": "NEO•ONE Simulation - Tour of an ICO.",
+  "description": "NEO•ONE Simulation - Bootstrap a decentralized app with NEO•ONE and React.",
   "repository": "https://github.com/neo-one-suite/neo-one",
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
@@ -36,13 +36,11 @@
     "node": ">=8.9.0"
   },
   "bin": {
-    "neo-one-simulation-ico-tour-post-create": "./dist/bin/post-create",
-    "neo-one-simulation-ico-tour-pre-compile": "./dist/bin/pre-compile"
+    "neo-one-simulation-react-post-create": "./dist/bin/post-create",
+    "neo-one-simulation-react-pre-compile": "./dist/bin/pre-compile"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.0.0-beta.36",
-    "@neo-one/simulation-utils": "^0.0.1",
-    "fs-extra": "^5.0.0",
-    "nunjucks": "^3.0.1"
+    "@babel/polyfill": "^7.0.0-beta.35",
+    "@neo-one/simulation-utils": "^0.0.1"
   }
 }

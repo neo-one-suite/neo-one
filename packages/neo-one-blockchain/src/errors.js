@@ -11,8 +11,8 @@ export class GenesisBlockNotRegisteredError extends Error {
 export class ScriptVerifyError extends Error {
   code: string;
 
-  constructor() {
-    super('Script verification failed.');
+  constructor(message: string) {
+    super(message);
     this.code = 'SCRIPT_VERIFY';
   }
 }

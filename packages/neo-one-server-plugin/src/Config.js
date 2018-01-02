@@ -36,11 +36,9 @@ const watchConfig$ = (file: string): Observable<Event> =>
     };
   });
 
-// flowlint-next-line unclear-type:off
 export default class Config<TConfig: Object> {
   _configPath: string;
   _defaultConfig: TConfig;
-  // flowlint-next-line unclear-type:off
   _validateConfig: any;
   _log: Log;
 
@@ -55,7 +53,6 @@ export default class Config<TConfig: Object> {
   }: {|
     name: string,
     defaultConfig: TConfig,
-    // flowlint-next-line unclear-type:off
     schema: Object,
     log: Log,
     configPath?: string,

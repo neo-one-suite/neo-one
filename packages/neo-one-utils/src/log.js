@@ -1,7 +1,4 @@
 /* @flow */
-// $FlowFixMe
-import { performance } from 'perf_hooks'; // eslint-disable-line
-
 export type LogLevel =
   | 'error'
   | 'warn'
@@ -34,7 +31,19 @@ export type Log = (message: LogMessage, onLogComplete?: () => void) => void;
 export type Profiler = {| stop: () => void |};
 export type Profile = (point: string, data?: LogData) => Profiler;
 
-const now = () => performance.now();
+const loadTime = Date.now();
+export const now = () => {
+  if (typeof performance !== 'undefined' && performance && performance.now) {
+    return performance.now();
+  } else if (process) {
+    // So webpack doesn't try to bundle it.
+    const perfHooks = 'perf_hooks';
+    // $FlowFixMe
+    return require(perfHooks).performance.now(); // eslint-disable-line
+  }
+
+  return Date.now() - loadTime;
+};
 // eslint-disable-next-line
 export const createProfile = (log: Log): Profile => (
   point: string,

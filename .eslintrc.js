@@ -30,5 +30,7 @@ module.exports = {
     "indent-legacy": 0,
     "jsx-a11y/href-no-hash": 0,
     "class-methods-use-this": 0,
+    "react/prefer-stateless-function": 0,
+    "react/jsx-filename-extension": 0,
   },
 };

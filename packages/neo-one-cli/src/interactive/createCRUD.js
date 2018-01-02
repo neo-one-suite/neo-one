@@ -61,7 +61,6 @@ const addCommon = ({
   });
 };
 
-// flowlint-next-line unclear-type:off
 type Spinners = Object;
 
 const getSymbol = (task: TaskStatus, spinners: Spinners) => {

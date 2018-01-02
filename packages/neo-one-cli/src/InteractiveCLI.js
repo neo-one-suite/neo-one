@@ -369,7 +369,6 @@ export default class InteractiveCLI {
   }: {|
     plugin: string,
     resourceType: string,
-    // flowlint-next-line unclear-type:off
   |}): ResourceType<any, any> {
     const plugin = this._plugins[pluginName];
     if (plugin == null) {

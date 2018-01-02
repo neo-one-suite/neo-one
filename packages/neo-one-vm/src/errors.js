@@ -1,10 +1,8 @@
 /* @flow */
 import type BN from 'bn.js';
-import { type OpCode } from '@neo-one/core';
+import { type OpCode, disassembleByteCode } from '@neo-one/core';
 
 import { type ExecutionContext } from './constants';
-
-import disassembleByteCode from './disassembleByteCode';
 
 export class VMError extends Error {
   code = 'VM_ERROR';

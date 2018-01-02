@@ -19,3 +19,10 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# IntelliJ IDE ignore
+.idea
+
+# Visual Studio Code
+.vscode
+.history

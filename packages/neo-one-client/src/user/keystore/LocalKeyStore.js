@@ -1,18 +1,19 @@
 /* @flow */
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import type { Observable } from 'rxjs/Observable';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 import _ from 'lodash';
 import { common, crypto } from '@neo-one/core';
-import { distinct, distinctUntilChanged } from 'rxjs/operators';
+import { distinct, distinctUntilChanged, map } from 'rxjs/operators';
 import { utils } from '@neo-one/utils';
 
 import type {
   BufferString,
   UserAccount,
+  UserAccountID,
   NetworkType,
   Witness,
-} from '../../types'; // eslint-disable-line
+} from '../../types';
 import {
   LockedAccountError,
   PasswordRequiredError,
@@ -37,70 +38,78 @@ export type Wallets = {
   [network: string]: { [address: string]: Wallet },
 };
 export type Store = {
+  +type: string,
   +getWallets: () => Promise<Array<Wallet>>,
   +saveWallet: (wallet: Wallet) => Promise<void>,
   +deleteWallet: (account: Wallet) => Promise<void>,
 };
 
-type WalletID = {|
-  address: string,
-  network: NetworkType,
-|};
+const flattenWallets = (wallets: Wallets) =>
+  _.flatten(
+    utils.values(wallets).map(networkWallets => utils.values(networkWallets)),
+  );
 
 export default class LocalKeyStore {
   +currentAccount$: Observable<?UserAccount>;
-  _currentAccount$: ReplaySubject<?UserAccount>;
   +accounts$: Observable<Array<UserAccount>>;
-  _accounts$: ReplaySubject<Array<UserAccount>>;
   +wallets$: Observable<Array<Wallet>>;
-  _wallets$: ReplaySubject<Array<Wallet>>;
 
-  _currentAccount: ?UserAccount;
-  wallets: Wallets;
+  _currentAccount$: BehaviorSubject<?UserAccount>;
+  _wallets$: BehaviorSubject<Wallets>;
+
   _store: Store;
 
-  constructor({ store, wallets }: {| store: Store, wallets: Wallets |}) {
-    this._accounts$ = new ReplaySubject(1);
-    this.accounts$ = this._accounts$.pipe(
-      distinctUntilChanged((a, b) => _.isEqual(a, b)),
-    );
+  _initPromise: Promise<void>;
 
-    this._wallets$ = new ReplaySubject(1);
+  constructor({ store }: {| store: Store |}) {
+    this._wallets$ = new BehaviorSubject({});
     this.wallets$ = this._wallets$.pipe(
       distinctUntilChanged((a, b) => _.isEqual(a, b)),
+      map(wallets => flattenWallets(wallets)),
     );
 
-    this._currentAccount$ = new ReplaySubject(1);
+    this.accounts$ = this.wallets$.pipe(
+      map(wallets => wallets.map(({ account }) => account)),
+    );
+
+    this._currentAccount$ = new BehaviorSubject(null);
     this.currentAccount$ = this._currentAccount$.pipe(distinct());
 
-    this._currentAccount = null;
-    this.wallets = wallets;
     this._store = store;
 
-    this._updateAccounts$();
-    this._newCurrentAccount$();
+    this._initPromise = this._init();
   }
 
-  static async create({ store }: {| store: Store |}): Promise<LocalKeyStore> {
-    const walletsList = await store.getWallets();
+  async _init(): Promise<void> {
+    const walletsList = await this._store.getWallets();
     const wallets = walletsList.reduce((acc, wallet) => {
-      if (acc[wallet.account.network] == null) {
-        acc[wallet.account.network] = {};
+      if (acc[wallet.account.id.network] == null) {
+        acc[wallet.account.id.network] = {};
       }
-      acc[wallet.account.network][wallet.account.address] = wallet;
+      acc[wallet.account.id.network][wallet.account.id.address] = wallet;
       return acc;
     }, {});
+    this._wallets$.next(wallets);
+    this._newCurrentAccount();
+  }
 
-    return new this({ wallets, store });
+  get wallets(): Wallets {
+    return this._wallets$.getValue();
+  }
+
+  get currentAccount(): ?UserAccount {
+    return this._currentAccount$.getValue();
   }
 
   async sign({
     account,
     message,
   }: {|
-    account: UserAccount,
+    account: UserAccountID,
     message: string,
   |}): Promise<Witness> {
+    await this._initPromise;
+
     const privateKey = this._getPrivateKey(account);
     const witness = crypto.createWitness(
       Buffer.from(message, 'hex'),
@@ -112,13 +121,12 @@ export default class LocalKeyStore {
     };
   }
 
-  selectAccount(id: WalletID): void {
+  selectAccount(id: UserAccountID): void {
     const { account } = this.getWallet(id);
-    this._currentAccount = account;
     this._currentAccount$.next(account);
   }
 
-  getWallet({ address, network }: WalletID): Wallet {
+  getWallet({ address, network }: UserAccountID): Wallet {
     const wallets = this.wallets[network];
     if (wallets == null) {
       throw new UnknownAccountError(address);
@@ -143,7 +151,7 @@ export default class LocalKeyStore {
     name?: string,
     password?: string,
   |}): Promise<Wallet> {
-    const select = _.isEmpty(this.wallets);
+    await this._initPromise;
 
     let privateKey = privateKeyIn;
     const publicKey = privateKeyToPublicKey(privateKey);
@@ -155,19 +163,18 @@ export default class LocalKeyStore {
       if (password == null) {
         throw new PasswordRequiredError();
       }
-      nep2 = await encryptNEP2({
-        privateKey,
-        password,
-      });
+      nep2 = await encryptNEP2({ privateKey, password });
       privateKey = undefined;
     }
 
     const wallet = {
       account: {
-        type: 'file',
-        network,
+        type: this._store.type,
+        id: {
+          network,
+          address,
+        },
         name: name == null ? address : name,
-        address,
         scriptHash,
         publicKey,
       },
@@ -176,42 +183,43 @@ export default class LocalKeyStore {
     };
 
     await this._store.saveWallet(wallet);
+    this._updateWallet(wallet);
 
-    if (this.wallets[wallet.account.network] == null) {
-      this.wallets[wallet.account.network] = {};
-    }
-
-    if (this.wallets[wallet.account.network][wallet.account.address] == null) {
-      this.wallets[wallet.account.network][wallet.account.address] = wallet;
-      this._updateAccounts$();
-    }
-
-    if (select) {
+    if (this.currentAccount == null) {
       this._currentAccount$.next(wallet.account);
     }
 
     return wallet;
   }
 
-  async deleteAccount(id: WalletID): Promise<void> {
-    const { account } = this.getWallet(id);
-    await this._store.deleteWallet(
-      this.wallets[account.network][account.address],
-    );
+  async deleteAccount(id: UserAccountID): Promise<void> {
+    await this._initPromise;
 
-    delete this.wallets[account.network][account.address];
-    if (_.isEmpty(this.wallets[account.network])) {
-      delete this.wallets[account.network];
+    const { wallets } = this;
+    const networkWalletsIn = wallets[id.network];
+    if (networkWalletsIn == null) {
+      return;
     }
 
-    this._updateAccounts$();
+    const networkWallets = { ...networkWalletsIn };
+    const wallet = networkWallets[id.address];
+    if (wallet == null) {
+      return;
+    }
+
+    delete networkWallets[id.network][id.address];
+    await this._store.deleteWallet(wallet);
+    this._wallets$.next({
+      ...wallets,
+      [id.network]: networkWallets,
+    });
 
     if (
-      this._currentAccount != null &&
-      this._currentAccount.network === account.network &&
-      this._currentAccount.address === account.address
+      this.currentAccount != null &&
+      this.currentAccount.network === id.network &&
+      this.currentAccount.address === id.address
     ) {
-      this._newCurrentAccount$();
+      this._newCurrentAccount();
     }
   }
 
@@ -219,9 +227,11 @@ export default class LocalKeyStore {
     id,
     password,
   }: {|
-    id: WalletID,
+    id: UserAccountID,
     password: string,
   |}): Promise<void> {
+    await this._initPromise;
+
     const wallet = this.getWallet(id);
     if (wallet.privateKey != null) {
       return;
@@ -236,64 +246,55 @@ export default class LocalKeyStore {
       password,
     });
 
-    this.wallets[wallet.account.network][wallet.account.address] = {
+    this._updateWallet({
       account: wallet.account,
       privateKey,
       nep2: wallet.nep2,
-    };
-    this._updateWallets$();
+    });
   }
 
-  lockWallet(id: WalletID): void {
+  lockWallet(id: UserAccountID): void {
     const wallet = this.getWallet(id);
     if (wallet.nep2 == null || wallet.privateKey == null) {
       return;
     }
 
-    this.wallets[wallet.account.network][wallet.account.address] = {
+    this._updateWallet({
       account: wallet.account,
       privateKey: null,
       nep2: wallet.nep2,
-    };
-    this._updateWallets$();
+    });
   }
 
-  _getPrivateKey(account: UserAccount): BufferString {
+  _getPrivateKey(id: UserAccountID): BufferString {
     const wallet = this.getWallet({
-      network: account.network,
-      address: account.address,
+      network: id.network,
+      address: id.address,
     });
 
     if (wallet.privateKey == null) {
-      throw new LockedAccountError(account.address);
+      throw new LockedAccountError(id.address);
     }
 
     return wallet.privateKey;
   }
 
-  _updateAccounts$(): void {
-    this._accounts$.next(this._getAllAccounts());
-    this._updateWallets$();
+  _updateWallet(wallet: Wallet): void {
+    const { wallets } = this;
+    this._wallets$.next({
+      ...wallets,
+      [wallet.account.id.network]: {
+        ...(wallets[wallet.account.id.network] || {}),
+        [wallet.account.id.address]: wallet,
+      },
+    });
   }
 
-  _updateWallets$(): void {
-    this._wallets$.next(this._getAllWallets());
-  }
-
-  _newCurrentAccount$(): void {
-    const allAccounts = this._getAllAccounts();
-    const account = allAccounts[0];
-    this._currentAccount = account;
-    this._currentAccount$.next(account);
-  }
-
-  _getAllAccounts(): Array<UserAccount> {
-    return this._getAllWallets().map(({ account }) => account);
-  }
-
-  _getAllWallets(): Array<Wallet> {
-    return _.flatten(
-      utils.values(this.wallets).map(wallets => utils.values(wallets)),
+  _newCurrentAccount(): void {
+    const allAccounts = flattenWallets(this.wallets).map(
+      ({ account }) => account,
     );
+    const account = allAccounts[0];
+    this._currentAccount$.next(account);
   }
 }

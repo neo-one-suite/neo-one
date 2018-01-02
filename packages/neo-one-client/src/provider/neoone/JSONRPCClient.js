@@ -117,7 +117,7 @@ export default class JSONRPCClient {
       })
       .then(result => {
         if (!result) {
-          throw new RelayTransactionError();
+          throw new RelayTransactionError('Relay transaction failed.');
         }
 
         return result;
@@ -132,7 +132,7 @@ export default class JSONRPCClient {
       })
       .catch(error => {
         if (error.code === 'JSON_RPC' && error.responseError.code === -110) {
-          throw new RelayTransactionError();
+          throw new RelayTransactionError(error.responseError.message);
         }
 
         throw error;

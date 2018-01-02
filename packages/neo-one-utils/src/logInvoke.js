@@ -4,7 +4,6 @@ import type { Log } from './log';
 async function logInvoke<T>(
   log: Log,
   event: string,
-  // flowlint-next-line unclear-type:off
   extra: Object,
   fn: () => Promise<T>,
   cleanupFn?: () => Promise<T>,

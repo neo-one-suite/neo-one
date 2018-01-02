@@ -2,6 +2,10 @@
 // flowlint untyped-import:off
 import { type ABI } from '@neo-one/client';
 import {
+  type Contract,
+  constants as compilerConstants,
+} from '@neo-one/server-plugin-compiler';
+import {
   type DescribeTable,
   type PluginManager,
   compoundName,
@@ -9,7 +13,6 @@ import {
 import type { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 
-import { constants as compilerConstants } from '@neo-one/server-plugin-compiler';
 import { map, shareReplay, take } from 'rxjs/operators';
 import fs from 'fs-extra';
 import path from 'path';
@@ -140,8 +143,7 @@ export default class SmartContractResource {
           options: {},
         })
         .pipe(take(1))
-        // flowlint-next-line unclear-type:off
-        .toPromise(): Promise<any>);
+        .toPromise(): Promise<?Contract>);
       if (compiledContract == null) {
         throw new ContractOrHashRequiredError(
           `Contract ${contract.name} does not exist.`,
@@ -283,7 +285,6 @@ export default class SmartContractResource {
       ['Config Path', this._configPath],
       ['ABI Path', this._abiPath],
     ].concat(
-      // flowlint-next-line unclear-type:off
       utils.entries((this._toResource(): Object)).map(([key, val]) => {
         if (val == null) {
           return [key, 'null'];

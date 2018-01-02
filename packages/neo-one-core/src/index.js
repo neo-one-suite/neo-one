@@ -148,7 +148,12 @@ export {
 } from './ContractPropertyState';
 export { createDeserializeWire, createSerializeWire } from './Serializable';
 export { SCRIPT_CONTAINER_TYPE } from './ScriptContainer';
-export { BYTECODE_TO_OPCODE, OPCODE_TO_BYTECODE, VM_STATE } from './vm';
+export {
+  BYTECODE_TO_OPCODE,
+  OPCODE_TO_BYTECODE,
+  VM_STATE,
+  disassembleByteCode,
+} from './vm';
 
 export type {
   ECPoint,

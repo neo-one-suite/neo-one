@@ -1,6 +1,5 @@
 /* @flow */
 // flowlint untyped-import:off
-// flowlint unclear-type:off
 import type {
   AllResources,
   BaseResource,

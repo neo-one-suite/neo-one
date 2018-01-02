@@ -122,8 +122,8 @@ export class UnknownBlockError extends Error {
 export class RelayTransactionError extends Error {
   code: string;
 
-  constructor() {
-    super('Transaction relay failed.');
+  constructor(message: string) {
+    super(message);
     this.code = 'RELAY_TRANSACTION';
   }
 }

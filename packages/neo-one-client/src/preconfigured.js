@@ -16,14 +16,14 @@ import ReadClient from './ReadClient';
 
 import * as networks from './networks';
 
-export const localClient = async (optionsIn?: {|
+export const localClient = (optionsIn?: {|
   store?: LocalStore,
   mainRPCURL?: string,
   testRPCURL?: string,
   options?: Array<NEOONEProviderOptions>,
 |}) => {
   const { store, mainRPCURL, testRPCURL, options } = optionsIn || {};
-  const keystore = await LocalKeyStore.create({
+  const keystore = new LocalKeyStore({
     store: store || new LocalMemoryStore(),
   });
   return new Client(

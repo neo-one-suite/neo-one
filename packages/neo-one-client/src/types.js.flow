@@ -450,12 +450,15 @@ export type NetworkSettings = {|
   issueGASFee: BigNumber,
 |};
 
+export type UserAccountID = {|
+  network: NetworkType,
+  address: AddressString,
+|};
 export type UserAccount = {|
   // UserAccountProvider defined string.
   type: string,
-  network: NetworkType,
+  id: UserAccountID,
   name: string,
-  address: AddressString,
   scriptHash: Hash160String,
   publicKey: PublicKeyString,
 |};
@@ -709,7 +712,6 @@ export type ABI = {|
 |};
 
 export type SmartContract = {|
-  // flowlint-next-line unclear-type:off
   [key: string]: any
 |};
 

@@ -42,6 +42,7 @@ export type { TaskContext } from './TaskList';
 export type {
   AllResources,
   BaseResource,
+  BaseResourceOptions,
   Binary,
   CLIArgs,
   CLIHook,

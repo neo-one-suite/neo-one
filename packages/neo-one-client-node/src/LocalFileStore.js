@@ -5,9 +5,11 @@ import fs from 'fs-extra';
 import path from 'path';
 
 export default class LocalFileStore {
+  type: string;
   _dataPath: string;
 
   constructor({ dataPath }: {| dataPath: string |}) {
+    this.type = 'file';
     this._dataPath = dataPath;
   }
 
@@ -27,7 +29,9 @@ export default class LocalFileStore {
     await fs.remove(this._getWalletPath(wallet));
   }
 
-  _getWalletPath({ account: { network, address } }: LocalWallet): string {
+  _getWalletPath({
+    account: { id: { network, address } },
+  }: LocalWallet): string {
     return path.resolve(this._dataPath, `${network}-${address}.json`);
   }
 }

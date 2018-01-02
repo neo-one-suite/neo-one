@@ -9,7 +9,6 @@ import type {
 } from './types';
 import CRUDResourceBase from './CRUDResourceBase';
 
-// flowlint-next-line unclear-type:off
 export type Request$Options<ResourceOptions: Object> = {|
   name: string,
   cancel$: Observable<void>,

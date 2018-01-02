@@ -50,17 +50,17 @@
     "docker:linux:test": "pushd ./scripts/docker/linux && eval $(docker-machine env -unset) && docker build . -t neo-one/test-linux:8.9.3 -f Dockerfile.test && popd"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.36",
-    "@babel/core": "^7.0.0-beta.36",
-    "@babel/node": "^7.0.0-beta.36",
-    "@babel/plugin-proposal-async-generator-functions": "^7.0.0-beta.36",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.36",
-    "@babel/plugin-proposal-export-namespace-from": "^7.0.0-beta.36",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.36",
-    "@babel/plugin-transform-flow-strip-types": "^7.0.0-beta.36",
-    "@babel/polyfill": "^7.0.0-beta.36",
-    "@babel/preset-env": "^7.0.0-beta.36",
-    "@babel/register": "^7.0.0-beta.36",
+    "@babel/cli": "^7.0.0-beta.35",
+    "@babel/core": "^7.0.0-beta.35",
+    "@babel/node": "^7.0.0-beta.35",
+    "@babel/plugin-proposal-async-generator-functions": "^7.0.0-beta.35",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.35",
+    "@babel/plugin-proposal-export-namespace-from": "^7.0.0-beta.35",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.35",
+    "@babel/plugin-transform-flow-strip-types": "^7.0.0-beta.35",
+    "@babel/polyfill": "^7.0.0-beta.35",
+    "@babel/preset-env": "^7.0.0-beta.35",
+    "@babel/register": "^7.0.0-beta.35",
     "babel-core": "^7.0.0-0",
     "babel-eslint": "^8.1.2",
     "babel-jest": "^22.0.4",
@@ -116,8 +116,7 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "<rootDir>/packages/neo-one-neo-settings/src/test.js",
-      "<rootDir>/migrate/.*",
-      "<rootDir>/packages/neo-one-simulation-ico-tour/template/.*"
+      "<rootDir>/migrate/.*"
     ],
     "snapshotSerializers": [
       "./scripts/serializers/blockchain.js",

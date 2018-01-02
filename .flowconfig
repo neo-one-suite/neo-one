@@ -18,6 +18,7 @@ decls/
 all=error
 sketchy-null-bool=off
 untyped-import=warn
+unclear-type=off
 
 [options]
 module.use_strict=true

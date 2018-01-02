@@ -49,9 +49,7 @@ export type CRUDBaseOptions<
 
 export type GetCLIResourceOptions = {|
   cli: InteractiveCLI,
-  // flowlint-next-line unclear-type:off
   args: Object,
-  // flowlint-next-line unclear-type:off
   options: Object,
 |};
 

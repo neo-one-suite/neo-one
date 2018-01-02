@@ -105,10 +105,11 @@ const getWallets = async ({
   );
 
   return walletResources.reduce((acc, wallet) => {
+    const { name } = walletConstants.extractWallet(wallet.name);
     if (wallet.wif == null) {
       throw new Error('Something went wrong.');
     }
-    acc[wallet.name] = ({
+    acc[name] = ({
       address: wallet.address,
       scriptHash: wallet.scriptHash,
       publicKey: wallet.publicKey,
@@ -189,7 +190,8 @@ const getDeployedContracts = async ({
   );
 
   return contractResources.reduce((acc, contract) => {
-    acc[contract.name] = ({
+    const { name } = walletConstants.extractContract(contract.name);
+    acc[name] = ({
       hash: contract.hash,
       abi: contract.abi,
     }: DeployedContractOutputConfig);
@@ -232,6 +234,6 @@ export default {
       pluginManager: ctx.pluginManager,
       options: ctx.options,
     });
-    await fs.writeJSON(ctx.options.configPath, config);
+    await fs.writeJSON(ctx.options.configPath, config, { spaces: 2 });
   },
 };

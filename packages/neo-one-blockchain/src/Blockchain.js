@@ -28,15 +28,12 @@ import {
   type Storage,
   type VM,
 } from '@neo-one/node-core';
-import { type Log, utils as commonUtils } from '@neo-one/utils';
+import { type Log, utils as commonUtils, performanceNow } from '@neo-one/utils';
 import PriorityQueue from 'js-priority-queue';
 import { Subject } from 'rxjs/Subject';
 
 import _ from 'lodash';
 import { filter, map, toArray } from 'rxjs/operators';
-// TODO: Support in browsers?
-// $FlowFixMe
-import { performance } from 'perf_hooks'; // eslint-disable-line
 
 import {
   GenesisBlockNotRegisteredError,
@@ -348,12 +345,12 @@ export default class Blockchain {
         entry.block.index === this.currentBlockIndex + 1
       ) {
         entry = this._blockQueue.dequeue();
-        const start = performance.now();
+        const start = performanceNow();
         // eslint-disable-next-line
         await this._persistBlock(entry.block, entry.unsafe);
         entry.resolve();
         this.block$.next(entry.block);
-        const duration = performance.now() - start;
+        const duration = performanceNow() - start;
         this.log({
           event: 'PERSIST_BLOCK_SUCCESS',
           index: entry.block.index,
@@ -433,7 +430,7 @@ export default class Blockchain {
     const result = await this._vm.executeScripts({
       scripts: [
         { code: witness.invocation, pushOnly: true },
-        { code: witness.verification },
+        { code: verification },
       ],
       blockchain,
       scriptContainer,
@@ -445,12 +442,15 @@ export default class Blockchain {
 
     const { stack } = result;
     if (stack.length !== 1) {
-      throw new ScriptVerifyError();
+      throw new ScriptVerifyError(
+        `Verification did not return one result. This may be a bug in the ` +
+          `smart contract. Found ${stack.length} results.`,
+      );
     }
 
     const top = stack[0];
     if (!top.asBoolean()) {
-      throw new ScriptVerifyError();
+      throw new ScriptVerifyError('Verification did not succeed.');
     }
   };
 

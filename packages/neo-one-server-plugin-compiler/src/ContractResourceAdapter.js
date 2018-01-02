@@ -118,7 +118,7 @@ export default class ContractResourceAdapter {
     const staticOptions = this._getStaticOptions(options);
     const [abi, script, { hasStorage, hasDynamicInvoke }] = await Promise.all([
       fs.readJSON(staticOptions.abiPath),
-      fs.readFile(staticOptions.avmPath, 'utf8'),
+      fs.readFile(staticOptions.avmPath, 'hex'),
       fs.readJSON(staticOptions.configPath),
     ]);
 
@@ -206,7 +206,7 @@ export default class ContractResourceAdapter {
                 hasDynamicInvoke = options.hasDynamicInvoke;
               }
 
-              const script = await fs.readFile(staticOptions.avmPath, 'utf8');
+              const script = await fs.readFile(staticOptions.avmPath, 'hex');
 
               ctx.abi = abi;
               ctx.hasDynamicInvoke = hasDynamicInvoke;

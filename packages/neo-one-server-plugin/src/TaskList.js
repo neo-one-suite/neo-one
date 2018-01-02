@@ -11,7 +11,6 @@ import type { TaskStatus } from './types';
 
 import { getTaskError, getTasksError, isTaskDone } from './tasks';
 
-// flowlint-next-line unclear-type:off
 export type TaskContext = Object;
 type SkipFn = (ctx: TaskContext) => string | boolean;
 type EnabledFn = (ctx: TaskContext) => boolean;

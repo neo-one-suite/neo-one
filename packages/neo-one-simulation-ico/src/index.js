@@ -40,5 +40,6 @@ export default {
     preCompile,
     postCreate,
   },
+  configPath: path.join('src', 'neo-one.json'),
   templateDir: path.resolve(__dirname, '..', 'template'),
 };

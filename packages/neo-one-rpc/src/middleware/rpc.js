@@ -256,7 +256,7 @@ export default ({
         ]);
         return transactionJSON;
       } catch (error) {
-        throw server.error(-110, 'Relay transaction failed.');
+        throw server.error(-110, `Relay transaction failed: ${error.message}`);
       }
     },
     getoutput: async args => {

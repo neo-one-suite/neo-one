@@ -85,7 +85,6 @@ export default class Output implements SerializableWire<Output>, Equatable {
 
   // TODO: Maybe store index on Output directly? And add it when deserializing
   //       from transaction
-  // flowlint-next-line unclear-type:off
   serializeJSON(context: SerializeJSONContext, index: number): Object {
     return {
       n: index,

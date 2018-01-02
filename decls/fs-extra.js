@@ -37,17 +37,18 @@ declare module 'fs-extra' {
       flag?: string;
   }
 
-  declare export interface WriteFileOptions {
+  declare export type WriteFileOptions = {|
       encoding?: string;
       flag?: string;
       mode?: number;
-  }
+  |}
 
-  declare export interface WriteOptions extends WriteFileOptions {
+  declare export type WriteOptions = {|
+      ...WriteFileOptions,
       fs?: Object;
       replacer?: any;
       spaces?: number | string;
-  }
+  |}
 
   declare export interface ReadResult {
       bytesRead: number;

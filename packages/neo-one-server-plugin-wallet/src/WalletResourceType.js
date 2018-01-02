@@ -78,7 +78,7 @@ export default class WalletResourceType extends ResourceType<
   }: MasterResourceAdapterOptions): Promise<
     MasterResourceAdapter<Wallet, WalletResourceOptions>,
   > {
-    const client = await localClient({
+    const client = localClient({
       store: new LocalFileStore({
         dataPath: path.resolve(dataPath, WALLETS_PATH),
       }),

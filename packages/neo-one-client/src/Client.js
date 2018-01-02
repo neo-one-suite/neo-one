@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint unclear-type:off
 import type { Observable } from 'rxjs/Observable';
 
 import { take } from 'rxjs/operators';

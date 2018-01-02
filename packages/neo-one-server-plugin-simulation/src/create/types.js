@@ -55,7 +55,6 @@ export type Options = {|
   preCompileConfig?: SimulationPreCompileOutputConfig,
   createHook?: string,
   configPath: string,
-  // flowlint-next-line unclear-type:off
   options: Object,
 |};
 
@@ -67,6 +66,5 @@ export type CreateContext = {
   dependents: Array<ResourceDependency>,
   resourceAdapter: SimulationResourceAdapter,
   pluginManager: PluginManager,
-  // flowlint-next-line unclear-type:off
   client: Client<any>,
 };

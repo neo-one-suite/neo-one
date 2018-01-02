@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint unclear-type:off
 // flowlint untyped-import:off
 import DataLoader from 'dataloader';
 

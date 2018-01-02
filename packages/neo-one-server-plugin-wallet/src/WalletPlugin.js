@@ -51,7 +51,6 @@ export default class WalletPlugin extends Plugin {
     return [networkConstants.PLUGIN, compilerConstants.PLUGIN];
   }
 
-  // flowlint-next-line unclear-type:off
   get resourceTypes(): Array<ResourceType<any, any>> {
     return [this.walletResourceType, this.smartContractResourceType];
   }

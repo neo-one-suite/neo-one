@@ -1,14 +1,13 @@
 /* @flow */
 import type { Observable } from 'rxjs/Observable';
 
-import type { BaseResource, DescribeTable } from './types';
+import type { BaseResource, BaseResourceOptions, DescribeTable } from './types';
 import type TaskList from './TaskList';
 
 // Note that all call orders are user initiated unless otherwise specified.
 export type ResourceAdapter<
   Resource: BaseResource,
-  // flowlint-next-line unclear-type:off
-  ResourceOptions: Object,
+  ResourceOptions: BaseResourceOptions,
 > = {
   // Called after
   //    destroy (upon restart)

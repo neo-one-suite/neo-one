@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint unclear-type:off
 import type {
   ArrayABI,
   Param,

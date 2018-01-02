@@ -1,10 +1,8 @@
 /* @flow */
 export class RPCError extends Error {
   code: number;
-  // flowlint-next-line unclear-type:off
   data: ?Object;
 
-  // flowlint-next-line unclear-type:off
   constructor(code: number, message: string, data?: ?Object) {
     super(message);
     this.code = code;

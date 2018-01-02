@@ -2,6 +2,8 @@
 import type { Wallet } from './LocalKeyStore';
 
 export default class LocalMemoryStore {
+  type: string = 'memory';
+
   getWallets(): Promise<Array<Wallet>> {
     return Promise.resolve([]);
   }
