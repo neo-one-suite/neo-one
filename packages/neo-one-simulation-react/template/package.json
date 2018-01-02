@@ -1,6 +1,6 @@
 {
-  "name": "template",
-  "version": "0.1.0",
+  "name": "@neo-one/simulation-react-template",
+  "version": "0.0.1",
   "private": true,
   "dependencies": {
     "@babel/polyfill": "^7.0.0-beta.35",

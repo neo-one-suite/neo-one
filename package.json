@@ -7,7 +7,8 @@
   "license": "MIT",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/*/*"
   ],
   "engines": {
     "node": ">=8.9.0"
@@ -18,6 +19,11 @@
       "git add",
       "eslint",
       "yarn test --findRelatedTests --ci --passWithNoTests"
+    ],
+    "packages/*/template/**/*.js": [
+      "prettier --write --config .prettierrc",
+      "git add",
+      "eslint"
     ],
     "scripts/**/*.js": [
       "prettier --write --config .prettierrc",
@@ -116,7 +122,8 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "<rootDir>/packages/neo-one-neo-settings/src/test.js",
-      "<rootDir>/migrate/.*"
+      "<rootDir>/migrate/.*",
+      "<rootDir>/packages/.*/template/.*"
     ],
     "snapshotSerializers": [
       "./scripts/serializers/blockchain.js",
