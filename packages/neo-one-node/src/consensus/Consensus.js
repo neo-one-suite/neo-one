@@ -61,8 +61,8 @@ export default class Consensus {
       map(options => {
         const privateKey = common.stringToPrivateKey(options.privateKey);
         const publicKey = crypto.privateKeyToPublicKey(privateKey);
-        const scriptHash = crypto.publicKeyToScriptHash(publicKey);
-        return { privateKey, publicKey, scriptHash };
+        const feeAddress = crypto.publicKeyToScriptHash(publicKey);
+        return { privateKey, publicKey, feeAddress };
       }),
       switchMap(options => this._start(options)),
       finalize(() => {

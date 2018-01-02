@@ -1,5 +1,5 @@
 [version]
-0.61.0
+0.62.0
 
 [ignore]
 .*/node_modules/babel-plugin-flow-runtime/.*
@@ -19,10 +19,9 @@ all=error
 sketchy-null-bool=off
 untyped-import=warn
 unclear-type=off
+unsafe-getters-setters=off
 
 [options]
 module.use_strict=true
 
 esproposal.export_star_as=enable
-
-unsafe.enable_getters_and_setters=true

@@ -326,7 +326,7 @@ export default class WalletResource {
     await fs.remove(this._dataPath);
   }
 
-  async _update(network?: Network): Promise<void> {
+  async _update(network?: ?Network): Promise<void> {
     if (network != null && network.nodes.some(node => node.ready)) {
       this._readClient = updateClient({
         networkName: this._networkName,

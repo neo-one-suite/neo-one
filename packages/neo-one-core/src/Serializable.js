@@ -26,11 +26,12 @@ export type SerializeWire = () => Buffer;
 export type DeserializeWireBase<T> = (options: DeserializeWireBaseOptions) => T;
 export type DeserializeWire<T> = (options: DeserializeWireOptions) => T;
 
+// eslint-disable-next-line
 export interface SerializableWire<T> {
   +serializeWireBase: (writer: BinaryWriter) => void;
   +serializeWire: SerializeWire;
-  static +deserializeWireBase: DeserializeWireBase<T>;
-  static +deserializeWire: DeserializeWire<T>;
+  // static +deserializeWireBase: DeserializeWireBase<T>;
+  // static +deserializeWire: DeserializeWire<T>;
 }
 
 export const createSerializeWire = (

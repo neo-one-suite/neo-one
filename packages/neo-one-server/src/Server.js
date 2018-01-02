@@ -114,15 +114,11 @@ export default class Server {
   }
 
   start$(): Observable<void> {
-    return combineLatest(
-      this.serverConfig.config$.pipe(map(config => config.server), distinct()),
-      this.serverConfig.config$.pipe(
-        map(config => config.services),
-        distinct(),
-      ),
-    ).pipe(
+    return this.serverConfig.config$.pipe(
+      map(config => config.server),
+      distinct(),
       mergeScan(
-        (prevApp, [serverConfig, servicesConfig]) =>
+        (prevApp, serverConfig) =>
           defer(async () => {
             if (prevApp == null) {
               const manager = new ServerManager({ dataPath: this.dataPath });
@@ -153,12 +149,7 @@ export default class Server {
             });
             app.use(context({ log: this._log }));
             app.use(logger);
-            app.use(
-              servicesMiddleware({
-                server: this,
-                config: servicesConfig,
-              }),
-            );
+            app.use(servicesMiddleware({ server: this }));
             this._serverDebug.port = serverConfig.port;
             app.start(`0.0.0.0:${serverConfig.port}`);
             this._log({ event: 'SERVER_START', port: serverConfig.port });

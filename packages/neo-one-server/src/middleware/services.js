@@ -20,13 +20,6 @@ import type Server from '../Server';
 
 import pkg from '../../package.json';
 
-export type Config = {||};
-export const SCHEMA = {
-  type: 'object',
-  required: [],
-  properties: {},
-};
-
 const makeObservable = (ctx: Context): Observable<*> =>
   Observable.create(observer => {
     ctx.req.on('data', value => {
@@ -41,14 +34,7 @@ const makeObservable = (ctx: Context): Observable<*> =>
     return () => ctx.req.destroy();
   });
 
-export const middleware = ({
-  server,
-  // eslint-disable-next-line
-  config,
-}: {|
-  server: Server,
-  config: Config,
-|}) => {
+export default ({ server }: {| server: Server |}) => {
   async function handleCRUD<
     TRequest: CRUDRequest,
     TStartRequest: CRUDRequestStart,

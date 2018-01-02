@@ -50,7 +50,10 @@ export default ({
               const options = {
                 privateNet: config.privateNet,
                 secondsPerBlock: config.secondsPerBlock,
-                standbyValidators: [...config.standbyValidators],
+                standbyValidators:
+                  config.standbyValidators == null
+                    ? undefined
+                    : config.standbyValidators,
                 address: config.address,
               };
               return config.test ? createTest(options) : createMain(options);
