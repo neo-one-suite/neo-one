@@ -1,5 +1,6 @@
 {
-  "name": "neo-one-simulation-my-sim",
+  "name": "@neo-one/simulation-template-template",
+  "private": true,
   "version": "0.0.1",
   "keywords": [
     "neo",
