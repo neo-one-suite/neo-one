@@ -1,0 +1,48 @@
+{
+  "name": "@neo-one/client-core",
+  "version": "0.0.1",
+  "keywords": [
+    "neo",
+    "NEO",
+    "one",
+    "ONE",
+    "blockchain",
+    "neo-one",
+    "neo-one-suite",
+    "neo one",
+    "neo one suite",
+    "NEO ONE",
+    "NEO ONE suite",
+    "NEO•ONE",
+    "NEO•ONE suite",
+    "neo blockchain",
+    "NEO Blockchain",
+    "NEO blockchain",
+    "dapp",
+    "dapps"
+  ],
+  "description": "NEO•ONE core types implementation.",
+  "repository": "https://github.com/neo-one-suite/neo-one",
+  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/es.js",
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@neo-one/utils": "^0.0.1",
+    "bignumber.js": "^5.0.0",
+    "bn.js": "^4.11.8",
+    "bs58": "^4.0.1",
+    "buffer-xor": "^2.0.2",
+    "ec-key": "^0.0.2",
+    "elliptic": "^6.4.0",
+    "lodash": "^4.17.4",
+    "scrypt-js": "^2.0.3",
+    "wif": "^2.0.6"
+  }
+}

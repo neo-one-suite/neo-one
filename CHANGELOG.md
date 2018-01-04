@@ -5,7 +5,7 @@ NEO•ONE is divided into many packages but only a some are meant to be consumed
  - [`@neo-one/cli`](packages/neo-one-cli/CHANGELOG.md)
  - [`@neo-one/client`](packages/neo-one-client/CHANGELOG.md)
  - [`@neo-one/client-node`](packages/neo-one-client-node/CHANGELOG.md)
- - [`@neo-one/full-node`](packages/neo-one-full-node/CHANGELOG.md)
+ - [`@neo-one/node`](packages/neo-one-node/CHANGELOG.md)
  - [`@neo-one/server-client`](packages/neo-one-server-client/CHANGELOG.md)
  - [`@neo-one/server-plugin`](packages/neo-one-server-plugin/CHANGELOG.md)
  - [`@neo-one/server-plugin-compiler`](packages/neo-one-server-plugin-compiler/CHANGELOG.md)

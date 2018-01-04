@@ -1,5 +1,5 @@
 /* @flow */
-import { type UInt160, common } from '@neo-one/core';
+import { type UInt160, common } from '@neo-one/client-core';
 
 import type ClientBase from '../ClientBase';
 import { InvalidArgumentError } from '../errors';

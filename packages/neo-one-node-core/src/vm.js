@@ -10,7 +10,7 @@ import {
   type UInt256,
   type VMState,
   common,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 import type { WriteBlockchain } from './Blockchain';
 

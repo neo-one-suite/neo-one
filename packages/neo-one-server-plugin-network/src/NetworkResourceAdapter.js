@@ -13,7 +13,7 @@ import type { Subject } from 'rxjs/Subject';
 
 import _ from 'lodash';
 import { combineLatest } from 'rxjs/observable/combineLatest';
-import { common, crypto } from '@neo-one/core';
+import { common, crypto } from '@neo-one/client-core';
 import { map, shareReplay, switchMap } from 'rxjs/operators';
 import fs from 'fs-extra';
 import path from 'path';

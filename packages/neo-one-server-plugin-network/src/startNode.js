@@ -1,11 +1,11 @@
 /* @flow */
 import type { CLIArgs } from '@neo-one/server-plugin';
 
-import { createMain, createTest } from '@neo-one/neo-settings';
+import { createMain, createTest } from '@neo-one/node-neo-settings';
 import { createProfile } from '@neo-one/utils';
 import { distinct, map, take } from 'rxjs/operators';
 import fs from 'fs-extra';
-import fullNode$ from '@neo-one/full-node';
+import fullNode$ from '@neo-one/node';
 import path from 'path';
 
 import { createNEOBlockchainNodeConfig } from './node';

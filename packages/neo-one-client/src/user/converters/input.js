@@ -1,5 +1,5 @@
 /* @flow */
-import { Input, common } from '@neo-one/core';
+import { Input, common } from '@neo-one/client-core';
 
 import type { Input as ClientInput } from '../../types'; // eslint-disable-line
 

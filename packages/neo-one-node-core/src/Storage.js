@@ -17,7 +17,7 @@ import type {
   Transaction,
   UInt256,
   Validator,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 import type BlockSystemFee from './BlockSystemFee';
 import type { Blockchain, ReadStorage } from './Blockchain';

@@ -16,7 +16,7 @@ import {
   type TransactionJSON,
   JSONHelper,
   utils,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import BigNumber from 'bignumber.js';
 

@@ -4,8 +4,10 @@
     "packages/*",
     "packages/*/template/*"
   ],
-  "version": "0.0.63",
+  "version": "0.0.1",
   "npmClient": "yarn",
-  "npmClientArgs": ["--ignore-engines"],
+  "npmClientArgs": [
+    "--ignore-engines"
+  ],
   "useWorkspaces": true
 }

@@ -35,6 +35,9 @@
   "engines": {
     "node": ">=8.9.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "cross-spawn": "^5.1.0"
   }

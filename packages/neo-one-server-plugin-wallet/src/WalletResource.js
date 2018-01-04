@@ -20,7 +20,7 @@ import {
   privateKeyToWIF,
   createReadClient,
 } from '@neo-one/client';
-import { common } from '@neo-one/core';
+import { common } from '@neo-one/client-core';
 
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { concatMap, map, shareReplay, take } from 'rxjs/operators';

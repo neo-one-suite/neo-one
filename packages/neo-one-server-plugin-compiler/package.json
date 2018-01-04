@@ -27,6 +27,12 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "module": "./dist/es.js",
+  "engines": {
+    "node": ">=8.9.0"
+  },  
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@neo-one/boa": "^0.0.2",
     "@neo-one/client": "^0.0.1",

@@ -9,7 +9,7 @@ import {
   BaseState,
   BinaryReader,
   createSerializeWire,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 export type TransactionSpentCoinsAdd = {|
   version?: number,

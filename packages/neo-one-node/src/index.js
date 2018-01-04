@@ -1,9 +1,9 @@
 /* @flow */
-import Node from './Node';
+import fullNode$ from './fullNode$';
 
-export default Node;
+export default fullNode$;
 
 export type {
-  Environment as NodeEnvironment,
-  Options as NodeOptions,
-} from './Node';
+  Environment as FullNodeEnvironment,
+  Options as FullNodeOptions,
+} from './fullNode$';

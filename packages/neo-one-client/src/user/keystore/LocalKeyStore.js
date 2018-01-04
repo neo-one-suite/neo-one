@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import type { Observable } from 'rxjs/Observable';
 
 import _ from 'lodash';
-import { common, crypto } from '@neo-one/core';
+import { common, crypto } from '@neo-one/client-core';
 import { distinct, distinctUntilChanged, map } from 'rxjs/operators';
 import { utils } from '@neo-one/utils';
 

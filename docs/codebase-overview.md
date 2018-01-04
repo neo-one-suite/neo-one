@@ -29,23 +29,23 @@ At a high level, NEO•ONE provides a few main components, but the functionality
 
 ### Core
 
-The [@neo-one/core](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-core) package contains the base NEO blockchain types and interfaces shared between the Node and Client packages.
+The [@neo-one/client-core](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-client-core) package contains the base NEO blockchain types and interfaces shared between the Node and Client packages.
 
 ### Node
 
 NEO•ONE implements a full node for the NEO blockchain across the following packages:
 
-- [@neo-one/blockchain](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-blockchain) makes use of a Storage and VM implementation to implement the core logic for persisting a block.
-- [@neo-one/data-backup](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-data-backup) contains logic for backing up and restoring a data path via different providers, e.g. MegaNZ and Google Cloud. This is used for backing up and restoring leveldb, though it's not limited to just leveldb Storage implementations.
-- [@neo-one/full-node](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-full-node) combines most of the other packages listed here to implement a NEO full node.
-- [@neo-one/levelup](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-blockchain) implements the Storage interface using a levelup compatible db.
-- [@neo-one/neo-settings](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-neo-settings) is a very simple package that just functions to create the standard MainNet and TestNet settings for use with `neo-one-blockchain`.
-- [@neo-one/network](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-network) implements the low-level Network protocol for joining a mesh network.
-- [@neo-one/node](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node) implements the high-level Node protocol for passing messages on the mesh Network. It also contains the Consensus logic.
-- [@neo-one/node-core](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-core) is similar to `neo-one-core` and contains the NEO blockchain types and interfaces shared between Node packages. In particular, it contains common abstractions like the Storage and VM interfaces used between packages.
--  [@neo-one/offline](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-offline) is a simple package that implements bootstrapping a new Blockchain using a serialized Block file, typically called chain.acc. Mostly useful when we need to change the underlying Storage interfaces in a backwards incompatible way and need to generate a new backup, otherwise just restoring from `neo-one-data-backup` is preferrable.
-- [@neo-one/rpc](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-rpc) contains the RPC server implementation
-- [@neo-one/vm](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-vm) contains the NEO VM implementation
+- [@neo-one/node-blockchain](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-blockchain) makes use of a Storage and VM implementation to implement the core logic for persisting a block.
+- [@neo-one/node-data-backup](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-data-backup) contains logic for backing up and restoring a data path via different providers, e.g. MegaNZ and Google Cloud. This is used for backing up and restoring leveldb, though it's not limited to just leveldb Storage implementations.
+- [@neo-one/node](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node) combines most of the other packages listed here to implement a NEO full node.
+- [@neo-one/node-levelup](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-blockchain) implements the Storage interface using a levelup compatible db.
+- [@neo-one/node-neo-settings](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-neo-settings) is a very simple package that just functions to create the standard MainNet and TestNet settings for use with `neo-one-node-blockchain`.
+- [@neo-one/node-network](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-network) implements the low-level Network protocol for joining a mesh network.
+- [@neo-one/node-protocol](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-protocol) implements the high-level Node protocol for passing messages on the mesh Network. It also contains the Consensus logic.
+- [@neo-one/node-core](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-core) is similar to `neo-one-client-core` and contains the NEO blockchain types and interfaces shared between Node packages. In particular, it contains common abstractions like the Storage and VM interfaces used between packages.
+-  [@neo-one/node-offline](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-offline) is a simple package that implements bootstrapping a new Blockchain using a serialized Block file, typically called chain.acc. Mostly useful when we need to change the underlying Storage interfaces in a backwards incompatible way and need to generate a new backup, otherwise just restoring from `neo-one-node-data-backup` is preferrable.
+- [@neo-one/node-rpc](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-rpc) contains the RPC server implementation
+- [@neo-one/node-vm](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-vm) contains the NEO VM implementation
 
 ### Client
 

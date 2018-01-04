@@ -1,7 +1,7 @@
 /* @flow */
 import { TaskList } from '@neo-one/server-plugin';
 
-import { common } from '@neo-one/core';
+import { common } from '@neo-one/client-core';
 import { constants as walletConstants } from '@neo-one/server-plugin-wallet';
 import { filter, take } from 'rxjs/operators';
 

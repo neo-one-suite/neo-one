@@ -7,7 +7,7 @@ import {
   type Witness,
   common,
   crypto,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 import _ from 'lodash';
 

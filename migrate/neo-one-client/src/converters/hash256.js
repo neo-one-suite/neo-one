@@ -1,5 +1,5 @@
 /* @flow */
-import { type UInt256, common } from '@neo-one/core';
+import { type UInt256, common } from '@neo-one/client-core';
 
 import type { Hash256Like } from '../types';
 import { InvalidArgumentError } from '../errors';

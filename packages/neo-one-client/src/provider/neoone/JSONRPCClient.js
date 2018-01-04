@@ -13,7 +13,7 @@ import {
   type TransactionJSON,
   type TransactionReceiptJSON,
   type ValidatorJSON,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 
 import {

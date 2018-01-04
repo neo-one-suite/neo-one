@@ -1,5 +1,5 @@
 /* @flow */
-import { Witness } from '@neo-one/core';
+import { Witness } from '@neo-one/client-core';
 
 import { InvalidArgumentError } from '../errors';
 import type { WitnessLike } from '../types';

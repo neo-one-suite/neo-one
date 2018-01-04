@@ -17,7 +17,7 @@ import {
   toContractParameterType,
   common,
   utils,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 import {
   type ABI,

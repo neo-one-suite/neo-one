@@ -1,5 +1,5 @@
 /* @flow */
-import { VM_STATE } from '@neo-one/core';
+import { VM_STATE } from '@neo-one/client-core';
 
 import BasicClient from '../BasicClient';
 

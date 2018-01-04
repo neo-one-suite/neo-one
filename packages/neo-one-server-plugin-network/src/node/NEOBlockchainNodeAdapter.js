@@ -9,7 +9,7 @@ import {
   Config,
   killProcess,
 } from '@neo-one/server-plugin';
-import type { FullNodeEnvironment, FullNodeOptions } from '@neo-one/full-node';
+import type { FullNodeEnvironment, FullNodeOptions } from '@neo-one/node';
 
 import _ from 'lodash';
 import fetch from 'node-fetch';

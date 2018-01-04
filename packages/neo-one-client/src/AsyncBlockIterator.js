@@ -1,5 +1,5 @@
 /* @flow */
-import { AsyncIteratorBase } from '@neo-one/core';
+import { AsyncIteratorBase } from '@neo-one/client-core';
 
 import _ from 'lodash';
 

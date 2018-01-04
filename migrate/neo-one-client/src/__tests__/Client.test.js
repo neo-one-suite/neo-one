@@ -1,6 +1,6 @@
 /* @flow */
 /* eslint-disable no-loop-func */
-import { VM_STATE, utils } from '@neo-one/core';
+import { VM_STATE, utils } from '@neo-one/client-core';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import BigNumber from 'bignumber.js';
 

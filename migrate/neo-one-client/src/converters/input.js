@@ -1,5 +1,5 @@
 /* @flow */
-import { Input } from '@neo-one/core';
+import { Input } from '@neo-one/client-core';
 
 import { InvalidArgumentError } from '../errors';
 import type { InputLike } from '../types';

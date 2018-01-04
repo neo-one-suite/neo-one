@@ -1,5 +1,5 @@
 /* @flow */
-import { Witness } from '@neo-one/core';
+import { Witness } from '@neo-one/client-core';
 
 import type { Witness as ClientWitness } from '../../types'; // eslint-disable-line
 

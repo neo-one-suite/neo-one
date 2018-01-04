@@ -1,5 +1,5 @@
 /* @flow */
-import { JSONHelper, common, utils } from '@neo-one/core';
+import { JSONHelper, common, utils } from '@neo-one/client-core';
 
 import type {
   ArrayABI,

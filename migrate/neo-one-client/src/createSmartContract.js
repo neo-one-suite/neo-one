@@ -1,6 +1,6 @@
 /* @flow */
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
-import { VM_STATE, type Param, type UInt160 } from '@neo-one/core';
+import { VM_STATE, type Param, type UInt160 } from '@neo-one/client-core';
 
 import _ from 'lodash';
 import { filter, map } from 'ix/asynciterable/pipe/index';

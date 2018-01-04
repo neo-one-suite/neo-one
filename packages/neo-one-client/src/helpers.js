@@ -1,5 +1,5 @@
 /* @flow */
-import { crypto, common } from '@neo-one/core';
+import { crypto, common } from '@neo-one/client-core';
 
 import type {
   AddressString,

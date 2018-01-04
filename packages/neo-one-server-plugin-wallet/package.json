@@ -28,10 +28,13 @@
   "engines": {
     "node": ">=8.9.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@neo-one/client": "^0.0.1",
     "@neo-one/client-node": "^0.0.1",
-    "@neo-one/core": "^0.0.1",
+    "@neo-one/client-core": "^0.0.1",
     "@neo-one/server-plugin": "^0.0.1",
     "@neo-one/server-plugin-compiler": "^0.0.1",
     "@neo-one/server-plugin-network": "^0.0.1",

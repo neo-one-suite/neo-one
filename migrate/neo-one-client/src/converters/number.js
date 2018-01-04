@@ -2,7 +2,7 @@
 import type BN from 'bn.js';
 import BigNumber from 'bignumber.js';
 
-import { common } from '@neo-one/core';
+import { common } from '@neo-one/client-core';
 
 import { InvalidArgumentError } from '../errors';
 import type { NumberLike } from '../types';

@@ -14,7 +14,7 @@ import {
   common,
   createSerializeWire,
   utils,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 export type BlockSystemFeeKey = {|
   hash: UInt256,

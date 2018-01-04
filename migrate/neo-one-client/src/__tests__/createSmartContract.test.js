@@ -2,7 +2,7 @@
 /* eslint-disable no-loop-func */
 // flowlint untyped-import:off
 // flowlint unclear-type:off
-import { VM_STATE, utils } from '@neo-one/core';
+import { VM_STATE, utils } from '@neo-one/client-core';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import BigNumber from 'bignumber.js';
 

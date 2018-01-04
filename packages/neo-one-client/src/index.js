@@ -10,7 +10,7 @@ export {
 } from './user';
 export { NEOONEDataProvider, NEOONEProvider } from './provider';
 
-export { disassembleByteCode } from '@neo-one/core';
+export { disassembleByteCode } from '@neo-one/client-core';
 
 export * from './helpers';
 export * as networks from './networks';

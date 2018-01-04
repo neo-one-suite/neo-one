@@ -1,6 +1,6 @@
 /* @flow */
 import BN from 'bn.js';
-import { type Param, common } from '@neo-one/core';
+import { type Param, common } from '@neo-one/client-core';
 
 import { InvalidArgumentError } from '../../errors';
 import type { ParamInternal as ClientParam } from '../../types'; // eslint-disable-line

@@ -37,7 +37,7 @@ import type {
   TransactionKey,
   Validator,
   ValidatorKey,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 import { type Log } from '@neo-one/utils';
 import type { Observable } from 'rxjs/Observable';
 

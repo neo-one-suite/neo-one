@@ -1,7 +1,7 @@
 /* @flow */
 import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
-import type { Param } from '@neo-one/core';
+import type { Param } from '@neo-one/client-core';
 
 import type ClientBase from '../ClientBase';
 import { InvalidParamError } from '../errors';

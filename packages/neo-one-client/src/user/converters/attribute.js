@@ -7,7 +7,7 @@ import {
   UInt256Attribute,
   common,
   toAttributeUsage,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 import { InvalidNamedArgumentError } from '../../errors';
 import type { Attribute as ClientAttribute } from '../../types'; // eslint-disable-line

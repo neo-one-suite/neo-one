@@ -1,7 +1,7 @@
 /* @flow */
 import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
-import { JSONHelper, common, utils } from '@neo-one/core';
+import { JSONHelper, common, utils } from '@neo-one/client-core';
 
 import type { ContractParameter } from './types';
 import { InvalidContractParameterError } from './errors';

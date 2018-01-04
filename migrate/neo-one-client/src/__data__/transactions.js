@@ -5,7 +5,7 @@ import {
   ScriptBuilder,
   common,
   crypto,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 const scriptBuilder = new ScriptBuilder();
 scriptBuilder.emitOp('PUSH1');

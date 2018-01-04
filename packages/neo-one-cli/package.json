@@ -34,6 +34,9 @@
   "engines": {
     "node": ">=8.9.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },  
   "dependencies": {
     "@babel/polyfill": "^7.0.0-beta.35",
     "@grpc/surface": "^0.1.0",

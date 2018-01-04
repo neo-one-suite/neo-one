@@ -1,5 +1,5 @@
 /* @flow */
-import { Output, crypto, common } from '@neo-one/core';
+import { Output, crypto, common } from '@neo-one/client-core';
 
 import type { Output as ClientOutput } from '../../types'; // eslint-disable-line
 

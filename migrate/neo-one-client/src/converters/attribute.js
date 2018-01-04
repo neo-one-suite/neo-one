@@ -6,7 +6,7 @@ import {
   UInt160Attribute,
   UInt256Attribute,
   toAttributeUsage,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 import type ClientBase from '../ClientBase';
 import { InvalidArgumentError } from '../errors';

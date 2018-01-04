@@ -8,14 +8,14 @@ import {
   type UInt256,
   common,
   utils,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 import _ from 'lodash';
 import { flatMap, flatten } from 'ix/asynciterable/pipe/index';
 import {
   main as mainSettings,
   test as testSettings,
-} from '@neo-one/neo-settings';
+} from '@neo-one/node-neo-settings';
 import { utils as commonUtils } from '@neo-one/utils';
 
 import type {

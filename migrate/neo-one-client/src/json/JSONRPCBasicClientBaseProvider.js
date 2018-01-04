@@ -4,7 +4,7 @@ import {
   type UInt256,
   type UInt160,
   JSONHelper,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 import {
   type Asset,

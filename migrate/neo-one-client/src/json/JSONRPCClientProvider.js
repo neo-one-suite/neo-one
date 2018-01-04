@@ -5,7 +5,7 @@ import {
   type UInt160,
   JSONHelper,
   common,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 import type {
   Account,

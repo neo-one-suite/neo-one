@@ -38,8 +38,8 @@
     "isomorphic-fetch": "^2.2.1",
     "ix": "^2.3.4",
     "lodash": "^4.17.4",
-    "@neo-one/core": "^0.0.1",
-    "@neo-one/neo-settings": "^0.0.1",
+    "@neo-one/client-core": "^0.0.1",
+    "@neo-one/node-neo-settings": "^0.0.1",
     "@neo-one/utils": "^0.0.1"
   }
 }

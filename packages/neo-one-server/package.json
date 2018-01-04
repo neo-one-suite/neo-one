@@ -30,6 +30,9 @@
   "engines": {
     "node": ">=8.9.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@neo-one/server-client": "^0.0.1",
     "@neo-one/server-grpc": "^0.0.1",

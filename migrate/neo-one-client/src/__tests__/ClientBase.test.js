@@ -1,6 +1,6 @@
 /* @flow */
 /* eslint-disable no-loop-func */
-import { common } from '@neo-one/core';
+import { common } from '@neo-one/client-core';
 
 import ClientBase from '../ClientBase';
 

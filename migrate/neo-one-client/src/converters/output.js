@@ -1,5 +1,5 @@
 /* @flow */
-import { Output } from '@neo-one/core';
+import { Output } from '@neo-one/client-core';
 
 import type ClientBase from '../ClientBase';
 import { InvalidArgumentError } from '../errors';

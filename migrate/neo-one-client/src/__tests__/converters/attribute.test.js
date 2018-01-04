@@ -5,7 +5,7 @@ import {
   ECPointAttribute,
   UInt160Attribute,
   UInt256Attribute,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 import { utils as commonUtils } from '@neo-one/utils';
 

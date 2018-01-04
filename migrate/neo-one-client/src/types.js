@@ -53,7 +53,7 @@ import type {
   UInt256Hex,
   PrivateKey,
   PrivateKeyHex,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 
 export type Action = ActionJSON;
 export type ActionType = ActionTypeJSON;

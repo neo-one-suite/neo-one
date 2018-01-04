@@ -1,5 +1,5 @@
 /* @flow */
-import { type ECPoint, common, crypto } from '@neo-one/core';
+import { type ECPoint, common, crypto } from '@neo-one/client-core';
 
 import { InvalidArgumentError } from '../errors';
 import type { PublicKeyLike } from '../types';

@@ -2,7 +2,7 @@
 // flowlint unclear-type:off
 import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
-import { JSONHelper, common, utils } from '@neo-one/core';
+import { JSONHelper, common, utils } from '@neo-one/client-core';
 
 import _ from 'lodash';
 

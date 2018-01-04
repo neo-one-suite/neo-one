@@ -2,7 +2,7 @@
 import type BigNumber from 'bignumber.js';
 
 import _ from 'lodash';
-import { common } from '@neo-one/core';
+import { common } from '@neo-one/client-core';
 
 import type {
   ABI,

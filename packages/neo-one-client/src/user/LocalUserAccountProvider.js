@@ -22,7 +22,7 @@ import {
   toContractParameterType,
   common,
   utils,
-} from '@neo-one/core';
+} from '@neo-one/client-core';
 import type { Observable } from 'rxjs/Observable';
 
 import _ from 'lodash';
