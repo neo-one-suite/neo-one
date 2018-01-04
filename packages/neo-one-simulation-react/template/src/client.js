@@ -29,10 +29,13 @@ export const setupClient = async client => {
 export const getContracts = client => {
   const contracts = {};
   for (const name of Object.keys(config.deployedContracts)) {
-    contracts[name] = client.smartContract(
-      config.deployedContracts[name].hash,
-      config.deployedContracts[name].abi,
-    );
+    // TODO: Hack to support new Client api, this will go away.
+    contracts[name] = client.smartContract({
+      networks: {
+        [network]: { hash: config.deployedContracts[name].hash },
+      },
+      abi: config.deployedContracts[name].abi,
+    });
   }
 
   return contracts;

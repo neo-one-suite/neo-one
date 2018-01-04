@@ -46,6 +46,7 @@ export default ({
         nodeConfig.config$
           .pipe(
             map(config => config.settings),
+            distinct(),
             map(config => {
               const options = {
                 privateNet: config.privateNet,
@@ -53,7 +54,7 @@ export default ({
                 standbyValidators:
                   config.standbyValidators == null
                     ? undefined
-                    : config.standbyValidators,
+                    : [...config.standbyValidators],
                 address: config.address,
               };
               return config.test ? createTest(options) : createMain(options);
