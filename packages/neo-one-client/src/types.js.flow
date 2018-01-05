@@ -544,7 +544,7 @@ export interface UserAccountProvider {
 
   getCurrentAccount(): ?UserAccount;
   getAccounts(): Array<UserAccount>;
-  getNetworks(): Array<NetworkType>;  
+  getNetworks(): Array<NetworkType>;
 
   transfer(
     transfers: Array<Transfer>,
@@ -581,6 +581,7 @@ export interface UserAccountProvider {
     method: string,
     params: Array<?ParamInternal>,
     paramsZipped: Array<[string, ?Param]>,
+    verify: boolean,
     options?: InvokeTransactionOptions,
   ): Promise<TransactionResult<InvokeReceiptInternal>>;
   _call(
@@ -704,6 +705,7 @@ export type ABIFunction = {|
   name: string,
   constant?: boolean,
   parameters?: Array<ABIParameter>,
+  verify?: boolean,
   returnType: ABIReturn,
 |};
 export type ABIEvent = {|

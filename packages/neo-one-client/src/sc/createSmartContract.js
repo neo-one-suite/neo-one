@@ -185,7 +185,7 @@ const filterLogs = (actions: Array<Event | Log>): Array<Log> =>
 const createInvoke = ({
   definition,
   client,
-  func: { name, parameters, returnType },
+  func: { name, parameters, returnType, verify },
 }: {|
   definition: SmartContractDefinition,
   client: Client<*>,
@@ -205,6 +205,7 @@ const createInvoke = ({
     name,
     params,
     paramsZipped,
+    !!verify,
     options,
   );
   return {

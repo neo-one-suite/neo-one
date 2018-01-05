@@ -429,6 +429,7 @@ export default class LocalUserAccountProvider<
     method: string,
     params: Array<?ParamInternal>,
     paramsZipped: Array<[string, ?Param]>,
+    verify: boolean,
     optionsIn?: InvokeTransactionOptions,
   ): Promise<TransactionResult<InvokeReceiptInternal>> {
     const options = optionsIn || {};
@@ -440,23 +441,27 @@ export default class LocalUserAccountProvider<
       }),
       options: {
         from: options.from,
-        attributes: (options.attributes || []).concat([
-          {
-            usage: 'Remark14',
-            data: Buffer.from(
-              `neo-one-invoke:${this._getInvokeAttributeTag(
-                contract,
-                method,
-                paramsZipped,
-              )}`,
-              'utf8',
-            ).toString('hex'),
-          },
-          ({
-            usage: 'Script',
-            data: contract,
-          }: $FlowFixMe),
-        ]),
+        attributes: (options.attributes || []).concat(
+          [
+            {
+              usage: 'Remark14',
+              data: Buffer.from(
+                `neo-one-invoke:${this._getInvokeAttributeTag(
+                  contract,
+                  method,
+                  paramsZipped,
+                )}`,
+                'utf8',
+              ).toString('hex'),
+            },
+            verify
+              ? ({
+                  usage: 'Script',
+                  data: contract,
+                }: $FlowFixMe)
+              : null,
+          ].filter(Boolean),
+        ),
         networkFee: options.networkFee,
         transfers: options.transfers,
       },
@@ -468,14 +473,16 @@ export default class LocalUserAccountProvider<
         actions: data.actions,
       }),
       scripts: [
-        new WitnessModel({
-          invocation: this._getInvokeMethodInvocationScript({
-            method,
-            params,
-          }),
-          verification: Buffer.alloc(0, 0),
-        }),
-      ],
+        verify
+          ? new WitnessModel({
+              invocation: this._getInvokeMethodInvocationScript({
+                method,
+                params,
+              }),
+              verification: Buffer.alloc(0, 0),
+            })
+          : null,
+      ].filter(Boolean),
     });
   }
 

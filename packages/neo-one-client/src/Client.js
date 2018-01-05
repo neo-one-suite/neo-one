@@ -110,6 +110,7 @@ export default class Client<TUserAccountProvider: UserAccountProvider> {
     method: string,
     params: Array<?ParamInternal>,
     paramsZipped: Array<[string, ?Param]>,
+    verify: boolean,
     options?: InvokeTransactionOptions,
   ): Promise<TransactionResult<InvokeReceiptInternal>> {
     return this.userAccountProvider._invoke(
@@ -117,6 +118,7 @@ export default class Client<TUserAccountProvider: UserAccountProvider> {
       method,
       params,
       paramsZipped,
+      verify,
       options,
     );
   }
