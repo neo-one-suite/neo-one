@@ -17,7 +17,7 @@ export default ({ monitor }: {| monitor: Monitor |}) =>
           [monitor.labels.RPC_METHOD]: ctx.fullName,
         })
         .captureSpanLog(
-          async span => {
+          async (span) => {
             ctx.monitor = span;
             await next();
           },

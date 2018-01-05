@@ -31,7 +31,7 @@ export default class UInt160Attribute extends AttributeBase<
 
   equals: Equals = utils.equals(
     UInt160Attribute,
-    other =>
+    (other) =>
       this.usage === other.usage &&
       common.uInt160Equal(this.value, other.value),
   );

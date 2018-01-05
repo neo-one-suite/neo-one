@@ -14,6 +14,7 @@ function createExpectedInvocationResult(options: Object) {
   const result = {
     state: 'HALT',
     gasConsumed: new BigNumber('0'),
+    gasCost: new BigNumber('0'),
     stack: [
       { type: 'Integer', value: new BN(1) },
       { type: 'Array', value: [{ type: 'Void' }] },
@@ -33,6 +34,7 @@ function createInvocationResultJSON(options: Object) {
   const result = {
     state: VM_STATE.HALT,
     gas_consumed: '0',
+    gas_cost: '0',
     stack: [
       { type: 'Integer', value: '1' },
       { type: 'Array', value: [{ type: 'Void' }] },

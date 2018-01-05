@@ -53,7 +53,7 @@ const addCommon = ({
     command.option(option, description);
   });
 
-  crud.aliases.forEach(alias => {
+  crud.aliases.forEach((alias) => {
     command.alias(alias);
   });
 };
@@ -176,7 +176,7 @@ const createResource = ({
   let cancel$ = new ReplaySubject();
   const command = cli.vorpal
     .command(crud.command, crud.help)
-    .action(async args => {
+    .action(async (args) => {
       cancel$ = new ReplaySubject();
 
       if (crud instanceof DeleteCRUD) {
@@ -260,7 +260,7 @@ const createGet = ({
     .command(crud.command, crud.help)
     .option('-w, --watch', 'Watch for changes')
     .option('-j, --json', 'Output as JSON')
-    .action(async args => {
+    .action(async (args) => {
       const options = await crud.getCLIResourceOptions({
         cli,
         args,
@@ -270,7 +270,7 @@ const createGet = ({
       const resources$ = crud
         .getResources$({ client: cli.client, options })
         .pipe(
-          map(resources => {
+          map((resources) => {
             const table = resourceType.getListTable(resources);
             if (args.options.json) {
               cli.vorpal.activeCommand.log(JSON.stringify(table));
@@ -283,7 +283,7 @@ const createGet = ({
       cancel$ = new ReplaySubject();
       cancel$.next('start');
       const print$ = cancel$.pipe(
-        switchMap(event => (event === 'cancel' ? empty() : resources$)),
+        switchMap((event) => (event === 'cancel' ? empty() : resources$)),
       );
 
       await crud.preExecCLI({ cli, options });
@@ -321,7 +321,7 @@ const createDescribe = ({
     .command(crud.command, crud.help)
     .option('-w, --watch', 'Watch for changes')
     .option('-j, --json', 'Output as JSON')
-    .action(async args => {
+    .action(async (args) => {
       const options = await crud.getCLIResourceOptions({
         cli,
         args,
@@ -340,7 +340,7 @@ const createDescribe = ({
           options,
         })
         .pipe(
-          map(resource => {
+          map((resource) => {
             if (resource == null) {
               throw new Error(
                 `${resourceType.names.capital} ${args.name} does not exist`,
@@ -359,7 +359,7 @@ const createDescribe = ({
       cancel$ = new ReplaySubject();
       cancel$.next('start');
       const print$ = cancel$.pipe(
-        switchMap(event => (event === 'cancel' ? empty() : resource$)),
+        switchMap((event) => (event === 'cancel' ? empty() : resource$)),
       );
 
       await crud.preExecCLI({ name, cli, options });

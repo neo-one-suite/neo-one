@@ -67,14 +67,14 @@ export type Environment = {|
     blockRestartInterval?: number,
     maxFileSize?: number,
   |},
-  node: NodeEnvironment,
+  node?: NodeEnvironment,
   backup?: BackupEnvironment,
   telemetry?: TelemetryEnvironment,
 |};
 
 export type Options = {|
-  node: NodeOptions,
-  rpc: RPCServerOptions,
+  node?: NodeOptions,
+  rpc?: RPCServerOptions,
   backup?: BackupOptions,
 |};
 
@@ -83,6 +83,7 @@ export type FullNodeOptions = {|
   settings: Settings,
   environment: Environment,
   options$: Observable<Options>,
+  leveldown?: any,
   chainFile?: string,
   dumpChainFile?: string,
 |};
@@ -92,6 +93,7 @@ export default ({
   settings,
   environment,
   options$,
+  leveldown: customLeveldown,
   chainFile,
   dumpChainFile,
 }: FullNodeOptions): Observable<*> => {
@@ -126,7 +128,11 @@ export default ({
     }
 
     const storage = levelUpStorage({
-      db: levelup(leveldown(dataPath, environment.levelDownOptions)),
+      db: levelup(
+        customLeveldown == null
+          ? leveldown(dataPath, environment.levelDownOptions)
+          : customLeveldown,
+      ),
       context: { messageMagic: settings.messageMagic },
     });
     const blockchain = await Blockchain.create({
@@ -152,7 +158,7 @@ export default ({
     return { blockchain, storage };
   }).pipe(
     neverComplete(),
-    finalize(async result => {
+    finalize(async (result) => {
       if (result != null) {
         await result.blockchain.stop();
         await result.storage.close();
@@ -164,7 +170,7 @@ export default ({
         blockchain,
         environment: environment.node,
         options$: options$.pipe(
-          map(options => options.node),
+          map((options) => options.node || {}),
           distinctUntilChanged(),
         ),
       });
@@ -177,7 +183,7 @@ export default ({
         node,
         environment: environment.rpc,
         options$: options$.pipe(
-          map(options => options.rpc),
+          map((options) => options.rpc || {}),
           distinctUntilChanged(),
         ),
       }),
@@ -185,16 +191,16 @@ export default ({
   );
 
   const start$ = options$.pipe(
-    map(options => options.backup),
+    map((options) => options.backup),
     distinctUntilChanged(),
-    switchMap(backupOptionsIn => {
+    switchMap((backupOptionsIn) => {
       const backupOptions = backupOptionsIn;
       if (backupOptions == null || backupOptions.backup == null) {
         return node$;
       }
 
       const { cronSchedule } = backupOptions.backup;
-      return Observable.create(observer => {
+      return Observable.create((observer) => {
         observer.next({ type: 'start' });
         const task = cron.schedule(cronSchedule, () =>
           observer.next({ type: 'backup' }),

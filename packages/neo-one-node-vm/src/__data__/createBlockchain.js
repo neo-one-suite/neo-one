@@ -37,7 +37,7 @@ export default ({
   }
 
   const storage = {};
-  blockchain.storageItem.add = jest.fn(async item => {
+  blockchain.storageItem.add = jest.fn(async (item) => {
     const hash = common.uInt160ToString(item.hash);
     if (storage[hash] == null) {
       storage[hash] = {};

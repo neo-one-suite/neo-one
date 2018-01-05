@@ -183,7 +183,7 @@ export const getActionKeyMin = ({
         blockIndexStart,
         transactionIndexStart,
         indexStart,
-      ].filter(value => value != null),
+      ].filter((value) => value != null),
     ),
   );
 export const getActionKeyMax = ({
@@ -194,7 +194,7 @@ export const getActionKeyMax = ({
   bytewise.encode(
     bytewise.sorts.array.bound.upper(
       [actionKeyPrefix, blockIndexStop, transactionIndexStop, indexStop].filter(
-        value => value != null,
+        (value) => value != null,
       ),
     ),
   );

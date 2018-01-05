@@ -22,7 +22,7 @@ export default class ReportHandler {
   }
 
   report(report: Report): void {
-    report.logs.forEach(log => {
+    report.logs.forEach((log) => {
       const { error } = log;
       let errorObj;
       if (error != null) {
@@ -44,9 +44,9 @@ export default class ReportHandler {
       });
     });
 
-    utils.values(report.metrics.counters).forEach(counterMetric => {
+    utils.values(report.metrics.counters).forEach((counterMetric) => {
       const counter = this._getCounter(counterMetric.metric);
-      counterMetric.values.forEach(value => {
+      counterMetric.values.forEach((value) => {
         if (typeof value.countOrLabels === 'number') {
           counter.inc(value.countOrLabels);
         } else if (value.count != null) {
@@ -57,9 +57,9 @@ export default class ReportHandler {
       });
     });
 
-    utils.values(report.metrics.histograms).forEach(histMetric => {
+    utils.values(report.metrics.histograms).forEach((histMetric) => {
       const histogram = this._getHistogram(histMetric.metric);
-      histMetric.values.forEach(value => {
+      histMetric.values.forEach((value) => {
         if (typeof value.countOrLabels === 'number') {
           histogram.observe(value.countOrLabels);
         } else if (value.countOrLabels != null && value.count != null) {

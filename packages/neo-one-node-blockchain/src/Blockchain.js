@@ -241,7 +241,7 @@ export default class Blockchain {
     }
 
     if (this._persistingBlocks) {
-      const doneRunningPromise = new Promise(resolve => {
+      const doneRunningPromise = new Promise((resolve) => {
         this._doneRunningResolve = resolve;
       });
       this._running = false;
@@ -319,7 +319,7 @@ export default class Blockchain {
     await this._getMonitor(monitor)
       .withData({ [labels.NEO_BLOCK_INDEX]: block.index })
       .captureSpan(
-        span =>
+        (span) =>
           block.verify({
             genesisBlock: this.settings.genesisBlock,
             tryGetBlock: this.block.tryGet,
@@ -331,9 +331,9 @@ export default class Blockchain {
             getValidators: this.getValidators,
             standbyValidators: this.settings.standbyValidators,
             getAllValidators: this._getAllValidators,
-            calculateClaimAmount: claims =>
+            calculateClaimAmount: (claims) =>
               this.calculateClaimAmount(claims, span),
-            verifyScript: options => this.verifyScript(options, span),
+            verifyScript: (options) => this.verifyScript(options, span),
             currentHeight:
               this._currentBlock == null ? 0 : this._currentBlock.index,
             governingToken: this.settings.governingToken,
@@ -352,10 +352,10 @@ export default class Blockchain {
     await this._getMonitor(monitor)
       .withData({ [labels.NEO_CONSENSUS_HASH]: payload.hashHex })
       .captureSpan(
-        span =>
+        (span) =>
           payload.verify({
             getValidators: () => this.getValidators([], span),
-            verifyScript: options => this.verifyScript(options, span),
+            verifyScript: (options) => this.verifyScript(options, span),
             currentIndex:
               this._currentBlock == null ? 0 : this._currentBlock.index,
             currentBlockHash: this.currentBlock.hash,
@@ -377,7 +377,7 @@ export default class Blockchain {
       await this._getMonitor(monitor)
         .withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex })
         .captureSpan(
-          span =>
+          (span) =>
             transaction.verify({
               calculateClaimAmount: this.calculateClaimAmount,
               isSpent: this._isSpent,
@@ -386,7 +386,7 @@ export default class Blockchain {
               tryGetAccount: this.account.tryGet,
               standbyValidators: this.settings.standbyValidators,
               getAllValidators: this._getAllValidators,
-              verifyScript: options => this.verifyScript(options, span),
+              verifyScript: (options) => this.verifyScript(options, span),
               governingToken: this.settings.governingToken,
               utilityToken: this.settings.utilityToken,
               fees: this.settings.fees,
@@ -465,7 +465,7 @@ export default class Blockchain {
         await (entry.monitor: Monitor)
           .withData({ [labels.NEO_BLOCK_INDEX]: entry.block.index })
           .captureSpanLog(
-            span =>
+            (span) =>
               this._persistBlock(span, entryNonNull.block, entryNonNull.unsafe),
             {
               name: 'neo_blockchain_persist_block_top_level',
@@ -592,7 +592,7 @@ export default class Blockchain {
     this._getMonitor(monitor).captureSpanLog(
       async () => {
         const spentCoins = await Promise.all(
-          claims.map(claim => this._tryGetSpentCoin(claim)),
+          claims.map((claim) => this._tryGetSpentCoin(claim)),
         );
         const filteredSpentCoins = spentCoins.filter(Boolean);
         if (spentCoins.length !== filteredSpentCoins.length) {
@@ -600,14 +600,14 @@ export default class Blockchain {
           throw new Error('Not all coins were spent');
         }
 
-        if (filteredSpentCoins.some(coin => coin.claimed)) {
+        if (filteredSpentCoins.some((coin) => coin.claimed)) {
           // TODO: Better error
           throw new Error('Coin was already claimed');
         }
 
         if (
           filteredSpentCoins.some(
-            coin =>
+            (coin) =>
               !common.uInt256Equal(
                 coin.output.asset,
                 this.settings.governingToken.hash,
@@ -619,14 +619,14 @@ export default class Blockchain {
         }
 
         return utils.calculateClaimAmount({
-          coins: filteredSpentCoins.map(coin => ({
+          coins: filteredSpentCoins.map((coin) => ({
             value: coin.output.value,
             startHeight: coin.startHeight,
             endHeight: coin.endHeight,
           })),
           decrementInterval: this.settings.decrementInterval,
           generationAmount: this.settings.generationAmount,
-          getSystemFee: async index => {
+          getSystemFee: async (index) => {
             const header = await this._storage.header.get({
               hashOrIndex: index,
             });
@@ -694,15 +694,15 @@ export default class Blockchain {
     transactions: Array<Transaction>,
   ): Promise<Array<Vote>> => {
     const inputs = await Promise.all(
-      transactions.map(transaction =>
+      transactions.map((transaction) =>
         transaction.getReferences({
           getOutput: this.output.get,
         }),
       ),
-    ).then(results =>
+    ).then((results) =>
       results
         .reduce((acc, inputResults) => acc.concat(inputResults), [])
-        .map(output => ({
+        .map((output) => ({
           address: output.address,
           asset: output.asset,
           value: output.value.neg(),
@@ -710,7 +710,7 @@ export default class Blockchain {
     );
     const outputs = transactions
       .reduce((acc, transaction) => acc.concat(transaction.outputs), [])
-      .map(output => ({
+      .map((output) => ({
         address: output.address,
         asset: output.asset,
         value: output.value,
@@ -721,13 +721,13 @@ export default class Blockchain {
           _.groupBy(
             inputs
               .concat(outputs)
-              .filter(output =>
+              .filter((output) =>
                 common.uInt256Equal(
                   output.asset,
                   this.settings.governingToken.hash,
                 ),
               ),
-            output => common.uInt160ToHex(output.address),
+            (output) => common.uInt160ToHex(output.address),
           ),
         )
         .map(([addressHex, addressOutputs]) => [
@@ -740,8 +740,8 @@ export default class Blockchain {
     );
     const votes = await this.account.all
       .pipe(
-        filter(account => account.votes.length > 0),
-        map(account => {
+        filter((account) => account.votes.length > 0),
+        map((account) => {
           let balance =
             account.balances[this.settings.governingToken.hashHex] ||
             utils.ZERO;
@@ -794,7 +794,7 @@ export default class Blockchain {
         ? Promise.resolve(null)
         : this._storage.asset.get({ hash: data.assetHash }),
       Promise.all(
-        data.contractHashes.map(contractHash =>
+        data.contractHashes.map((contractHash) =>
           this._storage.contract.get({ hash: contractHash }),
         ),
       ),
@@ -828,7 +828,7 @@ export default class Blockchain {
       .toPromise();
     // TODO: Quick fix because unclaimed includes all spent coins.
     const filtered = await Promise.all(
-      unclaimed.map(async value => {
+      unclaimed.map(async (value) => {
         const output = await this._storage.output.get(value.input);
         if (
           common.uInt256Equal(output.asset, this.settings.governingToken.hash)
@@ -847,7 +847,7 @@ export default class Blockchain {
       .getAll({ hash })
       .pipe(toArray())
       .toPromise();
-    return unspent.map(value => value.input);
+    return unspent.map((value) => value.input);
   };
 
   _getAllValidators = (): Promise<Array<Validator>> =>

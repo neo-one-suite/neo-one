@@ -81,7 +81,7 @@ export default ({
     tryGetLatest: read.createTryGetLatest({
       db,
       latestKey: keys.maxHeaderHashKey,
-      deserializeResult: result => ({
+      deserializeResult: (result) => ({
         hash: common.deserializeHeaderHash(result),
       }),
       get: headerBase.get,
@@ -110,7 +110,7 @@ export default ({
     tryGetLatest: read.createTryGetLatest({
       db,
       latestKey: keys.maxBlockHashKey,
-      deserializeResult: result => ({
+      deserializeResult: (result) => ({
         hash: common.deserializeBlockHash(result),
       }),
       get: blockBase.get,
@@ -275,7 +275,7 @@ export default ({
       await db.close();
     },
     async commit(changeSet: ChangeSet): Promise<void> {
-      const changesList = changeSet.map(change => convertChange(change));
+      const changesList = changeSet.map((change) => convertChange(change));
       const changes = changesList.reduce((acc, converted) => {
         acc.push(...converted);
         return acc;

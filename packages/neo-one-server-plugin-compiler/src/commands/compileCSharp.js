@@ -12,7 +12,7 @@ export default ({ vorpal, shutdown, logConfig$ }: CLIArgs) => {
       'compile csharp <file> <output>',
       'Compile C# code into a smart contract. Expects a dll file.',
     )
-    .action(async args => {
+    .action(async (args) => {
       const { file, output } = args;
 
       logConfig$.next({

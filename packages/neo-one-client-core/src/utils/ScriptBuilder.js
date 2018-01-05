@@ -2,9 +2,8 @@
 import BN from 'bn.js';
 import { CustomError } from '@neo-one/utils';
 
-import _ from 'lodash';
-
 import {
+  BYTECODE_TO_BYTECODE_BUFFER,
   OPCODE_TO_BYTECODE,
   type ByteCode,
   type OpCode,
@@ -34,13 +33,6 @@ export class InvalidParamError extends CustomError {
     this.code = 'INVALID_PARAM';
   }
 }
-
-const BYTECODE_TO_BYTECODE_BUFFER = _.fromPairs(
-  Object.values(OPCODE_TO_BYTECODE).map(byteCode => [
-    byteCode,
-    Buffer.from([(byteCode: $FlowFixMe)]),
-  ]),
-);
 
 export type Param =
   | BN

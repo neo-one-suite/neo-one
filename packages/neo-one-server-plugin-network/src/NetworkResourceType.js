@@ -90,7 +90,7 @@ export default class NetworkResourceType extends ResourceType<
 
   getListTable(resources: Array<Network>): ListTable {
     return [['Name', 'Type', 'Height', 'Nodes']].concat(
-      _.sortBy(resources, resource => resource.name).map(resource => [
+      _.sortBy(resources, (resource) => resource.name).map((resource) => [
         resource.name,
         resource.type,
         resource.height == null ? 'Unknown' : `${resource.height}`,
@@ -121,7 +121,7 @@ export default class NetworkResourceType extends ResourceType<
               'Peers',
             ],
           ].concat(
-            _.sortBy(resource.nodes, node => node.name).map(node => [
+            _.sortBy(resource.nodes, (node) => node.name).map((node) => [
               node.name,
               node.live ? 'Yes' : 'No',
               node.ready ? 'Yes' : 'No',

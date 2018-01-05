@@ -104,9 +104,14 @@ export const convertInvocationResult = ({
   returnType: ABIReturn,
   result: RawInvocationResult,
 |}): InvocationResult<?Param> => {
-  const { gasConsumed } = result;
+  const { gasConsumed, gasCost } = result;
   if (result.state === 'FAULT') {
-    return { state: result.state, gasConsumed, message: result.message };
+    return {
+      state: result.state,
+      gasConsumed,
+      gasCost,
+      message: result.message,
+    };
   }
 
   let value = result.stack[0];
@@ -117,7 +122,7 @@ export const convertInvocationResult = ({
     });
   }
 
-  return { state: result.state, gasConsumed, value };
+  return { state: result.state, gasConsumed, gasCost, value };
 };
 
 export const convertCallResult = ({

@@ -78,7 +78,7 @@ export default class ClaimTransaction extends TransactionBase<
       () =>
         super.size +
         IOHelper.sizeOfUInt8 +
-        IOHelper.sizeOfArray(this.claims, claim => claim.size),
+        IOHelper.sizeOfArray(this.claims, (claim) => claim.size),
     );
 
     this.__claimGetScriptHashesForVerifying = utils.lazyAsync(
@@ -87,7 +87,7 @@ export default class ClaimTransaction extends TransactionBase<
         const [hashesSet, hashes] = await Promise.all([
           super.getScriptHashesForVerifying(options),
           Promise.all(
-            this.claims.map(async claim => {
+            this.claims.map(async (claim) => {
               const output = await getOutput(claim);
               return common.uInt160ToHex(output.address);
             }),
@@ -121,7 +121,7 @@ export default class ClaimTransaction extends TransactionBase<
   }
 
   serializeExclusiveBase(writer: BinaryWriter): void {
-    writer.writeArray(this.claims, claim => {
+    writer.writeArray(this.claims, (claim) => {
       claim.serializeWireBase(writer);
     });
   }
@@ -183,7 +183,7 @@ export default class ClaimTransaction extends TransactionBase<
 
     if (
       memPool.some(
-        transaction =>
+        (transaction) =>
           transaction instanceof ClaimTransaction &&
           transaction.type === TRANSACTION_TYPE.CLAIM &&
           hasIntersectingInputs(this.claims, transaction.claims),
@@ -193,7 +193,7 @@ export default class ClaimTransaction extends TransactionBase<
     }
     const [results, claimAmount] = await Promise.all([
       this.getTransactionResults({ getOutput }),
-      calculateClaimAmount(this.claims).catch(error => {
+      calculateClaimAmount(this.claims).catch((error) => {
         throw new VerifyError(`Invalid claims: ${error.message}`);
       }),
     ]);
@@ -229,7 +229,7 @@ export default class ClaimTransaction extends TransactionBase<
       scripts: transactionBaseJSON.scripts,
       sys_fee: transactionBaseJSON.sys_fee,
       net_fee: transactionBaseJSON.net_fee,
-      claims: this.claims.map(claim => claim.serializeJSON(context)),
+      claims: this.claims.map((claim) => claim.serializeJSON(context)),
     };
   }
 }

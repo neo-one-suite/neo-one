@@ -28,7 +28,7 @@ export default class ArrayContractParameter extends ContractParameterBase<
     super();
     this.value = value;
     this.__size = utils.lazy(() =>
-      IOHelper.sizeOfArray(this.value, val => val.size),
+      IOHelper.sizeOfArray(this.value, (val) => val.size),
     );
   }
 
@@ -42,7 +42,7 @@ export default class ArrayContractParameter extends ContractParameterBase<
 
   serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
-    writer.writeArray(this.value, parameter =>
+    writer.writeArray(this.value, (parameter) =>
       parameter.serializeWireBase(writer),
     );
   }
@@ -52,7 +52,7 @@ export default class ArrayContractParameter extends ContractParameterBase<
   serializeJSON(context: SerializeJSONContext): ArrayContractParameterJSON {
     return {
       type: 'Array',
-      value: this.value.map(val => val.serializeJSON(context)),
+      value: this.value.map((val) => val.serializeJSON(context)),
     };
   }
 }

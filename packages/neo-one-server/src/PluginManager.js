@@ -94,7 +94,7 @@ export default class PluginManager {
                     .entries(pluginResourcesManagers)
                     .map(([resourceType, resourcesManager]) =>
                       resourcesManager.resources$.pipe(
-                        map(resources => [
+                        map((resources) => [
                           pluginResourceTypeUtil.make({
                             plugin: pluginName,
                             resourceType,
@@ -109,7 +109,7 @@ export default class PluginManager {
           ),
         ),
       ),
-      map(result => _.fromPairs(result)),
+      map((result) => _.fromPairs(result)),
       shareReplay(1),
     );
     this.allResources$.subscribe().unsubscribe();
@@ -129,18 +129,18 @@ export default class PluginManager {
 
   async reset(): Promise<void> {
     await Promise.all([
-      Promise.all(utils.values(this._plugins).map(plugin => plugin.reset())),
+      Promise.all(utils.values(this._plugins).map((plugin) => plugin.reset())),
       Promise.all(
         utils
           .values(this._resourcesManagers)
           .reduce((acc, managers) => acc.concat(utils.values(managers)), [])
-          .map(manager => manager.reset()),
+          .map((manager) => manager.reset()),
       ),
     ]);
   }
 
   async registerPlugins(pluginNames: Array<string>): Promise<void> {
-    const plugins = pluginNames.map(pluginName =>
+    const plugins = pluginNames.map((pluginName) =>
       pluginsUtil.getPlugin({
         monitor: this._monitor,
         pluginName,
@@ -148,7 +148,7 @@ export default class PluginManager {
     );
     const graph = plugins.reduce(
       (acc, plugin) =>
-        acc.concat(plugin.dependencies.map(dep => [plugin.name, dep])),
+        acc.concat(plugin.dependencies.map((dep) => [plugin.name, dep])),
       [],
     );
 
@@ -158,9 +158,11 @@ export default class PluginManager {
       return acc;
     }, {});
     const noDepPlugins = plugins.filter(
-      plugin => plugin.dependencies.length === 0,
+      (plugin) => plugin.dependencies.length === 0,
     );
-    await Promise.all(noDepPlugins.map(plugin => this._registerPlugin(plugin)));
+    await Promise.all(
+      noDepPlugins.map((plugin) => this._registerPlugin(plugin)),
+    );
     for (const pluginName of sorted) {
       const plugin = pluginNameToPlugin[pluginName];
       // The later plugins will fail with missing dependency
@@ -184,7 +186,7 @@ export default class PluginManager {
     this._plugins[plugin.name] = plugin;
     this._resourcesManagers[plugin.name] = {};
     const resourcesManagers = await Promise.all(
-      plugin.resourceTypes.map(async resourceType => {
+      plugin.resourceTypes.map(async (resourceType) => {
         const masterResourceAdapter = await resourceType.createMasterResourceAdapter(
           {
             pluginManager: this,

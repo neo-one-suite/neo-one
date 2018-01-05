@@ -24,7 +24,7 @@ export function createReadStorage<Key, Value>({
       return value;
     }
 
-    return storage.get(key).then(val => {
+    return storage.get(key).then((val) => {
       cache.set(keyString, val);
       return val;
     });
@@ -37,7 +37,7 @@ export function createReadStorage<Key, Value>({
       return value;
     }
 
-    return storage.tryGet(key).then(val => {
+    return storage.tryGet(key).then((val) => {
       if (val != null) {
         cache.set(keyString, val);
       }

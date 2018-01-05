@@ -196,7 +196,7 @@ describe('BrowserMonitor', () => {
 
     expect(fetch.mock.calls).toMatchSnapshot();
 
-    await new Promise(resolve => setTimeout(() => resolve(), 2000));
+    await new Promise((resolve) => setTimeout(() => resolve(), 2000));
     expect(fetch.mock.calls.length).toBeGreaterThanOrEqual(3);
   });
 
@@ -273,7 +273,7 @@ describe('BrowserMonitor', () => {
 
     expect(fetch.mock.calls).toMatchSnapshot();
 
-    await new Promise(resolve => setTimeout(() => resolve(), 2000));
+    await new Promise((resolve) => setTimeout(() => resolve(), 2000));
     expect(fetch.mock.calls.length).toBeGreaterThanOrEqual(3);
   });
 

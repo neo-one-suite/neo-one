@@ -18,7 +18,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) => {
     .autocomplete({
       data: async () => describe.getCLIAutocomplete({ cli }),
     })
-    .action(async args => {
+    .action(async (args) => {
       const options = await describe.getCLIResourceOptions({
         cli,
         args,

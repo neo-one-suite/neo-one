@@ -52,7 +52,7 @@ export default class ValidatorsCount extends BaseState
 
   serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.version);
-    writer.writeArray(this.votes, value => {
+    writer.writeArray(this.votes, (value) => {
       writer.writeFixed8(value || utils.ZERO);
     });
   }

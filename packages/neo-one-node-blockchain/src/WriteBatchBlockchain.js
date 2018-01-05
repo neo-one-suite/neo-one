@@ -217,57 +217,57 @@ export default class WriteBatchBlockchain {
         name: 'account',
         readAllStorage: this._storage.account,
         update: (value, update) => value.update(update),
-        getKeyFromValue: value => ({ hash: value.hash }),
-        getKeyString: key => common.uInt160ToString(key.hash),
-        createAddChange: value => ({ type: 'account', value }),
-        createDeleteChange: key => ({ type: 'account', key }),
+        getKeyFromValue: (value) => ({ hash: value.hash }),
+        getKeyString: (key) => common.uInt160ToString(key.hash),
+        createAddChange: (value) => ({ type: 'account', value }),
+        createDeleteChange: (key) => ({ type: 'account', key }),
       }),
       accountUnspent: new ReadAddDeleteStorageCache({
         name: 'accountUnspent',
         readStorage: this._storage.accountUnspent,
-        getKeyFromValue: value => ({ hash: value.hash, input: value.input }),
-        getKeyString: key =>
+        getKeyFromValue: (value) => ({ hash: value.hash, input: value.input }),
+        getKeyString: (key) =>
           `${common.uInt160ToString(key.hash)}:${common.uInt256ToString(
             key.input.hash,
           )}:${key.input.index}`,
-        createAddChange: value => ({ type: 'accountUnspent', value }),
-        createDeleteChange: key => ({ type: 'accountUnspent', key }),
+        createAddChange: (value) => ({ type: 'accountUnspent', value }),
+        createDeleteChange: (key) => ({ type: 'accountUnspent', key }),
       }),
       accountUnclaimed: new ReadAddDeleteStorageCache({
         name: 'accountUnclaimed',
         readStorage: this._storage.accountUnclaimed,
-        getKeyFromValue: value => ({ hash: value.hash, input: value.input }),
-        getKeyString: key =>
+        getKeyFromValue: (value) => ({ hash: value.hash, input: value.input }),
+        getKeyString: (key) =>
           `${common.uInt160ToString(key.hash)}:${common.uInt256ToString(
             key.input.hash,
           )}:${key.input.index}`,
-        createAddChange: value => ({ type: 'accountUnclaimed', value }),
-        createDeleteChange: key => ({ type: 'accountUnclaimed', key }),
+        createAddChange: (value) => ({ type: 'accountUnclaimed', value }),
+        createDeleteChange: (key) => ({ type: 'accountUnclaimed', key }),
       }),
       action: new ReadGetAllAddStorageCache({
         name: 'action',
         readGetAllStorage: this._storage.action,
-        getKeyFromValue: value => ({
+        getKeyFromValue: (value) => ({
           blockIndex: value.blockIndex,
           transactionIndex: value.transactionIndex,
           index: value.index,
         }),
-        getKeyString: key =>
+        getKeyString: (key) =>
           `${key.blockIndex}:${key.transactionIndex}:${key.index}`,
         // eslint-disable-next-line
         matchesPartialKey: (value, key) => {
           // TODO: Implement me
           throw new Error('Not implemented');
         },
-        createAddChange: value => ({ type: 'action', value }),
+        createAddChange: (value) => ({ type: 'action', value }),
       }),
       asset: new ReadAddUpdateStorageCache({
         name: 'asset',
         readStorage: this._storage.asset,
         update: (value, update) => value.update(update),
-        getKeyFromValue: value => ({ hash: value.hash }),
-        getKeyString: key => common.uInt256ToString(key.hash),
-        createAddChange: value => ({ type: 'asset', value }),
+        getKeyFromValue: (value) => ({ hash: value.hash }),
+        getKeyString: (key) => common.uInt256ToString(key.hash),
+        createAddChange: (value) => ({ type: 'asset', value }),
       }),
       block: new BlockLikeStorageCache({
         name: 'block',
@@ -275,14 +275,14 @@ export default class WriteBatchBlockchain {
           get: this._storage.block.get,
           tryGet: this._storage.block.tryGet,
         },
-        createAddChange: value => ({ type: 'block', value }),
+        createAddChange: (value) => ({ type: 'block', value }),
       }),
       blockSystemFee: new ReadAddStorageCache({
         name: 'blockSystemFee',
         readStorage: this._storage.blockSystemFee,
-        getKeyFromValue: value => ({ hash: value.hash }),
-        getKeyString: key => common.uInt256ToString(key.hash),
-        createAddChange: value => ({ type: 'blockSystemFee', value }),
+        getKeyFromValue: (value) => ({ hash: value.hash }),
+        getKeyString: (key) => common.uInt256ToString(key.hash),
+        createAddChange: (value) => ({ type: 'blockSystemFee', value }),
       }),
       header: new BlockLikeStorageCache({
         name: 'header',
@@ -290,15 +290,15 @@ export default class WriteBatchBlockchain {
           get: this._storage.header.get,
           tryGet: this._storage.header.tryGet,
         },
-        createAddChange: value => ({ type: 'header', value }),
+        createAddChange: (value) => ({ type: 'header', value }),
       }),
       transaction: new ReadAddStorageCache({
         name: 'transaction',
         readStorage: this._storage.transaction,
-        getKeyFromValue: value => ({ hash: value.hash }),
-        getKeyString: key => common.uInt256ToString(key.hash),
-        createAddChange: value => ({ type: 'transaction', value }),
-        onAdd: async value => {
+        getKeyFromValue: (value) => ({ hash: value.hash }),
+        getKeyString: (key) => common.uInt256ToString(key.hash),
+        createAddChange: (value) => ({ type: 'transaction', value }),
+        onAdd: async (value) => {
           await Promise.all(
             value.outputs.map((out, index) =>
               output.add({ hash: value.hash, index, output: out }),
@@ -310,56 +310,56 @@ export default class WriteBatchBlockchain {
         name: 'transactionSpentCoins',
         readStorage: this._storage.transactionSpentCoins,
         update: (value, update) => value.update(update),
-        getKeyFromValue: value => ({ hash: value.hash }),
-        getKeyString: key => common.uInt256ToString(key.hash),
-        createAddChange: value => ({ type: 'transactionSpentCoins', value }),
+        getKeyFromValue: (value) => ({ hash: value.hash }),
+        getKeyString: (key) => common.uInt256ToString(key.hash),
+        createAddChange: (value) => ({ type: 'transactionSpentCoins', value }),
       }),
       output,
       contract: new ReadAddDeleteStorageCache({
         name: 'contract',
         readStorage: this._storage.contract,
-        getKeyFromValue: value => ({ hash: value.hash }),
-        getKeyString: key => common.uInt160ToString(key.hash),
-        createAddChange: value => ({ type: 'contract', value }),
-        createDeleteChange: key => ({ type: 'contract', key }),
+        getKeyFromValue: (value) => ({ hash: value.hash }),
+        getKeyString: (key) => common.uInt160ToString(key.hash),
+        createAddChange: (value) => ({ type: 'contract', value }),
+        createDeleteChange: (key) => ({ type: 'contract', key }),
       }),
       storageItem: new ReadGetAllAddUpdateDeleteStorageCache({
         name: 'storageItem',
         readGetAllStorage: this._storage.storageItem,
         update: (value, update) => value.update(update),
-        getKeyFromValue: value => ({
+        getKeyFromValue: (value) => ({
           hash: value.hash,
           key: value.key,
         }),
-        getKeyString: key =>
+        getKeyString: (key) =>
           `${common.uInt160ToString(key.hash)}:${key.key.toString('hex')}`,
         matchesPartialKey: (value, key) =>
           (key.hash == null || common.uInt160Equal(value.hash, key.hash)) &&
           (key.prefix == null ||
             key.prefix.every((byte, idx) => value.key[idx] === byte)),
-        createAddChange: value => ({ type: 'storageItem', value }),
-        createDeleteChange: key => ({ type: 'storageItem', key }),
+        createAddChange: (value) => ({ type: 'storageItem', value }),
+        createDeleteChange: (key) => ({ type: 'storageItem', key }),
       }),
       validator: new ReadAllAddUpdateDeleteStorageCache({
         name: 'validator',
         readAllStorage: this._storage.validator,
-        getKeyFromValue: value => ({ publicKey: value.publicKey }),
-        getKeyString: key => common.ecPointToString(key.publicKey),
-        createAddChange: value => ({ type: 'validator', value }),
+        getKeyFromValue: (value) => ({ publicKey: value.publicKey }),
+        getKeyString: (key) => common.ecPointToString(key.publicKey),
+        createAddChange: (value) => ({ type: 'validator', value }),
         update: (value, update) => value.update(update),
-        createDeleteChange: key => ({ type: 'validator', key }),
+        createDeleteChange: (key) => ({ type: 'validator', key }),
       }),
       invocationData: new ReadAddStorageCache({
         name: 'invocationData',
         readStorage: this._storage.invocationData,
-        getKeyFromValue: value => ({ hash: value.hash }),
-        getKeyString: key => common.uInt256ToString(key.hash),
-        createAddChange: value => ({ type: 'invocationData', value }),
+        getKeyFromValue: (value) => ({ hash: value.hash }),
+        getKeyString: (key) => common.uInt256ToString(key.hash),
+        createAddChange: (value) => ({ type: 'invocationData', value }),
       }),
       validatorsCount: new ReadAddUpdateMetadataStorageCache({
         name: 'validatorsCount',
         readStorage: this._storage.validatorsCount,
-        createAddChange: value => ({ type: 'validatorsCount', value }),
+        createAddChange: (value) => ({ type: 'validatorsCount', value }),
         update: (value, update) => value.update(update),
       }),
     };
@@ -419,7 +419,7 @@ export default class WriteBatchBlockchain {
             ? Promise.resolve(utils.ZERO)
             : this.blockSystemFee
                 .get({ hash: block.previousHash })
-                .then(blockSystemFee => blockSystemFee.systemFee),
+                .then((blockSystemFee) => blockSystemFee.systemFee),
           this.block.add(block),
           this.header.add(block.header),
         ]),
@@ -441,7 +441,7 @@ export default class WriteBatchBlockchain {
     );
 
     await monitor.captureSpan(
-      span =>
+      (span) =>
         Promise.all([
           this.blockSystemFee.add(
             new BlockSystemFee({
@@ -483,7 +483,7 @@ export default class WriteBatchBlockchain {
     >,
   ): Promise<void> {
     await monitor.captureSpan(
-      async span => {
+      async (span) => {
         const inputs = [];
         const claims = [];
         const outputWithInputs = [];
@@ -499,12 +499,12 @@ export default class WriteBatchBlockchain {
         }
         await Promise.all([
           Promise.all(
-            transactions.map(transaction =>
+            transactions.map((transaction) =>
               this.transaction.add(transaction, true),
             ),
           ),
           Promise.all(
-            transactions.map(transaction =>
+            transactions.map((transaction) =>
               this.transactionSpentCoins.add(
                 new TransactionSpentCoins({
                   hash: transaction.hash,
@@ -530,7 +530,7 @@ export default class WriteBatchBlockchain {
     transactions: Array<[number, Transaction]>,
   ): Promise<void> {
     await monitor.captureSpan(
-      async span => {
+      async (span) => {
         for (const [idx, transaction] of transactions) {
           // eslint-disable-next-line
           await this._persistTransaction(span, block, transaction, idx);
@@ -552,7 +552,7 @@ export default class WriteBatchBlockchain {
       .withLabels({ [labels.NEO_TRANSACTION_TYPE]: transactionIn.type })
       .withData({ [labels.NEO_TRANSACTION_HASH]: transactionIn.hashHex })
       .captureSpan(
-        async span => {
+        async (span) => {
           const transaction = transactionIn;
           const claims =
             transaction.type === TRANSACTION_TYPE.CLAIM &&
@@ -576,7 +576,7 @@ export default class WriteBatchBlockchain {
                 this.account
                   .tryGet({ hash })
                   .then(
-                    account =>
+                    (account) =>
                       account == null ? new Account({ hash }) : account,
                   ),
               governingTokenHash: this.settings.governingToken.hashHex,
@@ -708,17 +708,17 @@ export default class WriteBatchBlockchain {
               const assetChangeSet = temporaryBlockchain.asset.getChangeSet();
               const assetHash = assetChangeSet
                 .map(
-                  change =>
+                  (change) =>
                     change.type === 'add' && change.change.type === 'asset'
                       ? change.change.value.hash
                       : null,
                 )
-                .find(value => value != null);
+                .find((value) => value != null);
 
               const contractsChangeSet = temporaryBlockchain.contract.getChangeSet();
               const contractHashes = contractsChangeSet
                 .map(
-                  change =>
+                  (change) =>
                     change.type === 'add' && change.change.type === 'contract'
                       ? change.change.value.hash
                       : null,
@@ -727,7 +727,7 @@ export default class WriteBatchBlockchain {
 
               const deletedContractHashes = contractsChangeSet
                 .map(
-                  change =>
+                  (change) =>
                     change.type === 'delete' &&
                     change.change.type === 'contract'
                       ? change.change.key.hash
@@ -737,7 +737,7 @@ export default class WriteBatchBlockchain {
 
               await Promise.all([
                 Promise.all(
-                  temporaryBlockchain.getChangeSet().map(async change => {
+                  temporaryBlockchain.getChangeSet().map(async (change) => {
                     if (change.type === 'add') {
                       await this._caches[change.change.type].add(
                         (change.change.value: $FlowFixMe),
@@ -884,7 +884,7 @@ export default class WriteBatchBlockchain {
         );
         const addressSpent = this._groupByAddress(inputOutputs);
         const addressClaimed = this._groupByAddress(claimOutputs);
-        const addressOutputs = _.groupBy(outputs, output =>
+        const addressOutputs = _.groupBy(outputs, (output) =>
           common.uInt160ToHex(output.output.address),
         );
 
@@ -924,7 +924,7 @@ export default class WriteBatchBlockchain {
     |}>,
   > {
     return Promise.all(
-      inputs.map(async input => {
+      inputs.map(async (input) => {
         const output = await this.output.get(input);
         return { input, output };
       }),
@@ -940,7 +940,7 @@ export default class WriteBatchBlockchain {
     const addressInputOutputs = _.groupBy(inputOutputs, ({ output }) =>
       common.uInt160ToHex(output.address),
     );
-    return _.mapValues(addressInputOutputs, inputs =>
+    return _.mapValues(addressInputOutputs, (inputs) =>
       inputs.map(({ input }) => input),
     );
   }
@@ -966,7 +966,7 @@ export default class WriteBatchBlockchain {
 
     const promises = [];
     promises.push(
-      ...spent.map(input =>
+      ...spent.map((input) =>
         this.accountUnspent.delete({
           hash: address,
           input,
@@ -979,7 +979,7 @@ export default class WriteBatchBlockchain {
       ),
     );
     promises.push(
-      ...claimed.map(input =>
+      ...claimed.map((input) =>
         this.accountUnclaimed.delete({
           hash: address,
           input,
@@ -987,7 +987,7 @@ export default class WriteBatchBlockchain {
       ),
     );
     promises.push(
-      ...spent.map(input =>
+      ...spent.map((input) =>
         this.accountUnclaimed.add(
           new AccountUnclaimed({ hash: address, input }),
         ),
@@ -1008,7 +1008,7 @@ export default class WriteBatchBlockchain {
       promises.push(
         this.account
           .update(account, { balances, votes })
-          .then(async newAccount => {
+          .then(async (newAccount) => {
             if (newAccount.isDeletable()) {
               await this.account.delete({ hash: address });
             }
@@ -1032,9 +1032,9 @@ export default class WriteBatchBlockchain {
     await monitor.captureSpan(
       async () => {
         const inputClaims = inputs
-          .map(input => ({ type: 'input', input, hash: input.hash }))
+          .map((input) => ({ type: 'input', input, hash: input.hash }))
           .concat(
-            claims.map(input => ({ type: 'claim', input, hash: input.hash })),
+            claims.map((input) => ({ type: 'claim', input, hash: input.hash })),
           );
         const hashInputClaims = commonUtils.entries(
           _.groupBy(inputClaims, ({ hash }) => common.uInt256ToHex(hash)),

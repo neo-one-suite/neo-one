@@ -16,11 +16,13 @@ export default async (
     if (result.state === VM_STATE.HALT) {
       return new InvocationResultSuccess({
         gasConsumed: result.gasConsumed,
+        gasCost: result.gasCost,
         stack: result.stack,
       });
     }
     return new InvocationResultError({
       gasConsumed: result.gasConsumed,
+      gasCost: result.gasCost,
       stack: result.stack,
       message:
         result.errorMessage == null ? 'Unknown Error' : result.errorMessage,
@@ -28,6 +30,7 @@ export default async (
   } catch (error) {
     return new InvocationResultError({
       gasConsumed: utils.ZERO,
+      gasCost: utils.ZERO,
       stack: [],
       message: error.message,
     });

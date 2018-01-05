@@ -315,11 +315,11 @@ export default class MonitorBase implements Span {
 
       if (result != null && result.then != null) {
         return result
-          .then(res => {
+          .then((res) => {
             doLog();
             return res;
           })
-          .catch(err => {
+          .catch((err) => {
             doLog(err);
             throw err;
           });
@@ -361,7 +361,7 @@ export default class MonitorBase implements Span {
     const fullLevel = this._getFullLevel(level);
     const references = (referenceIn || [])
       .concat([this.childOf(this)])
-      .map(reference => {
+      .map((reference) => {
         if (reference instanceof DefaultReference && reference.isValid()) {
           return reference.getTracerReference(this._tracer);
         }
@@ -403,13 +403,13 @@ export default class MonitorBase implements Span {
       const value = this.nowSeconds() - span.time;
       this._invokeMetric(
         metric.total,
-        total => total.observe(value),
+        (total) => total.observe(value),
         (total, labels) => total.observe(labels, value),
       );
       if (error) {
         this._invokeMetric(
           metric.error,
-          errorMetric => errorMetric.inc(),
+          (errorMetric) => errorMetric.inc(),
           (errorMetric, labels) => errorMetric.inc(labels),
         );
       }
@@ -456,11 +456,11 @@ export default class MonitorBase implements Span {
 
       if (result != null && result.then != null) {
         return result
-          .then(res => {
+          .then((res) => {
             span.end();
             return res;
           })
-          .catch(err => {
+          .catch((err) => {
             span.end(true);
             throw err;
           });
@@ -480,9 +480,9 @@ export default class MonitorBase implements Span {
   ): $FlowFixMe {
     const level = this._getFullLevel(options.level);
     return this.captureSpan(
-      span =>
+      (span) =>
         span.captureLog(
-          log => func(log),
+          (log) => func(log),
           {
             name: options.name,
             level: level.log,
@@ -585,7 +585,7 @@ export default class MonitorBase implements Span {
       if (maybeMetric != null) {
         this._invokeMetric(
           maybeMetric,
-          theMetric => theMetric.inc(),
+          (theMetric) => theMetric.inc(),
           (theMetric, labels) => theMetric.inc(labels),
         );
       }
@@ -667,9 +667,9 @@ export default class MonitorBase implements Span {
       const { parent } = this.getSpan();
       if (parent != null) {
         const parentLabels = new Set(Object.keys(parent._labels));
-        spanLabels = _.omitBy(spanLabels, label => parentLabels.has(label));
+        spanLabels = _.omitBy(spanLabels, (label) => parentLabels.has(label));
         const parentData = new Set(Object.keys(parent._data));
-        spanData = _.omitBy(spanData, label => parentData.has(label));
+        spanData = _.omitBy(spanData, (label) => parentData.has(label));
       }
     }
 
@@ -766,10 +766,10 @@ export default class MonitorBase implements Span {
 
   async _closeInternal(): Promise<void> {
     await Promise.all([
-      new Promise(resolve => {
+      new Promise((resolve) => {
         this._logger.close(() => resolve());
       }),
-      new Promise(resolve => {
+      new Promise((resolve) => {
         this._tracer.close(() => resolve());
       }),
     ]);

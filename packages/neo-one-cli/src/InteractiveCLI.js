@@ -139,7 +139,7 @@ export default class InteractiveCLI {
   }
 
   getSession$(plugin: string): Observable<Session> {
-    return this._sessions$.pipe(map(sessions => sessions[plugin] || {}));
+    return this._sessions$.pipe(map((sessions) => sessions[plugin] || {}));
   }
 
   addDelimiter(keyIn: string, nameIn: string): void {
@@ -201,18 +201,18 @@ export default class InteractiveCLI {
     this.clientConfig = createClientConfig({ paths });
 
     let isShutdown = false;
-    const shutdown = arg => {
+    const shutdown = (arg) => {
       shutdownIn(arg);
       isShutdown = true;
     };
 
     const logSubscription = combineLatest(
       this.clientConfig.config$.pipe(
-        map(config => config.paths.log),
+        map((config) => config.paths.log),
         distinctUntilChanged(),
       ),
       this.clientConfig.config$.pipe(
-        map(config => config.log),
+        map((config) => config.log),
         distinctUntilChanged(),
       ),
     )
@@ -238,11 +238,11 @@ export default class InteractiveCLI {
     });
     const start$ = combineLatest(
       serverConfig.config$.pipe(
-        map(conf => conf.paths.data),
+        map((conf) => conf.paths.data),
         distinctUntilChanged(),
       ),
       serverConfig.config$.pipe(
-        map(conf => conf.server.port),
+        map((conf) => conf.server.port),
         distinctUntilChanged(),
       ),
     ).pipe(
@@ -287,13 +287,13 @@ export default class InteractiveCLI {
       switchMap(() =>
         this.client
           .getPlugins$()
-          .pipe(map(pluginName => this._registerPlugin(monitor, pluginName))),
+          .pipe(map((pluginName) => this._registerPlugin(monitor, pluginName))),
       ),
       publishReplay(1),
       refCount(),
     );
     const subscription = start$.subscribe({
-      error: error => {
+      error: (error) => {
         monitor.logError({
           name: 'cli_uncaught_error',
           message: 'Something went wrong. Shutting down.',
@@ -319,10 +319,10 @@ export default class InteractiveCLI {
     shutdownFuncs.push(() => subscription.unsubscribe());
     await start$.pipe(take(1)).toPromise();
     const plugins = await this.client.getAllPlugins();
-    plugins.forEach(plugin => this._registerPlugin(monitor, plugin));
+    plugins.forEach((plugin) => this._registerPlugin(monitor, plugin));
 
     if (!isShutdown) {
-      commands.forEach(command => command(this));
+      commands.forEach((command) => command(this));
       const args = argv.slice(2);
       if (args.length > 0) {
         await this.vorpal.exec(args.join(' '));

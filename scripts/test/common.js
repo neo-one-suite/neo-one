@@ -11,6 +11,6 @@ export const getPackageJSONPaths = async (): Promise<Array<string>> => {
   const packages = `.${path.sep}packages`;
   const files = await readdir(packages);
   return files
-    .filter(file => !file.startsWith('.'))
-    .map(file => path.resolve(packages, file, 'package.json'));
+    .filter((file) => !file.startsWith('.'))
+    .map((file) => path.resolve(packages, file, 'package.json'));
 };

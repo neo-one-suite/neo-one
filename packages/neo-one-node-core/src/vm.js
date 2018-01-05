@@ -44,6 +44,7 @@ export type ExecuteScriptsResult = {|
   stack: Array<ContractParameter>,
   stackAlt: Array<ContractParameter>,
   gasConsumed: BN,
+  gasCost: BN,
   errorMessage?: string,
 |};
 export type VMListeners = {|

@@ -135,7 +135,7 @@ export default class ValidatorCache {
       .pipe(toArray())
       .toPromise();
     const publicKeyToValidator = _.fromPairs(
-      validators.map(validator => [
+      validators.map((validator) => [
         common.ecPointToHex(validator.publicKey),
         validator,
       ]),

@@ -49,7 +49,7 @@ export default class AccountInput implements Equatable, SerializableWire<this> {
 
   equals: Equals = utils.equals(
     AccountInput,
-    other =>
+    (other) =>
       common.uInt160Equal(this.hash, other.hash) &&
       this.input.equals(other.input),
   );

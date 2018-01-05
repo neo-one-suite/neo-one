@@ -69,7 +69,7 @@ export default class CLI {
       serverArgs: this.serverConfig,
       paths: this.paths,
     };
-    commands.forEach(command => command(cliArgs));
+    commands.forEach((command) => command(cliArgs));
 
     const cmd = argv.slice(2).join(' ');
     if (!this._exists(vorpal, cmd)) {
@@ -101,7 +101,7 @@ export default class CLI {
       minPort: this.serverConfig.minPort,
     });
     const port = await serverConfig.config$
-      .pipe(map(conf => conf.server.port), take(1))
+      .pipe(map((conf) => conf.server.port), take(1))
       .toPromise();
     const client = new Client({ port });
     const plugins = await client.getAllPlugins();
@@ -117,7 +117,7 @@ export default class CLI {
         monitor: cliArgs.monitor,
         pluginName,
       });
-      plugin.commands.forEach(command => command(cliArgs));
+      plugin.commands.forEach((command) => command(cliArgs));
     }
   }
 }

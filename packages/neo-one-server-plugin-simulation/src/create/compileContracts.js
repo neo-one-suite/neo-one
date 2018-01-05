@@ -14,14 +14,14 @@ export default {
       throw new Error('For Flow');
     }
     ctx.dependencies.push(
-      ...targetContract.compileContracts.map(contract => ({
+      ...targetContract.compileContracts.map((contract) => ({
         plugin: compilerConstants.PLUGIN,
         resourceType: compilerConstants.CONTRACT_RESOURCE_TYPE,
         name: contract.name,
       })),
     );
     return new TaskList({
-      tasks: targetContract.compileContracts.map(contract => ({
+      tasks: targetContract.compileContracts.map((contract) => ({
         title: `Compile ${contract.name}`,
         task: () =>
           ctx.pluginManager

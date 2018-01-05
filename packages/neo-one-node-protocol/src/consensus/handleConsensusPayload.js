@@ -101,7 +101,7 @@ const handlePrepareRequest = async ({
     header: {
       type: 'new',
       previousHash: context.previousHash,
-      transactionHashes: message.transactionHashes.map(hash =>
+      transactionHashes: message.transactionHashes.map((hash) =>
         common.uInt256ToHex(hash),
       ),
       blockIndex: context.blockIndex,

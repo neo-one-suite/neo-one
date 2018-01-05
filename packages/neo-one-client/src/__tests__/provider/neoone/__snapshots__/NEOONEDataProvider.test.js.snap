@@ -3,6 +3,7 @@
 exports[`NEOONEDataProvider call 1`] = `
 Object {
   "gasConsumed": "0",
+  "gasCost": "0",
   "message": "10",
   "stack": Array [
     Object {

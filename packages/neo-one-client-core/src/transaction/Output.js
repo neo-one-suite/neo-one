@@ -53,7 +53,7 @@ export default class Output implements SerializableWire<Output>, Equatable {
 
   equals: Equals = utils.equals(
     Output,
-    other =>
+    (other) =>
       common.uInt256Equal(this.asset, other.asset) &&
       this.value.eq(other.value) &&
       common.uInt160Equal(this.address, other.address),

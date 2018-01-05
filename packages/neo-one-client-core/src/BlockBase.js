@@ -124,7 +124,7 @@ export default class BlockBase implements Equatable {
     return this._script;
   }
 
-  equals: Equals = utils.equals(this.constructor, other =>
+  equals: Equals = utils.equals(this.constructor, (other) =>
     common.uInt256Equal(this.hash, other.hash),
   );
 

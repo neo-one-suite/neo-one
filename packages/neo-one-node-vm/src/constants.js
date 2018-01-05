@@ -82,6 +82,7 @@ export type ExecutionContext = {|
   code: Buffer,
   pushOnly: boolean,
   scriptHash: UInt160,
+  // TODO: This may be incorrect: https://github.com/neo-project/neo-vm/issues/29
   callingScriptHash: ?UInt160,
   entryScriptHash: UInt160,
   pc: number,

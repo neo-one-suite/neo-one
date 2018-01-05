@@ -95,10 +95,10 @@ const toByteArray = (contractParameter: ContractParameter): BufferString =>
 
 const toBoolean = (contractParameter: ContractParameter) => {
   if (contractParameter.type === 'Array') {
-    return contractParameter.value.some(item => toBoolean(item));
+    return contractParameter.value.some((item) => toBoolean(item));
   }
 
-  return toByteArrayBuffer(contractParameter).some(value => value !== 0);
+  return toByteArrayBuffer(contractParameter).some((value) => value !== 0);
 };
 
 const toString = (contractParameter: ContractParameter): string => {
@@ -200,7 +200,7 @@ const toArray = (
   const { value } = parameter;
   // eslint-disable-next-line
   const converter = contractParameters[value.type];
-  return contractParameter.value.map(val =>
+  return contractParameter.value.map((val) =>
     converter(val, (value: $FlowFixMe)),
   );
 };
@@ -218,7 +218,7 @@ const toVoid = (
 function createNullable<Result>(
   func: (contractParameter: ContractParameter) => Result,
 ): (contractParameter: ContractParameter) => ?Result {
-  return contractParameter => {
+  return (contractParameter) => {
     try {
       return func(contractParameter);
     } catch (error) {

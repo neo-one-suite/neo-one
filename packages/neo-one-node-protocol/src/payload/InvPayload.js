@@ -28,7 +28,7 @@ export default class InvPayload implements SerializableWire<InvPayload> {
 
   serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.type);
-    writer.writeArray(this.hashes, value => {
+    writer.writeArray(this.hashes, (value) => {
       writer.writeUInt256(value);
     });
   }

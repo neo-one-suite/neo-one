@@ -155,12 +155,14 @@ describe('common', () => {
     const invokeResult = {
       state: 'FAULT',
       gasConsumed: new BigNumber('10'),
+      gasCost: new BigNumber('10'),
       stack: [],
       message: 'message',
     };
     const expected = {
       state: 'FAULT',
       gasConsumed: new BigNumber('10'),
+      gasCost: new BigNumber('10'),
       message: 'message',
     };
 
@@ -176,11 +178,13 @@ describe('common', () => {
     const invokeResult = {
       state: 'HALT',
       gasConsumed: new BigNumber('10'),
+      gasCost: new BigNumber('10'),
       stack: [contractParameter],
     };
     const expected = {
       state: invokeResult.state,
       gasConsumed: invokeResult.gasConsumed,
+      gasCost: invokeResult.gasCost,
       value: 'test',
     };
 
@@ -196,11 +200,13 @@ describe('common', () => {
     const invokeResult = {
       state: 'HALT',
       gasConsumed: new BigNumber('10'),
+      gasCost: new BigNumber('10'),
       stack: [],
     };
     const expected = {
       state: invokeResult.state,
       gasConsumed: invokeResult.gasConsumed,
+      gasCost: invokeResult.gasCost,
     };
 
     const result = common.convertInvocationResult({
@@ -215,6 +221,7 @@ describe('common', () => {
     const resultCall = {
       state: 'FAULT',
       gasConsumed: new BigNumber('10'),
+      gasCost: new BigNumber('10'),
       stack: [contractParameter],
       message: 'testMsg',
     };
@@ -234,6 +241,7 @@ describe('common', () => {
     const resultCall = {
       state: 'HALT',
       gasConsumed: new BigNumber('10'),
+      gasCost: new BigNumber('10'),
       stack: [contractParameter],
     };
     const expected = 'test';
@@ -250,6 +258,7 @@ describe('common', () => {
     const resultCall = {
       state: 'HALT',
       gasConsumed: new BigNumber('10'),
+      gasCost: new BigNumber('10'),
       stack: [],
     };
 

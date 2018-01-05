@@ -19,7 +19,7 @@ class One {
     this.server = spawn(command.split(' ')[0], command.split(' ').slice(1));
 
     let stdout = '';
-    const listener = res => {
+    const listener = (res) => {
       stdout += res;
     };
     this.server.stdout.on('data', listener);
@@ -28,7 +28,7 @@ class One {
     let ready = false;
     while (!ready && tries >= 0) {
       // eslint-disable-next-line
-      await new Promise(resolve => setTimeout(() => resolve(), 5000));
+      await new Promise((resolve) => setTimeout(() => resolve(), 5000));
       // eslint-disable-next-line
       const result = await this._exec('check server --static-neo-one');
       try {
@@ -52,7 +52,7 @@ class One {
       await this._exec('reset --static-neo-one');
     } catch (error) {
       this.server.kill('SIGINT');
-      await new Promise(resolve => setTimeout(() => resolve(), 2500));
+      await new Promise((resolve) => setTimeout(() => resolve(), 2500));
       this.server.kill('SIGTERM');
     }
 
@@ -83,7 +83,7 @@ class One {
       } catch (error) {
         finalError = error;
         // eslint-disable-next-line
-        await new Promise(resolve => setTimeout(() => resolve(), 1000));
+        await new Promise((resolve) => setTimeout(() => resolve(), 1000));
       }
     }
 

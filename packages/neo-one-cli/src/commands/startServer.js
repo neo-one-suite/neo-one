@@ -19,7 +19,7 @@ export default (args: CLIArgs) => {
         serverConfig,
         binary,
       }).subscribe({
-        error: error => {
+        error: (error) => {
           monitor.logError({
             name: 'server_uncaught_error',
             message: 'Uncaught server error. Shutting down.',

@@ -112,7 +112,7 @@ export default class HeaderContext extends Context {
         version: this.version,
         previousHash: this.previousHash,
         merkleRoot: MerkleTree.computeRoot(
-          this.transactionHashes.map(hash => common.hexToUInt256(hash)),
+          this.transactionHashes.map((hash) => common.hexToUInt256(hash)),
         ),
         timestamp,
         index: this.blockIndex,
@@ -131,11 +131,11 @@ export default class HeaderContext extends Context {
   toJSON(): Object {
     return {
       ...super.toJSON(),
-      transactionHashes: this.transactionHashes.map(hash =>
+      transactionHashes: this.transactionHashes.map((hash) =>
         common.uInt256ToString(hash),
       ),
       signatures: this.signatures.map(
-        signature => (signature == null ? 'null' : signature.toString('hex')),
+        (signature) => (signature == null ? 'null' : signature.toString('hex')),
       ),
     };
   }

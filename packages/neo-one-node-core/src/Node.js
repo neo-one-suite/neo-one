@@ -10,7 +10,10 @@ export type Consensus = {
 };
 
 export interface Node {
-  relayTransaction(transaction: Transaction): Promise<void>;
+  relayTransaction(
+    transaction: Transaction,
+    throwVerifyError?: boolean,
+  ): Promise<void>;
   +connectedPeers: Array<Endpoint>;
   +memPool: { [hash: UInt256Hex]: Transaction };
   +consensus: ?Consensus;

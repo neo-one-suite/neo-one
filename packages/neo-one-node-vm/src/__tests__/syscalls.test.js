@@ -727,7 +727,7 @@ const SYSCALLS = ([
     result: [
       new ArrayStackItem(
         transactions.mintTransaction.attributes.map(
-          attribute => new AttributeStackItem(attribute),
+          (attribute) => new AttributeStackItem(attribute),
         ),
       ),
     ],
@@ -755,7 +755,7 @@ const SYSCALLS = ([
     result: [
       new ArrayStackItem(
         transactions.mintTransaction.inputs.map(
-          input => new InputStackItem(input),
+          (input) => new InputStackItem(input),
         ),
       ),
     ],
@@ -783,7 +783,7 @@ const SYSCALLS = ([
     result: [
       new ArrayStackItem(
         transactions.mintTransaction.outputs.map(
-          output => new OutputStackItem(output),
+          (output) => new OutputStackItem(output),
         ),
       ),
     ],
@@ -840,7 +840,7 @@ const SYSCALLS = ([
     result: [
       new ArrayStackItem(
         transactions.mintTransaction.outputs.map(
-          output => new OutputStackItem(output),
+          (output) => new OutputStackItem(output),
         ),
       ),
     ],
@@ -1180,7 +1180,7 @@ const SYSCALLS = ([
     name: 'Neo.Account.GetVotes',
     result: [
       new ArrayStackItem(
-        new Account(account).votes.map(vote => new ECPointStackItem(vote)),
+        new Account(account).votes.map((vote) => new ECPointStackItem(vote)),
       ),
     ],
     args: [
@@ -1470,7 +1470,7 @@ const SYSCALLS = ([
   },
   {
     name: 'Neo.Storage.Find',
-    result: () => result => {
+    result: () => (result) => {
       expect(result).toMatchSnapshot();
     },
     args: [
@@ -1489,7 +1489,7 @@ const SYSCALLS = ([
       blockchain.contract.get = jest.fn(() =>
         Promise.resolve({ hasStorage: true }),
       );
-      blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of([]));
+      blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of());
     },
     gas: FEES.ONE,
   },
@@ -2064,7 +2064,7 @@ const handleArgs = (sb: ScriptBuilder, args: Array<Arg>) => {
       arg.type === 'calls' &&
       arg.calls != null
     ) {
-      ((arg.calls: $FlowFixMe): Array<Call>).forEach(call => {
+      ((arg.calls: $FlowFixMe): Array<Call>).forEach((call) => {
         handleCall(sb, call);
       });
     } else {
@@ -2074,11 +2074,11 @@ const handleArgs = (sb: ScriptBuilder, args: Array<Arg>) => {
 };
 
 describe('syscalls', () => {
-  const filterMethods = value => {
+  const filterMethods = (value) => {
     if (value == null) {
       return value;
     } else if (Array.isArray(value)) {
-      return value.map(val => filterMethods(val));
+      return value.map((val) => filterMethods(val));
     } else if (typeof value === 'function') {
       return undefined;
     } else if (typeof value === 'object') {

@@ -45,7 +45,7 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
   constructor(providersIn: TUserAccountProviders) {
     const providersArray = utils.values(providersIn);
     const providerIn =
-      providersArray.find(provider => provider.getCurrentAccount() != null) ||
+      providersArray.find((provider) => provider.getCurrentAccount() != null) ||
       providersArray[0];
     if (providerIn == null) {
       throw new Error('At least one provider is required');
@@ -63,25 +63,25 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
     this._selectedProvider$ = new BehaviorSubject(providerIn);
 
     this.currentAccount$ = this._selectedProvider$.pipe(
-      switchMap(provider => provider.currentAccount$),
+      switchMap((provider) => provider.currentAccount$),
     );
     this.accounts$ = this._providers$.pipe(
-      switchMap(providers =>
+      switchMap((providers) =>
         combineLatest(
-          utils.values(providers).map(provider => provider.accounts$),
+          utils.values(providers).map((provider) => provider.accounts$),
         ),
       ),
-      map(accountss =>
+      map((accountss) =>
         accountss.reduce((acc, accounts) => acc.concat(accounts), []),
       ),
     );
     this.networks$ = this._providers$.pipe(
-      switchMap(providers =>
+      switchMap((providers) =>
         combineLatest(
-          utils.values(providers).map(provider => provider.networks$),
+          utils.values(providers).map((provider) => provider.networks$),
         ),
       ),
-      map(networkss => [
+      map((networkss) => [
         ...new Set(
           networkss.reduce((acc, networks) => acc.concat(networks), []),
         ),
@@ -92,9 +92,9 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
 
     if (this.getCurrentAccount() == null) {
       this.accounts$
-        .pipe(filter(accounts => accounts.length > 0), take(1))
+        .pipe(filter((accounts) => accounts.length > 0), take(1))
         .toPromise()
-        .then(async accounts => {
+        .then(async (accounts) => {
           const account = accounts[0];
           if (this.getCurrentAccount() == null && account != null) {
             await this.selectAccount(account.id);
@@ -115,7 +115,7 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
     const account = provider
       .getAccounts()
       .find(
-        acct =>
+        (acct) =>
           acct.id.network === id.network && acct.id.address === id.address,
       );
     /* istanbul ignore if  */
@@ -278,11 +278,11 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
     }
 
     const providers = utils.values(this.providers);
-    const accountProvider = providers.find(provider =>
+    const accountProvider = providers.find((provider) =>
       provider
         .getAccounts()
         .some(
-          account =>
+          (account) =>
             account.id.network === from.network &&
             account.id.address === from.address,
         ),
@@ -296,8 +296,8 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
 
   _getNetworkProvider(network: NetworkType): UserAccountProvider {
     const providers = utils.values(this.providers);
-    const accountProvider = providers.find(provider =>
-      provider.getAccounts().some(account => account.id.network === network),
+    const accountProvider = providers.find((provider) =>
+      provider.getAccounts().some((account) => account.id.network === network),
     );
     if (accountProvider == null) {
       throw new UnknownNetworkError(network);
@@ -307,6 +307,6 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
   }
 
   static inject(provider: UserAccountProvider): void {
-    clients.forEach(client => client.inject(provider));
+    clients.forEach((client) => client.inject(provider));
   }
 }

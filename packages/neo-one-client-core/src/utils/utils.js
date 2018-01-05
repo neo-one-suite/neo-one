@@ -42,7 +42,7 @@ const toSignedBuffer = (value: BN): Buffer => {
   return normalValue.eq(paddedValue) ? buff : paddedBuff;
 };
 
-const getBoolean = (value: Buffer): boolean => value.some(byte => byte !== 0);
+const getBoolean = (value: Buffer): boolean => value.some((byte) => byte !== 0);
 
 const booleanToBuffer = (value: boolean): Buffer =>
   Buffer.from([value ? 1 : 0]);
@@ -84,10 +84,10 @@ const calculateClaimAmount = async ({
   getSystemFee: (index: number) => Promise<BN>,
 |}): Promise<BN> => {
   const grouped = commonUtils.values(
-    _.groupBy(coins, coin => `${coin.startHeight}:${coin.endHeight}`),
+    _.groupBy(coins, (coin) => `${coin.startHeight}:${coin.endHeight}`),
   );
   const claimed = await Promise.all(
-    grouped.map(async coinsGroup => {
+    grouped.map(async (coinsGroup) => {
       const { startHeight, endHeight } = coinsGroup[0];
 
       let amount = ZERO;

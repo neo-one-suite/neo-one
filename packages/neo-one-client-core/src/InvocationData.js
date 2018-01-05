@@ -78,9 +78,11 @@ export default class InvocationData
         ) +
         IOHelper.sizeOfArray(
           this.voteUpdates,
-          value =>
+          (value) =>
             IOHelper.sizeOfUInt160 +
-            IOHelper.sizeOfArray(value[1], val => IOHelper.sizeOfECPoint(val)),
+            IOHelper.sizeOfArray(value[1], (val) =>
+              IOHelper.sizeOfECPoint(val),
+            ),
         ) +
         IOHelper.sizeOfUInt32LE +
         IOHelper.sizeOfUInt32LE +
@@ -95,10 +97,10 @@ export default class InvocationData
   serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt256(this.hash);
     writer.writeUInt256(this.assetHash || common.ZERO_UINT256);
-    writer.writeArray(this.contractHashes, contractHash => {
+    writer.writeArray(this.contractHashes, (contractHash) => {
       writer.writeUInt160(contractHash);
     });
-    writer.writeArray(this.deletedContractHashes, contractHash => {
+    writer.writeArray(this.deletedContractHashes, (contractHash) => {
       writer.writeUInt160(contractHash);
     });
     writer.writeArray(this.migratedContractHashes, ([from, to]) => {
@@ -107,7 +109,7 @@ export default class InvocationData
     });
     writer.writeArray(this.voteUpdates, ([address, votes]) => {
       writer.writeUInt160(address);
-      writer.writeArray(votes, vote => {
+      writer.writeArray(votes, (vote) => {
         writer.writeECPoint(vote);
       });
     });

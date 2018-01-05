@@ -45,4 +45,8 @@ export default class ObjectStackItem<Value: Equatable> extends StackItemBase {
   toContractParameter(): ContractParameter {
     return new InteropInterfaceContractParameter();
   }
+
+  toJSON(): any {
+    return JSON.stringify(this.value);
+  }
 }

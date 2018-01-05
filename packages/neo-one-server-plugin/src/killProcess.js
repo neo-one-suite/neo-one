@@ -28,7 +28,7 @@ export default async (pid: number): Promise<void> => {
       throw error;
     }
     // eslint-disable-next-line
-    await new Promise(resolve => setTimeout(() => resolve(), 1000));
+    await new Promise((resolve) => setTimeout(() => resolve(), 1000));
     alive = isRunning(pid);
     if (!alive) {
       return;

@@ -49,7 +49,7 @@ export type Store = {
 
 const flattenWallets = (wallets: Wallets) =>
   _.flatten(
-    utils.values(wallets).map(networkWallets => utils.values(networkWallets)),
+    utils.values(wallets).map((networkWallets) => utils.values(networkWallets)),
   );
 
 export default class LocalKeyStore {
@@ -71,12 +71,12 @@ export default class LocalKeyStore {
     this._wallets$ = new BehaviorSubject({});
     this.wallets$ = this._wallets$.pipe(
       distinctUntilChanged((a, b) => _.isEqual(a, b)),
-      map(wallets => flattenWallets(wallets)),
+      map((wallets) => flattenWallets(wallets)),
     );
 
     this._accounts$ = new BehaviorSubject([]);
     this.wallets$
-      .pipe(map(wallets => wallets.map(({ account }) => account)))
+      .pipe(map((wallets) => wallets.map(({ account }) => account)))
       .subscribe(this._accounts$);
     this.accounts$ = this._accounts$;
 
@@ -161,7 +161,7 @@ export default class LocalKeyStore {
     monitor,
   }: UpdateAccountNameOptions): Promise<void> {
     return this._capture(
-      async span => {
+      async (span) => {
         const wallet = this.getWallet(id);
         let newWallet;
         const account = {
@@ -188,7 +188,7 @@ export default class LocalKeyStore {
           };
         }
         await this._capture(
-          innerSpan => this._store.saveWallet(newWallet, innerSpan),
+          (innerSpan) => this._store.saveWallet(newWallet, innerSpan),
           'neo_save_wallet',
           span,
         );
@@ -215,7 +215,7 @@ export default class LocalKeyStore {
 
   getWallet$({ address, network }: UserAccountID): Observable<?Wallet> {
     return this._wallets$.pipe(
-      map(wallets => {
+      map((wallets) => {
         const networkWallets = wallets[network];
         if (networkWallets == null) {
           return null;
@@ -244,7 +244,7 @@ export default class LocalKeyStore {
     await this._initPromise;
 
     return this._capture(
-      async span => {
+      async (span) => {
         let privateKey = privateKeyIn;
         let nep2 = nep2In;
         if (privateKey == null) {
@@ -283,7 +283,7 @@ export default class LocalKeyStore {
         }
 
         await this._capture(
-          innerSpan => this._store.saveWallet(wallet, innerSpan),
+          (innerSpan) => this._store.saveWallet(wallet, innerSpan),
           'neo_save_wallet',
           span,
         );
@@ -304,7 +304,7 @@ export default class LocalKeyStore {
     await this._initPromise;
 
     return this._capture(
-      async span => {
+      async (span) => {
         const { wallets } = this;
         const networkWalletsIn = wallets[id.network];
         if (networkWalletsIn == null) {
@@ -320,7 +320,7 @@ export default class LocalKeyStore {
         delete networkWallets[id.address];
 
         await this._capture(
-          innerSpan => this._store.deleteWallet(wallet, innerSpan),
+          (innerSpan) => this._store.deleteWallet(wallet, innerSpan),
           'neo_delete_wallet',
           span,
         );

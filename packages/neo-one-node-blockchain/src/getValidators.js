@@ -52,7 +52,7 @@ const processOutput = async (
   ) {
     await Promise.all([
       Promise.all(
-        account.votes.map(publicKey =>
+        account.votes.map((publicKey) =>
           cache.updateValidatorVotes(publicKey, value),
         ),
       ),
@@ -67,13 +67,13 @@ const processTransaction = async (
   transaction: Transaction,
 ): Promise<void> => {
   let allOutputs = await Promise.all(
-    transaction.inputs.map(async input => {
+    transaction.inputs.map(async (input) => {
       const output = await blockchain.output.get(input);
       return { output, negative: true };
     }),
   );
   allOutputs = allOutputs.concat(
-    transaction.outputs.map(output => ({ output, negative: false })),
+    transaction.outputs.map((output) => ({ output, negative: false })),
   );
   await Promise.all(
     allOutputs.map(({ output, negative }) =>
@@ -84,9 +84,9 @@ const processTransaction = async (
     ...new Set(
       allOutputs.map(({ output }) => common.uInt160ToHex(output.address)),
     ),
-  ].map(hash => common.hexToUInt160(hash));
+  ].map((hash) => common.hexToUInt160(hash));
   const touchedValidators = await Promise.all(
-    accountHashes.map(async hash => {
+    accountHashes.map(async (hash) => {
       const account = await cache.getAccount(hash);
       return account.votes;
     }),
@@ -95,13 +95,13 @@ const processTransaction = async (
     ...new Set(
       touchedValidators.reduce(
         (acc, votes) =>
-          acc.concat(votes.map(vote => common.ecPointToHex(vote))),
+          acc.concat(votes.map((vote) => common.ecPointToHex(vote))),
         [],
       ),
     ),
-  ].map(publicKey => common.hexToECPoint(publicKey));
+  ].map((publicKey) => common.hexToECPoint(publicKey));
   await Promise.all(
-    touchedValidatorsSet.map(async publicKey => {
+    touchedValidatorsSet.map(async (publicKey) => {
       const validator = await cache.getValidator(publicKey);
       if (!validator.registered && validator.votes.eq(utils.ZERO)) {
         await cache.deleteValidator(publicKey);
@@ -153,10 +153,10 @@ export const getDescriptorChanges = async ({
     [],
   );
   const accountDescriptors = allDescriptors.filter(
-    descriptor => descriptor.type === 0x40,
+    (descriptor) => descriptor.type === 0x40,
   );
   const groupedAccountDescriptors = commonUtils.entries(
-    _.groupBy(accountDescriptors, descriptor =>
+    _.groupBy(accountDescriptors, (descriptor) =>
       common.uInt160ToHex(common.bufferToUInt160(descriptor.key)),
     ),
   );
@@ -201,13 +201,13 @@ export const getDescriptorChanges = async ({
   );
 
   const validatorDescriptors = allDescriptors.filter(
-    descriptor => descriptor.type === 0x48,
+    (descriptor) => descriptor.type === 0x48,
   );
   for (const descriptor of validatorDescriptors) {
     const publicKey = common.bufferToECPoint(descriptor.key);
     validatorRegisteredChanges[
       common.ecPointToHex(publicKey)
-    ] = descriptor.value.some(byte => byte !== 0);
+    ] = descriptor.value.some((byte) => byte !== 0);
   }
 
   const validatorChanges = ({}: ValidatorChanges);
@@ -309,7 +309,7 @@ export default async (
 ): Promise<Array<ECPoint>> => {
   const cache = new ValidatorCache(blockchain);
   await Promise.all(
-    transactions.map(transaction =>
+    transactions.map((transaction) =>
       processTransaction(blockchain, cache, transaction),
     ),
   );
@@ -318,23 +318,23 @@ export default async (
     validatorsCountChanges,
   } = await getDescriptorChanges({
     transactions: (transactions.filter(
-      transaction =>
+      (transaction) =>
         transaction.type === TRANSACTION_TYPE.STATE &&
         transaction instanceof StateTransaction,
     ): $FlowFixMe),
-    getAccount: hash => cache.getAccount(hash),
+    getAccount: (hash) => cache.getAccount(hash),
     governingTokenHash: blockchain.settings.governingToken.hashHex,
   });
   await processStateTransaction({
     validatorChanges,
     validatorsCountChanges,
     tryGetValidatorsCount: () => cache.getValidatorsCount(),
-    addValidatorsCount: value => cache.addValidatorsCount(value),
+    addValidatorsCount: (value) => cache.addValidatorsCount(value),
     updateValidatorsCount: (value, update) =>
       cache.updateValidatorsCount(update),
-    tryGetValidator: key => cache.getValidator(key.publicKey),
-    addValidator: validator => cache.addValidator(validator),
-    deleteValidator: key => cache.deleteValidator(key.publicKey),
+    tryGetValidator: (key) => cache.getValidator(key.publicKey),
+    addValidator: (validator) => cache.addValidator(validator),
+    deleteValidator: (key) => cache.deleteValidator(key.publicKey),
     updateValidator: (value, update) =>
       cache.updateValidator(value.publicKey, update),
   });
@@ -361,7 +361,7 @@ export default async (
   );
 
   const standbyValidatorsSet = new Set(
-    blockchain.settings.standbyValidators.map(publicKey =>
+    blockchain.settings.standbyValidators.map((publicKey) =>
       common.ecPointToHex(publicKey),
     ),
   );
@@ -370,7 +370,7 @@ export default async (
     _.take(
       validators
         .filter(
-          validator =>
+          (validator) =>
             (validator.registered && validator.votes.gt(utils.ZERO)) ||
             standbyValidatorsSet.has(common.ecPointToHex(validator.publicKey)),
         )
@@ -383,7 +383,7 @@ export default async (
                 )
               : -aValidator.votes.cmp(bValidator.votes),
         )
-        .map(validator => common.ecPointToHex(validator.publicKey)),
+        .map((validator) => common.ecPointToHex(validator.publicKey)),
       numValidators,
     ),
   );
@@ -398,7 +398,7 @@ export default async (
     validatorsPublicKeySet.add(standbyValidatorsArray[i]);
   }
 
-  const validatorsPublicKeys = [...validatorsPublicKeySet].map(hex =>
+  const validatorsPublicKeys = [...validatorsPublicKeySet].map((hex) =>
     common.hexToECPoint(hex),
   );
 

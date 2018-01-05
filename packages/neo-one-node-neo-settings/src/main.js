@@ -26,7 +26,7 @@ export default (options?: {|
       '02aaec38470f6aad0042c6e877cfd8087d2676b0f516fddd362801b9bd3936399e',
       '02486fd15702c4490a26703112a5cc1d0923fd697a33406bd5a1c00e0013b09a70',
     ]
-  ).map(value => common.stringToECPoint(value));
+  ).map((value) => common.stringToECPoint(value));
   const commonSettings = createCommon({
     privateNet,
     standbyValidators,

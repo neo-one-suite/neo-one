@@ -82,9 +82,9 @@ export const processArgs = async (
   const logPath = path.resolve(dataPath, 'log');
   const logSubscription = nodeConfig.config$
     .pipe(
-      map(config => config.log),
+      map((config) => config.log),
       distinctUntilChanged(),
-      map(config => ({
+      map((config) => ({
         name: 'node',
         path: logPath,
         level: config.level,

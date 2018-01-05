@@ -34,9 +34,9 @@ export default async ({
   ] = await Promise.all([
     nodeConfig.config$
       .pipe(
-        map(config => config.settings),
+        map((config) => config.settings),
         distinctUntilChanged(),
-        map(config => {
+        map((config) => {
           const options = {
             privateNet: config.privateNet,
             secondsPerBlock: config.secondsPerBlock,
@@ -52,13 +52,13 @@ export default async ({
       )
       .toPromise(),
     nodeConfig.config$
-      .pipe(map(config => config.environment.rpc), take(1))
+      .pipe(map((config) => config.environment.rpc), take(1))
       .toPromise(),
     nodeConfig.config$
-      .pipe(map(config => config.environment.node), take(1))
+      .pipe(map((config) => config.environment.node), take(1))
       .toPromise(),
     nodeConfig.config$
-      .pipe(map(config => config.environment.telemetry), take(1))
+      .pipe(map((config) => config.environment.telemetry), take(1))
       .toPromise(),
     fs.ensureDir(storagePath),
   ]);
@@ -74,7 +74,7 @@ export default async ({
         telemetry: telemetryEnvironment,
       },
       options$: nodeConfig.config$.pipe(
-        map(config => config.options),
+        map((config) => config.options),
         distinctUntilChanged(),
       ),
       chainFile,

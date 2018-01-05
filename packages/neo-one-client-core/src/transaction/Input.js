@@ -41,7 +41,7 @@ export default class Input
 
   equals: Equals = utils.equals(
     Input,
-    other =>
+    (other) =>
       common.uInt256Equal(this.hash, other.hash) && other.index === this.index,
   );
 

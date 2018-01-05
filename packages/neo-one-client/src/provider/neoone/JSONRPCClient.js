@@ -119,7 +119,7 @@ export default class JSONRPCClient {
         },
         monitor,
       )
-      .then(value => ({ hash, key, value }));
+      .then((value) => ({ hash, key, value }));
   }
 
   getUnspentOutput(input: InputJSON, monitor?: Monitor): Promise<?OutputJSON> {
@@ -154,7 +154,7 @@ export default class JSONRPCClient {
         },
         monitor,
       )
-      .then(result => {
+      .then((result) => {
         if (!result) {
           throw new RelayTransactionError('Relay transaction failed.');
         }
@@ -175,7 +175,7 @@ export default class JSONRPCClient {
         },
         monitor,
       )
-      .catch(error => {
+      .catch((error) => {
         if (error.code === 'JSON_RPC' && error.responseError.code === -110) {
           throw new RelayTransactionError(error.responseError.message);
         }
@@ -203,7 +203,7 @@ export default class JSONRPCClient {
         },
         monitor,
       )
-      .then(res => new BigNumber(res));
+      .then((res) => new BigNumber(res));
   }
 
   getAllStorage(
@@ -277,7 +277,7 @@ export default class JSONRPCClient {
         },
         monitor,
       )
-      .then(result => result.connected);
+      .then((result) => result.connected);
   }
 
   getNetworkSettings(monitor?: Monitor): Promise<NetworkSettingsJSON> {

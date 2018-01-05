@@ -52,7 +52,7 @@ export default class Witness
 
   equals: Equals = utils.equals(
     Witness,
-    other =>
+    (other) =>
       this.invocation.equals(other.invocation) &&
       this.verification.equals(other.verification),
   );

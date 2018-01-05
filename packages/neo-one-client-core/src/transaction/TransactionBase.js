@@ -63,7 +63,7 @@ const getUtilityValue = ({
   utilityToken: RegisterTransaction,
 |}) =>
   outputs
-    .filter(output => common.uInt256Equal(output.asset, utilityToken.hash))
+    .filter((output) => common.uInt256Equal(output.asset, utilityToken.hash))
     .reduce((acc, output) => acc.add(output.value), utils.ZERO);
 
 export type FeeContext = {|
@@ -173,10 +173,10 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
   _size = utils.lazy(
     () =>
       IOHelper.sizeOfUInt8 +
-      IOHelper.sizeOfArray(this.attributes, attribute => attribute.size) +
-      IOHelper.sizeOfArray(this.inputs, input => input.size) +
-      IOHelper.sizeOfArray(this.outputs, output => output.size) +
-      IOHelper.sizeOfArray(this.scripts, script => script.size),
+      IOHelper.sizeOfArray(this.attributes, (attribute) => attribute.size) +
+      IOHelper.sizeOfArray(this.inputs, (input) => input.size) +
+      IOHelper.sizeOfArray(this.outputs, (output) => output.size) +
+      IOHelper.sizeOfArray(this.scripts, (script) => script.size),
   );
   _message = utils.lazy(() => this.serializeUnsigned());
 
@@ -220,7 +220,7 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     });
   }
 
-  equals: Equals = utils.equals(this.constructor, other =>
+  equals: Equals = utils.equals(this.constructor, (other) =>
     common.uInt256Equal(this.hash, other.hash),
   );
 
@@ -231,20 +231,20 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     writer.writeUInt8(this.type);
     writer.writeUInt8(this.version);
     this.serializeExclusiveBase(writer);
-    writer.writeArray(this.attributes, attribute => {
+    writer.writeArray(this.attributes, (attribute) => {
       attribute.serializeWireBase(writer);
     });
-    writer.writeArray(this.inputs, input => {
+    writer.writeArray(this.inputs, (input) => {
       input.serializeWireBase(writer);
     });
-    writer.writeArray(this.outputs, output => {
+    writer.writeArray(this.outputs, (output) => {
       output.serializeWireBase(writer);
     });
   }
 
   serializeWireBase(writer: BinaryWriter): void {
     this.serializeUnsignedBase(writer);
-    writer.writeArray(this.scripts, script => {
+    writer.writeArray(this.scripts, (script) => {
       script.serializeWireBase(writer);
     });
   }
@@ -311,14 +311,14 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
       txid: common.uInt256ToString(this.hashHex),
       size: this.size,
       version: this.version,
-      attributes: this.attributes.map(attribute =>
+      attributes: this.attributes.map((attribute) =>
         attribute.serializeJSON(context),
       ),
-      vin: this.inputs.map(input => input.serializeJSON(context)),
+      vin: this.inputs.map((input) => input.serializeJSON(context)),
       vout: this.outputs.map((output, index) =>
         output.serializeJSON(context, index),
       ),
-      scripts: this.scripts.map(script => script.serializeJSON(context)),
+      scripts: this.scripts.map((script) => script.serializeJSON(context)),
       sys_fee: JSONHelper.writeFixed8(this.getSystemFee(context.feeContext)),
       net_fee: JSONHelper.writeFixed8(networkFee),
     };
@@ -333,7 +333,7 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     const { getOutput, utilityToken } = context;
 
     const outputsForInputs = await Promise.all(
-      this.inputs.map(input => getOutput(input)),
+      this.inputs.map((input) => getOutput(input)),
     );
     const inputValue = getUtilityValue({
       outputs: outputsForInputs,
@@ -356,7 +356,7 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
 
   __getReferences = utils.lazyAsync(
     async ({ getOutput }: GetReferencesOptions) =>
-      Promise.all(this.inputs.map(input => getOutput(input))),
+      Promise.all(this.inputs.map((input) => getOutput(input))),
   );
 
   getReferences(options: GetReferencesOptions): Promise<Array<Output>> {
@@ -384,7 +384,7 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
       addOutputs(inputOutputs);
       addOutputs(this.outputs, true);
 
-      return _.pickBy(results, value => !value.eq(utils.ZERO));
+      return _.pickBy(results, (value) => !value.eq(utils.ZERO));
     },
   );
 
@@ -401,13 +401,13 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     }: TransactionGetScriptHashesForVerifyingOptions) => {
       const [inputHashes, outputHashes] = await Promise.all([
         Promise.all(
-          this.inputs.map(async input => {
+          this.inputs.map(async (input) => {
             const output = await getOutput(input);
             return common.uInt160ToHex(output.address);
           }),
         ),
         Promise.all(
-          this.outputs.map(async output => {
+          this.outputs.map(async (output) => {
             const asset = await getAsset({ hash: output.asset });
             if (hasFlag(asset.type, ASSET_TYPE.DUTY_FLAG)) {
               return common.uInt160ToHex(output.address);
@@ -415,11 +415,11 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
 
             return null;
           }),
-        ).then(hashes => hashes.filter(Boolean)),
+        ).then((hashes) => hashes.filter(Boolean)),
       ]);
       const attributeHashes = this.attributes
         .map(
-          attribute =>
+          (attribute) =>
             attribute instanceof UInt160Attribute &&
             attribute.usage === ATTRIBUTE_USAGE.SCRIPT
               ? common.uInt160ToHex(attribute.value)
@@ -445,10 +445,10 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
 
     if (
       memPool.some(
-        tx =>
+        (tx) =>
           !tx.equals(this) &&
-          tx.inputs.some(input =>
-            this.inputs.some(thisInput => input.equals(thisInput)),
+          tx.inputs.some((input) =>
+            this.inputs.some((thisInput) => input.equals(thisInput)),
           ),
       )
     ) {
@@ -457,7 +457,7 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
 
     if (
       this.attributes.filter(
-        attribute =>
+        (attribute) =>
           attribute.usage === ATTRIBUTE_USAGE.ECDH02 ||
           attribute.usage === ATTRIBUTE_USAGE.ECDH03,
       ).length > 1
@@ -477,9 +477,9 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     isSpent,
   }: TransactionVerifyOptions): Promise<void> {
     const isDoubleSpend = await Promise.all(
-      this.inputs.map(input => isSpent(input)),
+      this.inputs.map((input) => isSpent(input)),
     );
-    if (isDoubleSpend.some(value => value)) {
+    if (isDoubleSpend.some((value) => value)) {
       throw new VerifyError('Transaction is a double spend');
     }
   }
@@ -489,7 +489,7 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     currentHeight,
   }: TransactionVerifyOptions): Promise<void> {
     const outputsGrouped = commonUtils.entries(
-      _.groupBy(this.outputs, output => common.uInt256ToHex(output.asset)),
+      _.groupBy(this.outputs, (output) => common.uInt256ToHex(output.asset)),
     );
     const hasInvalidOutputs = await Promise.all(
       outputsGrouped.map(async ([assetHex, outputs]) => {
@@ -503,14 +503,14 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
         }
 
         return outputs.some(
-          output =>
+          (output) =>
             !output.value
               .mod(utils.TEN.pow(utils.EIGHT.subn(asset.precision)))
               .eq(utils.ZERO),
         );
       }),
     );
-    if (hasInvalidOutputs.some(value => value)) {
+    if (hasInvalidOutputs.some((value) => value)) {
       throw new VerifyError('Transaction has invalid output');
     }
   }
@@ -611,7 +611,7 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
 
     const hashes = [...hashesSet]
       .sort()
-      .map(value => common.hexToUInt160(value));
+      .map((value) => common.hexToUInt160(value));
     await Promise.all(
       _.zip(hashes, this.scripts).map(([hash, witness]) =>
         verifyScript({

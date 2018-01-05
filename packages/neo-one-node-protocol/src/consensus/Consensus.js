@@ -68,7 +68,7 @@ export default class Consensus {
 
   start$(): Observable<void> {
     return this._options$.pipe(
-      map(options => {
+      map((options) => {
         const privateKey = common.stringToPrivateKey(options.privateKey);
         const publicKey = crypto.privateKeyToPublicKey(privateKey);
         const feeAddress = crypto.publicKeyToScriptHash(publicKey);
@@ -79,7 +79,7 @@ export default class Consensus {
           privateNet: options.privateNet,
         };
       }),
-      switchMap(options => this._start(options)),
+      switchMap((options) => this._start(options)),
       finalize(() => {
         this._clearTimer();
         this._queue.done();

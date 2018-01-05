@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { type Readable } from 'stream';
 
 export default (getStream: () => Readable): Observable<Buffer> =>
-  Observable.create(observer => {
+  Observable.create((observer) => {
     const stream = getStream();
     let done = false;
     const cleanup = () => {

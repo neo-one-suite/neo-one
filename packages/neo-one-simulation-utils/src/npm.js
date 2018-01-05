@@ -34,7 +34,7 @@ const checkThatNpmCanReadCwd = () => {
   // "; cwd = C:\path\to\current\dir" (unquoted)
   // I couldn't find an easier way to get it.
   const prefix = '; cwd = ';
-  const line = lines.find(l => l.indexOf(prefix) === 0);
+  const line = lines.find((l) => l.indexOf(prefix) === 0);
   if (typeof line !== 'string') {
     // Fail gracefully. They could remove it.
     return true;
@@ -62,7 +62,7 @@ const install = async () => {
     );
   }
 
-  await execa(command, args, { stdio: 'inherit' }).catch(error => {
+  await execa(command, args, { stdio: 'inherit' }).catch((error) => {
     throw new Error(
       `${command} ${args.join(' ')} exited with code ${error.code}`,
     );

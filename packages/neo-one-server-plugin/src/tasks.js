@@ -8,20 +8,20 @@ export const getTaskError = (task: TaskStatus): ?string =>
     : task.error;
 
 export const getTasksError = (tasks: Array<TaskStatus>): ?string =>
-  tasks.map(task => getTaskError(task)).filter(value => value != null)[0];
+  tasks.map((task) => getTaskError(task)).filter((value) => value != null)[0];
 
 export const isTaskDone = (task: TaskStatus): boolean =>
   getTaskError(task) != null || task.skipped != null || task.complete === true;
 
 export const areTasksDone = (tasks: Array<TaskStatus>): boolean =>
   getTasksError(tasks) != null ||
-  tasks.every(task => task.skipped != null || task.complete);
+  tasks.every((task) => task.skipped != null || task.complete);
 
 export const skipAllTasks = (
   tasks: Array<TaskStatus>,
   reason: string,
 ): Array<TaskStatus> =>
-  tasks.map(task => {
+  tasks.map((task) => {
     if (isTaskDone(task)) {
       return task;
     }

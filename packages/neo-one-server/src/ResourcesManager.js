@@ -128,13 +128,13 @@ export default class ResourcesManager<
     this._resourceAdaptersStarted = {};
 
     this.resources$ = this._resourceAdapters$.pipe(
-      switchMap(resourceAdapters => {
+      switchMap((resourceAdapters) => {
         const adapters = utils.values(resourceAdapters);
         if (adapters.length === 0) {
           return _of([]);
         }
 
-        return combineLatest(adapters.map(adapter => adapter.resource$));
+        return combineLatest(adapters.map((adapter) => adapter.resource$));
       }),
       shareReplay(1),
     );
@@ -240,7 +240,7 @@ export default class ResourcesManager<
 
   getResources$(options: ResourceOptions): Observable<Array<Resource>> {
     return this.resources$.pipe(
-      map(resources => this.resourceType.filterResources(resources, options)),
+      map((resources) => this.resourceType.filterResources(resources, options)),
     );
   }
 
@@ -252,7 +252,7 @@ export default class ResourcesManager<
     options: ResourceOptions,
   |}): Observable<?Resource> {
     return this.getResources$(options).pipe(
-      map(resources => resources.find(resource => resource.name === name)),
+      map((resources) => resources.find((resource) => resource.name === name)),
     );
   }
 
@@ -290,7 +290,7 @@ export default class ResourcesManager<
     }
 
     let set = false;
-    const setFromContext = ctx => {
+    const setFromContext = (ctx) => {
       if (!set) {
         set = true;
         if (ctx.resourceAdapter != null) {
@@ -327,10 +327,10 @@ export default class ResourcesManager<
         {
           title: 'Execute final setup',
           skip,
-          task: async ctx => {
+          task: async (ctx) => {
             setFromContext(ctx);
             await this.getResource$({ name, options: ({}: $FlowFixMe) })
-              .pipe(filter(value => value != null), take(1))
+              .pipe(filter((value) => value != null), take(1))
               .toPromise();
             const dependencies = ctx.dependencies || [];
             const dependents = ctx.dependents || [];
@@ -348,7 +348,7 @@ export default class ResourcesManager<
           enabled: () => this._createHooks.length > 0,
           task: () =>
             new TaskList({
-              tasks: this._createHooks.map(hook =>
+              tasks: this._createHooks.map((hook) =>
                 hook({
                   name,
                   options,
@@ -581,7 +581,7 @@ export default class ResourcesManager<
           task: () => resourceAdapter.start(options),
         },
       ],
-      onDone: failed => {
+      onDone: (failed) => {
         if (!shouldSkip) {
           this._resourceAdaptersStarted[name] = true;
           delete this._startTaskList[name];

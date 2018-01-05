@@ -92,7 +92,7 @@ export default class CRUDResourceBase<
         })
         .pipe(take(1))
         .toPromise()
-        .then(results => results.map(result => result.baseName));
+        .then((results) => results.map((result) => result.baseName));
       return [...new Set(resources.concat(this.autocomplete))];
     } catch (error) {
       this.resourceType.plugin.monitor.logError({

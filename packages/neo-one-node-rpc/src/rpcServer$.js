@@ -28,7 +28,7 @@ import {
 } from './middleware';
 
 export type ServerOptions = {|
-  keepAliveTimeout: number,
+  keepAliveTimeout?: number,
 |};
 
 type ListenOptions =
@@ -57,9 +57,9 @@ export type Environment = {|
 |};
 
 export type Options = {|
-  server: ServerOptions,
-  liveHealthCheck: LiveHealthCheckOptions,
-  readyHealthCheck: ReadyHealthCheckOptions,
+  server?: ServerOptions,
+  liveHealthCheck?: LiveHealthCheckOptions,
+  readyHealthCheck?: ReadyHealthCheckOptions,
 |};
 
 type Listener = (
@@ -114,7 +114,7 @@ async function handleServer<
 
     if (startServer) {
       const { host, port } = options;
-      await new Promise(resolve =>
+      await new Promise((resolve) =>
         safeServer.listen(port, host, 511, () => resolve()),
       );
       monitor
@@ -137,7 +137,7 @@ const finalizeServer = async (
 ) => {
   if (result != null && result.server != null) {
     const { server } = result;
-    await new Promise(resolve => server.close(() => resolve()));
+    await new Promise((resolve) => server.close(() => resolve()));
   }
 };
 
@@ -157,11 +157,11 @@ export default ({
   const monitor = monitorIn.at('rpc');
   const app$ = combineLatest(
     options$.pipe(
-      map(options => options.liveHealthCheck),
+      map((options) => options.liveHealthCheck),
       distinctUntilChanged(),
     ),
     options$.pipe(
-      map(options => options.readyHealthCheck),
+      map((options) => options.readyHealthCheck),
       distinctUntilChanged(),
     ),
   ).pipe(
@@ -174,27 +174,35 @@ export default ({
       app.on('error', appOnError({ monitor }));
 
       const router = new Router();
-      const liveMiddleware = liveHealthCheck({
-        blockchain,
-        options: liveHealthCheckOptions,
-      });
-      const readyMiddleware = readyHealthCheck({
-        blockchain,
-        options: readyHealthCheckOptions,
-      });
+
       const rpcMiddleware = rpc({ blockchain, node });
-      router
-        .use(context({ monitor }))
-        .get(
+      router.use(context({ monitor }));
+
+      if (liveHealthCheckOptions != null) {
+        const liveMiddleware = liveHealthCheck({
+          blockchain,
+          options: liveHealthCheckOptions,
+        });
+        router.get(
           liveMiddleware.name,
           liveMiddleware.path,
           liveMiddleware.middleware,
-        )
-        .get(
+        );
+      }
+
+      if (readyHealthCheckOptions != null) {
+        const readyMiddleware = readyHealthCheck({
+          blockchain,
+          options: readyHealthCheckOptions,
+        });
+        router.get(
           readyMiddleware.name,
           readyMiddleware.path,
           readyMiddleware.middleware,
-        )
+        );
+      }
+
+      router
         .use(cors)
         .post(rpcMiddleware.name, rpcMiddleware.path, rpcMiddleware.middleware);
 
@@ -214,7 +222,10 @@ export default ({
     combineLatest(
       app$,
       options$.pipe(
-        map(opts => opts.server.keepAliveTimeout),
+        map((opts) => {
+          const { keepAliveTimeout = 60000 } = opts.server || {};
+          return keepAliveTimeout;
+        }),
         distinctUntilChanged(),
       ),
     ).pipe(
@@ -236,7 +247,7 @@ export default ({
   return combineLatest(
     createServer$(() => http.createServer(), environment.http),
     createServer$(
-      options =>
+      (options) =>
         https.createServer({
           cert: (options: $FlowFixMe).cert,
           key: (options: $FlowFixMe).key,

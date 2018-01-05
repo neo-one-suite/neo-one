@@ -70,7 +70,7 @@ export default class StorageItem
 
   equals: Equals = utils.equals(
     StorageItem,
-    other =>
+    (other) =>
       common.uInt160Equal(this.hash, other.hash) &&
       this.key.equals(other.key) &&
       this.value.equals(other.value),

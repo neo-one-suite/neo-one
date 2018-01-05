@@ -1,0 +1,40 @@
+{
+  "name": "@neo-one/smart-contract-lib",
+  "version": "1.0.0-alpha.2",
+  "keywords": [
+    "neo",
+    "NEO",
+    "one",
+    "ONE",
+    "blockchain",
+    "neo-one",
+    "neo-one-suite",
+    "neo one",
+    "neo one suite",
+    "NEO ONE",
+    "NEO ONE suite",
+    "NEO•ONE",
+    "NEO•ONE suite",
+    "neo blockchain",
+    "NEO Blockchain",
+    "NEO blockchain",
+    "dapp",
+    "dapps"
+  ],
+  "description": "NEO•ONE TypeScript common smart contracts.",
+  "repository": "https://github.com/neo-one-suite/neo-one",
+  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "noCompile": true,
+  "dependencies": {
+    "@neo-one/smart-contract": "^1.0.0-alpha.2",
+    "@neo-one/smart-contract-test": "^1.0.0-alpha.2"
+  }
+}

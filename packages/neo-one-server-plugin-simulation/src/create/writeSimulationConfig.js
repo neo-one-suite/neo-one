@@ -71,7 +71,7 @@ const getWallets = async ({
     return {};
   }
 
-  const wallets = (walletsIn || []).map(wallet => ({
+  const wallets = (walletsIn || []).map((wallet) => ({
     name: wallet.name,
     network: wallet.network,
   }));
@@ -82,7 +82,7 @@ const getWallets = async ({
 
   const walletResources = await Promise.all(
     wallets.map(
-      wallet =>
+      (wallet) =>
         (pluginManager
           .getResourcesManager({
             plugin: walletConstants.PLUGIN,
@@ -95,8 +95,8 @@ const getWallets = async ({
           .pipe(take(1))
           .toPromise(): Promise<?Wallet>),
     ),
-  ).then(resources =>
-    resources.map(resource => {
+  ).then((resources) =>
+    resources.map((resource) => {
       if (resource == null) {
         throw new Error('Something went wrong.');
       }
@@ -131,7 +131,7 @@ const getCompiledContracts = async ({
 
   const contractResources = await Promise.all(
     targetContract.compileContracts.map(
-      contract =>
+      (contract) =>
         (pluginManager
           .getResourcesManager({
             plugin: compilerConstants.PLUGIN,
@@ -141,8 +141,8 @@ const getCompiledContracts = async ({
           .pipe(take(1))
           .toPromise(): Promise<?Contract>),
     ),
-  ).then(resources =>
-    resources.map(resource => {
+  ).then((resources) =>
+    resources.map((resource) => {
       if (resource == null) {
         throw new Error('Something went wrong.');
       }
@@ -167,7 +167,7 @@ const getDeployedContracts = async ({
 
   const contractResources = await Promise.all(
     targetContract.deployContracts.map(
-      contract =>
+      (contract) =>
         (pluginManager
           .getResourcesManager({
             plugin: walletConstants.PLUGIN,
@@ -180,8 +180,8 @@ const getDeployedContracts = async ({
           .pipe(take(1))
           .toPromise(): Promise<?SmartContract>),
     ),
-  ).then(resources =>
-    resources.map(resource => {
+  ).then((resources) =>
+    resources.map((resource) => {
       if (resource == null) {
         throw new Error('Something went wrong.');
       }

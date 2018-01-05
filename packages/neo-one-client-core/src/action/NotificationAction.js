@@ -57,7 +57,7 @@ export default class NotificationAction
 
   serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
-    writer.writeArray(this.args, arg => arg.serializeWireBase(writer));
+    writer.writeArray(this.args, (arg) => arg.serializeWireBase(writer));
   }
 
   static deserializeWireBase(options: DeserializeWireBaseOptions): this {
@@ -88,7 +88,7 @@ export default class NotificationAction
       transactionHash: action.transactionHash,
       index: action.index,
       scriptHash: action.scriptHash,
-      args: this.args.map(arg => arg.serializeJSON(context)),
+      args: this.args.map((arg) => arg.serializeJSON(context)),
     };
   }
 }

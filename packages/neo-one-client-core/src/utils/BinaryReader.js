@@ -108,7 +108,7 @@ export default class BinaryReader {
   readFixedString(length: number): string {
     const values = _.takeWhile(
       [...this.readBytes(length)],
-      value => value !== 0,
+      (value) => value !== 0,
     );
     return Buffer.from(values).toString('utf8');
   }
@@ -153,7 +153,9 @@ export default class BinaryReader {
     }
 
     if (value.gt(max)) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(
+        `Integer too large: ${value.toString(10)} > ${max.toString(10)}`,
+      );
     }
 
     return value;

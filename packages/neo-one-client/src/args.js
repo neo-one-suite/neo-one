@@ -297,7 +297,7 @@ export const assertABIFunction = (value: mixed): ABIFunction => {
   }
 
   if (value.parameters != null) {
-    assertArray(value.parameters).map(parameter =>
+    assertArray(value.parameters).map((parameter) =>
       assertABIParameter(parameter),
     );
   }
@@ -315,7 +315,9 @@ export const assertABIEvent = (value: mixed): ABIEvent => {
   }
 
   assertString('name', value.name);
-  assertArray(value.parameters).map(parameter => assertABIParameter(parameter));
+  assertArray(value.parameters).map((parameter) =>
+    assertABIParameter(parameter),
+  );
 
   return (value: $FlowFixMe);
 };
@@ -325,9 +327,9 @@ export const assertABI = (abi: mixed): ABI => {
     throw new InvalidArgumentError(`Invalid ABI param, found: ${String(abi)}`);
   }
 
-  assertArray(abi.functions).map(value => assertABIFunction(value));
+  assertArray(abi.functions).map((value) => assertABIFunction(value));
   if (abi.events != null) {
-    assertArray(abi.events).map(event => assertABIEvent(event));
+    assertArray(abi.events).map((event) => assertABIEvent(event));
   }
 
   return (abi: $FlowFixMe);
@@ -358,7 +360,7 @@ export const assertTransactionOptions = (
     if (!Array.isArray(options.attributes)) {
       throw new InvalidNamedArgumentError('TransactionOptions', options);
     }
-    options.attributes.forEach(attribute => {
+    options.attributes.forEach((attribute) => {
       assertAttributeArg(attribute);
     });
   }

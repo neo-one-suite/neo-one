@@ -125,7 +125,7 @@ const executeNext = async ({
     result = await monitor
       .withLabels({ [labels.OP_CODE]: op.name })
       .captureSpanLog(
-        span => op.invoke({ monitor: span, context, args, argsAlt }),
+        (span) => op.invoke({ monitor: span, context, args, argsAlt }),
         {
           name: 'neo_execute_op',
           level: { log: 'debug', span: 'debug' },
@@ -253,7 +253,7 @@ export const executeScript = async ({
     createdContracts: options.createdContracts || {},
   };
 
-  return monitor.captureSpanLog(span => run({ monitor: span, context }), {
+  return monitor.captureSpanLog((span) => run({ monitor: span, context }), {
     name: 'neo_execute_script',
     level: { log: 'debug', span: 'debug' },
     error: { level: 'debug' },
@@ -364,20 +364,23 @@ export default async ({
       stack: [],
       stackAlt: [],
       gasConsumed: utils.ZERO,
+      gasCost: utils.ZERO,
       errorMessage,
     };
   }
 
-  let gasConsumed = startingGas.sub(finalContext.gasLeft).sub(FREE_GAS);
+  const gasCost = startingGas.sub(finalContext.gasLeft);
+  let gasConsumed = gasCost.sub(FREE_GAS);
   if (gasConsumed.lt(utils.ZERO)) {
     gasConsumed = utils.ZERO;
   }
 
   return {
     state: errorMessage == null ? finalContext.state : VM_STATE.FAULT,
-    stack: finalContext.stack.map(item => item.toContractParameter()),
-    stackAlt: finalContext.stackAlt.map(item => item.toContractParameter()),
+    stack: finalContext.stack.map((item) => item.toContractParameter()),
+    stackAlt: finalContext.stackAlt.map((item) => item.toContractParameter()),
     gasConsumed,
+    gasCost,
     errorMessage:
       errorMessage == null ? finalContext.errorMessage : errorMessage,
   };

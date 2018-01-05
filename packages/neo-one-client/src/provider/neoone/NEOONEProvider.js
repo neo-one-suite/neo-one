@@ -97,7 +97,7 @@ export default class NEOONEProvider {
     rpcURL: string,
   |}): void {
     this._providers[network] = new NEOONEDataProvider({ network, rpcURL });
-    const networks = this._networks$.value.filter(net => network !== net);
+    const networks = this._networks$.value.filter((net) => network !== net);
     networks.push(network);
     this._networks$.next(networks);
   }

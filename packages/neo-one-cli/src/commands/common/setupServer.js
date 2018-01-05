@@ -17,11 +17,11 @@ export default (
 
   const logSubscription = combineLatest(
     serverConfig.config$.pipe(
-      map(config => config.paths.log),
+      map((config) => config.paths.log),
       distinctUntilChanged(),
     ),
     serverConfig.config$.pipe(
-      map(config => config.log),
+      map((config) => config.log),
       distinctUntilChanged(),
     ),
   )

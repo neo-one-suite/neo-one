@@ -315,7 +315,7 @@ export default class SimulationResourceAdapter {
               throw new Error('For Flow');
             }
 
-            this._subprocesses = postStart.map(cmd =>
+            this._subprocesses = postStart.map((cmd) =>
               execa.shell(cmd, {
                 cwd: this._simulationPath,
                 stdio: 'ignore',
@@ -349,7 +349,7 @@ export default class SimulationResourceAdapter {
               throw new Error('For Flow');
             }
 
-            this._subprocesses.forEach(proc => {
+            this._subprocesses.forEach((proc) => {
               proc.kill('SIGTERM');
             });
             this._subprocesses = [];

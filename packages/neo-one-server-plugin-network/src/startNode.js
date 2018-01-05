@@ -21,7 +21,7 @@ export default ({
       'Path of a chain.acc file to bootstrap the node',
     )
     .option('-d --dump <dump>', 'Path to dump a chain.acc file to')
-    .action(async args => {
+    .action(async (args) => {
       const { dataPath, options: cliOptions } = args;
 
       const nodeConfig = createNEOONENodeConfig({ dataPath });
@@ -29,9 +29,9 @@ export default ({
       const logPath = path.resolve(dataPath, 'log');
       const logSubscription = nodeConfig.config$
         .pipe(
-          map(config => config.log),
+          map((config) => config.log),
           distinctUntilChanged(),
-          map(config => ({
+          map((config) => ({
             name: 'node',
             path: logPath,
             level: config.level,
@@ -58,7 +58,7 @@ export default ({
         monitor,
         chainFile,
         dumpChainFile,
-        onError: error => {
+        onError: (error) => {
           monitor.logError({
             name: 'neo_node_uncaught_error',
             message: 'Uncaught node error, shutting down.',

@@ -112,7 +112,7 @@ export default class BinaryWriter {
 
   writeArray<T>(values: Array<T>, write: (value: T) => void): this {
     this.writeVarUIntLE(values.length);
-    values.forEach(value => write(value));
+    values.forEach((value) => write(value));
     return this;
   }
 

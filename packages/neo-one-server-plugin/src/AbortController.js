@@ -52,19 +52,19 @@ export class CombinedAbortSignal extends AbortSignal {
   }
 
   get aborted(): boolean {
-    return this._aborted || this.signals.some(signal => signal.aborted);
+    return this._aborted || this.signals.some((signal) => signal.aborted);
   }
 
   set aborted(value: boolean) {
     this._aborted = value;
-    this.signals.forEach(signal => {
+    this.signals.forEach((signal) => {
       // eslint-disable-next-line
       signal.aborted = value;
     });
   }
 
   check(): void {
-    this.signals.forEach(signal => signal.check());
+    this.signals.forEach((signal) => signal.check());
   }
 
   toString() {

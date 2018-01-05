@@ -114,7 +114,7 @@ const getStorage = async (provider: any, item: any): Promise<any> => {
       error = err;
       tries -= 1;
       // eslint-disable-next-line
-      await new Promise(resolve => setTimeout(() => resolve(), waitMS));
+      await new Promise((resolve) => setTimeout(() => resolve(), waitMS));
     }
   }
 
@@ -126,13 +126,13 @@ const verifyStorage = async (hash: string): Promise<void> => {
     AsyncIterableX.from(oneProvider.iterStorage(hash)),
   );
   await Promise.all(
-    storageItems.map(async itemIn => {
+    storageItems.map(async (itemIn) => {
       let [currentItem, testItem] = await Promise.all([
         getStorage(oneProvider, itemIn),
         getStorage(testProvider, itemIn),
       ]);
       if (!isEqual(currentItem, testItem)) {
-        await new Promise(resolve => setTimeout(() => resolve(), 5000));
+        await new Promise((resolve) => setTimeout(() => resolve(), 5000));
         [currentItem, testItem] = await Promise.all([
           getStorage(oneProvider, itemIn),
           getStorage(testProvider, itemIn),
@@ -193,7 +193,7 @@ const test = async () => {
 };
 
 test()
-  .catch(error => {
+  .catch((error) => {
     // eslint-disable-next-line
     console.error(error);
     process.exit(1);

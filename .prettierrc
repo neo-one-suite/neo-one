@@ -1,4 +1,5 @@
 {
+  "arrowParens": "always",
   "parser": "flow",
   "printWidth": 80,
   "singleQuote": true,

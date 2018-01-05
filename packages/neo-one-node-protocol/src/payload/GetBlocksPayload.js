@@ -27,7 +27,7 @@ export default class GetBlocksPayload
   }
 
   serializeWireBase(writer: BinaryWriter): void {
-    writer.writeArray(this.hashStart, value => {
+    writer.writeArray(this.hashStart, (value) => {
       writer.writeUInt256(value);
     });
     writer.writeUInt256(this.hashStop);

@@ -54,7 +54,7 @@ export default class PrepareRequestConsensusMessage extends ConsensusMessageBase
     super.serializeWireBase(writer);
     writer.writeUInt64LE(this.nonce);
     writer.writeUInt160(this.nextConsensus);
-    writer.writeArray(this.transactionHashes, value => {
+    writer.writeArray(this.transactionHashes, (value) => {
       writer.writeUInt256(value);
     });
     this.minerTransaction.serializeWireBase(writer);
@@ -68,7 +68,7 @@ export default class PrepareRequestConsensusMessage extends ConsensusMessageBase
     const nextConsensus = reader.readUInt160();
     const transactionHashes = reader.readArray(() => reader.readUInt256());
     const distinctTransactionHashes = new Set(
-      transactionHashes.map(hash => common.uInt256ToString(hash)),
+      transactionHashes.map((hash) => common.uInt256ToString(hash)),
     );
     if (distinctTransactionHashes.size !== transactionHashes.length) {
       throw new InvalidFormatError(

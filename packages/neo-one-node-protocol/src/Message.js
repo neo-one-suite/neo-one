@@ -353,7 +353,7 @@ export class MessageTransform extends Transform {
         new BinaryReader(this.buffer),
       );
       this.buffer = remainingBuffer;
-      messages.forEach(message => this.push((message: $FlowFixMe)));
+      messages.forEach((message) => this.push((message: $FlowFixMe)));
       callback(null);
     } catch (error) {
       callback(error);

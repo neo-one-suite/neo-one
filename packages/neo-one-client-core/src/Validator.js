@@ -79,7 +79,7 @@ export default class Validator extends BaseState
     });
   }
 
-  equals: Equals = utils.equals(Validator, other =>
+  equals: Equals = utils.equals(Validator, (other) =>
     common.ecPointEqual(this.publicKey, other.publicKey),
   );
 

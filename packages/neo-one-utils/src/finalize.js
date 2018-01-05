@@ -7,14 +7,14 @@ function finalize<T>(
   func: (value: ?T) => Promise<void> | void,
 ): (source: Observable<T>) => Observable<T> {
   return (source: Observable<T>) =>
-    Observable.create(observer => {
+    Observable.create((observer) => {
       let lastValue;
       const subscription = source.subscribe({
-        next: value => {
+        next: (value) => {
           lastValue = value;
           observer.next(value);
         },
-        error: error => observer.error(error),
+        error: (error) => observer.error(error),
         complete: () => observer.complete(),
       });
       subscription.add(() => {

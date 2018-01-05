@@ -28,12 +28,12 @@ beforeEach(() => {
   // $FlowFixMe
   client.getBlockCount = jest.fn(() => Promise.resolve(blockCount));
   // $FlowFixMe
-  client.getBlock = jest.fn(index => Promise.resolve(blocks[index]));
+  client.getBlock = jest.fn((index) => Promise.resolve(blocks[index]));
 });
 
 const verifyBlockIterator = async () => {
   let index = 0;
-  await AsyncIterable.from(blockIterator).forEach(value => {
+  await AsyncIterable.from(blockIterator).forEach((value) => {
     expect(value).toBe(blocks[index]);
     index += 1;
   });

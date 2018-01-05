@@ -168,7 +168,7 @@ export default class Asset extends BaseState
     return this.__size();
   }
 
-  equals: Equals = utils.equals(Asset, other =>
+  equals: Equals = utils.equals(Asset, (other) =>
     common.uInt256Equal(this.hash, other.hash),
   );
 

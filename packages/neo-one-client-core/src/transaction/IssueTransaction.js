@@ -70,7 +70,7 @@ export default class IssueTransaction extends TransactionBase<
         const { getOutput, getAsset } = options;
         const [hashes, issuerHashes] = await Promise.all([
           super.getScriptHashesForVerifying(options),
-          this.getTransactionResults({ getOutput }).then(results =>
+          this.getTransactionResults({ getOutput }).then((results) =>
             Promise.all(
               commonUtils
                 .entries(results)
@@ -164,7 +164,7 @@ export default class IssueTransaction extends TransactionBase<
     const { governingToken, utilityToken } = context;
     if (
       this.outputs.every(
-        output =>
+        (output) =>
           common.uInt256Equal(output.asset, governingToken.hash) ||
           common.uInt256Equal(output.asset, utilityToken.hash),
       )
@@ -198,11 +198,11 @@ export default class IssueTransaction extends TransactionBase<
 
         const issued = asset.available.add(
           memPool
-            .filter(transaction => transaction !== this)
+            .filter((transaction) => transaction !== this)
             .reduce(
               (acc, transaction) =>
                 transaction.outputs
-                  .filter(output => common.uInt256Equal(hash, output.asset))
+                  .filter((output) => common.uInt256Equal(hash, output.asset))
                   .reduce(
                     (innerAcc, output) => innerAcc.add(output.value),
                     acc,

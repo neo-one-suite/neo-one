@@ -88,7 +88,7 @@ const convertActions = ({
     acc[event.name] = event;
     return acc;
   }, {});
-  return actions.map(action =>
+  return actions.map((action) =>
     common.convertAction({
       action,
       events: eventsObj,
@@ -117,11 +117,11 @@ const createCall = ({
 
 const filterEvents = (actions: Array<Event | Log>): Array<Event> =>
   actions
-    .map(action => (action.type === 'Event' ? action : null))
+    .map((action) => (action.type === 'Event' ? action : null))
     .filter(Boolean);
 const filterLogs = (actions: Array<Event | Log>): Array<Log> =>
   actions
-    .map(action => (action.type === 'Log' ? action : null))
+    .map((action) => (action.type === 'Log' ? action : null))
     .filter(Boolean);
 
 const createInvoke = ({
@@ -181,7 +181,7 @@ export default ({
   client: Client<*>,
 |}): SmartContract => {
   const smartContract = ({}: Object);
-  definition.abi.functions.forEach(func => {
+  definition.abi.functions.forEach((func) => {
     if (func.constant) {
       smartContract[func.name] = createCall({
         definition,

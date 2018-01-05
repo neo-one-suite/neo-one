@@ -79,7 +79,7 @@ export default class GetCRUD<
         options,
       })
       .pipe(
-        map(resources => resources.map(resource => (resource: $FlowFixMe))),
+        map((resources) => resources.map((resource) => (resource: $FlowFixMe))),
       );
   }
 }

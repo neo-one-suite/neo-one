@@ -3,7 +3,7 @@
   "version": "1.0.0-alpha.48",
   "private": true,
   "dependencies": {
-    "@babel/polyfill": "7.0.0-beta.46",
+    "@babel/polyfill": "7.0.0-beta.44",
     "@neo-one/client": "^1.0.0-alpha.47",
     "material-ui": "1.0.0-beta.43",
     "react": "16.3.2",

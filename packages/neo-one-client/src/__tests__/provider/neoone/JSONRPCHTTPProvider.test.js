@@ -220,7 +220,7 @@ describe('JSONRPCHTTPProvider', () => {
       provider.request(req),
     ]);
 
-    await expect(results.then(res => res[0])).resolves.toBe(expected);
+    await expect(results.then((res) => res[0])).resolves.toBe(expected);
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith(endpoint, {
       method: 'POST',

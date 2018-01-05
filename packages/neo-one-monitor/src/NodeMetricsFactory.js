@@ -29,7 +29,7 @@ class NodeMetricsFactory extends MetricsFactoryProxy {
       this._initializeMetric(
         new prom.Counter(this._getMetricConstruct(options)),
         options,
-        metric => metric.inc(0),
+        (metric) => metric.inc(0),
       ),
       options.labelNames,
     );
@@ -40,7 +40,7 @@ class NodeMetricsFactory extends MetricsFactoryProxy {
       this._initializeMetric(
         new prom.Gauge(this._getMetricConstruct(options)),
         options,
-        metric => metric.set(0),
+        (metric) => metric.set(0),
       ),
       options.labelNames,
     );
@@ -51,7 +51,7 @@ class NodeMetricsFactory extends MetricsFactoryProxy {
       this._initializeMetric(
         new prom.Histogram(this._getMetricConstruct(options)),
         options,
-        metric => metric.observe(0),
+        (metric) => metric.observe(0),
       ),
       options.labelNames,
     );
@@ -62,7 +62,7 @@ class NodeMetricsFactory extends MetricsFactoryProxy {
       this._initializeMetric(
         new prom.Summary(this._getMetricConstruct(options)),
         options,
-        metric => metric.observe(0),
+        (metric) => metric.observe(0),
       ),
       options.labelNames,
     );

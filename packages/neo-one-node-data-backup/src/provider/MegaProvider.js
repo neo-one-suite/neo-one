@@ -48,8 +48,8 @@ export default class MegaProvider extends Provider {
 
     const { id, key } = download;
     const file = new File({ downloadID: id, key });
-    return new Promise(resolve => {
-      file.loadAttributes(err => {
+    return new Promise((resolve) => {
+      file.loadAttributes((err) => {
         if (err) {
           resolve(false);
         } else {
@@ -139,7 +139,7 @@ export default class MegaProvider extends Provider {
           autologin: false,
         });
         await new Promise((resolve, reject) =>
-          storage.login(innerErr => {
+          storage.login((innerErr) => {
             if (innerErr) {
               reject(innerErr);
             } else {

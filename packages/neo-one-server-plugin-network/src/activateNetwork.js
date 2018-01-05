@@ -21,7 +21,7 @@ export default (plugin: NetworkPlugin) => ({ cli }: InteractiveCLIArgs) =>
           .getCRUD()
           .describe.getCLIAutocomplete({ cli }),
     })
-    .action(async args => {
+    .action(async (args) => {
       const resource = await plugin.networkResourceType
         .getResource$({
           name: args.name,

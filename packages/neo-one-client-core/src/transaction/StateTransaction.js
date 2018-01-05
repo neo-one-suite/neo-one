@@ -70,7 +70,7 @@ export default class StateTransaction extends TransactionBase<
     this.__size = utils.lazy(
       () =>
         super.size +
-        IOHelper.sizeOfArray(this.descriptors, descriptor => descriptor.size),
+        IOHelper.sizeOfArray(this.descriptors, (descriptor) => descriptor.size),
     );
 
     this.__stateGetScriptHashesForVerifying = utils.lazyAsync(
@@ -122,7 +122,7 @@ export default class StateTransaction extends TransactionBase<
   }
 
   serializeExclusiveBase(writer: BinaryWriter): void {
-    writer.writeArray(this.descriptors, descriptor => {
+    writer.writeArray(this.descriptors, (descriptor) => {
       descriptor.serializeWireBase(writer);
     });
   }
@@ -175,7 +175,7 @@ export default class StateTransaction extends TransactionBase<
       scripts: transactionBaseJSON.scripts,
       sys_fee: transactionBaseJSON.sys_fee,
       net_fee: transactionBaseJSON.net_fee,
-      descriptors: this.descriptors.map(descriptor =>
+      descriptors: this.descriptors.map((descriptor) =>
         descriptor.serializeJSON(context),
       ),
     };
@@ -187,7 +187,7 @@ export default class StateTransaction extends TransactionBase<
 
   async _verify(options: TransactionVerifyOptions): Promise<void> {
     await Promise.all(
-      this.descriptors.map(descriptor => descriptor.verify(options)),
+      this.descriptors.map((descriptor) => descriptor.verify(options)),
     );
   }
 }

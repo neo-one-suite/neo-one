@@ -228,11 +228,13 @@ export type Contract = {|
 export type RawInvocationResultSuccess = {|
   state: 'HALT',
   gasConsumed: BigNumber,
+  gasCost: BigNumber,
   stack: Array<ContractParameter>,
 |};
 export type RawInvocationResultError = {|
   state: 'FAULT',
   gasConsumed: BigNumber,
+  gasCost: BigNumber,
   stack: Array<ContractParameter>,
   message: string,
 |};
@@ -506,11 +508,13 @@ export type InvokeReceiptInternal = {|
 export type InvocationResultSuccess<TValue> = {|
   state: 'HALT',
   gasConsumed: BigNumber,
+  gasCost: BigNumber,
   value: TValue,
 |};
 export type InvocationResultError = {|
   state: 'FAULT',
   gasConsumed: BigNumber,
+  gasCost: BigNumber,
   message: string,
 |};
 export type InvocationResult<TValue> =

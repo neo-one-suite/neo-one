@@ -156,7 +156,7 @@ export default class NodeAdapter {
       }
 
       // eslint-disable-next-line
-      await new Promise(resolve =>
+      await new Promise((resolve) =>
         setTimeout(() => resolve(), timeoutSeconds / 10 * 1000),
       );
     }

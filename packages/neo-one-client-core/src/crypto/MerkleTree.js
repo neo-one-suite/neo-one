@@ -147,7 +147,7 @@ export default class MerkleTree {
 
   constructor(hashesOrNode: Array<UInt256> | MerkleTreeNode) {
     this.root = Array.isArray(hashesOrNode)
-      ? build(hashesOrNode.map(hash => new MerkleTreeNode({ hash })))
+      ? build(hashesOrNode.map((hash) => new MerkleTreeNode({ hash })))
       : hashesOrNode;
     this.depth = 1;
     for (let node = this.root; node.leftChild != null; node = node.leftChild) {

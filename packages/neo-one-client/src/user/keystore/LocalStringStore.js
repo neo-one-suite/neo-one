@@ -23,9 +23,9 @@ export default class LocalStringStore {
   async getWallets(): Promise<Array<LocalWallet>> {
     const keys = await this.storage.getAllKeys();
     const values = await Promise.all(
-      keys.map(key => this.storage.getItem(key)),
+      keys.map((key) => this.storage.getItem(key)),
     );
-    return values.map(value => JSON.parse(value));
+    return values.map((value) => JSON.parse(value));
   }
 
   async saveWallet(wallet: LocalWallet): Promise<void> {
