@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": [
     "neo",
     "NEO",
@@ -34,7 +34,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/server-grpc": "^0.0.1",
+    "@neo-one/server-grpc": "^0.0.2",
     "@neo-one/server-plugin": "^0.0.1",
     "@neo-one/utils": "^0.0.1",
     "cross-spawn": "^5.1.0",

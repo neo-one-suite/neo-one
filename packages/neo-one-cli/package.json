@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": [
     "neo",
     "NEO",
@@ -40,8 +40,8 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0-beta.35",
     "@grpc/surface": "^0.1.0",
-    "@neo-one/server": "^0.0.1",
-    "@neo-one/server-client": "^0.0.1",
+    "@neo-one/server": "^0.0.2",
+    "@neo-one/server-client": "^0.0.2",
     "@neo-one/server-plugin": "^0.0.1",
     "@neo-one/server-plugin-compiler": "^0.0.1",
     "@neo-one/server-plugin-network": "^0.0.1",
