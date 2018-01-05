@@ -29,7 +29,7 @@
   "module": "./dist/es.js",
   "engines": {
     "node": ">=8.9.0"
-  },  
+  },
   "publishConfig": {
     "access": "public"
   },

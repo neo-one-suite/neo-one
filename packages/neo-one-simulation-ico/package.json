@@ -37,7 +37,7 @@
   },
   "publishConfig": {
     "access": "public"
-  },  
+  },
   "bin": {
     "neo-one-simulation-ico-post-create": "./dist/bin/post-create",
     "neo-one-simulation-ico-pre-compile": "./dist/bin/pre-compile"

@@ -32,7 +32,7 @@
   },
   "publishConfig": {
     "access": "public"
-  },  
+  },
   "dependencies": {
     "@neo-one/client": "^0.0.1",
     "fs-extra": "^5.0.0"
