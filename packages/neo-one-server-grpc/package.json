@@ -33,9 +33,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": [
-    "proto/*"
-  ],
   "dependencies": {
     "google-protobuf": "^3.5.0"
   }
