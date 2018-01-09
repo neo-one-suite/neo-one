@@ -7,6 +7,7 @@ import {
 } from '@neo-one/node-core';
 import type { Observable } from 'rxjs/Observable';
 
+import _ from 'lodash';
 import net from 'net';
 import { take } from 'rxjs/operators';
 import { utils } from '@neo-one/utils';
@@ -285,13 +286,15 @@ export default class Network<Message, PeerData> {
       maxConnectedPeers: maxConnectedPeersIn,
     } = await this._options$.pipe(take(1)).toPromise();
     const maxConnectedPeers =
-      maxConnectedPeersIn == null ? 10 : maxConnectedPeersIn;
+      maxConnectedPeersIn == null ? 50 : maxConnectedPeersIn;
     if (connectedPeersCount < maxConnectedPeers) {
       const count = maxConnectedPeers - connectedPeersCount;
       endpoints.push(
-        ...[...this._unconnectedPeers]
-          .filter(peer => !this._endpointBlacklist.has(peer))
-          .slice(0, count),
+        ..._.shuffle(
+          [...this._unconnectedPeers].filter(
+            peer => !this._endpointBlacklist.has(peer),
+          ),
+        ).slice(0, count),
       );
     }
 
@@ -423,9 +426,8 @@ export default class Network<Message, PeerData> {
 
   _onClose(peer: Peer<Message>): void {
     const connectedPeer = this._connectedPeers[peer.endpoint];
-    if (connectedPeer != null) {
-      delete this._connectedPeers[peer.endpoint];
-    }
+    delete this._connectedPeers[peer.endpoint];
+    delete this._connectingPeers[peer.endpoint];
     const endpoint = this._reverseBlacklist[peer.endpoint];
     if (endpoint != null) {
       delete this._reverseBlacklist[peer.endpoint];

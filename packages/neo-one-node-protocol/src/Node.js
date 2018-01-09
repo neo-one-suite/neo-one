@@ -509,7 +509,7 @@ export default class Node implements INode {
 
   _onRequestEndpoints = _.throttle((): void => {
     this._relay(this._createMessage({ command: COMMAND.GET_ADDR }));
-  }, 30000);
+  }, 5000);
 
   _onMessageReceived(
     peer: ConnectedPeer<Message, PeerData>,
