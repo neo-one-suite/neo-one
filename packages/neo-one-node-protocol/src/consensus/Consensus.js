@@ -28,11 +28,13 @@ import runConsensus from './runConsensus';
 
 export type Options = {|
   privateKey: string,
+  privateNet: boolean,
 |};
-type InternalOptions = {|
+export type InternalOptions = {|
   privateKey: PrivateKey,
   publicKey: ECPoint,
   feeAddress: UInt160,
+  privateNet: boolean,
 |};
 
 const MS_IN_SECOND = 1000;
@@ -62,7 +64,12 @@ export default class Consensus {
         const privateKey = common.stringToPrivateKey(options.privateKey);
         const publicKey = crypto.privateKeyToPublicKey(privateKey);
         const feeAddress = crypto.publicKeyToScriptHash(publicKey);
-        return { privateKey, publicKey, feeAddress };
+        return {
+          privateKey,
+          publicKey,
+          feeAddress,
+          privateNet: options.privateNet,
+        };
       }),
       switchMap(options => this._start(options)),
       finalize(() => {
@@ -115,8 +122,7 @@ export default class Consensus {
               result = await runConsensus({
                 context,
                 node: this._node,
-                feeAddress: options.feeAddress,
-                privateKey: options.privateKey,
+                options,
               });
               break;
             default:

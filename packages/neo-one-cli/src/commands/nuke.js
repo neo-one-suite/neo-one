@@ -1,4 +1,5 @@
 /* @flow */
+import { VERSION } from '@neo-one/server';
 import { type CLIArgs, name } from '@neo-one/server-plugin';
 import { ServerManager } from '@neo-one/server-client';
 
@@ -17,7 +18,10 @@ export default (args: CLIArgs) => {
       const { serverConfig, shutdown } = setupServer('nuke', args);
       const spinner = ora(`Shutting down ${name.title} server`).start();
       const config = await serverConfig.config$.pipe(take(1)).toPromise();
-      const manager = new ServerManager({ dataPath: config.paths.data });
+      const manager = new ServerManager({
+        dataPath: config.paths.data,
+        serverVersion: VERSION,
+      });
       await manager.kill();
 
       spinner.succeed(`${name.title} server shutdown`);

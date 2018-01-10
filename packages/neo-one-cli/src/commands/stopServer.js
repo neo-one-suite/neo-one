@@ -1,4 +1,5 @@
 /* @flow */
+import { VERSION } from '@neo-one/server';
 import { type CLIArgs, name } from '@neo-one/server-plugin';
 import { ServerManager } from '@neo-one/server-client';
 
@@ -19,7 +20,10 @@ export default (args: CLIArgs) => {
       let pid;
       try {
         const config = await serverConfig.config$.pipe(take(1)).toPromise();
-        manager = new ServerManager({ dataPath: config.paths.data });
+        manager = new ServerManager({
+          dataPath: config.paths.data,
+          serverVersion: VERSION,
+        });
         pid = await manager.getServerPID();
       } catch (error) {
         spinner.fail(

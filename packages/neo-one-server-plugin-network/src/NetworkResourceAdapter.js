@@ -14,7 +14,9 @@ import type { Subject } from 'rxjs/Subject';
 import _ from 'lodash';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { common, crypto } from '@neo-one/client-core';
-import { map, shareReplay, switchMap } from 'rxjs/operators';
+import { createReadClient } from '@neo-one/client';
+import { shareReplay, switchMap } from 'rxjs/operators';
+import { timer } from 'rxjs/observable/timer';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -97,18 +99,31 @@ export default class NetworkResourceAdapter {
     this._state = 'stopped';
 
     this._update$ = new ReplaySubject(1);
-    this.resource$ = this._update$.pipe(
+    this.resource$ = combineLatest(timer(0, 1000), this._update$).pipe(
       switchMap(() =>
         combineLatest(this._nodes.map(node => node.node$)).pipe(
-          map(currentNodes => ({
-            plugin: this._resourceType.plugin.name,
-            resourceType: this._resourceType.name,
-            name: this._name,
-            baseName: this._name,
-            state: this._state,
-            type: this._type,
-            nodes: currentNodes,
-          })),
+          switchMap(async currentNodes => {
+            const readyNode = currentNodes.find(node => node.ready);
+            let height = null;
+            if (readyNode != null) {
+              const client = createReadClient({
+                network: this._name,
+                rpcURL: readyNode.rpcAddress,
+              });
+              height = await client.getBlockCount();
+            }
+
+            return {
+              plugin: this._resourceType.plugin.name,
+              resourceType: this._resourceType.name,
+              name: this._name,
+              baseName: this._name,
+              state: this._state,
+              type: this._type,
+              height,
+              nodes: currentNodes,
+            };
+          }),
         ),
       ),
       shareReplay(1),
@@ -308,6 +323,7 @@ export default class NetworkResourceAdapter {
         enabled: false,
         options: {
           privateKey: 'doesntmatter',
+          privateNet: false,
         },
       },
       seeds: [
@@ -344,6 +360,7 @@ export default class NetworkResourceAdapter {
         enabled: false,
         options: {
           privateKey: 'doesntmatter',
+          privateNet: false,
         },
       },
       seeds: [
@@ -378,7 +395,7 @@ export default class NetworkResourceAdapter {
     const primaryAddress = common.uInt160ToString(
       crypto.privateKeyToScriptHash(primaryPrivateKey),
     );
-    const configuration = _.range(0, 7).map(idx => {
+    const configuration = _.range(0, 1).map(idx => {
       const { privateKey, publicKey } = crypto.createKeyPair();
       const name = `${options.name}-${idx}`;
       return {
@@ -389,7 +406,7 @@ export default class NetworkResourceAdapter {
         publicKey,
       };
     });
-    const secondsPerBlock = 5;
+    const secondsPerBlock = 1;
     const standbyValidators = configuration.map(({ publicKey }) =>
       common.ecPointToString(publicKey),
     );
@@ -413,6 +430,7 @@ export default class NetworkResourceAdapter {
           enabled: true,
           options: {
             privateKey: common.privateKeyToString(privateKey),
+            privateNet: true,
           },
         },
         seeds: otherConfiguration.map(

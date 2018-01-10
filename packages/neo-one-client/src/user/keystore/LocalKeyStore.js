@@ -218,7 +218,7 @@ export default class LocalKeyStore {
       return;
     }
 
-    delete networkWallets[id.network][id.address];
+    delete networkWallets[id.address];
     await this._store.deleteWallet(wallet);
     this._wallets$.next({
       ...wallets,

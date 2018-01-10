@@ -19,8 +19,11 @@ import proto from '@neo-one/server-grpc';
 import PluginManager from './PluginManager';
 import PortAllocator from './PortAllocator';
 import { ServerRunningError } from './errors';
-import { context, logger, services as servicesMiddleware } from './middleware';
 
+import { context, logger, services as servicesMiddleware } from './middleware';
+import pkg from '../package.json';
+
+export const VERSION = pkg.version;
 const PLUGIN_PATH = 'plugin';
 
 export default class Server {
@@ -121,7 +124,10 @@ export default class Server {
         (prevApp, serverConfig) =>
           defer(async () => {
             if (prevApp == null) {
-              const manager = new ServerManager({ dataPath: this.dataPath });
+              const manager = new ServerManager({
+                dataPath: this.dataPath,
+                serverVersion: VERSION,
+              });
               this._serverDebug.pidPath = manager.pidPath;
 
               const pid = await manager.checkAlive(serverConfig.port);

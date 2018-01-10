@@ -13,3 +13,7 @@ export type Event =
   | {| type: 'handleConsensusPayload', payload: ConsensusPayload |}
   | {| type: 'handleTransactionReceived', transaction: Transaction |}
   | {| type: 'timer' |};
+
+export type Options = {|
+  privateNet: boolean,
+|};

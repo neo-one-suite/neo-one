@@ -56,7 +56,7 @@ const defaultConfig = (dataPath: string) => ({
     node: {
       consensus: {
         enabled: false,
-        options: { privateKey: 'default' },
+        options: { privateKey: 'default', privateNet: false },
       },
       network: {
         seeds: ([
@@ -196,9 +196,10 @@ export const createNodeConfig = ({
                   enabled: { type: 'boolean' },
                   options: {
                     type: 'object',
-                    required: ['privateKey'],
+                    required: ['privateKey', 'privateNet'],
                     properties: {
                       privateKey: { type: 'string' },
+                      privateNet: { type: 'boolean' },
                     },
                   },
                 },

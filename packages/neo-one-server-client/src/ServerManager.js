@@ -13,8 +13,10 @@ const SERVER_PID = 'server.pid';
 
 const isSameVersion = async ({
   port,
+  expectedVersion,
 }: {|
   port: number,
+  expectedVersion: string,
 |}): Promise<boolean> => {
   const client = new Client({ port });
   const startTime = utils.nowSeconds();
@@ -22,7 +24,7 @@ const isSameVersion = async ({
     try {
       // eslint-disable-next-line
       const version = await client.getVersion();
-      return version === client.version;
+      return version === expectedVersion;
     } catch (error) {
       // eslint-disable-next-line
     }
@@ -63,9 +65,17 @@ const waitReachable = async ({ port }: {| port: number |}) => {
 
 export default class ServerManager {
   _dataPath: string;
+  _serverVersion: string;
 
-  constructor({ dataPath }: {| dataPath: string |}) {
+  constructor({
+    dataPath,
+    serverVersion,
+  }: {|
+    dataPath: string,
+    serverVersion: string,
+  |}) {
     this._dataPath = dataPath;
+    this._serverVersion = serverVersion;
   }
 
   async getServerPID(): Promise<?number> {
@@ -97,7 +107,10 @@ export default class ServerManager {
 
     if (pid != null) {
       if (isRunning(pid)) {
-        const sameVersion = await isSameVersion({ port });
+        const sameVersion = await isSameVersion({
+          port,
+          expectedVersion: this._serverVersion,
+        });
         if (sameVersion) {
           return pid;
         }

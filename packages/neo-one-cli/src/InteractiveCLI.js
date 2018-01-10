@@ -1,6 +1,7 @@
 /* @flow */
 // flowlint untyped-import:off
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { VERSION, plugins as pluginsUtil } from '@neo-one/server';
 import {
   Client,
   PluginNotInstalledError,
@@ -35,7 +36,6 @@ import {
   take,
 } from 'rxjs/operators';
 import ora from 'ora';
-import { plugins as pluginsUtil } from '@neo-one/server';
 
 import {
   type ClientConfig,
@@ -216,7 +216,7 @@ export default class InteractiveCLI {
             if (manager != null) {
               await manager.kill();
             }
-            manager = new ServerManager({ dataPath });
+            manager = new ServerManager({ dataPath, serverVersion: VERSION });
 
             let spinner;
             try {

@@ -15,19 +15,15 @@ import proto from '@neo-one/server-grpc';
 
 import { ReadError } from './errors';
 
-import pkg from '../package.json';
-
 const { Server } = grpc.load(proto);
 
 export default class Client {
   static _CLIENTS = {};
 
   _port: number;
-  version: string;
 
   constructor({ port, forceNew }: {| port: number, forceNew?: boolean |}) {
     this._port = port;
-    this.version = pkg.version;
 
     if (this.constructor._CLIENTS[port] == null || forceNew) {
       this.constructor._CLIENTS[port] = new Server(

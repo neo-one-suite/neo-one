@@ -24,10 +24,12 @@ import {
   RequestSentContext,
   SignatureSentContext,
 } from './context';
+import type { InternalOptions } from './Consensus';
 import type Node from '../Node';
 
 import {
   checkExpectedView,
+  checkSignatures,
   initializeConsensusInitial,
   incrementExpectedView,
   signAndRelay,
@@ -102,13 +104,11 @@ const requestChangeView = ({
 export default async ({
   context: contextIn,
   node,
-  feeAddress,
-  privateKey,
+  options: { privateKey, feeAddress, privateNet },
 }: {|
   context: Context,
   node: Node,
-  feeAddress: UInt160,
-  privateKey: PrivateKey,
+  options: InternalOptions,
 |}): Promise<Result<Context>> => {
   let context = contextIn;
   if (context.type === 'primary' && !(context instanceof RequestSentContext)) {
@@ -201,6 +201,10 @@ export default async ({
         signature: commonUtils.nullthrows(context.signatures[context.myIndex]),
       }),
     });
+
+    if (privateNet) {
+      return checkSignatures({ node, context });
+    }
 
     const { secondsPerBlock } = node.blockchain.settings;
     return {

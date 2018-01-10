@@ -80,8 +80,9 @@ export default ({
         options.timeoutMS,
       );
       if (
-        index != null &&
-        blockchain.currentBlockIndex >= index - options.offset
+        options.rpcEndpoints.length === 0 ||
+        (index != null &&
+          blockchain.currentBlockIndex >= index - options.offset)
       ) {
         ctx.status = 200;
       } else {

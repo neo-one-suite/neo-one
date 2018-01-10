@@ -29,6 +29,7 @@ export type Network = {|
   baseName: string,
   state: ResourceState,
   type: NetworkType,
+  height: ?number,
   nodes: Array<Node>,
 |};
 export type NetworkResourceOptions = {
@@ -87,10 +88,11 @@ export default class NetworkResourceType extends ResourceType<
   }
 
   getListTable(resources: Array<Network>): ListTable {
-    return [['Name', 'Type', 'Nodes']].concat(
+    return [['Name', 'Type', 'Height', 'Nodes']].concat(
       _.sortBy(resources, resource => resource.name).map(resource => [
         resource.name,
         resource.type,
+        resource.height == null ? 'Unknown' : `${resource.height}`,
         `${resource.nodes.length}`,
       ]),
     );
@@ -100,6 +102,7 @@ export default class NetworkResourceType extends ResourceType<
     return [
       ['Name', resource.name],
       ['Type', resource.type],
+      ['Height', resource.height == null ? 'Unknown' : `${resource.height}`],
       [
         'Nodes',
         {

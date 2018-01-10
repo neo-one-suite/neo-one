@@ -14,6 +14,7 @@ export type NodeSettings = {|
     enabled: boolean,
     options: {|
       privateKey: string,
+      privateNet: boolean,
     |},
   |},
   seeds: Array<string>,
