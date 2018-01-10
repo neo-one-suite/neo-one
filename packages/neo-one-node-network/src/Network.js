@@ -83,7 +83,7 @@ export default class Network<Message, PeerData> {
   _listenTCP: ?ListenTCP;
   _tcpServer: ?net.Server;
 
-  _connectPeersTimeout: ?number;
+  _connectPeersTimeout: ?TimeoutID;
 
   __negotiate: (peer: Peer<Message>) => Promise<NegotiateResult<PeerData>>;
   __createMessageTransform: () => Duplex;

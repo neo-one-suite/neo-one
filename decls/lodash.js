@@ -1044,5 +1044,5 @@ declare module "lodash" {
     templateSettings: TemplateSettings
   }
 
-  declare var exports: Lodash;
+  declare module.exports: Lodash;
 }

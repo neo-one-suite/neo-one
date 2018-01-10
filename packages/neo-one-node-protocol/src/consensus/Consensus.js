@@ -41,7 +41,7 @@ const MS_IN_SECOND = 1000;
 
 export default class Consensus {
   _queue: ConsensusQueue;
-  _timer: ?number;
+  _timer: ?TimeoutID;
   _options$: Observable<Options>;
   _node: Node;
 
