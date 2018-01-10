@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": [
     "neo",
     "NEO",
@@ -34,15 +34,15 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^0.0.1",
-    "@neo-one/node-blockchain": "^0.0.1",
-    "@neo-one/node-core": "^0.0.1",
-    "@neo-one/node-data-backup": "^0.0.1",
-    "@neo-one/node-levelup": "^0.0.1",
-    "@neo-one/node-protocol": "^0.0.1",
-    "@neo-one/node-rpc": "^0.0.1",
-    "@neo-one/node-vm": "^0.0.1",
-    "@neo-one/utils": "^0.0.1",
+    "@neo-one/client-core": "^0.0.2",
+    "@neo-one/node-blockchain": "^0.0.2",
+    "@neo-one/node-core": "^0.0.2",
+    "@neo-one/node-data-backup": "^0.0.2",
+    "@neo-one/node-levelup": "^0.0.2",
+    "@neo-one/node-protocol": "^0.0.2",
+    "@neo-one/node-rpc": "^0.0.2",
+    "@neo-one/node-vm": "^0.0.2",
+    "@neo-one/utils": "^0.0.2",
     "leveldown": "^2.1.1",
     "levelup": "^2.0.1",
     "node-cron": "^1.2.1",

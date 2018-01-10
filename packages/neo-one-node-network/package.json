@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-network",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": [
     "neo",
     "NEO",
@@ -34,9 +34,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^0.0.1",
-    "@neo-one/node-core": "^0.0.1",
-    "@neo-one/utils": "^0.0.1",
+    "@neo-one/client-core": "^0.0.2",
+    "@neo-one/node-core": "^0.0.2",
+    "@neo-one/utils": "^0.0.2",
     "lodash": "^4.17.4",
     "rxjs": "^5.5.6",
     "through": "^2.3.8"
