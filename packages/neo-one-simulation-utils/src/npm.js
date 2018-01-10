@@ -1,6 +1,9 @@
 /* @flow */
-import { exec } from 'child_process';
+import { exec as execCallback } from 'child_process';
+import { promisify } from 'util';
 import spawn from 'cross-spawn';
+
+const exec = promisify(execCallback);
 
 const shouldUseYarn = async () => {
   try {
