@@ -1,5 +1,6 @@
 /* @flow */
 import BN from 'bn.js';
+import { CustomError } from '@neo-one/utils';
 
 import _ from 'lodash';
 
@@ -14,7 +15,7 @@ import BinaryWriter from './BinaryWriter';
 import common, { type ECPoint, type UInt160, type UInt256 } from '../common';
 import utils from './utils';
 
-export class UnknownOpError extends Error {
+export class UnknownOpError extends CustomError {
   byteCode: string;
   code: string;
 
@@ -25,7 +26,7 @@ export class UnknownOpError extends Error {
   }
 }
 
-export class InvalidParamError extends Error {
+export class InvalidParamError extends CustomError {
   code: string;
 
   constructor() {

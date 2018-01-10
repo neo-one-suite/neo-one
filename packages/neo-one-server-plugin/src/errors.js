@@ -1,6 +1,8 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
+
 // eslint-disable-next-line
-export class FailedToKillProcessError extends Error {
+export class FailedToKillProcessError extends CustomError {
   code: string;
 
   constructor(pid: number) {

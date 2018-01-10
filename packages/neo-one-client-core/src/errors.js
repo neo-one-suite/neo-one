@@ -1,5 +1,7 @@
 /* @flow */
-export class InvalidFormatError extends Error {
+import { CustomError } from '@neo-one/utils';
+
+export class InvalidFormatError extends CustomError {
   code: string;
 
   constructor(reason?: string) {
@@ -8,7 +10,7 @@ export class InvalidFormatError extends Error {
   }
 }
 
-export class VerifyError extends Error {
+export class VerifyError extends CustomError {
   code: string;
 
   constructor(reason: string) {
@@ -17,7 +19,7 @@ export class VerifyError extends Error {
   }
 }
 
-export class UnsignedBlockError extends Error {
+export class UnsignedBlockError extends CustomError {
   code: string;
 
   constructor() {

@@ -1,5 +1,7 @@
 /* @flow */
-export class CouldNotLoadSimulationError extends Error {
+import { CustomError } from '@neo-one/utils';
+
+export class CouldNotLoadSimulationError extends CustomError {
   code: string;
 
   constructor(simulationPackage: string) {
@@ -11,7 +13,7 @@ export class CouldNotLoadSimulationError extends Error {
   }
 }
 
-export class InvalidSimulationConfigError extends Error {
+export class InvalidSimulationConfigError extends CustomError {
   code: string;
 
   constructor(reason: string) {
@@ -20,7 +22,7 @@ export class InvalidSimulationConfigError extends Error {
   }
 }
 
-export class InvalidLanguageError extends Error {
+export class InvalidLanguageError extends CustomError {
   code: string;
 
   constructor(language: string) {
@@ -29,7 +31,7 @@ export class InvalidLanguageError extends Error {
   }
 }
 
-export class SimulationPackageRequiredError extends Error {
+export class SimulationPackageRequiredError extends CustomError {
   code: string;
 
   constructor() {
@@ -38,7 +40,7 @@ export class SimulationPackageRequiredError extends Error {
   }
 }
 
-export class SimulationPathRequiredError extends Error {
+export class SimulationPathRequiredError extends CustomError {
   code: string;
 
   constructor() {

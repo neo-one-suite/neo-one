@@ -1,5 +1,6 @@
 /* @flow */
-// eslint-disable-next-line
+import { CustomError } from '@neo-one/utils';
+
 export const CONSENSUS_MESSAGE_TYPE = {
   CHANGE_VIEW: 0x00,
   PREPARE_REQUEST: 0x20,
@@ -10,7 +11,7 @@ export type ConsensusMessageType =
   | 0x20 // PrepareRequest
   | 0x21; // PrepareResponse
 
-export class InvalidConsensusMessageTypeError extends Error {
+export class InvalidConsensusMessageTypeError extends CustomError {
   type: number;
   code: string;
 

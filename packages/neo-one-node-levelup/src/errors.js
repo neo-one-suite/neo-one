@@ -1,5 +1,7 @@
 /* @flow */
-export class NotFoundError extends Error {
+import { CustomError } from '@neo-one/utils';
+
+export class NotFoundError extends CustomError {
   code: string;
 
   constructor() {
@@ -8,7 +10,7 @@ export class NotFoundError extends Error {
   }
 }
 
-export class UnknownTypeError extends Error {
+export class UnknownTypeError extends CustomError {
   code: string;
 
   constructor() {
@@ -17,7 +19,7 @@ export class UnknownTypeError extends Error {
   }
 }
 
-export class KeyNotFoundError extends Error {
+export class KeyNotFoundError extends CustomError {
   code: string;
 
   constructor(keyString: string) {

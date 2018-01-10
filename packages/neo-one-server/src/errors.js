@@ -1,7 +1,8 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
 import { name } from '@neo-one/server-plugin';
 
-export class PluginDependencyNotMetError extends Error {
+export class PluginDependencyNotMetError extends CustomError {
   code: string;
 
   constructor({
@@ -16,7 +17,7 @@ export class PluginDependencyNotMetError extends Error {
   }
 }
 
-export class ServerRunningError extends Error {
+export class ServerRunningError extends CustomError {
   code: string;
   exitCode: number;
 
@@ -27,7 +28,7 @@ export class ServerRunningError extends Error {
   }
 }
 
-export class ResourceNoStartError extends Error {
+export class ResourceNoStartError extends CustomError {
   code: string;
 
   constructor({
@@ -44,7 +45,7 @@ export class ResourceNoStartError extends Error {
   }
 }
 
-export class ResourceNoStopError extends Error {
+export class ResourceNoStopError extends CustomError {
   code: string;
 
   constructor({

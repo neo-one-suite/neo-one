@@ -1,10 +1,11 @@
 /* @flow */
 import type BN from 'bn.js';
+import { CustomError } from '@neo-one/utils';
 import { type OpCode, disassembleByteCode } from '@neo-one/client-core';
 
 import { type ExecutionContext } from './constants';
 
-export class VMError extends Error {
+export class VMError extends CustomError {
   code = 'VM_ERROR';
 
   constructor(context: ExecutionContext, message: string) {

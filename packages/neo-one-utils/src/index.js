@@ -1,4 +1,5 @@
 /* @flow */
+export { default as CustomError } from './CustomError';
 export { default as finalize } from './finalize';
 export { createProfile, now as performanceNow } from './log';
 export { default as logInvoke } from './logInvoke';

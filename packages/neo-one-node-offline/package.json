@@ -36,6 +36,7 @@
   "dependencies": {
     "@neo-one/client-core": "^0.0.1",
     "@neo-one/node-core": "^0.0.1",
+    "@neo-one/utils": "^0.0.1",
     "lodash": "^4.17.4"
   }
 }

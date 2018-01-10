@@ -1,4 +1,6 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
+
 export const INVENTORY_TYPE = {
   TRANSACTION: 0x01,
   BLOCK: 0x02,
@@ -6,7 +8,7 @@ export const INVENTORY_TYPE = {
 };
 export type InventoryType = 0x01 | 0x02 | 0xe0;
 
-export class InvalidInventoryTypeError extends Error {
+export class InvalidInventoryTypeError extends CustomError {
   inventoryType: number;
   code: string;
 

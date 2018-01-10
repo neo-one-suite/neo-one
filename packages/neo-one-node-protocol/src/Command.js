@@ -1,4 +1,5 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
 
 export type Command =
   | 'addr'
@@ -49,7 +50,7 @@ export const COMMAND = {
   REJECT: 'reject',
 };
 
-export class InvalidCommandError extends Error {
+export class InvalidCommandError extends CustomError {
   command: string;
   code: string;
 

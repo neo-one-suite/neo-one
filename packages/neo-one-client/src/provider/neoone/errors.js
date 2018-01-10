@@ -1,4 +1,5 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
 
 export type JSONRPCErrorResponse = {|
   code: number,
@@ -7,7 +8,7 @@ export type JSONRPCErrorResponse = {|
 |};
 
 // eslint-disable-next-line
-export class JSONRPCError extends Error {
+export class JSONRPCError extends CustomError {
   responseError: JSONRPCErrorResponse;
   code: string;
 
@@ -18,7 +19,7 @@ export class JSONRPCError extends Error {
   }
 }
 
-export class InvalidRPCResponseError extends Error {
+export class InvalidRPCResponseError extends CustomError {
   code: string;
   constructor() {
     super('Did not receive valid rpc response');
@@ -26,7 +27,7 @@ export class InvalidRPCResponseError extends Error {
   }
 }
 
-export class HTTPError extends Error {
+export class HTTPError extends CustomError {
   status: number;
   text: ?string;
   code: string;

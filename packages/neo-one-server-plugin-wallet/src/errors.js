@@ -1,5 +1,7 @@
 /* @flow */
-export class NetworkRequiredError extends Error {
+import { CustomError } from '@neo-one/utils';
+
+export class NetworkRequiredError extends CustomError {
   code: string;
 
   constructor() {
@@ -8,7 +10,7 @@ export class NetworkRequiredError extends Error {
   }
 }
 
-export class ABIRequiredError extends Error {
+export class ABIRequiredError extends CustomError {
   code: string;
 
   constructor(extra?: string) {
@@ -17,7 +19,7 @@ export class ABIRequiredError extends Error {
   }
 }
 
-export class ContractOrHashRequiredError extends Error {
+export class ContractOrHashRequiredError extends CustomError {
   code: string;
 
   constructor(extra?: string) {
@@ -30,7 +32,7 @@ export class ContractOrHashRequiredError extends Error {
   }
 }
 
-export class WalletRequiredError extends Error {
+export class WalletRequiredError extends CustomError {
   code: string;
 
   constructor(extra?: string) {

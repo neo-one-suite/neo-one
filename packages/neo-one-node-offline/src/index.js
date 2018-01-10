@@ -5,13 +5,14 @@ import {
   Block,
 } from '@neo-one/client-core';
 import type { Blockchain } from '@neo-one/node-core';
+import { CustomError } from '@neo-one/utils';
 import { type Readable, type Writable, Transform } from 'stream';
 
 import _ from 'lodash';
 import fs from 'fs';
 import zlib from 'zlib';
 
-export class InvalidBlockTransformEncodingError extends Error {
+export class InvalidBlockTransformEncodingError extends CustomError {
   code: string;
   constructor() {
     super('Invalid Block Transform Encoding.');

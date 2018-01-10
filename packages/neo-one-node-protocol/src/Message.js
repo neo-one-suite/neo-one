@@ -17,6 +17,7 @@ import {
   crypto,
   deserializeTransactionWire,
 } from '@neo-one/client-core';
+import { CustomError } from '@neo-one/utils';
 import { Transform } from 'stream';
 
 import {
@@ -313,7 +314,7 @@ export default class Message implements SerializableWire<Message> {
   }
 }
 
-export class InvalidMessageTransformEncodingError extends Error {
+export class InvalidMessageTransformEncodingError extends CustomError {
   code: string;
   constructor() {
     super('Invalid Message Transform Encoding.');

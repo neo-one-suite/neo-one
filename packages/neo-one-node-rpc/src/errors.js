@@ -1,5 +1,7 @@
 /* @flow */
-export class RPCError extends Error {
+import { CustomError } from '@neo-one/utils';
+
+export class RPCError extends CustomError {
   code: number;
   data: ?Object;
 
@@ -10,7 +12,7 @@ export class RPCError extends Error {
   }
 }
 
-export class RPCUnknownError extends Error {
+export class RPCUnknownError extends CustomError {
   code: string;
   error: $FlowFixMe;
 

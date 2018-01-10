@@ -1,4 +1,6 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
+
 import _ from 'lodash';
 
 import utils, { BinaryReader } from './utils';
@@ -552,7 +554,7 @@ export const SYS_CALL_NAME = {
     'System.ExecutionEngine.GetEntryScriptHash',
 };
 
-export class InvalidSysCallNameError extends Error {
+export class InvalidSysCallNameError extends CustomError {
   static code = 'INVALID_SYS_CALL_NAME';
   code = this.constructor.code;
   value: string;
@@ -770,7 +772,7 @@ export const assertSysCallName = (value: string): SysCallName => {
   }
 };
 
-export class InvalidVMStateError extends Error {
+export class InvalidVMStateError extends CustomError {
   static code = 'INVALID_VM_STATE';
   code = this.constructor.code;
 

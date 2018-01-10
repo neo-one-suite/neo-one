@@ -1,11 +1,13 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
+
 export const ACTION_TYPE = {
   LOG: 0x00,
   NOTIFICATION: 0x01,
 };
 export type ActionType = 0x00 | 0x01;
 
-export class InvalidActionTypeError extends Error {
+export class InvalidActionTypeError extends CustomError {
   type: number;
   code: string;
 

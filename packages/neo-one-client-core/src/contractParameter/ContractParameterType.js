@@ -1,4 +1,6 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
+
 export const CONTRACT_PARAMETER_TYPE = {
   SIGNATURE: 0x00,
   BOOLEAN: 0x01,
@@ -26,7 +28,7 @@ export type ContractParameterType =
   | 0xf0
   | 0xff;
 
-export class InvalidContractParameterTypeError extends Error {
+export class InvalidContractParameterTypeError extends CustomError {
   code: string;
   contractParameterType: number;
 
@@ -74,7 +76,7 @@ export const assertContractParameterType = (
   }
 };
 
-export class InvalidContractParameterTypeJSONError extends Error {
+export class InvalidContractParameterTypeJSONError extends CustomError {
   code: string;
   value: string;
 

@@ -1,4 +1,6 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
+
 export const TRANSACTION_TYPE = {
   MINER: 0x00,
   ISSUE: 0x01,
@@ -10,7 +12,7 @@ export const TRANSACTION_TYPE = {
   INVOCATION: 0xd1,
 };
 
-export class InvalidTransactionTypeError extends Error {
+export class InvalidTransactionTypeError extends CustomError {
   transactionType: number;
   code: string;
 

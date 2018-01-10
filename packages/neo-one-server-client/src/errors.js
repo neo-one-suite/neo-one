@@ -1,5 +1,7 @@
 /* @flow */
-export class ReadError extends Error {
+import { CustomError } from '@neo-one/utils';
+
+export class ReadError extends CustomError {
   code: string;
 
   constructor(code: string, message: string) {
@@ -8,7 +10,7 @@ export class ReadError extends Error {
   }
 }
 
-export class UnknownPluginResourceType extends Error {
+export class UnknownPluginResourceType extends CustomError {
   code: string;
 
   constructor({
@@ -23,7 +25,7 @@ export class UnknownPluginResourceType extends Error {
   }
 }
 
-export class PluginNotInstalledError extends Error {
+export class PluginNotInstalledError extends CustomError {
   code: string;
 
   constructor(nameIn: string) {

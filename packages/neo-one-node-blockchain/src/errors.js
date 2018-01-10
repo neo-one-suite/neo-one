@@ -1,5 +1,7 @@
 /* @flow */
-export class GenesisBlockNotRegisteredError extends Error {
+import { CustomError } from '@neo-one/utils';
+
+export class GenesisBlockNotRegisteredError extends CustomError {
   code: string;
 
   constructor() {
@@ -8,7 +10,7 @@ export class GenesisBlockNotRegisteredError extends Error {
   }
 }
 
-export class ScriptVerifyError extends Error {
+export class ScriptVerifyError extends CustomError {
   code: string;
 
   constructor(message: string) {
@@ -17,7 +19,7 @@ export class ScriptVerifyError extends Error {
   }
 }
 
-export class WitnessVerifyError extends Error {
+export class WitnessVerifyError extends CustomError {
   code: string;
 
   constructor() {

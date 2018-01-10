@@ -36,6 +36,7 @@
   "dependencies": {
     "@neo-one/client-core": "^0.0.1",
     "@neo-one/node-core": "^0.0.1",
+    "@neo-one/utils": "^0.0.1",
     "bytewise": "^1.1.0",
     "rxjs": "^5.5.6"
   }

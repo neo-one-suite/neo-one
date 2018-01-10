@@ -1,5 +1,6 @@
 /* @flow */
 import type BN from 'bn.js';
+import { CustomError } from '@neo-one/utils';
 
 import {
   ASSET_TYPE,
@@ -29,7 +30,7 @@ import common, {
 import crypto from './crypto';
 import utils, { BinaryReader, type BinaryWriter, JSONHelper } from './utils';
 
-export class InvalidAssetError extends Error {
+export class InvalidAssetError extends CustomError {
   code: string;
   constructor(message: string) {
     super(message);

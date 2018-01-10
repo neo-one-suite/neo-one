@@ -1,9 +1,10 @@
 /* @flow */
 import type BigNumber from 'bignumber.js';
+import { CustomError } from '@neo-one/utils';
 
 import type { ContractParameter, ContractParameterType } from './types'; // eslint-disable-line
 
-export class InvalidContractParameterError extends Error {
+export class InvalidContractParameterError extends CustomError {
   parameter: ContractParameter;
   expected: Array<ContractParameterType>;
   code: string;
@@ -22,7 +23,7 @@ export class InvalidContractParameterError extends Error {
   }
 }
 
-export class InvalidArgumentError extends Error {
+export class InvalidArgumentError extends CustomError {
   code: string;
 
   constructor(message: string) {
@@ -39,7 +40,7 @@ export class InvalidNamedArgumentError extends InvalidArgumentError {
   }
 }
 
-export class InvalidEventError extends Error {
+export class InvalidEventError extends CustomError {
   code: string;
 
   constructor(message: string) {
@@ -48,7 +49,7 @@ export class InvalidEventError extends Error {
   }
 }
 
-export class InsufficientFundsError extends Error {
+export class InsufficientFundsError extends CustomError {
   code: string;
 
   constructor(total: BigNumber, expected: BigNumber) {
@@ -57,7 +58,7 @@ export class InsufficientFundsError extends Error {
   }
 }
 
-export class NothingToClaimError extends Error {
+export class NothingToClaimError extends CustomError {
   code: string;
 
   constructor() {
@@ -66,7 +67,7 @@ export class NothingToClaimError extends Error {
   }
 }
 
-export class NothingToIssueError extends Error {
+export class NothingToIssueError extends CustomError {
   code: string;
 
   constructor() {
@@ -75,7 +76,7 @@ export class NothingToIssueError extends Error {
   }
 }
 
-export class NothingToTransferError extends Error {
+export class NothingToTransferError extends CustomError {
   code: string;
 
   constructor() {
@@ -84,7 +85,7 @@ export class NothingToTransferError extends Error {
   }
 }
 
-export class NoAccountError extends Error {
+export class NoAccountError extends CustomError {
   code: string;
 
   constructor() {
@@ -93,7 +94,7 @@ export class NoAccountError extends Error {
   }
 }
 
-export class NoContractDeployedError extends Error {
+export class NoContractDeployedError extends CustomError {
   code: string;
 
   constructor(networkType: string) {
@@ -102,7 +103,7 @@ export class NoContractDeployedError extends Error {
   }
 }
 
-export class InvalidTransactionError extends Error {
+export class InvalidTransactionError extends CustomError {
   code: string;
 
   constructor(message: string) {
@@ -111,7 +112,7 @@ export class InvalidTransactionError extends Error {
   }
 }
 
-export class InvokeError extends Error {
+export class InvokeError extends CustomError {
   code: string;
   constructor(message: string) {
     super(message);
@@ -119,7 +120,7 @@ export class InvokeError extends Error {
   }
 }
 
-export class UnknownBlockError extends Error {
+export class UnknownBlockError extends CustomError {
   code: string;
 
   constructor() {
@@ -128,7 +129,7 @@ export class UnknownBlockError extends Error {
   }
 }
 
-export class RelayTransactionError extends Error {
+export class RelayTransactionError extends CustomError {
   code: string;
 
   constructor(message: string) {
@@ -137,7 +138,7 @@ export class RelayTransactionError extends Error {
   }
 }
 
-export class UnknownNetworkError extends Error {
+export class UnknownNetworkError extends CustomError {
   code: string;
 
   constructor(name: string) {
@@ -146,7 +147,7 @@ export class UnknownNetworkError extends Error {
   }
 }
 
-export class UnknownAccountError extends Error {
+export class UnknownAccountError extends CustomError {
   code: string;
 
   constructor(address: string) {
@@ -155,7 +156,7 @@ export class UnknownAccountError extends Error {
   }
 }
 
-export class LockedAccountError extends Error {
+export class LockedAccountError extends CustomError {
   code: string;
 
   constructor(address: string) {
@@ -164,7 +165,7 @@ export class LockedAccountError extends Error {
   }
 }
 
-export class PasswordRequiredError extends Error {
+export class PasswordRequiredError extends CustomError {
   code: string;
 
   constructor() {

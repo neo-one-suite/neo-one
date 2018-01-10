@@ -1,4 +1,5 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
 import ECKey from 'ec-key';
 import WIF from 'wif';
 
@@ -24,7 +25,7 @@ type KeyPair = any;
 
 const ec = new EC('p256');
 
-export class Base58CheckError extends Error {
+export class Base58CheckError extends CustomError {
   code: string;
 
   constructor() {
@@ -33,7 +34,7 @@ export class Base58CheckError extends Error {
   }
 }
 
-export class InvalidAddressError extends Error {
+export class InvalidAddressError extends CustomError {
   address: string;
   code: string;
 
@@ -106,7 +107,7 @@ const sign = ({
 //   ]);
 // };
 
-class InvalidSignatureError extends Error {
+class InvalidSignatureError extends CustomError {
   code: string;
   constructor() {
     super('Invalid Signature');
@@ -217,7 +218,7 @@ const verify = ({
     .verify(signature);
 };
 
-class InvalidPrivateKeyError extends Error {
+class InvalidPrivateKeyError extends CustomError {
   code: string;
   constructor() {
     super('Invalid Private Key');

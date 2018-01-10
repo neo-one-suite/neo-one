@@ -1,7 +1,8 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
 import type { Endpoint } from '@neo-one/node-core';
 
-export class ReceiveMessageTimeoutError extends Error {
+export class ReceiveMessageTimeoutError extends CustomError {
   code: string;
 
   constructor() {
@@ -10,7 +11,7 @@ export class ReceiveMessageTimeoutError extends Error {
   }
 }
 
-export class UnsupportedEndpointType extends Error {
+export class UnsupportedEndpointType extends CustomError {
   endpoint: Endpoint;
   code: string;
 

@@ -1,8 +1,10 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
+
 import common, { type UInt256 } from '../common';
 import crypto from './crypto';
 
-class InvalidMerkleTreeException extends Error {
+class InvalidMerkleTreeException extends CustomError {
   code: string;
 
   constructor() {

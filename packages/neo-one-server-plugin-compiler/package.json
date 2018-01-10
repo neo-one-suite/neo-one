@@ -38,6 +38,7 @@
     "@neo-one/client": "^0.0.1",
     "@neo-one/csharp": "^0.0.1",
     "@neo-one/server-plugin": "^0.0.1",
+    "@neo-one/utils": "^0.0.1",
     "fs-extra": "^5.0.0",
     "lodash": "^4.17.4",
     "rxjs": "^5.5.6"

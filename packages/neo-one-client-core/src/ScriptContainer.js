@@ -1,4 +1,6 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
+
 import type Block from './Block';
 import type { ConsensusPayload } from './payload';
 import type { Transaction } from './transaction';
@@ -15,7 +17,7 @@ export type ScriptContainer =
   | {| type: 0x02, value: ConsensusPayload |};
 export type ScriptContainerType = 0x00 | 0x01 | 0x02;
 
-export class InvalidScriptContainerTypeError extends Error {
+export class InvalidScriptContainerTypeError extends CustomError {
   value: number;
   code: string;
 

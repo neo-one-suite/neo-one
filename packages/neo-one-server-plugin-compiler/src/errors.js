@@ -1,5 +1,7 @@
 /* @flow */
-export class ABIRequiredError extends Error {
+import { CustomError } from '@neo-one/utils';
+
+export class ABIRequiredError extends CustomError {
   code: string;
 
   constructor() {
@@ -8,7 +10,7 @@ export class ABIRequiredError extends Error {
   }
 }
 
-export class UnknownSmartContractFormatError extends Error {
+export class UnknownSmartContractFormatError extends CustomError {
   code: string;
 
   constructor({

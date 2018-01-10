@@ -1,6 +1,7 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
 
-export class InvalidValueArrayError extends Error {
+export class InvalidValueArrayError extends CustomError {
   code = 'INVALID_VALUE_ARRAY';
 
   constructor() {
@@ -8,7 +9,7 @@ export class InvalidValueArrayError extends Error {
   }
 }
 
-export class InvalidValueBufferError extends Error {
+export class InvalidValueBufferError extends CustomError {
   code = 'INVALID_VALUE_BUFFER';
 
   constructor() {
@@ -16,7 +17,7 @@ export class InvalidValueBufferError extends Error {
   }
 }
 
-export class InvalidValueHeaderError extends Error {
+export class InvalidValueHeaderError extends CustomError {
   code = 'INVALID_VALUE_HEADER';
 
   constructor() {
@@ -24,7 +25,7 @@ export class InvalidValueHeaderError extends Error {
   }
 }
 
-export class InvalidValueBlockError extends Error {
+export class InvalidValueBlockError extends CustomError {
   code = 'INVALID_VALUE_BLOCK';
 
   constructor() {
@@ -32,7 +33,7 @@ export class InvalidValueBlockError extends Error {
   }
 }
 
-export class InvalidValueBlockBaseError extends Error {
+export class InvalidValueBlockBaseError extends CustomError {
   code = 'INVALID_VALUE_BLOCK_BASE';
 
   constructor() {
@@ -40,7 +41,7 @@ export class InvalidValueBlockBaseError extends Error {
   }
 }
 
-export class InvalidValueTransactionError extends Error {
+export class InvalidValueTransactionError extends CustomError {
   code = 'INVALID_VALUE_TRANSACTION';
 
   constructor() {
@@ -48,7 +49,7 @@ export class InvalidValueTransactionError extends Error {
   }
 }
 
-export class InvalidValueAttributeError extends Error {
+export class InvalidValueAttributeError extends CustomError {
   code = 'INVALID_VALUE_ATTRIBUTE';
 
   constructor() {
@@ -56,7 +57,7 @@ export class InvalidValueAttributeError extends Error {
   }
 }
 
-export class InvalidValueAttributeStackItemError extends Error {
+export class InvalidValueAttributeStackItemError extends CustomError {
   code = 'INVALID_VALUE_ATTRIBUTE_STACK_ITEM';
 
   constructor() {
@@ -64,7 +65,7 @@ export class InvalidValueAttributeStackItemError extends Error {
   }
 }
 
-export class InvalidValueInputError extends Error {
+export class InvalidValueInputError extends CustomError {
   code = 'INVALID_VALUE_INPUT';
 
   constructor() {
@@ -72,7 +73,7 @@ export class InvalidValueInputError extends Error {
   }
 }
 
-export class InvalidValueOutputError extends Error {
+export class InvalidValueOutputError extends CustomError {
   code = 'INVALID_VALUE_OUTPUT';
 
   constructor() {
@@ -80,7 +81,7 @@ export class InvalidValueOutputError extends Error {
   }
 }
 
-export class InvalidValueAccountError extends Error {
+export class InvalidValueAccountError extends CustomError {
   code = 'INVALID_VALUE_ACCOUNT';
 
   constructor() {
@@ -88,7 +89,7 @@ export class InvalidValueAccountError extends Error {
   }
 }
 
-export class InvalidValueAssetError extends Error {
+export class InvalidValueAssetError extends CustomError {
   code = 'INVALID_VALUE_ASSET';
 
   constructor() {
@@ -96,7 +97,7 @@ export class InvalidValueAssetError extends Error {
   }
 }
 
-export class InvalidValueContractError extends Error {
+export class InvalidValueContractError extends CustomError {
   code = 'INVALID_VALUE_CONTRACT';
 
   constructor() {
@@ -104,7 +105,7 @@ export class InvalidValueContractError extends Error {
   }
 }
 
-export class InvalidValueValidatorError extends Error {
+export class InvalidValueValidatorError extends CustomError {
   code = 'INVALID_VALUE_VALIDATOR';
 
   constructor() {
@@ -112,7 +113,7 @@ export class InvalidValueValidatorError extends Error {
   }
 }
 
-export class InvalidValueStorageContextStackItemError extends Error {
+export class InvalidValueStorageContextStackItemError extends CustomError {
   code = 'INVALID_VALUE_STORAGE_CONTEXT_STACK_ITEM';
 
   constructor() {

@@ -1,4 +1,5 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
 
 export const ATTRIBUTE_USAGE = {
   CONTRACT_HASH: 0x00,
@@ -81,7 +82,7 @@ export type AttributeUsage =
   | 0xfe // REMARK14
   | 0xff;
 
-export class InvalidAttributeUsageError extends Error {
+export class InvalidAttributeUsageError extends CustomError {
   transactionAttributeUsage: number;
   code: string;
 
@@ -178,7 +179,7 @@ export const assertAttributeUsage = (value: number): AttributeUsage => {
   }
 };
 
-export class InvalidAttributeUsageJSONError extends Error {
+export class InvalidAttributeUsageJSONError extends CustomError {
   code: string;
   transactionAttributeUsage: string;
 

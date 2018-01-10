@@ -1,10 +1,11 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
 import type { Endpoint } from '@neo-one/node-core';
 
 import type Message from './Message';
 
 // eslint-disable-next-line
-export class NegotiationError extends Error {
+export class NegotiationError extends CustomError {
   messageObj: Message;
   code: string;
 
@@ -19,7 +20,7 @@ export class NegotiationError extends Error {
   }
 }
 
-export class AlreadyConnectedError extends Error {
+export class AlreadyConnectedError extends CustomError {
   code: string;
   endpoint: Endpoint;
 

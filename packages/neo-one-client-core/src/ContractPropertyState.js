@@ -1,4 +1,6 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
+
 export const CONTRACT_PROPERTY_STATE = {
   NO_PROPERTY: 0x00,
   HAS_STORAGE: 0x01,
@@ -18,7 +20,7 @@ export const HAS_DYNAMIC_INVOKE = (new Set([
   CONTRACT_PROPERTY_STATE.HAS_STORAGE_DYNAMIC_INVOKE,
 ]): Set<ContractPropertyState>);
 
-export class InvalidContractPropertyStateError extends Error {
+export class InvalidContractPropertyStateError extends CustomError {
   code: string;
   contractParameterType: number;
 

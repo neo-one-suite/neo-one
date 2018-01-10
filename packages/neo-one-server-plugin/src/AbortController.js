@@ -1,7 +1,8 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
 import EventEmitter from 'events';
 
-export class AbortError extends Error {
+export class AbortError extends CustomError {
   code: string;
 
   constructor() {

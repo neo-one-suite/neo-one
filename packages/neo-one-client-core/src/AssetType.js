@@ -1,4 +1,6 @@
 /* @flow */
+import { CustomError } from '@neo-one/utils';
+
 export const ASSET_TYPE = {
   CREDIT_FLAG: 0x40,
   DUTY_FLAG: 0x80,
@@ -16,7 +18,7 @@ export const hasFlag = (assetType: AssetType, flag: AssetType): boolean =>
   // eslint-disable-next-line
   (assetType & flag) === flag;
 
-export class InvalidAssetTypeError extends Error {
+export class InvalidAssetTypeError extends CustomError {
   assetType: number;
   code: string;
 
@@ -85,7 +87,7 @@ export const toJSONAssetType = (type: AssetType): AssetTypeJSON => {
   }
 };
 
-export class InvalidAssetTypeJSONError extends Error {
+export class InvalidAssetTypeJSONError extends CustomError {
   code: string;
   type: string;
   constructor(type: string) {
