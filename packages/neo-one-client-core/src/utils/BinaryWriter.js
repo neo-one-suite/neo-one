@@ -48,6 +48,12 @@ export default class BinaryWriter {
     return this.writeBytes(buffer);
   }
 
+  writeUInt16BE(value: number): this {
+    const buffer = Buffer.allocUnsafe(2);
+    buffer.writeUInt16BE(value, 0);
+    return this.writeBytes(buffer);
+  }
+
   writeInt32LE(value: number): this {
     const buffer = Buffer.allocUnsafe(4);
     buffer.writeInt32LE(value, 0);

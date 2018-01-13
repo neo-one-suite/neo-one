@@ -7,9 +7,10 @@ import {
   type SerializeWire,
   type SerializableWire,
   BinaryReader,
-  InvalidFormatError,
   createSerializeWire,
 } from '@neo-one/client-core';
+
+import { Address6 } from 'ip-address';
 
 export type NetworkAddressAdd = {|
   host: string,
@@ -33,20 +34,18 @@ export default class NetworkAddress
   }
 
   serializeWireBase(writer: BinaryWriter): void {
-    // TODO: Support non-ipv4 addresses
     const parts = this.host.split('.');
-    if (parts.length !== 4) {
-      throw new InvalidFormatError();
+    let address;
+    if (parts.length === 4) {
+      address = new Address6(Address6.fromAddress4(this.host).to4in6());
+    } else {
+      address = new Address6(this.host);
     }
-    const host = Buffer.from(parts.map(part => parseInt(part, 10)));
 
     writer.writeUInt32LE(this.timestamp);
     writer.writeUInt64LE(this.services);
-    writer.writeBytes(host);
-    // TODO: NEO node reverses endianness of machine, so this is
-    //       technically not well-defined. Let's assume it's always
-    //       trying to write little endian values.
-    writer.writeUInt16LE(this.port);
+    writer.writeBytes(address.toByteArray());
+    writer.writeUInt16BE(this.port);
   }
 
   serializeWire: SerializeWire = createSerializeWire(
@@ -58,15 +57,12 @@ export default class NetworkAddress
   }: DeserializeWireBaseOptions): NetworkAddress {
     const timestamp = reader.readUInt32LE();
     const services = reader.readUInt64LE();
-    const host0 = reader.readUInt8();
-    const host1 = reader.readUInt8();
-    const host2 = reader.readUInt8();
-    const host3 = reader.readUInt8();
-    const port = reader.readUInt16LE();
+    const address = Address6.fromByteArray([...reader.readBytes(16)]);
+    const port = reader.readUInt16BE();
     return new this({
       timestamp,
       services,
-      host: [host0, host1, host2, host3].join('.'),
+      host: address.canonicalForm() || '',
       port,
     });
   }

@@ -65,6 +65,12 @@ export default class BinaryReader {
     return result;
   }
 
+  readUInt16BE(): number {
+    const result = this.buffer.readUInt16BE(this.index);
+    this.index += 2;
+    return result;
+  }
+
   readInt32LE(): number {
     const result = this.buffer.readInt32LE(this.index);
     this.index += 4;

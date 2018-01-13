@@ -286,7 +286,7 @@ export default class Network<Message, PeerData> {
       maxConnectedPeers: maxConnectedPeersIn,
     } = await this._options$.pipe(take(1)).toPromise();
     const maxConnectedPeers =
-      maxConnectedPeersIn == null ? 50 : maxConnectedPeersIn;
+      maxConnectedPeersIn == null ? 20 : maxConnectedPeersIn;
     if (connectedPeersCount < maxConnectedPeers) {
       const count = maxConnectedPeers - connectedPeersCount;
       endpoints.push(

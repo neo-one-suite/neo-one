@@ -14,6 +14,7 @@ import type { Subject } from 'rxjs/Subject';
 import _ from 'lodash';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { common, crypto } from '@neo-one/client-core';
+import { createEndpoint } from '@neo-one/node-core';
 import { createReadClient } from '@neo-one/client';
 import { shareReplay, switchMap } from 'rxjs/operators';
 import { timer } from 'rxjs/observable/timer';
@@ -327,19 +328,24 @@ export default class NetworkResourceAdapter {
         },
       },
       seeds: [
-        'tcp:seed1.neo.org:10333',
-        'tcp:seed2.neo.org:10333',
-        'tcp:seed3.neo.org:10333',
-        'tcp:seed4.neo.org:10333',
-        'tcp:seed5.neo.org:10333',
-      ],
+        { type: 'tcp', host: 'seed1.cityofzion.io', port: 10333 },
+        { type: 'tcp', host: 'seed2.cityofzion.io', port: 10333 },
+        { type: 'tcp', host: 'seed3.cityofzion.io', port: 10333 },
+        { type: 'tcp', host: 'seed4.cityofzion.io', port: 10333 },
+        { type: 'tcp', host: 'seed5.cityofzion.io', port: 10333 },
+        { type: 'tcp', host: 'seed1.neo.org', port: 10333 },
+        { type: 'tcp', host: 'seed2.neo.org', port: 10333 },
+        { type: 'tcp', host: 'seed3.neo.org', port: 10333 },
+        { type: 'tcp', host: 'seed4.neo.org', port: 10333 },
+        { type: 'tcp', host: 'seed5.neo.org', port: 10333 },
+      ].map(seed => createEndpoint(seed)),
       rpcEndpoints: [
         'http://seed1.cityofzion.io:8080',
         'http://seed2.cityofzion.io:8080',
         'http://seed3.cityofzion.io:8080',
         'http://seed4.cityofzion.io:8080',
         'http://seed5.cityofzion.io:8080',
-        'http://seed1.neo.org:10332',
+        'https://seed1.neo.org:10332',
         'http://seed2.neo.org:10332',
         'http://seed3.neo.org:10332',
         'http://seed4.neo.org:10332',
@@ -364,19 +370,19 @@ export default class NetworkResourceAdapter {
         },
       },
       seeds: [
-        'tcp:seed1.neo.org:20333',
-        'tcp:seed2.neo.org:20333',
-        'tcp:seed3.neo.org:20333',
-        'tcp:seed4.neo.org:20333',
-        'tcp:seed5.neo.org:20333',
-      ],
+        { type: 'tcp', host: 'seed1.neo.org', port: 20333 },
+        { type: 'tcp', host: 'seed2.neo.org', port: 20333 },
+        { type: 'tcp', host: 'seed3.neo.org', port: 20333 },
+        { type: 'tcp', host: 'seed4.neo.org', port: 20333 },
+        { type: 'tcp', host: 'seed5.neo.org', port: 20333 },
+      ].map(seed => createEndpoint(seed)),
       rpcEndpoints: [
         'http://test1.cityofzion.io:8880',
         'http://test2.cityofzion.io:8880',
         'http://test3.cityofzion.io:8880',
         'http://test4.cityofzion.io:8880',
         'http://test5.cityofzion.io:8880',
-        'http://seed1.neo.org:20332',
+        'https://seed1.neo.org:20332',
         'http://seed2.neo.org:20332',
         'http://seed3.neo.org:20332',
         'http://seed4.neo.org:20332',
@@ -433,8 +439,12 @@ export default class NetworkResourceAdapter {
             privateNet: true,
           },
         },
-        seeds: otherConfiguration.map(
-          otherConfig => `tcp:localhost:${otherConfig.listenTCPPort}`,
+        seeds: otherConfiguration.map(otherConfig =>
+          createEndpoint({
+            type: 'tcp',
+            host: 'localhost',
+            port: otherConfig.listenTCPPort,
+          }),
         ),
         rpcEndpoints: otherConfiguration.map(
           otherConfig => `http://localhost:${otherConfig.rpcPort}/rpc`,

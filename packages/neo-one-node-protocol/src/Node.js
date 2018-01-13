@@ -24,6 +24,7 @@ import {
 } from '@neo-one/client-core';
 import {
   type Blockchain,
+  type Endpoint,
   type Node as INode,
   createEndpoint,
   getEndpointConfig,
@@ -103,7 +104,14 @@ const GET_BLOCKS_BUFFER = GET_BLOCKS_COUNT / 3;
 const GET_BLOCKS_TIME_MS = 10000;
 const GET_BLOCKS_THROTTLE_MS = 500;
 const GET_BLOCKS_CLOSE_COUNT = 2;
-const LOCAL_HOST_ADDRESSES = new Set(['0.0.0.0', 'localhost', '127.0.0.1']);
+const LOCAL_HOST_ADDRESSES = new Set([
+  '',
+  '0.0.0.0',
+  'localhost',
+  '127.0.0.1',
+  '::',
+  '::1',
+]);
 
 export default class Node implements INode {
   blockchain: Blockchain;
@@ -169,8 +177,8 @@ export default class Node implements INode {
     this._consensusCache = LRU(10000);
   }
 
-  get connectedPeersCount(): number {
-    return this._network.connectedPeers.length;
+  get connectedPeers(): Array<Endpoint> {
+    return this._network.connectedPeers.map(peer => peer.endpoint);
   }
 
   start(): Observable<*> {

@@ -11,7 +11,11 @@ import {
   crypto,
   deserializeTransactionWire,
 } from '@neo-one/client-core';
-import { type Blockchain, type Node } from '@neo-one/node-core';
+import {
+  type Blockchain,
+  type Node,
+  getEndpointConfig,
+} from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
 import { type Context } from 'koa';
 
@@ -142,7 +146,7 @@ export default ({
       });
       return blockSystemFee.systemFee.toString(10);
     },
-    getconnectioncount: async () => node.connectedPeersCount,
+    getconnectioncount: async () => node.connectedPeers.length,
     getcontractstate: async args => {
       const hash = JSONHelper.readUInt160(args[0]);
       const contract = await blockchain.contract.tryGet({ hash });
@@ -238,10 +242,12 @@ export default ({
 
       return { address: args[0], isvalid: scriptHash != null };
     },
-    getpeers: async () => {
-      // TODO: Implement me
-      throw server.error(-101, 'Not implemented');
-    },
+    getpeers: async () => ({
+      connected: node.connectedPeers.map(endpoint => {
+        const { host, port } = getEndpointConfig(endpoint);
+        return { address: host, port };
+      }),
+    }),
     // Extended
     relaytransaction: async args => {
       const transaction = deserializeTransactionWire({
