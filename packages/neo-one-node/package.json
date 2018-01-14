@@ -42,6 +42,7 @@
     "@neo-one/node-protocol": "^0.0.2",
     "@neo-one/node-rpc": "^0.0.2",
     "@neo-one/node-vm": "^0.0.2",
+    "@neo-one/node-offline": "^0.0.2",
     "@neo-one/utils": "^0.0.2",
     "leveldown": "^2.1.1",
     "levelup": "^2.0.1",

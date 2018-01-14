@@ -6,8 +6,12 @@ import {
   restore,
 } from '@neo-one/node-data-backup';
 import Blockchain from '@neo-one/node-blockchain';
-import { type Blockchain as BlockchainType } from '@neo-one/node-core';
-import { type Log, finalize, neverComplete } from '@neo-one/utils';
+import {
+  type Log,
+  finalize,
+  createProfile as createProfileDefault,
+  neverComplete,
+} from '@neo-one/utils';
 import Node, {
   type NodeEnvironment,
   type NodeOptions,
@@ -26,6 +30,7 @@ import { defer } from 'rxjs/observable/defer';
 import { concatMap, distinct, map, switchMap, take } from 'rxjs/operators';
 import { concat } from 'rxjs/observable/concat';
 import cron from 'node-cron';
+import { loadChain } from '@neo-one/node-offline';
 import { timer } from 'rxjs/observable/timer';
 import leveldown from 'leveldown';
 import levelup from 'levelup';
@@ -70,23 +75,27 @@ export type Options = {|
   backup?: BackupOptions,
 |};
 
-export default ({
-  log,
-  createLogForContext,
-  createProfile,
-  settings,
-  environment,
-  options$,
-  onCreateBlockchain,
-}: {|
+export type FullNodeOptions = {|
   log: Log,
-  createLogForContext: CreateLogForContext,
-  createProfile: CreateProfile,
+  createLogForContext?: CreateLogForContext,
+  createProfile?: CreateProfile,
   settings: Settings,
   environment: Environment,
   options$: Observable<Options>,
-  onCreateBlockchain?: (blockchain: BlockchainType) => Promise<void>,
-|}): Observable<*> => {
+  chainFile?: string,
+|};
+
+export default ({
+  log,
+  createLogForContext: createLogForContextIn,
+  createProfile: createProfileIn,
+  settings,
+  environment,
+  options$,
+  chainFile,
+}: FullNodeOptions): Observable<*> => {
+  const createLogForContext = createLogForContextIn || (() => log);
+  const createProfile = createProfileIn || createProfileDefault;
   const dataPath = path.resolve(environment.dataPath, 'data');
 
   const backupEnv = environment.backup || {};
@@ -123,8 +132,11 @@ export default ({
       vm,
       log,
     });
-    if (onCreateBlockchain != null) {
-      await onCreateBlockchain(blockchain);
+    if (chainFile != null) {
+      await loadChain({
+        chain: { format: 'raw', path: chainFile },
+        blockchain,
+      });
     }
 
     return { blockchain, storage };
