@@ -93,6 +93,11 @@ const defaultConfig = (dataPath: string) => ({
       server: {
         keepAliveTimeout: 60000,
       },
+      liveHealthCheck: {
+        rpcURLs: DEFAULT_RPC_URLS,
+        offset: 1,
+        timeoutMS: 5000,
+      },
       readyHealthCheck: {
         rpcURLs: DEFAULT_RPC_URLS,
         offset: 1,
@@ -230,13 +235,22 @@ export const createNodeConfig = ({
             },
             rpc: {
               type: 'object',
-              required: ['server', 'readyHealthCheck'],
+              required: ['server', 'liveHealthCheck', 'readyHealthCheck'],
               properties: {
                 server: {
                   type: 'object',
                   required: ['keepAliveTimeout'],
                   properties: {
                     keepAliveTimeout: { type: 'number' },
+                  },
+                },
+                liveHealthCheck: {
+                  type: 'object',
+                  required: ['rpcURLs', 'offset', 'timeoutMS'],
+                  properties: {
+                    rpcURLs: { type: 'array', items: { type: 'string' } },
+                    offset: { type: 'number' },
+                    timeoutMS: { type: 'number' },
                   },
                 },
                 readyHealthCheck: {
@@ -334,7 +348,9 @@ export default class NEOBlockchainNodeAdapter extends NodeAdapter {
 
   async _checkRPC(rpcPath: string): Promise<boolean> {
     try {
-      const response = await fetch(this._getAddress(rpcPath), { timeout: 500 });
+      const response = await fetch(this._getAddress(rpcPath), {
+        timeout: 5000,
+      });
       return response.status === 200;
     } catch (error) {
       if (error.code !== 'ECONNREFUSED') {
@@ -416,6 +432,11 @@ export default class NEOBlockchainNodeAdapter extends NodeAdapter {
         rpc: {
           server: {
             keepAliveTimeout: 60000,
+          },
+          liveHealthCheck: {
+            rpcURLs: settings.rpcEndpoints,
+            offset: 1,
+            timeoutMS: 5000,
           },
           readyHealthCheck: {
             rpcURLs: settings.rpcEndpoints,

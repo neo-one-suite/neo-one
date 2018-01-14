@@ -227,6 +227,10 @@ export default class Blockchain {
     return this._currentBlock == null ? -1 : this._currentBlock.index;
   }
 
+  get isPersistingBlock(): boolean {
+    return this._persistingBlocks;
+  }
+
   persistBlock({
     block,
     unsafe,

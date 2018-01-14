@@ -19,6 +19,7 @@ import {
 import {
   type CreateLogForContext,
   type CreateProfile,
+  type LiveHealthCheckOptions,
   type ReadyHealthCheckOptions,
   context,
   cors,
@@ -60,6 +61,7 @@ export type Environment = {|
 
 export type Options = {|
   server: ServerOptions,
+  liveHealthCheck: LiveHealthCheckOptions,
   readyHealthCheck: ReadyHealthCheckOptions,
 |};
 
@@ -151,10 +153,11 @@ export default ({
   environment: Environment,
   options$: Observable<Options>,
 |}): Observable<$FlowFixMe> => {
-  const app$ = options$.pipe(
-    map(options => options.readyHealthCheck),
-    distinct(),
-    map(readyHealthCheckOptions => {
+  const app$ = combineLatest(
+    options$.pipe(map(options => options.liveHealthCheck), distinct()),
+    options$.pipe(map(options => options.readyHealthCheck), distinct()),
+  ).pipe(
+    map(([liveHealthCheckOptions, readyHealthCheckOptions]) => {
       const app = new Koa();
       app.proxy = true;
       // $FlowFixMe
@@ -164,7 +167,7 @@ export default ({
 
       const middlewares = [
         context({ createLog: createLogForContext, createProfile }),
-        liveHealthCheck,
+        liveHealthCheck({ blockchain, options: liveHealthCheckOptions }),
         readyHealthCheck({ blockchain, options: readyHealthCheckOptions }),
         logger,
         cors,
