@@ -39,6 +39,20 @@ export type NodeConfig = {|
   options: FullNodeOptions,
 |};
 
+const DEFAULT_RPC_URLS = [
+  'http://seed1.cityofzion.io:8080',
+  'http://seed2.cityofzion.io:8080',
+  'http://seed3.cityofzion.io:8080',
+  'http://seed4.cityofzion.io:8080',
+  'http://seed5.cityofzion.io:8080',
+  'https://seed1.neo.org:10332',
+  'http://seed2.neo.org:10332',
+  'http://seed3.neo.org:10332',
+  'http://seed4.neo.org:10332',
+  'http://seed5.neo.org:10332',
+  'http://api.otcgo.cn:10332',
+];
+
 const defaultConfig = (dataPath: string) => ({
   log: {
     level: 'info',
@@ -73,24 +87,14 @@ const defaultConfig = (dataPath: string) => ({
           { type: 'tcp', host: 'seed5.neo.org', port: 10333 },
         ].map(seed => createEndpoint(seed)),
       },
+      rpcURLs: DEFAULT_RPC_URLS,
     },
     rpc: {
       server: {
         keepAliveTimeout: 60000,
       },
       readyHealthCheck: {
-        rpcEndpoints: [
-          'http://seed1.cityofzion.io:8080',
-          'http://seed2.cityofzion.io:8080',
-          'http://seed3.cityofzion.io:8080',
-          'http://seed4.cityofzion.io:8080',
-          'http://seed5.cityofzion.io:8080',
-          'https://seed1.neo.org:10332',
-          'http://seed2.neo.org:10332',
-          'http://seed3.neo.org:10332',
-          'http://seed4.neo.org:10332',
-          'http://seed5.neo.org:10332',
-        ],
+        rpcURLs: DEFAULT_RPC_URLS,
         offset: 1,
         timeoutMS: 5000,
       },
@@ -195,28 +199,33 @@ export const createNodeConfig = ({
           required: ['node', 'rpc'],
           properties: {
             node: {
-              consensus: {
-                type: 'object',
-                required: ['enabled', 'options'],
-                properties: {
-                  enabled: { type: 'boolean' },
-                  options: {
-                    type: 'object',
-                    required: ['privateKey', 'privateNet'],
-                    properties: {
-                      privateKey: { type: 'string' },
-                      privateNet: { type: 'boolean' },
+              type: 'object',
+              required: ['consensus', 'rpcURLs', 'network'],
+              properties: {
+                consensus: {
+                  type: 'object',
+                  required: ['enabled', 'options'],
+                  properties: {
+                    enabled: { type: 'boolean' },
+                    options: {
+                      type: 'object',
+                      required: ['privateKey', 'privateNet'],
+                      properties: {
+                        privateKey: { type: 'string' },
+                        privateNet: { type: 'boolean' },
+                      },
                     },
                   },
                 },
-              },
-              network: {
-                type: 'object',
-                required: ['seeds'],
-                properties: {
-                  seeds: { type: 'array', items: { type: 'string' } },
-                  maxConnectedPeers: { type: 'number' },
+                network: {
+                  type: 'object',
+                  required: ['seeds'],
+                  properties: {
+                    seeds: { type: 'array', items: { type: 'string' } },
+                    maxConnectedPeers: { type: 'number' },
+                  },
                 },
+                rpcURLs: { type: 'array', items: { type: 'string' } },
               },
             },
             rpc: {
@@ -232,9 +241,9 @@ export const createNodeConfig = ({
                 },
                 readyHealthCheck: {
                   type: 'object',
-                  required: ['rpcEndpoints', 'offset', 'timeoutMS'],
+                  required: ['rpcURLs', 'offset', 'timeoutMS'],
                   properties: {
-                    rpcEndpoints: { type: 'array', items: { type: 'string' } },
+                    rpcURLs: { type: 'array', items: { type: 'string' } },
                     offset: { type: 'number' },
                     timeoutMS: { type: 'number' },
                   },
@@ -402,13 +411,14 @@ export default class NEOBlockchainNodeAdapter extends NodeAdapter {
           network: {
             seeds: (settings.seeds: $FlowFixMe),
           },
+          rpcURLs: settings.rpcEndpoints,
         },
         rpc: {
           server: {
             keepAliveTimeout: 60000,
           },
           readyHealthCheck: {
-            rpcEndpoints: settings.rpcEndpoints,
+            rpcURLs: settings.rpcEndpoints,
             offset: 1,
             timeoutMS: 5000,
           },

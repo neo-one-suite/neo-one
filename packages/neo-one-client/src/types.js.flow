@@ -16,6 +16,11 @@ export type Hash160String = string;
 // NEO Hash256 string, e.g. 0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c
 export type Hash256String = string;
 
+export type Peer = {|
+  address: string,
+  port: number,
+|};
+
 export type ContractParameterType =
   | 'Signature'
   | 'Boolean'
@@ -613,6 +618,8 @@ export interface DataProvider {
   getTransaction(hash: Hash256String): Promise<Transaction>;
 
   getValidators(): Promise<Array<Validator>>;
+
+  getConnectedPeers(): Promise<Array<Peer>>;
 
   _getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem>;
   _iterStorage(hash: Hash160String): AsyncIterable<StorageItem>;

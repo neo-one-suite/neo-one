@@ -1,14 +1,10 @@
 /* @flow */
-export {
-  default as NEOBlockchainNodeAdapter,
-} from './NEOBlockchainNodeAdapter';
+export { default as NEOONENodeAdapter } from './NEOONENodeAdapter';
 export { default as NodeAdapter } from './NodeAdapter';
 
 export {
-  createNodeConfig as createNEOBlockchainNodeConfig,
-} from './NEOBlockchainNodeAdapter';
+  createNodeConfig as createNEOONENodeConfig,
+} from './NEOONENodeAdapter';
 
 export type { Node } from './NodeAdapter';
-export type {
-  NodeConfig as NEOBlockchainNodeConfig,
-} from './NEOBlockchainNodeAdapter';
+export type { NodeConfig as NEOONENodeConfig } from './NEOONENodeAdapter';

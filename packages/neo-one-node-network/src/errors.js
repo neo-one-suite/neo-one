@@ -21,3 +21,12 @@ export class UnsupportedEndpointType extends CustomError {
     this.code = 'UNSUPPORTED_ENDPOINT';
   }
 }
+
+export class SocketTimeoutError extends CustomError {
+  code: string;
+
+  constructor() {
+    super('Socket inactive.');
+    this.code = 'SOCKET_TIMEOUT';
+  }
+}

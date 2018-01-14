@@ -59,7 +59,7 @@ const fetchTallestBlockIndex = async (
 };
 
 export type Options = {|
-  rpcEndpoints: Array<string>,
+  rpcURLs: Array<string>,
   offset: number,
   timeoutMS: number,
 |};
@@ -76,11 +76,11 @@ export default ({
     mount('/ready_health_check', async (ctx: Context) => {
       const log = getLog(ctx);
       const index = await fetchTallestBlockIndex(
-        options.rpcEndpoints,
+        options.rpcURLs,
         options.timeoutMS,
       );
       if (
-        options.rpcEndpoints.length === 0 ||
+        options.rpcURLs.length === 0 ||
         (index != null &&
           blockchain.currentBlockIndex >= index - options.offset)
       ) {

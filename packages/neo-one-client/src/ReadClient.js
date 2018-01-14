@@ -13,6 +13,7 @@ import type {
   GetOptions,
   Hash160String,
   Hash256String,
+  Peer,
   ReadSmartContract,
   StorageItem,
   Transaction,
@@ -76,6 +77,10 @@ export default class ReadClient<TDataProvider: DataProvider> {
 
   getValidators(): Promise<Array<Validator>> {
     return this.dataProvider.getValidators();
+  }
+
+  getConnectedPeers(): Promise<Array<Peer>> {
+    return this.dataProvider.getConnectedPeers();
   }
 
   smartContract(hash: Hash160String, abi: ABI): ReadSmartContract {

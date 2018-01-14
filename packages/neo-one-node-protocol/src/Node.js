@@ -1,5 +1,6 @@
 /* @flow */
 // flowlint untyped-import:off
+import { Address6 } from 'ip-address';
 import {
   type ConnectedPeer,
   type EventMessage as NetworkEventMessage,
@@ -35,12 +36,12 @@ import type { Observable } from 'rxjs/Observable';
 import { ScalingBloem } from 'bloem';
 
 import _ from 'lodash';
+import { createReadClient } from '@neo-one/client';
 import { defer } from 'rxjs/observable/defer';
-import { distinct, map, switchMap } from 'rxjs/operators';
+import { distinct, map, switchMap, take } from 'rxjs/operators';
 import { empty } from 'rxjs/observable/empty';
 import { merge } from 'rxjs/observable/merge';
 import { finalize, neverComplete, utils as commonUtils } from '@neo-one/utils';
-import net from 'net';
 import { timer } from 'rxjs/observable/timer';
 
 import { COMMAND } from './Command';
@@ -73,6 +74,7 @@ export type Options = {|
     options: ConsensusOptions,
   |},
   network: NetworkOptions,
+  rpcURLs: Array<string>,
 |};
 
 const createPeerBloomFilter = ({
@@ -113,9 +115,15 @@ const LOCAL_HOST_ADDRESSES = new Set([
   '::1',
 ]);
 
+type PeerHealth = {
+  healthy: boolean,
+  blockIndex: number,
+  checkTimeSeconds: number,
+};
+
 export default class Node implements INode {
   blockchain: Blockchain;
-  _network: Network<Message, PeerData>;
+  _network: Network<Message, PeerData, PeerHealth>;
   _consensus: ?Consensus;
   _options$: Observable<Options>;
 
@@ -136,6 +144,7 @@ export default class Node implements INode {
   _getBlocksRequestsCount: number;
   _bestPeer: ?ConnectedPeer<Message, PeerData>;
   _consensusCache: LRU;
+  _blockIndex: { [endpoint: Endpoint]: number };
 
   constructor({
     blockchain,
@@ -151,6 +160,7 @@ export default class Node implements INode {
       environment: environment.network,
       options$: options$.pipe(map(options => options.network), distinct()),
       negotiate: this._negotiate,
+      checkPeerHealth: this._checkPeerHealth,
       createMessageTransform: () =>
         new MessageTransform(this.blockchain.deserializeWireContext),
       onMessageReceived: this._onMessageReceived.bind(this),
@@ -175,6 +185,7 @@ export default class Node implements INode {
     this._getBlocksRequestTime = null;
     this._getBlocksRequestsCount = 1;
     this._consensusCache = LRU(10000);
+    this._blockIndex = {};
   }
 
   get connectedPeers(): Array<Endpoint> {
@@ -360,9 +371,9 @@ export default class Node implements INode {
 
     this._checkVersion(message, versionPayload);
 
-    let address;
     const { host } = getEndpointConfig(peer.endpoint);
-    if (net.isIPv4(host)) {
+    let address;
+    if (NetworkAddress.isValid(host)) {
       address = new NetworkAddress({
         host,
         port: versionPayload.port,
@@ -387,6 +398,26 @@ export default class Node implements INode {
       },
       relay: versionPayload.relay,
     };
+  };
+
+  _checkPeerHealth = (
+    peer: ConnectedPeer<Message, PeerData>,
+    prevHealth?: PeerHealth,
+  ) => {
+    const checkTimeSeconds = commonUtils.nowSeconds();
+    const blockIndex = this._blockIndex[peer.endpoint];
+    const health = { healthy: true, checkTimeSeconds, blockIndex };
+    if (
+      prevHealth == null ||
+      (prevHealth.blockIndex != null &&
+        prevHealth.blockIndex < health.blockIndex) ||
+      (prevHealth.blockIndex == null &&
+        health.checkTimeSeconds - prevHealth.checkTimeSeconds < 45)
+    ) {
+      return health;
+    }
+
+    return { healthy: false, checkTimeSeconds, blockIndex };
   };
 
   _onEvent = (event: NetworkEventMessage<Message, PeerData>) => {
@@ -517,7 +548,57 @@ export default class Node implements INode {
 
   _onRequestEndpoints = _.throttle((): void => {
     this._relay(this._createMessage({ command: COMMAND.GET_ADDR }));
+    this._fetchEndpointsFromRPC();
   }, 5000);
+
+  async _fetchEndpointsFromRPC(): Promise<void> {
+    try {
+      await this._doFetchEndpointsFromRPC();
+    } catch (error) {
+      this.blockchain.log({
+        event: 'NODE_FETCH_ENDPOINTS_FROM_RPC_ERROR',
+        error,
+      });
+    }
+  }
+
+  async _doFetchEndpointsFromRPC(): Promise<void> {
+    const { rpcURLs } = await this._options$.pipe(take(1)).toPromise();
+    await Promise.all(
+      rpcURLs.map(rpcURL => this._fetchEndpointsFromRPCURL(rpcURL)),
+    );
+  }
+
+  async _fetchEndpointsFromRPCURL(rpcURL: string): Promise<void> {
+    const readClient = createReadClient({
+      network: 'doesntmatter',
+      rpcURL,
+    });
+    try {
+      const peers = await readClient.getConnectedPeers();
+      peers
+        .map(peer => {
+          const { address, port } = peer;
+          const host = new Address6(address);
+          return { host: host.canonicalForm() || '', port };
+        })
+        .filter(endpoint => !LOCAL_HOST_ADDRESSES.has(endpoint.host))
+        .map(endpoint =>
+          createEndpoint({
+            type: 'tcp',
+            host: endpoint.host,
+            port: endpoint.port,
+          }),
+        )
+        .forEach(endpoint => this._network.addEndpoint(endpoint));
+    } catch (error) {
+      this.blockchain.log({
+        event: 'NODE_FETCH_ENDPOINTS_FROM_RPC_URL_ERROR',
+        error,
+        rpcURL,
+      });
+    }
+  }
 
   _onMessageReceived(
     peer: ConnectedPeer<Message, PeerData>,
@@ -545,7 +626,9 @@ export default class Node implements INode {
           this._onAddrMessageReceived(message.value.payload);
           break;
         case COMMAND.BLOCK:
-          this._onBlockMessageReceived(message.value.payload).catch(onError);
+          this._onBlockMessageReceived(peer, message.value.payload).catch(
+            onError,
+          );
           break;
         case COMMAND.CONSENSUS:
           this._onConsensusMessageReceived(message.value.payload).catch(
@@ -634,12 +717,19 @@ export default class Node implements INode {
       .forEach(endpoint => this._network.addEndpoint(endpoint));
   }
 
-  async _onBlockMessageReceived(block: Block): Promise<void> {
+  async _onBlockMessageReceived(
+    peer: ConnectedPeer<Message, PeerData>,
+    block: Block,
+  ): Promise<void> {
     this.blockchain.log({
       event: 'BLOCK_RECEIVED',
       level: 'debug',
       index: block.index,
     });
+    this._blockIndex[peer.endpoint] = Math.max(
+      block.index,
+      this._blockIndex[peer.endpoint] || 0,
+    );
     await this._persistBlock(block);
   }
 

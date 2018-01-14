@@ -22,7 +22,8 @@ import {
   type GetOptions,
   type Hash160String,
   type Hash256String,
-} from '../../types'; // eslint-disable-line
+  type Peer,
+} from '../../types';
 import { type JSONRPCProvider } from './JSONRPCProvider';
 import { RelayTransactionError } from '../../errors';
 
@@ -192,6 +193,14 @@ export default class JSONRPCClient {
     return this._provider.request({
       method: 'getvalidators',
     });
+  }
+
+  getConnectedPeers(): Promise<Array<Peer>> {
+    return this._provider
+      .request({
+        method: 'getpeers',
+      })
+      .then(result => result.connected);
   }
 
   getNetworkSettings(): Promise<NetworkSettingsJSON> {

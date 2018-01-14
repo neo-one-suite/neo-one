@@ -47,6 +47,11 @@ export type EventMessage<Message, PeerData> =
       extra: {| connectedPeer: ConnectedPeer<Message, PeerData> |},
     |}
   | {|
+      event: 'PEER_UNHEALTHY',
+      message: string,
+      data: {| peer: string |},
+    |}
+  | {|
       event: 'PEER_ERROR',
       message: string,
       data: {| error?: Error, peer: string |},

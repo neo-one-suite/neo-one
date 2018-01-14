@@ -48,6 +48,7 @@ import type {
   NetworkSettings,
   NetworkType,
   Output,
+  Peer,
   StorageItem,
   Transaction,
   TransactionReceipt,
@@ -208,6 +209,10 @@ export default class NEOONEDataProvider implements DataProvider {
 
   getValidators(): Promise<Array<Validator>> {
     return this._client.getValidators();
+  }
+
+  getConnectedPeers(): Promise<Array<Peer>> {
+    return this._client.getConnectedPeers();
   }
 
   async getNetworkSettings(): Promise<NetworkSettings> {

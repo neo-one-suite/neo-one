@@ -5,6 +5,7 @@ import { type Endpoint, getEndpointConfig } from '@neo-one/node-core';
 import net from 'net';
 
 import Peer from './Peer';
+import { SocketTimeoutError } from './errors';
 
 type TCPPeerOptions<Message> = {|
   endpoint: Endpoint,
@@ -41,29 +42,49 @@ export default class TCPPeer<Message> extends Peer<Message> {
 
   async _connect(): Promise<void> {
     return new Promise((resolve, reject) => {
+      let handled = false;
+      const onDone = () => {
+        if (!handled) {
+          handled = true;
+          this._socket.setTimeout(this._timeoutMS, () => {
+            this._onError(new SocketTimeoutError());
+          });
+          resolve();
+        }
+      };
+      const onError = error => {
+        if (!handled) {
+          handled = true;
+          reject(error);
+        }
+      };
       this._socket.once('error', error => {
-        this.close();
-        reject(error);
+        onError(error);
+      });
+      this._socket.once('close', () => {
+        onError(new Error('Closed'));
       });
       this._socket.setTimeout(this._timeoutMS, () => {
-        this.close();
+        onError(new SocketTimeoutError());
       });
       if (this._initialConnected) {
-        resolve();
+        onDone();
       } else {
         this._socket.connect(
           {
             host: this._host,
             port: this._port,
           },
-          () => resolve(),
+          () => onDone(),
         );
       }
     });
   }
 
   _close(): void {
-    this._socket.end();
+    if (this._socket.connecting === false) {
+      this._socket.end();
+    }
     this._socket.destroy();
   }
 }

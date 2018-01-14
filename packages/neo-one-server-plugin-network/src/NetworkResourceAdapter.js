@@ -21,7 +21,7 @@ import { timer } from 'rxjs/observable/timer';
 import fs from 'fs-extra';
 import path from 'path';
 
-import { type NodeAdapter, NEOBlockchainNodeAdapter } from './node';
+import { type NodeAdapter, NEOONENodeAdapter } from './node';
 import type { NetworkType, NodeSettings } from './types';
 import type NetworkResourceType, {
   Network,
@@ -104,14 +104,25 @@ export default class NetworkResourceAdapter {
       switchMap(() =>
         combineLatest(this._nodes.map(node => node.node$)).pipe(
           switchMap(async currentNodes => {
-            const readyNode = currentNodes.find(node => node.ready);
+            const readyNode =
+              currentNodes.find(node => node.ready) ||
+              currentNodes.find(node => node.live) ||
+              currentNodes[0];
             let height = null;
+            let peers = null;
             if (readyNode != null) {
               const client = createReadClient({
                 network: this._name,
                 rpcURL: readyNode.rpcAddress,
               });
-              height = await client.getBlockCount();
+              try {
+                [height, peers] = await Promise.all([
+                  client.getBlockCount(),
+                  client.getConnectedPeers(),
+                ]);
+              } catch (error) {
+                // eslint-disable-next-line
+              }
             }
 
             return {
@@ -122,6 +133,7 @@ export default class NetworkResourceAdapter {
               state: this._state,
               type: this._type,
               height,
+              peers: peers == null ? peers : peers.length,
               nodes: currentNodes,
             };
           }),
@@ -350,6 +362,7 @@ export default class NetworkResourceAdapter {
         'http://seed3.neo.org:10332',
         'http://seed4.neo.org:10332',
         'http://seed5.neo.org:10332',
+        'http://api.otcgo.cn:10332',
       ],
     };
   }
@@ -464,7 +477,7 @@ export default class NetworkResourceAdapter {
     { name, dataPath, settings, options }: NodeOptions,
   ): NodeAdapter {
     if (options.type == null || options.type === 'neo-one') {
-      return new NEOBlockchainNodeAdapter({
+      return new NEOONENodeAdapter({
         log: resourceType.plugin.log,
         name,
         binary,

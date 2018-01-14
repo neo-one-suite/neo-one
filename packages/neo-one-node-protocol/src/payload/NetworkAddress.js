@@ -7,6 +7,7 @@ import {
   type SerializeWire,
   type SerializableWire,
   BinaryReader,
+  InvalidFormatError,
   createSerializeWire,
 } from '@neo-one/client-core';
 
@@ -34,14 +35,10 @@ export default class NetworkAddress
   }
 
   serializeWireBase(writer: BinaryWriter): void {
-    const parts = this.host.split('.');
-    let address;
-    if (parts.length === 4) {
-      address = new Address6(Address6.fromAddress4(this.host).to4in6());
-    } else {
-      address = new Address6(this.host);
+    const address = this.constructor.getAddress6(this.host);
+    if (address == null) {
+      throw new InvalidFormatError();
     }
-
     writer.writeUInt32LE(this.timestamp);
     writer.writeUInt64LE(this.services);
     writer.writeBytes(address.toByteArray());
@@ -62,7 +59,7 @@ export default class NetworkAddress
     return new this({
       timestamp,
       services,
-      host: address.canonicalForm() || '',
+      host: address == null ? '' : address.canonicalForm() || '',
       port,
     });
   }
@@ -72,5 +69,31 @@ export default class NetworkAddress
       context: options.context,
       reader: new BinaryReader(options.buffer),
     });
+  }
+
+  static isValid(host: string): boolean {
+    const address = this.getAddress6(host);
+    if (address == null) {
+      return false;
+    }
+
+    try {
+      address.toByteArray();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  static getAddress6(host: string): ?Address6 {
+    const parts = host.split('.');
+    let address;
+    if (parts.length === 4) {
+      address = Address6.fromAddress4(host);
+    } else {
+      address = new Address6(host);
+    }
+
+    return address;
   }
 }

@@ -30,6 +30,7 @@ export type Network = {|
   state: ResourceState,
   type: NetworkType,
   height: ?number,
+  peers: ?number,
   nodes: Array<Node>,
 |};
 export type NetworkResourceOptions = {
@@ -93,6 +94,7 @@ export default class NetworkResourceType extends ResourceType<
         resource.name,
         resource.type,
         resource.height == null ? 'Unknown' : `${resource.height}`,
+        resource.peers == null ? '0' : `${resource.peers}`,
         `${resource.nodes.length}`,
       ]),
     );
@@ -107,13 +109,17 @@ export default class NetworkResourceType extends ResourceType<
         'Nodes',
         {
           type: 'list',
-          table: [['Name', 'Live', 'Ready', 'RPC', 'TCP']].concat(
+          table: [
+            ['Name', 'Live', 'Ready', 'RPC', 'TCP', 'Height', 'Peers'],
+          ].concat(
             _.sortBy(resource.nodes, node => node.name).map(node => [
               node.name,
               node.live ? 'Yes' : 'No',
               node.ready ? 'Yes' : 'No',
               node.rpcAddress,
               node.tcpAddress,
+              resource.height == null ? 'Unknown' : `${resource.height}`,
+              resource.peers == null ? '0' : `${resource.peers}`,
             ]),
           ),
         },

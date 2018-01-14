@@ -36,6 +36,10 @@ export default ({
           ]
         : [],
   });
+  logger.on('error', error => {
+    // eslint-disable-next-line
+    console.error(error);
+  });
   const log = (logMessage: LogMessage, callbackIn?: () => void) => {
     const { error, ...rest } = logMessage;
     let { level } = logMessage;
@@ -61,18 +65,28 @@ export default ({
       logger.log(message);
       if (onExit != null) {
         const onExitNonNull = onExit;
+        let exited = false;
+        const doExit = () => {
+          if (!exited) {
+            exited = true;
+            onExitNonNull();
+          }
+        };
         const numFlushes = logger.transports.length;
         let numFlushed = 0;
         logger.transports.forEach(transport => {
           transport.once('finish', () => {
             numFlushed += 1;
             if (numFlushes === numFlushed) {
-              setTimeout(() => onExitNonNull(), 10);
+              setTimeout(() => doExit(), 10);
             }
           });
 
           transport.end();
         });
+
+        // Force an exit
+        setTimeout(() => doExit(), 5000);
       }
     } else if (onExit != null) {
       onExit();

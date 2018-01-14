@@ -8,7 +8,7 @@ import fs from 'fs-extra';
 import fullNode$ from '@neo-one/node';
 import path from 'path';
 
-import { createNEOBlockchainNodeConfig } from './node';
+import { createNEOONENodeConfig } from './node';
 
 export default ({
   vorpal,
@@ -22,7 +22,7 @@ export default ({
     .action(async args => {
       const { dataPath } = args;
 
-      const nodeConfig = createNEOBlockchainNodeConfig({ dataPath, log });
+      const nodeConfig = createNEOONENodeConfig({ dataPath, log });
 
       const logPath = path.resolve(dataPath, 'log');
       const logSubscription = nodeConfig.config$

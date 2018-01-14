@@ -6,10 +6,10 @@ import {
   getEndpointConfig,
 } from '@neo-one/node-core';
 import type { Observable } from 'rxjs/Observable';
+import type { Subscription } from 'rxjs/Subscription';
 
 import _ from 'lodash';
 import net from 'net';
-import { take } from 'rxjs/operators';
 import { utils } from '@neo-one/utils';
 
 import ConnectedPeer from './ConnectedPeer';
@@ -30,20 +30,29 @@ export type NegotiateResult<PeerData> = {|
 
 export type Environment = {|
   listenTCP?: ListenTCP,
-  externalEndpoints?: Array<Endpoint>,
-  connectPeersDelayMS?: number,
-  socketTimeoutMS?: number,
 |};
 
 export type Options = {|
   seeds: Array<Endpoint>,
   maxConnectedPeers?: number,
+  externalEndpoints?: Array<Endpoint>,
+  connectPeersDelayMS?: number,
+  socketTimeoutMS?: number,
+  connectErrorCodes?: Array<string>,
 |};
 
-type NetworkOptions<Message, PeerData> = {|
+export type PeerHealthBase = {
+  healthy: boolean,
+};
+
+type NetworkOptions<Message, PeerData, PeerHealth: PeerHealthBase> = {|
   environment: Environment,
   options$: Observable<Options>,
   negotiate: (peer: Peer<Message>) => Promise<NegotiateResult<PeerData>>,
+  checkPeerHealth: (
+    connectedPeer: ConnectedPeer<Message, PeerData>,
+    previousHealth?: PeerHealth,
+  ) => PeerHealth,
   createMessageTransform: () => Duplex,
   onMessageReceived: (
     peer: ConnectedPeer<Message, PeerData>,
@@ -64,28 +73,50 @@ const normalizeEndpoint = (endpoint: Endpoint) => {
   });
 };
 
-export default class Network<Message, PeerData> {
+const EXTERNAL_ENDPOINTS = new Set();
+const MAX_CONNECTED_PEERS = 20;
+const CONNECT_PEERS_DELAY_MS = 5000;
+const SOCKET_TIMEOUT_MS = 1000 * 60;
+const CONNECT_ERROR_CODES = new Set([
+  'ECONNREFUSED',
+  'ERR_INVALID_IP_ADDRESS',
+  'EHOSTUNREACH',
+  'ENETUNREACH',
+  'SOCKET_TIMEOUT',
+  'RECEIVE_MESSAGE_TIMEOUT',
+]);
+
+export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
   _started: boolean;
   _stopped: boolean;
 
   _externalEndpoints: Set<Endpoint>;
-  _connectPeersDelayMS: number;
   _maxConnectedPeers: number;
+  _connectPeersDelayMS: number;
   _options$: Observable<Options>;
   _socketTimeoutMS: number;
+  _connectErrorCodes: Set<string>;
 
   _connectedPeers: { [endpoint: Endpoint]: ConnectedPeer<Message, PeerData> };
   _connectingPeers: { [endpoint: Endpoint]: boolean };
   _unconnectedPeers: Set<Endpoint>;
   _endpointBlacklist: Set<Endpoint>;
   _reverseBlacklist: { [endpoint: Endpoint]: Endpoint };
+  _badEndpoints: Set<Endpoint>;
+  _previousHealth: { [endpoint: Endpoint]: PeerHealth };
+  _seeds: Set<Endpoint>;
 
   _listenTCP: ?ListenTCP;
   _tcpServer: ?net.Server;
 
   _connectPeersTimeout: ?TimeoutID;
+  _subscription: ?Subscription;
 
   __negotiate: (peer: Peer<Message>) => Promise<NegotiateResult<PeerData>>;
+  __checkPeerHealth: (
+    connectedPeer: ConnectedPeer<Message, PeerData>,
+    previousHealth?: PeerHealth,
+  ) => PeerHealth;
   __createMessageTransform: () => Duplex;
   __onMessageReceived: (
     peer: ConnectedPeer<Message, PeerData>,
@@ -94,31 +125,26 @@ export default class Network<Message, PeerData> {
   __onRequestEndpoints: () => void;
   __onEvent: OnEvent<Message, PeerData>;
 
-  constructor(options: NetworkOptions<Message, PeerData>) {
+  constructor(options: NetworkOptions<Message, PeerData, PeerHealth>) {
     const { environment, options$ } = options;
     this._started = false;
     this._stopped = false;
 
-    this._externalEndpoints = new Set(environment.externalEndpoints || []);
-    this._connectPeersDelayMS =
-      environment.connectPeersDelayMS == null
-        ? 1000
-        : environment.connectPeersDelayMS;
-    this._maxConnectedPeers =
-      environment.maxConnectedPeers == null
-        ? 10
-        : environment.maxConnectedPeers;
+    this._externalEndpoints = EXTERNAL_ENDPOINTS;
+    this._maxConnectedPeers = MAX_CONNECTED_PEERS;
+    this._connectPeersDelayMS = CONNECT_PEERS_DELAY_MS;
     this._options$ = options$;
-    this._socketTimeoutMS =
-      environment.socketTimeoutMS == null
-        ? 1000 * 60
-        : environment.socketTimeoutMS;
+    this._socketTimeoutMS = SOCKET_TIMEOUT_MS;
+    this._connectErrorCodes = CONNECT_ERROR_CODES;
 
     this._connectedPeers = {};
     this._connectingPeers = {};
     this._unconnectedPeers = new Set();
     this._endpointBlacklist = new Set();
     this._reverseBlacklist = {};
+    this._badEndpoints = new Set();
+    this._previousHealth = {};
+    this._seeds = new Set();
 
     this._listenTCP = environment.listenTCP;
     this._tcpServer = null;
@@ -126,6 +152,7 @@ export default class Network<Message, PeerData> {
     this._connectPeersTimeout = null;
 
     this.__negotiate = options.negotiate;
+    this.__checkPeerHealth = options.checkPeerHealth;
     this.__createMessageTransform = options.createMessageTransform;
     this.__onMessageReceived = options.onMessageReceived;
     this.__onRequestEndpoints = options.onRequestEndpoints;
@@ -150,13 +177,33 @@ export default class Network<Message, PeerData> {
     });
 
     try {
+      this._subscription = this._options$.subscribe({
+        next: options => {
+          this._seeds = new Set(options.seeds);
+          options.seeds.forEach(seed => this.addEndpoint(seed));
+          this._maxConnectedPeers =
+            options.maxConnectedPeers == null
+              ? MAX_CONNECTED_PEERS
+              : options.maxConnectedPeers;
+          this._externalEndpoints =
+            options.externalEndpoints == null
+              ? EXTERNAL_ENDPOINTS
+              : new Set(options.externalEndpoints);
+          this._connectPeersDelayMS =
+            options.connectPeersDelayMS == null
+              ? CONNECT_PEERS_DELAY_MS
+              : options.connectPeersDelayMS;
+          this._socketTimeoutMS =
+            options.socketTimeoutMS == null
+              ? SOCKET_TIMEOUT_MS
+              : options.socketTimeoutMS;
+          this._connectErrorCodes =
+            options.connectErrorCodes == null
+              ? CONNECT_ERROR_CODES
+              : new Set(options.connectErrorCodes);
+        },
+      });
       this._startServer();
-    } catch (error) {
-      this._started = false;
-      throw error;
-    }
-
-    try {
       this._run();
     } catch (error) {
       this._started = false;
@@ -188,6 +235,10 @@ export default class Network<Message, PeerData> {
 
       if (this._tcpServer != null) {
         this._tcpServer.close();
+      }
+
+      if (this._subscription != null) {
+        this._subscription.unsubscribe();
       }
 
       this._started = false;
@@ -259,8 +310,8 @@ export default class Network<Message, PeerData> {
     });
     while (!this._stopped) {
       try {
-        // eslint-disable-next-line
-        await this._connectToPeers();
+        this._connectToPeers();
+        this._checkPeerHealth();
         // eslint-disable-next-line
         await new Promise(resolve => {
           this._connectPeersTimeout = setTimeout(() => {
@@ -278,36 +329,53 @@ export default class Network<Message, PeerData> {
     }
   }
 
-  async _connectToPeers(): Promise<void> {
+  _connectToPeers(): void {
     const connectedPeersCount = Object.keys(this._connectedPeers).length;
-    let endpoints = [];
-    const {
-      seeds,
-      maxConnectedPeers: maxConnectedPeersIn,
-    } = await this._options$.pipe(take(1)).toPromise();
-    const maxConnectedPeers =
-      maxConnectedPeersIn == null ? 20 : maxConnectedPeersIn;
+    const endpoints = [];
+    const maxConnectedPeers = this._maxConnectedPeers;
     if (connectedPeersCount < maxConnectedPeers) {
-      const count = maxConnectedPeers - connectedPeersCount;
+      const count = (maxConnectedPeers - connectedPeersCount) * 2;
       endpoints.push(
         ..._.shuffle(
           [...this._unconnectedPeers].filter(
-            peer => !this._endpointBlacklist.has(peer),
+            peer =>
+              !this._endpointBlacklist.has(peer) &&
+              !this._badEndpoints.has(peer),
           ),
         ).slice(0, count),
       );
     }
 
     if (endpoints.length + connectedPeersCount < maxConnectedPeers) {
+      this._resetBadEndpoints();
       this.__onRequestEndpoints();
     }
 
-    endpoints.push(...seeds);
-    endpoints = endpoints.filter(
-      endpoint => !this._endpointBlacklist.has(endpoint),
-    );
-
     endpoints.forEach(endpoint => this._connectToPeer({ endpoint }));
+  }
+
+  _checkPeerHealth(): void {
+    for (const peer of utils.values(this._connectedPeers)) {
+      const health = this.__checkPeerHealth(
+        peer,
+        this._previousHealth[peer.endpoint],
+      );
+      if (health.healthy) {
+        this._previousHealth[peer.endpoint] = health;
+      } else {
+        this.__onEvent({
+          event: 'PEER_UNHEALTHY',
+          message: `Peer at ${peer.endpoint} is unhealthy, closing`,
+          data: { peer: peer.endpoint },
+        });
+        this._badEndpoints.add(peer.endpoint);
+        peer.close();
+      }
+    }
+  }
+
+  _resetBadEndpoints() {
+    this._badEndpoints = new Set();
   }
 
   async _connectToPeer({
@@ -348,6 +416,9 @@ export default class Network<Message, PeerData> {
         message: `Failed to connect to peer at ${endpoint}: ${error.message}`,
         data: { error, peer: endpoint },
       });
+      if (this._connectErrorCodes.has(error.code)) {
+        this._badEndpoints.add(endpoint);
+      }
     } finally {
       delete this._connectingPeers[endpoint];
     }
@@ -360,8 +431,9 @@ export default class Network<Message, PeerData> {
     try {
       await peer.connect();
     } catch (error) {
-      peer.close();
-      this._unconnectedPeers.delete(peer.endpoint);
+      if (!this._seeds.has(peer.endpoint)) {
+        this._unconnectedPeers.delete(peer.endpoint);
+      }
       throw error;
     }
 
@@ -414,7 +486,6 @@ export default class Network<Message, PeerData> {
   }
 
   _onError(peer: Peer<Message>, error: Error): void {
-    peer.close();
     this.__onEvent({
       event: 'PEER_ERROR',
       message: `Encountered error with peer at ${peer.endpoint}: ${
@@ -426,6 +497,7 @@ export default class Network<Message, PeerData> {
 
   _onClose(peer: Peer<Message>): void {
     const connectedPeer = this._connectedPeers[peer.endpoint];
+    delete this._previousHealth[peer.endpoint];
     delete this._connectedPeers[peer.endpoint];
     delete this._connectingPeers[peer.endpoint];
     const endpoint = this._reverseBlacklist[peer.endpoint];

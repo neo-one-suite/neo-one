@@ -25,7 +25,7 @@ export default class Peer<Message> {
   _buffer: Duplex;
 
   _connecting: boolean;
-  _closing: boolean;
+  _closed: boolean;
 
   __onError: (peer: Peer<Message>, error: Error) => void;
   __onClose: (peer: Peer<Message>) => void;
@@ -39,7 +39,7 @@ export default class Peer<Message> {
     this._buffer = through();
 
     this._connecting = false;
-    this._closing = false;
+    this._closed = false;
 
     this.__onError = options.onError;
     this.__onClose = options.onClose;
@@ -59,37 +59,48 @@ export default class Peer<Message> {
       return;
     }
     this._connecting = true;
-    this._closing = false;
+    this._closed = false;
 
     try {
       await this._connect();
       this.connected = true;
+    } catch (error) {
+      this.close();
+      throw error;
     } finally {
       this._connecting = false;
     }
   }
 
   close(): void {
+    if (this._closed) {
+      return;
+    }
+
     if (!this._connecting && !this.connected) {
       return;
     }
-    this._closing = true;
+
+    this._closed = true;
+    this._connecting = false;
+    this.connected = false;
 
     this._close();
     this._stream.unpipe(this._transform);
+    this._transform.unpipe(this._buffer);
     this._transform.end();
+    this._buffer.end();
   }
 
   write(buffer: Buffer): void {
-    if (!this.connected || this._closing) {
+    if (!this.connected || this._closed) {
       return;
     }
 
     try {
       this._stream.write(buffer);
     } catch (error) {
-      this.close();
-      this.__onError(this, error);
+      this._onError(error);
     }
   }
 
@@ -106,11 +117,11 @@ export default class Peer<Message> {
         this._transform.removeListener('data', onDataReceived);
       };
 
-      let resolved = false;
-      let rejected = false;
+      let handled = false;
       const onError = (error: Error) => {
-        if (!resolved && !rejected) {
-          rejected = true;
+        this._buffer.pause();
+        if (!handled) {
+          handled = true;
           cleanup();
           reject(error);
         }
@@ -118,8 +129,8 @@ export default class Peer<Message> {
 
       const onDataReceived = (data: Message) => {
         this._buffer.pause();
-        if (!resolved && !rejected) {
-          resolved = true;
+        if (!handled) {
+          handled = true;
           cleanup();
           resolve(data);
         }
@@ -151,13 +162,12 @@ export default class Peer<Message> {
   }
 
   _onError(error: Error): void {
+    this.close();
     this.__onError(this, error);
   }
 
   _onClose(): void {
-    this._connecting = false;
-    this.connected = false;
-
+    this.close();
     this.__onClose(this);
   }
 
