@@ -66,9 +66,10 @@ const emptyFunction = () => {};
 
 const normalizeEndpoint = (endpoint: Endpoint) => {
   const { type, host, port } = getEndpointConfig(endpoint);
+
   return createEndpoint({
     type,
-    host: host === 'localhost' ? '127.0.0.1' : host,
+    host: host === 'localhost' ? '::' : host,
     port,
   });
 };
@@ -84,6 +85,8 @@ const CONNECT_ERROR_CODES = new Set([
   'ENETUNREACH',
   'SOCKET_TIMEOUT',
   'RECEIVE_MESSAGE_TIMEOUT',
+  'EADDRNOTAVAIL',
+  'ETIMEDOUT',
 ]);
 
 export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
@@ -331,27 +334,23 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
 
   _connectToPeers(): void {
     const connectedPeersCount = Object.keys(this._connectedPeers).length;
-    const endpoints = [];
     const maxConnectedPeers = this._maxConnectedPeers;
     if (connectedPeersCount < maxConnectedPeers) {
-      const count = (maxConnectedPeers - connectedPeersCount) * 2;
-      endpoints.push(
-        ..._.shuffle(
-          [...this._unconnectedPeers].filter(
-            peer =>
-              !this._endpointBlacklist.has(peer) &&
-              !this._badEndpoints.has(peer),
-          ),
-        ).slice(0, count),
+      const count = Math.max(
+        (maxConnectedPeers - connectedPeersCount) * 2,
+        maxConnectedPeers,
       );
-    }
+      const endpoints = _.shuffle(
+        [...this._unconnectedPeers].filter(peer => this._filterEndpoint(peer)),
+      ).slice(0, count);
 
-    if (endpoints.length + connectedPeersCount < maxConnectedPeers) {
-      this._resetBadEndpoints();
-      this.__onRequestEndpoints();
-    }
+      if (endpoints.length + connectedPeersCount < maxConnectedPeers) {
+        this._resetBadEndpoints();
+        this.__onRequestEndpoints();
+      }
 
-    endpoints.forEach(endpoint => this._connectToPeer({ endpoint }));
+      endpoints.forEach(endpoint => this._connectToPeer({ endpoint }));
+    }
   }
 
   _checkPeerHealth(): void {
@@ -378,6 +377,15 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     this._badEndpoints = new Set();
   }
 
+  _filterEndpoint(endpoint: Endpoint): boolean {
+    return !(
+      this._endpointBlacklist.has(endpoint) ||
+      this._badEndpoints.has(endpoint) ||
+      this._connectingPeers[endpoint] ||
+      this._connectedPeers[endpoint] != null
+    );
+  }
+
   async _connectToPeer({
     endpoint: endpointIn,
     socket,
@@ -386,11 +394,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     socket?: net.Socket,
   |}): Promise<void> {
     const endpoint = normalizeEndpoint(endpointIn);
-    if (
-      this._endpointBlacklist.has(endpoint) ||
-      this._connectingPeers[endpoint] ||
-      this._connectedPeers[endpoint] != null
-    ) {
+    if (!this._filterEndpoint(endpoint)) {
       return;
     }
     this._connectingPeers[endpoint] = true;

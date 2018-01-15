@@ -64,9 +64,6 @@ export default class TCPPeer<Message> extends Peer<Message> {
       this._socket.once('close', () => {
         onError(new Error('Closed'));
       });
-      this._socket.setTimeout(this._timeoutMS, () => {
-        onError(new SocketTimeoutError());
-      });
       if (this._initialConnected) {
         onDone();
       } else {
@@ -82,9 +79,7 @@ export default class TCPPeer<Message> extends Peer<Message> {
   }
 
   _close(): void {
-    if (this._socket.connecting === false) {
-      this._socket.end();
-    }
+    this._socket.end();
     this._socket.destroy();
   }
 }

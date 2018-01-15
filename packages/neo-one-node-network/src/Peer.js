@@ -44,12 +44,8 @@ export default class Peer<Message> {
     this.__onError = options.onError;
     this.__onClose = options.onClose;
 
-    this._stream.on('error', this._onError.bind(this));
-    this._stream.on('close', this._onClose.bind(this));
     this._transform.on('error', this._onError.bind(this));
-    this._transform.on('close', this._onPipeClose.bind(this));
     this._buffer.on('error', this._onError.bind(this));
-    this._buffer.on('close', this._onPipeClose.bind(this));
     this._buffer.pause();
     this._stream.pipe(this._transform).pipe(this._buffer);
   }
@@ -63,10 +59,9 @@ export default class Peer<Message> {
 
     try {
       await this._connect();
+      this._stream.on('error', this._onError.bind(this));
+      this._stream.on('close', this._onClose.bind(this));
       this.connected = true;
-    } catch (error) {
-      this.close();
-      throw error;
     } finally {
       this._connecting = false;
     }
@@ -76,12 +71,11 @@ export default class Peer<Message> {
     if (this._closed) {
       return;
     }
+    this._closed = true;
 
     if (!this._connecting && !this.connected) {
       return;
     }
-
-    this._closed = true;
     this._connecting = false;
     this.connected = false;
 
@@ -167,12 +161,8 @@ export default class Peer<Message> {
   }
 
   _onClose(): void {
-    this.close();
+    this._closed = true;
     this.__onClose(this);
-  }
-
-  _onPipeClose(): void {
-    this.close();
   }
 
   // eslint-disable-next-line

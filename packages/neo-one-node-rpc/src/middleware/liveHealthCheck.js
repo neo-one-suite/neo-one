@@ -34,6 +34,9 @@ export default ({
         log({
           event: 'LIVE_HEALTH_CHECK_ERROR',
           index,
+          ready,
+          isPersistingBlock: blockchain.isPersistingBlock,
+          lastBlockIndex,
           currentBlockIndex: blockchain.currentBlockIndex,
         });
         ctx.status = 500;
