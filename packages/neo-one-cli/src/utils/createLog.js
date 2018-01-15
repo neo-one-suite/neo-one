@@ -7,6 +7,8 @@ import { createLogger, format, transports } from 'winston';
 import fs from 'fs-extra';
 import path from 'path';
 
+import './patchWinston';
+
 const isError = (message: LogMessage) =>
   message.event.toLowerCase().includes('error') ||
   message.event.toLowerCase().includes('failure') ||
