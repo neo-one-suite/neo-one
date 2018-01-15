@@ -268,9 +268,15 @@ export default class Node implements INode {
 
         this._knownTransactionHashes.add(transaction.hash);
       } catch (error) {
-        this.blockchain.log({ event: 'RELAY_TRANSACTION_ERROR', hash, error });
+        if (error.code !== 'VERIFY') {
+          this.blockchain.log({
+            event: 'RELAY_TRANSACTION_ERROR',
+            hash,
+            error,
+          });
 
-        throw error;
+          throw error;
+        }
         // eslint-disable-next-line
       } finally {
         this._tempKnownTransactionHashes.delete(transaction.hashHex);
