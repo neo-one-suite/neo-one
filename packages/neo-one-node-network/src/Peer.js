@@ -67,7 +67,7 @@ export default class Peer<Message> {
     }
   }
 
-  close(): void {
+  close(hadError?: boolean): void {
     if (this._closed) {
       return;
     }
@@ -79,7 +79,7 @@ export default class Peer<Message> {
     this._connecting = false;
     this.connected = false;
 
-    this._close();
+    this._close(!!hadError);
     this._stream.unpipe(this._transform);
     this._transform.unpipe(this._buffer);
     this._transform.end();
@@ -156,7 +156,7 @@ export default class Peer<Message> {
   }
 
   _onError(error: Error): void {
-    this.close();
+    this.close(true);
     this.__onError(this, error);
   }
 
@@ -168,5 +168,5 @@ export default class Peer<Message> {
   // eslint-disable-next-line
   async _connect(): Promise<void> {}
   // eslint-disable-next-line
-  _close(): void {}
+  _close(hadError: boolean): void {}
 }
