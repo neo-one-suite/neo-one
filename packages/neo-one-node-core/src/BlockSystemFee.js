@@ -11,6 +11,7 @@ import {
   type UInt256,
   type UInt256Hex,
   BinaryReader,
+  IOHelper,
   common,
   createSerializeWire,
   utils,
@@ -30,10 +31,19 @@ export default class BlockSystemFee
   hashHex: UInt256Hex;
   systemFee: BN;
 
+  __size: () => number;
+
   constructor({ hash, systemFee }: BlockSystemFeeAdd) {
     this.hash = hash;
     this.hashHex = common.uInt256ToHex(hash);
     this.systemFee = systemFee;
+    this.__size = utils.lazy(
+      () => IOHelper.sizeOfUInt256 + IOHelper.sizeOfFixed8,
+    );
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   equals: Equals = utils.equals(BlockSystemFee, other =>

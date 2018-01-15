@@ -1,5 +1,5 @@
 {
-  "name": "@neo-one/node",
+  "name": "@neo-one/node-storage-levelup",
   "version": "0.0.2",
   "keywords": [
     "neo",
@@ -21,7 +21,7 @@
     "dapp",
     "dapps"
   ],
-  "description": "NEO•ONE NEO full node.",
+  "description": "NEO•ONE levelup node storage.",
   "repository": "https://github.com/neo-one-suite/neo-one",
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
@@ -35,18 +35,10 @@
   },
   "dependencies": {
     "@neo-one/client-core": "^0.0.2",
-    "@neo-one/node-blockchain": "^0.0.2",
     "@neo-one/node-core": "^0.0.2",
-    "@neo-one/node-data-backup": "^0.0.2",
-    "@neo-one/node-protocol": "^0.0.2",
-    "@neo-one/node-rpc": "^0.0.2",
-    "@neo-one/node-storage-levelup": "^0.0.2",
-    "@neo-one/node-vm": "^0.0.2",
-    "@neo-one/node-offline": "^0.0.2",
+    "@neo-one/node-storage-common": "^0.0.2",
     "@neo-one/utils": "^0.0.2",
-    "leveldown": "^2.1.1",
-    "levelup": "^2.0.1",
-    "node-cron": "^1.2.1",
+    "bytewise": "^1.1.0",
     "rxjs": "^5.5.6"
   }
 }

@@ -19,6 +19,8 @@ import type {
   Validator,
 } from '@neo-one/client-core';
 
+import type AccountUnclaimed, { AccountUnclaimedKey } from './AccountUnclaimed';
+import type AccountUnspent, { AccountUnspentKey } from './AccountUnspent';
 import type BlockSystemFee from './BlockSystemFee';
 import type { Blockchain, ReadStorage } from './Blockchain';
 import type TransactionSpentCoins from './TransactionSpentCoins';
@@ -30,6 +32,8 @@ type OutputValue = {|
 |};
 export type AddChange =
   | {| type: 'account', value: Account |}
+  | {| type: 'accountUnclaimed', value: AccountUnclaimed |}
+  | {| type: 'accountUnspent', value: AccountUnspent |}
   | {| type: 'action', value: Action |}
   | {| type: 'asset', value: Asset |}
   | {| type: 'block', value: Block |}
@@ -44,6 +48,8 @@ export type AddChange =
   | {| type: 'output', value: OutputValue |};
 export type DeleteChange =
   | {| type: 'account', key: AccountKey |}
+  | {| type: 'accountUnclaimed', key: AccountUnclaimedKey |}
+  | {| type: 'accountUnspent', key: AccountUnspentKey |}
   | {| type: 'contract', key: ContractKey |}
   | {| type: 'storageItem', key: StorageItemKey |};
 export type Change =
@@ -57,6 +63,8 @@ interface LatestReadStorage<Key, Value> extends ReadStorage<Key, Value> {
 
 export type Storage = {
   account: $PropertyType<Blockchain, 'account'>,
+  accountUnclaimed: $PropertyType<Blockchain, 'accountUnclaimed'>,
+  accountUnspent: $PropertyType<Blockchain, 'accountUnspent'>,
   action: $PropertyType<Blockchain, 'action'>,
   asset: $PropertyType<Blockchain, 'asset'>,
   block: LatestReadStorage<BlockKey, Block>,

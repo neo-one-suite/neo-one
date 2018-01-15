@@ -2,7 +2,6 @@
 import type BN from 'bn.js';
 
 import type { InvocationResult } from './InvocationResult';
-import { BinaryReader, type BinaryWriter } from '../utils';
 import {
   type DeserializeWireBaseOptions,
   type DeserializeWireOptions,
@@ -16,6 +15,8 @@ import {
 } from '../contractParameter';
 import { type VMState, assertVMState } from '../vm';
 
+import utils, { BinaryReader, type BinaryWriter, IOHelper } from '../utils';
+
 export type InvocationResultBaseAdd = {|
   state: VMState,
   gasConsumed: BN,
@@ -28,10 +29,22 @@ export default class InvocationResultBase
   gasConsumed: BN;
   stack: Array<ContractParameter>;
 
+  _size: () => number;
+
   constructor({ state, gasConsumed, stack }: InvocationResultBaseAdd) {
     this.state = state;
     this.gasConsumed = gasConsumed;
     this.stack = stack;
+    this._size = utils.lazy(
+      () =>
+        IOHelper.sizeOfUInt8 +
+        IOHelper.sizeOfFixed8 +
+        IOHelper.sizeOfArray(this.stack, value => value.size),
+    );
+  }
+
+  get size(): number {
+    return this._size();
   }
 
   serializeWireBase(writer: BinaryWriter): void {

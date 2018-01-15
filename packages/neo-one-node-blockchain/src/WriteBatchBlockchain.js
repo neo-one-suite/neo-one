@@ -30,20 +30,25 @@ import {
   Account,
   Asset,
   ClaimTransaction,
+  ContractTransaction,
   RegisterTransaction,
   Input,
   InvocationData,
   InvocationResultSuccess,
   IssueTransaction,
   EnrollmentTransaction,
+  MinerTransaction,
   PublishTransaction,
   InvocationTransaction,
   Validator,
   common,
   utils,
 } from '@neo-one/client-core';
+import { Performance, utils as commonUtils } from '@neo-one/utils';
 import {
   TRIGGER_TYPE,
+  type AccountUnclaimedKey,
+  type AccountUnspentKey,
   type BlockSystemFeeKey,
   type OnStep,
   type TransactionSpentCoinsKey,
@@ -52,12 +57,13 @@ import {
   type Storage,
   type VM,
   type WriteBlockchain,
+  AccountUnclaimed,
+  AccountUnspent,
   BlockSystemFee,
   TransactionSpentCoins,
 } from '@neo-one/node-core';
 
 import _ from 'lodash';
-import { utils as commonUtils } from '@neo-one/utils';
 
 import {
   BlockLikeStorageCache,
@@ -83,6 +89,7 @@ type WriteBatchBlockchainOptions = {|
   vm: VM,
   onStep: OnStep,
   getValidators: $PropertyType<WriteBlockchain, 'getValidators'>,
+  perf?: Performance,
 |};
 
 type Caches = {|
@@ -90,6 +97,11 @@ type Caches = {|
     AccountKey,
     Account,
     AccountUpdate,
+  >,
+  accountUnspent: ReadAddDeleteStorageCache<AccountUnspentKey, AccountUnspent>,
+  accountUnclaimed: ReadAddDeleteStorageCache<
+    AccountUnclaimedKey,
+    AccountUnclaimed,
   >,
   action: ReadGetAllAddStorageCache<ActionKey, ActionsKey, Action>,
   asset: ReadAddUpdateStorageCache<AssetKey, Asset, AssetUpdate>,
@@ -120,6 +132,11 @@ type InputClaim = {|
   input: Input,
 |};
 
+type OutputWithInput = {|
+  output: Output,
+  input: Input,
+|};
+
 export default class WriteBatchBlockchain {
   log: $PropertyType<WriteBlockchain, 'log'>;
   settings: $PropertyType<WriteBlockchain, 'settings'>;
@@ -128,12 +145,18 @@ export default class WriteBatchBlockchain {
   _storage: Storage;
   _vm: VM;
   _onStep: OnStep;
+  _perf: Performance;
 
   _caches: Caches;
   account: ReadAllAddUpdateDeleteStorageCache<
     AccountKey,
     Account,
     AccountUpdate,
+  >;
+  accountUnspent: ReadAddDeleteStorageCache<AccountUnspentKey, AccountUnspent>;
+  accountUnclaimed: ReadAddDeleteStorageCache<
+    AccountUnclaimedKey,
+    AccountUnclaimed,
   >;
   action: ReadGetAllAddStorageCache<ActionKey, ActionsKey, Action>;
   asset: ReadAddUpdateStorageCache<AssetKey, Asset, AssetUpdate>;
@@ -167,6 +190,7 @@ export default class WriteBatchBlockchain {
     this._storage = options.storage;
     this._vm = options.vm;
     this._onStep = options.onStep;
+    this._perf = options.perf || new Performance();
     this.getValidators = options.getValidators;
 
     const output = new OutputStorageCache(this._storage.output);
@@ -179,6 +203,28 @@ export default class WriteBatchBlockchain {
         getKeyString: key => common.uInt160ToString(key.hash),
         createAddChange: value => ({ type: 'account', value }),
         createDeleteChange: key => ({ type: 'account', key }),
+      }),
+      accountUnspent: new ReadAddDeleteStorageCache({
+        name: 'accountUnspent',
+        readStorage: this._storage.accountUnspent,
+        getKeyFromValue: value => ({ hash: value.hash, input: value.input }),
+        getKeyString: key =>
+          `${common.uInt160ToString(key.hash)}:${common.uInt256ToString(
+            key.input.hash,
+          )}:${key.input.index}`,
+        createAddChange: value => ({ type: 'accountUnspent', value }),
+        createDeleteChange: key => ({ type: 'accountUnspent', key }),
+      }),
+      accountUnclaimed: new ReadAddDeleteStorageCache({
+        name: 'accountUnclaimed',
+        readStorage: this._storage.accountUnclaimed,
+        getKeyFromValue: value => ({ hash: value.hash, input: value.input }),
+        getKeyString: key =>
+          `${common.uInt160ToString(key.hash)}:${common.uInt256ToString(
+            key.input.hash,
+          )}:${key.input.index}`,
+        createAddChange: value => ({ type: 'accountUnclaimed', value }),
+        createDeleteChange: key => ({ type: 'accountUnclaimed', key }),
       }),
       action: new ReadGetAllAddStorageCache({
         name: 'action',
@@ -291,6 +337,8 @@ export default class WriteBatchBlockchain {
     };
 
     this.account = this._caches.account;
+    this.accountUnspent = this._caches.accountUnspent;
+    this.accountUnclaimed = this._caches.accountUnclaimed;
     this.action = this._caches.action;
     this.asset = this._caches.asset;
     this.block = this._caches.block;
@@ -343,8 +391,9 @@ export default class WriteBatchBlockchain {
   }
 
   async persistBlock(block: Block): Promise<void> {
+    let done = this._perf.start('WriteBatchBlockchain.persistBlock.0');
     // eslint-disable-next-line
-    const [systemFee, _] = await Promise.all([
+    const [systemFee, a, b] = await Promise.all([
       block.index === 0
         ? Promise.resolve(utils.ZERO)
         : this.blockSystemFee
@@ -353,23 +402,96 @@ export default class WriteBatchBlockchain {
       this.block.add(block),
       this.header.add(block.header),
     ]);
-    await this.blockSystemFee.add(
-      new BlockSystemFee({
-        hash: block.hash,
-        systemFee: systemFee.add(
-          block.getSystemFee({
-            getOutput: this.output.get,
-            governingToken: this.settings.governingToken,
-            utilityToken: this.settings.utilityToken,
-            fees: this.settings.fees,
-          }),
-        ),
-      }),
+    done();
+
+    const [utxo, rest] = _.partition(
+      block.transactions,
+      transaction =>
+        (transaction.type === TRANSACTION_TYPE.CLAIM &&
+          transaction instanceof ClaimTransaction) ||
+        (transaction.type === TRANSACTION_TYPE.CONTRACT &&
+          transaction instanceof ContractTransaction) ||
+        (transaction.type === TRANSACTION_TYPE.MINER &&
+          transaction instanceof MinerTransaction),
     );
-    for (const [idx, transaction] of block.transactions.entries()) {
+
+    done = this._perf.start('WriteBatchBlockchain.persistBlock.1');
+    await Promise.all([
+      this.blockSystemFee.add(
+        new BlockSystemFee({
+          hash: block.hash,
+          systemFee: systemFee.add(
+            block.getSystemFee({
+              getOutput: this.output.get,
+              governingToken: this.settings.governingToken,
+              utilityToken: this.settings.utilityToken,
+              fees: this.settings.fees,
+            }),
+          ),
+        }),
+      ),
+      utxo.length > 0
+        ? this._persistUTXOTransactions(block, (utxo: $FlowFixMe))
+        : Promise.resolve(),
+      rest.length > 0
+        ? this._persistTransactions(block, rest)
+        : Promise.resolve(),
+    ]);
+    done();
+  }
+
+  async _persistUTXOTransactions(
+    block: Block,
+    transactions: Array<
+      ContractTransaction | ClaimTransaction | MinerTransaction,
+    >,
+  ): Promise<void> {
+    const done = this._perf.start(
+      'WriteBatchBlockchain._persistUTXOTransactions',
+    );
+    const inputs = [];
+    const claims = [];
+    const outputWithInputs = [];
+    for (const transaction of transactions) {
+      inputs.push(...transaction.inputs);
+      if (
+        transaction.type === TRANSACTION_TYPE.CLAIM &&
+        transaction instanceof ClaimTransaction
+      ) {
+        claims.push(...transaction.claims);
+      }
+      outputWithInputs.push(...this._getOutputWithInput(transaction));
+    }
+    await Promise.all([
+      Promise.all(
+        transactions.map(transaction => this.transaction.add(transaction)),
+      ),
+      Promise.all(
+        transactions.map(transaction =>
+          this.transactionSpentCoins.add(
+            new TransactionSpentCoins({
+              hash: transaction.hash,
+              startHeight: block.index,
+            }),
+          ),
+        ),
+      ),
+      this._updateAccounts(inputs, claims, outputWithInputs),
+      this._updateCoins(inputs, claims, block),
+    ]);
+    done();
+  }
+
+  async _persistTransactions(
+    block: Block,
+    transactions: Array<Transaction>,
+  ): Promise<void> {
+    const done = this._perf.start('WriteBatchBlockchain._persistTransactions');
+    for (const [idx, transaction] of transactions.entries()) {
       // eslint-disable-next-line
       await this._persistTransaction(block, transaction, idx);
     }
+    done();
   }
 
   async _persistTransaction(
@@ -394,8 +516,7 @@ export default class WriteBatchBlockchain {
       this._updateAccounts(
         transaction.inputs,
         claims,
-        transaction.outputs,
-        transaction,
+        this._getOutputWithInput(transaction),
       ),
       this._updateCoins(transaction.inputs, claims, block),
     ]);
@@ -588,13 +709,14 @@ export default class WriteBatchBlockchain {
   async _updateAccounts(
     inputs: Array<Input>,
     claims: Array<Input>,
-    outputs: Array<Output>,
-    transaction: Transaction,
+    outputs: Array<OutputWithInput>,
   ): Promise<void> {
+    let done = this._perf.start('WriteBatchBlockchain._updateAccounts.0');
     const [inputOutputs, claimOutputs] = await Promise.all([
       this._getInputOutputs(inputs),
       this._getInputOutputs(claims),
     ]);
+    done();
 
     const addressValues = commonUtils.entries(
       _.groupBy(
@@ -605,7 +727,11 @@ export default class WriteBatchBlockchain {
             output.value.neg(),
           ])
           .concat(
-            outputs.map(output => [output.address, output.asset, output.value]),
+            outputs.map(({ output }) => [
+              output.address,
+              output.asset,
+              output.value,
+            ]),
           ),
         // eslint-disable-next-line
         ([address, asset, value]) => common.uInt160ToHex(address),
@@ -616,9 +742,10 @@ export default class WriteBatchBlockchain {
     const addressOutputs = _.groupBy(
       outputs,
       // eslint-disable-next-line
-      output => common.uInt160ToHex(output.address),
+      output => common.uInt160ToHex(output.output.address),
     );
 
+    done = this._perf.start('WriteBatchBlockchain._updateAccounts.1');
     await Promise.all(
       addressValues.map(([address, values]) =>
         this._updateAccount(
@@ -627,11 +754,18 @@ export default class WriteBatchBlockchain {
           values.map(([_, asset, value]) => [asset, value]),
           addressSpent[address] || [],
           addressClaimed[address] || [],
-          transaction,
           addressOutputs[address] || [],
         ),
       ),
     );
+    done();
+  }
+
+  _getOutputWithInput(transaction: Transaction): Array<OutputWithInput> {
+    return transaction.outputs.map((output, index) => ({
+      output,
+      input: new Input({ hash: transaction.hash, index }),
+    }));
   }
 
   async _getInputOutputs(
@@ -671,10 +805,11 @@ export default class WriteBatchBlockchain {
     values: Array<[UInt256, BN]>,
     spent: Array<Input>,
     claimed: Array<Input>,
-    transaction: Transaction,
-    outputs: Array<Output>,
+    outputs: Array<OutputWithInput>,
   ): Promise<void> {
+    const done = this._perf.start('WriteBatchBlockchain._updateAccount.tryGet');
     const account = await this.account.tryGet({ hash: address });
+    done();
 
     const balances = values.reduce((acc, [asset, value]) => {
       const key = (common.uInt256ToHex(asset): $FlowFixMe);
@@ -685,43 +820,56 @@ export default class WriteBatchBlockchain {
       return acc;
     }, account == null ? {} : account.balances);
 
-    const spentSet = new Set(spent.map(input => this._getInputKey(input)));
-    const unspent = (account == null ? [] : account.unspent)
-      .filter(input => !spentSet.has(this._getInputKey(input)))
-      .concat(
-        outputs.map(
-          (output, idx) =>
-            new Input({
-              hash: transaction.hash,
-              index: idx,
-            }),
+    const promises = [];
+    promises.push(
+      ...spent.map(input =>
+        this.accountUnspent.delete({
+          hash: address,
+          input,
+        }),
+      ),
+    );
+    promises.push(
+      ...outputs.map(({ input }) =>
+        this.accountUnspent.add(new AccountUnspent({ hash: address, input })),
+      ),
+    );
+    promises.push(
+      ...claimed.map(input =>
+        this.accountUnclaimed.delete({
+          hash: address,
+          input,
+        }),
+      ),
+    );
+    promises.push(
+      ...spent.map(input =>
+        this.accountUnclaimed.add(
+          new AccountUnclaimed({ hash: address, input }),
         ),
-      );
-
-    const claimedSet = new Set(claimed.map(claim => this._getInputKey(claim)));
-    const unclaimed = (account == null ? [] : account.unclaimed)
-      .filter(claim => !claimedSet.has(this._getInputKey(claim)))
-      .concat(spent);
+      ),
+    );
 
     if (account == null) {
-      await this.account.add(
-        new Account({
-          hash: address,
-          balances,
-          unspent,
-          unclaimed,
-        }),
+      promises.push(
+        this.account.add(
+          new Account({
+            hash: address,
+            balances,
+          }),
+        ),
       );
     } else {
-      const newAccount = await this.account.update(account, {
-        balances,
-        unspent,
-        unclaimed,
-      });
-      if (newAccount.isDeletable()) {
-        await this.account.delete({ hash: address });
-      }
+      promises.push(
+        this.account.update(account, { balances }).then(async newAccount => {
+          if (newAccount.isDeletable()) {
+            await this.account.delete({ hash: address });
+          }
+        }),
+      );
     }
+
+    await Promise.all(promises);
   }
 
   _getInputKey(input: Input): string {
@@ -754,7 +902,10 @@ export default class WriteBatchBlockchain {
     inputClaims: Array<InputClaim>,
     block: Block,
   ): Promise<void> {
+    const done = this._perf.start('WriteBatchBlockchain._updateCoin.get');
     const spentCoins = await this.transactionSpentCoins.get({ hash });
+    done();
+
     const endHeights = { ...spentCoins.endHeights };
     const claimed = { ...spentCoins.claimed };
     for (const inputClaim of inputClaims) {

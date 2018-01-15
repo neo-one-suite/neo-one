@@ -15,7 +15,7 @@ import {
   type SerializableJSON,
   createSerializeWire,
 } from './Serializable';
-import { type InputJSON, Input } from './transaction';
+import { type InputJSON } from './transaction';
 
 import common, {
   type ECPoint,
@@ -23,7 +23,12 @@ import common, {
   type UInt160Hex,
   type UInt256Hex,
 } from './common';
-import utils, { BinaryReader, type BinaryWriter, JSONHelper } from './utils';
+import utils, {
+  BinaryReader,
+  type BinaryWriter,
+  IOHelper,
+  JSONHelper,
+} from './utils';
 
 export type AccountKey = {| hash: UInt160 |};
 export type AccountAdd = {|
@@ -32,15 +37,11 @@ export type AccountAdd = {|
   isFrozen?: boolean,
   votes?: Array<ECPoint>,
   balances?: { [assetHash: UInt256Hex]: BN },
-  unspent?: Array<Input>,
-  unclaimed?: Array<Input>,
 |};
 export type AccountUpdate = {|
   isFrozen?: boolean,
   votes?: Array<ECPoint>,
   balances?: { [assetHash: UInt256Hex]: BN },
-  unspent?: Array<Input>,
-  unclaimed?: Array<Input>,
 |};
 
 export type AccountJSON = {|
@@ -65,28 +66,33 @@ export default class Account extends BaseState
   isFrozen: boolean;
   votes: Array<ECPoint>;
   balances: { [assetHash: UInt256Hex]: BN };
-  unspent: Array<Input>;
-  unclaimed: Array<Input>;
 
   serializeWire: () => Buffer;
 
-  constructor({
-    version,
-    hash,
-    isFrozen,
-    votes,
-    balances,
-    unspent,
-    unclaimed,
-  }: AccountAdd) {
+  __size: () => number;
+
+  constructor({ version, hash, isFrozen, votes, balances }: AccountAdd) {
     super({ version });
     this.hash = hash;
     this.hashHex = common.uInt160ToHex(hash);
     this.isFrozen = isFrozen || false;
     this.votes = votes || [];
     this.balances = balances || {};
-    this.unspent = unspent || [];
-    this.unclaimed = unclaimed || [];
+    this.__size = utils.lazy(
+      () =>
+        IOHelper.sizeOfUInt8 +
+        IOHelper.sizeOfUInt160 +
+        IOHelper.sizeOfBoolean +
+        IOHelper.sizeOfArray(this.votes, vote => IOHelper.sizeOfECPoint(vote)) +
+        IOHelper.sizeOfObject(
+          this.balances,
+          () => IOHelper.sizeOfUInt256 + IOHelper.sizeOfFixed8,
+        ),
+    );
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   equals: Equals = utils.equals(Account, other =>
@@ -98,27 +104,16 @@ export default class Account extends BaseState
     return (
       !this.isFrozen &&
       this.votes.length === 0 &&
-      (balances.length === 0 ||
-        balances.every(value => value.lte(utils.ZERO))) &&
-      this.unspent.length === 0 &&
-      this.unclaimed.length === 0
+      (balances.length === 0 || balances.every(value => value.lte(utils.ZERO)))
     );
   }
 
-  update({
-    isFrozen,
-    votes,
-    balances,
-    unspent,
-    unclaimed,
-  }: AccountUpdate): Account {
+  update({ isFrozen, votes, balances }: AccountUpdate): Account {
     return new Account({
       hash: this.hash,
       isFrozen: isFrozen == null ? this.isFrozen : isFrozen,
       votes: votes == null ? this.votes : votes,
       balances: balances == null ? this.balances : balances,
-      unspent: unspent == null ? this.unspent : unspent,
-      unclaimed: unclaimed == null ? this.unclaimed : unclaimed,
     });
   }
 
@@ -133,12 +128,6 @@ export default class Account extends BaseState
     writer.writeObject(balances, (key, value) => {
       writer.writeUInt256(key);
       writer.writeFixed8(value);
-    });
-    writer.writeArray(this.unspent, input => {
-      input.serializeWireBase(writer);
-    });
-    writer.writeArray(this.unclaimed, input => {
-      input.serializeWireBase(writer);
     });
   }
 
@@ -157,10 +146,6 @@ export default class Account extends BaseState
       const value = reader.readFixed8();
       return { key, value };
     });
-    const unspent = reader.readArray(() => Input.deserializeWireBase(options));
-    const unclaimed = reader.readArray(() =>
-      Input.deserializeWireBase(options),
-    );
 
     return new this({
       version,
@@ -168,8 +153,6 @@ export default class Account extends BaseState
       isFrozen,
       votes,
       balances,
-      unspent,
-      unclaimed,
     });
   }
 
@@ -181,7 +164,11 @@ export default class Account extends BaseState
   }
 
   // eslint-disable-next-line
-  serializeJSON(context: SerializeJSONContext): AccountJSON {
+  async serializeJSON(context: SerializeJSONContext): Promise<AccountJSON> {
+    const [unspent, unclaimed] = await Promise.all([
+      context.getUnspent(this.hash),
+      context.getUnclaimed(this.hash),
+    ]);
     return {
       version: this.version,
       script_hash: JSONHelper.writeUInt160(this.hash),
@@ -191,8 +178,8 @@ export default class Account extends BaseState
         asset: JSONHelper.writeUInt256(asset),
         value: JSONHelper.writeFixed8(value),
       })),
-      unspent: this.unspent.map(input => input.serializeJSON(context)),
-      unclaimed: this.unclaimed.map(input => input.serializeJSON(context)),
+      unspent: unspent.map(input => input.serializeJSON(context)),
+      unclaimed: unclaimed.map(input => input.serializeJSON(context)),
     };
   }
 }

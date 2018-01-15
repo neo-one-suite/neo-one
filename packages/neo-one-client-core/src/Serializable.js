@@ -5,7 +5,7 @@ import type Contract from './Contract';
 import { BinaryReader, BinaryWriter } from './utils';
 import type { ECPoint, UInt160 } from './common';
 import type { InvocationResult } from './invocationResult';
-import type { FeeContext, InvocationTransaction } from './transaction';
+import type { FeeContext, Input, InvocationTransaction } from './transaction';
 import type Validator from './Validator';
 
 export type DeserializeWireContext = {|
@@ -68,6 +68,8 @@ export type SerializeJSONContext = {|
   tryGetInvocationData: (
     transaction: InvocationTransaction,
   ) => Promise<?InvocationData>,
+  getUnclaimed: (hash: UInt160) => Promise<Array<Input>>,
+  getUnspent: (hash: UInt160) => Promise<Array<Input>>,
 |};
 
 export type SerializeJSON<TJSON> = (

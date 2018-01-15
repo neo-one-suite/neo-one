@@ -28,7 +28,12 @@ import common, {
   type UInt256Hex,
 } from './common';
 import crypto from './crypto';
-import utils, { BinaryReader, type BinaryWriter, JSONHelper } from './utils';
+import utils, {
+  BinaryReader,
+  type BinaryWriter,
+  IOHelper,
+  JSONHelper,
+} from './utils';
 
 export class InvalidAssetError extends CustomError {
   code: string;
@@ -102,6 +107,8 @@ export default class Asset extends BaseState
   expiration: number;
   isFrozen: boolean;
 
+  __size: () => number;
+
   constructor({
     version,
     hash,
@@ -137,6 +144,28 @@ export default class Asset extends BaseState
     this.issuer = issuer;
     this.expiration = expiration;
     this.isFrozen = isFrozen || false;
+    this.__size = utils.lazy(
+      () =>
+        IOHelper.sizeOfUInt8 +
+        IOHelper.sizeOfUInt256 +
+        IOHelper.sizeOfUInt8 +
+        IOHelper.sizeOfVarString(this.name) +
+        IOHelper.sizeOfFixed8 +
+        IOHelper.sizeOfFixed8 +
+        IOHelper.sizeOfUInt8 +
+        IOHelper.sizeOfUInt8 +
+        IOHelper.sizeOfFixed8 +
+        IOHelper.sizeOfUInt160 +
+        IOHelper.sizeOfECPoint(this.owner) +
+        IOHelper.sizeOfUInt160 +
+        IOHelper.sizeOfUInt160 +
+        IOHelper.sizeOfUInt32LE +
+        IOHelper.sizeOfBoolean,
+    );
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   equals: Equals = utils.equals(Asset, other =>

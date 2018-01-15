@@ -8,7 +8,9 @@ import {
   type UInt256,
   BaseState,
   BinaryReader,
+  IOHelper,
   createSerializeWire,
+  utils,
 } from '@neo-one/client-core';
 
 export type TransactionSpentCoinsAdd = {|
@@ -33,6 +35,8 @@ export default class TransactionSpentCoins extends BaseState
   endHeights: { [index: number]: number };
   claimed: { [index: number]: boolean };
 
+  __size: () => number;
+
   constructor({
     version,
     hash,
@@ -45,6 +49,24 @@ export default class TransactionSpentCoins extends BaseState
     this.startHeight = startHeight;
     this.endHeights = endHeights || {};
     this.claimed = claimed || {};
+    this.__size = utils.lazy(
+      () =>
+        IOHelper.sizeOfUInt8 +
+        IOHelper.sizeOfUInt256 +
+        IOHelper.sizeOfUInt32LE +
+        IOHelper.sizeOfObject(
+          this.endHeights,
+          () => IOHelper.sizeOfUInt32LE + IOHelper.sizeOfUInt32LE,
+        ) +
+        IOHelper.sizeOfObject(
+          this.claimed,
+          () => IOHelper.sizeOfUInt32LE + IOHelper.sizeOfBoolean,
+        ),
+    );
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   update({

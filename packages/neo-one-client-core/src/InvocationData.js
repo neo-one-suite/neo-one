@@ -1,5 +1,4 @@
 /* @flow */
-import { type BinaryWriter, BinaryReader } from './utils';
 import {
   type DeserializeWireBaseOptions,
   type DeserializeWireOptions,
@@ -10,6 +9,7 @@ import {
 import { type InvocationResult, deserializeWireBase } from './invocationResult';
 
 import common, { type ECPoint, type UInt160, type UInt256 } from './common';
+import utils, { type BinaryWriter, BinaryReader, IOHelper } from './utils';
 
 export type InvocationDataAdd = {|
   hash: UInt256,
@@ -40,6 +40,8 @@ export default class InvocationData
   transactionIndex: number;
   result: InvocationResult;
 
+  __size: () => number;
+
   constructor({
     hash,
     assetHash,
@@ -62,6 +64,39 @@ export default class InvocationData
     this.blockIndex = blockIndex;
     this.transactionIndex = transactionIndex;
     this.result = result;
+    this.__size = utils.lazy(
+      () =>
+        IOHelper.sizeOfUInt256 +
+        IOHelper.sizeOfUInt256 +
+        IOHelper.sizeOfArray(
+          this.contractHashes,
+          () => IOHelper.sizeOfUInt160,
+        ) +
+        IOHelper.sizeOfArray(
+          this.deletedContractHashes,
+          () => IOHelper.sizeOfUInt160,
+        ) +
+        IOHelper.sizeOfArray(
+          this.migratedContractHashes,
+          () => IOHelper.sizeOfUInt160,
+        ) +
+        IOHelper.sizeOfArray(
+          this.voteUpdates,
+          value =>
+            IOHelper.sizeOfUInt160 +
+            IOHelper.sizeOfArray(value[1], val => IOHelper.sizeOfECPoint(val)),
+        ) +
+        IOHelper.sizeOfArray(this.validatorPublicKeys, value =>
+          IOHelper.sizeOfECPoint(value),
+        ) +
+        IOHelper.sizeOfUInt32LE +
+        IOHelper.sizeOfUInt32LE +
+        this.result.size,
+    );
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   serializeWireBase(writer: BinaryWriter): void {

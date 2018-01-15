@@ -1,12 +1,13 @@
 /* @flow */
 import { CONTRACT_PARAMETER_TYPE } from './ContractParameterType';
-import { type BinaryWriter } from '../utils';
 import ContractParameterBase from './ContractParameterBase';
 import type {
   ContractParameter,
   ContractParameterJSON,
 } from './ContractParameter';
 import type { SerializeJSONContext } from '../Serializable';
+
+import utils, { type BinaryWriter, IOHelper } from '../utils';
 
 export type ArrayContractParameterJSON = {|
   type: 'Array',
@@ -22,9 +23,18 @@ export default class ArrayContractParameter extends ContractParameterBase<
   type = CONTRACT_PARAMETER_TYPE.ARRAY;
   value: Array<ContractParameter>;
 
+  __size: () => number;
+
   constructor(value: Array<ContractParameter>) {
     super();
     this.value = value;
+    this.__size = utils.lazy(() =>
+      IOHelper.sizeOfArray(this.value, val => val.size),
+    );
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   asBoolean(): boolean {

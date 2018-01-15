@@ -10,10 +10,16 @@ import {
   type ValidatorKey,
   common,
 } from '@neo-one/client-core';
+import {
+  type AccountInputKey,
+  type AccountInputsKey,
+} from '@neo-one/node-core';
 
 import bytewise from 'bytewise';
 
 const accountKeyPrefix = 'account';
+const accountUnclaimedKeyPrefix = 'accountUnclaimed';
+const accountUnspentKeyPrefix = 'accountUnspent';
 const actionKeyPrefix = 'action';
 const assetKeyPrefix = 'asset';
 const blockKeyPrefix = 'block';
@@ -42,6 +48,49 @@ export const maxBlockHashKey = (bytewise.encode([
   settingsPrefix,
   'max-block-hash',
 ]): Buffer);
+
+const createSerializeAccountInputKey = (prefix: string) => ({
+  hash,
+  input,
+}: AccountInputKey): Buffer =>
+  bytewise.encode([
+    prefix,
+    common.uInt160ToBuffer(hash),
+    common.uInt256ToBuffer(input.hash),
+    input.index,
+  ]);
+const createSerializeAccountInputKeyString = (prefix: string) => ({
+  hash,
+  input,
+}: AccountInputKey): string =>
+  `${prefix}:` +
+  `${common.uInt160ToString(hash)}:` +
+  `${common.uInt256ToString(input.hash)}:` +
+  `${input.index}`;
+const createGetAccountInputKeyMin = (prefix: string) => ({
+  hash,
+}: AccountInputsKey): Buffer =>
+  bytewise.encode(
+    bytewise.sorts.array.bound.lower([prefix, common.uInt160ToBuffer(hash)]),
+  );
+const createGetAccountInputKeyMax = (prefix: string) => ({
+  hash,
+}: AccountInputsKey): Buffer =>
+  bytewise.encode(
+    bytewise.sorts.array.bound.upper([prefix, common.uInt160ToBuffer(hash)]),
+  );
+export const getAccountUnclaimedKeyMin = createGetAccountInputKeyMin(
+  accountUnclaimedKeyPrefix,
+);
+export const getAccountUnclaimedKeyMax = createGetAccountInputKeyMax(
+  accountUnclaimedKeyPrefix,
+);
+export const getAccountUnspentKeyMin = createGetAccountInputKeyMin(
+  accountUnspentKeyPrefix,
+);
+export const getAccountUnspentKeyMax = createGetAccountInputKeyMax(
+  accountUnspentKeyPrefix,
+);
 
 const serializeStorageItemKey = ({ hash, key }: StorageItemKey): Buffer =>
   bytewise.encode([storageItemKeyPrefix, common.uInt160ToBuffer(hash), key]);
@@ -158,6 +207,8 @@ const serializeOutputKeyString = ({ index, hash }: OutputKey): string =>
 
 export const typeKeyToSerializeKey = {
   account: createSerializeUInt160Key(accountKeyPrefix),
+  accountUnclaimed: createSerializeAccountInputKey(accountUnclaimedKeyPrefix),
+  accountUnspent: createSerializeAccountInputKey(accountUnspentKeyPrefix),
   action: serializeActionKey,
   asset: createSerializeUInt256Key(assetKeyPrefix),
   block: createSerializeUInt256Key(blockKeyPrefix),
@@ -176,6 +227,10 @@ export const typeKeyToSerializeKey = {
 
 export const typeKeyToSerializeKeyString = {
   account: createSerializeUInt160KeyString(accountKeyPrefix),
+  accountUnclaimed: createSerializeAccountInputKeyString(
+    accountUnclaimedKeyPrefix,
+  ),
+  accountUnspent: createSerializeAccountInputKeyString(accountUnspentKeyPrefix),
   action: serializeActionKeyString,
   asset: createSerializeUInt256KeyString(assetKeyPrefix),
   block: createSerializeUInt256KeyString(blockKeyPrefix),

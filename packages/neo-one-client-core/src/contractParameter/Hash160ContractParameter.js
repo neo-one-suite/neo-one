@@ -1,12 +1,12 @@
 /* @flow */
 import { CONTRACT_PARAMETER_TYPE } from './ContractParameterType';
-import { type BinaryWriter, JSONHelper } from '../utils';
 import ContractParameterBase from './ContractParameterBase';
 import {
   type DeserializeWireBaseOptions,
   type SerializeJSONContext,
 } from '../Serializable';
 import common, { type UInt160 } from '../common';
+import utils, { type BinaryWriter, IOHelper, JSONHelper } from '../utils';
 
 export type Hash160ContractParameterJSON = {|
   type: 'Hash160',
@@ -21,9 +21,16 @@ export default class Hash160ContractParameter extends ContractParameterBase<
   type = CONTRACT_PARAMETER_TYPE.HASH160;
   value: UInt160;
 
+  __size: () => number;
+
   constructor(value: UInt160) {
     super();
     this.value = value;
+    this.__size = utils.lazy(() => IOHelper.sizeOfUInt160);
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   asBuffer(): Buffer {

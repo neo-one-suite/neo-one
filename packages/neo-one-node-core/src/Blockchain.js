@@ -41,6 +41,14 @@ import type {
 import { type Log } from '@neo-one/utils';
 import type { Observable } from 'rxjs/Observable';
 
+import type AccountUnclaimed, {
+  AccountUnclaimedKey,
+  AccountUnclaimedsKey,
+} from './AccountUnclaimed';
+import type AccountUnspent, {
+  AccountUnspentKey,
+  AccountUnspentsKey,
+} from './AccountUnspent';
 import type BlockSystemFee, { BlockSystemFeeKey } from './BlockSystemFee';
 import type TransactionSpentCoins, {
   TransactionSpentCoinsKey,
@@ -111,6 +119,16 @@ export type Blockchain = {
   +isPersistingBlock: boolean,
 
   +account: ReadAllStorage<AccountKey, Account>,
+  +accountUnclaimed: ReadGetAllStorage<
+    AccountUnclaimedKey,
+    AccountUnclaimedsKey,
+    AccountUnclaimed,
+  >,
+  +accountUnspent: ReadGetAllStorage<
+    AccountUnspentKey,
+    AccountUnspentsKey,
+    AccountUnspent,
+  >,
   +action: ReadGetAllStorage<ActionKey, ActionsKey, Action>,
   +asset: ReadStorage<AssetKey, Asset>,
   +block: ReadStorage<BlockKey, Block>,
@@ -161,6 +179,11 @@ export type WriteBlockchain = {
   +getValidators: $PropertyType<Blockchain, 'getValidators'>,
 
   +account: ReadAllAddUpdateDeleteStorage<AccountKey, Account, AccountUpdate>,
+  +accountUnclaimed: ReadAddDeleteStorage<
+    AccountUnclaimedKey,
+    AccountUnclaimed,
+  >,
+  +accountUnspent: ReadAddDeleteStorage<AccountUnspentKey, AccountUnspent>,
   +action: ReadGetAllAddStorage<ActionKey, ActionsKey, Action>,
   +asset: ReadAddUpdateStorage<AssetKey, Asset, AssetUpdate>,
   +block: ReadAddStorage<BlockKey, Block>,

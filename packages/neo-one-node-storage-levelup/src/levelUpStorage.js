@@ -19,16 +19,19 @@ import {
 import {
   type ChangeSet,
   type Storage,
+  AccountUnclaimed,
+  AccountUnspent,
   BlockSystemFee,
   TransactionSpentCoins,
 } from '@neo-one/node-core';
+
+import { keys } from '@neo-one/node-storage-common';
 
 import { type LevelUp } from './types';
 import { KeyNotFoundError } from './errors';
 
 import * as common from './common';
 import convertChange from './convertChange';
-import * as keys from './keys';
 import * as read from './read';
 
 export default ({
@@ -153,6 +156,30 @@ export default ({
       maxKey: keys.accountMaxKey,
       deserializeValue: (buffer: Buffer) =>
         Account.deserializeWire({
+          context,
+          buffer,
+        }),
+    }),
+    accountUnclaimed: read.createReadGetAllStorage({
+      db,
+      serializeKey: keys.typeKeyToSerializeKey.accountUnclaimed,
+      serializeKeyString: keys.typeKeyToSerializeKeyString.accountUnclaimed,
+      getMinKey: keys.getAccountUnclaimedKeyMin,
+      getMaxKey: keys.getAccountUnclaimedKeyMax,
+      deserializeValue: (buffer: Buffer) =>
+        AccountUnclaimed.deserializeWire({
+          context,
+          buffer,
+        }),
+    }),
+    accountUnspent: read.createReadGetAllStorage({
+      db,
+      serializeKey: keys.typeKeyToSerializeKey.accountUnspent,
+      serializeKeyString: keys.typeKeyToSerializeKeyString.accountUnspent,
+      getMinKey: keys.getAccountUnspentKeyMin,
+      getMaxKey: keys.getAccountUnspentKeyMax,
+      deserializeValue: (buffer: Buffer) =>
+        AccountUnspent.deserializeWire({
           context,
           buffer,
         }),

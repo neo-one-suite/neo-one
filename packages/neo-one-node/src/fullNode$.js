@@ -34,7 +34,7 @@ import { loadChain } from '@neo-one/node-offline';
 import { timer } from 'rxjs/observable/timer';
 import leveldown from 'leveldown';
 import levelup from 'levelup';
-import levelUpStorage from '@neo-one/node-levelup';
+import levelUpStorage from '@neo-one/node-storage-levelup';
 import path from 'path';
 import vm from '@neo-one/node-vm';
 

@@ -6,7 +6,7 @@ import {
 } from '../Serializable';
 import ContractParameterBase from './ContractParameterBase';
 
-import { type BinaryWriter } from '../utils';
+import utils, { type BinaryWriter, IOHelper } from '../utils';
 
 export type BooleanContractParameterJSON = {|
   type: 'Boolean',
@@ -24,9 +24,16 @@ export default class BooleanContractParameter extends ContractParameterBase<
   type = CONTRACT_PARAMETER_TYPE.BOOLEAN;
   value: boolean;
 
+  __size: () => number;
+
   constructor(value: boolean) {
     super();
     this.value = value;
+    this.__size = utils.lazy(() => IOHelper.sizeOfBoolean);
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   asBuffer(): Buffer {

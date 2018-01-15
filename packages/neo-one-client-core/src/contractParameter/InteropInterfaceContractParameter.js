@@ -16,6 +16,7 @@ export default class InteropInterfaceContractParameter extends ContractParameter
   typeof CONTRACT_PARAMETER_TYPE.INTEROP_INTERFACE,
 > {
   type = CONTRACT_PARAMETER_TYPE.INTEROP_INTERFACE;
+  size: number = 0;
 
   static deserializeWireBase(options: DeserializeWireBaseOptions): this {
     super.deserializeContractParameterBaseWireBase(options);

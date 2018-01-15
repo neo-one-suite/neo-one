@@ -1,11 +1,12 @@
 /* @flow */
 import { CONTRACT_PARAMETER_TYPE } from './ContractParameterType';
-import { type BinaryWriter, JSONHelper } from '../utils';
 import {
   type DeserializeWireBaseOptions,
   type SerializeJSONContext,
 } from '../Serializable';
 import ContractParameterBase from './ContractParameterBase';
+
+import utils, { type BinaryWriter, IOHelper, JSONHelper } from '../utils';
 
 export type ByteArrayContractParameterJSON = {|
   type: 'ByteArray',
@@ -20,9 +21,16 @@ export default class ByteArrayContractParameter extends ContractParameterBase<
   type = CONTRACT_PARAMETER_TYPE.BYTE_ARRAY;
   value: Buffer;
 
+  __size: () => number;
+
   constructor(value: Buffer) {
     super();
     this.value = value;
+    this.__size = utils.lazy(() => IOHelper.sizeOfVarBytesLE(this.value));
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   asBuffer(): Buffer {

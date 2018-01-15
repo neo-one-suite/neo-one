@@ -13,6 +13,7 @@ import {
   type OutputKey,
   type SerializableInvocationData,
   type Transaction,
+  type UInt160,
   type VerifyScriptOptions,
   InvocationTransaction,
   ScriptBuilder,
@@ -28,7 +29,12 @@ import {
   type Storage,
   type VM,
 } from '@neo-one/node-core';
-import { type Log, utils as commonUtils, performanceNow } from '@neo-one/utils';
+import {
+  type Log,
+  Performance,
+  utils as commonUtils,
+  performanceNow,
+} from '@neo-one/utils';
 import PriorityQueue from 'js-priority-queue';
 import { Subject } from 'rxjs/Subject';
 
@@ -80,6 +86,8 @@ export default class Blockchain {
   feeContext: $PropertyType<BlockchainType, 'feeContext'>;
 
   account: $PropertyType<BlockchainType, 'account'>;
+  accountUnclaimed: $PropertyType<BlockchainType, 'accountUnclaimed'>;
+  accountUnspent: $PropertyType<BlockchainType, 'accountUnspent'>;
   action: $PropertyType<BlockchainType, 'action'>;
   asset: $PropertyType<BlockchainType, 'asset'>;
   block: $PropertyType<BlockchainType, 'block'>;
@@ -102,6 +110,7 @@ export default class Blockchain {
   _vm: VM;
   _running: boolean;
   _doneRunningResolve: ?() => void;
+  _perf: Performance;
 
   block$: Subject<Block>;
 
@@ -117,11 +126,14 @@ export default class Blockchain {
     this._vm = options.vm;
     this._running = true;
     this._doneRunningResolve = null;
+    this._perf = new Performance();
 
     this.settings = options.settings;
     this.log = options.log;
 
     this.account = this._storage.account;
+    this.accountUnclaimed = this._storage.accountUnclaimed;
+    this.accountUnspent = this._storage.accountUnspent;
     this.action = this._storage.action;
     this.asset = this._storage.asset;
     this.block = {
@@ -154,6 +166,8 @@ export default class Blockchain {
       addressVersion: this.settings.addressVersion,
       feeContext: this.feeContext,
       tryGetInvocationData: this._tryGetInvocationData,
+      getUnclaimed: this._getUnclaimed,
+      getUnspent: this._getUnspent,
     };
 
     this.block$ = new Subject();
@@ -349,17 +363,30 @@ export default class Blockchain {
         entry.block.index === this.currentBlockIndex + 1
       ) {
         entry = this._blockQueue.dequeue();
+        const done = this._perf.start('Blockchain._persistBlocksAsync');
         const start = performanceNow();
         // eslint-disable-next-line
         await this._persistBlock(entry.block, entry.unsafe);
         entry.resolve();
         this.block$.next(entry.block);
         const duration = performanceNow() - start;
+        done();
         this.log({
           event: 'PERSIST_BLOCK_SUCCESS',
           index: entry.block.index,
           durationMS: duration,
         });
+        if (
+          this._perf.getCount('Blockchain._persistBlocksAsync') % 1000 ===
+          0
+        ) {
+          this.log({
+            event: 'PERSIST_BLOCK_PERF',
+            index: entry.block.index,
+            timings: (this._perf.toStats(): $FlowFixMe),
+          });
+          this._perf.reset();
+        }
 
         this.cleanBlockQueue();
         entry = this.peekBlockQueue();
@@ -409,9 +436,16 @@ export default class Blockchain {
       await this.verifyBlock(block);
     }
 
-    const blockchain = this._createWriteBlockchain();
+    const blockchain = this._createWriteBlockchain(this._perf);
+
+    let done = this._perf.start('Blockchain._persistBlock.persistBlock');
     await blockchain.persistBlock(block);
+    done();
+
+    done = this._perf.start('Blockchain._persistBlock.commit');
     await this._storage.commit(blockchain.getChangeSet());
+    done();
+
     this._currentBlock = block;
     this._currentHeader = block.header;
   }
@@ -674,7 +708,7 @@ export default class Blockchain {
     return votes.filter(Boolean);
   };
 
-  _createWriteBlockchain(): WriteBatchBlockchain {
+  _createWriteBlockchain(perf?: Performance): WriteBatchBlockchain {
     return new WriteBatchBlockchain({
       settings: this.settings,
       currentBlock: this._currentBlock,
@@ -684,6 +718,7 @@ export default class Blockchain {
       onStep: this._onStep,
       getValidators: this.getValidators,
       log: this.log,
+      perf,
     });
   }
 
@@ -733,6 +768,22 @@ export default class Blockchain {
       result: data.result,
       actions,
     };
+  };
+
+  _getUnclaimed = async (hash: UInt160): Promise<Array<Input>> => {
+    const unclaimed = await this._storage.accountUnclaimed
+      .getAll({ hash })
+      .pipe(toArray())
+      .toPromise();
+    return unclaimed.map(value => value.input);
+  };
+
+  _getUnspent = async (hash: UInt160): Promise<Array<Input>> => {
+    const unspent = await this._storage.accountUnspent
+      .getAll({ hash })
+      .pipe(toArray())
+      .toPromise();
+    return unspent.map(value => value.input);
   };
 
   _onStep = ({ context, opCode }: OnStepInput) => {

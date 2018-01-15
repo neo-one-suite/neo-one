@@ -5,11 +5,12 @@ import {
   type DeleteChange,
 } from '@neo-one/node-core';
 
+import { keys } from '@neo-one/node-storage-common';
+
 import { type LevelUpChange } from './types';
 import { UnknownTypeError } from './errors';
 
 import * as common from './common';
-import * as keys from './keys';
 
 const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
   const change = changeIn;
@@ -19,6 +20,28 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
         {
           type: 'put',
           key: keys.typeKeyToSerializeKey.account(change.value),
+          value: change.value.serializeWire(),
+        },
+      ];
+    case 'accountUnspent':
+      return [
+        {
+          type: 'put',
+          key: keys.typeKeyToSerializeKey.accountUnspent({
+            hash: change.value.hash,
+            input: change.value.input,
+          }),
+          value: change.value.serializeWire(),
+        },
+      ];
+    case 'accountUnclaimed':
+      return [
+        {
+          type: 'put',
+          key: keys.typeKeyToSerializeKey.accountUnclaimed({
+            hash: change.value.hash,
+            input: change.value.input,
+          }),
           value: change.value.serializeWire(),
         },
       ];
@@ -158,6 +181,16 @@ const convertDeleteChange = (change: DeleteChange): LevelUpChange => {
       return {
         type: 'del',
         key: keys.typeKeyToSerializeKey.account(change.key),
+      };
+    case 'accountUnspent':
+      return {
+        type: 'del',
+        key: keys.typeKeyToSerializeKey.accountUnspent(change.key),
+      };
+    case 'accountUnclaimed':
+      return {
+        type: 'del',
+        key: keys.typeKeyToSerializeKey.accountUnclaimed(change.key),
       };
     case 'contract':
       return {

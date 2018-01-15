@@ -11,7 +11,12 @@ import {
 } from './Serializable';
 
 import common, { type UInt160 } from './common';
-import utils, { BinaryReader, type BinaryWriter, JSONHelper } from './utils';
+import utils, {
+  BinaryReader,
+  type BinaryWriter,
+  IOHelper,
+  JSONHelper,
+} from './utils';
 
 export type StorageItemAdd = {|
   hash: UInt160,
@@ -43,10 +48,22 @@ export default class StorageItem
   key: Buffer;
   value: Buffer;
 
+  __size: () => number;
+
   constructor({ hash, key, value }: StorageItemAdd) {
     this.hash = hash;
     this.key = key;
     this.value = value;
+    this.__size = utils.lazy(
+      () =>
+        IOHelper.sizeOfUInt160 +
+        IOHelper.sizeOfVarBytesLE(this.key) +
+        IOHelper.sizeOfVarBytesLE(this.value),
+    );
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   equals: Equals = utils.equals(

@@ -16,6 +16,7 @@ export default class VoidContractParameter extends ContractParameterBase<
   typeof CONTRACT_PARAMETER_TYPE.VOID,
 > {
   type = CONTRACT_PARAMETER_TYPE.VOID;
+  size: number = 0;
 
   asBoolean(): boolean {
     return false;

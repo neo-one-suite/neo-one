@@ -8,7 +8,7 @@ import {
   type SerializeJSONContext,
 } from '../Serializable';
 
-import utils, { type BinaryWriter } from '../utils';
+import utils, { type BinaryWriter, IOHelper } from '../utils';
 
 export type IntegerContractParameterJSON = {|
   type: 'Integer',
@@ -23,9 +23,18 @@ export default class IntegerContractParameter extends ContractParameterBase<
   type = CONTRACT_PARAMETER_TYPE.INTEGER;
   value: BN;
 
+  __size: () => number;
+
   constructor(value: BN) {
     super();
     this.value = value;
+    this.__size = utils.lazy(() =>
+      IOHelper.sizeOfVarBytesLE(utils.toSignedBuffer(this.value)),
+    );
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   asBoolean(): boolean {

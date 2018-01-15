@@ -1,10 +1,27 @@
 /* @flow */
+export { default as AccountUnclaimed } from './AccountUnclaimed';
+export { default as AccountUnspent } from './AccountUnspent';
 export { default as BlockSystemFee } from './BlockSystemFee';
 export { default as TransactionSpentCoins } from './TransactionSpentCoins';
 
 export { createEndpoint, getEndpointConfig } from './Network';
 export { NULL_ACTION, TRIGGER_TYPE } from './vm';
 
+export type {
+  AccountInputAdd,
+  AccountInputKey,
+  AccountInputsKey,
+} from './AccountInput';
+export type {
+  AccountUnclaimedAdd,
+  AccountUnclaimedKey,
+  AccountUnclaimedsKey,
+} from './AccountUnclaimed';
+export type {
+  AccountUnspentAdd,
+  AccountUnspentKey,
+  AccountUnspentsKey,
+} from './AccountUnspent';
 export type {
   Blockchain,
   ReadStorage,

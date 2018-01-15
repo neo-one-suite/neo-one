@@ -1,12 +1,12 @@
 /* @flow */
 import { CONTRACT_PARAMETER_TYPE } from './ContractParameterType';
-import { type BinaryWriter, JSONHelper } from '../utils';
 import ContractParameterBase from './ContractParameterBase';
 import {
   type DeserializeWireBaseOptions,
   type SerializeJSONContext,
 } from '../Serializable';
 import common, { type UInt256 } from '../common';
+import utils, { type BinaryWriter, IOHelper, JSONHelper } from '../utils';
 
 export type Hash256ContractParameterJSON = {|
   type: 'Hash256',
@@ -21,9 +21,16 @@ export default class Hash256ContractParameter extends ContractParameterBase<
   type = CONTRACT_PARAMETER_TYPE.HASH256;
   value: UInt256;
 
+  __size: () => number;
+
   constructor(value: UInt256) {
     super();
     this.value = value;
+    this.__size = utils.lazy(() => IOHelper.sizeOfUInt256);
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   asBuffer(): Buffer {

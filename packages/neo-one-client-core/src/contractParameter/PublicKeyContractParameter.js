@@ -1,12 +1,12 @@
 /* @flow */
 import { CONTRACT_PARAMETER_TYPE } from './ContractParameterType';
-import { type BinaryWriter, JSONHelper } from '../utils';
 import ContractParameterBase from './ContractParameterBase';
 import {
   type DeserializeWireBaseOptions,
   type SerializeJSONContext,
 } from '../Serializable';
 import common, { type ECPoint } from '../common';
+import utils, { type BinaryWriter, IOHelper, JSONHelper } from '../utils';
 
 export type PublicKeyContractParameterJSON = {|
   type: 'PublicKey',
@@ -21,9 +21,16 @@ export default class PublicKeyContractParameter extends ContractParameterBase<
   type = CONTRACT_PARAMETER_TYPE.PUBLIC_KEY;
   value: ECPoint;
 
+  __size: () => number;
+
   constructor(value: ECPoint) {
     super();
     this.value = value;
+    this.__size = utils.lazy(() => IOHelper.sizeOfECPoint(this.value));
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   asBuffer(): Buffer {

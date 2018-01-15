@@ -1,7 +1,6 @@
 /* @flow */
 import type BN from 'bn.js';
 
-import { type BinaryWriter, JSONHelper } from '../utils';
 import type {
   DeserializeWireBaseOptions,
   SerializableJSON,
@@ -14,6 +13,8 @@ import {
   type ContractParameterJSON,
 } from '../contractParameter';
 import { type VMStateFault, VM_STATE } from '../vm';
+
+import utils, { type BinaryWriter, IOHelper, JSONHelper } from '../utils';
 
 export type InvocationResultErrorAdd = {|
   gasConsumed: BN,
@@ -33,10 +34,18 @@ const MAX_SIZE = 1024;
 export default class InvocationResultError extends InvocationResultBase
   implements SerializableJSON<InvocationResultErrorJSON> {
   message: string;
+  __size: () => number;
 
   constructor({ gasConsumed, stack, message }: InvocationResultErrorAdd) {
     super({ state: VM_STATE.FAULT, gasConsumed, stack });
     this.message = message;
+    this.__size = utils.lazy(
+      () => super.size + IOHelper.sizeOfVarString(this.message),
+    );
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   serializeWireBase(writer: BinaryWriter): void {

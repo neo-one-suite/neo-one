@@ -12,7 +12,12 @@ import {
 } from './Serializable';
 
 import common, { type ECPoint } from './common';
-import utils, { BinaryReader, type BinaryWriter, JSONHelper } from './utils';
+import utils, {
+  BinaryReader,
+  type BinaryWriter,
+  IOHelper,
+  JSONHelper,
+} from './utils';
 
 export type ValidatorKey = {|
   publicKey: ECPoint,
@@ -33,9 +38,16 @@ export default class Validator extends BaseState
     SerializableJSON<ValidatorJSON> {
   publicKey: ECPoint;
 
+  __size: () => number;
+
   constructor({ version, publicKey }: ValidatorAdd) {
     super({ version });
     this.publicKey = publicKey;
+    this.__size = utils.lazy(() => IOHelper.sizeOfECPoint(this.publicKey));
+  }
+
+  get size(): number {
+    return this.__size();
   }
 
   equals: Equals = utils.equals(Validator, other =>
