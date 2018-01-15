@@ -349,7 +349,7 @@ export default class NEOBlockchainNodeAdapter extends NodeAdapter {
   async _checkRPC(rpcPath: string): Promise<boolean> {
     try {
       const response = await fetch(this._getAddress(rpcPath), {
-        timeout: 5000,
+        timeout: 5500,
       });
       return response.status === 200;
     } catch (error) {

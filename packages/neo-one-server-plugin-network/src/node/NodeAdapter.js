@@ -77,7 +77,7 @@ export default class NodeAdapter {
       }),
       this._update$.pipe(
         switchMap(() =>
-          timer(0, 5000).pipe(
+          timer(0, 5500).pipe(
             switchMap(() =>
               defer(async () => {
                 const [ready, live] = await Promise.all([
