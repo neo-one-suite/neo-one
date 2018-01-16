@@ -418,7 +418,7 @@ export default class Node implements INode {
       (prevHealth.blockIndex != null &&
         prevHealth.blockIndex < health.blockIndex) ||
       (prevHealth.blockIndex == null &&
-        health.checkTimeSeconds - prevHealth.checkTimeSeconds < 60)
+        health.checkTimeSeconds - prevHealth.checkTimeSeconds < 120)
     ) {
       return health;
     }
