@@ -38,6 +38,8 @@ import levelUpStorage from '@neo-one/node-storage-levelup';
 import path from 'path';
 import vm from '@neo-one/node-vm';
 
+import getDataPath from './getDataPath';
+
 type BackupEnvironment = {|
   tmpPath?: string,
   readyPath?: string,
@@ -96,7 +98,7 @@ export default ({
 }: FullNodeOptions): Observable<*> => {
   const createLogForContext = createLogForContextIn || (() => log);
   const createProfile = createProfileIn || createProfileDefault;
-  const dataPath = path.resolve(environment.dataPath, 'data');
+  const dataPath = getDataPath(environment.dataPath);
 
   const backupEnv = environment.backup || {};
   const backupEnvironment = {

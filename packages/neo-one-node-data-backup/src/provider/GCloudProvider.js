@@ -37,6 +37,16 @@ export default class GCloudProvider extends Provider {
     this._options = options;
   }
 
+  async canRestore(): Promise<boolean> {
+    const { projectID, bucket, file } = this._options;
+    const storage = new Storage({ projectId: projectID });
+    const result = await storage
+      .bucket(bucket)
+      .file(file)
+      .exists();
+    return result[0];
+  }
+
   async restore(): Promise<void> {
     const { projectID, bucket, file, writeBytesPerSecond } = this._options;
     const { dataPath, tmpPath } = this._environment;

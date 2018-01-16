@@ -12,9 +12,11 @@ import extract from './extract';
 import upload from './upload';
 
 export type Options = {|
-  downloadID: string,
-  key: string,
-  writeBytesPerSecond: number,
+  download?: {|
+    id: string,
+    key: string,
+    writeBytesPerSecond: number,
+  |},
   upload?: {|
     email: string,
     password: string,
@@ -42,8 +44,33 @@ export default class MegaProvider extends Provider {
     this._options = options;
   }
 
+  async canRestore(): Promise<boolean> {
+    const { download } = this._options;
+    if (download == null) {
+      return false;
+    }
+
+    const { id, key } = download;
+    const file = new File({ downloadID: id, key });
+    return new Promise(resolve => {
+      file.loadAttributes(err => {
+        if (err) {
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      });
+    });
+  }
+
   async restore(): Promise<void> {
-    const { downloadID, key, writeBytesPerSecond } = this._options;
+    const { download } = this._options;
+    if (download == null) {
+      this._log({ event: 'DATA_BACKUP_MEGA_PROVIDER_SKIP_RESTORE' });
+      return;
+    }
+
+    const { id, key, writeBytesPerSecond } = download;
     const { dataPath, tmpPath } = this._environment;
     const downloadPath = path.resolve(tmpPath, 'storage.db.tar.gz');
 
@@ -51,7 +78,7 @@ export default class MegaProvider extends Provider {
     try {
       await new Promise((resolve, reject) => {
         const read = new File({
-          downloadID,
+          downloadID: id,
           key,
         }).download();
         const write = fs.createWriteStream(downloadPath);
@@ -122,12 +149,23 @@ export default class MegaProvider extends Provider {
 
     this._log({ event: 'DATA_BACKUP_MEGA_PROVIDER_BACKUP' });
     try {
+      const storage = new Storage({
+        email,
+        password,
+        autologin: false,
+      });
+      await new Promise((resolve, reject) =>
+        storage.login(err => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        }),
+      );
       await upload({
         dataPath,
-        write: new Storage({
-          email,
-          password,
-        }).upload(file),
+        write: storage.upload(file),
       });
       this._log({ event: 'DATA_BACKUP_MEGA_PROVIDER_BACKUP_SUCCESS' });
     } catch (error) {

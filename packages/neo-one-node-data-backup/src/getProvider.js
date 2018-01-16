@@ -35,8 +35,7 @@ export default ({
       provider = megaProvider;
     } else {
       provider = new MultiProvider({
-        primary: provider,
-        other: [megaProvider],
+        providers: [provider, megaProvider],
         environment,
       });
     }

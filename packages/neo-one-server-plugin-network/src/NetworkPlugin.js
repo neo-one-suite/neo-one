@@ -9,6 +9,7 @@ import {
 import NetworkResourceType from './NetworkResourceType';
 
 import activateNetwork from './activateNetwork';
+import backupNode from './backupNode';
 import constants from './constants';
 import deactivateNetwork from './deactivateNetwork';
 import startNode from './startNode';
@@ -39,7 +40,7 @@ export default class NetworkPlugin extends Plugin {
   }
 
   get commands(): Array<(cliArgs: CLIArgs) => void> {
-    return [startNode];
+    return [backupNode, startNode];
   }
 
   get interactive(): Array<InteractiveCommand> {

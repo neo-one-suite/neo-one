@@ -27,5 +27,7 @@ export default async ({
 
   await provider.backup();
 
+  await fs.remove(environment.tmpPath);
+
   log({ event: 'DATA_BACKUP_BACKUP_COMPLETE' });
 };
