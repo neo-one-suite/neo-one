@@ -191,7 +191,7 @@ const verify = ({
   s = rmPadding(s);
 
   // eslint-disable-next-line
-  while (!s[0] && !(s[1] & 0x80)) {
+  while (s.length > 0 && !s[0] && !(s[1] & 0x80)) {
     s = s.slice(1);
   }
   let arr = [0x02];
