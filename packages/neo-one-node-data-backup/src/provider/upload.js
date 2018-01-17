@@ -43,6 +43,7 @@ export default async ({
     read.once('error', onError);
     write.once('error', onError);
     write.once('finish', onDone);
+    write.once('complete', onDone);
 
     read.pipe(write);
   });
