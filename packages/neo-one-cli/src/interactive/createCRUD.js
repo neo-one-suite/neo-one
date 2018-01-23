@@ -7,6 +7,7 @@ import {
   type CRUDResource,
   type CRUDResourceBase,
   type DescribeCRUD,
+  DeleteCRUD,
   type GetCRUD,
   type Plugin,
   type TaskStatus,
@@ -149,6 +150,24 @@ const renderTasks = (
   return output.join('\n');
 };
 
+const promptDelete = ({
+  cli,
+  crud,
+  name,
+}: {|
+  cli: InteractiveCLI,
+  crud: CRUDResource<*, *>,
+  name: string,
+|}) =>
+  cli.vorpal.activeCommand.prompt({
+    type: 'confirm',
+    name: 'continue',
+    default: false,
+    message: `Are you sure you want to delete ${
+      crud.resourceType.name
+    } ${name}?`,
+  });
+
 const createResource = ({
   cli,
   crud,
@@ -161,6 +180,18 @@ const createResource = ({
     .command(crud.command, crud.help)
     .action(async args => {
       cancel$ = new ReplaySubject();
+
+      if (crud instanceof DeleteCRUD) {
+        const delresponse = await promptDelete({
+          cli,
+          crud,
+          name: args.name,
+        });
+        if (!delresponse.continue) {
+          cli.vorpal.activeCommand.log('Aborting...');
+          return;
+        }
+      }
 
       const options = await crud.getCLIResourceOptions({
         cli,
