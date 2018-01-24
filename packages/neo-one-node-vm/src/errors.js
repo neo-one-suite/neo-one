@@ -211,6 +211,12 @@ export class InvalidPickItemIndexError extends VMError {
   }
 }
 
+export class InvalidRemoveIndexError extends VMError {
+  constructor(context: ExecutionContext) {
+    super(context, 'Invalid REMOVE Index');
+  }
+}
+
 export class InvalidSetItemIndexError extends VMError {
   constructor(context: ExecutionContext) {
     super(context, 'Invalid SETITEM Index');

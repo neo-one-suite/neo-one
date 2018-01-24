@@ -189,6 +189,7 @@ export type OpCode =
   | 'NEWSTRUCT'
   | 'APPEND'
   | 'REVERSE'
+  | 'REMOVE'
   | 'THROW'
   | 'THROWIFNOT';
 
@@ -366,6 +367,7 @@ export type ByteCode =
   | 0xc6
   | 0xc8
   | 0xc9
+  | 0xca
   | 0xf0
   | 0xf1;
 
@@ -471,6 +473,7 @@ const OPCODE_PAIRS = [[0x00, 'PUSH0'], [0x01, 'PUSHBYTES1']]
     [0xc6, 'NEWSTRUCT'],
     [0xc8, 'APPEND'],
     [0xc9, 'REVERSE'],
+    [0xca, 'REMOVE'],
     [0xf0, 'THROW'],
     [0xf1, 'THROWIFNOT'],
   ]);

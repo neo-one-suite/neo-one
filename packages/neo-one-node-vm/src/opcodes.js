@@ -34,6 +34,7 @@ import {
   InvalidCheckMultisigArgumentsError,
   InvalidPackCountError,
   InvalidPickItemIndexError,
+  InvalidRemoveIndexError,
   InvalidSetItemIndexError,
   LeftNegativeError,
   PickNegativeError,
@@ -1510,7 +1511,7 @@ const OPCODE_PAIRS = [
       }),
     ],
     [
-      0xc7,
+      0xc8,
       createOp({
         name: 'APPEND',
         in: 2,
@@ -1527,13 +1528,30 @@ const OPCODE_PAIRS = [
       }),
     ],
     [
-      0xc8,
+      0xc9,
       createOp({
         name: 'REVERSE',
         in: 1,
         invoke: ({ context, args }: OpInvokeArgs) => {
           const value = args[0].asArray();
           value.reverse();
+
+          return { context };
+        },
+      }),
+    ],
+    [
+      0xca,
+      createOp({
+        name: 'REMOVE',
+        in: 2,
+        invoke: ({ context, args }: OpInvokeArgs) => {
+          const index = args[0].asBigInteger().toNumber();
+          const value = args[1].asArray();
+          if (index < 0 || index >= value.length) {
+            throw new InvalidRemoveIndexError(context);
+          }
+          value.splice(index, 1);
 
           return { context };
         },
