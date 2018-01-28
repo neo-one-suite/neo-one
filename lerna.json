@@ -9,12 +9,5 @@
   "npmClientArgs": [
     "--ignore-engines"
   ],
-  "useWorkspaces": true,
-  "commands": {
-    "publish": {
-      "npmClientArgs": [
-        "--access public"
-      ]
-    }
-  }
+  "useWorkspaces": true
 }
