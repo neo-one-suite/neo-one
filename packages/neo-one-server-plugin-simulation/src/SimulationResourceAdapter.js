@@ -181,6 +181,7 @@ export default class SimulationResourceAdapter {
             new TaskList({
               tasks: [createSimulationDirectory, createNetwork, writeOptions],
               concurrent: true,
+              collapse: false,
             }),
         },
         {
@@ -188,6 +189,7 @@ export default class SimulationResourceAdapter {
           task: () =>
             new TaskList({
               tasks: [runPreCompileHooks, compileContracts],
+              collapse: false,
             }),
         },
         {
@@ -198,11 +200,13 @@ export default class SimulationResourceAdapter {
             new TaskList({
               tasks: [setupWallets, deployContracts],
               concurrent: true,
+              collapse: false,
             }),
         },
         writeSimulationConfig,
         runCreateHooks,
       ],
+      collapse: false,
     });
   }
 

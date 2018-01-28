@@ -15,6 +15,7 @@ import { defer } from 'rxjs/observable/defer';
 import { map, shareReplay, switchMap } from 'rxjs/operators';
 import { of as _of } from 'rxjs/observable/of';
 import { timer } from 'rxjs/observable/timer';
+import { utils } from '@neo-one/utils';
 
 import type { NodeSettings } from '../types';
 
@@ -151,6 +152,23 @@ export default class NodeAdapter {
         this._update$.next();
       },
     );
+  }
+
+  async live(timeoutSeconds: number): Promise<void> {
+    const start = utils.nowSeconds();
+
+    while (utils.nowSeconds() - start < timeoutSeconds) {
+      // eslint-disable-next-line
+      const isLive = await this._isLive();
+      if (isLive) {
+        return;
+      }
+
+      // eslint-disable-next-line
+      await new Promise(resolve =>
+        setTimeout(() => resolve(), timeoutSeconds / 10 * 1000),
+      );
+    }
   }
 
   // eslint-disable-next-line

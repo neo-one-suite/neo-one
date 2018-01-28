@@ -264,6 +264,20 @@ export default class NetworkResourceAdapter {
               concurrent: true,
             }),
         },
+        {
+          title: 'Wait for network to be alive',
+          task: ctx =>
+            new TaskList({
+              tasks: nodeOptionsAndNodes.map(([nodeOptions, node]) => ({
+                title: `Waiting for node ${nodeOptions.name}`,
+                task: async () => {
+                  ctx.resourceAdapter._update$.next();
+                  await node.live(5);
+                },
+              })),
+              concurrent: true,
+            }),
+        },
       ],
     });
   }

@@ -364,7 +364,7 @@ export default async ({
     state: errorMessage == null ? finalContext.state : VM_STATE.FAULT,
     stack: finalContext.stack.map(item => item.toContractParameter()),
     stackAlt: finalContext.stackAlt.map(item => item.toContractParameter()),
-    gasConsumed: gas.sub(finalContext.gasLeft).add(FREE_GAS),
+    gasConsumed: gas.sub(finalContext.gasLeft),
     errorMessage:
       errorMessage == null ? finalContext.errorMessage : errorMessage,
   };

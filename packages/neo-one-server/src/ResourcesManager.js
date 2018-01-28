@@ -19,7 +19,7 @@ import { ReplaySubject } from 'rxjs/ReplaySubject';
 import type { Subject } from 'rxjs/Subject';
 
 import _ from 'lodash';
-import { map, shareReplay, switchMap } from 'rxjs/operators';
+import { filter, map, shareReplay, switchMap, take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import fs from 'fs-extra';
 import { of as _of } from 'rxjs/observable/of';
@@ -338,6 +338,9 @@ export default class ResourcesManager<
           skip,
           task: async ctx => {
             setFromContext(ctx);
+            await this.getResource$({ name, options: ({}: $FlowFixMe) })
+              .pipe(filter(value => value != null), take(1))
+              .toPromise();
             const dependencies = ctx.dependencies || [];
             const dependents = ctx.dependents || [];
             await Promise.all([
@@ -362,6 +365,7 @@ export default class ResourcesManager<
                 }),
               ),
               concurrent: true,
+              collapse: false,
             }),
         },
       ].filter(Boolean),
