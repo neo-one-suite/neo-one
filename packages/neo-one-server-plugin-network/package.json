@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-network",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "keywords": [
     "neo",
     "NEO",
@@ -34,14 +34,14 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.1",
-    "@neo-one/client-core": "^1.0.0-alpha.1",
-    "@neo-one/node": "^1.0.0-alpha.1",
-    "@neo-one/node-core": "^1.0.0-alpha.1",
-    "@neo-one/node-data-backup": "^1.0.0-alpha.1",
-    "@neo-one/node-neo-settings": "^1.0.0-alpha.1",
-    "@neo-one/server-plugin": "^1.0.0-alpha.1",
-    "@neo-one/utils": "^1.0.0-alpha.1",
+    "@neo-one/client": "^1.0.0-alpha.2",
+    "@neo-one/client-core": "^1.0.0-alpha.2",
+    "@neo-one/node": "^1.0.0-alpha.2",
+    "@neo-one/node-core": "^1.0.0-alpha.2",
+    "@neo-one/node-data-backup": "^1.0.0-alpha.2",
+    "@neo-one/node-neo-settings": "^1.0.0-alpha.2",
+    "@neo-one/server-plugin": "^1.0.0-alpha.2",
+    "@neo-one/utils": "^1.0.0-alpha.2",
     "cross-spawn": "^6.0.3",
     "fs-extra": "^5.0.0",
     "lodash": "^4.17.4",
