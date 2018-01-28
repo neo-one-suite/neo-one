@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "keywords": [
     "neo",
     "NEO",
@@ -34,9 +34,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^0.0.3",
-    "@neo-one/node-neo-settings": "^0.0.3",
-    "@neo-one/utils": "^0.0.3",
+    "@neo-one/client-core": "^0.1.0",
+    "@neo-one/node-neo-settings": "^0.1.0",
+    "@neo-one/utils": "^0.1.0",
     "bignumber.js": "^5.0.0",
     "bn.js": "^4.11.8",
     "dataloader": "^1.3.0",

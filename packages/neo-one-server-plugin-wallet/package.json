@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-wallet",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "keywords": [
     "neo",
     "NEO",
@@ -32,13 +32,13 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^0.0.3",
-    "@neo-one/client-core": "^0.0.3",
-    "@neo-one/client-node": "^0.0.3",
-    "@neo-one/server-plugin": "^0.0.3",
-    "@neo-one/server-plugin-compiler": "^0.0.3",
-    "@neo-one/server-plugin-network": "^0.0.3",
-    "@neo-one/utils": "^0.0.3",
+    "@neo-one/client": "^0.1.0",
+    "@neo-one/client-core": "^0.1.0",
+    "@neo-one/client-node": "^0.1.0",
+    "@neo-one/server-plugin": "^0.1.0",
+    "@neo-one/server-plugin-compiler": "^0.1.0",
+    "@neo-one/server-plugin-network": "^0.1.0",
+    "@neo-one/utils": "^0.1.0",
     "bignumber.js": "^5.0.0",
     "fs-extra": "^5.0.0",
     "lodash": "^4.17.4",
