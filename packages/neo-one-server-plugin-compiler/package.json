@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-compiler",
-  "version": "1.0.0-alpha.63f054ed",
+  "version": "1.0.0-alpha.0",
   "keywords": [
     "neo",
     "NEO",
@@ -35,10 +35,10 @@
   },
   "dependencies": {
     "@neo-one/boa": "^0.0.2",
-    "@neo-one/client": "^1.0.0-alpha.63f054ed",
+    "@neo-one/client": "^1.0.0-alpha.0",
     "@neo-one/csharp": "^0.0.1",
-    "@neo-one/server-plugin": "^1.0.0-alpha.63f054ed",
-    "@neo-one/utils": "^1.0.0-alpha.63f054ed",
+    "@neo-one/server-plugin": "^1.0.0-alpha.0",
+    "@neo-one/utils": "^1.0.0-alpha.0",
     "fs-extra": "^5.0.0",
     "lodash": "^4.17.4",
     "rxjs": "^5.5.6"

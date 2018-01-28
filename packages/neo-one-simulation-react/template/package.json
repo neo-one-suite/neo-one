@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/simulation-react-template",
-  "version": "1.0.0-alpha.63f054ed",
+  "version": "1.0.0-alpha.0",
   "private": true,
   "dependencies": {
     "@babel/polyfill": "^7.0.0-beta.38",
-    "@neo-one/client": "^1.0.0-alpha.63f054ed",
+    "@neo-one/client": "^1.0.0-alpha.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-scripts": "1.1.0"
