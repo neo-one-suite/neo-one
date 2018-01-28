@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-node",
-  "version": "0.1.0",
+  "version": "1.0.0-alpha.63f054ed",
   "keywords": [
     "neo",
     "NEO",
@@ -34,7 +34,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^0.1.0",
+    "@neo-one/client": "^1.0.0-alpha.63f054ed",
     "fs-extra": "^5.0.0"
   }
 }
