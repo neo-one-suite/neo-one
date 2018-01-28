@@ -66,7 +66,7 @@ export default class ConsensusQueue extends AsyncIteratorBase<
 
   _push(item: Item): void {
     if (this.__done) {
-      throw new Error('AsyncBlockIterator already ended');
+      throw new Error('ConsensusQueue already ended');
     }
 
     if (this._resolvers.length > 0) {
