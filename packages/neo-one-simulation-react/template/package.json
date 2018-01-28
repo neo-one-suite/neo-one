@@ -3,11 +3,11 @@
   "version": "0.0.2",
   "private": true,
   "dependencies": {
-    "@babel/polyfill": "^7.0.0-beta.37",
+    "@babel/polyfill": "^7.0.0-beta.38",
     "@neo-one/client": "^0.0.2",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.0.17"
+    "react-scripts": "1.1.0"
   },
   "scripts": {
     "start": "react-scripts start",

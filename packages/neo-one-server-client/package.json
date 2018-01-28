@@ -37,9 +37,9 @@
     "@neo-one/server-grpc": "^0.0.2",
     "@neo-one/server-plugin": "^0.0.2",
     "@neo-one/utils": "^0.0.2",
-    "cross-spawn": "^5.1.0",
+    "cross-spawn": "^6.0.3",
     "fs-extra": "^5.0.0",
-    "grpc": "^1.8.0",
+    "grpc": "^1.8.4",
     "is-running": "^2.1.0",
     "rxjs": "^5.5.6"
   }
