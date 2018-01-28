@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "keywords": [
     "neo",
     "NEO",
@@ -34,14 +34,14 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/server-client": "^0.0.3",
+    "@neo-one/server-client": "^0.0.4",
     "@neo-one/server-grpc": "^0.0.2",
-    "@neo-one/server-plugin": "^0.0.2",
-    "@neo-one/server-plugin-compiler": "^0.0.2",
-    "@neo-one/server-plugin-network": "^0.0.2",
-    "@neo-one/server-plugin-simulation": "^0.0.4",
-    "@neo-one/server-plugin-wallet": "^0.0.2",
-    "@neo-one/utils": "^0.0.2",
+    "@neo-one/server-plugin": "^0.0.3",
+    "@neo-one/server-plugin-compiler": "^0.0.3",
+    "@neo-one/server-plugin-network": "^0.0.3",
+    "@neo-one/server-plugin-simulation": "^0.0.5",
+    "@neo-one/server-plugin-wallet": "^0.0.3",
+    "@neo-one/utils": "^0.0.3",
     "fs-extra": "^5.0.0",
     "grpc": "^1.8.0",
     "grpc-error": "^1.0.0",
