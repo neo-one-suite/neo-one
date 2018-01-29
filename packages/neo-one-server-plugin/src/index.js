@@ -19,6 +19,7 @@ export { default as killProcess } from './killProcess';
 export { default as name } from './name';
 export { default as paths } from './paths';
 export { default as pluginResourceTypeUtil } from './pluginResourceTypeUtil';
+export { default as theme } from './theme';
 
 export { AbortController, AbortSignal } from './AbortController';
 export { getTasksError, areTasksDone, skipAllTasks } from './tasks';
