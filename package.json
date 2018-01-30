@@ -76,7 +76,7 @@
     "eslint-plugin-flowtype": "^2.42.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
-    "eslint-plugin-react": "^7.6.0",
+    "eslint-plugin-react": "^7.6.1",
     "flow-bin": "^0.64.0",
     "fs-extra": "^5.0.0",
     "gulp": "^3.9.1",
@@ -98,9 +98,9 @@
     "through2": "^2.0.3"
   },
   "resolutions": {
-    "ajv": "^6.0.0-rc.1",
+    "ajv": "^6.1.0",
     "bn.js": "^4.11.8",
-    "grpc": "^1.8.0"
+    "grpc": "^1.8.4"
   },
   "jest": {
     "collectCoverageFrom": [
