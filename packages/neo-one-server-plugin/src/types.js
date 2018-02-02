@@ -160,6 +160,7 @@ export type InteractiveCLI = {
   +addDelimiter: (key: string, name: string) => void,
   +removeDelimiter: (key: string) => void,
   +resetDelimiter: () => void,
+  +prompt: (questions: Array<Object>) => Promise<Object>,
   +log: (message: LogMessage) => void,
   +exec: (command: string) => Promise<void>,
   +printDescribe: (

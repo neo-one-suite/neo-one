@@ -11,6 +11,7 @@ import {
   type GetCRUD,
   type Plugin,
   type TaskStatus,
+  type InteractiveCLI,
   getTasksError,
   areTasksDone,
 } from '@neo-one/server-plugin';
@@ -26,8 +27,6 @@ import stripAnsi from 'strip-ansi';
 import { empty } from 'rxjs/observable/empty';
 import logUpdate from 'log-update';
 import { timer } from 'rxjs/observable/timer';
-
-import type InteractiveCLI from '../InteractiveCLI';
 
 const pointer = chalk.yellow(figures.pointer);
 const skipped = chalk.yellow(figures.arrowDown);
@@ -159,14 +158,16 @@ const promptDelete = ({
   crud: CRUDResource<*, *>,
   name: string,
 |}) =>
-  cli.vorpal.activeCommand.prompt({
-    type: 'confirm',
-    name: 'continue',
-    default: false,
-    message: `Are you sure you want to delete ${
-      crud.resourceType.name
-    } ${name}?`,
-  });
+  cli.prompt([
+    {
+      type: 'confirm',
+      name: 'continue',
+      default: false,
+      message: `Are you sure you want to delete ${
+        crud.resourceType.name
+      } ${name}?`,
+    },
+  ]);
 
 const createResource = ({
   cli,
@@ -182,12 +183,12 @@ const createResource = ({
       cancel$ = new ReplaySubject();
 
       if (crud instanceof DeleteCRUD) {
-        const delresponse = await promptDelete({
+        const response = await promptDelete({
           cli,
           crud,
           name: args.name,
         });
-        if (!delresponse.continue) {
+        if (!response.continue) {
           cli.vorpal.activeCommand.log('Aborting...');
           return;
         }
