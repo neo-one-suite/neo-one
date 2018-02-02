@@ -1,0 +1,79 @@
+/* Logo header css */
+body > div.fixedHeaderContainer {
+  background-color: $primaryLight;
+  min-height: 0px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+body > div.fixedHeaderContainer > div > header {
+  align-items: center;
+  height: 100%;
+}
+
+body > div.fixedHeaderContainer > div > header > a {
+  height: 100%;
+}
+
+body .fixedHeaderContainer header img.logo {
+  height: 56px;
+}
+
+body .fixedHeaderContainer header img.mobileLogo {
+  height: 24px;
+}
+/* Logo header css end */
+
+div.navPusher {
+  height: auto;
+  padding-top: 96px;
+  min-height: calc(100% - 96px);
+}
+
+.navigationSlider .slidingNav ul {
+  background-color: $primaryLight;
+  margin-top: 48px;
+}
+
+.navigationSlider .slidingNav ul li a {
+  height: auto;
+  padding-bottom: 14px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 14px;
+}
+
+@media only screen and (min-width: 736px) {
+  div.navPusher {
+    height: auto;
+    padding-top: 80px;
+    min-height: calc(100% - 80px);
+  }
+
+  .navigationSlider .slidingNav ul {
+    margin-top: 0px;
+  }
+}
+
+div.navigationWrapper.navigationSlider {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+div.navigationSlider > nav.slidingNav ul li a:hover {
+  font-size: 0.875rem;
+  color: $hover;
+  line-height: 1.46428em;
+}
+
+div.navigationSlider > nav.slidingNav ul li a {
+  font-size: 0.875rem;
+  color: $gray6;
+  line-height: 1.46428em;
+}
+
+.navigationSlider .slidingNav ul li a:focus, .navigationSlider .slidingNav ul li a:hover {
+  background-color: transparent;
+}

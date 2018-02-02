@@ -1,0 +1,89 @@
+.heroBackground {
+  background-image: url('../img/background.png');
+}
+
+.tagLineContainer {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.taglineText {
+  color: $gray0;
+  margin-left: 0px;
+}
+
+.heroButtonContainer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  margin-top: 40px;
+}
+
+.heroButtonMiddle {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.heroButtonLeft {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.heroButtonRight {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.heroContainer {
+  flex: 1 1 100%;
+  max-width: 100%;
+  text-align: left;
+  justify-content: center;
+}
+
+.heroLeftInner {
+  flex: 1 1 460px;
+  max-width: 460px;
+}
+
+.heroRightInner {
+  flex: 1 1 460px;
+  max-width: 460px;
+  text-align: left;
+}
+
+@media only screen and (min-width: 736px) {
+  .heroLeftInner {
+    flex: 0 1 400px;
+    max-width: 400px;
+    padding-right: 48px;
+  }
+
+  .heroContainer {
+    flex: 1 1 50%;
+    max-width: 50%;
+    text-align: left;
+    justify-content: flex-start;
+  }
+
+  .heroButtonMiddle {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .heroButtonLeft {
+    margin-left: 16px;
+  }
+
+  .heroButtonRight {
+    margin-right: 16px;
+  }
+}
+
+.githubContainer {
+  display: flex;
+  justify-content: flex-end;
+}

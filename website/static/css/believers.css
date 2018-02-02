@@ -1,0 +1,19 @@
+.believersContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.logosShowcase {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 16px;
+  padding-top: 16px;
+}
+
+@media only screen and (min-width: 736px) {
+  .logosShowcase {
+    padding-bottom: 48px;
+    padding-top: 48px;
+  }
+}

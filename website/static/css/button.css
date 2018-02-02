@@ -1,0 +1,21 @@
+.button {
+  background-color: $accent;
+  border: none;
+  border-radius: 24px;
+  color: $gray5;
+  padding-bottom: 12px;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 12px;
+  text-align: center;
+  text-transform: none;
+  width: 96px;
+  font-size: 0.875rem;
+  line-height: 1em;
+  text-align: center;
+}
+
+.button:hover {
+  background-color: $primaryLight;
+  color: $gray5;
+}

@@ -15,11 +15,14 @@
 @media only screen and (min-width: 1500px) {
 }
 
+/* First line docs css */
+
 body > div.navPusher > div > div.container.mainContainer > div > div.post > article > div > span > p:nth-child(1) {
-  color: #6d6d6d;
+  color: $gray2;
   font-size: 24px;
-  font-weight: 300;
 }
+
+/* First line docs css end */
 
 .installCallout {
   display: inline-block;

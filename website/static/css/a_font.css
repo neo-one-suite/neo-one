@@ -1,0 +1,168 @@
+@font-face {
+  font-family: 'Axiforma-Bold';
+  src: url('../font/Axiforma-Bold.woff2') format('woff2'),
+      url('../font/Axiforma-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Axiforma-SemiBold';
+  src: url('../font/Axiforma-SemiBold.woff2') format('woff2'),
+    url('../font/Axiforma-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Axiforma-Medium';
+  src: url('../font/Axiforma-Medium.woff2') format('woff2'),
+      url('../font/Axiforma-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Axiforma-Regular';
+  src: url('../font/Axiforma-Regular.woff2') format('woff2'),
+      url('../font/Axiforma-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Axiforma-Book';
+  src: url('../font/Axiforma-Book.woff2') format('woff2'),
+      url('../font/Axiforma-Book.woff') format('woff');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DecimaMonoProLt';
+  src: url('../font/DecimaMonoProLt.woff2') format('woff2'),
+    url('../font/DecimaMonoProLt.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
+.axiformaBold,
+div.navigationSlider > nav.slidingNav ul li a,
+div.navigationSlider > nav.slidingNav ul li a:hover,
+.button,
+.buttonText {
+  font-family: $axiformaBold;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.axiformaSemiBold {
+  font-family: $axiformaSemiBold;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.axiformaMedium,
+h1,
+h2,
+h3,
+h4 {
+  font-family: $axiformaMedium;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.axiformaRegular,
+body,
+.mainContainer {
+  font-family: $axiformaRegular;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.axiformaBook,
+body > div.navPusher > div > div.container.mainContainer > div > div.post > article > div > span > p:nth-child(1) {
+  font-family: $axiformaBook;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.decimaLight {
+  font-family: $decimaMonoProLt;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.display2 {
+  color: $gray6;
+  font-size: 2.8125rem; /* 45px */
+  line-height: 1.06666em;
+  margin-left: -.04em;
+  text-align: left;
+  /* font-family: $axiforma;
+  font-weight: 400; */
+}
+
+.display1 {
+  color: $gray6;
+  font-size: 2.125rem; /* 34px */
+  line-height: 1.20588em;
+  margin-left: -.04em;
+  text-align: left;
+  /* font-family: $axiforma;
+  font-weight: 400; */
+}
+
+.headline {
+  color: $gray6;
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.35416em;
+  margin-left: -.04em;
+  text-align: left;
+  /* font-family: $axiforma;
+  font-weight: 400; */
+}
+
+.subheading {
+  color: $gray6;
+  font-size: 1rem; /* 16px */
+  line-height: 1.5em;
+  text-align: left;
+  /* font-family: $axiforma;
+  font-weight: 400; */
+}
+
+.subheadingBold {
+  color: $gray6;
+  font-size: 1rem; /* 16px */
+  line-height: 1.71428em;
+  text-align: left;
+  /* font-family: $axiforma;
+  font-weight: 500; */
+}
+
+.body2 {
+  color: $gray6;
+  font-size: 0.875rem;
+  line-height: 1.71428em;
+  text-align: left;
+  /* font-family: $axiforma;
+  font-weight: 500; */
+}
+
+.body1 {
+  color: $gray6;
+  font-size: 0.875rem;
+  line-height: 1.46428em;
+  text-align: left;
+  /* font-family: $axiforma;
+  font-weight: 400; */
+}
+
+.buttonText {
+  font-size: 0.875rem;
+  line-height: 1em;
+  text-align: center;
+  /* font-family: $axiforma;
+  font-weight: 500; */
+}

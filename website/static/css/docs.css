@@ -1,0 +1,13 @@
+nav.toc .toggleNav .navGroup.navGroupActive h3 {
+  color: $gray5;
+  background-color: $primaryLight;
+}
+
+nav.toc .toggleNav .navGroup.navGroupActive {
+  color: $primaryColor;
+  background-color: $grayHalf;
+}
+
+nav.toc .toggleNav ul li a.navItemActive {
+  color: $primaryDark;
+}

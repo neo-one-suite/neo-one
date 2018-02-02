@@ -1,0 +1,67 @@
+footer.footerContainer {
+  background-color: $black;
+}
+
+.footerSectionWrapper {
+}
+
+.footerSection {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+footer .sitemap h5.footerTitle {
+  color: $primaryColor;
+  text-align: left;
+  font-size: 0.875rem;
+  line-height: 1.46428em;
+  padding-top: 8px;
+}
+
+footer .sitemap a {
+  color: $gray0;
+  font-size: 0.875rem;
+  line-height: 1.46428em;
+  text-align: left;
+}
+
+footer .copyright {
+  color: $gray4;
+  font-size: 0.875rem;
+  line-height: 1.46428em;
+  text-align: center;
+}
+
+.footerGitHubButton {
+  padding-top: 3px;
+  min-width: 80px;
+}
+
+footer .sitemap a.footerLink {
+  align-items: center;
+  display: flex;
+}
+
+.footerLinkImage {
+  width: 24px;
+}
+
+.footerLink:hover .footerLinkRestImage {
+  display: none;
+}
+
+.footerLink .footerLinkHoverImage {
+  display: none;
+}
+
+.footerLink:hover .footerLinkHoverImage {
+  display: inline-block;
+}
+
+.footerLinkText {
+  padding-left: 8px;
+}
+
+.footerLink:hover .footerLinkText {
+  color: $accent;
+}

@@ -1,0 +1,21 @@
+.featureCallout {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap-reverse;
+  justify-content: space-between;
+}
+
+.featureCalloutLTR {
+  flex-wrap: wrap;
+}
+
+.featureCalloutImage {
+  max-width: 500px;
+  flex: 0 1 500px;
+}
+
+.featureCalloutText {
+  display: flex;
+  flex: 0.75 1 375px;
+  flex-direction: column;
+}
