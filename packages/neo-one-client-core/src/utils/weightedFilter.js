@@ -40,7 +40,12 @@ export default function weightedFilter<T>(
       weight = end.minus(old).times(amount);
     }
 
-    result.push([value, weight.gte(0) ? weight.floor() : weight.ceil()]);
+    result.push([
+      value,
+      weight.gte(0)
+        ? weight.integerValue(BigNumber.ROUND_FLOOR)
+        : weight.integerValue(BigNumber.ROUND_CEIL),
+    ]);
   }
 
   return result;

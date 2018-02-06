@@ -37,7 +37,7 @@
     "@neo-one/client-core": "^1.0.0-alpha.3",
     "@neo-one/node-neo-settings": "^1.0.0-alpha.3",
     "@neo-one/utils": "^1.0.0-alpha.3",
-    "bignumber.js": "^5.0.0",
+    "bignumber.js": "^6.0.0",
     "bn.js": "^4.11.8",
     "dataloader": "^1.4.0",
     "fast-stable-stringify": "^1.0.0",

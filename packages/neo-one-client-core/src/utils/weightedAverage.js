@@ -14,11 +14,11 @@ export default (
     sumValue = sumValue.plus(value.weight.times(value.value));
   }
 
-  if (sumValue.equals(0) || sumWeight.equals(0)) {
+  if (sumValue.isEqualTo(0) || sumWeight.isEqualTo(0)) {
     return 0;
   }
   return sumValue
     .div(sumWeight)
-    .floor()
+    .integerValue(BigNumber.ROUND_FLOOR)
     .toNumber();
 };

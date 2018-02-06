@@ -136,7 +136,7 @@ export default async ({
         );
         transactions = _.take(
           networkFees.sort(([first, a], [second, b]) =>
-            b.div(second.size).cmp(a.div(first.size)),
+            b.div(second.size).comparedTo(a.div(first.size)),
           ),
           node.blockchain.settings.maxTransactionsPerBlock - 1,
           // eslint-disable-next-line

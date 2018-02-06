@@ -920,7 +920,7 @@ export default class LocalUserAccountProvider<
     }
 
     const outputsOrdered = remainingOutputs
-      .sort((coinA, coinB) => coinA.value.cmp(coinB.value))
+      .sort((coinA, coinB) => coinA.value.comparedTo(coinB.value))
       .reverse();
 
     const sum = outputsOrdered.reduce(
@@ -937,7 +937,7 @@ export default class LocalUserAccountProvider<
     let amountRemaining = amount.plus(utils.ZERO_BIG_NUMBER);
     while (outputsOrdered[k].value.lte(amountRemaining)) {
       amountRemaining = amountRemaining.minus(outputsOrdered[k].value);
-      if (amountRemaining.equals(utils.ZERO_BIG_NUMBER)) {
+      if (amountRemaining.isEqualTo(utils.ZERO_BIG_NUMBER)) {
         break;
       }
       k += 1;
