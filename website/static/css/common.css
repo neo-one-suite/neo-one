@@ -172,6 +172,18 @@ div.col-7 {
   background-color: $gray5;
 }
 
+.gray6 {
+  color: $gray6;
+}
+
+.gray6BG {
+  background-color: $gray6;
+}
+
+.blackBG {
+  background-color: $black;
+}
+
 .accent {
   color: $accent;
 }

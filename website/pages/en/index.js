@@ -231,7 +231,7 @@ class CallOut extends React.Component {
 class Features extends React.Component {
   render() {
     return (
-      <div className="featuresBG section">
+      <div className="blackBG section">
         <div className="wrapper featureWrapper">
           <FeaturesIntro language={this.props.language} />
           <div className="featureContainer">
