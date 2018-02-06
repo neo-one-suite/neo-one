@@ -35,6 +35,7 @@ import {
   switchMap,
   take,
 } from 'rxjs/operators';
+import inquirer from 'inquirer';
 import ora from 'ora';
 
 import {
@@ -420,5 +421,9 @@ export default class InteractiveCLI {
       ],
       ['Interactive CLI Config Path', this.clientConfig._configPath],
     ];
+  }
+
+  prompt(questions: Array<Object>): Promise<Object> {
+    return inquirer.prompt(questions);
   }
 }
