@@ -205,7 +205,7 @@ export class InvalidPackCountError extends VMError {
   }
 }
 
-export class InvalidPickItemIndexError extends VMError {
+export class InvalidPickItemKeyError extends VMError {
   constructor(context: ExecutionContext) {
     super(context, 'Invalid PICKITEM Index');
   }
@@ -214,6 +214,12 @@ export class InvalidPickItemIndexError extends VMError {
 export class InvalidRemoveIndexError extends VMError {
   constructor(context: ExecutionContext) {
     super(context, 'Invalid REMOVE Index');
+  }
+}
+
+export class InvalidHasKeyIndexError extends VMError {
+  constructor(context: ExecutionContext) {
+    super(context, 'Invalid HASKEY Index');
   }
 }
 

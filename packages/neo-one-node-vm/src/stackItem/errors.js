@@ -73,6 +73,14 @@ export class InvalidValueInputError extends CustomError {
   }
 }
 
+export class InvalidValueMapStackItemError extends CustomError {
+  code = 'INVALID_VALUE_MAP_STACK_ITEM';
+
+  constructor() {
+    super('Invalid Value. Expected MapStackItem');
+  }
+}
+
 export class InvalidValueOutputError extends CustomError {
   code = 'INVALID_VALUE_OUTPUT';
 

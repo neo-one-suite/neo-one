@@ -16,6 +16,7 @@ export { default as AccountStackItem } from './AccountStackItem';
 export { default as AssetStackItem } from './AssetStackItem';
 export { default as AttributeStackItem } from './AttributeStackItem';
 export { default as InputStackItem } from './InputStackItem';
+export { default as MapStackItem } from './MapStackItem';
 export { default as OutputStackItem } from './OutputStackItem';
 export { default as ValidatorStackItem } from './ValidatorStackItem';
 export { default as StorageContextStackItem } from './StorageContextStackItem';

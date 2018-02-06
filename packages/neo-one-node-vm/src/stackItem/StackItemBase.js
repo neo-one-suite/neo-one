@@ -36,8 +36,10 @@ import {
   InvalidValueAssetError,
   InvalidValueContractError,
   InvalidValueValidatorError,
+  InvalidValueMapStackItemError,
   InvalidValueStorageContextStackItemError,
 } from './errors';
+import type MapStackItem from './MapStackItem';
 import type { StackItem } from './StackItem';
 import type StorageContextStackItem from './StorageContextStackItem';
 
@@ -152,6 +154,10 @@ export default class StackItemBase implements Equatable {
     throw new InvalidValueValidatorError();
   }
 
+  asMapStackItem(): MapStackItem {
+    throw new InvalidValueMapStackItemError();
+  }
+
   // eslint-disable-next-line
   asStorageContextStackItem(
     // eslint-disable-next-line
@@ -166,6 +172,14 @@ export default class StackItemBase implements Equatable {
 
   toContractParameter(): ContractParameter {
     throw new Error('Not Implemented');
+  }
+
+  get size(): number {
+    return this.asBuffer().length;
+  }
+
+  toKeyString(): string {
+    return `${this.constructor.name}:${this.asBuffer().toString('hex')}`;
   }
 
   toString(): string {

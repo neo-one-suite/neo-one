@@ -17,6 +17,7 @@ import {
   BooleanStackItem,
   BufferStackItem,
   IntegerStackItem,
+  MapStackItem,
   StructStackItem,
   UInt160StackItem,
   UInt256StackItem,
@@ -32,8 +33,9 @@ import {
   CodeOverflowError,
   ContractNoDynamicInvokeError,
   InvalidCheckMultisigArgumentsError,
+  InvalidHasKeyIndexError,
   InvalidPackCountError,
-  InvalidPickItemIndexError,
+  InvalidPickItemKeyError,
   InvalidRemoveIndexError,
   InvalidSetItemIndexError,
   LeftNegativeError,
@@ -1368,15 +1370,7 @@ const OPCODE_PAIRS = [
         out: 1,
         invoke: ({ context, args }: OpInvokeArgs) => ({
           context,
-          results: [
-            new IntegerStackItem(
-              new BN(
-                args[0].isArray()
-                  ? args[0].asArray().length
-                  : args[0].asBuffer().length,
-              ),
-            ),
-          ],
+          results: [new IntegerStackItem(new BN(args[0].size))],
         }),
       }),
     ],
@@ -1443,13 +1437,23 @@ const OPCODE_PAIRS = [
         in: 2,
         out: 1,
         invoke: ({ context, args }: OpInvokeArgs) => {
-          const index = vmUtils.toNumber(context, args[0].asBigInteger());
-          const value = args[1].asArray();
-          if (index < 0 || index >= value.length) {
-            throw new InvalidPickItemIndexError(context);
+          if (args[1].isArray()) {
+            const index = vmUtils.toNumber(context, args[0].asBigInteger());
+            const value = args[1].asArray();
+            if (index < 0 || index >= value.length) {
+              throw new InvalidPickItemKeyError(context);
+            }
+
+            return { context, results: [value[index]] };
           }
 
-          return { context, results: [value[index]] };
+          const key = args[0];
+          const value = args[1].asMapStackItem();
+          if (!value.has(key)) {
+            throw new InvalidPickItemKeyError(context);
+          }
+
+          return { context, results: [value.get(key)] };
         },
       }),
     ],
@@ -1463,13 +1467,21 @@ const OPCODE_PAIRS = [
           if (newItem instanceof StructStackItem) {
             newItem = newItem.clone();
           }
-          const index = vmUtils.toNumber(context, args[1].asBigInteger());
-          const value = args[2].asArray();
-          if (index < 0 || index >= value.length) {
-            throw new InvalidSetItemIndexError(context);
+          if (args[2].isArray()) {
+            const index = vmUtils.toNumber(context, args[1].asBigInteger());
+            const value = args[2].asArray();
+            if (index < 0 || index >= value.length) {
+              throw new InvalidSetItemIndexError(context);
+            }
+
+            value[index] = newItem;
+            return { context };
           }
 
-          value[index] = newItem;
+          const key = args[1];
+          const value = args[2].asMapStackItem();
+          value.set(key, newItem);
+
           return { context };
         },
       }),
@@ -1511,6 +1523,17 @@ const OPCODE_PAIRS = [
       }),
     ],
     [
+      0xc7,
+      createOp({
+        name: 'NEWMAP',
+        out: 1,
+        invoke: ({ context }: OpInvokeArgs) => ({
+          context,
+          results: [new MapStackItem()],
+        }),
+      }),
+    ],
+    [
       0xc8,
       createOp({
         name: 'APPEND',
@@ -1546,14 +1569,85 @@ const OPCODE_PAIRS = [
         name: 'REMOVE',
         in: 2,
         invoke: ({ context, args }: OpInvokeArgs) => {
-          const index = args[0].asBigInteger().toNumber();
-          const value = args[1].asArray();
-          if (index < 0 || index >= value.length) {
-            throw new InvalidRemoveIndexError(context);
+          if (args[1].isArray()) {
+            const index = args[0].asBigInteger().toNumber();
+            const value = args[1].asArray();
+            if (index < 0 || index >= value.length) {
+              throw new InvalidRemoveIndexError(context);
+            }
+            value.splice(index, 1);
+
+            return { context };
           }
-          value.splice(index, 1);
+
+          const key = args[0];
+          const value = args[1].asMapStackItem();
+          value.delete(key);
 
           return { context };
+        },
+      }),
+    ],
+    [
+      0xcb,
+      createOp({
+        name: 'HASKEY',
+        in: 2,
+        invoke: ({ context, args }: OpInvokeArgs) => {
+          if (args[1].isArray()) {
+            const index = args[0].asBigInteger().toNumber();
+            const value = args[1].asArray();
+            if (index < 0) {
+              throw new InvalidHasKeyIndexError(context);
+            }
+
+            return {
+              context,
+              results: [new BooleanStackItem(index < value.length)],
+            };
+          }
+
+          const key = args[0];
+          const value = args[1].asMapStackItem();
+
+          return {
+            context,
+            results: [new BooleanStackItem(value.has(key))],
+          };
+        },
+      }),
+    ],
+    [
+      0xcc,
+      createOp({
+        name: 'KEYS',
+        in: 1,
+        out: 1,
+        invoke: ({ context, args }: OpInvokeArgs) => {
+          const value = args[0].asMapStackItem();
+          return { context, results: [value.keys()] };
+        },
+      }),
+    ],
+    [
+      0xcd,
+      createOp({
+        name: 'VALUES',
+        in: 1,
+        out: 1,
+        invoke: ({ context, args }: OpInvokeArgs) => {
+          const values = args[0].isArray()
+            ? args[0].asArray()
+            : args[0].asMapStackItem().valuesArray();
+
+          const newValues = [];
+          for (const value of values) {
+            newValues.push(
+              value instanceof StructStackItem ? value.clone() : value,
+            );
+          }
+
+          return { context, results: [new ArrayStackItem(newValues)] };
         },
       }),
     ],

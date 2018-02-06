@@ -187,9 +187,13 @@ export type OpCode =
   | 'SETITEM'
   | 'NEWARRAY'
   | 'NEWSTRUCT'
+  | 'NEWMAP'
   | 'APPEND'
   | 'REVERSE'
   | 'REMOVE'
+  | 'HASKEY'
+  | 'KEYS'
+  | 'VALUES'
   | 'THROW'
   | 'THROWIFNOT';
 
@@ -365,9 +369,13 @@ export type ByteCode =
   | 0xc4
   | 0xc5
   | 0xc6
+  | 0xc7
   | 0xc8
   | 0xc9
   | 0xca
+  | 0xcb
+  | 0xcc
+  | 0xcd
   | 0xf0
   | 0xf1;
 
@@ -471,9 +479,13 @@ const OPCODE_PAIRS = [[0x00, 'PUSH0'], [0x01, 'PUSHBYTES1']]
     [0xc4, 'SETITEM'],
     [0xc5, 'NEWARRAY'],
     [0xc6, 'NEWSTRUCT'],
+    [0xc7, 'NEWMAP'],
     [0xc8, 'APPEND'],
     [0xc9, 'REVERSE'],
     [0xca, 'REMOVE'],
+    [0xcb, 'HASKEY'],
+    [0xcc, 'KEYS'],
+    [0xcd, 'VALUES'],
     [0xf0, 'THROW'],
     [0xf1, 'THROWIFNOT'],
   ]);

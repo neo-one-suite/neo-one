@@ -13,6 +13,7 @@ import AccountStackItem from './AccountStackItem';
 import AssetStackItem from './AssetStackItem';
 import AttributeStackItem from './AttributeStackItem';
 import InputStackItem from './InputStackItem';
+import MapStackItem from './MapStackItem';
 import OutputStackItem from './OutputStackItem';
 import ValidatorStackItem from './ValidatorStackItem';
 import StorageContextStackItem from './StorageContextStackItem';
@@ -34,6 +35,7 @@ export type StackItem =
   | AssetStackItem
   | AttributeStackItem
   | InputStackItem
+  | MapStackItem
   | OutputStackItem
   | ValidatorStackItem
   | StorageContextStackItem
