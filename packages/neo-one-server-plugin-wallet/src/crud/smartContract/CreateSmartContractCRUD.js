@@ -114,7 +114,7 @@ export default class CreateSmartContractCRUD extends CreateCRUD<
       author,
       email,
       description,
-    } = await cli.vorpal.activeCommand.prompt([
+    } = await cli.prompt([
       {
         type: 'input',
         name: 'contractName',

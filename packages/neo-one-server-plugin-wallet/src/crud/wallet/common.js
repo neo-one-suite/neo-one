@@ -51,18 +51,20 @@ const promptPassword = async ({
   cli: InteractiveCLI,
   prompt: string,
 |}) => {
-  const { password } = await cli.vorpal.activeCommand.prompt({
-    type: 'password',
-    name: 'password',
-    message: prompt,
-    validate: input => {
-      if (typeof input !== 'string' || input.length < 8) {
-        return 'Password must be at least 8 characters';
-      }
+  const { password } = await cli.prompt([
+    {
+      type: 'password',
+      name: 'password',
+      message: prompt,
+      validate: input => {
+        if (typeof input !== 'string' || input.length < 8) {
+          return 'Password must be at least 8 characters';
+        }
 
-      return true;
+        return true;
+      },
     },
-  });
+  ]);
   return password;
 };
 
