@@ -4,7 +4,6 @@ import {
   InteropInterfaceContractParameter,
 } from '@neo-one/client-core';
 
-import _ from 'lodash';
 import { utils } from '@neo-one/utils';
 
 import ArrayStackItem from './ArrayStackItem';
@@ -30,22 +29,11 @@ export default class MapStackItem extends StackItemBase {
       return false;
     }
 
-    if (this === other) {
-      return true;
-    }
-
-    return (
-      other instanceof this.constructor &&
-      _.isEqualWith(
-        this._values,
-        (other: MapStackItem)._values,
-        (a, b) => a === b || (a != null && b != null && a.equals(b)),
-      )
-    );
+    return this === other;
   }
 
   asBoolean(): boolean {
-    return Object.keys(this._values).length > 0;
+    return true;
   }
 
   // eslint-disable-next-line

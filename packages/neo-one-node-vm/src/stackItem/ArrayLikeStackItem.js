@@ -4,7 +4,6 @@ import {
   ArrayContractParameter,
   BinaryWriter,
 } from '@neo-one/client-core';
-import _ from 'lodash';
 
 import { InvalidValueBufferError } from './errors';
 import StackItemBase from './StackItemBase';
@@ -26,18 +25,7 @@ export default class ArrayLikeStackItem extends StackItemBase {
       return false;
     }
 
-    if (this === other) {
-      return true;
-    }
-
-    return (
-      other instanceof this.constructor &&
-      _.isEqualWith(
-        this.value,
-        (other: ArrayLikeStackItem).value,
-        (a, b) => a === b || (a != null && b != null && a.equals(b)),
-      )
-    );
+    return this === other;
   }
 
   serialize(): Buffer {
@@ -60,7 +48,7 @@ export default class ArrayLikeStackItem extends StackItemBase {
   }
 
   asBoolean(): boolean {
-    return this.value.length > 0;
+    return true;
   }
 
   // eslint-disable-next-line
