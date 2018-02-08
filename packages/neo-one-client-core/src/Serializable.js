@@ -6,7 +6,6 @@ import { BinaryReader, BinaryWriter } from './utils';
 import type { ECPoint, UInt160 } from './common';
 import type { InvocationResult } from './invocationResult';
 import type { FeeContext, Input, InvocationTransaction } from './transaction';
-import type Validator from './Validator';
 
 export type DeserializeWireContext = {|
   messageMagic: number,
@@ -58,7 +57,6 @@ export type InvocationData = {|
   deletedContractHashes: Array<UInt160>,
   migratedContractHashes: Array<[UInt160, UInt160]>,
   voteUpdates: Array<[UInt160, Array<ECPoint>]>,
-  validators: Array<Validator>,
   result: InvocationResult,
   actions: Array<Action>,
 |};

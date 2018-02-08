@@ -168,6 +168,14 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           value: change.value.serializeWire(),
         },
       ];
+    case 'validatorsCount':
+      return [
+        {
+          type: 'put',
+          key: keys.validatorsCountKey,
+          value: change.value.serializeWire(),
+        },
+      ];
     default:
       // eslint-disable-next-line
       (change.type: empty);
@@ -201,6 +209,11 @@ const convertDeleteChange = (change: DeleteChange): LevelUpChange => {
       return {
         type: 'del',
         key: keys.typeKeyToSerializeKey.storageItem(change.key),
+      };
+    case 'validator':
+      return {
+        type: 'del',
+        key: keys.typeKeyToSerializeKey.validator(change.key),
       };
     default:
       // eslint-disable-next-line

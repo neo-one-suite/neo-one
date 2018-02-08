@@ -18,7 +18,6 @@ export type InvocationDataAdd = {|
   deletedContractHashes: Array<UInt160>,
   migratedContractHashes: Array<[UInt160, UInt160]>,
   voteUpdates: Array<[UInt160, Array<ECPoint>]>,
-  validatorPublicKeys: Array<ECPoint>,
   blockIndex: number,
   transactionIndex: number,
   result: InvocationResult,
@@ -35,7 +34,6 @@ export default class InvocationData
   deletedContractHashes: Array<UInt160>;
   migratedContractHashes: Array<[UInt160, UInt160]>;
   voteUpdates: Array<[UInt160, Array<ECPoint>]>;
-  validatorPublicKeys: Array<ECPoint>;
   blockIndex: number;
   transactionIndex: number;
   result: InvocationResult;
@@ -49,7 +47,6 @@ export default class InvocationData
     deletedContractHashes,
     migratedContractHashes,
     voteUpdates,
-    validatorPublicKeys,
     blockIndex,
     transactionIndex,
     result,
@@ -60,7 +57,6 @@ export default class InvocationData
     this.deletedContractHashes = deletedContractHashes;
     this.migratedContractHashes = migratedContractHashes;
     this.voteUpdates = voteUpdates;
-    this.validatorPublicKeys = validatorPublicKeys;
     this.blockIndex = blockIndex;
     this.transactionIndex = transactionIndex;
     this.result = result;
@@ -85,9 +81,6 @@ export default class InvocationData
           value =>
             IOHelper.sizeOfUInt160 +
             IOHelper.sizeOfArray(value[1], val => IOHelper.sizeOfECPoint(val)),
-        ) +
-        IOHelper.sizeOfArray(this.validatorPublicKeys, value =>
-          IOHelper.sizeOfECPoint(value),
         ) +
         IOHelper.sizeOfUInt32LE +
         IOHelper.sizeOfUInt32LE +
@@ -118,9 +111,6 @@ export default class InvocationData
         writer.writeECPoint(vote);
       });
     });
-    writer.writeArray(this.validatorPublicKeys, publicKey => {
-      writer.writeECPoint(publicKey);
-    });
     writer.writeUInt32LE(this.blockIndex);
     writer.writeUInt32LE(this.transactionIndex);
     this.result.serializeWireBase(writer);
@@ -148,7 +138,6 @@ export default class InvocationData
       const votes = reader.readArray(() => reader.readECPoint());
       return [address, votes];
     });
-    const validatorPublicKeys = reader.readArray(() => reader.readECPoint());
     const blockIndex = reader.readUInt32LE();
     const transactionIndex = reader.readUInt32LE();
     const result = deserializeWireBase(options);
@@ -161,7 +150,6 @@ export default class InvocationData
       deletedContractHashes,
       migratedContractHashes,
       voteUpdates,
-      validatorPublicKeys,
       blockIndex,
       transactionIndex,
       result,

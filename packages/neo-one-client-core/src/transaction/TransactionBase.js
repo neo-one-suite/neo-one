@@ -12,6 +12,7 @@ import {
   deserializeWireBase as deserializeAttributeWireBase,
 } from './attribute';
 import { ASSET_TYPE, hasFlag } from '../AssetType';
+import type Account, { AccountKey } from '../Account';
 import { SCRIPT_CONTAINER_TYPE } from '../ScriptContainer';
 import {
   TRANSACTION_TYPE,
@@ -35,6 +36,7 @@ import Output, { type OutputJSON, type OutputKey } from './Output';
 import type RegisterTransaction from './RegisterTransaction';
 import type { Transaction } from './Transaction';
 import type { VerifyScript } from '../vm';
+import type Validator from '../Validator';
 import Witness, { type WitnessJSON } from '../Witness';
 
 import common, {
@@ -71,6 +73,7 @@ export type FeeContext = {|
   // eslint-disable-next-line
   utilityToken: RegisterTransaction,
   fees: { [type: TransactionType]: BN },
+  registerValidatorFee: BN,
 |};
 export type TransactionGetScriptHashesForVerifyingOptions = {|
   getOutput: (key: OutputKey) => Promise<Output>,
@@ -87,6 +90,9 @@ export type TransactionVerifyOptions = {|
   isSpent: (key: OutputKey) => Promise<boolean>,
   getAsset: (key: AssetKey) => Promise<Asset>,
   getOutput: (key: OutputKey) => Promise<Output>,
+  tryGetAccount: (key: AccountKey) => Promise<?Account>,
+  standbyValidators: Array<ECPoint>,
+  getAllValidators: () => Promise<Array<Validator>>,
   verifyScript: VerifyScript,
   currentHeight: number,
   // eslint-disable-next-line
@@ -94,6 +100,7 @@ export type TransactionVerifyOptions = {|
   // eslint-disable-next-line
   utilityToken: RegisterTransaction,
   fees: { [type: TransactionType]: BN },
+  registerValidatorFee: BN,
   // eslint-disable-next-line
   memPool?: Array<Transaction>,
 |};
@@ -517,6 +524,7 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     utilityToken,
     governingToken,
     fees,
+    registerValidatorFee,
   }: TransactionVerifyOptions): Promise<void> {
     const results = await this.getTransactionResults({ getOutput });
     const resultsDestroy = commonUtils.entries(results).filter(
@@ -539,6 +547,7 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
       governingToken,
       utilityToken,
       fees,
+      registerValidatorFee,
     };
     const systemFee = this.getSystemFee(feeContext);
     if (

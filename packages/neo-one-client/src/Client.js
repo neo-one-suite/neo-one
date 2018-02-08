@@ -12,10 +12,8 @@ import type {
   NetworkType,
   TransactionOptions,
   InvokeTransactionOptions,
-  PublicKeyString,
   PublishReceipt,
   RegisterAssetReceipt,
-  RegisterValidatorReceipt,
   SmartContract,
   SmartContractDefinition,
   TransactionReceipt,
@@ -91,18 +89,6 @@ export default class Client<TUserAccountProvider: UserAccountProvider> {
 
   smartContract(definition: SmartContractDefinition): SmartContract {
     return createSmartContract({ definition, client: (this: $FlowFixMe) });
-  }
-
-  // NOTE: This API is subject to change and is not bound by semver.
-  // eslint-disable-next-line
-  experimental_registerValidator(
-    publicKey: PublicKeyString,
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<RegisterValidatorReceipt>> {
-    return this.userAccountProvider.experimental_registerValidator(
-      publicKey,
-      options,
-    );
   }
 
   _invoke(

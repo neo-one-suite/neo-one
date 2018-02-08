@@ -19,6 +19,7 @@ export type Settings = {|
   +decrementInterval: number,
   +generationAmount: Array<number>,
   +fees: { [transactionType: TransactionType]: BN },
+  +registerValidatorFee: BN,
   +messageMagic: number,
   +addressVersion: number,
   +privateKeyVersion: number,

@@ -25,3 +25,4 @@ unsafe-getters-setters=off
 module.use_strict=true
 
 esproposal.export_star_as=enable
+experimental.const_params=true

@@ -108,6 +108,10 @@ export default class Account extends BaseState
     );
   }
 
+  getBalance(asset: UInt256Hex): BN {
+    return this.balances[asset] || utils.ZERO;
+  }
+
   update({ isFrozen, votes, balances }: AccountUpdate): Account {
     return new Account({
       hash: this.hash,

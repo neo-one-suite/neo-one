@@ -245,6 +245,8 @@ export type StorageItem = {|
 export type Validator = {|
   version: number,
   publicKey: PublicKeyString,
+  registered: boolean,
+  votes: BigNumber,
 |};
 
 export type Input = {|
@@ -278,7 +280,6 @@ export type RawInvocationData = {|
   deletedContractHashes: Array<Hash160String>,
   migratedContractHashes: Array<[Hash160String, Hash160String]>,
   voteUpdates: Array<[AddressString, Array<PublicKeyString>]>,
-  validators: Array<Validator>,
   actions: Array<Action>,
 |};
 
@@ -343,6 +344,17 @@ export type RegisterTransaction = {|
     admin: AddressString,
   |},
 |};
+export type StateDescriptor = {|
+  type: 'Account' | 'Validator',
+  key: BufferString,
+  field: string,
+  value: BufferString,
+|};
+export type StateTransaction = {|
+  ...TransactionBase,
+  type: 'StateTransaction',
+  descriptors: Array<StateDescriptor>,
+|};
 export type CommonTransaction =
   | MinerTransaction
   | IssueTransaction
@@ -350,7 +362,8 @@ export type CommonTransaction =
   | EnrollmentTransaction
   | RegisterTransaction
   | ContractTransaction
-  | PublishTransaction;
+  | PublishTransaction
+  | StateTransaction;
 export type Transaction =
   | CommonTransaction
   | InvocationTransaction;
@@ -522,11 +535,6 @@ export type RegisterAssetReceipt = {|
   result: InvocationResult<Asset>,
 |};
 
-export type RegisterValidatorReceipt = {|
-  ...TransactionReceipt,
-  result: InvocationResult<Validator>,
-|};
-
 export type GetOptions = {|
   timeoutMS?: number,
 |};
@@ -574,12 +582,6 @@ export interface UserAccountProvider {
     transfers: Array<Transfer>,
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>>;
-
-  // NOTE: This API is subject to change and is not bound by SEMVER.
-  experimental_registerValidator(
-    publicKey: PublicKeyString,
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<RegisterValidatorReceipt>>;
 
   _invoke(
     contract: Hash160String,

@@ -3,6 +3,7 @@ import { type Observable } from 'rxjs/Observable';
 import {
   type ReadAllStorage,
   type ReadGetAllStorage,
+  type ReadMetadataStorage,
   type ReadStorage,
 } from '@neo-one/node-core';
 
@@ -167,4 +168,49 @@ export function createReadGetAllStorage<Key, Keys, Value>({
         deserializeValue,
       }),
   };
+}
+
+export function createTryGetMetadata<Value>({
+  get,
+}: {|
+  get: () => Promise<Value>,
+|}): () => Promise<?Value> {
+  return async (): Promise<?Value> => {
+    try {
+      const result = await get();
+      return result;
+    } catch (error) {
+      if (error.notFound || error.code === 'KEY_NOT_FOUND') {
+        return null;
+      }
+      throw error;
+    }
+  };
+}
+
+export function createReadMetadataStorage<Value>({
+  db,
+  key,
+  keyString,
+  deserializeValue,
+}: {|
+  db: LevelUp,
+  key: Buffer,
+  keyString: string,
+  deserializeValue: (value: Buffer) => Value,
+|}): ReadMetadataStorage<Value> {
+  const get = async (): Promise<Value> => {
+    try {
+      const result = await db.get(key);
+      return deserializeValue(result);
+    } catch (error) {
+      if (error.notFound || error.code === 'KEY_NOT_FOUND') {
+        throw new KeyNotFoundError(keyString);
+      }
+
+      throw error;
+    }
+  };
+
+  return { get, tryGet: createTryGet({ get }) };
 }

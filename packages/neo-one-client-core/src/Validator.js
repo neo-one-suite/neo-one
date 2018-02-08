@@ -1,4 +1,6 @@
 /* @flow */
+import type BN from 'bn.js';
+
 import BaseState from './BaseState';
 import { type Equatable, type Equals } from './Equatable';
 import {
@@ -25,11 +27,19 @@ export type ValidatorKey = {|
 export type ValidatorAdd = {|
   version?: number,
   publicKey: ECPoint,
+  registered?: boolean,
+  votes?: BN,
+|};
+export type ValidatorUpdate = {|
+  registered?: boolean,
+  votes?: BN,
 |};
 
 export type ValidatorJSON = {|
   version: number,
   publicKey: string,
+  registered: boolean,
+  votes: string,
 |};
 
 export default class Validator extends BaseState
@@ -37,17 +47,35 @@ export default class Validator extends BaseState
     Equatable,
     SerializableJSON<ValidatorJSON> {
   publicKey: ECPoint;
+  registered: boolean;
+  votes: BN;
 
   __size: () => number;
 
-  constructor({ version, publicKey }: ValidatorAdd) {
+  constructor({ version, publicKey, registered, votes }: ValidatorAdd) {
     super({ version });
     this.publicKey = publicKey;
-    this.__size = utils.lazy(() => IOHelper.sizeOfECPoint(this.publicKey));
+    this.registered = registered == null ? false : registered;
+    this.votes = votes == null ? utils.ZERO : votes;
+    this.__size = utils.lazy(
+      () =>
+        IOHelper.sizeOfECPoint(this.publicKey) +
+        IOHelper.sizeOfBoolean +
+        IOHelper.sizeOfFixed8,
+    );
   }
 
   get size(): number {
     return this.__size();
+  }
+
+  update({ votes, registered }: ValidatorUpdate): Validator {
+    return new Validator({
+      version: this.version,
+      publicKey: this.publicKey,
+      registered: registered == null ? this.registered : registered,
+      votes: votes == null ? this.votes : votes,
+    });
   }
 
   equals: Equals = utils.equals(Validator, other =>
@@ -57,6 +85,8 @@ export default class Validator extends BaseState
   serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.version);
     writer.writeECPoint(this.publicKey);
+    writer.writeBoolean(this.registered);
+    writer.writeFixed8(this.votes);
   }
 
   serializeWire: SerializeWire = createSerializeWire(
@@ -68,8 +98,10 @@ export default class Validator extends BaseState
   }: DeserializeWireBaseOptions): Validator {
     const version = reader.readUInt8();
     const publicKey = reader.readECPoint();
+    const registered = reader.readBoolean();
+    const votes = reader.readFixed8();
 
-    return new this({ version, publicKey });
+    return new this({ version, publicKey, registered, votes });
   }
 
   static deserializeWire(options: DeserializeWireOptions): this {
@@ -84,6 +116,8 @@ export default class Validator extends BaseState
     return {
       version: this.version,
       publicKey: JSONHelper.writeECPoint(this.publicKey),
+      registered: this.registered,
+      votes: JSONHelper.writeFixed8(this.votes),
     };
   }
 }

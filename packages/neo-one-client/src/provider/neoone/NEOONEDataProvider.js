@@ -14,6 +14,7 @@ import {
   type OutputJSON,
   type NetworkSettingsJSON,
   type TransactionJSON,
+  type ValidatorJSON,
   JSONHelper,
   utils,
 } from '@neo-one/client-core';
@@ -208,7 +209,11 @@ export default class NEOONEDataProvider implements DataProvider {
   }
 
   getValidators(): Promise<Array<Validator>> {
-    return this._client.getValidators();
+    return this._client
+      .getValidators()
+      .then(validators =>
+        validators.map(validator => this._convertValidator(validator)),
+      );
   }
 
   getConnectedPeers(): Promise<Array<Peer>> {
@@ -429,6 +434,20 @@ export default class NEOONEDataProvider implements DataProvider {
             admin: transaction.asset.admin,
           },
         };
+      case 'StateTransaction':
+        return {
+          type: 'StateTransaction',
+          txid: transaction.txid,
+          size: transaction.size,
+          version: transaction.version,
+          attributes: this._convertAttributes(transaction.attributes),
+          vin: transaction.vin,
+          vout: this._convertOutputs(transaction.vout),
+          scripts: transaction.scripts,
+          systemFee: new BigNumber(transaction.sys_fee),
+          networkFee: new BigNumber(transaction.net_fee),
+          descriptors: transaction.descriptors,
+        };
       default:
         // eslint-disable-next-line
         (transaction.type: empty);
@@ -484,7 +503,6 @@ export default class NEOONEDataProvider implements DataProvider {
       deletedContractHashes: data.deletedContractHashes,
       migratedContractHashes: data.migratedContractHashes,
       voteUpdates: data.voteUpdates,
-      validators: data.validators,
       actions: data.actions.map(action => this._convertAction(action)),
     };
   }
@@ -531,6 +549,15 @@ export default class NEOONEDataProvider implements DataProvider {
     }
 
     return parameter;
+  }
+
+  _convertValidator(validator: ValidatorJSON): Validator {
+    return {
+      version: validator.version,
+      publicKey: validator.publicKey,
+      registered: validator.registered,
+      votes: new BigNumber(validator.votes),
+    };
   }
 
   _convertAction(action: ActionJSON): Action {

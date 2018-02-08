@@ -1133,6 +1133,7 @@ export default class Node implements INode {
             governingToken: this.blockchain.settings.governingToken,
             utilityToken: this.blockchain.settings.utilityToken,
             fees: this.blockchain.settings.fees,
+            registerValidatorFee: this.blockchain.settings.registerValidatorFee,
           });
           return [transaction, networkFee];
         }),

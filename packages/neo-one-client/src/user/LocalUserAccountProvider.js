@@ -38,10 +38,8 @@ import type {
   Hash256String,
   Transfer,
   TransactionOptions,
-  PublicKeyString,
   PublishReceipt,
   RegisterAssetReceipt,
-  RegisterValidatorReceipt,
   TransactionReceipt,
   TransactionResult,
   Input,
@@ -381,46 +379,6 @@ export default class LocalUserAccountProvider<
       from,
       transaction,
       onConfirm: async ({ receipt }) => receipt,
-    });
-  }
-
-  // eslint-disable-next-line
-  experimental_registerValidator(
-    publicKey: PublicKeyString,
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<RegisterValidatorReceipt>> {
-    const sb = new ScriptBuilder();
-    sb.emitSysCall('Neo.Validator.Register', common.stringToECPoint(publicKey));
-
-    return this._invokeRaw({
-      script: sb.build(),
-      options,
-      onConfirm: ({ receipt, data }): RegisterValidatorReceipt => {
-        let result;
-        if (data.result.state === 'FAULT') {
-          result = this._getInvocationResultError(data.result);
-        } else {
-          const [registeredValidator] = data.validators;
-          if (registeredValidator == null) {
-            throw new InvalidTransactionError(
-              'Something went wrong! Expected a validator to have been registered, ' +
-                'but none was found',
-            );
-          }
-
-          result = this._getInvocationResultSuccess(
-            data.result,
-            registeredValidator,
-          );
-        }
-
-        return {
-          blockIndex: receipt.blockIndex,
-          blockHash: receipt.blockHash,
-          transactionIndex: receipt.transactionIndex,
-          result,
-        };
-      },
     });
   }
 

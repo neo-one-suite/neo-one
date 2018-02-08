@@ -979,6 +979,8 @@ export const SYSCALLS = {
     in: 2,
     fee: FEES.ONE_THOUSAND,
     invoke: async ({ context, args }: OpInvokeArgs) => {
+      // This has been removed, but we keep it here so that we can do a full
+      // build of the chain
       const address = args[0].asAccount().hash;
       const votes = args[1].asArray().map(vote => vote.asECPoint());
       if (votes.length > MAX_VOTES) {
@@ -1017,6 +1019,8 @@ export const SYSCALLS = {
     out: 1,
     fee: common.ONE_THOUSAND_FIXED8,
     invoke: async ({ context, args }: OpInvokeArgs) => {
+      // This has been removed, but we keep it here so that we can do a full
+      // build of the chain
       const publicKey = args[0].asECPoint();
       if (!checkWitnessPublicKey({ context, publicKey })) {
         throw new BadWitnessCheckError(context);

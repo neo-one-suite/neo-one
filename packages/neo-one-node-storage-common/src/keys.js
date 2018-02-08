@@ -34,6 +34,8 @@ const storageItemKeyPrefix = 'storageItem';
 const validatorKeyPrefix = 'validator';
 const invocationDataKeyPrefix = 'invocationData';
 const settingsPrefix = 'settings';
+export const validatorsCountKeyString = 'validatorsCount';
+export const validatorsCountKey = bytewise.encode([validatorsCountKeyString]);
 
 export const serializeHeaderIndexHashKey = (index: number): Buffer =>
   bytewise.encode([headerHashKeyPrefix, index]);

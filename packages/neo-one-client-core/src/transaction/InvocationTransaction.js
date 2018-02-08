@@ -18,7 +18,6 @@ import TransactionBase, {
   type TransactionVerifyOptions,
 } from './TransactionBase';
 import { InvalidFormatError, VerifyError } from '../errors';
-import type { ValidatorJSON } from '../Validator';
 import type Witness from '../Witness';
 
 import common from '../common';
@@ -38,7 +37,6 @@ export type InvocationDataJSON = {|
   deletedContractHashes: Array<string>,
   migratedContractHashes: Array<[string, string]>,
   voteUpdates: Array<[string, Array<string>]>,
-  validators: Array<ValidatorJSON>,
   actions: Array<ActionJSON>,
 |};
 
@@ -191,7 +189,6 @@ export default class InvocationTransaction extends TransactionBase<
         voteUpdates,
         actions,
         result,
-        validators,
       } = data;
       dataJSON = {
         result: result.serializeJSON(context),
@@ -212,9 +209,6 @@ export default class InvocationTransaction extends TransactionBase<
           votes.map(vote => common.ecPointToString(vote)),
         ]),
         actions: actions.map(action => action.serializeJSON(context)),
-        validators: validators.map(validator =>
-          validator.serializeJSON(context),
-        ),
       };
 
       if (dataJSON.asset == null) {

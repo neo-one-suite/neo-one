@@ -17,6 +17,7 @@ import EnrollmentTransaction from './EnrollmentTransaction';
 import RegisterTransaction from './RegisterTransaction';
 import ContractTransaction from './ContractTransaction';
 import PublishTransaction from './PublishTransaction';
+import StateTransaction from './StateTransaction';
 import InvocationTransaction from './InvocationTransaction';
 
 import type { MinerTransactionJSON } from './MinerTransaction';
@@ -26,6 +27,7 @@ import type { EnrollmentTransactionJSON } from './EnrollmentTransaction';
 import type { RegisterTransactionJSON } from './RegisterTransaction';
 import type { ContractTransactionJSON } from './ContractTransaction';
 import type { PublishTransactionJSON } from './PublishTransaction';
+import type { StateTransactionJSON } from './StateTransaction';
 import type { InvocationTransactionJSON } from './InvocationTransaction';
 
 export type Transaction =
@@ -36,6 +38,7 @@ export type Transaction =
   | RegisterTransaction
   | ContractTransaction
   | PublishTransaction
+  | StateTransaction
   | InvocationTransaction;
 
 export type TransactionJSON =
@@ -46,6 +49,7 @@ export type TransactionJSON =
   | RegisterTransactionJSON
   | ContractTransactionJSON
   | PublishTransactionJSON
+  | StateTransactionJSON
   | InvocationTransactionJSON;
 
 export type TransactionReceiptJSON = {|
@@ -74,6 +78,8 @@ export const deserializeWireBase = (
       return RegisterTransaction.deserializeWireBase(options);
     case 0x80:
       return ContractTransaction.deserializeWireBase(options);
+    case 0x90:
+      return StateTransaction.deserializeWireBase(options);
     case 0xd0:
       return PublishTransaction.deserializeWireBase(options);
     case 0xd1:

@@ -177,6 +177,15 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
+    case 'validatorsCount':
+      return [
+        {
+          type: 'add',
+          model: 'validatorsCount',
+          key: keys.validatorsCountKey,
+          value: change.value,
+        },
+      ];
     default:
       // eslint-disable-next-line
       (change.type: empty);
@@ -215,6 +224,12 @@ const convertDeleteChange = (change: DeleteChange) => {
         type: 'delete',
         model: 'storageItem',
         key: keys.typeKeyToSerializeKeyString.storageItem(change.key),
+      };
+    case 'validator':
+      return {
+        type: 'delete',
+        model: 'validator',
+        key: keys.typeKeyToSerializeKeyString.validator(change.key),
       };
     default:
       // eslint-disable-next-line

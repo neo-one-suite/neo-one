@@ -1,6 +1,7 @@
 /* @fl/* @flow */
 import type BN from 'bn.js';
 
+import type Account, { AccountKey } from './Account';
 import type Asset, { AssetKey } from './Asset';
 import BlockBase, { type BlockBaseJSON } from './BlockBase';
 import {
@@ -22,9 +23,10 @@ import {
   type Transaction,
   type TransactionJSON,
   type TransactionType,
-  deserializeWireBase,
+  deserializeTransactionWireBase,
 } from './transaction';
 import { InvalidFormatError, VerifyError } from './errors';
+import type Validator from './Validator';
 import type { VerifyScript } from './vm';
 import type Witness from './Witness';
 
@@ -56,7 +58,10 @@ export type BlockVerifyOptions = {|
   isSpent: (key: OutputKey) => Promise<boolean>,
   getAsset: (key: AssetKey) => Promise<Asset>,
   getOutput: (key: OutputKey) => Promise<Output>,
+  tryGetAccount: (key: AccountKey) => Promise<?Account>,
   getValidators: (transactions: Array<Transaction>) => Promise<Array<ECPoint>>,
+  standbyValidators: Array<ECPoint>,
+  getAllValidators: () => Promise<Array<Validator>>,
   calculateClaimAmount: (inputs: Array<Input>) => Promise<BN>,
   verifyScript: VerifyScript,
   currentHeight: number,
@@ -65,6 +70,7 @@ export type BlockVerifyOptions = {|
   // eslint-disable-next-line
   utilityToken: RegisterTransaction,
   fees: { [type: TransactionType]: BN },
+  registerValidatorFee: BN,
   completely?: boolean,
 |};
 
@@ -263,12 +269,16 @@ export default class Block extends BlockBase
           isSpent: options.isSpent,
           getAsset: options.getAsset,
           getOutput: options.getOutput,
+          tryGetAccount: options.tryGetAccount,
           calculateClaimAmount: options.calculateClaimAmount,
+          standbyValidators: options.standbyValidators,
+          getAllValidators: options.getAllValidators,
           verifyScript: options.verifyScript,
           currentHeight: options.currentHeight,
           governingToken: options.governingToken,
           utilityToken: options.utilityToken,
           fees: options.fees,
+          registerValidatorFee: options.registerValidatorFee,
         }),
       ),
     );
@@ -280,6 +290,7 @@ export default class Block extends BlockBase
       governingToken: options.governingToken,
       utilityToken: options.utilityToken,
       fees: options.fees,
+      registerValidatorFee: options.registerValidatorFee,
     });
     const minerTransaction = this.transactions.find(
       transaction => transaction.type === TRANSACTION_TYPE.MINER,
@@ -309,7 +320,7 @@ export default class Block extends BlockBase
     const { reader } = options;
     const blockBase = super.deserializeBlockBaseWireBase(options);
     const transactions = reader.readArray(
-      () => deserializeWireBase(options),
+      () => deserializeTransactionWireBase(options),
       0x10000,
     );
     if (transactions.length === 0) {

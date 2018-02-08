@@ -8,6 +8,7 @@ export const TRANSACTION_TYPE = {
   ENROLLMENT: 0x20,
   REGISTER: 0x40,
   CONTRACT: 0x80,
+  STATE: 0x90,
   PUBLISH: 0xd0,
   INVOCATION: 0xd1,
 };
@@ -30,6 +31,7 @@ export type TransactionType =
   | 0x20
   | 0x40
   | 0x80
+  | 0x90
   | 0xd0
   | 0xd1;
 
@@ -47,6 +49,8 @@ export const assertTransactionType = (value: number): TransactionType => {
       return 0x40;
     case 0x80: // Contract
       return 0x80;
+    case 0x90: // State
+      return 0x90;
     case 0xd0: // Publish
       return 0xd0;
     case 0xd1: // Invocation

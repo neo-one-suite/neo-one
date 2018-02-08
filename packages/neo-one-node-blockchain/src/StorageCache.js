@@ -11,6 +11,7 @@ import {
   type ChangeSet,
   type AddChange,
   type DeleteChange,
+  type ReadMetadataStorage,
   type ReadStorage,
   type ReadAllStorage,
   type ReadGetAllStorage,
@@ -83,7 +84,7 @@ type BaseReadStorageCacheOptions<Key, AddValue, Value> = {|
   onAdd?: (value: AddValue) => Promise<void>,
 |};
 
-class BaseReadStorageCache<Key, AddValue, Value> {
+export class BaseReadStorageCache<Key, AddValue, Value> {
   _readStorage: ReadStorage<Key, Value>;
   _name: string;
   _createAddChange: (value: AddValue) => AddChange;
@@ -758,5 +759,195 @@ export class OutputStorageCache extends ReadStorageCache<
         value: value.output,
       };
     };
+  }
+}
+
+type TrackedMetadataChange<AddValue, Value> =
+  | {| type: 'add', addValue: AddValue, value: Value |}
+  | {| type: 'delete' |};
+
+type GetMetadataFunc<Value> = () => Promise<Value>;
+type TryGetMetadataFunc<Value> = () => Promise<?Value>;
+
+function createGetMetadata<Key, Value>({
+  tryGetTracked,
+  readStorage,
+}: {|
+  tryGetTracked: () => ?TrackedMetadataChange<*, Value>,
+  readStorage: ReadMetadataStorage<Value>,
+|}): GetFunc<Key, Value> {
+  return async (): Promise<Value> => {
+    const trackedChange = tryGetTracked();
+    if (trackedChange != null) {
+      // TODO: Better error
+      if (trackedChange.type === 'delete') {
+        throw new Error('Not found');
+      }
+
+      return trackedChange.value;
+    }
+
+    const value = await readStorage.get();
+    return value;
+  };
+}
+
+function createTryGetMetadata<Value>({
+  tryGetTracked,
+  readStorage,
+}: {|
+  tryGetTracked: () => ?TrackedMetadataChange<*, Value>,
+  readStorage: ReadMetadataStorage<Value>,
+|}): TryGetMetadataFunc<Value> {
+  return async (): Promise<?Value> => {
+    const trackedChange = tryGetTracked();
+    if (trackedChange != null) {
+      if (trackedChange.type === 'delete') {
+        return null;
+      }
+
+      return trackedChange.value;
+    }
+
+    const value = await readStorage.tryGet();
+    return value;
+  };
+}
+
+type BaseReadMetadataStorageCacheOptions<AddValue, Value> = {|
+  readStorage: ReadMetadataStorage<Value>,
+  name: string,
+  createAddChange: (value: AddValue) => AddChange,
+  createDeleteChange?: () => DeleteChange,
+  onAdd?: (value: AddValue) => Promise<void>,
+|};
+
+export class BaseReadMetadataStorageCache<AddValue, Value> {
+  _readStorage: ReadMetadataStorage<Value>;
+  _name: string;
+  _createAddChange: (value: AddValue) => AddChange;
+  _createDeleteChange: ?() => DeleteChange;
+  _onAdd: ?(value: AddValue) => Promise<void>;
+  _value: ?TrackedMetadataChange<AddValue, Value>;
+
+  get: GetMetadataFunc<Value>;
+  tryGet: TryGetMetadataFunc<Value>;
+
+  constructor(options: BaseReadMetadataStorageCacheOptions<AddValue, Value>) {
+    this._readStorage = options.readStorage;
+    this._name = options.name;
+    this._createAddChange = options.createAddChange;
+    this._createDeleteChange = options.createDeleteChange;
+    this._onAdd = options.onAdd;
+    this._value = null;
+
+    this.get = createGetMetadata({
+      readStorage: this._readStorage,
+      tryGetTracked: this._tryGetTracked.bind(this),
+    });
+    this.tryGet = createTryGetMetadata({
+      readStorage: this._readStorage,
+      tryGetTracked: this._tryGetTracked.bind(this),
+    });
+  }
+
+  getChangeSet(): ChangeSet {
+    const createDeleteChange = this._createDeleteChange;
+    const value = this._value;
+    if (value == null) {
+      return [];
+    }
+
+    if (value.type === 'delete') {
+      if (createDeleteChange == null) {
+        // TODO: Make better
+        throw new Error('Invalid delete');
+      }
+
+      return [{ type: 'delete', change: createDeleteChange() }];
+    }
+
+    return [{ type: 'add', change: this._createAddChange(value.addValue) }];
+  }
+
+  // eslint-disable-next-line
+  _tryGetTracked(): ?TrackedMetadataChange<AddValue, Value> {
+    return this._value;
+  }
+}
+
+class ReadMetadataStorageCache<
+  AddValue,
+  Value,
+> extends BaseReadMetadataStorageCache<AddValue, Value> {}
+
+function createAddMetadata<Value>({
+  cache,
+}: {|
+  cache: ReadMetadataStorageCache<Value, Value>,
+|}): AddFunc<Value> {
+  return async (value: Value): Promise<void> => {
+    if (cache._onAdd != null) {
+      await cache._onAdd(value);
+    }
+
+    // eslint-disable-next-line
+    cache._value = {
+      type: 'add',
+      addValue: value,
+      value,
+    };
+  };
+}
+
+function createUpdateMetadata<Value, Update>({
+  cache,
+  update: updateFunc,
+}: {|
+  cache: ReadMetadataStorageCache<Value, Value>,
+  update: (value: Value, update: Update) => Value,
+|}): UpdateFunc<Value, Update> {
+  return async (value: Value, update: Update): Promise<Value> => {
+    const updatedValue = updateFunc(value, update);
+    // eslint-disable-next-line
+    cache._value = {
+      type: 'add',
+      addValue: updatedValue,
+      value: updatedValue,
+    };
+
+    return updatedValue;
+  };
+}
+
+type ReadAddUpdateMetadataStorageCacheOptions<Value, Update> = {|
+  ...BaseReadMetadataStorageCacheOptions<Value, Value>,
+  update: (value: Value, update: Update) => Value,
+|};
+
+export class ReadAddUpdateMetadataStorageCache<
+  Value,
+  Update,
+> extends ReadMetadataStorageCache<Value, Value> {
+  add: AddFunc<Value>;
+  update: UpdateFunc<Value, Update>;
+
+  constructor(
+    options: ReadAddUpdateMetadataStorageCacheOptions<Value, Update>,
+  ) {
+    super({
+      readStorage: options.readStorage,
+      name: options.name,
+      createAddChange: options.createAddChange,
+      createDeleteChange: options.createDeleteChange,
+      onAdd: options.onAdd,
+    });
+    this.add = createAddMetadata({
+      cache: this,
+    });
+    this.update = createUpdateMetadata({
+      cache: this,
+      update: options.update,
+    });
   }
 }

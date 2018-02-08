@@ -54,7 +54,12 @@ import type TransactionSpentCoins, {
   TransactionSpentCoinsKey,
   TransactionSpentCoinsUpdate,
 } from './TransactionSpentCoins';
+import type ValidatorsCount, { ValidatorsCountUpdate } from './ValidatorsCount';
 
+export interface ReadMetadataStorage<Value> {
+  +get: () => Promise<Value>;
+  +tryGet: () => Promise<?Value>;
+}
 export interface ReadStorage<Key, Value> {
   +get: (key: Key) => Promise<Value>;
   +tryGet: (key: Key) => Promise<?Value>;
@@ -67,15 +72,27 @@ export interface ReadGetAllStorage<Key, PartialKey, Value>
   +getAll: (key: PartialKey) => Observable<Value>;
 }
 
+export interface AddMetadataStorage<Value> {
+  +add: (add: Value) => Promise<void>;
+}
 export interface AddStorage<Value> {
   +add: (add: Value) => Promise<void>;
+}
+export interface AddUpdateMetadataStorage<Value, Update>
+  extends AddMetadataStorage<Value> {
+  +update: (value: Value, update: Update) => Promise<Value>;
 }
 export interface AddUpdateStorage<Value, Update> extends AddStorage<Value> {
   +update: (value: Value, update: Update) => Promise<Value>;
 }
+export interface DeleteMetadataStorage {
+  +delete: () => Promise<void>;
+}
 export interface DeleteStorage<Key> {
   +delete: (key: Key) => Promise<void>;
 }
+export interface AddUpdateDeleteMetadataStorage<Value, Update>
+  extends AddUpdateMetadataStorage<Value, Update>, DeleteMetadataStorage {}
 export interface AddUpdateDeleteStorage<Key, Value, Update>
   extends AddUpdateStorage<Value, Update>, DeleteStorage<Key> {}
 
@@ -83,11 +100,10 @@ interface ReadAddStorage<Key, Value>
   extends ReadStorage<Key, Value>, AddStorage<Value> {}
 interface ReadAddDeleteStorage<Key, Value>
   extends ReadStorage<Key, Value>, AddStorage<Value>, DeleteStorage<Key> {}
+interface ReadAddUpdateMetadataStorage<Value, Update>
+  extends ReadMetadataStorage<Value>, AddUpdateMetadataStorage<Value, Update> {}
 interface ReadAddUpdateStorage<Key, Value, Update>
   extends ReadStorage<Key, Value>, AddUpdateStorage<Value, Update> {}
-// eslint-disable-next-line
-interface ReadAddUpdateDeleteStorage<Key, Value, Update>
-  extends ReadStorage<Key, Value>, AddUpdateDeleteStorage<Key, Value, Update> {}
 interface ReadAllAddStorage<Key, Value>
   extends ReadAllStorage<Key, Value>, AddStorage<Value> {}
 interface ReadAllAddUpdateDeleteStorage<Key, Value, Update>
@@ -144,6 +160,7 @@ export type Blockchain = {
   +storageItem: ReadGetAllStorage<StorageItemKey, StorageItemsKey, StorageItem>,
   +validator: ReadAllStorage<ValidatorKey, Validator>,
   +invocationData: ReadStorage<InvocationDataKey, InvocationData>,
+  +validatorsCount: ReadMetadataStorage<ValidatorsCount>,
 
   +persistBlock: (options: {|
     block: Block,
@@ -205,4 +222,8 @@ export type WriteBlockchain = {
   >,
   +validator: ReadAllAddStorage<ValidatorKey, Validator>,
   +invocationData: ReadAddStorage<InvocationDataKey, InvocationData>,
+  +validatorsCount: ReadAddUpdateMetadataStorage<
+    ValidatorsCount,
+    ValidatorsCountUpdate,
+  >,
 };

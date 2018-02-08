@@ -15,10 +15,8 @@ import type {
   Transfer,
   NetworkType,
   TransactionOptions,
-  PublicKeyString,
   PublishReceipt,
   RegisterAssetReceipt,
-  RegisterValidatorReceipt,
   SmartContract,
   SmartContractDefinition,
   TransactionReceipt,
@@ -82,12 +80,6 @@ declare export default class Client<
   ): Promise<TransactionResult<TransactionReceipt>>;
 
   smartContract(definition: SmartContractDefinition): SmartContract;
-
-  // NOTE: This API is subject to change and is not bound by semver.
-  experimental_registerValidator(
-    publicKey: PublicKeyString,
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<RegisterValidatorReceipt>>;
 
   _invoke(
     contract: Hash160String,

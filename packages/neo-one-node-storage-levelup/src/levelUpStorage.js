@@ -23,6 +23,7 @@ import {
   AccountUnspent,
   BlockSystemFee,
   TransactionSpentCoins,
+  ValidatorsCount,
 } from '@neo-one/node-core';
 
 import { keys } from '@neo-one/node-storage-common';
@@ -256,6 +257,16 @@ export default ({
       serializeKeyString: keys.typeKeyToSerializeKeyString.invocationData,
       deserializeValue: (buffer: Buffer) =>
         InvocationData.deserializeWire({
+          context,
+          buffer,
+        }),
+    }),
+    validatorsCount: read.createReadMetadataStorage({
+      db,
+      key: keys.validatorsCountKey,
+      keyString: keys.validatorsCountKeyString,
+      deserializeValue: (buffer: Buffer) =>
+        ValidatorsCount.deserializeWire({
           context,
           buffer,
         }),

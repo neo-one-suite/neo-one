@@ -17,6 +17,7 @@ import type {
   Transaction,
   UInt256,
   Validator,
+  ValidatorKey,
 } from '@neo-one/client-core';
 
 import type AccountUnclaimed, { AccountUnclaimedKey } from './AccountUnclaimed';
@@ -24,6 +25,7 @@ import type AccountUnspent, { AccountUnspentKey } from './AccountUnspent';
 import type BlockSystemFee from './BlockSystemFee';
 import type { Blockchain, ReadStorage } from './Blockchain';
 import type TransactionSpentCoins from './TransactionSpentCoins';
+import type ValidatorsCount from './ValidatorsCount';
 
 type OutputValue = {|
   hash: UInt256,
@@ -45,13 +47,15 @@ export type AddChange =
   | {| type: 'blockSystemFee', value: BlockSystemFee |}
   | {| type: 'transactionSpentCoins', value: TransactionSpentCoins |}
   | {| type: 'invocationData', value: InvocationData |}
-  | {| type: 'output', value: OutputValue |};
+  | {| type: 'output', value: OutputValue |}
+  | {| type: 'validatorsCount', value: ValidatorsCount |};
 export type DeleteChange =
   | {| type: 'account', key: AccountKey |}
   | {| type: 'accountUnclaimed', key: AccountUnclaimedKey |}
   | {| type: 'accountUnspent', key: AccountUnspentKey |}
   | {| type: 'contract', key: ContractKey |}
-  | {| type: 'storageItem', key: StorageItemKey |};
+  | {| type: 'storageItem', key: StorageItemKey |}
+  | {| type: 'validator', key: ValidatorKey |};
 export type Change =
   | {| type: 'add', change: AddChange |}
   | {| type: 'delete', change: DeleteChange |};
@@ -77,6 +81,7 @@ export type Storage = {
   storageItem: $PropertyType<Blockchain, 'storageItem'>,
   validator: $PropertyType<Blockchain, 'validator'>,
   invocationData: $PropertyType<Blockchain, 'invocationData'>,
+  validatorsCount: $PropertyType<Blockchain, 'validatorsCount'>,
   commit: (changeSet: ChangeSet) => Promise<void>,
   close: () => Promise<void>,
 };

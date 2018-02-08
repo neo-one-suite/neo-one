@@ -117,6 +117,7 @@ export default ({
       serializeKeyString: keys.typeKeyToSerializeKeyString.validator,
     }),
     invocationData: storage.invocationData,
+    validatorsCount: storage.validatorsCount,
     async close(): Promise<void> {
       await storage.close();
     },

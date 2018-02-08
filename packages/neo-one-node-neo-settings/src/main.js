@@ -49,6 +49,7 @@ export default (options?: {|
       [TRANSACTION_TYPE.PUBLISH]: common.fixed8FromDecimal(500),
       [TRANSACTION_TYPE.REGISTER]: common.fixed8FromDecimal(10000),
     },
+    registerValidatorFee: common.fixed8FromDecimal(1000),
     messageMagic: 7630401,
     addressVersion: common.NEO_ADDRESS_VERSION,
     privateKeyVersion: common.NEO_PRIVATE_KEY_VERSION,

@@ -14,6 +14,7 @@ import {
   type SerializableInvocationData,
   type Transaction,
   type UInt160,
+  type Validator,
   type VerifyScriptOptions,
   InvocationTransaction,
   ScriptBuilder,
@@ -48,6 +49,7 @@ import {
 } from './errors';
 import WriteBatchBlockchain from './WriteBatchBlockchain';
 
+import getValidators from './getValidators';
 import wrapExecuteScripts from './wrapExecuteScripts';
 
 export type CreateBlockchainOptions = {|
@@ -100,6 +102,7 @@ export default class Blockchain {
   storageItem: $PropertyType<BlockchainType, 'storageItem'>;
   validator: $PropertyType<BlockchainType, 'validator'>;
   invocationData: $PropertyType<BlockchainType, 'invocationData'>;
+  validatorsCount: $PropertyType<BlockchainType, 'validatorsCount'>;
 
   _storage: Storage;
   _currentBlock: ?$PropertyType<BlockchainType, 'currentBlock'>;
@@ -152,6 +155,7 @@ export default class Blockchain {
     this.storageItem = this._storage.storageItem;
     this.validator = this._storage.validator;
     this.invocationData = this._storage.invocationData;
+    this.validatorsCount = this._storage.validatorsCount;
 
     this.deserializeWireContext = {
       messageMagic: this.settings.messageMagic,
@@ -161,6 +165,7 @@ export default class Blockchain {
       governingToken: this.settings.governingToken,
       utilityToken: this.settings.utilityToken,
       fees: this.settings.fees,
+      registerValidatorFee: this.settings.registerValidatorFee,
     };
     this.serializeJSONContext = {
       addressVersion: this.settings.addressVersion,
@@ -276,13 +281,17 @@ export default class Blockchain {
       isSpent: this._isSpent,
       getAsset: this.asset.get,
       getOutput: this.output.get,
+      tryGetAccount: this.account.tryGet,
       getValidators: this.getValidators,
+      standbyValidators: this.settings.standbyValidators,
+      getAllValidators: this._getAllValidators,
       calculateClaimAmount: this.calculateClaimAmount,
       verifyScript: this.verifyScript,
       currentHeight: this._currentBlock == null ? 0 : this._currentBlock.index,
       governingToken: this.settings.governingToken,
       utilityToken: this.settings.utilityToken,
       fees: this.settings.fees,
+      registerValidatorFee: this.settings.registerValidatorFee,
     });
   }
 
@@ -307,10 +316,14 @@ export default class Blockchain {
       isSpent: this._isSpent,
       getAsset: this.asset.get,
       getOutput: this.output.get,
+      tryGetAccount: this.account.tryGet,
+      standbyValidators: this.settings.standbyValidators,
+      getAllValidators: () => this.validator.all.pipe(toArray()).toPromise(),
       verifyScript: this.verifyScript,
       governingToken: this.settings.governingToken,
       utilityToken: this.settings.utilityToken,
       fees: this.settings.fees,
+      registerValidatorFee: this.settings.registerValidatorFee,
       currentHeight: this.currentBlockIndex,
       memPool,
     });
@@ -573,61 +586,8 @@ export default class Blockchain {
     };
   };
 
-  getValidators = async (
-    transactions: Array<Transaction>,
-  ): Promise<Array<ECPoint>> => {
-    const [votes, enrolled] = await Promise.all([
-      this._getVotes(transactions),
-      this.validator.all.pipe(toArray()).toPromise(),
-    ]);
-    const validators = _.uniqBy(
-      enrolled
-        .map(validator => validator.publicKey)
-        .concat(this.settings.standbyValidators),
-      validator => common.ecPointToString(validator),
-    );
-
-    const sortedVotes = _.sortBy(votes, vote => vote.publicKeys.length);
-    const validatorsCount = Math.max(
-      utils.weightedAverage(
-        utils
-          .weightedFilter(sortedVotes, 0.25, 0.75, vote => vote.count)
-          .map(([vote, weight]) => ({
-            value: vote.publicKeys.length,
-            weight,
-          })),
-      ),
-      this.settings.standbyValidators.length,
-    );
-
-    const validatorsToCount = _.fromPairs(
-      validators.map(validator => [common.ecPointToHex(validator), utils.ZERO]),
-    );
-    for (const vote of votes) {
-      for (const publicKey of _.take(vote.publicKeys, validatorsCount)) {
-        const publicKeyHex = common.ecPointToHex(publicKey);
-        if (validatorsToCount[publicKeyHex] != null) {
-          validatorsToCount[publicKeyHex] = validatorsToCount[publicKeyHex].add(
-            vote.count,
-          );
-        }
-      }
-    }
-
-    return _.take(
-      commonUtils
-        .entries(validatorsToCount)
-        .sort(
-          ([aKey, aValue], [bKey, bValue]) =>
-            aValue.eq(bValue)
-              ? common.ecPointCompare(aKey, bKey)
-              : -aValue.cmp(bValue),
-        )
-        // eslint-disable-next-line
-        .map(([key, _]) => common.hexToECPoint(key)),
-      validatorsCount,
-    );
-  };
+  getValidators = (transactions: Array<Transaction>): Promise<Array<ECPoint>> =>
+    getValidators(this, transactions);
 
   _getVotes = async (
     transactions: Array<Transaction>,
@@ -732,7 +692,7 @@ export default class Blockchain {
       return null;
     }
 
-    const [asset, contracts, actions, validators] = await Promise.all([
+    const [asset, contracts, actions] = await Promise.all([
       data.assetHash == null
         ? Promise.resolve(null)
         : this._storage.asset.get({ hash: data.assetHash }),
@@ -751,11 +711,6 @@ export default class Blockchain {
         })
         .pipe(toArray())
         .toPromise(),
-      Promise.all(
-        data.validatorPublicKeys.map(publicKey =>
-          this._storage.validator.get({ publicKey }),
-        ),
-      ),
     ]);
 
     return {
@@ -764,7 +719,6 @@ export default class Blockchain {
       deletedContractHashes: data.deletedContractHashes,
       migratedContractHashes: data.migratedContractHashes,
       voteUpdates: data.voteUpdates,
-      validators,
       result: data.result,
       actions,
     };
@@ -796,4 +750,8 @@ export default class Blockchain {
       opCode,
     });
   };
+
+  _getAllValidators(): Promise<Array<Validator>> {
+    return this.validator.all.pipe(toArray()).toPromise();
+  }
 }

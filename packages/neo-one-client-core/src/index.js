@@ -43,28 +43,7 @@ export {
   ConsensusPayload,
   UnsignedConsensusPayload,
 } from './payload';
-export {
-  ATTRIBUTE_USAGE,
-  TRANSACTION_TYPE,
-  MAX_TRANSACTION_ATTRIBUTES,
-  BufferAttribute,
-  ECPointAttribute,
-  UInt160Attribute,
-  UInt256Attribute,
-  MinerTransaction,
-  IssueTransaction,
-  ClaimTransaction,
-  EnrollmentTransaction,
-  RegisterTransaction,
-  ContractTransaction,
-  PublishTransaction,
-  InvocationTransaction,
-  Input,
-  Output,
-  assertAttributeUsageJSON,
-  toAttributeUsage,
-  deserializeWire as deserializeTransactionWire,
-} from './transaction';
+export * from './transaction';
 export {
   default as utils,
   AsyncIteratorBase,
@@ -101,29 +80,7 @@ export type {
   StorageItemsKey,
   StorageItemUpdate,
 } from './StorageItem';
-export type {
-  Attribute,
-  OutputKey,
-  Transaction,
-  TransactionKey,
-  TransactionType,
-  AttributeJSON,
-  ClaimTransactionJSON,
-  ContractTransactionJSON,
-  EnrollmentTransactionJSON,
-  InputJSON,
-  IssueTransactionJSON,
-  InvocationDataJSON,
-  InvocationTransactionJSON,
-  MinerTransactionJSON,
-  OutputJSON,
-  PublishTransactionJSON,
-  RegisterTransactionJSON,
-  TransactionJSON,
-  TransactionReceiptJSON,
-  FeeContext,
-} from './transaction';
-export type { ValidatorJSON, ValidatorKey } from './Validator';
+export * from './Validator';
 export type { WitnessJSON } from './Witness';
 
 export { deserializeWire as deserializeActionWire } from './action';

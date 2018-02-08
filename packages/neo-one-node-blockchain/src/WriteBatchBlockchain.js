@@ -14,6 +14,7 @@ import {
   type Block,
   type Contract,
   type ContractKey,
+  type ECPoint,
   type Header,
   type InvocationDataKey,
   type Output,
@@ -24,6 +25,7 @@ import {
   type Transaction,
   type TransactionKey,
   type ValidatorKey,
+  type ValidatorUpdate,
   type UInt160,
   type UInt160Hex,
   type UInt256,
@@ -40,6 +42,7 @@ import {
   MinerTransaction,
   PublishTransaction,
   InvocationTransaction,
+  StateTransaction,
   Validator,
   common,
   utils,
@@ -56,25 +59,33 @@ import {
   type ChangeSet,
   type Storage,
   type VM,
+  type ValidatorsCountUpdate,
   type WriteBlockchain,
   AccountUnclaimed,
   AccountUnspent,
   BlockSystemFee,
   TransactionSpentCoins,
+  ValidatorsCount,
 } from '@neo-one/node-core';
 
 import _ from 'lodash';
 
 import {
+  type AccountChanges,
+  type ValidatorsCountChanges,
+  type ValidatorChanges,
+  getDescriptorChanges,
+} from './getValidators';
+import {
   BlockLikeStorageCache,
   OutputStorageCache,
   ReadAddDeleteStorageCache,
+  ReadAddUpdateMetadataStorageCache,
   ReadAddUpdateStorageCache,
   ReadAddStorageCache,
   ReadGetAllAddUpdateDeleteStorageCache,
   ReadGetAllAddStorageCache,
   ReadAllAddUpdateDeleteStorageCache,
-  ReadAllAddStorageCache,
 } from './StorageCache';
 import { GenesisBlockNotRegisteredError } from './errors';
 
@@ -122,8 +133,16 @@ type Caches = {|
     StorageItem,
     StorageItemUpdate,
   >,
-  validator: ReadAllAddStorageCache<ValidatorKey, Validator>,
+  validator: ReadAllAddUpdateDeleteStorageCache<
+    ValidatorKey,
+    Validator,
+    ValidatorUpdate,
+  >,
   invocationData: ReadAddStorageCache<InvocationDataKey, InvocationData>,
+  validatorsCount: ReadAddUpdateMetadataStorageCache<
+    ValidatorsCount,
+    ValidatorsCountUpdate,
+  >,
 |};
 
 type InputClaim = {|
@@ -177,8 +196,16 @@ export default class WriteBatchBlockchain {
     StorageItem,
     StorageItemUpdate,
   >;
-  validator: ReadAllAddStorageCache<ValidatorKey, Validator>;
+  validator: ReadAllAddUpdateDeleteStorageCache<
+    ValidatorKey,
+    Validator,
+    ValidatorUpdate,
+  >;
   invocationData: ReadAddStorageCache<InvocationDataKey, InvocationData>;
+  validatorsCount: ReadAddUpdateMetadataStorageCache<
+    ValidatorsCount,
+    ValidatorsCountUpdate,
+  >;
 
   getValidators: $PropertyType<WriteBlockchain, 'getValidators'>;
 
@@ -320,12 +347,14 @@ export default class WriteBatchBlockchain {
         createAddChange: value => ({ type: 'storageItem', value }),
         createDeleteChange: key => ({ type: 'storageItem', key }),
       }),
-      validator: new ReadAllAddStorageCache({
+      validator: new ReadAllAddUpdateDeleteStorageCache({
         name: 'validator',
         readAllStorage: this._storage.validator,
         getKeyFromValue: value => ({ publicKey: value.publicKey }),
         getKeyString: key => common.ecPointToString(key.publicKey),
         createAddChange: value => ({ type: 'validator', value }),
+        update: (value, update) => value.update(update),
+        createDeleteChange: key => ({ type: 'validator', key }),
       }),
       invocationData: new ReadAddStorageCache({
         name: 'invocationData',
@@ -333,6 +362,12 @@ export default class WriteBatchBlockchain {
         getKeyFromValue: value => ({ hash: value.hash }),
         getKeyString: key => common.uInt256ToString(key.hash),
         createAddChange: value => ({ type: 'invocationData', value }),
+      }),
+      validatorsCount: new ReadAddUpdateMetadataStorageCache({
+        name: 'validatorsCount',
+        readStorage: this._storage.validatorsCount,
+        createAddChange: value => ({ type: 'validatorsCount', value }),
+        update: (value, update) => value.update(update),
       }),
     };
 
@@ -351,6 +386,7 @@ export default class WriteBatchBlockchain {
     this.storageItem = this._caches.storageItem;
     this.validator = this._caches.validator;
     this.invocationData = this._caches.invocationData;
+    this.validatorsCount = this._caches.validatorsCount;
   }
 
   get currentBlock(): Block {
@@ -374,20 +410,9 @@ export default class WriteBatchBlockchain {
   }
 
   getChangeSet(): ChangeSet {
-    return this.account
-      .getChangeSet()
-      .concat(this.asset.getChangeSet())
-      .concat(this.action.getChangeSet())
-      .concat(this.block.getChangeSet())
-      .concat(this.blockSystemFee.getChangeSet())
-      .concat(this.header.getChangeSet())
-      .concat(this.transaction.getChangeSet())
-      .concat(this.output.getChangeSet())
-      .concat(this.transactionSpentCoins.getChangeSet())
-      .concat(this.contract.getChangeSet())
-      .concat(this.storageItem.getChangeSet())
-      .concat(this.validator.getChangeSet())
-      .concat(this.invocationData.getChangeSet());
+    return commonUtils
+      .values((this._caches: $FlowFixMe))
+      .reduce((acc, cache) => acc.concat(cache.getChangeSet()), []);
   }
 
   async persistBlock(block: Block): Promise<void> {
@@ -426,6 +451,7 @@ export default class WriteBatchBlockchain {
               governingToken: this.settings.governingToken,
               utilityToken: this.settings.utilityToken,
               fees: this.settings.fees,
+              registerValidatorFee: this.settings.registerValidatorFee,
             }),
           ),
         }),
@@ -505,6 +531,28 @@ export default class WriteBatchBlockchain {
       transaction instanceof ClaimTransaction
         ? transaction.claims
         : [];
+    let accountChanges = {};
+    let validatorChanges = {};
+    let validatorsCountChanges = [];
+    if (
+      transaction.type === TRANSACTION_TYPE.STATE &&
+      transaction instanceof StateTransaction
+    ) {
+      ({
+        accountChanges,
+        validatorChanges,
+        validatorsCountChanges,
+      } = await getDescriptorChanges({
+        transactions: [transaction],
+        getAccount: (hash: UInt160) =>
+          this.account
+            .tryGet({ hash })
+            .then(
+              account => (account == null ? new Account({ hash }) : account),
+            ),
+        governingTokenHash: this.settings.governingToken.hashHex,
+      }));
+    }
     await Promise.all([
       this.transaction.add(transaction),
       this.transactionSpentCoins.add(
@@ -517,8 +565,10 @@ export default class WriteBatchBlockchain {
         transaction.inputs,
         claims,
         this._getOutputWithInput(transaction),
+        accountChanges,
       ),
       this._updateCoins(transaction.inputs, claims, block),
+      this._processStateTransaction(validatorChanges, validatorsCountChanges),
     ]);
 
     if (
@@ -648,15 +698,6 @@ export default class WriteBatchBlockchain {
                 : null,
           )
           .filter(Boolean);
-        const validatorsChangeSet = temporaryBlockchain.validator.getChangeSet();
-        const validatorPublicKeys = validatorsChangeSet
-          .map(
-            change =>
-              change.type === 'add' && change.change.type === 'validator'
-                ? change.change.value.publicKey
-                : null,
-          )
-          .filter(Boolean);
         await Promise.all([
           Promise.all(
             temporaryBlockchain.getChangeSet().map(async change => {
@@ -679,7 +720,6 @@ export default class WriteBatchBlockchain {
               contractHashes,
               deletedContractHashes,
               migratedContractHashes,
-              validatorPublicKeys,
               voteUpdates,
               blockIndex: block.index,
               transactionIndex,
@@ -696,7 +736,6 @@ export default class WriteBatchBlockchain {
             deletedContractHashes: [],
             migratedContractHashes: [],
             voteUpdates: [],
-            validatorPublicKeys: [],
             blockIndex: block.index,
             transactionIndex,
             result,
@@ -706,10 +745,59 @@ export default class WriteBatchBlockchain {
     }
   }
 
+  async _processStateTransaction(
+    validatorChanges: ValidatorChanges,
+    validatorsCountChanges: ValidatorsCountChanges,
+  ): Promise<void> {
+    const validatorsCount = await this.validatorsCount.tryGet();
+    const validatorsCountVotes =
+      validatorsCount == null ? [] : validatorsCount.votes;
+    for (const [index, value] of validatorsCountChanges.entries()) {
+      validatorsCountVotes[index] = value;
+    }
+
+    await Promise.all([
+      commonUtils
+        .entries(validatorChanges)
+        .map(async ([publicKeyHex, { registered, votes }]) => {
+          const publicKey = common.hexToECPoint(publicKeyHex);
+          const validator = await this.validator.tryGet({ publicKey });
+          if (validator == null) {
+            await this.validator.add(
+              new Validator({
+                publicKey,
+                registered,
+                votes,
+              }),
+            );
+          } else if (
+            ((registered != null && !registered) ||
+              (registered == null && !validator.registered)) &&
+            ((votes != null && votes.eq(utils.ZERO)) ||
+              (votes == null && validator.votes.eq(utils.ZERO)))
+          ) {
+            await this.validator.delete({ publicKey: validator.publicKey });
+          } else {
+            await this.validator.update(validator, { votes, registered });
+          }
+        }),
+      validatorsCount == null
+        ? this.validatorsCount.add(
+            new ValidatorsCount({
+              votes: validatorsCountVotes,
+            }),
+          )
+        : this.validatorsCount.update(validatorsCount, {
+            votes: validatorsCountVotes,
+          }),
+    ]);
+  }
+
   async _updateAccounts(
     inputs: Array<Input>,
     claims: Array<Input>,
     outputs: Array<OutputWithInput>,
+    accountChanges: AccountChanges = {},
   ): Promise<void> {
     let done = this._perf.start('WriteBatchBlockchain._updateAccounts.0');
     const [inputOutputs, claimOutputs] = await Promise.all([
@@ -755,6 +843,7 @@ export default class WriteBatchBlockchain {
           addressSpent[address] || [],
           addressClaimed[address] || [],
           addressOutputs[address] || [],
+          accountChanges[address] || [],
         ),
       ),
     );
@@ -806,6 +895,7 @@ export default class WriteBatchBlockchain {
     spent: Array<Input>,
     claimed: Array<Input>,
     outputs: Array<OutputWithInput>,
+    votes: Array<ECPoint>,
   ): Promise<void> {
     const done = this._perf.start('WriteBatchBlockchain._updateAccount.tryGet');
     const account = await this.account.tryGet({ hash: address });
@@ -856,16 +946,19 @@ export default class WriteBatchBlockchain {
           new Account({
             hash: address,
             balances,
+            votes,
           }),
         ),
       );
     } else {
       promises.push(
-        this.account.update(account, { balances }).then(async newAccount => {
-          if (newAccount.isDeletable()) {
-            await this.account.delete({ hash: address });
-          }
-        }),
+        this.account
+          .update(account, { balances, votes })
+          .then(async newAccount => {
+            if (newAccount.isDeletable()) {
+              await this.account.delete({ hash: address });
+            }
+          }),
       );
     }
 
