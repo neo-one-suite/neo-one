@@ -16,11 +16,13 @@ import {
   type UInt256,
   type Validator,
   type VMSettings,
+  BinaryWriter,
   common,
   utils,
 } from '@neo-one/client-core';
 import type BN from 'bn.js';
 
+import { STACK_ITEM_TYPE } from './StackItemType';
 import type AttributeStackItem from './AttributeStackItem';
 import {
   InvalidValueArrayError,
@@ -54,6 +56,13 @@ export type AsStorageContextStackItemOptions = {|
 export default class StackItemBase implements Equatable {
   equals(other: mixed): boolean {
     return this === other;
+  }
+
+  serialize(): Buffer {
+    const writer = new BinaryWriter();
+    writer.writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY);
+    writer.writeVarBytesLE(this.asBuffer());
+    return writer.toBuffer();
   }
 
   // eslint-disable-next-line

@@ -4,7 +4,10 @@ import {
   type Equatable,
   InteropInterfaceContractParameter,
 } from '@neo-one/client-core';
-import { InvalidValueBufferError } from './errors';
+import {
+  InvalidValueBufferError,
+  UnsupportedStackItemSerdeError,
+} from './errors';
 import StackItemBase from './StackItemBase';
 
 export default class ObjectStackItem<Value: Equatable> extends StackItemBase {
@@ -25,6 +28,10 @@ export default class ObjectStackItem<Value: Equatable> extends StackItemBase {
     }
 
     return other instanceof ObjectStackItem && this.value.equals(other.value);
+  }
+
+  serialize(): Buffer {
+    throw new UnsupportedStackItemSerdeError();
   }
 
   asBoolean(): boolean {

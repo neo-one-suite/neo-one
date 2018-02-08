@@ -68,9 +68,7 @@ const handlePrepareRequest = async ({
     context.type !== 'backup' ||
     context instanceof RequestReceivedContext ||
     payload.validatorIndex !== context.primaryIndex ||
-    payload.timestamp > commonUtils.nowSeconds() + TEN_MINUTES_IN_SECONDS ||
-    message.transactionHashes.length >
-      node.blockchain.settings.maxTransactionsPerBlock
+    payload.timestamp > commonUtils.nowSeconds() + TEN_MINUTES_IN_SECONDS
   ) {
     return { context };
   }

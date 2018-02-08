@@ -128,3 +128,11 @@ export class InvalidValueStorageContextStackItemError extends CustomError {
     super('Invalid Value. Expected StorageContextStackItem');
   }
 }
+
+export class UnsupportedStackItemSerdeError extends CustomError {
+  code = 'UNSUPPORTED_STACK_ITEM_SERDE';
+
+  constructor() {
+    super('Unsupported StackItem serde.');
+  }
+}

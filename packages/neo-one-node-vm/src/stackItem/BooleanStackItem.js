@@ -2,10 +2,12 @@
 import type BN from 'bn.js';
 import {
   type ContractParameter,
+  BinaryWriter,
   BooleanContractParameter,
   utils,
 } from '@neo-one/client-core';
 
+import { STACK_ITEM_TYPE } from './StackItemType';
 import StackItemBase from './StackItemBase';
 
 export default class BooleanStackItem extends StackItemBase {
@@ -35,6 +37,13 @@ export default class BooleanStackItem extends StackItemBase {
     return (
       other instanceof StackItemBase && this.asBuffer().equals(other.asBuffer())
     );
+  }
+
+  serialize(): Buffer {
+    const writer = new BinaryWriter();
+    writer.writeUInt8(STACK_ITEM_TYPE.BOOLEAN);
+    writer.writeBoolean(this.value);
+    return writer.toBuffer();
   }
 
   asBigInteger(): BN {

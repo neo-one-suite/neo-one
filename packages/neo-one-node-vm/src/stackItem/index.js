@@ -23,4 +23,6 @@ export { default as StorageContextStackItem } from './StorageContextStackItem';
 export { default as ECPointStackItem } from './ECPointStackItem';
 export { default as StructStackItem } from './StructStackItem';
 
+export { default as deserializeStackItem } from './deserializeStackItem';
+
 export type { StackItem } from './StackItem';

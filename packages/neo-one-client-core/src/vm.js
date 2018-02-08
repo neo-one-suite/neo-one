@@ -502,6 +502,8 @@ export const SYS_CALL_NAME = {
   RUNTIME_NOTIFY: 'Neo.Runtime.Notify',
   RUNTIME_LOG: 'Neo.Runtime.Log',
   RUNTIME_GET_TIME: 'Neo.Runtime.GetTime',
+  RUNTIME_SERIALIZE: 'Neo.Runtime.Serialize',
+  RUNTIME_DESERIALIZE: 'Neo.Runtime.Deserialize',
   BLOCKCHAIN_GET_HEIGHT: 'Neo.Blockchain.GetHeight',
   BLOCKCHAIN_GET_HEADER: 'Neo.Blockchain.GetHeader',
   BLOCKCHAIN_GET_BLOCK: 'Neo.Blockchain.GetBlock',
@@ -586,6 +588,8 @@ export type SysCallName =
   | 'Neo.Runtime.Notify'
   | 'Neo.Runtime.Log'
   | 'Neo.Runtime.GetTime'
+  | 'Neo.Runtime.Serialize'
+  | 'Neo.Runtime.Deserialize'
   | 'Neo.Blockchain.GetHeight'
   | 'Neo.Blockchain.GetHeader'
   | 'Neo.Blockchain.GetBlock'
@@ -660,6 +664,10 @@ export const assertSysCallName = (value: string): SysCallName => {
       return SYS_CALL_NAME.RUNTIME_LOG;
     case SYS_CALL_NAME.RUNTIME_GET_TIME:
       return SYS_CALL_NAME.RUNTIME_GET_TIME;
+    case SYS_CALL_NAME.RUNTIME_SERIALIZE:
+      return SYS_CALL_NAME.RUNTIME_SERIALIZE;
+    case SYS_CALL_NAME.RUNTIME_DESERIALIZE:
+      return SYS_CALL_NAME.RUNTIME_DESERIALIZE;
     case SYS_CALL_NAME.BLOCKCHAIN_GET_HEIGHT:
       return SYS_CALL_NAME.BLOCKCHAIN_GET_HEIGHT;
     case SYS_CALL_NAME.BLOCKCHAIN_GET_HEADER:

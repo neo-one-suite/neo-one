@@ -50,6 +50,7 @@ import {
   UInt160StackItem,
   UInt256StackItem,
   ValidatorStackItem,
+  deserializeStackItem,
 } from './stackItem';
 import {
   type ExecutionContext,
@@ -415,6 +416,24 @@ export const SYSCALLS = {
         context,
         results: [new IntegerStackItem(new BN(time))],
       };
+    },
+  }),
+  'Neo.Runtime.Serialize': createSysCall({
+    name: 'Neo.Runtime.Serialize',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => {
+      const serialized = args[0].serialize();
+      return { context, results: [new BufferStackItem(serialized)] };
+    },
+  }),
+  'Neo.Runtime.Deserialize': createSysCall({
+    name: 'Neo.Runtime.Deserialize',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => {
+      const deserialized = deserializeStackItem(args[0].asBuffer());
+      return { context, results: [deserialized] };
     },
   }),
   'Neo.Blockchain.GetHeight': createSysCall({

@@ -2,10 +2,12 @@
 import type BN from 'bn.js';
 import {
   type ContractParameter,
+  BinaryWriter,
   IntegerContractParameter,
   utils,
 } from '@neo-one/client-core';
 
+import { STACK_ITEM_TYPE } from './StackItemType';
 import { InvalidValueStorageContextStackItemError } from './errors';
 import StackItemBase, {
   type AsStorageContextStackItemOptions,
@@ -36,6 +38,13 @@ export default class IntegerStackItem extends StackItemBase {
     return (
       other instanceof StackItemBase && this.asBuffer().equals(other.asBuffer())
     );
+  }
+
+  serialize(): Buffer {
+    const writer = new BinaryWriter();
+    writer.writeUInt8(STACK_ITEM_TYPE.INTEGER);
+    writer.writeVarBytesLE(utils.toSignedBuffer(this.value));
+    return writer.toBuffer();
   }
 
   asBigInteger(): BN {
