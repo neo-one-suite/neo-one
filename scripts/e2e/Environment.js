@@ -86,7 +86,11 @@ class One {
         (error, stdout, stderr) => {
           if (error) {
             // eslint-disable-next-line
+            console.log('STDOUT:');
+            // eslint-disable-next-line
             console.log(stdout);
+            // eslint-disable-next-line
+            console.log('STDERR:');
             // eslint-disable-next-line
             console.log(stderr);
             reject(error);
