@@ -1,3 +1,3 @@
 /* eslint-disable */
 require('@babel/polyfill');
-jest.setTimeout(60000);
+jest.setTimeout(600000);
