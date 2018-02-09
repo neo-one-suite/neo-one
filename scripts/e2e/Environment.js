@@ -70,6 +70,7 @@ class One {
       exec(
         this._createCommand(command),
         {
+          maxBuffer: 20000 * 1024,
           windowsHide: true,
         },
         (error, stdout, stderr) => {
