@@ -85,15 +85,13 @@ class One {
         },
         (error, stdout, stderr) => {
           if (error) {
-            // eslint-disable-next-line
-            console.log('STDOUT:');
-            // eslint-disable-next-line
-            console.log(stdout);
-            // eslint-disable-next-line
-            console.log('STDERR:');
-            // eslint-disable-next-line
-            console.log(stderr);
-            reject(error);
+            reject(
+              new Error(
+                `STDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n\nERROR:\n${
+                  error.message
+                }\n${error.toString()}`,
+              ),
+            );
           } else {
             resolve(stdout);
           }
