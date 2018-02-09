@@ -52,6 +52,9 @@ jobs:
       - run:
           name: Test
           command: yarn test
+      - run:
+          name: E2E
+          command: yarn e2e
 
   deploy-website:
     <<: *defaults
