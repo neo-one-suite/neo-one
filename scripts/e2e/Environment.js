@@ -41,8 +41,12 @@ class One {
         {
           windowsHide: true,
         },
-        (error, stdout) => {
+        (error, stdout, stderr) => {
           if (error) {
+            // eslint-disable-next-line
+            console.log(stdout);
+            // eslint-disable-next-line
+            console.log(stderr);
             reject(error);
           } else {
             resolve(stdout);
