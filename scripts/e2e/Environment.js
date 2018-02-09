@@ -13,10 +13,41 @@ class One {
     this.dirName = this.dir.name;
     this.serverPort = _.random(10000, 50000);
     this.minPort = this.serverPort + 1;
-    const command = this._createCommand('start server --static-neo-one');
-    this.server = spawn(command.split(' ')[0], command.split(' ').slice(1), {
-      stdio: 'ignore',
-    });
+    const command = this._createCommand(
+      'start server --debug --static-neo-one',
+    );
+    this.server = spawn(command.split(' ')[0], command.split(' ').slice(1));
+
+    let stdout = '';
+    const listener = res => {
+      stdout += res;
+    };
+    this.server.stdout.on('data', listener);
+
+    let tries = 3;
+    let ready = false;
+    while (!ready && tries >= 0) {
+      // eslint-disable-next-line
+      await new Promise(resolve => setTimeout(() => resolve(), 2000));
+      // eslint-disable-next-line
+      const result = await this._exec('check server --static-neo-one');
+      try {
+        ready = JSON.parse(result);
+      } catch (error) {
+        // eslint-disable-next-line
+        console.log(result);
+        // eslint-disable-next-line
+        console.error(error);
+      }
+      tries -= 1;
+    }
+
+    this.server.stdout.removeListener('data', listener);
+
+    if (!ready) {
+      await this._teardown();
+      throw new Error(`Failed to start NEO-ONE server: ${stdout}`);
+    }
   }
 
   async _teardown() {
