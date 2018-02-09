@@ -1,15 +1,9 @@
 /* @flow */
-import { Config, paths } from '@neo-one/server-plugin';
+import { type Paths, Config } from '@neo-one/server-plugin';
 import type { Log } from '@neo-one/utils';
 
 export type ServerConfig = {|
-  paths: {|
-    data: string,
-    config: string,
-    cache: string,
-    log: string,
-    temp: string,
-  |},
+  paths: Paths,
   server: {|
     port: number,
   |},
@@ -24,19 +18,24 @@ export type ServerConfig = {|
   |},
 |};
 
-export default ({ log }: {| log: Log |}): Config<ServerConfig> =>
+export default ({
+  log,
+  paths,
+  serverPort,
+  minPort,
+}: {|
+  log: Log,
+  paths: Paths,
+  serverPort?: number,
+  minPort?: number,
+|}): Config<ServerConfig> =>
   new Config({
     name: 'server',
+    configPath: paths.config,
     defaultConfig: {
-      paths: {
-        data: paths.data,
-        config: paths.config,
-        cache: paths.cache,
-        log: paths.log,
-        temp: paths.temp,
-      },
+      paths,
       server: {
-        port: 40100,
+        port: serverPort == null ? 40100 : serverPort,
       },
       log: {
         level: 'info',
@@ -44,8 +43,8 @@ export default ({ log }: {| log: Log |}): Config<ServerConfig> =>
         maxFiles: 5,
       },
       ports: {
-        min: 40200,
-        max: 41200,
+        min: minPort == null ? 40200 : minPort,
+        max: (minPort == null ? 40200 : minPort) + 1000,
       },
     },
     schema: {

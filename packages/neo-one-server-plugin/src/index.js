@@ -24,6 +24,7 @@ export { default as theme } from './theme';
 export { AbortController, AbortSignal } from './AbortController';
 export { getTasksError, areTasksDone, skipAllTasks } from './tasks';
 export { logInvoke } from '@neo-one/utils';
+export * from './paths';
 
 export type {
   ExecCLIOptions,

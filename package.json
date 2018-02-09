@@ -44,6 +44,7 @@
     "posttest-coverage": "babel-node ./scripts/test/posttest.js",
     "test": "jest",
     "test-coverage": "yarn test --coverage",
+    "e2e": "jest --config e2e.json --testPathPattern './packages/.*/__e2e__/.*'",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.js\"",
     "nit:scripts": "prettier --config .prettierrc --list-different \"scripts/**/*.js\"",
     "nit": "yarn nit:source && yarn nit:scripts",
@@ -86,8 +87,10 @@
     "gulp-util": "^3.0.8",
     "husky": "^0.14.3",
     "jest": "^22.2.1",
+    "jest-environment-node": "^22.2.0",
     "lerna": "^2.8.0",
     "lint-staged": "^6.1.0",
+    "lodash": "^4.17.5",
     "prettier": "^1.10.2",
     "rollup": "^0.55.3",
     "rollup-plugin-babel": "4.0.0-beta.0",
@@ -95,7 +98,8 @@
     "rollup-plugin-node-resolve": "^3.0.2",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
-    "through2": "^2.0.3"
+    "through2": "^2.0.3",
+    "tmp": "^0.0.33"
   },
   "resolutions": {
     "ajv": "^6.1.0",
@@ -108,7 +112,8 @@
       "!**/bin/**",
       "!**/__mocks__/**",
       "!**/__tests__/**",
-      "!**/__data__/**"
+      "!**/__data__/**",
+      "!**/__e2e__/**"
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
@@ -121,9 +126,11 @@
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "/node_modules/",
+      "<rootDir>/decls/.*",
       "<rootDir>/packages/neo-one-node-neo-settings/src/test.js",
       "<rootDir>/migrate/.*",
-      "<rootDir>/packages/.*/template/.*"
+      "<rootDir>/packages/.*/template/.*",
+      "<rootDir>/packages/.*/__e2e__/.*"
     ],
     "snapshotSerializers": [
       "./scripts/serializers/blockchain.js",

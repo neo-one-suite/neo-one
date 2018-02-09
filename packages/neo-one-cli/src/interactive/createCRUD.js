@@ -317,6 +317,7 @@ const createDescribe = ({
   const command = cli.vorpal
     .command(crud.command, crud.help)
     .option('-w, --watch', 'Watch for changes')
+    .option('-j, --json', 'Output as JSON')
     .action(async args => {
       const options = await crud.getCLIResourceOptions({
         cli,
@@ -342,10 +343,12 @@ const createDescribe = ({
                 `${resourceType.names.capital} ${args.name} does not exist`,
               );
             } else {
-              cli.printDescribe(
-                resourceType.getDescribeTable(resource),
-                logUpdate,
-              );
+              const table = resourceType.getDescribeTable(resource);
+              if (args.options.json) {
+                cli.vorpal.activeCommand.log(JSON.stringify(table));
+              } else {
+                cli.printDescribe(table, logUpdate);
+              }
             }
           }),
         );

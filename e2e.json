@@ -1,0 +1,9 @@
+{
+  "testEnvironment": "./scripts/e2e/Environment",
+  "snapshotSerializers": [
+    "./scripts/serializers/blockchain.js",
+    "./scripts/serializers/bn.js",
+    "./scripts/serializers/buffer.js"
+  ],
+  "setupTestFrameworkScriptFile": "./scripts/e2e/jestSetup.js"
+}

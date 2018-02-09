@@ -1,15 +1,9 @@
 /* @flow */
-import { Config, paths } from '@neo-one/server-plugin';
+import { type Paths, Config } from '@neo-one/server-plugin';
 import type { Log } from '@neo-one/utils';
 
 export type ClientConfig = {|
-  paths: {|
-    data: string,
-    config: string,
-    cache: string,
-    log: string,
-    temp: string,
-  |},
+  paths: Paths,
   log: {|
     level: string,
     maxSize: number,
@@ -17,17 +11,18 @@ export type ClientConfig = {|
   |},
 |};
 
-export default ({ log }: {| log: Log |}): Config<ClientConfig> =>
+export default ({
+  log,
+  paths,
+}: {|
+  log: Log,
+  paths: Paths,
+|}): Config<ClientConfig> =>
   new Config({
     name: 'client',
+    configPath: paths.config,
     defaultConfig: {
-      paths: {
-        data: paths.data,
-        config: paths.config,
-        cache: paths.cache,
-        log: paths.log,
-        temp: paths.temp,
-      },
+      paths,
       log: {
         level: 'info',
         maxSize: 10 * 1024 * 1024,

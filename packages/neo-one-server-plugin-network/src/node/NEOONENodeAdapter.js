@@ -272,7 +272,7 @@ export const createNodeConfig = ({
     configPath: dataPath,
   });
 
-export default class NEOBlockchainNodeAdapter extends NodeAdapter {
+export default class NEOONENodeAdapter extends NodeAdapter {
   _config: ?Config<NodeConfig>;
   _process: ?ChildProcess;
 
