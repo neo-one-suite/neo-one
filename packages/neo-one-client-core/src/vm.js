@@ -551,6 +551,10 @@ export const SYS_CALL_NAME = {
   CONTRACT_GET_SCRIPT: 'Neo.Contract.GetScript',
   STORAGE_GET_CONTEXT: 'Neo.Storage.GetContext',
   STORAGE_GET: 'Neo.Storage.Get',
+  STORAGE_FIND: 'Neo.Storage.Find',
+  ITERATOR_NEXT: 'Neo.Iterator.Next',
+  ITERATOR_KEY: 'Neo.Iterator.Key',
+  ITERATOR_VALUE: 'Neo.Iterator.Value',
   ACCOUNT_SET_VOTES: 'Neo.Account.SetVotes',
   VALIDATOR_REGISTER: 'Neo.Validator.Register',
   ASSET_CREATE: 'Neo.Asset.Create',
@@ -637,6 +641,10 @@ export type SysCallName =
   | 'Neo.Contract.GetScript'
   | 'Neo.Storage.GetContext'
   | 'Neo.Storage.Get'
+  | 'Neo.Storage.Find'
+  | 'Neo.Iterator.Next'
+  | 'Neo.Iterator.Key'
+  | 'Neo.Iterator.Value'
   | 'Neo.Account.SetVotes'
   | 'Neo.Validator.Register'
   | 'Neo.Asset.Create'
@@ -762,6 +770,14 @@ export const assertSysCallName = (value: string): SysCallName => {
       return SYS_CALL_NAME.STORAGE_GET_CONTEXT;
     case SYS_CALL_NAME.STORAGE_GET:
       return SYS_CALL_NAME.STORAGE_GET;
+    case SYS_CALL_NAME.STORAGE_FIND:
+      return SYS_CALL_NAME.STORAGE_FIND;
+    case SYS_CALL_NAME.ITERATOR_NEXT:
+      return SYS_CALL_NAME.ITERATOR_NEXT;
+    case SYS_CALL_NAME.ITERATOR_KEY:
+      return SYS_CALL_NAME.ITERATOR_KEY;
+    case SYS_CALL_NAME.ITERATOR_VALUE:
+      return SYS_CALL_NAME.ITERATOR_VALUE;
     case SYS_CALL_NAME.ACCOUNT_SET_VOTES:
       return SYS_CALL_NAME.ACCOUNT_SET_VOTES;
     case SYS_CALL_NAME.VALIDATOR_REGISTER:

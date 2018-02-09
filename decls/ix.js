@@ -15,6 +15,8 @@ type AsyncIterableInput<TSource> =
   | rxjs$Observable<TSource>;
 
 declare class AsyncIterableX<T> extends $AsyncIterable<T, void, void> {
+  @@asyncIterator(): $AsyncIterator<T, void, void>;
+
   forEach(
     projection: (value: T, index: number) => void | Promise<void>,
     thisArg?: any

@@ -27,7 +27,8 @@ export type StorageItemUpdate = {|
   value: Buffer,
 |};
 export type StorageItemsKey = {|
-  hash: UInt160,
+  hash?: UInt160,
+  prefix?: Buffer,
 |};
 export type StorageItemKey = {|
   hash: UInt160,

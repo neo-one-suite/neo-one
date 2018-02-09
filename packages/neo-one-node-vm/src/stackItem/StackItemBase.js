@@ -39,10 +39,12 @@ import {
   InvalidValueContractError,
   InvalidValueValidatorError,
   InvalidValueMapStackItemError,
+  InvalidValueIteratorError,
   InvalidValueStorageContextStackItemError,
 } from './errors';
 import type MapStackItem from './MapStackItem';
 import type { StackItem } from './StackItem';
+import type StackItemIterator from './StackItemIterator';
 import type StorageContextStackItem from './StorageContextStackItem';
 
 export type AsStorageContextStackItemOptions = {|
@@ -165,6 +167,10 @@ export default class StackItemBase implements Equatable {
 
   asMapStackItem(): MapStackItem {
     throw new InvalidValueMapStackItemError();
+  }
+
+  asIterator(): StackItemIterator {
+    throw new InvalidValueIteratorError();
   }
 
   // eslint-disable-next-line

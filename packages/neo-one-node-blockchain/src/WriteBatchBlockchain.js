@@ -343,7 +343,9 @@ export default class WriteBatchBlockchain {
         getKeyString: key =>
           `${common.uInt160ToString(key.hash)}:${key.key.toString('hex')}`,
         matchesPartialKey: (value, key) =>
-          key.hash == null || common.uInt160Equal(value.hash, key.hash),
+          (key.hash == null || common.uInt160Equal(value.hash, key.hash)) &&
+          (key.prefix == null ||
+            key.prefix.every((byte, idx) => value.key[idx] === byte)),
         createAddChange: value => ({ type: 'storageItem', value }),
         createDeleteChange: key => ({ type: 'storageItem', key }),
       }),

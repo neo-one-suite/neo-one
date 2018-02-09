@@ -10,6 +10,7 @@ import {
   type SysCallName,
   type UInt160,
   type UInt256,
+  Account,
   Asset,
   Contract,
   StorageItem,
@@ -25,7 +26,9 @@ import {
   crypto,
   utils,
 } from '@neo-one/client-core';
+import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 
+import { map as asyncMap } from 'ix/asynciterable/pipe/index';
 import { concatMap, map, toArray } from 'rxjs/operators';
 import { defer } from 'rxjs/observable/defer';
 
@@ -44,6 +47,7 @@ import {
   HeaderStackItem,
   IntegerStackItem,
   InputStackItem,
+  IteratorStackItem,
   OutputStackItem,
   StorageContextStackItem,
   TransactionStackItem,
@@ -506,12 +510,13 @@ export const SYSCALLS = {
     out: 1,
     fee: FEES.ONE_HUNDRED,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const account = await context.blockchain.account.get({
-        hash: args[0].asUInt160(),
+      const hash = args[0].asUInt160();
+      const account = await context.blockchain.account.tryGet({
+        hash,
       });
       return {
         context,
-        results: [new AccountStackItem(account)],
+        results: [new AccountStackItem(account || new Account({ hash }))],
       };
     },
   }),
@@ -992,6 +997,61 @@ export const SYSCALLS = {
         results: [new BufferStackItem(result)],
       };
     },
+  }),
+  'Neo.Storage.Find': createSysCall({
+    name: 'Neo.Storage.Find',
+    in: 2,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => {
+      const hash = vmUtils.toStorageContext(context, args[0]).value;
+      await checkStorage({ context, hash });
+
+      const prefix = args[1].asBuffer();
+      const iterable = AsyncIterableX.from(
+        context.blockchain.storageItem.getAll({ hash, prefix }),
+      );
+      return {
+        context,
+        results: [
+          new IteratorStackItem(
+            (iterable.pipe(
+              asyncMap(item => new BufferStackItem(item)),
+            ): $FlowFixMe)[(Symbol: $FlowFixMe).asyncIterator](),
+          ),
+        ],
+      };
+    },
+  }),
+  'Neo.Iterator.Next': createSysCall({
+    name: 'Neo.Iterator.Next',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => {
+      const iterator = args[0].asIterator();
+      const value = await iterator.next();
+      return {
+        context,
+        results: [new BooleanStackItem(value)],
+      };
+    },
+  }),
+  'Neo.Iterator.Key': createSysCall({
+    name: 'Neo.Iterator.Key',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => ({
+      context,
+      results: [args[0].asIterator().key()],
+    }),
+  }),
+  'Neo.Iterator.Value': createSysCall({
+    name: 'Neo.Iterator.Value',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => ({
+      context,
+      results: [args[0].asIterator().value()],
+    }),
   }),
   'Neo.Account.SetVotes': createSysCall({
     name: 'Neo.Account.SetVotes',

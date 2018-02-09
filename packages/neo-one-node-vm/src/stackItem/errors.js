@@ -121,6 +121,14 @@ export class InvalidValueValidatorError extends CustomError {
   }
 }
 
+export class InvalidValueIteratorError extends CustomError {
+  code = 'INVALID_VALUE_ITERATOR';
+
+  constructor() {
+    super('Invalid Value. Expected Iterator');
+  }
+}
+
 export class InvalidValueStorageContextStackItemError extends CustomError {
   code = 'INVALID_VALUE_STORAGE_CONTEXT_STACK_ITEM';
 
@@ -134,5 +142,16 @@ export class UnsupportedStackItemSerdeError extends CustomError {
 
   constructor() {
     super('Unsupported StackItem serde.');
+  }
+}
+
+export class InvalidStorageStackItemIteratorError extends CustomError {
+  code = 'INVALID_STORAGE_STACK_ITEM_ITERATOR';
+
+  constructor() {
+    super(
+      'Current is not set. The iterator has been fully consumed or has not ' +
+        'been initialized',
+    );
   }
 }
