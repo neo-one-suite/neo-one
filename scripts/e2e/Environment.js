@@ -24,11 +24,11 @@ class One {
     };
     this.server.stdout.on('data', listener);
 
-    let tries = 3;
+    let tries = 6;
     let ready = false;
     while (!ready && tries >= 0) {
       // eslint-disable-next-line
-      await new Promise(resolve => setTimeout(() => resolve(), 2000));
+      await new Promise(resolve => setTimeout(() => resolve(), 5000));
       // eslint-disable-next-line
       const result = await this._exec('check server --static-neo-one');
       try {
