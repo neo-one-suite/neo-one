@@ -1,6 +1,6 @@
 /* @flow */
 import { CustomError } from '@neo-one/utils';
-import ECKey from 'ec-key';
+import ECKey from '@neo-one/ec-key';
 import WIF from 'wif';
 
 import bs58 from 'bs58';

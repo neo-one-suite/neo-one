@@ -619,6 +619,12 @@
   version "0.0.1"
   resolved "https://registry.npmjs.org/@neo-one/csharp/-/csharp-0.0.1.tgz#d102376bef6737d58d8159badb589306124a7d3e"
 
+"@neo-one/ec-key@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.npmjs.org/@neo-one/ec-key/-/ec-key-0.0.3.tgz#d309941a5f7deafe0a41af8b76227708152fd4de"
+  dependencies:
+    asn1.js "^1.0.4"
+
 "@types/jss@^9.3.0":
   version "9.3.0"
   resolved "https://registry.npmjs.org/@types/jss/-/jss-9.3.0.tgz#0f8484fd03ded206917be27b58217f274a0ad59f"
@@ -3441,12 +3447,6 @@ duplexify@^3.5.0, duplexify@^3.5.3:
     inherits "^2.0.1"
     readable-stream "^2.0.0"
     stream-shift "^1.0.0"
-
-ec-key@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.npmjs.org/ec-key/-/ec-key-0.0.2.tgz#50052ae961abd6f18710c235a87f349a72468189"
-  dependencies:
-    asn1.js "^1.0.4"
 
 ecc-jsbn@~0.1.1:
   version "0.1.1"

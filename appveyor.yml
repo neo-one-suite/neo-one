@@ -16,7 +16,7 @@ install:
   - ps: Install-Product node $env:nodejs_version x64
   - node --version
   - yarn --version
-  - yarn install --ignore-engines --non-interactive --frozen-lockfile
+  - yarn install --non-interactive --frozen-lockfile
   - yarn run build
 
 cache:
