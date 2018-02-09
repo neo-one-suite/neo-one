@@ -44,7 +44,7 @@
     "posttest-coverage": "babel-node ./scripts/test/posttest.js",
     "test": "jest",
     "test-coverage": "yarn run test --coverage",
-    "e2e": "jest --config e2e.json --testPathPattern './packages/.*/__e2e__/.*'",
+    "e2e": "jest --config e2e.json --testPathPattern 'packages/.*/__e2e__/.*'",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.js\"",
     "nit:scripts": "prettier --config .prettierrc --list-different \"scripts/**/*.js\"",
     "nit": "yarn run nit:source && yarn run nit:scripts",
