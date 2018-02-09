@@ -530,6 +530,7 @@ export const SYS_CALL_NAME = {
   TRANSACTION_GET_OUTPUTS: 'Neo.Transaction.GetOutputs',
   TRANSACTION_GET_REFERENCES: 'Neo.Transaction.GetReferences',
   TRANSACTION_GET_UNSPENT_COINS: 'Neo.Transaction.GetUnspentCoins',
+  INVOCATION_TRANSACTION_GET_SCRIPT: 'Neo.InvocationTransaction.GetScript',
   ATTRIBUTE_GET_USAGE: 'Neo.Attribute.GetUsage',
   ATTRIBUTE_GET_DATA: 'Neo.Attribute.GetData',
   INPUT_GET_HASH: 'Neo.Input.GetHash',
@@ -620,6 +621,7 @@ export type SysCallName =
   | 'Neo.Transaction.GetOutputs'
   | 'Neo.Transaction.GetReferences'
   | 'Neo.Transaction.GetUnspentCoins'
+  | 'Neo.InvocationTransaction.GetScript'
   | 'Neo.Attribute.GetUsage'
   | 'Neo.Attribute.GetData'
   | 'Neo.Input.GetHash'
@@ -728,6 +730,8 @@ export const assertSysCallName = (value: string): SysCallName => {
       return SYS_CALL_NAME.TRANSACTION_GET_REFERENCES;
     case SYS_CALL_NAME.TRANSACTION_GET_UNSPENT_COINS:
       return SYS_CALL_NAME.TRANSACTION_GET_UNSPENT_COINS;
+    case SYS_CALL_NAME.INVOCATION_TRANSACTION_GET_SCRIPT:
+      return SYS_CALL_NAME.INVOCATION_TRANSACTION_GET_SCRIPT;
     case SYS_CALL_NAME.ATTRIBUTE_GET_USAGE:
       return SYS_CALL_NAME.ATTRIBUTE_GET_USAGE;
     case SYS_CALL_NAME.ATTRIBUTE_GET_DATA:

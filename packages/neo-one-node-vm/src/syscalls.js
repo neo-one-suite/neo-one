@@ -13,6 +13,7 @@ import {
   Account,
   Asset,
   Contract,
+  InvocationTransaction,
   StorageItem,
   Validator,
   BinaryReader,
@@ -74,6 +75,7 @@ import {
   InvalidGetBlockArgumentsError,
   InvalidGetHeaderArgumentsError,
   InvalidIndexError,
+  InvalidInvocationTransactionError,
   NotEligibleVoteError,
   StackUnderflowError,
   TooManyVotesError,
@@ -786,6 +788,22 @@ export const SYSCALLS = {
           ),
         ],
       };
+    },
+  }),
+  'Neo.InvocationTransaction.GetScript': createSysCall({
+    name: 'Neo.InvocationTransaction.GetScript',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => {
+      const transaction = args[0].asTransaction();
+      if (transaction instanceof InvocationTransaction) {
+        return {
+          context,
+          results: [new BufferStackItem(transaction.script)],
+        };
+      }
+
+      throw new InvalidInvocationTransactionError(context);
     },
   }),
   'Neo.Attribute.GetUsage': createSysCall({

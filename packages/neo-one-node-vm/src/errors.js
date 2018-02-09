@@ -257,6 +257,12 @@ export class InvalidIndexError extends VMError {
   }
 }
 
+export class InvalidInvocationTransactionError extends VMError {
+  constructor(context: ExecutionContext) {
+    super(context, 'Expected InvocationTransaction.');
+  }
+}
+
 export class ContractNoStorageError extends VMError {
   constructor(context: ExecutionContext, hash: string) {
     super(context, `Contract Does Not Have Storage: ${hash}`);
