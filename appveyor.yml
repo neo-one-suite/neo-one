@@ -26,3 +26,6 @@ cache:
 test_script:
   - yarn run test --verbose
   - yarn run e2e --verbose
+
+# Don't actually build.
+build: off
