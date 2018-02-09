@@ -7,7 +7,7 @@ describe('create network', () => {
     await new Promise(resolve => setTimeout(() => resolve(), 10000));
     const output = await one.execute('describe network priv --json');
 
-    const description = JSON.parse(output);
+    const description = one.parseJSON(output);
     expect(description[0]).toEqual(['Name', 'priv']);
     expect(description[1]).toEqual(['Type', 'private']);
     expect(description[3][1].table[1][0]).toEqual('priv-0');

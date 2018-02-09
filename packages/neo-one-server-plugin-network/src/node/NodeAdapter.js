@@ -7,8 +7,6 @@ import {
   logInvoke,
 } from '@neo-one/server-plugin';
 import type { Observable } from 'rxjs/Observable';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
-import type { Subject } from 'rxjs/Subject';
 
 import { concat } from 'rxjs/observable/concat';
 import { defer } from 'rxjs/observable/defer';
@@ -40,7 +38,6 @@ export default class NodeAdapter {
   _portAllocator: PortAllocator;
 
   _settings: NodeSettings;
-  _update$: Subject<void>;
   node$: Observable<Node>;
 
   constructor({
@@ -66,7 +63,6 @@ export default class NodeAdapter {
 
     this._settings = settings;
 
-    this._update$ = new ReplaySubject(1);
     const { rpcAddress, tcpAddress } = this._getNodeStatus();
     this.node$ = concat(
       _of({
@@ -76,33 +72,28 @@ export default class NodeAdapter {
         rpcAddress,
         tcpAddress,
       }),
-      this._update$.pipe(
+      timer(0, 5500).pipe(
         switchMap(() =>
-          timer(0, 5500).pipe(
-            switchMap(() =>
-              defer(async () => {
-                const [ready, live] = await Promise.all([
-                  this._isReady(),
-                  this._isLive(),
-                ]);
-                return { ready, live };
-              }),
-            ),
-            map(({ ready, live }) => {
-              const config = this._getNodeStatus();
-              return {
-                name: this.name,
-                ready,
-                live,
-                rpcAddress: config.rpcAddress,
-                tcpAddress: config.tcpAddress,
-              };
-            }),
-          ),
+          defer(async () => {
+            const [ready, live] = await Promise.all([
+              this._isReady(),
+              this._isLive(),
+            ]);
+            return { ready, live };
+          }),
         ),
+        map(({ ready, live }) => {
+          const config = this._getNodeStatus();
+          return {
+            name: this.name,
+            ready,
+            live,
+            rpcAddress: config.rpcAddress,
+            tcpAddress: config.tcpAddress,
+          };
+        }),
       ),
     ).pipe(shareReplay(1));
-    this._update$.next();
   }
 
   async create(): Promise<void> {
@@ -112,7 +103,6 @@ export default class NodeAdapter {
       { name: this.name },
       async () => {
         await this._create();
-        this._update$.next();
       },
     );
   }
@@ -125,7 +115,6 @@ export default class NodeAdapter {
       async () => {
         await this._update(settings);
         this._settings = settings;
-        this._update$.next();
       },
     );
   }
@@ -137,7 +126,6 @@ export default class NodeAdapter {
       { name: this.name },
       async () => {
         await this._start();
-        this._update$.next();
       },
     );
   }
@@ -149,7 +137,6 @@ export default class NodeAdapter {
       { name: this.name },
       async () => {
         await this._stop();
-        this._update$.next();
       },
     );
   }

@@ -8,8 +8,7 @@ import {
   TaskList,
 } from '@neo-one/server-plugin';
 import { Observable } from 'rxjs/Observable';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
-import type { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import _ from 'lodash';
 import { combineLatest } from 'rxjs/observable/combineLatest';
@@ -71,9 +70,7 @@ export default class NetworkResourceAdapter {
   _nodesPath: string;
   _nodesOptionsPath: string;
   _state: ResourceState;
-  _nodes: Array<NodeAdapter>;
-
-  _update$: Subject<void>;
+  _nodes$: BehaviorSubject<Array<NodeAdapter>>;
 
   resource$: Observable<Network>;
 
@@ -86,7 +83,7 @@ export default class NetworkResourceAdapter {
     resourceType,
     nodesPath,
     nodesOptionsPath,
-    nodes,
+    nodes: nodesIn,
   }: NetworkResourceAdapterOptions) {
     this._name = name;
     this._type = type;
@@ -96,13 +93,13 @@ export default class NetworkResourceAdapter {
     this._resourceType = resourceType;
     this._nodesPath = nodesPath;
     this._nodesOptionsPath = nodesOptionsPath;
-    this._nodes = nodes;
+    this._nodes$ = new BehaviorSubject(nodesIn);
     this._state = 'stopped';
 
-    this._update$ = new ReplaySubject(1);
-    this.resource$ = combineLatest(timer(0, 1000), this._update$).pipe(
-      switchMap(() =>
-        combineLatest(this._nodes.map(node => node.node$)).pipe(
+    this.resource$ = combineLatest(timer(0, 1000), this._nodes$).pipe(
+      // eslint-disable-next-line
+      switchMap(([time, nodes]) =>
+        combineLatest(nodes.map(node => node.node$)).pipe(
           switchMap(async currentNodes => {
             const readyNode =
               currentNodes.find(node => node.ready) ||
@@ -141,7 +138,10 @@ export default class NetworkResourceAdapter {
       ),
       shareReplay(1),
     );
-    this._update$.next();
+  }
+
+  get _nodes(): Array<NodeAdapter> {
+    return this._nodes$.value;
   }
 
   static async init(
@@ -189,7 +189,7 @@ export default class NetworkResourceAdapter {
   }
 
   async destroy(): Promise<void> {
-    this._nodes = [];
+    this._nodes$.next([]);
   }
 
   static create(
@@ -266,12 +266,11 @@ export default class NetworkResourceAdapter {
         },
         {
           title: 'Wait for network to be alive',
-          task: ctx =>
+          task: () =>
             new TaskList({
               tasks: nodeOptionsAndNodes.map(([nodeOptions, node]) => ({
                 title: `Waiting for node ${nodeOptions.name}`,
                 task: async () => {
-                  ctx.resourceAdapter._update$.next();
                   await node.live(5);
                 },
               })),

@@ -59,6 +59,16 @@ class One {
     return this._exec(command);
   }
 
+  parseJSON(value) {
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      // eslint-disable-next-line
+      console.log(value);
+      throw error;
+    }
+  }
+
   _createCommand(command) {
     return `node ./packages/neo-one-cli/dist/bin/neo-one ${command} --dir ${
       this.dirName
