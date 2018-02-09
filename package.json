@@ -18,7 +18,7 @@
       "prettier --write --config .prettierrc",
       "git add",
       "eslint",
-      "yarn test --findRelatedTests --ci --passWithNoTests"
+      "yarn run test --findRelatedTests --ci --passWithNoTests"
     ],
     "packages/*/template/**/*.js": [
       "prettier --write --config .prettierrc",
@@ -43,14 +43,14 @@
     "pretest-coverage": "babel-node ./scripts/test/pretest.js",
     "posttest-coverage": "babel-node ./scripts/test/posttest.js",
     "test": "jest",
-    "test-coverage": "yarn test --coverage",
+    "test-coverage": "yarn run test --coverage",
     "e2e": "jest --config e2e.json --testPathPattern './packages/.*/__e2e__/.*'",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.js\"",
     "nit:scripts": "prettier --config .prettierrc --list-different \"scripts/**/*.js\"",
-    "nit": "yarn nit:source && yarn nit:scripts",
+    "nit": "yarn run nit:source && yarn run nit:scripts",
     "lint:source": "eslint packages/*/src/**",
     "lint:scripts": "eslint scripts/**",
-    "lint": "yarn lint:source && yarn lint:scripts",
+    "lint": "yarn run lint:source && yarn run lint:scripts",
     "docker:windows:build": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/build-windowsservercore:ltsc2016 -f Dockerfile.build && eval $(docker-machine env -unset) && popd",
     "docker:windows:test": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/test-windowsservercore:ltsc2016 -f Dockerfile.test && eval $(docker-machine env -unset) && popd",
     "docker:linux:build": "pushd ./scripts/docker/linux && eval $(docker-machine env -unset) && docker build . -t neo-one/build-linux:8.9.3 -f Dockerfile.build && popd",

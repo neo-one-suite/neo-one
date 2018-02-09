@@ -32,7 +32,7 @@ const dependencies = [
           Object.keys(
             (JSON.parse(
               fs.readFileSync(
-                path.resolve('./packages', source, './package.json'),
+                path.join('packages', source, 'package.json'),
                 'utf-8',
               ),
             ).dependencies || {}),
@@ -72,9 +72,9 @@ const getBabelConfig = ({
 });
 
 const createRollupInput = ({ source }: {| source: string |}) => {
-  const dir = `./packages/${source}/src/`;
+  const dir = path.join('packages', source, 'src');
   return {
-    input: `${dir}index.js`,
+    input: path.join(dir, 'index.js'),
     external: (module: string) =>
       dependencies.some(dep => dep !== source && module.startsWith(dep)),
     plugins: [
@@ -93,7 +93,7 @@ const createRollupInput = ({ source }: {| source: string |}) => {
       }),
       json({ preferConst: true }),
       babel({
-        exclude: 'node_modules/**',
+        exclude: path.join('node_modules', '**'),
         ...getBabelConfig({ modules: false }),
       }),
       sourcemaps(),
@@ -108,7 +108,12 @@ const createRollupOutput = ({
   source: string,
   format: Format,
 |}) => ({
-  file: `./packages/${source}/dist/${format === 'cjs' ? 'index' : format}.js`,
+  file: path.join(
+    'packages',
+    source,
+    'dist',
+    `${format === 'cjs' ? 'index' : format}.js`,
+  ),
   format,
   name: source,
   sourcemap: true,
@@ -167,14 +172,14 @@ export * from '../src';
 
 gulp.task('build:flow', () =>
   sources.forEach(source => {
-    const dir = `./packages/${source}/dist`;
+    const dir = path.join('packages', source, 'dist');
     fs.ensureDirSync(dir);
-    fs.writeFileSync(`${dir}/index.js.flow`, flowIndex);
+    fs.writeFileSync(path.join(dir, 'index.js.flow'), flowIndex);
   }),
 );
 
 const base = path.join(__dirname, 'packages');
-const srcBinGlob = './packages/*/src/bin/*';
+const srcBinGlob = path.join('packages', '*', 'src', 'bin', '*');
 const transformSrc = ({ glob, map }: {| glob: string, map: any |}) =>
   gulp
     .src(glob, { base })
@@ -210,7 +215,7 @@ gulp.task('build:bin', ['build:dist'], () =>
 gulp.task('build', ['build:bin', 'build:flow']);
 
 const createRollupWatch = ({ source }: {| source: string |}) => ({
-  include: `./packages/${source}/src/**`,
+  include: path.join('packages', source, 'src', '**'),
 });
 const createWatchConfig = ({ source }: {| source: string |}) => ({
   ...createRollupInput({ source }),

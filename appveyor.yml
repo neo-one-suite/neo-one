@@ -14,7 +14,7 @@ install:
   - curl -fsSL -o yarn.js https://github.com/yarnpkg/yarn/releases/download/v1.3.2/yarn-1.3.2.js
   - node ./yarn.js --version
   - node ./yarn.js install --ignore-engines --non-interactive
-  - node ./yarn.js run build
+  - node ./yarn.js run gulp build
 
 cache:
   - node_modules
