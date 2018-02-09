@@ -272,7 +272,7 @@ export const createNodeConfig = ({
     configPath: dataPath,
   });
 
-export default class NEOBlockchainNodeAdapter extends NodeAdapter {
+export default class NEOONENodeAdapter extends NodeAdapter {
   _config: ?Config<NodeConfig>;
   _process: ?ChildProcess;
 
@@ -338,18 +338,18 @@ export default class NEOBlockchainNodeAdapter extends NodeAdapter {
     };
   }
 
-  async _isLive(): Promise<boolean> {
-    return this._checkRPC('/live_health_check');
+  async _isLive(timeoutMS: number): Promise<boolean> {
+    return this._checkRPC('/live_health_check', timeoutMS);
   }
 
-  async _isReady(): Promise<boolean> {
-    return this._checkRPC('/ready_health_check');
+  async _isReady(timeoutMS: number): Promise<boolean> {
+    return this._checkRPC('/ready_health_check', timeoutMS);
   }
 
-  async _checkRPC(rpcPath: string): Promise<boolean> {
+  async _checkRPC(rpcPath: string, timeoutMS: number): Promise<boolean> {
     try {
       const response = await fetch(this._getAddress(rpcPath), {
-        timeout: 5500,
+        timeout: timeoutMS,
       });
       return response.status === 200;
     } catch (error) {

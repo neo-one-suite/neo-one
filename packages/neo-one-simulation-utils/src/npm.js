@@ -59,7 +59,6 @@ const install = async () => {
     command = 'yarn';
     args.push('--cwd');
     args.push(process.cwd());
-    args.push('--ignore-engines');
   } else if (!checkThatNpmCanReadCwd()) {
     throw new Error(
       'npm could not read cwd. This is probably caused by a misconfigured ' +

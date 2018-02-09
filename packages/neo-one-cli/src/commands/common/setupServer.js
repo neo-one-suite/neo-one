@@ -7,9 +7,14 @@ import { distinct, map } from 'rxjs/operators';
 
 export default (
   name: string,
-  { log, shutdown, logConfig$, shutdownFuncs }: CLIArgs,
+  { log, shutdown, logConfig$, shutdownFuncs, serverArgs, paths }: CLIArgs,
 ) => {
-  const serverConfig = createServerConfig({ log });
+  const serverConfig = createServerConfig({
+    log,
+    paths,
+    serverPort: serverArgs.serverPort,
+    minPort: serverArgs.minPort,
+  });
 
   const logSubscription = combineLatest(
     serverConfig.config$.pipe(map(config => config.paths.log), distinct()),

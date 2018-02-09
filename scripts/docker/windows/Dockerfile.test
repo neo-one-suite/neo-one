@@ -8,3 +8,7 @@ RUN choco install nodejs --version 8.9.2 -y;
 RUN $env:Path += ';C:\Program Files\nodejs';
 RUN choco install make -y;
 RUN refreshenv;
+RUN choco install yarn -y;
+RUN $env:Path += ';C:\Program Files (x86)\Yarn\bin';
+RUN choco install git -y;
+RUN $env:Path += ';C:\Program Files\Git\bin';

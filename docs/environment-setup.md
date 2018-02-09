@@ -18,7 +18,7 @@ Follow the instructions at [GitHub Standard Fork & Pull Request Workflow](https:
 ## Build
 
 Once you have the requirements installed, run the following:
-1. `yarn install --ignore-engines` [#1](https://github.com/neo-one-suite/neo-one/issues/1)
+1. `yarn install`
 2. `yarn build`
 
 While developing, you can use `yarn watch` to continuously rebuild.

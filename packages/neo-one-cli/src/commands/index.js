@@ -1,7 +1,8 @@
 /* @flow */
-import nuke from './nuke';
+import checkServer from './checkServer';
+import reset from './reset';
 import startServer from './startServer';
 import stopServer from './stopServer';
 import version from './version';
 
-export default [nuke, startServer, stopServer, version];
+export default [checkServer, reset, startServer, stopServer, version];

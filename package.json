@@ -18,7 +18,7 @@
       "prettier --write --config .prettierrc",
       "git add",
       "eslint",
-      "yarn test --findRelatedTests --ci --passWithNoTests"
+      "yarn run test --findRelatedTests --ci --passWithNoTests"
     ],
     "packages/*/template/**/*.js": [
       "prettier --write --config .prettierrc",
@@ -43,13 +43,14 @@
     "pretest-coverage": "babel-node ./scripts/test/pretest.js",
     "posttest-coverage": "babel-node ./scripts/test/posttest.js",
     "test": "jest",
-    "test-coverage": "yarn test --coverage",
+    "test-coverage": "yarn run test --coverage",
+    "e2e": "jest --config e2e.json",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.js\"",
     "nit:scripts": "prettier --config .prettierrc --list-different \"scripts/**/*.js\"",
-    "nit": "yarn nit:source && yarn nit:scripts",
+    "nit": "yarn run nit:source && yarn run nit:scripts",
     "lint:source": "eslint packages/*/src/**",
     "lint:scripts": "eslint scripts/**",
-    "lint": "yarn lint:source && yarn lint:scripts",
+    "lint": "yarn run lint:source && yarn run lint:scripts",
     "docker:windows:build": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/build-windowsservercore:ltsc2016 -f Dockerfile.build && eval $(docker-machine env -unset) && popd",
     "docker:windows:test": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/test-windowsservercore:ltsc2016 -f Dockerfile.test && eval $(docker-machine env -unset) && popd",
     "docker:linux:build": "pushd ./scripts/docker/linux && eval $(docker-machine env -unset) && docker build . -t neo-one/build-linux:8.9.3 -f Dockerfile.build && popd",
@@ -69,11 +70,11 @@
     "@babel/register": "^7.0.0-beta.39",
     "babel-core": "^7.0.0-0",
     "babel-eslint": "^8.2.1",
-    "babel-jest": "^22.2.0",
+    "babel-jest": "^22.2.2",
     "eslint": "^4.17.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-flowtype": "^2.42.0",
+    "eslint-plugin-flowtype": "^2.43.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.6.1",
@@ -85,21 +86,25 @@
     "gulp-plumber": "^1.2.0",
     "gulp-util": "^3.0.8",
     "husky": "^0.14.3",
-    "jest": "^22.2.1",
+    "jest": "^22.2.2",
+    "jest-environment-node": "^22.2.2",
     "lerna": "^2.8.0",
     "lint-staged": "^6.1.0",
+    "lodash": "^4.17.5",
     "prettier": "^1.10.2",
-    "rollup": "^0.55.3",
+    "rollup": "^0.55.4",
     "rollup-plugin-babel": "4.0.0-beta.0",
     "rollup-plugin-json": "^2.3.0",
     "rollup-plugin-node-resolve": "^3.0.2",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
-    "through2": "^2.0.3"
+    "through2": "^2.0.3",
+    "tmp": "^0.0.33"
   },
   "resolutions": {
     "ajv": "^6.1.0",
     "bn.js": "^4.11.8",
+    "cross-spawn": "^6.0.4",
     "grpc": "^1.8.4"
   },
   "jest": {
@@ -108,7 +113,8 @@
       "!**/bin/**",
       "!**/__mocks__/**",
       "!**/__tests__/**",
-      "!**/__data__/**"
+      "!**/__data__/**",
+      "!**/__e2e__/**"
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
@@ -121,9 +127,11 @@
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "/node_modules/",
+      "<rootDir>/decls/.*",
       "<rootDir>/packages/neo-one-node-neo-settings/src/test.js",
       "<rootDir>/migrate/.*",
-      "<rootDir>/packages/.*/template/.*"
+      "<rootDir>/packages/.*/template/.*",
+      "<rootDir>/packages/.*/__e2e__/.*"
     ],
     "snapshotSerializers": [
       "./scripts/serializers/blockchain.js",

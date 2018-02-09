@@ -18,6 +18,7 @@ import {
   type ResourceType,
   type Session,
   name,
+  paths as defaultPaths,
 } from '@neo-one/server-plugin';
 import type { Log, LogMessage } from '@neo-one/utils';
 import type { Observable } from 'rxjs/Observable';
@@ -37,6 +38,7 @@ import {
 } from 'rxjs/operators';
 import inquirer from 'inquirer';
 import ora from 'ora';
+import path from 'path';
 
 import {
   type ClientConfig,
@@ -90,10 +92,25 @@ export default class InteractiveCLI {
   _delimiter: Array<{| key: string, name: string |}>;
   _log: ?Log;
   _plugins: { [name: string]: Plugin };
+  _serverConfig: {|
+    dir?: string,
+    serverPort?: number,
+    minPort?: number,
+  |};
 
   _logPath: ?string;
 
-  constructor({ debug }: {| debug: boolean |}) {
+  constructor({
+    debug,
+    dir,
+    serverPort,
+    minPort,
+  }: {|
+    debug: boolean,
+    dir?: string,
+    serverPort?: number,
+    minPort?: number,
+  |}) {
     this.vorpal = new Vorpal().version(pkg.version);
     this.debug = debug;
     this._sessions = {};
@@ -103,6 +120,7 @@ export default class InteractiveCLI {
     this._delimiter = [];
     this._log = null;
     this._plugins = {};
+    this._serverConfig = { dir, serverPort, minPort };
 
     this._logPath = null;
   }
@@ -165,6 +183,14 @@ export default class InteractiveCLI {
   }
 
   async start(argv: Array<string>): Promise<void> {
+    const { dir } = this._serverConfig;
+    const paths = {
+      data: dir == null ? defaultPaths.data : path.join(dir, 'data'),
+      config: dir == null ? defaultPaths.config : path.join(dir, 'config'),
+      cache: dir == null ? defaultPaths.cache : path.join(dir, 'cache'),
+      log: dir == null ? defaultPaths.log : path.join(dir, 'log'),
+      temp: dir == null ? defaultPaths.temp : path.join(dir, 'temp'),
+    };
     const {
       log,
       config$: logConfig$,
@@ -174,7 +200,7 @@ export default class InteractiveCLI {
       vorpal: this.vorpal,
       debug: this.debug,
     });
-    this.clientConfig = createClientConfig({ log });
+    this.clientConfig = createClientConfig({ log, paths });
 
     let isShutdown = false;
     const shutdown = arg => {
@@ -190,11 +216,11 @@ export default class InteractiveCLI {
       this.clientConfig.config$.pipe(map(config => config.log), distinct()),
     )
       .pipe(
-        map(([path, config]) => {
-          this._logPath = path;
+        map(([logPath, config]) => {
+          this._logPath = logPath;
           return {
             name: 'interactiveCLI',
-            path,
+            path: logPath,
             level: config.level,
             maxSize: config.maxSize,
             maxFiles: config.maxFiles,
@@ -204,7 +230,12 @@ export default class InteractiveCLI {
       .subscribe(logConfig$);
     shutdownFuncs.push(() => logSubscription.unsubscribe());
 
-    const serverConfig = createServerConfig({ log });
+    const serverConfig = createServerConfig({
+      log,
+      paths,
+      serverPort: this._serverConfig.serverPort,
+      minPort: this._serverConfig.minPort,
+    });
     const start$ = combineLatest(
       serverConfig.config$.pipe(map(conf => conf.paths.data), distinct()),
       serverConfig.config$.pipe(map(conf => conf.server.port), distinct()),
@@ -223,7 +254,7 @@ export default class InteractiveCLI {
             try {
               const { pid } = await manager.start({
                 port,
-                binary: createBinary(argv),
+                binary: createBinary(argv, this._serverConfig),
                 onStart: () => {
                   if (first) {
                     spinner = ora(`Starting ${name.title} server...`).start();

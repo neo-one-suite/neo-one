@@ -1,0 +1,17 @@
+{
+  "testEnvironment": "./scripts/e2e/Environment",
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "<rootDir>/decls/.*",
+    "<rootDir>/packages/neo-one-node-neo-settings/src/test.js",
+    "<rootDir>/migrate/.*",
+    "<rootDir>/packages/.*/template/.*",
+    "<rootDir>/packages/.*/__tests__/.*"
+  ],
+  "snapshotSerializers": [
+    "./scripts/serializers/blockchain.js",
+    "./scripts/serializers/bn.js",
+    "./scripts/serializers/buffer.js"
+  ],
+  "setupTestFrameworkScriptFile": "./scripts/e2e/jestSetup.js"
+}

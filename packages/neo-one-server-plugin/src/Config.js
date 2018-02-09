@@ -11,8 +11,6 @@ import { distinct, mergeScan, switchMap } from 'rxjs/operators';
 import fs from 'fs-extra';
 import path from 'path';
 
-import paths from './paths';
-
 const ajv = new Ajv();
 
 type Event = 'change';
@@ -49,15 +47,14 @@ export default class Config<TConfig: Object> {
     defaultConfig,
     schema,
     log,
-    configPath: configPathIn,
+    configPath,
   }: {|
     name: string,
     defaultConfig: TConfig,
     schema: Object,
     log: Log,
-    configPath?: string,
+    configPath: string,
   |}) {
-    const configPath = configPathIn == null ? paths.config : configPathIn;
     this._configPath = path.resolve(configPath, `${configName}.json`);
     this._defaultConfig = defaultConfig;
     this._validateConfig = ajv.compile(schema);

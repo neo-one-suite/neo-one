@@ -4,6 +4,7 @@ import type { Observable } from 'rxjs/Observable';
 import type { Subject } from 'rxjs/Subject';
 import type Vorpal, { Args, Command } from 'vorpal';
 
+import type { Paths } from './paths';
 import type { ResourceAdapter } from './ResourceAdapter';
 import type { ResourceDependency } from './MasterResourceAdapter';
 import type ResourceType from './ResourceType';
@@ -145,6 +146,12 @@ export type CLIArgs = {|
   vorpal: Vorpal,
   debug: boolean,
   binary: Binary,
+  serverArgs: {|
+    dir?: string,
+    serverPort?: number,
+    minPort?: number,
+  |},
+  paths: Paths,
 |};
 
 export type Session = Object;

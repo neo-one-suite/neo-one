@@ -7,12 +7,10 @@ import {
   logInvoke,
 } from '@neo-one/server-plugin';
 import type { Observable } from 'rxjs/Observable';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
-import type { Subject } from 'rxjs/Subject';
 
 import { concat } from 'rxjs/observable/concat';
 import { defer } from 'rxjs/observable/defer';
-import { map, shareReplay, switchMap } from 'rxjs/operators';
+import { concatMap, map, shareReplay } from 'rxjs/operators';
 import { of as _of } from 'rxjs/observable/of';
 import { timer } from 'rxjs/observable/timer';
 import { utils } from '@neo-one/utils';
@@ -40,7 +38,6 @@ export default class NodeAdapter {
   _portAllocator: PortAllocator;
 
   _settings: NodeSettings;
-  _update$: Subject<void>;
   node$: Observable<Node>;
 
   constructor({
@@ -66,7 +63,6 @@ export default class NodeAdapter {
 
     this._settings = settings;
 
-    this._update$ = new ReplaySubject(1);
     const { rpcAddress, tcpAddress } = this._getNodeStatus();
     this.node$ = concat(
       _of({
@@ -76,33 +72,28 @@ export default class NodeAdapter {
         rpcAddress,
         tcpAddress,
       }),
-      this._update$.pipe(
-        switchMap(() =>
-          timer(0, 5500).pipe(
-            switchMap(() =>
-              defer(async () => {
-                const [ready, live] = await Promise.all([
-                  this._isReady(),
-                  this._isLive(),
-                ]);
-                return { ready, live };
-              }),
-            ),
-            map(({ ready, live }) => {
-              const config = this._getNodeStatus();
-              return {
-                name: this.name,
-                ready,
-                live,
-                rpcAddress: config.rpcAddress,
-                tcpAddress: config.tcpAddress,
-              };
-            }),
-          ),
+      timer(0, 6000).pipe(
+        concatMap(() =>
+          defer(async () => {
+            const [ready, live] = await Promise.all([
+              this._isReady(5000),
+              this._isLive(5000),
+            ]);
+            return { ready, live };
+          }),
         ),
+        map(({ ready, live }) => {
+          const config = this._getNodeStatus();
+          return {
+            name: this.name,
+            ready,
+            live,
+            rpcAddress: config.rpcAddress,
+            tcpAddress: config.tcpAddress,
+          };
+        }),
       ),
     ).pipe(shareReplay(1));
-    this._update$.next();
   }
 
   async create(): Promise<void> {
@@ -112,7 +103,6 @@ export default class NodeAdapter {
       { name: this.name },
       async () => {
         await this._create();
-        this._update$.next();
       },
     );
   }
@@ -125,7 +115,6 @@ export default class NodeAdapter {
       async () => {
         await this._update(settings);
         this._settings = settings;
-        this._update$.next();
       },
     );
   }
@@ -137,7 +126,6 @@ export default class NodeAdapter {
       { name: this.name },
       async () => {
         await this._start();
-        this._update$.next();
       },
     );
   }
@@ -149,7 +137,6 @@ export default class NodeAdapter {
       { name: this.name },
       async () => {
         await this._stop();
-        this._update$.next();
       },
     );
   }
@@ -159,7 +146,7 @@ export default class NodeAdapter {
 
     while (utils.nowSeconds() - start < timeoutSeconds) {
       // eslint-disable-next-line
-      const isLive = await this._isLive();
+      const isLive = await this._isLive(5000);
       if (isLive) {
         return;
       }
@@ -193,11 +180,13 @@ export default class NodeAdapter {
     throw new Error('Not Implemented');
   }
 
-  async _isLive(): Promise<boolean> {
+  // eslint-disable-next-line
+  async _isLive(timeoutMS: number): Promise<boolean> {
     throw new Error('Not Implemented');
   }
 
-  async _isReady(): Promise<boolean> {
+  // eslint-disable-next-line
+  async _isReady(timeoutMS: number): Promise<boolean> {
     throw new Error('Not Implemented');
   }
 

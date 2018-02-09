@@ -15,8 +15,7 @@ import {
   compoundName,
 } from '@neo-one/server-plugin';
 import type { Observable } from 'rxjs/Observable';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
-import type { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import _ from 'lodash';
 import { filter, map, shareReplay, switchMap, take } from 'rxjs/operators';
@@ -60,7 +59,9 @@ export default class ResourcesManager<
   masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>;
   _portAllocator: PortAllocator;
   _plugin: Plugin;
-  _resourceAdapters: ResourceAdapters<Resource, ResourceOptions>;
+  _resourceAdapters$: BehaviorSubject<
+    ResourceAdapters<Resource, ResourceOptions>,
+  >;
   _directResourceDependents: { [name: string]: Array<ResourceDependency> };
   _resourceDependents: { [name: string]: Array<ResourceDependency> };
   _createHooks: Array<CreateHook>;
@@ -77,7 +78,6 @@ export default class ResourcesManager<
 
   _resourceAdaptersStarted: { [resource: string]: boolean };
 
-  _update$: Subject<void>;
   resources$: Observable<Array<Resource>>;
 
   constructor({
@@ -102,7 +102,7 @@ export default class ResourcesManager<
     this.masterResourceAdapter = masterResourceAdapter;
     this._portAllocator = portAllocator;
     this._plugin = this.resourceType.plugin;
-    this._resourceAdapters = {};
+    this._resourceAdapters$ = new BehaviorSubject({});
     this._directResourceDependents = {};
     this._resourceDependents = {};
     this._createHooks = [];
@@ -121,10 +121,9 @@ export default class ResourcesManager<
 
     this._resourceAdaptersStarted = {};
 
-    this._update$ = new ReplaySubject(1);
-    this.resources$ = this._update$.pipe(
-      switchMap(() => {
-        const adapters = utils.values(this._resourceAdapters);
+    this.resources$ = this._resourceAdapters$.pipe(
+      switchMap(resourceAdapters => {
+        const adapters = utils.values(resourceAdapters);
         if (adapters.length === 0) {
           return _of([]);
         }
@@ -133,7 +132,10 @@ export default class ResourcesManager<
       }),
       shareReplay(1),
     );
-    this._update$.next();
+  }
+
+  get _resourceAdapters(): ResourceAdapters<Resource, ResourceOptions> {
+    return this._resourceAdapters$.value;
   }
 
   async init(): Promise<Array<InitError>> {
@@ -165,7 +167,7 @@ export default class ResourcesManager<
           foundResourceAdapters.add(name);
         });
 
-        this._resourceAdapters = {};
+        this._resourceAdapters$.next({});
         const results = await Promise.all(
           resources.map(async (name: string): Promise<?InitError> => {
             try {
@@ -187,7 +189,6 @@ export default class ResourcesManager<
             }
           }),
         );
-        this._update$.next();
         return results.filter(Boolean);
       },
     );
@@ -224,7 +225,6 @@ export default class ResourcesManager<
               this._destroy(name, resourceAdapter).catch(() => {}),
             ),
         );
-        this._update$.next();
       },
     );
   }
@@ -306,12 +306,16 @@ export default class ResourcesManager<
     const setFromContext = ctx => {
       if (!set) {
         set = true;
-        this._resourceAdapters[name] = ctx.resourceAdapter;
-        const dependencies = ctx.dependencies || [];
-        const dependents = ctx.dependents || [];
-        this._directResourceDependents[name] = dependents;
-        this._addDependents({ name, dependencies });
-        this._update$.next();
+        if (ctx.resourceAdapter != null) {
+          this._resourceAdapters$.next({
+            ...this._resourceAdapters,
+            [name]: ctx.resourceAdapter,
+          });
+          const dependencies = ctx.dependencies || [];
+          const dependents = ctx.dependents || [];
+          this._directResourceDependents[name] = dependents;
+          this._addDependents({ name, dependencies });
+        }
       }
     };
 
@@ -529,7 +533,6 @@ export default class ResourcesManager<
         if (!shouldSkip) {
           delete this._deleteTaskList[name];
         }
-        this._update$.next();
       },
     });
     if (!shouldSkip) {
@@ -665,7 +668,6 @@ export default class ResourcesManager<
               .catch(() => {});
           }
         }
-        this._update$.next();
       },
     });
     if (!shouldSkip) {
@@ -811,7 +813,6 @@ export default class ResourcesManager<
         if (!shouldSkip) {
           delete this._stopTaskList[name];
         }
-        this._update$.next();
       },
     });
     if (!shouldSkip) {
@@ -868,11 +869,15 @@ export default class ResourcesManager<
         name,
       },
       async () => {
-        this._resourceAdapters[
-          name
-        ] = await this.masterResourceAdapter.initResourceAdapter({
-          name,
-          dataPath: path.resolve(this._resourcesPath, name),
+        const resourceAdapter = await this.masterResourceAdapter.initResourceAdapter(
+          {
+            name,
+            dataPath: path.resolve(this._resourcesPath, name),
+          },
+        );
+        this._resourceAdapters$.next({
+          ...this._resourceAdapters,
+          [name]: resourceAdapter,
         });
       },
     );
@@ -891,7 +896,9 @@ export default class ResourcesManager<
         name,
       },
       async () => {
-        delete this._resourceAdapters[name];
+        const resourceAdapters = { ...this._resourceAdapters };
+        delete resourceAdapters[name];
+        this._resourceAdapters$.next(resourceAdapters);
         await resourceAdapter.destroy();
       },
     );

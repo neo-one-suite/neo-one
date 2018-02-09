@@ -20,7 +20,8 @@ module.exports = {
     "Browser": true,
     "Class": true,
     "FragmentComponent": true,
-    "$Keys": true
+    "$Keys": true,
+    "one": true
   },
   "rules": {
     "no-console": 2,
