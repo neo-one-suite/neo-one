@@ -14,8 +14,8 @@ export default (args: CLIArgs) => {
   vorpal
     .command('reset', `Resets all data paths and starts ${name.title} fresh.`)
     .action(async () => {
-      const { serverConfig, shutdown } = setupServer('reset', args);
       const spinner = ora(`Shutting down ${name.title} server`).start();
+      const { serverConfig, shutdown } = setupServer('reset', args);
       const config = await serverConfig.config$.pipe(take(1)).toPromise();
       const manager = new ServerManager({
         dataPath: config.paths.data,
