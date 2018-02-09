@@ -104,6 +104,7 @@
   "resolutions": {
     "ajv": "^6.1.0",
     "bn.js": "^4.11.8",
+    "cross-spawn": "^6.0.4",
     "grpc": "^1.8.4"
   },
   "jest": {

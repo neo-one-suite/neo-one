@@ -10,7 +10,7 @@ import type { Observable } from 'rxjs/Observable';
 
 import { concat } from 'rxjs/observable/concat';
 import { defer } from 'rxjs/observable/defer';
-import { map, shareReplay, switchMap } from 'rxjs/operators';
+import { concatMap, map, shareReplay } from 'rxjs/operators';
 import { of as _of } from 'rxjs/observable/of';
 import { timer } from 'rxjs/observable/timer';
 import { utils } from '@neo-one/utils';
@@ -72,12 +72,12 @@ export default class NodeAdapter {
         rpcAddress,
         tcpAddress,
       }),
-      timer(0, 5500).pipe(
-        switchMap(() =>
+      timer(0, 6000).pipe(
+        concatMap(() =>
           defer(async () => {
             const [ready, live] = await Promise.all([
-              this._isReady(),
-              this._isLive(),
+              this._isReady(5000),
+              this._isLive(5000),
             ]);
             return { ready, live };
           }),
@@ -146,7 +146,7 @@ export default class NodeAdapter {
 
     while (utils.nowSeconds() - start < timeoutSeconds) {
       // eslint-disable-next-line
-      const isLive = await this._isLive();
+      const isLive = await this._isLive(5000);
       if (isLive) {
         return;
       }
@@ -180,11 +180,13 @@ export default class NodeAdapter {
     throw new Error('Not Implemented');
   }
 
-  async _isLive(): Promise<boolean> {
+  // eslint-disable-next-line
+  async _isLive(timeoutMS: number): Promise<boolean> {
     throw new Error('Not Implemented');
   }
 
-  async _isReady(): Promise<boolean> {
+  // eslint-disable-next-line
+  async _isReady(timeoutMS: number): Promise<boolean> {
     throw new Error('Not Implemented');
   }
 

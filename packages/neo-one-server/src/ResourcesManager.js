@@ -306,19 +306,16 @@ export default class ResourcesManager<
     const setFromContext = ctx => {
       if (!set) {
         set = true;
-        if (ctx.resourceAdapter == null) {
-          throw new Error(
-            'Something went wrong. Resource adapter was not created.',
-          );
+        if (ctx.resourceAdapter != null) {
+          this._resourceAdapters$.next({
+            ...this._resourceAdapters,
+            [name]: ctx.resourceAdapter,
+          });
+          const dependencies = ctx.dependencies || [];
+          const dependents = ctx.dependents || [];
+          this._directResourceDependents[name] = dependents;
+          this._addDependents({ name, dependencies });
         }
-        this._resourceAdapters$.next({
-          ...this._resourceAdapters,
-          [name]: ctx.resourceAdapter,
-        });
-        const dependencies = ctx.dependencies || [];
-        const dependents = ctx.dependents || [];
-        this._directResourceDependents[name] = dependents;
-        this._addDependents({ name, dependencies });
       }
     };
 

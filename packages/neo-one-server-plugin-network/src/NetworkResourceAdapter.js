@@ -7,7 +7,7 @@ import {
   type ResourceState,
   TaskList,
 } from '@neo-one/server-plugin';
-import { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import _ from 'lodash';
@@ -15,7 +15,7 @@ import { combineLatest } from 'rxjs/observable/combineLatest';
 import { common, crypto } from '@neo-one/client-core';
 import { createEndpoint } from '@neo-one/node-core';
 import { createReadClient } from '@neo-one/client';
-import { shareReplay, switchMap } from 'rxjs/operators';
+import { concatMap, shareReplay, switchMap } from 'rxjs/operators';
 import { timer } from 'rxjs/observable/timer';
 import fs from 'fs-extra';
 import path from 'path';
@@ -96,11 +96,14 @@ export default class NetworkResourceAdapter {
     this._nodes$ = new BehaviorSubject(nodesIn);
     this._state = 'stopped';
 
-    this.resource$ = combineLatest(timer(0, 1000), this._nodes$).pipe(
-      // eslint-disable-next-line
-      switchMap(([time, nodes]) =>
-        combineLatest(nodes.map(node => node.node$)).pipe(
-          switchMap(async currentNodes => {
+    this.resource$ = this._nodes$.pipe(
+      switchMap(nodes =>
+        combineLatest(
+          timer(0, 2500),
+          combineLatest(nodes.map(node => node.node$)),
+        ).pipe(
+          // eslint-disable-next-line
+          concatMap(async ([time, currentNodes]) => {
             const readyNode =
               currentNodes.find(node => node.ready) ||
               currentNodes.find(node => node.live) ||
