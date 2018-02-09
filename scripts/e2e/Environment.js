@@ -51,7 +51,7 @@ class One {
   }
 
   async _teardown() {
-    await this._exec('nuke --static-neo-one');
+    await this._exec('reset --static-neo-one');
     await fs.remove(this.dir.name);
   }
 
