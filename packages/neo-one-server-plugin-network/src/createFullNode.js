@@ -24,7 +24,7 @@ export default async ({
 |}) => {
   const storagePath = path.resolve(dataPath, 'chain');
   // eslint-disable-next-line
-  const [settings, rpcEnvironment, nodeEnvironment, _] = await Promise.all([
+  const [settings, rpcEnvironment, nodeEnvironment] = await Promise.all([
     nodeConfig.config$
       .pipe(
         map(config => config.settings),

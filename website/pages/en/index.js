@@ -374,8 +374,8 @@ class Believers extends React.Component {
       })
       .map(user => {
         return (
-          <a href={user.infoLink}>
-            <img key={user.caption} src={user.image} title={user.caption} />
+          <a key={user.caption} href={user.infoLink}>
+            <img src={user.image} title={user.caption} />
           </a>
         );
       });

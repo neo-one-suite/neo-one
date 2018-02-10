@@ -255,10 +255,9 @@ export default ({
         buffer: JSONHelper.readBuffer(args[0]),
       });
       try {
-        // eslint-disable-next-line
-        const [_, transactionJSON] = await Promise.all([
-          node.relayTransaction(transaction),
+        const [transactionJSON] = await Promise.all([
           transaction.serializeJSON(blockchain.serializeJSONContext),
+          node.relayTransaction(transaction),
         ]);
         return transactionJSON;
       } catch (error) {
