@@ -431,7 +431,8 @@ export default class Node implements INode {
       const { connectedPeer } = event.extra;
       if (
         this._bestPeer == null ||
-        this._bestPeer.data.startHeight < connectedPeer.data.startHeight
+        // Only change best peer at most every 100 blocks
+        this._bestPeer.data.startHeight + 100 < connectedPeer.data.startHeight
       ) {
         this._bestPeer = connectedPeer;
         this._resetRequestBlocks();
@@ -470,8 +471,6 @@ export default class Node implements INode {
         });
         peer.close();
         this._getBlocksRequestsCount = 0;
-        // TODO: Seems like this causes issues sometimes, try resetting here...
-        this._knownBlockHashes = createScalingBloomFilter();
       } else if (this._shouldRequestBlocks()) {
         if (this._getBlocksRequestsIndex === block.index) {
           this.blockchain.log({
