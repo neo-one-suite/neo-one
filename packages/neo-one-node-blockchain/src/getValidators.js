@@ -350,7 +350,7 @@ export default async (
       utils
         .weightedFilter(
           validatorsCount.votes
-            .map((votes, count) => ({ count, votes }))
+            .map((votes, count) => ({ count, votes: votes || utils.ZERO }))
             .filter(({ votes }) => votes.gt(utils.ZERO)),
           0.25,
           0.75,
