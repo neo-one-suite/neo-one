@@ -1,5 +1,6 @@
 /* @flow */
 import type { Observable } from 'rxjs/Observable';
+import type { Param as ScriptBuilderParam } from '@neo-one/client-core';
 
 import type {
   AssetRegister,
@@ -7,7 +8,6 @@ import type {
   Hash160String,
   RawInvocationResult,
   Param,
-  ParamInternal,
   Transfer,
   NetworkType,
   TransactionOptions,
@@ -94,7 +94,7 @@ export default class Client<TUserAccountProvider: UserAccountProvider> {
   _invoke(
     contract: Hash160String,
     method: string,
-    params: Array<?ParamInternal>,
+    params: Array<?ScriptBuilderParam>,
     paramsZipped: Array<[string, ?Param]>,
     verify: boolean,
     options?: InvokeTransactionOptions,
@@ -112,7 +112,7 @@ export default class Client<TUserAccountProvider: UserAccountProvider> {
   _call(
     contract: Hash160String,
     method: string,
-    params: Array<?ParamInternal>,
+    params: Array<?ScriptBuilderParam>,
     options?: TransactionOptions,
   ): Promise<RawInvocationResult> {
     return this.userAccountProvider._call(contract, method, params, options);

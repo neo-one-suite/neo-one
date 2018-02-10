@@ -1,8 +1,9 @@
 /* @flow */
+import { type Param as ScriptBuilderParam, common } from '@neo-one/client-core';
+
 import type {
   ArrayABI,
   Param,
-  ParamInternal,
   SignatureABI,
   BooleanABI,
   Hash160ABI,
@@ -21,33 +22,33 @@ import * as utils from '../utils';
 
 const params = {
   // eslint-disable-next-line
-  String: (param: ?Param, parameter: StringABI): ?ParamInternal =>
+  String: (param: ?Param, parameter: StringABI): ?ScriptBuilderParam =>
     args.assertString('String', param),
   // eslint-disable-next-line
-  Hash160: (param: ?Param, parameter: Hash160ABI): ?ParamInternal =>
-    args.assertHash160(param),
+  Hash160: (param: ?Param, parameter: Hash160ABI): ?ScriptBuilderParam =>
+    common.stringToUInt160(args.assertHash160(param)),
   // eslint-disable-next-line
-  Hash256: (param: ?Param, parameter: Hash256ABI): ?ParamInternal =>
-    args.assertHash256(param),
+  Hash256: (param: ?Param, parameter: Hash256ABI): ?ScriptBuilderParam =>
+    common.stringToUInt256(args.assertHash256(param)),
   // eslint-disable-next-line
-  PublicKey: (param: ?Param, parameter: PublicKeyABI): ?ParamInternal =>
-    args.assertPublicKey(param),
+  PublicKey: (param: ?Param, parameter: PublicKeyABI): ?ScriptBuilderParam =>
+    common.stringToECPoint(args.assertPublicKey(param)),
   // eslint-disable-next-line
-  Integer: (param: ?Param, parameter: IntegerABI): ?ParamInternal => {
+  Integer: (param: ?Param, parameter: IntegerABI): ?ScriptBuilderParam => {
     const value = args.assertBigNumber(param);
 
     return utils.bigNumberToBN(value, parameter.decimals);
   },
   // eslint-disable-next-line
-  Boolean: (param: ?Param, parameter: BooleanABI): ?ParamInternal =>
+  Boolean: (param: ?Param, parameter: BooleanABI): ?ScriptBuilderParam =>
     args.assertBoolean(param),
   // eslint-disable-next-line
-  ByteArray: (param: ?Param, parameter: ByteArrayABI): ?ParamInternal =>
+  ByteArray: (param: ?Param, parameter: ByteArrayABI): ?ScriptBuilderParam =>
     args.assertBuffer(param),
   // eslint-disable-next-line
-  Signature: (param: ?Param, parameter: SignatureABI): ?ParamInternal =>
+  Signature: (param: ?Param, parameter: SignatureABI): ?ScriptBuilderParam =>
     args.assertBuffer(param),
-  Array: (param: ?Param, parameter: ArrayABI): ?ParamInternal => {
+  Array: (param: ?Param, parameter: ArrayABI): ?ScriptBuilderParam => {
     if (!Array.isArray(param)) {
       throw new InvalidArgumentError(`Expected Array, found: ${String(param)}`);
     }
@@ -59,11 +60,11 @@ const params = {
     param: ?Param,
     // eslint-disable-next-line
     parameter: InteropInterfaceABI,
-  ): ?ParamInternal => {
+  ): ?ScriptBuilderParam => {
     throw new InvalidArgumentError('InteropInterface is not a valid parameter');
   },
   // eslint-disable-next-line
-  Void: (param: ?Param, parameter: VoidABI): ?ParamInternal => {
+  Void: (param: ?Param, parameter: VoidABI): ?ScriptBuilderParam => {
     if (param != null) {
       throw new InvalidArgumentError(`Expected Void: ${String(param)}`);
     }

@@ -1,6 +1,7 @@
 /* @flow */
 import type BigNumber from 'bignumber.js';
 import type { Observable } from 'rxjs/Observable';
+import type { Param as ScriptBuilderParam } from '@neo-one/client-core';
 
 import type {
   AddressString,
@@ -11,7 +12,6 @@ import type {
   RawInvocationResult,
   InvokeTransactionOptions,
   Param,
-  ParamInternal,
   Transfer,
   NetworkType,
   TransactionOptions,
@@ -84,7 +84,7 @@ declare export default class Client<
   _invoke(
     contract: Hash160String,
     method: string,
-    params: Array<?ParamInternal>,
+    params: Array<?ScriptBuilderParam>,
     paramsZipped: Array<[string, ?Param]>,
     verify: boolean,
     options?: InvokeTransactionOptions,
@@ -92,7 +92,7 @@ declare export default class Client<
   _call(
     contract: Hash160String,
     method: string,
-    params: Array<?ParamInternal>,
+    params: Array<?ScriptBuilderParam>,
     options?: TransactionOptions,
   ): Promise<RawInvocationResult>;
 }

@@ -1,4 +1,6 @@
 /* @flow */
+import { type Param as ScriptBuilderParam } from '@neo-one/client-core';
+
 import _ from 'lodash';
 
 import type {
@@ -15,7 +17,6 @@ import type {
   RawInvocationResult,
   Log,
   Param,
-  ParamInternal,
   SmartContract,
   SmartContractDefinition,
   TransactionResult,
@@ -37,7 +38,7 @@ const convertParams = ({
   parameters: Array<ABIParameter>,
   params: Array<?Param>,
 |}): {|
-  converted: Array<?ParamInternal>,
+  converted: Array<?ScriptBuilderParam>,
   zipped: Array<[string, ?Param]>,
 |} => {
   if (parameters.length !== params.length) {
@@ -69,7 +70,7 @@ const getParamsAndOptions = ({
   args: Array<any>,
   client: Client<*>,
 |}): {|
-  params: Array<?ParamInternal>,
+  params: Array<?ScriptBuilderParam>,
   paramsZipped: Array<[string, ?Param]>,
   options: any,
   hash: Hash160String,

@@ -55,7 +55,6 @@ import type {
   NetworkType,
   Output,
   Param,
-  ParamInternal,
   ParamJSON,
   Transaction,
   UnspentOutput,
@@ -385,7 +384,7 @@ export default class LocalUserAccountProvider<
   _invoke(
     contract: Hash160String,
     method: string,
-    params: Array<?ParamInternal>,
+    params: Array<?ScriptBuilderParam>,
     paramsZipped: Array<[string, ?Param]>,
     verify: boolean,
     optionsIn?: InvokeTransactionOptions,
@@ -447,7 +446,7 @@ export default class LocalUserAccountProvider<
   async _call(
     contract: Hash160String,
     method: string,
-    params: Array<?ParamInternal>,
+    params: Array<?ScriptBuilderParam>,
     options?: TransactionOptions,
   ): Promise<RawInvocationResult> {
     const { from, attributes, networkFee } = await this._getTransactionOptions(
@@ -958,10 +957,10 @@ export default class LocalUserAccountProvider<
     params,
   }: {|
     method: string,
-    params: Array<?ParamInternal>,
+    params: Array<?ScriptBuilderParam>,
   |}): Buffer {
     const sb = new ScriptBuilder();
-    sb.emitAppCallInvocation(method, ...this._convertParams(params));
+    sb.emitAppCallInvocation(method, ...params);
 
     return sb.build();
   }
@@ -973,14 +972,10 @@ export default class LocalUserAccountProvider<
   }: {|
     hash: Hash160String,
     method: string,
-    params: Array<?ParamInternal>,
+    params: Array<?ScriptBuilderParam>,
   |}): Buffer {
     const sb = new ScriptBuilder();
-    sb.emitAppCall(
-      common.stringToUInt160(hash),
-      method,
-      ...this._convertParams(params),
-    );
+    sb.emitAppCall(common.stringToUInt160(hash), method, ...params);
 
     return sb.build();
   }
@@ -999,9 +994,5 @@ export default class LocalUserAccountProvider<
 
   _convertWitness(script: Witness): WitnessModel {
     return converters.witness(script);
-  }
-
-  _convertParams(params?: Array<?ParamInternal>): Array<?ScriptBuilderParam> {
-    return (params || []).map(param => converters.param(param));
   }
 }
