@@ -44,10 +44,10 @@ const params = {
     args.assertBoolean(param),
   // eslint-disable-next-line
   ByteArray: (param: ?Param, parameter: ByteArrayABI): ?ScriptBuilderParam =>
-    args.assertBuffer(param),
+    Buffer.from(args.assertBuffer(param), 'hex'),
   // eslint-disable-next-line
   Signature: (param: ?Param, parameter: SignatureABI): ?ScriptBuilderParam =>
-    args.assertBuffer(param),
+    Buffer.from(args.assertBuffer(param), 'hex'),
   Array: (param: ?Param, parameter: ArrayABI): ?ScriptBuilderParam => {
     if (!Array.isArray(param)) {
       throw new InvalidArgumentError(`Expected Array, found: ${String(param)}`);
