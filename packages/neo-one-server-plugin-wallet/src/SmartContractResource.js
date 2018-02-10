@@ -124,7 +124,7 @@ export default class SmartContractResource {
   }: NewSmartContractResourceOptions): Promise<SmartContractResource> {
     const { name: baseName, names: [networkName] } = compoundName.extract(name);
 
-    let hash = hashIn;
+    let hash;
     let abi = abiIn;
 
     let contractName;
@@ -176,8 +176,7 @@ export default class SmartContractResource {
       );
       const receipt = await result.confirmed();
       if (receipt.result.state === 'HALT') {
-        // eslint-disable-next-line
-        hash = receipt.result.value.hash;
+        ({ hash } = receipt.result.value);
       } else {
         throw new Error(receipt.result.message);
       }

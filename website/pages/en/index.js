@@ -2,11 +2,8 @@ const React = require('react');
 
 const CompLibrary = require('../../core/CompLibrary.js');
 const MarkdownBlock = CompLibrary.MarkdownBlock; /* Used to read markdown */
-const Container = CompLibrary.Container;
-const GridBlock = CompLibrary.GridBlock;
 
 const translate = require('../../server/translate.js').translate;
-const translation = require('../../server/translation.js');
 
 const siteConfig = require(process.cwd() + '/siteConfig.js');
 
@@ -195,7 +192,7 @@ class Feature extends React.Component {
             </div>
             <div className="featureTitle primaryLight decimaLight">
               {this.props.title.map(
-                (value, idx) => <div className={idx === 0 ? undefined : 'featureTitleText'}>{value}</div>
+                (value, idx) => <div key={value} className={idx === 0 ? undefined : 'featureTitleText'}>{value}</div>
               )}
             </div>
           </div>
@@ -378,7 +375,7 @@ class Believers extends React.Component {
       .map(user => {
         return (
           <a href={user.infoLink}>
-            <img src={user.image} title={user.caption} />
+            <img key={user.caption} src={user.image} title={user.caption} />
           </a>
         );
       });

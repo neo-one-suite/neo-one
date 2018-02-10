@@ -98,7 +98,8 @@ const trim = (
   depth: number,
   flags: Array<boolean>,
 ) => {
-  if (depth === 1 || node.leftChild == null) {
+  const { leftChild, rightChild } = node;
+  if (depth === 1 || leftChild == null) {
     return;
   }
 
@@ -109,22 +110,14 @@ const trim = (
       // eslint-disable-next-line
       node.rightChild = null;
     }
-  } else {
-    const { leftChild, rightChild } = node;
-    if (leftChild != null && rightChild != null) {
-      trim(leftChild, index * 2, depth - 1, flags);
-      trim(rightChild, index * 2 + 1, depth - 1, flags);
-      if (
-        node.leftChild != null &&
-        node.rightChild != null &&
-        node.leftChild.leftChild == null &&
-        node.rightChild.rightChild == null
-      ) {
-        // eslint-disable-next-line
-        node.leftChild = null;
-        // eslint-disable-next-line
-        node.rightChild = null;
-      }
+  } else if (rightChild != null) {
+    trim(leftChild, index * 2, depth - 1, flags);
+    trim(rightChild, index * 2 + 1, depth - 1, flags);
+    if (leftChild.leftChild == null && rightChild.rightChild == null) {
+      // eslint-disable-next-line
+      node.leftChild = null;
+      // eslint-disable-next-line
+      node.rightChild = null;
     }
   }
 };

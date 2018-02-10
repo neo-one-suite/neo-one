@@ -107,7 +107,7 @@ const getParamsAndOptions = ({
   return {
     params: converted,
     paramsZipped: zipped,
-    options: options || {},
+    options,
     hash: contractNetwork.hash,
   };
 };

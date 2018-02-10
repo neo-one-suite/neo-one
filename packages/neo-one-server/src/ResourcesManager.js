@@ -171,11 +171,10 @@ export default class ResourcesManager<
         const results = await Promise.all(
           resources.map(async (name: string): Promise<?InitError> => {
             try {
-              // eslint-disable-next-line
-              const [_, dependencies, dependents] = await Promise.all([
-                this._init(name),
+              const [dependencies, dependents] = await Promise.all([
                 this._readDeps(this._getDependenciesPath(name)),
                 this._readDeps(this._getDirectDependentsPath(name)),
+                this._init(name),
               ]);
               this._directResourceDependents[name] = dependents;
               this._addDependents({ name, dependencies });

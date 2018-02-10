@@ -40,10 +40,8 @@ const processOutput = async (
   if (negative) {
     value = value.neg();
   }
-  // eslint-disable-next-line
-  const [account, validatorsCount] = await Promise.all([
+  const [account] = await Promise.all([
     cache.getAccount(output.address),
-    cache.getValidatorsCount(),
     cache.updateAccountBalance(output.address, output.asset, value),
   ]);
   if (

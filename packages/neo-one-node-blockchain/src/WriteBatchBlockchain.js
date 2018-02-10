@@ -420,7 +420,7 @@ export default class WriteBatchBlockchain {
   async persistBlock(block: Block): Promise<void> {
     let done = this._perf.start('WriteBatchBlockchain.persistBlock.0');
     // eslint-disable-next-line
-    const [systemFee, a, b] = await Promise.all([
+    const [systemFee] = await Promise.all([
       block.index === 0
         ? Promise.resolve(utils.ZERO)
         : this.blockSystemFee
