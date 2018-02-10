@@ -469,7 +469,7 @@ export default class Node implements INode {
           level: 'debug',
           peer: peer.endpoint,
         });
-        peer.close();
+        this._network.blacklistAndClose(peer);
         this._getBlocksRequestsCount = 0;
       } else if (this._shouldRequestBlocks()) {
         if (this._getBlocksRequestsIndex === block.index) {
