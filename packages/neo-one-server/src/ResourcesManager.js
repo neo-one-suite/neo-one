@@ -195,6 +195,10 @@ export default class ResourcesManager<
     return result;
   }
 
+  async reset(): Promise<void> {
+    await this.destroy();
+  }
+
   async _readDeps(depsPath: string): Promise<Array<ResourceDependency>> {
     try {
       const deps = await fs.readJSON(depsPath);
@@ -220,9 +224,12 @@ export default class ResourcesManager<
         await Promise.all(
           utils
             .entries(this._resourceAdapters)
-            .map(([name, resourceAdapter]) =>
-              this._destroy(name, resourceAdapter).catch(() => {}),
-            ),
+            .map(async ([name, resourceAdapter]) => {
+              await this.stop(name, ({}: $FlowFixMe))
+                .toPromise()
+                .catch(() => {});
+              await this._destroy(name, resourceAdapter).catch(() => {});
+            }),
         );
       },
     );

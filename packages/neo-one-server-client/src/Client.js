@@ -49,6 +49,10 @@ export default class Client {
     });
   }
 
+  reset(): Promise<void> {
+    return this._unary(this._client.reset);
+  }
+
   getVersion(): Promise<string> {
     return this._unary(
       this._client.getVersion,
@@ -320,15 +324,15 @@ export default class Client {
 
   _unary<T>(
     func: (req: Object, cb: (err: Error, response: Object) => void) => void,
-    req: Object,
-    callback: (response: Object) => T,
+    req: Object = {},
+    callback?: (response: Object) => T,
   ): Promise<T> {
     return new Promise((resolve, reject) =>
       func.bind(this._client)(req, (err, response) => {
         if (err) {
           reject(err);
         } else {
-          resolve(callback(response));
+          resolve(callback == null ? response : callback(response));
         }
       }),
     );

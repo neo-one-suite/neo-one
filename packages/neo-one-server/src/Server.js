@@ -172,6 +172,10 @@ export default class Server {
     );
   }
 
+  async reset(): Promise<void> {
+    await this.pluginManager.reset();
+  }
+
   getDebug(): DescribeTable {
     return [
       ['Server Config Path', this.serverConfig._configPath],

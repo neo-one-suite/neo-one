@@ -130,6 +130,10 @@ export default ({ server }: {| server: Server |}) => {
   }
 
   return {
+    reset: async (ctx: Context) => {
+      await server.reset();
+      ctx.res = {};
+    },
     getVersion: async (ctx: Context) => {
       ctx.res = { version: pkg.version };
     },

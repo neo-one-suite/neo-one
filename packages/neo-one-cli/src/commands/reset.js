@@ -1,7 +1,7 @@
 /* @flow */
 import { VERSION } from '@neo-one/server';
 import { type CLIArgs, name } from '@neo-one/server-plugin';
-import { ServerManager } from '@neo-one/server-client';
+import { Client, ServerManager } from '@neo-one/server-client';
 
 import fs from 'fs-extra';
 import ora from 'ora';
@@ -21,7 +21,12 @@ export default (args: CLIArgs) => {
         dataPath: config.paths.data,
         serverVersion: VERSION,
       });
-      await manager.kill();
+      const pid = await manager.checkAlive(config.server.port);
+      if (pid != null) {
+        const client = new Client({ port: config.server.port });
+        await client.reset();
+        await manager.kill();
+      }
 
       spinner.succeed(`${name.title} server shutdown`);
 

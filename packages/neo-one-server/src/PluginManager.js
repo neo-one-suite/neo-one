@@ -125,6 +125,18 @@ export default class PluginManager {
     ]);
   }
 
+  async reset(): Promise<void> {
+    await Promise.all([
+      Promise.all(utils.values(this._plugins).map(plugin => plugin.reset())),
+      Promise.all(
+        utils
+          .values(this._resourcesManagers)
+          .reduce((acc, managers) => acc.concat(utils.values(managers)), [])
+          .map(manager => manager.reset()),
+      ),
+    ]);
+  }
+
   async registerPlugins(pluginNames: Array<string>): Promise<void> {
     const plugins = pluginNames.map(pluginName =>
       pluginsUtil.getPlugin({

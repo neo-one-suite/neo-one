@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 service Server {
+  rpc reset(ResetRequest) returns (ResetResponse) {}
   rpc getVersion(GetVersionRequest) returns (GetVersionResponse) {}
   rpc getDebug(GetDebugRequest) returns (GetDebugResponse) {}
   rpc getAllPlugins(GetAllPluginsRequest) returns (GetAllPluginsResponse) {}
@@ -12,6 +13,12 @@ service Server {
   rpc deleteResource(stream DeleteResourceRequest) returns (stream DeleteResourceResponse) {}
   rpc startResource(stream StartResourceRequest) returns (stream StartResourceResponse) {}
   rpc stopResource(stream StopResourceRequest) returns (stream StopResourceResponse) {}
+}
+
+message ResetRequest {
+}
+
+message ResetResponse {
 }
 
 message GetVersionRequest {

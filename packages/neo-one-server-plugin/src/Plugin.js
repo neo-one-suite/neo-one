@@ -31,6 +31,11 @@ export default class Plugin {
     this.log = log;
   }
 
+  // Called when the user requests a full reset of neo-one
+  async reset(): Promise<void> {
+    // eslint-disable-line
+  }
+
   // Plugin name, should match the module name, e.g.
   // `@neo-one/server-plugin-network`
   get name(): string {
