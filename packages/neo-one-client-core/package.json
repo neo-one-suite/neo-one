@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-core",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "keywords": [
     "neo",
     "NEO",
@@ -34,12 +34,12 @@
     "access": "public"
   },
   "dependencies": {
+    "@neo-one/ec-key": "^0.0.3",
     "@neo-one/utils": "^1.0.0-alpha.3",
     "bignumber.js": "^6.0.0",
     "bn.js": "^4.11.8",
     "bs58": "^4.0.1",
     "buffer-xor": "^2.0.2",
-    "@neo-one/ec-key": "^0.0.3",
     "elliptic": "^6.4.0",
     "lodash": "^4.17.5",
     "scrypt-js": "^2.0.3",

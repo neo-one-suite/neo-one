@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "keywords": [
     "neo",
     "NEO",
@@ -34,15 +34,15 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.3",
-    "@neo-one/node-blockchain": "^1.0.0-alpha.3",
-    "@neo-one/node-core": "^1.0.0-alpha.3",
-    "@neo-one/node-data-backup": "^1.0.0-alpha.3",
-    "@neo-one/node-offline": "^1.0.0-alpha.3",
-    "@neo-one/node-protocol": "^1.0.0-alpha.3",
-    "@neo-one/node-rpc": "^1.0.0-alpha.3",
-    "@neo-one/node-storage-levelup": "^1.0.0-alpha.3",
-    "@neo-one/node-vm": "^1.0.0-alpha.3",
+    "@neo-one/client-core": "^1.0.0-alpha.4",
+    "@neo-one/node-blockchain": "^1.0.0-alpha.4",
+    "@neo-one/node-core": "^1.0.0-alpha.4",
+    "@neo-one/node-data-backup": "^1.0.0-alpha.4",
+    "@neo-one/node-offline": "^1.0.0-alpha.4",
+    "@neo-one/node-protocol": "^1.0.0-alpha.4",
+    "@neo-one/node-rpc": "^1.0.0-alpha.4",
+    "@neo-one/node-storage-levelup": "^1.0.0-alpha.4",
+    "@neo-one/node-vm": "^1.0.0-alpha.4",
     "@neo-one/utils": "^1.0.0-alpha.3",
     "leveldown": "^3.0.0",
     "levelup": "^2.0.1",
