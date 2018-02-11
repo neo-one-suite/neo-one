@@ -1,4 +1,5 @@
 /* @flow */
+import BigNumber from 'bignumber.js';
 import { type Param as ScriptBuilderParam } from '@neo-one/client-core';
 
 import _ from 'lodash';
@@ -82,7 +83,7 @@ const getParamsAndOptions = ({
     finalArg != null &&
     typeof finalArg === 'object' &&
     !Array.isArray(finalArg) &&
-    finalArg.isBigNumber !== true
+    !BigNumber.isBigNumber(finalArg)
   ) {
     params = args.slice(0, -1);
     options = finalArg;
