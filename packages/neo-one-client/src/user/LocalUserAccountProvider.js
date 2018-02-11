@@ -942,10 +942,7 @@ export default class LocalUserAccountProvider<
       return param.map(value => this._paramToJSON(value));
     }
 
-    if (
-      param instanceof BigNumber ||
-      (typeof param === 'object' && param.isBigNumber === true)
-    ) {
+    if (BigNumber.isBigNumber(param)) {
       return param.toString();
     }
 

@@ -1,5 +1,5 @@
 /* @flow */
-import type BigNumber from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 
 import _ from 'lodash';
 import { common } from '@neo-one/client-core';
@@ -124,9 +124,7 @@ export const assertPublicKey = (publicKey: mixed): PublicKeyString => {
 };
 
 export const assertBigNumber = (value: mixed): BigNumber => {
-  if (
-    !(value != null && typeof value === 'object' && value.isBigNumber === true)
-  ) {
+  if (value == null || !BigNumber.isBigNumber(value)) {
     throw new InvalidArgumentError(
       `Expected BigNumber, found: ${String(value)}`,
     );
