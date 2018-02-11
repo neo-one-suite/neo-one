@@ -449,13 +449,16 @@ declare module 'rxjs/operators' {
   declare export function catchError<T, R>(selector: (err: Error, caught: rxjs$Observable<T>) => rxjs$ObservableInput<R>): rxjs$OperatorFunction<T, R>;
   declare export function concatAll<T>(): rxjs$OperatorFunction<rxjs$Observable<T>, T>;
   declare export function concatMap<T, R>(project: (value: T, index: number) => rxjs$ObservableInput<R>): rxjs$OperatorFunction<T, R>;
+  declare export function debounce<T>(durationSelector: (value: T) => rxjs$SubscribableOrPromise<any>): rxjs$OperatorFunction<T, T>;
+  declare export function delay<T>(delay: number | Date, scheduler?: rxjs$SchedulerClass): rxjs$OperatorFunction<T, T>;
   declare export function distinct<T, U>(keySelector?: (value: T) => U, flushes?: rxjs$Observable<mixed>): rxjs$OperatorFunction<T, T>;
   declare export function distinctUntilChanged<T>(compare?: (x: T, y: T) => boolean): rxjs$OperatorFunction<T, T>;
   declare export function filter<T>(predicate: (value: T, index: number) => boolean, thisArg?: any): rxjs$OperatorFunction<T, T>;
+  declare export function finalize<T>(callback: () => void): rxjs$OperatorFunction<T, T>;
   declare export function map<T, U>(f: (value: T) => U): rxjs$OperatorFunction<T, U>;
   declare export function mergeMap<T, R>(project: (value: T, index: number) => rxjs$ObservableInput<R>, concurrent?: number): rxjs$OperatorFunction<T, R>;
   declare export function mergeScan<T, R>(
-    accumulator: (acc?: R, value: T) => rxjs$Observable<R>,
+    accumulator: (acc?: R, value: T) => rxjs$ObservableInput<R>,
     seed?: R,
     concurrent?: number
   ): rxjs$OperatorFunction<T, R>;
@@ -464,6 +467,7 @@ declare module 'rxjs/operators' {
   declare export function refCount<T>(): rxjs$OperatorFunction<T, T>;
   declare export function scan<T, R>(accumulator: (acc?: R, value: T, index: number) => R, seed?: R): rxjs$OperatorFunction<T, R>;
   declare export function shareReplay<T>(bufferSize?: number, windowTime?: number, scheduler?: rxjs$SchedulerClass): rxjs$OperatorFunction<T, T>;
+  declare export function skipWhile<T>(predicate: (value: T, index: number) => boolean): rxjs$OperatorFunction<T, T>;
   declare export function startWith<T>(v1: T, scheduler?: rxjs$SchedulerClass): rxjs$OperatorFunction<T, T>;
   declare export function startWith<T>(v1: T, v2: T, scheduler?: rxjs$SchedulerClass): rxjs$OperatorFunction<T, T>;
   declare export function startWith<T>(v1: T, v2: T, v3: T, scheduler?: rxjs$SchedulerClass): rxjs$OperatorFunction<T, T>;
@@ -473,6 +477,7 @@ declare module 'rxjs/operators' {
   declare export function startWith<T>(...array: Array<T | rxjs$SchedulerClass>): rxjs$OperatorFunction<T, T>;
   declare export function switchMap<T, R>(project: (value: T, index: number) => rxjs$ObservableInput<R>): rxjs$OperatorFunction<T, R>;
   declare export function take<T>(count: number): rxjs$OperatorFunction<T, T>;
+  declare export function takeWhile<T>(predicate: (value: T, index: number) => boolean): rxjs$OperatorFunction<T, T>;
   declare export function timeout<T>(due: number | Date, scheduler?: rxjs$SchedulerClass): rxjs$OperatorFunction<T, T>;
   declare export function toArray<T>(): rxjs$OperatorFunction<T, Array<T>>
   declare export function publishReplay<T, R>(bufferSize?: number, windowTime?: number, selector?: rxjs$OperatorFunction<T, R>, scheduler?: rxjs$SchedulerClass): rxjs$OperatorFunction<T, R>;
