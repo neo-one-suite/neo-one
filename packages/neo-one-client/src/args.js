@@ -101,8 +101,7 @@ export const assertHash256 = (hash: mixed): Hash256String => {
 
 export const assertBuffer = (buffer: mixed): BufferString => {
   const value = assertString('Buffer', buffer);
-
-  if (parseInt(value, 16).toString(16) !== value.toLowerCase()) {
+  if (Buffer.from(value, 'hex').toString('hex') !== value.toLowerCase()) {
     throw new InvalidArgumentError(
       `Expected hex string, found: ${String(buffer)}`,
     );
@@ -167,7 +166,7 @@ export const assertNullableNumber = (value: mixed): ?number => {
 
 export const assertArray = (value: mixed): Array<mixed> => {
   if (!Array.isArray(value)) {
-    throw new InvalidArgumentError(`Expected Array: ${String(value)}`);
+    throw new InvalidArgumentError(`Expected Array, found: ${String(value)}`);
   }
 
   return value;
@@ -216,6 +215,12 @@ export const assertBlockFilter = (filter: mixed): ?BlockFilter => {
 export const assertGetOptions = (options: mixed): ?GetOptions => {
   if (options == null) {
     return options;
+  }
+
+  if (typeof options !== 'object') {
+    throw new InvalidArgumentError(
+      `Invalid GetOptions param, found: ${String(options)}`,
+    );
   }
 
   if (_.isEmpty(options)) {
@@ -320,7 +325,6 @@ export const assertABI = (abi: mixed): ABI => {
     throw new InvalidArgumentError(`Invalid ABI param, found: ${String(abi)}`);
   }
 
-  assertHash160(abi.hash);
   assertArray(abi.functions).map(value => assertABIFunction(value));
   if (abi.events != null) {
     assertArray(abi.events).map(event => assertABIEvent(event));
