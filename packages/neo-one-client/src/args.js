@@ -102,14 +102,13 @@ export const assertHash256 = (hash: mixed): Hash256String => {
 export const assertBuffer = (buffer: mixed): BufferString => {
   const value = assertString('Buffer', buffer);
 
-  try {
-    Buffer.from(value, 'hex');
-    return value;
-  } catch (error) {
+  if (parseInt(value, 16).toString(16) !== value.toLowerCase()) {
     throw new InvalidArgumentError(
       `Expected hex string, found: ${String(buffer)}`,
     );
   }
+
+  return value;
 };
 
 export const assertPublicKey = (publicKey: mixed): PublicKeyString => {

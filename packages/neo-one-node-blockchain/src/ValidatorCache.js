@@ -176,7 +176,7 @@ export default class ValidatorCache {
     this.validatorsCount = validatorsCount.update({
       votes: validatorsCount.votes
         .slice(0, index)
-        .concat(validatorsCount.votes[index].add(value))
+        .concat((validatorsCount.votes[index] || utils.ZERO).add(value))
         .concat(validatorsCount.votes.slice(index + 1)),
     });
   }

@@ -13,17 +13,18 @@ import {
   utils,
 } from '@neo-one/client-core';
 
+type Votes = Array<?BN>;
 export type ValidatorsCountUpdate = {|
-  votes?: Array<BN>,
+  votes?: Votes,
 |};
 export type ValidatorsCountAdd = {|
   version?: number,
-  votes?: Array<BN>,
+  votes?: Votes,
 |};
 
 export default class ValidatorsCount extends BaseState
   implements SerializableWire<this> {
-  votes: Array<BN>;
+  votes: Votes;
 
   __size: () => number;
 
@@ -52,7 +53,7 @@ export default class ValidatorsCount extends BaseState
   serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.version);
     writer.writeArray(this.votes, value => {
-      writer.writeFixed8(value);
+      writer.writeFixed8(value || utils.ZERO);
     });
   }
 

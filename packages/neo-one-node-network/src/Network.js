@@ -75,7 +75,7 @@ const normalizeEndpoint = (endpoint: Endpoint) => {
 };
 
 const EXTERNAL_ENDPOINTS = new Set();
-const MAX_CONNECTED_PEERS = 20;
+const MAX_CONNECTED_PEERS = 10;
 const CONNECT_PEERS_DELAY_MS = 5000;
 const SOCKET_TIMEOUT_MS = 1000 * 60;
 const CONNECT_ERROR_CODES = new Set([
@@ -269,6 +269,11 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     return utils.values(this._connectedPeers);
   }
 
+  blacklistAndClose(peer: ConnectedPeer<Message, PeerData>): void {
+    this._badEndpoints.add(peer.endpoint);
+    peer.close();
+  }
+
   _startServer(): void {
     const listenTCP = this._listenTCP;
     if (listenTCP == null) {
@@ -367,8 +372,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
           message: `Peer at ${peer.endpoint} is unhealthy, closing`,
           data: { peer: peer.endpoint },
         });
-        this._badEndpoints.add(peer.endpoint);
-        peer.close();
+        this.blacklistAndClose(peer);
       }
     }
   }

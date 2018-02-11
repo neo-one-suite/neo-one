@@ -34,10 +34,7 @@ class One {
       try {
         ready = JSON.parse(result);
       } catch (error) {
-        // eslint-disable-next-line
-        console.log(result);
-        // eslint-disable-next-line
-        console.error(error);
+        // eslint-disable-line
       }
       tries -= 1;
     }
@@ -51,7 +48,14 @@ class One {
   }
 
   async _teardown() {
-    await this._exec('reset --static-neo-one');
+    try {
+      await this._exec('reset --static-neo-one');
+    } catch (error) {
+      this.server.kill('SIGINT');
+      await new Promise(resolve => setTimeout(() => resolve(), 2500));
+      this.server.kill('SIGTERM');
+    }
+
     await fs.remove(this.dir.name);
   }
 
@@ -63,9 +67,7 @@ class One {
     try {
       return JSON.parse(value);
     } catch (error) {
-      // eslint-disable-next-line
-      console.log(value);
-      throw error;
+      throw new Error(`Value:\n${value}\n\nError:\n${error.toString()}`);
     }
   }
 
@@ -87,9 +89,7 @@ class One {
           if (error) {
             reject(
               new Error(
-                `STDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n\nERROR:\n${
-                  error.message
-                }\n${error.toString()}`,
+                `STDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n\nERROR:\n${error.toString()}`,
               ),
             );
           } else {
