@@ -103,11 +103,19 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
   }
 
   getAccounts(): Array<UserAccount> {
-    return this._selectedProvider$.value.getAccounts();
+    return utils
+      .values(this.providers)
+      .reduce((acc, provider) => acc.concat(provider.getAccounts()), []);
   }
 
   getNetworks(): Array<NetworkType> {
-    return this._selectedProvider$.value.getNetworks();
+    return [
+      ...new Set(
+        utils
+          .values(this.providers)
+          .reduce((acc, provider) => acc.concat(provider.getNetworks()), []),
+      ),
+    ];
   }
 
   transfer(
