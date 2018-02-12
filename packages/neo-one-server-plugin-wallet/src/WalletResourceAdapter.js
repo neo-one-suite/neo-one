@@ -5,7 +5,7 @@ import {
   TaskList,
   compoundName,
 } from '@neo-one/server-plugin';
-import { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs/Observable';
 
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 

@@ -1,5 +1,5 @@
 /* @flow */
-import { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs/Observable';
 import {
   type Block,
   type Output,

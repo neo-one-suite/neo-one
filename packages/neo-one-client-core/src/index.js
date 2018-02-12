@@ -13,6 +13,7 @@ export { default as Witness } from './Witness';
 
 export { LogAction, NotificationAction } from './action';
 export { default as common } from './common';
+export { default as disassembleByteCode } from './disassembleByteCode';
 export {
   SignatureContractParameter,
   BooleanContractParameter,
@@ -105,12 +106,7 @@ export {
 } from './ContractPropertyState';
 export { createDeserializeWire, createSerializeWire } from './Serializable';
 export { SCRIPT_CONTAINER_TYPE } from './ScriptContainer';
-export {
-  BYTECODE_TO_OPCODE,
-  OPCODE_TO_BYTECODE,
-  VM_STATE,
-  disassembleByteCode,
-} from './vm';
+export * from './vm';
 
 export type {
   ECPoint,
@@ -162,13 +158,6 @@ export type {
   InvalidScriptContainerTypeError,
 } from './ScriptContainer';
 export type { Param } from './utils';
-export type {
-  ByteCode,
-  OpCode,
-  SysCallName,
-  VerifyScriptOptions,
-  VMState,
-} from './vm';
 
 export type NetworkSettingsJSON = {|
   issueGASFee: string,

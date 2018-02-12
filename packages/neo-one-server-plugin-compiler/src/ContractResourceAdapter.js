@@ -6,7 +6,7 @@ import {
   type DescribeTable,
   TaskList,
 } from '@neo-one/server-plugin';
-import { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs/Observable';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import type { Subject } from 'rxjs/Subject';
 

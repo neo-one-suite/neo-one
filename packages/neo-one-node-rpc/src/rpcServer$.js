@@ -2,7 +2,7 @@
 import { type Blockchain, type Node } from '@neo-one/node-core';
 import { type Log, finalize } from '@neo-one/utils';
 import Koa from 'koa';
-import { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs/Observable';
 
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { defer } from 'rxjs/observable/defer';

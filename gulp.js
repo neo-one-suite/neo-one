@@ -117,6 +117,7 @@ const createRollupOutput = ({
   format,
   name: source,
   sourcemap: true,
+  exports: 'named',
 });
 
 const writeBundle = async ({

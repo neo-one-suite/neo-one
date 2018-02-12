@@ -7,7 +7,7 @@ import {
   type ResourceState,
   TaskList,
 } from '@neo-one/server-plugin';
-import { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs/Observable';
 import {
   type MasterWalletResourceAdapter,
   constants as walletConstants,
