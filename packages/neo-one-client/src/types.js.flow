@@ -542,6 +542,7 @@ export type BlockFilter = {|
 |};
 
 export interface UserAccountProvider {
+  +type: string;
   +currentAccount$: Observable<?UserAccount>;
   +accounts$: Observable<Array<UserAccount>>;
   +networks$: Observable<Array<NetworkType>>;
@@ -549,6 +550,8 @@ export interface UserAccountProvider {
   getCurrentAccount(): ?UserAccount;
   getAccounts(): Array<UserAccount>;
   getNetworks(): Array<NetworkType>;
+
+  selectAccount(account: UserAccountID): Promise<void>;
 
   transfer(
     transfers: Array<Transfer>,
@@ -574,7 +577,7 @@ export interface UserAccountProvider {
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>>;
 
-  _invoke(
+  invoke(
     contract: Hash160String,
     method: string,
     params: Array<?ScriptBuilderParam>,
@@ -582,13 +585,17 @@ export interface UserAccountProvider {
     verify: boolean,
     options?: InvokeTransactionOptions,
   ): Promise<TransactionResult<InvokeReceiptInternal>>;
-  _call(
+  call(
     contract: Hash160String,
     method: string,
     params: Array<?ScriptBuilderParam>,
     options?: TransactionOptions,
   ): Promise<RawInvocationResult>;
 }
+
+export type UserAccountProviders = {
+  [type: string]: UserAccountProvider,
+};
 
 export interface DataProvider {
   +network: NetworkType;

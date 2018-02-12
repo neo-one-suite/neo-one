@@ -77,10 +77,12 @@ import * as clientUtils from '../utils';
 import converters from './converters';
 
 export type KeyStore = {
+  +type: string,
   +currentAccount$: Observable<?UserAccount>,
   +getCurrentAccount: () => ?UserAccount,
   +accounts$: Observable<Array<UserAccount>>,
   +getAccounts: () => Array<UserAccount>,
+  +selectAccount: (id: UserAccountID) => Promise<void>,
   +sign: (options: {|
     account: UserAccountID,
     message: string,
@@ -133,6 +135,7 @@ export default class LocalUserAccountProvider<
   TKeyStore: KeyStore,
   TProvider: Provider,
 > implements UserAccountProvider {
+  +type: string;
   +currentAccount$: Observable<?UserAccount>;
   +accounts$: Observable<Array<UserAccount>>;
   +networks$: Observable<Array<NetworkType>>;
@@ -147,6 +150,7 @@ export default class LocalUserAccountProvider<
     keystore: TKeyStore,
     provider: TProvider,
   |}) {
+    this.type = keystore.type;
     this.keystore = keystore;
     this.provider = provider;
 
@@ -381,7 +385,7 @@ export default class LocalUserAccountProvider<
     });
   }
 
-  _invoke(
+  invoke(
     contract: Hash160String,
     method: string,
     params: Array<?ScriptBuilderParam>,
@@ -443,7 +447,7 @@ export default class LocalUserAccountProvider<
     });
   }
 
-  async _call(
+  async call(
     contract: Hash160String,
     method: string,
     params: Array<?ScriptBuilderParam>,
@@ -475,6 +479,10 @@ export default class LocalUserAccountProvider<
       from.network,
       testTransaction.serializeWire().toString('hex'),
     );
+  }
+
+  async selectAccount(account: UserAccountID): Promise<void> {
+    await this.keystore.selectAccount(account);
   }
 
   async _getTransactionOptions(

@@ -9,7 +9,13 @@ import {
   ResourceType,
 } from '@neo-one/server-plugin';
 import { LocalFileStore } from '@neo-one/client-node';
-import { type UserAccountID, localClient } from '@neo-one/client';
+import {
+  type UserAccountID,
+  Client,
+  LocalKeyStore,
+  LocalUserAccountProvider,
+  provider,
+} from '@neo-one/client';
 
 import _ from 'lodash';
 import path from 'path';
@@ -79,9 +85,14 @@ export default class WalletResourceType extends ResourceType<
   }: MasterResourceAdapterOptions): Promise<
     MasterResourceAdapter<Wallet, WalletResourceOptions>,
   > {
-    const client = localClient({
-      store: new LocalFileStore({
-        dataPath: path.resolve(dataPath, WALLETS_PATH),
+    const client = new Client({
+      file: new LocalUserAccountProvider({
+        keystore: new LocalKeyStore({
+          store: new LocalFileStore({
+            dataPath: path.resolve(dataPath, WALLETS_PATH),
+          }),
+        }),
+        provider: provider(),
       }),
     });
     return new MasterWalletResourceAdapter({

@@ -50,6 +50,7 @@ const flattenWallets = (wallets: Wallets) =>
   );
 
 export default class LocalKeyStore {
+  +type: string;
   +currentAccount$: Observable<?UserAccount>;
   +accounts$: Observable<Array<UserAccount>>;
   +wallets$: Observable<Array<Wallet>>;
@@ -63,6 +64,7 @@ export default class LocalKeyStore {
   _initPromise: Promise<void>;
 
   constructor({ store }: {| store: Store |}) {
+    this.type = store.type;
     this._wallets$ = new BehaviorSubject({});
     this.wallets$ = this._wallets$.pipe(
       distinctUntilChanged((a, b) => _.isEqual(a, b)),
@@ -132,7 +134,7 @@ export default class LocalKeyStore {
     };
   }
 
-  selectAccount(id: UserAccountID): void {
+  async selectAccount(id: UserAccountID): Promise<void> {
     const { account } = this.getWallet(id);
     this._currentAccount$.next(account);
   }

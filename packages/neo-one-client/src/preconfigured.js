@@ -1,11 +1,4 @@
 /* @flow */
-import Client from './Client';
-import {
-  type LocalStore,
-  LocalKeyStore,
-  LocalMemoryStore,
-  LocalUserAccountProvider,
-} from './user';
 import {
   type NEOONEProviderOptions,
   NEOONEDataProvider,
@@ -16,27 +9,11 @@ import ReadClient from './ReadClient';
 
 import * as networks from './networks';
 
-export const localClient = (optionsIn?: {|
-  store?: LocalStore,
+export const provider = (options?: {|
   mainRPCURL?: string,
   testRPCURL?: string,
   options?: Array<NEOONEProviderOptions>,
-|}) => {
-  const { store, mainRPCURL, testRPCURL, options } = optionsIn || {};
-  const keystore = new LocalKeyStore({
-    store: store || new LocalMemoryStore(),
-  });
-  return new Client(
-    new LocalUserAccountProvider({
-      keystore,
-      provider: new NEOONEProvider({
-        mainRPCURL,
-        testRPCURL,
-        options,
-      }),
-    }),
-  );
-};
+|}) => new NEOONEProvider(options || {});
 
 export const mainReadClient = (optionsIn?: {|
   rpcURL?: string,

@@ -73,7 +73,7 @@ const updateClient = ({
   }
 
   const clientNetworkType = getClientNetworkType(networkName);
-  client.userAccountProvider.provider.addNetwork({
+  client.providers.file.provider.addNetwork({
     network: clientNetworkType,
     rpcURL,
   });
@@ -307,7 +307,7 @@ export default class WalletResource {
       throw new Error('Something went wrong.');
     }
     const { privateKey, password } = this._initial;
-    await this._client.userAccountProvider.keystore.addAccount({
+    await this._client.providers.file.keystore.addAccount({
       network: this._clientNetworkType,
       name: this._baseName,
       privateKey,
@@ -320,9 +320,7 @@ export default class WalletResource {
 
   async delete(): Promise<void> {
     this._deleted = true;
-    await this._client.userAccountProvider.keystore.deleteAccount(
-      this.walletID,
-    );
+    await this._client.providers.file.keystore.deleteAccount(this.walletID);
     await fs.remove(this._dataPath);
   }
 
@@ -381,7 +379,7 @@ export default class WalletResource {
   }
 
   get wallet(): LocalWallet {
-    return this._client.userAccountProvider.keystore.getWallet(this.walletID);
+    return this._client.providers.file.keystore.getWallet(this.walletID);
   }
 
   get unlocked(): boolean {
@@ -389,14 +387,14 @@ export default class WalletResource {
   }
 
   async unlock({ password }: {| password: string |}): Promise<void> {
-    await this._client.userAccountProvider.keystore.unlockWallet({
+    await this._client.providers.file.keystore.unlockWallet({
       id: this.walletID,
       password,
     });
   }
 
   lock(): void {
-    this._client.userAccountProvider.keystore.lockWallet(this.walletID);
+    this._client.providers.file.keystore.lockWallet(this.walletID);
   }
 
   get wif(): ?string {

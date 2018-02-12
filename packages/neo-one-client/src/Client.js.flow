@@ -23,17 +23,15 @@ import type {
   TransactionResult,
   InvokeReceiptInternal,
   UserAccount,
-  UserAccountProvider,
+  UserAccountID,
 } from './types'; // eslint-disable-line
 
-declare export default class Client<
-  TUserAccountProvider: UserAccountProvider
-> {
+declare export default class Client<TUserAccountProviders> {
   constructor(
-    userAccountProvider: TUserAccountProvider,
-  ): Client<TUserAccountProvider>;
+    providers: TUserAccountProviders,
+  ): Client<TUserAccountProviders>;
 
-  +userAccountProvider: TUserAccountProvider;
+  +providers: TUserAccountProviders;
 
   +currentAccount$: Observable<?UserAccount>;
   +accounts$: Observable<Array<UserAccount>>;
@@ -42,6 +40,8 @@ declare export default class Client<
   getCurrentAccount(): ?UserAccount;
   getAccounts(): Array<UserAccount>;
   getNetworks(): Array<NetworkType>;
+
+  selectAccount(id: UserAccountID): Promise<void>;
 
   transfer(
     amount: BigNumber,
