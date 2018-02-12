@@ -1,4 +1,6 @@
 /* @flow */
+import { type Param as ScriptBuilderParam } from '@neo-one/client-core';
+
 import type {
   ABI,
   Account,
@@ -14,6 +16,7 @@ import type {
   Hash160String,
   Hash256String,
   Peer,
+  RawInvocationResult,
   ReadSmartContract,
   StorageItem,
   Transaction,
@@ -50,4 +53,9 @@ declare export default class ReadClient<TDataProvider: DataProvider> {
   _getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem>;
   _iterStorage(hash: Hash160String): AsyncIterable<StorageItem>;
   _iterActions(filterIn?: BlockFilter): AsyncIterable<Action>;
+  _call(
+    contract: Hash160String,
+    method: string,
+    params: Array<?ScriptBuilderParam>,
+  ): Promise<RawInvocationResult>;
 }

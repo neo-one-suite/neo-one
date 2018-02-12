@@ -395,7 +395,7 @@ export default class LocalUserAccountProvider<
   ): Promise<TransactionResult<InvokeReceiptInternal>> {
     const options = optionsIn || {};
     return this._invokeRaw({
-      script: this._getInvokeMethodScript({
+      script: clientUtils.getInvokeMethodScript({
         hash: contract,
         method,
         params,
@@ -436,7 +436,7 @@ export default class LocalUserAccountProvider<
       scripts: [
         verify
           ? new WitnessModel({
-              invocation: this._getInvokeMethodInvocationScript({
+              invocation: clientUtils.getInvokeMethodInvocationScript({
                 method,
                 params,
               }),
@@ -469,7 +469,7 @@ export default class LocalUserAccountProvider<
       outputs: this._convertOutputs(outputs),
       attributes: this._convertAttributes(attributes),
       gas: utils.ZERO,
-      script: this._getInvokeMethodScript({
+      script: clientUtils.getInvokeMethodScript({
         hash: contract,
         method,
         params,

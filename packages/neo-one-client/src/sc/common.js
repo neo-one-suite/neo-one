@@ -1,4 +1,6 @@
 /* @flow */
+import { type Param as ScriptBuilderParam } from '@neo-one/client-core';
+
 import _ from 'lodash';
 
 import type {
@@ -9,12 +11,15 @@ import type {
   ContractParameter,
   Event,
   EventParameters,
+  InvocationResult,
   Log,
   Param,
+  RawInvocationResult,
 } from '../types'; // eslint-disable-line
 import { InvalidEventError, InvalidArgumentError } from '../errors';
 
 import parameterConverters from './parameters';
+import paramCheckers from './params';
 
 export const convertParameter = ({
   type,
@@ -87,4 +92,55 @@ export const convertAction = ({
       parameters: args.slice(1),
     }),
   };
+};
+
+export const convertInvocationResult = ({
+  returnType,
+  result,
+}: {|
+  returnType: ABIReturn,
+  result: RawInvocationResult,
+|}): InvocationResult<?Param> => {
+  const { gasConsumed } = result;
+  if (result.state === 'FAULT') {
+    return { state: result.state, gasConsumed, message: result.message };
+  }
+
+  let value = result.stack[0];
+  if (value != null) {
+    value = convertParameter({
+      type: returnType,
+      parameter: value,
+    });
+  }
+
+  return { state: result.state, gasConsumed, value };
+};
+
+export const convertParams = ({
+  parameters,
+  params,
+}: {|
+  parameters: Array<ABIParameter>,
+  params: Array<?Param>,
+|}): {|
+  converted: Array<?ScriptBuilderParam>,
+  zipped: Array<[string, ?Param]>,
+|} => {
+  if (parameters.length !== params.length) {
+    throw new InvalidArgumentError(
+      `Expected parameters length (${parameters.length}) to equal params ` +
+        `length (${params.length}).`,
+    );
+  }
+
+  const converted = _.zip(parameters, params).map(([parameter, param]) =>
+    paramCheckers[parameter.type](param, (parameter: $FlowFixMe)),
+  );
+  const zipped = _.zip(parameters, params).map(([parameter, param]) => [
+    parameter.name,
+    param,
+  ]);
+
+  return { converted, zipped };
 };

@@ -8,6 +8,7 @@ export { NEOONEDataProvider, NEOONEProvider } from './provider';
 
 export { disassembleByteCode } from '@neo-one/client-core';
 
+export * as abi from './abi';
 export * from './helpers';
 export * as networks from './networks';
 export * from './preconfigured';

@@ -2,20 +2,16 @@
 import BigNumber from 'bignumber.js';
 import { type Param as ScriptBuilderParam } from '@neo-one/client-core';
 
-import _ from 'lodash';
-
 import type {
   Action,
   ABIEvent,
   ABIFunction,
   ABIParameter,
-  ABIReturn,
   Event,
   GetOptions,
   Hash160String,
   InvokeReceipt,
   InvocationResult,
-  RawInvocationResult,
   Log,
   Param,
   SmartContract,
@@ -23,42 +19,9 @@ import type {
   TransactionResult,
 } from '../types'; // eslint-disable-line
 import type Client from '../Client';
-import {
-  InvalidArgumentError,
-  NoAccountError,
-  NoContractDeployedError,
-} from '../errors';
+import { NoAccountError, NoContractDeployedError } from '../errors';
 
 import * as common from './common';
-import paramCheckers from './params';
-
-const convertParams = ({
-  parameters,
-  params,
-}: {|
-  parameters: Array<ABIParameter>,
-  params: Array<?Param>,
-|}): {|
-  converted: Array<?ScriptBuilderParam>,
-  zipped: Array<[string, ?Param]>,
-|} => {
-  if (parameters.length !== params.length) {
-    throw new InvalidArgumentError(
-      `Expected parameters length (${parameters.length}) to equal params ` +
-        `length (${params.length}).`,
-    );
-  }
-
-  const converted = _.zip(parameters, params).map(([parameter, param]) =>
-    paramCheckers[parameter.type](param, (parameter: $FlowFixMe)),
-  );
-  const zipped = _.zip(parameters, params).map(([parameter, param]) => [
-    parameter.name,
-    param,
-  ]);
-
-  return { converted, zipped };
-};
 
 const getParamsAndOptions = ({
   definition: { networks },
@@ -105,36 +68,13 @@ const getParamsAndOptions = ({
     throw new NoContractDeployedError(options.from.network);
   }
 
-  const { converted, zipped } = convertParams({ params, parameters });
+  const { converted, zipped } = common.convertParams({ params, parameters });
   return {
     params: converted,
     paramsZipped: zipped,
     options,
     hash: contractNetwork.hash,
   };
-};
-
-const convertInvocationResult = ({
-  returnType,
-  result,
-}: {|
-  returnType: ABIReturn,
-  result: RawInvocationResult,
-|}): InvocationResult<?Param> => {
-  const { gasConsumed } = result;
-  if (result.state === 'FAULT') {
-    return { state: result.state, gasConsumed, message: result.message };
-  }
-
-  let value = result.stack[0];
-  if (value != null) {
-    value = common.convertParameter({
-      type: returnType,
-      parameter: value,
-    });
-  }
-
-  return { state: result.state, gasConsumed, value };
 };
 
 const convertActions = ({
@@ -172,7 +112,7 @@ const createCall = ({
     client,
   });
   const result = await client._call(hash, name, params, options);
-  return convertInvocationResult({ returnType, result });
+  return common.convertInvocationResult({ returnType, result });
 };
 
 const filterEvents = (actions: Array<Event | Log>): Array<Event> =>
@@ -222,7 +162,10 @@ const createInvoke = ({
         blockIndex: receipt.blockIndex,
         blockHash: receipt.blockHash,
         transactionIndex: receipt.transactionIndex,
-        result: convertInvocationResult({ returnType, result: receipt.result }),
+        result: common.convertInvocationResult({
+          returnType,
+          result: receipt.result,
+        }),
         events: filterEvents(actions),
         logs: filterLogs(actions),
       };

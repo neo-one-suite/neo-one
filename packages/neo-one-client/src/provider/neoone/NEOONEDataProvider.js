@@ -13,8 +13,10 @@ import {
   type InvocationTransactionJSON,
   type OutputJSON,
   type NetworkSettingsJSON,
+  type Param as ScriptBuilderParam,
   type TransactionJSON,
   type ValidatorJSON,
+  InvocationTransaction as CoreInvocationTransaction,
   JSONHelper,
   utils,
 } from '@neo-one/client-core';
@@ -59,6 +61,8 @@ import type {
 import AsyncBlockIterator from '../../AsyncBlockIterator';
 import JSONRPCClient from './JSONRPCClient';
 import JSONRPCHTTPProvider from './JSONRPCHTTPProvider';
+
+import * as clientUtils from '../../utils';
 
 export type NEOONEDataProviderOptions = {|
   network: NetworkType,
@@ -225,17 +229,17 @@ export default class NEOONEDataProvider implements DataProvider {
     return this._convertNetworkSettings(settings);
   }
 
-  _getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem> {
+  getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem> {
     return this._client.getStorageItem(hash, key);
   }
 
-  _iterStorage(hash: Hash160String): AsyncIterable<StorageItem> {
+  iterStorage(hash: Hash160String): AsyncIterable<StorageItem> {
     return AsyncIterableX.from(
       this._client.getAllStorage(hash).then(res => AsyncIterableX.from(res)),
     ).pipe(flatten());
   }
 
-  _iterActions(filterIn?: BlockFilter): AsyncIterable<Action> {
+  iterActions(filterIn?: BlockFilter): AsyncIterable<Action> {
     const filter = filterIn || {};
     return AsyncIterableX.from(
       this.iterBlocks({
@@ -256,6 +260,23 @@ export default class NEOONEDataProvider implements DataProvider {
         return AsyncIterableX.of(...actions);
       }),
     );
+  }
+
+  call(
+    contract: Hash160String,
+    method: string,
+    params: Array<?ScriptBuilderParam>,
+  ): Promise<RawInvocationResult> {
+    const testTransaction = new CoreInvocationTransaction({
+      version: 1,
+      gas: utils.ZERO,
+      script: clientUtils.getInvokeMethodScript({
+        hash: contract,
+        method,
+        params,
+      }),
+    });
+    return this.testInvoke(testTransaction.serializeWire().toString('hex'));
   }
 
   _convertBlock(block: BlockJSON): Block {

@@ -621,9 +621,14 @@ export interface DataProvider {
 
   getConnectedPeers(): Promise<Array<Peer>>;
 
-  _getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem>;
-  _iterStorage(hash: Hash160String): AsyncIterable<StorageItem>;
-  _iterActions(filterIn?: BlockFilter): AsyncIterable<Action>;
+  getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem>;
+  iterStorage(hash: Hash160String): AsyncIterable<StorageItem>;
+  iterActions(filterIn?: BlockFilter): AsyncIterable<Action>;
+  call(
+    contract: Hash160String,
+    method: string,
+    params: Array<?ScriptBuilderParam>,
+  ): Promise<RawInvocationResult>;
 }
 
 
@@ -727,15 +732,16 @@ export type ABI = {|
 export type SmartContractNetworkDefinition = {|
   hash: Hash160String,
 |};
+export type SmartContractNetworksDefinition = {|
+  [type: NetworkType]: SmartContractNetworkDefinition,
+|};
 export type SmartContractDefinition = {|
-  networks: {|
-    [type: NetworkType]: SmartContractNetworkDefinition,
-  |},
+  networks: SmartContractNetworksDefinition,
   abi: ABI,
 |};
 
 export type SmartContract = {|
-  [key: string]: any
+  [key: string]: any,
 |};
 
 export type ReadSmartContract = {|
@@ -743,4 +749,5 @@ export type ReadSmartContract = {|
   iterLogs: (filter?: BlockFilter) => AsyncIterable<Log>,
   iterActions: (filter?: BlockFilter) => AsyncIterable<Event | Log>,
   iterStorage: () => AsyncIterable<StorageItem>,
+  [key: string]: any,
 |};

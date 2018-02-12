@@ -742,16 +742,16 @@ describe('NEOONEDataProvider', () => {
     expect(testError).toThrow(new Error('Unexpected null data'));
   });
 
-  test('_getStorage', async () => {
+  test('getStorage', async () => {
     const expected = {};
     // $FlowFixMe
     provider._client.getStorageItem = jest.fn(() => Promise.resolve({}));
 
-    const result = provider._getStorage(transactions.register.hash, '');
+    const result = provider.getStorage(transactions.register.hash, '');
     await expect(result).resolves.toEqual(expected);
   });
 
-  test('_iterStorage', async () => {
+  test('iterStorage', async () => {
     const storage = { hash: '0', key: '1', value: '2' };
     // $FlowFixMe
     const expected = [storage];
@@ -759,7 +759,7 @@ describe('NEOONEDataProvider', () => {
     provider._client.getAllStorage = jest.fn(() => Promise.resolve([storage]));
 
     const result = await toArray(
-      provider._iterStorage(transactions.register.hash),
+      provider.iterStorage(transactions.register.hash),
     );
     expect(result).toEqual(expected);
   });
@@ -779,7 +779,7 @@ describe('NEOONEDataProvider', () => {
     provider.iterBlocks = jest.fn(() => AsyncIterableX.from([block]));
 
     const result = await toArray(
-      provider._iterActions({ indexStart: 1, indexStop: 2 }),
+      provider.iterActions({ indexStart: 1, indexStop: 2 }),
     );
     expect(result).toEqual(expected);
   });
@@ -798,7 +798,7 @@ describe('NEOONEDataProvider', () => {
     // $FlowFixMe
     provider.iterBlocks = jest.fn(() => AsyncIterableX.from([block]));
 
-    const result = await toArray(provider._iterActions());
+    const result = await toArray(provider.iterActions());
     expect(result).toEqual(expected);
   });
 });

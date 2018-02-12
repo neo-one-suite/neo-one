@@ -1,20 +1,53 @@
 /* @flow */
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
+import { type Param as ScriptBuilderParam } from '@neo-one/client-core';
 
 import { filter, map } from 'ix/asynciterable/pipe/index';
 
 import type {
   ABI,
+  ABIFunction,
+  ABIParameter,
   BlockFilter,
   Event,
   Hash160String,
+  InvocationResult,
   Log,
+  Param,
   ReadSmartContract,
   StorageItem,
 } from '../types'; // eslint-disable-line
 import type ReadClient from '../ReadClient';
 
 import * as common from './common';
+
+const getParams = ({
+  parameters,
+  params,
+}: {|
+  parameters: Array<ABIParameter>,
+  params: Array<any>,
+|}): Array<?ScriptBuilderParam> => {
+  const { converted } = common.convertParams({ params, parameters });
+  return converted;
+};
+
+const createCall = ({
+  hash,
+  client,
+  func: { name, parameters, returnType },
+}: {|
+  hash: Hash160String,
+  client: ReadClient<*>,
+  func: ABIFunction,
+|}) => async (...args: Array<any>): Promise<InvocationResult<?Param>> => {
+  const params = getParams({
+    parameters: parameters || [],
+    params: args,
+  });
+  const result = await client._call(hash, name, params);
+  return common.convertInvocationResult({ returnType, result });
+};
 
 export default ({
   hash,
@@ -65,5 +98,12 @@ export default ({
   const iterStorage = (): AsyncIterable<StorageItem> =>
     client._iterStorage(hash);
 
-  return { iterActions, iterEvents, iterLogs, iterStorage };
+  const smartContract = { iterActions, iterEvents, iterLogs, iterStorage };
+  abi.functions.forEach(func => {
+    if (func.constant) {
+      smartContract[func.name] = createCall({ client, hash, func });
+    }
+  });
+
+  return smartContract;
 };
