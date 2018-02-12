@@ -19,6 +19,7 @@ import {
 } from '@neo-one/client';
 
 import _ from 'lodash';
+import fs from 'fs-extra';
 import path from 'path';
 
 import {
@@ -86,12 +87,14 @@ export default class WalletResourceType extends ResourceType<
   }: MasterResourceAdapterOptions): Promise<
     MasterResourceAdapter<Wallet, WalletResourceOptions>,
   > {
+    const walletsPath = path.resolve(dataPath, WALLETS_PATH);
+    fs.mkdirpSync(walletsPath);
     const client = new Client({
       file: new LocalUserAccountProvider({
         keystore: new LocalKeyStore({
           store: new LocalStringStore({
             type: 'file',
-            storage: new AsyncNodeStorage(path.resolve(dataPath, WALLETS_PATH)),
+            storage: new AsyncNodeStorage(walletsPath),
           }),
         }),
         provider: provider(),
