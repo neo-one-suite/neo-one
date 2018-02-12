@@ -38,7 +38,7 @@
   "dependencies": {
     "@neo-one/utils": "^1.0.0-alpha.3",
     "ajv": "^6.1.1",
-    "chalk": "^2.3.0",
+    "chalk": "^2.3.1",
     "chokidar": "^2.0.1",
     "env-paths": "^1.0.0",
     "fs-extra": "^5.0.0",
