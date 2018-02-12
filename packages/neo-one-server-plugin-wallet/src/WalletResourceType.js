@@ -1,4 +1,5 @@
 /* @flow */
+import { AsyncNodeStorage } from 'redux-persist-node-storage';
 import {
   type DescribeTable,
   type ListTable,
@@ -8,11 +9,11 @@ import {
   CRUD,
   ResourceType,
 } from '@neo-one/server-plugin';
-import { LocalFileStore } from '@neo-one/client-node';
 import {
   type UserAccountID,
   Client,
   LocalKeyStore,
+  LocalStringStore,
   LocalUserAccountProvider,
   provider,
 } from '@neo-one/client';
@@ -88,8 +89,9 @@ export default class WalletResourceType extends ResourceType<
     const client = new Client({
       file: new LocalUserAccountProvider({
         keystore: new LocalKeyStore({
-          store: new LocalFileStore({
-            dataPath: path.resolve(dataPath, WALLETS_PATH),
+          store: new LocalStringStore({
+            type: 'file',
+            storage: new AsyncNodeStorage(path.resolve(dataPath, WALLETS_PATH)),
           }),
         }),
         provider: provider(),
