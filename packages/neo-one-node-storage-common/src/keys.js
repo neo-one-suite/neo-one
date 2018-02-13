@@ -105,42 +105,54 @@ export const getStorageItemKeyMin = ({
   prefix,
 }: StorageItemsKey): Buffer => {
   if (hash == null) {
-    return bytewise.sorts.array.bound.lower([storageItemKeyPrefix]);
+    return bytewise.encode(
+      bytewise.sorts.array.bound.lower([storageItemKeyPrefix]),
+    );
   }
 
   if (prefix == null) {
-    return bytewise.sorts.array.bound.lower([
-      storageItemKeyPrefix,
-      common.uInt160ToBuffer(hash),
-    ]);
+    return bytewise.encode(
+      bytewise.sorts.array.bound.lower([
+        storageItemKeyPrefix,
+        common.uInt160ToBuffer(hash),
+      ]),
+    );
   }
 
-  return bytewise.sorts.array.bound.lower([
-    storageItemKeyPrefix,
-    common.uInt160ToBuffer(hash),
-    prefix,
-  ]);
+  return bytewise.encode(
+    bytewise.sorts.array.bound.lower([
+      storageItemKeyPrefix,
+      common.uInt160ToBuffer(hash),
+      prefix,
+    ]),
+  );
 };
 export const getStorageItemKeyMax = ({
   hash,
   prefix,
 }: StorageItemsKey): Buffer => {
   if (hash == null) {
-    return bytewise.sorts.array.bound.upper([storageItemKeyPrefix]);
+    return bytewise.encode(
+      bytewise.sorts.array.bound.upper([storageItemKeyPrefix]),
+    );
   }
 
   if (prefix == null) {
-    return bytewise.sorts.array.bound.upper([
-      storageItemKeyPrefix,
-      common.uInt160ToBuffer(hash),
-    ]);
+    return bytewise.encode(
+      bytewise.sorts.array.bound.upper([
+        storageItemKeyPrefix,
+        common.uInt160ToBuffer(hash),
+      ]),
+    );
   }
 
-  return bytewise.sorts.array.bound.upper([
-    storageItemKeyPrefix,
-    common.uInt160ToBuffer(hash),
-    prefix,
-  ]);
+  return bytewise.encode(
+    bytewise.sorts.array.bound.upper([
+      storageItemKeyPrefix,
+      common.uInt160ToBuffer(hash),
+      prefix,
+    ]),
+  );
 };
 
 export const serializeActionKey = ({

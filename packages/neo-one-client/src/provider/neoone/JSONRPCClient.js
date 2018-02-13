@@ -90,10 +90,12 @@ export default class JSONRPCClient {
     hash: Hash160String,
     key: BufferString,
   ): Promise<StorageItemJSON> {
-    return this._provider.request({
-      method: 'getstorage',
-      params: [hash, key],
-    });
+    return this._provider
+      .request({
+        method: 'getstorage',
+        params: [hash, key],
+      })
+      .then(value => ({ hash, key, value }));
   }
 
   getUnspentOutput(input: InputJSON): Promise<?OutputJSON> {

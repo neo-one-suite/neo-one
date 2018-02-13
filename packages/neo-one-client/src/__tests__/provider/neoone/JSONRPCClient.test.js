@@ -54,7 +54,8 @@ describe('JSONRPCClient', () => {
     },
     {
       method: 'getStorageItem',
-      args: [keys[0].scriptHash, Buffer.from('123', 'hex')],
+      args: [keys[0].scriptHash, '123'],
+      result: { hash: keys[0].scriptHash, key: '123', value: expected },
     },
     {
       method: 'getUnspentOutput',

@@ -24,17 +24,22 @@ const ONE = new BN(1);
 const NEGATIVE_ONE = new BN(-1);
 const ONE_HUNDRED_MILLION = new BN(100000000);
 
+const fromSignedBuffer = (value: Buffer): BN =>
+  value.length === 0 ? ZERO : new BN(value, 'le').fromTwos(value.length * 8);
+
 const toSignedBuffer = (value: BN): Buffer => {
   const buff = value.toArrayLike(Buffer, 'le');
   if (value.isNeg()) {
     return buff;
   }
 
-  return value.toArrayLike(Buffer, 'le', buff.length + 1);
-};
+  const normalValue = fromSignedBuffer(buff);
 
-const fromSignedBuffer = (value: Buffer): BN =>
-  value.length === 0 ? ZERO : new BN(value, 'le').fromTwos(value.length * 8);
+  const paddedBuff = value.toArrayLike(Buffer, 'le', buff.length + 1);
+  const paddedValue = fromSignedBuffer(paddedBuff);
+
+  return normalValue.eq(paddedValue) ? buff : paddedBuff;
+};
 
 // TODO: This might be incorrect with the shenanigans we're doing above
 const not = (value: BN): BN => value.notn(value.bitLength());

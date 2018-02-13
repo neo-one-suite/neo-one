@@ -54,7 +54,8 @@
     "docker:windows:build": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/build-windowsservercore:ltsc2016 -f Dockerfile.build && eval $(docker-machine env -unset) && popd",
     "docker:windows:test": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/test-windowsservercore:ltsc2016 -f Dockerfile.test && eval $(docker-machine env -unset) && popd",
     "docker:linux:build": "pushd ./scripts/docker/linux && eval $(docker-machine env -unset) && docker build . -t neo-one/build-linux:8.9.3 -f Dockerfile.build && popd",
-    "docker:linux:test": "pushd ./scripts/docker/linux && eval $(docker-machine env -unset) && docker build . -t neo-one/test-linux:8.9.3 -f Dockerfile.test && popd"
+    "docker:linux:test": "pushd ./scripts/docker/linux && eval $(docker-machine env -unset) && docker build . -t neo-one/test-linux:8.9.3 -f Dockerfile.test && popd",
+    "verify-storage": "babel-node ./scripts/verify/storage.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.39",
