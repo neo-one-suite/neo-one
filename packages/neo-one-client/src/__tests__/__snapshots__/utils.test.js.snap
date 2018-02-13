@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`utils getInvokeMethodInvocationScript 1`] = `"00c1066d6574686f64"`;
+
+exports[`utils getInvokeMethodScript 1`] = `"00c1066d6574686f6467cef0c0fdcfe7838eff6ff104f9cdec2922297537"`;
