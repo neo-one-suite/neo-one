@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`syscalls Neo.Runtime.CheckWitness 1`] = `Array []`;
+
+exports[`syscalls Neo.Runtime.CheckWitness 2`] = `Array []`;
+
+exports[`syscalls Neo.Runtime.GetTime 1`] = `Array []`;
+
+exports[`syscalls Neo.Runtime.GetTrigger 1`] = `Array []`;
+
+exports[`syscalls Neo.Runtime.Log 1`] = `
+Array [
+  Array [
+    LogAction {
+      "blockHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "blockIndex": -1,
+      "index": 0,
+      "message": "foo",
+      "scriptHash": "720f6e0afa42c0ba6b0a7a414ef94b10ac966c78",
+      "serializeWire": [Function],
+      "transactionHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "transactionIndex": -1,
+      "type": 0,
+      "version": 0,
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Runtime.Notify 1`] = `
+Array [
+  Array [
+    NotificationAction {
+      "args": Array [
+        Object {
+          "__$type": "IntegerContractParameter",
+          "type": 2,
+          "value": "1",
+        },
+      ],
+      "blockHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "blockIndex": -1,
+      "index": 0,
+      "scriptHash": "20bdad340ffefc952c253989bb24ca0de4857a36",
+      "serializeWire": [Function],
+      "transactionHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "transactionIndex": -1,
+      "type": 1,
+      "version": 0,
+    },
+  ],
+]
+`;

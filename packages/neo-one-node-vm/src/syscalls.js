@@ -166,10 +166,10 @@ const checkWitness = async ({
     return true;
   }
 
-  let scriptHashesForVerifiying;
+  let scriptHashesForVerifying;
   switch (scriptContainer.type) {
     case 0x00:
-      scriptHashesForVerifiying = await scriptContainer.value.getScriptHashesForVerifying(
+      scriptHashesForVerifying = await scriptContainer.value.getScriptHashesForVerifying(
         {
           getOutput: context.blockchain.output.get,
           getAsset: context.blockchain.asset.get,
@@ -177,14 +177,14 @@ const checkWitness = async ({
       );
       break;
     case 0x01:
-      scriptHashesForVerifiying = await scriptContainer.value.getScriptHashesForVerifying(
+      scriptHashesForVerifying = await scriptContainer.value.getScriptHashesForVerifying(
         {
           getHeader: context.blockchain.header.get,
         },
       );
       break;
     case 0x02:
-      scriptHashesForVerifiying = await scriptContainer.value.getScriptHashesForVerifying(
+      scriptHashesForVerifying = await scriptContainer.value.getScriptHashesForVerifying(
         {
           getValidators: () => context.blockchain.getValidators([]),
           currentBlockHash: () => context.blockchain.currentBlock.hash,
@@ -196,7 +196,7 @@ const checkWitness = async ({
       (scriptContainer.type: empty);
       throw new InvalidScriptContainerTypeError(scriptContainer.type);
   }
-  return scriptHashesForVerifiying.has(common.uInt160ToHex(hash));
+  return scriptHashesForVerifying.has(common.uInt160ToHex(hash));
 };
 
 const checkWitnessPublicKey = ({
@@ -297,13 +297,13 @@ function getContractFee<T>(
     const contractProperties = assertContractPropertyState(
       contextIn.stack[3].asBigInteger().toNumber(),
     );
-    let fee = FEES.ONE_HUNDRED;
+    let fee = common.ONE_HUNDRED_FIXED8;
 
     if (HAS_STORAGE.has(contractProperties)) {
-      fee = fee.add(FEES.FOUR_HUNDRED);
+      fee = fee.add(common.FOUR_HUNDRED_FIXED8);
     }
     if (HAS_DYNAMIC_INVOKE.has(contractProperties)) {
-      fee = fee.add(FEES.FIVE_HUNDRED);
+      fee = fee.add(common.FIVE_HUNDRED_FIXED8);
     }
 
     return func(args, fee);
@@ -1001,6 +1001,7 @@ export const SYSCALLS = {
     name: 'Neo.Storage.Get',
     in: 2,
     out: 1,
+    fee: FEES.ONE_HUNDRED,
     invoke: async ({ context, args }: OpInvokeArgs) => {
       const hash = vmUtils.toStorageContext(context, args[0]).value;
       await checkStorage({ context, hash });

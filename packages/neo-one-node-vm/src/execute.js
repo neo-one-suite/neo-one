@@ -226,7 +226,7 @@ const run = async ({
   return context;
 };
 
-const executeScript = ({
+export const executeScript = ({
   code,
   pushOnly,
   blockchain,
