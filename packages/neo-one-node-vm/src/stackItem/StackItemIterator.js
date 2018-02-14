@@ -8,11 +8,13 @@ export default class StackItemIterator implements Equatable {
   iterator: AsyncIterator<StorageItem>;
   current: ?StorageItem;
   done: boolean;
+  first: boolean;
 
   constructor(iterator: AsyncIterator<StorageItem>) {
     this.iterator = iterator;
     this.current = null;
     this.done = false;
+    this.first = true;
   }
 
   equals(other: mixed): boolean {
@@ -20,13 +22,19 @@ export default class StackItemIterator implements Equatable {
   }
 
   async next(): Promise<boolean> {
+    const { first } = this;
+    this.first = false;
     if (!this.done) {
       const result = await this.iterator.next();
       this.current = result.done ? null : result.value;
       this.done = result.done;
+      if (first && this.done) {
+        return false;
+      }
+      return true;
     }
 
-    return this.done;
+    return false;
   }
 
   key(): BufferStackItem {

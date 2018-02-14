@@ -249,6 +249,7 @@ const FOUR_HUNDRED_FIXED8 = fixed8FromDecimal(400);
 const FIVE_HUNDRED_FIXED8 = fixed8FromDecimal(500);
 const ONE_THOUSAND_FIXED8 = fixed8FromDecimal(1000);
 const FIVE_THOUSAND_FIXED8 = fixed8FromDecimal(5000);
+const ONE_HUNDRED_MILLION_FIXED8 = fixed8FromDecimal(100000000);
 
 export default {
   D8,
@@ -269,6 +270,7 @@ export default {
   FIVE_HUNDRED_FIXED8,
   ONE_THOUSAND_FIXED8,
   FIVE_THOUSAND_FIXED8,
+  ONE_HUNDRED_MILLION_FIXED8,
   NEO_ASSET_HASH:
     '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b',
   GAS_ASSET_HASH:

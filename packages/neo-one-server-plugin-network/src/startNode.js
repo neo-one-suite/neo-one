@@ -20,6 +20,7 @@ export default ({
       '-c, --chain <chain>',
       'Path of a chain.acc file to bootstrap the node',
     )
+    .option('-d --dump <dump>', 'Path to dump a chain.acc file to')
     .action(async args => {
       const { dataPath, options: cliOptions } = args;
 
@@ -45,11 +46,18 @@ export default ({
       if (cliOptions.chain != null) {
         chainFile = cliOptions.chain;
       }
+
+      let dumpChainFile;
+      if (cliOptions.dump != null) {
+        dumpChainFile = cliOptions.dump;
+      }
+
       const node = await createFullNode({
         dataPath,
         nodeConfig,
         log,
         chainFile,
+        dumpChainFile,
         onError: error => {
           log({ event: 'UNCAUGHT_NODE_ERROR', error });
           shutdown({ exitCode: 1, error });

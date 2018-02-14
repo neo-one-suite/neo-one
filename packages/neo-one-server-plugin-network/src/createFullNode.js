@@ -14,12 +14,14 @@ export default async ({
   nodeConfig,
   log,
   chainFile,
+  dumpChainFile,
   onError,
 }: {|
   dataPath: string,
   nodeConfig: Config<NEOONENodeConfig>,
   log: Log,
   chainFile?: string,
+  dumpChainFile?: string,
   onError?: (error: Error) => void,
 |}) => {
   const storagePath = path.resolve(dataPath, 'chain');
@@ -67,6 +69,7 @@ export default async ({
         distinct(),
       ),
       chainFile,
+      dumpChainFile,
     },
     onError,
   );

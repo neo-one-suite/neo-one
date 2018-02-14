@@ -23,6 +23,7 @@ const ZERO = new BN(0);
 const ONE = new BN(1);
 const NEGATIVE_ONE = new BN(-1);
 const ONE_HUNDRED_MILLION = new BN(100000000);
+const ONE_THOUSAND_TWENTY_FOUR = new BN(1024);
 
 const fromSignedBuffer = (value: Buffer): BN =>
   value.length === 0 ? ZERO : new BN(value, 'le').fromTwos(value.length * 8);
@@ -164,6 +165,7 @@ export default {
   UINT_MAX_NUMBER,
   UINT_MAX,
   ONE_HUNDRED_MILLION,
+  ONE_THOUSAND_TWENTY_FOUR,
   EIGHT: new BN(8),
   TEN: new BN(10),
   SIXTEEN: new BN(16),

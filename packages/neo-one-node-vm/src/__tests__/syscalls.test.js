@@ -1,21 +1,33 @@
 /* @flow */
+/* eslint-disable no-param-reassign */
 import { NULL_ACTION, TRIGGER_TYPE } from '@neo-one/node-core';
 import {
   type Param,
   type SysCallName,
   ATTRIBUTE_USAGE,
   SCRIPT_CONTAINER_TYPE,
+  BinaryWriter,
+  InvocationTransaction,
   UInt160Attribute,
   ScriptBuilder,
-  utils,
+  common,
+  crypto,
 } from '@neo-one/client-core';
 import BN from 'bn.js';
+import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
+
+import { utils as commonUtils } from '@neo-one/utils';
 
 import { FEES } from '../constants';
 import {
+  STACK_ITEM_TYPE,
   type StackItem,
+  BufferStackItem,
   BooleanStackItem,
   IntegerStackItem,
+  StorageContextStackItem,
+  TransactionStackItem,
+  UInt160StackItem,
 } from '../stackItem';
 
 import { executeScript } from '../execute';
@@ -25,12 +37,27 @@ const triggerType = TRIGGER_TYPE.APPLICATION;
 const scriptAttributeHash = keys[0].scriptHash;
 const blockTime = Date.now();
 
+type Call = {|
+  name: SysCallName,
+  // eslint-disable-next-line
+  args?: Array<Arg>,
+|};
+type Calls = {|
+  type: 'calls',
+  calls: Array<Call>,
+|};
+type Arg = ?Param | Calls;
 type TestCase = {|
   name: SysCallName,
-  result: Array<StackItem>,
+  result:
+    | Array<StackItem>
+    | ((options: {| transaction: InvocationTransaction |}) =>
+        | Array<StackItem>
+        | ((result: any) => void)),
   gas: BN,
-  args?: Array<?Param>,
+  args?: Array<Arg>,
   actionIndex?: number,
+  mock?: (options: {| blockchain: any |}) => void,
 |};
 
 const SYSCALLS = ([
@@ -55,6 +82,9 @@ const SYSCALLS = ([
     name: 'Neo.Runtime.Notify',
     result: [],
     args: [[true]],
+    mock: ({ blockchain }) => {
+      blockchain.action.add = jest.fn(() => Promise.resolve());
+    },
     gas: FEES.ONE,
     actionIndex: 1,
   },
@@ -62,6 +92,9 @@ const SYSCALLS = ([
     name: 'Neo.Runtime.Log',
     result: [],
     args: ['foo'],
+    mock: ({ blockchain }) => {
+      blockchain.action.add = jest.fn(() => Promise.resolve());
+    },
     gas: FEES.ONE,
     actionIndex: 1,
   },
@@ -70,12 +103,30 @@ const SYSCALLS = ([
     result: [new IntegerStackItem(new BN(blockTime))],
     gas: FEES.ONE,
   },
-  // {
-  //   name: 'Neo.Runtime.Serialize',
-  // },
-  // {
-  //   name: 'Neo.Runtime.Deserialize',
-  // },
+  {
+    name: 'Neo.Runtime.Serialize',
+    result: [
+      new BufferStackItem(
+        new BinaryWriter()
+          .writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY)
+          .writeVarBytesLE(Buffer.alloc(10, 1))
+          .toBuffer(),
+      ),
+    ],
+    args: [Buffer.alloc(10, 1)],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Runtime.Deserialize',
+    result: [new BufferStackItem(Buffer.alloc(10, 1))],
+    args: [
+      new BinaryWriter()
+        .writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY)
+        .writeVarBytesLE(Buffer.alloc(10, 1))
+        .toBuffer(),
+    ],
+    gas: FEES.ONE,
+  },
   // {
   //   name: 'Neo.Blockchain.GetHeight',
   // },
@@ -214,18 +265,99 @@ const SYSCALLS = ([
   // {
   //   name: 'Neo.Contract.GetScript',
   // },
-  // {
-  //   name: 'Neo.Storage.GetContext',
-  // },
-  // {
-  //   name: 'Neo.Storage.Get',
-  // },
-  // {
-  //   name: 'Neo.Storage.Find',
-  // },
-  // {
-  //   name: 'Neo.Iterator.Next',
-  // },
+  {
+    name: 'Neo.Storage.GetContext',
+    result: ({ transaction }) => [
+      new StorageContextStackItem(crypto.toScriptHash(transaction.script)),
+    ],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Storage.Get',
+    result: [new BufferStackItem(Buffer.alloc(10, 1))],
+    args: [
+      { type: 'calls', calls: [{ name: 'Neo.Storage.GetContext' }] },
+      Buffer.alloc(1, 1),
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.tryGet = jest.fn(() =>
+        Promise.resolve({ value: Buffer.alloc(10, 1) }),
+      );
+    },
+    gas: FEES.ONE_HUNDRED,
+  },
+  {
+    name: 'Neo.Storage.Find',
+    result: () => result => {
+      expect(result).toMatchSnapshot();
+    },
+    args: [
+      { type: 'calls', calls: [{ name: 'Neo.Storage.GetContext' }] },
+      Buffer.alloc(1, 1),
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of([]));
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Iterator.Next',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Storage.Find',
+            args: [
+              { type: 'calls', calls: [{ name: 'Neo.Storage.GetContext' }] },
+              Buffer.alloc(1, 1),
+            ],
+          },
+        ],
+      },
+    ],
+    result: [new BooleanStackItem(true)],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.getAll = jest.fn(() =>
+        AsyncIterableX.of(Buffer.alloc(1, 1), Buffer.alloc(1, 2)),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Iterator.Next',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Storage.Find',
+            args: [
+              { type: 'calls', calls: [{ name: 'Neo.Storage.GetContext' }] },
+              Buffer.alloc(1, 1),
+            ],
+          },
+        ],
+      },
+    ],
+    result: [new BooleanStackItem(false)],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of());
+    },
+    gas: FEES.ONE,
+  },
   // {
   //   name: 'Neo.Iterator.Key',
   // },
@@ -256,29 +388,179 @@ const SYSCALLS = ([
   // {
   //   name: 'Neo.Contract.Destroy',
   // },
-  // {
-  //   name: 'Neo.Storage.Put',
-  // },
-  // {
-  //   name: 'Neo.Storage.Delete',
-  // },
-  // {
-  //   name: 'System.ExecutionEngine.GetScriptContainer',
-  // },
-  // {
-  //   name: 'System.ExecutionEngine.GetExecutingScriptHash',
-  // },
-  // {
-  //   name: 'System.ExecutionEngine.GetCallingScriptHash',
-  // },
-  // {
-  //   name: 'System.ExecutionEngine.GetEntryScriptHash',
-  // },
+  {
+    name: 'Neo.Storage.Put',
+    result: [],
+    args: [
+      {
+        type: 'calls',
+        calls: [{ name: 'Neo.Storage.GetContext' }],
+      },
+      Buffer.alloc(0, 0),
+      Buffer.alloc(0, 0),
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.add = jest.fn(() => Promise.resolve());
+    },
+    gas: FEES.ONE_THOUSAND,
+  },
+  {
+    name: 'Neo.Storage.Put',
+    result: [],
+    args: [
+      {
+        type: 'calls',
+        calls: [{ name: 'Neo.Storage.GetContext' }],
+      },
+      Buffer.alloc(1024, 0),
+      Buffer.alloc(0, 0),
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.add = jest.fn(() => Promise.resolve());
+    },
+    gas: FEES.ONE_THOUSAND,
+  },
+  {
+    name: 'Neo.Storage.Put',
+    result: [],
+    args: [
+      {
+        type: 'calls',
+        calls: [{ name: 'Neo.Storage.GetContext' }],
+      },
+      Buffer.alloc(1025, 0),
+      Buffer.alloc(0, 0),
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.add = jest.fn(() => Promise.resolve());
+    },
+    gas: FEES.ONE_THOUSAND.mul(new BN(2)),
+  },
+  {
+    name: 'Neo.Storage.Put',
+    result: [],
+    args: [
+      {
+        type: 'calls',
+        calls: [{ name: 'Neo.Storage.GetContext' }],
+      },
+      Buffer.alloc(0, 0),
+      Buffer.alloc(1024, 0),
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.add = jest.fn(() => Promise.resolve());
+    },
+    gas: FEES.ONE_THOUSAND,
+  },
+  {
+    name: 'Neo.Storage.Put',
+    result: [],
+    args: [
+      {
+        type: 'calls',
+        calls: [{ name: 'Neo.Storage.GetContext' }],
+      },
+      Buffer.alloc(0, 0),
+      Buffer.alloc(1025, 0),
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.add = jest.fn(() => Promise.resolve());
+    },
+    gas: FEES.ONE_THOUSAND.mul(new BN(2)),
+  },
+  {
+    name: 'Neo.Storage.Delete',
+    result: [],
+    args: [
+      {
+        type: 'calls',
+        calls: [{ name: 'Neo.Storage.GetContext' }],
+      },
+      Buffer.alloc(0, 0),
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.delete = jest.fn(() => Promise.resolve());
+    },
+    gas: FEES.ONE_HUNDRED,
+  },
+  {
+    name: 'System.ExecutionEngine.GetScriptContainer',
+    result: ({ transaction }) => [new TransactionStackItem(transaction)],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'System.ExecutionEngine.GetExecutingScriptHash',
+    result: ({ transaction }) => [
+      new UInt160StackItem(crypto.toScriptHash(transaction.script)),
+    ],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'System.ExecutionEngine.GetCallingScriptHash',
+    result: [new BufferStackItem(Buffer.alloc(0, 0))],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'System.ExecutionEngine.GetEntryScriptHash',
+    result: ({ transaction }) => [
+      new UInt160StackItem(crypto.toScriptHash(transaction.script)),
+    ],
+    gas: FEES.ONE,
+  },
 ]: Array<TestCase>);
+
+const handleCall = (sb: ScriptBuilder, call: Call) => {
+  if (call.args != null) {
+    // eslint-disable-next-line
+    handleArgs(sb, call.args);
+  }
+  sb.emitSysCall(call.name);
+};
+
+const handleArgs = (sb: ScriptBuilder, args: Array<Arg>) => {
+  for (let i = args.length - 1; i >= 0; i -= 1) {
+    const arg = args[i];
+    if (
+      arg != null &&
+      typeof arg === 'object' &&
+      arg.type === 'calls' &&
+      arg.calls != null
+    ) {
+      ((arg.calls: $FlowFixMe): Array<Call>).forEach(call => {
+        handleCall(sb, call);
+      });
+    } else {
+      sb.emitPushParam((arg: $FlowFixMe));
+    }
+  }
+};
 
 describe('syscalls', () => {
   for (const testCase of SYSCALLS) {
-    const { name, result, gas, args = [], actionIndex = 0 } = testCase;
+    const { name, result, gas, args = [], actionIndex = 0, mock } = testCase;
     // eslint-disable-next-line
     it(name, async () => {
       const sb = new ScriptBuilder();
@@ -293,11 +575,12 @@ describe('syscalls', () => {
         ],
       });
       const blockchain = {
+        contract: {},
         output: {},
         asset: {},
-        action: {
-          add: jest.fn(() => {}),
-        },
+        action: {},
+        storageItem: {},
+        settings: {},
       };
       const block = { timestamp: blockTime };
       const init = {
@@ -311,12 +594,17 @@ describe('syscalls', () => {
         skipWitnessVerify: false,
         persistingBlock: (block: $FlowFixMe),
       };
-      const gasLeft = utils.ONE_HUNDRED_MILLION;
+      const gasLeft = common.ONE_HUNDRED_MILLION_FIXED8;
       let stack = [];
+
+      if (mock != null) {
+        mock({ blockchain });
+      }
 
       if (args.length) {
         const argsSB = new ScriptBuilder();
-        argsSB.emitPushParams(...args);
+        handleArgs(argsSB, args);
+
         const argsContext = await executeScript({
           code: argsSB.build(),
           blockchain: (blockchain: $FlowFixMe),
@@ -324,6 +612,7 @@ describe('syscalls', () => {
           gasLeft,
         });
         ({ stack } = argsContext);
+        expect(argsContext.errorMessage).toBeUndefined();
       }
 
       const context = await executeScript({
@@ -335,12 +624,29 @@ describe('syscalls', () => {
       });
 
       expect(context.errorMessage).toBeUndefined();
-      expect(context.stack).toEqual(result);
+      if (Array.isArray(result)) {
+        expect(context.stack).toEqual(result);
+      } else {
+        const expectedResult = result({ transaction });
+        if (Array.isArray(expectedResult)) {
+          expect(context.stack).toEqual(expectedResult);
+        } else {
+          expectedResult(result);
+        }
+      }
       expect(context.actionIndex).toEqual(actionIndex);
       expect(gasLeft.sub(context.gasLeft).toString(10)).toEqual(
         gas.toString(10),
       );
-      expect(blockchain.action.add.mock.calls).toMatchSnapshot();
+      commonUtils.values(blockchain).forEach(obj => {
+        if (typeof obj === 'object') {
+          commonUtils.values(obj).forEach(maybeMock => {
+            if (maybeMock != null && maybeMock.mock != null) {
+              expect(maybeMock.mock.calls).toMatchSnapshot();
+            }
+          });
+        }
+      });
     });
   }
 });

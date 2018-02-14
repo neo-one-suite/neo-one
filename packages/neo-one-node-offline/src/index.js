@@ -195,13 +195,14 @@ const writeOut = async (
     const blocks = await Promise.all(
       chunk.map(index => blockchain.block.get({ hashOrIndex: index })),
     );
-    // eslint-disable-next-line
-    blocks.forEach(block => {
+    for (const block of blocks) {
       const buffer = block.serializeWire();
       const length = Buffer.alloc(4, 0);
       length.writeInt32LE(buffer.length, 0);
-      out.write(length);
-      out.write(buffer);
+      // eslint-disable-next-line
+      await new Promise(resolve => out.write(length, () => resolve()));
+      // eslint-disable-next-line
+      await new Promise(resolve => out.write(buffer, () => resolve()));
       processed += 1;
       if (processed >= 100000) {
         // eslint-disable-next-line
@@ -211,7 +212,7 @@ const writeOut = async (
         processed = 0;
         start = Date.now();
       }
-    });
+    }
   }
   out.end();
 };

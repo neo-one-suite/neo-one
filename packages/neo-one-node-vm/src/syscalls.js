@@ -29,7 +29,6 @@ import {
 } from '@neo-one/client-core';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 
-import { map as asyncMap } from 'ix/asynciterable/pipe/index';
 import { concatMap, map, toArray } from 'rxjs/operators';
 import { defer } from 'rxjs/observable/defer';
 
@@ -50,6 +49,7 @@ import {
   InputStackItem,
   IteratorStackItem,
   OutputStackItem,
+  StackItemIterator,
   StorageContextStackItem,
   TransactionStackItem,
   UInt160StackItem,
@@ -1033,9 +1033,9 @@ export const SYSCALLS = {
         context,
         results: [
           new IteratorStackItem(
-            (iterable.pipe(
-              asyncMap(item => new BufferStackItem(item)),
-            ): $FlowFixMe)[(Symbol: $FlowFixMe).asyncIterator](),
+            new StackItemIterator(
+              (iterable: $FlowFixMe)[(Symbol: $FlowFixMe).asyncIterator](),
+            ),
           ),
         ],
       };
@@ -1337,12 +1337,15 @@ export const SYSCALLS = {
         3,
       );
     }
-    const ratio =
-      (keyIn.asBuffer().length + valueIn.asBuffer().length - 1) / 1024 + 1;
+    const ratio = new BN(keyIn.asBuffer().length)
+      .add(new BN(valueIn.asBuffer().length))
+      .sub(utils.ONE)
+      .div(utils.ONE_THOUSAND_TWENTY_FOUR)
+      .add(utils.ONE);
     return createSysCall({
       name: 'Neo.Storage.Put',
       in: 3,
-      fee: FEES.ONE_THOUSAND.mul(new BN(ratio)),
+      fee: FEES.ONE_THOUSAND.mul(ratio),
       invoke: async ({ context, args }: OpInvokeArgs) => {
         const hash = vmUtils.toStorageContext(context, args[0]).value;
         await checkStorage({ context, hash });

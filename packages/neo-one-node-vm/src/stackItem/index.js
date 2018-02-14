@@ -23,7 +23,10 @@ export { default as ValidatorStackItem } from './ValidatorStackItem';
 export { default as StorageContextStackItem } from './StorageContextStackItem';
 export { default as ECPointStackItem } from './ECPointStackItem';
 export { default as StructStackItem } from './StructStackItem';
+export { default as StackItemIterator } from './StackItemIterator';
 
 export { default as deserializeStackItem } from './deserializeStackItem';
 
 export type { StackItem } from './StackItem';
+
+export * from './StackItemType';

@@ -6,7 +6,9 @@ import { toArray } from 'ix/asynciterable/toarray';
 import { utils } from '@neo-one/client-core';
 
 // const oneRPCURL = 'https://neotracker.io/rpc';
+// const waitMS = 65000
 const oneRPCURL = 'http://localhost:40200/rpc';
+const waitMS = 1000;
 const testRPCURL = 'http://seed2.neo.org:10332';
 
 const hashes = [
@@ -53,11 +55,7 @@ const isEqual = (item: any, testItem: any) => {
 
   const { value } = item;
   const { value: testValue } = testItem;
-  if (value === testValue) {
-    return true;
-  }
-
-  return convertNumber(value) === convertNumber(testValue);
+  return value === testValue;
 };
 
 const reverse = (value: string) => {
@@ -73,21 +71,7 @@ const reverse = (value: string) => {
   return result;
 };
 
-const logItem = async (item: any) => {
-  // eslint-disable-next-line
-  console.log(JSON.stringify(item, null, 2));
-  try {
-    // eslint-disable-next-line
-    console.log(scriptHashToAddress(`0x${reverse(item.key)}`));
-  } catch (error) {
-    try {
-      // eslint-disable-next-line
-      console.log(Buffer.from(item.key, 'hex').toString('utf8'));
-    } catch (err) {
-      // eslint-disable-line
-    }
-  }
-
+const logItem = (item: any) => {
   try {
     // eslint-disable-next-line
     console.log(convertNumber(item.value));
@@ -108,7 +92,7 @@ const getStorage = async (provider: any, item: any): Promise<any> => {
       error = err;
       tries -= 1;
       // eslint-disable-next-line
-      await new Promise(resolve => setTimeout(() => resolve(), 65000));
+      await new Promise(resolve => setTimeout(() => resolve(), waitMS));
     }
   }
 
@@ -132,20 +116,29 @@ const verifyStorage = async (hash: string): Promise<void> => {
         ]);
       }
 
-      if (isEqual(currentItem, testItem)) {
-        return null;
+      if (!isEqual(currentItem, testItem)) {
+        // eslint-disable-next-line
+        console.log('NOT EQUAL:');
+        // eslint-disable-next-line
+        console.log(currentItem.hash);
+        // eslint-disable-next-line
+        console.log(currentItem.key);
+        try {
+          // eslint-disable-next-line
+          console.log(scriptHashToAddress(`0x${reverse(currentItem.key)}`));
+        } catch (error) {
+          try {
+            // eslint-disable-next-line
+            console.log(Buffer.from(currentItem.key, 'hex').toString('utf8'));
+          } catch (err) {
+            // eslint-disable-line
+          }
+        }
+        logItem(currentItem);
+        logItem(testItem);
+        // eslint-disable-next-line
+        console.log('\n');
       }
-
-      // eslint-disable-next-line
-      console.log('NOT EQUAL:');
-      // eslint-disable-next-line
-      await logItem(currentItem);
-      // eslint-disable-next-line
-      await logItem(testItem);
-      // eslint-disable-next-line
-      console.log('\n');
-
-      return null;
     }),
   );
 };
@@ -154,9 +147,10 @@ const test = async () => {
   for (const hash of hashes) {
     // eslint-disable-next-line
     console.log(`Testing ${hash}`);
-
     // eslint-disable-next-line
     await verifyStorage(hash);
+    // eslint-disable-next-line
+    console.log(`Done testing ${hash}`);
   }
 };
 

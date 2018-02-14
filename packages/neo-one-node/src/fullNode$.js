@@ -30,7 +30,7 @@ import { defer } from 'rxjs/observable/defer';
 import { concatMap, distinct, map, switchMap, take } from 'rxjs/operators';
 import { concat } from 'rxjs/observable/concat';
 import cron from 'node-cron';
-import { loadChain } from '@neo-one/node-offline';
+import { dumpChain, loadChain } from '@neo-one/node-offline';
 import { timer } from 'rxjs/observable/timer';
 import leveldown from 'leveldown';
 import levelup from 'levelup';
@@ -85,6 +85,7 @@ export type FullNodeOptions = {|
   environment: Environment,
   options$: Observable<Options>,
   chainFile?: string,
+  dumpChainFile?: string,
 |};
 
 export default ({
@@ -95,6 +96,7 @@ export default ({
   environment,
   options$,
   chainFile,
+  dumpChainFile,
 }: FullNodeOptions): Observable<*> => {
   const createLogForContext = createLogForContextIn || (() => log);
   const createProfile = createProfileIn || createProfileDefault;
@@ -137,6 +139,13 @@ export default ({
     if (chainFile != null) {
       await loadChain({
         chain: { format: 'raw', path: chainFile },
+        blockchain,
+      });
+    }
+
+    if (dumpChainFile != null) {
+      await dumpChain({
+        path: dumpChainFile,
         blockchain,
       });
     }
