@@ -3,7 +3,7 @@
   "version": "1.0.0-alpha.5",
   "private": true,
   "dependencies": {
-    "@babel/polyfill": "^7.0.0-beta.39",
+    "@babel/polyfill": "^7.0.0-beta.40",
     "@neo-one/client": "^1.0.0-alpha.5",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",

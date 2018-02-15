@@ -34,11 +34,11 @@
     "access": "public"
   },
   "dependencies": {
-    "@google-cloud/storage": "^1.5.2",
+    "@google-cloud/storage": "^1.6.0",
     "@neo-one/utils": "^1.0.0-alpha.3",
     "fs-extra": "^5.0.0",
     "leveldown": "^3.0.0",
-    "levelup": "^2.0.1",
+    "levelup": "^2.0.2",
     "megajs": "^0.13.2",
     "rxjs": "^5.5.6",
     "stream-throttle": "^0.1.3",
