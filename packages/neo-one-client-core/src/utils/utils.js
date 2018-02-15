@@ -42,7 +42,6 @@ const toSignedBuffer = (value: BN): Buffer => {
   return normalValue.eq(paddedValue) ? buff : paddedBuff;
 };
 
-// TODO: This might be incorrect with the shenanigans we're doing above
 const not = (value: BN): BN => value.notn(value.bitLength());
 
 const getBoolean = (value: Buffer): boolean => value.some(byte => byte !== 0);

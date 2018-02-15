@@ -110,6 +110,7 @@ const verifyStorage = async (hash: string): Promise<void> => {
         getStorage(testProvider, itemIn),
       ]);
       if (!isEqual(currentItem, testItem)) {
+        await new Promise(resolve => setTimeout(() => resolve(), 5000));
         [currentItem, testItem] = await Promise.all([
           getStorage(oneProvider, itemIn),
           getStorage(testProvider, itemIn),

@@ -226,7 +226,7 @@ const run = async ({
   return context;
 };
 
-export const executeScript = ({
+export const executeScript = async ({
   code,
   pushOnly,
   blockchain,
@@ -303,14 +303,21 @@ export default async ({
   };
 
   let context;
-  let gas = gasIn.add(FREE_GAS);
+  const startingGas = gasIn.add(FREE_GAS);
+  let gas = startingGas;
   let errorMessage;
   try {
     const entryScriptHash = crypto.hash160(scripts[scripts.length - 1].code);
-    for (const [idx, script] of scripts.entries()) {
+    for (
+      let idx = 0;
+      idx < scripts.length &&
+      (context == null || context.state === VM_STATE.HALT);
+      idx += 1
+    ) {
+      const script = scripts[idx];
       // NOTE: scriptHash has a different meaning here, it will be translated
       //       to callingScriptHash within executeScript. executeScript
-      //       automatically hashses the input code to determine the current
+      //       automatically hashes the input code to determine the current
       //       scriptHash.
       const scriptHash =
         idx + 1 < scripts.length ? crypto.hash160(scripts[idx + 1].code) : null;
@@ -357,14 +364,20 @@ export default async ({
       stack: [],
       stackAlt: [],
       gasConsumed: utils.ZERO,
+      errorMessage,
     };
+  }
+
+  let gasConsumed = startingGas.sub(finalContext.gasLeft).sub(FREE_GAS);
+  if (gasConsumed.lt(utils.ZERO)) {
+    gasConsumed = utils.ZERO;
   }
 
   return {
     state: errorMessage == null ? finalContext.state : VM_STATE.FAULT,
     stack: finalContext.stack.map(item => item.toContractParameter()),
     stackAlt: finalContext.stackAlt.map(item => item.toContractParameter()),
-    gasConsumed: gas.sub(finalContext.gasLeft),
+    gasConsumed,
     errorMessage:
       errorMessage == null ? finalContext.errorMessage : errorMessage,
   };

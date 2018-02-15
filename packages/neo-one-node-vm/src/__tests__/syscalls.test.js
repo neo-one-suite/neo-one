@@ -16,8 +16,6 @@ import {
 import BN from 'bn.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 
-import { utils as commonUtils } from '@neo-one/utils';
-
 import { FEES } from '../constants';
 import {
   STACK_ITEM_TYPE,
@@ -31,7 +29,7 @@ import {
 } from '../stackItem';
 
 import { executeScript } from '../execute';
-import { keys, transactions } from '../__data__';
+import { keys, testUtils, transactions } from '../__data__';
 
 const triggerType = TRIGGER_TYPE.APPLICATION;
 const scriptAttributeHash = keys[0].scriptHash;
@@ -638,15 +636,7 @@ describe('syscalls', () => {
       expect(gasLeft.sub(context.gasLeft).toString(10)).toEqual(
         gas.toString(10),
       );
-      commonUtils.values(blockchain).forEach(obj => {
-        if (typeof obj === 'object') {
-          commonUtils.values(obj).forEach(maybeMock => {
-            if (maybeMock != null && maybeMock.mock != null) {
-              expect(maybeMock.mock.calls).toMatchSnapshot();
-            }
-          });
-        }
-      });
+      testUtils.verifyBlockchainSnapshot(blockchain);
     });
   }
 });

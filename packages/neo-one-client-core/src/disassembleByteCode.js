@@ -44,7 +44,8 @@ export default (bytes: Buffer): Array<string> => {
     } else if (
       byte === OPCODE_TO_BYTECODE.JMP ||
       byte === OPCODE_TO_BYTECODE.JMPIF ||
-      byte === OPCODE_TO_BYTECODE.JMPIFNOT
+      byte === OPCODE_TO_BYTECODE.JMPIFNOT ||
+      byte === OPCODE_TO_BYTECODE.CALL
     ) {
       result.push([pc, opCode, `${reader.readInt16LE()}`]);
     } else if (

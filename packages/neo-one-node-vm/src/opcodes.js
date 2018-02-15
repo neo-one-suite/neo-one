@@ -346,7 +346,10 @@ const OPCODE_PAIRS = [
             context: {
               ...resultContext,
               pc: pc + 2,
-              state: VM_STATE.NONE,
+              state:
+                resultContext.state === VM_STATE.FAULT
+                  ? VM_STATE.FAULT
+                  : VM_STATE.NONE,
               depth: context.depth,
             },
           };
