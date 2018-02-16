@@ -9,7 +9,7 @@ import { utils } from '@neo-one/client-core';
 // const waitMS = 65000
 const oneRPCURL = 'http://localhost:40200/rpc';
 const waitMS = 1000;
-const testRPCURL = 'http://seed2.neo.org:10332';
+const testRPCURL = 'http://seed3.cityofzion.io:8080';
 
 const hashes = [
   '0x8a4d2865d01ec8e6add72e3dfdd20c12f44834e3',
