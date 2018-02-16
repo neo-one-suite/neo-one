@@ -56,7 +56,11 @@ describe('execute', () => {
       });
 
       if (state === VM_STATE.FAULT) {
-        expect(result.errorMessage).toMatchSnapshot();
+        const { errorMessage } = result;
+        expect(errorMessage).toBeDefined();
+        if (errorMessage != null) {
+          expect(errorMessage.split('\n')[0]).toMatchSnapshot();
+        }
       } else {
         expect(result.errorMessage).toBeUndefined();
       }
@@ -77,7 +81,7 @@ describe('execute', () => {
     VM_STATE.HALT,
   );
 
-  it('should fail mintTokens transaction', async () => {
+  it('should refund on mintTokens with insufficient presale', async () => {
     blockchain.contract.get = jest.fn(() =>
       Promise.resolve(transactions.kycContract),
     );
