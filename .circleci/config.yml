@@ -51,10 +51,10 @@ jobs:
           command: yarn flow
       - run:
           name: Test
-          command: yarn test
+          command: yarn test-ci
       - run:
           name: E2E
-          command: yarn e2e
+          command: yarn e2e-ci
 
   deploy-website:
     <<: *defaults
