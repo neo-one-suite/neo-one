@@ -229,8 +229,8 @@ export default class LocalKeyStore {
 
     if (
       this.currentAccount != null &&
-      this.currentAccount.network === id.network &&
-      this.currentAccount.address === id.address
+      this.currentAccount.id.network === id.network &&
+      this.currentAccount.id.address === id.address
     ) {
       this._newCurrentAccount();
     }
