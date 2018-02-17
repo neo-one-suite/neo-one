@@ -58,6 +58,7 @@ import type {
   ParamJSON,
   Transaction,
   UnspentOutput,
+  UpdateAccountNameOptions,
   UserAccount,
   UserAccountID,
   UserAccountProvider,
@@ -82,7 +83,9 @@ export type KeyStore = {
   +getCurrentAccount: () => ?UserAccount,
   +accounts$: Observable<Array<UserAccount>>,
   +getAccounts: () => Array<UserAccount>,
-  +selectAccount: (id: UserAccountID) => Promise<void>,
+  +selectAccount: (id?: UserAccountID) => Promise<void>,
+  +deleteAccount: (id: UserAccountID) => Promise<void>,
+  +updateAccountName: (options: UpdateAccountNameOptions) => Promise<void>,
   +sign: (options: {|
     account: UserAccountID,
     message: string,
@@ -481,8 +484,16 @@ export default class LocalUserAccountProvider<
     );
   }
 
-  async selectAccount(account: UserAccountID): Promise<void> {
-    await this.keystore.selectAccount(account);
+  async selectAccount(id?: UserAccountID): Promise<void> {
+    await this.keystore.selectAccount(id);
+  }
+
+  async deleteAccount(id: UserAccountID): Promise<void> {
+    await this.keystore.deleteAccount(id);
+  }
+
+  async updateAccountName(options: UpdateAccountNameOptions): Promise<void> {
+    await this.keystore.updateAccountName(options);
   }
 
   async _getTransactionOptions(

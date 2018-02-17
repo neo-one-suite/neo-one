@@ -1,7 +1,9 @@
 /* @flow */
 import { common, crypto } from '@neo-one/client-core';
 
-import LocalKeyStore from '../../../user/keystore/LocalKeyStore';
+import LocalKeyStore, {
+  type Wallet,
+} from '../../../user/keystore/LocalKeyStore';
 import {
   LockedAccountError,
   PasswordRequiredError,
@@ -24,6 +26,8 @@ describe('LocalKeyStore', () => {
     name: 'name1',
     scriptHash: 'scriptHash1',
     publicKey: 'publicKey1',
+    configurableName: true,
+    deletable: true,
   };
   const account2 = {
     type: 'test',
@@ -31,18 +35,22 @@ describe('LocalKeyStore', () => {
     name: 'name2',
     scriptHash: 'scriptHash2',
     publicKey: 'publicKey2',
+    configurableName: true,
+    deletable: true,
   };
   const wallet1 = {
+    type: 'unlocked',
     account: account1,
     privateKey: 'privateKey1',
     nep2: 'nep21',
   };
   const wallet2 = {
+    type: 'unlocked',
     account: account2,
     privateKey: 'privateKey2',
     nep2: undefined,
   };
-  let wallets = [wallet1];
+  let wallets: Array<Wallet> = [wallet1];
   const store = {
     type: 'test',
     getWallets: () => Promise.resolve(wallets),
@@ -101,8 +109,8 @@ describe('LocalKeyStore', () => {
 
   test('sign locked account', async () => {
     const walletLocked = {
+      type: 'locked',
       account: account1,
-      privateKey: null,
       nep2: wallet1.nep2,
     };
     wallets = [walletLocked];
@@ -146,11 +154,14 @@ describe('LocalKeyStore', () => {
       name: 'addrMain',
       scriptHash: 'scriptHashMain',
       publicKey: 'publicKeyMain',
+      configurableName: true,
+      deletable: true,
     };
     const walletMain = {
       account: accountMain,
-      privateKey: undefined,
+      privateKey: 'privateKeyMain',
       nep2: 'nep2Main',
+      type: 'unlocked',
     };
     // $FlowFixMe
     helpers.privateKeyToPublicKey = jest.fn(() => accountMain.publicKey);
@@ -313,10 +324,12 @@ describe('LocalKeyStore', () => {
       name: 'addrMain',
       scriptHash: 'scriptHashMain',
       publicKey: 'publicKeyMain',
+      configurableName: true,
+      deletable: true,
     };
     const walletMain = {
+      type: 'locked',
       account: accountMain,
-      privateKey: undefined,
       nep2: 'nep2Main',
     };
     wallets = [walletMain];
@@ -326,6 +339,7 @@ describe('LocalKeyStore', () => {
       account: accountMain,
       privateKey,
       nep2: 'nep2Main',
+      type: 'unlocked',
     };
 
     localKeyStore = await new LocalKeyStore({ store });
@@ -344,11 +358,11 @@ describe('LocalKeyStore', () => {
   });
 
   test('unlockWallet throws error on null nep2 & private key', async () => {
-    const walletError = {
+    const walletError = ({
       account: account1,
       privateKey: undefined,
       nep2: undefined,
-    };
+    }: $FlowFixMe);
     wallets = [walletError];
 
     localKeyStore = await new LocalKeyStore({ store });
@@ -365,8 +379,8 @@ describe('LocalKeyStore', () => {
 
   test('lockWallet', () => {
     const walletUpdated = {
+      type: 'locked',
       account: account1,
-      privateKey: null,
       nep2: wallet1.nep2,
     };
     localKeyStore.lockWallet(id1);
@@ -376,8 +390,8 @@ describe('LocalKeyStore', () => {
 
   test('lockWallet - null nep2 or privateKey - already locked', async () => {
     const walletUpdated = {
+      type: 'locked',
       account: account1,
-      privateKey: null,
       nep2: wallet1.nep2,
     };
     wallets = [walletUpdated];

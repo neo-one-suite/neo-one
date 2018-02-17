@@ -1,4 +1,5 @@
 /* @flow */
+/* eslint-disable */
 type JestMockFn<TArguments: $ReadOnlyArray<*>, TReturn> = {
   (...args: TArguments): TReturn,
   /**

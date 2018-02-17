@@ -1,5 +1,8 @@
 /* @flow */
+import { PasswordRequiredError } from '../../errors';
 import type { Wallet as LocalWallet } from './LocalKeyStore';
+
+import * as networks from '../../networks';
 
 type Storage = {|
   setItem: (key: string, value: string) => Promise<void>,
@@ -26,6 +29,15 @@ export default class LocalStringStore {
   }
 
   async saveWallet(wallet: LocalWallet): Promise<void> {
+    let safeWallet = wallet;
+    if (wallet.account.id.network === networks.MAIN) {
+      if (wallet.nep2 == null) {
+        throw new PasswordRequiredError();
+      }
+      safeWallet = { ...wallet };
+      delete safeWallet.privateKey;
+    }
+
     await this.storage.setItem(this._getKey(wallet), JSON.stringify(wallet));
   }
 

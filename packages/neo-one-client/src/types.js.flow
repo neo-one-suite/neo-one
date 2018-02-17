@@ -16,6 +16,8 @@ export type BufferString = string;
 export type Hash160String = string;
 // NEO Hash256 string, e.g. 0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c
 export type Hash256String = string;
+// Hex Buffer, e.g. 02028a99826ed
+export type SignatureString = string;
 
 export type Peer = {|
   address: string,
@@ -210,7 +212,7 @@ export type Contract = {|
   hash: Hash160String,
   script: BufferString,
   parameters: Array<ContractParameterType>,
-  returntype: ContractParameterType,
+  returnType: ContractParameterType,
   name: string,
   codeVersion: string,
   author: string,
@@ -376,7 +378,7 @@ export type Header = {|
   version: number,
   hash: Hash256String,
   previousBlockHash: Hash256String,
-  merkleroot: Hash256String,
+  merkleRoot: Hash256String,
   time: number,
   index: number,
   nonce: string,
@@ -470,6 +472,8 @@ export type UserAccount = {|
   name: string,
   scriptHash: Hash160String,
   publicKey: PublicKeyString,
+  configurableName: boolean,
+  deletable: boolean,
 |};
 
 export type TransactionOptions = {|
@@ -541,6 +545,11 @@ export type BlockFilter = {|
   indexStop?: number,
 |};
 
+export type UpdateAccountNameOptions = {|
+  id: UserAccountID,
+  name: string,
+|};
+
 export interface UserAccountProvider {
   +type: string;
   +currentAccount$: Observable<?UserAccount>;
@@ -551,7 +560,9 @@ export interface UserAccountProvider {
   getAccounts(): Array<UserAccount>;
   getNetworks(): Array<NetworkType>;
 
-  selectAccount(account: UserAccountID): Promise<void>;
+  selectAccount(id?: UserAccountID): Promise<void>;
+  deleteAccount(id: UserAccountID): Promise<void>;
+  updateAccountName(options: UpdateAccountNameOptions): Promise<void>;
 
   transfer(
     transfers: Array<Transfer>,

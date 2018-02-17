@@ -515,8 +515,8 @@ export default class WriteBatchBlockchain {
     transactions: Array<Transaction>,
   ): Promise<void> {
     const done = this._perf.start('WriteBatchBlockchain._persistTransactions');
+    // eslint-disable-next-line
     for (const [idx, transaction] of transactions.entries()) {
-      // eslint-disable-next-line
       await this._persistTransaction(block, transaction, idx);
     }
     done();

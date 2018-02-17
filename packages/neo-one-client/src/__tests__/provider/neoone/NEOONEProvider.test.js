@@ -46,7 +46,6 @@ describe('NEOONEProvider', () => {
 
   test('addNetwork new network', async () => {
     const newNetwork = 'newNet';
-    // $FlowFixMe
     provider.addNetwork({ network: newNetwork, rpcURL: 'rpc' });
 
     const result = await provider.getNetworks();
@@ -54,11 +53,10 @@ describe('NEOONEProvider', () => {
   });
 
   test('addNetwork existing network', async () => {
-    // $FlowFixMe
     provider.addNetwork({ network, rpcURL: 'rpc' });
 
     const result = await provider.getNetworks();
-    expect(result).toEqual([network, 'main', 'test']);
+    expect(result).toEqual(['main', 'test', network]);
   });
 
   test('_getProvider throws error for unknown network', async () => {

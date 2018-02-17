@@ -86,6 +86,10 @@ export default class NEOONEDataProvider implements DataProvider {
     this._iterBlocksFetchTimeoutMS = iterBlocksFetchTimeoutMS;
   }
 
+  setRPCURL(rpcURL: string): void {
+    this._client = new JSONRPCClient(new JSONRPCHTTPProvider(rpcURL));
+  }
+
   async getUnclaimed(
     address: AddressString,
   ): Promise<{| unclaimed: Array<Input>, amount: BigNumber |}> {
@@ -284,7 +288,7 @@ export default class NEOONEDataProvider implements DataProvider {
       version: block.version,
       hash: block.hash,
       previousBlockHash: block.previousblockhash,
-      merkleroot: block.merkleroot,
+      merkleRoot: block.merkleroot,
       time: block.time,
       index: block.index,
       nonce: block.nonce,
@@ -501,7 +505,7 @@ export default class NEOONEDataProvider implements DataProvider {
       hash: contract.hash,
       script: contract.script,
       parameters: contract.parameters,
-      returntype: contract.returntype,
+      returnType: contract.returntype,
       name: contract.name,
       codeVersion: contract.code_version,
       author: contract.author,

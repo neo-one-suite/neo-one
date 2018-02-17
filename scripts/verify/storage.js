@@ -83,15 +83,14 @@ const logItem = (item: any) => {
 const getStorage = async (provider: any, item: any): Promise<any> => {
   let tries = 3;
   let error;
+  // eslint-disable-next-line
   while (tries >= 0) {
     try {
-      // eslint-disable-next-line
       const result = await provider.getStorage(item.hash, item.key);
       return result;
     } catch (err) {
       error = err;
       tries -= 1;
-      // eslint-disable-next-line
       await new Promise(resolve => setTimeout(() => resolve(), waitMS));
     }
   }
@@ -145,10 +144,10 @@ const verifyStorage = async (hash: string): Promise<void> => {
 };
 
 const test = async () => {
+  // eslint-disable-next-line
   for (const hash of hashes) {
     // eslint-disable-next-line
     console.log(`Testing ${hash}`);
-    // eslint-disable-next-line
     await verifyStorage(hash);
     // eslint-disable-next-line
     console.log(`Done testing ${hash}`);

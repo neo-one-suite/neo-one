@@ -32,15 +32,13 @@ export default class NEOONEProvider {
 
   _providers: { [type: string]: NEOONEDataProvider };
 
-  constructor({
-    mainRPCURL: mainRPCURLIn,
-    testRPCURL: testRPCURLIn,
-    options,
-  }: {|
+  constructor(input?: {|
     mainRPCURL?: string,
     testRPCURL?: string,
     options?: Array<ProviderOptions>,
   |}) {
+    const { mainRPCURL: mainRPCURLIn, testRPCURL: testRPCURLIn, options } =
+      input || {};
     this._networks$ = new BehaviorSubject([]);
     this.networks$ = this._networks$;
     this._providers = {};
@@ -98,12 +96,10 @@ export default class NEOONEProvider {
     network: NetworkType,
     rpcURL: string,
   |}): void {
-    if (!this._networks$.value.some(net => network === net)) {
-      this._providers[network] = new NEOONEDataProvider({ network, rpcURL });
-      const networks = [...this._networks$.value];
-      networks.push(network);
-      this._networks$.next(networks);
-    }
+    this._providers[network] = new NEOONEDataProvider({ network, rpcURL });
+    const networks = this._networks$.value.filter(net => network !== net);
+    networks.push(network);
+    this._networks$.next(networks);
   }
 
   getUnclaimed(

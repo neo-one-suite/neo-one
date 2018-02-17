@@ -98,8 +98,8 @@ const getStream = (chain: Chain): Readable => {
 
 const getCount = async (stream: Readable): Promise<number> => {
   let count = stream.read(4);
+  // eslint-disable-next-line
   while (count == null) {
-    // eslint-disable-next-line
     await new Promise(resolve => setTimeout(() => resolve(), 250));
     count = stream.read(4);
   }
@@ -190,18 +190,17 @@ const writeOut = async (
 ): Promise<void> => {
   let processed = 0;
   let start = Date.now();
+  // eslint-disable-next-line
   for (const chunk of _.chunk(_.range(0, height), 10000)) {
-    // eslint-disable-next-line
     const blocks = await Promise.all(
       chunk.map(index => blockchain.block.get({ hashOrIndex: index })),
     );
+    // eslint-disable-next-line
     for (const block of blocks) {
       const buffer = block.serializeWire();
       const length = Buffer.alloc(4, 0);
       length.writeInt32LE(buffer.length, 0);
-      // eslint-disable-next-line
       await new Promise(resolve => out.write(length, () => resolve()));
-      // eslint-disable-next-line
       await new Promise(resolve => out.write(buffer, () => resolve()));
       processed += 1;
       if (processed >= 100000) {

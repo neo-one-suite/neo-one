@@ -316,11 +316,11 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
       event: 'CONNECT_LOOP_START',
       message: 'Starting connect loop...',
     });
+    // eslint-disable-next-line
     while (!this._stopped) {
       try {
         this._connectToPeers();
         this._checkPeerHealth();
-        // eslint-disable-next-line
         await new Promise(resolve => {
           this._connectPeersTimeout = setTimeout(() => {
             this._connectPeersTimeout = null;

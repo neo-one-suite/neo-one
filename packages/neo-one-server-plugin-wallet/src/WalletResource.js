@@ -383,7 +383,7 @@ export default class WalletResource {
   }
 
   get unlocked(): boolean {
-    return this.wallet.privateKey != null;
+    return this.wallet.type === 'unlocked';
   }
 
   async unlock({ password }: {| password: string |}): Promise<void> {

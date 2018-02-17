@@ -111,10 +111,10 @@ const handlePrepareRequest = async ({
     return { context };
   }
   context = newContext;
+  // eslint-disable-next-line
   for (const hash of context.transactionHashes.slice(1)) {
     const transaction = node.memPool[hash];
     if (transaction != null) {
-      // eslint-disable-next-line
       const result = await addTransaction({
         context,
         node,

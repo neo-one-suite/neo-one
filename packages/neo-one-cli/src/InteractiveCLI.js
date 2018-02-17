@@ -349,16 +349,16 @@ export default class InteractiveCLI {
 
   async executeCommandPreHooks(nameIn: string, args: Args): Promise<void> {
     const preHooks = this._preHooks[nameIn] || [];
+    // eslint-disable-next-line
     for (const preHook of preHooks) {
-      // eslint-disable-next-line
       await preHook({ cli: this, args });
     }
   }
 
   async executeCommandPostHooks(nameIn: string, args: Args): Promise<void> {
     const postHooks = this._postHooks[nameIn] || [];
+    // eslint-disable-next-line
     for (const postHook of postHooks) {
-      // eslint-disable-next-line
       await postHook({ cli: this, args });
     }
   }

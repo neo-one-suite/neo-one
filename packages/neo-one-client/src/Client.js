@@ -24,6 +24,7 @@ import type {
   TransactionReceipt,
   TransactionResult,
   InvokeReceiptInternal,
+  UpdateAccountNameOptions,
   UserAccount,
   UserAccountID,
   UserAccountProvider,
@@ -92,10 +93,36 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
     return this._providers$.value;
   }
 
-  async selectAccount(account: UserAccountID): Promise<void> {
-    const provider = this._getProvider({ from: account });
-    await provider.selectAccount(account);
+  getAccount(id: UserAccountID): UserAccount {
+    const provider = this._getProvider({ from: id });
+    const account = provider
+      .getAccounts()
+      .find(
+        acct =>
+          acct.id.network === id.network && acct.id.address === id.address,
+      );
+    if (account == null) {
+      throw new UnknownAccountError(id.address);
+    }
+
+    return account;
+  }
+
+  async selectAccount(id?: UserAccountID): Promise<void> {
+    const provider = this._getProvider({ from: id });
+    await provider.selectAccount(id);
     this._selectedProvider$.next(provider);
+  }
+
+  async deleteAccount(id: UserAccountID): Promise<void> {
+    await this._getProvider({ from: id }).deleteAccount(id);
+  }
+
+  async updateAccountName({
+    id,
+    name,
+  }: UpdateAccountNameOptions): Promise<void> {
+    await this._getProvider({ from: id }).updateAccountName({ id, name });
   }
 
   getCurrentAccount(): ?UserAccount {

@@ -18,7 +18,7 @@ import type {
 } from '../types'; // eslint-disable-line
 import { InvalidEventError, InvalidArgumentError } from '../errors';
 
-import parameterConverters from './parameters';
+import parameterConverters, { converters } from './parameters';
 import paramCheckers from './params';
 
 export const convertParameter = ({
@@ -71,7 +71,7 @@ export const convertAction = ({
     throw new InvalidEventError('Notification had no arguments');
   }
 
-  const event = parameterConverters.String(args[0], { type: 'String' });
+  const event = converters.toString(args[0]);
   const eventSpec = events[event];
   if (eventSpec == null) {
     throw new InvalidEventError(`Unknown event ${event}`);

@@ -22,11 +22,10 @@ export default class MultiProvider extends Provider {
   }
 
   async restore(): Promise<void> {
+    // eslint-disable-next-line
     for (const provider of this._providers) {
-      // eslint-disable-next-line
       const canRestore = await provider.canRestore();
       if (canRestore) {
-        // eslint-disable-next-line
         await provider.restore();
         break;
       }
@@ -34,12 +33,11 @@ export default class MultiProvider extends Provider {
   }
 
   async backup(): Promise<void> {
+    // eslint-disable-next-line
     for (const provider of this._providers) {
-      /* eslint-disable */
       await provider.backup();
       await fs.remove(this._environment.tmpPath);
       await fs.ensureDir(this._environment.tmpPath);
-      /* eslint-enable */
     }
   }
 }

@@ -3,6 +3,7 @@ import LocalStringStore from '../../../user/keystore/LocalStringStore';
 
 describe('LocalStringStore', () => {
   const wallet = {
+    type: 'unlocked',
     account: {
       type: 'test',
       id: {
@@ -12,6 +13,8 @@ describe('LocalStringStore', () => {
       name: 'name1',
       scriptHash: 'scriptHash1',
       publicKey: 'publicKey1',
+      configurableName: true,
+      deletable: true,
     },
     privateKey: 'privateKey1',
     nep2: 'nep21',

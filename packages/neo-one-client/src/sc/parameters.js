@@ -1,4 +1,5 @@
 /* @flow */
+import type BigNumber from 'bignumber.js';
 import { JSONHelper, common, utils } from '@neo-one/client-core';
 
 import type {
@@ -6,11 +7,16 @@ import type {
   ContractParameter,
   Param,
   SignatureABI,
+  SignatureString,
   BooleanABI,
   Hash160ABI,
+  Hash160String,
   Hash256ABI,
+  Hash256String,
   ByteArrayABI,
+  BufferString,
   PublicKeyABI,
+  PublicKeyString,
   StringABI,
   InteropInterfaceABI,
   VoidABI,
@@ -18,7 +24,7 @@ import type {
 } from '../types'; // eslint-disable-line
 import { InvalidContractParameterError } from '../errors';
 
-const toByteArray = (contractParameter: ContractParameter): Buffer => {
+const toByteArrayBuffer = (contractParameter: ContractParameter): Buffer => {
   let value;
   switch (contractParameter.type) {
     case 'Signature':
@@ -81,156 +87,258 @@ const toByteArray = (contractParameter: ContractParameter): Buffer => {
   return value;
 };
 
+const toByteArray = (contractParameter: ContractParameter): BufferString =>
+  toByteArrayBuffer(contractParameter).toString('hex');
+
 const toBoolean = (contractParameter: ContractParameter) => {
   if (contractParameter.type === 'Array') {
     return contractParameter.value.some(item => toBoolean(item));
   }
 
-  return toByteArray(contractParameter).some(value => value !== 0);
+  return toByteArrayBuffer(contractParameter).some(value => value !== 0);
 };
+
+const toString = (contractParameter: ContractParameter): string => {
+  if (contractParameter.type === 'String') {
+    return contractParameter.value;
+  } else if (contractParameter.type === 'ByteArray') {
+    return JSONHelper.readBuffer(contractParameter.value).toString('utf8');
+  }
+
+  throw new InvalidContractParameterError(contractParameter, [
+    'String',
+    'ByteArray',
+  ]);
+};
+
+const toHash160 = (contractParameter: ContractParameter): Hash160String => {
+  if (contractParameter.type === 'Hash160') {
+    return contractParameter.value;
+  } else if (contractParameter.type === 'ByteArray') {
+    return common.uInt160ToString(
+      JSONHelper.readUInt160(contractParameter.value),
+    );
+  }
+
+  throw new InvalidContractParameterError(contractParameter, [
+    'Hash160',
+    'ByteArray',
+  ]);
+};
+
+const toHash256 = (contractParameter: ContractParameter): Hash256String => {
+  if (contractParameter.type === 'Hash256') {
+    return contractParameter.value;
+  } else if (contractParameter.type === 'ByteArray') {
+    return common.uInt256ToString(
+      JSONHelper.readUInt256(contractParameter.value),
+    );
+  }
+
+  throw new InvalidContractParameterError(contractParameter, [
+    'Hash256',
+    'ByteArray',
+  ]);
+};
+
+const toPublicKey = (contractParameter: ContractParameter): PublicKeyString => {
+  if (contractParameter.type === 'PublicKey') {
+    return contractParameter.value;
+  } else if (contractParameter.type === 'ByteArray') {
+    return common.ecPointToString(
+      JSONHelper.readECPoint(contractParameter.value),
+    );
+  }
+
+  throw new InvalidContractParameterError(contractParameter, [
+    'PublicKey',
+    'ByteArray',
+  ]);
+};
+
+const toInteger = (
+  contractParameter: ContractParameter,
+  parameter: IntegerABI,
+): BigNumber => {
+  let value;
+  if (contractParameter.type === 'Integer') {
+    // eslint-disable-next-line
+    value = contractParameter.value;
+  } else if (contractParameter.type === 'ByteArray') {
+    value = utils.fromSignedBuffer(
+      JSONHelper.readBuffer(contractParameter.value),
+    );
+  } else {
+    throw new InvalidContractParameterError(contractParameter, [
+      'Integer',
+      'ByteArray',
+    ]);
+  }
+
+  return common.fixedToDecimal(value, parameter.decimals);
+};
+
+const toSignature = (contractParameter: ContractParameter): SignatureString => {
+  if (contractParameter.type === 'Signature') {
+    return contractParameter.value;
+  }
+
+  throw new InvalidContractParameterError(contractParameter, ['Signature']);
+};
+
+const toArray = (
+  contractParameter: ContractParameter,
+  parameter: ArrayABI,
+): Array<?Param> => {
+  if (contractParameter.type !== 'Array') {
+    throw new InvalidContractParameterError(contractParameter, ['Array']);
+  }
+
+  const { value } = parameter;
+  // eslint-disable-next-line
+  const converter = contractParameters[value.type];
+  return contractParameter.value.map(val =>
+    converter(val, (value: $FlowFixMe)),
+  );
+};
+
+const toInteropInterface = (
+  // eslint-disable-next-line
+  contractParameter: ContractParameter,
+): typeof undefined => undefined;
+
+const toVoid = (
+  // eslint-disable-next-line
+  contractParameter: ContractParameter,
+): typeof undefined => undefined;
+
+function createNullable<Result>(
+  func: (contractParameter: ContractParameter) => Result,
+): (contractParameter: ContractParameter) => ?Result {
+  return contractParameter => {
+    try {
+      return func(contractParameter);
+    } catch (error) {
+      return null;
+    }
+  };
+}
+
+function createNullableABI<Result, ABI>(
+  func: (contractParameter: ContractParameter, parameter: ABI) => Result,
+): (contractParameter: ContractParameter, parameter: ABI) => ?Result {
+  return (contractParameter, parameter) => {
+    try {
+      return func(contractParameter, parameter);
+    } catch (error) {
+      return null;
+    }
+  };
+}
 
 const contractParameters = {
   String: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: StringABI,
-  ): string => {
-    if (contractParameter.type === 'String') {
-      return contractParameter.value;
-    } else if (contractParameter.type === 'ByteArray') {
-      return JSONHelper.readBuffer(contractParameter.value).toString('utf8');
-    }
-
-    throw new InvalidContractParameterError(contractParameter, [
-      'String',
-      'ByteArray',
-    ]);
-  },
+  ): ?Param => toString(contractParameter),
   Hash160: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: Hash160ABI,
-  ): string => {
-    if (contractParameter.type === 'Hash160') {
-      return contractParameter.value;
-    } else if (contractParameter.type === 'ByteArray') {
-      return common.uInt160ToString(
-        JSONHelper.readUInt160(contractParameter.value),
-      );
-    }
-
-    throw new InvalidContractParameterError(contractParameter, [
-      'Hash160',
-      'ByteArray',
-    ]);
-  },
+  ): ?Param => toHash160(contractParameter),
   Hash256: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: Hash256ABI,
-  ): string => {
-    if (contractParameter.type === 'Hash256') {
-      return contractParameter.value;
-    } else if (contractParameter.type === 'ByteArray') {
-      return common.uInt256ToString(
-        JSONHelper.readUInt256(contractParameter.value),
-      );
-    }
-
-    throw new InvalidContractParameterError(contractParameter, [
-      'Hash256',
-      'ByteArray',
-    ]);
-  },
+  ): ?Param => toHash256(contractParameter),
   PublicKey: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: PublicKeyABI,
-  ): string => {
-    if (contractParameter.type === 'PublicKey') {
-      return contractParameter.value;
-    } else if (contractParameter.type === 'ByteArray') {
-      return common.ecPointToString(
-        JSONHelper.readECPoint(contractParameter.value),
-      );
-    }
-
-    throw new InvalidContractParameterError(contractParameter, [
-      'PublicKey',
-      'ByteArray',
-    ]);
-  },
+  ): ?Param => toPublicKey(contractParameter),
   Integer: (
     contractParameter: ContractParameter,
-    // eslint-disable-next-line
     parameter: IntegerABI,
-  ): ?Param => {
-    let value;
-    if (contractParameter.type === 'Integer') {
-      // eslint-disable-next-line
-      value = contractParameter.value;
-    } else if (contractParameter.type === 'ByteArray') {
-      value = utils.fromSignedBuffer(
-        JSONHelper.readBuffer(contractParameter.value),
-      );
-    } else {
-      throw new InvalidContractParameterError(contractParameter, [
-        'Integer',
-        'ByteArray',
-      ]);
-    }
-
-    return common.fixedToDecimal(value, parameter.decimals);
-  },
-
+  ): ?Param => toInteger(contractParameter, parameter),
   Boolean: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: BooleanABI,
   ): ?Param => toBoolean(contractParameter),
-
   Signature: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: SignatureABI,
-  ): ?Param => {
-    if (contractParameter.type === 'Signature') {
-      return contractParameter.value;
-    }
-
-    throw new InvalidContractParameterError(contractParameter, ['Signature']);
-  },
+  ): ?Param => toSignature(contractParameter),
   ByteArray: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: ByteArrayABI,
-  ): ?Param => toByteArray(contractParameter).toString('hex'),
-  Array: (
-    contractParameter: ContractParameter,
-    parameter: ArrayABI,
-  ): ?Param => {
-    if (contractParameter.type !== 'Array') {
-      throw new InvalidContractParameterError(contractParameter, ['Array']);
-    }
-
-    const { value } = parameter;
-    const converter = contractParameters[value.type];
-    return contractParameter.value.map(val =>
-      converter(val, (value: $FlowFixMe)),
-    );
-  },
+  ): ?Param => toByteArray(contractParameter),
+  Array: (contractParameter: ContractParameter, parameter: ArrayABI): ?Param =>
+    toArray(contractParameter, parameter),
   InteropInterface: (
     // eslint-disable-next-line
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: InteropInterfaceABI,
-  ): ?Param => undefined,
+  ): ?Param => toInteropInterface(contractParameter),
   Void: (
     // eslint-disable-next-line
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: VoidABI,
-  ): ?Param => undefined,
+  ): ?Param => toVoid(contractParameter),
+};
+
+export const converters = {
+  toString,
+  toStringNullable: (createNullable(toString): (
+    param: ContractParameter,
+  ) => ?string),
+  toHash160,
+  toHash160Nullable: (createNullable(toHash160): (
+    param: ContractParameter,
+  ) => ?Hash160String),
+  toHash256,
+  toHash256Nullable: (createNullable(toHash256): (
+    param: ContractParameter,
+  ) => ?Hash256String),
+  toPublicKey,
+  toPublicKeyNullable: (createNullable(toPublicKey): (
+    param: ContractParameter,
+  ) => ?PublicKeyString),
+  toInteger,
+  toIntegerNullable: (createNullableABI(toInteger): (
+    param: ContractParameter,
+    abi: IntegerABI,
+  ) => ?BigNumber),
+  toBoolean,
+  toBooleanNullable: (createNullable(toBoolean): (
+    param: ContractParameter,
+  ) => ?boolean),
+  toSignature,
+  toSignatureNullable: (createNullable(toSignature): (
+    param: ContractParameter,
+  ) => ?SignatureString),
+  toByteArray,
+  toByteArrayNullable: (createNullable(toByteArray): (
+    param: ContractParameter,
+  ) => ?BufferString),
+  toArray,
+  toArrayNullable: (createNullableABI(toArray): (
+    param: ContractParameter,
+    abi: ArrayABI,
+  ) => ?Array<?Param>),
+  toInteropInterface,
+  toInteropInterfaceNullable: (createNullable(toInteropInterface): (
+    param: ContractParameter,
+  ) => ?typeof undefined),
+  toVoid,
+  toVoidNullable: (createNullable(toVoid): (
+    param: ContractParameter,
+  ) => ?typeof undefined),
 };
 
 export default contractParameters;

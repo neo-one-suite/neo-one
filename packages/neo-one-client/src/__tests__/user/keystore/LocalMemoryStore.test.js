@@ -3,6 +3,7 @@ import LocalMemoryStore from '../../../user/keystore/LocalMemoryStore';
 
 describe('LocalMemoryStore', () => {
   const wallet = {
+    type: 'unlocked',
     account: {
       type: 'test',
       id: {
@@ -12,6 +13,8 @@ describe('LocalMemoryStore', () => {
       name: 'name1',
       scriptHash: 'scriptHash1',
       publicKey: 'publicKey1',
+      configurableName: true,
+      deletable: true,
     },
     privateKey: 'privateKey1',
     nep2: 'nep21',

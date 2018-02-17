@@ -12,13 +12,10 @@ import type {
   UserAccount,
   UserAccountID,
   NetworkType,
+  UpdateAccountNameOptions,
   Witness,
 } from '../../types';
-import {
-  LockedAccountError,
-  PasswordRequiredError,
-  UnknownAccountError,
-} from '../../errors';
+import { LockedAccountError, UnknownAccountError } from '../../errors';
 
 import {
   decryptNEP2,
@@ -27,13 +24,19 @@ import {
   publicKeyToScriptHash,
   scriptHashToAddress,
 } from '../../helpers';
-import * as networks from '../../networks';
 
-export type Wallet = {|
+export type LockedWallet = {|
+  type: 'locked',
   account: UserAccount,
-  privateKey: ?BufferString,
-  nep2: ?string,
+  nep2: string,
 |};
+export type UnlockedWallet = {|
+  type: 'unlocked',
+  account: UserAccount,
+  privateKey: BufferString,
+  nep2?: ?string,
+|};
+export type Wallet = LockedWallet | UnlockedWallet;
 export type Wallets = {
   [network: string]: { [address: string]: Wallet },
 };
@@ -134,9 +137,46 @@ export default class LocalKeyStore {
     };
   }
 
-  async selectAccount(id: UserAccountID): Promise<void> {
-    const { account } = this.getWallet(id);
-    this._currentAccount$.next(account);
+  async selectAccount(id?: UserAccountID): Promise<void> {
+    if (id == null) {
+      this._currentAccount$.next(null);
+    } else {
+      const { account } = this.getWallet(id);
+      this._currentAccount$.next(account);
+    }
+  }
+
+  async updateAccountName({
+    id,
+    name,
+  }: UpdateAccountNameOptions): Promise<void> {
+    const wallet = this.getWallet(id);
+    let newWallet;
+    const account = {
+      type: wallet.account.type,
+      id: wallet.account.id,
+      name,
+      scriptHash: wallet.account.scriptHash,
+      publicKey: wallet.account.publicKey,
+      deletable: true,
+      configurableName: true,
+    };
+    if (wallet.type === 'locked') {
+      newWallet = {
+        type: 'locked',
+        account,
+        nep2: wallet.nep2,
+      };
+    } else {
+      newWallet = {
+        type: 'unlocked',
+        account,
+        privateKey: wallet.privateKey,
+        nep2: wallet.nep2,
+      };
+    }
+    await this._store.saveWallet(newWallet);
+    this._updateWallet(newWallet);
   }
 
   getWallet({ address, network }: UserAccountID): Wallet {
@@ -158,51 +198,61 @@ export default class LocalKeyStore {
     privateKey: privateKeyIn,
     name,
     password,
+    nep2: nep2In,
   }: {|
     network: NetworkType,
-    privateKey: BufferString,
+    privateKey?: BufferString,
     name?: string,
     password?: string,
+    nep2?: string,
   |}): Promise<Wallet> {
     await this._initPromise;
 
     let privateKey = privateKeyIn;
+    let nep2 = nep2In;
+    if (privateKey == null) {
+      if (nep2 == null || password == null) {
+        throw new Error('Expected private key or password and NEP-2 key');
+      }
+      privateKey = await decryptNEP2({ encryptedKey: nep2, password });
+    }
+
     const publicKey = privateKeyToPublicKey(privateKey);
     const scriptHash = publicKeyToScriptHash(publicKey);
     const address = scriptHashToAddress(scriptHash);
 
-    let nep2;
-    if (network === networks.MAIN || password != null) {
-      if (password == null) {
-        throw new PasswordRequiredError();
-      }
+    if (nep2 == null && password != null) {
       nep2 = await encryptNEP2({ privateKey, password });
-      privateKey = undefined;
     }
 
-    const wallet = {
-      account: {
-        type: this._store.type,
-        id: {
-          network,
-          address,
-        },
-        name: name == null ? address : name,
-        scriptHash,
-        publicKey,
+    const account = {
+      type: this._store.type,
+      id: {
+        network,
+        address,
       },
-      nep2,
-      privateKey,
+      name: name == null ? address : name,
+      scriptHash,
+      publicKey,
+      configurableName: true,
+      deletable: true,
     };
 
+    const unlockedWallet = { type: 'unlocked', account, nep2, privateKey };
+
+    let wallet = unlockedWallet;
+    if (nep2 != null) {
+      wallet = { type: 'locked', account, nep2 };
+    }
+
     await this._store.saveWallet(wallet);
-    this._updateWallet(wallet);
+    this._updateWallet(unlockedWallet);
 
     if (this.currentAccount == null) {
       this._currentAccount$.next(wallet.account);
     }
 
-    return wallet;
+    return unlockedWallet;
   }
 
   async deleteAccount(id: UserAccountID): Promise<void> {
@@ -260,6 +310,7 @@ export default class LocalKeyStore {
     });
 
     this._updateWallet({
+      type: 'unlocked',
       account: wallet.account,
       privateKey,
       nep2: wallet.nep2,
@@ -273,8 +324,8 @@ export default class LocalKeyStore {
     }
 
     this._updateWallet({
+      type: 'locked',
       account: wallet.account,
-      privateKey: null,
       nep2: wallet.nep2,
     });
   }

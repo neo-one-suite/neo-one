@@ -32,9 +32,9 @@ const request = async ({
   let parseErrorTries = 3;
   let result;
   let finalError;
+  // eslint-disable-next-line
   while (tries >= 0) {
     try {
-      // eslint-disable-next-line
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -46,14 +46,12 @@ const request = async ({
       if (!response.ok) {
         let text = null;
         try {
-          // eslint-disable-next-line
           text = await response.text();
         } catch (error) {
           // eslint-disable-next-line
         }
         throw new HTTPError(response.status, text);
       }
-      // eslint-disable-next-line
       result = await response.json();
       if (!Array.isArray(result)) {
         if (

@@ -294,9 +294,9 @@ export default class TaskList {
       await Promise.all(this._tasks.map(task => task.run(ctx)));
     } else {
       let error;
+      // eslint-disable-next-line
       for (const task of this._tasks) {
         if (error == null) {
-          // eslint-disable-next-line
           await task.run(ctx);
         } else {
           task.complete();

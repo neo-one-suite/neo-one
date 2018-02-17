@@ -153,8 +153,8 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
       if (this._indexStop != null) {
         toFetch = Math.min(toFetch, this._indexStop - index);
       }
+      // eslint-disable-next-line
       for (const chunk of _.chunk(_.range(0, toFetch), BATCH_SIZE)) {
-        // eslint-disable-next-line
         const blocks = await Promise.all(
           chunk.map(offset => this._fetchOne(index + offset, true)),
         );

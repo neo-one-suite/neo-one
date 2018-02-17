@@ -22,6 +22,7 @@ import type {
   TransactionReceipt,
   TransactionResult,
   InvokeReceiptInternal,
+  UpdateAccountNameOptions,
   UserAccount,
   UserAccountID,
 } from './types'; // eslint-disable-line
@@ -41,7 +42,10 @@ declare export default class Client<TUserAccountProviders> {
   getAccounts(): Array<UserAccount>;
   getNetworks(): Array<NetworkType>;
 
-  selectAccount(id: UserAccountID): Promise<void>;
+  getAccount(id: UserAccountID): UserAccount;
+  selectAccount(id?: UserAccountID): Promise<void>;
+  deleteAccount(id: UserAccountID): Promise<void>;
+  updateAccountName(options: UpdateAccountNameOptions): Promise<void>;
 
   transfer(
     amount: BigNumber,

@@ -196,9 +196,9 @@ const run = async ({
   context: ExecutionContext,
 |}): Promise<ExecutionContext> => {
   let context = contextIn;
+  // eslint-disable-next-line
   while (context.state === VM_STATE.NONE) {
     try {
-      // eslint-disable-next-line
       context = await executeNext({ context });
     } catch (error) {
       context = {
@@ -313,7 +313,8 @@ export default async ({
       idx < scripts.length &&
       (context == null || context.state === VM_STATE.HALT);
       idx += 1
-    ) {
+    ) // eslint-disable-next-line
+    {
       const script = scripts[idx];
       // NOTE: scriptHash has a different meaning here, it will be translated
       //       to callingScriptHash within executeScript. executeScript
@@ -342,7 +343,6 @@ export default async ({
         };
       }
 
-      // eslint-disable-next-line
       context = await executeScript({
         code: script.code,
         pushOnly: script.pushOnly,
