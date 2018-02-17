@@ -312,9 +312,8 @@ export default async ({
       let idx = 0;
       idx < scripts.length &&
       (context == null || context.state === VM_STATE.HALT);
-      idx += 1
-    ) // eslint-disable-next-line
-    {
+      idx += 1 // eslint-disable-next-line
+    ) {
       const script = scripts[idx];
       // NOTE: scriptHash has a different meaning here, it will be translated
       //       to callingScriptHash within executeScript. executeScript

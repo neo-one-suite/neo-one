@@ -373,9 +373,8 @@ export default class Blockchain {
       while (
         this._running &&
         entry != null &&
-        entry.block.index === this.currentBlockIndex + 1
-      ) // eslint-disable-next-line
-      {
+        entry.block.index === this.currentBlockIndex + 1 // eslint-disable-next-line
+      ) {
         entry = this._blockQueue.dequeue();
         const done = this._perf.start('Blockchain._persistBlocksAsync');
         const start = performanceNow();
