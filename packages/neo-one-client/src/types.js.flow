@@ -732,9 +732,9 @@ export type ABI = {|
 export type SmartContractNetworkDefinition = {|
   hash: Hash160String,
 |};
-export type SmartContractNetworksDefinition = {|
+export type SmartContractNetworksDefinition = {
   [type: NetworkType]: SmartContractNetworkDefinition,
-|};
+};
 export type SmartContractDefinition = {|
   networks: SmartContractNetworksDefinition,
   abi: ABI,
