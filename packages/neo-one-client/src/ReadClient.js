@@ -4,7 +4,7 @@ import { type Param as ScriptBuilderParam } from '@neo-one/client-core';
 import type {
   ABI,
   Account,
-  Action,
+  ActionRaw,
   AddressString,
   Asset,
   Block,
@@ -103,9 +103,9 @@ export default class ReadClient<TDataProvider: DataProvider> {
     return this.dataProvider.iterStorage(hash);
   }
 
-  _iterActions(filter?: BlockFilter): AsyncIterable<Action> {
+  _iterActionsRaw(filter?: BlockFilter): AsyncIterable<ActionRaw> {
     args.assertBlockFilter(filter);
-    return this.dataProvider.iterActions(filter);
+    return this.dataProvider.iterActionsRaw(filter);
   }
 
   _call(

@@ -149,6 +149,10 @@ export default class NEOONEProvider {
     return this._getProvider(network).getNetworkSettings();
   }
 
+  read(network: NetworkType): NEOONEDataProvider {
+    return this._getProvider(network);
+  }
+
   _getProvider(network: NetworkType): NEOONEDataProvider {
     const provider = this._providers[network];
     if (provider == null) {

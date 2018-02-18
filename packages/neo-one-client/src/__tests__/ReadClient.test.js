@@ -6,7 +6,7 @@ import createReadSmartContract from '../sc/createReadSmartContract';
 
 jest.mock('../sc/createReadSmartContract');
 
-describe('ReadCleint', () => {
+describe('ReadClient', () => {
   let readClient = new ReadClient(({}: $FlowFixMe));
   let provider = readClient.dataProvider;
   beforeEach(() => {
@@ -90,7 +90,7 @@ describe('ReadCleint', () => {
       args: [dummyArg],
     },
     {
-      method: '_iterActions',
+      method: '_iterActionsRaw',
       asserts: ['assertBlockFilter'],
       args: [dummyArg],
     },

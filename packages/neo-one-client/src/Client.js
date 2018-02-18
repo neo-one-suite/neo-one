@@ -29,7 +29,8 @@ import type {
   UserAccountID,
   UserAccountProvider,
 } from './types';
-import { UnknownAccountError } from './errors';
+import ReadClient from './ReadClient';
+import { UnknownAccountError, UnknownNetworkError } from './errors';
 
 import * as argAssertions from './args';
 import { createSmartContract } from './sc';
@@ -185,6 +186,10 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
     return createSmartContract({ definition, client: (this: $FlowFixMe) });
   }
 
+  read(network: NetworkType): ReadClient<any> {
+    return new ReadClient(this._getNetworkProvider(network).read(network));
+  }
+
   _invoke(
     contract: Hash160String,
     method: string,
@@ -268,6 +273,18 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
     );
     if (accountProvider == null) {
       throw new UnknownAccountError(from.address);
+    }
+
+    return accountProvider;
+  }
+
+  _getNetworkProvider(network: NetworkType): UserAccountProvider {
+    const providers = utils.values(this.providers);
+    const accountProvider = providers.find(provider =>
+      provider.getAccounts().some(account => account.id.network === network),
+    );
+    if (accountProvider == null) {
+      throw new UnknownNetworkError(network);
     }
 
     return accountProvider;

@@ -33,6 +33,7 @@ import type {
   AssetRegister,
   Attribute,
   ContractRegister,
+  DataProvider,
   GetOptions,
   Hash160String,
   Hash256String,
@@ -121,6 +122,7 @@ export type Provider = {
     transaction: string,
   ) => Promise<RawInvocationResult>,
   +getNetworkSettings: (network: NetworkType) => Promise<NetworkSettings>,
+  +read: (network: NetworkType) => DataProvider,
 };
 
 type TransactionOptionsFull = {|
@@ -494,6 +496,10 @@ export default class LocalUserAccountProvider<
 
   async updateAccountName(options: UpdateAccountNameOptions): Promise<void> {
     await this.keystore.updateAccountName(options);
+  }
+
+  read(network: NetworkType): DataProvider {
+    return this.provider.read(network);
   }
 
   async _getTransactionOptions(

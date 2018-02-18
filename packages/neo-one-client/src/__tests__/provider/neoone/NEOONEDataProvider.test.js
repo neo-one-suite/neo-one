@@ -779,7 +779,7 @@ describe('NEOONEDataProvider', () => {
     provider.iterBlocks = jest.fn(() => AsyncIterableX.from([block]));
 
     const result = await toArray(
-      provider.iterActions({ indexStart: 1, indexStop: 2 }),
+      provider.iterActionsRaw({ indexStart: 1, indexStop: 2 }),
     );
     expect(result).toEqual(expected);
   });
@@ -798,7 +798,7 @@ describe('NEOONEDataProvider', () => {
     // $FlowFixMe
     provider.iterBlocks = jest.fn(() => AsyncIterableX.from([block]));
 
-    const result = await toArray(provider.iterActions());
+    const result = await toArray(provider.iterActionsRaw());
     expect(result).toEqual(expected);
   });
 });

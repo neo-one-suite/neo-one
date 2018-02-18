@@ -66,7 +66,7 @@ describe('createReadSmartContract', () => {
       indexStop: 1,
     };
     // $FlowFixMe
-    client._iterActions = jest.fn(() => expected);
+    client._iterActionsRaw = jest.fn(() => expected);
     // $FlowFixMe
     common.convertAction = jest
       .fn()
@@ -75,12 +75,12 @@ describe('createReadSmartContract', () => {
 
     const result = await toArray(readContract.iterActions(filter));
     expect(result).toEqual(expected);
-    expect(client._iterActions).toBeCalledWith(filter);
+    expect(client._iterActionsRaw).toBeCalledWith(filter);
   });
 
   test('iterActions with no filter', async () => {
     // $FlowFixMe
-    client._iterActions = jest.fn(() => expected);
+    client._iterActionsRaw = jest.fn(() => expected);
     // $FlowFixMe
     common.convertAction = jest
       .fn()
@@ -89,7 +89,7 @@ describe('createReadSmartContract', () => {
 
     const result = await toArray(readContract.iterActions());
     expect(result).toEqual(expected);
-    expect(client._iterActions).toBeCalledWith({});
+    expect(client._iterActionsRaw).toBeCalledWith({});
   });
 
   test('iterEvents', async () => {

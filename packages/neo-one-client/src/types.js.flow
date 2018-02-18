@@ -93,7 +93,7 @@ export type ContractParameter =
   | InteropInterfaceContractParameter
   | VoidContractParameter;
 
-export type ActionBase = {|
+export type ActionRawBase = {|
   version: number,
   blockIndex: number,
   blockHash: Hash256String,
@@ -102,17 +102,17 @@ export type ActionBase = {|
   index: number,
   scriptHash: Hash160String,
 |};
-export type NotificationAction = {|
-  ...ActionBase,
+export type NotificationRaw = {|
+  ...ActionRawBase,
   type: 'Notification',
   args: Array<ContractParameter>,
 |};
-export type LogAction = {|
-  ...ActionBase,
+export type LogRaw = {|
+  ...ActionRawBase,
   type: 'Log',
   message: string,
 |};
-export type Action = NotificationAction | LogAction;
+export type ActionRaw = NotificationRaw | LogRaw;
 
 export type Account = {|
   address: AddressString,
@@ -283,7 +283,7 @@ export type RawInvocationData = {|
   deletedContractHashes: Array<Hash160String>,
   migratedContractHashes: Array<[Hash160String, Hash160String]>,
   voteUpdates: Array<[AddressString, Array<PublicKeyString>]>,
-  actions: Array<Action>,
+  actions: Array<ActionRaw>,
 |};
 
 type TransactionBase = {|
@@ -444,17 +444,19 @@ export type ParamJSON =
 
 export type EventParameters = { [name: string]: ?Param };
 export type Event = {|
-  ...ActionBase,
+  ...ActionRawBase,
   type: 'Event',
   name: string,
   parameters: EventParameters,
 |};
 
 export type Log = {|
-  ...ActionBase,
+  ...ActionRawBase,
   type: 'Log',
   message: string,
 |};
+
+export type Action = Event | Log;
 
 export type NetworkType = 'main' | 'test' | string;
 export type NetworkSettings = {|
@@ -496,7 +498,7 @@ export type TransactionReceipt = {|
 export type InvokeReceiptInternal = {|
   ...TransactionReceipt,
   result: RawInvocationResult,
-  actions: Array<Action>,
+  actions: Array<ActionRaw>,
 |};
 
 export type InvocationResultSuccess<TValue> = {|
@@ -550,6 +552,40 @@ export type UpdateAccountNameOptions = {|
   name: string,
 |};
 
+export interface DataProvider {
+  +network: NetworkType;
+
+  getAccount(address: AddressString): Promise<Account>;
+
+  getAsset(hash: Hash256String): Promise<Asset>;
+
+  getBlock(hash: Hash256String): Promise<Block>;
+  getBlock(index: number, options?: GetOptions): Promise<Block>;
+  iterBlocks(filter?: BlockFilter): AsyncIterable<Block>;
+
+  getBestBlockHash(): Promise<Hash256String>;
+  getBlockCount(): Promise<number>;
+
+  getContract(hash: Hash160String): Promise<Contract>;
+
+  getMemPool(): Promise<Array<Hash256String>>;
+
+  getTransaction(hash: Hash256String): Promise<Transaction>;
+
+  getValidators(): Promise<Array<Validator>>;
+
+  getConnectedPeers(): Promise<Array<Peer>>;
+
+  getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem>;
+  iterStorage(hash: Hash160String): AsyncIterable<StorageItem>;
+  iterActionsRaw(filterIn?: BlockFilter): AsyncIterable<ActionRaw>;
+  call(
+    contract: Hash160String,
+    method: string,
+    params: Array<?ScriptBuilderParam>,
+  ): Promise<RawInvocationResult>;
+}
+
 export interface UserAccountProvider {
   +type: string;
   +currentAccount$: Observable<?UserAccount>;
@@ -602,46 +638,13 @@ export interface UserAccountProvider {
     params: Array<?ScriptBuilderParam>,
     options?: TransactionOptions,
   ): Promise<RawInvocationResult>;
+
+  read(network: NetworkType): DataProvider;
 }
 
 export type UserAccountProviders = {
   [type: string]: UserAccountProvider,
 };
-
-export interface DataProvider {
-  +network: NetworkType;
-
-  getAccount(address: AddressString): Promise<Account>;
-
-  getAsset(hash: Hash256String): Promise<Asset>;
-
-  getBlock(hash: Hash256String): Promise<Block>;
-  getBlock(index: number, options?: GetOptions): Promise<Block>;
-  iterBlocks(filter?: BlockFilter): AsyncIterable<Block>;
-
-  getBestBlockHash(): Promise<Hash256String>;
-  getBlockCount(): Promise<number>;
-
-  getContract(hash: Hash160String): Promise<Contract>;
-
-  getMemPool(): Promise<Array<Hash256String>>;
-
-  getTransaction(hash: Hash256String): Promise<Transaction>;
-
-  getValidators(): Promise<Array<Validator>>;
-
-  getConnectedPeers(): Promise<Array<Peer>>;
-
-  getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem>;
-  iterStorage(hash: Hash160String): AsyncIterable<StorageItem>;
-  iterActions(filterIn?: BlockFilter): AsyncIterable<Action>;
-  call(
-    contract: Hash160String,
-    method: string,
-    params: Array<?ScriptBuilderParam>,
-  ): Promise<RawInvocationResult>;
-}
-
 
 export type SignatureABIReturn =
   {| type: 'Signature' |};
@@ -758,7 +761,9 @@ export type SmartContract = {|
 export type ReadSmartContract = {|
   iterEvents: (filter?: BlockFilter) => AsyncIterable<Event>,
   iterLogs: (filter?: BlockFilter) => AsyncIterable<Log>,
-  iterActions: (filter?: BlockFilter) => AsyncIterable<Event | Log>,
+  iterActions: (filter?: BlockFilter) => AsyncIterable<Action>,
   iterStorage: () => AsyncIterable<StorageItem>,
+  iterActionsRaw: (filter?: BlockFilter) => AsyncIterable<ActionRaw>,
+  convertAction: (action: ActionRaw) => Action,
   [key: string]: any,
 |};

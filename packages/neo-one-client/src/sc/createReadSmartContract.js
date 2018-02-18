@@ -8,6 +8,8 @@ import type {
   ABI,
   ABIFunction,
   ABIParameter,
+  Action,
+  ActionRaw,
   BlockFilter,
   Event,
   Hash160String,
@@ -62,13 +64,19 @@ export default ({
     return acc;
   }, {});
 
-  const iterActions = (filterIn?: BlockFilter): AsyncIterable<Event | Log> => {
+  const iterActionsRaw = (filterIn?: BlockFilter): AsyncIterable<ActionRaw> => {
     const blockFilter = filterIn || {};
-    return AsyncIterableX.from(client._iterActions(blockFilter)).pipe(
-      filter(action => action.scriptHash === hash),
-      map(action => common.convertAction({ action, events })),
-    );
+    return client._iterActionsRaw(blockFilter);
   };
+
+  const convertAction = (action: ActionRaw): Action =>
+    common.convertAction({ action, events });
+
+  const iterActions = (filterIn?: BlockFilter): AsyncIterable<Action> =>
+    AsyncIterableX.from(iterActionsRaw(filterIn)).pipe(
+      filter(action => action.scriptHash === hash),
+      map(convertAction),
+    );
 
   const iterEvents = (actionFilter?: BlockFilter): AsyncIterable<Event> =>
     AsyncIterableX.from(iterActions(actionFilter)).pipe(
@@ -97,7 +105,14 @@ export default ({
   const iterStorage = (): AsyncIterable<StorageItem> =>
     client._iterStorage(hash);
 
-  const smartContract = { iterActions, iterEvents, iterLogs, iterStorage };
+  const smartContract = {
+    iterActionsRaw,
+    iterActions,
+    iterEvents,
+    iterLogs,
+    iterStorage,
+    convertAction,
+  };
   abi.functions.forEach(func => {
     if (func.constant) {
       smartContract[func.name] = createCall({ client, hash, func });

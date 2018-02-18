@@ -24,11 +24,11 @@ import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import BigNumber from 'bignumber.js';
 
 import _ from 'lodash';
-import { flatten, flatMap, map } from 'ix/asynciterable/pipe/index';
+import { flatten, flatMap } from 'ix/asynciterable/pipe/index';
 
 import type {
   Account,
-  Action,
+  ActionRaw,
   AddressString,
   Asset,
   Attribute,
@@ -191,7 +191,7 @@ export default class NEOONEDataProvider implements DataProvider {
             ? undefined
             : this._iterBlocksFetchTimeoutMS,
       }),
-    ).pipe(map(block => this._convertBlock(block)));
+    );
   }
 
   getBestBlockHash(): Promise<Hash256String> {
@@ -243,7 +243,7 @@ export default class NEOONEDataProvider implements DataProvider {
     ).pipe(flatten());
   }
 
-  iterActions(filterIn?: BlockFilter): AsyncIterable<Action> {
+  iterActionsRaw(filterIn?: BlockFilter): AsyncIterable<ActionRaw> {
     const filter = filterIn || {};
     return AsyncIterableX.from(
       this.iterBlocks({
@@ -585,7 +585,7 @@ export default class NEOONEDataProvider implements DataProvider {
     };
   }
 
-  _convertAction(action: ActionJSON): Action {
+  _convertAction(action: ActionJSON): ActionRaw {
     if (action.type === 'Log') {
       return action;
     }

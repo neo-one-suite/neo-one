@@ -4,6 +4,7 @@ import { type Param as ScriptBuilderParam } from '@neo-one/client-core';
 
 import type {
   Action,
+  ActionRaw,
   ABIEvent,
   ABIFunction,
   ABIParameter,
@@ -80,9 +81,9 @@ const convertActions = ({
   actions,
   events,
 }: {|
-  actions: Array<Action>,
+  actions: Array<ActionRaw>,
   events: Array<ABIEvent>,
-|}): Array<Event | Log> => {
+|}): Array<Action> => {
   const eventsObj = events.reduce((acc, event) => {
     acc[event.name] = event;
     return acc;

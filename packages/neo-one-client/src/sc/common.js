@@ -5,14 +5,13 @@ import _ from 'lodash';
 
 import type {
   Action,
+  ActionRaw,
   ABIEvent,
   ABIParameter,
   ABIReturn,
   ContractParameter,
-  Event,
   EventParameters,
   InvocationResult,
-  Log,
   Param,
   RawInvocationResult,
 } from '../types'; // eslint-disable-line
@@ -63,9 +62,9 @@ export const convertAction = ({
   action,
   events,
 }: {|
-  action: Action,
+  action: ActionRaw,
   events: { [key: string]: ABIEvent },
-|}): Event | Log => {
+|}): Action => {
   if (action.type === 'Log') {
     return action;
   }

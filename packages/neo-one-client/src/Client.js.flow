@@ -25,7 +25,8 @@ import type {
   UpdateAccountNameOptions,
   UserAccount,
   UserAccountID,
-} from './types'; // eslint-disable-line
+} from './types';
+import type ReadClient from './ReadClient';
 
 declare export default class Client<TUserAccountProviders> {
   constructor(
@@ -84,6 +85,8 @@ declare export default class Client<TUserAccountProviders> {
   ): Promise<TransactionResult<TransactionReceipt>>;
 
   smartContract(definition: SmartContractDefinition): SmartContract;
+
+  read(network: NetworkType): ReadClient<any>;
 
   _invoke(
     contract: Hash160String,
