@@ -182,12 +182,12 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
     return this._getProvider(options).transfer(transfers, options);
   }
 
-  smartContract(definition: SmartContractDefinition): SmartContract {
-    return createSmartContract({ definition, client: (this: $FlowFixMe) });
-  }
-
   read(network: NetworkType): ReadClient<any> {
     return new ReadClient(this._getNetworkProvider(network).read(network));
+  }
+
+  smartContract(definition: SmartContractDefinition): SmartContract {
+    return createSmartContract({ definition, client: (this: $FlowFixMe) });
   }
 
   _invoke(
