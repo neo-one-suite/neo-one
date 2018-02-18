@@ -52,7 +52,7 @@ describe('createSmartContract', () => {
     // $FlowFixMe
     client._call = jest.fn(() => Promise.resolve());
     // $FlowFixMe
-    common.convertInvocationResult = jest.fn(() => expected);
+    common.convertCallResult = jest.fn(() => expected);
 
     const smartContract = createSmartContract({ definition, client });
 

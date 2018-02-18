@@ -52,6 +52,9 @@ describe('createReadSmartContract', () => {
   const readContract = createReadSmartContract({ hash, abi, client });
 
   test('smartContract creation - createCall', async () => {
+    // $FlowFixMe
+    common.convertCallResult = jest.fn(() => expected);
+
     const result = await readContract[abi.functions[0].name]();
     expect(result).toEqual(expected);
     expect(nullEventsContract[abi.functions[0].name]).toBeUndefined();

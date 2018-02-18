@@ -1,12 +1,19 @@
+/* @flow */
 /* eslint-disable */
-// Its a bit different from Typescript def, i thought something in d.ts is typo.
-// https://github.com/DefinitelyTyped/DefinitelyTyped/blob/types-2.0/koa/index.d.ts#L158
-// So i retyped this from source-code of koa2.
+/*
+ * Type def from from source code of koa.
+ * this: https://github.com/koajs/koa/commit/08eb1a20c3975230aa1fe1c693b0cd1ac7a0752b
+ * previous: https://github.com/koajs/koa/commit/fabf5864c6a5dca0782b867a263b1b0825a05bf9
+ *
+ * Changelog
+ * breaking: remove unused app.name
+ * breaking: ctx.throw([status], [msg], [properties]) (caused by http-errors (#957) )
+**/
 declare module 'koa' {
   // Currently, import type doesnt work well ?
   // so copy `Server` from flow/lib/node.js#L820
   declare class Server extends net$Server {
-    listen(port: number, hostname?: string, backlog?: number, callback?: Function): Server,
+    listen(port?: number, hostname?: string, backlog?: number, callback?: Function): Server,
     listen(path: string, callback?: Function): Server,
     listen(handle: Object, callback?: Function): Server,
     close(callback?: Function): Server,
@@ -137,7 +144,7 @@ declare module 'koa' {
     request: Request,
 
     // docs/api/response.md#L113.
-    body: string|Buffer|stream$Stream|Object|null, // JSON contains null
+    body: string|Buffer|stream$Stream|Object|Array<mixed>|null, // JSON contains null
     etag: string,
     header: SimpleHeader,
     headers: SimpleHeader, // alias as header
@@ -188,15 +195,15 @@ declare module 'koa' {
   };
   // https://github.com/pillarjs/cookies
   declare type CookiesSetOptions = {
-    maxAge?: number, // milliseconds from Date.now() for expiry
-    expires?: Date, //cookie's expiration date (expires at the end of session by default).
-    path?: string, //  the path of the cookie (/ by default).
-    domain?: string, // domain of the cookie (no default).
-    secure?: boolean, // false by default for HTTP, true by default for HTTPS
-    httpOnly?: boolean, //  a boolean indicating whether the cookie is only to be sent over HTTP(S),
+    maxAge: number, // milliseconds from Date.now() for expiry
+    expires: Date, //cookie's expiration date (expires at the end of session by default).
+    path: string, //  the path of the cookie (/ by default).
+    domain: string, // domain of the cookie (no default).
+    secure: boolean, // false by default for HTTP, true by default for HTTPS
+    httpOnly: boolean, //  a boolean indicating whether the cookie is only to be sent over HTTP(S),
     // and not made available to client JavaScript (true by default).
-    signed?: boolean, // whether the cookie is to be signed (false by default)
-    overwrite?: boolean, //  whether to overwrite previously set cookies of the same name (false by default).
+    signed: boolean, // whether the cookie is to be signed (false by default)
+    overwrite: boolean, //  whether to overwrite previously set cookies of the same name (false by default).
   };
   declare type Cookies = {
     get: (name: string, options?: {signed: boolean}) => string|void,
@@ -224,10 +231,8 @@ declare module 'koa' {
     // context.js#L107
     // if (!(err instanceof Error)) err = new Error(`non-error thrown: ${err}`);
     onerror: (err?: mixed) => void,
-    // context.js#L70
-    throw: (( statusOrErr: string|number|Error, errOrStatus?: string|number|Error,
-      opts?: Object) => void) &
-      (( statusOrErr: string|number|Error, opts?: Object) => void),
+    // context.md#L88
+    throw: ( status: number, msg?: string, opts?: Object) => void,
     toJSON(): ContextJSON,
     inspect(): ContextJSON,
 
@@ -280,7 +285,7 @@ declare module 'koa' {
     ips: $PropertyType<Request, 'ips'>,
     ip: $PropertyType<Request, 'ip'>,
 
-    [key: string]: mixed, // props added by middlewares.
+    [key: string]: any, // props added by middlewares.
   }
 
   declare type Middleware =
@@ -297,7 +302,6 @@ declare module 'koa' {
     env: string,
     keys?: Array<string>|Object, // https://github.com/crypto-utils/keygrip
     middleware: Array<Middleware>,
-    name?: string, // optionally give your application a name
     proxy: boolean, // when true proxy header fields will be trusted
     request: Request,
     response: Response,

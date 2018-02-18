@@ -11,7 +11,6 @@ import type {
   GetOptions,
   Hash160String,
   InvokeReceipt,
-  InvocationResult,
   Log,
   Param,
   SmartContract,
@@ -104,7 +103,7 @@ const createCall = ({
   definition: SmartContractDefinition,
   client: Client<*>,
   func: ABIFunction,
-|}) => async (...args: Array<any>): Promise<InvocationResult<?Param>> => {
+|}) => async (...args: Array<any>): Promise<?Param> => {
   const { params, options, hash } = getParamsAndOptions({
     definition,
     parameters: parameters || [],
@@ -112,7 +111,7 @@ const createCall = ({
     client,
   });
   const result = await client._call(hash, name, params, options);
-  return common.convertInvocationResult({ returnType, result });
+  return common.convertCallResult({ returnType, result });
 };
 
 const filterEvents = (actions: Array<Event | Log>): Array<Event> =>

@@ -40,6 +40,15 @@ export class InvalidNamedArgumentError extends InvalidArgumentError {
   }
 }
 
+export class InvocationCallError extends CustomError {
+  code: string;
+
+  constructor(message: string) {
+    super(message);
+    this.code = 'INVOCATION_CALL';
+  }
+}
+
 export class InvalidEventError extends CustomError {
   code: string;
 

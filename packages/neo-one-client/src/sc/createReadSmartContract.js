@@ -11,7 +11,6 @@ import type {
   BlockFilter,
   Event,
   Hash160String,
-  InvocationResult,
   Log,
   Param,
   ReadSmartContract,
@@ -40,13 +39,13 @@ const createCall = ({
   hash: Hash160String,
   client: ReadClient<*>,
   func: ABIFunction,
-|}) => async (...args: Array<any>): Promise<InvocationResult<?Param>> => {
+|}) => async (...args: Array<any>): Promise<?Param> => {
   const params = getParams({
     parameters: parameters || [],
     params: args,
   });
   const result = await client._call(hash, name, params);
-  return common.convertInvocationResult({ returnType, result });
+  return common.convertCallResult({ returnType, result });
 };
 
 export default ({

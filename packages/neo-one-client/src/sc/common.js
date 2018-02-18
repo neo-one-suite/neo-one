@@ -16,7 +16,11 @@ import type {
   Param,
   RawInvocationResult,
 } from '../types'; // eslint-disable-line
-import { InvalidEventError, InvalidArgumentError } from '../errors';
+import {
+  InvalidEventError,
+  InvalidArgumentError,
+  InvocationCallError,
+} from '../errors';
 
 import parameterConverters, { converters } from './parameters';
 import paramCheckers from './params';
@@ -115,6 +119,28 @@ export const convertInvocationResult = ({
   }
 
   return { state: result.state, gasConsumed, value };
+};
+
+export const convertCallResult = ({
+  returnType,
+  result,
+}: {|
+  returnType: ABIReturn,
+  result: RawInvocationResult,
+|}): ?Param => {
+  if (result.state === 'FAULT') {
+    throw new InvocationCallError(result.message);
+  }
+
+  let value = result.stack[0];
+  if (value != null) {
+    value = convertParameter({
+      type: returnType,
+      parameter: value,
+    });
+  }
+
+  return value;
 };
 
 export const convertParams = ({
