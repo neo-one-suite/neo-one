@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-rpc",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0-alpha.8",
   "keywords": [
     "neo",
     "NEO",
@@ -34,7 +34,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.7",
+    "@neo-one/client": "^1.0.0-alpha.8",
     "@neo-one/client-core": "^1.0.0-alpha.6",
     "@neo-one/node-core": "^1.0.0-alpha.6",
     "@neo-one/utils": "^1.0.0-alpha.3",
