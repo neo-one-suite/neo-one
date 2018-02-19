@@ -170,6 +170,7 @@ export const serializeActionKeyString = ({
   `${blockIndex}:` +
   `${transactionIndex}:` +
   `${index}`;
+
 export const getActionKeyMin = ({
   blockIndexStart,
   transactionIndexStart,

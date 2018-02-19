@@ -688,6 +688,7 @@ export default class WriteBatchBlockchain {
                 : null,
           )
           .find(value => value != null);
+
         const contractsChangeSet = temporaryBlockchain.contract.getChangeSet();
         const contractHashes = contractsChangeSet
           .map(
@@ -697,6 +698,7 @@ export default class WriteBatchBlockchain {
                 : null,
           )
           .filter(Boolean);
+
         const deletedContractHashes = contractsChangeSet
           .map(
             change =>
@@ -705,6 +707,7 @@ export default class WriteBatchBlockchain {
                 : null,
           )
           .filter(Boolean);
+
         await Promise.all([
           Promise.all(
             temporaryBlockchain.getChangeSet().map(async change => {

@@ -974,34 +974,6 @@ export default class LocalUserAccountProvider<
     return (param: $FlowFixMe);
   }
 
-  _getInvokeMethodInvocationScript({
-    method,
-    params,
-  }: {|
-    method: string,
-    params: Array<?ScriptBuilderParam>,
-  |}): Buffer {
-    const sb = new ScriptBuilder();
-    sb.emitAppCallInvocation(method, ...params);
-
-    return sb.build();
-  }
-
-  _getInvokeMethodScript({
-    hash,
-    method,
-    params,
-  }: {|
-    hash: Hash160String,
-    method: string,
-    params: Array<?ScriptBuilderParam>,
-  |}): Buffer {
-    const sb = new ScriptBuilder();
-    sb.emitAppCall(common.stringToUInt160(hash), method, ...params);
-
-    return sb.build();
-  }
-
   _convertAttributes(attributes?: Array<Attribute>): Array<AttributeModel> {
     return (attributes || []).map(attribute => converters.attribute(attribute));
   }
