@@ -974,16 +974,16 @@ export default class LocalUserAccountProvider<
     return (param: $FlowFixMe);
   }
 
-  _convertAttributes(attributes?: Array<Attribute>): Array<AttributeModel> {
-    return (attributes || []).map(attribute => converters.attribute(attribute));
+  _convertAttributes(attributes: Array<Attribute>): Array<AttributeModel> {
+    return attributes.map(attribute => converters.attribute(attribute));
   }
 
-  _convertInputs(inputs?: Array<Input>): Array<InputModel> {
-    return (inputs || []).map(input => converters.input(input));
+  _convertInputs(inputs: Array<Input>): Array<InputModel> {
+    return inputs.map(input => converters.input(input));
   }
 
-  _convertOutputs(outputs?: Array<Output>): Array<OutputModel> {
-    return (outputs || []).map(output => converters.output(output));
+  _convertOutputs(outputs: Array<Output>): Array<OutputModel> {
+    return outputs.map(output => converters.output(output));
   }
 
   _convertWitness(script: Witness): WitnessModel {

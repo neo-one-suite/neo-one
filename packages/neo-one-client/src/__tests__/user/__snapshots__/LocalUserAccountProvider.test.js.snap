@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LocalUserAccountProvider deleteAccount 1`] = `
+Array [
+  Array [
+    Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "net1",
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider selectAccount 1`] = `
+Array [
+  Array [
+    Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "net1",
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider updateAccountName 1`] = `
+Array [
+  Array [
+    Object {
+      "id": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "name": "newName",
+    },
+  ],
+]
+`;
