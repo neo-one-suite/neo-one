@@ -191,14 +191,11 @@ export const getActionKeyMax = ({
   indexStop,
 }: ActionsKey): Buffer =>
   bytewise.encode(
-    bytewise.sorts.array.bound.upper([
-      actionKeyPrefix,
-      blockIndexStop == null ? Number.MAX_SAFE_INTEGER : blockIndexStop,
-      transactionIndexStop == null
-        ? Number.MAX_SAFE_INTEGER
-        : transactionIndexStop,
-      indexStop == null ? Number.MAX_SAFE_INTEGER : indexStop,
-    ]),
+    bytewise.sorts.array.bound.upper(
+      [actionKeyPrefix, blockIndexStop, transactionIndexStop, indexStop].filter(
+        value => value != null,
+      ),
+    ),
   );
 
 const serializeValidatorKey = ({ publicKey }: ValidatorKey): Buffer =>

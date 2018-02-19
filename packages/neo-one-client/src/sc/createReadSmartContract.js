@@ -75,10 +75,7 @@ export default ({
     common.convertAction({ action, events });
 
   const iterActions = (filterIn?: BlockFilter): AsyncIterable<Action> =>
-    AsyncIterableX.from(iterActionsRaw(filterIn)).pipe(
-      filter(action => action.scriptHash === hash),
-      map(convertAction),
-    );
+    AsyncIterableX.from(iterActionsRaw(filterIn)).pipe(map(convertAction));
 
   const iterEvents = (actionFilter?: BlockFilter): AsyncIterable<Event> =>
     AsyncIterableX.from(iterActions(actionFilter)).pipe(

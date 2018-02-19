@@ -432,8 +432,9 @@ export default class WriteBatchBlockchain {
     done();
 
     const [utxo, rest] = _.partition(
-      block.transactions,
-      transaction =>
+      block.transactions.map((transaction, idx) => [idx, transaction]),
+      // eslint-disable-next-line
+      ([idx, transaction]) =>
         (transaction.type === TRANSACTION_TYPE.CLAIM &&
           transaction instanceof ClaimTransaction) ||
         (transaction.type === TRANSACTION_TYPE.CONTRACT &&
@@ -459,7 +460,11 @@ export default class WriteBatchBlockchain {
         }),
       ),
       utxo.length > 0
-        ? this._persistUTXOTransactions(block, (utxo: $FlowFixMe))
+        ? this._persistUTXOTransactions(
+            block,
+            // eslint-disable-next-line
+            (utxo.map(([idx, transaction]) => transaction): $FlowFixMe),
+          )
         : Promise.resolve(),
       rest.length > 0
         ? this._persistTransactions(block, rest)
@@ -512,11 +517,11 @@ export default class WriteBatchBlockchain {
 
   async _persistTransactions(
     block: Block,
-    transactions: Array<Transaction>,
+    transactions: Array<[number, Transaction]>,
   ): Promise<void> {
     const done = this._perf.start('WriteBatchBlockchain._persistTransactions');
     // eslint-disable-next-line
-    for (const [idx, transaction] of transactions.entries()) {
+    for (const [idx, transaction] of transactions) {
       await this._persistTransaction(block, transaction, idx);
     }
     done();
