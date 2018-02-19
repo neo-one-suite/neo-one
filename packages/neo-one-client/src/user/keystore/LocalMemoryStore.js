@@ -2,7 +2,11 @@
 import type { Wallet } from './LocalKeyStore';
 
 export default class LocalMemoryStore {
-  type: string = 'memory';
+  type: string;
+
+  constructor(type?: string) {
+    this.type = type == null ? 'memory' : type;
+  }
 
   getWallets(): Promise<Array<Wallet>> {
     return Promise.resolve([]);
