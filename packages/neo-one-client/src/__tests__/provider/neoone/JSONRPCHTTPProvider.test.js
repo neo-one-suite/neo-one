@@ -196,7 +196,7 @@ describe('JSONRPCHTTPProvider', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(expectedReqTimeout),
-      timeout: 1000,
+      timeout: 1000 + 5000,
     });
   });
 

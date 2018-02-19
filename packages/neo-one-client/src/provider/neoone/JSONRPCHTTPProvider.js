@@ -10,6 +10,7 @@ import { type JSONRPCRequest, type JSONRPCProvider } from './JSONRPCProvider';
 import { UnknownBlockError } from '../../errors';
 
 const TIMEOUT_MS = 20000;
+const WATCH_TIMEOUT_MS = 5000;
 
 const PARSE_ERROR_CODE = -32700;
 const PARSE_ERROR_MESSAGE = 'Parse error';
@@ -92,7 +93,7 @@ const watchSingle = async ({
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(req),
-    timeout: timeoutMS,
+    timeout: timeoutMS + WATCH_TIMEOUT_MS,
   });
   if (!response.ok) {
     let text = null;

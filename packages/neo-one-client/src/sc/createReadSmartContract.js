@@ -66,7 +66,9 @@ export default ({
 
   const iterActionsRaw = (filterIn?: BlockFilter): AsyncIterable<ActionRaw> => {
     const blockFilter = filterIn || {};
-    return client._iterActionsRaw(blockFilter);
+    return AsyncIterableX.from(client._iterActionsRaw(blockFilter)).pipe(
+      filter(action => action.scriptHash === hash),
+    );
   };
 
   const convertAction = (action: ActionRaw): Action =>
