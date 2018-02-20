@@ -21,6 +21,12 @@ describe('LocalMemoryStore', () => {
   };
   const localMemoryStore = new LocalMemoryStore();
 
+  test('type', () => {
+    expect(localMemoryStore.type).toEqual('memory');
+    const typeStore = new LocalMemoryStore('newType');
+    expect(typeStore.type).toEqual('newType');
+  });
+
   test('getWallets', async () => {
     await expect(localMemoryStore.getWallets()).resolves.toEqual([]);
   });

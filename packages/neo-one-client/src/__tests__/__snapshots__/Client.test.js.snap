@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Client deleteAccount 1`] = `
+Array [
+  Array [
+    Object {
+      "address": "addr2",
+      "network": "net2",
+    },
+  ],
+]
+`;
+
+exports[`Client read 1`] = `
+ReadClient {
+  "dataProvider": undefined,
+}
+`;
+
+exports[`Client read 2`] = `
+Array [
+  Array [
+    "net1",
+  ],
+]
+`;
+
+exports[`Client updateAccountName 1`] = `
+Array [
+  Array [
+    Object {
+      "id": Object {
+        "address": "addr2",
+        "network": "net2",
+      },
+      "name": "newName",
+    },
+  ],
+]
+`;

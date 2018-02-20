@@ -34,7 +34,20 @@ describe('createReadSmartContract', () => {
   const expected = [expectedLog, expectedEvent];
   const hash = 'hash';
   const abi = abis.abi([abis.abiFunction(true)], [abis.abiEvent()]);
-  const abiNull = abis.abi();
+  const abiNull = {
+    functions: [
+      {
+        name: 'funcName',
+        constant: true,
+        returnType: abis.returns.Void,
+      },
+      {
+        name: 'nullName',
+        constant: false,
+        returnType: abis.returns.Void,
+      },
+    ],
+  };
 
   const client = new ReadClient(({}: $FlowFixMe));
   // $FlowFixMe
@@ -57,7 +70,10 @@ describe('createReadSmartContract', () => {
 
     const result = await readContract[abi.functions[0].name]();
     expect(result).toEqual(expected);
-    expect(nullEventsContract[abi.functions[0].name]).toBeUndefined();
+
+    const nullEventsResult = await nullEventsContract[abi.functions[0].name]();
+    expect(nullEventsResult).toEqual(expected);
+    expect(nullEventsContract.nulName).toBeUndefined();
   });
 
   test('iterActions with filter', async () => {

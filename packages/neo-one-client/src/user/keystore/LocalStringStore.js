@@ -34,11 +34,17 @@ export default class LocalStringStore {
       if (wallet.nep2 == null) {
         throw new PasswordRequiredError();
       }
-      safeWallet = { ...wallet };
-      delete safeWallet.privateKey;
+      safeWallet = {
+        type: 'locked',
+        account: wallet.account,
+        nep2: wallet.nep2,
+      };
     }
 
-    await this.storage.setItem(this._getKey(wallet), JSON.stringify(wallet));
+    await this.storage.setItem(
+      this._getKey(safeWallet),
+      JSON.stringify(safeWallet),
+    );
   }
 
   async deleteWallet(wallet: LocalWallet): Promise<void> {

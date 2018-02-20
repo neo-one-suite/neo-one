@@ -1,14 +1,8 @@
 /* @flow */
 import { common, crypto } from '@neo-one/client-core';
 
-import LocalKeyStore, {
-  type Wallet,
-} from '../../../user/keystore/LocalKeyStore';
-import {
-  LockedAccountError,
-  PasswordRequiredError,
-  UnknownAccountError,
-} from '../../../errors';
+import LocalKeyStore from '../../../user/keystore/LocalKeyStore';
+import { LockedAccountError, UnknownAccountError } from '../../../errors';
 import * as helpers from '../../../helpers';
 
 describe('LocalKeyStore', () => {
@@ -50,7 +44,7 @@ describe('LocalKeyStore', () => {
     privateKey: 'privateKey2',
     nep2: undefined,
   };
-  let wallets: Array<Wallet> = [wallet1];
+  let wallets = [wallet1];
   const store = {
     type: 'test',
     getWallets: () => Promise.resolve(wallets),
@@ -125,7 +119,7 @@ describe('LocalKeyStore', () => {
     ).rejects.toEqual(new LockedAccountError(id1.address));
   });
 
-  test('addAccount throws error on missing password for main net', async () => {
+  test('addAccount throws error on missing private key & password+nep2', async () => {
     // $FlowFixMe
     helpers.privateKeyToPublicKey = jest.fn(() => account2.publicKey);
     // $FlowFixMe
@@ -135,14 +129,54 @@ describe('LocalKeyStore', () => {
 
     const result = localKeyStore.addAccount({
       network: 'main',
-      privateKey: 'privateKey2',
       name: account2.name,
     });
 
-    expect(result).rejects.toEqual(new PasswordRequiredError());
+    expect(result).rejects.toEqual(
+      new Error('Expected private key or password and NEP-2 key'),
+    );
   });
 
-  test('addAccount sets nep2 on main net and is set to current account', async () => {
+  test('addAccount sets privateKey when given nep2+password', async () => {
+    localKeyStore = new LocalKeyStore({ store });
+    const idMain = {
+      network: 'main',
+      address: 'addrMain',
+    };
+    const accountMain = {
+      type: 'test',
+      id: idMain,
+      name: 'addrMain',
+      scriptHash: 'scriptHashMain',
+      publicKey: 'publicKeyMain',
+      configurableName: true,
+      deletable: true,
+    };
+    const walletMain = {
+      account: accountMain,
+      privateKey: 'privateKeyMain',
+      nep2: 'nep2Main',
+      type: 'unlocked',
+    };
+    // $FlowFixMe
+    helpers.privateKeyToPublicKey = jest.fn(() => accountMain.publicKey);
+    // $FlowFixMe
+    helpers.publicKeyToScriptHash = jest.fn(() => accountMain.scriptHash);
+    // $FlowFixMe
+    helpers.scriptHashToAddress = jest.fn(() => idMain.address);
+    // $FlowFixMe
+    helpers.decryptNEP2 = jest.fn(() => Promise.resolve(walletMain.privateKey));
+
+    const result = await localKeyStore.addAccount({
+      network: 'main',
+      password: 'pass',
+      nep2: 'nep2Main',
+    });
+
+    expect(result).toEqual(walletMain);
+  });
+
+  test('addAccount sets nep2 when given privateKey+password and is set to current account', async () => {
     localKeyStore = new LocalKeyStore({ store });
     const idMain = {
       network: 'main',
@@ -221,6 +255,71 @@ describe('LocalKeyStore', () => {
     await localKeyStore.selectAccount(id2);
 
     expect(localKeyStore.getCurrentAccount()).toEqual(account2);
+  });
+
+  test('selectAccount with null id', async () => {
+    expect(localKeyStore.getCurrentAccount()).toEqual(account1);
+
+    await localKeyStore.selectAccount();
+
+    expect(localKeyStore.getCurrentAccount()).toEqual(null);
+  });
+
+  test('updateAccountName - unlocked wallet', async () => {
+    const updateAccount = {
+      type: 'test',
+      id: id1,
+      name: 'newName',
+      scriptHash: 'scriptHash1',
+      publicKey: 'publicKey1',
+      configurableName: true,
+      deletable: true,
+    };
+
+    await localKeyStore.updateAccountName({
+      id: id1,
+      name: 'newName',
+    });
+
+    const result = localKeyStore.getWallet(id1);
+    expect(result).toEqual({
+      type: 'unlocked',
+      account: updateAccount,
+      privateKey: wallet1.privateKey,
+      nep2: wallet1.nep2,
+    });
+  });
+
+  test('updateAccountName - locked wallet', async () => {
+    const updateAccount = {
+      type: 'test',
+      id: id1,
+      name: 'newName',
+      scriptHash: 'scriptHash1',
+      publicKey: 'publicKey1',
+      configurableName: true,
+      deletable: true,
+    };
+    const wallet = {
+      type: 'locked',
+      account: account1,
+      nep2: wallet1.nep2,
+    };
+
+    wallets = [wallet];
+    localKeyStore = await new LocalKeyStore({ store });
+
+    await localKeyStore.updateAccountName({
+      id: id1,
+      name: 'newName',
+    });
+
+    const result = localKeyStore.getWallet(id1);
+    expect(result).toEqual({
+      type: 'locked',
+      account: updateAccount,
+      nep2: wallet1.nep2,
+    });
   });
 
   test('getWallet throws error on unknown network', async () => {

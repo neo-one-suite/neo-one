@@ -18,7 +18,7 @@ describe('NEOONEProvider', () => {
   });
 
   test('NEOONEProvider constructor with no options', async () => {
-    const testProvider = new NEOONEProvider({});
+    const testProvider = new NEOONEProvider();
     const result = await testProvider.getNetworks();
     expect(result).toEqual(['main', 'test']);
   });
@@ -59,7 +59,12 @@ describe('NEOONEProvider', () => {
     expect(result).toEqual(['main', 'test', network]);
   });
 
-  test('_getProvider throws error for unknown network', async () => {
+  test('read', () => {
+    const result = provider.read(network);
+    expect(result).toMatchSnapshot();
+  });
+
+  test('_getProvider throws error for unknown network', () => {
     const fakeNet = 'fake';
     function testError() {
       // $FlowFixMe

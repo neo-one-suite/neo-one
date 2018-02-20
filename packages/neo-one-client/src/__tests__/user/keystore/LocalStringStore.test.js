@@ -1,5 +1,6 @@
 /* @flow */
 import LocalStringStore from '../../../user/keystore/LocalStringStore';
+import { PasswordRequiredError } from '../../../errors';
 
 describe('LocalStringStore', () => {
   const wallet = {
@@ -19,8 +20,8 @@ describe('LocalStringStore', () => {
     privateKey: 'privateKey1',
     nep2: 'nep21',
   };
-  const keys = ['key1', 'key2'];
-  const items = {
+  let keys = ['key1', 'key2'];
+  let items = {
     key1: '{"item1": 1}',
     key2: '{"item2": 2}',
   };
@@ -38,7 +39,15 @@ describe('LocalStringStore', () => {
     getAllKeys: () => Promise.resolve(keys),
   };
 
-  const localStringStore = new LocalStringStore({ type: 'type', storage });
+  let localStringStore = new LocalStringStore({ type: 'type', storage });
+  beforeEach(() => {
+    keys = ['key1', 'key2'];
+    items = {
+      key1: '{"item1": 1}',
+      key2: '{"item2": 2}',
+    };
+    localStringStore = new LocalStringStore({ type: 'type', storage });
+  });
 
   test('getWallets', async () => {
     const expected = [{ item1: 1 }, { item2: 2 }];
@@ -58,14 +67,63 @@ describe('LocalStringStore', () => {
     await expect(localStringStore.getWallets()).resolves.toEqual(expected);
   });
 
+  test('saveWallet throws error missing password for main net wallet', async () => {
+    const passWallet = {
+      type: 'unlocked',
+      account: {
+        type: 'test',
+        id: {
+          network: 'main',
+          address: 'addr',
+        },
+        name: 'name1',
+        scriptHash: 'scriptHash1',
+        publicKey: 'publicKey1',
+        configurableName: true,
+        deletable: true,
+      },
+      privateKey: 'privateKey1',
+      nep2: null,
+    };
+
+    const result = localStringStore.saveWallet(passWallet);
+
+    await expect(result).rejects.toEqual(new PasswordRequiredError());
+  });
+
+  test('saveWallet removes privateKey of password protected wallets', async () => {
+    const expected = [{ item1: 1 }, { item2: 2 }];
+    const passWallet = {
+      type: 'unlocked',
+      account: {
+        type: 'test',
+        id: {
+          network: 'main',
+          address: 'addr',
+        },
+        name: 'name1',
+        scriptHash: 'scriptHash1',
+        publicKey: 'publicKey1',
+        configurableName: true,
+        deletable: true,
+      },
+      privateKey: 'privateKey1',
+      nep2: 'nep21',
+    };
+    await localStringStore.saveWallet(passWallet);
+    passWallet.type = 'locked';
+    delete passWallet.privateKey;
+    expected.push(passWallet);
+    await expect(localStringStore.getWallets()).resolves.toEqual(expected);
+  });
+
   test('deleteWallet', async () => {
     const expected = [{ item1: 1 }, { item2: 2 }, wallet];
-
+    await localStringStore.saveWallet(wallet);
     await expect(localStringStore.getWallets()).resolves.toEqual(expected);
 
-    expected.splice(2, 1);
     await localStringStore.deleteWallet(wallet);
-
+    expected.splice(2, 1);
     await expect(localStringStore.getWallets()).resolves.toEqual(expected);
   });
 });

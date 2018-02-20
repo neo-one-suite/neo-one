@@ -2,7 +2,11 @@
 import BigNumber from 'bignumber.js';
 
 import * as common from '../../sc/common';
-import { InvalidEventError, InvalidArgumentError } from '../../errors';
+import {
+  InvalidEventError,
+  InvalidArgumentError,
+  InvocationCallError,
+} from '../../errors';
 import * as abis from '../../__data__/abis';
 
 describe('common', () => {
@@ -185,6 +189,75 @@ describe('common', () => {
       result: invokeResult,
     });
     expect(result).toEqual(expected);
+  });
+
+  test('convertInvocationResult - invocation success with null stack', () => {
+    const returnType = { type: 'String' };
+    const invokeResult = {
+      state: 'HALT',
+      gasConsumed: new BigNumber('10'),
+      stack: [],
+    };
+    const expected = {
+      state: invokeResult.state,
+      gasConsumed: invokeResult.gasConsumed,
+    };
+
+    const result = common.convertInvocationResult({
+      returnType,
+      result: invokeResult,
+    });
+    expect(result).toEqual(expected);
+  });
+
+  test('convertCallResult throws error on fault', () => {
+    const returnType = { type: 'String' };
+    const resultCall = {
+      state: 'FAULT',
+      gasConsumed: new BigNumber('10'),
+      stack: [contractParameter],
+      message: 'testMsg',
+    };
+
+    function testError() {
+      return common.convertCallResult({
+        returnType,
+        result: resultCall,
+      });
+    }
+
+    expect(testError).toThrow(new InvocationCallError(resultCall.message));
+  });
+
+  test('convertCallResult', () => {
+    const returnType = { type: 'String' };
+    const resultCall = {
+      state: 'HALT',
+      gasConsumed: new BigNumber('10'),
+      stack: [contractParameter],
+    };
+    const expected = 'test';
+
+    const result = common.convertCallResult({
+      returnType,
+      result: resultCall,
+    });
+    expect(result).toEqual(expected);
+  });
+
+  test('convertCallResult on null stack', () => {
+    const returnType = { type: 'String' };
+    const resultCall = {
+      state: 'HALT',
+      gasConsumed: new BigNumber('10'),
+      stack: [],
+    };
+
+    const result = common.convertCallResult({
+      returnType,
+      result: resultCall,
+    });
+    expect(result).toBeUndefined();
   });
 
   test('convertParams', () => {
