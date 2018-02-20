@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NEOONEDataProvider call 1`] = `
+Object {
+  "gasConsumed": "0",
+  "message": "10",
+  "stack": Array [
+    Object {
+      "type": "Integer",
+      "value": "100000000",
+    },
+    Object {
+      "type": "Array",
+      "value": Array [
+        Object {
+          "type": "Void",
+        },
+      ],
+    },
+  ],
+  "state": "FAULT",
+}
+`;
+
+exports[`NEOONEDataProvider setRPCURL 1`] = `
+NEOONEDataProvider {
+  "_client": JSONRPCClient {
+    "_provider": JSONRPCHTTPProvider {
+      "batcher": DataLoader {
+        "_batchLoadFn": [Function],
+        "_options": Object {
+          "cacheKeyFn": [Function],
+          "maxBatchSize": 25,
+        },
+        "_promiseCache": Array [],
+        "_queue": Array [],
+      },
+      "endpoint": "buzz",
+    },
+  },
+  "_iterBlocksFetchTimeoutMS": 1000,
+  "network": "foo",
+}
+`;

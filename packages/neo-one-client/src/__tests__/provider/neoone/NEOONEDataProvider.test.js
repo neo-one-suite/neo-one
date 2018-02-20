@@ -366,6 +366,12 @@ describe('NEOONEDataProvider', () => {
     });
   });
 
+  test('setRPCURL', () => {
+    const newRPC = 'buzz';
+    provider.setRPCURL(newRPC);
+    expect(provider).toMatchSnapshot();
+  });
+
   test('getUnclaimed', async () => {
     const expected = { unclaimed: [], amount: new BigNumber(0) };
     // $FlowFixMe
@@ -800,5 +806,21 @@ describe('NEOONEDataProvider', () => {
 
     const result = await toArray(provider.iterActionsRaw());
     expect(result).toEqual(expected);
+  });
+
+  test('call', async () => {
+    const contract = '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9';
+    const method = 'testMethod';
+    const params = ['param1'];
+
+    // $FlowFixMe
+    provider._client.testInvocation = jest.fn(() =>
+      Promise.resolve(
+        createInvocationResultJSON({ state: VM_STATE.FAULT, message: '10' }),
+      ),
+    );
+
+    const result = await provider.call(contract, method, params);
+    expect(result).toMatchSnapshot();
   });
 });

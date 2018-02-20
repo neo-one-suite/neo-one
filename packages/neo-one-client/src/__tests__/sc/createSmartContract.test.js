@@ -60,6 +60,30 @@ describe('createSmartContract', () => {
     await expect(result).resolves.toEqual(expected);
   });
 
+  test('createCall - null params', async () => {
+    const expected = '10';
+    const func = {
+      name: 'funcName',
+      constant: true,
+      returnType: abis.returns.Void,
+    };
+    const abi = { functions: [func] };
+    const definition = { networks, abi };
+    const options = { from: { network: 'test' } };
+    const params = { converted: ['test'], zipped: ['name', 'test'] };
+    // $FlowFixMe
+    common.convertParams = jest.fn(() => params);
+    // $FlowFixMe
+    client._call = jest.fn(() => Promise.resolve());
+    // $FlowFixMe
+    common.convertCallResult = jest.fn(() => expected);
+
+    const smartContract = createSmartContract({ definition, client });
+
+    const result = smartContract[func.name](options);
+    await expect(result).resolves.toEqual(expected);
+  });
+
   test('createInvoke', async () => {
     const func = abis.abiFunction();
     const event = abis.abiEvent();

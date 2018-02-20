@@ -1,7 +1,7 @@
 /* @flow */
 import Client from '../Client';
 import * as argAssertions from '../args';
-import { UnknownAccountError } from '../errors';
+import { UnknownAccountError, UnknownNetworkError } from '../errors';
 import { transactions } from '../__data__';
 import createSmartContract from '../sc/createSmartContract';
 
@@ -32,6 +32,9 @@ describe('Client', () => {
     getCurrentAccount: () => account1,
     getAccounts: () => [account1],
     getNetworks: () => [network1],
+    deleteAccount: () => [],
+    updateAccountName: () => [],
+    read: () => [],
   };
   const provider2 = {
     type: 'test2',
@@ -39,6 +42,9 @@ describe('Client', () => {
     getCurrentAccount: () => account2,
     getAccounts: () => [account2],
     getNetworks: () => [network2],
+    deleteAccount: () => [],
+    updateAccountName: () => [],
+    read: () => [],
   };
 
   let client = new Client(({ test1: provider1, test2: provider2 }: $FlowFixMe));
@@ -98,11 +104,56 @@ describe('Client', () => {
     expect(result).toEqual(expected);
   });
 
+  test('getAccount', () => {
+    const expected = account1;
+
+    const result = client.getAccount(id1);
+    expect(result).toEqual(expected);
+  });
+
+  test('getAccount throws error on nonexistant account', () => {
+    const idFake = { network: 'fakeNet', address: 'fakeAddr' };
+
+    function testError() {
+      return client.getAccount(idFake);
+    }
+    expect(testError).toThrow(new UnknownAccountError(idFake.address));
+  });
+
+  test('deleteAccount', async () => {
+    provider2.deleteAccount = jest.fn(() => Promise.resolve());
+
+    await client.deleteAccount(id2);
+    expect(provider2.deleteAccount.mock.calls).toMatchSnapshot();
+  });
+
+  test('updateAccountName', async () => {
+    provider2.updateAccountName = jest.fn(() => Promise.resolve());
+
+    await client.updateAccountName({ id: id2, name: 'newName' });
+    expect(provider2.updateAccountName.mock.calls).toMatchSnapshot();
+  });
+
   test('getNetworks', () => {
     const expected = [network1, network2];
 
     const result = client.getNetworks();
     expect(result).toEqual(expected);
+  });
+
+  test('read', () => {
+    provider1.read = jest.fn(() => {});
+
+    const result = client.read('net1');
+    expect(result).toMatchSnapshot();
+    expect(provider1.read.mock.calls).toMatchSnapshot();
+  });
+
+  test('read throws error on invalid network', () => {
+    function testError() {
+      return client.read('fakeNet');
+    }
+    expect(testError).toThrow(new UnknownNetworkError('fakeNet'));
   });
 
   test('inject', () => {
