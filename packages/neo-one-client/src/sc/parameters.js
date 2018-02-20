@@ -1,6 +1,11 @@
 /* @flow */
 import type BigNumber from 'bignumber.js';
-import { JSONHelper, common, utils } from '@neo-one/client-core';
+import {
+  InvalidContractParameterTypeJSONError,
+  JSONHelper,
+  common,
+  utils,
+} from '@neo-one/client-core';
 
 import type {
   ArrayABI,
@@ -79,9 +84,7 @@ const toByteArrayBuffer = (contractParameter: ContractParameter): Buffer => {
     default:
       // eslint-disable-next-line
       (contractParameter.type: empty);
-      throw new Error(
-        `Unknown contractParameter type: ${contractParameter.type}`,
-      );
+      throw new InvalidContractParameterTypeJSONError(contractParameter.type);
   }
 
   return value;
@@ -219,6 +222,13 @@ function createNullable<Result>(
     try {
       return func(contractParameter);
     } catch (error) {
+      if (
+        error.code === 'INVALID_CONTRACT_PARAMETER' ||
+        error.code === 'INVALID_CONTRACT_PARAMETER_TYPE_JSON'
+      ) {
+        throw error;
+      }
+
       return null;
     }
   };
@@ -231,114 +241,133 @@ function createNullableABI<Result, ABI>(
     try {
       return func(contractParameter, parameter);
     } catch (error) {
+      if (
+        error.code === 'INVALID_CONTRACT_PARAMETER' ||
+        error.code === 'INVALID_CONTRACT_PARAMETER_TYPE_JSON'
+      ) {
+        throw error;
+      }
+
       return null;
     }
   };
 }
+
+const toStringNullable = (createNullable(toString): (
+  param: ContractParameter,
+) => ?string);
+const toHash160Nullable = (createNullable(toHash160): (
+  param: ContractParameter,
+) => ?Hash160String);
+const toHash256Nullable = (createNullable(toHash256): (
+  param: ContractParameter,
+) => ?Hash256String);
+const toPublicKeyNullable = (createNullable(toPublicKey): (
+  param: ContractParameter,
+) => ?PublicKeyString);
+const toIntegerNullable = (createNullableABI(toInteger): (
+  param: ContractParameter,
+  abi: IntegerABI,
+) => ?BigNumber);
+const toBooleanNullable = (createNullable(toBoolean): (
+  param: ContractParameter,
+) => ?boolean);
+const toSignatureNullable = (createNullable(toSignature): (
+  param: ContractParameter,
+) => ?SignatureString);
+const toByteArrayNullable = (createNullable(toByteArray): (
+  param: ContractParameter,
+) => ?BufferString);
+const toArrayNullable = (createNullableABI(toArray): (
+  param: ContractParameter,
+  abi: ArrayABI,
+) => ?Array<?Param>);
+const toInteropInterfaceNullable = (createNullable(toInteropInterface): (
+  param: ContractParameter,
+) => ?typeof undefined);
+const toVoidNullable = (createNullable(toVoid): (
+  param: ContractParameter,
+) => ?typeof undefined);
 
 const contractParameters = {
   String: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: StringABI,
-  ): ?Param => toString(contractParameter),
+  ): ?Param => toStringNullable(contractParameter),
   Hash160: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: Hash160ABI,
-  ): ?Param => toHash160(contractParameter),
+  ): ?Param => toHash160Nullable(contractParameter),
   Hash256: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: Hash256ABI,
-  ): ?Param => toHash256(contractParameter),
+  ): ?Param => toHash256Nullable(contractParameter),
   PublicKey: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: PublicKeyABI,
-  ): ?Param => toPublicKey(contractParameter),
+  ): ?Param => toPublicKeyNullable(contractParameter),
   Integer: (
     contractParameter: ContractParameter,
     parameter: IntegerABI,
-  ): ?Param => toInteger(contractParameter, parameter),
+  ): ?Param => toIntegerNullable(contractParameter, parameter),
   Boolean: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: BooleanABI,
-  ): ?Param => toBoolean(contractParameter),
+  ): ?Param => toBooleanNullable(contractParameter),
   Signature: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: SignatureABI,
-  ): ?Param => toSignature(contractParameter),
+  ): ?Param => toSignatureNullable(contractParameter),
   ByteArray: (
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: ByteArrayABI,
-  ): ?Param => toByteArray(contractParameter),
+  ): ?Param => toByteArrayNullable(contractParameter),
   Array: (contractParameter: ContractParameter, parameter: ArrayABI): ?Param =>
-    toArray(contractParameter, parameter),
+    toArrayNullable(contractParameter, parameter),
   InteropInterface: (
     // eslint-disable-next-line
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: InteropInterfaceABI,
-  ): ?Param => toInteropInterface(contractParameter),
+  ): ?Param => toInteropInterfaceNullable(contractParameter),
   Void: (
     // eslint-disable-next-line
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: VoidABI,
-  ): ?Param => toVoid(contractParameter),
+  ): ?Param => toVoidNullable(contractParameter),
 };
 
 export const converters = {
   toString,
-  toStringNullable: (createNullable(toString): (
-    param: ContractParameter,
-  ) => ?string),
+  toStringNullable,
   toHash160,
-  toHash160Nullable: (createNullable(toHash160): (
-    param: ContractParameter,
-  ) => ?Hash160String),
+  toHash160Nullable,
   toHash256,
-  toHash256Nullable: (createNullable(toHash256): (
-    param: ContractParameter,
-  ) => ?Hash256String),
+  toHash256Nullable,
   toPublicKey,
-  toPublicKeyNullable: (createNullable(toPublicKey): (
-    param: ContractParameter,
-  ) => ?PublicKeyString),
+  toPublicKeyNullable,
   toInteger,
-  toIntegerNullable: (createNullableABI(toInteger): (
-    param: ContractParameter,
-    abi: IntegerABI,
-  ) => ?BigNumber),
+  toIntegerNullable,
   toBoolean,
-  toBooleanNullable: (createNullable(toBoolean): (
-    param: ContractParameter,
-  ) => ?boolean),
+  toBooleanNullable,
   toSignature,
-  toSignatureNullable: (createNullable(toSignature): (
-    param: ContractParameter,
-  ) => ?SignatureString),
+  toSignatureNullable,
   toByteArray,
-  toByteArrayNullable: (createNullable(toByteArray): (
-    param: ContractParameter,
-  ) => ?BufferString),
+  toByteArrayNullable,
   toArray,
-  toArrayNullable: (createNullableABI(toArray): (
-    param: ContractParameter,
-    abi: ArrayABI,
-  ) => ?Array<?Param>),
+  toArrayNullable,
   toInteropInterface,
-  toInteropInterfaceNullable: (createNullable(toInteropInterface): (
-    param: ContractParameter,
-  ) => ?typeof undefined),
+  toInteropInterfaceNullable,
   toVoid,
-  toVoidNullable: (createNullable(toVoid): (
-    param: ContractParameter,
-  ) => ?typeof undefined),
+  toVoidNullable,
 };
 
 export default contractParameters;

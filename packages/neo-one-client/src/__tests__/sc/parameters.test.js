@@ -1,5 +1,10 @@
 /* @flow */
-import { JSONHelper, common, utils } from '@neo-one/client-core';
+import {
+  InvalidContractParameterTypeJSONError,
+  JSONHelper,
+  common,
+  utils,
+} from '@neo-one/client-core';
 
 import parameters from '../../sc/parameters';
 import { InvalidContractParameterError } from '../../errors';
@@ -120,7 +125,7 @@ describe('parameters', () => {
       }
 
       expect(testError).toThrow(
-        new Error(`Unknown contractParameter type: Unknown`),
+        new InvalidContractParameterTypeJSONError('Unknown'),
       );
     });
   });

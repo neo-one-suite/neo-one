@@ -14,21 +14,6 @@ export { default as Witness } from './Witness';
 export { LogAction, NotificationAction } from './action';
 export { default as common } from './common';
 export { default as disassembleByteCode } from './disassembleByteCode';
-export {
-  SignatureContractParameter,
-  BooleanContractParameter,
-  IntegerContractParameter,
-  Hash160ContractParameter,
-  Hash256ContractParameter,
-  ByteArrayContractParameter,
-  PublicKeyContractParameter,
-  StringContractParameter,
-  ArrayContractParameter,
-  InteropInterfaceContractParameter,
-  VoidContractParameter,
-  assertContractParameterTypeJSON,
-  toContractParameterType,
-} from './contractParameter';
 export { default as crypto, MerkleTree } from './crypto';
 export { InvalidFormatError } from './errors';
 export {
@@ -92,11 +77,7 @@ export {
   assertAssetTypeJSON,
   toAssetType,
 } from './AssetType';
-export {
-  CONTRACT_PARAMETER_TYPE,
-  InvalidContractParameterTypeError,
-  assertContractParameterType,
-} from './contractParameter';
+export * from './contractParameter';
 export {
   CONTRACT_PROPERTY_STATE,
   HAS_DYNAMIC_INVOKE,
@@ -118,23 +99,6 @@ export type {
   UInt256,
   UInt256Hex,
 } from './common';
-export type {
-  ContractParameter,
-  ContractParameterJSON,
-  ContractParameterType,
-  ContractParameterTypeJSON,
-  SignatureContractParameterJSON,
-  BooleanContractParameterJSON,
-  IntegerContractParameterJSON,
-  Hash160ContractParameterJSON,
-  Hash256ContractParameterJSON,
-  ByteArrayContractParameterJSON,
-  PublicKeyContractParameterJSON,
-  StringContractParameterJSON,
-  ArrayContractParameterJSON,
-  InteropInterfaceContractParameterJSON,
-  VoidContractParameterJSON,
-} from './contractParameter';
 export type { Equatable, Equals } from './Equatable';
 export type {
   InvocationResult,

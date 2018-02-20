@@ -47,20 +47,9 @@ export type {
 } from './InteropInterfaceContractParameter';
 export type { VoidContractParameterJSON } from './VoidContractParameter';
 
-export {
-  CONTRACT_PARAMETER_TYPE,
-  InvalidContractParameterTypeError,
-  assertContractParameterTypeJSON,
-  assertContractParameterType,
-  toJSONContractParameterType,
-  toContractParameterType,
-} from './ContractParameterType';
+export * from './ContractParameterType';
 export { deserializeWire, deserializeWireBase } from './ContractParameter';
 
-export type {
-  ContractParameterType,
-  ContractParameterTypeJSON,
-} from './ContractParameterType';
 export type {
   ContractParameter,
   ContractParameterJSON,
