@@ -71,6 +71,7 @@ import {
   InvokeError,
   NoAccountError,
   NothingToClaimError,
+  NothingToIssueError,
   NothingToTransferError,
 } from '../errors';
 
@@ -375,7 +376,7 @@ export default class LocalUserAccountProvider<
     });
 
     if (inputs.length === 0) {
-      throw new NothingToTransferError();
+      throw new NothingToIssueError();
     }
 
     const transaction = new IssueTransaction({

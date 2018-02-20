@@ -102,6 +102,7 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
         acct =>
           acct.id.network === id.network && acct.id.address === id.address,
       );
+    /* istanbul ignore if  */
     if (account == null) {
       throw new UnknownAccountError(id.address);
     }

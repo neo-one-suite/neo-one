@@ -11,6 +11,7 @@ import {
   InvokeError,
   NoAccountError,
   NothingToClaimError,
+  NothingToIssueError,
   NothingToTransferError,
 } from '../../errors';
 
@@ -894,7 +895,7 @@ describe('LocalUserAccountProvider', () => {
     );
 
     const result = localUserAccountProvider.issue(transfers);
-    await expect(result).rejects.toEqual(new NothingToTransferError());
+    await expect(result).rejects.toEqual(new NothingToIssueError());
   });
 
   test('issue', async () => {
