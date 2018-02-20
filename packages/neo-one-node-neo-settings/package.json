@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-neo-settings",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0-alpha.8",
   "keywords": [
     "neo",
     "NEO",
@@ -34,7 +34,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.7",
+    "@neo-one/client-core": "^1.0.0-alpha.8",
     "bn.js": "^4.11.8"
   }
 }
