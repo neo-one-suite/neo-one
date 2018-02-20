@@ -3,7 +3,7 @@ export { default as Client } from './Client';
 export { default as ReadClient } from './ReadClient';
 
 export * from './user';
-export { NEOONEDataProvider, NEOONEProvider } from './provider';
+export * from './provider';
 
 export { disassembleByteCode } from '@neo-one/client-core';
 
