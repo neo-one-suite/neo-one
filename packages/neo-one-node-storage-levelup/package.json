@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-storage-levelup",
-  "version": "1.0.0-alpha.8",
+  "version": "1.0.0-alpha.9",
   "keywords": [
     "neo",
     "NEO",
@@ -34,9 +34,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.6",
-    "@neo-one/node-core": "^1.0.0-alpha.6",
-    "@neo-one/node-storage-common": "^1.0.0-alpha.8",
+    "@neo-one/client-core": "^1.0.0-alpha.7",
+    "@neo-one/node-core": "^1.0.0-alpha.7",
+    "@neo-one/node-storage-common": "^1.0.0-alpha.9",
     "@neo-one/utils": "^1.0.0-alpha.3",
     "bytewise": "^1.1.0",
     "rxjs": "^5.5.6"
