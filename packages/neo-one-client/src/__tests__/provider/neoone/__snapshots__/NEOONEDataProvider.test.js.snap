@@ -22,6 +22,74 @@ Object {
 }
 `;
 
+exports[`NEOONEDataProvider iterBlocks - null iterBlocksFetchTimeoutMS 1`] = `
+FromAsyncIterable {
+  "_selector": [Function],
+  "_source": AsyncBlockIterator {
+    "__done": false,
+    "_client": NEOONEDataProvider {
+      "_client": JSONRPCClient {
+        "_provider": JSONRPCHTTPProvider {
+          "batcher": DataLoader {
+            "_batchLoadFn": [Function],
+            "_options": Object {
+              "cacheKeyFn": [Function],
+              "maxBatchSize": 25,
+            },
+            "_promiseCache": Array [],
+            "_queue": Array [],
+          },
+          "endpoint": "bar",
+        },
+      },
+      "_iterBlocksFetchTimeoutMS": undefined,
+      "network": "foo",
+    },
+    "_currentIndex": 1,
+    "_fetchTimeoutMS": 20000,
+    "_fetching": false,
+    "_indexStop": 2,
+    "_items": Array [],
+    "_resolvers": Array [],
+    "_startHeight": null,
+  },
+}
+`;
+
+exports[`NEOONEDataProvider iterBlocks 1`] = `
+FromAsyncIterable {
+  "_selector": [Function],
+  "_source": AsyncBlockIterator {
+    "__done": false,
+    "_client": NEOONEDataProvider {
+      "_client": JSONRPCClient {
+        "_provider": JSONRPCHTTPProvider {
+          "batcher": DataLoader {
+            "_batchLoadFn": [Function],
+            "_options": Object {
+              "cacheKeyFn": [Function],
+              "maxBatchSize": 25,
+            },
+            "_promiseCache": Array [],
+            "_queue": Array [],
+          },
+          "endpoint": "bar",
+        },
+      },
+      "_iterBlocksFetchTimeoutMS": 1000,
+      "network": "foo",
+    },
+    "_currentIndex": 0,
+    "_fetchTimeoutMS": 1000,
+    "_fetching": false,
+    "_indexStop": undefined,
+    "_items": Array [],
+    "_resolvers": Array [],
+    "_startHeight": null,
+  },
+}
+`;
+
 exports[`NEOONEDataProvider setRPCURL 1`] = `
 NEOONEDataProvider {
   "_client": JSONRPCClient {

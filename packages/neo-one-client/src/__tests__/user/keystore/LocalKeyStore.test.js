@@ -68,6 +68,35 @@ describe('LocalKeyStore', () => {
     expect(localKeyStore.wallets).toEqual({ net1: { addr1: wallet1 } });
   });
 
+  test('wallets get - same network', async () => {
+    const id = {
+      network: 'net1',
+      address: 'addr',
+    };
+    const account = {
+      type: 'test',
+      id,
+      name: 'addr',
+      scriptHash: 'scriptHashNew',
+      publicKey: 'publicKeyNew',
+      configurableName: true,
+      deletable: true,
+    };
+    const wallet = {
+      account,
+      privateKey: 'privateKeyNew',
+      nep2: 'nep2New',
+      type: 'unlocked',
+    };
+
+    wallets = [wallet1, wallet];
+    localKeyStore = await new LocalKeyStore({ store });
+
+    expect(localKeyStore.wallets).toEqual({
+      net1: { addr1: wallet1, addr: wallet },
+    });
+  });
+
   test('getCurrentAccount', () => {
     expect(localKeyStore.getCurrentAccount()).toEqual(account1);
   });

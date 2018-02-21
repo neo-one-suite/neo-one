@@ -473,6 +473,7 @@ export default class NEOONEDataProvider implements DataProvider {
           networkFee: new BigNumber(transaction.net_fee),
           descriptors: transaction.descriptors,
         };
+      /* istanbul ignore next */
       default:
         // eslint-disable-next-line
         (transaction.type: empty);
