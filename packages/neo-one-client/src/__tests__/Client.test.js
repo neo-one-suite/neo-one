@@ -69,7 +69,9 @@ describe('Client', () => {
 
   test('Client constructor throws error on mismatched provider type', () => {
     function testError() {
-      client = new Client({ test: { type: 'invalid' } });
+      client = new Client({
+        test: { type: 'invalid', getCurrentAccount: () => {} },
+      });
     }
 
     expect(testError).toThrow(

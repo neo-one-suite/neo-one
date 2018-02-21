@@ -4,7 +4,7 @@ import type { Observable } from 'rxjs/Observable';
 import type { Param as ScriptBuilderParam } from '@neo-one/client-core';
 
 import { combineLatest } from 'rxjs/observable/combineLatest';
-import { map, switchMap } from 'rxjs/operators';
+import { filter, map, switchMap, take } from 'rxjs/operators';
 import { utils } from '@neo-one/utils';
 
 import type {
@@ -45,7 +45,10 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
   +_selectedProvider$: BehaviorSubject<UserAccountProvider>;
 
   constructor(providersIn: TUserAccountProviders) {
-    const providerIn = utils.values(providersIn)[0];
+    const providersArray = utils.values(providersIn);
+    const providerIn =
+      providersArray.find(provider => provider.getCurrentAccount() != null) ||
+      providersArray[0];
     if (providerIn == null) {
       throw new Error('At least one provider is required');
     }
@@ -88,6 +91,21 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
     );
 
     clients.push(this);
+
+    if (this.getCurrentAccount() == null) {
+      this.accounts$
+        .pipe(filter(accounts => accounts.length > 0), take(1))
+        .toPromise()
+        .then(async accounts => {
+          const account = accounts[0];
+          if (this.getCurrentAccount() == null && account != null) {
+            await this.selectAccount(account.id);
+          }
+        })
+        .catch(() => {
+          // Just ignore errors here.
+        });
+    }
   }
 
   get providers(): TUserAccountProviders {

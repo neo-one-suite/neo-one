@@ -35,6 +35,7 @@ describe('LocalStringStore', () => {
     removeItem: (key: string) => {
       keys.splice(keys.indexOf(key), 1);
       delete items[key];
+      return Promise.resolve();
     },
     getAllKeys: () => Promise.resolve(keys),
   };

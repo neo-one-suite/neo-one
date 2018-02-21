@@ -193,6 +193,19 @@ export default class LocalKeyStore {
     return wallet;
   }
 
+  getWallet$({ address, network }: UserAccountID): Observable<?Wallet> {
+    return this._wallets$.pipe(
+      map(wallets => {
+        const networkWallets = wallets[network];
+        if (networkWallets == null) {
+          return null;
+        }
+
+        return networkWallets[address];
+      }),
+    );
+  }
+
   async addAccount({
     network,
     privateKey: privateKeyIn,
