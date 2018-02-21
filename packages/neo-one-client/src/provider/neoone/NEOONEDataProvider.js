@@ -1,4 +1,5 @@
 /* @flow */
+import BN from 'bn.js';
 import {
   VM_STATE,
   type AccountJSON,
@@ -17,7 +18,6 @@ import {
   type TransactionJSON,
   type ValidatorJSON,
   InvocationTransaction as CoreInvocationTransaction,
-  JSONHelper,
   utils,
 } from '@neo-one/client-core';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
@@ -564,7 +564,7 @@ export default class NEOONEDataProvider implements DataProvider {
     if (parameter.type === 'Integer') {
       return {
         type: 'Integer',
-        value: JSONHelper.readFixed8(parameter.value),
+        value: new BN(parameter.value, 10),
       };
     }
     if (parameter.type === 'Array') {

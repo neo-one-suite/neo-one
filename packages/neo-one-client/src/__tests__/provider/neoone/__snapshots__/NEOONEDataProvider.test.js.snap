@@ -7,7 +7,7 @@ Object {
   "stack": Array [
     Object {
       "type": "Integer",
-      "value": "100000000",
+      "value": "1",
     },
     Object {
       "type": "Array",

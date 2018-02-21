@@ -1,5 +1,6 @@
 /* @flow */
-import { VM_STATE, common } from '@neo-one/client-core';
+import BN from 'bn.js';
+import { VM_STATE } from '@neo-one/client-core';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import BigNumber from 'bignumber.js';
 
@@ -14,7 +15,7 @@ function createExpectedInvocationResult(options: Object) {
     state: 'HALT',
     gasConsumed: new BigNumber('0'),
     stack: [
-      { type: 'Integer', value: common.fixed8FromDecimal(new BigNumber('1')) },
+      { type: 'Integer', value: new BN(1) },
       { type: 'Array', value: [{ type: 'Void' }] },
     ],
   };
