@@ -3,7 +3,6 @@ import { toArray } from 'ix/asynciterable/toarray';
 
 import createReadSmartContract from '../../sc/createReadSmartContract';
 import * as common from '../../sc/common';
-import ReadClient from '../../ReadClient';
 import * as abis from '../../__data__/abis';
 
 describe('createReadSmartContract', () => {
@@ -49,20 +48,49 @@ describe('createReadSmartContract', () => {
     ],
   };
 
-  const client = new ReadClient(({}: $FlowFixMe));
-  // $FlowFixMe
-  client._call = jest.fn(() => Promise.resolve());
-  // $FlowFixMe
-  common.convertParams = jest.fn(() => expected);
-  // $FlowFixMe
-  common.convertInvocationResult = jest.fn(() => expected);
+  let client = ({}: $FlowFixMe);
 
-  const nullEventsContract = createReadSmartContract({
+  const verifyMock = (name: string, mock: any) => {
+    Object.entries(mock).forEach(([key, maybeMock]) => {
+      if (
+        maybeMock != null &&
+        maybeMock.mock != null &&
+        maybeMock.mock.calls != null
+      ) {
+        expect(maybeMock.mock.calls).toMatchSnapshot(`${name}.${key}`);
+      }
+    });
+  };
+  const verifyMocks = () => {
+    verifyMock('client', client);
+    verifyMock('common', common);
+  };
+
+  let nullEventsContract = createReadSmartContract({
     hash,
     abi: abiNull,
     client,
   });
-  const readContract = createReadSmartContract({ hash, abi, client });
+  let readContract = createReadSmartContract({ hash, abi, client });
+
+  beforeEach(() => {
+    client = ({}: $FlowFixMe);
+    // $FlowFixMe
+    client._call = jest.fn(() => Promise.resolve());
+    // $FlowFixMe
+    common.convertParams = jest.fn(() => expected);
+    // $FlowFixMe
+    common.convertInvocationResult = jest.fn(() => expected);
+    // $FlowFixMe
+    client._iterActionsRaw = jest.fn(() => expected);
+
+    nullEventsContract = createReadSmartContract({
+      hash,
+      abi: abiNull,
+      client,
+    });
+    readContract = createReadSmartContract({ hash, abi, client });
+  });
 
   test('smartContract creation - createCall', async () => {
     // $FlowFixMe
@@ -74,6 +102,7 @@ describe('createReadSmartContract', () => {
     const nullEventsResult = await nullEventsContract[abi.functions[0].name]();
     expect(nullEventsResult).toEqual(expected);
     expect(nullEventsContract.nulName).toBeUndefined();
+    verifyMocks();
   });
 
   test('iterActions with filter', async () => {
@@ -82,8 +111,6 @@ describe('createReadSmartContract', () => {
       indexStop: 1,
     };
     // $FlowFixMe
-    client._iterActionsRaw = jest.fn(() => expected);
-    // $FlowFixMe
     common.convertAction = jest
       .fn()
       .mockReturnValueOnce(expectedLog)
@@ -91,7 +118,7 @@ describe('createReadSmartContract', () => {
 
     const result = await toArray(readContract.iterActions(filter));
     expect(result).toEqual(expected);
-    expect(client._iterActionsRaw).toBeCalledWith(filter);
+    verifyMocks();
   });
 
   test('iterActions with no filter', async () => {
@@ -105,7 +132,7 @@ describe('createReadSmartContract', () => {
 
     const result = await toArray(readContract.iterActions());
     expect(result).toEqual(expected);
-    expect(client._iterActionsRaw).toBeCalledWith({});
+    verifyMocks();
   });
 
   test('iterEvents', async () => {
@@ -117,6 +144,7 @@ describe('createReadSmartContract', () => {
 
     const result = await toArray(readContract.iterEvents());
     expect(result).toEqual([expectedEvent]);
+    verifyMocks();
   });
 
   test('iterLogs', async () => {
@@ -128,6 +156,7 @@ describe('createReadSmartContract', () => {
 
     const result = await toArray(readContract.iterLogs());
     expect(result).toEqual([expectedLog]);
+    verifyMocks();
   });
 
   test('iterStorage', async () => {
@@ -136,5 +165,6 @@ describe('createReadSmartContract', () => {
 
     const result = nullEventsContract.iterStorage();
     expect(result).toEqual(expected);
+    verifyMocks();
   });
 });

@@ -1,0 +1,369 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createSmartContract NoAccountError: client.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`createSmartContract NoContractDeployedError: client.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`createSmartContract createCall - null params: client._call 1`] = `
+Array [
+  Array [
+    "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    "funcName",
+    Array [
+      "test",
+    ],
+    Object {
+      "from": Object {
+        "network": "test",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createCall - null params: client.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`createSmartContract createCall - null params: common.convertCallResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createCall - null params: common.convertParams 1`] = `
+Array [
+  Array [
+    Object {
+      "parameters": Array [],
+      "params": Array [],
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createCall: client._call 1`] = `
+Array [
+  Array [
+    "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    "funcName",
+    Array [
+      "test",
+    ],
+    Object {
+      "from": Object {
+        "network": "test",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createCall: client.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`createSmartContract createCall: common.convertCallResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createCall: common.convertParams 1`] = `
+Array [
+  Array [
+    Object {
+      "parameters": Array [
+        Object {
+          "name": "stringName",
+          "type": "String",
+        },
+      ],
+      "params": Array [],
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke null events & params: client._call 1`] = `
+Array [
+  Array [
+    "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    "funcName",
+    Array [
+      "test",
+    ],
+    Object {
+      "from": Object {
+        "network": "test",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke null events & params: client._invoke 1`] = `
+Array [
+  Array [
+    "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    "funcName",
+    Array [
+      "test",
+    ],
+    Array [
+      "name",
+      "test",
+    ],
+    false,
+    Object {
+      "from": Object {
+        "network": "test",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke null events & params: client.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`createSmartContract createInvoke null events & params: common.convertAction 1`] = `
+Array [
+  Array [
+    Object {
+      "action": Object {
+        "args": Array [
+          Object {
+            "type": "String",
+            "value": "stringVal",
+          },
+          Object {
+            "type": "Integer",
+            "value": "100000000000",
+          },
+        ],
+        "blockHash": "0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+        "blockIndex": 1,
+        "transactionIndex": 2,
+        "type": "Event",
+      },
+      "events": Object {},
+    },
+  ],
+  Array [
+    Object {
+      "action": Object {
+        "type": "Log",
+      },
+      "events": Object {},
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke null events & params: common.convertCallResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke null events & params: common.convertInvocationResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke null events & params: common.convertParams 1`] = `
+Array [
+  Array [
+    Object {
+      "parameters": Array [],
+      "params": Array [],
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke: client._call 1`] = `
+Array [
+  Array [
+    "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    "funcName",
+    Array [
+      "test",
+    ],
+    Object {
+      "from": Object {
+        "network": "test",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke: client._invoke 1`] = `
+Array [
+  Array [
+    "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    "funcName",
+    Array [
+      "test",
+    ],
+    Array [
+      "name",
+      "test",
+    ],
+    false,
+    Object {
+      "from": Object {
+        "network": "test",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke: client.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`createSmartContract createInvoke: common.convertAction 1`] = `
+Array [
+  Array [
+    Object {
+      "action": Object {
+        "args": Array [
+          Object {
+            "type": "String",
+            "value": "stringVal",
+          },
+          Object {
+            "type": "Integer",
+            "value": "100000000000",
+          },
+        ],
+        "blockHash": "0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+        "blockIndex": 1,
+        "transactionIndex": 2,
+        "type": "Event",
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+  Array [
+    Object {
+      "action": Object {
+        "type": "Log",
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke: common.convertCallResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke: common.convertInvocationResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract createInvoke: common.convertParams 1`] = `
+Array [
+  Array [
+    Object {
+      "parameters": Array [
+        Object {
+          "name": "stringName",
+          "type": "String",
+        },
+      ],
+      "params": Array [],
+    },
+  ],
+]
+`;

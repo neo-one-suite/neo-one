@@ -1,0 +1,538 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createReadSmartContract iterActions with filter: client._call 1`] = `Array []`;
+
+exports[`createReadSmartContract iterActions with filter: client._iterActionsRaw 1`] = `
+Array [
+  Array [
+    Object {
+      "indexStart": 0,
+      "indexStop": 1,
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterActions with filter: common.convertAction 1`] = `
+Array [
+  Array [
+    Object {
+      "action": Object {
+        "blockHash": "blockLogHash",
+        "blockIndex": 1,
+        "index": 3,
+        "message": "logMsg",
+        "scriptHash": "hash",
+        "transactionHash": "transLogHash",
+        "transactionIndex": 2,
+        "type": "Log",
+        "version": 0,
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+  Array [
+    Object {
+      "action": Object {
+        "blockHash": "blockEventHash",
+        "blockIndex": 5,
+        "index": 7,
+        "message": "eventMsg",
+        "name": "eventName",
+        "parameters": Object {},
+        "scriptHash": "hash",
+        "transactionHash": "transEventHash",
+        "transactionIndex": 6,
+        "type": "Event",
+        "version": 4,
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterActions with filter: common.convertCallResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterActions with filter: common.convertInvocationResult 1`] = `Array []`;
+
+exports[`createReadSmartContract iterActions with filter: common.convertParams 1`] = `Array []`;
+
+exports[`createReadSmartContract iterActions with no filter: client._call 1`] = `Array []`;
+
+exports[`createReadSmartContract iterActions with no filter: client._iterActionsRaw 1`] = `
+Array [
+  Array [
+    Object {},
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterActions with no filter: common.convertAction 1`] = `
+Array [
+  Array [
+    Object {
+      "action": Object {
+        "blockHash": "blockLogHash",
+        "blockIndex": 1,
+        "index": 3,
+        "message": "logMsg",
+        "scriptHash": "hash",
+        "transactionHash": "transLogHash",
+        "transactionIndex": 2,
+        "type": "Log",
+        "version": 0,
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+  Array [
+    Object {
+      "action": Object {
+        "blockHash": "blockEventHash",
+        "blockIndex": 5,
+        "index": 7,
+        "message": "eventMsg",
+        "name": "eventName",
+        "parameters": Object {},
+        "scriptHash": "hash",
+        "transactionHash": "transEventHash",
+        "transactionIndex": 6,
+        "type": "Event",
+        "version": 4,
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterActions with no filter: common.convertCallResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterActions with no filter: common.convertInvocationResult 1`] = `Array []`;
+
+exports[`createReadSmartContract iterActions with no filter: common.convertParams 1`] = `Array []`;
+
+exports[`createReadSmartContract iterEvents: client._call 1`] = `Array []`;
+
+exports[`createReadSmartContract iterEvents: client._iterActionsRaw 1`] = `
+Array [
+  Array [
+    Object {},
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterEvents: common.convertAction 1`] = `
+Array [
+  Array [
+    Object {
+      "action": Object {
+        "blockHash": "blockLogHash",
+        "blockIndex": 1,
+        "index": 3,
+        "message": "logMsg",
+        "scriptHash": "hash",
+        "transactionHash": "transLogHash",
+        "transactionIndex": 2,
+        "type": "Log",
+        "version": 0,
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+  Array [
+    Object {
+      "action": Object {
+        "blockHash": "blockEventHash",
+        "blockIndex": 5,
+        "index": 7,
+        "message": "eventMsg",
+        "name": "eventName",
+        "parameters": Object {},
+        "scriptHash": "hash",
+        "transactionHash": "transEventHash",
+        "transactionIndex": 6,
+        "type": "Event",
+        "version": 4,
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterEvents: common.convertCallResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterEvents: common.convertInvocationResult 1`] = `Array []`;
+
+exports[`createReadSmartContract iterEvents: common.convertParams 1`] = `Array []`;
+
+exports[`createReadSmartContract iterLogs: client._call 1`] = `Array []`;
+
+exports[`createReadSmartContract iterLogs: client._iterActionsRaw 1`] = `
+Array [
+  Array [
+    Object {},
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterLogs: common.convertAction 1`] = `
+Array [
+  Array [
+    Object {
+      "action": Object {
+        "blockHash": "blockLogHash",
+        "blockIndex": 1,
+        "index": 3,
+        "message": "logMsg",
+        "scriptHash": "hash",
+        "transactionHash": "transLogHash",
+        "transactionIndex": 2,
+        "type": "Log",
+        "version": 0,
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+  Array [
+    Object {
+      "action": Object {
+        "blockHash": "blockEventHash",
+        "blockIndex": 5,
+        "index": 7,
+        "message": "eventMsg",
+        "name": "eventName",
+        "parameters": Object {},
+        "scriptHash": "hash",
+        "transactionHash": "transEventHash",
+        "transactionIndex": 6,
+        "type": "Event",
+        "version": 4,
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterLogs: common.convertCallResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterLogs: common.convertInvocationResult 1`] = `Array []`;
+
+exports[`createReadSmartContract iterLogs: common.convertParams 1`] = `Array []`;
+
+exports[`createReadSmartContract iterStorage: client._call 1`] = `Array []`;
+
+exports[`createReadSmartContract iterStorage: client._iterActionsRaw 1`] = `Array []`;
+
+exports[`createReadSmartContract iterStorage: client._iterStorage 1`] = `
+Array [
+  Array [
+    "hash",
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterStorage: common.convertAction 1`] = `
+Array [
+  Array [
+    Object {
+      "action": Object {
+        "blockHash": "blockLogHash",
+        "blockIndex": 1,
+        "index": 3,
+        "message": "logMsg",
+        "scriptHash": "hash",
+        "transactionHash": "transLogHash",
+        "transactionIndex": 2,
+        "type": "Log",
+        "version": 0,
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+  Array [
+    Object {
+      "action": Object {
+        "blockHash": "blockEventHash",
+        "blockIndex": 5,
+        "index": 7,
+        "message": "eventMsg",
+        "name": "eventName",
+        "parameters": Object {},
+        "scriptHash": "hash",
+        "transactionHash": "transEventHash",
+        "transactionIndex": 6,
+        "type": "Event",
+        "version": 4,
+      },
+      "events": Object {
+        "eventName": Object {
+          "name": "eventName",
+          "parameters": Array [
+            Object {
+              "name": "stringName",
+              "type": "String",
+            },
+          ],
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterStorage: common.convertCallResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract iterStorage: common.convertInvocationResult 1`] = `Array []`;
+
+exports[`createReadSmartContract iterStorage: common.convertParams 1`] = `Array []`;
+
+exports[`createReadSmartContract smartContract creation - createCall: client._call 1`] = `
+Array [
+  Array [
+    "hash",
+    "funcName",
+    undefined,
+  ],
+  Array [
+    "hash",
+    "funcName",
+    undefined,
+  ],
+]
+`;
+
+exports[`createReadSmartContract smartContract creation - createCall: client._iterActionsRaw 1`] = `Array []`;
+
+exports[`createReadSmartContract smartContract creation - createCall: common.convertCallResult 1`] = `
+Array [
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+  Array [
+    Object {
+      "result": undefined,
+      "returnType": Object {
+        "type": "Void",
+      },
+    },
+  ],
+]
+`;
+
+exports[`createReadSmartContract smartContract creation - createCall: common.convertInvocationResult 1`] = `Array []`;
+
+exports[`createReadSmartContract smartContract creation - createCall: common.convertParams 1`] = `
+Array [
+  Array [
+    Object {
+      "parameters": Array [
+        Object {
+          "name": "stringName",
+          "type": "String",
+        },
+      ],
+      "params": Array [],
+    },
+  ],
+  Array [
+    Object {
+      "parameters": Array [],
+      "params": Array [],
+    },
+  ],
+]
+`;

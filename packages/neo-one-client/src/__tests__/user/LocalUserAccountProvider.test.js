@@ -84,6 +84,23 @@ describe('LocalUserAccountProvider', () => {
       provider,
     }: $FlowFixMe),
   );
+
+  const verifyMock = (name: string, mock: any) => {
+    Object.entries(mock).forEach(([key, maybeMock]) => {
+      if (
+        maybeMock != null &&
+        maybeMock.mock != null &&
+        maybeMock.mock.calls != null
+      ) {
+        expect(maybeMock.mock.calls).toMatchSnapshot(`${name}.${key}`);
+      }
+    });
+  };
+  const verifyMocks = () => {
+    verifyMock('keystore', keystore);
+    verifyMock('provider', provider);
+  };
+
   beforeEach(() => {
     keystore = {};
     provider = {};
@@ -93,6 +110,7 @@ describe('LocalUserAccountProvider', () => {
         provider,
       }: $FlowFixMe),
     );
+    utils.randomUInt = () => 10;
   });
 
   test('getCurrentAccount', () => {
@@ -101,6 +119,7 @@ describe('LocalUserAccountProvider', () => {
 
     const result = localUserAccountProvider.getCurrentAccount();
     expect(result).toEqual(account1);
+    verifyMocks();
   });
 
   test('getAccounts', () => {
@@ -110,6 +129,7 @@ describe('LocalUserAccountProvider', () => {
 
     const result = localUserAccountProvider.getAccounts();
     expect(result).toEqual(expected);
+    verifyMocks();
   });
 
   test('getNetworks', () => {
@@ -119,6 +139,7 @@ describe('LocalUserAccountProvider', () => {
 
     const result = localUserAccountProvider.getNetworks();
     expect(result).toEqual(expected);
+    verifyMocks();
   });
 
   test('selectAccount', async () => {
@@ -126,7 +147,7 @@ describe('LocalUserAccountProvider', () => {
     keystore.selectAccount = jest.fn(() => Promise.resolve());
 
     await localUserAccountProvider.selectAccount(id1);
-    expect(keystore.selectAccount.mock.calls).toMatchSnapshot();
+    verifyMocks();
   });
 
   test('deleteAccount', async () => {
@@ -134,7 +155,7 @@ describe('LocalUserAccountProvider', () => {
     keystore.deleteAccount = jest.fn(() => Promise.resolve());
 
     await localUserAccountProvider.deleteAccount(id1);
-    expect(keystore.deleteAccount.mock.calls).toMatchSnapshot();
+    verifyMocks();
   });
 
   test('updateAccountName', async () => {
@@ -145,7 +166,7 @@ describe('LocalUserAccountProvider', () => {
       id: id1,
       name: 'newName',
     });
-    expect(keystore.updateAccountName.mock.calls).toMatchSnapshot();
+    verifyMocks();
   });
 
   test('read', async () => {
@@ -155,6 +176,7 @@ describe('LocalUserAccountProvider', () => {
 
     const result = localUserAccountProvider.read('main');
     expect(result).toEqual(expected);
+    verifyMocks();
   });
 
   test('transfer throws error on empty transfers', async () => {
@@ -165,6 +187,7 @@ describe('LocalUserAccountProvider', () => {
     const result = localUserAccountProvider.transfer(transfers);
 
     await expect(result).rejects.toEqual(new NothingToTransferError());
+    verifyMocks();
   });
 
   test('transfer throws error on missing account', async () => {
@@ -175,6 +198,7 @@ describe('LocalUserAccountProvider', () => {
     const result = localUserAccountProvider.transfer(transfers);
 
     await expect(result).rejects.toEqual(new NoAccountError());
+    verifyMocks();
   });
 
   test('transfer throws insufficient funds error', async () => {
@@ -196,10 +220,10 @@ describe('LocalUserAccountProvider', () => {
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve([unspent]));
 
     const result = localUserAccountProvider.transfer(transfers, options);
-
     await expect(result).rejects.toEqual(
       new InsufficientFundsError(new BigNumber('5'), new BigNumber('10')),
     );
+    verifyMocks();
   });
 
   test('transfer 0', async () => {
@@ -228,43 +252,54 @@ describe('LocalUserAccountProvider', () => {
 
     expect(result.transaction).toEqual('transactionDummy');
     await expect(result.confirmed()).resolves.toEqual('receiptDummy');
+    verifyMocks();
   });
 
-  test('transfer', async () => {
-    const transfers = [
-      {
-        amount: new BigNumber('5'),
-        asset: common.NEO_ASSET_HASH,
-        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
-      },
-    ];
-    const unspent = [
-      outputs.oneNEO,
-      outputs.oneNEO,
-      outputs.oneNEO,
-      outputs.oneNEO,
-      outputs.oneNEO,
-      outputs.oneNEO,
-      outputs.elevenGAS,
-    ];
-    // $FlowFixMe
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    // $FlowFixMe
-    keystore.sign = jest.fn(() => witness);
-    // $FlowFixMe
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
-    // $FlowFixMe
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve('receiptDummy'),
-    );
+  const testTransfer = (noGas: boolean) => {
+    test(`transfer${noGas ? ' without network fee' : ''}`, async () => {
+      const transfers = [
+        {
+          amount: new BigNumber('5'),
+          asset: common.NEO_ASSET_HASH,
+          to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
+        },
+      ];
+      const unspent = [
+        outputs.oneNEO,
+        outputs.oneNEO,
+        outputs.oneNEO,
+        outputs.oneNEO,
+        outputs.oneNEO,
+        outputs.oneNEO,
+        outputs.elevenGAS,
+      ];
+      // $FlowFixMe
+      provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
+      // $FlowFixMe
+      keystore.sign = jest.fn(() => witness);
+      // $FlowFixMe
+      provider.relayTransaction = jest.fn(() =>
+        Promise.resolve('transactionDummy'),
+      );
+      // $FlowFixMe
+      provider.getTransactionReceipt = jest.fn(() =>
+        Promise.resolve('receiptDummy'),
+      );
 
-    const result = await localUserAccountProvider.transfer(transfers, options);
+      const result = await localUserAccountProvider.transfer(transfers, {
+        from: options.from,
+        attributes: options.attributes,
+        networkFee: noGas ? undefined : options.networkFee,
+      });
 
-    expect(result.transaction).toEqual('transactionDummy');
-    await expect(result.confirmed()).resolves.toEqual('receiptDummy');
-  });
+      expect(result.transaction).toEqual('transactionDummy');
+      await expect(result.confirmed()).resolves.toEqual('receiptDummy');
+      verifyMocks();
+    });
+  };
+
+  testTransfer(true);
+  testTransfer(false);
 
   test('claim throws NothingToClaim error', async () => {
     const unspent = [outputs.elevenGAS];
@@ -280,41 +315,52 @@ describe('LocalUserAccountProvider', () => {
 
     const result = localUserAccountProvider.claim(options);
     await expect(result).rejects.toEqual(new NothingToClaimError());
+    verifyMocks();
   });
 
-  test('claim', async () => {
-    const unspent = [outputs.elevenGAS];
+  const testClaim = (noGas: boolean) => {
+    test(`claim${noGas ? ' without networkFee' : ''}`, async () => {
+      const unspent = [outputs.elevenGAS];
 
-    // $FlowFixMe
-    keystore.sign = jest.fn(() => witness);
-    // $FlowFixMe
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    // $FlowFixMe
-    provider.getUnclaimed = jest.fn(() =>
-      Promise.resolve({
-        unclaimed: [
-          {
-            txid:
-              '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-            vout: 2,
-          },
-        ],
-        amount: new BigNumber('3'),
-      }),
-    );
-    // $FlowFixMe
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
-    // $FlowFixMe
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve('receiptDummy'),
-    );
+      // $FlowFixMe
+      keystore.sign = jest.fn(() => witness);
+      // $FlowFixMe
+      provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
+      // $FlowFixMe
+      provider.getUnclaimed = jest.fn(() =>
+        Promise.resolve({
+          unclaimed: [
+            {
+              txid:
+                '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+              vout: 2,
+            },
+          ],
+          amount: new BigNumber('3'),
+        }),
+      );
+      // $FlowFixMe
+      provider.relayTransaction = jest.fn(() =>
+        Promise.resolve('transactionDummy'),
+      );
+      // $FlowFixMe
+      provider.getTransactionReceipt = jest.fn(() =>
+        Promise.resolve('receiptDummy'),
+      );
 
-    const result = await localUserAccountProvider.claim(options);
-    expect(result.transaction).toEqual('transactionDummy');
-    await expect(result.confirmed()).resolves.toEqual('receiptDummy');
-  });
+      const result = await localUserAccountProvider.claim({
+        from: options.from,
+        attributes: options.attributes,
+        networkFee: noGas ? undefined : options.networkFee,
+      });
+      expect(result.transaction).toEqual('transactionDummy');
+      await expect(result.confirmed()).resolves.toEqual('receiptDummy');
+      verifyMocks();
+    });
+  };
+
+  testClaim(true);
+  testClaim(false);
 
   test('error thrown on 2 script attributes when neither match script hash', async () => {
     const unspent = [outputs.elevenGAS];
@@ -348,6 +394,7 @@ describe('LocalUserAccountProvider', () => {
     await expect(result).rejects.toEqual(
       new InvalidTransactionError('Something went wrong!'),
     );
+    verifyMocks();
   });
 
   test('error thrown with 2 script attributes and no transaction scripts', async () => {
@@ -382,6 +429,7 @@ describe('LocalUserAccountProvider', () => {
     await expect(result).rejects.toEqual(
       new InvalidTransactionError('Something went wrong!'),
     );
+    verifyMocks();
   });
 
   test('error thrown with 1 script attributes and no transaction scripts', async () => {
@@ -415,6 +463,7 @@ describe('LocalUserAccountProvider', () => {
     await expect(result).rejects.toEqual(
       new InvalidTransactionError('Something went wrong!'),
     );
+    verifyMocks();
   });
 
   test('error thrown with 3+ script attributes', async () => {
@@ -450,6 +499,7 @@ describe('LocalUserAccountProvider', () => {
     await expect(result).rejects.toEqual(
       new InvalidTransactionError('Something went wrong!'),
     );
+    verifyMocks();
   });
 
   test('error thrown with with 0 script attributes, but nonzero transaction scripts', async () => {
@@ -475,12 +525,6 @@ describe('LocalUserAccountProvider', () => {
     keystore.sign = jest.fn(() => witness);
     // $FlowFixMe
     provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
-    // $FlowFixMe
-    clientUtils.getInvokeMethodScript = jest.fn(() => Buffer.alloc(1, 1));
-    // $FlowFixMe
-    clientUtils.getInvokeMethodInvocationScript = jest.fn(() =>
-      Buffer.alloc(2, 1),
-    );
 
     const result = localUserAccountProvider.invoke(
       contract,
@@ -494,6 +538,7 @@ describe('LocalUserAccountProvider', () => {
     await expect(result).rejects.toEqual(
       new InvalidTransactionError('Something went wrong!'),
     );
+    verifyMocks();
   });
 
   test('publish throws error on invoke fault', async () => {
@@ -521,6 +566,7 @@ describe('LocalUserAccountProvider', () => {
 
     const result = localUserAccountProvider.publish(contract, options);
     await expect(result).rejects.toEqual(new InvokeError('testMessage'));
+    verifyMocks();
   });
 
   test('publish throws error when no contracts are created', async () => {
@@ -568,6 +614,7 @@ describe('LocalUserAccountProvider', () => {
           ' to have been created, but none was found',
       ),
     );
+    verifyMocks();
   });
 
   test('publish - result fault', async () => {
@@ -623,6 +670,7 @@ describe('LocalUserAccountProvider', () => {
         message: results.fault.message,
       },
     });
+    verifyMocks();
   });
 
   test('publish - result success', async () => {
@@ -678,6 +726,7 @@ describe('LocalUserAccountProvider', () => {
         value: contract,
       },
     });
+    verifyMocks();
   });
 
   test('registerAsset throws error on missing asset', async () => {
@@ -726,6 +775,7 @@ describe('LocalUserAccountProvider', () => {
           'but none was found',
       ),
     );
+    verifyMocks();
   });
 
   test('registerAsset with no options', async () => {
@@ -779,6 +829,7 @@ describe('LocalUserAccountProvider', () => {
         message: results.fault.message,
       },
     });
+    verifyMocks();
   });
 
   test('registerAsset - result fault', async () => {
@@ -830,6 +881,7 @@ describe('LocalUserAccountProvider', () => {
         message: results.fault.message,
       },
     });
+    verifyMocks();
   });
 
   test('registerAsset - result success', async () => {
@@ -881,6 +933,7 @@ describe('LocalUserAccountProvider', () => {
         value: asset,
       },
     });
+    verifyMocks();
   });
 
   test('issue throws error on no inputs', async () => {
@@ -896,6 +949,7 @@ describe('LocalUserAccountProvider', () => {
 
     const result = localUserAccountProvider.issue(transfers);
     await expect(result).rejects.toEqual(new NothingToIssueError());
+    verifyMocks();
   });
 
   test('issue', async () => {
@@ -930,6 +984,7 @@ describe('LocalUserAccountProvider', () => {
 
     expect(result.transaction).toEqual('transactionDummy');
     await expect(result.confirmed()).resolves.toEqual('receiptDummy');
+    verifyMocks();
   });
 
   test('invoke with no options', async () => {
@@ -966,12 +1021,6 @@ describe('LocalUserAccountProvider', () => {
         actions: ['action1'],
       }),
     );
-    // $FlowFixMe
-    clientUtils.getInvokeMethodScript = jest.fn(() => Buffer.alloc(1, 1));
-    // $FlowFixMe
-    clientUtils.getInvokeMethodInvocationScript = jest.fn(() =>
-      Buffer.alloc(2, 1),
-    );
 
     const result = await localUserAccountProvider.invoke(
       contract,
@@ -988,6 +1037,7 @@ describe('LocalUserAccountProvider', () => {
       result: results.halt,
       actions: ['action1'],
     });
+    verifyMocks();
   });
 
   test('invoke', async () => {
@@ -1029,12 +1079,6 @@ describe('LocalUserAccountProvider', () => {
         actions: ['action1'],
       }),
     );
-    // $FlowFixMe
-    clientUtils.getInvokeMethodScript = jest.fn(() => Buffer.alloc(1, 1));
-    // $FlowFixMe
-    clientUtils.getInvokeMethodInvocationScript = jest.fn(() =>
-      Buffer.alloc(2, 1),
-    );
 
     const result = await localUserAccountProvider.invoke(
       contract,
@@ -1051,6 +1095,7 @@ describe('LocalUserAccountProvider', () => {
       result: results.halt,
       actions: ['action1'],
     });
+    verifyMocks();
   });
 
   test('call with no options', async () => {
@@ -1064,8 +1109,6 @@ describe('LocalUserAccountProvider', () => {
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     // $FlowFixMe
     provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
-    // $FlowFixMe
-    clientUtils.getInvokeMethodsScript = jest.fn(() => Buffer.alloc(1, 1));
 
     const result = await localUserAccountProvider.call(
       contract,
@@ -1074,6 +1117,7 @@ describe('LocalUserAccountProvider', () => {
     );
 
     expect(result).toEqual(results.halt);
+    verifyMocks();
   });
 
   test('call', async () => {
@@ -1085,8 +1129,6 @@ describe('LocalUserAccountProvider', () => {
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     // $FlowFixMe
     provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
-    // $FlowFixMe
-    clientUtils.getInvokeMethodsScript = jest.fn(() => Buffer.alloc(1, 1));
 
     const result = await localUserAccountProvider.call(
       contract,
@@ -1096,5 +1138,6 @@ describe('LocalUserAccountProvider', () => {
     );
 
     expect(result).toEqual(results.halt);
+    verifyMocks();
   });
 });

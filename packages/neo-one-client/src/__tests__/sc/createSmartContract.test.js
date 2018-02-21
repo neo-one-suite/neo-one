@@ -1,6 +1,5 @@
 /* @flow */
 import createSmartContract from '../../sc/createSmartContract';
-import Client from '../../Client';
 import { NoAccountError, NoContractDeployedError } from '../../errors';
 import * as common from '../../sc/common';
 
@@ -8,9 +7,25 @@ import * as abis from '../../__data__/abis';
 import contracts from '../../__data__/contracts';
 
 describe('createSmartContract', () => {
-  const client = new Client({ testProvider: { type: 'testProvider' } });
+  const client = ({}: $FlowFixMe);
   const networks = {
     test: { hash: '0x3775292229eccdf904f16fff8e83e7cffdc0f0ce' },
+  };
+
+  const verifyMock = (name: string, mock: any) => {
+    Object.entries(mock).forEach(([key, maybeMock]) => {
+      if (
+        maybeMock != null &&
+        maybeMock.mock != null &&
+        maybeMock.mock.calls != null
+      ) {
+        expect(maybeMock.mock.calls).toMatchSnapshot(`${name}.${key}`);
+      }
+    });
+  };
+  const verifyMocks = () => {
+    verifyMock('client', client);
+    verifyMock('common', common);
   };
 
   test('NoAccountError', async () => {
@@ -24,6 +39,7 @@ describe('createSmartContract', () => {
 
     const result = smartContract[func.name]();
     await expect(result).rejects.toEqual(new NoAccountError());
+    verifyMocks();
   });
 
   test('NoContractDeployedError', async () => {
@@ -38,6 +54,7 @@ describe('createSmartContract', () => {
 
     const result = smartContract[func.name]();
     await expect(result).rejects.toEqual(new NoContractDeployedError('error'));
+    verifyMocks();
   });
 
   test('createCall', async () => {
@@ -58,6 +75,7 @@ describe('createSmartContract', () => {
 
     const result = smartContract[func.name](options);
     await expect(result).resolves.toEqual(expected);
+    verifyMocks();
   });
 
   test('createCall - null params', async () => {
@@ -82,6 +100,7 @@ describe('createSmartContract', () => {
 
     const result = smartContract[func.name](options);
     await expect(result).resolves.toEqual(expected);
+    verifyMocks();
   });
 
   test('createInvoke', async () => {
@@ -140,6 +159,7 @@ describe('createSmartContract', () => {
 
     const result = await invoke.confirmed();
     expect(result).toEqual(expected);
+    verifyMocks();
   });
 
   test('createInvoke null events & params', async () => {
@@ -201,5 +221,6 @@ describe('createSmartContract', () => {
 
     const result = await invoke.confirmed();
     expect(result).toEqual(expected);
+    verifyMocks();
   });
 });

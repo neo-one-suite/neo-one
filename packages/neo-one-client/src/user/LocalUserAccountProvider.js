@@ -215,7 +215,7 @@ export default class LocalUserAccountProvider<
 
     const [{ unclaimed, amount }, { inputs, outputs }] = await Promise.all([
       this.provider.getUnclaimed(from.network, from.address),
-      this._getTransfersInputOutputs({ from, gas: networkFee }),
+      this._getTransfersInputOutputs({ from, gas: networkFee, transfers: [] }),
     ]);
     if (unclaimed.length === 0) {
       throw new NothingToClaimError();
@@ -649,7 +649,9 @@ export default class LocalUserAccountProvider<
     if (
       transactionUnsigned.inputs.length === 0 &&
       (transactionUnsigned.claims == null ||
+        /* istanbul ignore next */
         !Array.isArray(transactionUnsigned.claims) ||
+        /* istanbul ignore next */
         transactionUnsigned.claims.length === 0)
     ) {
       transactionUnsigned = transactionUnsigned.clone({
@@ -771,13 +773,13 @@ export default class LocalUserAccountProvider<
   async _getTransfersInputOutputs({
     from,
     transfers: transfersIn,
-    gas: gasIn,
+    gas,
   }: {|
     from: UserAccountID,
-    transfers?: Array<Transfer>,
-    gas?: BigNumber,
+    transfers: Array<Transfer>,
+    gas: BigNumber,
   |}): Promise<{| outputs: Array<Output>, inputs: Array<Input> |}> {
-    const transfers = ((transfersIn || []).map(transfer => ({
+    const transfers = (transfersIn.map(transfer => ({
       to: transfer.to,
       asset: transfer.asset,
       amount: transfer.amount,
@@ -787,7 +789,6 @@ export default class LocalUserAccountProvider<
       amount: BigNumber,
     |}>);
 
-    const gas = gasIn || utils.ZERO_BIG_NUMBER;
     if (transfers.length === 0 && gas.lte(utils.ZERO_BIG_NUMBER)) {
       return { inputs: [], outputs: [] };
     }
@@ -799,7 +800,7 @@ export default class LocalUserAccountProvider<
     return commonUtils
       .values(
         _.groupBy(
-          gas == null
+          gas.isEqualTo(utils.ZERO_BIG_NUMBER)
             ? transfers
             : transfers.concat({
                 amount: gas,
