@@ -373,16 +373,16 @@ describe('NEOONEDataProvider', () => {
   });
 
   test('getUnclaimed', async () => {
-    const expected = { unclaimed: [], amount: new BigNumber(0) };
+    const expected = { unclaimed: ['val'], amount: new BigNumber('1') };
     // $FlowFixMe
     provider._client.getAccount = jest.fn(() =>
       Promise.resolve({
-        unclaimed: [],
+        unclaimed: ['val'],
       }),
     );
     // $FlowFixMe
     provider._client.getClaimAmount = jest.fn(() =>
-      Promise.resolve([new BigNumber(0)]),
+      Promise.resolve([new BigNumber('1')]),
     );
 
     const result = await provider.getUnclaimed(keys[0].address);
@@ -768,6 +768,20 @@ describe('NEOONEDataProvider', () => {
       provider.iterStorage(transactions.register.hash),
     );
     expect(result).toEqual(expected);
+  });
+
+  test('iterBlocks - null iterBlocksFetchTimeoutMS', async () => {
+    provider = new NEOONEDataProvider({
+      network,
+      rpcURL,
+    });
+    const result = provider.iterBlocks({ indexStart: 1, indexStop: 2 });
+    expect(result).toMatchSnapshot();
+  });
+
+  test('iterBlocks', async () => {
+    const result = provider.iterBlocks();
+    expect(result).toMatchSnapshot();
   });
 
   test('iterActions', async () => {

@@ -62,6 +62,19 @@ describe('parameters', () => {
 
       expect(result).toEqual(false);
     });
+
+    test('nullable parameter', () => {
+      const result = parameters.String(
+        (null: $FlowFixMe),
+        abis.parameters.String,
+      );
+      expect(result).toBeNull();
+    });
+
+    test('nullable abi', () => {
+      const result = parameters.Array((null: $FlowFixMe), abis.returns.Array);
+      expect(result).toBeNull();
+    });
   });
 
   describe('incorrect parameter types throw errors', () => {

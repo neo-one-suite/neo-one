@@ -1,4 +1,7 @@
 /* @flow */
+import { of } from 'rxjs/observable/of';
+import { take } from 'rxjs/operators';
+
 import Client from '../Client';
 import * as argAssertions from '../args';
 import { UnknownAccountError, UnknownNetworkError } from '../errors';
@@ -28,7 +31,9 @@ describe('Client', () => {
   const network2 = 'net2';
   const provider1 = {
     type: 'test1',
-    currentAcount$: account1,
+    currentAccount$: of(account1),
+    accounts$: of([account1]),
+    networks$: of(['net1']),
     getCurrentAccount: () => account1,
     getAccounts: () => [account1],
     getNetworks: () => [network1],
@@ -38,7 +43,9 @@ describe('Client', () => {
   };
   const provider2 = {
     type: 'test2',
-    currentAccount$: account2,
+    currentAccount$: of(account2),
+    accounts$: of([account2]),
+    networks$: of(['net2']),
     getCurrentAccount: () => account2,
     getAccounts: () => [account2],
     getNetworks: () => [network2],
@@ -70,7 +77,22 @@ describe('Client', () => {
     );
   });
 
-  test('get providers', () => {
+  test('Client constructor sets up currentAcount$ observable', async () => {
+    const result = await client.currentAccount$.pipe(take(1)).toPromise();
+    expect(result).toEqual(account1);
+  });
+
+  test('Client constructor sets up accounts$ observable', async () => {
+    const result = await client.accounts$.pipe(take(1)).toPromise();
+    expect(result).toEqual([account1, account2]);
+  });
+
+  test('Client constructor sets up networks$ observable', async () => {
+    const result = await client.networks$.pipe(take(1)).toPromise();
+    expect(result).toEqual(['net1', 'net2']);
+  });
+
+  test('get providers', async () => {
     const result = client.providers;
     expect(result).toEqual({
       test1: provider1,
