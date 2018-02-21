@@ -151,13 +151,13 @@ describe('parameters', () => {
       },
       {
         param: 'Hash160',
-        json: 'readUInt160',
-        common: 'uInt160ToString',
+        json: 'writeUInt160',
+        common: 'bufferToUInt160',
       },
       {
         param: 'Hash256',
-        json: 'readUInt256',
-        common: 'uInt256ToString',
+        json: 'writeUInt256',
+        common: 'bufferToUInt256',
       },
       {
         param: 'PublicKey',

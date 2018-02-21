@@ -118,8 +118,8 @@ const toHash160 = (contractParameter: ContractParameter): Hash160String => {
   if (contractParameter.type === 'Hash160') {
     return contractParameter.value;
   } else if (contractParameter.type === 'ByteArray') {
-    return common.uInt160ToString(
-      JSONHelper.readUInt160(contractParameter.value),
+    return JSONHelper.writeUInt160(
+      common.bufferToUInt160(JSONHelper.readBuffer(contractParameter.value)),
     );
   }
 
@@ -133,8 +133,8 @@ const toHash256 = (contractParameter: ContractParameter): Hash256String => {
   if (contractParameter.type === 'Hash256') {
     return contractParameter.value;
   } else if (contractParameter.type === 'ByteArray') {
-    return common.uInt256ToString(
-      JSONHelper.readUInt256(contractParameter.value),
+    return JSONHelper.writeUInt256(
+      common.bufferToUInt256(JSONHelper.readBuffer(contractParameter.value)),
     );
   }
 
