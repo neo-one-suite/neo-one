@@ -202,7 +202,7 @@ export const assertBlockFilter = (filter: mixed): ?BlockFilter => {
   if (
     filter.indexStart != null &&
     filter.indexStop != null &&
-    filter.indexStart >= filter.indexStop
+    filter.indexStart > filter.indexStop
   ) {
     throw new InvalidArgumentError(
       `Invalid BlockFilter param, found: ${String(filter)}`,
