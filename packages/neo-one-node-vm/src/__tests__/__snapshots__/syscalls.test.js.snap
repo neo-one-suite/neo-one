@@ -1,5 +1,335 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`syscalls Neo.Account.GetBalance 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Account.GetBalance 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Account.GetBalance 3`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Account.GetBalance 4`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Account.GetScriptHash 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Account.GetVotes 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Asset.GetAdmin 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Asset.GetAmount 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Asset.GetAssetId 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Asset.GetAssetType 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Asset.GetAvailable 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Asset.GetIssuer 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Asset.GetOwner 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Asset.GetPrecision 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Block.GetTransaction 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Block.GetTransactionCount 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Block.GetTransactions 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Blockchain.GetAccount 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Blockchain.GetAsset 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Blockchain.GetBlock 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Blockchain.GetContract 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Blockchain.GetHeader 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Blockchain.GetTransaction 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Contract.GetScript 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Header.GetConsensusData 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Header.GetHash 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Header.GetIndex 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Header.GetMerkleRoot 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Header.GetNextConsensus 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Header.GetPrevHash 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Header.GetTimestamp 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Header.GetVersion 1`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.InvocationTransaction.GetScript 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
 exports[`syscalls Neo.Iterator.Next 1`] = `
 Array [
   Array [
@@ -326,6 +656,119 @@ Array [
       "key": "",
       "serializeWire": [Function],
       "value": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetAttributes 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetHash 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetInputs 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetOutputs 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetReferences 1`] = `
+Array [
+  Array [
+    Object {
+      "__$type": "Input",
+      "hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "index": 0,
+      "size": 34,
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetReferences 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetType 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetUnspentCoins 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetUnspentCoins 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "df09c9981eb0c4a2a182ce6090148647a2f4f6053c970380a645ed63b91ce258",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetUnspentCoins 3`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetUnspentCoins 4`] = `
+Array [
+  Array [
+    Object {
+      "hash": "df09c9981eb0c4a2a182ce6090148647a2f4f6053c970380a645ed63b91ce258",
     },
   ],
 ]

@@ -541,6 +541,7 @@ const OPCODE_PAIRS = [
       createOp({
         name: 'OVER',
         in: 2,
+        out: 3,
         invoke: ({ context, args }: OpInvokeArgs) => ({
           context,
           results: [args[1], args[0], args[1]],
