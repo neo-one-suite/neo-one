@@ -728,7 +728,20 @@ export default class Blockchain {
       .getAll({ hash })
       .pipe(toArray())
       .toPromise();
-    return unclaimed.map(value => value.input);
+    // TODO: Quick fix because unclaimed includes all spent coins.
+    const filtered = await Promise.all(
+      unclaimed.map(async value => {
+        const output = await this._storage.output.get(value.input);
+        if (
+          common.uInt256Equal(output.asset, this.settings.governingToken.hash)
+        ) {
+          return value.input;
+        }
+
+        return (null: $FlowFixMe);
+      }),
+    );
+    return filtered.filter(Boolean);
   };
 
   _getUnspent = async (hash: UInt160): Promise<Array<Input>> => {
