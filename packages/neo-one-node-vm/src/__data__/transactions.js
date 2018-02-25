@@ -11,6 +11,7 @@ import {
   Output,
   common,
   utils,
+  BufferAttribute,
 } from '@neo-one/client-core';
 
 import keys from './keys';
@@ -87,6 +88,12 @@ export const mintTransaction = new InvocationTransaction({
       value: new BN(150).mul(utils.ONE_HUNDRED_MILLION),
       asset: common.stringToUInt256(common.NEO_ASSET_HASH),
       address: keys[0].scriptHash,
+    }),
+  ],
+  attributes: [
+    new BufferAttribute({
+      usage: 0x81,
+      value: Buffer.alloc(32, 0),
     }),
   ],
 });

@@ -893,7 +893,7 @@ export const SYSCALLS = {
   }),
   'Neo.Account.GetBalance': createSysCall({
     name: 'Neo.Account.GetBalance',
-    in: 1,
+    in: 2,
     out: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => {
       const account = args[0].asAccount();
