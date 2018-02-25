@@ -65,7 +65,7 @@ export default class AccountInput implements Equatable, SerializableWire<this> {
 
   static deserializeWireBase(options: DeserializeWireBaseOptions): this {
     const { reader } = options;
-    const hash = reader.readUInt256();
+    const hash = reader.readUInt160();
     const input = Input.deserializeWireBase(options);
 
     // $FlowFixMe
