@@ -68,9 +68,7 @@ const getUtilityValue = ({
 
 export type FeeContext = {|
   getOutput: (input: Input) => Promise<Output>,
-  // eslint-disable-next-line
   governingToken: RegisterTransaction,
-  // eslint-disable-next-line
   utilityToken: RegisterTransaction,
   fees: { [type: TransactionType]: BN },
   registerValidatorFee: BN,
@@ -95,13 +93,10 @@ export type TransactionVerifyOptions = {|
   getAllValidators: () => Promise<Array<Validator>>,
   verifyScript: VerifyScript,
   currentHeight: number,
-  // eslint-disable-next-line
   governingToken: RegisterTransaction,
-  // eslint-disable-next-line
   utilityToken: RegisterTransaction,
   fees: { [type: TransactionType]: BN },
   registerValidatorFee: BN,
-  // eslint-disable-next-line
   memPool?: Array<Transaction>,
 |};
 export type TransactionBaseAdd = {|
@@ -565,7 +560,6 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     switch (this.type) {
       case TRANSACTION_TYPE.MINER:
       case TRANSACTION_TYPE.CLAIM:
-        // eslint-disable-next-line
         if (
           resultsIssue.some(
             // eslint-disable-next-line
@@ -580,7 +574,6 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
         }
         break;
       case TRANSACTION_TYPE.ISSUE:
-        // eslint-disable-next-line
         if (
           // eslint-disable-next-line
           resultsIssue.some(([assetHex, _]) =>

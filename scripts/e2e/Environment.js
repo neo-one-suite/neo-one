@@ -26,14 +26,15 @@ class One {
 
     let tries = 6;
     let ready = false;
-    // eslint-disable-next-line
     while (!ready && tries >= 0) {
+      // eslint-disable-next-line
       await new Promise(resolve => setTimeout(() => resolve(), 5000));
+      // eslint-disable-next-line
       const result = await this._exec('check server --static-neo-one');
       try {
         ready = JSON.parse(result);
       } catch (error) {
-        // eslint-disable-line
+        // Ignore errors
       }
       tries -= 1;
     }

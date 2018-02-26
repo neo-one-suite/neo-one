@@ -46,7 +46,6 @@ export type ExecutionInit = {|
   scriptContainer: ScriptContainer,
   triggerType: TriggerType,
   action: ExecutionAction,
-  // eslint-disable-next-line
   onStep?: (input: {| context: VMContext, opCode: OpCode |}) => void,
   listeners: VMListeners,
   skipWitnessVerify: boolean,

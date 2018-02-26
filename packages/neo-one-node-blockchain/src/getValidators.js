@@ -1,5 +1,4 @@
 /* @flow */
-/* eslint-disable no-param-reassign */
 import BN from 'bn.js';
 import {
   TRANSACTION_TYPE,
@@ -384,7 +383,6 @@ export default async (
                 )
               : -aValidator.votes.cmp(bValidator.votes),
         )
-        // eslint-disable-next-line
         .map(validator => common.ecPointToHex(validator.publicKey)),
       numValidators,
     ),

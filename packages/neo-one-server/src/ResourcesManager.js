@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import { type Log, logInvoke, utils } from '@neo-one/utils';
 import {
   type BaseResource,

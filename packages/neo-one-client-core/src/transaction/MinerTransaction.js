@@ -94,7 +94,6 @@ export default class MinerTransaction extends TransactionBase<
     writer.writeUInt32LE(this.nonce);
   }
 
-  // eslint-disable-next-line
   static deserializeWireBase(options: DeserializeWireBaseOptions): this {
     const { reader } = options;
     const { type, version } = super.deserializeTransactionBaseStartWireBase(
@@ -123,7 +122,6 @@ export default class MinerTransaction extends TransactionBase<
     });
   }
 
-  // eslint-disable-next-line
   async serializeJSON(
     context: SerializeJSONContext,
   ): Promise<MinerTransactionJSON> {

@@ -26,7 +26,7 @@ import type {
   InteropInterfaceABI,
   VoidABI,
   IntegerABI,
-} from '../types'; // eslint-disable-line
+} from '../types';
 import { InvalidContractParameterError } from '../errors';
 
 const toByteArrayBuffer = (contractParameter: ContractParameter): Buffer => {
@@ -332,13 +332,11 @@ const contractParameters = {
   Array: (contractParameter: ContractParameter, parameter: ArrayABI): ?Param =>
     toArrayNullable(contractParameter, parameter),
   InteropInterface: (
-    // eslint-disable-next-line
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: InteropInterfaceABI,
   ): ?Param => toInteropInterfaceNullable(contractParameter),
   Void: (
-    // eslint-disable-next-line
     contractParameter: ContractParameter,
     // eslint-disable-next-line
     parameter: VoidABI,

@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import { type ChildProcess } from 'child_process';
 import {
   type Binary,
@@ -310,7 +309,6 @@ export default class NEOONENodeAdapter extends NodeAdapter {
 
   async _start(): Promise<void> {
     if (this._process == null) {
-      // eslint-disable-next-line
       const child = spawn(
         this._binary.cmd,
         this._binary.firstArgs.concat(['start', 'node', this._dataPath]),

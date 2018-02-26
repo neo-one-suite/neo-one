@@ -193,7 +193,6 @@ export default class RegisterTransaction extends TransactionBase<
     });
   }
 
-  // eslint-disable-next-line
   async serializeJSON(
     context: SerializeJSONContext,
   ): Promise<RegisterTransactionJSON> {
@@ -205,7 +204,7 @@ export default class RegisterTransaction extends TransactionBase<
     try {
       name = JSON.parse(name);
     } catch (error) {
-      // eslint-disable-next-line
+      // ignore errors
     }
 
     return {

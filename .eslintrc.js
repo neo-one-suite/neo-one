@@ -4,7 +4,8 @@ module.exports = {
     "airbnb",
     "plugin:flowtype/recommended",
     "prettier",
-    "prettier/flowtype"
+    "prettier/flowtype",
+    "plugin:eslint-comments/recommended"
   ],
   "plugins": [
     "flowtype"
@@ -33,5 +34,7 @@ module.exports = {
     "class-methods-use-this": 0,
     "react/prefer-stateless-function": 0,
     "react/jsx-filename-extension": 0,
+    "eslint-comments/no-unlimited-disable": 0,
+    "eslint-comments/disable-enable-pair": 0,
   },
 };

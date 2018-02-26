@@ -19,7 +19,6 @@ export default class ContractParameterBase<
 > implements SerializableWire<T>, SerializableJSON<TJSON> {
   type: Type;
 
-  // eslint-disable-next-line
   asBuffer(): Buffer {
     throw new Error('Unimplemented.');
   }
@@ -37,7 +36,6 @@ export default class ContractParameterBase<
     this.serializeWireBase.bind(this),
   );
 
-  // eslint-disable-next-line
   static deserializeContractParameterBaseWireBase({
     reader,
   }: DeserializeWireBaseOptions) {

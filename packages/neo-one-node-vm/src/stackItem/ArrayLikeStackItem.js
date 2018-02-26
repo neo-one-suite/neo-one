@@ -51,7 +51,6 @@ export default class ArrayLikeStackItem extends StackItemBase {
     return true;
   }
 
-  // eslint-disable-next-line
   asBuffer(): Buffer {
     throw new InvalidValueBufferError();
   }

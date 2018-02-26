@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import type { Command } from 'vorpal';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import {

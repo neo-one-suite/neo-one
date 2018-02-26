@@ -7,7 +7,6 @@
 .*/packages/.*/dist/es.js.map
 .*/node_modules/protobufjs/src/bower.json
 .*/node_modules/dataloader/index.js.flow
-<PROJECT_ROOT>/migrate/.*
 
 [include]
 
@@ -23,6 +22,10 @@ unsafe-getters-setters=off
 
 [options]
 module.use_strict=true
+module.file_ext=.mjs
+module.file_ext=.js
 
 esproposal.export_star_as=enable
 experimental.const_params=true
+
+suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe

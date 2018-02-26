@@ -10,7 +10,7 @@ export default async (pid: number): Promise<void> => {
   if (!alive) {
     return;
   }
-  // eslint-disable-next-line
+
   while (utils.nowSeconds() - startTime <= 10) {
     try {
       let signal = 'SIGINT';
@@ -27,6 +27,7 @@ export default async (pid: number): Promise<void> => {
 
       throw error;
     }
+    // eslint-disable-next-line
     await new Promise(resolve => setTimeout(() => resolve(), 1000));
     alive = isRunning(pid);
     if (!alive) {

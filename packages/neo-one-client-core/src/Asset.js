@@ -254,13 +254,12 @@ export default class Asset extends BaseState
     });
   }
 
-  // eslint-disable-next-line
   serializeJSON(context: SerializeJSONContext): AssetJSON {
     let name = this.name || '';
     try {
       name = JSON.parse(name);
     } catch (error) {
-      // eslint-disable-next-line
+      // ignore errors
     }
 
     return {

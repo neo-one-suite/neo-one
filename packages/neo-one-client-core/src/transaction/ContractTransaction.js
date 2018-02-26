@@ -72,7 +72,6 @@ export default class ContractTransaction extends TransactionBase<
     });
   }
 
-  // eslint-disable-next-line
   static deserializeWireBase(options: DeserializeWireBaseOptions): this {
     const { type, version } = super.deserializeTransactionBaseStartWireBase(
       options,
@@ -97,7 +96,6 @@ export default class ContractTransaction extends TransactionBase<
     });
   }
 
-  // eslint-disable-next-line
   async serializeJSON(
     context: SerializeJSONContext,
   ): Promise<ContractTransactionJSON> {

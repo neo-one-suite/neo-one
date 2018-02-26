@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import Ajv from 'ajv';
 import Immutable from 'seamless-immutable';
 import type { Log } from '@neo-one/utils';

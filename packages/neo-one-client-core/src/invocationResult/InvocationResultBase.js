@@ -59,7 +59,6 @@ export default class InvocationResultBase
     this.serializeWireBase.bind(this),
   );
 
-  // eslint-disable-next-line
   static deserializeInvocationResultWireBase(
     options: DeserializeWireBaseOptions,
   ): {|

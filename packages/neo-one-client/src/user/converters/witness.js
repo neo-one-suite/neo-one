@@ -1,7 +1,7 @@
 /* @flow */
 import { Witness } from '@neo-one/client-core';
 
-import type { Witness as ClientWitness } from '../../types'; // eslint-disable-line
+import type { Witness as ClientWitness } from '../../types';
 
 export default (witnessLike: ClientWitness): Witness =>
   new Witness({

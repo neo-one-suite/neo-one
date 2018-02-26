@@ -15,7 +15,7 @@ import type {
   Transaction,
   TransactionReceipt,
   UnspentOutput,
-} from '../../types'; // eslint-disable-line
+} from '../../types';
 import NEOONEDataProvider from './NEOONEDataProvider';
 import { UnknownNetworkError } from '../../errors';
 

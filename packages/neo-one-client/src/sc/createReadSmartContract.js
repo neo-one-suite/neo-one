@@ -17,7 +17,7 @@ import type {
   Param,
   ReadSmartContract,
   StorageItem,
-} from '../types'; // eslint-disable-line
+} from '../types';
 import type ReadClient from '../ReadClient';
 
 import * as common from './common';

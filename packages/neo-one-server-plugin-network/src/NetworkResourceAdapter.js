@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import {
   type Binary,
   type DescribeTable,
@@ -121,7 +120,7 @@ export default class NetworkResourceAdapter {
                   client.getConnectedPeers(),
                 ]);
               } catch (error) {
-                // eslint-disable-next-line
+                // ignore errors
               }
             }
 

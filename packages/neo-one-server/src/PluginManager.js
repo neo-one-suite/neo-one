@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import { type Log, utils } from '@neo-one/utils';
 import type { Observable } from 'rxjs/Observable';
 import {
@@ -159,11 +158,11 @@ export default class PluginManager {
       plugin => plugin.dependencies.length === 0,
     );
     await Promise.all(noDepPlugins.map(plugin => this._registerPlugin(plugin)));
-    // eslint-disable-next-line
     for (const pluginName of sorted) {
       const plugin = pluginNameToPlugin[pluginName];
       // The later plugins will fail with missing dependency
       if (plugin != null) {
+        // eslint-disable-next-line
         await this._registerPlugin(pluginNameToPlugin[pluginName]);
       }
     }

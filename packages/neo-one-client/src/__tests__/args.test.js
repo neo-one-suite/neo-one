@@ -186,7 +186,6 @@ describe('arg assertions', () => {
 
   for (const testCase of workingTestCases) {
     const { method, args } = testCase;
-    // eslint-disable-next-line
     test(method, async () => {
       // $FlowFixMe
       const result = assertArgs[method](...args);
@@ -687,7 +686,6 @@ describe('arg assertions', () => {
 
   for (const testCase of errorTestCases) {
     const { method, message, args, error } = testCase;
-    // eslint-disable-next-line
     test(message, async () => {
       function testError() {
         // $FlowFixMe

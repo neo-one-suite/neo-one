@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import {
   TRANSACTION_TYPE,
   type Block,
@@ -237,7 +236,7 @@ export default ({
           address: args[0],
         });
       } catch (error) {
-        // eslint-disable-next-line
+        // Ignore errors
       }
 
       return { address: args[0], isvalid: scriptHash != null };

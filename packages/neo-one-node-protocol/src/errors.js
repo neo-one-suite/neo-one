@@ -4,7 +4,6 @@ import type { Endpoint } from '@neo-one/node-core';
 
 import type Message from './Message';
 
-// eslint-disable-next-line
 export class NegotiationError extends CustomError {
   messageObj: Message;
   code: string;

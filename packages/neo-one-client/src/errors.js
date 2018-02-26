@@ -2,7 +2,7 @@
 import type BigNumber from 'bignumber.js';
 import { CustomError } from '@neo-one/utils';
 
-import type { ContractParameter, ContractParameterType } from './types'; // eslint-disable-line
+import type { ContractParameter, ContractParameterType } from './types';
 
 export class InvalidContractParameterError extends CustomError {
   parameter: ContractParameter;

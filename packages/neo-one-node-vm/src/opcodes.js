@@ -61,7 +61,6 @@ export type CreateOpArgs = {| context: ExecutionContext |};
 export type CreateOp = (input: CreateOpArgs) => Op;
 export const createOp = ({
   name,
-  // eslint-disable-next-line
   in: in_,
   inAlt,
   out,

@@ -69,7 +69,6 @@ export type ExecuteScripts = (input: {|
   triggerType: TriggerType,
   action: ExecutionAction,
   gas: BN,
-  // eslint-disable-next-line
   onStep?: OnStep,
   listeners?: VMListeners,
   skipWitnessVerify?: boolean,

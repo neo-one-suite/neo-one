@@ -17,7 +17,7 @@ import type {
   SmartContract,
   SmartContractDefinition,
   TransactionResult,
-} from '../types'; // eslint-disable-line
+} from '../types';
 import type Client from '../Client';
 import { NoAccountError, NoContractDeployedError } from '../errors';
 

@@ -1,7 +1,7 @@
 /* @flow */
 import { Input, common } from '@neo-one/client-core';
 
-import type { Input as ClientInput } from '../../types'; // eslint-disable-line
+import type { Input as ClientInput } from '../../types';
 
 export default (inputLike: ClientInput): Input =>
   new Input({

@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import type { ChildProcess } from 'child_process';
 import {
   type DescribeTable,
@@ -124,9 +123,8 @@ export default class SimulationResourceAdapter {
     });
   }
 
-  async destroy(): Promise<void> {
-    // eslint-disable-next-line
-  }
+  // eslint-disable-next-line
+  async destroy(): Promise<void> {}
 
   static create(
     adapterOptions: SimulationResourceAdapterInitOptions,

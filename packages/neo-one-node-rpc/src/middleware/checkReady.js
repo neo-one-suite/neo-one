@@ -9,7 +9,6 @@ const fetchCount = async (
   timeoutMS: number,
 ): Promise<?number> => {
   try {
-    // eslint-disable-next-line
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
@@ -28,7 +27,6 @@ const fetchCount = async (
     if (!response.ok) {
       return null;
     }
-    // eslint-disable-next-line
     const result = await response.json();
     if (Array.isArray(result)) {
       const responseJSON = result[0];

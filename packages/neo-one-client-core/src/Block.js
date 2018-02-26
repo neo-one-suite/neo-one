@@ -65,9 +65,7 @@ export type BlockVerifyOptions = {|
   calculateClaimAmount: (inputs: Array<Input>) => Promise<BN>,
   verifyScript: VerifyScript,
   currentHeight: number,
-  // eslint-disable-next-line
   governingToken: RegisterTransaction,
-  // eslint-disable-next-line
   utilityToken: RegisterTransaction,
   fees: { [type: TransactionType]: BN },
   registerValidatorFee: BN,
@@ -354,7 +352,6 @@ export default class Block extends BlockBase
     });
   }
 
-  // eslint-disable-next-line
   async serializeJSON(context: SerializeJSONContext): Promise<BlockJSON> {
     const blockBaseJSON = super.serializeBlockBaseJSON(context);
 

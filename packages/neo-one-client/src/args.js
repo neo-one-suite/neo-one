@@ -19,7 +19,7 @@ import type {
   Hash256String,
   PublicKeyString,
   TransactionOptions,
-} from './types'; // eslint-disable-line
+} from './types';
 import { InvalidArgumentError, InvalidNamedArgumentError } from './errors';
 
 import { addressToScriptHash } from './helpers';

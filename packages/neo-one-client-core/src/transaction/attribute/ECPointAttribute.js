@@ -41,7 +41,6 @@ export default class ECPointAttribute extends AttributeBase<
     writer.writeBytes(common.ecPointToBuffer(this.value).slice(1));
   }
 
-  // eslint-disable-next-line
   static deserializeWireBase(options: DeserializeWireBaseOptions): this {
     const { reader } = options;
     const { usage } = super.deserializeAttributeWireBase(options);

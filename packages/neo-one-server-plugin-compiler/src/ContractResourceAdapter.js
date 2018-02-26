@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import type { ABI } from '@neo-one/client';
 import {
   type Binary,
@@ -151,9 +150,8 @@ export default class ContractResourceAdapter {
     };
   }
 
-  async destroy(): Promise<void> {
-    // eslint-disable-next-line
-  }
+  // eslint-disable-next-line
+  async destroy(): Promise<void> {}
 
   static create(
     adapterOptions: ContractResourceAdapterInitOptions,

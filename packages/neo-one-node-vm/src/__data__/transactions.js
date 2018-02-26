@@ -16,7 +16,6 @@ import {
 
 import keys from './keys';
 
-// eslint-disable-next-line
 export const createInvocation = ({
   script,
   gas,

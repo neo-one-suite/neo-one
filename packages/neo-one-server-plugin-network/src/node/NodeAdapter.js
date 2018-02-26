@@ -144,20 +144,20 @@ export default class NodeAdapter {
   async live(timeoutSeconds: number): Promise<void> {
     const start = utils.nowSeconds();
 
-    // eslint-disable-next-line
     while (utils.nowSeconds() - start < timeoutSeconds) {
+      // eslint-disable-next-line
       const isLive = await this._isLive(5000);
       if (isLive) {
         return;
       }
 
+      // eslint-disable-next-line
       await new Promise(resolve =>
         setTimeout(() => resolve(), timeoutSeconds / 10 * 1000),
       );
     }
   }
 
-  // eslint-disable-next-line
   async _create(): Promise<void> {
     throw new Error('Not Implemented');
   }

@@ -89,7 +89,6 @@ export type CreateSysCallArgs = {| context: ExecutionContext |};
 export type CreateSysCall = (input: CreateSysCallArgs) => SysCall;
 export const createSysCall = ({
   name,
-  // eslint-disable-next-line
   in: in_,
   inAlt,
   out,

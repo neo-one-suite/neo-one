@@ -68,9 +68,8 @@ export default class SmartContractResourceAdapter {
     });
   }
 
-  async destroy(): Promise<void> {
-    // eslint-disable-next-line
-  }
+  // eslint-disable-next-line
+  async destroy(): Promise<void> {}
 
   static create(
     {

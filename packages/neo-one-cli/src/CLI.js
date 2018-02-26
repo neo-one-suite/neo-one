@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import { Client, createServerConfig } from '@neo-one/server-client';
 import {
   type CLIArgs,

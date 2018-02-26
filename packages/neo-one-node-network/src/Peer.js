@@ -10,9 +10,7 @@ export type PeerOptions<Message> = {|
   endpoint: Endpoint,
   stream: Duplex,
   transform: Duplex,
-  // eslint-disable-next-line
   onError: (peer: Peer<Message>, error: Error) => void,
-  // eslint-disable-next-line
   onClose: (peer: Peer<Message>) => void,
 |};
 

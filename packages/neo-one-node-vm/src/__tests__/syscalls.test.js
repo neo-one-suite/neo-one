@@ -1406,7 +1406,6 @@ describe('syscalls', () => {
 
   for (const testCase of SYSCALLS) {
     const { name, result, gas, args = [], actionIndex = 0, mock } = testCase;
-    // eslint-disable-next-line
     it(name, async () => {
       const sb = new ScriptBuilder();
       sb.emitSysCall(name);

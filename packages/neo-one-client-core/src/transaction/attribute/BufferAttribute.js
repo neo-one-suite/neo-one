@@ -66,7 +66,6 @@ export default class BufferAttribute extends AttributeBase<
     }
   }
 
-  // eslint-disable-next-line
   static deserializeWireBase(options: DeserializeWireBaseOptions): this {
     const { reader } = options;
     const { usage } = super.deserializeAttributeWireBase(options);

@@ -44,7 +44,6 @@ export const now = () => {
 
   return Date.now() - loadTime;
 };
-// eslint-disable-next-line
 export const createProfile = (log: Log): Profile => (
   point: string,
   data?: LogData,

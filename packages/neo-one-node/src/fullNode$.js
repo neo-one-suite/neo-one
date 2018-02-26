@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import {
   type BackupRestoreOptions,
   backup,

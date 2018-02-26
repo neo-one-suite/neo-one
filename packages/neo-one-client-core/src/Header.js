@@ -65,7 +65,6 @@ export default class Header extends BlockBase
     });
   }
 
-  // eslint-disable-next-line
   async serializeJSON(context: SerializeJSONContext): Promise<HeaderJSON> {
     return super.serializeBlockBaseJSON(context);
   }

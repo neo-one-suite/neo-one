@@ -373,11 +373,12 @@ export default class Blockchain {
       while (
         this._running &&
         entry != null &&
-        entry.block.index === this.currentBlockIndex + 1 // eslint-disable-next-line
+        entry.block.index === this.currentBlockIndex + 1
       ) {
         entry = this._blockQueue.dequeue();
         const done = this._perf.start('Blockchain._persistBlocksAsync');
         const start = performanceNow();
+        // eslint-disable-next-line
         await this._persistBlock(entry.block, entry.unsafe);
         entry.resolve();
         this.block$.next(entry.block);
@@ -626,7 +627,6 @@ export default class Blockchain {
                 ),
               ),
             output => common.uInt160ToHex(output.address),
-            // eslint-disable-next-line
           ),
         )
         .map(([addressHex, addressOutputs]) => [

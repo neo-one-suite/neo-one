@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint-next-line untyped-type-import:off
 import type LRU from 'lru-cache';
 import {
   type ReadAllStorage,

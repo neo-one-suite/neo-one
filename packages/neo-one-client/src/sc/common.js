@@ -14,7 +14,7 @@ import type {
   InvocationResult,
   Param,
   RawInvocationResult,
-} from '../types'; // eslint-disable-line
+} from '../types';
 import {
   InvalidEventError,
   InvalidArgumentError,

@@ -127,7 +127,6 @@ export default class StateTransaction extends TransactionBase<
     });
   }
 
-  // eslint-disable-next-line
   static deserializeWireBase(options: DeserializeWireBaseOptions): this {
     const { reader } = options;
     const { type, version } = super.deserializeTransactionBaseStartWireBase(
@@ -158,7 +157,6 @@ export default class StateTransaction extends TransactionBase<
     });
   }
 
-  // eslint-disable-next-line
   async serializeJSON(
     context: SerializeJSONContext,
   ): Promise<StateTransactionJSON> {

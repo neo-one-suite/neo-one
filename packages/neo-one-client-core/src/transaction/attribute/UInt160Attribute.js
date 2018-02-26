@@ -41,7 +41,6 @@ export default class UInt160Attribute extends AttributeBase<
     writer.writeUInt160(this.value);
   }
 
-  // eslint-disable-next-line
   static deserializeWireBase(options: DeserializeWireBaseOptions): this {
     const { reader } = options;
     const { usage } = super.deserializeAttributeWireBase(options);

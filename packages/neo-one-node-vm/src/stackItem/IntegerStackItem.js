@@ -60,7 +60,6 @@ export default class IntegerStackItem extends StackItemBase {
   }
 
   // https://github.com/lllwvlvwlll/MegaCity.AntShares/tree/master/src/AntShares
-  // eslint-disable-next-line
   asStorageContextStackItem({
     currentBlockIndex,
     vm,

@@ -7,7 +7,6 @@ export type JSONRPCErrorResponse = {|
   data?: $FlowFixMe,
 |};
 
-// eslint-disable-next-line
 export class JSONRPCError extends CustomError {
   responseError: JSONRPCErrorResponse;
   code: string;

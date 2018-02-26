@@ -45,9 +45,8 @@ export const onError = ({ log: logIn }: {| log: Log |}) => (
   if (ctx != null) {
     try {
       log = getLog(ctx);
-      // eslint-disable-next-line
-    } catch (error) {
-      // eslint-disable-next-line
+    } catch (err) {
+      // Ignore errors
     }
   }
 

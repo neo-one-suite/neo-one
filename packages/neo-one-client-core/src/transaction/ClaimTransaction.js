@@ -211,7 +211,6 @@ export default class ClaimTransaction extends TransactionBase<
     }
   }
 
-  // eslint-disable-next-line
   async serializeJSON(
     context: SerializeJSONContext,
   ): Promise<ClaimTransactionJSON> {

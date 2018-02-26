@@ -14,7 +14,7 @@ import type {
   InteropInterfaceABI,
   VoidABI,
   IntegerABI,
-} from '../types'; // eslint-disable-line
+} from '../types';
 import { InvalidArgumentError } from '../errors';
 
 import * as args from '../args';
@@ -33,7 +33,6 @@ const params = {
   // eslint-disable-next-line
   PublicKey: (param: ?Param, parameter: PublicKeyABI): ?ScriptBuilderParam =>
     common.stringToECPoint(args.assertPublicKey(param)),
-  // eslint-disable-next-line
   Integer: (param: ?Param, parameter: IntegerABI): ?ScriptBuilderParam => {
     const value = args.assertBigNumber(param);
 

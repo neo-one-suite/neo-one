@@ -89,7 +89,6 @@ describe('parameters', () => {
     ];
 
     for (const param of errorTestCases) {
-      // eslint-disable-next-line
       test(`${param} throws error`, () => {
         function testError() {
           return parameters[param](

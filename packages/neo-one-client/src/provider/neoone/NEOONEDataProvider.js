@@ -57,7 +57,7 @@ import type {
   TransactionReceipt,
   UnspentOutput,
   Validator,
-} from '../../types'; // eslint-disable-line
+} from '../../types';
 import AsyncBlockIterator from '../../AsyncBlockIterator';
 import JSONRPCClient from './JSONRPCClient';
 import JSONRPCHTTPProvider from './JSONRPCHTTPProvider';
@@ -617,7 +617,6 @@ export default class NEOONEDataProvider implements DataProvider {
         name = enName.name;
       }
     } else {
-      // eslint-disable-next-line
       name = assetName;
     }
     return {

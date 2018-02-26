@@ -111,14 +111,12 @@ export default class ResourceType<
   // Format the resource information into a table, the first element in the
   // array will be the header. Must always return an array with at least one
   // element (the header).
-  // eslint-disable-next-line
   getListTable(resources: Array<Resource>): ListTable {
     return [['Name']].concat(resources.map(resource => [resource.baseName]));
   }
 
   // Format the resource information into a vertical table. Nested tables
   // can also be used as a value.
-  // eslint-disable-next-line
   getDescribeTable(resource: Resource): DescribeTable {
     return [['Name', resource.baseName]];
   }

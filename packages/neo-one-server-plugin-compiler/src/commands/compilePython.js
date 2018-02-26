@@ -33,7 +33,6 @@ export default ({ vorpal, log, shutdown, logConfig$ }: CLIArgs) => {
         });
       } catch (error) {
         log({ event: 'COMPILE_PYTHON_COMPILE_ERROR', error });
-        // eslint-disable-next-line
         process.stdout.write(error.message);
         shutdown({ exitCode: 1, error });
         return;

@@ -53,7 +53,6 @@ export default class InvocationResultError extends InvocationResultBase
     writer.writeVarString(this.message, MAX_SIZE);
   }
 
-  // eslint-disable-next-line
   static deserializeWireBase(options: DeserializeWireBaseOptions): this {
     const { reader } = options;
     const {
@@ -68,7 +67,6 @@ export default class InvocationResultError extends InvocationResultBase
     return new this({ gasConsumed, stack, message });
   }
 
-  // eslint-disable-next-line
   serializeJSON(context: SerializeJSONContext): InvocationResultErrorJSON {
     return {
       state: VM_STATE.FAULT,

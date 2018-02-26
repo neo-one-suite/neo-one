@@ -11,7 +11,6 @@ import utils, { type BinaryWriter, IOHelper } from '../utils';
 
 export type ArrayContractParameterJSON = {|
   type: 'Array',
-  // eslint-disable-next-line
   value: Array<ContractParameterJSON>,
 |};
 

@@ -752,7 +752,6 @@ export class OutputStorageCache extends ReadStorageCache<
         }
       }
 
-      // eslint-disable-next-line
       this._values[this._getKeyString(key)] = {
         type: 'add',
         addValue: value,
@@ -870,7 +869,6 @@ export class BaseReadMetadataStorageCache<AddValue, Value> {
     return [{ type: 'add', change: this._createAddChange(value.addValue) }];
   }
 
-  // eslint-disable-next-line
   _tryGetTracked(): ?TrackedMetadataChange<AddValue, Value> {
     return this._value;
   }

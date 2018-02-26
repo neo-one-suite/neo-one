@@ -10,7 +10,7 @@ import {
 } from '@neo-one/client-core';
 
 import { InvalidNamedArgumentError } from '../../errors';
-import type { Attribute as ClientAttribute } from '../../types'; // eslint-disable-line
+import type { Attribute as ClientAttribute } from '../../types';
 
 export default (attributeLike: ClientAttribute): Attribute => {
   if (typeof attributeLike !== 'object') {

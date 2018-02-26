@@ -38,7 +38,6 @@ export default class ObjectStackItem<Value: Equatable> extends StackItemBase {
     return this.value != null;
   }
 
-  // eslint-disable-next-line
   asBuffer(): Buffer {
     throw new InvalidValueBufferError();
   }

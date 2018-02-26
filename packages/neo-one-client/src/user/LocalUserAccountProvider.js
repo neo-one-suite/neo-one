@@ -64,7 +64,7 @@ import type {
   UserAccountID,
   UserAccountProvider,
   Witness,
-} from '../types'; // eslint-disable-line
+} from '../types';
 import {
   InsufficientFundsError,
   InvalidTransactionError,

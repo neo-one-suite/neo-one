@@ -67,7 +67,6 @@ export default class StackItemBase implements Equatable {
     return writer.toBuffer();
   }
 
-  // eslint-disable-next-line
   asArray(): Array<StackItem> {
     throw new InvalidValueArrayError();
   }
@@ -76,7 +75,6 @@ export default class StackItemBase implements Equatable {
     return utils.fromSignedBuffer(this.asBuffer());
   }
 
-  // eslint-disable-next-line
   asBuffer(): Buffer {
     throw new Error('Unimplemented.');
   }
@@ -136,7 +134,6 @@ export default class StackItemBase implements Equatable {
     throw new InvalidValueAttributeError();
   }
 
-  // eslint-disable-next-line
   asAttributeStackItem(): AttributeStackItem {
     throw new InvalidValueAttributeStackItemError();
   }
@@ -173,7 +170,6 @@ export default class StackItemBase implements Equatable {
     throw new InvalidValueIteratorError();
   }
 
-  // eslint-disable-next-line
   asStorageContextStackItem(
     // eslint-disable-next-line
     options: AsStorageContextStackItemOptions,

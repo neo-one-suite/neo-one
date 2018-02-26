@@ -2,7 +2,6 @@
 import { type StorageItem, utils } from '@neo-one/client-core';
 import { utils as commonUtils } from '@neo-one/utils';
 
-// eslint-disable-next-line
 export const verifyBlockchainSnapshot = (blockchain: any) => {
   commonUtils.values(blockchain).forEach(obj => {
     if (typeof obj === 'object') {

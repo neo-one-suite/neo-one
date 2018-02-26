@@ -20,13 +20,13 @@ const isSameVersion = async ({
 |}): Promise<boolean> => {
   const client = new Client({ port });
   const startTime = utils.nowSeconds();
-  // eslint-disable-next-line
   while (utils.nowSeconds() - startTime <= 5) {
     try {
+      // eslint-disable-next-line
       const version = await client.getVersion();
       return version === expectedVersion;
     } catch (error) {
-      // eslint-disable-next-line
+      // ignore errors
     }
   }
 
@@ -35,8 +35,8 @@ const isSameVersion = async ({
 
 const waitRunning = async ({ pid }: {| pid: number |}) => {
   const startTime = utils.nowSeconds();
-  // eslint-disable-next-line
   while (!isRunning(pid) && utils.nowSeconds() - startTime <= 5) {
+    // eslint-disable-next-line
     await new Promise(resolve => setTimeout(() => resolve(), 100));
   }
 };
@@ -45,15 +45,15 @@ const waitReachable = async ({ port }: {| port: number |}) => {
   const client = new Client({ port });
   const startTime = utils.nowSeconds();
   let lastError;
-  // eslint-disable-next-line
   while (utils.nowSeconds() - startTime <= 30) {
     try {
+      // eslint-disable-next-line
       await client.wait(1000);
       return;
     } catch (error) {
+      // eslint-disable-next-line
       await new Promise(resolve => setTimeout(() => resolve(), 100));
       lastError = error;
-      // eslint-disable-next-line
     }
   }
 

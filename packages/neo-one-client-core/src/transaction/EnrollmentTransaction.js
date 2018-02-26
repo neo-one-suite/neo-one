@@ -134,7 +134,6 @@ export default class EnrollmentTransaction extends TransactionBase<
     });
   }
 
-  // eslint-disable-next-line
   async serializeJSON(
     context: SerializeJSONContext,
   ): Promise<EnrollmentTransactionJSON> {

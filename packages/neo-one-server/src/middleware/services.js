@@ -8,7 +8,6 @@ import {
   type TaskStatus,
   areTasksDone,
 } from '@neo-one/server-plugin';
-// flowlint-next-line untyped-type-import:off
 import type { Context } from 'mali';
 import { Observable } from 'rxjs/Observable';
 

@@ -167,7 +167,6 @@ export default class Account extends BaseState
     });
   }
 
-  // eslint-disable-next-line
   async serializeJSON(context: SerializeJSONContext): Promise<AccountJSON> {
     const [unspent, unclaimed] = await Promise.all([
       context.getUnspent(this.hash),

@@ -1,6 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
-// flowlint-next-line untyped-type-import:off
 import type { Context } from 'mali';
 import GRPCError from 'grpc-error';
 import type { Log } from '@neo-one/utils';

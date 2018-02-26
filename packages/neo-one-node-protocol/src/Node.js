@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import { Address6 } from 'ip-address';
 import {
   type ConnectedPeer,
@@ -277,7 +276,6 @@ export default class Node implements INode {
 
           throw error;
         }
-        // eslint-disable-next-line
       } finally {
         this._tempKnownTransactionHashes.delete(transaction.hashHex);
       }
@@ -792,7 +790,6 @@ export default class Node implements INode {
     }
   }
 
-  // eslint-disable-next-line
   async _onConsensusMessageReceived(payload: ConsensusPayload): Promise<void> {
     const consensus = this._consensus;
     if (consensus != null) {
@@ -801,7 +798,6 @@ export default class Node implements INode {
     }
   }
 
-  // eslint-disable-next-line
   _onFilterAddMessageReceived(
     peer: ConnectedPeer<Message, PeerData>,
     filterAdd: FilterAddPayload,
@@ -811,13 +807,11 @@ export default class Node implements INode {
     }
   }
 
-  // eslint-disable-next-line
   _onFilterClearMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
     // eslint-disable-next-line
     peer.data.bloomFilter = null;
   }
 
-  // eslint-disable-next-line
   _onFilterLoadMessageReceived(
     peer: ConnectedPeer<Message, PeerData>,
     filterLoad: FilterLoadPayload,
@@ -1071,12 +1065,10 @@ export default class Node implements INode {
     }
   }
 
-  // eslint-disable-next-line
   _onVerackMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
     peer.close();
   }
 
-  // eslint-disable-next-line
   _onVersionMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
     peer.close();
   }

@@ -142,7 +142,6 @@ export default class PublishTransaction extends TransactionBase<
     });
   }
 
-  // eslint-disable-next-line
   async serializeJSON(
     context: SerializeJSONContext,
   ): Promise<PublishTransactionJSON> {

@@ -937,7 +937,6 @@ describe('opcodes', () => {
       args = [],
       preOps = [],
     } = testCase;
-    // eslint-disable-next-line
     it(op, async () => {
       const sb = new ScriptBuilder();
       for (const { op: preOp, buffer: preBuffer } of preOps) {

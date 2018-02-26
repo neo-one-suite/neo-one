@@ -1,5 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
 import { type ABI } from '@neo-one/client';
 import {
   type Contract,

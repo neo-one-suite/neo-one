@@ -1,6 +1,4 @@
 /* @flow */
-// flowlint untyped-import:off
-// flowlint-next-line untyped-type-import:off
 import type { Context } from 'mali';
 import { utils } from '@neo-one/utils';
 

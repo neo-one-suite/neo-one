@@ -32,7 +32,6 @@ export default class InvocationResultSuccess extends InvocationResultBase
     super({ state: VM_STATE.HALT, gasConsumed, stack });
   }
 
-  // eslint-disable-next-line
   static deserializeWireBase(options: DeserializeWireBaseOptions): this {
     const {
       state,
@@ -45,7 +44,6 @@ export default class InvocationResultSuccess extends InvocationResultBase
     return new this({ gasConsumed, stack });
   }
 
-  // eslint-disable-next-line
   serializeJSON(context: SerializeJSONContext): InvocationResultSuccessJSON {
     return {
       state: VM_STATE.HALT,

@@ -38,7 +38,6 @@ export default class AttributeBase<Usage: AttributeUsage, Value>
     this.serializeWireBase.bind(this),
   );
 
-  // eslint-disable-next-line
   static deserializeAttributeWireBase({
     reader,
   }: DeserializeWireBaseOptions): {| usage: number |} {

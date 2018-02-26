@@ -10,9 +10,7 @@ const add0x = (value: string) => `0x${value}`;
 const strip0x = (value: string) =>
   value.startsWith('0x') ? value.substring(2) : value;
 
-// eslint-disable-next-line
 export opaque type UInt160 = Buffer;
-// eslint-disable-next-line
 export opaque type UInt160Hex: string = string;
 
 const UINT160_BUFFER_BYTES = 20;
@@ -56,9 +54,7 @@ const asUInt160 = (value: mixed): UInt160 => {
 
 const ZERO_UINT160 = (Buffer.alloc(20, 0): UInt160);
 
-// eslint-disable-next-line
 export opaque type UInt256 = Buffer;
-// eslint-disable-next-line
 export opaque type UInt256Hex: string = string;
 
 const UINT256_BUFFER_BYTES = 32;
@@ -104,11 +100,9 @@ const asUInt256 = (value: mixed): UInt256 => {
 const toUInt32LE = (bytes: UInt256): number =>
   new BN(uInt256ToBuffer(bytes).slice(0, 4), 'le').toNumber();
 
-// eslint-disable-next-line
 export opaque type ECPointBase = Buffer;
 export opaque type ECPointInfinity = Buffer;
 export type ECPoint = ECPointBase | ECPointInfinity;
-// eslint-disable-next-line
 export opaque type ECPointHex: string = string;
 
 // Encoded compressed ECPoint
@@ -175,9 +169,7 @@ const asECPoint = (value: mixed): ECPoint => {
   throw new InvalidFormatError();
 };
 
-// eslint-disable-next-line
 export opaque type PrivateKey = Buffer;
-// eslint-disable-next-line
 export opaque type PrivateKeyHex: string = string;
 
 const PRIVATE_KEY_BUFFER_BYTES = 32;

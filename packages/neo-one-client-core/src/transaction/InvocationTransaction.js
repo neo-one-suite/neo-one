@@ -170,7 +170,6 @@ export default class InvocationTransaction extends TransactionBase<
     });
   }
 
-  // eslint-disable-next-line
   async serializeJSON(
     context: SerializeJSONContext,
   ): Promise<InvocationTransactionJSON> {
@@ -243,7 +242,6 @@ export default class InvocationTransaction extends TransactionBase<
     return this.gas;
   }
 
-  // eslint-disable-next-line
   async verify(options: TransactionVerifyOptions): Promise<void> {
     if (!this.gas.mod(utils.ONE_HUNDRED_MILLION).eq(utils.ZERO)) {
       throw new VerifyError('Invalid GAS amount');

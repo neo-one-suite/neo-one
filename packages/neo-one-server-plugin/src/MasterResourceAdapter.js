@@ -22,14 +22,11 @@ export type MasterResourceAdapter<
 > = {
   // ResourceAdapter for this ResourceType.
   initResourceAdapter(
-    // eslint-disable-next-line
     options: ResourceAdapterOptions,
   ): Promise<ResourceAdapter<Resource, ResourceOptions>>,
 
   createResourceAdapter(
-    // eslint-disable-next-line
     adapterOptions: ResourceAdapterOptions,
-    // eslint-disable-next-line
     options: ResourceOptions,
   ): TaskList,
 };

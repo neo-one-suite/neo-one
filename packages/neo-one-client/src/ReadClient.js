@@ -21,7 +21,7 @@ import type {
   StorageItem,
   Transaction,
   Validator,
-} from './types'; // eslint-disable-line
+} from './types';
 
 import * as args from './args';
 import { createReadSmartContract } from './sc';

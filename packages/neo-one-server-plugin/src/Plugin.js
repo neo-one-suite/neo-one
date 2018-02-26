@@ -32,9 +32,8 @@ export default class Plugin {
   }
 
   // Called when the user requests a full reset of neo-one
-  async reset(): Promise<void> {
-    // eslint-disable-line
-  }
+  // eslint-disable-next-line
+  async reset(): Promise<void> {}
 
   // Plugin name, should match the module name, e.g.
   // `@neo-one/server-plugin-network`

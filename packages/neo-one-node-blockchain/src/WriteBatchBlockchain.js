@@ -419,7 +419,6 @@ export default class WriteBatchBlockchain {
 
   async persistBlock(block: Block): Promise<void> {
     let done = this._perf.start('WriteBatchBlockchain.persistBlock.0');
-    // eslint-disable-next-line
     const [systemFee] = await Promise.all([
       block.index === 0
         ? Promise.resolve(utils.ZERO)
@@ -520,8 +519,8 @@ export default class WriteBatchBlockchain {
     transactions: Array<[number, Transaction]>,
   ): Promise<void> {
     const done = this._perf.start('WriteBatchBlockchain._persistTransactions');
-    // eslint-disable-next-line
     for (const [idx, transaction] of transactions) {
+      // eslint-disable-next-line
       await this._persistTransaction(block, transaction, idx);
     }
     done();
@@ -837,10 +836,8 @@ export default class WriteBatchBlockchain {
     );
     const addressSpent = this._groupByAddress(inputOutputs);
     const addressClaimed = this._groupByAddress(claimOutputs);
-    const addressOutputs = _.groupBy(
-      outputs,
-      // eslint-disable-next-line
-      output => common.uInt160ToHex(output.output.address),
+    const addressOutputs = _.groupBy(outputs, output =>
+      common.uInt160ToHex(output.output.address),
     );
 
     done = this._perf.start('WriteBatchBlockchain._updateAccounts.1');
@@ -889,10 +886,8 @@ export default class WriteBatchBlockchain {
       output: Output,
     |}>,
   ): { [key: UInt160Hex]: Array<Input> } {
-    const addressInputOutputs = _.groupBy(
-      inputOutputs,
-      // eslint-disable-next-line
-      ({ output }) => common.uInt160ToHex(output.address),
+    const addressInputOutputs = _.groupBy(inputOutputs, ({ output }) =>
+      common.uInt160ToHex(output.address),
     );
     return _.mapValues(addressInputOutputs, inputs =>
       inputs.map(({ input }) => input),
