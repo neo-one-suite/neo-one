@@ -15,20 +15,20 @@
   },
   "lint-staged": {
     "packages/*/src/**/*.js": [
-      "prettier --write --config .prettierrc",
+      "yarn run prettier --write --config .prettierrc",
       "git add",
-      "eslint",
+      "yarn run eslint",
       "yarn run test --findRelatedTests --ci --passWithNoTests"
     ],
     "packages/*/template/**/*.js": [
-      "prettier --write --config .prettierrc",
+      "yarn run prettier --write --config .prettierrc",
       "git add",
-      "eslint"
+      "yarn run eslint"
     ],
     "scripts/**/*.js": [
-      "prettier --write --config .prettierrc",
+      "yarn run prettier --write --config .prettierrc",
       "git add",
-      "eslint"
+      "yarn run eslint"
     ]
   },
   "scripts": {
@@ -72,15 +72,15 @@
     "@babel/preset-env": "^7.0.0-beta.40",
     "@babel/register": "^7.0.0-beta.40",
     "babel-core": "^7.0.0-0",
-    "babel-eslint": "^8.2.1",
-    "babel-jest": "^22.2.2",
-    "eslint": "^4.18.0",
+    "babel-eslint": "^8.2.2",
+    "babel-jest": "^22.4.1",
+    "eslint": "^4.18.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-flowtype": "^2.44.0",
-    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-flowtype": "^2.46.1",
+    "eslint-plugin-import": "^2.9.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
-    "eslint-plugin-react": "^7.6.1",
+    "eslint-plugin-react": "^7.7.0",
     "flow-bin": "^0.66.0",
     "fs-extra": "^5.0.0",
     "gulp": "^3.9.1",
@@ -89,13 +89,13 @@
     "gulp-plumber": "^1.2.0",
     "gulp-util": "^3.0.8",
     "husky": "^0.14.3",
-    "jest": "^22.3.0",
-    "jest-environment-node": "^22.3.0",
+    "jest": "^22.4.2",
+    "jest-environment-node": "^22.4.1",
     "lerna": "^2.9.0",
-    "lint-staged": "^6.1.1",
+    "lint-staged": "^7.0.0",
     "lodash": "^4.17.5",
     "prettier": "^1.10.2",
-    "rollup": "^0.56.1",
+    "rollup": "^0.56.3",
     "rollup-plugin-babel": "4.0.0-beta.0",
     "rollup-plugin-json": "^2.3.0",
     "rollup-plugin-node-resolve": "^3.0.3",
