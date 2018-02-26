@@ -12,7 +12,12 @@ import { ServerManager } from '@neo-one/server-client';
 
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { defer } from 'rxjs/observable/defer';
-import { distinct, map, mergeScan, switchMap } from 'rxjs/operators';
+import {
+  distinctUntilChanged,
+  map,
+  mergeScan,
+  switchMap,
+} from 'rxjs/operators';
 import path from 'path';
 import proto from '@neo-one/server-grpc';
 
@@ -69,11 +74,14 @@ export default class Server {
   |}): Observable<Server> {
     const dataPath$ = serverConfig.config$.pipe(
       map(config => config.paths.data),
-      distinct(),
+      distinctUntilChanged(),
     );
     const portAllocator$ = combineLatest(
       dataPath$,
-      serverConfig.config$.pipe(map(config => config.ports), distinct()),
+      serverConfig.config$.pipe(
+        map(config => config.ports),
+        distinctUntilChanged(),
+      ),
     ).pipe(
       switchMap(([dataPath, ports]) =>
         defer(async () => {
@@ -111,7 +119,7 @@ export default class Server {
           dataPath,
           pluginManager,
         });
-        return server.start$().pipe(map(() => server), distinct());
+        return server.start$().pipe(map(() => server), distinctUntilChanged());
       }),
     );
   }
@@ -119,7 +127,7 @@ export default class Server {
   start$(): Observable<void> {
     return this.serverConfig.config$.pipe(
       map(config => config.server),
-      distinct(),
+      distinctUntilChanged(),
       mergeScan(
         (prevApp, serverConfig) =>
           defer(async () => {

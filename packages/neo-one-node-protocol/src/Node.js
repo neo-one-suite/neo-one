@@ -37,7 +37,7 @@ import { ScalingBloem } from 'bloem';
 import _ from 'lodash';
 import { createReadClient } from '@neo-one/client';
 import { defer } from 'rxjs/observable/defer';
-import { distinct, map, switchMap, take } from 'rxjs/operators';
+import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
 import { empty } from 'rxjs/observable/empty';
 import { merge } from 'rxjs/observable/merge';
 import { finalize, neverComplete, utils as commonUtils } from '@neo-one/utils';
@@ -157,7 +157,10 @@ export default class Node implements INode {
     this.blockchain = blockchain;
     this._network = new Network({
       environment: environment.network,
-      options$: options$.pipe(map(options => options.network), distinct()),
+      options$: options$.pipe(
+        map(options => options.network),
+        distinctUntilChanged(),
+      ),
       negotiate: this._negotiate,
       checkPeerHealth: this._checkPeerHealth,
       createMessageTransform: () =>
@@ -204,13 +207,13 @@ export default class Node implements INode {
     );
     const consensus$ = this._options$.pipe(
       map(options => options.consensus.enabled),
-      distinct(),
+      distinctUntilChanged(),
       switchMap(enabled => {
         if (enabled) {
           const consensus = new Consensus({
             options$: this._options$.pipe(
               map(options => options.consensus.options),
-              distinct(),
+              distinctUntilChanged(),
             ),
             node: this,
           });

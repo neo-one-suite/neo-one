@@ -4,7 +4,7 @@ import type { Observable } from 'rxjs/Observable';
 
 import _ from 'lodash';
 import { common, crypto } from '@neo-one/client-core';
-import { distinct, distinctUntilChanged, map } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { utils } from '@neo-one/utils';
 
 import type {
@@ -81,7 +81,7 @@ export default class LocalKeyStore {
     this.accounts$ = this._accounts$;
 
     this._currentAccount$ = new BehaviorSubject(null);
-    this.currentAccount$ = this._currentAccount$.pipe(distinct());
+    this.currentAccount$ = this._currentAccount$.pipe(distinctUntilChanged());
 
     this._store = store;
 

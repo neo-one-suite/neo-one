@@ -27,7 +27,7 @@ import Vorpal, { type Args } from 'vorpal';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { defer } from 'rxjs/observable/defer';
 import {
-  distinct,
+  distinctUntilChanged,
   map,
   mergeScan,
   publishReplay,
@@ -210,9 +210,12 @@ export default class InteractiveCLI {
     const logSubscription = combineLatest(
       this.clientConfig.config$.pipe(
         map(config => config.paths.log),
-        distinct(),
+        distinctUntilChanged(),
       ),
-      this.clientConfig.config$.pipe(map(config => config.log), distinct()),
+      this.clientConfig.config$.pipe(
+        map(config => config.log),
+        distinctUntilChanged(),
+      ),
     )
       .pipe(
         map(([logPath, config]) => {
@@ -236,8 +239,14 @@ export default class InteractiveCLI {
       minPort: this._serverConfig.minPort,
     });
     const start$ = combineLatest(
-      serverConfig.config$.pipe(map(conf => conf.paths.data), distinct()),
-      serverConfig.config$.pipe(map(conf => conf.server.port), distinct()),
+      serverConfig.config$.pipe(
+        map(conf => conf.paths.data),
+        distinctUntilChanged(),
+      ),
+      serverConfig.config$.pipe(
+        map(conf => conf.server.port),
+        distinctUntilChanged(),
+      ),
     ).pipe(
       mergeScan(
         (managerIn, [dataPath, port]) =>

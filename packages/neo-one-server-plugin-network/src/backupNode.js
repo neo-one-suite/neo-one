@@ -1,7 +1,7 @@
 /* @flow */
 import type { CLIArgs } from '@neo-one/server-plugin';
 
-import { distinct, map } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import path from 'path';
 
 import createFullNode from './createFullNode';
@@ -76,7 +76,7 @@ export default (cliArgs: CLIArgs) => {
       const logSubscription = nodeConfig.config$
         .pipe(
           map(config => config.log),
-          distinct(),
+          distinctUntilChanged(),
           map(config => ({
             name: 'node',
             path: logPath,

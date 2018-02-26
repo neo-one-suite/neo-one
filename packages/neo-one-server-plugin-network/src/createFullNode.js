@@ -3,7 +3,7 @@ import type { Config, Log } from '@neo-one/server-plugin';
 import FullNode from '@neo-one/node';
 
 import { createMain, createTest } from '@neo-one/node-neo-settings';
-import { distinct, map, take } from 'rxjs/operators';
+import { distinctUntilChanged, map, take } from 'rxjs/operators';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -29,7 +29,7 @@ export default async ({
     nodeConfig.config$
       .pipe(
         map(config => config.settings),
-        distinct(),
+        distinctUntilChanged(),
         map(config => {
           const options = {
             privateNet: config.privateNet,
@@ -65,7 +65,7 @@ export default async ({
       },
       options$: nodeConfig.config$.pipe(
         map(config => config.options),
-        distinct(),
+        distinctUntilChanged(),
       ),
       chainFile,
       dumpChainFile,

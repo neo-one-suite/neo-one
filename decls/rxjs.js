@@ -451,7 +451,6 @@ declare module 'rxjs/operators' {
   declare export function concatMap<T, R>(project: (value: T, index: number) => rxjs$ObservableInput<R>): rxjs$OperatorFunction<T, R>;
   declare export function debounce<T>(durationSelector: (value: T) => rxjs$SubscribableOrPromise<any>): rxjs$OperatorFunction<T, T>;
   declare export function delay<T>(delay: number | Date, scheduler?: rxjs$SchedulerClass): rxjs$OperatorFunction<T, T>;
-  declare export function distinct<T, U>(keySelector?: (value: T) => U, flushes?: rxjs$Observable<mixed>): rxjs$OperatorFunction<T, T>;
   declare export function distinctUntilChanged<T>(compare?: (x: T, y: T) => boolean): rxjs$OperatorFunction<T, T>;
   declare export function filter<T>(predicate: (value: T, index: number) => boolean, thisArg?: any): rxjs$OperatorFunction<T, T>;
   declare export function finalize<T>(callback: () => void): rxjs$OperatorFunction<T, T>;

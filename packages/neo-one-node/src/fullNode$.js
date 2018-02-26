@@ -26,7 +26,13 @@ import {
 } from '@neo-one/node-rpc';
 
 import { defer } from 'rxjs/observable/defer';
-import { concatMap, distinct, map, switchMap, take } from 'rxjs/operators';
+import {
+  concatMap,
+  distinctUntilChanged,
+  map,
+  switchMap,
+  take,
+} from 'rxjs/operators';
 import { concat } from 'rxjs/observable/concat';
 import cron from 'node-cron';
 import { dumpChain, loadChain } from '@neo-one/node-offline';
@@ -162,7 +168,10 @@ export default ({
       const node = new Node({
         blockchain,
         environment: environment.node,
-        options$: options$.pipe(map(options => options.node), distinct()),
+        options$: options$.pipe(
+          map(options => options.node),
+          distinctUntilChanged(),
+        ),
       });
       return node.start().pipe(map(() => ({ blockchain, node })));
     }),
@@ -174,14 +183,17 @@ export default ({
         blockchain,
         node,
         environment: environment.rpc,
-        options$: options$.pipe(map(options => options.rpc), distinct()),
+        options$: options$.pipe(
+          map(options => options.rpc),
+          distinctUntilChanged(),
+        ),
       }),
     ),
   );
 
   const start$ = options$.pipe(
     map(options => options.backup),
-    distinct(),
+    distinctUntilChanged(),
     switchMap(backupOptionsIn => {
       const backupOptions = backupOptionsIn;
       if (backupOptions == null || backupOptions.backup == null) {

@@ -3,7 +3,7 @@ import type { CLIArgs } from '@neo-one/server-plugin';
 
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { createServerConfig } from '@neo-one/server-client';
-import { distinct, map } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 
 export default (
   name: string,
@@ -17,8 +17,14 @@ export default (
   });
 
   const logSubscription = combineLatest(
-    serverConfig.config$.pipe(map(config => config.paths.log), distinct()),
-    serverConfig.config$.pipe(map(config => config.log), distinct()),
+    serverConfig.config$.pipe(
+      map(config => config.paths.log),
+      distinctUntilChanged(),
+    ),
+    serverConfig.config$.pipe(
+      map(config => config.log),
+      distinctUntilChanged(),
+    ),
   )
     .pipe(
       map(([path, config]) => ({

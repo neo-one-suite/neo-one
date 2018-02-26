@@ -9,7 +9,7 @@ import { defer } from 'rxjs/observable/defer';
 import http from 'http';
 import https from 'https';
 import {
-  distinct,
+  distinctUntilChanged,
   map,
   mergeScan,
   publishReplay,
@@ -154,8 +154,14 @@ export default ({
   options$: Observable<Options>,
 |}): Observable<$FlowFixMe> => {
   const app$ = combineLatest(
-    options$.pipe(map(options => options.liveHealthCheck), distinct()),
-    options$.pipe(map(options => options.readyHealthCheck), distinct()),
+    options$.pipe(
+      map(options => options.liveHealthCheck),
+      distinctUntilChanged(),
+    ),
+    options$.pipe(
+      map(options => options.readyHealthCheck),
+      distinctUntilChanged(),
+    ),
   ).pipe(
     map(([liveHealthCheckOptions, readyHealthCheckOptions]) => {
       const app = new Koa();
@@ -190,7 +196,10 @@ export default ({
   ) =>
     combineLatest(
       app$,
-      options$.pipe(map(opts => opts.server.keepAliveTimeout), distinct()),
+      options$.pipe(
+        map(opts => opts.server.keepAliveTimeout),
+        distinctUntilChanged(),
+      ),
     ).pipe(
       mergeScan((prevResult, [app, keepAliveTimeout]) =>
         defer(() =>

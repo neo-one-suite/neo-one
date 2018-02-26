@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
 
 import chokidar from 'chokidar';
 import { defer } from 'rxjs/observable/defer';
-import { distinct, mergeScan, switchMap } from 'rxjs/operators';
+import { distinctUntilChanged, mergeScan, switchMap } from 'rxjs/operators';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -68,7 +68,7 @@ export default class Config<TConfig: Object> {
           ),
         ),
       ),
-      distinct(),
+      distinctUntilChanged(),
     );
 
     this._validate(this._defaultConfig);
