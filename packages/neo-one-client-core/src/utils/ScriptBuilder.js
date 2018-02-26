@@ -93,6 +93,12 @@ export default class ScriptBuilder {
     return this.emit(buff);
   }
 
+  emitInt16LE(value: number): this {
+    const buff = Buffer.allocUnsafe(2);
+    buff.writeInt16LE(value, 0);
+    return this.emit(buff);
+  }
+
   emitUInt32LE(value: number): this {
     const buff = Buffer.allocUnsafe(4);
     buff.writeUInt32LE(value, 0);

@@ -29,11 +29,11 @@ const fromSignedBuffer = (value: Buffer): BN =>
   value.length === 0 ? ZERO : new BN(value, 'le').fromTwos(value.length * 8);
 
 const toSignedBuffer = (value: BN): Buffer => {
-  const buff = value.toArrayLike(Buffer, 'le');
   if (value.isNeg()) {
-    return buff;
+    return value.toTwos((value.byteLength() + 1) * 8).toArrayLike(Buffer, 'le');
   }
 
+  const buff = value.toArrayLike(Buffer, 'le');
   const normalValue = fromSignedBuffer(buff);
 
   const paddedBuff = value.toArrayLike(Buffer, 'le', buff.length + 1);
@@ -41,8 +41,6 @@ const toSignedBuffer = (value: BN): Buffer => {
 
   return normalValue.eq(paddedValue) ? buff : paddedBuff;
 };
-
-const not = (value: BN): BN => value.notn(value.bitLength());
 
 const getBoolean = (value: Buffer): boolean => value.some(byte => byte !== 0);
 
@@ -153,6 +151,7 @@ export default {
   FFFFFFFF: new BN(0xffffffff),
   ZERO,
   ONE,
+  TWO: new BN(2),
   NEGATIVE_ONE,
   INT_MAX_VALUE: new BN(2147483647),
   SATOSHI: ONE,
@@ -171,7 +170,6 @@ export default {
   ZERO_BIG_NUMBER: new BigNumber(0),
   toSignedBuffer,
   fromSignedBuffer,
-  not,
   getBoolean,
   booleanToBuffer,
   toASCII,

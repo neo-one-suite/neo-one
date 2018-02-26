@@ -1094,7 +1094,8 @@ export const SYSCALLS = {
       if (balance.isZero() && votes.length > 0) {
         throw new NotEligibleVoteError(context);
       }
-      if (!checkWitness({ context, hash: address })) {
+      const valid = await checkWitness({ context, hash: address });
+      if (!valid) {
         throw new BadWitnessCheckError(context);
       }
 
@@ -1120,7 +1121,8 @@ export const SYSCALLS = {
       // This has been removed, but we keep it here so that we can do a full
       // build of the chain
       const publicKey = args[0].asECPoint();
-      if (!checkWitnessPublicKey({ context, publicKey })) {
+      const valid = await checkWitnessPublicKey({ context, publicKey });
+      if (!valid) {
         throw new BadWitnessCheckError(context);
       }
 
@@ -1166,7 +1168,8 @@ export const SYSCALLS = {
       const admin = args[5].asUInt160();
       const issuer = args[6].asUInt160();
 
-      if (!checkWitnessPublicKey({ context, publicKey: owner })) {
+      const valid = await checkWitnessPublicKey({ context, publicKey: owner });
+      if (!valid) {
         throw new BadWitnessCheckError(context);
       }
 

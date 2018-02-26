@@ -1,5 +1,7 @@
 /* @flow */
-import type BN from 'bn.js';
+import BN from 'bn.js';
+
+import { utils } from '@neo-one/client-core';
 
 import { type ExecutionContext } from './constants';
 import { NumberTooLargeError } from './errors';
@@ -11,6 +13,19 @@ const toNumber = (context: ExecutionContext, value: BN): number => {
   } catch (error) {
     throw new NumberTooLargeError(context, value);
   }
+};
+
+const shiftLeft = (value: BN, shift: BN): BN => value.mul(utils.TWO.pow(shift));
+
+const shiftRight = (value: BN, shift: BN): BN => {
+  let result = value.div(utils.TWO.pow(shift));
+  if (result.mul(shift).lt(utils.ZERO)) {
+    result = result.sub(utils.ONE);
+  }
+  if (result.eq(utils.ZERO) && value.isNeg()) {
+    result = utils.NEGATIVE_ONE;
+  }
+  return result;
 };
 
 const toStorageContext = (
@@ -28,4 +43,6 @@ const toStorageContext = (
 export default {
   toNumber,
   toStorageContext,
+  shiftLeft,
+  shiftRight,
 };

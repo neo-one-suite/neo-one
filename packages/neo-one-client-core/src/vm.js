@@ -379,7 +379,9 @@ export type ByteCode =
   | 0xf1;
 
 const OPCODE_PAIRS = [[0x00, 'PUSH0'], [0x01, 'PUSHBYTES1']]
-  .concat(_.range(2, 74).map(idx => [idx, (`PUSHBYTES${idx}`: $FlowFixMe)]))
+  .concat(
+    _.range(0x02, 0x4b).map(idx => [idx, (`PUSHBYTES${idx}`: $FlowFixMe)]),
+  )
   .concat([
     [0x4b, 'PUSHBYTES75'],
     [0x4c, 'PUSHDATA1'],

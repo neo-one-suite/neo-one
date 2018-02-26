@@ -11,6 +11,7 @@ import {
 } from '@neo-one/client-core';
 
 import _ from 'lodash';
+import bitwise from 'bitwise';
 
 import {
   ArrayStackItem,
@@ -729,7 +730,15 @@ const OPCODE_PAIRS = [
         out: 1,
         invoke: ({ context, args }: OpInvokeArgs) => ({
           context,
-          results: [new IntegerStackItem(utils.not(args[0].asBigInteger()))],
+          results: [
+            new IntegerStackItem(
+              utils.fromSignedBuffer(
+                bitwise.buffer.not(
+                  utils.toSignedBuffer(args[0].asBigInteger()),
+                ),
+              ),
+            ),
+          ],
         }),
       }),
     ],
@@ -743,7 +752,12 @@ const OPCODE_PAIRS = [
           context,
           results: [
             new IntegerStackItem(
-              args[0].asBigInteger().and(args[1].asBigInteger()),
+              utils.fromSignedBuffer(
+                bitwise.buffer.and(
+                  utils.toSignedBuffer(args[0].asBigInteger()),
+                  utils.toSignedBuffer(args[1].asBigInteger()),
+                ),
+              ),
             ),
           ],
         }),
@@ -759,7 +773,12 @@ const OPCODE_PAIRS = [
           context,
           results: [
             new IntegerStackItem(
-              args[0].asBigInteger().or(args[1].asBigInteger()),
+              utils.fromSignedBuffer(
+                bitwise.buffer.or(
+                  utils.toSignedBuffer(args[0].asBigInteger()),
+                  utils.toSignedBuffer(args[1].asBigInteger()),
+                ),
+              ),
             ),
           ],
         }),
@@ -775,7 +794,12 @@ const OPCODE_PAIRS = [
           context,
           results: [
             new IntegerStackItem(
-              args[0].asBigInteger().xor(args[1].asBigInteger()),
+              utils.fromSignedBuffer(
+                bitwise.buffer.xor(
+                  utils.toSignedBuffer(args[0].asBigInteger()),
+                  utils.toSignedBuffer(args[1].asBigInteger()),
+                ),
+              ),
             ),
           ],
         }),
@@ -982,6 +1006,7 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
+    // TODO: We need to check SHL and SHR are correct against the C# VM
     [
       0x98,
       createOp({
@@ -992,9 +1017,7 @@ const OPCODE_PAIRS = [
           context,
           results: [
             new IntegerStackItem(
-              args[0]
-                .asBigInteger()
-                .shln(vmUtils.toNumber(context, args[1].asBigInteger())),
+              vmUtils.shiftLeft(args[0].asBigInteger(), args[1].asBigInteger()),
             ),
           ],
         }),
@@ -1010,9 +1033,10 @@ const OPCODE_PAIRS = [
           context,
           results: [
             new IntegerStackItem(
-              args[0]
-                .asBigInteger()
-                .shrn(vmUtils.toNumber(context, args[1].asBigInteger())),
+              vmUtils.shiftRight(
+                args[0].asBigInteger(),
+                args[1].asBigInteger(),
+              ),
             ),
           ],
         }),
@@ -1385,6 +1409,7 @@ const OPCODE_PAIRS = [
         const top = stack[0];
         let in_;
         if (top == null) {
+          // This will cause the op to throw once it's executed.
           in_ = 1;
         } else {
           in_ = 1 + vmUtils.toNumber(contextIn, top.asBigInteger());

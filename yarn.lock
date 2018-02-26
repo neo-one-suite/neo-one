@@ -1881,6 +1881,10 @@ bitbuffer@0.1.x:
   version "0.1.3"
   resolved "https://registry.npmjs.org/bitbuffer/-/bitbuffer-0.1.3.tgz#780feb1297caaf0fac9e48cfab946d6efd2bd397"
 
+bitwise@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.npmjs.org/bitwise/-/bitwise-1.4.0.tgz#ae16cf4e384440dcff67cc7719604c052d290d58"
+
 bl@^1.0.0:
   version "1.2.1"
   resolved "https://registry.npmjs.org/bl/-/bl-1.2.1.tgz#cac328f7bee45730d404b692203fcb590e172d5e"

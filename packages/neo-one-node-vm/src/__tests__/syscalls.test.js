@@ -23,6 +23,8 @@ import {
 import BN from 'bn.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 
+import { utils as commonUtils } from '@neo-one/utils';
+
 import { FEES } from '../constants';
 import {
   STACK_ITEM_TYPE,
@@ -157,6 +159,7 @@ const SYSCALLS = ([
     result: [new IntegerStackItem(new BN(blockTime))],
     gas: FEES.ONE,
   },
+  // TODO (afragapane): Reverse of each of these + STRUCT + error cases
   {
     name: 'Neo.Runtime.Serialize',
     result: [
@@ -168,6 +171,54 @@ const SYSCALLS = ([
       ),
     ],
     args: [Buffer.alloc(10, 1)],
+    gas: FEES.ONE,
+  },
+  // TODO (afragapane): What's going on with this one?
+  // {
+  //   name: 'Neo.Runtime.Serialize',
+  //   result: [
+  //     new BufferStackItem(
+  //       new BinaryWriter()
+  //         .writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY)
+  //         .writeVarBytesLE(Buffer.alloc(1, 1))
+  //         .toBuffer(),
+  //     ),
+  //   ],
+  //   args: [true],
+  //   gas: FEES.ONE,
+  // },
+  {
+    name: 'Neo.Runtime.Serialize',
+    result: [
+      new BufferStackItem(
+        new BinaryWriter()
+          .writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY)
+          .writeVarBytesLE(utils.toSignedBuffer(new BN('10000000000000', 10)))
+          .toBuffer(),
+      ),
+    ],
+    args: [new BN('10000000000000', 10)],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Runtime.Serialize',
+    result: [
+      new BufferStackItem(
+        new BinaryWriter()
+          .writeUInt8(STACK_ITEM_TYPE.ARRAY)
+          .writeVarUIntLE(1)
+          .writeBytes(
+            new BinaryWriter()
+              .writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY)
+              .writeVarBytesLE(
+                utils.toSignedBuffer(new BN('10000000000000', 10)),
+              )
+              .toBuffer(),
+          )
+          .toBuffer(),
+      ),
+    ],
+    args: [[new BN('10000000000000', 10)]],
     gas: FEES.ONE,
   },
   {
@@ -1335,6 +1386,24 @@ const handleArgs = (sb: ScriptBuilder, args: Array<Arg>) => {
 };
 
 describe('syscalls', () => {
+  const filterMethods = value => {
+    if (value == null) {
+      return value;
+    } else if (Array.isArray(value)) {
+      return value.map(val => filterMethods(val));
+    } else if (typeof value === 'function') {
+      return undefined;
+    } else if (typeof value === 'object') {
+      const result = {};
+      for (const [key, val] of commonUtils.entries(value)) {
+        result[key] = filterMethods(val);
+      }
+      return result;
+    }
+
+    return value;
+  };
+
   for (const testCase of SYSCALLS) {
     const { name, result, gas, args = [], actionIndex = 0, mock } = testCase;
     // eslint-disable-next-line
@@ -1410,13 +1479,13 @@ describe('syscalls', () => {
 
       expect(context.errorMessage).toBeUndefined();
       if (Array.isArray(result)) {
-        expect(JSON.stringify(context.stack)).toEqual(JSON.stringify(result));
+        expect(filterMethods(context.stack)).toEqual(filterMethods(result));
       } else {
         const expectedResult = result({ transaction });
         if (Array.isArray(expectedResult)) {
           expect(context.stack).toEqual(expectedResult);
         } else {
-          expectedResult(result);
+          expectedResult(context.stack);
         }
       }
       expect(context.actionIndex).toEqual(actionIndex);

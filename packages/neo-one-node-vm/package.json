@@ -37,6 +37,7 @@
     "@neo-one/client-core": "^1.0.0-alpha.8",
     "@neo-one/node-core": "^1.0.0-alpha.9",
     "@neo-one/utils": "^1.0.0-alpha.4",
+    "bitwise": "^1.4.0",
     "bn.js": "^4.11.8",
     "ix": "^2.3.4",
     "lodash": "^4.17.5",

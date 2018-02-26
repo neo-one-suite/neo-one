@@ -437,7 +437,23 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Find 1`] = `[Function]`;
+exports[`syscalls Neo.Storage.Find 1`] = `
+Array [
+  IteratorStackItem {
+    "value": StackItemIterator {
+      "current": null,
+      "done": false,
+      "first": true,
+      "iterator": Object {
+        "next": [Function],
+        "return": [Function],
+        "throw": [Function],
+        Symbol(Symbol.asyncIterator): [Function],
+      },
+    },
+  },
+]
+`;
 
 exports[`syscalls Neo.Storage.Find 2`] = `
 Array [
