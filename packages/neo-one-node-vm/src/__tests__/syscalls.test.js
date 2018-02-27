@@ -3,9 +3,12 @@
 import { NULL_ACTION, TRIGGER_TYPE } from '@neo-one/node-core';
 import {
   type Param,
+  type OpCode,
   type SysCallName,
   ATTRIBUTE_USAGE,
   SCRIPT_CONTAINER_TYPE,
+  // CONTRACT_PARAMETER_TYPE,
+  // CONTRACT_PROPERTY_STATE,
   BinaryWriter,
   InvocationTransaction,
   UInt160Attribute,
@@ -19,13 +22,15 @@ import {
   Asset,
   ASSET_TYPE,
   utils,
+  // Contract,
 } from '@neo-one/client-core';
 import BN from 'bn.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
+import { of } from 'rxjs/observable/of';
 
 import { utils as commonUtils } from '@neo-one/utils';
 
-import { FEES } from '../constants';
+import { FEES, BLOCK_HEIGHT_YEAR } from '../constants';
 import {
   STACK_ITEM_TYPE,
   type StackItem,
@@ -93,11 +98,34 @@ const asset = {
   available: new BN(5),
 };
 
-type Call = {|
+// const sbContract = new ScriptBuilder();
+// sbContract.emitSysCall('Neo.Contract.GetStorageContext');
+// const contract = new Contract({
+//   script: sbContract.build(),
+//   parameterList: [],
+//   returnType: CONTRACT_PARAMETER_TYPE.VOID,
+//   name: '',
+//   codeVersion: '',
+//   author: '',
+//   email: '',
+//   description: '',
+//   contractProperties: CONTRACT_PROPERTY_STATE.HAS_STORAGE,
+// })
+
+type SysCall = {|
   name: SysCallName,
+  type: 'sys',
   // eslint-disable-next-line
   args?: Array<Arg>,
 |};
+type OpCall = {|
+  name: OpCode,
+  type: 'op',
+  // eslint-disable-next-line
+  args?: Array<Arg>,
+  buffer?: Buffer,
+|};
+type Call = SysCall | OpCall;
 type Calls = {|
   type: 'calls',
   calls: Array<Call>,
@@ -333,6 +361,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetHeader',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -354,6 +383,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetHeader',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -375,6 +405,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetHeader',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -396,6 +427,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetHeader',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -417,6 +449,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetHeader',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -438,6 +471,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetHeader',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -459,6 +493,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetHeader',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -480,6 +515,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetHeader',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -501,6 +537,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetBlock',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -527,6 +564,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetBlock',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -548,6 +586,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetBlock',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -570,6 +609,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -591,6 +631,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -618,6 +659,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -645,6 +687,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -672,6 +715,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -697,6 +741,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -727,6 +772,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -755,6 +801,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -783,6 +830,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -795,34 +843,239 @@ const SYSCALLS = ([
     },
     gas: FEES.ONE,
   },
-  // {
-  //   name: 'Neo.Attribute.GetUsage',
-  //   result: [new IntegerStackItem(
-  //     new BN(transactions.mintTransaction.attributes[0].usage)
-  //   )],
-  //   args: [new AttributeStackItem(
-  //     transactions.mintTransaction.attributes[0]
-  //   ).asBuffer()],
-  //   gas: FEES.ONE,
-  // },
-  // {
-  //   name: 'Neo.Attribute.GetData',
-  // },
-  // {
-  //   name: 'Neo.Input.GetHash',
-  // },
-  // {
-  //   name: 'Neo.Input.GetIndex',
-  // },
-  // {
-  //   name: 'Neo.Output.GetAssetId',
-  // },
-  // {
-  //   name: 'Neo.Output.GetValue',
-  // },
-  // {
-  //   name: 'Neo.Output.GetScriptHash',
-  // },
+  {
+    name: 'Neo.Attribute.GetUsage',
+    result: [
+      new IntegerStackItem(
+        new BN(transactions.mintTransaction.attributes[0].usage),
+      ),
+    ],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
+            args: [Buffer.alloc(32, 3)],
+          },
+          {
+            name: 'Neo.Transaction.GetAttributes',
+            type: 'sys',
+          },
+          {
+            name: 'PICKITEM',
+            type: 'op',
+            args: [new BN(0)],
+          },
+        ],
+      },
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.transaction.get = jest.fn(() =>
+        Promise.resolve(transactions.mintTransaction),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Attribute.GetData',
+    result: [
+      new BufferStackItem(transactions.mintTransaction.attributes[0].value),
+    ],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
+            args: [Buffer.alloc(32, 3)],
+          },
+          {
+            name: 'Neo.Transaction.GetAttributes',
+            type: 'sys',
+          },
+          {
+            name: 'PICKITEM',
+            type: 'op',
+            args: [new BN(0)],
+          },
+        ],
+      },
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.transaction.get = jest.fn(() =>
+        Promise.resolve(transactions.mintTransaction),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Input.GetHash',
+    result: [new UInt256StackItem(transactions.mintTransaction.inputs[0].hash)],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
+            args: [Buffer.alloc(32, 3)],
+          },
+          {
+            name: 'Neo.Transaction.GetInputs',
+            type: 'sys',
+          },
+          {
+            name: 'PICKITEM',
+            type: 'op',
+            args: [new BN(0)],
+          },
+        ],
+      },
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.transaction.get = jest.fn(() =>
+        Promise.resolve(transactions.mintTransaction),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Input.GetIndex',
+    result: [
+      new IntegerStackItem(
+        new BN(transactions.mintTransaction.inputs[0].index),
+      ),
+    ],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
+            args: [Buffer.alloc(32, 3)],
+          },
+          {
+            name: 'Neo.Transaction.GetInputs',
+            type: 'sys',
+          },
+          {
+            name: 'PICKITEM',
+            type: 'op',
+            args: [new BN(0)],
+          },
+        ],
+      },
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.transaction.get = jest.fn(() =>
+        Promise.resolve(transactions.mintTransaction),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Output.GetAssetId',
+    result: [
+      new UInt256StackItem(transactions.mintTransaction.outputs[0].asset),
+    ],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
+            args: [Buffer.alloc(32, 3)],
+          },
+          {
+            name: 'Neo.Transaction.GetOutputs',
+            type: 'sys',
+          },
+          {
+            name: 'PICKITEM',
+            type: 'op',
+            args: [new BN(0)],
+          },
+        ],
+      },
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.transaction.get = jest.fn(() =>
+        Promise.resolve(transactions.mintTransaction),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Output.GetValue',
+    result: [
+      new IntegerStackItem(transactions.mintTransaction.outputs[0].value),
+    ],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
+            args: [Buffer.alloc(32, 3)],
+          },
+          {
+            name: 'Neo.Transaction.GetOutputs',
+            type: 'sys',
+          },
+          {
+            name: 'PICKITEM',
+            type: 'op',
+            args: [new BN(0)],
+          },
+        ],
+      },
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.transaction.get = jest.fn(() =>
+        Promise.resolve(transactions.mintTransaction),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Output.GetScriptHash',
+    result: [
+      new UInt160StackItem(transactions.mintTransaction.outputs[0].address),
+    ],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Blockchain.GetTransaction',
+            type: 'sys',
+            args: [Buffer.alloc(32, 3)],
+          },
+          {
+            name: 'Neo.Transaction.GetOutputs',
+            type: 'sys',
+          },
+          {
+            name: 'PICKITEM',
+            type: 'op',
+            args: [new BN(0)],
+          },
+        ],
+      },
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.transaction.get = jest.fn(() =>
+        Promise.resolve(transactions.mintTransaction),
+      );
+    },
+    gas: FEES.ONE,
+  },
   {
     name: 'Neo.Account.GetScriptHash',
     result: [new UInt160StackItem(scriptAttributeHash)],
@@ -832,6 +1085,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAccount',
+            type: 'sys',
             args: [scriptAttributeHash],
           },
         ],
@@ -857,6 +1111,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAccount',
+            type: 'sys',
             args: [scriptAttributeHash],
           },
         ],
@@ -878,6 +1133,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAccount',
+            type: 'sys',
             args: [scriptAttributeHash],
           },
         ],
@@ -903,6 +1159,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAccount',
+            type: 'sys',
             args: [scriptAttributeHash],
           },
         ],
@@ -928,6 +1185,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAsset',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -947,6 +1205,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAsset',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -966,6 +1225,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAsset',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -985,6 +1245,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAsset',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -1004,6 +1265,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAsset',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -1023,6 +1285,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAsset',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -1042,6 +1305,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAsset',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -1061,6 +1325,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetAsset',
+            type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
         ],
@@ -1080,6 +1345,7 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Blockchain.GetContract',
+            type: 'sys',
             args: [scriptAttributeHash],
           },
         ],
@@ -1103,7 +1369,15 @@ const SYSCALLS = ([
     name: 'Neo.Storage.Get',
     result: [new BufferStackItem(Buffer.alloc(10, 1))],
     args: [
-      { type: 'calls', calls: [{ name: 'Neo.Storage.GetContext' }] },
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Storage.GetContext',
+            type: 'sys',
+          },
+        ],
+      },
       Buffer.alloc(1, 1),
     ],
     mock: ({ blockchain }) => {
@@ -1122,7 +1396,15 @@ const SYSCALLS = ([
       expect(result).toMatchSnapshot();
     },
     args: [
-      { type: 'calls', calls: [{ name: 'Neo.Storage.GetContext' }] },
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Storage.GetContext',
+            type: 'sys',
+          },
+        ],
+      },
       Buffer.alloc(1, 1),
     ],
     mock: ({ blockchain }) => {
@@ -1141,8 +1423,17 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Storage.Find',
+            type: 'sys',
             args: [
-              { type: 'calls', calls: [{ name: 'Neo.Storage.GetContext' }] },
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'Neo.Storage.GetContext',
+                    type: 'sys',
+                  },
+                ],
+              },
               Buffer.alloc(1, 1),
             ],
           },
@@ -1168,8 +1459,17 @@ const SYSCALLS = ([
         calls: [
           {
             name: 'Neo.Storage.Find',
+            type: 'sys',
             args: [
-              { type: 'calls', calls: [{ name: 'Neo.Storage.GetContext' }] },
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'Neo.Storage.GetContext',
+                    type: 'sys',
+                  },
+                ],
+              },
               Buffer.alloc(1, 1),
             ],
           },
@@ -1185,43 +1485,225 @@ const SYSCALLS = ([
     },
     gas: FEES.ONE,
   },
+  // TODO: Move these two iterator tests out
   // {
   //   name: 'Neo.Iterator.Key',
+  //   result: [],
+  //   stackItems: [],
+  //   gas: FEES.ONE,
   // },
   // {
   //   name: 'Neo.Iterator.Value',
   // },
-  // {
-  //   name: 'Neo.Account.SetVotes',
-  // },
-  // {
-  //   name: 'Neo.Validator.Register',
-  // },
-  // {
-  //   name: 'Neo.Asset.Create',
-  // },
-  // {
-  //   name: 'Neo.Asset.Renew',
-  // },
-  // {
-  //   name: 'Neo.Contract.Create',
-  // },
-  // {
-  //   name: 'Neo.Contract.Migrate',
-  // },
+  {
+    name: 'Neo.Account.SetVotes',
+    result: [],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Blockchain.GetAccount',
+            type: 'sys',
+            args: [scriptAttributeHash],
+          },
+        ],
+      },
+      [keys[2].publicKey],
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.account.tryGet = jest.fn(() =>
+        Promise.resolve(new Account(account)),
+      );
+      blockchain.account.get = jest.fn(() =>
+        Promise.resolve(new Account(account)),
+      );
+      blockchain.settings.governingToken = { hashHex: ASSETHASH1 };
+      blockchain.account.update = jest.fn(() =>
+        Promise.resolve({
+          ...account,
+          votes: [keys[2].publicKey],
+          isDeletable: () => false,
+        }),
+      );
+    },
+    gas: FEES.ONE_THOUSAND,
+  },
+  {
+    name: 'Neo.Validator.Register',
+    result: [
+      new ValidatorStackItem(new Validator({ publicKey: keys[0].publicKey })),
+    ],
+    args: [keys[0].publicKey],
+    mock: ({ blockchain }) => {
+      blockchain.validator.tryGet = jest.fn(
+        () => new Validator({ publicKey: keys[0].publicKey }),
+      );
+    },
+    gas: common.ONE_THOUSAND_FIXED8,
+  },
+  {
+    name: 'Neo.Asset.Create',
+    result: [
+      new AssetStackItem(
+        new Asset({
+          ...asset,
+          hash: common.stringToUInt256(
+            '0x6859cd3caa26f28d8dd3e2eb29b05019f9dad3c0adf0215a1a4f198f4a9c4e29',
+          ),
+          available: new BN(0),
+        }),
+      ),
+    ],
+    args: [
+      ASSET_TYPE.CURRENCY,
+      'assetName',
+      new BN(10),
+      8,
+      keys[0].publicKey,
+      scriptAttributeHash,
+      keys[1].scriptHash,
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.currentBlock.index = 2 - (2000000 + 1);
+      blockchain.asset.add = jest.fn(() => Promise.resolve());
+    },
+    gas: common.FIVE_THOUSAND_FIXED8,
+  },
+  {
+    name: 'Neo.Asset.Renew',
+    result: [
+      new IntegerStackItem(
+        new BN(2).add(new BN(2).mul(new BN(BLOCK_HEIGHT_YEAR))),
+      ),
+    ],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Blockchain.GetAsset',
+            type: 'sys',
+            args: [Buffer.alloc(32, 3)],
+          },
+        ],
+      },
+      new BN(2),
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.asset.get = jest.fn(() => Promise.resolve(new Asset(asset)));
+      blockchain.currentBlock.index = 1;
+      blockchain.asset.update = jest.fn(() => Promise.resolve());
+    },
+    gas: common.FIVE_THOUSAND_FIXED8.mul(new BN(2)),
+  },
+  {
+    name: 'Neo.Contract.Create',
+    result: [new ContractStackItem(transactions.kycContract)],
+    args: [
+      transactions.kycContract.script,
+      Buffer.from(transactions.kycContract.parameterList),
+      transactions.kycContract.returnType,
+      transactions.kycContract.contractProperties,
+      transactions.kycContract.name,
+      transactions.kycContract.codeVersion,
+      transactions.kycContract.author,
+      transactions.kycContract.email,
+      transactions.kycContract.description,
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.contract.tryGet = jest.fn(() => Promise.resolve());
+      blockchain.contract.add = jest.fn(() => Promise.resolve());
+    },
+    gas: common.FIVE_HUNDRED_FIXED8,
+  },
+  {
+    name: 'Neo.Contract.Migrate',
+    result: [new ContractStackItem(transactions.kycContract)],
+    args: [
+      transactions.kycContract.script,
+      Buffer.from(transactions.kycContract.parameterList),
+      transactions.kycContract.returnType,
+      transactions.kycContract.contractProperties,
+      transactions.kycContract.name,
+      transactions.kycContract.codeVersion,
+      transactions.kycContract.author,
+      transactions.kycContract.email,
+      transactions.kycContract.description,
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.contract.tryGet = jest.fn(() => Promise.resolve());
+      blockchain.contract.add = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.getAll = jest.fn(() => of());
+    },
+    gas: common.FIVE_HUNDRED_FIXED8,
+  },
+  // TODO: Move this test out
   // {
   //   name: 'Neo.Contract.GetStorageContext',
+  //   result: [new StorageContextStackItem(contract.hash)],
+  //   args: [
+  //     {
+  //       type: 'calls',
+  //       calls: [
+  //         {
+  //           name: 'Neo.Contract.Create',
+  //           type: 'sys',
+  //           args: [
+  //             contract.script,
+  //             Buffer.from(contract.parameterList),
+  //             contract.returnType,
+  //             contract.contractProperties,
+  //             contract.name,
+  //             contract.codeVersion,
+  //             contract.author,
+  //             contract.email,
+  //             contract.description,
+  //           ]
+  //         },
+  //         {
+  //           name: 'APPCALL',
+  //           type: 'op',
+  //           buffer: Buffer.from(contract.hash, 'hex')
+  //         },
+  //       ],
+  //     },
+  //   ],
+  //   mock: ({ blockchain }) => {
+  //     blockchain.contract.tryGet = jest.fn(() =>
+  //       Promise.resolve()
+  //     );
+  //     blockchain.contract.add = jest.fn(() =>
+  //       Promise.resolve()
+  //     );
+  //     blockchain.contract.get = jest.fn(() =>
+  //       Promise.resolve(contract)
+  //     );
+  //   },
+  //   gas: FEES.ONE,
   // },
-  // {
-  //   name: 'Neo.Contract.Destroy',
-  // },
+  {
+    name: 'Neo.Contract.Destroy',
+    result: [],
+    mock: ({ blockchain }) => {
+      blockchain.contract.tryGet = jest.fn(() => {
+        Promise.resolve();
+      });
+    },
+    gas: FEES.ONE,
+  },
   {
     name: 'Neo.Storage.Put',
     result: [],
     args: [
       {
         type: 'calls',
-        calls: [{ name: 'Neo.Storage.GetContext' }],
+        calls: [
+          {
+            name: 'Neo.Storage.GetContext',
+            type: 'sys',
+          },
+        ],
       },
       Buffer.alloc(0, 0),
       Buffer.alloc(0, 0),
@@ -1241,7 +1723,12 @@ const SYSCALLS = ([
     args: [
       {
         type: 'calls',
-        calls: [{ name: 'Neo.Storage.GetContext' }],
+        calls: [
+          {
+            name: 'Neo.Storage.GetContext',
+            type: 'sys',
+          },
+        ],
       },
       Buffer.alloc(1024, 0),
       Buffer.alloc(0, 0),
@@ -1261,7 +1748,12 @@ const SYSCALLS = ([
     args: [
       {
         type: 'calls',
-        calls: [{ name: 'Neo.Storage.GetContext' }],
+        calls: [
+          {
+            name: 'Neo.Storage.GetContext',
+            type: 'sys',
+          },
+        ],
       },
       Buffer.alloc(1025, 0),
       Buffer.alloc(0, 0),
@@ -1281,7 +1773,12 @@ const SYSCALLS = ([
     args: [
       {
         type: 'calls',
-        calls: [{ name: 'Neo.Storage.GetContext' }],
+        calls: [
+          {
+            name: 'Neo.Storage.GetContext',
+            type: 'sys',
+          },
+        ],
       },
       Buffer.alloc(0, 0),
       Buffer.alloc(1024, 0),
@@ -1301,7 +1798,12 @@ const SYSCALLS = ([
     args: [
       {
         type: 'calls',
-        calls: [{ name: 'Neo.Storage.GetContext' }],
+        calls: [
+          {
+            name: 'Neo.Storage.GetContext',
+            type: 'sys',
+          },
+        ],
       },
       Buffer.alloc(0, 0),
       Buffer.alloc(1025, 0),
@@ -1321,7 +1823,12 @@ const SYSCALLS = ([
     args: [
       {
         type: 'calls',
-        calls: [{ name: 'Neo.Storage.GetContext' }],
+        calls: [
+          {
+            name: 'Neo.Storage.GetContext',
+            type: 'sys',
+          },
+        ],
       },
       Buffer.alloc(0, 0),
     ],
@@ -1364,7 +1871,12 @@ const handleCall = (sb: ScriptBuilder, call: Call) => {
     // eslint-disable-next-line
     handleArgs(sb, call.args);
   }
-  sb.emitSysCall(call.name);
+  if (call.type === 'sys') {
+    sb.emitSysCall(call.name);
+  }
+  if (call.type === 'op') {
+    sb.emitOp(call.name, call.buffer);
+  }
 };
 
 const handleArgs = (sb: ScriptBuilder, args: Array<Arg>) => {

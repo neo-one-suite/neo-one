@@ -44,10 +44,56 @@ type TestCase = {|
   preOps?: Array<Op>,
   postOps?: Array<Op>,
   result: Array<StackItem>,
+  resultAlt?: Array<StackItem>,
   gas: BN,
   args?: Array<?Param>,
+  argsAlt?: Array<?Param>,
+  stackItems?: Array<StackItem>,
+  ref?: StackItem,
   // state?: VMState,
 |};
+
+const setRef = new ArrayStackItem([new IntegerStackItem(new BN(1))]);
+const appendRef = new ArrayStackItem([]);
+const reverseRef = new ArrayStackItem([
+  new IntegerStackItem(new BN(1)),
+  new IntegerStackItem(new BN(2)),
+  new IntegerStackItem(new BN(3)),
+]);
+const removeRef = new ArrayStackItem([
+  new IntegerStackItem(new BN(1)),
+  new IntegerStackItem(new BN(2)),
+]);
+const mapStatic = new MapStackItem({
+  keys: {
+    'BufferStackItem:aaaa': new BufferStackItem(Buffer.from('aaaa', 'hex')),
+    'BufferStackItem:bbbb': new BufferStackItem(Buffer.from('bbbb', 'hex')),
+  },
+  values: {
+    'BufferStackItem:aaaa': new IntegerStackItem(new BN(1)),
+    'BufferStackItem:bbbb': new IntegerStackItem(new BN(2)),
+  },
+});
+const mapSetRef = new MapStackItem({
+  keys: {
+    'BufferStackItem:aaaa': new BufferStackItem(Buffer.from('aaaa', 'hex')),
+    'BufferStackItem:bbbb': new BufferStackItem(Buffer.from('bbbb', 'hex')),
+  },
+  values: {
+    'BufferStackItem:aaaa': new IntegerStackItem(new BN(1)),
+    'BufferStackItem:bbbb': new IntegerStackItem(new BN(2)),
+  },
+});
+const mapRemoveRef = new MapStackItem({
+  keys: {
+    'BufferStackItem:aaaa': new BufferStackItem(Buffer.from('aaaa', 'hex')),
+    'BufferStackItem:bbbb': new BufferStackItem(Buffer.from('bbbb', 'hex')),
+  },
+  values: {
+    'BufferStackItem:aaaa': new IntegerStackItem(new BN(1)),
+    'BufferStackItem:bbbb': new IntegerStackItem(new BN(2)),
+  },
+});
 
 const OPCODES = ([
   {
@@ -281,15 +327,26 @@ const OPCODES = ([
     // {
     //   op: 'TAILCALL',
     // },
-    // {
-    //   op: 'DUPFROMALTSTACK',
-    // },
-    // {
-    //   op: 'TOALTSTACK',
-    // },
-    // {
-    //   op: 'FROMALTSTACK',
-    // },
+    {
+      op: 'DUPFROMALTSTACK',
+      argsAlt: [new BN(1)],
+      result: [new IntegerStackItem(new BN(1))],
+      resultAlt: [new IntegerStackItem(new BN(1))],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'TOALTSTACK',
+      args: [new BN(1)],
+      result: [],
+      resultAlt: [new IntegerStackItem(new BN(1))],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'FROMALTSTACK',
+      argsAlt: [new BN(1)],
+      result: [new IntegerStackItem(new BN(1))],
+      gas: FEES.ONE,
+    },
     {
       op: 'XDROP',
       args: [new BN(1), Buffer.alloc(1, 1), Buffer.alloc(1, 0)],
@@ -854,7 +911,6 @@ const OPCODES = ([
       ],
       gas: FEES.ONE,
     },
-    // TODO (afragapane): Need 2nd case for MapStackItem
     {
       op: 'PICKITEM',
       args: [
@@ -862,6 +918,53 @@ const OPCODES = ([
         [Buffer.alloc(1, 0), Buffer.alloc(1, 1), Buffer.alloc(1, 2)],
       ],
       result: [new BufferStackItem(Buffer.alloc(1, 1))],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'PICKITEM',
+      stackItems: [new BufferStackItem(Buffer.from('aaaa', 'hex')), mapStatic],
+      result: [new IntegerStackItem(new BN(1))],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'SETITEM',
+      ref: setRef,
+      stackItems: [
+        new IntegerStackItem(new BN(5)),
+        new IntegerStackItem(new BN(0)),
+        setRef,
+      ],
+      result: [new ArrayStackItem([new IntegerStackItem(new BN(5))])],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'SETITEM',
+      ref: mapSetRef,
+      stackItems: [
+        new IntegerStackItem(new BN(5)),
+        new BufferStackItem(Buffer.from('dddd', 'hex')),
+        mapSetRef,
+      ],
+      result: [
+        new MapStackItem({
+          keys: {
+            'BufferStackItem:aaaa': new BufferStackItem(
+              Buffer.from('aaaa', 'hex'),
+            ),
+            'BufferStackItem:bbbb': new BufferStackItem(
+              Buffer.from('bbbb', 'hex'),
+            ),
+            'BufferStackItem:dddd': new BufferStackItem(
+              Buffer.from('dddd', 'hex'),
+            ),
+          },
+          values: {
+            'BufferStackItem:aaaa': new IntegerStackItem(new BN(1)),
+            'BufferStackItem:bbbb': new IntegerStackItem(new BN(2)),
+            'BufferStackItem:dddd': new IntegerStackItem(new BN(5)),
+          },
+        }),
+      ],
       gas: FEES.ONE,
     },
     {
@@ -893,31 +996,101 @@ const OPCODES = ([
       result: [new MapStackItem()],
       gas: FEES.ONE,
     },
-    // TODO (afragapane): Needs to be tested separately
-    // {
-    //   op: 'APPEND',
-    //   args: [new BN(3), []],
-    //   result: [new ArrayStackItem([
-    //     new IntegerStackItem(new BN(3))
-    //   ])],
-    //   gas: FEES.ONE,
-    // },
-    // {
-    //   op: 'REVERSE',
-    //   args: []
-    // },
-    // {
-    //   op: 'REMOVE',
-    // },
-    // {
-    //   op: 'HASKEY',
-    // },
-    // {
-    //   op: 'KEYS',
-    // },
-    // {
-    //   op: 'VALUES',
-    // },
+    {
+      op: 'APPEND',
+      ref: appendRef,
+      stackItems: [new IntegerStackItem(new BN(3)), appendRef],
+      result: [new ArrayStackItem([new IntegerStackItem(new BN(3))])],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'REVERSE',
+      ref: reverseRef,
+      stackItems: [reverseRef],
+      result: [
+        new ArrayStackItem([
+          new IntegerStackItem(new BN(3)),
+          new IntegerStackItem(new BN(2)),
+          new IntegerStackItem(new BN(1)),
+        ]),
+      ],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'REMOVE',
+      ref: removeRef,
+      stackItems: [new IntegerStackItem(new BN(1)), removeRef],
+      result: [new ArrayStackItem([new IntegerStackItem(new BN(1))])],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'REMOVE',
+      ref: mapRemoveRef,
+      stackItems: [
+        new BufferStackItem(Buffer.from('bbbb', 'hex')),
+        mapRemoveRef,
+      ],
+      result: [
+        new MapStackItem({
+          keys: {
+            'BufferStackItem:aaaa': new BufferStackItem(
+              Buffer.from('aaaa', 'hex'),
+            ),
+          },
+          values: {
+            'BufferStackItem:aaaa': new IntegerStackItem(new BN(1)),
+          },
+        }),
+      ],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'HASKEY',
+      args: [new BN(1), [new BN(0), new BN(1)]],
+      result: [new BooleanStackItem(true)],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'HASKEY',
+      args: [new BN(2), [new BN(0), new BN(1)]],
+      result: [new BooleanStackItem(false)],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'HASKEY',
+      stackItems: [new BufferStackItem(Buffer.from('aaaa', 'hex')), mapStatic],
+      result: [new BooleanStackItem(true)],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'HASKEY',
+      stackItems: [new BufferStackItem(Buffer.from('cccc', 'hex')), mapStatic],
+      result: [new BooleanStackItem(false)],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'KEYS',
+      stackItems: [mapStatic],
+      result: [mapStatic.keys()],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'VALUES',
+      args: [[new BN(1), new BN(2)]],
+      result: [
+        new ArrayStackItem([
+          new IntegerStackItem(new BN(1)),
+          new IntegerStackItem(new BN(2)),
+        ]),
+      ],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'VALUES',
+      stackItems: [mapStatic],
+      result: [new ArrayStackItem(mapStatic.valuesArray())],
+      gas: FEES.ONE,
+    },
     // {
     //   op: 'THROW',
     // },
@@ -932,10 +1105,14 @@ describe('opcodes', () => {
       op,
       postOps = [],
       result,
+      resultAlt,
       gas,
       buffer,
       args = [],
+      argsAlt = [],
       preOps = [],
+      stackItems = [],
+      ref,
     } = testCase;
     it(op, async () => {
       const sb = new ScriptBuilder();
@@ -979,6 +1156,7 @@ describe('opcodes', () => {
       };
       const gasLeft = utils.ONE_HUNDRED_MILLION;
       let stack = [];
+      let stackAlt = [];
 
       if (args.length) {
         const argsSB = new ScriptBuilder();
@@ -990,6 +1168,20 @@ describe('opcodes', () => {
           gasLeft,
         });
         ({ stack } = argsContext);
+      } else if (stackItems.length) {
+        stack = stackItems;
+      }
+
+      if (argsAlt.length) {
+        const argsAltSB = new ScriptBuilder();
+        argsAltSB.emitPushParams(...argsAlt);
+        const argsAltContext = await executeScript({
+          code: argsAltSB.build(),
+          blockchain: (blockchain: $FlowFixMe),
+          init,
+          gasLeft,
+        });
+        stackAlt = argsAltContext.stack;
       }
 
       const context = await executeScript({
@@ -997,11 +1189,19 @@ describe('opcodes', () => {
         blockchain: (blockchain: $FlowFixMe),
         init,
         gasLeft,
-        options: ({ stack }: $FlowFixMe),
+        options: ({ stack, stackAlt }: $FlowFixMe),
       });
 
       expect(context.errorMessage).toBeUndefined();
-      if (
+      if (resultAlt) {
+        expect(context.stackAlt).toEqual(resultAlt);
+      }
+
+      if (stackItems.length && ref) {
+        expect(ref).toEqual(result[0]);
+      } else if (stackItems.length) {
+        expect(context.stack).toEqual(result);
+      } else if (
         result.length === 1 &&
         context.stack.length === 1 &&
         result[0] instanceof IntegerStackItem &&

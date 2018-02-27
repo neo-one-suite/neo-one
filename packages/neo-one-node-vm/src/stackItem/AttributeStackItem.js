@@ -54,4 +54,8 @@ export default class AttributeStackItem extends ObjectStackItem<Attribute> {
   toContractParameter(): ContractParameter {
     return this.toValueStackItem().toContractParameter();
   }
+
+  asAttributeStackItem(): AttributeStackItem {
+    return this;
+  }
 }
