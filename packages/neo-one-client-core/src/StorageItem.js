@@ -42,7 +42,8 @@ export type StorageItemJSON = {|
 |};
 
 export default class StorageItem
-  implements SerializableWire<StorageItem>,
+  implements
+    SerializableWire<StorageItem>,
     Equatable,
     SerializableJSON<StorageItemJSON> {
   hash: UInt160;

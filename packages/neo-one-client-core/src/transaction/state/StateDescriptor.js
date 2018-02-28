@@ -46,7 +46,8 @@ const VOTES = 'Votes';
 const REGISTERED = 'Registered';
 
 export default class StateDescriptor
-  implements SerializableWire<StateDescriptor>,
+  implements
+    SerializableWire<StateDescriptor>,
     SerializableJSON<StateDescriptorJSON> {
   type: StateDescriptorType;
   key: Buffer;

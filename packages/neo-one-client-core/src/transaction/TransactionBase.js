@@ -127,7 +127,8 @@ export type TransactionBaseJSON = {|
 export const MAX_TRANSACTION_ATTRIBUTES = 16;
 
 export default class TransactionBase<Type: TransactionType, TransactionJSON>
-  implements Equatable,
+  implements
+    Equatable,
     SerializableWire<Transaction>,
     SerializableJSON<TransactionJSON> {
   static VERSION = 0;

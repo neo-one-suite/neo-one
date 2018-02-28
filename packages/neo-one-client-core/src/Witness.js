@@ -28,7 +28,8 @@ export type WitnessJSON = {|
 |};
 
 export default class Witness
-  implements SerializableWire<Witness>,
+  implements
+    SerializableWire<Witness>,
     SerializableJSON<WitnessJSON>,
     Equatable {
   verification: Buffer;
