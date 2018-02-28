@@ -51,7 +51,6 @@ import {
   InputStackItem,
   OutputStackItem,
   ECPointStackItem,
-  StackItemIterator,
 } from '../stackItem';
 
 import { executeScript } from '../execute';
@@ -98,21 +97,11 @@ const asset = {
   available: new BN(5),
 };
 
-const iterator = AsyncIterableX.of();
-const nextItem = {
-  value: new StorageItem({
-    hash: scriptAttributeHash,
-    key: Buffer.from('key', 'utf-8'),
-    value: Buffer.from('val', 'utf-8'),
-  }),
-};
-// $FlowFixMe
-iterator.next = jest.fn(() => Promise.resolve(nextItem));
-const stackIterator = new StackItemIterator((iterator: $FlowFixMe));
-async function initializeIterator() {
-  await stackIterator.next();
-}
-initializeIterator();
+const nextItem = new StorageItem({
+  hash: scriptAttributeHash,
+  key: Buffer.from('key', 'utf-8'),
+  value: Buffer.from('val', 'utf-8'),
+});
 
 type SysCall = {|
   name: SysCallName,
@@ -1490,14 +1479,140 @@ const SYSCALLS = ([
   },
   {
     name: 'Neo.Iterator.Key',
-    options: ({ stack: [stackIterator] }: $FlowFixMe),
-    result: [new BufferStackItem(nextItem.value.key)],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'SWAP',
+            type: 'op',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'Neo.Iterator.Next',
+                    type: 'sys',
+                    args: [
+                      {
+                        type: 'calls',
+                        calls: [
+                          {
+                            name: 'DUP',
+                            type: 'op',
+                            args: [
+                              {
+                                type: 'calls',
+                                calls: [
+                                  {
+                                    name: 'Neo.Storage.Find',
+                                    type: 'sys',
+                                    args: [
+                                      {
+                                        type: 'calls',
+                                        calls: [
+                                          {
+                                            name: 'Neo.Storage.GetContext',
+                                            type: 'sys',
+                                          },
+                                        ],
+                                      },
+                                      Buffer.alloc(1, 1),
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    result: [new BufferStackItem(nextItem.key), new BooleanStackItem(true)],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.getAll = jest.fn(() =>
+        AsyncIterableX.of(nextItem),
+      );
+    },
     gas: FEES.ONE,
   },
   {
     name: 'Neo.Iterator.Value',
-    options: ({ stack: [stackIterator] }: $FlowFixMe),
-    result: [new BufferStackItem(nextItem.value.value)],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'SWAP',
+            type: 'op',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'Neo.Iterator.Next',
+                    type: 'sys',
+                    args: [
+                      {
+                        type: 'calls',
+                        calls: [
+                          {
+                            name: 'DUP',
+                            type: 'op',
+                            args: [
+                              {
+                                type: 'calls',
+                                calls: [
+                                  {
+                                    name: 'Neo.Storage.Find',
+                                    type: 'sys',
+                                    args: [
+                                      {
+                                        type: 'calls',
+                                        calls: [
+                                          {
+                                            name: 'Neo.Storage.GetContext',
+                                            type: 'sys',
+                                          },
+                                        ],
+                                      },
+                                      Buffer.alloc(1, 1),
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    result: [new BufferStackItem(nextItem.value), new BooleanStackItem(true)],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.getAll = jest.fn(() =>
+        AsyncIterableX.of(nextItem),
+      );
+    },
     gas: FEES.ONE,
   },
   {

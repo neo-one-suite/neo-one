@@ -1,4 +1,5 @@
 /* @flow */
+/* eslint-disable no-param-reassign */
 import { NULL_ACTION, TRIGGER_TYPE } from '@neo-one/node-core';
 import {
   type OpCode,
@@ -53,6 +54,8 @@ type TestCase = {|
   argsAlt?: Array<?Param>,
   stackItems?: Array<StackItem>,
   ref?: StackItem,
+  mockBlockchain?: (options: {| blockchain: any |}) => void,
+  mockTransaction?: (options: {| transaction: any |}) => void,
   // state?: VMState,
 |};
 
@@ -353,12 +356,18 @@ const OPCODES = ([
         new IntegerStackItem(new BN(2)),
         new IntegerStackItem(new BN(3)),
       ],
+      mockBlockchain: ({ blockchain }) => {
+        blockchain.contract.get = jest.fn(() => Promise.resolve(contract));
+      },
       gas: FEES.TEN,
     },
     {
       op: 'SYSCALL',
       buffer: Buffer.from(' Neo.Blockchain.GetHeight', 'utf-8'),
       result: [new IntegerStackItem(new BN(10))],
+      mockBlockchain: ({ blockchain }) => {
+        blockchain.currentBlock.index = 10;
+      },
       gas: FEES.ONE,
     },
     {
@@ -369,6 +378,9 @@ const OPCODES = ([
         new IntegerStackItem(new BN(2)),
         new IntegerStackItem(new BN(3)),
       ],
+      mockBlockchain: ({ blockchain }) => {
+        blockchain.contract.get = jest.fn(() => Promise.resolve(contract));
+      },
       gas: FEES.TEN,
     },
     {
@@ -918,6 +930,9 @@ const OPCODES = ([
       op: 'CHECKSIG',
       args: [keys[0].publicKey, signature0],
       result: [new BooleanStackItem(true)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
       gas: FEES.ONE_HUNDRED,
     },
     {
@@ -930,12 +945,75 @@ const OPCODES = ([
       op: 'CHECKMULTISIG',
       args: [[keys[0].publicKey, keys[1].publicKey], [signature0, signature1]],
       result: [new BooleanStackItem(true)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
       gas: FEES.ONE_HUNDRED.mul(new BN(2)),
+    },
+    {
+      op: 'CHECKMULTISIG',
+      args: [
+        new BN(2),
+        keys[0].publicKey,
+        keys[1].publicKey,
+        new BN(2),
+        signature0,
+        signature1,
+      ],
+      result: [new BooleanStackItem(true)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
+      gas: FEES.ONE_HUNDRED.mul(new BN(2)),
+    },
+    {
+      op: 'CHECKMULTISIG',
+      args: [
+        [keys[0].publicKey, keys[2].publicKey, keys[1].publicKey],
+        [signature0, signature1],
+      ],
+      result: [new BooleanStackItem(true)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
+      gas: FEES.ONE_HUNDRED.mul(new BN(3)),
+    },
+    {
+      op: 'CHECKMULTISIG',
+      args: [
+        new BN(3),
+        keys[0].publicKey,
+        keys[2].publicKey,
+        keys[1].publicKey,
+        new BN(2),
+        signature0,
+        signature1,
+      ],
+      result: [new BooleanStackItem(true)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
+      gas: FEES.ONE_HUNDRED.mul(new BN(3)),
     },
     {
       op: 'CHECKMULTISIG',
       args: [[keys[0].publicKey, keys[1].publicKey], [Buffer.alloc(64, 10)]],
       result: [new BooleanStackItem(false)],
+      gas: FEES.ONE_HUNDRED.mul(new BN(2)),
+    },
+    {
+      op: 'CHECKMULTISIG',
+      args: [
+        new BN(2),
+        keys[0].publicKey,
+        keys[1].publicKey,
+        new BN(1),
+        Buffer.alloc(64, 10),
+      ],
+      result: [new BooleanStackItem(false)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
       gas: FEES.ONE_HUNDRED.mul(new BN(2)),
     },
     {
@@ -1171,6 +1249,8 @@ describe('opcodes', () => {
       preOps = [],
       stackItems = [],
       ref,
+      mockBlockchain,
+      mockTransaction,
     } = testCase;
     it(op, async () => {
       const sb = new ScriptBuilder();
@@ -1193,7 +1273,9 @@ describe('opcodes', () => {
           }),
         ],
       });
-      transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      if (mockTransaction != null) {
+        mockTransaction({ transaction });
+      }
 
       const blockchain = {
         output: {},
@@ -1201,12 +1283,8 @@ describe('opcodes', () => {
         action: {
           add: jest.fn(() => {}),
         },
-        contract: {
-          get: jest.fn(() => contract),
-        },
-        currentBlock: {
-          index: 10,
-        },
+        contract: {},
+        currentBlock: {},
       };
       const block = { timestamp: blockTime };
       const init = {
@@ -1223,6 +1301,9 @@ describe('opcodes', () => {
       const gasLeft = utils.ONE_HUNDRED_MILLION;
       let stack = [];
       let stackAlt = [];
+      if (mockBlockchain != null) {
+        mockBlockchain({ blockchain });
+      }
 
       if (args.length) {
         const argsSB = new ScriptBuilder();
