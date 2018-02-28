@@ -54,4 +54,8 @@ export default class StackItemIterator implements Equatable {
 
     return new BufferStackItem(current.value);
   }
+
+  asIterator(): StackItemIterator {
+    return this;
+  }
 }
