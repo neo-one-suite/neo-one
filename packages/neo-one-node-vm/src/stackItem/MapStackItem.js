@@ -79,4 +79,8 @@ export default class MapStackItem extends StackItemBase {
   valuesArray(): Array<StackItem> {
     return utils.values(this._values);
   }
+
+  asMapStackItem(): MapStackItem {
+    return this;
+  }
 }

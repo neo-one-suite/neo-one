@@ -1621,6 +1621,7 @@ const OPCODE_PAIRS = [
       createOp({
         name: 'HASKEY',
         in: 2,
+        out: 1,
         invoke: ({ context, args }: OpInvokeArgs) => {
           if (args[1].isArray()) {
             const index = args[0].asBigInteger().toNumber();
