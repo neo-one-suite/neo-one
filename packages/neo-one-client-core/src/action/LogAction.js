@@ -23,10 +23,9 @@ export type LogActionJSON = {|
   message: string,
 |};
 
-export default class LogAction extends ActionBase<
-  LogAction,
-  typeof ACTION_TYPE.LOG,
-> implements SerializableJSON<LogActionJSON> {
+export default class LogAction
+  extends ActionBase<LogAction, typeof ACTION_TYPE.LOG>
+  implements SerializableJSON<LogActionJSON> {
   message: string;
   constructor({
     version,

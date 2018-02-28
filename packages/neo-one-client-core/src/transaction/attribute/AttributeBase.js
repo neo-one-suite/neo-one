@@ -19,7 +19,8 @@ export type AttributeJSON = {|
 |};
 
 export default class AttributeBase<Usage: AttributeUsage, Value>
-  implements Equatable,
+  implements
+    Equatable,
     SerializableWire<Attribute>,
     SerializableJSON<AttributeJSON> {
   usage: Usage;

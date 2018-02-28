@@ -58,7 +58,8 @@ export type AccountJSON = {|
 |};
 
 export default class Account extends BaseState
-  implements SerializableWire<Account>,
+  implements
+    SerializableWire<Account>,
     SerializableJSON<AccountJSON>,
     Equatable {
   hash: UInt160;

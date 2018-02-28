@@ -66,7 +66,8 @@ export type ContractJSON = {|
 |};
 
 export default class Contract extends BaseState
-  implements SerializableWire<Contract>,
+  implements
+    SerializableWire<Contract>,
     SerializableJSON<ContractJSON>,
     Equatable {
   script: Buffer;

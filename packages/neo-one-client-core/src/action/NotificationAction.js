@@ -27,10 +27,9 @@ export type NotificationActionJSON = {|
   args: Array<ContractParameterJSON>,
 |};
 
-export default class NotificationAction extends ActionBase<
-  NotificationAction,
-  typeof ACTION_TYPE.NOTIFICATION,
-> implements SerializableJSON<NotificationActionJSON> {
+export default class NotificationAction
+  extends ActionBase<NotificationAction, typeof ACTION_TYPE.NOTIFICATION>
+  implements SerializableJSON<NotificationActionJSON> {
   args: Array<ContractParameter>;
 
   constructor({

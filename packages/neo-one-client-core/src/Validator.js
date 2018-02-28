@@ -43,7 +43,8 @@ export type ValidatorJSON = {|
 |};
 
 export default class Validator extends BaseState
-  implements SerializableWire<Validator>,
+  implements
+    SerializableWire<Validator>,
     Equatable,
     SerializableJSON<ValidatorJSON> {
   publicKey: ECPoint;
