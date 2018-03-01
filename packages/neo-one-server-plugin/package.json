@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin",
-  "version": "1.0.0-alpha.8",
+  "version": "1.0.0-alpha.9",
   "keywords": [
     "neo",
     "NEO",
@@ -36,7 +36,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/utils": "^1.0.0-alpha.5",
+    "@neo-one/utils": "^1.0.0-alpha.6",
     "ajv": "^6.2.0",
     "chalk": "^2.3.1",
     "chokidar": "^2.0.2",
