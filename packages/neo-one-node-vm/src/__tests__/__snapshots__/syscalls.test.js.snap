@@ -581,6 +581,27 @@ Array [
 ]
 `;
 
+exports[`syscalls Neo.Iterator.Key 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "2bff2cb77d7724a63e041947d29d76f58fb2f19b",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Iterator.Key 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "2bff2cb77d7724a63e041947d29d76f58fb2f19b",
+      "prefix": "01",
+    },
+  ],
+]
+`;
+
 exports[`syscalls Neo.Iterator.Next 1`] = `
 Array [
   Array [
@@ -617,6 +638,27 @@ Array [
   Array [
     Object {
       "hash": "686302f409a2f3a10c2a7e547703d5032b877c75",
+      "prefix": "01",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Iterator.Value 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "2bff2cb77d7724a63e041947d29d76f58fb2f19b",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Iterator.Value 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "2bff2cb77d7724a63e041947d29d76f58fb2f19b",
       "prefix": "01",
     },
   ],

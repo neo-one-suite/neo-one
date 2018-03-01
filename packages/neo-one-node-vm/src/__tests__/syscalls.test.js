@@ -7,8 +7,6 @@ import {
   type SysCallName,
   ATTRIBUTE_USAGE,
   SCRIPT_CONTAINER_TYPE,
-  // CONTRACT_PARAMETER_TYPE,
-  // CONTRACT_PROPERTY_STATE,
   BinaryWriter,
   InvocationTransaction,
   UInt160Attribute,
@@ -22,7 +20,8 @@ import {
   Asset,
   ASSET_TYPE,
   utils,
-  // Contract,
+  Contract,
+  StorageItem,
 } from '@neo-one/client-core';
 import BN from 'bn.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
@@ -30,7 +29,7 @@ import { of } from 'rxjs/observable/of';
 
 import { utils as commonUtils } from '@neo-one/utils';
 
-import { FEES, BLOCK_HEIGHT_YEAR } from '../constants';
+import { FEES, BLOCK_HEIGHT_YEAR, type Options } from '../constants';
 import {
   STACK_ITEM_TYPE,
   type StackItem,
@@ -98,19 +97,11 @@ const asset = {
   available: new BN(5),
 };
 
-// const sbContract = new ScriptBuilder();
-// sbContract.emitSysCall('Neo.Contract.GetStorageContext');
-// const contract = new Contract({
-//   script: sbContract.build(),
-//   parameterList: [],
-//   returnType: CONTRACT_PARAMETER_TYPE.VOID,
-//   name: '',
-//   codeVersion: '',
-//   author: '',
-//   email: '',
-//   description: '',
-//   contractProperties: CONTRACT_PROPERTY_STATE.HAS_STORAGE,
-// })
+const nextItem = new StorageItem({
+  hash: scriptAttributeHash,
+  key: Buffer.from('key', 'utf-8'),
+  value: Buffer.from('val', 'utf-8'),
+});
 
 type SysCall = {|
   name: SysCallName,
@@ -141,6 +132,7 @@ type TestCase = {|
   gas: BN,
   args?: Array<Arg>,
   actionIndex?: number,
+  options?: Options,
   mock?: (options: {| blockchain: any |}) => void,
 |};
 
@@ -1485,16 +1477,144 @@ const SYSCALLS = ([
     },
     gas: FEES.ONE,
   },
-  // TODO: Move these two iterator tests out
-  // {
-  //   name: 'Neo.Iterator.Key',
-  //   result: [],
-  //   stackItems: [],
-  //   gas: FEES.ONE,
-  // },
-  // {
-  //   name: 'Neo.Iterator.Value',
-  // },
+  {
+    name: 'Neo.Iterator.Key',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'SWAP',
+            type: 'op',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'Neo.Iterator.Next',
+                    type: 'sys',
+                    args: [
+                      {
+                        type: 'calls',
+                        calls: [
+                          {
+                            name: 'DUP',
+                            type: 'op',
+                            args: [
+                              {
+                                type: 'calls',
+                                calls: [
+                                  {
+                                    name: 'Neo.Storage.Find',
+                                    type: 'sys',
+                                    args: [
+                                      {
+                                        type: 'calls',
+                                        calls: [
+                                          {
+                                            name: 'Neo.Storage.GetContext',
+                                            type: 'sys',
+                                          },
+                                        ],
+                                      },
+                                      Buffer.alloc(1, 1),
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    result: [new BufferStackItem(nextItem.key), new BooleanStackItem(true)],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.getAll = jest.fn(() =>
+        AsyncIterableX.of(nextItem),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Iterator.Value',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'SWAP',
+            type: 'op',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'Neo.Iterator.Next',
+                    type: 'sys',
+                    args: [
+                      {
+                        type: 'calls',
+                        calls: [
+                          {
+                            name: 'DUP',
+                            type: 'op',
+                            args: [
+                              {
+                                type: 'calls',
+                                calls: [
+                                  {
+                                    name: 'Neo.Storage.Find',
+                                    type: 'sys',
+                                    args: [
+                                      {
+                                        type: 'calls',
+                                        calls: [
+                                          {
+                                            name: 'Neo.Storage.GetContext',
+                                            type: 'sys',
+                                          },
+                                        ],
+                                      },
+                                      Buffer.alloc(1, 1),
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    result: [new BufferStackItem(nextItem.value), new BooleanStackItem(true)],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.getAll = jest.fn(() =>
+        AsyncIterableX.of(nextItem),
+      );
+    },
+    gas: FEES.ONE,
+  },
   {
     name: 'Neo.Account.SetVotes',
     result: [],
@@ -1638,50 +1758,20 @@ const SYSCALLS = ([
     },
     gas: common.FIVE_HUNDRED_FIXED8,
   },
-  // TODO: Move this test out
-  // {
-  //   name: 'Neo.Contract.GetStorageContext',
-  //   result: [new StorageContextStackItem(contract.hash)],
-  //   args: [
-  //     {
-  //       type: 'calls',
-  //       calls: [
-  //         {
-  //           name: 'Neo.Contract.Create',
-  //           type: 'sys',
-  //           args: [
-  //             contract.script,
-  //             Buffer.from(contract.parameterList),
-  //             contract.returnType,
-  //             contract.contractProperties,
-  //             contract.name,
-  //             contract.codeVersion,
-  //             contract.author,
-  //             contract.email,
-  //             contract.description,
-  //           ]
-  //         },
-  //         {
-  //           name: 'APPCALL',
-  //           type: 'op',
-  //           buffer: Buffer.from(contract.hash, 'hex')
-  //         },
-  //       ],
-  //     },
-  //   ],
-  //   mock: ({ blockchain }) => {
-  //     blockchain.contract.tryGet = jest.fn(() =>
-  //       Promise.resolve()
-  //     );
-  //     blockchain.contract.add = jest.fn(() =>
-  //       Promise.resolve()
-  //     );
-  //     blockchain.contract.get = jest.fn(() =>
-  //       Promise.resolve(contract)
-  //     );
-  //   },
-  //   gas: FEES.ONE,
-  // },
+  {
+    name: 'Neo.Contract.GetStorageContext',
+    options: ({
+      stack: [new ContractStackItem(new Contract(transactions.kycContract))],
+      createdContracts: {
+        [transactions.kycContract.hashHex]: Buffer.from(
+          'f42c9189cbfc9d582b7039b29e2cf36ec1283f1b',
+          'hex',
+        ),
+      },
+    }: $FlowFixMe),
+    result: [new StorageContextStackItem(transactions.kycContract.hash)],
+    gas: FEES.ONE,
+  },
   {
     name: 'Neo.Contract.Destroy',
     result: [],
@@ -1917,7 +2007,15 @@ describe('syscalls', () => {
   };
 
   for (const testCase of SYSCALLS) {
-    const { name, result, gas, args = [], actionIndex = 0, mock } = testCase;
+    const {
+      name,
+      result,
+      gas,
+      args = [],
+      actionIndex = 0,
+      mock,
+      options,
+    } = testCase;
     it(name, async () => {
       const sb = new ScriptBuilder();
       sb.emitSysCall(name);
@@ -1985,7 +2083,7 @@ describe('syscalls', () => {
         blockchain: (blockchain: $FlowFixMe),
         init,
         gasLeft,
-        options: ({ stack }: $FlowFixMe),
+        options: options || ({ stack }: $FlowFixMe),
       });
 
       expect(context.errorMessage).toBeUndefined();

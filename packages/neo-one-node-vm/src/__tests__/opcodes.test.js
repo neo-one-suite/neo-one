@@ -1,14 +1,18 @@
 /* @flow */
+/* eslint-disable no-param-reassign */
 import { NULL_ACTION, TRIGGER_TYPE } from '@neo-one/node-core';
 import {
   type OpCode,
   type Param,
   ATTRIBUTE_USAGE,
   SCRIPT_CONTAINER_TYPE,
+  CONTRACT_PARAMETER_TYPE,
+  CONTRACT_PROPERTY_STATE,
   UInt160Attribute,
   ScriptBuilder,
   utils,
   crypto,
+  Contract,
 } from '@neo-one/client-core';
 import BN from 'bn.js';
 
@@ -50,6 +54,8 @@ type TestCase = {|
   argsAlt?: Array<?Param>,
   stackItems?: Array<StackItem>,
   ref?: StackItem,
+  mockBlockchain?: (options: {| blockchain: any |}) => void,
+  mockTransaction?: (options: {| transaction: any |}) => void,
   // state?: VMState,
 |};
 
@@ -93,6 +99,31 @@ const mapRemoveRef = new MapStackItem({
     'BufferStackItem:aaaa': new IntegerStackItem(new BN(1)),
     'BufferStackItem:bbbb': new IntegerStackItem(new BN(2)),
   },
+});
+const contractSB = new ScriptBuilder();
+contractSB.emitOp('PUSH3');
+contractSB.emitOp('PUSH2');
+
+const contract = new Contract({
+  script: contractSB.build(),
+  parameterList: [],
+  returnType: CONTRACT_PARAMETER_TYPE.VOID,
+  name: '',
+  codeVersion: '',
+  author: '',
+  email: '',
+  description: '',
+  contractProperties: CONTRACT_PROPERTY_STATE.NO_PROPERTY,
+});
+
+const signature0 = crypto.sign({
+  message: Buffer.alloc(32, 10),
+  privateKey: keys[0].privateKey,
+});
+
+const signature1 = crypto.sign({
+  message: Buffer.alloc(32, 10),
+  privateKey: keys[1].privateKey,
 });
 
 const OPCODES = ([
@@ -317,16 +348,41 @@ const OPCODES = ([
       gas: FEES.ONE.add(FEES.ONE).add(FEES.ONE),
     },
     // RET is tested above
-    // {
-    //   op: 'APPCALL',
-    //   gas: FEES.TEN,
-    // },
-    // {
-    //   op: 'SYSCALL',
-    // },
-    // {
-    //   op: 'TAILCALL',
-    // },
+    {
+      op: 'APPCALL',
+      buffer: Buffer.alloc(20, 10),
+      // Result of Contract Script defined above
+      result: [
+        new IntegerStackItem(new BN(2)),
+        new IntegerStackItem(new BN(3)),
+      ],
+      mockBlockchain: ({ blockchain }) => {
+        blockchain.contract.get = jest.fn(() => Promise.resolve(contract));
+      },
+      gas: FEES.TEN,
+    },
+    {
+      op: 'SYSCALL',
+      buffer: Buffer.from(' Neo.Blockchain.GetHeight', 'utf-8'),
+      result: [new IntegerStackItem(new BN(10))],
+      mockBlockchain: ({ blockchain }) => {
+        blockchain.currentBlock.index = 10;
+      },
+      gas: FEES.ONE,
+    },
+    {
+      op: 'TAILCALL',
+      buffer: Buffer.alloc(20, 10),
+      // Result of Contract Script defined above
+      result: [
+        new IntegerStackItem(new BN(2)),
+        new IntegerStackItem(new BN(3)),
+      ],
+      mockBlockchain: ({ blockchain }) => {
+        blockchain.contract.get = jest.fn(() => Promise.resolve(contract));
+      },
+      gas: FEES.TEN,
+    },
     {
       op: 'DUPFROMALTSTACK',
       argsAlt: [new BN(1)],
@@ -870,16 +926,96 @@ const OPCODES = ([
       result: [new UInt256StackItem(crypto.hash256(Buffer.alloc(32, 1)))],
       gas: FEES.TWENTY,
     },
-    // TODO (afragapane): Need to test true condition
+    {
+      op: 'CHECKSIG',
+      args: [keys[0].publicKey, signature0],
+      result: [new BooleanStackItem(true)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
+      gas: FEES.ONE_HUNDRED,
+    },
     {
       op: 'CHECKSIG',
       args: [keys[0].publicKey, Buffer.alloc(64, 10)],
       result: [new BooleanStackItem(false)],
       gas: FEES.ONE_HUNDRED,
     },
-    // {
-    //   op: 'CHECKMULTISIG',
-    // },
+    {
+      op: 'CHECKMULTISIG',
+      args: [[keys[0].publicKey, keys[1].publicKey], [signature0, signature1]],
+      result: [new BooleanStackItem(true)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
+      gas: FEES.ONE_HUNDRED.mul(new BN(2)),
+    },
+    {
+      op: 'CHECKMULTISIG',
+      args: [
+        new BN(2),
+        keys[0].publicKey,
+        keys[1].publicKey,
+        new BN(2),
+        signature0,
+        signature1,
+      ],
+      result: [new BooleanStackItem(true)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
+      gas: FEES.ONE_HUNDRED.mul(new BN(2)),
+    },
+    {
+      op: 'CHECKMULTISIG',
+      args: [
+        [keys[0].publicKey, keys[2].publicKey, keys[1].publicKey],
+        [signature0, signature1],
+      ],
+      result: [new BooleanStackItem(true)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
+      gas: FEES.ONE_HUNDRED.mul(new BN(3)),
+    },
+    {
+      op: 'CHECKMULTISIG',
+      args: [
+        new BN(3),
+        keys[0].publicKey,
+        keys[2].publicKey,
+        keys[1].publicKey,
+        new BN(2),
+        signature0,
+        signature1,
+      ],
+      result: [new BooleanStackItem(true)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
+      gas: FEES.ONE_HUNDRED.mul(new BN(3)),
+    },
+    {
+      op: 'CHECKMULTISIG',
+      args: [[keys[0].publicKey, keys[1].publicKey], [Buffer.alloc(64, 10)]],
+      result: [new BooleanStackItem(false)],
+      gas: FEES.ONE_HUNDRED.mul(new BN(2)),
+    },
+    {
+      op: 'CHECKMULTISIG',
+      args: [
+        new BN(2),
+        keys[0].publicKey,
+        keys[1].publicKey,
+        new BN(1),
+        Buffer.alloc(64, 10),
+      ],
+      result: [new BooleanStackItem(false)],
+      mockTransaction: ({ transaction }) => {
+        transaction._message = jest.fn(() => Buffer.alloc(32, 10));
+      },
+      gas: FEES.ONE_HUNDRED.mul(new BN(2)),
+    },
     {
       op: 'ARRAYSIZE',
       args: [[true, false]],
@@ -1113,6 +1249,8 @@ describe('opcodes', () => {
       preOps = [],
       stackItems = [],
       ref,
+      mockBlockchain,
+      mockTransaction,
     } = testCase;
     it(op, async () => {
       const sb = new ScriptBuilder();
@@ -1135,12 +1273,18 @@ describe('opcodes', () => {
           }),
         ],
       });
+      if (mockTransaction != null) {
+        mockTransaction({ transaction });
+      }
+
       const blockchain = {
         output: {},
         asset: {},
         action: {
           add: jest.fn(() => {}),
         },
+        contract: {},
+        currentBlock: {},
       };
       const block = { timestamp: blockTime };
       const init = {
@@ -1157,6 +1301,9 @@ describe('opcodes', () => {
       const gasLeft = utils.ONE_HUNDRED_MILLION;
       let stack = [];
       let stackAlt = [];
+      if (mockBlockchain != null) {
+        mockBlockchain({ blockchain });
+      }
 
       if (args.length) {
         const argsSB = new ScriptBuilder();
@@ -1199,8 +1346,6 @@ describe('opcodes', () => {
 
       if (stackItems.length && ref) {
         expect(ref).toEqual(result[0]);
-      } else if (stackItems.length) {
-        expect(context.stack).toEqual(result);
       } else if (
         result.length === 1 &&
         context.stack.length === 1 &&
