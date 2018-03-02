@@ -79,7 +79,7 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "8.2.2",
     "babel-jest": "22.4.1",
-    "eslint": "4.18.1",
+    "eslint": "4.18.2",
     "eslint-config-airbnb": "16.1.0",
     "eslint-config-prettier": "2.9.0",
     "eslint-plugin-eslint-comments": "2.0.2",
