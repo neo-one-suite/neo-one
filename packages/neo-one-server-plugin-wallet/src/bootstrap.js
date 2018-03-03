@@ -10,6 +10,7 @@ import {
   LocalMemoryStore,
   NEOONEProvider,
   wifToPrivateKey,
+  type Transfer,
 } from '@neo-one/client';
 import { common } from '@neo-one/client-core';
 import {
@@ -17,10 +18,10 @@ import {
   type Network,
 } from '@neo-one/server-plugin-network';
 
-import { take } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
 import BigNumber from 'bignumber.js';
 
-import type Wallet from './WalletResource';
+import type { Wallet } from './WalletResourceType';
 import WalletPlugin from './WalletPlugin';
 import constants from './constants';
 
@@ -47,6 +48,54 @@ const getNetwork = async ({
   );
 };
 
+async function getWallet(
+  walletName: string,
+  networkName: string,
+  { cli }: InteractiveCLIArgs,
+  plugin: WalletPlugin,
+): Promise<Wallet> {
+  const walletResource = await plugin.walletResourceType.getResource({
+    name: constants.makeWallet({
+      network: networkName,
+      name: walletName,
+    }),
+    client: cli.client,
+    options: {},
+  });
+
+  return ((walletResource: $FlowFixMe): Wallet);
+}
+
+async function createWallet(
+  walletName: string,
+  networkName: string,
+  { cli }: InteractiveCLIArgs,
+  keystore: LocalKeyStore,
+  plugin: WalletPlugin,
+): Promise<void> {
+  await cli.client.createResource({
+    plugin: constants.PLUGIN,
+    resourceType: constants.WALLET_RESOURCE_TYPE,
+    name: constants.makeWallet({ name: walletName, network: networkName }),
+    options: {
+      network: networkName,
+    },
+    cancel$: of(),
+  });
+  const wallet = await (getWallet(
+    walletName,
+    networkName,
+    { cli },
+    plugin,
+  ): $FlowFixMe);
+
+  await keystore.addAccount({
+    network: networkName,
+    name: wallet.name,
+    privateKey: wifToPrivateKey(wallet.wif),
+  });
+}
+
 function getNumWallets(options): number {
   const { wallets } = options;
   if (wallets != null && typeof wallets === 'number') {
@@ -56,20 +105,46 @@ function getNumWallets(options): number {
 }
 
 function randomInt(max: number): number {
-  return Math.floor(Math.random() * Math.floor(max));
+  return Math.floor(Math.random() * Math.floor(max)) + 1;
 }
 
 function randomIntDist(seed: number): number {
   if (seed < 40) {
-    return randomInt(10);
-  } else if (seed >= 40 && seed < 90) {
     return randomInt(100);
-  } else if (seed >= 90 && seed < 97) {
+  } else if (seed >= 40 && seed < 90) {
     return randomInt(1000);
-  } else if (seed >= 97 && seed < 100) {
+  } else if (seed >= 90 && seed < 97) {
     return randomInt(10000);
+  } else if (seed >= 97 && seed < 100) {
+    return randomInt(100000);
   }
-  return randomInt(100000);
+  return randomInt(1000000);
+}
+
+async function createTransfers(
+  walletName: string,
+  networkName: string,
+  { cli }: InteractiveCLIArgs,
+  plugin: WalletPlugin,
+): Promise<Array<Transfer>> {
+  const wallet = await getWallet(walletName, networkName, { cli }, plugin);
+
+  const seed = randomInt(100);
+  const neo = randomIntDist(seed);
+  const gas = randomIntDist(seed);
+
+  return Promise.resolve([
+    {
+      amount: new BigNumber(neo),
+      asset: common.NEO_ASSET_HASH,
+      to: wallet.address,
+    },
+    {
+      amount: new BigNumber(gas),
+      asset: common.GAS_ASSET_HASH,
+      to: wallet.address,
+    },
+  ]);
 }
 
 export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
@@ -84,30 +159,23 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         options: args.options,
       });
 
-      const networkResource = await cli.client
-        .getResource$({
-          plugin: networkConstants.PLUGIN,
-          name: networkName,
-          resourceType: networkConstants.NETWORK_RESOURCE_TYPE,
-          options: {},
-        })
-        .pipe(take(1))
-        .toPromise();
+      const networkResource = await cli.client.getResource({
+        plugin: networkConstants.PLUGIN,
+        name: networkName,
+        resourceType: networkConstants.NETWORK_RESOURCE_TYPE,
+        options: {},
+      });
       if (networkResource == null) {
         throw new Error(`Network ${networkName} does not exist.`);
       }
       const network = ((networkResource: $FlowFixMe): Network);
 
-      const masterWalletResource = await plugin.walletResourceType
-        .getResource$({
-          name: constants.makeMasterWallet(network.name),
-          client: cli.client,
-          options: {},
-        })
-        .pipe(take(1))
-        .toPromise();
-
-      const masterWallet = ((masterWalletResource: $FlowFixMe): Wallet);
+      const masterWallet = await (getWallet(
+        constants.MASTER_WALLET,
+        network.name,
+        { cli },
+        plugin,
+      ): $FlowFixMe);
 
       const keystore = new LocalKeyStore({
         store: new LocalMemoryStore(),
@@ -115,9 +183,8 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
 
       await keystore.addAccount({
         network: network.name,
-        // $FlowFixMe
         name: masterWallet.name,
-        privateKey: wifToPrivateKey((masterWallet.wif: $FlowFixMe)),
+        privateKey: wifToPrivateKey(masterWallet.wif),
       });
 
       const wallets = [];
@@ -126,41 +193,11 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         wallets.push(`wallet-${i}`);
       }
 
-      async function getWallet(walletName: string): Promise<Wallet> {
-        const walletResource = await plugin.walletResourceType
-          .getResource$({
-            name: constants.makeWallet({
-              network: network.name,
-              name: walletName,
-            }),
-            client: cli.client,
-            options: {},
-          })
-          .pipe(take(1))
-          .toPromise();
-
-        const wallet = ((walletResource: $FlowFixMe): Wallet);
-        return Promise.resolve(wallet);
-      }
-
-      async function createWallet(walletName: string): Promise<void> {
-        await cli.exec(`create wallet ${walletName} --network ${network.name}`);
-        // $FlowFixMe
-        const wallet = await getWallet(walletName);
-
-        await keystore.addAccount({
-          network: network.name,
-          name: wallet.name,
-          privateKey: wifToPrivateKey(wallet.wif),
-        });
-
-        await cli.exec(`deactivate wallet ${walletName}`);
-      }
-
-      for (const walletName of wallets) {
-        // eslint-disable-next-line
-        await createWallet(walletName);
-      }
+      await Promise.all(
+        wallets.map(walletName =>
+          createWallet(walletName, network.name, { cli }, keystore, plugin),
+        ),
+      );
 
       const client = new Client({
         memory: new LocalUserAccountProvider({
@@ -173,33 +210,35 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         }),
       });
 
-      async function transferFunds(
-        walletName: string,
-        seed: number,
-      ): Promise<void> {
-        // $FlowFixMe
-        const wallet = await getWallet(walletName);
-        const neo = randomIntDist(seed);
-        const gas = randomIntDist(seed);
-
-        await client.transfer(
-          new BigNumber(neo),
-          common.NEO_ASSET_HASH,
-          wallet.address,
-          // $FlowFixMe
-          { from: masterWallet.accountID },
-        );
-
-        await client.transfer(
-          new BigNumber(gas),
-          common.GAS_ASSET_HASH,
-          wallet.address,
-          // $FlowFixMe
-          { from: masterWallet.accountID },
-        );
+      const transfers = await Promise.all(
+        wallets.map(walletName =>
+          createTransfers(walletName, network.name, { cli }, plugin),
+        ),
+      );
+      const neoTransfers = [];
+      const gasTransfers = [];
+      for (const transfer of transfers) {
+        neoTransfers.push(transfer[0]);
+        gasTransfers.push(transfer[1]);
       }
-      for (const walletName of wallets) {
-        // eslint-disable-next-line
-        await transferFunds(walletName, randomInt(100));
-      }
+
+      const neoTransaction = await client.transfer(neoTransfers, {
+        from: masterWallet.accountID,
+      });
+      await neoTransaction.confirmed();
+
+      const gasTransaction = await client.transfer(gasTransfers, {
+        from: masterWallet.accountID,
+      });
+      await gasTransaction.confirmed();
+
+      // for (const walletName of wallets) {
+      //   const wallet = await getWallet(
+      //     walletName,
+      //     networkName,
+      //     {cli},
+      //     plugin,
+      //   )
+      //   console.log(wallet)
+      // }
     });

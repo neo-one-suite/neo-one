@@ -8,7 +8,14 @@ import type {
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { filter, map, publishReplay, refCount } from 'rxjs/operators';
+import {
+  filter,
+  map,
+  publishReplay,
+  refCount,
+  take,
+  toArray,
+} from 'rxjs/operators';
 import grpc from 'grpc';
 import proto from '@neo-one/server-grpc';
 
@@ -128,6 +135,27 @@ export default class Client {
     );
   }
 
+  getResource({
+    plugin,
+    resourceType,
+    name,
+    options,
+  }: {|
+    plugin: string,
+    resourceType: string,
+    name: string,
+    options: Object,
+  |}): Promise<?BaseResource> {
+    return this.getResource$({
+      plugin,
+      resourceType,
+      name,
+      options,
+    })
+      .pipe(take(1))
+      .toPromise();
+  }
+
   createResource$({
     plugin,
     resourceType,
@@ -149,6 +177,30 @@ export default class Client {
       options,
       cancel$,
     });
+  }
+
+  createResource({
+    plugin,
+    resourceType,
+    name,
+    options,
+    cancel$,
+  }: {|
+    plugin: string,
+    resourceType: string,
+    name: string,
+    options: Object,
+    cancel$: Observable<void>,
+  |}): Promise<Array<ModifyResourceResponse>> {
+    return this.createResource$({
+      plugin,
+      resourceType,
+      name,
+      options,
+      cancel$,
+    })
+      .pipe(toArray())
+      .toPromise();
   }
 
   deleteResource$({

@@ -92,6 +92,12 @@ export type Client = {
     name: string,
     options: BaseResourceOptions,
   |}): Observable<?BaseResource>,
+  getResource(options: {|
+    plugin: string,
+    resourceType: string,
+    name: string,
+    options: BaseResourceOptions,
+  |}): Promise<?BaseResource>,
   createResource$(options: {|
     plugin: string,
     resourceType: string,
@@ -99,6 +105,13 @@ export type Client = {
     options: BaseResourceOptions,
     cancel$: Observable<void>,
   |}): Observable<ModifyResourceResponse>,
+  createResource(options: {|
+    plugin: string,
+    resourceType: string,
+    name: string,
+    options: BaseResourceOptions,
+    cancel$: Observable<void>,
+  |}): Promise<Array<ModifyResourceResponse>>,
   deleteResource$(options: {|
     plugin: string,
     resourceType: string,

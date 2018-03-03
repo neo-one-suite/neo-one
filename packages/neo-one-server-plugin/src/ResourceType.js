@@ -1,7 +1,7 @@
 /* @flow */
 import type { Observable } from 'rxjs/Observable';
 
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 
 import type {
   BaseResource,
@@ -94,6 +94,23 @@ export default class ResourceType<
         options,
       })
       .pipe(map(resource => (resource: $FlowFixMe)));
+  }
+
+  getResource({
+    name,
+    client,
+    options,
+  }: GetResource$Options<ResourceOptions>): Promise<?Resource> {
+    return client
+      .getResource$({
+        plugin: this.plugin.name,
+        resourceType: this.name,
+        name,
+        options,
+      })
+      .pipe(map(resource => (resource: $FlowFixMe)))
+      .pipe(take(1))
+      .toPromise();
   }
 
   createMasterResourceAdapter(
