@@ -50,13 +50,13 @@ const getNetwork = async ({
   );
 };
 
-function getWallet(
+async function getWallet(
   walletName: string,
   networkName: string,
   cli: InteractiveCLI,
   plugin: WalletPlugin,
-): Promise<?Wallet> {
-  return plugin.walletResourceType.getResource({
+): Promise<Wallet> {
+  const wallet = await plugin.walletResourceType.getResource({
     name: constants.makeWallet({
       network: networkName,
       name: walletName,
@@ -64,6 +64,12 @@ function getWallet(
     client: cli.client,
     options: {},
   });
+
+  if (wallet == null) {
+    throw new Error(`Failed to find wallet, ${walletName}`);
+  }
+
+  return wallet;
 }
 
 async function createWallet(
@@ -131,10 +137,6 @@ async function createTransfers(
 ): Promise<Array<Transfer>> {
   const wallet = await getWallet(walletName, networkName, cli, plugin);
 
-  if (wallet == null) {
-    throw new Error(`Failed to find wallet, ${walletName}`);
-  }
-
   let neo;
   let gas;
   if (from == null) {
@@ -200,9 +202,6 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         plugin,
       );
 
-      if (masterWallet == null) {
-        throw new Error('Failed to find master wallet');
-      }
       if (masterWallet.wif == null) {
         throw new Error('Something went wrong, wif is null');
       }
@@ -278,7 +277,6 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
 
       const transactionsBatch2 = await Promise.all(
         transfersBatch2.map(transfer =>
-          // $FlowFixMe
           client.transfer(transfer[0], { from: transfer[1].accountID }),
         ),
       );
