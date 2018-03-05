@@ -58,7 +58,7 @@ export default class GCloudProvider extends Provider {
       await storage
         .bucket(bucket)
         .file(file)
-        .download({ destination: downloadPath, validation: false });
+        .download({ destination: downloadPath, validation: true });
       this._log({
         event: 'DATA_BACKUP_GCLOUD_PROVIDER_RESTORE_DOWNLOAD_SUCCESS',
       });
@@ -102,7 +102,7 @@ export default class GCloudProvider extends Provider {
         write: storage
           .bucket(bucket)
           .file(file)
-          .createWriteStream({ validation: false }),
+          .createWriteStream({ validation: true }),
       });
       this._log({ event: 'DATA_BACKUP_GCLOUD_PROVIDER_BACKUP_SUCCESS' });
     } catch (error) {
