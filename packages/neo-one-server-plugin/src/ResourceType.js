@@ -101,14 +101,11 @@ export default class ResourceType<
     client,
     options,
   }: GetResource$Options<ResourceOptions>): Promise<?Resource> {
-    return client
-      .getResource$({
-        plugin: this.plugin.name,
-        resourceType: this.name,
-        name,
-        options,
-      })
-      .pipe(map(resource => (resource: $FlowFixMe)))
+    return this.getResource$({
+      name,
+      client,
+      options,
+    })
       .pipe(take(1))
       .toPromise();
   }

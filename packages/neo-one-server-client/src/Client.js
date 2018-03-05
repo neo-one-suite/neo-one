@@ -1,21 +1,15 @@
 /* @flow */
-import type {
-  AllResources,
-  BaseResource,
-  DescribeTable,
-  ModifyResourceResponse,
+import {
+  type AllResources,
+  type BaseResource,
+  type DescribeTable,
+  type ModifyResourceResponse,
+  getTasksError,
 } from '@neo-one/server-plugin';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import {
-  filter,
-  map,
-  publishReplay,
-  refCount,
-  take,
-  toArray,
-} from 'rxjs/operators';
+import { filter, map, publishReplay, refCount, take } from 'rxjs/operators';
 import grpc from 'grpc';
 import proto from '@neo-one/server-grpc';
 
@@ -179,7 +173,7 @@ export default class Client {
     });
   }
 
-  createResource({
+  async createResource({
     plugin,
     resourceType,
     name,
@@ -191,16 +185,26 @@ export default class Client {
     name: string,
     options: Object,
     cancel$: Observable<void>,
-  |}): Promise<Array<ModifyResourceResponse>> {
-    return this.createResource$({
+  |}): Promise<?BaseResource> {
+    const response = await this.createResource$({
       plugin,
       resourceType,
       name,
       options,
       cancel$,
-    })
-      .pipe(toArray())
-      .toPromise();
+    }).toPromise();
+
+    const error = getTasksError(response.tasks);
+    if (error != null) {
+      throw new Error(error);
+    }
+
+    return this.getResource({
+      plugin,
+      resourceType,
+      name,
+      options,
+    });
   }
 
   deleteResource$({

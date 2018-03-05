@@ -111,7 +111,7 @@ export type Client = {
     name: string,
     options: BaseResourceOptions,
     cancel$: Observable<void>,
-  |}): Promise<Array<ModifyResourceResponse>>,
+  |}): Promise<?BaseResource>,
   deleteResource$(options: {|
     plugin: string,
     resourceType: string,
