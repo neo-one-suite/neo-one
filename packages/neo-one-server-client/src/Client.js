@@ -185,7 +185,7 @@ export default class Client {
     name: string,
     options: Object,
     cancel$: Observable<void>,
-  |}): Promise<?BaseResource> {
+  |}): Promise<BaseResource> {
     const response = await this.createResource$({
       plugin,
       resourceType,
@@ -199,12 +199,17 @@ export default class Client {
       throw new Error(error);
     }
 
-    return this.getResource({
+    const resource = await this.getResource({
       plugin,
       resourceType,
       name,
       options,
     });
+
+    if (resource == null) {
+      throw new Error(`Failed to find ${resourceType}: ${name}`);
+    }
+    return resource;
   }
 
   deleteResource$({

@@ -1,4 +1,5 @@
 /* @flow */
+import BigNumber from 'bignumber.js';
 import {
   type GetCLIResourceOptions,
   type InteractiveCLIArgs,
@@ -12,6 +13,7 @@ import {
   NEOONEProvider,
   wifToPrivateKey,
   type Transfer,
+  type Account,
 } from '@neo-one/client';
 import { common } from '@neo-one/client-core';
 import {
@@ -21,10 +23,10 @@ import {
 
 import _ from 'lodash';
 import { of as _of } from 'rxjs/observable/of';
-import BigNumber from 'bignumber.js';
 
 import type { Wallet } from './WalletResourceType';
 import WalletPlugin from './WalletPlugin';
+
 import constants from './constants';
 
 const DEFAULT_NUM_WALLETS = 10;
@@ -50,12 +52,17 @@ const getNetwork = async ({
   );
 };
 
-async function getWallet(
+async function getWallet({
+  walletName,
+  networkName,
+  cli,
+  plugin,
+}: {|
   walletName: string,
   networkName: string,
   cli: InteractiveCLI,
   plugin: WalletPlugin,
-): Promise<Wallet> {
+|}): Promise<Wallet> {
   const wallet = await plugin.walletResourceType.getResource({
     name: constants.makeWallet({
       network: networkName,
@@ -72,12 +79,17 @@ async function getWallet(
   return wallet;
 }
 
-async function createWallet(
+async function createWallet({
+  walletName,
+  networkName,
+  cli,
+  keystore,
+}: {|
   walletName: string,
   networkName: string,
   cli: InteractiveCLI,
   keystore: LocalKeyStore,
-): Promise<void> {
+|}): Promise<void> {
   const walletResource = await cli.client.createResource({
     plugin: constants.PLUGIN,
     resourceType: constants.WALLET_RESOURCE_TYPE,
@@ -89,9 +101,6 @@ async function createWallet(
   });
 
   const wallet = ((walletResource: $FlowFixMe): Wallet);
-  if (wallet == null) {
-    throw new Error(`Failed to find wallet, ${walletName}`);
-  }
   if (wallet.wif == null) {
     throw new Error(`Something went wrong, wif is null for ${walletName}`);
   }
@@ -107,7 +116,10 @@ function getNumWallets(options): number {
   const { wallets } = options;
   if (wallets != null && typeof wallets === 'number') {
     return wallets;
+  } else if (wallets != null && typeof wallets !== 'number') {
+    throw new Error('--wallets <number> option must be a number');
   }
+
   return DEFAULT_NUM_WALLETS;
 }
 
@@ -128,25 +140,35 @@ function randomIntDist(seed: number): number {
   return randomInt(1000000);
 }
 
-async function createTransfers(
+async function createTransfers({
+  walletName,
+  networkName,
+  cli,
+  plugin,
+  from,
+}: {|
   walletName: string,
   networkName: string,
   cli: InteractiveCLI,
   plugin: WalletPlugin,
-  from?: ?Wallet,
-): Promise<Array<Transfer>> {
-  const wallet = await getWallet(walletName, networkName, cli, plugin);
+  from?: Account,
+|}): Promise<Array<Transfer>> {
+  const wallet = await getWallet({ walletName, networkName, cli, plugin });
 
   let neo;
   let gas;
-  if (from == null) {
+  if (from != null) {
+    const transferPercent = randomInt(75) / 100;
+    neo = Math.ceil(
+      transferPercent * Number(from.balances[common.NEO_ASSET_HASH]),
+    );
+    gas = Math.ceil(
+      transferPercent * Number(from.balances[common.GAS_ASSET_HASH]),
+    );
+  } else {
     const seed = randomInt(100);
     neo = randomIntDist(seed);
     gas = randomIntDist(seed);
-  } else {
-    const transferPercent = randomInt(75) / 100;
-    neo = Math.ceil(transferPercent * Number(from.neoBalance));
-    gas = Math.ceil(transferPercent * Number(from.gasBalance));
   }
 
   return [
@@ -195,12 +217,12 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
       }
       const network = ((networkResource: $FlowFixMe): Network);
 
-      const masterWallet = await getWallet(
-        constants.MASTER_WALLET,
-        network.name,
+      const masterWallet = await getWallet({
+        walletName: constants.MASTER_WALLET,
+        networkName: network.name,
         cli,
         plugin,
-      );
+      });
 
       if (masterWallet.wif == null) {
         throw new Error('Something went wrong, wif is null');
@@ -224,7 +246,12 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
 
       await Promise.all(
         wallets.map(walletName =>
-          createWallet(walletName, network.name, cli, keystore),
+          createWallet({
+            walletName,
+            networkName: network.name,
+            cli,
+            keystore,
+          }),
         ),
       );
 
@@ -238,50 +265,61 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           }),
         }),
       });
-      const [walletsBatch1, walletsBatch2] = _.chunk(
+      const [firstWalletBatch, secondWalletBatch] = _.chunk(
         wallets,
         Math.ceil(wallets.length / 2),
       );
 
-      let transfersBatch1 = await Promise.all(
-        walletsBatch1.map(walletName =>
-          createTransfers(walletName, network.name, cli, plugin),
-        ),
-      );
-      transfersBatch1 = _.flatten(transfersBatch1);
-
-      const transactionBatch1 = await client.transfer(transfersBatch1, {
-        from: masterWallet.accountID,
-      });
-      await transactionBatch1.confirmed();
-      await new Promise(resolve => setTimeout(() => resolve(), 2000));
-
-      const fromWallets = await Promise.all(
-        walletsBatch1
-          .slice(0, walletsBatch2.length)
-          .map(walletName => getWallet(walletName, network.name, cli, plugin)),
-      );
-
-      let transfersBatch2 = await Promise.all(
-        _.zip(walletsBatch2, fromWallets).map(transferWallets =>
-          createTransfers(
-            transferWallets[0],
-            network.name,
+      let firstTransferBatch = await Promise.all(
+        firstWalletBatch.map(walletName =>
+          createTransfers({
+            walletName,
+            networkName: network.name,
             cli,
             plugin,
-            transferWallets[1],
-          ),
+          }),
         ),
       );
-      transfersBatch2 = _.zip(transfersBatch2, fromWallets);
+      firstTransferBatch = _.flatten(firstTransferBatch);
 
-      const transactionsBatch2 = await Promise.all(
-        transfersBatch2.map(transfer =>
+      const firstTransactionBatch = await client.transfer(firstTransferBatch, {
+        from: masterWallet.accountID,
+      });
+      await firstTransactionBatch.confirmed();
+
+      const fromWallets = await Promise.all(
+        firstWalletBatch
+          .slice(0, secondWalletBatch.length)
+          .map(walletName =>
+            getWallet({ walletName, networkName: network.name, cli, plugin }),
+          ),
+      );
+      const fromAccounts = await Promise.all(
+        fromWallets.map(wallet =>
+          client.read(network.name).getAccount(wallet.address),
+        ),
+      );
+
+      let secondTransferBatch = await Promise.all(
+        _.zip(secondWalletBatch, fromAccounts).map(transferWallets =>
+          createTransfers({
+            walletName: transferWallets[0],
+            networkName: network.name,
+            cli,
+            plugin,
+            from: transferWallets[1],
+          }),
+        ),
+      );
+      secondTransferBatch = _.zip(secondTransferBatch, fromWallets);
+
+      const secondTransactionBatch = await Promise.all(
+        secondTransferBatch.map(transfer =>
           client.transfer(transfer[0], { from: transfer[1].accountID }),
         ),
       );
 
       await Promise.all(
-        transactionsBatch2.map(transaction => transaction.confirmed()),
+        secondTransactionBatch.map(transaction => transaction.confirmed()),
       );
     });
