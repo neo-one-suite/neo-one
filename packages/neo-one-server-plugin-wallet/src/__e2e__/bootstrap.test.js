@@ -17,6 +17,9 @@ async function testBootstrap(
   // remove header row
   wallets = wallets.slice(1);
 
+  let neoBalanceCount = 0;
+  let gasBalanceCount = 0;
+
   for (const wallet of wallets) {
     // Check wallet is on network boottest
     expect(wallet[0]).toEqual('boottest');
@@ -26,9 +29,20 @@ async function testBootstrap(
     expect(wallet[3]).toEqual('Yes');
     // Check NEO balance is a number 0 or greater
     expect(Number(wallet[4])).toBeGreaterThanOrEqual(0);
+    if (Number(wallet[4]) > 0) {
+      neoBalanceCount += 1;
+    }
     // Check GAS balance is a number 0 or greater
     expect(Number(wallet[5])).toBeGreaterThanOrEqual(0);
+    if (Number(wallet[5]) > 0) {
+      gasBalanceCount += 1;
+    }
   }
+  // Check that at least ceil(numWallets/2) have nonzero balances
+  // This is the minimum number of wallets that could have balance,
+  // so this checks that the transfers succeeded
+  expect(neoBalanceCount).toBeGreaterThanOrEqual(Math.ceil(numWallets / 2));
+  expect(gasBalanceCount).toBeGreaterThanOrEqual(Math.ceil(numWallets / 2));
 }
 
 describe('bootstrap', () => {
