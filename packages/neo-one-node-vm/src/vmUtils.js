@@ -18,10 +18,14 @@ const toNumber = (context: ExecutionContext, value: BN): number => {
 const shiftLeft = (value: BN, shift: BN): BN => value.mul(utils.TWO.pow(shift));
 
 const shiftRight = (value: BN, shift: BN): BN => {
-  let result = value.div(utils.TWO.pow(shift));
-  if (result.mul(shift).lt(utils.ZERO)) {
-    result = result.sub(utils.ONE);
+  let result = utils.ZERO;
+  if (new BN(utils.toSignedBuffer(value).length * 8).gt(shift)) {
+    result = value.div(utils.TWO.pow(shift));
+    if (result.mul(shift).lt(utils.ZERO)) {
+      result = result.sub(utils.ONE);
+    }
   }
+
   if (result.eq(utils.ZERO) && value.isNeg()) {
     result = utils.NEGATIVE_ONE;
   }
