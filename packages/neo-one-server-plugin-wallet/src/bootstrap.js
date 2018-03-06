@@ -25,7 +25,7 @@ import _ from 'lodash';
 import { of as _of } from 'rxjs/observable/of';
 
 import type { Wallet } from './WalletResourceType';
-import WalletPlugin from './WalletPlugin';
+import type WalletPlugin from './WalletPlugin';
 
 import constants from './constants';
 
@@ -112,11 +112,12 @@ async function createWallet({
   });
 }
 
-function getNumWallets(options): number {
+function getNumWallets(options: Object): number {
   const { wallets } = options;
-  if (wallets != null && typeof wallets === 'number') {
-    return wallets;
-  } else if (wallets != null && typeof wallets !== 'number') {
+  if (wallets != null) {
+    if (typeof wallets === 'number') {
+      return wallets;
+    }
     throw new Error('--wallets <number> option must be a number');
   }
 
@@ -157,7 +158,11 @@ async function createTransfers({
 
   let neo;
   let gas;
-  if (from != null) {
+  if (from == null) {
+    const seed = randomInt(100);
+    neo = randomIntDist(seed);
+    gas = randomIntDist(seed);
+  } else {
     const transferPercent = randomInt(75) / 100;
     neo = Math.ceil(
       transferPercent * Number(from.balances[common.NEO_ASSET_HASH]),
@@ -165,10 +170,6 @@ async function createTransfers({
     gas = Math.ceil(
       transferPercent * Number(from.balances[common.GAS_ASSET_HASH]),
     );
-  } else {
-    const seed = randomInt(100);
-    neo = randomIntDist(seed);
-    gas = randomIntDist(seed);
   }
 
   return [
