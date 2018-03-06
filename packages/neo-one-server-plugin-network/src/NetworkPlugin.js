@@ -12,6 +12,7 @@ import activateNetwork from './activateNetwork';
 import backupNode from './backupNode';
 import constants from './constants';
 import deactivateNetwork from './deactivateNetwork';
+import restoreNode from './restoreNode';
 import startNode from './startNode';
 
 export default class NetworkPlugin extends Plugin {
@@ -40,7 +41,7 @@ export default class NetworkPlugin extends Plugin {
   }
 
   get commands(): Array<(cliArgs: CLIArgs) => void> {
-    return [backupNode, startNode];
+    return [backupNode, restoreNode, startNode];
   }
 
   get interactive(): Array<InteractiveCommand> {

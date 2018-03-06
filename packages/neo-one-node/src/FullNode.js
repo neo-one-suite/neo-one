@@ -1,5 +1,10 @@
 /* @flow */
-import { type BackupRestoreOptions, backup } from '@neo-one/node-data-backup';
+import {
+  type BackupRestoreEnvironment,
+  type BackupRestoreOptions,
+  backup,
+  restore,
+} from '@neo-one/node-data-backup';
 import type { Subscription } from 'rxjs/Subscription';
 
 import path from 'path';
@@ -48,16 +53,31 @@ export default class FullNode {
       throw new Error('Cannot backup while running.');
     }
 
+    await backup({
+      log: this._options.log,
+      environment: this._getBackupEnvironment(),
+      options,
+    });
+  }
+
+  async restore(options: BackupRestoreOptions): Promise<void> {
+    if (this._subscription != null) {
+      throw new Error('Cannot backup while running.');
+    }
+
+    await restore({
+      log: this._options.log,
+      environment: this._getBackupEnvironment(),
+      options,
+    });
+  }
+
+  _getBackupEnvironment(): BackupRestoreEnvironment {
     const dataPath = getDataPath(this._options.environment.dataPath);
-    const backupEnvironment = {
+    return {
       dataPath,
       tmpPath: path.resolve(this._options.environment.dataPath, 'tmp'),
       readyPath: path.resolve(this._options.environment.dataPath, 'data.ready'),
     };
-    await backup({
-      log: this._options.log,
-      environment: backupEnvironment,
-      options,
-    });
   }
 }
