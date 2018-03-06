@@ -18,6 +18,7 @@ import WalletResourceType from './WalletResourceType';
 import activateWallet from './activateWallet';
 import constants from './constants';
 import deactivateWallet from './deactivateWallet';
+import bootstrap from './bootstrap';
 
 export default class WalletPlugin extends Plugin {
   walletResourceType: WalletResourceType = new WalletResourceType({
@@ -56,7 +57,7 @@ export default class WalletPlugin extends Plugin {
   }
 
   get interactive(): Array<InteractiveCommand> {
-    return [activateWallet(this), deactivateWallet(this)];
+    return [activateWallet(this), deactivateWallet(this), bootstrap(this)];
   }
 
   get createHooks(): Array<CreateHookConfig> {

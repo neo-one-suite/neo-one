@@ -1,14 +1,15 @@
 /* @flow */
-import type {
-  AllResources,
-  BaseResource,
-  DescribeTable,
-  ModifyResourceResponse,
+import {
+  type AllResources,
+  type BaseResource,
+  type DescribeTable,
+  type ModifyResourceResponse,
+  getTasksError,
 } from '@neo-one/server-plugin';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { filter, map, publishReplay, refCount } from 'rxjs/operators';
+import { filter, map, publishReplay, refCount, take } from 'rxjs/operators';
 import grpc from 'grpc';
 import proto from '@neo-one/server-grpc';
 
@@ -128,6 +129,27 @@ export default class Client {
     );
   }
 
+  getResource({
+    plugin,
+    resourceType,
+    name,
+    options,
+  }: {|
+    plugin: string,
+    resourceType: string,
+    name: string,
+    options: Object,
+  |}): Promise<?BaseResource> {
+    return this.getResource$({
+      plugin,
+      resourceType,
+      name,
+      options,
+    })
+      .pipe(take(1))
+      .toPromise();
+  }
+
   createResource$({
     plugin,
     resourceType,
@@ -149,6 +171,45 @@ export default class Client {
       options,
       cancel$,
     });
+  }
+
+  async createResource({
+    plugin,
+    resourceType,
+    name,
+    options,
+    cancel$,
+  }: {|
+    plugin: string,
+    resourceType: string,
+    name: string,
+    options: Object,
+    cancel$: Observable<void>,
+  |}): Promise<BaseResource> {
+    const response = await this.createResource$({
+      plugin,
+      resourceType,
+      name,
+      options,
+      cancel$,
+    }).toPromise();
+
+    const error = getTasksError(response.tasks);
+    if (error != null) {
+      throw new Error(error);
+    }
+
+    const resource = await this.getResource({
+      plugin,
+      resourceType,
+      name,
+      options,
+    });
+
+    if (resource == null) {
+      throw new Error(`Failed to find ${resourceType}: ${name}`);
+    }
+    return resource;
   }
 
   deleteResource$({

@@ -261,6 +261,7 @@ const createGet = ({
   const command = cli.vorpal
     .command(crud.command, crud.help)
     .option('-w, --watch', 'Watch for changes')
+    .option('-j, --json', 'Output as JSON')
     .action(async args => {
       const options = await crud.getCLIResourceOptions({
         cli,
@@ -271,9 +272,14 @@ const createGet = ({
       const resources$ = crud
         .getResources$({ client: cli.client, options })
         .pipe(
-          map(resources =>
-            cli.printList(resourceType.getListTable(resources), logUpdate),
-          ),
+          map(resources => {
+            const table = resourceType.getListTable(resources);
+            if (args.options.json) {
+              cli.vorpal.activeCommand.log(JSON.stringify(table));
+            } else {
+              cli.printList(table, logUpdate);
+            }
+          }),
         );
 
       cancel$ = new ReplaySubject();
