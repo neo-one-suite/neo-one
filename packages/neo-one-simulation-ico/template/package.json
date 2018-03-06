@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/simulation-ico-template",
-  "version": "1.0.0-alpha.22",
+  "version": "1.0.0-alpha.23",
   "private": true,
   "dependencies": {
     "@babel/polyfill": "7.0.0-beta.40",
