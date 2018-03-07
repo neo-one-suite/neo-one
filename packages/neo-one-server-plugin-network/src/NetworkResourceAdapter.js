@@ -440,7 +440,7 @@ export default class NetworkResourceAdapter {
         publicKey,
       };
     });
-    const secondsPerBlock = 1;
+    const secondsPerBlock = 15;
     const standbyValidators = configuration.map(({ publicKey }) =>
       common.ecPointToString(publicKey),
     );

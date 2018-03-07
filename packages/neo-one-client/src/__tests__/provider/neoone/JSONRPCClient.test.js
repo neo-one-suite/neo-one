@@ -125,6 +125,10 @@ describe('JSONRPCClient', () => {
       method: 'getNetworkSettings',
       args: [],
     },
+    {
+      method: 'startConsensusNow',
+      args: [],
+    },
   ];
 
   beforeEach(() => {

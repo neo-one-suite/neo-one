@@ -838,4 +838,13 @@ describe('NEOONEDataProvider', () => {
     const result = await provider.call(contract, method, params);
     expect(result).toMatchSnapshot();
   });
+
+  test('startConsensusNow', () => {
+    // $FlowFixMe
+    provider._client.startConsensusNow = jest.fn();
+
+    const result = provider.startConsensusNow();
+    expect(result).toBeUndefined();
+    expect(result).toMatchSnapshot();
+  });
 });

@@ -586,6 +586,12 @@ export interface DataProvider {
   ): Promise<RawInvocationResult>;
 }
 
+export interface DeveloperProvider {
+  +network: NetworkType;
+
+  startConsensusNow(): void;
+}
+
 export interface UserAccountProvider {
   +type: string;
   +currentAccount$: Observable<?UserAccount>;

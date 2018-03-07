@@ -7,6 +7,8 @@ import {
 } from '@neo-one/server-plugin';
 import {
   Client,
+  DeveloperClient,
+  NEOONEDataProvider,
   LocalKeyStore,
   LocalUserAccountProvider,
   LocalMemoryStore,
@@ -271,6 +273,13 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         Math.ceil(wallets.length / 2),
       );
 
+      const developerClient = new DeveloperClient(
+        new NEOONEDataProvider({
+          network: network.name,
+          rpcURL: network.nodes[0].rpcAddress,
+        }),
+      );
+
       let firstTransferBatch = await Promise.all(
         firstWalletBatch.map(walletName =>
           createTransfers({
@@ -286,6 +295,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
       const firstTransactionBatch = await client.transfer(firstTransferBatch, {
         from: masterWallet.accountID,
       });
+      await developerClient.startConsensusNow();
       await firstTransactionBatch.confirmed();
 
       const fromWallets = await Promise.all(
@@ -319,7 +329,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           client.transfer(transfer[0], { from: transfer[1].accountID }),
         ),
       );
-
+      await developerClient.startConsensusNow();
       await Promise.all(
         secondTransactionBatch.map(transaction => transaction.confirmed()),
       );

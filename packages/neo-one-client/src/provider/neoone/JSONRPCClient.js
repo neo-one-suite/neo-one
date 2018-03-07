@@ -210,4 +210,10 @@ export default class JSONRPCClient {
       method: 'getnetworksettings',
     });
   }
+
+  startConsensusNow(): Promise<void> {
+    return this._provider.request({
+      method: 'runconsensusnow',
+    });
+  }
 }

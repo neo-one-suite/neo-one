@@ -374,6 +374,13 @@ export default ({
         issueGASFee: issueGASFee.toString(),
       };
     },
+    runconsensusnow: () => {
+      if (node.consensus) {
+        node.consensus.runConsensusNow();
+      } else {
+        throw new Error('Something went wrong. consensus is empty');
+      }
+    },
   };
   server = jayson.server(
     _.mapValues(handlers, handler => async (...args: $FlowFixMe): Promise<

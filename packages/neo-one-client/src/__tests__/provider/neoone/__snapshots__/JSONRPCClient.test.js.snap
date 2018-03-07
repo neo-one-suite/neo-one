@@ -240,6 +240,14 @@ Array [
 ]
 `;
 
+exports[`JSONRPCClient startConsensusNow 1`] = `
+Array [
+  Object {
+    "method": "runconsensusnow",
+  },
+]
+`;
+
 exports[`JSONRPCClient testInvocation 1`] = `
 Array [
   Object {

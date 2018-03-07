@@ -110,3 +110,5 @@ NEOONEDataProvider {
   "network": "foo",
 }
 `;
+
+exports[`NEOONEDataProvider startConsensusNow 1`] = `undefined`;

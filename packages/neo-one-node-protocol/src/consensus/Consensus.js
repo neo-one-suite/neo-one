@@ -157,6 +157,10 @@ export default class Consensus {
     });
   }
 
+  runConsensusNow(): void {
+    this._queue.write({ type: 'timer' });
+  }
+
   _handleResult(result: Result<Context>): Context {
     this._node.blockchain.log({
       event: 'CONSENSUS_RESULT',

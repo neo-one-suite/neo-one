@@ -41,6 +41,7 @@ import type {
   Contract,
   ContractParameter,
   DataProvider,
+  DeveloperProvider,
   GetOptions,
   Hash160String,
   Hash256String,
@@ -70,7 +71,8 @@ export type NEOONEDataProviderOptions = {|
   iterBlocksFetchTimeoutMS?: number,
 |};
 
-export default class NEOONEDataProvider implements DataProvider {
+export default class NEOONEDataProvider
+  implements DataProvider, DeveloperProvider {
   network: NetworkType;
 
   _client: JSONRPCClient;
@@ -281,6 +283,10 @@ export default class NEOONEDataProvider implements DataProvider {
       }),
     });
     return this.testInvoke(testTransaction.serializeWire().toString('hex'));
+  }
+
+  startConsensusNow(): void {
+    this._client.startConsensusNow();
   }
 
   _convertBlock(block: BlockJSON): Block {

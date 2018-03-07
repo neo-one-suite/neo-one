@@ -1,6 +1,7 @@
 /* @flow */
 export { default as Client } from './Client';
 export { default as ReadClient } from './ReadClient';
+export { default as DeveloperClient } from './DeveloperClient';
 
 export * from './user';
 export * from './provider';

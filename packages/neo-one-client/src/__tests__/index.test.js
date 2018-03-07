@@ -4,6 +4,7 @@ describe('exported api', () => {
   const EXPECTED = [
     'Client',
     'ReadClient',
+    'DeveloperClient',
     // ./user
     'LocalUserAccountProvider',
     'LocalKeyStore',
