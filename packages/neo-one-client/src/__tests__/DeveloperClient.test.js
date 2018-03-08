@@ -26,4 +26,20 @@ describe('DeveloperClient', () => {
 
     expect(result).toBeUndefined();
   });
+
+  test('fastForwardOffset', async () => {
+    // $FlowFixMe
+    provider.fastForwardOffset = jest.fn();
+    const result = await developerClient.fastForwardOffset(10);
+
+    expect(result).toBeUndefined();
+  });
+
+  test('fastForwardOffset', async () => {
+    // $FlowFixMe
+    provider.fastForwardToTime = jest.fn();
+    const result = await developerClient.fastForwardToTime(10);
+
+    expect(result).toBeUndefined();
+  });
 });

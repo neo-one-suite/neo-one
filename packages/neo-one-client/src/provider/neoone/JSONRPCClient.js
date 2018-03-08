@@ -224,4 +224,18 @@ export default class JSONRPCClient {
       params: [options],
     });
   }
+
+  fastForwardOffset(seconds: number): Promise<void> {
+    return this._provider.request({
+      method: 'fastforwardoffset',
+      params: [seconds],
+    });
+  }
+
+  fastForwardToTime(seconds: number): Promise<void> {
+    return this._provider.request({
+      method: 'fastforwardtotime',
+      params: [seconds],
+    });
+  }
 }

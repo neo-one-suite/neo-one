@@ -26,6 +26,7 @@ import {
 } from './context';
 import type { InternalOptions } from './Consensus';
 import type Node from '../Node';
+import type ConsensusContext from './ConsensusContext';
 
 import {
   checkExpectedView,
@@ -71,10 +72,12 @@ const requestChangeView = ({
   context: contextIn,
   node,
   privateKey,
+  consensusContext,
 }: {|
   context: Context,
   node: Node,
   privateKey: PrivateKey,
+  consensusContext: ConsensusContext,
 |}): Result<Context> => {
   let context = contextIn;
 
@@ -90,6 +93,7 @@ const requestChangeView = ({
       blockchain: node.blockchain,
       context,
       viewNumber,
+      consensusContext,
     });
   }
 
@@ -105,10 +109,12 @@ export default async ({
   context: contextIn,
   node,
   options: { privateKey, feeAddress, privateNet },
+  consensusContext,
 }: {|
   context: Context,
   node: Node,
   options: InternalOptions,
+  consensusContext: ConsensusContext,
 |}): Promise<Result<Context>> => {
   let context = contextIn;
   if (context.type === 'primary' && !(context instanceof RequestSentContext)) {
@@ -169,7 +175,7 @@ export default async ({
           blockIndex: context.blockIndex,
           nonce,
           timestamp: Math.max(
-            commonUtils.nowSeconds(),
+            consensusContext.currentCustomTime(),
             previousHeader.timestamp + 1,
           ),
           nextConsensus: crypto.getConsensusAddress(validators),
@@ -220,6 +226,7 @@ export default async ({
       context,
       node,
       privateKey,
+      consensusContext,
     });
   }
 

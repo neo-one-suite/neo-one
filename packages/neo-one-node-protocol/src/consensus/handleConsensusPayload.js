@@ -10,11 +10,10 @@ import {
   crypto,
 } from '@neo-one/client-core';
 
-import { utils as commonUtils } from '@neo-one/utils';
-
 import { type Context, HeaderContext, RequestReceivedContext } from './context';
 import type Node from '../Node';
 import type { Result } from './types';
+import type ConsensusContext from './ConsensusContext';
 
 import {
   addTransaction,
@@ -27,11 +26,13 @@ const handleChangeView = ({
   context: contextIn,
   node,
   payload,
+  consensusContext,
   message,
 }: {|
   context: Context,
   node: Node,
   payload: ConsensusPayload,
+  consensusContext: ConsensusContext,
   message: ChangeViewConsensusMessage,
 |}): Result<Context> => {
   let context = contextIn;
@@ -41,7 +42,12 @@ const handleChangeView = ({
     expectedView[payload.validatorIndex] = viewNumber;
     context = context.cloneExpectedView({ expectedView });
     if (checkExpectedView({ context, viewNumber })) {
-      return initializeConsensus({ node, context, viewNumber });
+      return initializeConsensus({
+        node,
+        context,
+        viewNumber,
+        consensusContext,
+      });
     }
   }
 
@@ -55,12 +61,14 @@ const handlePrepareRequest = async ({
   node,
   privateKey,
   payload,
+  consensusContext,
   message,
 }: {|
   context: Context,
   node: Node,
   privateKey: PrivateKey,
   payload: ConsensusPayload,
+  consensusContext: ConsensusContext,
   message: PrepareRequestConsensusMessage,
 |}): Promise<Result<Context>> => {
   let context = contextIn;
@@ -68,7 +76,8 @@ const handlePrepareRequest = async ({
     context.type !== 'backup' ||
     context instanceof RequestReceivedContext ||
     payload.validatorIndex !== context.primaryIndex ||
-    payload.timestamp > commonUtils.nowSeconds() + TEN_MINUTES_IN_SECONDS
+    payload.timestamp >
+      consensusContext.currentCustomTime() + TEN_MINUTES_IN_SECONDS
   ) {
     return { context };
   }
@@ -121,6 +130,7 @@ const handlePrepareRequest = async ({
         privateKey,
         transaction,
         verify: false,
+        consensusContext,
       });
       if (!(result.context instanceof RequestReceivedContext)) {
         return result;
@@ -136,6 +146,7 @@ const handlePrepareRequest = async ({
     privateKey,
     transaction: message.minerTransaction,
     verify: true,
+    consensusContext,
   });
   if (!(result.context instanceof RequestReceivedContext)) {
     return result;
@@ -182,11 +193,13 @@ export default async ({
   node,
   privateKey,
   payload,
+  consensusContext,
 }: {|
   context: Context,
   node: Node,
   privateKey: PrivateKey,
   payload: ConsensusPayload,
+  consensusContext: ConsensusContext,
 |}): Promise<Result<Context>> => {
   const { consensusMessage } = payload;
   if (
@@ -207,6 +220,7 @@ export default async ({
         context,
         node,
         payload,
+        consensusContext,
         message: ((consensusMessage: $FlowFixMe): ChangeViewConsensusMessage),
       });
     case 0x20:
@@ -215,6 +229,7 @@ export default async ({
         node,
         privateKey,
         payload,
+        consensusContext,
         message: ((consensusMessage: $FlowFixMe): PrepareRequestConsensusMessage),
       });
     case 0x21:

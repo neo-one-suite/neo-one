@@ -2,6 +2,7 @@
 import BigNumber from 'bignumber.js';
 
 import { common } from '@neo-one/client-core';
+import { utils } from '@neo-one/utils';
 
 import DeveloperClient from '../DeveloperClient';
 import Client from '../Client';
@@ -10,6 +11,7 @@ import LocalKeyStore from '../user/keystore/LocalKeyStore';
 import LocalMemoryStore from '../user/keystore/LocalMemoryStore';
 import LocalUserAccountProvider from '../user/LocalUserAccountProvider';
 import type { TransactionResult, TransactionReceipt } from '../types';
+
 import { wifToPrivateKey } from '../helpers';
 
 async function getWalletInfo(
@@ -105,6 +107,37 @@ async function setupTransaction(
   return transaction;
 }
 
+async function checkWalletBalance(
+  walletName: string,
+  networkName: string,
+): Promise<void> {
+  const walletOutput = await one.execute(
+    `describe wallet ${walletName} --network ${networkName} --json`,
+  );
+  const walletDescribe = one.parseJSON(walletOutput);
+  expect(walletDescribe[7][1].table[1][1]).toEqual('1000');
+}
+
+async function confirmTransaction(
+  transaction: TransactionResult<TransactionReceipt>,
+): Promise<void> {
+  let done = false;
+  await Promise.all([
+    transaction.confirmed().then(() => {
+      done = true;
+    }),
+    new Promise((resolve, reject) =>
+      setTimeout(() => {
+        if (done) {
+          resolve();
+        } else {
+          reject(new Error('Timed out'));
+        }
+      }, 2000),
+    ),
+  ]);
+}
+
 describe('DeverloperClient', () => {
   test('runConsensusNow', async () => {
     const network = 'e2e-1';
@@ -133,12 +166,7 @@ describe('DeverloperClient', () => {
       ),
     ]);
 
-    const walletOutput = await one.execute(
-      `describe wallet ${walletName} --network ${network} --json`,
-    );
-    const walletDescribe = one.parseJSON(walletOutput);
-
-    expect(walletDescribe[7][1].table[1][1]).toEqual('1000');
+    await checkWalletBalance(walletName, network);
   });
 
   test('updateSettings', async () => {
@@ -154,26 +182,44 @@ describe('DeverloperClient', () => {
     await new Promise(resolve => setTimeout(() => resolve(), 15000));
     const transaction = await setupTransaction(client, master, wallet);
 
-    let done = false;
-    await Promise.all([
-      transaction.confirmed().then(() => {
-        done = true;
-      }),
-      new Promise((resolve, reject) =>
-        setTimeout(() => {
-          if (done) {
-            resolve();
-          } else {
-            reject(new Error('Timed out'));
-          }
-        }, 2000),
-      ),
-    ]);
+    await confirmTransaction(transaction);
 
-    const walletOutput = await one.execute(
-      `describe wallet ${walletName} --network ${network} --json`,
+    await checkWalletBalance(walletName, network);
+  });
+
+  test('fastForwardOffset', async () => {
+    const network = 'e2e-3';
+    const walletName = 'wallet-3';
+    const offsetSeconds = 15;
+
+    const { developerClient, client, master, wallet } = await setupClients(
+      network,
+      walletName,
     );
-    const walletDescribe = one.parseJSON(walletOutput);
-    expect(walletDescribe[7][1].table[1][1]).toEqual('1000');
+    const transaction = await setupTransaction(client, master, wallet);
+
+    await developerClient.fastForwardOffset(offsetSeconds);
+
+    await confirmTransaction(transaction);
+
+    await checkWalletBalance(walletName, network);
+  });
+
+  test('fastForwardToTime', async () => {
+    const network = 'e2e-4';
+    const walletName = 'wallet-4';
+    const offsetSeconds = 15;
+
+    const { developerClient, client, master, wallet } = await setupClients(
+      network,
+      walletName,
+    );
+    const transaction = await setupTransaction(client, master, wallet);
+
+    await developerClient.fastForwardToTime(utils.nowSeconds() + offsetSeconds);
+
+    await confirmTransaction(transaction);
+
+    await checkWalletBalance(walletName, network);
   });
 });

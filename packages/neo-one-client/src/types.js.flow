@@ -595,6 +595,8 @@ export interface DeveloperProvider {
 
   runConsensusNow(): Promise<void>;
   updateSettings(options: Options): Promise<void>;
+  fastForwardOffset(seconds: number): Promise<void>;
+  fastForwardToTime(seconds: number): Promise<void>;
 }
 
 export interface UserAccountProvider {

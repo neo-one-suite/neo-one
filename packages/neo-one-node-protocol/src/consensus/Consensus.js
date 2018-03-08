@@ -17,6 +17,7 @@ import { map, switchMap, take } from 'rxjs/operators';
 
 import ConsensusQueue from './ConsensusQueue';
 import type { Context } from './context';
+import ConsensusContext from './ConsensusContext';
 import type { Event, Result } from './types';
 import type Node from '../Node';
 
@@ -44,6 +45,7 @@ export default class Consensus {
   _timer: ?TimeoutID;
   _options$: Observable<Options>;
   _node: Node;
+  _consensusContext: ConsensusContext;
 
   constructor({
     options$,
@@ -56,6 +58,7 @@ export default class Consensus {
     this._timer = null;
     this._options$ = options$;
     this._node = node;
+    this._consensusContext = new ConsensusContext({ fastForwardSeconds: 0 });
   }
 
   start$(): Observable<void> {
@@ -84,6 +87,7 @@ export default class Consensus {
     const initialResult = await initializeNewConsensus({
       blockchain: this._node.blockchain,
       publicKey: options.publicKey,
+      consensusContext: this._consensusContext,
     });
 
     await AsyncIterableX.from(this._queue)
@@ -100,6 +104,7 @@ export default class Consensus {
               result = await handlePersistBlock({
                 blockchain: this._node.blockchain,
                 publicKey: options.publicKey,
+                consensusContext: this._consensusContext,
               });
               break;
             case 'handleConsensusPayload':
@@ -108,6 +113,7 @@ export default class Consensus {
                 node: this._node,
                 privateKey: options.privateKey,
                 payload: event.payload,
+                consensusContext: this._consensusContext,
               });
               break;
             case 'handleTransactionReceived':
@@ -116,6 +122,7 @@ export default class Consensus {
                 node: this._node,
                 privateKey: options.privateKey,
                 transaction: event.transaction,
+                consensusContext: this._consensusContext,
               });
               break;
             case 'timer':
@@ -123,6 +130,7 @@ export default class Consensus {
                 context,
                 node: this._node,
                 options,
+                consensusContext: this._consensusContext,
               });
               break;
             default:
@@ -163,6 +171,28 @@ export default class Consensus {
       this._queue.write({ type: 'timer' });
     } else {
       throw new Error('Can only force consensus on a private network.');
+    }
+  }
+
+  currentCustomTime(): number {
+    return this._consensusContext.currentCustomTime();
+  }
+
+  async fastForwardOffset(seconds: number): Promise<void> {
+    const options = await this._options$.pipe(take(1)).toPromise();
+    if (options.privateNet) {
+      this._consensusContext.fastForwardOffset(seconds);
+    } else {
+      throw new Error('Can only fast forward on a private network.');
+    }
+  }
+
+  async fastForwardToTime(seconds: number): Promise<void> {
+    const options = await this._options$.pipe(take(1)).toPromise();
+    if (options.privateNet) {
+      this._consensusContext.fastForwardToTime(seconds);
+    } else {
+      throw new Error('Can only fast forward on a private network.');
     }
   }
 

@@ -294,6 +294,14 @@ export default class NEOONEDataProvider
     return this._client.updateSettings(options);
   }
 
+  fastForwardOffset(seconds: number): Promise<void> {
+    return this._client.fastForwardOffset(seconds);
+  }
+
+  fastForwardToTime(seconds: number): Promise<void> {
+    return this._client.fastForwardToTime(seconds);
+  }
+
   _convertBlock(block: BlockJSON): Block {
     return {
       version: block.version,

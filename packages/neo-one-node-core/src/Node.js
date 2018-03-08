@@ -4,6 +4,9 @@ import type { Endpoint } from './Network';
 
 export type Consensus = {
   runConsensusNow(): Promise<void>,
+  fastForwardOffset(seconds: number): Promise<void>,
+  fastForwardToTime(seconds: number): Promise<void>,
+  currentCustomTime(): number,
 };
 
 export interface Node {

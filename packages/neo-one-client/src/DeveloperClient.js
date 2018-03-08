@@ -15,4 +15,12 @@ export default class DeveloperClient {
   async updateSettings(options: Options): Promise<void> {
     await this._developerProvider.updateSettings(options);
   }
+
+  async fastForwardOffset(seconds: number): Promise<void> {
+    await this._developerProvider.fastForwardOffset(seconds);
+  }
+
+  async fastForwardToTime(seconds: number): Promise<void> {
+    await this._developerProvider.fastForwardToTime(seconds);
+  }
 }

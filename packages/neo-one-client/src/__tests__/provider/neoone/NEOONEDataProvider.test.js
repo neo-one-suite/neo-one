@@ -854,4 +854,20 @@ describe('NEOONEDataProvider', () => {
 
     expect(result).toBeUndefined();
   });
+
+  test('fastForwardOffset', () => {
+    // $FlowFixMe
+    provider._client.fastForwardOffset = jest.fn();
+    const result = provider.fastForwardOffset(10);
+
+    expect(result).toBeUndefined();
+  });
+
+  test('fastForwardToTime', () => {
+    // $FlowFixMe
+    provider._client.fastForwardToTime = jest.fn();
+    const result = provider.fastForwardToTime(10);
+
+    expect(result).toBeUndefined();
+  });
 });
