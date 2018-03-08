@@ -126,8 +126,12 @@ describe('JSONRPCClient', () => {
       args: [],
     },
     {
-      method: 'startConsensusNow',
+      method: 'runConsensusNow',
       args: [],
+    },
+    {
+      method: 'updateSettings',
+      args: [{ secondsPerBlock: 10 }],
     },
   ];
 

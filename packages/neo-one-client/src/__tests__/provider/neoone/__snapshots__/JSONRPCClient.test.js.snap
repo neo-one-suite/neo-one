@@ -240,7 +240,7 @@ Array [
 ]
 `;
 
-exports[`JSONRPCClient startConsensusNow 1`] = `
+exports[`JSONRPCClient runConsensusNow 1`] = `
 Array [
   Object {
     "method": "runconsensusnow",
@@ -265,6 +265,19 @@ Array [
     "method": "invokescript",
     "params": Array [
       "12",
+    ],
+  },
+]
+`;
+
+exports[`JSONRPCClient updateSettings 1`] = `
+Array [
+  Object {
+    "method": "updatesettings",
+    "params": Array [
+      Object {
+        "secondsPerBlock": 10,
+      },
     ],
   },
 ]

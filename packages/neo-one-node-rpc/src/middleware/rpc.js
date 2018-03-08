@@ -378,8 +378,17 @@ export default ({
       if (node.consensus) {
         node.consensus.runConsensusNow();
       } else {
-        throw new Error('Something went wrong. consensus is empty');
+        throw new Error('This node does not support trigger consensus.');
       }
+    },
+    updatesettings: args => {
+      const { settings } = blockchain;
+      const newSettings = {
+        ...settings,
+        secondsPerBlock: args[0].secondsPerBlock,
+      };
+
+      blockchain.updateSettings(newSettings);
     },
   };
   server = jayson.server(

@@ -123,6 +123,7 @@ type PeerHealth = {
 export default class Node implements INode {
   blockchain: Blockchain;
   _network: Network<Message, PeerData, PeerHealth>;
+  // $FlowFixMe
   consensus: ?Consensus;
   _options$: Observable<Options>;
 

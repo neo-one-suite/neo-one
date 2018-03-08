@@ -3,19 +3,27 @@ import DeveloperClient from '../DeveloperClient';
 import NEOONEDataProvider from '../provider/neoone/NEOONEDataProvider';
 
 describe('DeveloperClient', () => {
-  const developerClient = new DeveloperClient(
-    new NEOONEDataProvider({
-      network: 'net',
-      rpcURL: 'rpc',
-    }),
-  );
+  const provider = new NEOONEDataProvider({
+    network: 'net',
+    rpcURL: 'rpc',
+  });
+  const developerClient = new DeveloperClient(provider);
 
-  test('startConsensusNow', () => {
+  test('runConsensusNow', async () => {
     // $FlowFixMe
-    developerClient.developerProvider.startConsensusNow = jest.fn();
-    const result = developerClient.startConsensusNow();
+    provider.runConsensusNow = jest.fn();
+    const result = await developerClient.runConsensusNow();
 
     expect(result).toBeUndefined();
-    expect(result).toMatchSnapshot();
+  });
+
+  test('updateSettings', async () => {
+    // $FlowFixMe
+    provider.updateSettings = jest.fn();
+    const result = await developerClient.updateSettings({
+      secondsPerBlock: 10,
+    });
+
+    expect(result).toBeUndefined();
   });
 });

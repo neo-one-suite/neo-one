@@ -13,7 +13,7 @@ import type { Observable } from 'rxjs/Observable';
 
 import { finalize } from '@neo-one/utils';
 import { scan } from 'ix/asynciterable/pipe/index';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 
 import ConsensusQueue from './ConsensusQueue';
 import type { Context } from './context';
@@ -157,8 +157,13 @@ export default class Consensus {
     });
   }
 
-  runConsensusNow(): void {
-    this._queue.write({ type: 'timer' });
+  async runConsensusNow(): Promise<void> {
+    const options = await this._options$.pipe(take(1)).toPromise();
+    if (options.privateNet) {
+      this._queue.write({ type: 'timer' });
+    } else {
+      throw new Error('Can only force consensus on a private network.');
+    }
   }
 
   _handleResult(result: Result<Context>): Context {

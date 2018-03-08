@@ -58,6 +58,7 @@ import type {
   TransactionReceipt,
   UnspentOutput,
   Validator,
+  Options,
 } from '../../types';
 import AsyncBlockIterator from '../../AsyncBlockIterator';
 import JSONRPCClient from './JSONRPCClient';
@@ -285,8 +286,12 @@ export default class NEOONEDataProvider
     return this.testInvoke(testTransaction.serializeWire().toString('hex'));
   }
 
-  startConsensusNow(): void {
-    this._client.startConsensusNow();
+  runConsensusNow(): Promise<void> {
+    return this._client.runConsensusNow();
+  }
+
+  updateSettings(options: Options): Promise<void> {
+    return this._client.updateSettings(options);
   }
 
   _convertBlock(block: BlockJSON): Block {

@@ -536,6 +536,10 @@ export type GetOptions = {|
   timeoutMS?: number,
 |};
 
+export type Options = {|
+  secondsPerBlock: number,
+|};
+
 export type TransactionResult<TTransactionReceipt> = {|
   transaction: Transaction,
   confirmed: (options?: GetOptions) => Promise<TTransactionReceipt>,
@@ -589,7 +593,8 @@ export interface DataProvider {
 export interface DeveloperProvider {
   +network: NetworkType;
 
-  startConsensusNow(): void;
+  runConsensusNow(): Promise<void>;
+  updateSettings(options: Options): Promise<void>;
 }
 
 export interface UserAccountProvider {

@@ -839,12 +839,19 @@ describe('NEOONEDataProvider', () => {
     expect(result).toMatchSnapshot();
   });
 
-  test('startConsensusNow', () => {
+  test('runConsensusNow', () => {
     // $FlowFixMe
-    provider._client.startConsensusNow = jest.fn();
+    provider._client.runConsensusNow = jest.fn();
 
-    const result = provider.startConsensusNow();
+    const result = provider.runConsensusNow();
     expect(result).toBeUndefined();
-    expect(result).toMatchSnapshot();
+  });
+
+  test('updateSettings', () => {
+    // $FlowFixMe
+    provider._client.updateSettings = jest.fn();
+    const result = provider.updateSettings({ secondsPerBlock: 10 });
+
+    expect(result).toBeUndefined();
   });
 });
