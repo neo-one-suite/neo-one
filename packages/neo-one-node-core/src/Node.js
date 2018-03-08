@@ -3,7 +3,7 @@ import type { Transaction, UInt256Hex } from '@neo-one/client-core';
 import type { Endpoint } from './Network';
 
 export type Consensus = {
-  runConsensusNow(): void,
+  runConsensusNow(): Promise<void>,
 };
 
 export interface Node {

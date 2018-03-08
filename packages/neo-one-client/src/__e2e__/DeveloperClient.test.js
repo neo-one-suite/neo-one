@@ -9,6 +9,7 @@ import NEOONEProvider from '../provider/neoone/NEOONEProvider';
 import LocalKeyStore from '../user/keystore/LocalKeyStore';
 import LocalMemoryStore from '../user/keystore/LocalMemoryStore';
 import LocalUserAccountProvider from '../user/LocalUserAccountProvider';
+import type { TransactionResult, TransactionReceipt } from '../types';
 import { wifToPrivateKey } from '../helpers';
 
 async function getWalletInfo(
@@ -37,7 +38,7 @@ async function setupNetwork(networkName: string): Promise<string> {
   return description[3][1].table[1][3];
 }
 
-async function setupTransaction(
+async function setupClients(
   networkName: string,
   walletName: string,
 ): Promise<Object> {
@@ -46,24 +47,27 @@ async function setupTransaction(
   const rpcURL = await setupNetwork(networkName);
   await one.execute(`create wallet ${walletName} --network ${networkName}`);
 
-  const master = await getWalletInfo(masterWallet, networkName);
-  const wallet = await getWalletInfo(walletName, networkName);
+  const [master, wallet] = await Promise.all([
+    getWalletInfo(masterWallet, networkName),
+    getWalletInfo(walletName, networkName),
+  ]);
 
   const keystore = new LocalKeyStore({
     store: new LocalMemoryStore(),
   });
 
-  await keystore.addAccount({
-    network: networkName,
-    name: masterWallet,
-    privateKey: wifToPrivateKey(master.privateKey),
-  });
-
-  await keystore.addAccount({
-    network: networkName,
-    name: walletName,
-    privateKey: wifToPrivateKey(wallet.privateKey),
-  });
+  await Promise.all([
+    keystore.addAccount({
+      network: networkName,
+      name: masterWallet,
+      privateKey: wifToPrivateKey(master.privateKey),
+    }),
+    keystore.addAccount({
+      network: networkName,
+      name: walletName,
+      privateKey: wifToPrivateKey(wallet.privateKey),
+    }),
+  ]);
 
   const provider = new NEOONEProvider({
     options: [{ network: networkName, rpcURL }],
@@ -78,6 +82,19 @@ async function setupTransaction(
 
   const developerClient = new DeveloperClient(provider.read(networkName));
 
+  return {
+    developerClient,
+    client,
+    master,
+    wallet,
+  };
+}
+
+async function setupTransaction(
+  client: Client<LocalUserAccountProvider<NEOONEProvider>>,
+  master: Object,
+  wallet: Object,
+): Promise<TransactionResult<TransactionReceipt>> {
   const transaction = await client.transfer(
     new BigNumber(1000),
     common.NEO_ASSET_HASH,
@@ -85,73 +102,78 @@ async function setupTransaction(
     { from: master.accountID },
   );
 
-  return {
-    developerClient,
-    transaction,
-  };
+  return transaction;
 }
 
 describe('DeverloperClient', () => {
   test('runConsensusNow', async () => {
-    const network = 'e2e';
+    const network = 'e2e-1';
     const walletName = 'wallet-1';
 
-    const { developerClient, transaction } = await setupTransaction(
+    const { developerClient, client, master, wallet } = await setupClients(
       network,
       walletName,
     );
+    const transaction = await setupTransaction(client, master, wallet);
 
-    const done = Promise.all([
-      transaction.confirmed(),
+    let done = false;
+    await Promise.all([
+      transaction.confirmed().then(() => {
+        done = true;
+      }),
       developerClient.runConsensusNow(),
-    ]).then(() => true);
-
-    await new Promise((resolve, reject) =>
-      setTimeout(() => {
-        if (done) {
-          resolve();
-        } else {
-          reject(new Error('Timed out'));
-        }
-      }, 2000),
-    );
+      new Promise((resolve, reject) =>
+        setTimeout(() => {
+          if (done) {
+            resolve();
+          } else {
+            reject(new Error('Timed out'));
+          }
+        }, 2000),
+      ),
+    ]);
 
     const walletOutput = await one.execute(
-      `get wallet --network ${network} --json`,
+      `describe wallet ${walletName} --network ${network} --json`,
     );
-    const wallets = one.parseJSON(walletOutput);
+    const walletDescribe = one.parseJSON(walletOutput);
 
-    expect(wallets[2][4]).toEqual('1000');
+    expect(walletDescribe[7][1].table[1][1]).toEqual('1000');
   });
 
   test('updateSettings', async () => {
-    const network = 'e2e';
-    const walletName = 'wallet-1';
+    const network = 'e2e-2';
+    const walletName = 'wallet-2';
 
-    const { developerClient, transaction } = await setupTransaction(
+    const { developerClient, client, master, wallet } = await setupClients(
       network,
       walletName,
     );
 
     await developerClient.updateSettings({ secondsPerBlock: 1 });
+    await new Promise(resolve => setTimeout(() => resolve(), 15000));
+    const transaction = await setupTransaction(client, master, wallet);
 
-    const done = transaction.confirmed();
-
-    await new Promise((resolve, reject) =>
-      setTimeout(() => {
-        if (done) {
-          resolve();
-        } else {
-          reject(new Error('Timed out'));
-        }
-      }, 2000),
-    );
+    let done = false;
+    await Promise.all([
+      transaction.confirmed().then(() => {
+        done = true;
+      }),
+      new Promise((resolve, reject) =>
+        setTimeout(() => {
+          if (done) {
+            resolve();
+          } else {
+            reject(new Error('Timed out'));
+          }
+        }, 2000),
+      ),
+    ]);
 
     const walletOutput = await one.execute(
-      `get wallet --network ${network} --json`,
+      `describe wallet ${walletName} --network ${network} --json`,
     );
-    const wallets = one.parseJSON(walletOutput);
-
-    expect(wallets[2][4]).toEqual('1000');
+    const walletDescribe = one.parseJSON(walletOutput);
+    expect(walletDescribe[7][1].table[1][1]).toEqual('1000');
   });
 });

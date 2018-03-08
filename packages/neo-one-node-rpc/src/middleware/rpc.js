@@ -374,11 +374,11 @@ export default ({
         issueGASFee: issueGASFee.toString(),
       };
     },
-    runconsensusnow: () => {
+    runconsensusnow: async () => {
       if (node.consensus) {
-        node.consensus.runConsensusNow();
+        await node.consensus.runConsensusNow();
       } else {
-        throw new Error('This node does not support trigger consensus.');
+        throw new Error('This node does not support triggering consensus.');
       }
     },
     updatesettings: args => {
