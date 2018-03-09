@@ -71,7 +71,8 @@ export default async ({
   );
   const ready =
     options.rpcURLs.length === 0 ||
-    (index != null && blockchain.currentBlockIndex >= index - options.offset);
+    index == null ||
+    blockchain.currentBlockIndex >= index - options.offset;
 
   return { ready, index };
 };

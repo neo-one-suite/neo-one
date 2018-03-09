@@ -27,6 +27,7 @@ export default ({
         log({
           event: 'READY_HEALTH_CHECK_ERROR',
           index,
+          noIndex: index == null,
           currentBlockIndex: blockchain.currentBlockIndex,
         });
         ctx.status = 500;
