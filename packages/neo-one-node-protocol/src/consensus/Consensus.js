@@ -15,9 +15,9 @@ import { finalize } from '@neo-one/utils';
 import { scan } from 'ix/asynciterable/pipe/index';
 import { map, switchMap, take } from 'rxjs/operators';
 
+import ConsensusContext from './ConsensusContext';
 import ConsensusQueue from './ConsensusQueue';
 import type { Context } from './context';
-import ConsensusContext from './ConsensusContext';
 import type { Event, Result } from './types';
 import type Node from '../Node';
 

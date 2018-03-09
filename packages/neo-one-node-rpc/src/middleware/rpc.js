@@ -394,14 +394,14 @@ export default ({
       if (node.consensus) {
         await node.consensus.fastForwardOffset(args[0]);
       } else {
-        throw new Error('This node does not support triggering consensus.');
+        throw new Error('This node does not support fast forwarding.');
       }
     },
     fastforwardtotime: async args => {
       if (node.consensus != null) {
         await node.consensus.fastForwardToTime(args[0]);
       } else {
-        throw new Error('This node does not support triggering consensus.');
+        throw new Error('This node does not support fast forwarding.');
       }
     },
   };

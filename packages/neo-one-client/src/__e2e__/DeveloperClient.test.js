@@ -10,14 +10,33 @@ import NEOONEProvider from '../provider/neoone/NEOONEProvider';
 import LocalKeyStore from '../user/keystore/LocalKeyStore';
 import LocalMemoryStore from '../user/keystore/LocalMemoryStore';
 import LocalUserAccountProvider from '../user/LocalUserAccountProvider';
-import type { TransactionResult, TransactionReceipt } from '../types';
+import type {
+  TransactionResult,
+  TransactionReceipt,
+  UserAccountID,
+} from '../types';
 
 import { wifToPrivateKey } from '../helpers';
 
-async function getWalletInfo(
+type WalletInfo = {|
+  privateKey: string,
+  accountID: UserAccountID,
+|};
+
+type SetupClientsReturn = {|
+  developerClient: DeveloperClient,
+  client: Client<*>,
+  keystore: LocalKeyStore,
+  master: WalletInfo,
+|};
+
+async function getWalletInfo({
+  walletName,
+  networkName,
+}: {|
   walletName: string,
   networkName: string,
-): Promise<Object> {
+|}): Promise<WalletInfo> {
   const output = await one.execute(
     `describe wallet ${walletName} --network ${networkName} --json`,
   );
@@ -40,34 +59,39 @@ async function setupNetwork(networkName: string): Promise<string> {
   return description[3][1].table[1][3];
 }
 
-async function setupClients(
+async function addWallet({
+  walletName,
+  keystore,
+  networkName,
+}: {|
+  walletName: string,
+  keystore: LocalKeyStore,
   networkName: string,
-  walletName?: string,
-): Promise<Object> {
+|}): Promise<WalletInfo> {
+  if (walletName !== 'master') {
+    await one.execute(`create wallet ${walletName} --network ${networkName}`);
+  }
+  const wallet = await getWalletInfo({ walletName, networkName });
+  await keystore.addAccount({
+    network: networkName,
+    name: walletName,
+    privateKey: wifToPrivateKey(wallet.privateKey),
+  });
+  return wallet;
+}
+
+async function setupClients(networkName: string): Promise<SetupClientsReturn> {
   const masterWallet = 'master';
   const keystore = new LocalKeyStore({
     store: new LocalMemoryStore(),
   });
 
   const rpcURL = await setupNetwork(networkName);
-  const master = await getWalletInfo(masterWallet, networkName);
-  await keystore.addAccount({
-    network: networkName,
-    name: masterWallet,
-    privateKey: wifToPrivateKey(master.privateKey),
+  const master = await addWallet({
+    walletName: masterWallet,
+    keystore,
+    networkName,
   });
-
-  let wallet;
-  if (walletName != null) {
-    await one.execute(`create wallet ${walletName} --network ${networkName}`);
-
-    wallet = await getWalletInfo(walletName, networkName);
-    await keystore.addAccount({
-      network: networkName,
-      name: walletName,
-      privateKey: wifToPrivateKey(wallet.privateKey),
-    });
-  }
 
   const provider = new NEOONEProvider({
     options: [{ network: networkName, rpcURL }],
@@ -85,16 +109,20 @@ async function setupClients(
   return {
     developerClient,
     client,
+    keystore,
     master,
-    wallet: wallet || null,
   };
 }
 
-async function setupTransaction(
-  client: Client<LocalUserAccountProvider<NEOONEProvider>>,
-  master: Object,
-  wallet: Object,
-): Promise<TransactionResult<TransactionReceipt>> {
+async function setupTransaction({
+  client,
+  master,
+  wallet,
+}: {|
+  client: Client<*>,
+  master: WalletInfo,
+  wallet: WalletInfo,
+|}): Promise<TransactionResult<TransactionReceipt>> {
   const transaction = await client.transfer(
     new BigNumber(1000),
     common.NEO_ASSET_HASH,
@@ -105,10 +133,13 @@ async function setupTransaction(
   return transaction;
 }
 
-async function checkWalletBalance(
+async function checkWalletBalance({
+  walletName,
+  networkName,
+}: {|
   walletName: string,
   networkName: string,
-): Promise<void> {
+|}): Promise<void> {
   const walletOutput = await one.execute(
     `describe wallet ${walletName} --network ${networkName} --json`,
   );
@@ -118,19 +149,12 @@ async function checkWalletBalance(
 
 async function confirmTransaction(
   transaction: TransactionResult<TransactionReceipt>,
-  developerClient?: DeveloperClient,
 ): Promise<void> {
-  let consensus;
-  if (developerClient) {
-    consensus = developerClient.runConsensusNow();
-  }
-
   let done = false;
   await Promise.all([
     transaction.confirmed().then(() => {
       done = true;
     }),
-    consensus,
     new Promise((resolve, reject) =>
       setTimeout(() => {
         if (done) {
@@ -143,67 +167,110 @@ async function confirmTransaction(
   ]);
 }
 
+async function getBlockTimes({
+  client,
+  networkName,
+}: {|
+  client: Client<*>,
+  networkName: string,
+|}): Promise<Array<number>> {
+  const blockCount = await client.read(networkName).getBlockCount();
+  const indices = Array.from(Array(blockCount - 1), (x, i) => i + 1);
+  const blocks = await Promise.all(
+    indices.map(i => client.read(networkName).getBlock(i)),
+  );
+
+  return blocks.map(block => block.time);
+}
+
 describe('DeverloperClient', () => {
   test('runConsensusNow', async () => {
-    const network = 'e2e-1';
+    const networkName = 'e2e-1';
     const walletName = 'wallet-1';
 
-    const { developerClient, client, master, wallet } = await setupClients(
-      network,
-      walletName,
+    const { developerClient, client, keystore, master } = await setupClients(
+      networkName,
     );
-    const transaction = await setupTransaction(client, master, wallet);
+    const wallet = await addWallet({ walletName, keystore, networkName });
 
-    await confirmTransaction(transaction, developerClient);
+    const transaction = await setupTransaction({ client, master, wallet });
 
-    await checkWalletBalance(walletName, network);
+    await Promise.all([
+      confirmTransaction(transaction),
+      developerClient.runConsensusNow(),
+    ]);
+
+    await checkWalletBalance({ walletName, networkName });
   });
 
   test('updateSettings', async () => {
-    const network = 'e2e-2';
+    const networkName = 'e2e-2';
     const walletName = 'wallet-2';
 
-    const { developerClient, client, master, wallet } = await setupClients(
-      network,
-      walletName,
+    const { developerClient, client, keystore, master } = await setupClients(
+      networkName,
     );
+    const wallet = await addWallet({ walletName, keystore, networkName });
 
     await developerClient.updateSettings({ secondsPerBlock: 1 });
     await new Promise(resolve => setTimeout(() => resolve(), 15000));
-    const transaction = await setupTransaction(client, master, wallet);
+    const transaction = await setupTransaction({ client, master, wallet });
 
     await confirmTransaction(transaction);
 
-    await checkWalletBalance(walletName, network);
+    await checkWalletBalance({ walletName, networkName });
   });
 
   test('fastForwardOffset', async () => {
-    const network = 'e2e-3';
+    const networkName = 'e2e-3';
+    const secondsPerBlock = 1;
     const offsetSeconds = 1000000000;
 
-    const { developerClient, client } = await setupClients(network);
-    await developerClient.fastForwardOffset(offsetSeconds);
+    const { developerClient, client } = await setupClients(networkName);
+
+    await developerClient.updateSettings({ secondsPerBlock });
     await new Promise(resolve => setTimeout(() => resolve(), 15000));
 
-    const firstBlock = await client.read(network).getBlock(0);
-    const secondBlock = await client.read(network).getBlock(1);
+    await developerClient.fastForwardOffset(offsetSeconds);
+    await new Promise(resolve => setTimeout(() => resolve(), 2000));
 
-    expect(secondBlock.time - firstBlock.time).toBeGreaterThanOrEqual(
-      offsetSeconds,
-    );
+    const times = await getBlockTimes({ client, networkName });
+
+    let offsetFound = false;
+    for (let i = 0; i < times.length - 2; i += 1) {
+      const offset = times[i + 1] - times[i];
+      if (offset === offsetSeconds + secondsPerBlock) {
+        offsetFound = true;
+        break;
+      }
+    }
+    expect(offsetFound).toEqual(true);
   });
 
   test('fastForwardToTime', async () => {
-    const network = 'e2e-4';
-    const time = utils.nowSeconds() + 1000000000;
+    const networkName = 'e2e-4';
+    const secondsPerBlock = 1;
+    const offset = 1000000000;
 
-    const { developerClient, client } = await setupClients(network);
+    const { developerClient, client } = await setupClients(networkName);
 
-    await developerClient.fastForwardToTime(time);
+    await developerClient.updateSettings({ secondsPerBlock });
     await new Promise(resolve => setTimeout(() => resolve(), 15000));
 
-    const block = await client.read(network).getBlock(1);
-    expect(block.time).toBeGreaterThanOrEqual(time);
-    expect(block.time).toBeLessThanOrEqual(time + 15);
+    const time = utils.nowSeconds() + offset;
+    await developerClient.fastForwardToTime(time);
+    await new Promise(resolve => setTimeout(() => resolve(), 2000));
+
+    const times = await getBlockTimes({ client, networkName });
+
+    let timeFound = false;
+    for (let i = 0; i < times.length - 1; i += 1) {
+      if (times[i] === time) {
+        timeFound = true;
+        break;
+      }
+    }
+
+    expect(timeFound).toEqual(true);
   });
 });
