@@ -265,7 +265,7 @@ describe('DeverloperClient', () => {
 
     let timeFound = false;
     for (let i = 0; i < times.length - 1; i += 1) {
-      if (times[i] === time) {
+      if (times[i] >= time && times[i] <= time + secondsPerBlock) {
         timeFound = true;
         break;
       }
