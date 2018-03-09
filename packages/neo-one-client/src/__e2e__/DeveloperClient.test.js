@@ -85,7 +85,7 @@ async function setupClients(
   return {
     developerClient,
     client,
-    master: master || null,
+    master,
     wallet: wallet || null,
   };
 }
