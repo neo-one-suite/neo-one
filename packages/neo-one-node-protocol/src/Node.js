@@ -481,6 +481,7 @@ export default class Node implements INode {
             level: 'debug',
             peer: peer.endpoint,
             index: block.index,
+            hash: block.hashHex,
           });
           this._getBlocksRequestsCount += 1;
         } else {
@@ -489,6 +490,7 @@ export default class Node implements INode {
             level: 'debug',
             peer: peer.endpoint,
             index: block.index,
+            hash: block.hashHex,
           });
           this._getBlocksRequestsCount = 1;
           this._getBlocksRequestsIndex = block.index;
