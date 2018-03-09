@@ -58,7 +58,7 @@ export default class Consensus {
     this._timer = null;
     this._options$ = options$;
     this._node = node;
-    this._consensusContext = new ConsensusContext({ fastForwardSeconds: 0 });
+    this._consensusContext = new ConsensusContext();
   }
 
   start$(): Observable<void> {
@@ -174,8 +174,8 @@ export default class Consensus {
     }
   }
 
-  currentCustomTime(): number {
-    return this._consensusContext.currentCustomTime();
+  nowSeconds(): number {
+    return this._consensusContext.nowSeconds();
   }
 
   async fastForwardOffset(seconds: number): Promise<void> {

@@ -2,21 +2,25 @@
 import { utils } from '@neo-one/utils';
 
 export default class ConsensusContext {
-  fastForwardSeconds: number;
+  _fastForwardSeconds: number;
 
-  constructor({ fastForwardSeconds }: {| fastForwardSeconds: number |}) {
-    this.fastForwardSeconds = fastForwardSeconds;
+  constructor() {
+    this._fastForwardSeconds = 0;
   }
 
-  currentCustomTime(): number {
-    return utils.nowSeconds() + this.fastForwardSeconds;
+  nowSeconds(): number {
+    return utils.nowSeconds() + this._fastForwardSeconds;
   }
 
   fastForwardOffset(seconds: number) {
-    this.fastForwardSeconds += seconds;
+    if (seconds >= 0) {
+      this._fastForwardSeconds += seconds;
+    } else {
+      throw new Error('Can only fast forward to future time.');
+    }
   }
 
   fastForwardToTime(seconds: number) {
-    this.fastForwardSeconds = seconds;
+    this.fastForwardOffset(seconds - utils.nowSeconds());
   }
 }

@@ -175,7 +175,7 @@ export default async ({
           blockIndex: context.blockIndex,
           nonce,
           timestamp: Math.max(
-            consensusContext.currentCustomTime(),
+            consensusContext.nowSeconds(),
             previousHeader.timestamp + 1,
           ),
           nextConsensus: crypto.getConsensusAddress(validators),

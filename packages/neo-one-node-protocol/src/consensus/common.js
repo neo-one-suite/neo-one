@@ -108,8 +108,7 @@ function initializeConsensusCommon<
       timerSeconds: Math.max(
         0,
         blockchain.settings.secondsPerBlock -
-          (consensusContext.currentCustomTime() -
-            context.blockReceivedTimeSeconds),
+          (consensusContext.nowSeconds() - context.blockReceivedTimeSeconds),
       ),
     };
   }

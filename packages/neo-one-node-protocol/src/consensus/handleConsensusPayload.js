@@ -76,8 +76,7 @@ const handlePrepareRequest = async ({
     context.type !== 'backup' ||
     context instanceof RequestReceivedContext ||
     payload.validatorIndex !== context.primaryIndex ||
-    payload.timestamp >
-      consensusContext.currentCustomTime() + TEN_MINUTES_IN_SECONDS
+    payload.timestamp > consensusContext.nowSeconds() + TEN_MINUTES_IN_SECONDS
   ) {
     return { context };
   }

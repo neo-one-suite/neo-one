@@ -13,7 +13,7 @@ import ConsensusContext from '../../consensus/ConsensusContext';
 import { context } from '../../__data__';
 import handleConsensusPayload from '../../consensus/handleConsensusPayload';
 
-const consensusContext = new ConsensusContext({ fastForwardSeconds: 0 });
+const consensusContext = new ConsensusContext();
 
 const makePayload = ({
   context: contextIn,

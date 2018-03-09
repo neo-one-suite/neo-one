@@ -398,13 +398,8 @@ export default ({
       }
     },
     fastforwardtotime: async args => {
-      if (
-        node.consensus != null &&
-        node.consensus.currentCustomTime() <= args[0]
-      ) {
+      if (node.consensus != null) {
         await node.consensus.fastForwardToTime(args[0]);
-      } else if (node.consensus != null) {
-        throw new Error('Can only fast forward to future time');
       } else {
         throw new Error('This node does not support triggering consensus.');
       }
