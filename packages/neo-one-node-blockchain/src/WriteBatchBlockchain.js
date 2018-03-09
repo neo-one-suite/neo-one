@@ -496,7 +496,9 @@ export default class WriteBatchBlockchain {
     }
     await Promise.all([
       Promise.all(
-        transactions.map(transaction => this.transaction.add(transaction)),
+        transactions.map(transaction =>
+          this.transaction.add(transaction, true),
+        ),
       ),
       Promise.all(
         transactions.map(transaction =>
@@ -505,6 +507,7 @@ export default class WriteBatchBlockchain {
               hash: transaction.hash,
               startHeight: block.index,
             }),
+            true,
           ),
         ),
       ),
@@ -560,12 +563,13 @@ export default class WriteBatchBlockchain {
       }));
     }
     await Promise.all([
-      this.transaction.add(transaction),
+      this.transaction.add(transaction, true),
       this.transactionSpentCoins.add(
         new TransactionSpentCoins({
           hash: transaction.hash,
           startHeight: block.index,
         }),
+        true,
       ),
       this._updateAccounts(
         transaction.inputs,
