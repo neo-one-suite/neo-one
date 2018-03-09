@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node",
-  "version": "1.0.0-alpha.26",
+  "version": "1.0.0-alpha.27",
   "keywords": [
     "neo",
     "NEO",
@@ -39,7 +39,7 @@
     "@neo-one/node-core": "^1.0.0-alpha.11",
     "@neo-one/node-data-backup": "^1.0.0-alpha.11",
     "@neo-one/node-offline": "^1.0.0-alpha.11",
-    "@neo-one/node-protocol": "^1.0.0-alpha.23",
+    "@neo-one/node-protocol": "^1.0.0-alpha.24",
     "@neo-one/node-rpc": "^1.0.0-alpha.23",
     "@neo-one/node-storage-levelup": "^1.0.0-alpha.13",
     "@neo-one/node-vm": "^1.0.0-alpha.12",
