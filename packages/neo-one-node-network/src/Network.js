@@ -106,6 +106,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
   _endpointBlacklist: Set<Endpoint>;
   _reverseBlacklist: { [endpoint: Endpoint]: Endpoint };
   _badEndpoints: Set<Endpoint>;
+  _permanentBlacklist: Set<Endpoint>;
   _previousHealth: { [endpoint: Endpoint]: PeerHealth };
   _seeds: Set<Endpoint>;
 
@@ -146,6 +147,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     this._endpointBlacklist = new Set();
     this._reverseBlacklist = {};
     this._badEndpoints = new Set();
+    this._permanentBlacklist = new Set();
     this._previousHealth = {};
     this._seeds = new Set();
 
@@ -274,6 +276,10 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     peer.close();
   }
 
+  permanentlyBlacklist(endpoint: Endpoint): void {
+    this._permanentBlacklist.add(endpoint);
+  }
+
   _startServer(): void {
     const listenTCP = this._listenTCP;
     if (listenTCP == null) {
@@ -385,6 +391,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     return !(
       this._endpointBlacklist.has(endpoint) ||
       this._badEndpoints.has(endpoint) ||
+      this._permanentBlacklist.has(endpoint) ||
       this._connectingPeers[endpoint] ||
       this._connectedPeers[endpoint] != null
     );

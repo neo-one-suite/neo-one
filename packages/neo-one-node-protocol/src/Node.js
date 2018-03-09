@@ -376,7 +376,7 @@ export default class Node implements INode {
       throw new NegotiationError(message);
     }
 
-    this._checkVersion(message, versionPayload);
+    this._checkVersion(peer, message, versionPayload);
 
     const { host } = getEndpointConfig(peer.endpoint);
     let address;
@@ -534,13 +534,18 @@ export default class Node implements INode {
     );
   }
 
-  _checkVersion(message: Message, version: VersionPayload): void {
+  _checkVersion(
+    peer: Peer<Message>,
+    message: Message,
+    version: VersionPayload,
+  ): void {
     if (version.nonce === this._nonce) {
+      this._network.permanentlyBlacklist(peer.endpoint);
       throw new NegotiationError(message, 'Nonce equals my nonce.');
     }
 
     const connectedPeer = this._network.connectedPeers.find(
-      peer => version.nonce === peer.data.nonce,
+      otherPeer => version.nonce === otherPeer.data.nonce,
     );
     if (connectedPeer != null) {
       throw new AlreadyConnectedError(
