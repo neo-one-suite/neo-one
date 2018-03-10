@@ -102,7 +102,7 @@ const GET_ADDR_PEER_COUNT = 200;
 const GET_BLOCKS_COUNT = 500;
 // Assume that we get 500 back, but if not, at least request every 10 seconds
 const GET_BLOCKS_BUFFER = GET_BLOCKS_COUNT / 3;
-const GET_BLOCKS_TIME_MS = 10000;
+const GET_BLOCKS_TIME_MS = 5000;
 const GET_BLOCKS_THROTTLE_MS = 500;
 const GET_BLOCKS_CLOSE_COUNT = 2;
 const UNHEALTHY_PEER_SECONDS = 120 * 60;
@@ -484,7 +484,7 @@ export default class Node implements INode {
   _requestBlocks = _.debounce(() => {
     const peer = this._bestPeer;
     const block = this.blockchain.currentBlock;
-    if (peer != null && block.index < peer.data.startHeight) {
+    if (peer != null) {
       if (this._getBlocksRequestsCount >= GET_BLOCKS_CLOSE_COUNT) {
         this.blockchain.log({
           event: 'REQUEST_BLOCKS_NEW_PEER',
