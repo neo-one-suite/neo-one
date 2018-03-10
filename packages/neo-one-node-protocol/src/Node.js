@@ -493,8 +493,6 @@ export default class Node implements INode {
         });
         this._bestPeer = this._findBestPeer(peer);
         this._getBlocksRequestsCount = 0;
-        // TODO: Seems like this causes issues sometimes, try resetting here...
-        this._knownBlockHashes = createScalingBloomFilter();
       } else if (this._shouldRequestBlocks()) {
         if (this._getBlocksRequestsIndex === block.index) {
           this.blockchain.log({
@@ -795,18 +793,15 @@ export default class Node implements INode {
             this._consensus.onPersistBlock();
           }
 
-          const peer = this._bestPeer;
-          if (peer != null && block.index > peer.data.startHeight) {
-            this._relay(
-              this._createMessage({
-                command: COMMAND.INV,
-                payload: new InvPayload({
-                  type: INVENTORY_TYPE.BLOCK,
-                  hashes: [block.hash],
-                }),
+          this._relay(
+            this._createMessage({
+              command: COMMAND.INV,
+              payload: new InvPayload({
+                type: INVENTORY_TYPE.BLOCK,
+                hashes: [block.hash],
               }),
-            );
-          }
+            }),
+          );
         }
 
         this._knownBlockHashes.add(block.hash);

@@ -34,6 +34,7 @@ export type Environment = {|
 
 export type Options = {|
   seeds: Array<Endpoint>,
+  peerSeeds?: Array<Endpoint>,
   maxConnectedPeers?: number,
   externalEndpoints?: Array<Endpoint>,
   connectPeersDelayMS?: number,
@@ -109,6 +110,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
   _permanentBlacklist: Set<Endpoint>;
   _previousHealth: { [endpoint: Endpoint]: PeerHealth };
   _seeds: Set<Endpoint>;
+  _peerSeeds: Set<Endpoint>;
 
   _listenTCP: ?ListenTCP;
   _tcpServer: ?net.Server;
@@ -150,6 +152,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     this._permanentBlacklist = new Set();
     this._previousHealth = {};
     this._seeds = new Set();
+    this._peerSeeds = new Set();
 
     this._listenTCP = environment.listenTCP;
     this._tcpServer = null;
@@ -185,6 +188,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
       this._subscription = this._options$.subscribe({
         next: options => {
           this._seeds = new Set(options.seeds);
+          this._peerSeeds = new Set(options.peerSeeds || []);
           options.seeds.forEach(seed => this.addEndpoint(seed));
           this._maxConnectedPeers =
             options.maxConnectedPeers == null
@@ -346,22 +350,29 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
   _connectToPeers(): void {
     const connectedPeersCount = Object.keys(this._connectedPeers).length;
     const maxConnectedPeers = this._maxConnectedPeers;
+    let endpoints = [];
     if (connectedPeersCount < maxConnectedPeers) {
       const count = Math.max(
         (maxConnectedPeers - connectedPeersCount) * 2,
         maxConnectedPeers,
       );
-      const endpoints = _.shuffle(
-        [...this._unconnectedPeers].filter(peer => this._filterEndpoint(peer)),
-      ).slice(0, count);
+      endpoints = endpoints.concat(
+        _.shuffle(
+          [...this._unconnectedPeers].filter(peer =>
+            this._filterEndpoint(peer),
+          ),
+        ).slice(0, count),
+      );
 
       if (endpoints.length + connectedPeersCount < maxConnectedPeers) {
         this._resetBadEndpoints();
         this.__onRequestEndpoints();
       }
-
-      endpoints.forEach(endpoint => this._connectToPeer({ endpoint }));
     }
+
+    endpoints
+      .concat([...this._peerSeeds])
+      .forEach(endpoint => this._connectToPeer({ endpoint }));
   }
 
   _checkPeerHealth(): void {
@@ -397,6 +408,17 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     );
   }
 
+  _shouldConnect(endpoint: Endpoint): boolean {
+    if (this._peerSeeds.has(endpoint)) {
+      return (
+        !this._connectingPeers[endpoint] &&
+        this._connectedPeers[endpoint] == null
+      );
+    }
+
+    return this._filterEndpoint(endpoint);
+  }
+
   async _connectToPeer({
     endpoint: endpointIn,
     socket,
@@ -405,7 +427,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     socket?: net.Socket,
   |}): Promise<void> {
     const endpoint = normalizeEndpoint(endpointIn);
-    if (!this._filterEndpoint(endpoint)) {
+    if (!this._shouldConnect(endpoint)) {
       return;
     }
     this._connectingPeers[endpoint] = true;
