@@ -467,12 +467,18 @@ export default class Node implements INode {
 
   _findBestPeer(
     bestPeer?: ConnectedPeer<Message, PeerData>,
-  ): ConnectedPeer<Message, PeerData> {
+  ): ?ConnectedPeer<Message, PeerData> {
     let peers = this._network.connectedPeers;
     if (bestPeer != null) {
       peers = peers.filter(peer => peer.endpoint !== bestPeer.endpoint);
     }
-    return _.maxBy(peers, peer => peer.data.startHeight);
+    const result = _.maxBy(peers, peer => peer.data.startHeight);
+    if (result == null) {
+      return null;
+    }
+    return _.shuffle(
+      peers.filter(peer => peer.data.startHeight === result.data.startHeight),
+    )[0];
   }
 
   _requestBlocks = _.debounce(() => {
