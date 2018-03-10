@@ -412,16 +412,23 @@ export default class Node implements INode {
     peer: ConnectedPeer<Message, PeerData>,
     prevHealth?: PeerHealth,
   ) => {
-    const checkTimeSeconds = commonUtils.nowSeconds();
+    const checkTimeSeconds =
+      prevHealth == null
+        ? commonUtils.nowSeconds()
+        : prevHealth.checkTimeSeconds;
     const blockIndex = this._blockIndex[peer.endpoint];
     const health = { healthy: true, checkTimeSeconds, blockIndex };
     if (
+      // If first check -> healthy
       prevHealth == null ||
+      // If seen new block -> healthy
       (prevHealth.blockIndex != null &&
         prevHealth.blockIndex < health.blockIndex) ||
-      (prevHealth.blockIndex == null &&
-        health.checkTimeSeconds - prevHealth.checkTimeSeconds <
-          UNHEALTHY_PEER_SECONDS)
+      // If not seen a block or a new block BUT it has NOT been a long
+      // time -> healthy
+      ((prevHealth.blockIndex == null ||
+        prevHealth.blockIndex === health.blockIndex) &&
+        commonUtils.nowSeconds() - checkTimeSeconds < UNHEALTHY_PEER_SECONDS)
     ) {
       return health;
     }
