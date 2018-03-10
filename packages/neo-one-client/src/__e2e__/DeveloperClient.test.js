@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 
 import { common } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
+import _ from 'lodash';
 
 import DeveloperClient from '../DeveloperClient';
 import Client from '../Client';
@@ -175,7 +176,7 @@ async function getBlockTimes({
   networkName: string,
 |}): Promise<Array<number>> {
   const blockCount = await client.read(networkName).getBlockCount();
-  const indices = Array.from(Array(blockCount - 1), (x, i) => i + 1);
+  const indices = _.range(1, blockCount);
   const blocks = await Promise.all(
     indices.map(i => client.read(networkName).getBlock(i)),
   );
@@ -237,9 +238,9 @@ describe('DeverloperClient', () => {
     const times = await getBlockTimes({ client, networkName });
 
     let offsetFound = false;
-    for (let i = 0; i < times.length - 2; i += 1) {
+    for (let i = 0; i < times.length - 1; i += 1) {
       const offset = times[i + 1] - times[i];
-      if (offset === offsetSeconds + secondsPerBlock) {
+      if (offset >= offsetSeconds) {
         offsetFound = true;
         break;
       }
@@ -263,14 +264,8 @@ describe('DeverloperClient', () => {
 
     const times = await getBlockTimes({ client, networkName });
 
-    let timeFound = false;
-    for (let i = 0; i < times.length - 1; i += 1) {
-      if (times[i] >= time && times[i] <= time + secondsPerBlock) {
-        timeFound = true;
-        break;
-      }
-    }
+    const timeFound = times.find(blockTime => blockTime >= time);
 
-    expect(timeFound).toEqual(true);
+    expect(timeFound).toBeDefined();
   });
 });
