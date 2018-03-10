@@ -98,7 +98,10 @@ export default class Peer<Message> {
 
   receiveMessage(timeoutMS?: number): Promise<Message> {
     return new Promise((resolve, reject) => {
+      let handled = false;
       const cleanup = () => {
+        this._buffer.pause();
+        handled = true;
         // eslint-disable-next-line
         this._stream.removeListener('error', onError);
         // eslint-disable-next-line
@@ -106,23 +109,18 @@ export default class Peer<Message> {
         // eslint-disable-next-line
         this._buffer.removeListener('error', onError);
         // eslint-disable-next-line
-        this._transform.removeListener('data', onDataReceived);
+        this._buffer.removeListener('data', onDataReceived);
       };
 
-      let handled = false;
       const onError = (error: Error) => {
-        this._buffer.pause();
         if (!handled) {
-          handled = true;
           cleanup();
           reject(error);
         }
       };
 
       const onDataReceived = (data: Message) => {
-        this._buffer.pause();
         if (!handled) {
-          handled = true;
           cleanup();
           resolve(data);
         }
