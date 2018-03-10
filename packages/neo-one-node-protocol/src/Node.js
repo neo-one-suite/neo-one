@@ -105,6 +105,7 @@ const GET_BLOCKS_BUFFER = GET_BLOCKS_COUNT / 3;
 const GET_BLOCKS_TIME_MS = 10000;
 const GET_BLOCKS_THROTTLE_MS = 500;
 const GET_BLOCKS_CLOSE_COUNT = 2;
+const UNHEALTHY_PEER_SECONDS = 120 * 60;
 const LOCAL_HOST_ADDRESSES = new Set([
   '',
   '0.0.0.0',
@@ -419,7 +420,8 @@ export default class Node implements INode {
       (prevHealth.blockIndex != null &&
         prevHealth.blockIndex < health.blockIndex) ||
       (prevHealth.blockIndex == null &&
-        health.checkTimeSeconds - prevHealth.checkTimeSeconds < 120)
+        health.checkTimeSeconds - prevHealth.checkTimeSeconds <
+          UNHEALTHY_PEER_SECONDS)
     ) {
       return health;
     }
@@ -456,21 +458,27 @@ export default class Node implements INode {
     });
   };
 
-  _findBestPeer(): ConnectedPeer<Message, PeerData> {
-    return _.maxBy(this._network.connectedPeers, peer => peer.data.startHeight);
+  _findBestPeer(
+    bestPeer?: ConnectedPeer<Message, PeerData>,
+  ): ConnectedPeer<Message, PeerData> {
+    let peers = this._network.connectedPeers;
+    if (bestPeer != null) {
+      peers = peers.filter(peer => peer.endpoint !== bestPeer.endpoint);
+    }
+    return _.maxBy(peers, peer => peer.data.startHeight);
   }
 
   _requestBlocks = _.debounce(() => {
     const peer = this._bestPeer;
     const block = this.blockchain.currentBlock;
     if (peer != null && block.index < peer.data.startHeight) {
-      if (this._getBlocksRequestsCount > GET_BLOCKS_CLOSE_COUNT) {
+      if (this._getBlocksRequestsCount >= GET_BLOCKS_CLOSE_COUNT) {
         this.blockchain.log({
-          event: 'REQUEST_BLOCKS_CLOSE_PEER',
+          event: 'REQUEST_BLOCKS_NEW_PEER',
           level: 'debug',
           peer: peer.endpoint,
         });
-        this._network.blacklistAndClose(peer);
+        this._bestPeer = this._findBestPeer(peer);
         this._getBlocksRequestsCount = 0;
         // TODO: Seems like this causes issues sometimes, try resetting here...
         this._knownBlockHashes = createScalingBloomFilter();
@@ -513,9 +521,9 @@ export default class Node implements INode {
           index: block.index,
         });
       }
-
-      this._requestBlocks();
     }
+
+    this._requestBlocks();
   }, GET_BLOCKS_THROTTLE_MS);
 
   _resetRequestBlocks(): void {
