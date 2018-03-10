@@ -102,10 +102,10 @@ const GET_ADDR_PEER_COUNT = 200;
 const GET_BLOCKS_COUNT = 500;
 // Assume that we get 500 back, but if not, at least request every 10 seconds
 const GET_BLOCKS_BUFFER = GET_BLOCKS_COUNT / 3;
-const GET_BLOCKS_TIME_MS = 5000;
-const GET_BLOCKS_THROTTLE_MS = 500;
+const GET_BLOCKS_TIME_MS = 10000;
+const GET_BLOCKS_THROTTLE_MS = 1000;
 const GET_BLOCKS_CLOSE_COUNT = 2;
-const UNHEALTHY_PEER_SECONDS = 120 * 60;
+const UNHEALTHY_PEER_SECONDS = 120;
 const LOCAL_HOST_ADDRESSES = new Set([
   '',
   '0.0.0.0',
@@ -412,25 +412,31 @@ export default class Node implements INode {
     peer: ConnectedPeer<Message, PeerData>,
     prevHealth?: PeerHealth,
   ) => {
-    const checkTimeSeconds =
-      prevHealth == null
-        ? commonUtils.nowSeconds()
-        : prevHealth.checkTimeSeconds;
+    const checkTimeSeconds = commonUtils.nowSeconds();
     const blockIndex = this._blockIndex[peer.endpoint];
-    const health = { healthy: true, checkTimeSeconds, blockIndex };
+
+    // If first check -> healthy
+    if (prevHealth == null) {
+      return { healthy: true, checkTimeSeconds, blockIndex };
+    }
+
+    // If seen new block -> healthy + update check time
+    if (prevHealth.blockIndex != null && prevHealth.blockIndex < blockIndex) {
+      return { healthy: true, checkTimeSeconds, blockIndex };
+    }
+
+    // If not seen a block or a new block BUT it has NOT been a long
+    // time -> healthy
     if (
-      // If first check -> healthy
-      prevHealth == null ||
-      // If seen new block -> healthy
-      (prevHealth.blockIndex != null &&
-        prevHealth.blockIndex < health.blockIndex) ||
-      // If not seen a block or a new block BUT it has NOT been a long
-      // time -> healthy
-      ((prevHealth.blockIndex == null ||
-        prevHealth.blockIndex === health.blockIndex) &&
-        commonUtils.nowSeconds() - checkTimeSeconds < UNHEALTHY_PEER_SECONDS)
+      (prevHealth.blockIndex == null || prevHealth.blockIndex === blockIndex) &&
+      commonUtils.nowSeconds() - prevHealth.checkTimeSeconds <
+        UNHEALTHY_PEER_SECONDS
     ) {
-      return health;
+      return {
+        healthy: true,
+        checkTimeSeconds: prevHealth.checkTimeSeconds,
+        blockIndex: prevHealth.blockIndex,
+      };
     }
 
     return { healthy: false, checkTimeSeconds, blockIndex };
@@ -484,14 +490,15 @@ export default class Node implements INode {
   _requestBlocks = _.debounce(() => {
     const peer = this._bestPeer;
     const block = this.blockchain.currentBlock;
-    if (peer != null) {
-      if (this._getBlocksRequestsCount >= GET_BLOCKS_CLOSE_COUNT) {
+    if (peer != null && block.index < peer.data.startHeight) {
+      if (this._getBlocksRequestsCount > GET_BLOCKS_CLOSE_COUNT) {
         this.blockchain.log({
-          event: 'REQUEST_BLOCKS_NEW_PEER',
+          event: 'REQUEST_BLOCKS_CLOSE_PEER',
           level: 'debug',
           peer: peer.endpoint,
         });
         this._bestPeer = this._findBestPeer(peer);
+        this._network.blacklistAndClose(peer);
         this._getBlocksRequestsCount = 0;
       } else if (this._shouldRequestBlocks()) {
         if (this._getBlocksRequestsIndex === block.index) {
@@ -532,9 +539,9 @@ export default class Node implements INode {
           index: block.index,
         });
       }
-    }
 
-    this._requestBlocks();
+      this._requestBlocks();
+    }
   }, GET_BLOCKS_THROTTLE_MS);
 
   _resetRequestBlocks(): void {
@@ -793,15 +800,18 @@ export default class Node implements INode {
             this._consensus.onPersistBlock();
           }
 
-          this._relay(
-            this._createMessage({
-              command: COMMAND.INV,
-              payload: new InvPayload({
-                type: INVENTORY_TYPE.BLOCK,
-                hashes: [block.hash],
+          const peer = this._bestPeer;
+          if (peer != null && block.index > peer.data.startHeight) {
+            this._relay(
+              this._createMessage({
+                command: COMMAND.INV,
+                payload: new InvPayload({
+                  type: INVENTORY_TYPE.BLOCK,
+                  hashes: [block.hash],
+                }),
               }),
-            }),
-          );
+            );
+          }
         }
 
         this._knownBlockHashes.add(block.hash);
