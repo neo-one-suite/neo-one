@@ -22,11 +22,12 @@ type AsyncBlockIteratorOptions = {|
   client: Client,
   filter: BlockFilter,
   fetchTimeoutMS?: number,
+  batchSize?: number,
 |};
 
 const FETCH_TIMEOUT_MS = 20000;
 const QUEUE_SIZE = 1000;
-const BATCH_SIZE = 50;
+const BATCH_SIZE = 10;
 
 export default class AsyncBlockIterator extends AsyncIteratorBase<
   Block,
@@ -42,8 +43,14 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
   _startHeight: ?number;
   _indexStop: ?number;
   _fetchTimeoutMS: number;
+  _batchSize: number;
 
-  constructor({ client, filter, fetchTimeoutMS }: AsyncBlockIteratorOptions) {
+  constructor({
+    client,
+    filter,
+    fetchTimeoutMS,
+    batchSize,
+  }: AsyncBlockIteratorOptions) {
     super();
     this._client = client;
     this._items = [];
@@ -55,6 +62,7 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
     this._indexStop = filter.indexStop;
     this._fetchTimeoutMS =
       fetchTimeoutMS == null ? FETCH_TIMEOUT_MS : fetchTimeoutMS;
+    this._batchSize = batchSize == null ? BATCH_SIZE : batchSize;
   }
 
   next(): Promise<IteratorResult<Block, void>> {
@@ -153,7 +161,7 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
       if (this._indexStop != null) {
         toFetch = Math.min(toFetch, this._indexStop - index);
       }
-      for (const chunk of _.chunk(_.range(0, toFetch), BATCH_SIZE)) {
+      for (const chunk of _.chunk(_.range(0, toFetch), this._batchSize)) {
         // eslint-disable-next-line
         const blocks = await Promise.all(
           chunk.map(offset => this._fetchOne(index + offset, true)),

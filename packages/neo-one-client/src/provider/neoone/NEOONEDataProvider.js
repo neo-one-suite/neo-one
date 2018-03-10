@@ -68,22 +68,26 @@ export type NEOONEDataProviderOptions = {|
   network: NetworkType,
   rpcURL: string,
   iterBlocksFetchTimeoutMS?: number,
+  iterBlocksBatchSize?: number,
 |};
 
 export default class NEOONEDataProvider implements DataProvider {
   network: NetworkType;
 
   _client: JSONRPCClient;
-  _iterBlocksFetchTimeoutMS: ?number;
+  _iterBlocksFetchTimeoutMS: number | void;
+  _iterBlocksBatchSize: number | void;
 
   constructor({
     network,
     rpcURL,
     iterBlocksFetchTimeoutMS,
+    iterBlocksBatchSize,
   }: NEOONEDataProviderOptions) {
     this.network = network;
     this._client = new JSONRPCClient(new JSONRPCHTTPProvider(rpcURL));
     this._iterBlocksFetchTimeoutMS = iterBlocksFetchTimeoutMS;
+    this._iterBlocksBatchSize = iterBlocksBatchSize;
   }
 
   setRPCURL(rpcURL: string): void {
@@ -186,10 +190,8 @@ export default class NEOONEDataProvider implements DataProvider {
       new AsyncBlockIterator({
         client: this,
         filter: filter || {},
-        fetchTimeoutMS:
-          this._iterBlocksFetchTimeoutMS == null
-            ? undefined
-            : this._iterBlocksFetchTimeoutMS,
+        fetchTimeoutMS: this._iterBlocksFetchTimeoutMS,
+        batchSize: this._iterBlocksBatchSize,
       }),
     );
   }

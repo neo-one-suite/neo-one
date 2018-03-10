@@ -16,6 +16,7 @@ NEOONEDataProvider {
       "endpoint": "rpc",
     },
   },
+  "_iterBlocksBatchSize": undefined,
   "_iterBlocksFetchTimeoutMS": undefined,
   "network": "net",
 }

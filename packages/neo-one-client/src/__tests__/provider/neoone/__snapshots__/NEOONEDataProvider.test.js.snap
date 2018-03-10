@@ -27,6 +27,7 @@ FromAsyncIterable {
   "_selector": [Function],
   "_source": AsyncBlockIterator {
     "__done": false,
+    "_batchSize": 10,
     "_client": NEOONEDataProvider {
       "_client": JSONRPCClient {
         "_provider": JSONRPCHTTPProvider {
@@ -42,6 +43,7 @@ FromAsyncIterable {
           "endpoint": "bar",
         },
       },
+      "_iterBlocksBatchSize": undefined,
       "_iterBlocksFetchTimeoutMS": undefined,
       "network": "foo",
     },
@@ -61,6 +63,7 @@ FromAsyncIterable {
   "_selector": [Function],
   "_source": AsyncBlockIterator {
     "__done": false,
+    "_batchSize": 10,
     "_client": NEOONEDataProvider {
       "_client": JSONRPCClient {
         "_provider": JSONRPCHTTPProvider {
@@ -76,6 +79,7 @@ FromAsyncIterable {
           "endpoint": "bar",
         },
       },
+      "_iterBlocksBatchSize": undefined,
       "_iterBlocksFetchTimeoutMS": 1000,
       "network": "foo",
     },
@@ -106,6 +110,7 @@ NEOONEDataProvider {
       "endpoint": "buzz",
     },
   },
+  "_iterBlocksBatchSize": undefined,
   "_iterBlocksFetchTimeoutMS": 1000,
   "network": "foo",
 }
