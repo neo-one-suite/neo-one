@@ -54,6 +54,7 @@ async function getWalletInfo({
 
 async function setupNetwork(networkName: string): Promise<string> {
   await one.execute(`create network ${networkName}`);
+  await new Promise(resolve => setTimeout(() => resolve(), 10000));
   const output = await one.execute(`describe network ${networkName} --json`);
 
   const description = one.parseJSON(output);
