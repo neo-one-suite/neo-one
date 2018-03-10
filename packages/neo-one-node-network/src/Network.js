@@ -292,6 +292,10 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
 
     const tcpServer = net.createServer({ pauseOnConnect: true }, socket => {
       const host = socket.remoteAddress;
+      this.__onEvent({
+        event: 'TCP_SERVER_SOCKET',
+        data: { host },
+      });
       if (host == null) {
         socket.end();
         return;
@@ -411,6 +415,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
   _shouldConnect(endpoint: Endpoint): boolean {
     if (this._peerSeeds.has(endpoint)) {
       return (
+        !this._endpointBlacklist.has(endpoint) &&
         !this._connectingPeers[endpoint] &&
         this._connectedPeers[endpoint] == null
       );

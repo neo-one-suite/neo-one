@@ -17,6 +17,10 @@ export type EventMessage<Message, PeerData> =
       data: {| host: string, port: number |},
     |}
   | {|
+      event: 'TCP_SERVER_SOCKET',
+      data: {| host?: ?string |},
+    |}
+  | {|
       event: 'TCP_SERVER_ERROR',
       message: string,
       data: {| error?: Error |},
