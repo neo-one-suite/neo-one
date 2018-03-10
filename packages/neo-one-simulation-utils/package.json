@@ -39,6 +39,6 @@
     "access": "public"
   },
   "dependencies": {
-    "cross-spawn": "^6.0.4"
+    "cross-spawn": "^6.0.5"
   }
 }
