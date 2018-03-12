@@ -41,6 +41,7 @@ import type {
   Contract,
   ContractParameter,
   DataProvider,
+  DeveloperProvider,
   GetOptions,
   Hash160String,
   Hash256String,
@@ -57,6 +58,7 @@ import type {
   TransactionReceipt,
   UnspentOutput,
   Validator,
+  Options,
 } from '../../types';
 import AsyncBlockIterator from '../../AsyncBlockIterator';
 import JSONRPCClient from './JSONRPCClient';
@@ -71,7 +73,8 @@ export type NEOONEDataProviderOptions = {|
   iterBlocksBatchSize?: number,
 |};
 
-export default class NEOONEDataProvider implements DataProvider {
+export default class NEOONEDataProvider
+  implements DataProvider, DeveloperProvider {
   network: NetworkType;
 
   _client: JSONRPCClient;
@@ -283,6 +286,22 @@ export default class NEOONEDataProvider implements DataProvider {
       }),
     });
     return this.testInvoke(testTransaction.serializeWire().toString('hex'));
+  }
+
+  runConsensusNow(): Promise<void> {
+    return this._client.runConsensusNow();
+  }
+
+  updateSettings(options: Options): Promise<void> {
+    return this._client.updateSettings(options);
+  }
+
+  fastForwardOffset(seconds: number): Promise<void> {
+    return this._client.fastForwardOffset(seconds);
+  }
+
+  fastForwardToTime(seconds: number): Promise<void> {
+    return this._client.fastForwardToTime(seconds);
   }
 
   _convertBlock(block: BlockJSON): Block {

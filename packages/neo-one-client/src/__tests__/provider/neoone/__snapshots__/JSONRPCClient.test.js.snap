@@ -1,5 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`JSONRPCClient fastForwardOffset 1`] = `
+Array [
+  Object {
+    "method": "fastforwardoffset",
+    "params": Array [
+      10,
+    ],
+  },
+]
+`;
+
+exports[`JSONRPCClient fastForwardToTime 1`] = `
+Array [
+  Object {
+    "method": "fastforwardtotime",
+    "params": Array [
+      10,
+    ],
+  },
+]
+`;
+
 exports[`JSONRPCClient getAccount 1`] = `
 Array [
   Object {
@@ -229,6 +251,14 @@ Array [
 ]
 `;
 
+exports[`JSONRPCClient runConsensusNow 1`] = `
+Array [
+  Object {
+    "method": "runconsensusnow",
+  },
+]
+`;
+
 exports[`JSONRPCClient sendTransactionRaw 1`] = `
 Array [
   Object {
@@ -257,6 +287,19 @@ Array [
     "method": "invokescript",
     "params": Array [
       "12",
+    ],
+  },
+]
+`;
+
+exports[`JSONRPCClient updateSettings 1`] = `
+Array [
+  Object {
+    "method": "updatesettings",
+    "params": Array [
+      Object {
+        "secondsPerBlock": 10,
+      },
     ],
   },
 ]

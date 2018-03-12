@@ -25,6 +25,7 @@ import {
   RequestReceivedContext,
   ViewChangingContext,
 } from './context';
+import ConsensusContext from './ConsensusContext';
 import type { Result } from './types';
 import type Node from '../Node';
 
@@ -91,9 +92,11 @@ function initializeConsensusCommon<
 >({
   context,
   blockchain,
+  consensusContext,
 }: {|
   context: TContext,
   blockchain: Blockchain,
+  consensusContext: ConsensusContext,
 |}): Result<TContext> {
   if (context.myIndex < 0) {
     return { context };
@@ -105,7 +108,7 @@ function initializeConsensusCommon<
       timerSeconds: Math.max(
         0,
         blockchain.settings.secondsPerBlock -
-          (commonUtils.nowSeconds() - context.blockReceivedTimeSeconds),
+          (consensusContext.nowSeconds() - context.blockReceivedTimeSeconds),
       ),
     };
   }
@@ -121,9 +124,11 @@ function initializeConsensusCommon<
 export const initializeNewConsensus = async ({
   blockchain,
   publicKey,
+  consensusContext,
 }: {|
   blockchain: Blockchain,
   publicKey: ECPoint,
+  consensusContext: ConsensusContext,
 |}): Promise<Result<InitialContext>> => {
   const validators = await blockchain.getValidators([]);
   const blockReceivedTimeSeconds = blockchain.currentBlock.timestamp;
@@ -149,7 +154,7 @@ export const initializeNewConsensus = async ({
     context: { ...context.toJSON() },
   });
 
-  return initializeConsensusCommon({ context, blockchain });
+  return initializeConsensusCommon({ context, blockchain, consensusContext });
 };
 
 const getPrimaryIndexType = ({
@@ -175,10 +180,12 @@ export const initializeConsensus = ({
   node,
   context: contextIn,
   viewNumber,
+  consensusContext,
 }: {|
   node: Node,
   context: Context,
   viewNumber: number,
+  consensusContext: ConsensusContext,
 |}): Result<InitialContext | SignatureSentContext> => {
   if (viewNumber <= 0) {
     throw new Error('Programming error');
@@ -197,7 +204,7 @@ export const initializeConsensus = ({
     context = context.cloneInitial({ type, primaryIndex, viewNumber });
   }
 
-  return initializeConsensusCommon({ blockchain, context });
+  return initializeConsensusCommon({ blockchain, context, consensusContext });
 };
 
 export async function checkSignatures<TContext: HeaderContext>({
@@ -280,15 +287,18 @@ export const initializeConsensusInitial = ({
   blockchain,
   context,
   viewNumber,
+  consensusContext,
 }: {|
   blockchain: Blockchain,
   context: Context,
   viewNumber: number,
+  consensusContext: ConsensusContext,
 |}): Result<InitialContext> => {
   const { primaryIndex, type } = getPrimaryIndexType({ context, viewNumber });
   return initializeConsensusCommon({
     blockchain,
     context: context.cloneInitial({ type, primaryIndex, viewNumber }),
+    consensusContext,
   });
 };
 
@@ -302,10 +312,12 @@ const requestChangeViewBackup = ({
   context: contextIn,
   node,
   privateKey,
+  consensusContext,
 }: {|
   context: RequestReceivedContext,
   node: Node,
   privateKey: PrivateKey,
+  consensusContext: ConsensusContext,
 |}): Result<InitialContext | ViewChangingContext> => {
   let context = contextIn;
 
@@ -321,6 +333,7 @@ const requestChangeViewBackup = ({
       blockchain: node.blockchain,
       context,
       viewNumber,
+      consensusContext,
     });
   }
 
@@ -333,12 +346,14 @@ export const addTransaction = async ({
   privateKey,
   transaction,
   verify,
+  consensusContext,
 }: {|
   context: RequestReceivedContext,
   node: Node,
   privateKey: PrivateKey,
   transaction: Transaction,
   verify: boolean,
+  consensusContext: ConsensusContext,
 |}): Promise<
   Result<
     | RequestReceivedContext
@@ -352,7 +367,12 @@ export const addTransaction = async ({
   const { blockchain } = node;
   const tx = await blockchain.transaction.tryGet({ hash: transaction.hash });
   if (tx != null) {
-    return requestChangeViewBackup({ context, node, privateKey });
+    return requestChangeViewBackup({
+      context,
+      node,
+      privateKey,
+      consensusContext,
+    });
   }
   if (verify) {
     let verified = true;
@@ -370,7 +390,12 @@ export const addTransaction = async ({
       verified = false;
     }
     if (!verified) {
-      return requestChangeViewBackup({ context, node, privateKey });
+      return requestChangeViewBackup({
+        context,
+        node,
+        privateKey,
+        consensusContext,
+      });
     }
   }
 
@@ -412,7 +437,12 @@ export const addTransaction = async ({
       expectedConsensusAddress: common.uInt160ToString(consensusAddress),
     });
 
-    return requestChangeViewBackup({ context, node, privateKey });
+    return requestChangeViewBackup({
+      context,
+      node,
+      privateKey,
+      consensusContext,
+    });
   }
 
   return { context };

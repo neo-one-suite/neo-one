@@ -124,7 +124,7 @@ type PeerHealth = {
 export default class Node implements INode {
   blockchain: Blockchain;
   _network: Network<Message, PeerData, PeerHealth>;
-  _consensus: ?Consensus;
+  consensus: ?Consensus;
   _options$: Observable<Options>;
 
   _externalPort: number;
@@ -170,7 +170,7 @@ export default class Node implements INode {
       onRequestEndpoints: this._onRequestEndpoints.bind(this),
       onEvent: this._onEvent,
     });
-    this._consensus = null;
+    this.consensus = null;
     this._options$ = options$;
 
     this._externalPort = (environment.network.listenTCP || {}).port || 0;
@@ -218,7 +218,7 @@ export default class Node implements INode {
             ),
             node: this,
           });
-          this._consensus = consensus;
+          this.consensus = consensus;
           return timer(5000).pipe(switchMap(() => consensus.start$()));
         }
         return empty();
@@ -257,8 +257,8 @@ export default class Node implements INode {
             memPool: commonUtils.values(this.memPool),
           });
           this.memPool[transaction.hashHex] = transaction;
-          if (this._consensus != null) {
-            this._consensus.onTransactionReceived(transaction);
+          if (this.consensus != null) {
+            this.consensus.onTransactionReceived(transaction);
           }
           this._relayTransaction(transaction);
           this.blockchain.log({
@@ -796,8 +796,8 @@ export default class Node implements INode {
             index: block.index,
           });
           await this.blockchain.persistBlock({ block });
-          if (this._consensus != null) {
-            this._consensus.onPersistBlock();
+          if (this.consensus != null) {
+            this.consensus.onPersistBlock();
           }
 
           const peer = this._bestPeer;
@@ -827,7 +827,7 @@ export default class Node implements INode {
   }
 
   async _onConsensusMessageReceived(payload: ConsensusPayload): Promise<void> {
-    const consensus = this._consensus;
+    const { consensus } = this;
     if (consensus != null) {
       await this.blockchain.verifyConsensusPayload(payload);
       consensus.onConsensusPayloadReceived(payload);
@@ -1094,9 +1094,9 @@ export default class Node implements INode {
       // TODO: Kinda hacky
       if (
         transaction.type === TRANSACTION_TYPE.MINER &&
-        this._consensus != null
+        this.consensus != null
       ) {
-        this._consensus.onTransactionReceived(transaction);
+        this.consensus.onTransactionReceived(transaction);
       }
     }
   }

@@ -23,6 +23,7 @@ import {
   type Hash160String,
   type Hash256String,
   type Peer,
+  type Options,
 } from '../../types';
 import { type JSONRPCProvider } from './JSONRPCProvider';
 import { RelayTransactionError } from '../../errors';
@@ -208,6 +209,33 @@ export default class JSONRPCClient {
   getNetworkSettings(): Promise<NetworkSettingsJSON> {
     return this._provider.request({
       method: 'getnetworksettings',
+    });
+  }
+
+  runConsensusNow(): Promise<void> {
+    return this._provider.request({
+      method: 'runconsensusnow',
+    });
+  }
+
+  updateSettings(options: Options): Promise<void> {
+    return this._provider.request({
+      method: 'updatesettings',
+      params: [options],
+    });
+  }
+
+  fastForwardOffset(seconds: number): Promise<void> {
+    return this._provider.request({
+      method: 'fastforwardoffset',
+      params: [seconds],
+    });
+  }
+
+  fastForwardToTime(seconds: number): Promise<void> {
+    return this._provider.request({
+      method: 'fastforwardtotime',
+      params: [seconds],
     });
   }
 }

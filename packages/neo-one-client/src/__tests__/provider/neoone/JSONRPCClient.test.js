@@ -125,6 +125,22 @@ describe('JSONRPCClient', () => {
       method: 'getNetworkSettings',
       args: [],
     },
+    {
+      method: 'runConsensusNow',
+      args: [],
+    },
+    {
+      method: 'updateSettings',
+      args: [{ secondsPerBlock: 10 }],
+    },
+    {
+      method: 'fastForwardOffset',
+      args: [10],
+    },
+    {
+      method: 'fastForwardToTime',
+      args: [10],
+    },
   ];
 
   beforeEach(() => {

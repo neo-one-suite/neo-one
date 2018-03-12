@@ -183,11 +183,12 @@ export type Blockchain = {
   ) => Promise<InvocationResult>,
   +calculateClaimAmount: (inputs: Array<Input>) => Promise<BN>,
 
+  +updateSettings: (settings: Settings) => void,
   +stop: () => Promise<void>,
 };
 
 export type WriteBlockchain = {
-  +settings: $PropertyType<Blockchain, 'settings'>,
+  +settings: Settings,
   +log: $PropertyType<Blockchain, 'log'>,
 
   +currentBlock: $PropertyType<Blockchain, 'currentBlock'>,

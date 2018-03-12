@@ -838,4 +838,48 @@ describe('NEOONEDataProvider', () => {
     const result = await provider.call(contract, method, params);
     expect(result).toMatchSnapshot();
   });
+
+  test('runConsensusNow', () => {
+    // $FlowFixMe
+    provider._client.runConsensusNow = jest.fn();
+
+    const result = provider.runConsensusNow();
+
+    expect(result).toBeUndefined();
+    expect(provider._client.runConsensusNow).toHaveBeenCalledWith();
+    expect(provider._client.runConsensusNow).toHaveBeenCalledTimes(1);
+  });
+
+  test('updateSettings', () => {
+    const options = { secondsPerBlock: 10 };
+    // $FlowFixMe
+    provider._client.updateSettings = jest.fn();
+    const result = provider.updateSettings(options);
+
+    expect(result).toBeUndefined();
+    expect(provider._client.updateSettings).toHaveBeenCalledWith(options);
+    expect(provider._client.updateSettings).toHaveBeenCalledTimes(1);
+  });
+
+  test('fastForwardOffset', () => {
+    const offset = 10;
+    // $FlowFixMe
+    provider._client.fastForwardOffset = jest.fn();
+    const result = provider.fastForwardOffset(offset);
+
+    expect(result).toBeUndefined();
+    expect(provider._client.fastForwardOffset).toHaveBeenCalledWith(offset);
+    expect(provider._client.fastForwardOffset).toHaveBeenCalledTimes(1);
+  });
+
+  test('fastForwardToTime', () => {
+    const time = 10;
+    // $FlowFixMe
+    provider._client.fastForwardToTime = jest.fn();
+    const result = provider.fastForwardToTime(time);
+
+    expect(result).toBeUndefined();
+    expect(provider._client.fastForwardToTime).toHaveBeenCalledWith(time);
+    expect(provider._client.fastForwardToTime).toHaveBeenCalledTimes(1);
+  });
 });

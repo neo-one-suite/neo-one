@@ -7,6 +7,7 @@ import {
 } from '@neo-one/server-plugin';
 import {
   Client,
+  DeveloperClient,
   LocalKeyStore,
   LocalUserAccountProvider,
   LocalMemoryStore,
@@ -256,20 +257,24 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         ),
       );
 
+      const provider = new NEOONEProvider({
+        options: [
+          { network: network.name, rpcURL: network.nodes[0].rpcAddress },
+        ],
+      });
+
       const client = new Client({
         memory: new LocalUserAccountProvider({
           keystore,
-          provider: new NEOONEProvider({
-            options: [
-              { network: network.name, rpcURL: network.nodes[0].rpcAddress },
-            ],
-          }),
+          provider,
         }),
       });
       const [firstWalletBatch, secondWalletBatch] = _.chunk(
         wallets,
         Math.ceil(wallets.length / 2),
       );
+
+      const developerClient = new DeveloperClient(provider.read(network.name));
 
       let firstTransferBatch = await Promise.all(
         firstWalletBatch.map(walletName =>
@@ -286,7 +291,10 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
       const firstTransactionBatch = await client.transfer(firstTransferBatch, {
         from: masterWallet.accountID,
       });
-      await firstTransactionBatch.confirmed();
+      await Promise.all([
+        developerClient.runConsensusNow(),
+        firstTransactionBatch.confirmed(),
+      ]);
 
       const fromWallets = await Promise.all(
         firstWalletBatch
@@ -321,6 +329,8 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
       );
 
       await Promise.all(
-        secondTransactionBatch.map(transaction => transaction.confirmed()),
+        [developerClient.runConsensusNow()].concat(
+          secondTransactionBatch.map(transaction => transaction.confirmed()),
+        ),
       );
     });

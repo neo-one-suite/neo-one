@@ -374,6 +374,36 @@ export default ({
         issueGASFee: issueGASFee.toString(),
       };
     },
+    runconsensusnow: async () => {
+      if (node.consensus) {
+        await node.consensus.runConsensusNow();
+      } else {
+        throw new Error('This node does not support triggering consensus.');
+      }
+    },
+    updatesettings: args => {
+      const { settings } = blockchain;
+      const newSettings = {
+        ...settings,
+        secondsPerBlock: args[0].secondsPerBlock,
+      };
+
+      blockchain.updateSettings(newSettings);
+    },
+    fastforwardoffset: async args => {
+      if (node.consensus) {
+        await node.consensus.fastForwardOffset(args[0]);
+      } else {
+        throw new Error('This node does not support fast forwarding.');
+      }
+    },
+    fastforwardtotime: async args => {
+      if (node.consensus != null) {
+        await node.consensus.fastForwardToTime(args[0]);
+      } else {
+        throw new Error('This node does not support fast forwarding.');
+      }
+    },
   };
   server = jayson.server(
     _.mapValues(handlers, handler => async (...args: $FlowFixMe): Promise<

@@ -16,6 +16,7 @@ import {
   type UInt160,
   type Validator,
   type VerifyScriptOptions,
+  type Settings,
   InvocationTransaction,
   ScriptBuilder,
   common,
@@ -37,6 +38,7 @@ import {
   performanceNow,
 } from '@neo-one/utils';
 import PriorityQueue from 'js-priority-queue';
+import { BehaviorSubject } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 
 import _ from 'lodash';
@@ -53,7 +55,7 @@ import getValidators from './getValidators';
 import wrapExecuteScripts from './wrapExecuteScripts';
 
 export type CreateBlockchainOptions = {|
-  settings: $PropertyType<BlockchainType, 'settings'>,
+  settings: Settings,
   storage: Storage,
   vm: VM,
   log: Log,
@@ -78,7 +80,6 @@ type Vote = {|
 |};
 
 export default class Blockchain {
-  settings: $PropertyType<BlockchainType, 'settings'>;
   log: $PropertyType<BlockchainType, 'log'>;
   deserializeWireContext: $PropertyType<
     BlockchainType,
@@ -104,6 +105,7 @@ export default class Blockchain {
   invocationData: $PropertyType<BlockchainType, 'invocationData'>;
   validatorsCount: $PropertyType<BlockchainType, 'validatorsCount'>;
 
+  _settings$: BehaviorSubject<Settings>;
   _storage: Storage;
   _currentBlock: ?$PropertyType<BlockchainType, 'currentBlock'>;
   _currentHeader: ?$PropertyType<BlockchainType, 'currentHeader'>;
@@ -131,7 +133,8 @@ export default class Blockchain {
     this._doneRunningResolve = null;
     this._perf = new Performance();
 
-    this.settings = options.settings;
+    this._settings$ = new BehaviorSubject(options.settings);
+
     this.log = options.log;
 
     this.account = this._storage.account;
@@ -248,6 +251,14 @@ export default class Blockchain {
 
   get isPersistingBlock(): boolean {
     return this._persistingBlocks;
+  }
+
+  get settings(): Settings {
+    return this._settings$.getValue();
+  }
+
+  updateSettings(settings: Settings): void {
+    this._settings$.next(settings);
   }
 
   persistBlock({
