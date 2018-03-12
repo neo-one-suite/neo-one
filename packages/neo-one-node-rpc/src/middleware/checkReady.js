@@ -42,12 +42,18 @@ const fetchCount = async (
   }
 };
 
+const CHECK_ENDPOINTS = 5;
+
 const fetchTallestBlockIndex = async (
   rpcEndpoints: Array<string>,
   timeoutMS: number,
+  checkEndpoints?: number,
 ): Promise<?number> => {
   const counts = await Promise.all(
-    rpcEndpoints.map(rpcEndpoint => fetchCount(rpcEndpoint, timeoutMS)),
+    _.take(
+      _.shuffle(rpcEndpoints),
+      checkEndpoints == null ? CHECK_ENDPOINTS : checkEndpoints,
+    ).map(rpcEndpoint => fetchCount(rpcEndpoint, timeoutMS)),
   );
   return _.max(counts.filter(Boolean).map(count => count - 1));
 };
@@ -56,6 +62,7 @@ export type Options = {|
   rpcURLs: Array<string>,
   offset: number,
   timeoutMS: number,
+  checkEndpoints?: number,
 |};
 
 export default async ({
@@ -68,10 +75,12 @@ export default async ({
   const index = await fetchTallestBlockIndex(
     options.rpcURLs,
     options.timeoutMS,
+    options.checkEndpoints,
   );
   const ready =
     options.rpcURLs.length === 0 ||
-    (index != null && blockchain.currentBlockIndex >= index - options.offset);
+    index == null ||
+    blockchain.currentBlockIndex >= index - options.offset;
 
   return { ready, index };
 };

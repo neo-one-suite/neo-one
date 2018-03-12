@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-rpc",
-  "version": "1.0.0-alpha.23",
+  "version": "1.0.0-alpha.26",
   "keywords": [
     "neo",
     "NEO",
@@ -34,7 +34,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.22",
+    "@neo-one/client": "^1.0.0-alpha.23",
     "@neo-one/client-core": "^1.0.0-alpha.10",
     "@neo-one/node-core": "^1.0.0-alpha.11",
     "@neo-one/utils": "^1.0.0-alpha.6",
@@ -48,7 +48,7 @@
     "koa-cors": "^0.0.16",
     "koa-mount": "^3.0.0",
     "lodash": "^4.17.5",
-    "node-fetch": "^2.0.0",
+    "node-fetch": "^2.1.1",
     "rxjs": "^5.5.6"
   }
 }

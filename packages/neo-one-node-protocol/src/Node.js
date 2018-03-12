@@ -103,8 +103,9 @@ const GET_BLOCKS_COUNT = 500;
 // Assume that we get 500 back, but if not, at least request every 10 seconds
 const GET_BLOCKS_BUFFER = GET_BLOCKS_COUNT / 3;
 const GET_BLOCKS_TIME_MS = 10000;
-const GET_BLOCKS_THROTTLE_MS = 500;
+const GET_BLOCKS_THROTTLE_MS = 1000;
 const GET_BLOCKS_CLOSE_COUNT = 2;
+const UNHEALTHY_PEER_SECONDS = 120;
 const LOCAL_HOST_ADDRESSES = new Set([
   '',
   '0.0.0.0',
@@ -376,7 +377,7 @@ export default class Node implements INode {
       throw new NegotiationError(message);
     }
 
-    this._checkVersion(message, versionPayload);
+    this._checkVersion(peer, message, versionPayload);
 
     const { host } = getEndpointConfig(peer.endpoint);
     let address;
@@ -413,15 +414,29 @@ export default class Node implements INode {
   ) => {
     const checkTimeSeconds = commonUtils.nowSeconds();
     const blockIndex = this._blockIndex[peer.endpoint];
-    const health = { healthy: true, checkTimeSeconds, blockIndex };
+
+    // If first check -> healthy
+    if (prevHealth == null) {
+      return { healthy: true, checkTimeSeconds, blockIndex };
+    }
+
+    // If seen new block -> healthy + update check time
+    if (prevHealth.blockIndex != null && prevHealth.blockIndex < blockIndex) {
+      return { healthy: true, checkTimeSeconds, blockIndex };
+    }
+
+    // If not seen a block or a new block BUT it has NOT been a long
+    // time -> healthy
     if (
-      prevHealth == null ||
-      (prevHealth.blockIndex != null &&
-        prevHealth.blockIndex < health.blockIndex) ||
-      (prevHealth.blockIndex == null &&
-        health.checkTimeSeconds - prevHealth.checkTimeSeconds < 120)
+      (prevHealth.blockIndex == null || prevHealth.blockIndex === blockIndex) &&
+      commonUtils.nowSeconds() - prevHealth.checkTimeSeconds <
+        UNHEALTHY_PEER_SECONDS
     ) {
-      return health;
+      return {
+        healthy: true,
+        checkTimeSeconds: prevHealth.checkTimeSeconds,
+        blockIndex: prevHealth.blockIndex,
+      };
     }
 
     return { healthy: false, checkTimeSeconds, blockIndex };
@@ -456,8 +471,20 @@ export default class Node implements INode {
     });
   };
 
-  _findBestPeer(): ConnectedPeer<Message, PeerData> {
-    return _.maxBy(this._network.connectedPeers, peer => peer.data.startHeight);
+  _findBestPeer(
+    bestPeer?: ConnectedPeer<Message, PeerData>,
+  ): ?ConnectedPeer<Message, PeerData> {
+    let peers = this._network.connectedPeers;
+    if (bestPeer != null) {
+      peers = peers.filter(peer => peer.endpoint !== bestPeer.endpoint);
+    }
+    const result = _.maxBy(peers, peer => peer.data.startHeight);
+    if (result == null) {
+      return null;
+    }
+    return _.shuffle(
+      peers.filter(peer => peer.data.startHeight === result.data.startHeight),
+    )[0];
   }
 
   _requestBlocks = _.debounce(() => {
@@ -470,10 +497,9 @@ export default class Node implements INode {
           level: 'debug',
           peer: peer.endpoint,
         });
+        this._bestPeer = this._findBestPeer(peer);
         this._network.blacklistAndClose(peer);
         this._getBlocksRequestsCount = 0;
-        // TODO: Seems like this causes issues sometimes, try resetting here...
-        this._knownBlockHashes = createScalingBloomFilter();
       } else if (this._shouldRequestBlocks()) {
         if (this._getBlocksRequestsIndex === block.index) {
           this.blockchain.log({
@@ -481,6 +507,7 @@ export default class Node implements INode {
             level: 'debug',
             peer: peer.endpoint,
             index: block.index,
+            hash: block.hashHex,
           });
           this._getBlocksRequestsCount += 1;
         } else {
@@ -489,6 +516,7 @@ export default class Node implements INode {
             level: 'debug',
             peer: peer.endpoint,
             index: block.index,
+            hash: block.hashHex,
           });
           this._getBlocksRequestsCount = 1;
           this._getBlocksRequestsIndex = block.index;
@@ -532,13 +560,18 @@ export default class Node implements INode {
     );
   }
 
-  _checkVersion(message: Message, version: VersionPayload): void {
+  _checkVersion(
+    peer: Peer<Message>,
+    message: Message,
+    version: VersionPayload,
+  ): void {
     if (version.nonce === this._nonce) {
+      this._network.permanentlyBlacklist(peer.endpoint);
       throw new NegotiationError(message, 'Nonce equals my nonce.');
     }
 
     const connectedPeer = this._network.connectedPeers.find(
-      peer => version.nonce === peer.data.nonce,
+      otherPeer => version.nonce === otherPeer.data.nonce,
     );
     if (connectedPeer != null) {
       throw new AlreadyConnectedError(

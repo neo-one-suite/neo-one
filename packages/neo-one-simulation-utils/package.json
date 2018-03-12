@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/simulation-utils",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-alpha.6",
   "keywords": [
     "neo",
     "NEO",
@@ -39,6 +39,6 @@
     "access": "public"
   },
   "dependencies": {
-    "cross-spawn": "^6.0.4"
+    "cross-spawn": "^6.0.5"
   }
 }
