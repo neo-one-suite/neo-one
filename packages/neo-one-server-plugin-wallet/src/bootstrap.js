@@ -554,7 +554,6 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         }),
       });
       const developerClient = new DeveloperClient(provider.read(network.name));
-      await developerClient.updateSettings({ secondsPerBlock: 1 });
 
       await initializeWallets({
         wallets,
