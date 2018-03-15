@@ -380,9 +380,17 @@ export default class LocalUserAccountProvider<
       throw new NothingToIssueError();
     }
 
+    const issueOutputs = outputs.concat(
+      transfers.map(transfer => ({
+        address: transfer.to,
+        asset: transfer.asset,
+        value: transfer.amount,
+      })),
+    );
+
     const transaction = new IssueTransaction({
       inputs: this._convertInputs(inputs),
-      outputs: this._convertOutputs(outputs),
+      outputs: this._convertOutputs(issueOutputs),
       attributes: this._convertAttributes(attributes),
     });
     return this._sendTransaction({

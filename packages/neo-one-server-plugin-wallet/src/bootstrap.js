@@ -17,6 +17,8 @@ import {
   type Account,
   type AssetType,
   type Hash256String,
+  type TransactionResult,
+  type TransactionReceipt,
 } from '@neo-one/client';
 import { common } from '@neo-one/client-core';
 import {
@@ -406,6 +408,69 @@ async function registerAssets({
   return registrations.map(registration => registration.result.value.hash);
 }
 
+async function issueAsset({
+  wallets,
+  asset,
+  networkName,
+  cli,
+  plugin,
+  client,
+}: {|
+  wallets: Array<string>,
+  networkName: string,
+  asset: {
+    assetType: AssetType,
+    name: string,
+    amount: BigNumber,
+    precision: number,
+    wallet: Wallet,
+    hash: Hash256String,
+  },
+  cli: InteractiveCLI,
+  plugin: WalletPlugin,
+  client: Client<*>,
+|}): Promise<TransactionResult<TransactionReceipt>> {
+  const accounts = await Promise.all(
+    wallets.map(wallet =>
+      getWallet({
+        walletName: wallet,
+        networkName,
+        cli,
+        plugin,
+      }),
+    ),
+  );
+
+  const numIssues = Math.floor(accounts.length / 3);
+  const positions = [];
+  const transfers = [];
+  let available = asset.amount;
+  for (let i = 0; i < numIssues; i += 1) {
+    let pos = randomInt(accounts.length) - 1;
+    while (positions.includes(pos)) {
+      pos = randomInt(accounts.length) - 1;
+    }
+    positions.push(pos);
+
+    const amount = new BigNumber(randomInt(10000) + 10);
+    available = available.minus(amount);
+    transfers.push({
+      to: accounts[pos].address,
+      asset: asset.hash,
+      amount,
+    });
+  }
+  transfers.push({
+    to: asset.wallet.address,
+    asset: asset.hash,
+    amount: available,
+  });
+
+  const issue = await client.issue(transfers, { from: asset.wallet.accountID });
+
+  return issue;
+}
+
 export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
   cli.vorpal
     .command('bootstrap', 'Bootstraps a Network with test data.')
@@ -501,7 +566,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         developerClient,
       });
 
-      const assets = [
+      let assets = [
         {
           assetType: 'Token',
           name: 'redcoin',
@@ -509,9 +574,9 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           precision: 4,
         },
         {
-          assetType: 'Share',
+          assetType: 'Token',
           name: 'bluecoin',
-          amount: new BigNumber(650000000),
+          amount: new BigNumber(650000),
           precision: 0,
         },
         {
@@ -531,12 +596,37 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         masterWallet,
       });
 
-      await registerAssets({
+      const assetHashes = await registerAssets({
         assets,
         assetWallets,
         client,
         developerClient,
       });
+
+      assets = _.zip(assets, assetWallets, assetHashes).map(asset => ({
+        ...asset[0],
+        wallet: asset[1],
+        hash: asset[2],
+      }));
+
+      const issues = await Promise.all(
+        assets.map(asset =>
+          issueAsset({
+            wallets,
+            asset,
+            networkName: network.name,
+            cli,
+            plugin,
+            client,
+          }),
+        ),
+      );
+
+      await Promise.all(
+        [developerClient.runConsensusNow()].concat(
+          issues.map(issue => issue.confirmed()),
+        ),
+      );
 
       const kyc = await client.publish(kycContract);
       await Promise.all([developerClient.runConsensusNow(), kyc.confirmed()]);
