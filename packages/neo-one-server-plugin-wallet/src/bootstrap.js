@@ -150,20 +150,12 @@ function randomIntDist(seed: number): number {
 }
 
 async function createTransfers({
-  walletName,
-  networkName,
-  cli,
-  plugin,
+  wallet,
   from,
 }: {|
-  walletName: string,
-  networkName: string,
-  cli: InteractiveCLI,
-  plugin: WalletPlugin,
+  wallet: Wallet,
   from?: Account,
 |}): Promise<Array<Transfer>> {
-  const wallet = await getWallet({ walletName, networkName, cli, plugin });
-
   let neo;
   let gas;
   if (from == null) {
@@ -198,16 +190,12 @@ async function initializeWallets({
   wallets,
   masterWallet,
   networkName,
-  cli,
-  plugin,
   client,
   developerClient,
 }: {|
-  wallets: Array<string>,
+  wallets: Array<Wallet>,
   masterWallet: Wallet,
   networkName: string,
-  cli: InteractiveCLI,
-  plugin: WalletPlugin,
   client: Client<*>,
   developerClient: DeveloperClient,
 |}): Promise<void> {
@@ -217,14 +205,7 @@ async function initializeWallets({
   );
 
   let firstTransferBatch = await Promise.all(
-    firstWalletBatch.map(walletName =>
-      createTransfers({
-        walletName,
-        networkName,
-        cli,
-        plugin,
-      }),
-    ),
+    firstWalletBatch.map(wallet => createTransfers({ wallet })),
   );
   firstTransferBatch = _.flatten(firstTransferBatch);
 
@@ -236,11 +217,8 @@ async function initializeWallets({
     firstTransactionBatch.confirmed(),
   ]);
 
-  const fromWallets = await Promise.all(
-    firstWalletBatch
-      .slice(0, secondWalletBatch.length)
-      .map(walletName => getWallet({ walletName, networkName, cli, plugin })),
-  );
+  const fromWallets = firstWalletBatch.slice(0, secondWalletBatch.length);
+
   const fromAccounts = await Promise.all(
     fromWallets.map(wallet =>
       client.read(networkName).getAccount(wallet.address),
@@ -250,10 +228,7 @@ async function initializeWallets({
   let secondTransferBatch = await Promise.all(
     _.zip(secondWalletBatch, fromAccounts).map(transferWallets =>
       createTransfers({
-        walletName: transferWallets[0],
-        networkName,
-        cli,
-        plugin,
+        wallet: transferWallets[0],
         from: transferWallets[1],
       }),
     ),
@@ -276,36 +251,20 @@ async function initializeWallets({
 async function initiateClaims({
   wallets,
   networkName,
-  cli,
-  plugin,
   client,
   developerClient,
   provider,
 }: {|
-  wallets: Array<string>,
+  wallets: Array<Wallet>,
   networkName: string,
-  cli: InteractiveCLI,
-  plugin: WalletPlugin,
   client: Client<*>,
   developerClient: DeveloperClient,
   provider: NEOONEProvider,
 |}): Promise<void> {
-  const accounts = await Promise.all(
-    wallets.map(wallet =>
-      getWallet({
-        walletName: wallet,
-        networkName,
-        cli,
-        plugin,
-      }),
-    ),
-  );
   const unclaimed = await Promise.all(
-    accounts.map(account =>
-      provider.getUnclaimed(networkName, account.address),
-    ),
+    wallets.map(wallet => provider.getUnclaimed(networkName, wallet.address)),
   );
-  const unclaimedAccounts = _.zip(accounts, unclaimed)
+  const unclaimedAccounts = _.zip(wallets, unclaimed)
     .filter(account => account[1].unclaimed.length > 0)
     .map(account => account[0]);
 
@@ -411,13 +370,9 @@ async function registerAssets({
 async function issueAsset({
   wallets,
   asset,
-  networkName,
-  cli,
-  plugin,
   client,
 }: {|
-  wallets: Array<string>,
-  networkName: string,
+  wallets: Array<Wallet>,
   asset: {
     assetType: AssetType,
     name: string,
@@ -426,36 +381,23 @@ async function issueAsset({
     wallet: Wallet,
     hash: Hash256String,
   },
-  cli: InteractiveCLI,
-  plugin: WalletPlugin,
   client: Client<*>,
 |}): Promise<TransactionResult<TransactionReceipt>> {
-  const accounts = await Promise.all(
-    wallets.map(wallet =>
-      getWallet({
-        walletName: wallet,
-        networkName,
-        cli,
-        plugin,
-      }),
-    ),
-  );
-
-  const numIssues = Math.floor(accounts.length / 3);
+  const numIssues = Math.floor(wallets.length / 3);
   const positions = [];
   const transfers = [];
   let available = asset.amount;
   for (let i = 0; i < numIssues; i += 1) {
-    let pos = randomInt(accounts.length) - 1;
+    let pos = randomInt(wallets.length) - 1;
     while (positions.includes(pos)) {
-      pos = randomInt(accounts.length) - 1;
+      pos = randomInt(wallets.length) - 1;
     }
     positions.push(pos);
 
     const amount = new BigNumber(randomInt(10000) + 10);
     available = available.minus(amount);
     transfers.push({
-      to: accounts[pos].address,
+      to: wallets[pos].address,
       asset: asset.hash,
       amount,
     });
@@ -469,6 +411,75 @@ async function issueAsset({
   const issue = await client.issue(transfers, { from: asset.wallet.accountID });
 
   return issue;
+}
+
+async function createAssetTransfer({
+  wallets,
+  assetHash,
+  networkName,
+  client,
+  assetWallet,
+}: {|
+  wallets: Array<Wallet>,
+  assetHash: Hash256String,
+  networkName: string,
+  client: Client<*>,
+  assetWallet: Wallet,
+|}): Promise<Array<TransactionResult<TransactionReceipt>>> {
+  const accounts = await Promise.all(
+    wallets.map(wallet => client.read(networkName).getAccount(wallet.address)),
+  );
+  const assetAccount = await client
+    .read(networkName)
+    .getAccount(assetWallet.address);
+  const walletTransfers = [];
+  for (const account of accounts) {
+    const transferPercent = randomInt(75) / 100;
+
+    const stringBalance = account.balances[assetHash];
+    if (stringBalance != null) {
+      const amount = Math.ceil(transferPercent * Number(stringBalance));
+      walletTransfers.push({
+        transfer: {
+          amount: new BigNumber(amount),
+          asset: assetHash,
+          to: wallets[randomInt(wallets.length) - 1].address,
+        },
+        from: {
+          from: {
+            network: networkName,
+            address: account.address,
+          },
+        },
+      });
+    }
+  }
+
+  const firstTransfers = await Promise.all(
+    walletTransfers.map(walletTransfer =>
+      client.transfer([walletTransfer.transfer], walletTransfer.from),
+    ),
+  );
+
+  const numTransfers = Math.floor(wallets.length / 3);
+  const assetWalletTransfers = [];
+  for (let i = 0; i < numTransfers; i += 1) {
+    const transferPercent = randomInt(100) / 1000;
+    const balance = Number(assetAccount.balances[assetHash]);
+
+    const amount = Math.ceil(transferPercent * balance);
+    assetWalletTransfers.push({
+      amount: new BigNumber(amount),
+      asset: assetHash,
+      to: wallets[randomInt(wallets.length) - 1].address,
+    });
+  }
+
+  const secondTransfers = await client.transfer(assetWalletTransfers, {
+    from: assetWallet.accountID,
+  });
+
+  return firstTransfers.concat([secondTransfers]);
 }
 
 export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
@@ -524,14 +535,14 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         privateKey: wifToPrivateKey(masterWallet.wif),
       });
 
-      const wallets = [];
+      const walletNames = [];
       const numWallets = getNumWallets(args.options);
       for (let i = 1; i < numWallets + 1; i += 1) {
-        wallets.push(`wallet-${i}`);
+        walletNames.push(`wallet-${i}`);
       }
 
-      await Promise.all(
-        wallets.map(walletName =>
+      const wallets = await Promise.all(
+        walletNames.map(walletName =>
           createWallet({
             walletName,
             networkName: network.name,
@@ -559,8 +570,6 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         wallets,
         masterWallet,
         networkName: network.name,
-        cli,
-        plugin,
         client,
         developerClient,
       });
@@ -613,9 +622,6 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           issueAsset({
             wallets,
             asset,
-            networkName: network.name,
-            cli,
-            plugin,
             client,
           }),
         ),
@@ -624,6 +630,24 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
       await Promise.all(
         [developerClient.runConsensusNow()].concat(
           issues.map(issue => issue.confirmed()),
+        ),
+      );
+
+      const assetTransfers = await Promise.all(
+        assets.map(asset =>
+          createAssetTransfer({
+            wallets,
+            assetHash: asset.hash,
+            networkName: network.name,
+            client,
+            assetWallet: asset.wallet,
+          }),
+        ),
+      );
+
+      await Promise.all(
+        [developerClient.runConsensusNow()].concat(
+          _.flatten(assetTransfers).map(transfer => transfer.confirmed()),
         ),
       );
 
@@ -639,8 +663,6 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
       await initiateClaims({
         wallets,
         networkName: network.name,
-        cli,
-        plugin,
         client,
         developerClient,
         provider,

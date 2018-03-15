@@ -24,7 +24,7 @@ async function testAssetIssue({
       expect(Number(balance[1])).toEqual(44510);
     } else if (balance[0] === asset) {
       expectedAssetCount += 1;
-      expect(Number(balance[1])).toBeGreaterThan(600000);
+      expect(Number(balance[1])).toBeGreaterThan(500000);
     }
   }
   expect(expectedAssetCount).toEqual(2);
@@ -52,7 +52,7 @@ async function testAssetIssue({
       }
     }
   }
-  expect(assetWalletCount).toEqual(Math.floor(numWallets / 3));
+  expect(assetWalletCount).toBeGreaterThanOrEqual(Math.floor(numWallets / 3));
 }
 
 async function testBootstrap(
