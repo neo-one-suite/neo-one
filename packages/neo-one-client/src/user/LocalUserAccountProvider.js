@@ -321,6 +321,7 @@ export default class LocalUserAccountProvider<
     options?: TransactionOptions,
   ): Promise<TransactionResult<RegisterAssetReceipt>> {
     const sb = new ScriptBuilder();
+
     sb.emitSysCall(
       'Neo.Asset.Create',
       toAssetType(assertAssetTypeJSON(asset.assetType)),
@@ -328,8 +329,8 @@ export default class LocalUserAccountProvider<
       clientUtils.bigNumberToBN(asset.amount, 8),
       asset.precision,
       common.stringToECPoint(asset.owner),
-      addressToScriptHash(asset.admin),
-      addressToScriptHash(asset.issuer),
+      common.stringToUInt160(addressToScriptHash(asset.admin)),
+      common.stringToUInt160(addressToScriptHash(asset.issuer)),
     );
 
     return this._invokeRaw({
@@ -474,7 +475,7 @@ export default class LocalUserAccountProvider<
       inputs: this._convertInputs(inputs),
       outputs: this._convertOutputs(outputs),
       attributes: this._convertAttributes(attributes),
-      gas: utils.ZERO,
+      gas: common.TEN_THOUSAND_FIXED8,
       script: clientUtils.getInvokeMethodScript({
         hash: contract,
         method,
@@ -591,7 +592,7 @@ export default class LocalUserAccountProvider<
       inputs: this._convertInputs(testInputs),
       outputs: this._convertOutputs(testOutputs),
       attributes: this._convertAttributes(attributes),
-      gas: utils.ZERO,
+      gas: common.TEN_THOUSAND_FIXED8,
       script,
       scripts,
     });

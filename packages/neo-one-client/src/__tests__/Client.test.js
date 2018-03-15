@@ -238,7 +238,6 @@ describe('Client', () => {
     {
       method: 'issue',
       args: [0, 1],
-      providerMethod: 'transfer',
     },
     {
       method: '_invoke',

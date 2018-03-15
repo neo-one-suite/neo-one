@@ -197,8 +197,7 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
 
   issue(...args: Array<any>): Promise<TransactionResult<TransactionReceipt>> {
     const { transfers, options } = this._getTransfersOptions(args);
-
-    return this._getProvider(options).transfer(transfers, options);
+    return this._getProvider(options).issue(transfers, options);
   }
 
   read(network: NetworkType): ReadClient<any> {

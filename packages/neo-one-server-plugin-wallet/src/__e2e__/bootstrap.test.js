@@ -38,23 +38,28 @@ async function testBootstrap(
       gasBalanceCount += 1;
     }
   }
-  // Check that at least ceil(numWallets/2) have nonzero balances
+  // Check that at least ceil((numWallets - 3)/2) have nonzero neo balances
+  // and ceil((nuwallets-3)/2 + 3) have nonzero gas balances.
   // This is the minimum number of wallets that could have balance,
   // so this checks that the transfers succeeded
-  expect(neoBalanceCount).toBeGreaterThanOrEqual(Math.ceil(numWallets / 2));
-  expect(gasBalanceCount).toBeGreaterThanOrEqual(Math.ceil(numWallets / 2));
+  expect(neoBalanceCount).toBeGreaterThanOrEqual(
+    Math.ceil((numWallets - 3) / 2),
+  );
+  expect(gasBalanceCount).toBeGreaterThanOrEqual(
+    Math.ceil((numWallets - 3) / 2) + 3,
+  );
 }
 
 describe('bootstrap', () => {
   test('bootstrap - default', async () => {
-    const numWallets = 10;
+    const numWallets = 13;
     const command = 'bootstrap --network boottest';
 
     await testBootstrap(command, numWallets);
   });
 
   test('bootstrap - 20 wallets', async () => {
-    const numWallets = 20;
+    const numWallets = 23;
     const command = 'bootstrap --network boottest --wallets 20';
 
     await testBootstrap(command, numWallets);
