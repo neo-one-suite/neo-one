@@ -464,7 +464,7 @@ async function createAssetTransfer({
   const numTransfers = Math.floor(wallets.length / 3);
   const assetWalletTransfers = [];
   for (let i = 0; i < numTransfers; i += 1) {
-    const transferPercent = randomInt(100) / 1000;
+    const transferPercent = randomInt(Math.floor(250 / numTransfers)) / 1000;
     const balance = Number(assetAccount.balances[assetHash]);
 
     const amount = Math.ceil(transferPercent * balance);

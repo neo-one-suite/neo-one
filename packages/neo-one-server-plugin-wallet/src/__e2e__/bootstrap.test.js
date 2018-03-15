@@ -1,5 +1,6 @@
 /* @flow */
 import { addressToScriptHash } from '@neo-one/client';
+import _ from 'lodash';
 
 async function testAssetIssue({
   numWallets,
@@ -24,7 +25,7 @@ async function testAssetIssue({
       expect(Number(balance[1])).toEqual(44510);
     } else if (balance[0] === asset) {
       expectedAssetCount += 1;
-      expect(Number(balance[1])).toBeGreaterThan(500000);
+      expect(Number(balance[1])).toBeGreaterThan(450000);
     }
   }
   expect(expectedAssetCount).toEqual(2);
@@ -34,11 +35,28 @@ async function testAssetIssue({
     walletNames.push(`wallet-${i}`);
   }
 
-  const walletDescribes = await Promise.all(
-    walletNames.map(walletName =>
+  const walletNamesSplit = _.chunk(walletNames, 10);
+  let walletDescribes = [];
+
+  const chunkOne = await Promise.all(
+    walletNamesSplit[0].map(walletName =>
       one.execute(`describe wallet ${walletName} --network ${network} --json`),
     ),
   );
+  walletDescribes.push(chunkOne);
+
+  if (walletNamesSplit.length === 2) {
+    const chunkTwo = await Promise.all(
+      walletNamesSplit[1].map(walletName =>
+        one.execute(
+          `describe wallet ${walletName} --network ${network} --json`,
+        ),
+      ),
+    );
+    walletDescribes.push(chunkTwo);
+  }
+  walletDescribes = _.flatten(walletDescribes);
+
   const walletBalances = walletDescribes.map(walletDescribe =>
     one.parseJSON(walletDescribe)[7][1].table.slice(1),
   );
