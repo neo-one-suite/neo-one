@@ -7,6 +7,8 @@ import {
   StartCRUD,
 } from '@neo-one/server-plugin';
 
+import { constants as networkConstants } from '@neo-one/server-plugin-network';
+
 import type WalletResourceType, {
   Wallet,
   WalletResourceOptions,
@@ -53,7 +55,7 @@ export default class StartWalletCRUD extends StartCRUD<
     const { cli, options } = optionsIn;
     const { network } = await common.getCLIResourceOptions(optionsIn);
     let { password } = options;
-    if (network === constants.MAIN_NETWORK && password == null) {
+    if (network === networkConstants.NETWORK_NAME.MAIN && password == null) {
       password = await common.promptPassword({
         cli,
         prompt: 'Enter password',

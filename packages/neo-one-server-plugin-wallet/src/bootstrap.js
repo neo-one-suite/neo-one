@@ -495,8 +495,8 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
       });
 
       if (
-        networkName === networkConstants.MAIN ||
-        networkName === networkConstants.TEST
+        networkName === networkConstants.NETWORK_NAME.MAIN ||
+        networkName === networkConstants.NETWORK_NAME.TEST
       ) {
         throw new Error(
           'Invalid Network: Can only bootstrap a private network',

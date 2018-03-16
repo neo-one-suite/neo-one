@@ -42,7 +42,7 @@
     "neo-one-simulation-react-post-create": "./dist/bin/post-create"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.0.0-beta.40",
+    "@babel/polyfill": "^7.0.0-beta.42",
     "@neo-one/simulation-utils": "^1.0.0-alpha.6"
   }
 }

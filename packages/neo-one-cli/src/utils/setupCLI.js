@@ -43,9 +43,9 @@ export default ({
   |}) => {
     const exitCode =
       error != null &&
-      error.exitCode != null &&
-      typeof error.exitCode === 'number'
-        ? error.exitCode
+      (error: $FlowFixMe).exitCode != null &&
+      typeof (error: $FlowFixMe).exitCode === 'number'
+        ? (error: $FlowFixMe).exitCode
         : exitCodeIn;
     if (!shutdownInitiated) {
       shutdownInitiated = true;

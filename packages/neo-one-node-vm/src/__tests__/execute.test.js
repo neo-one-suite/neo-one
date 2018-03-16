@@ -23,14 +23,17 @@ import _ from 'lodash';
 import execute from '../execute';
 import { createBlockchain, testUtils, transactions } from '../__data__';
 
+const monitor = DefaultMonitor.create({
+  namespace: 'test',
+  logger: { log: () => {}, close: () => {} },
+});
+
 const executeSimple = ({
-  monitor,
   blockchain,
   transaction,
   gas,
   persistingBlock,
 }: {|
-  monitor: $FlowFixMe,
   blockchain: $FlowFixMe,
   transaction: InvocationTransaction,
   gas?: BN,
@@ -57,7 +60,6 @@ const NEO_ASSET_HASH_UINT256 = common.stringToUInt256(common.NEO_ASSET_HASH);
 
 describe('execute', () => {
   let blockchain: $FlowFixMe;
-  let monitor: $FlowFixMe;
   beforeEach(() => {
     blockchain = ({
       contract: {},
@@ -69,10 +71,6 @@ describe('execute', () => {
       output: {},
       currentBlock: {},
     }: $FlowFixMe);
-    monitor = DefaultMonitor.create({
-      namespace: 'test',
-      logger: { log: () => {}, close: () => {} },
-    });
   });
 
   const testKYC = (name: string, gas: BN, state: number) => {
@@ -91,7 +89,6 @@ describe('execute', () => {
       blockchain.action.add = jest.fn(() => Promise.resolve());
 
       const result = await executeSimple({
-        monitor,
         blockchain,
         transaction: transactions.kycTransaction,
         gas,
@@ -152,7 +149,6 @@ describe('execute', () => {
     blockchain.currentBlock.index = 1920286;
 
     const result = await executeSimple({
-      monitor,
       blockchain,
       transaction: transactions.mintTransaction,
     });
@@ -218,7 +214,6 @@ describe('execute', () => {
 
     const executeSetupScript = async (script: Buffer) => {
       const result = await executeSimple({
-        monitor,
         blockchain,
         transaction: transactions.createInvocation({ script }),
       });
@@ -346,7 +341,6 @@ describe('execute', () => {
         await deploy();
 
         const result = await executeSimple({
-          monitor,
           blockchain,
           transaction: transactions.createInvocation({
             script: mintTokensScript,
@@ -365,7 +359,6 @@ describe('execute', () => {
           await deploy();
 
           const result = await executeSimple({
-            monitor,
             blockchain,
             transaction: neoTransaction,
             persistingBlock: {
@@ -392,7 +385,6 @@ describe('execute', () => {
           await setParam('setPresaleBegin', '1518598770');
 
           const result = await executeSimple({
-            monitor,
             blockchain,
             transaction: transactions.createInvocation({
               script: mintTokensScript,
@@ -423,7 +415,6 @@ describe('execute', () => {
           await addToWhitelist(senderAddress);
 
           const result = await executeSimple({
-            monitor,
             blockchain,
             transaction: neoTransaction,
             persistingBlock: {
@@ -438,7 +429,6 @@ describe('execute', () => {
           await deploy();
 
           const result = await executeSimple({
-            monitor,
             blockchain,
             transaction: neoTransaction,
             persistingBlock: {
@@ -456,7 +446,6 @@ describe('execute', () => {
         await setParam('setWhitelistSaleRate', '22');
 
         const result = await executeSimple({
-          monitor,
           blockchain,
           transaction: neoTransaction,
           persistingBlock: {
@@ -474,7 +463,6 @@ describe('execute', () => {
         await setParam('setMaxPurchase', '5');
 
         const result = await executeSimple({
-          monitor,
           blockchain,
           transaction: neoTransaction,
           persistingBlock: {
@@ -493,7 +481,6 @@ describe('execute', () => {
         await setParam('setMainsaleHardcap', '39000050');
 
         const result = await executeSimple({
-          monitor,
           blockchain,
           transaction: neoTransaction,
           persistingBlock: {
@@ -515,7 +502,6 @@ describe('execute', () => {
         await setParam('setMaxPurchase', '1000');
 
         const result = await executeSimple({
-          monitor,
           blockchain,
           transaction: neoTransaction,
           persistingBlock: {
@@ -565,7 +551,6 @@ describe('execute', () => {
           });
 
           const result = await executeSimple({
-            monitor,
             blockchain,
             transaction: transactions.createInvocation({
               script: sb.build(),

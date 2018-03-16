@@ -57,6 +57,11 @@ import {
 import { executeScript } from '../execute';
 import { keys, testUtils, transactions } from '../__data__';
 
+const monitor = DefaultMonitor.create({
+  namespace: 'test',
+  logger: { log: () => {}, close: () => {} },
+});
+
 const triggerType = TRIGGER_TYPE.APPLICATION;
 const scriptAttributeHash = keys[0].scriptHash;
 const blockTime = Date.now();
@@ -2044,10 +2049,6 @@ describe('syscalls', () => {
         validator: {},
         transactionSpentCoins: {},
       };
-      const monitor = DefaultMonitor.create({
-        namespace: 'test',
-        logger: { log: () => {}, close: () => {} },
-      });
       const block = {
         timestamp: blockTime,
       };
@@ -2074,7 +2075,7 @@ describe('syscalls', () => {
         handleArgs(argsSB, args);
 
         const argsContext = await executeScript({
-          monitor: (monitor: $FlowFixMe),
+          monitor,
           code: argsSB.build(),
           blockchain: (blockchain: $FlowFixMe),
           init,
@@ -2085,7 +2086,7 @@ describe('syscalls', () => {
       }
 
       const context = await executeScript({
-        monitor: (monitor: $FlowFixMe),
+        monitor,
         code: transaction.script,
         blockchain: (blockchain: $FlowFixMe),
         init,

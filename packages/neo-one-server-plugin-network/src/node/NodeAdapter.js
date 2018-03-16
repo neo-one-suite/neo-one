@@ -209,12 +209,6 @@ export default class NodeAdapter {
                 : JSON.stringify(this._settings.isTestNet),
             ],
             [
-              'Utility Token Amount',
-              this._settings.utilityTokenAmount == null
-                ? "'null'"
-                : JSON.stringify(this._settings.utilityTokenAmount),
-            ],
-            [
               'Seconds Per Block',
               this._settings.secondsPerBlock == null
                 ? "'null'"

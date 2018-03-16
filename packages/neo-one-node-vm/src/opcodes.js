@@ -1721,7 +1721,7 @@ export const lookupOp = ({ context }: {| context: ExecutionContext |}) => {
   if (
     opCode > OPCODE_TO_BYTECODE.PUSH16 &&
     opCode !== OPCODE_TO_BYTECODE.RET &&
-    context.PushOnly
+    context.pushOnly
   ) {
     throw new PushOnlyError(context, opCode);
   }

@@ -50,7 +50,7 @@
     "mali": "^0.7.1",
     "mali-compose": "^1.0.0",
     "mali-onerror": "^0.1.1",
-    "rxjs": "^5.5.6",
+    "rxjs": "^5.5.7",
     "toposort": "^1.0.6",
     "uuid": "^3.2.1"
   }

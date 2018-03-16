@@ -112,9 +112,10 @@ export default ({ server }: {| server: Server |}) => {
           _of({
             type: 'error',
             code:
-              error.code == null || typeof error.code !== 'string'
+              (error: $FlowFixMe).code == null ||
+              typeof (error: $FlowFixMe).code !== 'string'
                 ? 'UNKNOWN_ERROR'
-                : error.code,
+                : (error: $FlowFixMe).code,
             message: error.message,
           }),
         ),

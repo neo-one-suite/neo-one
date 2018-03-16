@@ -1236,6 +1236,11 @@ const OPCODES = ([
     // },
   ]): Array<TestCase>);
 
+const monitor = DefaultMonitor.create({
+  namespace: 'test',
+  logger: { log: () => {}, close: () => {} },
+});
+
 describe('opcodes', () => {
   for (const testCase of OPCODES) {
     const {
@@ -1287,10 +1292,6 @@ describe('opcodes', () => {
         contract: {},
         currentBlock: {},
       };
-      const monitor = DefaultMonitor.create({
-        namespace: 'test',
-        logger: { log: () => {}, close: () => {} },
-      });
       const block = { timestamp: blockTime };
       const init = {
         scriptContainer: {

@@ -283,7 +283,6 @@ class DefaultReference {
   _type: ReferenceType;
   _span: SpanContext | DefaultMonitor;
 
-  // eslint-disable-next-line
   constructor(span: SpanContext | DefaultMonitor) {
     this._span = span;
   }
@@ -308,7 +307,7 @@ class DefaultReference {
       return null;
     }
 
-    return this.type === 'childOf'
+    return this._type === 'childOf'
       ? tracer.childOf(context)
       : tracer.followsFrom(context);
   }
@@ -874,7 +873,9 @@ export default class DefaultMonitor implements Span {
         const { error: errorObj } = error;
         if (errorObj != null) {
           spanLog['error.kind'] =
-            errorObj.code == null ? errorObj.constructor.name : errorObj.code;
+            (errorObj: $FlowFixMe).code == null
+              ? errorObj.constructor.name
+              : (errorObj: $FlowFixMe).code;
           spanLog['error.object'] = errorObj;
           spanLog.stack = errorObj.stack;
         }
