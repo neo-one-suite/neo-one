@@ -1,5 +1,7 @@
 /* @flow */
 import type { Context } from 'koa';
+
+import gcStats from 'prometheus-gc-stats';
 import prom from 'prom-client';
 
 import type {
@@ -380,6 +382,8 @@ export default class DefaultMonitor implements Span {
     metricsLogLevel,
     spanLogLevel,
   }: DefaultMonitorCreate): DefaultMonitor {
+    prom.collectDefaultMetrics({ timeout: 4000 });
+    gcStats(prom.register)();
     return new DefaultMonitor({
       namespace,
       logger,
@@ -986,6 +990,7 @@ export default class DefaultMonitor implements Span {
   }
 
   async _closeInternal(): Promise<void> {
+    clearInterval(prom.collectDefaultMetrics());
     await Promise.all([
       new Promise(resolve => {
         this._logger.close(() => resolve());

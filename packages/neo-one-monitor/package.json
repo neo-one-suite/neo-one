@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "opentracing": "^0.14.1",
-    "prom-client": "^11.0.0"
+    "prom-client": "^11.0.0",
+    "prometheus-gc-stats": "^0.5.1"
   }
 }
