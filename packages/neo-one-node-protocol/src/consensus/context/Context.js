@@ -1,6 +1,5 @@
 /* @flow */
 import { type ECPoint, type UInt256, common } from '@neo-one/client-core';
-import { type LogData } from '@neo-one/utils';
 
 import type BlockSentContext from './BlockSentContext';
 import type InitialContext from './InitialContext';
@@ -83,7 +82,7 @@ export default class Context {
     throw new Error('Not Implemented');
   }
 
-  toJSON(): LogData {
+  toJSON(): Object {
     return {
       class: this.constructor.name,
       version: this.version,

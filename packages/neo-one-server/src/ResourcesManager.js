@@ -1,5 +1,4 @@
 /* @flow */
-import { type Log, logInvoke, utils } from '@neo-one/utils';
 import {
   type BaseResource,
   type BaseResourceOptions,
@@ -13,6 +12,7 @@ import {
   TaskList,
   compoundName,
 } from '@neo-one/server-plugin';
+import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -20,6 +20,7 @@ import _ from 'lodash';
 import { filter, map, shareReplay, switchMap, take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import fs from 'fs-extra';
+import { utils } from '@neo-one/utils';
 import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
 import type PluginManager from './PluginManager';
@@ -51,7 +52,7 @@ export default class ResourcesManager<
   Resource: BaseResource,
   ResourceOptions: BaseResourceOptions,
 > {
-  _log: Log;
+  _monitor: Monitor;
   _dataPath: string;
   _pluginManager: PluginManager;
   resourceType: ResourceType<Resource, ResourceOptions>;
@@ -80,21 +81,24 @@ export default class ResourcesManager<
   resources$: Observable<Array<Resource>>;
 
   constructor({
-    log,
+    monitor,
     dataPath,
     pluginManager,
     resourceType,
     masterResourceAdapter,
     portAllocator,
   }: {|
-    log: Log,
+    monitor: Monitor,
     dataPath: string,
     pluginManager: PluginManager,
     resourceType: ResourceType<Resource, ResourceOptions>,
     masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>,
     portAllocator: PortAllocator,
   |}) {
-    this._log = log;
+    this._monitor = monitor.sub('resources_manager').withLabels({
+      'plugin.name': resourceType.plugin.name,
+      'resource_type.name': resourceType.name,
+    });
     this._dataPath = dataPath;
     this._pluginManager = pluginManager;
     this.resourceType = resourceType;
@@ -138,13 +142,7 @@ export default class ResourcesManager<
   }
 
   async init(): Promise<Array<InitError>> {
-    const result = await logInvoke(
-      this._log,
-      'RESOURCES_MANAGER_INIT',
-      {
-        plugin: this._plugin.name,
-        resourceType: this.resourceType.name,
-      },
+    return this._monitor.captureLog(
       async () => {
         await Promise.all([
           fs.ensureDir(this._resourcesPath),
@@ -189,9 +187,12 @@ export default class ResourcesManager<
         );
         return results.filter(Boolean);
       },
+      {
+        name: 'init',
+        message: 'Initializing resource manager.',
+        error: 'Failed to initialize resource manager.',
+      },
     );
-
-    return result;
   }
 
   async reset(): Promise<void> {
@@ -212,13 +213,7 @@ export default class ResourcesManager<
   }
 
   async destroy(): Promise<void> {
-    await logInvoke(
-      this._log,
-      'RESOURCES_MANAGER_DESTROY',
-      {
-        plugin: this._plugin.name,
-        resourceType: this.resourceType.name,
-      },
+    this._monitor.captureLog(
       async () => {
         await Promise.all(
           utils
@@ -231,17 +226,17 @@ export default class ResourcesManager<
             }),
         );
       },
+      {
+        name: 'destroy',
+        help: 'Total count of destroy attempts',
+        message: `Destroyed resource manager for ${this._plugin.name} ${
+          this.resourceType.name
+        }`,
+      },
     );
   }
 
   getResources$(options: ResourceOptions): Observable<Array<Resource>> {
-    this._log({
-      event: 'RESOURCES_MANAGER_GET_RESOURCES',
-      plugin: this._plugin.name,
-      resourceType: this.resourceType.name,
-      options,
-    });
-
     return this.resources$.pipe(
       map(resources => this.resourceType.filterResources(resources, options)),
     );
@@ -254,27 +249,12 @@ export default class ResourcesManager<
     name: string,
     options: ResourceOptions,
   |}): Observable<?Resource> {
-    this._log({
-      event: 'RESOURCES_MANAGER_GET_RESOURCE',
-      plugin: this._plugin.name,
-      resourceType: this.resourceType.name,
-      options,
-    });
-
     return this.getResources$(options).pipe(
       map(resources => resources.find(resource => resource.name === name)),
     );
   }
 
   create(name: string, options: ResourceOptions): TaskList {
-    this._log({
-      event: 'RESOURCES_MANAGER_CREATE',
-      plugin: this._plugin.name,
-      resourceType: this.resourceType.name,
-      name,
-      options,
-    });
-
     const { create, start } = this.resourceType.getCRUD();
     const shouldSkip = this._createTaskList[name] != null;
     const resourceAdapter = this._resourceAdapters[name];
@@ -379,25 +359,9 @@ export default class ResourcesManager<
         },
       ].filter(Boolean),
       onError: (error, ctx) => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_ERROR',
-          plugin: this._plugin.name,
-          resourceType: this.resourceType.name,
-          name,
-          error,
-        });
-
         if (!shouldSkip) {
           setFromContext(ctx);
         }
-      },
-      onComplete: () => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_CREATE_COMPLETE',
-          plugin: this._plugin.name,
-          resourceType: this.resourceType.name,
-          name,
-        });
       },
       onDone: (failed: boolean) => {
         if (!shouldSkip) {
@@ -418,13 +382,6 @@ export default class ResourcesManager<
   }
 
   delete(name: string, options: ResourceOptions): TaskList {
-    this._log({
-      event: 'RESOURCES_MANAGER_DELETE',
-      plugin: this._plugin.name,
-      resourceType: this.resourceType.name,
-      name,
-    });
-
     const shouldSkip = this._deleteTaskList[name] != null;
     const { create, start, stop, delete: del } = this.resourceType.getCRUD();
     const startTaskList = this._startTaskList[name];
@@ -517,23 +474,6 @@ export default class ResourcesManager<
             },
           },
         ]),
-      onError: error => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE_ERROR',
-          plugin: this._plugin.name,
-          resourceType: this.resourceType.name,
-          name,
-          error,
-        });
-      },
-      onComplete: () => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_DELETE_COMPLETE',
-          plugin: this._plugin.name,
-          resourceType: this.resourceType.name,
-          name,
-        });
-      },
       onDone: () => {
         if (!shouldSkip) {
           delete this._deleteTaskList[name];
@@ -568,13 +508,6 @@ export default class ResourcesManager<
   }
 
   start(name: string, options: ResourceOptions): TaskList {
-    this._log({
-      event: 'RESOURCES_MANAGER_START',
-      plugin: this._plugin.name,
-      resourceType: this.resourceType.name,
-      name,
-    });
-
     const { create, start, stop } = this.resourceType.getCRUD();
     if (start == null) {
       throw new ResourceNoStartError({
@@ -646,23 +579,6 @@ export default class ResourcesManager<
           task: () => resourceAdapter.start(options),
         },
       ],
-      onError: error => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START_ERROR',
-          plugin: this._plugin.name,
-          resourceType: this.resourceType.name,
-          name,
-          error,
-        });
-      },
-      onComplete: () => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_START_COMPLETE',
-          plugin: this._plugin.name,
-          resourceType: this.resourceType.name,
-          name,
-        });
-      },
       onDone: failed => {
         if (!shouldSkip) {
           this._resourceAdaptersStarted[name] = true;
@@ -720,13 +636,6 @@ export default class ResourcesManager<
   }
 
   stop(name: string, options: ResourceOptions): TaskList {
-    this._log({
-      event: 'RESOURCES_MANAGER_STOP',
-      plugin: this._plugin.name,
-      resourceType: this.resourceType.name,
-      name,
-    });
-
     const { start, stop } = this.resourceType.getCRUD();
     if (start == null) {
       throw new ResourceNoStartError({
@@ -796,22 +705,7 @@ export default class ResourcesManager<
           task: () => this._stopDeps(directDependents),
         },
       ],
-      onError: error => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP_ERROR',
-          plugin: this._plugin.name,
-          resourceType: this.resourceType.name,
-          name,
-          error,
-        });
-      },
       onComplete: () => {
-        this._log({
-          event: 'RESOURCES_MANAGER_RESOURCE_ADAPTER_STOP_COMPLETE',
-          plugin: this._plugin.name,
-          resourceType: this.resourceType.name,
-          name,
-        });
         this._resourceAdaptersStarted[name] = false;
       },
       onDone: () => {
@@ -865,48 +759,26 @@ export default class ResourcesManager<
   }
 
   async _init(name: string): Promise<void> {
-    await logInvoke(
-      this._log,
-      'RESOURCES_MANAGER_RESOURCE_ADAPTER_INIT',
+    const resourceAdapter = await this.masterResourceAdapter.initResourceAdapter(
       {
-        plugin: this._plugin.name,
-        resourceType: this.resourceType.name,
         name,
-      },
-      async () => {
-        const resourceAdapter = await this.masterResourceAdapter.initResourceAdapter(
-          {
-            name,
-            dataPath: path.resolve(this._resourcesPath, name),
-          },
-        );
-        this._resourceAdapters$.next({
-          ...this._resourceAdapters,
-          [name]: resourceAdapter,
-        });
+        dataPath: path.resolve(this._resourcesPath, name),
       },
     );
+    this._resourceAdapters$.next({
+      ...this._resourceAdapters,
+      [name]: resourceAdapter,
+    });
   }
 
   async _destroy(
     name: string,
     resourceAdapter: ResourceAdapter<Resource, ResourceOptions>,
   ): Promise<void> {
-    await logInvoke(
-      this._log,
-      'RESOURCES_MANAGER_RESOURCE_ADAPTER_DESTROY',
-      {
-        plugin: this._plugin.name,
-        resourceType: this.resourceType.name,
-        name,
-      },
-      async () => {
-        const resourceAdapters = { ...this._resourceAdapters };
-        delete resourceAdapters[name];
-        this._resourceAdapters$.next(resourceAdapters);
-        await resourceAdapter.destroy();
-      },
-    );
+    const resourceAdapters = { ...this._resourceAdapters };
+    delete resourceAdapters[name];
+    this._resourceAdapters$.next(resourceAdapters);
+    await resourceAdapter.destroy();
   }
 
   _getSimpleName(nameIn: string): string {

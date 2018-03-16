@@ -1,5 +1,5 @@
 /* @flow */
-import type { Log } from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 
 import {
   type CLIArgs,
@@ -10,7 +10,7 @@ import {
 import type ResourceType from './ResourceType';
 
 export type PluginOptions = {|
-  log: Log,
+  monitor: Monitor,
 |};
 
 export type CLIHookConfig = {|
@@ -25,10 +25,10 @@ export type CreateHookConfig = {|
 |};
 
 export default class Plugin {
-  log: Log;
+  monitor: Monitor;
 
-  constructor({ log }: PluginOptions) {
-    this.log = log;
+  constructor({ monitor }: PluginOptions) {
+    this.monitor = monitor;
   }
 
   // Called when the user requests a full reset of neo-one

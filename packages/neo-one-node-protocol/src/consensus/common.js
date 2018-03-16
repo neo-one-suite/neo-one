@@ -50,10 +50,6 @@ export const signAndRelay = ({
     }),
     privateKey,
   );
-  node.blockchain.log({
-    event: 'CONSENSUS_SIGN_AND_RELAY',
-    message: payload.consensusMessage.constructor.name,
-  });
   node.relayConsensusPayload(payload);
 };
 
@@ -148,10 +144,6 @@ export const initializeNewConsensus = async ({
     expectedView: _.range(0, validators.length).map(() => 0),
     validators,
     blockReceivedTimeSeconds,
-  });
-  blockchain.log({
-    event: 'INITIALIZE_NEW_CONSENSUS',
-    context: { ...context.toJSON() },
   });
 
   return initializeConsensusCommon({ context, blockchain, consensusContext });
@@ -382,11 +374,6 @@ export const addTransaction = async ({
         memPool: commonUtils.values(context.transactions),
       });
     } catch (error) {
-      node.blockchain.log({
-        event: 'CONSENSUS_INVALID_TRANSACTION',
-        hash: transaction.hashHex,
-        error,
-      });
       verified = false;
     }
     if (!verified) {
@@ -430,12 +417,6 @@ export const addTransaction = async ({
       });
       return checkSignatures({ node, context });
     }
-
-    node.blockchain.log({
-      event: 'CONSENSUS_WRONG_CONSENSUS_ADDRESS',
-      consensusAddress: common.uInt160ToString(context.header.nextConsensus),
-      expectedConsensusAddress: common.uInt160ToString(consensusAddress),
-    });
 
     return requestChangeViewBackup({
       context,

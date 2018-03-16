@@ -5,6 +5,7 @@ import {
   createEndpoint,
   getEndpointConfig,
 } from '@neo-one/node-core';
+import type { Gauge, Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 import type { Subscription } from 'rxjs/Subscription';
 
@@ -47,6 +48,7 @@ export type PeerHealthBase = {
 };
 
 type NetworkOptions<Message, PeerData, PeerHealth: PeerHealthBase> = {|
+  monitor: Monitor,
   environment: Environment,
   options$: Observable<Options>,
   negotiate: (peer: Peer<Message>) => Promise<NegotiateResult<PeerData>>,
@@ -91,6 +93,7 @@ const CONNECT_ERROR_CODES = new Set([
 ]);
 
 export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
+  _monitor: Monitor;
   _started: boolean;
   _stopped: boolean;
 
@@ -102,7 +105,9 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
   _connectErrorCodes: Set<string>;
 
   _connectedPeers: { [endpoint: Endpoint]: ConnectedPeer<Message, PeerData> };
+  _connectedPeersGauge: Gauge;
   _connectingPeers: { [endpoint: Endpoint]: boolean };
+  _connectingPeersGauge: Gauge;
   _unconnectedPeers: Set<Endpoint>;
   _endpointBlacklist: Set<Endpoint>;
   _reverseBlacklist: { [endpoint: Endpoint]: Endpoint };
@@ -133,6 +138,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
 
   constructor(options: NetworkOptions<Message, PeerData, PeerHealth>) {
     const { environment, options$ } = options;
+    this._monitor = options.monitor.at('neo_one_node_network');
     this._started = false;
     this._stopped = false;
 
@@ -144,7 +150,15 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     this._connectErrorCodes = CONNECT_ERROR_CODES;
 
     this._connectedPeers = {};
+    this._connectedPeersGauge = this._monitor.getGauge({
+      name: 'connected_peers_total',
+      help: 'Total number of currently connected peers',
+    });
     this._connectingPeers = {};
+    this._connectingPeersGauge = this._monitor.getGauge({
+      name: 'connecting_peers_total',
+      help: 'Total number of connecting peers',
+    });
     this._unconnectedPeers = new Set();
     this._endpointBlacklist = new Set();
     this._reverseBlacklist = {};
@@ -179,45 +193,49 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     this._started = true;
     this._stopped = false;
 
-    this.__onEvent({
-      event: 'NETWORK_START',
-      message: 'Network starting...',
-    });
-
-    try {
-      this._subscription = this._options$.subscribe({
-        next: options => {
-          this._seeds = new Set(options.seeds);
-          this._peerSeeds = new Set(options.peerSeeds || []);
-          options.seeds.forEach(seed => this.addEndpoint(seed));
-          this._maxConnectedPeers =
-            options.maxConnectedPeers == null
-              ? MAX_CONNECTED_PEERS
-              : options.maxConnectedPeers;
-          this._externalEndpoints =
-            options.externalEndpoints == null
-              ? EXTERNAL_ENDPOINTS
-              : new Set(options.externalEndpoints);
-          this._connectPeersDelayMS =
-            options.connectPeersDelayMS == null
-              ? CONNECT_PEERS_DELAY_MS
-              : options.connectPeersDelayMS;
-          this._socketTimeoutMS =
-            options.socketTimeoutMS == null
-              ? SOCKET_TIMEOUT_MS
-              : options.socketTimeoutMS;
-          this._connectErrorCodes =
-            options.connectErrorCodes == null
-              ? CONNECT_ERROR_CODES
-              : new Set(options.connectErrorCodes);
-        },
-      });
-      this._startServer();
-      this._run();
-    } catch (error) {
-      this._started = false;
-      throw error;
-    }
+    this._monitor.captureLogSingle(
+      () => {
+        try {
+          this._subscription = this._options$.subscribe({
+            next: options => {
+              this._seeds = new Set(options.seeds);
+              this._peerSeeds = new Set(options.peerSeeds || []);
+              options.seeds.forEach(seed => this.addEndpoint(seed));
+              this._maxConnectedPeers =
+                options.maxConnectedPeers == null
+                  ? MAX_CONNECTED_PEERS
+                  : options.maxConnectedPeers;
+              this._externalEndpoints =
+                options.externalEndpoints == null
+                  ? EXTERNAL_ENDPOINTS
+                  : new Set(options.externalEndpoints);
+              this._connectPeersDelayMS =
+                options.connectPeersDelayMS == null
+                  ? CONNECT_PEERS_DELAY_MS
+                  : options.connectPeersDelayMS;
+              this._socketTimeoutMS =
+                options.socketTimeoutMS == null
+                  ? SOCKET_TIMEOUT_MS
+                  : options.socketTimeoutMS;
+              this._connectErrorCodes =
+                options.connectErrorCodes == null
+                  ? CONNECT_ERROR_CODES
+                  : new Set(options.connectErrorCodes);
+            },
+          });
+          this._startServer();
+          this._run();
+        } catch (error) {
+          this._started = false;
+          throw error;
+        }
+      },
+      {
+        name: 'network_start',
+        message: 'Network started.',
+        error: 'Network failed to start.',
+      },
+    );
   }
 
   stop(): void {
@@ -226,35 +244,39 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     }
     this._stopped = true;
 
-    this.__onEvent({
-      event: 'NETWORK_STOP',
-      message: 'Network stopping...',
-    });
+    this._monitor.captureLogSingle(
+      () => {
+        try {
+          if (this._connectPeersTimeout != null) {
+            clearTimeout(this._connectPeersTimeout);
+            this._connectPeersTimeout = null;
+          }
 
-    try {
-      if (this._connectPeersTimeout != null) {
-        clearTimeout(this._connectPeersTimeout);
-        this._connectPeersTimeout = null;
-      }
+          utils.keys(this._connectedPeers).forEach(endpoint => {
+            this._connectedPeers[endpoint].close();
+            delete this._connectedPeers[endpoint];
+          });
 
-      utils.keys(this._connectedPeers).forEach(endpoint => {
-        this._connectedPeers[endpoint].close();
-        delete this._connectedPeers[endpoint];
-      });
+          if (this._tcpServer != null) {
+            this._tcpServer.close();
+          }
 
-      if (this._tcpServer != null) {
-        this._tcpServer.close();
-      }
+          if (this._subscription != null) {
+            this._subscription.unsubscribe();
+          }
 
-      if (this._subscription != null) {
-        this._subscription.unsubscribe();
-      }
-
-      this._started = false;
-    } catch (error) {
-      this._stopped = false;
-      throw error;
-    }
+          this._started = false;
+        } catch (error) {
+          this._stopped = false;
+          throw error;
+        }
+      },
+      {
+        name: 'network_stop',
+        message: 'Network stopped.',
+        error: 'Network failed to stop cleanly.',
+      },
+    );
   }
 
   addEndpoint(endpoint: Endpoint): void {
@@ -292,10 +314,19 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
 
     const tcpServer = net.createServer({ pauseOnConnect: true }, socket => {
       const host = socket.remoteAddress;
-      this.__onEvent({
-        event: 'TCP_SERVER_SOCKET',
-        data: { host },
-      });
+      this._monitor
+        .withData({
+          [this._monitor.labels.PEER_ADDRESS]: host,
+          [this._monitor.labels.PEER_PORT]: socket.remotePort,
+        })
+        .log({
+          name: 'tcp_server_connect',
+          help: 'Total number of socket connection attempts',
+          level: 'verbose',
+          message: `Received socket connection from ${
+            host == null ? 'unknown' : host
+          }`,
+        });
       if (host == null) {
         socket.end();
         return;
@@ -309,25 +340,36 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     });
     this._tcpServer = tcpServer;
     tcpServer.on('error', error => {
-      this.__onEvent({
-        event: 'TCP_SERVER_ERROR',
-        message: `TCP peer server encountered an error: $${error.message}`,
-        data: { error },
+      this._monitor.logError({
+        name: 'tcp_server',
+        message: 'TCP peer server encountered an error.',
+        help: 'Uncaught TCP errors',
+        error,
+      });
+    });
+    tcpServer.on('close', () => {
+      this._monitor.logSingle({
+        name: 'tcp_server_close',
+        message: 'TCP server closed',
       });
     });
     const host = listenTCP.host == null ? '0.0.0.0' : listenTCP.host;
     tcpServer.listen(listenTCP.port, host);
 
-    this.__onEvent({
-      event: 'TCP_SERVER_LISTEN',
-      message: `Listening on ${host}:${listenTCP.port}.`,
-      data: { host, port: listenTCP.port },
-    });
+    this._monitor
+      .withData({
+        host,
+        port: listenTCP.port,
+      })
+      .logSingle({
+        name: 'tcp_server',
+        message: `Listening on ${host}:${listenTCP.port}.`,
+      });
   }
 
   async _run(): Promise<void> {
-    this.__onEvent({
-      event: 'CONNECT_LOOP_START',
+    this._monitor.logSingle({
+      name: 'connect_loop',
       message: 'Starting connect loop...',
     });
     while (!this._stopped) {
@@ -342,13 +384,17 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
           }, this._connectPeersDelayMS);
         });
       } catch (error) {
-        this.__onEvent({
-          event: 'CONNECT_LOOP_ERROR',
-          message: `Encountered error in connect loop: ${error.message}`,
-          data: { error },
+        this._monitor.logError({
+          name: 'connect_loop',
+          message: 'Connect loop encountered an error',
+          error,
         });
       }
     }
+    this._monitor.logSingle({
+      name: 'connect_loop',
+      message: 'Stopped connect loop.',
+    });
   }
 
   _connectToPeers(): void {
@@ -388,11 +434,15 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
       if (health.healthy) {
         this._previousHealth[peer.endpoint] = health;
       } else {
-        this.__onEvent({
-          event: 'PEER_UNHEALTHY',
-          message: `Peer at ${peer.endpoint} is unhealthy, closing`,
-          data: { peer: peer.endpoint },
-        });
+        this._monitor
+          .withData({
+            [this._monitor.labels.PEER_ADDRESS]: peer.endpoint,
+          })
+          .log({
+            name: 'unhealthy_peer',
+            message: `Peer at ${peer.endpoint} is unhealthy.`,
+            level: 'verbose',
+          });
         this.blacklistAndClose(peer);
       }
     }
@@ -436,33 +486,39 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
       return;
     }
     this._connectingPeers[endpoint] = true;
+    this._connectingPeersGauge.inc();
 
-    this.__onEvent({
-      event: 'PEER_CONNECT_START',
-      message: `Connecting to peer at ${endpoint}`,
-      data: { peer: endpoint },
-    });
     try {
-      const endpointConfig = getEndpointConfig(endpoint);
-      if (endpointConfig.type === 'tcp') {
-        await this._startPeerConnection(
-          this._createTCPPeer(endpoint, socket),
-          true,
+      await this._monitor
+        .withData({
+          [this._monitor.labels.PEER_ADDRESS]: endpoint,
+        })
+        .captureLog(
+          async () => {
+            const endpointConfig = getEndpointConfig(endpoint);
+            if (endpointConfig.type === 'tcp') {
+              await this._startPeerConnection(
+                this._createTCPPeer(endpoint, socket),
+                true,
+              );
+            } else {
+              throw new UnsupportedEndpointType(endpoint);
+            }
+          },
+          {
+            name: 'peer_connect',
+            message: `Connecting to peer at ${endpoint}`,
+            level: 'verbose',
+            error: `Failed to connect to peer at ${endpoint}.`,
+          },
         );
-      } else {
-        throw new UnsupportedEndpointType(endpoint);
-      }
     } catch (error) {
-      this.__onEvent({
-        event: 'PEER_CONNECT_ERROR',
-        message: `Failed to connect to peer at ${endpoint}: ${error.message}`,
-        data: { error, peer: endpoint },
-      });
       if (this._connectErrorCodes.has(error.code)) {
         this._badEndpoints.add(endpoint);
       }
     } finally {
       delete this._connectingPeers[endpoint];
+      this._connectingPeersGauge.dec();
     }
   }
 
@@ -503,15 +559,14 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     if (peer.connected) {
       const connectedPeer = new ConnectedPeer({ peer, data, relay });
       this._connectedPeers[peer.endpoint] = connectedPeer;
+      this._connectedPeersGauge.inc();
       connectedPeer.peer.streamData(message =>
         this.__onMessageReceived(connectedPeer, message),
       );
 
       this.__onEvent({
         event: 'PEER_CONNECT_SUCCESS',
-        message: `Connected to peer at ${peer.endpoint}`,
-        data: { peer: peer.endpoint },
-        extra: { connectedPeer },
+        connectedPeer,
       });
     }
   }
@@ -528,30 +583,44 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
   }
 
   _onError(peer: Peer<Message>, error: Error): void {
-    this.__onEvent({
-      event: 'PEER_ERROR',
-      message: `Encountered error with peer at ${peer.endpoint}: ${
-        error.message
-      }`,
-      data: { error, peer: peer.endpoint },
-    });
+    this._monitor
+      .withData({
+        [this._monitor.labels.PEER_ADDRESS]: peer.endpoint,
+      })
+      .logError({
+        name: 'peer',
+        help: 'Total number of unexpected peer errors',
+        message: `Encountered error with peer at ${peer.endpoint}.`,
+        error,
+      });
   }
 
   _onClose(peer: Peer<Message>): void {
     const connectedPeer = this._connectedPeers[peer.endpoint];
     delete this._previousHealth[peer.endpoint];
     delete this._connectedPeers[peer.endpoint];
+    this._connectedPeersGauge.set(Object.keys(this._connectedPeers).length);
     delete this._connectingPeers[peer.endpoint];
+    this._connectingPeersGauge.set(Object.keys(this._connectedPeers).length);
     const endpoint = this._reverseBlacklist[peer.endpoint];
     if (endpoint != null) {
       delete this._reverseBlacklist[peer.endpoint];
       this._endpointBlacklist.delete((endpoint: $FlowFixMe));
     }
+    this._monitor
+      .withData({
+        [this._monitor.labels.PEER_ADDRESS]: peer.endpoint,
+      })
+      .log({
+        name: 'peer_closed',
+        help:
+          'Total number of times a peer was closed due to error or ending the socket.',
+        message: `Peer closed at ${peer.endpoint}`,
+        level: 'verbose',
+      });
     this.__onEvent({
       event: 'PEER_CLOSED',
-      message: `Peer at ${peer.endpoint} closed.`,
-      data: { peer: peer.endpoint },
-      extra: { peer: connectedPeer || peer },
+      peer: connectedPeer || peer,
     });
   }
 }

@@ -493,7 +493,7 @@ export default class NetworkResourceAdapter {
   ): NodeAdapter {
     if (options.type == null || options.type === 'neo-one') {
       return new NEOONENodeAdapter({
-        log: resourceType.plugin.log,
+        monitor: resourceType.plugin.monitor,
         name,
         binary,
         dataPath,
@@ -542,11 +542,15 @@ export default class NetworkResourceAdapter {
       );
       await fs.writeFile(nodeOptionsPath, JSON.stringify(nodeOptions));
     } catch (error) {
-      options.resourceType.plugin.log({
-        event: 'NETWORK_RESOURCE_ADAPTER_WRITE_NODE_OPTIONS_ERROR',
-        name: nodeOptions.name,
-        error,
-      });
+      options.resourceType.plugin.monitor
+        .withLabels({
+          'node.name': nodeOptions.name,
+        })
+        .logError({
+          name: 'write_node_options',
+          message: 'Failed to persist node options',
+          error,
+        });
       throw error;
     }
   }
@@ -559,11 +563,15 @@ export default class NetworkResourceAdapter {
       const contents = await fs.readFile(nodeOptionsPath, 'utf8');
       return JSON.parse(contents);
     } catch (error) {
-      resourceType.plugin.log({
-        event: 'NETWORK_RESOURCE_ADAPTER_READ_NODE_OPTIONS_ERROR',
-        path: nodeOptionsPath,
-        error,
-      });
+      resourceType.plugin.monitor
+        .withData({
+          'node.options_path': nodeOptionsPath,
+        })
+        .logError({
+          name: 'read_node_options',
+          message: 'Failed to read node options.',
+          error,
+        });
       throw error;
     }
   }

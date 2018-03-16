@@ -24,11 +24,10 @@ export default ({ cli, plugin }: {| cli: InteractiveCLI, plugin: Plugin |}) => {
         }
       } catch (error) {
         ora(error.message).fail();
-        cli.log({
-          event: 'COMMAND_ERROR',
+        cli.monitor.withLabels({ 'command.name': command._name }).logError({
+          name: 'command',
           error,
-          message: error.message,
-          name: command._name,
+          message: `Command ${command._name} failed.`,
         });
       }
     });

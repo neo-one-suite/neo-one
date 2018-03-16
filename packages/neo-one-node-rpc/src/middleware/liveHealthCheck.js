@@ -5,7 +5,7 @@ import type { Context } from 'koa';
 import mount from 'koa-mount';
 
 import checkReady, { type Options as CheckReadyOptions } from './checkReady';
-import { getLog, simpleMiddleware } from './common';
+import { getMonitor, simpleMiddleware } from './common';
 
 export type Options = CheckReadyOptions;
 
@@ -20,8 +20,12 @@ export default ({
   return simpleMiddleware(
     'liveHealthCheck',
     mount('/live_health_check', async (ctx: Context) => {
-      const log = getLog(ctx);
-      const { ready, index } = await checkReady({ blockchain, options });
+      const monitor = getMonitor(ctx);
+      const counter = monitor.getCounter({
+        name: 'live_health_check',
+        labelNames: [monitor.labels.ERROR],
+      });
+      const ready = await checkReady({ monitor, blockchain, options });
       if (
         ready ||
         lastBlockIndex == null ||
@@ -30,17 +34,10 @@ export default ({
       ) {
         lastBlockIndex = blockchain.currentBlockIndex;
         ctx.status = 200;
+        counter.inc({ [monitor.labels.ERROR]: false });
       } else {
-        log({
-          event: 'LIVE_HEALTH_CHECK_ERROR',
-          index,
-          noIndex: index == null,
-          ready,
-          isPersistingBlock: blockchain.isPersistingBlock,
-          lastBlockIndex,
-          currentBlockIndex: blockchain.currentBlockIndex,
-        });
         ctx.status = 500;
+        counter.inc({ [monitor.labels.ERROR]: true });
       }
     }),
   );

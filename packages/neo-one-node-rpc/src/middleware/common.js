@@ -1,24 +1,34 @@
 /* @flow */
 import type { Context, Middleware } from 'koa';
-import type { Log, Profile } from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 
-export const getLog = (ctx: Context): Log => {
-  const { log } = ctx.state;
-  if (log == null) {
+export const getMonitor = (ctx: Context): Monitor => {
+  const { monitor } = ctx.state;
+  if (monitor == null) {
     ctx.throw(500);
     throw new Error('For Flow');
   }
-  return log;
+  return monitor;
 };
 
-export const getProfile = (ctx: Context): Profile => {
-  const { profile } = ctx.state;
-  if (profile == null) {
+export async function setMonitor<T>(
+  ctx: Context,
+  monitor: Monitor,
+  func: () => T,
+): Promise<T> {
+  const { monitor: currentMonitor } = ctx.state;
+  if (currentMonitor == null) {
     ctx.throw(500);
     throw new Error('For Flow');
   }
-  return profile;
-};
+  try {
+    ctx.state.monitor = monitor;
+    const result = await func();
+    return result;
+  } finally {
+    ctx.state.monitor = currentMonitor;
+  }
+}
 
 export type ServerMiddleware = {|
   name: string,

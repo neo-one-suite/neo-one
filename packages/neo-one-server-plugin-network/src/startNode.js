@@ -9,7 +9,7 @@ import { createNEOONENodeConfig } from './node';
 
 export default ({
   vorpal,
-  log,
+  monitor,
   shutdown,
   shutdownFuncs,
   logConfig$,
@@ -24,7 +24,7 @@ export default ({
     .action(async args => {
       const { dataPath, options: cliOptions } = args;
 
-      const nodeConfig = createNEOONENodeConfig({ dataPath, log });
+      const nodeConfig = createNEOONENodeConfig({ dataPath });
 
       const logPath = path.resolve(dataPath, 'log');
       const logSubscription = nodeConfig.config$
@@ -55,11 +55,16 @@ export default ({
       const node = await createFullNode({
         dataPath,
         nodeConfig,
-        log,
+        monitor,
         chainFile,
         dumpChainFile,
         onError: error => {
-          log({ event: 'UNCAUGHT_NODE_ERROR', error });
+          monitor.logError({
+            name: 'uncaught_node_error',
+            help: 'Uncaught node errors',
+            message: 'Uncaught node error, shutting down.',
+            error,
+          });
           shutdown({ exitCode: 1, error });
         },
       });

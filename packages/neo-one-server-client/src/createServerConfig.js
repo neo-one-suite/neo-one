@@ -1,6 +1,5 @@
 /* @flow */
 import { type Paths, Config } from '@neo-one/server-plugin';
-import type { Log } from '@neo-one/utils';
 
 export type ServerConfig = {|
   paths: Paths,
@@ -19,12 +18,10 @@ export type ServerConfig = {|
 |};
 
 export default ({
-  log,
   paths,
   serverPort,
   minPort,
 }: {|
-  log: Log,
   paths: Paths,
   serverPort?: number,
   minPort?: number,
@@ -88,5 +85,4 @@ export default ({
         },
       },
     },
-    log,
   });

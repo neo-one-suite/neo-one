@@ -4,13 +4,13 @@ import {
   type Block,
   type ContractParameter,
   type ECPoint,
-  type OpCode,
   type ScriptContainer,
   type UInt160,
   type UInt256,
   type VMState,
   common,
 } from '@neo-one/client-core';
+import type { Monitor } from '@neo-one/monitor';
 
 import type { WriteBlockchain } from './Blockchain';
 
@@ -46,30 +46,18 @@ export type ExecuteScriptsResult = {|
   gasConsumed: BN,
   errorMessage?: string,
 |};
-export type VMContext = {|
-  script: Script,
-  scriptHash: UInt160,
-  pc: number,
-  depth: number,
-  stack: Array<ContractParameter>,
-  stackAlt: Array<ContractParameter>,
-  state: VMState,
-  gasLeft: BN,
-|};
-export type OnStepInput = {| context: VMContext, opCode: OpCode |};
-export type OnStep = (input: OnStepInput) => void;
 export type VMListeners = {|
   onMigrateContract?: (options: {| from: UInt160, to: UInt160 |}) => void,
   onSetVotes?: (options: {| address: UInt160, votes: Array<ECPoint> |}) => void,
 |};
 export type ExecuteScripts = (input: {|
+  monitor: Monitor,
   scripts: Array<Script>,
   blockchain: WriteBlockchain,
   scriptContainer: ScriptContainer,
   triggerType: TriggerType,
   action: ExecutionAction,
   gas: BN,
-  onStep?: OnStep,
   listeners?: VMListeners,
   skipWitnessVerify?: boolean,
   persistingBlock?: Block,

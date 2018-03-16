@@ -1,5 +1,4 @@
 /* @flow */
-import { type Log, utils } from '@neo-one/utils';
 import type { Observable } from 'rxjs/Observable';
 import {
   type AllResources,
@@ -8,6 +7,7 @@ import {
   type Plugin,
   pluginResourceTypeUtil,
 } from '@neo-one/server-plugin';
+import type { Monitor } from '@neo-one/monitor';
 import {
   PluginNotInstalledError,
   UnknownPluginResourceType,
@@ -23,6 +23,7 @@ import { map, shareReplay, switchMap } from 'rxjs/operators';
 import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
 import toposort from 'toposort';
+import { utils } from '@neo-one/utils';
 
 import { PluginDependencyNotMetError } from './errors';
 import type PortAllocator from './PortAllocator';
@@ -43,7 +44,7 @@ type ResourcesManagers = {
 type Plugins = { [plugin: string]: Plugin };
 
 export default class PluginManager {
-  _log: Log;
+  _monitor: Monitor;
   _binary: Binary;
   _portAllocator: PortAllocator;
   _dataPath: string;
@@ -57,17 +58,17 @@ export default class PluginManager {
   allResources$: Observable<AllResources>;
 
   constructor({
-    log,
+    monitor,
     binary,
     portAllocator,
     dataPath,
   }: {|
-    log: Log,
+    monitor: Monitor,
     binary: Binary,
     portAllocator: PortAllocator,
     dataPath: string,
   |}) {
-    this._log = log;
+    this._monitor = monitor.sub('plugin_manager');
     this._binary = binary;
     this._portAllocator = portAllocator;
     this._dataPath = dataPath;
@@ -139,7 +140,7 @@ export default class PluginManager {
   async registerPlugins(pluginNames: Array<string>): Promise<void> {
     const plugins = pluginNames.map(pluginName =>
       pluginsUtil.getPlugin({
-        log: this._log,
+        monitor: this._monitor,
         pluginName,
       }),
     );
@@ -194,7 +195,7 @@ export default class PluginManager {
           },
         );
         const resourcesManager = new ResourcesManager({
-          log: this._log,
+          monitor: this._monitor,
           dataPath: this._getResourcesManagerDataPath({
             plugin: plugin.name,
             resourceType: resourceType.name,

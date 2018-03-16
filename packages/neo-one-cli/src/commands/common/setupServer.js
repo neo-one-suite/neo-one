@@ -7,10 +7,9 @@ import { distinctUntilChanged, map } from 'rxjs/operators';
 
 export default (
   name: string,
-  { log, shutdown, logConfig$, shutdownFuncs, serverArgs, paths }: CLIArgs,
+  { monitor, shutdown, logConfig$, shutdownFuncs, serverArgs, paths }: CLIArgs,
 ) => {
   const serverConfig = createServerConfig({
-    log,
     paths,
     serverPort: serverArgs.serverPort,
     minPort: serverArgs.minPort,
@@ -38,5 +37,10 @@ export default (
     .subscribe(logConfig$);
   shutdownFuncs.push(() => logSubscription.unsubscribe());
 
-  return { log, shutdownFuncs, shutdown, serverConfig };
+  return {
+    monitor: monitor.at('server'),
+    shutdownFuncs,
+    shutdown,
+    serverConfig,
+  };
 };

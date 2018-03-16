@@ -9,6 +9,7 @@ import {
   common,
   crypto,
 } from '@neo-one/client-core';
+import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 
 import { finalize } from '@neo-one/utils';
@@ -46,19 +47,23 @@ export default class Consensus {
   _options$: Observable<Options>;
   _node: Node;
   _consensusContext: ConsensusContext;
+  _monitor: Monitor;
 
   constructor({
     options$,
     node,
+    monitor,
   }: {|
     options$: Observable<Options>,
     node: Node,
+    monitor: Monitor,
   |}) {
     this._queue = new ConsensusQueue();
     this._timer = null;
     this._options$ = options$;
     this._node = node;
     this._consensusContext = new ConsensusContext();
+    this._monitor = monitor.at('neo_one_node_consensus');
   }
 
   start$(): Observable<void> {
@@ -83,7 +88,11 @@ export default class Consensus {
   }
 
   async _start(options: InternalOptions): Promise<void> {
-    this._node.blockchain.log({ event: 'CONSENSUS_START' });
+    this._monitor.logSingle({
+      name: 'consensus_start',
+      message: 'Consensus started.',
+      level: 'verbose',
+    });
     const initialResult = await initializeNewConsensus({
       blockchain: this._node.blockchain,
       publicKey: options.publicKey,
@@ -93,11 +102,6 @@ export default class Consensus {
     await AsyncIterableX.from(this._queue)
       .pipe(
         scan(async (context: Context, event: Event) => {
-          this._node.blockchain.log({
-            event: 'CONSENSUS_QUEUE',
-            consensusEvent: event.type,
-            context: { ...context.toJSON() },
-          });
           let result;
           switch (event.type) {
             case 'handlePersistBlock':
@@ -144,7 +148,11 @@ export default class Consensus {
       )
       .forEach(() => {});
 
-    this._node.blockchain.log({ event: 'CONSENSUS_STOP' });
+    this._monitor.logSingle({
+      name: 'consensus_stop',
+      message: 'Consensus stopped.',
+      level: 'verbose',
+    });
   }
 
   onPersistBlock(): void {
@@ -197,11 +205,6 @@ export default class Consensus {
   }
 
   _handleResult(result: Result<Context>): Context {
-    this._node.blockchain.log({
-      event: 'CONSENSUS_RESULT',
-      timerSeconds: result.timerSeconds,
-      context: { ...result.context.toJSON() },
-    });
     if (result.timerSeconds != null) {
       this._handleTimer(result.timerSeconds);
     }

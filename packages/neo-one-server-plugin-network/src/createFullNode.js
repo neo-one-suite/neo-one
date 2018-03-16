@@ -1,6 +1,7 @@
 /* @flow */
-import type { Config, Log } from '@neo-one/server-plugin';
+import type { Config } from '@neo-one/server-plugin';
 import FullNode from '@neo-one/node';
+import type { Monitor } from '@neo-one/monitor';
 
 import { createMain, createTest } from '@neo-one/node-neo-settings';
 import { distinctUntilChanged, map, take } from 'rxjs/operators';
@@ -12,14 +13,14 @@ import type { NEOONENodeConfig } from './node';
 export default async ({
   dataPath,
   nodeConfig,
-  log,
+  monitor,
   chainFile,
   dumpChainFile,
   onError,
 }: {|
   dataPath: string,
   nodeConfig: Config<NEOONENodeConfig>,
-  log: Log,
+  monitor: Monitor,
   chainFile?: string,
   dumpChainFile?: string,
   onError?: (error: Error) => void,
@@ -56,7 +57,7 @@ export default async ({
 
   return new FullNode(
     {
-      log,
+      monitor,
       settings,
       environment: {
         dataPath: storagePath,

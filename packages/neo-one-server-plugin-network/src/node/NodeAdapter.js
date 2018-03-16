@@ -1,11 +1,10 @@
 /* @flow */
 import {
   type Binary,
-  type Log,
   type DescribeTable,
   type PortAllocator,
-  logInvoke,
 } from '@neo-one/server-plugin';
+import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 
 import { concat } from 'rxjs/observable/concat';
@@ -31,7 +30,7 @@ export type NodeStatus = {|
 |};
 
 export default class NodeAdapter {
-  _log: Log;
+  _monitor: Monitor;
   name: string;
   _binary: Binary;
   _dataPath: string;
@@ -41,21 +40,21 @@ export default class NodeAdapter {
   node$: Observable<Node>;
 
   constructor({
-    log,
+    monitor,
     name,
     binary,
     dataPath,
     portAllocator,
     settings,
   }: {|
-    log: Log,
+    monitor: Monitor,
     name: string,
     binary: Binary,
     dataPath: string,
     portAllocator: PortAllocator,
     settings: NodeSettings,
   |}) {
-    this._log = log;
+    this._monitor = monitor;
     this.name = name;
     this._binary = binary;
     this._dataPath = dataPath;
@@ -97,46 +96,51 @@ export default class NodeAdapter {
   }
 
   async create(): Promise<void> {
-    await logInvoke(
-      this._log,
-      'NODE_ADAPTER_CREATE',
-      { name: this.name },
-      async () => {
-        await this._create();
-      },
-    );
+    await this._monitor
+      .withData({ 'node.name': this.name })
+      .captureLog(() => this._create(), {
+        name: 'create',
+        message: `Created node ${this.name}`,
+        error: `Failed to create node ${this.name}`,
+      });
   }
 
   async update(settings: NodeSettings): Promise<void> {
-    await logInvoke(
-      this._log,
-      'NODE_ADAPTER_UPDATE',
-      { name: this.name },
+    this._monitor.withData({ 'node.name': this.name }).captureLog(
       async () => {
         await this._update(settings);
         this._settings = settings;
+      },
+      {
+        name: 'update',
+        message: `Updated node ${this.name}`,
+        error: `Failed to update node ${this.name}`,
       },
     );
   }
 
   async start(): Promise<void> {
-    await logInvoke(
-      this._log,
-      'NODE_ADAPTER_START',
-      { name: this.name },
+    this._monitor.withData({ 'node.name': this.name }).captureLog(
       async () => {
         await this._start();
+      },
+      {
+        name: 'start',
+        message: `Started node ${this.name}`,
+        error: `Failed to start node ${this.name}`,
       },
     );
   }
 
   async stop(): Promise<void> {
-    await logInvoke(
-      this._log,
-      'NODE_ADAPTER_STOP',
-      { name: this.name },
+    this._monitor.withData({ 'node.name': this.name }).captureLog(
       async () => {
         await this._stop();
+      },
+      {
+        name: 'stop',
+        message: `Stopped node ${this.name}`,
+        error: `Failed to stop node ${this.name}`,
       },
     );
   }

@@ -1,6 +1,6 @@
 /* @flow */
 import { File, Storage } from 'megajs';
-import type { Log } from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 
 import fs from 'fs';
 import path from 'path';
@@ -25,21 +25,17 @@ export type Options = {|
 |};
 
 export default class MegaProvider extends Provider {
-  _log: Log;
   _environment: Environment;
   _options: Options;
 
   constructor({
-    log,
     environment,
     options,
   }: {|
-    log: Log,
     environment: Environment,
     options: Options,
   |}) {
     super();
-    this._log = log;
     this._environment = environment;
     this._options = options;
   }
@@ -63,10 +59,12 @@ export default class MegaProvider extends Provider {
     });
   }
 
-  async restore(): Promise<void> {
+  async restore(monitorIn: Monitor): Promise<void> {
+    const monitor = monitorIn.withLabels({
+      provider: 'mega_provider',
+    });
     const { download } = this._options;
     if (download == null) {
-      this._log({ event: 'DATA_BACKUP_MEGA_PROVIDER_SKIP_RESTORE' });
       return;
     }
 
@@ -74,103 +72,120 @@ export default class MegaProvider extends Provider {
     const { dataPath, tmpPath } = this._environment;
     const downloadPath = path.resolve(tmpPath, 'storage.db.tar.gz');
 
-    this._log({ event: 'DATA_BACKUP_MEGA_PROVIDER_RESTORE_DOWNLOAD' });
-    try {
-      await new Promise((resolve, reject) => {
-        const read = new File({
-          downloadID: id,
-          key,
-        }).download();
-        const write = fs.createWriteStream(downloadPath);
+    await monitor.captureSpan(
+      span =>
+        span.captureLogSingle(
+          () =>
+            new Promise((resolve, reject) => {
+              const read = new File({
+                downloadID: id,
+                key,
+              }).download();
+              const write = fs.createWriteStream(downloadPath);
 
-        let done = false;
-        const cleanup = () => {
-          done = true;
-        };
+              let done = false;
+              const cleanup = () => {
+                done = true;
+              };
 
-        const onDone = () => {
-          if (!done) {
-            cleanup();
-            resolve();
-          }
-        };
+              const onDone = () => {
+                if (!done) {
+                  cleanup();
+                  resolve();
+                }
+              };
 
-        const onError = (error: Error) => {
-          if (!done) {
-            cleanup();
-            reject(error);
-          }
-        };
+              const onError = (error: Error) => {
+                if (!done) {
+                  cleanup();
+                  reject(error);
+                }
+              };
 
-        read.once('error', onError);
-        write.once('error', onError);
-        write.once('finish', onDone);
+              read.once('error', onError);
+              write.once('error', onError);
+              write.once('finish', onDone);
 
-        read.pipe(write);
-      });
-      this._log({
-        event: 'DATA_BACKUP_MEGA_PROVIDER_RESTORE_DOWNLOAD_SUCCESS',
-      });
-    } catch (error) {
-      this._log({
-        event: 'DATA_BACKUP_MEGA_PROVIDER_RESTORE_DOWNLOAD_ERROR',
-        error,
-      });
-      throw error;
-    }
+              read.pipe(write);
+            }),
+          {
+            name: 'restore_download',
+            message: 'Backup downloaded',
+            error: 'Failed to download backup.',
+          },
+        ),
+      {
+        name: 'restore_download',
+        help: 'Restore from backup duration',
+      },
+    );
 
-    this._log({ event: 'DATA_BACKUP_MEGA_PROVIDER_RESTORE_EXTRACT' });
-    try {
-      await extract({
-        downloadPath,
-        dataPath,
-        writeBytesPerSecond,
-      });
-      this._log({
-        event: 'DATA_BACKUP_MEGA_PROVIDER_RESTORE_EXTRACT_SUCCESS',
-      });
-    } catch (error) {
-      this._log({
-        event: 'DATA_BACKUP_MEGA_PROVIDER_RESTORE_EXTRACT_ERROR',
-        error,
-      });
-      throw error;
-    }
+    await monitor.captureSpan(
+      span =>
+        span.captureLogSingle(
+          () =>
+            extract({
+              downloadPath,
+              dataPath,
+              writeBytesPerSecond,
+            }),
+          {
+            name: 'restore_extract',
+            message: 'Backup extracted',
+            error: 'Failed to extract backup',
+          },
+        ),
+      {
+        name: 'restore_extract',
+        help: 'Extract backup duration',
+      },
+    );
   }
 
-  async backup(): Promise<void> {
+  async backup(monitorIn: Monitor): Promise<void> {
+    const monitor = monitorIn.withLabels({
+      provider: 'mega_provider',
+    });
     const { upload: uploadOptions } = this._options;
     if (uploadOptions == null) {
-      this._log({ event: 'DATA_BACKUP_MEGA_PROVIDER_SKIP_BACKUP' });
       return;
     }
     const { email, password, file } = uploadOptions;
     const { dataPath } = this._environment;
 
-    this._log({ event: 'DATA_BACKUP_MEGA_PROVIDER_BACKUP' });
-    try {
-      const storage = new Storage({
-        email,
-        password,
-        autologin: false,
-      });
-      await new Promise((resolve, reject) =>
-        storage.login(err => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        }),
-      );
-      await upload({
-        dataPath,
-        write: storage.upload(file),
-      });
-      this._log({ event: 'DATA_BACKUP_MEGA_PROVIDER_BACKUP_SUCCESS' });
-    } catch (error) {
-      this._log({ event: 'DATA_BACKUP_MEGA_PROVIDER_BACKUP_ERROR', error });
-      throw error;
-    }
+    await monitor.captureSpan(
+      span =>
+        span.captureLogSingle(
+          async () => {
+            const storage = new Storage({
+              email,
+              password,
+              autologin: false,
+            });
+            await new Promise((resolve, reject) =>
+              storage.login(innerErr => {
+                if (innerErr) {
+                  reject(innerErr);
+                } else {
+                  resolve();
+                }
+              }),
+            );
+            await upload({
+              dataPath,
+              write: storage.upload(file),
+            });
+          },
+          {
+            name: 'backup_push',
+            message: 'Backup pushed.',
+            error: 'Failed to push backup.',
+          },
+        ),
+      {
+        name: 'backup_push',
+        help: 'Push backup duration',
+      },
+    );
   }
 }

@@ -54,7 +54,7 @@ export default class FullNode {
     }
 
     await backup({
-      log: this._options.log,
+      monitor: this._options.monitor,
       environment: this._getBackupEnvironment(),
       options,
     });
@@ -66,7 +66,7 @@ export default class FullNode {
     }
 
     await restore({
-      log: this._options.log,
+      monitor: this._options.monitor,
       environment: this._getBackupEnvironment(),
       options,
     });

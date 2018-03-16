@@ -5,7 +5,7 @@ import type { Context } from 'koa';
 import mount from 'koa-mount';
 
 import checkReady, { type Options as CheckReadyOptions } from './checkReady';
-import { getLog, simpleMiddleware } from './common';
+import { getMonitor, simpleMiddleware } from './common';
 
 export type Options = CheckReadyOptions;
 
@@ -19,18 +19,18 @@ export default ({
   simpleMiddleware(
     'readyHealthCheck',
     mount('/ready_health_check', async (ctx: Context) => {
-      const { ready, index } = await checkReady({ blockchain, options });
-      const log = getLog(ctx);
+      const monitor = getMonitor(ctx);
+      const counter = monitor.getCounter({
+        name: 'ready_health_check',
+        labelNames: [monitor.labels.ERROR],
+      });
+      const ready = await checkReady({ monitor, blockchain, options });
       if (ready) {
         ctx.status = 200;
+        counter.inc({ [monitor.labels.ERROR]: false });
       } else {
-        log({
-          event: 'READY_HEALTH_CHECK_ERROR',
-          index,
-          noIndex: index == null,
-          currentBlockIndex: blockchain.currentBlockIndex,
-        });
         ctx.status = 500;
+        counter.inc({ [monitor.labels.ERROR]: true });
       }
     }),
   );

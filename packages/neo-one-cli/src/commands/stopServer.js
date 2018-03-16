@@ -14,7 +14,7 @@ export default (args: CLIArgs) => {
     .command('stop server', `Stops the ${name.title} server`)
     .action(async () => {
       const spinner = ora(`Shutting down ${name.title} server`).start();
-      const { log, serverConfig, shutdown } = setupServer('stopServer', args);
+      const { serverConfig, shutdown } = setupServer('stopServer', args);
 
       let manager;
       let pid;
@@ -38,12 +38,9 @@ export default (args: CLIArgs) => {
       } else {
         spinner.start(`Shutting down ${name.title} server (pid=${pid})`);
         try {
-          log({ event: 'STOP_SERVER_START' });
           manager.kill();
-          log({ event: 'STOP_SERVER_SUCCESS' });
           spinner.succeed(`${name.title} server shutdown (pid=${pid})`);
         } catch (error) {
-          log({ event: 'STOP_SERVER_ERROR', error });
           spinner.fail(
             `Failed to shutdown ${name.title} server (pid=${pid}): ` +
               `${error.message}`,

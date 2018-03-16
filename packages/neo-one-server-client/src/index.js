@@ -6,5 +6,4 @@ export { default as createServerConfig } from './createServerConfig';
 
 export { PluginNotInstalledError, UnknownPluginResourceType } from './errors';
 
-export type { Log } from '@neo-one/utils';
 export type { ServerConfig } from './createServerConfig';

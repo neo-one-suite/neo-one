@@ -207,7 +207,7 @@ const call = ({ name, tailCall }: {| name: OpCode, tailCall?: boolean |}) => ({
     in: isDynamic(hashIn) ? 1 : 0,
     invocation: tailCall ? 0 : 1,
     fee: FEES.TEN,
-    invoke: async ({ context, args }: OpInvokeArgs) => {
+    invoke: async ({ monitor, context, args }: OpInvokeArgs) => {
       const { pc, scriptHash } = context;
       let hash = common.bufferToUInt160(context.code.slice(pc, pc + 20));
       if (isDynamic(hash)) {
@@ -226,6 +226,7 @@ const call = ({ name, tailCall }: {| name: OpCode, tailCall?: boolean |}) => ({
       }
       const contract = await context.blockchain.contract.get({ hash });
       const resultContext = await context.engine.executeScript({
+        monitor,
         code: contract.script,
         blockchain: context.blockchain,
         init: context.init,
@@ -323,7 +324,7 @@ const OPCODE_PAIRS = [
       createOp({
         name: 'CALL',
         invocation: 1,
-        invoke: async ({ context }: OpInvokeArgs) => {
+        invoke: async ({ monitor, context }: OpInvokeArgs) => {
           const { pc } = context;
           // High level:
           // Execute JMP in place of current op codes pc using same context
@@ -331,11 +332,13 @@ const OPCODE_PAIRS = [
           // Set current pc to pc + 2
           const op = JMP({ context });
           const { context: startContext } = await op.invoke({
+            monitor,
             context: op.context,
             args: [],
             argsAlt: [],
           });
           const resultContext = await context.engine.run({
+            monitor,
             context: {
               ...startContext,
               depth: context.depth + 1,

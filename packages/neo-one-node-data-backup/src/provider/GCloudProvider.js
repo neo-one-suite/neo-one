@@ -1,5 +1,5 @@
 /* @flow */
-import type { Log } from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 import Storage from '@google-cloud/storage';
 
 import path from 'path';
@@ -18,21 +18,17 @@ export type Options = {|
 |};
 
 export default class GCloudProvider extends Provider {
-  _log: Log;
   _environment: Environment;
   _options: Options;
 
   constructor({
-    log,
     environment,
     options,
   }: {|
-    log: Log,
     environment: Environment,
     options: Options,
   |}) {
     super();
-    this._log = log;
     this._environment = environment;
     this._options = options;
   }
@@ -47,67 +43,83 @@ export default class GCloudProvider extends Provider {
     return result[0];
   }
 
-  async restore(): Promise<void> {
+  async restore(monitorIn: Monitor): Promise<void> {
+    const monitor = monitorIn.withLabels({ provider: 'gcloud_provider' });
     const { projectID, bucket, file, writeBytesPerSecond } = this._options;
     const { dataPath, tmpPath } = this._environment;
     const downloadPath = path.resolve(tmpPath, 'storage.db.tar.gz');
 
     const storage = new Storage({ projectId: projectID });
-    this._log({ event: 'DATA_BACKUP_GCLOUD_PROVIDER_RESTORE_DOWNLOAD' });
-    try {
-      await storage
-        .bucket(bucket)
-        .file(file)
-        .download({ destination: downloadPath, validation: true });
-      this._log({
-        event: 'DATA_BACKUP_GCLOUD_PROVIDER_RESTORE_DOWNLOAD_SUCCESS',
-      });
-    } catch (error) {
-      this._log({
-        event: 'DATA_BACKUP_GCLOUD_PROVIDER_RESTORE_DOWNLOAD_ERROR',
-        error,
-      });
-      throw error;
-    }
+    await monitor.captureSpan(
+      span =>
+        span.captureLogSingle(
+          () =>
+            storage
+              .bucket(bucket)
+              .file(file)
+              .download({ destination: downloadPath, validation: true }),
+          {
+            name: 'restore_download',
+            message: 'Backup downloaded',
+            error: 'Failed to download backup.',
+          },
+        ),
+      {
+        name: 'restore_download',
+        help: 'Restore from backup duration',
+      },
+    );
 
-    this._log({ event: 'DATA_BACKUP_GCLOUD_PROVIDER_RESTORE_EXTRACT' });
-    try {
-      await extract({
-        downloadPath,
-        dataPath,
-        writeBytesPerSecond,
-      });
-      this._log({
-        event: 'DATA_BACKUP_GCLOUD_PROVIDER_RESTORE_EXTRACT_SUCCESS',
-      });
-    } catch (error) {
-      this._log({
-        event: 'DATA_BACKUP_GCLOUD_PROVIDER_RESTORE_EXTRACT_ERROR',
-        error,
-      });
-      throw error;
-    }
+    await monitor.captureSpan(
+      span =>
+        span.captureLogSingle(
+          () =>
+            extract({
+              downloadPath,
+              dataPath,
+              writeBytesPerSecond,
+            }),
+          {
+            name: 'restore_extract',
+            message: 'Backup extracted',
+            error: 'Failed to extract backup',
+          },
+        ),
+      {
+        name: 'restore_extract',
+        help: 'Extract backup duration',
+      },
+    );
   }
 
-  async backup(): Promise<void> {
+  async backup(monitorIn: Monitor): Promise<void> {
+    const monitor = monitorIn.withLabels({ provider: 'gcloud_provider' });
     const { projectID, bucket, file } = this._options;
     const { dataPath } = this._environment;
 
     const storage = new Storage({ projectId: projectID });
 
-    this._log({ event: 'DATA_BACKUP_GCLOUD_PROVIDER_BACKUP' });
-    try {
-      await upload({
-        dataPath,
-        write: storage
-          .bucket(bucket)
-          .file(file)
-          .createWriteStream({ validation: true }),
-      });
-      this._log({ event: 'DATA_BACKUP_GCLOUD_PROVIDER_BACKUP_SUCCESS' });
-    } catch (error) {
-      this._log({ event: 'DATA_BACKUP_GCLOUD_PROVIDER_BACKUP_ERROR', error });
-      throw error;
-    }
+    await monitor.captureSpan(
+      span =>
+        span.captureLogSingle(
+          () =>
+            upload({
+              dataPath,
+              write: storage
+                .bucket(bucket)
+                .file(file)
+                .createWriteStream({ validation: true }),
+            }),
+          {
+            name: 'backup_push',
+            message: 'Backup pushed',
+            error: 'Failed to push backup',
+          },
+        ),
+      {
+        name: 'backup_push',
+        help: 'Push backup duration',
+      },
+    );
   }
 }

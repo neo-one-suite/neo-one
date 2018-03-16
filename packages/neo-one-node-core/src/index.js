@@ -43,11 +43,8 @@ export type * from './ValidatorsCount';
 export type {
   ExecutionAction,
   ExecuteScriptsResult,
-  OnStep,
-  OnStepInput,
   Script,
   TriggerType,
   VM,
-  VMContext,
   VMListeners,
 } from './vm';

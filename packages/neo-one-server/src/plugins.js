@@ -1,5 +1,5 @@
 /* @flow */
-import type { Log } from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 import type { Plugin } from '@neo-one/server-plugin';
 
 const DEFAULT_PLUGINS = [
@@ -10,19 +10,23 @@ const DEFAULT_PLUGINS = [
 ];
 
 const getPlugin = ({
-  log,
+  monitor,
   pluginName,
 }: {|
-  log: Log,
+  monitor: Monitor,
   pluginName: string,
 |}): Plugin => {
   try {
     // $FlowFixMe
     const module = require(pluginName); // eslint-disable-line
     const PluginClass = module.default == null ? module : module.default;
-    return new PluginClass({ log });
+    return new PluginClass({ monitor });
   } catch (error) {
-    log({ event: 'LOAD_PLUGIN_ERROR', error });
+    monitor.withLabels({ 'plugin.name': pluginName }).logError({
+      name: 'load_plugin',
+      message: `Failed to load plugin: ${pluginName}`,
+      error,
+    });
     throw error;
   }
 };

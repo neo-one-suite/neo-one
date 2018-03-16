@@ -7,6 +7,5 @@ export { default as readyHealthCheck } from './readyHealthCheck';
 export { default as rpc } from './rpc';
 
 export type { ServerMiddleware } from './common';
-export type { CreateLogForContext, CreateProfile } from './context';
 export type { Options as LiveHealthCheckOptions } from './liveHealthCheck';
 export type { Options as ReadyHealthCheckOptions } from './readyHealthCheck';

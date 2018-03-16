@@ -1,7 +1,7 @@
 /* @flow */
 import { type Blockchain, type Node } from '@neo-one/node-core';
-import { type Log, finalize } from '@neo-one/utils';
 import Koa from 'koa';
+import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 
 import { combineLatest } from 'rxjs/observable/combineLatest';
@@ -15,10 +15,9 @@ import {
   publishReplay,
   refCount,
 } from 'rxjs/operators';
+import { finalize } from '@neo-one/utils';
 
 import {
-  type CreateLogForContext,
-  type CreateProfile,
   type LiveHealthCheckOptions,
   type ReadyHealthCheckOptions,
   context,
@@ -79,14 +78,14 @@ async function handleServer<
   T: http.Server | https.Server,
   TOptions: ListenOptions,
 >({
-  log,
+  monitor,
   createServer,
   options,
   app,
   keepAliveTimeout,
   prevResult,
 }: {|
-  log: Log,
+  monitor: Monitor,
   createServer: (options: TOptions) => T,
   options?: ?TOptions,
   app: Koa,
@@ -120,7 +119,16 @@ async function handleServer<
       await new Promise(resolve =>
         safeServer.listen(port, host, 511, () => resolve()),
       );
-      log({ event: 'SERVER_LISTENING', host, port });
+      monitor
+        .withLabels({
+          [monitor.labels.SPAN_KIND]: 'server',
+        })
+        .withData({ host, port })
+        .logSingle({
+          name: 'server_listening',
+          message: `Server listening on ${host}:${port}`,
+          level: 'verbose',
+        });
     }
   }
 
@@ -137,22 +145,19 @@ const finalizeServer = async (
 };
 
 export default ({
-  log,
-  createLogForContext,
-  createProfile,
+  monitor: monitorIn,
   blockchain,
   node,
   environment,
   options$,
 }: {|
-  log: Log,
-  createLogForContext: CreateLogForContext,
-  createProfile: CreateProfile,
+  monitor: Monitor,
   blockchain: Blockchain,
   node: Node,
   environment: Environment,
   options$: Observable<Options>,
 |}): Observable<$FlowFixMe> => {
+  const monitor = monitorIn.at('node_rpc');
   const app$ = combineLatest(
     options$.pipe(
       map(options => options.liveHealthCheck),
@@ -169,10 +174,10 @@ export default ({
       // $FlowFixMe
       app.silent = true;
 
-      app.on('error', appOnError({ log }));
+      app.on('error', appOnError({ monitor }));
 
       const middlewares = [
-        context({ createLog: createLogForContext, createProfile }),
+        context({ monitor }),
         liveHealthCheck({ blockchain, options: liveHealthCheckOptions }),
         readyHealthCheck({ blockchain, options: readyHealthCheckOptions }),
         logger,
@@ -204,7 +209,7 @@ export default ({
       mergeScan((prevResult, [app, keepAliveTimeout]) =>
         defer(() =>
           handleServer({
-            log,
+            monitor,
             createServer,
             options,
             app,

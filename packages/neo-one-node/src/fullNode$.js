@@ -5,12 +5,7 @@ import {
   restore,
 } from '@neo-one/node-data-backup';
 import Blockchain from '@neo-one/node-blockchain';
-import {
-  type Log,
-  finalize,
-  createProfile as createProfileDefault,
-  neverComplete,
-} from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 import Node, {
   type NodeEnvironment,
   type NodeOptions,
@@ -18,8 +13,6 @@ import Node, {
 import { Observable } from 'rxjs/Observable';
 import { type Settings } from '@neo-one/client-core';
 import {
-  type CreateLogForContext,
-  type CreateProfile,
   type RPCServerEnvironment,
   type RPCServerOptions,
   rpcServer$,
@@ -36,6 +29,7 @@ import {
 import { concat } from 'rxjs/observable/concat';
 import cron from 'node-cron';
 import { dumpChain, loadChain } from '@neo-one/node-offline';
+import { finalize, neverComplete } from '@neo-one/utils';
 import { timer } from 'rxjs/observable/timer';
 import leveldown from 'leveldown';
 import levelup from 'levelup';
@@ -83,9 +77,7 @@ export type Options = {|
 |};
 
 export type FullNodeOptions = {|
-  log: Log,
-  createLogForContext?: CreateLogForContext,
-  createProfile?: CreateProfile,
+  monitor: Monitor,
   settings: Settings,
   environment: Environment,
   options$: Observable<Options>,
@@ -94,17 +86,13 @@ export type FullNodeOptions = {|
 |};
 
 export default ({
-  log,
-  createLogForContext: createLogForContextIn,
-  createProfile: createProfileIn,
+  monitor,
   settings,
   environment,
   options$,
   chainFile,
   dumpChainFile,
 }: FullNodeOptions): Observable<*> => {
-  const createLogForContext = createLogForContextIn || (() => log);
-  const createProfile = createProfileIn || createProfileDefault;
   const dataPath = getDataPath(environment.dataPath);
 
   const backupEnv = environment.backup || {};
@@ -123,7 +111,7 @@ export default ({
     const options = await options$.pipe(take(1)).toPromise();
     if (options.backup != null && options.backup.restore) {
       await restore({
-        log,
+        monitor,
         environment: backupEnvironment,
         options: options.backup.options,
       });
@@ -139,7 +127,7 @@ export default ({
       settings,
       storage,
       vm,
-      log,
+      monitor,
     });
     if (chainFile != null) {
       await loadChain({
@@ -166,6 +154,7 @@ export default ({
     }),
     switchMap(({ blockchain }) => {
       const node = new Node({
+        monitor,
         blockchain,
         environment: environment.node,
         options$: options$.pipe(
@@ -177,9 +166,7 @@ export default ({
     }),
     concatMap(({ node, blockchain }) =>
       rpcServer$({
-        log,
-        createLogForContext,
-        createProfile,
+        monitor,
         blockchain,
         node,
         environment: environment.rpc,
@@ -223,7 +210,7 @@ export default ({
             switchMap(() =>
               defer(async () => {
                 await backup({
-                  log,
+                  monitor,
                   environment: backupEnvironment,
                   options: backupOptions.options,
                 });

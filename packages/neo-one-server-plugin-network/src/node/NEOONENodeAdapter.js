@@ -3,12 +3,12 @@ import { type ChildProcess } from 'child_process';
 import {
   type Binary,
   type DescribeTable,
-  type Log,
   type PortAllocator,
   Config,
   killProcess,
 } from '@neo-one/server-plugin';
 import type { FullNodeEnvironment, FullNodeOptions } from '@neo-one/node';
+import type { Monitor } from '@neo-one/monitor';
 
 import _ from 'lodash';
 import { createEndpoint } from '@neo-one/node-core';
@@ -107,11 +107,9 @@ const defaultConfig = (dataPath: string) => ({
 });
 
 export const createNodeConfig = ({
-  log,
   dataPath,
   defaultConfig: defaultConfigIn,
 }: {|
-  log: Log,
   dataPath: string,
   defaultConfig?: NodeConfig,
 |}): Config<NodeConfig> =>
@@ -267,7 +265,6 @@ export const createNodeConfig = ({
         },
       },
     },
-    log,
     configPath: dataPath,
   });
 
@@ -276,21 +273,28 @@ export default class NEOONENodeAdapter extends NodeAdapter {
   _process: ?ChildProcess;
 
   constructor({
-    log,
+    monitor,
     name,
     binary,
     dataPath,
     portAllocator,
     settings,
   }: {|
-    log: Log,
+    monitor: Monitor,
     name: string,
     binary: Binary,
     dataPath: string,
     portAllocator: PortAllocator,
     settings: NodeSettings,
   |}) {
-    super({ log, name, binary, dataPath, portAllocator, settings });
+    super({
+      monitor: monitor.sub('neo_one_node_adapter'),
+      name,
+      binary,
+      dataPath,
+      portAllocator,
+      settings,
+    });
     this._config = null;
     this._process = null;
   }
@@ -352,9 +356,9 @@ export default class NEOONENodeAdapter extends NodeAdapter {
       return response.status === 200;
     } catch (error) {
       if (error.code !== 'ECONNREFUSED') {
-        this._log({
-          event: 'NEO_BLOCKCHAIN_NODE_ADAPTER_CHECK_RPC_ERROR',
-          rpcPath,
+        this._monitor.withData({ 'rpc.path': rpcPath }).logError({
+          name: 'check_rpc_error',
+          message: 'Failed to check RPC.',
           error,
         });
       }
@@ -370,7 +374,6 @@ export default class NEOONENodeAdapter extends NodeAdapter {
     let config = this._config;
     if (config == null) {
       config = createNodeConfig({
-        log: this._log,
         dataPath: this._dataPath,
         defaultConfig: this._createConfig(settings),
       });

@@ -52,14 +52,14 @@ export default class CLI {
     const vorpal = new Vorpal();
     vorpal.version(pkg.version);
 
-    const { log, config$: logConfig$, shutdownFuncs, shutdown } = setupCLI({
+    const { monitor, config$: logConfig$, shutdownFuncs, shutdown } = setupCLI({
       logConsole: false,
       vorpal,
       debug: this._debug,
     });
 
     const cliArgs = {
-      log,
+      monitor,
       vorpal,
       debug: this._debug,
       binary: createBinary(argv, this.serverConfig),
@@ -96,7 +96,6 @@ export default class CLI {
 
   async _installPlugins(cliArgs: CLIArgs): Promise<void> {
     const serverConfig = createServerConfig({
-      log: () => {},
       paths: cliArgs.paths,
       serverPort: this.serverConfig.serverPort,
       minPort: this.serverConfig.minPort,
@@ -114,7 +113,10 @@ export default class CLI {
   _installPlugin(pluginName: string, cliArgs: CLIArgs): void {
     if (!this._plugins.has(pluginName)) {
       this._plugins.add(pluginName);
-      const plugin = pluginsUtil.getPlugin({ log: cliArgs.log, pluginName });
+      const plugin = pluginsUtil.getPlugin({
+        monitor: cliArgs.monitor,
+        pluginName,
+      });
       plugin.commands.forEach(command => command(cliArgs));
     }
   }

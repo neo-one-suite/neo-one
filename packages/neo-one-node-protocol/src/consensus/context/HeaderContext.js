@@ -9,7 +9,6 @@ import {
   MerkleTree,
   common,
 } from '@neo-one/client-core';
-import { type LogData } from '@neo-one/utils';
 
 import Context from './Context';
 import type { Transactions, Type } from './types';
@@ -129,7 +128,7 @@ export default class HeaderContext extends Context {
     throw new Error('Not Implemented');
   }
 
-  toJSON(): LogData {
+  toJSON(): Object {
     return {
       ...super.toJSON(),
       transactionHashes: this.transactionHashes.map(hash =>

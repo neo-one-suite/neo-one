@@ -3,7 +3,6 @@ import BN from 'bn.js';
 import {
   type ExecutionAction,
   type TriggerType,
-  type VMContext,
   type VMListeners,
   type WriteBlockchain,
 } from '@neo-one/node-core';
@@ -17,6 +16,7 @@ import {
   type VMState,
   common,
 } from '@neo-one/client-core';
+import type { Monitor } from '@neo-one/monitor';
 
 import type { StackItem } from './stackItem';
 
@@ -46,7 +46,6 @@ export type ExecutionInit = {|
   scriptContainer: ScriptContainer,
   triggerType: TriggerType,
   action: ExecutionAction,
-  onStep?: (input: {| context: VMContext, opCode: OpCode |}) => void,
   listeners: VMListeners,
   skipWitnessVerify: boolean,
   persistingBlock?: Block,
@@ -67,8 +66,11 @@ export type ExecutionContext = {|
   blockchain: WriteBlockchain,
   init: ExecutionInit,
   engine: {
-    run: (input: {| context: ExecutionContext |}) => Promise<ExecutionContext>,
+    run: (input: {| monitor: Monitor, context: ExecutionContext |}) => Promise<
+      ExecutionContext,
+    >,
     executeScript: (input: {|
+      monitor: Monitor,
       code: Buffer,
       pushOnly?: boolean,
       blockchain: WriteBlockchain,
@@ -97,6 +99,7 @@ export type OpResult = {|
   resultsAlt?: Array<StackItem>,
 |};
 export type OpInvokeArgs = {|
+  monitor: Monitor,
   context: ExecutionContext,
   args: Array<StackItem>,
   argsAlt: Array<StackItem>,

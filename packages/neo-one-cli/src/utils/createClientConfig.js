@@ -1,6 +1,5 @@
 /* @flow */
 import { type Paths, Config } from '@neo-one/server-plugin';
-import type { Log } from '@neo-one/utils';
 
 export type ClientConfig = {|
   paths: Paths,
@@ -11,13 +10,7 @@ export type ClientConfig = {|
   |},
 |};
 
-export default ({
-  log,
-  paths,
-}: {|
-  log: Log,
-  paths: Paths,
-|}): Config<ClientConfig> =>
+export default ({ paths }: {| paths: Paths |}): Config<ClientConfig> =>
   new Config({
     name: 'client',
     configPath: paths.config,
@@ -55,5 +48,4 @@ export default ({
         },
       },
     },
-    log,
   });

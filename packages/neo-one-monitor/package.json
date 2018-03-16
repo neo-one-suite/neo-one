@@ -1,6 +1,6 @@
 {
-  "name": "@neo-one/node-network",
-  "version": "1.0.0-alpha.15",
+  "name": "@neo-one/monitor",
+  "version": "1.0.0-alpha.1",
   "keywords": [
     "neo",
     "NEO",
@@ -21,7 +21,7 @@
     "dapp",
     "dapps"
   ],
-  "description": "NEO•ONE NEO network protocol.",
+  "description": "NEO•ONE monitoring.",
   "repository": "https://github.com/neo-one-suite/neo-one",
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
@@ -34,12 +34,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.10",
-    "@neo-one/monitor": "^1.0.0-alpha.1",
-    "@neo-one/node-core": "^1.0.0-alpha.11",
-    "@neo-one/utils": "^1.0.0-alpha.6",
-    "lodash": "^4.17.5",
-    "rxjs": "^5.5.6",
-    "through": "^2.3.8"
+    "opentracing": "^0.14.1",
+    "prom-client": "^11.0.0"
   }
 }

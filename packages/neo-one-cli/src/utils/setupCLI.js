@@ -1,10 +1,12 @@
 /* @flow */
 import type Vorpal from 'vorpal';
-import { type Log, finalize } from '@neo-one/utils';
 import type { LogConfig } from '@neo-one/server-plugin';
+import type { Monitor } from '@neo-one/monitor';
 import type { Subject } from 'rxjs/Subject';
 
-import createLog from './createLog';
+import { finalize } from '@neo-one/utils';
+
+import createMonitor from './createMonitor';
 
 export default ({
   vorpal,
@@ -15,7 +17,7 @@ export default ({
   debug?: boolean,
   logConsole?: boolean,
 |}): {|
-  log: Log,
+  monitor: Monitor,
   shutdown: (options: {|
     exitCode: number,
     error?: ?Error,
@@ -23,7 +25,7 @@ export default ({
   shutdownFuncs: Array<() => Promise<void> | void>,
   config$: Subject<LogConfig>,
 |} => {
-  const { log, config$, cleanup } = createLog({ debug, logConsole });
+  const { monitor, config$, cleanup } = createMonitor({ debug, logConsole });
   const shutdownFuncs = [() => cleanup()];
 
   const initiateShutdown = async () => {
@@ -47,27 +49,40 @@ export default ({
         : exitCodeIn;
     if (!shutdownInitiated) {
       shutdownInitiated = true;
-      initiateShutdown()
+      monitor
+        .captureLogSingle(initiateShutdown, {
+          name: 'shutdown',
+          message: 'Shutdown cleanly.',
+          error: 'Failed to shutdown cleanly',
+        })
         .then(() => {
-          log({ event: 'SHUTDOWN_SUCCESS' }, () => {
+          monitor.close(() => {
             process.exit(exitCode);
           });
         })
-        .catch(shutdownError => {
-          log({ event: 'SHUTDOWN_ERROR', error: shutdownError }, () =>
-            process.exit(exitCode > 0 ? exitCode : 1),
-          );
+        .catch(() => {
+          monitor.close(() => {
+            process.exit(exitCode > 0 ? exitCode : 1);
+          });
         });
     }
   };
 
   process.on('unhandledRejection', error => {
-    log({ event: 'UNHANDLED_REJECTION.', error });
+    monitor.logErrorSingle({
+      name: 'unhandled_rejection',
+      message: 'Unhandled rejection. Shutting down.',
+      error,
+    });
     shutdown({ exitCode: 1, error });
   });
 
   process.on('uncaughtException', error => {
-    log({ event: 'UNCAUGHT_EXCEPTION', error });
+    monitor.logErrorSingle({
+      name: 'uncaught_exception',
+      message: 'Uncaught exception. Shutting down.',
+      error,
+    });
     shutdown({ exitCode: 1, error });
   });
 
@@ -75,12 +90,18 @@ export default ({
     const ui = (vorpal.ui: $FlowFixMe);
     if (ui._sigintCount > 1) {
       ui.parent.emit('vorpal_exit');
-      log({ event: 'SIGINT' });
+      monitor.logSingle({
+        name: 'sigint',
+        message: 'Exiting...',
+      });
       shutdown({ exitCode: 0 });
     } else {
       const text = vorpal.ui.input();
       if (!ui.parent) {
-        log({ event: 'SIGINT' });
+        monitor.logSingle({
+          name: 'sigint',
+          message: 'Exiting...',
+        });
         shutdown({ exitCode: 0 });
       } else if (ui.parent.session.cancelCommands) {
         ui.imprint();
@@ -102,5 +123,5 @@ export default ({
     }
   });
 
-  return { log, shutdown, config$, shutdownFuncs };
+  return { monitor, shutdown, config$, shutdownFuncs };
 };

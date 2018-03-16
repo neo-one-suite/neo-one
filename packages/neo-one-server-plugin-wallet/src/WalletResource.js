@@ -358,11 +358,13 @@ export default class WalletResource {
         this._neoBalance = neoBalance;
         this._gasBalance = gasBalance;
       } catch (error) {
-        this._resourceType.plugin.log({
-          event: 'WALLET_RESOURCE_UPDATE_WALLET_ERROR',
-          address: this._address,
-          error,
-        });
+        this._resourceType.plugin.monitor
+          .withData({ address: this._address })
+          .logError({
+            name: 'wallet_resource_update_wallet',
+            message: `Failed to update wallet ${this._address}`,
+            error,
+          });
       }
     }
   }

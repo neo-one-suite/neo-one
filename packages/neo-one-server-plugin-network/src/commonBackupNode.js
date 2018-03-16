@@ -38,7 +38,7 @@ export const processArgs = async (
   cliArgs: CLIArgs,
   args: any,
 ): Promise<?{| node: FullNode, options: BackupRestoreOptions |}> => {
-  const { vorpal, log, shutdown, shutdownFuncs, logConfig$ } = cliArgs;
+  const { vorpal, monitor, shutdown, shutdownFuncs, logConfig$ } = cliArgs;
   const { dataPath, provider, options: cliOptions } = args;
   let mega;
   let gcloud;
@@ -78,7 +78,7 @@ export const processArgs = async (
   }
   const options = { gcloud, mega };
 
-  const nodeConfig = createNEOONENodeConfig({ dataPath, log });
+  const nodeConfig = createNEOONENodeConfig({ dataPath });
   const logPath = path.resolve(dataPath, 'log');
   const logSubscription = nodeConfig.config$
     .pipe(
@@ -98,7 +98,7 @@ export const processArgs = async (
   const node = await createFullNode({
     dataPath,
     nodeConfig,
-    log,
+    monitor,
   });
 
   return { node, options };

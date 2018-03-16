@@ -1,19 +1,17 @@
 /* @flow */
 import { Subject } from 'rxjs/Subject';
-import type { Log, LogMessage } from '@neo-one/utils';
 import type { LogConfig } from '@neo-one/server-plugin';
+import {
+  type LoggerLogOptions,
+  type Monitor,
+  DefaultMonitor,
+} from '@neo-one/monitor';
 
 import { createLogger, format, transports } from 'winston';
 import fs from 'fs-extra';
 import path from 'path';
 
 import './patchWinston';
-
-const isError = (message: LogMessage) =>
-  message.event.toLowerCase().includes('error') ||
-  message.event.toLowerCase().includes('failure') ||
-  message.event.toLowerCase().includes('exception') ||
-  message.error != null;
 
 export default ({
   logConsole,
@@ -23,7 +21,7 @@ export default ({
   debug?: boolean,
 |}): {|
   config$: Subject<LogConfig>,
-  log: Log,
+  monitor: Monitor,
   cleanup: () => void,
 |} => {
   const formats = format.combine(format.timestamp(), format.json());
@@ -42,36 +40,30 @@ export default ({
     // eslint-disable-next-line
     console.error(error);
   });
-  const log = (logMessage: LogMessage, callbackIn?: () => void) => {
-    const { error, ...rest } = logMessage;
-    let { level } = logMessage;
-    if (level == null) {
-      level = isError(logMessage) ? 'error' : 'info';
-    }
+  const monitor = DefaultMonitor.create({
+    namespace: 'cli',
+    logger: {
+      log: (logMessage: LoggerLogOptions) => {
+        const { error, ...rest } = logMessage;
 
-    let onExit = null;
-    const callback = callbackIn;
-    if (callback != null) {
-      onExit = () => callback();
-    }
+        let message = { ...rest };
+        if (error != null) {
+          message = {
+            ...message,
+            stack: error.stack,
+          };
+        }
 
-    let message = { ...rest, level };
-    if (error != null) {
-      message = {
-        ...message,
-        stack: error.stack,
-      };
-    }
-
-    if (logger.transports.length > 0) {
-      logger.log(message);
-      if (onExit != null) {
-        const onExitNonNull = onExit;
+        if (logger.transports.length > 0) {
+          logger.log(message);
+        }
+      },
+      close: (callback: () => void) => {
         let exited = false;
         const doExit = () => {
           if (!exited) {
             exited = true;
-            onExitNonNull();
+            callback();
           }
         };
         const numFlushes = logger.transports.length;
@@ -89,11 +81,10 @@ export default ({
 
         // Force an exit
         setTimeout(() => doExit(), 5000);
-      }
-    } else if (onExit != null) {
-      onExit();
-    }
-  };
+      },
+    },
+  });
+
   const config$ = new Subject();
   const subscription = config$.subscribe({
     next: ({ name, path: logPath, level, maxSize, maxFiles }) => {
@@ -120,13 +111,17 @@ export default ({
           }
         })
         .catch(error => {
-          log({ event: 'LOG_CREATE_DIR_ERROR', error });
+          monitor.logError({
+            name: 'log_create_dir',
+            message: 'Failed to create log directory',
+            error,
+          });
         });
     },
   });
 
   return {
-    log,
+    monitor,
     config$,
     cleanup: () => {
       subscription.unsubscribe();

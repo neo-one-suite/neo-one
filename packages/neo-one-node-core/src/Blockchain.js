@@ -38,7 +38,7 @@ import type {
   Validator,
   ValidatorKey,
 } from '@neo-one/client-core';
-import { type Log } from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 
 import type AccountUnclaimed, {
@@ -123,7 +123,6 @@ interface ReadGetAllAddUpdateDeleteStorage<Key, PartialKey, Value, Update>
 
 export type Blockchain = {
   +settings: Settings,
-  +log: Log,
   +deserializeWireContext: DeserializeWireContext,
   +serializeJSONContext: SerializeJSONContext,
   +feeContext: FeeContext,
@@ -163,33 +162,47 @@ export type Blockchain = {
   +validatorsCount: ReadMetadataStorage<ValidatorsCount>,
 
   +persistBlock: (options: {|
+    monitor?: Monitor,
     block: Block,
     unsafe?: boolean,
   |}) => Promise<void>,
-  +persistHeaders: (headers: Array<Header>) => Promise<void>,
+  +persistHeaders: (headers: Array<Header>, monitor?: Monitor) => Promise<void>,
 
-  +verifyBlock: (block: Block) => Promise<void>,
+  +verifyBlock: (block: Block, monitor?: Monitor) => Promise<void>,
   +verifyTransaction: ({
+    monitor?: Monitor,
     transaction: Transaction,
     memPool?: Array<Transaction>,
   }) => Promise<void>,
-  +verifyConsensusPayload: (payload: ConsensusPayload) => Promise<void>,
+  +verifyConsensusPayload: (
+    payload: ConsensusPayload,
+    monitor?: Monitor,
+  ) => Promise<void>,
 
-  +getValidators: (transactions: Array<Transaction>) => Promise<Array<ECPoint>>,
+  +getValidators: (
+    transactions: Array<Transaction>,
+    monitor?: Monitor,
+  ) => Promise<Array<ECPoint>>,
 
-  +invokeScript: (script: Buffer) => Promise<InvocationResult>,
+  +invokeScript: (
+    script: Buffer,
+    monitor?: Monitor,
+  ) => Promise<InvocationResult>,
   +invokeTransaction: (
     transaction: InvocationTransaction,
+    monitor?: Monitor,
   ) => Promise<InvocationResult>,
-  +calculateClaimAmount: (inputs: Array<Input>) => Promise<BN>,
+  +calculateClaimAmount: (
+    inputs: Array<Input>,
+    monitor?: Monitor,
+  ) => Promise<BN>,
 
   +updateSettings: (settings: Settings) => void,
   +stop: () => Promise<void>,
 };
 
 export type WriteBlockchain = {
-  +settings: Settings,
-  +log: $PropertyType<Blockchain, 'log'>,
+  +settings: $PropertyType<Blockchain, 'settings'>,
 
   +currentBlock: $PropertyType<Blockchain, 'currentBlock'>,
   +currentHeader: $PropertyType<Blockchain, 'currentHeader'>,

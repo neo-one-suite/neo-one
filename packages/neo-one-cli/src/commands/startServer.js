@@ -9,33 +9,30 @@ export default (args: CLIArgs) => {
   vorpal
     .command('start server', `Starts the ${name.title} server`)
     .action(async () => {
-      const { log, serverConfig, shutdown, shutdownFuncs } = setupServer(
+      const { monitor, serverConfig, shutdown, shutdownFuncs } = setupServer(
         'server',
         args,
       );
 
       const subscription = Server.init$({
-        log: (message, onExit) => {
-          if (
-            message.event === 'SERVER_START' &&
-            message.port != null &&
-            typeof message.port === 'number'
-          ) {
-            (vorpal.activeCommand || vorpal).log(
-              `Server listening on port ${message.port}`,
-            );
-          }
-          log(message, onExit);
-        },
+        monitor,
         serverConfig,
         binary,
       }).subscribe({
         error: error => {
-          log({ event: 'UNCAUGHT_SERVER_ERROR', error });
+          monitor.logErrorSingle({
+            name: 'uncaught_server',
+            message: 'Uncaught server error. Shutting down.',
+            error,
+          });
           shutdown({ exitCode: 1, error });
         },
         complete: () => {
-          log({ event: 'UNEXPECTED_SERVER_COMPLETE' });
+          monitor.logSingle({
+            name: 'unexpected_server_complete',
+            message: 'Something went wrong. Shutting down.',
+            level: 'error',
+          });
           shutdown({ exitCode: 1 });
         },
       });

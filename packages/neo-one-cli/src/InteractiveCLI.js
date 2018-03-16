@@ -19,7 +19,7 @@ import {
   name,
   paths as defaultPaths,
 } from '@neo-one/server-plugin';
-import type { Log, LogMessage } from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 import Table from 'cli-table2';
 import Vorpal, { type Args } from 'vorpal';
@@ -89,7 +89,7 @@ export default class InteractiveCLI {
   _preHooks: { [command: string]: Array<CLIHook> };
   _postHooks: { [command: string]: Array<CLIHook> };
   _delimiter: Array<{| key: string, name: string |}>;
-  _log: ?Log;
+  _monitor: ?Monitor;
   _plugins: { [name: string]: Plugin };
   _serverConfig: {|
     dir?: string,
@@ -117,7 +117,7 @@ export default class InteractiveCLI {
     this._preHooks = {};
     this._postHooks = {};
     this._delimiter = [];
-    this._log = null;
+    this._monitor = null;
     this._plugins = {};
     this._serverConfig = { dir, serverPort, minPort };
 
@@ -175,10 +175,11 @@ export default class InteractiveCLI {
     }
   }
 
-  log(message: LogMessage): void {
-    if (this._log != null) {
-      this._log(message);
+  get monitor(): Monitor {
+    if (this._monitor == null) {
+      throw new Error('Attempted to access monitor before it was available');
     }
+    return this._monitor;
   }
 
   async start(argv: Array<string>): Promise<void> {
@@ -191,7 +192,7 @@ export default class InteractiveCLI {
       temp: dir == null ? defaultPaths.temp : path.join(dir, 'temp'),
     };
     const {
-      log,
+      monitor,
       config$: logConfig$,
       shutdownFuncs,
       shutdown: shutdownIn,
@@ -199,7 +200,8 @@ export default class InteractiveCLI {
       vorpal: this.vorpal,
       debug: this.debug,
     });
-    this.clientConfig = createClientConfig({ log, paths });
+    this._monitor = monitor;
+    this.clientConfig = createClientConfig({ paths });
 
     let isShutdown = false;
     const shutdown = arg => {
@@ -233,7 +235,6 @@ export default class InteractiveCLI {
     shutdownFuncs.push(() => logSubscription.unsubscribe());
 
     const serverConfig = createServerConfig({
-      log,
       paths,
       serverPort: this._serverConfig.serverPort,
       minPort: this._serverConfig.minPort,
@@ -289,31 +290,39 @@ export default class InteractiveCLI {
       switchMap(() =>
         this.client
           .getPlugins$()
-          .pipe(map(pluginName => this._registerPlugin(log, pluginName))),
+          .pipe(map(pluginName => this._registerPlugin(monitor, pluginName))),
       ),
       publishReplay(1),
       refCount(),
     );
     const subscription = start$.subscribe({
       error: error => {
-        log({ event: 'UNCAUGHT_CLI_ERROR', error });
+        monitor.logErrorSingle({
+          name: 'uncaught_cli',
+          message: 'Something went wrong. Shutting down.',
+          error,
+        });
         this.vorpal.log(
           `Something went wrong: ${error.message}. Shutting down.`,
         );
         shutdown({ exitCode: 1, error });
       },
       complete: () => {
-        log({ event: 'UNCAUGHT_CLI_COMPLETE' });
-        this.vorpal.log(
-          'Something went wrong: CLI unexpectedly exited. Shutting down.',
-        );
+        const message =
+          'Something went wrong: CLI unexpectedly exited. Shutting down.';
+        monitor.logSingle({
+          name: 'uncaught_cli_complete',
+          message,
+          level: 'error',
+        });
+        this.vorpal.log(message);
         shutdown({ exitCode: 1 });
       },
     });
     shutdownFuncs.push(() => subscription.unsubscribe());
     await start$.pipe(take(1)).toPromise();
     const plugins = await this.client.getAllPlugins();
-    plugins.forEach(plugin => this._registerPlugin(log, plugin));
+    plugins.forEach(plugin => this._registerPlugin(monitor, plugin));
 
     if (!isShutdown) {
       commands.forEach(command => command(this));
@@ -328,10 +337,10 @@ export default class InteractiveCLI {
     }
   }
 
-  _registerPlugin(log: Log, pluginName: string): void {
+  _registerPlugin(monitor: Monitor, pluginName: string): void {
     if (this._plugins[pluginName] == null) {
       this._plugins[pluginName] = pluginsUtil.getPlugin({
-        log,
+        monitor,
         pluginName,
       });
       createPlugin({
@@ -384,8 +393,8 @@ export default class InteractiveCLI {
     }
   }
 
-  printDescribe(describeTable: DescribeTable, log?: (value: string) => void) {
-    this._getLog(log)(this._getDescribe(describeTable));
+  printDescribe(describeTable: DescribeTable, print?: (value: string) => void) {
+    this._getPrint(print)(this._getDescribe(describeTable));
   }
 
   _getDescribe(describeTable: DescribeTable): string {
@@ -406,8 +415,8 @@ export default class InteractiveCLI {
     return table.toString();
   }
 
-  printList(listTable: ListTable, log?: (value: string) => void) {
-    this._getLog(log)(this._getList(listTable));
+  printList(listTable: ListTable, print?: (value: string) => void) {
+    this._getPrint(print)(this._getList(listTable));
   }
 
   getResourceType({
@@ -439,17 +448,17 @@ export default class InteractiveCLI {
     return table.toString();
   }
 
-  _getLog(logIn?: (value: string) => void): (value: string) => void {
-    let log = logIn;
-    if (log == null) {
+  _getPrint(printIn?: (value: string) => void): (value: string) => void {
+    let print = printIn;
+    if (print == null) {
       if (this.vorpal.activeCommand != null) {
-        log = this.vorpal.activeCommand.log.bind(this.vorpal.activeCommand);
+        print = this.vorpal.activeCommand.log.bind(this.vorpal.activeCommand);
       } else {
-        log = this.vorpal.log.bind(this.vorpal);
+        print = this.vorpal.log.bind(this.vorpal);
       }
     }
 
-    return (log: $FlowFixMe);
+    return (print: $FlowFixMe);
   }
 
   getDebug(): DescribeTable {

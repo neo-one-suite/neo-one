@@ -31,6 +31,7 @@ import {
 } from '@neo-one/node-core';
 import BloomFilter from 'bloom-filter';
 import LRU from 'lru-cache';
+import type { Gauge, Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 import { ScalingBloem } from 'bloem';
 
@@ -123,6 +124,7 @@ type PeerHealth = {
 
 export default class Node implements INode {
   blockchain: Blockchain;
+  _monitor: Monitor;
   _network: Network<Message, PeerData, PeerHealth>;
   consensus: ?Consensus;
   _options$: Observable<Options>;
@@ -132,13 +134,13 @@ export default class Node implements INode {
   _userAgent: string;
 
   memPool: { [hash: UInt256Hex]: Transaction };
+  _memPoolGauge: Gauge;
   _knownBlockHashes: ScalingBloem;
   _tempKnownBlockHashes: Set<UInt256Hex>;
   _knownTransactionHashes: ScalingBloem;
   _tempKnownTransactionHashes: Set<UInt256Hex>;
   _knownHeaderHashes: ScalingBloem;
   _tempKnownHeaderHashes: Set<UInt256Hex>;
-  _fetchedIndex: number;
   _getBlocksRequestsIndex: ?number;
   _getBlocksRequestTime: ?number;
   _getBlocksRequestsCount: number;
@@ -147,16 +149,20 @@ export default class Node implements INode {
   _blockIndex: { [endpoint: Endpoint]: number };
 
   constructor({
+    monitor,
     blockchain,
     environment,
     options$,
   }: {|
+    monitor: Monitor,
     blockchain: Blockchain,
     environment: Environment,
     options$: Observable<Options>,
   |}) {
     this.blockchain = blockchain;
+    this._monitor = monitor.at('node_protocol');
     this._network = new Network({
+      monitor,
       environment: environment.network,
       options$: options$.pipe(
         map(options => options.network),
@@ -166,12 +172,22 @@ export default class Node implements INode {
       checkPeerHealth: this._checkPeerHealth,
       createMessageTransform: () =>
         new MessageTransform(this.blockchain.deserializeWireContext),
-      onMessageReceived: this._onMessageReceived.bind(this),
+      onMessageReceived: (
+        peer: ConnectedPeer<Message, PeerData>,
+        message: Message,
+      ) => {
+        this._onMessageReceived(peer, message);
+      },
       onRequestEndpoints: this._onRequestEndpoints.bind(this),
       onEvent: this._onEvent,
     });
     this.consensus = null;
     this._options$ = options$;
+
+    this._memPoolGauge = this._monitor.getGauge({
+      name: 'mempool_size',
+      help: 'Current size of the mempool',
+    });
 
     this._externalPort = (environment.network.listenTCP || {}).port || 0;
     this._nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
@@ -197,13 +213,21 @@ export default class Node implements INode {
 
   start(): Observable<*> {
     const network$ = defer(async () => {
-      this.blockchain.log({ event: 'NODE_START' });
       this._network.start();
+      this._monitor.logSingle({
+        name: 'protocol',
+        message: 'Protocol started.',
+        level: 'verbose',
+      });
     }).pipe(
       neverComplete(),
       finalize(() => {
-        this.blockchain.log({ event: 'NODE_STOP' });
         this._network.stop();
+        this._monitor.logSingle({
+          name: 'protocol',
+          message: 'Protocol stopped.',
+          level: 'verbose',
+        });
       }),
     );
     const consensus$ = this._options$.pipe(
@@ -212,6 +236,7 @@ export default class Node implements INode {
       switchMap(enabled => {
         if (enabled) {
           const consensus = new Consensus({
+            monitor: this._monitor,
             options$: this._options$.pipe(
               map(options => options.consensus.options),
               distinctUntilChanged(),
@@ -238,46 +263,47 @@ export default class Node implements INode {
     }
 
     if (!this._knownTransactionHashes.has(transaction.hash)) {
-      const hash = common.uInt256ToString(transaction.hash);
-      this.blockchain.log({
-        event: 'RELAY_TRANSACTION_START',
-        level: 'debug',
-        hash,
-      });
-
       this._tempKnownTransactionHashes.add(transaction.hashHex);
 
       try {
-        const foundTransaction = await this.blockchain.transaction.tryGet({
-          hash: transaction.hash,
-        });
-        if (foundTransaction == null) {
-          await this.blockchain.verifyTransaction({
-            transaction,
-            memPool: commonUtils.values(this.memPool),
-          });
-          this.memPool[transaction.hashHex] = transaction;
-          if (this.consensus != null) {
-            this.consensus.onTransactionReceived(transaction);
-          }
-          this._relayTransaction(transaction);
-          this.blockchain.log({
-            event: 'RELAY_TRANSACTION_SUCCESS',
-            level: 'debug',
-            hash,
-          });
-          await this._trimMemPool();
-        }
+        await this._monitor.withData({ hash: transaction.hashHex }).captureSpan(
+          span =>
+            span.captureLogSingle(
+              async () => {
+                const foundTransaction = await this.blockchain.transaction.tryGet(
+                  {
+                    hash: transaction.hash,
+                  },
+                );
+                if (foundTransaction == null) {
+                  await this.blockchain.verifyTransaction({
+                    monitor: span,
+                    transaction,
+                    memPool: commonUtils.values(this.memPool),
+                  });
+                  this.memPool[transaction.hashHex] = transaction;
+                  this._memPoolGauge.inc();
+                  if (this.consensus != null) {
+                    this.consensus.onTransactionReceived(transaction);
+                  }
+                  this._relayTransaction(transaction);
+                  await this._trimMemPool(span);
+                }
 
-        this._knownTransactionHashes.add(transaction.hash);
+                this._knownTransactionHashes.add(transaction.hash);
+              },
+              {
+                name: 'relay_transaction',
+                message: `Relayed transaction: ${transaction.hashHex}`,
+                error: `Failed to relay transaction: ${transaction.hashHex}`,
+              },
+            ),
+          {
+            name: 'relay_transaction',
+          },
+        );
       } catch (error) {
         if (error.code !== 'VERIFY') {
-          this.blockchain.log({
-            event: 'RELAY_TRANSACTION_ERROR',
-            hash,
-            error,
-          });
-
           throw error;
         }
       } finally {
@@ -286,13 +312,25 @@ export default class Node implements INode {
     }
   }
 
-  async relayBlock(block: Block): Promise<void> {
-    this.blockchain.log({
-      event: 'RELAY_BLOCK',
-      hash: common.uInt256ToString(block.hash),
-      index: block.index,
-    });
-    await this._persistBlock(block);
+  async relayBlock(block: Block, monitor?: Monitor): Promise<void> {
+    await (monitor || this._monitor)
+      .withData({ 'block.index': block.index })
+      .captureSpan(
+        span =>
+          span.captureLogSingle(
+            logMonitor => this._persistBlock(logMonitor, block),
+            {
+              name: 'relay_block',
+              message: `Relayed block: ${block.index}`,
+              level: 'verbose',
+              error: `Failed to relay block: ${block.index}`,
+            },
+          ),
+        {
+          name: 'relay_block',
+          help: 'Time taken to persist and relay a block.',
+        },
+      );
   }
 
   relayConsensusPayload(payload: ConsensusPayload): void {
@@ -312,11 +350,6 @@ export default class Node implements INode {
   }
 
   _relay(message: Message): void {
-    this.blockchain.log({
-      event: 'RELAY_MESSAGE',
-      level: 'debug',
-      command: message.value.command,
-    });
     this._network.relay(message.serializeWire());
   }
 
@@ -340,12 +373,6 @@ export default class Node implements INode {
     peer: Peer<Message> | ConnectedPeer<Message, PeerData>,
     message: Message,
   ): void {
-    this.blockchain.log({
-      event: 'SEND_MESSAGE',
-      level: 'debug',
-      command: message.value.command,
-      endpoint: peer.endpoint,
-    });
     peer.write(message.serializeWire());
   }
 
@@ -444,7 +471,7 @@ export default class Node implements INode {
 
   _onEvent = (event: NetworkEventMessage<Message, PeerData>) => {
     if (event.event === 'PEER_CONNECT_SUCCESS') {
-      const { connectedPeer } = event.extra;
+      const { connectedPeer } = event;
       if (
         this._bestPeer == null ||
         // Only change best peer at most every 100 blocks
@@ -457,18 +484,13 @@ export default class Node implements INode {
     } else if (event.event === 'PEER_CLOSED') {
       if (
         this._bestPeer != null &&
-        this._bestPeer.endpoint === event.extra.peer.endpoint
+        this._bestPeer.endpoint === event.peer.endpoint
       ) {
         this._bestPeer = this._findBestPeer();
         this._resetRequestBlocks();
         this._requestBlocks();
       }
     }
-
-    this.blockchain.log({
-      event: event.event,
-      ...(event.data || {}),
-    });
   };
 
   _findBestPeer(
@@ -492,32 +514,13 @@ export default class Node implements INode {
     const block = this.blockchain.currentBlock;
     if (peer != null && block.index < peer.data.startHeight) {
       if (this._getBlocksRequestsCount > GET_BLOCKS_CLOSE_COUNT) {
-        this.blockchain.log({
-          event: 'REQUEST_BLOCKS_CLOSE_PEER',
-          level: 'debug',
-          peer: peer.endpoint,
-        });
         this._bestPeer = this._findBestPeer(peer);
         this._network.blacklistAndClose(peer);
         this._getBlocksRequestsCount = 0;
       } else if (this._shouldRequestBlocks()) {
         if (this._getBlocksRequestsIndex === block.index) {
-          this.blockchain.log({
-            event: 'REQUEST_BLOCKS_REPEAT_REQUEST',
-            level: 'debug',
-            peer: peer.endpoint,
-            index: block.index,
-            hash: block.hashHex,
-          });
           this._getBlocksRequestsCount += 1;
         } else {
-          this.blockchain.log({
-            event: 'REQUEST_BLOCKS_INITIAL_REQUEST',
-            level: 'debug',
-            peer: peer.endpoint,
-            index: block.index,
-            hash: block.hashHex,
-          });
           this._getBlocksRequestsCount = 1;
           this._getBlocksRequestsIndex = block.index;
         }
@@ -531,13 +534,6 @@ export default class Node implements INode {
             }),
           }),
         );
-      } else {
-        this.blockchain.log({
-          event: 'REQUEST_BLOCKS_SKIP_REQUEST',
-          level: 'debug',
-          peer: peer.endpoint,
-          index: block.index,
-        });
       }
 
       this._requestBlocks();
@@ -596,10 +592,7 @@ export default class Node implements INode {
     try {
       await this._doFetchEndpointsFromRPC();
     } catch (error) {
-      this.blockchain.log({
-        event: 'NODE_FETCH_ENDPOINTS_FROM_RPC_ERROR',
-        error,
-      });
+      // ignore, logged deeper in the stack
     }
   }
 
@@ -633,119 +626,135 @@ export default class Node implements INode {
         )
         .forEach(endpoint => this._network.addEndpoint(endpoint));
     } catch (error) {
-      this.blockchain.log({
-        event: 'NODE_FETCH_ENDPOINTS_FROM_RPC_URL_ERROR',
-        error,
-        rpcURL,
-      });
+      this._monitor
+        .withData({ [this._monitor.labels.HTTP_URL]: rpcURL })
+        .logError({
+          name: 'fetch_endpoints_rpc',
+          message: `Failed to fetch endpoints from ${rpcURL}`,
+          error,
+        });
     }
   }
 
-  _onMessageReceived(
+  async _onMessageReceived(
     peer: ConnectedPeer<Message, PeerData>,
     message: Message,
-  ): void {
-    this.blockchain.log({
-      event: 'MESSAGE_RECEIVED',
-      level: 'debug',
-      endpoint: peer.endpoint,
-      command: message.value.command,
-    });
-
-    const onError = (error: Error) => {
-      this.blockchain.log({
-        event: 'MESSAGE_RECEIVED_ERROR',
-        error,
-        endpoint: peer.endpoint,
-        command: message.value.command,
-      });
-    };
-
-    try {
-      switch (message.value.command) {
-        case COMMAND.ADDR:
-          this._onAddrMessageReceived(message.value.payload);
-          break;
-        case COMMAND.BLOCK:
-          this._onBlockMessageReceived(peer, message.value.payload).catch(
-            onError,
-          );
-          break;
-        case COMMAND.CONSENSUS:
-          this._onConsensusMessageReceived(message.value.payload).catch(
-            onError,
-          );
-          break;
-        case COMMAND.FILTER_ADD:
-          this._onFilterAddMessageReceived(peer, message.value.payload);
-          break;
-        case COMMAND.FILTER_CLEAR:
-          this._onFilterClearMessageReceived(peer);
-          break;
-        case COMMAND.FILTER_LOAD:
-          this._onFilterLoadMessageReceived(peer, message.value.payload);
-          break;
-        case COMMAND.GET_ADDR:
-          this._onGetAddrMessageReceived(peer);
-          break;
-        case COMMAND.GET_BLOCKS:
-          this._onGetBlocksMessageReceived(peer, message.value.payload).catch(
-            onError,
-          );
-          break;
-        case COMMAND.GET_DATA:
-          this._onGetDataMessageReceived(peer, message.value.payload).catch(
-            onError,
-          );
-          break;
-        case COMMAND.GET_HEADERS:
-          this._onGetHeadersMessageReceived(peer, message.value.payload).catch(
-            onError,
-          );
-          break;
-        case COMMAND.HEADERS:
-          this._onHeadersMessageReceived(peer, message.value.payload).catch(
-            onError,
-          );
-          break;
-        case COMMAND.INV:
-          this._onInvMessageReceived(peer, message.value.payload);
-          break;
-        case COMMAND.MEMPOOL:
-          this._onMemPoolMessageReceived(peer);
-          break;
-        case COMMAND.TX:
-          this._onTransactionReceived(message.value.payload).catch(onError);
-          break;
-        case COMMAND.VERACK:
-          this._onVerackMessageReceived(peer);
-          break;
-        case COMMAND.VERSION:
-          this._onVersionMessageReceived(peer);
-          break;
-        case COMMAND.ALERT:
-          break;
-        case COMMAND.MERKLE_BLOCK:
-          break;
-        case COMMAND.NOT_FOUND:
-          break;
-        case COMMAND.PING:
-          break;
-        case COMMAND.PONG:
-          break;
-        case COMMAND.REJECT:
-          break;
-        default:
-          // eslint-disable-next-line
-          (message.value.command: empty);
-          break;
-      }
-    } catch (error) {
-      onError(error);
-    }
+  ): Promise<void> {
+    await this._monitor
+      .withLabels({ 'message.command': message.value.command })
+      .withData({ [this._monitor.labels.PEER_ADDRESS]: peer.endpoint })
+      .captureLog(
+        async monitor => {
+          switch (message.value.command) {
+            case COMMAND.ADDR:
+              this._onAddrMessageReceived(monitor, message.value.payload);
+              break;
+            case COMMAND.BLOCK:
+              await this._onBlockMessageReceived(
+                monitor,
+                peer,
+                message.value.payload,
+              );
+              break;
+            case COMMAND.CONSENSUS:
+              await this._onConsensusMessageReceived(
+                monitor,
+                message.value.payload,
+              );
+              break;
+            case COMMAND.FILTER_ADD:
+              this._onFilterAddMessageReceived(
+                monitor,
+                peer,
+                message.value.payload,
+              );
+              break;
+            case COMMAND.FILTER_CLEAR:
+              this._onFilterClearMessageReceived(monitor, peer);
+              break;
+            case COMMAND.FILTER_LOAD:
+              this._onFilterLoadMessageReceived(
+                monitor,
+                peer,
+                message.value.payload,
+              );
+              break;
+            case COMMAND.GET_ADDR:
+              this._onGetAddrMessageReceived(monitor, peer);
+              break;
+            case COMMAND.GET_BLOCKS:
+              await this._onGetBlocksMessageReceived(
+                monitor,
+                peer,
+                message.value.payload,
+              );
+              break;
+            case COMMAND.GET_DATA:
+              await this._onGetDataMessageReceived(
+                monitor,
+                peer,
+                message.value.payload,
+              );
+              break;
+            case COMMAND.GET_HEADERS:
+              await this._onGetHeadersMessageReceived(
+                monitor,
+                peer,
+                message.value.payload,
+              );
+              break;
+            case COMMAND.HEADERS:
+              await this._onHeadersMessageReceived(
+                monitor,
+                peer,
+                message.value.payload,
+              );
+              break;
+            case COMMAND.INV:
+              this._onInvMessageReceived(monitor, peer, message.value.payload);
+              break;
+            case COMMAND.MEMPOOL:
+              this._onMemPoolMessageReceived(monitor, peer);
+              break;
+            case COMMAND.TX:
+              await this._onTransactionReceived(monitor, message.value.payload);
+              break;
+            case COMMAND.VERACK:
+              this._onVerackMessageReceived(monitor, peer);
+              break;
+            case COMMAND.VERSION:
+              this._onVersionMessageReceived(monitor, peer);
+              break;
+            case COMMAND.ALERT:
+              break;
+            case COMMAND.MERKLE_BLOCK:
+              break;
+            case COMMAND.NOT_FOUND:
+              break;
+            case COMMAND.PING:
+              break;
+            case COMMAND.PONG:
+              break;
+            case COMMAND.REJECT:
+              break;
+            default:
+              // eslint-disable-next-line
+              (message.value.command: empty);
+              break;
+          }
+        },
+        {
+          name: 'message_received',
+          level: { log: 'debug', metric: 'verbose' },
+          message: `Received ${message.value.command} from ${peer.endpoint}`,
+          error: `Failed to process message ${message.value.command} from ${
+            peer.endpoint
+          }`,
+        },
+      );
   }
 
-  _onAddrMessageReceived(addr: AddrPayload): void {
+  _onAddrMessageReceived(monitor: Monitor, addr: AddrPayload): void {
     addr.addresses
       .filter(address => !LOCAL_HOST_ADDRESSES.has(address.host))
       .map(address =>
@@ -759,22 +768,18 @@ export default class Node implements INode {
   }
 
   async _onBlockMessageReceived(
+    monitor: Monitor,
     peer: ConnectedPeer<Message, PeerData>,
     block: Block,
   ): Promise<void> {
-    this.blockchain.log({
-      event: 'BLOCK_RECEIVED',
-      level: 'debug',
-      index: block.index,
-    });
     this._blockIndex[peer.endpoint] = Math.max(
       block.index,
       this._blockIndex[peer.endpoint] || 0,
     );
-    await this._persistBlock(block);
+    await this.relayBlock(block, monitor);
   }
 
-  async _persistBlock(block: Block): Promise<void> {
+  async _persistBlock(monitor: Monitor, block: Block): Promise<void> {
     if (
       this.blockchain.currentBlockIndex >= block.index ||
       this._tempKnownBlockHashes.has(block.hashHex)
@@ -790,12 +795,7 @@ export default class Node implements INode {
           hashOrIndex: block.hash,
         });
         if (foundBlock == null) {
-          this.blockchain.log({
-            event: 'NODE_PERSIST_BLOCK',
-            level: 'debug',
-            index: block.index,
-          });
-          await this.blockchain.persistBlock({ block });
+          await this.blockchain.persistBlock({ monitor, block });
           if (this.consensus != null) {
             this.consensus.onPersistBlock();
           }
@@ -820,21 +820,26 @@ export default class Node implements INode {
           delete this.memPool[transaction.hashHex];
           this._knownTransactionHashes.add(transaction.hash);
         }
+        this._memPoolGauge.set(Object.keys(this.memPool).length);
       } finally {
         this._tempKnownBlockHashes.delete(block.hashHex);
       }
     }
   }
 
-  async _onConsensusMessageReceived(payload: ConsensusPayload): Promise<void> {
+  async _onConsensusMessageReceived(
+    monitor: Monitor,
+    payload: ConsensusPayload,
+  ): Promise<void> {
     const { consensus } = this;
     if (consensus != null) {
-      await this.blockchain.verifyConsensusPayload(payload);
+      await this.blockchain.verifyConsensusPayload(payload, monitor);
       consensus.onConsensusPayloadReceived(payload);
     }
   }
 
   _onFilterAddMessageReceived(
+    monitor: Monitor,
     peer: ConnectedPeer<Message, PeerData>,
     filterAdd: FilterAddPayload,
   ): void {
@@ -843,12 +848,16 @@ export default class Node implements INode {
     }
   }
 
-  _onFilterClearMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
+  _onFilterClearMessageReceived(
+    monitor: Monitor,
+    peer: ConnectedPeer<Message, PeerData>,
+  ): void {
     // eslint-disable-next-line
     peer.data.bloomFilter = null;
   }
 
   _onFilterLoadMessageReceived(
+    monitor: Monitor,
     peer: ConnectedPeer<Message, PeerData>,
     filterLoad: FilterLoadPayload,
   ): void {
@@ -856,7 +865,10 @@ export default class Node implements INode {
     peer.data.bloomFilter = createPeerBloomFilter(filterLoad);
   }
 
-  _onGetAddrMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
+  _onGetAddrMessageReceived(
+    monitor: Monitor,
+    peer: ConnectedPeer<Message, PeerData>,
+  ): void {
     const addresses = _.take(
       _.shuffle(
         this._network.connectedPeers
@@ -877,6 +889,7 @@ export default class Node implements INode {
   }
 
   async _onGetBlocksMessageReceived(
+    monitor: Monitor,
     peer: ConnectedPeer<Message, PeerData>,
     getBlocks: GetBlocksPayload,
   ): Promise<void> {
@@ -897,6 +910,7 @@ export default class Node implements INode {
   }
 
   async _onGetDataMessageReceived(
+    monitor: Monitor,
     peer: ConnectedPeer<Message, PeerData>,
     getData: InvPayload,
   ): Promise<void> {
@@ -977,6 +991,7 @@ export default class Node implements INode {
   }
 
   async _onGetHeadersMessageReceived(
+    monitor: Monitor,
     peer: ConnectedPeer<Message, PeerData>,
     getBlocks: GetBlocksPayload,
   ): Promise<void> {
@@ -994,6 +1009,7 @@ export default class Node implements INode {
   }
 
   async _onHeadersMessageReceived(
+    monitor: Monitor,
     peer: ConnectedPeer<Message, PeerData>,
     headersPayload: HeadersPayload,
   ): Promise<void> {
@@ -1032,6 +1048,7 @@ export default class Node implements INode {
   }
 
   _onInvMessageReceived(
+    monitor: Monitor,
     peer: ConnectedPeer<Message, PeerData>,
     inv: InvPayload,
   ): void {
@@ -1073,7 +1090,10 @@ export default class Node implements INode {
     }
   }
 
-  _onMemPoolMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
+  _onMemPoolMessageReceived(
+    monitor: Monitor,
+    peer: ConnectedPeer<Message, PeerData>,
+  ): void {
     this._sendMessage(
       peer,
       this._createMessage({
@@ -1088,7 +1108,10 @@ export default class Node implements INode {
     );
   }
 
-  async _onTransactionReceived(transaction: Transaction): Promise<void> {
+  async _onTransactionReceived(
+    monitor: Monitor,
+    transaction: Transaction,
+  ): Promise<void> {
     if (this._ready()) {
       await this.relayTransaction(transaction);
       // TODO: Kinda hacky
@@ -1101,11 +1124,17 @@ export default class Node implements INode {
     }
   }
 
-  _onVerackMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
+  _onVerackMessageReceived(
+    monitor: Monitor,
+    peer: ConnectedPeer<Message, PeerData>,
+  ): void {
     peer.close();
   }
 
-  _onVersionMessageReceived(peer: ConnectedPeer<Message, PeerData>): void {
+  _onVersionMessageReceived(
+    monitor: Monitor,
+    peer: ConnectedPeer<Message, PeerData>,
+  ): void {
     peer.close();
   }
 
@@ -1152,33 +1181,42 @@ export default class Node implements INode {
     return headers;
   }
 
-  async _trimMemPool(): Promise<void> {
+  async _trimMemPool(monitor: Monitor): Promise<void> {
     const memPool = commonUtils.values(this.memPool);
     if (memPool.length > MEM_POOL_SIZE) {
-      const transactionAndFee = await Promise.all(
-        memPool.map(async transaction => {
-          const networkFee = await transaction.getNetworkFee({
-            getOutput: this.blockchain.output.get,
-            governingToken: this.blockchain.settings.governingToken,
-            utilityToken: this.blockchain.settings.utilityToken,
-            fees: this.blockchain.settings.fees,
-            registerValidatorFee: this.blockchain.settings.registerValidatorFee,
-          });
-          return [transaction, networkFee];
-        }),
+      await monitor.withData({ 'mempool.size': memPool.length }).captureSpan(
+        async () => {
+          const transactionAndFee = await Promise.all(
+            memPool.map(async transaction => {
+              const networkFee = await transaction.getNetworkFee({
+                getOutput: this.blockchain.output.get,
+                governingToken: this.blockchain.settings.governingToken,
+                utilityToken: this.blockchain.settings.utilityToken,
+                fees: this.blockchain.settings.fees,
+                registerValidatorFee: this.blockchain.settings
+                  .registerValidatorFee,
+              });
+              return [transaction, networkFee];
+            }),
+          );
+          const hashesToRemove = _.take(
+            _.sortBy(
+              transactionAndFee,
+              // TODO: Might be a bug since we're converting to number
+              ([transaction, networkFee]) =>
+                networkFee.divn(transaction.size).toNumber(),
+            ),
+            // eslint-disable-next-line
+          ).map(([transaction, _]) => transaction.hashHex);
+          for (const hash of hashesToRemove) {
+            delete this.memPool[hash];
+          }
+          this._memPoolGauge.set(Object.keys(this.memPool).length);
+        },
+        {
+          name: 'trim_mempool',
+        },
       );
-      const hashesToRemove = _.take(
-        _.sortBy(
-          transactionAndFee,
-          // TODO: Might be a bug since we're converting to number
-          ([transaction, networkFee]) =>
-            networkFee.divn(transaction.size).toNumber(),
-        ),
-        // eslint-disable-next-line
-      ).map(([transaction, _]) => transaction.hashHex);
-      for (const hash of hashesToRemove) {
-        delete this.memPool[hash];
-      }
     }
   }
 

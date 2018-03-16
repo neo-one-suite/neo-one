@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^1.6.0",
+    "@neo-one/monitor": "^1.0.0-alpha.1",
     "@neo-one/utils": "^1.0.0-alpha.6",
     "fs-extra": "^5.0.0",
     "leveldown": "^3.0.0",

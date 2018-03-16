@@ -1,7 +1,6 @@
 /* @flow */
 import Ajv from 'ajv';
 import Immutable from 'seamless-immutable';
-import type { Log } from '@neo-one/utils';
 import { Observable } from 'rxjs/Observable';
 
 import chokidar from 'chokidar';
@@ -37,7 +36,6 @@ export default class Config<TConfig: Object> {
   _configPath: string;
   _defaultConfig: TConfig;
   _validateConfig: any;
-  _log: Log;
 
   config$: Observable<TConfig>;
 
@@ -45,19 +43,16 @@ export default class Config<TConfig: Object> {
     name: configName,
     defaultConfig,
     schema,
-    log,
     configPath,
   }: {|
     name: string,
     defaultConfig: TConfig,
     schema: Object,
-    log: Log,
     configPath: string,
   |}) {
     this._configPath = path.resolve(configPath, `${configName}.json`);
     this._defaultConfig = defaultConfig;
     this._validateConfig = ajv.compile(schema);
-    this._log = log;
     this.config$ = defer(() => this._getConfig()).pipe(
       switchMap(config =>
         watchConfig$(this._configPath).pipe(
@@ -75,24 +70,10 @@ export default class Config<TConfig: Object> {
   }
 
   async update({ config }: {| config: TConfig |}): Promise<void> {
-    this._log({ event: 'CONFIG_CONFIGURATION', path: this._configPath });
-    try {
-      this._validate(config);
-      await fs.ensureDir(path.dirname(this._configPath));
-      await fs.writeFile(this._configPath, JSON.stringify(config));
-      this._log({
-        event: 'CONFIG_CONFIGURATION_SUCCESS',
-        path: this._configPath,
-      });
-      return config;
-    } catch (error) {
-      this._log({
-        event: 'CONFIG_CONFIGURATION_ERROR',
-        error,
-        path: this._configPath,
-      });
-      throw error;
-    }
+    this._validate(config);
+    await fs.ensureDir(path.dirname(this._configPath));
+    await fs.writeFile(this._configPath, JSON.stringify(config));
+    return config;
   }
 
   async _getConfig(options?: {| config?: TConfig |}): Promise<TConfig> {
@@ -103,7 +84,6 @@ export default class Config<TConfig: Object> {
       contents = await fs.readFile(this._configPath, 'utf8');
     } catch (error) {
       if (error.code === 'ENOENT') {
-        this._log({ event: 'CONFIG_DOES_NOT_EXIST', error });
         const result = await this.update({ config });
         return result;
       }
@@ -111,20 +91,15 @@ export default class Config<TConfig: Object> {
       throw error;
     }
 
-    try {
-      const currentConfig = JSON.parse(contents);
-      this._validate(currentConfig);
+    const currentConfig = JSON.parse(contents);
+    this._validate(currentConfig);
 
-      if (config != null) {
-        return Immutable.merge(config, currentConfig, {
-          deep: true,
-        });
-      }
-      return currentConfig;
-    } catch (error) {
-      this._log({ event: 'CONFIG_INVALID', error });
-      throw error;
+    if (config != null) {
+      return Immutable.merge(config, currentConfig, {
+        deep: true,
+      });
     }
+    return currentConfig;
   }
 
   _validate(config: TConfig): void {

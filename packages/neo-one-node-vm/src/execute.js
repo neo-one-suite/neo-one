@@ -5,7 +5,6 @@ import {
   type Script,
   type ExecuteScriptsResult,
   type TriggerType,
-  type VMContext,
   type VMListeners,
   type WriteBlockchain,
 } from '@neo-one/node-core';
@@ -13,10 +12,10 @@ import {
   VM_STATE,
   type Block,
   type ScriptContainer,
-  type OpCode,
   crypto,
   utils,
 } from '@neo-one/client-core';
+import type { Monitor } from '@neo-one/monitor';
 
 import {
   type ExecutionContext,
@@ -42,29 +41,13 @@ import {
 
 import { lookupOp } from './opcodes';
 
-const createVMContext = (context: ExecutionContext): VMContext => ({
-  script: {
-    code: context.code,
-    pushOnly: context.pushOnly,
-  },
-  scriptHash: context.scriptHash,
-  pc: context.pc,
-  depth: context.depth,
-  get stack() {
-    return context.stack.map(val => val.toContractParameter());
-  },
-  get stackAlt() {
-    return context.stackAlt.map(val => val.toContractParameter());
-  },
-  state: context.state,
-  gasLeft: context.gasLeft,
-});
-
 const getErrorMessage = (error: Error) => `${error.message}\n${error.stack}`;
 
 const executeNext = async ({
+  monitor,
   context: contextIn,
 }: {|
+  monitor: Monitor,
   context: ExecutionContext,
 |}): Promise<ExecutionContext> => {
   let context = contextIn;
@@ -82,14 +65,6 @@ const executeNext = async ({
   const op = lookupOp({ context });
   // eslint-disable-next-line
   context = op.context;
-
-  const { onStep } = context.init;
-  if (onStep != null) {
-    await onStep({
-      context: createVMContext(context),
-      opCode: op.name,
-    });
-  }
 
   if (context.stack.length < op.in) {
     throw new StackUnderflowError(
@@ -145,10 +120,12 @@ const executeNext = async ({
 
   let result;
   try {
-    result = op.invoke({ context, args, argsAlt });
-    if (result instanceof Promise) {
-      result = await result;
-    }
+    result = await monitor
+      .withLabels({ 'op.code': op.name })
+      .captureSpan(
+        span => op.invoke({ monitor: span, context, args, argsAlt }),
+        { name: 'execute_op', level: 'debug' },
+      );
   } catch (error) {
     if (error.code === 'VM_ERROR') {
       throw error;
@@ -191,15 +168,17 @@ const executeNext = async ({
 };
 
 const run = async ({
+  monitor,
   context: contextIn,
 }: {|
+  monitor: Monitor,
   context: ExecutionContext,
 |}): Promise<ExecutionContext> => {
   let context = contextIn;
   while (context.state === VM_STATE.NONE) {
     try {
       // eslint-disable-next-line
-      context = await executeNext({ context });
+      context = await executeNext({ monitor, context });
     } catch (error) {
       context = {
         state: VM_STATE.FAULT,
@@ -227,6 +206,7 @@ const run = async ({
 };
 
 export const executeScript = async ({
+  monitor,
   code,
   pushOnly,
   blockchain,
@@ -234,6 +214,7 @@ export const executeScript = async ({
   gasLeft,
   options: optionsIn,
 }: {|
+  monitor: Monitor,
   code: Buffer,
   pushOnly?: boolean,
   blockchain: WriteBlockchain,
@@ -266,37 +247,40 @@ export const executeScript = async ({
     createdContracts: options.createdContracts || {},
   };
 
-  return run({ context });
+  return monitor.captureSpan(span => run({ monitor: span, context }), {
+    name: 'execute_script',
+    level: 'debug',
+  });
 };
 
 export default async ({
+  monitor: monitorIn,
   scripts,
   blockchain,
   scriptContainer,
   triggerType,
   action,
   gas: gasIn,
-  onStep,
   listeners,
   skipWitnessVerify,
   persistingBlock,
 }: {|
+  monitor: Monitor,
   scripts: Array<Script>,
   blockchain: WriteBlockchain,
   scriptContainer: ScriptContainer,
   triggerType: TriggerType,
   action: ExecutionAction,
   gas: BN,
-  onStep?: (input: {| context: VMContext, opCode: OpCode |}) => void,
   listeners?: VMListeners,
   skipWitnessVerify?: boolean,
   persistingBlock?: Block,
 |}): Promise<ExecuteScriptsResult> => {
+  const monitor = monitorIn.at('node_vm');
   const init = {
     scriptContainer,
     triggerType,
     action,
-    onStep,
     listeners: listeners || {},
     skipWitnessVerify: skipWitnessVerify || false,
     persistingBlock,
@@ -306,6 +290,8 @@ export default async ({
   const startingGas = gasIn.add(FREE_GAS);
   let gas = startingGas;
   let errorMessage;
+  const span = monitor.startSpan({ name: 'execute_scripts', level: 'debug' });
+  let err;
   try {
     const entryScriptHash = crypto.hash160(scripts[scripts.length - 1].code);
     for (
@@ -344,6 +330,7 @@ export default async ({
 
       // eslint-disable-next-line
       context = await executeScript({
+        monitor: span,
         code: script.code,
         pushOnly: script.pushOnly,
         blockchain,
@@ -354,7 +341,10 @@ export default async ({
       gas = context.gasLeft;
     }
   } catch (error) {
+    err = error;
     errorMessage = getErrorMessage(error);
+  } finally {
+    span.end(err != null);
   }
 
   const finalContext = context;

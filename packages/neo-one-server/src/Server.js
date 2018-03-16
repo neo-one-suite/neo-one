@@ -4,8 +4,8 @@ import {
   type DescribeTable,
   Config,
 } from '@neo-one/server-plugin';
-import { type Log, finalize } from '@neo-one/utils';
 import Mali from 'mali';
+import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 import type { ServerConfig } from '@neo-one/server-client';
 import { ServerManager } from '@neo-one/server-client';
@@ -18,6 +18,7 @@ import {
   mergeScan,
   switchMap,
 } from 'rxjs/operators';
+import { finalize } from '@neo-one/utils';
 import path from 'path';
 import proto from '@neo-one/server-grpc';
 
@@ -36,7 +37,7 @@ export default class Server {
   dataPath: string;
   pluginManager: PluginManager;
 
-  _log: Log;
+  _monitor: Monitor;
 
   _serverDebug: {|
     port?: number,
@@ -45,17 +46,17 @@ export default class Server {
   |};
 
   constructor({
-    log,
+    monitor,
     serverConfig,
     dataPath,
     pluginManager,
   }: {|
-    log: Log,
+    monitor: Monitor,
     serverConfig: Config<ServerConfig>,
     dataPath: string,
     pluginManager: PluginManager,
   |}) {
-    this._log = log;
+    this._monitor = monitor.at('neo_one_server');
     this.serverConfig = serverConfig;
     this.dataPath = dataPath;
     this.pluginManager = pluginManager;
@@ -64,11 +65,11 @@ export default class Server {
   }
 
   static init$({
-    log,
+    monitor,
     binary,
     serverConfig,
   }: {|
-    log: Log,
+    monitor: Monitor,
     binary: Binary,
     serverConfig: Config<ServerConfig>,
   |}): Observable<Server> {
@@ -86,7 +87,7 @@ export default class Server {
       switchMap(([dataPath, ports]) =>
         defer(async () => {
           const portAllocator = await PortAllocator.create({
-            log,
+            monitor,
             dataPath,
             portMin: ports.min,
             portMax: ports.max,
@@ -100,7 +101,7 @@ export default class Server {
       switchMap(([dataPath, portAllocator]) =>
         defer(async () => {
           const pluginManager = new PluginManager({
-            log,
+            monitor,
             binary,
             portAllocator,
             dataPath: path.resolve(dataPath, PLUGIN_PATH),
@@ -114,7 +115,7 @@ export default class Server {
     return combineLatest(dataPath$, pluginManager$).pipe(
       switchMap(([dataPath, pluginManager]) => {
         const server = new Server({
-          log,
+          monitor,
           serverConfig,
           dataPath,
           pluginManager,
@@ -148,25 +149,43 @@ export default class Server {
               }
             } else {
               await prevApp.close().catch(error => {
-                this._log({ event: 'APP_CLOSE_ERROR', error });
+                this._monitor.logError({
+                  name: 'app_close',
+                  help: 'App close failures.',
+                  message: 'Failed to close previous app',
+                  error,
+                });
               });
             }
             const app = new Mali(proto);
             app.silent = false;
             app.on('error', (error, ctx) => {
-              let log = this._log;
-              if (ctx != null && ctx.state != null && ctx.state.log != null) {
+              let monitor = this._monitor;
+              if (
+                ctx != null &&
+                ctx.state != null &&
+                ctx.state.monitor != null
+              ) {
                 // eslint-disable-next-line
-                log = ctx.state.log;
+                monitor = ctx.state.monitor;
               }
-              log({ event: 'APP_ERROR', error });
+              monitor.logError({
+                name: 'app',
+                help: 'Uncaught koa errors',
+                message: 'Uncaught koa error.',
+                error,
+              });
             });
-            app.use(context({ log: this._log }));
+            app.use(context({ monitor: this._monitor }));
             app.use(logger);
             app.use(servicesMiddleware({ server: this }));
             this._serverDebug.port = serverConfig.port;
             app.start(`0.0.0.0:${serverConfig.port}`);
-            this._log({ event: 'SERVER_START', port: serverConfig.port });
+            this._monitor.logSingle({
+              name: 'server',
+              message: 'Server started.',
+              level: 'info',
+            });
             return app;
           }),
         undefined,

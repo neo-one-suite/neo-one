@@ -15,6 +15,7 @@ import {
   Contract,
 } from '@neo-one/client-core';
 import BN from 'bn.js';
+import { DefaultMonitor } from '@neo-one/monitor';
 
 import _ from 'lodash';
 
@@ -1286,6 +1287,10 @@ describe('opcodes', () => {
         contract: {},
         currentBlock: {},
       };
+      const monitor = DefaultMonitor.create({
+        namespace: 'test',
+        logger: { log: () => {}, close: () => {} },
+      });
       const block = { timestamp: blockTime };
       const init = {
         scriptContainer: {
@@ -1311,6 +1316,7 @@ describe('opcodes', () => {
         const argsContext = await executeScript({
           code: argsSB.build(),
           blockchain: (blockchain: $FlowFixMe),
+          monitor: (monitor: $FlowFixMe),
           init,
           gasLeft,
         });
@@ -1325,6 +1331,7 @@ describe('opcodes', () => {
         const argsAltContext = await executeScript({
           code: argsAltSB.build(),
           blockchain: (blockchain: $FlowFixMe),
+          monitor: (monitor: $FlowFixMe),
           init,
           gasLeft,
         });
@@ -1332,6 +1339,7 @@ describe('opcodes', () => {
       }
 
       const context = await executeScript({
+        monitor: (monitor: $FlowFixMe),
         code: transaction.script,
         blockchain: (blockchain: $FlowFixMe),
         init,

@@ -1,25 +1,14 @@
 /* @flow */
 import type { Context } from 'koa';
-import type { Log, Profile } from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 
 import { simpleMiddleware } from './common';
 
-export type CreateLogForContext = (ctx: Context) => Log;
-export type CreateProfile = (log: Log) => Profile;
-
-export default ({
-  createLog,
-  createProfile,
-}: {|
-  createLog: CreateLogForContext,
-  createProfile: CreateProfile,
-|}) =>
+export default ({ monitor }: {| monitor: Monitor |}) =>
   simpleMiddleware(
     'context',
     async (ctx: Context, next: () => Promise<void>) => {
-      const log = createLog(ctx);
-      ctx.state.log = log;
-      ctx.state.profile = createProfile(log);
+      ctx.state.monitor = monitor.forRequest(ctx);
 
       await next();
     },

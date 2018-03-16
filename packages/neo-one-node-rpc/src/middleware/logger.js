@@ -1,54 +1,51 @@
 /* @flow */
 import type { Context } from 'koa';
-import type { Log } from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 
-import { getLog, simpleMiddleware } from './common';
-
-const nowSeconds = () => Date.now() / 1000;
-
-const getLatencySeconds = (startTimeSeconds: number) => {
-  const latencySeconds = nowSeconds() - startTimeSeconds;
-  return Math.round(latencySeconds * 1000) / 1000;
-};
+import { getMonitor, simpleMiddleware } from './common';
 
 export default simpleMiddleware(
   'logger',
   async (ctx: Context, next: () => Promise<void>) => {
-    const startTimeSeconds = nowSeconds();
-    const log = getLog(ctx);
-    try {
-      await next();
-    } catch (error) {
-      if (error.code !== 'ECONNABORTED') {
-        log({
-          event: 'REQUEST_ERROR',
-          error,
-          httpRequest: { latency: getLatencySeconds(startTimeSeconds) },
-        });
-      }
-
-      throw error;
-    } finally {
-      log({
-        event: 'REQUEST',
-        httpRequest: { latency: getLatencySeconds(startTimeSeconds) },
-      });
-    }
+    const monitor = getMonitor(ctx);
+    await monitor.captureSpan(
+      span =>
+        span.captureLogSingle(
+          async () => {
+            try {
+              await next();
+            } finally {
+              span.setLabels({ [monitor.labels.HTTP_STATUS_CODE]: ctx.status });
+            }
+          },
+          {
+            name: 'http_request',
+            message: `Handled request for ${ctx.originalUrl || ctx.url}`,
+            level: 'verbose',
+            error: `Request failed for ${ctx.originalUrl || ctx.url}`,
+          },
+        ),
+      { name: 'http_request' },
+    );
   },
 );
 
-export const onError = ({ log: logIn }: {| log: Log |}) => (
+export const onError = ({ monitor: monitorIn }: {| monitor: Monitor |}) => (
   error: Error,
   ctx?: Context,
 ) => {
-  let log = logIn;
+  let monitor = monitorIn;
   if (ctx != null) {
     try {
-      log = getLog(ctx);
+      monitor = getMonitor(ctx);
     } catch (err) {
       // Ignore errors
     }
   }
 
-  log({ event: 'UNEXPECTED_REQUEST_ERROR', error });
+  monitor.logError({
+    name: 'uncaught_request',
+    message: 'Unexpected uncaught request error.',
+    error,
+  });
 };

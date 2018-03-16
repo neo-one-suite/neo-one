@@ -34,6 +34,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@neo-one/monitor": "^1.0.0-alpha.1",
     "@neo-one/server-client": "^1.0.0-alpha.11",
     "@neo-one/server-grpc": "^1.0.0-alpha.5",
     "@neo-one/server-plugin": "^1.0.0-alpha.11",

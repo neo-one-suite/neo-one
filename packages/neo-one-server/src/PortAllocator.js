@@ -1,9 +1,10 @@
 /* @flow */
 import { Config, type DescribeTable } from '@neo-one/server-plugin';
-import { type Log, utils } from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 
 import _ from 'lodash';
 import { take } from 'rxjs/operators';
+import { utils } from '@neo-one/utils';
 
 type Ports = {
   [plugin: string]: {
@@ -16,15 +17,12 @@ type Ports = {
 };
 type PortAllocatorConfig = {| ports: Ports |};
 const createPortAllocatorConfig = ({
-  log,
   dataPath,
 }: {|
-  log: Log,
   dataPath: string,
 |}): Config<PortAllocatorConfig> =>
   new Config({
     name: 'port_allocator',
-    log,
     defaultConfig: { ports: {} },
     schema: {
       type: 'object',
@@ -57,7 +55,7 @@ const createPortAllocatorConfig = ({
   });
 
 export default class PortAllocator {
-  _log: Log;
+  _monitor: Monitor;
   _ports: Ports;
   _currentPort: number;
   _availablePorts: Array<number>;
@@ -67,19 +65,19 @@ export default class PortAllocator {
   _shouldPersist: boolean;
 
   constructor({
-    log,
+    monitor,
     ports,
     portMin,
     portMax,
     config,
   }: {|
-    log: Log,
+    monitor: Monitor,
     ports: Ports,
     portMin: number,
     portMax: number,
     config: Config<PortAllocatorConfig>,
   |}) {
-    this._log = log;
+    this._monitor = monitor;
 
     let maxPort = -1;
     const filteredPorts = {};
@@ -125,20 +123,20 @@ export default class PortAllocator {
   }
 
   static async create({
-    log,
+    monitor,
     dataPath,
     portMin,
     portMax,
   }: {|
-    log: Log,
+    monitor: Monitor,
     dataPath: string,
     portMin: number,
     portMax: number,
   |}): Promise<PortAllocator> {
-    const config = createPortAllocatorConfig({ log, dataPath });
+    const config = createPortAllocatorConfig({ dataPath });
     const { ports } = await config.config$.pipe(take(1)).toPromise();
     return new PortAllocator({
-      log,
+      monitor,
       config,
       ports,
       portMin,
@@ -229,8 +227,10 @@ export default class PortAllocator {
     try {
       await this._config.update({ config: { ports: this._ports } });
     } catch (error) {
-      this._log({
-        event: 'PORT_ALLOCATOR_PERSIST_ERROR',
+      this._monitor.logError({
+        name: 'persist',
+        help: 'Total count of persist errors',
+        message: 'Failed to persist ports',
         error,
       });
     }

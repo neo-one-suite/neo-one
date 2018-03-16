@@ -25,6 +25,7 @@ import {
 } from '@neo-one/client-core';
 import BN from 'bn.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
+import { DefaultMonitor } from '@neo-one/monitor';
 import { of } from 'rxjs/observable/of';
 
 import { utils as commonUtils } from '@neo-one/utils';
@@ -2043,6 +2044,10 @@ describe('syscalls', () => {
         validator: {},
         transactionSpentCoins: {},
       };
+      const monitor = DefaultMonitor.create({
+        namespace: 'test',
+        logger: { log: () => {}, close: () => {} },
+      });
       const block = {
         timestamp: blockTime,
       };
@@ -2069,6 +2074,7 @@ describe('syscalls', () => {
         handleArgs(argsSB, args);
 
         const argsContext = await executeScript({
+          monitor: (monitor: $FlowFixMe),
           code: argsSB.build(),
           blockchain: (blockchain: $FlowFixMe),
           init,
@@ -2079,6 +2085,7 @@ describe('syscalls', () => {
       }
 
       const context = await executeScript({
+        monitor: (monitor: $FlowFixMe),
         code: transaction.script,
         blockchain: (blockchain: $FlowFixMe),
         init,

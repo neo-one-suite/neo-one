@@ -16,19 +16,11 @@ import {
   getEndpointConfig,
 } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
-import { type Context } from 'koa';
 
-import _ from 'lodash';
-import compose from 'koa-compose';
-import compress from 'koa-compress';
-import connect from 'koa-connect';
 import { filter, map, take, timeout, toArray } from 'rxjs/operators';
-import jayson from 'jayson/promise';
 import mount from 'koa-mount';
 
-import { RPCError, RPCUnknownError } from '../errors';
-
-import bodyParser from './bodyParser';
+import jsonrpc, { JSONRPCError } from './jsonrpc';
 import { simpleMiddleware } from './common';
 
 const getTransactionReceipt = (value: Block, hash: string) => {
@@ -55,12 +47,10 @@ export default ({
 |}) => {
   const checkHeight = (height: number) => {
     if (height < 0 && height > blockchain.currentBlockIndex) {
-      // eslint-disable-next-line
-      throw server.error(-100, 'Invalid Height');
+      throw new JSONRPCError(-100, 'Invalid Height');
     }
   };
 
-  let server;
   const handlers = {
     getaccountstate: async args => {
       const hash = crypto.addressToScriptHash({
@@ -80,7 +70,7 @@ export default ({
       });
 
       if (asset == null) {
-        throw server.error(-100, 'Unknown asset');
+        throw new JSONRPCError(-100, 'Unknown asset');
       }
 
       return asset.serializeJSON(blockchain.serializeJSONContext);
@@ -105,7 +95,7 @@ export default ({
       let block = await blockchain.block.tryGet({ hashOrIndex });
       if (block == null) {
         if (watchTimeoutMS == null) {
-          throw server.error(-100, 'Unknown block');
+          throw new JSONRPCError(-100, 'Unknown block');
         }
         try {
           block = await blockchain.block$
@@ -118,7 +108,7 @@ export default ({
             )
             .toPromise();
         } catch (error) {
-          throw server.error(-100, 'Unknown block');
+          throw new JSONRPCError(-100, 'Unknown block');
         }
       }
 
@@ -150,7 +140,7 @@ export default ({
       const hash = JSONHelper.readUInt160(args[0]);
       const contract = await blockchain.contract.tryGet({ hash });
       if (contract == null) {
-        throw server.error(-100, 'Unknown contract');
+        throw new JSONRPCError(-100, 'Unknown contract');
       }
 
       return contract.serializeJSON(blockchain.serializeJSONContext);
@@ -167,7 +157,7 @@ export default ({
         transaction = await blockchain.transaction.tryGet({ hash });
       }
       if (transaction == null) {
-        throw server.error(-100, 'Unknown transaction');
+        throw new JSONRPCError(-100, 'Unknown transaction');
       }
 
       if (args[1] === true || args[1] === 1) {
@@ -201,13 +191,13 @@ export default ({
     },
     invoke: async () => {
       // TODO: Implement me
-      throw server.error(-101, 'Not implemented');
+      throw new JSONRPCError(-101, 'Not implemented');
     },
     invokefunction: async () => {
       // TODO: Implement me
-      throw server.error(-101, 'Not implemented');
+      throw new JSONRPCError(-101, 'Not implemented');
     },
-    invokescript: async (args: [string]) => {
+    invokescript: async args => {
       const script = JSONHelper.readBuffer(args[0]);
       const result = await blockchain.invokeScript(script);
       return result.serializeJSON(blockchain.serializeJSONContext);
@@ -226,7 +216,7 @@ export default ({
     },
     submitblock: async () => {
       // TODO: Implement me
-      throw server.error(-101, 'Not implemented');
+      throw new JSONRPCError(-101, 'Not implemented');
     },
     validateaddress: async args => {
       let scriptHash;
@@ -260,7 +250,10 @@ export default ({
         ]);
         return transactionJSON;
       } catch (error) {
-        throw server.error(-110, `Relay transaction failed: ${error.message}`);
+        throw new JSONRPCError(
+          -110,
+          `Relay transaction failed: ${error.message}`,
+        );
       }
     },
     getoutput: async args => {
@@ -268,7 +261,7 @@ export default ({
       const index = args[1];
       const output = await blockchain.output.tryGet({ hash, index });
       if (output == null) {
-        throw server.error(-100, 'Unknown output');
+        throw new JSONRPCError(-100, 'Unknown output');
       }
 
       return output.serializeJSON(blockchain.serializeJSONContext, index);
@@ -285,7 +278,7 @@ export default ({
         ]);
         return common.fixed8ToDecimal(value).toString();
       } catch (error) {
-        throw server.error(-102, error.message);
+        throw new JSONRPCError(-102, error.message);
       }
     },
     getallstorage: async args => {
@@ -308,7 +301,7 @@ export default ({
         return result.serializeJSON(blockchain.serializeJSONContext);
       }
 
-      throw server.error(-103, 'Invalid InvocationTransaction');
+      throw new JSONRPCError(-103, 'Invalid InvocationTransaction');
     },
     gettransactionreceipt: async args => {
       const spentCoins = await blockchain.transactionSpentCoins.tryGet({
@@ -324,7 +317,7 @@ export default ({
       let result;
       if (spentCoins == null) {
         if (watchTimeoutMS == null) {
-          throw server.error(-100, 'Unknown transaction');
+          throw new JSONRPCError(-100, 'Unknown transaction');
         }
 
         result = await blockchain.block$
@@ -353,7 +346,7 @@ export default ({
         blockchain.serializeJSONContext,
       );
       if (result.data == null) {
-        throw server.error(-103, 'Invalid InvocationTransaction');
+        throw new JSONRPCError(-103, 'Invalid InvocationTransaction');
       }
 
       return result.data;
@@ -380,8 +373,9 @@ export default ({
       } else {
         throw new Error('This node does not support triggering consensus.');
       }
+      return true;
     },
-    updatesettings: args => {
+    updatesettings: async args => {
       const { settings } = blockchain;
       const newSettings = {
         ...settings,
@@ -389,6 +383,7 @@ export default ({
       };
 
       blockchain.updateSettings(newSettings);
+      return true;
     },
     fastforwardoffset: async args => {
       if (node.consensus) {
@@ -396,6 +391,8 @@ export default ({
       } else {
         throw new Error('This node does not support fast forwarding.');
       }
+
+      return true;
     },
     fastforwardtotime: async args => {
       if (node.consensus != null) {
@@ -403,58 +400,10 @@ export default ({
       } else {
         throw new Error('This node does not support fast forwarding.');
       }
+
+      return true;
     },
   };
-  server = jayson.server(
-    _.mapValues(handlers, handler => async (...args: $FlowFixMe): Promise<
-      $FlowFixMe,
-    > => {
-      try {
-        const result = await handler(...args);
-        return result;
-      } catch (error) {
-        let logError = error;
-        if (!(error instanceof Error)) {
-          if (
-            typeof error === 'object' &&
-            error.code != null &&
-            error.message != null
-          ) {
-            logError = new RPCError(error.code, error.message, error.data);
-          } else {
-            logError = new RPCUnknownError(error);
-          }
 
-          Error.captureStackTrace(logError);
-        }
-        blockchain.log({
-          event: 'RPC_ERROR',
-          error: logError,
-        });
-
-        throw error;
-      }
-    }),
-  );
-
-  return simpleMiddleware(
-    'rpc',
-    mount(
-      '/rpc',
-      compose([
-        compress(),
-        bodyParser(),
-        async (ctx: Context, next: () => Promise<void>): Promise<void> => {
-          const { fields } = ctx.request;
-          if (fields != null) {
-            // $FlowFixMe
-            ctx.req.body = fields;
-          }
-
-          await next();
-        },
-        connect(server.middleware({ end: false })),
-      ]),
-    ),
-  );
+  return simpleMiddleware('rpc', mount('/rpc', jsonrpc(handlers)));
 };

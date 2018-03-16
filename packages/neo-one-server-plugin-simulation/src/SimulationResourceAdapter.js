@@ -229,8 +229,9 @@ export default class SimulationResourceAdapter {
       const config = require(simulationPackage); // eslint-disable-line
       return config != null && config.default != null ? config.default : config;
     } catch (error) {
-      options.resourceType.plugin.log({
-        event: 'SIMULATION_RESOURCE_ADAPTER_REQUIRE_ERROR',
+      options.resourceType.plugin.monitor.logError({
+        name: 'simulation_resource_adapter_require_error',
+        message: `Failed to require ${simulationPackage}`,
         error,
       });
       return null;

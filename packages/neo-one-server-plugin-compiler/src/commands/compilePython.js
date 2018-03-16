@@ -4,7 +4,7 @@ import { type CLIArgs, paths } from '@neo-one/server-plugin';
 import boa from '@neo-one/boa';
 import { execFile } from 'child_process';
 
-export default ({ vorpal, log, shutdown, logConfig$ }: CLIArgs) => {
+export default ({ vorpal, shutdown, logConfig$ }: CLIArgs) => {
   vorpal
     .command(
       'compile python <file> <output>',
@@ -32,7 +32,6 @@ export default ({ vorpal, log, shutdown, logConfig$ }: CLIArgs) => {
           });
         });
       } catch (error) {
-        log({ event: 'COMPILE_PYTHON_COMPILE_ERROR', error });
         process.stdout.write(error.message);
         shutdown({ exitCode: 1, error });
         return;

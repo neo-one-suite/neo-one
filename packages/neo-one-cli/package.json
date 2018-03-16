@@ -40,6 +40,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0-beta.40",
     "@grpc/surface": "^0.1.0",
+    "@neo-one/monitor": "^1.0.0-alpha.1",
     "@neo-one/server": "^1.0.0-alpha.39",
     "@neo-one/server-client": "^1.0.0-alpha.11",
     "@neo-one/server-plugin": "^1.0.0-alpha.11",

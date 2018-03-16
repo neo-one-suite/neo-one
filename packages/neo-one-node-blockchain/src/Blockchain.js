@@ -27,22 +27,17 @@ import {
   NULL_ACTION,
   TRIGGER_TYPE,
   type Blockchain as BlockchainType,
-  type OnStepInput,
   type Storage,
   type VM,
 } from '@neo-one/node-core';
-import {
-  type Log,
-  Performance,
-  utils as commonUtils,
-  performanceNow,
-} from '@neo-one/utils';
+import type { Gauge, Monitor } from '@neo-one/monitor';
 import PriorityQueue from 'js-priority-queue';
 import { BehaviorSubject } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 
 import _ from 'lodash';
 import { filter, map, toArray } from 'rxjs/operators';
+import { utils as commonUtils } from '@neo-one/utils';
 
 import {
   GenesisBlockNotRegisteredError,
@@ -58,7 +53,7 @@ export type CreateBlockchainOptions = {|
   settings: Settings,
   storage: Storage,
   vm: VM,
-  log: Log,
+  monitor: Monitor,
 |};
 
 export type BlockchainOptions = {|
@@ -79,8 +74,12 @@ type Vote = {|
   count: BN,
 |};
 
+const NAMESPACE = 'neo_one_node_blockchain';
+
 export default class Blockchain {
-  log: $PropertyType<BlockchainType, 'log'>;
+  _monitor: Monitor;
+  _blockIndexGauge: Gauge;
+  _persistingBlockIndexGauge: Gauge;
   deserializeWireContext: $PropertyType<
     BlockchainType,
     'deserializeWireContext',
@@ -115,7 +114,6 @@ export default class Blockchain {
   _vm: VM;
   _running: boolean;
   _doneRunningResolve: ?() => void;
-  _perf: Performance;
 
   block$: Subject<Block>;
 
@@ -131,11 +129,17 @@ export default class Blockchain {
     this._vm = options.vm;
     this._running = true;
     this._doneRunningResolve = null;
-    this._perf = new Performance();
 
     this._settings$ = new BehaviorSubject(options.settings);
-
-    this.log = options.log;
+    this._monitor = options.monitor.at(NAMESPACE);
+    this._blockIndexGauge = this._monitor.getGauge({
+      name: 'block_index',
+      help: 'The current block index',
+    });
+    this._persistingBlockIndexGauge = this._monitor.getGauge({
+      name: 'persisting_block_index',
+      help: 'The current in progress persist index',
+    });
 
     this.account = this._storage.account;
     this.accountUnclaimed = this._storage.accountUnclaimed;
@@ -185,7 +189,7 @@ export default class Blockchain {
     settings,
     storage,
     vm,
-    log,
+    monitor,
   }: CreateBlockchainOptions): Promise<BlockchainType> {
     const [currentBlock, currentHeader] = await Promise.all([
       storage.block.tryGetLatest(),
@@ -198,7 +202,7 @@ export default class Blockchain {
       settings,
       storage,
       vm,
-      log,
+      monitor,
     });
 
     if (currentHeader == null) {
@@ -262,9 +266,11 @@ export default class Blockchain {
   }
 
   persistBlock({
+    monitor,
     block,
     unsafe,
   }: {|
+    monitor?: Monitor,
     block: Block,
     unsafe?: boolean,
   |}): Promise<void> {
@@ -274,7 +280,13 @@ export default class Blockchain {
       }
       this._inQueue.add(block.index);
 
-      this._blockQueue.queue({ block, resolve, reject, unsafe });
+      this._blockQueue.queue({
+        monitor: this._getMonitor(monitor),
+        block,
+        resolve,
+        reject,
+        unsafe,
+      });
       this._persistBlocksAsync();
     });
   }
@@ -284,78 +296,110 @@ export default class Blockchain {
     // TODO: Perhaps don't implement this?
   }
 
-  async verifyBlock(block: Block): Promise<void> {
-    await block.verify({
-      genesisBlock: this.settings.genesisBlock,
-      tryGetBlock: this.block.tryGet,
-      tryGetHeader: this.header.tryGet,
-      isSpent: this._isSpent,
-      getAsset: this.asset.get,
-      getOutput: this.output.get,
-      tryGetAccount: this.account.tryGet,
-      getValidators: this.getValidators,
-      standbyValidators: this.settings.standbyValidators,
-      getAllValidators: this._getAllValidators,
-      calculateClaimAmount: this.calculateClaimAmount,
-      verifyScript: this.verifyScript,
-      currentHeight: this._currentBlock == null ? 0 : this._currentBlock.index,
-      governingToken: this.settings.governingToken,
-      utilityToken: this.settings.utilityToken,
-      fees: this.settings.fees,
-      registerValidatorFee: this.settings.registerValidatorFee,
-    });
+  async verifyBlock(block: Block, monitor?: Monitor): Promise<void> {
+    await this._getMonitor(monitor)
+      .withData({ 'block.index': block.index })
+      .captureSpan(
+        span =>
+          block.verify({
+            genesisBlock: this.settings.genesisBlock,
+            tryGetBlock: this.block.tryGet,
+            tryGetHeader: this.header.tryGet,
+            isSpent: this._isSpent,
+            getAsset: this.asset.get,
+            getOutput: this.output.get,
+            tryGetAccount: this.account.tryGet,
+            getValidators: this.getValidators,
+            standbyValidators: this.settings.standbyValidators,
+            getAllValidators: this._getAllValidators,
+            calculateClaimAmount: claims =>
+              this.calculateClaimAmount(claims, span),
+            verifyScript: options => this.verifyScript(options, span),
+            currentHeight:
+              this._currentBlock == null ? 0 : this._currentBlock.index,
+            governingToken: this.settings.governingToken,
+            utilityToken: this.settings.utilityToken,
+            fees: this.settings.fees,
+            registerValidatorFee: this.settings.registerValidatorFee,
+          }),
+        { name: 'verify_block' },
+      );
   }
 
-  async verifyConsensusPayload(payload: ConsensusPayload): Promise<void> {
-    await payload.verify({
-      getValidators: () => this.getValidators([]),
-      verifyScript: this.verifyScript,
-      currentIndex: this._currentBlock == null ? 0 : this._currentBlock.index,
-      currentBlockHash: this.currentBlock.hash,
-    });
+  async verifyConsensusPayload(
+    payload: ConsensusPayload,
+    monitor?: Monitor,
+  ): Promise<void> {
+    await this._getMonitor(monitor)
+      .withData({ 'consensus.hash': payload.hashHex })
+      .captureSpan(
+        span =>
+          payload.verify({
+            getValidators: () => this.getValidators([], span),
+            verifyScript: options => this.verifyScript(options, span),
+            currentIndex:
+              this._currentBlock == null ? 0 : this._currentBlock.index,
+            currentBlockHash: this.currentBlock.hash,
+          }),
+        { name: 'verify_consensus' },
+      );
   }
 
   async verifyTransaction({
+    monitor,
     transaction,
     memPool,
   }: {
+    monitor?: Monitor,
     transaction: Transaction,
     memPool?: Array<Transaction>,
   }): Promise<void> {
-    await transaction.verify({
-      calculateClaimAmount: this.calculateClaimAmount,
-      isSpent: this._isSpent,
-      getAsset: this.asset.get,
-      getOutput: this.output.get,
-      tryGetAccount: this.account.tryGet,
-      standbyValidators: this.settings.standbyValidators,
-      getAllValidators: () => this.validator.all.pipe(toArray()).toPromise(),
-      verifyScript: this.verifyScript,
-      governingToken: this.settings.governingToken,
-      utilityToken: this.settings.utilityToken,
-      fees: this.settings.fees,
-      registerValidatorFee: this.settings.registerValidatorFee,
-      currentHeight: this.currentBlockIndex,
-      memPool,
-    });
+    await this._getMonitor(monitor)
+      .withData({ 'transaction.hash': transaction.hashHex })
+      .captureSpan(
+        span =>
+          transaction.verify({
+            calculateClaimAmount: this.calculateClaimAmount,
+            isSpent: this._isSpent,
+            getAsset: this.asset.get,
+            getOutput: this.output.get,
+            tryGetAccount: this.account.tryGet,
+            standbyValidators: this.settings.standbyValidators,
+            getAllValidators: () =>
+              this.validator.all.pipe(toArray()).toPromise(),
+            verifyScript: options => this.verifyScript(options, span),
+            governingToken: this.settings.governingToken,
+            utilityToken: this.settings.utilityToken,
+            fees: this.settings.fees,
+            registerValidatorFee: this.settings.registerValidatorFee,
+            currentHeight: this.currentBlockIndex,
+            memPool,
+          }),
+        { name: 'verify_transaction' },
+      );
   }
 
-  async invokeScript(script: Buffer): Promise<InvocationResult> {
+  async invokeScript(
+    script: Buffer,
+    monitor?: Monitor,
+  ): Promise<InvocationResult> {
     const transaction = new InvocationTransaction({
       script,
       gas: common.ONE_HUNDRED_FIXED8,
     });
 
-    return this.invokeTransaction(transaction);
+    return this.invokeTransaction(transaction, monitor);
   }
 
   async invokeTransaction(
     transaction: InvocationTransaction,
+    monitor?: Monitor,
   ): Promise<InvocationResult> {
     const blockchain = this._createWriteBlockchain();
 
     return wrapExecuteScripts(() =>
       this._vm.executeScripts({
+        monitor: this._getMonitor(monitor),
         scripts: [{ code: transaction.script }],
         blockchain,
         scriptContainer: {
@@ -365,7 +409,6 @@ export default class Blockchain {
         triggerType: TRIGGER_TYPE.APPLICATION,
         action: NULL_ACTION,
         gas: transaction.gas,
-        onStep: this._onStep,
         skipWitnessVerify: true,
       }),
     );
@@ -387,31 +430,30 @@ export default class Blockchain {
         entry.block.index === this.currentBlockIndex + 1
       ) {
         entry = this._blockQueue.dequeue();
-        const done = this._perf.start('Blockchain._persistBlocksAsync');
-        const start = performanceNow();
+        const entryNonNull = entry;
         // eslint-disable-next-line
-        await this._persistBlock(entry.block, entry.unsafe);
+        await (entry.monitor: Monitor)
+          .withData({ 'block.index': entry.block.index })
+          .captureSpan(
+            span =>
+              this._persistBlock(
+                span,
+                entryNonNull.block,
+                entryNonNull.unsafe,
+              ).catch(error => {
+                span.logError({
+                  name: 'persist_block_top_level',
+                  message: `Failed to persist block ${
+                    entryNonNull.block.index
+                  }`,
+                  error,
+                });
+                throw error;
+              }),
+            { name: 'persist_block_top_level' },
+          );
         entry.resolve();
         this.block$.next(entry.block);
-        const duration = performanceNow() - start;
-        done();
-        this.log({
-          event: 'PERSIST_BLOCK_SUCCESS',
-          index: entry.block.index,
-          durationMS: duration,
-        });
-        if (
-          this._perf.getCount('Blockchain._persistBlocksAsync') % 1000 ===
-          0
-        ) {
-          this.log({
-            event: 'PERSIST_BLOCK_PERF',
-            index: entry.block.index,
-            timings: (this._perf.toStats(): $FlowFixMe),
-          });
-          this._perf.reset();
-        }
-
         this.cleanBlockQueue();
         entry = this.peekBlockQueue();
       }
@@ -419,11 +461,6 @@ export default class Blockchain {
       if (entry != null) {
         entry.reject(error);
       }
-      this.log({
-        event: 'PERSIST_BLOCK_ERROR',
-        error,
-        index: entry == null ? null : entry.block.index,
-      });
     } finally {
       this._persistingBlocks = false;
       if (this._doneRunningResolve != null) {
@@ -455,30 +492,32 @@ export default class Blockchain {
     return null;
   }
 
-  async _persistBlock(block: Block, unsafe?: boolean): Promise<void> {
+  async _persistBlock(
+    monitor: Monitor,
+    block: Block,
+    unsafe?: boolean,
+  ): Promise<void> {
     if (!unsafe) {
-      await this.verifyBlock(block);
+      await this.verifyBlock(block, monitor);
     }
 
-    const blockchain = this._createWriteBlockchain(this._perf);
+    const blockchain = this._createWriteBlockchain();
 
-    let done = this._perf.start('Blockchain._persistBlock.persistBlock');
-    await blockchain.persistBlock(block);
-    done();
+    await blockchain.persistBlock(monitor, block);
 
-    done = this._perf.start('Blockchain._persistBlock.commit');
-    await this._storage.commit(blockchain.getChangeSet());
-    done();
+    await monitor.captureSpan(
+      () => this._storage.commit(blockchain.getChangeSet()),
+      { name: 'persist_block_commit_storage' },
+    );
 
     this._currentBlock = block;
     this._currentHeader = block.header;
   }
 
-  verifyScript = async ({
-    scriptContainer,
-    hash,
-    witness,
-  }: VerifyScriptOptions): Promise<void> => {
+  verifyScript = async (
+    { scriptContainer, hash, witness }: VerifyScriptOptions,
+    monitor?: Monitor,
+  ): Promise<void> => {
     let { verification } = witness;
     if (verification.length === 0) {
       const builder = new ScriptBuilder();
@@ -490,6 +529,7 @@ export default class Blockchain {
 
     const blockchain = this._createWriteBlockchain();
     const result = await this._vm.executeScripts({
+      monitor: this._getMonitor(monitor),
       scripts: [
         { code: witness.invocation, pushOnly: true },
         { code: verification },
@@ -499,7 +539,6 @@ export default class Blockchain {
       triggerType: TRIGGER_TYPE.VERIFICATION,
       action: NULL_ACTION,
       gas: utils.ZERO,
-      onStep: this._onStep,
     });
 
     const { stack } = result;
@@ -516,51 +555,68 @@ export default class Blockchain {
     }
   };
 
-  calculateClaimAmount = async (claims: Array<Input>): Promise<BN> => {
-    const spentCoins = await Promise.all(
-      claims.map(claim => this._tryGetSpentCoin(claim)),
+  calculateClaimAmount = async (
+    claims: Array<Input>,
+    monitor?: Monitor,
+  ): Promise<BN> =>
+    this._getMonitor(monitor).captureSpan(
+      span =>
+        (async () => {
+          const spentCoins = await Promise.all(
+            claims.map(claim => this._tryGetSpentCoin(claim)),
+          );
+          const filteredSpentCoins = spentCoins.filter(Boolean);
+          if (spentCoins.length !== filteredSpentCoins.length) {
+            // TODO: Better error
+            throw new Error('Not all coins were spent');
+          }
+
+          if (filteredSpentCoins.some(coin => coin.claimed)) {
+            // TODO: Better error
+            throw new Error('Coin was already claimed');
+          }
+
+          if (
+            filteredSpentCoins.some(
+              coin =>
+                !common.uInt256Equal(
+                  coin.output.asset,
+                  this.settings.governingToken.hash,
+                ),
+            )
+          ) {
+            // TODO: Better error
+            throw new Error('Invalid claim');
+          }
+
+          return utils.calculateClaimAmount({
+            coins: filteredSpentCoins.map(coin => ({
+              value: coin.output.value,
+              startHeight: coin.startHeight,
+              endHeight: coin.endHeight,
+            })),
+            decrementInterval: this.settings.decrementInterval,
+            generationAmount: this.settings.generationAmount,
+            getSystemFee: async index => {
+              const header = await this._storage.header.get({
+                hashOrIndex: index,
+              });
+              const blockSystemFee = await this._storage.blockSystemFee.get({
+                hash: header.hash,
+              });
+              return blockSystemFee.systemFee;
+            },
+          });
+        })().catch(error => {
+          span.logError({
+            name: 'calculate_claim_amount',
+            message: 'Failed to calculate claim amount.',
+            error,
+          });
+          throw error;
+        }),
+      { name: 'calculate_claim_amount' },
     );
-    const filteredSpentCoins = spentCoins.filter(Boolean);
-    if (spentCoins.length !== filteredSpentCoins.length) {
-      // TODO: Better error
-      throw new Error('Not all coins were spent');
-    }
-
-    if (filteredSpentCoins.some(coin => coin.claimed)) {
-      // TODO: Better error
-      throw new Error('Coin was already claimed');
-    }
-
-    if (
-      filteredSpentCoins.some(
-        coin =>
-          !common.uInt256Equal(
-            coin.output.asset,
-            this.settings.governingToken.hash,
-          ),
-      )
-    ) {
-      // TODO: Better error
-      throw new Error('Invalid claim');
-    }
-
-    return utils.calculateClaimAmount({
-      coins: filteredSpentCoins.map(coin => ({
-        value: coin.output.value,
-        startHeight: coin.startHeight,
-        endHeight: coin.endHeight,
-      })),
-      decrementInterval: this.settings.decrementInterval,
-      generationAmount: this.settings.generationAmount,
-      getSystemFee: async index => {
-        const header = await this._storage.header.get({ hashOrIndex: index });
-        const blockSystemFee = await this._storage.blockSystemFee.get({
-          hash: header.hash,
-        });
-        return blockSystemFee.systemFee;
-      },
-    });
-  };
 
   _isSpent = async (input: OutputKey): Promise<boolean> => {
     const transactionSpentCoins = await this.transactionSpentCoins.tryGet({
@@ -597,8 +653,22 @@ export default class Blockchain {
     };
   };
 
-  getValidators = (transactions: Array<Transaction>): Promise<Array<ECPoint>> =>
-    getValidators(this, transactions);
+  getValidators = async (
+    transactions: Array<Transaction>,
+    monitor?: Monitor,
+  ): Promise<Array<ECPoint>> =>
+    this._getMonitor(monitor).captureSpan(
+      span =>
+        getValidators(this, transactions).catch(error => {
+          span.logError({
+            name: 'get_validators',
+            message: 'Failed to calculate validators',
+            error,
+          });
+          throw error;
+        }),
+      { name: 'get_validators' },
+    );
 
   _getVotes = async (
     transactions: Array<Transaction>,
@@ -678,17 +748,14 @@ export default class Blockchain {
     return votes.filter(Boolean);
   };
 
-  _createWriteBlockchain(perf?: Performance): WriteBatchBlockchain {
+  _createWriteBlockchain(): WriteBatchBlockchain {
     return new WriteBatchBlockchain({
       settings: this.settings,
       currentBlock: this._currentBlock,
       currentHeader: this._currentHeader,
       storage: this._storage,
       vm: this._vm,
-      onStep: this._onStep,
       getValidators: this.getValidators,
-      log: this.log,
-      perf,
     });
   }
 
@@ -763,18 +830,15 @@ export default class Blockchain {
     return unspent.map(value => value.input);
   };
 
-  _onStep = ({ context, opCode }: OnStepInput) => {
-    const scriptHash = common.uInt160ToString(context.scriptHash);
-    this.log({
-      event: 'VM_STEP',
-      level: 'silly',
-      scriptHash,
-      pc: context.pc,
-      opCode,
-    });
-  };
-
   _getAllValidators(): Promise<Array<Validator>> {
     return this.validator.all.pipe(toArray()).toPromise();
+  }
+
+  _getMonitor(monitor?: Monitor): Monitor {
+    if (monitor == null) {
+      return this._monitor;
+    }
+
+    return monitor.at(NAMESPACE);
   }
 }

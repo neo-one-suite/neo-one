@@ -6,7 +6,7 @@ import { execFile } from 'child_process';
 import fs from 'fs-extra';
 import path from 'path';
 
-export default ({ vorpal, log, shutdown, logConfig$ }: CLIArgs) => {
+export default ({ vorpal, shutdown, logConfig$ }: CLIArgs) => {
   vorpal
     .command(
       'compile csharp <file> <output>',
@@ -34,7 +34,6 @@ export default ({ vorpal, log, shutdown, logConfig$ }: CLIArgs) => {
           });
         });
       } catch (error) {
-        log({ event: 'COMPILE_CSHARP_COMPILE_ERROR', error });
         process.stdout.write(error.message);
         shutdown({ exitCode: 1, error });
         return;
@@ -44,7 +43,6 @@ export default ({ vorpal, log, shutdown, logConfig$ }: CLIArgs) => {
         const outputPath = path.basename(file.replace('.dll', '.avm'));
         await fs.move(outputPath, output);
       } catch (error) {
-        log({ event: 'COMPILE_CSHARP_MOVE_PATH_ERROR', error });
         process.stdout.write(error.message);
         shutdown({ exitCode: 1, error });
         return;
@@ -54,7 +52,6 @@ export default ({ vorpal, log, shutdown, logConfig$ }: CLIArgs) => {
         const abiPath = path.basename(file.replace('.dll', '.abi.json'));
         await fs.remove(abiPath);
       } catch (error) {
-        log({ event: 'COMPILE_CSHARP_REMOVE_ABI_ERROR', error });
         process.stdout.write(error.message);
         shutdown({ exitCode: 1, error });
         return;

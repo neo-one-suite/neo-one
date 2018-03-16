@@ -1,5 +1,5 @@
 /* @flow */
-import type { Log } from '@neo-one/utils';
+import type { Monitor } from '@neo-one/monitor';
 
 import fs from 'fs-extra';
 
@@ -8,26 +8,44 @@ import type { Environment, Options } from './types';
 import getProvider from './getProvider';
 
 export default async ({
-  log,
+  monitor: monitorIn,
   environment,
   options,
 }: {|
-  log: Log,
+  monitor: Monitor,
   environment: Environment,
   options: Options,
 |}) => {
-  const provider = getProvider({ log, environment, options });
+  const monitor = monitorIn.at('data_backup');
+  const provider = getProvider({ environment, options });
   if (provider == null) {
-    log({ event: 'DATA_BACKUP_SKIP_BACKUP_NO_PROVIDER' });
+    monitor.log({
+      name: 'skip_no_provider',
+      message: 'Skipping backup due to no provider',
+    });
     return;
   }
 
-  await fs.remove(environment.tmpPath);
-  await fs.ensureDir(environment.tmpPath);
+  await monitor.captureSpan(
+    span =>
+      span.captureLogSingle(
+        async () => {
+          await fs.remove(environment.tmpPath);
+          await fs.ensureDir(environment.tmpPath);
 
-  await provider.backup();
+          await provider.backup(span);
 
-  await fs.remove(environment.tmpPath);
-
-  log({ event: 'DATA_BACKUP_BACKUP_COMPLETE' });
+          await fs.remove(environment.tmpPath);
+        },
+        {
+          name: 'backup',
+          message: 'Backup complete.',
+          error: 'Backup failed.',
+        },
+      ),
+    {
+      name: 'backup',
+      help: 'Duration taken for backup',
+    },
+  );
 };
