@@ -141,7 +141,7 @@ export type SpanOptions = {|
 
   help?: string,
 
-  references?: Array<Reference>,
+  references?: Array<Reference | void>,
 |};
 
 export type CaptureSpanOptions = {|
@@ -150,7 +150,7 @@ export type CaptureSpanOptions = {|
 
   help?: string,
 
-  references?: Array<Reference>,
+  references?: Array<Reference | void>,
 |};
 
 export interface Counter {
@@ -234,6 +234,11 @@ export type KnownLabels = {|
 |};
 
 export type Format = 'http_headers' | 'text_map' | 'binary';
+export type Formats = {|
+  HTTP: 'http_headers',
+  TEXT: 'text_map',
+  BINARY: 'binary',
+|};
 export type Carrier = any;
 
 /*
@@ -247,6 +252,7 @@ Did you enter a sub-component? monitor.sub
 */
 export interface Monitor {
   labels: KnownLabels;
+  formats: Formats;
   at(namespace: string): Monitor;
   sub(namespace: string): Monitor;
   withLabels(labels: Labels): Monitor;
@@ -293,11 +299,14 @@ export interface Monitor {
   ): Promise<TResult>;
 
   childOf(span: SpanContext | Monitor): Reference;
+  childOf(span: void): void;
   followsFrom(span: SpanContext | Monitor): Reference;
-  extract(format: Format, carrier: Carrier): SpanContext;
+  followsFrom(span: void): void;
+  extract(format: Format, carrier: Carrier): SpanContext | void;
   inject(format: Format, carrier: Carrier): void;
 
-  nowSeconds(): number;
+  nowMS(): number;
+  serveMetrics(port: number): void;
   close(callback: () => void): void;
 }
 

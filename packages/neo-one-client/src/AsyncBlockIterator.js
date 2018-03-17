@@ -1,5 +1,6 @@
 /* @flow */
 import { AsyncIteratorBase } from '@neo-one/client-core';
+import type { Monitor } from '@neo-one/monitor';
 
 import _ from 'lodash';
 
@@ -14,7 +15,7 @@ type Resolver = {|
 |};
 
 type Client = {
-  +getBlockCount: () => Promise<number>,
+  +getBlockCount: (monitor?: Monitor) => Promise<number>,
   +getBlock: (index: number, options?: GetOptions) => Promise<Block>,
 };
 
@@ -44,6 +45,7 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
   _indexStop: ?number;
   _fetchTimeoutMS: number;
   _batchSize: number;
+  _monitor: Monitor | void;
 
   constructor({
     client,
@@ -63,6 +65,10 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
     this._fetchTimeoutMS =
       fetchTimeoutMS == null ? FETCH_TIMEOUT_MS : fetchTimeoutMS;
     this._batchSize = batchSize == null ? BATCH_SIZE : batchSize;
+    this._monitor =
+      filter.monitor == null
+        ? undefined
+        : filter.monitor.at('async_block_iterator');
   }
 
   next(): Promise<IteratorResult<Block, void>> {
@@ -136,7 +142,7 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
   async _asyncFetch(): Promise<void> {
     let startHeight = this._startHeight;
     if (startHeight == null) {
-      const blockCount = await this._client.getBlockCount();
+      const blockCount = await this._client.getBlockCount(this._monitor);
       startHeight = blockCount - 1;
       this._startHeight = startHeight;
     }
@@ -148,7 +154,7 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
       const [block, newStartHeight] = await Promise.all([
         this._fetchOne(index),
         // Refresh the block count in case we got behind somehow
-        this._client.getBlockCount(),
+        this._client.getBlockCount(this._monitor),
       ]);
       this._currentIndex += 1;
       this._write(block);
@@ -176,7 +182,14 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
     try {
       const block = await this._client.getBlock(
         index,
-        isBatch ? undefined : { timeoutMS: this._fetchTimeoutMS },
+        isBatch
+          ? {
+              monitor: this._monitor,
+            }
+          : {
+              timeoutMS: this._fetchTimeoutMS,
+              monitor: this._monitor,
+            },
       );
       return block;
     } catch (error) {

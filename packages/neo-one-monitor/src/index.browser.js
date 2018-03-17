@@ -1,5 +1,5 @@
 /* @flow */
-export { default as DefaultMonitor } from './NodeMonitor';
+export { default as DefaultMonitor } from './BrowserMonitor';
 
 export { default as createTracer } from './createTracer';
 

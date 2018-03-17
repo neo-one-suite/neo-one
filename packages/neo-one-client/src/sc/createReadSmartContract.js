@@ -1,5 +1,7 @@
 /* @flow */
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
+import BigNumber from 'bignumber.js';
+import type { Monitor } from '@neo-one/monitor';
 import { type Param as ScriptBuilderParam } from '@neo-one/client-core';
 
 import { filter, map } from 'ix/asynciterable/pipe/index';
@@ -24,13 +26,26 @@ import * as common from './common';
 
 const getParams = ({
   parameters,
-  params,
+  params: paramsIn,
 }: {|
   parameters: Array<ABIParameter>,
   params: Array<any>,
-|}): Array<?ScriptBuilderParam> => {
+|}): {| params: Array<?ScriptBuilderParam>, monitor?: Monitor |} => {
+  let params = paramsIn;
+  const finalArg = params[params.length - 1];
+  let monitor;
+  if (
+    finalArg != null &&
+    typeof finalArg === 'object' &&
+    !Array.isArray(finalArg) &&
+    !BigNumber.isBigNumber(finalArg)
+  ) {
+    params = params.slice(0, -1);
+    monitor = finalArg;
+  }
+
   const { converted } = common.convertParams({ params, parameters });
-  return converted;
+  return { params: converted, monitor };
 };
 
 const createCall = ({
@@ -42,11 +57,11 @@ const createCall = ({
   client: ReadClient<*>,
   func: ABIFunction,
 |}) => async (...args: Array<any>): Promise<?Param> => {
-  const params = getParams({
+  const { params, monitor } = getParams({
     parameters: parameters || [],
     params: args,
   });
-  const result = await client._call(hash, name, params);
+  const result = await client._call(hash, name, params, monitor);
   return common.convertCallResult({ returnType, result });
 };
 

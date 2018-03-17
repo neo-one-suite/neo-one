@@ -23,6 +23,7 @@ import {
   common,
   utils,
 } from '@neo-one/client-core';
+import type { Labels, Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 
 import _ from 'lodash';
@@ -91,6 +92,7 @@ export type KeyStore = {
   +sign: (options: {|
     account: UserAccountID,
     message: string,
+    monitor?: Monitor,
   |}) => Promise<Witness>,
 };
 
@@ -100,14 +102,17 @@ export type Provider = {
   +getUnclaimed: (
     network: NetworkType,
     address: AddressString,
+    monitor?: Monitor,
   ) => Promise<{| unclaimed: Array<Input>, amount: BigNumber |}>,
   +getUnspentOutputs: (
     network: NetworkType,
     address: AddressString,
+    monitor?: Monitor,
   ) => Promise<Array<UnspentOutput>>,
   +relayTransaction: (
     network: NetworkType,
     transaction: string,
+    monitor?: Monitor,
   ) => Promise<Transaction>,
   +getTransactionReceipt: (
     network: NetworkType,
@@ -117,12 +122,17 @@ export type Provider = {
   +getInvocationData: (
     network: NetworkType,
     hash: Hash256String,
+    monitor?: Monitor,
   ) => Promise<RawInvocationData>,
   +testInvoke: (
     network: NetworkType,
     transaction: string,
+    monitor?: Monitor,
   ) => Promise<RawInvocationResult>,
-  +getNetworkSettings: (network: NetworkType) => Promise<NetworkSettings>,
+  +getNetworkSettings: (
+    network: NetworkType,
+    monitor?: Monitor,
+  ) => Promise<NetworkSettings>,
   +read: (network: NetworkType) => DataProvider,
 };
 
@@ -130,6 +140,7 @@ type TransactionOptionsFull = {|
   from: UserAccountID,
   attributes: Array<Attribute>,
   networkFee: BigNumber,
+  monitor?: Monitor,
 |};
 
 const NEO_ONE_ATTRIBUTE = {
@@ -181,65 +192,100 @@ export default class LocalUserAccountProvider<
     transfers: Array<Transfer>,
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>> {
-    const { from, attributes, networkFee } = await this._getTransactionOptions(
-      options,
+    const {
+      from,
+      attributes,
+      networkFee,
+      monitor,
+    } = this._getTransactionOptions(options);
+
+    return this._capture(
+      async span => {
+        const { inputs, outputs } = await this._getTransfersInputOutputs({
+          transfers,
+          from,
+          gas: networkFee,
+          monitor: span,
+        });
+
+        if (inputs.length === 0) {
+          throw new NothingToTransferError();
+        }
+
+        const transaction = new ContractTransaction({
+          inputs: this._convertInputs(inputs),
+          outputs: this._convertOutputs(outputs),
+          attributes: this._convertAttributes(attributes),
+        });
+        return this._sendTransaction({
+          from,
+          transaction,
+          onConfirm: async ({ receipt }) => receipt,
+          monitor: span,
+        });
+      },
+      {
+        name: 'transfer',
+        message: 'Transferred coins',
+        error: 'Failed to transfer coins',
+      },
+      monitor,
     );
-    const { inputs, outputs } = await this._getTransfersInputOutputs({
-      transfers,
-      from,
-      gas: networkFee,
-    });
-
-    if (inputs.length === 0) {
-      throw new NothingToTransferError();
-    }
-
-    const transaction = new ContractTransaction({
-      inputs: this._convertInputs(inputs),
-      outputs: this._convertOutputs(outputs),
-      attributes: this._convertAttributes(attributes),
-    });
-    return this._sendTransaction({
-      from,
-      transaction,
-      onConfirm: async ({ receipt }) => receipt,
-    });
   }
 
   async claim(
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>> {
-    const { from, attributes, networkFee } = await this._getTransactionOptions(
-      options,
-    );
-
-    const [{ unclaimed, amount }, { inputs, outputs }] = await Promise.all([
-      this.provider.getUnclaimed(from.network, from.address),
-      this._getTransfersInputOutputs({ from, gas: networkFee, transfers: [] }),
-    ]);
-    if (unclaimed.length === 0) {
-      throw new NothingToClaimError();
-    }
-
-    const transaction = new ClaimTransaction({
-      inputs: this._convertInputs(inputs),
-      claims: this._convertInputs(unclaimed),
-      outputs: this._convertOutputs(
-        outputs.concat([
-          {
-            address: from.address,
-            asset: common.GAS_ASSET_HASH,
-            value: amount,
-          },
-        ]),
-      ),
-      attributes: this._convertAttributes(attributes),
-    });
-    return this._sendTransaction({
+    const {
       from,
-      transaction,
-      onConfirm: async ({ receipt }) => receipt,
-    });
+      attributes,
+      networkFee,
+      monitor,
+    } = this._getTransactionOptions(options);
+
+    return this._capture(
+      async span => {
+        const [{ unclaimed, amount }, { inputs, outputs }] = await Promise.all([
+          this.provider.getUnclaimed(from.network, from.address, span),
+          this._getTransfersInputOutputs({
+            from,
+            gas: networkFee,
+            transfers: [],
+            monitor: span,
+          }),
+        ]);
+        if (unclaimed.length === 0) {
+          throw new NothingToClaimError();
+        }
+
+        const transaction = new ClaimTransaction({
+          inputs: this._convertInputs(inputs),
+          claims: this._convertInputs(unclaimed),
+          outputs: this._convertOutputs(
+            outputs.concat([
+              {
+                address: from.address,
+                asset: common.GAS_ASSET_HASH,
+                value: amount,
+              },
+            ]),
+          ),
+          attributes: this._convertAttributes(attributes),
+        });
+        return this._sendTransaction({
+          from,
+          transaction,
+          onConfirm: async ({ receipt }) => receipt,
+          monitor: span,
+        });
+      },
+      {
+        name: 'claim',
+        message: 'Claimed gas.',
+        error: 'Failed to claim gas.',
+      },
+      monitor,
+    );
   }
 
   publish(
@@ -313,6 +359,7 @@ export default class LocalUserAccountProvider<
           result,
         };
       },
+      method: 'publish',
     });
   }
 
@@ -359,6 +406,7 @@ export default class LocalUserAccountProvider<
           result,
         };
       },
+      method: 'registerAsset',
     });
   }
 
@@ -366,38 +414,57 @@ export default class LocalUserAccountProvider<
     transfers: Array<Transfer>,
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>> {
-    const { from, attributes, networkFee } = await this._getTransactionOptions(
-      options,
-    );
-    const settings = await this.provider.getNetworkSettings(from.network);
-    const { inputs, outputs } = await this._getTransfersInputOutputs({
-      transfers: [],
+    const {
       from,
-      gas: networkFee.plus(settings.issueGASFee),
-    });
+      attributes,
+      networkFee,
+      monitor,
+    } = this._getTransactionOptions(options);
 
-    if (inputs.length === 0) {
-      throw new NothingToIssueError();
-    }
+    return this._capture(
+      async span => {
+        const settings = await this.provider.getNetworkSettings(
+          from.network,
+          span,
+        );
+        const { inputs, outputs } = await this._getTransfersInputOutputs({
+          transfers: [],
+          from,
+          gas: networkFee.plus(settings.issueGASFee),
+          monitor: span,
+        });
 
-    const issueOutputs = outputs.concat(
-      transfers.map(transfer => ({
-        address: transfer.to,
-        asset: transfer.asset,
-        value: transfer.amount,
-      })),
+        if (inputs.length === 0) {
+          throw new NothingToIssueError();
+        }
+
+        const issueOutputs = outputs.concat(
+          transfers.map(transfer => ({
+            address: transfer.to,
+            asset: transfer.asset,
+            value: transfer.amount,
+          })),
+        );
+
+        const transaction = new IssueTransaction({
+          inputs: this._convertInputs(inputs),
+          outputs: this._convertOutputs(issueOutputs),
+          attributes: this._convertAttributes(attributes),
+        });
+        return this._sendTransaction({
+          from,
+          transaction,
+          onConfirm: async ({ receipt }) => receipt,
+          monitor: span,
+        });
+      },
+      {
+        name: 'issue',
+        message: 'Issued currency.',
+        error: 'Failed to issue currency.',
+      },
+      monitor,
     );
-
-    const transaction = new IssueTransaction({
-      inputs: this._convertInputs(inputs),
-      outputs: this._convertOutputs(issueOutputs),
-      attributes: this._convertAttributes(attributes),
-    });
-    return this._sendTransaction({
-      from,
-      transaction,
-      onConfirm: async ({ receipt }) => receipt,
-    });
   }
 
   invoke(
@@ -459,40 +526,62 @@ export default class LocalUserAccountProvider<
             })
           : null,
       ].filter(Boolean),
+      method: 'invoke',
+      labels: {
+        'invoke.method': method,
+      },
     });
   }
 
-  async call(
+  call(
     contract: Hash160String,
     method: string,
     params: Array<?ScriptBuilderParam>,
     options?: TransactionOptions,
   ): Promise<RawInvocationResult> {
-    const { from, attributes, networkFee } = await this._getTransactionOptions(
-      options,
-    );
-
-    const transfers = (options || {}).transfers || [];
-    const { inputs, outputs } = await this._getTransfersInputOutputs({
-      transfers,
+    const {
       from,
-      gas: networkFee,
-    });
-    const testTransaction = new InvocationTransaction({
-      version: 1,
-      inputs: this._convertInputs(inputs),
-      outputs: this._convertOutputs(outputs),
-      attributes: this._convertAttributes(attributes),
-      gas: common.TEN_THOUSAND_FIXED8,
-      script: clientUtils.getInvokeMethodScript({
-        hash: contract,
-        method,
-        params,
-      }),
-    });
-    return this.provider.testInvoke(
-      from.network,
-      testTransaction.serializeWire().toString('hex'),
+      attributes,
+      networkFee,
+      monitor,
+    } = this._getTransactionOptions(options);
+
+    return this._capture(
+      async span => {
+        const transfers = (options || {}).transfers || [];
+        const { inputs, outputs } = await this._getTransfersInputOutputs({
+          transfers,
+          from,
+          gas: networkFee,
+          monitor: span,
+        });
+        const testTransaction = new InvocationTransaction({
+          version: 1,
+          inputs: this._convertInputs(inputs),
+          outputs: this._convertOutputs(outputs),
+          attributes: this._convertAttributes(attributes),
+          gas: common.TEN_THOUSAND_FIXED8,
+          script: clientUtils.getInvokeMethodScript({
+            hash: contract,
+            method,
+            params,
+          }),
+        });
+        return this.provider.testInvoke(
+          from.network,
+          testTransaction.serializeWire().toString('hex'),
+          span,
+        );
+      },
+      {
+        name: 'call',
+        message: 'Called method.',
+        error: 'Failed to call method.',
+        labels: {
+          'call.method': method,
+        },
+      },
+      monitor,
     );
   }
 
@@ -512,9 +601,9 @@ export default class LocalUserAccountProvider<
     return this.provider.read(network);
   }
 
-  async _getTransactionOptions(
+  _getTransactionOptions(
     optionsIn?: TransactionOptions | InvokeTransactionOptions,
-  ): Promise<TransactionOptionsFull> {
+  ): TransactionOptionsFull {
     const options = optionsIn || {};
     // $FlowFixMe
     const attributes = (options.attributes || []: Array<Attribute>);
@@ -533,6 +622,7 @@ export default class LocalUserAccountProvider<
       from,
       attributes: attributes.concat(NEO_ONE_ATTRIBUTE),
       networkFee: options.networkFee || utils.ZERO_BIG_NUMBER,
+      monitor: options.monitor,
     };
   }
 
@@ -561,7 +651,9 @@ export default class LocalUserAccountProvider<
     script,
     options,
     onConfirm,
+    method,
     scripts: scriptsIn,
+    labels,
   }: {|
     script: Buffer,
     options?: TransactionOptions | InvokeTransactionOptions,
@@ -570,81 +662,103 @@ export default class LocalUserAccountProvider<
       data: RawInvocationData,
       receipt: TransactionReceipt,
     |}) => Promise<T> | T,
+    method: string,
     scripts?: Array<WitnessModel>,
+    labels?: Labels,
   |}): Promise<TransactionResult<T>> {
     const {
       from,
       attributes: attributesIn,
       networkFee,
-    } = await this._getTransactionOptions(options);
+      monitor,
+    } = this._getTransactionOptions(options);
 
-    const transfers = (options || {}).transfers || [];
-    const {
-      inputs: testInputs,
-      outputs: testOutputs,
-    } = await this._getTransfersInputOutputs({
-      transfers,
-      from,
-      gas: networkFee,
-    });
+    return this._capture(
+      async span => {
+        const transfers = (options || {}).transfers || [];
+        const {
+          inputs: testInputs,
+          outputs: testOutputs,
+        } = await this._getTransfersInputOutputs({
+          transfers,
+          from,
+          gas: networkFee,
+          monitor: span,
+        });
 
-    const attributes = attributesIn.concat({
-      usage: 'Remark15',
-      data: Buffer.from(`${utils.randomUInt()}`, 'utf8').toString('hex'),
-    });
+        const attributes = attributesIn.concat({
+          usage: 'Remark15',
+          data: Buffer.from(`${utils.randomUInt()}`, 'utf8').toString('hex'),
+        });
 
-    const scripts = scriptsIn || [];
+        const scripts = scriptsIn || [];
 
-    const testTransaction = new InvocationTransaction({
-      version: 1,
-      inputs: this._convertInputs(testInputs),
-      outputs: this._convertOutputs(testOutputs),
-      attributes: this._convertAttributes(attributes),
-      gas: common.TEN_THOUSAND_FIXED8,
-      script,
-      scripts,
-    });
-    const result = await this.provider.testInvoke(
-      from.network,
-      testTransaction.serializeWire().toString('hex'),
-    );
-    if (result.state === 'FAULT') {
-      throw new InvokeError(result.message);
-    }
-    const { inputs, outputs } = await this._getTransfersInputOutputs({
-      transfers,
-      from,
-      gas: networkFee.plus(result.gasConsumed),
-    });
-
-    const invokeTransaction = new InvocationTransaction({
-      version: 1,
-      inputs: this._convertInputs(inputs),
-      outputs: this._convertOutputs(outputs),
-      attributes: this._convertAttributes(attributes),
-      gas: clientUtils.bigNumberToBN(result.gasConsumed, 8),
-      script,
-      scripts,
-    });
-
-    return this._sendTransaction({
-      from,
-      transaction: invokeTransaction,
-      onConfirm: async ({ transaction, receipt }) => {
-        const data = await this.provider.getInvocationData(
+        const testTransaction = new InvocationTransaction({
+          version: 1,
+          inputs: this._convertInputs(testInputs),
+          outputs: this._convertOutputs(testOutputs),
+          attributes: this._convertAttributes(attributes),
+          gas: common.TEN_THOUSAND_FIXED8,
+          script,
+          scripts,
+        });
+        const result = await this.provider.testInvoke(
           from.network,
-          transaction.txid,
+          testTransaction.serializeWire().toString('hex'),
+          span,
         );
-        const res = await onConfirm({ transaction, receipt, data });
-        return res;
+        if (result.state === 'FAULT') {
+          throw new InvokeError(result.message);
+        }
+        const { inputs, outputs } = await this._getTransfersInputOutputs({
+          transfers,
+          from,
+          gas: networkFee.plus(result.gasConsumed),
+          monitor: span,
+        });
+
+        const invokeTransaction = new InvocationTransaction({
+          version: 1,
+          inputs: this._convertInputs(inputs),
+          outputs: this._convertOutputs(outputs),
+          attributes: this._convertAttributes(attributes),
+          gas: clientUtils.bigNumberToBN(result.gasConsumed, 8),
+          script,
+          scripts,
+        });
+
+        return this._sendTransaction({
+          from,
+          transaction: invokeTransaction,
+          onConfirm: async ({ transaction, receipt }) => {
+            const data = await this.provider.getInvocationData(
+              from.network,
+              transaction.txid,
+            );
+            const res = await onConfirm({ transaction, receipt, data });
+            return res;
+          },
+          monitor: span,
+        });
       },
-    });
+      {
+        name: 'invoke_raw',
+        message: 'Successful invocation.',
+        error: 'Failed to invoke.',
+        labels: {
+          ...(labels || {}),
+          'invoke_raw.method': method,
+        },
+      },
+      monitor,
+    );
   }
 
-  async _sendTransaction<T>({
+  _sendTransaction<T>({
     transaction: transactionUnsignedIn,
     from,
     onConfirm,
+    monitor,
   }: {|
     transaction: TransactionModel,
     from: UserAccountID,
@@ -652,61 +766,74 @@ export default class LocalUserAccountProvider<
       transaction: Transaction,
       receipt: TransactionReceipt,
     |}) => Promise<T>,
+    monitor?: Monitor,
   |}): Promise<TransactionResult<T>> {
-    let transactionUnsigned = transactionUnsignedIn;
-    const scriptHash = addressToScriptHash(from.address);
-    if (
-      transactionUnsigned.inputs.length === 0 &&
-      (transactionUnsigned.claims == null ||
-        /* istanbul ignore next */
-        !Array.isArray(transactionUnsigned.claims) ||
-        /* istanbul ignore next */
-        transactionUnsigned.claims.length === 0)
-    ) {
-      transactionUnsigned = transactionUnsigned.clone({
-        attributes: transactionUnsigned.attributes.concat(
-          this._convertAttributes([
-            {
-              usage: 'Script',
-              data: scriptHash,
-            },
-          ]),
-        ),
-      });
-    }
-
-    const witness = await this.keystore.sign({
-      account: from,
-      message: transactionUnsigned.serializeUnsigned().toString('hex'),
-    });
-
-    const transaction = await this.provider.relayTransaction(
-      from.network,
-      this._addWitness({
-        transaction: transactionUnsigned,
-        scriptHash,
-        witness: this._convertWitness(witness),
-      })
-        .serializeWire()
-        .toString('hex'),
-    );
-
-    return {
-      transaction,
-      confirmed: async (optionsIn?: GetOptions): Promise<T> => {
-        const options = optionsIn || ({}: $FlowFixMe);
-        if (options.timeoutMS == null) {
-          options.timeoutMS = 120000;
+    return this._capture(
+      async span => {
+        let transactionUnsigned = transactionUnsignedIn;
+        const scriptHash = addressToScriptHash(from.address);
+        if (
+          transactionUnsigned.inputs.length === 0 &&
+          (transactionUnsigned.claims == null ||
+            /* istanbul ignore next */
+            !Array.isArray(transactionUnsigned.claims) ||
+            /* istanbul ignore next */
+            transactionUnsigned.claims.length === 0)
+        ) {
+          transactionUnsigned = transactionUnsigned.clone({
+            attributes: transactionUnsigned.attributes.concat(
+              this._convertAttributes([
+                {
+                  usage: 'Script',
+                  data: scriptHash,
+                },
+              ]),
+            ),
+          });
         }
-        const receipt = await this.provider.getTransactionReceipt(
+
+        const witness = await this.keystore.sign({
+          account: from,
+          message: transactionUnsigned.serializeUnsigned().toString('hex'),
+          monitor: span,
+        });
+
+        const transaction = await this.provider.relayTransaction(
           from.network,
-          transaction.txid,
-          options,
+          this._addWitness({
+            transaction: transactionUnsigned,
+            scriptHash,
+            witness: this._convertWitness(witness),
+          })
+            .serializeWire()
+            .toString('hex'),
+          span,
         );
 
-        return onConfirm({ transaction, receipt });
+        return {
+          transaction,
+          confirmed: async (optionsIn?: GetOptions): Promise<T> => {
+            const options = optionsIn || ({}: $FlowFixMe);
+            if (options.timeoutMS == null) {
+              options.timeoutMS = 120000;
+            }
+            const receipt = await this.provider.getTransactionReceipt(
+              from.network,
+              transaction.txid,
+              options,
+            );
+
+            return onConfirm({ transaction, receipt });
+          },
+        };
       },
-    };
+      {
+        name: 'send_transaction',
+        message: 'Sent transaction.',
+        error: 'Failed to send transaction.',
+      },
+      monitor,
+    );
   }
 
   /*
@@ -783,10 +910,12 @@ export default class LocalUserAccountProvider<
     from,
     transfers: transfersIn,
     gas,
+    monitor,
   }: {|
     from: UserAccountID,
     transfers: Array<Transfer>,
     gas: BigNumber,
+    monitor?: Monitor,
   |}): Promise<{| outputs: Array<Output>, inputs: Array<Input> |}> {
     const transfers = (transfersIn.map(transfer => ({
       to: transfer.to,
@@ -805,6 +934,7 @@ export default class LocalUserAccountProvider<
     const allOutputs = await this.provider.getUnspentOutputs(
       from.network,
       from.address,
+      monitor,
     );
     return commonUtils
       .values(
@@ -999,5 +1129,39 @@ export default class LocalUserAccountProvider<
 
   _convertWitness(script: Witness): WitnessModel {
     return converters.witness(script);
+  }
+
+  _capture<T>(
+    func: (monitor?: Monitor) => Promise<T>,
+    {
+      name,
+      message,
+      error,
+      labels,
+    }: {|
+      name: string,
+      message: string,
+      error: string,
+      labels?: Labels,
+    |},
+    monitor?: Monitor,
+  ): Promise<T> {
+    if (monitor == null) {
+      return func();
+    }
+
+    return monitor
+      .at('neo_one_local_user_account_provider')
+      .withLabels(labels || {})
+      .captureSpan(
+        span =>
+          span.captureLogSingle(() => func(span), {
+            name,
+            message,
+            error,
+            level: 'verbose',
+          }),
+        { name },
+      );
   }
 }

@@ -1,6 +1,7 @@
 /* @flow */
 import type BN from 'bn.js';
 import type BigNumber from 'bignumber.js';
+import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 import type { Param as ScriptBuilderParam } from '@neo-one/client-core';
 
@@ -482,6 +483,7 @@ export type TransactionOptions = {|
   from?: UserAccountID,
   attributes?: Array<AttributeArg>,
   networkFee?: BigNumber,
+  monitor?: Monitor,
 |};
 
 export type InvokeTransactionOptions = {|
@@ -534,6 +536,7 @@ export type RegisterAssetReceipt = {|
 
 export type GetOptions = {|
   timeoutMS?: number,
+  monitor?: Monitor,
 |};
 
 export type Options = {|
@@ -549,6 +552,7 @@ export type TransactionResult<TTransactionReceipt> = {|
 export type BlockFilter = {|
   indexStart?: number,
   indexStop?: number,
+  monitor?: Monitor,
 |};
 
 export type UpdateAccountNameOptions = {|
@@ -559,44 +563,45 @@ export type UpdateAccountNameOptions = {|
 export interface DataProvider {
   +network: NetworkType;
 
-  getAccount(address: AddressString): Promise<Account>;
+  getAccount(address: AddressString, monitor?: Monitor): Promise<Account>;
 
-  getAsset(hash: Hash256String): Promise<Asset>;
+  getAsset(hash: Hash256String, monitor?: Monitor): Promise<Asset>;
 
-  getBlock(hash: Hash256String): Promise<Block>;
+  getBlock(hash: Hash256String, options?: GetOptions): Promise<Block>;
   getBlock(index: number, options?: GetOptions): Promise<Block>;
   iterBlocks(filter?: BlockFilter): AsyncIterable<Block>;
 
-  getBestBlockHash(): Promise<Hash256String>;
-  getBlockCount(): Promise<number>;
+  getBestBlockHash(monitor?: Monitor): Promise<Hash256String>;
+  getBlockCount(monitor?: Monitor): Promise<number>;
 
-  getContract(hash: Hash160String): Promise<Contract>;
+  getContract(hash: Hash160String, monitor?: Monitor): Promise<Contract>;
 
-  getMemPool(): Promise<Array<Hash256String>>;
+  getMemPool(monitor?: Monitor): Promise<Array<Hash256String>>;
 
-  getTransaction(hash: Hash256String): Promise<Transaction>;
+  getTransaction(hash: Hash256String, monitor?: Monitor): Promise<Transaction>;
 
-  getValidators(): Promise<Array<Validator>>;
+  getValidators(monitor?: Monitor): Promise<Array<Validator>>;
 
-  getConnectedPeers(): Promise<Array<Peer>>;
+  getConnectedPeers(monitor?: Monitor): Promise<Array<Peer>>;
 
-  getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem>;
-  iterStorage(hash: Hash160String): AsyncIterable<StorageItem>;
+  getStorage(hash: Hash160String, key: BufferString, monitor?: Monitor): Promise<StorageItem>;
+  iterStorage(hash: Hash160String, monitor?: Monitor): AsyncIterable<StorageItem>;
   iterActionsRaw(filterIn?: BlockFilter): AsyncIterable<ActionRaw>;
   call(
     contract: Hash160String,
     method: string,
     params: Array<?ScriptBuilderParam>,
+    monitor?: Monitor,
   ): Promise<RawInvocationResult>;
 }
 
 export interface DeveloperProvider {
   +network: NetworkType;
 
-  runConsensusNow(): Promise<void>;
-  updateSettings(options: Options): Promise<void>;
-  fastForwardOffset(seconds: number): Promise<void>;
-  fastForwardToTime(seconds: number): Promise<void>;
+  runConsensusNow(monitor?: Monitor): Promise<void>;
+  updateSettings(options: Options, monitor?: Monitor): Promise<void>;
+  fastForwardOffset(seconds: number, monitor?: Monitor): Promise<void>;
+  fastForwardToTime(seconds: number, monitor?: Monitor): Promise<void>;
 }
 
 export interface UserAccountProvider {

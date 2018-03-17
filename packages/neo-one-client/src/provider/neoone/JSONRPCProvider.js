@@ -1,4 +1,6 @@
 /* @flow */
+import type { Monitor } from '@neo-one/monitor';
+
 export type JSONRPCRequest = {|
   method: string,
   params?: any,
@@ -8,5 +10,5 @@ export type JSONRPCRequest = {|
 export type JSONRPCResponse = any;
 
 export interface JSONRPCProvider {
-  request(req: JSONRPCRequest): Promise<JSONRPCResponse>;
+  request(req: JSONRPCRequest, monitor?: Monitor): Promise<JSONRPCResponse>;
 }

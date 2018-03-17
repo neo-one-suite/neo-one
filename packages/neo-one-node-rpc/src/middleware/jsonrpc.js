@@ -133,7 +133,12 @@ export default (handlers: Handlers): Middleware => {
             level: 'verbose',
             error: 'JSONRPC request failed.',
           }),
-        { name: 'http_jsonrpc_request' },
+        {
+          name: 'http_jsonrpc_request',
+          references: [
+            monitor.childOf(monitor.extract(monitor.formats.HTTP, ctx.headers)),
+          ],
+        },
       );
       return result;
     } catch (error) {

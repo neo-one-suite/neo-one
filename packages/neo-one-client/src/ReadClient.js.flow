@@ -1,4 +1,5 @@
 /* @flow */
+import type { Monitor } from '@neo-one/monitor';
 import { type Param as ScriptBuilderParam } from '@neo-one/client-core';
 
 import type {
@@ -25,37 +26,38 @@ import type {
 
 declare export default class ReadClient<TDataProvider: DataProvider> {
   +dataProvider: TDataProvider;
-  constructor(dataProvider: TDataProvider): ReadClient<TDataProvider>;
+  constructor(dataProvider: TDataProvider, monitor?: Monitor): ReadClient<TDataProvider>;
 
-  getAccount(address: AddressString): Promise<Account>;
+  getAccount(address: AddressString, monitor?: Monitor): Promise<Account>;
 
-  getAsset(hash: Hash256String): Promise<Asset>;
+  getAsset(hash: Hash256String, monitor?: Monitor): Promise<Asset>;
 
-  getBlock(hash: Hash256String): Promise<Block>;
+  getBlock(hash: Hash256String, monitor?: Monitor): Promise<Block>;
   getBlock(index: number, options?: GetOptions): Promise<Block>;
   iterBlocks(filter?: BlockFilter): AsyncIterable<Block>;
 
-  getBestBlockHash(): Promise<Hash256String>;
-  getBlockCount(): Promise<number>;
+  getBestBlockHash(monitor?: Monitor): Promise<Hash256String>;
+  getBlockCount(monitor?: Monitor): Promise<number>;
 
-  getContract(hash: Hash160String): Promise<Contract>;
+  getContract(hash: Hash160String, monitor?: Monitor): Promise<Contract>;
 
-  getMemPool(): Promise<Array<Hash256String>>;
+  getMemPool(monitor?: Monitor): Promise<Array<Hash256String>>;
 
-  getTransaction(hash: Hash256String): Promise<Transaction>;
+  getTransaction(hash: Hash256String, monitor?: Monitor): Promise<Transaction>;
 
-  getValidators(): Promise<Array<Validator>>;
+  getValidators(monitor?: Monitor): Promise<Array<Validator>>;
 
   smartContract(hash: Hash160String, abi: ABI): ReadSmartContract;
 
-  getConnectedPeers(): Promise<Array<Peer>>;
+  getConnectedPeers(monitor?: Monitor): Promise<Array<Peer>>;
 
-  _getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem>;
-  _iterStorage(hash: Hash160String): AsyncIterable<StorageItem>;
+  _getStorage(hash: Hash160String, key: BufferString, monitor?: Monitor): Promise<StorageItem>;
+  _iterStorage(hash: Hash160String, monitor?: Monitor): AsyncIterable<StorageItem>;
   _iterActionsRaw(filterIn?: BlockFilter): AsyncIterable<ActionRaw>;
   _call(
     contract: Hash160String,
     method: string,
     params: Array<?ScriptBuilderParam>,
+    monitor?: Monitor,
   ): Promise<RawInvocationResult>;
 }

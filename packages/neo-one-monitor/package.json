@@ -26,7 +26,11 @@
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
   "main": "./dist/index.js",
-  "module": "./dist/es.js",
+  "module": "./dist/index.es.js",
+  "browser": {
+    "./dist/index.js": "./dist/index.browser.js",
+    "./dist/es.js": "./dist/index.browser.es.js"
+  },
   "engines": {
     "node": ">=8.9.0"
   },
@@ -34,6 +38,8 @@
     "access": "public"
   },
   "dependencies": {
+    "koa": "^2.5.0",
+    "koa-mount": "^3.0.0",
     "opentracing": "^0.14.1",
     "prom-client": "^11.0.0",
     "prometheus-gc-stats": "^0.5.1"

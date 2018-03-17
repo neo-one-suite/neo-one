@@ -1,5 +1,6 @@
 /* @flow */
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 
 import _ from 'lodash';
@@ -120,21 +121,33 @@ export default class LocalKeyStore {
   async sign({
     account,
     message,
+    monitor,
   }: {|
     account: UserAccountID,
     message: string,
+    monitor?: Monitor,
   |}): Promise<Witness> {
     await this._initPromise;
 
-    const privateKey = this._getPrivateKey(account);
-    const witness = crypto.createWitness(
-      Buffer.from(message, 'hex'),
-      common.stringToPrivateKey(privateKey),
+    return this._capture(
+      async () => {
+        const privateKey = this._getPrivateKey(account);
+        const witness = crypto.createWitness(
+          Buffer.from(message, 'hex'),
+          common.stringToPrivateKey(privateKey),
+        );
+        return {
+          verification: witness.verification.toString('hex'),
+          invocation: witness.invocation.toString('hex'),
+        };
+      },
+      {
+        name: 'sign',
+        message: 'Signed transaction.',
+        error: 'Failed to sign transaction.',
+      },
+      monitor,
     );
-    return {
-      verification: witness.verification.toString('hex'),
-      invocation: witness.invocation.toString('hex'),
-    };
   }
 
   async selectAccount(id?: UserAccountID): Promise<void> {
@@ -373,5 +386,34 @@ export default class LocalKeyStore {
     );
     const account = allAccounts[0];
     this._currentAccount$.next(account);
+  }
+
+  _capture<T>(
+    func: (monitor?: Monitor) => Promise<T>,
+    {
+      name,
+      message,
+      error,
+    }: {|
+      name: string,
+      message: string,
+      error: string,
+    |},
+    monitor?: Monitor,
+  ): Promise<T> {
+    if (monitor == null) {
+      return func();
+    }
+
+    return monitor.at('local_key_store').captureSpan(
+      span =>
+        span.captureLogSingle(() => func(span), {
+          name,
+          message,
+          error,
+          level: 'verbose',
+        }),
+      { name },
+    );
   }
 }

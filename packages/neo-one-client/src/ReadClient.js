@@ -1,4 +1,5 @@
 /* @flow */
+import type { Monitor } from '@neo-one/monitor';
 import { type Param as ScriptBuilderParam } from '@neo-one/client-core';
 
 import type {
@@ -33,14 +34,14 @@ export default class ReadClient<TDataProvider: DataProvider> {
     this.dataProvider = dataProvider;
   }
 
-  getAccount(address: AddressString): Promise<Account> {
+  getAccount(address: AddressString, monitor?: Monitor): Promise<Account> {
     args.assertAddress(address);
-    return this.dataProvider.getAccount(address);
+    return this.dataProvider.getAccount(address, monitor);
   }
 
-  getAsset(hash: Hash256String): Promise<Asset> {
+  getAsset(hash: Hash256String, monitor?: Monitor): Promise<Asset> {
     args.assertHash256(hash);
-    return this.dataProvider.getAsset(hash);
+    return this.dataProvider.getAsset(hash, monitor);
   }
 
   getBlock(hash: number | Hash256String, options?: GetOptions): Promise<Block> {
@@ -56,34 +57,34 @@ export default class ReadClient<TDataProvider: DataProvider> {
     return this.dataProvider.iterBlocks(filter);
   }
 
-  getBestBlockHash(): Promise<Hash256String> {
-    return this.dataProvider.getBestBlockHash();
+  getBestBlockHash(monitor?: Monitor): Promise<Hash256String> {
+    return this.dataProvider.getBestBlockHash(monitor);
   }
 
-  getBlockCount(): Promise<number> {
-    return this.dataProvider.getBlockCount();
+  getBlockCount(monitor?: Monitor): Promise<number> {
+    return this.dataProvider.getBlockCount(monitor);
   }
 
-  getContract(hash: Hash160String): Promise<Contract> {
+  getContract(hash: Hash160String, monitor?: Monitor): Promise<Contract> {
     args.assertHash160(hash);
-    return this.dataProvider.getContract(hash);
+    return this.dataProvider.getContract(hash, monitor);
   }
 
-  getMemPool(): Promise<Array<Hash256String>> {
-    return this.dataProvider.getMemPool();
+  getMemPool(monitor?: Monitor): Promise<Array<Hash256String>> {
+    return this.dataProvider.getMemPool(monitor);
   }
 
-  getTransaction(hash: Hash256String): Promise<Transaction> {
+  getTransaction(hash: Hash256String, monitor?: Monitor): Promise<Transaction> {
     args.assertHash256(hash);
-    return this.dataProvider.getTransaction(hash);
+    return this.dataProvider.getTransaction(hash, monitor);
   }
 
-  getValidators(): Promise<Array<Validator>> {
-    return this.dataProvider.getValidators();
+  getValidators(monitor?: Monitor): Promise<Array<Validator>> {
+    return this.dataProvider.getValidators(monitor);
   }
 
-  getConnectedPeers(): Promise<Array<Peer>> {
-    return this.dataProvider.getConnectedPeers();
+  getConnectedPeers(monitor?: Monitor): Promise<Array<Peer>> {
+    return this.dataProvider.getConnectedPeers(monitor);
   }
 
   smartContract(hash: Hash160String, abi: ABI): ReadSmartContract {
@@ -92,15 +93,22 @@ export default class ReadClient<TDataProvider: DataProvider> {
     return createReadSmartContract({ hash, abi, client: (this: $FlowFixMe) });
   }
 
-  _getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem> {
+  _getStorage(
+    hash: Hash160String,
+    key: BufferString,
+    monitor?: Monitor,
+  ): Promise<StorageItem> {
     args.assertHash160(hash);
     args.assertBuffer(key);
-    return this.dataProvider.getStorage(hash, key);
+    return this.dataProvider.getStorage(hash, key, monitor);
   }
 
-  _iterStorage(hash: Hash160String): AsyncIterable<StorageItem> {
+  _iterStorage(
+    hash: Hash160String,
+    monitor?: Monitor,
+  ): AsyncIterable<StorageItem> {
     args.assertHash160(hash);
-    return this.dataProvider.iterStorage(hash);
+    return this.dataProvider.iterStorage(hash, monitor);
   }
 
   _iterActionsRaw(filter?: BlockFilter): AsyncIterable<ActionRaw> {
@@ -112,7 +120,8 @@ export default class ReadClient<TDataProvider: DataProvider> {
     contract: Hash160String,
     method: string,
     params: Array<?ScriptBuilderParam>,
+    monitor?: Monitor,
   ): Promise<RawInvocationResult> {
-    return this.dataProvider.call(contract, method, params);
+    return this.dataProvider.call(contract, method, params, monitor);
   }
 }

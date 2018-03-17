@@ -100,9 +100,9 @@ export default async ({
 |}) => {
   if (
     lastCheckTime == null ||
-    monitor.nowSeconds() - lastCheckTime > options.timeoutMS
+    monitor.nowMS() - lastCheckTime > options.timeoutMS
   ) {
-    lastCheckTime = monitor.nowSeconds();
+    lastCheckTime = monitor.nowMS();
     lastCheckIndex = await fetchTallestBlockIndex(
       monitor,
       options.rpcURLs,

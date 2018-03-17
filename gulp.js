@@ -71,10 +71,10 @@ const getBabelConfig = ({
   ...getBabelConfigBase({ modules, useBuiltIns }),
 });
 
-const createRollupInput = ({ source }: {| source: string |}) => {
+const createRollupInput = ({ source, entry }: {| source: string, entry: string |}) => {
   const dir = path.join('packages', source, 'src');
   return {
-    input: path.join(dir, 'index.js'),
+    input: path.join(dir, `${entry}.js`),
     external: (module: string) =>
       dependencies.some(dep => dep !== source && module.startsWith(dep)),
     plugins: [
@@ -104,15 +104,17 @@ const createRollupInput = ({ source }: {| source: string |}) => {
 const createRollupOutput = ({
   source,
   format,
+  entry,
 }: {|
   source: string,
   format: Format,
+  entry: string,
 |}) => ({
   file: path.join(
     'packages',
     source,
     'dist',
-    `${format === 'cjs' ? 'index' : format}.js`,
+    `${entry}${format === 'cjs' ? '' : `.${format}`}.js`
   ),
   format,
   name: source,
@@ -124,20 +126,24 @@ const writeBundle = async ({
   source,
   bundle,
   format,
+  entry,
 }: {|
   source: string,
   bundle: any,
   format: Format,
+  entry: string,
 |}) => {
-  await bundle.write(createRollupOutput({ source, format }));
+  await bundle.write(createRollupOutput({ source, format, entry }));
 };
 
 const writeBundles = async ({
   source,
   bundle,
+  entry,
 }: {|
   source: string,
   bundle: any,
+  entry: string,
 |}) => {
   await Promise.all(
     FORMATS.map(format =>
@@ -145,19 +151,48 @@ const writeBundles = async ({
         source,
         bundle,
         format,
+        entry,
       }),
     ),
   );
 };
 
-const buildSource = async ({ source }: {| source: string |}) => {
-  const bundle = await rollup(createRollupInput({ source }));
+const buildSource = async ({
+  source,
+  entry,
+}: {|
+  source: string,
+  entry: string,
+|}) => {
+  const bundle = await rollup(createRollupInput({ source, entry }));
 
-  await writeBundles({ source, bundle });
-};
+  await writeBundles({ source, bundle, entry });
+}
+
+const getSourcesAndEntries = () => Promise.all(
+  sources.map(async source => {
+    const dir = path.join('packages', source, 'src');
+    const [existsIndex, existsIndexBrowser] = await Promise.all([
+      fs.pathExists(path.join(dir, 'index.js')),
+      fs.pathExists(path.join(dir, 'index.browser.js')),
+    ]);
+    const result = [];
+    if (existsIndex) {
+      result.push({ source, entry: 'index' });
+    }
+    if (existsIndexBrowser) {
+      result.push({ source, entry: 'index.browser' });
+    }
+
+    return result;
+  })
+).then(result => result.reduce((acc, value) => acc.concat(value), []));
 
 gulp.task('build:dist', async () => {
-  await Promise.all(sources.map(source => buildSource({ source })));
+  const sourcesAndEntries = await getSourcesAndEntries();
+  await Promise.all(sourcesAndEntries.map(
+    ({ source, entry }) => buildSource({ source, entry }),
+  ));
 });
 
 function swapSrcWithDist(srcPath) {
@@ -218,14 +253,17 @@ gulp.task('build', ['build:bin', 'build:flow']);
 const createRollupWatch = ({ source }: {| source: string |}) => ({
   include: path.join('packages', source, 'src', '**'),
 });
-const createWatchConfig = ({ source }: {| source: string |}) => ({
-  ...createRollupInput({ source }),
-  output: FORMATS.map(format => createRollupOutput({ format, source })),
+const createWatchConfig = ({ source, entry }: {| source: string, entry: string |}) => ({
+  ...createRollupInput({ source, entry }),
+  output: FORMATS.map(format => createRollupOutput({ format, source, entry })),
   watch: createRollupWatch({ source }),
 });
 
-gulp.task('watch', () => {
-  const watcher = watch(sources.map(source => createWatchConfig({ source })));
+gulp.task('watch', async () => {
+  const sourcesAndEntries = await getSourcesAndEntries();
+  const watcher = watch(sourcesAndEntries.map(
+    ({ source, entry }) => createWatchConfig({ source, entry }),
+  ));
 
   watcher.on('event', event => {
     if (event.code === 'BUNDLE_START') {

@@ -30,7 +30,7 @@
     "neo-one": "./dist/bin/neo-one"
   },
   "main": "./dist/index.js",
-  "module": "./dist/es.js",
+  "module": "./dist/index.es.js",
   "engines": {
     "node": ">=8.9.0"
   },

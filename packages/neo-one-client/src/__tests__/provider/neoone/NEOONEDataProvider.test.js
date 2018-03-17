@@ -846,7 +846,7 @@ describe('NEOONEDataProvider', () => {
     const result = provider.runConsensusNow();
 
     expect(result).toBeUndefined();
-    expect(provider._client.runConsensusNow).toHaveBeenCalledWith();
+    expect(provider._client.runConsensusNow).toHaveBeenCalledWith(undefined);
     expect(provider._client.runConsensusNow).toHaveBeenCalledTimes(1);
   });
 
@@ -857,7 +857,10 @@ describe('NEOONEDataProvider', () => {
     const result = provider.updateSettings(options);
 
     expect(result).toBeUndefined();
-    expect(provider._client.updateSettings).toHaveBeenCalledWith(options);
+    expect(provider._client.updateSettings).toHaveBeenCalledWith(
+      options,
+      undefined,
+    );
     expect(provider._client.updateSettings).toHaveBeenCalledTimes(1);
   });
 
@@ -868,7 +871,10 @@ describe('NEOONEDataProvider', () => {
     const result = provider.fastForwardOffset(offset);
 
     expect(result).toBeUndefined();
-    expect(provider._client.fastForwardOffset).toHaveBeenCalledWith(offset);
+    expect(provider._client.fastForwardOffset).toHaveBeenCalledWith(
+      offset,
+      undefined,
+    );
     expect(provider._client.fastForwardOffset).toHaveBeenCalledTimes(1);
   });
 
@@ -879,7 +885,10 @@ describe('NEOONEDataProvider', () => {
     const result = provider.fastForwardToTime(time);
 
     expect(result).toBeUndefined();
-    expect(provider._client.fastForwardToTime).toHaveBeenCalledWith(time);
+    expect(provider._client.fastForwardToTime).toHaveBeenCalledWith(
+      time,
+      undefined,
+    );
     expect(provider._client.fastForwardToTime).toHaveBeenCalledTimes(1);
   });
 });

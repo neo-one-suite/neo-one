@@ -24,7 +24,7 @@
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
   "main": "./dist/index.js",
-  "module": "./dist/es.js",
+  "module": "./dist/index.es.js",
   "engines": {
     "node": ">=8.9.0"
   },

@@ -22,6 +22,7 @@ import {
 } from '@neo-one/client-core';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import BigNumber from 'bignumber.js';
+import type { Monitor } from '@neo-one/monitor';
 
 import _ from 'lodash';
 import { flatten, flatMap } from 'ix/asynciterable/pipe/index';
@@ -97,51 +98,78 @@ export default class NEOONEDataProvider
     this._client = new JSONRPCClient(new JSONRPCHTTPProvider(rpcURL));
   }
 
-  async getUnclaimed(
+  getUnclaimed(
     address: AddressString,
+    monitor?: Monitor,
   ): Promise<{| unclaimed: Array<Input>, amount: BigNumber |}> {
-    const account = await this._getAccount(address);
-    const amounts = await Promise.all(
-      account.unclaimed.map(input => this._client.getClaimAmount(input)),
-    );
+    return this._capture(
+      async span => {
+        const account = await this._getAccount(address, span);
+        const amounts = await Promise.all(
+          account.unclaimed.map(input =>
+            this._client.getClaimAmount(input, span),
+          ),
+        );
 
-    return {
-      unclaimed: account.unclaimed,
-      amount: amounts.reduce(
-        (acc, amount) => acc.plus(amount),
-        utils.ZERO_BIG_NUMBER,
-      ),
-    };
+        return {
+          unclaimed: account.unclaimed,
+          amount: amounts.reduce(
+            (acc, amount) => acc.plus(amount),
+            utils.ZERO_BIG_NUMBER,
+          ),
+        };
+      },
+      {
+        name: 'get_unclaimed',
+        message: 'Fetched unclaimed inputs.',
+        error: 'Failed to fetch unclaimed inputs.',
+      },
+      monitor,
+    );
   }
 
   async getUnspentOutputs(
     address: AddressString,
+    monitor?: Monitor,
   ): Promise<Array<UnspentOutput>> {
-    const account = await this._getAccount(address);
-    const outputs = await Promise.all(
-      account.unspent.map(async (input): Promise<?UnspentOutput> => {
-        const outputJSON = await this._client.getUnspentOutput(input);
-        if (outputJSON == null) {
-          return null;
-        }
+    return this._capture(
+      async span => {
+        const account = await this._getAccount(address, span);
+        const outputs = await Promise.all(
+          account.unspent.map(async (input): Promise<?UnspentOutput> => {
+            const outputJSON = await this._client.getUnspentOutput(input, span);
+            if (outputJSON == null) {
+              return null;
+            }
 
-        const output = this._convertOutput(outputJSON);
+            const output = this._convertOutput(outputJSON);
 
-        return {
-          asset: output.asset,
-          value: output.value,
-          address: output.address,
-          txid: input.txid,
-          vout: input.vout,
-        };
-      }),
+            return {
+              asset: output.asset,
+              value: output.value,
+              address: output.address,
+              txid: input.txid,
+              vout: input.vout,
+            };
+          }),
+        );
+
+        return outputs.filter(Boolean);
+      },
+      {
+        name: 'get_unspent',
+        message: 'Fetched unspent outputs.',
+        error: 'Failed to fetch unspent outputs.',
+      },
+      monitor,
     );
-
-    return outputs.filter(Boolean);
   }
 
-  async relayTransaction(transaction: string): Promise<Transaction> {
-    const result = await this._client.relayTransaction(transaction);
+  async relayTransaction(
+    transaction: string,
+    monitor?: Monitor,
+  ): Promise<Transaction> {
+    const result = await this._client.relayTransaction(transaction, monitor);
     return this._convertTransaction(result);
   }
 
@@ -152,18 +180,27 @@ export default class NEOONEDataProvider
     return this._client.getTransactionReceipt(hash, options);
   }
 
-  async getInvocationData(hash: Hash256String): Promise<RawInvocationData> {
-    const result = await this._client.getInvocationData(hash);
+  async getInvocationData(
+    hash: Hash256String,
+    monitor?: Monitor,
+  ): Promise<RawInvocationData> {
+    const result = await this._client.getInvocationData(hash, monitor);
     return this._convertInvocationData(result);
   }
 
-  async testInvoke(transaction: string): Promise<RawInvocationResult> {
-    const result = await this._client.testInvocation(transaction);
+  async testInvoke(
+    transaction: string,
+    monitor?: Monitor,
+  ): Promise<RawInvocationResult> {
+    const result = await this._client.testInvocation(transaction, monitor);
     return this._convertInvocationResult(result);
   }
 
-  async getAccount(address: AddressString): Promise<Account> {
-    const account = await this._getAccount(address);
+  async getAccount(
+    address: AddressString,
+    monitor?: Monitor,
+  ): Promise<Account> {
+    const account = await this._getAccount(address, monitor);
     return {
       address,
       frozen: account.frozen,
@@ -175,8 +212,8 @@ export default class NEOONEDataProvider
     };
   }
 
-  async getAsset(hash: Hash256String): Promise<Asset> {
-    const asset = await this._client.getAsset(hash);
+  async getAsset(hash: Hash256String, monitor?: Monitor): Promise<Asset> {
+    const asset = await this._client.getAsset(hash, monitor);
     return this._convertAsset(asset);
   }
 
@@ -199,52 +236,64 @@ export default class NEOONEDataProvider
     );
   }
 
-  getBestBlockHash(): Promise<Hash256String> {
-    return this._client.getBestBlockHash();
+  getBestBlockHash(monitor?: Monitor): Promise<Hash256String> {
+    return this._client.getBestBlockHash(monitor);
   }
 
-  getBlockCount(): Promise<number> {
-    return this._client.getBlockCount();
+  getBlockCount(monitor?: Monitor): Promise<number> {
+    return this._client.getBlockCount(monitor);
   }
 
-  async getContract(hash: Hash160String): Promise<Contract> {
-    const contract = await this._client.getContract(hash);
+  async getContract(hash: Hash160String, monitor?: Monitor): Promise<Contract> {
+    const contract = await this._client.getContract(hash, monitor);
     return this._convertContract(contract);
   }
 
-  getMemPool(): Promise<Array<Hash256String>> {
-    return this._client.getMemPool();
+  getMemPool(monitor?: Monitor): Promise<Array<Hash256String>> {
+    return this._client.getMemPool(monitor);
   }
 
-  async getTransaction(hash: Hash256String): Promise<Transaction> {
-    const transaction = await this._client.getTransaction(hash);
+  async getTransaction(
+    hash: Hash256String,
+    monitor?: Monitor,
+  ): Promise<Transaction> {
+    const transaction = await this._client.getTransaction(hash, monitor);
     return this._convertTransaction(transaction);
   }
 
-  getValidators(): Promise<Array<Validator>> {
+  getValidators(monitor?: Monitor): Promise<Array<Validator>> {
     return this._client
-      .getValidators()
+      .getValidators(monitor)
       .then(validators =>
         validators.map(validator => this._convertValidator(validator)),
       );
   }
 
-  getConnectedPeers(): Promise<Array<Peer>> {
-    return this._client.getConnectedPeers();
+  getConnectedPeers(monitor?: Monitor): Promise<Array<Peer>> {
+    return this._client.getConnectedPeers(monitor);
   }
 
-  async getNetworkSettings(): Promise<NetworkSettings> {
-    const settings = await this._client.getNetworkSettings();
+  async getNetworkSettings(monitor?: Monitor): Promise<NetworkSettings> {
+    const settings = await this._client.getNetworkSettings(monitor);
     return this._convertNetworkSettings(settings);
   }
 
-  getStorage(hash: Hash160String, key: BufferString): Promise<StorageItem> {
-    return this._client.getStorageItem(hash, key);
+  getStorage(
+    hash: Hash160String,
+    key: BufferString,
+    monitor?: Monitor,
+  ): Promise<StorageItem> {
+    return this._client.getStorageItem(hash, key, monitor);
   }
 
-  iterStorage(hash: Hash160String): AsyncIterable<StorageItem> {
+  iterStorage(
+    hash: Hash160String,
+    monitor?: Monitor,
+  ): AsyncIterable<StorageItem> {
     return AsyncIterableX.from(
-      this._client.getAllStorage(hash).then(res => AsyncIterableX.from(res)),
+      this._client
+        .getAllStorage(hash, monitor)
+        .then(res => AsyncIterableX.from(res)),
     ).pipe(flatten());
   }
 
@@ -254,6 +303,7 @@ export default class NEOONEDataProvider
       this.iterBlocks({
         indexStart: filter.indexStart,
         indexStop: filter.indexStop,
+        monitor: filter.monitor,
       }),
     ).pipe(
       flatMap(async block => {
@@ -275,6 +325,7 @@ export default class NEOONEDataProvider
     contract: Hash160String,
     method: string,
     params: Array<?ScriptBuilderParam>,
+    monitor?: Monitor,
   ): Promise<RawInvocationResult> {
     const testTransaction = new CoreInvocationTransaction({
       version: 1,
@@ -285,23 +336,26 @@ export default class NEOONEDataProvider
         params,
       }),
     });
-    return this.testInvoke(testTransaction.serializeWire().toString('hex'));
+    return this.testInvoke(
+      testTransaction.serializeWire().toString('hex'),
+      monitor,
+    );
   }
 
-  runConsensusNow(): Promise<void> {
-    return this._client.runConsensusNow();
+  runConsensusNow(monitor?: Monitor): Promise<void> {
+    return this._client.runConsensusNow(monitor);
   }
 
-  updateSettings(options: Options): Promise<void> {
-    return this._client.updateSettings(options);
+  updateSettings(options: Options, monitor?: Monitor): Promise<void> {
+    return this._client.updateSettings(options, monitor);
   }
 
-  fastForwardOffset(seconds: number): Promise<void> {
-    return this._client.fastForwardOffset(seconds);
+  fastForwardOffset(seconds: number, monitor?: Monitor): Promise<void> {
+    return this._client.fastForwardOffset(seconds, monitor);
   }
 
-  fastForwardToTime(seconds: number): Promise<void> {
-    return this._client.fastForwardToTime(seconds);
+  fastForwardToTime(seconds: number, monitor?: Monitor): Promise<void> {
+    return this._client.fastForwardToTime(seconds, monitor);
   }
 
   _convertBlock(block: BlockJSON): Block {
@@ -655,13 +709,42 @@ export default class NEOONEDataProvider
     };
   }
 
-  _getAccount(address: AddressString): Promise<AccountJSON> {
-    return this._client.getAccount(address);
+  _getAccount(address: AddressString, monitor?: Monitor): Promise<AccountJSON> {
+    return this._client.getAccount(address, monitor);
   }
 
   _convertNetworkSettings(settings: NetworkSettingsJSON): NetworkSettings {
     return {
       issueGASFee: new BigNumber(settings.issueGASFee),
     };
+  }
+
+  _capture<T>(
+    func: (monitor?: Monitor) => Promise<T>,
+    {
+      name,
+      message,
+      error,
+    }: {|
+      name: string,
+      message: string,
+      error: string,
+    |},
+    monitor?: Monitor,
+  ): Promise<T> {
+    if (monitor == null) {
+      return func();
+    }
+
+    return monitor.at('neo_one_data_provider').captureSpan(
+      span =>
+        span.captureLogSingle(() => func(span), {
+          name,
+          message,
+          error,
+          level: 'verbose',
+        }),
+      { name },
+    );
   }
 }

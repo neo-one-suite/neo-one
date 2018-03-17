@@ -1,6 +1,7 @@
 /* @flow */
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import type BigNumber from 'bignumber.js';
+import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 
 import type {
@@ -105,22 +106,25 @@ export default class NEOONEProvider {
   getUnclaimed(
     network: NetworkType,
     address: AddressString,
+    monitor?: Monitor,
   ): Promise<{| unclaimed: Array<Input>, amount: BigNumber |}> {
-    return this._getProvider(network).getUnclaimed(address);
+    return this._getProvider(network).getUnclaimed(address, monitor);
   }
 
   getUnspentOutputs(
     network: NetworkType,
     address: AddressString,
+    monitor?: Monitor,
   ): Promise<Array<UnspentOutput>> {
-    return this._getProvider(network).getUnspentOutputs(address);
+    return this._getProvider(network).getUnspentOutputs(address, monitor);
   }
 
   relayTransaction(
     network: NetworkType,
     transaction: string,
+    monitor?: Monitor,
   ): Promise<Transaction> {
-    return this._getProvider(network).relayTransaction(transaction);
+    return this._getProvider(network).relayTransaction(transaction, monitor);
   }
 
   getTransactionReceipt(
@@ -134,19 +138,24 @@ export default class NEOONEProvider {
   getInvocationData(
     network: NetworkType,
     hash: Hash256String,
+    monitor?: Monitor,
   ): Promise<RawInvocationData> {
-    return this._getProvider(network).getInvocationData(hash);
+    return this._getProvider(network).getInvocationData(hash, monitor);
   }
 
   testInvoke(
     network: NetworkType,
     transaction: string,
+    monitor?: Monitor,
   ): Promise<RawInvocationResult> {
-    return this._getProvider(network).testInvoke(transaction);
+    return this._getProvider(network).testInvoke(transaction, monitor);
   }
 
-  getNetworkSettings(network: NetworkType): Promise<NetworkSettings> {
-    return this._getProvider(network).getNetworkSettings();
+  getNetworkSettings(
+    network: NetworkType,
+    monitor?: Monitor,
+  ): Promise<NetworkSettings> {
+    return this._getProvider(network).getNetworkSettings(monitor);
   }
 
   read(network: NetworkType): NEOONEDataProvider {

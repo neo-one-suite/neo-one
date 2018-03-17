@@ -7,7 +7,7 @@ import type {
   TracerReference,
   TracerStartSpanOptions,
   TracerSpan,
-} from './DefaultMonitor';
+} from './MonitorBase';
 
 export default (tracerIn?: opentracing.Tracer): Tracer => {
   const tracer = tracerIn || new opentracing.Tracer();

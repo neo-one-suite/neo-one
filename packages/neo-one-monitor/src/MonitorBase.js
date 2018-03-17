@@ -1,9 +1,5 @@
 /* @flow */
 import type { Context } from 'koa';
-
-import gcStats from 'prometheus-gc-stats';
-import prom from 'prom-client';
-
 import type {
   Carrier,
   CaptureLogOptions,
@@ -23,7 +19,6 @@ import type {
   LogOptions,
   MetricOptions,
   Monitor,
-  Reference,
   Span,
   SpanContext,
   SpanOptions,
@@ -72,11 +67,11 @@ export interface Tracer {
   close(callback: () => void): void;
 }
 
-export type NowSeconds = () => number;
+export type NowMS = () => number;
 
-type RawLabels = Labels;
-type TagLabels = Labels;
-type MetricLabels = Labels;
+export type RawLabels = Labels;
+export type TagLabels = Labels;
+export type MetricLabels = Labels;
 
 type SpanData = {|
   histogram?: {|
@@ -87,50 +82,35 @@ type SpanData = {|
   span?: TracerSpan,
 |};
 
-type DefaultMonitorOptions = {|
-  namespace: string,
-  labels: RawLabels,
-  data: RawLabels,
-  logger: Logger,
-  tracer: Tracer,
-  nowSeconds: NowSeconds,
-  metricsLogLevel: LogLevel,
-  spanLogLevel: LogLevel,
-  span?: SpanData,
+export type MetricConstruct = {|
+  ...MetricOptions,
+  metricLabels: MetricLabels,
 |};
 
-type DefaultMonitorCreate = {|
+export interface MetricsFactory {
+  createCounter(options: MetricConstruct): Counter;
+  createGauge(options: MetricConstruct): Gauge;
+  createHistogram(options: MetricConstruct): Histogram;
+  createSummary(options: MetricConstruct): Summary;
+}
+
+type DefaultMonitorOptions = {|
   namespace: string,
+  labels?: RawLabels,
+  data?: RawLabels,
   logger: Logger,
   tracer?: Tracer,
-  nowSeconds?: NowSeconds,
+  nowMS?: NowMS,
   metricsLogLevel?: LogLevel,
   spanLogLevel?: LogLevel,
+  span?: SpanData,
+  metricsFactory: MetricsFactory,
 |};
 
 const counters: { [name: string]: Counter } = {};
 const gauges: { [name: string]: Gauge } = {};
 const histograms: { [name: string]: Histogram } = {};
 const summaries: { [name: string]: Summary } = {};
-
-type MetricConstruct = {|
-  ...MetricOptions,
-  metricLabels: MetricLabels,
-|};
-
-const loadTime = Date.now();
-export const nowSecondsDefault = () => {
-  if (typeof performance !== 'undefined' && performance && performance.now) {
-    return performance.now();
-  } else if (process) {
-    // So webpack doesn't try to bundle it.
-    const perfHooks = 'perf_hooks';
-    // $FlowFixMe
-    return require(perfHooks).performance.now(); // eslint-disable-line
-  }
-
-  return Date.now() - loadTime;
-};
 
 const KNOWN_LABELS = {
   DB_INSTANCE: 'db.instance',
@@ -153,14 +133,21 @@ const KNOWN_LABELS = {
 
   HTTP_PATH: 'http.path',
   RPC_METHOD: 'rpc.method',
+  RPC_TYPE: 'rpc.type',
+};
+
+const FORMATS = {
+  HTTP: 'http_headers',
+  TEXT: 'text_map',
+  BINARY: 'binary',
 };
 
 const KNOWN_LABELS_SET = new Set(Object.values(KNOWN_LABELS));
 
-const convertMetricLabel = (dotLabel: string): string =>
+export const convertMetricLabel = (dotLabel: string): string =>
   dotLabel.replace('.', '_');
 
-const convertMetricLabels = (labelsIn?: RawLabels): MetricLabels => {
+export const convertMetricLabels = (labelsIn?: RawLabels): MetricLabels => {
   if (labelsIn == null) {
     return {};
   }
@@ -172,7 +159,7 @@ const convertMetricLabels = (labelsIn?: RawLabels): MetricLabels => {
   return labels;
 };
 
-const convertTagLabel = (dotLabel: string): string => {
+export const convertTagLabel = (dotLabel: string): string => {
   if (KNOWN_LABELS_SET.has(dotLabel)) {
     return dotLabel;
   }
@@ -180,7 +167,7 @@ const convertTagLabel = (dotLabel: string): string => {
   return `label.${dotLabel}`;
 };
 
-const convertTagLabels = (labelsIn?: RawLabels): TagLabels => {
+export const convertTagLabels = (labelsIn?: RawLabels): TagLabels => {
   if (labelsIn == null) {
     return {};
   }
@@ -200,82 +187,6 @@ const LOG_LEVEL_TO_LEVEL = {
   debug: 4,
   silly: 5,
 };
-
-class BaseMetric<TMetric: Object> {
-  static MetricClass: Class<TMetric>;
-  _metric: TMetric;
-  _labelNamesSet: Set<string>;
-  _metricLabels: MetricLabels;
-
-  constructor({ name, help, labelNames, metricLabels }: MetricConstruct) {
-    this._metric = new this.constructor.MetricClass({
-      name,
-      help: help == null ? 'Placeholder' : help,
-      labelNames: (labelNames || []).map(labelName =>
-        convertMetricLabel(labelName),
-      ),
-    });
-    this._labelNamesSet = new Set(labelNames);
-    this._metricLabels = metricLabels;
-  }
-
-  _getArgs(
-    valueOrLabels?: RawLabels | number,
-    value?: number,
-  ): [MetricLabels, number | void] {
-    if (valueOrLabels == null || typeof valueOrLabels === 'number') {
-      return [this._metricLabels, valueOrLabels];
-    }
-
-    const labels = {};
-    for (const key of Object.keys(valueOrLabels)) {
-      if (this._labelNamesSet.has(key)) {
-        labels[convertMetricLabel(key)] = valueOrLabels[key];
-      }
-    }
-    return [{ ...this._metricLabels, ...labels }, value];
-  }
-}
-
-class DefaultCounter extends BaseMetric<prom.Counter> implements Counter {
-  static MetricClass = prom.Counter;
-
-  inc(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.inc(...this._getArgs(countOrLabels, count));
-  }
-}
-
-class DefaultGauge extends BaseMetric<prom.Gauge> implements Gauge {
-  static MetricClass = prom.Gauge;
-
-  inc(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.inc(...this._getArgs(countOrLabels, count));
-  }
-
-  dec(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.dec(...this._getArgs(countOrLabels, count));
-  }
-
-  set(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.set(...this._getArgs(countOrLabels, count));
-  }
-}
-
-class DefaultHistogram extends BaseMetric<prom.Histogram> implements Histogram {
-  static MetricClass = prom.Histogram;
-
-  observe(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.observe(...this._getArgs(countOrLabels, count));
-  }
-}
-
-class DefaultSummary extends BaseMetric<prom.Summary> implements Summary {
-  static MetricClass = prom.Summary;
-
-  observe(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.observe(...this._getArgs(countOrLabels, count));
-  }
-}
 
 type ReferenceType = 'childOf' | 'followsFrom';
 
@@ -341,6 +252,7 @@ type CommonLogOptions = {|
 
 export default class DefaultMonitor implements Span {
   labels = KNOWN_LABELS;
+  formats = FORMATS;
   _namespace: string;
   _labels: RawLabels;
   _data: RawLabels;
@@ -348,8 +260,9 @@ export default class DefaultMonitor implements Span {
   _metricsLogLevel: LogLevel;
   _spanLogLevel: LogLevel;
   _tracer: Tracer;
-  nowSeconds: NowSeconds;
+  nowMS: NowMS;
   _span: SpanData | void;
+  _metricsFactory: MetricsFactory;
 
   constructor({
     namespace,
@@ -359,40 +272,21 @@ export default class DefaultMonitor implements Span {
     metricsLogLevel,
     spanLogLevel,
     tracer,
-    nowSeconds,
+    nowMS,
     span,
+    metricsFactory,
   }: DefaultMonitorOptions) {
     this._namespace = namespace;
-    this._labels = labels;
-    this._data = data;
+    this._labels = labels || {};
+    this._data = data || {};
     this._logger = logger;
-    this._metricsLogLevel = metricsLogLevel;
-    this._spanLogLevel = spanLogLevel;
-    this._tracer = tracer;
-    this.nowSeconds = nowSeconds;
+    this._metricsLogLevel =
+      metricsLogLevel == null ? 'verbose' : metricsLogLevel;
+    this._spanLogLevel = spanLogLevel == null ? 'info' : spanLogLevel;
+    this._tracer = tracer || createTracer();
+    this.nowMS = nowMS || (() => Date.now());
     this._span = span;
-  }
-
-  static create({
-    namespace,
-    logger,
-    tracer,
-    nowSeconds,
-    metricsLogLevel,
-    spanLogLevel,
-  }: DefaultMonitorCreate): DefaultMonitor {
-    prom.collectDefaultMetrics({ timeout: 4000 });
-    gcStats(prom.register)();
-    return new DefaultMonitor({
-      namespace,
-      logger,
-      tracer: tracer || createTracer(),
-      nowSeconds: nowSeconds || nowSecondsDefault,
-      metricsLogLevel: metricsLogLevel == null ? 'verbose' : metricsLogLevel,
-      spanLogLevel: spanLogLevel == null ? 'info' : spanLogLevel,
-      labels: {},
-      data: {},
-    });
+    this._metricsFactory = metricsFactory;
   }
 
   at(namespace: string): Monitor {
@@ -591,7 +485,9 @@ export default class DefaultMonitor implements Span {
   getCounter(options: MetricOptions): Counter {
     const name = this._getName(options.name);
     if (counters[name] == null) {
-      counters[name] = new DefaultCounter(this._getMetricConstruct(options));
+      counters[name] = this._metricsFactory.createCounter(
+        this._getMetricConstruct(options),
+      );
     }
 
     return counters[name];
@@ -600,7 +496,9 @@ export default class DefaultMonitor implements Span {
   getGauge(options: MetricOptions): Gauge {
     const name = this._getName(options.name);
     if (gauges[name] == null) {
-      gauges[name] = new DefaultGauge(this._getMetricConstruct(options));
+      gauges[name] = this._metricsFactory.createGauge(
+        this._getMetricConstruct(options),
+      );
     }
 
     return gauges[name];
@@ -609,7 +507,7 @@ export default class DefaultMonitor implements Span {
   getHistogram(options: MetricOptions): Histogram {
     const name = this._getName(options.name);
     if (histograms[name] == null) {
-      histograms[name] = new DefaultHistogram(
+      histograms[name] = this._metricsFactory.createHistogram(
         this._getMetricConstruct(options),
       );
     }
@@ -620,7 +518,9 @@ export default class DefaultMonitor implements Span {
   getSummary(options: MetricOptions): Summary {
     const name = this._getName(options.name);
     if (summaries[name] == null) {
-      summaries[name] = new DefaultSummary(this._getMetricConstruct(options));
+      summaries[name] = this._metricsFactory.createSummary(
+        this._getMetricConstruct(options),
+      );
     }
 
     return summaries[name];
@@ -672,7 +572,7 @@ export default class DefaultMonitor implements Span {
     return this._clone({
       span: {
         histogram,
-        time: this.nowSeconds(),
+        time: this.nowMS(),
         span,
       },
     });
@@ -682,7 +582,7 @@ export default class DefaultMonitor implements Span {
     const span = this.getSpan();
     const { histogram } = span;
     if (histogram != null) {
-      const value = this.nowSeconds() - span.time;
+      const value = this.nowMS() - span.time;
       this.getHistogram({
         name: histogram.name,
         help: histogram.help,
@@ -725,15 +625,21 @@ export default class DefaultMonitor implements Span {
     }
   }
 
-  childOf(span: SpanContext | Monitor): Reference {
+  childOf(span: SpanContext | Monitor | void): $FlowFixMe {
+    if (span == null) {
+      return undefined;
+    }
     return (new ChildOfReference((span: $FlowFixMe)): $FlowFixMe);
   }
 
-  followsFrom(span: SpanContext | Monitor): Reference {
+  followsFrom(span: SpanContext | Monitor | void): $FlowFixMe {
+    if (span == null) {
+      return undefined;
+    }
     return (new FollowsFromReference((span: $FlowFixMe)): $FlowFixMe);
   }
 
-  extract(format: Format, carrier: Carrier): SpanContext {
+  extract(format: Format, carrier: Carrier): SpanContext | void {
     return this._tracer.extract(format, carrier);
   }
 
@@ -743,6 +649,9 @@ export default class DefaultMonitor implements Span {
       this._tracer.inject(span.span.context(), format, carrier);
     }
   }
+
+  // eslint-disable-next-line
+  serveMetrics(port: number): void {}
 
   close(callback: () => void): void {
     this._closeInternal()
@@ -981,17 +890,17 @@ export default class DefaultMonitor implements Span {
       namespace: namespace == null ? this._namespace : namespace,
       logger: this._logger,
       tracer: this._tracer,
-      nowSeconds: this.nowSeconds,
+      nowMS: this.nowMS,
       labels: mergedLabels,
       data: mergedData,
       span: span == null ? this._span : span,
       metricsLogLevel: this._metricsLogLevel,
       spanLogLevel: this._spanLogLevel,
+      metricsFactory: this._metricsFactory,
     });
   }
 
   async _closeInternal(): Promise<void> {
-    clearInterval(prom.collectDefaultMetrics());
     await Promise.all([
       new Promise(resolve => {
         this._logger.close(() => resolve());
