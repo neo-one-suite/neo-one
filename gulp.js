@@ -59,22 +59,34 @@ const dependencies = [
 
 const FORMATS = ['cjs', 'es'];
 type Format = 'cjs' | 'es';
+type Entry = 'node' | 'browser';
 
 const getBabelConfig = ({
   modules,
+  entry,
   useBuiltIns,
 }: {|
   modules: boolean | string,
+  entry: Entry,
   useBuiltIns?: boolean | string,
 |}) => ({
   babelrc: false,
-  ...getBabelConfigBase({ modules, useBuiltIns }),
+  ...getBabelConfigBase({
+    modules,
+    useBuiltIns,
+    targets: entry === 'node'
+      ? { node: '8.9.0' }
+      : { browsers: ['> 1%', 'last 2 versions', 'not ie <= 10'] },
+  }),
 });
 
-const createRollupInput = ({ source, entry }: {| source: string, entry: string |}) => {
+const getEntryFile = (entry: Entry) =>
+  entry === 'node' ? 'index' : 'index.browser';
+
+const createRollupInput = ({ source, entry }: {| source: string, entry: Entry |}) => {
   const dir = path.join('packages', source, 'src');
   return {
-    input: path.join(dir, `${entry}.js`),
+    input: path.join(dir, `${getEntryFile(entry)}.js`),
     external: (module: string) =>
       dependencies.some(dep => dep !== source && module.startsWith(dep)),
     plugins: [
@@ -94,7 +106,7 @@ const createRollupInput = ({ source, entry }: {| source: string, entry: string |
       json({ preferConst: true }),
       babel({
         exclude: path.join('node_modules', '**'),
-        ...getBabelConfig({ modules: false }),
+        ...getBabelConfig({ modules: false, entry }),
       }),
       sourcemaps(),
     ],
@@ -108,13 +120,13 @@ const createRollupOutput = ({
 }: {|
   source: string,
   format: Format,
-  entry: string,
+  entry: Entry,
 |}) => ({
   file: path.join(
     'packages',
     source,
     'dist',
-    `${entry}${format === 'cjs' ? '' : `.${format}`}.js`
+    `${getEntryFile(entry)}${format === 'cjs' ? '' : `.${format}`}.js`
   ),
   format,
   name: source,
@@ -131,7 +143,7 @@ const writeBundle = async ({
   source: string,
   bundle: any,
   format: Format,
-  entry: string,
+  entry: Entry,
 |}) => {
   await bundle.write(createRollupOutput({ source, format, entry }));
 };
@@ -143,7 +155,7 @@ const writeBundles = async ({
 }: {|
   source: string,
   bundle: any,
-  entry: string,
+  entry: Entry,
 |}) => {
   await Promise.all(
     FORMATS.map(format =>
@@ -162,7 +174,7 @@ const buildSource = async ({
   entry,
 }: {|
   source: string,
-  entry: string,
+  entry: Entry,
 |}) => {
   const bundle = await rollup(createRollupInput({ source, entry }));
 
@@ -178,10 +190,10 @@ const getSourcesAndEntries = () => Promise.all(
     ]);
     const result = [];
     if (existsIndex) {
-      result.push({ source, entry: 'index' });
+      result.push({ source, entry: 'node' });
     }
     if (existsIndexBrowser) {
-      result.push({ source, entry: 'index.browser' });
+      result.push({ source, entry: 'browser' });
     }
 
     return result;
@@ -242,6 +254,7 @@ gulp.task('build:bin', ['build:dist'], () =>
         getBabelConfig({
           modules: 'commonjs',
           useBuiltIns: 'entry',
+          entry: 'node',
         }),
       ),
     )
@@ -253,7 +266,7 @@ gulp.task('build', ['build:bin', 'build:flow']);
 const createRollupWatch = ({ source }: {| source: string |}) => ({
   include: path.join('packages', source, 'src', '**'),
 });
-const createWatchConfig = ({ source, entry }: {| source: string, entry: string |}) => ({
+const createWatchConfig = ({ source, entry }: {| source: string, entry: Entry |}) => ({
   ...createRollupInput({ source, entry }),
   output: FORMATS.map(format => createRollupOutput({ format, source, entry })),
   watch: createRollupWatch({ source }),

@@ -1,10 +1,11 @@
-module.exports = ({ modules, useBuiltIns }) => ({
+module.exports = ({ modules, useBuiltIns, targets }) => ({
   presets: [
     [
       '@babel/preset-env',
       {
         useBuiltIns: useBuiltIns == null ? false : useBuiltIns,
         modules,
+        targets,
       },
     ],
   ],
