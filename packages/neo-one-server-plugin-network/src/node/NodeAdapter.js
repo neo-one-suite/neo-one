@@ -22,11 +22,13 @@ export type Node = {|
   ready: boolean,
   rpcAddress: string,
   tcpAddress: string,
+  telemetryAddress: string,
 |};
 
 export type NodeStatus = {|
   rpcAddress: string,
   tcpAddress: string,
+  telemetryAddress: string,
 |};
 
 export default class NodeAdapter {
@@ -62,7 +64,7 @@ export default class NodeAdapter {
 
     this._settings = settings;
 
-    const { rpcAddress, tcpAddress } = this._getNodeStatus();
+    const { rpcAddress, tcpAddress, telemetryAddress } = this._getNodeStatus();
     this.node$ = concat(
       _of({
         name: this.name,
@@ -70,6 +72,7 @@ export default class NodeAdapter {
         live: false,
         rpcAddress,
         tcpAddress,
+        telemetryAddress,
       }),
       timer(0, 6000).pipe(
         concatMap(() =>
@@ -89,6 +92,7 @@ export default class NodeAdapter {
             live,
             rpcAddress: config.rpcAddress,
             tcpAddress: config.tcpAddress,
+            telemetryAddress: config.telemetryAddress,
           };
         }),
       ),
@@ -237,6 +241,12 @@ export default class NodeAdapter {
               this._settings.listenTCPPort == null
                 ? "'null'"
                 : JSON.stringify(this._settings.listenTCPPort),
+            ],
+            [
+              'Telemetry Port',
+              this._settings.telemetryPort == null
+                ? "'null'"
+                : JSON.stringify(this._settings.telemetryPort),
             ],
             [
               'Consensus Enabled',

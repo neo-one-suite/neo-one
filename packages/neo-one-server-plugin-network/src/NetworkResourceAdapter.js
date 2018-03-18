@@ -347,6 +347,7 @@ export default class NetworkResourceAdapter {
       isTestNet: false,
       rpcPort: this._getRPCPort(options, options.name),
       listenTCPPort: this._getListenTCPPort(options, options.name),
+      telemetryPort: this._getTelemetryPort(options, options.name),
       consensus: {
         enabled: false,
         options: {
@@ -390,6 +391,7 @@ export default class NetworkResourceAdapter {
       isTestNet: true,
       rpcPort: this._getRPCPort(options, options.name),
       listenTCPPort: this._getListenTCPPort(options, options.name),
+      telemetryPort: this._getTelemetryPort(options, options.name),
       consensus: {
         enabled: false,
         options: {
@@ -436,6 +438,7 @@ export default class NetworkResourceAdapter {
         name,
         rpcPort: this._getRPCPort(options, name),
         listenTCPPort: this._getListenTCPPort(options, name),
+        telemetryPort: this._getTelemetryPort(options, name),
         privateKey,
         publicKey,
       };
@@ -446,7 +449,13 @@ export default class NetworkResourceAdapter {
     );
 
     return configuration.map(config => {
-      const { name, rpcPort, listenTCPPort, privateKey } = config;
+      const {
+        name,
+        rpcPort,
+        listenTCPPort,
+        telemetryPort,
+        privateKey,
+      } = config;
       const otherConfiguration = configuration.filter(
         ({ name: otherName }) => name !== otherName,
       );
@@ -456,6 +465,7 @@ export default class NetworkResourceAdapter {
         isTestNet: false,
         rpcPort,
         listenTCPPort,
+        telemetryPort,
         privateNet: true,
         secondsPerBlock,
         standbyValidators,
@@ -517,6 +527,13 @@ export default class NetworkResourceAdapter {
     name: string,
   ): number {
     return this._getPort(options, `${name}-listen-tcp`);
+  }
+
+  static _getTelemetryPort(
+    options: NetworkResourceAdapterStaticOptions,
+    name: string,
+  ): number {
+    return this._getPort(options, `${name}-telemetry`);
   }
 
   static _getPort(

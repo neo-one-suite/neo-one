@@ -337,6 +337,9 @@ export default class NEOONENodeAdapter extends NodeAdapter {
     return {
       rpcAddress: this._getAddress('/rpc'),
       tcpAddress: `localhost:${this._settings.listenTCPPort}`,
+      telemetryAddress: `http://localhost:${
+        this._settings.telemetryPort
+      }/metrics`,
     };
   }
 
@@ -420,6 +423,9 @@ export default class NEOONENodeAdapter extends NodeAdapter {
               host: '0.0.0.0',
             },
           },
+        },
+        telemetry: {
+          port: settings.telemetryPort,
         },
       },
       options: {

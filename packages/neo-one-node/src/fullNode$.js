@@ -52,6 +52,10 @@ type BackupOptions = {|
   options: BackupRestoreOptions,
 |};
 
+type TelemetryEnvironment = {|
+  port: number,
+|};
+
 export type Environment = {|
   dataPath: string,
   rpc: RPCServerEnvironment,
@@ -68,6 +72,7 @@ export type Environment = {|
   |},
   node: NodeEnvironment,
   backup?: BackupEnvironment,
+  telemetry?: TelemetryEnvironment,
 |};
 
 export type Options = {|
@@ -119,6 +124,10 @@ export default ({
   });
 
   const node$ = defer(async () => {
+    if (environment.telemetry != null) {
+      monitor.serveMetrics(environment.telemetry.port);
+    }
+
     const storage = levelUpStorage({
       db: levelup(leveldown(dataPath, environment.levelDownOptions)),
       context: { messageMagic: settings.messageMagic },

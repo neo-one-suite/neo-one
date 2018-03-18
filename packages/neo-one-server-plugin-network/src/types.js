@@ -10,6 +10,7 @@ export type NodeSettings = {|
   address?: string,
   rpcPort: number,
   listenTCPPort: number,
+  telemetryPort: number,
   consensus: {|
     enabled: boolean,
     options: {|

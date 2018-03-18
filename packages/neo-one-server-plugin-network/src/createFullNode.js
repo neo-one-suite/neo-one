@@ -26,7 +26,12 @@ export default async ({
   onError?: (error: Error) => void,
 |}) => {
   const storagePath = path.resolve(dataPath, 'chain');
-  const [settings, rpcEnvironment, nodeEnvironment] = await Promise.all([
+  const [
+    settings,
+    rpcEnvironment,
+    nodeEnvironment,
+    telemetryEnvironment,
+  ] = await Promise.all([
     nodeConfig.config$
       .pipe(
         map(config => config.settings),
@@ -52,6 +57,9 @@ export default async ({
     nodeConfig.config$
       .pipe(map(config => config.environment.node), take(1))
       .toPromise(),
+    nodeConfig.config$
+      .pipe(map(config => config.environment.telemetry), take(1))
+      .toPromise(),
     fs.ensureDir(storagePath),
   ]);
 
@@ -63,6 +71,7 @@ export default async ({
         dataPath: storagePath,
         rpc: rpcEnvironment,
         node: nodeEnvironment,
+        telemetry: telemetryEnvironment,
       },
       options$: nodeConfig.config$.pipe(
         map(config => config.options),

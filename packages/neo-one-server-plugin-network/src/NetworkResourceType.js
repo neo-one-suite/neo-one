@@ -110,7 +110,16 @@ export default class NetworkResourceType extends ResourceType<
         {
           type: 'list',
           table: [
-            ['Name', 'Live', 'Ready', 'RPC', 'TCP', 'Height', 'Peers'],
+            [
+              'Name',
+              'Live',
+              'Ready',
+              'RPC',
+              'TCP',
+              'Telemetry',
+              'Height',
+              'Peers',
+            ],
           ].concat(
             _.sortBy(resource.nodes, node => node.name).map(node => [
               node.name,
@@ -118,6 +127,7 @@ export default class NetworkResourceType extends ResourceType<
               node.ready ? 'Yes' : 'No',
               node.rpcAddress,
               node.tcpAddress,
+              node.telemetryAddress,
               resource.height == null ? 'Unknown' : `${resource.height}`,
               resource.peers == null ? '0' : `${resource.peers}`,
             ]),
