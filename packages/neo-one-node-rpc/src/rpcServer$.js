@@ -157,7 +157,7 @@ export default ({
   environment: Environment,
   options$: Observable<Options>,
 |}): Observable<$FlowFixMe> => {
-  const monitor = monitorIn.at('node_rpc');
+  const monitor = monitorIn.at('neo_one_node_rpc');
   const app$ = combineLatest(
     options$.pipe(
       map(options => options.liveHealthCheck),

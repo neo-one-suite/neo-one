@@ -276,7 +276,7 @@ export default async ({
   skipWitnessVerify?: boolean,
   persistingBlock?: Block,
 |}): Promise<ExecuteScriptsResult> => {
-  const monitor = monitorIn.at('node_vm');
+  const monitor = monitorIn.at('neo_one_node_vm');
   const init = {
     scriptContainer,
     triggerType,

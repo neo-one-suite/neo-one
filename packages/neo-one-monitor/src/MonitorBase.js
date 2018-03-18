@@ -67,7 +67,7 @@ export interface Tracer {
   close(callback: () => void): void;
 }
 
-export type NowMS = () => number;
+export type Now = () => number;
 
 export type RawLabels = Labels;
 export type TagLabels = Labels;
@@ -94,13 +94,13 @@ export interface MetricsFactory {
   createSummary(options: MetricConstruct): Summary;
 }
 
-type DefaultMonitorOptions = {|
+type MonitorBaseOptions = {|
   namespace: string,
   labels?: RawLabels,
   data?: RawLabels,
   logger: Logger,
   tracer?: Tracer,
-  nowMS?: NowMS,
+  now: Now,
   metricsLogLevel?: LogLevel,
   spanLogLevel?: LogLevel,
   span?: SpanData,
@@ -192,15 +192,15 @@ type ReferenceType = 'childOf' | 'followsFrom';
 
 class DefaultReference {
   _type: ReferenceType;
-  _span: SpanContext | DefaultMonitor;
+  _span: SpanContext | MonitorBase;
 
-  constructor(span: SpanContext | DefaultMonitor) {
+  constructor(span: SpanContext | MonitorBase) {
     this._span = span;
   }
 
   isValid(): boolean {
     // eslint-disable-next-line
-    return !(this._span instanceof DefaultMonitor) || this._span.hasSpan();
+    return !(this._span instanceof MonitorBase) || this._span.hasSpan();
   }
 
   getTracerReference(tracer: Tracer): ?TracerReference {
@@ -210,7 +210,7 @@ class DefaultReference {
 
     let context = this._span;
     // eslint-disable-next-line
-    if (context instanceof DefaultMonitor) {
+    if (context instanceof MonitorBase) {
       context = context.getSpan().span;
     }
 
@@ -250,7 +250,7 @@ type CommonLogOptions = {|
   },
 |};
 
-export default class DefaultMonitor implements Span {
+export default class MonitorBase implements Span {
   labels = KNOWN_LABELS;
   formats = FORMATS;
   _namespace: string;
@@ -260,7 +260,7 @@ export default class DefaultMonitor implements Span {
   _metricsLogLevel: LogLevel;
   _spanLogLevel: LogLevel;
   _tracer: Tracer;
-  nowMS: NowMS;
+  now: Now;
   _span: SpanData | void;
   _metricsFactory: MetricsFactory;
 
@@ -272,10 +272,10 @@ export default class DefaultMonitor implements Span {
     metricsLogLevel,
     spanLogLevel,
     tracer,
-    nowMS,
+    now,
     span,
     metricsFactory,
-  }: DefaultMonitorOptions) {
+  }: MonitorBaseOptions) {
     this._namespace = namespace;
     this._labels = labels || {};
     this._data = data || {};
@@ -284,9 +284,13 @@ export default class DefaultMonitor implements Span {
       metricsLogLevel == null ? 'verbose' : metricsLogLevel;
     this._spanLogLevel = spanLogLevel == null ? 'info' : spanLogLevel;
     this._tracer = tracer || createTracer();
-    this.nowMS = nowMS || (() => Date.now());
+    this.now = now;
     this._span = span;
     this._metricsFactory = metricsFactory;
+  }
+
+  nowSeconds(): number {
+    return this.now() / 1000;
   }
 
   at(namespace: string): Monitor {
@@ -540,7 +544,7 @@ export default class DefaultMonitor implements Span {
       .filter(Boolean);
     const fullLevel = this._getFullLevel(level);
     if (
-      LOG_LEVEL_TO_LEVEL[fullLevel.span] >=
+      LOG_LEVEL_TO_LEVEL[fullLevel.span] <=
         LOG_LEVEL_TO_LEVEL[this._spanLogLevel] ||
       references.length > 0
     ) {
@@ -563,7 +567,7 @@ export default class DefaultMonitor implements Span {
 
     let histogram;
     if (
-      LOG_LEVEL_TO_LEVEL[fullLevel.metric] >=
+      LOG_LEVEL_TO_LEVEL[fullLevel.metric] <=
       LOG_LEVEL_TO_LEVEL[this._metricsLogLevel]
     ) {
       histogram = { name: `${name}_duration_seconds`, help };
@@ -572,7 +576,7 @@ export default class DefaultMonitor implements Span {
     return this._clone({
       span: {
         histogram,
-        time: this.nowMS(),
+        time: this.nowSeconds(),
         span,
       },
     });
@@ -582,7 +586,7 @@ export default class DefaultMonitor implements Span {
     const span = this.getSpan();
     const { histogram } = span;
     if (histogram != null) {
-      const value = this.nowMS() - span.time;
+      const value = this.nowSeconds() - span.time;
       this.getHistogram({
         name: histogram.name,
         help: histogram.help,
@@ -710,7 +714,7 @@ export default class DefaultMonitor implements Span {
         labels = { ...labels };
         labels[KNOWN_LABELS.ERROR] = error.error != null;
       }
-      metricLevel = Math.max(
+      metricLevel = Math.min(
         metricLevel,
         LOG_LEVEL_TO_LEVEL[error.level == null ? 'error' : error.level],
       );
@@ -723,7 +727,7 @@ export default class DefaultMonitor implements Span {
     }
 
     if (
-      metricLevel >= LOG_LEVEL_TO_LEVEL[this._metricsLogLevel] &&
+      metricLevel <= LOG_LEVEL_TO_LEVEL[this._metricsLogLevel] &&
       metric != null
     ) {
       const metricName = `${name}_${metric.suffix}`;
@@ -769,7 +773,7 @@ export default class DefaultMonitor implements Span {
 
     const { span: tracerSpan } = this._span || {};
     if (
-      LOG_LEVEL_TO_LEVEL[fullLevel.span] >=
+      LOG_LEVEL_TO_LEVEL[fullLevel.span] <=
         LOG_LEVEL_TO_LEVEL[this._spanLogLevel] &&
       tracerSpan != null
     ) {
@@ -890,7 +894,7 @@ export default class DefaultMonitor implements Span {
       namespace: namespace == null ? this._namespace : namespace,
       logger: this._logger,
       tracer: this._tracer,
-      nowMS: this.nowMS,
+      now: this.now,
       labels: mergedLabels,
       data: mergedData,
       span: span == null ? this._span : span,

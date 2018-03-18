@@ -71,6 +71,25 @@ class One {
     }
   }
 
+  async until(func, timeoutMSIn) {
+    const start = Date.now();
+    const timeoutMS = timeoutMSIn == null ? 60 * 1000 : timeoutMSIn;
+    let finalError;
+    while (Date.now() - start < timeoutMS) {
+      try {
+        // eslint-disable-next-line
+        await func();
+        return;
+      } catch (error) {
+        finalError = error;
+        // eslint-disable-next-line
+        await new Promise(resolve => setTimeout(() => resolve(), 1000));
+      }
+    }
+
+    throw finalError;
+  }
+
   _createCommand(command) {
     return `node ./packages/neo-one-cli/dist/bin/neo-one ${command} --dir ${
       this.dirName

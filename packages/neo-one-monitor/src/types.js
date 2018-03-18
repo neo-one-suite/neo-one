@@ -305,7 +305,11 @@ export interface Monitor {
   extract(format: Format, carrier: Carrier): SpanContext | void;
   inject(format: Format, carrier: Carrier): void;
 
-  nowMS(): number;
+  // Equivalent of performance.now() in the browser and perf_hooks in node
+  // Used for comparisons, value is in milliseconds with microsecond decimals.
+  now(): number;
+  // now() / 1000
+  nowSeconds(): number;
   serveMetrics(port: number): void;
   close(callback: () => void): void;
 }

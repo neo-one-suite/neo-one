@@ -601,7 +601,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     delete this._connectedPeers[peer.endpoint];
     this._connectedPeersGauge.set(Object.keys(this._connectedPeers).length);
     delete this._connectingPeers[peer.endpoint];
-    this._connectingPeersGauge.set(Object.keys(this._connectedPeers).length);
+    this._connectingPeersGauge.set(Object.keys(this._connectingPeers).length);
     const endpoint = this._reverseBlacklist[peer.endpoint];
     if (endpoint != null) {
       delete this._reverseBlacklist[peer.endpoint];

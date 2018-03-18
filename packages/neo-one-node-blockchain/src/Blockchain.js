@@ -30,7 +30,7 @@ import {
   type Storage,
   type VM,
 } from '@neo-one/node-core';
-import type { Gauge, Monitor } from '@neo-one/monitor';
+import type { Gauge, Histogram, Monitor } from '@neo-one/monitor';
 import PriorityQueue from 'js-priority-queue';
 import { BehaviorSubject } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
@@ -80,6 +80,7 @@ export default class Blockchain {
   _monitor: Monitor;
   _blockIndexGauge: Gauge;
   _persistingBlockIndexGauge: Gauge;
+  _persistBlockLatencyHistogram: Histogram;
   deserializeWireContext: $PropertyType<
     BlockchainType,
     'deserializeWireContext',
@@ -136,9 +137,15 @@ export default class Blockchain {
       name: 'block_index',
       help: 'The current block index',
     });
+    this._blockIndexGauge.set(this.currentBlockIndex);
     this._persistingBlockIndexGauge = this._monitor.getGauge({
       name: 'persisting_block_index',
       help: 'The current in progress persist index',
+    });
+    this._persistingBlockIndexGauge.set(this.currentBlockIndex);
+    this._persistBlockLatencyHistogram = this._monitor.getHistogram({
+      name: 'persist_block_latency_seconds',
+      help: 'The latency from block timestamp to persist',
     });
 
     this.account = this._storage.account;
@@ -441,7 +448,7 @@ export default class Blockchain {
                 entryNonNull.block,
                 entryNonNull.unsafe,
               ).catch(error => {
-                span.logError({
+                span.logErrorSingle({
                   name: 'persist_block_top_level',
                   message: `Failed to persist block ${
                     entryNonNull.block.index
@@ -454,6 +461,10 @@ export default class Blockchain {
           );
         entry.resolve();
         this.block$.next(entry.block);
+        this._blockIndexGauge.set(entry.block.index);
+        this._persistBlockLatencyHistogram.observe(
+          this._monitor.nowSeconds() - entry.block.timestamp,
+        );
         this.cleanBlockQueue();
         entry = this.peekBlockQueue();
       }
@@ -497,6 +508,7 @@ export default class Blockchain {
     block: Block,
     unsafe?: boolean,
   ): Promise<void> {
+    this._persistingBlockIndexGauge.set(block.index);
     if (!unsafe) {
       await this.verifyBlock(block, monitor);
     }

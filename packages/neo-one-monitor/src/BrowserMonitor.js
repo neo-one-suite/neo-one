@@ -4,7 +4,6 @@ import MonitorBase, {
   type Logger,
   type MetricConstruct,
   type MetricsFactory,
-  type NowMS,
   type RawLabels,
   type Tracer,
 } from './MonitorBase';
@@ -62,7 +61,6 @@ type BrowserMonitorCreate = {|
   namespace: string,
   logger: Logger,
   tracer?: Tracer,
-  nowMS?: NowMS,
   metricsLogLevel?: LogLevel,
   spanLogLevel?: LogLevel,
 |};
@@ -72,16 +70,16 @@ export default class BrowserMonitor extends MonitorBase {
     namespace,
     logger,
     tracer,
-    nowMS,
     metricsLogLevel,
     spanLogLevel,
   }: BrowserMonitorCreate): BrowserMonitor {
+    const perf = performance;
     return new BrowserMonitor({
       namespace,
       logger,
       tracer,
       metricsFactory: new BrowserMetricsFactory(),
-      nowMS,
+      now: () => perf.now(),
       metricsLogLevel,
       spanLogLevel,
     });

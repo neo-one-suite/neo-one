@@ -160,7 +160,7 @@ export default class Node implements INode {
     options$: Observable<Options>,
   |}) {
     this.blockchain = blockchain;
-    this._monitor = monitor.at('node_protocol');
+    this._monitor = monitor.at('neo_one_node_protocol');
     this._network = new Network({
       monitor,
       environment: environment.network,

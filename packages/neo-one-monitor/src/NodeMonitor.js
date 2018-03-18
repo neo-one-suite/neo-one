@@ -3,6 +3,8 @@ import Koa, { type Context } from 'koa';
 
 import gcStats from 'prometheus-gc-stats';
 import mount from 'koa-mount';
+// $FlowFixMe
+import perfHooks from 'perf_hooks';
 import prom from 'prom-client';
 
 import type { Counter, Gauge, Histogram, LogLevel, Summary } from './types';
@@ -11,7 +13,6 @@ import MonitorBase, {
   type MetricConstruct,
   type MetricLabels,
   type MetricsFactory,
-  type NowMS,
   type RawLabels,
   type Tracer,
   convertMetricLabel,
@@ -115,7 +116,6 @@ type NodeMonitorCreate = {|
   namespace: string,
   logger: Logger,
   tracer?: Tracer,
-  nowMS?: NowMS,
   metricsLogLevel?: LogLevel,
   spanLogLevel?: LogLevel,
 |};
@@ -127,7 +127,6 @@ export default class NodeMonitor extends MonitorBase {
     namespace,
     logger,
     tracer,
-    nowMS,
     metricsLogLevel,
     spanLogLevel,
   }: NodeMonitorCreate): NodeMonitor {
@@ -138,7 +137,7 @@ export default class NodeMonitor extends MonitorBase {
       logger,
       tracer,
       metricsFactory: new NodeMetricsFactory(),
-      nowMS,
+      now: () => perfHooks.performance.now(),
       metricsLogLevel,
       spanLogLevel,
     });
