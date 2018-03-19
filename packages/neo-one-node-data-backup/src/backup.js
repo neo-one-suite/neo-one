@@ -26,23 +26,15 @@ export default async ({
     return;
   }
 
-  await monitor.captureSpan(
-    span =>
-      span.captureLogSingle(
-        async () => {
-          await fs.remove(environment.tmpPath);
-          await fs.ensureDir(environment.tmpPath);
+  await monitor.captureSpanLog(
+    async span => {
+      await fs.remove(environment.tmpPath);
+      await fs.ensureDir(environment.tmpPath);
 
-          await provider.backup(span);
+      await provider.backup(span);
 
-          await fs.remove(environment.tmpPath);
-        },
-        {
-          name: 'backup',
-          message: 'Backup complete.',
-          error: 'Backup failed.',
-        },
-      ),
+      await fs.remove(environment.tmpPath);
+    },
     {
       name: 'backup',
       help: 'Duration taken for backup',

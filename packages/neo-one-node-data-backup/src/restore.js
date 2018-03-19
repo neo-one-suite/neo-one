@@ -47,31 +47,21 @@ export default async ({
     return;
   }
 
-  await monitor.captureSpan(
-    span =>
-      span.captureLogSingle(
-        async () => {
-          await Promise.all([fs.remove(dataPath), fs.remove(tmpPath)]);
-          await Promise.all([
-            fs.ensureDir(tmpPath),
-            fs.ensureDir(path.dirname(readyPath)),
-            fs.ensureDir(dataPath),
-          ]);
+  await monitor.captureSpanLog(
+    async span => {
+      await Promise.all([fs.remove(dataPath), fs.remove(tmpPath)]);
+      await Promise.all([
+        fs.ensureDir(tmpPath),
+        fs.ensureDir(path.dirname(readyPath)),
+        fs.ensureDir(dataPath),
+      ]);
 
-          await provider.restore(span);
+      await provider.restore(span);
 
-          await fs.remove(tmpPath);
+      await fs.remove(tmpPath);
 
-          await fs.writeFile(readyPath, 'ready');
-        },
-        {
-          name: 'restore',
-          message: 'Restore complete.',
-          error: {
-            message: 'Restore failed.',
-          },
-        },
-      ),
+      await fs.writeFile(readyPath, 'ready');
+    },
     {
       name: 'restore',
       help: 'Duration taken for restore',

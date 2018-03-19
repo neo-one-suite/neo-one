@@ -44,8 +44,8 @@ export type Wallets = {
 export type Store = {
   +type: string,
   +getWallets: () => Promise<Array<Wallet>>,
-  +saveWallet: (wallet: Wallet) => Promise<void>,
-  +deleteWallet: (account: Wallet) => Promise<void>,
+  +saveWallet: (wallet: Wallet, monitor?: Monitor) => Promise<void>,
+  +deleteWallet: (account: Wallet, monitor?: Monitor) => Promise<void>,
 };
 
 const flattenWallets = (wallets: Wallets) =>
@@ -141,16 +141,13 @@ export default class LocalKeyStore {
           invocation: witness.invocation.toString('hex'),
         };
       },
-      {
-        name: 'sign',
-        message: 'Signed transaction.',
-        error: 'Failed to sign transaction.',
-      },
+      'sign',
       monitor,
     );
   }
 
-  async selectAccount(id?: UserAccountID): Promise<void> {
+  // eslint-disable-next-line
+  async selectAccount(id?: UserAccountID, monitor?: Monitor): Promise<void> {
     if (id == null) {
       this._currentAccount$.next(null);
     } else {
@@ -162,34 +159,45 @@ export default class LocalKeyStore {
   async updateAccountName({
     id,
     name,
+    monitor,
   }: UpdateAccountNameOptions): Promise<void> {
-    const wallet = this.getWallet(id);
-    let newWallet;
-    const account = {
-      type: wallet.account.type,
-      id: wallet.account.id,
-      name,
-      scriptHash: wallet.account.scriptHash,
-      publicKey: wallet.account.publicKey,
-      deletable: true,
-      configurableName: true,
-    };
-    if (wallet.type === 'locked') {
-      newWallet = {
-        type: 'locked',
-        account,
-        nep2: wallet.nep2,
-      };
-    } else {
-      newWallet = {
-        type: 'unlocked',
-        account,
-        privateKey: wallet.privateKey,
-        nep2: wallet.nep2,
-      };
-    }
-    await this._store.saveWallet(newWallet);
-    this._updateWallet(newWallet);
+    return this._capture(
+      async span => {
+        const wallet = this.getWallet(id);
+        let newWallet;
+        const account = {
+          type: wallet.account.type,
+          id: wallet.account.id,
+          name,
+          scriptHash: wallet.account.scriptHash,
+          publicKey: wallet.account.publicKey,
+          deletable: true,
+          configurableName: true,
+        };
+        if (wallet.type === 'locked') {
+          newWallet = {
+            type: 'locked',
+            account,
+            nep2: wallet.nep2,
+          };
+        } else {
+          newWallet = {
+            type: 'unlocked',
+            account,
+            privateKey: wallet.privateKey,
+            nep2: wallet.nep2,
+          };
+        }
+        await this._capture(
+          innerSpan => this._store.saveWallet(newWallet, innerSpan),
+          'save_wallet',
+          span,
+        );
+        this._updateWallet(newWallet);
+      },
+      'update_account_name',
+      monitor,
+    );
   }
 
   getWallet({ address, network }: UserAccountID): Wallet {
@@ -225,122 +233,155 @@ export default class LocalKeyStore {
     name,
     password,
     nep2: nep2In,
+    monitor,
   }: {|
     network: NetworkType,
     privateKey?: BufferString,
     name?: string,
     password?: string,
     nep2?: string,
+    monitor?: Monitor,
   |}): Promise<Wallet> {
     await this._initPromise;
 
-    let privateKey = privateKeyIn;
-    let nep2 = nep2In;
-    if (privateKey == null) {
-      if (nep2 == null || password == null) {
-        throw new Error('Expected private key or password and NEP-2 key');
-      }
-      privateKey = await decryptNEP2({ encryptedKey: nep2, password });
-    }
+    return this._capture(
+      async span => {
+        let privateKey = privateKeyIn;
+        let nep2 = nep2In;
+        if (privateKey == null) {
+          if (nep2 == null || password == null) {
+            throw new Error('Expected private key or password and NEP-2 key');
+          }
+          privateKey = await decryptNEP2({ encryptedKey: nep2, password });
+        }
 
-    const publicKey = privateKeyToPublicKey(privateKey);
-    const scriptHash = publicKeyToScriptHash(publicKey);
-    const address = scriptHashToAddress(scriptHash);
+        const publicKey = privateKeyToPublicKey(privateKey);
+        const scriptHash = publicKeyToScriptHash(publicKey);
+        const address = scriptHashToAddress(scriptHash);
 
-    if (nep2 == null && password != null) {
-      nep2 = await encryptNEP2({ privateKey, password });
-    }
+        if (nep2 == null && password != null) {
+          nep2 = await encryptNEP2({ privateKey, password });
+        }
 
-    const account = {
-      type: this._store.type,
-      id: {
-        network,
-        address,
+        const account = {
+          type: this._store.type,
+          id: {
+            network,
+            address,
+          },
+          name: name == null ? address : name,
+          scriptHash,
+          publicKey,
+          configurableName: true,
+          deletable: true,
+        };
+
+        const unlockedWallet = { type: 'unlocked', account, nep2, privateKey };
+
+        let wallet = unlockedWallet;
+        if (nep2 != null) {
+          wallet = { type: 'locked', account, nep2 };
+        }
+
+        await this._capture(
+          innerSpan => this._store.saveWallet(wallet, innerSpan),
+          'save_wallet',
+          span,
+        );
+        this._updateWallet(unlockedWallet);
+
+        if (this.currentAccount == null) {
+          this._currentAccount$.next(wallet.account);
+        }
+
+        return unlockedWallet;
       },
-      name: name == null ? address : name,
-      scriptHash,
-      publicKey,
-      configurableName: true,
-      deletable: true,
-    };
-
-    const unlockedWallet = { type: 'unlocked', account, nep2, privateKey };
-
-    let wallet = unlockedWallet;
-    if (nep2 != null) {
-      wallet = { type: 'locked', account, nep2 };
-    }
-
-    await this._store.saveWallet(wallet);
-    this._updateWallet(unlockedWallet);
-
-    if (this.currentAccount == null) {
-      this._currentAccount$.next(wallet.account);
-    }
-
-    return unlockedWallet;
+      'add_account',
+      monitor,
+    );
   }
 
-  async deleteAccount(id: UserAccountID): Promise<void> {
+  async deleteAccount(id: UserAccountID, monitor?: Monitor): Promise<void> {
     await this._initPromise;
 
-    const { wallets } = this;
-    const networkWalletsIn = wallets[id.network];
-    if (networkWalletsIn == null) {
-      return;
-    }
+    return this._capture(
+      async span => {
+        const { wallets } = this;
+        const networkWalletsIn = wallets[id.network];
+        if (networkWalletsIn == null) {
+          return;
+        }
 
-    const networkWallets = { ...networkWalletsIn };
-    const wallet = networkWallets[id.address];
-    if (wallet == null) {
-      return;
-    }
+        const networkWallets = { ...networkWalletsIn };
+        const wallet = networkWallets[id.address];
+        if (wallet == null) {
+          return;
+        }
 
-    delete networkWallets[id.address];
-    await this._store.deleteWallet(wallet);
-    this._wallets$.next({
-      ...wallets,
-      [id.network]: networkWallets,
-    });
+        delete networkWallets[id.address];
 
-    if (
-      this.currentAccount != null &&
-      this.currentAccount.id.network === id.network &&
-      this.currentAccount.id.address === id.address
-    ) {
-      this._newCurrentAccount();
-    }
+        await this._capture(
+          innerSpan => this._store.deleteWallet(wallet, innerSpan),
+          'delete_wallet',
+          span,
+        );
+        this._wallets$.next({
+          ...wallets,
+          [id.network]: networkWallets,
+        });
+
+        if (
+          this.currentAccount != null &&
+          this.currentAccount.id.network === id.network &&
+          this.currentAccount.id.address === id.address
+        ) {
+          this._newCurrentAccount();
+        }
+      },
+      'delete_account',
+      monitor,
+    );
   }
 
   async unlockWallet({
     id,
     password,
+    monitor,
   }: {|
     id: UserAccountID,
     password: string,
+    monitor?: Monitor,
   |}): Promise<void> {
     await this._initPromise;
 
-    const wallet = this.getWallet(id);
-    if (wallet.privateKey != null) {
-      return;
-    }
+    return this._capture(
+      async () => {
+        const wallet = this.getWallet(id);
+        if (wallet.privateKey != null) {
+          return;
+        }
 
-    if (wallet.nep2 == null) {
-      throw new Error('Unexpected error, privateKey and NEP2 were both null.');
-    }
+        if (wallet.nep2 == null) {
+          throw new Error(
+            'Unexpected error, privateKey and NEP2 were both null.',
+          );
+        }
 
-    const privateKey = await decryptNEP2({
-      encryptedKey: wallet.nep2,
-      password,
-    });
+        const privateKey = await decryptNEP2({
+          encryptedKey: wallet.nep2,
+          password,
+        });
 
-    this._updateWallet({
-      type: 'unlocked',
-      account: wallet.account,
-      privateKey,
-      nep2: wallet.nep2,
-    });
+        this._updateWallet({
+          type: 'unlocked',
+          account: wallet.account,
+          privateKey,
+          nep2: wallet.nep2,
+        });
+      },
+      'unlock_wallet',
+      monitor,
+    );
   }
 
   lockWallet(id: UserAccountID): void {
@@ -390,30 +431,16 @@ export default class LocalKeyStore {
 
   _capture<T>(
     func: (monitor?: Monitor) => Promise<T>,
-    {
-      name,
-      message,
-      error,
-    }: {|
-      name: string,
-      message: string,
-      error: string,
-    |},
+    name: string,
     monitor?: Monitor,
   ): Promise<T> {
     if (monitor == null) {
       return func();
     }
 
-    return monitor.at('local_key_store').captureSpan(
-      span =>
-        span.captureLogSingle(() => func(span), {
-          name,
-          message,
-          error,
-          level: 'verbose',
-        }),
-      { name },
-    );
+    return monitor.at('local_key_store').captureSpanLog(func, {
+      name,
+      level: { log: 'verbose', metric: 'info', span: 'info' },
+    });
   }
 }

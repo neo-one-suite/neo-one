@@ -171,6 +171,7 @@ Array [
       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
       "network": "net1",
     },
+    undefined,
   ],
 ]
 `;
@@ -1101,6 +1102,7 @@ Array [
       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
       "network": "net1",
     },
+    undefined,
   ],
 ]
 `;

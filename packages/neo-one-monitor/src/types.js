@@ -153,6 +153,17 @@ export type CaptureSpanOptions = {|
   references?: Array<Reference | void>,
 |};
 
+export type CaptureSpanLogOptions = {|
+  name: string,
+  message?: string,
+  level?: LogLevelOption,
+
+  help?: string,
+
+  error?: CaptureErrorOptions,
+  references?: Array<Reference | void>,
+|};
+
 export interface Counter {
   inc(count?: number): void;
   inc(labels?: Labels, count?: number): void;
@@ -261,20 +272,24 @@ export interface Monitor {
 
   log(options: LogOptions): void;
   captureLog<TResult>(
-    func: (monitor: Monitor) => TResult,
+    // eslint-disable-next-line
+    func: (monitor: CaptureMonitor) => TResult,
     options: CaptureLogOptions,
   ): TResult;
   captureLog<TResult>(
-    func: (monitor: Monitor) => Promise<TResult>,
+    // eslint-disable-next-line
+    func: (monitor: CaptureMonitor) => Promise<TResult>,
     options: CaptureLogOptions,
   ): Promise<TResult>;
   logSingle(options: LogSingleOptions): void;
   captureLogSingle<TResult>(
-    func: (monitor: Monitor) => TResult,
+    // eslint-disable-next-line
+    func: (monitor: CaptureMonitor) => TResult,
     options: CaptureLogSingleOptions,
   ): TResult;
   captureLogSingle<TResult>(
-    func: (monitor: Monitor) => Promise<TResult>,
+    // eslint-disable-next-line
+    func: (monitor: CaptureMonitor) => Promise<TResult>,
     options: CaptureLogSingleOptions,
   ): Promise<TResult>;
   logError(options: LogErrorOptions): void;
@@ -289,13 +304,23 @@ export interface Monitor {
   startSpan(options: SpanOptions): Span;
   captureSpan<TResult>(
     // eslint-disable-next-line
-    func: (span: Span) => TResult,
+    func: (span: CaptureMonitor) => TResult,
     options: CaptureSpanOptions,
   ): TResult;
   captureSpan<TResult>(
     // eslint-disable-next-line
-    func: (span: Span) => Promise<TResult>,
+    func: (span: CaptureMonitor) => Promise<TResult>,
     options: CaptureSpanOptions,
+  ): Promise<TResult>;
+  captureSpanLog<TResult>(
+    // eslint-disable-next-line
+    func: (span: CaptureMonitor) => TResult,
+    options: CaptureSpanLogOptions,
+  ): TResult;
+  captureSpanLog<TResult>(
+    // eslint-disable-next-line
+    func: (span: CaptureMonitor) => Promise<TResult>,
+    options: CaptureSpanLogOptions,
   ): Promise<TResult>;
 
   childOf(span: SpanContext | Monitor): Reference;
@@ -316,8 +341,11 @@ export interface Monitor {
 
 export opaque type SpanContext = any;
 
-export interface Span extends Monitor {
+export interface CaptureMonitor extends Monitor {
   setLabels(labels: Labels): void;
   setData(data: Labels): void;
+}
+
+export interface Span extends CaptureMonitor {
   end(error?: boolean): void;
 }

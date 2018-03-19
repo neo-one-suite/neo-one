@@ -441,23 +441,13 @@ export default class Blockchain {
         // eslint-disable-next-line
         await (entry.monitor: Monitor)
           .withData({ 'block.index': entry.block.index })
-          .captureSpan(
+          .captureSpanLog(
             span =>
-              this._persistBlock(
-                span,
-                entryNonNull.block,
-                entryNonNull.unsafe,
-              ).catch(error => {
-                span.logErrorSingle({
-                  name: 'persist_block_top_level',
-                  message: `Failed to persist block ${
-                    entryNonNull.block.index
-                  }`,
-                  error,
-                });
-                throw error;
-              }),
-            { name: 'persist_block_top_level' },
+              this._persistBlock(span, entryNonNull.block, entryNonNull.unsafe),
+            {
+              name: 'persist_block_top_level',
+              level: { log: 'verbose', metric: 'info', span: 'info' },
+            },
           );
         entry.resolve();
         this.block$.next(entry.block);

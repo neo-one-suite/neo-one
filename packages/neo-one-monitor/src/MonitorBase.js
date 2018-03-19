@@ -4,7 +4,9 @@ import type {
   Carrier,
   CaptureLogOptions,
   CaptureLogSingleOptions,
+  CaptureMonitor,
   CaptureSpanOptions,
+  CaptureSpanLogOptions,
   Counter,
   Format,
   Gauge,
@@ -194,7 +196,6 @@ class DefaultReference {
   _type: ReferenceType;
   _span: SpanContext | MonitorBase;
 
-  // eslint-disable-next-line
   constructor(span: SpanContext | MonitorBase) {
     this._span = span;
   }
@@ -316,6 +317,7 @@ export default class MonitorBase implements Span {
       [KNOWN_LABELS.SPAN_KIND]: 'server',
     }).withData({
       [KNOWN_LABELS.HTTP_URL]: ctx.originalUrl || ctx.url,
+      [KNOWN_LABELS.HTTP_PATH]: ctx.path,
     });
   }
 
@@ -337,7 +339,7 @@ export default class MonitorBase implements Span {
   }
 
   captureLog(
-    func: (monitor: Monitor) => $FlowFixMe,
+    func: (monitor: CaptureMonitor) => $FlowFixMe,
     options: CaptureLogOptions,
   ): $FlowFixMe {
     let { error: errorObj } = options;
@@ -392,7 +394,7 @@ export default class MonitorBase implements Span {
   }
 
   captureLogSingle(
-    func: (monitor: Monitor) => $FlowFixMe,
+    func: (monitor: CaptureMonitor) => $FlowFixMe,
     options: CaptureLogSingleOptions,
   ): $FlowFixMe {
     let { error: errorObj } = options;
@@ -463,11 +465,10 @@ export default class MonitorBase implements Span {
         metric == null
           ? {
               type: 'counter',
-              suffix: 'error_total',
+              suffix: 'total',
             }
           : metric,
       error: { error, message, level: errorLevel },
-      disableErrorLabel: true,
     });
   }
 
@@ -483,7 +484,6 @@ export default class MonitorBase implements Span {
       message,
       level: level == null ? 'error' : level,
       error: { error, message, level: errorLevel },
-      disableErrorLabel: true,
     });
   }
 
@@ -603,10 +603,15 @@ export default class MonitorBase implements Span {
   }
 
   captureSpan(
-    func: (span: Span) => $FlowFixMe,
+    func: (span: CaptureMonitor) => $FlowFixMe,
     options: CaptureSpanOptions,
   ): $FlowFixMe {
-    const span = this.startSpan(options);
+    const span = this.startSpan({
+      name: options.name,
+      level: options.level,
+      help: options.help,
+      references: options.references,
+    });
     try {
       const result = func(span);
 
@@ -628,6 +633,27 @@ export default class MonitorBase implements Span {
       span.end(true);
       throw error;
     }
+  }
+
+  captureSpanLog(
+    func: (span: CaptureMonitor) => $FlowFixMe,
+    options: CaptureSpanLogOptions,
+  ): $FlowFixMe {
+    return this.captureSpan(
+      span =>
+        span.captureLogSingle(log => func(log), {
+          name: options.name,
+          level: options.level,
+          message: options.message,
+          error: options.error == null ? {} : options.error,
+        }),
+      {
+        name: options.name,
+        level: options.level,
+        help: options.help,
+        references: options.references,
+      },
+    );
   }
 
   childOf(span: SpanContext | Monitor | void): $FlowFixMe {
@@ -700,28 +726,20 @@ export default class MonitorBase implements Span {
     metric,
 
     error,
-    disableErrorLabel,
-  }: {|
-    ...CommonLogOptions,
-    disableErrorLabel?: boolean,
-  |}): void {
+  }: CommonLogOptions): void {
     let labels = {};
     let message = messageIn;
     const fullLevel = this._getFullLevel(level);
     let logLevel = fullLevel.log;
     let metricLevel = LOG_LEVEL_TO_LEVEL[fullLevel.metric];
     if (error != null) {
-      if (!disableErrorLabel) {
-        labels = { ...labels };
-        labels[KNOWN_LABELS.ERROR] = error.error != null;
-      }
-      metricLevel = Math.min(
-        metricLevel,
-        LOG_LEVEL_TO_LEVEL[error.level == null ? 'error' : error.level],
-      );
+      labels = { ...labels };
+      labels[KNOWN_LABELS.ERROR] = error.error != null;
+      const errorLevel = error.level == null ? 'error' : error.level;
+      metricLevel = Math.min(metricLevel, LOG_LEVEL_TO_LEVEL[errorLevel]);
       const { error: errorObj } = error;
       if (errorObj != null) {
-        logLevel = error.level == null ? 'error' : error.level;
+        logLevel = errorLevel;
         const { message: errorMessage } = error;
         if (errorMessage == null) {
           message = errorMessage;
@@ -843,9 +861,9 @@ export default class MonitorBase implements Span {
 
   _setSpanLabels(labels: RawLabels): void {
     const span = this.getSpan();
-    const tagLabels = convertTagLabels(labels);
     const { span: tracerSpan } = span;
     if (tracerSpan != null) {
+      const tagLabels = convertTagLabels(labels);
       for (const key of Object.keys(tagLabels)) {
         if (tagLabels[key] != null) {
           tracerSpan.setTag(key, tagLabels[key]);

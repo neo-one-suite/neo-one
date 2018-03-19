@@ -16,7 +16,7 @@ const fetchCount = async (
       [monitor.labels.SPAN_KIND]: 'client',
     })
     .withData({ [monitor.labels.HTTP_URL]: endpoint })
-    .captureSpan(
+    .captureSpanLog(
       async span => {
         let status = -1;
         let response;
@@ -58,7 +58,7 @@ const fetchCount = async (
         name: 'check_ready_request',
         help:
           'Requests the current block count from the endpoint to verify the node is not behind.',
-        level: 'debug',
+        level: { log: 'debug', metric: 'verbose', span: 'debug' },
       },
     );
 

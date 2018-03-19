@@ -72,69 +72,53 @@ export default class MegaProvider extends Provider {
     const { dataPath, tmpPath } = this._environment;
     const downloadPath = path.resolve(tmpPath, 'storage.db.tar.gz');
 
-    await monitor.captureSpan(
-      span =>
-        span.captureLogSingle(
-          () =>
-            new Promise((resolve, reject) => {
-              const read = new File({
-                downloadID: id,
-                key,
-              }).download();
-              const write = fs.createWriteStream(downloadPath);
+    await monitor.captureSpanLog(
+      () =>
+        new Promise((resolve, reject) => {
+          const read = new File({
+            downloadID: id,
+            key,
+          }).download();
+          const write = fs.createWriteStream(downloadPath);
 
-              let done = false;
-              const cleanup = () => {
-                done = true;
-              };
+          let done = false;
+          const cleanup = () => {
+            done = true;
+          };
 
-              const onDone = () => {
-                if (!done) {
-                  cleanup();
-                  resolve();
-                }
-              };
+          const onDone = () => {
+            if (!done) {
+              cleanup();
+              resolve();
+            }
+          };
 
-              const onError = (error: Error) => {
-                if (!done) {
-                  cleanup();
-                  reject(error);
-                }
-              };
+          const onError = (error: Error) => {
+            if (!done) {
+              cleanup();
+              reject(error);
+            }
+          };
 
-              read.once('error', onError);
-              write.once('error', onError);
-              write.once('finish', onDone);
+          read.once('error', onError);
+          write.once('error', onError);
+          write.once('finish', onDone);
 
-              read.pipe(write);
-            }),
-          {
-            name: 'restore_download',
-            message: 'Backup downloaded',
-            error: 'Failed to download backup.',
-          },
-        ),
+          read.pipe(write);
+        }),
       {
         name: 'restore_download',
         help: 'Restore from backup duration',
       },
     );
 
-    await monitor.captureSpan(
-      span =>
-        span.captureLogSingle(
-          () =>
-            extract({
-              downloadPath,
-              dataPath,
-              writeBytesPerSecond,
-            }),
-          {
-            name: 'restore_extract',
-            message: 'Backup extracted',
-            error: 'Failed to extract backup',
-          },
-        ),
+    await monitor.captureSpanLog(
+      () =>
+        extract({
+          downloadPath,
+          dataPath,
+          writeBytesPerSecond,
+        }),
       {
         name: 'restore_extract',
         help: 'Extract backup duration',
@@ -153,35 +137,27 @@ export default class MegaProvider extends Provider {
     const { email, password, file } = uploadOptions;
     const { dataPath } = this._environment;
 
-    await monitor.captureSpan(
-      span =>
-        span.captureLogSingle(
-          async () => {
-            const storage = new Storage({
-              email,
-              password,
-              autologin: false,
-            });
-            await new Promise((resolve, reject) =>
-              storage.login(innerErr => {
-                if (innerErr) {
-                  reject(innerErr);
-                } else {
-                  resolve();
-                }
-              }),
-            );
-            await upload({
-              dataPath,
-              write: storage.upload(file),
-            });
-          },
-          {
-            name: 'backup_push',
-            message: 'Backup pushed.',
-            error: 'Failed to push backup.',
-          },
-        ),
+    await monitor.captureSpanLog(
+      async () => {
+        const storage = new Storage({
+          email,
+          password,
+          autologin: false,
+        });
+        await new Promise((resolve, reject) =>
+          storage.login(innerErr => {
+            if (innerErr) {
+              reject(innerErr);
+            } else {
+              resolve();
+            }
+          }),
+        );
+        await upload({
+          dataPath,
+          write: storage.upload(file),
+        });
+      },
       {
         name: 'backup_push',
         help: 'Push backup duration',

@@ -8,24 +8,18 @@ export default simpleMiddleware(
   'logger',
   async (ctx: Context, next: () => Promise<void>) => {
     const monitor = getMonitor(ctx);
-    await monitor.captureSpan(
-      span =>
-        span.captureLogSingle(
-          async () => {
-            try {
-              await next();
-            } finally {
-              span.setLabels({ [monitor.labels.HTTP_STATUS_CODE]: ctx.status });
-            }
-          },
-          {
-            name: 'http_request',
-            message: `Handled request for ${ctx.originalUrl || ctx.url}`,
-            level: 'verbose',
-            error: `Request failed for ${ctx.originalUrl || ctx.url}`,
-          },
-        ),
-      { name: 'http_request' },
+    await monitor.captureSpanLog(
+      async span => {
+        try {
+          await next();
+        } finally {
+          span.setLabels({ [monitor.labels.HTTP_STATUS_CODE]: ctx.status });
+        }
+      },
+      {
+        name: 'http_request',
+        level: { log: 'verbose', metric: 'info', span: 'info' },
+      },
     );
   },
 );

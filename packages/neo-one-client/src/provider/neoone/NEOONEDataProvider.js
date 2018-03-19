@@ -119,11 +119,7 @@ export default class NEOONEDataProvider
           ),
         };
       },
-      {
-        name: 'get_unclaimed',
-        message: 'Fetched unclaimed inputs.',
-        error: 'Failed to fetch unclaimed inputs.',
-      },
+      'get_unclaimed',
       monitor,
     );
   }
@@ -156,11 +152,7 @@ export default class NEOONEDataProvider
 
         return outputs.filter(Boolean);
       },
-      {
-        name: 'get_unspent',
-        message: 'Fetched unspent outputs.',
-        error: 'Failed to fetch unspent outputs.',
-      },
+      'get_unspent',
       monitor,
     );
   }
@@ -721,30 +713,16 @@ export default class NEOONEDataProvider
 
   _capture<T>(
     func: (monitor?: Monitor) => Promise<T>,
-    {
-      name,
-      message,
-      error,
-    }: {|
-      name: string,
-      message: string,
-      error: string,
-    |},
+    name: string,
     monitor?: Monitor,
   ): Promise<T> {
     if (monitor == null) {
       return func();
     }
 
-    return monitor.at('neo_one_data_provider').captureSpan(
-      span =>
-        span.captureLogSingle(() => func(span), {
-          name,
-          message,
-          error,
-          level: 'verbose',
-        }),
-      { name },
-    );
+    return monitor.at('neo_one_data_provider').captureSpanLog(func, {
+      name,
+      level: { log: 'verbose', metric: 'info', span: 'info' },
+    });
   }
 }

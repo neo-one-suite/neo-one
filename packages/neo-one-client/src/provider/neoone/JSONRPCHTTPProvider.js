@@ -36,32 +36,21 @@ const instrumentFetch = (
       [monitor.labels.HTTP_METHOD]: 'POST',
       'fetch.type': type,
     })
-    .captureSpan(
-      span =>
-        span.captureLogSingle(
-          () => {
-            span.inject(monitor.formats.HTTP, headers);
-            return doFetch(headers)
-              .then(resp => {
-                span.setLabels({
-                  [monitor.labels.HTTP_STATUS_CODE]: resp.status,
-                });
-                return resp;
-              })
-              .catch(error => {
-                span.setLabels({ [monitor.labels.HTTP_STATUS_CODE]: -1 });
-                throw error;
-              });
-          },
-          {
-            name: 'fetch',
-            message: 'Fetched from rpc',
-            error: 'Failed to fetch from rpc',
-            level: 'verbose',
-          },
-        ),
+    .captureSpanLog(
+      async span => {
+        span.inject(monitor.formats.HTTP, headers);
+        let status = -1;
+        try {
+          const resp = await doFetch(headers);
+          ({ status } = resp);
+          return resp;
+        } finally {
+          span.setLabels({ [monitor.labels.HTTP_STATUS_CODE]: status });
+        }
+      },
       {
         name: 'fetch',
+        level: { log: 'verbose', metric: 'info', span: 'info' },
         references: (monitors || [])
           .slice(1)
           .map(parent => monitor.childOf(parent)),
@@ -221,22 +210,16 @@ export default class JSONRPCHTTPProvider implements JSONRPCProvider {
   request(req: JSONRPCRequest, monitor?: Monitor): Promise<any> {
     if (monitor != null) {
       return monitor
-        .at('json_rpc_http_provider')
+        .at('neo_one_json_rpc_http_provider')
         .withLabels({
           [monitor.labels.RPC_TYPE]: 'jsonrpc',
           [monitor.labels.RPC_METHOD]: req.method,
           [monitor.labels.SPAN_KIND]: 'client',
         })
-        .captureSpan(
-          span =>
-            span.captureLogSingle(log => this._request(req, log), {
-              name: 'request',
-              message: `Sent request ${req.method}.`,
-              error: `Request ${req.method} failed.`,
-              level: 'verbose',
-            }),
-          { name: 'request' },
-        );
+        .captureSpanLog(span => this._request(req, span), {
+          name: 'request',
+          level: { log: 'verbose', metric: 'info', span: 'info' },
+        });
     }
 
     return this._request(req);

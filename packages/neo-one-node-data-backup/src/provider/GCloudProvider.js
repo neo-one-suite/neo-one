@@ -50,41 +50,25 @@ export default class GCloudProvider extends Provider {
     const downloadPath = path.resolve(tmpPath, 'storage.db.tar.gz');
 
     const storage = new Storage({ projectId: projectID });
-    await monitor.captureSpan(
-      span =>
-        span.captureLogSingle(
-          () =>
-            storage
-              .bucket(bucket)
-              .file(file)
-              .download({ destination: downloadPath, validation: true }),
-          {
-            name: 'restore_download',
-            message: 'Backup downloaded',
-            error: 'Failed to download backup.',
-          },
-        ),
+    await monitor.captureSpanLog(
+      () =>
+        storage
+          .bucket(bucket)
+          .file(file)
+          .download({ destination: downloadPath, validation: true }),
       {
         name: 'restore_download',
         help: 'Restore from backup duration',
       },
     );
 
-    await monitor.captureSpan(
-      span =>
-        span.captureLogSingle(
-          () =>
-            extract({
-              downloadPath,
-              dataPath,
-              writeBytesPerSecond,
-            }),
-          {
-            name: 'restore_extract',
-            message: 'Backup extracted',
-            error: 'Failed to extract backup',
-          },
-        ),
+    await monitor.captureSpanLog(
+      () =>
+        extract({
+          downloadPath,
+          dataPath,
+          writeBytesPerSecond,
+        }),
       {
         name: 'restore_extract',
         help: 'Extract backup duration',
@@ -99,23 +83,15 @@ export default class GCloudProvider extends Provider {
 
     const storage = new Storage({ projectId: projectID });
 
-    await monitor.captureSpan(
-      span =>
-        span.captureLogSingle(
-          () =>
-            upload({
-              dataPath,
-              write: storage
-                .bucket(bucket)
-                .file(file)
-                .createWriteStream({ validation: true }),
-            }),
-          {
-            name: 'backup_push',
-            message: 'Backup pushed',
-            error: 'Failed to push backup',
-          },
-        ),
+    await monitor.captureSpanLog(
+      () =>
+        upload({
+          dataPath,
+          write: storage
+            .bucket(bucket)
+            .file(file)
+            .createWriteStream({ validation: true }),
+        }),
       {
         name: 'backup_push',
         help: 'Push backup duration',

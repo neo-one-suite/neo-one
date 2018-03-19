@@ -65,46 +65,40 @@ export default (handlers: Handlers): Middleware => {
     ctx: Context,
     requestIn: any,
   ) =>
-    monitor.captureSpan(
-      span =>
-        span.captureLogSingle(
-          async () => {
-            let request;
-            try {
-              request = validateRequest(ctx, requestIn);
-            } finally {
-              span.setLabels({
-                [span.labels.RPC_METHOD]:
-                  request == null ? 'UNKNOWN' : request.method,
-              });
-            }
-            const handler = handlers[request.method];
-            if (handler == null) {
-              throw new JSONRPCError(-32601, 'Method not found');
-            }
+    monitor.captureSpanLog(
+      async span => {
+        let request;
+        try {
+          request = validateRequest(ctx, requestIn);
+        } finally {
+          span.setLabels({
+            [span.labels.RPC_METHOD]:
+              request == null ? 'UNKNOWN' : request.method,
+          });
+        }
+        const handler = handlers[request.method];
+        if (handler == null) {
+          throw new JSONRPCError(-32601, 'Method not found');
+        }
 
-            let { params } = request;
-            if (params == null) {
-              params = [];
-            } else if (!Array.isArray(params)) {
-              params = [params];
-            }
+        let { params } = request;
+        if (params == null) {
+          params = [];
+        } else if (!Array.isArray(params)) {
+          params = [params];
+        }
 
-            const result = await handler(params, monitor, ctx);
-            return {
-              jsonrpc: '2.0',
-              result,
-              id: request.id == null ? null : request.id,
-            };
-          },
-          {
-            name: 'http_jsonrpc_single_request',
-            message: 'Handled json rpc request',
-            level: 'verbose',
-            error: 'Failed to handle json rpc request',
-          },
-        ),
-      { name: 'http_jsonrpc_single_request' },
+        const result = await handler(params, monitor, ctx);
+        return {
+          jsonrpc: '2.0',
+          result,
+          id: request.id == null ? null : request.id,
+        };
+      },
+      {
+        name: 'http_jsonrpc_single_request',
+        level: { log: 'verbose', metric: 'info', span: 'info' },
+      },
     );
 
   const handleRequest = (monitor: Monitor, ctx: Context, request: mixed) => {
@@ -125,16 +119,11 @@ export default (handlers: Handlers): Middleware => {
     request: mixed,
   ): Promise<Object | Array<any>> => {
     try {
-      const result = await monitor.captureSpan(
-        span =>
-          span.captureLogSingle(() => handleRequest(span, ctx, request), {
-            name: 'http_jsonrpc_request',
-            message: 'Handled jsonrpc request.',
-            level: 'verbose',
-            error: 'JSONRPC request failed.',
-          }),
+      const result = await monitor.captureSpanLog(
+        span => handleRequest(span, ctx, request),
         {
           name: 'http_jsonrpc_request',
+          level: { log: 'verbose', metric: 'info', span: 'info' },
           references: [
             monitor.childOf(monitor.extract(monitor.formats.HTTP, ctx.headers)),
           ],

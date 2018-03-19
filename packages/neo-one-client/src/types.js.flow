@@ -558,6 +558,7 @@ export type BlockFilter = {|
 export type UpdateAccountNameOptions = {|
   id: UserAccountID,
   name: string,
+  monitor?: Monitor,
 |};
 
 export interface DataProvider {

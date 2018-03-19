@@ -122,9 +122,12 @@ const executeNext = async ({
   try {
     result = await monitor
       .withLabels({ 'op.code': op.name })
-      .captureSpan(
+      .captureSpanLog(
         span => op.invoke({ monitor: span, context, args, argsAlt }),
-        { name: 'execute_op', level: 'debug' },
+        {
+          name: 'execute_op',
+          level: { log: 'debug', metric: 'verbose', span: 'debug' },
+        },
       );
   } catch (error) {
     if (error.code === 'VM_ERROR') {
@@ -247,9 +250,9 @@ export const executeScript = async ({
     createdContracts: options.createdContracts || {},
   };
 
-  return monitor.captureSpan(span => run({ monitor: span, context }), {
+  return monitor.captureSpanLog(span => run({ monitor: span, context }), {
     name: 'execute_script',
-    level: 'debug',
+    level: { log: 'debug', metric: 'verbose', span: 'debug' },
   });
 };
 
@@ -290,7 +293,10 @@ export default async ({
   const startingGas = gasIn.add(FREE_GAS);
   let gas = startingGas;
   let errorMessage;
-  const span = monitor.startSpan({ name: 'execute_scripts', level: 'debug' });
+  const span = monitor.startSpan({
+    name: 'execute_scripts',
+    level: { log: 'debug', metric: 'verbose', span: 'debug' },
+  });
   let err;
   try {
     const entryScriptHash = crypto.hash160(scripts[scripts.length - 1].code);

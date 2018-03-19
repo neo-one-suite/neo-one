@@ -266,42 +266,37 @@ export default class Node implements INode {
       this._tempKnownTransactionHashes.add(transaction.hashHex);
 
       try {
-        await this._monitor.withData({ hash: transaction.hashHex }).captureSpan(
-          span =>
-            span.captureLogSingle(
-              async () => {
-                const foundTransaction = await this.blockchain.transaction.tryGet(
-                  {
-                    hash: transaction.hash,
-                  },
-                );
-                if (foundTransaction == null) {
-                  await this.blockchain.verifyTransaction({
-                    monitor: span,
-                    transaction,
-                    memPool: commonUtils.values(this.memPool),
-                  });
-                  this.memPool[transaction.hashHex] = transaction;
-                  this._memPoolGauge.inc();
-                  if (this.consensus != null) {
-                    this.consensus.onTransactionReceived(transaction);
-                  }
-                  this._relayTransaction(transaction);
-                  await this._trimMemPool(span);
+        await this._monitor
+          .withData({ hash: transaction.hashHex })
+          .captureSpanLog(
+            async span => {
+              const foundTransaction = await this.blockchain.transaction.tryGet(
+                {
+                  hash: transaction.hash,
+                },
+              );
+              if (foundTransaction == null) {
+                await this.blockchain.verifyTransaction({
+                  monitor: span,
+                  transaction,
+                  memPool: commonUtils.values(this.memPool),
+                });
+                this.memPool[transaction.hashHex] = transaction;
+                this._memPoolGauge.inc();
+                if (this.consensus != null) {
+                  this.consensus.onTransactionReceived(transaction);
                 }
+                this._relayTransaction(transaction);
+                await this._trimMemPool(span);
+              }
 
-                this._knownTransactionHashes.add(transaction.hash);
-              },
-              {
-                name: 'relay_transaction',
-                message: `Relayed transaction: ${transaction.hashHex}`,
-                error: `Failed to relay transaction: ${transaction.hashHex}`,
-              },
-            ),
-          {
-            name: 'relay_transaction',
-          },
-        );
+              this._knownTransactionHashes.add(transaction.hash);
+            },
+            {
+              name: 'relay_transaction',
+              level: { log: 'verbose', metric: 'info', span: 'info' },
+            },
+          );
       } catch (error) {
         if (error.code !== 'VERIFY') {
           throw error;
@@ -315,22 +310,11 @@ export default class Node implements INode {
   async relayBlock(block: Block, monitor?: Monitor): Promise<void> {
     await (monitor || this._monitor)
       .withData({ 'block.index': block.index })
-      .captureSpan(
-        span =>
-          span.captureLogSingle(
-            logMonitor => this._persistBlock(logMonitor, block),
-            {
-              name: 'relay_block',
-              message: `Relayed block: ${block.index}`,
-              level: 'verbose',
-              error: `Failed to relay block: ${block.index}`,
-            },
-          ),
-        {
-          name: 'relay_block',
-          help: 'Time taken to persist and relay a block.',
-        },
-      );
+      .captureSpanLog(span => this._persistBlock(span, block), {
+        name: 'relay_block',
+        help: 'Time taken to persist and relay a block.',
+        level: { log: 'verbose', metric: 'info', span: 'info' },
+      });
   }
 
   relayConsensusPayload(payload: ConsensusPayload): void {

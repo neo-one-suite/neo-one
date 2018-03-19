@@ -86,8 +86,8 @@ export type KeyStore = {
   +getCurrentAccount: () => ?UserAccount,
   +accounts$: Observable<Array<UserAccount>>,
   +getAccounts: () => Array<UserAccount>,
-  +selectAccount: (id?: UserAccountID) => Promise<void>,
-  +deleteAccount: (id: UserAccountID) => Promise<void>,
+  +selectAccount: (id?: UserAccountID, monitor?: Monitor) => Promise<void>,
+  +deleteAccount: (id: UserAccountID, monitor?: Monitor) => Promise<void>,
   +updateAccountName: (options: UpdateAccountNameOptions) => Promise<void>,
   +sign: (options: {|
     account: UserAccountID,
@@ -226,8 +226,6 @@ export default class LocalUserAccountProvider<
       },
       {
         name: 'transfer',
-        message: 'Transferred coins',
-        error: 'Failed to transfer coins',
       },
       monitor,
     );
@@ -281,8 +279,6 @@ export default class LocalUserAccountProvider<
       },
       {
         name: 'claim',
-        message: 'Claimed gas.',
-        error: 'Failed to claim gas.',
       },
       monitor,
     );
@@ -460,8 +456,6 @@ export default class LocalUserAccountProvider<
       },
       {
         name: 'issue',
-        message: 'Issued currency.',
-        error: 'Failed to issue currency.',
       },
       monitor,
     );
@@ -575,8 +569,6 @@ export default class LocalUserAccountProvider<
       },
       {
         name: 'call',
-        message: 'Called method.',
-        error: 'Failed to call method.',
         labels: {
           'call.method': method,
         },
@@ -585,12 +577,12 @@ export default class LocalUserAccountProvider<
     );
   }
 
-  async selectAccount(id?: UserAccountID): Promise<void> {
-    await this.keystore.selectAccount(id);
+  async selectAccount(id?: UserAccountID, monitor?: Monitor): Promise<void> {
+    await this.keystore.selectAccount(id, monitor);
   }
 
-  async deleteAccount(id: UserAccountID): Promise<void> {
-    await this.keystore.deleteAccount(id);
+  async deleteAccount(id: UserAccountID, monitor?: Monitor): Promise<void> {
+    await this.keystore.deleteAccount(id, monitor);
   }
 
   async updateAccountName(options: UpdateAccountNameOptions): Promise<void> {
@@ -743,8 +735,6 @@ export default class LocalUserAccountProvider<
       },
       {
         name: 'invoke_raw',
-        message: 'Successful invocation.',
-        error: 'Failed to invoke.',
         labels: {
           ...(labels || {}),
           'invoke_raw.method': method,
@@ -829,8 +819,6 @@ export default class LocalUserAccountProvider<
       },
       {
         name: 'send_transaction',
-        message: 'Sent transaction.',
-        error: 'Failed to send transaction.',
       },
       monitor,
     );
@@ -1135,13 +1123,9 @@ export default class LocalUserAccountProvider<
     func: (monitor?: Monitor) => Promise<T>,
     {
       name,
-      message,
-      error,
       labels,
     }: {|
       name: string,
-      message: string,
-      error: string,
       labels?: Labels,
     |},
     monitor?: Monitor,
@@ -1153,15 +1137,9 @@ export default class LocalUserAccountProvider<
     return monitor
       .at('neo_one_local_user_account_provider')
       .withLabels(labels || {})
-      .captureSpan(
-        span =>
-          span.captureLogSingle(() => func(span), {
-            name,
-            message,
-            error,
-            level: 'verbose',
-          }),
-        { name },
-      );
+      .captureSpanLog(func, {
+        name,
+        level: { log: 'verbose', metric: 'info', span: 'info' },
+      });
   }
 }

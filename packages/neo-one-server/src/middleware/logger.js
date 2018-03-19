@@ -9,15 +9,9 @@ import { getMonitor, setMonitor } from './common';
 export default compose([
   async (ctx: Context, next: () => Promise<void>) => {
     const monitor = getMonitor(ctx);
-    await monitor.captureSpan(
-      span =>
-        span.captureLogSingle(() => setMonitor(ctx, span, () => next()), {
-          name: 'request',
-          message: 'Handled request.',
-          error: 'Request error.',
-        }),
-      { name: 'request' },
-    );
+    await monitor.captureSpanLog(span => setMonitor(ctx, span, () => next()), {
+      name: 'request',
+    });
   },
   onError((error: Error, ctx: Context) => {
     const monitor = getMonitor(ctx);
