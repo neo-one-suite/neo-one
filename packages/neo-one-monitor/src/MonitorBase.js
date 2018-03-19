@@ -29,7 +29,7 @@ import createTracer from './createTracer';
 export type LoggerLogOptions = {|
   name: string,
   level: LogLevel,
-  message: string,
+  message?: string,
   labels?: Labels,
   data?: Labels,
   error?: ?Error,
@@ -194,6 +194,7 @@ class DefaultReference {
   _type: ReferenceType;
   _span: SpanContext | MonitorBase;
 
+  // eslint-disable-next-line
   constructor(span: SpanContext | MonitorBase) {
     this._span = span;
   }
@@ -234,7 +235,7 @@ class FollowsFromReference extends DefaultReference {
 
 type CommonLogOptions = {|
   name: string,
-  message: string,
+  message?: string,
   level?: LogLevelOption,
 
   help?: string,
@@ -245,7 +246,7 @@ type CommonLogOptions = {|
 
   error?: {
     error?: ?Error,
-    message: string,
+    message?: string,
     level?: LogLevel,
   },
 |};
@@ -721,8 +722,13 @@ export default class MonitorBase implements Span {
       const { error: errorObj } = error;
       if (errorObj != null) {
         logLevel = error.level == null ? 'error' : error.level;
-        const dot = error.message.endsWith('.') ? '' : '.';
-        message = `${error.message}${dot} ${errorObj.message}`;
+        const { message: errorMessage } = error;
+        if (errorMessage == null) {
+          message = errorMessage;
+        } else {
+          const dot = errorMessage.endsWith('.') ? '' : '.';
+          message = `${errorMessage}${dot} ${errorObj.message}`;
+        }
       }
     }
 

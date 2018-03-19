@@ -59,7 +59,7 @@ export type LogMetricOptions = {|
 
 export type LogOptions = {|
   name: string, // Lowercase. Increments a counter for the same event.
-  message: string, // Human readable string.
+  message?: string, // Human readable string.
   level?: LogLevelOption,
 
   help?: string, // Description of the event.
@@ -67,19 +67,19 @@ export type LogOptions = {|
 
   error?: {
     error?: ?Error,
-    message: string,
+    message?: string,
     level?: LogLevel,
   },
 |};
 
 export type LogSingleOptions = {|
   name: string,
-  message: string,
+  message?: string,
   level?: LogLevelOption,
 
   error?: {
     error?: ?Error,
-    message: string,
+    message?: string,
     level?: LogLevel,
   },
 |};
@@ -87,13 +87,13 @@ export type LogSingleOptions = {|
 export type CaptureErrorOptions =
   | string
   | {|
-      message: string,
-      level: LogLevel,
+      message?: string,
+      level?: LogLevel,
     |};
 
 export type CaptureLogOptions = {|
   name: string,
-  message: string,
+  message?: string,
   level?: LogLevelOption,
 
   help?: string,
@@ -104,7 +104,7 @@ export type CaptureLogOptions = {|
 
 export type CaptureLogSingleOptions = {|
   name: string,
-  message: string,
+  message?: string,
   level?: LogLevelOption,
 
   error?: CaptureErrorOptions,
@@ -112,7 +112,7 @@ export type CaptureLogSingleOptions = {|
 
 export type LogErrorOptions = {|
   name: string,
-  message: string,
+  message?: string,
   error: Error,
   level?: LogLevelOption,
 
@@ -122,7 +122,7 @@ export type LogErrorOptions = {|
 
 export type LogErrorSingleOptions = {|
   name: string,
-  message: string,
+  message?: string,
   error: Error,
   level?: LogLevelOption,
 |};
