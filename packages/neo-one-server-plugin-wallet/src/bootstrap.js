@@ -27,8 +27,8 @@ import {
 } from '@neo-one/server-plugin-network';
 
 import _ from 'lodash';
-import { of as _of } from 'rxjs';
-
+import { of as _of } from 'rxjs/observable/of';
+import ora from 'ora';
 import type { Wallet } from './WalletResourceType';
 import type WalletPlugin from './WalletPlugin';
 
@@ -362,6 +362,7 @@ async function registerAssets({
       assetRegistrations.map(registration => registration.confirmed()),
     ),
   );
+
   const registrations = promises.slice(1);
   // $FlowFixMe
   return registrations.map(registration => registration.result.value.hash);
@@ -502,7 +503,10 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           'Invalid Network: Can only bootstrap a private network',
         );
       }
-
+      const spinner = ora(
+        `Initializing bootstrap of network ${networkName}`,
+      ).start();
+      spinner.succeed();
       const networkResource = await cli.client.getResource({
         plugin: networkConstants.PLUGIN,
         name: networkName,
@@ -540,7 +544,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
       for (let i = 1; i < numWallets + 1; i += 1) {
         walletNames.push(`wallet-${i}`);
       }
-
+      spinner.start('Creating wallets');
       const wallets = await Promise.all(
         walletNames.map(walletName =>
           createWallet({
@@ -551,7 +555,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           }),
         ),
       );
-
+      spinner.succeed();
       const provider = new NEOONEProvider({
         options: [
           { network: network.name, rpcURL: network.nodes[0].rpcAddress },
@@ -565,7 +569,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         }),
       });
       const developerClient = new DeveloperClient(provider.read(network.name));
-
+      spinner.start('Initializing wallets with funds');
       await initializeWallets({
         wallets,
         masterWallet,
@@ -573,7 +577,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         client,
         developerClient,
       });
-
+      spinner.succeed();
       let assets = [
         {
           assetType: 'Token',
@@ -594,6 +598,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           precision: 6,
         },
       ];
+      spinner.start('Setting up asset wallets');
       const assetWallets = await setupAssetWallets({
         names: assets.map(asset => asset.name),
         networkName: network.name,
@@ -603,20 +608,22 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         developerClient,
         masterWallet,
       });
+      spinner.succeed();
 
+      spinner.start('Registering test assets');
       const assetHashes = await registerAssets({
         assets,
         assetWallets,
         client,
         developerClient,
       });
-
+      spinner.succeed();
       assets = _.zip(assets, assetWallets, assetHashes).map(asset => ({
         ...asset[0],
         wallet: asset[1],
         hash: asset[2],
       }));
-
+      spinner.start('Issuing assets');
       const issues = await Promise.all(
         assets.map(asset =>
           issueAsset({
@@ -632,7 +639,9 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           issues.map(issue => issue.confirmed()),
         ),
       );
+      spinner.succeed();
 
+      spinner.start('Distributing assets');
       const assetTransfers = await Promise.all(
         assets.map(asset =>
           createAssetTransfer({
@@ -650,16 +659,22 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           _.flatten(assetTransfers).map(transfer => transfer.confirmed()),
         ),
       );
+      spinner.succeed();
 
+      spinner.start('Publishing KYC SmartContract');
       const kyc = await client.publish(kycContract);
       await Promise.all([developerClient.runConsensusNow(), kyc.confirmed()]);
+      spinner.succeed();
 
+      spinner.start('Publishing Concierge SmartContract');
       const concierge = await client.publish(conciergeContract);
       await Promise.all([
         developerClient.runConsensusNow(),
         concierge.confirmed(),
       ]);
+      spinner.succeed();
 
+      spinner.start('Claiming GAS');
       await initiateClaims({
         wallets,
         networkName: network.name,
@@ -667,4 +682,5 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         developerClient,
         provider,
       });
+      spinner.succeed();
     });
