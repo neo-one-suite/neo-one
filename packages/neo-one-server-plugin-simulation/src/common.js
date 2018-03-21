@@ -8,7 +8,7 @@ export const executeHook = (cmd: string, cwd: string) =>
   Observable.create(observer => {
     observer.next(cmd);
     let running = true;
-    const child = execa(cmd, [], {
+    const child = execa.shell(cmd, {
       cwd,
       windowsHide: true,
       shell: true,

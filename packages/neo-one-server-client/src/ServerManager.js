@@ -160,6 +160,7 @@ export default class ServerManager {
         detached: true,
         stdio: 'ignore',
         windowsHide: true,
+        cleanup: false,
       },
     );
     child.unref();

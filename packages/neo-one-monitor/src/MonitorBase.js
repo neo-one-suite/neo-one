@@ -151,8 +151,6 @@ const FORMATS = {
   BINARY: 'binary',
 };
 
-const KNOWN_LABELS_SET = new Set(Object.values(KNOWN_LABELS));
-
 export const convertMetricLabel = (dotLabel: string): string =>
   dotLabel.replace('.', '_');
 
@@ -162,19 +160,13 @@ export const convertMetricLabels = (labelsIn?: RawLabels): MetricLabels => {
   }
 
   const labels = {};
-  for (const key of Object.keys(labels)) {
-    labels[convertMetricLabel(key)] = labels[key];
+  for (const key of Object.keys(labelsIn)) {
+    labels[convertMetricLabel(key)] = labelsIn[key];
   }
   return labels;
 };
 
-export const convertTagLabel = (dotLabel: string): string => {
-  if (KNOWN_LABELS_SET.has(dotLabel)) {
-    return dotLabel;
-  }
-
-  return `label.${dotLabel}`;
-};
+export const convertTagLabel = (dotLabel: string): string => dotLabel;
 
 export const convertTagLabels = (labelsIn?: RawLabels): TagLabels => {
   if (labelsIn == null) {
@@ -182,8 +174,8 @@ export const convertTagLabels = (labelsIn?: RawLabels): TagLabels => {
   }
 
   const labels = {};
-  for (const key of Object.keys(labels)) {
-    labels[convertTagLabel(key)] = labels[key];
+  for (const key of Object.keys(labelsIn)) {
+    labels[convertTagLabel(key)] = labelsIn[key];
   }
   return labels;
 };
@@ -356,8 +348,9 @@ export default class MonitorBase implements Span {
       errorObj = { message: errorObj, level: 'error' };
     }
     const errorObjFinal = errorObj;
+    const log = this._clone();
     const doLog = (error?: ?Error) =>
-      this.log({
+      log.log({
         name: options.name,
         message: options.message,
         level: options.level,
@@ -374,7 +367,7 @@ export default class MonitorBase implements Span {
       });
 
     try {
-      const result = func(this);
+      const result = func(log);
 
       if (result != null && result.then != null) {
         return result
@@ -411,8 +404,9 @@ export default class MonitorBase implements Span {
       errorObj = { message: errorObj, level: 'error' };
     }
     const errorObjFinal = errorObj;
+    const log = this._clone();
     const doLog = (error?: ?Error) =>
-      this.log({
+      log.logSingle({
         name: options.name,
         message: options.message,
         level: options.level,
@@ -427,7 +421,7 @@ export default class MonitorBase implements Span {
       });
 
     try {
-      const result = func(this);
+      const result = func(log);
 
       if (result != null && result.then != null) {
         return result
@@ -847,7 +841,9 @@ export default class MonitorBase implements Span {
   }
 
   _getLabelNames(labelNames?: Array<string>): Array<string> {
-    return Object.keys(this._labels).concat(labelNames || []);
+    return Object.keys(this._labels)
+      .concat(labelNames || [])
+      .map(label => convertMetricLabel(label));
   }
 
   _getAllRawLabels(labels?: RawLabels): RawLabels {
@@ -867,7 +863,7 @@ export default class MonitorBase implements Span {
   }
 
   _setSpanLabels(labels: RawLabels): void {
-    const span = this.getSpan();
+    const span = this._span || {};
     const { span: tracerSpan } = span;
     if (tracerSpan != null) {
       const tagLabels = convertTagLabels(labels);
@@ -900,17 +896,13 @@ export default class MonitorBase implements Span {
     };
   }
 
-  _clone({
-    namespace,
-    mergeLabels,
-    mergeData,
-    span,
-  }: {|
+  _clone(options?: {|
     namespace?: string,
     mergeLabels?: Labels,
     mergeData?: Labels,
     span?: SpanData,
   |}) {
+    const { namespace, mergeLabels, mergeData, span } = options || {};
     let mergedLabels = this._labels;
     if (mergeLabels != null) {
       mergedLabels = { ...this._labels, ...mergeLabels };
@@ -918,7 +910,7 @@ export default class MonitorBase implements Span {
 
     let mergedData = this._data;
     if (mergeData != null) {
-      mergedData = { ...this._labels, ...mergeData };
+      mergedData = { ...this._data, ...mergeData };
     }
 
     return new this.constructor({

@@ -219,6 +219,7 @@ export default class JSONRPCHTTPProvider implements JSONRPCProvider {
         .captureSpanLog(span => this._request(req, span), {
           name: 'request',
           level: { log: 'verbose', metric: 'info', span: 'info' },
+          error: { level: 'verbose' },
         });
     }
 
