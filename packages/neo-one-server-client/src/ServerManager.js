@@ -4,7 +4,7 @@ import { type Binary, killProcess } from '@neo-one/server-plugin';
 import fs from 'fs-extra';
 import isRunning from 'is-running';
 import path from 'path';
-import spawn from 'cross-spawn';
+import execa from 'execa';
 import { utils } from '@neo-one/utils';
 
 import Client from './Client';
@@ -153,12 +153,13 @@ export default class ServerManager {
       onStart();
     }
 
-    const child = spawn(
+    const child = execa(
       binary.cmd,
       binary.firstArgs.concat(['start', 'server']),
       {
         detached: true,
         stdio: 'ignore',
+        windowsHide: true,
       },
     );
     child.unref();

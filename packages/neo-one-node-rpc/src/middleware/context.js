@@ -8,7 +8,7 @@ export default ({ monitor }: {| monitor: Monitor |}) =>
   simpleMiddleware(
     'context',
     async (ctx: Context, next: () => Promise<void>) => {
-      ctx.state.monitor = monitor.forRequest(ctx);
+      ctx.state.monitor = monitor.forContext(ctx);
 
       await next();
     },

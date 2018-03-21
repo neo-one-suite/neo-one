@@ -2,7 +2,7 @@
 import { type CLIArgs, paths } from '@neo-one/server-plugin';
 
 import boa from '@neo-one/boa';
-import { execFile } from 'child_process';
+import execa from 'execa';
 
 export default ({ vorpal, shutdown, logConfig$ }: CLIArgs) => {
   vorpal
@@ -22,15 +22,7 @@ export default ({ vorpal, shutdown, logConfig$ }: CLIArgs) => {
       });
 
       try {
-        await new Promise((resolve, reject) => {
-          execFile(boa, [file, output], err => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        });
+        await execa(boa, [file, output]);
       } catch (error) {
         process.stdout.write(error.message);
         shutdown({ exitCode: 1, error });

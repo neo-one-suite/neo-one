@@ -14,10 +14,10 @@ import {
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import type { Subject } from 'rxjs/Subject';
 
+import execa from 'execa';
 import fs from 'fs-extra';
 import { map, shareReplay } from 'rxjs/operators';
 import path from 'path';
-import spawn from 'cross-spawn';
 
 import {
   type CreateContext,
@@ -317,15 +317,12 @@ export default class SimulationResourceAdapter {
               throw new Error('For Flow');
             }
 
-            this._subprocesses = await Promise.all(
-              postStart.map(cmd =>
-                spawn(cmd, {
-                  cwd: this._simulationPath,
-                  stdio: 'ignore',
-                  windowsHide: true,
-                  shell: true,
-                }),
-              ),
+            this._subprocesses = postStart.map(cmd =>
+              execa.shell(cmd, {
+                cwd: this._simulationPath,
+                stdio: 'ignore',
+                shell: true,
+              }),
             );
           },
         },

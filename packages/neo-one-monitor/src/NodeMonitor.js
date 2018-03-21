@@ -7,7 +7,14 @@ import mount from 'koa-mount';
 import perfHooks from 'perf_hooks';
 import prom from 'prom-client';
 
-import type { Counter, Gauge, Histogram, LogLevel, Summary } from './types';
+import type {
+  Counter,
+  Gauge,
+  Histogram,
+  LogLevel,
+  Monitor,
+  Summary,
+} from './types';
 import MonitorBase, {
   type Logger,
   type MetricConstruct,
@@ -114,7 +121,7 @@ class NodeMetricsFactory implements MetricsFactory {
 
 type NodeMonitorCreate = {|
   namespace: string,
-  logger: Logger,
+  logger?: Logger,
   tracer?: Tracer,
   metricsLogLevel?: LogLevel,
   spanLogLevel?: LogLevel,
@@ -134,13 +141,43 @@ export default class NodeMonitor extends MonitorBase {
     gcStats(prom.register)();
     return new NodeMonitor({
       namespace,
-      logger,
+      logger: logger || {
+        log: () => {},
+        close: (callback: () => void) => {
+          callback();
+        },
+      },
       tracer,
       metricsFactory: new NodeMetricsFactory(),
       now: () => perfHooks.performance.now(),
       metricsLogLevel,
       spanLogLevel,
     });
+  }
+
+  forContext(ctx: Context): Monitor {
+    return this.withLabels({
+      [this.labels.HTTP_METHOD]: ctx.request.method,
+      [this.labels.SPAN_KIND]: 'server',
+      [this.labels.HTTP_REQUEST_PROTOCOL]: ctx.request.protocol,
+    }).withData({
+      [this.labels.HTTP_HEADERS]: JSON.stringify(ctx.request.headers),
+      [this.labels.HTTP_URL]: ctx.request.originalUrl,
+      [this.labels.HTTP_PATH]: ctx.request.path,
+      [this.labels.HTTP_REQUEST_QUERY]: ctx.request.querystring,
+      [this.labels.PEER_ADDRESS]: ctx.request.ip,
+      [this.labels.PEER_PORT]: ctx.request.socket.remotePort,
+      [this.labels.HTTP_REQUEST_SIZE]: ctx.request.length,
+    });
+  }
+
+  forMessage(message: http$IncomingMessage): Monitor {
+    const app = new Koa();
+    app.proxy = true;
+    // $FlowFixMe
+    app.silent = true;
+    const ctx = ((app: $FlowFixMe).createContext(message, undefined): Context);
+    return this.forContext(ctx);
   }
 
   serveMetrics(port: number): void {

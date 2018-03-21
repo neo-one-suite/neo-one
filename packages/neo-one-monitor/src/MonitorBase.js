@@ -1,5 +1,6 @@
 /* @flow */
 import type { Context } from 'koa';
+
 import type {
   Carrier,
   CaptureLogOptions,
@@ -133,7 +134,13 @@ const KNOWN_LABELS = {
   SAMPLING_PRIORITY: 'sampling.priority',
   SPAN_KIND: 'span.kind',
 
+  DB_STATEMENT_SUMMARY: 'db.statement.summary',
   HTTP_PATH: 'http.path',
+  HTTP_USER_AGENT: 'http.user_agent',
+  HTTP_REQUEST_SIZE: 'http.request.size',
+  HTTP_HEADERS: 'http.headers',
+  HTTP_REQUEST_PROTOCOL: 'http.request.protocol',
+  HTTP_REQUEST_QUERY: 'http.request.query',
   RPC_METHOD: 'rpc.method',
   RPC_TYPE: 'rpc.type',
 };
@@ -311,14 +318,14 @@ export default class MonitorBase implements Span {
     return this._clone({ mergeData: data });
   }
 
-  forRequest(ctx: Context): Monitor {
-    return this.withLabels({
-      [KNOWN_LABELS.HTTP_METHOD]: ctx.method,
-      [KNOWN_LABELS.SPAN_KIND]: 'server',
-    }).withData({
-      [KNOWN_LABELS.HTTP_URL]: ctx.originalUrl || ctx.url,
-      [KNOWN_LABELS.HTTP_PATH]: ctx.path,
-    });
+  // eslint-disable-next-line
+  forContext(ctx: Context): Monitor {
+    return this;
+  }
+
+  // eslint-disable-next-line
+  forMessage(ctx: http$IncomingMessage): Monitor {
+    return this;
   }
 
   log({ name, message, level, help, metric, error }: LogOptions): void {

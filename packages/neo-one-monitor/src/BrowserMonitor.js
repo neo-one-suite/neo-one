@@ -59,7 +59,7 @@ class BrowserMetricsFactory implements MetricsFactory {
 
 type BrowserMonitorCreate = {|
   namespace: string,
-  logger: Logger,
+  logger?: Logger,
   tracer?: Tracer,
   metricsLogLevel?: LogLevel,
   spanLogLevel?: LogLevel,
@@ -76,7 +76,12 @@ export default class BrowserMonitor extends MonitorBase {
     const perf = performance;
     return new BrowserMonitor({
       namespace,
-      logger,
+      logger: logger || {
+        log: () => {},
+        close: (callback: () => void) => {
+          callback();
+        },
+      },
       tracer,
       metricsFactory: new BrowserMetricsFactory(),
       now: () => perf.now(),

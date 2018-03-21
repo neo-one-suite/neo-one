@@ -39,6 +39,6 @@
     "access": "public"
   },
   "dependencies": {
-    "cross-spawn": "^6.0.5"
+    "execa": "^0.10.0"
   }
 }

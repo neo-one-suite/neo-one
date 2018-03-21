@@ -2,7 +2,7 @@
 import { type CLIArgs, paths } from '@neo-one/server-plugin';
 
 import csharp from '@neo-one/csharp';
-import { execFile } from 'child_process';
+import execa from 'execa';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -24,15 +24,7 @@ export default ({ vorpal, shutdown, logConfig$ }: CLIArgs) => {
       });
 
       try {
-        await new Promise((resolve, reject) => {
-          execFile(csharp, [file], err => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        });
+        await execa(csharp, [file]);
       } catch (error) {
         process.stdout.write(error.message);
         shutdown({ exitCode: 1, error });

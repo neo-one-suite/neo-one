@@ -12,10 +12,10 @@ import type { Monitor } from '@neo-one/monitor';
 
 import _ from 'lodash';
 import { createEndpoint } from '@neo-one/node-core';
+import execa from 'execa';
 import fetch from 'node-fetch';
 import fs from 'fs-extra';
 import path from 'path';
-import spawn from 'cross-spawn';
 import { take } from 'rxjs/operators';
 
 import NodeAdapter, { type NodeStatus } from './NodeAdapter';
@@ -313,7 +313,7 @@ export default class NEOONENodeAdapter extends NodeAdapter {
 
   async _start(): Promise<void> {
     if (this._process == null) {
-      const child = spawn(
+      const child = execa(
         this._binary.cmd,
         this._binary.firstArgs.concat(['start', 'node', this._dataPath]),
         {

@@ -45,7 +45,7 @@
     "@neo-one/simulation-template": "^1.0.0-alpha.5",
     "@neo-one/utils": "^1.0.0-alpha.9",
     "bignumber.js": "^6.0.0",
-    "cross-spawn": "^6.0.5",
+    "execa": "^0.10.0",
     "fs-extra": "^5.0.0",
     "lodash": "^4.17.5",
     "rxjs": "^5.5.7"

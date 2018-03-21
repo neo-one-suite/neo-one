@@ -235,9 +235,21 @@ export type KnownLabels = {|
   // "producer" or "consumer" for the appropriate roles in a messaging scenario.
   SPAN_KIND: 'span.kind',
 
+  // Low cardinality version of db.statement
+  DB_STATEMENT_SUMMARY: 'db.statement.summary',
   // The path of the request. Must be low cardinality. E.g. /account/:id
   // not /account/123
   HTTP_PATH: 'http.path',
+  // The user agent for the request.
+  HTTP_USER_AGENT: 'http.user_agent',
+  // Request length
+  HTTP_REQUEST_SIZE: 'http.request.size',
+  // Headers
+  HTTP_HEADERS: 'http.headers',
+  // Request protocol
+  HTTP_REQUEST_PROTOCOL: 'http.request.protocol',
+  // Request querystring
+  HTTP_REQUEST_QUERY: 'http.request.query',
   // RPC method called. E.g. getblock.
   RPC_METHOD: 'rpc.method',
   // RPC type, e.g. jsonrpc.
@@ -268,7 +280,8 @@ export interface Monitor {
   sub(namespace: string): Monitor;
   withLabels(labels: Labels): Monitor;
   withData(data: Labels): Monitor;
-  forRequest(ctx: Context): Monitor;
+  forContext(ctx: Context): Monitor;
+  forMessage(message: http$IncomingMessage): Monitor;
 
   log(options: LogOptions): void;
   captureLog<TResult>(

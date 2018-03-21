@@ -1,7 +1,7 @@
 /* @flow */
 import type { Binary } from '@neo-one/server-plugin';
 
-import { execFile } from 'child_process';
+import execa from 'execa';
 
 import type { CompileResult } from './index';
 
@@ -14,16 +14,11 @@ export default ({
   avmPath: string,
   binary: Binary,
 |}): Promise<CompileResult> =>
-  new Promise((resolve, reject) => {
-    execFile(
-      binary.cmd,
-      binary.firstArgs.concat(['compile', 'csharp', scPath, avmPath]),
-      (err, stdout) => {
-        if (err) {
-          reject(new Error(`C# compilation failed: ${stdout}`));
-        } else {
-          resolve(({}: $FlowFixMe));
-        }
-      },
-    );
-  });
+  execa(
+    binary.cmd,
+    binary.firstArgs.concat(['compile', 'csharp', scPath, avmPath]),
+  )
+    .then(() => ({}: $FlowFixMe))
+    .catch(error => {
+      throw new Error(`C# compilation failed: ${error.stdout}`);
+    });

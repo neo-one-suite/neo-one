@@ -1,13 +1,9 @@
 /* @flow */
-import { exec as execCallback } from 'child_process';
-import { promisify } from 'util';
-import spawn from 'cross-spawn';
-
-const exec = promisify(execCallback);
+import execa from 'execa';
 
 const shouldUseYarn = async () => {
   try {
-    await exec('yarn --version', { stdio: 'ignore' });
+    await execa('yarn', ['--version'], { stdio: 'ignore' });
     return true;
   } catch (e) {
     return false;
@@ -23,7 +19,7 @@ const checkThatNpmCanReadCwd = () => {
     // `npm config list` is the only reliable way I could find
     // to reproduce the wrong path. Just printing process.cwd()
     // in a Node process was not enough.
-    childOutput = spawn.sync('npm', ['config', 'list']).output.join('');
+    childOutput = execa.sync('npm', ['config', 'list']).output.join('');
   } catch (err) {
     // Something went wrong spawning node.
     // Not great, but it means we can't do this check.
@@ -66,17 +62,10 @@ const install = async () => {
     );
   }
 
-  await new Promise((resolve, reject) => {
-    const child = spawn(command, args, { stdio: 'inherit' });
-    child.on('close', code => {
-      if (code !== 0) {
-        reject(
-          new Error(`${command} ${args.join(' ')} exited with code ${code}`),
-        );
-      } else {
-        resolve();
-      }
-    });
+  await execa(command, args, { stdio: 'inherit' }).catch(error => {
+    throw new Error(
+      `${command} ${args.join(' ')} exited with code ${error.code}`,
+    );
   });
 };
 

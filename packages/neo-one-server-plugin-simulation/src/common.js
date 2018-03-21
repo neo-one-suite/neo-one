@@ -1,14 +1,14 @@
 /* @flow */
 import { Observable } from 'rxjs/Observable';
 
-import spawn from 'cross-spawn';
+import execa from 'execa';
 
 // eslint-disable-next-line
 export const executeHook = (cmd: string, cwd: string) =>
   Observable.create(observer => {
     observer.next(cmd);
     let running = true;
-    const child = spawn(cmd, [], {
+    const child = execa(cmd, [], {
       cwd,
       windowsHide: true,
       shell: true,

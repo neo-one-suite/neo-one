@@ -65,7 +65,7 @@ const request = async ({
   tries: triesIn,
 }: {|
   endpoint: string,
-  requests: Array<{| monitor?: Monitor, request: Object |}>,
+  requests: $ReadOnlyArray<{| monitor?: Monitor, request: Object |}>,
   timeoutMS: number,
   tries: number,
 |}) => {
@@ -185,7 +185,7 @@ const handleResponse = (responseJSON: Object): any => {
 
 export default class JSONRPCHTTPProvider implements JSONRPCProvider {
   endpoint: string;
-  batcher: DataLoader<Object, Object>;
+  batcher: DataLoader<{| monitor?: Monitor, request: Object |}, Object>;
 
   constructor(endpoint: string) {
     this.endpoint = endpoint;
