@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/simulation-react",
-  "version": "1.0.0-alpha.9",
+  "version": "1.0.0-alpha.10",
   "keywords": [
     "neo",
     "NEO",
@@ -43,6 +43,6 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0-beta.42",
-    "@neo-one/simulation-utils": "^1.0.0-alpha.7"
+    "@neo-one/simulation-utils": "^1.0.0-alpha.8"
   }
 }
