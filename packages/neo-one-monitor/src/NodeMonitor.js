@@ -23,15 +23,15 @@ import MonitorBase, {
   type RawLabels,
   type Tracer,
   convertMetricLabel,
+  convertMetricLabels,
 } from './MonitorBase';
 
 class BaseMetric<TMetric: Object> {
   static MetricClass: Class<TMetric>;
   _metric: TMetric;
-  _labelNamesSet: Set<string>;
-  _metricLabels: MetricLabels;
+  _labels: RawLabels;
 
-  constructor({ name, help, labelNames, metricLabels }: MetricConstruct) {
+  constructor({ name, help, labelNames, labels }: MetricConstruct) {
     this._metric = new this.constructor.MetricClass({
       name,
       help: help == null ? 'Placeholder' : help,
@@ -39,8 +39,7 @@ class BaseMetric<TMetric: Object> {
         convertMetricLabel(labelName),
       ),
     });
-    this._labelNamesSet = new Set(labelNames);
-    this._metricLabels = metricLabels;
+    this._labels = labels;
   }
 
   _getArgs(
@@ -48,16 +47,10 @@ class BaseMetric<TMetric: Object> {
     value?: number,
   ): [MetricLabels, number | void] {
     if (valueOrLabels == null || typeof valueOrLabels === 'number') {
-      return [this._metricLabels, valueOrLabels];
+      return [convertMetricLabels(this._labels), valueOrLabels];
     }
 
-    const labels = {};
-    for (const key of Object.keys(valueOrLabels)) {
-      if (this._labelNamesSet.has(key)) {
-        labels[convertMetricLabel(key)] = valueOrLabels[key];
-      }
-    }
-    return [{ ...this._metricLabels, ...labels }, value];
+    return [convertMetricLabels({ ...this._labels, ...valueOrLabels }), value];
   }
 }
 

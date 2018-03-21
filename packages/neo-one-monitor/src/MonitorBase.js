@@ -87,7 +87,7 @@ type SpanData = {|
 
 export type MetricConstruct = {|
   ...MetricOptions,
-  metricLabels: MetricLabels,
+  labels: Labels,
 |};
 
 export interface MetricsFactory {
@@ -151,8 +151,9 @@ const FORMATS = {
   BINARY: 'binary',
 };
 
+const dotRegex = /\./g;
 export const convertMetricLabel = (dotLabel: string): string =>
-  dotLabel.replace('.', '_');
+  dotLabel.replace(dotRegex, '_');
 
 export const convertMetricLabels = (labelsIn?: RawLabels): MetricLabels => {
   if (labelsIn == null) {
@@ -195,6 +196,7 @@ class DefaultReference {
   _type: ReferenceType;
   _span: SpanContext | MonitorBase;
 
+  // eslint-disable-next-line
   constructor(span: SpanContext | MonitorBase) {
     this._span = span;
   }
@@ -396,6 +398,7 @@ export default class MonitorBase implements Span {
   captureLogSingle(
     func: (monitor: CaptureMonitor) => $FlowFixMe,
     options: CaptureLogSingleOptions,
+    disableClone?: boolean,
   ): $FlowFixMe {
     let { error: errorObj } = options;
     if (errorObj == null) {
@@ -404,7 +407,7 @@ export default class MonitorBase implements Span {
       errorObj = { message: errorObj, level: 'error' };
     }
     const errorObjFinal = errorObj;
-    const log = this._clone();
+    const log = disableClone ? this : this._clone();
     const doLog = (error?: ?Error) =>
       log.logSingle({
         name: options.name,
@@ -532,7 +535,12 @@ export default class MonitorBase implements Span {
     return summaries[name];
   }
 
-  startSpan({ name, level, help, references: referenceIn }: SpanOptions): Span {
+  startSpan({
+    name,
+    level,
+    help,
+    references: referenceIn,
+  }: SpanOptions): MonitorBase {
     let span;
     const references = (referenceIn || [])
       .concat([this.childOf(this)])
@@ -593,7 +601,7 @@ export default class MonitorBase implements Span {
         name: histogram.name,
         help: histogram.help,
         labelNames: [this.labels.ERROR],
-      }).observe({ [this.labels.ERROR]: !!error }, value);
+      }).observe({ [convertMetricLabel(this.labels.ERROR)]: !!error }, value);
     }
 
     const { span: tracerSpan } = span;
@@ -604,7 +612,7 @@ export default class MonitorBase implements Span {
   }
 
   captureSpan(
-    func: (span: CaptureMonitor) => $FlowFixMe,
+    func: (span: MonitorBase) => $FlowFixMe,
     options: CaptureSpanOptions,
   ): $FlowFixMe {
     const span = this.startSpan({
@@ -642,12 +650,16 @@ export default class MonitorBase implements Span {
   ): $FlowFixMe {
     return this.captureSpan(
       span =>
-        span.captureLogSingle(log => func(log), {
-          name: options.name,
-          level: options.level,
-          message: options.message,
-          error: options.error == null ? {} : options.error,
-        }),
+        span.captureLogSingle(
+          log => func(log),
+          {
+            name: options.name,
+            level: options.level,
+            message: options.message,
+            error: options.error == null ? {} : options.error,
+          },
+          true,
+        ),
       {
         name: options.name,
         level: options.level,
@@ -791,8 +803,8 @@ export default class MonitorBase implements Span {
       name: this._getName(name),
       level: logLevel,
       message,
-      labels: convertMetricLabels(this._getAllRawLabels(labels)),
-      data: convertMetricLabels(this._getAllRawData()),
+      labels: convertTagLabels(this._getAllRawLabels(labels)),
+      data: convertTagLabels(this._getAllRawData()),
       error: error == null ? undefined : error.error,
     });
 
@@ -805,7 +817,7 @@ export default class MonitorBase implements Span {
       const spanLog = ({
         event: name,
         message,
-        labels: convertMetricLabels(labels),
+        labels: convertTagLabels(labels),
       }: Object);
       if (error != null) {
         const { error: errorObj } = error;
@@ -832,7 +844,7 @@ export default class MonitorBase implements Span {
       name: this._getName(name),
       help,
       labelNames: this._getLabelNames(labelNames),
-      metricLabels: convertMetricLabels(this._labels),
+      labels: this._labels,
     };
   }
 
@@ -841,9 +853,7 @@ export default class MonitorBase implements Span {
   }
 
   _getLabelNames(labelNames?: Array<string>): Array<string> {
-    return Object.keys(this._labels)
-      .concat(labelNames || [])
-      .map(label => convertMetricLabel(label));
+    return Object.keys(this._labels).concat(labelNames || []);
   }
 
   _getAllRawLabels(labels?: RawLabels): RawLabels {
