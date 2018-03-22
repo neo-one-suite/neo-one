@@ -46,6 +46,7 @@
     "test-coverage": "yarn run test --coverage",
     "test-ci": "jest -w 1",
     "e2e": "jest --config e2e.json",
+    "e2e-coverage": "nyc --clean yarn run e2e --coverage",
     "e2e-ci": "jest --config e2e.json -w 1",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.js\"",
     "nit:template": "prettier --config .prettierrc --list-different \"packages/*/template/**/*.js\"",
@@ -100,6 +101,7 @@
     "lerna": "2.9.0",
     "lint-staged": "7.0.0",
     "lodash": "4.17.5",
+    "nyc": "^11.6.0",
     "prettier": "1.11.1",
     "rimraf": "^2.6.2",
     "rollup": "0.57.1",
@@ -149,5 +151,30 @@
       "./scripts/serializers/buffer.js"
     ],
     "setupTestFrameworkScriptFile": "./scripts/test/jestSetup.js"
+  },
+  "nyc": {
+    "cache": true,
+    "exclude": [
+      "/node_modules/",
+      "<rootDir>/decls/.*",
+      "<rootDir>/packages/neo-one-node-neo-settings/src/test.js",
+      "<rootDir>/migrate/.*",
+      "<rootDir>/packages/.*/template/.*",
+      "<rootDir>/packages/.*/__e2e__/.*",
+      "<rootDir>/packages/neo-one-client-core/src/utils/AsyncIteratorBase.flow.js"
+    ],
+    "include": [
+      "packages/*/src/**/*.js",
+      "!**/bin/**",
+      "!**/__mocks__/**",
+      "!**/__tests__/**",
+      "!**/__data__/**",
+      "!**/__e2e__/**"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "tempDirectory": "./coverage"
   }
 }
