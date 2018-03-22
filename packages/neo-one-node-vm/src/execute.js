@@ -127,6 +127,7 @@ const executeNext = async ({
         {
           name: 'execute_op',
           level: { log: 'debug', metric: 'verbose', span: 'debug' },
+          error: { level: 'debug' },
         },
       );
   } catch (error) {
@@ -253,6 +254,7 @@ export const executeScript = async ({
   return monitor.captureSpanLog(span => run({ monitor: span, context }), {
     name: 'execute_script',
     level: { log: 'debug', metric: 'verbose', span: 'debug' },
+    error: { level: 'debug' },
   });
 };
 

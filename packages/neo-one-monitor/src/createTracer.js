@@ -1,5 +1,5 @@
 /* @flow */
-import opentracing from 'opentracing';
+import * as opentracing from 'opentracing';
 
 import type { Carrier, Format, SpanContext } from './types';
 import type {
