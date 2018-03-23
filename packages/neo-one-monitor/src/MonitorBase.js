@@ -22,23 +22,16 @@ import type {
   LogLevel,
   LogMetricOptions,
   LogOptions,
+  LoggerLogOptions,
   MetricOptions,
   Monitor,
+  Report,
   Span,
   SpanContext,
   SpanOptions,
   Summary,
 } from './types';
 import createTracer from './createTracer';
-
-export type LoggerLogOptions = {|
-  name: string,
-  level: LogLevel,
-  message?: string,
-  labels?: Labels,
-  data?: Labels,
-  error?: ?Error,
-|};
 
 export type FullLogLevelOption = {|
   log: LogLevel,
@@ -122,6 +115,21 @@ const counters: { [name: string]: Counter } = {};
 const gauges: { [name: string]: Gauge } = {};
 const histograms: { [name: string]: Histogram } = {};
 const summaries: { [name: string]: Summary } = {};
+
+export const reset = (): void => {
+  for (const counter of Object.keys(counters)) {
+    delete counters[counter];
+  }
+  for (const gauge of Object.keys(gauges)) {
+    delete gauges[gauge];
+  }
+  for (const histogram of Object.keys(histograms)) {
+    delete histograms[histogram];
+  }
+  for (const summary of Object.keys(summaries)) {
+    delete summaries[summary];
+  }
+};
 
 const KNOWN_LABELS = {
   // These are added automatically
@@ -777,6 +785,38 @@ export default class MonitorBase implements Span {
     const span = this._span;
     if (span != null && span.span != null) {
       this._tracer.inject(span.span.context(), format, carrier);
+    }
+  }
+
+  receive(report: Report): void {
+    report.logs.map(log => this._logger.log(log));
+
+    for (const counterMetric of report.metrics.counters) {
+      const counter = this.getCounter({
+        name: counterMetric.metric.name,
+        help: counterMetric.metric.help,
+        labelNames: counterMetric.metric.labelNames,
+        metricLabels: counterMetric.metric.metricLabels,
+        receivedFromBrowser: true,
+      });
+
+      counterMetric.values.forEach(value => {
+        counter.inc(value.countOrLabels, value.count);
+      });
+    }
+
+    for (const histMetric of report.metrics.histograms) {
+      const histogram = this.getHistogram({
+        name: histMetric.metric.name,
+        help: histMetric.metric.help,
+        labelNames: histMetric.metric.labelNames,
+        metricLabels: histMetric.metric.metricLabels,
+        receivedFromBrowser: true,
+      });
+
+      histMetric.values.forEach(value => {
+        histogram.observe(value.countOrLabels, value.count);
+      });
     }
   }
 

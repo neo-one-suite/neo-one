@@ -85,6 +85,15 @@ export type LogSingleOptions = {|
   },
 |};
 
+export type LoggerLogOptions = {|
+  name: string,
+  level: LogLevel,
+  message?: string,
+  labels?: Labels,
+  data?: Labels,
+  error?: ?Error,
+|};
+
 export type CaptureErrorOptions =
   | string
   | {|
@@ -134,6 +143,8 @@ export type MetricOptions = {|
   name: string,
   help?: string,
   labelNames?: Array<Label>,
+  metricLabels?: Labels,
+  receivedFromBrowser?: boolean,
 |};
 
 export opaque type Reference = any;
@@ -171,6 +182,11 @@ export type CaptureSpanLogOptions = {|
   error?: CaptureErrorOptions,
   references?: Array<Reference | void>,
   trace?: boolean, // Is this allowed to be a top level span?
+|};
+
+export type Report = {|
+  logs: Array<LoggerLogOptions>,
+  metrics: Object,
 |};
 
 export interface Counter {
@@ -367,6 +383,8 @@ export interface Monitor {
   // now() / 1000
   nowSeconds(): number;
   serveMetrics(port: number): void;
+  receive(report: Report): void;
+
   close(callback: () => void): void;
 }
 

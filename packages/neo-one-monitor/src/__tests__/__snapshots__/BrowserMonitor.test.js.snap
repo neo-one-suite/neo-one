@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BrowserMonitor Reporter - POST failure 1`] = `
+Array [
+  Array [
+    "fakeEnd",
+    Object {
+      "body": "{\\"logs\\":[{\\"name\\":\\"log1\\",\\"level\\":\\"info\\",\\"message\\":\\"test1\\",\\"labels\\":{\\"label1\\":10},\\"data\\":{\\"data1\\":\\"20\\"}}],\\"metrics\\":{\\"counters\\":[{\\"metric\\":{\\"name\\":\\"namespace1_counter1\\",\\"help\\":\\"helpCount\\",\\"labelNames\\":[\\"label1\\",\\"label2\\"],\\"labels\\":{},\\"metricLabels\\":{\\"countMetric1\\":7}},\\"values\\":[{\\"countOrLabels\\":5},{\\"countOrLabels\\":4}]}],\\"gauges\\":[],\\"histograms\\":[],\\"summaries\\":[]}}",
+      "method": "POST",
+    },
+  ],
+  Array [
+    "fakeEnd",
+    Object {
+      "body": "{\\"logs\\":[{\\"name\\":\\"log2\\",\\"level\\":\\"silly\\",\\"message\\":\\"test2\\",\\"labels\\":{\\"label2\\":30},\\"data\\":{\\"data1\\":\\"40\\"},\\"error\\":{}},{\\"name\\":\\"log1\\",\\"level\\":\\"info\\",\\"message\\":\\"test1\\",\\"labels\\":{\\"label1\\":10},\\"data\\":{\\"data1\\":\\"20\\"}}],\\"metrics\\":{\\"counters\\":[{\\"metric\\":{\\"name\\":\\"namespace1_counter1\\",\\"help\\":\\"helpCount\\",\\"labelNames\\":[\\"label1\\",\\"label2\\"],\\"labels\\":{},\\"metricLabels\\":{\\"countMetric1\\":7}},\\"values\\":[{\\"countOrLabels\\":5},{\\"countOrLabels\\":4}]}],\\"gauges\\":[],\\"histograms\\":[{\\"metric\\":{\\"name\\":\\"namespace1_histogram1\\",\\"help\\":\\"helpHist\\",\\"labelNames\\":[\\"histLabel1\\",\\"histLabel2\\"],\\"labels\\":{},\\"metricLabels\\":{\\"histMetric1\\":8}},\\"values\\":[{\\"countOrLabels\\":{\\"histLabel1\\":14},\\"count\\":3}]}],\\"summaries\\":[]}}",
+      "method": "POST",
+    },
+  ],
+]
+`;
+
+exports[`BrowserMonitor Reporter - POST success 1`] = `
+Array [
+  Array [
+    "fakeEnd",
+    Object {
+      "body": "{\\"logs\\":[{\\"name\\":\\"log1\\",\\"level\\":\\"info\\",\\"message\\":\\"test1\\",\\"labels\\":{\\"label1\\":10},\\"data\\":{\\"data1\\":\\"20\\"}}],\\"metrics\\":{\\"counters\\":[{\\"metric\\":{\\"name\\":\\"namespace1_counter1\\",\\"help\\":\\"helpCount\\",\\"labelNames\\":[\\"label1\\",\\"label2\\"],\\"labels\\":{},\\"metricLabels\\":{\\"countMetric1\\":7}},\\"values\\":[{\\"countOrLabels\\":5},{\\"countOrLabels\\":4}]}],\\"gauges\\":[],\\"histograms\\":[],\\"summaries\\":[]}}",
+      "method": "POST",
+    },
+  ],
+]
+`;
