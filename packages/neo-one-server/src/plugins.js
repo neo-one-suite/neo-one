@@ -2,6 +2,8 @@
 import type { Monitor } from '@neo-one/monitor';
 import type { Plugin } from '@neo-one/server-plugin';
 
+import { labels } from '@neo-one/utils';
+
 const DEFAULT_PLUGINS = [
   '@neo-one/server-plugin-network',
   '@neo-one/server-plugin-wallet',
@@ -22,9 +24,10 @@ const getPlugin = ({
     const PluginClass = module.default == null ? module : module.default;
     return new PluginClass({ monitor });
   } catch (error) {
-    monitor.withLabels({ 'plugin.name': pluginName }).logError({
-      name: 'load_plugin',
+    monitor.withLabels({ [labels.PLUGIN_NAME]: pluginName }).logError({
+      name: 'neo_load_plugin_error',
       message: `Failed to load plugin: ${pluginName}`,
+      labelNames: [labels.PLUGIN_NAME],
       error,
     });
     throw error;

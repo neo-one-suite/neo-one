@@ -64,6 +64,7 @@ export type LogOptions = {|
 
   help?: string, // Description of the event.
   metric?: LogMetricOptions,
+  labelNames?: Array<string>, // Labels to include on the metric
 
   error?: {
     error?: ?Error,
@@ -98,6 +99,7 @@ export type CaptureLogOptions = {|
 
   help?: string,
   metric?: LogMetricOptions,
+  labelNames?: Array<string>, // Labels to include on the metric
 
   error?: CaptureErrorOptions,
 |};
@@ -118,6 +120,7 @@ export type LogErrorOptions = {|
 
   help?: string,
   metric?: LogMetricOptions,
+  labelNames?: Array<string>, // Labels to include on the metric
 |};
 
 export type LogErrorSingleOptions = {|
@@ -140,6 +143,7 @@ export type SpanOptions = {|
   level?: LogLevelOption,
 
   help?: string,
+  labelNames?: Array<string>, // Labels to include on the metric
 
   references?: Array<Reference | void>,
 |};
@@ -149,6 +153,7 @@ export type CaptureSpanOptions = {|
   level?: LogLevelOption,
 
   help?: string,
+  labelNames?: Array<string>, // Labels to include on the metric
 
   references?: Array<Reference | void>,
 |};
@@ -159,6 +164,7 @@ export type CaptureSpanLogOptions = {|
   level?: LogLevelOption,
 
   help?: string,
+  labelNames?: Array<string>, // Labels to include on the metric
 
   error?: CaptureErrorOptions,
   references?: Array<Reference | void>,
@@ -189,6 +195,9 @@ export interface Summary {
 }
 
 export type KnownLabels = {|
+  SERVICE: 'service',
+  COMPONENT: 'component',
+
   // Database instance name. E.g. main
   DB_INSTANCE: 'db.instance',
   // Database statement. E.g. SELECT * FROM wuser table;
@@ -200,6 +209,12 @@ export type KnownLabels = {|
   DB_USER: 'db.user',
   // true if and only if the application considers the operation to have failed
   ERROR: 'error',
+  // Error code if available or constructor name
+  ERROR_KIND: 'error.kind',
+  // Actual Error object
+  ERROR_OBJECT: 'error.object',
+  // Error stack
+  ERROR_STACK: 'stack',
   // HTTP method of the request for the associated Span. E.g., "GET", "POST"
   HTTP_METHOD: 'http.method',
   // HTTP response status code for the associated Span. E.g., 200, 503, 404
@@ -240,6 +255,8 @@ export type KnownLabels = {|
   // The path of the request. Must be low cardinality. E.g. /account/:id
   // not /account/123
   HTTP_PATH: 'http.path',
+  // Full path of the request, high cardinality.
+  HTTP_FULLPATH: 'http.full_path',
   // The user agent for the request.
   HTTP_USER_AGENT: 'http.user_agent',
   // Request length
@@ -271,13 +288,11 @@ Do you want to log a message? monitor.log
 Do you want to add metadata to all subsequent monitoring? monitor.withLabels
 Do you want to time something? monitor.startSpan
 Did you enter a new component? monitor.at
-Did you enter a sub-component? monitor.sub
 */
 export interface Monitor {
   labels: KnownLabels;
   formats: Formats;
-  at(namespace: string): Monitor;
-  sub(namespace: string): Monitor;
+  at(component: string): Monitor;
   withLabels(labels: Labels): Monitor;
   withData(data: Labels): Monitor;
   forContext(ctx: Context): Monitor;

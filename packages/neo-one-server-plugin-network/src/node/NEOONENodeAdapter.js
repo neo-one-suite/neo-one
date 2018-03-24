@@ -288,7 +288,7 @@ export default class NEOONENodeAdapter extends NodeAdapter {
     settings: NodeSettings,
   |}) {
     super({
-      monitor: monitor.sub('neo_one_node_adapter'),
+      monitor: monitor.at('neo_one_node_adapter'),
       name,
       binary,
       dataPath,
@@ -359,11 +359,13 @@ export default class NEOONENodeAdapter extends NodeAdapter {
       return response.status === 200;
     } catch (error) {
       if (error.code !== 'ECONNREFUSED') {
-        this._monitor.withData({ 'rpc.path': rpcPath }).logError({
-          name: 'check_rpc_error',
-          message: 'Failed to check RPC.',
-          error,
-        });
+        this._monitor
+          .withData({ [this._monitor.labels.HTTP_PATH]: rpcPath })
+          .logError({
+            name: 'http_client_request',
+            message: 'Failed to check RPC.',
+            error,
+          });
       }
       return false;
     }

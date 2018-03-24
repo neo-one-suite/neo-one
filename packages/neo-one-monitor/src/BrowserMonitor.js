@@ -58,7 +58,7 @@ class BrowserMetricsFactory implements MetricsFactory {
 }
 
 type BrowserMonitorCreate = {|
-  namespace: string,
+  service: string,
   logger?: Logger,
   tracer?: Tracer,
   metricsLogLevel?: LogLevel,
@@ -67,7 +67,7 @@ type BrowserMonitorCreate = {|
 
 export default class BrowserMonitor extends MonitorBase {
   static create({
-    namespace,
+    service,
     logger,
     tracer,
     metricsLogLevel,
@@ -75,7 +75,8 @@ export default class BrowserMonitor extends MonitorBase {
   }: BrowserMonitorCreate): BrowserMonitor {
     const perf = performance;
     return new BrowserMonitor({
-      namespace,
+      service,
+      component: service,
       logger: logger || {
         log: () => {},
         close: (callback: () => void) => {

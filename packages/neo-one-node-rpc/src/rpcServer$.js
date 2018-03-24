@@ -3,6 +3,7 @@ import { type Blockchain, type Node } from '@neo-one/node-core';
 import Koa from 'koa';
 import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
+import Router from 'koa-router';
 
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { defer } from 'rxjs/observable/defer';
@@ -23,7 +24,6 @@ import {
   context,
   cors,
   liveHealthCheck,
-  logger,
   onError as appOnError,
   readyHealthCheck,
   rpc,
@@ -125,7 +125,7 @@ async function handleServer<
         })
         .withData({ host, port })
         .logSingle({
-          name: 'server_listening',
+          name: 'server_listen',
           message: `Server listening on ${host}:${port}`,
           level: 'verbose',
         });
@@ -157,7 +157,7 @@ export default ({
   environment: Environment,
   options$: Observable<Options>,
 |}): Observable<$FlowFixMe> => {
-  const monitor = monitorIn.at('neo_one_node_rpc');
+  const monitor = monitorIn.at('rpc');
   const app$ = combineLatest(
     options$.pipe(
       map(options => options.liveHealthCheck),
@@ -176,18 +176,33 @@ export default ({
 
       app.on('error', appOnError({ monitor }));
 
-      const middlewares = [
-        context({ monitor }),
-        liveHealthCheck({ blockchain, options: liveHealthCheckOptions }),
-        readyHealthCheck({ blockchain, options: readyHealthCheckOptions }),
-        logger,
-        cors,
-        rpc({ blockchain, node }),
-      ];
+      const router = new Router();
+      const liveMiddleware = liveHealthCheck({
+        blockchain,
+        options: liveHealthCheckOptions,
+      });
+      const readyMiddleware = readyHealthCheck({
+        blockchain,
+        options: readyHealthCheckOptions,
+      });
+      const rpcMiddleware = rpc({ blockchain, node });
+      router
+        .use(context({ monitor }))
+        .get(
+          liveMiddleware.name,
+          liveMiddleware.path,
+          liveMiddleware.middleware,
+        )
+        .get(
+          readyMiddleware.name,
+          readyMiddleware.path,
+          readyMiddleware.middleware,
+        )
+        .use(cors)
+        .post(rpcMiddleware.name, rpcMiddleware.path, rpcMiddleware.middleware);
 
-      for (const middleware of middlewares) {
-        app.use(middleware.middleware);
-      }
+      app.use(router.routes());
+      app.use(router.allowedMethods());
 
       return app;
     }),

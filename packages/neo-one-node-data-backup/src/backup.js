@@ -16,11 +16,11 @@ export default async ({
   environment: Environment,
   options: Options,
 |}) => {
-  const monitor = monitorIn.at('data_backup');
+  const monitor = monitorIn.at('node_data_backup');
   const provider = getProvider({ environment, options });
   if (provider == null) {
     monitor.log({
-      name: 'skip_no_provider',
+      name: 'backup_skip_no_provider',
       message: 'Skipping backup due to no provider',
     });
     return;
@@ -36,7 +36,7 @@ export default async ({
       await fs.remove(environment.tmpPath);
     },
     {
-      name: 'backup',
+      name: 'backup_execute',
       help: 'Duration taken for backup',
     },
   );

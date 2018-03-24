@@ -1,6 +1,7 @@
 /* @flow */
 import type { Plugin } from '@neo-one/server-plugin';
 
+import { labels } from '@neo-one/utils';
 import ora from 'ora';
 
 import createCRUD from './createCRUD';
@@ -24,11 +25,13 @@ export default ({ cli, plugin }: {| cli: InteractiveCLI, plugin: Plugin |}) => {
         }
       } catch (error) {
         ora(error.message).fail();
-        cli.monitor.withLabels({ 'command.name': command._name }).logError({
-          name: 'command',
-          error,
-          message: `Command ${command._name} failed.`,
-        });
+        cli.monitor
+          .withLabels({ [labels.COMMAND_NAME]: command._name })
+          .logError({
+            name: 'neo_command_error',
+            error,
+            message: `Command ${command._name} failed.`,
+          });
       }
     });
 

@@ -26,7 +26,7 @@ import PluginManager from './PluginManager';
 import PortAllocator from './PortAllocator';
 import { ServerRunningError } from './errors';
 
-import { context, logger, services as servicesMiddleware } from './middleware';
+import { context, services as servicesMiddleware } from './middleware';
 import pkg from '../package.json';
 
 export const VERSION = pkg.version;
@@ -56,7 +56,7 @@ export default class Server {
     dataPath: string,
     pluginManager: PluginManager,
   |}) {
-    this._monitor = monitor.at('neo_one_server');
+    this._monitor = monitor.at('server');
     this.serverConfig = serverConfig;
     this.dataPath = dataPath;
     this.pluginManager = pluginManager;
@@ -150,7 +150,7 @@ export default class Server {
             } else {
               await prevApp.close().catch(error => {
                 this._monitor.logError({
-                  name: 'app_close',
+                  name: 'grpc_app_close_error',
                   help: 'App close failures.',
                   message: 'Failed to close previous app',
                   error,
@@ -166,23 +166,21 @@ export default class Server {
                 ctx.state != null &&
                 ctx.state.monitor != null
               ) {
-                // eslint-disable-next-line
-                monitor = ctx.state.monitor;
+                ({ monitor } = ctx.state);
               }
               monitor.logError({
-                name: 'app',
-                help: 'Uncaught koa errors',
-                message: 'Uncaught koa error.',
+                name: 'grpc_server_request_uncaught_error',
+                help: 'Uncaught grpc errors',
+                message: 'Uncaught grpc error.',
                 error,
               });
             });
             app.use(context({ monitor: this._monitor }));
-            app.use(logger);
             app.use(servicesMiddleware({ server: this }));
             this._serverDebug.port = serverConfig.port;
             app.start(`0.0.0.0:${serverConfig.port}`);
             this._monitor.logSingle({
-              name: 'server',
+              name: 'server_listen',
               message: 'Server started.',
               level: 'info',
             });

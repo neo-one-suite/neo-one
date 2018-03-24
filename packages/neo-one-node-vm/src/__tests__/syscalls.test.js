@@ -58,8 +58,7 @@ import { executeScript } from '../execute';
 import { keys, testUtils, transactions } from '../__data__';
 
 const monitor = DefaultMonitor.create({
-  namespace: 'test',
-  logger: { log: () => {}, close: () => {} },
+  service: 'test',
 });
 
 const triggerType = TRIGGER_TYPE.APPLICATION;

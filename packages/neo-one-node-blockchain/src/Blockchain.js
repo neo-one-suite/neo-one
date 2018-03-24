@@ -37,7 +37,7 @@ import { Subject } from 'rxjs/Subject';
 
 import _ from 'lodash';
 import { filter, map, toArray } from 'rxjs/operators';
-import { utils as commonUtils } from '@neo-one/utils';
+import { labels, utils as commonUtils } from '@neo-one/utils';
 
 import {
   GenesisBlockNotRegisteredError,
@@ -74,7 +74,7 @@ type Vote = {|
   count: BN,
 |};
 
-const NAMESPACE = 'neo_one_node_blockchain';
+const NAMESPACE = 'blockchain';
 
 export default class Blockchain {
   _monitor: Monitor;
@@ -134,17 +134,17 @@ export default class Blockchain {
     this._settings$ = new BehaviorSubject(options.settings);
     this._monitor = options.monitor.at(NAMESPACE);
     this._blockIndexGauge = this._monitor.getGauge({
-      name: 'block_index',
+      name: 'blockchain_block_index',
       help: 'The current block index',
     });
     this._blockIndexGauge.set(this.currentBlockIndex);
     this._persistingBlockIndexGauge = this._monitor.getGauge({
-      name: 'persisting_block_index',
+      name: 'blockchain_persisting_block_index',
       help: 'The current in progress persist index',
     });
     this._persistingBlockIndexGauge.set(this.currentBlockIndex);
     this._persistBlockLatencyHistogram = this._monitor.getHistogram({
-      name: 'persist_block_latency_seconds',
+      name: 'blockchain_persist_block_latency_seconds',
       help: 'The latency from block timestamp to persist',
     });
 
@@ -440,12 +440,12 @@ export default class Blockchain {
         const entryNonNull = entry;
         // eslint-disable-next-line
         await (entry.monitor: Monitor)
-          .withData({ 'block.index': entry.block.index })
+          .withData({ [labels.NEO_BLOCK_INDEX]: entry.block.index })
           .captureSpanLog(
             span =>
               this._persistBlock(span, entryNonNull.block, entryNonNull.unsafe),
             {
-              name: 'persist_block_top_level',
+              name: 'neo_persist_block_top_level',
               level: { log: 'verbose', metric: 'info', span: 'info' },
             },
           );
@@ -561,63 +561,58 @@ export default class Blockchain {
     claims: Array<Input>,
     monitor?: Monitor,
   ): Promise<BN> =>
-    this._getMonitor(monitor).captureSpan(
-      span =>
-        (async () => {
-          const spentCoins = await Promise.all(
-            claims.map(claim => this._tryGetSpentCoin(claim)),
-          );
-          const filteredSpentCoins = spentCoins.filter(Boolean);
-          if (spentCoins.length !== filteredSpentCoins.length) {
-            // TODO: Better error
-            throw new Error('Not all coins were spent');
-          }
+    this._getMonitor(monitor).captureSpanLog(
+      async () => {
+        const spentCoins = await Promise.all(
+          claims.map(claim => this._tryGetSpentCoin(claim)),
+        );
+        const filteredSpentCoins = spentCoins.filter(Boolean);
+        if (spentCoins.length !== filteredSpentCoins.length) {
+          // TODO: Better error
+          throw new Error('Not all coins were spent');
+        }
 
-          if (filteredSpentCoins.some(coin => coin.claimed)) {
-            // TODO: Better error
-            throw new Error('Coin was already claimed');
-          }
+        if (filteredSpentCoins.some(coin => coin.claimed)) {
+          // TODO: Better error
+          throw new Error('Coin was already claimed');
+        }
 
-          if (
-            filteredSpentCoins.some(
-              coin =>
-                !common.uInt256Equal(
-                  coin.output.asset,
-                  this.settings.governingToken.hash,
-                ),
-            )
-          ) {
-            // TODO: Better error
-            throw new Error('Invalid claim');
-          }
+        if (
+          filteredSpentCoins.some(
+            coin =>
+              !common.uInt256Equal(
+                coin.output.asset,
+                this.settings.governingToken.hash,
+              ),
+          )
+        ) {
+          // TODO: Better error
+          throw new Error('Invalid claim');
+        }
 
-          return utils.calculateClaimAmount({
-            coins: filteredSpentCoins.map(coin => ({
-              value: coin.output.value,
-              startHeight: coin.startHeight,
-              endHeight: coin.endHeight,
-            })),
-            decrementInterval: this.settings.decrementInterval,
-            generationAmount: this.settings.generationAmount,
-            getSystemFee: async index => {
-              const header = await this._storage.header.get({
-                hashOrIndex: index,
-              });
-              const blockSystemFee = await this._storage.blockSystemFee.get({
-                hash: header.hash,
-              });
-              return blockSystemFee.systemFee;
-            },
-          });
-        })().catch(error => {
-          span.logError({
-            name: 'calculate_claim_amount',
-            message: 'Failed to calculate claim amount.',
-            error,
-          });
-          throw error;
-        }),
-      { name: 'calculate_claim_amount' },
+        return utils.calculateClaimAmount({
+          coins: filteredSpentCoins.map(coin => ({
+            value: coin.output.value,
+            startHeight: coin.startHeight,
+            endHeight: coin.endHeight,
+          })),
+          decrementInterval: this.settings.decrementInterval,
+          generationAmount: this.settings.generationAmount,
+          getSystemFee: async index => {
+            const header = await this._storage.header.get({
+              hashOrIndex: index,
+            });
+            const blockSystemFee = await this._storage.blockSystemFee.get({
+              hash: header.hash,
+            });
+            return blockSystemFee.systemFee;
+          },
+        });
+      },
+      {
+        name: 'neo_calculate_claim_amount',
+        level: { log: 'verbose', metric: 'info', span: 'info' },
+      },
     );
 
   _isSpent = async (input: OutputKey): Promise<boolean> => {
@@ -659,17 +654,12 @@ export default class Blockchain {
     transactions: Array<Transaction>,
     monitor?: Monitor,
   ): Promise<Array<ECPoint>> =>
-    this._getMonitor(monitor).captureSpan(
-      span =>
-        getValidators(this, transactions).catch(error => {
-          span.logError({
-            name: 'get_validators',
-            message: 'Failed to calculate validators',
-            error,
-          });
-          throw error;
-        }),
-      { name: 'get_validators' },
+    this._getMonitor(monitor).captureSpanLog(
+      () => getValidators(this, transactions),
+      {
+        name: 'get_validators',
+        level: { log: 'verbose', metric: 'info', span: 'info' },
+      },
     );
 
   _getVotes = async (

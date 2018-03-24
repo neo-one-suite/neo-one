@@ -20,7 +20,7 @@ import _ from 'lodash';
 import { filter, map, shareReplay, switchMap, take } from 'rxjs/operators';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import fs from 'fs-extra';
-import { utils } from '@neo-one/utils';
+import { labels, utils } from '@neo-one/utils';
 import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
 import type PluginManager from './PluginManager';
@@ -95,9 +95,9 @@ export default class ResourcesManager<
     masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>,
     portAllocator: PortAllocator,
   |}) {
-    this._monitor = monitor.sub('resources_manager').withLabels({
-      'plugin.name': resourceType.plugin.name,
-      'resource_type.name': resourceType.name,
+    this._monitor = monitor.at('resources_manager').withLabels({
+      [labels.PLUGIN_NAME]: resourceType.plugin.name,
+      [labels.RESOURCETYPE_NAME]: resourceType.name,
     });
     this._dataPath = dataPath;
     this._pluginManager = pluginManager;
@@ -188,9 +188,10 @@ export default class ResourcesManager<
         return results.filter(Boolean);
       },
       {
-        name: 'init',
+        name: 'resource_manager_inititalize',
         message: 'Initializing resource manager.',
         error: 'Failed to initialize resource manager.',
+        labelNames: [labels.PLUGIN_NAME, labels.RESOURCETYPE_NAME],
       },
     );
   }
@@ -227,11 +228,12 @@ export default class ResourcesManager<
         );
       },
       {
-        name: 'destroy',
+        name: 'resource_manager_destroy',
         help: 'Total count of destroy attempts',
         message: `Destroyed resource manager for ${this._plugin.name} ${
           this.resourceType.name
         }`,
+        labelNames: [labels.PLUGIN_NAME, labels.RESOURCETYPE_NAME],
       },
     );
   }

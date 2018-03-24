@@ -38,7 +38,7 @@
     "@neo-one/monitor": "^1.0.0-alpha.7",
     "@neo-one/node-core": "^1.0.0-alpha.17",
     "@neo-one/utils": "^1.0.0-alpha.12",
-    "bitwise": "^1.4.0",
+    "bitwise": "^1.4.1",
     "bn.js": "^4.11.8",
     "ix": "^2.3.5",
     "lodash": "^4.17.5",

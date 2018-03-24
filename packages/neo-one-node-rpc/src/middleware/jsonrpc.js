@@ -96,8 +96,9 @@ export default (handlers: Handlers): Middleware => {
         };
       },
       {
-        name: 'http_jsonrpc_single_request',
+        name: 'http_jsonrpc_server_single_request',
         level: { log: 'verbose', metric: 'info', span: 'info' },
+        labelNames: [monitor.labels.RPC_METHOD],
       },
     );
 
@@ -122,11 +123,8 @@ export default (handlers: Handlers): Middleware => {
       const result = await monitor.captureSpanLog(
         span => handleRequest(span, ctx, request),
         {
-          name: 'http_jsonrpc_request',
+          name: 'http_jsonrpc_server_request',
           level: { log: 'verbose', metric: 'info', span: 'info' },
-          references: [
-            monitor.childOf(monitor.extract(monitor.formats.HTTP, ctx.headers)),
-          ],
         },
       );
       return result;
@@ -156,11 +154,6 @@ export default (handlers: Handlers): Middleware => {
     compress(),
     bodyParser(),
     async (ctx: Context): Promise<void> => {
-      if (ctx.method !== 'POST') {
-        ctx.set('Allow', 'POST');
-        return ctx.throw(405);
-      }
-
       if (!ctx.is('application/json')) {
         return ctx.throw(415);
       }
@@ -168,10 +161,7 @@ export default (handlers: Handlers): Middleware => {
       const { fields } = ctx.request;
       const monitor = getMonitor(ctx);
       const result = await handleRequestSafe(
-        monitor.withLabels({
-          [monitor.labels.HTTP_PATH]: '/rpc',
-          [monitor.labels.RPC_TYPE]: 'jsonrpc',
-        }),
+        monitor.withLabels({ [monitor.labels.RPC_TYPE]: 'jsonrpc' }),
         ctx,
         fields,
       );

@@ -15,6 +15,7 @@ import { common, crypto } from '@neo-one/client-core';
 import { createEndpoint } from '@neo-one/node-core';
 import { createReadClient } from '@neo-one/client';
 import { concatMap, shareReplay, switchMap } from 'rxjs/operators';
+import { labels } from '@neo-one/utils';
 import { timer } from 'rxjs/observable/timer';
 import fs from 'fs-extra';
 import path from 'path';
@@ -560,11 +561,11 @@ export default class NetworkResourceAdapter {
       await fs.writeFile(nodeOptionsPath, JSON.stringify(nodeOptions));
     } catch (error) {
       options.resourceType.plugin.monitor
-        .withLabels({
-          'node.name': nodeOptions.name,
+        .withData({
+          [labels.NODE_NAME]: nodeOptions.name,
         })
         .logError({
-          name: 'write_node_options',
+          name: 'network_resource_adapter_write_node_options_error',
           message: 'Failed to persist node options',
           error,
         });
@@ -582,10 +583,10 @@ export default class NetworkResourceAdapter {
     } catch (error) {
       resourceType.plugin.monitor
         .withData({
-          'node.options_path': nodeOptionsPath,
+          [labels.NODE_OPTIONSPATH]: nodeOptionsPath,
         })
         .logError({
-          name: 'read_node_options',
+          name: 'network_resource_adapter_read_node_options_error',
           message: 'Failed to read node options.',
           error,
         });

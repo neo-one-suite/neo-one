@@ -3,6 +3,7 @@ import DataLoader from 'dataloader';
 import type { Monitor } from '@neo-one/monitor';
 
 import fetch from 'isomorphic-fetch';
+import { labels } from '@neo-one/utils';
 import stringify from 'fast-stable-stringify';
 
 import { HTTPError, InvalidRPCResponseError, JSONRPCError } from './errors';
@@ -34,7 +35,7 @@ const instrumentFetch = (
     .withLabels({
       [monitor.labels.HTTP_URL]: endpoint,
       [monitor.labels.HTTP_METHOD]: 'POST',
-      'fetch.type': type,
+      [labels.JSONRPC_TYPE]: type,
     })
     .captureSpanLog(
       async span => {
@@ -49,11 +50,12 @@ const instrumentFetch = (
         }
       },
       {
-        name: 'fetch',
+        name: 'http_client_request',
         level: { log: 'verbose', metric: 'info', span: 'info' },
         references: (monitors || [])
           .slice(1)
           .map(parent => monitor.childOf(parent)),
+        labelNames: [monitor.labels.RPC_TYPE, labels.JSONRPC_TYPE],
       },
     );
 };
@@ -210,14 +212,14 @@ export default class JSONRPCHTTPProvider implements JSONRPCProvider {
   request(req: JSONRPCRequest, monitor?: Monitor): Promise<any> {
     if (monitor != null) {
       return monitor
-        .at('neo_one_json_rpc_http_provider')
+        .at('jsonrpc_http_provider')
         .withLabels({
           [monitor.labels.RPC_TYPE]: 'jsonrpc',
           [monitor.labels.RPC_METHOD]: req.method,
           [monitor.labels.SPAN_KIND]: 'client',
         })
         .captureSpanLog(span => this._request(req, span), {
-          name: 'request',
+          name: 'jsonrpc_client_request',
           level: { log: 'verbose', metric: 'info', span: 'info' },
           error: { level: 'verbose' },
         });

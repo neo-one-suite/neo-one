@@ -141,7 +141,7 @@ export default class LocalKeyStore {
           invocation: witness.invocation.toString('hex'),
         };
       },
-      'sign',
+      'neo_sign',
       monitor,
     );
   }
@@ -190,12 +190,12 @@ export default class LocalKeyStore {
         }
         await this._capture(
           innerSpan => this._store.saveWallet(newWallet, innerSpan),
-          'save_wallet',
+          'neo_save_wallet',
           span,
         );
         this._updateWallet(newWallet);
       },
-      'update_account_name',
+      'neo_update_account_name',
       monitor,
     );
   }
@@ -285,7 +285,7 @@ export default class LocalKeyStore {
 
         await this._capture(
           innerSpan => this._store.saveWallet(wallet, innerSpan),
-          'save_wallet',
+          'neo_save_wallet',
           span,
         );
         this._updateWallet(unlockedWallet);
@@ -296,7 +296,7 @@ export default class LocalKeyStore {
 
         return unlockedWallet;
       },
-      'add_account',
+      'neo_add_account',
       monitor,
     );
   }
@@ -322,7 +322,7 @@ export default class LocalKeyStore {
 
         await this._capture(
           innerSpan => this._store.deleteWallet(wallet, innerSpan),
-          'delete_wallet',
+          'neo_delete_wallet',
           span,
         );
         this._wallets$.next({
@@ -338,7 +338,7 @@ export default class LocalKeyStore {
           this._newCurrentAccount();
         }
       },
-      'delete_account',
+      'neo_delete_account',
       monitor,
     );
   }
@@ -379,7 +379,7 @@ export default class LocalKeyStore {
           nep2: wallet.nep2,
         });
       },
-      'unlock_wallet',
+      'neo_unlock_wallet',
       monitor,
     );
   }

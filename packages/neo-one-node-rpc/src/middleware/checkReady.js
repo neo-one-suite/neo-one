@@ -55,10 +55,11 @@ const fetchCount = async (
         return null;
       },
       {
-        name: 'check_ready_request',
+        name: 'rpc_check_ready_client_request',
         help:
           'Requests the current block count from the endpoint to verify the node is not behind.',
         level: { log: 'debug', metric: 'verbose', span: 'debug' },
+        labelNames: [monitor.labels.HTTP_STATUS_CODE],
       },
     );
 

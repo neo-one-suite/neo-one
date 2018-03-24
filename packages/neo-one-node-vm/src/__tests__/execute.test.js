@@ -24,8 +24,7 @@ import execute from '../execute';
 import { createBlockchain, testUtils, transactions } from '../__data__';
 
 const monitor = DefaultMonitor.create({
-  namespace: 'test',
-  logger: { log: () => {}, close: () => {} },
+  service: 'test',
 });
 
 const executeSimple = ({

@@ -17,6 +17,8 @@ import {
 } from '@neo-one/client-core';
 import type { Monitor } from '@neo-one/monitor';
 
+import { labels } from '@neo-one/utils';
+
 import {
   type ExecutionContext,
   type ExecutionInit,
@@ -121,13 +123,14 @@ const executeNext = async ({
   let result;
   try {
     result = await monitor
-      .withLabels({ 'op.code': op.name })
+      .withLabels({ [labels.OP_CODE]: op.name })
       .captureSpanLog(
         span => op.invoke({ monitor: span, context, args, argsAlt }),
         {
-          name: 'execute_op',
+          name: 'neo_execute_op',
           level: { log: 'debug', metric: 'verbose', span: 'debug' },
           error: { level: 'debug' },
+          labelNames: [labels.OP_CODE],
         },
       );
   } catch (error) {
@@ -252,7 +255,7 @@ export const executeScript = async ({
   };
 
   return monitor.captureSpanLog(span => run({ monitor: span, context }), {
-    name: 'execute_script',
+    name: 'neo_execute_script',
     level: { log: 'debug', metric: 'verbose', span: 'debug' },
     error: { level: 'debug' },
   });
@@ -281,7 +284,7 @@ export default async ({
   skipWitnessVerify?: boolean,
   persistingBlock?: Block,
 |}): Promise<ExecuteScriptsResult> => {
-  const monitor = monitorIn.at('neo_one_node_vm');
+  const monitor = monitorIn.at('vm');
   const init = {
     scriptContainer,
     triggerType,
@@ -296,7 +299,7 @@ export default async ({
   let gas = startingGas;
   let errorMessage;
   const span = monitor.startSpan({
-    name: 'execute_scripts',
+    name: 'neo_execute_scripts',
     level: { log: 'debug', metric: 'verbose', span: 'debug' },
   });
   let err;

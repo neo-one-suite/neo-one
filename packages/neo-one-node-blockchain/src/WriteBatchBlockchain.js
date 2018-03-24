@@ -409,7 +409,7 @@ export default class WriteBatchBlockchain {
   }
 
   async persistBlock(monitorIn: Monitor, block: Block): Promise<void> {
-    const monitor = monitorIn.sub('write').withData({
+    const monitor = monitorIn.at('write_blockchain').withData({
       'block.index': block.index,
     });
     const [systemFee] = await monitor.captureSpan(

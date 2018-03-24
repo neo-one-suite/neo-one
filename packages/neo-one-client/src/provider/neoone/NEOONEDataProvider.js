@@ -119,7 +119,7 @@ export default class NEOONEDataProvider
           ),
         };
       },
-      'get_unclaimed',
+      'neo_get_unclaimed',
       monitor,
     );
   }
@@ -152,7 +152,7 @@ export default class NEOONEDataProvider
 
         return outputs.filter(Boolean);
       },
-      'get_unspent',
+      'neo_get_unspent',
       monitor,
     );
   }

@@ -44,7 +44,7 @@ export default class GCloudProvider extends Provider {
   }
 
   async restore(monitorIn: Monitor): Promise<void> {
-    const monitor = monitorIn.withLabels({ provider: 'gcloud_provider' });
+    const monitor = monitorIn.at('gcloud_provider');
     const { projectID, bucket, file, writeBytesPerSecond } = this._options;
     const { dataPath, tmpPath } = this._environment;
     const downloadPath = path.resolve(tmpPath, 'storage.db.tar.gz');
@@ -77,7 +77,7 @@ export default class GCloudProvider extends Provider {
   }
 
   async backup(monitorIn: Monitor): Promise<void> {
-    const monitor = monitorIn.withLabels({ provider: 'gcloud_provider' });
+    const monitor = monitorIn.at('gcloud_provider');
     const { projectID, bucket, file } = this._options;
     const { dataPath } = this._environment;
 

@@ -2,10 +2,8 @@
 import type { Blockchain } from '@neo-one/node-core';
 import type { Context } from 'koa';
 
-import mount from 'koa-mount';
-
 import checkReady, { type Options as CheckReadyOptions } from './checkReady';
-import { getMonitor, simpleMiddleware } from './common';
+import { getMonitor } from './common';
 
 export type Options = CheckReadyOptions;
 
@@ -17,12 +15,13 @@ export default ({
   options: Options,
 |}) => {
   let lastBlockIndex;
-  return simpleMiddleware(
-    'liveHealthCheck',
-    mount('/live_health_check', async (ctx: Context) => {
+  return {
+    name: 'liveHealthCheck',
+    path: '/live_health_check',
+    middleware: async (ctx: Context) => {
       const monitor = getMonitor(ctx);
       const counter = monitor.getCounter({
-        name: 'live_health_check',
+        name: 'rpc_live_health_check',
         labelNames: [monitor.labels.ERROR],
       });
       const ready = await checkReady({ monitor, blockchain, options });
@@ -39,6 +38,6 @@ export default ({
         ctx.status = 500;
         counter.inc({ [monitor.labels.ERROR]: true });
       }
-    }),
-  );
+    },
+  };
 };

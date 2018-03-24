@@ -17,21 +17,21 @@ export default async ({
   environment: Environment,
   options: Options,
 |}) => {
-  const monitor = monitorIn.at('data_restore');
+  const monitor = monitorIn.at('node_data_restore');
   const { dataPath, tmpPath, readyPath } = environment;
   try {
     // eslint-disable-next-line
     await fs.access(readyPath, fs.constants.R_OK | fs.constants.W_OK);
     monitor.log({
-      name: 'skip_exists',
+      name: 'restore_skip_exists',
       message: 'Skipping restore beause it already exists',
     });
     return;
   } catch (error) {
     if (error.code !== 'ENOENT') {
       monitor.logError({
-        name: 'skip_exists',
-        message: 'Encountered error checing for existing restore.',
+        name: 'restore_skip_exists',
+        message: 'Encountered error checking for existing restore.',
         error,
       });
       throw error;
@@ -41,7 +41,7 @@ export default async ({
   const provider = getProvider({ environment, options });
   if (provider == null) {
     monitor.log({
-      name: 'skip_no_provider',
+      name: 'restore_skip_no_provider',
       message: 'Skipping restore due to no provider',
     });
     return;
@@ -63,7 +63,7 @@ export default async ({
       await fs.writeFile(readyPath, 'ready');
     },
     {
-      name: 'restore',
+      name: 'restore_execute',
       help: 'Duration taken for restore',
     },
   );

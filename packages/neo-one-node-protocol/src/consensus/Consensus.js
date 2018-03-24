@@ -63,7 +63,7 @@ export default class Consensus {
     this._options$ = options$;
     this._node = node;
     this._consensusContext = new ConsensusContext();
-    this._monitor = monitor.at('neo_one_node_consensus');
+    this._monitor = monitor.at('node_consensus');
   }
 
   start$(): Observable<void> {

@@ -68,7 +68,7 @@ export default class PluginManager {
     portAllocator: PortAllocator,
     dataPath: string,
   |}) {
-    this._monitor = monitor.sub('plugin_manager');
+    this._monitor = monitor.at('plugin_manager');
     this._binary = binary;
     this._portAllocator = portAllocator;
     this._dataPath = dataPath;

@@ -12,7 +12,7 @@ import { defer } from 'rxjs/observable/defer';
 import { concatMap, map, shareReplay } from 'rxjs/operators';
 import { of as _of } from 'rxjs/observable/of';
 import { timer } from 'rxjs/observable/timer';
-import { utils } from '@neo-one/utils';
+import { labels, utils } from '@neo-one/utils';
 
 import type { NodeSettings } from '../types';
 
@@ -101,22 +101,22 @@ export default class NodeAdapter {
 
   async create(): Promise<void> {
     await this._monitor
-      .withData({ 'node.name': this.name })
+      .withData({ [labels.NODE_NAME]: this.name })
       .captureLog(() => this._create(), {
-        name: 'create',
+        name: 'node_adapter_create',
         message: `Created node ${this.name}`,
         error: `Failed to create node ${this.name}`,
       });
   }
 
   async update(settings: NodeSettings): Promise<void> {
-    this._monitor.withData({ 'node.name': this.name }).captureLog(
+    this._monitor.withData({ [labels.NODE_NAME]: this.name }).captureLog(
       async () => {
         await this._update(settings);
         this._settings = settings;
       },
       {
-        name: 'update',
+        name: 'node_adapter_update',
         message: `Updated node ${this.name}`,
         error: `Failed to update node ${this.name}`,
       },
@@ -124,12 +124,12 @@ export default class NodeAdapter {
   }
 
   async start(): Promise<void> {
-    this._monitor.withData({ 'node.name': this.name }).captureLog(
+    this._monitor.withData({ [labels.NODE_NAME]: this.name }).captureLog(
       async () => {
         await this._start();
       },
       {
-        name: 'start',
+        name: 'node_adapter_start',
         message: `Started node ${this.name}`,
         error: `Failed to start node ${this.name}`,
       },
@@ -137,12 +137,12 @@ export default class NodeAdapter {
   }
 
   async stop(): Promise<void> {
-    this._monitor.withData({ 'node.name': this.name }).captureLog(
+    this._monitor.withData({ [labels.NODE_NAME]: this.name }).captureLog(
       async () => {
         await this._stop();
       },
       {
-        name: 'stop',
+        name: 'node_adapter_stop',
         message: `Stopped node ${this.name}`,
         error: `Failed to stop node ${this.name}`,
       },

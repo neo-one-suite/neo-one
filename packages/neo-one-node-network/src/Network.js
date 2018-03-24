@@ -138,7 +138,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
 
   constructor(options: NetworkOptions<Message, PeerData, PeerHealth>) {
     const { environment, options$ } = options;
-    this._monitor = options.monitor.at('neo_one_node_network');
+    this._monitor = options.monitor.at('node_network');
     this._started = false;
     this._stopped = false;
 
@@ -151,12 +151,12 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
 
     this._connectedPeers = {};
     this._connectedPeersGauge = this._monitor.getGauge({
-      name: 'connected_peers_total',
+      name: 'network_connected_peers_total',
       help: 'Total number of currently connected peers',
     });
     this._connectingPeers = {};
     this._connectingPeersGauge = this._monitor.getGauge({
-      name: 'connecting_peers_total',
+      name: 'network_connecting_peers_total',
       help: 'Total number of connecting peers',
     });
     this._unconnectedPeers = new Set();
@@ -341,7 +341,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
     this._tcpServer = tcpServer;
     tcpServer.on('error', error => {
       this._monitor.logError({
-        name: 'tcp_server',
+        name: 'tcp_server_uncaught_error',
         message: 'TCP peer server encountered an error.',
         help: 'Uncaught TCP errors',
         error,
@@ -362,14 +362,14 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
         port: listenTCP.port,
       })
       .logSingle({
-        name: 'tcp_server',
+        name: 'tcp_server_listen',
         message: `Listening on ${host}:${listenTCP.port}.`,
       });
   }
 
   async _run(): Promise<void> {
     this._monitor.logSingle({
-      name: 'connect_loop',
+      name: 'network_connect_loop_start',
       message: 'Starting connect loop...',
     });
     while (!this._stopped) {
@@ -385,14 +385,14 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
         });
       } catch (error) {
         this._monitor.logError({
-          name: 'connect_loop',
+          name: 'network_connect_loop_error',
           message: 'Connect loop encountered an error',
           error,
         });
       }
     }
     this._monitor.logSingle({
-      name: 'connect_loop',
+      name: 'network_connect_loop_stop',
       message: 'Stopped connect loop.',
     });
   }
@@ -439,7 +439,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
             [this._monitor.labels.PEER_ADDRESS]: peer.endpoint,
           })
           .log({
-            name: 'unhealthy_peer',
+            name: 'network_unhealthy_peer',
             message: `Peer at ${peer.endpoint} is unhealthy.`,
             level: 'verbose',
           });
@@ -506,7 +506,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
             }
           },
           {
-            name: 'peer_connect',
+            name: 'network_peer_connect',
             message: `Connecting to peer at ${endpoint}`,
             level: 'verbose',
             error: `Failed to connect to peer at ${endpoint}.`,
@@ -588,7 +588,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
         [this._monitor.labels.PEER_ADDRESS]: peer.endpoint,
       })
       .logError({
-        name: 'peer',
+        name: 'network_peer_error',
         help: 'Total number of unexpected peer errors',
         message: `Encountered error with peer at ${peer.endpoint}.`,
         error,
@@ -612,7 +612,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
         [this._monitor.labels.PEER_ADDRESS]: peer.endpoint,
       })
       .log({
-        name: 'peer_closed',
+        name: 'network_peer_closed',
         help:
           'Total number of times a peer was closed due to error or ending the socket.',
         message: `Peer closed at ${peer.endpoint}`,

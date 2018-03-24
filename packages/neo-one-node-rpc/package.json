@@ -46,7 +46,7 @@
     "koa-connect": "^2.0.1",
     "koa-convert": "^1.2.0",
     "koa-cors": "^0.0.16",
-    "koa-mount": "^3.0.0",
+    "koa-router": "^7.4.0",
     "lodash": "^4.17.5",
     "node-fetch": "^2.1.1",
     "rxjs": "^5.5.7"

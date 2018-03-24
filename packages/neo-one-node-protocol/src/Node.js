@@ -41,7 +41,12 @@ import { defer } from 'rxjs/observable/defer';
 import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
 import { empty } from 'rxjs/observable/empty';
 import { merge } from 'rxjs/observable/merge';
-import { finalize, neverComplete, utils as commonUtils } from '@neo-one/utils';
+import {
+  finalize,
+  labels,
+  neverComplete,
+  utils as commonUtils,
+} from '@neo-one/utils';
 import { timer } from 'rxjs/observable/timer';
 
 import { COMMAND } from './Command';
@@ -160,7 +165,7 @@ export default class Node implements INode {
     options$: Observable<Options>,
   |}) {
     this.blockchain = blockchain;
-    this._monitor = monitor.at('neo_one_node_protocol');
+    this._monitor = monitor.at('node_protocol');
     this._network = new Network({
       monitor,
       environment: environment.network,
@@ -185,7 +190,7 @@ export default class Node implements INode {
     this._options$ = options$;
 
     this._memPoolGauge = this._monitor.getGauge({
-      name: 'mempool_size',
+      name: 'protocol_mempool_size',
       help: 'Current size of the mempool',
     });
 
@@ -267,14 +272,19 @@ export default class Node implements INode {
 
       try {
         await this._monitor
-          .withData({ hash: transaction.hashHex })
+          .withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex })
           .captureSpanLog(
             async span => {
-              const foundTransaction = await this.blockchain.transaction.tryGet(
-                {
+              let foundTransaction;
+              try {
+                foundTransaction = await this.blockchain.transaction.tryGet({
                   hash: transaction.hash,
-                },
-              );
+                });
+              } finally {
+                span.setLabels({
+                  [labels.NEO_TRANSACTION_FOUND]: foundTransaction != null,
+                });
+              }
               if (foundTransaction == null) {
                 await this.blockchain.verifyTransaction({
                   monitor: span,
@@ -293,8 +303,9 @@ export default class Node implements INode {
               this._knownTransactionHashes.add(transaction.hash);
             },
             {
-              name: 'relay_transaction',
+              name: 'neo_relay_transaction',
               level: { log: 'verbose', metric: 'info', span: 'info' },
+              labelNames: [labels.NEO_TRANSACTION_FOUND],
             },
           );
       } catch (error) {
@@ -309,9 +320,9 @@ export default class Node implements INode {
 
   async relayBlock(block: Block, monitor?: Monitor): Promise<void> {
     await (monitor || this._monitor)
-      .withData({ 'block.index': block.index })
+      .withData({ [labels.NEO_BLOCK_INDEX]: block.index })
       .captureSpanLog(span => this._persistBlock(span, block), {
-        name: 'relay_block',
+        name: 'neo_relay_block',
         help: 'Time taken to persist and relay a block.',
         level: { log: 'verbose', metric: 'info', span: 'info' },
       });
@@ -613,7 +624,7 @@ export default class Node implements INode {
       this._monitor
         .withData({ [this._monitor.labels.HTTP_URL]: rpcURL })
         .logError({
-          name: 'fetch_endpoints_rpc',
+          name: 'node_fetch_endpoints_error',
           message: `Failed to fetch endpoints from ${rpcURL}`,
           error,
         });
@@ -728,7 +739,7 @@ export default class Node implements INode {
           }
         },
         {
-          name: 'message_received',
+          name: 'node_message_received',
           level: { log: 'debug', metric: 'verbose' },
           message: `Received ${message.value.command} from ${peer.endpoint}`,
           error: `Failed to process message ${message.value.command} from ${

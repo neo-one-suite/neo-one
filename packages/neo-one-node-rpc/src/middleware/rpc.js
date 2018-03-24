@@ -18,10 +18,8 @@ import {
 import { utils } from '@neo-one/utils';
 
 import { filter, map, take, timeout, toArray } from 'rxjs/operators';
-import mount from 'koa-mount';
 
 import jsonrpc, { JSONRPCError } from './jsonrpc';
-import { simpleMiddleware } from './common';
 
 const getTransactionReceipt = (value: Block, hash: string) => {
   const transactionIndex = value.transactions
@@ -405,5 +403,9 @@ export default ({
     },
   };
 
-  return simpleMiddleware('rpc', mount('/rpc', jsonrpc(handlers)));
+  return {
+    name: 'rpc',
+    path: '/rpc',
+    middleware: jsonrpc(handlers),
+  };
 };

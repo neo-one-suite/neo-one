@@ -1,6 +1,8 @@
 /* @flow */
 import type { Context } from 'koa';
 
+import _ from 'lodash';
+
 import type {
   Carrier,
   CaptureLogOptions,
@@ -80,6 +82,7 @@ type SpanData = {|
   histogram?: {|
     name: string,
     help?: string,
+    labelNames?: Array<string>,
   |},
   time: number,
   span?: TracerSpan,
@@ -98,7 +101,8 @@ export interface MetricsFactory {
 }
 
 type MonitorBaseOptions = {|
-  namespace: string,
+  service: string,
+  component: string,
   labels?: RawLabels,
   data?: RawLabels,
   logger: Logger,
@@ -116,11 +120,18 @@ const histograms: { [name: string]: Histogram } = {};
 const summaries: { [name: string]: Summary } = {};
 
 const KNOWN_LABELS = {
+  // These are added automatically
+  SERVICE: 'service',
+  COMPONENT: 'component',
+
   DB_INSTANCE: 'db.instance',
   DB_STATEMENT: 'db.statement',
   DB_TYPE: 'db.type',
   DB_USER: 'db.user',
   ERROR: 'error',
+  ERROR_KIND: 'error.kind',
+  ERROR_OBJECT: 'error.object',
+  ERROR_STACK: 'stack',
   HTTP_METHOD: 'http.method',
   HTTP_STATUS_CODE: 'http.status_code',
   HTTP_URL: 'http.url',
@@ -136,6 +147,7 @@ const KNOWN_LABELS = {
 
   DB_STATEMENT_SUMMARY: 'db.statement.summary',
   HTTP_PATH: 'http.path',
+  HTTP_FULLPATH: 'http.full_path',
   HTTP_USER_AGENT: 'http.user_agent',
   HTTP_REQUEST_SIZE: 'http.request.size',
   HTTP_HEADERS: 'http.headers',
@@ -196,7 +208,6 @@ class DefaultReference {
   _type: ReferenceType;
   _span: SpanContext | MonitorBase;
 
-  // eslint-disable-next-line
   constructor(span: SpanContext | MonitorBase) {
     this._span = span;
   }
@@ -242,6 +253,7 @@ type CommonLogOptions = {|
 
   help?: string,
   metric?: LogMetricOptions,
+  labelNames?: Array<string>,
 
   labels?: Labels,
   data?: Labels,
@@ -256,7 +268,8 @@ type CommonLogOptions = {|
 export default class MonitorBase implements Span {
   labels = KNOWN_LABELS;
   formats = FORMATS;
-  _namespace: string;
+  _service: string;
+  _component: string;
   _labels: RawLabels;
   _data: RawLabels;
   _logger: Logger;
@@ -268,7 +281,8 @@ export default class MonitorBase implements Span {
   _metricsFactory: MetricsFactory;
 
   constructor({
-    namespace,
+    service,
+    component,
     labels,
     data,
     logger,
@@ -279,7 +293,8 @@ export default class MonitorBase implements Span {
     span,
     metricsFactory,
   }: MonitorBaseOptions) {
-    this._namespace = namespace;
+    this._service = service;
+    this._component = component;
     this._labels = labels || {};
     this._data = data || {};
     this._logger = logger;
@@ -296,12 +311,8 @@ export default class MonitorBase implements Span {
     return this.now() / 1000;
   }
 
-  at(namespace: string): Monitor {
-    return this._clone({ namespace });
-  }
-
-  sub(namespace: string): Monitor {
-    return this._clone({ namespace: `${this._namespace}_${namespace}` });
+  at(component: string): Monitor {
+    return this._clone({ component });
   }
 
   withLabels(labels: RawLabels): Monitor {
@@ -322,7 +333,15 @@ export default class MonitorBase implements Span {
     return this;
   }
 
-  log({ name, message, level, help, metric, error }: LogOptions): void {
+  log({
+    name,
+    message,
+    level,
+    help,
+    metric,
+    labelNames,
+    error,
+  }: LogOptions): void {
     this._commonLog({
       name,
       message,
@@ -335,6 +354,7 @@ export default class MonitorBase implements Span {
               suffix: 'total',
             }
           : metric,
+      labelNames,
       error,
     });
   }
@@ -358,6 +378,7 @@ export default class MonitorBase implements Span {
         level: options.level,
         help: options.help,
         metric: options.metric,
+        labelNames: options.labelNames,
         error:
           errorObjFinal == null
             ? undefined
@@ -452,6 +473,7 @@ export default class MonitorBase implements Span {
     level,
     help,
     metric,
+    labelNames,
     error,
   }: LogErrorOptions): void {
     let errorLevel = level;
@@ -472,6 +494,7 @@ export default class MonitorBase implements Span {
               suffix: 'total',
             }
           : metric,
+      labelNames,
       error: { error, message, level: errorLevel },
     });
   }
@@ -492,7 +515,7 @@ export default class MonitorBase implements Span {
   }
 
   getCounter(options: MetricOptions): Counter {
-    const name = this._getName(options.name);
+    const { name } = options;
     if (counters[name] == null) {
       counters[name] = this._metricsFactory.createCounter(
         this._getMetricConstruct(options),
@@ -503,7 +526,7 @@ export default class MonitorBase implements Span {
   }
 
   getGauge(options: MetricOptions): Gauge {
-    const name = this._getName(options.name);
+    const { name } = options;
     if (gauges[name] == null) {
       gauges[name] = this._metricsFactory.createGauge(
         this._getMetricConstruct(options),
@@ -514,7 +537,7 @@ export default class MonitorBase implements Span {
   }
 
   getHistogram(options: MetricOptions): Histogram {
-    const name = this._getName(options.name);
+    const { name } = options;
     if (histograms[name] == null) {
       histograms[name] = this._metricsFactory.createHistogram(
         this._getMetricConstruct(options),
@@ -525,7 +548,7 @@ export default class MonitorBase implements Span {
   }
 
   getSummary(options: MetricOptions): Summary {
-    const name = this._getName(options.name);
+    const { name } = options;
     if (summaries[name] == null) {
       summaries[name] = this._metricsFactory.createSummary(
         this._getMetricConstruct(options),
@@ -539,6 +562,7 @@ export default class MonitorBase implements Span {
     name,
     level,
     help,
+    labelNames,
     references: referenceIn,
   }: SpanOptions): MonitorBase {
     let span;
@@ -567,11 +591,12 @@ export default class MonitorBase implements Span {
 
       span = this._tracer.startSpan(name, {
         references,
-        tags: {
-          ...convertTagLabels(spanLabels),
-          ...convertTagLabels(spanData),
-          component: this._namespace,
-        },
+        tags: convertTagLabels({
+          ...spanLabels,
+          ...spanData,
+          [this.labels.SERVICE]: this._service,
+          [this.labels.COMPONENT]: this._component,
+        }),
       });
     }
 
@@ -580,7 +605,7 @@ export default class MonitorBase implements Span {
       LOG_LEVEL_TO_LEVEL[fullLevel.metric] <=
       LOG_LEVEL_TO_LEVEL[this._metricsLogLevel]
     ) {
-      histogram = { name: `${name}_duration_seconds`, help };
+      histogram = { name: `${name}_duration_seconds`, help, labelNames };
     }
 
     return this._clone({
@@ -600,7 +625,7 @@ export default class MonitorBase implements Span {
       this.getHistogram({
         name: histogram.name,
         help: histogram.help,
-        labelNames: [this.labels.ERROR],
+        labelNames: (histogram.labelNames || []).concat([this.labels.ERROR]),
       }).observe({ [convertMetricLabel(this.labels.ERROR)]: !!error }, value);
     }
 
@@ -619,6 +644,7 @@ export default class MonitorBase implements Span {
       name: options.name,
       level: options.level,
       help: options.help,
+      labelNames: options.labelNames,
       references: options.references,
     });
     try {
@@ -664,6 +690,7 @@ export default class MonitorBase implements Span {
         name: options.name,
         level: options.level,
         help: options.help,
+        labelNames: options.labelNames,
         references: options.references,
       },
     );
@@ -737,6 +764,7 @@ export default class MonitorBase implements Span {
     level,
     help,
     metric,
+    labelNames: labelNamesIn,
 
     error,
   }: CommonLogOptions): void {
@@ -748,6 +776,7 @@ export default class MonitorBase implements Span {
     if (error != null) {
       labels = { ...labels };
       labels[KNOWN_LABELS.ERROR] = error.error != null;
+      labels[KNOWN_LABELS.ERROR_KIND] = this._getErrorKind(error.error);
       const errorLevel = error.level == null ? 'error' : error.level;
       metricLevel = Math.min(metricLevel, LOG_LEVEL_TO_LEVEL[errorLevel]);
       const { error: errorObj } = error;
@@ -768,11 +797,12 @@ export default class MonitorBase implements Span {
       metric != null
     ) {
       const metricName = `${name}_${metric.suffix}`;
+      const labelNames = (labelNamesIn || []).concat(Object.keys(labels));
       if (metric.type === 'counter') {
         this.getCounter({
           name: metricName,
           help,
-          labelNames: Object.keys(labels),
+          labelNames,
         }).inc(labels);
       } else {
         const value = metric.value == null ? 1 : metric.value;
@@ -780,19 +810,19 @@ export default class MonitorBase implements Span {
           this.getGauge({
             name: metricName,
             help,
-            labelNames: Object.keys(labels),
+            labelNames,
           }).set(labels, value);
         } else if (metric.type === 'histogram') {
           this.getHistogram({
             name: metricName,
             help,
-            labelNames: Object.keys(labels),
+            labelNames,
           }).observe(labels, value);
         } else {
           this.getSummary({
             name: metricName,
             help,
-            labelNames: Object.keys(labels),
+            labelNames,
           }).observe(labels, value);
         }
       }
@@ -800,7 +830,7 @@ export default class MonitorBase implements Span {
 
     // Gather up all information for logging
     this._logger.log({
-      name: this._getName(name),
+      name,
       level: logLevel,
       message,
       labels: convertTagLabels(this._getAllRawLabels(labels)),
@@ -817,17 +847,13 @@ export default class MonitorBase implements Span {
       const spanLog = ({
         event: name,
         message,
-        labels: convertTagLabels(labels),
+        ...convertTagLabels(labels),
       }: Object);
       if (error != null) {
         const { error: errorObj } = error;
         if (errorObj != null) {
-          spanLog['error.kind'] =
-            (errorObj: $FlowFixMe).code == null
-              ? errorObj.constructor.name
-              : (errorObj: $FlowFixMe).code;
-          spanLog['error.object'] = errorObj;
-          spanLog.stack = errorObj.stack;
+          spanLog[this.labels.ERROR_OBJECT] = errorObj;
+          spanLog[this.labels.ERROR_STACK] = errorObj.stack;
         }
       }
       // Only log information from the current point in time
@@ -835,25 +861,34 @@ export default class MonitorBase implements Span {
     }
   }
 
+  _getErrorKind(error?: ?Error): string {
+    if (error == null) {
+      return 'n/a';
+    }
+
+    return (error: $FlowFixMe).code == null
+      ? error.constructor.name
+      : (error: $FlowFixMe).code;
+  }
+
   _getMetricConstruct({
     name,
     help,
-    labelNames,
+    labelNames: labelNamesIn,
   }: MetricOptions): MetricConstruct {
+    const labelNames = (labelNamesIn || []).concat([
+      this.labels.SERVICE,
+      this.labels.COMPONENT,
+    ]);
+    const labelNamesSet = new Set(labelNames);
     return {
-      name: this._getName(name),
+      name,
       help,
-      labelNames: this._getLabelNames(labelNames),
-      labels: this._labels,
+      labelNames,
+      labels: _.pickBy(this._labels, (value, key: string) =>
+        labelNamesSet.has(key),
+      ),
     };
-  }
-
-  _getName(name: string): string {
-    return `${this._namespace}_${name}`;
-  }
-
-  _getLabelNames(labelNames?: Array<string>): Array<string> {
-    return Object.keys(this._labels).concat(labelNames || []);
   }
 
   _getAllRawLabels(labels?: RawLabels): RawLabels {
@@ -861,7 +896,12 @@ export default class MonitorBase implements Span {
       return this._labels;
     }
 
-    return { ...this._labels, ...labels };
+    return {
+      ...this._labels,
+      ...labels,
+      [this.labels.SERVICE]: this._service,
+      [this.labels.COMPONENT]: this._component,
+    };
   }
 
   _getAllRawData(labels?: RawLabels): RawLabels {
@@ -907,12 +947,12 @@ export default class MonitorBase implements Span {
   }
 
   _clone(options?: {|
-    namespace?: string,
+    component?: string,
     mergeLabels?: Labels,
     mergeData?: Labels,
     span?: SpanData,
   |}) {
-    const { namespace, mergeLabels, mergeData, span } = options || {};
+    const { component, mergeLabels, mergeData, span } = options || {};
     let mergedLabels = this._labels;
     if (mergeLabels != null) {
       mergedLabels = { ...this._labels, ...mergeLabels };
@@ -924,7 +964,8 @@ export default class MonitorBase implements Span {
     }
 
     return new this.constructor({
-      namespace: namespace == null ? this._namespace : namespace,
+      service: this._service,
+      component: component == null ? this._component : component,
       logger: this._logger,
       tracer: this._tracer,
       now: this.now,

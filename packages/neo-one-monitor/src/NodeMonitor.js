@@ -113,7 +113,7 @@ class NodeMetricsFactory implements MetricsFactory {
 }
 
 type NodeMonitorCreate = {|
-  namespace: string,
+  service: string,
   logger?: Logger,
   tracer?: Tracer,
   metricsLogLevel?: LogLevel,
@@ -124,7 +124,7 @@ export default class NodeMonitor extends MonitorBase {
   _server: ?net$Server = null;
 
   static create({
-    namespace,
+    service,
     logger,
     tracer,
     metricsLogLevel,
@@ -133,7 +133,8 @@ export default class NodeMonitor extends MonitorBase {
     prom.collectDefaultMetrics({ timeout: 4000 });
     gcStats(prom.register)();
     return new NodeMonitor({
-      namespace,
+      service,
+      component: service,
       logger: logger || {
         log: () => {},
         close: (callback: () => void) => {
@@ -153,10 +154,12 @@ export default class NodeMonitor extends MonitorBase {
       [this.labels.HTTP_METHOD]: ctx.request.method,
       [this.labels.SPAN_KIND]: 'server',
       [this.labels.HTTP_REQUEST_PROTOCOL]: ctx.request.protocol,
+      [this.labels.HTTP_PATH]:
+        ctx._matchedRoute == null ? 'unmatched' : ctx._matchedRoute,
     }).withData({
       [this.labels.HTTP_HEADERS]: JSON.stringify(ctx.request.headers),
       [this.labels.HTTP_URL]: ctx.request.originalUrl,
-      [this.labels.HTTP_PATH]: ctx.request.path,
+      [this.labels.HTTP_FULLPATH]: ctx.request.path,
       [this.labels.HTTP_REQUEST_QUERY]: ctx.request.querystring,
       [this.labels.PEER_ADDRESS]: ctx.request.ip,
       [this.labels.PEER_PORT]: ctx.request.socket.remotePort,
@@ -182,7 +185,7 @@ export default class NodeMonitor extends MonitorBase {
     const monitor = this.at('telemetry');
     app.on('error', error => {
       monitor.logError({
-        name: 'uncaught_request',
+        name: 'http_server_request_uncaught_error',
         message: 'Unexpected uncaught request error.',
         error,
       });

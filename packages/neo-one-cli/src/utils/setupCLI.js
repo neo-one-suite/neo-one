@@ -51,7 +51,7 @@ export default ({
       shutdownInitiated = true;
       monitor
         .captureLogSingle(initiateShutdown, {
-          name: 'shutdown',
+          name: 'cli_shutdown',
           message: 'Shutdown cleanly.',
           error: 'Failed to shutdown cleanly',
         })

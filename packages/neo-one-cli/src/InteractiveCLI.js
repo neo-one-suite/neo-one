@@ -298,7 +298,7 @@ export default class InteractiveCLI {
     const subscription = start$.subscribe({
       error: error => {
         monitor.logErrorSingle({
-          name: 'uncaught_cli',
+          name: 'cli_uncaught_error',
           message: 'Something went wrong. Shutting down.',
           error,
         });
@@ -311,7 +311,7 @@ export default class InteractiveCLI {
         const message =
           'Something went wrong: CLI unexpectedly exited. Shutting down.';
         monitor.logSingle({
-          name: 'uncaught_cli_complete',
+          name: 'cli_uncaught_complete',
           message,
           level: 'error',
         });

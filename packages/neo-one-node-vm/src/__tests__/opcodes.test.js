@@ -1237,8 +1237,7 @@ const OPCODES = ([
   ]): Array<TestCase>);
 
 const monitor = DefaultMonitor.create({
-  namespace: 'test',
-  logger: { log: () => {}, close: () => {} },
+  service: 'test',
 });
 
 describe('opcodes', () => {

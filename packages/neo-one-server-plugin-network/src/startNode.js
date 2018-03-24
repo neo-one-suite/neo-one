@@ -60,7 +60,7 @@ export default ({
         dumpChainFile,
         onError: error => {
           monitor.logError({
-            name: 'uncaught_node_error',
+            name: 'node_uncaught_error',
             help: 'Uncaught node errors',
             message: 'Uncaught node error, shutting down.',
             error,

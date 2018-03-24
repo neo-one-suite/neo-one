@@ -41,7 +41,7 @@ export default ({
     console.error(error);
   });
   const monitor = DefaultMonitor.create({
-    namespace: 'cli',
+    service: 'cli',
     logger: {
       log: (logMessage: LoggerLogOptions) => {
         const { error, ...rest } = logMessage;
@@ -112,7 +112,7 @@ export default ({
         })
         .catch(error => {
           monitor.logError({
-            name: 'log_create_dir',
+            name: 'log_create_directory_error',
             message: 'Failed to create log directory',
             error,
           });

@@ -77,7 +77,7 @@ export default class PortAllocator {
     portMax: number,
     config: Config<PortAllocatorConfig>,
   |}) {
-    this._monitor = monitor;
+    this._monitor = monitor.at('port_allocator');
 
     let maxPort = -1;
     const filteredPorts = {};
@@ -228,9 +228,8 @@ export default class PortAllocator {
       await this._config.update({ config: { ports: this._ports } });
     } catch (error) {
       this._monitor.logError({
-        name: 'persist',
-        help: 'Total count of persist errors',
-        message: 'Failed to persist ports',
+        name: 'neo_update_config_error',
+        message: 'Failed to update config',
         error,
       });
     }

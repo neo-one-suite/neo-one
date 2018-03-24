@@ -21,7 +21,7 @@ export default (args: CLIArgs) => {
       }).subscribe({
         error: error => {
           monitor.logErrorSingle({
-            name: 'uncaught_server',
+            name: 'server_uncaught_error',
             message: 'Uncaught server error. Shutting down.',
             error,
           });
@@ -29,7 +29,7 @@ export default (args: CLIArgs) => {
         },
         complete: () => {
           monitor.logSingle({
-            name: 'unexpected_server_complete',
+            name: 'server_uncaught_complete',
             message: 'Something went wrong. Shutting down.',
             level: 'error',
           });

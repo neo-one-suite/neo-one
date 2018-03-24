@@ -26,7 +26,7 @@ import { concatMap, map, shareReplay, take } from 'rxjs/operators';
 import fs from 'fs-extra';
 import path from 'path';
 import { timer } from 'rxjs/observable/timer';
-import { utils } from '@neo-one/utils';
+import { labels, utils } from '@neo-one/utils';
 
 import { NetworkRequiredError } from './errors';
 import type { ReadWalletClient, WalletClient } from './types';
@@ -359,9 +359,9 @@ export default class WalletResource {
         this._gasBalance = gasBalance;
       } catch (error) {
         this._resourceType.plugin.monitor
-          .withData({ address: this._address })
+          .withData({ [labels.NEO_ADDRESS]: this._address })
           .logError({
-            name: 'wallet_resource_update_wallet',
+            name: 'neo_wallet_resource_update_wallet',
             message: `Failed to update wallet ${this._address}`,
             error,
           });

@@ -27,7 +27,7 @@ import type { Labels, Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 
 import _ from 'lodash';
-import { utils as commonUtils } from '@neo-one/utils';
+import { labels as labelNames, utils as commonUtils } from '@neo-one/utils';
 
 import type {
   AddressString,
@@ -225,7 +225,7 @@ export default class LocalUserAccountProvider<
         });
       },
       {
-        name: 'transfer',
+        name: 'neo_transfer',
       },
       monitor,
     );
@@ -278,7 +278,7 @@ export default class LocalUserAccountProvider<
         });
       },
       {
-        name: 'claim',
+        name: 'neo_claim',
       },
       monitor,
     );
@@ -455,7 +455,7 @@ export default class LocalUserAccountProvider<
         });
       },
       {
-        name: 'issue',
+        name: 'neo_issue',
       },
       monitor,
     );
@@ -522,7 +522,7 @@ export default class LocalUserAccountProvider<
       ].filter(Boolean),
       method: 'invoke',
       labels: {
-        'invoke.method': method,
+        [labelNames.INVOKE_METHOD]: method,
       },
     });
   }
@@ -568,9 +568,9 @@ export default class LocalUserAccountProvider<
         );
       },
       {
-        name: 'call',
+        name: 'neo_call',
         labels: {
-          'call.method': method,
+          [labelNames.CALL_METHOD]: method,
         },
       },
       monitor,
@@ -734,10 +734,10 @@ export default class LocalUserAccountProvider<
         });
       },
       {
-        name: 'invoke_raw',
+        name: 'neo_invoke_raw',
         labels: {
           ...(labels || {}),
-          'invoke_raw.method': method,
+          [labelNames.INVOKE_RAW_METHOD]: method,
         },
       },
       monitor,
@@ -818,7 +818,7 @@ export default class LocalUserAccountProvider<
         };
       },
       {
-        name: 'send_transaction',
+        name: 'neo_send_transaction',
       },
       monitor,
     );
@@ -1123,7 +1123,7 @@ export default class LocalUserAccountProvider<
     func: (monitor?: Monitor) => Promise<T>,
     {
       name,
-      labels,
+      labels: labelsIn,
     }: {|
       name: string,
       labels?: Labels,
@@ -1134,12 +1134,14 @@ export default class LocalUserAccountProvider<
       return func();
     }
 
+    const labels = labelsIn || {};
     return monitor
-      .at('neo_one_local_user_account_provider')
-      .withLabels(labels || {})
+      .at('local_user_account_provider')
+      .withLabels(labels)
       .captureSpanLog(func, {
         name,
         level: { log: 'verbose', metric: 'info', span: 'info' },
+        labelNames: Object.keys(labels),
       });
   }
 }

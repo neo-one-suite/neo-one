@@ -60,9 +60,7 @@ export default class MegaProvider extends Provider {
   }
 
   async restore(monitorIn: Monitor): Promise<void> {
-    const monitor = monitorIn.withLabels({
-      provider: 'mega_provider',
-    });
+    const monitor = monitorIn.at('mega_provider');
     const { download } = this._options;
     if (download == null) {
       return;
@@ -127,9 +125,7 @@ export default class MegaProvider extends Provider {
   }
 
   async backup(monitorIn: Monitor): Promise<void> {
-    const monitor = monitorIn.withLabels({
-      provider: 'mega_provider',
-    });
+    const monitor = monitorIn.at('mega_provider');
     const { upload: uploadOptions } = this._options;
     if (uploadOptions == null) {
       return;
