@@ -154,8 +154,6 @@ export default class NodeMonitor extends MonitorBase {
       [this.labels.HTTP_METHOD]: ctx.request.method,
       [this.labels.SPAN_KIND]: 'server',
       [this.labels.HTTP_REQUEST_PROTOCOL]: ctx.request.protocol,
-      [this.labels.HTTP_PATH]:
-        ctx._matchedRoute == null ? 'unmatched' : ctx._matchedRoute,
     }).withData({
       [this.labels.HTTP_HEADERS]: JSON.stringify(ctx.request.headers),
       [this.labels.HTTP_URL]: ctx.request.originalUrl,

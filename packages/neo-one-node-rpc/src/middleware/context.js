@@ -14,7 +14,19 @@ export default ({ monitor }: {| monitor: Monitor |}) => async (
         ctx.state.monitor = span;
         await next();
       } finally {
-        span.setLabels({ [monitor.labels.HTTP_STATUS_CODE]: ctx.status });
+        span.setLabels({
+          [monitor.labels.HTTP_STATUS_CODE]: ctx.status,
+          [monitor.labels.HTTP_PATH]: 'unknown',
+        });
+        const { router, routerName } = ctx;
+        if (router != null && routerName != null) {
+          const layer = router.route(routerName);
+          if (layer) {
+            span.setLabels({
+              [monitor.labels.HTTP_PATH]: layer.path,
+            });
+          }
+        }
       }
     },
     {
