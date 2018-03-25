@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client",
-  "version": "1.0.0-alpha.30",
+  "version": "1.0.0-alpha.31",
   "keywords": [
     "neo",
     "NEO",
@@ -38,10 +38,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.17",
-    "@neo-one/monitor": "^1.0.0-alpha.8",
-    "@neo-one/node-neo-settings": "^1.0.0-alpha.17",
-    "@neo-one/utils": "^1.0.0-alpha.13",
+    "@neo-one/client-core": "^1.0.0-alpha.18",
+    "@neo-one/monitor": "^1.0.0-alpha.9",
+    "@neo-one/node-neo-settings": "^1.0.0-alpha.18",
+    "@neo-one/utils": "^1.0.0-alpha.14",
     "bignumber.js": "^6.0.0",
     "bn.js": "^4.11.8",
     "dataloader": "^1.4.0",
