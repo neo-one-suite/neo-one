@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/utils",
-  "version": "1.0.0-alpha.14",
+  "version": "1.0.0-alpha.15",
   "keywords": [
     "neo",
     "NEO",
@@ -34,7 +34,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0-alpha.9",
+    "@neo-one/monitor": "^1.0.0-alpha.10",
     "rxjs": "^5.5.7",
     "uuid": "^3.2.1"
   }
