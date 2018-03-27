@@ -54,13 +54,14 @@ export interface Logger {
 export interface TracerSpan {
   log(data: Object): void;
   setTag(name: string, value: string | number | boolean): void;
-  finish(): void;
+  finish(finishTime?: number): void;
   context(): SpanContext;
 }
 export type TracerReference = any;
 export type TracerStartSpanOptions = {|
   references?: Array<TracerReference>,
   tags?: Object,
+  startTime?: number,
 |};
 
 export interface Tracer {
@@ -208,7 +209,7 @@ class DefaultReference {
   _type: ReferenceType;
   _span: SpanContext | MonitorBase;
 
-  constructor(span: SpanContext | MonitorBase) {
+  constructor(span: SpanContext | $FlowFixMe) {
     this._span = span;
   }
 
@@ -576,6 +577,7 @@ export default class MonitorBase implements Span {
         return null;
       })
       .filter(Boolean);
+    const time = this.nowSeconds();
     const fullLevel = this._getFullLevel(level);
     if (
       LOG_LEVEL_TO_LEVEL[fullLevel.span] <=
@@ -597,6 +599,7 @@ export default class MonitorBase implements Span {
           [this.labels.SERVICE]: this._service,
           [this.labels.COMPONENT]: this._component,
         }),
+        startTime: time,
       });
     }
 
@@ -611,7 +614,7 @@ export default class MonitorBase implements Span {
     return this._clone({
       span: {
         histogram,
-        time: this.nowSeconds(),
+        time,
         span,
       },
     });
@@ -620,8 +623,9 @@ export default class MonitorBase implements Span {
   end(error?: boolean): void {
     const span = this.getSpan();
     const { histogram } = span;
+    const finishTime = this.nowSeconds();
     if (histogram != null) {
-      const value = this.nowSeconds() - span.time;
+      const value = finishTime - span.time;
       this.getHistogram({
         name: histogram.name,
         help: histogram.help,
@@ -632,7 +636,7 @@ export default class MonitorBase implements Span {
     const { span: tracerSpan } = span;
     if (tracerSpan != null) {
       tracerSpan.setTag(this.labels.ERROR, !!error);
-      tracerSpan.finish();
+      tracerSpan.finish(finishTime);
     }
   }
 
