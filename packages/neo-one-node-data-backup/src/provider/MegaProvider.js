@@ -105,7 +105,7 @@ export default class MegaProvider extends Provider {
           read.pipe(write);
         }),
       {
-        name: 'restore_download',
+        name: 'neo_restore_download',
         help: 'Restore from backup duration',
       },
     );
@@ -118,7 +118,7 @@ export default class MegaProvider extends Provider {
           writeBytesPerSecond,
         }),
       {
-        name: 'restore_extract',
+        name: 'neo_restore_extract',
         help: 'Extract backup duration',
       },
     );
@@ -155,7 +155,7 @@ export default class MegaProvider extends Provider {
         });
       },
       {
-        name: 'backup_push',
+        name: 'neo_backup_push',
         help: 'Push backup duration',
       },
     );

@@ -103,7 +103,7 @@ export default class NodeAdapter {
     await this._monitor
       .withData({ [labels.NODE_NAME]: this.name })
       .captureLog(() => this._create(), {
-        name: 'node_adapter_create',
+        name: 'neo_node_adapter_create',
         message: `Created node ${this.name}`,
         error: `Failed to create node ${this.name}`,
       });
@@ -116,7 +116,7 @@ export default class NodeAdapter {
         this._settings = settings;
       },
       {
-        name: 'node_adapter_update',
+        name: 'neo_node_adapter_update',
         message: `Updated node ${this.name}`,
         error: `Failed to update node ${this.name}`,
       },
@@ -129,7 +129,7 @@ export default class NodeAdapter {
         await this._start();
       },
       {
-        name: 'node_adapter_start',
+        name: 'neo_node_adapter_start',
         message: `Started node ${this.name}`,
         error: `Failed to start node ${this.name}`,
       },
@@ -142,7 +142,7 @@ export default class NodeAdapter {
         await this._stop();
       },
       {
-        name: 'node_adapter_stop',
+        name: 'neo_node_adapter_stop',
         message: `Stopped node ${this.name}`,
         error: `Failed to stop node ${this.name}`,
       },

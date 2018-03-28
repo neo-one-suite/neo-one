@@ -565,7 +565,7 @@ export default class NetworkResourceAdapter {
           [labels.NODE_NAME]: nodeOptions.name,
         })
         .logError({
-          name: 'network_resource_adapter_write_node_options_error',
+          name: 'neo_network_resource_adapter_write_node_options_error',
           message: 'Failed to persist node options',
           error,
         });
@@ -586,7 +586,7 @@ export default class NetworkResourceAdapter {
           [labels.NODE_OPTIONSPATH]: nodeOptionsPath,
         })
         .logError({
-          name: 'network_resource_adapter_read_node_options_error',
+          name: 'neo_network_resource_adapter_read_node_options_error',
           message: 'Failed to read node options.',
           error,
         });

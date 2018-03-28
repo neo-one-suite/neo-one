@@ -134,17 +134,17 @@ export default class Blockchain {
     this._settings$ = new BehaviorSubject(options.settings);
     this._monitor = options.monitor.at(NAMESPACE);
     this._blockIndexGauge = this._monitor.getGauge({
-      name: 'blockchain_block_index',
+      name: 'neo_blockchain_block_index',
       help: 'The current block index',
     });
     this._blockIndexGauge.set(this.currentBlockIndex);
     this._persistingBlockIndexGauge = this._monitor.getGauge({
-      name: 'blockchain_persisting_block_index',
+      name: 'neo_blockchain_persisting_block_index',
       help: 'The current in progress persist index',
     });
     this._persistingBlockIndexGauge.set(this.currentBlockIndex);
     this._persistBlockLatencyHistogram = this._monitor.getHistogram({
-      name: 'blockchain_persist_block_latency_seconds',
+      name: 'neo_blockchain_persist_block_latency_seconds',
       help: 'The latency from block timestamp to persist',
     });
 
@@ -329,7 +329,7 @@ export default class Blockchain {
             fees: this.settings.fees,
             registerValidatorFee: this.settings.registerValidatorFee,
           }),
-        { name: 'verify_block' },
+        { name: 'neo_blockchain_verify_block' },
       );
   }
 
@@ -348,7 +348,7 @@ export default class Blockchain {
               this._currentBlock == null ? 0 : this._currentBlock.index,
             currentBlockHash: this.currentBlock.hash,
           }),
-        { name: 'verify_consensus' },
+        { name: 'neo_blockchain_verify_consensus' },
       );
   }
 
@@ -382,7 +382,7 @@ export default class Blockchain {
             currentHeight: this.currentBlockIndex,
             memPool,
           }),
-        { name: 'verify_transaction' },
+        { name: 'neo_blockchain_verify_transaction' },
       );
   }
 
@@ -445,7 +445,7 @@ export default class Blockchain {
             span =>
               this._persistBlock(span, entryNonNull.block, entryNonNull.unsafe),
             {
-              name: 'neo_persist_block_top_level',
+              name: 'neo_blockchain_persist_block_top_level',
               level: { log: 'verbose', metric: 'info', span: 'info' },
             },
           );
@@ -509,7 +509,7 @@ export default class Blockchain {
 
     await monitor.captureSpan(
       () => this._storage.commit(blockchain.getChangeSet()),
-      { name: 'persist_block_commit_storage' },
+      { name: 'neo_blockchain_persist_block_commit_storage' },
     );
 
     this._currentBlock = block;
@@ -610,7 +610,7 @@ export default class Blockchain {
         });
       },
       {
-        name: 'neo_calculate_claim_amount',
+        name: 'neo_blockchain_calculate_claim_amount',
         level: { log: 'verbose', metric: 'info', span: 'info' },
       },
     );
@@ -657,7 +657,7 @@ export default class Blockchain {
     this._getMonitor(monitor).captureSpanLog(
       () => getValidators(this, transactions),
       {
-        name: 'get_validators',
+        name: 'neo_blockchain_get_validators',
         level: { log: 'verbose', metric: 'info', span: 'info' },
       },
     );

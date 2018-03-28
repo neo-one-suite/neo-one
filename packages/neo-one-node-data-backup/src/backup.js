@@ -20,7 +20,7 @@ export default async ({
   const provider = getProvider({ environment, options });
   if (provider == null) {
     monitor.log({
-      name: 'backup_skip_no_provider',
+      name: 'neo_backup_skip_no_provider',
       message: 'Skipping backup due to no provider',
     });
     return;
@@ -36,7 +36,7 @@ export default async ({
       await fs.remove(environment.tmpPath);
     },
     {
-      name: 'backup_execute',
+      name: 'neo_backup_execute',
       help: 'Duration taken for backup',
     },
   );

@@ -190,7 +190,7 @@ export default class Node implements INode {
     this._options$ = options$;
 
     this._memPoolGauge = this._monitor.getGauge({
-      name: 'protocol_mempool_size',
+      name: 'neo_protocol_mempool_size',
       help: 'Current size of the mempool',
     });
 
@@ -220,7 +220,7 @@ export default class Node implements INode {
     const network$ = defer(async () => {
       this._network.start();
       this._monitor.logSingle({
-        name: 'protocol',
+        name: 'neo_protocol_start',
         message: 'Protocol started.',
         level: 'verbose',
       });
@@ -229,7 +229,7 @@ export default class Node implements INode {
       finalize(() => {
         this._network.stop();
         this._monitor.logSingle({
-          name: 'protocol',
+          name: 'neo_protocol_stop',
           message: 'Protocol stopped.',
           level: 'verbose',
         });
@@ -624,7 +624,7 @@ export default class Node implements INode {
       this._monitor
         .withData({ [this._monitor.labels.HTTP_URL]: rpcURL })
         .logError({
-          name: 'node_fetch_endpoints_error',
+          name: 'neo_protocol_fetch_endpoints_error',
           message: `Failed to fetch endpoints from ${rpcURL}`,
           error,
         });
@@ -739,7 +739,7 @@ export default class Node implements INode {
           }
         },
         {
-          name: 'node_message_received',
+          name: 'neo_protocol_message_received',
           level: { log: 'debug', metric: 'verbose' },
           message: `Received ${message.value.command} from ${peer.endpoint}`,
           error: `Failed to process message ${message.value.command} from ${
@@ -1209,7 +1209,7 @@ export default class Node implements INode {
           this._memPoolGauge.set(Object.keys(this.memPool).length);
         },
         {
-          name: 'trim_mempool',
+          name: 'neo_protocol_trim_mempool',
         },
       );
     }

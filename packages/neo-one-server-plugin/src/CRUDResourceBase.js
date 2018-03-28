@@ -96,7 +96,7 @@ export default class CRUDResourceBase<
       return [...new Set(resources.concat(this.autocomplete))];
     } catch (error) {
       this.resourceType.plugin.monitor.logErrorSingle({
-        name: 'crud_get_cli_autocomplete_error',
+        name: 'neo_crud_get_cli_autocomplete_error',
         message: 'Failed to fetch cli autocomplete.',
         error,
       });

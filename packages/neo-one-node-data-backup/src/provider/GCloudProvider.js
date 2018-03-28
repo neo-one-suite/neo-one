@@ -57,7 +57,7 @@ export default class GCloudProvider extends Provider {
           .file(file)
           .download({ destination: downloadPath, validation: true }),
       {
-        name: 'restore_download',
+        name: 'neo_restore_download',
         help: 'Restore from backup duration',
       },
     );
@@ -70,7 +70,7 @@ export default class GCloudProvider extends Provider {
           writeBytesPerSecond,
         }),
       {
-        name: 'restore_extract',
+        name: 'neo_restore_extract',
         help: 'Extract backup duration',
       },
     );
@@ -93,7 +93,7 @@ export default class GCloudProvider extends Provider {
             .createWriteStream({ validation: true }),
         }),
       {
-        name: 'backup_push',
+        name: 'neo_backup_push',
         help: 'Push backup duration',
       },
     );

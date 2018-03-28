@@ -188,7 +188,7 @@ export default class ResourcesManager<
         return results.filter(Boolean);
       },
       {
-        name: 'resource_manager_inititalize',
+        name: 'neo_resource_manager_inititalize',
         message: 'Initializing resource manager.',
         error: 'Failed to initialize resource manager.',
         labelNames: [labels.PLUGIN_NAME, labels.RESOURCETYPE_NAME],
@@ -228,7 +228,7 @@ export default class ResourcesManager<
         );
       },
       {
-        name: 'resource_manager_destroy',
+        name: 'neo_resource_manager_destroy',
         help: 'Total count of destroy attempts',
         message: `Destroyed resource manager for ${this._plugin.name} ${
           this.resourceType.name

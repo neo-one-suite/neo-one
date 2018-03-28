@@ -23,14 +23,14 @@ export default async ({
     // eslint-disable-next-line
     await fs.access(readyPath, fs.constants.R_OK | fs.constants.W_OK);
     monitor.log({
-      name: 'restore_skip_exists',
+      name: 'neo_restore_skip_exists',
       message: 'Skipping restore beause it already exists',
     });
     return;
   } catch (error) {
     if (error.code !== 'ENOENT') {
       monitor.logError({
-        name: 'restore_skip_exists',
+        name: 'neo_restore_skip_exists',
         message: 'Encountered error checking for existing restore.',
         error,
       });
@@ -41,7 +41,7 @@ export default async ({
   const provider = getProvider({ environment, options });
   if (provider == null) {
     monitor.log({
-      name: 'restore_skip_no_provider',
+      name: 'neo_restore_skip_no_provider',
       message: 'Skipping restore due to no provider',
     });
     return;
@@ -63,7 +63,7 @@ export default async ({
       await fs.writeFile(readyPath, 'ready');
     },
     {
-      name: 'restore_execute',
+      name: 'neo_restore_execute',
       help: 'Duration taken for restore',
     },
   );

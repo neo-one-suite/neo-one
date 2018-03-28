@@ -18,97 +18,25 @@ import type {
 import MonitorBase, {
   type Logger,
   type MetricConstruct,
-  type MetricLabels,
   type MetricsFactory,
-  type RawLabels,
   type Tracer,
-  convertMetricLabel,
-  convertMetricLabels,
 } from './MonitorBase';
-
-class BaseMetric<TMetric: Object> {
-  static MetricClass: Class<TMetric>;
-  _metric: TMetric;
-  _labels: RawLabels;
-
-  constructor({ name, help, labelNames, labels }: MetricConstruct) {
-    this._metric = new this.constructor.MetricClass({
-      name,
-      help: help == null ? 'Placeholder' : help,
-      labelNames: (labelNames || []).map(labelName =>
-        convertMetricLabel(labelName),
-      ),
-    });
-    this._labels = labels;
-  }
-
-  _getArgs(
-    valueOrLabels?: RawLabels | number,
-    value?: number,
-  ): [MetricLabels, number | void] {
-    if (valueOrLabels == null || typeof valueOrLabels === 'number') {
-      return [convertMetricLabels(this._labels), valueOrLabels];
-    }
-
-    return [convertMetricLabels({ ...this._labels, ...valueOrLabels }), value];
-  }
-}
-
-class NodeCounter extends BaseMetric<prom.Counter> implements Counter {
-  static MetricClass = prom.Counter;
-
-  inc(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.inc(...this._getArgs(countOrLabels, count));
-  }
-}
-
-class NodeGauge extends BaseMetric<prom.Gauge> implements Gauge {
-  static MetricClass = prom.Gauge;
-
-  inc(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.inc(...this._getArgs(countOrLabels, count));
-  }
-
-  dec(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.dec(...this._getArgs(countOrLabels, count));
-  }
-
-  set(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.set(...this._getArgs(countOrLabels, count));
-  }
-}
-
-class NodeHistogram extends BaseMetric<prom.Histogram> implements Histogram {
-  static MetricClass = prom.Histogram;
-
-  observe(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.observe(...this._getArgs(countOrLabels, count));
-  }
-}
-
-class NodeSummary extends BaseMetric<prom.Summary> implements Summary {
-  static MetricClass = prom.Summary;
-
-  observe(countOrLabels?: number | RawLabels, count?: number): void {
-    this._metric.observe(...this._getArgs(countOrLabels, count));
-  }
-}
 
 class NodeMetricsFactory implements MetricsFactory {
   createCounter(options: MetricConstruct): Counter {
-    return new NodeCounter(options);
+    return new prom.Counter(options);
   }
 
   createGauge(options: MetricConstruct): Gauge {
-    return new NodeGauge(options);
+    return new prom.Gauge(options);
   }
 
   createHistogram(options: MetricConstruct): Histogram {
-    return new NodeHistogram(options);
+    return new prom.Histogram(options);
   }
 
   createSummary(options: MetricConstruct): Summary {
-    return new NodeSummary(options);
+    return new prom.Summary(options);
   }
 }
 

@@ -90,8 +90,9 @@ type SpanData = {|
 |};
 
 export type MetricConstruct = {|
-  ...MetricOptions,
-  labels: Labels,
+  name: string,
+  help: string,
+  labelNames: Array<string>,
 |};
 
 export interface MetricsFactory {
@@ -146,7 +147,7 @@ const KNOWN_LABELS = {
   SAMPLING_PRIORITY: 'sampling.priority',
   SPAN_KIND: 'span.kind',
 
-  DB_STATEMENT_SUMMARY: 'db.statement.summary',
+  DB_STATEMENT_SUMMARY: 'db.statement_summary',
   HTTP_PATH: 'http.path',
   HTTP_FULLPATH: 'http.full_path',
   HTTP_USER_AGENT: 'http.user_agent',
@@ -245,6 +246,57 @@ class ChildOfReference extends DefaultReference {
 
 class FollowsFromReference extends DefaultReference {
   _type = 'followsFrom';
+}
+
+class MetricWrapper {
+  _metric: Counter | Gauge | Histogram | Summary;
+  _labels: MetricLabels;
+
+  constructor({
+    metric,
+    labels,
+  }: {|
+    metric: Counter | Gauge | Histogram | Summary,
+    labels: RawLabels,
+  |}) {
+    this._metric = metric;
+    this._labels = convertMetricLabels(labels);
+  }
+
+  _getArgs(
+    valueOrLabels?: RawLabels | number,
+    value?: number,
+  ): [MetricLabels, number | void] {
+    if (valueOrLabels == null || typeof valueOrLabels === 'number') {
+      return [{ ...this._labels }, valueOrLabels];
+    }
+
+    return [{ ...this._labels, ...convertMetricLabels(valueOrLabels) }, value];
+  }
+
+  inc(countOrLabels?: number | RawLabels, count?: number): void {
+    ((this._metric: $FlowFixMe): Counter | Gauge).inc(
+      ...this._getArgs(countOrLabels, count),
+    );
+  }
+
+  dec(countOrLabels?: number | RawLabels, count?: number): void {
+    ((this._metric: $FlowFixMe): Gauge).dec(
+      ...this._getArgs(countOrLabels, count),
+    );
+  }
+
+  set(countOrLabels?: number | RawLabels, count?: number): void {
+    ((this._metric: $FlowFixMe): Gauge).set(
+      ...(this._getArgs(countOrLabels, count): $FlowFixMe),
+    );
+  }
+
+  observe(countOrLabels?: number | RawLabels, count?: number): void {
+    ((this._metric: $FlowFixMe): Histogram | Summary).observe(
+      ...(this._getArgs(countOrLabels, count): $FlowFixMe),
+    );
+  }
 }
 
 type CommonLogOptions = {|
@@ -523,7 +575,7 @@ export default class MonitorBase implements Span {
       );
     }
 
-    return counters[name];
+    return this._getMetricWrapper(counters[name], options);
   }
 
   getGauge(options: MetricOptions): Gauge {
@@ -534,7 +586,7 @@ export default class MonitorBase implements Span {
       );
     }
 
-    return gauges[name];
+    return this._getMetricWrapper(gauges[name], options);
   }
 
   getHistogram(options: MetricOptions): Histogram {
@@ -545,7 +597,7 @@ export default class MonitorBase implements Span {
       );
     }
 
-    return histograms[name];
+    return this._getMetricWrapper(histograms[name], options);
   }
 
   getSummary(options: MetricOptions): Summary {
@@ -556,7 +608,7 @@ export default class MonitorBase implements Span {
       );
     }
 
-    return summaries[name];
+    return this._getMetricWrapper(summaries[name], options);
   }
 
   startSpan({
@@ -877,22 +929,33 @@ export default class MonitorBase implements Span {
 
   _getMetricConstruct({
     name,
-    help,
+    help = 'Placeholder',
     labelNames: labelNamesIn,
   }: MetricOptions): MetricConstruct {
-    const labelNames = (labelNamesIn || []).concat([
+    const labelNames = this._getMetricLabelNames(labelNamesIn).map(labelName =>
+      convertMetricLabel(labelName),
+    );
+    return { name, help, labelNames };
+  }
+
+  _getMetricLabelNames(labelNames?: Array<string>): Array<string> {
+    return (labelNames || []).concat([
       this.labels.SERVICE,
       this.labels.COMPONENT,
     ]);
+  }
+
+  _getMetricWrapper(
+    metric: Counter | Gauge | Histogram | Summary,
+    options: MetricOptions,
+  ): Counter & Gauge & Histogram & Summary {
+    const labelNames = this._getMetricLabelNames(options.labelNames);
     const labelNamesSet = new Set(labelNames);
-    return {
-      name,
-      help,
-      labelNames,
-      labels: _.pickBy(this._labels, (value, key: string) =>
-        labelNamesSet.has(key),
-      ),
-    };
+    const labels = _.pickBy(this._labels, (value, key: string) =>
+      labelNamesSet.has(key),
+    );
+
+    return new MetricWrapper({ metric, labels });
   }
 
   _getAllRawLabels(labels?: RawLabels): RawLabels {

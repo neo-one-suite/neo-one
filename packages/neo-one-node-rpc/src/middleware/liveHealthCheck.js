@@ -21,7 +21,7 @@ export default ({
     middleware: async (ctx: Context) => {
       const monitor = getMonitor(ctx);
       const counter = monitor.getCounter({
-        name: 'rpc_live_health_check',
+        name: 'neo_rpc_live_health_check',
         labelNames: [monitor.labels.ERROR],
       });
       const ready = await checkReady({ monitor, blockchain, options });

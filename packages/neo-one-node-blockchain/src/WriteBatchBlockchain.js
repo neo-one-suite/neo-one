@@ -424,7 +424,7 @@ export default class WriteBatchBlockchain {
           this.header.add(block.header),
         ]),
       {
-        name: 'stage_0',
+        name: 'neo_write_blockchain_stage_0',
         help:
           'Total time taken to fetch the system fee and add the block to storage',
       },
@@ -472,7 +472,7 @@ export default class WriteBatchBlockchain {
             : Promise.resolve(),
         ]),
       {
-        name: 'stage_1',
+        name: 'neo_write_blockchain_stage_1',
         help: 'Total time taken to do the remainder of the work',
       },
     );
@@ -522,7 +522,7 @@ export default class WriteBatchBlockchain {
         ]);
       },
       {
-        name: 'persist_utxo_transactions',
+        name: 'neo_write_blockchain_persist_utxo_transactions',
         help: 'Total time taken to persist utxo transactions',
       },
     );
@@ -541,7 +541,7 @@ export default class WriteBatchBlockchain {
         }
       },
       {
-        name: 'persist_transactions',
+        name: 'neo_write_blockchain_persist_transactions',
         help: 'Total time taken to persist serial transactions',
       },
     );
@@ -787,7 +787,7 @@ export default class WriteBatchBlockchain {
           }
         },
         {
-          name: 'persist_single_transaction',
+          name: 'neo_write_blockchain_persist_single_transaction',
           help: 'Total time taken to persist a single transaction',
         },
       );
@@ -844,7 +844,7 @@ export default class WriteBatchBlockchain {
         ]);
       },
       {
-        name: 'process_state_transaction',
+        name: 'neo_write_blockchain_process_state_transaction',
         help: 'Total time taken to process a state transaction',
       },
     );
@@ -864,7 +864,7 @@ export default class WriteBatchBlockchain {
           this._getInputOutputs(claims),
         ]),
       {
-        name: 'update_accounts_get_input_outputs',
+        name: 'neo_write_blockchain_update_accounts_get_input_outputs',
         help: 'Total time taken to fetch data necessary to update accounts',
       },
     );
@@ -911,7 +911,7 @@ export default class WriteBatchBlockchain {
         );
       },
       {
-        name: 'update_accounts_process',
+        name: 'neo_write_blockchain_update_accounts_process',
         help: 'Total time taken to process account updates',
       },
     );
@@ -1056,7 +1056,7 @@ export default class WriteBatchBlockchain {
         );
       },
       {
-        name: 'update_coins',
+        name: 'neo_write_blockchain_update_coins',
         help: 'Total time taken to update coins',
       },
     );
