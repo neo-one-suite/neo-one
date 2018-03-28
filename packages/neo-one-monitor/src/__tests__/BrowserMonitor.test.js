@@ -1,5 +1,9 @@
 /* @flow */
-import BrowserMonitor, { BrowserLogger, Reporter } from '../BrowserMonitor';
+/* @jest-environment jsdom */
+import BrowserMonitor from '../BrowserMonitor';
+import BrowserLogger from '../BrowserLogger';
+import BrowserMetricsFactory, { resetMetrics } from '../BrowserMetricsFactory';
+import Reporter from '../Reporter';
 import { reset } from '../MonitorBase';
 
 describe('BrowserMonitor', () => {
@@ -23,43 +27,30 @@ describe('BrowserMonitor', () => {
     name: 'counter1',
     help: 'helpCount',
     labelNames: ['label1', 'label2'],
-    metricLabels: { countMetric1: 7 },
   };
 
   const counterResult1 = {
     metric: {
-      name: 'namespace1_counter1',
+      name: counterOptions1.name,
       help: counterOptions1.help,
-      labelNames: counterOptions1.labelNames,
-      labels: {},
-      metricLabels: counterOptions1.metricLabels,
+      labelNames: [...counterOptions1.labelNames, 'service', 'component'],
     },
-    values: [{ countOrLabels: 5 }, { countOrLabels: 4 }],
+    values: [{ count: 5, countOrLabels: {} }, { count: 4, countOrLabels: {} }],
   };
 
   const histogramOptions1 = {
     name: 'histogram1',
     help: 'helpHist',
     labelNames: ['histLabel1', 'histLabel2'],
-    metricLabels: { histMetric1: 8 },
   };
 
   const histResult1 = {
     metric: {
-      name: 'namespace1_histogram1',
+      name: histogramOptions1.name,
       help: histogramOptions1.help,
-      labelNames: histogramOptions1.labelNames,
-      labels: {},
-      metricLabels: histogramOptions1.metricLabels,
+      labelNames: [...histogramOptions1.labelNames, 'service', 'component'],
     },
     values: [{ countOrLabels: { histLabel1: 14 }, count: 3 }],
-  };
-
-  const startMetrics = {
-    counters: [],
-    gauges: [],
-    histograms: [],
-    summaries: [],
   };
 
   const emptyMetrics = {
@@ -69,31 +60,40 @@ describe('BrowserMonitor', () => {
         values: [],
       },
     ],
-    gauges: [],
     histograms: [
       {
         metric: histResult1.metric,
         values: [],
       },
     ],
-    summaries: [],
+  };
+
+  const requestCounter = {
+    name: 'browserRequestCounter',
+    help: 'Counts fetch requests from Browser Reporter to endpoint',
+    labelNames: ['success', 'failure'],
   };
 
   let logger = new BrowserLogger();
+  let metricsFactory = new BrowserMetricsFactory();
   let monitor = BrowserMonitor.create({
     service: 'namespace1',
     logger,
+    metricsFactory,
   });
   beforeEach(() => {
     logger = new BrowserLogger();
+    metricsFactory = new BrowserMetricsFactory();
     monitor = BrowserMonitor.create({
       service: 'namespace1',
       logger,
+      metricsFactory,
     });
   });
 
   afterEach(() => {
     reset();
+    resetMetrics();
   });
 
   test('BrowserLogger', () => {
@@ -124,24 +124,22 @@ describe('BrowserMonitor', () => {
     const histogram = monitor.getHistogram(histogramOptions1);
     histogram.observe({ histLabel1: 14 }, 3);
 
-    const result = monitor.collect();
-    expect(JSON.stringify(result)).toEqual(
-      JSON.stringify({
-        ...emptyMetrics,
-        counters: [counterResult1],
-        histograms: [histResult1],
-      }),
-    );
+    const result = metricsFactory.collect();
+    expect(result).toEqual({
+      ...emptyMetrics,
+      counters: [counterResult1],
+      histograms: [histResult1],
+    });
 
-    expect(monitor.collect()).toEqual(emptyMetrics);
+    expect(metricsFactory.collect()).toEqual(emptyMetrics);
 
     counter.inc(3);
-    expect(monitor.collect()).toEqual({
+    expect(metricsFactory.collect()).toEqual({
       ...emptyMetrics,
       counters: [
         {
           metric: counterResult1.metric,
-          values: [{ countOrLabels: 3 }],
+          values: [{ count: 3, countOrLabels: {} }],
         },
       ],
     });
@@ -152,7 +150,7 @@ describe('BrowserMonitor', () => {
 
     const reporter = new Reporter({
       logger,
-      monitor,
+      metricsFactory,
       timer: 1000,
       endpoint: 'fakeEnd',
     });
@@ -165,9 +163,19 @@ describe('BrowserMonitor', () => {
 
     await new Promise(resolve => setTimeout(() => resolve(), 1000));
     expect(logger.collect()).toEqual([]);
-    expect(monitor.collect()).toEqual({ ...emptyMetrics, histograms: [] });
-    expect(reporter._backLogs).toEqual([]);
-    expect(reporter._backMetrics).toEqual(startMetrics);
+    expect(metricsFactory.collect()).toEqual({
+      counters: [
+        {
+          metric: requestCounter,
+          values: [],
+        },
+        {
+          metric: counterResult1.metric,
+          values: [],
+        },
+      ],
+      histograms: [],
+    });
 
     logger.log(options2);
 
@@ -177,18 +185,23 @@ describe('BrowserMonitor', () => {
     await new Promise(resolve => setTimeout(() => resolve(), 500));
     expect(logger.collect()).toEqual([options2]);
 
-    expect(JSON.stringify(monitor.collect())).toEqual(
-      JSON.stringify({
-        ...emptyMetrics,
-        histograms: [histResult1],
-      }),
-    );
-    expect(reporter._backLogs).toEqual([]);
-    expect(reporter._backMetrics).toEqual(startMetrics);
+    expect(metricsFactory.collect()).toEqual({
+      counters: [
+        {
+          metric: requestCounter,
+          values: [{ countOrLabels: { success: 1 } }],
+        },
+        {
+          metric: counterResult1.metric,
+          values: [],
+        },
+      ],
+      histograms: [histResult1],
+    });
 
     expect(fetch.mock.calls).toMatchSnapshot();
 
-    const spy = jest.spyOn(reporter, '_shutdownFunc');
+    const spy = jest.spyOn(reporter._subscription, 'unsubscribe');
     reporter.close();
     expect(spy).toHaveBeenCalledTimes(1);
   });
@@ -198,7 +211,7 @@ describe('BrowserMonitor', () => {
 
     const reporter = new Reporter({
       logger,
-      monitor,
+      metricsFactory,
       timer: 1000,
       endpoint: 'fakeEnd',
     });
@@ -210,13 +223,6 @@ describe('BrowserMonitor', () => {
     counter.inc(4);
 
     await new Promise(resolve => setTimeout(() => resolve(), 1500));
-    expect(reporter._backLogs).toEqual([options1]);
-    expect(JSON.stringify(reporter._backMetrics)).toEqual(
-      JSON.stringify({
-        ...startMetrics,
-        counters: [counterResult1],
-      }),
-    );
 
     logger.log(options2);
 
@@ -224,24 +230,16 @@ describe('BrowserMonitor', () => {
     histogram.observe({ histLabel1: 14 }, 3);
 
     await new Promise(resolve => setTimeout(() => resolve(), 1000));
-    expect(reporter._backLogs).toEqual([options2, options1]);
-    expect(JSON.stringify(reporter._backMetrics)).toEqual(
-      JSON.stringify({
-        ...emptyMetrics,
-        counters: [counterResult1],
-        histograms: [histResult1],
-      }),
-    );
 
     expect(fetch.mock.calls).toMatchSnapshot();
 
-    const spy = jest.spyOn(reporter, '_shutdownFunc');
+    const spy = jest.spyOn(reporter._subscription, 'unsubscribe');
     reporter.close();
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  test('receive', () => {
-    monitor.receive({
+  test('report', () => {
+    monitor.report({
       logs: [options1, options2],
       metrics: {
         ...emptyMetrics,
@@ -253,13 +251,10 @@ describe('BrowserMonitor', () => {
     const logResult = logger.collect();
     expect(logResult).toEqual([options1, options2]);
 
-    const metricsResult = monitor.collect();
-    expect(JSON.stringify(metricsResult)).toEqual(
-      JSON.stringify({
-        ...emptyMetrics,
-        counters: [counterResult1],
-        histograms: [histResult1],
-      }),
-    );
+    const metricsResult = metricsFactory.collect();
+    expect(metricsResult).toEqual({
+      counters: [counterResult1],
+      histograms: [histResult1],
+    });
   });
 });

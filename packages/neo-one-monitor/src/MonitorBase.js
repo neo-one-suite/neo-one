@@ -788,7 +788,7 @@ export default class MonitorBase implements Span {
     }
   }
 
-  receive(report: Report): void {
+  report(report: Report): void {
     report.logs.map(log => this._logger.log(log));
 
     for (const counterMetric of report.metrics.counters) {
@@ -974,10 +974,15 @@ export default class MonitorBase implements Span {
     name,
     help = 'Placeholder',
     labelNames: labelNamesIn,
+    receivedFromBrowser,
   }: MetricOptions): MetricConstruct {
-    const labelNames = this._getMetricLabelNames(labelNamesIn).map(labelName =>
-      convertMetricLabel(labelName),
-    );
+    let labelNames;
+    if (receivedFromBrowser) {
+      labelNames = labelNamesIn || [];
+    } else {
+      labelNames = this._getMetricLabelNames(labelNamesIn).map(labelName =>
+        convertMetricLabel(labelName),);
+    }
     return { name, help, labelNames };
   }
 

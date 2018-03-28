@@ -383,7 +383,7 @@ export interface Monitor {
   // now() / 1000
   nowSeconds(): number;
   serveMetrics(port: number): void;
-  receive(report: Report): void;
+  report(report: Report): void;
 
   close(callback: () => void): void;
 }
