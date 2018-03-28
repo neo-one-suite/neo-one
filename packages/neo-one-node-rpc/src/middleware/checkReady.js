@@ -61,7 +61,8 @@ const fetchCount = async (
         level: { log: 'debug', metric: 'verbose', span: 'debug' },
         labelNames: [monitor.labels.HTTP_STATUS_CODE],
       },
-    );
+    )
+    .catch(() => null);
 
 const CHECK_ENDPOINTS = 5;
 
