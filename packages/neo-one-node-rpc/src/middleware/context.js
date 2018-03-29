@@ -40,6 +40,7 @@ export default ({ monitor }: {| monitor: Monitor |}) => async (
       references: [
         monitor.childOf(monitor.extract(monitor.formats.HTTP, ctx.headers)),
       ],
+      trace: true,
     },
   );
 };

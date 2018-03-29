@@ -1142,6 +1142,7 @@ export default class LocalUserAccountProvider<
         name,
         level: { log: 'verbose', metric: 'info', span: 'info' },
         labelNames: Object.keys(labels),
+        trace: true,
       });
   }
 }

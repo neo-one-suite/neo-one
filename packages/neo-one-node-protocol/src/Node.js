@@ -306,6 +306,7 @@ export default class Node implements INode {
               name: 'neo_relay_transaction',
               level: { log: 'verbose', metric: 'info', span: 'info' },
               labelNames: [labels.NEO_TRANSACTION_FOUND],
+              trace: true,
             },
           );
       } catch (error) {
@@ -319,13 +320,7 @@ export default class Node implements INode {
   }
 
   async relayBlock(block: Block, monitor?: Monitor): Promise<void> {
-    await (monitor || this._monitor)
-      .withData({ [labels.NEO_BLOCK_INDEX]: block.index })
-      .captureSpanLog(span => this._persistBlock(span, block), {
-        name: 'neo_relay_block',
-        help: 'Time taken to persist and relay a block.',
-        level: { log: 'verbose', metric: 'info', span: 'info' },
-      });
+    await this._persistBlock(block, monitor);
   }
 
   relayConsensusPayload(payload: ConsensusPayload): void {
@@ -774,7 +769,7 @@ export default class Node implements INode {
     await this.relayBlock(block, monitor);
   }
 
-  async _persistBlock(monitor: Monitor, block: Block): Promise<void> {
+  async _persistBlock(block: Block, monitor?: Monitor): Promise<void> {
     if (
       this.blockchain.currentBlockIndex >= block.index ||
       this._tempKnownBlockHashes.has(block.hashHex)
@@ -790,23 +785,35 @@ export default class Node implements INode {
           hashOrIndex: block.hash,
         });
         if (foundBlock == null) {
-          await this.blockchain.persistBlock({ monitor, block });
-          if (this.consensus != null) {
-            this.consensus.onPersistBlock();
-          }
+          await (monitor || this._monitor)
+            .withData({ [labels.NEO_BLOCK_INDEX]: block.index })
+            .captureSpanLog(
+              async span => {
+                await this.blockchain.persistBlock({ monitor: span, block });
+                if (this.consensus != null) {
+                  this.consensus.onPersistBlock();
+                }
 
-          const peer = this._bestPeer;
-          if (peer != null && block.index > peer.data.startHeight) {
-            this._relay(
-              this._createMessage({
-                command: COMMAND.INV,
-                payload: new InvPayload({
-                  type: INVENTORY_TYPE.BLOCK,
-                  hashes: [block.hash],
-                }),
-              }),
+                const peer = this._bestPeer;
+                if (peer != null && block.index > peer.data.startHeight) {
+                  this._relay(
+                    this._createMessage({
+                      command: COMMAND.INV,
+                      payload: new InvPayload({
+                        type: INVENTORY_TYPE.BLOCK,
+                        hashes: [block.hash],
+                      }),
+                    }),
+                  );
+                }
+              },
+              {
+                name: 'neo_relay_block',
+                help: 'Time taken to persist and relay a block.',
+                level: { log: 'verbose', metric: 'info', span: 'info' },
+                trace: true,
+              },
             );
-          }
         }
 
         this._knownBlockHashes.add(block.hash);

@@ -617,26 +617,27 @@ export default class MonitorBase implements Span {
     help,
     labelNames,
     references: referenceIn,
+    trace,
   }: SpanOptions): MonitorBase {
     let span;
     const timeMS = this.now();
     const time = timeMS / 1000;
     const fullLevel = this._getFullLevel(level);
+    const references = (referenceIn || [])
+      .concat([this.childOf(this)])
+      .map(reference => {
+        if (reference instanceof DefaultReference && reference.isValid()) {
+          return reference.getTracerReference(this._tracer);
+        }
+
+        return null;
+      })
+      .filter(Boolean);
     if (
       LOG_LEVEL_TO_LEVEL[fullLevel.span] <=
-      LOG_LEVEL_TO_LEVEL[this._spanLogLevel]
+        LOG_LEVEL_TO_LEVEL[this._spanLogLevel] &&
+      (trace || references.length > 0)
     ) {
-      const references = (referenceIn || [])
-        .concat([this.childOf(this)])
-        .map(reference => {
-          if (reference instanceof DefaultReference && reference.isValid()) {
-            return reference.getTracerReference(this._tracer);
-          }
-
-          return null;
-        })
-        .filter(Boolean);
-
       let spanLabels = {};
       let spanData = {};
       if (!this.hasSpan()) {
@@ -703,6 +704,7 @@ export default class MonitorBase implements Span {
       help: options.help,
       labelNames: options.labelNames,
       references: options.references,
+      trace: options.trace,
     });
     try {
       const result = func(span);
@@ -749,6 +751,7 @@ export default class MonitorBase implements Span {
         help: options.help,
         labelNames: options.labelNames,
         references: options.references,
+        trace: options.trace,
       },
     );
   }

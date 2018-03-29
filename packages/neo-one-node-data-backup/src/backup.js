@@ -38,6 +38,7 @@ export default async ({
     {
       name: 'neo_backup_execute',
       help: 'Duration taken for backup',
+      trace: true,
     },
   );
 };

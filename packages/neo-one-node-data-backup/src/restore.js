@@ -65,6 +65,7 @@ export default async ({
     {
       name: 'neo_restore_execute',
       help: 'Duration taken for restore',
+      trace: true,
     },
   );
 };

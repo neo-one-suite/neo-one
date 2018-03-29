@@ -146,6 +146,7 @@ export type SpanOptions = {|
   labelNames?: Array<string>, // Labels to include on the metric
 
   references?: Array<Reference | void>,
+  trace?: boolean, // Is this allowed to be a top level span?
 |};
 
 export type CaptureSpanOptions = {|
@@ -156,6 +157,7 @@ export type CaptureSpanOptions = {|
   labelNames?: Array<string>, // Labels to include on the metric
 
   references?: Array<Reference | void>,
+  trace?: boolean, // Is this allowed to be a top level span?
 |};
 
 export type CaptureSpanLogOptions = {|
@@ -168,6 +170,7 @@ export type CaptureSpanLogOptions = {|
 
   error?: CaptureErrorOptions,
   references?: Array<Reference | void>,
+  trace?: boolean, // Is this allowed to be a top level span?
 |};
 
 export interface Counter {

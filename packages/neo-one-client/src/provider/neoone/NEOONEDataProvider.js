@@ -723,6 +723,7 @@ export default class NEOONEDataProvider
     return monitor.at('neo_one_data_provider').captureSpanLog(func, {
       name,
       level: { log: 'verbose', metric: 'info', span: 'info' },
+      trace: true,
     });
   }
 }

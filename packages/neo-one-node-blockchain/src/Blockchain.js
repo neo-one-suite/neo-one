@@ -447,6 +447,7 @@ export default class Blockchain {
             {
               name: 'neo_blockchain_persist_block_top_level',
               level: { log: 'verbose', metric: 'info', span: 'info' },
+              trace: true,
             },
           );
         entry.resolve();

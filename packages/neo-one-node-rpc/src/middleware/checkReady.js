@@ -60,6 +60,7 @@ const fetchCount = async (
           'Requests the current block count from the endpoint to verify the node is not behind.',
         level: { log: 'debug', metric: 'verbose', span: 'debug' },
         labelNames: [monitor.labels.HTTP_STATUS_CODE],
+        trace: true,
       },
     )
     .catch(() => null);
