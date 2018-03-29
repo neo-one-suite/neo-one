@@ -619,24 +619,24 @@ export default class MonitorBase implements Span {
     references: referenceIn,
   }: SpanOptions): MonitorBase {
     let span;
-    const references = (referenceIn || [])
-      .concat([this.childOf(this)])
-      .map(reference => {
-        if (reference instanceof DefaultReference && reference.isValid()) {
-          return reference.getTracerReference(this._tracer);
-        }
-
-        return null;
-      })
-      .filter(Boolean);
     const timeMS = this.now();
     const time = timeMS / 1000;
     const fullLevel = this._getFullLevel(level);
     if (
       LOG_LEVEL_TO_LEVEL[fullLevel.span] <=
-        LOG_LEVEL_TO_LEVEL[this._spanLogLevel] ||
-      references.length > 0
+      LOG_LEVEL_TO_LEVEL[this._spanLogLevel]
     ) {
+      const references = (referenceIn || [])
+        .concat([this.childOf(this)])
+        .map(reference => {
+          if (reference instanceof DefaultReference && reference.isValid()) {
+            return reference.getTracerReference(this._tracer);
+          }
+
+          return null;
+        })
+        .filter(Boolean);
+
       let spanLabels = {};
       let spanData = {};
       if (!this.hasSpan()) {
