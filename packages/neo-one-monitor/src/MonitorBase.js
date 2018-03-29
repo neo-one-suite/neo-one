@@ -652,7 +652,6 @@ export default class MonitorBase implements Span {
           [this.labels.SERVICE]: this._service,
           [this.labels.COMPONENT]: this._component,
         }),
-        startTime: timeMS,
       });
     }
 
@@ -690,7 +689,7 @@ export default class MonitorBase implements Span {
     const { span: tracerSpan } = span;
     if (tracerSpan != null) {
       tracerSpan.setTag(this.labels.ERROR, !!error);
-      tracerSpan.finish(finishTimeMS);
+      tracerSpan.finish();
     }
   }
 
