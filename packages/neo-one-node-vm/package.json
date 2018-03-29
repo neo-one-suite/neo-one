@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-vm",
-  "version": "1.0.0-alpha.23",
+  "version": "1.0.0-alpha.24",
   "keywords": [
     "neo",
     "NEO",
@@ -34,10 +34,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.21",
-    "@neo-one/monitor": "^1.0.0-alpha.12",
-    "@neo-one/node-core": "^1.0.0-alpha.22",
-    "@neo-one/utils": "^1.0.0-alpha.17",
+    "@neo-one/client-core": "^1.0.0-alpha.22",
+    "@neo-one/monitor": "^1.0.0-alpha.13",
+    "@neo-one/node-core": "^1.0.0-alpha.23",
+    "@neo-one/utils": "^1.0.0-alpha.18",
     "bitwise": "^1.4.1",
     "bn.js": "^4.11.8",
     "ix": "^2.3.5",
