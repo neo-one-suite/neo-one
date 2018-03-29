@@ -87,6 +87,8 @@ type SpanData = {|
   |},
   time: number,
   span?: TracerSpan,
+  // eslint-disable-next-line
+  parent?: MonitorBase,
 |};
 
 export type MetricConstruct = {|
@@ -620,8 +622,8 @@ export default class MonitorBase implements Span {
     trace,
   }: SpanOptions): MonitorBase {
     let span;
-    const timeMS = this.now();
-    const time = timeMS / 1000;
+    let parent;
+
     const fullLevel = this._getFullLevel(level);
     const references = (referenceIn || [])
       .concat([this.childOf(this)])
@@ -638,22 +640,11 @@ export default class MonitorBase implements Span {
         LOG_LEVEL_TO_LEVEL[this._spanLogLevel] &&
       (trace || references.length > 0)
     ) {
-      let spanLabels = {};
-      let spanData = {};
-      if (!this.hasSpan()) {
-        spanLabels = this._getAllRawLabels(spanLabels);
-        spanData = this._getAllRawData(spanData);
-      }
-
       span = this._tracer.startSpan(name, {
         references,
-        tags: convertTagLabels({
-          ...spanLabels,
-          ...spanData,
-          [this.labels.SERVICE]: this._service,
-          [this.labels.COMPONENT]: this._component,
-        }),
+        tags: this._getSpanTags(),
       });
+      parent = this;
     }
 
     let histogram;
@@ -664,11 +655,19 @@ export default class MonitorBase implements Span {
       histogram = { name: `${name}_duration_seconds`, help, labelNames };
     }
 
+    let currentParent;
+    if (this.hasSpan()) {
+      ({ parent: currentParent } = this.getSpan());
+    }
+
+    const timeMS = this.now();
+    const time = timeMS / 1000;
     return this._clone({
       span: {
         histogram,
         time,
         span,
+        parent: parent == null ? currentParent : parent,
       },
     });
   }
@@ -907,7 +906,7 @@ export default class MonitorBase implements Span {
       const spanLog = ({
         event: name,
         message,
-        ...convertTagLabels(labels),
+        ...this._getSpanTags(labels),
       }: Object);
       if (error != null) {
         const { error: errorObj } = error;
@@ -960,6 +959,26 @@ export default class MonitorBase implements Span {
     );
 
     return new MetricWrapper({ metric, labels });
+  }
+
+  _getSpanTags(labels?: RawLabels): TagLabels {
+    let spanLabels = this._getAllRawLabels();
+    let spanData = this._getAllRawData();
+    if (this.hasSpan()) {
+      const { parent } = this.getSpan();
+      if (parent != null) {
+        const parentLabels = new Set(Object.keys(parent._labels));
+        spanLabels = _.omitBy(spanLabels, label => parentLabels.has(label));
+        const parentData = new Set(Object.keys(parent._data));
+        spanData = _.omitBy(spanData, label => parentData.has(label));
+      }
+    }
+
+    return convertTagLabels({
+      ...spanLabels,
+      ...spanData,
+      ...(labels || {}),
+    });
   }
 
   _getAllRawLabels(labels?: RawLabels): RawLabels {
