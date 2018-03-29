@@ -71,7 +71,7 @@ export default class NodeMonitor extends MonitorBase {
       },
       tracer,
       metricsFactory: new NodeMetricsFactory(),
-      now: () => perfHooks.performance.now(),
+      now: () => perfHooks.performance.timeOrigin + perfHooks.performance.now(),
       metricsLogLevel,
       spanLogLevel,
     });

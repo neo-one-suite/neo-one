@@ -73,7 +73,6 @@ export default class BrowserMonitor extends MonitorBase {
     metricsLogLevel,
     spanLogLevel,
   }: BrowserMonitorCreate): BrowserMonitor {
-    const perf = performance;
     return new BrowserMonitor({
       service,
       component: service,
@@ -85,7 +84,9 @@ export default class BrowserMonitor extends MonitorBase {
       },
       tracer,
       metricsFactory: new BrowserMetricsFactory(),
-      now: () => perf.now(),
+      // NOTE: We do not use performance.now because there is no longer a
+      //       benefit in browsers with result rounding.
+      now: () => Date.now(),
       metricsLogLevel,
       spanLogLevel,
     });
