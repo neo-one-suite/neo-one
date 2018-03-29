@@ -507,180 +507,186 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         `Initializing bootstrap of network ${networkName}`,
       ).start();
       spinner.succeed();
-      const networkResource = await cli.client.getResource({
-        plugin: networkConstants.PLUGIN,
-        name: networkName,
-        resourceType: networkConstants.NETWORK_RESOURCE_TYPE,
-        options: {},
-      });
-      if (networkResource == null) {
-        throw new Error(`Network ${networkName} does not exist.`);
-      }
-      const network = ((networkResource: $FlowFixMe): Network);
+      try {
+        const networkResource = await cli.client.getResource({
+          plugin: networkConstants.PLUGIN,
+          name: networkName,
+          resourceType: networkConstants.NETWORK_RESOURCE_TYPE,
+          options: {},
+        });
+        if (networkResource == null) {
+          throw new Error(`Network ${networkName} does not exist.`);
+        }
+        const network = ((networkResource: $FlowFixMe): Network);
 
-      const masterWallet = await getWallet({
-        walletName: constants.MASTER_WALLET,
-        networkName: network.name,
-        cli,
-        plugin,
-      });
+        const masterWallet = await getWallet({
+          walletName: constants.MASTER_WALLET,
+          networkName: network.name,
+          cli,
+          plugin,
+        });
 
-      if (masterWallet.wif == null) {
-        throw new Error('Something went wrong, wif is null');
-      }
+        if (masterWallet.wif == null) {
+          throw new Error('Something went wrong, wif is null');
+        }
 
-      const keystore = new LocalKeyStore({
-        store: new LocalMemoryStore(),
-      });
+        const keystore = new LocalKeyStore({
+          store: new LocalMemoryStore(),
+        });
 
-      await keystore.addAccount({
-        network: network.name,
-        name: masterWallet.name,
-        privateKey: wifToPrivateKey(masterWallet.wif),
-      });
+        await keystore.addAccount({
+          network: network.name,
+          name: masterWallet.name,
+          privateKey: wifToPrivateKey(masterWallet.wif),
+        });
 
-      const walletNames = [];
-      const numWallets = getNumWallets(args.options);
-      for (let i = 1; i < numWallets + 1; i += 1) {
-        walletNames.push(`wallet-${i}`);
-      }
-      spinner.start('Creating wallets');
-      const wallets = await Promise.all(
-        walletNames.map(walletName =>
-          createWallet({
-            walletName,
-            networkName: network.name,
-            cli,
+        const walletNames = [];
+        const numWallets = getNumWallets(args.options);
+        for (let i = 1; i < numWallets + 1; i += 1) {
+          walletNames.push(`wallet-${i}`);
+        }
+        spinner.start('Creating wallets');
+        const wallets = await Promise.all(
+          walletNames.map(walletName =>
+            createWallet({
+              walletName,
+              networkName: network.name,
+              cli,
+              keystore,
+            }),
+          ),
+        );
+        spinner.succeed();
+        const provider = new NEOONEProvider({
+          options: [
+            { network: network.name, rpcURL: network.nodes[0].rpcAddress },
+          ],
+        });
+
+        const client = new Client({
+          memory: new LocalUserAccountProvider({
             keystore,
+            provider,
           }),
-        ),
-      );
-      spinner.succeed();
-      const provider = new NEOONEProvider({
-        options: [
-          { network: network.name, rpcURL: network.nodes[0].rpcAddress },
-        ],
-      });
-
-      const client = new Client({
-        memory: new LocalUserAccountProvider({
+        });
+        const developerClient = new DeveloperClient(
+          provider.read(network.name),
+        );
+        spinner.start('Initializing wallets with funds');
+        await initializeWallets({
+          wallets,
+          masterWallet,
+          networkName: network.name,
+          client,
+          developerClient,
+        });
+        spinner.succeed();
+        let assets = [
+          {
+            assetType: 'Token',
+            name: 'redcoin',
+            amount: new BigNumber(1000000),
+            precision: 4,
+          },
+          {
+            assetType: 'Token',
+            name: 'bluecoin',
+            amount: new BigNumber(650000),
+            precision: 0,
+          },
+          {
+            assetType: 'Currency',
+            name: 'greencoin',
+            amount: new BigNumber(50000000),
+            precision: 6,
+          },
+        ];
+        spinner.start('Setting up asset wallets');
+        const assetWallets = await setupAssetWallets({
+          names: assets.map(asset => asset.name),
+          networkName: network.name,
+          cli,
           keystore,
+          client,
+          developerClient,
+          masterWallet,
+        });
+        spinner.succeed();
+
+        spinner.start('Registering test assets');
+        const assetHashes = await registerAssets({
+          assets,
+          assetWallets,
+          client,
+          developerClient,
+        });
+        spinner.succeed();
+        assets = _.zip(assets, assetWallets, assetHashes).map(asset => ({
+          ...asset[0],
+          wallet: asset[1],
+          hash: asset[2],
+        }));
+        spinner.start('Issuing assets');
+        const issues = await Promise.all(
+          assets.map(asset =>
+            issueAsset({
+              wallets,
+              asset,
+              client,
+            }),
+          ),
+        );
+
+        await Promise.all(
+          [developerClient.runConsensusNow()].concat(
+            issues.map(issue => issue.confirmed()),
+          ),
+        );
+        spinner.succeed();
+
+        spinner.start('Distributing assets');
+        const assetTransfers = await Promise.all(
+          assets.map(asset =>
+            createAssetTransfer({
+              wallets,
+              assetHash: asset.hash,
+              networkName: network.name,
+              client,
+              assetWallet: asset.wallet,
+            }),
+          ),
+        );
+
+        await Promise.all(
+          [developerClient.runConsensusNow()].concat(
+            _.flatten(assetTransfers).map(transfer => transfer.confirmed()),
+          ),
+        );
+        spinner.succeed();
+
+        spinner.start('Publishing KYC SmartContract');
+        const kyc = await client.publish(kycContract);
+        await Promise.all([developerClient.runConsensusNow(), kyc.confirmed()]);
+        spinner.succeed();
+
+        spinner.start('Publishing Concierge SmartContract');
+        const concierge = await client.publish(conciergeContract);
+        await Promise.all([
+          developerClient.runConsensusNow(),
+          concierge.confirmed(),
+        ]);
+        spinner.succeed();
+
+        spinner.start('Claiming GAS');
+        await initiateClaims({
+          wallets,
+          networkName: network.name,
+          client,
+          developerClient,
           provider,
-        }),
-      });
-      const developerClient = new DeveloperClient(provider.read(network.name));
-      spinner.start('Initializing wallets with funds');
-      await initializeWallets({
-        wallets,
-        masterWallet,
-        networkName: network.name,
-        client,
-        developerClient,
-      });
-      spinner.succeed();
-      let assets = [
-        {
-          assetType: 'Token',
-          name: 'redcoin',
-          amount: new BigNumber(1000000),
-          precision: 4,
-        },
-        {
-          assetType: 'Token',
-          name: 'bluecoin',
-          amount: new BigNumber(650000),
-          precision: 0,
-        },
-        {
-          assetType: 'Currency',
-          name: 'greencoin',
-          amount: new BigNumber(50000000),
-          precision: 6,
-        },
-      ];
-      spinner.start('Setting up asset wallets');
-      const assetWallets = await setupAssetWallets({
-        names: assets.map(asset => asset.name),
-        networkName: network.name,
-        cli,
-        keystore,
-        client,
-        developerClient,
-        masterWallet,
-      });
-      spinner.succeed();
-
-      spinner.start('Registering test assets');
-      const assetHashes = await registerAssets({
-        assets,
-        assetWallets,
-        client,
-        developerClient,
-      });
-      spinner.succeed();
-      assets = _.zip(assets, assetWallets, assetHashes).map(asset => ({
-        ...asset[0],
-        wallet: asset[1],
-        hash: asset[2],
-      }));
-      spinner.start('Issuing assets');
-      const issues = await Promise.all(
-        assets.map(asset =>
-          issueAsset({
-            wallets,
-            asset,
-            client,
-          }),
-        ),
-      );
-
-      await Promise.all(
-        [developerClient.runConsensusNow()].concat(
-          issues.map(issue => issue.confirmed()),
-        ),
-      );
-      spinner.succeed();
-
-      spinner.start('Distributing assets');
-      const assetTransfers = await Promise.all(
-        assets.map(asset =>
-          createAssetTransfer({
-            wallets,
-            assetHash: asset.hash,
-            networkName: network.name,
-            client,
-            assetWallet: asset.wallet,
-          }),
-        ),
-      );
-
-      await Promise.all(
-        [developerClient.runConsensusNow()].concat(
-          _.flatten(assetTransfers).map(transfer => transfer.confirmed()),
-        ),
-      );
-      spinner.succeed();
-
-      spinner.start('Publishing KYC SmartContract');
-      const kyc = await client.publish(kycContract);
-      await Promise.all([developerClient.runConsensusNow(), kyc.confirmed()]);
-      spinner.succeed();
-
-      spinner.start('Publishing Concierge SmartContract');
-      const concierge = await client.publish(conciergeContract);
-      await Promise.all([
-        developerClient.runConsensusNow(),
-        concierge.confirmed(),
-      ]);
-      spinner.succeed();
-
-      spinner.start('Claiming GAS');
-      await initiateClaims({
-        wallets,
-        networkName: network.name,
-        client,
-        developerClient,
-        provider,
-      });
-      spinner.succeed();
+        });
+        spinner.succeed();
+      } catch (error) {
+        spinner.fail(error);
+      }
     });
