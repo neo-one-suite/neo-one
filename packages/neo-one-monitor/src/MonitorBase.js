@@ -629,7 +629,8 @@ export default class MonitorBase implements Span {
         return null;
       })
       .filter(Boolean);
-    const time = this.nowSeconds();
+    const timeMS = this.now();
+    const time = timeMS / 1000;
     const fullLevel = this._getFullLevel(level);
     if (
       LOG_LEVEL_TO_LEVEL[fullLevel.span] <=
@@ -651,7 +652,7 @@ export default class MonitorBase implements Span {
           [this.labels.SERVICE]: this._service,
           [this.labels.COMPONENT]: this._component,
         }),
-        startTime: time,
+        startTime: timeMS,
       });
     }
 
@@ -675,7 +676,8 @@ export default class MonitorBase implements Span {
   end(error?: boolean): void {
     const span = this.getSpan();
     const { histogram } = span;
-    const finishTime = this.nowSeconds();
+    const finishTimeMS = this.nowSeconds();
+    const finishTime = finishTimeMS / 1000;
     if (histogram != null) {
       const value = finishTime - span.time;
       this.getHistogram({
@@ -688,7 +690,7 @@ export default class MonitorBase implements Span {
     const { span: tracerSpan } = span;
     if (tracerSpan != null) {
       tracerSpan.setTag(this.labels.ERROR, !!error);
-      tracerSpan.finish(finishTime);
+      tracerSpan.finish(finishTimeMS);
     }
   }
 
