@@ -1,6 +1,5 @@
 /* @flow */
 import type { Counter, Gauge, Histogram, LogLevel, Summary } from './types';
-
 import MonitorBase, {
   type Logger,
   type MetricConstruct,
@@ -19,7 +18,7 @@ class BrowserCounter extends BaseMetric implements Counter {
   inc(countOrLabels?: number | MetricLabels, count?: number): void {}
 }
 
-export class BrowserGauge extends BaseMetric implements Gauge {
+class BrowserGauge extends BaseMetric implements Gauge {
   // eslint-disable-next-line
   inc(countOrLabels?: number | MetricLabels, count?: number): void {}
 

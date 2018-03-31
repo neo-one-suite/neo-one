@@ -25,12 +25,12 @@ import type {
   LoggerLogOptions,
   MetricOptions,
   Monitor,
-  Report,
   Span,
   SpanContext,
   SpanOptions,
   Summary,
 } from './types';
+import type { Report } from './Reporter';
 import createTracer from './createTracer';
 
 export type FullLogLevelOption = {|
@@ -131,7 +131,7 @@ export const reset = (): void => {
   }
 };
 
-const KNOWN_LABELS = {
+export const KNOWN_LABELS = {
   // These are added automatically
   SERVICE: 'service',
   COMPONENT: 'component',
@@ -584,7 +584,9 @@ export default class MonitorBase implements Span {
         this._getMetricConstruct(options),
       );
     }
-
+    if (options.directReport) {
+      return counters[name];
+    }
     return this._getMetricWrapper(counters[name], options);
   }
 
@@ -606,7 +608,9 @@ export default class MonitorBase implements Span {
         this._getMetricConstruct(options),
       );
     }
-
+    if (options.directReport) {
+      return histograms[name];
+    }
     return this._getMetricWrapper(histograms[name], options);
   }
 
@@ -789,33 +793,68 @@ export default class MonitorBase implements Span {
   }
 
   report(report: Report): void {
-    report.logs.map(log => this._logger.log(log));
+    report.logs.forEach(log => {
+      const newLog = {
+        name: log.name,
+        level: log.level,
+        message: log.message,
+        labels: log.labels,
+        data: log.data,
+        error: undefined,
+      };
+      const { error } = log;
+      if (error != null) {
+        newLog.error = new Error(error.message);
+        if (error.stack != null) {
+          newLog.error.stack = error.stack;
+        }
+      }
+      this._logger.log(newLog);
+    });
 
-    for (const counterMetric of report.metrics.counters) {
+    for (const counterName of Object.keys(report.metrics.counters)) {
+      const counterMetric = report.metrics.counters[counterName];
       const counter = this.getCounter({
         name: counterMetric.metric.name,
         help: counterMetric.metric.help,
         labelNames: counterMetric.metric.labelNames,
-        metricLabels: counterMetric.metric.metricLabels,
-        receivedFromBrowser: true,
+        directReport: true,
       });
 
       counterMetric.values.forEach(value => {
-        counter.inc(value.countOrLabels, value.count);
+        if (
+          value.countOrLabels != null &&
+          typeof value.countOrLabels === 'object'
+        ) {
+          counter.inc(value.countOrLabels, value.count);
+        } else {
+          counter.inc(value.countOrLabels);
+        }
       });
     }
 
-    for (const histMetric of report.metrics.histograms) {
+    for (const histName of Object.keys(report.metrics.histograms)) {
+      const histMetric = report.metrics.histograms[histName];
       const histogram = this.getHistogram({
         name: histMetric.metric.name,
         help: histMetric.metric.help,
         labelNames: histMetric.metric.labelNames,
-        metricLabels: histMetric.metric.metricLabels,
-        receivedFromBrowser: true,
+        directReport: true,
       });
 
       histMetric.values.forEach(value => {
-        histogram.observe(value.countOrLabels, value.count);
+        if (
+          value.countOrLabels != null &&
+          typeof value.countOrLabels === 'object' &&
+          value.count != null
+        ) {
+          histogram.observe(value.countOrLabels, value.count);
+        } else if (
+          value.countOrLabels != null &&
+          typeof value.countOrLabels === 'number'
+        ) {
+          histogram.observe(value.countOrLabels);
+        }
       });
     }
   }
@@ -974,14 +1013,15 @@ export default class MonitorBase implements Span {
     name,
     help = 'Placeholder',
     labelNames: labelNamesIn,
-    receivedFromBrowser,
+    directReport,
   }: MetricOptions): MetricConstruct {
     let labelNames;
-    if (receivedFromBrowser) {
+    if (directReport) {
       labelNames = labelNamesIn || [];
     } else {
       labelNames = this._getMetricLabelNames(labelNamesIn).map(labelName =>
-        convertMetricLabel(labelName),);
+        convertMetricLabel(labelName),
+      );
     }
     return { name, help, labelNames };
   }

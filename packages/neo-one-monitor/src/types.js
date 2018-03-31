@@ -1,5 +1,6 @@
 /* @flow */
 import type { Context } from 'koa';
+import type { Report } from './Reporter';
 
 export type LogField =
   // The type or "kind" of an error (only for event="error" logs).
@@ -144,7 +145,7 @@ export type MetricOptions = {|
   help?: string,
   labelNames?: Array<Label>,
   metricLabels?: Labels,
-  receivedFromBrowser?: boolean,
+  directReport?: boolean,
 |};
 
 export opaque type Reference = any;
@@ -182,11 +183,6 @@ export type CaptureSpanLogOptions = {|
   error?: CaptureErrorOptions,
   references?: Array<Reference | void>,
   trace?: boolean, // Is this allowed to be a top level span?
-|};
-
-export type Report = {|
-  logs: Array<LoggerLogOptions>,
-  metrics: Object,
 |};
 
 export interface Counter {

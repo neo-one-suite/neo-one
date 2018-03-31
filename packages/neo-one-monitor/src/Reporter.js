@@ -3,21 +3,19 @@ import { interval } from 'rxjs/observable/interval';
 import { mergeScan } from 'rxjs/operators';
 import type { Subscription } from 'rxjs/Subscription';
 
-import type BrowserLogger from './BrowserLogger';
+import BrowserLogger, {
+  type CollectingLoggerLogOptions,
+} from './BrowserLogger';
 import BrowserMetricsFactory, {
-  type BaseMetric,
+  type MetricCollection,
 } from './BrowserMetricsFactory';
-
-import type { LoggerLogOptions, Report } from './types';
+import { KNOWN_LABELS } from './MonitorBase';
 
 const MAX_BACKLOG = 1000;
 
-type BackReport = {|
-  logs: Array<LoggerLogOptions>,
-  metrics: {|
-    counters: { [name: string]: BaseMetric },
-    histograms: { [name: string]: BaseMetric },
-  |},
+export type Report = {|
+  logs: Array<CollectingLoggerLogOptions>,
+  metrics: MetricCollection,
 |};
 
 export default class Reporter {
@@ -39,7 +37,7 @@ export default class Reporter {
     const requestCounter = metricsFactory.createCounter({
       name: 'browserRequestCounter',
       help: 'Counts fetch requests from Browser Reporter to endpoint',
-      labelNames: ['success', 'failure'],
+      labelNames: [KNOWN_LABELS.ERROR],
     });
     const emptyBackReport = {
       logs: [],
@@ -58,19 +56,16 @@ export default class Reporter {
             let report = { logs, metrics };
 
             if (backReport != null) {
-              report = this._checkBackReport({ logs, metrics }, backReport);
+              report = this._addBackReport({ logs, metrics }, backReport);
             }
-            let response;
-            try {
-              response = await this._report(report);
-            } catch (error) {
-              throw new Error(error);
-            }
+
+            const response = await this._report(report);
+
             if (!response.ok) {
-              requestCounter.inc({ failure: 1 });
+              requestCounter.inc({ [KNOWN_LABELS.ERROR]: true });
               return this._constructBackReport(report);
             }
-            requestCounter.inc({ success: 1 });
+            requestCounter.inc({ [KNOWN_LABELS.ERROR]: false });
             return emptyBackReport;
           },
           emptyBackReport,
@@ -87,21 +82,19 @@ export default class Reporter {
     });
   }
 
-  _checkBackReport(report: Report, backReport: BackReport): Report {
-    const logs = report.logs.concat(backReport.logs);
+  _addBackReport(report: Report, backReport: Report): Report {
+    const logs = backReport.logs.concat(report.logs);
     const { metrics } = report;
 
-    for (const metricType of Object.keys(metrics)) {
-      for (const metric of metrics[metricType]) {
-        if (metric != null) {
-          const { name } = metric.metric;
-          if (name in backReport.metrics[metricType]) {
-            metric.values = metric.values.concat(
-              backReport.metrics[metricType][name].values,
-            );
-          } else {
-            metrics[metricType].push(backReport.metrics[metricType][name]);
-          }
+    for (const metricType of Object.keys(backReport.metrics)) {
+      for (const name of Object.keys(backReport.metrics[metricType])) {
+        if (metrics[metricType][name] != null) {
+          const newValues = backReport.metrics[metricType][name].values.concat(
+            metrics[metricType][name].values,
+          );
+          metrics[metricType][name].values = newValues;
+        } else {
+          metrics[metricType][name] = backReport.metrics[metricType][name];
         }
       }
     }
@@ -112,18 +105,16 @@ export default class Reporter {
     };
   }
 
-  _constructBackReport(report: Report): BackReport {
-    const backLogs = report.logs.slice(0, MAX_BACKLOG);
+  _constructBackReport(report: Report): Report {
+    const backLogs = report.logs.slice(-MAX_BACKLOG);
     const backMetrics = {
       counters: {},
       histograms: {},
     };
 
     for (const metricType of Object.keys(report.metrics)) {
-      for (const metric of report.metrics[metricType]) {
-        if (metric != null) {
-          backMetrics[metricType][metric.metric.name] = metric;
-        }
+      for (const name of Object.keys(report.metrics[metricType])) {
+        backMetrics[metricType][name] = report.metrics[metricType][name];
       }
     }
 

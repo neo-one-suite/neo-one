@@ -1,24 +1,30 @@
 /* @flow */
-import type { MetricConstruct, MetricsFactory, RawLabels } from './MonitorBase';
+import type {
+  MetricsFactory,
+  MetricLabels,
+  MetricConstruct,
+} from './MonitorBase';
 
 import type { Counter, Gauge, Histogram, Summary } from './types';
 
-const metrics = {
-  counters: [],
-  histograms: [],
+let metrics = {
+  counters: {},
+  histograms: {},
 };
 
-export const resetMetrics = (): void => {
-  metrics.counters = [];
-  metrics.histograms = [];
+export const resetMetricsForTesting = (): void => {
+  metrics = {
+    counters: {},
+    histograms: {},
+  };
 };
 
-type MetricValue = {|
-  countOrLabels?: number | RawLabels,
+export type MetricValue = {|
+  countOrLabels?: number | MetricLabels,
   count?: number,
 |};
 
-export class BaseMetric {
+export class CollectingMetric {
   metric: MetricConstruct;
   values: Array<MetricValue>;
 
@@ -33,48 +39,45 @@ export class BaseMetric {
 }
 
 export type MetricCollection = {|
-  counters: Array<BaseMetric>,
-  histograms: Array<BaseMetric>,
+  counters: { [name: string]: CollectingMetric },
+  histograms: { [name: string]: CollectingMetric },
 |};
 
-class BrowserCounter extends BaseMetric implements Counter {
-  inc(countOrLabels?: number | RawLabels, count?: number): void {
+class BrowserCounter extends CollectingMetric implements Counter {
+  inc(countOrLabels?: number | MetricLabels, count?: number): void {
     this.values.push({ countOrLabels, count });
   }
 }
 
-export class BrowserGauge extends BaseMetric implements Gauge {
+export class BrowserGauge extends CollectingMetric implements Gauge {
   // eslint-disable-next-line
-  inc(countOrLabels?: number | RawLabels, count?: number): void {}
+  inc(countOrLabels?: number | MetricLabels, count?: number): void {}
 
   // eslint-disable-next-line
-  dec(countOrLabels?: number | RawLabels, count?: number): void {}
+  dec(countOrLabels?: number | MetricLabels, count?: number): void {}
 
   // eslint-disable-next-line
-  set(countOrLabels?: number | RawLabels, count?: number): void {}
+  set(countOrLabels?: number | MetricLabels, count?: number): void {}
 }
 
-class BrowserHistogram extends BaseMetric implements Histogram {
-  observe(countOrLabels?: number | RawLabels, count?: number): void {
+class BrowserHistogram extends CollectingMetric implements Histogram {
+  observe(countOrLabels?: number | MetricLabels, count?: number): void {
     this.values.push({ countOrLabels, count });
   }
 }
 
-export class BrowserSummary extends BaseMetric implements Summary {
+export class BrowserSummary extends CollectingMetric implements Summary {
   // eslint-disable-next-line
-  observe(countOrLabels?: number | RawLabels, count?: number): void {}
+  observe(countOrLabels?: number | MetricLabels, count?: number): void {}
 }
 
-interface MetricsFactoryCollect extends MetricsFactory {
-  collect(): MetricCollection;
-  _serializeJSON(inputJSON: Object): Object;
-}
-
-export default class BrowserMetricsFactory implements MetricsFactoryCollect {
+export default class BrowserMetricsFactory implements MetricsFactory {
   collect(): MetricCollection {
     const currentMetrics = this._serializeJSON(metrics);
     for (const metricType of Object.keys(metrics)) {
-      metrics[metricType].map(metric => metric.reset());
+      for (const name of Object.keys(metrics[metricType])) {
+        metrics[metricType][name].reset();
+      }
     }
     return currentMetrics;
   }
@@ -85,14 +88,14 @@ export default class BrowserMetricsFactory implements MetricsFactoryCollect {
 
   createCounter(options: MetricConstruct): Counter {
     const counter = new BrowserCounter(options);
-    metrics.counters.push(counter);
+    metrics.counters[counter.metric.name] = counter;
 
     return counter;
   }
 
   createHistogram(options: MetricConstruct): Histogram {
     const histogram = new BrowserHistogram(options);
-    metrics.histograms.push(histogram);
+    metrics.histograms[histogram.metric.name] = histogram;
 
     return histogram;
   }
@@ -101,21 +104,39 @@ export default class BrowserMetricsFactory implements MetricsFactoryCollect {
     return new BrowserSummary(options);
   }
 
-  _serializeJSON(inputJSON: Object): Object {
-    if (typeof inputJSON !== 'object') {
-      return inputJSON;
-    }
+  _serializeJSON(currentMetrics: MetricCollection): MetricCollection {
+    const copy = {
+      counters: {},
+      histograms: {},
+    };
 
-    const copy = {};
-    for (const key of Object.keys(inputJSON)) {
-      if (inputJSON[key] instanceof Array) {
-        const arrCopy = [];
-        inputJSON[key].map(elem => arrCopy.push(this._serializeJSON(elem)));
-        copy[key] = arrCopy;
-      } else if (inputJSON[key] != null && typeof inputJSON[key] === 'object') {
-        copy[key] = this._serializeJSON(inputJSON[key]);
-      } else {
-        copy[key] = inputJSON[key];
+    for (const metricType of Object.keys(currentMetrics)) {
+      for (const name of Object.keys(currentMetrics[metricType])) {
+        const metricCopy = {
+          metric: {},
+          values: [],
+        };
+        metricCopy.metric.name = currentMetrics[metricType][name].metric.name;
+        metricCopy.metric.help = currentMetrics[metricType][name].metric.help;
+        metricCopy.metric.labelNames = [];
+        currentMetrics[metricType][name].metric.labelNames.map(label =>
+          metricCopy.metric.labelNames.push(label),
+        );
+        metricCopy.values = [];
+        currentMetrics[metricType][name].values.forEach(value => {
+          let countOrLabelsCopy = value.countOrLabels;
+          if (typeof value.countOrLabels === 'object') {
+            countOrLabelsCopy = {};
+            for (const label of Object.keys(value.countOrLabels)) {
+              countOrLabelsCopy[label] = value.countOrLabels[label];
+            }
+          }
+          metricCopy.values.push({
+            countOrLabels: countOrLabelsCopy,
+            count: value.count,
+          });
+        });
+        copy[metricType][name] = metricCopy;
       }
     }
     return copy;
