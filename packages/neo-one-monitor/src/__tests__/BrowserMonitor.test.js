@@ -19,20 +19,23 @@ describe('BrowserMonitor', () => {
     labels: { label1: 10 },
     data: { data1: '20' },
   };
+  const error = new Error('testError');
+  (error: $FlowFixMe).code = 'red';
   const options2 = {
     name: 'log2',
     level: 'silly',
     message: 'test2',
     labels: { label2: 30 },
     data: { data1: '40' },
-    error: new Error('testError'),
+    error,
   };
 
   const options2Result = {
     ...options2,
     error: {
-      message: options2.error.message,
-      stack: options2.error.stack,
+      message: error.message,
+      stack: error.stack,
+      code: (error: $FlowFixMe).code,
     },
   };
 
@@ -48,7 +51,7 @@ describe('BrowserMonitor', () => {
       help: counterOptions1.help,
       labelNames: [...counterOptions1.labelNames, 'service', 'component'],
     },
-    values: [{ count: 5, countOrLabels: {} }, { count: 4, countOrLabels: {} }],
+    values: [{ count: 5, labels: {} }, { count: 4, labels: {} }],
   };
 
   const histogramOptions1 = {
@@ -63,7 +66,7 @@ describe('BrowserMonitor', () => {
       help: histogramOptions1.help,
       labelNames: [...histogramOptions1.labelNames, 'service', 'component'],
     },
-    values: [{ countOrLabels: { histLabel1: 14 }, count: 3 }],
+    values: [{ labels: { histLabel1: 14 }, count: 3 }],
   };
 
   const emptyMetrics = {
@@ -82,7 +85,7 @@ describe('BrowserMonitor', () => {
   };
 
   const requestCounter = {
-    name: 'browserRequestCounter',
+    name: 'browser_request_counter',
     help: 'Counts fetch requests from Browser Reporter to endpoint',
     labelNames: [KNOWN_LABELS.ERROR],
   };
@@ -151,7 +154,7 @@ describe('BrowserMonitor', () => {
       counters: {
         [counterResult1.metric.name]: {
           metric: counterResult1.metric,
-          values: [{ count: 3, countOrLabels: {} }],
+          values: [{ count: 3, labels: {} }],
         },
       },
     });
@@ -201,7 +204,7 @@ describe('BrowserMonitor', () => {
       counters: {
         [requestCounter.name]: {
           metric: requestCounter,
-          values: [{ countOrLabels: { [KNOWN_LABELS.ERROR]: false } }],
+          values: [{ labels: { [KNOWN_LABELS.ERROR]: false } }],
         },
         [counterResult1.metric.name]: {
           metric: counterResult1.metric,
@@ -236,7 +239,7 @@ describe('BrowserMonitor', () => {
 
     await new Promise(resolve => setTimeout(() => resolve(), 1500));
 
-    logger.log(options2);
+    logger.log(options1);
 
     const histogram = monitor.getHistogram(histogramOptions1);
     histogram.observe({ histLabel1: 14 }, 3);
@@ -268,7 +271,7 @@ describe('BrowserMonitor', () => {
         inc: jest.fn(),
       };
       const getCounterSpy = jest
-        .spyOn(nodeMonitor, 'getCounter')
+        .spyOn(nodeMonitor, '_getCounter')
         .mockImplementation(() => fakeCounter);
       const counter = monitor.getCounter(counterOptions1);
       counter.inc(5);
@@ -284,7 +287,6 @@ describe('BrowserMonitor', () => {
       nodeMonitor.report(JSON.parse(testReport));
 
       reporter.close();
-      reset();
       getCounterSpy.mockRestore();
 
       const nodeCounter = nodeMonitor.getCounter(counterOptions1);
@@ -318,7 +320,7 @@ describe('BrowserMonitor', () => {
         observe: jest.fn(),
       };
       const getHistSpy = jest
-        .spyOn(nodeMonitor, 'getHistogram')
+        .spyOn(nodeMonitor, '_getHistogram')
         .mockImplementation(() => fakeHist);
       const histogram = monitor.getHistogram(histogramOptions1);
       histogram.observe({ histLabel1: 14 }, 3);
@@ -360,7 +362,7 @@ describe('BrowserMonitor', () => {
       const nodeMonitor = NodeMonitor.create({
         service: 'test',
       });
-      const getCounterSpy = jest.spyOn(nodeMonitor, 'getCounter');
+      const getCounterSpy = jest.spyOn(nodeMonitor, '_getCounter');
 
       const counter = monitor.getCounter(counterOptions1);
       counter.inc(5);
@@ -384,7 +386,7 @@ describe('BrowserMonitor', () => {
       nodeCounter.inc({ label1: 7 });
       nodeCounter.inc({ label2: 12 }, 36);
       // $FlowFixMe
-      const nodeResult = getCounterSpy.mock.returnValues[2]._metric;
+      const nodeResult = getCounterSpy.mock.returnValues[2];
 
       expect(nodeResult).toEqual(browserResult);
       nodeMonitor.close(() => {});
@@ -405,7 +407,7 @@ describe('BrowserMonitor', () => {
       const nodeMonitor = NodeMonitor.create({
         service: 'test',
       });
-      const getHistSpy = jest.spyOn(nodeMonitor, 'getHistogram');
+      const getHistSpy = jest.spyOn(nodeMonitor, '_getHistogram');
 
       const histogram = monitor.getHistogram(histogramOptions1);
       histogram.observe({ histLabel1: 14 }, 3);
@@ -425,7 +427,7 @@ describe('BrowserMonitor', () => {
       nodeHist.observe({ histLabel1: 14 }, 3);
       nodeHist.observe(7);
       // $FlowFixMe
-      const nodeResult = getHistSpy.mock.returnValues[1]._metric;
+      const nodeResult = getHistSpy.mock.returnValues[1];
 
       expect(nodeResult).toEqual(browserResult);
       nodeMonitor.close(() => {});

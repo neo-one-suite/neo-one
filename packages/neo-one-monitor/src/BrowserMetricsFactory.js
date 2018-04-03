@@ -1,11 +1,18 @@
 /* @flow */
+import { utils } from '@neo-one/utils';
+
 import type {
   MetricsFactory,
   MetricLabels,
   MetricConstruct,
 } from './MonitorBase';
 
-import type { Counter, Gauge, Histogram, Summary } from './types';
+import type {
+  CounterMetric,
+  GaugeMetric,
+  HistogramMetric,
+  SummaryMetric,
+} from './types';
 
 let metrics = {
   counters: {},
@@ -20,7 +27,7 @@ export const resetMetricsForTesting = (): void => {
 };
 
 export type MetricValue = {|
-  countOrLabels?: number | MetricLabels,
+  labels?: MetricLabels,
   count?: number,
 |};
 
@@ -43,102 +50,100 @@ export type MetricCollection = {|
   histograms: { [name: string]: CollectingMetric },
 |};
 
-class BrowserCounter extends CollectingMetric implements Counter {
-  inc(countOrLabels?: number | MetricLabels, count?: number): void {
-    this.values.push({ countOrLabels, count });
+class BrowserCounter extends CollectingMetric implements CounterMetric {
+  inc(labels?: MetricLabels, count?: number): void {
+    this.values.push({ labels, count });
   }
 }
 
-export class BrowserGauge extends CollectingMetric implements Gauge {
+export class BrowserGauge extends CollectingMetric implements GaugeMetric {
   // eslint-disable-next-line
-  inc(countOrLabels?: number | MetricLabels, count?: number): void {}
+  inc(labels?: MetricLabels, count?: number): void {}
 
   // eslint-disable-next-line
-  dec(countOrLabels?: number | MetricLabels, count?: number): void {}
+  dec(labels?: MetricLabels, count?: number): void {}
 
   // eslint-disable-next-line
-  set(countOrLabels?: number | MetricLabels, count?: number): void {}
+  set(labels?: MetricLabels, count?: number): void {}
 }
 
-class BrowserHistogram extends CollectingMetric implements Histogram {
-  observe(countOrLabels?: number | MetricLabels, count?: number): void {
-    this.values.push({ countOrLabels, count });
+class BrowserHistogram extends CollectingMetric implements HistogramMetric {
+  observe(labels?: MetricLabels, count?: number): void {
+    this.values.push({ labels, count });
   }
 }
 
-export class BrowserSummary extends CollectingMetric implements Summary {
+export class BrowserSummary extends CollectingMetric implements SummaryMetric {
   // eslint-disable-next-line
-  observe(countOrLabels?: number | MetricLabels, count?: number): void {}
+  observe(labels?: MetricLabels, count?: number): void {}
 }
 
 export default class BrowserMetricsFactory implements MetricsFactory {
   collect(): MetricCollection {
     const currentMetrics = this._serializeJSON(metrics);
-    for (const metricType of Object.keys(metrics)) {
-      for (const name of Object.keys(metrics[metricType])) {
-        metrics[metricType][name].reset();
-      }
-    }
+    utils
+      .keys(metrics)
+      .map(metricType =>
+        utils
+          .keys(metrics[metricType])
+          .map(name => metrics[metricType][name].reset()),
+      );
     return currentMetrics;
   }
 
-  createGauge(options: MetricConstruct): Gauge {
+  createGauge(options: MetricConstruct): GaugeMetric {
     return new BrowserGauge(options);
   }
 
-  createCounter(options: MetricConstruct): Counter {
+  createCounter(options: MetricConstruct): CounterMetric {
     const counter = new BrowserCounter(options);
     metrics.counters[counter.metric.name] = counter;
 
     return counter;
   }
 
-  createHistogram(options: MetricConstruct): Histogram {
+  createHistogram(options: MetricConstruct): HistogramMetric {
     const histogram = new BrowserHistogram(options);
     metrics.histograms[histogram.metric.name] = histogram;
 
     return histogram;
   }
 
-  createSummary(options: MetricConstruct): Summary {
+  createSummary(options: MetricConstruct): SummaryMetric {
     return new BrowserSummary(options);
   }
 
   _serializeJSON(currentMetrics: MetricCollection): MetricCollection {
-    const copy = {
-      counters: {},
-      histograms: {},
-    };
+    const copy = utils
+      .keys(currentMetrics)
+      .reduce((accMetricType, metricType) => {
+        const resultMetricType = { ...accMetricType };
+        resultMetricType[metricType] = utils
+          .keys(currentMetrics[metricType])
+          .reduce((accMetric, name) => {
+            const result = { ...accMetric };
+            const metric = {
+              metric: {
+                name: currentMetrics[metricType][name].metric.name,
+                help: currentMetrics[metricType][name].metric.help,
+                labelNames: [
+                  ...currentMetrics[metricType][name].metric.labelNames,
+                ],
+              },
+              values: currentMetrics[metricType][name].values.map(value => ({
+                labels: { ...value.labels },
+                count: value.count,
+              })),
+            };
+            result[name] = metric;
+            return result;
+          }, {});
+        return resultMetricType;
+      }, {});
 
-    for (const metricType of Object.keys(currentMetrics)) {
-      for (const name of Object.keys(currentMetrics[metricType])) {
-        const metricCopy = {
-          metric: {},
-          values: [],
-        };
-        metricCopy.metric.name = currentMetrics[metricType][name].metric.name;
-        metricCopy.metric.help = currentMetrics[metricType][name].metric.help;
-        metricCopy.metric.labelNames = [];
-        currentMetrics[metricType][name].metric.labelNames.map(label =>
-          metricCopy.metric.labelNames.push(label),
-        );
-        metricCopy.values = [];
-        currentMetrics[metricType][name].values.forEach(value => {
-          let countOrLabelsCopy = value.countOrLabels;
-          if (typeof value.countOrLabels === 'object') {
-            countOrLabelsCopy = {};
-            for (const label of Object.keys(value.countOrLabels)) {
-              countOrLabelsCopy[label] = value.countOrLabels[label];
-            }
-          }
-          metricCopy.values.push({
-            countOrLabels: countOrLabelsCopy,
-            count: value.count,
-          });
-        });
-        copy[metricType][name] = metricCopy;
-      }
-    }
-    return copy;
+    return {
+      counters: copy.counters,
+      histograms: copy.histograms,
+    };
   }
 }

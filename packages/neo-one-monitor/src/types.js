@@ -86,15 +86,6 @@ export type LogSingleOptions = {|
   },
 |};
 
-export type LoggerLogOptions = {|
-  name: string,
-  level: LogLevel,
-  message?: string,
-  labels?: Labels,
-  data?: Labels,
-  error?: ?Error,
-|};
-
 export type CaptureErrorOptions =
   | string
   | {|
@@ -144,8 +135,6 @@ export type MetricOptions = {|
   name: string,
   help?: string,
   labelNames?: Array<Label>,
-  metricLabels?: Labels,
-  directReport?: boolean,
 |};
 
 export opaque type Reference = any;
@@ -206,6 +195,24 @@ export interface Histogram {
 
 export interface Summary {
   observe(value: number): void;
+  observe(labels: Labels, value: number): void;
+}
+
+export interface CounterMetric {
+  inc(labels?: Labels, count?: number): void;
+}
+
+export interface GaugeMetric {
+  inc(labels?: Labels, count?: number): void;
+  dec(labels?: Labels, count?: number): void;
+  set(labels: Labels, value: number): void;
+}
+
+export interface HistogramMetric {
+  observe(labels?: Labels, value?: number): void;
+}
+
+export interface SummaryMetric {
   observe(labels: Labels, value: number): void;
 }
 

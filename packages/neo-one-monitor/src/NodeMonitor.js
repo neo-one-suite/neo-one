@@ -8,12 +8,12 @@ import perfHooks from 'perf_hooks';
 import prom from 'prom-client';
 
 import type {
-  Counter,
-  Gauge,
-  Histogram,
+  CounterMetric,
+  GaugeMetric,
+  HistogramMetric,
   LogLevel,
   Monitor,
-  Summary,
+  SummaryMetric,
 } from './types';
 import MonitorBase, {
   type Logger,
@@ -23,19 +23,19 @@ import MonitorBase, {
 } from './MonitorBase';
 
 class NodeMetricsFactory implements MetricsFactory {
-  createCounter(options: MetricConstruct): Counter {
+  createCounter(options: MetricConstruct): CounterMetric {
     return new prom.Counter(options);
   }
 
-  createGauge(options: MetricConstruct): Gauge {
+  createGauge(options: MetricConstruct): GaugeMetric {
     return new prom.Gauge(options);
   }
 
-  createHistogram(options: MetricConstruct): Histogram {
+  createHistogram(options: MetricConstruct): HistogramMetric {
     return new prom.Histogram(options);
   }
 
-  createSummary(options: MetricConstruct): Summary {
+  createSummary(options: MetricConstruct): SummaryMetric {
     return new prom.Summary(options);
   }
 }

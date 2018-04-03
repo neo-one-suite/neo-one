@@ -148,5 +148,8 @@
       "./scripts/serializers/buffer.js"
     ],
     "setupTestFrameworkScriptFile": "./scripts/test/jestSetup.js"
+  },
+  "dependencies": {
+    "flow": "^0.2.3"
   }
 }

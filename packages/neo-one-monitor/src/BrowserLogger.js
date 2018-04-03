@@ -1,7 +1,7 @@
 /* @flow */
-import type { LoggerLogOptions, LogLevel, Labels } from './types';
+import type { LogLevel, Labels } from './types';
 
-import type { Logger } from './MonitorBase';
+import type { Logger, LoggerLogOptions } from './MonitorBase';
 
 export type CollectingLoggerLogOptions = {|
   name: string,
@@ -12,6 +12,7 @@ export type CollectingLoggerLogOptions = {|
   error?: {|
     message?: string,
     stack?: string,
+    code?: string,
   |},
 |};
 
@@ -29,14 +30,19 @@ export default class BrowserLogger implements Logger {
       message: options.message,
       labels: options.labels,
       data: options.data,
-      error: undefined,
+      error:
+        options.error == null
+          ? undefined
+          : {
+              message: options.error.message,
+              stack: options.error.stack,
+              code:
+                (options.error: $FlowFixMe).code == null
+                  ? options.error.constructor.name
+                  : (options.error: $FlowFixMe).code,
+            },
     };
-    if (options.error) {
-      log.error = {
-        message: options.error.message,
-        stack: options.error.stack,
-      };
-    }
+
     this._logs.push(log);
   }
 

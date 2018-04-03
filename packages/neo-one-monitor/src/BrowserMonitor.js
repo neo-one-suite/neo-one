@@ -1,5 +1,11 @@
 /* @flow */
-import type { Counter, Gauge, Histogram, LogLevel, Summary } from './types';
+import type {
+  CounterMetric,
+  GaugeMetric,
+  HistogramMetric,
+  LogLevel,
+  SummaryMetric,
+} from './types';
 import MonitorBase, {
   type Logger,
   type MetricConstruct,
@@ -13,46 +19,46 @@ class BaseMetric {
   constructor(options: MetricConstruct) {}
 }
 
-class BrowserCounter extends BaseMetric implements Counter {
+class BrowserCounter extends BaseMetric implements CounterMetric {
   // eslint-disable-next-line
-  inc(countOrLabels?: number | MetricLabels, count?: number): void {}
+  inc(countOrLabels?: MetricLabels, count?: number): void {}
 }
 
-class BrowserGauge extends BaseMetric implements Gauge {
+class BrowserGauge extends BaseMetric implements GaugeMetric {
   // eslint-disable-next-line
-  inc(countOrLabels?: number | MetricLabels, count?: number): void {}
+  inc(countOrLabels?: MetricLabels, count?: number): void {}
 
   // eslint-disable-next-line
-  dec(countOrLabels?: number | MetricLabels, count?: number): void {}
+  dec(countOrLabels?: MetricLabels, count?: number): void {}
 
   // eslint-disable-next-line
-  set(countOrLabels?: number | MetricLabels, count?: number): void {}
+  set(countOrLabels?: MetricLabels, count?: number): void {}
 }
 
-class BrowserHistogram extends BaseMetric implements Histogram {
+class BrowserHistogram extends BaseMetric implements HistogramMetric {
   // eslint-disable-next-line
-  observe(countOrLabels?: number | MetricLabels, count?: number): void {}
+  observe(countOrLabels?: MetricLabels, count?: number): void {}
 }
 
-class BrowserSummary extends BaseMetric implements Summary {
+class BrowserSummary extends BaseMetric implements SummaryMetric {
   // eslint-disable-next-line
-  observe(countOrLabels?: number | MetricLabels, count?: number): void {}
+  observe(countOrLabels: MetricLabels, count?: number): void {}
 }
 
 class BrowserMetricsFactory implements MetricsFactory {
-  createCounter(options: MetricConstruct): Counter {
+  createCounter(options: MetricConstruct): CounterMetric {
     return new BrowserCounter(options);
   }
 
-  createGauge(options: MetricConstruct): Gauge {
+  createGauge(options: MetricConstruct): GaugeMetric {
     return new BrowserGauge(options);
   }
 
-  createHistogram(options: MetricConstruct): Histogram {
+  createHistogram(options: MetricConstruct): HistogramMetric {
     return new BrowserHistogram(options);
   }
 
-  createSummary(options: MetricConstruct): Summary {
+  createSummary(options: MetricConstruct): SummaryMetric {
     return new BrowserSummary(options);
   }
 }
