@@ -90,6 +90,14 @@ describe('BrowserMonitor', () => {
     labelNames: [KNOWN_LABELS.ERROR],
   };
 
+  const emptyBackReport = {
+    logs: [],
+    metrics: {
+      counters: {},
+      histograms: {},
+    },
+  };
+
   let logger = new BrowserLogger();
   let metricsFactory = new BrowserMetricsFactory();
   let monitor = BrowserMonitor.create({
@@ -166,7 +174,7 @@ describe('BrowserMonitor', () => {
     const reporter = new Reporter({
       logger,
       metricsFactory,
-      timer: 1000,
+      timer: 2000,
       endpoint: 'fakeEnd',
     });
 
@@ -176,45 +184,31 @@ describe('BrowserMonitor', () => {
     counter.inc(5);
     counter.inc(4);
 
-    await new Promise(resolve => setTimeout(() => resolve(), 1000));
-    expect(logger.collect()).toEqual([]);
-    expect(metricsFactory.collect()).toEqual({
-      counters: {
-        [requestCounter.name]: {
-          metric: requestCounter,
-          values: [],
-        },
-        [counterResult1.metric.name]: {
-          metric: counterResult1.metric,
-          values: [],
-        },
-      },
-      histograms: {},
+    const firstResult = await reporter._collectReport({
+      backReport: emptyBackReport,
+      logger,
+      metricsFactory,
+      emptyBackReport,
     });
 
-    logger.log(options2);
+    expect(firstResult).toEqual(emptyBackReport);
 
     const histogram = monitor.getHistogram(histogramOptions1);
     histogram.observe({ histLabel1: 14 }, 3);
 
-    await new Promise(resolve => setTimeout(() => resolve(), 500));
-    expect(logger.collect()).toEqual([options2Result]);
-
-    expect(metricsFactory.collect()).toEqual({
-      counters: {
-        [requestCounter.name]: {
-          metric: requestCounter,
-          values: [{ labels: { [KNOWN_LABELS.ERROR]: false } }],
-        },
-        [counterResult1.metric.name]: {
-          metric: counterResult1.metric,
-          values: [],
-        },
-      },
-      histograms: { [histResult1.metric.name]: histResult1 },
+    const secondResult = await reporter._collectReport({
+      backReport: emptyBackReport,
+      logger,
+      metricsFactory,
+      emptyBackReport,
     });
 
+    expect(secondResult).toEqual(emptyBackReport);
+
     expect(fetch.mock.calls).toMatchSnapshot();
+
+    await new Promise(resolve => setTimeout(() => resolve(), 2000));
+    expect(fetch.mock.calls.length).toBeGreaterThanOrEqual(3);
 
     const spy = jest.spyOn(reporter._subscription, 'unsubscribe');
     reporter.close();
@@ -227,7 +221,7 @@ describe('BrowserMonitor', () => {
     const reporter = new Reporter({
       logger,
       metricsFactory,
-      timer: 1000,
+      timer: 2000,
       endpoint: 'fakeEnd',
     });
 
@@ -237,16 +231,62 @@ describe('BrowserMonitor', () => {
     counter.inc(5);
     counter.inc(4);
 
-    await new Promise(resolve => setTimeout(() => resolve(), 1500));
+    const firstBackReport = {
+      logs: [options1],
+      metrics: {
+        counters: {
+          [requestCounter.name]: {
+            metric: requestCounter,
+            values: [],
+          },
+          [counterResult1.metric.name]: counterResult1,
+        },
+        histograms: {},
+      },
+    };
 
-    logger.log(options1);
+    const firstResult = await reporter._collectReport({
+      backReport: emptyBackReport,
+      logger,
+      metricsFactory,
+      emptyBackReport,
+    });
+
+    expect(firstResult).toEqual(firstBackReport);
 
     const histogram = monitor.getHistogram(histogramOptions1);
     histogram.observe({ histLabel1: 14 }, 3);
 
-    await new Promise(resolve => setTimeout(() => resolve(), 1000));
+    const secondBackReport = {
+      logs: [],
+      metrics: {
+        counters: {
+          [requestCounter.name]: {
+            metric: requestCounter,
+            values: [{ labels: { [KNOWN_LABELS.ERROR]: true } }],
+          },
+          [counterResult1.metric.name]: {
+            metric: counterResult1.metric,
+            values: [],
+          },
+        },
+        histograms: { [histResult1.metric.name]: histResult1 },
+      },
+    };
+
+    const secondResult = await reporter._collectReport({
+      backReport: emptyBackReport,
+      logger,
+      metricsFactory,
+      emptyBackReport,
+    });
+
+    expect(secondResult).toEqual(secondBackReport);
 
     expect(fetch.mock.calls).toMatchSnapshot();
+
+    await new Promise(resolve => setTimeout(() => resolve(), 2000));
+    expect(fetch.mock.calls.length).toBeGreaterThanOrEqual(3);
 
     const spy = jest.spyOn(reporter._subscription, 'unsubscribe');
     reporter.close();

@@ -2,17 +2,14 @@
 import { utils } from '@neo-one/utils';
 
 import type {
-  MetricsFactory,
-  MetricLabels,
-  MetricConstruct,
-} from './MonitorBase';
-
-import type {
   CounterMetric,
   GaugeMetric,
   HistogramMetric,
+  MetricsFactory,
+  MetricLabels,
+  MetricConstruct,
   SummaryMetric,
-} from './types';
+} from './MonitorBase';
 
 let metrics = {
   counters: {},
@@ -31,6 +28,11 @@ export type MetricValue = {|
   count?: number,
 |};
 
+export type CollectingMetricJSON = {|
+  metric: MetricConstruct,
+  values: Array<MetricValue>,
+|};
+
 export class CollectingMetric {
   metric: MetricConstruct;
   values: Array<MetricValue>;
@@ -38,6 +40,20 @@ export class CollectingMetric {
   constructor(metric: MetricConstruct) {
     this.metric = metric;
     this.values = [];
+  }
+
+  toJSON(): CollectingMetricJSON {
+    return {
+      metric: {
+        name: this.metric.name,
+        help: this.metric.help,
+        labelNames: [...this.metric.labelNames],
+      },
+      values: this.values.map(value => ({
+        labels: { ...value.labels },
+        count: value.count,
+      })),
+    };
   }
 
   reset(): void {
@@ -82,12 +98,11 @@ export default class BrowserMetricsFactory implements MetricsFactory {
   collect(): MetricCollection {
     const currentMetrics = this._serializeJSON(metrics);
     utils
-      .keys(metrics)
-      .map(metricType =>
-        utils
-          .keys(metrics[metricType])
-          .map(name => metrics[metricType][name].reset()),
+      .values(metrics)
+      .forEach(innerMetrics =>
+        utils.values(innerMetrics).forEach(metric => metric.reset()),
       );
+
     return currentMetrics;
   }
 
@@ -114,32 +129,19 @@ export default class BrowserMetricsFactory implements MetricsFactory {
   }
 
   _serializeJSON(currentMetrics: MetricCollection): MetricCollection {
-    const copy = utils
-      .keys(currentMetrics)
-      .reduce((accMetricType, metricType) => {
-        const resultMetricType = { ...accMetricType };
-        resultMetricType[metricType] = utils
-          .keys(currentMetrics[metricType])
-          .reduce((accMetric, name) => {
-            const result = { ...accMetric };
-            const metric = {
-              metric: {
-                name: currentMetrics[metricType][name].metric.name,
-                help: currentMetrics[metricType][name].metric.help,
-                labelNames: [
-                  ...currentMetrics[metricType][name].metric.labelNames,
-                ],
-              },
-              values: currentMetrics[metricType][name].values.map(value => ({
-                labels: { ...value.labels },
-                count: value.count,
-              })),
-            };
-            result[name] = metric;
-            return result;
-          }, {});
-        return resultMetricType;
-      }, {});
+    const copy = utils.entries(currentMetrics).reduce(
+      (accMetricType, [metricType, metricsObj]) => ({
+        ...accMetricType,
+        [metricType]: utils.entries(metricsObj).reduce(
+          (accMetric, [name, metric]) => ({
+            ...accMetric,
+            [name]: metric.toJSON(),
+          }),
+          {},
+        ),
+      }),
+      { counters: {}, histograms: {} },
+    );
 
     return {
       counters: copy.counters,

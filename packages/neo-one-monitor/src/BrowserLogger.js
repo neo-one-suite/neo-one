@@ -24,7 +24,7 @@ export default class BrowserLogger implements Logger {
   }
 
   log(options: LoggerLogOptions): void {
-    const log = {
+    this._logs.push({
       name: options.name,
       level: options.level,
       message: options.message,
@@ -41,9 +41,7 @@ export default class BrowserLogger implements Logger {
                   ? options.error.constructor.name
                   : (options.error: $FlowFixMe).code,
             },
-    };
-
-    this._logs.push(log);
+    });
   }
 
   collect(): Array<CollectingLoggerLogOptions> {

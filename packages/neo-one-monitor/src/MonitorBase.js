@@ -13,12 +13,9 @@ import type {
   CaptureSpanOptions,
   CaptureSpanLogOptions,
   Counter,
-  CounterMetric,
   Format,
   Gauge,
-  GaugeMetric,
   Histogram,
-  HistogramMetric,
   Labels,
   LogErrorOptions,
   LogErrorSingleOptions,
@@ -29,20 +26,13 @@ import type {
   LogOptions,
   MetricOptions,
   Monitor,
+  Report,
   Span,
   SpanContext,
   SpanOptions,
   Summary,
-  SummaryMetric,
 } from './types';
-import type { Report } from './Reporter';
 import createTracer from './createTracer';
-
-export type FullLogLevelOption = {|
-  log: LogLevel,
-  metric: LogLevel,
-  span: LogLevel,
-|};
 
 export type LoggerLogOptions = {|
   name: string,
@@ -51,6 +41,12 @@ export type LoggerLogOptions = {|
   labels?: Labels,
   data?: Labels,
   error?: ?Error,
+|};
+
+export type FullLogLevelOption = {|
+  log: LogLevel,
+  metric: LogLevel,
+  span: LogLevel,
 |};
 
 export interface Logger {
@@ -103,6 +99,24 @@ export type MetricConstruct = {|
   help: string,
   labelNames: Array<string>,
 |};
+
+export interface CounterMetric {
+  inc(labels?: Labels, count?: number): void;
+}
+
+export interface GaugeMetric {
+  inc(labels?: Labels, count?: number): void;
+  dec(labels?: Labels, count?: number): void;
+  set(labels: Labels, value: number): void;
+}
+
+export interface HistogramMetric {
+  observe(labels?: Labels, value?: number): void;
+}
+
+export interface SummaryMetric {
+  observe(labels: Labels, value: number): void;
+}
 
 export interface MetricsFactory {
   createCounter(options: MetricConstruct): CounterMetric;
@@ -823,51 +837,29 @@ export default class MonitorBase implements Span {
           (errorObj: $FlowFixMe).code = error.code;
         }
       }
-      const newLog = {
+      this._logger.log({
         name: log.name,
         level: log.level,
         message: log.message,
         labels: log.labels,
         data: log.data,
         error: error == null ? undefined : errorObj,
-      };
-
-      this._logger.log(newLog);
+      });
     });
 
-    utils
-      .keys(report.metrics.counters)
-      .map(counterName => {
-        const counterMetric = report.metrics.counters[counterName];
-        const counter = this._getCounter({
-          name: counterMetric.metric.name,
-          help: counterMetric.metric.help,
-          labelNames: counterMetric.metric.labelNames,
-        });
-        return { values: counterMetric.values, counter };
-      })
-      .forEach(({ values, counter }) =>
-        values.forEach(value => {
-          counter.inc(value.labels, value.count);
-        }),
-      );
+    utils.values(report.metrics.counters).forEach(counterMetric => {
+      const counter = this._getCounter(counterMetric.metric);
+      counterMetric.values.forEach(value => {
+        counter.inc(value.labels, value.count);
+      });
+    });
 
-    utils
-      .keys(report.metrics.histograms)
-      .map(histName => {
-        const histMetric = report.metrics.histograms[histName];
-        const histogram = this._getHistogram({
-          name: histMetric.metric.name,
-          help: histMetric.metric.help,
-          labelNames: histMetric.metric.labelNames,
-        });
-        return { values: histMetric.values, histogram };
-      })
-      .forEach(({ values, histogram }) =>
-        values.forEach(value => {
-          histogram.observe(value.labels, value.count);
-        }),
-      );
+    utils.values(report.metrics.histograms).forEach(histMetric => {
+      const histogram = this._getHistogram(histMetric.metric);
+      histMetric.values.forEach(value => {
+        histogram.observe(value.labels, value.count);
+      });
+    });
   }
 
   // eslint-disable-next-line

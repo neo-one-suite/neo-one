@@ -12,7 +12,7 @@ Array [
   Array [
     "fakeEnd",
     Object {
-      "body": "{\\"logs\\":[{\\"name\\":\\"log1\\",\\"level\\":\\"info\\",\\"message\\":\\"test1\\",\\"labels\\":{\\"label1\\":10},\\"data\\":{\\"data1\\":\\"20\\"}},{\\"name\\":\\"log1\\",\\"level\\":\\"info\\",\\"message\\":\\"test1\\",\\"labels\\":{\\"label1\\":10},\\"data\\":{\\"data1\\":\\"20\\"}}],\\"metrics\\":{\\"counters\\":{\\"browser_request_counter\\":{\\"metric\\":{\\"name\\":\\"browser_request_counter\\",\\"help\\":\\"Counts fetch requests from Browser Reporter to endpoint\\",\\"labelNames\\":[\\"error\\"]},\\"values\\":[{\\"labels\\":{\\"error\\":true}}]},\\"counter1\\":{\\"metric\\":{\\"name\\":\\"counter1\\",\\"help\\":\\"helpCount\\",\\"labelNames\\":[\\"label1\\",\\"label2\\",\\"service\\",\\"component\\"]},\\"values\\":[{\\"labels\\":{},\\"count\\":5},{\\"labels\\":{},\\"count\\":4}]}},\\"histograms\\":{\\"histogram1\\":{\\"metric\\":{\\"name\\":\\"histogram1\\",\\"help\\":\\"helpHist\\",\\"labelNames\\":[\\"histLabel1\\",\\"histLabel2\\",\\"service\\",\\"component\\"]},\\"values\\":[{\\"labels\\":{\\"histLabel1\\":14},\\"count\\":3}]}}}}",
+      "body": "{\\"logs\\":[],\\"metrics\\":{\\"counters\\":{\\"browser_request_counter\\":{\\"metric\\":{\\"name\\":\\"browser_request_counter\\",\\"help\\":\\"Counts fetch requests from Browser Reporter to endpoint\\",\\"labelNames\\":[\\"error\\"]},\\"values\\":[{\\"labels\\":{\\"error\\":true}}]},\\"counter1\\":{\\"metric\\":{\\"name\\":\\"counter1\\",\\"help\\":\\"helpCount\\",\\"labelNames\\":[\\"label1\\",\\"label2\\",\\"service\\",\\"component\\"]},\\"values\\":[]}},\\"histograms\\":{\\"histogram1\\":{\\"metric\\":{\\"name\\":\\"histogram1\\",\\"help\\":\\"helpHist\\",\\"labelNames\\":[\\"histLabel1\\",\\"histLabel2\\",\\"service\\",\\"component\\"]},\\"values\\":[{\\"labels\\":{\\"histLabel1\\":14},\\"count\\":3}]}}}}",
       "method": "POST",
     },
   ],
@@ -25,6 +25,13 @@ Array [
     "fakeEnd",
     Object {
       "body": "{\\"logs\\":[{\\"name\\":\\"log1\\",\\"level\\":\\"info\\",\\"message\\":\\"test1\\",\\"labels\\":{\\"label1\\":10},\\"data\\":{\\"data1\\":\\"20\\"}}],\\"metrics\\":{\\"counters\\":{\\"browser_request_counter\\":{\\"metric\\":{\\"name\\":\\"browser_request_counter\\",\\"help\\":\\"Counts fetch requests from Browser Reporter to endpoint\\",\\"labelNames\\":[\\"error\\"]},\\"values\\":[]},\\"counter1\\":{\\"metric\\":{\\"name\\":\\"counter1\\",\\"help\\":\\"helpCount\\",\\"labelNames\\":[\\"label1\\",\\"label2\\",\\"service\\",\\"component\\"]},\\"values\\":[{\\"labels\\":{},\\"count\\":5},{\\"labels\\":{},\\"count\\":4}]}},\\"histograms\\":{}}}",
+      "method": "POST",
+    },
+  ],
+  Array [
+    "fakeEnd",
+    Object {
+      "body": "{\\"logs\\":[],\\"metrics\\":{\\"counters\\":{\\"browser_request_counter\\":{\\"metric\\":{\\"name\\":\\"browser_request_counter\\",\\"help\\":\\"Counts fetch requests from Browser Reporter to endpoint\\",\\"labelNames\\":[\\"error\\"]},\\"values\\":[{\\"labels\\":{\\"error\\":false}}]},\\"counter1\\":{\\"metric\\":{\\"name\\":\\"counter1\\",\\"help\\":\\"helpCount\\",\\"labelNames\\":[\\"label1\\",\\"label2\\",\\"service\\",\\"component\\"]},\\"values\\":[]}},\\"histograms\\":{\\"histogram1\\":{\\"metric\\":{\\"name\\":\\"histogram1\\",\\"help\\":\\"helpHist\\",\\"labelNames\\":[\\"histLabel1\\",\\"histLabel2\\",\\"service\\",\\"component\\"]},\\"values\\":[{\\"labels\\":{\\"histLabel1\\":14},\\"count\\":3}]}}}}",
       "method": "POST",
     },
   ],

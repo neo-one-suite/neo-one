@@ -1,6 +1,7 @@
 /* @flow */
 import type { Context } from 'koa';
-import type { Report } from './Reporter';
+import type { MetricCollection } from './BrowserMetricsFactory';
+import type { CollectingLoggerLogOptions } from './BrowserLogger';
 
 export type LogField =
   // The type or "kind" of an error (only for event="error" logs).
@@ -198,24 +199,6 @@ export interface Summary {
   observe(labels: Labels, value: number): void;
 }
 
-export interface CounterMetric {
-  inc(labels?: Labels, count?: number): void;
-}
-
-export interface GaugeMetric {
-  inc(labels?: Labels, count?: number): void;
-  dec(labels?: Labels, count?: number): void;
-  set(labels: Labels, value: number): void;
-}
-
-export interface HistogramMetric {
-  observe(labels?: Labels, value?: number): void;
-}
-
-export interface SummaryMetric {
-  observe(labels: Labels, value: number): void;
-}
-
 export type KnownLabels = {|
   SERVICE: 'service',
   COMPONENT: 'component',
@@ -302,6 +285,11 @@ export type Formats = {|
   BINARY: 'binary',
 |};
 export type Carrier = any;
+
+export type Report = {|
+  logs: Array<CollectingLoggerLogOptions>,
+  metrics: MetricCollection,
+|};
 
 /*
 Usage:

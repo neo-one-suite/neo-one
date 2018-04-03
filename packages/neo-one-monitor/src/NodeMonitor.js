@@ -7,18 +7,15 @@ import mount from 'koa-mount';
 import perfHooks from 'perf_hooks';
 import prom from 'prom-client';
 
-import type {
-  CounterMetric,
-  GaugeMetric,
-  HistogramMetric,
-  LogLevel,
-  Monitor,
-  SummaryMetric,
-} from './types';
+import type { LogLevel, Monitor } from './types';
 import MonitorBase, {
+  type CounterMetric,
+  type GaugeMetric,
+  type HistogramMetric,
   type Logger,
   type MetricConstruct,
   type MetricsFactory,
+  type SummaryMetric,
   type Tracer,
 } from './MonitorBase';
 
