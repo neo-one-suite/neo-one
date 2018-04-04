@@ -7,9 +7,15 @@ import type {
   HistogramMetric,
   MetricsFactory,
   MetricLabels,
-  MetricConstruct,
   SummaryMetric,
 } from './MonitorBase';
+import type {
+  MetricCollection,
+  MetricConstruct,
+  MetricValue,
+  CollectingMetricBase,
+  CollectingMetricJSON,
+} from './types';
 
 let metrics = {
   counters: {},
@@ -23,17 +29,7 @@ export const resetMetricsForTesting = (): void => {
   };
 };
 
-export type MetricValue = {|
-  labels?: MetricLabels,
-  count?: number,
-|};
-
-export type CollectingMetricJSON = {|
-  metric: MetricConstruct,
-  values: Array<MetricValue>,
-|};
-
-export class CollectingMetric {
+export class CollectingMetric implements CollectingMetricBase {
   metric: MetricConstruct;
   values: Array<MetricValue>;
 
@@ -43,28 +39,13 @@ export class CollectingMetric {
   }
 
   toJSON(): CollectingMetricJSON {
-    return {
-      metric: {
-        name: this.metric.name,
-        help: this.metric.help,
-        labelNames: [...this.metric.labelNames],
-      },
-      values: this.values.map(value => ({
-        labels: { ...value.labels },
-        count: value.count,
-      })),
-    };
+    return { metric: this.metric, values: this.values };
   }
 
   reset(): void {
     this.values = [];
   }
 }
-
-export type MetricCollection = {|
-  counters: { [name: string]: CollectingMetric },
-  histograms: { [name: string]: CollectingMetric },
-|};
 
 class BrowserCounter extends CollectingMetric implements CounterMetric {
   inc(labels?: MetricLabels, count?: number): void {

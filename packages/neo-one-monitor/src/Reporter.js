@@ -13,6 +13,14 @@ import { KNOWN_LABELS, type CounterMetric } from './MonitorBase';
 
 const MAX_BACKLOG = 1000;
 
+const EMPTY_BACKREPORT = {
+  logs: [],
+  metrics: {
+    counters: {},
+    histograms: {},
+  },
+};
+
 export default class Reporter {
   _endpoint: string;
   _subscription: Subscription;
@@ -35,13 +43,6 @@ export default class Reporter {
       help: 'Counts fetch requests from Browser Reporter to endpoint',
       labelNames: [KNOWN_LABELS.ERROR],
     });
-    const emptyBackReport = {
-      logs: [],
-      metrics: {
-        counters: {},
-        histograms: {},
-      },
-    };
 
     this._subscription = interval(timer)
       .pipe(
@@ -51,9 +52,8 @@ export default class Reporter {
               backReport,
               logger,
               metricsFactory,
-              emptyBackReport,
             }),
-          emptyBackReport,
+          EMPTY_BACKREPORT,
           1,
         ),
       )
@@ -71,12 +71,10 @@ export default class Reporter {
     backReport,
     logger,
     metricsFactory,
-    emptyBackReport,
   }: {|
     backReport?: Report,
     logger: BrowserLogger,
     metricsFactory: BrowserMetricsFactory,
-    emptyBackReport: Report,
   |}): Promise<Report> {
     const logs = logger.collect();
     const metrics = metricsFactory.collect();
@@ -95,7 +93,7 @@ export default class Reporter {
       return this._constructBackReport(report);
     }
     this._requestCounter.inc({ [KNOWN_LABELS.ERROR]: false });
-    return emptyBackReport;
+    return EMPTY_BACKREPORT;
   }
 
   _addBackReport(report: Report, backReport?: Report): Report {
@@ -121,10 +119,10 @@ export default class Reporter {
                     ),
             },
           }),
-          { ...currentMetrics[metricType] },
+          accMetricType[metricType] || {},
         ),
       }),
-      { counters: {}, histograms: {} },
+      currentMetrics,
     );
 
     return {

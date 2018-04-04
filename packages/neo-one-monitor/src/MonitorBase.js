@@ -25,6 +25,7 @@ import type {
   LogMetricOptions,
   LogOptions,
   MetricOptions,
+  MetricConstruct,
   Monitor,
   Report,
   Span,
@@ -92,12 +93,6 @@ type SpanData = {|
   span?: TracerSpan,
   // eslint-disable-next-line
   parent?: MonitorBase,
-|};
-
-export type MetricConstruct = {|
-  name: string,
-  help: string,
-  labelNames: Array<string>,
 |};
 
 export interface CounterMetric {

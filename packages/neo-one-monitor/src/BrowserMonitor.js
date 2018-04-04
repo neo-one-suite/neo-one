@@ -1,11 +1,10 @@
 /* @flow */
-import type { LogLevel } from './types';
+import type { LogLevel, MetricConstruct } from './types';
 import MonitorBase, {
   type CounterMetric,
   type GaugeMetric,
   type HistogramMetric,
   type Logger,
-  type MetricConstruct,
   type MetricLabels,
   type MetricsFactory,
   type SummaryMetric,

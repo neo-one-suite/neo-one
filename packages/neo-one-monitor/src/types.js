@@ -1,7 +1,5 @@
 /* @flow */
 import type { Context } from 'koa';
-import type { MetricCollection } from './BrowserMetricsFactory';
-import type { CollectingLoggerLogOptions } from './BrowserLogger';
 
 export type LogField =
   // The type or "kind" of an error (only for event="error" logs).
@@ -285,6 +283,47 @@ export type Formats = {|
   BINARY: 'binary',
 |};
 export type Carrier = any;
+
+export type CollectingLoggerLogOptions = {|
+  name: string,
+  level: LogLevel,
+  message?: string,
+  labels?: Labels,
+  data?: Labels,
+  error?: {|
+    message?: string,
+    stack?: string,
+    code?: string,
+  |},
+|};
+
+export type MetricConstruct = {|
+  name: string,
+  help: string,
+  labelNames: Array<string>,
+|};
+
+export type MetricValue = {|
+  labels?: Labels,
+  count?: number,
+|};
+
+export type CollectingMetricJSON = {|
+  metric: MetricConstruct,
+  values: Array<MetricValue>,
+|};
+
+export interface CollectingMetricBase {
+  metric: MetricConstruct;
+  values: Array<MetricValue>;
+  toJSON(): CollectingMetricJSON;
+  reset(): void;
+}
+
+export type MetricCollection = {|
+  counters: { [name: string]: CollectingMetricBase },
+  histograms: { [name: string]: CollectingMetricBase },
+|};
 
 export type Report = {|
   logs: Array<CollectingLoggerLogOptions>,

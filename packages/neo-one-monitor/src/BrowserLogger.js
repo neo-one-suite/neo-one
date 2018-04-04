@@ -1,20 +1,6 @@
 /* @flow */
-import type { LogLevel, Labels } from './types';
-
 import type { Logger, LoggerLogOptions } from './MonitorBase';
-
-export type CollectingLoggerLogOptions = {|
-  name: string,
-  level: LogLevel,
-  message?: string,
-  labels?: Labels,
-  data?: Labels,
-  error?: {|
-    message?: string,
-    stack?: string,
-    code?: string,
-  |},
-|};
+import type { CollectingLoggerLogOptions } from './types';
 
 export default class BrowserLogger implements Logger {
   _logs: Array<CollectingLoggerLogOptions>;

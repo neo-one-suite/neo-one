@@ -188,7 +188,6 @@ describe('BrowserMonitor', () => {
       backReport: emptyBackReport,
       logger,
       metricsFactory,
-      emptyBackReport,
     });
 
     expect(firstResult).toEqual(emptyBackReport);
@@ -200,7 +199,6 @@ describe('BrowserMonitor', () => {
       backReport: emptyBackReport,
       logger,
       metricsFactory,
-      emptyBackReport,
     });
 
     expect(secondResult).toEqual(emptyBackReport);
@@ -249,7 +247,6 @@ describe('BrowserMonitor', () => {
       backReport: emptyBackReport,
       logger,
       metricsFactory,
-      emptyBackReport,
     });
 
     expect(firstResult).toEqual(firstBackReport);
@@ -278,7 +275,6 @@ describe('BrowserMonitor', () => {
       backReport: emptyBackReport,
       logger,
       metricsFactory,
-      emptyBackReport,
     });
 
     expect(secondResult).toEqual(secondBackReport);
