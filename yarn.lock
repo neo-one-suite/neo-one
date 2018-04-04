@@ -10136,7 +10136,7 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.npmjs.org/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs@^5.4.2, rxjs@^5.5.2, rxjs@^5.5.8:
+rxjs@^5.4.2, rxjs@^5.5.2, rxjs@^5.5.7, rxjs@^5.5.8:
   version "5.5.8"
   resolved "https://registry.npmjs.org/rxjs/-/rxjs-5.5.8.tgz#b2b0809a57614ad6254c03d7446dea0d83ca3791"
   dependencies:

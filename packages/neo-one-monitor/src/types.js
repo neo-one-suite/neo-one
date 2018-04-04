@@ -284,6 +284,52 @@ export type Formats = {|
 |};
 export type Carrier = any;
 
+export type CollectingLoggerLogOptions = {|
+  name: string,
+  level: LogLevel,
+  message?: string,
+  labels?: Labels,
+  data?: Labels,
+  error?: {|
+    message?: string,
+    stack?: string,
+    code?: string,
+  |},
+|};
+
+export type MetricConstruct = {|
+  name: string,
+  help: string,
+  labelNames: Array<string>,
+|};
+
+export type MetricValue = {|
+  labels?: Labels,
+  count?: number,
+|};
+
+export type CollectingMetricJSON = {|
+  metric: MetricConstruct,
+  values: Array<MetricValue>,
+|};
+
+export interface CollectingMetricBase {
+  metric: MetricConstruct;
+  values: Array<MetricValue>;
+  toJSON(): CollectingMetricJSON;
+  reset(): void;
+}
+
+export type MetricCollection = {|
+  counters: { [name: string]: CollectingMetricBase },
+  histograms: { [name: string]: CollectingMetricBase },
+|};
+
+export type Report = {|
+  logs: Array<CollectingLoggerLogOptions>,
+  metrics: MetricCollection,
+|};
+
 /*
 Usage:
 Do you want to count something? monitor.getCounter
@@ -367,6 +413,8 @@ export interface Monitor {
   // now() / 1000
   nowSeconds(): number;
   serveMetrics(port: number): void;
+  report(report: Report): void;
+
   close(callback: () => void): void;
 }
 

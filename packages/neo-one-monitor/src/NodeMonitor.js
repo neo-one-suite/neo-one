@@ -7,35 +7,31 @@ import mount from 'koa-mount';
 import perfHooks from 'perf_hooks';
 import prom from 'prom-client';
 
-import type {
-  Counter,
-  Gauge,
-  Histogram,
-  LogLevel,
-  Monitor,
-  Summary,
-} from './types';
+import type { LogLevel, Monitor, MetricConstruct } from './types';
 import MonitorBase, {
+  type CounterMetric,
+  type GaugeMetric,
+  type HistogramMetric,
   type Logger,
-  type MetricConstruct,
   type MetricsFactory,
+  type SummaryMetric,
   type Tracer,
 } from './MonitorBase';
 
 class NodeMetricsFactory implements MetricsFactory {
-  createCounter(options: MetricConstruct): Counter {
+  createCounter(options: MetricConstruct): CounterMetric {
     return new prom.Counter(options);
   }
 
-  createGauge(options: MetricConstruct): Gauge {
+  createGauge(options: MetricConstruct): GaugeMetric {
     return new prom.Gauge(options);
   }
 
-  createHistogram(options: MetricConstruct): Histogram {
+  createHistogram(options: MetricConstruct): HistogramMetric {
     return new prom.Histogram(options);
   }
 
-  createSummary(options: MetricConstruct): Summary {
+  createSummary(options: MetricConstruct): SummaryMetric {
     return new prom.Summary(options);
   }
 }
