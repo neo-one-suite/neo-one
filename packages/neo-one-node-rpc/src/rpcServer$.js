@@ -124,7 +124,7 @@ async function handleServer<
           [monitor.labels.SPAN_KIND]: 'server',
         })
         .withData({ host, port })
-        .logSingle({
+        .log({
           name: 'server_listen',
           message: `Server listening on ${host}:${port}`,
           level: 'verbose',

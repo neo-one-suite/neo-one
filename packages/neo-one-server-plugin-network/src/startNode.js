@@ -61,7 +61,6 @@ export default ({
         onError: error => {
           monitor.logError({
             name: 'neo_node_uncaught_error',
-            help: 'Uncaught node errors',
             message: 'Uncaught node error, shutting down.',
             error,
           });

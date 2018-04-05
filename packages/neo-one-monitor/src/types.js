@@ -24,7 +24,8 @@ export type LogField =
   | 'stack';
 
 export type Label = string;
-export type Labels = { [label: Label]: ?string | ?number | ?boolean | void };
+export type LabelValue = ?string | ?number | ?boolean | void;
+export type Labels = { [label: Label]: LabelValue };
 
 /* General guidelines -
   - 'info'
@@ -47,155 +48,8 @@ export type LogLevelOption =
   | LogLevel
   | {|
       log: LogLevel,
-      metric?: LogLevel,
       span?: LogLevel,
     |};
-
-export type LogMetricOptions = {|
-  type: 'counter' | 'gauge' | 'histogram' | 'summary',
-  value?: number,
-  suffix: string,
-|};
-
-export type LogOptions = {|
-  name: string, // Lowercase. Increments a counter for the same event.
-  message?: string, // Human readable string.
-  level?: LogLevelOption,
-
-  help?: string, // Description of the event.
-  metric?: LogMetricOptions,
-  labelNames?: Array<string>, // Labels to include on the metric
-
-  error?: {
-    error?: ?Error,
-    message?: string,
-    level?: LogLevel,
-  },
-|};
-
-export type LogSingleOptions = {|
-  name: string,
-  message?: string,
-  level?: LogLevelOption,
-
-  error?: {
-    error?: ?Error,
-    message?: string,
-    level?: LogLevel,
-  },
-|};
-
-export type CaptureErrorOptions =
-  | string
-  | {|
-      message?: string,
-      level?: LogLevel,
-    |};
-
-export type CaptureLogOptions = {|
-  name: string,
-  message?: string,
-  level?: LogLevelOption,
-
-  help?: string,
-  metric?: LogMetricOptions,
-  labelNames?: Array<string>, // Labels to include on the metric
-
-  error?: CaptureErrorOptions,
-|};
-
-export type CaptureLogSingleOptions = {|
-  name: string,
-  message?: string,
-  level?: LogLevelOption,
-
-  error?: CaptureErrorOptions,
-|};
-
-export type LogErrorOptions = {|
-  name: string,
-  message?: string,
-  error: Error,
-  level?: LogLevelOption,
-
-  help?: string,
-  metric?: LogMetricOptions,
-  labelNames?: Array<string>, // Labels to include on the metric
-|};
-
-export type LogErrorSingleOptions = {|
-  name: string,
-  message?: string,
-  error: Error,
-  level?: LogLevelOption,
-|};
-
-export type MetricOptions = {|
-  name: string,
-  help?: string,
-  labelNames?: Array<Label>,
-|};
-
-export opaque type Reference = any;
-
-export type SpanOptions = {|
-  name: string,
-  level?: LogLevelOption,
-
-  help?: string,
-  labelNames?: Array<string>, // Labels to include on the metric
-
-  references?: Array<Reference | void>,
-  trace?: boolean, // Is this allowed to be a top level span?
-|};
-
-export type CaptureSpanOptions = {|
-  name: string,
-  level?: LogLevelOption,
-
-  help?: string,
-  labelNames?: Array<string>, // Labels to include on the metric
-
-  references?: Array<Reference | void>,
-  trace?: boolean, // Is this allowed to be a top level span?
-|};
-
-export type CaptureSpanLogOptions = {|
-  name: string,
-  message?: string,
-  level?: LogLevelOption,
-
-  help?: string,
-  labelNames?: Array<string>, // Labels to include on the metric
-
-  error?: CaptureErrorOptions,
-  references?: Array<Reference | void>,
-  trace?: boolean, // Is this allowed to be a top level span?
-|};
-
-export interface Counter {
-  inc(count?: number): void;
-  inc(labels?: Labels, count?: number): void;
-}
-
-export interface Gauge {
-  inc(count?: number): void;
-  inc(labels?: Labels, count?: number): void;
-  dec(count?: number): void;
-  dec(labels?: Labels, count?: number): void;
-  set(value: number): void;
-  set(labels: Labels, value: number): void;
-}
-
-export interface Histogram {
-  observe(value: number): void;
-  observe(labels: Labels, value: number): void;
-}
-
-export interface Summary {
-  observe(value: number): void;
-  observe(labels: Labels, value: number): void;
-}
 
 export type KnownLabels = {|
   SERVICE: 'service',
@@ -284,7 +138,7 @@ export type Formats = {|
 |};
 export type Carrier = any;
 
-export type CollectingLoggerLogOptions = {|
+export type CollectedLoggerLogOptions = {|
   name: string,
   level: LogLevel,
   message?: string,
@@ -297,37 +151,179 @@ export type CollectingLoggerLogOptions = {|
   |},
 |};
 
-export type MetricConstruct = {|
+export type MetricOptions = {|
   name: string,
-  help: string,
-  labelNames: Array<string>,
+  help?: string,
+  labelNames?: Array<Label>,
+  labels?: Array<Labels>,
 |};
 
+export type BucketedMetricOptions = {|
+  ...MetricOptions,
+  buckets?: Array<number>,
+|};
+
+export type PercentiledMetricOptions = {|
+  ...MetricOptions,
+  percentiles?: Array<number>,
+|};
+
+export type AllMetricOptions =
+  | MetricOptions
+  | BucketedMetricOptions
+  | PercentiledMetricOptions;
+
 export type MetricValue = {|
-  labels?: Labels,
+  countOrLabels?: Labels | number,
   count?: number,
 |};
 
-export type CollectingMetricJSON = {|
-  metric: MetricConstruct,
+export type CollectedMetric<T: MetricOptions | BucketedMetricOptions> = {|
+  metric: T,
   values: Array<MetricValue>,
 |};
-
-export interface CollectingMetricBase {
-  metric: MetricConstruct;
-  values: Array<MetricValue>;
-  toJSON(): CollectingMetricJSON;
-  reset(): void;
-}
+export type CollectedMetrics<T: MetricOptions | BucketedMetricOptions> = {
+  [name: string]: CollectedMetric<T>,
+};
 
 export type MetricCollection = {|
-  counters: { [name: string]: CollectingMetricBase },
-  histograms: { [name: string]: CollectingMetricBase },
+  counters: CollectedMetrics<MetricOptions>,
+  histograms: CollectedMetrics<BucketedMetricOptions>,
 |};
 
 export type Report = {|
-  logs: Array<CollectingLoggerLogOptions>,
+  logs: Array<CollectedLoggerLogOptions>,
   metrics: MetricCollection,
+|};
+
+export interface Counter {
+  inc(count?: number): void;
+  inc(labels?: Labels, count?: number): void;
+
+  getLabelNames(): Array<Label>;
+}
+
+export interface Gauge {
+  inc(count?: number): void;
+  inc(labels?: Labels, count?: number): void;
+  dec(count?: number): void;
+  dec(labels?: Labels, count?: number): void;
+  set(value: number): void;
+  set(labels: Labels, value: number): void;
+
+  getLabelNames(): Array<Label>;
+}
+
+export interface Histogram {
+  observe(value: number): void;
+  observe(labels: Labels, value: number): void;
+
+  getLabelNames(): Array<Label>;
+}
+
+export interface Summary {
+  observe(value: number): void;
+  observe(labels: Labels, value: number): void;
+
+  getLabelNames(): Array<Label>;
+}
+
+export type Metric = Counter | Gauge | Histogram | Summary;
+
+export interface MetricsFactory {
+  createCounter(options: MetricOptions): Counter;
+  createGauge(options: MetricOptions): Gauge;
+  createHistogram(options: BucketedMetricOptions): Histogram;
+  createSummary(options: PercentiledMetricOptions): Summary;
+
+  setFactory(factory: MetricsFactory): void;
+}
+
+export type LogOptions = {|
+  name: string, // Lowercase. Increments a counter for the same event.
+  message?: string, // Human readable string.
+  level?: LogLevel,
+
+  metric?: Counter,
+
+  error?: {|
+    metric?: Counter,
+    error?: ?Error,
+    message?: string,
+    level?: LogLevel,
+  |},
+|};
+
+export type CaptureLogOptions = {|
+  name: string,
+  message?: string,
+  level?: LogLevel,
+
+  metric?: Counter,
+
+  error?:
+    | string
+    | {|
+        metric?: Counter,
+        message?: string,
+        level?: LogLevel,
+      |},
+|};
+
+export type LogErrorOptions = {|
+  name: string,
+  message?: string,
+  error: Error,
+  level?: LogLevel,
+  metric?: Counter,
+|};
+
+export opaque type Reference = any;
+
+export type SpanOptions = {|
+  name: string,
+  level?: LogLevel,
+
+  metric?: {|
+    total: Histogram | Summary,
+    error: Counter,
+  |},
+
+  references?: Array<Reference | void>,
+  trace?: boolean, // Is this allowed to be a top level span?
+|};
+
+export type CaptureSpanOptions = {|
+  name: string,
+  level?: LogLevel,
+
+  metric?: {|
+    total: Histogram | Summary,
+    error: Counter,
+  |},
+
+  references?: Array<Reference | void>,
+  trace?: boolean, // Is this allowed to be a top level span?
+|};
+
+export type CaptureSpanLogOptions = {|
+  name: string,
+  message?: string,
+  level?: LogLevelOption,
+
+  metric?: {|
+    total: Histogram | Summary,
+    error: Counter,
+  |},
+
+  error?:
+    | string
+    | {|
+        message?: string,
+        level?: LogLevel,
+      |},
+  references?: Array<Reference | void>,
+  trace?: boolean, // Is this allowed to be a top level span?
 |};
 
 /*
@@ -358,24 +354,7 @@ export interface Monitor {
     func: (monitor: CaptureMonitor) => Promise<TResult>,
     options: CaptureLogOptions,
   ): Promise<TResult>;
-  logSingle(options: LogSingleOptions): void;
-  captureLogSingle<TResult>(
-    // eslint-disable-next-line
-    func: (monitor: CaptureMonitor) => TResult,
-    options: CaptureLogSingleOptions,
-  ): TResult;
-  captureLogSingle<TResult>(
-    // eslint-disable-next-line
-    func: (monitor: CaptureMonitor) => Promise<TResult>,
-    options: CaptureLogSingleOptions,
-  ): Promise<TResult>;
   logError(options: LogErrorOptions): void;
-  logErrorSingle(options: LogErrorSingleOptions): void;
-
-  getCounter(options: MetricOptions): Counter;
-  getGauge(options: MetricOptions): Gauge;
-  getHistogram(options: MetricOptions): Histogram;
-  getSummary(options: MetricOptions): Summary;
 
   // eslint-disable-next-line
   startSpan(options: SpanOptions): Span;

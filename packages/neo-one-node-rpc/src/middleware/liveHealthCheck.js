@@ -20,10 +20,6 @@ export default ({
     path: '/live_health_check',
     middleware: async (ctx: Context) => {
       const monitor = getMonitor(ctx);
-      const counter = monitor.getCounter({
-        name: 'neo_rpc_live_health_check',
-        labelNames: [monitor.labels.ERROR],
-      });
       const ready = await checkReady({ monitor, blockchain, options });
       if (
         ready ||
@@ -33,10 +29,8 @@ export default ({
       ) {
         lastBlockIndex = blockchain.currentBlockIndex;
         ctx.status = 200;
-        counter.inc({ [monitor.labels.ERROR]: false });
       } else {
         ctx.status = 500;
-        counter.inc({ [monitor.labels.ERROR]: true });
       }
     },
   };

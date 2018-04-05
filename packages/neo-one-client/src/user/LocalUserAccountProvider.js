@@ -23,7 +23,13 @@ import {
   common,
   utils,
 } from '@neo-one/client-core';
-import type { Labels, Monitor } from '@neo-one/monitor';
+import {
+  type Counter,
+  type Histogram,
+  type Labels,
+  type Monitor,
+  metrics,
+} from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 
 import _ from 'lodash';
@@ -148,6 +154,27 @@ const NEO_ONE_ATTRIBUTE = {
   data: Buffer.from('neo-one', 'utf8').toString('hex'),
 };
 
+const NEO_TRANSFER_DURATION_SECONDS = metrics.createHistogram({
+  name: 'neo_transfer_duration_seconds',
+});
+const NEO_TRANSFER_FAILURES_TOTAL = metrics.createCounter({
+  name: 'neo_transfer_failures_total',
+});
+const NEO_CLAIM_DURATION_SECONDS = metrics.createHistogram({
+  name: 'neo_claim_duration_seconds',
+});
+const NEO_CLAIM_FAILURES_TOTAL = metrics.createCounter({
+  name: 'neo_claim_failures_total',
+});
+const NEO_INVOKE_RAW_DURATION_SECONDS = metrics.createHistogram({
+  name: 'neo_invoke_raw_duration_seconds',
+  labelNames: [labelNames.INVOKE_RAW_METHOD],
+});
+const NEO_INVOKE_RAW_FAILURES_TOTAL = metrics.createCounter({
+  name: 'neo_invoke_raw_failures_total',
+  labelNames: [labelNames.INVOKE_RAW_METHOD],
+});
+
 export default class LocalUserAccountProvider<
   TKeyStore: KeyStore,
   TProvider: Provider,
@@ -226,6 +253,10 @@ export default class LocalUserAccountProvider<
       },
       {
         name: 'neo_transfer',
+        metric: {
+          total: NEO_TRANSFER_DURATION_SECONDS,
+          error: NEO_TRANSFER_FAILURES_TOTAL,
+        },
       },
       monitor,
     );
@@ -279,6 +310,10 @@ export default class LocalUserAccountProvider<
       },
       {
         name: 'neo_claim',
+        metric: {
+          total: NEO_CLAIM_DURATION_SECONDS,
+          error: NEO_CLAIM_FAILURES_TOTAL,
+        },
       },
       monitor,
     );
@@ -739,6 +774,10 @@ export default class LocalUserAccountProvider<
           ...(labels || {}),
           [labelNames.INVOKE_RAW_METHOD]: method,
         },
+        metric: {
+          total: NEO_INVOKE_RAW_DURATION_SECONDS,
+          error: NEO_INVOKE_RAW_FAILURES_TOTAL,
+        },
       },
       monitor,
     );
@@ -1124,9 +1163,14 @@ export default class LocalUserAccountProvider<
     {
       name,
       labels: labelsIn,
+      metric,
     }: {|
       name: string,
       labels?: Labels,
+      metric?: {|
+        total: Histogram,
+        error: Counter,
+      |},
     |},
     monitor?: Monitor,
   ): Promise<T> {
@@ -1140,8 +1184,8 @@ export default class LocalUserAccountProvider<
       .withLabels(labels)
       .captureSpanLog(func, {
         name,
-        level: { log: 'verbose', metric: 'info', span: 'info' },
-        labelNames: Object.keys(labels),
+        metric,
+        level: { log: 'verbose', span: 'info' },
         trace: true,
       });
   }

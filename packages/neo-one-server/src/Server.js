@@ -151,7 +151,6 @@ export default class Server {
               await prevApp.close().catch(error => {
                 this._monitor.logError({
                   name: 'grpc_app_close_error',
-                  help: 'App close failures.',
                   message: 'Failed to close previous app',
                   error,
                 });
@@ -170,7 +169,6 @@ export default class Server {
               }
               monitor.logError({
                 name: 'grpc_server_request_uncaught_error',
-                help: 'Uncaught grpc errors',
                 message: 'Uncaught grpc error.',
                 error,
               });
@@ -179,7 +177,7 @@ export default class Server {
             app.use(servicesMiddleware({ server: this }));
             this._serverDebug.port = serverConfig.port;
             app.start(`0.0.0.0:${serverConfig.port}`);
-            this._monitor.logSingle({
+            this._monitor.log({
               name: 'server_listen',
               message: 'Server started.',
               level: 'info',

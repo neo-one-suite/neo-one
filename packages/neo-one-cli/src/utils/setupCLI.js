@@ -50,7 +50,7 @@ export default ({
     if (!shutdownInitiated) {
       shutdownInitiated = true;
       monitor
-        .captureLogSingle(initiateShutdown, {
+        .captureLog(initiateShutdown, {
           name: 'cli_shutdown',
           message: 'Shutdown cleanly.',
           error: 'Failed to shutdown cleanly',
@@ -69,7 +69,7 @@ export default ({
   };
 
   process.on('unhandledRejection', error => {
-    monitor.logErrorSingle({
+    monitor.logError({
       name: 'unhandled_rejection',
       message: 'Unhandled rejection. Shutting down.',
       error,
@@ -78,7 +78,7 @@ export default ({
   });
 
   process.on('uncaughtException', error => {
-    monitor.logErrorSingle({
+    monitor.logError({
       name: 'uncaught_exception',
       message: 'Uncaught exception. Shutting down.',
       error,
@@ -90,7 +90,7 @@ export default ({
     const ui = (vorpal.ui: $FlowFixMe);
     if (ui._sigintCount > 1) {
       ui.parent.emit('vorpal_exit');
-      monitor.logSingle({
+      monitor.log({
         name: 'sigint',
         message: 'Exiting...',
       });
@@ -98,7 +98,7 @@ export default ({
     } else {
       const text = vorpal.ui.input();
       if (!ui.parent) {
-        monitor.logSingle({
+        monitor.log({
           name: 'sigint',
           message: 'Exiting...',
         });

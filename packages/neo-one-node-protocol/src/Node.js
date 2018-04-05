@@ -31,7 +31,7 @@ import {
 } from '@neo-one/node-core';
 import BloomFilter from 'bloom-filter';
 import LRU from 'lru-cache';
-import type { Gauge, Monitor } from '@neo-one/monitor';
+import { type Monitor, metrics } from '@neo-one/monitor';
 import type { Observable } from 'rxjs/Observable';
 import { ScalingBloem } from 'bloem';
 
@@ -69,6 +69,24 @@ import { AlreadyConnectedError, NegotiationError } from './errors';
 import { type PeerData } from './PeerData';
 
 import pkg from '../package.json';
+
+const messageReceivedLabelNames = [labels.COMMAND_NAME];
+const messageReceivedLabels = commonUtils.values(COMMAND).map(command => ({
+  [labels.COMMAND_NAME]: command,
+}));
+const NEO_PROTOCOL_MESSAGES_RECEIVED_TOTAL = metrics.createCounter({
+  name: 'neo_protocol_messages_received_total',
+  labelNames: messageReceivedLabelNames,
+  labels: messageReceivedLabels,
+});
+const NEO_PROTOCOL_MESSAGES_FAILURES_TOTAL = metrics.createCounter({
+  name: 'neo_protocol_messages_failures_total',
+  labelNames: messageReceivedLabelNames,
+  labels: messageReceivedLabels,
+});
+const NEO_PROTOCOL_MEMPOOL_SIZE = metrics.createGauge({
+  name: 'neo_protocol_mempool_size',
+});
 
 export type Environment = {|
   network: NetworkEnvironment,
@@ -139,7 +157,6 @@ export default class Node implements INode {
   _userAgent: string;
 
   memPool: { [hash: UInt256Hex]: Transaction };
-  _memPoolGauge: Gauge;
   _knownBlockHashes: ScalingBloem;
   _tempKnownBlockHashes: Set<UInt256Hex>;
   _knownTransactionHashes: ScalingBloem;
@@ -189,11 +206,6 @@ export default class Node implements INode {
     this.consensus = null;
     this._options$ = options$;
 
-    this._memPoolGauge = this._monitor.getGauge({
-      name: 'neo_protocol_mempool_size',
-      help: 'Current size of the mempool',
-    });
-
     this._externalPort = (environment.network.listenTCP || {}).port || 0;
     this._nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
     this._userAgent = `NEO:neo-one-js:${pkg.version}`;
@@ -219,7 +231,7 @@ export default class Node implements INode {
   start(): Observable<*> {
     const network$ = defer(async () => {
       this._network.start();
-      this._monitor.logSingle({
+      this._monitor.log({
         name: 'neo_protocol_start',
         message: 'Protocol started.',
         level: 'verbose',
@@ -228,7 +240,7 @@ export default class Node implements INode {
       neverComplete(),
       finalize(() => {
         this._network.stop();
-        this._monitor.logSingle({
+        this._monitor.log({
           name: 'neo_protocol_stop',
           message: 'Protocol stopped.',
           level: 'verbose',
@@ -292,7 +304,7 @@ export default class Node implements INode {
                   memPool: commonUtils.values(this.memPool),
                 });
                 this.memPool[transaction.hashHex] = transaction;
-                this._memPoolGauge.inc();
+                NEO_PROTOCOL_MEMPOOL_SIZE.inc();
                 if (this.consensus != null) {
                   this.consensus.onTransactionReceived(transaction);
                 }
@@ -304,8 +316,7 @@ export default class Node implements INode {
             },
             {
               name: 'neo_relay_transaction',
-              level: { log: 'verbose', metric: 'info', span: 'info' },
-              labelNames: [labels.NEO_TRANSACTION_FOUND],
+              level: { log: 'verbose', span: 'info' },
               trace: true,
             },
           );
@@ -631,7 +642,7 @@ export default class Node implements INode {
     message: Message,
   ): Promise<void> {
     await this._monitor
-      .withLabels({ 'message.command': message.value.command })
+      .withLabels({ [labels.COMMAND_NAME]: message.value.command })
       .withData({ [this._monitor.labels.PEER_ADDRESS]: peer.endpoint })
       .captureLog(
         async monitor => {
@@ -735,11 +746,15 @@ export default class Node implements INode {
         },
         {
           name: 'neo_protocol_message_received',
-          level: { log: 'debug', metric: 'verbose' },
+          level: 'debug',
           message: `Received ${message.value.command} from ${peer.endpoint}`,
-          error: `Failed to process message ${message.value.command} from ${
-            peer.endpoint
-          }`,
+          metric: NEO_PROTOCOL_MESSAGES_RECEIVED_TOTAL,
+          error: {
+            metric: NEO_PROTOCOL_MESSAGES_FAILURES_TOTAL,
+            message: `Failed to process message ${message.value.command} from ${
+              peer.endpoint
+            }`,
+          },
         },
       );
   }
@@ -809,8 +824,7 @@ export default class Node implements INode {
               },
               {
                 name: 'neo_relay_block',
-                help: 'Time taken to persist and relay a block.',
-                level: { log: 'verbose', metric: 'info', span: 'info' },
+                level: { log: 'verbose', span: 'info' },
                 trace: true,
               },
             );
@@ -822,7 +836,7 @@ export default class Node implements INode {
           delete this.memPool[transaction.hashHex];
           this._knownTransactionHashes.add(transaction.hash);
         }
-        this._memPoolGauge.set(Object.keys(this.memPool).length);
+        NEO_PROTOCOL_MEMPOOL_SIZE.set(Object.keys(this.memPool).length);
       } finally {
         this._tempKnownBlockHashes.delete(block.hashHex);
       }
@@ -1213,7 +1227,7 @@ export default class Node implements INode {
           for (const hash of hashesToRemove) {
             delete this.memPool[hash];
           }
-          this._memPoolGauge.set(Object.keys(this.memPool).length);
+          NEO_PROTOCOL_MEMPOOL_SIZE.set(Object.keys(this.memPool).length);
         },
         {
           name: 'neo_protocol_trim_mempool',

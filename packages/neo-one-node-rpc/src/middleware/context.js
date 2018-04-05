@@ -1,8 +1,22 @@
 /* @flow */
 import type { Context } from 'koa';
-import type { Monitor } from '@neo-one/monitor';
+import { LABELS, type Monitor, metrics } from '@neo-one/monitor';
 
 import { getMonitor } from './common';
+
+const labelNames = [
+  LABELS.HTTP_PATH,
+  LABELS.HTTP_STATUS_CODE,
+  LABELS.HTTP_METHOD,
+];
+const REQUESTS_HISTOGRAM = metrics.createHistogram({
+  name: 'http_server_request_duration_seconds',
+  labelNames,
+});
+const REQUEST_ERRORS_COUNTER = metrics.createCounter({
+  name: 'http_server_request_failures_total',
+  labelNames,
+});
 
 export default ({ monitor }: {| monitor: Monitor |}) => async (
   ctx: Context,
@@ -31,12 +45,11 @@ export default ({ monitor }: {| monitor: Monitor |}) => async (
     },
     {
       name: 'http_server_request',
-      level: { log: 'verbose', metric: 'info', span: 'info' },
-      labelNames: [
-        monitor.labels.HTTP_PATH,
-        monitor.labels.HTTP_STATUS_CODE,
-        monitor.labels.HTTP_METHOD,
-      ],
+      level: { log: 'verbose', span: 'info' },
+      metric: {
+        total: REQUESTS_HISTOGRAM,
+        error: REQUEST_ERRORS_COUNTER,
+      },
       references: [
         monitor.childOf(monitor.extract(monitor.formats.HTTP, ctx.headers)),
       ],

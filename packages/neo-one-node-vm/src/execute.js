@@ -128,9 +128,8 @@ const executeNext = async ({
         span => op.invoke({ monitor: span, context, args, argsAlt }),
         {
           name: 'neo_execute_op',
-          level: { log: 'debug', metric: 'verbose', span: 'debug' },
+          level: { log: 'debug', span: 'debug' },
           error: { level: 'debug' },
-          labelNames: [labels.OP_CODE],
         },
       );
   } catch (error) {
@@ -256,7 +255,7 @@ export const executeScript = async ({
 
   return monitor.captureSpanLog(span => run({ monitor: span, context }), {
     name: 'neo_execute_script',
-    level: { log: 'debug', metric: 'verbose', span: 'debug' },
+    level: { log: 'debug', span: 'debug' },
     error: { level: 'debug' },
   });
 };
@@ -300,7 +299,7 @@ export default async ({
   let errorMessage;
   const span = monitor.startSpan({
     name: 'neo_execute_scripts',
-    level: { log: 'debug', metric: 'verbose', span: 'debug' },
+    level: 'debug',
   });
   let err;
   try {

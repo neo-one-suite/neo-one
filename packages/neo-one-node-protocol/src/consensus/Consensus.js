@@ -88,7 +88,7 @@ export default class Consensus {
   }
 
   async _start(options: InternalOptions): Promise<void> {
-    this._monitor.logSingle({
+    this._monitor.log({
       name: 'neo_consensus_start',
       message: 'Consensus started.',
       level: 'verbose',
@@ -148,7 +148,7 @@ export default class Consensus {
       )
       .forEach(() => {});
 
-    this._monitor.logSingle({
+    this._monitor.log({
       name: 'neo_consensus_stop',
       message: 'Consensus stopped.',
       level: 'verbose',

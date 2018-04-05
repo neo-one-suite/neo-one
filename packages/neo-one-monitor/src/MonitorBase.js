@@ -3,36 +3,31 @@ import type { Context } from 'koa';
 
 import _ from 'lodash';
 
-import { utils } from '@neo-one/utils';
-
 import type {
+  Counter,
+  Histogram,
+  Summary,
   Carrier,
   CaptureLogOptions,
-  CaptureLogSingleOptions,
   CaptureMonitor,
   CaptureSpanOptions,
   CaptureSpanLogOptions,
-  Counter,
   Format,
-  Gauge,
-  Histogram,
   Labels,
   LogErrorOptions,
-  LogErrorSingleOptions,
   LogLevelOption,
-  LogSingleOptions,
   LogLevel,
-  LogMetricOptions,
   LogOptions,
-  MetricOptions,
-  MetricConstruct,
+  Metric,
   Monitor,
   Report,
   Span,
   SpanContext,
   SpanOptions,
-  Summary,
 } from './types';
+import ReportHandler from './ReportHandler';
+
+import { convertTagLabels } from './utils';
 import createTracer from './createTracer';
 
 export type LoggerLogOptions = {|
@@ -46,7 +41,6 @@ export type LoggerLogOptions = {|
 
 export type FullLogLevelOption = {|
   log: LogLevel,
-  metric: LogLevel,
   span: LogLevel,
 |};
 
@@ -79,15 +73,10 @@ export interface Tracer {
 
 export type Now = () => number;
 
-export type RawLabels = Labels;
-export type TagLabels = Labels;
-export type MetricLabels = Labels;
-
 type SpanData = {|
-  histogram?: {|
-    name: string,
-    help?: string,
-    labelNames?: Array<string>,
+  metric?: {|
+    total: Histogram | Summary,
+    error: Counter,
   |},
   time: number,
   span?: TracerSpan,
@@ -95,66 +84,20 @@ type SpanData = {|
   parent?: MonitorBase,
 |};
 
-export interface CounterMetric {
-  inc(labels?: Labels, count?: number): void;
-}
-
-export interface GaugeMetric {
-  inc(labels?: Labels, count?: number): void;
-  dec(labels?: Labels, count?: number): void;
-  set(labels: Labels, value: number): void;
-}
-
-export interface HistogramMetric {
-  observe(labels?: Labels, value?: number): void;
-}
-
-export interface SummaryMetric {
-  observe(labels: Labels, value: number): void;
-}
-
-export interface MetricsFactory {
-  createCounter(options: MetricConstruct): CounterMetric;
-  createGauge(options: MetricConstruct): GaugeMetric;
-  createHistogram(options: MetricConstruct): HistogramMetric;
-  createSummary(options: MetricConstruct): SummaryMetric;
-}
-
 type MonitorBaseOptions = {|
   service: string,
   component: string,
-  labels?: RawLabels,
-  data?: RawLabels,
+  labels?: Labels,
+  data?: Labels,
   logger: Logger,
   tracer?: Tracer,
   now: Now,
-  metricsLogLevel?: LogLevel,
   spanLogLevel?: LogLevel,
   span?: SpanData,
-  metricsFactory: MetricsFactory,
+  reportHandler?: ReportHandler,
 |};
 
-const counters: { [name: string]: CounterMetric } = {};
-const gauges: { [name: string]: GaugeMetric } = {};
-const histograms: { [name: string]: HistogramMetric } = {};
-const summaries: { [name: string]: SummaryMetric } = {};
-
-export const reset = (): void => {
-  for (const counter of Object.keys(counters)) {
-    delete counters[counter];
-  }
-  for (const gauge of Object.keys(gauges)) {
-    delete gauges[gauge];
-  }
-  for (const histogram of Object.keys(histograms)) {
-    delete histograms[histogram];
-  }
-  for (const summary of Object.keys(summaries)) {
-    delete summaries[summary];
-  }
-};
-
-export const KNOWN_LABELS = {
+export const LABELS = {
   // These are added automatically
   SERVICE: 'service',
   COMPONENT: 'component',
@@ -196,36 +139,6 @@ const FORMATS = {
   HTTP: 'http_headers',
   TEXT: 'text_map',
   BINARY: 'binary',
-};
-
-const dotRegex = /\./g;
-export const convertMetricLabel = (dotLabel: string): string =>
-  dotLabel.replace(dotRegex, '_');
-
-export const convertMetricLabels = (labelsIn?: RawLabels): MetricLabels => {
-  if (labelsIn == null) {
-    return {};
-  }
-
-  const labels = {};
-  for (const key of Object.keys(labelsIn)) {
-    labels[convertMetricLabel(key)] = labelsIn[key];
-  }
-  return labels;
-};
-
-export const convertTagLabel = (dotLabel: string): string => dotLabel;
-
-export const convertTagLabels = (labelsIn?: RawLabels): TagLabels => {
-  if (labelsIn == null) {
-    return {};
-  }
-
-  const labels = {};
-  for (const key of Object.keys(labelsIn)) {
-    labels[convertTagLabel(key)] = labelsIn[key];
-  }
-  return labels;
 };
 
 const LOG_LEVEL_TO_LEVEL = {
@@ -281,70 +194,15 @@ class FollowsFromReference extends DefaultReference {
   _type = 'followsFrom';
 }
 
-class MetricWrapper {
-  _metric: CounterMetric | GaugeMetric | HistogramMetric | SummaryMetric;
-  _labels: MetricLabels;
-
-  constructor({
-    metric,
-    labels,
-  }: {|
-    metric: CounterMetric | GaugeMetric | HistogramMetric | SummaryMetric,
-    labels: RawLabels,
-  |}) {
-    this._metric = metric;
-    this._labels = convertMetricLabels(labels);
-  }
-
-  _getArgs(
-    valueOrLabels?: RawLabels | number,
-    value?: number,
-  ): [MetricLabels, number | void] {
-    if (valueOrLabels == null || typeof valueOrLabels === 'number') {
-      return [{ ...this._labels }, valueOrLabels];
-    }
-
-    return [{ ...this._labels, ...convertMetricLabels(valueOrLabels) }, value];
-  }
-
-  inc(countOrLabels?: number | RawLabels, count?: number): void {
-    ((this._metric: $FlowFixMe): CounterMetric | GaugeMetric).inc(
-      ...this._getArgs(countOrLabels, count),
-    );
-  }
-
-  dec(countOrLabels?: number | RawLabels, count?: number): void {
-    ((this._metric: $FlowFixMe): GaugeMetric).dec(
-      ...this._getArgs(countOrLabels, count),
-    );
-  }
-
-  set(countOrLabels?: number | RawLabels, count?: number): void {
-    ((this._metric: $FlowFixMe): GaugeMetric).set(
-      ...(this._getArgs(countOrLabels, count): $FlowFixMe),
-    );
-  }
-
-  observe(countOrLabels?: number | RawLabels, count?: number): void {
-    ((this._metric: $FlowFixMe): HistogramMetric | SummaryMetric).observe(
-      ...(this._getArgs(countOrLabels, count): $FlowFixMe),
-    );
-  }
-}
-
 type CommonLogOptions = {|
   name: string,
   message?: string,
-  level?: LogLevelOption,
+  level?: LogLevel,
 
-  help?: string,
-  metric?: LogMetricOptions,
-  labelNames?: Array<string>,
-
-  labels?: Labels,
-  data?: Labels,
+  metric?: Counter,
 
   error?: {
+    metric?: Counter,
     error?: ?Error,
     message?: string,
     level?: LogLevel,
@@ -352,19 +210,18 @@ type CommonLogOptions = {|
 |};
 
 export default class MonitorBase implements Span {
-  labels = KNOWN_LABELS;
+  labels = LABELS;
   formats = FORMATS;
   _service: string;
   _component: string;
-  _labels: RawLabels;
-  _data: RawLabels;
+  _labels: Labels;
+  _data: Labels;
   _logger: Logger;
-  _metricsLogLevel: LogLevel;
   _spanLogLevel: LogLevel;
   _tracer: Tracer;
   now: Now;
   _span: SpanData | void;
-  _metricsFactory: MetricsFactory;
+  _reportHandler: ReportHandler;
 
   constructor({
     service,
@@ -372,25 +229,22 @@ export default class MonitorBase implements Span {
     labels,
     data,
     logger,
-    metricsLogLevel,
     spanLogLevel,
     tracer,
     now,
     span,
-    metricsFactory,
+    reportHandler,
   }: MonitorBaseOptions) {
     this._service = service;
     this._component = component;
     this._labels = labels || {};
     this._data = data || {};
     this._logger = logger;
-    this._metricsLogLevel =
-      metricsLogLevel == null ? 'verbose' : metricsLogLevel;
     this._spanLogLevel = spanLogLevel == null ? 'info' : spanLogLevel;
     this._tracer = tracer || createTracer();
     this.now = now;
     this._span = span;
-    this._metricsFactory = metricsFactory;
+    this._reportHandler = reportHandler || new ReportHandler(logger);
   }
 
   nowSeconds(): number {
@@ -401,11 +255,11 @@ export default class MonitorBase implements Span {
     return this._clone({ component });
   }
 
-  withLabels(labels: RawLabels): Monitor {
+  withLabels(labels: Labels): Monitor {
     return this._clone({ mergeLabels: labels });
   }
 
-  withData(data: RawLabels): Monitor {
+  withData(data: Labels): Monitor {
     return this._clone({ mergeData: data });
   }
 
@@ -419,56 +273,37 @@ export default class MonitorBase implements Span {
     return this;
   }
 
-  log({
-    name,
-    message,
-    level,
-    help,
-    metric,
-    labelNames,
-    error,
-  }: LogOptions): void {
-    this._commonLog({
-      name,
-      message,
-      level,
-      help,
-      metric:
-        metric == null
-          ? {
-              type: 'counter',
-              suffix: 'total',
-            }
-          : metric,
-      labelNames,
-      error,
-    });
+  log({ name, message, level, metric, error }: LogOptions): void {
+    this._commonLog({ name, message, level, metric, error });
   }
 
   captureLog(
     func: (monitor: CaptureMonitor) => $FlowFixMe,
     options: CaptureLogOptions,
+    cloned?: boolean,
   ): $FlowFixMe {
     let { error: errorObj } = options;
     if (errorObj == null) {
       errorObj = undefined;
     } else if (typeof errorObj === 'string') {
-      errorObj = { message: errorObj, level: 'error' };
+      errorObj = { metric: undefined, message: errorObj, level: 'error' };
     }
     const errorObjFinal = errorObj;
-    const log = this._clone();
+    let log = this;
+    if (!cloned) {
+      log = this._clone();
+    }
     const doLog = (error?: ?Error) =>
-      log.log({
+      log._commonLog({
         name: options.name,
         message: options.message,
         level: options.level,
-        help: options.help,
         metric: options.metric,
-        labelNames: options.labelNames,
         error:
           errorObjFinal == null
             ? undefined
             : {
+                metric: errorObjFinal.metric,
                 message: errorObjFinal.message,
                 error,
                 level: errorObjFinal.level,
@@ -498,70 +333,7 @@ export default class MonitorBase implements Span {
     }
   }
 
-  logSingle({ name, message, level, error }: LogSingleOptions): void {
-    this._commonLog({ name, message, level, error });
-  }
-
-  captureLogSingle(
-    func: (monitor: CaptureMonitor) => $FlowFixMe,
-    options: CaptureLogSingleOptions,
-    disableClone?: boolean,
-  ): $FlowFixMe {
-    let { error: errorObj } = options;
-    if (errorObj == null) {
-      errorObj = undefined;
-    } else if (typeof errorObj === 'string') {
-      errorObj = { message: errorObj, level: 'error' };
-    }
-    const errorObjFinal = errorObj;
-    const log = disableClone ? this : this._clone();
-    const doLog = (error?: ?Error) =>
-      log.logSingle({
-        name: options.name,
-        message: options.message,
-        level: options.level,
-        error:
-          errorObjFinal == null
-            ? undefined
-            : {
-                message: errorObjFinal.message,
-                error,
-                level: errorObjFinal.level,
-              },
-      });
-
-    try {
-      const result = func(log);
-
-      if (result != null && result.then != null) {
-        return result
-          .then(res => {
-            doLog();
-            return res;
-          })
-          .catch(err => {
-            doLog(err);
-            throw err;
-          });
-      }
-
-      doLog();
-      return result;
-    } catch (error) {
-      doLog(error);
-      throw error;
-    }
-  }
-
-  logError({
-    name,
-    message,
-    level,
-    help,
-    metric,
-    labelNames,
-    error,
-  }: LogErrorOptions): void {
+  logError({ name, message, level, error, metric }: LogErrorOptions): void {
     let errorLevel = level;
     if (errorLevel == null) {
       errorLevel = 'error';
@@ -572,91 +344,14 @@ export default class MonitorBase implements Span {
       name,
       message,
       level: level == null ? 'error' : level,
-      help,
-      metric:
-        metric == null
-          ? {
-              type: 'counter',
-              suffix: 'total',
-            }
-          : metric,
-      labelNames,
-      error: { error, message, level: errorLevel },
+      error: { metric, error, message, level: errorLevel },
     });
-  }
-
-  logErrorSingle({ name, message, level, error }: LogErrorSingleOptions): void {
-    let errorLevel = level;
-    if (errorLevel == null) {
-      errorLevel = 'error';
-    } else if (typeof errorLevel === 'object') {
-      errorLevel = errorLevel.log;
-    }
-    this._commonLog({
-      name,
-      message,
-      level: level == null ? 'error' : level,
-      error: { error, message, level: errorLevel },
-    });
-  }
-
-  getCounter(options: MetricOptions): Counter {
-    return this._getMetricWrapper(
-      this._getCounter(this._getMetricConstruct(options)),
-      options,
-    );
-  }
-
-  _getCounter(options: MetricConstruct): CounterMetric {
-    const { name } = options;
-    if (counters[name] == null) {
-      counters[name] = this._metricsFactory.createCounter(options);
-    }
-    return counters[name];
-  }
-
-  getGauge(options: MetricOptions): Gauge {
-    const { name } = options;
-    if (gauges[name] == null) {
-      gauges[name] = this._metricsFactory.createGauge(
-        this._getMetricConstruct(options),
-      );
-    }
-
-    return this._getMetricWrapper(gauges[name], options);
-  }
-
-  getHistogram(options: MetricOptions): Histogram {
-    return this._getMetricWrapper(
-      this._getHistogram(this._getMetricConstruct(options)),
-      options,
-    );
-  }
-
-  _getHistogram(options: MetricConstruct): HistogramMetric {
-    const { name } = options;
-    if (histograms[name] == null) {
-      histograms[name] = this._metricsFactory.createHistogram(options);
-    }
-    return histograms[name];
-  }
-
-  getSummary(options: MetricOptions): Summary {
-    const { name } = options;
-    if (summaries[name] == null) {
-      summaries[name] = this._metricsFactory.createSummary(
-        this._getMetricConstruct(options),
-      );
-    }
-
-    return this._getMetricWrapper(summaries[name], options);
   }
 
   startSpan({
     name,
     level,
-    help,
-    labelNames,
+    metric,
     references: referenceIn,
     trace,
   }: SpanOptions): MonitorBase {
@@ -686,14 +381,6 @@ export default class MonitorBase implements Span {
       parent = this;
     }
 
-    let histogram;
-    if (
-      LOG_LEVEL_TO_LEVEL[fullLevel.metric] <=
-      LOG_LEVEL_TO_LEVEL[this._metricsLogLevel]
-    ) {
-      histogram = { name: `${name}_duration_seconds`, help, labelNames };
-    }
-
     let currentParent;
     if (this.hasSpan()) {
       ({ parent: currentParent } = this.getSpan());
@@ -703,7 +390,7 @@ export default class MonitorBase implements Span {
     const time = timeMS / 1000;
     return this._clone({
       span: {
-        histogram,
+        metric,
         time,
         span,
         parent: parent == null ? currentParent : parent,
@@ -713,16 +400,17 @@ export default class MonitorBase implements Span {
 
   end(error?: boolean): void {
     const span = this.getSpan();
-    const { histogram } = span;
+    const { metric } = span;
     const finishTimeMS = this.nowSeconds();
     const finishTime = finishTimeMS / 1000;
-    if (histogram != null) {
-      const value = finishTime - span.time;
-      this.getHistogram({
-        name: histogram.name,
-        help: histogram.help,
-        labelNames: (histogram.labelNames || []).concat([this.labels.ERROR]),
-      }).observe({ [convertMetricLabel(this.labels.ERROR)]: !!error }, value);
+    if (metric != null) {
+      metric.total.observe(
+        this._getLabelsForMetric(metric.total),
+        finishTime - span.time,
+      );
+      if (error) {
+        metric.error.inc(this._getLabelsForMetric(metric.error));
+      }
     }
 
     const { span: tracerSpan } = span;
@@ -732,6 +420,15 @@ export default class MonitorBase implements Span {
     }
   }
 
+  _getLabelsForMetric(metric: Metric): Labels {
+    const labels = {};
+    for (const labelName of metric.getLabelNames()) {
+      labels[labelName] = this._labels[labelName];
+    }
+
+    return labels;
+  }
+
   captureSpan(
     func: (span: MonitorBase) => $FlowFixMe,
     options: CaptureSpanOptions,
@@ -739,8 +436,7 @@ export default class MonitorBase implements Span {
     const span = this.startSpan({
       name: options.name,
       level: options.level,
-      help: options.help,
-      labelNames: options.labelNames,
+      metric: options.metric,
       references: options.references,
       trace: options.trace,
     });
@@ -771,23 +467,29 @@ export default class MonitorBase implements Span {
     func: (span: CaptureMonitor) => $FlowFixMe,
     options: CaptureSpanLogOptions,
   ): $FlowFixMe {
+    const level = this._getFullLevel(options.level);
     return this.captureSpan(
       span =>
-        span.captureLogSingle(
+        span.captureLog(
           log => func(log),
           {
             name: options.name,
-            level: options.level,
+            level: level.log,
             message: options.message,
-            error: options.error == null ? {} : options.error,
+            error:
+              typeof options.error === 'object'
+                ? {
+                    level: options.error.level,
+                    message: options.error.message,
+                  }
+                : options.error,
           },
           true,
         ),
       {
         name: options.name,
-        level: options.level,
-        help: options.help,
-        labelNames: options.labelNames,
+        level: level.span,
+        metric: options.metric,
         references: options.references,
         trace: options.trace,
       },
@@ -820,41 +522,7 @@ export default class MonitorBase implements Span {
   }
 
   report(report: Report): void {
-    report.logs.forEach(log => {
-      const { error } = log;
-      let errorObj;
-      if (error != null) {
-        errorObj = new Error(error.message);
-        if (error.stack != null) {
-          errorObj.stack = error.stack;
-        }
-        if (error.code != null) {
-          (errorObj: $FlowFixMe).code = error.code;
-        }
-      }
-      this._logger.log({
-        name: log.name,
-        level: log.level,
-        message: log.message,
-        labels: log.labels,
-        data: log.data,
-        error: error == null ? undefined : errorObj,
-      });
-    });
-
-    utils.values(report.metrics.counters).forEach(counterMetric => {
-      const counter = this._getCounter(counterMetric.metric);
-      counterMetric.values.forEach(value => {
-        counter.inc(value.labels, value.count);
-      });
-    });
-
-    utils.values(report.metrics.histograms).forEach(histMetric => {
-      const histogram = this._getHistogram(histMetric.metric);
-      histMetric.values.forEach(value => {
-        histogram.observe(value.labels, value.count);
-      });
-    });
+    this._reportHandler.report(report);
   }
 
   // eslint-disable-next-line
@@ -870,12 +538,12 @@ export default class MonitorBase implements Span {
       });
   }
 
-  setLabels(labels: RawLabels): void {
+  setLabels(labels: Labels): void {
     this._setSpanLabels(labels);
     this._labels = { ...this._labels, ...labels };
   }
 
-  setData(data: RawLabels): void {
+  setData(data: Labels): void {
     this._setSpanLabels(data);
     this._data = { ...this._data, ...data };
   }
@@ -898,23 +566,29 @@ export default class MonitorBase implements Span {
     message: messageIn,
 
     level,
-    help,
     metric,
-    labelNames: labelNamesIn,
 
     error,
   }: CommonLogOptions): void {
+    const incrementMetric = (maybeMetric?: Counter) => {
+      if (maybeMetric != null) {
+        const labels = this._getLabelsForMetric(maybeMetric);
+        maybeMetric.inc(labels);
+      }
+    };
+
     let labels = {};
     let message = messageIn;
     const fullLevel = this._getFullLevel(level);
     let logLevel = fullLevel.log;
-    let metricLevel = LOG_LEVEL_TO_LEVEL[fullLevel.metric];
+    incrementMetric(metric);
     if (error != null) {
+      incrementMetric(error.metric);
+
       labels = { ...labels };
-      labels[KNOWN_LABELS.ERROR] = error.error != null;
-      labels[KNOWN_LABELS.ERROR_KIND] = this._getErrorKind(error.error);
+      labels[LABELS.ERROR] = error.error != null;
+      labels[LABELS.ERROR_KIND] = this._getErrorKind(error.error);
       const errorLevel = error.level == null ? 'error' : error.level;
-      metricLevel = Math.min(metricLevel, LOG_LEVEL_TO_LEVEL[errorLevel]);
       const { error: errorObj } = error;
       if (errorObj != null) {
         logLevel = errorLevel;
@@ -924,42 +598,6 @@ export default class MonitorBase implements Span {
         } else {
           const dot = errorMessage.endsWith('.') ? '' : '.';
           message = `${errorMessage}${dot} ${errorObj.message}`;
-        }
-      }
-    }
-
-    if (
-      metricLevel <= LOG_LEVEL_TO_LEVEL[this._metricsLogLevel] &&
-      metric != null
-    ) {
-      const metricName = `${name}_${metric.suffix}`;
-      const labelNames = (labelNamesIn || []).concat(Object.keys(labels));
-      if (metric.type === 'counter') {
-        this.getCounter({
-          name: metricName,
-          help,
-          labelNames,
-        }).inc(labels);
-      } else {
-        const value = metric.value == null ? 1 : metric.value;
-        if (metric.type === 'gauge') {
-          this.getGauge({
-            name: metricName,
-            help,
-            labelNames,
-          }).set(labels, value);
-        } else if (metric.type === 'histogram') {
-          this.getHistogram({
-            name: metricName,
-            help,
-            labelNames,
-          }).observe(labels, value);
-        } else {
-          this.getSummary({
-            name: metricName,
-            help,
-            labelNames,
-          }).observe(labels, value);
         }
       }
     }
@@ -1007,38 +645,7 @@ export default class MonitorBase implements Span {
       : (error: $FlowFixMe).code;
   }
 
-  _getMetricConstruct({
-    name,
-    help = 'Placeholder',
-    labelNames: labelNamesIn,
-  }: MetricOptions): MetricConstruct {
-    const labelNames = this._getMetricLabelNames(labelNamesIn).map(labelName =>
-      convertMetricLabel(labelName),
-    );
-    return { name, help, labelNames };
-  }
-
-  _getMetricLabelNames(labelNames?: Array<string>): Array<string> {
-    return (labelNames || []).concat([
-      this.labels.SERVICE,
-      this.labels.COMPONENT,
-    ]);
-  }
-
-  _getMetricWrapper(
-    metric: CounterMetric | GaugeMetric | HistogramMetric | SummaryMetric,
-    options: MetricOptions,
-  ): Counter & Gauge & Histogram & Summary {
-    const labelNames = this._getMetricLabelNames(options.labelNames);
-    const labelNamesSet = new Set(labelNames);
-    const labels = _.pickBy(this._labels, (value, key: string) =>
-      labelNamesSet.has(key),
-    );
-
-    return new MetricWrapper({ metric, labels });
-  }
-
-  _getSpanTags(labels?: RawLabels): TagLabels {
+  _getSpanTags(labels?: Labels): Labels {
     let spanLabels = this._getAllRawLabels();
     let spanData = this._getAllRawData();
     if (this.hasSpan()) {
@@ -1058,7 +665,7 @@ export default class MonitorBase implements Span {
     });
   }
 
-  _getAllRawLabels(labels?: RawLabels): RawLabels {
+  _getAllRawLabels(labels?: Labels): Labels {
     if (labels == null) {
       return this._labels;
     }
@@ -1071,7 +678,7 @@ export default class MonitorBase implements Span {
     };
   }
 
-  _getAllRawData(labels?: RawLabels): RawLabels {
+  _getAllRawData(labels?: Labels): Labels {
     if (labels == null) {
       return this._data;
     }
@@ -1079,7 +686,7 @@ export default class MonitorBase implements Span {
     return { ...this._data, ...labels };
   }
 
-  _setSpanLabels(labels: RawLabels): void {
+  _setSpanLabels(labels: Labels): void {
     const span = this._span || {};
     const { span: tracerSpan } = span;
     if (tracerSpan != null) {
@@ -1101,14 +708,12 @@ export default class MonitorBase implements Span {
     if (typeof level === 'string') {
       return {
         log: level,
-        metric: level,
         span: level,
       };
     }
 
     return {
       log: level.log,
-      metric: level.metric == null ? level.log : level.metric,
       span: level.span == null ? level.log : level.span,
     };
   }
@@ -1139,9 +744,8 @@ export default class MonitorBase implements Span {
       labels: mergedLabels,
       data: mergedData,
       span: span == null ? this._span : span,
-      metricsLogLevel: this._metricsLogLevel,
       spanLogLevel: this._spanLogLevel,
-      metricsFactory: this._metricsFactory,
+      reportHandler: this._reportHandler,
     });
   }
 

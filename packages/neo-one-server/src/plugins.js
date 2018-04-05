@@ -27,7 +27,6 @@ const getPlugin = ({
     monitor.withLabels({ [labels.PLUGIN_NAME]: pluginName }).logError({
       name: 'neo_load_plugin_error',
       message: `Failed to load plugin: ${pluginName}`,
-      labelNames: [labels.PLUGIN_NAME],
       error,
     });
     throw error;

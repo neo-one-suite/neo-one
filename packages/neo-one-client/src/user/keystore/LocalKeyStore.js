@@ -440,7 +440,7 @@ export default class LocalKeyStore {
 
     return monitor.at('local_key_store').captureSpanLog(func, {
       name,
-      level: { log: 'verbose', metric: 'info', span: 'info' },
+      level: { log: 'verbose', span: 'info' },
       trace: true,
     });
   }

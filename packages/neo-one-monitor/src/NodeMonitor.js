@@ -7,40 +7,13 @@ import mount from 'koa-mount';
 import perfHooks from 'perf_hooks';
 import prom from 'prom-client';
 
-import type { LogLevel, Monitor, MetricConstruct } from './types';
-import MonitorBase, {
-  type CounterMetric,
-  type GaugeMetric,
-  type HistogramMetric,
-  type Logger,
-  type MetricsFactory,
-  type SummaryMetric,
-  type Tracer,
-} from './MonitorBase';
-
-class NodeMetricsFactory implements MetricsFactory {
-  createCounter(options: MetricConstruct): CounterMetric {
-    return new prom.Counter(options);
-  }
-
-  createGauge(options: MetricConstruct): GaugeMetric {
-    return new prom.Gauge(options);
-  }
-
-  createHistogram(options: MetricConstruct): HistogramMetric {
-    return new prom.Histogram(options);
-  }
-
-  createSummary(options: MetricConstruct): SummaryMetric {
-    return new prom.Summary(options);
-  }
-}
+import type { LogLevel, Monitor } from './types';
+import MonitorBase, { type Logger, type Tracer } from './MonitorBase';
 
 type NodeMonitorCreate = {|
   service: string,
   logger?: Logger,
   tracer?: Tracer,
-  metricsLogLevel?: LogLevel,
   spanLogLevel?: LogLevel,
 |};
 
@@ -51,7 +24,6 @@ export default class NodeMonitor extends MonitorBase {
     service,
     logger,
     tracer,
-    metricsLogLevel,
     spanLogLevel,
   }: NodeMonitorCreate): NodeMonitor {
     prom.collectDefaultMetrics({ timeout: 4000 });
@@ -66,9 +38,7 @@ export default class NodeMonitor extends MonitorBase {
         },
       },
       tracer,
-      metricsFactory: new NodeMetricsFactory(),
       now: () => perfHooks.performance.timeOrigin + perfHooks.performance.now(),
-      metricsLogLevel,
       spanLogLevel,
     });
   }

@@ -5,11 +5,11 @@ import type { Subscription } from 'rxjs/Subscription';
 
 import { utils } from '@neo-one/utils';
 
-import BrowserLogger from './BrowserLogger';
-import BrowserMetricsFactory from './BrowserMetricsFactory';
-import type { Report } from './types';
+import type CollectingLogger from './CollectingLogger';
+import type { Counter, Report } from './types';
 
-import { KNOWN_LABELS, type CounterMetric } from './MonitorBase';
+import collectingMetrics from './CollectingMetricsFactory';
+import metricsFactory from './NoOpMetricsFactory';
 
 const MAX_BACKLOG = 1000;
 
@@ -24,24 +24,24 @@ const EMPTY_BACKREPORT = {
 export default class Reporter {
   _endpoint: string;
   _subscription: Subscription;
-  _requestCounter: CounterMetric;
+  _requestsTotal: Counter;
+  _requestErrorsTotal: Counter;
 
   constructor({
     logger,
-    metricsFactory,
     timer,
     endpoint,
   }: {|
-    logger: BrowserLogger,
-    metricsFactory: BrowserMetricsFactory,
+    logger: CollectingLogger,
     timer: number,
     endpoint: string,
   |}) {
     this._endpoint = endpoint;
-    this._requestCounter = metricsFactory.createCounter({
-      name: 'browser_request_counter',
-      help: 'Counts fetch requests from Browser Reporter to endpoint',
-      labelNames: [KNOWN_LABELS.ERROR],
+    this._requestsTotal = metricsFactory.createCounter({
+      name: 'http_report_metrics_requests_total',
+    });
+    this._requestErrorsTotal = metricsFactory.createCounter({
+      name: 'http_report_metrics_failures_total',
     });
 
     this._subscription = interval(timer)
@@ -51,7 +51,6 @@ export default class Reporter {
             this._collectReport({
               backReport,
               logger,
-              metricsFactory,
             }),
           EMPTY_BACKREPORT,
           1,
@@ -70,14 +69,12 @@ export default class Reporter {
   async _collectReport({
     backReport,
     logger,
-    metricsFactory,
   }: {|
     backReport?: Report,
-    logger: BrowserLogger,
-    metricsFactory: BrowserMetricsFactory,
+    logger: CollectingLogger,
   |}): Promise<Report> {
     const logs = logger.collect();
-    const metrics = metricsFactory.collect();
+    const metrics = collectingMetrics.collect();
 
     const report = this._addBackReport({ logs, metrics }, backReport);
 
@@ -88,11 +85,12 @@ export default class Reporter {
       response = { ok: false };
     }
 
+    this._requestsTotal.inc();
     if (!response.ok) {
-      this._requestCounter.inc({ [KNOWN_LABELS.ERROR]: true });
+      this._requestErrorsTotal.inc();
       return this._constructBackReport(report);
     }
-    this._requestCounter.inc({ [KNOWN_LABELS.ERROR]: false });
+
     return EMPTY_BACKREPORT;
   }
 
@@ -100,44 +98,45 @@ export default class Reporter {
     if (backReport == null) {
       return report;
     }
-    const logs = backReport.logs.concat(report.logs);
-    const currentMetrics = report.metrics;
 
-    const newMetrics = utils.entries(backReport.metrics).reduce(
-      (accMetricType, [metricType, metrics]) => ({
-        ...accMetricType,
-        [metricType]: utils.entries(metrics).reduce(
+    return {
+      logs: backReport.logs.concat(report.logs),
+      metrics: {
+        counters: utils.entries(backReport.metrics.counters).reduce(
           (accMetric, [name, metric]) => ({
             ...accMetric,
             [name]: {
               metric: metric.metric,
               values:
-                currentMetrics[metricType][name] == null
+                accMetric[name] == null
                   ? metric.values
-                  : metric.values.concat(
-                      currentMetrics[metricType][name].values,
-                    ),
+                  : metric.values.concat(accMetric[name].values),
             },
           }),
-          accMetricType[metricType] || {},
+          report.metrics.counters,
         ),
-      }),
-      currentMetrics,
-    );
-
-    return {
-      logs,
-      metrics: newMetrics,
+        histograms: utils.entries(backReport.metrics.histograms).reduce(
+          (accMetric, [name, metric]) => ({
+            ...accMetric,
+            [name]: {
+              metric: metric.metric,
+              values:
+                accMetric[name] == null
+                  ? metric.values
+                  : metric.values.concat(accMetric[name].values),
+            },
+          }),
+          report.metrics.histograms,
+        ),
+      },
     };
   }
 
   _constructBackReport(report: Report): Report {
-    const backLogs = report.logs.slice(-MAX_BACKLOG);
-
-    const backMetrics = utils.entries(report.metrics).reduce(
-      (accMetricType, [metricType, metrics]) => ({
-        ...accMetricType,
-        [metricType]: utils.entries(metrics).reduce(
+    return {
+      logs: report.logs.slice(-MAX_BACKLOG),
+      metrics: {
+        counters: utils.entries(report.metrics.counters).reduce(
           (accMetric, [name, metric]) => ({
             ...accMetric,
             [name]: {
@@ -147,13 +146,17 @@ export default class Reporter {
           }),
           {},
         ),
-      }),
-      { counters: {}, histograms: {} },
-    );
-
-    return {
-      logs: backLogs,
-      metrics: backMetrics,
+        histograms: utils.entries(report.metrics.histograms).reduce(
+          (accMetric, [name, metric]) => ({
+            ...accMetric,
+            [name]: {
+              metric: metric.metric,
+              values: metric.values.slice(-MAX_BACKLOG),
+            },
+          }),
+          {},
+        ),
+      },
     };
   }
 

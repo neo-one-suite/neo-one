@@ -2,14 +2,12 @@
 /* @jest-environment jsdom */
 import prom from 'prom-client';
 
-import BrowserMonitor from '../BrowserMonitor';
-import BrowserLogger from '../BrowserLogger';
-import BrowserMetricsFactory, {
-  resetMetricsForTesting,
-} from '../BrowserMetricsFactory';
+import CollectingLogger from '../CollectingLogger';
 import NodeMonitor from '../NodeMonitor';
 import Reporter from '../Reporter';
-import { reset, KNOWN_LABELS } from '../MonitorBase';
+
+import collectingMetrics from '../CollectingMetricsFactory';
+import metrics from '../NoOpMetricsFactory';
 
 describe('BrowserMonitor', () => {
   const options1 = {
@@ -49,9 +47,9 @@ describe('BrowserMonitor', () => {
     metric: {
       name: counterOptions1.name,
       help: counterOptions1.help,
-      labelNames: [...counterOptions1.labelNames, 'service', 'component'],
+      labelNames: [...counterOptions1.labelNames],
     },
-    values: [{ count: 5, labels: {} }, { count: 4, labels: {} }],
+    values: [{ countOrLabels: 5 }, { countOrLabels: 4 }],
   };
 
   const histogramOptions1 = {
@@ -64,9 +62,9 @@ describe('BrowserMonitor', () => {
     metric: {
       name: histogramOptions1.name,
       help: histogramOptions1.help,
-      labelNames: [...histogramOptions1.labelNames, 'service', 'component'],
+      labelNames: [...histogramOptions1.labelNames],
     },
-    values: [{ labels: { histLabel1: 14 }, count: 3 }],
+    values: [{ countOrLabels: { histLabel1: 14 }, count: 3 }],
   };
 
   const emptyMetrics = {
@@ -85,9 +83,11 @@ describe('BrowserMonitor', () => {
   };
 
   const requestCounter = {
-    name: 'browser_request_counter',
-    help: 'Counts fetch requests from Browser Reporter to endpoint',
-    labelNames: [KNOWN_LABELS.ERROR],
+    name: 'http_report_metrics_requests_total',
+  };
+
+  const failuresCounter = {
+    name: 'http_report_metrics_failures_total',
   };
 
   const emptyBackReport = {
@@ -98,29 +98,23 @@ describe('BrowserMonitor', () => {
     },
   };
 
-  let logger = new BrowserLogger();
-  let metricsFactory = new BrowserMetricsFactory();
-  let monitor = BrowserMonitor.create({
-    service: 'namespace1',
-    logger,
-    metricsFactory,
-  });
+  let logger = new CollectingLogger();
+  let reporter;
   beforeEach(() => {
-    logger = new BrowserLogger();
-    metricsFactory = new BrowserMetricsFactory();
-    monitor = BrowserMonitor.create({
-      service: 'namespace1',
-      logger,
-      metricsFactory,
-    });
+    logger = new CollectingLogger();
+    reporter = null;
+    metrics.setFactory(collectingMetrics);
   });
 
   afterEach(() => {
-    reset();
-    resetMetricsForTesting();
+    collectingMetrics.reset();
+    prom.register.clear();
+    if (reporter != null) {
+      reporter.close();
+    }
   });
 
-  test('BrowserLogger', () => {
+  test('CollectingLogger', () => {
     expect(logger.collect()).toEqual([]);
 
     logger.log(options1);
@@ -141,28 +135,28 @@ describe('BrowserMonitor', () => {
   });
 
   test('BrowserMetricsFactory', () => {
-    const counter = monitor.getCounter(counterOptions1);
+    const counter = metrics.createCounter(counterOptions1);
     counter.inc(5);
     counter.inc(4);
 
-    const histogram = monitor.getHistogram(histogramOptions1);
+    const histogram = metrics.createHistogram(histogramOptions1);
     histogram.observe({ histLabel1: 14 }, 3);
 
-    const result = metricsFactory.collect();
+    const result = collectingMetrics.collect();
     expect(result).toEqual({
       counters: { [counterResult1.metric.name]: counterResult1 },
       histograms: { [histResult1.metric.name]: histResult1 },
     });
 
-    expect(metricsFactory.collect()).toEqual(emptyMetrics);
+    expect(collectingMetrics.collect()).toEqual(emptyMetrics);
 
     counter.inc(3);
-    expect(metricsFactory.collect()).toEqual({
+    expect(collectingMetrics.collect()).toEqual({
       ...emptyMetrics,
       counters: {
         [counterResult1.metric.name]: {
           metric: counterResult1.metric,
-          values: [{ count: 3, labels: {} }],
+          values: [{ countOrLabels: 3, count: undefined }],
         },
       },
     });
@@ -171,34 +165,31 @@ describe('BrowserMonitor', () => {
   test('Reporter - POST success', async () => {
     global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
 
-    const reporter = new Reporter({
+    reporter = new Reporter({
       logger,
-      metricsFactory,
       timer: 2000,
       endpoint: 'fakeEnd',
     });
 
     logger.log(options1);
 
-    const counter = monitor.getCounter(counterOptions1);
+    const counter = metrics.createCounter(counterOptions1);
     counter.inc(5);
     counter.inc(4);
 
     const firstResult = await reporter._collectReport({
       backReport: emptyBackReport,
       logger,
-      metricsFactory,
     });
 
     expect(firstResult).toEqual(emptyBackReport);
 
-    const histogram = monitor.getHistogram(histogramOptions1);
+    const histogram = metrics.createHistogram(histogramOptions1);
     histogram.observe({ histLabel1: 14 }, 3);
 
     const secondResult = await reporter._collectReport({
       backReport: emptyBackReport,
       logger,
-      metricsFactory,
     });
 
     expect(secondResult).toEqual(emptyBackReport);
@@ -207,25 +198,20 @@ describe('BrowserMonitor', () => {
 
     await new Promise(resolve => setTimeout(() => resolve(), 2000));
     expect(fetch.mock.calls.length).toBeGreaterThanOrEqual(3);
-
-    const spy = jest.spyOn(reporter._subscription, 'unsubscribe');
-    reporter.close();
-    expect(spy).toHaveBeenCalledTimes(1);
   });
 
   test('Reporter - POST failure', async () => {
     global.fetch = jest.fn(() => Promise.resolve({ ok: false }));
 
-    const reporter = new Reporter({
+    reporter = new Reporter({
       logger,
-      metricsFactory,
       timer: 2000,
       endpoint: 'fakeEnd',
     });
 
     logger.log(options1);
 
-    const counter = monitor.getCounter(counterOptions1);
+    const counter = metrics.createCounter(counterOptions1);
     counter.inc(5);
     counter.inc(4);
 
@@ -235,7 +221,11 @@ describe('BrowserMonitor', () => {
         counters: {
           [requestCounter.name]: {
             metric: requestCounter,
-            values: [],
+            values: [{ countOrLabels: 0 }],
+          },
+          [failuresCounter.name]: {
+            metric: failuresCounter,
+            values: [{ countOrLabels: 0 }],
           },
           [counterResult1.metric.name]: counterResult1,
         },
@@ -246,12 +236,11 @@ describe('BrowserMonitor', () => {
     const firstResult = await reporter._collectReport({
       backReport: emptyBackReport,
       logger,
-      metricsFactory,
     });
 
     expect(firstResult).toEqual(firstBackReport);
 
-    const histogram = monitor.getHistogram(histogramOptions1);
+    const histogram = metrics.createHistogram(histogramOptions1);
     histogram.observe({ histLabel1: 14 }, 3);
 
     const secondBackReport = {
@@ -260,7 +249,11 @@ describe('BrowserMonitor', () => {
         counters: {
           [requestCounter.name]: {
             metric: requestCounter,
-            values: [{ labels: { [KNOWN_LABELS.ERROR]: true } }],
+            values: [{ countOrLabels: undefined, count: undefined }],
+          },
+          [failuresCounter.name]: {
+            metric: failuresCounter,
+            values: [{ countOrLabels: undefined, count: undefined }],
           },
           [counterResult1.metric.name]: {
             metric: counterResult1.metric,
@@ -274,7 +267,6 @@ describe('BrowserMonitor', () => {
     const secondResult = await reporter._collectReport({
       backReport: emptyBackReport,
       logger,
-      metricsFactory,
     });
 
     expect(secondResult).toEqual(secondBackReport);
@@ -283,33 +275,12 @@ describe('BrowserMonitor', () => {
 
     await new Promise(resolve => setTimeout(() => resolve(), 2000));
     expect(fetch.mock.calls.length).toBeGreaterThanOrEqual(3);
-
-    const spy = jest.spyOn(reporter._subscription, 'unsubscribe');
-    reporter.close();
-    expect(spy).toHaveBeenCalledTimes(1);
   });
 
   describe('report to Node', () => {
     test('Counter.inc called with same args', () => {
-      global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
-
-      const reporter = new Reporter({
-        logger,
-        metricsFactory,
-        timer: 1000,
-        endpoint: 'fakeEnd',
-      });
-
-      const nodeMonitor = NodeMonitor.create({
-        service: 'test',
-      });
-      const fakeCounter = {
-        inc: jest.fn(),
-      };
-      const getCounterSpy = jest
-        .spyOn(nodeMonitor, '_getCounter')
-        .mockImplementation(() => fakeCounter);
-      const counter = monitor.getCounter(counterOptions1);
+      const counter = metrics.createCounter(counterOptions1);
+      const clientCounterInc = jest.spyOn(counter, 'inc');
       counter.inc(5);
       counter.inc(4);
       counter.inc({ label1: 7 });
@@ -317,192 +288,67 @@ describe('BrowserMonitor', () => {
 
       const testReport = JSON.stringify({
         logs: logger.collect(),
-        metrics: metricsFactory.collect(),
+        metrics: collectingMetrics.collect(),
       });
-      reset();
+
+      const nodeMonitor = NodeMonitor.create({
+        service: 'test',
+      });
+      const nodeCounter = {
+        inc: jest.fn(),
+      };
+      const createCounterSpy = jest
+        .spyOn(metrics, 'createCounter')
+        .mockImplementationOnce(() => nodeCounter);
       nodeMonitor.report(JSON.parse(testReport));
+      createCounterSpy.mockRestore();
 
-      reporter.close();
-      getCounterSpy.mockRestore();
-
-      const nodeCounter = nodeMonitor.getCounter(counterOptions1);
-      // $FlowFixMe
-      const counterSpy = jest.spyOn(nodeCounter._metric, 'inc');
-      nodeCounter.inc(5);
-      nodeCounter.inc(4);
-      nodeCounter.inc({ label1: 7 });
-      nodeCounter.inc({ label2: 12 }, 36);
-
-      expect(fakeCounter.inc.mock.calls).toEqual(counterSpy.mock.calls);
-      nodeMonitor.close(() => {});
-      reset();
-      prom.register.clear();
+      expect(clientCounterInc.mock.calls).toEqual(nodeCounter.inc.mock.calls);
     });
 
     test('Histogram.observe called with same args', () => {
-      global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
+      const histogram = metrics.createHistogram(histogramOptions1);
+      const clientHistogramObserve = jest.spyOn(histogram, 'observe');
+      histogram.observe({ histLabel1: 14 }, 3);
+      histogram.observe(7);
 
-      const reporter = new Reporter({
-        logger,
-        metricsFactory,
-        timer: 1000,
-        endpoint: 'fakeEnd',
+      const testReport = JSON.stringify({
+        logs: logger.collect(),
+        metrics: collectingMetrics.collect(),
       });
 
       const nodeMonitor = NodeMonitor.create({
         service: 'test',
       });
-      const fakeHist = {
+      const nodeHistogram = {
         observe: jest.fn(),
       };
-      const getHistSpy = jest
-        .spyOn(nodeMonitor, '_getHistogram')
-        .mockImplementation(() => fakeHist);
-      const histogram = monitor.getHistogram(histogramOptions1);
-      histogram.observe({ histLabel1: 14 }, 3);
-      histogram.observe(7);
-
-      const testReport = JSON.stringify({
-        logs: logger.collect(),
-        metrics: metricsFactory.collect(),
-      });
-      reset();
+      const createHistogramSpy = jest
+        .spyOn(metrics, 'createHistogram')
+        .mockImplementationOnce(() => nodeHistogram);
       nodeMonitor.report(JSON.parse(testReport));
+      createHistogramSpy.mockRestore();
 
-      reporter.close();
-      reset();
-      getHistSpy.mockRestore();
-
-      const nodeHist = nodeMonitor.getHistogram(histogramOptions1);
-      // $FlowFixMe
-      const histSpy = jest.spyOn(nodeHist._metric, 'observe');
-      nodeHist.observe({ histLabel1: 14 }, 3);
-      nodeHist.observe(7);
-
-      expect(fakeHist.observe.mock.calls).toEqual(histSpy.mock.calls);
-      nodeMonitor.close(() => {});
-      reset();
-      prom.register.clear();
-    });
-
-    test('Counter in Node matches', () => {
-      global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
-
-      const reporter = new Reporter({
-        logger,
-        metricsFactory,
-        timer: 1000,
-        endpoint: 'fakeEnd',
-      });
-
-      const nodeMonitor = NodeMonitor.create({
-        service: 'test',
-      });
-      const getCounterSpy = jest.spyOn(nodeMonitor, '_getCounter');
-
-      const counter = monitor.getCounter(counterOptions1);
-      counter.inc(5);
-      counter.inc(4);
-      counter.inc({ label1: 7 });
-      counter.inc({ label2: 12 }, 36);
-
-      const testReport = JSON.stringify({
-        logs: logger.collect(),
-        metrics: metricsFactory.collect(),
-      });
-      reset();
-      nodeMonitor.report(JSON.parse(testReport));
-      reporter.close();
-      // $FlowFixMe
-      const browserResult = getCounterSpy.mock.returnValues[1];
-
-      const nodeCounter = nodeMonitor.getCounter(counterOptions1);
-      nodeCounter.inc(5);
-      nodeCounter.inc(4);
-      nodeCounter.inc({ label1: 7 });
-      nodeCounter.inc({ label2: 12 }, 36);
-      // $FlowFixMe
-      const nodeResult = getCounterSpy.mock.returnValues[2];
-
-      expect(nodeResult).toEqual(browserResult);
-      nodeMonitor.close(() => {});
-      reset();
-      prom.register.clear();
-    });
-
-    test('Histogram in Node matches', () => {
-      global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
-
-      const reporter = new Reporter({
-        logger,
-        metricsFactory,
-        timer: 1000,
-        endpoint: 'fakeEnd',
-      });
-
-      const nodeMonitor = NodeMonitor.create({
-        service: 'test',
-      });
-      const getHistSpy = jest.spyOn(nodeMonitor, '_getHistogram');
-
-      const histogram = monitor.getHistogram(histogramOptions1);
-      histogram.observe({ histLabel1: 14 }, 3);
-      histogram.observe(7);
-
-      const testReport = JSON.stringify({
-        logs: logger.collect(),
-        metrics: metricsFactory.collect(),
-      });
-      reset();
-      nodeMonitor.report(JSON.parse(testReport));
-      reporter.close();
-      // $FlowFixMe
-      const browserResult = getHistSpy.mock.returnValues[0];
-
-      const nodeHist = nodeMonitor.getHistogram(histogramOptions1);
-      nodeHist.observe({ histLabel1: 14 }, 3);
-      nodeHist.observe(7);
-      // $FlowFixMe
-      const nodeResult = getHistSpy.mock.returnValues[1];
-
-      expect(nodeResult).toEqual(browserResult);
-      nodeMonitor.close(() => {});
-      reset();
-      prom.register.clear();
+      expect(clientHistogramObserve.mock.calls).toEqual(
+        nodeHistogram.observe.mock.calls,
+      );
     });
 
     test('logging', () => {
-      global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
-
-      const reporter = new Reporter({
-        logger,
-        metricsFactory,
-        timer: 1000,
-        endpoint: 'fakeEnd',
-      });
-
-      const nodeMonitor = NodeMonitor.create({
-        service: 'test',
-      });
-      const logSpy = jest.spyOn(nodeMonitor._logger, 'log');
-
       logger.log(options1);
       logger.log(options2);
 
       const testReport = JSON.stringify({
         logs: logger.collect(),
-        metrics: metricsFactory.collect(),
+        metrics: collectingMetrics.collect(),
       });
+      const nodeMonitor = NodeMonitor.create({
+        service: 'test',
+      });
+      const logSpy = jest.spyOn(nodeMonitor._logger, 'log');
       nodeMonitor.report(JSON.parse(testReport));
-      const browserResult = logSpy.mock.calls.slice(0, 2);
-      reporter.close();
 
-      nodeMonitor._logger.log(options1);
-      nodeMonitor._logger.log(options2);
-      const nodeResult = logSpy.mock.calls.slice(2, 4);
-
-      expect(browserResult).toEqual(nodeResult);
-      nodeMonitor.close(() => {});
+      expect([[options1], [options2]]).toEqual(logSpy.mock.calls);
     });
   });
 });

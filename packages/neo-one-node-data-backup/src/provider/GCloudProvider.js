@@ -58,7 +58,6 @@ export default class GCloudProvider extends Provider {
           .download({ destination: downloadPath, validation: true }),
       {
         name: 'neo_restore_download',
-        help: 'Restore from backup duration',
       },
     );
 
@@ -71,7 +70,6 @@ export default class GCloudProvider extends Provider {
         }),
       {
         name: 'neo_restore_extract',
-        help: 'Extract backup duration',
       },
     );
   }
@@ -94,7 +92,6 @@ export default class GCloudProvider extends Provider {
         }),
       {
         name: 'neo_backup_push',
-        help: 'Push backup duration',
       },
     );
   }

@@ -1,16 +1,16 @@
 /* @flow */
 import type { Logger, LoggerLogOptions } from './MonitorBase';
-import type { CollectingLoggerLogOptions } from './types';
+import type { CollectedLoggerLogOptions } from './types';
 
-export default class BrowserLogger implements Logger {
-  _logs: Array<CollectingLoggerLogOptions>;
+export default class CollectingLogger implements Logger {
+  _logs: Array<CollectedLoggerLogOptions>;
 
   constructor() {
     this._logs = [];
   }
 
   log(options: LoggerLogOptions): void {
-    this._logs.push({
+    const logOptions = {
       name: options.name,
       level: options.level,
       message: options.message,
@@ -27,10 +27,16 @@ export default class BrowserLogger implements Logger {
                   ? options.error.constructor.name
                   : (options.error: $FlowFixMe).code,
             },
-    });
+    };
+
+    if (logOptions.error == null) {
+      delete logOptions.error;
+    }
+
+    this._logs.push(logOptions);
   }
 
-  collect(): Array<CollectingLoggerLogOptions> {
+  collect(): Array<CollectedLoggerLogOptions> {
     const logs = this._logs;
     this._logs = [];
 

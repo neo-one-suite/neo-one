@@ -68,7 +68,7 @@ import {
 import type { Monitor } from '@neo-one/monitor';
 
 import _ from 'lodash';
-import { utils as commonUtils } from '@neo-one/utils';
+import { labels, utils as commonUtils } from '@neo-one/utils';
 
 import {
   type AccountChanges,
@@ -410,7 +410,7 @@ export default class WriteBatchBlockchain {
 
   async persistBlock(monitorIn: Monitor, block: Block): Promise<void> {
     const monitor = monitorIn.at('write_blockchain').withData({
-      'block.index': block.index,
+      [labels.NEO_BLOCK_INDEX]: block.index,
     });
     const [systemFee] = await monitor.captureSpan(
       () =>
@@ -425,8 +425,6 @@ export default class WriteBatchBlockchain {
         ]),
       {
         name: 'neo_write_blockchain_stage_0',
-        help:
-          'Total time taken to fetch the system fee and add the block to storage',
       },
     );
 
@@ -473,7 +471,6 @@ export default class WriteBatchBlockchain {
         ]),
       {
         name: 'neo_write_blockchain_stage_1',
-        help: 'Total time taken to do the remainder of the work',
       },
     );
   }
@@ -523,7 +520,6 @@ export default class WriteBatchBlockchain {
       },
       {
         name: 'neo_write_blockchain_persist_utxo_transactions',
-        help: 'Total time taken to persist utxo transactions',
       },
     );
   }
@@ -542,7 +538,6 @@ export default class WriteBatchBlockchain {
       },
       {
         name: 'neo_write_blockchain_persist_transactions',
-        help: 'Total time taken to persist serial transactions',
       },
     );
   }
@@ -554,8 +549,8 @@ export default class WriteBatchBlockchain {
     transactionIndex: number,
   ): Promise<void> {
     await monitor
-      .withLabels({ 'transaction.type': transactionIn.type })
-      .withData({ 'transaction.hash': transactionIn.hashHex })
+      .withLabels({ [labels.NEO_TRANSACTION_TYPE]: transactionIn.type })
+      .withData({ [labels.NEO_TRANSACTION_HASH]: transactionIn.hashHex })
       .captureSpan(
         async span => {
           const transaction = transactionIn;
@@ -788,7 +783,6 @@ export default class WriteBatchBlockchain {
         },
         {
           name: 'neo_write_blockchain_persist_single_transaction',
-          help: 'Total time taken to persist a single transaction',
         },
       );
   }
@@ -845,7 +839,6 @@ export default class WriteBatchBlockchain {
       },
       {
         name: 'neo_write_blockchain_process_state_transaction',
-        help: 'Total time taken to process a state transaction',
       },
     );
   }
@@ -865,7 +858,6 @@ export default class WriteBatchBlockchain {
         ]),
       {
         name: 'neo_write_blockchain_update_accounts_get_input_outputs',
-        help: 'Total time taken to fetch data necessary to update accounts',
       },
     );
 
@@ -912,7 +904,6 @@ export default class WriteBatchBlockchain {
       },
       {
         name: 'neo_write_blockchain_update_accounts_process',
-        help: 'Total time taken to process account updates',
       },
     );
   }
@@ -1057,7 +1048,6 @@ export default class WriteBatchBlockchain {
       },
       {
         name: 'neo_write_blockchain_update_coins',
-        help: 'Total time taken to update coins',
       },
     );
   }

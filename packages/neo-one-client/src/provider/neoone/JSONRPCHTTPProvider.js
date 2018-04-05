@@ -51,11 +51,10 @@ const instrumentFetch = (
       },
       {
         name: 'http_client_request',
-        level: { log: 'verbose', metric: 'info', span: 'info' },
+        level: { log: 'verbose', span: 'info' },
         references: (monitors || [])
           .slice(1)
           .map(parent => monitor.childOf(parent)),
-        labelNames: [monitor.labels.RPC_TYPE, labels.JSONRPC_TYPE],
         trace: true,
       },
     );
@@ -221,7 +220,7 @@ export default class JSONRPCHTTPProvider implements JSONRPCProvider {
         })
         .captureSpanLog(span => this._request(req, span), {
           name: 'jsonrpc_client_request',
-          level: { log: 'verbose', metric: 'info', span: 'info' },
+          level: { log: 'verbose', span: 'info' },
           error: { level: 'verbose' },
           trace: true,
         });

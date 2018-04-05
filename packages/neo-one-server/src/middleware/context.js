@@ -23,8 +23,7 @@ export default ({ monitor }: {| monitor: Monitor |}) =>
           },
           {
             name: 'grpc_server_request',
-            level: { log: 'verbose', metric: 'info', span: 'info' },
-            labelNames: [monitor.labels.RPC_METHOD],
+            level: { log: 'verbose', span: 'info' },
             trace: true,
           },
         );

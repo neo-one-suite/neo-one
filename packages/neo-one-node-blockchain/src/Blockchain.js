@@ -30,7 +30,12 @@ import {
   type Storage,
   type VM,
 } from '@neo-one/node-core';
-import type { Gauge, Histogram, Monitor } from '@neo-one/monitor';
+import {
+  type Gauge,
+  type Histogram,
+  type Monitor,
+  metrics,
+} from '@neo-one/monitor';
 import PriorityQueue from 'js-priority-queue';
 import { BehaviorSubject } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
@@ -75,6 +80,25 @@ type Vote = {|
 |};
 
 const NAMESPACE = 'blockchain';
+
+const NEO_BLOCKCHAIN_PERSIST_BLOCK_DURATION_SECONDS = metrics.createHistogram({
+  name: 'neo_blockchain_persist_block_duration_seconds',
+});
+const NEO_BLOCKCHAIN_PERSIST_BLOCK_FAILURES_TOTAL = metrics.createCounter({
+  name: 'neo_blockchain_persist_block_failures_total',
+});
+const NEO_BLOCKCHAIN_BLOCK_INDEX_GAUGE = metrics.createGauge({
+  name: 'neo_blockchain_block_index',
+  help: 'The current block index',
+});
+const NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE = metrics.createGauge({
+  name: 'neo_blockchain_persisting_block_index',
+  help: 'The current in progress persist index',
+});
+const NEO_BLOCKCHAIN_PERSIST_BLOCK_LATENCY_SECONDS = metrics.createHistogram({
+  name: 'neo_blockchain_persist_block_latency_seconds',
+  help: 'The latency from block timestamp to persist',
+});
 
 export default class Blockchain {
   _monitor: Monitor;
@@ -133,21 +157,8 @@ export default class Blockchain {
 
     this._settings$ = new BehaviorSubject(options.settings);
     this._monitor = options.monitor.at(NAMESPACE);
-    this._blockIndexGauge = this._monitor.getGauge({
-      name: 'neo_blockchain_block_index',
-      help: 'The current block index',
-    });
-    this._blockIndexGauge.set(this.currentBlockIndex);
-    this._persistingBlockIndexGauge = this._monitor.getGauge({
-      name: 'neo_blockchain_persisting_block_index',
-      help: 'The current in progress persist index',
-    });
-    this._persistingBlockIndexGauge.set(this.currentBlockIndex);
-    this._persistBlockLatencyHistogram = this._monitor.getHistogram({
-      name: 'neo_blockchain_persist_block_latency_seconds',
-      help: 'The latency from block timestamp to persist',
-    });
-
+    NEO_BLOCKCHAIN_BLOCK_INDEX_GAUGE.set(this.currentBlockIndex);
+    NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE.set(this.currentBlockIndex);
     this.account = this._storage.account;
     this.accountUnclaimed = this._storage.accountUnclaimed;
     this.accountUnspent = this._storage.accountUnspent;
@@ -446,14 +457,18 @@ export default class Blockchain {
               this._persistBlock(span, entryNonNull.block, entryNonNull.unsafe),
             {
               name: 'neo_blockchain_persist_block_top_level',
-              level: { log: 'verbose', metric: 'info', span: 'info' },
+              level: { log: 'verbose', span: 'info' },
+              metric: {
+                total: NEO_BLOCKCHAIN_PERSIST_BLOCK_DURATION_SECONDS,
+                error: NEO_BLOCKCHAIN_PERSIST_BLOCK_FAILURES_TOTAL,
+              },
               trace: true,
             },
           );
         entry.resolve();
         this.block$.next(entry.block);
-        this._blockIndexGauge.set(entry.block.index);
-        this._persistBlockLatencyHistogram.observe(
+        NEO_BLOCKCHAIN_BLOCK_INDEX_GAUGE.set(entry.block.index);
+        NEO_BLOCKCHAIN_PERSIST_BLOCK_LATENCY_SECONDS.observe(
           this._monitor.nowSeconds() - entry.block.timestamp,
         );
         this.cleanBlockQueue();
@@ -499,7 +514,7 @@ export default class Blockchain {
     block: Block,
     unsafe?: boolean,
   ): Promise<void> {
-    this._persistingBlockIndexGauge.set(block.index);
+    NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE.set(block.index);
     if (!unsafe) {
       await this.verifyBlock(block, monitor);
     }
@@ -612,7 +627,7 @@ export default class Blockchain {
       },
       {
         name: 'neo_blockchain_calculate_claim_amount',
-        level: { log: 'verbose', metric: 'info', span: 'info' },
+        level: { log: 'verbose', span: 'info' },
       },
     );
 
@@ -659,7 +674,7 @@ export default class Blockchain {
       () => getValidators(this, transactions),
       {
         name: 'neo_blockchain_get_validators',
-        level: { log: 'verbose', metric: 'info', span: 'info' },
+        level: { log: 'verbose', span: 'info' },
       },
     );
 
