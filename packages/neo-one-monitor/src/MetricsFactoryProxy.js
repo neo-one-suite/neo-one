@@ -46,7 +46,7 @@ class MetricProxy {
 export class CounterProxy extends MetricProxy implements Counter {
   inc(countOrLabels?: Labels | number, count?: number): void {
     if (this.metric != null) {
-      this.metric.inc(countOrLabels, count);
+      this.metric.inc(this._getLabels(countOrLabels), count);
     }
   }
 }
@@ -54,19 +54,19 @@ export class CounterProxy extends MetricProxy implements Counter {
 export class GaugeProxy extends MetricProxy implements Gauge {
   inc(countOrLabels?: Labels | number, count?: number): void {
     if (this.metric != null) {
-      this.metric.inc(countOrLabels, count);
+      this.metric.inc(this._getLabels(countOrLabels), count);
     }
   }
 
   dec(countOrLabels?: Labels | number, count?: number): void {
     if (this.metric != null) {
-      this.metric.dec(countOrLabels, count);
+      this.metric.dec(this._getLabels(countOrLabels), count);
     }
   }
 
   set(countOrLabels?: Labels | number, count?: number): void {
     if (this.metric != null) {
-      this.metric.set(countOrLabels, count);
+      this.metric.set(this._getLabels(countOrLabels), count);
     }
   }
 }
@@ -74,7 +74,7 @@ export class GaugeProxy extends MetricProxy implements Gauge {
 export class HistogramProxy extends MetricProxy implements Histogram {
   observe(countOrLabels?: Labels | number, count?: number): void {
     if (this.metric != null) {
-      this.metric.observe(countOrLabels, count);
+      this.metric.observe(this._getLabels(countOrLabels), count);
     }
   }
 }
@@ -82,7 +82,7 @@ export class HistogramProxy extends MetricProxy implements Histogram {
 export class SummaryProxy extends MetricProxy implements Summary {
   observe(countOrLabels: Labels | number, count?: number): void {
     if (this.metric != null) {
-      this.metric.observe(countOrLabels, count);
+      this.metric.observe(this._getLabels(countOrLabels), count);
     }
   }
 }
