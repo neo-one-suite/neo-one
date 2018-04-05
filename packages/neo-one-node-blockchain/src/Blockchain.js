@@ -316,7 +316,7 @@ export default class Blockchain {
 
   async verifyBlock(block: Block, monitor?: Monitor): Promise<void> {
     await this._getMonitor(monitor)
-      .withData({ 'block.index': block.index })
+      .withData({ [labels.NEO_BLOCK_INDEX]: block.index })
       .captureSpan(
         span =>
           block.verify({
@@ -349,7 +349,7 @@ export default class Blockchain {
     monitor?: Monitor,
   ): Promise<void> {
     await this._getMonitor(monitor)
-      .withData({ 'consensus.hash': payload.hashHex })
+      .withData({ [labels.NEO_CONSENSUS_HASH]: payload.hashHex })
       .captureSpan(
         span =>
           payload.verify({
@@ -373,7 +373,7 @@ export default class Blockchain {
     memPool?: Array<Transaction>,
   }): Promise<void> {
     await this._getMonitor(monitor)
-      .withData({ 'transaction.hash': transaction.hashHex })
+      .withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex })
       .captureSpan(
         span =>
           transaction.verify({
@@ -534,43 +534,53 @@ export default class Blockchain {
 
   verifyScript = async (
     { scriptContainer, hash, witness }: VerifyScriptOptions,
-    monitor?: Monitor,
+    monitor: Monitor,
   ): Promise<void> => {
-    let { verification } = witness;
-    if (verification.length === 0) {
-      const builder = new ScriptBuilder();
-      builder.emitAppCallVerification(hash);
-      verification = builder.build();
-    } else if (!common.uInt160Equal(hash, crypto.toScriptHash(verification))) {
-      throw new WitnessVerifyError();
-    }
+    monitor.captureLog(
+      async () => {
+        let { verification } = witness;
+        if (verification.length === 0) {
+          const builder = new ScriptBuilder();
+          builder.emitAppCallVerification(hash);
+          verification = builder.build();
+        } else if (
+          !common.uInt160Equal(hash, crypto.toScriptHash(verification))
+        ) {
+          throw new WitnessVerifyError();
+        }
 
-    const blockchain = this._createWriteBlockchain();
-    const result = await this._vm.executeScripts({
-      monitor: this._getMonitor(monitor),
-      scripts: [
-        { code: witness.invocation, pushOnly: true },
-        { code: verification },
-      ],
-      blockchain,
-      scriptContainer,
-      triggerType: TRIGGER_TYPE.VERIFICATION,
-      action: NULL_ACTION,
-      gas: utils.ZERO,
-    });
+        const blockchain = this._createWriteBlockchain();
+        const result = await this._vm.executeScripts({
+          monitor: this._getMonitor(monitor),
+          scripts: [
+            { code: witness.invocation, pushOnly: true },
+            { code: verification },
+          ],
+          blockchain,
+          scriptContainer,
+          triggerType: TRIGGER_TYPE.VERIFICATION,
+          action: NULL_ACTION,
+          gas: utils.ZERO,
+        });
 
-    const { stack } = result;
-    if (stack.length !== 1) {
-      throw new ScriptVerifyError(
-        `Verification did not return one result. This may be a bug in the ` +
-          `smart contract. Found ${stack.length} results.`,
-      );
-    }
+        const { stack } = result;
+        if (stack.length !== 1) {
+          throw new ScriptVerifyError(
+            `Verification did not return one result. This may be a bug in the ` +
+              `smart contract. Found ${stack.length} results.`,
+          );
+        }
 
-    const top = stack[0];
-    if (!top.asBoolean()) {
-      throw new ScriptVerifyError('Verification did not succeed.');
-    }
+        const top = stack[0];
+        if (!top.asBoolean()) {
+          throw new ScriptVerifyError('Verification did not succeed.');
+        }
+      },
+      {
+        name: 'neo_blockchain_verify_script',
+        level: 'verbose',
+      },
+    );
   };
 
   calculateClaimAmount = async (

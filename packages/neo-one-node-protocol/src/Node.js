@@ -1200,7 +1200,7 @@ export default class Node implements INode {
   async _trimMemPool(monitor: Monitor): Promise<void> {
     const memPool = commonUtils.values(this.memPool);
     if (memPool.length > MEM_POOL_SIZE) {
-      await monitor.withData({ 'mempool.size': memPool.length }).captureSpan(
+      await monitor.captureSpan(
         async () => {
           const transactionAndFee = await Promise.all(
             memPool.map(async transaction => {

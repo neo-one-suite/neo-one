@@ -123,7 +123,6 @@ async function handleServer<
         .withLabels({
           [monitor.labels.SPAN_KIND]: 'server',
         })
-        .withData({ host, port })
         .log({
           name: 'server_listen',
           message: `Server listening on ${host}:${port}`,

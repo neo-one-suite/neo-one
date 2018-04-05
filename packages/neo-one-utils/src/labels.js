@@ -9,6 +9,7 @@ export default {
   NEO_TRANSACTION_HASH: 'neo.transaction.hash',
   NEO_TRANSACTION_TYPE: 'neo.transaction.type',
   NEO_TRANSACTION_FOUND: 'neo.transaction.found',
+  NEO_CONSENSUS_HASH: 'neo.consensus.hash',
   NEO_BLOCK_INDEX: 'neo.block.index',
   CALL_METHOD: 'call.method',
   INVOKE_METHOD: 'invoke.method',

@@ -519,6 +519,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
             error: {
               message: `Failed to connect to peer at ${endpoint}.`,
               metric: NEO_NETWORK_PEER_CONNECT_FAILURES_TOTAL,
+              level: 'verbose',
             },
           },
         );
