@@ -386,12 +386,10 @@ export default class MonitorBase implements Span {
       ({ parent: currentParent } = this.getSpan());
     }
 
-    const timeMS = this.now();
-    const time = timeMS / 1000;
     return this._clone({
       span: {
         metric,
-        time,
+        time: this.nowSeconds(),
         span,
         parent: parent == null ? currentParent : parent,
       },
@@ -401,15 +399,19 @@ export default class MonitorBase implements Span {
   end(error?: boolean): void {
     const span = this.getSpan();
     const { metric } = span;
-    const finishTimeMS = this.nowSeconds();
-    const finishTime = finishTimeMS / 1000;
     if (metric != null) {
-      metric.total.observe(
-        this._getLabelsForMetric(metric.total),
-        finishTime - span.time,
+      const value = this.nowSeconds() - span.time;
+      this._invokeMetric(
+        metric.total,
+        total => total.observe(value),
+        (total, labels) => total.observe(labels, value),
       );
       if (error) {
-        metric.error.inc(this._getLabelsForMetric(metric.error));
+        this._invokeMetric(
+          metric.error,
+          errorMetric => errorMetric.inc(),
+          (errorMetric, labels) => errorMetric.inc(labels),
+        );
       }
     }
 
@@ -420,13 +422,22 @@ export default class MonitorBase implements Span {
     }
   }
 
-  _getLabelsForMetric(metric: Metric): Labels {
-    const labels = {};
-    for (const labelName of metric.getLabelNames()) {
-      labels[labelName] = this._labels[labelName];
-    }
+  _invokeMetric<T: Metric>(
+    metric: T,
+    withoutLabels: (metric: T) => void,
+    withLabels: (metric: T, labels: Labels) => void,
+  ): void {
+    const labelNames = metric.getLabelNames();
+    if (labelNames.length === 0) {
+      withoutLabels(metric);
+    } else {
+      const labels = {};
+      for (const labelName of metric.getLabelNames()) {
+        labels[labelName] = this._labels[labelName];
+      }
 
-    return labels;
+      withLabels(metric, labels);
+    }
   }
 
   captureSpan(
@@ -572,8 +583,11 @@ export default class MonitorBase implements Span {
   }: CommonLogOptions): void {
     const incrementMetric = (maybeMetric?: Counter) => {
       if (maybeMetric != null) {
-        const labels = this._getLabelsForMetric(maybeMetric);
-        maybeMetric.inc(labels);
+        this._invokeMetric(
+          maybeMetric,
+          theMetric => theMetric.inc(),
+          (theMetric, labels) => theMetric.inc(labels),
+        );
       }
     };
 
