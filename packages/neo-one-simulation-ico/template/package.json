@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/simulation-ico-template",
-  "version": "1.0.0-alpha.40",
+  "version": "1.0.0-alpha.41",
   "private": true,
   "dependencies": {
     "@babel/polyfill": "7.0.0-beta.44",
-    "@neo-one/client": "^1.0.0-alpha.39",
+    "@neo-one/client": "^1.0.0-alpha.40",
     "material-ui": "1.0.0-beta.36",
     "react": "16.3.1",
     "react-dom": "16.3.1",
