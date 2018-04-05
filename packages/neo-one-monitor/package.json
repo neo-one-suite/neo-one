@@ -42,7 +42,7 @@
     "koa": "^2.5.0",
     "koa-mount": "^3.0.0",
     "lodash": "^4.17.5",
-    "opentracing": "^0.14.1",
+    "opentracing": "^0.14.2",
     "prom-client": "^11.0.0",
     "prometheus-gc-stats": "^0.5.1",
     "rxjs": "^5.5.7"

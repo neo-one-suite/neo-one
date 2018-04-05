@@ -38,7 +38,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.0.0-beta.42",
+    "@babel/polyfill": "^7.0.0-beta.44",
     "@grpc/surface": "^0.1.0",
     "@neo-one/monitor": "^1.0.0-alpha.16",
     "@neo-one/server": "^1.0.0-alpha.54",
