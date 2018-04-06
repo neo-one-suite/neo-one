@@ -98,6 +98,7 @@ const NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE = metrics.createGauge({
 const NEO_BLOCKCHAIN_PERSIST_BLOCK_LATENCY_SECONDS = metrics.createHistogram({
   name: 'neo_blockchain_persist_block_latency_seconds',
   help: 'The latency from block timestamp to persist',
+  buckets: [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
 });
 
 export default class Blockchain {
