@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-wallet",
-  "version": "1.0.0-alpha.57",
+  "version": "1.0.0-alpha.58",
   "keywords": [
     "neo",
     "NEO",
@@ -36,7 +36,7 @@
     "@neo-one/client-core": "^1.0.0-alpha.28",
     "@neo-one/server-plugin": "^1.0.0-alpha.29",
     "@neo-one/server-plugin-compiler": "^1.0.0-alpha.42",
-    "@neo-one/server-plugin-network": "^1.0.0-alpha.57",
+    "@neo-one/server-plugin-network": "^1.0.0-alpha.58",
     "@neo-one/utils": "^1.0.0-alpha.24",
     "bignumber.js": "^6.0.0",
     "fs-extra": "^5.0.0",
