@@ -3,8 +3,6 @@ import Koa, { type Context } from 'koa';
 
 import gcStats from 'prometheus-gc-stats';
 import mount from 'koa-mount';
-// $FlowFixMe
-import perfHooks from 'perf_hooks';
 import prom from 'prom-client';
 
 import type { LogLevel, Monitor } from './types';
@@ -38,7 +36,9 @@ export default class NodeMonitor extends MonitorBase {
         },
       },
       tracer,
-      now: () => perfHooks.performance.timeOrigin + perfHooks.performance.now(),
+      // Perfhooks is broken in 8.9 - there's no way to get the current
+      // high resolution timestamp. Fix is in 9.8.0.
+      now: () => Date.now(),
       spanLogLevel,
     });
   }
