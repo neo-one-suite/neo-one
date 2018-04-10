@@ -384,8 +384,7 @@ export default class Blockchain {
             getOutput: this.output.get,
             tryGetAccount: this.account.tryGet,
             standbyValidators: this.settings.standbyValidators,
-            getAllValidators: () =>
-              this.validator.all.pipe(toArray()).toPromise(),
+            getAllValidators: this._getAllValidators,
             verifyScript: options => this.verifyScript(options, span),
             governingToken: this.settings.governingToken,
             utilityToken: this.settings.utilityToken,
@@ -537,52 +536,41 @@ export default class Blockchain {
     { scriptContainer, hash, witness }: VerifyScriptOptions,
     monitor: Monitor,
   ): Promise<void> => {
-    monitor.captureLog(
-      async () => {
-        let { verification } = witness;
-        if (verification.length === 0) {
-          const builder = new ScriptBuilder();
-          builder.emitAppCallVerification(hash);
-          verification = builder.build();
-        } else if (
-          !common.uInt160Equal(hash, crypto.toScriptHash(verification))
-        ) {
-          throw new WitnessVerifyError();
-        }
+    let { verification } = witness;
+    if (verification.length === 0) {
+      const builder = new ScriptBuilder();
+      builder.emitAppCallVerification(hash);
+      verification = builder.build();
+    } else if (!common.uInt160Equal(hash, crypto.toScriptHash(verification))) {
+      throw new WitnessVerifyError();
+    }
 
-        const blockchain = this._createWriteBlockchain();
-        const result = await this._vm.executeScripts({
-          monitor: this._getMonitor(monitor),
-          scripts: [
-            { code: witness.invocation, pushOnly: true },
-            { code: verification },
-          ],
-          blockchain,
-          scriptContainer,
-          triggerType: TRIGGER_TYPE.VERIFICATION,
-          action: NULL_ACTION,
-          gas: utils.ZERO,
-        });
+    const blockchain = this._createWriteBlockchain();
+    const result = await this._vm.executeScripts({
+      monitor: this._getMonitor(monitor),
+      scripts: [
+        { code: witness.invocation, pushOnly: true },
+        { code: verification },
+      ],
+      blockchain,
+      scriptContainer,
+      triggerType: TRIGGER_TYPE.VERIFICATION,
+      action: NULL_ACTION,
+      gas: utils.ZERO,
+    });
 
-        const { stack } = result;
-        if (stack.length !== 1) {
-          throw new ScriptVerifyError(
-            `Verification did not return one result. This may be a bug in the ` +
-              `smart contract. Found ${stack.length} results.`,
-          );
-        }
+    const { stack } = result;
+    if (stack.length !== 1) {
+      throw new ScriptVerifyError(
+        `Verification did not return one result. This may be a bug in the ` +
+          `smart contract. Found ${stack.length} results.`,
+      );
+    }
 
-        const top = stack[0];
-        if (!top.asBoolean()) {
-          throw new ScriptVerifyError('Verification did not succeed.');
-        }
-      },
-      {
-        name: 'neo_blockchain_verify_script',
-        level: 'verbose',
-        error: {},
-      },
-    );
+    const top = stack[0];
+    if (!top.asBoolean()) {
+      throw new ScriptVerifyError('Verification did not succeed.');
+    }
   };
 
   calculateClaimAmount = async (
@@ -850,9 +838,8 @@ export default class Blockchain {
     return unspent.map(value => value.input);
   };
 
-  _getAllValidators(): Promise<Array<Validator>> {
-    return this.validator.all.pipe(toArray()).toPromise();
-  }
+  _getAllValidators = (): Promise<Array<Validator>> =>
+    this.validator.all.pipe(toArray()).toPromise();
 
   _getMonitor(monitor?: Monitor): Monitor {
     if (monitor == null) {
