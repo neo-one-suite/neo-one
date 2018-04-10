@@ -321,7 +321,11 @@ export default class Node implements INode {
             },
           );
       } catch (error) {
-        if (error.code !== 'VERIFY') {
+        if (
+          error.code == null ||
+          typeof error.code !== 'string' ||
+          !error.code.includes('VERIFY')
+        ) {
           throw error;
         }
       } finally {

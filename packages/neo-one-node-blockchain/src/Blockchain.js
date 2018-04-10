@@ -580,6 +580,7 @@ export default class Blockchain {
       {
         name: 'neo_blockchain_verify_script',
         level: 'verbose',
+        error: {},
       },
     );
   };
