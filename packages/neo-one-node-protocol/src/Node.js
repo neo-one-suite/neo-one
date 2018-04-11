@@ -641,11 +641,11 @@ export default class Node implements INode {
     }
   }
 
-  async _onMessageReceived(
+  _onMessageReceived(
     peer: ConnectedPeer<Message, PeerData>,
     message: Message,
-  ): Promise<void> {
-    await this._monitor
+  ): void {
+    this._monitor
       .withLabels({ [labels.COMMAND_NAME]: message.value.command })
       .withData({ [this._monitor.labels.PEER_ADDRESS]: peer.endpoint })
       .captureLog(
@@ -760,7 +760,8 @@ export default class Node implements INode {
             }`,
           },
         },
-      );
+      )
+      .catch(() => {});
   }
 
   _onAddrMessageReceived(monitor: Monitor, addr: AddrPayload): void {
