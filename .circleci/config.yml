@@ -25,7 +25,7 @@ aliases:
       yarn install --non-interactive --cache-folder ~/.cache/yarn --frozen-lockfile
 defaults: &defaults
   docker:
-    - image: circleci/node:8.9
+    - image: circleci/node:8.9@sha256:24e35a687948c0a1addfa7e6145f5ae22fda663b457139380f3132e16be0ffb5
 
 version: 2
 jobs:
