@@ -27,3 +27,7 @@ export class WitnessVerifyError extends CustomError {
     this.code = 'WITNESS_VERIFY';
   }
 }
+
+export class UnknownVerifyError extends CustomError {
+  code: string = 'UNKNOWN_VERIFY';
+}

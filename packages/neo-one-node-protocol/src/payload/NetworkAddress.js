@@ -41,7 +41,7 @@ export default class NetworkAddress
     }
     writer.writeUInt32LE(this.timestamp);
     writer.writeUInt64LE(this.services);
-    writer.writeBytes(address.toByteArray());
+    writer.writeBytes(Buffer.from(address.toByteArray()));
     writer.writeUInt16BE(this.port);
   }
 

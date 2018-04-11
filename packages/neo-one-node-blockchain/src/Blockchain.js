@@ -48,6 +48,7 @@ import {
   GenesisBlockNotRegisteredError,
   ScriptVerifyError,
   WitnessVerifyError,
+  UnknownVerifyError,
 } from './errors';
 import WriteBatchBlockchain from './WriteBatchBlockchain';
 
@@ -373,28 +374,40 @@ export default class Blockchain {
     transaction: Transaction,
     memPool?: Array<Transaction>,
   }): Promise<void> {
-    await this._getMonitor(monitor)
-      .withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex })
-      .captureSpan(
-        span =>
-          transaction.verify({
-            calculateClaimAmount: this.calculateClaimAmount,
-            isSpent: this._isSpent,
-            getAsset: this.asset.get,
-            getOutput: this.output.get,
-            tryGetAccount: this.account.tryGet,
-            standbyValidators: this.settings.standbyValidators,
-            getAllValidators: this._getAllValidators,
-            verifyScript: options => this.verifyScript(options, span),
-            governingToken: this.settings.governingToken,
-            utilityToken: this.settings.utilityToken,
-            fees: this.settings.fees,
-            registerValidatorFee: this.settings.registerValidatorFee,
-            currentHeight: this.currentBlockIndex,
-            memPool,
-          }),
-        { name: 'neo_blockchain_verify_transaction' },
-      );
+    try {
+      await this._getMonitor(monitor)
+        .withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex })
+        .captureSpan(
+          span =>
+            transaction.verify({
+              calculateClaimAmount: this.calculateClaimAmount,
+              isSpent: this._isSpent,
+              getAsset: this.asset.get,
+              getOutput: this.output.get,
+              tryGetAccount: this.account.tryGet,
+              standbyValidators: this.settings.standbyValidators,
+              getAllValidators: this._getAllValidators,
+              verifyScript: options => this.verifyScript(options, span),
+              governingToken: this.settings.governingToken,
+              utilityToken: this.settings.utilityToken,
+              fees: this.settings.fees,
+              registerValidatorFee: this.settings.registerValidatorFee,
+              currentHeight: this.currentBlockIndex,
+              memPool,
+            }),
+          { name: 'neo_blockchain_verify_transaction' },
+        );
+    } catch (error) {
+      if (
+        error.code == null ||
+        typeof error.code !== 'string' ||
+        !error.code.includes('VERIFY')
+      ) {
+        throw new UnknownVerifyError(error.message);
+      }
+
+      throw error;
+    }
   }
 
   async invokeScript(
