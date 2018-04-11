@@ -692,8 +692,8 @@
     "@types/react" "*"
 
 "@types/react@*":
-  version "16.3.6"
-  resolved "https://registry.npmjs.org/@types/react/-/react-16.3.6.tgz#50cec71f14cbaaf49a53167dc1d6739be1d43f12"
+  version "16.3.8"
+  resolved "https://registry.npmjs.org/@types/react/-/react-16.3.8.tgz#40c7e4eca3f48783e4c4ccee26fc7f5a5a476d84"
   dependencies:
     csstype "^2.0.0"
 
@@ -1422,9 +1422,9 @@ babel-plugin-jest-hoist@^22.4.3:
   version "22.4.3"
   resolved "https://registry.npmjs.org/babel-plugin-jest-hoist/-/babel-plugin-jest-hoist-22.4.3.tgz#7d8bcccadc2667f96a0dcc6afe1891875ee6c14a"
 
-babel-plugin-jest-hoist@^23.0.0-alpha.4:
-  version "23.0.0-alpha.4"
-  resolved "https://registry.npmjs.org/babel-plugin-jest-hoist/-/babel-plugin-jest-hoist-23.0.0-alpha.4.tgz#3f32715d54640e37cc62a84a9d3d7eada6a067fc"
+babel-plugin-jest-hoist@^23.0.0-alpha.5r:
+  version "23.0.0-alpha.5r"
+  resolved "https://registry.npmjs.org/babel-plugin-jest-hoist/-/babel-plugin-jest-hoist-23.0.0-alpha.5r.tgz#713df3d8044a0ca18b51a2e09a8a017691b885c5"
 
 babel-plugin-syntax-async-functions@^6.8.0:
   version "6.13.0"
@@ -1785,10 +1785,10 @@ babel-preset-jest@^22.4.3:
     babel-plugin-syntax-object-rest-spread "^6.13.0"
 
 babel-preset-jest@^23.0.0-alpha.4:
-  version "23.0.0-alpha.4"
-  resolved "https://registry.npmjs.org/babel-preset-jest/-/babel-preset-jest-23.0.0-alpha.4.tgz#d3080507330e6d23c47dcc366d69f7a330174f70"
+  version "23.0.0-alpha.5r"
+  resolved "https://registry.npmjs.org/babel-preset-jest/-/babel-preset-jest-23.0.0-alpha.5r.tgz#2b01ed977ec78e11fef5f367d7998f8b193aa58f"
   dependencies:
-    babel-plugin-jest-hoist "^23.0.0-alpha.4"
+    babel-plugin-jest-hoist "^23.0.0-alpha.5r"
     babel-plugin-syntax-object-rest-spread "^6.13.0"
 
 babel-preset-react-app@^3.1.1:
@@ -6439,9 +6439,9 @@ jest-message-util@^22.4.3:
     slash "^1.0.0"
     stack-utils "^1.0.1"
 
-jest-message-util@^23.0.0-alpha.4:
-  version "23.0.0-alpha.4"
-  resolved "https://registry.npmjs.org/jest-message-util/-/jest-message-util-23.0.0-alpha.4.tgz#8e2c7d1ff72fc5947ad548c4a425a9f5f137df86"
+jest-message-util@^23.0.0-alpha.5r:
+  version "23.0.0-alpha.5r"
+  resolved "https://registry.npmjs.org/jest-message-util/-/jest-message-util-23.0.0-alpha.5r.tgz#1bd3f35fc885c921d8ae61dc390238b0e8165edf"
   dependencies:
     "@babel/code-frame" "^7.0.0-beta.35"
     chalk "^2.0.1"
@@ -6458,8 +6458,8 @@ jest-mock@^22.4.3:
   resolved "https://registry.npmjs.org/jest-mock/-/jest-mock-22.4.3.tgz#f63ba2f07a1511772cdc7979733397df770aabc7"
 
 jest-mock@^23.0.0-alpha.4:
-  version "23.0.0-alpha.4"
-  resolved "https://registry.npmjs.org/jest-mock/-/jest-mock-23.0.0-alpha.4.tgz#a36bac72b5bb77e3b213631401211622796d995c"
+  version "23.0.0-alpha.5r"
+  resolved "https://registry.npmjs.org/jest-mock/-/jest-mock-23.0.0-alpha.5r.tgz#fc1df64d61f4f77cca14e16a1aacc4d49bb078e0"
 
 jest-regex-util@^20.0.3:
   version "20.0.3"
@@ -6608,14 +6608,14 @@ jest-util@^22.4.3:
     source-map "^0.6.0"
 
 jest-util@^23.0.0-alpha.4:
-  version "23.0.0-alpha.4"
-  resolved "https://registry.npmjs.org/jest-util/-/jest-util-23.0.0-alpha.4.tgz#ded2e4c98cce55cbd42c449712aed5eb75f811a8"
+  version "23.0.0-alpha.5r"
+  resolved "https://registry.npmjs.org/jest-util/-/jest-util-23.0.0-alpha.5r.tgz#e38b4523c5ccdc887a222bf2f2d68453f8b766d7"
   dependencies:
     callsites "^2.0.0"
     chalk "^2.0.1"
     graceful-fs "^4.1.11"
     is-ci "^1.0.10"
-    jest-message-util "^23.0.0-alpha.4"
+    jest-message-util "^23.0.0-alpha.5r"
     mkdirp "^0.5.1"
     source-map "^0.6.0"
 
@@ -8079,8 +8079,8 @@ negotiator@0.6.1:
   resolved "https://registry.npmjs.org/negotiator/-/negotiator-0.6.1.tgz#2b327184e8992101177b28563fb5e7102acd0ca9"
 
 neo-async@^2.5.0:
-  version "2.5.0"
-  resolved "https://registry.npmjs.org/neo-async/-/neo-async-2.5.0.tgz#76b1c823130cca26acfbaccc8fbaf0a2fa33b18f"
+  version "2.5.1"
+  resolved "https://registry.npmjs.org/neo-async/-/neo-async-2.5.1.tgz#acb909e327b1e87ec9ef15f41b8a269512ad41ee"
 
 next-tick@1:
   version "1.0.0"
@@ -10165,9 +10165,9 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.npmjs.org/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs@^5.4.2, rxjs@^5.5.2, rxjs@^5.5.7, rxjs@^5.5.8:
-  version "5.5.8"
-  resolved "https://registry.npmjs.org/rxjs/-/rxjs-5.5.8.tgz#b2b0809a57614ad6254c03d7446dea0d83ca3791"
+rxjs@^5.4.2, rxjs@^5.5.2, rxjs@^5.5.9:
+  version "5.5.9"
+  resolved "https://registry.npmjs.org/rxjs/-/rxjs-5.5.9.tgz#12a0487794b00f5eb370fec2751bd973a89886fb"
   dependencies:
     symbol-observable "1.0.1"
 
