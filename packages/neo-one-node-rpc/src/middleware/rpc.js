@@ -146,7 +146,7 @@ const jsonrpc = (handlers: Handlers): Middleware => {
           if (request != null) {
             ({ method } = request);
           } else if (typeof requestIn === 'object') {
-            ({ method } = requestIn.method);
+            ({ method } = requestIn);
           }
 
           if (RPC_METHODS[method] == null) {
