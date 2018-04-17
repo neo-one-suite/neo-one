@@ -194,7 +194,7 @@ const privateKeyToBuffer = (value: PrivateKey | PrivateKeyHex): Buffer =>
   typeof value === 'string' ? hexToPrivateKey(value) : value;
 
 const privateKeyToString = (value: PrivateKey | PrivateKeyHex): string =>
-  typeof value === 'string' ? value : ecPointToHex(value);
+  typeof value === 'string' ? value : privateKeyToHex(value);
 
 const stringToPrivateKey = (value: string): PrivateKey =>
   hexToPrivateKey(value);
