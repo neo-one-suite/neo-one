@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-protocol",
-  "version": "1.0.0-alpha.54",
+  "version": "1.0.0-alpha.55",
   "keywords": [
     "neo",
     "NEO",
@@ -34,12 +34,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.44",
-    "@neo-one/client-core": "^1.0.0-alpha.31",
-    "@neo-one/monitor": "^1.0.0-alpha.22",
-    "@neo-one/node-core": "^1.0.0-alpha.32",
-    "@neo-one/node-network": "^1.0.0-alpha.36",
-    "@neo-one/utils": "^1.0.0-alpha.27",
+    "@neo-one/client": "^1.0.0-alpha.45",
+    "@neo-one/client-core": "^1.0.0-alpha.32",
+    "@neo-one/monitor": "^1.0.0-alpha.23",
+    "@neo-one/node-core": "^1.0.0-alpha.33",
+    "@neo-one/node-network": "^1.0.0-alpha.37",
+    "@neo-one/utils": "^1.0.0-alpha.28",
     "bignumber.js": "^6.0.0",
     "bloem": "^0.2.4",
     "bloom-filter": "^0.2.0",
