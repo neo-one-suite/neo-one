@@ -598,9 +598,11 @@ export default class MonitorBase implements Span {
     incrementMetric(metric);
     if (error != null) {
       const { error: errorObj } = error;
-      labels = { ...labels };
-      labels[LABELS.ERROR] = errorObj != null;
-      labels[LABELS.ERROR_KIND] = this._getErrorKind(errorObj);
+      labels = {
+        ...labels,
+        [LABELS.ERROR]: errorObj != null,
+        [LABELS.ERROR_KIND]: this._getErrorKind(errorObj),
+      };
       const errorLevel = error.level == null ? 'error' : error.level;
       if (errorObj != null) {
         incrementMetric(error.metric);

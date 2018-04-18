@@ -44,13 +44,13 @@
     "@neo-one/server-plugin-wallet": "^1.0.0-alpha.62",
     "@neo-one/utils": "^1.0.0-alpha.27",
     "fs-extra": "^5.0.0",
-    "grpc": "^1.10.1",
+    "grpc": "^1.11.0-pre2",
     "grpc-error": "^1.0.0",
     "lodash": "^4.17.5",
     "mali": "^0.7.1",
     "mali-compose": "^1.0.0",
     "mali-onerror": "^0.1.1",
-    "rxjs": "^5.5.9",
+    "rxjs": "^5.5.10",
     "toposort": "^1.0.6",
     "uuid": "^3.2.1"
   }

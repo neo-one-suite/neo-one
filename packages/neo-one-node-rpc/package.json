@@ -42,13 +42,13 @@
     "koa": "^2.5.0",
     "koa-better-body": "^3.0.4",
     "koa-compose": "^4.0.0",
-    "koa-compress": "^2.0.0",
+    "koa-compress": "^3.0.0",
     "koa-connect": "^2.0.1",
     "koa-convert": "^1.2.0",
     "koa-cors": "^0.0.16",
     "koa-router": "^7.4.0",
     "lodash": "^4.17.5",
     "node-fetch": "^2.1.2",
-    "rxjs": "^5.5.9"
+    "rxjs": "^5.5.10"
   }
 }

@@ -1,7 +1,12 @@
 /* @flow */
-import { common, crypto } from '@neo-one/client-core';
+import {
+  type PrivateKey,
+  type ECPoint,
+  common,
+  crypto,
+} from '@neo-one/client-core';
 
-export default [
+export default ([
   '422857ede524202494579a1c40e88f8c45556e51c83c3c812eff4f22ccafb79e',
   'cc820c2f669004e2755db6365a69d08f9bcd78c63653b78d26020e3ed45bece0',
   '23856dcb5a080be43deb159ce4ba2114fa147bedcfd71a47e747b236de6dff75',
@@ -13,4 +18,4 @@ export default [
   const privateKey = common.stringToPrivateKey(key);
   const publicKey = crypto.privateKeyToPublicKey(privateKey);
   return { privateKey, publicKey };
-});
+}): Array<{| privateKey: PrivateKey, publicKey: ECPoint |}>);
