@@ -5,7 +5,7 @@
   "dependencies": {
     "@babel/polyfill": "7.0.0-beta.44",
     "@neo-one/client": "^1.0.0-alpha.44",
-    "material-ui": "1.0.0-beta.36",
+    "material-ui": "1.0.0-beta.42",
     "react": "16.3.1",
     "react-dom": "16.3.1",
     "react-scripts": "1.1.4",
