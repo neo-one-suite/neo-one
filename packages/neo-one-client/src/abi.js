@@ -47,6 +47,7 @@ export const NEP5_STATIC = (decimals: number) => ({
     },
     {
       name: 'balanceOf',
+      constant: true,
       parameters: [
         {
           name: 'account',

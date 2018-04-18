@@ -56,6 +56,7 @@ describe('abi', () => {
         },
         {
           name: 'balanceOf',
+          constant: true,
           parameters: [
             {
               name: 'account',
