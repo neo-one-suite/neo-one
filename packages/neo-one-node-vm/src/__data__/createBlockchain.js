@@ -14,6 +14,7 @@ export default ({
     },
     action: {},
     output: {},
+    asset: {},
   }: $FlowFixMe);
   if (contracts.length > 0) {
     const scriptHashToContract = contracts.reduce((acc, contract) => {

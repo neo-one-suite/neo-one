@@ -23,7 +23,7 @@ import { DefaultMonitor } from '@neo-one/monitor';
 import _ from 'lodash';
 
 import execute from '../execute';
-import { createBlockchain, testUtils, transactions } from '../__data__';
+import { assets, createBlockchain, testUtils, transactions } from '../__data__';
 
 const monitor = DefaultMonitor.create({
   service: 'test',
@@ -34,11 +34,13 @@ const executeSimple = ({
   transaction,
   gas,
   persistingBlock,
+  skipWitnessVerify,
 }: {|
   blockchain: $FlowFixMe,
   transaction: InvocationTransaction,
   gas?: BN,
   persistingBlock?: $FlowFixMe,
+  skipWitnessVerify?: boolean,
 |}) =>
   execute({
     monitor,
@@ -51,13 +53,12 @@ const executeSimple = ({
     triggerType: TRIGGER_TYPE.APPLICATION,
     action: NULL_ACTION,
     gas: gas || utils.ZERO,
-    skipWitnessVerify: true,
+    skipWitnessVerify: skipWitnessVerify == null ? true : skipWitnessVerify,
     persistingBlock,
   });
 
 const neoBN = (value: string) =>
   new BN(value, 10).mul(utils.ONE_HUNDRED_MILLION);
-const NEO_ASSET_HASH_UINT256 = common.stringToUInt256(common.NEO_ASSET_HASH);
 
 describe('execute', () => {
   let blockchain: $FlowFixMe;
@@ -242,7 +243,7 @@ describe('execute', () => {
         new Output({
           address: conciergeSenderAddress,
           value: neoBN('20'),
-          asset: NEO_ASSET_HASH_UINT256,
+          asset: assets.NEO_ASSET_HASH_UINT256,
         }),
       ),
     );
@@ -265,12 +266,12 @@ describe('execute', () => {
       new Output({
         address: conciergeSenderAddress,
         value: neoBN('10'),
-        asset: NEO_ASSET_HASH_UINT256,
+        asset: assets.NEO_ASSET_HASH_UINT256,
       }),
       new Output({
         address: conciergeContract.hash,
         value: neoBN('10'),
-        asset: NEO_ASSET_HASH_UINT256,
+        asset: assets.NEO_ASSET_HASH_UINT256,
       }),
     ],
   });
@@ -386,7 +387,7 @@ describe('execute', () => {
               new Output({
                 address: conciergeSenderAddress,
                 value: neoBN('1'),
-                asset: NEO_ASSET_HASH_UINT256,
+                asset: assets.NEO_ASSET_HASH_UINT256,
               }),
             ),
           );
@@ -408,7 +409,7 @@ describe('execute', () => {
               outputs: [
                 new Output({
                   address: conciergeContract.hash,
-                  asset: NEO_ASSET_HASH_UINT256,
+                  asset: assets.NEO_ASSET_HASH_UINT256,
                   value: neoBN('1'),
                 }),
               ],
@@ -617,12 +618,30 @@ describe('execute', () => {
     const { switcheoContract } = transactions;
     const feeAddress = Buffer.alloc(20, 10);
 
+    const switcheoInputHash = common.bufferToUInt256(Buffer.alloc(32, 6));
+
     const mockBlockchain = () => {
       blockchain = createBlockchain({
         contracts: [switcheoContract, conciergeContract],
       });
 
-      mockConciergeMintOutput();
+      blockchain.asset.get = assets.createGetAsset();
+
+      blockchain.output.get = jest.fn(async ({ hash }) => {
+        if (common.uInt256Equal(hash, switcheoInputHash)) {
+          return new Output({
+            address: switcheoContract.hash,
+            value: new BN(1),
+            asset: assets.GAS_ASSET_HASH_UINT256,
+          });
+        }
+
+        return new Output({
+          address: conciergeSenderAddress,
+          value: neoBN('20'),
+          asset: assets.NEO_ASSET_HASH_UINT256,
+        });
+      });
     };
 
     beforeEach(() => {
@@ -745,8 +764,21 @@ describe('execute', () => {
         blockchain,
         transaction: transactions.createInvocation({
           script: new ScriptBuilder()
-            .emitAppCall(switcheoContract.hash, 'withdraw')
+            .emitTailCall(switcheoContract.hash, 'withdraw')
             .build(),
+          inputs: [
+            new Input({
+              hash: switcheoInputHash,
+              index: 0,
+            }),
+          ],
+          outputs: [
+            new Output({
+              address: switcheoContract.hash,
+              value: new BN(1),
+              asset: assets.GAS_ASSET_HASH_UINT256,
+            }),
+          ],
           attributes: [
             // Withdrawal Stage = Withdraw
             new UInt256Attribute({
@@ -777,6 +809,7 @@ describe('execute', () => {
             }),
           ],
         }),
+        skipWitnessVerify: false,
       });
 
       expectSuccess(result);

@@ -200,6 +200,15 @@ export default class ScriptBuilder {
     return this.emitAppCallVerification(scriptHash);
   }
 
+  emitTailCall(
+    scriptHash: UInt160,
+    operation: string,
+    ...params: Array<?Param>
+  ): this {
+    this.emitAppCallInvocation(operation, ...params);
+    return this.emitOp('TAILCALL', common.uInt160ToBuffer(scriptHash));
+  }
+
   emitSysCall(sysCall: SysCallName, ...params: Array<?Param>): this {
     this.emitPushParams(...params);
     const sysCallBuffer = Buffer.from(sysCall, 'ascii');
