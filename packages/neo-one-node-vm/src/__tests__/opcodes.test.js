@@ -114,7 +114,7 @@ const contract = new Contract({
   author: '',
   email: '',
   description: '',
-  contractProperties: CONTRACT_PROPERTY_STATE.NO_PROPERTY,
+  contractProperties: CONTRACT_PROPERTY_STATE.HAS_DYNAMIC_INVOKE,
 });
 
 const signature0 = crypto.sign({
@@ -357,6 +357,23 @@ const OPCODES = ([
         new IntegerStackItem(new BN(2)),
         new IntegerStackItem(new BN(3)),
       ],
+      mockBlockchain: ({ blockchain }) => {
+        blockchain.contract.get = jest.fn(() => Promise.resolve(contract));
+      },
+      gas: FEES.TEN,
+    },
+    {
+      op: 'APPCALL',
+      buffer: Buffer.alloc(20, 0),
+      args: [Buffer.alloc(20, 10)],
+      // Result of Contract Script defined above
+      result: [
+        new IntegerStackItem(new BN(2)),
+        new IntegerStackItem(new BN(3)),
+      ],
+      // Slightly broken because we're actually running a dynamic invoke
+      // directly from a transaction, but it works because we mock return
+      // this contract with dynamic invoke enabled
       mockBlockchain: ({ blockchain }) => {
         blockchain.contract.get = jest.fn(() => Promise.resolve(contract));
       },

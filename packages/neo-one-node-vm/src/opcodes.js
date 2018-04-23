@@ -220,7 +220,7 @@ const call = ({ name, tailCall }: {| name: OpCode, tailCall?: boolean |}) => ({
         if (!executingContract.hasDynamicInvoke) {
           throw new ContractNoDynamicInvokeError(
             context,
-            common.uInt160ToString(hash),
+            common.uInt160ToString(scriptHash),
           );
         }
       }
