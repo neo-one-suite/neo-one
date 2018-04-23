@@ -9,6 +9,8 @@ import {
   SCRIPT_CONTAINER_TYPE,
   VM_STATE,
   type UInt160,
+  UInt160Attribute,
+  UInt256Attribute,
   Input,
   InvocationTransaction,
   Output,
@@ -59,6 +61,57 @@ const NEO_ASSET_HASH_UINT256 = common.stringToUInt256(common.NEO_ASSET_HASH);
 
 describe('execute', () => {
   let blockchain: $FlowFixMe;
+
+  const expectFailure = (result: ExecuteScriptsResult) => {
+    expect(result.errorMessage).toBeUndefined();
+    expect(result.state).toEqual(VM_STATE.HALT);
+    expect(result.stack.length).toEqual(1);
+    expect(result.stack[0].asBoolean()).toBeFalsy();
+    expect(result.gasConsumed.toString(10)).toMatchSnapshot();
+    testUtils.verifyBlockchainSnapshot(blockchain);
+  };
+
+  const expectThrow = (result: ExecuteScriptsResult) => {
+    expect(result.errorMessage).toBeDefined();
+    if (result.errorMessage != null) {
+      expect(result.errorMessage.split('\n')[0]).toMatchSnapshot();
+    }
+    expect(result.state).toEqual(VM_STATE.FAULT);
+    expect(result.gasConsumed.toString(10)).toMatchSnapshot();
+    testUtils.verifyBlockchainSnapshot(blockchain);
+  };
+
+  const expectSuccess = (result: ExecuteScriptsResult) => {
+    testUtils.verifyBlockchainSnapshot(blockchain);
+    expect(result.errorMessage).toBeUndefined();
+    expect(result.state).toEqual(VM_STATE.HALT);
+    expect(result.stack.length).toEqual(1);
+    expect(result.stack[0].asBoolean()).toBeTruthy();
+    expect(result.gasConsumed.toString(10)).toMatchSnapshot();
+    testUtils.verifyBlockchainSnapshot(blockchain);
+  };
+
+  const checkResult = (result: ExecuteScriptsResult) => {
+    if (result.errorMessage != null) {
+      throw new Error(result.errorMessage);
+    }
+
+    if (result.state !== VM_STATE.HALT) {
+      throw new Error(`Ended in ${result.state}`);
+    }
+
+    return result.stack[0];
+  };
+
+  const executeSetupScript = async (script: Buffer) => {
+    const result = await executeSimple({
+      blockchain,
+      transaction: transactions.createInvocation({ script }),
+    });
+
+    return checkResult(result);
+  };
+
   beforeEach(() => {
     blockchain = ({
       contract: {},
@@ -158,27 +211,88 @@ describe('execute', () => {
     testUtils.verifyBlockchainSnapshot(blockchain);
   });
 
-  describe('concierge', () => {
-    const { conciergeContract } = transactions;
-    const senderAddress = common.bufferToUInt160(Buffer.alloc(20, 10));
+  const { conciergeContract } = transactions;
 
+  const setConciergeParam = async (operation: string, value: string) =>
+    executeSetupScript(
+      new ScriptBuilder()
+        .emitAppCall(conciergeContract.hash, operation, new BN(value, 10))
+        .build(),
+    );
+
+  const expectItemBNEquals = async (
+    hash: UInt160,
+    key: Buffer | UInt160,
+    value: string,
+  ) => {
+    const item = await blockchain.storageItem.get({
+      hash,
+      key,
+    });
+    testUtils.expectItemBNEquals(item, value);
+  };
+
+  const expectConciergeItemBNEquals = (key: Buffer | UInt160, value: string) =>
+    expectItemBNEquals(conciergeContract.hash, key, value);
+
+  const conciergeSenderAddress = common.bufferToUInt160(Buffer.alloc(20, 10));
+  const mockConciergeMintOutput = () => {
+    blockchain.output.get = jest.fn(() =>
+      Promise.resolve(
+        new Output({
+          address: conciergeSenderAddress,
+          value: neoBN('20'),
+          asset: NEO_ASSET_HASH_UINT256,
+        }),
+      ),
+    );
+  };
+
+  const conciergeMintTokensScript = new ScriptBuilder()
+    .emitAppCall(conciergeContract.hash, 'mintTokens')
+    .build();
+  const conciergeInputHash = common.bufferToUInt256(Buffer.alloc(32, 5));
+
+  const conciergeNEOTransaction = transactions.createInvocation({
+    script: conciergeMintTokensScript,
+    inputs: [
+      new Input({
+        hash: conciergeInputHash,
+        index: 0,
+      }),
+    ],
+    outputs: [
+      new Output({
+        address: conciergeSenderAddress,
+        value: neoBN('10'),
+        asset: NEO_ASSET_HASH_UINT256,
+      }),
+      new Output({
+        address: conciergeContract.hash,
+        value: neoBN('10'),
+        asset: NEO_ASSET_HASH_UINT256,
+      }),
+    ],
+  });
+
+  const conciergeWhitelistBeginTime = 1518512400;
+  const conciergePreSaleBeginTime = 1518598800;
+  const conciergeMainSaleBeginTime = 1522486800;
+
+  const conciergeDeploy = () =>
+    executeSetupScript(
+      new ScriptBuilder().emitAppCall(conciergeContract.hash, 'deploy').build(),
+    );
+
+  describe('concierge', () => {
     const mockBlockchain = () => {
       blockchain = createBlockchain({
-        contract: conciergeContract,
+        contracts: [conciergeContract],
       });
 
-      blockchain.output.get = jest.fn(() =>
-        Promise.resolve(
-          new Output({
-            address: senderAddress,
-            value: neoBN('20'),
-            asset: NEO_ASSET_HASH_UINT256,
-          }),
-        ),
-      );
+      mockConciergeMintOutput();
     };
 
-    const inputHash = common.bufferToUInt256(Buffer.alloc(32, 5));
     const ownerScriptHash = common.stringToUInt160(
       '0x78bad2350ef3403faba2a1b5fc5415ebd88e0946',
     );
@@ -191,41 +305,9 @@ describe('execute', () => {
     const mainSaleHardCap = Buffer.from('MAIN_SALE_HARD_CAP', 'utf8');
     const maxNEOPerTransfer = Buffer.from('MAX_NEO_PER_TRANSFER', 'utf8');
 
-    const whitelistBeginTime = 1518512400;
-    const preSaleBeginTime = 1518598800;
-    const mainSaleBeginTime = 1522486800;
-
     beforeEach(() => {
       mockBlockchain();
     });
-
-    const checkResult = (result: ExecuteScriptsResult) => {
-      if (result.errorMessage != null) {
-        throw new Error(result.errorMessage);
-      }
-
-      if (result.state !== VM_STATE.HALT) {
-        throw new Error(`Ended in ${result.state}`);
-      }
-
-      return result.stack[0];
-    };
-
-    const executeSetupScript = async (script: Buffer) => {
-      const result = await executeSimple({
-        blockchain,
-        transaction: transactions.createInvocation({ script }),
-      });
-
-      return checkResult(result);
-    };
-
-    const deploy = () =>
-      executeSetupScript(
-        new ScriptBuilder()
-          .emitAppCall(conciergeContract.hash, 'deploy')
-          .build(),
-      );
 
     const addToWhitelist = async (address: UInt160) =>
       executeSetupScript(
@@ -234,101 +316,31 @@ describe('execute', () => {
           .build(),
       );
 
-    const setParam = async (operation: string, value: string) =>
-      executeSetupScript(
-        new ScriptBuilder()
-          .emitAppCall(conciergeContract.hash, operation, new BN(value, 10))
-          .build(),
-      );
-
-    const expectItemBNEquals = async (key: Buffer | UInt160, value: string) => {
-      const item = await blockchain.storageItem.get({
-        hash: conciergeContract.hash,
-        key,
-      });
-      testUtils.expectItemBNEquals(item, value);
-    };
-
-    const expectFailure = (result: ExecuteScriptsResult) => {
-      expect(result.errorMessage).toBeUndefined();
-      expect(result.state).toEqual(VM_STATE.HALT);
-      expect(result.stack.length).toEqual(1);
-      expect(result.stack[0].asBoolean()).toBeFalsy();
-      expect(result.gasConsumed.toString(10)).toMatchSnapshot();
-      testUtils.verifyBlockchainSnapshot(blockchain);
-    };
-
-    const expectThrow = (result: ExecuteScriptsResult) => {
-      expect(result.errorMessage).toBeDefined();
-      if (result.errorMessage != null) {
-        expect(result.errorMessage.split('\n')[0]).toMatchSnapshot();
-      }
-      expect(result.state).toEqual(VM_STATE.FAULT);
-      expect(result.gasConsumed.toString(10)).toMatchSnapshot();
-      testUtils.verifyBlockchainSnapshot(blockchain);
-    };
-
-    const expectSuccess = (result: ExecuteScriptsResult) => {
-      testUtils.verifyBlockchainSnapshot(blockchain);
-      expect(result.errorMessage).toBeUndefined();
-      expect(result.state).toEqual(VM_STATE.HALT);
-      expect(result.stack.length).toEqual(1);
-      expect(result.stack[0].asBoolean()).toBeTruthy();
-      expect(result.gasConsumed.toString(10)).toMatchSnapshot();
-      testUtils.verifyBlockchainSnapshot(blockchain);
-    };
-
     it('should add to storage in deploy', async () => {
-      const ret = await deploy();
+      const ret = await conciergeDeploy();
 
       testUtils.verifyBlockchainSnapshot(blockchain);
 
       expect(ret.asBoolean()).toBeTruthy();
-      await expectItemBNEquals(ownerScriptHash, '3900000000000000');
-      await expectItemBNEquals(totalSupply, '3900000000000000');
-      await expectItemBNEquals(whitelistSaleBegin, '1518512400');
-      await expectItemBNEquals(whitelistHardCap, '45000000');
-      await expectItemBNEquals(preSaleBegin, '1518598800');
-      await expectItemBNEquals(preSaleHardCap, '55000000');
-      await expectItemBNEquals(mainSaleBegin, '1522486800');
-      await expectItemBNEquals(mainSaleHardCap, '100000000');
-      await expectItemBNEquals(maxNEOPerTransfer, '250');
+      await expectConciergeItemBNEquals(ownerScriptHash, '3900000000000000');
+      await expectConciergeItemBNEquals(totalSupply, '3900000000000000');
+      await expectConciergeItemBNEquals(whitelistSaleBegin, '1518512400');
+      await expectConciergeItemBNEquals(whitelistHardCap, '45000000');
+      await expectConciergeItemBNEquals(preSaleBegin, '1518598800');
+      await expectConciergeItemBNEquals(preSaleHardCap, '55000000');
+      await expectConciergeItemBNEquals(mainSaleBegin, '1522486800');
+      await expectConciergeItemBNEquals(mainSaleHardCap, '100000000');
+      await expectConciergeItemBNEquals(maxNEOPerTransfer, '250');
     });
 
     it('should fail on multiple deploy', async () => {
-      let ret = await deploy();
+      let ret = await conciergeDeploy();
       expect(ret.asBoolean()).toBeTruthy();
 
-      ret = await deploy();
+      ret = await conciergeDeploy();
       expect(ret.asBoolean()).toBeFalsy();
 
       testUtils.verifyBlockchainSnapshot(blockchain);
-    });
-
-    const mintTokensScript = new ScriptBuilder()
-      .emitAppCall(conciergeContract.hash, 'mintTokens')
-      .build();
-
-    const neoTransaction = transactions.createInvocation({
-      script: mintTokensScript,
-      inputs: [
-        new Input({
-          hash: inputHash,
-          index: 0,
-        }),
-      ],
-      outputs: [
-        new Output({
-          address: senderAddress,
-          value: neoBN('10'),
-          asset: NEO_ASSET_HASH_UINT256,
-        }),
-        new Output({
-          address: conciergeContract.hash,
-          value: neoBN('10'),
-          asset: NEO_ASSET_HASH_UINT256,
-        }),
-      ],
     });
 
     describe('mintTokens', () => {
@@ -337,12 +349,12 @@ describe('execute', () => {
       });
 
       it('should fail without a sender', async () => {
-        await deploy();
+        await conciergeDeploy();
 
         const result = await executeSimple({
           blockchain,
           transaction: transactions.createInvocation({
-            script: mintTokensScript,
+            script: conciergeMintTokensScript,
           }),
         });
 
@@ -355,13 +367,13 @@ describe('execute', () => {
         });
 
         it('when whitelist sale period and not whitelisted', async () => {
-          await deploy();
+          await conciergeDeploy();
 
           const result = await executeSimple({
             blockchain,
-            transaction: neoTransaction,
+            transaction: conciergeNEOTransaction,
             persistingBlock: {
-              timestamp: whitelistBeginTime + 1,
+              timestamp: conciergeWhitelistBeginTime + 1,
             },
           });
 
@@ -372,24 +384,24 @@ describe('execute', () => {
           blockchain.output.get = jest.fn(() =>
             Promise.resolve(
               new Output({
-                address: senderAddress,
+                address: conciergeSenderAddress,
                 value: neoBN('1'),
                 asset: NEO_ASSET_HASH_UINT256,
               }),
             ),
           );
 
-          await deploy();
-          await setParam('setWhitelistSaleBegin', '1518512370');
-          await setParam('setPresaleBegin', '1518598770');
+          await conciergeDeploy();
+          await setConciergeParam('setWhitelistSaleBegin', '1518512370');
+          await setConciergeParam('setPresaleBegin', '1518598770');
 
           const result = await executeSimple({
             blockchain,
             transaction: transactions.createInvocation({
-              script: mintTokensScript,
+              script: conciergeMintTokensScript,
               inputs: [
                 new Input({
-                  hash: inputHash,
+                  hash: conciergeInputHash,
                   index: 0,
                 }),
               ],
@@ -410,14 +422,14 @@ describe('execute', () => {
         });
 
         it('when whitelist sale period and rate not set', async () => {
-          await deploy();
-          await addToWhitelist(senderAddress);
+          await conciergeDeploy();
+          await addToWhitelist(conciergeSenderAddress);
 
           const result = await executeSimple({
             blockchain,
-            transaction: neoTransaction,
+            transaction: conciergeNEOTransaction,
             persistingBlock: {
-              timestamp: whitelistBeginTime + 1,
+              timestamp: conciergeWhitelistBeginTime + 1,
             },
           });
 
@@ -425,13 +437,13 @@ describe('execute', () => {
         });
 
         it('when pre sale sale period and rate not set', async () => {
-          await deploy();
+          await conciergeDeploy();
 
           const result = await executeSimple({
             blockchain,
-            transaction: neoTransaction,
+            transaction: conciergeNEOTransaction,
             persistingBlock: {
-              timestamp: preSaleBeginTime + 1,
+              timestamp: conciergePreSaleBeginTime + 1,
             },
           });
 
@@ -440,55 +452,58 @@ describe('execute', () => {
       });
 
       it('should mint tokens during whitelist based on exchange rate', async () => {
-        await deploy();
-        await addToWhitelist(senderAddress);
-        await setParam('setWhitelistSaleRate', '22');
+        await conciergeDeploy();
+        await addToWhitelist(conciergeSenderAddress);
+        await setConciergeParam('setWhitelistSaleRate', '22');
 
         const result = await executeSimple({
           blockchain,
-          transaction: neoTransaction,
+          transaction: conciergeNEOTransaction,
           persistingBlock: {
-            timestamp: whitelistBeginTime + 1,
+            timestamp: conciergeWhitelistBeginTime + 1,
           },
         });
 
         expectSuccess(result);
-        await expectItemBNEquals(senderAddress, '22000000000');
+        await expectConciergeItemBNEquals(
+          conciergeSenderAddress,
+          '22000000000',
+        );
       });
 
       it('should mint tokens during pre sale based on exchange rate with max tokens', async () => {
-        await deploy();
-        await setParam('setPresaleWeek1Rate', '10');
-        await setParam('setMaxPurchase', '5');
+        await conciergeDeploy();
+        await setConciergeParam('setPresaleWeek1Rate', '10');
+        await setConciergeParam('setMaxPurchase', '5');
 
         const result = await executeSimple({
           blockchain,
-          transaction: neoTransaction,
+          transaction: conciergeNEOTransaction,
           persistingBlock: {
-            timestamp: preSaleBeginTime + 1,
+            timestamp: conciergePreSaleBeginTime + 1,
           },
         });
 
         expectSuccess(result);
-        await expectItemBNEquals(senderAddress, '5000000000');
+        await expectConciergeItemBNEquals(conciergeSenderAddress, '5000000000');
       });
 
       it('should mint tokens during main sale based on exchange rate with total supply cap', async () => {
-        await deploy();
-        await setParam('setMainsaleWeek2Rate', '10');
-        await setParam('setMaxPurchase', '10');
-        await setParam('setMainsaleHardcap', '39000050');
+        await conciergeDeploy();
+        await setConciergeParam('setMainsaleWeek2Rate', '10');
+        await setConciergeParam('setMaxPurchase', '10');
+        await setConciergeParam('setMainsaleHardcap', '39000050');
 
         const result = await executeSimple({
           blockchain,
-          transaction: neoTransaction,
+          transaction: conciergeNEOTransaction,
           persistingBlock: {
-            timestamp: mainSaleBeginTime + 1 + 7 * 24 * 3600,
+            timestamp: conciergeMainSaleBeginTime + 1 + 7 * 24 * 3600,
           },
         });
 
         expectSuccess(result);
-        await expectItemBNEquals(senderAddress, '5000000000');
+        await expectConciergeItemBNEquals(conciergeSenderAddress, '5000000000');
       });
     });
 
@@ -496,15 +511,15 @@ describe('execute', () => {
       const receiverAddress = common.bufferToUInt160(Buffer.alloc(20, 4));
 
       const mintTokens = async () => {
-        await deploy();
-        await setParam('setPresaleWeek1Rate', '1000');
-        await setParam('setMaxPurchase', '1000');
+        await conciergeDeploy();
+        await setConciergeParam('setPresaleWeek1Rate', '1000');
+        await setConciergeParam('setMaxPurchase', '1000');
 
         const result = await executeSimple({
           blockchain,
-          transaction: neoTransaction,
+          transaction: conciergeNEOTransaction,
           persistingBlock: {
-            timestamp: preSaleBeginTime + 1,
+            timestamp: conciergePreSaleBeginTime + 1,
           },
         });
 
@@ -514,7 +529,7 @@ describe('execute', () => {
       const getSenderValue = async () => {
         const senderItem = await blockchain.storageItem.get({
           hash: conciergeContract.hash,
-          key: senderAddress,
+          key: conciergeSenderAddress,
         });
         return utils.fromSignedBuffer(senderItem.value);
       };
@@ -540,7 +555,7 @@ describe('execute', () => {
             sb.emitAppCall(
               conciergeContract.hash,
               'transfer',
-              senderAddress,
+              conciergeSenderAddress,
               receiverAddress,
               value,
             );
@@ -560,11 +575,11 @@ describe('execute', () => {
           if (success) {
             await expectSuccess(result);
             const expectedValue = value.mul(new BN(count));
-            await expectItemBNEquals(
-              senderAddress,
+            await expectConciergeItemBNEquals(
+              conciergeSenderAddress,
               senderValue.sub(expectedValue).toString(10),
             );
-            await expectItemBNEquals(
+            await expectConciergeItemBNEquals(
               receiverAddress,
               expectedValue.toString(10),
             );
@@ -595,6 +610,196 @@ describe('execute', () => {
           gas: '10',
         }),
       );
+    });
+  });
+
+  describe('switcheo', () => {
+    const { switcheoContract } = transactions;
+    const feeAddress = Buffer.alloc(20, 10);
+
+    const mockBlockchain = () => {
+      blockchain = createBlockchain({
+        contracts: [switcheoContract, conciergeContract],
+      });
+
+      mockConciergeMintOutput();
+    };
+
+    beforeEach(() => {
+      mockBlockchain();
+    });
+
+    const deploy = async () => {
+      await executeSetupScript(
+        new ScriptBuilder()
+          .emitAppCall(
+            switcheoContract.hash,
+            'initialize',
+            utils.ZERO,
+            utils.ZERO,
+            feeAddress,
+          )
+          .build(),
+      );
+
+      await conciergeDeploy();
+    };
+
+    const whitelistConcierge = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(
+              switcheoContract.hash,
+              'addToWhitelist',
+              conciergeContract.hash,
+            )
+            .build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    const conciergeTokenAmount = '5000000000';
+    const conciergeDepositAmount = '2500000000';
+    const conciergeRemainingAmount = '2500000000';
+    const mintConciergeTokens = async () => {
+      await setConciergeParam('setPresaleWeek1Rate', '10');
+      await setConciergeParam('setMaxPurchase', '5');
+
+      const result = await executeSimple({
+        blockchain,
+        transaction: conciergeNEOTransaction,
+        persistingBlock: {
+          timestamp: conciergePreSaleBeginTime + 1,
+        },
+      });
+
+      expectSuccess(result);
+      await expectConciergeItemBNEquals(
+        conciergeSenderAddress,
+        conciergeTokenAmount,
+      );
+    };
+
+    const depositConciergeTokens = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(
+              switcheoContract.hash,
+              'deposit',
+              conciergeSenderAddress,
+              conciergeContract.hash,
+              new BN(conciergeDepositAmount, 10),
+            )
+            .build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    const markWithdrawConciergeTokens = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(switcheoContract.hash, 'withdraw')
+            .build(),
+          attributes: [
+            // Withdrawal Stage = Mark
+            new UInt256Attribute({
+              usage: 0xa1,
+              value: common.bufferToUInt256(
+                Buffer.concat([Buffer.from([0x50]), Buffer.alloc(31, 0)]),
+              ),
+            }),
+            // Withdrawal address
+            new UInt160Attribute({
+              usage: 0x20,
+              value: conciergeSenderAddress,
+            }),
+            // Withdrawal asset
+            new UInt256Attribute({
+              usage: 0xa2,
+              value: common.bufferToUInt256(
+                Buffer.concat([
+                  common.uInt160ToBuffer(conciergeContract.hash),
+                  Buffer.alloc(12, 0),
+                ]),
+              ),
+            }),
+          ],
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    const processWithdrawConciergeTokens = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(switcheoContract.hash, 'withdraw')
+            .build(),
+          attributes: [
+            // Withdrawal Stage = Withdraw
+            new UInt256Attribute({
+              usage: 0xa1,
+              value: common.bufferToUInt256(
+                Buffer.concat([Buffer.from([0x51]), Buffer.alloc(31, 0)]),
+              ),
+            }),
+            // Withdrawal address
+            new UInt256Attribute({
+              usage: 0xa4,
+              value: common.bufferToUInt256(
+                Buffer.concat([
+                  common.uInt160ToBuffer(conciergeSenderAddress),
+                  Buffer.alloc(12, 0),
+                ]),
+              ),
+            }),
+            // Withdrawal asset
+            new UInt256Attribute({
+              usage: 0xa2,
+              value: common.bufferToUInt256(
+                Buffer.concat([
+                  common.uInt160ToBuffer(conciergeContract.hash),
+                  Buffer.alloc(12, 0),
+                ]),
+              ),
+            }),
+          ],
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    describe('withdraw', () => {
+      it('should allow NEP5 withdrawals', async () => {
+        await deploy();
+        await mintConciergeTokens();
+        await whitelistConcierge();
+        await depositConciergeTokens();
+        await expectConciergeItemBNEquals(
+          conciergeSenderAddress,
+          conciergeRemainingAmount,
+        );
+
+        await markWithdrawConciergeTokens();
+        await processWithdrawConciergeTokens();
+        await expectConciergeItemBNEquals(
+          conciergeSenderAddress,
+          conciergeTokenAmount,
+        );
+      });
     });
   });
 });
