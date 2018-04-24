@@ -1307,6 +1307,33 @@ const OPCODE_PAIRS = [
       }),
     ],
     [
+      0xad,
+      createOp({
+        name: 'VERIFY',
+        in: 3,
+        out: 1,
+        invoke: async ({ context, args }: OpInvokeArgs) => {
+          const publicKey = args[0].asECPoint();
+          const signature = args[1].asBuffer();
+          const message = args[2].asBuffer();
+          let result;
+          try {
+            result = await crypto.verify({
+              message,
+              signature,
+              publicKey,
+            });
+          } catch (error) {
+            result = false;
+          }
+          return {
+            context,
+            results: [new BooleanStackItem(result)],
+          };
+        },
+      }),
+    ],
+    [
       0xae,
       ({ context: contextIn }: CreateOpArgs) => {
         const { stack } = contextIn;

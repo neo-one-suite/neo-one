@@ -178,6 +178,7 @@ export type OpCode =
   | 'HASH160'
   | 'HASH256'
   | 'CHECKSIG'
+  | 'VERIFY'
   | 'CHECKMULTISIG'
   | 'ARRAYSIZE'
   | 'PACK'
@@ -360,6 +361,7 @@ export type ByteCode =
   | 0xa9
   | 0xaa
   | 0xac
+  | 0xad
   | 0xae
   | 0xc0
   | 0xc1
@@ -472,6 +474,7 @@ const OPCODE_PAIRS = [[0x00, 'PUSH0'], [0x01, 'PUSHBYTES1']]
     [0xa9, 'HASH160'],
     [0xaa, 'HASH256'],
     [0xac, 'CHECKSIG'],
+    [0xad, 'VERIFY'],
     [0xae, 'CHECKMULTISIG'],
     [0xc0, 'ARRAYSIZE'],
     [0xc1, 'PACK'],

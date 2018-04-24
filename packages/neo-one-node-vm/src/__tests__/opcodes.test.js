@@ -960,6 +960,18 @@ const OPCODES = ([
       gas: FEES.ONE_HUNDRED,
     },
     {
+      op: 'VERIFY',
+      args: [keys[0].publicKey, signature0, Buffer.alloc(32, 10)],
+      result: [new BooleanStackItem(true)],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'VERIFY',
+      args: [keys[0].publicKey, signature0, Buffer.alloc(32, 1)],
+      result: [new BooleanStackItem(false)],
+      gas: FEES.ONE,
+    },
+    {
       op: 'CHECKMULTISIG',
       args: [[keys[0].publicKey, keys[1].publicKey], [signature0, signature1]],
       result: [new BooleanStackItem(true)],
