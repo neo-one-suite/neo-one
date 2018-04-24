@@ -176,7 +176,9 @@ export const loadChain = async ({
             if (processed >= 100) {
               // eslint-disable-next-line
               console.log(
-                `Processed ${processed} blocks in ${Date.now() - start} ms`,
+                `Processed ${processed} blocks in ${Date.now() - start} ms (${
+                  block.index
+                })`,
               );
               processed = 0;
               start = Date.now();
