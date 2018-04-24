@@ -8,7 +8,7 @@ import {
   withProps,
 } from 'recompose';
 import * as React from 'react';
-import Reboot from 'material-ui/Reboot';
+import CssBaseline from 'material-ui/CssBaseline';
 
 import ICO from './ico';
 import Tour from './tour';
@@ -28,7 +28,7 @@ type Props = {|
 function App(props: Props): React.Element<*> {
   return (
     <div>
-      <Reboot />
+      <CssBaseline />
       <ICO />
       <Tour />
     </div>
