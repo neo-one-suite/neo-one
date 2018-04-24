@@ -359,12 +359,7 @@ export const addTransaction = async ({
   const { blockchain } = node;
   const tx = await blockchain.transaction.tryGet({ hash: transaction.hash });
   if (tx != null) {
-    return requestChangeViewBackup({
-      context,
-      node,
-      privateKey,
-      consensusContext,
-    });
+    return { context };
   }
   if (verify) {
     let verified = true;
@@ -377,12 +372,7 @@ export const addTransaction = async ({
       verified = false;
     }
     if (!verified) {
-      return requestChangeViewBackup({
-        context,
-        node,
-        privateKey,
-        consensusContext,
-      });
+      return { context };
     }
   }
 

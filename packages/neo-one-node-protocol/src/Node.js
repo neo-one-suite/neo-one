@@ -1224,9 +1224,13 @@ export default class Node implements INode {
             _.sortBy(
               transactionAndFee,
               // TODO: Might be a bug since we're converting to number
-              ([transaction, networkFee]) =>
-                networkFee.divn(transaction.size).toNumber(),
+              [
+                ([transaction, networkFee]) =>
+                  networkFee.divn(transaction.size).toNumber(),
+                ([transaction]) => transaction.hashHex,
+              ],
             ),
+            this.blockchain.settings.memPoolSize,
             // eslint-disable-next-line
           ).map(([transaction, _]) => transaction.hashHex);
           for (const hash of hashesToRemove) {

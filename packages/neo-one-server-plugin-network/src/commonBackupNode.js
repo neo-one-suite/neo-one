@@ -67,7 +67,7 @@ export const processArgs = async (
       projectID,
       bucket,
       file,
-      writeBytesPerSecond: 10000,
+      writeBytesPerSecond: 50000000,
     };
   } else {
     vorpal.activeCommand.log(

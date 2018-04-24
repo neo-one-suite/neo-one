@@ -29,6 +29,7 @@ import {
   type Op,
   type OpInvoke,
   type OpInvokeArgs,
+  getResultContext,
 } from './constants';
 import {
   CodeOverflowError,
@@ -248,14 +249,23 @@ const call = ({ name, tailCall }: {| name: OpCode, tailCall?: boolean |}) => ({
         // of the script, and we just return immediately here.
         state = tailCall ? VM_STATE.HALT : context.state;
       }
+
       return {
-        context: {
-          ...resultContext,
-          code: context.code,
-          pc: pc + 20,
+        context: ({
           state,
+          errorMessage: resultContext.errorMessage,
+          blockchain: context.blockchain,
+          init: context.init,
+          engine: context.engine,
+          code: context.code,
+          pushOnly: context.pushOnly,
+          scriptHash: context.scriptHash,
+          callingScriptHash: context.callingScriptHash,
+          entryScriptHash: context.entryScriptHash,
+          pc: pc + 20,
           depth: context.depth,
-        },
+          ...getResultContext(resultContext),
+        }: ExecutionContext),
       };
     },
   })({ context: contextIn });

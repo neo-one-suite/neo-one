@@ -59,7 +59,7 @@ const executeNext = async ({
 
   if (context.pc >= context.code.length) {
     return {
-      ...(context: $FlowFixMe),
+      ...context,
       state: VM_STATE.HALT,
     };
   }
@@ -170,7 +170,7 @@ const executeNext = async ({
     throw new UnknownError(context);
   }
 
-  return (context: $FlowFixMe);
+  return context;
 };
 
 const run = async ({

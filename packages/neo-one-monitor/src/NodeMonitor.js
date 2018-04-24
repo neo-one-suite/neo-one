@@ -97,7 +97,9 @@ export default class NodeMonitor extends MonitorBase {
     await Promise.all([
       super._closeInternal(),
       new Promise(resolve => {
-        if (this._server != null) {
+        if (this._server == null) {
+          resolve();
+        } else {
           this._server.close(() => resolve());
         }
       }),

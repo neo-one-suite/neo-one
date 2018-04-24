@@ -179,5 +179,6 @@ export default (optionsIn?: Options) => {
       : GENERATION_AMOUNT,
     secondsPerBlock: SECONDS_PER_BLOCK,
     maxTransactionsPerBlock: MAX_TRANSACTION_PER_BLOCK,
+    memPoolSize: 50000,
   };
 };

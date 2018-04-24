@@ -27,4 +27,5 @@ export type Settings = {|
   +vm: VMSettings,
   +secondsPerBlock: number,
   +maxTransactionsPerBlock: number,
+  +memPoolSize: number,
 |};

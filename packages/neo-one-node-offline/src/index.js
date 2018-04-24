@@ -150,7 +150,10 @@ export const loadChain = async ({
     // TODO: Not sure why I can't get this to work with a Writable stream so
     //       just implement janky custom backpressure control
     let pending = 0;
+    let processed = 0;
+    let start = Date.now();
     let paused = false;
+    const trackIndex = blockchain.currentBlockIndex;
     transform.on('data', block => {
       pending += 1;
       blockchain
@@ -160,6 +163,24 @@ export const loadChain = async ({
           if (pending < 500 && paused) {
             paused = false;
             transform.resume();
+          }
+
+          if (block.index === trackIndex) {
+            // eslint-disable-next-line
+            console.log(
+              `Loaded chain to current index in ${Date.now() - start} ms`,
+            );
+            start = Date.now();
+          } else if (block.index > trackIndex) {
+            processed += 1;
+            if (processed >= 100) {
+              // eslint-disable-next-line
+              console.log(
+                `Processed ${processed} blocks in ${Date.now() - start} ms`,
+              );
+              processed = 0;
+              start = Date.now();
+            }
           }
         })
         .catch(onError);

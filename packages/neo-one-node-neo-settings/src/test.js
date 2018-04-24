@@ -43,6 +43,7 @@ export default (options?: {|
         ? commonSettings.secondsPerBlock
         : secondsPerBlock,
     maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
+    memPoolSize: commonSettings.memPoolSize,
     fees: {
       [TRANSACTION_TYPE.ENROLLMENT]: common.fixed8FromDecimal(10),
       [TRANSACTION_TYPE.ISSUE]: common.fixed8FromDecimal(5),

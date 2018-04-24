@@ -93,6 +93,14 @@ export type ExecutionContext = {|
   createdContracts: CreatedContracts,
 |};
 
+export const getResultContext = (context: ExecutionContext) => ({
+  stack: context.stack,
+  stackAlt: context.stackAlt,
+  gasLeft: context.gasLeft,
+  actionIndex: context.actionIndex,
+  createdContracts: context.createdContracts,
+});
+
 export type OpResult = {|
   context: ExecutionContext,
   results?: Array<StackItem>,

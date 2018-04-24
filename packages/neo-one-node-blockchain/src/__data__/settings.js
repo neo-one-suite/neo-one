@@ -134,6 +134,7 @@ export default {
   generationAmount: GENERATION_AMOUNT,
   secondsPerBlock: 15,
   maxTransactionsPerBlock: 500,
+  memPoolSize: 50000,
   fees: {
     [TRANSACTION_TYPE.ENROLLMENT]: common.fixed8FromDecimal(1000),
     [TRANSACTION_TYPE.ISSUE]: common.fixed8FromDecimal(500),
