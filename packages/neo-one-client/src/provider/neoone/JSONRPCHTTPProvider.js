@@ -108,18 +108,25 @@ const request = async ({
       }
       // eslint-disable-next-line
       result = await response.json();
-      if (!Array.isArray(result)) {
+      if (Array.isArray(result)) {
+        return result;
+      } else if (
+        typeof result === 'object' &&
+        result.error != null &&
+        typeof result.error === 'object' &&
+        typeof result.error.code === 'number' &&
+        typeof result.error.message === 'string'
+      ) {
         if (
-          result.error &&
           result.error.code === PARSE_ERROR_CODE &&
           result.error.message === PARSE_ERROR_MESSAGE &&
           parseErrorTries > 0
         ) {
           tries += 1;
           parseErrorTries -= 1;
+        } else {
+          throw new JSONRPCError(result.error);
         }
-      } else {
-        return result;
       }
     } catch (error) {
       finalError = error;

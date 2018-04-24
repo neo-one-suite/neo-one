@@ -54,7 +54,12 @@ describe('JSONRPCHTTPProvider', () => {
 
     const result = provider.request(req);
 
-    await expect(result).rejects.toEqual(new InvalidRPCResponseError());
+    await expect(result).rejects.toEqual(
+      new JSONRPCError({
+        code: -32700,
+        message: 'Parse error',
+      }),
+    );
     expect(fetch).toHaveBeenCalledTimes(5);
   });
 

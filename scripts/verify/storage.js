@@ -94,6 +94,8 @@ const reverse = (value: string) => {
 const logItem = (item: any) => {
   try {
     // eslint-disable-next-line
+    console.log(item.value);
+    // eslint-disable-next-line
     console.log(convertNumber(item.value));
   } catch (error) {
     // Ignore errors
