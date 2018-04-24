@@ -16,6 +16,7 @@ import {
   Output,
   ScriptBuilder,
   common,
+  crypto,
   utils,
 } from '@neo-one/client-core';
 import { DefaultMonitor } from '@neo-one/monitor';
@@ -83,7 +84,6 @@ describe('execute', () => {
   };
 
   const expectSuccess = (result: ExecuteScriptsResult) => {
-    testUtils.verifyBlockchainSnapshot(blockchain);
     expect(result.errorMessage).toBeUndefined();
     expect(result.state).toEqual(VM_STATE.HALT);
     expect(result.stack.length).toEqual(1);
@@ -614,6 +614,56 @@ describe('execute', () => {
     });
   });
 
+  const { switcheoTokenContract } = transactions;
+
+  const expectSwitcheoItemBNEquals = (key: Buffer | UInt160, value: string) =>
+    expectItemBNEquals(switcheoTokenContract.hash, key, value);
+
+  const switcheoTokenSenderAddress = common.bufferToUInt160(
+    Buffer.alloc(20, 7),
+  );
+
+  const switcheoMintTokensScript = new ScriptBuilder()
+    .emitAppCall(switcheoTokenContract.hash, 'mintTokens')
+    .build();
+  const switcheoTokenInputHash = common.bufferToUInt256(Buffer.alloc(32, 7));
+
+  const switcheoNEOTransaction = transactions.createInvocation({
+    script: switcheoMintTokensScript,
+    inputs: [
+      new Input({
+        hash: switcheoTokenInputHash,
+        index: 0,
+      }),
+    ],
+    outputs: [
+      new Output({
+        address: switcheoTokenSenderAddress,
+        value: neoBN('10'),
+        asset: assets.NEO_ASSET_HASH_UINT256,
+      }),
+      new Output({
+        address: switcheoTokenContract.hash,
+        value: neoBN('10'),
+        asset: assets.NEO_ASSET_HASH_UINT256,
+      }),
+    ],
+  });
+
+  const switcheoDeploy = async () => {
+    await executeSetupScript(
+      new ScriptBuilder()
+        .emitAppCall(switcheoTokenContract.hash, 'deploy')
+        .build(),
+    );
+
+    await executeSetupScript(
+      new ScriptBuilder()
+        .emitAppCall(switcheoTokenContract.hash, 'enableTransfers')
+        .build(),
+    );
+  };
+
   describe('switcheo', () => {
     const { switcheoContract } = transactions;
     const feeAddress = Buffer.alloc(20, 10);
@@ -622,7 +672,7 @@ describe('execute', () => {
 
     const mockBlockchain = () => {
       blockchain = createBlockchain({
-        contracts: [switcheoContract, conciergeContract],
+        contracts: [switcheoContract, conciergeContract, switcheoTokenContract],
       });
 
       blockchain.asset.get = assets.createGetAsset();
@@ -636,11 +686,23 @@ describe('execute', () => {
           });
         }
 
-        return new Output({
-          address: conciergeSenderAddress,
-          value: neoBN('20'),
-          asset: assets.NEO_ASSET_HASH_UINT256,
-        });
+        if (common.uInt256Equal(hash, switcheoTokenInputHash)) {
+          return new Output({
+            address: switcheoTokenSenderAddress,
+            value: neoBN('20'),
+            asset: assets.NEO_ASSET_HASH_UINT256,
+          });
+        }
+
+        if (common.uInt256Equal(hash, conciergeInputHash)) {
+          return new Output({
+            address: conciergeSenderAddress,
+            value: neoBN('20'),
+            asset: assets.NEO_ASSET_HASH_UINT256,
+          });
+        }
+
+        throw new Error('Unknown input');
       });
     };
 
@@ -654,32 +716,32 @@ describe('execute', () => {
           .emitAppCall(
             switcheoContract.hash,
             'initialize',
-            utils.ZERO,
-            utils.ZERO,
+            utils.TWO, // Taker fee
+            utils.TWO, // Maker fee
             feeAddress,
           )
           .build(),
       );
 
       await conciergeDeploy();
+      await switcheoDeploy();
     };
 
-    const whitelistConcierge = async () => {
+    const whitelist = async (hash: UInt160) => {
       const result = await executeSimple({
         blockchain,
         transaction: transactions.createInvocation({
           script: new ScriptBuilder()
-            .emitAppCall(
-              switcheoContract.hash,
-              'addToWhitelist',
-              conciergeContract.hash,
-            )
+            .emitAppCall(switcheoContract.hash, 'addToWhitelist', hash)
             .build(),
         }),
       });
 
       expectSuccess(result);
     };
+
+    const whitelistConcierge = async () => whitelist(conciergeContract.hash);
+    const whitelistSwitcheo = async () => whitelist(switcheoTokenContract.hash);
 
     const conciergeTokenAmount = '5000000000';
     const conciergeDepositAmount = '2500000000';
@@ -703,6 +765,56 @@ describe('execute', () => {
       );
     };
 
+    const switcheoTokenAmount = '5000000000';
+    const switcheoDepositAmount = '2500000000';
+    const switcheoRemainingAmount = '2500000000';
+    const mintSwitcheoTokens = async () => {
+      const configResult = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(
+              switcheoTokenContract.hash,
+              'setSaleConfig',
+              new BN(conciergePreSaleBeginTime),
+              new BN('500000000', 10),
+              new BN('500000000', 10),
+            )
+            .build(),
+        }),
+      });
+      expectSuccess(configResult);
+
+      const whitelistResult = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(
+              switcheoTokenContract.hash,
+              'addToWhitelist',
+              switcheoTokenSenderAddress,
+              '1',
+            )
+            .build(),
+        }),
+      });
+      expectSuccess(whitelistResult);
+
+      const result = await executeSimple({
+        blockchain,
+        transaction: switcheoNEOTransaction,
+        persistingBlock: {
+          timestamp: conciergePreSaleBeginTime + 1,
+        },
+      });
+
+      expectSuccess(result);
+      await expectSwitcheoItemBNEquals(
+        switcheoTokenSenderAddress,
+        switcheoTokenAmount,
+      );
+    };
+
     const depositConciergeTokens = async () => {
       const result = await executeSimple({
         blockchain,
@@ -722,7 +834,29 @@ describe('execute', () => {
       expectSuccess(result);
     };
 
-    const markWithdrawConciergeTokens = async () => {
+    const depositSwitcheoTokens = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(
+              switcheoContract.hash,
+              'deposit',
+              switcheoTokenSenderAddress,
+              switcheoTokenContract.hash,
+              new BN(switcheoDepositAmount, 10),
+            )
+            .build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    const markWithdrawTokens = async (
+      withdrawAddress: UInt160,
+      asset: UInt160,
+    ) => {
       const result = await executeSimple({
         blockchain,
         transaction: transactions.createInvocation({
@@ -740,14 +874,14 @@ describe('execute', () => {
             // Withdrawal address
             new UInt160Attribute({
               usage: 0x20,
-              value: conciergeSenderAddress,
+              value: withdrawAddress,
             }),
             // Withdrawal asset
             new UInt256Attribute({
               usage: 0xa2,
               value: common.bufferToUInt256(
                 Buffer.concat([
-                  common.uInt160ToBuffer(conciergeContract.hash),
+                  common.uInt160ToBuffer(asset),
                   Buffer.alloc(12, 0),
                 ]),
               ),
@@ -759,7 +893,12 @@ describe('execute', () => {
       expectSuccess(result);
     };
 
-    const processWithdrawConciergeTokens = async () => {
+    const markWithdrawConciergeTokens = async (address: UInt160) =>
+      markWithdrawTokens(address, conciergeContract.hash);
+    const markWithdrawSwitcheoTokens = async (address: UInt160) =>
+      markWithdrawTokens(address, switcheoTokenContract.hash);
+
+    const processWithdrawTokens = async (address: UInt160, asset: UInt160) => {
       const result = await executeSimple({
         blockchain,
         transaction: transactions.createInvocation({
@@ -792,7 +931,7 @@ describe('execute', () => {
               usage: 0xa4,
               value: common.bufferToUInt256(
                 Buffer.concat([
-                  common.uInt160ToBuffer(conciergeSenderAddress),
+                  common.uInt160ToBuffer(address),
                   Buffer.alloc(12, 0),
                 ]),
               ),
@@ -802,7 +941,7 @@ describe('execute', () => {
               usage: 0xa2,
               value: common.bufferToUInt256(
                 Buffer.concat([
-                  common.uInt160ToBuffer(conciergeContract.hash),
+                  common.uInt160ToBuffer(asset),
                   Buffer.alloc(12, 0),
                 ]),
               ),
@@ -815,8 +954,69 @@ describe('execute', () => {
       expectSuccess(result);
     };
 
+    const processWithdrawConciergeTokens = async (address: UInt160) =>
+      processWithdrawTokens(address, conciergeContract.hash);
+    const processWithdrawSwitcheoTokens = async (address: UInt160) =>
+      processWithdrawTokens(address, switcheoTokenContract.hash);
+
+    const offerHash = crypto.hash256(
+      Buffer.concat([
+        common.uInt160ToBuffer(switcheoTokenSenderAddress),
+        switcheoTokenContract.hash,
+        conciergeContract.hash,
+        utils.toSignedBuffer(new BN(switcheoDepositAmount, 10)),
+        utils.toSignedBuffer(new BN(conciergeDepositAmount, 10)),
+        utils.toSignedBuffer(new BN(10)),
+      ]),
+    );
+
+    const offerSwitcheoTokens = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(
+              switcheoContract.hash,
+              'makeOffer',
+              switcheoTokenSenderAddress,
+              switcheoTokenContract.hash,
+              new BN(switcheoDepositAmount, 10),
+              conciergeContract.hash,
+              new BN(conciergeDepositAmount, 10),
+              new BN(10),
+            )
+            .build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+    const fillSwitcheoTokens = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(
+              switcheoContract.hash,
+              'fillOffer',
+              conciergeSenderAddress,
+              Buffer.concat([
+                switcheoTokenContract.hash,
+                conciergeContract.hash,
+              ]),
+              offerHash,
+              new BN(conciergeDepositAmount, 10),
+              true,
+            )
+            .build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
     describe('withdraw', () => {
-      it('should allow NEP5 withdrawals', async () => {
+      it('should allow NEP5 Concierge withdrawals', async () => {
         await deploy();
         await mintConciergeTokens();
         await whitelistConcierge();
@@ -826,11 +1026,66 @@ describe('execute', () => {
           conciergeRemainingAmount,
         );
 
-        await markWithdrawConciergeTokens();
-        await processWithdrawConciergeTokens();
+        await markWithdrawConciergeTokens(conciergeSenderAddress);
+        await processWithdrawConciergeTokens(conciergeSenderAddress);
         await expectConciergeItemBNEquals(
           conciergeSenderAddress,
           conciergeTokenAmount,
+        );
+      });
+
+      it('should allow NEP5 Switcheo withdrawals', async () => {
+        await deploy();
+        await mintSwitcheoTokens();
+        await whitelistSwitcheo();
+        await depositSwitcheoTokens();
+        await expectSwitcheoItemBNEquals(
+          switcheoTokenSenderAddress,
+          switcheoRemainingAmount,
+        );
+
+        await markWithdrawSwitcheoTokens(switcheoTokenSenderAddress);
+        await processWithdrawSwitcheoTokens(switcheoTokenSenderAddress);
+        await expectSwitcheoItemBNEquals(
+          switcheoTokenSenderAddress,
+          switcheoTokenAmount,
+        );
+      });
+
+      it('should allow withdrawing filled orders', async () => {
+        await deploy();
+
+        await whitelistConcierge();
+        await mintConciergeTokens();
+        await depositConciergeTokens();
+        await expectConciergeItemBNEquals(
+          conciergeSenderAddress,
+          conciergeRemainingAmount,
+        );
+
+        await whitelistSwitcheo();
+        await mintSwitcheoTokens();
+        await depositSwitcheoTokens();
+        await expectSwitcheoItemBNEquals(
+          switcheoTokenSenderAddress,
+          switcheoRemainingAmount,
+        );
+
+        await offerSwitcheoTokens();
+        await fillSwitcheoTokens();
+
+        await markWithdrawConciergeTokens(switcheoTokenSenderAddress);
+        await processWithdrawConciergeTokens(switcheoTokenSenderAddress);
+        await expectConciergeItemBNEquals(
+          switcheoTokenSenderAddress,
+          '2499995000',
+        );
+
+        await markWithdrawSwitcheoTokens(conciergeSenderAddress);
+        await processWithdrawSwitcheoTokens(conciergeSenderAddress);
+        await expectSwitcheoItemBNEquals(
+          conciergeSenderAddress,
+          switcheoDepositAmount,
         );
       });
     });
