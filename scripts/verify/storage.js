@@ -32,9 +32,23 @@ const hashes = [
   '0xa721d5893480260bd28ca1f395f2c465d0b5b1c2',
   '0x891daf0e1750a1031ebe23030828ad7781d874d6',
   '0x442e7964f6486005235e87e082f56cd52aa663b8',
-  '0xceab719b8baa2310f232ee0d277c061704541cfb',
+  // Too much storage to iterate through.
+  // '0xceab719b8baa2310f232ee0d277c061704541cfb',
   '0x23501e5fef0f67ec476406c556e91992323a0357',
   '0x0e86a40588f715fcaf7acd1812d50af478e6e917',
+  '0xaf7c7328eee5a275a3bcaee2bf0cf662b5e739be',
+  '0x67a5086bac196b67d5fd20745b0dc9db4d2930ed',
+  '0x9577c3f972d769220d69d1c4ddbd617c44d067aa',
+  '0x78e6d16b914fe15bc16150aeb11d0c2a8e532bdd',
+  '0x8a570d34a4081086e90ccbecdb04df1f71bf5e0b',
+  '0xe8f98440ad0d7a6e76d84fb1c3d3f8a16e162e97',
+  '0x40bb36a54bf28872b6ffdfa7fbc6480900e58448',
+  '0x81c089ab996fc89c468a26c0a88d23ae2f34b5c0',
+  '0x0ec5712e0f7c63e4b0fea31029a28cea5e9d551f',
+  '0x06fa8be9b6609d963e8fc63977b9f8dc5f10895f',
+  '0xacbc532904b6b51b5ea6d19b803d78af70e7e6f9',
+  '0x7ac4a2bb052a047506f2f2d3d1528b89cc38e8d4',
+  '0xa0b328c01eac8b12b0f8a4fe93645d18fb3f1f0a',
 ];
 
 const oneProvider = new NEOONEDataProvider({
@@ -151,13 +165,28 @@ const verifyStorage = async (hash: string): Promise<void> => {
 };
 
 const test = async () => {
-  for (const hash of hashes) {
+  const [oneCount, testCount] = await Promise.all([
+    oneProvider.getBlockCount(),
+    testProvider.getBlockCount(),
+  ]);
+  if (oneCount === testCount) {
     // eslint-disable-next-line
-    console.log(`Testing ${hash}`);
+    console.log(`Current block: ${oneCount - 1}`);
+    for (const hash of hashes) {
+      // eslint-disable-next-line
+      console.log(`Testing ${hash}`);
+      // eslint-disable-next-line
+      await verifyStorage(hash);
+      // eslint-disable-next-line
+      console.log(`Done testing ${hash}`);
+    }
+  } else {
     // eslint-disable-next-line
-    await verifyStorage(hash);
+    console.log(
+      `Height mismatched, one: ${oneCount - 1} test: ${testCount - 1}`,
+    );
     // eslint-disable-next-line
-    console.log(`Done testing ${hash}`);
+    console.log('Bailing...');
   }
 };
 
