@@ -39,7 +39,7 @@
     "@neo-one/node-core": "^1.0.0-alpha.34",
     "@neo-one/utils": "^1.0.0-alpha.29",
     "lodash": "^4.17.5",
-    "rxjs": "^5.5.10",
+    "rxjs": "^6.0.0",
     "through": "^2.3.8"
   }
 }

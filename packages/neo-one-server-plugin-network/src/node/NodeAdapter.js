@@ -5,13 +5,9 @@ import {
   type PortAllocator,
 } from '@neo-one/server-plugin';
 import type { Monitor } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
+import { type Observable, concat, defer, of as _of, timer } from 'rxjs';
 
-import { concat } from 'rxjs/observable/concat';
-import { defer } from 'rxjs/observable/defer';
 import { concatMap, map, shareReplay } from 'rxjs/operators';
-import { of as _of } from 'rxjs/observable/of';
-import { timer } from 'rxjs/observable/timer';
 import { labels, utils } from '@neo-one/utils';
 
 import type { NodeSettings } from '../types';

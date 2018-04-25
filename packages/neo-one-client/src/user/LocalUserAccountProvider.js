@@ -30,7 +30,7 @@ import {
   type Monitor,
   metrics,
 } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs';
 
 import _ from 'lodash';
 import { labels as labelNames, utils as commonUtils } from '@neo-one/utils';

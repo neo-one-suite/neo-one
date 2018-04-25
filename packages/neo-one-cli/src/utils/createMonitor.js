@@ -1,5 +1,5 @@
 /* @flow */
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import type { LogConfig } from '@neo-one/server-plugin';
 import {
   type LoggerLogOptions,

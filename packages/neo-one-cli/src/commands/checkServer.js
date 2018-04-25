@@ -3,7 +3,7 @@ import { type CLIArgs, name } from '@neo-one/server-plugin';
 import { VERSION } from '@neo-one/server';
 import { ServerManager } from '@neo-one/server-client';
 
-import { combineLatest } from 'rxjs/observable/combineLatest';
+import { combineLatest } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
 import { setupServer } from './common';

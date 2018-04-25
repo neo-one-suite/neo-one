@@ -13,16 +13,19 @@ import {
   compoundName,
 } from '@neo-one/server-plugin';
 import type { Monitor } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import {
+  type Observable,
+  BehaviorSubject,
+  combineLatest,
+  of as _of,
+} from 'rxjs';
 
 import _ from 'lodash';
 import { filter, map, shareReplay, switchMap, take } from 'rxjs/operators';
-import { combineLatest } from 'rxjs/observable/combineLatest';
 import fs from 'fs-extra';
 import { labels, utils } from '@neo-one/utils';
-import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
+
 import type PluginManager from './PluginManager';
 import type PortAllocator from './PortAllocator';
 import Ready from './Ready';

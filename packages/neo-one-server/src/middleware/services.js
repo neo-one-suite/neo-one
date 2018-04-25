@@ -9,10 +9,9 @@ import {
   areTasksDone,
 } from '@neo-one/server-plugin';
 import type { Context } from 'mali';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of as _of } from 'rxjs';
 
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { of as _of } from 'rxjs/observable/of';
 
 import type ResourcesManager from '../ResourcesManager';
 import type Server from '../Server';

@@ -5,7 +5,7 @@ import {
   backup,
   restore,
 } from '@neo-one/node-data-backup';
-import type { Subscription } from 'rxjs/Subscription';
+import type { Subscription } from 'rxjs';
 
 import path from 'path';
 

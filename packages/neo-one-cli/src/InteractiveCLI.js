@@ -1,5 +1,4 @@
 /* @flow */
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { VERSION, plugins as pluginsUtil } from '@neo-one/server';
 import {
   Client,
@@ -20,12 +19,10 @@ import {
   paths as defaultPaths,
 } from '@neo-one/server-plugin';
 import type { Monitor } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
+import { type Observable, BehaviorSubject, combineLatest, defer } from 'rxjs';
 import Table from 'cli-table2';
 import Vorpal, { type Args } from 'vorpal';
 
-import { combineLatest } from 'rxjs/observable/combineLatest';
-import { defer } from 'rxjs/observable/defer';
 import {
   distinctUntilChanged,
   map,

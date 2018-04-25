@@ -1,5 +1,5 @@
 /* @flow */
-import type { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs';
 
 import type { BaseResource, BaseResourceOptions, DescribeTable } from './types';
 import type TaskList from './TaskList';

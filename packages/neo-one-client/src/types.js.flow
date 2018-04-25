@@ -2,7 +2,7 @@
 import type BN from 'bn.js';
 import type BigNumber from 'bignumber.js';
 import type { Monitor } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs';
 import type { Param as ScriptBuilderParam } from '@neo-one/client-core';
 
 // A NEO address string, e.g. APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR

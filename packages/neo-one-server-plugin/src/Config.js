@@ -1,10 +1,9 @@
 /* @flow */
 import Ajv from 'ajv';
 import Immutable from 'seamless-immutable';
-import { Observable } from 'rxjs/Observable';
+import { Observable, defer } from 'rxjs';
 
 import chokidar from 'chokidar';
-import { defer } from 'rxjs/observable/defer';
 import { distinctUntilChanged, mergeScan, switchMap } from 'rxjs/operators';
 import fs from 'fs-extra';
 import path from 'path';

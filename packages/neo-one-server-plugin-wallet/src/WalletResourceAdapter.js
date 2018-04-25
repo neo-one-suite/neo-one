@@ -5,7 +5,7 @@ import {
   TaskList,
   compoundName,
 } from '@neo-one/server-plugin';
-import type { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs';
 
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 
@@ -95,7 +95,9 @@ export default class WalletResourceAdapter {
               dataPath,
             });
 
-            const { names: [networkName] } = compoundName.extract(name);
+            const {
+              names: [networkName],
+            } = compoundName.extract(name);
             ctx.resourceAdapter = new this({
               resourceType,
               walletResource,

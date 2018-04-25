@@ -6,8 +6,7 @@ import {
   getEndpointConfig,
 } from '@neo-one/node-core';
 import { type Monitor, metrics } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
-import type { Subscription } from 'rxjs/Subscription';
+import type { Observable, Subscription } from 'rxjs';
 
 import _ from 'lodash';
 import net from 'net';

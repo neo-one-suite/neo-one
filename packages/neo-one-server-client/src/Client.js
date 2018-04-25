@@ -6,8 +6,7 @@ import {
   type ModifyResourceResponse,
   getTasksError,
 } from '@neo-one/server-plugin';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { Observable, Subject } from 'rxjs';
 
 import { filter, map, publishReplay, refCount, take } from 'rxjs/operators';
 import grpc from 'grpc';

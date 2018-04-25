@@ -5,13 +5,10 @@ import {
   type DescribeTable,
   TaskList,
 } from '@neo-one/server-plugin';
-import type { Observable } from 'rxjs/Observable';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
-import type { Subject } from 'rxjs/Subject';
+import { type Observable, type Subject, ReplaySubject, of as _of } from 'rxjs';
 
 import { shareReplay, switchMap } from 'rxjs/operators';
 import fs from 'fs-extra';
-import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
 
 import { ABIRequiredError } from './errors';

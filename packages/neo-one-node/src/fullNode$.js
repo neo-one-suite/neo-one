@@ -10,7 +10,7 @@ import Node, {
   type NodeEnvironment,
   type NodeOptions,
 } from '@neo-one/node-protocol';
-import { Observable } from 'rxjs/Observable';
+import { Observable, concat, defer, timer } from 'rxjs';
 import { type Settings } from '@neo-one/client-core';
 import {
   type RPCServerEnvironment,
@@ -18,7 +18,6 @@ import {
   rpcServer$,
 } from '@neo-one/node-rpc';
 
-import { defer } from 'rxjs/observable/defer';
 import {
   concatMap,
   distinctUntilChanged,
@@ -26,11 +25,9 @@ import {
   switchMap,
   take,
 } from 'rxjs/operators';
-import { concat } from 'rxjs/observable/concat';
 import cron from 'node-cron';
 import { dumpChain, loadChain } from '@neo-one/node-offline';
 import { finalize, neverComplete } from '@neo-one/utils';
-import { timer } from 'rxjs/observable/timer';
 import leveldown from 'leveldown';
 import levelup from 'levelup';
 import levelUpStorage from '@neo-one/node-storage-levelup';

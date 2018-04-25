@@ -1,5 +1,5 @@
 /* @flow */
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import uuidV4 from 'uuid/v4';
 

@@ -9,7 +9,7 @@ import {
   type NetworkType,
   constants as networkConstants,
 } from '@neo-one/server-plugin-network';
-import type { Observable } from 'rxjs/Observable';
+import { type Observable, combineLatest, timer } from 'rxjs';
 import {
   type LocalWallet,
   type NetworkType as ClientNetworkType,
@@ -21,11 +21,9 @@ import {
 } from '@neo-one/client';
 import { common } from '@neo-one/client-core';
 
-import { combineLatest } from 'rxjs/observable/combineLatest';
 import { concatMap, map, shareReplay, take } from 'rxjs/operators';
 import fs from 'fs-extra';
 import path from 'path';
-import { timer } from 'rxjs/observable/timer';
 import { labels, utils } from '@neo-one/utils';
 
 import { NetworkRequiredError } from './errors';
@@ -225,7 +223,10 @@ export default class WalletResource {
     password,
     dataPath,
   }: NewWalletResourceOptions): Promise<WalletResource> {
-    const { name: baseName, names: [networkName] } = compoundName.extract(name);
+    const {
+      name: baseName,
+      names: [networkName],
+    } = compoundName.extract(name);
 
     const network = await getNetwork$({ networkName, pluginManager })
       .pipe(take(1))
@@ -275,7 +276,10 @@ export default class WalletResource {
     name,
     dataPath,
   }: ExistingWalletResourceOptions): Promise<WalletResource> {
-    const { name: baseName, names: [networkName] } = compoundName.extract(name);
+    const {
+      name: baseName,
+      names: [networkName],
+    } = compoundName.extract(name);
 
     const network = await getNetwork$({ networkName, pluginManager })
       .pipe(take(1))

@@ -6,17 +6,14 @@ import {
   type ResourceState,
   TaskList,
 } from '@neo-one/server-plugin';
-import type { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { type Observable, BehaviorSubject, combineLatest, timer } from 'rxjs';
 
 import _ from 'lodash';
-import { combineLatest } from 'rxjs/observable/combineLatest';
 import { common, crypto } from '@neo-one/client-core';
 import { createEndpoint } from '@neo-one/node-core';
 import { createReadClient } from '@neo-one/client';
 import { concatMap, shareReplay, switchMap } from 'rxjs/operators';
 import { labels } from '@neo-one/utils';
-import { timer } from 'rxjs/observable/timer';
 import fs from 'fs-extra';
 import path from 'path';
 

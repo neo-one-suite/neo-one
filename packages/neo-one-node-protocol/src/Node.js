@@ -32,22 +32,18 @@ import {
 import BloomFilter from 'bloom-filter';
 import LRU from 'lru-cache';
 import { type Monitor, metrics } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
+import { type Observable, defer, empty, merge, timer } from 'rxjs';
 import { ScalingBloem } from 'bloem';
 
 import _ from 'lodash';
 import { createReadClient } from '@neo-one/client';
-import { defer } from 'rxjs/observable/defer';
 import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
-import { empty } from 'rxjs/observable/empty';
-import { merge } from 'rxjs/observable/merge';
 import {
   finalize,
   labels,
   neverComplete,
   utils as commonUtils,
 } from '@neo-one/utils';
-import { timer } from 'rxjs/observable/timer';
 
 import { COMMAND } from './Command';
 import {

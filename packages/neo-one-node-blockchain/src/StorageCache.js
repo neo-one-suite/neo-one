@@ -1,5 +1,5 @@
 /* @flow */
-import type { Observable } from 'rxjs/Observable';
+import { type Observable, defer, empty, concat, of as _of } from 'rxjs';
 import {
   type Block,
   type Output,
@@ -18,10 +18,6 @@ import {
 } from '@neo-one/node-core';
 
 import { concatMap } from 'rxjs/operators';
-import { defer } from 'rxjs/observable/defer';
-import { empty } from 'rxjs/observable/empty';
-import { concat } from 'rxjs/observable/concat';
-import { of as _of } from 'rxjs/observable/of';
 import { utils as commonUtils } from '@neo-one/utils';
 
 type TrackedChange<Key, AddValue, Value> =

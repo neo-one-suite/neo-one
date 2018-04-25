@@ -10,7 +10,7 @@ import {
 } from '@neo-one/client-core';
 import { DefaultMonitor } from '@neo-one/monitor';
 
-import { of as _of } from 'rxjs/observable/of';
+import { of as _of } from 'rxjs';
 
 import Blockchain from '../Blockchain';
 

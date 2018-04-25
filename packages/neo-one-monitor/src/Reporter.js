@@ -1,8 +1,7 @@
 /* @flow */
-import { interval } from 'rxjs/observable/interval';
-import { mergeScan } from 'rxjs/operators';
-import type { Subscription } from 'rxjs/Subscription';
+import { type Subscription, interval } from 'rxjs';
 
+import { mergeScan } from 'rxjs/operators';
 import { utils } from '@neo-one/utils';
 
 import type CollectingLogger from './CollectingLogger';

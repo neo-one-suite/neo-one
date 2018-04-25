@@ -6,12 +6,10 @@ import {
 } from '@neo-one/server-plugin';
 import Mali from 'mali';
 import type { Monitor } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
+import { type Observable, combineLatest, defer } from 'rxjs';
 import type { ServerConfig } from '@neo-one/server-client';
 import { ServerManager } from '@neo-one/server-client';
 
-import { combineLatest } from 'rxjs/observable/combineLatest';
-import { defer } from 'rxjs/observable/defer';
 import {
   distinctUntilChanged,
   map,

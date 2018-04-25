@@ -9,8 +9,7 @@ import {
   type PluginManager,
   compoundName,
 } from '@neo-one/server-plugin';
-import type { Observable } from 'rxjs/Observable';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
+import { type Observable, ReplaySubject } from 'rxjs';
 
 import { map, shareReplay, take } from 'rxjs/operators';
 import fs from 'fs-extra';
@@ -121,7 +120,10 @@ export default class SmartContractResource {
     wallet: walletName,
     dataPath,
   }: NewSmartContractResourceOptions): Promise<SmartContractResource> {
-    const { name: baseName, names: [networkName] } = compoundName.extract(name);
+    const {
+      name: baseName,
+      names: [networkName],
+    } = compoundName.extract(name);
 
     let hash;
     let abi = abiIn;
@@ -217,7 +219,10 @@ export default class SmartContractResource {
     name,
     dataPath,
   }: ExistingSmartContractResourceOptions): Promise<SmartContractResource> {
-    const { name: baseName, names: [networkName] } = compoundName.extract(name);
+    const {
+      name: baseName,
+      names: [networkName],
+    } = compoundName.extract(name);
 
     const configPath = this._getConfigPath(dataPath);
     const abiPath = this._getABIPath(dataPath);

@@ -39,7 +39,7 @@ import type {
   ValidatorKey,
 } from '@neo-one/client-core';
 import type { Monitor } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs';
 
 import type AccountUnclaimed, {
   AccountUnclaimedKey,

@@ -1,8 +1,7 @@
 /* @flow */
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import type BigNumber from 'bignumber.js';
 import type { Monitor } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
+import { type Observable, BehaviorSubject } from 'rxjs';
 
 import type {
   AddressString,

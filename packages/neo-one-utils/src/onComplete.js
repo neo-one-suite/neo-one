@@ -1,5 +1,5 @@
 /* @flow */
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 function onComplete<T>(
   func: () => void,

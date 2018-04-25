@@ -1,6 +1,6 @@
 /* @flow */
 import type { Command } from 'vorpal';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
+import { ReplaySubject, empty, timer } from 'rxjs';
 import {
   type CRUDBase,
   type CRUDResource,
@@ -23,9 +23,7 @@ import indentString from 'indent-string';
 import logSymbols from 'log-symbols';
 import { map, switchMap, take } from 'rxjs/operators';
 import stripAnsi from 'strip-ansi';
-import { empty } from 'rxjs/observable/empty';
 import logUpdate from 'log-update';
-import { timer } from 'rxjs/observable/timer';
 
 const pointer = chalk.yellow(figures.pointer);
 const skipped = chalk.yellow(figures.arrowDown);

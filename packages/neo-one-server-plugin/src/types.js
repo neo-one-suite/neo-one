@@ -1,6 +1,5 @@
 /* @flow */
-import type { Observable } from 'rxjs/Observable';
-import type { Subject } from 'rxjs/Subject';
+import type { Observable, Subject } from 'rxjs';
 import type Vorpal, { Args, Command } from 'vorpal';
 import type { Monitor } from '@neo-one/monitor';
 

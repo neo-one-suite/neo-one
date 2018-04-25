@@ -1,5 +1,5 @@
 /* @flow */
-import { of } from 'rxjs/observable/of';
+import { of } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import Client from '../Client';

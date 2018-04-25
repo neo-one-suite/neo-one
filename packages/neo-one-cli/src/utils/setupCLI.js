@@ -2,7 +2,7 @@
 import type Vorpal from 'vorpal';
 import type { LogConfig } from '@neo-one/server-plugin';
 import type { Monitor } from '@neo-one/monitor';
-import type { Subject } from 'rxjs/Subject';
+import type { Subject } from 'rxjs';
 
 import { finalize } from '@neo-one/utils';
 

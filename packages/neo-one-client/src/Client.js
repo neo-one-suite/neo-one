@@ -1,9 +1,7 @@
 /* @flow */
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import type { Observable } from 'rxjs/Observable';
+import { type Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import type { Param as ScriptBuilderParam } from '@neo-one/client-core';
 
-import { combineLatest } from 'rxjs/observable/combineLatest';
 import { filter, map, switchMap, take } from 'rxjs/operators';
 import { utils } from '@neo-one/utils';
 

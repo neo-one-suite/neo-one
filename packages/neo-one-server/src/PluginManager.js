@@ -1,5 +1,12 @@
 /* @flow */
-import type { Observable } from 'rxjs/Observable';
+import {
+  type Observable,
+  ReplaySubject,
+  Subject,
+  combineLatest,
+  concat,
+  of as _of,
+} from 'rxjs';
 import {
   type AllResources,
   type Binary,
@@ -12,15 +19,10 @@ import {
   PluginNotInstalledError,
   UnknownPluginResourceType,
 } from '@neo-one/server-client';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
-import { Subject } from 'rxjs/Subject';
 
 import _ from 'lodash';
-import { combineLatest } from 'rxjs/observable/combineLatest';
-import { concat } from 'rxjs/observable/concat';
 import fs from 'fs-extra';
 import { map, shareReplay, switchMap } from 'rxjs/operators';
-import { of as _of } from 'rxjs/observable/of';
 import path from 'path';
 import toposort from 'toposort';
 import { utils } from '@neo-one/utils';

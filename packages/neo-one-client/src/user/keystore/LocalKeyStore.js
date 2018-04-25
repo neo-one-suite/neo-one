@@ -1,7 +1,6 @@
 /* @flow */
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import type { Monitor } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
+import { type Observable, BehaviorSubject } from 'rxjs';
 
 import _ from 'lodash';
 import { common, crypto } from '@neo-one/client-core';

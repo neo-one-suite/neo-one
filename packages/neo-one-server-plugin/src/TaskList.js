@@ -1,11 +1,13 @@
 /* @flow */
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
-import type { Subscription } from 'rxjs/Subscription';
+import {
+  type Subscription,
+  BehaviorSubject,
+  Observable,
+  ReplaySubject,
+  combineLatest,
+} from 'rxjs';
 
-import { combineLatest } from 'rxjs/observable/combineLatest';
-import { map } from 'rxjs/operators/map';
+import { map } from 'rxjs/operators';
 
 import type { TaskStatus } from './types';
 

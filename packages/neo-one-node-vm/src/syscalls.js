@@ -30,7 +30,7 @@ import {
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 
 import { concatMap, map, toArray } from 'rxjs/operators';
-import { defer } from 'rxjs/observable/defer';
+import { defer } from 'rxjs';
 
 import {
   type StackItem,

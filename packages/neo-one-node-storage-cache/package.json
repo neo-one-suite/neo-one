@@ -40,6 +40,6 @@
     "@neo-one/utils": "^1.0.0-alpha.29",
     "bytewise": "^1.1.0",
     "lru-cache": "^4.1.2",
-    "rxjs": "^5.5.10"
+    "rxjs": "^6.0.0"
   }
 }

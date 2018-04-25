@@ -6,13 +6,11 @@ import {
   type ResourceState,
   TaskList,
 } from '@neo-one/server-plugin';
-import type { Observable } from 'rxjs/Observable';
+import { type Observable, type Subject, ReplaySubject } from 'rxjs';
 import {
   type MasterWalletResourceAdapter,
   constants as walletConstants,
 } from '@neo-one/server-plugin-wallet';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
-import type { Subject } from 'rxjs/Subject';
 
 import execa from 'execa';
 import fs from 'fs-extra';

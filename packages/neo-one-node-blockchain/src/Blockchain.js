@@ -37,8 +37,7 @@ import {
   metrics,
 } from '@neo-one/monitor';
 import PriorityQueue from 'js-priority-queue';
-import { BehaviorSubject } from 'rxjs';
-import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 import _ from 'lodash';
 import { filter, map, toArray } from 'rxjs/operators';

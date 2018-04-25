@@ -1,7 +1,7 @@
 /* @flow */
 import type { CLIArgs } from '@neo-one/server-plugin';
 
-import { combineLatest } from 'rxjs/observable/combineLatest';
+import { combineLatest } from 'rxjs';
 import { createServerConfig } from '@neo-one/server-client';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 

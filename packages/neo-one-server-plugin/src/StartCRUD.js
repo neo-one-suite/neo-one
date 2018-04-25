@@ -1,5 +1,5 @@
 /* @flow */
-import type { Observable } from 'rxjs/Observable';
+import type { Observable } from 'rxjs';
 
 import type {
   BaseResource,

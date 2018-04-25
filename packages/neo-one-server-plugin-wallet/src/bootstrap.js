@@ -27,7 +27,7 @@ import {
 } from '@neo-one/server-plugin-network';
 
 import _ from 'lodash';
-import { of as _of } from 'rxjs/observable/of';
+import { of as _of } from 'rxjs';
 
 import type { Wallet } from './WalletResourceType';
 import type WalletPlugin from './WalletPlugin';

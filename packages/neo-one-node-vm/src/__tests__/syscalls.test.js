@@ -26,7 +26,7 @@ import {
 import BN from 'bn.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import { DefaultMonitor } from '@neo-one/monitor';
-import { of } from 'rxjs/observable/of';
+import { of } from 'rxjs';
 
 import { utils as commonUtils } from '@neo-one/utils';
 

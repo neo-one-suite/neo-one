@@ -2,11 +2,9 @@
 import { type Blockchain, type Node } from '@neo-one/node-core';
 import Koa from 'koa';
 import type { Monitor } from '@neo-one/monitor';
-import type { Observable } from 'rxjs/Observable';
+import { type Observable, combineLatest, defer } from 'rxjs';
 import Router from 'koa-router';
 
-import { combineLatest } from 'rxjs/observable/combineLatest';
-import { defer } from 'rxjs/observable/defer';
 import http from 'http';
 import https from 'https';
 import {
