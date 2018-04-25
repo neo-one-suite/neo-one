@@ -52,6 +52,7 @@ import {
   InputStackItem,
   OutputStackItem,
   ECPointStackItem,
+  MapStackItem,
 } from '../stackItem';
 
 import { executeScript } from '../execute';
@@ -247,12 +248,92 @@ const SYSCALLS = ([
     gas: FEES.ONE,
   },
   {
+    name: 'Neo.Runtime.Serialize',
+    result: [
+      new BufferStackItem(
+        new BinaryWriter()
+          .writeUInt8(STACK_ITEM_TYPE.MAP)
+          .writeVarUIntLE(1)
+          .writeBytes(
+            new BinaryWriter()
+              .writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY)
+              .writeVarBytesLE(Buffer.from('key', 'utf8'))
+              .toBuffer(),
+          )
+          .writeBytes(
+            new BinaryWriter()
+              .writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY)
+              .writeVarBytesLE(Buffer.from('value', 'utf8'))
+              .toBuffer(),
+          )
+          .toBuffer(),
+      ),
+    ],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'NEWMAP',
+            type: 'op',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'SETITEM',
+            type: 'op',
+            args: [Buffer.from('value', 'utf8'), Buffer.from('key', 'utf8')],
+          },
+        ],
+      },
+    ],
+    gas: FEES.ONE,
+  },
+  {
     name: 'Neo.Runtime.Deserialize',
     result: [new BufferStackItem(Buffer.alloc(10, 1))],
     args: [
       new BinaryWriter()
         .writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY)
         .writeVarBytesLE(Buffer.alloc(10, 1))
+        .toBuffer(),
+    ],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Runtime.Deserialize',
+    result: [
+      new MapStackItem({
+        keys: {
+          [new BufferStackItem(
+            Buffer.from('key', 'utf8'),
+          ).toKeyString()]: new BufferStackItem(Buffer.from('key', 'utf8')),
+        },
+        values: {
+          [new BufferStackItem(
+            Buffer.from('key', 'utf8'),
+          ).toKeyString()]: new BufferStackItem(Buffer.from('value', 'utf8')),
+        },
+      }),
+    ],
+    args: [
+      new BinaryWriter()
+        .writeUInt8(STACK_ITEM_TYPE.MAP)
+        .writeVarUIntLE(1)
+        .writeBytes(
+          new BinaryWriter()
+            .writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY)
+            .writeVarBytesLE(Buffer.from('key', 'utf8'))
+            .toBuffer(),
+        )
+        .writeBytes(
+          new BinaryWriter()
+            .writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY)
+            .writeVarBytesLE(Buffer.from('value', 'utf8'))
+            .toBuffer(),
+        )
         .toBuffer(),
     ],
     gas: FEES.ONE,

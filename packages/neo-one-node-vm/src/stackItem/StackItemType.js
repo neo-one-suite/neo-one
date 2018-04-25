@@ -8,6 +8,7 @@ export const STACK_ITEM_TYPE = {
   INTEROP_INTERFACE: 0x40,
   ARRAY: 0x80,
   STRUCT: 0x81,
+  MAP: 0x82,
 };
 
 export class InvalidStackItemTypeError extends CustomError {
@@ -21,7 +22,7 @@ export class InvalidStackItemTypeError extends CustomError {
   }
 }
 
-export type StackItemType = 0x00 | 0x01 | 0x02 | 0x40 | 0x80 | 0x81;
+export type StackItemType = 0x00 | 0x01 | 0x02 | 0x40 | 0x80 | 0x81 | 0x82;
 
 export const assertStackItemType = (value: number): StackItemType => {
   switch (value) {
@@ -37,6 +38,8 @@ export const assertStackItemType = (value: number): StackItemType => {
       return 0x80;
     case 0x81: // STRUCT
       return 0x81;
+    case 0x82: // MAP
+      return 0x82;
     default:
       throw new InvalidStackItemTypeError(value);
   }

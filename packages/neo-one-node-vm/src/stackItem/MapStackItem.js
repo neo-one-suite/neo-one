@@ -1,11 +1,13 @@
 /* @flow */
 import {
   type ContractParameter,
+  BinaryWriter,
   InteropInterfaceContractParameter,
 } from '@neo-one/client-core';
 
 import { utils } from '@neo-one/utils';
 
+import { STACK_ITEM_TYPE } from './StackItemType';
 import ArrayStackItem from './ArrayStackItem';
 import { InvalidValueBufferError } from './errors';
 import StackItemBase from './StackItemBase';
@@ -30,6 +32,19 @@ export default class MapStackItem extends StackItemBase {
     }
 
     return this === other;
+  }
+
+  serialize(): Buffer {
+    const writer = new BinaryWriter();
+    writer.writeUInt8(STACK_ITEM_TYPE.MAP);
+    const keys = this.keysArray();
+    writer.writeVarUIntLE(keys.length);
+    for (const key of keys) {
+      writer.writeBytes(key.serialize());
+      writer.writeBytes(this.get(key).serialize());
+    }
+
+    return writer.toBuffer();
   }
 
   asBoolean(): boolean {
@@ -73,7 +88,11 @@ export default class MapStackItem extends StackItemBase {
   }
 
   keys(): ArrayStackItem {
-    return new ArrayStackItem(utils.values(this._keys));
+    return new ArrayStackItem(this.keysArray());
+  }
+
+  keysArray(): Array<StackItem> {
+    return utils.values(this._keys);
   }
 
   valuesArray(): Array<StackItem> {

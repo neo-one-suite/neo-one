@@ -5,6 +5,7 @@ import ArrayStackItem from './ArrayStackItem';
 import BooleanStackItem from './BooleanStackItem';
 import BufferStackItem from './BufferStackItem';
 import IntegerStackItem from './IntegerStackItem';
+import MapStackItem from './MapStackItem';
 import type { StackItem } from './StackItem';
 import StructStackItem from './StructStackItem';
 import { UnsupportedStackItemSerdeError } from './errors';
@@ -35,6 +36,21 @@ const deserializeStackItemBase = (reader: BinaryReader): StackItem => {
       return type === 0x80
         ? new ArrayStackItem(value)
         : new StructStackItem(value);
+    }
+    case 0x82: {
+      // MAP
+      const count = reader.readVarUIntLE().toNumber();
+      const keys = {};
+      const values = {};
+      for (let i = 0; i < count; i += 1) {
+        const key = deserializeStackItemBase(reader);
+        const value = deserializeStackItemBase(reader);
+        const keyString = key.toKeyString();
+        keys[keyString] = key;
+        values[keyString] = value;
+      }
+
+      return new MapStackItem({ keys, values });
     }
     default:
       // eslint-disable-next-line
