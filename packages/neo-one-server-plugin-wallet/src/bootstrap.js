@@ -13,6 +13,7 @@ import {
   LocalMemoryStore,
   NEOONEProvider,
   wifToPrivateKey,
+  privateKeyToAddress,
   type Transfer,
   type Account,
   type AssetType,
@@ -36,6 +37,22 @@ import constants from './constants';
 import { kycContract, conciergeContract } from './__data__/contracts';
 
 const DEFAULT_NUM_WALLETS = 10;
+const NEOTRACKERRPC = 'http://localhost:1351/rpc';
+const NEOTRACKERMASTERWIF = 'L2XyV1N13DaucVccKBswMxnHKPjKe8Nr3AEnudqeRuZYMjwZQsXP';
+const NEOTRACKERMASTERADDRESS = 'AKCxnaWy1hUrNT1KzqZRsTdt3NmTEEbMft';
+const NEOTRACKERNETWORKNAME = 'priv';
+const NEOTRACKERWIFS = [
+'L4qgv7X6BRMnHh1WA4omi7hv4k2GfYwceN9S2a8hqD32W8ZcDgk2',
+'Kzrxrgbmw4AoVThTj26oXs4ayaNqhihQVWm75DMjbYmD41iNc7ys',
+'L52rkNez2XbzJ7i5j8qLuYUdAM9WsBdMbAXYFNmUV5ma5AZf5VSW',
+'L5c7JTiMqGW9jo42bf45Us6o2fXoPSfgf3Us28DFdSbp8h19TRio',
+'KxsiWrvBdvBE4SAXrfga5zRm8bf93gmYxyT1GdkgfrXNJ7nuR2TM',
+'L3oLZ7ivV2k2dr9jpSuvN4cMxU7yqCf5nfY4E5iXGuNKviw3yC1g',
+'L4yxLVbmoyW8MFXmewfLLY5nsofGiMCVHGHvFBXa9ArPNvH2iVaP',
+'KwmuQxS7DFrQjdTXb4J6QRB6E5JV5up17p5hvDpPLZwXTHAva8m3',
+'Ky4P9ZkMe8PaDC2caqPABUXTxxd4gBVYSdmhvqXVRZhtDrqg6n5G',
+'L19FGgVoSLcpEgoQwiTxWGaTZrNU8ZWnNMJcGy4FVbecypB2wL6y',
+]
 
 const getNetwork = async ({
   cli,
@@ -63,11 +80,13 @@ async function getWallet({
   networkName,
   cli,
   plugin,
+  wif,
 }: {|
   walletName: string,
   networkName: string,
   cli: InteractiveCLI,
   plugin: WalletPlugin,
+  wif?: string,
 |}): Promise<Wallet> {
   const wallet = await plugin.walletResourceType.getResource({
     name: constants.makeWallet({
@@ -107,6 +126,7 @@ async function createWallet({
   });
 
   const wallet = ((walletResource: $FlowFixMe): Wallet);
+
   if (wallet.wif == null) {
     throw new Error(`Something went wrong, wif is null for ${walletName}`);
   }
@@ -486,28 +506,43 @@ async function createAssetTransfer({
 export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
   cli.vorpal
     .command('bootstrap', 'Bootstraps a Network with test data.')
+    .option('--neotracker', 'Bootstraps a private network run by Neotracker.')
     .option('-n, --network <name>', 'Network to bootstrap')
     .option('--wallets <number>', 'Number of wallets to create - default 10')
     .action(async args => {
-      const networkName = await getNetwork({
-        cli,
-        args,
-        options: args.options,
-      });
+      const {neotracker} = args.options;
 
-      if (
-        networkName === networkConstants.NETWORK_NAME.MAIN ||
-        networkName === networkConstants.NETWORK_NAME.TEST
-      ) {
-        throw new Error(
-          'Invalid Network: Can only bootstrap a private network',
-        );
-      }
-      const spinner = ora(
-        `Initializing bootstrap of network ${networkName}`,
-      ).start();
-      spinner.succeed();
-      try {
+      let networkName;
+      let network;
+      let masterWallet;
+      if (neotracker) {
+        networkName = NEOTRACKERNETWORKNAME;
+        network = {
+          name: networkName,
+          nodes: [{rpcAddress: NEOTRACKERRPC}],
+        }
+
+        masterWallet = {
+          name: 'master',
+          wif: NEOTRACKERMASTERWIF,
+          address: NEOTRACKERMASTERADDRESS,
+        }
+      } else {
+        networkName = await getNetwork({
+          cli,
+          args,
+          options: args.options,
+        });
+
+        if (
+          networkName === networkConstants.NETWORK_NAME.MAIN ||
+          networkName === networkConstants.NETWORK_NAME.TEST
+        ) {
+          throw new Error(
+            'Invalid Network: Can only bootstrap a private network',
+          );
+        }
+
         const networkResource = await cli.client.getResource({
           plugin: networkConstants.PLUGIN,
           name: networkName,
@@ -517,9 +552,9 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         if (networkResource == null) {
           throw new Error(`Network ${networkName} does not exist.`);
         }
-        const network = ((networkResource: $FlowFixMe): Network);
+        network = ((networkResource: $FlowFixMe): Network);
 
-        const masterWallet = await getWallet({
+        masterWallet = await getWallet({
           walletName: constants.MASTER_WALLET,
           networkName: network.name,
           cli,
@@ -529,7 +564,13 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         if (masterWallet.wif == null) {
           throw new Error('Something went wrong, wif is null');
         }
+      }
 
+      try {
+        const spinner = ora(
+          `Initializing bootstrap of network ${networkName}`,
+        ).start();
+        spinner.succeed();
         const keystore = new LocalKeyStore({
           store: new LocalMemoryStore(),
         });
@@ -545,8 +586,25 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         for (let i = 1; i < numWallets + 1; i += 1) {
           walletNames.push(`wallet-${i}`);
         }
+
         spinner.start('Creating wallets');
-        const wallets = await Promise.all(
+        let wallets;
+        if (neotracker) {
+          wallets = _.zip(walletNames, NEOTRACKERWIFS).map(walletInfo => {
+            keystore.addAccount({
+              network: network.name,
+              name: walletInfo[0],
+              privateKey: wifToPrivateKey(walletInfo[1]),
+            })
+            return {
+              name: walletInfo[0],
+              wif: walletInfo[1],
+              address: privateKeyToAddress(wifToPrivateKey(walletInfo[1]))
+            }
+          }
+          )
+        } else {
+        wallets = await Promise.all(
           walletNames.map(walletName =>
             createWallet({
               walletName,
@@ -556,7 +614,9 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
             }),
           ),
         );
+        }
         spinner.succeed();
+
         const provider = new NEOONEProvider({
           options: [
             { network: network.name, rpcURL: network.nodes[0].rpcAddress },
@@ -569,6 +629,13 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
             provider,
           }),
         });
+
+        await keystore.addAccount({
+          network: networkName,
+          name: 'wallet-1',
+          privateKey: wifToPrivateKey(NEOTRACKERWIFS[0]),
+        });
+
         const developerClient = new DeveloperClient(
           provider.read(network.name),
         );
@@ -581,111 +648,111 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           developerClient,
         });
         spinner.succeed();
-        let assets = [
-          {
-            assetType: 'Token',
-            name: 'redcoin',
-            amount: new BigNumber(1000000),
-            precision: 4,
-          },
-          {
-            assetType: 'Token',
-            name: 'bluecoin',
-            amount: new BigNumber(650000),
-            precision: 0,
-          },
-          {
-            assetType: 'Currency',
-            name: 'greencoin',
-            amount: new BigNumber(50000000),
-            precision: 6,
-          },
-        ];
-        spinner.start('Setting up asset wallets');
-        const assetWallets = await setupAssetWallets({
-          names: assets.map(asset => asset.name),
-          networkName: network.name,
-          cli,
-          keystore,
-          client,
-          developerClient,
-          masterWallet,
-        });
-        spinner.succeed();
-
-        spinner.start('Registering test assets');
-        const assetHashes = await registerAssets({
-          assets,
-          assetWallets,
-          client,
-          developerClient,
-        });
-        spinner.succeed();
-        assets = _.zip(assets, assetWallets, assetHashes).map(asset => ({
-          ...asset[0],
-          wallet: asset[1],
-          hash: asset[2],
-        }));
-        spinner.start('Issuing assets');
-        const issues = await Promise.all(
-          assets.map(asset =>
-            issueAsset({
-              wallets,
-              asset,
-              client,
-            }),
-          ),
-        );
-
-        await Promise.all(
-          [developerClient.runConsensusNow()].concat(
-            issues.map(issue => issue.confirmed()),
-          ),
-        );
-        spinner.succeed();
-
-        spinner.start('Distributing assets');
-        const assetTransfers = await Promise.all(
-          assets.map(asset =>
-            createAssetTransfer({
-              wallets,
-              assetHash: asset.hash,
-              networkName: network.name,
-              client,
-              assetWallet: asset.wallet,
-            }),
-          ),
-        );
-
-        await Promise.all(
-          [developerClient.runConsensusNow()].concat(
-            _.flatten(assetTransfers).map(transfer => transfer.confirmed()),
-          ),
-        );
-        spinner.succeed();
-
-        spinner.start('Publishing KYC SmartContract');
-        const kyc = await client.publish(kycContract);
-        await Promise.all([developerClient.runConsensusNow(), kyc.confirmed()]);
-        spinner.succeed();
-
-        spinner.start('Publishing Concierge SmartContract');
-        const concierge = await client.publish(conciergeContract);
-        await Promise.all([
-          developerClient.runConsensusNow(),
-          concierge.confirmed(),
-        ]);
-        spinner.succeed();
-
-        spinner.start('Claiming GAS');
-        await initiateClaims({
-          wallets,
-          networkName: network.name,
-          client,
-          developerClient,
-          provider,
-        });
-        spinner.succeed();
+        // let assets = [
+        //   {
+        //     assetType: 'Token',
+        //     name: 'redcoin',
+        //     amount: new BigNumber(1000000),
+        //     precision: 4,
+        //   },
+        //   {
+        //     assetType: 'Token',
+        //     name: 'bluecoin',
+        //     amount: new BigNumber(650000),
+        //     precision: 0,
+        //   },
+        //   {
+        //     assetType: 'Currency',
+        //     name: 'greencoin',
+        //     amount: new BigNumber(50000000),
+        //     precision: 6,
+        //   },
+        // ];
+        // spinner.start('Setting up asset wallets');
+        // const assetWallets = await setupAssetWallets({
+        //   names: assets.map(asset => asset.name),
+        //   networkName: network.name,
+        //   cli,
+        //   keystore,
+        //   client,
+        //   developerClient,
+        //   masterWallet,
+        // });
+        // spinner.succeed();
+        //
+        // spinner.start('Registering test assets');
+        // const assetHashes = await registerAssets({
+        //   assets,
+        //   assetWallets,
+        //   client,
+        //   developerClient,
+        // });
+        // spinner.succeed();
+        // assets = _.zip(assets, assetWallets, assetHashes).map(asset => ({
+        //   ...asset[0],
+        //   wallet: asset[1],
+        //   hash: asset[2],
+        // }));
+        // spinner.start('Issuing assets');
+        // const issues = await Promise.all(
+        //   assets.map(asset =>
+        //     issueAsset({
+        //       wallets,
+        //       asset,
+        //       client,
+        //     }),
+        //   ),
+        // );
+        //
+        // await Promise.all(
+        //   [developerClient.runConsensusNow()].concat(
+        //     issues.map(issue => issue.confirmed()),
+        //   ),
+        // );
+        // spinner.succeed();
+        //
+        // spinner.start('Distributing assets');
+        // const assetTransfers = await Promise.all(
+        //   assets.map(asset =>
+        //     createAssetTransfer({
+        //       wallets,
+        //       assetHash: asset.hash,
+        //       networkName: network.name,
+        //       client,
+        //       assetWallet: asset.wallet,
+        //     }),
+        //   ),
+        // );
+        //
+        // await Promise.all(
+        //   [developerClient.runConsensusNow()].concat(
+        //     _.flatten(assetTransfers).map(transfer => transfer.confirmed()),
+        //   ),
+        // );
+        // spinner.succeed();
+        //
+        // spinner.start('Publishing KYC SmartContract');
+        // const kyc = await client.publish(kycContract);
+        // await Promise.all([developerClient.runConsensusNow(), kyc.confirmed()]);
+        // spinner.succeed();
+        //
+        // spinner.start('Publishing Concierge SmartContract');
+        // const concierge = await client.publish(conciergeContract);
+        // await Promise.all([
+        //   developerClient.runConsensusNow(),
+        //   concierge.confirmed(),
+        // ]);
+        // spinner.succeed();
+        //
+        // spinner.start('Claiming GAS');
+        // await initiateClaims({
+        //   wallets,
+        //   networkName: network.name,
+        //   client,
+        //   developerClient,
+        //   provider,
+        // });
+        // spinner.succeed();
       } catch (error) {
         spinner.fail(error);
       }
