@@ -51,7 +51,11 @@ export default class LocalStringStore {
     await this.storage.removeItem(this._getKey(wallet));
   }
 
-  _getKey({ account: { id: { network, address } } }: LocalWallet): string {
+  _getKey({
+    account: {
+      id: { network, address },
+    },
+  }: LocalWallet): string {
     return `${network}-${address}`;
   }
 }

@@ -29,7 +29,9 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) => {
         cli,
         options,
       });
-      const { names: [network] } = compoundName.extract(name);
+      const {
+        names: [network],
+      } = compoundName.extract(name);
       const resource = await plugin.walletResourceType
         .getResource$({
           name,
