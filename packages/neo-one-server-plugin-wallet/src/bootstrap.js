@@ -39,15 +39,34 @@ import constants from './constants';
 import { kycContract, conciergeContract } from './__data__/contracts';
 
 const DEFAULT_NUM_WALLETS = 10;
-const NEOTRACKERRPC = 'http://localhost:1351/rpc';
-const NEOTRACKERMASTERPRIVATEKEY =
+const NEOTRACKER_MASTER_PRIVATE_KEY =
   '9e9522c90f4b33cac8a174353ae54651770f3f4dd1de78e74d9b49ba615d7c1f';
-const NEOTRACKERNETWORKNAME = 'priv';
-const NEOTRACKERPRIVATEKEYS = [
+const NEOTRACKER_NETWORK_NAME = 'priv';
+const NEOTRACKER_PRIVATE_KEYS = [
   'e35ecb8189067a0a06f17f163be3db95c4b7805c81b48af1f4b8bbdfbeeb1afd',
   '6cad314f75624a26b780368a8b0753d10815ca44c1fca6eb3972484548805d9e',
   'e91dc6e5fffcae0510ef5a7e41675d024e5b286769b3ff455e71e01a4cf16ef0',
   'fa38cb00810d173e14631219d8ee689ee183a3d307c3c8bd2e1234d332dd3255',
+];
+const ASSET_INFO = [
+  {
+    assetType: 'Token',
+    name: 'redcoin',
+    amount: new BigNumber(1000000),
+    precision: 4,
+  },
+  {
+    assetType: 'Token',
+    name: 'bluecoin',
+    amount: new BigNumber(650000),
+    precision: 0,
+  },
+  {
+    assetType: 'Currency',
+    name: 'greencoin',
+    amount: new BigNumber(50000000),
+    precision: 6,
+  },
 ];
 
 type WalletData = {|
@@ -89,11 +108,7 @@ const getNetwork = async ({
   );
 };
 
-async function getRPC({
-  cli,
-  args,
-  options,
-}: GetCLIResourceOptions): Promise<{ network: string, rpc: string }> {
+async function getRPC({ options }: GetCLIResourceOptions): Promise<string> {
   const { rpc } = options;
 
   if (rpc != null && typeof rpc === 'string') {
@@ -103,10 +118,11 @@ async function getRPC({
     ) {
       throw new Error('Invalid Network: Can only bootstrap a private network');
     }
-    const network = await getNetwork({ cli, args, options });
-    return { network, rpc };
+    return rpc;
   }
-  return { network: NEOTRACKERNETWORKNAME, rpc: NEOTRACKERRPC };
+  throw new Error(
+    'Bootstrap requires an input RPC URL to connect to the NEO Tracker private network',
+  );
 }
 
 async function getWallet({
@@ -549,31 +565,31 @@ async function getNEOTrackerData({
   walletNames: Array<string>,
   assetWalletNames: Array<string>,
 |}): Promise<BootstrapData> {
-  const { network: networkName, rpc: rpcURL } = await getRPC(cliOptions);
+  const rpcURL = await getRPC(cliOptions);
   const network = {
-    name: networkName,
+    name: NEOTRACKER_NETWORK_NAME,
     rpcURL,
   };
 
   let master;
-  if (rpcURL === NEOTRACKERRPC) {
-    master = {
-      name: 'master',
-      privateKey: NEOTRACKERMASTERPRIVATEKEY,
-      address: privateKeyToAddress(NEOTRACKERMASTERPRIVATEKEY),
-    };
-  } else {
+  if (cliOptions.args.options.testingOnly) {
     master = await getWallet({
       walletName: constants.MASTER_WALLET,
       networkName: network.name,
       cli: cliOptions.cli,
       plugin,
     });
+  } else {
+    master = {
+      name: 'master',
+      privateKey: NEOTRACKER_MASTER_PRIVATE_KEY,
+      address: privateKeyToAddress(NEOTRACKER_MASTER_PRIVATE_KEY),
+    };
   }
 
   const hardcodedWallets = _.zip(
-    walletNames.slice(0, NEOTRACKERPRIVATEKEYS.length),
-    NEOTRACKERPRIVATEKEYS,
+    walletNames.slice(0, NEOTRACKER_PRIVATE_KEYS.length),
+    NEOTRACKER_PRIVATE_KEYS,
   ).map(walletInfo => ({
     name: walletInfo[0],
     privateKey: walletInfo[1],
@@ -581,7 +597,7 @@ async function getNEOTrackerData({
   }));
 
   const wallets = walletNames
-    .slice(NEOTRACKERPRIVATEKEYS.length)
+    .slice(NEOTRACKER_PRIVATE_KEYS.length)
     .map(name => {
       const privateKey = createPrivateKey();
       return {
@@ -710,15 +726,14 @@ async function addWalletsToKeystore({
 export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
   cli.vorpal
     .command('bootstrap', 'Bootstraps a Network with test data.')
-    .option('--neotracker', 'Bootstraps a private network run by Neotracker.')
-    .option(
-      '--rpc <string>',
-      'Bootstraps a private network with the given rpcURL. Must also provide the network name to use this option.',
-    )
     .option('-n, --network <name>', 'Network to bootstrap')
     .option('--wallets <number>', 'Number of wallets to create - default 10')
+    .option(
+      '--rpc <string>',
+      'Bootstraps a neotracker private network with the given rpcURL.',
+    )
+    .option('--testingOnly', 'Option to spoof neotracker path for testing')
     .action(async args => {
-      const { neotracker } = args.options;
       const spinner = ora(`Gathering data for bootstrap`).start();
 
       const walletNames = [];
@@ -727,31 +742,11 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         walletNames.push(`wallet-${i}`);
       }
 
-      const assetInfo = [
-        {
-          assetType: 'Token',
-          name: 'redcoin',
-          amount: new BigNumber(1000000),
-          precision: 4,
-        },
-        {
-          assetType: 'Token',
-          name: 'bluecoin',
-          amount: new BigNumber(650000),
-          precision: 0,
-        },
-        {
-          assetType: 'Currency',
-          name: 'greencoin',
-          amount: new BigNumber(50000000),
-          precision: 6,
-        },
-      ];
-      const assetWalletNames = assetInfo.map(asset => `${asset.name}-wallet`);
+      const assetWalletNames = ASSET_INFO.map(asset => `${asset.name}-wallet`);
 
       try {
         let bootstrapData;
-        if (neotracker || args.options.rpc != null) {
+        if (args.options.rpc != null) {
           bootstrapData = await getNEOTrackerData({
             cliOptions: {
               cli,
@@ -832,14 +827,14 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
 
         spinner.start('Registering test assets');
         const assetHashes = await registerAssets({
-          assets: assetInfo,
+          assets: ASSET_INFO,
           assetWallets,
           networkName: network.name,
           client,
           developerClient,
         });
         spinner.succeed();
-        const assets = _.zip(assetInfo, assetWallets, assetHashes).map(
+        const assets = _.zip(ASSET_INFO, assetWallets, assetHashes).map(
           asset => ({
             ...asset[0],
             wallet: asset[1],

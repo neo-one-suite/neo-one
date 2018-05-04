@@ -4,7 +4,7 @@ import { common } from '@neo-one/client-core';
 
 import { getRPC } from './bootstrapTestUtils';
 
-const NEOTRACKERPRIVATEKEYS = [
+const NEOTRACKER_PRIVATE_KEYS = [
   'e35ecb8189067a0a06f17f163be3db95c4b7805c81b48af1f4b8bbdfbeeb1afd',
   '6cad314f75624a26b780368a8b0753d10815ca44c1fca6eb3972484548805d9e',
   'e91dc6e5fffcae0510ef5a7e41675d024e5b286769b3ff455e71e01a4cf16ef0',
@@ -13,7 +13,7 @@ const NEOTRACKERPRIVATEKEYS = [
 
 describe('bootstrap neotracker', () => {
   test('bootstrap - neotracker', async () => {
-    const network = 'boottest-nt';
+    const network = 'priv';
 
     await one.execute(`create network ${network}`);
     const rpcURL = await getRPC(network);
@@ -21,10 +21,10 @@ describe('bootstrap neotracker', () => {
     const provider = new NEOONEProvider({
       options: [{ network, rpcURL }],
     });
-    await one.execute(`bootstrap --network ${network} --rpc ${rpcURL}`);
+    await one.execute(`bootstrap --rpc ${rpcURL} --testingOnly`);
 
     const accounts = await Promise.all(
-      NEOTRACKERPRIVATEKEYS.map(key =>
+      NEOTRACKER_PRIVATE_KEYS.map(key =>
         provider.read(network).getAccount(privateKeyToAddress(key)),
       ),
     );
