@@ -42,8 +42,8 @@ export default class Output implements SerializableWire<Output>, Equatable {
   value: BN;
   address: UInt160;
   size: number = IOHelper.sizeOfUInt256 +
-    IOHelper.sizeOfUInt16LE +
-    IOHelper.sizeOfUInt160;
+  IOHelper.sizeOfUInt16LE +
+  IOHelper.sizeOfUInt160;
 
   constructor({ asset, value, address }: OutputAdd) {
     this.asset = asset;

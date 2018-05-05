@@ -17,13 +17,19 @@ export default {
   makeWallet: ({ network, name }: {| network: string, name: string |}) =>
     compoundName.make({ name, names: [network] }),
   extractWallet: (name: string): {| network: string, name: string |} => {
-    const { names: [network], name: baseName } = compoundName.extract(name);
+    const {
+      names: [network],
+      name: baseName,
+    } = compoundName.extract(name);
     return { network, name: baseName };
   },
   makeContract: ({ network, name }: {| network: string, name: string |}) =>
     compoundName.make({ name, names: [network] }),
   extractContract: (name: string): {| network: string, name: string |} => {
-    const { names: [network], name: baseName } = compoundName.extract(name);
+    const {
+      names: [network],
+      name: baseName,
+    } = compoundName.extract(name);
     return { network, name: baseName };
   },
 };
