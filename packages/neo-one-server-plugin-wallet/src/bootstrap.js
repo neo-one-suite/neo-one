@@ -39,10 +39,10 @@ import constants from './constants';
 import { kycContract, conciergeContract } from './__data__/contracts';
 
 const DEFAULT_NUM_WALLETS = 10;
-const NEOTRACKER_MASTER_PRIVATE_KEY =
+const DEFAULT_MASTER_PRIVATE_KEY =
   '9e9522c90f4b33cac8a174353ae54651770f3f4dd1de78e74d9b49ba615d7c1f';
-const NEOTRACKER_NETWORK_NAME = 'priv';
-const NEOTRACKER_PRIVATE_KEYS = [
+const DEFAULT_NETWORK_NAME = 'priv';
+const DEFAULT_PRIVATE_KEYS = [
   'e35ecb8189067a0a06f17f163be3db95c4b7805c81b48af1f4b8bbdfbeeb1afd',
   '6cad314f75624a26b780368a8b0753d10815ca44c1fca6eb3972484548805d9e',
   'e91dc6e5fffcae0510ef5a7e41675d024e5b286769b3ff455e71e01a4cf16ef0',
@@ -554,7 +554,7 @@ async function createAssetTransfer({
   return firstTransfers.concat([secondTransfers]);
 }
 
-async function getNEOTrackerData({
+async function getPresetData({
   cliOptions,
   plugin,
   walletNames,
@@ -567,12 +567,12 @@ async function getNEOTrackerData({
 |}): Promise<BootstrapData> {
   const rpcURL = await getRPC(cliOptions);
   const network = {
-    name: NEOTRACKER_NETWORK_NAME,
+    name: DEFAULT_NETWORK_NAME,
     rpcURL,
   };
 
   let master;
-  if (cliOptions.args.options.testingOnly) {
+  if (cliOptions.args.options['testing-only']) {
     master = await getWallet({
       walletName: constants.MASTER_WALLET,
       networkName: network.name,
@@ -582,14 +582,14 @@ async function getNEOTrackerData({
   } else {
     master = {
       name: 'master',
-      privateKey: NEOTRACKER_MASTER_PRIVATE_KEY,
-      address: privateKeyToAddress(NEOTRACKER_MASTER_PRIVATE_KEY),
+      privateKey: DEFAULT_MASTER_PRIVATE_KEY,
+      address: privateKeyToAddress(DEFAULT_MASTER_PRIVATE_KEY),
     };
   }
 
   const hardcodedWallets = _.zip(
-    walletNames.slice(0, NEOTRACKER_PRIVATE_KEYS.length),
-    NEOTRACKER_PRIVATE_KEYS,
+    walletNames.slice(0, DEFAULT_PRIVATE_KEYS.length),
+    DEFAULT_PRIVATE_KEYS,
   ).map(walletInfo => ({
     name: walletInfo[0],
     privateKey: walletInfo[1],
@@ -597,7 +597,7 @@ async function getNEOTrackerData({
   }));
 
   const wallets = walletNames
-    .slice(NEOTRACKER_PRIVATE_KEYS.length)
+    .slice(DEFAULT_PRIVATE_KEYS.length)
     .map(name => {
       const privateKey = createPrivateKey();
       return {
@@ -730,9 +730,9 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
     .option('--wallets <number>', 'Number of wallets to create - default 10')
     .option(
       '--rpc <string>',
-      'Bootstraps a neotracker private network with the given rpcURL.',
+      'Bootstraps a private network with the given rpcURL.',
     )
-    .option('--testingOnly', 'Option to spoof neotracker path for testing')
+    .option('--testing-only', 'Option to spoof rpc path for testing')
     .action(async args => {
       const spinner = ora(`Gathering data for bootstrap`).start();
 
@@ -747,7 +747,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
       try {
         let bootstrapData;
         if (args.options.rpc != null) {
-          bootstrapData = await getNEOTrackerData({
+          bootstrapData = await getPresetData({
             cliOptions: {
               cli,
               args,
