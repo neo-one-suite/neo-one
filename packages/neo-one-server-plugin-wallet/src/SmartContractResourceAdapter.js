@@ -84,7 +84,7 @@ export default class SmartContractResourceAdapter {
       tasks: [
         {
           title: 'Deploy smart contract',
-          task: async ctx => {
+          task: async (ctx) => {
             const smartContractResource = await SmartContractResource.createNew(
               {
                 pluginManager,

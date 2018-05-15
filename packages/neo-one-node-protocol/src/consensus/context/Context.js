@@ -93,7 +93,7 @@ export default class Context {
       myIndex: this.myIndex,
       primaryIndex: this.primaryIndex,
       expectedView: [...this.expectedView],
-      validators: this.validators.map(validator =>
+      validators: this.validators.map((validator) =>
         common.ecPointToString(validator),
       ),
       blockReceivedTimeSeconds: this.blockReceivedTimeSeconds,

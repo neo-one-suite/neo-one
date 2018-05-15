@@ -28,7 +28,7 @@ describe('NEOONEProvider', () => {
       { network: networkConfigs.MAIN, rpcURL: networkConfigs.MAIN_URL },
       { network: networkConfigs.TEST, rpcURL: networkConfigs.TEST_URL },
     ];
-    const testExpected = testOptions.map(option => option.network);
+    const testExpected = testOptions.map((option) => option.network);
 
     // $FlowFixMe
     const testProvider = new NEOONEProvider({ options: testOptions });

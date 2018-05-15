@@ -19,8 +19,8 @@ export default (args: CLIArgs) => {
       const { serverConfig, shutdown } = setupServer('check-server', args);
 
       const [dataPath, port] = await combineLatest(
-        serverConfig.config$.pipe(map(conf => conf.paths.data)),
-        serverConfig.config$.pipe(map(conf => conf.server.port)),
+        serverConfig.config$.pipe(map((conf) => conf.paths.data)),
+        serverConfig.config$.pipe(map((conf) => conf.server.port)),
       )
         .pipe(take(1))
         .toPromise();

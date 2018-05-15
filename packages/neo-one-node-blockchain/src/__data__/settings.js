@@ -88,7 +88,7 @@ const standbyValidators = ([
   '024c7b7fb6c310fccf1ba33b082519d82964ea93868d676662d4a59ad548df0e7d',
   '02aaec38470f6aad0042c6e877cfd8087d2676b0f516fddd362801b9bd3936399e',
   '02486fd15702c4490a26703112a5cc1d0923fd697a33406bd5a1c00e0013b09a70',
-].map(value => common.stringToECPoint(value)): Array<ECPoint>);
+].map((value) => common.stringToECPoint(value)): Array<ECPoint>);
 const address = crypto.toScriptHash(
   crypto.createMultiSignatureVerificationScript(
     standbyValidators.length / 2 + 1,

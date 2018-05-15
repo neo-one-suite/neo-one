@@ -84,7 +84,9 @@ export default class Account extends BaseState
         IOHelper.sizeOfUInt8 +
         IOHelper.sizeOfUInt160 +
         IOHelper.sizeOfBoolean +
-        IOHelper.sizeOfArray(this.votes, vote => IOHelper.sizeOfECPoint(vote)) +
+        IOHelper.sizeOfArray(this.votes, (vote) =>
+          IOHelper.sizeOfECPoint(vote),
+        ) +
         IOHelper.sizeOfObject(
           this.balances,
           () => IOHelper.sizeOfUInt256 + IOHelper.sizeOfFixed8,
@@ -96,7 +98,7 @@ export default class Account extends BaseState
     return this.__size();
   }
 
-  equals: Equals = utils.equals(Account, other =>
+  equals: Equals = utils.equals(Account, (other) =>
     common.uInt160Equal(this.hash, other.hash),
   );
 
@@ -105,7 +107,8 @@ export default class Account extends BaseState
     return (
       !this.isFrozen &&
       this.votes.length === 0 &&
-      (balances.length === 0 || balances.every(value => value.lte(utils.ZERO)))
+      (balances.length === 0 ||
+        balances.every((value) => value.lte(utils.ZERO)))
     );
   }
 
@@ -126,10 +129,10 @@ export default class Account extends BaseState
     writer.writeUInt8(this.version);
     writer.writeUInt160(this.hash);
     writer.writeBoolean(this.isFrozen);
-    writer.writeArray(this.votes, vote => {
+    writer.writeArray(this.votes, (vote) => {
       writer.writeECPoint(vote);
     });
-    const balances = _.pickBy(this.balances, value => value.gt(utils.ZERO));
+    const balances = _.pickBy(this.balances, (value) => value.gt(utils.ZERO));
     writer.writeObject(balances, (key, value) => {
       writer.writeUInt256(key);
       writer.writeFixed8(value);
@@ -177,13 +180,13 @@ export default class Account extends BaseState
       version: this.version,
       script_hash: JSONHelper.writeUInt160(this.hash),
       frozen: this.isFrozen,
-      votes: this.votes.map(vote => JSONHelper.writeECPoint(vote)),
+      votes: this.votes.map((vote) => JSONHelper.writeECPoint(vote)),
       balances: commonUtils.entries(this.balances).map(([asset, value]) => ({
         asset: JSONHelper.writeUInt256(asset),
         value: JSONHelper.writeFixed8(value),
       })),
-      unspent: unspent.map(input => input.serializeJSON(context)),
-      unclaimed: unclaimed.map(input => input.serializeJSON(context)),
+      unspent: unspent.map((input) => input.serializeJSON(context)),
+      unclaimed: unclaimed.map((input) => input.serializeJSON(context)),
     };
   }
 }

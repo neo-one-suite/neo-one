@@ -19,7 +19,7 @@ export default {
     }
 
     return new TaskList({
-      tasks: wallets.map(wallet => ({
+      tasks: wallets.map((wallet) => ({
         title: `Setup wallet ${wallet.baseName}`,
         task: () =>
           new TaskList({
@@ -53,7 +53,7 @@ export default {
                         name: wallet.name,
                         options: {},
                       })
-                      .pipe(filter(value => value != null), take(1))
+                      .pipe(filter((value) => value != null), take(1))
                       .toPromise(),
                     manager
                       .getResource$({

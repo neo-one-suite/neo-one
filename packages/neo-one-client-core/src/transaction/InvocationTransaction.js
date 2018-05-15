@@ -49,6 +49,10 @@ export type InvocationTransactionJSON = {|
   data?: InvocationDataJSON,
 |};
 
+// TODO: Work with NEO to increase this.
+// const MAX_SCRIPT_SIZE = 65536;
+const MAX_SCRIPT_SIZE = 1000000;
+
 export default class InvocationTransaction extends TransactionBase<
   typeof TRANSACTION_TYPE.INVOCATION,
   InvocationTransactionJSON,
@@ -142,7 +146,7 @@ export default class InvocationTransaction extends TransactionBase<
       throw new InvalidFormatError();
     }
 
-    const script = reader.readVarBytesLE(65536);
+    const script = reader.readVarBytesLE(MAX_SCRIPT_SIZE);
     if (script.length === 0) {
       throw new InvalidFormatError();
     }
@@ -192,8 +196,8 @@ export default class InvocationTransaction extends TransactionBase<
       dataJSON = {
         result: result.serializeJSON(context),
         asset: asset == null ? undefined : asset.serializeJSON(context),
-        contracts: contracts.map(contract => contract.serializeJSON(context)),
-        deletedContractHashes: deletedContractHashes.map(hash =>
+        contracts: contracts.map((contract) => contract.serializeJSON(context)),
+        deletedContractHashes: deletedContractHashes.map((hash) =>
           common.uInt160ToString(hash),
         ),
         migratedContractHashes: migratedContractHashes.map(([from, to]) => [
@@ -205,9 +209,9 @@ export default class InvocationTransaction extends TransactionBase<
             addressVersion: context.addressVersion,
             scriptHash: address,
           }),
-          votes.map(vote => common.ecPointToString(vote)),
+          votes.map((vote) => common.ecPointToString(vote)),
         ]),
-        actions: actions.map(action => action.serializeJSON(context)),
+        actions: actions.map((action) => action.serializeJSON(context)),
       };
 
       if (dataJSON.asset == null) {

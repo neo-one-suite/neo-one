@@ -103,10 +103,10 @@ export default class NEOONEDataProvider
     monitor?: Monitor,
   ): Promise<{| unclaimed: Array<Input>, amount: BigNumber |}> {
     return this._capture(
-      async span => {
+      async (span) => {
         const account = await this._getAccount(address, span);
         const amounts = await Promise.all(
-          account.unclaimed.map(input =>
+          account.unclaimed.map((input) =>
             this._client.getClaimAmount(input, span),
           ),
         );
@@ -129,7 +129,7 @@ export default class NEOONEDataProvider
     monitor?: Monitor,
   ): Promise<Array<UnspentOutput>> {
     return this._capture(
-      async span => {
+      async (span) => {
         const account = await this._getAccount(address, span);
         const outputs = await Promise.all(
           account.unspent.map(async (input): Promise<?UnspentOutput> => {
@@ -256,8 +256,8 @@ export default class NEOONEDataProvider
   getValidators(monitor?: Monitor): Promise<Array<Validator>> {
     return this._client
       .getValidators(monitor)
-      .then(validators =>
-        validators.map(validator => this._convertValidator(validator)),
+      .then((validators) =>
+        validators.map((validator) => this._convertValidator(validator)),
       );
   }
 
@@ -285,7 +285,7 @@ export default class NEOONEDataProvider
     return AsyncIterableX.from(
       this._client
         .getAllStorage(hash, monitor)
-        .then(res => AsyncIterableX.from(res)),
+        .then((res) => AsyncIterableX.from(res)),
     ).pipe(flatten());
   }
 
@@ -298,9 +298,9 @@ export default class NEOONEDataProvider
         monitor: filter.monitor,
       }),
     ).pipe(
-      flatMap(async block => {
+      flatMap(async (block) => {
         const actions = _.flatten(
-          block.transactions.map(transaction => {
+          block.transactions.map((transaction) => {
             if (transaction.type === 'InvocationTransaction') {
               return transaction.data.actions;
             }
@@ -362,14 +362,14 @@ export default class NEOONEDataProvider
       nextConsensus: block.nextconsensus,
       script: block.script,
       size: block.size,
-      transactions: block.tx.map(transaction =>
+      transactions: block.tx.map((transaction) =>
         this._convertConfirmedTransaction(transaction),
       ),
     };
   }
 
   _convertTransaction(transaction: TransactionJSON): Transaction {
-    return this._convertTransactionBase(transaction, invocation => ({
+    return this._convertTransactionBase(transaction, (invocation) => ({
       type: 'InvocationTransaction',
       txid: invocation.txid,
       size: invocation.size,
@@ -388,7 +388,7 @@ export default class NEOONEDataProvider
   _convertConfirmedTransaction(
     transaction: TransactionJSON,
   ): ConfirmedTransaction {
-    return this._convertTransactionBase(transaction, invocation => {
+    return this._convertTransactionBase(transaction, (invocation) => {
       if (invocation.data == null) {
         throw new Error('Unexpected null data');
       }
@@ -549,14 +549,14 @@ export default class NEOONEDataProvider
   }
 
   _convertAttributes(attributes: Array<AttributeJSON>): Array<Attribute> {
-    return attributes.map(attribute => ({
+    return attributes.map((attribute) => ({
       usage: (attribute.usage: $FlowFixMe),
       data: attribute.data,
     }));
   }
 
   _convertOutputs(outputs: Array<OutputJSON>): Array<Output> {
-    return outputs.map(output => this._convertOutput(output));
+    return outputs.map((output) => this._convertOutput(output));
   }
 
   _convertOutput(output: OutputJSON): Output {
@@ -590,13 +590,13 @@ export default class NEOONEDataProvider
     return {
       result: this._convertInvocationResult(data.result),
       asset: data.asset == null ? data.asset : this._convertAsset(data.asset),
-      contracts: data.contracts.map(contract =>
+      contracts: data.contracts.map((contract) =>
         this._convertContract(contract),
       ),
       deletedContractHashes: data.deletedContractHashes,
       migratedContractHashes: data.migratedContractHashes,
       voteUpdates: data.voteUpdates,
-      actions: data.actions.map(action => this._convertAction(action)),
+      actions: data.actions.map((action) => this._convertAction(action)),
     };
   }
 
@@ -605,6 +605,7 @@ export default class NEOONEDataProvider
       return {
         state: 'FAULT',
         gasConsumed: new BigNumber(result.gas_consumed),
+        gasCost: new BigNumber(result.gas_cost),
         stack: this._convertContractParameters(result.stack),
         message: result.message,
       };
@@ -613,6 +614,7 @@ export default class NEOONEDataProvider
     return {
       state: 'HALT',
       gasConsumed: new BigNumber(result.gas_consumed),
+      gasCost: new BigNumber(result.gas_cost),
       stack: this._convertContractParameters(result.stack),
     };
   }
@@ -620,7 +622,7 @@ export default class NEOONEDataProvider
   _convertContractParameters(
     parameters: Array<ContractParameterJSON>,
   ): Array<ContractParameter> {
-    return parameters.map(parameter =>
+    return parameters.map((parameter) =>
       this._convertContractParameter(parameter),
     );
   }

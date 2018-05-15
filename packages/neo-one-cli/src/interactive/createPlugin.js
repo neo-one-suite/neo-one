@@ -10,12 +10,12 @@ import type InteractiveCLI from '../InteractiveCLI';
 
 export default ({ cli, plugin }: {| cli: InteractiveCLI, plugin: Plugin |}) => {
   const commands = createCRUD({ cli, plugin }).concat(
-    plugin.interactive.map(interactiveCommand => interactiveCommand({ cli })),
+    plugin.interactive.map((interactiveCommand) => interactiveCommand({ cli })),
   );
-  commands.forEach(command => {
+  commands.forEach((command) => {
     const fn = command._fn;
     let cancelled = false;
-    command.action(async args => {
+    command.action(async (args) => {
       try {
         cancelled = false;
         await cli.executeCommandPreHooks(command._name, args);

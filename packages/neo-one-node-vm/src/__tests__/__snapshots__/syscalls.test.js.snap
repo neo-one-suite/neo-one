@@ -762,19 +762,7 @@ Array [
 
 exports[`syscalls Neo.Storage.Find 1`] = `
 Array [
-  IteratorStackItem {
-    "value": StackItemIterator {
-      "current": null,
-      "done": false,
-      "first": true,
-      "iterator": Object {
-        "next": [Function],
-        "return": [Function],
-        "throw": [Function],
-        Symbol(Symbol.asyncIterator): [Function],
-      },
-    },
-  },
+  "{\\"iterator\\":{},\\"current\\":null,\\"done\\":false,\\"first\\":true}",
 ]
 `;
 

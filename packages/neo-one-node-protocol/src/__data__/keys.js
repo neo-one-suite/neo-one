@@ -14,7 +14,7 @@ export default ([
   '1045788e7f18036dc5637091fa002b6af354c060aa000976df4d89a54cb2ccd2',
   '891389165b2b17bd943c0eef2a98fe41140635adf46b09030ab6c055e0926eb2',
   '84e32b27ce9542ca5a4b37827f2c28cb099a5135eb898f30af94f0bbd8f79e89',
-].map(key => {
+].map((key) => {
   const privateKey = common.stringToPrivateKey(key);
   const publicKey = crypto.privateKeyToPublicKey(privateKey);
   return { privateKey, publicKey };

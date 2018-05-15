@@ -84,7 +84,7 @@ export default class WalletResourceAdapter {
       tasks: [
         {
           title: 'Create wallet resource',
-          task: async ctx => {
+          task: async (ctx) => {
             const walletResource = await WalletResource.createNew({
               client,
               pluginManager,

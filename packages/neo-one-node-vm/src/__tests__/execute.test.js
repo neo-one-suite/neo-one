@@ -177,7 +177,7 @@ describe('execute', () => {
     blockchain.contract.get = jest.fn(() =>
       Promise.resolve(transactions.kycContract),
     );
-    blockchain.storageItem.tryGet = jest.fn(item => {
+    blockchain.storageItem.tryGet = jest.fn((item) => {
       if (item.key.toString('utf8') === 'sale_paused') {
         return Promise.resolve({ value: Buffer.alloc(1, 0) });
       }
@@ -552,7 +552,7 @@ describe('execute', () => {
           const senderValue = await getSenderValue();
 
           const sb = new ScriptBuilder();
-          _.range(count).forEach(idx => {
+          _.range(count).forEach((idx) => {
             sb.emitAppCall(
               conciergeContract.hash,
               'transfer',
@@ -594,17 +594,17 @@ describe('execute', () => {
         mockBlockchain();
       });
 
-      _.range(1, 4).forEach(count => testTransfer({ count, success: true }));
-      _.range(4, 6).forEach(count => testTransfer({ count, success: false }));
+      _.range(1, 4).forEach((count) => testTransfer({ count, success: true }));
+      _.range(4, 6).forEach((count) => testTransfer({ count, success: false }));
 
-      _.range(4, 8).forEach(count =>
+      _.range(4, 8).forEach((count) =>
         testTransfer({
           count,
           success: true,
           gas: '10',
         }),
       );
-      _.range(8, 10).forEach(count =>
+      _.range(8, 10).forEach((count) =>
         testTransfer({
           count,
           success: false,

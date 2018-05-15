@@ -38,6 +38,7 @@ export {
   IOHelper,
   JSONHelper,
   ScriptBuilder,
+  UnknownOpError,
 } from './utils';
 
 export type { AccountJSON, AccountKey, AccountUpdate } from './Account';

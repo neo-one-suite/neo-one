@@ -1,6 +1,5 @@
 /* @flow */
 /* eslint import/no-extraneous-dependencies: ['error', {'devDependencies': true}] */
-// flowlint untyped-import:off
 import babel from 'rollup-plugin-babel';
 import fs from 'fs-extra';
 import gulp from 'gulp';
@@ -20,23 +19,24 @@ import getBabelConfigBase from './scripts/getBabelConfig';
 
 gulp.task('default', ['build']);
 
+const getSourcePackage = (source: string) => JSON.parse(
+  fs.readFileSync(
+    path.resolve(__dirname, 'packages', source, 'package.json'),
+    'utf-8',
+  ),
+);
+
 const sources = fs
   .readdirSync('packages')
-  .filter(file => !file.startsWith('.'));
+  .filter(file => !file.startsWith('.'))
+  .filter(source => !getSourcePackage(source).noCompile);
 
 const dependencies = [
   ...new Set(
     sources.reduce(
       (acc, source) =>
         acc.concat(
-          Object.keys(
-            (JSON.parse(
-              fs.readFileSync(
-                path.join('packages', source, 'package.json'),
-                'utf-8',
-              ),
-            ).dependencies || {}),
-          ),
+          Object.keys((getSourcePackage(source).dependencies || {})),
         ),
       [],
     ),
@@ -65,10 +65,12 @@ const getBabelConfig = ({
   modules,
   entry,
   useBuiltIns,
+  typescript,
 }: {|
   modules: boolean | string,
   entry: Entry,
   useBuiltIns?: boolean | string,
+  typescript: boolean,
 |}) => ({
   babelrc: false,
   ...getBabelConfigBase({
@@ -77,6 +79,7 @@ const getBabelConfig = ({
     targets: entry === 'node'
       ? { node: '8.9.0' }
       : { browsers: ['> 1%', 'last 2 versions', 'not ie <= 10'] },
+    typescript,
   }),
 });
 
@@ -85,8 +88,12 @@ const getEntryFile = (entry: Entry) =>
 
 const createRollupInput = ({ source, entry }: {| source: string, entry: Entry |}) => {
   const dir = path.join('packages', source, 'src');
+  const indexJS = path.join(dir, `${getEntryFile(entry)}.js`);
+  const indexTS = path.join(dir, `${getEntryFile(entry)}.ts`);
+  const isJS = fs.pathExistsSync(indexJS);
+  const input = isJS ? indexJS : indexTS;
   return {
-    input: path.join(dir, `${getEntryFile(entry)}.js`),
+    input,
     external: (module: string) =>
       dependencies.some(dep => dep !== source && module.startsWith(dep)),
     plugins: [
@@ -95,6 +102,7 @@ const createRollupInput = ({ source, entry }: {| source: string, entry: Entry |}
         jsnext: true,
         main: true,
         preferBuiltins: true,
+        extensions: ['.js', '.ts'],
       }),
       replace({
         include: 'node_modules/JSONStream/index.js',
@@ -106,7 +114,7 @@ const createRollupInput = ({ source, entry }: {| source: string, entry: Entry |}
       json({ preferConst: true }),
       babel({
         exclude: path.join('node_modules', '**'),
-        ...getBabelConfig({ modules: false, entry }),
+        ...getBabelConfig({ modules: false, entry, typescript: !isJS }),
       }),
       sourcemaps(),
     ],
@@ -184,15 +192,17 @@ const buildSource = async ({
 const getSourcesAndEntries = () => Promise.all(
   sources.map(async source => {
     const dir = path.join('packages', source, 'src');
-    const [existsIndex, existsIndexBrowser] = await Promise.all([
+    const [existsIndex, existsIndexTS, existsIndexBrowser, existsIndexBrowserTS] = await Promise.all([
       fs.pathExists(path.join(dir, 'index.js')),
+      fs.pathExists(path.join(dir, 'index.ts')),
       fs.pathExists(path.join(dir, 'index.browser.js')),
+      fs.pathExists(path.join(dir, 'index.browser.ts')),
     ]);
     const result = [];
-    if (existsIndex) {
+    if (existsIndex || existsIndexTS) {
       result.push({ source, entry: 'node' });
     }
-    if (existsIndexBrowser) {
+    if (existsIndexBrowser || existsIndexBrowserTS) {
       result.push({ source, entry: 'browser' });
     }
 
@@ -219,11 +229,13 @@ export * from '../src';
 `;
 
 gulp.task('build:flow', () =>
-  sources.forEach(source => {
-    const dir = path.join('packages', source, 'dist');
-    fs.ensureDirSync(dir);
-    fs.writeFileSync(path.join(dir, 'index.js.flow'), flowIndex);
-  }),
+  sources
+    .filter(source => fs.pathExistsSync(path.resolve(__dirname, 'packages', source, 'src', 'index.js')))
+    .forEach(source => {
+      const dir = path.join('packages', source, 'dist');
+      fs.ensureDirSync(dir);
+      fs.writeFileSync(path.join(dir, 'index.js.flow'), flowIndex);
+    }),
 );
 
 const base = path.join(__dirname, 'packages');
@@ -255,6 +267,7 @@ gulp.task('build:bin', ['build:dist'], () =>
           modules: 'commonjs',
           useBuiltIns: 'entry',
           entry: 'node',
+          typescript: false,
         }),
       ),
     )

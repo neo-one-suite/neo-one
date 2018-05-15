@@ -37,7 +37,7 @@ const waitRunning = async ({ pid }: {| pid: number |}) => {
   const startTime = utils.nowSeconds();
   while (!isRunning(pid) && utils.nowSeconds() - startTime <= 5) {
     // eslint-disable-next-line
-    await new Promise(resolve => setTimeout(() => resolve(), 100));
+    await new Promise((resolve) => setTimeout(() => resolve(), 100));
   }
 };
 
@@ -52,7 +52,7 @@ const waitReachable = async ({ port }: {| port: number |}) => {
       return;
     } catch (error) {
       // eslint-disable-next-line
-      await new Promise(resolve => setTimeout(() => resolve(), 100));
+      await new Promise((resolve) => setTimeout(() => resolve(), 100));
       lastError = error;
     }
   }

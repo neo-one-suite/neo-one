@@ -139,7 +139,7 @@ export default class Contract extends BaseState
     return this._hashHex();
   }
 
-  equals: Equals = utils.equals(Contract, other =>
+  equals: Equals = utils.equals(Contract, (other) =>
     common.uInt160Equal(this.hash, other.hash),
   );
 
@@ -173,7 +173,7 @@ export default class Contract extends BaseState
       version: this.version,
       hash: JSONHelper.writeUInt160(this.hash),
       script: JSONHelper.writeBuffer(this.script),
-      parameters: this.parameterList.map(parameter =>
+      parameters: this.parameterList.map((parameter) =>
         toJSONContractParameterType(parameter),
       ),
       returntype: toJSONContractParameterType(this.returnType),
@@ -228,7 +228,7 @@ export const deserializeContractWireBase = ({
   publishVersion?: number,
 |}): Contract => {
   const script = reader.readVarBytesLE();
-  const parameterList = [...reader.readVarBytesLE()].map(value =>
+  const parameterList = [...reader.readVarBytesLE()].map((value) =>
     assertContractParameterType(value),
   );
   const returnType = assertContractParameterType(reader.readUInt8());

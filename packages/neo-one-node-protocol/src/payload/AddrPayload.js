@@ -23,7 +23,7 @@ export default class AddrPayload implements SerializableWire<AddrPayload> {
   }
 
   serializeWireBase(writer: BinaryWriter): void {
-    writer.writeArray(this.addresses, address =>
+    writer.writeArray(this.addresses, (address) =>
       address.serializeWireBase(writer),
     );
   }

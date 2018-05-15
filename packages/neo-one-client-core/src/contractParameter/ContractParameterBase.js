@@ -24,7 +24,7 @@ export default class ContractParameterBase<
   }
 
   asBoolean(): boolean {
-    return this.asBuffer().some(value => value !== 0);
+    return this.asBuffer().some((value) => value !== 0);
   }
 
   // TODO: Need to deal with circular references in arrays

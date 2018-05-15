@@ -66,7 +66,7 @@ export default class ConsensusPayload extends UnsignedConsensusPayload
   _hashHex = utils.lazy(() => common.uInt256ToHex(this.hash));
   _message = utils.lazy(() => this.serializeUnsigned());
 
-  equals: Equals = utils.equals(this.constructor, other =>
+  equals: Equals = utils.equals(this.constructor, (other) =>
     common.uInt256Equal(this.hash, other.hash),
   );
 
@@ -184,7 +184,7 @@ export default class ConsensusPayload extends UnsignedConsensusPayload
       value: this,
     };
     await Promise.all(
-      [...scriptHashes].map(hash =>
+      [...scriptHashes].map((hash) =>
         verifyScript({
           scriptContainer,
           hash: common.hexToUInt160(hash),

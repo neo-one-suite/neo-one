@@ -97,8 +97,8 @@ export default ({
       options,
     };
     const compileContracts = languageConfig.contracts
-      .filter(contract => contract.target != null)
-      .map(contract => ({
+      .filter((contract) => contract.target != null)
+      .map((contract) => ({
         name: contract.resourceName,
         path: path.resolve(contractsDir, contract.file),
         abi: contract.abi,
@@ -110,8 +110,8 @@ export default ({
           contract.properties == null ? undefined : contract.properties.storage,
       }));
     const deployContracts = languageConfig.contracts
-      .filter(contract => contract.target === 'deploy')
-      .map(contract => {
+      .filter((contract) => contract.target === 'deploy')
+      .map((contract) => {
         if (network == null || masterWallet == null) {
           throw new InvalidSimulationConfigError(
             `Network is required to deploy contracts`,

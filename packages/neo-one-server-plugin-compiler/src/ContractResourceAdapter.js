@@ -165,7 +165,7 @@ export default class ContractResourceAdapter {
         },
         {
           title: 'Compile smart contract',
-          task: async ctx => {
+          task: async (ctx) => {
             if (options.scPath == null) {
               throw new Error(
                 'Something went wrong, smart contract path was null.',
@@ -215,7 +215,7 @@ export default class ContractResourceAdapter {
         },
         {
           title: 'Save ABI and configuration',
-          task: async ctx => {
+          task: async (ctx) => {
             const { abi, hasDynamicInvoke, hasStorage, script } = ctx;
             await Promise.all([
               fs.writeJSON(staticOptions.abiPath, abi),

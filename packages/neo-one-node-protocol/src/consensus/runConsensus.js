@@ -133,7 +133,7 @@ export default async ({
         transactions.length >= node.blockchain.settings.maxTransactionsPerBlock
       ) {
         const networkFees = await Promise.all(
-          transactions.map(async transaction => {
+          transactions.map(async (transaction) => {
             const networkFee = await transaction.getNetworkFee(
               node.blockchain.feeContext,
             );
@@ -170,7 +170,7 @@ export default async ({
           type: 'new',
           previousHash: context.previousHash,
           transactionHashes: transactions.map(
-            transaction => transaction.hashHex,
+            (transaction) => transaction.hashHex,
           ),
           blockIndex: context.blockIndex,
           nonce,
@@ -198,7 +198,7 @@ export default async ({
         viewNumber: context.viewNumber,
         nonce: context.header.consensusData,
         nextConsensus: context.header.nextConsensus,
-        transactionHashes: context.transactionHashes.map(hash =>
+        transactionHashes: context.transactionHashes.map((hash) =>
           common.hexToUInt256(hash),
         ),
         minerTransaction: (context.transactions[

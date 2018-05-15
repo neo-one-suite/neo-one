@@ -154,7 +154,7 @@ export class MetricsFactoryProxy implements MetricsFactory {
       help = 'placeholder',
       labelNames: labelNamesIn = [],
     } = options;
-    const labelNames = labelNamesIn.map(labelName =>
+    const labelNames = labelNamesIn.map((labelName) =>
       convertMetricLabel(labelName),
     );
     let construct = { name, help, labelNames };

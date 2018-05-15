@@ -31,7 +31,7 @@ export default class ECPointAttribute extends AttributeBase<
 
   equals: Equals = utils.equals(
     ECPointAttribute,
-    other =>
+    (other) =>
       this.usage === other.usage &&
       common.ecPointEqual(this.value, other.value),
   );

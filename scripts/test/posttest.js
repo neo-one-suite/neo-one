@@ -19,14 +19,14 @@ const rewritePackageJSON = async (file: string): Promise<void> => {
 
 const run = async () => {
   const paths = await common.getPackageJSONPaths();
-  await Promise.all(paths.map(file => rewritePackageJSON(file)));
+  await Promise.all(paths.map((file) => rewritePackageJSON(file)));
 };
 
 run()
   .then(() => {
     process.exit(0);
   })
-  .catch(error => {
+  .catch((error) => {
     // eslint-disable-next-line
     console.error(error);
     process.exit(1);

@@ -237,7 +237,7 @@ const createContract = async ({
   args: Array<StackItem>,
 |}) => {
   const script = args[0].asBuffer();
-  const parameterList = [...args[1].asBuffer()].map(parameter =>
+  const parameterList = [...args[1].asBuffer()].map((parameter) =>
     assertContractParameterType(parameter),
   );
   const returnType = assertContractParameterType(
@@ -319,7 +319,7 @@ const destroyContract = async ({ context }: OpInvokeArgs) => {
         ? context.blockchain.storageItem
             .getAll({ hash })
             .pipe(
-              concatMap(item =>
+              concatMap((item) =>
                 defer(() =>
                   context.blockchain.storageItem.delete({
                     hash,
@@ -371,7 +371,7 @@ export const SYSCALLS = {
         transactionHash: context.init.action.transactionHash,
         index: context.actionIndex,
         scriptHash: context.scriptHash,
-        args: args[0].asArray().map(item => item.toContractParameter()),
+        args: args[0].asArray().map((item) => item.toContractParameter()),
       });
       await context.blockchain.action.add(notification);
       return {
@@ -662,7 +662,7 @@ export const SYSCALLS = {
           args[0]
             .asBlock()
             .transactions.map(
-              transaction => new TransactionStackItem(transaction),
+              (transaction) => new TransactionStackItem(transaction),
             ),
         ),
       ],
@@ -713,7 +713,7 @@ export const SYSCALLS = {
         new ArrayStackItem(
           args[0]
             .asTransaction()
-            .attributes.map(attribute => new AttributeStackItem(attribute)),
+            .attributes.map((attribute) => new AttributeStackItem(attribute)),
         ),
       ],
     }),
@@ -728,7 +728,7 @@ export const SYSCALLS = {
         new ArrayStackItem(
           args[0]
             .asTransaction()
-            .inputs.map(input => new InputStackItem(input)),
+            .inputs.map((input) => new InputStackItem(input)),
         ),
       ],
     }),
@@ -743,7 +743,7 @@ export const SYSCALLS = {
         new ArrayStackItem(
           args[0]
             .asTransaction()
-            .outputs.map(output => new OutputStackItem(output)),
+            .outputs.map((output) => new OutputStackItem(output)),
         ),
       ],
     }),
@@ -761,7 +761,7 @@ export const SYSCALLS = {
         context,
         results: [
           new ArrayStackItem(
-            outputs.map(output => new OutputStackItem(output)),
+            outputs.map((output) => new OutputStackItem(output)),
           ),
         ],
       };
@@ -783,7 +783,7 @@ export const SYSCALLS = {
           new ArrayStackItem(
             transaction.outputs
               .filter((output, idx) => spentCoins.endHeights[idx] == null)
-              .map(output => new OutputStackItem(output)),
+              .map((output) => new OutputStackItem(output)),
           ),
         ],
       };
@@ -885,7 +885,7 @@ export const SYSCALLS = {
       context,
       results: [
         new ArrayStackItem(
-          args[0].asAccount().votes.map(vote => new ECPointStackItem(vote)),
+          args[0].asAccount().votes.map((vote) => new ECPointStackItem(vote)),
         ),
       ],
     }),
@@ -1079,7 +1079,7 @@ export const SYSCALLS = {
       // This has been removed, but we keep it here so that we can do a full
       // build of the chain
       const address = args[0].asAccount().hash;
-      const votes = args[1].asArray().map(vote => vote.asECPoint());
+      const votes = args[1].asArray().map((vote) => vote.asECPoint());
       if (votes.length > MAX_VOTES) {
         throw new TooManyVotesError(context);
       }
@@ -1265,7 +1265,7 @@ export const SYSCALLS = {
               hash: context.scriptHash,
             })
             .pipe(
-              concatMap(item =>
+              concatMap((item) =>
                 defer(() =>
                   context.blockchain.storageItem.add(
                     new StorageItem({

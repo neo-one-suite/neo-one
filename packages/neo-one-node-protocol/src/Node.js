@@ -67,7 +67,7 @@ import { type PeerData } from './PeerData';
 import pkg from '../package.json';
 
 const messageReceivedLabelNames = [labels.COMMAND_NAME];
-const messageReceivedLabels = commonUtils.values(COMMAND).map(command => ({
+const messageReceivedLabels = commonUtils.values(COMMAND).map((command) => ({
   [labels.COMMAND_NAME]: command,
 }));
 const NEO_PROTOCOL_MESSAGES_RECEIVED_TOTAL = metrics.createCounter({
@@ -85,15 +85,15 @@ const NEO_PROTOCOL_MEMPOOL_SIZE = metrics.createGauge({
 });
 
 export type Environment = {|
-  network: NetworkEnvironment,
+  network?: NetworkEnvironment,
 |};
 export type Options = {|
-  consensus: {|
+  consensus?: {|
     enabled: boolean,
     options: ConsensusOptions,
   |},
-  network: NetworkOptions,
-  rpcURLs: Array<string>,
+  network?: NetworkOptions,
+  rpcURLs?: Array<string>,
 |};
 
 const createPeerBloomFilter = ({
@@ -169,12 +169,12 @@ export default class Node implements INode {
   constructor({
     monitor,
     blockchain,
-    environment,
+    environment = {},
     options$,
   }: {|
     monitor: Monitor,
     blockchain: Blockchain,
-    environment: Environment,
+    environment?: Environment,
     options$: Observable<Options>,
   |}) {
     this.blockchain = blockchain;
@@ -183,7 +183,7 @@ export default class Node implements INode {
       monitor,
       environment: environment.network,
       options$: options$.pipe(
-        map(options => options.network),
+        map((options) => options.network || {}),
         distinctUntilChanged(),
       ),
       negotiate: this._negotiate,
@@ -202,7 +202,8 @@ export default class Node implements INode {
     this.consensus = null;
     this._options$ = options$;
 
-    this._externalPort = (environment.network.listenTCP || {}).port || 0;
+    this._externalPort =
+      ((environment.network || {}).listenTCP || {}).port || 0;
     this._nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
     this._userAgent = `NEO:neo-one-js:${pkg.version}`;
 
@@ -221,7 +222,7 @@ export default class Node implements INode {
   }
 
   get connectedPeers(): Array<Endpoint> {
-    return this._network.connectedPeers.map(peer => peer.endpoint);
+    return this._network.connectedPeers.map((peer) => peer.endpoint);
   }
 
   start(): Observable<*> {
@@ -243,15 +244,19 @@ export default class Node implements INode {
         });
       }),
     );
+    const defaultOptions = {
+      enabled: false,
+      options: { privateKey: 'unused', privateNet: false },
+    };
     const consensus$ = this._options$.pipe(
-      map(options => options.consensus.enabled),
+      map((options) => (options.consensus || defaultOptions).enabled),
       distinctUntilChanged(),
-      switchMap(enabled => {
+      switchMap((enabled) => {
         if (enabled) {
           const consensus = new Consensus({
             monitor: this._monitor,
             options$: this._options$.pipe(
-              map(options => options.consensus.options),
+              map((options) => (options.consensus || defaultOptions).options),
               distinctUntilChanged(),
             ),
             node: this,
@@ -266,7 +271,10 @@ export default class Node implements INode {
     return merge(network$, consensus$);
   }
 
-  async relayTransaction(transaction: Transaction): Promise<void> {
+  async relayTransaction(
+    transaction: Transaction,
+    throwVerifyError: boolean = false,
+  ): Promise<void> {
     if (
       transaction.type === TRANSACTION_TYPE.MINER ||
       this.memPool[transaction.hashHex] != null ||
@@ -282,7 +290,7 @@ export default class Node implements INode {
         await this._monitor
           .withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex })
           .captureSpanLog(
-            async span => {
+            async (span) => {
               let foundTransaction;
               try {
                 foundTransaction = await this.blockchain.transaction.tryGet({
@@ -320,7 +328,8 @@ export default class Node implements INode {
         if (
           error.code == null ||
           typeof error.code !== 'string' ||
-          !error.code.includes('VERIFY')
+          !error.code.includes('VERIFY') ||
+          throwVerifyError
         ) {
           throw error;
         }
@@ -499,14 +508,14 @@ export default class Node implements INode {
   ): ?ConnectedPeer<Message, PeerData> {
     let peers = this._network.connectedPeers;
     if (bestPeer != null) {
-      peers = peers.filter(peer => peer.endpoint !== bestPeer.endpoint);
+      peers = peers.filter((peer) => peer.endpoint !== bestPeer.endpoint);
     }
-    const result = _.maxBy(peers, peer => peer.data.startHeight);
+    const result = _.maxBy(peers, (peer) => peer.data.startHeight);
     if (result == null) {
       return null;
     }
     return _.shuffle(
-      peers.filter(peer => peer.data.startHeight === result.data.startHeight),
+      peers.filter((peer) => peer.data.startHeight === result.data.startHeight),
     )[0];
   }
 
@@ -568,7 +577,7 @@ export default class Node implements INode {
     }
 
     const connectedPeer = this._network.connectedPeers.find(
-      otherPeer => version.nonce === otherPeer.data.nonce,
+      (otherPeer) => version.nonce === otherPeer.data.nonce,
     );
     if (connectedPeer != null) {
       throw new AlreadyConnectedError(
@@ -598,9 +607,9 @@ export default class Node implements INode {
   }
 
   async _doFetchEndpointsFromRPC(): Promise<void> {
-    const { rpcURLs } = await this._options$.pipe(take(1)).toPromise();
+    const { rpcURLs = [] } = await this._options$.pipe(take(1)).toPromise();
     await Promise.all(
-      rpcURLs.map(rpcURL => this._fetchEndpointsFromRPCURL(rpcURL)),
+      rpcURLs.map((rpcURL) => this._fetchEndpointsFromRPCURL(rpcURL)),
     );
   }
 
@@ -612,20 +621,20 @@ export default class Node implements INode {
     try {
       const peers = await readClient.getConnectedPeers();
       peers
-        .map(peer => {
+        .map((peer) => {
           const { address, port } = peer;
           const host = new Address6(address);
           return { host: host.canonicalForm() || '', port };
         })
-        .filter(endpoint => !LOCAL_HOST_ADDRESSES.has(endpoint.host))
-        .map(endpoint =>
+        .filter((endpoint) => !LOCAL_HOST_ADDRESSES.has(endpoint.host))
+        .map((endpoint) =>
           createEndpoint({
             type: 'tcp',
             host: endpoint.host,
             port: endpoint.port,
           }),
         )
-        .forEach(endpoint => this._network.addEndpoint(endpoint));
+        .forEach((endpoint) => this._network.addEndpoint(endpoint));
     } catch (error) {
       this._monitor
         .withData({ [this._monitor.labels.HTTP_URL]: rpcURL })
@@ -645,7 +654,7 @@ export default class Node implements INode {
       .withLabels({ [labels.COMMAND_NAME]: message.value.command })
       .withData({ [this._monitor.labels.PEER_ADDRESS]: peer.endpoint })
       .captureLog(
-        async monitor => {
+        async (monitor) => {
           switch (message.value.command) {
             case COMMAND.ADDR:
               this._onAddrMessageReceived(monitor, message.value.payload);
@@ -762,15 +771,15 @@ export default class Node implements INode {
 
   _onAddrMessageReceived(monitor: Monitor, addr: AddrPayload): void {
     addr.addresses
-      .filter(address => !LOCAL_HOST_ADDRESSES.has(address.host))
-      .map(address =>
+      .filter((address) => !LOCAL_HOST_ADDRESSES.has(address.host))
+      .map((address) =>
         createEndpoint({
           type: 'tcp',
           host: address.host,
           port: address.port,
         }),
       )
-      .forEach(endpoint => this._network.addEndpoint(endpoint));
+      .forEach((endpoint) => this._network.addEndpoint(endpoint));
   }
 
   async _onBlockMessageReceived(
@@ -804,7 +813,7 @@ export default class Node implements INode {
           await (monitor || this._monitor)
             .withData({ [labels.NEO_BLOCK_INDEX]: block.index })
             .captureSpanLog(
-              async span => {
+              async (span) => {
                 await this.blockchain.persistBlock({ monitor: span, block });
                 if (this.consensus != null) {
                   this.consensus.onPersistBlock();
@@ -889,7 +898,7 @@ export default class Node implements INode {
     const addresses = _.take(
       _.shuffle(
         this._network.connectedPeers
-          .map(connectedPeer => connectedPeer.data.address)
+          .map((connectedPeer) => connectedPeer.data.address)
           .filter(Boolean),
       ),
       GET_ADDR_PEER_COUNT,
@@ -920,7 +929,7 @@ export default class Node implements INode {
         command: COMMAND.INV,
         payload: new InvPayload({
           type: INVENTORY_TYPE.BLOCK,
-          hashes: headers.map(header => header.hash),
+          hashes: headers.map((header) => header.hash),
         }),
       }),
     );
@@ -934,7 +943,7 @@ export default class Node implements INode {
     switch (getData.type) {
       case 0x01: // Transaction
         await Promise.all(
-          getData.hashes.map(async hash => {
+          getData.hashes.map(async (hash) => {
             let transaction = this.memPool[common.uInt256ToHex(hash)];
             if (transaction == null) {
               transaction = await this.blockchain.transaction.tryGet({ hash });
@@ -954,7 +963,7 @@ export default class Node implements INode {
         break;
       case 0x02: // Block
         await Promise.all(
-          getData.hashes.map(async hash => {
+          getData.hashes.map(async (hash) => {
             const block = await this.blockchain.block.tryGet({
               hashOrIndex: hash,
             });
@@ -974,7 +983,7 @@ export default class Node implements INode {
                     command: COMMAND.MERKLE_BLOCK,
                     payload: this._createMerkleBlockPayload({
                       block,
-                      flags: block.transactions.map(transaction =>
+                      flags: block.transactions.map((transaction) =>
                         this._testFilter(peer.data.bloomFilter, transaction),
                       ),
                     }),
@@ -986,7 +995,7 @@ export default class Node implements INode {
         );
         break;
       case 0xe0: // Consensus
-        getData.hashes.forEach(hash => {
+        getData.hashes.forEach((hash) => {
           const payload = this._consensusCache.get(common.uInt256ToHex(hash));
           if (payload != null) {
             this._sendMessage(
@@ -1031,7 +1040,7 @@ export default class Node implements INode {
     headersPayload: HeadersPayload,
   ): Promise<void> {
     const headers = headersPayload.headers.filter(
-      header =>
+      (header) =>
         !this._knownHeaderHashes.has(header.hash) &&
         !this._tempKnownHeaderHashes.has(header.hashHex),
     );
@@ -1073,14 +1082,14 @@ export default class Node implements INode {
     switch (inv.type) {
       case 0x01: // Transaction
         hashes = inv.hashes.filter(
-          hash =>
+          (hash) =>
             !this._knownTransactionHashes.has(hash) &&
             !this._tempKnownTransactionHashes.has(common.uInt256ToHex(hash)),
         );
         break;
       case 0x02: // Block
         hashes = inv.hashes.filter(
-          hash =>
+          (hash) =>
             !this._knownBlockHashes.has(hash) &&
             !this._tempKnownBlockHashes.has(common.uInt256ToHex(hash)),
         );
@@ -1119,7 +1128,7 @@ export default class Node implements INode {
           type: INVENTORY_TYPE.TRANSACTION,
           hashes: commonUtils
             .values(this.memPool)
-            .map(transaction => transaction.hash),
+            .map((transaction) => transaction.hash),
         }),
       }),
     );
@@ -1164,7 +1173,7 @@ export default class Node implements INode {
       hashStopIndexPromise = this.blockchain.header
         .tryGet({ hashOrIndex: getBlocks.hashStop })
         .then(
-          hashStopHeader =>
+          (hashStopHeader) =>
             hashStopHeader == null
               ? maxHeight
               : Math.min(hashStopHeader.index, maxHeight),
@@ -1172,14 +1181,14 @@ export default class Node implements INode {
     }
     const [hashStartHeaders, hashEnd] = await Promise.all([
       Promise.all(
-        getBlocks.hashStart.map(hash =>
+        getBlocks.hashStart.map((hash) =>
           this.blockchain.header.tryGet({ hashOrIndex: hash }),
         ),
       ),
       hashStopIndexPromise,
     ]);
     const hashStartHeader = _.head(
-      _.orderBy(hashStartHeaders.filter(Boolean), [header => header.index]),
+      _.orderBy(hashStartHeaders.filter(Boolean), [(header) => header.index]),
     );
     if (hashStartHeader == null) {
       return [];
@@ -1191,7 +1200,7 @@ export default class Node implements INode {
 
     const headers = await Promise.all(
       _.range(hashStart, Math.min(hashStart + GET_BLOCKS_COUNT, hashEnd)).map(
-        index => this.blockchain.header.get({ hashOrIndex: index }),
+        (index) => this.blockchain.header.get({ hashOrIndex: index }),
       ),
     );
 
@@ -1204,7 +1213,7 @@ export default class Node implements INode {
       await monitor.captureSpan(
         async () => {
           const transactionAndFee = await Promise.all(
-            memPool.map(async transaction => {
+            memPool.map(async (transaction) => {
               const networkFee = await transaction.getNetworkFee({
                 getOutput: this.blockchain.output.get,
                 governingToken: this.blockchain.settings.governingToken,
@@ -1248,13 +1257,13 @@ export default class Node implements INode {
     }
     return (
       bloomFilter.contains(transaction.hash) ||
-      transaction.outputs.some(output =>
+      transaction.outputs.some((output) =>
         bloomFilter.contains(output.address),
       ) ||
-      transaction.inputs.some(input =>
+      transaction.inputs.some((input) =>
         bloomFilter.contains(input.serializeWire()),
       ) ||
-      transaction.scripts.some(script =>
+      transaction.scripts.some((script) =>
         bloomFilter.contains(crypto.toScriptHash(script.verification)),
       ) ||
       (transaction.type === TRANSACTION_TYPE.REGISTER &&
@@ -1271,7 +1280,7 @@ export default class Node implements INode {
     flags: Array<boolean>,
   |}): MerkleBlockPayload {
     const tree = new MerkleTree(
-      block.transactions.map(transaction => transaction.hash),
+      block.transactions.map((transaction) => transaction.hash),
     ).trim(flags);
 
     const buffer = Buffer.allocUnsafe(Math.floor((flags.length + 7) / 8));

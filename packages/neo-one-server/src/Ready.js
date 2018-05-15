@@ -32,7 +32,7 @@ export default class Ready {
     try {
       const files = await fs.readdir(this.dir);
       return Promise.all(
-        files.map(file => fs.readFile(path.resolve(this.dir, file), 'utf8')),
+        files.map((file) => fs.readFile(path.resolve(this.dir, file), 'utf8')),
       );
     } catch (error) {
       if (error.code === 'ENOENT') {

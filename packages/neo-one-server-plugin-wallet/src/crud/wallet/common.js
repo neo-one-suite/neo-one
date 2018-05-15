@@ -56,7 +56,7 @@ const promptPassword = async ({
       type: 'password',
       name: 'password',
       message: prompt,
-      validate: input => {
+      validate: (input) => {
         if (typeof input !== 'string' || input.length < 8) {
           return 'Password must be at least 8 characters';
         }

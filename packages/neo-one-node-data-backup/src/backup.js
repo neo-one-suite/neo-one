@@ -27,7 +27,7 @@ export default async ({
   }
 
   await monitor.captureSpanLog(
-    async span => {
+    async (span) => {
       await fs.remove(environment.tmpPath);
       await fs.ensureDir(environment.tmpPath);
 

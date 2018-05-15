@@ -19,6 +19,6 @@ export default ({
     binary.firstArgs.concat(['compile', 'python', scPath, avmPath]),
   )
     .then(() => ({}: $FlowFixMe))
-    .catch(error => {
+    .catch((error) => {
       throw new Error(`Python compilation failed: ${error.stdout}`);
     });

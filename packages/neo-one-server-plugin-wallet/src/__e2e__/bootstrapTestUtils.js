@@ -24,7 +24,7 @@ async function testAssetIssue({
   });
 
   const assetAccounts = await Promise.all(
-    assetWalletAddresses.map(address =>
+    assetWalletAddresses.map((address) =>
       provider.read(network).getAccount(address),
     ),
   );
@@ -40,7 +40,9 @@ async function testAssetIssue({
   }
 
   const accounts = await Promise.all(
-    walletAddresses.map(address => provider.read(network).getAccount(address)),
+    walletAddresses.map((address) =>
+      provider.read(network).getAccount(address),
+    ),
   );
 
   for (const account of accounts) {
@@ -71,7 +73,7 @@ export default (async function testBootstrap(
 
   const output = await one.execute(`get wallet --network ${network} --json`);
   let wallets = one.parseJSON(output);
-  wallets = wallets.filter(wallet => wallet[0] === network);
+  wallets = wallets.filter((wallet) => wallet[0] === network);
   // Bootstrap creates numWallets number of wallets
   // Wallets will also have the master wallet plus
   // 3 asset wallets

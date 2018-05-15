@@ -33,7 +33,7 @@ export type Environment = {|
 |};
 
 export type Options = {|
-  seeds: Array<Endpoint>,
+  seeds?: Array<Endpoint>,
   peerSeeds?: Array<Endpoint>,
   maxConnectedPeers?: number,
   externalEndpoints?: Array<Endpoint>,
@@ -48,7 +48,7 @@ export type PeerHealthBase = {
 
 type NetworkOptions<Message, PeerData, PeerHealth: PeerHealthBase> = {|
   monitor: Monitor,
-  environment: Environment,
+  environment?: Environment,
   options$: Observable<Options>,
   negotiate: (peer: Peer<Message>) => Promise<NegotiateResult<PeerData>>,
   checkPeerHealth: (
@@ -152,7 +152,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
   __onEvent: OnEvent<Message, PeerData>;
 
   constructor(options: NetworkOptions<Message, PeerData, PeerHealth>) {
-    const { environment, options$ } = options;
+    const { environment = {}, options$ } = options;
     this._monitor = options.monitor.at('node_network');
     this._started = false;
     this._stopped = false;
@@ -204,10 +204,10 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
       () => {
         try {
           this._subscription = this._options$.subscribe({
-            next: options => {
+            next: (options) => {
               this._seeds = new Set(options.seeds);
               this._peerSeeds = new Set(options.peerSeeds || []);
-              options.seeds.forEach(seed => this.addEndpoint(seed));
+              (options.seeds || []).forEach((seed) => this.addEndpoint(seed));
               this._maxConnectedPeers =
                 options.maxConnectedPeers == null
                   ? MAX_CONNECTED_PEERS
@@ -259,7 +259,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
             this._connectPeersTimeout = null;
           }
 
-          utils.keys(this._connectedPeers).forEach(endpoint => {
+          utils.keys(this._connectedPeers).forEach((endpoint) => {
             this._connectedPeers[endpoint].close();
             delete this._connectedPeers[endpoint];
           });
@@ -319,7 +319,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
       return;
     }
 
-    const tcpServer = net.createServer({ pauseOnConnect: true }, socket => {
+    const tcpServer = net.createServer({ pauseOnConnect: true }, (socket) => {
       const host = socket.remoteAddress;
       this._monitor
         .withData({
@@ -345,7 +345,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
       this._connectToPeer({ endpoint, socket });
     });
     this._tcpServer = tcpServer;
-    tcpServer.on('error', error => {
+    tcpServer.on('error', (error) => {
       this._monitor.logError({
         name: 'tcp_server_uncaught_error',
         message: 'TCP peer server encountered an error.',
@@ -382,7 +382,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
         this._connectToPeers();
         this._checkPeerHealth();
         // eslint-disable-next-line
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           this._connectPeersTimeout = setTimeout(() => {
             this._connectPeersTimeout = null;
             resolve();
@@ -413,7 +413,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
       );
       endpoints = endpoints.concat(
         _.shuffle(
-          [...this._unconnectedPeers].filter(peer =>
+          [...this._unconnectedPeers].filter((peer) =>
             this._filterEndpoint(peer),
           ),
         ).slice(0, count),
@@ -427,7 +427,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
 
     endpoints
       .concat([...this._peerSeeds])
-      .forEach(endpoint => this._connectToPeer({ endpoint }));
+      .forEach((endpoint) => this._connectToPeer({ endpoint }));
   }
 
   _checkPeerHealth(): void {
@@ -570,7 +570,7 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
       const connectedPeer = new ConnectedPeer({ peer, data, relay });
       this._connectedPeers[peer.endpoint] = connectedPeer;
       NEO_NETWORK_CONNECTED_PEERS_TOTAL.inc();
-      connectedPeer.peer.streamData(message =>
+      connectedPeer.peer.streamData((message) =>
         this.__onMessageReceived(connectedPeer, message),
       );
 

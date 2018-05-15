@@ -111,7 +111,7 @@ export class BaseReadStorageCache<Key, AddValue, Value> {
 
   getChangeSet(): ChangeSet {
     const createDeleteChange = this._createDeleteChange;
-    return commonUtils.values(this._values).map(value => {
+    return commonUtils.values(this._values).map((value) => {
       if (value.type === 'delete') {
         if (createDeleteChange == null) {
           // TODO: Make better
@@ -198,12 +198,12 @@ class ReadAllStorageCache<Key, Value> extends ReadStorageCache<
         _of(
           ...commonUtils
             .values(this._values)
-            .map(value => (value.type === 'add' ? value.value : null))
+            .map((value) => (value.type === 'add' ? value.value : null))
             .filter(Boolean),
         ),
       ),
       this._readAllStorage.all.pipe(
-        concatMap(value => {
+        concatMap((value) => {
           const trackedChange = this._tryGetTracked(
             this._getKeyFromValue(value),
           );
@@ -261,7 +261,7 @@ class ReadGetAllStorageCache<Key, PartialKey, Value> extends ReadStorageCache<
       const createdValues = commonUtils
         .values(this._values)
         .map(
-          value =>
+          (value) =>
             value.type === 'add' && this._matchesPartialKey(value.value, key)
               ? value.value
               : null,
@@ -270,7 +270,7 @@ class ReadGetAllStorageCache<Key, PartialKey, Value> extends ReadStorageCache<
       return concat(
         _of(...createdValues),
         this._readGetAllStorage.getAll(key).pipe(
-          concatMap(value => {
+          concatMap((value) => {
             const trackedChange = this._tryGetTracked(
               this._getKeyFromValue(value),
             );

@@ -66,7 +66,7 @@ export const getInitialContextAdd = ({
 |}) => {
   const blockIndex = blockchain.currentBlock.index + 1;
   const primaryIndex = blockIndex % validators.length;
-  const myIndex = _.findIndex(validators, validator =>
+  const myIndex = _.findIndex(validators, (validator) =>
     common.ecPointEqual(validator, publicKey),
   );
 
@@ -130,7 +130,7 @@ export const initializeNewConsensus = async ({
   const blockReceivedTimeSeconds = blockchain.currentBlock.timestamp;
   const blockIndex = blockchain.currentBlock.index + 1;
   const primaryIndex = blockIndex % validators.length;
-  const myIndex = _.findIndex(validators, validator =>
+  const myIndex = _.findIndex(validators, (validator) =>
     common.ecPointEqual(validator, publicKey),
   );
 
@@ -206,11 +206,13 @@ export async function checkSignatures<TContext: HeaderContext>({
   node: Node,
   context: TContext,
 |}): Promise<Result<TContext | BlockSentContext>> {
-  const signaturesLength = context.signatures.filter(p => p != null).length;
+  const signaturesLength = context.signatures.filter((p) => p != null).length;
 
   if (
     signaturesLength >= context.M &&
-    context.transactionHashes.every(hash => context.transactions[hash] != null)
+    context.transactionHashes.every(
+      (hash) => context.transactions[hash] != null,
+    )
   ) {
     const publicKeyToSignature = {};
     for (
@@ -234,7 +236,7 @@ export async function checkSignatures<TContext: HeaderContext>({
     );
     const block = context.header.clone({
       transactions: context.transactionHashes.map(
-        hash => context.transactions[hash],
+        (hash) => context.transactions[hash],
       ),
       script,
     });
@@ -273,7 +275,7 @@ export const checkExpectedView = ({
   viewNumber: number,
 |}) =>
   context.viewNumber !== viewNumber &&
-  context.expectedView.filter(p => p === viewNumber).length >= context.M;
+  context.expectedView.filter((p) => p === viewNumber).length >= context.M;
 
 export const initializeConsensusInitial = ({
   blockchain,

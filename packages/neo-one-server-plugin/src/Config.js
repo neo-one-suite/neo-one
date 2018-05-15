@@ -12,7 +12,7 @@ const ajv = new Ajv();
 
 type Event = 'change';
 const watchConfig$ = (file: string): Observable<Event> =>
-  Observable.create(observer => {
+  Observable.create((observer) => {
     const watcher = chokidar.watch(file, { ignoreInitial: false });
     watcher.on('add', () => {
       observer.next('change');
@@ -20,7 +20,7 @@ const watchConfig$ = (file: string): Observable<Event> =>
     watcher.on('change', () => {
       observer.next('change');
     });
-    watcher.on('error', error => {
+    watcher.on('error', (error) => {
       observer.error(error);
     });
     watcher.on('unlink', () => {
@@ -53,10 +53,11 @@ export default class Config<TConfig: Object> {
     this._defaultConfig = defaultConfig;
     this._validateConfig = ajv.compile(schema);
     this.config$ = defer(() => this._getConfig()).pipe(
-      switchMap(config =>
+      switchMap((config) =>
         watchConfig$(this._configPath).pipe(
           mergeScan(
-            prevConfig => defer(() => this._getConfig({ config: prevConfig })),
+            (prevConfig) =>
+              defer(() => this._getConfig({ config: prevConfig })),
             config,
             1,
           ),

@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@neo-one/monitor": "^1.0.0-alpha.25",
-    "rxjs": "^6.0.0",
+    "rxjs": "^6.1.0",
     "uuid": "^3.2.1"
   }
 }

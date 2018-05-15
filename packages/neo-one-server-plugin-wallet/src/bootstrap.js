@@ -278,7 +278,7 @@ async function initializeWallets({
   );
 
   let firstTransferBatch = await Promise.all(
-    firstWalletBatch.map(wallet => createTransfers({ wallet })),
+    firstWalletBatch.map((wallet) => createTransfers({ wallet })),
   );
   firstTransferBatch = _.flatten(firstTransferBatch);
 
@@ -296,13 +296,13 @@ async function initializeWallets({
   const fromWallets = firstWalletBatch.slice(0, secondWalletBatch.length);
 
   const fromAccounts = await Promise.all(
-    fromWallets.map(wallet =>
+    fromWallets.map((wallet) =>
       client.read(networkName).getAccount(wallet.address),
     ),
   );
 
   let secondTransferBatch = await Promise.all(
-    _.zip(secondWalletBatch, fromAccounts).map(transferWallets =>
+    _.zip(secondWalletBatch, fromAccounts).map((transferWallets) =>
       createTransfers({
         wallet: transferWallets[0],
         from: transferWallets[1],
@@ -312,7 +312,7 @@ async function initializeWallets({
   secondTransferBatch = _.zip(secondTransferBatch, fromWallets);
 
   const secondTransactionBatch = await Promise.all(
-    secondTransferBatch.map(transfer =>
+    secondTransferBatch.map((transfer) =>
       client.transfer(transfer[0], {
         from: { network: networkName, address: transfer[1].address },
       }),
@@ -321,7 +321,7 @@ async function initializeWallets({
 
   await Promise.all(
     [developerClient.runConsensusNow()].concat(
-      secondTransactionBatch.map(transaction => transaction.confirmed()),
+      secondTransactionBatch.map((transaction) => transaction.confirmed()),
     ),
   );
 }
@@ -340,14 +340,14 @@ async function initiateClaims({
   provider: NEOONEProvider,
 |}): Promise<void> {
   const unclaimed = await Promise.all(
-    wallets.map(wallet => provider.getUnclaimed(networkName, wallet.address)),
+    wallets.map((wallet) => provider.getUnclaimed(networkName, wallet.address)),
   );
   const unclaimedAccounts = _.zip(wallets, unclaimed)
-    .filter(account => account[1].unclaimed.length > 0)
-    .map(account => account[0]);
+    .filter((account) => account[1].unclaimed.length > 0)
+    .map((account) => account[0]);
 
   const claims = await Promise.all(
-    unclaimedAccounts.map(account =>
+    unclaimedAccounts.map((account) =>
       client.claim({
         from: { network: networkName, address: account.address },
       }),
@@ -355,7 +355,7 @@ async function initiateClaims({
   );
   await Promise.all(
     [developerClient.runConsensusNow()].concat(
-      claims.map(claim => claim.confirmed()),
+      claims.map((claim) => claim.confirmed()),
     ),
   );
 }
@@ -376,7 +376,7 @@ async function setupAssetWallets({
   const startingGAS = 50000;
 
   const transfer = await client.transfer(
-    wallets.map(wallet => ({
+    wallets.map((wallet) => ({
       amount: new BigNumber(startingGAS),
       asset: common.GAS_ASSET_HASH,
       to: wallet.address,
@@ -406,7 +406,7 @@ async function registerAssets({
   developerClient: DeveloperClient,
 |}): Promise<Array<Hash256String>> {
   const assetRegistrations = await Promise.all(
-    _.zip(assets, assetWallets).map(asset =>
+    _.zip(assets, assetWallets).map((asset) =>
       client.registerAsset(
         {
           assetType: asset[0].assetType,
@@ -426,13 +426,13 @@ async function registerAssets({
 
   const promises = await Promise.all(
     [developerClient.runConsensusNow()].concat(
-      assetRegistrations.map(registration => registration.confirmed()),
+      assetRegistrations.map((registration) => registration.confirmed()),
     ),
   );
 
   const registrations = promises.slice(1);
   // $FlowFixMe
-  return registrations.map(registration => registration.result.value.hash);
+  return registrations.map((registration) => registration.result.value.hash);
 }
 
 async function issueAsset({
@@ -499,7 +499,9 @@ async function createAssetTransfer({
   assetWallet: WalletData,
 |}): Promise<Array<TransactionResult<TransactionReceipt>>> {
   const accounts = await Promise.all(
-    wallets.map(wallet => client.read(networkName).getAccount(wallet.address)),
+    wallets.map((wallet) =>
+      client.read(networkName).getAccount(wallet.address),
+    ),
   );
   const assetAccount = await client
     .read(networkName)
@@ -528,7 +530,7 @@ async function createAssetTransfer({
   }
 
   const firstTransfers = await Promise.all(
-    walletTransfers.map(walletTransfer =>
+    walletTransfers.map((walletTransfer) =>
       client.transfer([walletTransfer.transfer], walletTransfer.from),
     ),
   );
@@ -590,7 +592,7 @@ async function getPresetData({
   const hardcodedWallets = _.zip(
     walletNames.slice(0, DEFAULT_PRIVATE_KEYS.length),
     DEFAULT_PRIVATE_KEYS,
-  ).map(walletInfo => ({
+  ).map((walletInfo) => ({
     name: walletInfo[0],
     privateKey: walletInfo[1],
     address: privateKeyToAddress(walletInfo[1]),
@@ -598,7 +600,7 @@ async function getPresetData({
 
   const wallets = walletNames
     .slice(DEFAULT_PRIVATE_KEYS.length)
-    .map(name => {
+    .map((name) => {
       const privateKey = createPrivateKey();
       return {
         name,
@@ -608,7 +610,7 @@ async function getPresetData({
     })
     .concat(hardcodedWallets);
 
-  const assetWallets = assetWalletNames.map(name => {
+  const assetWallets = assetWalletNames.map((name) => {
     const privateKey = createPrivateKey();
     return {
       name,
@@ -669,7 +671,7 @@ async function getNEOONEData({
   });
 
   const wallets = await Promise.all(
-    walletNames.map(walletName =>
+    walletNames.map((walletName) =>
       createWallet({
         walletName,
         networkName: network.name,
@@ -679,7 +681,7 @@ async function getNEOONEData({
   );
 
   const assetWallets = await Promise.all(
-    assetWalletNames.map(walletName =>
+    assetWalletNames.map((walletName) =>
       createWallet({
         walletName,
         networkName: network.name,
@@ -713,7 +715,7 @@ async function addWalletsToKeystore({
     wallets
       .concat([master])
       .concat(assetWallets)
-      .map(wallet =>
+      .map((wallet) =>
         keystore.addAccount({
           network: networkName,
           name: wallet.name,
@@ -733,7 +735,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
       'Bootstraps a private network with the given rpcURL.',
     )
     .option('--testing-only', 'Option to spoof rpc path for testing')
-    .action(async args => {
+    .action(async (args) => {
       const spinner = ora(`Gathering data for bootstrap`).start();
 
       const walletNames = [];
@@ -742,7 +744,9 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         walletNames.push(`wallet-${i}`);
       }
 
-      const assetWalletNames = ASSET_INFO.map(asset => `${asset.name}-wallet`);
+      const assetWalletNames = ASSET_INFO.map(
+        (asset) => `${asset.name}-wallet`,
+      );
 
       try {
         let bootstrapData;
@@ -835,7 +839,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         });
         spinner.succeed();
         const assets = _.zip(ASSET_INFO, assetWallets, assetHashes).map(
-          asset => ({
+          (asset) => ({
             ...asset[0],
             wallet: asset[1],
             hash: asset[2],
@@ -843,7 +847,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         );
         spinner.start('Issuing assets');
         const issues = await Promise.all(
-          assets.map(asset =>
+          assets.map((asset) =>
             issueAsset({
               wallets,
               networkName: network.name,
@@ -855,14 +859,14 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
 
         await Promise.all(
           [developerClient.runConsensusNow()].concat(
-            issues.map(issue => issue.confirmed()),
+            issues.map((issue) => issue.confirmed()),
           ),
         );
         spinner.succeed();
 
         spinner.start('Distributing assets');
         const assetTransfers = await Promise.all(
-          assets.map(asset =>
+          assets.map((asset) =>
             createAssetTransfer({
               wallets,
               assetHash: asset.hash,
@@ -875,7 +879,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
 
         await Promise.all(
           [developerClient.runConsensusNow()].concat(
-            _.flatten(assetTransfers).map(transfer => transfer.confirmed()),
+            _.flatten(assetTransfers).map((transfer) => transfer.confirmed()),
           ),
         );
         spinner.succeed();

@@ -227,7 +227,7 @@ export default class LocalUserAccountProvider<
     } = this._getTransactionOptions(options);
 
     return this._capture(
-      async span => {
+      async (span) => {
         const { inputs, outputs } = await this._getTransfersInputOutputs({
           transfers,
           from,
@@ -273,7 +273,7 @@ export default class LocalUserAccountProvider<
     } = this._getTransactionOptions(options);
 
     return this._capture(
-      async span => {
+      async (span) => {
         const [{ unclaimed, amount }, { inputs, outputs }] = await Promise.all([
           this.provider.getUnclaimed(from.network, from.address, span),
           this._getTransfersInputOutputs({
@@ -333,7 +333,7 @@ export default class LocalUserAccountProvider<
     }
     const contract = new ContractModel({
       script: Buffer.from(contractIn.script, 'hex'),
-      parameterList: contractIn.parameters.map(parameter =>
+      parameterList: contractIn.parameters.map((parameter) =>
         toContractParameterType(assertContractParameterTypeJSON(parameter)),
       ),
       returnType: toContractParameterType(
@@ -453,7 +453,7 @@ export default class LocalUserAccountProvider<
     } = this._getTransactionOptions(options);
 
     return this._capture(
-      async span => {
+      async (span) => {
         const settings = await this.provider.getNetworkSettings(
           from.network,
           span,
@@ -470,7 +470,7 @@ export default class LocalUserAccountProvider<
         }
 
         const issueOutputs = outputs.concat(
-          transfers.map(transfer => ({
+          transfers.map((transfer) => ({
             address: transfer.to,
             asset: transfer.asset,
             value: transfer.amount,
@@ -576,7 +576,7 @@ export default class LocalUserAccountProvider<
     } = this._getTransactionOptions(options);
 
     return this._capture(
-      async span => {
+      async (span) => {
         const transfers = (options || {}).transfers || [];
         const { inputs, outputs } = await this._getTransfersInputOutputs({
           transfers,
@@ -659,6 +659,7 @@ export default class LocalUserAccountProvider<
     return {
       state: result.state,
       gasConsumed: result.gasConsumed,
+      gasCost: result.gasCost,
       message: result.message,
     };
   }
@@ -670,6 +671,7 @@ export default class LocalUserAccountProvider<
     return {
       state: result.state,
       gasConsumed: result.gasConsumed,
+      gasCost: result.gasCost,
       value,
     };
   }
@@ -701,7 +703,7 @@ export default class LocalUserAccountProvider<
     } = this._getTransactionOptions(options);
 
     return this._capture(
-      async span => {
+      async (span) => {
         const transfers = (options || {}).transfers || [];
         const {
           inputs: testInputs,
@@ -737,10 +739,14 @@ export default class LocalUserAccountProvider<
         if (result.state === 'FAULT') {
           throw new InvokeError(result.message);
         }
+
+        // TODO: This seems strange, why do InvocationTransactions require
+        //       gas to be an integer?
+        const gas = result.gasConsumed.integerValue(BigNumber.ROUND_UP);
         const { inputs, outputs } = await this._getTransfersInputOutputs({
           transfers,
           from,
-          gas: networkFee.plus(result.gasConsumed),
+          gas: networkFee.plus(gas),
           monitor: span,
         });
 
@@ -749,7 +755,7 @@ export default class LocalUserAccountProvider<
           inputs: this._convertInputs(inputs),
           outputs: this._convertOutputs(outputs),
           attributes: this._convertAttributes(attributes),
-          gas: clientUtils.bigNumberToBN(result.gasConsumed, 8),
+          gas: clientUtils.bigNumberToBN(gas, 8),
           script,
           scripts,
         });
@@ -798,7 +804,7 @@ export default class LocalUserAccountProvider<
     monitor?: Monitor,
   |}): Promise<TransactionResult<T>> {
     return this._capture(
-      async span => {
+      async (span) => {
         let transactionUnsigned = transactionUnsignedIn;
         const scriptHash = addressToScriptHash(from.address);
         if (
@@ -888,9 +894,9 @@ export default class LocalUserAccountProvider<
   |}): TransactionModel {
     // $FlowFixMe
     const scriptAttributes = (transaction.attributes.filter(
-      attribute => attribute.usage === ATTRIBUTE_USAGE.SCRIPT,
+      (attribute) => attribute.usage === ATTRIBUTE_USAGE.SCRIPT,
     ): Array<UInt160Attribute>);
-    const scriptHashes = scriptAttributes.map(attribute =>
+    const scriptHashes = scriptAttributes.map((attribute) =>
       common.uInt160ToString(attribute.value),
     );
 
@@ -916,8 +922,8 @@ export default class LocalUserAccountProvider<
       return transaction.clone({
         scripts: _.sortBy(
           [[scriptHash, witness], [otherHash, otherScript]],
-          value => value[0],
-        ).map(value => value[1]),
+          (value) => value[0],
+        ).map((value) => value[1]),
       });
     } else if (
       scriptHashes.length === 0 ||
@@ -944,7 +950,7 @@ export default class LocalUserAccountProvider<
     gas: BigNumber,
     monitor?: Monitor,
   |}): Promise<{| outputs: Array<Output>, inputs: Array<Input> |}> {
-    const transfers = (transfersIn.map(transfer => ({
+    const transfers = (transfersIn.map((transfer) => ({
       to: transfer.to,
       asset: transfer.asset,
       amount: transfer.amount,
@@ -1002,7 +1008,7 @@ export default class LocalUserAccountProvider<
             {
               remaining: utils.ZERO_BIG_NUMBER,
               remainingOutputs: allOutputs.filter(
-                output => output.asset === asset,
+                (output) => output.asset === asset,
               ),
               inputs: ([]: Array<Input>),
               outputs: ([]: Array<Output>),
@@ -1132,7 +1138,7 @@ export default class LocalUserAccountProvider<
     }
 
     if (Array.isArray(param)) {
-      return param.map(value => this._paramToJSON(value));
+      return param.map((value) => this._paramToJSON(value));
     }
 
     if (BigNumber.isBigNumber(param)) {
@@ -1143,15 +1149,15 @@ export default class LocalUserAccountProvider<
   }
 
   _convertAttributes(attributes: Array<Attribute>): Array<AttributeModel> {
-    return attributes.map(attribute => converters.attribute(attribute));
+    return attributes.map((attribute) => converters.attribute(attribute));
   }
 
   _convertInputs(inputs: Array<Input>): Array<InputModel> {
-    return inputs.map(input => converters.input(input));
+    return inputs.map((input) => converters.input(input));
   }
 
   _convertOutputs(outputs: Array<Output>): Array<OutputModel> {
-    return outputs.map(output => converters.output(output));
+    return outputs.map((output) => converters.output(output));
   }
 
   _convertWitness(script: Witness): WitnessModel {

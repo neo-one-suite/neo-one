@@ -101,7 +101,7 @@ export default class Block extends BlockBase
       merkleRoot:
         merkleRoot ||
         MerkleTree.computeRoot(
-          transactions.map(transaction => transaction.hash),
+          transactions.map((transaction) => transaction.hash),
         ),
       timestamp,
       index,
@@ -116,7 +116,7 @@ export default class Block extends BlockBase
         super.size +
         IOHelper.sizeOfArray(
           this.transactions,
-          transaction => transaction.size,
+          (transaction) => transaction.size,
         ),
     );
   }
@@ -172,7 +172,7 @@ export default class Block extends BlockBase
     transactions: Array<Transaction>,
   ): Promise<BN> {
     const fees = await Promise.all(
-      transactions.map(transaction => transaction.getNetworkFee(context)),
+      transactions.map((transaction) => transaction.getNetworkFee(context)),
     );
     return fees.reduce((acc, fee) => acc.add(fee), utils.ZERO);
   }
@@ -192,7 +192,7 @@ export default class Block extends BlockBase
       this.transactions[0].type !== TRANSACTION_TYPE.MINER ||
       this.transactions
         .slice(1)
-        .some(transaction => transaction.type === TRANSACTION_TYPE.MINER)
+        .some((transaction) => transaction.type === TRANSACTION_TYPE.MINER)
     ) {
       throw new VerifyError('Invalid miner transaction in block.');
     }
@@ -262,7 +262,7 @@ export default class Block extends BlockBase
 
   async _verifyTransactions(options: BlockVerifyOptions): Promise<void> {
     await Promise.all(
-      this.transactions.map(transaction =>
+      this.transactions.map((transaction) =>
         transaction.verify({
           isSpent: options.isSpent,
           getAsset: options.getAsset,
@@ -291,7 +291,7 @@ export default class Block extends BlockBase
       registerValidatorFee: options.registerValidatorFee,
     });
     const minerTransaction = this.transactions.find(
-      transaction => transaction.type === TRANSACTION_TYPE.MINER,
+      (transaction) => transaction.type === TRANSACTION_TYPE.MINER,
     );
     if (minerTransaction == null) {
       throw new VerifyError('Missing miner transaction');
@@ -309,7 +309,7 @@ export default class Block extends BlockBase
 
   serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
-    writer.writeArray(this.transactions, transaction =>
+    writer.writeArray(this.transactions, (transaction) =>
       transaction.serializeWireBase(writer),
     );
   }
@@ -326,7 +326,7 @@ export default class Block extends BlockBase
     }
 
     const merkleRoot = MerkleTree.computeRoot(
-      transactions.map(transaction => transaction.hash),
+      transactions.map((transaction) => transaction.hash),
     );
     if (!common.uInt256Equal(merkleRoot, blockBase.merkleRoot)) {
       throw new InvalidFormatError();
@@ -367,7 +367,7 @@ export default class Block extends BlockBase
       script: blockBaseJSON.script,
       tx: await Promise.all(
         this.transactions.map(
-          transaction => (transaction.serializeJSON(context): $FlowFixMe),
+          (transaction) => (transaction.serializeJSON(context): $FlowFixMe),
         ),
       ),
       size: blockBaseJSON.size,

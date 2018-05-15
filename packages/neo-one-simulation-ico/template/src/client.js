@@ -13,9 +13,9 @@ export const getClient = () =>
     ],
   });
 
-export const setupClient = async client => {
+export const setupClient = async (client) => {
   await Promise.all(
-    Object.keys(config.wallets).map(async name => {
+    Object.keys(config.wallets).map(async (name) => {
       const wallet = config.wallets[name];
       await client.userAccountProvider.keystore.addAccount({
         network,
@@ -26,7 +26,7 @@ export const setupClient = async client => {
   );
 };
 
-export const getContracts = client => {
+export const getContracts = (client) => {
   const contracts = {};
   for (const name of Object.keys(config.deployedContracts)) {
     contracts[name] = client.smartContract(

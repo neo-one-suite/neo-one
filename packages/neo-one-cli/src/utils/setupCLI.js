@@ -29,7 +29,7 @@ export default ({
   const shutdownFuncs = [() => cleanup()];
 
   const initiateShutdown = async () => {
-    await Promise.all(shutdownFuncs.map(func => func()));
+    await Promise.all(shutdownFuncs.map((func) => func()));
     await finalize.wait();
   };
 
@@ -68,7 +68,7 @@ export default ({
     }
   };
 
-  process.on('unhandledRejection', error => {
+  process.on('unhandledRejection', (error) => {
     monitor.logError({
       name: 'unhandled_rejection',
       message: 'Unhandled rejection. Shutting down.',
@@ -77,7 +77,7 @@ export default ({
     shutdown({ exitCode: 1, error });
   });
 
-  process.on('uncaughtException', error => {
+  process.on('uncaughtException', (error) => {
     monitor.logError({
       name: 'uncaught_exception',
       message: 'Uncaught exception. Shutting down.',

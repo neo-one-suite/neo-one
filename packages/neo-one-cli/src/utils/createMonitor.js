@@ -36,7 +36,7 @@ export default ({
           ]
         : [],
   });
-  logger.on('error', error => {
+  logger.on('error', (error) => {
     // eslint-disable-next-line
     console.error(error);
   });
@@ -68,7 +68,7 @@ export default ({
         };
         const numFlushes = logger.transports.length;
         let numFlushed = 0;
-        logger.transports.forEach(transport => {
+        logger.transports.forEach((transport) => {
           transport.once('finish', () => {
             numFlushed += 1;
             if (numFlushes === numFlushed) {
@@ -110,7 +110,7 @@ export default ({
             );
           }
         })
-        .catch(error => {
+        .catch((error) => {
           monitor.logError({
             name: 'log_create_directory_error',
             message: 'Failed to create log directory',

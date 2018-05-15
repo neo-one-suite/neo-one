@@ -53,7 +53,7 @@ export default class BufferAttribute extends AttributeBase<
 
   equals: Equals = utils.equals(
     BufferAttribute,
-    other => this.usage === other.usage && this.value.equals(other.value),
+    (other) => this.usage === other.usage && this.value.equals(other.value),
   );
 
   serializeWireBase(writer: BinaryWriter): void {

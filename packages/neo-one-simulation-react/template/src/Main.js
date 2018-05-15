@@ -14,7 +14,7 @@ export default class Main extends Component {
     receipt: null,
   };
 
-  _handleSubmit = event => {
+  _handleSubmit = (event) => {
     event.preventDefault();
     if (this.state.invoking) {
       return;
@@ -23,17 +23,17 @@ export default class Main extends Component {
     this.setState({ invoking: true });
     this.context.contracts.hello_world
       .hello(this.state.value)
-      .then(result =>
-        result.confirmed().then(receipt => {
+      .then((result) =>
+        result.confirmed().then((receipt) => {
           this.setState({ receipt, invoking: false });
         }),
       )
-      .catch(error => {
+      .catch((error) => {
         this.setState({ error, invoking: false });
       });
   };
 
-  _handleChange = event => {
+  _handleChange = (event) => {
     this.setState({ value: event.target.value });
   };
 

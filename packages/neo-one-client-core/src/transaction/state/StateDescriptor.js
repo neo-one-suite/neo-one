@@ -79,7 +79,7 @@ export default class StateDescriptor
       case 0x40:
         return utils.ZERO;
       case 0x48:
-        if (this.value.some(byte => byte !== 0)) {
+        if (this.value.some((byte) => byte !== 0)) {
           return context.registerValidatorFee;
         }
 
@@ -228,10 +228,10 @@ export default class StateDescriptor
 
       const validatorPublicKeysSet = new Set(
         validators
-          .filter(validator => validator.registered)
-          .map(validator => validator.publicKey)
+          .filter((validator) => validator.registered)
+          .map((validator) => validator.publicKey)
           .concat(options.standbyValidators)
-          .map(key => common.ecPointToHex(key)),
+          .map((key) => common.ecPointToHex(key)),
       );
 
       for (const publicKey of publicKeys) {

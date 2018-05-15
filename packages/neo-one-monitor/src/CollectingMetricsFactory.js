@@ -58,8 +58,8 @@ export class CollectingMetricsFactory extends MetricsFactoryProxy {
 
   collect(): MetricCollection {
     const currentMetrics = this._serializeJSON();
-    utils.values(this._counters).forEach(metric => metric.reset());
-    utils.values(this._histograms).forEach(metric => metric.reset());
+    utils.values(this._counters).forEach((metric) => metric.reset());
+    utils.values(this._histograms).forEach((metric) => metric.reset());
 
     return currentMetrics;
   }
@@ -71,7 +71,7 @@ export class CollectingMetricsFactory extends MetricsFactoryProxy {
     return this._initializeMetric(
       new CounterProxy(counter, options.labelNames),
       options,
-      metric => metric.inc(0),
+      (metric) => metric.inc(0),
       (metric, labels) => metric.inc(labels, 0),
     );
   }
@@ -88,7 +88,7 @@ export class CollectingMetricsFactory extends MetricsFactoryProxy {
     return this._initializeMetric(
       new HistogramProxy(histogram, options.labelNames),
       options,
-      metric => metric.observe(0),
+      (metric) => metric.observe(0),
       (metric, labels) => metric.observe(labels, 0),
     );
   }

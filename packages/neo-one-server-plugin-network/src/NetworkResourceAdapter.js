@@ -94,16 +94,16 @@ export default class NetworkResourceAdapter {
     this._state = 'stopped';
 
     this.resource$ = this._nodes$.pipe(
-      switchMap(nodes =>
+      switchMap((nodes) =>
         combineLatest(
           timer(0, 2500),
-          combineLatest(nodes.map(node => node.node$)),
+          combineLatest(nodes.map((node) => node.node$)),
         ).pipe(
           // eslint-disable-next-line
           concatMap(async ([time, currentNodes]) => {
             const readyNode =
-              currentNodes.find(node => node.ready) ||
-              currentNodes.find(node => node.live) ||
+              currentNodes.find((node) => node.ready) ||
+              currentNodes.find((node) => node.live) ||
               currentNodes[0];
             let height = null;
             let peers = null;
@@ -150,14 +150,14 @@ export default class NetworkResourceAdapter {
     const staticOptions = this._getStaticOptions(options);
     const files = await fs.readdir(staticOptions.nodesOptionsPath);
     const nodeOptionss = await Promise.all(
-      files.map(file =>
+      files.map((file) =>
         this._readNodeOptions(
           staticOptions,
           path.resolve(staticOptions.nodesOptionsPath, file),
         ),
       ),
     );
-    const nodes = nodeOptionss.map(nodeOptions =>
+    const nodes = nodeOptionss.map((nodeOptions) =>
       this._createNodeAdapter(staticOptions, nodeOptions),
     );
 
@@ -220,7 +220,7 @@ export default class NetworkResourceAdapter {
       settings,
       options,
     }));
-    const nodeOptionsAndNodes = nodeOptionss.map(nodeOptions => [
+    const nodeOptionsAndNodes = nodeOptionss.map((nodeOptions) => [
       nodeOptions,
       this._createNodeAdapter(staticOptions, nodeOptions),
     ]);
@@ -236,7 +236,7 @@ export default class NetworkResourceAdapter {
           nodesPath: staticOptions.nodesPath,
           nodesOptionsPath: staticOptions.nodesOptionsPath,
           type: nodeSettings[0][1].type,
-          nodes: nodeOptionsAndNodes.map(value => value[1]),
+          nodes: nodeOptionsAndNodes.map((value) => value[1]),
         }),
         dependencies: [],
       },
@@ -303,7 +303,7 @@ export default class NetworkResourceAdapter {
           title: 'Start nodes',
           task: () =>
             new TaskList({
-              tasks: this._nodes.map(node => ({
+              tasks: this._nodes.map((node) => ({
                 title: `Start node ${node.name}`,
                 task: async () => {
                   await node.start();
@@ -324,7 +324,7 @@ export default class NetworkResourceAdapter {
           title: 'Stop nodes',
           task: () =>
             new TaskList({
-              tasks: this._nodes.map(node => ({
+              tasks: this._nodes.map((node) => ({
                 title: `Stop node ${node.name}`,
                 task: async () => {
                   await node.stop();
@@ -364,7 +364,7 @@ export default class NetworkResourceAdapter {
         { type: 'tcp', host: 'seed3.neo.org', port: 10333 },
         { type: 'tcp', host: 'seed4.neo.org', port: 10333 },
         { type: 'tcp', host: 'seed5.neo.org', port: 10333 },
-      ].map(seed => createEndpoint(seed)),
+      ].map((seed) => createEndpoint(seed)),
       rpcEndpoints: [
         'http://seed1.cityofzion.io:8080',
         'http://seed2.cityofzion.io:8080',
@@ -403,7 +403,7 @@ export default class NetworkResourceAdapter {
         { type: 'tcp', host: 'seed3.neo.org', port: 20333 },
         { type: 'tcp', host: 'seed4.neo.org', port: 20333 },
         { type: 'tcp', host: 'seed5.neo.org', port: 20333 },
-      ].map(seed => createEndpoint(seed)),
+      ].map((seed) => createEndpoint(seed)),
       rpcEndpoints: [
         'http://test1.cityofzion.io:8880',
         'http://test2.cityofzion.io:8880',
@@ -429,7 +429,7 @@ export default class NetworkResourceAdapter {
     const primaryAddress = common.uInt160ToString(
       crypto.privateKeyToScriptHash(primaryPrivateKey),
     );
-    const configuration = _.range(0, 1).map(idx => {
+    const configuration = _.range(0, 1).map((idx) => {
       const { privateKey, publicKey } = crypto.createKeyPair();
       const name = `${options.name}-${idx}`;
       return {
@@ -446,7 +446,7 @@ export default class NetworkResourceAdapter {
       common.ecPointToString(publicKey),
     );
 
-    return configuration.map(config => {
+    return configuration.map((config) => {
       const {
         name,
         rpcPort,
@@ -475,7 +475,7 @@ export default class NetworkResourceAdapter {
             privateNet: true,
           },
         },
-        seeds: otherConfiguration.map(otherConfig =>
+        seeds: otherConfiguration.map((otherConfig) =>
           createEndpoint({
             type: 'tcp',
             host: 'localhost',
@@ -483,7 +483,7 @@ export default class NetworkResourceAdapter {
           }),
         ),
         rpcEndpoints: otherConfiguration.map(
-          otherConfig => `http://localhost:${otherConfig.rpcPort}/rpc`,
+          (otherConfig) => `http://localhost:${otherConfig.rpcPort}/rpc`,
         ),
       };
 
@@ -609,7 +609,7 @@ export default class NetworkResourceAdapter {
         'Nodes',
         {
           type: 'describe',
-          table: this._nodes.map(node => [
+          table: this._nodes.map((node) => [
             node.name,
             { type: 'describe', table: node.getDebug() },
           ]),

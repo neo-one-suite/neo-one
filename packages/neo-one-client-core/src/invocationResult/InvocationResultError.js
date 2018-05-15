@@ -18,6 +18,7 @@ import utils, { type BinaryWriter, IOHelper, JSONHelper } from '../utils';
 
 export type InvocationResultErrorAdd = {|
   gasConsumed: BN,
+  gasCost: BN,
   stack: Array<ContractParameter>,
   message: string,
 |};
@@ -25,6 +26,7 @@ export type InvocationResultErrorAdd = {|
 export type InvocationResultErrorJSON = {|
   state: VMStateFault,
   gas_consumed: string,
+  gas_cost: string,
   stack: Array<ContractParameterJSON>,
   message: string,
 |};
@@ -36,8 +38,13 @@ export default class InvocationResultError extends InvocationResultBase
   message: string;
   __size: () => number;
 
-  constructor({ gasConsumed, stack, message }: InvocationResultErrorAdd) {
-    super({ state: VM_STATE.FAULT, gasConsumed, stack });
+  constructor({
+    gasConsumed,
+    gasCost,
+    stack,
+    message,
+  }: InvocationResultErrorAdd) {
+    super({ state: VM_STATE.FAULT, gasConsumed, gasCost, stack });
     this.message = message;
     this.__size = utils.lazy(
       () => super.size + IOHelper.sizeOfVarString(this.message),
@@ -58,20 +65,22 @@ export default class InvocationResultError extends InvocationResultBase
     const {
       state,
       gasConsumed,
+      gasCost,
       stack,
     } = super.deserializeInvocationResultWireBase(options);
     if (state !== VM_STATE.FAULT) {
       throw new InvalidFormatError();
     }
     const message = reader.readVarString(MAX_SIZE);
-    return new this({ gasConsumed, stack, message });
+    return new this({ gasConsumed, gasCost, stack, message });
   }
 
   serializeJSON(context: SerializeJSONContext): InvocationResultErrorJSON {
     return {
       state: VM_STATE.FAULT,
       gas_consumed: JSONHelper.writeFixed8(this.gasConsumed),
-      stack: this.stack.map(value => value.serializeJSON(context)),
+      gas_cost: JSONHelper.writeFixed8(this.gasCost),
+      stack: this.stack.map((value) => value.serializeJSON(context)),
       message: this.message,
     };
   }

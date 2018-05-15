@@ -38,6 +38,6 @@
     "@neo-one/monitor": "^1.0.0-alpha.25",
     "@neo-one/utils": "^1.0.0-alpha.30",
     "bn.js": "^4.11.8",
-    "rxjs": "^6.0.0"
+    "rxjs": "^6.1.0"
   }
 }

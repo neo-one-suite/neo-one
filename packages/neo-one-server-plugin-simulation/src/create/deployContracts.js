@@ -22,7 +22,7 @@ export default {
     }
 
     return new TaskList({
-      tasks: deployContracts.map(contract => ({
+      tasks: deployContracts.map((contract) => ({
         title: `Deploy ${contract.baseName}`,
         task: () => {
           ctx.dependencies.push({

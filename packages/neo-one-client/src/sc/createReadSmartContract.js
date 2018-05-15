@@ -82,7 +82,7 @@ export default ({
   const iterActionsRaw = (filterIn?: BlockFilter): AsyncIterable<ActionRaw> => {
     const blockFilter = filterIn || {};
     return AsyncIterableX.from(client._iterActionsRaw(blockFilter)).pipe(
-      filter(action => action.scriptHash === hash),
+      filter((action) => action.scriptHash === hash),
     );
   };
 
@@ -94,7 +94,7 @@ export default ({
 
   const iterEvents = (actionFilter?: BlockFilter): AsyncIterable<Event> =>
     AsyncIterableX.from(iterActions(actionFilter)).pipe(
-      map(action => {
+      map((action) => {
         if (action.type === 'Log') {
           return (null: $FlowFixMe);
         }
@@ -106,7 +106,7 @@ export default ({
 
   const iterLogs = (actionFilter?: BlockFilter): AsyncIterable<Log> =>
     AsyncIterableX.from(iterActions(actionFilter)).pipe(
-      map(action => {
+      map((action) => {
         if (action.type === 'Event') {
           return (null: $FlowFixMe);
         }
@@ -127,7 +127,7 @@ export default ({
     iterStorage,
     convertAction,
   };
-  abi.functions.forEach(func => {
+  abi.functions.forEach((func) => {
     if (func.constant) {
       smartContract[func.name] = createCall({ client, hash, func });
     }

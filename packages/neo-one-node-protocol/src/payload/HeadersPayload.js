@@ -23,7 +23,9 @@ export default class HeadersPayload
   }
 
   serializeWireBase(writer: BinaryWriter): void {
-    writer.writeArray(this.headers, header => header.serializeWireBase(writer));
+    writer.writeArray(this.headers, (header) =>
+      header.serializeWireBase(writer),
+    );
   }
 
   serializeWire: SerializeWire = createSerializeWire(

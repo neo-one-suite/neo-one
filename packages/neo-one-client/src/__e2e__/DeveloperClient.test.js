@@ -54,7 +54,7 @@ async function getWalletInfo({
 
 async function setupNetwork(networkName: string): Promise<string> {
   await one.execute(`create network ${networkName}`);
-  await new Promise(resolve => setTimeout(() => resolve(), 10000));
+  await new Promise((resolve) => setTimeout(() => resolve(), 10000));
   const output = await one.execute(`describe network ${networkName} --json`);
 
   const description = one.parseJSON(output);
@@ -179,10 +179,10 @@ async function getBlockTimes({
   const blockCount = await client.read(networkName).getBlockCount();
   const indices = _.range(1, blockCount);
   const blocks = await Promise.all(
-    indices.map(i => client.read(networkName).getBlock(i)),
+    indices.map((i) => client.read(networkName).getBlock(i)),
   );
 
-  return blocks.map(block => block.time);
+  return blocks.map((block) => block.time);
 }
 
 describe('DeverloperClient', () => {
@@ -215,7 +215,7 @@ describe('DeverloperClient', () => {
     const wallet = await addWallet({ walletName, keystore, networkName });
 
     await developerClient.updateSettings({ secondsPerBlock: 1 });
-    await new Promise(resolve => setTimeout(() => resolve(), 15000));
+    await new Promise((resolve) => setTimeout(() => resolve(), 15000));
     const transaction = await setupTransaction({ client, master, wallet });
 
     await confirmTransaction(transaction);
@@ -231,10 +231,10 @@ describe('DeverloperClient', () => {
     const { developerClient, client } = await setupClients(networkName);
 
     await developerClient.updateSettings({ secondsPerBlock });
-    await new Promise(resolve => setTimeout(() => resolve(), 15000));
+    await new Promise((resolve) => setTimeout(() => resolve(), 15000));
 
     await developerClient.fastForwardOffset(offsetSeconds);
-    await new Promise(resolve => setTimeout(() => resolve(), 2000));
+    await new Promise((resolve) => setTimeout(() => resolve(), 2000));
 
     const times = await getBlockTimes({ client, networkName });
 
@@ -257,15 +257,15 @@ describe('DeverloperClient', () => {
     const { developerClient, client } = await setupClients(networkName);
 
     await developerClient.updateSettings({ secondsPerBlock });
-    await new Promise(resolve => setTimeout(() => resolve(), 15000));
+    await new Promise((resolve) => setTimeout(() => resolve(), 15000));
 
     const time = utils.nowSeconds() + offset;
     await developerClient.fastForwardToTime(time);
-    await new Promise(resolve => setTimeout(() => resolve(), 2000));
+    await new Promise((resolve) => setTimeout(() => resolve(), 2000));
 
     const times = await getBlockTimes({ client, networkName });
 
-    const timeFound = times.find(blockTime => blockTime >= time);
+    const timeFound = times.find((blockTime) => blockTime >= time);
 
     expect(timeFound).toBeDefined();
   });

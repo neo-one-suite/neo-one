@@ -122,7 +122,7 @@ export default ({
       await storage.close();
     },
     async commit(changeSet: ChangeSet): Promise<void> {
-      const changesList = changeSet.map(change => convertChange(change));
+      const changesList = changeSet.map((change) => convertChange(change));
       for (const changes of changesList) {
         for (const change of changes) {
           switch (change.type) {

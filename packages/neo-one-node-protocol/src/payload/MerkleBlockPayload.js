@@ -70,7 +70,7 @@ export default class MerkleBlockPayload extends BlockBase
   serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
     writer.writeVarUIntLE(this.transactionCount);
-    writer.writeArray(this.hashes, hash => {
+    writer.writeArray(this.hashes, (hash) => {
       writer.writeUInt256(hash);
     });
     writer.writeVarBytesLE(this.flags);

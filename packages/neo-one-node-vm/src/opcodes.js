@@ -48,6 +48,7 @@ import {
   PushOnlyError,
   SubstrNegativeEndError,
   SubstrNegativeStartError,
+  StackUnderflowError,
   ThrowError,
   UnknownOpError,
   XDropNegativeError,
@@ -195,7 +196,7 @@ const jump = ({ name, checkTrue }: {| name: OpCode, checkTrue?: boolean |}) =>
   });
 
 const isDynamic = (hash: UInt160) =>
-  common.uInt160ToBuffer(hash).every(value => value === 0);
+  common.uInt160ToBuffer(hash).every((value) => value === 0);
 
 const call = ({ name, tailCall }: {| name: OpCode, tailCall?: boolean |}) => ({
   context: contextIn,
@@ -287,7 +288,7 @@ const OPCODE_PAIRS = [
   ],
 ]
   .concat(
-    _.range(0x01, 0x4c).map(idx => [
+    _.range(0x01, 0x4c).map((idx) => [
       idx,
       createOp({
         name: (`PUSHBYTES${idx}`: $FlowFixMe),
@@ -313,7 +314,7 @@ const OPCODE_PAIRS = [
     [0x4f, pushNumber({ name: 'PUSHM1', value: -1 })],
   ])
   .concat(
-    _.range(0x51, 0x61).map(idx => {
+    _.range(0x51, 0x61).map((idx) => {
       const value = idx - 0x50;
       return [idx, pushNumber({ name: (`PUSH${value}`: $FlowFixMe), value })];
     }),
@@ -572,6 +573,14 @@ const OPCODE_PAIRS = [
           if (n < 0) {
             throw new PickNegativeError(context);
           }
+          if (n >= context.stack.length) {
+            throw new StackUnderflowError(
+              context,
+              'PICK',
+              context.stack.length,
+              n + 1,
+            );
+          }
 
           return { context, results: [context.stack[n]] };
         },
@@ -588,6 +597,14 @@ const OPCODE_PAIRS = [
           const n = vmUtils.toNumber(context, args[0].asBigInteger());
           if (n < 0) {
             throw new RollNegativeError(context);
+          }
+          if (n >= context.stack.length) {
+            throw new StackUnderflowError(
+              context,
+              'ROLL',
+              context.stack.length,
+              n + 1,
+            );
           }
 
           const { stack } = context;
@@ -1377,18 +1394,24 @@ const OPCODE_PAIRS = [
             let publicKeys;
             if (args[0].isArray()) {
               index = 1;
-              publicKeys = args[0].asArray().map(value => value.asECPoint());
+              publicKeys = args[0].asArray().map((value) => value.asECPoint());
             } else {
               const count = vmUtils.toNumber(context, args[0].asBigInteger());
               index = 1 + count;
-              publicKeys = args.slice(1, index).map(value => value.asECPoint());
+              publicKeys = args
+                .slice(1, index)
+                .map((value) => value.asECPoint());
             }
 
             let signatures;
             if (args[index].isArray()) {
-              signatures = args[index].asArray().map(value => value.asBuffer());
+              signatures = args[index]
+                .asArray()
+                .map((value) => value.asBuffer());
             } else {
-              signatures = args.slice(index + 1).map(value => value.asBuffer());
+              signatures = args
+                .slice(index + 1)
+                .map((value) => value.asBuffer());
             }
 
             if (
@@ -1641,7 +1664,7 @@ const OPCODE_PAIRS = [
             const index = args[0].asBigInteger().toNumber();
             const value = args[1].asArray();
             if (index < 0 || index >= value.length) {
-              throw new InvalidRemoveIndexError(context);
+              throw new InvalidRemoveIndexError(context, index);
             }
             value.splice(index, 1);
 

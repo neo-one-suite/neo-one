@@ -53,7 +53,7 @@ const params = {
     }
     const { value } = parameter;
     const checker = params[value.type];
-    return param.map(val => checker(val, (value: $FlowFixMe)));
+    return param.map((val) => checker(val, (value: $FlowFixMe)));
   },
   InteropInterface: (
     param: ?Param,

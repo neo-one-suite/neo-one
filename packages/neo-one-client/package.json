@@ -42,13 +42,13 @@
     "@neo-one/monitor": "^1.0.0-alpha.25",
     "@neo-one/node-neo-settings": "^1.0.0-alpha.34",
     "@neo-one/utils": "^1.0.0-alpha.30",
-    "bignumber.js": "^6.0.0",
+    "bignumber.js": "^7.0.1",
     "bn.js": "^4.11.8",
     "dataloader": "^1.4.0",
     "fast-stable-stringify": "^1.0.0",
     "isomorphic-fetch": "^2.2.1",
     "ix": "^2.3.5",
     "lodash": "^4.17.5",
-    "rxjs": "^6.0.0"
+    "rxjs": "^6.1.0"
   }
 }

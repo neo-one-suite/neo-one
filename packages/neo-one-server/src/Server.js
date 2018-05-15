@@ -72,13 +72,13 @@ export default class Server {
     serverConfig: Config<ServerConfig>,
   |}): Observable<Server> {
     const dataPath$ = serverConfig.config$.pipe(
-      map(config => config.paths.data),
+      map((config) => config.paths.data),
       distinctUntilChanged(),
     );
     const portAllocator$ = combineLatest(
       dataPath$,
       serverConfig.config$.pipe(
-        map(config => config.ports),
+        map((config) => config.ports),
         distinctUntilChanged(),
       ),
     ).pipe(
@@ -125,7 +125,7 @@ export default class Server {
 
   start$(): Observable<void> {
     return this.serverConfig.config$.pipe(
-      map(config => config.server),
+      map((config) => config.server),
       distinctUntilChanged(),
       mergeScan(
         (prevApp, serverConfig) =>
@@ -146,7 +146,7 @@ export default class Server {
                 throw new ServerRunningError(pid);
               }
             } else {
-              await prevApp.close().catch(error => {
+              await prevApp.close().catch((error) => {
                 this._monitor.logError({
                   name: 'grpc_app_close_error',
                   message: 'Failed to close previous app',
@@ -185,7 +185,7 @@ export default class Server {
         undefined,
         1,
       ),
-      finalize(async app => {
+      finalize(async (app) => {
         if (app != null) {
           await app.close();
         }

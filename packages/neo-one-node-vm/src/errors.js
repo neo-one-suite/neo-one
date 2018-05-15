@@ -10,7 +10,7 @@ export class VMError extends CustomError {
 
   constructor(context: ExecutionContext, message: string) {
     const debug = disassembleByteCode(context.code).join('\n');
-    const stack = context.stack.map(item => item.toString()).join('\n');
+    const stack = context.stack.map((item) => item.toString()).join('\n');
     const { pc } = context;
     super(`${message}\nPC: ${pc}\nCode:\n${debug}\nStack:\n${stack}`);
   }
@@ -212,8 +212,8 @@ export class InvalidPickItemKeyError extends VMError {
 }
 
 export class InvalidRemoveIndexError extends VMError {
-  constructor(context: ExecutionContext) {
-    super(context, 'Invalid REMOVE Index');
+  constructor(context: ExecutionContext, index: number) {
+    super(context, `Invalid REMOVE Index: ${index}`);
   }
 }
 

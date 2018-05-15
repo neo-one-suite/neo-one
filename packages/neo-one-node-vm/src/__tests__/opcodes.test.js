@@ -135,7 +135,7 @@ const OPCODES = ([
   },
 ]
   .concat(
-    _.range(0x01, 0x4c).map(idx => ({
+    _.range(0x01, 0x4c).map((idx) => ({
       op: (`PUSHBYTES${idx}`: $FlowFixMe),
       buffer: Buffer.alloc(idx, 10),
       result: [new BufferStackItem(Buffer.alloc(idx, 10))],

@@ -47,7 +47,7 @@ class BlockTransform extends Transform {
         new BinaryReader(this.buffer),
       );
       this.buffer = remainingBuffer;
-      blocks.reverse().forEach(block => this.push((block: $FlowFixMe)));
+      blocks.reverse().forEach((block) => this.push((block: $FlowFixMe)));
       callback(null);
     } catch (error) {
       callback(error);
@@ -100,7 +100,7 @@ const getCount = async (stream: Readable): Promise<number> => {
   let count = stream.read(4);
   while (count == null) {
     // eslint-disable-next-line
-    await new Promise(resolve => setTimeout(() => resolve(), 250));
+    await new Promise((resolve) => setTimeout(() => resolve(), 250));
     count = stream.read(4);
   }
 
@@ -154,7 +154,7 @@ export const loadChain = async ({
     let start = Date.now();
     let paused = false;
     const trackIndex = blockchain.currentBlockIndex;
-    transform.on('data', block => {
+    transform.on('data', (block) => {
       pending += 1;
       blockchain
         .persistBlock({ block, unsafe: true })
@@ -193,7 +193,7 @@ export const loadChain = async ({
     });
 
     getCount(stream)
-      .then(count => {
+      .then((count) => {
         if (count > blockchain.currentBlockIndex) {
           stream.pipe(transform);
         } else {
@@ -216,16 +216,16 @@ const writeOut = async (
   for (const chunk of _.chunk(_.range(0, height), 10000)) {
     // eslint-disable-next-line
     const blocks = await Promise.all(
-      chunk.map(index => blockchain.block.get({ hashOrIndex: index })),
+      chunk.map((index) => blockchain.block.get({ hashOrIndex: index })),
     );
     for (const block of blocks) {
       const buffer = block.serializeWire();
       const length = Buffer.alloc(4, 0);
       length.writeInt32LE(buffer.length, 0);
       // eslint-disable-next-line
-      await new Promise(resolve => out.write(length, () => resolve()));
+      await new Promise((resolve) => out.write(length, () => resolve()));
       // eslint-disable-next-line
-      await new Promise(resolve => out.write(buffer, () => resolve()));
+      await new Promise((resolve) => out.write(buffer, () => resolve()));
       processed += 1;
       if (processed >= 100000) {
         // eslint-disable-next-line

@@ -84,7 +84,7 @@ const defaultConfig = (dataPath: string) => ({
           { type: 'tcp', host: 'seed3.neo.org', port: 10333 },
           { type: 'tcp', host: 'seed4.neo.org', port: 10333 },
           { type: 'tcp', host: 'seed5.neo.org', port: 10333 },
-        ].map(seed => createEndpoint(seed)),
+        ].map((seed) => createEndpoint(seed)),
       },
       rpcURLs: DEFAULT_RPC_URLS,
     },

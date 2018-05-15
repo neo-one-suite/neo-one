@@ -103,7 +103,7 @@ export function createAll<Value>({
       gte: minKey,
       lte: maxKey,
     }),
-  ).pipe(map(value => deserializeValue(value)));
+  ).pipe(map((value) => deserializeValue(value)));
 }
 
 export function createReadAllStorage<Key, Value>({

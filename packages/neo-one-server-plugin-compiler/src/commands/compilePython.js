@@ -10,7 +10,7 @@ export default ({ vorpal, shutdown, logConfig$ }: CLIArgs) => {
       'compile python <file> <output>',
       'Compile Python code into a smart contract. Expects a py file.',
     )
-    .action(async args => {
+    .action(async (args) => {
       const { file, output } = args;
 
       logConfig$.next({

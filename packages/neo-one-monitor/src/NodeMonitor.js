@@ -75,7 +75,7 @@ export default class NodeMonitor extends MonitorBase {
     app.silent = true;
 
     const monitor = this.at('telemetry');
-    app.on('error', error => {
+    app.on('error', (error) => {
       monitor.logError({
         name: 'http_server_request_uncaught_error',
         message: 'Unexpected uncaught request error.',
@@ -96,7 +96,7 @@ export default class NodeMonitor extends MonitorBase {
     clearInterval(prom.collectDefaultMetrics());
     await Promise.all([
       super._closeInternal(),
-      new Promise(resolve => {
+      new Promise((resolve) => {
         if (this._server == null) {
           resolve();
         } else {

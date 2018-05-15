@@ -370,9 +370,9 @@ const compareKeys = (a: KeyPair, b: KeyPair): number => {
 
 const sortKeys = (publicKeys: Array<ECPoint>): Array<ECPoint> =>
   publicKeys
-    .map(publicKey => ec.keyFromPublic(publicKey))
+    .map((publicKey) => ec.keyFromPublic(publicKey))
     .sort(compareKeys)
-    .map(keyPair => toECPointFromKeyPair(keyPair));
+    .map((keyPair) => toECPointFromKeyPair(keyPair));
 
 const createMultiSignatureVerificationScript = (
   mIn: number,

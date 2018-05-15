@@ -5,7 +5,7 @@ import * as React from 'react';
 import { withStyles } from 'material-ui';
 
 // eslint-disable-next-line
-const styles = theme => ({});
+const styles = (theme) => ({});
 
 type ExternalProps = {|
   className?: string,

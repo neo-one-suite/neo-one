@@ -142,7 +142,7 @@ class TaskWrapper {
         if (result instanceof Observable) {
           await result
             .pipe(
-              map(message => {
+              map((message) => {
                 status = { ...status, message };
                 this.status$.next(status);
               }),
@@ -156,7 +156,7 @@ class TaskWrapper {
           result._run(ctx);
           const finalSubtasks = await result.status$
             .pipe(
-              map(subtasks => {
+              map((subtasks) => {
                 status = { ...status, subtasks };
                 this.status$.next(status);
                 return subtasks;
@@ -215,7 +215,7 @@ export default class TaskList {
   }: TaskListOptions) {
     const collapse = collapseIn == null ? true : collapseIn;
     this._tasks = tasks.map(
-      task =>
+      (task) =>
         new TaskWrapper({
           task,
           taskList: this,
@@ -277,13 +277,13 @@ export default class TaskList {
     }
     this._checkAll(ctx);
 
-    this._subscription = combineLatest(this._tasks.map(task => task.status$))
-      .pipe(map(statuses => statuses.filter(Boolean)))
+    this._subscription = combineLatest(this._tasks.map((task) => task.status$))
+      .pipe(map((statuses) => statuses.filter(Boolean)))
       .subscribe(this._status$);
 
     await this._runTasks(ctx);
     const err = getTasksError(
-      this._tasks.map(task => task.status$.getValue()).filter(Boolean),
+      this._tasks.map((task) => task.status$.getValue()).filter(Boolean),
     );
     if (err == null) {
       this._onComplete();
@@ -293,7 +293,7 @@ export default class TaskList {
 
   async _runTasks(ctx: TaskContext): Promise<void> {
     if (this._concurrent) {
-      await Promise.all(this._tasks.map(task => task.run(ctx)));
+      await Promise.all(this._tasks.map((task) => task.run(ctx)));
     } else {
       let error;
       for (const task of this._tasks) {
@@ -310,6 +310,6 @@ export default class TaskList {
   }
 
   _checkAll(ctx: TaskContext): void {
-    this._tasks.forEach(task => task.check(ctx));
+    this._tasks.forEach((task) => task.check(ctx));
   }
 }

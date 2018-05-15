@@ -19,6 +19,6 @@ export default ({
     binary.firstArgs.concat(['compile', 'csharp', scPath, avmPath]),
   )
     .then(() => ({}: $FlowFixMe))
-    .catch(error => {
+    .catch((error) => {
       throw new Error(`C# compilation failed: ${error.stdout}`);
     });

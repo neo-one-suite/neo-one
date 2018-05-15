@@ -19,11 +19,11 @@ import type Server from '../Server';
 import pkg from '../../package.json';
 
 const makeObservable = (ctx: Context): Observable<*> =>
-  Observable.create(observer => {
-    ctx.req.on('data', value => {
+  Observable.create((observer) => {
+    ctx.req.on('data', (value) => {
       observer.next(value);
     });
-    ctx.req.on('error', error => {
+    ctx.req.on('error', (error) => {
       observer.error(error);
     });
     ctx.req.on('end', () => {
@@ -93,7 +93,7 @@ export default ({ server }: {| server: Server |}) => {
             case 'start':
               if (observable$ == null) {
                 observable$ = createObservable$(request).pipe(
-                  map(response => ({ type: 'response', response })),
+                  map((response) => ({ type: 'response', response })),
                 );
               }
               return observable$;
@@ -107,7 +107,7 @@ export default ({ server }: {| server: Server |}) => {
               });
           }
         }),
-        catchError(error =>
+        catchError((error) =>
           _of({
             type: 'error',
             code:
@@ -144,29 +144,29 @@ export default ({ server }: {| server: Server |}) => {
     },
     getPlugins: async (ctx: Context) => {
       await handleRead(ctx, () =>
-        server.pluginManager.plugins$.pipe(map(plugin => ({ plugin }))),
+        server.pluginManager.plugins$.pipe(map((plugin) => ({ plugin }))),
       );
     },
     getAllResources: async (ctx: Context) => {
       await handleRead(ctx, () =>
         server.pluginManager.allResources$.pipe(
-          map(value => ({ resources: JSON.stringify(value) })),
+          map((value) => ({ resources: JSON.stringify(value) })),
         ),
       );
     },
     getResources: async (ctx: Context) => {
-      await handleRead(ctx, request =>
+      await handleRead(ctx, (request) =>
         server.pluginManager
           .getResourcesManager({
             plugin: request.plugin,
             resourceType: request.resourceType,
           })
           .getResources$(JSON.parse(request.options))
-          .pipe(map(value => ({ resources: JSON.stringify(value) }))),
+          .pipe(map((value) => ({ resources: JSON.stringify(value) }))),
       );
     },
     getResource: async (ctx: Context) => {
-      await handleRead(ctx, request =>
+      await handleRead(ctx, (request) =>
         server.pluginManager
           .getResourcesManager({
             plugin: request.plugin,
@@ -177,7 +177,7 @@ export default ({ server }: {| server: Server |}) => {
             options: JSON.parse(request.options),
           })
           .pipe(
-            map(value => ({
+            map((value) => ({
               resource: value == null ? value : JSON.stringify(value),
             })),
           ),

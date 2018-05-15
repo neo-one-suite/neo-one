@@ -38,7 +38,7 @@ const instrumentFetch = (
       [labels.JSONRPC_TYPE]: type,
     })
     .captureSpanLog(
-      async span => {
+      async (span) => {
         span.inject(monitor.formats.HTTP, headers);
         let status = -1;
         try {
@@ -54,7 +54,7 @@ const instrumentFetch = (
         level: { log: 'verbose', span: 'info' },
         references: (monitors || [])
           .slice(1)
-          .map(parent => monitor.childOf(parent)),
+          .map((parent) => monitor.childOf(parent)),
         trace: true,
       },
     );
@@ -71,9 +71,9 @@ const request = async ({
   timeoutMS: number,
   tries: number,
 |}) => {
-  const monitors = requests.map(req => req.monitor).filter(Boolean);
+  const monitors = requests.map((req) => req.monitor).filter(Boolean);
   const monitor = monitors[0];
-  const body = JSON.stringify(requests.map(req => req.request));
+  const body = JSON.stringify(requests.map((req) => req.request));
 
   let tries = triesIn;
   let parseErrorTries = 3;
@@ -83,7 +83,7 @@ const request = async ({
     try {
       // eslint-disable-next-line
       const response = await instrumentFetch(
-        headers =>
+        (headers) =>
           fetch(endpoint, {
             method: 'POST',
             headers,
@@ -153,7 +153,7 @@ const watchSingle = async ({
   monitor?: Monitor,
 |}) => {
   const response = await instrumentFetch(
-    headers =>
+    (headers) =>
       fetch(endpoint, {
         method: 'POST',
         headers,
@@ -199,7 +199,7 @@ export default class JSONRPCHTTPProvider implements JSONRPCProvider {
   constructor(endpoint: string) {
     this.endpoint = endpoint;
     this.batcher = new DataLoader(
-      async requests => {
+      async (requests) => {
         this.batcher.clearAll();
         const result = await request({
           endpoint,
@@ -225,7 +225,7 @@ export default class JSONRPCHTTPProvider implements JSONRPCProvider {
           [monitor.labels.RPC_METHOD]: req.method,
           [monitor.labels.SPAN_KIND]: 'client',
         })
-        .captureSpanLog(span => this._request(req, span), {
+        .captureSpanLog((span) => this._request(req, span), {
           name: 'jsonrpc_client_request',
           level: { log: 'verbose', span: 'info' },
           error: { level: 'verbose' },

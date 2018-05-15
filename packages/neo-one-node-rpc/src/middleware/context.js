@@ -23,7 +23,7 @@ export default ({ monitor }: {| monitor: Monitor |}) => async (
   next: () => Promise<void>,
 ) => {
   await monitor.forContext(ctx).captureSpanLog(
-    async span => {
+    async (span) => {
       try {
         ctx.state.monitor = span;
         await next();

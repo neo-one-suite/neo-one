@@ -96,7 +96,7 @@ const RPC_METHODS = {
 };
 
 const rpcLabelNames = [LABELS.RPC_METHOD];
-const rpcLabels = utils.values(RPC_METHODS).map(method => ({
+const rpcLabels = utils.values(RPC_METHODS).map((method) => ({
   [LABELS.RPC_METHOD]: method,
 }));
 const SINGLE_REQUESTS_HISTOGRAM = metrics.createHistogram({
@@ -137,7 +137,7 @@ const jsonrpc = (handlers: Handlers): Middleware => {
     requestIn: any,
   ) =>
     monitor.captureSpanLog(
-      async span => {
+      async (span) => {
         let request;
         try {
           request = validateRequest(ctx, requestIn);
@@ -187,7 +187,7 @@ const jsonrpc = (handlers: Handlers): Middleware => {
   const handleRequest = (monitor: Monitor, ctx: Context, request: mixed) => {
     if (Array.isArray(request)) {
       return Promise.all(
-        request.map(batchRequest =>
+        request.map((batchRequest) =>
           handleSingleRequest(monitor, ctx, batchRequest),
         ),
       );
@@ -203,7 +203,7 @@ const jsonrpc = (handlers: Handlers): Middleware => {
   ): Promise<Object | Array<any>> => {
     try {
       const result = await monitor.captureSpanLog(
-        span => handleRequest(span, ctx, request),
+        (span) => handleRequest(span, ctx, request),
         {
           name: 'http_jsonrpc_server_request',
           level: { log: 'verbose', span: 'info' },
@@ -256,7 +256,7 @@ const jsonrpc = (handlers: Handlers): Middleware => {
 
 const getTransactionReceipt = (value: Block, hash: string) => {
   const transactionIndex = value.transactions
-    .map(transaction => transaction.hashHex)
+    .map((transaction) => transaction.hashHex)
     .indexOf(hash);
   if (transactionIndex === -1) {
     return null;
@@ -283,7 +283,7 @@ export default ({
   };
 
   const handlers = {
-    [RPC_METHODS.getaccountstate]: async args => {
+    [RPC_METHODS.getaccountstate]: async (args) => {
       const hash = crypto.addressToScriptHash({
         addressVersion: blockchain.settings.addressVersion,
         address: args[0],
@@ -295,7 +295,7 @@ export default ({
 
       return account.serializeJSON(blockchain.serializeJSONContext);
     },
-    [RPC_METHODS.getassetstate]: async args => {
+    [RPC_METHODS.getassetstate]: async (args) => {
       const asset = await blockchain.asset.tryGet({
         hash: JSONHelper.readUInt256(args[0]),
       });
@@ -308,7 +308,7 @@ export default ({
     },
     [RPC_METHODS.getbestblockhash]: async () =>
       JSONHelper.writeUInt256(blockchain.currentBlock.hash),
-    [RPC_METHODS.getblock]: async args => {
+    [RPC_METHODS.getblock]: async (args) => {
       let hashOrIndex = args[0];
       if (typeof args[0] === 'string') {
         hashOrIndex = JSONHelper.readUInt256(args[0]);
@@ -332,7 +332,7 @@ export default ({
           block = await blockchain.block$
             .pipe(
               filter(
-                value => value.hashHex === args[0] || value.index === args[0],
+                (value) => value.hashHex === args[0] || value.index === args[0],
               ),
               take(1),
               timeout(new Date(Date.now() + watchTimeoutMS)),
@@ -351,13 +351,13 @@ export default ({
       return block.serializeWire().toString('hex');
     },
     [RPC_METHODS.getblockcount]: async () => blockchain.currentBlockIndex + 1,
-    [RPC_METHODS.getblockhash]: async args => {
+    [RPC_METHODS.getblockhash]: async (args) => {
       const height = args[0];
       checkHeight(height);
       const block = await blockchain.block.get({ hashOrIndex: height });
       return JSONHelper.writeUInt256(block.hash);
     },
-    [RPC_METHODS.getblocksysfee]: async args => {
+    [RPC_METHODS.getblocksysfee]: async (args) => {
       const height = args[0];
       checkHeight(height);
       const header = await blockchain.header.get({ hashOrIndex: height });
@@ -367,7 +367,7 @@ export default ({
       return blockSystemFee.systemFee.toString(10);
     },
     [RPC_METHODS.getconnectioncount]: async () => node.connectedPeers.length,
-    [RPC_METHODS.getcontractstate]: async args => {
+    [RPC_METHODS.getcontractstate]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
       const contract = await blockchain.contract.tryGet({ hash });
       if (contract == null) {
@@ -379,8 +379,8 @@ export default ({
     [RPC_METHODS.getrawmempool]: async () =>
       utils
         .values(node.memPool)
-        .map(transaction => JSONHelper.writeUInt256(transaction.hash)),
-    [RPC_METHODS.getrawtransaction]: async args => {
+        .map((transaction) => JSONHelper.writeUInt256(transaction.hash)),
+    [RPC_METHODS.getrawtransaction]: async (args) => {
       const hash = JSONHelper.readUInt256(args[0]);
 
       let transaction = node.memPool[common.uInt256ToHex(hash)];
@@ -400,13 +400,13 @@ export default ({
 
       return transaction.serializeWire().toString('hex');
     },
-    [RPC_METHODS.getstorage]: async args => {
+    [RPC_METHODS.getstorage]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
       const key = Buffer.from(args[1], 'hex');
       const item = await blockchain.storageItem.tryGet({ hash, key });
       return item == null ? null : item.value.toString('hex');
     },
-    [RPC_METHODS.gettxout]: async args => {
+    [RPC_METHODS.gettxout]: async (args) => {
       const hash = JSONHelper.readUInt256(args[0]);
       const index = args[1];
       const [output, spentCoins] = await Promise.all([
@@ -428,18 +428,18 @@ export default ({
       // TODO: Implement me
       throw new JSONRPCError(-101, 'Not implemented');
     },
-    [RPC_METHODS.invokescript]: async args => {
+    [RPC_METHODS.invokescript]: async (args) => {
       const script = JSONHelper.readBuffer(args[0]);
       const result = await blockchain.invokeScript(script);
       return result.serializeJSON(blockchain.serializeJSONContext);
     },
-    [RPC_METHODS.sendrawtransaction]: async args => {
+    [RPC_METHODS.sendrawtransaction]: async (args) => {
       const transaction = deserializeTransactionWire({
         context: blockchain.deserializeWireContext,
         buffer: JSONHelper.readBuffer(args[0]),
       });
       try {
-        await node.relayTransaction(transaction);
+        await node.relayTransaction(transaction, true);
         return true;
       } catch (error) {
         return false;
@@ -449,7 +449,7 @@ export default ({
       // TODO: Implement me
       throw new JSONRPCError(-101, 'Not implemented');
     },
-    [RPC_METHODS.validateaddress]: async args => {
+    [RPC_METHODS.validateaddress]: async (args) => {
       let scriptHash;
       try {
         scriptHash = crypto.addressToScriptHash({
@@ -463,13 +463,13 @@ export default ({
       return { address: args[0], isvalid: scriptHash != null };
     },
     [RPC_METHODS.getpeers]: async () => ({
-      connected: node.connectedPeers.map(endpoint => {
+      connected: node.connectedPeers.map((endpoint) => {
         const { host, port } = getEndpointConfig(endpoint);
         return { address: host, port };
       }),
     }),
     // Extended
-    [RPC_METHODS.relaytransaction]: async args => {
+    [RPC_METHODS.relaytransaction]: async (args) => {
       const transaction = deserializeTransactionWire({
         context: blockchain.deserializeWireContext,
         buffer: JSONHelper.readBuffer(args[0]),
@@ -477,7 +477,7 @@ export default ({
       try {
         const [transactionJSON] = await Promise.all([
           transaction.serializeJSON(blockchain.serializeJSONContext),
-          node.relayTransaction(transaction),
+          node.relayTransaction(transaction, true),
         ]);
         return transactionJSON;
       } catch (error) {
@@ -487,7 +487,7 @@ export default ({
         );
       }
     },
-    [RPC_METHODS.getoutput]: async args => {
+    [RPC_METHODS.getoutput]: async (args) => {
       const hash = JSONHelper.readUInt256(args[0]);
       const index = args[1];
       const output = await blockchain.output.tryGet({ hash, index });
@@ -497,7 +497,7 @@ export default ({
 
       return output.serializeJSON(blockchain.serializeJSONContext, index);
     },
-    [RPC_METHODS.getclaimamount]: async args => {
+    [RPC_METHODS.getclaimamount]: async (args) => {
       const hash = JSONHelper.readUInt256(args[0]);
       const index = args[1];
       try {
@@ -512,17 +512,17 @@ export default ({
         throw new JSONRPCError(-102, error.message);
       }
     },
-    [RPC_METHODS.getallstorage]: async args => {
+    [RPC_METHODS.getallstorage]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
       const items = await blockchain.storageItem
         .getAll({ hash })
         .pipe(toArray())
         .toPromise();
-      return items.map(item =>
+      return items.map((item) =>
         item.serializeJSON(blockchain.serializeJSONContext),
       );
     },
-    [RPC_METHODS.testinvocation]: async args => {
+    [RPC_METHODS.testinvocation]: async (args) => {
       const transaction = deserializeTransactionWire({
         context: blockchain.deserializeWireContext,
         buffer: JSONHelper.readBuffer(args[0]),
@@ -534,7 +534,7 @@ export default ({
 
       throw new JSONRPCError(-103, 'Invalid InvocationTransaction');
     },
-    [RPC_METHODS.gettransactionreceipt]: async args => {
+    [RPC_METHODS.gettransactionreceipt]: async (args) => {
       const spentCoins = await blockchain.transactionSpentCoins.tryGet({
         hash: JSONHelper.readUInt256(args[0]),
       });
@@ -551,14 +551,18 @@ export default ({
           throw new JSONRPCError(-100, 'Unknown transaction');
         }
 
-        result = await blockchain.block$
-          .pipe(
-            map(value => getTransactionReceipt(value, args[0])),
-            filter(receipt => receipt != null),
-            take(1),
-            timeout(new Date(Date.now() + watchTimeoutMS)),
-          )
-          .toPromise();
+        try {
+          result = await blockchain.block$
+            .pipe(
+              map((value) => getTransactionReceipt(value, args[0])),
+              filter((receipt) => receipt != null),
+              take(1),
+              timeout(new Date(Date.now() + watchTimeoutMS)),
+            )
+            .toPromise();
+        } catch (error) {
+          throw new JSONRPCError(-100, 'Unknown transaction');
+        }
       } else {
         const block = await blockchain.block.get({
           hashOrIndex: spentCoins.startHeight,
@@ -568,7 +572,7 @@ export default ({
 
       return result;
     },
-    [RPC_METHODS.getinvocationdata]: async args => {
+    [RPC_METHODS.getinvocationdata]: async (args) => {
       const transaction = await blockchain.transaction.get({
         hash: JSONHelper.readUInt256(args[0]),
       });
@@ -586,7 +590,7 @@ export default ({
       const validators = await blockchain.validator.all
         .pipe(toArray())
         .toPromise();
-      return validators.map(validator =>
+      return validators.map((validator) =>
         validator.serializeJSON(blockchain.serializeJSONContext),
       );
     },
@@ -606,7 +610,7 @@ export default ({
       }
       return true;
     },
-    [RPC_METHODS.updatesettings]: async args => {
+    [RPC_METHODS.updatesettings]: async (args) => {
       const { settings } = blockchain;
       const newSettings = {
         ...settings,
@@ -616,7 +620,7 @@ export default ({
       blockchain.updateSettings(newSettings);
       return true;
     },
-    [RPC_METHODS.fastforwardoffset]: async args => {
+    [RPC_METHODS.fastforwardoffset]: async (args) => {
       if (node.consensus) {
         await node.consensus.fastForwardOffset(args[0]);
       } else {
@@ -625,7 +629,7 @@ export default ({
 
       return true;
     },
-    [RPC_METHODS.fastforwardtotime]: async args => {
+    [RPC_METHODS.fastforwardtotime]: async (args) => {
       if (node.consensus != null) {
         await node.consensus.fastForwardToTime(args[0]);
       } else {

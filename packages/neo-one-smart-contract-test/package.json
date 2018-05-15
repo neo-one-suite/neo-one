@@ -1,0 +1,45 @@
+{
+  "name": "@neo-one/smart-contract-test",
+  "version": "1.0.0-alpha.2",
+  "keywords": [
+    "neo",
+    "NEO",
+    "one",
+    "ONE",
+    "blockchain",
+    "neo-one",
+    "neo-one-suite",
+    "neo one",
+    "neo one suite",
+    "NEO ONE",
+    "NEO ONE suite",
+    "NEO•ONE",
+    "NEO•ONE suite",
+    "neo blockchain",
+    "NEO Blockchain",
+    "NEO blockchain",
+    "dapp",
+    "dapps"
+  ],
+  "description": "NEO•ONE TypeScript smart contract unit testing.",
+  "repository": "https://github.com/neo-one-suite/neo-one",
+  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.es.js",
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@neo-one/client": "^1.0.0-alpha.47",
+    "@neo-one/node": "^1.0.0-alpha.65",
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.2",
+    "@neo-one/utils": "^1.0.0-alpha.30",
+    "lodash": "^4.17.5",
+    "memdown": "^2.0.0",
+    "ts-simple-ast": "^11.2.0"
+  }
+}

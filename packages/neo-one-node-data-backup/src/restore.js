@@ -48,7 +48,7 @@ export default async ({
   }
 
   await monitor.captureSpanLog(
-    async span => {
+    async (span) => {
       await Promise.all([fs.remove(dataPath), fs.remove(tmpPath)]);
       await Promise.all([
         fs.ensureDir(tmpPath),

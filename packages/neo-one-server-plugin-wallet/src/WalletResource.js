@@ -38,7 +38,7 @@ const getRPCURL = (network?: ?Network): ?string => {
   }
 
   if (network.state === 'started') {
-    const readyNode = network.nodes.find(node => node.ready);
+    const readyNode = network.nodes.find((node) => node.ready);
     if (readyNode != null) {
       return readyNode.rpcAddress;
     }
@@ -99,7 +99,7 @@ const getNetwork$ = ({
     });
 
   return network$.pipe(
-    map(network => (network == null ? network : (network: $FlowFixMe))),
+    map((network) => (network == null ? network : (network: $FlowFixMe))),
   );
 };
 
@@ -206,7 +206,7 @@ export default class WalletResource {
 
     this._network$ = getNetwork$({ pluginManager, networkName });
     this.resource$ = combineLatest(this._network$, timer(0, 5000)).pipe(
-      concatMap(async value => {
+      concatMap(async (value) => {
         await this._update(value[0]);
         return this._toResource();
       }),
@@ -328,7 +328,7 @@ export default class WalletResource {
   }
 
   async _update(network?: ?Network): Promise<void> {
-    if (network != null && network.nodes.some(node => node.ready)) {
+    if (network != null && network.nodes.some((node) => node.ready)) {
       this._readClient = updateClient({
         networkName: this._networkName,
         network,

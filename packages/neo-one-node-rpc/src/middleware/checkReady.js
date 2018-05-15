@@ -17,7 +17,7 @@ const fetchCount = async (
     })
     .withData({ [monitor.labels.HTTP_URL]: endpoint })
     .captureSpanLog(
-      async span => {
+      async (span) => {
         let status = -1;
         let response;
         try {
@@ -74,9 +74,9 @@ const fetchTallestBlockIndex = async (
     _.take(
       _.shuffle(rpcEndpoints),
       checkEndpoints == null ? CHECK_ENDPOINTS : checkEndpoints,
-    ).map(rpcEndpoint => fetchCount(monitor, rpcEndpoint, timeoutMS)),
+    ).map((rpcEndpoint) => fetchCount(monitor, rpcEndpoint, timeoutMS)),
   );
-  return _.max(counts.filter(Boolean).map(count => count - 1));
+  return _.max(counts.filter(Boolean).map((count) => count - 1));
 };
 
 export type Options = {|

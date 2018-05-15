@@ -113,7 +113,7 @@ export default class PortAllocator {
     this._ports = filteredPorts;
     this._currentPort = maxPort === -1 ? portMin : maxPort + 1;
     this._availablePorts = _.range(portMin, this._currentPort).filter(
-      port => !allPorts.has(port),
+      (port) => !allPorts.has(port),
     );
     this._config = config;
 

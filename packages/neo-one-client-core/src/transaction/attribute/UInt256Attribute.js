@@ -48,7 +48,7 @@ export default class UInt256Attribute extends AttributeBase<
 
   equals: Equals = utils.equals(
     UInt256Attribute,
-    other =>
+    (other) =>
       this.usage === other.usage &&
       common.uInt256Equal(this.value, other.value),
   );

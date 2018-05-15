@@ -133,7 +133,7 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
       .then(() => {
         this._fetching = false;
       })
-      .catch(error => {
+      .catch((error) => {
         this._fetching = false;
         this._error(error);
       });
@@ -170,10 +170,10 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
       for (const chunk of _.chunk(_.range(0, toFetch), this._batchSize)) {
         // eslint-disable-next-line
         const blocks = await Promise.all(
-          chunk.map(offset => this._fetchOne(index + offset, true)),
+          chunk.map((offset) => this._fetchOne(index + offset, true)),
         );
         this._currentIndex += chunk.length;
-        blocks.forEach(block => this._write(block));
+        blocks.forEach((block) => this._write(block));
       }
     }
   }

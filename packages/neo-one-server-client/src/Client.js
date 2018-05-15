@@ -38,7 +38,7 @@ export default class Client {
 
   async wait(timeout: number): Promise<void> {
     await new Promise((resolve, reject) => {
-      this._client.waitForReady(Date.now() + timeout, error => {
+      this._client.waitForReady(Date.now() + timeout, (error) => {
         if (error) {
           reject(error);
         } else {
@@ -56,12 +56,12 @@ export default class Client {
     return this._unary(
       this._client.getVersion,
       {},
-      response => response.version,
+      (response) => response.version,
     );
   }
 
   getDebug(): Promise<DescribeTable> {
-    return this._unary(this._client.getDebug, {}, response =>
+    return this._unary(this._client.getDebug, {}, (response) =>
       JSON.parse(response.debug),
     );
   }
@@ -70,19 +70,19 @@ export default class Client {
     return this._unary(
       this._client.getAllPlugins,
       {},
-      response => response.plugins,
+      (response) => response.plugins,
     );
   }
 
   getPlugins$(): Observable<string> {
     return this._makeReadObservable(this._client.getPlugins()).pipe(
-      map(response => response.plugin),
+      map((response) => response.plugin),
     );
   }
 
   getAllResources$(): Observable<AllResources> {
     return this._makeReadObservable(this._client.getAllResources()).pipe(
-      map(response => JSON.parse(response.resources)),
+      map((response) => JSON.parse(response.resources)),
     );
   }
 
@@ -99,7 +99,7 @@ export default class Client {
       plugin,
       resourceType,
       options: JSON.stringify(options),
-    }).pipe(map(response => JSON.parse(response.resources)));
+    }).pipe(map((response) => JSON.parse(response.resources)));
   }
 
   getResource$({
@@ -120,7 +120,7 @@ export default class Client {
       options: JSON.stringify(options),
     }).pipe(
       map(
-        response =>
+        (response) =>
           response.resource === '' || response.resource == null
             ? null
             : JSON.parse(response.resource),
@@ -305,7 +305,7 @@ export default class Client {
         options: JSON.stringify(options),
       },
       cancel$,
-    ).pipe(map(response => ({ tasks: JSON.parse(response.tasks) })));
+    ).pipe(map((response) => ({ tasks: JSON.parse(response.tasks) })));
   }
 
   _makeCancellable(
@@ -347,8 +347,8 @@ export default class Client {
         subscription.unsubscribe();
       };
     }).pipe(
-      filter(response => response.type !== 'aborted'),
-      map(response => {
+      filter((response) => response.type !== 'aborted'),
+      map((response) => {
         if (response.type === 'error') {
           throw new ReadError(response.code, response.message);
         }
@@ -359,11 +359,11 @@ export default class Client {
   }
 
   _makeObservable(call: any, start?: () => () => void): Observable<any> {
-    return Observable.create(observer => {
-      call.on('data', value => {
+    return Observable.create((observer) => {
+      call.on('data', (value) => {
         observer.next(value);
       });
-      call.on('error', error => {
+      call.on('error', (error) => {
         observer.error(error);
       });
       call.on('end', () => {

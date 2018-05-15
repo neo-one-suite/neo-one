@@ -48,11 +48,11 @@ describe('LocalKeyStore', () => {
   const store = {
     type: 'test',
     getWallets: () => Promise.resolve(wallets),
-    saveWallet: wallet => {
+    saveWallet: (wallet) => {
       wallets.push(wallet);
       return Promise.resolve();
     },
-    deleteWallet: wallet => {
+    deleteWallet: (wallet) => {
       wallets.splice(wallets.indexOf(wallet), 1);
       return Promise.resolve();
     },

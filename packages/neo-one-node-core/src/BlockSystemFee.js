@@ -46,7 +46,7 @@ export default class BlockSystemFee
     return this.__size();
   }
 
-  equals: Equals = utils.equals(BlockSystemFee, other =>
+  equals: Equals = utils.equals(BlockSystemFee, (other) =>
     common.uInt256Equal(this.hash, other.hash),
   );
 

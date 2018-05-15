@@ -88,7 +88,7 @@ export default class StackItemBase implements Equatable {
   }
 
   asBoolean(): boolean {
-    return this.asBuffer().some(value => value !== 0);
+    return this.asBuffer().some((value) => value !== 0);
   }
 
   asUInt160(): UInt160 {
@@ -194,6 +194,10 @@ export default class StackItemBase implements Equatable {
   }
 
   toString(): string {
+    return JSON.stringify(this.toJSON());
+  }
+
+  toJSON(): any {
     try {
       return this.asBuffer().toString('hex');
     } catch (error) {

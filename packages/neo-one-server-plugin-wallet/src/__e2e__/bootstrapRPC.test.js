@@ -24,7 +24,7 @@ describe('bootstrap with rpc', () => {
     await one.execute(`bootstrap --rpc ${rpcURL} --testing-only`);
 
     const accounts = await Promise.all(
-      PRIVATE_KEYS.map(key =>
+      PRIVATE_KEYS.map((key) =>
         provider.read(network).getAccount(privateKeyToAddress(key)),
       ),
     );
@@ -34,7 +34,7 @@ describe('bootstrap with rpc', () => {
       expect(Object.keys(account.balances).length).toBeGreaterThanOrEqual(2);
       if (Object.keys(account.balances).length > 2) {
         const accountAssets = Object.keys(account.balances).slice(2);
-        accountAssets.forEach(asset => {
+        accountAssets.forEach((asset) => {
           if (!assets.includes(asset)) {
             assets.push(asset);
           }
@@ -56,7 +56,7 @@ describe('bootstrap with rpc', () => {
       blockIndicies.push(i);
     }
     const blocks = await Promise.all(
-      blockIndicies.map(index => provider.read(network).getBlock(index)),
+      blockIndicies.map((index) => provider.read(network).getBlock(index)),
     );
     const transactionCount = blocks.reduce(
       (acc, block) => acc + block.transactions.length,

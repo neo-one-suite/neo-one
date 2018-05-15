@@ -44,11 +44,14 @@ jobs:
           name: Prettier
           command: yarn nit
       - run:
-          name: ESLint
+          name: Lint
           command: yarn lint
       - run:
           name: Flow
           command: yarn flow
+      - run:
+          name: Typescript
+          command: yarn tsc
       - run:
           name: Test
           command: yarn test-ci

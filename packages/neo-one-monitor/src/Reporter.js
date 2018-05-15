@@ -46,7 +46,7 @@ export default class Reporter {
     this._subscription = interval(timer)
       .pipe(
         mergeScan(
-          async backReport =>
+          async (backReport) =>
             this._collectReport({
               backReport,
               logger,

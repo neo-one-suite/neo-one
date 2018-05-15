@@ -52,13 +52,13 @@ export default class TCPPeer<Message> extends Peer<Message> {
           resolve();
         }
       };
-      const onError = error => {
+      const onError = (error) => {
         if (!handled) {
           handled = true;
           reject(error);
         }
       };
-      this._socket.once('error', error => {
+      this._socket.once('error', (error) => {
         onError(error);
       });
       this._socket.once('close', () => {

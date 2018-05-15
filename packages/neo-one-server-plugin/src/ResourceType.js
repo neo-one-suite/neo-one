@@ -93,7 +93,7 @@ export default class ResourceType<
         name,
         options,
       })
-      .pipe(map(resource => (resource: $FlowFixMe)));
+      .pipe(map((resource) => (resource: $FlowFixMe)));
   }
 
   getResource({
@@ -126,7 +126,7 @@ export default class ResourceType<
   // array will be the header. Must always return an array with at least one
   // element (the header).
   getListTable(resources: Array<Resource>): ListTable {
-    return [['Name']].concat(resources.map(resource => [resource.baseName]));
+    return [['Name']].concat(resources.map((resource) => [resource.baseName]));
   }
 
   // Format the resource information into a vertical table. Nested tables
