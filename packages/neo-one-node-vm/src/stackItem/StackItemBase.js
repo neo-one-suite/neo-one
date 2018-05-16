@@ -95,8 +95,24 @@ export default class StackItemBase implements Equatable {
     return common.bufferToUInt160(this.asBuffer());
   }
 
+  asUInt160Maybe(): ?UInt160 {
+    try {
+      return this.asUInt160();
+    } catch (error) {
+      return null;
+    }
+  }
+
   asUInt256(): UInt256 {
     return common.bufferToUInt256(this.asBuffer());
+  }
+
+  asUInt256Maybe(): ?UInt256 {
+    try {
+      return this.asUInt256();
+    } catch (error) {
+      return null;
+    }
   }
 
   asECPoint(): ECPoint {
@@ -108,6 +124,14 @@ export default class StackItemBase implements Equatable {
     return buffer.length === 0
       ? common.ECPOINT_INFINITY
       : common.bufferToECPoint(buffer);
+  }
+
+  asECPointMaybe(): ?ECPoint {
+    try {
+      return this.asECPoint();
+    } catch (error) {
+      return null;
+    }
   }
 
   asString(): string {

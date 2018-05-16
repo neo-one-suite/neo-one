@@ -25,10 +25,12 @@ export default class UInt256StackItem extends StackItemBase {
       return true;
     }
 
-    return (
-      other instanceof StackItemBase &&
-      common.uInt256Equal(this.value, other.asUInt256())
-    );
+    if (other instanceof StackItemBase) {
+      const value = other.asUInt256Maybe();
+      return value != null && common.uInt256Equal(this.value, value);
+    }
+
+    return false;
   }
 
   asUInt256(): UInt256 {

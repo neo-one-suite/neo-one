@@ -25,10 +25,12 @@ export default class ECPointStackItem extends StackItemBase {
       return true;
     }
 
-    return (
-      other instanceof StackItemBase &&
-      common.ecPointEqual(this.value, other.asECPoint())
-    );
+    if (other instanceof StackItemBase) {
+      const point = other.asECPointMaybe();
+      return point != null && common.ecPointEqual(this.value, point);
+    }
+
+    return false;
   }
 
   asECPoint(): ECPoint {

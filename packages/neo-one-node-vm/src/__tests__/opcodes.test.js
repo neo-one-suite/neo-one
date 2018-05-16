@@ -381,7 +381,8 @@ const OPCODES = ([
     },
     {
       op: 'SYSCALL',
-      buffer: Buffer.from(' Neo.Blockchain.GetHeight', 'utf-8'),
+      // Hacky way to get syscall to work with the extra space.
+      buffer: Buffer.from(' Neo.Blockchain.GetHeight', 'utf8'),
       result: [new IntegerStackItem(new BN(10))],
       mockBlockchain: ({ blockchain }) => {
         blockchain.currentBlock.index = 10;
@@ -651,6 +652,24 @@ const OPCODES = ([
       op: 'EQUAL',
       args: [Buffer.alloc(10, 0x01), Buffer.alloc(10, 0x01)],
       result: [new BooleanStackItem(true)],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'EQUAL',
+      args: [Buffer.alloc(10, 0x01), []],
+      result: [new BooleanStackItem(false)],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'EQUAL',
+      args: [new BN(1), []],
+      result: [new BooleanStackItem(false)],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'EQUAL',
+      args: [true, []],
+      result: [new BooleanStackItem(false)],
       gas: FEES.ONE,
     },
     // {

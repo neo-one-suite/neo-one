@@ -23,9 +23,12 @@ export default class BufferStackItem extends StackItemBase {
       return true;
     }
 
-    return (
-      other instanceof StackItemBase && this.value.equals(other.asBuffer())
-    );
+    if (other instanceof StackItemBase) {
+      const value = other.asBufferMaybe();
+      return value != null && this.asBuffer().equals(value);
+    }
+
+    return false;
   }
 
   asBuffer(): Buffer {

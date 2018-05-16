@@ -35,9 +35,12 @@ export default class IntegerStackItem extends StackItemBase {
       return this.value.eq(other.value);
     }
 
-    return (
-      other instanceof StackItemBase && this.asBuffer().equals(other.asBuffer())
-    );
+    if (other instanceof StackItemBase) {
+      const value = other.asBufferMaybe();
+      return value != null && this.asBuffer().equals(value);
+    }
+
+    return false;
   }
 
   serialize(): Buffer {

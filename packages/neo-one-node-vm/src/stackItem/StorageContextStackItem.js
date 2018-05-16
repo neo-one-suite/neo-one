@@ -27,10 +27,12 @@ export default class StorageContextStackItem extends StackItemBase {
       return true;
     }
 
-    return (
-      other instanceof StorageContextStackItem &&
-      common.uInt160Equal(this.asUInt160(), other.asUInt160())
-    );
+    if (other instanceof StackItemBase) {
+      const value = other.asUInt160Maybe();
+      return value != null && common.uInt160Equal(this.asUInt160(), value);
+    }
+
+    return false;
   }
 
   asUInt160(): UInt160 {
