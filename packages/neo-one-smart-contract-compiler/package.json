@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-compiler",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "keywords": [
     "neo",
     "NEO",
@@ -34,15 +34,15 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.47",
-    "@neo-one/client-core": "^1.0.0-alpha.34",
-    "@neo-one/monitor": "^1.0.0-alpha.25",
-    "@neo-one/node-blockchain": "^1.0.0-alpha.41",
-    "@neo-one/node-neo-settings": "^1.0.0-alpha.34",
-    "@neo-one/node-storage-levelup": "^1.0.0-alpha.37",
-    "@neo-one/node-vm": "^1.0.0-alpha.36",
-    "@neo-one/smart-contract": "^1.0.0-alpha.2",
-    "@neo-one/smart-contract-internal": "^1.0.0-alpha.2",
+    "@neo-one/client": "^1.0.0-alpha.48",
+    "@neo-one/client-core": "^1.0.0-alpha.35",
+    "@neo-one/monitor": "^1.0.0-alpha.26",
+    "@neo-one/node-blockchain": "^1.0.0-alpha.42",
+    "@neo-one/node-neo-settings": "^1.0.0-alpha.35",
+    "@neo-one/node-storage-levelup": "^1.0.0-alpha.38",
+    "@neo-one/node-vm": "^1.0.0-alpha.37",
+    "@neo-one/smart-contract": "^1.0.0-alpha.3",
+    "@neo-one/smart-contract-internal": "^1.0.0-alpha.3",
     "@types/node": "^10.1.0",
     "app-root-dir": "^1.0.2",
     "bn.js": "^4.11.8",
