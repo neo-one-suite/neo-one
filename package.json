@@ -92,7 +92,7 @@
     "@types/jest": "22.2.3",
     "@types/koa": "2.0.45",
     "@types/lodash": "4.14.108",
-    "@types/node": "10.0.10",
+    "@types/node": "10.1.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "8.2.3",
     "babel-jest": "23.0.0-charlie.2",
