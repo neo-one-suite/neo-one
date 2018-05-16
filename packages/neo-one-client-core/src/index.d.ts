@@ -4,10 +4,10 @@ export type ECPoint = Buffer;
 export type UInt160 = Buffer;
 export type UInt256 = Buffer;
 
-export declare interface DeserializeWireContext { }
+export declare interface DeserializeWireContext {}
 
-export declare interface Block { }
-export declare interface RegisterTransaction { }
+export declare interface Block {}
+export declare interface RegisterTransaction {}
 
 export declare enum VM_STATE {
   NONE = 0x00,
@@ -16,7 +16,7 @@ export declare enum VM_STATE {
   BREAK = 0x04,
 }
 
-export declare interface VMState { }
+export declare interface VMState {}
 
 export enum ContractParameterType {
   Integer = 0x02,
@@ -339,7 +339,7 @@ export declare class BinaryWriter {
   writeVarBytesLE(buffer: Buffer): BinaryWriter;
 }
 
-export interface ParamArray extends Array<Param> { }
+export interface ParamArray extends Array<Param> {}
 export type Param =
   | BN
   | number

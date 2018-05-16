@@ -1,10 +1,5 @@
 // tslint:disable ban-types no-bitwise
-import AST, {
-  SourceFile,
-  Symbol,
-  ts,
-  Identifier,
-} from 'ts-simple-ast';
+import AST, { SourceFile, Symbol, ts, Identifier } from 'ts-simple-ast';
 
 import path from 'path';
 
@@ -49,7 +44,7 @@ const findInterfaceFile = (ast: AST, name: string): SourceFile | undefined => {
     return (
       isGlobalAugmentation ||
       (bufferInterface.compilerNode.flags & ts.NodeFlags.GlobalAugmentation) !==
-      0
+        0
     );
   });
 };

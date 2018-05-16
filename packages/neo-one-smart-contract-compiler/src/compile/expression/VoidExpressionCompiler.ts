@@ -6,7 +6,7 @@ import { VisitOptions } from '../types';
 
 export default class VoidExpressionCompiler extends NodeCompiler<
   VoidExpression
-  > {
+> {
   public readonly kind: SyntaxKind = SyntaxKind.VoidExpression;
 
   public visitNode(

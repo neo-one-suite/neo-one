@@ -6,7 +6,7 @@ import { VisitOptions } from '../types';
 
 export default class TemplateExpressionCompiler extends NodeCompiler<
   TemplateExpression
-  > {
+> {
   public readonly kind: SyntaxKind = SyntaxKind.TemplateExpression;
 
   public visitNode(

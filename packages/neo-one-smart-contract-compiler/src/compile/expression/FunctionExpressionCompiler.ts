@@ -6,7 +6,7 @@ import { VisitOptions } from '../types';
 
 export default class FunctionExpressionCompiler extends NodeCompiler<
   FunctionExpression
-  > {
+> {
   public readonly kind: SyntaxKind = SyntaxKind.FunctionExpression;
 
   public visitNode(

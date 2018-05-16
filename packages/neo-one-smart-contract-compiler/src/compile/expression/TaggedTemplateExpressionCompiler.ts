@@ -6,7 +6,7 @@ import { VisitOptions } from '../types';
 
 export default class TaggedTemplateExpressionCompiler extends NodeCompiler<
   TaggedTemplateExpression
-  > {
+> {
   public readonly kind: SyntaxKind = SyntaxKind.TaggedTemplateExpression;
   public visitNode(
     sb: ScriptBuilder,

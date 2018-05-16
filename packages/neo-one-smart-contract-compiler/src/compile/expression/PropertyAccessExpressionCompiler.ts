@@ -6,7 +6,7 @@ import { VisitOptions } from '../types';
 
 export default class PropertyAccessExpressionCompiler extends NodeCompiler<
   PropertyAccessExpression
-  > {
+> {
   public readonly kind: SyntaxKind = SyntaxKind.PropertyAccessExpression;
 
   public visitNode(
