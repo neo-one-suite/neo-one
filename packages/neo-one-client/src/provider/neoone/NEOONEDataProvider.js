@@ -582,6 +582,7 @@ export default class NEOONEDataProvider
       properties: {
         storage: contract.properties.storage,
         dynamicInvoke: contract.properties.dynamic_invoke,
+        payable: contract.properties.payable,
       },
     };
   }

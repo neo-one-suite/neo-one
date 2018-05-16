@@ -16,6 +16,7 @@ export const kycContract = {
   properties: {
     storage: true,
     dynamicInvoke: false,
+    payable: true,
   },
 };
 
@@ -35,5 +36,6 @@ export const conciergeContract = {
   properties: {
     storage: true,
     dynamicInvoke: false,
+    payable: true,
   },
 };

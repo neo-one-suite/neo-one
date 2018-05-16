@@ -169,6 +169,7 @@ export default class SmartContractResource {
           properties: {
             storage: compiledContract.hasStorage,
             dynamicInvoke: compiledContract.hasDynamicInvoke,
+            payable: compiledContract.payable,
           },
         },
         {

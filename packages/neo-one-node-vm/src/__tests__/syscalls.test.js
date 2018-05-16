@@ -1437,6 +1437,28 @@ const SYSCALLS = ([
     gas: FEES.ONE,
   },
   {
+    name: 'Neo.Contract.IsPayable',
+    result: [new BooleanStackItem(transactions.kycContract.payable)],
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Blockchain.GetContract',
+            type: 'sys',
+            args: [scriptAttributeHash],
+          },
+        ],
+      },
+    ],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve(transactions.kycContract),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
     name: 'Neo.Storage.GetContext',
     result: ({ transaction }) => [
       new StorageContextStackItem(crypto.toScriptHash(transaction.script)),

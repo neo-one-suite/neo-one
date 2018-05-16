@@ -554,6 +554,7 @@ describe('LocalUserAccountProvider', () => {
       properties: {
         storage: true,
         dynamicInvoke: true,
+        payable: true,
       },
     };
     const unspent = [outputs.elevenGAS];
@@ -582,6 +583,7 @@ describe('LocalUserAccountProvider', () => {
       properties: {
         storage: false,
         dynamicInvoke: true,
+        payable: true,
       },
     };
     const unspent = [outputs.elevenGAS];
@@ -630,6 +632,7 @@ describe('LocalUserAccountProvider', () => {
       properties: {
         storage: false,
         dynamicInvoke: false,
+        payable: true,
       },
     };
     const unspent = [outputs.elevenGAS];
@@ -686,6 +689,7 @@ describe('LocalUserAccountProvider', () => {
       properties: {
         storage: true,
         dynamicInvoke: false,
+        payable: true,
       },
     };
     const unspent = [outputs.elevenGAS];

@@ -93,6 +93,7 @@ export const setupTest = async (
     properties: {
       storage: true,
       dynamicInvoke: true,
+      payable: true,
     },
   });
 

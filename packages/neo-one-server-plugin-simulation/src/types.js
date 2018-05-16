@@ -24,6 +24,7 @@ type ContractConfig = {|
   properties?: {|
     storage: boolean,
     dynamicInvoke: boolean,
+    payable: boolean,
   |},
   // Required if the contract language's compiler cannot automatically infer it.
   abi?: ABI,

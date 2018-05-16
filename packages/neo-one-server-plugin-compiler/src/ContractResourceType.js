@@ -32,12 +32,14 @@ export type Contract = {|
   abi: ABI,
   hasStorage: boolean,
   hasDynamicInvoke: boolean,
+  payable: boolean,
 |};
 export type ContractResourceOptions = {|
   scPath?: string,
   abi?: ABI,
   hasStorage?: boolean,
   hasDynamicInvoke?: boolean,
+  payable?: boolean,
 |};
 
 export default class ContractResourceType extends ResourceType<
@@ -106,6 +108,7 @@ export default class ContractResourceType extends ResourceType<
       ['Smart Contract', resource.avmPath],
       ['Storage', resource.hasStorage ? 'Yes' : 'No'],
       ['Dynamic Invoke', resource.hasDynamicInvoke ? 'Yes' : 'No'],
+      ['Payable', resource.payable ? 'Yes' : 'No'],
       ['ABI', JSON.stringify(resource.abi, null, 2)],
       [
         'Contract',

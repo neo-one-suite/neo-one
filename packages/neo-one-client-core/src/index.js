@@ -85,6 +85,7 @@ export {
   HAS_STORAGE,
   InvalidContractPropertyStateError,
   assertContractPropertyState,
+  getContractProperties,
 } from './ContractPropertyState';
 export { createDeserializeWire, createSerializeWire } from './Serializable';
 export { SCRIPT_CONTAINER_TYPE } from './ScriptContainer';

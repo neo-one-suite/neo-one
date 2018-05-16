@@ -28,6 +28,7 @@ export type Options = {|
       abi?: ABI,
       hasDynamicInvoke?: boolean,
       hasStorage?: boolean,
+      payable?: boolean,
     |}>,
     deployContracts: Array<{|
       baseName: string,

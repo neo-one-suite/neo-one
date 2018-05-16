@@ -56,7 +56,7 @@ export const kycContract = new Contract({
   author: '',
   email: '',
   description: '',
-  contractProperties: CONTRACT_PROPERTY_STATE.HAS_STORAGE,
+  contractProperties: CONTRACT_PROPERTY_STATE.HAS_STORAGE_PAYABLE,
 });
 export const kycTransaction = new InvocationTransaction({
   script: Buffer.from(
@@ -113,7 +113,7 @@ export const conciergeContract = new Contract({
   author: '',
   email: '',
   description: '',
-  contractProperties: CONTRACT_PROPERTY_STATE.HAS_STORAGE,
+  contractProperties: CONTRACT_PROPERTY_STATE.HAS_STORAGE_PAYABLE,
 });
 
 export const switcheoTokenContractScript = Buffer.from(
@@ -132,7 +132,7 @@ export const switcheoTokenContract = new Contract({
   author: 'Ivan Poon',
   email: 'ivan.poon@switcheo.network',
   description: 'NEP-5 Token for Switcheo Network',
-  contractProperties: CONTRACT_PROPERTY_STATE.HAS_STORAGE,
+  contractProperties: CONTRACT_PROPERTY_STATE.HAS_STORAGE_PAYABLE,
 });
 
 export const switcheoContractScript = Buffer.from(
@@ -151,5 +151,6 @@ export const switcheoContract = new Contract({
   author: 'Switcheo',
   email: 'engineering@switcheo.network',
   description: 'Switcheo Exchange',
-  contractProperties: CONTRACT_PROPERTY_STATE.HAS_STORAGE_DYNAMIC_INVOKE,
+  contractProperties:
+    CONTRACT_PROPERTY_STATE.HAS_STORAGE_DYNAMIC_INVOKE_PAYABLE,
 });

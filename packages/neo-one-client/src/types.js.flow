@@ -222,6 +222,7 @@ export type Contract = {|
   properties: {|
     storage: boolean,
     dynamicInvoke: boolean,
+    payable: boolean,
   |},
 |};
 
@@ -416,6 +417,7 @@ export type ContractRegister = {|
   properties: {|
     storage: boolean,
     dynamicInvoke: boolean,
+    payable: boolean,
   |},
 |};
 

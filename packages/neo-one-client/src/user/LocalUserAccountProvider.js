@@ -2,7 +2,6 @@
 import BigNumber from 'bignumber.js';
 import {
   ATTRIBUTE_USAGE,
-  CONTRACT_PROPERTY_STATE,
   type Attribute as AttributeModel,
   type Input as InputModel,
   type Output as OutputModel,
@@ -21,6 +20,7 @@ import {
   toAssetType,
   toContractParameterType,
   common,
+  getContractProperties,
   utils,
 } from '@neo-one/client-core';
 import {
@@ -323,14 +323,6 @@ export default class LocalUserAccountProvider<
     contractIn: ContractRegister,
     options?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt>> {
-    let contractProperties = CONTRACT_PROPERTY_STATE.NO_PROPERTY;
-    if (contractIn.properties.storage && contractIn.properties.dynamicInvoke) {
-      contractProperties = CONTRACT_PROPERTY_STATE.HAS_STORAGE_DYNAMIC_INVOKE;
-    } else if (contractIn.properties.storage) {
-      contractProperties = CONTRACT_PROPERTY_STATE.HAS_STORAGE;
-    } else if (contractIn.properties.dynamicInvoke) {
-      contractProperties = CONTRACT_PROPERTY_STATE.HAS_DYNAMIC_INVOKE;
-    }
     const contract = new ContractModel({
       script: Buffer.from(contractIn.script, 'hex'),
       parameterList: contractIn.parameters.map((parameter) =>
@@ -344,7 +336,11 @@ export default class LocalUserAccountProvider<
       author: contractIn.author,
       email: contractIn.email,
       description: contractIn.description,
-      contractProperties,
+      contractProperties: getContractProperties({
+        hasDynamicInvoke: contractIn.properties.dynamicInvoke,
+        hasStorage: contractIn.properties.storage,
+        payable: contractIn.properties.payable,
+      }),
     });
 
     const sb = new ScriptBuilder();
@@ -353,7 +349,7 @@ export default class LocalUserAccountProvider<
       contract.script,
       Buffer.from(contract.parameterList),
       contract.returnType,
-      contract.hasStorage,
+      contract.contractProperties,
       contract.name,
       contract.codeVersion,
       contract.author,

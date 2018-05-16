@@ -9,6 +9,7 @@ import {
 import {
   CONTRACT_PROPERTY_STATE,
   HAS_DYNAMIC_INVOKE,
+  HAS_PAYABLE,
   HAS_STORAGE,
   type ContractPropertyState,
   assertContractPropertyState,
@@ -62,6 +63,7 @@ export type ContractJSON = {|
   properties: {|
     storage: boolean,
     dynamic_invoke: boolean,
+    payable: boolean,
   |},
 |};
 
@@ -82,6 +84,7 @@ export default class Contract extends BaseState
 
   hasStorage: boolean;
   hasDynamicInvoke: boolean;
+  payable: boolean;
 
   constructor({
     version,
@@ -108,6 +111,7 @@ export default class Contract extends BaseState
 
     this.hasStorage = HAS_STORAGE.has(this.contractProperties);
     this.hasDynamicInvoke = HAS_DYNAMIC_INVOKE.has(this.contractProperties);
+    this.payable = HAS_PAYABLE.has(this.contractProperties);
   }
 
   __contractSize = utils.lazy(() =>
@@ -185,6 +189,7 @@ export default class Contract extends BaseState
       properties: {
         storage: this.hasStorage,
         dynamic_invoke: this.hasDynamicInvoke,
+        payable: this.payable,
       },
     };
   }

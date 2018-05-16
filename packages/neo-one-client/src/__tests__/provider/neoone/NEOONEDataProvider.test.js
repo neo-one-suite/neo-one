@@ -114,6 +114,7 @@ function createExpectedContract(options: Object) {
     properties: {
       storage: true,
       dynamicInvoke: false,
+      payable: true,
     },
   };
 
@@ -141,6 +142,7 @@ function createContractJSON(options: Object) {
     properties: {
       storage: true,
       dynamic_invoke: false,
+      payable: true,
     },
   };
 

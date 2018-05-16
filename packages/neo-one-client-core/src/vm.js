@@ -3,7 +3,6 @@ import { CustomError } from '@neo-one/utils';
 
 import _ from 'lodash';
 
-import utils, { BinaryReader } from './utils';
 import type { ScriptContainer } from './ScriptContainer';
 import type { UInt160 } from './common';
 import type Witness from './Witness';
@@ -562,6 +561,7 @@ export const SYS_CALL_NAME = {
   ASSET_GET_ADMIN: 'Neo.Asset.GetAdmin',
   ASSET_GET_ISSUER: 'Neo.Asset.GetIssuer',
   CONTRACT_GET_SCRIPT: 'Neo.Contract.GetScript',
+  CONTRACT_IS_PAYABLE: 'Neo.Contract.IsPayable',
   STORAGE_GET_CONTEXT: 'Neo.Storage.GetContext',
   STORAGE_GET: 'Neo.Storage.Get',
   STORAGE_FIND: 'Neo.Storage.Find',
@@ -653,6 +653,7 @@ export type SysCallName =
   | 'Neo.Asset.GetAdmin'
   | 'Neo.Asset.GetIssuer'
   | 'Neo.Contract.GetScript'
+  | 'Neo.Contract.IsPayable'
   | 'Neo.Storage.GetContext'
   | 'Neo.Storage.Get'
   | 'Neo.Storage.Find'
@@ -782,6 +783,8 @@ export const assertSysCallName = (value: string): SysCallName => {
       return SYS_CALL_NAME.ASSET_GET_ISSUER;
     case SYS_CALL_NAME.CONTRACT_GET_SCRIPT:
       return SYS_CALL_NAME.CONTRACT_GET_SCRIPT;
+    case SYS_CALL_NAME.CONTRACT_IS_PAYABLE:
+      return SYS_CALL_NAME.CONTRACT_IS_PAYABLE;
     case SYS_CALL_NAME.STORAGE_GET_CONTEXT:
       return SYS_CALL_NAME.STORAGE_GET_CONTEXT;
     case SYS_CALL_NAME.STORAGE_GET:
@@ -867,76 +870,4 @@ export const assertVMState = (state: number): VMState => {
     default:
       throw new InvalidVMStateError(state);
   }
-};
-
-const createHexString = (bytes: Buffer): string => {
-  let result = '';
-  for (const byte of bytes) {
-    result += `${byte.toString(16).padStart(2, '0')}`;
-  }
-
-  return `0x${result}`;
-};
-
-export const disassembleByteCode = (bytes: Buffer): Array<string> => {
-  const reader = new BinaryReader(bytes);
-
-  const result = [];
-  while (reader.hasMore()) {
-    const pc = reader.index;
-    const byte = reader.readUInt8();
-
-    const pushBytes =
-      byte >= OPCODE_TO_BYTECODE.PUSHBYTES1 &&
-      byte <= OPCODE_TO_BYTECODE.PUSHBYTES75;
-    const pushData1 = byte === OPCODE_TO_BYTECODE.PUSHDATA1;
-    const pushData2 = byte === OPCODE_TO_BYTECODE.PUSHDATA2;
-    const pushData4 = byte === OPCODE_TO_BYTECODE.PUSHDATA4;
-
-    const opCode = BYTECODE_TO_OPCODE[byte];
-
-    if (pushBytes || pushData1 || pushData2 || pushData4) {
-      let numBytes;
-      if (pushBytes) {
-        numBytes = byte;
-      } else if (pushData1) {
-        numBytes = reader.readUInt8();
-      } else if (pushData2) {
-        numBytes = reader.readUInt16LE();
-      } else {
-        numBytes = reader.readInt32LE();
-      }
-      result.push([pc, opCode, createHexString(reader.readBytes(numBytes))]);
-    } else if (
-      byte === OPCODE_TO_BYTECODE.JMP ||
-      byte === OPCODE_TO_BYTECODE.JMPIF ||
-      byte === OPCODE_TO_BYTECODE.JMPIFNOT ||
-      byte === OPCODE_TO_BYTECODE.CALL
-    ) {
-      result.push([pc, opCode, `${reader.readInt16LE()}`]);
-    } else if (
-      byte === OPCODE_TO_BYTECODE.APPCALL ||
-      byte === OPCODE_TO_BYTECODE.TAILCALL
-    ) {
-      const appBytes = [...reader.readBytes(20)];
-      result.push([
-        pc,
-        opCode,
-        createHexString(Buffer.from(appBytes.reverse())),
-      ]);
-    } else if (byte === OPCODE_TO_BYTECODE.SYSCALL) {
-      result.push([pc, opCode, utils.toASCII(reader.readVarBytesLE(252))]);
-    } else if (BYTECODE_TO_OPCODE[byte] != null) {
-      result.push([pc, opCode, null]);
-    } else {
-      result.push([pc, 'UNKNOWN', byte.toString(16)]);
-    }
-  }
-
-  return result.map(
-    ([index, opCode, val]) =>
-      `${index.toString().padStart(4, '0')}:${opCode}${
-        val == null ? '' : ` ${val}`
-      }`,
-  );
 };

@@ -220,6 +220,7 @@ export interface Contract {
   properties: {
     storage: boolean;
     dynamicInvoke: boolean;
+    payable: boolean;
   };
 }
 
@@ -401,6 +402,7 @@ export interface ContractRegister {
   properties: {
     storage: boolean;
     dynamicInvoke: boolean;
+    payable: boolean;
   };
 }
 

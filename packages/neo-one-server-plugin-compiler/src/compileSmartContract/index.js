@@ -13,6 +13,7 @@ export type CompileResult = {|
   abi?: ?ABI,
   hasStorage?: ?boolean,
   hasDynamicInvoke?: ?boolean,
+  payable?: ?boolean,
 |};
 
 export default async ({

@@ -32,6 +32,10 @@ export default class CreateContractCRUD extends CreateCRUD<
           option: '--dynamic-invoke',
           description: 'Does the Smart Contract use dynamic invocations?',
         },
+        {
+          option: '--payable',
+          description: 'Is the Smart Contract payable?',
+        },
       ],
     });
   }
@@ -58,6 +62,7 @@ export default class CreateContractCRUD extends CreateCRUD<
       abi,
       hasStorage: !!options.storage,
       hasDynamicInvoke: !!options['dynamic-invoke'],
+      payable: !!options.payable,
     };
   }
 }

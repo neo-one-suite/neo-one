@@ -43,6 +43,7 @@ export type ContractResourceAdapterOptions = {|
   abi: ABI,
   hasStorage: boolean,
   hasDynamicInvoke: boolean,
+  payable: boolean,
 |};
 
 export default class ContractResourceAdapter {
@@ -57,6 +58,7 @@ export default class ContractResourceAdapter {
   _abi: ABI;
   _hasStorage: boolean;
   _hasDynamicInvoke: boolean;
+  _payable: boolean;
 
   _update$: Subject<void>;
 
@@ -74,6 +76,7 @@ export default class ContractResourceAdapter {
     abi,
     hasStorage,
     hasDynamicInvoke,
+    payable,
   }: ContractResourceAdapterOptions) {
     this._name = name;
     this._dataPath = dataPath;
@@ -86,6 +89,7 @@ export default class ContractResourceAdapter {
     this._abi = abi;
     this._hasStorage = hasStorage;
     this._hasDynamicInvoke = hasDynamicInvoke;
+    this._payable = payable;
 
     this._update$ = new ReplaySubject(1);
     this.resource$ = this._update$.pipe(
@@ -101,6 +105,7 @@ export default class ContractResourceAdapter {
           abi: this._abi,
           hasStorage: this._hasStorage,
           hasDynamicInvoke: this._hasDynamicInvoke,
+          payable: this._payable,
         }),
       ),
       shareReplay(1),
@@ -112,7 +117,11 @@ export default class ContractResourceAdapter {
     options: ContractResourceAdapterInitOptions,
   ): Promise<ContractResourceAdapter> {
     const staticOptions = this._getStaticOptions(options);
-    const [abi, script, { hasStorage, hasDynamicInvoke }] = await Promise.all([
+    const [
+      abi,
+      script,
+      { hasStorage, hasDynamicInvoke, payable },
+    ] = await Promise.all([
       fs.readJSON(staticOptions.abiPath),
       fs.readFile(staticOptions.avmPath, 'hex'),
       fs.readJSON(staticOptions.configPath),
@@ -130,6 +139,7 @@ export default class ContractResourceAdapter {
       script,
       hasStorage,
       hasDynamicInvoke,
+      payable,
     });
   }
 
@@ -176,6 +186,7 @@ export default class ContractResourceAdapter {
                 abi,
                 hasStorage,
                 hasDynamicInvoke,
+                payable,
               } = await compileSmartContract({
                 scPath: options.scPath,
                 avmPath: staticOptions.avmPath,
@@ -201,11 +212,16 @@ export default class ContractResourceAdapter {
                 hasDynamicInvoke = options.hasDynamicInvoke;
               }
 
+              if (payable == null) {
+                ({ payable } = options);
+              }
+
               const script = await fs.readFile(staticOptions.avmPath, 'hex');
 
               ctx.abi = abi;
               ctx.hasDynamicInvoke = hasDynamicInvoke;
               ctx.hasStorage = hasStorage;
+              ctx.payable = payable;
               ctx.script = script;
             } catch (error) {
               await fs.remove(staticOptions.dataPath);
@@ -216,12 +232,13 @@ export default class ContractResourceAdapter {
         {
           title: 'Save ABI and configuration',
           task: async (ctx) => {
-            const { abi, hasDynamicInvoke, hasStorage, script } = ctx;
+            const { abi, hasDynamicInvoke, hasStorage, payable, script } = ctx;
             await Promise.all([
               fs.writeJSON(staticOptions.abiPath, abi),
               fs.writeJSON(staticOptions.configPath, {
                 hasDynamicInvoke,
                 hasStorage,
+                payable,
               }),
             ]);
 
@@ -237,6 +254,7 @@ export default class ContractResourceAdapter {
               abi,
               hasStorage,
               hasDynamicInvoke,
+              payable,
             });
             ctx.dependencies = [];
           },
@@ -277,6 +295,7 @@ export default class ContractResourceAdapter {
       ['Config Path', this._configPath],
       ['Storage', this._hasStorage ? 'Yes' : 'No'],
       ['Dynamic Invoke', this._hasDynamicInvoke ? 'Yes' : 'No'],
+      ['Payable', this._payable ? 'Yes' : 'No'],
       ['ABI', JSON.stringify(this._abi, null, 2)],
     ];
   }

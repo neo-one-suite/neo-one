@@ -108,6 +108,8 @@ export default ({
             : contract.properties.dynamicInvoke,
         hasStorage:
           contract.properties == null ? undefined : contract.properties.storage,
+        payable:
+          contract.properties == null ? undefined : contract.properties.payable,
       }));
     const deployContracts = languageConfig.contracts
       .filter((contract) => contract.target === 'deploy')

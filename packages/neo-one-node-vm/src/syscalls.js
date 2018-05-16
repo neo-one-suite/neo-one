@@ -988,6 +988,15 @@ export const SYSCALLS = {
       results: [new BufferStackItem(args[0].asContract().script)],
     }),
   }),
+  'Neo.Contract.IsPayable': createSysCall({
+    name: 'Neo.Contract.IsPayable',
+    in: 1,
+    out: 1,
+    invoke: ({ context, args }: OpInvokeArgs) => ({
+      context,
+      results: [new BooleanStackItem(args[0].asContract().payable)],
+    }),
+  }),
   'Neo.Storage.GetContext': createSysCall({
     name: 'Neo.Storage.GetContext',
     out: 1,
