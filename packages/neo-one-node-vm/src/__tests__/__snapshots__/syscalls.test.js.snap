@@ -346,6 +346,16 @@ Array [
 ]
 `;
 
+exports[`syscalls Neo.Blockchain.GetContract 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
 exports[`syscalls Neo.Blockchain.GetHeader 1`] = `
 Array [
   Array [

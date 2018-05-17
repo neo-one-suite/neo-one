@@ -559,12 +559,16 @@ export const SYSCALLS = {
     out: 1,
     fee: FEES.ONE_HUNDRED,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const contract = await context.blockchain.contract.get({
+      const contract = await context.blockchain.contract.tryGet({
         hash: args[0].asUInt160(),
       });
       return {
         context,
-        results: [new ContractStackItem(contract)],
+        results: [
+          contract == null
+            ? new BufferStackItem(Buffer.alloc(0, 0))
+            : new ContractStackItem(contract),
+        ],
       };
     },
   }),

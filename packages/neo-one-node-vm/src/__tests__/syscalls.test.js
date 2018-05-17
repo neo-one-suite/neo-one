@@ -423,9 +423,18 @@ const SYSCALLS = ([
     name: 'Neo.Blockchain.GetContract',
     result: [new ContractStackItem(transactions.kycContract)],
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() =>
+      blockchain.contract.tryGet = jest.fn(() =>
         Promise.resolve(transactions.kycContract),
       );
+    },
+    args: [scriptAttributeHash],
+    gas: FEES.ONE_HUNDRED,
+  },
+  {
+    name: 'Neo.Blockchain.GetContract',
+    result: [new BufferStackItem(Buffer.alloc(0, 0))],
+    mock: ({ blockchain }) => {
+      blockchain.contract.tryGet = jest.fn(() => Promise.resolve(null));
     },
     args: [scriptAttributeHash],
     gas: FEES.ONE_HUNDRED,
@@ -1430,7 +1439,7 @@ const SYSCALLS = ([
       },
     ],
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() =>
+      blockchain.contract.tryGet = jest.fn(() =>
         Promise.resolve(transactions.kycContract),
       );
     },
@@ -1452,7 +1461,7 @@ const SYSCALLS = ([
       },
     ],
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() =>
+      blockchain.contract.tryGet = jest.fn(() =>
         Promise.resolve(transactions.kycContract),
       );
     },
