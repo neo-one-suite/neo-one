@@ -37,7 +37,6 @@ function createGet<Key, Value>({
   return async (key: Key): Promise<Value> => {
     const trackedChange = tryGetTracked(key);
     if (trackedChange != null) {
-      // TODO: Better error
       if (trackedChange.type === 'delete') {
         throw new Error('Not found');
       }
@@ -114,7 +113,6 @@ export class BaseReadStorageCache<Key, AddValue, Value> {
     return commonUtils.values(this._values).map((value) => {
       if (value.type === 'delete') {
         if (createDeleteChange == null) {
-          // TODO: Make better
           throw new Error('Invalid delete');
         }
 
@@ -304,7 +302,6 @@ function createAdd<Key, Value>({
     if (!force) {
       const currentValue = await cache.tryGet(key);
       if (currentValue != null) {
-        // TODO: Better error
         throw new Error(
           `Attempted to add an already existing object for key ` +
             `${cache._name}:${getKeyString(key)}.`,
@@ -690,7 +687,6 @@ export class BlockLikeStorageCache<
     if (!force) {
       const currentValue = await this.tryGet({ hashOrIndex: value.index });
       if (currentValue != null) {
-        // TODO: Better error
         throw new Error('Attempted to add an already existing object.');
       }
     }
@@ -740,7 +736,6 @@ export class OutputStorageCache extends ReadStorageCache<
       if (!force) {
         const currentValue = await this.tryGet(key);
         if (currentValue != null) {
-          // TODO: Better error
           throw new Error(
             `Attempted to add an already existing object for key ` +
               `${this._name}:${this._getKeyString(key)}.`,
@@ -774,7 +769,6 @@ function createGetMetadata<Key, Value>({
   return async (): Promise<Value> => {
     const trackedChange = tryGetTracked();
     if (trackedChange != null) {
-      // TODO: Better error
       if (trackedChange.type === 'delete') {
         throw new Error('Not found');
       }
@@ -855,7 +849,6 @@ export class BaseReadMetadataStorageCache<AddValue, Value> {
 
     if (value.type === 'delete') {
       if (createDeleteChange == null) {
-        // TODO: Make better
         throw new Error('Invalid delete');
       }
 

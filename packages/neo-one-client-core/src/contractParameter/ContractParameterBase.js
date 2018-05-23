@@ -27,7 +27,6 @@ export default class ContractParameterBase<
     return this.asBuffer().some((value) => value !== 0);
   }
 
-  // TODO: Need to deal with circular references in arrays
   serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.type);
   }

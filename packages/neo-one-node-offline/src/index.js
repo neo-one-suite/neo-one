@@ -66,7 +66,7 @@ class BlockTransform extends Transform {
 
     const length = reader.clone().readInt32LE();
 
-    // TODO: Not sure why this doesn't work properly with just length...
+    // Not sure why this doesn't work properly with just length...
     if (reader.remaining + SIZE_OF_INT32 < length * 2) {
       return { remainingBuffer: reader.remainingBuffer, blocks: [] };
     }
@@ -147,8 +147,8 @@ export const loadChain = async ({
     transform.once('close', onEnd);
     transform.once('error', onError);
 
-    // TODO: Not sure why I can't get this to work with a Writable stream so
-    //       just implement janky custom backpressure control
+    // Not sure why I can't get this to work with a Writable stream so
+    // just implement janky custom backpressure control
     let pending = 0;
     let processed = 0;
     let start = Date.now();

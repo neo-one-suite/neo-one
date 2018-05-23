@@ -2,7 +2,6 @@
 import body from 'koa-better-body';
 import convert from 'koa-convert';
 
-// TODO: Try to optimize this
 export default () =>
   convert(
     body({

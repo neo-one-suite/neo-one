@@ -354,8 +354,8 @@ export const assertTransactionOptions = (
   if (typeof options !== 'object') {
     throw new InvalidNamedArgumentError('TransactionOptions', options);
   }
-  // TODO: Fixme
-  // assertNullableString('TransactionOptions', options.from);
+
+  assertNullableString('TransactionOptions', options.from);
   if (options.attributes != null) {
     if (!Array.isArray(options.attributes)) {
       throw new InvalidNamedArgumentError('TransactionOptions', options);

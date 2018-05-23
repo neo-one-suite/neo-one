@@ -45,7 +45,6 @@ export class ForLoopHelper extends Helper {
     }
   }
 
-  // TODO: Optimize to check for continue/break that refers to this loop in child.
   private emitLoop(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (this.initializer != null) {
       this.initializer();

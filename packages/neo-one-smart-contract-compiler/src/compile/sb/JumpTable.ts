@@ -24,7 +24,6 @@ export class JumpTable {
   }
 
   public emitTable(sb: ScriptBuilder, outerNode: Node): void {
-    // TODO: Binary search over table - O(logn) ops vs O(n) currently
     this.table.forEach(({ node, jumpNumber, bytecode }) => {
       sb.emitHelper(
         node,

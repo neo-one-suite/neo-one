@@ -178,7 +178,6 @@ export class Context {
     );
   }
 
-  // TODO: This should check unions
   public isGlobal(
     node: Node,
     type: Type | undefined,

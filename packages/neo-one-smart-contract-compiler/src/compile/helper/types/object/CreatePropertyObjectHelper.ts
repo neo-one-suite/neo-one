@@ -9,7 +9,6 @@ import { VisitOptions } from '../../../types';
 export class CreatePropertyObjectHelper extends Helper<Node> {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (options.pushValue) {
-      // TODO: This could use some optimization.
       const obj = sb.scope.addUnique();
       const pobj = sb.scope.addUnique();
       // [pobj, pobj]

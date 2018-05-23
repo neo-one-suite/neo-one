@@ -31,3 +31,15 @@ export class WitnessVerifyError extends CustomError {
 export class UnknownVerifyError extends CustomError {
   code: string = 'UNKNOWN_VERIFY';
 }
+
+export class InvalidClaimError extends CustomError {
+  code: string = 'INVALID_CLAIM';
+}
+
+export class CoinClaimedError extends CustomError {
+  code: string = 'COIN_CLAIMED';
+}
+
+export class CoinUnspentError extends CustomError {
+  code: string = 'COIN_UNSPENT';
+}

@@ -1,4 +1,3 @@
-// TODO: Implement contract create + migrate + destroy, iterator
 export type Address = Buffer;
 export type Hash256 = Buffer;
 export type PublicKey = Buffer;
@@ -41,10 +40,6 @@ export class MapStorage<
       value,
     );
   }
-
-  /* TODO: iterPrefix signatures
-  public iterPrefix(k: K extends [any, any, any] ? K[0] | [K[0], K[1]] : never)
-  */
 }
 
 export class SetStorage<K extends SerializableValue> {

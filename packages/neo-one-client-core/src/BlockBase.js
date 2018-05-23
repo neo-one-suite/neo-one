@@ -115,7 +115,6 @@ export default class BlockBase implements Equatable {
     return this.__thisSize();
   }
 
-  // TODO: Split these classes out so we don't have this hacky error here.
   get script(): Witness {
     if (this._script == null) {
       throw new UnsignedBlockError();
@@ -211,7 +210,6 @@ export default class BlockBase implements Equatable {
         scriptHash: this.nextConsensus,
       }),
       script: this.script.serializeJSON(context),
-      // TODO: Not sure if we should bother with this...
       confirmations: 0,
     };
   }

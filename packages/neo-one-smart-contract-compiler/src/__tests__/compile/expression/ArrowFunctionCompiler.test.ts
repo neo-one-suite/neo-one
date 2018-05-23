@@ -129,6 +129,4 @@ describe('ArrowFunctionCompiler', () => {
       }
     `);
   });
-
-  // TODO: Add this capture. Also global this capture.
 });

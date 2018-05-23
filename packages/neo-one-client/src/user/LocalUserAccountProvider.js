@@ -736,8 +736,6 @@ export default class LocalUserAccountProvider<
           throw new InvokeError(result.message);
         }
 
-        // TODO: This seems strange, why do InvocationTransactions require
-        //       gas to be an integer?
         const gas = result.gasConsumed.integerValue(BigNumber.ROUND_UP);
         const { inputs, outputs } = await this._getTransfersInputOutputs({
           transfers,

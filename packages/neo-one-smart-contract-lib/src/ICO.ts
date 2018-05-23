@@ -106,8 +106,6 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
       throw new Error('Cannot change token amount once crowdsale has started');
     }
     this.tokensPerAsset.set(asset, tokens);
-    // TODO: Me
-    // notify(new TokenExchangeRate(asset, tokens));
   }
 
   public getExchangeRate(asset: Hash256): Fixed<Decimals> {
@@ -123,8 +121,6 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
       throw new Error('Cannot change token amount once crowdsale has started');
     }
     this.tokensPerAssetLimitedRound.set(asset, tokens);
-    // TODO: Me
-    // notify(new LimitedTokenExchangeRate(asset, tokens));
   }
 
   @constant
@@ -155,8 +151,6 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
     addresses.forEach((addr) => {
       if (!this.kyc.has(addr)) {
         this.kyc.add(addr);
-        // TODO: Me
-        // notify(new Register(addr));
       }
     });
   }
@@ -183,7 +177,6 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   }
 
   private refund(): void {
-    // TODO: Me
-    // notify(new Refund());
+    // notify
   }
 }

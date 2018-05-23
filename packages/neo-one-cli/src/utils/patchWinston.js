@@ -4,7 +4,6 @@ import { transports } from 'winston';
 
 const noop = () => {};
 
-// TODO: Seems like a bug in winston #59
 transports.File.prototype.log = function log(info, callbackIn) {
   if (this._nexts == null) {
     this._nexts = [];
@@ -44,7 +43,7 @@ transports.File.prototype.log = function log(info, callbackIn) {
 
     //
     // End the current stream, ensure it flushes and create a new one.
-    // TODO: This could probably be optimized to not run a stat call but its
+    // This could probably be optimized to not run a stat call but its
     // the safest way since we are supporting `maxFiles`.
     // Remark: We could call `open` here but that would incur an extra unnecessary stat call
     //

@@ -83,8 +83,6 @@ export default class Output implements SerializableWire<Output>, Equatable {
     });
   }
 
-  // TODO: Maybe store index on Output directly? And add it when deserializing
-  //       from transaction
   serializeJSON(context: SerializeJSONContext, index: number): Object {
     return {
       n: index,

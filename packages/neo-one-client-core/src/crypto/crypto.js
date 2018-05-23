@@ -9,7 +9,11 @@ import { ec as EC } from 'elliptic';
 import scrypt from 'scrypt-js';
 import xor from 'buffer-xor';
 
-import { InvalidFormatError } from '../errors';
+import {
+  InvalidFormatError,
+  InvalidNumberOfKeysError,
+  TooManyPublicKeysError,
+} from '../errors';
 import { ScriptBuilder } from '../utils';
 import Witness from '../Witness';
 
@@ -69,7 +73,6 @@ const hash160 = (value: Buffer): UInt160 =>
 const hash256 = (value: Buffer): UInt256 =>
   common.bufferToUInt256(sha256(sha256(value)));
 
-// TODO: This + verify should probably handle DER format signatures as well
 const sign = ({
   message,
   privateKey,
@@ -84,29 +87,6 @@ const sign = ({
   ]);
 };
 
-// TODO: Not faster and also doesn't seem to produce the correct signature.
-// const signNew = ({
-//   message,
-//   privateKey,
-// }: {|
-//   message: Buffer,
-//   privateKey: PrivateKey,
-// |}): Buffer => {
-//   const key = new ECKey({
-//     crv: 'P-256',
-//     privateKey,
-//     publicKey: Buffer.from(ec.keyFromPrivate(privateKey).getPublic(false, 'hex'), 'hex'),
-//   });
-//   const signature = key.createSign('SHA256')
-//     .update(message)
-//     .sign();
-//   const sig = new Signature(signature);
-//   return Buffer.concat([
-//     sig.r.toArrayLike(Buffer, 'be', 32),
-//     sig.s.toArrayLike(Buffer, 'be', 32),
-//   ]);
-// };
-
 class InvalidSignatureError extends CustomError {
   code: string;
   constructor() {
@@ -114,24 +94,6 @@ class InvalidSignatureError extends CustomError {
     this.code = 'INVALID_SIGNATURE';
   }
 }
-
-// const verify = ({
-//   message,
-//   signature,
-//   publicKey,
-// }: {|
-//   message: Buffer,
-//   signature: Buffer,
-//   publicKey: ECPoint,
-// |}) => {
-//   if (signature.length !== 64) {
-//     throw new InvalidSignatureError();
-//   }
-//
-//   const r = signature.slice(0, 32);
-//   const s = signature.slice(32);
-//   return ec.verify(sha256(message), { r, s }, publicKey);
-// };
 
 const rmPadding = (buf: Array<number>): Array<number> => {
   let i = 0;
@@ -380,8 +342,11 @@ const createMultiSignatureVerificationScript = (
 ) => {
   const m = Math.floor(mIn);
   if (!(m >= 1 && m <= publicKeys.length && publicKeys.length <= 1024)) {
-    // TODO: Better error
-    throw new Error();
+    throw new InvalidNumberOfKeysError();
+  }
+
+  if (publicKeys.length > 1024) {
+    throw new TooManyPublicKeysError();
   }
 
   const builder = new ScriptBuilder();

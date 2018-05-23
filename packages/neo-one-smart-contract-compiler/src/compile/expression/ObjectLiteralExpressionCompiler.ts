@@ -46,7 +46,6 @@ export default class ObjectLiteralExpressionCompiler extends NodeCompiler<
             }),
           );
         } else {
-          // TODO: Support get/set accessors
           sb.reportUnsupported(prop);
         }
         // [objectVal]

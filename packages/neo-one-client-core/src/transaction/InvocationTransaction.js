@@ -45,11 +45,9 @@ export type InvocationTransactionJSON = {|
   type: 'InvocationTransaction',
   script: string,
   gas: string,
-  // TODO: Pull this out
   data?: InvocationDataJSON,
 |};
 
-// TODO: Work with NEO to increase this.
 // const MAX_SCRIPT_SIZE = 65536;
 const MAX_SCRIPT_SIZE = 1000000;
 
@@ -102,7 +100,6 @@ export default class InvocationTransaction extends TransactionBase<
       () =>
         super.size +
         IOHelper.sizeOfUInt8 +
-        // TODO: Doesn't seem to add size of GAS
         IOHelper.sizeOfVarBytesLE(this.script),
     );
   }

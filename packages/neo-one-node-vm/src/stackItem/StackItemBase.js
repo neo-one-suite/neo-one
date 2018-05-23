@@ -116,10 +116,6 @@ export default class StackItemBase implements Equatable {
   }
 
   asECPoint(): ECPoint {
-    // TODO: This may be incorrect. neo source code indicates a 0 length
-    //       byte array is not a valid ECPoint, yet one of the invocations
-    //       on the test net only succeeds if we interpret it as an infinity
-    //       ECPoint.
     const buffer = this.asBuffer();
     return buffer.length === 0
       ? common.ECPOINT_INFINITY

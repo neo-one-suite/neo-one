@@ -1,8 +1,5 @@
 import { helpers } from '../../../__data__';
 
-// TODO: Test unsupported
-// TODO: Fill out tests based on ecma spec.
-
 describe('BinaryExpressionCompiler', () => {
   test('x = 3', async () => {
     await helpers.executeString(`
@@ -52,16 +49,15 @@ if (x !== 1) {
     `);
   });
 
-  // TODO: Implement me
-  //   test('x **= 3', async () => {
-  //     await helpers.executeString(`
-  // let x = 3;
-  // x **= 3;
-  // if (x !== 27) {
-  //   throw 'Failure';
-  // }
-  //     `);
-  //   });
+  test.skip('x **= 3', async () => {
+    await helpers.executeString(`
+  let x = 3;
+  x **= 3;
+  if (x !== 27) {
+    throw 'Failure';
+  }
+      `);
+  });
 
   test('3 % 3 === 0', async () => {
     await helpers.executeString(`
@@ -119,26 +115,25 @@ if (x !== 0b101) {
     `);
   });
 
-  // TODO: Figure out why these are broken.
-  //   test('x <<= 1', async () => {
-  //     await helpers.executeString(`
-  // let x = 0b011;
-  // x <<= 1;
-  // if (x !== 0b110) {
-  //   throw 'Failure';
-  // }
-  //     `);
-  //   });
+  test.skip('x <<= 1', async () => {
+    await helpers.executeString(`
+  let x = 0b011;
+  x <<= 1;
+  if (x !== 0b110) {
+    throw 'Failure';
+  }
+      `);
+  });
 
-  //   test('x >>= 1', async () => {
-  //     await helpers.executeString(`
-  // let x = 0b011;
-  // x >>= 1;
-  // if (x !== 0b001) {
-  //   throw 'Failure';
-  // }
-  //     `);
-  //   });
+  test.skip('x >>= 1', async () => {
+    await helpers.executeString(`
+  let x = 0b011;
+  x >>= 1;
+  if (x !== 0b001) {
+    throw 'Failure';
+  }
+      `);
+  });
 
   test('1 * 2 = 2', async () => {
     await helpers.executeString(`
@@ -187,8 +182,6 @@ if (1 - 2 !== -1) {
 }
     `);
   });
-
-  // TODO: Test SHL, SHR
 
   test('1 < 1', async () => {
     await helpers.executeString(`

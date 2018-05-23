@@ -80,9 +80,12 @@ export class ArrFilterHelper extends Helper {
               condition: () => {
                 // [keepVal, value, arr, idx, size, ...array]
                 this.map();
-                // TODO: This should be toBoolean
                 // [keep, value, arr, idx, size, ...array]
-                sb.emitHelper(node, options, sb.helpers.getBoolean);
+                sb.emitHelper(
+                  node,
+                  options,
+                  sb.helpers.toBoolean({ type: undefined }),
+                );
               },
               whenTrue: () => {
                 // [arr, value, arr, idx, size, ...array]

@@ -21,7 +21,6 @@ export class GetArgumentHelper extends TypedHelper {
     sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
     // [numberVal, argv]
     sb.emitOp(node, 'SWAP');
-    // TODO: This should really be toNumber
     // [number, argv]
     sb.emitHelper(node, options, sb.helpers.toNumber({ type: this.type }));
     // [value]

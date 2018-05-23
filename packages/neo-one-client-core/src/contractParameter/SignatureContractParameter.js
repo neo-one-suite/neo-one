@@ -13,7 +13,6 @@ export type SignatureContractParameterJSON = {|
   value: string,
 |};
 
-// TODO: What is this? How is it used?
 export default class SignatureContractParameter extends ContractParameterBase<
   SignatureContractParameter,
   SignatureContractParameterJSON,

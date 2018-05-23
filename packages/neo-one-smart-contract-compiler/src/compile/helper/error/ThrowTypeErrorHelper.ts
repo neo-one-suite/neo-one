@@ -8,7 +8,6 @@ import { VisitOptions } from '../../types';
 // Output: []
 export class ThrowTypeErrorHelper extends Helper<Node> {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
-    // TODO: Implement with global TypeError prototype
     // ['TypeError']
     sb.emitPushString(node, 'TypeError');
     // [value]

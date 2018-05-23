@@ -281,7 +281,6 @@ export class ResolvedScope implements Scope {
     sb.emitOp(node, 'NEWARRAY');
     // [idx, scope, scopes]
     sb.emitPushInt(node, 0);
-    // TODO: Should we just loop at compile time?
     sb.withProgramCounter((loopPC) => {
       // [idx, idx, scope, scopes]
       sb.emitOp(node, 'DUP');
@@ -293,7 +292,7 @@ export class ResolvedScope implements Scope {
       sb.emitJmp(node, 'JMPIFNOT', loopPC.getLast());
       // [scope, idx, scope, scopes]
       sb.emitOp(node, 'OVER');
-      // TODO: throw ReferenceError once it's defined on global
+      // [errorString, scope, idx, scope, scopes]
       sb.emitPushString(node, 'Referenced variable before it was defined');
       // [error, scope, idx, scope, scopes]
       sb.emitHelper(

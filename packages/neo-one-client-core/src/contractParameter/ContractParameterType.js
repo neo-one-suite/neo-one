@@ -66,7 +66,7 @@ export const assertContractParameterType = (
       return CONTRACT_PARAMETER_TYPE.ARRAY;
     case CONTRACT_PARAMETER_TYPE.INTEROP_INTERFACE:
       return CONTRACT_PARAMETER_TYPE.INTEROP_INTERFACE;
-    // TODO: Seems to be a bug in the TestNet
+    // Seems to be a bug in the TestNet
     case 0x16:
       return CONTRACT_PARAMETER_TYPE.ARRAY;
     case CONTRACT_PARAMETER_TYPE.VOID:

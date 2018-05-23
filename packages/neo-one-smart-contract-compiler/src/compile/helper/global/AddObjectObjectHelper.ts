@@ -13,7 +13,6 @@ export class AddObjectObjectHelper extends Helper<Node> {
     sb.emitOp(node, 'DUP');
 
     /* create object prototype */
-    // TODO: Implement more of the prototype
     // [objectPrototypeVal, globalObjectVal, globalObjectVal]
     sb.emitHelper(node, options, sb.helpers.createObject);
     // [objectPrototypeVal, objectPrototypeVal, globalObjectVal, globalObjectVal]

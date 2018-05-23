@@ -36,8 +36,6 @@ export default class PublishTransaction extends TransactionBase<
   typeof TRANSACTION_TYPE.PUBLISH,
   PublishTransactionJSON,
 > {
-  // TODO: How is version set?
-  // static VERSION = 1;
   contract: Contract;
 
   __size: () => number;

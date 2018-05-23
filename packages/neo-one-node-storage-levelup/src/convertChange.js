@@ -8,7 +8,7 @@ import {
 import { keys } from '@neo-one/node-storage-common';
 
 import { type LevelUpChange } from './types';
-import { UnknownTypeError } from './errors';
+import { UnknownChangeTypeError, UnknownTypeError } from './errors';
 
 import * as common from './common';
 
@@ -231,6 +231,5 @@ export default (change: Change): Array<LevelUpChange> => {
 
   // eslint-disable-next-line
   (change.type: empty);
-  // TODO: Make better
-  throw new Error('Bad change type');
+  throw new UnknownChangeTypeError();
 };

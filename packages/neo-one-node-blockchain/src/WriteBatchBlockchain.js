@@ -256,7 +256,6 @@ export default class WriteBatchBlockchain {
           `${key.blockIndex}:${key.transactionIndex}:${key.index}`,
         // eslint-disable-next-line
         matchesPartialKey: (value, key) => {
-          // TODO: Implement me
           throw new Error('Not implemented');
         },
         createAddChange: (value) => ({ type: 'action', value }),
@@ -665,7 +664,6 @@ export default class WriteBatchBlockchain {
             transaction.type === TRANSACTION_TYPE.INVOCATION &&
             transaction instanceof InvocationTransaction
           ) {
-            // TODO: Make this less hacky.
             const temporaryBlockchain = new WriteBatchBlockchain({
               settings: this.settings,
               currentBlock: this._currentBlock,

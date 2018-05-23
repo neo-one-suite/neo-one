@@ -27,3 +27,11 @@ export class UnsignedBlockError extends CustomError {
     this.code = 'UNSIGNED_BLOCK';
   }
 }
+
+export class TooManyPublicKeysError extends CustomError {
+  code: string = 'TOO_MANY_PUBLIC_KEYS';
+}
+
+export class InvalidNumberOfKeysError extends CustomError {
+  code: string = 'INVALID_NUMBER_OF_KEYS';
+}

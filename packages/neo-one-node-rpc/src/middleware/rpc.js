@@ -421,11 +421,9 @@ export default ({
         : output.serializeJSON(blockchain.serializeJSONContext, index);
     },
     [RPC_METHODS.invoke]: async () => {
-      // TODO: Implement me
       throw new JSONRPCError(-101, 'Not implemented');
     },
     [RPC_METHODS.invokefunction]: async () => {
-      // TODO: Implement me
       throw new JSONRPCError(-101, 'Not implemented');
     },
     [RPC_METHODS.invokescript]: async (args) => {
@@ -446,7 +444,6 @@ export default ({
       }
     },
     [RPC_METHODS.submitblock]: async () => {
-      // TODO: Implement me
       throw new JSONRPCError(-101, 'Not implemented');
     },
     [RPC_METHODS.validateaddress]: async (args) => {

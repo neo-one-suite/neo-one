@@ -34,7 +34,6 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
     this.transpileDeploy(transpiler, node);
   }
 
-  // TODO: Lots of edge cases to handle here. E.g. readonly constructor properties
   private transpileDeploy(
     transpiler: Transpiler,
     node: ClassDeclaration,
@@ -75,7 +74,6 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
         if (TypeGuards.isCallExpression(callExpr)) {
           const lhsrExpr = callExpr.getExpression();
           if (TypeGuards.isSuperExpression(lhsrExpr)) {
-            // TODO: Handle case where constructor needs keep some statements
             firstStatement.replaceWithText(
               `super.deploy(${callExpr
                 .getArguments()
@@ -203,7 +201,6 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
     `);
 
     if (ctor != null) {
-      // TODO: Handle case where constructor needs keep some statements
       ctor.remove();
     }
   }

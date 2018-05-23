@@ -49,7 +49,6 @@ export class HandleCompletionHelper extends Helper {
             TypeGuards.isSourceFile(node) ||
             (parent != null && TypeGuards.isSourceFile(parent))
           ) {
-            // TODO: Add Error notification
             sb.emitOp(node, 'THROW');
           } else if (parent == null) {
             sb.reportError(

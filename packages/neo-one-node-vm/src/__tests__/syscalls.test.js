@@ -185,7 +185,6 @@ const SYSCALLS = ([
     result: [new IntegerStackItem(new BN(blockTime))],
     gas: FEES.ONE,
   },
-  // TODO (afragapane): Reverse of each of these + STRUCT + error cases
   {
     name: 'Neo.Runtime.Serialize',
     result: [
@@ -199,20 +198,21 @@ const SYSCALLS = ([
     args: [Buffer.alloc(10, 1)],
     gas: FEES.ONE,
   },
-  // TODO (afragapane): What's going on with this one?
-  // {
-  //   name: 'Neo.Runtime.Serialize',
-  //   result: [
-  //     new BufferStackItem(
-  //       new BinaryWriter()
-  //         .writeUInt8(STACK_ITEM_TYPE.BYTE_ARRAY)
-  //         .writeVarBytesLE(Buffer.alloc(1, 1))
-  //         .toBuffer(),
-  //     ),
-  //   ],
-  //   args: [true],
-  //   gas: FEES.ONE,
-  // },
+  // This one is a bit odd because true turns into emitting an integer
+  // stack item.
+  {
+    name: 'Neo.Runtime.Serialize',
+    result: [
+      new BufferStackItem(
+        new BinaryWriter()
+          .writeUInt8(STACK_ITEM_TYPE.INTEGER)
+          .writeVarBytesLE(Buffer.alloc(1, 1))
+          .toBuffer(),
+      ),
+    ],
+    args: [true],
+    gas: FEES.ONE,
+  },
   {
     name: 'Neo.Runtime.Serialize',
     result: [

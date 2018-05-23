@@ -185,18 +185,6 @@ export class NEOTranspiler implements Transpiler {
     }
   }
 
-  public addEvent(
-    node: Node,
-    name: string,
-    parameters: ParameterDeclaration[],
-  ): void {
-    // TODO: Change how events work.
-    // if (this.events[name] != null) {
-    //   this.reportError(node, 'Duplicate event.', DiagnosticCode.UNSUPPORTED_SYNTAX);
-    // }
-    // this.events[name] = parameters;
-  }
-
   public isSmartContract(node: ClassDeclaration): boolean {
     return (
       node === this.smartContract ||

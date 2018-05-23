@@ -63,11 +63,12 @@ export default class ScriptBuilder {
       this.emitOp('PUSHDATA2');
       this.emitUInt16LE(value.length);
       this.emit(value);
-      // TODO: Check this condition if (data.Length < 0x100000000L)
-    } else {
+    } else if (value.length < 0x100000000) {
       this.emitOp('PUSHDATA4');
       this.emitUInt32LE(value.length);
       this.emit(value);
+    } else {
+      throw new Error('Invalid buffer length');
     }
 
     return this;

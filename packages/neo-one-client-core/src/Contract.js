@@ -217,7 +217,6 @@ export const sizeOfContract = ({
   IOHelper.sizeOfVarBytesLE(script) +
   IOHelper.sizeOfVarBytesLE(Buffer.from(parameterList)) +
   IOHelper.sizeOfUInt8 +
-  // TODO: Doesn't take version into account?
   (publishVersion == null ? IOHelper.sizeOfBoolean : 0) +
   IOHelper.sizeOfVarString(name) +
   IOHelper.sizeOfVarString(codeVersion) +

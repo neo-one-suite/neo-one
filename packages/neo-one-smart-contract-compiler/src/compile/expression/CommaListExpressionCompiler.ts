@@ -14,7 +14,6 @@ export default class CommaListExpressionCompiler extends NodeCompiler<
     expr: CommaListExpression,
     options: VisitOptions,
   ): void {
-    // TODO: What is this??
     sb.reportUnsupported(expr);
   }
 }

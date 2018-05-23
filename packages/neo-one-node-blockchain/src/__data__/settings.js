@@ -54,7 +54,6 @@ const getGoverningToken = () => {
         '[{"lang":"zh-CN","name":"小蚁股"},{"lang":"en","name":"AntShare"}]',
       amount: ONE_HUNDRED_MILLION,
       precision: 0,
-      // TODO: Fix size calculation - should be 1 for infinite point
       owner: common.ECPOINT_INFINITY,
       admin,
     },

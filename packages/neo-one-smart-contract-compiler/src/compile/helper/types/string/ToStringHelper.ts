@@ -91,7 +91,6 @@ export class ToStringHelper extends TypedHelper {
     node: Node,
     options: VisitOptions,
   ): void {
-    // TODO: Try to support this
     sb.emitHelper(node, options, sb.helpers.throwTypeError);
   }
 

@@ -50,7 +50,6 @@ export class ProcessStatementsHelper extends Helper<Node & StatementedNode> {
       );
     }
     statements.forEach((statement: any) => {
-      // TODO: Should functions be hoisted?
       sb.visit(statement, sb.noValueOptions(options));
     });
   }

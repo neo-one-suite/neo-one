@@ -1035,7 +1035,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-    // TODO: We need to check SHL and SHR are correct against the C# VM
     [
       0x98,
       createOp({

@@ -8,8 +8,6 @@ import { VisitOptions } from '../../../types';
 import * as typeUtils from '../../../../typeUtils';
 import { Types } from '../Types';
 
-// TODO: Should we support NaN? We currently throw TypeError in cases where NaN would normally
-// be the result.
 // Input: [val]
 // Output: [number]
 export class ToNumberHelper extends TypedHelper {
@@ -56,7 +54,6 @@ export class ToNumberHelper extends TypedHelper {
     node: Node,
     options: VisitOptions,
   ): void {
-    // TODO: Should we support this?
     sb.emitHelper(node, options, sb.helpers.throwTypeError);
   }
 
@@ -109,7 +106,6 @@ export class ToNumberHelper extends TypedHelper {
     node: Node,
     options: VisitOptions,
   ): void {
-    // TODO: Should we support this?
     sb.emitHelper(node, options, sb.helpers.throwTypeError);
   }
 

@@ -14,7 +14,6 @@ export interface LessThanHelperOptions {
 
 // Input: []
 // Output: [boolean]
-// TODO: Currently only supports numbers. Invalid to pass in a string.
 export class LessThanHelper extends Helper<Node> {
   private leftFirst: boolean;
   private left: Node;

@@ -65,23 +65,22 @@ describe('ClassDeclarationCompiler', () => {
     `);
   });
 
-  // TODO: Fix undefined
-  // test.only('basic class with optional constructor arguments', async () => {
-  //   await helpers.executeString(`
-  //     class Foo {
-  //       x: string | undefined;
+  test.skip('basic class with optional constructor arguments', async () => {
+    await helpers.executeString(`
+      class Foo {
+        x: string | undefined;
 
-  //       constructor(x?: string) {
-  //         this.x = x;
-  //       }
-  //     }
+        constructor(x?: string) {
+          this.x = x;
+        }
+      }
 
-  //     const f = new Foo();
-  //     if (f.x !== undefined) {
-  //       throw 'Failure';
-  //     }
-  //   `);
-  // });
+      const f = new Foo();
+      if (f.x !== undefined) {
+        throw 'Failure';
+      }
+    `);
+  });
 
   test('basic class with method', async () => {
     await helpers.executeString(`
@@ -295,7 +294,6 @@ describe('ClassDeclarationCompiler', () => {
     `);
   });
 
-  // TODO: Allow tests to use storage
   test.skip('realistic class inheritance', async () => {
     await helpers.executeString(`
       function verifySender(addr: Buffer): void {

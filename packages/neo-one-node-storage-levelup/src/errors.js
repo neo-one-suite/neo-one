@@ -27,3 +27,12 @@ export class KeyNotFoundError extends CustomError {
     this.code = 'KEY_NOT_FOUND';
   }
 }
+
+export class UnknownChangeTypeError extends CustomError {
+  code: string;
+
+  constructor() {
+    super('Unknown change type');
+    this.code = 'UNKNOWN_CHANGE_TYPE';
+  }
+}

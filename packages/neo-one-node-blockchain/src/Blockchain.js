@@ -44,7 +44,10 @@ import { filter, map, toArray } from 'rxjs/operators';
 import { labels, utils as commonUtils } from '@neo-one/utils';
 
 import {
+  CoinClaimedError,
+  CoinUnspentError,
   GenesisBlockNotRegisteredError,
+  InvalidClaimError,
   ScriptVerifyError,
   WitnessVerifyError,
   UnknownVerifyError,
@@ -312,7 +315,7 @@ export default class Blockchain {
 
   // eslint-disable-next-line
   async persistHeaders(headers: Array<Header>): Promise<void> {
-    // TODO: Perhaps don't implement this?
+    // We don't ever just persist the headers.
   }
 
   async verifyBlock(block: Block, monitor?: Monitor): Promise<void> {
@@ -596,13 +599,11 @@ export default class Blockchain {
         );
         const filteredSpentCoins = spentCoins.filter(Boolean);
         if (spentCoins.length !== filteredSpentCoins.length) {
-          // TODO: Better error
-          throw new Error('Not all coins were spent');
+          throw new CoinUnspentError();
         }
 
         if (filteredSpentCoins.some((coin) => coin.claimed)) {
-          // TODO: Better error
-          throw new Error('Coin was already claimed');
+          throw new CoinClaimedError();
         }
 
         if (
@@ -614,8 +615,7 @@ export default class Blockchain {
               ),
           )
         ) {
-          // TODO: Better error
-          throw new Error('Invalid claim');
+          throw new InvalidClaimError();
         }
 
         return utils.calculateClaimAmount({
@@ -798,7 +798,6 @@ export default class Blockchain {
           this._storage.contract.get({ hash: contractHash }),
         ),
       ),
-      // TODO: Make this more efficient with a DataLoader
       this._storage.action
         .getAll({
           blockIndexStart: data.blockIndex,
@@ -826,7 +825,6 @@ export default class Blockchain {
       .getAll({ hash })
       .pipe(toArray())
       .toPromise();
-    // TODO: Quick fix because unclaimed includes all spent coins.
     const filtered = await Promise.all(
       unclaimed.map(async (value) => {
         const output = await this._storage.output.get(value.input);

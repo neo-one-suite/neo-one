@@ -325,7 +325,6 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
           sb.emitOp(node, 'CAT');
           sb.emitHelper(node, options, sb.helpers.createString);
         } else {
-          // TODO: Add preferredType
           // [right, left]
           visit(sb.helpers.toPrimitive);
           // [left, right]
@@ -401,7 +400,6 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
         sb.emitOp(node, 'SUB');
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
-      // TODO: Should we try to make these match the js semantics?
       case SyntaxKind.GreaterThanGreaterThanToken:
         visitNumeric();
         sb.emitOp(node, 'SHR');
@@ -476,18 +474,15 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
       case SyntaxKind.InKeyword:
-        // TODO: Implement me
         sb.reportUnsupported(node);
         break;
       case SyntaxKind.InstanceOfKeyword:
-        // TODO: Implement me
         sb.reportUnsupported(node);
         break;
       case SyntaxKind.CommaToken:
         sb.emitOp(node, 'DROP');
         break;
       case SyntaxKind.AsteriskAsteriskToken:
-        // TODO: Implement me
         sb.reportUnsupported(node);
         break;
       case SyntaxKind.EqualsEqualsEqualsToken:

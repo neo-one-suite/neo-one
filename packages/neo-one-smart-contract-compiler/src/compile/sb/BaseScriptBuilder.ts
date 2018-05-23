@@ -224,9 +224,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
     if (value.eq(utils.NEGATIVE_ONE)) {
       return this.emitOp(node, 'PUSHM1');
     } else if (value.eq(utils.ZERO)) {
-      // TODO: Empty byte breaks equality with 0. Not sure if it's a bug in the vm or
-      //       we need to explicitly push a buffer with one 0 byte rather than PUSH0
-      // this.emitOp(node, 'PUSH0');
       return this.emitPush(node, utils.toSignedBuffer(value));
     } else if (value.gt(utils.ZERO) && value.lt(utils.SIXTEEN)) {
       return this.emitOpByte(
@@ -517,8 +514,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
           .emit(value)
           .build(),
       );
-      // TODO: Check this condition if (data.Length < 0x100000000L)
-    } else {
+    } else if (value.length < 0x100000000) {
       this.emitOp(
         node,
         'PUSHDATA4',
@@ -527,6 +523,8 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
           .emit(value)
           .build(),
       );
+    } else {
+      throw new Error('Value too large.');
     }
   }
 

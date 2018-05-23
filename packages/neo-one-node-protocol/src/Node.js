@@ -1007,7 +1007,6 @@ export default class Node implements INode {
             );
           }
         });
-        // TODO: Implement
         break;
       default:
         // eslint-disable-next-line
@@ -1139,13 +1138,12 @@ export default class Node implements INode {
     transaction: Transaction,
   ): Promise<void> {
     if (this._ready()) {
-      await this.relayTransaction(transaction);
-      // TODO: Kinda hacky
-      if (
-        transaction.type === TRANSACTION_TYPE.MINER &&
-        this.consensus != null
-      ) {
-        this.consensus.onTransactionReceived(transaction);
+      if (transaction.type === TRANSACTION_TYPE.MINER) {
+        if (this.consensus != null) {
+          this.consensus.onTransactionReceived(transaction);
+        }
+      } else {
+        await this.relayTransaction(transaction);
       }
     }
   }
@@ -1226,15 +1224,11 @@ export default class Node implements INode {
             }),
           );
           const hashesToRemove = _.take(
-            _.sortBy(
-              transactionAndFee,
-              // TODO: Might be a bug since we're converting to number
-              [
-                ([transaction, networkFee]) =>
-                  networkFee.divn(transaction.size).toNumber(),
-                ([transaction]) => transaction.hashHex,
-              ],
-            ),
+            _.sortBy(transactionAndFee, [
+              ([transaction, networkFee]) =>
+                networkFee.divn(transaction.size).toNumber(),
+              ([transaction]) => transaction.hashHex,
+            ]),
             this.blockchain.settings.memPoolSize,
             // eslint-disable-next-line
           ).map(([transaction, _]) => transaction.hashHex);

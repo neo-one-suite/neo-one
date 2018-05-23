@@ -20,7 +20,6 @@ export class CreateFunctionArrayHelper extends Helper<Node> {
 
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (options.pushValue) {
-      // TODO: This might break if this/global change after copying?
       /* create function */
       // [[scopes, this]]
       sb.scope.pushAll(sb, node, options);

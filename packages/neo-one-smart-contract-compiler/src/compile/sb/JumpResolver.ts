@@ -299,9 +299,6 @@ export class JumpResolver {
   public process(bytecode: Array<Buffer | Jump>): Array<Buffer | Jump> {
     let first: CodePoint = this.getCodePoint(bytecode);
     let newTargets = [];
-    // TODO: We do this in a loop in case there's a math problem in inserting
-    //       new jumps, might not be necessary.
-    // TODO: Optimize and fix this crazy logic.
     do {
       this.resolvePC(first);
       const result = this.processOne(first);

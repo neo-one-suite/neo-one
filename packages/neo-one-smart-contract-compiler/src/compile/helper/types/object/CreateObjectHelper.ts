@@ -22,7 +22,6 @@ export class CreateObjectHelper extends Helper<Node> {
       // [pobj, sobj, iobj]
       sb.emitOp(node, 'NEWMAP');
 
-      // TODO: Consolidate with ShallowCloneObjectHelper
       /* create object array */
       // [3, pobj, sobj, iobj]
       sb.emitPushInt(node, 3);

@@ -46,7 +46,6 @@ export class ShallowCloneObjectHelper extends Helper<Node> {
     // [objectType, object]
     sb.emitPushInt(node, Types.Object);
 
-    // TODO: Consolidate with CreateObjectHelper
     /* create object */
     // [2, objectType, object]
     sb.emitPushInt(node, 2);

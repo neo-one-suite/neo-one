@@ -35,9 +35,6 @@ export default class IssueTransaction extends TransactionBase<
   typeof TRANSACTION_TYPE.ISSUE,
   IssueTransactionJSON,
 > {
-  // TODO: How is version set?
-  // static VERSION = 1;
-
   __size: () => number;
   __issueGetScriptHashesForVerifying: (
     options: TransactionGetScriptHashesForVerifyingOptions,
