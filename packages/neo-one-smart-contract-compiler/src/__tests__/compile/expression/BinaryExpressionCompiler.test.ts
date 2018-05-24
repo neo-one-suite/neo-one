@@ -382,4 +382,14 @@ if (true && false) {
       }
     `);
   });
+
+  test('dog instanceof Animal [InstanceOfKeyword]', async () => {
+    await helpers.executeString(`
+    class Animal {};
+    let dog = new Animal();
+    if (!(dog instanceof Animal )) {
+      throw 'Failure';
+    }
+    `);
+  });
 });

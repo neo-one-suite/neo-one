@@ -477,7 +477,14 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
         sb.reportUnsupported(node);
         break;
       case SyntaxKind.InstanceOfKeyword:
-        sb.reportUnsupported(node);
+        // [left]
+        sb.visit(left, options);
+        // [right, left]
+        sb.visit(right, options);
+        // [left instanceof right]
+        sb.emitHelper(node, options, sb.helpers.instanceof);
+        // [booleanVal]
+        sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case SyntaxKind.CommaToken:
         sb.emitOp(node, 'DROP');
