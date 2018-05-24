@@ -483,6 +483,7 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
         sb.visit(right, options);
         // [left instanceof right]
         sb.emitHelper(node, options, sb.helpers.instanceof);
+        // [booleanVal]
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case SyntaxKind.CommaToken:
