@@ -6,7 +6,6 @@ import Ast, {
   Type,
   Symbol,
   TypeGuards,
-  ParameterDeclaration,
   Identifier,
   SyntaxKind,
   TypeNode,
