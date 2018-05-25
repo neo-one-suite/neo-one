@@ -633,6 +633,18 @@ const OPCODES = ([
       gas: FEES.ONE,
     },
     {
+      op: 'OR',
+      args: [2, 128],
+      result: [new IntegerStackItem(new BN(130))],
+      gas: FEES.ONE,
+    },
+    {
+      op: 'OR',
+      args: [128, 2],
+      result: [new IntegerStackItem(new BN(130))],
+      gas: FEES.ONE,
+    },
+    {
       op: 'XOR',
       args: [Buffer.alloc(10, 0xa0), Buffer.alloc(10, 0x0a)],
       result: [

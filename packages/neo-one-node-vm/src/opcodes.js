@@ -781,11 +781,10 @@ const OPCODE_PAIRS = [
           context,
           results: [
             new IntegerStackItem(
-              utils.fromSignedBuffer(
-                bitwise.buffer.and(
-                  utils.toSignedBuffer(args[0].asBigInteger()),
-                  utils.toSignedBuffer(args[1].asBigInteger()),
-                ),
+              vmUtils.bitwiseOp(
+                bitwise.buffer.and,
+                args[0].asBigInteger(),
+                args[1].asBigInteger(),
               ),
             ),
           ],
@@ -802,11 +801,10 @@ const OPCODE_PAIRS = [
           context,
           results: [
             new IntegerStackItem(
-              utils.fromSignedBuffer(
-                bitwise.buffer.or(
-                  utils.toSignedBuffer(args[0].asBigInteger()),
-                  utils.toSignedBuffer(args[1].asBigInteger()),
-                ),
+              vmUtils.bitwiseOp(
+                bitwise.buffer.or,
+                args[0].asBigInteger(),
+                args[1].asBigInteger(),
               ),
             ),
           ],
@@ -823,11 +821,10 @@ const OPCODE_PAIRS = [
           context,
           results: [
             new IntegerStackItem(
-              utils.fromSignedBuffer(
-                bitwise.buffer.xor(
-                  utils.toSignedBuffer(args[0].asBigInteger()),
-                  utils.toSignedBuffer(args[1].asBigInteger()),
-                ),
+              vmUtils.bitwiseOp(
+                bitwise.buffer.xor,
+                args[0].asBigInteger(),
+                args[1].asBigInteger(),
               ),
             ),
           ],
