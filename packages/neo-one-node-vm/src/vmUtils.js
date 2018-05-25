@@ -1,6 +1,8 @@
 /* @flow */
 import BN from 'bn.js';
 
+import _ from 'lodash';
+import bitwise from 'bitwise';
 import { utils } from '@neo-one/client-core';
 
 import { type ExecutionContext } from './constants';
@@ -44,9 +46,45 @@ const toStorageContext = (
     entryScriptHash: context.entryScriptHash,
   });
 
+const leftPad = (value: Buffer, length: number): Buffer => {
+  if (value.length === 0) {
+    return Buffer.alloc(0, length);
+  }
+
+  const lastByte = bitwise.byte.read(value[value.length - 1]);
+
+  return Buffer.concat([
+    value.slice(0, -1),
+    bitwise.buffer.create(
+      lastByte
+        .slice(0, -1)
+        .concat(_.range((length - value.length) * 8).map(() => 0))
+        .concat([lastByte[7]]),
+    ),
+  ]);
+};
+
+const bitwiseOp = (
+  func: (a: Buffer, b: Buffer) => Buffer,
+  a: BN,
+  b: BN,
+): BN => {
+  let aBuffer = utils.toSignedBuffer(a);
+  let bBuffer = utils.toSignedBuffer(b);
+
+  if (aBuffer.length < bBuffer.length) {
+    aBuffer = leftPad(aBuffer, bBuffer.length);
+  } else if (aBuffer.length > bBuffer.length) {
+    bBuffer = leftPad(bBuffer, aBuffer.length);
+  }
+
+  return utils.fromSignedBuffer(func(aBuffer, bBuffer));
+};
+
 export default {
   toNumber,
   toStorageContext,
   shiftLeft,
   shiftRight,
+  bitwiseOp,
 };
