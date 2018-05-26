@@ -5,7 +5,13 @@ import type Contract from './Contract';
 import { BinaryReader, BinaryWriter } from './utils';
 import type { ECPoint, UInt160 } from './common';
 import type { InvocationResult } from './invocationResult';
-import type { FeeContext, Input, InvocationTransaction } from './transaction';
+import type {
+  FeeContext,
+  Input,
+  InvocationTransaction,
+  TransactionBase,
+} from './transaction';
+import type TransactionData from './TransactionData';
 
 export type DeserializeWireContext = {|
   messageMagic: number,
@@ -66,6 +72,9 @@ export type SerializeJSONContext = {|
   tryGetInvocationData: (
     transaction: InvocationTransaction,
   ) => Promise<?InvocationData>,
+  tryGetTransactionData: (
+    transaction: TransactionBase<any, any>,
+  ) => Promise<?TransactionData>,
   getUnclaimed: (hash: UInt160) => Promise<Array<Input>>,
   getUnspent: (hash: UInt160) => Promise<Array<Input>>,
 |};

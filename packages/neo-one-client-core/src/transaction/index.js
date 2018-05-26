@@ -30,6 +30,7 @@ export { default as StateTransaction } from './StateTransaction';
 export { default as InvocationTransaction } from './InvocationTransaction';
 export { default as Input } from './Input';
 export { default as Output } from './Output';
+export { default as TransactionBase } from './TransactionBase';
 
 export type { MinerTransactionJSON } from './MinerTransaction';
 export type { IssueTransactionJSON } from './IssueTransaction';

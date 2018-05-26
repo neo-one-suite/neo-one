@@ -61,7 +61,7 @@ describe('common', () => {
       blockHash: 'blockHash1',
       transactionIndex: 2,
       transactionHash: 'transHash1',
-      index: 3,
+      index: new BigNumber(3),
       scriptHash: 'scriptHash1',
       type: 'Log',
       message: 'msg',
@@ -80,7 +80,7 @@ describe('common', () => {
       blockHash: 'blockHash1',
       transactionIndex: 2,
       transactionHash: 'transHash1',
-      index: 3,
+      index: new BigNumber(3),
       scriptHash: 'scriptHash1',
       type: 'Notification',
       args: [],
@@ -101,7 +101,7 @@ describe('common', () => {
       blockHash: 'blockHash1',
       transactionIndex: 2,
       transactionHash: 'transHash1',
-      index: 3,
+      index: new BigNumber(3),
       scriptHash: 'scriptHash1',
       type: 'Notification',
       args: [contractParameter],
@@ -127,7 +127,7 @@ describe('common', () => {
       transactionIndex: 2,
       transactionHash:
         '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89cb',
-      index: 3,
+      index: new BigNumber(3),
       scriptHash: '0x3775292229eccdf904f16fff8e83e7cffdc0f0ce',
     };
     const events = {

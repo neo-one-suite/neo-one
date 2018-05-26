@@ -12,6 +12,10 @@ export default class LocalMemoryStore {
     return Promise.resolve([]);
   }
 
+  getWalletsSync(): Array<Wallet> {
+    return [];
+  }
+
   // eslint-disable-next-line
   saveWallet(wallet: Wallet): Promise<void> {
     return Promise.resolve();

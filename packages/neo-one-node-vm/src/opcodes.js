@@ -237,7 +237,6 @@ const call = ({ name, tailCall }: {| name: OpCode, tailCall?: boolean |}) => ({
           stack: context.stack,
           stackAlt: context.stackAlt,
           depth: tailCall ? context.depth : context.depth + 1,
-          actionIndex: context.actionIndex,
           createdContracts: context.createdContracts,
           scriptHash: context.scriptHash,
           entryScriptHash: context.entryScriptHash,

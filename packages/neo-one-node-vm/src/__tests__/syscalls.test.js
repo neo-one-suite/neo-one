@@ -137,7 +137,6 @@ type TestCase = {|
         | ((result: any) => void)),
   gas: BN,
   args?: Array<Arg>,
-  actionIndex?: number,
   options?: Options,
   mock?: (options: {| blockchain: any |}) => void,
 |};
@@ -164,21 +163,13 @@ const SYSCALLS = ([
     name: 'Neo.Runtime.Notify',
     result: [],
     args: [[true]],
-    mock: ({ blockchain }) => {
-      blockchain.action.add = jest.fn(() => Promise.resolve());
-    },
     gas: FEES.ONE,
-    actionIndex: 1,
   },
   {
     name: 'Neo.Runtime.Log',
     result: [],
     args: ['foo'],
-    mock: ({ blockchain }) => {
-      blockchain.action.add = jest.fn(() => Promise.resolve());
-    },
     gas: FEES.ONE,
-    actionIndex: 1,
   },
   {
     name: 'Neo.Runtime.GetTime',
@@ -869,7 +860,7 @@ const SYSCALLS = ([
       blockchain.transaction.get = jest.fn(() =>
         Promise.resolve(transactions.mintTransaction),
       );
-      blockchain.transactionSpentCoins.get = jest.fn(() =>
+      blockchain.transactionData.get = jest.fn(() =>
         Promise.resolve({
           hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
           startHeight: 1,
@@ -898,7 +889,7 @@ const SYSCALLS = ([
       blockchain.transaction.get = jest.fn(() =>
         Promise.resolve(transactions.mintTransaction),
       );
-      blockchain.transactionSpentCoins.get = jest.fn(() =>
+      blockchain.transactionData.get = jest.fn(() =>
         Promise.resolve({
           hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
           startHeight: 1,
@@ -2124,15 +2115,7 @@ describe('syscalls', () => {
   };
 
   for (const testCase of SYSCALLS) {
-    const {
-      name,
-      result,
-      gas,
-      args = [],
-      actionIndex = 0,
-      mock,
-      options,
-    } = testCase;
+    const { name, result, gas, args = [], mock, options } = testCase;
     it(name, async () => {
       const sb = new ScriptBuilder();
       sb.emitSysCall(name);
@@ -2158,7 +2141,13 @@ describe('syscalls', () => {
         transaction: {},
         account: {},
         validator: {},
-        transactionSpentCoins: {},
+        transactionData: {},
+      };
+      const listeners = {
+        onNotify: jest.fn(() => {}),
+        onLog: jest.fn(() => {}),
+        onMigrateContract: jest.fn(() => {}),
+        onSetVotes: jest.fn(() => {}),
       };
       const block = {
         timestamp: blockTime,
@@ -2170,7 +2159,7 @@ describe('syscalls', () => {
         },
         triggerType,
         action: NULL_ACTION,
-        listeners: {},
+        listeners,
         skipWitnessVerify: false,
         persistingBlock: (block: $FlowFixMe),
       };
@@ -2216,11 +2205,11 @@ describe('syscalls', () => {
           expectedResult(context.stack);
         }
       }
-      expect(context.actionIndex).toEqual(actionIndex);
       expect(gasLeft.sub(context.gasLeft).toString(10)).toEqual(
         gas.toString(10),
       );
       testUtils.verifyBlockchainSnapshot(blockchain);
+      testUtils.verifyListeners(listeners);
     });
   }
 });

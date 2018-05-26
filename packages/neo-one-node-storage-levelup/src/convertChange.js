@@ -50,8 +50,6 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
         {
           type: 'put',
           key: keys.typeKeyToSerializeKey.action({
-            blockIndex: change.value.blockIndex,
-            transactionIndex: change.value.transactionIndex,
             index: change.value.index,
           }),
           value: change.value.serializeWire(),
@@ -78,11 +76,11 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           value: common.serializeBlockHash(change.value.hash),
         },
       ];
-    case 'blockSystemFee':
+    case 'blockData':
       return [
         {
           type: 'put',
-          key: keys.typeKeyToSerializeKey.blockSystemFee(change.value),
+          key: keys.typeKeyToSerializeKey.blockData(change.value),
           value: change.value.serializeWire(),
         },
       ];
@@ -123,11 +121,11 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           value: change.value.output.serializeWire(),
         },
       ];
-    case 'transactionSpentCoins':
+    case 'transactionData':
       return [
         {
           type: 'put',
-          key: keys.typeKeyToSerializeKey.transactionSpentCoins(change.value),
+          key: keys.typeKeyToSerializeKey.transactionData(change.value),
           value: change.value.serializeWire(),
         },
       ];

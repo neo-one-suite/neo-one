@@ -17,8 +17,6 @@ import {
   StorageItem,
   Validator,
   BinaryReader,
-  LogAction,
-  NotificationAction,
   InvalidScriptContainerTypeError,
   assertAssetType,
   assertContractParameterType,
@@ -364,44 +362,28 @@ export const SYSCALLS = {
     name: 'Neo.Runtime.Notify',
     in: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const notification = new NotificationAction({
-        blockIndex: context.init.action.blockIndex,
-        blockHash: context.init.action.blockHash,
-        transactionIndex: context.init.action.transactionIndex,
-        transactionHash: context.init.action.transactionHash,
-        index: context.actionIndex,
-        scriptHash: context.scriptHash,
-        args: args[0].asArray().map((item) => item.toContractParameter()),
-      });
-      await context.blockchain.action.add(notification);
-      return {
-        context: {
-          ...context,
-          actionIndex: context.actionIndex + 1,
-        },
-      };
+      const { onNotify } = context.init.listeners;
+      if (onNotify != null) {
+        onNotify({
+          scriptHash: context.scriptHash,
+          args: args[0].asArray().map((item) => item.toContractParameter()),
+        });
+      }
+      return { context };
     },
   }),
   'Neo.Runtime.Log': createSysCall({
     name: 'Neo.Runtime.Log',
     in: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const log = new LogAction({
-        blockIndex: context.init.action.blockIndex,
-        blockHash: context.init.action.blockHash,
-        transactionIndex: context.init.action.transactionIndex,
-        transactionHash: context.init.action.transactionHash,
-        index: context.actionIndex,
-        scriptHash: context.scriptHash,
-        message: args[0].asString(),
-      });
-      await context.blockchain.action.add(log);
-      return {
-        context: {
-          ...context,
-          actionIndex: context.actionIndex + 1,
-        },
-      };
+      const { onLog } = context.init.listeners;
+      if (onLog != null) {
+        onLog({
+          scriptHash: context.scriptHash,
+          message: args[0].asString(),
+        });
+      }
+      return { context };
     },
   }),
   'Neo.Runtime.GetTime': createSysCall({
@@ -778,7 +760,7 @@ export const SYSCALLS = {
     fee: FEES.TWO_HUNDRED,
     invoke: async ({ context, args }: OpInvokeArgs) => {
       const transaction = args[0].asTransaction();
-      const spentCoins = await context.blockchain.transactionSpentCoins.get({
+      const spentCoins = await context.blockchain.transactionData.get({
         hash: transaction.hash,
       });
       return {

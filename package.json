@@ -200,7 +200,8 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "transformIgnorePatterns": [
-      "<rootDir>/node_modules/(?!ix)"
+      "<rootDir>/node_modules/(?!ix)",
+      "<rootDir>/packages/.*/dist/.*"
     ],
     "snapshotSerializers": [
       "./scripts/serializers/blockchain.js",

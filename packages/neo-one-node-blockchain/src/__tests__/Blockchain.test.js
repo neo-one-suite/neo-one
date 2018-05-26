@@ -62,7 +62,7 @@ describe('Blockchain', () => {
         tryGet: tryNotFound(),
         get: notFound(),
       },
-      blockSystemFee: {
+      blockData: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
@@ -75,7 +75,7 @@ describe('Blockchain', () => {
         tryGet: tryNotFound(),
         get: notFound(),
       },
-      transactionSpentCoins: {
+      transactionData: {
         tryGet: tryNotFound(),
         get: notFound(),
       },

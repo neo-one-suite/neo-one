@@ -14,6 +14,12 @@ export const verifyBlockchainSnapshot = (blockchain: any) => {
   });
 };
 
+export const verifyListeners = (listeners: any) => {
+  commonUtils.values(listeners).forEach((func) => {
+    expect(func.mock.calls).toMatchSnapshot();
+  });
+};
+
 export const expectItemBNEquals = (item: StorageItem, value: string) => {
   expect(utils.fromSignedBuffer(item.value).toString(10)).toEqual(value);
 };

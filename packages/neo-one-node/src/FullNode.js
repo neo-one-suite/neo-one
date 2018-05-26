@@ -7,6 +7,7 @@ import {
 } from '@neo-one/node-data-backup';
 import type { Subscription } from 'rxjs';
 
+import { finalize } from '@neo-one/utils';
 import path from 'path';
 
 import fullNode$, { type FullNodeOptions } from './fullNode$';
@@ -41,10 +42,11 @@ export default class FullNode {
     }
   }
 
-  stop(): void {
+  async stop(): Promise<void> {
     if (this._subscription != null) {
       this._subscription.unsubscribe();
       this._subscription = null;
+      await finalize.wait();
     }
   }
 

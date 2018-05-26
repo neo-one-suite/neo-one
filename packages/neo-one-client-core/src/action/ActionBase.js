@@ -1,4 +1,6 @@
-/* @/* @flow */
+/* @flow */
+import type BN from 'bn.js';
+
 import { type ActionType } from './ActionType';
 import { type BinaryWriter, BinaryReader, JSONHelper } from '../utils';
 import {
@@ -9,15 +11,11 @@ import {
   type SerializableWire,
   createSerializeWire,
 } from '../Serializable';
-import { type UInt160, type UInt256 } from '../common';
+import { type UInt160 } from '../common';
 
 export type ActionBaseAdd = {|
   version?: number,
-  blockIndex: number,
-  blockHash: UInt256,
-  transactionIndex: number,
-  transactionHash: UInt256,
-  index: number,
+  index: BN,
   scriptHash: UInt160,
 |};
 export type ActionBaseAddWithType<Type: ActionType> = {|
@@ -27,11 +25,7 @@ export type ActionBaseAddWithType<Type: ActionType> = {|
 
 export type ActionBaseJSON = {|
   version: number,
-  blockIndex: number,
-  blockHash: string,
-  transactionIndex: number,
-  transactionHash: string,
-  index: number,
+  index: string,
   scriptHash: string,
 |};
 
@@ -41,29 +35,17 @@ export default class ActionBase<T, Type: ActionType>
 
   type: Type;
   version: number;
-  blockIndex: number;
-  blockHash: UInt256;
-  transactionIndex: number;
-  transactionHash: UInt256;
-  index: number;
+  index: BN;
   scriptHash: UInt160;
 
   constructor({
     type,
     version,
-    blockIndex,
-    blockHash,
-    transactionIndex,
-    transactionHash,
     index,
     scriptHash,
   }: ActionBaseAddWithType<Type>) {
     this.type = type;
     this.version = version == null ? this.constructor.VERSION : version;
-    this.blockIndex = blockIndex;
-    this.blockHash = blockHash;
-    this.transactionIndex = transactionIndex;
-    this.transactionHash = transactionHash;
     this.index = index;
     this.scriptHash = scriptHash;
   }
@@ -71,11 +53,7 @@ export default class ActionBase<T, Type: ActionType>
   serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.type);
     writer.writeUInt8(this.version);
-    writer.writeUInt32LE(this.blockIndex);
-    writer.writeUInt256(this.blockHash);
-    writer.writeUInt32LE(this.transactionIndex);
-    writer.writeUInt256(this.transactionHash);
-    writer.writeUInt32LE(this.index);
+    writer.writeUInt64LE(this.index);
     writer.writeUInt160(this.scriptHash);
   }
 
@@ -88,20 +66,12 @@ export default class ActionBase<T, Type: ActionType>
   }: DeserializeWireBaseOptions) => {
     const type = reader.readUInt8();
     const version = reader.readUInt8();
-    const blockIndex = reader.readUInt32LE();
-    const blockHash = reader.readUInt256();
-    const transactionIndex = reader.readUInt32LE();
-    const transactionHash = reader.readUInt256();
-    const index = reader.readUInt32LE();
+    const index = reader.readUInt64LE();
     const scriptHash = reader.readUInt160();
 
     return {
       type,
       version,
-      blockIndex,
-      blockHash,
-      transactionIndex,
-      transactionHash,
       index,
       scriptHash,
     };
@@ -123,11 +93,7 @@ export default class ActionBase<T, Type: ActionType>
   serializeActionBaseJSON(context: SerializeJSONContext): ActionBaseJSON {
     return {
       version: this.version,
-      blockIndex: this.blockIndex,
-      blockHash: JSONHelper.writeUInt256(this.blockHash),
-      transactionIndex: this.transactionIndex,
-      transactionHash: JSONHelper.writeUInt256(this.transactionHash),
-      index: this.index,
+      index: JSONHelper.writeUInt64(this.index),
       scriptHash: JSONHelper.writeUInt160(this.scriptHash),
     };
   }

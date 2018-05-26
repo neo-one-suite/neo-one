@@ -155,7 +155,10 @@ function createContractJSON(options: Object) {
   return contract;
 }
 
-function createExpectedInvocationData(options: Object) {
+function createExpectedInvocationData(
+  extra: Object,
+  options: {| hash?: string |} = { hash: undefined },
+) {
   const invocation = {
     result: createExpectedInvocationResult({}),
     asset: createExpectedAsset({}),
@@ -168,30 +171,30 @@ function createExpectedInvocationData(options: Object) {
         type: 'Log',
         message: '0',
         version: 0,
-        blockIndex: 1,
-        blockHash: '1',
-        transactionIndex: 2,
-        transactionHash: '2',
-        index: 3,
+        blockIndex: 4,
+        blockHash: '3',
+        transactionIndex: 5,
+        transactionHash: options.hash == null ? '0' : options.hash,
+        index: new BigNumber(3),
         scriptHash: '3',
       },
       {
         type: 'Notification',
         args: [],
         version: 0,
-        blockIndex: 1,
-        blockHash: '0',
-        transactionIndex: 2,
-        transactionHash: '1',
-        index: 3,
+        blockIndex: 4,
+        blockHash: '3',
+        transactionIndex: 5,
+        transactionHash: options.hash == null ? '0' : options.hash,
+        index: new BigNumber(4),
         scriptHash: '2',
       },
     ],
   };
 
-  if (options) {
-    for (const option of Object.keys(options)) {
-      invocation[option] = options[option];
+  if (extra) {
+    for (const option of Object.keys(extra)) {
+      invocation[option] = extra[option];
     }
   }
 
@@ -211,22 +214,14 @@ function createInvocationDataJSON(options: Object) {
         type: 'Log',
         message: '0',
         version: 0,
-        blockIndex: 1,
-        blockHash: '1',
-        transactionIndex: 2,
-        transactionHash: '2',
-        index: 3,
+        index: '3',
         scriptHash: '3',
       },
       {
         type: 'Notification',
         args: [],
         version: 0,
-        blockIndex: 1,
-        blockHash: '0',
-        transactionIndex: 2,
-        transactionHash: '1',
-        index: 3,
+        index: '4',
         scriptHash: '2',
       },
     ],
@@ -289,10 +284,14 @@ function createExpectedOutput(options: Object) {
   return output;
 }
 
-function createTransactionJSON(type: string, options: Object) {
+function createTransactionJSON(
+  type: string,
+  extra: Object,
+  options: {| noData?: boolean, hash?: string |} = { noData: false },
+) {
   const transaction = {
     type,
-    txid: '0',
+    txid: options.hash == null ? '0' : options.hash,
     size: 0,
     version: 1,
     attributes: [createAttributeJSON({})],
@@ -303,16 +302,30 @@ function createTransactionJSON(type: string, options: Object) {
     net_fee: '2',
   };
 
-  if (options) {
-    for (const option of Object.keys(options)) {
-      transaction[option] = options[option];
+  if (!options.noData) {
+    // $FlowFixMe
+    transaction.data = {
+      blockHash: '3',
+      blockIndex: 4,
+      index: 5,
+      globalIndex: '4',
+    };
+  }
+
+  if (extra) {
+    for (const option of Object.keys(extra)) {
+      transaction[option] = extra[option];
     }
   }
 
   return transaction;
 }
 
-function createExpectedTransaction(type: string, options: Object) {
+function createExpectedTransaction(
+  type: string,
+  extra: Object,
+  options: {| noData: boolean |} = { noData: false },
+) {
   const transaction = {
     type,
     txid: '0',
@@ -326,22 +339,39 @@ function createExpectedTransaction(type: string, options: Object) {
     networkFee: new BigNumber('2'),
   };
 
-  if (options) {
-    for (const option of Object.keys(options)) {
-      transaction[option] = options[option];
+  if (!options.noData) {
+    // $FlowFixMe
+    transaction.data = {
+      blockHash: '3',
+      blockIndex: 4,
+      index: 5,
+      globalIndex: new BigNumber('4'),
+    };
+  }
+
+  if (extra) {
+    for (const option of Object.keys(extra)) {
+      transaction[option] = extra[option];
     }
   }
 
   return transaction;
 }
 
-function createExpectedRegisterTransaction(nameOption: Object) {
+function createExpectedRegisterTransaction(
+  nameOption: Object,
+  options?: {| noData: boolean |} = { noData: false },
+) {
   const { type, name, amount, precision, owner, admin } = createExpectedAsset(
     nameOption,
   );
-  return createExpectedTransaction('RegisterTransaction', {
-    asset: { type, name, amount, precision, owner, admin },
-  });
+  return createExpectedTransaction(
+    'RegisterTransaction',
+    {
+      asset: { type, name, amount, precision, owner, admin },
+    },
+    options,
+  );
 }
 
 function createRegisterTransactionJSON(nameOption: Object) {
@@ -436,64 +466,102 @@ describe('NEOONEDataProvider', () => {
   describe('_ConvertTransactionBase types', () => {
     const testCases = [
       {
-        expected: createExpectedTransaction('MinerTransaction', { nonce: 10 }),
+        expected: createExpectedTransaction(
+          'MinerTransaction',
+          { nonce: 10 },
+          { noData: true },
+        ),
         transactionJSON: createTransactionJSON('MinerTransaction', {
           nonce: 10,
         }),
       },
       {
-        expected: createExpectedTransaction('ClaimTransaction', { claims: [] }),
+        expected: createExpectedTransaction(
+          'ClaimTransaction',
+          { claims: [] },
+          { noData: true },
+        ),
         transactionJSON: createTransactionJSON('ClaimTransaction', {
           claims: [],
         }),
       },
       {
-        expected: createExpectedTransaction('ContractTransaction', {}),
+        expected: createExpectedTransaction(
+          'ContractTransaction',
+          {},
+          { noData: true },
+        ),
         transactionJSON: createTransactionJSON('ContractTransaction', {}),
       },
       {
-        expected: createExpectedTransaction('EnrollmentTransaction', {
-          publicKey: '0',
-        }),
+        expected: createExpectedTransaction(
+          'EnrollmentTransaction',
+          {
+            publicKey: '0',
+          },
+          { noData: true },
+        ),
         transactionJSON: createTransactionJSON('EnrollmentTransaction', {
           pubkey: '0',
         }),
       },
       {
-        expected: createExpectedTransaction('IssueTransaction', {}),
+        expected: createExpectedTransaction(
+          'IssueTransaction',
+          {},
+          { noData: true },
+        ),
         transactionJSON: createTransactionJSON('IssueTransaction', {}),
       },
       {
-        expected: createExpectedTransaction('PublishTransaction', {
-          contract: createExpectedContract({}),
-        }),
+        expected: createExpectedTransaction(
+          'PublishTransaction',
+          {
+            contract: createExpectedContract({}),
+          },
+          { noData: true },
+        ),
         transactionJSON: createTransactionJSON('PublishTransaction', {
           contract: createContractJSON({}),
         }),
       },
       {
-        expected: createExpectedRegisterTransaction({ name: '10' }),
+        expected: createExpectedRegisterTransaction(
+          { name: '10' },
+          { noData: true },
+        ),
         transactionJSON: createRegisterTransactionJSON({ name: '10' }),
       },
       {
-        expected: createExpectedRegisterTransaction({ name: '10' }),
+        expected: createExpectedRegisterTransaction(
+          { name: '10' },
+          { noData: true },
+        ),
         transactionJSON: createRegisterTransactionJSON({
           name: [{ name: '10' }],
         }),
       },
       {
-        expected: createExpectedTransaction('StateTransaction', {
-          descriptors: '10',
-        }),
+        expected: createExpectedTransaction(
+          'StateTransaction',
+          {
+            descriptors: '10',
+          },
+          { noData: true },
+        ),
         transactionJSON: createTransactionJSON('StateTransaction', {
           descriptors: '10',
         }),
       },
       {
-        expected: createExpectedTransaction('InvocationTransaction', {
-          gas: new BigNumber('10'),
-          script: '11',
-        }),
+        expected: createExpectedTransaction(
+          'InvocationTransaction',
+          {
+            gas: new BigNumber('10'),
+            script: '11',
+          },
+          { noData: true },
+        ),
         transactionJSON: createTransactionJSON('InvocationTransaction', {
           gas: '10',
           script: '11',
@@ -528,10 +596,23 @@ describe('NEOONEDataProvider', () => {
   });
 
   test('getInvocationData', async () => {
-    const expected = createExpectedInvocationData({});
+    const expected = createExpectedInvocationData(
+      {},
+      { hash: transactions.register.hash },
+    );
     // $FlowFixMe
     provider._client.getInvocationData = jest.fn(() =>
       Promise.resolve(createInvocationDataJSON({})),
+    );
+    // $FlowFixMe
+    provider._client.getTransaction = jest.fn(() =>
+      Promise.resolve(
+        createTransactionJSON(
+          'InvocationTransaction',
+          {},
+          { hash: transactions.register.hash },
+        ),
+      ),
     );
 
     const result = await provider.getInvocationData(transactions.register.hash);
@@ -616,7 +697,7 @@ describe('NEOONEDataProvider', () => {
         createExpectedTransaction('InvocationTransaction', {
           gas: new BigNumber('10'),
           script: '11',
-          data: createExpectedInvocationData({ asset: null }),
+          invocationData: createExpectedInvocationData({ asset: null }),
         }),
       ],
     };
@@ -638,7 +719,7 @@ describe('NEOONEDataProvider', () => {
           createTransactionJSON('InvocationTransaction', {
             gas: '10',
             script: '11',
-            data: createInvocationDataJSON({ asset: null }),
+            invocationData: createInvocationDataJSON({ asset: null }),
           }),
         ],
       }),
@@ -721,10 +802,20 @@ describe('NEOONEDataProvider', () => {
   });
 
   test('getTransaction', async () => {
-    const expected = createExpectedTransaction('ClaimTransaction', {});
+    const expected = createExpectedTransaction(
+      'ClaimTransaction',
+      { claims: [] },
+      { noData: true },
+    );
     // $FlowFixMe
     provider._client.getTransaction = jest.fn(() =>
-      Promise.resolve(createTransactionJSON('ClaimTransaction', {})),
+      Promise.resolve(
+        createTransactionJSON(
+          'ClaimTransaction',
+          { claims: [] },
+          { noData: true },
+        ),
+      ),
     );
 
     const result = provider.getTransaction(transactions.register.hash);
@@ -747,7 +838,20 @@ describe('NEOONEDataProvider', () => {
       // $FlowFixMe
       provider._convertConfirmedTransaction(
         // $FlowFixMe
-        createTransactionJSON('InvocationTransaction', { data: null }),
+        createTransactionJSON('ContractTransaction', { data: null }),
+      );
+    }
+    expect(testError).toThrow(new Error('Unexpected null data'));
+  });
+
+  test('_convertConfirmedTransaction with InvocationTransaction throws null data error', async () => {
+    function testError() {
+      // $FlowFixMe
+      provider._convertConfirmedTransaction(
+        // $FlowFixMe
+        createTransactionJSON('InvocationTransaction', {
+          invocationData: null,
+        }),
       );
     }
     expect(testError).toThrow(new Error('Unexpected null data'));
@@ -794,7 +898,7 @@ describe('NEOONEDataProvider', () => {
     const block = {
       transactions: [
         createTransactionJSON('InvocationTransaction', {
-          data: { actions: '0' },
+          invocationData: { actions: '0' },
         }),
         createTransactionJSON('ClaimTransaction', {}),
       ],
@@ -814,7 +918,7 @@ describe('NEOONEDataProvider', () => {
     const block = {
       transactions: [
         createTransactionJSON('InvocationTransaction', {
-          data: { actions: '0' },
+          invocationData: { actions: '0' },
         }),
         createTransactionJSON('ClaimTransaction', {}),
       ],

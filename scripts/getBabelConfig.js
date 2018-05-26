@@ -6,7 +6,7 @@ module.exports = ({ modules, useBuiltIns, targets, typescript }) => ({
       {
         useBuiltIns: useBuiltIns == null ? false : useBuiltIns,
         modules,
-        targets,
+        targets: targets == null ? { node: '8.9.0' } : targets,
       },
     ],
   ].filter(Boolean),
