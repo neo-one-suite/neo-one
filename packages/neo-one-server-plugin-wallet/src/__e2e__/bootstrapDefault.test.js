@@ -1,5 +1,5 @@
 /* @flow */
-import testBootstrap from './bootstrapTestUtils';
+import testBootstrap from '../__data__/bootstrapTestUtils';
 
 describe('bootstrap default', () => {
   test('bootstrap - default', async () => {
