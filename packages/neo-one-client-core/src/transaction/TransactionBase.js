@@ -137,7 +137,7 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     Equatable,
     SerializableWire<Transaction>,
     SerializableJSON<TransactionJSON> {
-  static VERSION = 0;
+  static VERSION: number;
 
   type: Type;
   version: number;
@@ -158,7 +158,9 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     scripts,
     hash,
   }: TransactionBaseAddWithType<Type>) {
-    this.version = version == null ? this.constructor.VERSION : version;
+    // workaround: babel fails to transpile if we have
+    // static VERSION: number = 0;
+    this.version = version == null ? this.constructor.VERSION || 0 : version;
     this.type = type;
     this.attributes = attributes || [];
     this.inputs = inputs || [];
