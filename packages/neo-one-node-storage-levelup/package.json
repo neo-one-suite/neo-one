@@ -39,6 +39,6 @@
     "@neo-one/node-storage-common": "^1.0.0-alpha.38",
     "@neo-one/utils": "^1.0.0-alpha.31",
     "bytewise": "^1.1.0",
-    "rxjs": "^6.1.0"
+    "rxjs": "^6.2.0"
   }
 }

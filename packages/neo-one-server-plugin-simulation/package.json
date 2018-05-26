@@ -44,10 +44,10 @@
     "@neo-one/simulation-react": "^1.0.0-alpha.15",
     "@neo-one/simulation-template": "^1.0.0-alpha.5",
     "@neo-one/utils": "^1.0.0-alpha.31",
-    "bignumber.js": "^7.0.1",
+    "bignumber.js": "^7.2.1",
     "execa": "^0.10.0",
     "fs-extra": "^6.0.1",
     "lodash": "^4.17.5",
-    "rxjs": "^6.1.0"
+    "rxjs": "^6.2.0"
   }
 }

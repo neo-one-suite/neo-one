@@ -43,13 +43,13 @@
     "@neo-one/node-vm": "^1.0.0-alpha.37",
     "@neo-one/smart-contract": "^1.0.0-alpha.3",
     "@neo-one/smart-contract-internal": "^1.0.0-alpha.3",
-    "@types/node": "^10.1.0",
+    "@types/node": "^10.1.2",
     "app-root-dir": "^1.0.2",
     "bn.js": "^4.11.8",
     "fs-extra": "^6.0.1",
-    "levelup": "^2.0.2",
+    "levelup": "^3.0.1",
     "lodash": "^4.17.5",
-    "memdown": "^2.0.0",
+    "memdown": "^3.0.0",
     "safe-stable-stringify": "^1.0.1",
     "ts-simple-ast": "^11.2.0"
   }

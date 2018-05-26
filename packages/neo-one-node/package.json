@@ -45,9 +45,9 @@
     "@neo-one/node-storage-levelup": "^1.0.0-alpha.38",
     "@neo-one/node-vm": "^1.0.0-alpha.37",
     "@neo-one/utils": "^1.0.0-alpha.31",
-    "leveldown": "^3.0.2",
-    "levelup": "^2.0.2",
+    "leveldown": "^4.0.1",
+    "levelup": "^3.0.1",
     "node-cron": "^1.2.1",
-    "rxjs": "^6.1.0"
+    "rxjs": "^6.2.0"
   }
 }

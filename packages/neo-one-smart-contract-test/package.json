@@ -39,7 +39,7 @@
     "@neo-one/smart-contract-compiler": "^1.0.0-alpha.3",
     "@neo-one/utils": "^1.0.0-alpha.31",
     "lodash": "^4.17.5",
-    "memdown": "^2.0.0",
+    "memdown": "^3.0.0",
     "ts-simple-ast": "^11.2.0"
   }
 }

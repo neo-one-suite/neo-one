@@ -45,6 +45,6 @@
     "opentracing": "^0.14.3",
     "prom-client": "^11.0.0",
     "prometheus-gc-stats": "^0.5.1",
-    "rxjs": "^6.1.0"
+    "rxjs": "^6.2.0"
   }
 }
