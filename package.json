@@ -21,7 +21,7 @@
       "yarn run test --findRelatedTests --ci --passWithNoTests"
     ],
     "packages/*/src/**/*.ts": [
-      "prettier --write --config .prettierrc --parser typescript",
+      "yarn run prettier --write --config .prettierrc --parser typescript",
       "git add",
       "yarn test --findRelatedTests --ci --passWithNoTests"
     ],
@@ -40,7 +40,7 @@
     "flow": "flow",
     "lint-staged": "lint-staged",
     "flow:coverage": "flow-coverage-report -i 'packages/*/src/**/*.js' -t html",
-    "precommit": "lint-staged && flow && tsc && tslint --project .",
+    "precommit": "flow && tsc && tslint --project . && lint-staged",
     "bootstrap": "yarn run build && lerna bootstrap",
     "build": "rm -rf ./packages/*/dist && yarn run gulp build",
     "watch": "yarn run gulp watch",
