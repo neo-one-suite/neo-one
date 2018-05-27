@@ -371,6 +371,17 @@ const SYSCALLS = ([
     gas: FEES.ONE_HUNDRED,
   },
   {
+    name: 'Neo.Blockchain.GetTransactionHeight',
+    result: [new IntegerStackItem(new BN(10))],
+    args: [Buffer.alloc(32, 3)],
+    mock: ({ blockchain }) => {
+      blockchain.transactionData.get = jest.fn(() =>
+        Promise.resolve({ startHeight: 10 }),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
     name: 'Neo.Blockchain.GetAccount',
     result: [new AccountStackItem(new Account(account))],
     args: [scriptAttributeHash],

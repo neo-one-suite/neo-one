@@ -519,6 +519,7 @@ export const SYS_CALL_NAME = {
   BLOCKCHAIN_GET_HEADER: 'Neo.Blockchain.GetHeader',
   BLOCKCHAIN_GET_BLOCK: 'Neo.Blockchain.GetBlock',
   BLOCKCHAIN_GET_TRANSACTION: 'Neo.Blockchain.GetTransaction',
+  BLOCKCHAIN_GET_TRANSACTION_HEIGHT: 'Neo.Blockchain.GetTransactionHeight',
   BLOCKCHAIN_GET_ACCOUNT: 'Neo.Blockchain.GetAccount',
   BLOCKCHAIN_GET_VALIDATORS: 'Neo.Blockchain.GetValidators',
   BLOCKCHAIN_GET_ASSET: 'Neo.Blockchain.GetAsset',
@@ -613,6 +614,7 @@ export type SysCallName =
   | 'Neo.Blockchain.GetHeader'
   | 'Neo.Blockchain.GetBlock'
   | 'Neo.Blockchain.GetTransaction'
+  | 'Neo.Blockchain.GetTransactionHeight'
   | 'Neo.Blockchain.GetAccount'
   | 'Neo.Blockchain.GetValidators'
   | 'Neo.Blockchain.GetAsset'
@@ -703,6 +705,8 @@ export const assertSysCallName = (value: string): SysCallName => {
       return SYS_CALL_NAME.BLOCKCHAIN_GET_BLOCK;
     case SYS_CALL_NAME.BLOCKCHAIN_GET_TRANSACTION:
       return SYS_CALL_NAME.BLOCKCHAIN_GET_TRANSACTION;
+    case SYS_CALL_NAME.BLOCKCHAIN_GET_TRANSACTION_HEIGHT:
+      return SYS_CALL_NAME.BLOCKCHAIN_GET_TRANSACTION_HEIGHT;
     case SYS_CALL_NAME.BLOCKCHAIN_GET_ACCOUNT:
       return SYS_CALL_NAME.BLOCKCHAIN_GET_ACCOUNT;
     case SYS_CALL_NAME.BLOCKCHAIN_GET_VALIDATORS:

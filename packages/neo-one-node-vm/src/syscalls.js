@@ -487,6 +487,20 @@ export const SYSCALLS = {
       };
     },
   }),
+  'Neo.Blockchain.GetTransactionHeight': createSysCall({
+    name: 'Neo.Blockchain.GetTransactionHeight',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => {
+      const transactionData = await context.blockchain.transactionData.get({
+        hash: args[0].asUInt256(),
+      });
+      return {
+        context,
+        results: [new IntegerStackItem(new BN(transactionData.startHeight))],
+      };
+    },
+  }),
   'Neo.Blockchain.GetAccount': createSysCall({
     name: 'Neo.Blockchain.GetAccount',
     in: 1,

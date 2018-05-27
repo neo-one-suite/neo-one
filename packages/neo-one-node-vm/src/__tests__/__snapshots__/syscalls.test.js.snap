@@ -611,6 +611,24 @@ exports[`syscalls Neo.Blockchain.GetTransaction 4`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetTransaction 5`] = `Array []`;
 
+exports[`syscalls Neo.Blockchain.GetTransactionHeight 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Blockchain.GetTransactionHeight 2`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetTransactionHeight 3`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetTransactionHeight 4`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetTransactionHeight 5`] = `Array []`;
+
 exports[`syscalls Neo.Blockchain.GetValidators 1`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetValidators 2`] = `Array []`;
