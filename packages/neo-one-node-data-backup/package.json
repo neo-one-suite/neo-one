@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-data-backup",
-  "version": "1.0.0-alpha.36",
+  "version": "1.0.0-alpha.37",
   "keywords": [
     "neo",
     "NEO",
@@ -35,8 +35,8 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^1.7.0",
-    "@neo-one/monitor": "^1.0.0-alpha.26",
-    "@neo-one/utils": "^1.0.0-alpha.31",
+    "@neo-one/monitor": "^1.0.0-alpha.27",
+    "@neo-one/utils": "^1.0.0-alpha.32",
     "fs-extra": "^6.0.1",
     "leveldown": "^4.0.1",
     "levelup": "^3.0.1",
