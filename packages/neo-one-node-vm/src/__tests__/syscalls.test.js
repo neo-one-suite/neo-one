@@ -1560,7 +1560,182 @@ const SYSCALLS = ([
     gas: FEES.ONE,
   },
   {
-    name: 'Neo.Iterator.Next',
+    name: 'Neo.Enumerator.Next',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(0)]],
+          },
+        ],
+      },
+    ],
+    result: [new BooleanStackItem(true)],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Next',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(0)]],
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new BooleanStackItem(false)],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Value',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(1), new BN(2)]],
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new IntegerStackItem(new BN(1))],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Next',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(1)]],
+          },
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(2)]],
+          },
+          {
+            name: 'Neo.Enumerator.Concat',
+            type: 'sys',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new BooleanStackItem(false)],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Value',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(2)]],
+          },
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(1)]],
+          },
+          {
+            name: 'Neo.Enumerator.Concat',
+            type: 'sys',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new IntegerStackItem(new BN(2))],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Next',
     args: [
       {
         type: 'calls',
@@ -1596,7 +1771,7 @@ const SYSCALLS = ([
     gas: FEES.ONE,
   },
   {
-    name: 'Neo.Iterator.Next',
+    name: 'Neo.Enumerator.Next',
     args: [
       {
         type: 'calls',
@@ -1643,7 +1818,7 @@ const SYSCALLS = ([
                 type: 'calls',
                 calls: [
                   {
-                    name: 'Neo.Iterator.Next',
+                    name: 'Neo.Enumerator.Next',
                     type: 'sys',
                     args: [
                       {
@@ -1699,7 +1874,7 @@ const SYSCALLS = ([
     gas: FEES.ONE,
   },
   {
-    name: 'Neo.Iterator.Value',
+    name: 'Neo.Enumerator.Value',
     args: [
       {
         type: 'calls',
@@ -1712,7 +1887,7 @@ const SYSCALLS = ([
                 type: 'calls',
                 calls: [
                   {
-                    name: 'Neo.Iterator.Next',
+                    name: 'Neo.Enumerator.Next',
                     type: 'sys',
                     args: [
                       {
@@ -1757,6 +1932,110 @@ const SYSCALLS = ([
       },
     ],
     result: [new BufferStackItem(nextItem.value), new BooleanStackItem(true)],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.getAll = jest.fn(() =>
+        AsyncIterableX.of(nextItem),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Value',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Storage.Find',
+            type: 'sys',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'Neo.Storage.GetContext',
+                    type: 'sys',
+                  },
+                ],
+              },
+              Buffer.alloc(1, 1),
+            ],
+          },
+          {
+            name: 'Neo.Iterator.Values',
+            type: 'sys',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new BufferStackItem(nextItem.value)],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.getAll = jest.fn(() =>
+        AsyncIterableX.of(nextItem),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Value',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Storage.Find',
+            type: 'sys',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'Neo.Storage.GetContext',
+                    type: 'sys',
+                  },
+                ],
+              },
+              Buffer.alloc(1, 1),
+            ],
+          },
+          {
+            name: 'Neo.Iterator.Keys',
+            type: 'sys',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new BufferStackItem(nextItem.key)],
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(() =>
         Promise.resolve({ hasStorage: true }),

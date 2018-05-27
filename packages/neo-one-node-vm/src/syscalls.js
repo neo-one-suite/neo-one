@@ -29,6 +29,7 @@ import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 
 import { concatMap, map, toArray } from 'rxjs/operators';
 import { defer } from 'rxjs';
+import { map as asyncMap } from 'ix/asynciterable/pipe/index';
 
 import {
   type StackItem,
@@ -42,11 +43,13 @@ import {
   ConsensusPayloadStackItem,
   ContractStackItem,
   ECPointStackItem,
+  EnumeratorStackItem,
   HeaderStackItem,
   IntegerStackItem,
   InputStackItem,
   IteratorStackItem,
   OutputStackItem,
+  StackItemEnumerator,
   StackItemIterator,
   StorageContextStackItem,
   TransactionStackItem,
@@ -1044,6 +1047,11 @@ export const SYSCALLS = {
       const prefix = args[1].asBuffer();
       const iterable = AsyncIterableX.from(
         context.blockchain.storageItem.getAll({ hash, prefix }),
+      ).pipe(
+        asyncMap(({ key, value }) => ({
+          key: new BufferStackItem(key),
+          value: new BufferStackItem(value),
+        })),
       );
       return {
         context,
@@ -1068,13 +1076,33 @@ export const SYSCALLS = {
       ],
     }),
   }),
-  'Neo.Iterator.Next': createSysCall({
-    name: 'Neo.Iterator.Next',
+  'Neo.Enumerator.Create': createSysCall({
+    name: 'Neo.Enumerator.Create',
     in: 1,
     out: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const iterator = args[0].asIterator();
-      const value = await iterator.next();
+      const iterable = AsyncIterableX.from(
+        args[0].asArray().map((value) => ({ value })),
+      );
+      return {
+        context,
+        results: [
+          new EnumeratorStackItem(
+            new StackItemEnumerator(
+              (iterable: $FlowFixMe)[(Symbol: $FlowFixMe).asyncIterator](),
+            ),
+          ),
+        ],
+      };
+    },
+  }),
+  'Neo.Enumerator.Next': createSysCall({
+    name: 'Neo.Enumerator.Next',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => {
+      const enumerator = args[0].asEnumerator();
+      const value = await enumerator.next();
       return {
         context,
         results: [new BooleanStackItem(value)],
@@ -1087,16 +1115,47 @@ export const SYSCALLS = {
     out: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => ({
       context,
-      results: [args[0].asIterator().key()],
+      results: [(args[0].asIterator().key(): $FlowFixMe)],
     }),
   }),
-  'Neo.Iterator.Value': createSysCall({
-    name: 'Neo.Iterator.Value',
+  'Neo.Enumerator.Value': createSysCall({
+    name: 'Neo.Enumerator.Value',
     in: 1,
     out: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => ({
       context,
-      results: [args[0].asIterator().value()],
+      results: [(args[0].asEnumerator().value(): $FlowFixMe)],
+    }),
+  }),
+  'Neo.Enumerator.Concat': createSysCall({
+    name: 'Neo.Enumerator.Concat',
+    in: 2,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => ({
+      context,
+      results: [
+        new EnumeratorStackItem(
+          args[0].asEnumerator().concat(args[1].asEnumerator()),
+        ),
+      ],
+    }),
+  }),
+  'Neo.Iterator.Keys': createSysCall({
+    name: 'Neo.Iterator.Keys',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => ({
+      context,
+      results: [new EnumeratorStackItem(args[0].asIterator().keys())],
+    }),
+  }),
+  'Neo.Iterator.Values': createSysCall({
+    name: 'Neo.Iterator.Values',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => ({
+      context,
+      results: [new EnumeratorStackItem(args[0].asIterator().values())],
     }),
   }),
   'Neo.Account.SetVotes': createSysCall({
@@ -1469,6 +1528,8 @@ export const SYSCALLS = {
 };
 
 export const SYSCALL_ALIASES = {
+  'Neo.Iterator.Next': 'Neo.Enumerator.Next',
+  'Neo.Iterator.Value': 'Neo.Enumerator.Value',
   'AntShares.Runtime.CheckWitness': 'Neo.Runtime.CheckWitness',
   'AntShares.Runtime.Notify': 'Neo.Runtime.Notify',
   'AntShares.Runtime.Log': 'Neo.Runtime.Log',

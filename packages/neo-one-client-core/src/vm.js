@@ -568,9 +568,13 @@ export const SYS_CALL_NAME = {
   STORAGE_GET: 'Neo.Storage.Get',
   STORAGE_FIND: 'Neo.Storage.Find',
   STORAGE_CONTEXT_AS_READ_ONLY: 'Neo.StorageContext.AsReadOnly',
-  ITERATOR_NEXT: 'Neo.Iterator.Next',
+  ENUMERATOR_CREATE: 'Neo.Enumerator.Create',
+  ENUMERATOR_NEXT: 'Neo.Enumerator.Next',
   ITERATOR_KEY: 'Neo.Iterator.Key',
-  ITERATOR_VALUE: 'Neo.Iterator.Value',
+  ENUMERATOR_VALUE: 'Neo.Enumerator.Value',
+  ENUMERATOR_CONCAT: 'Neo.Enumerator.Concat',
+  ITERATOR_KEYS: 'Neo.Iterator.Keys',
+  ITERATOR_VALUES: 'Neo.Iterator.Values',
   ACCOUNT_SET_VOTES: 'Neo.Account.SetVotes',
   VALIDATOR_REGISTER: 'Neo.Validator.Register',
   ASSET_CREATE: 'Neo.Asset.Create',
@@ -663,9 +667,13 @@ export type SysCallName =
   | 'Neo.Storage.Get'
   | 'Neo.Storage.Find'
   | 'Neo.StorageContext.AsReadOnly'
-  | 'Neo.Iterator.Next'
+  | 'Neo.Enumerator.Create'
+  | 'Neo.Enumerator.Next'
   | 'Neo.Iterator.Key'
-  | 'Neo.Iterator.Value'
+  | 'Neo.Enumerator.Value'
+  | 'Neo.Enumerator.Concat'
+  | 'Neo.Iterator.Keys'
+  | 'Neo.Iterator.Values'
   | 'Neo.Account.SetVotes'
   | 'Neo.Validator.Register'
   | 'Neo.Asset.Create'
@@ -803,12 +811,20 @@ export const assertSysCallName = (value: string): SysCallName => {
       return SYS_CALL_NAME.STORAGE_FIND;
     case SYS_CALL_NAME.STORAGE_CONTEXT_AS_READ_ONLY:
       return SYS_CALL_NAME.STORAGE_CONTEXT_AS_READ_ONLY;
-    case SYS_CALL_NAME.ITERATOR_NEXT:
-      return SYS_CALL_NAME.ITERATOR_NEXT;
+    case SYS_CALL_NAME.ENUMERATOR_CREATE:
+      return SYS_CALL_NAME.ENUMERATOR_CREATE;
+    case SYS_CALL_NAME.ENUMERATOR_NEXT:
+      return SYS_CALL_NAME.ENUMERATOR_NEXT;
     case SYS_CALL_NAME.ITERATOR_KEY:
       return SYS_CALL_NAME.ITERATOR_KEY;
-    case SYS_CALL_NAME.ITERATOR_VALUE:
-      return SYS_CALL_NAME.ITERATOR_VALUE;
+    case SYS_CALL_NAME.ENUMERATOR_VALUE:
+      return SYS_CALL_NAME.ENUMERATOR_VALUE;
+    case SYS_CALL_NAME.ENUMERATOR_CONCAT:
+      return SYS_CALL_NAME.ENUMERATOR_CONCAT;
+    case SYS_CALL_NAME.ITERATOR_KEYS:
+      return SYS_CALL_NAME.ITERATOR_KEYS;
+    case SYS_CALL_NAME.ITERATOR_VALUES:
+      return SYS_CALL_NAME.ITERATOR_VALUES;
     case SYS_CALL_NAME.ACCOUNT_SET_VOTES:
       return SYS_CALL_NAME.ACCOUNT_SET_VOTES;
     case SYS_CALL_NAME.VALIDATOR_REGISTER:
