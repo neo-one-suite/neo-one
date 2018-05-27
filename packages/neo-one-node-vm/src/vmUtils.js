@@ -6,7 +6,7 @@ import bitwise from 'bitwise';
 import { utils } from '@neo-one/client-core';
 
 import { type ExecutionContext } from './constants';
-import { NumberTooLargeError } from './errors';
+import { NumberTooLargeError, ReadOnlyStorageContextError } from './errors';
 import { type StackItem, StorageContextStackItem } from './stackItem';
 
 const toNumber = (context: ExecutionContext, value: BN): number => {
@@ -34,17 +34,29 @@ const shiftRight = (value: BN, shift: BN): BN => {
   return result;
 };
 
-const toStorageContext = (
+const toStorageContext = ({
+  context,
+  value,
+  write = false,
+}: {|
   context: ExecutionContext,
   value: StackItem,
-): StorageContextStackItem =>
-  value.asStorageContextStackItem({
+  write?: boolean,
+|}): StorageContextStackItem => {
+  const item = value.asStorageContextStackItem({
     currentBlockIndex: context.blockchain.currentBlockIndex,
     vm: context.blockchain.settings.vm,
     scriptHash: context.scriptHash,
     callingScriptHash: context.callingScriptHash,
     entryScriptHash: context.entryScriptHash,
   });
+
+  if (write && item.isReadOnly) {
+    throw new ReadOnlyStorageContextError(context);
+  }
+
+  return item;
+};
 
 const leftPad = (value: Buffer, length: number): Buffer => {
   if (value.length === 0) {

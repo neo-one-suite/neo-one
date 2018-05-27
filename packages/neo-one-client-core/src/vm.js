@@ -563,8 +563,10 @@ export const SYS_CALL_NAME = {
   CONTRACT_GET_SCRIPT: 'Neo.Contract.GetScript',
   CONTRACT_IS_PAYABLE: 'Neo.Contract.IsPayable',
   STORAGE_GET_CONTEXT: 'Neo.Storage.GetContext',
+  STORAGE_GET_READ_ONLY_CONTEXT: 'Neo.Storage.GetReadOnlyContext',
   STORAGE_GET: 'Neo.Storage.Get',
   STORAGE_FIND: 'Neo.Storage.Find',
+  STORAGE_CONTEXT_AS_READ_ONLY: 'Neo.StorageContext.AsReadOnly',
   ITERATOR_NEXT: 'Neo.Iterator.Next',
   ITERATOR_KEY: 'Neo.Iterator.Key',
   ITERATOR_VALUE: 'Neo.Iterator.Value',
@@ -655,8 +657,10 @@ export type SysCallName =
   | 'Neo.Contract.GetScript'
   | 'Neo.Contract.IsPayable'
   | 'Neo.Storage.GetContext'
+  | 'Neo.Storage.GetReadOnlyContext'
   | 'Neo.Storage.Get'
   | 'Neo.Storage.Find'
+  | 'Neo.StorageContext.AsReadOnly'
   | 'Neo.Iterator.Next'
   | 'Neo.Iterator.Key'
   | 'Neo.Iterator.Value'
@@ -787,10 +791,14 @@ export const assertSysCallName = (value: string): SysCallName => {
       return SYS_CALL_NAME.CONTRACT_IS_PAYABLE;
     case SYS_CALL_NAME.STORAGE_GET_CONTEXT:
       return SYS_CALL_NAME.STORAGE_GET_CONTEXT;
+    case SYS_CALL_NAME.STORAGE_GET_READ_ONLY_CONTEXT:
+      return SYS_CALL_NAME.STORAGE_GET_READ_ONLY_CONTEXT;
     case SYS_CALL_NAME.STORAGE_GET:
       return SYS_CALL_NAME.STORAGE_GET;
     case SYS_CALL_NAME.STORAGE_FIND:
       return SYS_CALL_NAME.STORAGE_FIND;
+    case SYS_CALL_NAME.STORAGE_CONTEXT_AS_READ_ONLY:
+      return SYS_CALL_NAME.STORAGE_CONTEXT_AS_READ_ONLY;
     case SYS_CALL_NAME.ITERATOR_NEXT:
       return SYS_CALL_NAME.ITERATOR_NEXT;
     case SYS_CALL_NAME.ITERATOR_KEY:

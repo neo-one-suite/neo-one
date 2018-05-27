@@ -1466,6 +1466,16 @@ const SYSCALLS = ([
     gas: FEES.ONE,
   },
   {
+    name: 'Neo.Storage.GetReadOnlyContext',
+    result: ({ transaction }) => [
+      new StorageContextStackItem(
+        crypto.toScriptHash(transaction.script),
+        true,
+      ),
+    ],
+    gas: FEES.ONE,
+  },
+  {
     name: 'Neo.Storage.Get',
     result: [new BufferStackItem(Buffer.alloc(10, 1))],
     args: [
@@ -1513,6 +1523,29 @@ const SYSCALLS = ([
       );
       blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of());
     },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.StorageContext.AsReadOnly',
+    result: ({ transaction }) => (stack) => {
+      expect(stack.length).toEqual(1);
+      // It should equal the call's script hash.
+      expect(stack[0].value).not.toEqual(
+        crypto.toScriptHash(transaction.script),
+      );
+      expect(stack[0].isReadOnly).toBeTruthy();
+    },
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Storage.GetContext',
+            type: 'sys',
+          },
+        ],
+      },
+    ],
     gas: FEES.ONE,
   },
   {

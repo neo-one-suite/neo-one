@@ -991,13 +991,21 @@ export const SYSCALLS = {
       results: [new StorageContextStackItem(context.scriptHash)],
     }),
   }),
+  'Neo.Storage.GetReadOnlyContext': createSysCall({
+    name: 'Neo.Storage.GetReadOnlyContext',
+    out: 1,
+    invoke: ({ context }: OpInvokeArgs) => ({
+      context,
+      results: [new StorageContextStackItem(context.scriptHash).asReadOnly()],
+    }),
+  }),
   'Neo.Storage.Get': createSysCall({
     name: 'Neo.Storage.Get',
     in: 2,
     out: 1,
     fee: FEES.ONE_HUNDRED,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const hash = vmUtils.toStorageContext(context, args[0]).value;
+      const hash = vmUtils.toStorageContext({ context, value: args[0] }).value;
       await checkStorage({ context, hash });
 
       const item = await context.blockchain.storageItem.tryGet({
@@ -1016,7 +1024,7 @@ export const SYSCALLS = {
     in: 2,
     out: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const hash = vmUtils.toStorageContext(context, args[0]).value;
+      const hash = vmUtils.toStorageContext({ context, value: args[0] }).value;
       await checkStorage({ context, hash });
 
       const prefix = args[1].asBuffer();
@@ -1034,6 +1042,17 @@ export const SYSCALLS = {
         ],
       };
     },
+  }),
+  'Neo.StorageContext.AsReadOnly': createSysCall({
+    name: 'Neo.StorageContext.AsReadOnly',
+    in: 1,
+    out: 1,
+    invoke: ({ context, args }: OpInvokeArgs) => ({
+      context,
+      results: [
+        vmUtils.toStorageContext({ context, value: args[0] }).asReadOnly(),
+      ],
+    }),
   }),
   'Neo.Iterator.Next': createSysCall({
     name: 'Neo.Iterator.Next',
@@ -1344,7 +1363,11 @@ export const SYSCALLS = {
       in: 3,
       fee: FEES.ONE_THOUSAND.mul(ratio),
       invoke: async ({ context, args }: OpInvokeArgs) => {
-        const hash = vmUtils.toStorageContext(context, args[0]).value;
+        const hash = vmUtils.toStorageContext({
+          context,
+          value: args[0],
+          write: true,
+        }).value;
         await checkStorage({ context, hash });
         const key = args[1].asBuffer();
         const value = args[2].asBuffer();
@@ -1366,7 +1389,11 @@ export const SYSCALLS = {
     in: 2,
     fee: FEES.ONE_HUNDRED,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const hash = vmUtils.toStorageContext(context, args[0]).value;
+      const hash = vmUtils.toStorageContext({
+        context,
+        value: args[0],
+        write: true,
+      }).value;
       await checkStorage({ context, hash });
       const key = args[1].asBuffer();
       await context.blockchain.storageItem.delete({ hash, key });

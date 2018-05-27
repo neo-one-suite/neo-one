@@ -1390,6 +1390,14 @@ exports[`syscalls Neo.Storage.GetContext 3`] = `Array []`;
 
 exports[`syscalls Neo.Storage.GetContext 4`] = `Array []`;
 
+exports[`syscalls Neo.Storage.GetReadOnlyContext 1`] = `Array []`;
+
+exports[`syscalls Neo.Storage.GetReadOnlyContext 2`] = `Array []`;
+
+exports[`syscalls Neo.Storage.GetReadOnlyContext 3`] = `Array []`;
+
+exports[`syscalls Neo.Storage.GetReadOnlyContext 4`] = `Array []`;
+
 exports[`syscalls Neo.Storage.Put 1`] = `
 Array [
   Array [
@@ -1609,6 +1617,14 @@ exports[`syscalls Neo.Storage.Put 33`] = `Array []`;
 exports[`syscalls Neo.Storage.Put 34`] = `Array []`;
 
 exports[`syscalls Neo.Storage.Put 35`] = `Array []`;
+
+exports[`syscalls Neo.StorageContext.AsReadOnly 1`] = `Array []`;
+
+exports[`syscalls Neo.StorageContext.AsReadOnly 2`] = `Array []`;
+
+exports[`syscalls Neo.StorageContext.AsReadOnly 3`] = `Array []`;
+
+exports[`syscalls Neo.StorageContext.AsReadOnly 4`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetAttributes 1`] = `
 Array [
