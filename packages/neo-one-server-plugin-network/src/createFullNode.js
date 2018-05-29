@@ -52,13 +52,22 @@ export default async ({
       )
       .toPromise(),
     nodeConfig.config$
-      .pipe(map((config) => config.environment.rpc), take(1))
+      .pipe(
+        map((config) => config.environment.rpc),
+        take(1),
+      )
       .toPromise(),
     nodeConfig.config$
-      .pipe(map((config) => config.environment.node), take(1))
+      .pipe(
+        map((config) => config.environment.node),
+        take(1),
+      )
       .toPromise(),
     nodeConfig.config$
-      .pipe(map((config) => config.environment.telemetry), take(1))
+      .pipe(
+        map((config) => config.environment.telemetry),
+        take(1),
+      )
       .toPromise(),
     fs.ensureDir(storagePath),
   ]);

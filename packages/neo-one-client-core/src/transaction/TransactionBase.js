@@ -349,22 +349,24 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     throw new Error('Not Implemented');
   }
 
-  _networkFee = utils.lazyAsync(async (context: FeeContext): Promise<BN> => {
-    const { getOutput, utilityToken } = context;
+  _networkFee = utils.lazyAsync(
+    async (context: FeeContext): Promise<BN> => {
+      const { getOutput, utilityToken } = context;
 
-    const outputsForInputs = await Promise.all(
-      this.inputs.map((input) => getOutput(input)),
-    );
-    const inputValue = getUtilityValue({
-      outputs: outputsForInputs,
-      utilityToken,
-    });
-    const outputValue = getUtilityValue({
-      outputs: this.outputs,
-      utilityToken,
-    });
-    return inputValue.sub(outputValue).sub(this.getSystemFee(context));
-  });
+      const outputsForInputs = await Promise.all(
+        this.inputs.map((input) => getOutput(input)),
+      );
+      const inputValue = getUtilityValue({
+        outputs: outputsForInputs,
+        utilityToken,
+      });
+      const outputValue = getUtilityValue({
+        outputs: this.outputs,
+        utilityToken,
+      });
+      return inputValue.sub(outputValue).sub(this.getSystemFee(context));
+    },
+  );
 
   async getNetworkFee(context: FeeContext): Promise<BN> {
     return this._networkFee(context);

@@ -12,7 +12,11 @@ import common, {
 } from '../common';
 
 export default {
-  writeUInt64LE: (value: BN) => value.toString(16, 16),
+  writeUInt64LE: (value: BN) =>
+    value.toString(
+      16,
+      16,
+    ),
   readUInt64LE: (value: string) => new BN(value, 16),
   writeUInt64: (value: BN) => value.toString(10),
   readUInt64: (value: string) => new BigNumber(value),

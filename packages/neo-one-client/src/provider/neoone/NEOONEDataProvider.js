@@ -134,22 +134,27 @@ export default class NEOONEDataProvider
       async (span) => {
         const account = await this._getAccount(address, span);
         const outputs = await Promise.all(
-          account.unspent.map(async (input): Promise<?UnspentOutput> => {
-            const outputJSON = await this._client.getUnspentOutput(input, span);
-            if (outputJSON == null) {
-              return null;
-            }
+          account.unspent.map(
+            async (input): Promise<?UnspentOutput> => {
+              const outputJSON = await this._client.getUnspentOutput(
+                input,
+                span,
+              );
+              if (outputJSON == null) {
+                return null;
+              }
 
-            const output = this._convertOutput(outputJSON);
+              const output = this._convertOutput(outputJSON);
 
-            return {
-              asset: output.asset,
-              value: output.value,
-              address: output.address,
-              txid: input.txid,
-              vout: input.vout,
-            };
-          }),
+              return {
+                asset: output.asset,
+                value: output.value,
+                address: output.address,
+                txid: input.txid,
+                vout: input.vout,
+              };
+            },
+          ),
         );
 
         return outputs.filter(Boolean);

@@ -1197,9 +1197,9 @@ export default class Node implements INode {
     }
 
     const headers = await Promise.all(
-      _.range(hashStart, Math.min(hashStart + GET_BLOCKS_COUNT, hashEnd)).map(
-        (index) => this.blockchain.header.get({ hashOrIndex: index }),
-      ),
+      _
+        .range(hashStart, Math.min(hashStart + GET_BLOCKS_COUNT, hashEnd))
+        .map((index) => this.blockchain.header.get({ hashOrIndex: index })),
     );
 
     return headers;
@@ -1223,15 +1223,17 @@ export default class Node implements INode {
               return [transaction, networkFee];
             }),
           );
-          const hashesToRemove = _.take(
-            _.sortBy(transactionAndFee, [
-              ([transaction, networkFee]) =>
-                networkFee.divn(transaction.size).toNumber(),
-              ([transaction]) => transaction.hashHex,
-            ]),
-            this.blockchain.settings.memPoolSize,
+          const hashesToRemove = _
+            .take(
+              _.sortBy(transactionAndFee, [
+                ([transaction, networkFee]) =>
+                  networkFee.divn(transaction.size).toNumber(),
+                ([transaction]) => transaction.hashHex,
+              ]),
+              this.blockchain.settings.memPoolSize,
+            )
             // eslint-disable-next-line
-          ).map(([transaction, _]) => transaction.hashHex);
+            .map(([transaction, _]) => transaction.hashHex);
           for (const hash of hashesToRemove) {
             delete this.memPool[hash];
           }
@@ -1281,7 +1283,7 @@ export default class Node implements INode {
     for (let i = 0; i < flags.length; i += 1) {
       if (flags[i]) {
         // eslint-disable-next-line
-        buffer[Math.floor(i / 8)] |= 1 << (i % 8);
+        buffer[Math.floor(i / 8)] |= 1 << i % 8;
       }
     }
 

@@ -169,24 +169,26 @@ export default class ResourcesManager<
 
         this._resourceAdapters$.next({});
         const results = await Promise.all(
-          resources.map(async (name: string): Promise<?InitError> => {
-            try {
-              const [dependencies, dependents] = await Promise.all([
-                this._readDeps(this._getDependenciesPath(name)),
-                this._readDeps(this._getDirectDependentsPath(name)),
-                this._init(name),
-              ]);
-              this._directResourceDependents[name] = dependents;
-              this._addDependents({ name, dependencies });
-              return null;
-            } catch (error) {
-              return {
-                resourceType: this.resourceType.name,
-                resource: name,
-                error,
-              };
-            }
-          }),
+          resources.map(
+            async (name: string): Promise<?InitError> => {
+              try {
+                const [dependencies, dependents] = await Promise.all([
+                  this._readDeps(this._getDependenciesPath(name)),
+                  this._readDeps(this._getDirectDependentsPath(name)),
+                  this._init(name),
+                ]);
+                this._directResourceDependents[name] = dependents;
+                this._addDependents({ name, dependencies });
+                return null;
+              } catch (error) {
+                return {
+                  resourceType: this.resourceType.name,
+                  resource: name,
+                  error,
+                };
+              }
+            },
+          ),
         );
         return results.filter(Boolean);
       },
@@ -330,7 +332,10 @@ export default class ResourcesManager<
           task: async (ctx) => {
             setFromContext(ctx);
             await this.getResource$({ name, options: ({}: $FlowFixMe) })
-              .pipe(filter((value) => value != null), take(1))
+              .pipe(
+                filter((value) => value != null),
+                take(1),
+              )
               .toPromise();
             const dependencies = ctx.dependencies || [];
             const dependents = ctx.dependents || [];
