@@ -30,7 +30,7 @@ import {
 } from '@neo-one/server-plugin-network';
 
 import _ from 'lodash';
-import { of as _of } from 'rxjs/observable/of';
+import { of as _of } from 'rxjs';
 import ora from 'ora';
 import type { Wallet } from './WalletResourceType';
 import type WalletPlugin from './WalletPlugin';
@@ -342,7 +342,8 @@ async function initiateClaims({
   const unclaimed = await Promise.all(
     wallets.map((wallet) => provider.getUnclaimed(networkName, wallet.address)),
   );
-  const unclaimedAccounts = _.zip(wallets, unclaimed)
+  const unclaimedAccounts = _
+    .zip(wallets, unclaimed)
     .filter((account) => account[1].unclaimed.length > 0)
     .map((account) => account[0]);
 
@@ -594,14 +595,16 @@ async function getPresetData({
     };
   }
 
-  const hardcodedWallets = _.zip(
-    walletNames.slice(0, DEFAULT_PRIVATE_KEYS.length),
-    DEFAULT_PRIVATE_KEYS,
-  ).map((walletInfo) => ({
-    name: walletInfo[0],
-    privateKey: walletInfo[1],
-    address: privateKeyToAddress(walletInfo[1]),
-  }));
+  const hardcodedWallets = _
+    .zip(
+      walletNames.slice(0, DEFAULT_PRIVATE_KEYS.length),
+      DEFAULT_PRIVATE_KEYS,
+    )
+    .map((walletInfo) => ({
+      name: walletInfo[0],
+      privateKey: walletInfo[1],
+      address: privateKeyToAddress(walletInfo[1]),
+    }));
 
   const wallets = walletNames
     .slice(DEFAULT_PRIVATE_KEYS.length)
@@ -843,13 +846,13 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           developerClient,
         });
         spinner.succeed();
-        const assets = _.zip(ASSET_INFO, assetWallets, assetHashes).map(
-          (asset) => ({
+        const assets = _
+          .zip(ASSET_INFO, assetWallets, assetHashes)
+          .map((asset) => ({
             ...asset[0],
             wallet: asset[1],
             hash: asset[2],
-          }),
-        );
+          }));
         spinner.start('Issuing assets');
         const issues = await Promise.all(
           assets.map((asset) =>
