@@ -588,12 +588,13 @@ export default class NEOONEDataProvider
       deletedContractHashes: data.deletedContractHashes,
       migratedContractHashes: data.migratedContractHashes,
       voteUpdates: data.voteUpdates,
-      actions: data.actions.map((action) =>
+      actions: data.actions.map((action, idx) =>
         this._convertAction(
           blockHash,
           blockIndex,
           transactionHash,
           transactionIndex,
+          idx,
           action,
         ),
       ),
@@ -660,6 +661,7 @@ export default class NEOONEDataProvider
     blockIndex: number,
     transactionHash: string,
     transactionIndex: number,
+    index: number,
     action: ActionJSON,
   ): ActionRaw {
     if (action.type === 'Log') {
@@ -670,7 +672,8 @@ export default class NEOONEDataProvider
         blockHash,
         transactionIndex,
         transactionHash,
-        index: JSONHelper.readUInt64(action.index),
+        index,
+        globalIndex: JSONHelper.readUInt64(action.index),
         scriptHash: action.scriptHash,
         message: action.message,
       };
@@ -683,7 +686,8 @@ export default class NEOONEDataProvider
       blockHash,
       transactionIndex,
       transactionHash,
-      index: JSONHelper.readUInt64(action.index),
+      index,
+      globalIndex: JSONHelper.readUInt64(action.index),
       scriptHash: action.scriptHash,
       args: this._convertContractParameters(action.args),
     };

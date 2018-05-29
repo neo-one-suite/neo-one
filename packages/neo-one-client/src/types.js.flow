@@ -100,7 +100,8 @@ export type ActionRawBase = {|
   blockHash: Hash256String,
   transactionIndex: number,
   transactionHash: Hash256String,
-  index: BigNumber,
+  index: number,
+  globalIndex: BigNumber,
   scriptHash: Hash160String,
 |};
 export type NotificationRaw = {|
