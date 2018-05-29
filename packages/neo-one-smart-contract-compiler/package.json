@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-compiler",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "keywords": [
     "neo",
     "NEO",
@@ -34,7 +34,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.49",
+    "@neo-one/client": "^1.0.0-alpha.50",
     "@neo-one/client-core": "^1.0.0-alpha.36",
     "@neo-one/monitor": "^1.0.0-alpha.27",
     "@neo-one/node-blockchain": "^1.0.0-alpha.43",

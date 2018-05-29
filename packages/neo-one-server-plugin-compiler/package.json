@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-compiler",
-  "version": "1.0.0-alpha.50",
+  "version": "1.0.0-alpha.51",
   "keywords": [
     "neo",
     "NEO",
@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@neo-one/boa": "^0.0.2",
-    "@neo-one/client": "^1.0.0-alpha.49",
+    "@neo-one/client": "^1.0.0-alpha.50",
     "@neo-one/csharp": "^0.0.1",
     "@neo-one/server-plugin": "^1.0.0-alpha.37",
     "@neo-one/utils": "^1.0.0-alpha.32",
