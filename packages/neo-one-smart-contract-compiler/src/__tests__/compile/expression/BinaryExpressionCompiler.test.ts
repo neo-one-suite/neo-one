@@ -201,7 +201,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test.skip('(224 >>> 2) == 56 [GreaterThanGreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
-      if (! ((224 >>> 2) == 56) ) {
+      if ((224 >>> 2) !== 56) {
         throw 'Failure';
       }
     `);
@@ -209,7 +209,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test.skip('(128 >> 2) == 32 [GreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
-      if (! ((128 >> 2) == 32) ) {
+      if ((128 >> 2) !== 32) {
         throw 'Failure';
       }
     `);
@@ -217,15 +217,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test.skip('(-234 >> 2) == -59 [GreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
-      if (! ((-234 >> 2) == -59) ) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test.skip('(-234 >> 2) == -59 [GreaterThanGreaterThanToken]', async () => {
-    await helpers.executeString(`
-      if (! ((-234 >> 2) == -59) ) {
+      if ((-234 >> 2) !== -59) {
         throw 'Failure';
       }
     `);
@@ -233,7 +225,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test.skip('(128 >> 2) == 32 [GreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
-      if (! ((128 >> 2) == 32) ) {
+      if ((128 >> 2) !== 32) {
         throw 'Failure';
       }
     `);
@@ -241,7 +233,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test.skip('(256 >> -2) == 0 [GreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
-      if (! ((256 >> -2) == 0) ) {
+      if ((256 >> -2) !== 0) {
         throw 'Failure';
       }
     `);
@@ -249,7 +241,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test.skip('(-256 >> -2) == -1 [GreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
-      if (! ((-256 >> -2) == -1) ) {
+      if ((-256 >> -2) !== -1) {
         throw 'Failure';
       }
     `);
@@ -257,7 +249,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test.skip('(32 << 2) == 128 [LessThanLessThanToken]', async () => {
     await helpers.executeString(`
-      if (! ((32 << 2) == 128) ) {
+      if ((32 << 2) !== 128) {
         throw 'Failure';
       }
     `);
@@ -265,7 +257,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test.skip('(-24 << 2) == 96 [LessThanLessThanToken]', async () => {
     await helpers.executeString(`
-      if (! ((-24 << 2) == 96) ) {
+      if ((-24 << 2) !== 96)  {
         throw 'Failure';
       }
     `);
@@ -287,7 +279,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('2 <= 1 [LessThanEqualsToken]', async () => {
+  test('!(2 <= 1) [LessThanEqualsToken]', async () => {
     await helpers.executeString(`
       if (2 <= 1) {
         throw 'Failure';
@@ -295,7 +287,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('!(2 <= 2) [LessThanEqualsToken]', async () => {
+  test('2 <= 2 [LessThanEqualsToken]', async () => {
     await helpers.executeString(`
       if (!(2 <= 2)) {
         throw 'Failure';
@@ -463,7 +455,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('! (true == false) [EqualsEqualsToken]', async () => {
+  test('!(true == false) [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (true == false) {
         throw 'Failure';
@@ -471,7 +463,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('! (undefined == "a") [EqualsEqualsToken]', async () => {
+  test.skip('!(undefined == "a") [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (undefined == "a") {
         throw 'Failure';
@@ -479,7 +471,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('! (0 == null) [EqualsEqualsToken]', async () => {
+  test.skip('!(0 == null) [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (0 == null) {
         throw 'Failure';
@@ -511,7 +503,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('! (false == "a") [EqualsEqualsToken]', async () => {
+  test.skip('!(false == "a") [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (!(false == "a")) {
         throw 'Failure';
@@ -527,7 +519,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('! (null == false) [EqualsEqualsToken]', async () => {
+  test.skip('!(null == false) [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (null == false) {
         throw 'Failure';
@@ -585,7 +577,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('(6 & 5) === 4 [AmpersandToken]', async () => {
     await helpers.executeString(`
-      if (!(6 & 5) === 4) {
+      if ((6 & 5) !== 4) {
         throw 'Failure';
       }
     `);
@@ -593,7 +585,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('(12 & 10) === 8 [AmpersandToken]', async () => {
     await helpers.executeString(`
-      if (!((12 & 10) === 8)) {
+      if ((12 & 10) !== 8) {
         throw 'Failure';
       }
     `);
@@ -601,7 +593,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('(128 & 2) === 0 [AmpersandToken]', async () => {
     await helpers.executeString(`
-      if (!((128 & 2) === 0)) {
+      if ((128 & 2) !== 0) {
         throw 'Failure';
       }
     `);
@@ -609,7 +601,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('(3 | 6) === 7 [BarToken]', async () => {
     await helpers.executeString(`
-      if (!((3 | 6) === 7)) {
+      if ((3 | 6) !== 7) {
         throw 'Failure';
       }
     `);
@@ -617,7 +609,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('(19 | -3) === -1 [BarToken]', async () => {
     await helpers.executeString(`
-      if (!((19 | -3) === -1)) {
+      if ((19 | -3) !== -1) {
         throw 'Failure';
       }
     `);
@@ -625,7 +617,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('(5 ^ 2) === 7 [CaretToken]', async () => {
     await helpers.executeString(`
-      if (!((5 ^ 2) === 7)) {
+      if ((5 ^ 2) !== 7) {
         throw 'Failure';
       }
     `);
@@ -633,15 +625,15 @@ describe('BinaryExpressionCompiler', () => {
 
   test.skip('(127 ^ 2) === 125 [CaretToken]', async () => {
     await helpers.executeString(`
-      if (!((127 ^ 2) === 125)) {
+      if ((127 ^ 2) !== 125) {
         throw 'Failure';
       }
     `);
   });
 
-  test('(127 ^ -6) === -123 [CaretToken]', async () => {
+  test.skip('(127 ^ -6) === -123 [CaretToken]', async () => {
     await helpers.executeString(`
-      if (!((127 ^ -6) === -123)) {
+      if ((127 ^ -6) !== -123) {
         throw 'Failure';
       }
     `);
@@ -649,7 +641,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test.skip('(128 ^ 5) === 133 [CaretToken]', async () => {
     await helpers.executeString(`
-      if (!((128 ^ 5) === 133)) {
+      if ((128 ^ 5) !== 133) {
         throw 'Failure';
       }
     `);
@@ -657,13 +649,13 @@ describe('BinaryExpressionCompiler', () => {
 
   test('true === true [EqualsEqualsEqualsToken]', async () => {
     await helpers.executeString(`
-      if (! (true === true) ) {
+      if (!(true === true)) {
         throw 'Failure';
       }
     `);
   });
 
-  test('! (false === null) [EqualsEqualsEqualsToken]', async () => {
+  test('!(false === null) [EqualsEqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (false === null) {
         throw 'Failure';
@@ -671,7 +663,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('! (undefined === null) [EqualsEqualsEqualsToken]', async () => {
+  test('!(undefined === null) [EqualsEqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (undefined === null) {
         throw 'Failure';
@@ -679,7 +671,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('! (undefined === false) [EqualsEqualsEqualsToken]', async () => {
+  test('!(undefined === false) [EqualsEqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (undefined === false) {
         throw 'Failure';
@@ -689,15 +681,15 @@ describe('BinaryExpressionCompiler', () => {
 
   test('0 === false [EqualsEqualsEqualsToken]', async () => {
     await helpers.executeString(`
-      if ( 0 === false ) {
+      if (0 === false) {
         throw 'Failure';
       }
     `);
   });
 
-  test('! (0 === null) [EqualsEqualsEqualsToken]', async () => {
+  test('!(0 === null) [EqualsEqualsEqualsToken]', async () => {
     await helpers.executeString(`
-      if (0 === null ) {
+      if (0 === null) {
         throw 'Failure';
       }
     `);
@@ -705,7 +697,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('0 === "a" [EqualsEqualsEqualsToken]', async () => {
     await helpers.executeString(`
-      if ( 0 === "a" ) {
+      if (0 === "a") {
         throw 'Failure';
       }
     `);
@@ -713,7 +705,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('false === false [EqualsEqualsEqualsToken]', async () => {
     await helpers.executeString(`
-      if (! (false === false) ) {
+      if (false !== false) {
         throw 'Failure';
       }
     `);
@@ -721,7 +713,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('"a" !== true [ExclamationEqualsEqualsToken]', async () => {
     await helpers.executeString(`
-      if (! ("a" !== true) ) {
+      if (!("a" !== true)) {
         throw 'Failure';
       }
     `);
@@ -729,7 +721,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('false !== true [ExclamationEqualsEqualsToken]', async () => {
     await helpers.executeString(`
-      if (! (false !== true) ) {
+      if (!(false !== true)) {
         throw 'Failure';
       }
     `);
@@ -737,7 +729,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('false !== null [ExclamationEqualsEqualsToken]', async () => {
     await helpers.executeString(`
-      if (! (false !== null) ) {
+      if (!(false !== null)) {
         throw 'Failure';
       }
     `);
@@ -745,7 +737,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test('false !== 0 [ExclamationEqualsEqualsToken]', async () => {
     await helpers.executeString(`
-      if (! (false !== 0) ) {
+      if (!(false !== 0)) {
         throw 'Failure';
       }
     `);
@@ -753,29 +745,29 @@ describe('BinaryExpressionCompiler', () => {
 
   test('4 !== -4 [ExclamationEqualsEqualsToken]', async () => {
     await helpers.executeString(`
-      if (! (4 !== -4) ) {
+      if (!(4 !== -4)) {
         throw 'Failure';
       }
     `);
   });
 
-  test('! (42 !== 42) [ExclamationEqualsEqualsToken]', async () => {
+  test('!(42 !== 42) [ExclamationEqualsEqualsToken]', async () => {
     await helpers.executeString(`
-      if ( 42 !== 42 ) {
+      if (42 !== 42) {
         throw 'Failure';
       }
     `);
   });
   test.skip('(3 ** 2) == 9 [AsteriskAsteriskToken]', async () => {
     await helpers.executeString(`
-      if ((3 ** 2) != 9 ) {
+      if ((3 ** 2) != 9) {
         throw 'Failure';
       }
     `);
   });
   test.skip('(10 ** -2) == 0.01 [AsteriskAsteriskToken]', async () => {
     await helpers.executeString(`
-      if ((10 ** -2) != 0.01 ) {
+      if ((10 ** -2) != 0.01) {
         throw 'Failure';
       }
     `);
@@ -784,7 +776,7 @@ describe('BinaryExpressionCompiler', () => {
     await helpers.executeString(`
       class Animal {};
       let dog = new Animal();
-      if (!(dog instanceof Animal )) {
+      if (!(dog instanceof Animal)) {
         throw 'Failure';
       }
     `);
@@ -792,15 +784,15 @@ describe('BinaryExpressionCompiler', () => {
   test.skip('memory in computer [InKeyword]', async () => {
     await helpers.executeString(`
     let computer = {cpu: 'i7', memory:'64gb', storage:'1tb'};
-      if (!('cpu' in computer )) {
+      if (!('cpu' in computer)) {
         throw 'Failure';
       }
     `);
   });
-  test.skip('! ("nic" in computer) [InKeyword]', async () => {
+  test.skip('!("nic" in computer) [InKeyword]', async () => {
     await helpers.executeString(`
     let computer = {cpu: 'i7', memory:'64gb', storage:'1tb'};
-      if (('nic' in computer )) {
+      if ('nic' in computer) {
         throw 'Failure';
       }
     `);
