@@ -57,10 +57,7 @@ export default class StorageContextStackItem extends StackItemBase {
   }
 
   asReadOnly(): StorageContextStackItem {
-    return new this.constructor(
-      this.value,
-      true,
-    );
+    return new this.constructor(this.value, true);
   }
 
   toContractParameter(): ContractParameter {
