@@ -1089,6 +1089,11 @@ export const SYSCALLS = {
     args: [new SysCallArgument('hash', BufferValue)],
     returnType: TransactionValue,
   }),
+  'Neo.Blockchain.GetTransactionHeight': new SimpleSysCall({
+    name: 'Neo.Blockchain.GetTransactionHeight',
+    args: [new SysCallArgument('transaction', TransactionValue)],
+    returnType: NumberValue,
+  }),
   'Neo.Blockchain.GetAccount': new SimpleSysCall({
     name: 'Neo.Blockchain.GetAccount',
     args: [new SysCallArgument('hash', BufferValue)],
