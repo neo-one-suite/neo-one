@@ -18,14 +18,16 @@ export default class ArrayContractParameter extends ContractParameterBase<
   ArrayContractParameter,
   ArrayContractParameterJSON,
   typeof CONTRACT_PARAMETER_TYPE.ARRAY,
-> {
+  CONTRACT_PARAMETER_TYPE.ARRAY,> {
   type = CONTRACT_PARAMETER_TYPE.ARRAY;
   value: Array<ContractParameter>;
+  seen: ArrayContractParameter
 
   __size: () => number;
 
   constructor(value: Array<ContractParameter>) {
     super();
+    this.__scrub_array(this)
     this.value = value;
     this.__size = utils.lazy(() =>
       IOHelper.sizeOfArray(this.value, (val) => val.size),
@@ -34,6 +36,17 @@ export default class ArrayContractParameter extends ContractParameterBase<
 
   get size(): number {
     return this.__size();
+  }
+  __scrub_array(curlist:ArrayContractParameter, prev_seen: {[ContractParameter]: boolean} = {}){
+    prev_seen[curlist] = true;
+    curlist.value.forEach(param=>{
+      if(param instanceof ArrayContractParameter)
+        if(prev_seen[param]){
+          throw new Error("ContractParameter array contains circular reference");
+        }else{
+          this.__scrub_array(param, [...prev_seen]);
+        }
+    });
   }
 
   asBoolean(): boolean {
