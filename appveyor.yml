@@ -1,7 +1,6 @@
 environment:
   matrix:
     - nodejs_version: "8.9.0"
-    - nodejs_version: "9"
 
 branches:
   only:
@@ -24,9 +23,9 @@ cache:
   - "%LOCALAPPDATA%\\Yarn"
 
 test_script:
-  - nvm i 9 && run test --verbose
-  - nvm i 10 && run test --verbose
-  - nvm i 8.9.4 && run test --verbose
+  - nvm i 9 && yarn run test --verbose
+  - nvm i 10 && yarn run test --verbose
+  - nvm i 8.9.0 && yarn run test --verbose
   - yarn run test --verbose
   - yarn run e2e --verbose
 
