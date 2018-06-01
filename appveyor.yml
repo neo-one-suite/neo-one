@@ -17,16 +17,16 @@ install:
   - yarn --version
   - yarn install --non-interactive --frozen-lockfile
   - yarn run build
-  - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+  - curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="/home/circleci/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 cache:
   - node_modules
   - "%LOCALAPPDATA%\\Yarn"
 
 test_script:
-  - export NVM_DIR="/home/circleci/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && nvm i 9 && yarn run test --verbose
-  - export NVM_DIR="/home/circleci/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && nvm i 10 && yarn run test --verbose
-  - export NVM_DIR="/home/circleci/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && nvm i 8.9.0 && yarn run test --verbose
+  - nvm i 9 && yarn run test --verbose
+  - nvm i 10 && yarn run test --verbose
+  - nvm i 8.9.0 && yarn run test --verbose
   - yarn run e2e --verbose
 
 # Don't actually build.
