@@ -25,14 +25,6 @@ cache:
   - "%LOCALAPPDATA%\\Yarn"
 
 test_script:
-  - ps: Install-Product node 8.9.0 x64
-  - node --version  
-  - yarn run test --verbose
-  - ps: Install-Product node 9.0.0 x64
-  - node --version
-  - yarn run test --verbose
-  - ps: Install-Product node 10.0.0 x64
-  - node --version
   - yarn run test --verbose
   - yarn run e2e --verbose
 
