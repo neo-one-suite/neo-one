@@ -41,8 +41,9 @@ jobs:
           name: TryNode9
           command: |
             curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-            find /home/circleci/.nvm/
-            /home/circleci/.nvm/nvm i 9
+            export NVM_DIR="/home/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            nvm i 9
 
       - run:
           name: Build
