@@ -38,6 +38,13 @@ jobs:
       - run: *yarn
       - save-cache: *save-yarn-cache
       - run:
+          name: TryNode9
+          command: |
+            curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+            find /home/circleci/.nvm/
+            /home/circleci/.nvm/nvm i 9
+
+      - run:
           name: Build
           command: yarn build
       - run:
@@ -56,6 +63,7 @@ jobs:
           name: Node9Test
           command: |
             curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+            ls -ltr
             /home/circleci/.nvm/nvm i 9 && yarn test-ci
       - run:
           name: Node10Test
