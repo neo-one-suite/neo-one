@@ -38,13 +38,11 @@ jobs:
       - run: *yarn
       - save-cache: *save-yarn-cache
       - run:
-          name: TryNode9
+          name: Install NVM
           command: |
             curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
             export NVM_DIR="/home/circleci/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-            nvm i 9
-
       - run:
           name: Build
           command: yarn build
@@ -62,17 +60,13 @@ jobs:
           command: yarn tsc
       - run:
           name: Node9Test
-          command: |
-            curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-            ls -ltr
-            /home/circleci/.nvm/nvm i 9 && yarn test-ci
+          command: nvm i 9 && yarn test-ci
       - run:
           name: Node10Test
-          command: |
-            /home/circleci/.nvm/nvmnvm i 10 && yarn test-ci
+          command:  nvm i 9 && yarn test-ci
       - run:
           name: Test
-          command: /home/circleci/.nvm/nvm 8.9.4 yarn test-ci
+          command:  nvm i 8.9.4 && yarn test-ci
       - run:
           name: E2E
           command: yarn e2e-ci
