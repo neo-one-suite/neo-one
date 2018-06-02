@@ -58,23 +58,23 @@ jobs:
           name: Typescript
           command: yarn tsc
       - run:
-          name: Test against Node 9.11
+          name: Test against Node 8.9.0
           command: |
             export NVM_DIR="/home/circleci/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            nvm i 8.9.0 && yarn test-ci
+      - run:
+          name: Test against Node 9.11
+          command: |
+            export NVM_DIR="/home/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm i 9 && yarn test-ci
       - run:
           name: Test against Node 10
           command: |
             export NVM_DIR="/home/circleci/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm i 10 && yarn test-ci
-      - run:
-          name: Test against Node 8.9.4
-          command: |
-            export NVM_DIR="/home/circleci/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-            nvm i 8.9.4 && yarn test-ci
       - run:
           name: E2E
           command: yarn e2e-ci
