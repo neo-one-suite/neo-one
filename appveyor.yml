@@ -2,6 +2,7 @@ environment:
   matrix:
     - nodejs_version: "8.9.0"
     - nodejs_version: "9"
+    - nodejs_version: "10"
 
 branches:
   only:
@@ -26,6 +27,7 @@ cache:
 test_script:
   - yarn run test --verbose
   - yarn run e2e --verbose
+
 
 # Don't actually build.
 build: off
