@@ -6,11 +6,17 @@ import {
 } from '@neo-one/client-core';
 
 import { InvalidValueBufferError } from './errors';
-import StackItemBase from './StackItemBase';
+
+import {
+  CollectionStackItemBase,
+  StackCollectionType,
+  StackCollectionParentChainType
+} from './CollectionStackItemBase';
+
 import type { StackItem } from './StackItem';
 import type { StackItemType } from './StackItemType';
 
-export default class ArrayLikeStackItem extends StackItemBase {
+export default class ArrayLikeStackItem extends CollectionStackItemBase {
   static type: StackItemType;
 
   value: Array<StackItem>;
@@ -55,9 +61,12 @@ export default class ArrayLikeStackItem extends StackItemBase {
     throw new InvalidValueBufferError();
   }
 
-  toContractParameter(): ContractParameter {
+  toContractParameter(parents : StackCollectionParentChainType = {}): ContractParameter {
     return new ArrayContractParameter(
-      this.value.map((val) => val.toContractParameter()),
+      this.value.map((val) => val instanceof ArrayLikeStackItem ?
+            val.toContractParameter({...parents, this: true})
+            : val.toContractParameter()
+      )
     );
   }
 

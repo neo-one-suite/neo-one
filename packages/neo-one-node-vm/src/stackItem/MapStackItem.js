@@ -13,6 +13,12 @@ import { InvalidValueBufferError } from './errors';
 import StackItemBase from './StackItemBase';
 import type { StackItem } from './StackItem';
 
+import {
+  CollectionStackItemBase,
+  StackCollectionType,
+  StackCollectionParentChainType
+} from './CollectionStackItemBase';
+
 type MapKeys = { [key: string]: StackItem };
 type MapValues = { [key: string]: StackItem };
 export default class MapStackItem extends StackItemBase {
