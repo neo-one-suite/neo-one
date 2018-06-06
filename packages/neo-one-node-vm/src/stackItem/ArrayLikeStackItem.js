@@ -10,7 +10,7 @@ import {
   CircularReferenceError,
 } from './errors';
 
-import type StackItemBase from './StackItemBase';
+import StackItemBase from './StackItemBase';
 import type { StackItem } from './StackItem';
 import type { StackItemType } from './StackItemType';
 
@@ -65,7 +65,7 @@ export default class ArrayLikeStackItem extends StackItemBase {
     }
     const newSeen = new Set([...seen]);
     newSeen.add(this);
-    return new ArrayContractParameter(this.values.map((value) => value.toContractParameter(newSeen)));
+    return new ArrayContractParameter(this.value.map((value) => value.toContractParameter(newSeen)));
   }
 
   get size(): number {
