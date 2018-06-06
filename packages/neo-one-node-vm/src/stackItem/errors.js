@@ -9,6 +9,16 @@ export class InvalidValueArrayError extends CustomError {
   }
 }
 
+
+export class CircularReferenceError extends CustomError {
+  code = 'CIRCULAR_REFERENCE_ERROR';
+
+  constructor() {
+    super('Circular Reference Eerror');
+  }
+}
+
+
 export class InvalidValueBufferError extends CustomError {
   code = 'INVALID_VALUE_BUFFER';
 

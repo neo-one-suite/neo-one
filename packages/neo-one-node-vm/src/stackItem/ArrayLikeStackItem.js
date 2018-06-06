@@ -5,18 +5,16 @@ import {
   BinaryWriter,
 } from '@neo-one/client-core';
 
-import { InvalidValueBufferError } from './errors';
-
 import {
-  CollectionStackItemBase,
-  StackCollectionType,
-  StackCollectionParentChainType
-} from './CollectionStackItemBase';
+  InvalidValueBufferError,
+  CircularReferenceError,
+} from './errors';
 
+import type StackItemBase from './StackItemBase';
 import type { StackItem } from './StackItem';
 import type { StackItemType } from './StackItemType';
 
-export default class ArrayLikeStackItem extends CollectionStackItemBase {
+export default class ArrayLikeStackItem extends StackItemBase {
   static type: StackItemType;
 
   value: Array<StackItem>;
@@ -61,13 +59,13 @@ export default class ArrayLikeStackItem extends CollectionStackItemBase {
     throw new InvalidValueBufferError();
   }
 
-  toContractParameter(parents : StackCollectionParentChainType = {}): ContractParameter {
-    return new ArrayContractParameter(
-      this.value.map((val) => val instanceof ArrayLikeStackItem ?
-            val.toContractParameter({...parents, this: true})
-            : val.toContractParameter()
-      )
-    );
+  toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
+    if (seen.has(this)) {
+      throw new CircularReferenceError();
+    }
+    const newSeen = new Set([...seen]);
+    newSeen.add(this);
+    return new ArrayContractParameter(this.values.map((value) => value.toContractParameter(newSeen)));
   }
 
   get size(): number {
