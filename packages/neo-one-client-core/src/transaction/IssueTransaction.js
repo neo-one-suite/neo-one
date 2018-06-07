@@ -140,16 +140,8 @@ export default class IssueTransaction extends TransactionBase<
     );
 
     return {
+      ...transactionBaseJSON,
       type: 'IssueTransaction',
-      txid: transactionBaseJSON.txid,
-      size: transactionBaseJSON.size,
-      version: transactionBaseJSON.version,
-      attributes: transactionBaseJSON.attributes,
-      vin: transactionBaseJSON.vin,
-      vout: transactionBaseJSON.vout,
-      scripts: transactionBaseJSON.scripts,
-      sys_fee: transactionBaseJSON.sys_fee,
-      net_fee: transactionBaseJSON.net_fee,
     };
   }
 

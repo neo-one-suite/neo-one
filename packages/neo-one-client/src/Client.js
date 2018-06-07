@@ -92,7 +92,10 @@ export default class Client<TUserAccountProviders: $FlowFixMe> {
 
     if (this.getCurrentAccount() == null) {
       this.accounts$
-        .pipe(filter((accounts) => accounts.length > 0), take(1))
+        .pipe(
+          filter((accounts) => accounts.length > 0),
+          take(1),
+        )
         .toPromise()
         .then(async (accounts) => {
           const account = accounts[0];

@@ -67,10 +67,10 @@ export default ({
   return {
     header,
     block,
-    blockSystemFee: read.createReadStorage({
+    blockData: read.createReadStorage({
       cache,
-      storage: storage.blockSystemFee,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.blockSystemFee,
+      storage: storage.blockData,
+      serializeKeyString: keys.typeKeyToSerializeKeyString.blockData,
     }),
     account: read.createReadAllStorage({
       cache,
@@ -90,11 +90,10 @@ export default ({
       storage: storage.transaction,
       serializeKeyString: keys.typeKeyToSerializeKeyString.transaction,
     }),
-    transactionSpentCoins: read.createReadStorage({
+    transactionData: read.createReadStorage({
       cache,
-      storage: storage.transactionSpentCoins,
-      serializeKeyString:
-        keys.typeKeyToSerializeKeyString.transactionSpentCoins,
+      storage: storage.transactionData,
+      serializeKeyString: keys.typeKeyToSerializeKeyString.transactionData,
     }),
     output: read.createReadStorage({
       cache,

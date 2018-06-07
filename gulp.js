@@ -138,7 +138,9 @@ const createRollupOutput = ({
   ),
   format,
   name: source,
-  sourcemap: true,
+  sourcemap: process.env.NEO_ONE_BUILD_INLINE_SOURCEMAP === 'true'
+    ? 'inline'
+    : true,
   exports: 'named',
 });
 

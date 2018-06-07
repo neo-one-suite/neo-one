@@ -2,7 +2,7 @@
 import type { Context, Middleware } from 'koa';
 import {
   TRANSACTION_TYPE,
-  type Block,
+  type TransactionData,
   Account,
   Input,
   InvocationTransaction,
@@ -20,7 +20,7 @@ import { LABELS, type Monitor, metrics } from '@neo-one/monitor';
 
 import compose from 'koa-compose';
 import compress from 'koa-compress';
-import { filter, map, take, timeout, toArray } from 'rxjs/operators';
+import { filter, switchMap, take, timeout, toArray } from 'rxjs/operators';
 import { utils } from '@neo-one/utils';
 
 import bodyParser from './bodyParser';
@@ -254,20 +254,11 @@ const jsonrpc = (handlers: Handlers): Middleware => {
   ]);
 };
 
-const getTransactionReceipt = (value: Block, hash: string) => {
-  const transactionIndex = value.transactions
-    .map((transaction) => transaction.hashHex)
-    .indexOf(hash);
-  if (transactionIndex === -1) {
-    return null;
-  }
-
-  return {
-    blockIndex: value.index,
-    blockHash: JSONHelper.writeUInt256(value.hash),
-    transactionIndex,
-  };
-};
+const getTransactionReceipt = (value: TransactionData) => ({
+  blockIndex: value.startHeight,
+  blockHash: JSONHelper.writeUInt256(value.blockHash),
+  transactionIndex: value.index,
+});
 
 export default ({
   blockchain,
@@ -361,10 +352,10 @@ export default ({
       const height = args[0];
       checkHeight(height);
       const header = await blockchain.header.get({ hashOrIndex: height });
-      const blockSystemFee = await blockchain.blockSystemFee.get({
+      const blockData = await blockchain.blockData.get({
         hash: header.hash,
       });
-      return blockSystemFee.systemFee.toString(10);
+      return blockData.systemFee.toString(10);
     },
     [RPC_METHODS.getconnectioncount]: async () => node.connectedPeers.length,
     [RPC_METHODS.getcontractstate]: async (args) => {
@@ -411,7 +402,7 @@ export default ({
       const index = args[1];
       const [output, spentCoins] = await Promise.all([
         blockchain.output.tryGet({ hash, index }),
-        blockchain.transactionSpentCoins.tryGet({ hash }),
+        blockchain.transactionData.tryGet({ hash }),
       ]);
       if (spentCoins != null && spentCoins.endHeights[index] != null) {
         return null;
@@ -532,7 +523,7 @@ export default ({
       throw new JSONRPCError(-103, 'Invalid InvocationTransaction');
     },
     [RPC_METHODS.gettransactionreceipt]: async (args) => {
-      const spentCoins = await blockchain.transactionSpentCoins.tryGet({
+      const transactionData = await blockchain.transactionData.tryGet({
         hash: JSONHelper.readUInt256(args[0]),
       });
 
@@ -543,7 +534,7 @@ export default ({
       }
 
       let result;
-      if (spentCoins == null) {
+      if (transactionData == null) {
         if (watchTimeoutMS == null) {
           throw new JSONRPCError(-100, 'Unknown transaction');
         }
@@ -551,7 +542,12 @@ export default ({
         try {
           result = await blockchain.block$
             .pipe(
-              map((value) => getTransactionReceipt(value, args[0])),
+              switchMap(async () => {
+                const data = await blockchain.transactionData.tryGet({
+                  hash: JSONHelper.readUInt256(args[0]),
+                });
+                return data == null ? null : getTransactionReceipt(data);
+              }),
               filter((receipt) => receipt != null),
               take(1),
               timeout(new Date(Date.now() + watchTimeoutMS)),
@@ -561,10 +557,7 @@ export default ({
           throw new JSONRPCError(-100, 'Unknown transaction');
         }
       } else {
-        const block = await blockchain.block.get({
-          hashOrIndex: spentCoins.startHeight,
-        });
-        result = getTransactionReceipt(block, args[0]);
+        result = getTransactionReceipt(transactionData);
       }
 
       return result;
@@ -577,11 +570,11 @@ export default ({
       const result = await transaction.serializeJSON(
         blockchain.serializeJSONContext,
       );
-      if (result.data == null) {
+      if (result.invocationData == null) {
         throw new JSONRPCError(-103, 'Invalid InvocationTransaction');
       }
 
-      return result.data;
+      return result.invocationData;
     },
     [RPC_METHODS.getvalidators]: async () => {
       const validators = await blockchain.validator.all

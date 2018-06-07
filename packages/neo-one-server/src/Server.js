@@ -118,7 +118,10 @@ export default class Server {
           dataPath,
           pluginManager,
         });
-        return server.start$().pipe(map(() => server), distinctUntilChanged());
+        return server.start$().pipe(
+          map(() => server),
+          distinctUntilChanged(),
+        );
       }),
     );
   }

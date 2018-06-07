@@ -14,6 +14,8 @@ import common, {
 export default {
   writeUInt64LE: (value: BN) => value.toString(16, 16),
   readUInt64LE: (value: string) => new BN(value, 16),
+  writeUInt64: (value: BN) => value.toString(10),
+  readUInt64: (value: string) => new BigNumber(value),
   writeUInt160: (value: UInt160 | UInt160Hex): string =>
     common.uInt160ToString(value),
   readUInt160: (hash: string): UInt160 => common.stringToUInt160(hash),

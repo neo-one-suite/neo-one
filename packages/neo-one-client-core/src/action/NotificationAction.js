@@ -32,23 +32,10 @@ export default class NotificationAction
   implements SerializableJSON<NotificationActionJSON> {
   args: Array<ContractParameter>;
 
-  constructor({
-    version,
-    blockIndex,
-    blockHash,
-    transactionIndex,
-    transactionHash,
-    index,
-    scriptHash,
-    args,
-  }: NotificationAdd) {
+  constructor({ version, index, scriptHash, args }: NotificationAdd) {
     super({
       type: ACTION_TYPE.NOTIFICATION,
       version,
-      blockIndex,
-      blockHash,
-      transactionIndex,
-      transactionHash,
       index,
       scriptHash,
     });
@@ -67,10 +54,6 @@ export default class NotificationAction
 
     return new this({
       version: action.version,
-      blockIndex: action.blockIndex,
-      blockHash: action.blockHash,
-      transactionIndex: action.transactionIndex,
-      transactionHash: action.transactionHash,
       index: action.index,
       scriptHash: action.scriptHash,
       args,
@@ -82,10 +65,6 @@ export default class NotificationAction
     return {
       type: 'Notification',
       version: action.version,
-      blockIndex: action.blockIndex,
-      blockHash: action.blockHash,
-      transactionIndex: action.transactionIndex,
-      transactionHash: action.transactionHash,
       index: action.index,
       scriptHash: action.scriptHash,
       args: this.args.map((arg) => arg.serializeJSON(context)),

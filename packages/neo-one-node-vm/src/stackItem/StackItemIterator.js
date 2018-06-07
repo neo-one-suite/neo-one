@@ -1,61 +1,38 @@
 /* @flow */
-import { type StorageItem, type Equatable } from '@neo-one/client-core';
-import BufferStackItem from './BufferStackItem';
+import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
+
+import { map } from 'ix/asynciterable/pipe/index';
 
 import { InvalidStorageStackItemIteratorError } from './errors';
+import type StackItemBase from './StackItemBase';
+import StackItemEnumerator from './StackItemEnumerator';
 
-export default class StackItemIterator implements Equatable {
-  iterator: AsyncIterator<StorageItem>;
-  current: ?StorageItem;
-  done: boolean;
-  first: boolean;
-
-  constructor(iterator: AsyncIterator<StorageItem>) {
-    this.iterator = iterator;
-    this.current = null;
-    this.done = false;
-    this.first = true;
-  }
-
-  equals(other: mixed): boolean {
-    return this === other;
-  }
-
-  async next(): Promise<boolean> {
-    const { first } = this;
-    this.first = false;
-    if (!this.done) {
-      const result = await this.iterator.next();
-      this.current = result.done ? null : result.value;
-      this.done = result.done;
-      if (first && this.done) {
-        return false;
-      }
-      return true;
-    }
-
-    return false;
-  }
-
-  key(): BufferStackItem {
+export default class StackItemIterator extends StackItemEnumerator<{
+  key: StackItemBase,
+  value: StackItemBase,
+}> {
+  key(): StackItemBase {
     const { current } = this;
     if (current == null) {
       throw new InvalidStorageStackItemIteratorError();
     }
 
-    return new BufferStackItem(current.key);
+    return current.key;
   }
 
-  value(): BufferStackItem {
-    const { current } = this;
-    if (current == null) {
-      throw new InvalidStorageStackItemIteratorError();
-    }
+  keys(): StackItemEnumerator<> {
+    const iterable = AsyncIterableX.from(this.enumerator).pipe(
+      map(({ key }) => ({ value: key })),
+    );
 
-    return new BufferStackItem(current.value);
+    return new StackItemEnumerator(this._getIterator(iterable));
   }
 
-  asIterator(): StackItemIterator {
-    return this;
+  values(): StackItemEnumerator<> {
+    const iterable = AsyncIterableX.from(this.enumerator).pipe(
+      map(({ value }) => ({ value })),
+    );
+
+    return new StackItemEnumerator(this._getIterator(iterable));
   }
 }

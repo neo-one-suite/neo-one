@@ -4,6 +4,7 @@ import {
   NULL_ACTION,
   TRIGGER_TYPE,
   type ExecuteScriptsResult,
+  type VMListeners,
 } from '@neo-one/node-core';
 import {
   SCRIPT_CONTAINER_TYPE,
@@ -29,6 +30,8 @@ import { assets, createBlockchain, testUtils, transactions } from '../__data__';
 const monitor = DefaultMonitor.create({
   service: 'test',
 });
+
+let listeners: VMListeners;
 
 const executeSimple = ({
   blockchain,
@@ -56,6 +59,7 @@ const executeSimple = ({
     gas: gas || utils.ZERO,
     skipWitnessVerify: skipWitnessVerify == null ? true : skipWitnessVerify,
     persistingBlock,
+    listeners,
   });
 
 const neoBN = (value: string) =>
@@ -124,6 +128,12 @@ describe('execute', () => {
       output: {},
       currentBlock: {},
     }: $FlowFixMe);
+    listeners = {
+      onNotify: jest.fn(() => {}),
+      onLog: jest.fn(() => {}),
+      onMigrateContract: jest.fn(() => {}),
+      onSetVotes: jest.fn(() => {}),
+    };
   });
 
   const testKYC = (name: string, gas: BN, state: number) => {
@@ -159,6 +169,7 @@ describe('execute', () => {
       expect(result.state).toEqual(state);
       expect(result.gasConsumed.toString(10)).toMatchSnapshot();
       testUtils.verifyBlockchainSnapshot(blockchain);
+      testUtils.verifyListeners(listeners);
     });
   };
 
@@ -210,6 +221,7 @@ describe('execute', () => {
     expect(result.state).toEqual(VM_STATE.HALT);
     expect(result.gasConsumed.toString(10)).toMatchSnapshot();
     testUtils.verifyBlockchainSnapshot(blockchain);
+    testUtils.verifyListeners(listeners);
   });
 
   const { conciergeContract } = transactions;
@@ -332,6 +344,7 @@ describe('execute', () => {
       await expectConciergeItemBNEquals(mainSaleBegin, '1522486800');
       await expectConciergeItemBNEquals(mainSaleHardCap, '100000000');
       await expectConciergeItemBNEquals(maxNEOPerTransfer, '250');
+      testUtils.verifyListeners(listeners);
     });
 
     it('should fail on multiple deploy', async () => {
@@ -342,6 +355,7 @@ describe('execute', () => {
       expect(ret.asBoolean()).toBeFalsy();
 
       testUtils.verifyBlockchainSnapshot(blockchain);
+      testUtils.verifyListeners(listeners);
     });
 
     describe('mintTokens', () => {
@@ -360,6 +374,7 @@ describe('execute', () => {
         });
 
         expectFailure(result);
+        testUtils.verifyListeners(listeners);
       });
 
       describe('should fail if current exchange rate is 0', () => {
@@ -379,6 +394,7 @@ describe('execute', () => {
           });
 
           expectFailure(result);
+          testUtils.verifyListeners(listeners);
         });
 
         it('when whitelist sale period and not whitelisted real world', async () => {
@@ -420,6 +436,7 @@ describe('execute', () => {
           });
 
           expectFailure(result);
+          testUtils.verifyListeners(listeners);
         });
 
         it('when whitelist sale period and rate not set', async () => {
@@ -435,6 +452,7 @@ describe('execute', () => {
           });
 
           expectFailure(result);
+          testUtils.verifyListeners(listeners);
         });
 
         it('when pre sale sale period and rate not set', async () => {
@@ -449,6 +467,7 @@ describe('execute', () => {
           });
 
           expectFailure(result);
+          testUtils.verifyListeners(listeners);
         });
       });
 
@@ -470,6 +489,7 @@ describe('execute', () => {
           conciergeSenderAddress,
           '22000000000',
         );
+        testUtils.verifyListeners(listeners);
       });
 
       it('should mint tokens during pre sale based on exchange rate with max tokens', async () => {
@@ -487,6 +507,7 @@ describe('execute', () => {
 
         expectSuccess(result);
         await expectConciergeItemBNEquals(conciergeSenderAddress, '5000000000');
+        testUtils.verifyListeners(listeners);
       });
 
       it('should mint tokens during main sale based on exchange rate with total supply cap', async () => {
@@ -505,6 +526,7 @@ describe('execute', () => {
 
         expectSuccess(result);
         await expectConciergeItemBNEquals(conciergeSenderAddress, '5000000000');
+        testUtils.verifyListeners(listeners);
       });
     });
 
@@ -525,6 +547,7 @@ describe('execute', () => {
         });
 
         checkResult(result);
+        testUtils.verifyListeners(listeners);
       };
 
       const getSenderValue = async () => {
@@ -587,6 +610,7 @@ describe('execute', () => {
           } else {
             await expectThrow(result);
           }
+          testUtils.verifyListeners(listeners);
         });
       };
 
@@ -1032,6 +1056,7 @@ describe('execute', () => {
           conciergeSenderAddress,
           conciergeTokenAmount,
         );
+        testUtils.verifyListeners(listeners);
       });
 
       it('should allow NEP5 Switcheo withdrawals', async () => {
@@ -1050,6 +1075,7 @@ describe('execute', () => {
           switcheoTokenSenderAddress,
           switcheoTokenAmount,
         );
+        testUtils.verifyListeners(listeners);
       });
 
       it('should allow withdrawing filled orders', async () => {
@@ -1087,6 +1113,7 @@ describe('execute', () => {
           conciergeSenderAddress,
           switcheoDepositAmount,
         );
+        testUtils.verifyListeners(listeners);
       });
     });
   });

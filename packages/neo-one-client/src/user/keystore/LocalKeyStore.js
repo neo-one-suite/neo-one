@@ -43,6 +43,7 @@ export type Wallets = {
 export type Store = {
   +type: string,
   +getWallets: () => Promise<Array<Wallet>>,
+  +getWalletsSync?: () => Array<Wallet>,
   +saveWallet: (wallet: Wallet, monitor?: Monitor) => Promise<void>,
   +deleteWallet: (account: Wallet, monitor?: Monitor) => Promise<void>,
 };
@@ -85,6 +86,9 @@ export default class LocalKeyStore {
 
     this._store = store;
 
+    if (store.getWalletsSync != null) {
+      this._initWithWallets(store.getWalletsSync());
+    }
     this._initPromise = this._init();
   }
 
@@ -98,6 +102,10 @@ export default class LocalKeyStore {
 
   async _init(): Promise<void> {
     const walletsList = await this._store.getWallets();
+    this._initWithWallets(walletsList);
+  }
+
+  _initWithWallets(walletsList: Array<Wallet>): void {
     const wallets = walletsList.reduce((acc, wallet) => {
       if (acc[wallet.account.id.network] == null) {
         acc[wallet.account.id.network] = {};
@@ -162,6 +170,8 @@ export default class LocalKeyStore {
   }: UpdateAccountNameOptions): Promise<void> {
     return this._capture(
       async (span) => {
+        await this._initPromise;
+
         const wallet = this.getWallet(id);
         let newWallet;
         const account = {
@@ -383,7 +393,9 @@ export default class LocalKeyStore {
     );
   }
 
-  lockWallet(id: UserAccountID): void {
+  async lockWallet(id: UserAccountID): Promise<void> {
+    await this._initPromise;
+
     const wallet = this.getWallet(id);
     if (wallet.nep2 == null || wallet.privateKey == null) {
       return;

@@ -101,6 +101,7 @@ export type ActionRawBase = {|
   transactionIndex: number,
   transactionHash: Hash256String,
   index: number,
+  globalIndex: BigNumber,
   scriptHash: Hash160String,
 |};
 export type NotificationRaw = {|
@@ -290,7 +291,7 @@ export type RawInvocationData = {|
   actions: Array<ActionRaw>,
 |};
 
-type TransactionBase = {|
+export type TransactionBase = {|
   version: number,
   txid: Hash256String,
   size: number,
@@ -301,23 +302,47 @@ type TransactionBase = {|
   systemFee: BigNumber,
   networkFee: BigNumber,
 |};
+export type ConfirmedTransactionBase = {|
+  data: {|
+    blockHash: Hash256String,
+    blockIndex: number,
+    index: number,
+    globalIndex: BigNumber,
+  |},
+|};
 export type ClaimTransaction = {|
   ...TransactionBase,
   type: 'ClaimTransaction',
   claims: Array<Input>,
 |};
+export type ConfirmedClaimTransaction = {|
+  ...ClaimTransaction,
+  ...ConfirmedTransactionBase,
+|};
 export type ContractTransaction = {|
   ...TransactionBase,
   type: 'ContractTransaction',
+|};
+export type ConfirmedContractTransaction = {|
+  ...ContractTransaction,
+  ...ConfirmedTransactionBase,
 |};
 export type EnrollmentTransaction = {|
   ...TransactionBase,
   type: 'EnrollmentTransaction',
   publicKey: PublicKeyString,
 |};
+export type ConfirmedEnrollmentTransaction = {|
+  ...EnrollmentTransaction,
+  ...ConfirmedTransactionBase,
+|};
 export type IssueTransaction = {|
   ...TransactionBase,
   type: 'IssueTransaction',
+|};
+export type ConfirmedIssueTransaction = {|
+  ...IssueTransaction,
+  ...ConfirmedTransactionBase,
 |};
 export type InvocationTransaction = {|
   ...TransactionBase,
@@ -327,17 +352,26 @@ export type InvocationTransaction = {|
 |};
 export type ConfirmedInvocationTransaction = {|
   ...InvocationTransaction,
-  data: RawInvocationData,
+  ...ConfirmedTransactionBase,
+  invocationData: RawInvocationData,
 |};
 export type MinerTransaction = {|
   ...TransactionBase,
   type: 'MinerTransaction',
   nonce: number,
 |};
+export type ConfirmedMinerTransaction = {|
+  ...MinerTransaction,
+  ...ConfirmedTransactionBase,
+|};
 export type PublishTransaction = {|
   ...TransactionBase,
   type: 'PublishTransaction',
   contract: Contract,
+|};
+export type ConfirmedPublishTransaction = {|
+  ...PublishTransaction,
+  ...ConfirmedTransactionBase,
 |};
 export type RegisterTransaction = {|
   ...TransactionBase,
@@ -351,6 +385,10 @@ export type RegisterTransaction = {|
     admin: AddressString,
   |},
 |};
+export type ConfirmedRegisterTransaction = {|
+  ...RegisterTransaction,
+  ...ConfirmedTransactionBase,
+|};
 export type StateDescriptor = {|
   type: 'Account' | 'Validator',
   key: BufferString,
@@ -362,7 +400,11 @@ export type StateTransaction = {|
   type: 'StateTransaction',
   descriptors: Array<StateDescriptor>,
 |};
-export type CommonTransaction =
+export type ConfirmedStateTransaction = {|
+  ...StateTransaction,
+  ...ConfirmedTransactionBase,
+|};
+export type Transaction =
   | MinerTransaction
   | IssueTransaction
   | ClaimTransaction
@@ -370,12 +412,17 @@ export type CommonTransaction =
   | RegisterTransaction
   | ContractTransaction
   | PublishTransaction
-  | StateTransaction;
-export type Transaction =
-  | CommonTransaction
+  | StateTransaction
   | InvocationTransaction;
 export type ConfirmedTransaction =
-  | CommonTransaction
+  | ConfirmedMinerTransaction
+  | ConfirmedIssueTransaction
+  | ConfirmedClaimTransaction
+  | ConfirmedEnrollmentTransaction
+  | ConfirmedRegisterTransaction
+  | ConfirmedContractTransaction
+  | ConfirmedPublishTransaction
+  | ConfirmedStateTransaction
   | ConfirmedInvocationTransaction;
 
 export type Header = {|

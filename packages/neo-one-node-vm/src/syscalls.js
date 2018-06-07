@@ -17,8 +17,6 @@ import {
   StorageItem,
   Validator,
   BinaryReader,
-  LogAction,
-  NotificationAction,
   InvalidScriptContainerTypeError,
   assertAssetType,
   assertContractParameterType,
@@ -31,6 +29,7 @@ import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 
 import { concatMap, map, toArray } from 'rxjs/operators';
 import { defer } from 'rxjs';
+import { map as asyncMap } from 'ix/asynciterable/pipe/index';
 
 import {
   type StackItem,
@@ -44,11 +43,13 @@ import {
   ConsensusPayloadStackItem,
   ContractStackItem,
   ECPointStackItem,
+  EnumeratorStackItem,
   HeaderStackItem,
   IntegerStackItem,
   InputStackItem,
   IteratorStackItem,
   OutputStackItem,
+  StackItemEnumerator,
   StackItemIterator,
   StorageContextStackItem,
   TransactionStackItem,
@@ -364,44 +365,28 @@ export const SYSCALLS = {
     name: 'Neo.Runtime.Notify',
     in: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const notification = new NotificationAction({
-        blockIndex: context.init.action.blockIndex,
-        blockHash: context.init.action.blockHash,
-        transactionIndex: context.init.action.transactionIndex,
-        transactionHash: context.init.action.transactionHash,
-        index: context.actionIndex,
-        scriptHash: context.scriptHash,
-        args: args[0].asArray().map((item) => item.toContractParameter()),
-      });
-      await context.blockchain.action.add(notification);
-      return {
-        context: {
-          ...context,
-          actionIndex: context.actionIndex + 1,
-        },
-      };
+      const { onNotify } = context.init.listeners;
+      if (onNotify != null) {
+        onNotify({
+          scriptHash: context.scriptHash,
+          args: args[0].asArray().map((item) => item.toContractParameter()),
+        });
+      }
+      return { context };
     },
   }),
   'Neo.Runtime.Log': createSysCall({
     name: 'Neo.Runtime.Log',
     in: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const log = new LogAction({
-        blockIndex: context.init.action.blockIndex,
-        blockHash: context.init.action.blockHash,
-        transactionIndex: context.init.action.transactionIndex,
-        transactionHash: context.init.action.transactionHash,
-        index: context.actionIndex,
-        scriptHash: context.scriptHash,
-        message: args[0].asString(),
-      });
-      await context.blockchain.action.add(log);
-      return {
-        context: {
-          ...context,
-          actionIndex: context.actionIndex + 1,
-        },
-      };
+      const { onLog } = context.init.listeners;
+      if (onLog != null) {
+        onLog({
+          scriptHash: context.scriptHash,
+          message: args[0].asString(),
+        });
+      }
+      return { context };
     },
   }),
   'Neo.Runtime.GetTime': createSysCall({
@@ -502,6 +487,20 @@ export const SYSCALLS = {
       return {
         context,
         results: [new TransactionStackItem(transaction)],
+      };
+    },
+  }),
+  'Neo.Blockchain.GetTransactionHeight': createSysCall({
+    name: 'Neo.Blockchain.GetTransactionHeight',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => {
+      const transactionData = await context.blockchain.transactionData.get({
+        hash: args[0].asUInt256(),
+      });
+      return {
+        context,
+        results: [new IntegerStackItem(new BN(transactionData.startHeight))],
       };
     },
   }),
@@ -778,7 +777,7 @@ export const SYSCALLS = {
     fee: FEES.TWO_HUNDRED,
     invoke: async ({ context, args }: OpInvokeArgs) => {
       const transaction = args[0].asTransaction();
-      const spentCoins = await context.blockchain.transactionSpentCoins.get({
+      const spentCoins = await context.blockchain.transactionData.get({
         hash: transaction.hash,
       });
       return {
@@ -1009,13 +1008,21 @@ export const SYSCALLS = {
       results: [new StorageContextStackItem(context.scriptHash)],
     }),
   }),
+  'Neo.Storage.GetReadOnlyContext': createSysCall({
+    name: 'Neo.Storage.GetReadOnlyContext',
+    out: 1,
+    invoke: ({ context }: OpInvokeArgs) => ({
+      context,
+      results: [new StorageContextStackItem(context.scriptHash).asReadOnly()],
+    }),
+  }),
   'Neo.Storage.Get': createSysCall({
     name: 'Neo.Storage.Get',
     in: 2,
     out: 1,
     fee: FEES.ONE_HUNDRED,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const hash = vmUtils.toStorageContext(context, args[0]).value;
+      const hash = vmUtils.toStorageContext({ context, value: args[0] }).value;
       await checkStorage({ context, hash });
 
       const item = await context.blockchain.storageItem.tryGet({
@@ -1034,12 +1041,17 @@ export const SYSCALLS = {
     in: 2,
     out: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const hash = vmUtils.toStorageContext(context, args[0]).value;
+      const hash = vmUtils.toStorageContext({ context, value: args[0] }).value;
       await checkStorage({ context, hash });
 
       const prefix = args[1].asBuffer();
       const iterable = AsyncIterableX.from(
         context.blockchain.storageItem.getAll({ hash, prefix }),
+      ).pipe(
+        asyncMap(({ key, value }) => ({
+          key: new BufferStackItem(key),
+          value: new BufferStackItem(value),
+        })),
       );
       return {
         context,
@@ -1053,13 +1065,44 @@ export const SYSCALLS = {
       };
     },
   }),
-  'Neo.Iterator.Next': createSysCall({
-    name: 'Neo.Iterator.Next',
+  'Neo.StorageContext.AsReadOnly': createSysCall({
+    name: 'Neo.StorageContext.AsReadOnly',
+    in: 1,
+    out: 1,
+    invoke: ({ context, args }: OpInvokeArgs) => ({
+      context,
+      results: [
+        vmUtils.toStorageContext({ context, value: args[0] }).asReadOnly(),
+      ],
+    }),
+  }),
+  'Neo.Enumerator.Create': createSysCall({
+    name: 'Neo.Enumerator.Create',
     in: 1,
     out: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const iterator = args[0].asIterator();
-      const value = await iterator.next();
+      const iterable = AsyncIterableX.from(
+        args[0].asArray().map((value) => ({ value })),
+      );
+      return {
+        context,
+        results: [
+          new EnumeratorStackItem(
+            new StackItemEnumerator(
+              (iterable: $FlowFixMe)[(Symbol: $FlowFixMe).asyncIterator](),
+            ),
+          ),
+        ],
+      };
+    },
+  }),
+  'Neo.Enumerator.Next': createSysCall({
+    name: 'Neo.Enumerator.Next',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => {
+      const enumerator = args[0].asEnumerator();
+      const value = await enumerator.next();
       return {
         context,
         results: [new BooleanStackItem(value)],
@@ -1072,16 +1115,47 @@ export const SYSCALLS = {
     out: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => ({
       context,
-      results: [args[0].asIterator().key()],
+      results: [(args[0].asIterator().key(): $FlowFixMe)],
     }),
   }),
-  'Neo.Iterator.Value': createSysCall({
-    name: 'Neo.Iterator.Value',
+  'Neo.Enumerator.Value': createSysCall({
+    name: 'Neo.Enumerator.Value',
     in: 1,
     out: 1,
     invoke: async ({ context, args }: OpInvokeArgs) => ({
       context,
-      results: [args[0].asIterator().value()],
+      results: [(args[0].asEnumerator().value(): $FlowFixMe)],
+    }),
+  }),
+  'Neo.Enumerator.Concat': createSysCall({
+    name: 'Neo.Enumerator.Concat',
+    in: 2,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => ({
+      context,
+      results: [
+        new EnumeratorStackItem(
+          args[0].asEnumerator().concat(args[1].asEnumerator()),
+        ),
+      ],
+    }),
+  }),
+  'Neo.Iterator.Keys': createSysCall({
+    name: 'Neo.Iterator.Keys',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => ({
+      context,
+      results: [new EnumeratorStackItem(args[0].asIterator().keys())],
+    }),
+  }),
+  'Neo.Iterator.Values': createSysCall({
+    name: 'Neo.Iterator.Values',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }: OpInvokeArgs) => ({
+      context,
+      results: [new EnumeratorStackItem(args[0].asIterator().values())],
     }),
   }),
   'Neo.Account.SetVotes': createSysCall({
@@ -1362,7 +1436,11 @@ export const SYSCALLS = {
       in: 3,
       fee: FEES.ONE_THOUSAND.mul(ratio),
       invoke: async ({ context, args }: OpInvokeArgs) => {
-        const hash = vmUtils.toStorageContext(context, args[0]).value;
+        const hash = vmUtils.toStorageContext({
+          context,
+          value: args[0],
+          write: true,
+        }).value;
         await checkStorage({ context, hash });
         const key = args[1].asBuffer();
         const value = args[2].asBuffer();
@@ -1384,7 +1462,11 @@ export const SYSCALLS = {
     in: 2,
     fee: FEES.ONE_HUNDRED,
     invoke: async ({ context, args }: OpInvokeArgs) => {
-      const hash = vmUtils.toStorageContext(context, args[0]).value;
+      const hash = vmUtils.toStorageContext({
+        context,
+        value: args[0],
+        write: true,
+      }).value;
       await checkStorage({ context, hash });
       const key = args[1].asBuffer();
       await context.blockchain.storageItem.delete({ hash, key });
@@ -1446,6 +1528,8 @@ export const SYSCALLS = {
 };
 
 export const SYSCALL_ALIASES = {
+  'Neo.Iterator.Next': 'Neo.Enumerator.Next',
+  'Neo.Iterator.Value': 'Neo.Enumerator.Value',
   'AntShares.Runtime.CheckWitness': 'Neo.Runtime.CheckWitness',
   'AntShares.Runtime.Notify': 'Neo.Runtime.Notify',
   'AntShares.Runtime.Log': 'Neo.Runtime.Log',

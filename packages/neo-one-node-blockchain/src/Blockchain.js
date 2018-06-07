@@ -13,6 +13,8 @@ import {
   type OutputKey,
   type SerializableInvocationData,
   type Transaction,
+  type TransactionBase,
+  type TransactionData,
   type UInt160,
   type Validator,
   type VerifyScriptOptions,
@@ -122,10 +124,10 @@ export default class Blockchain {
   action: $PropertyType<BlockchainType, 'action'>;
   asset: $PropertyType<BlockchainType, 'asset'>;
   block: $PropertyType<BlockchainType, 'block'>;
-  blockSystemFee: $PropertyType<BlockchainType, 'blockSystemFee'>;
+  blockData: $PropertyType<BlockchainType, 'blockData'>;
   header: $PropertyType<BlockchainType, 'header'>;
   transaction: $PropertyType<BlockchainType, 'transaction'>;
-  transactionSpentCoins: $PropertyType<BlockchainType, 'transactionSpentCoins'>;
+  transactionData: $PropertyType<BlockchainType, 'transactionData'>;
   output: $PropertyType<BlockchainType, 'output'>;
   contract: $PropertyType<BlockchainType, 'contract'>;
   storageItem: $PropertyType<BlockchainType, 'storageItem'>;
@@ -172,13 +174,13 @@ export default class Blockchain {
       get: this._storage.block.get,
       tryGet: this._storage.block.tryGet,
     };
-    this.blockSystemFee = this._storage.blockSystemFee;
+    this.blockData = this._storage.blockData;
     this.header = {
       get: this._storage.header.get,
       tryGet: this._storage.header.tryGet,
     };
     this.transaction = this._storage.transaction;
-    this.transactionSpentCoins = this._storage.transactionSpentCoins;
+    this.transactionData = this._storage.transactionData;
     this.output = this._storage.output;
     this.contract = this._storage.contract;
     this.storageItem = this._storage.storageItem;
@@ -200,6 +202,7 @@ export default class Blockchain {
       addressVersion: this.settings.addressVersion,
       feeContext: this.feeContext,
       tryGetInvocationData: this._tryGetInvocationData,
+      tryGetTransactionData: this._tryGetTransactionData,
       getUnclaimed: this._getUnclaimed,
       getUnspent: this._getUnspent,
     };
@@ -630,10 +633,10 @@ export default class Blockchain {
             const header = await this._storage.header.get({
               hashOrIndex: index,
             });
-            const blockSystemFee = await this._storage.blockSystemFee.get({
+            const blockData = await this._storage.blockData.get({
               hash: header.hash,
             });
-            return blockSystemFee.systemFee;
+            return blockData.systemFee;
           },
         });
       },
@@ -644,35 +647,34 @@ export default class Blockchain {
     );
 
   _isSpent = async (input: OutputKey): Promise<boolean> => {
-    const transactionSpentCoins = await this.transactionSpentCoins.tryGet({
+    const transactionData = await this.transactionData.tryGet({
       hash: input.hash,
     });
 
     return (
-      transactionSpentCoins != null &&
-      transactionSpentCoins.endHeights[input.index] != null
+      transactionData != null && transactionData.endHeights[input.index] != null
     );
   };
 
   _tryGetSpentCoin = async (input: Input): Promise<?SpentCoin> => {
-    const [transactionSpentCoins, output] = await Promise.all([
-      this.transactionSpentCoins.tryGet({ hash: input.hash }),
+    const [transactionData, output] = await Promise.all([
+      this.transactionData.tryGet({ hash: input.hash }),
       this.output.get(input),
     ]);
-    if (transactionSpentCoins == null) {
+    if (transactionData == null) {
       return null;
     }
 
-    const endHeight = transactionSpentCoins.endHeights[input.index];
+    const endHeight = transactionData.endHeights[input.index];
     if (endHeight == null) {
       return null;
     }
 
-    const claimed = transactionSpentCoins.claimed[input.index];
+    const claimed = transactionData.claimed[input.index];
 
     return {
       output,
-      startHeight: transactionSpentCoins.startHeight,
+      startHeight: transactionData.startHeight,
       endHeight,
       claimed: !!claimed,
     };
@@ -798,15 +800,15 @@ export default class Blockchain {
           this._storage.contract.get({ hash: contractHash }),
         ),
       ),
-      this._storage.action
-        .getAll({
-          blockIndexStart: data.blockIndex,
-          transactionIndexStart: data.transactionIndex,
-          blockIndexStop: data.blockIndex,
-          transactionIndexStop: data.transactionIndex,
-        })
-        .pipe(toArray())
-        .toPromise(),
+      data.actionIndexStart.eq(data.actionIndexStop)
+        ? Promise.resolve([])
+        : this._storage.action
+            .getAll({
+              indexStart: data.actionIndexStart,
+              indexStop: data.actionIndexStop.sub(utils.ONE),
+            })
+            .pipe(toArray())
+            .toPromise(),
     ]);
 
     return {
@@ -820,25 +822,17 @@ export default class Blockchain {
     };
   };
 
-  _getUnclaimed = async (hash: UInt160): Promise<Array<Input>> => {
-    const unclaimed = await this._storage.accountUnclaimed
+  _tryGetTransactionData = async (
+    transaction: TransactionBase<any, any>,
+  ): Promise<?TransactionData> =>
+    this.transactionData.tryGet({ hash: transaction.hash });
+
+  _getUnclaimed = (hash: UInt160): Promise<Array<Input>> =>
+    this._storage.accountUnclaimed
       .getAll({ hash })
       .pipe(toArray())
-      .toPromise();
-    const filtered = await Promise.all(
-      unclaimed.map(async (value) => {
-        const output = await this._storage.output.get(value.input);
-        if (
-          common.uInt256Equal(output.asset, this.settings.governingToken.hash)
-        ) {
-          return value.input;
-        }
-
-        return (null: $FlowFixMe);
-      }),
-    );
-    return filtered.filter(Boolean);
-  };
+      .toPromise()
+      .then((values) => values.map((value) => value.input));
 
   _getUnspent = async (hash: UInt160): Promise<Array<Input>> => {
     const unspent = await this._storage.accountUnspent

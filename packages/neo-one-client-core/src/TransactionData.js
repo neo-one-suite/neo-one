@@ -1,37 +1,42 @@
 /* @flow */
+import type BN from 'bn.js';
+import BaseState from './BaseState';
 import {
-  type BinaryWriter,
   type DeserializeWireBaseOptions,
   type DeserializeWireOptions,
   type SerializeWire,
   type SerializableWire,
-  type UInt256,
-  BaseState,
-  BinaryReader,
-  IOHelper,
   createSerializeWire,
-  utils,
-} from '@neo-one/client-core';
+} from './Serializable';
+import { type UInt256 } from './common';
 
-export type TransactionSpentCoinsAdd = {|
+import utils, { type BinaryWriter, BinaryReader, IOHelper } from './utils';
+
+export type TransactionDataAdd = {|
   version?: number,
   hash: UInt256,
+  blockHash: UInt256,
   startHeight: number,
+  index: number,
+  globalIndex: BN,
   endHeights?: { [index: number]: number },
   claimed?: { [index: number]: boolean },
 |};
-export type TransactionSpentCoinsUpdate = {|
+export type TransactionDataUpdate = {|
   endHeights?: { [index: number]: number },
   claimed?: { [index: number]: boolean },
 |};
-export type TransactionSpentCoinsKey = {|
+export type TransactionDataKey = {|
   hash: UInt256,
 |};
 
-export default class TransactionSpentCoins extends BaseState
-  implements SerializableWire<TransactionSpentCoins> {
+export default class TransactionData extends BaseState
+  implements SerializableWire<TransactionData> {
   hash: UInt256;
+  blockHash: UInt256;
   startHeight: number;
+  index: number;
+  globalIndex: BN;
   endHeights: { [index: number]: number };
   claimed: { [index: number]: boolean };
 
@@ -40,13 +45,19 @@ export default class TransactionSpentCoins extends BaseState
   constructor({
     version,
     hash,
+    blockHash,
     startHeight,
+    index,
+    globalIndex,
     endHeights,
     claimed,
-  }: TransactionSpentCoinsAdd) {
+  }: TransactionDataAdd) {
     super({ version });
     this.hash = hash;
+    this.blockHash = blockHash;
     this.startHeight = startHeight;
+    this.index = index;
+    this.globalIndex = globalIndex;
     this.endHeights = endHeights || {};
     this.claimed = claimed || {};
     this.__size = utils.lazy(
@@ -69,14 +80,14 @@ export default class TransactionSpentCoins extends BaseState
     return this.__size();
   }
 
-  update({
-    endHeights,
-    claimed,
-  }: TransactionSpentCoinsUpdate): TransactionSpentCoins {
+  update({ endHeights, claimed }: TransactionDataUpdate): TransactionData {
     return new this.constructor({
       version: this.version,
       hash: this.hash,
+      blockHash: this.blockHash,
       startHeight: this.startHeight,
+      index: this.index,
+      globalIndex: this.globalIndex,
       endHeights: endHeights == null ? this.endHeights : endHeights,
       claimed: claimed == null ? this.claimed : claimed,
     });
@@ -85,7 +96,10 @@ export default class TransactionSpentCoins extends BaseState
   serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.version);
     writer.writeUInt256(this.hash);
+    writer.writeUInt256(this.blockHash);
     writer.writeUInt32LE(this.startHeight);
+    writer.writeUInt32LE(this.index);
+    writer.writeUInt64LE(this.globalIndex);
     writer.writeObject(this.endHeights, (key, value) => {
       writer.writeUInt32LE(key);
       writer.writeUInt32LE(value);
@@ -102,10 +116,13 @@ export default class TransactionSpentCoins extends BaseState
 
   static deserializeWireBase({
     reader,
-  }: DeserializeWireBaseOptions): TransactionSpentCoins {
+  }: DeserializeWireBaseOptions): TransactionData {
     const version = reader.readUInt8();
     const hash = reader.readUInt256();
+    const blockHash = reader.readUInt256();
     const startHeight = reader.readUInt32LE();
+    const index = reader.readUInt32LE();
+    const globalIndex = reader.readUInt64LE();
     const endHeights = reader.readObject(() => {
       const key = reader.readUInt32LE();
       const value = reader.readUInt32LE();
@@ -120,7 +137,10 @@ export default class TransactionSpentCoins extends BaseState
     return new this({
       version,
       hash,
+      blockHash,
       startHeight,
+      index,
+      globalIndex,
       endHeights,
       claimed,
     });

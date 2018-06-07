@@ -2,14 +2,9 @@
 import { NEOONEProvider, privateKeyToAddress } from '@neo-one/client';
 import { common } from '@neo-one/client-core';
 
-import { getRPC } from './bootstrapTestUtils';
+import { DEFAULT_PRIVATE_KEYS } from '../bootstrap';
 
-const PRIVATE_KEYS = [
-  'e35ecb8189067a0a06f17f163be3db95c4b7805c81b48af1f4b8bbdfbeeb1afd',
-  '6cad314f75624a26b780368a8b0753d10815ca44c1fca6eb3972484548805d9e',
-  'e91dc6e5fffcae0510ef5a7e41675d024e5b286769b3ff455e71e01a4cf16ef0',
-  'fa38cb00810d173e14631219d8ee689ee183a3d307c3c8bd2e1234d332dd3255',
-];
+import { getRPC } from '../__data__/bootstrapTestUtils';
 
 describe('bootstrap with rpc', () => {
   test('bootstrap - rpc', async () => {
@@ -24,7 +19,7 @@ describe('bootstrap with rpc', () => {
     await one.execute(`bootstrap --rpc ${rpcURL} --testing-only`);
 
     const accounts = await Promise.all(
-      PRIVATE_KEYS.map((key) =>
+      DEFAULT_PRIVATE_KEYS.map((key) =>
         provider.read(network).getAccount(privateKeyToAddress(key)),
       ),
     );
@@ -62,6 +57,6 @@ describe('bootstrap with rpc', () => {
       (acc, block) => acc + block.transactions.length,
       0,
     );
-    expect(transactionCount).toBeGreaterThan(40);
+    expect(transactionCount).toEqual(40);
   });
 });

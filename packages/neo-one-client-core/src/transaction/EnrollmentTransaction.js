@@ -142,16 +142,8 @@ export default class EnrollmentTransaction extends TransactionBase<
     );
 
     return {
+      ...transactionBaseJSON,
       type: 'EnrollmentTransaction',
-      txid: transactionBaseJSON.txid,
-      size: transactionBaseJSON.size,
-      version: transactionBaseJSON.version,
-      attributes: transactionBaseJSON.attributes,
-      vin: transactionBaseJSON.vin,
-      vout: transactionBaseJSON.vout,
-      scripts: transactionBaseJSON.scripts,
-      sys_fee: transactionBaseJSON.sys_fee,
-      net_fee: transactionBaseJSON.net_fee,
       pubkey: JSONHelper.writeECPoint(this.publicKey),
     };
   }

@@ -237,7 +237,6 @@ const call = ({ name, tailCall }: {| name: OpCode, tailCall?: boolean |}) => ({
           stack: context.stack,
           stackAlt: context.stackAlt,
           depth: tailCall ? context.depth : context.depth + 1,
-          actionIndex: context.actionIndex,
           createdContracts: context.createdContracts,
           scriptHash: context.scriptHash,
           entryScriptHash: context.entryScriptHash,
@@ -1583,9 +1582,9 @@ const OPCODE_PAIRS = [
           context,
           results: [
             new ArrayStackItem(
-              _.range(0, vmUtils.toNumber(context, args[0].asBigInteger())).map(
-                () => new BooleanStackItem(false),
-              ),
+              _
+                .range(0, vmUtils.toNumber(context, args[0].asBigInteger()))
+                .map(() => new BooleanStackItem(false)),
             ),
           ],
         }),
@@ -1601,9 +1600,9 @@ const OPCODE_PAIRS = [
           context,
           results: [
             new StructStackItem(
-              _.range(0, vmUtils.toNumber(context, args[0].asBigInteger())).map(
-                () => new BooleanStackItem(false),
-              ),
+              _
+                .range(0, vmUtils.toNumber(context, args[0].asBigInteger()))
+                .map(() => new BooleanStackItem(false)),
             ),
           ],
         }),

@@ -202,7 +202,6 @@ const run = async ({
         stack: context.stack,
         stackAlt: context.stackAlt,
         gasLeft: context.gasLeft,
-        actionIndex: context.actionIndex,
         createdContracts: context.createdContracts,
       };
     }
@@ -249,7 +248,6 @@ export const executeScript = async ({
     stack: options.stack || [],
     stackAlt: options.stackAlt || [],
     gasLeft,
-    actionIndex: options.actionIndex || 0,
     createdContracts: options.createdContracts || {},
   };
 
@@ -321,7 +319,6 @@ export default async ({
         depth: scripts.length - idx,
         stack: [],
         stackAlt: [],
-        actionIndex: 0,
         createdContracts: {},
         scriptHash,
         entryScriptHash,
@@ -331,7 +328,6 @@ export default async ({
           depth: scripts.length - idx,
           stack: context.stack,
           stackAlt: context.stackAlt,
-          actionIndex: context.actionIndex,
           createdContracts: context.createdContracts,
           scriptHash,
           entryScriptHash,

@@ -55,7 +55,6 @@ export type Options = {|
   depth: number,
   stack: ExecutionStack,
   stackAlt: ExecutionStack,
-  actionIndex: number,
   createdContracts: CreatedContracts,
   scriptHash: ?UInt160,
   entryScriptHash: UInt160,
@@ -89,7 +88,6 @@ export type ExecutionContext = {|
   stack: ExecutionStack,
   stackAlt: ExecutionStack,
   gasLeft: BN,
-  actionIndex: number,
   createdContracts: CreatedContracts,
 |};
 
@@ -97,7 +95,6 @@ export const getResultContext = (context: ExecutionContext) => ({
   stack: context.stack,
   stackAlt: context.stackAlt,
   gasLeft: context.gasLeft,
-  actionIndex: context.actionIndex,
   createdContracts: context.createdContracts,
 });
 

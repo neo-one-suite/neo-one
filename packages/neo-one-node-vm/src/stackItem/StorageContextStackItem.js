@@ -12,10 +12,12 @@ import StackItemBase, {
 
 export default class StorageContextStackItem extends StackItemBase {
   value: UInt160;
+  isReadOnly: boolean;
 
-  constructor(value: UInt160) {
+  constructor(value: UInt160, isReadOnly: boolean = false) {
     super();
     this.value = value;
+    this.isReadOnly = isReadOnly;
   }
 
   equals(other: mixed): boolean {
@@ -52,6 +54,10 @@ export default class StorageContextStackItem extends StackItemBase {
     options: AsStorageContextStackItemOptions,
   ): StorageContextStackItem {
     return this;
+  }
+
+  asReadOnly(): StorageContextStackItem {
+    return new this.constructor(this.value, true);
   }
 
   toContractParameter(): ContractParameter {

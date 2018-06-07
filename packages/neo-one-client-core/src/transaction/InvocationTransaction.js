@@ -45,7 +45,7 @@ export type InvocationTransactionJSON = {|
   type: 'InvocationTransaction',
   script: string,
   gas: string,
-  data?: InvocationDataJSON,
+  invocationData?: InvocationDataJSON,
 |};
 
 // const MAX_SCRIPT_SIZE = 65536;
@@ -179,7 +179,7 @@ export default class InvocationTransaction extends TransactionBase<
     );
 
     const data = await context.tryGetInvocationData(this);
-    let dataJSON;
+    let invocationDataJSON;
     if (data != null) {
       const {
         asset,
@@ -190,7 +190,7 @@ export default class InvocationTransaction extends TransactionBase<
         actions,
         result,
       } = data;
-      dataJSON = {
+      invocationDataJSON = {
         result: result.serializeJSON(context),
         asset: asset == null ? undefined : asset.serializeJSON(context),
         contracts: contracts.map((contract) => contract.serializeJSON(context)),
@@ -211,28 +211,20 @@ export default class InvocationTransaction extends TransactionBase<
         actions: actions.map((action) => action.serializeJSON(context)),
       };
 
-      if (dataJSON.asset == null) {
-        delete dataJSON.asset;
+      if (invocationDataJSON.asset == null) {
+        delete invocationDataJSON.asset;
       }
     }
 
     const json = {
+      ...transactionBaseJSON,
       type: 'InvocationTransaction',
-      txid: transactionBaseJSON.txid,
-      size: transactionBaseJSON.size,
-      version: transactionBaseJSON.version,
-      attributes: transactionBaseJSON.attributes,
-      vin: transactionBaseJSON.vin,
-      vout: transactionBaseJSON.vout,
-      scripts: transactionBaseJSON.scripts,
-      sys_fee: transactionBaseJSON.sys_fee,
-      net_fee: transactionBaseJSON.net_fee,
       script: JSONHelper.writeBuffer(this.script),
       gas: JSONHelper.writeFixed8(this.gas),
-      data: dataJSON,
+      invocationData: invocationDataJSON,
     };
-    if (json.data == null) {
-      delete json.data;
+    if (json.invocationData == null) {
+      delete json.invocationData;
     }
 
     return json;
