@@ -471,7 +471,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('!(0 == null) [EqualsEqualsToken]', async () => {
+  test('!(0 == null) [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (0 == null) {
         throw 'Failure';
@@ -495,7 +495,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('!(true == undefined) [EqualsEqualsToken]', async () => {
+  test('!(true == undefined) [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (true == undefined) {
         throw 'Failure';
@@ -503,7 +503,29 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('!(false == "a") [EqualsEqualsToken]', async () => {
+  test('(false == 0) [EqualsEqualsToken]', async () => {
+    await helpers.executeString(`
+      if (!(false == 0)) {
+        throw 'Failure';
+      }
+    `);
+  });
+  test('(true == 1) [EqualsEqualsToken]', async () => {
+    await helpers.executeString(`
+      if (!(true == 1)) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('!(true == 2) [EqualsEqualsToken]', async () => {
+    await helpers.executeString(`
+      if (true == 2) {
+        throw 'Failure';
+      }
+    `);
+  });
+  test.skip('(false == "a") [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (!(false == "a")) {
         throw 'Failure';
@@ -511,7 +533,39 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('!(null == true) [EqualsEqualsToken]', async () => {
+  test.skip('(false == "") [EqualsEqualsToken]', async () => {
+    await helpers.executeString(`
+      if (!(false == "")) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test.skip('(false == " ")  [EqualsEqualsToken]', async () => {
+    await helpers.executeString(`
+      if (!(false == " ")) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test.skip('!(false == "a") [EqualsEqualsToken]', async () => {
+    await helpers.executeString(`
+      if (false == "a") {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test.skip('(3 == "3") [EqualsEqualsToken]', async () => {
+    await helpers.executeString(`
+      if (!(3 == "3")) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('!(null == true) [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (null == true) {
         throw 'Failure';
@@ -519,7 +573,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('!(null == false) [EqualsEqualsToken]', async () => {
+  test('!(null == false) [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       if (null == false) {
         throw 'Failure';
@@ -527,7 +581,23 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('true != null [ExclamationEqualsToken]', async () => {
+  test('null == undefined [EqualsEqualsToken]', async () => {
+    await helpers.executeString(`
+      if (!(null == undefined)) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('null !== true [EqualsEqualsToken]', async () => {
+    await helpers.executeString(`
+      if (null == true) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('true != null [ExclamationEqualsToken]', async () => {
     await helpers.executeString(`
       if (!(true != null)) {
         throw 'Failure';
@@ -535,7 +605,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('true != undefined [ExclamationEqualsToken]', async () => {
+  test('true != undefined [ExclamationEqualsToken]', async () => {
     await helpers.executeString(`
       if (!(true != undefined)) {
         throw 'Failure';
