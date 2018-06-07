@@ -1,5 +1,5 @@
 /* @flow */
-import testBootstrap from './bootstrapTestUtils';
+import testBootstrap from '../__data__/bootstrapTestUtils';
 
 describe('bootstrap 20 wallets', () => {
   test('bootstrap - 20 wallets', async () => {

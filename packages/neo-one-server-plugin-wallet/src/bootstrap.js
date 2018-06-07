@@ -30,7 +30,7 @@ import {
 } from '@neo-one/server-plugin-network';
 
 import _ from 'lodash';
-import { of as _of } from 'rxjs/observable/of';
+import { of as _of } from 'rxjs';
 import ora from 'ora';
 import type { Wallet } from './WalletResourceType';
 import type WalletPlugin from './WalletPlugin';
@@ -42,13 +42,13 @@ const DEFAULT_NUM_WALLETS = 10;
 const DEFAULT_MASTER_PRIVATE_KEY =
   '9e9522c90f4b33cac8a174353ae54651770f3f4dd1de78e74d9b49ba615d7c1f';
 const DEFAULT_NETWORK_NAME = 'priv';
-const DEFAULT_PRIVATE_KEYS = [
+export const DEFAULT_PRIVATE_KEYS = [
   'e35ecb8189067a0a06f17f163be3db95c4b7805c81b48af1f4b8bbdfbeeb1afd',
   '6cad314f75624a26b780368a8b0753d10815ca44c1fca6eb3972484548805d9e',
   'e91dc6e5fffcae0510ef5a7e41675d024e5b286769b3ff455e71e01a4cf16ef0',
   'fa38cb00810d173e14631219d8ee689ee183a3d307c3c8bd2e1234d332dd3255',
 ];
-const ASSET_INFO = [
+export const ASSET_INFO = [
   {
     assetType: 'Token',
     name: 'redcoin',
@@ -233,26 +233,26 @@ async function createTransfers({
   let gas;
   if (from == null) {
     const seed = randomInt(100);
-    neo = randomIntDist(seed);
-    gas = randomIntDist(seed);
+    neo = new BigNumber(randomIntDist(seed));
+    gas = new BigNumber(randomIntDist(seed));
   } else {
-    const transferPercent = randomInt(75) / 100;
-    neo = Math.ceil(
-      transferPercent * Number(from.balances[common.NEO_ASSET_HASH]),
-    );
-    gas = Math.ceil(
-      transferPercent * Number(from.balances[common.GAS_ASSET_HASH]),
-    );
+    const transferPercent = new BigNumber(randomInt(75) / 100);
+    neo = transferPercent
+      .times(from.balances[common.NEO_ASSET_HASH])
+      .integerValue(BigNumber.ROUND_CEIL);
+    gas = transferPercent
+      .times(from.balances[common.GAS_ASSET_HASH])
+      .integerValue(BigNumber.ROUND_CEIL);
   }
 
   return [
     {
-      amount: new BigNumber(neo),
+      amount: neo,
       asset: common.NEO_ASSET_HASH,
       to: wallet.address,
     },
     {
-      amount: new BigNumber(gas),
+      amount: gas,
       asset: common.GAS_ASSET_HASH,
       to: wallet.address,
     },
@@ -342,7 +342,8 @@ async function initiateClaims({
   const unclaimed = await Promise.all(
     wallets.map((wallet) => provider.getUnclaimed(networkName, wallet.address)),
   );
-  const unclaimedAccounts = _.zip(wallets, unclaimed)
+  const unclaimedAccounts = _
+    .zip(wallets, unclaimed)
     .filter((account) => account[1].unclaimed.length > 0)
     .map((account) => account[0]);
 
@@ -373,11 +374,11 @@ async function setupAssetWallets({
   developerClient: DeveloperClient,
   master: WalletData,
 |}): Promise<void> {
-  const startingGAS = 50000;
+  const startingGAS = new BigNumber(50000);
 
   const transfer = await client.transfer(
     wallets.map((wallet) => ({
-      amount: new BigNumber(startingGAS),
+      amount: startingGAS,
       asset: common.GAS_ASSET_HASH,
       to: wallet.address,
     })),
@@ -508,14 +509,16 @@ async function createAssetTransfer({
     .getAccount(assetWallet.address);
   const walletTransfers = [];
   for (const account of accounts) {
-    const transferPercent = randomInt(75) / 100;
+    const transferPercent = new BigNumber(randomInt(75) / 100);
 
-    const stringBalance = account.balances[assetHash];
-    if (stringBalance != null) {
-      const amount = Math.ceil(transferPercent * Number(stringBalance));
+    const balance = account.balances[assetHash];
+    if (balance != null) {
+      const amount = transferPercent
+        .times(balance)
+        .integerValue(BigNumber.ROUND_CEIL);
       walletTransfers.push({
         transfer: {
-          amount: new BigNumber(amount),
+          amount,
           asset: assetHash,
           to: wallets[randomInt(wallets.length) - 1].address,
         },
@@ -538,12 +541,15 @@ async function createAssetTransfer({
   const numTransfers = Math.floor(wallets.length / 3);
   const assetWalletTransfers = [];
   for (let i = 0; i < numTransfers; i += 1) {
-    const transferPercent = randomInt(Math.floor(250 / numTransfers)) / 1000;
-    const balance = Number(assetAccount.balances[assetHash]);
+    const transferPercent = new BigNumber(
+      randomInt(Math.floor(250 / numTransfers)) / 1000,
+    );
+    const amount = transferPercent
+      .times(assetAccount.balances[assetHash])
+      .integerValue(BigNumber.ROUND_CEIL);
 
-    const amount = Math.ceil(transferPercent * balance);
     assetWalletTransfers.push({
-      amount: new BigNumber(amount),
+      amount,
       asset: assetHash,
       to: wallets[randomInt(wallets.length) - 1].address,
     });
@@ -589,14 +595,16 @@ async function getPresetData({
     };
   }
 
-  const hardcodedWallets = _.zip(
-    walletNames.slice(0, DEFAULT_PRIVATE_KEYS.length),
-    DEFAULT_PRIVATE_KEYS,
-  ).map((walletInfo) => ({
-    name: walletInfo[0],
-    privateKey: walletInfo[1],
-    address: privateKeyToAddress(walletInfo[1]),
-  }));
+  const hardcodedWallets = _
+    .zip(
+      walletNames.slice(0, DEFAULT_PRIVATE_KEYS.length),
+      DEFAULT_PRIVATE_KEYS,
+    )
+    .map((walletInfo) => ({
+      name: walletInfo[0],
+      privateKey: walletInfo[1],
+      address: privateKeyToAddress(walletInfo[1]),
+    }));
 
   const wallets = walletNames
     .slice(DEFAULT_PRIVATE_KEYS.length)
@@ -838,13 +846,13 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           developerClient,
         });
         spinner.succeed();
-        const assets = _.zip(ASSET_INFO, assetWallets, assetHashes).map(
-          (asset) => ({
+        const assets = _
+          .zip(ASSET_INFO, assetWallets, assetHashes)
+          .map((asset) => ({
             ...asset[0],
             wallet: asset[1],
             hash: asset[2],
-          }),
-        );
+          }));
         spinner.start('Issuing assets');
         const issues = await Promise.all(
           assets.map((asset) =>

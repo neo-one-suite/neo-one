@@ -47,7 +47,7 @@ describe('LocalKeyStore', () => {
   let wallets = [wallet1];
   const store = {
     type: 'test',
-    getWallets: () => Promise.resolve(wallets),
+    getWallets: async () => wallets,
     saveWallet: (wallet) => {
       wallets.push(wallet);
       return Promise.resolve();
@@ -64,8 +64,21 @@ describe('LocalKeyStore', () => {
     localKeyStore = new LocalKeyStore({ store });
   });
 
-  test('wallets get', () => {
-    expect(localKeyStore.wallets).toEqual({ net1: { addr1: wallet1 } });
+  test('wallets get without sync', () => {
+    localKeyStore = new LocalKeyStore({ store });
+
+    expect(localKeyStore.wallets).toEqual({});
+  });
+
+  test('wallets get with sync', () => {
+    const storeWithSync = {
+      ...store,
+      getWalletsSync: () => wallets,
+    };
+
+    const keyStore = new LocalKeyStore({ store: storeWithSync });
+
+    expect(keyStore.wallets).toEqual({ net1: { addr1: wallet1 } });
   });
 
   test('wallets get - same network', async () => {
@@ -90,7 +103,12 @@ describe('LocalKeyStore', () => {
     };
 
     wallets = [wallet1, wallet];
-    localKeyStore = await new LocalKeyStore({ store });
+    const storeWithSync = {
+      ...store,
+      getWalletsSync: () => wallets,
+    };
+
+    localKeyStore = new LocalKeyStore({ store: storeWithSync });
 
     expect(localKeyStore.wallets).toEqual({
       net1: { addr1: wallet1, addr: wallet },
@@ -138,7 +156,7 @@ describe('LocalKeyStore', () => {
     };
     wallets = [walletLocked];
 
-    localKeyStore = await new LocalKeyStore({ store });
+    localKeyStore = new LocalKeyStore({ store });
 
     await expect(
       localKeyStore.sign({
@@ -246,7 +264,7 @@ describe('LocalKeyStore', () => {
 
   test('construct with null network', async () => {
     wallets = [];
-    localKeyStore = await new LocalKeyStore({ store });
+    localKeyStore = new LocalKeyStore({ store });
     expect(localKeyStore.wallets).toEqual({});
   });
 
@@ -336,7 +354,7 @@ describe('LocalKeyStore', () => {
     };
 
     wallets = [wallet];
-    localKeyStore = await new LocalKeyStore({ store });
+    localKeyStore = new LocalKeyStore({ store });
 
     await localKeyStore.updateAccountName({
       id: id1,
@@ -470,7 +488,7 @@ describe('LocalKeyStore', () => {
       type: 'unlocked',
     };
 
-    localKeyStore = await new LocalKeyStore({ store });
+    localKeyStore = new LocalKeyStore({ store });
 
     // $FlowFixMe
     helpers.decryptNEP2 = jest.fn(() => Promise.resolve(privateKey));
@@ -493,7 +511,7 @@ describe('LocalKeyStore', () => {
     }: $FlowFixMe);
     wallets = [walletError];
 
-    localKeyStore = await new LocalKeyStore({ store });
+    localKeyStore = new LocalKeyStore({ store });
 
     await expect(
       localKeyStore.unlockWallet({
@@ -505,13 +523,13 @@ describe('LocalKeyStore', () => {
     );
   });
 
-  test('lockWallet', () => {
+  test('lockWallet', async () => {
     const walletUpdated = {
       type: 'locked',
       account: account1,
       nep2: wallet1.nep2,
     };
-    localKeyStore.lockWallet(id1);
+    await localKeyStore.lockWallet(id1);
 
     expect(localKeyStore.wallets).toEqual({ net1: { addr1: walletUpdated } });
   });
@@ -524,9 +542,9 @@ describe('LocalKeyStore', () => {
     };
     wallets = [walletUpdated];
 
-    localKeyStore = await new LocalKeyStore({ store });
+    localKeyStore = new LocalKeyStore({ store });
 
-    localKeyStore.lockWallet(id1);
+    await localKeyStore.lockWallet(id1);
 
     expect(localKeyStore.wallets).toEqual({ net1: { addr1: walletUpdated } });
   });

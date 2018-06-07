@@ -90,13 +90,15 @@ export default class NetworkResourceType extends ResourceType<
 
   getListTable(resources: Array<Network>): ListTable {
     return [['Name', 'Type', 'Height', 'Nodes']].concat(
-      _.sortBy(resources, (resource) => resource.name).map((resource) => [
-        resource.name,
-        resource.type,
-        resource.height == null ? 'Unknown' : `${resource.height}`,
-        resource.peers == null ? '0' : `${resource.peers}`,
-        `${resource.nodes.length}`,
-      ]),
+      _
+        .sortBy(resources, (resource) => resource.name)
+        .map((resource) => [
+          resource.name,
+          resource.type,
+          resource.height == null ? 'Unknown' : `${resource.height}`,
+          resource.peers == null ? '0' : `${resource.peers}`,
+          `${resource.nodes.length}`,
+        ]),
     );
   }
 
@@ -121,16 +123,18 @@ export default class NetworkResourceType extends ResourceType<
               'Peers',
             ],
           ].concat(
-            _.sortBy(resource.nodes, (node) => node.name).map((node) => [
-              node.name,
-              node.live ? 'Yes' : 'No',
-              node.ready ? 'Yes' : 'No',
-              node.rpcAddress,
-              node.tcpAddress,
-              node.telemetryAddress,
-              resource.height == null ? 'Unknown' : `${resource.height}`,
-              resource.peers == null ? '0' : `${resource.peers}`,
-            ]),
+            _
+              .sortBy(resource.nodes, (node) => node.name)
+              .map((node) => [
+                node.name,
+                node.live ? 'Yes' : 'No',
+                node.ready ? 'Yes' : 'No',
+                node.rpcAddress,
+                node.tcpAddress,
+                node.telemetryAddress,
+                resource.height == null ? 'Unknown' : `${resource.height}`,
+                resource.peers == null ? '0' : `${resource.peers}`,
+              ]),
           ),
         },
       ],

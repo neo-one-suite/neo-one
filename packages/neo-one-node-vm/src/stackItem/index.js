@@ -11,6 +11,7 @@ export { default as IntegerStackItem } from './IntegerStackItem';
 export { default as HeaderStackItem } from './HeaderStackItem';
 export { default as BlockStackItem } from './BlockStackItem';
 export { default as ContractStackItem } from './ContractStackItem';
+export { default as EnumeratorStackItem } from './EnumeratorStackItem';
 export { default as TransactionStackItem } from './TransactionStackItem';
 export { default as AccountStackItem } from './AccountStackItem';
 export { default as AssetStackItem } from './AssetStackItem';
@@ -23,6 +24,7 @@ export { default as ValidatorStackItem } from './ValidatorStackItem';
 export { default as StorageContextStackItem } from './StorageContextStackItem';
 export { default as ECPointStackItem } from './ECPointStackItem';
 export { default as StructStackItem } from './StructStackItem';
+export { default as StackItemEnumerator } from './StackItemEnumerator';
 export { default as StackItemIterator } from './StackItemIterator';
 
 export { default as deserializeStackItem } from './deserializeStackItem';

@@ -53,7 +53,10 @@ export default {
                         name: wallet.name,
                         options: {},
                       })
-                      .pipe(filter((value) => value != null), take(1))
+                      .pipe(
+                        filter((value) => value != null),
+                        take(1),
+                      )
                       .toPromise(),
                     manager
                       .getResource$({

@@ -1,8 +1,10 @@
 /* @flow */
-import ObjectStackItem from './ObjectStackItem';
-import StackItemIterator from './StackItemIterator';
+import EnumeratorStackItem from './EnumeratorStackItem';
+import type StackItemIterator from './StackItemIterator';
+import type StackItemBase from './StackItemBase';
 
-export default class IteratorStackItem extends ObjectStackItem<
+export default class IteratorStackItem extends EnumeratorStackItem<
+  { key: StackItemBase, value: StackItemBase },
   StackItemIterator,
 > {
   asIterator(): StackItemIterator {

@@ -89,8 +89,7 @@ export default ({
   const subscription = config$.subscribe({
     next: ({ name, path: logPath, level, maxSize, maxFiles }) => {
       const filename = path.resolve(logPath, name, `${name}.log`);
-      fs
-        .ensureDir(path.dirname(filename))
+      fs.ensureDir(path.dirname(filename))
         .then(() => {
           logger.clear().add(
             new transports.File({

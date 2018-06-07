@@ -18,6 +18,7 @@ import {
   type TransactionJSON,
   type ValidatorJSON,
   InvocationTransaction as CoreInvocationTransaction,
+  JSONHelper,
   utils,
 } from '@neo-one/client-core';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
@@ -36,18 +37,17 @@ import type {
   Block,
   BlockFilter,
   BufferString,
-  CommonTransaction,
-  ConfirmedInvocationTransaction,
   ConfirmedTransaction,
   Contract,
   ContractParameter,
+  ContractTransaction,
   DataProvider,
   DeveloperProvider,
   GetOptions,
   Hash160String,
   Hash256String,
   Input,
-  InvocationTransaction,
+  IssueTransaction,
   RawInvocationData,
   RawInvocationResult,
   NetworkSettings,
@@ -56,6 +56,7 @@ import type {
   Peer,
   StorageItem,
   Transaction,
+  TransactionBase,
   TransactionReceipt,
   UnspentOutput,
   Validator,
@@ -64,6 +65,7 @@ import type {
 import AsyncBlockIterator from '../../AsyncBlockIterator';
 import JSONRPCClient from './JSONRPCClient';
 import JSONRPCHTTPProvider from './JSONRPCHTTPProvider';
+import { MissingTransactionDataError } from './errors';
 
 import * as clientUtils from '../../utils';
 
@@ -132,22 +134,27 @@ export default class NEOONEDataProvider
       async (span) => {
         const account = await this._getAccount(address, span);
         const outputs = await Promise.all(
-          account.unspent.map(async (input): Promise<?UnspentOutput> => {
-            const outputJSON = await this._client.getUnspentOutput(input, span);
-            if (outputJSON == null) {
-              return null;
-            }
+          account.unspent.map(
+            async (input): Promise<?UnspentOutput> => {
+              const outputJSON = await this._client.getUnspentOutput(
+                input,
+                span,
+              );
+              if (outputJSON == null) {
+                return null;
+              }
 
-            const output = this._convertOutput(outputJSON);
+              const output = this._convertOutput(outputJSON);
 
-            return {
-              asset: output.asset,
-              value: output.value,
-              address: output.address,
-              txid: input.txid,
-              vout: input.vout,
-            };
-          }),
+              return {
+                asset: output.asset,
+                value: output.value,
+                address: output.address,
+                txid: input.txid,
+                vout: input.vout,
+              };
+            },
+          ),
         );
 
         return outputs.filter(Boolean);
@@ -176,8 +183,22 @@ export default class NEOONEDataProvider
     hash: Hash256String,
     monitor?: Monitor,
   ): Promise<RawInvocationData> {
-    const result = await this._client.getInvocationData(hash, monitor);
-    return this._convertInvocationData(result);
+    const [invocationData, transaction] = await Promise.all([
+      this._client.getInvocationData(hash, monitor),
+      this._client.getTransaction(hash, monitor),
+    ]);
+
+    if (transaction.data == null) {
+      throw new MissingTransactionDataError(hash);
+    }
+
+    return this._convertInvocationData(
+      invocationData,
+      transaction.data.blockHash,
+      transaction.data.blockIndex,
+      hash,
+      transaction.data.index,
+    );
   }
 
   async testInvoke(
@@ -302,7 +323,7 @@ export default class NEOONEDataProvider
         const actions = _.flatten(
           block.transactions.map((transaction) => {
             if (transaction.type === 'InvocationTransaction') {
-              return transaction.data.actions;
+              return transaction.invocationData.actions;
             }
 
             return [];
@@ -369,152 +390,125 @@ export default class NEOONEDataProvider
   }
 
   _convertTransaction(transaction: TransactionJSON): Transaction {
-    return this._convertTransactionBase(transaction, (invocation) => ({
-      type: 'InvocationTransaction',
-      txid: invocation.txid,
-      size: invocation.size,
-      version: invocation.version,
-      attributes: this._convertAttributes(invocation.attributes),
-      vin: invocation.vin,
-      vout: this._convertOutputs(invocation.vout),
-      scripts: invocation.scripts,
-      systemFee: new BigNumber(invocation.sys_fee),
-      networkFee: new BigNumber(invocation.net_fee),
-      script: invocation.script,
-      gas: new BigNumber(invocation.gas),
-    }));
+    return this._convertTransactionBase(
+      transaction,
+      (invocation, transactionBase) => ({
+        ...transactionBase,
+        type: 'InvocationTransaction',
+        script: invocation.script,
+        gas: new BigNumber(invocation.gas),
+      }),
+      (converted) => converted,
+    );
   }
 
   _convertConfirmedTransaction(
     transaction: TransactionJSON,
   ): ConfirmedTransaction {
-    return this._convertTransactionBase(transaction, (invocation) => {
-      if (invocation.data == null) {
-        throw new Error('Unexpected null data');
-      }
+    if (transaction.data == null) {
+      throw new Error('Unexpected null data');
+    }
+    const data = {
+      blockHash: transaction.data.blockHash,
+      blockIndex: transaction.data.blockIndex,
+      index: transaction.data.index,
+      globalIndex: JSONHelper.readUInt64(transaction.data.globalIndex),
+    };
+    return this._convertTransactionBase(
+      transaction,
+      (invocation, transactionBase) => {
+        if (invocation.invocationData == null || transaction.data == null) {
+          throw new Error('Unexpected null data');
+        }
 
-      const data = this._convertInvocationData(invocation.data);
-      return {
-        type: 'InvocationTransaction',
-        txid: invocation.txid,
-        size: invocation.size,
-        version: invocation.version,
-        attributes: this._convertAttributes(invocation.attributes),
-        vin: invocation.vin,
-        vout: this._convertOutputs(invocation.vout),
-        scripts: invocation.scripts,
-        systemFee: new BigNumber(invocation.sys_fee),
-        networkFee: new BigNumber(invocation.net_fee),
-        script: invocation.script,
-        gas: new BigNumber(invocation.gas),
-        data,
-      };
-    });
+        const invocationData = this._convertInvocationData(
+          invocation.invocationData,
+          transaction.data.blockHash,
+          transaction.data.blockIndex,
+          transaction.txid,
+          transaction.data.index,
+        );
+        return {
+          ...transactionBase,
+          type: 'InvocationTransaction',
+          script: invocation.script,
+          gas: new BigNumber(invocation.gas),
+          data,
+          invocationData,
+        };
+      },
+      (converted) =>
+        (({ ...converted, data }: $FlowFixMe): ConfirmedTransaction),
+    );
   }
 
-  _convertTransactionBase<
-    Result: InvocationTransaction | ConfirmedInvocationTransaction,
-  >(
+  _convertTransactionBase<Result: Transaction | ConfirmedTransaction>(
     transaction: TransactionJSON,
-    convertInvocation: (invocation: InvocationTransactionJSON) => Result,
-  ): CommonTransaction | Result {
+    convertInvocation: (
+      invocation: InvocationTransactionJSON,
+      transactionBase: TransactionBase,
+    ) => Result,
+    convertTransaction: (transaction: Transaction) => Result,
+  ): Result {
+    const transactionBase = {
+      txid: transaction.txid,
+      size: transaction.size,
+      version: transaction.version,
+      attributes: this._convertAttributes(transaction.attributes),
+      vin: transaction.vin,
+      vout: this._convertOutputs(transaction.vout),
+      scripts: transaction.scripts,
+      systemFee: new BigNumber(transaction.sys_fee),
+      networkFee: new BigNumber(transaction.net_fee),
+    };
+    let converted;
     switch (transaction.type) {
       case 'ClaimTransaction':
-        return {
+        converted = {
+          ...transactionBase,
           type: 'ClaimTransaction',
-          txid: transaction.txid,
-          size: transaction.size,
-          version: transaction.version,
-          attributes: this._convertAttributes(transaction.attributes),
-          vin: transaction.vin,
-          vout: this._convertOutputs(transaction.vout),
-          scripts: transaction.scripts,
-          systemFee: new BigNumber(transaction.sys_fee),
-          networkFee: new BigNumber(transaction.net_fee),
           claims: transaction.claims,
         };
+        break;
       case 'ContractTransaction':
-        return {
+        converted = ({
+          ...transactionBase,
           type: 'ContractTransaction',
-          txid: transaction.txid,
-          size: transaction.size,
-          version: transaction.version,
-          attributes: this._convertAttributes(transaction.attributes),
-          vin: transaction.vin,
-          vout: this._convertOutputs(transaction.vout),
-          scripts: transaction.scripts,
-          systemFee: new BigNumber(transaction.sys_fee),
-          networkFee: new BigNumber(transaction.net_fee),
-        };
+        }: ContractTransaction);
+        break;
       case 'EnrollmentTransaction':
-        return {
+        converted = {
+          ...transactionBase,
           type: 'EnrollmentTransaction',
-          txid: transaction.txid,
-          size: transaction.size,
-          version: transaction.version,
-          attributes: this._convertAttributes(transaction.attributes),
-          vin: transaction.vin,
-          vout: this._convertOutputs(transaction.vout),
-          scripts: transaction.scripts,
-          systemFee: new BigNumber(transaction.sys_fee),
-          networkFee: new BigNumber(transaction.net_fee),
           publicKey: transaction.pubkey,
         };
+        break;
       case 'InvocationTransaction':
-        return convertInvocation(transaction);
+        return convertInvocation(transaction, transactionBase);
       case 'IssueTransaction':
-        return {
+        converted = ({
+          ...transactionBase,
           type: 'IssueTransaction',
-          txid: transaction.txid,
-          size: transaction.size,
-          version: transaction.version,
-          attributes: this._convertAttributes(transaction.attributes),
-          vin: transaction.vin,
-          vout: this._convertOutputs(transaction.vout),
-          scripts: transaction.scripts,
-          systemFee: new BigNumber(transaction.sys_fee),
-          networkFee: new BigNumber(transaction.net_fee),
-        };
+        }: IssueTransaction);
+        break;
       case 'MinerTransaction':
-        return {
+        converted = {
+          ...transactionBase,
           type: 'MinerTransaction',
-          txid: transaction.txid,
-          size: transaction.size,
-          version: transaction.version,
-          attributes: this._convertAttributes(transaction.attributes),
-          vin: transaction.vin,
-          vout: this._convertOutputs(transaction.vout),
-          scripts: transaction.scripts,
-          systemFee: new BigNumber(transaction.sys_fee),
-          networkFee: new BigNumber(transaction.net_fee),
           nonce: transaction.nonce,
         };
+        break;
       case 'PublishTransaction':
-        return {
+        converted = {
+          ...transactionBase,
           type: 'PublishTransaction',
-          txid: transaction.txid,
-          size: transaction.size,
-          version: transaction.version,
-          attributes: this._convertAttributes(transaction.attributes),
-          vin: transaction.vin,
-          vout: this._convertOutputs(transaction.vout),
-          scripts: transaction.scripts,
-          systemFee: new BigNumber(transaction.sys_fee),
-          networkFee: new BigNumber(transaction.net_fee),
           contract: this._convertContract(transaction.contract),
         };
+        break;
       case 'RegisterTransaction':
-        return {
+        converted = {
+          ...transactionBase,
           type: 'RegisterTransaction',
-          txid: transaction.txid,
-          size: transaction.size,
-          version: transaction.version,
-          attributes: this._convertAttributes(transaction.attributes),
-          vin: transaction.vin,
-          vout: this._convertOutputs(transaction.vout),
-          scripts: transaction.scripts,
-          systemFee: new BigNumber(transaction.sys_fee),
-          networkFee: new BigNumber(transaction.net_fee),
           asset: {
             type: transaction.asset.type,
             name: Array.isArray(transaction.asset.name)
@@ -526,26 +520,22 @@ export default class NEOONEDataProvider
             admin: transaction.asset.admin,
           },
         };
+        break;
       case 'StateTransaction':
-        return {
+        converted = {
+          ...transactionBase,
           type: 'StateTransaction',
-          txid: transaction.txid,
-          size: transaction.size,
-          version: transaction.version,
-          attributes: this._convertAttributes(transaction.attributes),
-          vin: transaction.vin,
-          vout: this._convertOutputs(transaction.vout),
-          scripts: transaction.scripts,
-          systemFee: new BigNumber(transaction.sys_fee),
-          networkFee: new BigNumber(transaction.net_fee),
           descriptors: transaction.descriptors,
         };
+        break;
       /* istanbul ignore next */
       default:
         // eslint-disable-next-line
         (transaction.type: empty);
         throw new Error('For Flow');
     }
+
+    return convertTransaction(converted);
   }
 
   _convertAttributes(attributes: Array<AttributeJSON>): Array<Attribute> {
@@ -587,7 +577,13 @@ export default class NEOONEDataProvider
     };
   }
 
-  _convertInvocationData(data: InvocationDataJSON): RawInvocationData {
+  _convertInvocationData(
+    data: InvocationDataJSON,
+    blockHash: string,
+    blockIndex: number,
+    transactionHash: string,
+    transactionIndex: number,
+  ): RawInvocationData {
     return {
       result: this._convertInvocationResult(data.result),
       asset: data.asset == null ? data.asset : this._convertAsset(data.asset),
@@ -597,7 +593,16 @@ export default class NEOONEDataProvider
       deletedContractHashes: data.deletedContractHashes,
       migratedContractHashes: data.migratedContractHashes,
       voteUpdates: data.voteUpdates,
-      actions: data.actions.map((action) => this._convertAction(action)),
+      actions: data.actions.map((action, idx) =>
+        this._convertAction(
+          blockHash,
+          blockIndex,
+          transactionHash,
+          transactionIndex,
+          idx,
+          action,
+        ),
+      ),
     };
   }
 
@@ -656,19 +661,38 @@ export default class NEOONEDataProvider
     };
   }
 
-  _convertAction(action: ActionJSON): ActionRaw {
+  _convertAction(
+    blockHash: string,
+    blockIndex: number,
+    transactionHash: string,
+    transactionIndex: number,
+    index: number,
+    action: ActionJSON,
+  ): ActionRaw {
     if (action.type === 'Log') {
-      return action;
+      return {
+        type: 'Log',
+        version: action.version,
+        blockIndex,
+        blockHash,
+        transactionIndex,
+        transactionHash,
+        index,
+        globalIndex: JSONHelper.readUInt64(action.index),
+        scriptHash: action.scriptHash,
+        message: action.message,
+      };
     }
 
     return {
       type: 'Notification',
       version: action.version,
-      blockIndex: action.blockIndex,
-      blockHash: action.blockHash,
-      transactionIndex: action.transactionIndex,
-      transactionHash: action.transactionHash,
-      index: action.index,
+      blockIndex,
+      blockHash,
+      transactionIndex,
+      transactionHash,
+      index,
+      globalIndex: JSONHelper.readUInt64(action.index),
       scriptHash: action.scriptHash,
       args: this._convertContractParameters(action.args),
     };

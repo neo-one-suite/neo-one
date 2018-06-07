@@ -22,12 +22,12 @@ function Tour({
   // eslint-disable-next-line
   classes,
 }: Props): React.Element<*> {
-  return (
-    // eslint-disable-next-line
-    <div className={className} />
-  );
+  return <div className={className} />;
 }
 
-const enhance: HOC<*, *> = compose(withStyles(styles), pure);
+const enhance: HOC<*, *> = compose(
+  withStyles(styles),
+  pure,
+);
 
 export default (enhance(Tour): React.ComponentType<ExternalProps>);

@@ -8,6 +8,7 @@ export { default as Contract } from './Contract';
 export { default as Header } from './Header';
 export { default as InvocationData } from './InvocationData';
 export { default as StorageItem } from './StorageItem';
+export { default as TransactionData } from './TransactionData';
 export { default as Validator } from './Validator';
 export { default as Witness } from './Witness';
 
@@ -67,6 +68,7 @@ export type {
   StorageItemsKey,
   StorageItemUpdate,
 } from './StorageItem';
+export * from './TransactionData';
 export * from './Validator';
 export type { WitnessJSON } from './Witness';
 

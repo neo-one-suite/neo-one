@@ -48,6 +48,11 @@ export type ExecuteScriptsResult = {|
   errorMessage?: string,
 |};
 export type VMListeners = {|
+  onNotify?: (options: {|
+    args: Array<ContractParameter>,
+    scriptHash: UInt160,
+  |}) => void,
+  onLog?: (options: {| message: string, scriptHash: UInt160 |}) => void,
   onMigrateContract?: (options: {| from: UInt160, to: UInt160 |}) => void,
   onSetVotes?: (options: {| address: UInt160, votes: Array<ECPoint> |}) => void,
 |};

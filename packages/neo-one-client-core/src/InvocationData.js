@@ -1,4 +1,5 @@
 /* @flow */
+import type BN from 'bn.js';
 import {
   type DeserializeWireBaseOptions,
   type DeserializeWireOptions,
@@ -20,6 +21,8 @@ export type InvocationDataAdd = {|
   voteUpdates: Array<[UInt160, Array<ECPoint>]>,
   blockIndex: number,
   transactionIndex: number,
+  actionIndexStart: BN,
+  actionIndexStop: BN,
   result: InvocationResult,
 |};
 export type InvocationDataKey = {|
@@ -36,6 +39,8 @@ export default class InvocationData
   voteUpdates: Array<[UInt160, Array<ECPoint>]>;
   blockIndex: number;
   transactionIndex: number;
+  actionIndexStart: BN;
+  actionIndexStop: BN;
   result: InvocationResult;
 
   __size: () => number;
@@ -49,6 +54,8 @@ export default class InvocationData
     voteUpdates,
     blockIndex,
     transactionIndex,
+    actionIndexStart,
+    actionIndexStop,
     result,
   }: InvocationDataAdd) {
     this.hash = hash;
@@ -59,6 +66,8 @@ export default class InvocationData
     this.voteUpdates = voteUpdates;
     this.blockIndex = blockIndex;
     this.transactionIndex = transactionIndex;
+    this.actionIndexStart = actionIndexStart;
+    this.actionIndexStop = actionIndexStop;
     this.result = result;
     this.__size = utils.lazy(
       () =>
@@ -86,6 +95,8 @@ export default class InvocationData
         ) +
         IOHelper.sizeOfUInt32LE +
         IOHelper.sizeOfUInt32LE +
+        IOHelper.sizeOfUInt64LE +
+        IOHelper.sizeOfUInt64LE +
         this.result.size,
     );
   }
@@ -115,6 +126,8 @@ export default class InvocationData
     });
     writer.writeUInt32LE(this.blockIndex);
     writer.writeUInt32LE(this.transactionIndex);
+    writer.writeUInt64LE(this.actionIndexStart);
+    writer.writeUInt64LE(this.actionIndexStop);
     this.result.serializeWireBase(writer);
   }
 
@@ -142,6 +155,8 @@ export default class InvocationData
     });
     const blockIndex = reader.readUInt32LE();
     const transactionIndex = reader.readUInt32LE();
+    const actionIndexStart = reader.readUInt64LE();
+    const actionIndexStop = reader.readUInt64LE();
     const result = deserializeWireBase(options);
     return new this({
       hash,
@@ -154,6 +169,8 @@ export default class InvocationData
       voteUpdates,
       blockIndex,
       transactionIndex,
+      actionIndexStart,
+      actionIndexStop,
       result,
     });
   }

@@ -29,6 +29,7 @@ import {
   InvalidValueHeaderError,
   InvalidValueBlockError,
   InvalidValueBlockBaseError,
+  InvalidValueEnumeratorError,
   InvalidValueTransactionError,
   InvalidValueAttributeError,
   InvalidValueAttributeStackItemError,
@@ -44,6 +45,7 @@ import {
 } from './errors';
 import type MapStackItem from './MapStackItem';
 import type { StackItem } from './StackItem';
+import type StackItemEnumerator from './StackItemEnumerator';
 import type StackItemIterator from './StackItemIterator';
 import type StorageContextStackItem from './StorageContextStackItem';
 
@@ -184,6 +186,10 @@ export default class StackItemBase implements Equatable {
 
   asMapStackItem(): MapStackItem {
     throw new InvalidValueMapStackItemError();
+  }
+
+  asEnumerator(): StackItemEnumerator<> {
+    throw new InvalidValueEnumeratorError();
   }
 
   asIterator(): StackItemIterator {

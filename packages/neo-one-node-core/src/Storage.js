@@ -15,6 +15,7 @@ import type {
   StorageItem,
   StorageItemKey,
   Transaction,
+  TransactionData,
   UInt256,
   Validator,
   ValidatorKey,
@@ -22,9 +23,8 @@ import type {
 
 import type AccountUnclaimed, { AccountUnclaimedKey } from './AccountUnclaimed';
 import type AccountUnspent, { AccountUnspentKey } from './AccountUnspent';
-import type BlockSystemFee from './BlockSystemFee';
+import type BlockData from './BlockData';
 import type { Blockchain, ReadStorage } from './Blockchain';
-import type TransactionSpentCoins from './TransactionSpentCoins';
 import type ValidatorsCount from './ValidatorsCount';
 
 type OutputValue = {|
@@ -44,8 +44,8 @@ export type AddChange =
   | {| type: 'contract', value: Contract |}
   | {| type: 'storageItem', value: StorageItem |}
   | {| type: 'validator', value: Validator |}
-  | {| type: 'blockSystemFee', value: BlockSystemFee |}
-  | {| type: 'transactionSpentCoins', value: TransactionSpentCoins |}
+  | {| type: 'blockData', value: BlockData |}
+  | {| type: 'transactionData', value: TransactionData |}
   | {| type: 'invocationData', value: InvocationData |}
   | {| type: 'output', value: OutputValue |}
   | {| type: 'validatorsCount', value: ValidatorsCount |};
@@ -72,10 +72,10 @@ export type Storage = {
   action: $PropertyType<Blockchain, 'action'>,
   asset: $PropertyType<Blockchain, 'asset'>,
   block: LatestReadStorage<BlockKey, Block>,
-  blockSystemFee: $PropertyType<Blockchain, 'blockSystemFee'>,
+  blockData: $PropertyType<Blockchain, 'blockData'>,
   header: LatestReadStorage<HeaderKey, Header>,
   transaction: $PropertyType<Blockchain, 'transaction'>,
-  transactionSpentCoins: $PropertyType<Blockchain, 'transactionSpentCoins'>,
+  transactionData: $PropertyType<Blockchain, 'transactionData'>,
   output: $PropertyType<Blockchain, 'output'>,
   contract: $PropertyType<Blockchain, 'contract'>,
   storageItem: $PropertyType<Blockchain, 'storageItem'>,

@@ -1,4 +1,5 @@
 /* @flow */
+import type BN from 'bn.js';
 import { InvalidActionTypeError, assertActionType } from './ActionType';
 import {
   type DeserializeWire,
@@ -13,17 +14,11 @@ import type { NotificationActionJSON } from './NotificationAction';
 import type { LogActionJSON } from './LogAction';
 
 export type ActionsKey = {|
-  blockIndexStart?: number,
-  transactionIndexStart?: number,
-  indexStart?: number,
-  blockIndexStop?: number,
-  transactionIndexStop?: number,
-  indexStop?: number,
+  indexStart?: BN,
+  indexStop?: BN,
 |};
 export type ActionKey = {|
-  blockIndex: number,
-  transactionIndex: number,
-  index: number,
+  index: BN,
 |};
 
 export type Action = LogAction | NotificationAction;

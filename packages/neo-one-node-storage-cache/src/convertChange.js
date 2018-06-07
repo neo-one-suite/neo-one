@@ -49,8 +49,6 @@ const convertAddChange = (changeIn: AddChange) => {
           type: 'add',
           model: 'action',
           key: keys.typeKeyToSerializeKeyString.action({
-            blockIndex: change.value.blockIndex,
-            transactionIndex: change.value.transactionIndex,
             index: change.value.index,
           }),
           value: change.value,
@@ -80,12 +78,12 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
-    case 'blockSystemFee':
+    case 'blockData':
       return [
         {
           type: 'add',
-          model: 'blockSystemFee',
-          key: keys.typeKeyToSerializeKeyString.blockSystemFee(change.value),
+          model: 'blockData',
+          key: keys.typeKeyToSerializeKeyString.blockData(change.value),
           value: change.value,
         },
       ];
@@ -125,14 +123,12 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value.output,
         },
       ];
-    case 'transactionSpentCoins':
+    case 'transactionData':
       return [
         {
           type: 'add',
-          model: 'transactionSpentCoins',
-          key: keys.typeKeyToSerializeKeyString.transactionSpentCoins(
-            change.value,
-          ),
+          model: 'transactionData',
+          key: keys.typeKeyToSerializeKeyString.transactionData(change.value),
           value: change.value,
         },
       ];

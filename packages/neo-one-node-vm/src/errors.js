@@ -316,3 +316,9 @@ export class InvalidContractGetStorageContextError extends VMError {
     super(context, 'Invalid Contract.GetStorageContext context');
   }
 }
+
+export class ReadOnlyStorageContextError extends VMError {
+  constructor(context: ExecutionContext) {
+    super(context, 'StorageContext is read only');
+  }
+}

@@ -12,6 +12,7 @@ import {
   InvocationData,
   Output,
   StorageItem,
+  TransactionData,
   Validator,
   deserializeActionWire,
   deserializeTransactionWire,
@@ -21,8 +22,7 @@ import {
   type Storage,
   AccountUnclaimed,
   AccountUnspent,
-  BlockSystemFee,
-  TransactionSpentCoins,
+  BlockData,
   ValidatorsCount,
 } from '@neo-one/node-core';
 
@@ -139,12 +139,12 @@ export default ({
   return {
     header,
     block,
-    blockSystemFee: read.createReadStorage({
+    blockData: read.createReadStorage({
       db,
-      serializeKey: keys.typeKeyToSerializeKey.blockSystemFee,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.blockSystemFee,
+      serializeKey: keys.typeKeyToSerializeKey.blockData,
+      serializeKeyString: keys.typeKeyToSerializeKeyString.blockData,
       deserializeValue: (buffer: Buffer) =>
-        BlockSystemFee.deserializeWire({
+        BlockData.deserializeWire({
           context,
           buffer,
         }),
@@ -208,13 +208,12 @@ export default ({
         }),
     }),
     transaction,
-    transactionSpentCoins: read.createReadStorage({
+    transactionData: read.createReadStorage({
       db,
-      serializeKey: keys.typeKeyToSerializeKey.transactionSpentCoins,
-      serializeKeyString:
-        keys.typeKeyToSerializeKeyString.transactionSpentCoins,
+      serializeKey: keys.typeKeyToSerializeKey.transactionData,
+      serializeKeyString: keys.typeKeyToSerializeKeyString.transactionData,
       deserializeValue: (buffer: Buffer) =>
-        TransactionSpentCoins.deserializeWire({ context, buffer }),
+        TransactionData.deserializeWire({ context, buffer }),
     }),
     output,
     contract: read.createReadStorage({

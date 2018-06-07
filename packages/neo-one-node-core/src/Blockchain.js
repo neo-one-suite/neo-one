@@ -35,6 +35,9 @@ import type {
   Settings,
   Transaction,
   TransactionKey,
+  TransactionData,
+  TransactionDataKey,
+  TransactionDataUpdate,
   Validator,
   ValidatorKey,
 } from '@neo-one/client-core';
@@ -49,11 +52,7 @@ import type AccountUnspent, {
   AccountUnspentKey,
   AccountUnspentsKey,
 } from './AccountUnspent';
-import type BlockSystemFee, { BlockSystemFeeKey } from './BlockSystemFee';
-import type TransactionSpentCoins, {
-  TransactionSpentCoinsKey,
-  TransactionSpentCoinsUpdate,
-} from './TransactionSpentCoins';
+import type BlockData, { BlockDataKey } from './BlockData';
 import type ValidatorsCount, { ValidatorsCountUpdate } from './ValidatorsCount';
 
 export interface ReadMetadataStorage<Value> {
@@ -147,13 +146,10 @@ export type Blockchain = {
   +action: ReadGetAllStorage<ActionKey, ActionsKey, Action>,
   +asset: ReadStorage<AssetKey, Asset>,
   +block: ReadStorage<BlockKey, Block>,
-  +blockSystemFee: ReadStorage<BlockSystemFeeKey, BlockSystemFee>,
+  +blockData: ReadStorage<BlockDataKey, BlockData>,
   +header: ReadStorage<HeaderKey, Header>,
   +transaction: ReadStorage<TransactionKey, Transaction>,
-  +transactionSpentCoins: ReadStorage<
-    TransactionSpentCoinsKey,
-    TransactionSpentCoins,
-  >,
+  +transactionData: ReadStorage<TransactionDataKey, TransactionData>,
   +output: ReadStorage<OutputKey, Output>,
   +contract: ReadStorage<ContractKey, Contract>,
   +storageItem: ReadGetAllStorage<StorageItemKey, StorageItemsKey, StorageItem>,
@@ -218,13 +214,13 @@ export type WriteBlockchain = {
   +action: ReadGetAllAddStorage<ActionKey, ActionsKey, Action>,
   +asset: ReadAddUpdateStorage<AssetKey, Asset, AssetUpdate>,
   +block: ReadAddStorage<BlockKey, Block>,
-  +blockSystemFee: ReadAddStorage<BlockSystemFeeKey, BlockSystemFee>,
+  +blockData: ReadAddStorage<BlockDataKey, BlockData>,
   +header: ReadAddStorage<HeaderKey, Header>,
   +transaction: ReadAddStorage<TransactionKey, Transaction>,
-  +transactionSpentCoins: ReadAddUpdateStorage<
-    TransactionSpentCoinsKey,
-    TransactionSpentCoins,
-    TransactionSpentCoinsUpdate,
+  +transactionData: ReadAddUpdateStorage<
+    TransactionDataKey,
+    TransactionData,
+    TransactionDataUpdate,
   >,
   +output: $PropertyType<Blockchain, 'output'>,
   +contract: ReadAddDeleteStorage<ContractKey, Contract>,

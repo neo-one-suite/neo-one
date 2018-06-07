@@ -378,7 +378,10 @@ export default class Client {
           destroy();
         }
       };
-    }).pipe(publishReplay(), refCount());
+    }).pipe(
+      publishReplay(),
+      refCount(),
+    );
   }
 
   _unary<T>(

@@ -1,4 +1,5 @@
 /* @flow */
+import type BN from 'bn.js';
 import {
   type OutputKey,
   type ActionKey,
@@ -23,12 +24,12 @@ const accountUnspentKeyPrefix = 'accountUnspent';
 const actionKeyPrefix = 'action';
 const assetKeyPrefix = 'asset';
 const blockKeyPrefix = 'block';
-const blockSystemFeeKeyPrefix = 'blockSystemFee';
+const blockDataKeyPrefix = 'blockData';
 const headerKeyPrefix = 'header';
 const headerHashKeyPrefix = 'header-index';
 const transactionKeyPrefix = 'transaction';
 const outputKeyPrefix = 'output';
-const transactionSpentCoinsKeyPrefix = 'transactionSpentCoins';
+const transactionDataKeyPrefix = 'transactionData';
 const contractKeyPrefix = 'contract';
 const storageItemKeyPrefix = 'storageItem';
 const validatorKeyPrefix = 'validator';
@@ -155,47 +156,29 @@ export const getStorageItemKeyMax = ({
   );
 };
 
-export const serializeActionKey = ({
-  blockIndex,
-  transactionIndex,
-  index,
-}: ActionKey): Buffer =>
-  bytewise.encode([actionKeyPrefix, blockIndex, transactionIndex, index]);
-export const serializeActionKeyString = ({
-  blockIndex,
-  transactionIndex,
-  index,
-}: ActionKey): string =>
-  `${actionKeyPrefix}:` +
-  `${blockIndex}:` +
-  `${transactionIndex}:` +
-  `${index}`;
+const serializeUInt64 = (value: BN) => value.toArrayLike(Buffer, 'be', 8);
 
-export const getActionKeyMin = ({
-  blockIndexStart,
-  transactionIndexStart,
-  indexStart,
-}: ActionsKey): Buffer =>
+export const serializeActionKey = ({ index }: ActionKey): Buffer =>
+  bytewise.encode([actionKeyPrefix, serializeUInt64(index)]);
+export const serializeActionKeyString = ({ index }: ActionKey): string =>
+  `${actionKeyPrefix}:${index.toString(10)}`;
+
+export const getActionKeyMin = ({ indexStart }: ActionsKey): Buffer =>
   bytewise.encode(
     bytewise.sorts.array.bound.lower(
       [
         actionKeyPrefix,
-        blockIndexStart,
-        transactionIndexStart,
-        indexStart,
-      ].filter((value) => value != null),
+        indexStart == null ? null : serializeUInt64(indexStart),
+      ].filter(Boolean),
     ),
   );
-export const getActionKeyMax = ({
-  blockIndexStop,
-  transactionIndexStop,
-  indexStop,
-}: ActionsKey): Buffer =>
+export const getActionKeyMax = ({ indexStop }: ActionsKey): Buffer =>
   bytewise.encode(
     bytewise.sorts.array.bound.upper(
-      [actionKeyPrefix, blockIndexStop, transactionIndexStop, indexStop].filter(
-        (value) => value != null,
-      ),
+      [
+        actionKeyPrefix,
+        indexStop == null ? null : serializeUInt64(indexStop),
+      ].filter((value) => value != null),
     ),
   );
 
@@ -248,13 +231,11 @@ export const typeKeyToSerializeKey = {
   action: serializeActionKey,
   asset: createSerializeUInt256Key(assetKeyPrefix),
   block: createSerializeUInt256Key(blockKeyPrefix),
-  blockSystemFee: createSerializeUInt256Key(blockSystemFeeKeyPrefix),
+  blockData: createSerializeUInt256Key(blockDataKeyPrefix),
   header: createSerializeUInt256Key(headerKeyPrefix),
   transaction: createSerializeUInt256Key(transactionKeyPrefix),
   output: serializeOutputKey,
-  transactionSpentCoins: createSerializeUInt256Key(
-    transactionSpentCoinsKeyPrefix,
-  ),
+  transactionData: createSerializeUInt256Key(transactionDataKeyPrefix),
   contract: createSerializeUInt160Key(contractKeyPrefix),
   storageItem: serializeStorageItemKey,
   validator: serializeValidatorKey,
@@ -270,13 +251,11 @@ export const typeKeyToSerializeKeyString = {
   action: serializeActionKeyString,
   asset: createSerializeUInt256KeyString(assetKeyPrefix),
   block: createSerializeUInt256KeyString(blockKeyPrefix),
-  blockSystemFee: createSerializeUInt256KeyString(blockSystemFeeKeyPrefix),
+  blockData: createSerializeUInt256KeyString(blockDataKeyPrefix),
   header: createSerializeUInt256KeyString(headerKeyPrefix),
   transaction: createSerializeUInt256KeyString(transactionKeyPrefix),
   output: serializeOutputKeyString,
-  transactionSpentCoins: createSerializeUInt256KeyString(
-    transactionSpentCoinsKeyPrefix,
-  ),
+  transactionData: createSerializeUInt256KeyString(transactionDataKeyPrefix),
   contract: createSerializeUInt160KeyString(contractKeyPrefix),
   storageItem: serializeStorageItemKeyString,
   validator: serializeValidatorKeyString,

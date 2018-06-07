@@ -137,7 +137,6 @@ type TestCase = {|
         | ((result: any) => void)),
   gas: BN,
   args?: Array<Arg>,
-  actionIndex?: number,
   options?: Options,
   mock?: (options: {| blockchain: any |}) => void,
 |};
@@ -164,21 +163,13 @@ const SYSCALLS = ([
     name: 'Neo.Runtime.Notify',
     result: [],
     args: [[true]],
-    mock: ({ blockchain }) => {
-      blockchain.action.add = jest.fn(() => Promise.resolve());
-    },
     gas: FEES.ONE,
-    actionIndex: 1,
   },
   {
     name: 'Neo.Runtime.Log',
     result: [],
     args: ['foo'],
-    mock: ({ blockchain }) => {
-      blockchain.action.add = jest.fn(() => Promise.resolve());
-    },
     gas: FEES.ONE,
-    actionIndex: 1,
   },
   {
     name: 'Neo.Runtime.GetTime',
@@ -378,6 +369,17 @@ const SYSCALLS = ([
       );
     },
     gas: FEES.ONE_HUNDRED,
+  },
+  {
+    name: 'Neo.Blockchain.GetTransactionHeight',
+    result: [new IntegerStackItem(new BN(10))],
+    args: [Buffer.alloc(32, 3)],
+    mock: ({ blockchain }) => {
+      blockchain.transactionData.get = jest.fn(() =>
+        Promise.resolve({ startHeight: 10 }),
+      );
+    },
+    gas: FEES.ONE,
   },
   {
     name: 'Neo.Blockchain.GetAccount',
@@ -869,7 +871,7 @@ const SYSCALLS = ([
       blockchain.transaction.get = jest.fn(() =>
         Promise.resolve(transactions.mintTransaction),
       );
-      blockchain.transactionSpentCoins.get = jest.fn(() =>
+      blockchain.transactionData.get = jest.fn(() =>
         Promise.resolve({
           hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
           startHeight: 1,
@@ -898,7 +900,7 @@ const SYSCALLS = ([
       blockchain.transaction.get = jest.fn(() =>
         Promise.resolve(transactions.mintTransaction),
       );
-      blockchain.transactionSpentCoins.get = jest.fn(() =>
+      blockchain.transactionData.get = jest.fn(() =>
         Promise.resolve({
           hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
           startHeight: 1,
@@ -1475,6 +1477,16 @@ const SYSCALLS = ([
     gas: FEES.ONE,
   },
   {
+    name: 'Neo.Storage.GetReadOnlyContext',
+    result: ({ transaction }) => [
+      new StorageContextStackItem(
+        crypto.toScriptHash(transaction.script),
+        true,
+      ),
+    ],
+    gas: FEES.ONE,
+  },
+  {
     name: 'Neo.Storage.Get',
     result: [new BufferStackItem(Buffer.alloc(10, 1))],
     args: [
@@ -1525,7 +1537,205 @@ const SYSCALLS = ([
     gas: FEES.ONE,
   },
   {
-    name: 'Neo.Iterator.Next',
+    name: 'Neo.StorageContext.AsReadOnly',
+    result: ({ transaction }) => (stack) => {
+      expect(stack.length).toEqual(1);
+      // It should equal the call's script hash.
+      expect(stack[0].value).not.toEqual(
+        crypto.toScriptHash(transaction.script),
+      );
+      expect(stack[0].isReadOnly).toBeTruthy();
+    },
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Storage.GetContext',
+            type: 'sys',
+          },
+        ],
+      },
+    ],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Next',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(0)]],
+          },
+        ],
+      },
+    ],
+    result: [new BooleanStackItem(true)],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Next',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(0)]],
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new BooleanStackItem(false)],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Value',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(1), new BN(2)]],
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new IntegerStackItem(new BN(1))],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Next',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(1)]],
+          },
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(2)]],
+          },
+          {
+            name: 'Neo.Enumerator.Concat',
+            type: 'sys',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new BooleanStackItem(false)],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Value',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(2)]],
+          },
+          {
+            name: 'Neo.Enumerator.Create',
+            type: 'sys',
+            args: [[new BN(1)]],
+          },
+          {
+            name: 'Neo.Enumerator.Concat',
+            type: 'sys',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new IntegerStackItem(new BN(2))],
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Next',
     args: [
       {
         type: 'calls',
@@ -1561,7 +1771,7 @@ const SYSCALLS = ([
     gas: FEES.ONE,
   },
   {
-    name: 'Neo.Iterator.Next',
+    name: 'Neo.Enumerator.Next',
     args: [
       {
         type: 'calls',
@@ -1608,7 +1818,7 @@ const SYSCALLS = ([
                 type: 'calls',
                 calls: [
                   {
-                    name: 'Neo.Iterator.Next',
+                    name: 'Neo.Enumerator.Next',
                     type: 'sys',
                     args: [
                       {
@@ -1664,7 +1874,7 @@ const SYSCALLS = ([
     gas: FEES.ONE,
   },
   {
-    name: 'Neo.Iterator.Value',
+    name: 'Neo.Enumerator.Value',
     args: [
       {
         type: 'calls',
@@ -1677,7 +1887,7 @@ const SYSCALLS = ([
                 type: 'calls',
                 calls: [
                   {
-                    name: 'Neo.Iterator.Next',
+                    name: 'Neo.Enumerator.Next',
                     type: 'sys',
                     args: [
                       {
@@ -1722,6 +1932,110 @@ const SYSCALLS = ([
       },
     ],
     result: [new BufferStackItem(nextItem.value), new BooleanStackItem(true)],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.getAll = jest.fn(() =>
+        AsyncIterableX.of(nextItem),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Value',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Storage.Find',
+            type: 'sys',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'Neo.Storage.GetContext',
+                    type: 'sys',
+                  },
+                ],
+              },
+              Buffer.alloc(1, 1),
+            ],
+          },
+          {
+            name: 'Neo.Iterator.Values',
+            type: 'sys',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new BufferStackItem(nextItem.value)],
+    mock: ({ blockchain }) => {
+      blockchain.contract.get = jest.fn(() =>
+        Promise.resolve({ hasStorage: true }),
+      );
+      blockchain.storageItem.getAll = jest.fn(() =>
+        AsyncIterableX.of(nextItem),
+      );
+    },
+    gas: FEES.ONE,
+  },
+  {
+    name: 'Neo.Enumerator.Value',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Storage.Find',
+            type: 'sys',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'Neo.Storage.GetContext',
+                    type: 'sys',
+                  },
+                ],
+              },
+              Buffer.alloc(1, 1),
+            ],
+          },
+          {
+            name: 'Neo.Iterator.Keys',
+            type: 'sys',
+          },
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+    result: [new BufferStackItem(nextItem.key)],
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(() =>
         Promise.resolve({ hasStorage: true }),
@@ -2124,15 +2438,7 @@ describe('syscalls', () => {
   };
 
   for (const testCase of SYSCALLS) {
-    const {
-      name,
-      result,
-      gas,
-      args = [],
-      actionIndex = 0,
-      mock,
-      options,
-    } = testCase;
+    const { name, result, gas, args = [], mock, options } = testCase;
     it(name, async () => {
       const sb = new ScriptBuilder();
       sb.emitSysCall(name);
@@ -2158,7 +2464,13 @@ describe('syscalls', () => {
         transaction: {},
         account: {},
         validator: {},
-        transactionSpentCoins: {},
+        transactionData: {},
+      };
+      const listeners = {
+        onNotify: jest.fn(() => {}),
+        onLog: jest.fn(() => {}),
+        onMigrateContract: jest.fn(() => {}),
+        onSetVotes: jest.fn(() => {}),
       };
       const block = {
         timestamp: blockTime,
@@ -2170,7 +2482,7 @@ describe('syscalls', () => {
         },
         triggerType,
         action: NULL_ACTION,
-        listeners: {},
+        listeners,
         skipWitnessVerify: false,
         persistingBlock: (block: $FlowFixMe),
       };
@@ -2216,11 +2528,11 @@ describe('syscalls', () => {
           expectedResult(context.stack);
         }
       }
-      expect(context.actionIndex).toEqual(actionIndex);
       expect(gasLeft.sub(context.gasLeft).toString(10)).toEqual(
         gas.toString(10),
       );
       testUtils.verifyBlockchainSnapshot(blockchain);
+      testUtils.verifyListeners(listeners);
     });
   }
 });

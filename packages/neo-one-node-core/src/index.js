@@ -1,8 +1,7 @@
 /* @flow */
 export { default as AccountUnclaimed } from './AccountUnclaimed';
 export { default as AccountUnspent } from './AccountUnspent';
-export { default as BlockSystemFee } from './BlockSystemFee';
-export { default as TransactionSpentCoins } from './TransactionSpentCoins';
+export { default as BlockData } from './BlockData';
 export { default as ValidatorsCount } from './ValidatorsCount';
 
 export { createEndpoint, getEndpointConfig } from './Network';
@@ -24,14 +23,9 @@ export type {
   AccountUnspentsKey,
 } from './AccountUnspent';
 export type * from './Blockchain';
-export type { BlockSystemFeeKey } from './BlockSystemFee';
+export type { BlockDataKey } from './BlockData';
 export type { Endpoint, EndpointConfig } from './Network';
 export type { Node } from './Node';
-export type {
-  TransactionSpentCoinsAdd,
-  TransactionSpentCoinsKey,
-  TransactionSpentCoinsUpdate,
-} from './TransactionSpentCoins';
 export type {
   AddChange,
   Change,

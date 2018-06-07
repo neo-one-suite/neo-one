@@ -122,6 +122,12 @@ export type TransactionBaseJSON = {|
   scripts: Array<WitnessJSON>,
   sys_fee: string,
   net_fee: string,
+  data: ?{|
+    blockHash: string,
+    blockIndex: number,
+    index: number,
+    globalIndex: string,
+  |},
 |};
 
 export const MAX_TRANSACTION_ATTRIBUTES = 16;
@@ -131,7 +137,7 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     Equatable,
     SerializableWire<Transaction>,
     SerializableJSON<TransactionJSON> {
-  static VERSION = 0;
+  static VERSION: number;
 
   type: Type;
   version: number;
@@ -152,7 +158,9 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     scripts,
     hash,
   }: TransactionBaseAddWithType<Type>) {
-    this.version = version == null ? this.constructor.VERSION : version;
+    // workaround: babel fails to transpile if we have
+    // static VERSION: number = 0;
+    this.version = version == null ? this.constructor.VERSION || 0 : version;
     this.type = type;
     this.attributes = attributes || [];
     this.inputs = inputs || [];
@@ -306,7 +314,10 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
   async serializeTransactionBaseJSON(
     context: SerializeJSONContext,
   ): Promise<TransactionBaseJSON> {
-    const networkFee = await this.getNetworkFee(context.feeContext);
+    const [networkFee, transactionData] = await Promise.all([
+      this.getNetworkFee(context.feeContext),
+      context.tryGetTransactionData(this),
+    ]);
     return {
       txid: common.uInt256ToString(this.hashHex),
       size: this.size,
@@ -321,6 +332,15 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
       scripts: this.scripts.map((script) => script.serializeJSON(context)),
       sys_fee: JSONHelper.writeFixed8(this.getSystemFee(context.feeContext)),
       net_fee: JSONHelper.writeFixed8(networkFee),
+      data:
+        transactionData == null
+          ? null
+          : {
+              blockHash: common.uInt256ToString(transactionData.blockHash),
+              blockIndex: transactionData.startHeight,
+              index: transactionData.index,
+              globalIndex: JSONHelper.writeUInt64(transactionData.globalIndex),
+            },
     };
   }
 
@@ -329,22 +349,24 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
     throw new Error('Not Implemented');
   }
 
-  _networkFee = utils.lazyAsync(async (context: FeeContext): Promise<BN> => {
-    const { getOutput, utilityToken } = context;
+  _networkFee = utils.lazyAsync(
+    async (context: FeeContext): Promise<BN> => {
+      const { getOutput, utilityToken } = context;
 
-    const outputsForInputs = await Promise.all(
-      this.inputs.map((input) => getOutput(input)),
-    );
-    const inputValue = getUtilityValue({
-      outputs: outputsForInputs,
-      utilityToken,
-    });
-    const outputValue = getUtilityValue({
-      outputs: this.outputs,
-      utilityToken,
-    });
-    return inputValue.sub(outputValue).sub(this.getSystemFee(context));
-  });
+      const outputsForInputs = await Promise.all(
+        this.inputs.map((input) => getOutput(input)),
+      );
+      const inputValue = getUtilityValue({
+        outputs: outputsForInputs,
+        utilityToken,
+      });
+      const outputValue = getUtilityValue({
+        outputs: this.outputs,
+        utilityToken,
+      });
+      return inputValue.sub(outputValue).sub(this.getSystemFee(context));
+    },
+  );
 
   async getNetworkFee(context: FeeContext): Promise<BN> {
     return this._networkFee(context);

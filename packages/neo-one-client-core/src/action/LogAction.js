@@ -27,23 +27,10 @@ export default class LogAction
   extends ActionBase<LogAction, typeof ACTION_TYPE.LOG>
   implements SerializableJSON<LogActionJSON> {
   message: string;
-  constructor({
-    version,
-    blockIndex,
-    blockHash,
-    transactionIndex,
-    transactionHash,
-    index,
-    scriptHash,
-    message,
-  }: LogAdd) {
+  constructor({ version, index, scriptHash, message }: LogAdd) {
     super({
       type: ACTION_TYPE.LOG,
       version,
-      blockIndex,
-      blockHash,
-      transactionIndex,
-      transactionHash,
       index,
       scriptHash,
     });
@@ -62,10 +49,6 @@ export default class LogAction
 
     return new this({
       version: action.version,
-      blockIndex: action.blockIndex,
-      blockHash: action.blockHash,
-      transactionIndex: action.transactionIndex,
-      transactionHash: action.transactionHash,
       index: action.index,
       scriptHash: action.scriptHash,
       message,
@@ -77,10 +60,6 @@ export default class LogAction
     return {
       type: 'Log',
       version: action.version,
-      blockIndex: action.blockIndex,
-      blockHash: action.blockHash,
-      transactionIndex: action.transactionIndex,
-      transactionHash: action.transactionHash,
       index: action.index,
       scriptHash: action.scriptHash,
       message: this.message,

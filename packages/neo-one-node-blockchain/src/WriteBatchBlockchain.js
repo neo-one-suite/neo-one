@@ -1,5 +1,5 @@
 /* @flow */
-import type BN from 'bn.js';
+import BN from 'bn.js';
 
 import {
   SCRIPT_CONTAINER_TYPE,
@@ -24,6 +24,8 @@ import {
   type StorageItemUpdate,
   type Transaction,
   type TransactionKey,
+  type TransactionDataKey,
+  type TransactionDataUpdate,
   type ValidatorKey,
   type ValidatorUpdate,
   type UInt160,
@@ -38,11 +40,14 @@ import {
   InvocationData,
   InvocationResultSuccess,
   IssueTransaction,
+  LogAction,
   EnrollmentTransaction,
   MinerTransaction,
+  NotificationAction,
   PublishTransaction,
   InvocationTransaction,
   StateTransaction,
+  TransactionData,
   Validator,
   common,
   utils,
@@ -51,9 +56,7 @@ import {
   TRIGGER_TYPE,
   type AccountUnclaimedKey,
   type AccountUnspentKey,
-  type BlockSystemFeeKey,
-  type TransactionSpentCoinsKey,
-  type TransactionSpentCoinsUpdate,
+  type BlockDataKey,
   type ChangeSet,
   type Storage,
   type VM,
@@ -61,8 +64,7 @@ import {
   type WriteBlockchain,
   AccountUnclaimed,
   AccountUnspent,
-  BlockSystemFee,
-  TransactionSpentCoins,
+  BlockData,
   ValidatorsCount,
 } from '@neo-one/node-core';
 import type { Monitor } from '@neo-one/monitor';
@@ -114,13 +116,13 @@ type Caches = {|
   action: ReadGetAllAddStorageCache<ActionKey, ActionsKey, Action>,
   asset: ReadAddUpdateStorageCache<AssetKey, Asset, AssetUpdate>,
   block: BlockLikeStorageCache<Block>,
-  blockSystemFee: ReadAddStorageCache<BlockSystemFeeKey, BlockSystemFee>,
+  blockData: ReadAddStorageCache<BlockDataKey, BlockData>,
   header: BlockLikeStorageCache<Header>,
   transaction: ReadAddStorageCache<TransactionKey, Transaction>,
-  transactionSpentCoins: ReadAddUpdateStorageCache<
-    TransactionSpentCoinsKey,
-    TransactionSpentCoins,
-    TransactionSpentCoinsUpdate,
+  transactionData: ReadAddUpdateStorageCache<
+    TransactionDataKey,
+    TransactionData,
+    TransactionDataUpdate,
   >,
   output: OutputStorageCache,
   contract: ReadAddDeleteStorageCache<ContractKey, Contract>,
@@ -174,13 +176,13 @@ export default class WriteBatchBlockchain {
   action: ReadGetAllAddStorageCache<ActionKey, ActionsKey, Action>;
   asset: ReadAddUpdateStorageCache<AssetKey, Asset, AssetUpdate>;
   block: BlockLikeStorageCache<Block>;
-  blockSystemFee: ReadAddStorageCache<BlockSystemFeeKey, BlockSystemFee>;
+  blockData: ReadAddStorageCache<BlockDataKey, BlockData>;
   header: BlockLikeStorageCache<Header>;
   transaction: ReadAddStorageCache<TransactionKey, Transaction>;
-  transactionSpentCoins: ReadAddUpdateStorageCache<
-    TransactionSpentCoinsKey,
-    TransactionSpentCoins,
-    TransactionSpentCoinsUpdate,
+  transactionData: ReadAddUpdateStorageCache<
+    TransactionDataKey,
+    TransactionData,
+    TransactionDataUpdate,
   >;
   output: OutputStorageCache;
   contract: ReadAddDeleteStorageCache<ContractKey, Contract>;
@@ -248,12 +250,9 @@ export default class WriteBatchBlockchain {
         name: 'action',
         readGetAllStorage: this._storage.action,
         getKeyFromValue: (value) => ({
-          blockIndex: value.blockIndex,
-          transactionIndex: value.transactionIndex,
           index: value.index,
         }),
-        getKeyString: (key) =>
-          `${key.blockIndex}:${key.transactionIndex}:${key.index}`,
+        getKeyString: (key) => key.index.toString(10),
         // eslint-disable-next-line
         matchesPartialKey: (value, key) => {
           throw new Error('Not implemented');
@@ -276,12 +275,12 @@ export default class WriteBatchBlockchain {
         },
         createAddChange: (value) => ({ type: 'block', value }),
       }),
-      blockSystemFee: new ReadAddStorageCache({
-        name: 'blockSystemFee',
-        readStorage: this._storage.blockSystemFee,
+      blockData: new ReadAddStorageCache({
+        name: 'blockData',
+        readStorage: this._storage.blockData,
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
-        createAddChange: (value) => ({ type: 'blockSystemFee', value }),
+        createAddChange: (value) => ({ type: 'blockData', value }),
       }),
       header: new BlockLikeStorageCache({
         name: 'header',
@@ -305,13 +304,13 @@ export default class WriteBatchBlockchain {
           );
         },
       }),
-      transactionSpentCoins: new ReadAddUpdateStorageCache({
-        name: 'transactionSpentCoins',
-        readStorage: this._storage.transactionSpentCoins,
+      transactionData: new ReadAddUpdateStorageCache({
+        name: 'transactionData',
+        readStorage: this._storage.transactionData,
         update: (value, update) => value.update(update),
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
-        createAddChange: (value) => ({ type: 'transactionSpentCoins', value }),
+        createAddChange: (value) => ({ type: 'transactionData', value }),
       }),
       output,
       contract: new ReadAddDeleteStorageCache({
@@ -369,10 +368,10 @@ export default class WriteBatchBlockchain {
     this.action = this._caches.action;
     this.asset = this._caches.asset;
     this.block = this._caches.block;
-    this.blockSystemFee = this._caches.blockSystemFee;
+    this.blockData = this._caches.blockData;
     this.header = this._caches.header;
     this.transaction = this._caches.transaction;
-    this.transactionSpentCoins = this._caches.transactionSpentCoins;
+    this.transactionData = this._caches.transactionData;
     this.output = this._caches.output;
     this.contract = this._caches.contract;
     this.storageItem = this._caches.storageItem;
@@ -411,14 +410,30 @@ export default class WriteBatchBlockchain {
     const monitor = monitorIn.at('write_blockchain').withData({
       [labels.NEO_BLOCK_INDEX]: block.index,
     });
-    const [systemFee] = await monitor.captureSpan(
+
+    const [maybePrevBlockData, outputContractsList] = await monitor.captureSpan(
       () =>
         Promise.all([
           block.index === 0
-            ? Promise.resolve(utils.ZERO)
-            : this.blockSystemFee
-                .get({ hash: block.previousHash })
-                .then((blockSystemFee) => blockSystemFee.systemFee),
+            ? Promise.resolve(null)
+            : this.blockData.get({ hash: block.previousHash }),
+          Promise.all(
+            [
+              ...new Set(
+                block.transactions.reduce(
+                  (acc, transaction) =>
+                    acc.concat(
+                      transaction.outputs.map((output) =>
+                        common.uInt160ToString(output.address),
+                      ),
+                    ),
+                  [],
+                ),
+              ),
+            ].map((hash) =>
+              this.contract.tryGet({ hash: common.stringToUInt160(hash) }),
+            ),
+          ),
           this.block.add(block),
           this.header.add(block.header),
         ]),
@@ -427,50 +442,90 @@ export default class WriteBatchBlockchain {
       },
     );
 
+    const prevBlockData =
+      maybePrevBlockData == null
+        ? {
+            lastGlobalTransactionIndex: utils.NEGATIVE_ONE,
+            lastGlobalActionIndex: utils.NEGATIVE_ONE,
+            systemFee: utils.ZERO,
+          }
+        : {
+            lastGlobalTransactionIndex:
+              maybePrevBlockData.lastGlobalTransactionIndex,
+            lastGlobalActionIndex: maybePrevBlockData.lastGlobalActionIndex,
+            systemFee: maybePrevBlockData.systemFee,
+          };
+
+    const outputContracts = {};
+    for (const outputContract of outputContractsList) {
+      if (outputContract != null) {
+        outputContracts[outputContract.hashHex] = outputContract;
+      }
+    }
+
     const [utxo, rest] = _.partition(
       block.transactions.map((transaction, idx) => [idx, transaction]),
       // eslint-disable-next-line
       ([idx, transaction]) =>
-        (transaction.type === TRANSACTION_TYPE.CLAIM &&
+        ((transaction.type === TRANSACTION_TYPE.CLAIM &&
           transaction instanceof ClaimTransaction) ||
-        (transaction.type === TRANSACTION_TYPE.CONTRACT &&
-          transaction instanceof ContractTransaction) ||
-        (transaction.type === TRANSACTION_TYPE.MINER &&
-          transaction instanceof MinerTransaction),
+          (transaction.type === TRANSACTION_TYPE.CONTRACT &&
+            transaction instanceof ContractTransaction) ||
+          (transaction.type === TRANSACTION_TYPE.MINER &&
+            transaction instanceof MinerTransaction)) &&
+        !transaction.outputs.some(
+          (output) =>
+            outputContracts[common.uInt160ToString(output.address)] != null,
+        ),
     );
 
-    await monitor.captureSpan(
+    const [globalActionIndex] = await monitor.captureSpan(
       (span) =>
         Promise.all([
-          this.blockSystemFee.add(
-            new BlockSystemFee({
-              hash: block.hash,
-              systemFee: systemFee.add(
-                block.getSystemFee({
-                  getOutput: this.output.get,
-                  governingToken: this.settings.governingToken,
-                  utilityToken: this.settings.utilityToken,
-                  fees: this.settings.fees,
-                  registerValidatorFee: this.settings.registerValidatorFee,
-                }),
-              ),
-            }),
-          ),
+          rest.length > 0
+            ? this._persistTransactions(
+                span,
+                block,
+                (rest: $FlowFixMe),
+                prevBlockData.lastGlobalTransactionIndex,
+                prevBlockData.lastGlobalActionIndex,
+              )
+            : Promise.resolve(prevBlockData.lastGlobalActionIndex),
           utxo.length > 0
             ? this._persistUTXOTransactions(
                 span,
                 block,
-                // eslint-disable-next-line
-                (utxo.map(([idx, transaction]) => transaction): $FlowFixMe),
+                (utxo: $FlowFixMe),
+                prevBlockData.lastGlobalTransactionIndex,
               )
-            : Promise.resolve(),
-          rest.length > 0
-            ? this._persistTransactions(span, block, rest)
             : Promise.resolve(),
         ]),
       {
         name: 'neo_write_blockchain_stage_1',
       },
+    );
+
+    await monitor.captureSpan(
+      () =>
+        this.blockData.add(
+          new BlockData({
+            hash: block.hash,
+            lastGlobalTransactionIndex: prevBlockData.lastGlobalTransactionIndex.add(
+              new BN(block.transactions.length),
+            ),
+            lastGlobalActionIndex: globalActionIndex,
+            systemFee: prevBlockData.systemFee.add(
+              block.getSystemFee({
+                getOutput: this.output.get,
+                governingToken: this.settings.governingToken,
+                utilityToken: this.settings.utilityToken,
+                fees: this.settings.fees,
+                registerValidatorFee: this.settings.registerValidatorFee,
+              }),
+            ),
+          }),
+        ),
+      { name: 'neo_write_blockchain_stage_2' },
     );
   }
 
@@ -478,15 +533,17 @@ export default class WriteBatchBlockchain {
     monitor: Monitor,
     block: Block,
     transactions: Array<
-      ContractTransaction | ClaimTransaction | MinerTransaction,
+      [number, ContractTransaction | ClaimTransaction | MinerTransaction],
     >,
+    lastGlobalTransactionIndex: BN,
   ): Promise<void> {
     await monitor.captureSpan(
       async (span) => {
         const inputs = [];
         const claims = [];
         const outputWithInputs = [];
-        for (const transaction of transactions) {
+        // eslint-disable-next-line
+        for (const [idx, transaction] of transactions) {
           inputs.push(...transaction.inputs);
           if (
             transaction.type === TRANSACTION_TYPE.CLAIM &&
@@ -498,16 +555,20 @@ export default class WriteBatchBlockchain {
         }
         await Promise.all([
           Promise.all(
-            transactions.map((transaction) =>
+            // eslint-disable-next-line
+            transactions.map(([idx, transaction]) =>
               this.transaction.add(transaction, true),
             ),
           ),
           Promise.all(
-            transactions.map((transaction) =>
-              this.transactionSpentCoins.add(
-                new TransactionSpentCoins({
+            transactions.map(([idx, transaction]) =>
+              this.transactionData.add(
+                new TransactionData({
                   hash: transaction.hash,
                   startHeight: block.index,
+                  blockHash: block.hash,
+                  index: idx,
+                  globalIndex: lastGlobalTransactionIndex.add(new BN(idx + 1)),
                 }),
                 true,
               ),
@@ -527,13 +588,25 @@ export default class WriteBatchBlockchain {
     monitor: Monitor,
     block: Block,
     transactions: Array<[number, Transaction]>,
-  ): Promise<void> {
-    await monitor.captureSpan(
+    lastGlobalTransactionIndex: BN,
+    lastGlobalActionIndex: BN,
+  ): Promise<BN> {
+    return monitor.captureSpan(
       async (span) => {
+        let globalActionIndex = lastGlobalActionIndex.add(utils.ONE);
         for (const [idx, transaction] of transactions) {
           // eslint-disable-next-line
-          await this._persistTransaction(span, block, transaction, idx);
+          globalActionIndex = await this._persistTransaction(
+            span,
+            block,
+            transaction,
+            idx,
+            lastGlobalTransactionIndex,
+            globalActionIndex,
+          );
         }
+
+        return globalActionIndex.sub(utils.ONE);
       },
       {
         name: 'neo_write_blockchain_persist_transactions',
@@ -546,7 +619,10 @@ export default class WriteBatchBlockchain {
     block: Block,
     transactionIn: Transaction,
     transactionIndex: number,
-  ): Promise<void> {
+    lastGlobalTransactionIndex: BN,
+    globalActionIndexIn: BN,
+  ): Promise<BN> {
+    let globalActionIndex = globalActionIndexIn;
     await monitor
       .withLabels({ [labels.NEO_TRANSACTION_TYPE]: transactionIn.type })
       .withData({ [labels.NEO_TRANSACTION_HASH]: transactionIn.hashHex })
@@ -583,10 +659,15 @@ export default class WriteBatchBlockchain {
           }
           await Promise.all([
             this.transaction.add(transaction, true),
-            this.transactionSpentCoins.add(
-              new TransactionSpentCoins({
+            this.transactionData.add(
+              new TransactionData({
                 hash: transaction.hash,
+                blockHash: block.hash,
                 startHeight: block.index,
+                index: transactionIndex,
+                globalIndex: lastGlobalTransactionIndex.add(
+                  new BN(transactionIndex + 1),
+                ),
               }),
               true,
             ),
@@ -674,6 +755,7 @@ export default class WriteBatchBlockchain {
             });
             const migratedContractHashes = [];
             const voteUpdates = [];
+            const actions = [];
             const result = await wrapExecuteScripts(() =>
               this._vm.executeScripts({
                 monitor: span,
@@ -692,6 +774,26 @@ export default class WriteBatchBlockchain {
                 },
                 gas: transaction.gas,
                 listeners: {
+                  onLog: ({ message, scriptHash }) => {
+                    actions.push(
+                      new LogAction({
+                        index: globalActionIndex,
+                        scriptHash,
+                        message,
+                      }),
+                    );
+                    globalActionIndex = globalActionIndex.add(utils.ONE);
+                  },
+                  onNotify: ({ args, scriptHash }) => {
+                    actions.push(
+                      new NotificationAction({
+                        index: globalActionIndex,
+                        scriptHash,
+                        args,
+                      }),
+                    );
+                    globalActionIndex = globalActionIndex.add(utils.ONE);
+                  },
                   onMigrateContract: ({ from, to }) => {
                     migratedContractHashes.push([from, to]);
                   },
@@ -701,6 +803,10 @@ export default class WriteBatchBlockchain {
                 },
                 persistingBlock: block,
               }),
+            );
+
+            const addActionsPromise = Promise.all(
+              actions.map((action) => this.action.add(action)),
             );
             if (result instanceof InvocationResultSuccess) {
               const assetChangeSet = temporaryBlockchain.asset.getChangeSet();
@@ -758,24 +864,32 @@ export default class WriteBatchBlockchain {
                     voteUpdates,
                     blockIndex: block.index,
                     transactionIndex,
+                    actionIndexStart: globalActionIndexIn,
+                    actionIndexStop: globalActionIndex,
                     result,
                   }),
                 ),
+                addActionsPromise,
               ]);
             } else {
-              await this.invocationData.add(
-                new InvocationData({
-                  hash: transaction.hash,
-                  assetHash: undefined,
-                  contractHashes: [],
-                  deletedContractHashes: [],
-                  migratedContractHashes: [],
-                  voteUpdates: [],
-                  blockIndex: block.index,
-                  transactionIndex,
-                  result,
-                }),
-              );
+              await Promise.all([
+                this.invocationData.add(
+                  new InvocationData({
+                    hash: transaction.hash,
+                    assetHash: undefined,
+                    contractHashes: [],
+                    deletedContractHashes: [],
+                    migratedContractHashes: [],
+                    voteUpdates: [],
+                    blockIndex: block.index,
+                    transactionIndex,
+                    actionIndexStart: globalActionIndexIn,
+                    actionIndexStop: globalActionIndex,
+                    result,
+                  }),
+                ),
+                addActionsPromise,
+              ]);
             }
           }
         },
@@ -783,6 +897,8 @@ export default class WriteBatchBlockchain {
           name: 'neo_write_blockchain_persist_single_transaction',
         },
       );
+
+    return globalActionIndex;
   }
 
   async _processStateTransaction(
@@ -881,7 +997,10 @@ export default class WriteBatchBlockchain {
           ),
         );
         const addressSpent = this._groupByAddress(inputOutputs);
-        const addressClaimed = this._groupByAddress(claimOutputs);
+        const addressClaimed = _.mapValues(
+          this._groupByAddress(claimOutputs),
+          (values) => values.map(({ input }) => input),
+        );
         const addressOutputs = _.groupBy(outputs, (output) =>
           common.uInt160ToHex(output.output.address),
         );
@@ -930,23 +1049,17 @@ export default class WriteBatchBlockchain {
   }
 
   _groupByAddress(
-    inputOutputs: Array<{|
-      input: Input,
-      output: Output,
-    |}>,
-  ): { [key: UInt160Hex]: Array<Input> } {
-    const addressInputOutputs = _.groupBy(inputOutputs, ({ output }) =>
+    inputOutputs: Array<OutputWithInput>,
+  ): { [key: UInt160Hex]: Array<OutputWithInput> } {
+    return _.groupBy(inputOutputs, ({ output }) =>
       common.uInt160ToHex(output.address),
-    );
-    return _.mapValues(addressInputOutputs, (inputs) =>
-      inputs.map(({ input }) => input),
     );
   }
 
   async _updateAccount(
     address: UInt160,
     values: Array<[UInt256, BN]>,
-    spent: Array<Input>,
+    spent: Array<OutputWithInput>,
     claimed: Array<Input>,
     outputs: Array<OutputWithInput>,
     votes: Array<ECPoint>,
@@ -964,7 +1077,7 @@ export default class WriteBatchBlockchain {
 
     const promises = [];
     promises.push(
-      ...spent.map((input) =>
+      ...spent.map(({ input }) =>
         this.accountUnspent.delete({
           hash: address,
           input,
@@ -985,11 +1098,15 @@ export default class WriteBatchBlockchain {
       ),
     );
     promises.push(
-      ...spent.map((input) =>
-        this.accountUnclaimed.add(
-          new AccountUnclaimed({ hash: address, input }),
+      ...spent
+        .filter(({ output }) =>
+          common.uInt256Equal(output.asset, this.settings.governingToken.hash),
+        )
+        .map(({ input }) =>
+          this.accountUnclaimed.add(
+            new AccountUnclaimed({ hash: address, input }),
+          ),
         ),
-      ),
     );
 
     if (account == null) {
@@ -1055,7 +1172,7 @@ export default class WriteBatchBlockchain {
     inputClaims: Array<InputClaim>,
     block: Block,
   ): Promise<void> {
-    const spentCoins = await this.transactionSpentCoins.get({ hash });
+    const spentCoins = await this.transactionData.get({ hash });
     const endHeights = { ...spentCoins.endHeights };
     const claimed = { ...spentCoins.claimed };
     for (const inputClaim of inputClaims) {
@@ -1066,7 +1183,7 @@ export default class WriteBatchBlockchain {
       }
     }
 
-    await this.transactionSpentCoins.update(spentCoins, {
+    await this.transactionData.update(spentCoins, {
       endHeights,
       claimed,
     });

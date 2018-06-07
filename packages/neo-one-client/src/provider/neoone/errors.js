@@ -42,3 +42,11 @@ export class HTTPError extends CustomError {
     this.code = 'HTTP';
   }
 }
+
+export class MissingTransactionDataError extends CustomError {
+  code: string = 'MISSING_TRANSACTION_DATA';
+
+  constructor(hash: string) {
+    super(`Missing transaction data for transaction ${hash}`);
+  }
+}

@@ -17,6 +17,14 @@ export class InvalidValueBufferError extends CustomError {
   }
 }
 
+export class InvalidValueEnumeratorError extends CustomError {
+  code = 'INVALID_VALUE_ENUMERATOR';
+
+  constructor() {
+    super('Invalid Value. Expected Enumerator');
+  }
+}
+
 export class InvalidValueHeaderError extends CustomError {
   code = 'INVALID_VALUE_HEADER';
 
@@ -142,6 +150,17 @@ export class UnsupportedStackItemSerdeError extends CustomError {
 
   constructor() {
     super('Unsupported StackItem serde.');
+  }
+}
+
+export class InvalidStorageStackItemEnumeratorError extends CustomError {
+  code = 'INVALID_STORAGE_STACK_ITEM_ENUMERATOR';
+
+  constructor() {
+    super(
+      'Current is not set. The enumerator has been fully consumed or has not ' +
+        'been initialized',
+    );
   }
 }
 

@@ -101,7 +101,10 @@ export default class CLI {
       minPort: this.serverConfig.minPort,
     });
     const port = await serverConfig.config$
-      .pipe(map((conf) => conf.server.port), take(1))
+      .pipe(
+        map((conf) => conf.server.port),
+        take(1),
+      )
       .toPromise();
     const client = new Client({ port });
     const plugins = await client.getAllPlugins();

@@ -1,6 +1,10 @@
 /* @flow */
+import BigNumber from 'bignumber.js';
+
 import { addressToScriptHash, NEOONEProvider } from '@neo-one/client';
 import { common } from '@neo-one/client-core';
+
+import { ASSET_INFO } from '../bootstrap';
 
 export async function getRPC(network: string): Promise<string> {
   const networkOutput = await one.execute(`describe network ${network} --json`);
@@ -77,7 +81,7 @@ export default (async function testBootstrap(
   // Bootstrap creates numWallets number of wallets
   // Wallets will also have the master wallet plus
   // 3 asset wallets
-  expect(wallets.length).toEqual(numWallets + 4);
+  expect(wallets.length).toEqual(numWallets + 1 + ASSET_INFO.length);
 
   let neoBalanceCount = 0;
   let gasBalanceCount = 0;
@@ -96,13 +100,13 @@ export default (async function testBootstrap(
     // Check wallet is unlocked
     expect(wallet[3]).toEqual('Yes');
     // Check NEO balance is a number 0 or greater
-    expect(Number(wallet[4])).toBeGreaterThanOrEqual(0);
-    if (Number(wallet[4]) > 0) {
+    expect(new BigNumber(wallet[4]).toNumber()).toBeGreaterThanOrEqual(0);
+    if (new BigNumber(wallet[4]).toNumber() > 0) {
       neoBalanceCount += 1;
     }
     // Check GAS balance is a number 0 or greater
-    expect(Number(wallet[5])).toBeGreaterThanOrEqual(0);
-    if (Number(wallet[5]) > 0) {
+    expect(new BigNumber(wallet[5]).toNumber()).toBeGreaterThanOrEqual(0);
+    if (new BigNumber(wallet[5]).toNumber() > 0) {
       gasBalanceCount += 1;
     }
   }
