@@ -70,6 +70,7 @@ export class NEOTranspiler implements Transpiler {
     const events = this.processEvents(file);
     this.visit(file);
     const functions = this.processSmartContract(file);
+    this.strip();
 
     return {
       ast: this.ast,
@@ -280,6 +281,16 @@ export class NEOTranspiler implements Transpiler {
       .concat(call.getArguments().map((arg) => arg.getText()))
       .join(', ');
     call.replaceWithText(`syscall('Neo.Runtime.Notify', ${args})`);
+  }
+
+  private strip(): void {
+    const identifiers = [...this.context.libAliases.Fixed];
+    identifiers.forEach((identifier) => {
+      const parent = identifier.getParent();
+      if (parent != null && TypeGuards.isTypeReferenceNode(parent)) {
+        parent.replaceWithText('number');
+      }
+    });
   }
 
   private processSmartContract(file: SourceFile): ABIFunction[] {
@@ -641,7 +652,7 @@ export class NEOTranspiler implements Transpiler {
 
   private getFixedDecimals(type: Type): number {
     return (type.getUnionTypes()[1].getIntersectionTypes()[1]
-      .compilerType as any).value;
+      .compilerType as any).typeArguments[0].value;
   }
 
   private getIdentifier(node: TypeNode | undefined): Identifier | undefined {

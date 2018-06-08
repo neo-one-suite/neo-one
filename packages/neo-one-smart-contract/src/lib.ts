@@ -2,7 +2,10 @@ export type Address = Buffer;
 export type Hash256 = Buffer;
 export type PublicKey = Buffer;
 export type Signature = Buffer;
-export type Fixed<T extends number> = number & (number | T);
+export interface FixedTag<T extends number> {
+  __decimals: T;
+}
+export type Fixed<T extends number> = number | (number & FixedTag<T>);
 export type Integer = Fixed<0>;
 export type Fixed8 = Fixed<8>;
 

@@ -189,6 +189,7 @@ export interface LibAliases {
   readonly Hash256: Set<Identifier>;
   readonly Signature: Set<Identifier>;
   readonly PublicKey: Set<Identifier>;
+  readonly Fixed: Set<Identifier>;
 }
 
 export const getLibAliases = (ast: AST): LibAliases => {
@@ -229,6 +230,11 @@ export const getLibAliases = (ast: AST): LibAliases => {
     get PublicKey(): Set<Identifier> {
       return new Set(libFile
         .getTypeAliasOrThrow('PublicKey')
+        .findReferencesAsNodes() as Identifier[]);
+    },
+    get Fixed(): Set<Identifier> {
+      return new Set(libFile
+        .getTypeAliasOrThrow('Fixed')
         .findReferencesAsNodes() as Identifier[]);
     },
   };
