@@ -15,7 +15,7 @@ export const hasUnionType = (
   type: Type<ts.Type>,
   isType: (type: Type<ts.Type>) => boolean,
 ): boolean =>
-  getType(type).isUnionType() &&
+  getType(type).isUnion() &&
   getType(type)
     .getUnionTypes()
     .some(isType);
@@ -24,7 +24,7 @@ export const hasIntersectionType = (
   type: Type<ts.Type>,
   isType: (type: Type<ts.Type>) => boolean,
 ): boolean =>
-  getType(type).isIntersectionType() &&
+  getType(type).isIntersection() &&
   getType(type)
     .getIntersectionTypes()
     .some(isType);
@@ -44,17 +44,17 @@ export const isOnly = (
   type != null &&
   !getType(type).isNullable() &&
   (isType(type) ||
-    (getType(type).isUnionType() &&
+    (getType(type).isUnion() &&
       getType(type)
         .getUnionTypes()
         .every((unionType) => isOnly(unionType, isType))) ||
-    (getType(type).isIntersectionType() &&
+    (getType(type).isIntersection() &&
       getType(type)
         .getIntersectionTypes()
         .every((intersectionType) => isOnly(intersectionType, isType))));
 
 export const isUndefined = (type?: Type<ts.Type>): boolean =>
-  type != null && getType(type).isUndefinedType();
+  type != null && getType(type).isUndefined();
 
 export const isOnlyUndefined = (type?: Type<ts.Type>): boolean =>
   isOnly(type, isUndefined);
@@ -63,7 +63,7 @@ export const hasUndefined = (type: Type<ts.Type>): boolean =>
   hasType(type, isUndefined);
 
 export const isNull = (type?: Type<ts.Type>): boolean =>
-  type != null && (getType(type).isNullType() || getType(type).isNullable());
+  type != null && (getType(type).isNull() || getType(type).isNullable());
 
 export const isOnlyNull = (type?: Type<ts.Type>): boolean =>
   isOnly(type, isNull);
@@ -72,12 +72,10 @@ export const hasNull = (type: Type<ts.Type>): boolean =>
   hasType(type, isNull) || getType(type).isNullable();
 
 export const isOnlyNumberLiteral = (type?: Type<ts.Type>): boolean =>
-  type != null &&
-  isOnly(type, (tpe) => tpe != null && tpe.isNumberLiteralType());
+  type != null && isOnly(type, (tpe) => tpe != null && tpe.isNumberLiteral());
 
 export const isNumber = (type?: Type<ts.Type>): boolean =>
-  type != null &&
-  (getType(type).isNumberType() || getType(type).isNumberLiteralType());
+  type != null && (getType(type).isNumber() || getType(type).isNumberLiteral());
 
 export const isOnlyNumber = (type?: Type<ts.Type>): boolean =>
   isOnly(type, isNumber);
@@ -86,8 +84,7 @@ export const hasNumber = (type: Type<ts.Type>): boolean =>
   hasType(type, isNumber);
 
 export const isString = (type?: Type<ts.Type>): boolean =>
-  type != null &&
-  (getType(type).isStringType() || getType(type).isStringLiteralType());
+  type != null && (getType(type).isString() || getType(type).isStringLiteral());
 
 export const isOnlyString = (type?: Type<ts.Type>): boolean =>
   isOnly(type, isString);
@@ -97,7 +94,7 @@ export const hasString = (type: Type<ts.Type>): boolean =>
 
 export const isBoolean = (type?: Type<ts.Type>): boolean =>
   type != null &&
-  (getType(type).isBooleanType() || getType(type).isBooleanLiteralType());
+  (getType(type).isBoolean() || getType(type).isBooleanLiteral());
 
 export const isOnlyBoolean = (type?: Type<ts.Type>): boolean =>
   isOnly(type, isBoolean);
@@ -138,13 +135,13 @@ export const isOnlyObject = (type?: Type<ts.Type>): boolean =>
   isOnly(type, (tpe) => !isPrimitive(tpe));
 
 export const isArray = (type?: Type<ts.Type>): boolean =>
-  type != null && getType(type).isArrayType();
+  type != null && getType(type).isArray();
 
 export const isOnlyArray = (type?: Type<ts.Type>): boolean =>
   isOnly(type, isArray);
 
 export const isTuple = (type?: Type<ts.Type>): boolean =>
-  type != null && getType(type).isTupleType();
+  type != null && getType(type).isTuple();
 
 export const isOnlyTuple = (type?: Type<ts.Type>): boolean =>
   isOnly(type, isTuple);
@@ -158,13 +155,13 @@ export const isSame = (type0?: Type<ts.Type>, type1?: Type<ts.Type>): boolean =>
     (isOnlyString(type0) && isOnlyString(type1)));
 
 export const isUnion = (type?: Type<ts.Type>): boolean =>
-  type != null && getType(type).isUnionType();
+  type != null && getType(type).isUnion();
 
 export const isIntersection = (type?: Type<ts.Type>): boolean =>
-  type != null && getType(type).isIntersectionType();
+  type != null && getType(type).isIntersection();
 
 export const isLiteral = (type?: Type): boolean =>
-  type != null && getType(type).isLiteralType();
+  type != null && getType(type).isLiteral();
 
 export const isAnyType = (type?: Type): boolean =>
   type != null && hasTypeFlag(type, TypeFlags.Any);

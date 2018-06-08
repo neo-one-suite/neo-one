@@ -121,16 +121,14 @@ export default class WalletResourceType extends ResourceType<
 
   getListTable(resources: Array<Wallet>): ListTable {
     return [['Wallet', 'Name', 'Address', 'Unlocked', 'NEO', 'GAS']].concat(
-      _
-        .sortBy(resources, (resource) => resource.name)
-        .map((resource) => [
-          resource.network,
-          resource.baseName,
-          resource.address,
-          resource.unlocked ? 'Yes' : 'No',
-          resource.neoBalance,
-          resource.gasBalance,
-        ]),
+      _.sortBy(resources, (resource) => resource.name).map((resource) => [
+        resource.network,
+        resource.baseName,
+        resource.address,
+        resource.unlocked ? 'Yes' : 'No',
+        resource.neoBalance,
+        resource.gasBalance,
+      ]),
     );
   }
 
@@ -149,9 +147,11 @@ export default class WalletResourceType extends ResourceType<
         {
           type: 'list',
           table: [['Asset', 'Amount', 'Hash']].concat(
-            _
-              .sortBy(resource.balance, (coin) => coin.asset)
-              .map((coin) => [coin.assetName, coin.amount, coin.asset]),
+            _.sortBy(resource.balance, (coin) => coin.asset).map((coin) => [
+              coin.assetName,
+              coin.amount,
+              coin.asset,
+            ]),
           ),
         },
       ],

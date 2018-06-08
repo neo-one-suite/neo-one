@@ -214,22 +214,22 @@ export const getLibAliases = (ast: AST): LibAliases => {
     get Address(): Set<Identifier> {
       return new Set(libFile
         .getTypeAliasOrThrow('Address')
-        .getReferencingNodes() as Identifier[]);
+        .findReferencesAsNodes() as Identifier[]);
     },
     get Hash256(): Set<Identifier> {
       return new Set(libFile
         .getTypeAliasOrThrow('Hash256')
-        .getReferencingNodes() as Identifier[]);
+        .findReferencesAsNodes() as Identifier[]);
     },
     get Signature(): Set<Identifier> {
       return new Set(libFile
         .getTypeAliasOrThrow('Signature')
-        .getReferencingNodes() as Identifier[]);
+        .findReferencesAsNodes() as Identifier[]);
     },
     get PublicKey(): Set<Identifier> {
       return new Set(libFile
         .getTypeAliasOrThrow('PublicKey')
-        .getReferencingNodes() as Identifier[]);
+        .findReferencesAsNodes() as Identifier[]);
     },
   };
 };

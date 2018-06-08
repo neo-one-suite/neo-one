@@ -182,7 +182,7 @@ export class NEOTranspiler implements Transpiler {
     }
 
     const calls = decl
-      .getReferencingNodes()
+      .findReferencesAsNodes()
       .map((node) => {
         if (TypeGuards.isIdentifier(node)) {
           const parent = node.getParent();
@@ -212,8 +212,10 @@ export class NEOTranspiler implements Transpiler {
     }
 
     const name = nameArg.getLiteralValue();
-    const parameters = _
-      .zip(call.getArguments().slice(1), call.getTypeArguments())
+    const parameters = _.zip(
+      call.getArguments().slice(1),
+      call.getTypeArguments(),
+    )
       .map(([paramNameArg, paramTypeNode]) => {
         if (paramNameArg == null || paramTypeNode == null) {
           this.reportError(
@@ -253,7 +255,7 @@ export class NEOTranspiler implements Transpiler {
     } else {
       const identifier = parent.getNameNode();
       identifier
-        .getReferencingNodes()
+        .findReferencesAsNodes()
         .map((node) => {
           if (TypeGuards.isIdentifier(node)) {
             const nodeParent = node.getParent();

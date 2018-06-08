@@ -845,7 +845,7 @@ class Serializable extends SimpleSysCallType {
     if (
       type != null &&
       this.shouldHandleNull &&
-      type.isUnionType() &&
+      type.isUnion() &&
       type
         .getUnionTypes()
         .some((unionType) => typeUtils.isOnlyUndefined(unionType))

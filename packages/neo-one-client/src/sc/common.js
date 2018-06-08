@@ -46,15 +46,16 @@ export const getParametersObject = ({
     );
   }
 
-  return _
-    .zip(abiParameters, parameters)
-    .reduce((acc, [abiParameter, parameter]) => {
+  return _.zip(abiParameters, parameters).reduce(
+    (acc, [abiParameter, parameter]) => {
       acc[abiParameter.name] = convertParameter({
         type: abiParameter,
         parameter,
       });
       return acc;
-    }, {});
+    },
+    {},
+  );
 };
 
 export const convertAction = ({
@@ -164,14 +165,13 @@ export const convertParams = ({
     );
   }
 
-  const converted = _
-    .zip(parameters, params)
-    .map(([parameter, param]) =>
-      paramCheckers[parameter.type](param, (parameter: $FlowFixMe)),
-    );
-  const zipped = _
-    .zip(parameters, params)
-    .map(([parameter, param]) => [parameter.name, param]);
+  const converted = _.zip(parameters, params).map(([parameter, param]) =>
+    paramCheckers[parameter.type](param, (parameter: $FlowFixMe)),
+  );
+  const zipped = _.zip(parameters, params).map(([parameter, param]) => [
+    parameter.name,
+    param,
+  ]);
 
   return { converted, zipped };
 };
