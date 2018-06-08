@@ -1197,9 +1197,9 @@ export default class Node implements INode {
     }
 
     const headers = await Promise.all(
-      _
-        .range(hashStart, Math.min(hashStart + GET_BLOCKS_COUNT, hashEnd))
-        .map((index) => this.blockchain.header.get({ hashOrIndex: index })),
+      _.range(hashStart, Math.min(hashStart + GET_BLOCKS_COUNT, hashEnd)).map(
+        (index) => this.blockchain.header.get({ hashOrIndex: index }),
+      ),
     );
 
     return headers;
@@ -1223,15 +1223,14 @@ export default class Node implements INode {
               return [transaction, networkFee];
             }),
           );
-          const hashesToRemove = _
-            .take(
-              _.sortBy(transactionAndFee, [
-                ([transaction, networkFee]) =>
-                  networkFee.divn(transaction.size).toNumber(),
-                ([transaction]) => transaction.hashHex,
-              ]),
-              this.blockchain.settings.memPoolSize,
-            )
+          const hashesToRemove = _.take(
+            _.sortBy(transactionAndFee, [
+              ([transaction, networkFee]) =>
+                networkFee.divn(transaction.size).toNumber(),
+              ([transaction]) => transaction.hashHex,
+            ]),
+            this.blockchain.settings.memPoolSize,
+          )
             // eslint-disable-next-line
             .map(([transaction, _]) => transaction.hashHex);
           for (const hash of hashesToRemove) {

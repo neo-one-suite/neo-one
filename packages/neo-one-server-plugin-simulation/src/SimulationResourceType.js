@@ -77,9 +77,10 @@ export default class SimulationResourceType extends ResourceType<
 
   getListTable(resources: Array<Simulation>): ListTable {
     return [['Name', 'Simulation']].concat(
-      _
-        .sortBy(resources, (resource) => resource.name)
-        .map((resource) => [resource.baseName, resource.simulationPackage]),
+      _.sortBy(resources, (resource) => resource.name).map((resource) => [
+        resource.baseName,
+        resource.simulationPackage,
+      ]),
     );
   }
 

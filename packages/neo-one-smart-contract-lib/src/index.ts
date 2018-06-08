@@ -1,1 +1,2 @@
-export { default as Token } from './Token';
+export { ICO } from './ICO';
+export { Token } from './Token';

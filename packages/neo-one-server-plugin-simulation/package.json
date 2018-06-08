@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-simulation",
-  "version": "1.0.0-alpha.69",
+  "version": "1.0.0-alpha.70",
   "keywords": [
     "neo",
     "NEO",
@@ -34,16 +34,16 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.51",
-    "@neo-one/client-core": "^1.0.0-alpha.37",
-    "@neo-one/server-plugin": "^1.0.0-alpha.37",
-    "@neo-one/server-plugin-compiler": "^1.0.0-alpha.52",
-    "@neo-one/server-plugin-network": "^1.0.0-alpha.69",
-    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.69",
+    "@neo-one/client": "^1.0.0-alpha.52",
+    "@neo-one/client-core": "^1.0.0-alpha.38",
+    "@neo-one/server-plugin": "^1.0.0-alpha.38",
+    "@neo-one/server-plugin-compiler": "^1.0.0-alpha.53",
+    "@neo-one/server-plugin-network": "^1.0.0-alpha.70",
+    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.70",
     "@neo-one/simulation-ico": "^1.0.0-alpha.19",
     "@neo-one/simulation-react": "^1.0.0-alpha.16",
     "@neo-one/simulation-template": "^1.0.0-alpha.5",
-    "@neo-one/utils": "^1.0.0-alpha.32",
+    "@neo-one/utils": "^1.0.0-alpha.33",
     "bignumber.js": "^7.2.1",
     "execa": "^0.10.0",
     "fs-extra": "^6.0.1",

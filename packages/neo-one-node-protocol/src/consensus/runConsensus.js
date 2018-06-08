@@ -140,13 +140,12 @@ export default async ({
             return [transaction, new BigNumber(networkFee.toString(10))];
           }),
         );
-        transactions = _
-          .take(
-            networkFees.sort(([first, a], [second, b]) =>
-              b.div(second.size).comparedTo(a.div(first.size)),
-            ),
-            node.blockchain.settings.maxTransactionsPerBlock - 1,
-          )
+        transactions = _.take(
+          networkFees.sort(([first, a], [second, b]) =>
+            b.div(second.size).comparedTo(a.div(first.size)),
+          ),
+          node.blockchain.settings.maxTransactionsPerBlock - 1,
+        )
           // eslint-disable-next-line
           .map(([transaction, networkFee]) => transaction);
       }

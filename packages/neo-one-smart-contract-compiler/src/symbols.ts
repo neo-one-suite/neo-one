@@ -130,6 +130,7 @@ export interface Libs {
   readonly Fixed: Symbol;
   readonly constant: Symbol;
   readonly verify: Symbol;
+  readonly createEventHandler: Symbol;
 }
 
 const findLibFile = (ast: AST): SourceFile | undefined => {
@@ -175,6 +176,11 @@ export const getLibs = (ast: AST): Libs => {
     get verify(): Symbol {
       return libFile.getFunctionOrThrow('verify').getSymbolOrThrow();
     },
+    get createEventHandler(): Symbol {
+      return libFile
+        .getFunctionOrThrow('createEventHandler')
+        .getSymbolOrThrow();
+    },
   };
 };
 
@@ -183,6 +189,7 @@ export interface LibAliases {
   readonly Hash256: Set<Identifier>;
   readonly Signature: Set<Identifier>;
   readonly PublicKey: Set<Identifier>;
+  readonly Fixed: Set<Identifier>;
 }
 
 export const getLibAliases = (ast: AST): LibAliases => {
@@ -208,22 +215,27 @@ export const getLibAliases = (ast: AST): LibAliases => {
     get Address(): Set<Identifier> {
       return new Set(libFile
         .getTypeAliasOrThrow('Address')
-        .getReferencingNodes() as Identifier[]);
+        .findReferencesAsNodes() as Identifier[]);
     },
     get Hash256(): Set<Identifier> {
       return new Set(libFile
         .getTypeAliasOrThrow('Hash256')
-        .getReferencingNodes() as Identifier[]);
+        .findReferencesAsNodes() as Identifier[]);
     },
     get Signature(): Set<Identifier> {
       return new Set(libFile
         .getTypeAliasOrThrow('Signature')
-        .getReferencingNodes() as Identifier[]);
+        .findReferencesAsNodes() as Identifier[]);
     },
     get PublicKey(): Set<Identifier> {
       return new Set(libFile
         .getTypeAliasOrThrow('PublicKey')
-        .getReferencingNodes() as Identifier[]);
+        .findReferencesAsNodes() as Identifier[]);
+    },
+    get Fixed(): Set<Identifier> {
+      return new Set(libFile
+        .getTypeAliasOrThrow('Fixed')
+        .findReferencesAsNodes() as Identifier[]);
     },
   };
 };

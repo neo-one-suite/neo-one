@@ -29,7 +29,45 @@ ${interfaces}
 ${syscalls}
 }
 
-export * from './lib';
+export {
+  Address,
+  Hash256,
+  PublicKey,
+  Signature,
+  Fixed,
+  Integer,
+  Fixed8,
+  SmartContract,
+  MapStorage,
+  SetStorage,
+  Output,
+  Input,
+  AttributeUsage,
+  Attribute,
+  TransactionType,
+  Transaction,
+  BaseBlock,
+  Header,
+  Block,
+  Account,
+  AssetType,
+  Asset,
+  Contract,
+  verifySender,
+  getCurrentTransaction,
+  getCurrentTime,
+  getHeight,
+  getHeader,
+  getBlock,
+  getTransaction,
+  getAccount,
+  getAsset,
+  getValidators,
+  getContract,
+  verify,
+  constant,
+  createEventHandler,
+} from './lib';
 `;
   const filePath = path.resolve(
     appRootDir.get(),

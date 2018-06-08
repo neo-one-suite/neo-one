@@ -1,11 +1,10 @@
 import {
   Address,
-  Integer,
   Fixed,
   createEventHandler,
+  verifySender,
 } from '@neo-one/smart-contract';
-
-import { ICO } from '../../ICO';
+import { Token } from '@neo-one/smart-contract-lib';
 
 const onTransfer = createEventHandler<Address, Address, Fixed<8>>(
   'transfer',
@@ -20,21 +19,15 @@ const onApprove = createEventHandler<Address, Address, Fixed<8>>(
   'amount',
 );
 
-export class TestICO extends ICO<8> {
-  public readonly name: string = 'TestToken';
+export class SimpleToken extends Token<8> {
+  public readonly name: string = 'SimpleToken';
   public readonly decimals: 8 = 8;
-  public readonly symbol: string = 'TT';
-  public readonly icoAmount: Fixed<8> = 5000_00000000;
-  public readonly maxLimitedRoundAmount: Fixed<8> = 1_00000000;
+  public readonly symbol: string = 'ST';
 
-  constructor(owner: Address, startTimeSeconds: Integer) {
-    super(
-      owner,
-      startTimeSeconds,
-      24 * 60 * 60, // 24 hours * 60 minutes * 60 seconds
-      7 * 24 * 60 * 60, // 7 days * 24 hours * 60 minutes * 60 seconds
-      5000_00000000,
-    );
+  constructor(owner: Address) {
+    super(owner);
+    verifySender(owner);
+    this.issue(owner, 100_0000);
   }
 
   protected onTransfer(from: Address, to: Address, amount: Fixed<8>): void {

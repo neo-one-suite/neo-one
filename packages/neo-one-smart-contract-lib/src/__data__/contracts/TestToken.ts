@@ -1,6 +1,24 @@
-import { Address, verifySender } from '@neo-one/smart-contract';
+import {
+  Address,
+  Fixed,
+  createEventHandler,
+  verifySender,
+} from '@neo-one/smart-contract';
 
 import { Token } from '../../Token';
+
+const onTransfer = createEventHandler<Address, Address, Fixed<4>>(
+  'transfer',
+  'from',
+  'to',
+  'amount',
+);
+const onApprove = createEventHandler<Address, Address, Fixed<4>>(
+  'approve',
+  'owner',
+  'spender',
+  'amount',
+);
 
 export class TestToken extends Token<4> {
   public readonly name: string = 'TestToken';
@@ -11,5 +29,17 @@ export class TestToken extends Token<4> {
     super(owner);
     verifySender(owner);
     this.issue(owner, 100_0000);
+  }
+
+  protected onTransfer(from: Address, to: Address, amount: Fixed<4>): void {
+    onTransfer(from, to, amount);
+  }
+
+  protected onApprove(
+    owner: Address,
+    spender: Address,
+    amount: Fixed<4>,
+  ): void {
+    onApprove(owner, spender, amount);
   }
 }

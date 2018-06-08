@@ -11,9 +11,12 @@ import {
   getCurrentTime,
   MapStorage,
   SetStorage,
+  createEventHandler,
 } from '@neo-one/smart-contract';
 
 import { Token } from './Token';
+
+const onRefund = createEventHandler('refund');
 
 export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   public abstract readonly icoAmount: Fixed<Decimals>;
@@ -47,11 +50,11 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   @verify
   public mintTokens(): void {
     if (!this.hasStarted()) {
-      this.refund();
+      this.onRefund();
       throw new Error('Crowdsale has not started');
     }
     if (this.hasEnded()) {
-      this.refund();
+      this.onRefund();
       throw new Error('Crowdsale has ended');
     }
 
@@ -62,7 +65,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
 
     const sender = references[0].address;
     if (!this.canParticipate(sender)) {
-      this.refund();
+      this.onRefund();
       throw new Error('Address has not been whitelised');
     }
     const amount = getCurrentTransaction()
@@ -72,7 +75,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
           ? this.tokensPerAssetLimitedRound.get(output.asset)
           : this.tokensPerAsset.get(output.asset);
         if (amountPerAsset == null) {
-          this.refund();
+          this.onRefund();
           throw new Error(
             `Asset ${output.asset} is not accepted for the crowdsale`,
           );
@@ -83,14 +86,14 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
       }, 0);
 
     if (amount > this.icoRemaining) {
-      this.refund();
+      this.onRefund();
       throw new Error('Amount is greater than remaining ICO tokens');
     }
 
     if (this.isLimitedRound()) {
       const remaining = this.getRemainingLimitedRound(sender);
       if (amount > remaining) {
-        this.refund();
+        this.onRefund();
         throw new Error('Limited round maximum contribution reached.');
       }
       this.limitedRoundRemaining.set(sender, remaining - amount);
@@ -176,7 +179,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
     );
   }
 
-  private refund(): void {
-    // notify
+  private onRefund(): void {
+    onRefund();
   }
 }
