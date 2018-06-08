@@ -37,6 +37,8 @@
     "@neo-one/server-plugin": "^1.0.0-alpha.37",
     "@neo-one/server-plugin-compiler": "^1.0.0-alpha.52",
     "@neo-one/server-plugin-network": "^1.0.0-alpha.69",
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.37",
+    "@neo-one/smart-contract-lib": "1.0.0-alpha.6",
     "@neo-one/utils": "^1.0.0-alpha.32",
     "bignumber.js": "^7.2.1",
     "fs-extra": "^6.0.1",

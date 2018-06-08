@@ -15,7 +15,9 @@ import {
   wifToPrivateKey,
   privateKeyToAddress,
   privateKeyToPublicKey,
+  privateKeyToScriptHash,
   createPrivateKey,
+  type ABI,
   type Transfer,
   type Account,
   type AssetType,
@@ -30,13 +32,18 @@ import {
 } from '@neo-one/server-plugin-network';
 
 import _ from 'lodash';
+import {
+  compileContract,
+  findContract,
+} from '@neo-one/smart-contract-compiler';
 import { of as _of } from 'rxjs';
 import ora from 'ora';
+import path from 'path';
+
 import type { Wallet } from './WalletResourceType';
 import type WalletPlugin from './WalletPlugin';
 
 import constants from './constants';
-import { kycContract, conciergeContract } from './__data__/contracts';
 
 const DEFAULT_NUM_WALLETS = 10;
 const DEFAULT_MASTER_PRIVATE_KEY =
@@ -733,6 +740,119 @@ async function addWalletsToKeystore({
   );
 }
 
+const compileSmartContract = async (
+  contractName: string,
+): Promise<{|
+  code: Buffer,
+  abi: ABI,
+|}> => {
+  const dir = path.resolve(
+    require.resolve('@neo-one/server-plugin-wallet'),
+    'src',
+    'contracts',
+  );
+  const { filePath, name } = await findContract(dir, contractName);
+  const { code, abi } = await compileContract({ dir, filePath, name });
+
+  return { code, abi };
+};
+
+const publishContract = async ({
+  code,
+  name,
+  client,
+  developerClient,
+}: {|
+  code: Buffer,
+  name: string,
+  isRPC: boolean,
+  client: Client<any>,
+  developerClient: DeveloperClient,
+|}): Promise<string> => {
+  // TODO: Support using neo-one cli for compiling/publishing when !isRPC
+  const result = await client.publish({
+    script: code.toString('hex'),
+    parameters: ['String', 'Array'],
+    returnType: 'ByteArray',
+    name,
+    codeVersion: '1.0',
+    author: 'test',
+    email: 'test@test.com',
+    description: 'test',
+    // TODO: Get these directly from smart contract compilation
+    properties: {
+      storage: true,
+      dynamicInvoke: true,
+      payable: true,
+    },
+  });
+  const [receipt] = await Promise.all([
+    result.confirmed(),
+    developerClient.runConsensusNow(),
+  ]);
+
+  if (receipt.result.state === 'FAULT') {
+    throw new Error(receipt.result.message);
+  }
+
+  return receipt.result.value.hash;
+};
+
+const transferTokens = async ({
+  wallets,
+  masterWallet,
+  networkName,
+  hash,
+  abi,
+  client,
+  developerClient,
+}: {|
+  wallets: Array<WalletData>,
+  masterWallet: WalletData,
+  networkName: string,
+  hash: string,
+  abi: ABI,
+  client: Client<any>,
+  developerClient: DeveloperClient,
+|}): Promise<void> => {
+  const smartContract = client.smartContract({
+    networks: { [networkName]: { hash } },
+    abi,
+  });
+
+  const masterAccountID = {
+    network: networkName,
+    address: masterWallet.address,
+  };
+
+  let result = await smartContract.deploy(
+    privateKeyToScriptHash(masterWallet.privateKey),
+    { from: masterAccountID },
+  );
+  let [receipt] = await Promise.all([
+    result.confirmed({ timeoutMS: 15000 }),
+    developerClient.runConsensusNow(),
+  ]);
+
+  if (receipt.result.state === 'FAULT') {
+    throw new Error(receipt.result.message);
+  }
+
+  result = await smartContract.transfer(
+    privateKeyToScriptHash(masterWallet.privateKey),
+    privateKeyToScriptHash(wallets[0].privateKey),
+    { from: masterAccountID },
+  );
+  [receipt] = await Promise.all([
+    result.confirmed({ timeoutMS: 15000 }),
+    developerClient.runConsensusNow(),
+  ]);
+
+  if (receipt.result.state === 'FAULT') {
+    throw new Error(receipt.result.message);
+  }
+};
+
 export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
   cli.vorpal
     .command('bootstrap', 'Bootstraps a Network with test data.')
@@ -892,17 +1012,35 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         );
         spinner.succeed();
 
-        spinner.start('Publishing KYC SmartContract');
-        const kyc = await client.publish(kycContract);
-        await Promise.all([developerClient.runConsensusNow(), kyc.confirmed()]);
+        spinner.start('Compiling smart contracts');
+        const simpleTokenName = 'SimpleToken';
+        const {
+          code: simpleTokenCode,
+          abi: simpleTokenABI,
+        } = await compileSmartContract(simpleTokenName);
         spinner.succeed();
 
-        spinner.start('Publishing Concierge SmartContract');
-        const concierge = await client.publish(conciergeContract);
-        await Promise.all([
-          developerClient.runConsensusNow(),
-          concierge.confirmed(),
-        ]);
+        spinner.start('Publishing SmartContracts');
+        const isRPC = args.options.rpc != null;
+        const simpleTokenHash = await publishContract({
+          code: simpleTokenCode,
+          name: simpleTokenName,
+          isRPC,
+          client,
+          developerClient,
+        });
+        spinner.succeed();
+
+        spinner.start('Transferring tokens');
+        await transferTokens({
+          wallets,
+          masterWallet: master,
+          networkName: network.name,
+          hash: simpleTokenHash,
+          abi: simpleTokenABI,
+          client,
+          developerClient,
+        });
         spinner.succeed();
 
         spinner.start('Claiming GAS');
