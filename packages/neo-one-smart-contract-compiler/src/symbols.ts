@@ -130,6 +130,7 @@ export interface Libs {
   readonly Fixed: Symbol;
   readonly constant: Symbol;
   readonly verify: Symbol;
+  readonly createEventHandler: Symbol;
 }
 
 const findLibFile = (ast: AST): SourceFile | undefined => {
@@ -174,6 +175,11 @@ export const getLibs = (ast: AST): Libs => {
     },
     get verify(): Symbol {
       return libFile.getFunctionOrThrow('verify').getSymbolOrThrow();
+    },
+    get createEventHandler(): Symbol {
+      return libFile
+        .getFunctionOrThrow('createEventHandler')
+        .getSymbolOrThrow();
     },
   };
 };

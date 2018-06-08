@@ -83,6 +83,16 @@ describe('Token', () => {
     );
     expect(receipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
     expect(receipt.result.value).toBeTruthy();
+    expect(receipt.events).toHaveLength(1);
+    let event = receipt.events[0];
+    expect(event.name).toEqual('transfer');
+    expect(event.parameters.from).toEqual(
+      '0x6dfd6e08c99dc5c1c1ef14fba5113f5ee390931a',
+    );
+    expect(event.parameters.to).toEqual(
+      privateKeyToScriptHash(masterPrivateKey),
+    );
+    expect(event.parameters.amount.toString()).toEqual('100');
 
     const issueValue = new BigNumber('100');
     let value = await smartContract.balanceOf(
@@ -110,6 +120,16 @@ describe('Token', () => {
       'transfer consume',
     );
     expect(receipt.result.gasCost.toString()).toMatchSnapshot('transfer cost');
+    expect(receipt.events).toHaveLength(1);
+    event = receipt.events[0];
+    expect(event.name).toEqual('transfer');
+    expect(event.parameters.from).toEqual(
+      privateKeyToScriptHash(masterPrivateKey),
+    );
+    expect(event.parameters.to).toEqual(addressToScriptHash(account0.address));
+    expect(event.parameters.amount.toString()).toEqual(
+      transferValue.toString(),
+    );
 
     value = await smartContract.balanceOf(
       addressToScriptHash(masterAccountID.address),

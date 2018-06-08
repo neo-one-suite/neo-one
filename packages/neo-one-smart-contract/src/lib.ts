@@ -409,3 +409,27 @@ export function constant(
 ): void {
   throw new Error('This should be transpiled.');
 }
+
+export function createEventHandler(name: string): () => void;
+export function createEventHandler<A0>(
+  name: string,
+  arg0Name: string,
+): (arg0: A0) => void;
+export function createEventHandler<A0, A1>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+): (arg0: A0, arg1: A1) => void;
+export function createEventHandler<A0, A1, A2>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+): (arg0: A0, arg1: A1, arg2: A2) => void;
+export function createEventHandler(
+  name: string,
+  // tslint:disable-next-line
+  ...args: any[]
+): (...args: any[]) => void {
+  throw new Error('This should be transpiled');
+}
