@@ -25,6 +25,9 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
+  "files": [
+    "tsconfig.json"
+  ],
   "engines": {
     "node": ">=8.9.0"
   },

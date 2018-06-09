@@ -276,7 +276,16 @@ gulp.task('build:bin', ['build:dist'], () =>
     .pipe(gulp.dest(base)),
 );
 
-gulp.task('build', ['build:bin', 'build:flow']);
+gulp.task('build:tsconfig', () =>
+  sources
+    .filter(source => fs.pathExistsSync(path.resolve(__dirname, 'packages', source, 'tsconfig.dist.json')))
+    .forEach(source => {
+      const dir = path.resolve(__dirname, 'packages', source);
+      fs.copySync(path.join(dir, 'tsconfig.dist.json'), path.join(dir, 'tsconfig.json'));
+    }),
+);
+
+gulp.task('build', ['build:bin', 'build:flow', 'build:tsconfig']);
 
 const createRollupWatch = ({ source }: {| source: string |}) => ({
   include: path.join('packages', source, 'src', '**'),
