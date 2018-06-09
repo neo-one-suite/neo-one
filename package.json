@@ -40,7 +40,7 @@
     "flow": "flow",
     "lint-staged": "lint-staged",
     "flow:coverage": "flow-coverage-report -i 'packages/*/src/**/*.js' -t html",
-    "precommit": "flow && tsc && tslint --project . && lint-staged",
+    "precommit": "rm -rf ./packages/neo-one-server-plugin-wallet/tsconfig.json && flow && tsc && tslint --project . && lint-staged",
     "bootstrap": "yarn run build && lerna bootstrap",
     "build": "rm -rf ./packages/*/dist && yarn run gulp build",
     "watch": "yarn run gulp watch",
