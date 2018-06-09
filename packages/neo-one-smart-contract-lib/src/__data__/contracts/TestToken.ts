@@ -4,8 +4,7 @@ import {
   createEventHandler,
   verifySender,
 } from '@neo-one/smart-contract';
-
-import { Token } from '../../Token';
+import { Token } from '@neo-one/smart-contract-lib';
 
 const onTransfer = createEventHandler<Address, Address, Fixed<4>>(
   'transfer',

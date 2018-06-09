@@ -8,7 +8,7 @@ import * as path from 'path';
 const findRoot = async (
   dir: string | string[],
   filename: string,
-): Promise<string> => {
+): Promise<string | null> => {
   let start = dir;
 
   if (typeof start === 'string') {
@@ -18,7 +18,7 @@ const findRoot = async (
     start = start.split(path.sep);
   }
   if (!start.length) {
-    throw new Error('tsconfig.json not found in path');
+    return null;
   }
 
   start.pop();
@@ -33,7 +33,18 @@ const findRoot = async (
 };
 
 export const makeAst = async (dir: string): Promise<Ast> => {
-  const tsConfigFilePath = await findRoot(dir, 'tsconfig.json');
+  let tsConfigFilePath = await findRoot(dir, 'tsconfig.json');
+  if (tsConfigFilePath == null) {
+    tsConfigFilePath = await findRoot(
+      require.resolve('@neo-one/smart-contract-compiler'),
+      'tsconfig.default.json',
+    );
+  }
+
+  if (tsConfigFilePath == null) {
+    throw new Error('tsconfig.json not found in path');
+  }
+
   const res = ts.readConfigFile(tsConfigFilePath, (value) =>
     fs.readFileSync(value, 'utf8'),
   );
