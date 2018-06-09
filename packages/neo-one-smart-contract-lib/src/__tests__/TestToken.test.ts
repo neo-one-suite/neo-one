@@ -87,7 +87,7 @@ describe('Token', () => {
     let event = receipt.events[0];
     expect(event.name).toEqual('transfer');
     expect(event.parameters.from).toEqual(
-      '0x6dfd6e08c99dc5c1c1ef14fba5113f5ee390931a',
+      '0xcda5ae3ce34a488a7e6642b42ec2d853553d4ef8',
     );
     expect(event.parameters.to).toEqual(
       privateKeyToScriptHash(masterPrivateKey),

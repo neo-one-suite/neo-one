@@ -1,24 +1,18 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
     "alwaysStrict": true,
     "target": "esnext",
     "module": "commonjs",
     "declaration": true,
-    "experimentalDecorators": true,
     "lib": [
-      "dom",
       "es2017",
-      "es2017.object",
-      "esnext.asynciterable"
+      "es2017.object"
     ],
-    "sourceMap": true,
     "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "pretty": true,
     "strict": true,
     "strictFunctionTypes": true,
     "typeRoots": [
