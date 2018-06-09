@@ -36,6 +36,7 @@ import {
   compileContract,
   findContract,
 } from '@neo-one/smart-contract-compiler';
+import fs from 'fs-extra';
 import { of as _of } from 'rxjs';
 import ora from 'ora';
 import path from 'path';
@@ -737,16 +738,23 @@ async function addWalletsToKeystore({
   );
 }
 
+const findContracts = async (current: string): Promise<string> => {
+  const exists = await fs.pathExists(path.resolve(current, 'package.json'));
+  if (exists) {
+    return path.resolve(current, 'src', 'contracts');
+  }
+
+  return findContracts(path.dirname(current));
+};
+
 const compileSmartContract = async (
   contractName: string,
 ): Promise<{|
   code: Buffer,
   abi: ABI,
 |}> => {
-  const dir = path.resolve(
+  const dir = await findContracts(
     require.resolve('@neo-one/server-plugin-wallet'),
-    'src',
-    'contracts',
   );
   const { filePath, name } = await findContract(dir, contractName);
   const { code, abi } = await compileContract({ dir, filePath, name });
