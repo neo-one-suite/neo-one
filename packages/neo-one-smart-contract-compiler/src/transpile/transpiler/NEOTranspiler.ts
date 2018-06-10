@@ -29,7 +29,7 @@ import { Transpiler } from './Transpiler';
 import declarations from '../declaration';
 import * as nodeUtils from '../../nodeUtils';
 import * as typeUtils from '../../typeUtils';
-import { TranspileResult } from '../types';
+import { TranspileResult, VisitOptions } from '../types';
 
 const transpilers = [declarations];
 
@@ -68,7 +68,8 @@ export class NEOTranspiler implements Transpiler {
   public process(): TranspileResult {
     const file = this.smartContract.getSourceFile();
     const events = this.processEvents(file);
-    this.visit(file);
+    this.visit(this.smartContract, { isSmartContract: true });
+    this.context.libAliases.reset();
     const functions = this.processSmartContract(file);
     this.strip();
 
@@ -80,18 +81,10 @@ export class NEOTranspiler implements Transpiler {
     };
   }
 
-  public visit(node?: Node): void {
-    if (node == null) {
-      return;
-    }
-
+  public visit(node: Node, options: VisitOptions): void {
     const transpiler = this.transpilers[node.compilerNode.kind];
-    if (transpiler == null) {
-      node.getChildren().forEach((child) => {
-        this.visit(child);
-      });
-    } else {
-      transpiler.visitNode(this, node);
+    if (transpiler != null) {
+      transpiler.visitNode(this, node, options);
     }
   }
 
@@ -158,6 +151,10 @@ export class NEOTranspiler implements Transpiler {
       type.getAliasSymbol() || type.getSymbol(),
       'Fixed',
     );
+  }
+
+  public isSmartContractOptions(options: VisitOptions): VisitOptions {
+    return { ...options, isSmartContract: true };
   }
 
   public reportError(node: Node, message: string, code: DiagnosticCode): void {
@@ -284,6 +281,7 @@ export class NEOTranspiler implements Transpiler {
   }
 
   private strip(): void {
+    this.context.libAliases.reset();
     const identifiers = [...this.context.libAliases.Fixed];
     identifiers.forEach((identifier) => {
       const parent = identifier.getParent();

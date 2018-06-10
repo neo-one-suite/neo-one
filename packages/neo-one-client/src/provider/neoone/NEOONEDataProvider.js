@@ -19,6 +19,7 @@ import {
   type ValidatorJSON,
   InvocationTransaction as CoreInvocationTransaction,
   JSONHelper,
+  common,
   utils,
 } from '@neo-one/client-core';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
@@ -342,7 +343,7 @@ export default class NEOONEDataProvider
   ): Promise<RawInvocationResult> {
     const testTransaction = new CoreInvocationTransaction({
       version: 1,
-      gas: utils.ZERO,
+      gas: common.TEN_THOUSAND_FIXED8,
       script: clientUtils.getInvokeMethodScript({
         hash: contract,
         method,
@@ -369,6 +370,10 @@ export default class NEOONEDataProvider
 
   fastForwardToTime(seconds: number, monitor?: Monitor): Promise<void> {
     return this._client.fastForwardToTime(seconds, monitor);
+  }
+
+  reset(monitor?: Monitor): Promise<void> {
+    return this._client.reset(monitor);
   }
 
   _convertBlock(block: BlockJSON): Block {

@@ -1,7 +1,4 @@
-import {
-  compileContract,
-  findContract,
-} from '@neo-one/smart-contract-compiler';
+import { findAndCompileContract } from '@neo-one/smart-contract-compiler';
 
 import { Result, setupTest } from './setupTest';
 
@@ -17,11 +14,9 @@ export const setupContractTest = async ({
   ignoreWarnings,
 }: SetupContractTestOptions): Promise<Result> =>
   setupTest(async () => {
-    const { filePath, name } = await findContract(dir, contractName);
-    const { code: script, diagnostics, abi } = await compileContract({
+    const { script, diagnostics, abi } = await findAndCompileContract({
       dir,
-      filePath,
-      name,
+      contractName,
     });
     return { script, diagnostics, abi, ignoreWarnings };
   });

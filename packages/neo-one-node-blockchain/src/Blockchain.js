@@ -152,14 +152,7 @@ export default class Blockchain {
     this._storage = options.storage;
     this._currentBlock = options.currentBlock;
     this._currentHeader = options.currentHeader;
-    this._persistingBlocks = false;
-    this._blockQueue = new PriorityQueue({
-      comparator: (a, b) => a.block.index - b.block.index,
-    });
-    this._inQueue = new Set();
     this._vm = options.vm;
-    this._running = true;
-    this._doneRunningResolve = null;
 
     this._settings$ = new BehaviorSubject(options.settings);
     this._monitor = options.monitor.at(NAMESPACE);
@@ -207,7 +200,7 @@ export default class Blockchain {
       getUnspent: this._getUnspent,
     };
 
-    this.block$ = new Subject();
+    this._start();
   }
 
   static async create({
@@ -241,6 +234,18 @@ export default class Blockchain {
     return blockchain;
   }
 
+  _start(): void {
+    this.block$ = new Subject();
+    this._persistingBlocks = false;
+    this._blockQueue = new PriorityQueue({
+      comparator: (a, b) => a.block.index - b.block.index,
+    });
+    this._inQueue = new Set();
+    this._doneRunningResolve = null;
+    this._running = true;
+    this._monitor.log({ name: 'neo_blockchain_start' });
+  }
+
   async stop(): Promise<void> {
     if (!this._running) {
       return;
@@ -253,9 +258,12 @@ export default class Blockchain {
       this._running = false;
 
       await doneRunningPromise;
+      this._doneRunningResolve = null;
     } else {
       this._running = false;
     }
+
+    this._monitor.log({ name: 'neo_blockchain_stop' });
   }
 
   get currentBlock(): Block {
@@ -645,6 +653,16 @@ export default class Blockchain {
         level: { log: 'verbose', span: 'info' },
       },
     );
+
+  async reset(): Promise<void> {
+    await this.stop();
+    await this._storage.reset();
+    this._currentHeader = null;
+    this._currentBlock = null;
+    this._start();
+    await this.persistHeaders([this.settings.genesisBlock.header]);
+    await this.persistBlock({ block: this.settings.genesisBlock });
+  }
 
   _isSpent = async (input: OutputKey): Promise<boolean> => {
     const transactionData = await this.transactionData.tryGet({

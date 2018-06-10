@@ -84,4 +84,5 @@ export type Storage = {
   validatorsCount: $PropertyType<Blockchain, 'validatorsCount'>,
   commit: (changeSet: ChangeSet) => Promise<void>,
   close: () => Promise<void>,
+  reset: () => Promise<void>,
 };

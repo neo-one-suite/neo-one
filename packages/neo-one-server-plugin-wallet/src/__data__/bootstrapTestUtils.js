@@ -1,121 +1,341 @@
 /* @flow */
 import BigNumber from 'bignumber.js';
 
-import { addressToScriptHash, NEOONEProvider } from '@neo-one/client';
+import {
+  NEOONEProvider,
+  ReadClient,
+  addressToScriptHash,
+  privateKeyToAddress,
+} from '@neo-one/client';
 import { common } from '@neo-one/client-core';
+import _ from 'lodash';
 
-import { ASSET_INFO } from '../bootstrap';
+import {
+  ASSET_INFO,
+  TOKEN_INFO,
+  type TokenInfo,
+  compileSmartContract,
+} from '../bootstrap';
 
-export async function getRPC(network: string): Promise<string> {
+import constants from '../constants';
+
+export async function getNetworkInfo(
+  network: string,
+): Promise<{|
+  height: number,
+  rpcURL: string,
+|}> {
   const networkOutput = await one.execute(`describe network ${network} --json`);
   const networkInfo = one.parseJSON(networkOutput);
 
-  return networkInfo[3][1].table[1][3];
+  return {
+    height: parseInt(networkInfo[3][1].table[1][6], 10),
+    rpcURL: networkInfo[3][1].table[1][3],
+  };
 }
 
-async function testAssetIssue({
-  assetWalletAddresses,
-  walletAddresses,
-  network,
+type Coin = {|
+  asset: string,
+  name: string,
+  amount: string,
+|};
+type Wallet = {|
+  name: string,
+  address: string,
+  balance: Array<Coin>,
+|};
+
+const ASSET_WALLET_ADDRESSES = new Set(
+  ASSET_INFO.map(({ privateKey }) => privateKeyToAddress(privateKey)),
+);
+const TOKEN_WALLET_ADDRESSES = new Set(
+  TOKEN_INFO.map(({ privateKey }) => privateKeyToAddress(privateKey)),
+);
+
+const TOKEN_HASHES = {
+  RedToken: '0x6937b11039ba775836c32682738bac4e4922d671',
+  BlueToken: '0xeeb5765790d7a43dbf7026cf8c1164bb9188055b',
+  GreenToken: '0xa204296a3841bc03da6c700c22603bbbda01bee7',
+};
+
+function expectNotNull<T>(value: T | null | typeof undefined): T {
+  if (value == null) {
+    expect(value).toBeTruthy();
+    throw new Error('For Flow');
+  }
+
+  return value;
+}
+
+const getCoin = (wallet: Wallet, test: (coin: Coin) => boolean) =>
+  expectNotNull(wallet.balance.find(test));
+
+const getAssetCoin = (wallet: Wallet, asset: string) =>
+  getCoin(wallet, (coin) => coin.asset === asset);
+const getAssetNameCoin = (wallet: Wallet, name: string) =>
+  getCoin(wallet, (coin) => coin.name === name);
+
+const getSmartContract = async ({
+  token,
+  client,
 }: {|
-  assetWalletAddresses: Array<string>,
-  walletAddresses: Array<string>,
-  network: string,
-|}): Promise<void> {
-  const rpcURL = await getRPC(network);
-  const provider = new NEOONEProvider({
-    options: [{ network, rpcURL }],
+  token: TokenInfo,
+  client: ReadClient<*>,
+|}) => {
+  const { abi } = await compileSmartContract(token.name);
+  return client.smartContract(TOKEN_HASHES[token.name], abi);
+};
+
+const getSmartContracts = async ({ client }: {| client: ReadClient<*> |}) =>
+  Promise.all(
+    TOKEN_INFO.map(async (token) => {
+      const smartContract = await getSmartContract({ token, client });
+      return { token, smartContract };
+    }),
+  );
+
+const testTransfersAndClaims = ({
+  transferWallets,
+}: {|
+  transferWallets: Array<Wallet>,
+|}) => {
+  const [firstWallets, secondWallets] = _.chunk(
+    transferWallets,
+    transferWallets.length / 2,
+  );
+
+  firstWallets.forEach((wallet) => {
+    const neoCoin = getAssetCoin(wallet, common.NEO_ASSET_HASH);
+    expect(neoCoin.amount).toEqual('750000');
+
+    const gasCoin = getAssetCoin(wallet, common.GAS_ASSET_HASH);
+    // Additional .08 for the gas claim
+    expect(gasCoin.amount).toEqual('750000.08');
   });
 
-  const assetAccounts = await Promise.all(
-    assetWalletAddresses.map((address) =>
-      provider.read(network).getAccount(address),
-    ),
-  );
+  secondWallets.forEach((wallet) => {
+    const neoCoin = getAssetCoin(wallet, common.NEO_ASSET_HASH);
+    expect(neoCoin.amount).toEqual('250000');
 
-  const assets = {};
-  for (const account of assetAccounts) {
-    expect(Object.keys(account.balances).length).toEqual(2);
-    expect(account.balances[common.GAS_ASSET_HASH].toNumber()).toEqual(44510);
-    expect(
-      account.balances[Object.keys(account.balances)[1]].toNumber(),
-    ).toBeGreaterThan(450000);
-    assets[Object.keys(account.balances)[1]] = 0;
-  }
+    const gasCoin = getAssetCoin(wallet, common.GAS_ASSET_HASH);
+    expect(gasCoin.amount).toEqual('250000');
+  });
+};
 
-  const accounts = await Promise.all(
-    walletAddresses.map((address) =>
-      provider.read(network).getAccount(address),
-    ),
-  );
+const getAddressToWallet = (wallets: Array<Wallet>) => {
+  const addressToWallet = {};
+  wallets.forEach((wallet) => {
+    addressToWallet[wallet.address] = wallet;
+  });
 
-  for (const account of accounts) {
-    for (const balance of Object.keys(account.balances)) {
-      if (
-        balance !== common.NEO_ASSET_HASH &&
-        balance !== common.GAS_ASSET_HASH
-      ) {
-        assets[balance] += 1;
-      }
+  return addressToWallet;
+};
+
+const testAssets = ({
+  wallets,
+  transferWallets,
+}: {|
+  wallets: Array<Wallet>,
+  transferWallets: Array<Wallet>,
+|}) => {
+  const addressToWallet = getAddressToWallet(wallets);
+  // Order is important here due to the idx % 2 check below
+  const assetWallets = ASSET_INFO.map((asset) => {
+    const wallet = addressToWallet[privateKeyToAddress(asset.privateKey)];
+    if (wallet == null) {
+      return null;
     }
-  }
-  expect(Object.keys(assets).length).toEqual(3);
-  for (const asset of Object.keys(assets)) {
-    expect(assets[asset]).toBeGreaterThanOrEqual(
-      Math.floor(walletAddresses.length / 3),
+    return { asset, wallet };
+  }).filter(Boolean);
+  expect(assetWallets.length).toEqual(ASSET_INFO.length);
+
+  assetWallets.forEach(({ asset, wallet }, idx) => {
+    const assetCoin = getAssetNameCoin(wallet, asset.name);
+    const transferredWallets =
+      idx % 2 === 0
+        ? transferWallets.slice(0, transferWallets.length / 2)
+        : transferWallets.slice(transferWallets.length / 2);
+    expect(assetCoin.amount).toEqual(
+      asset.amount
+        .minus(
+          asset.amount
+            .div(2)
+            .div(transferredWallets.length)
+            .integerValue(BigNumber.ROUND_FLOOR)
+            .times(transferredWallets.length),
+        )
+        .toString(),
     );
-  }
+
+    const gasCoin = getCoin(
+      wallet,
+      (coin) => coin.asset === common.GAS_ASSET_HASH,
+    );
+    expect(gasCoin.amount).toEqual('44510');
+
+    transferredWallets.forEach((transferredWallet) => {
+      const transferredAssetCoin = getAssetNameCoin(
+        transferredWallet,
+        asset.name,
+      );
+      expect(transferredAssetCoin.amount).toEqual(
+        asset.amount
+          .div(2)
+          .div(transferredWallets.length)
+          .integerValue(BigNumber.ROUND_FLOOR)
+          .toString(),
+      );
+    });
+  });
+};
+
+const testTokens = async ({
+  wallets,
+  transferWallets,
+  client,
+}: {|
+  wallets: Array<Wallet>,
+  transferWallets: Array<Wallet>,
+  client: ReadClient<*>,
+|}) => {
+  const addressToWallet = getAddressToWallet(wallets);
+  // Order is important here due to the idx % 2 check below
+  const tokenWallets = TOKEN_INFO.map(
+    (token) => addressToWallet[privateKeyToAddress(token.privateKey)],
+  ).filter(Boolean);
+  expect(tokenWallets.length).toEqual(TOKEN_INFO.length);
+
+  const tokenAndSmartContracts = await getSmartContracts({ client });
+
+  await Promise.all(
+    _.zip(tokenAndSmartContracts, tokenWallets).map(
+      async ([{ token, smartContract }, wallet], idx) => {
+        const balance = await smartContract.balanceOf(
+          addressToScriptHash(wallet.address),
+        );
+        const transferredWallets =
+          idx % 2 === 0
+            ? transferWallets.slice(0, transferWallets.length / 2)
+            : transferWallets.slice(transferWallets.length / 2);
+        expect(balance.toString()).toEqual(
+          token.amount
+            .minus(
+              token.amount
+                .div(2)
+                .div(transferredWallets.length)
+                .integerValue(BigNumber.ROUND_FLOOR)
+                .times(transferredWallets.length),
+            )
+            .toString(),
+        );
+
+        const gasCoin = getCoin(
+          wallet,
+          (coin) => coin.asset === common.GAS_ASSET_HASH,
+        );
+        expect(gasCoin.amount).toEqual('48953');
+
+        await Promise.all(
+          transferredWallets.map(async (transferredWallet) => {
+            const transferredBalance = await smartContract.balanceOf(
+              addressToScriptHash(transferredWallet.address),
+            );
+            expect(transferredBalance.toString()).toEqual(
+              token.amount
+                .div(2)
+                .div(transferredWallets.length)
+                .integerValue(BigNumber.ROUND_FLOOR)
+                .toString(),
+            );
+          }),
+        );
+      },
+    ),
+  );
+};
+
+export type Info = {| wallets: Array<Wallet> |};
+
+type Options = {|
+  network: string,
+  rpcURL: string,
+|};
+
+export async function getDefaultInfo({ network }: Options): Promise<Info> {
+  const outputs = await one.execute(`get wallet --network ${network} --json`);
+  const walletNames = ((one.parseJSON(outputs): $FlowFixMe): Array<any>)
+    .slice(1)
+    .map((info) => info[1]);
+  const wallets = await Promise.all(
+    walletNames.map(async (walletName) => {
+      const output = await one.execute(
+        `describe wallet ${walletName} --network ${network} --json`,
+      );
+      const wallet = ((one.parseJSON(output): $FlowFixMe): Array<any>);
+      return {
+        name: walletName,
+        address: expectNotNull(
+          wallet.find((value) => value[0] === 'Address'),
+        )[1],
+        balance: expectNotNull(
+          wallet.find((value) => value[0] === 'Balance'),
+        )[1]
+          .table.slice(1)
+          .map(([name, amount, asset]) => ({
+            name,
+            amount,
+            asset,
+          })),
+      };
+    }),
+  );
+
+  return { wallets };
 }
 
-export default (async function testBootstrap(
-  command: string,
+export async function testBootstrap(
+  getCommand: (options: Options) => Promise<string>,
   numWallets: number,
   network: string,
+  getInfo: (options: Options) => Promise<Info>,
 ): Promise<void> {
   await one.execute(`create network ${network}`);
+
+  const { rpcURL } = await getNetworkInfo(network);
+  const command = await getCommand({ network, rpcURL });
+
   await one.execute(command);
 
-  const output = await one.execute(`get wallet --network ${network} --json`);
-  let wallets = one.parseJSON(output);
-  wallets = wallets.filter((wallet) => wallet[0] === network);
+  const [{ height }, { wallets }] = await Promise.all([
+    getNetworkInfo(network),
+    getInfo({ network, rpcURL }),
+  ]);
+  expect(height).toEqual(13);
+
   // Bootstrap creates numWallets number of wallets
   // Wallets will also have the master wallet plus
-  // 3 asset wallets
-  expect(wallets.length).toEqual(numWallets + 1 + ASSET_INFO.length);
+  // asset wallets plus token wallets
+  expect(wallets.length).toEqual(
+    numWallets + 1 + ASSET_INFO.length + TOKEN_INFO.length,
+  );
 
-  let neoBalanceCount = 0;
-  let gasBalanceCount = 0;
-  const walletAddresses = [];
-  const assetWalletAddresses = [];
-  for (const wallet of wallets) {
-    // Check wallet is on network boottest
-    expect(wallet[0]).toEqual(network);
-    // Assert address is a valid address
-    expect(addressToScriptHash(wallet[2])).toBeDefined();
-    if (wallet[1].substring(0, 6) === 'wallet') {
-      walletAddresses.push(wallet[2]);
-    } else if (wallet[1].includes('coin')) {
-      assetWalletAddresses.push(wallet[2]);
-    }
-    // Check wallet is unlocked
-    expect(wallet[3]).toEqual('Yes');
-    // Check NEO balance is a number 0 or greater
-    expect(new BigNumber(wallet[4]).toNumber()).toBeGreaterThanOrEqual(0);
-    if (new BigNumber(wallet[4]).toNumber() > 0) {
-      neoBalanceCount += 1;
-    }
-    // Check GAS balance is a number 0 or greater
-    expect(new BigNumber(wallet[5]).toNumber()).toBeGreaterThanOrEqual(0);
-    if (new BigNumber(wallet[5]).toNumber() > 0) {
-      gasBalanceCount += 1;
-    }
-  }
-  // Check that at least ceil(numWallets/2) have nonzero neo balances
-  // and ceil(nuwallets/2 + 3) have nonzero gas balances to account for asset wallets.
-  // This is the minimum number of wallets that could have balance,
-  // so this checks that the transfers succeeded
-  expect(neoBalanceCount).toBeGreaterThanOrEqual(Math.ceil(numWallets / 2));
-  expect(gasBalanceCount).toBeGreaterThanOrEqual(Math.ceil(numWallets / 2) + 3);
+  const transferWallets = _.sortBy(
+    wallets.filter(
+      (wallet) =>
+        !ASSET_WALLET_ADDRESSES.has(wallet.address) &&
+        !TOKEN_WALLET_ADDRESSES.has(wallet.address) &&
+        wallet.name !== constants.MASTER_WALLET,
+    ),
+    (wallet) => parseInt(wallet.name.slice('wallet-'.length), 10),
+  );
+  expect(transferWallets.length).toEqual(numWallets);
 
-  await testAssetIssue({ assetWalletAddresses, walletAddresses, network });
-});
+  const provider = new NEOONEProvider({
+    options: [{ network, rpcURL }],
+  }).read(network);
+  const client = new ReadClient(provider);
+
+  testTransfersAndClaims({ transferWallets });
+  testAssets({ wallets, transferWallets });
+  await testTokens({ wallets, transferWallets, client });
+}

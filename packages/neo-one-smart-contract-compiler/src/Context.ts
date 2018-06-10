@@ -12,7 +12,7 @@ import {
 
 import { CompilerDiagnostic } from './CompilerDiagnostic';
 import { DiagnosticCode } from './DiagnosticCode';
-import { Globals, Libs, LibAliases } from './symbols';
+import { Globals, Libs, LibAliases, LibAliasesWithReset } from './symbols';
 
 import * as typeUtils from './typeUtils';
 
@@ -22,7 +22,7 @@ export class Context {
   constructor(
     public readonly globals: Globals,
     public readonly libs: Libs,
-    public readonly libAliases: LibAliases,
+    public readonly libAliases: LibAliasesWithReset,
   ) {}
 
   public reportError(node: Node, message: string, code: DiagnosticCode): void {

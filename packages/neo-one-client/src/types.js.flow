@@ -656,6 +656,7 @@ export interface DeveloperProvider {
   updateSettings(options: Options, monitor?: Monitor): Promise<void>;
   fastForwardOffset(seconds: number, monitor?: Monitor): Promise<void>;
   fastForwardToTime(seconds: number, monitor?: Monitor): Promise<void>;
+  reset(monitor?: Monitor): Promise<void>;
 }
 
 export interface UserAccountProvider {
