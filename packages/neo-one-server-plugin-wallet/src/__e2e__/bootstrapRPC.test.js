@@ -1,62 +1,103 @@
 /* @flow */
 import { NEOONEProvider, privateKeyToAddress } from '@neo-one/client';
-import { common } from '@neo-one/client-core';
+import { utils } from '@neo-one/utils';
 
-import { DEFAULT_PRIVATE_KEYS } from '../bootstrap';
+import { ASSET_INFO, TOKEN_INFO, DEFAULT_PRIVATE_KEYS } from '../bootstrap';
 
-import { getRPC } from '../__data__/bootstrapTestUtils';
+import * as bootstrapTestUtils from '../__data__/bootstrapTestUtils';
 
 describe('bootstrap with rpc', () => {
   test('bootstrap - rpc', async () => {
-    const network = 'priv';
+    const getCommand = async ({
+      rpcURL,
+    }: {|
+      rpcURL: string,
+      network: string,
+    |}) => `bootstrap --rpc ${rpcURL} --testing-only --reset`;
 
-    await one.execute(`create network ${network}`);
-    const rpcURL = await getRPC(network);
+    const getInfo = async ({
+      network,
+      rpcURL,
+    }: {|
+      rpcURL: string,
+      network: string,
+    |}) => {
+      const provider = new NEOONEProvider({
+        options: [{ network, rpcURL }],
+      }).read(network);
 
-    const provider = new NEOONEProvider({
-      options: [{ network, rpcURL }],
-    });
-    await one.execute(`bootstrap --rpc ${rpcURL} --testing-only`);
+      const assets = {};
+      const getAsset = (assetHash: string) => {
+        if (assets[assetHash] == null) {
+          assets[assetHash] = provider.getAsset(assetHash);
+        }
 
-    const accounts = await Promise.all(
-      DEFAULT_PRIVATE_KEYS.map((key) =>
-        provider.read(network).getAccount(privateKeyToAddress(key)),
-      ),
-    );
+        return assets[assetHash];
+      };
 
-    const assets = [];
-    for (const account of accounts) {
-      expect(Object.keys(account.balances).length).toBeGreaterThanOrEqual(2);
-      if (Object.keys(account.balances).length > 2) {
-        const accountAssets = Object.keys(account.balances).slice(2);
-        accountAssets.forEach((asset) => {
-          if (!assets.includes(asset)) {
-            assets.push(asset);
-          }
-        });
+      const getWallet = async (privateKey: string, name: string) => {
+        const address = privateKeyToAddress(privateKey);
+        const account = await provider.getAccount(address);
+        const balance = await Promise.all(
+          utils.entries(account.balances).map(async ([assetHash, amount]) => {
+            const asset = await getAsset(assetHash);
+            return {
+              asset: assetHash,
+              name: asset.name,
+              amount: amount.toString(),
+            };
+          }),
+        );
+
+        return {
+          name,
+          address,
+          balance,
+        };
+      };
+
+      const [
+        transferWallets,
+        assetWallets,
+        tokenWallets,
+        { wallets },
+      ] = await Promise.all([
+        Promise.all(
+          DEFAULT_PRIVATE_KEYS.map((privateKey, idx) =>
+            getWallet(privateKey, `wallet-${idx}`),
+          ),
+        ),
+        Promise.all(
+          ASSET_INFO.map(({ name, privateKey }) =>
+            getWallet(privateKey, `${name}-wallet`),
+          ),
+        ),
+        Promise.all(
+          TOKEN_INFO.map(({ name, privateKey }) =>
+            getWallet(privateKey, `${name}-token-wallet`),
+          ),
+        ),
+        bootstrapTestUtils.getDefaultInfo({ network, rpcURL }),
+      ]);
+      const masterWallet = wallets.find((wallet) => wallet.name === 'master');
+      if (masterWallet == null) {
+        expect(masterWallet).toBeTruthy();
+        throw new Error('For Flow');
       }
-      expect(
-        account.balances[common.NEO_ASSET_HASH].toNumber(),
-      ).toBeGreaterThanOrEqual(0);
-      expect(
-        account.balances[common.GAS_ASSET_HASH].toNumber(),
-      ).toBeGreaterThanOrEqual(0);
-    }
-    expect(assets.length).toEqual(3);
 
-    const blockCount = await provider.read(network).getBlockCount();
+      return {
+        wallets: transferWallets
+          .concat(assetWallets)
+          .concat(tokenWallets)
+          .concat([masterWallet]),
+      };
+    };
 
-    const blockIndicies = [];
-    for (let i = blockCount - 1; i >= 0; i -= 1) {
-      blockIndicies.push(i);
-    }
-    const blocks = await Promise.all(
-      blockIndicies.map((index) => provider.read(network).getBlock(index)),
+    await bootstrapTestUtils.testBootstrap(
+      getCommand,
+      10,
+      'boottest-rpc',
+      getInfo,
     );
-    const transactionCount = blocks.reduce(
-      (acc, block) => acc + block.transactions.length,
-      0,
-    );
-    expect(transactionCount).toEqual(40);
   });
 });

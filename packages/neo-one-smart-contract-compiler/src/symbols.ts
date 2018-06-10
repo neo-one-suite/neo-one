@@ -192,7 +192,19 @@ export interface LibAliases {
   readonly Fixed: Set<Identifier>;
 }
 
-export const getLibAliases = (ast: AST): LibAliases => {
+export interface LibAliasesWithReset extends LibAliases {
+  readonly reset: () => void;
+}
+
+interface LibAliasesOptional {
+  Address?: Set<Identifier>;
+  Hash256?: Set<Identifier>;
+  Signature?: Set<Identifier>;
+  PublicKey?: Set<Identifier>;
+  Fixed?: Set<Identifier>;
+}
+
+export const getLibAliases = (ast: AST): LibAliasesWithReset => {
   let libFileIn = findLibFile(ast);
   if (libFileIn == null) {
     ast.addExistingSourceFiles(
@@ -211,31 +223,51 @@ export const getLibAliases = (ast: AST): LibAliases => {
 
   const libFile = libFileIn;
 
+  let aliases: LibAliasesOptional = {};
+
   return {
-    get Address(): Set<Identifier> {
-      return new Set(libFile
-        .getTypeAliasOrThrow('Address')
-        .findReferencesAsNodes() as Identifier[]);
+    get Address() {
+      if (aliases.Address == null) {
+        aliases.Address = new Set(libFile
+          .getTypeAliasOrThrow('Address')
+          .findReferencesAsNodes() as Identifier[]);
+      }
+      return aliases.Address;
     },
-    get Hash256(): Set<Identifier> {
-      return new Set(libFile
-        .getTypeAliasOrThrow('Hash256')
-        .findReferencesAsNodes() as Identifier[]);
+    get Hash256() {
+      if (aliases.Hash256 == null) {
+        aliases.Hash256 = new Set(libFile
+          .getTypeAliasOrThrow('Hash256')
+          .findReferencesAsNodes() as Identifier[]);
+      }
+      return aliases.Hash256;
     },
-    get Signature(): Set<Identifier> {
-      return new Set(libFile
-        .getTypeAliasOrThrow('Signature')
-        .findReferencesAsNodes() as Identifier[]);
+    get Signature() {
+      if (aliases.Signature == null) {
+        aliases.Signature = new Set(libFile
+          .getTypeAliasOrThrow('Signature')
+          .findReferencesAsNodes() as Identifier[]);
+      }
+      return aliases.Signature;
     },
-    get PublicKey(): Set<Identifier> {
-      return new Set(libFile
-        .getTypeAliasOrThrow('PublicKey')
-        .findReferencesAsNodes() as Identifier[]);
+    get PublicKey() {
+      if (aliases.PublicKey == null) {
+        aliases.PublicKey = new Set(libFile
+          .getTypeAliasOrThrow('PublicKey')
+          .findReferencesAsNodes() as Identifier[]);
+      }
+      return aliases.PublicKey;
     },
-    get Fixed(): Set<Identifier> {
-      return new Set(libFile
-        .getTypeAliasOrThrow('Fixed')
-        .findReferencesAsNodes() as Identifier[]);
+    get Fixed() {
+      if (aliases.Fixed == null) {
+        aliases.Fixed = new Set(libFile
+          .getTypeAliasOrThrow('Fixed')
+          .findReferencesAsNodes() as Identifier[]);
+      }
+      return aliases.Fixed;
+    },
+    reset() {
+      aliases = {};
     },
   };
 };

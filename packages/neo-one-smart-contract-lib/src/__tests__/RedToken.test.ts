@@ -3,17 +3,19 @@ import { privateKeyToScriptHash } from '@neo-one/client';
 
 import { testToken } from '../__data__';
 
+const issueValue = new BigNumber('1000000');
+
 testToken({
-  contractName: 'TestToken',
-  name: 'TestToken',
-  symbol: 'TT',
-  decimals: 4,
+  contractName: 'RedToken',
+  name: 'RedToken',
+  symbol: 'RT',
+  decimals: 8,
   deploy: async ({ masterPrivateKey, masterAccountID, smartContract }) =>
-    smartContract.deploy(privateKeyToScriptHash(masterPrivateKey), {
+    smartContract.deploy(privateKeyToScriptHash(masterPrivateKey), issueValue, {
       from: masterAccountID,
     }),
-  issueValue: new BigNumber('100'),
+  issueValue,
   transferValue: new BigNumber('10'),
-  contractHash: '0xcda5ae3ce34a488a7e6642b42ec2d853553d4ef8',
-  dir: 'token',
+  contractHash: '0x6937b11039ba775836c32682738bac4e4922d671',
+  dir: 'red',
 });

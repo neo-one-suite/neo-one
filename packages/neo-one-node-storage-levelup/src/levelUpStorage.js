@@ -281,5 +281,21 @@ export default ({
       }, []);
       await db.batch(changes);
     },
+    async reset(): Promise<void> {
+      const batch = [];
+      await new Promise((resolve, reject) => {
+        db.createKeyStream()
+          .on('data', (key) => {
+            batch.push({ type: 'del', key });
+          })
+          .on('error', (error) => {
+            reject(error);
+          })
+          .on('end', () => {
+            resolve();
+          });
+      });
+      await db.batch(batch);
+    },
   };
 };

@@ -33,13 +33,14 @@ const findRoot = async (
 };
 
 export const makeAst = async (dir: string): Promise<Ast> => {
-  let tsConfigFilePath = await findRoot(dir, 'tsconfig.json');
-  if (tsConfigFilePath == null) {
-    tsConfigFilePath = await findRoot(
+  const [localSCConfig, defaultConfig] = await Promise.all([
+    findRoot(dir, 'tsconfig.sc.json'),
+    findRoot(
       require.resolve('@neo-one/smart-contract-compiler'),
       'tsconfig.default.json',
-    );
-  }
+    ),
+  ]);
+  const tsConfigFilePath = localSCConfig || defaultConfig;
 
   if (tsConfigFilePath == null) {
     throw new Error('tsconfig.json not found in path');
@@ -66,6 +67,14 @@ export const makeAst = async (dir: string): Promise<Ast> => {
 export const getAst = async (dir: string): Promise<Ast> => {
   const ast = await makeAst(dir);
   ast.addExistingSourceFiles(path.join(dir, '**', '*.ts'));
+  // For some reason this forces Ast to resolve references. Do not remove.
+  ast.getPreEmitDiagnostics();
+  return ast;
+};
+
+export const getAstForPath = async (filePath: string): Promise<Ast> => {
+  const ast = await makeAst(path.dirname(filePath));
+  ast.addExistingSourceFiles(filePath);
   // For some reason this forces Ast to resolve references. Do not remove.
   ast.getPreEmitDiagnostics();
   return ast;

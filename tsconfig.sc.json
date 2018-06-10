@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "alwaysStrict": true,
+    "baseUrl": "./packages",
     "target": "esnext",
     "module": "commonjs",
     "declaration": true,
@@ -9,11 +10,19 @@
     "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@neo-one/*": [
+        "./neo-one-*/src"
+      ],
+      "*": [
+        "../@types/*"
+      ]
+    },
     "strict": true,
     "strictFunctionTypes": true,
     "typeRoots": [
       "./node_modules/@types/",
-      "./node_modules/@neo-one/smart-contract"
+      "./packages/neo-one-smart-contract"
     ]
   }
 }

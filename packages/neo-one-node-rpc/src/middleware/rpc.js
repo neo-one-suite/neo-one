@@ -91,6 +91,7 @@ const RPC_METHODS = {
   updatesettings: 'updatesettings',
   fastforwardoffset: 'fastforwardoffset',
   fastforwardtotime: 'fastforwardtotime',
+  reset: 'reset',
   UNKNOWN: 'UNKNOWN',
   INVALID: 'INVALID',
 };
@@ -624,6 +625,17 @@ export default ({
         await node.consensus.fastForwardToTime(args[0]);
       } else {
         throw new Error('This node does not support fast forwarding.');
+      }
+
+      return true;
+    },
+    [RPC_METHODS.reset]: async () => {
+      if (node.consensus != null) {
+        await node.consensus.pause();
+      }
+      await blockchain.reset();
+      if (node.consensus != null) {
+        await node.consensus.resume();
       }
 
       return true;

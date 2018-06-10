@@ -5,7 +5,6 @@ import { ts } from 'ts-simple-ast';
 import { ABI } from '@neo-one/client/src';
 
 export interface CompileContractOptions {
-  readonly dir: string;
   readonly filePath: string;
   readonly name: string;
 }
@@ -17,11 +16,10 @@ export interface CompileContractResult {
 }
 
 export const compileContract = async ({
-  dir,
   filePath,
   name,
 }: CompileContractOptions): Promise<CompileContractResult> => {
-  const ast = await utils.getAst(dir);
+  const ast = await utils.getAstForPath(filePath);
   const smartContract = ast
     .getSourceFileOrThrow(filePath)
     .getClassOrThrow(name);

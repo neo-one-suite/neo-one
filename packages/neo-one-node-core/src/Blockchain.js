@@ -195,6 +195,7 @@ export type Blockchain = {
 
   +updateSettings: (settings: Settings) => void,
   +stop: () => Promise<void>,
+  +reset: () => Promise<void>,
 };
 
 export type WriteBlockchain = {
