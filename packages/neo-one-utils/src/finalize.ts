@@ -1,4 +1,3 @@
-/* @flow */
 import { Observable, Observer } from 'rxjs';
 
 let currentID = 0;
