@@ -5,6 +5,7 @@
 /build/
 /packages/*/lib
 /packages/*/dist
+/packages/*/dist-ts
 
 # Logs
 logs

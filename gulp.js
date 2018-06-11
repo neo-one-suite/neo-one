@@ -14,10 +14,29 @@ import resolve from 'rollup-plugin-node-resolve';
 import { rollup, watch } from 'rollup';
 import sourcemaps from 'rollup-plugin-sourcemaps';
 import through from 'through2';
+import ts from 'typescript';
 
 import getBabelConfigBase from './scripts/getBabelConfig';
 
 gulp.task('default', ['build']);
+
+const formatHost: ts.FormatDiagnosticsHost = {
+  getCanonicalFileName: (value) => value,
+  getCurrentDirectory: ts.sys.getCurrentDirectory,
+  getNewLine: () => ts.sys.newLine,
+}
+
+function reportDiagnostic(diagnostic: ts.Diagnostic) {
+  // eslint-disable-next-line
+  console.error("Error", diagnostic.code, ":",
+    ts.flattenDiagnosticMessageText(diagnostic.messageText, formatHost.getNewLine())
+  );
+}
+
+function reportWatchStatusChanged(diagnostic: ts.Diagnostic) {
+  // eslint-disable-next-line
+  console.info(ts.formatDiagnostic(diagnostic, formatHost));
+}
 
 const getSourcePackage = (source: string) => JSON.parse(
   fs.readFileSync(
@@ -86,12 +105,10 @@ const getBabelConfig = ({
 const getEntryFile = (entry: Entry) =>
   entry === 'node' ? 'index' : 'index.browser';
 
-const createRollupInput = ({ source, entry }: {| source: string, entry: Entry |}) => {
-  const dir = path.join('packages', source, 'src');
-  const indexJS = path.join(dir, `${getEntryFile(entry)}.js`);
-  const indexTS = path.join(dir, `${getEntryFile(entry)}.ts`);
-  const isJS = fs.pathExistsSync(indexJS);
-  const input = isJS ? indexJS : indexTS;
+const createRollupInput = ({ source, entry, typescript }: {| source: string, entry: Entry, typescript: boolean |}) => {
+  const indexJS = path.join(path.join('packages', source, 'src'), `${getEntryFile(entry)}.js`);
+  const indexTS = path.join(path.join('packages', source, 'dist-ts'), `${getEntryFile(entry)}.js`);
+  const input = typescript ? indexTS : indexJS;
   return {
     input,
     external: (module: string) =>
@@ -114,7 +131,7 @@ const createRollupInput = ({ source, entry }: {| source: string, entry: Entry |}
       json({ preferConst: true }),
       babel({
         exclude: path.join('node_modules', '**'),
-        ...getBabelConfig({ modules: false, entry, typescript: !isJS }),
+        ...getBabelConfig({ modules: false, entry, typescript: false }),
       }),
       sourcemaps(),
     ],
@@ -182,11 +199,13 @@ const writeBundles = async ({
 const buildSource = async ({
   source,
   entry,
+  typescript,
 }: {|
   source: string,
   entry: Entry,
+  typescript: boolean,
 |}) => {
-  const bundle = await rollup(createRollupInput({ source, entry }));
+  const bundle = await rollup(createRollupInput({ source, entry, typescript }));
 
   await writeBundles({ source, bundle, entry });
 }
@@ -202,20 +221,135 @@ const getSourcesAndEntries = () => Promise.all(
     ]);
     const result = [];
     if (existsIndex || existsIndexTS) {
-      result.push({ source, entry: 'node' });
+      result.push({ source, entry: 'node', typescript: existsIndexTS });
     }
     if (existsIndexBrowser || existsIndexBrowserTS) {
-      result.push({ source, entry: 'browser' });
+      result.push({ source, entry: 'browser', typescript: existsIndexBrowserTS });
     }
 
     return result;
   })
 ).then(result => result.reduce((acc, value) => acc.concat(value), []));
 
-gulp.task('build:dist', async () => {
+const updateCompilerOptions = (source: string, compilerOptions: Object) => {
+  const dir = path.resolve(__dirname, 'packages', source);
+  return {
+    ...compilerOptions,
+    baseUrl: path.resolve(dir, 'src'),
+    noEmit: false,
+    outDir: path.resolve(dir, 'dist-ts'),
+    paths: {
+      '@neo-one/*': ['../../neo-one-*/src'],
+      '*': ['../../../@types/*'],
+    },
+    typeRoots: [
+      path.resolve(dir, '..', '..', 'node_modules', '@types'),
+    ],
+  };
+}
+
+const getCompilerOptions = (source: string) => {
+  const configPath = path.resolve(__dirname, 'packages', source, 'tsconfig.json');
+  const res = ts.readConfigFile(configPath, (value) =>
+    fs.readFileSync(value, 'utf8'),
+  );
+  const parseConfigHost = {
+    fileExists: fs.pathExistsSync,
+    readDirectory: ts.sys.readDirectory,
+    readFile: ts.sys.readFile,
+    useCaseSensitiveFileNames: true,
+  };
+  const { options } = ts.parseJsonConfigFileContent(
+    res.config,
+    parseConfigHost,
+    path.dirname(configPath),
+  );
+  return updateCompilerOptions(source, options);
+}
+
+const getTypescriptFiles = (source: string, entries: Array<Entry>) =>
+  entries.map((entry) => path.resolve(
+    __dirname,
+    'packages',
+    source,
+    'src',
+    `${getEntryFile(entry)}.ts`,
+  ));
+
+const resolveModuleNames = (options: Object) => (moduleNames: Array<string>, containingFile: string) =>
+  moduleNames.map((moduleName) => {
+    const result = ts.resolveModuleName(moduleName, containingFile, options, {
+      fileExists: ts.sys.fileExists, readFile: ts.sys.readFile
+    });
+    if (result == null) {
+      return null;
+    }
+
+    if (moduleName.startsWith('@neo-one')) {
+      result.resolvedModule.isExternalLibraryImport = true;
+    }
+
+    return result.resolvedModule;
+  });
+
+const compileTypescript = ({
+  source,
+  entries,
+}: {|
+  source: string,
+  entries: Array<Entry>,
+|}) => {
+  const options = getCompilerOptions(source);
+  const host = ts.createCompilerHost(options);
+  host.resolveModuleNames = resolveModuleNames(options);
+  const program = ts.createProgram(
+    getTypescriptFiles(source, entries),
+    getCompilerOptions(source),
+    host,
+  );
+  const emitResult = program.emit();
+
+  const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
+
+  allDiagnostics.forEach(diagnostic => {
+    if (diagnostic.file) {
+      const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+      const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+      // eslint-disable-next-line
+      console.log(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
+    }
+    else {
+      // eslint-disable-next-line
+      console.log(`${ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')}`);
+    }
+  });
+}
+
+const getTypescriptSourceToEntries = async () => {
+  const sourcesAndEntries = await getSourcesAndEntries();
+  const sourceToEntries = {};
+  for (const { source, entry, typescript } of sourcesAndEntries) {
+    if (typescript) {
+      if (sourceToEntries[source] == null) {
+        sourceToEntries[source] = [];
+      }
+      sourceToEntries[source].push(entry);
+    }
+  }
+  return sourceToEntries;
+};
+
+gulp.task('build:ts', async () => {
+  const sourceToEntries = await getTypescriptSourceToEntries();
+  await Promise.all(Object.entries(sourceToEntries).map(
+    ([source, entries]) => compileTypescript({ source, entries: (entries: $FlowFixMe) }),
+  ));
+});
+
+gulp.task('build:dist', ['build:ts'], async () => {
   const sourcesAndEntries = await getSourcesAndEntries();
   await Promise.all(sourcesAndEntries.map(
-    ({ source, entry }) => buildSource({ source, entry }),
+    ({ source, entry, typescript }) => buildSource({ source, entry, typescript }),
   ));
 });
 
@@ -281,8 +415,8 @@ gulp.task('build', ['build:bin', 'build:flow']);
 const createRollupWatch = ({ source }: {| source: string |}) => ({
   include: path.join('packages', source, 'src', '**'),
 });
-const createWatchConfig = ({ source, entry }: {| source: string, entry: Entry |}) => ({
-  ...createRollupInput({ source, entry }),
+const createWatchConfig = ({ source, entry, typescript }: {| source: string, entry: Entry, typescript: boolean |}) => ({
+  ...createRollupInput({ source, entry, typescript }),
   output: FORMATS.map(format => createRollupOutput({ format, source, entry })),
   watch: createRollupWatch({ source }),
 });
@@ -290,7 +424,7 @@ const createWatchConfig = ({ source, entry }: {| source: string, entry: Entry |}
 gulp.task('watch', async () => {
   const sourcesAndEntries = await getSourcesAndEntries();
   const watcher = watch(sourcesAndEntries.map(
-    ({ source, entry }) => createWatchConfig({ source, entry }),
+    ({ source, entry, typescript }) => createWatchConfig({ source, entry, typescript }),
   ));
 
   watcher.on('event', event => {
@@ -306,5 +440,20 @@ gulp.task('watch', async () => {
       // eslint-disable-next-line
       console.log(event);
     }
+  });
+
+  const sourceToEntries = await getTypescriptSourceToEntries();
+  Object.entries(sourceToEntries).forEach(([source, entries]) => {
+    const options = getCompilerOptions(source);
+    const host = ts.createWatchCompilerHost(
+      getTypescriptFiles(source, (entries: $FlowFixMe)),
+      options,
+      ts.sys,
+      ts.createEmitAndSemanticDiagnosticsBuilderProgram,
+      reportDiagnostic,
+      reportWatchStatusChanged,
+    );
+    host.resolveModuleNames = resolveModuleNames(options);
+    ts.createWatchProgram(host);
   });
 });

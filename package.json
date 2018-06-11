@@ -42,7 +42,7 @@
     "flow:coverage": "flow-coverage-report -i 'packages/*/src/**/*.js' -t html",
     "precommit": "flow && tsc && tslint --project . && lint-staged",
     "bootstrap": "yarn run build && lerna bootstrap",
-    "build": "rm -rf ./packages/*/dist && yarn run gulp build",
+    "build": "rm -rf ./packages/*/dist && rm -rf ./packages/*/dist-ts && yarn run gulp build",
     "watch": "yarn run gulp watch",
     "publish": "yarn run build && lerna publish",
     "pretest-coverage": "babel-node ./scripts/test/pretest.js",
