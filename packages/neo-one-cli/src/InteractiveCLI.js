@@ -20,7 +20,7 @@ import {
 } from '@neo-one/server-plugin';
 import type { Monitor } from '@neo-one/monitor';
 import { type Observable, BehaviorSubject, combineLatest, defer } from 'rxjs';
-import Table from 'cli-table2';
+import Table from 'cli-table3';
 import Vorpal, { type Args } from 'vorpal';
 
 import {
