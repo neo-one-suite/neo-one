@@ -20,7 +20,6 @@ import {
   type ABI,
   type Transfer,
   type Hash256String,
-  type InvokeReceipt,
   type PublishReceipt,
   type SmartContract,
   type TransactionResult,
@@ -926,25 +925,31 @@ const publishTokens = async ({
 };
 
 async function transferToken({
-  wallets,
-  token,
+  tokens,
+  count,
+  developerClient,
 }: {|
-  wallets: Array<WalletData>,
-  token: TokenWithWallet,
-|}): Promise<Array<TransactionResult<InvokeReceipt>>> {
-  return Promise.all(
-    wallets.map((wallet) =>
+  tokens: Array<[TokenWithWallet, WalletData]>,
+  count: number,
+  developerClient: DeveloperClient,
+|}): Promise<void> {
+  const results = await Promise.all(
+    tokens.map(([token, wallet]) =>
       token.smartContract.transfer(
         privateKeyToScriptHash(token.wallet.privateKey),
         privateKeyToScriptHash(wallet.privateKey),
         token.amount
           .div(2)
-          .div(wallets.length)
+          .div(count)
           .integerValue(BigNumber.ROUND_FLOOR),
         { from: token.wallet.accountID },
       ),
     ),
   );
+  await Promise.all([
+    Promise.all(results.map((result) => result.confirmed())),
+    developerClient.runConsensusNow(),
+  ]);
 }
 
 const transferTokens = async ({
@@ -956,30 +961,23 @@ const transferTokens = async ({
   tokens: Array<TokenWithWallet>,
   developerClient: DeveloperClient,
 |}) => {
-  const resultss = await Promise.all(
-    tokens.map((token, idx) =>
-      transferToken({
-        wallets:
-          idx % 2 === 0
-            ? wallets.slice(0, wallets.length / 2)
-            : wallets.slice(wallets.length / 2),
+  const count = wallets.length / 2;
+  const tokensWithWallets = tokens.map((token, idx) => [
+    token,
+    idx % 2 === 0 ? wallets.slice(0, count) : wallets.slice(count),
+  ]);
+
+  for (const idx of _.range(count)) {
+    // eslint-disable-next-line
+    await transferToken({
+      tokens: tokensWithWallets.map(([token, tokenWallets]) => [
         token,
-      }),
-    ),
-  );
-  const results = _.flatten(resultss);
-
-  await Promise.all(
-    [developerClient.runConsensusNow()].concat(
-      results.map(async (result) => {
-        const receipt = await result.confirmed();
-
-        if (receipt.result.state === 'FAULT') {
-          throw new Error(receipt.result.message);
-        }
-      }),
-    ),
-  );
+        tokenWallets[idx],
+      ]),
+      count,
+      developerClient,
+    });
+  }
 };
 
 export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>

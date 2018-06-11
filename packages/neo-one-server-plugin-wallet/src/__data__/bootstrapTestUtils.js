@@ -310,7 +310,8 @@ export async function testBootstrap(
     getNetworkInfo(network),
     getInfo({ network, rpcURL }),
   ]);
-  expect(height).toEqual(13);
+  // numWallets / 2 token transfers
+  expect(height).toEqual(12 + numWallets / 2);
 
   // Bootstrap creates numWallets number of wallets
   // Wallets will also have the master wallet plus
