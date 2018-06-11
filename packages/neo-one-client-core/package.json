@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-core",
-  "version": "1.0.0-alpha.39",
+  "version": "1.0.0-alpha.40",
   "keywords": [
     "neo",
     "NEO",
@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@neo-one/ec-key": "^0.0.3",
-    "@neo-one/utils": "^1.0.0-alpha.34",
+    "@neo-one/utils": "^1.0.0-alpha.35",
     "bignumber.js": "^7.2.1",
     "bn.js": "^4.11.8",
     "bs58": "^4.0.1",
