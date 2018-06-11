@@ -18,12 +18,12 @@
       "yarn run prettier --write --config .prettierrc",
       "git add",
       "yarn run eslint",
-      "yarn run test --findRelatedTests --ci --passWithNoTests"
+      "yarn run test --findRelatedTests --ci --passWithNoTests -w 4"
     ],
     "packages/*/src/**/*.ts": [
       "yarn run prettier --write --config .prettierrc --parser typescript",
       "git add",
-      "yarn test --findRelatedTests --ci --passWithNoTests"
+      "yarn test --findRelatedTests --ci --passWithNoTests -w 4"
     ],
     "packages/*/template/**/*.js": [
       "yarn run prettier --write --config .prettierrc",
