@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-simulation",
-  "version": "1.0.0-alpha.75",
+  "version": "1.0.0-alpha.76",
   "keywords": [
     "neo",
     "NEO",
@@ -34,12 +34,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.54",
-    "@neo-one/client-core": "^1.0.0-alpha.40",
-    "@neo-one/server-plugin": "^1.0.0-alpha.40",
-    "@neo-one/server-plugin-compiler": "^1.0.0-alpha.55",
-    "@neo-one/server-plugin-network": "^1.0.0-alpha.72",
-    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.75",
+    "@neo-one/client": "^1.0.0-alpha.55",
+    "@neo-one/client-core": "^1.0.0-alpha.41",
+    "@neo-one/server-plugin": "^1.0.0-alpha.41",
+    "@neo-one/server-plugin-compiler": "^1.0.0-alpha.56",
+    "@neo-one/server-plugin-network": "^1.0.0-alpha.73",
+    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.76",
     "@neo-one/simulation-ico": "^1.0.0-alpha.20",
     "@neo-one/simulation-react": "^1.0.0-alpha.17",
     "@neo-one/simulation-template": "^1.0.0-alpha.5",

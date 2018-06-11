@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-lib",
-  "version": "1.0.0-alpha.9",
+  "version": "1.0.0-alpha.10",
   "keywords": [
     "neo",
     "NEO",
@@ -35,6 +35,6 @@
   "noCompile": true,
   "dependencies": {
     "@neo-one/smart-contract": "^1.0.0-alpha.5",
-    "@neo-one/smart-contract-test": "^1.0.0-alpha.9"
+    "@neo-one/smart-contract-test": "^1.0.0-alpha.10"
   }
 }
