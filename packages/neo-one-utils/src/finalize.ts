@@ -41,16 +41,18 @@ export function finalize<T>(
       return subscription;
     });
 }
+(finalize as any).shutdownPromises = {};
+(finalize as any).wait = async () => {
+  const promises = Object.values(finalize.shutdownPromises);
+  if (promises.length === 0) {
+    return;
+  }
 
-export namespace finalize {
-  export const shutdownPromises: { [key: string]: Promise<void> } = {};
-  export const wait = async () => {
-    const promises = Object.values(shutdownPromises);
-    if (promises.length === 0) {
-      return;
-    }
+  await Promise.all(promises);
+  await finalize.wait();
+};
 
-    await Promise.all(promises);
-    await finalize.wait();
-  };
+export declare namespace finalize {
+  export const shutdownPromises: { [key: string]: Promise<void> };
+  export const wait: () => Promise<void>;
 }

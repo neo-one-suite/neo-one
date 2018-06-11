@@ -1,4 +1,4 @@
-export const enum LABELS {
+export enum labels {
   PLUGIN_NAME = 'plugin.name',
   RESOURCETYPE_NAME = 'resource_type.name',
   NODE_NAME = 'node.name',
