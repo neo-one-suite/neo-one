@@ -1,5 +1,4 @@
-/* @flow */
-import type { Labels } from './types';
+import { Labels } from './types';
 
 const dotRegex = /\./g;
 export const convertMetricLabel = (dotLabel: string): string =>
@@ -10,7 +9,7 @@ export const convertMetricLabels = (labelsIn?: Labels): Labels => {
     return {};
   }
 
-  const labels = {};
+  const labels: Labels = {};
   for (const key of Object.keys(labelsIn)) {
     labels[convertMetricLabel(key)] = labelsIn[key];
   }
@@ -24,7 +23,7 @@ export const convertTagLabels = (labelsIn?: Labels): Labels => {
     return {};
   }
 
-  const labels = {};
+  const labels: Labels = {};
   for (const key of Object.keys(labelsIn)) {
     labels[convertTagLabel(key)] = labelsIn[key];
   }

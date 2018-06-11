@@ -16,7 +16,7 @@ import {
   type Node,
   getEndpointConfig,
 } from '@neo-one/node-core';
-import { LABELS, type Monitor, metrics } from '@neo-one/monitor';
+import { KnownLabel, type Monitor, metrics } from '@neo-one/monitor';
 
 import compose from 'koa-compose';
 import compress from 'koa-compress';
@@ -96,9 +96,9 @@ const RPC_METHODS = {
   INVALID: 'INVALID',
 };
 
-const rpcLabelNames = [LABELS.RPC_METHOD];
+const rpcLabelNames = [KnownLabel.RPC_METHOD];
 const rpcLabels = utils.values(RPC_METHODS).map((method) => ({
-  [LABELS.RPC_METHOD]: method,
+  [KnownLabel.RPC_METHOD]: method,
 }));
 const SINGLE_REQUESTS_HISTOGRAM = metrics.createHistogram({
   name: 'http_jsonrpc_server_single_request_duration_seconds',

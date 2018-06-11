@@ -1,16 +1,16 @@
-/* @flow */
 /* @jest-environment jsdom */
 import prom from 'prom-client';
 
-import CollectingLogger from '../CollectingLogger';
-import NodeMonitor from '../NodeMonitor';
-import Reporter from '../Reporter';
+import { CollectingLogger } from '../CollectingLogger';
+import { NodeMonitor } from '../NodeMonitor';
+import { Reporter } from '../Reporter';
 
-import collectingMetrics from '../CollectingMetricsFactory';
-import metrics from '../NoOpMetricsFactory';
+import { collectingMetrics } from '../CollectingMetricsFactory';
+import { metrics } from '../NoOpMetricsFactory';
+import { LoggerLogOptions } from '../types';
 
 describe('BrowserMonitor', () => {
-  const options1 = {
+  const options1: LoggerLogOptions = {
     name: 'log1',
     level: 'info',
     message: 'test1',
@@ -18,8 +18,8 @@ describe('BrowserMonitor', () => {
     data: { data1: '20' },
   };
   const error = new Error('testError');
-  (error: $FlowFixMe).code = 'red';
-  const options2 = {
+  (error as any).code = 'red';
+  const options2: LoggerLogOptions = {
     name: 'log2',
     level: 'silly',
     message: 'test2',
@@ -33,7 +33,7 @@ describe('BrowserMonitor', () => {
     error: {
       message: error.message,
       stack: error.stack,
-      code: (error: $FlowFixMe).code,
+      code: (error as any).code,
     },
   };
 
@@ -99,7 +99,7 @@ describe('BrowserMonitor', () => {
   };
 
   let logger = new CollectingLogger();
-  let reporter;
+  let reporter: Reporter | null;
   beforeEach(() => {
     logger = new CollectingLogger();
     reporter = null;
@@ -107,7 +107,7 @@ describe('BrowserMonitor', () => {
   });
 
   afterEach(() => {
-    collectingMetrics.reset();
+    collectingMetrics.reset_forTest();
     prom.register.clear();
     if (reporter != null) {
       reporter.close();
@@ -163,7 +163,7 @@ describe('BrowserMonitor', () => {
   });
 
   test('Reporter - POST success', async () => {
-    global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
+    (global as any).fetch = jest.fn(() => Promise.resolve({ ok: true }));
 
     reporter = new Reporter({
       logger,
@@ -177,7 +177,7 @@ describe('BrowserMonitor', () => {
     counter.inc(5);
     counter.inc(4);
 
-    const firstResult = await reporter._collectReport({
+    const firstResult = await reporter.collectReport_forTest({
       backReport: emptyBackReport,
       logger,
     });
@@ -187,21 +187,21 @@ describe('BrowserMonitor', () => {
     const histogram = metrics.createHistogram(histogramOptions1);
     histogram.observe({ histLabel1: 14 }, 3);
 
-    const secondResult = await reporter._collectReport({
+    const secondResult = await reporter.collectReport_forTest({
       backReport: emptyBackReport,
       logger,
     });
 
     expect(secondResult).toEqual(emptyBackReport);
 
-    expect(fetch.mock.calls).toMatchSnapshot();
+    expect((fetch as any).mock.calls).toMatchSnapshot();
 
     await new Promise((resolve) => setTimeout(() => resolve(), 2000));
-    expect(fetch.mock.calls.length).toBeGreaterThanOrEqual(3);
+    expect((fetch as any).mock.calls.length).toBeGreaterThanOrEqual(3);
   });
 
   test('Reporter - POST failure', async () => {
-    global.fetch = jest.fn(() => Promise.resolve({ ok: false }));
+    (global as any).fetch = jest.fn(() => Promise.resolve({ ok: false }));
 
     reporter = new Reporter({
       logger,
@@ -233,7 +233,7 @@ describe('BrowserMonitor', () => {
       },
     };
 
-    const firstResult = await reporter._collectReport({
+    const firstResult = await reporter.collectReport_forTest({
       backReport: emptyBackReport,
       logger,
     });
@@ -264,17 +264,17 @@ describe('BrowserMonitor', () => {
       },
     };
 
-    const secondResult = await reporter._collectReport({
+    const secondResult = await reporter.collectReport_forTest({
       backReport: emptyBackReport,
       logger,
     });
 
     expect(secondResult).toEqual(secondBackReport);
 
-    expect(fetch.mock.calls).toMatchSnapshot();
+    expect((fetch as any).mock.calls).toMatchSnapshot();
 
     await new Promise((resolve) => setTimeout(() => resolve(), 2000));
-    expect(fetch.mock.calls.length).toBeGreaterThanOrEqual(3);
+    expect((fetch as any).mock.calls.length).toBeGreaterThanOrEqual(3);
   });
 
   describe('report to Node', () => {
@@ -297,9 +297,8 @@ describe('BrowserMonitor', () => {
       const nodeCounter = {
         inc: jest.fn(),
       };
-      const createCounterSpy = jest
-        .spyOn(metrics, 'createCounter')
-        .mockImplementationOnce(() => nodeCounter);
+      const createCounterSpy = jest.spyOn(metrics, 'createCounter');
+      createCounterSpy.mockImplementationOnce(() => nodeCounter);
       nodeMonitor.report(JSON.parse(testReport));
       createCounterSpy.mockRestore();
 
@@ -323,9 +322,8 @@ describe('BrowserMonitor', () => {
       const nodeHistogram = {
         observe: jest.fn(),
       };
-      const createHistogramSpy = jest
-        .spyOn(metrics, 'createHistogram')
-        .mockImplementationOnce(() => nodeHistogram);
+      const createHistogramSpy = jest.spyOn(metrics, 'createHistogram');
+      createHistogramSpy.mockImplementationOnce(() => nodeHistogram);
       nodeMonitor.report(JSON.parse(testReport));
       createHistogramSpy.mockRestore();
 
@@ -345,7 +343,7 @@ describe('BrowserMonitor', () => {
       const nodeMonitor = NodeMonitor.create({
         service: 'test',
       });
-      const logSpy = jest.spyOn(nodeMonitor._logger, 'log');
+      const logSpy = jest.spyOn((nodeMonitor as any).logger, 'log');
       nodeMonitor.report(JSON.parse(testReport));
 
       expect([[options1], [options2]]).toEqual(logSpy.mock.calls);

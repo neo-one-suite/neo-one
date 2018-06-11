@@ -1,18 +1,16 @@
-/* @flow */
-import { type Subscription, interval } from 'rxjs';
+import { Subscription, interval } from 'rxjs';
 
 import { mergeScan } from 'rxjs/operators';
-import { utils } from '@neo-one/utils';
 
-import type CollectingLogger from './CollectingLogger';
-import type { Counter, Report } from './types';
+import { CollectingLogger } from './CollectingLogger';
+import { Counter, Report } from './types';
 
-import collectingMetrics from './CollectingMetricsFactory';
-import metricsFactory from './NoOpMetricsFactory';
+import { collectingMetrics } from './CollectingMetricsFactory';
+import { metrics as metricsFactory } from './NoOpMetricsFactory';
 
 const MAX_BACKLOG = 1000;
 
-const EMPTY_BACKREPORT = {
+const EMPTY_BACKREPORT: Report = {
   logs: [],
   metrics: {
     counters: {},
@@ -20,34 +18,39 @@ const EMPTY_BACKREPORT = {
   },
 };
 
-export default class Reporter {
-  _endpoint: string;
-  _subscription: Subscription;
-  _requestsTotal: Counter;
-  _requestErrorsTotal: Counter;
+export interface CollectReportOptions {
+  backReport?: Report;
+  logger: CollectingLogger;
+}
+
+export class Reporter {
+  private readonly endpoint: string;
+  private readonly subscription: Subscription;
+  private readonly requestsTotal: Counter;
+  private readonly requestErrorsTotal: Counter;
 
   constructor({
     logger,
     timer,
     endpoint,
-  }: {|
-    logger: CollectingLogger,
-    timer: number,
-    endpoint: string,
-  |}) {
-    this._endpoint = endpoint;
-    this._requestsTotal = metricsFactory.createCounter({
+  }: {
+    logger: CollectingLogger;
+    timer: number;
+    endpoint: string;
+  }) {
+    this.endpoint = endpoint;
+    this.requestsTotal = metricsFactory.createCounter({
       name: 'http_report_metrics_requests_total',
     });
-    this._requestErrorsTotal = metricsFactory.createCounter({
+    this.requestErrorsTotal = metricsFactory.createCounter({
       name: 'http_report_metrics_failures_total',
     });
 
-    this._subscription = interval(timer)
+    this.subscription = interval(timer)
       .pipe(
         mergeScan(
           async (backReport) =>
-            this._collectReport({
+            this.collectReport({
               backReport,
               logger,
             }),
@@ -58,42 +61,49 @@ export default class Reporter {
       .subscribe();
   }
 
-  async _report(report: Report): Promise<Response> {
-    return fetch(this._endpoint, {
+  public close(): void {
+    this.subscription.unsubscribe();
+  }
+
+  public async collectReport_forTest(
+    options: CollectReportOptions,
+  ): Promise<Report> {
+    return this.collectReport(options);
+  }
+
+  private async report(report: Report): Promise<Response> {
+    return fetch(this.endpoint, {
       method: 'POST',
       body: JSON.stringify(report),
     });
   }
 
-  async _collectReport({
+  private async collectReport({
     backReport,
     logger,
-  }: {|
-    backReport?: Report,
-    logger: CollectingLogger,
-  |}): Promise<Report> {
+  }: CollectReportOptions): Promise<Report> {
     const logs = logger.collect();
     const metrics = collectingMetrics.collect();
 
-    const report = this._addBackReport({ logs, metrics }, backReport);
+    const report = this.addBackReport({ logs, metrics }, backReport);
 
     let response;
     try {
-      response = await this._report(report);
+      response = await this.report(report);
     } catch (error) {
       response = { ok: false };
     }
 
-    this._requestsTotal.inc();
+    this.requestsTotal.inc();
     if (!response.ok) {
-      this._requestErrorsTotal.inc();
-      return this._constructBackReport(report);
+      this.requestErrorsTotal.inc();
+      return this.constructBackReport(report);
     }
 
     return EMPTY_BACKREPORT;
   }
 
-  _addBackReport(report: Report, backReport?: Report): Report {
+  private addBackReport(report: Report, backReport?: Report): Report {
     if (backReport == null) {
       return report;
     }
@@ -101,7 +111,7 @@ export default class Reporter {
     return {
       logs: backReport.logs.concat(report.logs),
       metrics: {
-        counters: utils.entries(backReport.metrics.counters).reduce(
+        counters: Object.entries(backReport.metrics.counters).reduce(
           (accMetric, [name, metric]) => ({
             ...accMetric,
             [name]: {
@@ -114,7 +124,7 @@ export default class Reporter {
           }),
           report.metrics.counters,
         ),
-        histograms: utils.entries(backReport.metrics.histograms).reduce(
+        histograms: Object.entries(backReport.metrics.histograms).reduce(
           (accMetric, [name, metric]) => ({
             ...accMetric,
             [name]: {
@@ -131,11 +141,11 @@ export default class Reporter {
     };
   }
 
-  _constructBackReport(report: Report): Report {
+  private constructBackReport(report: Report): Report {
     return {
       logs: report.logs.slice(-MAX_BACKLOG),
       metrics: {
-        counters: utils.entries(report.metrics.counters).reduce(
+        counters: Object.entries(report.metrics.counters).reduce(
           (accMetric, [name, metric]) => ({
             ...accMetric,
             [name]: {
@@ -145,7 +155,7 @@ export default class Reporter {
           }),
           {},
         ),
-        histograms: utils.entries(report.metrics.histograms).reduce(
+        histograms: Object.entries(report.metrics.histograms).reduce(
           (accMetric, [name, metric]) => ({
             ...accMetric,
             [name]: {
@@ -157,9 +167,5 @@ export default class Reporter {
         ),
       },
     };
-  }
-
-  close(): void {
-    this._subscription.unsubscribe();
   }
 }

@@ -1,24 +1,23 @@
-/* @flow */
-import Koa, { type Context } from 'koa';
+import { IncomingMessage } from 'http';
+import Koa, { Context } from 'koa';
+import { Server } from 'net';
 
 import gcStats from 'prometheus-gc-stats';
 import mount from 'koa-mount';
 import prom from 'prom-client';
 
-import type { LogLevel, Monitor } from './types';
-import MonitorBase, { type Logger, type Tracer } from './MonitorBase';
+import { Logger, LogLevel, Monitor } from './types';
+import { MonitorBase, Tracer } from './MonitorBase';
 
-type NodeMonitorCreate = {|
-  service: string,
-  logger?: Logger,
-  tracer?: Tracer,
-  spanLogLevel?: LogLevel,
-|};
+export interface NodeMonitorCreate {
+  service: string;
+  logger?: Logger;
+  tracer?: Tracer;
+  spanLogLevel?: LogLevel;
+}
 
-export default class NodeMonitor extends MonitorBase {
-  _server: ?net$Server = null;
-
-  static create({
+export class NodeMonitor extends MonitorBase {
+  public static create({
     service,
     logger,
     tracer,
@@ -30,7 +29,9 @@ export default class NodeMonitor extends MonitorBase {
       service,
       component: service,
       logger: logger || {
-        log: () => {},
+        log: () => {
+          // do nothing
+        },
         close: (callback: () => void) => {
           callback();
         },
@@ -43,7 +44,9 @@ export default class NodeMonitor extends MonitorBase {
     });
   }
 
-  forContext(ctx: Context): Monitor {
+  private server: Server | null = null;
+
+  public forContext(ctx: Context): Monitor {
     return this.withLabels({
       [this.labels.HTTP_METHOD]: ctx.request.method,
       [this.labels.SPAN_KIND]: 'server',
@@ -59,16 +62,16 @@ export default class NodeMonitor extends MonitorBase {
     });
   }
 
-  forMessage(message: http$IncomingMessage): Monitor {
+  public forMessage(message: IncomingMessage): Monitor {
     const app = new Koa();
     app.proxy = true;
     // $FlowFixMe
     app.silent = true;
-    const ctx = ((app: $FlowFixMe).createContext(message, undefined): Context);
+    const ctx = app.createContext(message, undefined as any);
     return this.forContext(ctx);
   }
 
-  serveMetrics(port: number): void {
+  public serveMetrics(port: number): void {
     const app = new Koa();
     app.proxy = true;
     // $FlowFixMe
@@ -89,18 +92,18 @@ export default class NodeMonitor extends MonitorBase {
       }),
     );
 
-    this._server = app.listen(port);
+    this.server = app.listen(port);
   }
 
-  async _closeInternal(): Promise<void> {
+  protected async closeInternal(): Promise<void> {
     clearInterval(prom.collectDefaultMetrics());
     await Promise.all([
-      super._closeInternal(),
+      super.closeInternal(),
       new Promise((resolve) => {
-        if (this._server == null) {
+        if (this.server == null) {
           resolve();
         } else {
-          this._server.close(() => resolve());
+          this.server.close(() => resolve());
         }
       }),
     ]);

@@ -889,7 +889,13 @@
   version "3.2.2"
   resolved "https://registry.npmjs.org/@types/koa-compose/-/koa-compose-3.2.2.tgz#dc106e000bbf92a3ac900f756df47344887ee847"
 
-"@types/koa@2.0.46":
+"@types/koa-mount@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.npmjs.org/@types/koa-mount/-/koa-mount-3.0.1.tgz#2c068d1696b173c62c316158210c4316c4401f57"
+  dependencies:
+    "@types/koa" "*"
+
+"@types/koa@*", "@types/koa@2.0.46":
   version "2.0.46"
   resolved "https://registry.npmjs.org/@types/koa/-/koa-2.0.46.tgz#24bc3cd405d10fcde81f876cd8285b44d4ddc3e9"
   dependencies:

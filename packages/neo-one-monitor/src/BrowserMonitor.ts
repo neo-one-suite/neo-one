@@ -1,16 +1,15 @@
-/* @flow */
-import type { LogLevel } from './types';
-import MonitorBase, { type Logger, type Tracer } from './MonitorBase';
+import { Logger, LogLevel } from './types';
+import { MonitorBase, Tracer } from './MonitorBase';
 
-type BrowserMonitorCreate = {|
-  service: string,
-  logger?: Logger,
-  tracer?: Tracer,
-  spanLogLevel?: LogLevel,
-|};
+export interface BrowserMonitorCreate {
+  service: string;
+  logger?: Logger;
+  tracer?: Tracer;
+  spanLogLevel?: LogLevel;
+}
 
-export default class BrowserMonitor extends MonitorBase {
-  static create({
+export class BrowserMonitor extends MonitorBase {
+  public static create({
     service,
     logger,
     tracer,
@@ -20,7 +19,9 @@ export default class BrowserMonitor extends MonitorBase {
       service,
       component: service,
       logger: logger || {
-        log: () => {},
+        log: () => {
+          // do nothing
+        },
         close: (callback: () => void) => {
           callback();
         },

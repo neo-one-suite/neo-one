@@ -19,6 +19,7 @@ untyped-import=warn
 unclear-type=off
 unsafe-getters-setters=off
 deprecated-type=off
+untyped-type-import=off
 
 [options]
 module.use_strict=true
