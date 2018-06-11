@@ -40,6 +40,6 @@
     "@neo-one/utils": "^1.0.0-alpha.35",
     "lodash": "^4.17.5",
     "memdown": "^3.0.0",
-    "ts-simple-ast": "^12.2.0"
+    "ts-simple-ast": "^12.4.0"
   }
 }

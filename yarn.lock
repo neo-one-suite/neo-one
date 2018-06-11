@@ -790,6 +790,10 @@
   dependencies:
     asn1.js "^1.0.4"
 
+"@neo-one/smart-contract-internal@^1.0.0-alpha.3":
+  version "1.0.0-alpha.3"
+  resolved "https://registry.npmjs.org/@neo-one/smart-contract-internal/-/smart-contract-internal-1.0.0-alpha.3.tgz#6cf26aa959ce0fb18da6d771cd6b1faa9a597c13"
+
 "@nodelib/fs.stat@^1.0.1":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@nodelib/fs.stat/-/fs.stat-1.1.0.tgz#50c1e2260ac0ed9439a181de3725a0168d59c48a"
@@ -1020,13 +1024,13 @@ ajv-keywords@^3.0.0:
   version "3.2.0"
   resolved "https://registry.npmjs.org/ajv-keywords/-/ajv-keywords-3.2.0.tgz#e86b819c602cf8821ad637413698f1dec021847a"
 
-ajv@6.5.0, ajv@^5.0.0, ajv@^5.1.0, ajv@^5.1.5, ajv@^5.2.0, ajv@^5.2.3, ajv@^5.3.0, ajv@^6.0.1, ajv@^6.5.0:
-  version "6.5.0"
-  resolved "https://registry.npmjs.org/ajv/-/ajv-6.5.0.tgz#4c8affdf80887d8f132c9c52ab8a2dc4d0b7b24c"
+ajv@6.5.1, ajv@^5.0.0, ajv@^5.1.0, ajv@^5.1.5, ajv@^5.2.0, ajv@^5.2.3, ajv@^5.3.0, ajv@^6.0.1, ajv@^6.5.1:
+  version "6.5.1"
+  resolved "https://registry.npmjs.org/ajv/-/ajv-6.5.1.tgz#88ebc1263c7133937d108b80c5572e64e1d9322d"
   dependencies:
     fast-deep-equal "^2.0.1"
     fast-json-stable-stringify "^2.0.0"
-    json-schema-traverse "^0.3.0"
+    json-schema-traverse "^0.4.1"
     uri-js "^4.2.1"
 
 align-text@^0.1.1, align-text@^0.1.3:
@@ -2852,8 +2856,8 @@ compare-func@^1.3.1:
     dot-prop "^3.0.0"
 
 compare-versions@^3.1.0:
-  version "3.2.1"
-  resolved "https://registry.npmjs.org/compare-versions/-/compare-versions-3.2.1.tgz#a49eb7689d4caaf0b6db5220173fd279614000f7"
+  version "3.3.0"
+  resolved "https://registry.npmjs.org/compare-versions/-/compare-versions-3.3.0.tgz#af93ea705a96943f622ab309578b9b90586f39c3"
 
 component-emitter@^1.2.1:
   version "1.2.1"
@@ -3962,8 +3966,8 @@ escape-string-regexp@1.0.5, escape-string-regexp@^1.0.2, escape-string-regexp@^1
   resolved "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
 
 escodegen@^1.6.1, escodegen@^1.9.0:
-  version "1.9.1"
-  resolved "https://registry.npmjs.org/escodegen/-/escodegen-1.9.1.tgz#dbae17ef96c8e4bedb1356f4504fa4cc2f7cb7e2"
+  version "1.10.0"
+  resolved "https://registry.npmjs.org/escodegen/-/escodegen-1.10.0.tgz#f647395de22519fbd0d928ffcf1d17e0dec2603e"
   dependencies:
     esprima "^3.1.3"
     estraverse "^4.2.0"
@@ -5491,8 +5495,8 @@ hmac-drbg@^1.0.0:
     minimalistic-crypto-utils "^1.0.1"
 
 hoist-non-react-statics@^2.3.1, hoist-non-react-statics@^2.5.0:
-  version "2.5.2"
-  resolved "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-2.5.2.tgz#de8381ea0fbed0041cb49d132c1ff654d3c79455"
+  version "2.5.0"
+  resolved "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-2.5.0.tgz#d2ca2dfc19c5a91c5a6615ce8e564ef0347e2a40"
 
 home-or-tmp@^3.0.0:
   version "3.0.0"
@@ -5658,8 +5662,8 @@ icss-utils@^2.1.0:
     postcss "^6.0.1"
 
 ieee754@^1.1.4:
-  version "1.1.11"
-  resolved "https://registry.npmjs.org/ieee754/-/ieee754-1.1.11.tgz#c16384ffe00f5b7835824e67b6f2bd44a5229455"
+  version "1.1.12"
+  resolved "https://registry.npmjs.org/ieee754/-/ieee754-1.1.12.tgz#50bf24e5b9c8bb98af4964c941cdb0918da7b60b"
 
 ignore-walk@^3.0.1:
   version "3.0.1"
@@ -7025,9 +7029,9 @@ json-parse-better-errors@^1.0.1:
   version "1.0.2"
   resolved "https://registry.npmjs.org/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz#bb867cfb3450e69107c131d1c514bab3dc8bcaa9"
 
-json-schema-traverse@^0.3.0:
-  version "0.3.1"
-  resolved "https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-0.3.1.tgz#349a6d44c53a51de89b40805c5d5e59b417d3340"
+json-schema-traverse@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-0.4.1.tgz#69f6a87d9513ab8bb8fe63bdb0979c448e684660"
 
 json-schema@0.2.3:
   version "0.2.3"
@@ -7158,8 +7162,8 @@ jss-vendor-prefixer@^7.0.0:
     css-vendor "^0.3.8"
 
 jss@^9.3.3, jss@^9.7.0:
-  version "9.8.2"
-  resolved "https://registry.npmjs.org/jss/-/jss-9.8.2.tgz#09cabdfba831545bf094e399cfa45a1743daf4a6"
+  version "9.8.3"
+  resolved "https://registry.npmjs.org/jss/-/jss-9.8.3.tgz#399da571c4b2c8f4cf418ca7e8627e44fc287fc8"
   dependencies:
     is-in-browser "^1.1.3"
     symbol-observable "^1.1.0"
@@ -7416,8 +7420,8 @@ level-errors@~2.0.0:
     errno "~0.1.1"
 
 level-iterator-stream@~2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/level-iterator-stream/-/level-iterator-stream-2.0.0.tgz#e0fe4273a0322177c81bb87684016bb5b90a98b4"
+  version "2.0.1"
+  resolved "https://registry.npmjs.org/level-iterator-stream/-/level-iterator-stream-2.0.1.tgz#3ef8309d238578cd8730b2a15b764f26862d9e63"
   dependencies:
     inherits "^2.0.1"
     readable-stream "^2.0.5"
@@ -8602,8 +8606,8 @@ nunjucks@^3.1.3:
   resolved "https://registry.npmjs.org/nwmatcher/-/nwmatcher-1.4.4.tgz#2285631f34a95f0d0395cd900c96ed39b58f346e"
 
 nwsapi@^2.0.0:
-  version "2.0.2"
-  resolved "https://registry.npmjs.org/nwsapi/-/nwsapi-2.0.2.tgz#33a0aab27c678d4dfdbba6a7f84b1c627fc4966f"
+  version "2.0.3"
+  resolved "https://registry.npmjs.org/nwsapi/-/nwsapi-2.0.3.tgz#3f4010d6c943f34018d3dfb5f2fbc0de90476959"
 
 oauth-sign@~0.8.2:
   version "0.8.2"
@@ -11455,9 +11459,9 @@ ts-jest@22.4.6:
     source-map-support "^0.5.5"
     yargs "^11.0.0"
 
-ts-simple-ast@^12.2.0:
-  version "12.2.0"
-  resolved "https://registry.npmjs.org/ts-simple-ast/-/ts-simple-ast-12.2.0.tgz#a6d084135ea896ecd14794fef3e2bbc596660afa"
+ts-simple-ast@^12.4.0:
+  version "12.4.0"
+  resolved "https://registry.npmjs.org/ts-simple-ast/-/ts-simple-ast-12.4.0.tgz#6b53f6d6a59145da637dfe0e8c646d1e66ba278a"
   dependencies:
     "@dsherret/to-absolute-glob" "^2.0.2"
     code-block-writer "^7.2.0"
