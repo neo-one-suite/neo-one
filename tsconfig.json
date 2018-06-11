@@ -5,6 +5,7 @@
     "baseUrl": "./packages",
     "target": "esnext",
     "module": "commonjs",
+    "moduleResolution": "node",
     "declaration": true,
     "experimentalDecorators": true,
     "lib": [

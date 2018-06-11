@@ -18,9 +18,6 @@ export const executeScript = async (
   prelude: Buffer = Buffer.alloc(0, 0),
 ): Promise<InvocationResult> => {
   const blockchain = await Blockchain.create({
-    log: () => {
-      // tslint:disable-next-line
-    },
     settings: testNet,
     storage: levelUpStorage({
       context: { messageMagic: testNet.messageMagic },

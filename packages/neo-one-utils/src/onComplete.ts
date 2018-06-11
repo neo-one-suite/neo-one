@@ -1,11 +1,10 @@
-/* @flow */
-import { Observable } from 'rxjs';
+import { Observable, Observer } from 'rxjs';
 
-function onComplete<T>(
+export function onComplete<T>(
   func: () => void,
 ): (source: Observable<T>) => Observable<T> {
   return (source: Observable<T>) =>
-    Observable.create((observer) =>
+    Observable.create((observer: Observer<T>) =>
       source.subscribe({
         next: (value) => observer.next(value),
         error: (error) => observer.error(error),
@@ -16,5 +15,3 @@ function onComplete<T>(
       }),
     );
 }
-
-export default onComplete;
