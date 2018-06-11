@@ -193,10 +193,12 @@ const testTokens = async ({
   wallets,
   transferWallets,
   client,
+  tokenGas,
 }: {|
   wallets: Array<Wallet>,
   transferWallets: Array<Wallet>,
   client: ReadClient<*>,
+  tokenGas: string,
 |}) => {
   const addressToWallet = getAddressToWallet(wallets);
   // Order is important here due to the idx % 2 check below
@@ -233,7 +235,7 @@ const testTokens = async ({
           wallet,
           (coin) => coin.asset === common.GAS_ASSET_HASH,
         );
-        expect(gasCoin.amount).toEqual('48953');
+        expect(gasCoin.amount).toEqual(tokenGas);
 
         await Promise.all(
           transferredWallets.map(async (transferredWallet) => {
@@ -298,6 +300,7 @@ export async function testBootstrap(
   numWallets: number,
   network: string,
   getInfo: (options: Options) => Promise<Info>,
+  tokenGas: string,
 ): Promise<void> {
   await one.execute(`create network ${network}`);
 
@@ -338,5 +341,5 @@ export async function testBootstrap(
 
   testTransfersAndClaims({ transferWallets });
   testAssets({ wallets, transferWallets });
-  await testTokens({ wallets, transferWallets, client });
+  await testTokens({ wallets, transferWallets, client, tokenGas });
 }

@@ -98,6 +98,7 @@ describe('bootstrap with rpc', () => {
       10,
       'boottest-rpc',
       getInfo,
+      '48953',
     );
   });
 });
