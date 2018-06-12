@@ -1,19 +1,19 @@
 import BN from 'bn.js';
 import {
-  VM_STATE,
+  VMState,
   ContractParameter,
   ContractParameterType,
   InvocationResult,
 } from '@neo-one/client-core';
 
 export const checkResult = (result: InvocationResult) => {
-  if (result.state === VM_STATE.FAULT) {
+  if (result.state === VMState.Fault) {
     throw new Error(`Error in execution: ${result.message}`);
   }
 };
 
 const checkStackLength = (result: InvocationResult, length: number) => {
-  if (result.state === VM_STATE.FAULT) {
+  if (result.state === VMState.Fault) {
     throw new Error(`Error in execution: ${result.message}`);
   }
 

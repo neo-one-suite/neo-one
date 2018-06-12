@@ -810,12 +810,22 @@
   dependencies:
     "@types/node" "*"
 
+"@types/base-x@*":
+  version "1.0.29"
+  resolved "https://registry.npmjs.org/@types/base-x/-/base-x-1.0.29.tgz#8a2d73e4a5c3121757a5f8870cfa4509655186b6"
+
 "@types/body-parser@*":
   version "1.17.0"
   resolved "https://registry.npmjs.org/@types/body-parser/-/body-parser-1.17.0.tgz#9f5c9d9bd04bb54be32d5eb9fc0d8c974e6cf58c"
   dependencies:
     "@types/connect" "*"
     "@types/node" "*"
+
+"@types/bs58@^3.0.30":
+  version "3.0.30"
+  resolved "https://registry.npmjs.org/@types/bs58/-/bs58-3.0.30.tgz#916ba10992465e56f81afc735e7935fd749893e1"
+  dependencies:
+    "@types/base-x" "*"
 
 "@types/connect@*":
   version "3.4.32"

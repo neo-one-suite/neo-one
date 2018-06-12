@@ -33,7 +33,7 @@ beforeEach(() => {
 
 const verifyBlockIterator = async () => {
   let index = 0;
-  await AsyncIterable.from(blockIterator).forEach((value) => {
+  await AsyncIterable.from((blockIterator: $FlowFixMe)).forEach((value) => {
     expect(value).toBe(blocks[index]);
     index += 1;
   });
@@ -58,7 +58,7 @@ describe('AsyncBlockIterator', () => {
     client.getBlockCount = jest.fn(() => Promise.reject(error));
     let thrownError;
     try {
-      await toArray(AsyncIterable.from(blockIterator));
+      await toArray(AsyncIterable.from((blockIterator: $FlowFixMe)));
     } catch (err) {
       thrownError = err;
     }

@@ -1,6 +1,4 @@
 /* @flow */
-import { AsyncIteratorBase } from '@neo-one/client-core';
-
 import type { Event } from './types';
 
 type Item =
@@ -11,20 +9,22 @@ type Resolver = {|
   reject: (reason: Error) => void,
 |};
 
-export default class ConsensusQueue extends AsyncIteratorBase<
-  Event,
-  void,
-  void,
-> {
+// $FlowFixMe
+export default class ConsensusQueue
+  implements $AsyncIterator<Event, void, void> {
   _items: Array<Item>;
   _resolvers: Array<Resolver>;
   __done: boolean;
 
   constructor() {
-    super();
     this._items = [];
     this._resolvers = [];
     this.__done = false;
+  }
+
+  // $FlowFixMe
+  [Symbol.asyncIterator]() {
+    return this;
   }
 
   next(): Promise<IteratorResult<Event, void>> {

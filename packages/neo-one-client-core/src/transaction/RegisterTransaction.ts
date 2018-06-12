@@ -1,0 +1,240 @@
+import BN from 'bn.js';
+import { AssetNameJSON } from '../Asset';
+import { Attribute } from './attribute';
+import {
+  AssetType,
+  AssetTypeJSON,
+  assertAssetType,
+  toJSONAssetType,
+} from '../AssetType';
+import { TransactionType } from './TransactionType';
+import {
+  DeserializeWireBaseOptions,
+  SerializeJSONContext,
+} from '../Serializable';
+import {
+  TransactionBase,
+  FeeContext,
+  TransactionBaseAdd,
+  TransactionBaseJSON,
+  TransactionGetScriptHashesForVerifyingOptions,
+  TransactionVerifyOptions,
+} from './TransactionBase';
+import { InvalidFormatError, VerifyError } from '../errors';
+import { Witness } from '../Witness';
+import { common, ECPoint, UInt160, UInt160Hex } from '../common';
+import { crypto } from '../crypto';
+import { utils, BinaryWriter, IOHelper, JSONHelper } from '../utils';
+
+interface Asset {
+  readonly type: AssetType;
+  readonly name: string;
+  readonly amount: BN;
+  readonly precision: number;
+  readonly owner: ECPoint;
+  readonly admin: UInt160;
+}
+
+export interface RegisterTransactionAdd extends TransactionBaseAdd {
+  asset: Asset;
+}
+
+export interface RegisterTransactionJSON extends TransactionBaseJSON {
+  type: 'RegisterTransaction';
+  asset: {
+    type: AssetTypeJSON;
+    name: AssetNameJSON;
+    amount: string;
+    precision: number;
+    owner: string;
+    admin: string;
+  };
+}
+
+export class RegisterTransaction extends TransactionBase<
+  typeof TransactionType.Register,
+  RegisterTransactionJSON
+> {
+  public static deserializeWireBase(
+    options: DeserializeWireBaseOptions,
+  ): RegisterTransaction {
+    const { reader } = options;
+
+    const { type, version } = super.deserializeTransactionBaseStartWireBase(
+      options,
+    );
+
+    if (type !== TransactionType.Register) {
+      throw new InvalidFormatError();
+    }
+
+    const assetType = assertAssetType(reader.readUInt8());
+    const name = reader.readVarString(1024);
+    const amount = reader.readFixed8();
+    const precision = reader.readUInt8();
+    const owner = reader.readECPoint();
+    const admin = reader.readUInt160();
+
+    const {
+      attributes,
+      inputs,
+      outputs,
+      scripts,
+    } = super.deserializeTransactionBaseEndWireBase(options);
+
+    return new this({
+      version,
+      attributes,
+      inputs,
+      outputs,
+      scripts,
+      asset: {
+        type: assetType,
+        name,
+        amount,
+        precision,
+        owner,
+        admin,
+      },
+    });
+  }
+
+  public readonly asset: Asset;
+  protected readonly sizeExclusive: () => number = utils.lazy(
+    () =>
+      IOHelper.sizeOfUInt8 +
+      IOHelper.sizeOfUInt8 +
+      IOHelper.sizeOfVarString(this.asset.name) +
+      IOHelper.sizeOfFixed8 +
+      IOHelper.sizeOfUInt8 +
+      IOHelper.sizeOfECPoint(this.asset.owner) +
+      IOHelper.sizeOfUInt160,
+  );
+  private readonly registerGetScriptHashesForVerifyingInternal: (
+    options: TransactionGetScriptHashesForVerifyingOptions,
+  ) => Promise<Set<UInt160Hex>>;
+
+  constructor({
+    version,
+    attributes,
+    inputs,
+    outputs,
+    scripts,
+    hash,
+    asset,
+  }: RegisterTransactionAdd) {
+    super({
+      version,
+      type: TransactionType.Register,
+      attributes,
+      inputs,
+      outputs,
+      scripts,
+      hash,
+    });
+
+    this.asset = asset;
+
+    if (this.version !== 0) {
+      throw new InvalidFormatError();
+    }
+
+    if (
+      common.ecPointIsInfinity(asset.owner) &&
+      asset.type !== AssetType.GoverningToken &&
+      asset.type !== AssetType.UtilityToken
+    ) {
+      throw new InvalidFormatError();
+    }
+
+    this.registerGetScriptHashesForVerifyingInternal = utils.lazyAsync(
+      async (options: TransactionGetScriptHashesForVerifyingOptions) => {
+        const hashes = await super.getScriptHashesForVerifying(options);
+        const scriptHash = common.uInt160ToHex(
+          crypto.getVerificationScriptHash(this.asset.owner),
+        );
+
+        return new Set([...hashes, scriptHash]);
+      },
+    );
+  }
+
+  public clone({
+    scripts,
+    attributes,
+  }: {
+    scripts?: Witness[];
+    attributes?: Attribute[];
+  }): RegisterTransaction {
+    return new RegisterTransaction({
+      version: this.version,
+      attributes: attributes || this.attributes,
+      inputs: this.inputs,
+      outputs: this.outputs,
+      scripts: scripts || this.scripts,
+      hash: this.hash,
+      asset: this.asset,
+    });
+  }
+
+  public serializeExclusiveBase(writer: BinaryWriter): void {
+    writer.writeUInt8(this.asset.type);
+    writer.writeVarString(this.asset.name);
+    writer.writeFixed8(this.asset.amount);
+    writer.writeUInt8(this.asset.precision);
+    writer.writeECPoint(this.asset.owner);
+    writer.writeUInt160(this.asset.admin);
+  }
+
+  public async serializeJSON(
+    context: SerializeJSONContext,
+  ): Promise<RegisterTransactionJSON> {
+    const transactionBaseJSON = await super.serializeTransactionBaseJSON(
+      context,
+    );
+
+    let { name } = this.asset;
+    try {
+      name = JSON.parse(name);
+    } catch (error) {
+      // ignore errors
+    }
+
+    return {
+      ...transactionBaseJSON,
+      type: 'RegisterTransaction',
+      asset: {
+        type: toJSONAssetType(this.asset.type),
+        name,
+        amount: JSONHelper.writeFixed8(this.asset.amount),
+        precision: this.asset.precision,
+        owner: JSONHelper.writeECPoint(this.asset.owner),
+        admin: crypto.scriptHashToAddress({
+          addressVersion: context.addressVersion,
+          scriptHash: this.asset.admin,
+        }),
+      },
+    };
+  }
+
+  public getSystemFee(context: FeeContext): BN {
+    if (
+      this.asset.type === AssetType.GoverningToken ||
+      this.asset.type === AssetType.UtilityToken
+    ) {
+      return utils.ZERO;
+    }
+
+    return super.getSystemFee(context);
+  }
+
+  public async getScriptHashesForVerifying(
+    options: TransactionGetScriptHashesForVerifyingOptions,
+  ): Promise<Set<UInt160Hex>> {
+    return this.registerGetScriptHashesForVerifyingInternal(options);
+  }
+
+  public async verify(options: TransactionVerifyOptions): Promise<void> {
+    throw new VerifyError('Enrollment transactions are obsolete');
+  }
+}

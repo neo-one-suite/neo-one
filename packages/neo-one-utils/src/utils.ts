@@ -11,7 +11,7 @@ function nullthrows<T>(value: T | null): T {
 export const utils = {
   nowSeconds,
   nullthrows,
-  keys: Object.keys,
-  entries: Object.entries,
-  values: Object.values,
+  notNull<T>(value: T | null | undefined): value is T {
+    return value != null;
+  },
 };

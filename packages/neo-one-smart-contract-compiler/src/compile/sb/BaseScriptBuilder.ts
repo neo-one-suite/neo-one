@@ -1,14 +1,14 @@
 // tslint:disable ban-types
 import {
-  BYTECODE_TO_BYTECODE_BUFFER,
-  OPCODE_TO_BYTECODE,
+  ByteBuffer,
+  Op,
   BinaryWriter,
   ByteCode,
   OpCode,
   UnknownOpError,
   utils,
   ScriptBuilder as ClientScriptBuilder,
-  SysCallName,
+  SysCall,
 } from '@neo-one/client-core';
 import BN from 'bn.js';
 import Ast, { Node, SourceFile, Type, Symbol } from 'ts-simple-ast';
@@ -152,8 +152,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
         const offsetPC = new BN(value.pc.getPC()).sub(new BN(pc));
         // @ts-ignore
         const jumpPC = offsetPC.toTwos(16);
-        const byteCodeBuffer =
-          BYTECODE_TO_BYTECODE_BUFFER[OPCODE_TO_BYTECODE[value.op]];
+        const byteCodeBuffer = ByteBuffer[Op[value.op]];
         if (byteCodeBuffer == null) {
           throw new Error(
             'Something went wrong, could not find bytecode buffer',
@@ -212,7 +211,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
     code: OpCode,
     buffer?: Buffer | null | undefined,
   ): void {
-    const bytecode = OPCODE_TO_BYTECODE[code];
+    const bytecode = Op[code];
     if (bytecode == null) {
       throw new UnknownOpError(code);
     }
@@ -226,10 +225,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
     } else if (value.eq(utils.ZERO)) {
       return this.emitPush(node, utils.toSignedBuffer(value));
     } else if (value.gt(utils.ZERO) && value.lt(utils.SIXTEEN)) {
-      return this.emitOpByte(
-        node,
-        OPCODE_TO_BYTECODE.PUSH1 - 1 + value.toNumber(),
-      );
+      return this.emitOpByte(node, Op.PUSH1 - 1 + value.toNumber());
     }
 
     return this.emitPush(node, utils.toSignedBuffer(value));
@@ -278,7 +274,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
     this.emitJump(node, new Call(this.jumpTablePC));
   }
 
-  public emitSysCall(node: Node, name: SysCallName): void {
+  public emitSysCall(node: Node, name: SysCall): void {
     const sysCallBuffer = Buffer.from(name, 'ascii');
     const writer = new BinaryWriter();
     writer.writeVarBytesLE(sysCallBuffer);
@@ -494,7 +490,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
   ): TScope;
 
   private emitPush(node: Node, value: Buffer): void {
-    if (value.length <= OPCODE_TO_BYTECODE.PUSHBYTES75) {
+    if (value.length <= Op.PUSHBYTES75) {
       this.emitOpByte(node, value.length, value);
     } else if (value.length < 0x100) {
       this.emitOp(
@@ -530,14 +526,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
 
   private emitOpByte(
     node: Node,
-    byteCodeIn: ByteCode | null,
+    byteCode: ByteCode,
     buffer?: Buffer | null | undefined,
   ): void {
-    const byteCode = `${byteCodeIn == null ? '' : byteCodeIn}`;
-    const byteCodeBuffer = BYTECODE_TO_BYTECODE_BUFFER[byteCode];
-    if (byteCodeBuffer == null) {
-      throw new UnknownOpError(byteCode);
-    }
+    const byteCodeBuffer = ByteBuffer[byteCode];
     let value = byteCodeBuffer;
     if (buffer != null) {
       value = Buffer.concat([byteCodeBuffer, buffer]);

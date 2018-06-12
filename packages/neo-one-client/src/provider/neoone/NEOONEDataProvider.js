@@ -241,12 +241,12 @@ export default class NEOONEDataProvider
 
   iterBlocks(filter?: BlockFilter): AsyncIterable<Block> {
     return AsyncIterableX.from(
-      new AsyncBlockIterator({
+      (new AsyncBlockIterator({
         client: this,
         filter: filter || {},
         fetchTimeoutMS: this._iterBlocksFetchTimeoutMS,
         batchSize: this._iterBlocksBatchSize,
-      }),
+      }): $FlowFixMe),
     );
   }
 

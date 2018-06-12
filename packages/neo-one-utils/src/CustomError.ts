@@ -19,7 +19,7 @@ function inherits(subClass, superClass) {
   }
 }
 
-export let CustomError = (function(_super) {
+export let CustomError: typeof Error = (function(_super) {
   inherits(CustomError, _super);
   function CustomError() {
     // @ts-ignore
@@ -30,4 +30,4 @@ export let CustomError = (function(_super) {
     return _this;
   }
   return CustomError;
-})(Error);
+})(Error) as any;

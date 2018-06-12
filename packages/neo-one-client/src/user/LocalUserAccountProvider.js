@@ -1074,7 +1074,7 @@ export default class LocalUserAccountProvider<
       .reverse();
 
     const sum = outputsOrdered.reduce(
-      (acc, coin) => acc.plus(coin.value),
+      (acc: BigNumber, coin) => acc.plus(coin.value),
       utils.ZERO_BIG_NUMBER,
     );
 

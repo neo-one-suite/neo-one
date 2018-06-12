@@ -19,6 +19,9 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
+      "@neo-one/ec-key": [
+        "../@types/@neo-one/ec-key"
+      ],
       "@neo-one/*": [
         "./neo-one-*/src"
       ],
@@ -29,6 +32,7 @@
     "pretty": true,
     "strict": true,
     "strictFunctionTypes": true,
+    "strictNullChecks": true,
     "typeRoots": [
       "./node_modules/@types/",
       "./packages/neo-one-smart-contract"

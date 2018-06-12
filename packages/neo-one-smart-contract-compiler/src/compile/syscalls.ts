@@ -1369,8 +1369,8 @@ export const SYSCALLS = {
     ],
     returnType: StorageIteratorValue,
   }),
-  'Neo.Iterator.Next': new SimpleSysCall({
-    name: 'Neo.Iterator.Next',
+  'Neo.Enumerator.Next': new SimpleSysCall({
+    name: 'Neo.Enumerator.Next',
     args: [new SysCallArgument('iterator', StorageIteratorValue)],
     returnType: BooleanValue,
   }),
@@ -1379,8 +1379,8 @@ export const SYSCALLS = {
     args: [new SysCallArgument('iterator', StorageIteratorValue)],
     returnType: StorageKey,
   }),
-  'Neo.Iterator.Value': new SimpleSysCall({
-    name: 'Neo.Iterator.Value',
+  'Neo.Enumerator.Value': new SimpleSysCall({
+    name: 'Neo.Enumerator.Value',
     args: [new SysCallArgument('iterator', StorageIteratorValue)],
     returnType: StorageValue,
   }),

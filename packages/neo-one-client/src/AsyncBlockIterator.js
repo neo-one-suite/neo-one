@@ -1,5 +1,4 @@
 /* @flow */
-import { AsyncIteratorBase } from '@neo-one/client-core';
 import type { Monitor } from '@neo-one/monitor';
 
 import _ from 'lodash';
@@ -30,11 +29,9 @@ const FETCH_TIMEOUT_MS = 20000;
 const QUEUE_SIZE = 1000;
 const BATCH_SIZE = 10;
 
-export default class AsyncBlockIterator extends AsyncIteratorBase<
-  Block,
-  void,
-  void,
-> {
+// $FlowFixMe
+export default class AsyncBlockIterator
+  implements $AsyncIterator<Block, void, void> {
   _client: Client;
   _items: Array<Item>;
   _resolvers: Array<Resolver>;
@@ -53,7 +50,6 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
     fetchTimeoutMS,
     batchSize,
   }: AsyncBlockIteratorOptions) {
-    super();
     this._client = client;
     this._items = [];
     this._resolvers = [];
@@ -69,6 +65,11 @@ export default class AsyncBlockIterator extends AsyncIteratorBase<
       filter.monitor == null
         ? undefined
         : filter.monitor.at('async_block_iterator');
+  }
+
+  // $FlowFixMe
+  [Symbol.asyncIterator]() {
+    return this;
   }
 
   next(): Promise<IteratorResult<Block, void>> {
