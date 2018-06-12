@@ -42,7 +42,8 @@ export default class ObjectStackItem<Value: Equatable> extends StackItemBase {
     throw new InvalidValueBufferError();
   }
 
-  toContractParameter(): ContractParameter {
+  // eslint-disable-next-line
+  toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new InteropInterfaceContractParameter();
   }
 

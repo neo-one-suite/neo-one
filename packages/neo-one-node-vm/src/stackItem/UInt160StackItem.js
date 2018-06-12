@@ -41,7 +41,8 @@ export default class UInt160StackItem extends StackItemBase {
     return common.uInt160ToBuffer(this.value);
   }
 
-  toContractParameter(): ContractParameter {
+  // eslint-disable-next-line
+  toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new Hash160ContractParameter(this.value);
   }
 }
