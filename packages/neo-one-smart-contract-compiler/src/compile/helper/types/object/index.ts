@@ -11,6 +11,7 @@ export * from './GetSymbolObjectHelper';
 export * from './GetSymbolObjectPropertyHelper';
 export * from './InstanceofHelper';
 export * from './IsObjectHelper';
+export * from './PackObjectHelper';
 export * from './SetAccessorPropertyObjectPropertyHelper';
 export * from './SetAccessorSymbolObjectPropertyHelper';
 export * from './SetDataPropertyObjectPropertyHelper';
