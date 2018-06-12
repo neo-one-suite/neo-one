@@ -327,4 +327,8 @@ export default class JSONRPCClient {
       monitor,
     );
   }
+
+  reset(monitor?: Monitor): Promise<void> {
+    return this._provider.request({ method: 'reset' }, monitor);
+  }
 }

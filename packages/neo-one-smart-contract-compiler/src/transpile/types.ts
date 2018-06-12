@@ -8,3 +8,7 @@ export interface TranspileResult {
   abi: ABI;
   context: Context;
 }
+
+export interface VisitOptions {
+  isSmartContract: boolean;
+}

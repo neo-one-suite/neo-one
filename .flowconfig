@@ -1,5 +1,5 @@
 [version]
-0.73.0
+0.74.0
 
 [ignore]
 .*/node_modules/babel-plugin-flow-runtime/.*
@@ -19,6 +19,7 @@ untyped-import=warn
 unclear-type=off
 unsafe-getters-setters=off
 deprecated-type=off
+untyped-type-import=off
 
 [options]
 module.use_strict=true

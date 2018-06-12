@@ -355,7 +355,15 @@ export const assertTransactionOptions = (
     throw new InvalidNamedArgumentError('TransactionOptions', options);
   }
 
-  assertNullableString('TransactionOptions', options.from);
+  const { from } = options;
+  if (from != null) {
+    if (typeof from !== 'object') {
+      throw new InvalidNamedArgumentError('TransactionOptions', options);
+    }
+    assertString('TransactionOptions', from.network);
+    assertString('TransactionOptions', from.address);
+  }
+
   if (options.attributes != null) {
     if (!Array.isArray(options.attributes)) {
       throw new InvalidNamedArgumentError('TransactionOptions', options);

@@ -23,4 +23,8 @@ export default class DeveloperClient {
   async fastForwardToTime(seconds: number): Promise<void> {
     await this._developerProvider.fastForwardToTime(seconds);
   }
+
+  async reset(): Promise<void> {
+    await this._developerProvider.reset();
+  }
 }

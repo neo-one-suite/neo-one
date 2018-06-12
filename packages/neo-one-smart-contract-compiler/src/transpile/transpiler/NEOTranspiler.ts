@@ -9,8 +9,17 @@ import Ast, {
   Identifier,
   SyntaxKind,
   TypeNode,
+  SourceFile,
+  CallExpression,
 } from 'ts-simple-ast';
-import { ABIParameter, ABIReturn, ABIFunction } from '@neo-one/client';
+import {
+  ABIParameter,
+  ABIReturn,
+  ABIFunction,
+  ABIEvent,
+} from '@neo-one/client';
+
+import _ from 'lodash';
 
 import { Context } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
@@ -20,7 +29,7 @@ import { Transpiler } from './Transpiler';
 import declarations from '../declaration';
 import * as nodeUtils from '../../nodeUtils';
 import * as typeUtils from '../../typeUtils';
-import { TranspileResult } from '../types';
+import { TranspileResult, VisitOptions } from '../types';
 
 const transpilers = [declarations];
 
@@ -58,8 +67,231 @@ export class NEOTranspiler implements Transpiler {
 
   public process(): TranspileResult {
     const file = this.smartContract.getSourceFile();
-    this.visit(file);
+    const events = this.processEvents(file);
+    this.visit(this.smartContract, { isSmartContract: true });
+    this.context.libAliases.reset();
+    const functions = this.processSmartContract(file);
+    this.strip();
 
+    return {
+      ast: this.ast,
+      sourceFile: file,
+      abi: { functions, events },
+      context: this.context,
+    };
+  }
+
+  public visit(node: Node, options: VisitOptions): void {
+    const transpiler = this.transpilers[node.compilerNode.kind];
+    if (transpiler != null) {
+      transpiler.visitNode(this, node, options);
+    }
+  }
+
+  public isSmartContract(node: ClassDeclaration): boolean {
+    return (
+      node === this.smartContract ||
+      node.getDerivedClasses().some((derived) => this.isSmartContract(derived))
+    );
+  }
+
+  public getType(node: Node): Type | undefined {
+    return this.context.getType(node);
+  }
+
+  public getTypeOfSymbol(
+    symbol: Symbol | undefined,
+    node: Node,
+  ): Type | undefined {
+    return this.context.getTypeOfSymbol(symbol, node);
+  }
+
+  public getSymbol(node: Node): Symbol | undefined {
+    return this.context.getSymbol(node);
+  }
+
+  public isOnlyGlobal(
+    node: Node,
+    type: Type | undefined,
+    name: keyof Globals,
+  ): boolean {
+    return this.context.isOnlyGlobal(node, type, name);
+  }
+
+  public isLibSymbol(
+    node: Node,
+    symbol: Symbol | undefined,
+    name: keyof Libs,
+  ): boolean {
+    return this.context.isLibSymbol(node, symbol, name);
+  }
+
+  public isOnlyLib(
+    node: Node,
+    type: Type | undefined,
+    name: keyof Libs,
+  ): boolean {
+    return this.context.isOnlyLib(node, type, name);
+  }
+
+  public isLibAlias(
+    identifier: Identifier | undefined,
+    name: keyof LibAliases,
+  ): boolean {
+    return this.context.isLibAlias(identifier, name);
+  }
+
+  public isFixedType(node: Node, type: Type | undefined): boolean {
+    if (type == null) {
+      return false;
+    }
+
+    return this.isLibSymbol(
+      node,
+      type.getAliasSymbol() || type.getSymbol(),
+      'Fixed',
+    );
+  }
+
+  public isSmartContractOptions(options: VisitOptions): VisitOptions {
+    return { ...options, isSmartContract: true };
+  }
+
+  public reportError(node: Node, message: string, code: DiagnosticCode): void {
+    this.context.reportError(node, message, code);
+  }
+
+  public reportUnsupported(node: Node): void {
+    this.context.reportUnsupported(node);
+  }
+
+  public assertNotNull<T>(value: T | undefined | null): T {
+    return this.context.assertNotNull(value);
+  }
+
+  public filterNotNull<T>(value: T | undefined | null): value is T {
+    return value != null;
+  }
+
+  private processEvents(file: SourceFile): ABIEvent[] {
+    const decl = this.context.libs.createEventHandler.getValueDeclarationOrThrow();
+    if (decl == null || !TypeGuards.isReferenceFindableNode(decl)) {
+      throw new Error('Something went wrong!');
+    }
+
+    const calls = decl
+      .findReferencesAsNodes()
+      .map((node) => {
+        if (TypeGuards.isIdentifier(node)) {
+          const parent = node.getParent();
+          if (parent != null && TypeGuards.isCallExpression(parent)) {
+            return parent;
+          }
+        }
+        return null;
+      })
+      .filter(this.filterNotNull);
+    const events = calls
+      .map((call) => this.toABIEvent(call))
+      .filter(this.filterNotNull);
+
+    return events;
+  }
+
+  private toABIEvent(call: CallExpression): ABIEvent | null {
+    const nameArg = call.getArguments()[0];
+    if (nameArg == null || !TypeGuards.isStringLiteral(nameArg)) {
+      this.reportError(
+        nameArg,
+        'Invalid event specification.',
+        DiagnosticCode.INVALID_CONTRACT_EVENT,
+      );
+      return null;
+    }
+
+    const name = nameArg.getLiteralValue();
+    const parameters = _.zip(
+      call.getArguments().slice(1),
+      call.getTypeArguments(),
+    )
+      .map(([paramNameArg, paramTypeNode]) => {
+        if (paramNameArg == null || paramTypeNode == null) {
+          this.reportError(
+            call,
+            'Invalid event specification.',
+            DiagnosticCode.INVALID_CONTRACT_EVENT,
+          );
+          return null;
+        }
+
+        if (!TypeGuards.isStringLiteral(paramNameArg)) {
+          this.reportError(
+            paramNameArg,
+            'Invalid event specification.',
+            DiagnosticCode.INVALID_CONTRACT_EVENT,
+          );
+          return null;
+        }
+
+        const paramName = paramNameArg.getLiteralValue();
+        return this.toABIParameter(
+          paramName,
+          paramNameArg,
+          this.getType(paramTypeNode),
+          this.getIdentifier(paramTypeNode),
+        );
+      })
+      .filter(this.filterNotNull);
+
+    const parent = call.getParent();
+    if (parent == null || !TypeGuards.isVariableDeclaration(parent)) {
+      this.reportError(
+        nameArg,
+        'Invalid event specification.',
+        DiagnosticCode.INVALID_CONTRACT_EVENT,
+      );
+    } else {
+      const identifier = parent.getNameNode();
+      identifier
+        .findReferencesAsNodes()
+        .map((node) => {
+          if (TypeGuards.isIdentifier(node)) {
+            const nodeParent = node.getParent();
+            if (nodeParent != null && TypeGuards.isCallExpression(nodeParent)) {
+              return nodeParent;
+            }
+          }
+
+          return null;
+        })
+        .filter(this.filterNotNull)
+        .forEach((eventCall) => this.replaceEventCall(name, eventCall));
+
+      parent.remove();
+    }
+
+    return { name, parameters };
+  }
+
+  private replaceEventCall(name: string, call: CallExpression): void {
+    const args = [`'${name}'`]
+      .concat(call.getArguments().map((arg) => arg.getText()))
+      .join(', ');
+    call.replaceWithText(`syscall('Neo.Runtime.Notify', ${args})`);
+  }
+
+  private strip(): void {
+    this.context.libAliases.reset();
+    const identifiers = [...this.context.libAliases.Fixed];
+    identifiers.forEach((identifier) => {
+      const parent = identifier.getParent();
+      if (parent != null && TypeGuards.isTypeReferenceNode(parent)) {
+        parent.replaceWithText('number');
+      }
+    });
+  }
+
+  private processSmartContract(file: SourceFile): ABIFunction[] {
     const smartContract = file.getClassOrThrow(
       this.smartContract.getNameOrThrow(),
     );
@@ -161,108 +393,7 @@ export class NEOTranspiler implements Transpiler {
 
     file.addStatements(statements);
 
-    return {
-      ast: this.ast,
-      sourceFile: file,
-      abi: { functions },
-      context: this.context,
-    };
-  }
-
-  public visit(node?: Node): void {
-    if (node == null) {
-      return;
-    }
-
-    const transpiler = this.transpilers[node.compilerNode.kind];
-    if (transpiler == null) {
-      node.getChildren().forEach((child) => {
-        this.visit(child);
-      });
-    } else {
-      transpiler.visitNode(this, node);
-    }
-  }
-
-  public isSmartContract(node: ClassDeclaration): boolean {
-    return (
-      node === this.smartContract ||
-      node.getDerivedClasses().some((derived) => this.isSmartContract(derived))
-    );
-  }
-
-  public getType(node: Node): Type | undefined {
-    return this.context.getType(node);
-  }
-
-  public getTypeOfSymbol(
-    symbol: Symbol | undefined,
-    node: Node,
-  ): Type | undefined {
-    return this.context.getTypeOfSymbol(symbol, node);
-  }
-
-  public getSymbol(node: Node): Symbol | undefined {
-    return this.context.getSymbol(node);
-  }
-
-  public isOnlyGlobal(
-    node: Node,
-    type: Type | undefined,
-    name: keyof Globals,
-  ): boolean {
-    return this.context.isOnlyGlobal(node, type, name);
-  }
-
-  public isLibSymbol(
-    node: Node,
-    symbol: Symbol | undefined,
-    name: keyof Libs,
-  ): boolean {
-    return this.context.isLibSymbol(node, symbol, name);
-  }
-
-  public isOnlyLib(
-    node: Node,
-    type: Type | undefined,
-    name: keyof Libs,
-  ): boolean {
-    return this.context.isOnlyLib(node, type, name);
-  }
-
-  public isLibAlias(
-    identifier: Identifier | undefined,
-    name: keyof LibAliases,
-  ): boolean {
-    return this.context.isLibAlias(identifier, name);
-  }
-
-  public isFixedType(node: Node, type: Type | undefined): boolean {
-    if (type == null) {
-      return false;
-    }
-
-    return this.isLibSymbol(
-      node,
-      type.getAliasSymbol() || type.getSymbol(),
-      'Fixed',
-    );
-  }
-
-  public reportError(node: Node, message: string, code: DiagnosticCode): void {
-    this.context.reportError(node, message, code);
-  }
-
-  public reportUnsupported(node: Node): void {
-    this.context.reportUnsupported(node);
-  }
-
-  public assertNotNull<T>(value: T | undefined | null): T {
-    return this.context.assertNotNull(value);
-  }
-
-  public filterNotNull<T>(value: T | undefined | null): value is T {
-    return value != null;
+    return functions;
   }
 
   private processProperty(
@@ -384,7 +515,7 @@ export class NEOTranspiler implements Transpiler {
 
       const parameters = callSignature
         .getParameters()
-        .map((parameter) => this.toABIParameter(parameter))
+        .map((parameter) => this.paramToABIParameter(parameter))
         .filter(this.filterNotNull);
       const returnType = this.toABIReturn(
         decl,
@@ -436,18 +567,32 @@ export class NEOTranspiler implements Transpiler {
       );
   }
 
-  private toABIParameter(param: Symbol): ABIParameter | undefined {
+  private paramToABIParameter(param: Symbol): ABIParameter | undefined {
     const decl = this.assertNotNull(param.getDeclarations()[0]);
     const id = TypeGuards.isParameterDeclaration(decl)
       ? this.getIdentifier(decl.getTypeNode())
       : undefined;
 
-    const type = this.toABIReturn(decl, this.getTypeOfSymbol(param, decl), id);
+    return this.toABIParameter(
+      param.getName(),
+      decl,
+      this.getTypeOfSymbol(param, decl),
+      id,
+    );
+  }
+
+  private toABIParameter(
+    name: string,
+    node: Node,
+    resolvedType: Type | undefined,
+    typeIdentifier?: Identifier,
+  ): ABIParameter | undefined {
+    const type = this.toABIReturn(node, resolvedType, typeIdentifier);
     if (type == null) {
       return undefined;
     }
 
-    return { ...type, name: param.getName() };
+    return { ...type, name };
   }
 
   private toABIReturn(
@@ -505,7 +650,7 @@ export class NEOTranspiler implements Transpiler {
 
   private getFixedDecimals(type: Type): number {
     return (type.getUnionTypes()[1].getIntersectionTypes()[1]
-      .compilerType as any).value;
+      .compilerType as any).typeArguments[0].value;
   }
 
   private getIdentifier(node: TypeNode | undefined): Identifier | undefined {

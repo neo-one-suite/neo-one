@@ -15,13 +15,16 @@ import {
   wifToPrivateKey,
   privateKeyToAddress,
   privateKeyToPublicKey,
+  privateKeyToScriptHash,
   createPrivateKey,
+  type ABI,
   type Transfer,
-  type Account,
-  type AssetType,
   type Hash256String,
+  type PublishReceipt,
+  type SmartContract,
   type TransactionResult,
   type TransactionReceipt,
+  type UserAccountID,
 } from '@neo-one/client';
 import { common } from '@neo-one/client-core';
 import {
@@ -30,16 +33,19 @@ import {
 } from '@neo-one/server-plugin-network';
 
 import _ from 'lodash';
+import { findAndCompileContract } from '@neo-one/smart-contract-compiler';
+import fs from 'fs-extra';
 import { of as _of } from 'rxjs';
 import ora from 'ora';
+import path from 'path';
+
 import type { Wallet } from './WalletResourceType';
 import type WalletPlugin from './WalletPlugin';
 
 import constants from './constants';
-import { kycContract, conciergeContract } from './__data__/contracts';
 
 const DEFAULT_NUM_WALLETS = 10;
-const DEFAULT_MASTER_PRIVATE_KEY =
+export const DEFAULT_MASTER_PRIVATE_KEY =
   '9e9522c90f4b33cac8a174353ae54651770f3f4dd1de78e74d9b49ba615d7c1f';
 const DEFAULT_NETWORK_NAME = 'priv';
 export const DEFAULT_PRIVATE_KEYS = [
@@ -47,32 +53,76 @@ export const DEFAULT_PRIVATE_KEYS = [
   '6cad314f75624a26b780368a8b0753d10815ca44c1fca6eb3972484548805d9e',
   'e91dc6e5fffcae0510ef5a7e41675d024e5b286769b3ff455e71e01a4cf16ef0',
   'fa38cb00810d173e14631219d8ee689ee183a3d307c3c8bd2e1234d332dd3255',
+  '3ca9e1140253f75dded54a1e73bfd44678d0cbf7b9ee7229dfa2cf06aba6a3b5',
+  '3cdafff958a81f84425b062085aad7a842fd35d980f873aee392116cdd10969d',
+  '48e297109c2a9d46a9f72ad9bcf71ad784e2613695b9455dc1b1a3295955c774',
+  '996b7ff875733a4b4aa92f450923bf64ee0f1b9d8c88028d06cef808221f2fb2',
+  'eeb0940129baed17ae519a228afed2664a7bce372df0885a2675ee4426151a0f',
+  '31efd094e0e299daaae8e08c1f7e99df0d71f8f26b30924274901812a4730992',
 ];
+type AssetInfo = {|
+  assetType: string,
+  name: string,
+  amount: BigNumber,
+  precision: number,
+  privateKey: string,
+|};
 export const ASSET_INFO = [
   {
     assetType: 'Token',
     name: 'redcoin',
     amount: new BigNumber(1000000),
     precision: 4,
+    privateKey:
+      '7bb05e6087cd116aa5f1da9001736a5350981c4548116e2bc08c9a4f29b3fee4',
   },
   {
     assetType: 'Token',
     name: 'bluecoin',
-    amount: new BigNumber(650000),
+    amount: new BigNumber(660000),
     precision: 0,
+    privateKey:
+      'c27b96a2854ead7d4b4ef50de2695201fef87d3d46c9b36a6cd113774706748b',
   },
   {
     assetType: 'Currency',
     name: 'greencoin',
     amount: new BigNumber(50000000),
     precision: 6,
+    privateKey:
+      '8868b8c6152e3ba39e3c31b4774f67fcce3465f41720a408d59bfd34e6980ec3',
+  },
+];
+export type TokenInfo = {|
+  name: string,
+  amount: BigNumber,
+  privateKey: string,
+|};
+export const TOKEN_INFO = [
+  {
+    name: 'RedToken',
+    amount: new BigNumber(1000000),
+    privateKey:
+      '3fedc9048caf7b75cece9d0db85748e5cb44940ff4d48f6230526db295040df4',
+  },
+  {
+    name: 'BlueToken',
+    amount: new BigNumber(660000),
+    privateKey:
+      'b29b677bf6c1abb7e184d943df10c3b57bedc14a85f9fda21cc93ec1b91be9ae',
+  },
+  {
+    name: 'GreenToken',
+    amount: new BigNumber(50000000),
+    privateKey:
+      'b8ec5eb6c6f499240fc431bbf68feee76ef503212e61496f0c8b8804168ae954',
   },
 ];
 
 type WalletData = {|
   name: string,
   privateKey: string,
-  address: string,
+  accountID: UserAccountID,
 |};
 
 type NetworkData = {|
@@ -85,6 +135,7 @@ type BootstrapData = {|
   master: WalletData,
   wallets: Array<WalletData>,
   assetWallets: Array<WalletData>,
+  tokenWallets: Array<WalletData>,
 |};
 
 const getNetwork = async ({
@@ -125,6 +176,27 @@ async function getRPC({ options }: GetCLIResourceOptions): Promise<string> {
   );
 }
 
+const makeWallet = ({
+  networkName,
+  wallet,
+}: {|
+  networkName: string,
+  wallet: Wallet,
+|}) => {
+  if (wallet.wif == null) {
+    throw new Error(`Something went wrong, wif is null for ${wallet.name}`);
+  }
+
+  return {
+    name: wallet.name,
+    privateKey: wifToPrivateKey(wallet.wif),
+    accountID: {
+      network: networkName,
+      address: wallet.address,
+    },
+  };
+};
+
 async function getWallet({
   walletName,
   networkName,
@@ -150,25 +222,20 @@ async function getWallet({
   if (wallet == null) {
     throw new Error(`Failed to find wallet, ${walletName}`);
   }
-  if (wallet.wif == null) {
-    throw new Error(`Something went wrong, wif is null for ${walletName}`);
-  }
 
-  return {
-    name: wallet.name,
-    privateKey: wifToPrivateKey(wallet.wif),
-    address: wallet.address,
-  };
+  return makeWallet({ networkName, wallet });
 }
 
 async function createWallet({
   walletName,
   networkName,
   cli,
+  privateKey,
 }: {|
   walletName: string,
   networkName: string,
   cli: InteractiveCLI,
+  privateKey?: string,
 |}): Promise<WalletData> {
   const walletResource = await cli.client.createResource({
     plugin: constants.PLUGIN,
@@ -176,50 +243,27 @@ async function createWallet({
     name: constants.makeWallet({ name: walletName, network: networkName }),
     options: {
       network: networkName,
+      privateKey,
     },
     cancel$: _of(),
   });
 
   const wallet = ((walletResource: $FlowFixMe): Wallet);
 
-  if (wallet.wif == null) {
-    throw new Error(`Something went wrong, wif is null for ${walletName}`);
-  }
-
-  return {
-    name: wallet.name,
-    privateKey: wifToPrivateKey(wallet.wif),
-    address: wallet.address,
-  };
+  return makeWallet({ networkName, wallet });
 }
 
 function getNumWallets(options: Object): number {
-  const { wallets } = options;
-  if (wallets != null) {
-    if (typeof wallets === 'number') {
-      return wallets;
-    }
+  let { wallets } = options;
+  if (wallets != null && typeof wallets !== 'number') {
     throw new Error('--wallets <number> option must be a number');
   }
 
-  return DEFAULT_NUM_WALLETS;
-}
-
-function randomInt(max: number): number {
-  return Math.floor(Math.random() * Math.floor(max)) + 1;
-}
-
-function randomIntDist(seed: number): number {
-  if (seed < 40) {
-    return randomInt(100);
-  } else if (seed >= 40 && seed < 90) {
-    return randomInt(1000);
-  } else if (seed >= 90 && seed < 97) {
-    return randomInt(10000);
-  } else if (seed >= 97 && seed < 100) {
-    return randomInt(100000);
+  if (wallets == null) {
+    wallets = DEFAULT_NUM_WALLETS;
   }
-  return randomInt(1000000);
+
+  return wallets % 2 === 0 ? wallets : wallets + 1;
 }
 
 async function createTransfers({
@@ -227,34 +271,28 @@ async function createTransfers({
   from,
 }: {|
   wallet: WalletData,
-  from?: Account,
+  from?: WalletData,
 |}): Promise<Array<Transfer>> {
   let neo;
   let gas;
   if (from == null) {
-    const seed = randomInt(100);
-    neo = new BigNumber(randomIntDist(seed));
-    gas = new BigNumber(randomIntDist(seed));
+    neo = new BigNumber('1000000');
+    gas = new BigNumber('1000000');
   } else {
-    const transferPercent = new BigNumber(randomInt(75) / 100);
-    neo = transferPercent
-      .times(from.balances[common.NEO_ASSET_HASH])
-      .integerValue(BigNumber.ROUND_CEIL);
-    gas = transferPercent
-      .times(from.balances[common.GAS_ASSET_HASH])
-      .integerValue(BigNumber.ROUND_CEIL);
+    neo = new BigNumber('250000');
+    gas = new BigNumber('250000');
   }
 
   return [
     {
       amount: neo,
       asset: common.NEO_ASSET_HASH,
-      to: wallet.address,
+      to: wallet.accountID.address,
     },
     {
       amount: gas,
       asset: common.GAS_ASSET_HASH,
-      to: wallet.address,
+      to: wallet.accountID.address,
     },
   ];
 }
@@ -262,19 +300,17 @@ async function createTransfers({
 async function initializeWallets({
   wallets,
   master,
-  networkName,
   client,
   developerClient,
 }: {|
   wallets: Array<WalletData>,
   master: WalletData,
-  networkName: string,
   client: Client<*>,
   developerClient: DeveloperClient,
 |}): Promise<void> {
   const [firstWalletBatch, secondWalletBatch] = _.chunk(
     wallets,
-    Math.ceil(wallets.length / 2),
+    wallets.length / 2,
   );
 
   let firstTransferBatch = await Promise.all(
@@ -283,38 +319,23 @@ async function initializeWallets({
   firstTransferBatch = _.flatten(firstTransferBatch);
 
   const firstTransactionBatch = await client.transfer(firstTransferBatch, {
-    from: {
-      network: networkName,
-      address: master.address,
-    },
+    from: master.accountID,
   });
   await Promise.all([
     developerClient.runConsensusNow(),
     firstTransactionBatch.confirmed(),
   ]);
 
-  const fromWallets = firstWalletBatch.slice(0, secondWalletBatch.length);
-
-  const fromAccounts = await Promise.all(
-    fromWallets.map((wallet) =>
-      client.read(networkName).getAccount(wallet.address),
+  const secondTransferBatch = await Promise.all(
+    _.zip(firstWalletBatch, secondWalletBatch).map(([from, wallet]) =>
+      createTransfers({ wallet, from }),
     ),
   );
-
-  let secondTransferBatch = await Promise.all(
-    _.zip(secondWalletBatch, fromAccounts).map((transferWallets) =>
-      createTransfers({
-        wallet: transferWallets[0],
-        from: transferWallets[1],
-      }),
-    ),
-  );
-  secondTransferBatch = _.zip(secondTransferBatch, fromWallets);
 
   const secondTransactionBatch = await Promise.all(
-    secondTransferBatch.map((transfer) =>
-      client.transfer(transfer[0], {
-        from: { network: networkName, address: transfer[1].address },
+    _.zip(firstWalletBatch, secondTransferBatch).map(([from, transfer]) =>
+      client.transfer(transfer, {
+        from: from.accountID,
       }),
     ),
   );
@@ -340,19 +361,17 @@ async function initiateClaims({
   provider: NEOONEProvider,
 |}): Promise<void> {
   const unclaimed = await Promise.all(
-    wallets.map((wallet) => provider.getUnclaimed(networkName, wallet.address)),
+    wallets.map((wallet) =>
+      provider.getUnclaimed(networkName, wallet.accountID.address),
+    ),
   );
-  const unclaimedAccounts = _
-    .zip(wallets, unclaimed)
-    .filter((account) => account[1].unclaimed.length > 0)
-    .map((account) => account[0]);
+  const unclaimedWallets = _.zip(wallets, unclaimed)
+    // eslint-disable-next-line
+    .filter(([__, accountUnclaimed]) => accountUnclaimed.unclaimed.length > 0)
+    .map(([wallet]) => wallet);
 
   const claims = await Promise.all(
-    unclaimedAccounts.map((account) =>
-      client.claim({
-        from: { network: networkName, address: account.address },
-      }),
-    ),
+    unclaimedWallets.map((wallet) => client.claim({ from: wallet.accountID })),
   );
   await Promise.all(
     [developerClient.runConsensusNow()].concat(
@@ -361,15 +380,13 @@ async function initiateClaims({
   );
 }
 
-async function setupAssetWallets({
+async function setupWallets({
   wallets,
-  networkName,
   client,
   developerClient,
   master,
 }: {|
   wallets: Array<WalletData>,
-  networkName: string,
   client: Client<*>,
   developerClient: DeveloperClient,
   master: WalletData,
@@ -380,198 +397,190 @@ async function setupAssetWallets({
     wallets.map((wallet) => ({
       amount: startingGAS,
       asset: common.GAS_ASSET_HASH,
-      to: wallet.address,
+      to: wallet.accountID.address,
     })),
-    { from: { network: networkName, address: master.address } },
+    { from: master.accountID },
   );
 
   await Promise.all([developerClient.runConsensusNow(), transfer.confirmed()]);
 }
 
+type AssetWithWallet = {|
+  ...AssetInfo,
+  wallet: WalletData,
+  hash: Hash256String,
+|};
+
 async function registerAssets({
-  assets,
   assetWallets,
-  networkName,
   client,
   developerClient,
 }: {|
-  assets: Array<{
-    assetType: AssetType,
-    name: string,
-    amount: BigNumber,
-    precision: number,
-  }>,
   assetWallets: Array<WalletData>,
-  networkName: string,
   client: Client<*>,
   developerClient: DeveloperClient,
-|}): Promise<Array<Hash256String>> {
+|}): Promise<Array<AssetWithWallet>> {
   const assetRegistrations = await Promise.all(
-    _.zip(assets, assetWallets).map((asset) =>
+    _.zip(ASSET_INFO, assetWallets).map(([asset, wallet]) =>
       client.registerAsset(
         {
-          assetType: asset[0].assetType,
-          name: asset[0].name,
-          amount: asset[0].amount,
-          precision: asset[0].precision,
-          owner: privateKeyToPublicKey(asset[1].privateKey),
-          admin: asset[1].address,
-          issuer: asset[1].address,
+          assetType: asset.assetType,
+          name: asset.name,
+          amount: asset.amount,
+          precision: asset.precision,
+          owner: privateKeyToPublicKey(wallet.privateKey),
+          admin: wallet.accountID.address,
+          issuer: wallet.accountID.address,
         },
         {
-          from: { network: networkName, address: asset[1].address },
+          from: wallet.accountID,
         },
       ),
     ),
   );
 
-  const promises = await Promise.all(
+  // eslint-disable-next-line
+  const [nada, ...registrations] = await Promise.all(
     [developerClient.runConsensusNow()].concat(
       assetRegistrations.map((registration) => registration.confirmed()),
     ),
   );
 
-  const registrations = promises.slice(1);
-  // $FlowFixMe
-  return registrations.map((registration) => registration.result.value.hash);
+  const assetHashes = registrations.filter(Boolean).map((registration) => {
+    if (registration.result.state === 'FAULT') {
+      throw new Error(registration.result.message);
+    }
+
+    return registration.result.value.hash;
+  });
+
+  return _.zip(ASSET_INFO, assetWallets, assetHashes).map((asset) => ({
+    ...asset[0],
+    wallet: asset[1],
+    hash: asset[2],
+  }));
 }
 
 async function issueAsset({
-  wallets,
   asset,
-  networkName,
   client,
 }: {|
-  wallets: Array<WalletData>,
-  asset: {
-    assetType: AssetType,
-    name: string,
-    amount: BigNumber,
-    precision: number,
-    wallet: WalletData,
-    hash: Hash256String,
-  },
-  networkName: string,
+  asset: AssetWithWallet,
   client: Client<*>,
 |}): Promise<TransactionResult<TransactionReceipt>> {
-  const numIssues = Math.floor(wallets.length / 3);
-  const positions = [];
-  const transfers = [];
-  let available = asset.amount;
-  for (let i = 0; i < numIssues; i += 1) {
-    let pos = randomInt(wallets.length) - 1;
-    while (positions.includes(pos)) {
-      pos = randomInt(wallets.length) - 1;
-    }
-    positions.push(pos);
-
-    const amount = new BigNumber(randomInt(10000) + 10);
-    available = available.minus(amount);
-    transfers.push({
-      to: wallets[pos].address,
-      asset: asset.hash,
-      amount,
-    });
-  }
-  transfers.push({
-    to: asset.wallet.address,
+  const transfer = {
+    to: asset.wallet.accountID.address,
     asset: asset.hash,
-    amount: available,
-  });
+    amount: asset.amount,
+  };
 
-  const issue = await client.issue(transfers, {
-    from: { network: networkName, address: asset.wallet.address },
+  return client.issue([transfer], {
+    from: asset.wallet.accountID,
   });
-
-  return issue;
 }
+
+const issueAssets = async ({
+  assets,
+  client,
+  developerClient,
+}: {|
+  assets: Array<AssetWithWallet>,
+  client: Client<*>,
+  developerClient: DeveloperClient,
+|}) => {
+  const issues = await Promise.all(
+    assets.map((asset) => issueAsset({ asset, client })),
+  );
+
+  await Promise.all(
+    [developerClient.runConsensusNow()].concat(
+      issues.map((issue) => issue.confirmed()),
+    ),
+  );
+};
 
 async function createAssetTransfer({
   wallets,
-  assetHash,
-  networkName,
+  asset,
   client,
-  assetWallet,
 }: {|
   wallets: Array<WalletData>,
-  assetHash: Hash256String,
-  networkName: string,
+  asset: AssetWithWallet,
   client: Client<*>,
-  assetWallet: WalletData,
-|}): Promise<Array<TransactionResult<TransactionReceipt>>> {
-  const accounts = await Promise.all(
-    wallets.map((wallet) =>
-      client.read(networkName).getAccount(wallet.address),
-    ),
-  );
-  const assetAccount = await client
-    .read(networkName)
-    .getAccount(assetWallet.address);
-  const walletTransfers = [];
-  for (const account of accounts) {
-    const transferPercent = new BigNumber(randomInt(75) / 100);
+|}): Promise<TransactionResult<TransactionReceipt>> {
+  const transfers = wallets.map((wallet) => ({
+    to: wallet.accountID.address,
+    asset: asset.hash,
+    amount: asset.amount
+      .div(2)
+      .div(wallets.length)
+      .integerValue(BigNumber.ROUND_FLOOR),
+  }));
 
-    const balance = account.balances[assetHash];
-    if (balance != null) {
-      const amount = transferPercent
-        .times(balance)
-        .integerValue(BigNumber.ROUND_CEIL);
-      walletTransfers.push({
-        transfer: {
-          amount,
-          asset: assetHash,
-          to: wallets[randomInt(wallets.length) - 1].address,
-        },
-        from: {
-          from: {
-            network: networkName,
-            address: account.address,
-          },
-        },
-      });
-    }
-  }
-
-  const firstTransfers = await Promise.all(
-    walletTransfers.map((walletTransfer) =>
-      client.transfer([walletTransfer.transfer], walletTransfer.from),
-    ),
-  );
-
-  const numTransfers = Math.floor(wallets.length / 3);
-  const assetWalletTransfers = [];
-  for (let i = 0; i < numTransfers; i += 1) {
-    const transferPercent = new BigNumber(
-      randomInt(Math.floor(250 / numTransfers)) / 1000,
-    );
-    const amount = transferPercent
-      .times(assetAccount.balances[assetHash])
-      .integerValue(BigNumber.ROUND_CEIL);
-
-    assetWalletTransfers.push({
-      amount,
-      asset: assetHash,
-      to: wallets[randomInt(wallets.length) - 1].address,
-    });
-  }
-
-  const secondTransfers = await client.transfer(assetWalletTransfers, {
-    from: { network: networkName, address: assetWallet.address },
+  return client.transfer(transfers, {
+    from: asset.wallet.accountID,
   });
-
-  return firstTransfers.concat([secondTransfers]);
 }
+
+const transferAssets = async ({
+  wallets,
+  assets,
+  client,
+  developerClient,
+}: {|
+  wallets: Array<WalletData>,
+  assets: Array<AssetWithWallet>,
+  client: Client<*>,
+  developerClient: DeveloperClient,
+|}) => {
+  const assetTransfers = await Promise.all(
+    assets.map((asset, idx) =>
+      createAssetTransfer({
+        wallets:
+          idx % 2 === 0
+            ? wallets.slice(0, wallets.length / 2)
+            : wallets.slice(wallets.length / 2),
+        asset,
+        client,
+      }),
+    ),
+  );
+
+  await Promise.all(
+    [developerClient.runConsensusNow()].concat(
+      assetTransfers.map((transfer) => transfer.confirmed()),
+    ),
+  );
+};
+
+const getAssetWallets = (networkName: string) =>
+  ASSET_INFO.map(({ name, privateKey }) => ({
+    name: `${name}-wallet`,
+    privateKey,
+    accountID: {
+      network: networkName,
+      address: privateKeyToAddress(privateKey),
+    },
+  }));
+
+const getTokenWallets = (networkName: string) =>
+  TOKEN_INFO.map(({ name, privateKey }) => ({
+    name: `${name}-token-wallet`,
+    privateKey,
+    accountID: {
+      network: networkName,
+      address: privateKeyToAddress(privateKey),
+    },
+  }));
 
 async function getPresetData({
   cliOptions,
   plugin,
   walletNames,
-  assetWalletNames,
 }: {|
   cliOptions: GetCLIResourceOptions,
   plugin: WalletPlugin,
   walletNames: Array<string>,
-  assetWalletNames: Array<string>,
 |}): Promise<BootstrapData> {
   const rpcURL = await getRPC(cliOptions);
   const network = {
@@ -591,47 +600,65 @@ async function getPresetData({
     master = {
       name: 'master',
       privateKey: DEFAULT_MASTER_PRIVATE_KEY,
-      address: privateKeyToAddress(DEFAULT_MASTER_PRIVATE_KEY),
+      accountID: {
+        network: network.name,
+        address: privateKeyToAddress(DEFAULT_MASTER_PRIVATE_KEY),
+      },
     };
   }
 
-  const hardcodedWallets = _
-    .zip(
-      walletNames.slice(0, DEFAULT_PRIVATE_KEYS.length),
-      DEFAULT_PRIVATE_KEYS,
-    )
-    .map((walletInfo) => ({
-      name: walletInfo[0],
-      privateKey: walletInfo[1],
-      address: privateKeyToAddress(walletInfo[1]),
-    }));
+  const getHardCodedWallet = ([name, privateKey]: [string, string]) => ({
+    name,
+    privateKey,
+    accountID: {
+      network: network.name,
+      address: privateKeyToAddress(privateKey),
+    },
+  });
 
-  const wallets = walletNames
-    .slice(DEFAULT_PRIVATE_KEYS.length)
-    .map((name) => {
-      const privateKey = createPrivateKey();
-      return {
-        name,
-        privateKey,
-        address: privateKeyToAddress(privateKey),
-      };
-    })
-    .concat(hardcodedWallets);
-
-  const assetWallets = assetWalletNames.map((name) => {
+  const getGeneratedWallet = (name: string) => {
     const privateKey = createPrivateKey();
     return {
       name,
       privateKey,
-      address: privateKeyToAddress(privateKey),
+      accountID: {
+        network: network.name,
+        address: privateKeyToAddress(privateKey),
+      },
     };
-  });
+  };
+
+  const wallets = _.zip(
+    walletNames.slice(0, DEFAULT_PRIVATE_KEYS.length / 2),
+    DEFAULT_PRIVATE_KEYS.slice(0, DEFAULT_PRIVATE_KEYS.length / 2),
+  )
+    .map(getHardCodedWallet)
+    .concat(
+      walletNames
+        .slice(DEFAULT_PRIVATE_KEYS.length / 2, walletNames.length / 2)
+        .map(getGeneratedWallet),
+    )
+    .concat(
+      _.zip(
+        walletNames.slice(
+          walletNames.length / 2,
+          walletNames.length / 2 + DEFAULT_PRIVATE_KEYS.length / 2,
+        ),
+        DEFAULT_PRIVATE_KEYS.slice(DEFAULT_PRIVATE_KEYS.length / 2),
+      ).map(getHardCodedWallet),
+    )
+    .concat(
+      walletNames
+        .slice(walletNames.length / 2 + DEFAULT_PRIVATE_KEYS.length / 2)
+        .map(getGeneratedWallet),
+    );
 
   return {
     network,
     master,
     wallets,
-    assetWallets,
+    assetWallets: getAssetWallets(network.name),
+    tokenWallets: getTokenWallets(network.name),
   };
 }
 
@@ -639,12 +666,10 @@ async function getNEOONEData({
   cliOptions,
   plugin,
   walletNames,
-  assetWalletNames,
 }: {|
   cliOptions: GetCLIResourceOptions,
   plugin: WalletPlugin,
   walletNames: Array<string>,
-  assetWalletNames: Array<string>,
 |}): Promise<BootstrapData> {
   const networkName = await getNetwork(cliOptions);
 
@@ -689,11 +714,23 @@ async function getNEOONEData({
   );
 
   const assetWallets = await Promise.all(
-    assetWalletNames.map((walletName) =>
+    getAssetWallets(network.name).map((wallet) =>
       createWallet({
-        walletName,
+        walletName: wallet.name,
         networkName: network.name,
         cli: cliOptions.cli,
+        privateKey: wallet.privateKey,
+      }),
+    ),
+  );
+
+  const tokenWallets = await Promise.all(
+    getTokenWallets(network.name).map((wallet) =>
+      createWallet({
+        walletName: wallet.name,
+        networkName: network.name,
+        cli: cliOptions.cli,
+        privateKey: wallet.privateKey,
       }),
     ),
   );
@@ -703,6 +740,7 @@ async function getNEOONEData({
     master,
     wallets,
     assetWallets,
+    tokenWallets,
   };
 }
 
@@ -712,17 +750,20 @@ async function addWalletsToKeystore({
   master,
   wallets,
   assetWallets,
+  tokenWallets,
 }: {|
   keystore: LocalKeyStore,
   networkName: string,
   master: WalletData,
   wallets: Array<WalletData>,
   assetWallets: Array<WalletData>,
+  tokenWallets: Array<WalletData>,
 |}): Promise<void> {
   await Promise.all(
     wallets
       .concat([master])
       .concat(assetWallets)
+      .concat(tokenWallets)
       .map((wallet) =>
         keystore.addAccount({
           network: networkName,
@@ -732,6 +773,212 @@ async function addWalletsToKeystore({
       ),
   );
 }
+
+const findContracts = async (current: string): Promise<string> => {
+  const exists = await fs.pathExists(path.resolve(current, 'package.json'));
+  if (exists) {
+    return path.resolve(current, 'src', 'contracts');
+  }
+
+  return findContracts(path.dirname(current));
+};
+
+type CompileResult = {|
+  code: Buffer,
+  abi: ABI,
+  name: string,
+|};
+
+export const compileSmartContract = async (
+  contractName: string,
+): Promise<CompileResult> => {
+  const dir = await findContracts(
+    require.resolve('@neo-one/server-plugin-wallet'),
+  );
+  const { script: code, abi } = await findAndCompileContract({
+    dir,
+    contractName,
+  });
+
+  return { code, abi, name: contractName };
+};
+
+const compileSmartContracts = async (
+  contractNames: Array<string>,
+): Promise<Array<CompileResult>> =>
+  Promise.all(
+    contractNames.map((contractName) => compileSmartContract(contractName)),
+  );
+
+const publishContract = async ({
+  wallet,
+  client,
+  result: { code, name },
+}: {|
+  wallet: WalletData,
+  isRPC: boolean,
+  client: Client<any>,
+  result: CompileResult,
+|}): Promise<TransactionResult<PublishReceipt>> => {
+  // TODO: Support using neo-one cli for compiling/publishing when !isRPC
+  const result = await client.publish(
+    {
+      script: code.toString('hex'),
+      // TODO: Get all of these directly from smart contract compilation
+      parameters: ['String', 'Array'],
+      returnType: 'ByteArray',
+      name,
+      codeVersion: '1.0',
+      author: 'test',
+      email: 'test@test.com',
+      description: 'test',
+      properties: {
+        storage: true,
+        dynamicInvoke: true,
+        payable: true,
+      },
+    },
+    { from: wallet.accountID },
+  );
+
+  return result;
+};
+
+type TokenWithWallet = {|
+  ...TokenInfo,
+  wallet: WalletData,
+  smartContract: SmartContract,
+|};
+
+const publishTokens = async ({
+  tokenWallets,
+  isRPC,
+  client,
+  developerClient,
+}: {|
+  tokenWallets: Array<WalletData>,
+  isRPC: boolean,
+  client: Client<any>,
+  developerClient: DeveloperClient,
+|}): Promise<Array<TokenWithWallet>> => {
+  const wallets = _.zip(tokenWallets, TOKEN_INFO).map(([wallet, token]) => ({
+    wallet,
+    token,
+  }));
+
+  const compileResults = await compileSmartContracts(
+    wallets.map(({ token }) => token.name),
+  );
+  const publishResults = await Promise.all(
+    _.zip(wallets, compileResults).map(async ([{ wallet }, compileResult]) =>
+      publishContract({
+        wallet,
+        result: compileResult,
+        isRPC,
+        client,
+      }),
+    ),
+  );
+
+  const [receipts] = await Promise.all([
+    Promise.all(publishResults.map((result) => result.confirmed())),
+    developerClient.runConsensusNow(),
+  ]);
+
+  const tokenWithWallets = _.zip(wallets, compileResults, receipts).map(
+    ([{ token, wallet }, compileResult, receipt]) => {
+      if (receipt.result.state === 'FAULT') {
+        throw new Error(receipt.result.message);
+      }
+
+      const smartContract = client.smartContract({
+        networks: {
+          [wallet.accountID.network]: { hash: receipt.result.value.hash },
+        },
+        abi: compileResult.abi,
+      });
+
+      return { ...token, smartContract, wallet };
+    },
+  );
+
+  const deployResults = await Promise.all(
+    tokenWithWallets.map(({ smartContract, wallet, amount }) =>
+      smartContract.deploy(privateKeyToScriptHash(wallet.privateKey), amount, {
+        from: wallet.accountID,
+      }),
+    ),
+  );
+
+  const [deployReceipts] = await Promise.all([
+    Promise.all(deployResults.map((result) => result.confirmed())),
+    developerClient.runConsensusNow(),
+  ]);
+
+  deployReceipts.forEach((receipt) => {
+    if (receipt.result.state === 'FAULT') {
+      throw new Error(receipt.result.message);
+    }
+  });
+
+  return tokenWithWallets;
+};
+
+async function transferToken({
+  tokens,
+  count,
+  developerClient,
+}: {|
+  tokens: Array<[TokenWithWallet, WalletData]>,
+  count: number,
+  developerClient: DeveloperClient,
+|}): Promise<void> {
+  const results = await Promise.all(
+    tokens.map(([token, wallet]) =>
+      token.smartContract.transfer(
+        privateKeyToScriptHash(token.wallet.privateKey),
+        privateKeyToScriptHash(wallet.privateKey),
+        token.amount
+          .div(2)
+          .div(count)
+          .integerValue(BigNumber.ROUND_FLOOR),
+        { from: token.wallet.accountID },
+      ),
+    ),
+  );
+  await Promise.all([
+    Promise.all(results.map((result) => result.confirmed())),
+    developerClient.runConsensusNow(),
+  ]);
+}
+
+const transferTokens = async ({
+  wallets,
+  tokens,
+  developerClient,
+}: {|
+  wallets: Array<WalletData>,
+  tokens: Array<TokenWithWallet>,
+  developerClient: DeveloperClient,
+|}) => {
+  const count = wallets.length / 2;
+  const tokensWithWallets = tokens.map((token, idx) => [
+    token,
+    idx % 2 === 0 ? wallets.slice(0, count) : wallets.slice(count),
+  ]);
+
+  for (const idx of _.range(count)) {
+    // eslint-disable-next-line
+    await transferToken({
+      tokens: tokensWithWallets.map(([token, tokenWallets]) => [
+        token,
+        tokenWallets[idx],
+      ]),
+      count,
+      developerClient,
+    });
+  }
+};
 
 export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
   cli.vorpal
@@ -743,6 +990,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
       'Bootstraps a private network with the given rpcURL.',
     )
     .option('--testing-only', 'Option to spoof rpc path for testing')
+    .option('--reset', 'Reset blockchain before bootstrapping')
     .action(async (args) => {
       const spinner = ora(`Gathering data for bootstrap`).start();
 
@@ -752,36 +1000,33 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         walletNames.push(`wallet-${i}`);
       }
 
-      const assetWalletNames = ASSET_INFO.map(
-        (asset) => `${asset.name}-wallet`,
-      );
-
       try {
         let bootstrapData;
+        const cliOptions = {
+          cli,
+          args,
+          options: args.options,
+        };
         if (args.options.rpc != null) {
           bootstrapData = await getPresetData({
-            cliOptions: {
-              cli,
-              args,
-              options: args.options,
-            },
+            cliOptions,
             plugin,
             walletNames,
-            assetWalletNames,
           });
         } else {
           bootstrapData = await getNEOONEData({
-            cliOptions: {
-              cli,
-              args,
-              options: args.options,
-            },
+            cliOptions,
             plugin,
             walletNames,
-            assetWalletNames,
           });
         }
-        const { network, master, wallets, assetWallets } = bootstrapData;
+        const {
+          network,
+          master,
+          wallets,
+          assetWallets,
+          tokenWallets,
+        } = bootstrapData;
         spinner.succeed();
 
         spinner.start(`Bootstrapping network ${bootstrapData.network.name}`);
@@ -795,6 +1040,7 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           master,
           wallets,
           assetWallets,
+          tokenWallets,
         });
 
         const provider = new NEOONEProvider({
@@ -807,30 +1053,44 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
             provider,
           }),
         });
-        await client.selectAccount({
-          network: network.name,
-          address: master.address,
-        });
+        await client.selectAccount(master.accountID);
 
         const developerClient = new DeveloperClient(
           provider.read(network.name),
         );
         spinner.succeed();
 
+        await developerClient.updateSettings({
+          secondsPerBlock: 600,
+        });
+
+        if (args.options.reset) {
+          spinner.start('Resetting network');
+          await developerClient.reset();
+          spinner.succeed();
+        }
+
         spinner.start('Initializing wallets with funds');
         await initializeWallets({
           wallets,
           master,
-          networkName: network.name,
           client,
           developerClient,
         });
         spinner.succeed();
 
         spinner.start('Setting up asset wallets');
-        await setupAssetWallets({
+        await setupWallets({
           wallets: assetWallets,
-          networkName: network.name,
+          client,
+          developerClient,
+          master,
+        });
+        spinner.succeed();
+
+        spinner.start('Setting up token wallets');
+        await setupWallets({
+          wallets: tokenWallets,
           client,
           developerClient,
           master,
@@ -838,71 +1098,46 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
         spinner.succeed();
 
         spinner.start('Registering test assets');
-        const assetHashes = await registerAssets({
-          assets: ASSET_INFO,
+        const assets = await registerAssets({
           assetWallets,
-          networkName: network.name,
           client,
           developerClient,
         });
         spinner.succeed();
-        const assets = _
-          .zip(ASSET_INFO, assetWallets, assetHashes)
-          .map((asset) => ({
-            ...asset[0],
-            wallet: asset[1],
-            hash: asset[2],
-          }));
-        spinner.start('Issuing assets');
-        const issues = await Promise.all(
-          assets.map((asset) =>
-            issueAsset({
-              wallets,
-              networkName: network.name,
-              asset,
-              client,
-            }),
-          ),
-        );
 
-        await Promise.all(
-          [developerClient.runConsensusNow()].concat(
-            issues.map((issue) => issue.confirmed()),
-          ),
-        );
+        spinner.start('Issuing assets');
+        await issueAssets({
+          assets,
+          client,
+          developerClient,
+        });
         spinner.succeed();
 
         spinner.start('Distributing assets');
-        const assetTransfers = await Promise.all(
-          assets.map((asset) =>
-            createAssetTransfer({
-              wallets,
-              assetHash: asset.hash,
-              networkName: network.name,
-              client,
-              assetWallet: asset.wallet,
-            }),
-          ),
-        );
-
-        await Promise.all(
-          [developerClient.runConsensusNow()].concat(
-            _.flatten(assetTransfers).map((transfer) => transfer.confirmed()),
-          ),
-        );
+        await transferAssets({
+          wallets,
+          assets,
+          client,
+          developerClient,
+        });
         spinner.succeed();
 
-        spinner.start('Publishing KYC SmartContract');
-        const kyc = await client.publish(kycContract);
-        await Promise.all([developerClient.runConsensusNow(), kyc.confirmed()]);
+        spinner.start('Publishing tokens');
+        const isRPC = args.options.rpc != null;
+        const tokens = await publishTokens({
+          tokenWallets,
+          client,
+          isRPC,
+          developerClient,
+        });
         spinner.succeed();
 
-        spinner.start('Publishing Concierge SmartContract');
-        const concierge = await client.publish(conciergeContract);
-        await Promise.all([
-          developerClient.runConsensusNow(),
-          concierge.confirmed(),
-        ]);
+        spinner.start('Transferring tokens');
+        await transferTokens({
+          wallets,
+          tokens,
+          developerClient,
+        });
         spinner.succeed();
 
         spinner.start('Claiming GAS');
@@ -914,6 +1149,8 @@ export default (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs) =>
           provider,
         });
         spinner.succeed();
+
+        await developerClient.updateSettings({ secondsPerBlock: 15 });
       } catch (error) {
         spinner.fail(error);
       }

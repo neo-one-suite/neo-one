@@ -263,6 +263,7 @@ export declare type SysCallName =
   | 'Neo.Blockchain.GetHeader'
   | 'Neo.Blockchain.GetBlock'
   | 'Neo.Blockchain.GetTransaction'
+  | 'Neo.Blockchain.GetTransactionHeight'
   | 'Neo.Blockchain.GetAccount'
   | 'Neo.Blockchain.GetValidators'
   | 'Neo.Blockchain.GetAsset'

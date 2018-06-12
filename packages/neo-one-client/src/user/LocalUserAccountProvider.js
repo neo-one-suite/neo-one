@@ -914,12 +914,10 @@ export default class LocalUserAccountProvider<
       }
 
       return transaction.clone({
-        scripts: _
-          .sortBy(
-            [[scriptHash, witness], [otherHash, otherScript]],
-            (value) => value[0],
-          )
-          .map((value) => value[1]),
+        scripts: _.sortBy(
+          [[scriptHash, witness], [otherHash, otherScript]],
+          (value) => value[0],
+        ).map((value) => value[1]),
       });
     } else if (
       scriptHashes.length === 0 ||

@@ -1,13 +1,13 @@
 /* @flow */
 import type { Context } from 'koa';
-import { LABELS, type Monitor, metrics } from '@neo-one/monitor';
+import { KnownLabel, type Monitor, metrics } from '@neo-one/monitor';
 
 import { getMonitor } from './common';
 
 const labelNames = [
-  LABELS.HTTP_PATH,
-  LABELS.HTTP_STATUS_CODE,
-  LABELS.HTTP_METHOD,
+  KnownLabel.HTTP_PATH,
+  KnownLabel.HTTP_STATUS_CODE,
+  KnownLabel.HTTP_METHOD,
 ];
 const REQUESTS_HISTOGRAM = metrics.createHistogram({
   name: 'http_server_request_duration_seconds',

@@ -16,7 +16,7 @@ import {
   type Node,
   getEndpointConfig,
 } from '@neo-one/node-core';
-import { LABELS, type Monitor, metrics } from '@neo-one/monitor';
+import { KnownLabel, type Monitor, metrics } from '@neo-one/monitor';
 
 import compose from 'koa-compose';
 import compress from 'koa-compress';
@@ -91,13 +91,14 @@ const RPC_METHODS = {
   updatesettings: 'updatesettings',
   fastforwardoffset: 'fastforwardoffset',
   fastforwardtotime: 'fastforwardtotime',
+  reset: 'reset',
   UNKNOWN: 'UNKNOWN',
   INVALID: 'INVALID',
 };
 
-const rpcLabelNames = [LABELS.RPC_METHOD];
+const rpcLabelNames = [KnownLabel.RPC_METHOD];
 const rpcLabels = utils.values(RPC_METHODS).map((method) => ({
-  [LABELS.RPC_METHOD]: method,
+  [KnownLabel.RPC_METHOD]: method,
 }));
 const SINGLE_REQUESTS_HISTOGRAM = metrics.createHistogram({
   name: 'http_jsonrpc_server_single_request_duration_seconds',
@@ -624,6 +625,17 @@ export default ({
         await node.consensus.fastForwardToTime(args[0]);
       } else {
         throw new Error('This node does not support fast forwarding.');
+      }
+
+      return true;
+    },
+    [RPC_METHODS.reset]: async () => {
+      if (node.consensus != null) {
+        await node.consensus.pause();
+      }
+      await blockchain.reset();
+      if (node.consensus != null) {
+        await node.consensus.resume();
       }
 
       return true;

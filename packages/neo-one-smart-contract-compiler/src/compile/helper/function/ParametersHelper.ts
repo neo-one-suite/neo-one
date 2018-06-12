@@ -19,7 +19,8 @@ export class ParametersHelper extends Helper<Node & SignaturedDeclaration> {
 
       const initializer = param.getInitializer();
       if (param.isRestParameter()) {
-        sb.reportUnsupported(param);
+        // TODO: Support me, currently commented out to allow for createEventHandler
+        // sb.reportUnsupported(param);
       } else if (initializer != null) {
         sb.emitHelper(
           param,

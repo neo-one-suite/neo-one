@@ -55,6 +55,7 @@ export abstract class Token<Decimals extends number> extends SmartContract {
       [owner, spender],
       this.allowance(owner, spender) + amount,
     );
+    this.onApprove(owner, spender, amount);
   }
 
   @constant
@@ -71,9 +72,21 @@ export abstract class Token<Decimals extends number> extends SmartContract {
     return this.supply;
   }
 
+  protected abstract onTransfer(
+    from: Address,
+    to: Address,
+    amount: Fixed<Decimals>,
+  ): void;
+  protected abstract onApprove(
+    owner: Address,
+    spender: Address,
+    amount: Fixed<Decimals>,
+  ): void;
+
   protected issue(addr: Address, amount: Fixed<Decimals>): void {
     this.balances.set(addr, this.balanceOf(addr) + amount);
     this.supply += amount;
+    this.onTransfer(this.address, addr, amount);
   }
 
   private doTransfer(
@@ -92,5 +105,6 @@ export abstract class Token<Decimals extends number> extends SmartContract {
 
     this.balances.set(from, fromValue - amount);
     this.balances.set(to, this.balanceOf(to) + amount);
+    this.onTransfer(from, to, amount);
   }
 }

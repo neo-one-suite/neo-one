@@ -343,4 +343,5 @@ export {
   getContract,
   verify,
   constant,
+  createEventHandler,
 } from './lib';
