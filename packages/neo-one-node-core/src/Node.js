@@ -7,6 +7,8 @@ export type Consensus = {
   fastForwardOffset(seconds: number): Promise<void>,
   fastForwardToTime(seconds: number): Promise<void>,
   nowSeconds(): number,
+  pause(): Promise<void>,
+  resume(): Promise<void>,
 };
 
 export interface Node {

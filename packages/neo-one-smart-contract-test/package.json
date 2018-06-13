@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-test",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.10",
   "keywords": [
     "neo",
     "NEO",
@@ -27,6 +27,7 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
+  "types": "./src/index.ts",
   "engines": {
     "node": ">=8.9.0"
   },
@@ -34,12 +35,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.51",
-    "@neo-one/node": "^1.0.0-alpha.69",
-    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.6",
-    "@neo-one/utils": "^1.0.0-alpha.32",
+    "@neo-one/client": "^1.0.0-alpha.55",
+    "@neo-one/node": "^1.0.0-alpha.73",
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.10",
+    "@neo-one/utils": "^1.0.0-alpha.35",
     "lodash": "^4.17.5",
     "memdown": "^3.0.0",
-    "ts-simple-ast": "^11.2.0"
+    "ts-simple-ast": "^12.4.0"
   }
 }

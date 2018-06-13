@@ -140,5 +140,9 @@ export default ({
       }
       await storage.commit(changeSet);
     },
+    async reset(): Promise<void> {
+      cache.clear();
+      await storage.reset();
+    },
   };
 };

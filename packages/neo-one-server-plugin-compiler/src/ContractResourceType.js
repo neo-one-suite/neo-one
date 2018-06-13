@@ -95,9 +95,10 @@ export default class ContractResourceType extends ResourceType<
 
   getListTable(resources: Array<Contract>): ListTable {
     return [['Name', 'Smart Contract']].concat(
-      _
-        .sortBy(resources, (resource) => resource.name)
-        .map((resource) => [resource.name, resource.avmPath]),
+      _.sortBy(resources, (resource) => resource.name).map((resource) => [
+        resource.name,
+        resource.avmPath,
+      ]),
     );
   }
 

@@ -364,7 +364,10 @@ export default class TransactionBase<Type: TransactionType, TransactionJSON>
         outputs: this.outputs,
         utilityToken,
       });
-      return inputValue.sub(outputValue).sub(this.getSystemFee(context));
+      const result = inputValue
+        .sub(outputValue)
+        .sub(this.getSystemFee(context));
+      return result.lt(utils.ZERO) ? utils.ZERO : result;
     },
   );
 

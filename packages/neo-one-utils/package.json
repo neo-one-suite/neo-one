@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/utils",
-  "version": "1.0.0-alpha.32",
+  "version": "1.0.0-alpha.35",
   "keywords": [
     "neo",
     "NEO",
@@ -27,6 +27,7 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
+  "types": "./src/index.ts",
   "engines": {
     "node": ">=8.9.0"
   },
@@ -34,8 +35,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0-alpha.27",
-    "rxjs": "^6.2.0",
-    "uuid": "^3.2.1"
+    "@neo-one/monitor": "^1.0.0-alpha.30",
+    "rxjs": "^6.2.0"
   }
 }

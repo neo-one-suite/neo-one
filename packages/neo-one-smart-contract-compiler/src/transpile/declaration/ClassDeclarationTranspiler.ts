@@ -11,6 +11,7 @@ import { NodeTranspiler } from '../NodeTranspiler';
 import { Transpiler } from '../transpiler';
 import * as typeUtils from '../../typeUtils';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { VisitOptions } from '../types';
 
 const DEPLOY_METHOD = 'deploy';
 
@@ -19,17 +20,29 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
 > {
   public readonly kind: SyntaxKind = SyntaxKind.ClassDeclaration;
 
-  public visitNode(transpiler: Transpiler, node: ClassDeclaration): void {
-    if (transpiler.isSmartContract(node)) {
-      this.transpileSmartContract(transpiler, node);
+  public visitNode(
+    transpiler: Transpiler,
+    node: ClassDeclaration,
+    options: VisitOptions,
+  ): void {
+    if (options.isSmartContract || transpiler.isSmartContract(node)) {
+      this.transpileSmartContract(
+        transpiler,
+        node,
+        transpiler.isSmartContractOptions(options),
+      );
     }
   }
 
   private transpileSmartContract(
     transpiler: Transpiler,
     node: ClassDeclaration,
+    options: VisitOptions,
   ): void {
-    transpiler.visit(node.getBaseClass());
+    const baseClass = node.getBaseClass();
+    if (baseClass != null) {
+      transpiler.visit(baseClass, options);
+    }
 
     this.transpileDeploy(transpiler, node);
   }
@@ -91,26 +104,20 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
       parameters = ctor.getParameters();
     }
 
-    const deploy = node.addMethod({
-      name: DEPLOY_METHOD,
-      returnType: 'boolean',
-      bodyText,
-      parameters: parameters.map((param) => {
-        const initializer = param.getInitializer();
-        let type = param.getType().getText();
-        const typeNode = param.getTypeNode();
-        if (typeNode != null) {
-          type = typeNode.getText();
-        }
-        return {
-          name: param.getNameOrThrow(),
-          type,
-          initializer: initializer == null ? undefined : initializer.getText(),
-          hasQuestionToken: param.hasQuestionToken(),
-          isRestParameter: param.isRestParameter(),
-        };
-      }),
-      scope: Scope.Public,
+    const deployParameters = parameters.map((param) => {
+      const initializer = param.getInitializer();
+      let type = param.getType().getText();
+      const typeNode = param.getTypeNode();
+      if (typeNode != null) {
+        type = typeNode.getText();
+      }
+      return {
+        name: param.getNameOrThrow(),
+        type,
+        initializer: initializer == null ? undefined : initializer.getText(),
+        hasQuestionToken: param.hasQuestionToken(),
+        isRestParameter: param.isRestParameter(),
+      };
     });
 
     node.getInstanceProperties().forEach((property) => {
@@ -137,9 +144,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
           transpiler.isOnlyGlobal(property, type, 'Buffer')
         ) {
           if (TypeGuards.isParameterDeclaration(property)) {
-            deploy.addStatements(`
-              this.${property.getName()} = ${property.getName()};
-            `);
+            bodyText += `this.${property.getName()} = ${property.getName()};`;
           }
 
           const init = property.getInitializer();
@@ -148,9 +153,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
             if (property.isReadonly()) {
               addAccessors = false;
             } else {
-              deploy.addStatements(`
-                this.${property.getName()} = ${init.getText()};
-              `);
+              bodyText += `this.${property.getName()} = ${init.getText()};`;
             }
           }
 
@@ -196,9 +199,13 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
       }
     });
 
-    deploy.addStatements(`
-      return true;
-    `);
+    node.addMethod({
+      name: DEPLOY_METHOD,
+      returnType: 'boolean',
+      bodyText: bodyText + 'return true;',
+      parameters: deployParameters,
+      scope: Scope.Public,
+    });
 
     if (ctor != null) {
       ctor.remove();
@@ -214,7 +221,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
       return undefined;
     }
 
-    const deploy = baseClass.getInstanceMethod('deploy');
+    const deploy = baseClass.getInstanceMethod(DEPLOY_METHOD);
     if (deploy == null) {
       return this.getBaseDeploy(transpiler, baseClass);
     }

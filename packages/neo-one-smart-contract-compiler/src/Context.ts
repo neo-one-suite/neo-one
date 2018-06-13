@@ -12,7 +12,7 @@ import {
 
 import { CompilerDiagnostic } from './CompilerDiagnostic';
 import { DiagnosticCode } from './DiagnosticCode';
-import { Globals, Libs, LibAliases } from './symbols';
+import { Globals, Libs, LibAliases, LibAliasesWithReset } from './symbols';
 
 import * as typeUtils from './typeUtils';
 
@@ -20,9 +20,9 @@ export class Context {
   public readonly diagnostics: ts.Diagnostic[] = [];
 
   constructor(
-    private readonly globals: Globals,
-    private readonly libs: Libs,
-    private readonly libAliases: LibAliases,
+    public readonly globals: Globals,
+    public readonly libs: Libs,
+    public readonly libAliases: LibAliasesWithReset,
   ) {}
 
   public reportError(node: Node, message: string, code: DiagnosticCode): void {

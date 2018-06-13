@@ -412,13 +412,11 @@ export default class Network<Message, PeerData, PeerHealth: PeerHealthBase> {
         maxConnectedPeers,
       );
       endpoints = endpoints.concat(
-        _
-          .shuffle(
-            [...this._unconnectedPeers].filter((peer) =>
-              this._filterEndpoint(peer),
-            ),
-          )
-          .slice(0, count),
+        _.shuffle(
+          [...this._unconnectedPeers].filter((peer) =>
+            this._filterEndpoint(peer),
+          ),
+        ).slice(0, count),
       );
 
       if (endpoints.length + connectedPeersCount < maxConnectedPeers) {

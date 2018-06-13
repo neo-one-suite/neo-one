@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client",
-  "version": "1.0.0-alpha.51",
+  "version": "1.0.0-alpha.55",
   "keywords": [
     "neo",
     "NEO",
@@ -27,6 +27,7 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
+  "types": "./src/index.d.ts",
   "browser": {
     "./dist/index.js": "./dist/index.browser.js",
     "./dist/index.es.js": "./dist/index.browser.es.js"
@@ -38,10 +39,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.37",
-    "@neo-one/monitor": "^1.0.0-alpha.27",
-    "@neo-one/node-neo-settings": "^1.0.0-alpha.37",
-    "@neo-one/utils": "^1.0.0-alpha.32",
+    "@neo-one/client-core": "^1.0.0-alpha.41",
+    "@neo-one/monitor": "^1.0.0-alpha.30",
+    "@neo-one/node-neo-settings": "^1.0.0-alpha.41",
+    "@neo-one/utils": "^1.0.0-alpha.35",
     "bignumber.js": "^7.2.1",
     "bn.js": "^4.11.8",
     "dataloader": "^1.4.0",

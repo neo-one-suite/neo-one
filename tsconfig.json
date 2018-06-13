@@ -4,14 +4,13 @@
     "alwaysStrict": true,
     "baseUrl": "./packages",
     "target": "esnext",
-    "module": "commonjs",
-    "declaration": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "declaration": false,
     "experimentalDecorators": true,
     "lib": [
       "dom",
-      "es2017",
-      "es2017.object",
-      "esnext.asynciterable"
+      "esnext"
     ],
     "sourceMap": true,
     "noEmit": true,

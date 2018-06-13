@@ -12,5 +12,6 @@ export type LevelUp = {
   get: (key: Buffer) => Promise<Buffer>,
   close: () => Promise<void>,
   batch: (changes: Array<LevelUpChange>) => Promise<void>,
-  createValueStream: (options: StreamOptions) => Readable,
+  createKeyStream: (options?: StreamOptions) => Readable,
+  createValueStream: (options?: StreamOptions) => Readable,
 };

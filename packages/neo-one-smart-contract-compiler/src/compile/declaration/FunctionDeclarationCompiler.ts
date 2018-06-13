@@ -15,6 +15,10 @@ export class FunctionDeclarationCompiler extends NodeCompiler<
     decl: FunctionDeclaration,
     optionsIn: VisitOptions,
   ): void {
+    if (!decl.isImplementation()) {
+      return;
+    }
+
     const options = sb.pushValueOptions(optionsIn);
     const name = sb.scope.add(decl.getName());
     // [callArray]

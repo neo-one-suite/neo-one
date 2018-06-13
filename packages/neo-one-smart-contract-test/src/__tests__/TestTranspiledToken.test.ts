@@ -53,31 +53,7 @@ describe('TestTranspiledToken', () => {
     await cleanupTest();
   });
 
-  test('name', async () => {
-    const { smartContract } = await setup();
-
-    const result = await smartContract.name();
-
-    expect(result).toEqual('TestToken');
-  });
-
-  test('decimals', async () => {
-    const { smartContract } = await setup();
-
-    const result = await smartContract.decimals();
-
-    expect(result.toString()).toEqual('4');
-  });
-
-  test('symbol', async () => {
-    const { smartContract } = await setup();
-
-    const result = await smartContract.symbol();
-
-    expect(result).toEqual('TT');
-  });
-
-  test('issue + balanceOf + totalSupply + transfer', async () => {
+  test('properties + issue + balanceOf + totalSupply + transfer', async () => {
     const {
       networkName,
       keystore,
@@ -86,6 +62,15 @@ describe('TestTranspiledToken', () => {
       masterAccountID,
       masterPrivateKey,
     } = await setup();
+
+    const [nameResult, decimalsResult, symbolResult] = await Promise.all([
+      smartContract.name(),
+      smartContract.decimals(),
+      smartContract.symbol(),
+    ]);
+    expect(nameResult).toEqual('TestToken');
+    expect(decimalsResult.toString()).toEqual('4');
+    expect(symbolResult).toEqual('TT');
 
     const wallet0 = await keystore.addAccount({
       network: networkName,

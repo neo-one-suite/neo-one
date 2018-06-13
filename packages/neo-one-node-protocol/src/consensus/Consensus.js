@@ -12,7 +12,7 @@ import {
 import type { Monitor } from '@neo-one/monitor';
 import type { Observable } from 'rxjs';
 
-import { finalize } from '@neo-one/utils';
+import { finalize, mergeScanLatest } from '@neo-one/utils';
 import { scan } from 'ix/asynciterable/pipe/index';
 import { map, switchMap, take } from 'rxjs/operators';
 
@@ -44,10 +44,11 @@ const MS_IN_SECOND = 1000;
 export default class Consensus {
   _queue: ConsensusQueue;
   _timer: ?TimeoutID;
-  _options$: Observable<Options>;
+  _options$: Observable<InternalOptions>;
   _node: Node;
   _consensusContext: ConsensusContext;
   _monitor: Monitor;
+  _startPromise: Promise<void> | null;
 
   constructor({
     options$,
@@ -60,14 +61,7 @@ export default class Consensus {
   |}) {
     this._queue = new ConsensusQueue();
     this._timer = null;
-    this._options$ = options$;
-    this._node = node;
-    this._consensusContext = new ConsensusContext();
-    this._monitor = monitor.at('node_consensus');
-  }
-
-  start$(): Observable<void> {
-    return this._options$.pipe(
+    this._options$ = options$.pipe(
       map((options) => {
         const privateKey = common.stringToPrivateKey(options.privateKey);
         const publicKey = crypto.privateKeyToPublicKey(privateKey);
@@ -79,10 +73,29 @@ export default class Consensus {
           privateNet: options.privateNet,
         };
       }),
-      switchMap((options) => this._start(options)),
-      finalize(() => {
-        this._clearTimer();
-        this._queue.done();
+    );
+    this._node = node;
+    this._consensusContext = new ConsensusContext();
+    this._monitor = monitor.at('node_consensus');
+    this._startPromise = null;
+  }
+
+  start$(): Observable<void> {
+    return this._options$.pipe(
+      switchMap(async (options) => {
+        if (this._startPromise != null) {
+          await this.pause();
+        }
+        return options;
+      }),
+      mergeScanLatest(async (_, options) => {
+        this._startPromise = this._start(options).then(() => {
+          this._startPromise = null;
+        });
+        await this._startPromise;
+      }),
+      finalize(async () => {
+        await this.pause();
       }),
     );
   }
@@ -202,6 +215,20 @@ export default class Consensus {
     } else {
       throw new Error('Can only fast forward on a private network.');
     }
+  }
+
+  async pause(): Promise<void> {
+    this._clearTimer();
+    this._queue.done();
+    this._queue = new ConsensusQueue();
+    if (this._startPromise != null) {
+      await this._startPromise;
+    }
+  }
+
+  async resume(): Promise<void> {
+    const options = await this._options$.pipe(take(1)).toPromise();
+    this._startPromise = this._start(options);
   }
 
   _handleResult(result: Result<Context>): Context {

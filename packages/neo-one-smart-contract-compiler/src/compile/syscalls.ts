@@ -845,7 +845,7 @@ class Serializable extends SimpleSysCallType {
     if (
       type != null &&
       this.shouldHandleNull &&
-      type.isUnionType() &&
+      type.isUnion() &&
       type
         .getUnionTypes()
         .some((unionType) => typeUtils.isOnlyUndefined(unionType))
@@ -1088,6 +1088,11 @@ export const SYSCALLS = {
     name: 'Neo.Blockchain.GetTransaction',
     args: [new SysCallArgument('hash', BufferValue)],
     returnType: TransactionValue,
+  }),
+  'Neo.Blockchain.GetTransactionHeight': new SimpleSysCall({
+    name: 'Neo.Blockchain.GetTransactionHeight',
+    args: [new SysCallArgument('hash', BufferValue)],
+    returnType: NumberValue,
   }),
   'Neo.Blockchain.GetAccount': new SimpleSysCall({
     name: 'Neo.Blockchain.GetAccount',
