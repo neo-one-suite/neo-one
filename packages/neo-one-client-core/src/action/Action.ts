@@ -1,14 +1,14 @@
 import BN from 'bn.js';
-import { ActionType, assertActionType } from './ActionType';
 import {
+  createDeserializeWire,
   DeserializeWire,
   DeserializeWireBaseOptions,
-  createDeserializeWire,
 } from '../Serializable';
+import { ActionType, assertActionType } from './ActionType';
 import { LogAction } from './LogAction';
+import { LogActionJSON } from './LogAction';
 import { NotificationAction } from './NotificationAction';
 import { NotificationActionJSON } from './NotificationAction';
-import { LogActionJSON } from './LogAction';
 
 export interface ActionsKey {
   indexStart?: BN;

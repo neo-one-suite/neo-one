@@ -1,17 +1,17 @@
 import {
   Address,
+  constant,
+  createEventHandler,
+  Fixed,
+  getAsset,
+  getCurrentTime,
+  getCurrentTransaction,
   Hash256,
   Integer,
-  Fixed,
-  constant,
-  verify,
-  verifySender,
-  getAsset,
-  getCurrentTransaction,
-  getCurrentTime,
   MapStorage,
   SetStorage,
-  createEventHandler,
+  verify,
+  verifySender,
 } from '@neo-one/smart-contract';
 
 import { Token } from './Token';

@@ -1,9 +1,9 @@
 import { common } from '@neo-one/client-core';
-import { params } from '../../sc/params';
-import { InvalidArgumentError } from '../../errors';
-import * as args from '../../args';
-import * as utils from '../../utils';
 import * as abis from '../../__data__/abis';
+import * as args from '../../args';
+import { InvalidArgumentError } from '../../errors';
+import { params } from '../../sc/params';
+import * as utils from '../../utils';
 
 describe('params', () => {
   const expected = '10';

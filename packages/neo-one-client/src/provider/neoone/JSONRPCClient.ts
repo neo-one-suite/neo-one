@@ -13,19 +13,19 @@ import {
   TransactionReceiptJSON,
   ValidatorJSON,
 } from '@neo-one/client-core';
-import BigNumber from 'bignumber.js';
 import { Monitor } from '@neo-one/monitor';
+import BigNumber from 'bignumber.js';
+import { RelayTransactionError } from '../../errors';
 import {
   AddressString,
   BufferString,
   GetOptions,
   Hash160String,
   Hash256String,
-  Peer,
   Options,
+  Peer,
 } from '../../types';
 import { JSONRPCProvider } from './JSONRPCProvider';
-import { RelayTransactionError } from '../../errors';
 
 export class JSONRPCClient {
   private readonly provider: JSONRPCProvider;

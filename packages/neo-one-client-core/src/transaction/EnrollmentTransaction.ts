@@ -1,9 +1,13 @@
-import { TransactionType } from './TransactionType';
-import { Attribute } from './attribute';
+import { common, ECPoint, UInt160Hex } from '../common';
+import { crypto } from '../crypto';
+import { InvalidFormatError, VerifyError } from '../errors';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
+import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
+import { Witness } from '../Witness';
+import { Attribute } from './attribute';
 import {
   TransactionBase,
   TransactionBaseAdd,
@@ -11,11 +15,7 @@ import {
   TransactionGetScriptHashesForVerifyingOptions,
   TransactionVerifyOptions,
 } from './TransactionBase';
-import { InvalidFormatError, VerifyError } from '../errors';
-import { Witness } from '../Witness';
-import { common, ECPoint, UInt160Hex } from '../common';
-import { crypto } from '../crypto';
-import { utils, BinaryWriter, IOHelper, JSONHelper } from '../utils';
+import { TransactionType } from './TransactionType';
 
 export interface EnrollmentTransactionAdd extends TransactionBaseAdd {
   publicKey: ECPoint;

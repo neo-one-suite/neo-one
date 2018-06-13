@@ -1,7 +1,7 @@
 import { CustomError } from '@neo-one/utils';
 import _ from 'lodash';
-import { ScriptContainer } from './ScriptContainer';
 import { UInt160 } from './common';
+import { ScriptContainer } from './ScriptContainer';
 import { Witness } from './Witness';
 
 export interface VerifyScriptOptions {

@@ -1,11 +1,11 @@
 import fetch from 'isomorphic-fetch';
-import { JSONRPCHTTPProvider } from '../../../provider/neoone/JSONRPCHTTPProvider';
+import { UnknownBlockError } from '../../../errors';
 import {
   HTTPError,
   InvalidRPCResponseError,
   JSONRPCError,
 } from '../../../provider/neoone/errors';
-import { UnknownBlockError } from '../../../errors';
+import { JSONRPCHTTPProvider } from '../../../provider/neoone/JSONRPCHTTPProvider';
 
 jest.mock('isomorphic-fetch');
 

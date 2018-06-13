@@ -1,5 +1,5 @@
-import { LocalMemoryStore } from '../../../user/keystore/LocalMemoryStore';
 import { UnlockedWallet } from '../../../user';
+import { LocalMemoryStore } from '../../../user/keystore/LocalMemoryStore';
 
 describe('LocalMemoryStore', () => {
   const wallet: UnlockedWallet = {

@@ -1,8 +1,8 @@
 // tslint:disable ban-types
-import { ClassDeclaration, Node, Type, Symbol } from 'ts-simple-ast';
+import { ClassDeclaration, Node, Symbol, Type } from 'ts-simple-ast';
 
 import { DiagnosticCode } from '../../DiagnosticCode';
-import { Libs, Globals } from '../../symbols';
+import { Globals, Libs } from '../../symbols';
 import { VisitOptions } from '../types';
 
 export interface Transpiler {

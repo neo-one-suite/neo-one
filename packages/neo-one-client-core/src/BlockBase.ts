@@ -1,17 +1,17 @@
 import BN from 'bn.js';
+import { common, UInt160, UInt256, UInt256Hex } from './common';
+import { crypto } from './crypto';
+import { Equals, Equatable } from './Equatable';
+import { InvalidFormatError, UnsignedBlockError } from './errors';
+import { Header, HeaderKey } from './Header';
 import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   SerializeJSONContext,
   SerializeWire,
-  createSerializeWire,
 } from './Serializable';
-import { Equatable, Equals } from './Equatable';
-import { Header, HeaderKey } from './Header';
-import { InvalidFormatError, UnsignedBlockError } from './errors';
+import { BinaryWriter, IOHelper, JSONHelper, utils } from './utils';
 import { Witness, WitnessJSON } from './Witness';
-import { common, UInt160, UInt256, UInt256Hex } from './common';
-import { crypto } from './crypto';
-import { utils, BinaryWriter, IOHelper, JSONHelper } from './utils';
 
 export interface BlockGetScriptHashesForVerifyingOptions {
   getHeader: (key: HeaderKey) => Promise<Header>;

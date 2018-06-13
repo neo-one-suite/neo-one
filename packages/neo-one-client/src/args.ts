@@ -1,6 +1,8 @@
+import { common } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { common } from '@neo-one/client-core';
+import { InvalidArgumentError, InvalidNamedArgumentError } from './errors';
+import { addressToScriptHash } from './helpers';
 import {
   ABI,
   ABIEvent,
@@ -17,8 +19,6 @@ import {
   PublicKeyString,
   TransactionOptions,
 } from './types';
-import { InvalidArgumentError, InvalidNamedArgumentError } from './errors';
-import { addressToScriptHash } from './helpers';
 import { converters } from './user/converters';
 
 export const assertString = (name: string, param: any): string => {

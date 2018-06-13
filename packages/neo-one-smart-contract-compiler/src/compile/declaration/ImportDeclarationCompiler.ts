@@ -1,4 +1,4 @@
-import { SyntaxKind, ImportDeclaration } from 'ts-simple-ast';
+import { ImportDeclaration, SyntaxKind } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

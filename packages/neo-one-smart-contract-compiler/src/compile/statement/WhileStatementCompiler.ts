@@ -1,4 +1,4 @@
-import { WhileStatement, SyntaxKind } from 'ts-simple-ast';
+import { SyntaxKind, WhileStatement } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

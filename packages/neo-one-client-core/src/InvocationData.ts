@@ -1,17 +1,17 @@
 import BN from 'bn.js';
+import { common, ECPoint, UInt160, UInt256 } from './common';
 import {
+  deserializeInvocationResultWireBase,
+  InvocationResult,
+} from './invocationResult';
+import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  SerializeWire,
   SerializableWire,
-  createSerializeWire,
+  SerializeWire,
 } from './Serializable';
-import {
-  InvocationResult,
-  deserializeInvocationResultWireBase,
-} from './invocationResult';
-import { common, ECPoint, UInt160, UInt256 } from './common';
-import { utils, BinaryWriter, BinaryReader, IOHelper } from './utils';
+import { BinaryReader, BinaryWriter, IOHelper, utils } from './utils';
 
 export interface InvocationDataAdd {
   hash: UInt256;

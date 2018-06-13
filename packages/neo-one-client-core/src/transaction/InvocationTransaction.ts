@@ -1,26 +1,26 @@
 import BN from 'bn.js';
-import { TransactionType } from './TransactionType';
-import { Attribute } from './attribute';
 import { ActionJSON } from '../action';
 import { AssetJSON } from '../Asset';
+import { common } from '../common';
 import { ContractJSON } from '../Contract';
+import { crypto } from '../crypto';
+import { InvalidFormatError, VerifyError } from '../errors';
+import { InvocationResultJSON } from '../invocationResult';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
-import { InvocationResultJSON } from '../invocationResult';
+import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
+import { Witness } from '../Witness';
+import { Attribute } from './attribute';
 import {
-  TransactionBase,
   FeeContext,
+  TransactionBase,
   TransactionBaseAdd,
   TransactionBaseJSON,
   TransactionVerifyOptions,
 } from './TransactionBase';
-import { InvalidFormatError, VerifyError } from '../errors';
-import { Witness } from '../Witness';
-import { common } from '../common';
-import { crypto } from '../crypto';
-import { utils, BinaryWriter, IOHelper, JSONHelper } from '../utils';
+import { TransactionType } from './TransactionType';
 
 export interface InvocationTransactionAdd extends TransactionBaseAdd {
   gas: BN;

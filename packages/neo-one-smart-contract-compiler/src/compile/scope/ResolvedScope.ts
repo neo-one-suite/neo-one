@@ -1,10 +1,10 @@
 import { Node } from 'ts-simple-ast';
 
 import { DiagnosticCode } from '../../DiagnosticCode';
-import { Name, Scope } from './Scope';
 import { ProgramCounter } from '../pc';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
+import { Name, Scope } from './Scope';
 
 import * as constants from '../../constants';
 

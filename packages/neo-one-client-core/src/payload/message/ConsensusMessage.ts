@@ -1,13 +1,13 @@
 import {
+  createDeserializeWire,
   DeserializeWire,
   DeserializeWireBaseOptions,
-  createDeserializeWire,
 } from '../../Serializable';
+import { ChangeViewConsensusMessage } from './ChangeViewConsensusMessage';
 import {
   assertConsensusMessageType,
   ConsensusMessageType,
 } from './ConsensusMessageType';
-import { ChangeViewConsensusMessage } from './ChangeViewConsensusMessage';
 import { PrepareRequestConsensusMessage } from './PrepareRequestConsensusMessage';
 import { PrepareResponseConsensusMessage } from './PrepareResponseConsensusMessage';
 

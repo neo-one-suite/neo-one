@@ -1,18 +1,18 @@
 import BN from 'bn.js';
-import { InvocationResult } from './InvocationResult';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializeWire,
-  SerializableWire,
-  createSerializeWire,
-} from '../Serializable';
 import {
   ContractParameter,
   deserializeContractParameterWireBase,
 } from '../contractParameter';
-import { VMState, assertVMState } from '../vm';
-import { utils, BinaryReader, BinaryWriter, IOHelper } from '../utils';
+import {
+  createSerializeWire,
+  DeserializeWireBaseOptions,
+  DeserializeWireOptions,
+  SerializableWire,
+  SerializeWire,
+} from '../Serializable';
+import { BinaryReader, BinaryWriter, IOHelper, utils } from '../utils';
+import { assertVMState, VMState } from '../vm';
+import { InvocationResult } from './InvocationResult';
 
 export interface InvocationResultBaseAdd<T extends VMState> {
   state: T;

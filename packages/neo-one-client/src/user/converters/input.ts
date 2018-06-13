@@ -1,4 +1,4 @@
-import { Input, common } from '@neo-one/client-core';
+import { common, Input } from '@neo-one/client-core';
 import { Input as ClientInput } from '../../types';
 
 export const input = (inputLike: ClientInput): Input =>

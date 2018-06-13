@@ -1,25 +1,25 @@
-import { TransactionType } from './TransactionType';
-import { Attribute } from './attribute';
 import {
   Contract,
   ContractJSON,
-  serializeContractWireBase,
   deserializeContractWireBase,
+  serializeContractWireBase,
   sizeOfContract,
 } from '../Contract';
+import { InvalidFormatError, VerifyError } from '../errors';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
+import { BinaryWriter, IOHelper, utils } from '../utils';
+import { Witness } from '../Witness';
+import { Attribute } from './attribute';
 import {
   TransactionBase,
   TransactionBaseAdd,
   TransactionBaseJSON,
   TransactionVerifyOptions,
 } from './TransactionBase';
-import { InvalidFormatError, VerifyError } from '../errors';
-import { Witness } from '../Witness';
-import { utils, BinaryWriter, IOHelper } from '../utils';
+import { TransactionType } from './TransactionType';
 
 export interface PublishTransactionAdd extends TransactionBaseAdd {
   contract: Contract;

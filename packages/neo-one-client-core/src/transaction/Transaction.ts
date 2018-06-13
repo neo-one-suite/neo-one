@@ -1,28 +1,28 @@
-import { assertTransactionType, TransactionType } from './TransactionType';
+import { UInt256 } from '../common';
 import {
+  createDeserializeWire,
   DeserializeWire,
   DeserializeWireBaseOptions,
-  createDeserializeWire,
 } from '../Serializable';
-import { UInt256 } from '../common';
-import { MinerTransaction } from './MinerTransaction';
-import { IssueTransaction } from './IssueTransaction';
 import { ClaimTransaction } from './ClaimTransaction';
-import { EnrollmentTransaction } from './EnrollmentTransaction';
-import { RegisterTransaction } from './RegisterTransaction';
-import { ContractTransaction } from './ContractTransaction';
-import { PublishTransaction } from './PublishTransaction';
-import { StateTransaction } from './StateTransaction';
-import { InvocationTransaction } from './InvocationTransaction';
-import { MinerTransactionJSON } from './MinerTransaction';
-import { IssueTransactionJSON } from './IssueTransaction';
 import { ClaimTransactionJSON } from './ClaimTransaction';
-import { EnrollmentTransactionJSON } from './EnrollmentTransaction';
-import { RegisterTransactionJSON } from './RegisterTransaction';
 import { ContractTransactionJSON } from './ContractTransaction';
-import { PublishTransactionJSON } from './PublishTransaction';
-import { StateTransactionJSON } from './StateTransaction';
+import { ContractTransaction } from './ContractTransaction';
+import { EnrollmentTransactionJSON } from './EnrollmentTransaction';
+import { EnrollmentTransaction } from './EnrollmentTransaction';
+import { InvocationTransaction } from './InvocationTransaction';
 import { InvocationTransactionJSON } from './InvocationTransaction';
+import { IssueTransactionJSON } from './IssueTransaction';
+import { IssueTransaction } from './IssueTransaction';
+import { MinerTransactionJSON } from './MinerTransaction';
+import { MinerTransaction } from './MinerTransaction';
+import { PublishTransaction } from './PublishTransaction';
+import { PublishTransactionJSON } from './PublishTransaction';
+import { RegisterTransaction } from './RegisterTransaction';
+import { RegisterTransactionJSON } from './RegisterTransaction';
+import { StateTransaction } from './StateTransaction';
+import { StateTransactionJSON } from './StateTransaction';
+import { assertTransactionType, TransactionType } from './TransactionType';
 
 export type Transaction =
   | MinerTransaction

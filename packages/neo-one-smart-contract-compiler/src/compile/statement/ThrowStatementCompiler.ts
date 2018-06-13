@@ -1,4 +1,4 @@
-import { ThrowStatement, SyntaxKind } from 'ts-simple-ast';
+import { SyntaxKind, ThrowStatement } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

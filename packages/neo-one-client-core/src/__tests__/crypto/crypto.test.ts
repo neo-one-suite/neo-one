@@ -1,6 +1,6 @@
+import { keys } from '../../__data__';
 import { common } from '../../common';
 import { crypto } from '../../crypto';
-import { keys } from '../../__data__';
 
 for (const key of keys) {
   const {

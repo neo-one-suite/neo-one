@@ -1,7 +1,7 @@
 import { ClassDeclaration } from 'ts-simple-ast';
 
-import * as utils from './utils';
 import { getLibs } from './symbols';
+import * as utils from './utils';
 
 export interface Contracts {
   [file: string]: string[];

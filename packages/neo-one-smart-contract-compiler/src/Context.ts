@@ -1,18 +1,18 @@
 // tslint:disable ban-types
 import {
   DiagnosticCategory,
+  Identifier,
   Node,
   Symbol,
+  ts,
   Type,
   TypeFlags,
   TypeGuards,
-  ts,
-  Identifier,
 } from 'ts-simple-ast';
 
 import { CompilerDiagnostic } from './CompilerDiagnostic';
 import { DiagnosticCode } from './DiagnosticCode';
-import { Globals, Libs, LibAliases, LibAliasesWithReset } from './symbols';
+import { Globals, LibAliases, LibAliasesWithReset, Libs } from './symbols';
 
 import * as typeUtils from './typeUtils';
 

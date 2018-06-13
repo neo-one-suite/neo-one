@@ -1,8 +1,8 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 export type ForLoopHelperFunction = (() => void) | undefined;
 export interface ForLoopHelperOptions {

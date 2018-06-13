@@ -4,8 +4,8 @@ import AsExpressionCompiler from './AsExpressionCompiler';
 import AwaitExpressionCompiler from './AwaitExpressionCompiler';
 import BinaryExpressionCompiler from './BinaryExpressionCompiler';
 import {
-  TrueBooleanLiteralCompiler,
   FalseBooleanLiteralCompiler,
+  TrueBooleanLiteralCompiler,
 } from './BooleanLiteralCompiler';
 import CallExpressionCompiler from './CallExpressionCompiler';
 import CommaListExpressionCompiler from './CommaListExpressionCompiler';

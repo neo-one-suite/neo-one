@@ -1,8 +1,8 @@
-import { ElementAccessExpression, Node, Type, ts } from 'ts-simple-ast';
+import { ElementAccessExpression, Node, ts, Type } from 'ts-simple-ast';
 
-import { Helper } from '../../Helper';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
+import { Helper } from '../../Helper';
 
 import * as typeUtils from '../../../../typeUtils';
 

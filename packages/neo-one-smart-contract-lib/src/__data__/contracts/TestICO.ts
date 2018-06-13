@@ -1,8 +1,8 @@
 import {
   Address,
-  Integer,
-  Fixed,
   createEventHandler,
+  Fixed,
+  Integer,
 } from '@neo-one/smart-contract';
 
 import { ICO } from '../../ICO';

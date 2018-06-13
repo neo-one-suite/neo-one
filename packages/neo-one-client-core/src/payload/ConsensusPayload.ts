@@ -1,20 +1,20 @@
+import { common, ECPoint, PrivateKey, UInt256, UInt256Hex } from '../common';
+import { crypto } from '../crypto';
+import { Equals, Equatable } from '../Equatable';
+import { InvalidFormatError, VerifyError } from '../errors';
 import { ScriptContainerType } from '../ScriptContainer';
 import {
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
   SerializableWire,
 } from '../Serializable';
-import { Equatable, Equals } from '../Equatable';
-import { InvalidFormatError, VerifyError } from '../errors';
+import { BinaryReader, BinaryWriter, utils } from '../utils';
+import { VerifyScript } from '../vm';
+import { Witness } from '../Witness';
 import {
   UnsignedConsensusPayload,
   UnsignedConsensusPayloadAdd,
 } from './UnsignedConsensusPayload';
-import { VerifyScript } from '../vm';
-import { Witness } from '../Witness';
-import { common, ECPoint, PrivateKey, UInt256, UInt256Hex } from '../common';
-import { crypto } from '../crypto';
-import { utils, BinaryReader, BinaryWriter } from '../utils';
 
 export interface ConsensusPayloadAdd extends UnsignedConsensusPayloadAdd {
   script: Witness;

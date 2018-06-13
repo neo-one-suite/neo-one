@@ -1,13 +1,13 @@
-import Blockchain from '@neo-one/node-blockchain';
-import Ast, { DiagnosticCategory, SourceFile } from 'ts-simple-ast';
 import { InvocationResult } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
+import Blockchain from '@neo-one/node-blockchain';
+import Ast, { DiagnosticCategory, SourceFile } from 'ts-simple-ast';
 
-import levelup from 'levelup';
-import levelUpStorage from '@neo-one/node-storage-levelup';
-import memdown from 'memdown';
 import { test as testNet } from '@neo-one/node-neo-settings';
+import levelUpStorage from '@neo-one/node-storage-levelup';
 import vm from '@neo-one/node-vm';
+import levelup from 'levelup';
+import memdown from 'memdown';
 
 import { compile } from './compile';
 

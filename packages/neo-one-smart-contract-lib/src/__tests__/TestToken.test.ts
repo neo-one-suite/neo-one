@@ -1,5 +1,5 @@
-import BigNumber from 'bignumber.js';
 import { privateKeyToScriptHash } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
 
 import { testToken } from '../__data__';
 

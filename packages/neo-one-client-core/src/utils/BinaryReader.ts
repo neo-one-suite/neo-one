@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import _ from 'lodash';
-import { ECPoint, UInt160, UInt256, common } from '../common';
+import { common, ECPoint, UInt160, UInt256 } from '../common';
 import { InvalidFormatError } from '../errors';
 
 export class BinaryReader {

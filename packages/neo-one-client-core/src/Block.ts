@@ -2,6 +2,11 @@ import BN from 'bn.js';
 import { Account, AccountKey } from './Account';
 import { Asset, AssetKey } from './Asset';
 import { BlockBase, BlockBaseJSON } from './BlockBase';
+import { common, ECPoint, UInt160, UInt256 } from './common';
+import { crypto, MerkleTree } from './crypto';
+import { InvalidFormatError, VerifyError } from './errors';
+import { Header, HeaderKey } from './Header';
+import { ScriptContainerType } from './ScriptContainer';
 import {
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
@@ -9,9 +14,8 @@ import {
   SerializableWire,
   SerializeJSONContext,
 } from './Serializable';
-import { Header, HeaderKey } from './Header';
-import { ScriptContainerType } from './ScriptContainer';
 import {
+  deserializeTransactionWireBase,
   FeeContext,
   Input,
   Output,
@@ -20,15 +24,11 @@ import {
   Transaction,
   TransactionJSON,
   TransactionType,
-  deserializeTransactionWireBase,
 } from './transaction';
-import { InvalidFormatError, VerifyError } from './errors';
+import { BinaryReader, BinaryWriter, IOHelper, utils } from './utils';
 import { Validator } from './Validator';
 import { VerifyScript } from './vm';
 import { Witness } from './Witness';
-import { common, ECPoint, UInt160, UInt256 } from './common';
-import { crypto, MerkleTree } from './crypto';
-import { utils, BinaryReader, BinaryWriter, IOHelper } from './utils';
 
 export interface BlockAdd {
   version?: number;

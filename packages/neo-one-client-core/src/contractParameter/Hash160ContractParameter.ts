@@ -1,11 +1,11 @@
-import { ContractParameterType } from './ContractParameterType';
-import { ContractParameterBase } from './ContractParameterBase';
+import { common, UInt160 } from '../common';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
-import { common, UInt160 } from '../common';
-import { utils, BinaryWriter, IOHelper, JSONHelper } from '../utils';
+import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
+import { ContractParameterBase } from './ContractParameterBase';
+import { ContractParameterType } from './ContractParameterType';
 
 export interface Hash160ContractParameterJSON {
   type: 'Hash160';

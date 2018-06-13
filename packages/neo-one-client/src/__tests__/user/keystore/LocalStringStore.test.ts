@@ -1,6 +1,6 @@
-import { LocalStringStore } from '../../../user/keystore/LocalStringStore';
 import { PasswordRequiredError } from '../../../errors';
 import { UnlockedWallet } from '../../../user';
+import { LocalStringStore } from '../../../user/keystore/LocalStringStore';
 
 describe('LocalStringStore', () => {
   const wallet: UnlockedWallet = {

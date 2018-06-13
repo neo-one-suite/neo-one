@@ -1,20 +1,20 @@
-import { Param as ScriptBuilderParam, common } from '@neo-one/client-core';
+import { common, Param as ScriptBuilderParam } from '@neo-one/client-core';
+import * as args from '../args';
+import { InvalidArgumentError } from '../errors';
 import {
   ArrayABI,
-  Param,
-  SignatureABI,
   BooleanABI,
+  ByteArrayABI,
   Hash160ABI,
   Hash256ABI,
-  ByteArrayABI,
-  PublicKeyABI,
-  StringABI,
-  InteropInterfaceABI,
-  VoidABI,
   IntegerABI,
+  InteropInterfaceABI,
+  Param,
+  PublicKeyABI,
+  SignatureABI,
+  StringABI,
+  VoidABI,
 } from '../types';
-import { InvalidArgumentError } from '../errors';
-import * as args from '../args';
 import * as utils from '../utils';
 
 export const params = {

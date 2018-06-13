@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { Jump, Call, Jmp } from '../pc';
+import { Call, Jmp, Jump } from '../pc';
 
 import { KnownProgramCounter } from '../pc/KnownProgramCounter';
 

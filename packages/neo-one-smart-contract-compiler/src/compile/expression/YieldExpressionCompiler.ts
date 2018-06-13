@@ -1,4 +1,4 @@
-import { YieldExpression, SyntaxKind } from 'ts-simple-ast';
+import { SyntaxKind, YieldExpression } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

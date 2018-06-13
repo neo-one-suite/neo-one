@@ -1,12 +1,12 @@
-import { BinaryWriter, BinaryReader } from '../../utils';
-import { ConsensusMessageType } from './ConsensusMessageType';
 import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  SerializeWire,
   SerializableWire,
-  createSerializeWire,
+  SerializeWire,
 } from '../../Serializable';
+import { BinaryReader, BinaryWriter } from '../../utils';
+import { ConsensusMessageType } from './ConsensusMessageType';
 
 export interface ConsensusMessageBaseAdd {
   viewNumber: number;
@@ -14,7 +14,7 @@ export interface ConsensusMessageBaseAdd {
 
 export interface ConsensusMessageBaseAddWithType<
   Type extends ConsensusMessageType
-  > extends ConsensusMessageBaseAdd {
+> extends ConsensusMessageBaseAdd {
   type: Type;
 }
 
@@ -31,7 +31,7 @@ export class ConsensusMessageBase<T, Type extends ConsensusMessageType>
       type,
       viewNumber,
     };
-  }
+  };
 
   public static deserializeWireBase(
     options: DeserializeWireBaseOptions,

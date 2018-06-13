@@ -1,12 +1,12 @@
 import BigNumber from 'bignumber.js';
-import * as common from '../../sc/common';
+import * as abis from '../../__data__/abis';
 import {
-  InvalidEventError,
   InvalidArgumentError,
+  InvalidEventError,
   InvocationCallError,
 } from '../../errors';
-import * as abis from '../../__data__/abis';
-import { ABIParameter, ContractParameter, ActionRaw } from '../../types';
+import * as common from '../../sc/common';
+import { ABIParameter, ActionRaw, ContractParameter } from '../../types';
 
 describe('common', () => {
   const abiParameter: ABIParameter = { name: 'name', type: 'String' };

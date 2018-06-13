@@ -1,8 +1,7 @@
 import { Action } from './action';
 import { Asset } from './Asset';
-import { Contract } from './Contract';
-import { BinaryReader, BinaryWriter } from './utils';
 import { ECPoint, UInt160 } from './common';
+import { Contract } from './Contract';
 import { InvocationResult } from './invocationResult';
 import {
   FeeContext,
@@ -11,6 +10,7 @@ import {
   TransactionBase,
 } from './transaction';
 import { TransactionData } from './TransactionData';
+import { BinaryReader, BinaryWriter } from './utils';
 
 export interface DeserializeWireContext {
   messageMagic: number;

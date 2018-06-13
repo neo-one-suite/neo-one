@@ -1,22 +1,22 @@
 import BN from 'bn.js';
 import { BaseState } from './BaseState';
-import { Equatable, Equals } from './Equatable';
+import { common, ECPoint } from './common';
+import { Equals, Equatable } from './Equatable';
 import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  SerializeJSONContext,
   SerializableJSON,
-  SerializeWire,
   SerializableWire,
-  createSerializeWire,
+  SerializeJSONContext,
+  SerializeWire,
 } from './Serializable';
-import { common, ECPoint } from './common';
 import {
-  utils,
   BinaryReader,
   BinaryWriter,
   IOHelper,
   JSONHelper,
+  utils,
 } from './utils';
 
 export interface ValidatorKey {

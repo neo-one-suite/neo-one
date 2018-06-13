@@ -1,13 +1,13 @@
-import Ast, { SourceFile } from 'ts-simple-ast';
 import { InvocationResult } from '@neo-one/client-core';
+import Ast, { SourceFile } from 'ts-simple-ast';
 
 import appRootDir from 'app-root-dir';
 import path from 'path';
 
-import { checkResult } from './extractors';
 import { executeScript } from '../../executeScript';
-import { monitor } from './monitor';
 import * as utils from '../../utils';
+import { checkResult } from './extractors';
+import { monitor } from './monitor';
 
 const execute = async (ast: Ast, sourceFile: SourceFile, prelude?: Buffer) => {
   const result = await executeScript(monitor, ast, sourceFile, prelude);

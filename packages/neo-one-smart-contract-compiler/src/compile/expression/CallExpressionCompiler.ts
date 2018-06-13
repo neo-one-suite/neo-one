@@ -1,10 +1,10 @@
 import { CallExpression, SyntaxKind, TypeGuards } from 'ts-simple-ast';
 
-import { SYSCALLS } from '../syscalls';
+import { DiagnosticCode } from '../../DiagnosticCode';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
+import { SYSCALLS } from '../syscalls';
 import { VisitOptions } from '../types';
-import { DiagnosticCode } from '../../DiagnosticCode';
 
 export default class CallExpressionCompiler extends NodeCompiler<
   CallExpression

@@ -1,21 +1,21 @@
 import BN from 'bn.js';
-import { Equatable, Equals } from '../Equatable';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializeWire,
-  SerializableWire,
-  SerializeJSONContext,
-  createSerializeWire,
-} from '../Serializable';
 import { common, UInt160, UInt256 } from '../common';
 import { crypto } from '../crypto';
+import { Equals, Equatable } from '../Equatable';
 import {
-  utils,
+  createSerializeWire,
+  DeserializeWireBaseOptions,
+  DeserializeWireOptions,
+  SerializableWire,
+  SerializeJSONContext,
+  SerializeWire,
+} from '../Serializable';
+import {
   BinaryReader,
   BinaryWriter,
   IOHelper,
   JSONHelper,
+  utils,
 } from '../utils';
 
 export interface OutputKey {

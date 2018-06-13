@@ -1,14 +1,14 @@
-import { BehaviorSubject } from 'rxjs';
 import FullNode from '@neo-one/node';
+import { BehaviorSubject } from 'rxjs';
 
-import _ from 'lodash';
-import { createMain } from '@neo-one/node-neo-settings';
 import {
   addressToScriptHash,
   createPrivateKey,
   privateKeyToAddress,
   privateKeyToPublicKey,
 } from '@neo-one/client';
+import { createMain } from '@neo-one/node-neo-settings';
+import _ from 'lodash';
 import memdown from 'memdown';
 
 import { addCleanup } from './cleanupTest';

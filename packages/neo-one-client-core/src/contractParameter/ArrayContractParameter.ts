@@ -1,8 +1,8 @@
-import { ContractParameterType } from './ContractParameterType';
-import { ContractParameterBase } from './ContractParameterBase';
-import { ContractParameter, ContractParameterJSON } from './ContractParameter';
 import { SerializeJSONContext } from '../Serializable';
-import { utils, BinaryWriter, IOHelper } from '../utils';
+import { BinaryWriter, IOHelper, utils } from '../utils';
+import { ContractParameter, ContractParameterJSON } from './ContractParameter';
+import { ContractParameterBase } from './ContractParameterBase';
+import { ContractParameterType } from './ContractParameterType';
 
 export interface ArrayContractParameterJSON {
   type: 'Array';

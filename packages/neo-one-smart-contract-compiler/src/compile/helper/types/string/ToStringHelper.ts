@@ -1,9 +1,9 @@
 import { Node, Type } from 'ts-simple-ast';
 
-import { Helper } from '../../Helper';
-import { TypedHelper } from '../../common';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
+import { TypedHelper } from '../../common';
+import { Helper } from '../../Helper';
 
 import * as typeUtils from '../../../../typeUtils';
 

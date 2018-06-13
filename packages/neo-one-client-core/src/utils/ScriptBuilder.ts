@@ -1,8 +1,8 @@
-import BN from 'bn.js';
 import { CustomError } from '@neo-one/utils';
-import { ByteCode, OpCode, Op, ByteBuffer, SysCallName } from '../vm';
+import BN from 'bn.js';
+import { common, ECPoint, UInt160, UInt256 } from '../common';
+import { ByteBuffer, ByteCode, Op, OpCode, SysCallName } from '../vm';
 import { BinaryWriter } from './BinaryWriter';
-import { ECPoint, UInt160, UInt256, common } from '../common';
 import { utils } from './utils';
 
 export class UnknownOpError extends CustomError {
@@ -25,7 +25,7 @@ export class InvalidParamError extends CustomError {
   }
 }
 
-export interface ParamArray extends Array<Param | null> { }
+export interface ParamArray extends Array<Param | null> {}
 export type Param =
   | BN
   | number

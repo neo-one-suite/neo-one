@@ -1,14 +1,14 @@
 import BN from 'bn.js';
+import { ContractParameter, ContractParameterJSON } from '../contractParameter';
+import { InvalidFormatError } from '../errors';
 import {
   DeserializeWireBaseOptions,
   SerializableJSON,
   SerializeJSONContext,
 } from '../Serializable';
-import { InvocationResultBase } from './InvocationResultBase';
-import { InvalidFormatError } from '../errors';
-import { ContractParameter, ContractParameterJSON } from '../contractParameter';
+import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { VMState } from '../vm';
-import { utils, BinaryWriter, IOHelper, JSONHelper } from '../utils';
+import { InvocationResultBase } from './InvocationResultBase';
 
 export interface InvocationResultErrorAdd {
   gasConsumed: BN;

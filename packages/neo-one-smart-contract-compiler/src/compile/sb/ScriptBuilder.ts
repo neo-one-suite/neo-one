@@ -1,15 +1,15 @@
 // tslint:disable ban-types
-import BN from 'bn.js';
-import { Node, SourceFile, Type, Symbol } from 'ts-simple-ast';
 import { OpCode, SysCallName } from '@neo-one/client-core';
+import BN from 'bn.js';
+import { Node, SourceFile, Symbol, Type } from 'ts-simple-ast';
 
 import { DiagnosticCode } from '../../DiagnosticCode';
-import { Helpers, Helper } from '../helper';
-import { JumpTable } from './JumpTable';
-import { ProgramCounter, ProgramCounterHelper, Jump } from '../pc';
-import { Scope, Name } from '../scope';
-import { VisitOptions } from '../types';
 import { Globals } from '../../symbols';
+import { Helper, Helpers } from '../helper';
+import { Jump, ProgramCounter, ProgramCounterHelper } from '../pc';
+import { Name, Scope } from '../scope';
+import { VisitOptions } from '../types';
+import { JumpTable } from './JumpTable';
 
 export type Bytecode = Array<[Node, Buffer | Jump]>;
 

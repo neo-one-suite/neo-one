@@ -1,4 +1,4 @@
-import { SyntaxKind, ExportAssignment } from 'ts-simple-ast';
+import { ExportAssignment, SyntaxKind } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

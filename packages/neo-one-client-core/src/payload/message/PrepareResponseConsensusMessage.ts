@@ -1,10 +1,10 @@
-import { ConsensusMessageType } from './ConsensusMessageType';
+import { DeserializeWireBaseOptions } from '../../Serializable';
 import { BinaryWriter } from '../../utils';
 import {
   ConsensusMessageBase,
   ConsensusMessageBaseAdd,
 } from './ConsensusMessageBase';
-import { DeserializeWireBaseOptions } from '../../Serializable';
+import { ConsensusMessageType } from './ConsensusMessageType';
 
 export interface PrepareResponseAdd extends ConsensusMessageBaseAdd {
   signature: Buffer;

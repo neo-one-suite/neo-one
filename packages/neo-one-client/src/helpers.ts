@@ -1,4 +1,4 @@
-import { crypto, common } from '@neo-one/client-core';
+import { common, crypto } from '@neo-one/client-core';
 import {
   AddressString,
   Hash160String,

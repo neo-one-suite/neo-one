@@ -1,21 +1,21 @@
 import {
-  CollectedMetric,
-  Counter,
-  Histogram,
-  Labels,
-  MetricCollection,
-  MetricOptions,
-  BucketedMetricOptions,
-  PercentiledMetricOptions,
-  MetricValue,
-  CounterBase,
-  HistogramBase,
-} from './types';
-import {
   CounterProxy,
   HistogramProxy,
   MetricsFactoryProxy,
 } from './MetricsFactoryProxy';
+import {
+  BucketedMetricOptions,
+  CollectedMetric,
+  Counter,
+  CounterBase,
+  Histogram,
+  HistogramBase,
+  Labels,
+  MetricCollection,
+  MetricOptions,
+  MetricValue,
+  PercentiledMetricOptions,
+} from './types';
 
 class CollectingMetric<T extends MetricOptions | BucketedMetricOptions> {
   public readonly metric: T;

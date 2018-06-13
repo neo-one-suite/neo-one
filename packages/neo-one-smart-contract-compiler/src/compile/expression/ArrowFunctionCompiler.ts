@@ -1,9 +1,9 @@
 import { ArrowFunction, SyntaxKind } from 'ts-simple-ast';
 
+import { InternalFunctionProperties } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
-import { InternalFunctionProperties } from '../helper';
 
 export default class ArrowFunctionCompiler extends NodeCompiler<ArrowFunction> {
   public readonly kind: SyntaxKind = SyntaxKind.ArrowFunction;

@@ -1,12 +1,8 @@
-import {
-  JSONHelper,
-  common,
-  utils,
-} from '@neo-one/client-core';
-import { contractParameters as parameters } from '../../sc/parameters';
-import { InvalidContractParameterError } from '../../errors';
+import { common, JSONHelper, utils } from '@neo-one/client-core';
 import * as abis from '../../__data__/abis';
 import { contracts } from '../../__data__/contracts';
+import { InvalidContractParameterError } from '../../errors';
+import { contractParameters as parameters } from '../../sc/parameters';
 
 describe('parameters', () => {
   describe('check parameters of correct type', () => {
@@ -115,7 +111,7 @@ describe('parameters', () => {
       function testError() {
         // @ts-ignore
         return parameters.ByteArray(
-          (contracts.Array as any),
+          contracts.Array as any,
           (abis.parameters as any).ByteArray,
         );
       }
@@ -197,7 +193,7 @@ describe('parameters', () => {
       });
       // @ts-ignore
       const result = parameters.Integer(
-        (contracts.ByteArray as any),
+        contracts.ByteArray as any,
         (abis.parameters as any).Integer,
       );
 
@@ -276,7 +272,7 @@ describe('parameters', () => {
 
       // @ts-ignore
       const result = parameters.ByteArray(
-        (contracts.String as any),
+        contracts.String as any,
         (abis.parameters as any).ByteArray,
       );
 
@@ -288,7 +284,7 @@ describe('parameters', () => {
 
       // @ts-ignore
       const result = parameters.ByteArray(
-        (contracts.InteropInterface as any),
+        contracts.InteropInterface as any,
         (abis.parameters as any).ByteArray,
       );
 
@@ -300,7 +296,7 @@ describe('parameters', () => {
 
       // @ts-ignore
       const result = parameters.ByteArray(
-        (contracts.Void as any),
+        contracts.Void as any,
         (abis.parameters as any).ByteArray,
       );
 

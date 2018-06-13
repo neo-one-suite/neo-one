@@ -1,13 +1,13 @@
-import { VMState, assertVMState } from '../vm';
 import {
+  createDeserializeWire,
   DeserializeWire,
   DeserializeWireBaseOptions,
-  createDeserializeWire,
 } from '../Serializable';
-import { InvocationResultSuccess } from './InvocationResultSuccess';
+import { assertVMState, VMState } from '../vm';
 import { InvocationResultError } from './InvocationResultError';
-import { InvocationResultSuccessJSON } from './InvocationResultSuccess';
 import { InvocationResultErrorJSON } from './InvocationResultError';
+import { InvocationResultSuccess } from './InvocationResultSuccess';
+import { InvocationResultSuccessJSON } from './InvocationResultSuccess';
 
 export type InvocationResult = InvocationResultSuccess | InvocationResultError;
 export type InvocationResultJSON =

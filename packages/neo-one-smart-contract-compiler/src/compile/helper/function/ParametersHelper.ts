@@ -1,8 +1,8 @@
-import { SignaturedDeclaration, Node } from 'ts-simple-ast';
+import { Node, SignaturedDeclaration } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 // Input: [argsArray]
 // Output: []

@@ -1,15 +1,15 @@
 import BN from 'bn.js';
-import { ActionType } from './ActionType';
-import { BinaryWriter, BinaryReader, JSONHelper } from '../utils';
+import { UInt160 } from '../common';
 import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
+  SerializableWire,
   SerializeJSONContext,
   SerializeWire,
-  SerializableWire,
-  createSerializeWire,
 } from '../Serializable';
-import { UInt160 } from '../common';
+import { BinaryReader, BinaryWriter, JSONHelper } from '../utils';
+import { ActionType } from './ActionType';
 
 export interface ActionBaseAdd {
   version?: number;
@@ -46,7 +46,7 @@ export class ActionBase<T, Type extends ActionType>
       index,
       scriptHash,
     };
-  }
+  };
 
   public static deserializeWireBase(
     options: DeserializeWireBaseOptions,

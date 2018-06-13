@@ -1,23 +1,24 @@
-import { Context } from 'koa';
 import { IncomingMessage } from 'http';
+import { Context } from 'koa';
 
 import _ from 'lodash';
 
+import { ReportHandler } from './ReportHandler';
 import {
-  Counter,
-  Histogram,
-  Summary,
-  Carrier,
   CaptureLogOptions,
   CaptureMonitor,
-  CaptureSpanOptions,
   CaptureSpanLogOptions,
+  CaptureSpanOptions,
+  Carrier,
+  Counter,
   Format,
+  Histogram,
+  KnownLabel,
   Labels,
-  Logger,
   LogErrorOptions,
-  LogLevelOption,
+  Logger,
   LogLevel,
+  LogLevelOption,
   LogOptions,
   Metric,
   Monitor,
@@ -25,12 +26,11 @@ import {
   Span,
   SpanContext,
   SpanOptions,
-  KnownLabel,
+  Summary,
 } from './types';
-import { ReportHandler } from './ReportHandler';
 
-import { convertTagLabels } from './utils';
 import { createTracer } from './createTracer';
+import { convertTagLabels } from './utils';
 
 export interface FullLogLevelOption {
   log: LogLevel;

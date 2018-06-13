@@ -1,9 +1,9 @@
-import { ContractParameterType } from './ContractParameterType';
-import { ContractParameterBase } from './ContractParameterBase';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
+import { ContractParameterBase } from './ContractParameterBase';
+import { ContractParameterType } from './ContractParameterType';
 
 export interface InteropInterfaceContractParameterJSON {
   type: 'InteropInterface';

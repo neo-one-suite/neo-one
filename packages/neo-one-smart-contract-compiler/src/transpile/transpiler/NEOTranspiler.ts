@@ -1,35 +1,35 @@
 // tslint:disable ban-types
-import Ast, {
-  Node,
-  ClassInstanceMemberTypes,
-  ClassDeclaration,
-  Type,
-  Symbol,
-  TypeGuards,
-  Identifier,
-  SyntaxKind,
-  TypeNode,
-  SourceFile,
-  CallExpression,
-} from 'ts-simple-ast';
 import {
+  ABIEvent,
+  ABIFunction,
   ABIParameter,
   ABIReturn,
-  ABIFunction,
-  ABIEvent,
 } from '@neo-one/client';
+import Ast, {
+  CallExpression,
+  ClassDeclaration,
+  ClassInstanceMemberTypes,
+  Identifier,
+  Node,
+  SourceFile,
+  Symbol,
+  SyntaxKind,
+  Type,
+  TypeGuards,
+  TypeNode,
+} from 'ts-simple-ast';
 
 import _ from 'lodash';
 
 import { Context } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
-import { Globals, Libs, LibAliases } from '../../symbols';
-import { NodeTranspiler } from '../NodeTranspiler';
-import { Transpiler } from './Transpiler';
-import declarations from '../declaration';
 import * as nodeUtils from '../../nodeUtils';
+import { Globals, LibAliases, Libs } from '../../symbols';
 import * as typeUtils from '../../typeUtils';
+import declarations from '../declaration';
+import { NodeTranspiler } from '../NodeTranspiler';
 import { TranspileResult, VisitOptions } from '../types';
+import { Transpiler } from './Transpiler';
 
 const transpilers = [declarations];
 

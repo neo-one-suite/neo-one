@@ -5,7 +5,7 @@
   "rules": {
     "interface-name": false,
     "max-classes-per-file": false,
-    "ordered-imports": false,
+    "ordered-imports": true,
     "quotemark": [
       true,
       "single"

@@ -1,4 +1,4 @@
-import { TryStatement, SyntaxKind } from 'ts-simple-ast';
+import { SyntaxKind, TryStatement } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

@@ -1,10 +1,10 @@
 import Ast, { Node, SourceFile } from 'ts-simple-ast';
 
-import { BaseScriptBuilder } from './BaseScriptBuilder';
 import { Context } from '../../Context';
-import { ResolvedScope } from '../scope';
-import { ScriptBuilder } from './ScriptBuilder';
 import { Helper, Helpers } from '../helper';
+import { ResolvedScope } from '../scope';
+import { BaseScriptBuilder } from './BaseScriptBuilder';
+import { ScriptBuilder } from './ScriptBuilder';
 
 export interface EmittingScriptBuilderOptions {
   context: Context;

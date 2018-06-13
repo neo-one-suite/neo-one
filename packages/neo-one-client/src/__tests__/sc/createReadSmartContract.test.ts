@@ -1,7 +1,7 @@
 import { toArray } from 'ix/asynciterable/toarray';
-import { createReadSmartContract } from '../../sc/createReadSmartContract';
-import * as common from '../../sc/common';
 import * as abis from '../../__data__/abis';
+import * as common from '../../sc/common';
+import { createReadSmartContract } from '../../sc/createReadSmartContract';
 
 describe('createReadSmartContract', () => {
   const expectedLog = {

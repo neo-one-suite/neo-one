@@ -1,4 +1,4 @@
-import { WithStatement, SyntaxKind } from 'ts-simple-ast';
+import { SyntaxKind, WithStatement } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

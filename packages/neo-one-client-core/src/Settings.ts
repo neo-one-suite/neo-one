@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import { Block } from './Block';
 import { ECPoint } from './common';
-import { TransactionType, RegisterTransaction } from './transaction';
+import { RegisterTransaction, TransactionType } from './transaction';
 
 export interface VMSettings {
   storageContext: {

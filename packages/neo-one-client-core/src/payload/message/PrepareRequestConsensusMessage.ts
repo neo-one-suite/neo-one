@@ -1,14 +1,14 @@
 import BN from 'bn.js';
-import { ConsensusMessageType } from './ConsensusMessageType';
+import { common, UInt160, UInt256 } from '../../common';
+import { InvalidFormatError } from '../../errors';
+import { DeserializeWireBaseOptions } from '../../Serializable';
+import { MinerTransaction } from '../../transaction';
 import { BinaryWriter } from '../../utils';
 import {
   ConsensusMessageBase,
   ConsensusMessageBaseAdd,
 } from './ConsensusMessageBase';
-import { DeserializeWireBaseOptions } from '../../Serializable';
-import { InvalidFormatError } from '../../errors';
-import { MinerTransaction } from '../../transaction';
-import { common, UInt160, UInt256 } from '../../common';
+import { ConsensusMessageType } from './ConsensusMessageType';
 
 export interface PrepareRequestAdd extends ConsensusMessageBaseAdd {
   nonce: BN;

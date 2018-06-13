@@ -1,7 +1,7 @@
-import { NEOONEProvider } from '../../../provider/neoone/NEOONEProvider';
-import { UnknownNetworkError } from '../../../errors';
 import { keys, transactions } from '../../../__data__';
+import { UnknownNetworkError } from '../../../errors';
 import * as networkConfigs from '../../../networks';
+import { NEOONEProvider } from '../../../provider/neoone/NEOONEProvider';
 
 describe('NEOONEProvider', () => {
   const network = 'net';

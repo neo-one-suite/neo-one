@@ -1,5 +1,5 @@
-import { Helper } from '../../Helper';
 import { ScriptBuilder } from '../../../sb';
+import { Helper } from '../../Helper';
 import { SetObjectPropertyHelperBase } from './SetObjectPropertyHelperBase';
 
 // Input: [val, stringProp, objectVal]

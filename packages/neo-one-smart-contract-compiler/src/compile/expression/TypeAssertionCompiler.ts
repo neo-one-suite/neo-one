@@ -1,4 +1,4 @@
-import { TypeAssertion, SyntaxKind } from 'ts-simple-ast';
+import { SyntaxKind, TypeAssertion } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

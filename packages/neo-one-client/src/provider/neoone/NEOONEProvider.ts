@@ -1,22 +1,22 @@
-import BigNumber from 'bignumber.js';
 import { Monitor } from '@neo-one/monitor';
-import { Observable, BehaviorSubject } from 'rxjs';
+import BigNumber from 'bignumber.js';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { UnknownNetworkError } from '../../errors';
+import * as networkConfigs from '../../networks';
 import {
   AddressString,
   GetOptions,
   Hash256String,
   Input,
-  RawInvocationData,
-  RawInvocationResult,
   NetworkSettings,
   NetworkType,
+  RawInvocationData,
+  RawInvocationResult,
   Transaction,
   TransactionReceipt,
   UnspentOutput,
 } from '../../types';
 import { NEOONEDataProvider } from './NEOONEDataProvider';
-import { UnknownNetworkError } from '../../errors';
-import * as networkConfigs from '../../networks';
 
 export interface NEOONEProviderOptions {
   network: NetworkType;

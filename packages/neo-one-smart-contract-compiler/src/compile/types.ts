@@ -1,8 +1,8 @@
 import { Type } from 'ts-simple-ast';
 
+import { Context } from '../Context';
 import { ProgramCounter } from './pc';
 import { Name } from './scope';
-import { Context } from '../Context';
 
 export interface VisitOptions {
   pushValue?: boolean | undefined;

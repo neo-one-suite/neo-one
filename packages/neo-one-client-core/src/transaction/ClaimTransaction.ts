@@ -1,24 +1,24 @@
 import BN from 'bn.js';
-import { TransactionType } from './TransactionType';
-import { Attribute } from './attribute';
+import { common, UInt160Hex } from '../common';
+import { InvalidFormatError, VerifyError } from '../errors';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
+import { BinaryWriter, IOHelper, utils } from '../utils';
+import { Witness } from '../Witness';
+import { Attribute } from './attribute';
+import { hasDuplicateInputs, hasIntersectingInputs } from './common';
 import { Input, InputJSON } from './Input';
 import {
-  TransactionBase,
   FeeContext,
+  TransactionBase,
   TransactionBaseAdd,
   TransactionBaseJSON,
   TransactionGetScriptHashesForVerifyingOptions,
   TransactionVerifyOptions,
 } from './TransactionBase';
-import { InvalidFormatError, VerifyError } from '../errors';
-import { Witness } from '../Witness';
-import { common, UInt160Hex } from '../common';
-import { hasDuplicateInputs, hasIntersectingInputs } from './common';
-import { utils, BinaryWriter, IOHelper } from '../utils';
+import { TransactionType } from './TransactionType';
 
 export interface ClaimTransactionAdd extends TransactionBaseAdd {
   claims: Input[];

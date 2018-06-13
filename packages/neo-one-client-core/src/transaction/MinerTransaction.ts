@@ -1,21 +1,21 @@
 import BN from 'bn.js';
-import { TransactionType } from './TransactionType';
-import { Attribute } from './attribute';
+import { common } from '../common';
+import { InvalidFormatError, VerifyError } from '../errors';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
+import { BinaryWriter, IOHelper, utils } from '../utils';
+import { Witness } from '../Witness';
+import { Attribute } from './attribute';
 import {
-  TransactionBase,
   FeeContext,
+  TransactionBase,
   TransactionBaseAdd,
   TransactionBaseJSON,
   TransactionVerifyOptions,
 } from './TransactionBase';
-import { InvalidFormatError, VerifyError } from '../errors';
-import { Witness } from '../Witness';
-import { common } from '../common';
-import { utils, BinaryWriter, IOHelper } from '../utils';
+import { TransactionType } from './TransactionType';
 
 export interface MinerTransactionAdd extends TransactionBaseAdd {
   nonce: number;

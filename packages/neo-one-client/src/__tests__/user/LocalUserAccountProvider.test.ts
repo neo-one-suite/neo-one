@@ -1,7 +1,5 @@
-import BigNumber from 'bignumber.js';
 import { common, utils } from '@neo-one/client-core';
-import { LocalUserAccountProvider } from '../../user/LocalUserAccountProvider';
-import * as clientUtils from '../../utils';
+import BigNumber from 'bignumber.js';
 import {
   InsufficientFundsError,
   InvalidTransactionError,
@@ -12,11 +10,13 @@ import {
   NothingToTransferError,
 } from '../../errors';
 import {
-  Transfer,
+  AssetRegister,
   AttributeArg,
   ContractRegister,
-  AssetRegister,
+  Transfer,
 } from '../../types';
+import { LocalUserAccountProvider } from '../../user/LocalUserAccountProvider';
+import * as clientUtils from '../../utils';
 
 describe('LocalUserAccountProvider', () => {
   const id1 = {

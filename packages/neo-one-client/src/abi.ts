@@ -1,5 +1,5 @@
-import { ABI, Hash160String, ABIFunction } from './types';
 import { ReadClient } from './ReadClient';
+import { ABI, ABIFunction, Hash160String } from './types';
 
 const decimalsFunction: ABIFunction = {
   name: 'decimals',

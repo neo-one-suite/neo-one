@@ -1,10 +1,10 @@
 import {
+  BucketedMetricOptions,
   Counter,
   Histogram,
   Logger,
-  Report,
   MetricOptions,
-  BucketedMetricOptions,
+  Report,
 } from './types';
 
 import { metrics } from './NoOpMetricsFactory';

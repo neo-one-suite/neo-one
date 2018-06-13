@@ -1,7 +1,7 @@
 import {
   BinaryExpression,
-  Node,
   Expression,
+  Node,
   SyntaxKind,
   ts,
 } from 'ts-simple-ast';

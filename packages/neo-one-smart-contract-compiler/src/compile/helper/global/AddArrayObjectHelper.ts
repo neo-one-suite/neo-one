@@ -2,9 +2,9 @@ import { Node } from 'ts-simple-ast';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { AddConstructorObjectHelper } from './AddConstructorObjectHelper';
 import { InternalFunctionProperties } from '../function';
 import { Helper } from '../Helper';
+import { AddConstructorObjectHelper } from './AddConstructorObjectHelper';
 
 // Input: [objectPrototypeVal, globalObjectVal]
 // Output: [objectPrototypeVal, globalObjectVal]

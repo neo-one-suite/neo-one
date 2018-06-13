@@ -1,19 +1,19 @@
-import { Equatable, Equals } from './Equatable';
+import { Equals, Equatable } from './Equatable';
 import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  SerializeWire,
+  SerializableJSON,
   SerializableWire,
   SerializeJSONContext,
-  SerializableJSON,
-  createSerializeWire,
+  SerializeWire,
 } from './Serializable';
 import {
-  utils,
   BinaryReader,
   BinaryWriter,
   IOHelper,
   JSONHelper,
+  utils,
 } from './utils';
 
 export interface WitnessAdd {

@@ -1,5 +1,5 @@
-import { Byte, Op, assertByteCode, OpCode } from './vm';
-import { utils, BinaryReader } from './utils';
+import { BinaryReader, utils } from './utils';
+import { assertByteCode, Byte, Op, OpCode } from './vm';
 
 const createHexString = (bytes: Buffer): string => {
   let result = '';

@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
-import _ from 'lodash';
 import crypto from 'crypto';
+import _ from 'lodash';
 import { equals } from './equals';
 import { lazy } from './lazy';
 import { lazyAsync } from './lazyAsync';

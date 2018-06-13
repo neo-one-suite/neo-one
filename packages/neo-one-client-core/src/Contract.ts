@@ -1,35 +1,35 @@
 import { BaseState } from './BaseState';
+import { common, UInt160, UInt160Hex } from './common';
 import {
+  assertContractParameterType,
   ContractParameterType,
   ContractParameterTypeJSON,
-  assertContractParameterType,
   toJSONContractParameterType,
 } from './contractParameter';
 import {
+  assertContractPropertyState,
   ContractPropertyState,
   HasDynamicInvoke,
   HasPayable,
   HasStorage,
-  assertContractPropertyState,
 } from './ContractPropertyState';
-import { Equatable, Equals } from './Equatable';
+import { crypto } from './crypto';
+import { Equals, Equatable } from './Equatable';
 import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  SerializeWire,
+  SerializableJSON,
   SerializableWire,
   SerializeJSONContext,
-  SerializableJSON,
-  createSerializeWire,
+  SerializeWire,
 } from './Serializable';
-import { common, UInt160, UInt160Hex } from './common';
-import { crypto } from './crypto';
 import {
-  utils,
   BinaryReader,
   BinaryWriter,
   IOHelper,
   JSONHelper,
+  utils,
 } from './utils';
 
 export interface ContractKey {

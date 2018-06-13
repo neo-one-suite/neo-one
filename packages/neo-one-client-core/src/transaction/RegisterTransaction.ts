@@ -1,30 +1,30 @@
 import BN from 'bn.js';
 import { AssetNameJSON } from '../Asset';
-import { Attribute } from './attribute';
 import {
+  assertAssetType,
   AssetType,
   AssetTypeJSON,
-  assertAssetType,
   toJSONAssetType,
 } from '../AssetType';
-import { TransactionType } from './TransactionType';
+import { common, ECPoint, UInt160, UInt160Hex } from '../common';
+import { crypto } from '../crypto';
+import { InvalidFormatError, VerifyError } from '../errors';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
+import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
+import { Witness } from '../Witness';
+import { Attribute } from './attribute';
 import {
-  TransactionBase,
   FeeContext,
+  TransactionBase,
   TransactionBaseAdd,
   TransactionBaseJSON,
   TransactionGetScriptHashesForVerifyingOptions,
   TransactionVerifyOptions,
 } from './TransactionBase';
-import { InvalidFormatError, VerifyError } from '../errors';
-import { Witness } from '../Witness';
-import { common, ECPoint, UInt160, UInt160Hex } from '../common';
-import { crypto } from '../crypto';
-import { utils, BinaryWriter, IOHelper, JSONHelper } from '../utils';
+import { TransactionType } from './TransactionType';
 
 interface Asset {
   readonly type: AssetType;

@@ -1,28 +1,28 @@
 import BN from 'bn.js';
+import { common, UInt160Hex } from '../../common';
+import { crypto } from '../../crypto';
+import { InvalidFormatError, VerifyError } from '../../errors';
 import {
-  StateDescriptorType,
-  assertStateDescriptorType,
-} from './StateDescriptorType';
-import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
   SerializableJSON,
+  SerializableWire,
   SerializeJSONContext,
   SerializeWire,
-  SerializableWire,
-  createSerializeWire,
 } from '../../Serializable';
-import { FeeContext, TransactionVerifyOptions } from '../TransactionBase';
-import { InvalidFormatError, VerifyError } from '../../errors';
-import { common, UInt160Hex } from '../../common';
-import { crypto } from '../../crypto';
 import {
-  utils,
   BinaryReader,
   BinaryWriter,
   IOHelper,
   JSONHelper,
+  utils,
 } from '../../utils';
+import { FeeContext, TransactionVerifyOptions } from '../TransactionBase';
+import {
+  assertStateDescriptorType,
+  StateDescriptorType,
+} from './StateDescriptorType';
 
 export interface StateDescriptorAdd {
   type: StateDescriptorType;

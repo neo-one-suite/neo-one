@@ -1,6 +1,6 @@
 import { AsyncIterableX as AsyncIterable } from 'ix/asynciterable/asynciterablex';
-import _ from 'lodash';
 import { toArray } from 'ix/asynciterable/toarray';
+import _ from 'lodash';
 import { AsyncBlockIterator } from '../AsyncBlockIterator';
 import { UnknownBlockError } from '../errors';
 

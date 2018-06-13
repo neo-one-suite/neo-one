@@ -1,8 +1,8 @@
-import * as utils from './utils';
-import { transpile } from './transpile';
-import { compile } from './compile';
-import { ts } from 'ts-simple-ast';
 import { ABI } from '@neo-one/client/src';
+import { ts } from 'ts-simple-ast';
+import { compile } from './compile';
+import { transpile } from './transpile';
+import * as utils from './utils';
 
 export interface CompileContractOptions {
   readonly filePath: string;

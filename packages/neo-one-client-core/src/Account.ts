@@ -1,24 +1,24 @@
 import BN from 'bn.js';
 import _ from 'lodash';
 import { BaseState } from './BaseState';
-import { Equatable, Equals } from './Equatable';
+import { common, ECPoint, UInt160, UInt160Hex, UInt256Hex } from './common';
+import { Equals, Equatable } from './Equatable';
 import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  SerializeWire,
+  SerializableJSON,
   SerializableWire,
   SerializeJSONContext,
-  SerializableJSON,
-  createSerializeWire,
+  SerializeWire,
 } from './Serializable';
 import { InputJSON } from './transaction';
-import { common, ECPoint, UInt160, UInt160Hex, UInt256Hex } from './common';
 import {
-  utils,
   BinaryReader,
   BinaryWriter,
   IOHelper,
   JSONHelper,
+  utils,
 } from './utils';
 
 export interface AccountKey {

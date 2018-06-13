@@ -1,11 +1,12 @@
-import { CustomError } from '@neo-one/utils';
 import ECKey from '@neo-one/ec-key';
-import WIF from 'wif';
+import { CustomError } from '@neo-one/utils';
 import bs58 from 'bs58';
+import xor from 'buffer-xor';
 import cryptoLib from 'crypto';
 import { ec as EC, KeyPair } from 'elliptic';
 import scrypt from 'scrypt-js';
-import xor from 'buffer-xor';
+import WIF from 'wif';
+import { common, ECPoint, PrivateKey, UInt160, UInt256 } from '../common';
 import {
   InvalidFormatError,
   InvalidNumberOfKeysError,
@@ -13,7 +14,6 @@ import {
 } from '../errors';
 import { ScriptBuilder } from '../utils';
 import { Witness } from '../Witness';
-import { common, ECPoint, PrivateKey, UInt160, UInt256 } from '../common';
 
 const ec = new EC('p256') as any;
 

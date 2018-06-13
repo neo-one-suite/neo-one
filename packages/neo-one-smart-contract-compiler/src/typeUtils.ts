@@ -1,4 +1,4 @@
-import { Type, TypeFlags, ts } from 'ts-simple-ast';
+import { ts, Type, TypeFlags } from 'ts-simple-ast';
 
 function getType(type: undefined): undefined;
 function getType(type: Type<ts.Type>): Type<ts.Type>;

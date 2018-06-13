@@ -1,5 +1,5 @@
-import { Logger, LogLevel } from './types';
 import { MonitorBase, Tracer } from './MonitorBase';
+import { Logger, LogLevel } from './types';
 
 export interface BrowserMonitorCreate {
   service: string;

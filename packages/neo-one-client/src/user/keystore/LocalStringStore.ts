@@ -1,6 +1,6 @@
 import { PasswordRequiredError } from '../../errors';
-import { Wallet as LocalWallet } from './LocalKeyStore';
 import * as networks from '../../networks';
+import { Wallet as LocalWallet } from './LocalKeyStore';
 
 interface Storage {
   setItem: (key: string, value: string) => Promise<void>;

@@ -1,5 +1,5 @@
-import _ from 'lodash';
 import { CustomError } from '@neo-one/utils';
+import _ from 'lodash';
 
 export enum AssetType {
   CreditFlag = 0x40,

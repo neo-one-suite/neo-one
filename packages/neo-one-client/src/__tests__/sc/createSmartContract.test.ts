@@ -1,8 +1,8 @@
-import { createSmartContract } from '../../sc/createSmartContract';
-import { NoAccountError, NoContractDeployedError } from '../../errors';
-import * as common from '../../sc/common';
 import * as abis from '../../__data__/abis';
 import { contracts } from '../../__data__/contracts';
+import { NoAccountError, NoContractDeployedError } from '../../errors';
+import * as common from '../../sc/common';
+import { createSmartContract } from '../../sc/createSmartContract';
 
 describe('createSmartContract', () => {
   const client = {} as any;

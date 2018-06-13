@@ -1,8 +1,8 @@
 /* tslint:disable no-string-throw */
-import { foo } from './foo';
-import { SmartContract, Address, foo as foo2 } from './foo2';
 import * as bar from './bar';
 import baz from './baz';
+import { foo } from './foo';
+import { Address, foo as foo2, SmartContract } from './foo2';
 
 if (foo !== 'foo') {
   throw 'Failure';

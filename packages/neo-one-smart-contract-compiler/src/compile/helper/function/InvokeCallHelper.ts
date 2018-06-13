@@ -1,9 +1,9 @@
-import { Node } from 'ts-simple-ast';
 import stringify from 'safe-stable-stringify';
+import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 import { InternalFunctionProperties } from './InternalFunctionProperties';
 
 export interface InvokeCallHelperOptions {

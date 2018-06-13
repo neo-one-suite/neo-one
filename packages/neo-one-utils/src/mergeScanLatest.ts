@@ -2,11 +2,11 @@ import {
   Observable,
   ObservableInput,
   OperatorFunction,
-  Subscription,
   Subscriber,
+  Subscription,
 } from 'rxjs';
-import { OuterSubscriber } from 'rxjs/internal/OuterSubscriber';
 import { Operator } from 'rxjs/internal/Operator';
+import { OuterSubscriber } from 'rxjs/internal/OuterSubscriber';
 import { subscribeToResult } from 'rxjs/internal/util/subscribeToResult';
 
 const EMPTY_LAST_VALUE = {};

@@ -1,12 +1,12 @@
-import { AttributeBase, AttributeJSON } from './AttributeBase';
+import { Equals } from '../../Equatable';
+import { InvalidFormatError } from '../../errors';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../../Serializable';
-import { Equals } from '../../Equatable';
-import { InvalidFormatError } from '../../errors';
-import { toJSONAttributeUsage, AttributeUsage } from './AttributeUsage';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../../utils';
+import { AttributeBase, AttributeJSON } from './AttributeBase';
+import { AttributeUsage, toJSONAttributeUsage } from './AttributeUsage';
 
 export type BufferAttributeUsage =
   | 0x81

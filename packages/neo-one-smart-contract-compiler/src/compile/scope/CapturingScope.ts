@@ -1,9 +1,9 @@
 import { Node } from 'ts-simple-ast';
 
-import { ResolvedScope } from './ResolvedScope';
-import { Name, Scope } from './Scope';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
+import { ResolvedScope } from './ResolvedScope';
+import { Name, Scope } from './Scope';
 
 export class CapturingScope implements Scope {
   private variableCount: number = 0;

@@ -1,5 +1,5 @@
 // tslint:disable ban-types no-bitwise
-import AST, { SourceFile, Symbol, ts, Identifier } from 'ts-simple-ast';
+import AST, { Identifier, SourceFile, Symbol, ts } from 'ts-simple-ast';
 
 import path from 'path';
 

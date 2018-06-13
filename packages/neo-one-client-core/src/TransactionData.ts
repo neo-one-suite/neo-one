@@ -1,14 +1,14 @@
 import BN from 'bn.js';
 import { BaseState } from './BaseState';
+import { UInt256 } from './common';
 import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  SerializeWire,
   SerializableWire,
-  createSerializeWire,
+  SerializeWire,
 } from './Serializable';
-import { UInt256 } from './common';
-import { utils, BinaryWriter, BinaryReader, IOHelper } from './utils';
+import { BinaryReader, BinaryWriter, IOHelper, utils } from './utils';
 
 export interface TransactionDataAdd {
   version?: number;

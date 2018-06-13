@@ -1,9 +1,9 @@
 import {
   Address,
+  constant,
   Fixed,
   MapStorage,
   SmartContract,
-  constant,
   verifySender,
 } from '@neo-one/smart-contract';
 

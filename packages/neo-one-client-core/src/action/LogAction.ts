@@ -1,11 +1,11 @@
-import { ActionType } from './ActionType';
-import { ActionBase, ActionBaseAdd, ActionBaseJSON } from './ActionBase';
-import { BinaryWriter } from '../utils';
 import {
   DeserializeWireBaseOptions,
   SerializableJSON,
   SerializeJSONContext,
 } from '../Serializable';
+import { BinaryWriter } from '../utils';
+import { ActionBase, ActionBaseAdd, ActionBaseJSON } from './ActionBase';
+import { ActionType } from './ActionType';
 
 export interface LogAdd extends ActionBaseAdd {
   message: string;

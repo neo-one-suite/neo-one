@@ -1,11 +1,11 @@
-import DataLoader from 'dataloader';
 import { Monitor } from '@neo-one/monitor';
-import fetch from 'isomorphic-fetch';
 import { labels, utils } from '@neo-one/utils';
+import DataLoader from 'dataloader';
 import stringify from 'fast-stable-stringify';
-import { HTTPError, InvalidRPCResponseError, JSONRPCError } from './errors';
-import { JSONRPCRequest, JSONRPCProvider } from './JSONRPCProvider';
+import fetch from 'isomorphic-fetch';
 import { UnknownBlockError } from '../../errors';
+import { HTTPError, InvalidRPCResponseError, JSONRPCError } from './errors';
+import { JSONRPCProvider, JSONRPCRequest } from './JSONRPCProvider';
 
 const TIMEOUT_MS = 20000;
 const WATCH_TIMEOUT_MS = 5000;

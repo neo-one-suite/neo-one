@@ -1,9 +1,9 @@
 import { Node } from 'ts-simple-ast';
 
-import { ScriptBuilder } from './ScriptBuilder';
-import { ScopeCapturingScriptBuilder } from './ScopeCapturingScriptBuilder';
 import { Helper } from '../helper';
 import { VisitOptions } from '../types';
+import { ScopeCapturingScriptBuilder } from './ScopeCapturingScriptBuilder';
+import { ScriptBuilder } from './ScriptBuilder';
 
 export class HelperCapturingScriptBuilder extends ScopeCapturingScriptBuilder
   implements ScriptBuilder {

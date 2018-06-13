@@ -1,9 +1,9 @@
 import {
   AssetType,
-  RegisterTransaction,
-  ScriptBuilder,
   common,
   crypto,
+  RegisterTransaction,
+  ScriptBuilder,
 } from '@neo-one/client-core';
 
 const scriptBuilder = new ScriptBuilder();

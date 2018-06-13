@@ -1,4 +1,4 @@
-import { SyntaxKind, InterfaceDeclaration } from 'ts-simple-ast';
+import { InterfaceDeclaration, SyntaxKind } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

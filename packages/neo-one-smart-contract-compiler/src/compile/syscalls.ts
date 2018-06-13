@@ -1,12 +1,12 @@
 import { SysCallName } from '@neo-one/client-core';
+import { CallExpression, Node, ts, Type } from 'ts-simple-ast';
 import { ScriptBuilder } from './sb';
-import { CallExpression, Node, Type, ts } from 'ts-simple-ast';
 import { VisitOptions } from './types';
 
-import * as typeUtils from '../typeUtils';
 import { DiagnosticCode } from '../DiagnosticCode';
+import * as typeUtils from '../typeUtils';
+import { deserializeType, SerializableType, serializeType } from './helper';
 import { BlockchainInterfaceName } from './helper/blockchain';
-import { serializeType, SerializableType, deserializeType } from './helper';
 
 export interface SysCallType {
   name: string;

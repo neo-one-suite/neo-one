@@ -1,4 +1,4 @@
-import { ABIEvent, ABIFunction, ABIParameter, ABIReturn, ABI } from '../types';
+import { ABI, ABIEvent, ABIFunction, ABIParameter, ABIReturn } from '../types';
 
 export const returns = {
   Signature: { type: 'Signature' } as ABIReturn,

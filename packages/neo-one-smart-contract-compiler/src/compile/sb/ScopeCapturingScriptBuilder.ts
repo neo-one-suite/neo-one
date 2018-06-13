@@ -1,7 +1,7 @@
 import { Node } from 'ts-simple-ast';
 
-import { BaseScriptBuilder } from './BaseScriptBuilder';
 import { CapturingScope, ResolvedScope } from '../scope';
+import { BaseScriptBuilder } from './BaseScriptBuilder';
 import { ScriptBuilder } from './ScriptBuilder';
 
 export class ScopeCapturingScriptBuilder

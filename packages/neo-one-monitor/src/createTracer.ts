@@ -1,12 +1,12 @@
 import * as opentracing from 'opentracing';
 
-import { Carrier, Format, SpanContext } from './types';
 import {
   Tracer,
   TracerReference,
-  TracerStartSpanOptions,
   TracerSpan,
+  TracerStartSpanOptions,
 } from './MonitorBase';
+import { Carrier, Format, SpanContext } from './types';
 
 export const createTracer = (tracerIn?: opentracing.Tracer): Tracer => {
   const tracer = tracerIn || new opentracing.Tracer();

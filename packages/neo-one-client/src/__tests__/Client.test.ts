@@ -1,9 +1,9 @@
 import { of } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { Client } from '../Client';
-import * as argAssertions from '../args';
-import { UnknownAccountError, UnknownNetworkError } from '../errors';
 import { transactions } from '../__data__';
+import * as argAssertions from '../args';
+import { Client } from '../Client';
+import { UnknownAccountError, UnknownNetworkError } from '../errors';
 import { createSmartContract } from '../sc/createSmartContract';
 import { UserAccountProvider } from '../types';
 

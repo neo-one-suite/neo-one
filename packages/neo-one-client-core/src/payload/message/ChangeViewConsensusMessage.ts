@@ -1,11 +1,11 @@
-import { ConsensusMessageType } from './ConsensusMessageType';
+import { InvalidFormatError } from '../../errors';
+import { DeserializeWireBaseOptions } from '../../Serializable';
 import { BinaryWriter } from '../../utils';
 import {
   ConsensusMessageBase,
   ConsensusMessageBaseAdd,
 } from './ConsensusMessageBase';
-import { DeserializeWireBaseOptions } from '../../Serializable';
-import { InvalidFormatError } from '../../errors';
+import { ConsensusMessageType } from './ConsensusMessageType';
 
 export interface ChangeViewAdd extends ConsensusMessageBaseAdd {
   newViewNumber: number;

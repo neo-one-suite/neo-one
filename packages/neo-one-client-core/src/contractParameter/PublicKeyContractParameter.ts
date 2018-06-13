@@ -1,11 +1,11 @@
-import { ContractParameterType } from './ContractParameterType';
-import { ContractParameterBase } from './ContractParameterBase';
+import { common, ECPoint } from '../common';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
-import { common, ECPoint } from '../common';
-import { utils, BinaryWriter, IOHelper, JSONHelper } from '../utils';
+import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
+import { ContractParameterBase } from './ContractParameterBase';
+import { ContractParameterType } from './ContractParameterType';
 
 export interface PublicKeyContractParameterJSON {
   type: 'PublicKey';

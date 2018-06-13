@@ -1,6 +1,3 @@
-import { ActionType } from './ActionType';
-import { ActionBase, ActionBaseAdd, ActionBaseJSON } from './ActionBase';
-import { BinaryWriter } from '../utils';
 import {
   ContractParameter,
   ContractParameterJSON,
@@ -11,6 +8,9 @@ import {
   SerializableJSON,
   SerializeJSONContext,
 } from '../Serializable';
+import { BinaryWriter } from '../utils';
+import { ActionBase, ActionBaseAdd, ActionBaseJSON } from './ActionBase';
+import { ActionType } from './ActionType';
 
 export interface NotificationAdd extends ActionBaseAdd {
   args: ContractParameter[];

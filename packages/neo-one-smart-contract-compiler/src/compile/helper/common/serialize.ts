@@ -1,7 +1,7 @@
 import { Node, ts } from 'ts-simple-ast';
 
-import { VisitOptions } from '../../types';
 import { ScriptBuilder } from '../../sb';
+import { VisitOptions } from '../../types';
 
 export enum SerializableType {
   Array = 7,

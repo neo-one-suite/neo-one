@@ -1,4 +1,4 @@
-import { VoidExpression, SyntaxKind } from 'ts-simple-ast';
+import { SyntaxKind, VoidExpression } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

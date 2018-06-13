@@ -1,13 +1,13 @@
-import { AttributeBase, AttributeJSON } from './AttributeBase';
+import { common, UInt160 } from '../../common';
+import { Equals } from '../../Equatable';
+import { InvalidFormatError } from '../../errors';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../../Serializable';
-import { Equals } from '../../Equatable';
-import { InvalidFormatError } from '../../errors';
-import { toJSONAttributeUsage, AttributeUsage } from './AttributeUsage';
-import { common, UInt160 } from '../../common';
-import { utils, BinaryWriter, IOHelper, JSONHelper } from '../../utils';
+import { BinaryWriter, IOHelper, JSONHelper, utils } from '../../utils';
+import { AttributeBase, AttributeJSON } from './AttributeBase';
+import { AttributeUsage, toJSONAttributeUsage } from './AttributeUsage';
 
 export type UInt160AttributeUsage = 0x20;
 

@@ -1,10 +1,10 @@
-import { ContractParameterType } from './ContractParameterType';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
+import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { ContractParameterBase } from './ContractParameterBase';
-import { utils, BinaryWriter, IOHelper, JSONHelper } from '../utils';
+import { ContractParameterType } from './ContractParameterType';
 
 export interface SignatureContractParameterJSON {
   type: 'Signature';

@@ -2,8 +2,8 @@ import { Node, TypeGuards } from 'ts-simple-ast';
 
 import { DiagnosticCode } from '../../../DiagnosticCode';
 import { ScriptBuilder } from '../../sb';
-import { Helper } from '../Helper';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 import * as constants from '../../../constants';
 

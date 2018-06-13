@@ -1,41 +1,41 @@
 // tslint:disable ban-types
 import {
-  ByteBuffer,
-  Op,
   BinaryWriter,
+  ByteBuffer,
   ByteCode,
+  Op,
   OpCode,
-  UnknownOpError,
-  utils,
   ScriptBuilder as ClientScriptBuilder,
   SysCall,
+  UnknownOpError,
+  utils,
 } from '@neo-one/client-core';
 import BN from 'bn.js';
-import Ast, { Node, SourceFile, Type, Symbol } from 'ts-simple-ast';
+import Ast, { Node, SourceFile, Symbol, Type } from 'ts-simple-ast';
 
 import { Context } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { Helper, Helpers } from '../helper';
-import { JumpTable } from './JumpTable';
-import {
-  DeferredProgramCounter,
-  ProgramCounterHelper,
-  ProgramCounter,
-  Jump,
-  Jmp,
-  Call,
-} from '../pc';
 import { NodeCompiler } from '../NodeCompiler';
-import { Scope, Name } from '../scope';
-import { Bytecode, CaptureResult, ScriptBuilder } from './ScriptBuilder';
+import {
+  Call,
+  DeferredProgramCounter,
+  Jmp,
+  Jump,
+  ProgramCounter,
+  ProgramCounterHelper,
+} from '../pc';
+import { Name, Scope } from '../scope';
 import { VisitOptions } from '../types';
+import { JumpTable } from './JumpTable';
+import { Bytecode, CaptureResult, ScriptBuilder } from './ScriptBuilder';
 
+import { Globals } from '../../symbols';
 import declarations from '../declaration';
 import decorator from '../decorator';
 import expression from '../expression';
 import file from '../file';
 import statement from '../statement';
-import { Globals } from '../../symbols';
 import { JumpResolver } from './JumpResolver';
 
 const compilers = [declarations, decorator, expression, file, statement];

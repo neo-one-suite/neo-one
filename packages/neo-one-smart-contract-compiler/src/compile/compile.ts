@@ -1,14 +1,14 @@
 import Ast, { SourceFile } from 'ts-simple-ast';
 
+import { Context } from '../Context';
+import { getGlobals, getLibAliases, getLibs } from '../symbols';
+import { createHelpers } from './helper';
 import {
   EmittingScriptBuilder,
   HelperCapturingScriptBuilder,
   ScopeCapturingScriptBuilder,
 } from './sb';
-import { Context } from '../Context';
 import { CompileResult } from './types';
-import { getGlobals, getLibs, getLibAliases } from '../symbols';
-import { createHelpers } from './helper';
 
 export interface CompileOptions {
   ast: Ast;

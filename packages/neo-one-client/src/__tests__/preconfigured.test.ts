@@ -1,7 +1,7 @@
+import * as networks from '../networks';
 import * as preconfigured from '../preconfigured';
 import { NEOONEDataProvider, NEOONEProvider } from '../provider';
 import { ReadClient } from '../ReadClient';
-import * as networks from '../networks';
 
 describe('preconfigured', () => {
   const fakeRPC = 'fakeRPC';

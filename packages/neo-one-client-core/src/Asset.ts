@@ -1,30 +1,30 @@
-import BN from 'bn.js';
 import { CustomError } from '@neo-one/utils';
+import BN from 'bn.js';
 import {
+  assertAssetType,
   AssetType,
   AssetTypeJSON,
-  assertAssetType,
   toJSONAssetType,
 } from './AssetType';
 import { BaseState } from './BaseState';
-import { Equatable, Equals } from './Equatable';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializeWire,
-  SerializableWire,
-  SerializeJSONContext,
-  SerializableJSON,
-  createSerializeWire,
-} from './Serializable';
 import { common, ECPoint, UInt160, UInt256, UInt256Hex } from './common';
 import { crypto } from './crypto';
+import { Equals, Equatable } from './Equatable';
 import {
-  utils,
+  createSerializeWire,
+  DeserializeWireBaseOptions,
+  DeserializeWireOptions,
+  SerializableJSON,
+  SerializableWire,
+  SerializeJSONContext,
+  SerializeWire,
+} from './Serializable';
+import {
   BinaryReader,
   BinaryWriter,
   IOHelper,
   JSONHelper,
+  utils,
 } from './utils';
 
 export class InvalidAssetError extends CustomError {

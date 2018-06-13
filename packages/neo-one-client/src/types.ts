@@ -1,8 +1,8 @@
-import BN from 'bn.js';
-import BigNumber from 'bignumber.js';
-import { Monitor } from '@neo-one/monitor';
-import { Observable } from 'rxjs';
 import { Param as ScriptBuilderParam } from '@neo-one/client-core';
+import { Monitor } from '@neo-one/monitor';
+import BigNumber from 'bignumber.js';
+import BN from 'bn.js';
+import { Observable } from 'rxjs';
 
 // A NEO address string, e.g. APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR
 export type AddressString = string;

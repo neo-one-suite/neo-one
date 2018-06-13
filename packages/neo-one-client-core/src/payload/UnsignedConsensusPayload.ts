@@ -1,14 +1,14 @@
 import { utils as commonUtils } from '@neo-one/utils';
-import { BinaryWriter, BinaryReader } from '../utils';
-import { ConsensusMessage, deserializeConsensusMessageWire } from './message';
+import { UInt256 } from '../common';
 import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  SerializeWire,
   SerializableWire,
-  createSerializeWire,
+  SerializeWire,
 } from '../Serializable';
-import { UInt256 } from '../common';
+import { BinaryReader, BinaryWriter } from '../utils';
+import { ConsensusMessage, deserializeConsensusMessageWire } from './message';
 
 export interface UnsignedConsensusPayloadAdd {
   version: number;
@@ -44,7 +44,7 @@ export class UnsignedConsensusPayload
       timestamp,
       consensusMessage,
     };
-  }
+  };
 
   public static deserializeWireBase(
     options: DeserializeWireBaseOptions,

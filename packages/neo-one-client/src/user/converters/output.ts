@@ -1,4 +1,4 @@
-import { Output, crypto, common } from '@neo-one/client-core';
+import { common, crypto, Output } from '@neo-one/client-core';
 import { Output as ClientOutput } from '../../types';
 import * as clientUtils from '../../utils';
 

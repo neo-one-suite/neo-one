@@ -1,24 +1,24 @@
 import {
-  ContractParameterType,
-  assertContractParameterType,
-} from './ContractParameterType';
-import {
+  createDeserializeWire,
   DeserializeWire,
   DeserializeWireBaseOptions,
-  createDeserializeWire,
 } from '../Serializable';
 import {
-  SignatureContractParameter,
-  SignatureContractParameterJSON,
-} from './SignatureContractParameter';
+  ArrayContractParameter,
+  ArrayContractParameterJSON,
+} from './ArrayContractParameter';
 import {
   BooleanContractParameter,
   BooleanContractParameterJSON,
 } from './BooleanContractParameter';
 import {
-  IntegerContractParameter,
-  IntegerContractParameterJSON,
-} from './IntegerContractParameter';
+  ByteArrayContractParameter,
+  ByteArrayContractParameterJSON,
+} from './ByteArrayContractParameter';
+import {
+  assertContractParameterType,
+  ContractParameterType,
+} from './ContractParameterType';
 import {
   Hash160ContractParameter,
   Hash160ContractParameterJSON,
@@ -28,25 +28,25 @@ import {
   Hash256ContractParameterJSON,
 } from './Hash256ContractParameter';
 import {
-  ByteArrayContractParameter,
-  ByteArrayContractParameterJSON,
-} from './ByteArrayContractParameter';
+  IntegerContractParameter,
+  IntegerContractParameterJSON,
+} from './IntegerContractParameter';
+import {
+  InteropInterfaceContractParameter,
+  InteropInterfaceContractParameterJSON,
+} from './InteropInterfaceContractParameter';
 import {
   PublicKeyContractParameter,
   PublicKeyContractParameterJSON,
 } from './PublicKeyContractParameter';
 import {
+  SignatureContractParameter,
+  SignatureContractParameterJSON,
+} from './SignatureContractParameter';
+import {
   StringContractParameter,
   StringContractParameterJSON,
 } from './StringContractParameter';
-import {
-  ArrayContractParameter,
-  ArrayContractParameterJSON,
-} from './ArrayContractParameter';
-import {
-  InteropInterfaceContractParameter,
-  InteropInterfaceContractParameterJSON,
-} from './InteropInterfaceContractParameter';
 import {
   VoidContractParameter,
   VoidContractParameterJSON,

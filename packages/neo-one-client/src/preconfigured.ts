@@ -1,11 +1,11 @@
+import * as networks from './networks';
 import {
-  NEOONEProviderOptions,
   NEOONEDataProvider,
   NEOONEProvider,
+  NEOONEProviderOptions,
 } from './provider';
-import { NetworkType } from './types';
 import { ReadClient } from './ReadClient';
-import * as networks from './networks';
+import { NetworkType } from './types';
 
 export const provider = (options?: {
   mainRPCURL?: string;

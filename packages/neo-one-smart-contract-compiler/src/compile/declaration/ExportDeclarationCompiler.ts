@@ -1,7 +1,7 @@
 import {
-  SyntaxKind,
   ExportDeclaration,
   ExportSpecifier,
+  SyntaxKind,
   TypeGuards,
 } from 'ts-simple-ast';
 

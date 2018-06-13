@@ -1,16 +1,16 @@
 import {
   ClassDeclaration,
+  MethodDeclaration,
+  ParameterDeclaration,
+  Scope,
   SyntaxKind,
   TypeGuards,
-  ParameterDeclaration,
-  MethodDeclaration,
-  Scope,
 } from 'ts-simple-ast';
 
+import { DiagnosticCode } from '../../DiagnosticCode';
+import * as typeUtils from '../../typeUtils';
 import { NodeTranspiler } from '../NodeTranspiler';
 import { Transpiler } from '../transpiler';
-import * as typeUtils from '../../typeUtils';
-import { DiagnosticCode } from '../../DiagnosticCode';
 import { VisitOptions } from '../types';
 
 const DEPLOY_METHOD = 'deploy';

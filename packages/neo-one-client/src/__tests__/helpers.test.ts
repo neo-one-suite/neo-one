@@ -1,4 +1,4 @@
-import { crypto, common } from '@neo-one/client-core';
+import { common, crypto } from '@neo-one/client-core';
 import * as helpers from '../helpers';
 
 describe('helpers', () => {

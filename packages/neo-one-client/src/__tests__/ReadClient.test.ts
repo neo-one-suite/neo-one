@@ -1,5 +1,5 @@
-import { ReadClient } from '../ReadClient';
 import * as assertArgs from '../args';
+import { ReadClient } from '../ReadClient';
 import { createReadSmartContract } from '../sc/createReadSmartContract';
 
 jest.mock('../sc/createReadSmartContract');

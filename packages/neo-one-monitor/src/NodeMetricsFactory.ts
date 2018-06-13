@@ -1,22 +1,22 @@
 import prom from 'prom-client';
 
 import {
-  Counter,
-  Gauge,
-  Histogram,
-  Summary,
-  MetricOptions,
-  BucketedMetricOptions,
-  MetricsFactory,
-  PercentiledMetricOptions,
-} from './types';
-import {
   CounterProxy,
   GaugeProxy,
   HistogramProxy,
-  SummaryProxy,
   MetricsFactoryProxy,
+  SummaryProxy,
 } from './MetricsFactoryProxy';
+import {
+  BucketedMetricOptions,
+  Counter,
+  Gauge,
+  Histogram,
+  MetricOptions,
+  MetricsFactory,
+  PercentiledMetricOptions,
+  Summary,
+} from './types';
 
 class NodeMetricsFactory extends MetricsFactoryProxy {
   protected createCounterInternal(options: MetricOptions): Counter {

@@ -1,5 +1,5 @@
-import BigNumber from 'bignumber.js';
 import { CustomError } from '@neo-one/utils';
+import BigNumber from 'bignumber.js';
 import { ContractParameter, ContractParameterType } from './types';
 
 export class InvalidContractParameterError extends CustomError {

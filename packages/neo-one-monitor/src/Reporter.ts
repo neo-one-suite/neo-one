@@ -1,4 +1,4 @@
-import { Subscription, interval } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
 
 import { mergeScan } from 'rxjs/operators';
 

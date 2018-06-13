@@ -1,14 +1,14 @@
 import { BlockBase, BlockBaseAdd, BlockBaseJSON } from './BlockBase';
+import { UInt256 } from './common';
+import { InvalidFormatError } from './errors';
 import {
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  SerializableWire,
   SerializableJSON,
+  SerializableWire,
   SerializeJSONContext,
 } from './Serializable';
-import { InvalidFormatError } from './errors';
-import { UInt256 } from './common';
-import { utils, BinaryReader, BinaryWriter, IOHelper } from './utils';
+import { BinaryReader, BinaryWriter, IOHelper, utils } from './utils';
 
 export type HeaderAdd = BlockBaseAdd;
 export interface HeaderKey {

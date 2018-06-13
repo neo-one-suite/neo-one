@@ -1,16 +1,8 @@
-import { Monitor } from '@neo-one/monitor';
-import { Observable, BehaviorSubject } from 'rxjs';
-import _ from 'lodash';
 import { common, crypto } from '@neo-one/client-core';
+import { Monitor } from '@neo-one/monitor';
+import _ from 'lodash';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import {
-  BufferString,
-  UserAccount,
-  UserAccountID,
-  NetworkType,
-  UpdateAccountNameOptions,
-  Witness,
-} from '../../types';
 import { LockedAccountError, UnknownAccountError } from '../../errors';
 import {
   decryptNEP2,
@@ -19,6 +11,14 @@ import {
   publicKeyToScriptHash,
   scriptHashToAddress,
 } from '../../helpers';
+import {
+  BufferString,
+  NetworkType,
+  UpdateAccountNameOptions,
+  UserAccount,
+  UserAccountID,
+  Witness,
+} from '../../types';
 
 export interface LockedWallet {
   type: 'locked';

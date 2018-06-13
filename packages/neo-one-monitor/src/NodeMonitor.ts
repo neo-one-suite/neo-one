@@ -2,12 +2,12 @@ import { IncomingMessage } from 'http';
 import Koa, { Context } from 'koa';
 import { Server } from 'net';
 
-import gcStats from 'prometheus-gc-stats';
 import mount from 'koa-mount';
 import prom from 'prom-client';
+import gcStats from 'prometheus-gc-stats';
 
-import { Logger, LogLevel, Monitor } from './types';
 import { MonitorBase, Tracer } from './MonitorBase';
+import { Logger, LogLevel, Monitor } from './types';
 
 export interface NodeMonitorCreate {
   service: string;

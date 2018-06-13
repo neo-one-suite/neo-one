@@ -1,7 +1,7 @@
 import {
   Address,
-  Fixed,
   createEventHandler,
+  Fixed,
   verifySender,
 } from '@neo-one/smart-contract';
 import { Token } from '@neo-one/smart-contract-lib';

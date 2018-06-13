@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js';
 import { keys, transactions } from '../../../__data__';
-import { JSONRPCClient } from '../../../provider/neoone/JSONRPCClient';
 import { RelayTransactionError } from '../../../errors';
 import { JSONRPCError } from '../../../provider/neoone/errors';
+import { JSONRPCClient } from '../../../provider/neoone/JSONRPCClient';
 
 describe('JSONRPCClient', () => {
   const expected = '10';

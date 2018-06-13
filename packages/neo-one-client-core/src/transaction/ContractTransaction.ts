@@ -1,17 +1,17 @@
-import { TransactionType } from './TransactionType';
-import { Attribute } from './attribute';
+import { InvalidFormatError } from '../errors';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
+import { IOHelper, utils } from '../utils';
+import { Witness } from '../Witness';
+import { Attribute } from './attribute';
 import {
   TransactionBase,
   TransactionBaseAdd,
   TransactionBaseJSON,
 } from './TransactionBase';
-import { InvalidFormatError } from '../errors';
-import { Witness } from '../Witness';
-import { utils, IOHelper } from '../utils';
+import { TransactionType } from './TransactionType';
 
 export type ContractTransactionAdd = TransactionBaseAdd;
 

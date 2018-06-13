@@ -1,10 +1,10 @@
 import {
   BufferAttribute,
+  common,
   ECPointAttribute,
+  toAttributeUsage,
   UInt160Attribute,
   UInt256Attribute,
-  toAttributeUsage,
-  common,
 } from '@neo-one/client-core';
 import { InvalidNamedArgumentError } from '../../../errors';
 import { attribute } from '../../../user/converters/attribute';

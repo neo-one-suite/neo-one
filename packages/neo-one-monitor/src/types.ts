@@ -1,5 +1,5 @@
-import { Context } from 'koa';
 import { IncomingMessage } from 'http';
+import { Context } from 'koa';
 
 export type LogField =
   // The type or "kind" of an error (only for event="error" logs).

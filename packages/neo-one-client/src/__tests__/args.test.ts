@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
+import { keys } from '../__data__';
 import * as assertArgs from '../args';
 import { InvalidArgumentError, InvalidNamedArgumentError } from '../errors';
-import { keys } from '../__data__';
 import { converters } from '../user/converters';
 
 describe('arg assertions', () => {

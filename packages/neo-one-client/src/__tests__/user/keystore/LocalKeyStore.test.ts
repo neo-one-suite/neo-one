@@ -1,13 +1,13 @@
 import { common, crypto } from '@neo-one/client-core';
+import { LockedAccountError, UnknownAccountError } from '../../../errors';
+import * as helpers from '../../../helpers';
+import { UserAccount, UserAccountID } from '../../../types';
 import {
   LocalKeyStore,
   LockedWallet,
   UnlockedWallet,
   Wallet,
 } from '../../../user/keystore/LocalKeyStore';
-import { LockedAccountError, UnknownAccountError } from '../../../errors';
-import * as helpers from '../../../helpers';
-import { UserAccount, UserAccountID } from '../../../types';
 
 describe('LocalKeyStore', () => {
   const id1: UserAccountID = {

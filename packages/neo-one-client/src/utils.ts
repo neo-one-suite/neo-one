@@ -1,10 +1,10 @@
-import BN from 'bn.js';
-import BigNumber from 'bignumber.js';
 import {
+  common,
   Param as ScriptBuilderParam,
   ScriptBuilder,
-  common,
 } from '@neo-one/client-core';
+import BigNumber from 'bignumber.js';
+import BN from 'bn.js';
 import { Hash160String } from './types';
 
 export const bigNumberToBN = (value: BigNumber, decimals: number): BN => {

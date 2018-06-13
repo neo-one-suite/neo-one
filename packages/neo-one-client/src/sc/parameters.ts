@@ -1,27 +1,27 @@
-import BigNumber from 'bignumber.js';
-import { JSONHelper, common, utils } from '@neo-one/client-core';
+import { common, JSONHelper, utils } from '@neo-one/client-core';
 import { utils as commonUtils } from '@neo-one/utils';
+import BigNumber from 'bignumber.js';
+import { InvalidContractParameterError } from '../errors';
 import {
   ArrayABI,
-  ContractParameter,
-  Param,
-  SignatureABI,
-  SignatureString,
   BooleanABI,
+  BufferString,
+  ByteArrayABI,
+  ContractParameter,
   Hash160ABI,
   Hash160String,
   Hash256ABI,
   Hash256String,
-  ByteArrayABI,
-  BufferString,
+  IntegerABI,
+  InteropInterfaceABI,
+  Param,
   PublicKeyABI,
   PublicKeyString,
+  SignatureABI,
+  SignatureString,
   StringABI,
-  InteropInterfaceABI,
   VoidABI,
-  IntegerABI,
 } from '../types';
-import { InvalidContractParameterError } from '../errors';
 
 const toByteArrayBuffer = (contractParameter: ContractParameter): Buffer => {
   let value;

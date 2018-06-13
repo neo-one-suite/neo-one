@@ -1,9 +1,9 @@
 import { FunctionDeclaration, SyntaxKind } from 'ts-simple-ast';
 
+import { InternalFunctionProperties } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
-import { InternalFunctionProperties } from '../helper';
 
 export class FunctionDeclarationCompiler extends NodeCompiler<
   FunctionDeclaration

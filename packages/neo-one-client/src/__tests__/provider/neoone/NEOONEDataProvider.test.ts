@@ -1,10 +1,10 @@
-import BN from 'bn.js';
 import { VMState } from '@neo-one/client-core';
-import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import BigNumber from 'bignumber.js';
+import BN from 'bn.js';
+import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import { toArray } from 'ix/asynciterable/toarray';
-import { NEOONEDataProvider } from '../../../provider/neoone/NEOONEDataProvider';
 import { keys, transactions } from '../../../__data__';
+import { NEOONEDataProvider } from '../../../provider/neoone/NEOONEDataProvider';
 
 function createExpectedInvocationResult(options: object) {
   const result = {

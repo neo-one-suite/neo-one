@@ -1,20 +1,20 @@
-import { Equatable, Equals } from './Equatable';
+import { common, UInt160 } from './common';
+import { Equals, Equatable } from './Equatable';
 import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  SerializeJSONContext,
   SerializableJSON,
-  SerializeWire,
   SerializableWire,
-  createSerializeWire,
+  SerializeJSONContext,
+  SerializeWire,
 } from './Serializable';
-import { common, UInt160 } from './common';
 import {
-  utils,
   BinaryReader,
   BinaryWriter,
   IOHelper,
   JSONHelper,
+  utils,
 } from './utils';
 
 export interface StorageItemAdd {

@@ -2,8 +2,8 @@ import { Node } from 'ts-simple-ast';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { InternalGlobalProperties } from './InternalGlobalProperties';
 import { TypedHelper } from '../common';
+import { InternalGlobalProperties } from './InternalGlobalProperties';
 
 // Input: [numberVal]
 // Output: [value]

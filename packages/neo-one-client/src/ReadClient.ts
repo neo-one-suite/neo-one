@@ -1,5 +1,7 @@
-import { Monitor } from '@neo-one/monitor';
 import { Param as ScriptBuilderParam } from '@neo-one/client-core';
+import { Monitor } from '@neo-one/monitor';
+import * as args from './args';
+import { createReadSmartContract } from './sc';
 import {
   ABI,
   Account,
@@ -21,8 +23,6 @@ import {
   Transaction,
   Validator,
 } from './types';
-import * as args from './args';
-import { createReadSmartContract } from './sc';
 
 export class ReadClient<TDataProvider extends DataProvider> {
   public readonly dataProvider: TDataProvider;

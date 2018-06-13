@@ -1,13 +1,13 @@
-import { BinaryWriter, BinaryReader } from '../utils';
 import {
+  createSerializeWire,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  SerializableWire,
-  SerializeWire,
   SerializableJSON,
+  SerializableWire,
   SerializeJSONContext,
-  createSerializeWire,
+  SerializeWire,
 } from '../Serializable';
+import { BinaryReader, BinaryWriter } from '../utils';
 import { ContractParameterType } from './ContractParameterType';
 
 export abstract class ContractParameterBase<

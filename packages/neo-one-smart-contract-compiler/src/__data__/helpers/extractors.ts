@@ -1,10 +1,10 @@
-import BN from 'bn.js';
 import {
-  VMState,
   ContractParameter,
   ContractParameterType,
   InvocationResult,
+  VMState,
 } from '@neo-one/client-core';
+import BN from 'bn.js';
 
 export const checkResult = (result: InvocationResult) => {
   if (result.state === VMState.Fault) {

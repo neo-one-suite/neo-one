@@ -1,5 +1,5 @@
-import BN from 'bn.js';
 import BigNumber from 'bignumber.js';
+import BN from 'bn.js';
 
 export function weightedFilter<T>(
   input: T[],

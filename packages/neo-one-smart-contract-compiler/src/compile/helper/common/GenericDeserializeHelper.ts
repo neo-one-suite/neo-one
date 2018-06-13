@@ -1,10 +1,10 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { getTypes, DESERIALIZE_NAME, invokeDeserialize } from './serialize';
 import { InternalFunctionProperties } from '../function';
+import { Helper } from '../Helper';
+import { DESERIALIZE_NAME, getTypes, invokeDeserialize } from './serialize';
 
 // Input: [val]
 // Output: []

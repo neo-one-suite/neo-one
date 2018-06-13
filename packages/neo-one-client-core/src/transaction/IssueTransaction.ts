@@ -1,22 +1,22 @@
 import BN from 'bn.js';
-import { TransactionType } from './TransactionType';
-import { Attribute } from './attribute';
+import { common, UInt160Hex } from '../common';
+import { InvalidFormatError, VerifyError } from '../errors';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
+import { IOHelper, utils } from '../utils';
+import { Witness } from '../Witness';
+import { Attribute } from './attribute';
 import {
-  TransactionBase,
   FeeContext,
+  TransactionBase,
   TransactionBaseAdd,
   TransactionBaseJSON,
   TransactionGetScriptHashesForVerifyingOptions,
   TransactionVerifyOptions,
 } from './TransactionBase';
-import { InvalidFormatError, VerifyError } from '../errors';
-import { Witness } from '../Witness';
-import { common, UInt160Hex } from '../common';
-import { utils, IOHelper } from '../utils';
+import { TransactionType } from './TransactionType';
 
 // tslint:disable-next-line
 export interface IssueTransactionAdd extends TransactionBaseAdd {}

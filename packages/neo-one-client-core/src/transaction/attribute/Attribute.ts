@@ -1,9 +1,9 @@
-import { assertAttributeUsage, AttributeUsage } from './AttributeUsage';
 import {
+  createDeserializeWire,
   DeserializeWire,
   DeserializeWireBaseOptions,
-  createDeserializeWire,
 } from '../../Serializable';
+import { assertAttributeUsage, AttributeUsage } from './AttributeUsage';
 import { BufferAttribute } from './BufferAttribute';
 import { ECPointAttribute } from './ECPointAttribute';
 import { UInt160Attribute } from './UInt160Attribute';

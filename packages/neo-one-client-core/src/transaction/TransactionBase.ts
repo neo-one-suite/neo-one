@@ -1,54 +1,54 @@
+import { utils as commonUtils } from '@neo-one/utils';
 import BN from 'bn.js';
 import _ from 'lodash';
-import { utils as commonUtils } from '@neo-one/utils';
-import {
-  AttributeUsage,
-  Attribute,
-  AttributeJSON,
-  UInt160Attribute,
-  deserializeAttributeWireBase,
-} from './attribute';
-import { AssetType, hasFlag } from '../AssetType';
 import { Account, AccountKey } from '../Account';
-import { ScriptContainerType } from '../ScriptContainer';
-import { TransactionType, assertTransactionType } from './TransactionType';
 import { Asset, AssetKey } from '../Asset';
-import { Equatable, Equals } from '../Equatable';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableJSON,
-  SerializeJSONContext,
-  SerializeWire,
-  SerializableWire,
-  createSerializeWire,
-} from '../Serializable';
-import { InvalidFormatError, VerifyError } from '../errors';
-import { Input, InputJSON } from './Input';
-import { Output, OutputJSON, OutputKey } from './Output';
-import { RegisterTransaction } from './RegisterTransaction';
-import { Transaction } from './Transaction';
-import { VerifyScript } from '../vm';
-import { Validator } from '../Validator';
-import { Witness, WitnessJSON } from '../Witness';
+import { AssetType, hasFlag } from '../AssetType';
 import {
   common,
   ECPoint,
   PrivateKey,
+  UInt160,
   UInt160Hex,
   UInt256,
   UInt256Hex,
-  UInt160,
 } from '../common';
 import { crypto } from '../crypto';
-import { hasDuplicateInputs } from './common';
+import { Equals, Equatable } from '../Equatable';
+import { InvalidFormatError, VerifyError } from '../errors';
+import { ScriptContainerType } from '../ScriptContainer';
 import {
-  utils,
+  createSerializeWire,
+  DeserializeWireBaseOptions,
+  DeserializeWireOptions,
+  SerializableJSON,
+  SerializableWire,
+  SerializeJSONContext,
+  SerializeWire,
+} from '../Serializable';
+import {
   BinaryReader,
   BinaryWriter,
   IOHelper,
   JSONHelper,
+  utils,
 } from '../utils';
+import { Validator } from '../Validator';
+import { VerifyScript } from '../vm';
+import { Witness, WitnessJSON } from '../Witness';
+import {
+  Attribute,
+  AttributeJSON,
+  AttributeUsage,
+  deserializeAttributeWireBase,
+  UInt160Attribute,
+} from './attribute';
+import { hasDuplicateInputs } from './common';
+import { Input, InputJSON } from './Input';
+import { Output, OutputJSON, OutputKey } from './Output';
+import { RegisterTransaction } from './RegisterTransaction';
+import { Transaction } from './Transaction';
+import { assertTransactionType, TransactionType } from './TransactionType';
 
 const getUtilityValue = ({
   outputs,

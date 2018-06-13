@@ -1,23 +1,23 @@
 import BN from 'bn.js';
-import { TransactionType } from './TransactionType';
-import { Attribute } from './attribute';
+import { UInt160Hex } from '../common';
+import { InvalidFormatError } from '../errors';
 import {
   DeserializeWireBaseOptions,
   SerializeJSONContext,
 } from '../Serializable';
-import { StateDescriptorJSON, StateDescriptor } from './state';
+import { BinaryWriter, IOHelper, utils } from '../utils';
+import { Witness } from '../Witness';
+import { Attribute } from './attribute';
+import { StateDescriptor, StateDescriptorJSON } from './state';
 import {
-  TransactionBase,
   FeeContext,
+  TransactionBase,
   TransactionBaseAdd,
   TransactionBaseJSON,
   TransactionGetScriptHashesForVerifyingOptions,
   TransactionVerifyOptions,
 } from './TransactionBase';
-import { InvalidFormatError } from '../errors';
-import { UInt160Hex } from '../common';
-import { Witness } from '../Witness';
-import { utils, BinaryWriter, IOHelper } from '../utils';
+import { TransactionType } from './TransactionType';
 
 export interface StateTransactionAdd extends TransactionBaseAdd {
   descriptors: StateDescriptor[];

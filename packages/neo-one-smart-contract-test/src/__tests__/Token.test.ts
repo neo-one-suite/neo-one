@@ -1,10 +1,10 @@
-import BigNumber from 'bignumber.js';
 import {
   abi,
   addressToScriptHash,
   createPrivateKey,
   privateKeyToScriptHash,
 } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
 
 import appRootDir from 'app-root-dir';
 import path from 'path';

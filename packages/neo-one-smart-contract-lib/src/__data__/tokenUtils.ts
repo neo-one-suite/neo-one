@@ -1,14 +1,14 @@
-import BigNumber from 'bignumber.js';
 import {
   addressToScriptHash,
   createPrivateKey,
-  privateKeyToScriptHash,
-  TransactionResult,
   InvokeReceipt,
-  UserAccountID,
+  privateKeyToScriptHash,
   SmartContract,
+  TransactionResult,
+  UserAccountID,
 } from '@neo-one/client';
 import { cleanupTest, setupContractTest } from '@neo-one/smart-contract-test';
+import BigNumber from 'bignumber.js';
 
 import appRootDir from 'app-root-dir';
 import path from 'path';

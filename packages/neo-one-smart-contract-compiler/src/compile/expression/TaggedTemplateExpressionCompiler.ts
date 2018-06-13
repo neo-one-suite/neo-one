@@ -1,4 +1,4 @@
-import { TaggedTemplateExpression, SyntaxKind } from 'ts-simple-ast';
+import { SyntaxKind, TaggedTemplateExpression } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

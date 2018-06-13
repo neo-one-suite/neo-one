@@ -1,9 +1,9 @@
 import { ClassDeclaration, SyntaxKind, TypeGuards } from 'ts-simple-ast';
 
+import { InternalFunctionProperties } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
-import { InternalFunctionProperties } from '../helper';
 
 export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
   public readonly kind: SyntaxKind = SyntaxKind.ClassDeclaration;

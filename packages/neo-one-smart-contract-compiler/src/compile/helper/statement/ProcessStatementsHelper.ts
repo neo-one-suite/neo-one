@@ -1,8 +1,8 @@
 import { Node, StatementedNode } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 export interface ProcessStatementsHelperOptions {
   createScope: boolean;
