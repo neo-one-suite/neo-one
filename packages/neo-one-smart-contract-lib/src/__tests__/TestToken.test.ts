@@ -14,6 +14,6 @@ testToken({
     }),
   issueValue: new BigNumber('100'),
   transferValue: new BigNumber('10'),
-  contractHash: '0xcda5ae3ce34a488a7e6642b42ec2d853553d4ef8',
+  contractHash: '0x54f652847812646d265a45f56b2a18ffd962f37a',
   dir: 'token',
 });
