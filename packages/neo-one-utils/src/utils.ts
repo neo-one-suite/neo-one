@@ -8,9 +8,14 @@ function nullthrows<T>(value: T | null): T {
   return value;
 }
 
+function assertNever(value: never): void {
+  // do nothing
+}
+
 export const utils = {
   nowSeconds,
   nullthrows,
+  assertNever,
   notNull<T>(value: T | null | undefined): value is T {
     return value != null;
   },

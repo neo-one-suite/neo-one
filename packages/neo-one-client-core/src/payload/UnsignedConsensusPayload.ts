@@ -44,7 +44,7 @@ export class UnsignedConsensusPayload
       timestamp,
       consensusMessage,
     };
-  };
+  }
 
   public static deserializeWireBase(
     options: DeserializeWireBaseOptions,

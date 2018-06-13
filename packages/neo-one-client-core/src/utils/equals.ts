@@ -3,7 +3,7 @@ export function equals<T>(
   equalsFunc: (other: T) => boolean,
 ): (other: any) => boolean {
   return (other: any): boolean =>
-    // @ts-ignore
     other != null &&
+    // @ts-ignore
     (this === other || (other instanceof clazz && equalsFunc(other)));
 }

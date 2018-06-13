@@ -18,9 +18,9 @@ export interface AttributeJSON {
 
 export abstract class AttributeBase<Usage extends AttributeUsage, Value>
   implements
-    Equatable,
-    SerializableWire<Attribute>,
-    SerializableJSON<AttributeJSON> {
+  Equatable,
+  SerializableWire<Attribute>,
+  SerializableJSON<AttributeJSON> {
   public static deserializeAttributeWireBase({
     reader,
   }: DeserializeWireBaseOptions): { usage: number } {
@@ -37,7 +37,7 @@ export abstract class AttributeBase<Usage extends AttributeUsage, Value>
 
   public readonly equals = (other: {}): boolean => {
     return this === other;
-  };
+  }
 
   public serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.usage);

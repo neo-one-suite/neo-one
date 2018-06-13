@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import { CustomError } from '@neo-one/utils';
-import { ByteCode, OpCode, Op, ByteBuffer, SysCall } from '../vm';
+import { ByteCode, OpCode, Op, ByteBuffer, SysCallName } from '../vm';
 import { BinaryWriter } from './BinaryWriter';
 import { ECPoint, UInt160, UInt256, common } from '../common';
 import { utils } from './utils';
@@ -25,7 +25,7 @@ export class InvalidParamError extends CustomError {
   }
 }
 
-export interface ParamArray extends Array<Param | null> {}
+export interface ParamArray extends Array<Param | null> { }
 export type Param =
   | BN
   | number
@@ -195,7 +195,10 @@ export class ScriptBuilder {
     return this.emitOp('TAILCALL', common.uInt160ToBuffer(scriptHash));
   }
 
-  public emitSysCall(sysCall: SysCall, ...params: Array<Param | null>): this {
+  public emitSysCall(
+    sysCall: SysCallName,
+    ...params: Array<Param | null>
+  ): this {
     this.emitPushParams(...params);
     const sysCallBuffer = Buffer.from(sysCall, 'ascii');
     const writer = new BinaryWriter();

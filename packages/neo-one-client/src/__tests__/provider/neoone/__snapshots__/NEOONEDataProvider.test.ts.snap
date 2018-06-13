@@ -1,0 +1,120 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NEOONEDataProvider call 1`] = `
+Object {
+  "gasConsumed": "0",
+  "gasCost": "0",
+  "message": "10",
+  "stack": Array [
+    Object {
+      "type": "Integer",
+      "value": "1",
+    },
+    Object {
+      "type": "Array",
+      "value": Array [
+        Object {
+          "type": "Void",
+        },
+      ],
+    },
+  ],
+  "state": "FAULT",
+}
+`;
+
+exports[`NEOONEDataProvider iterBlocks - null iterBlocksFetchTimeoutMS 1`] = `
+FromAsyncIterable {
+  "_selector": [Function],
+  "_source": AsyncBlockIterator {
+    "batchSize": 10,
+    "client": NEOONEDataProvider {
+      "client": JSONRPCClient {
+        "provider": JSONRPCHTTPProvider {
+          "batcher": DataLoader {
+            "_batchLoadFn": [Function],
+            "_options": Object {
+              "cacheKeyFn": [Function],
+              "maxBatchSize": 25,
+            },
+            "_promiseCache": Array [],
+            "_queue": Array [],
+          },
+          "endpoint": "bar",
+        },
+      },
+      "iterBlocksBatchSize": undefined,
+      "iterBlocksFetchTimeoutMS": undefined,
+      "network": "foo",
+    },
+    "currentIndex": 1,
+    "doneInternal": false,
+    "fetchTimeoutMS": 20000,
+    "fetching": false,
+    "indexStop": 2,
+    "items": Array [],
+    "monitor": undefined,
+    "resolvers": Array [],
+    "startHeight": null,
+  },
+}
+`;
+
+exports[`NEOONEDataProvider iterBlocks 1`] = `
+FromAsyncIterable {
+  "_selector": [Function],
+  "_source": AsyncBlockIterator {
+    "batchSize": 10,
+    "client": NEOONEDataProvider {
+      "client": JSONRPCClient {
+        "provider": JSONRPCHTTPProvider {
+          "batcher": DataLoader {
+            "_batchLoadFn": [Function],
+            "_options": Object {
+              "cacheKeyFn": [Function],
+              "maxBatchSize": 25,
+            },
+            "_promiseCache": Array [],
+            "_queue": Array [],
+          },
+          "endpoint": "bar",
+        },
+      },
+      "iterBlocksBatchSize": undefined,
+      "iterBlocksFetchTimeoutMS": 1000,
+      "network": "foo",
+    },
+    "currentIndex": 0,
+    "doneInternal": false,
+    "fetchTimeoutMS": 1000,
+    "fetching": false,
+    "indexStop": undefined,
+    "items": Array [],
+    "monitor": undefined,
+    "resolvers": Array [],
+    "startHeight": null,
+  },
+}
+`;
+
+exports[`NEOONEDataProvider setRPCURL 1`] = `
+NEOONEDataProvider {
+  "client": JSONRPCClient {
+    "provider": JSONRPCHTTPProvider {
+      "batcher": DataLoader {
+        "_batchLoadFn": [Function],
+        "_options": Object {
+          "cacheKeyFn": [Function],
+          "maxBatchSize": 25,
+        },
+        "_promiseCache": Array [],
+        "_queue": Array [],
+      },
+      "endpoint": "buzz",
+    },
+  },
+  "iterBlocksBatchSize": undefined,
+  "iterBlocksFetchTimeoutMS": 1000,
+  "network": "foo",
+}
+`;

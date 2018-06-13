@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NEOONEProvider read 1`] = `
+NEOONEDataProvider {
+  "client": JSONRPCClient {
+    "provider": JSONRPCHTTPProvider {
+      "batcher": DataLoader {
+        "_batchLoadFn": [Function],
+        "_options": Object {
+          "cacheKeyFn": [Function],
+          "maxBatchSize": 25,
+        },
+        "_promiseCache": Array [],
+        "_queue": Array [],
+      },
+      "endpoint": "rpc",
+    },
+  },
+  "iterBlocksBatchSize": undefined,
+  "iterBlocksFetchTimeoutMS": undefined,
+  "network": "net",
+}
+`;

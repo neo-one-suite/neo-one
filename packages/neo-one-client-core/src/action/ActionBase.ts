@@ -46,7 +46,7 @@ export class ActionBase<T, Type extends ActionType>
       index,
       scriptHash,
     };
-  };
+  }
 
   public static deserializeWireBase(
     options: DeserializeWireBaseOptions,

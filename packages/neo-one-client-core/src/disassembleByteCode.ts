@@ -10,7 +10,7 @@ const createHexString = (bytes: Buffer): string => {
   return `0x${result}`;
 };
 
-export default (bytes: Buffer): string[] => {
+export const disassembleByteCode = (bytes: Buffer): string[] => {
   const reader = new BinaryReader(bytes);
 
   const result: Array<[number, OpCode | 'UNKNOWN', string | null]> = [];

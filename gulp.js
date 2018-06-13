@@ -239,6 +239,9 @@ const updateCompilerOptions = (source: string, compilerOptions: Object) => {
     noEmit: false,
     outDir: path.resolve(dir, 'dist-ts'),
     paths: {
+      '@neo-one/ec-key': [
+        '../../../@types/@neo-one/ec-key',
+      ],
       '@neo-one/*': ['../../neo-one-*/src'],
       '*': ['../../../@types/*'],
     },

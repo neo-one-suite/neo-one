@@ -14,7 +14,7 @@ export interface ConsensusMessageBaseAdd {
 
 export interface ConsensusMessageBaseAddWithType<
   Type extends ConsensusMessageType
-> extends ConsensusMessageBaseAdd {
+  > extends ConsensusMessageBaseAdd {
   type: Type;
 }
 
@@ -31,7 +31,7 @@ export class ConsensusMessageBase<T, Type extends ConsensusMessageType>
       type,
       viewNumber,
     };
-  };
+  }
 
   public static deserializeWireBase(
     options: DeserializeWireBaseOptions,

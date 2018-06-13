@@ -35,7 +35,8 @@
     "strictNullChecks": true,
     "typeRoots": [
       "./node_modules/@types/",
-      "./packages/neo-one-smart-contract"
+      "./packages/neo-one-smart-contract",
+      "./@types/roots"
     ]
   }
 }
