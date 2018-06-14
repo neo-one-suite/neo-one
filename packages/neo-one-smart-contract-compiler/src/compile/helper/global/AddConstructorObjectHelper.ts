@@ -1,14 +1,14 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { InternalFunctionProperties } from '../function';
+import { Helper } from '../Helper';
 
 // Input: [objectPrototypeVal, globalObjectVal]
 // Output: [objectPrototypeVal, globalObjectVal]
-export abstract class AddConstructorObjectHelper extends Helper<Node> {
-  protected abstract name: string;
+export abstract class AddConstructorObjectHelper extends Helper {
+  protected abstract readonly name: string;
 
   public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
@@ -19,7 +19,7 @@ export abstract class AddConstructorObjectHelper extends Helper<Node> {
     // [objectPrototypeVal, globalObjectVal, objectPrototypeVal, globalObjectVal]
     sb.emitOp(node, 'OVER');
 
-    /* create constructor prototype */
+    // create constructor prototype
     // [prototypeVal, objectPrototypeVal, globalObjectVal]
     sb.emitHelper(node, options, sb.helpers.createObject);
     // [prototypeVal, objectPrototypeVal, prototypeVal, globalObjectVal]
@@ -33,7 +33,7 @@ export abstract class AddConstructorObjectHelper extends Helper<Node> {
     // [prototypeVal, globalObjectVal]
     this.addPrototypeProperties(sb, node, options);
 
-    /* create object */
+    // create object
     // [objectVal, prototypeVal, globalObjectVal]
     sb.emitHelper(node, options, sb.helpers.createObject);
     // [objectVal, prototypeVal, objectVal, globalObjectVal]
@@ -64,19 +64,11 @@ export abstract class AddConstructorObjectHelper extends Helper<Node> {
     sb.emitHelper(node, options, sb.helpers.setDataPropertyObjectProperty);
   }
 
-  protected addPrototypeProperties(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  protected addPrototypeProperties(_sb: ScriptBuilder, _node: Node, _options: VisitOptions): void {
     // do nothing
   }
 
-  protected addConstructorProperties(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  protected addConstructorProperties(_sb: ScriptBuilder, _node: Node, _options: VisitOptions): void {
     // do nothing
   }
 
@@ -108,7 +100,7 @@ export abstract class AddConstructorObjectHelper extends Helper<Node> {
       node,
       options,
       sb.helpers.createFunctionObject({
-        property: InternalFunctionProperties.CALL,
+        property: InternalFunctionProperties.Call,
       }),
     );
     // [prototypeVal, globalObjectVal]

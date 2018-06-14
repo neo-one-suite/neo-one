@@ -1,25 +1,20 @@
+import _ from 'lodash';
 import { ArrayLiteralExpression, SyntaxKind } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export default class ArrayLiteralExpressionCompiler extends NodeCompiler<
-  ArrayLiteralExpression
-> {
+export class ArrayLiteralExpressionCompiler extends NodeCompiler<ArrayLiteralExpression> {
   public readonly kind: SyntaxKind = SyntaxKind.ArrayLiteralExpression;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: ArrayLiteralExpression,
-    optionsIn: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: ArrayLiteralExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
-    const elements = [...node.getElements()].reverse();
-    for (const element of elements) {
+    const elements = _.reverse([...node.getElements()]);
+    elements.forEach((element) => {
       sb.visit(element, options);
-    }
+    });
     // [length, ...vals]
     sb.emitPushInt(node, elements.length);
     // [valArr]

@@ -7,11 +7,7 @@ import { VisitOptions } from '../types';
 export class EmptyStatementCompiler extends NodeCompiler<EmptyStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.EmptyStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: EmptyStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(_sb: ScriptBuilder, _node: EmptyStatement, _options: VisitOptions): void {
     // tslint:disable-line
   }
 }

@@ -4,16 +4,10 @@ import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export default class ConditionalExpressionCompiler extends NodeCompiler<
-  ConditionalExpression
-> {
+export class ConditionalExpressionCompiler extends NodeCompiler<ConditionalExpression> {
   public readonly kind: SyntaxKind = SyntaxKind.ConditionalExpression;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    expr: ConditionalExpression,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, expr: ConditionalExpression, options: VisitOptions): void {
     sb.emitHelper(
       expr,
       options,

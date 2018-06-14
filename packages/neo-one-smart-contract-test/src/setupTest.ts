@@ -14,25 +14,25 @@ import { DiagnosticCategory, ts } from 'ts-simple-ast';
 import { createNode } from './createNode';
 
 export interface Options {
-  script: Buffer;
-  abi: ABI;
-  diagnostics: ts.Diagnostic[];
-  ignoreWarnings?: boolean;
+  readonly script: Buffer;
+  readonly abi: ABI;
+  readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
+  readonly ignoreWarnings?: boolean;
 }
 
 export interface Result {
-  networkName: string;
-  client: Client<any>;
-  keystore: LocalKeyStore;
-  developerClient: DeveloperClient;
-  smartContract: SmartContract;
-  masterAccountID: UserAccountID;
-  masterPrivateKey: string;
+  readonly networkName: string;
+  readonly client: Client<{
+    readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;
+  }>;
+  readonly keystore: LocalKeyStore;
+  readonly developerClient: DeveloperClient;
+  readonly smartContract: SmartContract;
+  readonly masterAccountID: UserAccountID;
+  readonly masterPrivateKey: string;
 }
 
-export const setupTest = async (
-  getContract: () => Promise<Options>,
-): Promise<Result> => {
+export const setupTest = async (getContract: () => Promise<Options>): Promise<Result> => {
   const { privateKey, rpcURL } = await createNode();
   const networkName = 'priv';
   const masterWalletName = 'master';
@@ -60,26 +60,18 @@ export const setupTest = async (
   const developerClient = new DeveloperClient(provider.read(networkName));
 
   const { script, diagnostics, abi, ignoreWarnings } = await getContract();
-  const error = diagnostics.filter(
-    (diagnostic) => diagnostic.category === DiagnosticCategory.Error,
-  )[0];
-  if (error != null) {
-    throw new Error(
-      `Compilation error: ${error.messageText} at ${error.source}`,
-    );
+  const error = diagnostics.find((diagnostic) => diagnostic.category === DiagnosticCategory.Error);
+  if (error !== undefined) {
+    throw new Error(`Compilation error: ${error.messageText} at ${error.source}`);
   }
 
-  const warning = diagnostics.filter(
-    (diagnostic) => diagnostic.category === DiagnosticCategory.Warning,
-  )[0];
-  if (warning != null && !ignoreWarnings) {
-    throw new Error(
-      `Compilation warning: ${warning.messageText} at ${warning.source}`,
-    );
+  const warning = diagnostics.find((diagnostic) => diagnostic.category === DiagnosticCategory.Warning);
+  if (warning !== undefined && !ignoreWarnings) {
+    throw new Error(`Compilation warning: ${warning.messageText} at ${warning.source}`);
   }
 
   // Give RPC server a chance to startup.
-  await new Promise((resolve) => setTimeout(() => resolve(), 5000));
+  await new Promise<void>((resolve) => setTimeout(resolve, 5000));
 
   const result = await client.publish({
     script: script.toString('hex'),
@@ -97,10 +89,7 @@ export const setupTest = async (
     },
   });
 
-  const [receipt] = await Promise.all([
-    result.confirmed({ timeoutMS: 2500 }),
-    developerClient.runConsensusNow(),
-  ]);
+  const [receipt] = await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
   if (receipt.result.state === 'FAULT') {
     throw new Error(receipt.result.message);
   }

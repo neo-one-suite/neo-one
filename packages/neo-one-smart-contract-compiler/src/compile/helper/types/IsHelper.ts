@@ -1,18 +1,19 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 import { Types } from './Types';
 
 // Input: [val]
 // Output: [boolean]
-export abstract class IsHelper extends Helper<Node> {
-  protected abstract type: Types;
+export abstract class IsHelper extends Helper {
+  protected abstract readonly type: Types;
 
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

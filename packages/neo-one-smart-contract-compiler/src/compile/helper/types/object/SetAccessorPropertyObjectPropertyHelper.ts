@@ -1,5 +1,5 @@
-import { Helper } from '../../Helper';
 import { ScriptBuilder } from '../../../sb';
+import { Helper } from '../../Helper';
 import { SetObjectAccessorPropertyHelperBase } from './SetObjectAccessorPropertyHelperBase';
 
 // Input: [?getObjectVal, ?setObjectVal, stringProp, objectVal]

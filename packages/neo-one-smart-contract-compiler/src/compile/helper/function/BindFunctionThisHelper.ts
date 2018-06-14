@@ -1,19 +1,19 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 export interface BindFunctionThisHelperOptions {
-  overwrite: boolean;
+  readonly overwrite: boolean;
 }
 
 // Input: [func, this]
 // Output: [func]
 export class BindFunctionThisHelper extends Helper {
-  private overwrite: boolean;
+  private readonly overwrite: boolean;
 
-  constructor(options: BindFunctionThisHelperOptions) {
+  public constructor(options: BindFunctionThisHelperOptions) {
     super();
     this.overwrite = options.overwrite;
   }
@@ -22,6 +22,7 @@ export class BindFunctionThisHelper extends Helper {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

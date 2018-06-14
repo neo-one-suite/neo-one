@@ -1,3 +1,4 @@
+// tslint:disable readonly-array no-object-mutation no-unused
 export type Address = Buffer;
 export type Hash256 = Buffer;
 export type PublicKey = Buffer;
@@ -11,34 +12,23 @@ export abstract class SmartContract {
   }
   public deploy(owner: Address): boolean {
     this.owner = owner;
+
     return true;
   }
   public get owner(): Address {
-    return syscall(
-      'Neo.Storage.Get',
-      syscall('Neo.Storage.GetContext'),
-      'owner',
-    ) as Address;
+    return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), 'owner') as Address;
   }
   public set owner(owner: Address) {
-    syscall(
-      'Neo.Storage.Put',
-      syscall('Neo.Storage.GetContext'),
-      'owner',
-      owner,
-    );
+    syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), 'owner', owner);
   }
 }
-export class MapStorage<
-  K extends SerializableValue,
-  V extends SerializableValue
-> {
-  constructor(private readonly prefix?: Buffer) {}
+export class MapStorage<K extends SerializableValue, V extends SerializableValue> {
+  public constructor(private readonly prefix?: Buffer) {}
   public get(keyIn: K): V | null {
     return syscall(
       'Neo.Storage.Get',
       syscall('Neo.Storage.GetContext'),
-      this.prefix == null
+      this.prefix === undefined
         ? syscall('Neo.Runtime.Serialize', keyIn)
         : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)]),
     ) as V | null;
@@ -47,7 +37,7 @@ export class MapStorage<
     syscall(
       'Neo.Storage.Put',
       syscall('Neo.Storage.GetContext'),
-      this.prefix == null
+      this.prefix === undefined
         ? syscall('Neo.Runtime.Serialize', keyIn)
         : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)]),
       value,
@@ -55,17 +45,15 @@ export class MapStorage<
   }
 }
 export class SetStorage<K extends SerializableValue> {
-  constructor(private readonly prefix?: Buffer) {}
+  public constructor(private readonly prefix?: Buffer) {}
   public has(keyIn: K): boolean {
     return (
       syscall(
         'Neo.Storage.Get',
         syscall('Neo.Storage.GetContext'),
-        this.prefix == null
+        this.prefix === undefined
           ? syscall('Neo.Runtime.Serialize', keyIn)
-          : Buffer.concat(
-              [this.prefix, syscall('Neo.Runtime.Serialize', keyIn)],
-            ),
+          : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)]),
       ) === true
     );
   }
@@ -73,7 +61,7 @@ export class SetStorage<K extends SerializableValue> {
     syscall(
       'Neo.Storage.Put',
       syscall('Neo.Storage.GetContext'),
-      this.prefix == null
+      this.prefix === undefined
         ? syscall('Neo.Runtime.Serialize', keyIn)
         : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)]),
       true,
@@ -81,7 +69,7 @@ export class SetStorage<K extends SerializableValue> {
   }
 }
 export class Output {
-  constructor(private readonly output: OutputBase) {}
+  public constructor(private readonly output: OutputBase) {}
   public get address(): Address {
     return syscall('Neo.Output.GetScriptHash', this.output);
   }
@@ -93,7 +81,7 @@ export class Output {
   }
 }
 export class Input {
-  constructor(private readonly input: InputBase) {}
+  public constructor(private readonly input: InputBase) {}
   public get hash(): Hash256 {
     return syscall('Neo.Input.GetHash', this.input);
   }
@@ -141,7 +129,7 @@ export type AttributeUsage =
   | 0xfe // REMARK14
   | 0xff; // REMARK15
 export class Attribute {
-  constructor(private readonly attribute: AttributeBase) {}
+  public constructor(private readonly attribute: AttributeBase) {}
   public get usage(): AttributeUsage {
     return syscall('Neo.Attribute.GetUsage', this.attribute) as AttributeUsage;
   }
@@ -161,49 +149,36 @@ export type TransactionType =
   | 0xd1; // Invocation
 export class Transaction {
   private readonly transaction: TransactionBase;
-  constructor(transaction: TransactionBase) {
+  public constructor(transaction: TransactionBase) {
     this.transaction = transaction;
   }
   public get hash(): Hash256 {
     return syscall('Neo.Transaction.GetHash', this.transaction);
   }
   public get type(): TransactionType {
-    return syscall(
-      'Neo.Transaction.GetType',
-      this.transaction,
-    ) as TransactionType;
+    return syscall('Neo.Transaction.GetType', this.transaction) as TransactionType;
   }
   public get attributes(): Attribute[] {
-    return syscall('Neo.Transaction.GetAttributes', this.transaction).map(
-      (attribute) => new Attribute(attribute),
-    );
+    return syscall('Neo.Transaction.GetAttributes', this.transaction).map((attribute) => new Attribute(attribute));
   }
   public get outputs(): Output[] {
-    return syscall('Neo.Transaction.GetOutputs', this.transaction).map(
-      (output) => new Output(output),
-    );
+    return syscall('Neo.Transaction.GetOutputs', this.transaction).map((output) => new Output(output));
   }
   public get inputs(): Input[] {
-    return syscall('Neo.Transaction.GetInputs', this.transaction).map(
-      (input) => new Input(input),
-    );
+    return syscall('Neo.Transaction.GetInputs', this.transaction).map((input) => new Input(input));
   }
   public get references(): Output[] {
-    return syscall('Neo.Transaction.GetReferences', this.transaction).map(
-      (output) => new Output(output),
-    );
+    return syscall('Neo.Transaction.GetReferences', this.transaction).map((output) => new Output(output));
   }
   public get unspentOutputs(): Output[] {
-    return syscall('Neo.Transaction.GetUnspentCoins', this.transaction).map(
-      (output) => new Output(output),
-    );
+    return syscall('Neo.Transaction.GetUnspentCoins', this.transaction).map((output) => new Output(output));
   }
   public get script(): Buffer {
     return syscall('Neo.InvocationTransaction.GetScript', this.transaction);
   }
 }
 export abstract class BaseBlock<T extends HeaderBase | BlockBase> {
-  constructor(protected readonly block: T) {}
+  public constructor(protected readonly block: T) {}
   public get hash(): Hash256 {
     return syscall('Neo.Header.GetHash', this.block);
   }
@@ -235,18 +210,14 @@ export class Block extends BaseBlock<BlockBase> {
     return syscall('Neo.Block.GetTransactionCount', this.block);
   }
   public get transactions(): Transaction[] {
-    return syscall('Neo.Block.GetTransactions', this.block).map(
-      (transaction) => new Transaction(transaction),
-    );
+    return syscall('Neo.Block.GetTransactions', this.block).map((transaction) => new Transaction(transaction));
   }
   public getTransaction(index: Integer): Transaction {
-    return new Transaction(
-      syscall('Neo.Block.GetTransaction', this.block, index),
-    );
+    return new Transaction(syscall('Neo.Block.GetTransaction', this.block, index));
   }
 }
 export class Account {
-  constructor(private readonly account: AccountBase) {}
+  public constructor(private readonly account: AccountBase) {}
   public get hash(): Address {
     return syscall('Neo.Account.GetScriptHash', this.account);
   }
@@ -270,7 +241,7 @@ export type AssetType =
   | 0x98 // Invoice
   | 0x60; // Token
 export class Asset {
-  constructor(private readonly asset: AssetBase) {}
+  public constructor(private readonly asset: AssetBase) {}
   public get hash(): Hash256 {
     return syscall('Neo.Asset.GetAssetId', this.asset);
   }
@@ -297,7 +268,7 @@ export class Asset {
   }
 }
 export class Contract extends Account {
-  constructor(private readonly contract: ContractBase, account: AccountBase) {
+  public constructor(private readonly contract: ContractBase, account: AccountBase) {
     super(account);
   }
   public get script(): Buffer {
@@ -337,22 +308,13 @@ export function getValidators(): PublicKey[] {
   return syscall('Neo.Blockchain.GetValidators');
 }
 export function getContract(address: Address): Contract {
-  return new Contract(
-    syscall('Neo.Blockchain.GetContract', address),
-    syscall('Neo.Blockchain.GetAccount', address),
-  );
+  return new Contract(syscall('Neo.Blockchain.GetContract', address), syscall('Neo.Blockchain.GetAccount', address));
 }
-export function verify(
-  target: any,
-  propertyKey: string,
-  descriptor: PropertyDescriptor,
-): void {
+// tslint:disable-next-line no-any
+export function verify(target: any, propertyKey: string, descriptor: PropertyDescriptor): void {
   throw new Error('This should be transpiled.');
 }
-export function constant(
-  target: any,
-  propertyKey: string,
-  descriptor: PropertyDescriptor,
-): void {
+// tslint:disable-next-line no-any
+export function constant(target: any, propertyKey: string, descriptor: PropertyDescriptor): void {
   throw new Error('This should be transpiled.');
 }

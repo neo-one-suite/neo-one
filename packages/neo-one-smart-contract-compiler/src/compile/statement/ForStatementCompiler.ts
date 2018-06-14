@@ -7,14 +7,10 @@ import { VisitOptions } from '../types';
 export class ForStatementCompiler extends NodeCompiler<ForStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.ForStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: ForStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: ForStatement, options: VisitOptions): void {
     let initializer;
     const exprInitializer = node.getInitializer();
-    if (exprInitializer != null) {
+    if (exprInitializer !== undefined) {
       initializer = () => {
         sb.visit(exprInitializer, sb.noPushValueOptions(options));
       };
@@ -22,7 +18,7 @@ export class ForStatementCompiler extends NodeCompiler<ForStatement> {
 
     let condition;
     const exprCondition = node.getCondition();
-    if (exprCondition != null) {
+    if (exprCondition !== undefined) {
       condition = () => {
         sb.visit(exprCondition, sb.pushValueOptions(options));
         sb.emitHelper(
@@ -37,7 +33,7 @@ export class ForStatementCompiler extends NodeCompiler<ForStatement> {
 
     let incrementor;
     const exprIncrementor = node.getIncrementor();
-    if (exprIncrementor != null) {
+    if (exprIncrementor !== undefined) {
       incrementor = () => {
         sb.visit(exprIncrementor, sb.noPushValueOptions(options));
       };

@@ -1,12 +1,12 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../../Helper';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
+import { Helper } from '../../Helper';
 
 // Input: [stringProp, objectVal]
 // Output: [val]
-export abstract class GetObjectPropertyHelperBase extends Helper<Node> {
+export abstract class GetObjectPropertyHelperBase extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [objectVal, stringProp, objectVal]
     sb.emitOp(node, 'OVER');
@@ -22,11 +22,7 @@ export abstract class GetObjectPropertyHelperBase extends Helper<Node> {
           // [getObjectVal, objectVal]
           sb.emitOp(node, 'PICKITEM');
           // [val]
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.invokeCall({ bindThis: true, noArgs: true }),
-          );
+          sb.emitHelper(node, options, sb.helpers.invokeCall({ bindThis: true, noArgs: true }));
         },
         dataExists: () => {
           // [propVal]
@@ -54,5 +50,5 @@ export abstract class GetObjectPropertyHelperBase extends Helper<Node> {
     );
   }
 
-  protected abstract getObject(sb: ScriptBuilder): Helper<Node>;
+  protected abstract getObject(sb: ScriptBuilder): Helper;
 }

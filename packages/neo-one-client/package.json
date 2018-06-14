@@ -27,7 +27,7 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
-  "types": "./src/index.d.ts",
+  "typings": "./src/index.ts",
   "browser": {
     "./dist/index.js": "./dist/index.browser.js",
     "./dist/index.es.js": "./dist/index.browser.es.js"

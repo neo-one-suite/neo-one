@@ -1,31 +1,25 @@
-import {
-  Counter,
-  Histogram,
-  Logger,
-  Report,
-  MetricOptions,
-  BucketedMetricOptions,
-} from './types';
+import { BucketedMetricOptions, Counter, Histogram, Logger, MetricOptions, Report } from './types';
 
 import { metrics } from './NoOpMetricsFactory';
 
 export class ReportHandler {
-  private counters: { [name: string]: Counter } = {};
-  private histograms: { [name: string]: Histogram } = {};
+  private readonly mutableCounters: { [K in string]?: Counter } = {};
+  private readonly mutableHistograms: { [K in string]?: Histogram } = {};
 
-  constructor(private readonly logger: Logger) {}
+  public constructor(private readonly logger: Logger) {}
 
   public report(report: Report): void {
     report.logs.forEach((log) => {
       const { error } = log;
-      let errorObj: Error | undefined;
-      if (error != null) {
-        errorObj = new Error(error.message);
-        if (error.stack != null) {
-          errorObj.stack = error.stack;
+      let mutableErrorObj: Error | undefined;
+      if (error !== undefined) {
+        mutableErrorObj = new Error(error.message);
+        if (error.stack !== undefined) {
+          mutableErrorObj.stack = error.stack;
         }
-        if (error.code != null) {
-          (errorObj as any).code = error.code;
+        if (error.code !== undefined) {
+          // tslint:disable-next-line no-object-mutation
+          (mutableErrorObj as { code?: string }).code = error.code;
         }
       }
       this.logger.log({
@@ -34,7 +28,7 @@ export class ReportHandler {
         message: log.message,
         labels: log.labels,
         data: log.data,
-        error: error == null ? undefined : errorObj,
+        error: error === undefined ? undefined : mutableErrorObj,
       });
     });
 
@@ -43,7 +37,7 @@ export class ReportHandler {
       counterMetric.values.forEach((value) => {
         if (typeof value.countOrLabels === 'number') {
           counter.inc(value.countOrLabels);
-        } else if (value.count != null) {
+        } else if (value.count !== undefined) {
           counter.inc(value.countOrLabels, value.count);
         } else {
           counter.inc(value.countOrLabels);
@@ -56,7 +50,7 @@ export class ReportHandler {
       histMetric.values.forEach((value) => {
         if (typeof value.countOrLabels === 'number') {
           histogram.observe(value.countOrLabels);
-        } else if (value.countOrLabels != null && value.count != null) {
+        } else if (value.countOrLabels !== undefined && value.count !== undefined) {
           histogram.observe(value.countOrLabels, value.count);
         }
       });
@@ -64,18 +58,22 @@ export class ReportHandler {
   }
 
   private getCounter(options: MetricOptions): Counter {
-    if (this.counters[options.name] == null) {
-      this.counters[options.name] = metrics.createCounter(options);
+    let counter = this.mutableCounters[options.name];
+    if (counter === undefined) {
+      counter = metrics.createCounter(options);
+      this.mutableCounters[options.name] = counter;
     }
 
-    return this.counters[options.name];
+    return counter;
   }
 
   private getHistogram(options: BucketedMetricOptions): Histogram {
-    if (this.histograms[options.name] == null) {
-      this.histograms[options.name] = metrics.createHistogram(options);
+    let histogram = this.mutableHistograms[options.name];
+    if (histogram === undefined) {
+      histogram = metrics.createHistogram(options);
+      this.mutableHistograms[options.name] = histogram;
     }
 
-    return this.histograms[options.name];
+    return histogram;
   }
 }

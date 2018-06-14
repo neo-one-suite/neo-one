@@ -7,27 +7,15 @@ import { VisitOptions } from '../types';
 export class ReturnStatementCompiler extends NodeCompiler<ReturnStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.ReturnStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: ReturnStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: ReturnStatement, options: VisitOptions): void {
     const expr = node.getExpression();
-    if (expr == null) {
-      sb.emitHelper(
-        node,
-        sb.pushValueOptions(options),
-        sb.helpers.createUndefined,
-      );
+    if (expr === undefined) {
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
     } else {
       sb.visit(expr, sb.pushValueOptions(options));
     }
 
-    sb.emitHelper(
-      node,
-      sb.pushValueOptions(options),
-      sb.helpers.createNormalCompletion,
-    );
+    sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createNormalCompletion);
     sb.emitOp(node, 'RET');
   }
 }

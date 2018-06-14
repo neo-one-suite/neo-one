@@ -1,30 +1,25 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../../Helper';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
+import { Helper } from '../../Helper';
 
 export interface FindObjectPropertyHelperOptions {
-  accessor: () => void;
-  dataExists: () => void;
-  data: () => void;
-  getObject: (sb: ScriptBuilder) => Helper<Node>;
+  readonly accessor: () => void;
+  readonly dataExists: () => void;
+  readonly data: () => void;
+  readonly getObject: (sb: ScriptBuilder) => Helper;
 }
 
 // Input: [stringProp, objectVal]
 // Output: [val]
-export class FindObjectPropertyHelper extends Helper<Node> {
+export class FindObjectPropertyHelper extends Helper {
   private readonly accessor: () => void;
   private readonly dataExists: () => void;
   private readonly data: () => void;
-  private readonly getObject: (sb: ScriptBuilder) => Helper<Node>;
+  private readonly getObject: (sb: ScriptBuilder) => Helper;
 
-  constructor({
-    accessor,
-    dataExists,
-    data,
-    getObject,
-  }: FindObjectPropertyHelperOptions) {
+  public constructor({ accessor, dataExists, data, getObject }: FindObjectPropertyHelperOptions) {
     super();
     this.accessor = accessor;
     this.dataExists = dataExists;
@@ -36,6 +31,7 @@ export class FindObjectPropertyHelper extends Helper<Node> {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

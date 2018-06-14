@@ -1,9 +1,11 @@
 import { CollectedLoggerLogOptions, Logger, LoggerLogOptions } from './types';
 
 export class CollectingLogger implements Logger {
+  // tslint:disable-next-line readonly-array readonly-keyword
   private logs: CollectedLoggerLogOptions[] = [];
 
   public log(options: LoggerLogOptions): void {
+    const error = options.error as (Error & { code?: number }) | undefined;
     const logOptions = {
       name: options.name,
       level: options.level,
@@ -11,32 +13,28 @@ export class CollectingLogger implements Logger {
       labels: options.labels,
       data: options.data,
       error:
-        options.error == null
+        error === undefined
           ? undefined
           : {
-              message: options.error.message,
-              stack: options.error.stack,
-              code:
-                (options.error as any).code == null
-                  ? options.error.constructor.name
-                  : (options.error as any).code,
+              message: error.message,
+              stack: error.stack,
+              code: error.code === undefined ? error.constructor.name : `${error.code}`,
             },
     };
 
-    if (logOptions.error == null) {
-      delete logOptions.error;
-    }
-
+    // tslint:disable-next-line no-array-mutation
     this.logs.push(logOptions);
   }
 
-  public collect(): CollectedLoggerLogOptions[] {
-    const { logs } = this;
+  public collect(): ReadonlyArray<CollectedLoggerLogOptions> {
+    const localLogs = this.logs;
+    // tslint:disable-next-line no-object-mutation
     this.logs = [];
 
-    return logs;
+    return localLogs;
   }
 
+  // tslint:disable-next-line
   public close(callback: () => void): void {
     callback();
   }

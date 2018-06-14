@@ -3,9 +3,9 @@ import { findAndCompileContract } from '@neo-one/smart-contract-compiler';
 import { Result, setupTest } from './setupTest';
 
 export interface SetupContractTestOptions {
-  dir: string;
-  contractName: string;
-  ignoreWarnings?: boolean;
+  readonly dir: string;
+  readonly contractName: string;
+  readonly ignoreWarnings?: boolean;
 }
 
 export const setupContractTest = async ({
@@ -18,5 +18,6 @@ export const setupContractTest = async ({
       dir,
       contractName,
     });
+
     return { script, diagnostics, abi, ignoreWarnings };
   });

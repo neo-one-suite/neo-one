@@ -38,6 +38,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@neo-one/utils": "^1.0.0-alpha.35",
     "koa": "^2.5.1",
     "koa-mount": "^3.0.0",
     "lodash": "^4.17.5",

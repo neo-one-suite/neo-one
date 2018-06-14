@@ -1,15 +1,10 @@
-import { BehaviorSubject } from 'rxjs';
 import FullNode from '@neo-one/node';
+import { BehaviorSubject } from 'rxjs';
 
-import _ from 'lodash';
+import { addressToScriptHash, createPrivateKey, privateKeyToAddress, privateKeyToPublicKey } from '@neo-one/client';
 import { createMain } from '@neo-one/node-neo-settings';
-import {
-  addressToScriptHash,
-  createPrivateKey,
-  privateKeyToAddress,
-  privateKeyToPublicKey,
-} from '@neo-one/client';
-import memdown from 'memdown';
+import _ from 'lodash';
+import MemDown from 'memdown';
 
 import { addCleanup } from './cleanupTest';
 import { getMonitor } from './getMonitor';
@@ -48,7 +43,7 @@ export const createNode = async () => {
           },
         },
       }),
-      leveldown: memdown(),
+      leveldown: MemDown(),
     },
     (error) => {
       // tslint:disable-next-line
@@ -59,5 +54,6 @@ export const createNode = async () => {
   addCleanup(() => node.stop());
   node.start();
 
+  // tslint:disable-next-line no-http-string
   return { privateKey, node, rpcURL: `http://localhost:${port}/rpc` };
 };

@@ -7,11 +7,7 @@ import { VisitOptions } from '../types';
 export class DebuggerStatementCompiler extends NodeCompiler<DebuggerStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.DebuggerStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: DebuggerStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: DebuggerStatement, _options: VisitOptions): void {
     sb.reportUnsupported(node);
   }
 }

@@ -1,26 +1,26 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 export interface CreateFunctionArrayHelperOptions {
-  body: () => void;
+  readonly body: () => void;
 }
 
 // Input: []
 // Output: [farr]
-export class CreateFunctionArrayHelper extends Helper<Node> {
-  private body: () => void;
+export class CreateFunctionArrayHelper extends Helper {
+  private readonly body: () => void;
 
-  constructor({ body }: CreateFunctionArrayHelperOptions) {
+  public constructor({ body }: CreateFunctionArrayHelperOptions) {
     super();
     this.body = body;
   }
 
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (options.pushValue) {
-      /* create function */
+      // create function
       // [[scopes, this]]
       sb.scope.pushAll(sb, node, options);
       // [[scopes, this]]

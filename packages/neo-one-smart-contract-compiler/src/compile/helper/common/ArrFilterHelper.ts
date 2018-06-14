@@ -1,12 +1,12 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 export interface ArrFilterHelperOptions {
-  map: () => void;
-  withIndex?: boolean;
+  readonly map: () => void;
+  readonly withIndex?: boolean;
 }
 
 // Input: [array]
@@ -15,7 +15,7 @@ export class ArrFilterHelper extends Helper {
   private readonly map: () => void;
   private readonly withIndex: boolean;
 
-  constructor(options: ArrFilterHelperOptions) {
+  public constructor(options: ArrFilterHelperOptions) {
     super();
     this.map = options.map;
     this.withIndex = options.withIndex || false;
@@ -24,6 +24,7 @@ export class ArrFilterHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 
@@ -79,13 +80,10 @@ export class ArrFilterHelper extends Helper {
             sb.helpers.if({
               condition: () => {
                 // [keepVal, value, arr, idx, size, ...array]
+                // tslint:disable-next-line no-map-without-usage
                 this.map();
                 // [keep, value, arr, idx, size, ...array]
-                sb.emitHelper(
-                  node,
-                  options,
-                  sb.helpers.toBoolean({ type: undefined }),
-                );
+                sb.emitHelper(node, options, sb.helpers.toBoolean({ type: undefined }));
               },
               whenTrue: () => {
                 // [arr, value, arr, idx, size, ...array]

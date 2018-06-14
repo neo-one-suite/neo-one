@@ -1,7 +1,8 @@
+// tslint:disable prefer-switch
 import { Address, verifySender } from './transpiledLib';
 import { Token } from './TranspiledToken';
 
-export class TestToken extends Token<4> {
+export class TestTranspiledToken extends Token<4> {
   public readonly name: string = 'TestToken';
   public readonly decimals: 4 = 4;
   public readonly symbol: string = 'TT';
@@ -10,11 +11,12 @@ export class TestToken extends Token<4> {
     super.deploy(owner);
     verifySender(owner);
     this.issue(owner, 1000000);
+
     return true;
   }
 }
 
-const contract = new TestToken();
+const contract = new TestTranspiledToken();
 const method = syscall('Neo.Runtime.GetArgument', 0) as string;
 if (syscall('Neo.Runtime.GetTrigger') === 0x10) {
   if (method === 'name') {
@@ -27,25 +29,13 @@ if (syscall('Neo.Runtime.GetTrigger') === 0x10) {
     const args = syscall('Neo.Runtime.GetArgument', 1) as [Buffer];
     syscall('Neo.Runtime.Return', contract.deploy(args[0]));
   } else if (method === 'transfer') {
-    const args = syscall('Neo.Runtime.GetArgument', 1) as [
-      Buffer,
-      Buffer,
-      number
-    ];
+    const args = syscall('Neo.Runtime.GetArgument', 1) as [Buffer, Buffer, number];
     contract.transfer(args[0], args[1], args[2]);
   } else if (method === 'transferFrom') {
-    const args = syscall('Neo.Runtime.GetArgument', 1) as [
-      Buffer,
-      Buffer,
-      number
-    ];
+    const args = syscall('Neo.Runtime.GetArgument', 1) as [Buffer, Buffer, number];
     contract.transferFrom(args[0], args[1], args[2]);
   } else if (method === 'approve') {
-    const args = syscall('Neo.Runtime.GetArgument', 1) as [
-      Buffer,
-      Buffer,
-      number
-    ];
+    const args = syscall('Neo.Runtime.GetArgument', 1) as [Buffer, Buffer, number];
     contract.approve(args[0], args[1], args[2]);
   } else if (method === 'balanceOf') {
     const args = syscall('Neo.Runtime.GetArgument', 1) as [Buffer];

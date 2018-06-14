@@ -7,11 +7,7 @@ import { VisitOptions } from '../types';
 export class DecoratorCompiler extends NodeCompiler<Decorator> {
   public readonly kind: SyntaxKind = SyntaxKind.Decorator;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    decl: Decorator,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, decl: Decorator, _options: VisitOptions): void {
     sb.reportUnsupported(decl);
   }
 }

@@ -1,27 +1,27 @@
 import { Node, Type } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 export interface ForType {
-  isType: (type?: Type) => boolean;
-  isRuntimeType: (options: VisitOptions) => void;
-  process: (options: VisitOptions) => void;
+  readonly isType: (type?: Type) => boolean;
+  readonly isRuntimeType: (options: VisitOptions) => void;
+  readonly process: (options: VisitOptions) => void;
 }
 
 export interface ForTypeHelperOptions {
-  types: ForType[];
-  defaultCase?: (options: VisitOptions) => void;
+  readonly types: ReadonlyArray<ForType>;
+  readonly defaultCase?: (options: VisitOptions) => void;
 }
 
 // Input: [val]
 // Output: []
 export class ForTypeHelper extends Helper {
-  private readonly types: ForType[];
+  private readonly types: ReadonlyArray<ForType>;
   private readonly defaultCase: ((options: VisitOptions) => void) | undefined;
 
-  constructor({ types, defaultCase }: ForTypeHelperOptions) {
+  public constructor({ types, defaultCase }: ForTypeHelperOptions) {
     super();
     this.types = types;
     this.defaultCase = defaultCase;
@@ -31,17 +31,18 @@ export class ForTypeHelper extends Helper {
     const noCastOptions = sb.noCastOptions(optionsIn);
     const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
     let type = optionsIn.cast;
-    if (type == null) {
+    if (type === undefined) {
       type = sb.getType(node);
     }
 
     const types = this.types.filter((testType) => testType.isType(type));
     const defaultCase =
-      this.defaultCase ||
-      ((innerOptions) => {
-        sb.emitOp(node, 'DROP');
-        sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
-      });
+      this.defaultCase === undefined
+        ? (innerOptions: VisitOptions) => {
+            sb.emitOp(node, 'DROP');
+            sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+          }
+        : this.defaultCase;
     if (types.length === 0) {
       defaultCase(noCastOptions);
     } else if (types.length === 1) {

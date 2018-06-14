@@ -10,17 +10,13 @@ import * as constants from '../../constants';
 export class BreakStatementCompiler extends NodeCompiler<BreakStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.BreakStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: BreakStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: BreakStatement, options: VisitOptions): void {
     const label = node.getLabel();
-    if (label != null) {
+    if (label !== undefined) {
       sb.reportUnsupported(label);
     }
 
-    if (options.breakPC == null) {
+    if (options.breakPC === undefined) {
       sb.reportError(
         node,
         'Something went wrong. Expected a break jump location.',

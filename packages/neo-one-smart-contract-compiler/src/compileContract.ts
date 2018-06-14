@@ -1,8 +1,8 @@
-import * as utils from './utils';
-import { transpile } from './transpile';
-import { compile } from './compile';
+import { ABI } from '@neo-one/client';
 import { ts } from 'ts-simple-ast';
-import { ABI } from '@neo-one/client/src';
+import { compile } from './compile';
+import { transpile } from './transpile';
+import * as utils from './utils';
 
 export interface CompileContractOptions {
   readonly filePath: string;
@@ -10,19 +10,14 @@ export interface CompileContractOptions {
 }
 
 export interface CompileContractResult {
-  code: Buffer;
-  diagnostics: ts.Diagnostic[];
-  abi: ABI;
+  readonly code: Buffer;
+  readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
+  readonly abi: ABI;
 }
 
-export const compileContract = async ({
-  filePath,
-  name,
-}: CompileContractOptions): Promise<CompileContractResult> => {
+export const compileContract = async ({ filePath, name }: CompileContractOptions): Promise<CompileContractResult> => {
   const ast = await utils.getAstForPath(filePath);
-  const smartContract = ast
-    .getSourceFileOrThrow(filePath)
-    .getClassOrThrow(name);
+  const smartContract = ast.getSourceFileOrThrow(filePath).getClassOrThrow(name);
   const { ast: transpiledAst, sourceFile, abi, context } = transpile({
     ast,
     smartContract,

@@ -37,7 +37,6 @@ lerna-debug.log
 .idea
 
 # Visual Studio Code
-.vscode
 .history
 
 # flow-typed Lib Defs

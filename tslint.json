@@ -1,16 +1,169 @@
 {
   "extends": [
-    "tslint:recommended"
+    "tslint:all",
+    "tslint-config-prettier"
   ],
+  "rulesDirectory": [
+    "tslint-microsoft-contrib",
+    "./node_modules/tslint-immutable/rules",
+    "./node_modules/tslint-consistent-codestyle/rules",
+    "./node_modules/tslint-sonarts/lib/rules/",
+    "./node_modules/tslint-clean-code/dist/build",
+    "./node_modules/rxjs-tslint-rules/dist/rules"
+  ],
+  "linterOptions": {
+    "exclude": [
+      "./packages/*/src/__tests__/**/*",
+      "./packages/*/src/__data__/**/*",
+      "./packages/*/src/__e2e__/**/*"
+    ]
+  },
   "rules": {
+    "cyclomatic-complexity": false,
+    "no-unused-variable": false,
+    "no-duplicate-variable": false,
+    "no-unbound-method": false,
+    "completed-docs": false,
     "interface-name": false,
     "max-classes-per-file": false,
-    "ordered-imports": false,
+    "object-literal-sort-keys": false,
+    "no-namespace": false,
+    "typedef": false,
+    "no-empty-interface": false,
+    "no-use-before-declare": false,
+    "no-magic-numbers": false,
+    "prefer-method-signature": false,
+    "restrict-plus-operands": false,
+    "no-unsafe-any": false,
+    "max-file-line-count": false,
+    "no-expression-statement": false,
+    "no-parameter-properties": false,
+    "prefer-function-over-method": false,
+
+    "trailing-comma": [
+      true,
+      {
+        "multiline": {
+          "objects": "always",
+          "arrays": "always",
+          "functions": "always",
+          "typeLiterals": "always"
+        },
+        "esSpecCompliant": true
+      }
+    ],  
+    "ordered-imports": true,
     "quotemark": [
       true,
       "single"
     ],
-    "object-literal-sort-keys": false,
-    "no-namespace": false
+    "triple-equals": [
+      true,
+      "allow-undefined-check"
+    ],
+    "member-ordering": [
+      true,
+      {
+        "order": "statics-first"
+      }
+    ],
+    "no-inferrable-types": true,
+    "only-arrow-functions": [
+      true,
+      "allow-declarations"
+    ],
+    "no-submodule-imports": [
+      true,
+      "rxjs",
+      "ix"
+    ],
+    "strict-boolean-expressions": [
+      true,
+      "allow-null-union",
+      "allow-undefined-union",
+      "allow-string",
+      "allow-number",
+      "allow-mix",
+      "allow-boolean-or-undefined"
+    ],
+    "no-implicit-dependencies": [
+      true,
+      "dev"
+    ],
+    "comment-format": [
+      true,
+      "check-space"
+    ],
+    "no-void-expression": [
+      true,
+      "ignore-arrow-function-shorthand"
+    ],
+    "no-this-assignment": [
+      true,
+      {
+        "allow-destructuring": true
+      }
+    ],
+    "one-variable-per-declaration": [
+      true,
+      "ignore-for-loop"
+    ],
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore"
+    ],
+    "export-name": true,
+    "no-control-regex": true,
+    "no-empty-line-after-opening-brace": true,
+    "no-increment-decrement": true,
+    "no-invalid-regexp": true,
+    "no-regex-spaces": true,
+    "no-single-line-block-comment": true,
+    "no-suspicious-comment": true,
+    "no-unnecessary-field-initialization": true,
+    "possible-timing-attack": true,
+    "prefer-array-literal": [ true, { "allow-type-parameters": true } ],
+    "promise-must-complete": true,
+    "use-named-parameter": true,
+    "no-unused-expression": [true, "allow-fast-null-checks"],
+    "readonly-keyword": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable"] }],
+    "readonly-array": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable"] }],
+    "no-let": [true, "ignore-local"],
+    "no-array-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable"] }],
+    "no-object-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "app.proxy", "app.silent", "ctx."] }],
+    "no-method-signature": true,
+    "no-loop-statement": true,
+    "no-accessor-recursion": true,
+    "no-collapsible-if": true,
+    "no-unnecessary-else": true,
+    "no-unnecessary-type-annotation": true,
+    "no-unused": [true, "unused-function-expression-name", "unused-class-expression-name", "unused-catch-binding"],
+    "no-var-before-return": true,
+    "prefer-while": true,
+    "no-ignored-initial-value": true,
+    "no-ignored-return": true,
+    "no-in-misuse": true,
+    "no-misleading-array-reverse": true,
+    "no-unthrown-error": true,
+    "no-use-of-empty-return-value": true,
+    "no-useless-increment": true,
+    "no-useless-intersection": true,
+    "no-array-delete": true,
+    "no-dead-store": true,
+    "no-gratuitous-expressions": true,
+    "no-inconsistent-return": true,
+    "no-redundant-boolean": true,
+    "no-redundant-parentheses": true,
+    "no-useless-cast": true,
+    "prefer-immediate-return": true,
+    "prefer-promise-shorthand": true,
+    "use-primitive-type": true,
+    "no-map-without-usage": true,
+    "rxjs-finnish": true,
+    "rxjs-no-deep-operators": true,
+    "rxjs-no-ignored-error": true,
+    "rxjs-no-patched": true
   }
 }

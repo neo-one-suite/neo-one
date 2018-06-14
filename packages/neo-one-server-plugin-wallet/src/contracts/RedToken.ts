@@ -5,7 +5,7 @@ export class RedToken extends SimpleToken {
   public readonly name: string = 'RedToken';
   public readonly symbol: string = 'RT';
 
-  constructor(owner: Address, amount: Fixed<8>) {
+  public constructor(owner: Address, amount: Fixed<8>) {
     super(owner, amount);
   }
 }

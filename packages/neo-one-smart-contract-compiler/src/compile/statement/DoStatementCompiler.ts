@@ -7,19 +7,12 @@ import { VisitOptions } from '../types';
 export class DoStatementCompiler extends NodeCompiler<DoStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.DoStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: DoStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: DoStatement, options: VisitOptions): void {
     sb.withProgramCounter((pc) => {
       sb.withProgramCounter((innerPC) => {
         sb.visit(
           node.getStatement(),
-          sb.breakPCOptions(
-            sb.continuePCOptions(options, innerPC.getLast()),
-            pc.getLast(),
-          ),
+          sb.breakPCOptions(sb.continuePCOptions(options, innerPC.getLast()), pc.getLast()),
         );
       });
 

@@ -1,7 +1,7 @@
 import { DiagnosticCategory, Node, ts } from 'ts-simple-ast';
 
 export class CompilerDiagnostic implements ts.Diagnostic {
-  constructor(
+  public constructor(
     private readonly node: Node,
     public readonly messageText: string,
     public readonly code: number,

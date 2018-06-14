@@ -1,74 +1,71 @@
+import { CounterProxy, HistogramProxy, MetricsFactoryProxy } from './MetricsFactoryProxy';
 import {
+  BucketedMetricOptions,
   CollectedMetric,
+  CollectedMetrics,
   Counter,
+  CounterBase,
   Histogram,
+  HistogramBase,
   Labels,
   MetricCollection,
   MetricOptions,
-  BucketedMetricOptions,
-  PercentiledMetricOptions,
   MetricValue,
-  CounterBase,
-  HistogramBase,
+  PercentiledMetricOptions,
 } from './types';
-import {
-  CounterProxy,
-  HistogramProxy,
-  MetricsFactoryProxy,
-} from './MetricsFactoryProxy';
 
 class CollectingMetric<T extends MetricOptions | BucketedMetricOptions> {
   public readonly metric: T;
-  protected values: MetricValue[];
+  // tslint:disable-next-line readonly-keyword readonly-array
+  protected mutableValues: MetricValue[];
 
-  constructor(metric: T) {
+  public constructor(metric: T) {
     this.metric = metric;
-    this.values = [];
+    this.mutableValues = [];
   }
 
   public toJSON(): CollectedMetric<T> {
-    return { metric: this.metric, values: this.values };
+    return { metric: this.metric, values: this.mutableValues };
   }
 
   public reset(): void {
-    this.values = [];
+    this.mutableValues = [];
   }
 }
 
-class CollectingCounter extends CollectingMetric<MetricOptions>
-  implements CounterBase {
+class CollectingCounter extends CollectingMetric<MetricOptions> implements CounterBase {
   public inc(countOrLabels?: Labels | number, count?: number): void {
-    this.values.push({ countOrLabels, count });
+    this.mutableValues.push({ countOrLabels, count });
   }
 }
 
-class CollectingHistogram extends CollectingMetric<BucketedMetricOptions>
-  implements HistogramBase {
+class CollectingHistogram extends CollectingMetric<BucketedMetricOptions> implements HistogramBase {
   public observe(countOrLabels?: Labels | number, count?: number): void {
-    this.values.push({ countOrLabels, count });
+    // tslint:disable-next-line no-array-mutate
+    this.mutableValues.push({ countOrLabels, count });
   }
 }
 
 export class CollectingMetricsFactory extends MetricsFactoryProxy {
-  private counters: { [name: string]: CollectingCounter } = {};
-  private histograms: { [name: string]: CollectingHistogram } = {};
+  private mutableCounters: { [K in string]: CollectingCounter } = {};
+  private mutableHistograms: { [K in string]: CollectingHistogram } = {};
 
   public collect(): MetricCollection {
     const currentMetrics = this.serializeJSON();
-    Object.values(this.counters).forEach((metric) => metric.reset());
-    Object.values(this.histograms).forEach((metric) => metric.reset());
+    Object.values(this.mutableCounters).forEach((metric) => metric.reset());
+    Object.values(this.mutableHistograms).forEach((metric) => metric.reset());
 
     return currentMetrics;
   }
 
   public reset_forTest(): void {
-    this.counters = {};
-    this.histograms = {};
+    this.mutableCounters = {};
+    this.mutableHistograms = {};
   }
 
   protected createCounterInternal(options: MetricOptions): Counter {
     const counter = new CollectingCounter(options);
-    this.counters[counter.metric.name] = counter;
+    this.mutableCounters[counter.metric.name] = counter;
 
     return this.initializeMetric(
       new CounterProxy(counter, options.labelNames),
@@ -80,7 +77,7 @@ export class CollectingMetricsFactory extends MetricsFactoryProxy {
 
   protected createHistogramInternal(options: BucketedMetricOptions): Histogram {
     const histogram = new CollectingHistogram(options);
-    this.histograms[histogram.metric.name] = histogram;
+    this.mutableHistograms[histogram.metric.name] = histogram;
 
     return this.initializeMetric(
       new HistogramProxy(histogram, options.labelNames),
@@ -92,14 +89,14 @@ export class CollectingMetricsFactory extends MetricsFactoryProxy {
 
   private serializeJSON(): MetricCollection {
     return {
-      counters: Object.entries(this.counters).reduce(
+      counters: Object.entries(this.mutableCounters).reduce<CollectedMetrics<MetricOptions>>(
         (accMetric, [name, metric]) => ({
           ...accMetric,
           [name]: metric.toJSON(),
         }),
         {},
       ),
-      histograms: Object.entries(this.histograms).reduce(
+      histograms: Object.entries(this.mutableHistograms).reduce<CollectedMetrics<BucketedMetricOptions>>(
         (accMetric, [name, metric]) => ({
           ...accMetric,
           [name]: metric.toJSON(),
@@ -111,23 +108,20 @@ export class CollectingMetricsFactory extends MetricsFactoryProxy {
 
   private initializeMetric<T extends CounterBase | HistogramBase>(
     metric: T,
-    {
-      labelNames,
-      labels = [],
-    }: MetricOptions | BucketedMetricOptions | PercentiledMetricOptions,
+    { labelNames, labels = [] }: MetricOptions | BucketedMetricOptions | PercentiledMetricOptions,
     init: (metric: T) => void,
     initLabels: (metric: T, labels: Labels) => void,
   ): T {
-    if (labelNames == null) {
+    if (labelNames === undefined) {
       init(metric);
     } else {
-      for (const labelSet of labels) {
+      labels.forEach((labelSet) => {
         initLabels(metric, labelSet);
-      }
+      });
     }
 
     return metric;
   }
 }
 
-export const collectingMetrics: CollectingMetricsFactory = new CollectingMetricsFactory();
+export const collectingMetrics = new CollectingMetricsFactory();

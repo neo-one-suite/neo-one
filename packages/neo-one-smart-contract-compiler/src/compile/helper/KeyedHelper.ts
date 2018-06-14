@@ -1,3 +1,3 @@
 export interface KeyedHelper<Options> {
-  getKey(options: Options): string;
+  readonly getKey: (options: Options) => string;
 }

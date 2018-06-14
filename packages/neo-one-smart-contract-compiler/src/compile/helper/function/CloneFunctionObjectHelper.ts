@@ -1,35 +1,30 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import {
-  FuncProperty,
-  InternalFunctionProperties,
-} from './InternalFunctionProperties';
+import { Helper } from '../Helper';
+import { FuncProperty, InternalFunctionProperties } from './InternalFunctionProperties';
 
 export interface CloneSingleFunctionHelperOptions {
-  type: 'single';
-  property: FuncProperty;
+  readonly type: 'single';
+  readonly property: FuncProperty;
 }
 export interface CloneBothFunctionHelperOptions {
-  type: 'both';
+  readonly type: 'both';
 }
 
-export type CloneFunctionObjectHelperOptions =
-  | CloneSingleFunctionHelperOptions
-  | CloneBothFunctionHelperOptions;
+export type CloneFunctionObjectHelperOptions = CloneSingleFunctionHelperOptions | CloneBothFunctionHelperOptions;
 
 // Input: [objectVal]
 // Output: [objectVal]
 export class CloneFunctionObjectHelper extends Helper {
-  private property: FuncProperty;
-  private both: boolean;
+  private readonly property: FuncProperty;
+  private readonly both: boolean;
 
-  constructor(options: CloneFunctionObjectHelperOptions) {
+  public constructor(options: CloneFunctionObjectHelperOptions) {
     super();
     if (options.type === 'both') {
-      this.property = InternalFunctionProperties.CALL;
+      this.property = InternalFunctionProperties.Call;
       this.both = true;
     } else {
       this.property = options.property;
@@ -40,6 +35,7 @@ export class CloneFunctionObjectHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 
@@ -48,26 +44,16 @@ export class CloneFunctionObjectHelper extends Helper {
 
     if (this.both) {
       // [objectVal]
-      this.cloneFunction(sb, node, options, InternalFunctionProperties.CALL);
+      this.cloneFunction(sb, node, options, InternalFunctionProperties.Call);
       // [objectVal]
-      this.cloneFunction(
-        sb,
-        node,
-        options,
-        InternalFunctionProperties.CONSTRUCT,
-      );
+      this.cloneFunction(sb, node, options, InternalFunctionProperties.Construct);
     } else {
       // [objectVal]
       this.cloneFunction(sb, node, options, this.property);
     }
   }
 
-  public cloneFunction(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    property: FuncProperty,
-  ): void {
+  public cloneFunction(sb: ScriptBuilder, node: Node, options: VisitOptions, property: FuncProperty): void {
     // [objectVal, objectVal]
     sb.emitOp(node, 'DUP');
     // [property, objectVal, objectVal]

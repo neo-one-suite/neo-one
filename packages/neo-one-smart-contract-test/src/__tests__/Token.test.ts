@@ -1,10 +1,6 @@
+// tslint:disable no-unsafe-any
+import { abi, addressToScriptHash, createPrivateKey, privateKeyToScriptHash } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
-import {
-  abi,
-  addressToScriptHash,
-  createPrivateKey,
-  privateKeyToScriptHash,
-} from '@neo-one/client';
 
 import appRootDir from 'app-root-dir';
 import path from 'path';
@@ -12,7 +8,7 @@ import path from 'path';
 import { cleanupTest } from '../cleanupTest';
 import { setupBasicTest } from '../setupBasicTest';
 
-const setup = () => {
+const setup = async () => {
   const nep5 = abi.NEP5_STATIC(8);
 
   return setupBasicTest({
@@ -69,14 +65,7 @@ describe('Token', () => {
   });
 
   test('properties + issue + balanceOf + totalSupply + transfer', async () => {
-    const {
-      networkName,
-      keystore,
-      developerClient,
-      smartContract,
-      masterAccountID,
-      masterPrivateKey,
-    } = await setup();
+    const { networkName, keystore, developerClient, smartContract, masterAccountID, masterPrivateKey } = await setup();
 
     const [nameResult, decimalsResult, symbolResult] = await Promise.all([
       smartContract.name(),
@@ -104,15 +93,10 @@ describe('Token', () => {
 
     const owner = privateKeyToScriptHash(masterPrivateKey);
     let result = await smartContract.deploy(owner, { from: masterAccountID });
-    let [receipt] = await Promise.all([
-      result.confirmed(),
-      developerClient.runConsensusNow(),
-    ]);
+    let [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
 
     expect(receipt.result.state).toEqual('HALT');
-    expect(receipt.result.gasConsumed.toString()).toMatchSnapshot(
-      'deploy consumed',
-    );
+    expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
     expect(receipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
     expect(receipt.result.value).toBeTruthy();
 
@@ -123,26 +107,15 @@ describe('Token', () => {
     expect(supply.toString(10)).toEqual('0');
 
     const issueValue = new BigNumber('100');
-    result = await smartContract.issue(
-      addressToScriptHash(account0.address),
-      issueValue,
-      { from: masterAccountID },
-    );
-    [receipt] = await Promise.all([
-      result.confirmed(),
-      developerClient.runConsensusNow(),
-    ]);
+    result = await smartContract.issue(addressToScriptHash(account0.address), issueValue, { from: masterAccountID });
+    [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
 
     expect(receipt.result.state).toEqual('HALT');
-    expect(receipt.result.gasConsumed.toString()).toMatchSnapshot(
-      'issue consume',
-    );
+    expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('issue consume');
     expect(receipt.result.gasCost.toString()).toMatchSnapshot('issue cost');
     expect(receipt.result.value).toBeTruthy();
 
-    let value = await smartContract.balanceOf(
-      addressToScriptHash(account0.address),
-    );
+    let value = await smartContract.balanceOf(addressToScriptHash(account0.address));
     expect(value.toString()).toEqual(issueValue.toString());
 
     value = await smartContract.totalSupply();
@@ -155,26 +128,17 @@ describe('Token', () => {
       transferValue,
       { from: account0 },
     );
-    [receipt] = await Promise.all([
-      result.confirmed(),
-      developerClient.runConsensusNow(),
-    ]);
+    [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
 
     expect(receipt.result.state).toEqual('HALT');
-    expect(receipt.result.gasConsumed.toString()).toMatchSnapshot(
-      'transfer consume',
-    );
+    expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('transfer consume');
     expect(receipt.result.gasCost.toString()).toMatchSnapshot('transfer cost');
     expect(receipt.result.value).toBeTruthy();
 
-    value = await smartContract.balanceOf(
-      addressToScriptHash(account0.address),
-    );
+    value = await smartContract.balanceOf(addressToScriptHash(account0.address));
     expect(value.toString()).toEqual(transferValue.toString());
 
-    value = await smartContract.balanceOf(
-      addressToScriptHash(account1.address),
-    );
+    value = await smartContract.balanceOf(addressToScriptHash(account1.address));
     expect(value.toString()).toEqual(transferValue.toString());
 
     value = await smartContract.totalSupply();

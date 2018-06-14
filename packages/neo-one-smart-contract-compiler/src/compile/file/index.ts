@@ -1,3 +1,4 @@
 import { SourceFileCompiler } from './SourceFileCompiler';
 
-export default [SourceFileCompiler];
+// tslint:disable-next-line export-name readonly-array
+export const files = [SourceFileCompiler];

@@ -1,15 +1,15 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 import {
   BlockchainInterfaceName,
   InternalBlockchainInterfaceProperties,
 } from './InternalBlockchainInterfaceProperties';
 
 export interface WrapBlockchainInterfaceHelperOptions {
-  name: BlockchainInterfaceName;
+  readonly name: BlockchainInterfaceName;
 }
 
 // Input: [blockchainInterface]
@@ -17,7 +17,7 @@ export interface WrapBlockchainInterfaceHelperOptions {
 export class WrapBlockchainInterfaceHelper extends Helper {
   private readonly name: BlockchainInterfaceName;
 
-  constructor(options: WrapBlockchainInterfaceHelperOptions) {
+  public constructor(options: WrapBlockchainInterfaceHelperOptions) {
     super();
     this.name = options.name;
   }
@@ -25,6 +25,7 @@ export class WrapBlockchainInterfaceHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 
@@ -44,10 +45,7 @@ export class WrapBlockchainInterfaceHelper extends Helper {
     // [objectVal, blockchainInterface, objectVal]
     sb.emitOp(node, 'OVER');
     // ['blockchain_interface', objectVal, blockchainInterface, objectVal]
-    sb.emitPushString(
-      node,
-      InternalBlockchainInterfaceProperties.BLOCKCHAIN_INTERFACE,
-    );
+    sb.emitPushString(node, InternalBlockchainInterfaceProperties.BlockchainInterface);
     // [blockchainInterface, 'blockchain_interface', objectVal, objectVal]
     sb.emitOp(node, 'ROT');
     // [objectVal]

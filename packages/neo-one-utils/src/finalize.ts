@@ -1,19 +1,22 @@
 import { Observable, Observer } from 'rxjs';
+import { utils } from './utils';
 
+// tslint:disable-next-line no-let
 let currentID = 0;
 const getID = () => {
   const result = currentID;
   currentID += 1;
+
   return result;
 };
 
 export function finalize<T>(
-  func: (value: T | undefined) => Promise<void> | void,
-): (source: Observable<T>) => Observable<T> {
-  return (source: Observable<T>) =>
+  func: (value: T | undefined) => Promise<{}> | {},
+): (source$: Observable<T>) => Observable<T> {
+  return (source$) =>
     Observable.create((observer: Observer<T>) => {
       let lastValue: T | undefined;
-      const subscription = source.subscribe({
+      const subscription = source$.subscribe({
         next: (value) => {
           lastValue = value;
           observer.next(value);
@@ -23,33 +26,32 @@ export function finalize<T>(
       });
       subscription.add(() => {
         const result = func(lastValue);
-        if (result != null && result.then != null) {
+        if (utils.isPromise(result)) {
           const id = getID();
           let deleted = false;
           const promise = result.then(() => {
             deleted = true;
-            if (finalize.shutdownPromises[id] != null) {
-              delete finalize.shutdownPromises[id];
-            }
+            finalize.shutdownPromises.delete(id);
           });
           if (!deleted) {
-            finalize.shutdownPromises[id] = promise;
+            finalize.shutdownPromises.set(id, promise);
           }
         }
       });
+
       return subscription;
-    });
+    }) as Observable<T>;
 }
 
 export namespace finalize {
-  export const shutdownPromises: { [key: string]: Promise<void> } = {};
-  export const wait: () => Promise<void> = async () => {
-    const promises = Object.values(finalize.shutdownPromises);
+  export const shutdownPromises: Map<number, Promise<void>> = new Map();
+  export const wait = async () => {
+    const promises = Object.values(shutdownPromises);
     if (promises.length === 0) {
       return;
     }
 
     await Promise.all(promises);
-    await finalize.wait();
+    await wait();
   };
 }

@@ -1,17 +1,17 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 import { InternalGlobalProperties } from './InternalGlobalProperties';
 
 // Input: [argv, globalObjectVal]
 // Output: []
-export class AddArgumentsHelper extends Helper<Node> {
+export class AddArgumentsHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // ['arguments', argv, globalObjectVal]
-    sb.emitPushString(node, InternalGlobalProperties.ARGUMENTS);
+    sb.emitPushString(node, InternalGlobalProperties.Arguments);
     // [argv, 'arguments', globalObjectVal]
     sb.emitOp(node, 'SWAP');
     // []

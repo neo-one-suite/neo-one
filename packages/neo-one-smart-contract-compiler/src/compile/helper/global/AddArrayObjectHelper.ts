@@ -2,34 +2,26 @@ import { Node } from 'ts-simple-ast';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { AddConstructorObjectHelper } from './AddConstructorObjectHelper';
 import { InternalFunctionProperties } from '../function';
 import { Helper } from '../Helper';
+import { AddConstructorObjectHelper } from './AddConstructorObjectHelper';
 
 // Input: [objectPrototypeVal, globalObjectVal]
 // Output: [objectPrototypeVal, globalObjectVal]
 export class AddArrayObjectHelper extends AddConstructorObjectHelper {
-  protected name: string = 'Array';
+  protected readonly name = 'Array';
 
-  protected addPrototypeProperties(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  protected addPrototypeProperties(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     this.addMap(sb, node, options);
     this.addFilter(sb, node, options);
     this.addReduce(sb, node, options);
   }
 
-  protected addConstructorProperties(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  protected addConstructorProperties(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [objectVal, objectVal, globalObjectVal]
     sb.emitOp(node, 'DUP');
     // ['construct', objectVal, objectVal, globalObjectVal]
-    sb.emitPushString(node, InternalFunctionProperties.CONSTRUCT);
+    sb.emitPushString(node, InternalFunctionProperties.Construct);
     // [func, 'construct', objectVal, objectVal, globalObjectVal]
     sb.emitHelper(
       node,
@@ -122,11 +114,7 @@ export class AddArrayObjectHelper extends AddConstructorObjectHelper {
           // [lengthVal, 'length', objectVal]
           sb.emitHelper(node, options, sb.helpers.createNumber);
           // []
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.setDataPropertyObjectProperty,
-          );
+          sb.emitHelper(node, options, sb.helpers.setDataPropertyObjectProperty);
         },
       }),
     );
@@ -138,19 +126,11 @@ export class AddArrayObjectHelper extends AddConstructorObjectHelper {
     this.addMapLike(sb, node, options, 'map', sb.helpers.arrMap);
   }
 
-  private addFilter(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private addFilter(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     this.addMapLike(sb, node, options, 'filter', sb.helpers.arrFilter);
   }
 
-  private addReduce(
-    sb: ScriptBuilder,
-    node: Node,
-    outerOptions: VisitOptions,
-  ): void {
+  private addReduce(sb: ScriptBuilder, node: Node, outerOptions: VisitOptions): void {
     this.addMethod(sb, node, outerOptions, 'reduce', (options) => {
       const func = sb.scope.addUnique();
       const accum = sb.scope.addUnique();
@@ -237,7 +217,7 @@ export class AddArrayObjectHelper extends AddConstructorObjectHelper {
     node: Node,
     outerOptions: VisitOptions,
     name: string,
-    helper: ((options: { map: () => void; withIndex: boolean }) => Helper),
+    helper: ((options: { readonly map: () => void; readonly withIndex: boolean }) => Helper),
   ): void {
     this.addMethod(sb, node, outerOptions, name, (options) => {
       const func = sb.scope.addUnique();

@@ -1,19 +1,19 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 export interface NewHelperOptions {
-  noArgs?: boolean;
+  readonly noArgs?: boolean;
 }
 
 // Input: [objectVal, ?argsarr]
 // Output: [thisVal]
 export class NewHelper extends Helper {
-  private noArgs: boolean;
+  private readonly noArgs: boolean;
 
-  constructor(options: NewHelperOptions = { noArgs: false }) {
+  public constructor(options: NewHelperOptions = { noArgs: false }) {
     super();
     this.noArgs = options.noArgs || false;
   }
@@ -46,11 +46,7 @@ export class NewHelper extends Helper {
     // [objectVal, thisVal, ?argsarr, thisVal]
     sb.emitHelper(node, options, sb.helpers.setDataPropertyObjectProperty);
     // [thisVal]
-    sb.emitHelper(
-      node,
-      options,
-      sb.helpers.invokeConstruct({ noArgs: this.noArgs }),
-    );
+    sb.emitHelper(node, options, sb.helpers.invokeConstruct({ noArgs: this.noArgs }));
 
     if (!optionsIn.pushValue) {
       // []

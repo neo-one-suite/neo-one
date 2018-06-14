@@ -37,6 +37,7 @@
     "@neo-one/server-plugin": "^1.0.0-alpha.41",
     "@neo-one/server-plugin-compiler": "^1.0.0-alpha.56",
     "@neo-one/server-plugin-network": "^1.0.0-alpha.73",
+    "@neo-one/smart-contract": "^1.0.0-alpha.5",
     "@neo-one/smart-contract-compiler": "^1.0.0-alpha.10",
     "@neo-one/smart-contract-lib": "^1.0.0-alpha.10",
     "@neo-one/utils": "^1.0.0-alpha.35",

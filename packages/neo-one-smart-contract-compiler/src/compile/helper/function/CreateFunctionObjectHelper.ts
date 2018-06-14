@@ -1,20 +1,20 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 import { FuncProperty } from './InternalFunctionProperties';
 
 export interface CreateFunctionObjectHelperOptions {
-  property: FuncProperty;
+  readonly property: FuncProperty;
 }
 
 // Input: [farr]
 // Output: [objectVal]
-export class CreateFunctionObjectHelper extends Helper<Node> {
-  private property: FuncProperty;
+export class CreateFunctionObjectHelper extends Helper {
+  private readonly property: FuncProperty;
 
-  constructor({ property }: CreateFunctionObjectHelperOptions) {
+  public constructor({ property }: CreateFunctionObjectHelperOptions) {
     super();
     this.property = property;
   }

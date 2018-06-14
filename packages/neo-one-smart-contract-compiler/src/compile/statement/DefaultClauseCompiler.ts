@@ -7,16 +7,8 @@ import { VisitOptions } from '../types';
 export class DefaultClauseCompiler extends NodeCompiler<DefaultClause> {
   public readonly kind: SyntaxKind = SyntaxKind.DefaultClause;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: DefaultClause,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: DefaultClause, options: VisitOptions): void {
     sb.emitOp(node, 'DROP');
-    sb.emitHelper(
-      node,
-      options,
-      sb.helpers.processStatements({ createScope: false }),
-    );
+    sb.emitHelper(node, options, sb.helpers.processStatements({ createScope: false }));
   }
 }

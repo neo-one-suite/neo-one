@@ -1,25 +1,26 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../../Helper';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
+import { Helper } from '../../Helper';
 
 // Input: [obj]
 // Output: [obj]
-export class ShallowCloneObjHelper extends Helper<Node> {
+export class ShallowCloneObjHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 
-    /* create new obj */
+    // create new obj
     // [newObj, oldObj]
     sb.emitOp(node, 'NEWMAP');
     // [oldObj, newObj]
     sb.emitOp(node, 'SWAP');
 
-    /* get keys and values */
+    // get keys and values
     // [oldObj, oldObj, newObj]
     sb.emitOp(node, 'DUP');
     // [valuesArray, oldObj, newObj]
@@ -29,7 +30,7 @@ export class ShallowCloneObjHelper extends Helper<Node> {
     // [keysArray, valuesArray, newObj]
     sb.emitOp(node, 'KEYS');
 
-    /* set keys/values on new obj */
+    // set keys/values on new obj
     sb.withScope(node, options, (scopeOptions) => {
       const counter = sb.scope.addUnique();
       const length = sb.scope.addUnique();

@@ -1,8 +1,8 @@
 import { Node } from 'ts-simple-ast';
 
-import { TypedHelper } from '../../common';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
+import { TypedHelper } from '../../common';
 
 import * as typeUtils from '../../../../typeUtils';
 
@@ -12,6 +12,7 @@ export class ToObjectHelper extends TypedHelper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 
@@ -54,7 +55,7 @@ export class ToObjectHelper extends TypedHelper {
                 // [val, val]
                 sb.emitOp(node, 'DUP');
                 // [isObject, val]
-                sb.emitHelper(node, options, sb.helpers.isObject);
+                sb.emitHelper(node, options, helper);
               },
               whenTrue: () => {
                 this.convertPrimitive(sb, node, options, primitive);
@@ -69,12 +70,7 @@ export class ToObjectHelper extends TypedHelper {
     }
   }
 
-  public convertPrimitive(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    primitive: string,
-  ): void {
+  public convertPrimitive(sb: ScriptBuilder, node: Node, options: VisitOptions, primitive: string): void {
     // [1, val]
     sb.emitPushInt(node, 1);
     // [valArgsArray]

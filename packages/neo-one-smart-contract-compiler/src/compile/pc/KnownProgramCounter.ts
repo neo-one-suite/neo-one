@@ -1,7 +1,7 @@
 import { ProgramCounter } from './ProgramCounter';
 
 export class KnownProgramCounter extends ProgramCounter {
-  constructor(private readonly pc: number) {
+  public constructor(private readonly pc: number) {
     super();
   }
 

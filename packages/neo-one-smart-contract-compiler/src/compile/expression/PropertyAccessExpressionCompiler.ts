@@ -4,26 +4,16 @@ import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export default class PropertyAccessExpressionCompiler extends NodeCompiler<
-  PropertyAccessExpression
-> {
+export class PropertyAccessExpressionCompiler extends NodeCompiler<PropertyAccessExpression> {
   public readonly kind: SyntaxKind = SyntaxKind.PropertyAccessExpression;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    expr: PropertyAccessExpression,
-    optionsIn: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, expr: PropertyAccessExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
     const expression = expr.getExpression();
     // [val]
     sb.visit(expression, options);
     // [objectVal]
-    sb.emitHelper(
-      expression,
-      options,
-      sb.helpers.toObject({ type: sb.getType(expression) }),
-    );
+    sb.emitHelper(expression, options, sb.helpers.toObject({ type: sb.getType(expression) }));
 
     if (optionsIn.setValue) {
       if (optionsIn.pushValue) {

@@ -1066,14 +1066,17 @@ export default class WriteBatchBlockchain {
   ): Promise<void> {
     const account = await this.account.tryGet({ hash: address });
 
-    const balances = values.reduce((acc, [asset, value]) => {
-      const key = (common.uInt256ToHex(asset): $FlowFixMe);
-      if (acc[key] == null) {
-        acc[key] = utils.ZERO;
-      }
-      acc[key] = acc[key].add(value);
-      return acc;
-    }, account == null ? {} : account.balances);
+    const balances = values.reduce(
+      (acc: { [asset: string]: BN }, [asset, value]) => {
+        const key = (common.uInt256ToHex(asset): $FlowFixMe);
+        if (acc[key] == null) {
+          acc[key] = utils.ZERO;
+        }
+        acc[key] = acc[key].add(value);
+        return acc;
+      },
+      account == null ? {} : account.balances,
+    );
 
     const promises = [];
     promises.push(

@@ -4,6 +4,6 @@ import { Types } from '../Types';
 // Input: []
 // Output: [nullVal]
 export class CreateNullHelper extends CreatePrimitiveHelper {
-  protected length = 1;
-  protected type = Types.Null;
+  protected readonly length = 1;
+  protected readonly type = Types.Null;
 }

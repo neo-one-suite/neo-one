@@ -1,27 +1,21 @@
-import {
-  Address,
-  Fixed,
-  MapStorage,
-  SmartContract,
-  verifySender,
-} from './transpiledLib';
+// tslint:disable readonly-array no-object-mutation prefer-switch
+import { Address, Fixed, MapStorage, SmartContract, verifySender } from './transpiledLib';
 
 export abstract class Token<Decimals extends number> extends SmartContract {
   public abstract readonly name: string;
   public abstract readonly decimals: Decimals;
   public abstract readonly symbol: string;
-  private readonly balances: MapStorage<
-    Address,
-    Fixed<Decimals>
-  > = new MapStorage(syscall('Neo.Runtime.Serialize', 'balances'));
-  private readonly allowances: MapStorage<
-    [Address, Address],
-    Fixed<Decimals>
-  > = new MapStorage(syscall('Neo.Runtime.Serialize', 'allowances'));
+  private readonly balances: MapStorage<Address, Fixed<Decimals>> = new MapStorage(
+    syscall('Neo.Runtime.Serialize', 'balances'),
+  );
+  private readonly allowances: MapStorage<[Address, Address], Fixed<Decimals>> = new MapStorage(
+    syscall('Neo.Runtime.Serialize', 'allowances'),
+  );
 
   public deploy(owner: Address): boolean {
     super.deploy(owner);
     this.supply = 0;
+
     return true;
   }
 
@@ -30,11 +24,7 @@ export abstract class Token<Decimals extends number> extends SmartContract {
     this.doTransfer(from, to, amount);
   }
 
-  public transferFrom(
-    from: Address,
-    to: Address,
-    amount: Fixed<Decimals>,
-  ): void {
+  public transferFrom(from: Address, to: Address, amount: Fixed<Decimals>): void {
     const available = this.allowance(from, to);
     if (available < amount) {
       throw new Error('Insufficient funds approved');
@@ -43,20 +33,13 @@ export abstract class Token<Decimals extends number> extends SmartContract {
     this.allowances.set([from, to], available - amount);
   }
 
-  public approve(
-    owner: Address,
-    spender: Address,
-    amount: Fixed<Decimals>,
-  ): void {
+  public approve(owner: Address, spender: Address, amount: Fixed<Decimals>): void {
     verifySender(owner);
     const fromValue = this.balanceOf(owner);
     if (fromValue < amount) {
       throw new Error('Insufficient funds');
     }
-    this.allowances.set(
-      [owner, spender],
-      this.allowance(owner, spender) + amount,
-    );
+    this.allowances.set([owner, spender], this.allowance(owner, spender) + amount);
   }
 
   public balanceOf(addr: Address): Fixed<Decimals> {
@@ -76,11 +59,7 @@ export abstract class Token<Decimals extends number> extends SmartContract {
     this.supply += amount;
   }
 
-  private doTransfer(
-    from: Address,
-    to: Address,
-    amount: Fixed<Decimals>,
-  ): void {
+  private doTransfer(from: Address, to: Address, amount: Fixed<Decimals>): void {
     if (amount <= 0) {
       throw new Error('Invalid amount');
     }
@@ -93,19 +72,10 @@ export abstract class Token<Decimals extends number> extends SmartContract {
   }
 
   private get supply(): Fixed<Decimals> {
-    return syscall(
-      'Neo.Storage.Get',
-      syscall('Neo.Storage.GetContext'),
-      'supply',
-    ) as Fixed<Decimals>;
+    return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), 'supply') as Fixed<Decimals>;
   }
 
   private set supply(supply: Fixed<Decimals>) {
-    syscall(
-      'Neo.Storage.Put',
-      syscall('Neo.Storage.GetContext'),
-      'supply',
-      supply,
-    );
+    syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), 'supply', supply);
   }
 }

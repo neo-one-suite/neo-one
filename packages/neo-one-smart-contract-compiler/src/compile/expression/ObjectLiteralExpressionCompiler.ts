@@ -1,20 +1,14 @@
 import { ObjectLiteralExpression, SyntaxKind, TypeGuards } from 'ts-simple-ast';
 
+import { InternalFunctionProperties } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
-import { InternalFunctionProperties } from '../helper';
 
-export default class ObjectLiteralExpressionCompiler extends NodeCompiler<
-  ObjectLiteralExpression
-> {
+export class ObjectLiteralExpressionCompiler extends NodeCompiler<ObjectLiteralExpression> {
   public readonly kind: SyntaxKind = SyntaxKind.ObjectLiteralExpression;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: ObjectLiteralExpression,
-    optionsIn: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: ObjectLiteralExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [objectVal]
     sb.emitHelper(node, options, sb.helpers.createObject);
@@ -42,7 +36,7 @@ export default class ObjectLiteralExpressionCompiler extends NodeCompiler<
             prop,
             options,
             sb.helpers.createFunctionObject({
-              property: InternalFunctionProperties.CALL,
+              property: InternalFunctionProperties.Call,
             }),
           );
         } else {

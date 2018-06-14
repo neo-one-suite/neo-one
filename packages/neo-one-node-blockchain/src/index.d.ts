@@ -8,6 +8,7 @@ declare interface CreateBlockchainOptions {
   vm: VM;
   monitor: Monitor;
 }
+// @ts-ignore
 declare class Blockchain implements IBlockchain {
   settings: IBlockchain['settings'];
   invokeScript(buffer: Buffer, monitor?: Monitor): Promise<InvocationResult>;

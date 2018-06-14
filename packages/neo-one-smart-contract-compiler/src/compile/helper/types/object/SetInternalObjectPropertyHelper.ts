@@ -1,21 +1,17 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../../Helper';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
+import { Helper } from '../../Helper';
 
 // Input: [val, stringProp, objectVal]
 // Output: []
-export class SetInternalObjectPropertyHelper extends Helper<Node> {
+export class SetInternalObjectPropertyHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [objectVal, val, stringProp]
     sb.emitOp(node, 'ROT');
     // [obj, val, stringProp]
-    sb.emitHelper(
-      node,
-      sb.pushValueOptions(options),
-      sb.helpers.getInternalObject,
-    );
+    sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.getInternalObject);
     // [stringProp, obj, val]
     sb.emitOp(node, 'ROT');
     // [val, stringProp, obj]

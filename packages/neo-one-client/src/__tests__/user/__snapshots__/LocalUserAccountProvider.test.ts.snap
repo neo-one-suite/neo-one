@@ -1,0 +1,1285 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LocalUserAccountProvider call with no options: keystore.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`LocalUserAccountProvider call with no options: provider.getUnspentOutputs 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider call with no options: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d1012200c10a746573744d6574686f6467f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec0010a5d4e800000001ff076e656f2d6f6e65000000",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider call: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider call: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d1012906706172616d3151c10a746573744d6574686f6467f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec0010a5d4e800000002f000ff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce00",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim throws NothingToClaim error: provider.getUnclaimed 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim throws NothingToClaim error: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim without networkFee: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "0200015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11368c02487f020002f000ff076e656f2d6f6e650001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000a3e111000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim without networkFee: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim without networkFee: provider.getUnclaimed 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim without networkFee: provider.getUnspentOutputs 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider claim without networkFee: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "0200015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11368c02487f020002f000ff076e656f2d6f6e650001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000a3e111000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "0200015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11368c02487f020002f000ff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030002e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000a3e111000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim: provider.getUnclaimed 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "0200015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11368c02487f020002f000ff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030002e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000a3e111000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider deleteAccount: keystore.deleteAccount 1`] = `
+Array [
+  Array [
+    Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "net1",
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown on 2 script attributes when neither match script hash: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "0200015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11368c02487f02000320f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec20f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ecff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030002e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000a3e111000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown on 2 script attributes when neither match script hash: provider.getUnclaimed 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown on 2 script attributes when neither match script hash: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with 1 script attributes and no transaction scripts: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "0200015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11368c02487f020002203775292229eccdf904f16fff8e83e7dffdc0f0ceff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030002e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000a3e111000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with 1 script attributes and no transaction scripts: provider.getUnclaimed 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with 1 script attributes and no transaction scripts: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with 2 script attributes and no transaction scripts: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "0200015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11368c02487f020003203775292229eccdf904f16fff8e83e7cffdc0f0ce20f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ecff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030002e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000a3e111000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with 2 script attributes and no transaction scripts: provider.getUnclaimed 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with 2 script attributes and no transaction scripts: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with 3+ script attributes: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "0200015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11368c02487f02000420f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec203775292229eccdf904f16fff8e83e7cffdc0f0ce20f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ecff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030002e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000a3e111000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with 3+ script attributes: provider.getUnclaimed 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with 3+ script attributes: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with with 0 script attributes, but nonzero transaction scripts: keystore.getCurrentAccount 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider error thrown with with 0 script attributes, but nonzero transaction scripts: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "d1012200c10a746573744d6574686f6467f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec000000000000000000015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with with 0 script attributes, but nonzero transaction scripts: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider error thrown with with 0 script attributes, but nonzero transaction scripts: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d1012200c10a746573744d6574686f6467f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec0010a5d4e800000000015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010d00c10a746573744d6574686f6400",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider getAccounts: keystore.getAccounts 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`LocalUserAccountProvider getCurrentAccount: keystore.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`LocalUserAccountProvider getNetworks: provider.getNetworks 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke with no options: keystore.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke with no options: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "d1012200c10a746573744d6574686f6467f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec000000000000000004fe6a6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22307865636336623230643363636163316565396566313039616635613763646238353730366231646639222c226d6574686f64223a22746573744d6574686f64222c22706172616d73223a5b5d7dff076e656f2d6f6e65ff023130203775292229eccdf904f16fff8e83e7cffdc0f0ce0000",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke with no options: provider.getInvocationData 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke with no options: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke with no options: provider.getUnspentOutputs 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider invoke with no options: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "d1012200c10a746573744d6574686f6467f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec000000000000000004fe6a6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22307865636336623230643363636163316565396566313039616635613763646238353730366231646639222c226d6574686f64223a22746573744d6574686f64222c22706172616d73223a5b5d7dff076e656f2d6f6e65ff023130203775292229eccdf904f16fff8e83e7cffdc0f0ce0000010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke with no options: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d1012200c10a746573744d6574686f6467f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec0010a5d4e800000003fe6a6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22307865636336623230643363636163316565396566313039616635613763646238353730366231646639222c226d6574686f64223a22746573744d6574686f64222c22706172616d73223a5b5d7dff076e656f2d6f6e65ff023130000000",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke: keystore.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "d1012d5a0051c106706172616d3153c10a746573744d6574686f6467f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec000000000000000005fea06e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22307865636336623230643363636163316565396566313039616635613763646238353730366231646639222c226d6574686f64223a22746573744d6574686f64222c22706172616d73223a5b5b22537472696e67222c22706172616d31225d2c5b224172726179222c5b6e756c6c5d5d2c5b224269674e756d626572222c2231225d5d7d20f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ecff076e656f2d6f6e65ff023130203775292229eccdf904f16fff8e83e7cffdc0f0ce0000",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke: provider.getInvocationData 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke: provider.getUnspentOutputs 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider invoke: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "d1012d5a0051c106706172616d3153c10a746573744d6574686f6467f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec000000000000000005fea06e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22307865636336623230643363636163316565396566313039616635613763646238353730366231646639222c226d6574686f64223a22746573744d6574686f64222c22706172616d73223a5b5b22537472696e67222c22706172616d31225d2c5b224172726179222c5b6e756c6c5d5d2c5b224269674e756d626572222c2231225d5d7d20f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ecff076e656f2d6f6e65ff023130203775292229eccdf904f16fff8e83e7cffdc0f0ce0000020602028a99826e0602028a99826e185a0051c106706172616d3153c10a746573744d6574686f6400",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider invoke: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d1012d5a0051c106706172616d3153c10a746573744d6574686f6467f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec0010a5d4e800000004fea06e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22307865636336623230643363636163316565396566313039616635613763646238353730366231646639222c226d6574686f64223a22746573744d6574686f64222c22706172616d73223a5b5b22537472696e67222c22706172616d31225d2c5b224172726179222c5b6e756c6c5d5d2c5b224269674e756d626572222c2231225d5d7d20f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ecff076e656f2d6f6e65ff023130000001185a0051c106706172616d3153c10a746573744d6574686f6400",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider issue throws error on no inputs: keystore.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`LocalUserAccountProvider issue throws error on no inputs: provider.getNetworkSettings 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider issue: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "010002f000ff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030002e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600008af2f000000003775292229eccdf904f16fff8e83e7cffdc0f0ce9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider issue: provider.getNetworkSettings 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider issue: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider issue: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider issue: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "010002f000ff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030002e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600008af2f000000003775292229eccdf904f16fff8e83e7cffdc0f0ce9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result fault: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "d101510f746573744465736372697074696f6e0974657374456d61696c0a74657374417574686f72027631086e616d6554657374545701070602028a99826e68134e656f2e436f6e74726163742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result fault: provider.getInvocationData 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result fault: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result fault: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result fault: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101510f746573744465736372697074696f6e0974657374456d61696c0a74657374417574686f72027631086e616d6554657374545701070602028a99826e68134e656f2e436f6e74726163742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result fault: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101510f746573744465736372697074696f6e0974657374456d61696c0a74657374417574686f72027631086e616d6554657374545701070602028a99826e68134e656f2e436f6e74726163742e4372656174650010a5d4e800000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce00",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result success: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "d101510f746573744465736372697074696f6e0974657374456d61696c0a74657374417574686f72027631086e616d6554657374555701070602028a99826e68134e656f2e436f6e74726163742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result success: provider.getInvocationData 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result success: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result success: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result success: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101510f746573744465736372697074696f6e0974657374456d61696c0a74657374417574686f72027631086e616d6554657374555701070602028a99826e68134e656f2e436f6e74726163742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish - result success: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101510f746573744465736372697074696f6e0974657374456d61696c0a74657374417574686f72027631086e616d6554657374555701070602028a99826e68134e656f2e436f6e74726163742e4372656174650010a5d4e800000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce00",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish throws error on invoke fault: keystore.sign 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider publish throws error on invoke fault: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish throws error on invoke fault: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101510f746573744465736372697074696f6e0974657374456d61696c0a74657374417574686f72027631086e616d6554657374575701070602028a99826e68134e656f2e436f6e74726163742e4372656174650010a5d4e800000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce00",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish throws error when no contracts are created: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "d101510f746573744465736372697074696f6e0974657374456d61696c0a74657374417574686f72027631086e616d6554657374565701070602028a99826e68134e656f2e436f6e74726163742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish throws error when no contracts are created: provider.getInvocationData 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish throws error when no contracts are created: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish throws error when no contracts are created: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish throws error when no contracts are created: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101510f746573744465736372697074696f6e0974657374456d61696c0a74657374417574686f72027631086e616d6554657374565701070602028a99826e68134e656f2e436f6e74726163742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider publish throws error when no contracts are created: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101510f746573744465736372697074696f6e0974657374456d61696c0a74657374417574686f72027631086e616d6554657374565701070602028a99826e68134e656f2e436f6e74726163742e4372656174650010a5d4e800000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce00",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider read: provider.read 1`] = `
+Array [
+  Array [
+    "main",
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result fault: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result fault: provider.getInvocationData 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result fault: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result fault: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result fault: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result fault: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e4372656174650010a5d4e800000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce00",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result success: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result success: provider.getInvocationData 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result success: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result success: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result success: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset - result success: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e4372656174650010a5d4e800000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce00",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset throws error on missing asset: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset throws error on missing asset: provider.getInvocationData 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset throws error on missing asset: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset throws error on missing asset: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset throws error on missing asset: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e437265617465000000000000000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset throws error on missing asset: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e4372656174650010a5d4e800000003f000ff076e656f2d6f6e65ff023130015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f030001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce00",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset with no options: keystore.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset with no options: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e437265617465000000000000000003ff076e656f2d6f6e65ff023130203775292229eccdf904f16fff8e83e7cffdc0f0ce0000",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset with no options: provider.getInvocationData 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset with no options: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 10,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset with no options: provider.getUnspentOutputs 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider registerAsset with no options: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e437265617465000000000000000003ff076e656f2d6f6e65ff023130203775292229eccdf904f16fff8e83e7cffdc0f0ce0000010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider registerAsset with no options: provider.testInvoke 1`] = `
+Array [
+  Array [
+    "net1",
+    "d101701459e75d652b5d3827bf04c165bbe9ef95cca4bf551459e75d652b5d3827bf04c165bbe9ef95cca4bf552102028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef00040065cd1d09746573744173736574013868104e656f2e41737365742e4372656174650010a5d4e800000002ff076e656f2d6f6e65ff023130000000",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider selectAccount: keystore.selectAccount 1`] = `
+Array [
+  Array [
+    Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "net1",
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer 0: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "800002f000ff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0300029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500000000000000009847e26135152874355e324afd5cc99f002acb33e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer 0: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer 0: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer 0: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "800002f000ff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0300029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500000000000000009847e26135152874355e324afd5cc99f002acb33e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer throws error on empty transfers: keystore.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer throws error on missing account: keystore.getCurrentAccount 1`] = `
+Array [
+  Array [],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer throws insufficient funds error: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer without network fee: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "800002f000ff076e656f2d6f6e65055c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer without network fee: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer without network fee: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer without network fee: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "800002f000ff076e656f2d6f6e65055c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "800002f000ff076e656f2d6f6e65065c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0300029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer: provider.getTransactionReceipt 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+    Object {
+      "timeoutMS": 120000,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transfer: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "800002f000ff076e656f2d6f6e65065c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0300029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider updateAccountName: keystore.updateAccountName 1`] = `
+Array [
+  Array [
+    Object {
+      "id": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "name": "newName",
+    },
+  ],
+]
+`;

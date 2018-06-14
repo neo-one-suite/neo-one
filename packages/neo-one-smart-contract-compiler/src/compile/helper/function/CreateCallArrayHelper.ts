@@ -1,15 +1,8 @@
-import {
-  Node,
-  SignaturedDeclaration,
-  StatementedNode,
-  TypeGuards,
-  BodiedNode,
-  BodyableNode,
-} from 'ts-simple-ast';
+import { BodiedNode, BodyableNode, Node, SignaturedDeclaration, StatementedNode, TypeGuards } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 // Input: []
 // Output: [farr]
@@ -18,10 +11,7 @@ export class CreateCallArrayHelper extends Helper<
 > {
   public emit(
     sb: ScriptBuilder,
-    node: Node &
-      StatementedNode &
-      SignaturedDeclaration &
-      (BodiedNode | BodyableNode),
+    node: Node & StatementedNode & SignaturedDeclaration & (BodiedNode | BodyableNode),
     outerOptions: VisitOptions,
   ): void {
     if (!outerOptions.pushValue) {
@@ -35,12 +25,7 @@ export class CreateCallArrayHelper extends Helper<
         body: () => {
           sb.withScope(node, outerOptions, (options) => {
             sb.emitHelper(node, options, sb.helpers.parameters);
-            let body;
-            if (TypeGuards.isBodyableNode(node)) {
-              body = node.getBodyOrThrow();
-            } else {
-              body = node.getBody();
-            }
+            const body = TypeGuards.isBodyableNode(node) ? node.getBodyOrThrow() : node.getBody();
             if (TypeGuards.isExpression(body)) {
               // [val]
               sb.visit(body, options);

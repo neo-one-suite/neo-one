@@ -1,8 +1,8 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 import { ExportHelperOptions } from './ExportHelper';
 
 // Input: [val]
@@ -10,7 +10,7 @@ import { ExportHelperOptions } from './ExportHelper';
 export class ExportSingleHelper extends Helper {
   private readonly options: ExportHelperOptions;
 
-  constructor(options: ExportHelperOptions) {
+  public constructor(options: ExportHelperOptions) {
     super();
     this.options = options;
   }

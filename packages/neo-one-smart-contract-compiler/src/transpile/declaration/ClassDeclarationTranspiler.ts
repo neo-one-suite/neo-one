@@ -1,74 +1,57 @@
 import {
   ClassDeclaration,
+  MethodDeclaration,
+  ParameterDeclaration,
+  Scope,
+  Statement,
   SyntaxKind,
   TypeGuards,
-  ParameterDeclaration,
-  MethodDeclaration,
-  Scope,
 } from 'ts-simple-ast';
 
+import { DiagnosticCode } from '../../DiagnosticCode';
+import * as typeUtils from '../../typeUtils';
 import { NodeTranspiler } from '../NodeTranspiler';
 import { Transpiler } from '../transpiler';
-import * as typeUtils from '../../typeUtils';
-import { DiagnosticCode } from '../../DiagnosticCode';
 import { VisitOptions } from '../types';
 
 const DEPLOY_METHOD = 'deploy';
 
-export class ClassDeclarationTranspiler extends NodeTranspiler<
-  ClassDeclaration
-> {
+export class ClassDeclarationTranspiler extends NodeTranspiler<ClassDeclaration> {
   public readonly kind: SyntaxKind = SyntaxKind.ClassDeclaration;
 
-  public visitNode(
-    transpiler: Transpiler,
-    node: ClassDeclaration,
-    options: VisitOptions,
-  ): void {
+  public visitNode(transpiler: Transpiler, node: ClassDeclaration, options: VisitOptions): void {
     if (options.isSmartContract || transpiler.isSmartContract(node)) {
-      this.transpileSmartContract(
-        transpiler,
-        node,
-        transpiler.isSmartContractOptions(options),
-      );
+      this.transpileSmartContract(transpiler, node, transpiler.isSmartContractOptions(options));
     }
   }
 
-  private transpileSmartContract(
-    transpiler: Transpiler,
-    node: ClassDeclaration,
-    options: VisitOptions,
-  ): void {
+  private transpileSmartContract(transpiler: Transpiler, node: ClassDeclaration, options: VisitOptions): void {
     const baseClass = node.getBaseClass();
-    if (baseClass != null) {
+    if (baseClass !== undefined) {
       transpiler.visit(baseClass, options);
     }
 
     this.transpileDeploy(transpiler, node);
   }
 
-  private transpileDeploy(
-    transpiler: Transpiler,
-    node: ClassDeclaration,
-  ): void {
+  private transpileDeploy(transpiler: Transpiler, node: ClassDeclaration): void {
     const existingDeploy = node.getMethod(DEPLOY_METHOD);
-    if (existingDeploy != null) {
+    if (existingDeploy !== undefined) {
       transpiler.reportError(
         existingDeploy,
         'The deploy method is reserved in SmartContract instances.',
         DiagnosticCode.UNSUPPORTED_SYNTAX,
       );
+
       return;
     }
 
-    const ctor = node
-      .getConstructors()
-      .find((ctorDecl) => ctorDecl.isImplementation());
+    const ctor = node.getConstructors().find((ctorDecl) => ctorDecl.isImplementation());
     let bodyText = '';
     let parameters: ParameterDeclaration[] = [];
-    if (ctor == null) {
+    if (ctor === undefined) {
       const baseDeploy = this.getBaseDeploy(transpiler, node);
-      if (baseDeploy != null) {
+      if (baseDeploy !== undefined) {
         bodyText = `
           super.deploy(${baseDeploy
             .getParameters()
@@ -78,11 +61,8 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
         parameters = baseDeploy.getParameters();
       }
     } else {
-      const firstStatement = ctor.getStatements()[0];
-      if (
-        firstStatement != null &&
-        TypeGuards.isExpressionStatement(firstStatement)
-      ) {
+      const firstStatement = ctor.getStatements()[0] as Statement | undefined;
+      if (firstStatement !== undefined && TypeGuards.isExpressionStatement(firstStatement)) {
         const callExpr = firstStatement.getExpression();
         if (TypeGuards.isCallExpression(callExpr)) {
           const lhsrExpr = callExpr.getExpression();
@@ -108,13 +88,14 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
       const initializer = param.getInitializer();
       let type = param.getType().getText();
       const typeNode = param.getTypeNode();
-      if (typeNode != null) {
+      if (typeNode !== undefined) {
         type = typeNode.getText();
       }
+
       return {
         name: param.getNameOrThrow(),
         type,
-        initializer: initializer == null ? undefined : initializer.getText(),
+        initializer: initializer === undefined ? undefined : initializer.getText(),
         hasQuestionToken: param.hasQuestionToken(),
         isRestParameter: param.isRestParameter(),
       };
@@ -122,22 +103,15 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
 
     node.getInstanceProperties().forEach((property) => {
       if (
-        (TypeGuards.isPropertyDeclaration(property) &&
-          !property.isAbstract()) ||
+        (TypeGuards.isPropertyDeclaration(property) && !property.isAbstract()) ||
         TypeGuards.isParameterDeclaration(property)
       ) {
-        const name = TypeGuards.isPropertyDeclaration(property)
-          ? property.getName()
-          : property.getNameOrThrow();
+        const name = TypeGuards.isPropertyDeclaration(property) ? property.getName() : property.getNameOrThrow();
         const type = property.getType();
         const typeNode = property.getTypeNode();
 
-        if (type == null || typeNode == null) {
-          transpiler.reportError(
-            property,
-            'Could not determine type of property.',
-            DiagnosticCode.UNKNOWN_TYPE,
-          );
+        if (typeNode === undefined) {
+          transpiler.reportError(property, 'Could not determine type of property.', DiagnosticCode.UNKNOWN_TYPE);
         } else if (
           typeUtils.isOnlyPrimitive(type) ||
           transpiler.isFixedType(property, type) ||
@@ -149,7 +123,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
 
           const init = property.getInitializer();
           let addAccessors = true;
-          if (TypeGuards.isPropertyDeclaration(property) && init != null) {
+          if (TypeGuards.isPropertyDeclaration(property) && init !== undefined) {
             if (property.isReadonly()) {
               addAccessors = false;
             } else {
@@ -182,19 +156,11 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
             property.remove();
           }
         } else if (transpiler.isOnlyLib(property, type, 'MapStorage')) {
-          property.setInitializer(
-            `new MapStorage(syscall('Neo.Runtime.Serialize', '${name}'))`,
-          );
+          property.setInitializer(`new MapStorage(syscall('Neo.Runtime.Serialize', '${name}'))`);
         } else if (transpiler.isOnlyLib(property, type, 'SetStorage')) {
-          property.setInitializer(
-            `new SetStorage(syscall('Neo.Runtime.Serialize', '${name}'))`,
-          );
+          property.setInitializer(`new SetStorage(syscall('Neo.Runtime.Serialize', '${name}'))`);
         } else {
-          transpiler.reportError(
-            property,
-            'Unsupported SmartContract property.',
-            DiagnosticCode.UNSUPPORTED_SYNTAX,
-          );
+          transpiler.reportError(property, 'Unsupported SmartContract property.', DiagnosticCode.UNSUPPORTED_SYNTAX);
         }
       }
     });
@@ -202,27 +168,24 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<
     node.addMethod({
       name: DEPLOY_METHOD,
       returnType: 'boolean',
-      bodyText: bodyText + 'return true;',
+      bodyText: `${bodyText}return true;`,
       parameters: deployParameters,
       scope: Scope.Public,
     });
 
-    if (ctor != null) {
+    if (ctor !== undefined) {
       ctor.remove();
     }
   }
 
-  private getBaseDeploy(
-    transpiler: Transpiler,
-    node: ClassDeclaration,
-  ): MethodDeclaration | undefined {
+  private getBaseDeploy(transpiler: Transpiler, node: ClassDeclaration): MethodDeclaration | undefined {
     const baseClass = node.getBaseClass();
-    if (baseClass == null) {
+    if (baseClass === undefined) {
       return undefined;
     }
 
     const deploy = baseClass.getInstanceMethod(DEPLOY_METHOD);
-    if (deploy == null) {
+    if (deploy === undefined) {
       return this.getBaseDeploy(transpiler, baseClass);
     }
 

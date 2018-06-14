@@ -1,20 +1,20 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 import { InternalFunctionProperties } from './InternalFunctionProperties';
 
 export interface InvokeConstructHelperOptions {
-  noArgs?: boolean;
+  readonly noArgs?: boolean;
 }
 
 // Input: [objectVal, thisObjectVal, ?argsarray]
 // Output: []
 export class InvokeConstructHelper extends Helper {
-  private noArgs: boolean;
+  private readonly noArgs: boolean;
 
-  constructor(options: InvokeConstructHelperOptions = { noArgs: false }) {
+  public constructor(options: InvokeConstructHelperOptions = { noArgs: false }) {
     super();
     this.noArgs = options.noArgs || false;
   }
@@ -22,15 +22,11 @@ export class InvokeConstructHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // ['construct', objectVal, thisObjectVal, ?argsarray]
-    sb.emitPushString(node, InternalFunctionProperties.CONSTRUCT);
+    sb.emitPushString(node, InternalFunctionProperties.Construct);
     // [func, thisObjectVal, ?argsarray]
     sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
     // [func, ?argsarray]
-    sb.emitHelper(
-      node,
-      options,
-      sb.helpers.bindFunctionThis({ overwrite: true }),
-    );
+    sb.emitHelper(node, options, sb.helpers.bindFunctionThis({ overwrite: true }));
     if (this.noArgs) {
       // [0, func]
       sb.emitPushInt(node, 0);

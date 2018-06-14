@@ -1,4 +1,4 @@
-import { SyntaxKind, ExportAssignment } from 'ts-simple-ast';
+import { ExportAssignment, SyntaxKind } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -7,11 +7,7 @@ import { VisitOptions } from '../types';
 export class ExportAssignmentCompiler extends NodeCompiler<ExportAssignment> {
   public readonly kind: SyntaxKind = SyntaxKind.ExportAssignment;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: ExportAssignment,
-    optionsIn: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: ExportAssignment, optionsIn: VisitOptions): void {
     if (node.isExportEquals()) {
       sb.reportUnsupported(node);
     } else {
@@ -19,11 +15,7 @@ export class ExportAssignmentCompiler extends NodeCompiler<ExportAssignment> {
       // [val]
       sb.visit(node.getExpression(), options);
       // []
-      sb.emitHelper(
-        node,
-        options,
-        sb.helpers.exportSingle({ defaultExport: true }),
-      );
+      sb.emitHelper(node, options, sb.helpers.exportSingle({ defaultExport: true }));
     }
   }
 }

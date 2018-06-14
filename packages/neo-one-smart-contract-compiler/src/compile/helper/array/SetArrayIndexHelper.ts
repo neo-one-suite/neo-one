@@ -1,8 +1,8 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 // Input: [val, indexNumber, objectVal]
 // Output: []
@@ -61,11 +61,7 @@ export class SetArrayIndexHelper extends Helper {
           // [lengthVal, 'length', objectVal, objectVal, indexNumber, val]
           sb.emitHelper(node, options, sb.helpers.createNumber);
           // [objectVal, indexNumber, val]
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.setDataPropertyObjectProperty,
-          );
+          sb.emitHelper(node, options, sb.helpers.setDataPropertyObjectProperty);
           // []
           this.setIndex(sb, node, options);
         },

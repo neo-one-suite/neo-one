@@ -21,6 +21,7 @@ module.exports = ({ modules, useBuiltIns, targets, typescript }) => ({
     '@babel/plugin-proposal-class-properties',
     '@babel/plugin-proposal-object-rest-spread',
     '@babel/plugin-proposal-export-namespace-from',
+    '@babel/plugin-proposal-optional-catch-binding',
   ].filter(Boolean),
 });
 

@@ -1,8 +1,8 @@
 import { Node, Type } from 'ts-simple-ast';
 
-import { TypedHelper } from '../../common';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
+import { TypedHelper } from '../../common';
 
 import * as typeUtils from '../../../../typeUtils';
 
@@ -12,22 +12,18 @@ export class ToBooleanHelper extends TypedHelper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 
-    if (this.type != null) {
+    if (this.type !== undefined) {
       this.convertType(sb, node, options, this.type);
     } else {
       this.convertUnknownType(sb, node, options);
     }
   }
 
-  private convertType(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    type: Type,
-  ): void {
+  private convertType(sb: ScriptBuilder, node: Node, options: VisitOptions, type: Type): void {
     if (typeUtils.isOnlyUndefined(type) || typeUtils.isOnlyNull(type)) {
       sb.emitPushBoolean(node, false);
     } else if (typeUtils.isOnlyBoolean(type)) {
@@ -50,40 +46,24 @@ export class ToBooleanHelper extends TypedHelper {
     }
   }
 
-  private convertBoolean(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private convertBoolean(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     sb.emitHelper(node, options, sb.helpers.getBoolean);
   }
 
-  private convertNumber(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private convertNumber(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     sb.emitHelper(node, options, sb.helpers.getNumber);
     sb.emitPushInt(node, 0);
     sb.emitOp(node, 'NUMNOTEQUAL');
   }
 
-  private convertString(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private convertString(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     sb.emitHelper(node, options, sb.helpers.getString);
     sb.emitPushString(node, '');
     sb.emitOp(node, 'EQUAL');
     sb.emitOp(node, 'NOT');
   }
 
-  private convertUnknownType(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private convertUnknownType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     sb.emitHelper(
       node,
       options,

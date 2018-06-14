@@ -10,17 +10,13 @@ import * as constants from '../../constants';
 export class ContinueStatementCompiler extends NodeCompiler<ContinueStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.ContinueStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: ContinueStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: ContinueStatement, options: VisitOptions): void {
     const label = node.getLabel();
-    if (label != null) {
+    if (label !== undefined) {
       sb.reportUnsupported(label);
     }
 
-    if (options.continuePC == null) {
+    if (options.continuePC === undefined) {
       sb.reportError(
         node,
         'Something went wrong. Expected a continue jump location.',

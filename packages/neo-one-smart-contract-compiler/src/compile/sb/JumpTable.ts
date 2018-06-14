@@ -3,28 +3,28 @@ import { Node } from 'ts-simple-ast';
 import { Bytecode, ScriptBuilder } from '../sb';
 
 interface JumpResult {
-  node: Node;
-  jumpNumber: number;
-  bytecode: Bytecode;
+  readonly node: Node;
+  readonly jumpNumber: number;
+  readonly bytecode: Bytecode;
 }
 
 export class JumpTable {
-  private jumpNumber: number = 0;
-  private readonly table: JumpResult[] = [];
+  private mutableJumpNumber = 0;
+  private readonly mutableTable: JumpResult[] = [];
 
   public add(sb: ScriptBuilder, node: Node, body: () => void): number {
-    const jumpNumber = this.jumpNumber;
-    this.jumpNumber += 1;
+    const jumpNumber = this.mutableJumpNumber;
+    this.mutableJumpNumber += 1;
     const { bytecode } = sb.capture(() => {
       body();
     });
-    this.table.push({ jumpNumber, node, bytecode });
+    this.mutableTable.push({ jumpNumber, node, bytecode });
 
     return jumpNumber;
   }
 
   public emitTable(sb: ScriptBuilder, outerNode: Node): void {
-    this.table.forEach(({ node, jumpNumber, bytecode }) => {
+    this.mutableTable.forEach(({ node, jumpNumber, bytecode }) => {
       sb.emitHelper(
         node,
         {},

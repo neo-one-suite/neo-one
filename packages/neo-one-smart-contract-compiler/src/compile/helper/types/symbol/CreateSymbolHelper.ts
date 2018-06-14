@@ -4,5 +4,5 @@ import { Types } from '../Types';
 // Input: [string]
 // Output: [symbolVal]
 export class CreateSymbolHelper extends CreatePrimitiveHelper {
-  protected type = Types.Symbol;
+  protected readonly type = Types.Symbol;
 }

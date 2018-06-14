@@ -1,4 +1,4 @@
-import { SyntaxKind, ImportDeclaration } from 'ts-simple-ast';
+import { ImportDeclaration, SyntaxKind } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -7,17 +7,13 @@ import { VisitOptions } from '../types';
 export class ImportDeclarationCompiler extends NodeCompiler<ImportDeclaration> {
   public readonly kind: SyntaxKind = SyntaxKind.ImportDeclaration;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: ImportDeclaration,
-    optionsIn: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: ImportDeclaration, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [exports]
     sb.loadModule(node.getModuleSpecifierSourceFileOrThrow());
 
     const namespaceImport = node.getNamespaceImport();
-    if (namespaceImport != null) {
+    if (namespaceImport !== undefined) {
       const name = namespaceImport.getText();
       sb.scope.add(name);
       // [objectVal]
@@ -30,14 +26,9 @@ export class ImportDeclarationCompiler extends NodeCompiler<ImportDeclaration> {
       const namedImports = node
         .getNamedImports()
         .filter((namedImport) =>
-          sb.hasExport(
-            namedImport
-              .getImportDeclaration()
-              .getModuleSpecifierSourceFileOrThrow(),
-            namedImport.getName(),
-          ),
+          sb.hasExport(namedImport.getImportDeclaration().getModuleSpecifierSourceFileOrThrow(), namedImport.getName()),
         );
-      if (defaultImport != null) {
+      if (defaultImport !== undefined) {
         if (namedImports.length > 0) {
           // [exports, exports]
           sb.emitOp(node, 'DUP');
@@ -56,7 +47,7 @@ export class ImportDeclarationCompiler extends NodeCompiler<ImportDeclaration> {
       }
 
       if (namedImports.length > 0) {
-        for (const namedImport of namedImports) {
+        namedImports.forEach((namedImport) => {
           // [exports, exports]
           sb.emitOp(node, 'DUP');
           // [name, exports, exports]
@@ -66,14 +57,14 @@ export class ImportDeclarationCompiler extends NodeCompiler<ImportDeclaration> {
 
           let name = namedImport.getName();
           const alias = namedImport.getAliasIdentifier();
-          if (alias != null) {
+          if (alias !== undefined) {
             name = alias.getText();
           }
           sb.scope.add(name);
 
           // [exports]
           sb.scope.set(sb, node, options, name);
-        }
+        });
 
         sb.emitOp(node, 'DROP');
       }

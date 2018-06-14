@@ -4,16 +4,10 @@ import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export default class ElementAccessExpressionCompiler extends NodeCompiler<
-  ElementAccessExpression
-> {
+export class ElementAccessExpressionCompiler extends NodeCompiler<ElementAccessExpression> {
   public readonly kind: SyntaxKind = SyntaxKind.ElementAccessExpression;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    expr: ElementAccessExpression,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, expr: ElementAccessExpression, options: VisitOptions): void {
     const value = expr.getExpression();
 
     // [val]

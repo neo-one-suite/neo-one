@@ -1,14 +1,15 @@
-import BigNumber from 'bignumber.js';
+// tslint:disable no-unsafe-any
 import {
   addressToScriptHash,
   createPrivateKey,
-  privateKeyToScriptHash,
-  TransactionResult,
   InvokeReceipt,
-  UserAccountID,
+  privateKeyToScriptHash,
   SmartContract,
+  TransactionResult,
+  UserAccountID,
 } from '@neo-one/client';
 import { cleanupTest, setupContractTest } from '@neo-one/smart-contract-test';
+import BigNumber from 'bignumber.js';
 
 import appRootDir from 'app-root-dir';
 import path from 'path';
@@ -40,18 +41,10 @@ export const testToken = ({
   issueValue,
   transferValue,
   contractHash,
-  dir,
 }: Options) => {
-  const setup = () =>
+  const setup = async () =>
     setupContractTest({
-      dir: path.resolve(
-        appRootDir.get(),
-        'packages',
-        'neo-one-smart-contract-lib',
-        'src',
-        '__data__',
-        'contracts',
-      ),
+      dir: path.resolve(appRootDir.get(), 'packages', 'neo-one-smart-contract-lib', 'src', '__data__', 'contracts'),
       contractName,
     });
 
@@ -91,37 +84,28 @@ export const testToken = ({
         masterAccountID,
         smartContract,
       });
-      let [receipt] = await Promise.all([
-        result.confirmed({ timeoutMS: 30000 }),
-        developerClient.runConsensusNow(),
-      ]);
+      let [receipt] = await Promise.all([result.confirmed({ timeoutMS: 30000 }), developerClient.runConsensusNow()]);
 
       if (receipt.result.state !== 'HALT') {
         expect(receipt.result.state).toEqual('HALT');
         throw new Error('For TS');
       }
 
-      expect(receipt.result.gasConsumed.toString()).toMatchSnapshot(
-        'deploy consumed',
-      );
+      expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
       expect(receipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
       expect(receipt.result.value).toBeTruthy();
       expect(receipt.events).toHaveLength(1);
       let event = receipt.events[0];
       expect(event.name).toEqual('transfer');
       expect(event.parameters.from).toEqual(contractHash);
-      expect(event.parameters.to).toEqual(
-        privateKeyToScriptHash(masterPrivateKey),
-      );
-      if (event.parameters.amount == null) {
+      expect(event.parameters.to).toEqual(privateKeyToScriptHash(masterPrivateKey));
+      if (event.parameters.amount == undefined) {
         expect(event.parameters.amount).toBeTruthy();
         throw new Error('For TS');
       }
       expect(event.parameters.amount.toString()).toEqual(issueValue.toString());
 
-      let value = await smartContract.balanceOf(
-        addressToScriptHash(masterAccountID.address),
-      );
+      let value = await smartContract.balanceOf(addressToScriptHash(masterAccountID.address));
       expect(value.toString()).toEqual(issueValue.toString());
 
       value = await smartContract.totalSupply();
@@ -133,56 +117,37 @@ export const testToken = ({
         transferValue,
         { from: masterAccountID },
       );
-      [receipt] = await Promise.all([
-        result.confirmed(),
-        developerClient.runConsensusNow(),
-      ]);
+      [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
 
       if (receipt.result.state !== 'HALT') {
         expect(receipt.result.state).toEqual('HALT');
         throw new Error('For TS');
       }
 
-      expect(receipt.result.gasConsumed.toString()).toMatchSnapshot(
-        'transfer consume',
-      );
-      expect(receipt.result.gasCost.toString()).toMatchSnapshot(
-        'transfer cost',
-      );
+      expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('transfer consume');
+      expect(receipt.result.gasCost.toString()).toMatchSnapshot('transfer cost');
       expect(receipt.events).toHaveLength(1);
       event = receipt.events[0];
       expect(event.name).toEqual('transfer');
-      expect(event.parameters.from).toEqual(
-        privateKeyToScriptHash(masterPrivateKey),
-      );
-      expect(event.parameters.to).toEqual(
-        addressToScriptHash(account0.address),
-      );
-      if (event.parameters.amount == null) {
+      expect(event.parameters.from).toEqual(privateKeyToScriptHash(masterPrivateKey));
+      expect(event.parameters.to).toEqual(addressToScriptHash(account0.address));
+      if (event.parameters.amount == undefined) {
         expect(event.parameters.amount).toBeTruthy();
         throw new Error('For TS');
       }
-      expect(event.parameters.amount.toString()).toEqual(
-        transferValue.toString(),
-      );
+      expect(event.parameters.amount.toString()).toEqual(transferValue.toString());
 
       const remainingValue = issueValue.minus(transferValue);
-      value = await smartContract.balanceOf(
-        addressToScriptHash(masterAccountID.address),
-      );
+      value = await smartContract.balanceOf(addressToScriptHash(masterAccountID.address));
       expect(value.toString()).toEqual(remainingValue.toString());
 
-      value = await smartContract.balanceOf(
-        addressToScriptHash(account0.address),
-      );
+      value = await smartContract.balanceOf(addressToScriptHash(account0.address));
       expect(value.toString()).toEqual(transferValue.toString());
 
       value = await smartContract.totalSupply();
       expect(value.toString()).toEqual(issueValue.toString());
 
-      value = await smartContract.balanceOf(
-        privateKeyToScriptHash(createPrivateKey()),
-      );
+      value = await smartContract.balanceOf(privateKeyToScriptHash(createPrivateKey()));
       expect(value.toString()).toEqual('0');
     });
   });

@@ -1,42 +1,43 @@
 import { Node, Type } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 import * as typeUtils from '../../../typeUtils';
 import { Types } from './Types';
 
 export type PreferredType = 'default' | 'string' | 'number';
 export interface ToPrimitiveHelperOptions {
-  type: Type | undefined;
-  knownType?: Types;
-  preferredType?: PreferredType;
+  readonly type: Type | undefined;
+  readonly knownType?: Types;
+  readonly preferredType?: PreferredType;
 }
 
 // NOTE: Unlike the other To* methods, this returns a wrapped value.
 // Input: [val]
 // Output: [val]
-export class ToPrimitiveHelper extends Helper<Node> {
+export class ToPrimitiveHelper extends Helper {
   private readonly type: Type | undefined;
   private readonly knownType: Types | undefined;
   private readonly preferredType: PreferredType;
 
-  constructor({ type, knownType, preferredType }: ToPrimitiveHelperOptions) {
+  public constructor({ type, knownType, preferredType = 'default' }: ToPrimitiveHelperOptions) {
     super();
     this.type = type;
     this.knownType = knownType;
-    this.preferredType = preferredType || 'default';
+    this.preferredType = preferredType;
   }
 
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 
     if (!typeUtils.isOnlyPrimitive(this.type)) {
-      if (this.type == null && this.knownType !== Types.Object) {
+      if (this.type === undefined && this.knownType !== Types.Object) {
         this.toPrimitive(sb, node, options);
       } else {
         this.toPrimitiveObject(sb, node, options);
@@ -44,11 +45,7 @@ export class ToPrimitiveHelper extends Helper<Node> {
     }
   }
 
-  private toPrimitive(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private toPrimitive(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     sb.emitHelper(
       node,
       options,
@@ -66,11 +63,7 @@ export class ToPrimitiveHelper extends Helper<Node> {
     );
   }
 
-  private toPrimitiveObject(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private toPrimitiveObject(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [value, value]
     sb.emitOp(node, 'DUP');
     // [symbol, value, value]
@@ -105,11 +98,7 @@ export class ToPrimitiveHelper extends Helper<Node> {
           // [toPrimitiveVal, val, args]
           sb.emitOp(node, 'ROT');
           // [val]
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.invokeCall({ bindThis: true }),
-          );
+          sb.emitHelper(node, options, sb.helpers.invokeCall({ bindThis: true }));
         },
       }),
     );
@@ -121,10 +110,7 @@ export class ToPrimitiveHelper extends Helper<Node> {
     options: VisitOptions,
     preferredType: 'string' | 'number' | 'default',
   ): void {
-    const methods =
-      preferredType === 'string'
-        ? ['toString', 'valueOf']
-        : ['valueOf', 'toString'];
+    const methods = preferredType === 'string' ? ['toString', 'valueOf'] : ['valueOf', 'toString'];
     // [value, value]
     sb.emitOp(node, 'DUP');
     // [method, value]
@@ -169,21 +155,13 @@ export class ToPrimitiveHelper extends Helper<Node> {
                 sb.emitHelper(node, options, sb.helpers.throwTypeError);
               },
               whenFalse: () => {
-                sb.emitHelper(
-                  node,
-                  options,
-                  sb.helpers.invokeCall({ bindThis: true, noArgs: true }),
-                );
+                sb.emitHelper(node, options, sb.helpers.invokeCall({ bindThis: true, noArgs: true }));
               },
             }),
           );
         },
         whenFalse: () => {
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.invokeCall({ bindThis: true, noArgs: true }),
-          );
+          sb.emitHelper(node, options, sb.helpers.invokeCall({ bindThis: true, noArgs: true }));
         },
       }),
     );

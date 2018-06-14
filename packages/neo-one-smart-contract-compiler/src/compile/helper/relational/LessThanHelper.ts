@@ -1,25 +1,25 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 import * as typeUtils from '../../../typeUtils';
 
 export interface LessThanHelperOptions {
-  leftFirst: boolean;
-  left: Node;
-  right: Node;
+  readonly leftFirst: boolean;
+  readonly left: Node;
+  readonly right: Node;
 }
 
 // Input: []
 // Output: [boolean]
-export class LessThanHelper extends Helper<Node> {
-  private leftFirst: boolean;
-  private left: Node;
-  private right: Node;
+export class LessThanHelper extends Helper {
+  private readonly leftFirst: boolean;
+  private readonly left: Node;
+  private readonly right: Node;
 
-  constructor(options: LessThanHelperOptions) {
+  public constructor(options: LessThanHelperOptions) {
     super();
     this.leftFirst = options.leftFirst;
     this.left = options.left;
@@ -35,6 +35,7 @@ export class LessThanHelper extends Helper<Node> {
         sb.visit(this.right, options);
         sb.visit(this.left, options);
       }
+
       return;
     }
 
@@ -88,26 +89,15 @@ export class LessThanHelper extends Helper<Node> {
       sb.emitOp(node, 'SWAP');
     }
 
-    if (
-      typeUtils.isOnlyString(sb.getType(this.left)) &&
-      typeUtils.isOnlyString(sb.getType(this.right))
-    ) {
+    if (typeUtils.isOnlyString(sb.getType(this.left)) && typeUtils.isOnlyString(sb.getType(this.right))) {
       sb.reportUnsupported(node);
     } else {
       // [rightNumber, leftPrim]
-      sb.emitHelper(
-        this.right,
-        options,
-        sb.helpers.toNumber({ type: sb.getType(this.right) }),
-      );
+      sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.getType(this.right) }));
       // [leftPrim, rightNumber]
       sb.emitOp(node, 'SWAP');
       // [leftNumber, rightNumber]
-      sb.emitHelper(
-        this.left,
-        options,
-        sb.helpers.toNumber({ type: sb.getType(this.left) }),
-      );
+      sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.getType(this.left) }));
       // [rightNumber, leftNumber]
       sb.emitOp(node, 'SWAP');
       // [lt]

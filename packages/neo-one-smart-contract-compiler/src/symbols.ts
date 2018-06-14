@@ -1,5 +1,5 @@
 // tslint:disable ban-types no-bitwise
-import AST, { SourceFile, Symbol, ts, Identifier } from 'ts-simple-ast';
+import Project, { Identifier, SourceFile, Symbol, ts } from 'ts-simple-ast';
 
 import path from 'path';
 
@@ -22,8 +22,9 @@ export interface Globals {
   readonly syscall: Symbol;
 }
 
-const findInterfaceFile = (ast: AST, name: string): SourceFile | undefined => {
+const findInterfaceFile = (ast: Project, name: string): SourceFile | undefined => {
   const files = ast.getSourceFiles();
+
   return files.find((file) => {
     if (!file.isDeclarationFile()) {
       return false;
@@ -32,35 +33,30 @@ const findInterfaceFile = (ast: AST, name: string): SourceFile | undefined => {
     let bufferInterface = file.getInterface(name);
     const globalNamespace = file.getNamespace('global');
     let isGlobalAugmentation = false;
-    if (bufferInterface == null && globalNamespace != null) {
+    if (bufferInterface === undefined && globalNamespace !== undefined) {
       bufferInterface = globalNamespace.getInterface(name);
       isGlobalAugmentation = true;
     }
 
-    if (bufferInterface == null) {
+    if (bufferInterface === undefined) {
       return false;
     }
 
-    return (
-      isGlobalAugmentation ||
-      (bufferInterface.compilerNode.flags & ts.NodeFlags.GlobalAugmentation) !==
-        0
-    );
+    return isGlobalAugmentation || (bufferInterface.compilerNode.flags & ts.NodeFlags.GlobalAugmentation) !== 0;
   });
 };
 
-export const getGlobals = (ast: AST): Globals => {
+export const getGlobals = (ast: Project): Globals => {
   let bufferFile = findInterfaceFile(ast, 'Buffer');
-  if (bufferFile == null) {
-    bufferFile = ast.addExistingSourceFileIfExists(
-      require.resolve('@types/node/index.d.ts'),
-    );
+  if (bufferFile === undefined) {
+    bufferFile = ast.addExistingSourceFileIfExists(require.resolve('@types/node/index.d.ts'));
   }
-  if (bufferFile == null) {
+  if (bufferFile === undefined) {
     throw new Error('Could not find Buffer');
   }
   const buffer = bufferFile.getInterfaceOrThrow('Buffer');
 
+  // tslint:disable-next-line no-any
   const typeChecker = ast.getTypeChecker().compilerObject as any;
   // @ts-ignore
   const array = new Symbol(
@@ -70,18 +66,12 @@ export const getGlobals = (ast: AST): Globals => {
   ).getDeclaredType();
 
   let neoFile = findInterfaceFile(ast, 'AccountBase');
-  if (neoFile == null) {
-    ast.addExistingSourceFiles(
-      path.join(
-        path.dirname(require.resolve('@neo-one/smart-contract')),
-        '**',
-        '*.ts',
-      ),
-    );
+  if (neoFile === undefined) {
+    ast.addExistingSourceFiles(path.join(path.dirname(require.resolve('@neo-one/smart-contract')), '**', '*.ts'));
   }
 
   neoFile = findInterfaceFile(ast, 'AccountBase');
-  if (neoFile == null) {
+  if (neoFile === undefined) {
     throw new Error('Could not find NEO type definition file');
   }
 
@@ -90,35 +80,19 @@ export const getGlobals = (ast: AST): Globals => {
   return {
     Array: array.getSymbolOrThrow(),
     Buffer: buffer.getSymbolOrThrow(),
-    process: bufferFile
-      .getVariableDeclarationOrThrow('process')
-      .getSymbolOrThrow(),
-    AccountBase: neoGlobal
-      .getInterfaceOrThrow('AccountBase')
-      .getSymbolOrThrow(),
+    process: bufferFile.getVariableDeclarationOrThrow('process').getSymbolOrThrow(),
+    AccountBase: neoGlobal.getInterfaceOrThrow('AccountBase').getSymbolOrThrow(),
     AssetBase: neoGlobal.getInterfaceOrThrow('AssetBase').getSymbolOrThrow(),
-    AttributeBase: neoGlobal
-      .getInterfaceOrThrow('AttributeBase')
-      .getSymbolOrThrow(),
+    AttributeBase: neoGlobal.getInterfaceOrThrow('AttributeBase').getSymbolOrThrow(),
     BlockBase: neoGlobal.getInterfaceOrThrow('BlockBase').getSymbolOrThrow(),
-    ContractBase: neoGlobal
-      .getInterfaceOrThrow('ContractBase')
-      .getSymbolOrThrow(),
+    ContractBase: neoGlobal.getInterfaceOrThrow('ContractBase').getSymbolOrThrow(),
     HeaderBase: neoGlobal.getInterfaceOrThrow('HeaderBase').getSymbolOrThrow(),
     InputBase: neoGlobal.getInterfaceOrThrow('InputBase').getSymbolOrThrow(),
     OutputBase: neoGlobal.getInterfaceOrThrow('OutputBase').getSymbolOrThrow(),
-    TransactionBase: neoGlobal
-      .getInterfaceOrThrow('TransactionBase')
-      .getSymbolOrThrow(),
-    ValidatorBase: neoGlobal
-      .getInterfaceOrThrow('ValidatorBase')
-      .getSymbolOrThrow(),
-    StorageContextBase: neoGlobal
-      .getInterfaceOrThrow('StorageContextBase')
-      .getSymbolOrThrow(),
-    StorageIteratorBase: neoGlobal
-      .getInterfaceOrThrow('StorageIteratorBase')
-      .getSymbolOrThrow(),
+    TransactionBase: neoGlobal.getInterfaceOrThrow('TransactionBase').getSymbolOrThrow(),
+    ValidatorBase: neoGlobal.getInterfaceOrThrow('ValidatorBase').getSymbolOrThrow(),
+    StorageContextBase: neoGlobal.getInterfaceOrThrow('StorageContextBase').getSymbolOrThrow(),
+    StorageIteratorBase: neoGlobal.getInterfaceOrThrow('StorageIteratorBase').getSymbolOrThrow(),
     syscall: neoGlobal.getFunctionOrThrow('syscall').getSymbolOrThrow(),
   };
 };
@@ -133,25 +107,20 @@ export interface Libs {
   readonly createEventHandler: Symbol;
 }
 
-const findLibFile = (ast: AST): SourceFile | undefined => {
+const findLibFile = (ast: Project): SourceFile | undefined => {
   const files = ast.getSourceFiles();
-  return files.find((file) => file.getClass('MapStorage') != null);
+
+  return files.find((file) => file.getClass('MapStorage') !== undefined);
 };
 
-export const getLibs = (ast: AST): Libs => {
+export const getLibs = (ast: Project): Libs => {
   let libFileIn = findLibFile(ast);
-  if (libFileIn == null) {
-    ast.addExistingSourceFiles(
-      path.join(
-        path.dirname(require.resolve('@neo-one/smart-contract')),
-        '**',
-        '*.ts',
-      ),
-    );
+  if (libFileIn === undefined) {
+    ast.addExistingSourceFiles(path.join(path.dirname(require.resolve('@neo-one/smart-contract')), '**', '*.ts'));
   }
 
   libFileIn = findLibFile(ast);
-  if (libFileIn == null) {
+  if (libFileIn === undefined) {
     throw new Error('Could not find NEO lib file');
   }
 
@@ -177,9 +146,7 @@ export const getLibs = (ast: AST): Libs => {
       return libFile.getFunctionOrThrow('verify').getSymbolOrThrow();
     },
     get createEventHandler(): Symbol {
-      return libFile
-        .getFunctionOrThrow('createEventHandler')
-        .getSymbolOrThrow();
+      return libFile.getFunctionOrThrow('createEventHandler').getSymbolOrThrow();
     },
   };
 };
@@ -196,6 +163,7 @@ export interface LibAliasesWithReset extends LibAliases {
   readonly reset: () => void;
 }
 
+// tslint:disable readonly-keyword
 interface LibAliasesOptional {
   Address?: Set<Identifier>;
   Hash256?: Set<Identifier>;
@@ -203,21 +171,16 @@ interface LibAliasesOptional {
   PublicKey?: Set<Identifier>;
   Fixed?: Set<Identifier>;
 }
+// tslint:enable readonly-keyword
 
-export const getLibAliases = (ast: AST): LibAliasesWithReset => {
+export const getLibAliases = (ast: Project): LibAliasesWithReset => {
   let libFileIn = findLibFile(ast);
-  if (libFileIn == null) {
-    ast.addExistingSourceFiles(
-      path.join(
-        path.dirname(require.resolve('@neo-one/smart-contract')),
-        '**',
-        '*.ts',
-      ),
-    );
+  if (libFileIn === undefined) {
+    ast.addExistingSourceFiles(path.join(path.dirname(require.resolve('@neo-one/smart-contract')), '**', '*.ts'));
   }
 
   libFileIn = findLibFile(ast);
-  if (libFileIn == null) {
+  if (libFileIn === undefined) {
     throw new Error('Could not find NEO lib file');
   }
 
@@ -227,43 +190,43 @@ export const getLibAliases = (ast: AST): LibAliasesWithReset => {
 
   return {
     get Address() {
-      if (aliases.Address == null) {
-        aliases.Address = new Set(libFile
-          .getTypeAliasOrThrow('Address')
-          .findReferencesAsNodes() as Identifier[]);
+      if (aliases.Address === undefined) {
+        // tslint:disable-next-line no-object-mutation
+        aliases.Address = new Set(libFile.getTypeAliasOrThrow('Address').findReferencesAsNodes() as Identifier[]);
       }
+
       return aliases.Address;
     },
     get Hash256() {
-      if (aliases.Hash256 == null) {
-        aliases.Hash256 = new Set(libFile
-          .getTypeAliasOrThrow('Hash256')
-          .findReferencesAsNodes() as Identifier[]);
+      if (aliases.Hash256 === undefined) {
+        // tslint:disable-next-line no-object-mutation
+        aliases.Hash256 = new Set(libFile.getTypeAliasOrThrow('Hash256').findReferencesAsNodes() as Identifier[]);
       }
+
       return aliases.Hash256;
     },
     get Signature() {
-      if (aliases.Signature == null) {
-        aliases.Signature = new Set(libFile
-          .getTypeAliasOrThrow('Signature')
-          .findReferencesAsNodes() as Identifier[]);
+      if (aliases.Signature === undefined) {
+        // tslint:disable-next-line no-object-mutation
+        aliases.Signature = new Set(libFile.getTypeAliasOrThrow('Signature').findReferencesAsNodes() as Identifier[]);
       }
+
       return aliases.Signature;
     },
     get PublicKey() {
-      if (aliases.PublicKey == null) {
-        aliases.PublicKey = new Set(libFile
-          .getTypeAliasOrThrow('PublicKey')
-          .findReferencesAsNodes() as Identifier[]);
+      if (aliases.PublicKey === undefined) {
+        // tslint:disable-next-line no-object-mutation
+        aliases.PublicKey = new Set(libFile.getTypeAliasOrThrow('PublicKey').findReferencesAsNodes() as Identifier[]);
       }
+
       return aliases.PublicKey;
     },
     get Fixed() {
-      if (aliases.Fixed == null) {
-        aliases.Fixed = new Set(libFile
-          .getTypeAliasOrThrow('Fixed')
-          .findReferencesAsNodes() as Identifier[]);
+      if (aliases.Fixed === undefined) {
+        // tslint:disable-next-line no-object-mutation
+        aliases.Fixed = new Set(libFile.getTypeAliasOrThrow('Fixed').findReferencesAsNodes() as Identifier[]);
       }
+
       return aliases.Fixed;
     },
     reset() {

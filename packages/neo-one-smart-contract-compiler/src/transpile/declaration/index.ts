@@ -1,3 +1,4 @@
 import { ClassDeclarationTranspiler } from './ClassDeclarationTranspiler';
 
-export default [ClassDeclarationTranspiler];
+// tslint:disable-next-line export-name readonly-array
+export const declarations = [ClassDeclarationTranspiler];

@@ -1,21 +1,21 @@
 import { Node } from 'ts-simple-ast';
 
-import { Helper } from '../Helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { Helper } from '../Helper';
 
 export interface CreateConstructArrayHelperOptions {
-  body: () => void;
-  withoutScope?: boolean;
+  readonly body: () => void;
+  readonly withoutScope?: boolean;
 }
 
 // Input: []
 // Output: [farr]
-export class CreateConstructArrayHelper extends Helper<Node> {
+export class CreateConstructArrayHelper extends Helper {
   private readonly body: () => void;
   private readonly withoutScope: boolean;
 
-  constructor({ body, withoutScope }: CreateConstructArrayHelperOptions) {
+  public constructor({ body, withoutScope }: CreateConstructArrayHelperOptions) {
     super();
     this.body = body;
     this.withoutScope = withoutScope || false;

@@ -112,7 +112,7 @@ export default class Consensus {
       consensusContext: this._consensusContext,
     });
 
-    await AsyncIterableX.from(this._queue)
+    await AsyncIterableX.from((this._queue: $FlowFixMe))
       .pipe(
         scan(async (context: Context, event: Event) => {
           let result;

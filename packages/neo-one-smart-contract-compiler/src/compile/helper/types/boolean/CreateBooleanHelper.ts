@@ -4,5 +4,5 @@ import { Types } from '../Types';
 // Input: [boolean]
 // Output: [booleanVal]
 export class CreateBooleanHelper extends CreatePrimitiveHelper {
-  protected type = Types.Boolean;
+  protected readonly type = Types.Boolean;
 }

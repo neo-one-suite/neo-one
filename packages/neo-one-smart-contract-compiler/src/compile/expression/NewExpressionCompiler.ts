@@ -4,14 +4,10 @@ import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export default class NewExpressionCompiler extends NodeCompiler<NewExpression> {
+export class NewExpressionCompiler extends NodeCompiler<NewExpression> {
   public readonly kind: SyntaxKind = SyntaxKind.NewExpression;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    expr: NewExpression,
-    optionsIn: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, expr: NewExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [argsarr]
     sb.emitHelper(expr, options, sb.helpers.args);

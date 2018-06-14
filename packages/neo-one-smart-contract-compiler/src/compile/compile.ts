@@ -1,36 +1,25 @@
-import Ast, { SourceFile } from 'ts-simple-ast';
+import Project, { SourceFile } from 'ts-simple-ast';
 
-import {
-  EmittingScriptBuilder,
-  HelperCapturingScriptBuilder,
-  ScopeCapturingScriptBuilder,
-} from './sb';
 import { Context } from '../Context';
-import { CompileResult } from './types';
-import { getGlobals, getLibs, getLibAliases } from '../symbols';
+import { getGlobals, getLibAliases, getLibs } from '../symbols';
 import { createHelpers } from './helper';
+import { EmittingScriptBuilder, HelperCapturingScriptBuilder, ScopeCapturingScriptBuilder } from './sb';
+import { CompileResult } from './types';
 
 export interface CompileOptions {
-  ast: Ast;
-  sourceFile: SourceFile;
-  context?: Context;
+  readonly ast: Project;
+  readonly sourceFile: SourceFile;
+  readonly context?: Context;
 }
 
 export const compile = ({
   ast,
   sourceFile,
-  context: contextIn,
+  context = new Context(getGlobals(ast), getLibs(ast), getLibAliases(ast)),
 }: CompileOptions): CompileResult => {
-  const context =
-    contextIn || new Context(getGlobals(ast), getLibs(ast), getLibAliases(ast));
   const helpers = createHelpers();
 
-  const helperScriptBuilder = new HelperCapturingScriptBuilder(
-    context,
-    helpers,
-    ast,
-    sourceFile,
-  );
+  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, ast, sourceFile);
   helperScriptBuilder.process();
 
   const scopeScriptBuilder = new ScopeCapturingScriptBuilder(

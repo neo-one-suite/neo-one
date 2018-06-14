@@ -1,4 +1,4 @@
-import { VariableStatement, SyntaxKind } from 'ts-simple-ast';
+import { SyntaxKind, VariableStatement } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -7,11 +7,7 @@ import { VisitOptions } from '../types';
 export class VariableStatementCompiler extends NodeCompiler<VariableStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.VariableStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: VariableStatement,
-    optionsIn: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: VariableStatement, optionsIn: VisitOptions): void {
     sb.visit(node.getDeclarationList(), optionsIn);
 
     if (node.isNamedExport()) {
@@ -28,11 +24,7 @@ export class VariableStatementCompiler extends NodeCompiler<VariableStatement> {
           // [val, exports, exports]
           sb.scope.get(sb, node, options, decl.getName());
           // [exports]
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.export({ name: decl.getName() }),
-          );
+          sb.emitHelper(node, options, sb.helpers.export({ name: decl.getName() }));
         });
       // []
       sb.emitOp(node, 'DROP');

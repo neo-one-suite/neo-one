@@ -1,10 +1,5 @@
-import {
-  BinaryExpression,
-  Node,
-  Expression,
-  SyntaxKind,
-  ts,
-} from 'ts-simple-ast';
+import { utils } from '@neo-one/utils';
+import { BinaryExpression, Expression, Node, SyntaxKind, ts } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -14,20 +9,12 @@ import * as typeUtils from '../../typeUtils';
 import { Helper } from '../helper';
 import { TypedHelperOptions } from '../helper/common';
 
-type ExpressionOperatorKind =
-  | ts.BitwiseOperatorOrHigher
-  | SyntaxKind.CommaToken;
-export default class BinaryExpressionCompiler extends NodeCompiler<
-  BinaryExpression
-> {
+type ExpressionOperatorKind = ts.BitwiseOperatorOrHigher | SyntaxKind.CommaToken;
+export class BinaryExpressionCompiler extends NodeCompiler<BinaryExpression> {
   public readonly kind: SyntaxKind = SyntaxKind.BinaryExpression;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    expr: BinaryExpression,
-    options: VisitOptions,
-  ): void {
-    const kind = expr.getOperatorToken().getKind() as ts.BinaryOperator;
+  public visitNode(sb: ScriptBuilder, expr: BinaryExpression, options: VisitOptions): void {
+    const kind = expr.getOperatorToken().getKind();
 
     switch (kind) {
       case SyntaxKind.EqualsToken:
@@ -75,7 +62,7 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
         this.visitLogicalExpressionOperator(sb, kind, expr, options);
         break;
       default:
-        sb.assertUnreachable(kind);
+        sb.reportUnsupported(expr);
     }
   }
 
@@ -96,113 +83,43 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
         break;
       case SyntaxKind.PlusEqualsToken:
         // Tested
-        this.visitExpressionOperatorBase(
-          sb,
-          token,
-          SyntaxKind.PlusToken,
-          left,
-          right,
-          pushValueOptions,
-        );
+        this.visitExpressionOperatorBase(sb, token, SyntaxKind.PlusToken, left, right, pushValueOptions);
         break;
       case SyntaxKind.MinusEqualsToken:
         // Tested
-        this.visitExpressionOperatorBase(
-          sb,
-          token,
-          SyntaxKind.MinusToken,
-          left,
-          right,
-          pushValueOptions,
-        );
+        this.visitExpressionOperatorBase(sb, token, SyntaxKind.MinusToken, left, right, pushValueOptions);
         break;
       case SyntaxKind.AsteriskAsteriskEqualsToken:
         // SKIPPED Test: Unsupported
-        this.visitExpressionOperatorBase(
-          sb,
-          token,
-          SyntaxKind.AsteriskAsteriskToken,
-          left,
-          right,
-          pushValueOptions,
-        );
+        this.visitExpressionOperatorBase(sb, token, SyntaxKind.AsteriskAsteriskToken, left, right, pushValueOptions);
         break;
       case SyntaxKind.AsteriskEqualsToken:
         // Tested
-        this.visitExpressionOperatorBase(
-          sb,
-          token,
-          SyntaxKind.AsteriskToken,
-          left,
-          right,
-          pushValueOptions,
-        );
+        this.visitExpressionOperatorBase(sb, token, SyntaxKind.AsteriskToken, left, right, pushValueOptions);
         break;
       case SyntaxKind.SlashEqualsToken:
         // Tested
-        this.visitExpressionOperatorBase(
-          sb,
-          token,
-          SyntaxKind.SlashToken,
-          left,
-          right,
-          pushValueOptions,
-        );
+        this.visitExpressionOperatorBase(sb, token, SyntaxKind.SlashToken, left, right, pushValueOptions);
         break;
       case SyntaxKind.PercentEqualsToken:
         // Tested
-        this.visitExpressionOperatorBase(
-          sb,
-          token,
-          SyntaxKind.PercentToken,
-          left,
-          right,
-          pushValueOptions,
-        );
+        this.visitExpressionOperatorBase(sb, token, SyntaxKind.PercentToken, left, right, pushValueOptions);
         break;
       case SyntaxKind.AmpersandEqualsToken:
         // Tested
-        this.visitExpressionOperatorBase(
-          sb,
-          token,
-          SyntaxKind.AmpersandToken,
-          left,
-          right,
-          pushValueOptions,
-        );
+        this.visitExpressionOperatorBase(sb, token, SyntaxKind.AmpersandToken, left, right, pushValueOptions);
         break;
       case SyntaxKind.BarEqualsToken:
         // Tested
-        this.visitExpressionOperatorBase(
-          sb,
-          token,
-          SyntaxKind.BarToken,
-          left,
-          right,
-          pushValueOptions,
-        );
+        this.visitExpressionOperatorBase(sb, token, SyntaxKind.BarToken, left, right, pushValueOptions);
         break;
       case SyntaxKind.CaretEqualsToken:
         // Tested
-        this.visitExpressionOperatorBase(
-          sb,
-          token,
-          SyntaxKind.CaretToken,
-          left,
-          right,
-          pushValueOptions,
-        );
+        this.visitExpressionOperatorBase(sb, token, SyntaxKind.CaretToken, left, right, pushValueOptions);
         break;
       case SyntaxKind.LessThanLessThanEqualsToken:
         // Tested
-        this.visitExpressionOperatorBase(
-          sb,
-          token,
-          SyntaxKind.LessThanLessThanToken,
-          left,
-          right,
-          pushValueOptions,
-        );
+        this.visitExpressionOperatorBase(sb, token, SyntaxKind.LessThanLessThanToken, left, right, pushValueOptions);
         break;
       case SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
         // NOT TESTED
@@ -227,7 +144,7 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
         );
         break;
       default:
-        sb.assertUnreachable(kind);
+        utils.assertNever(kind);
     }
 
     sb.visit(expr.getLeft(), sb.setValueOptions(options));
@@ -239,14 +156,7 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
     expr: BinaryExpression,
     options: VisitOptions,
   ): void {
-    this.visitExpressionOperatorBase(
-      sb,
-      expr.getOperatorToken(),
-      kind,
-      expr.getLeft(),
-      expr.getRight(),
-      options,
-    );
+    this.visitExpressionOperatorBase(sb, expr.getOperatorToken(), kind, expr.getLeft(), expr.getRight(), options);
   }
 
   private visitLogicalExpressionOperator(
@@ -265,6 +175,7 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
     );
   }
 
+  // tslint:disable-next-line cyclomatic-complexity
   private visitExpressionOperatorBase(
     sb: ScriptBuilder,
     node: Node,
@@ -276,12 +187,13 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
     if (!options.pushValue) {
       sb.visit(left, options);
       sb.visit(right, options);
+
       return;
     }
 
     const visit = (
-      leftHelper: (options: TypedHelperOptions) => Helper<Node>,
-      rightHelper?: (options: TypedHelperOptions) => Helper<Node>,
+      leftHelper: (options: TypedHelperOptions) => Helper,
+      rightHelper?: (options: TypedHelperOptions) => Helper,
     ) => {
       sb.visit(left, options);
       sb.emitHelper(left, options, leftHelper({ type: sb.getType(left) }));
@@ -289,7 +201,7 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
       sb.emitHelper(
         right,
         options,
-        (rightHelper || leftHelper)({ type: sb.getType(right) }),
+        (rightHelper === undefined ? leftHelper : rightHelper)({ type: sb.getType(right) }),
       );
     };
 
@@ -298,8 +210,7 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
     const leftType = sb.getType(left);
     const rightType = sb.getType(right);
 
-    const isBinaryNumeric =
-      typeUtils.isOnlyNumber(leftType) && typeUtils.isOnlyNumber(rightType);
+    const isBinaryNumeric = typeUtils.isOnlyNumber(leftType) && typeUtils.isOnlyNumber(rightType);
 
     switch (kind) {
       case SyntaxKind.AsteriskToken:
@@ -326,10 +237,7 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
           visitNumeric();
           sb.emitOp(node, 'ADD');
           sb.emitHelper(node, options, sb.helpers.createNumber);
-        } else if (
-          typeUtils.isOnlyString(leftType) &&
-          typeUtils.isOnlyString(rightType)
-        ) {
+        } else if (typeUtils.isOnlyString(leftType) && typeUtils.isOnlyString(rightType)) {
           // Tested: PlusToken:binaryNumeric
           visit(() => sb.helpers.getString);
           sb.emitOp(node, 'CAT');
@@ -370,19 +278,11 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
               },
               whenTrue: () => {
                 // [string0, left]
-                sb.emitHelper(
-                  node,
-                  options,
-                  sb.helpers.toString({ type: sb.getType(right) }),
-                );
+                sb.emitHelper(node, options, sb.helpers.toString({ type: sb.getType(right) }));
                 // [left, string0]
                 sb.emitOp(node, 'SWAP');
                 // [string1, string0]
-                sb.emitHelper(
-                  node,
-                  options,
-                  sb.helpers.toString({ type: sb.getType(left) }),
-                );
+                sb.emitHelper(node, options, sb.helpers.toString({ type: sb.getType(left) }));
                 // [string0, string1]
                 sb.emitOp(node, 'SWAP');
                 // [string]
@@ -392,19 +292,11 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
               },
               whenFalse: () => {
                 // [number0, left]
-                sb.emitHelper(
-                  node,
-                  options,
-                  sb.helpers.toNumber({ type: sb.getType(right) }),
-                );
+                sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.getType(right) }));
                 // [left, number0]
                 sb.emitOp(node, 'SWAP');
                 // [number1, number0]
-                sb.emitHelper(
-                  node,
-                  options,
-                  sb.helpers.toNumber({ type: sb.getType(left) }),
-                );
+                sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.getType(left) }));
                 // [number0, number1]
                 sb.emitOp(node, 'SWAP');
                 //  [number]
@@ -442,39 +334,23 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
         break;
       case SyntaxKind.LessThanToken:
         // Tested
-        sb.emitHelper(
-          node,
-          options,
-          sb.helpers.lessThan({ leftFirst: true, left, right }),
-        );
+        sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: true, left, right }));
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case SyntaxKind.LessThanEqualsToken:
         // Tested
-        sb.emitHelper(
-          node,
-          options,
-          sb.helpers.lessThan({ leftFirst: false, left: right, right: left }),
-        );
+        sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: false, left: right, right: left }));
         sb.emitOp(node, 'NOT');
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case SyntaxKind.GreaterThanToken:
         // Tested
-        sb.emitHelper(
-          node,
-          options,
-          sb.helpers.lessThan({ leftFirst: false, left: right, right: left }),
-        );
+        sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: false, left: right, right: left }));
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case SyntaxKind.GreaterThanEqualsToken:
         // Tested
-        sb.emitHelper(
-          node,
-          options,
-          sb.helpers.lessThan({ leftFirst: true, left, right }),
-        );
+        sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: true, left, right }));
         sb.emitOp(node, 'NOT');
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
@@ -531,26 +407,18 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
         break;
       case SyntaxKind.EqualsEqualsEqualsToken:
         // Tested
-        sb.emitHelper(
-          node,
-          options,
-          sb.helpers.equalsEqualsEquals({ left, right }),
-        );
+        sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ left, right }));
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case SyntaxKind.ExclamationEqualsEqualsToken:
         // Tested
-        sb.emitHelper(
-          node,
-          options,
-          sb.helpers.equalsEqualsEquals({ left, right }),
-        );
+        sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ left, right }));
         sb.emitOp(node, 'NOT');
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       default:
         // NOT TESTED
-        sb.assertUnreachable(kind);
+        utils.assertNever(kind);
     }
   }
 
@@ -577,11 +445,7 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
                 sb.emitOp(left, 'DUP');
               }
               // [leftBoolean, ?left]
-              sb.emitHelper(
-                left,
-                sb.pushValueOptions(options),
-                sb.helpers.toBoolean({ type: sb.getType(left) }),
-              );
+              sb.emitHelper(left, sb.pushValueOptions(options), sb.helpers.toBoolean({ type: sb.getType(left) }));
             },
             whenTrue: () => {
               if (options.pushValue) {
@@ -607,11 +471,7 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
                 sb.emitOp(left, 'DUP');
               }
               // [leftBoolean, ?left]
-              sb.emitHelper(
-                left,
-                sb.pushValueOptions(options),
-                sb.helpers.toBoolean({ type: sb.getType(left) }),
-              );
+              sb.emitHelper(left, sb.pushValueOptions(options), sb.helpers.toBoolean({ type: sb.getType(left) }));
             },
             whenFalse: () => {
               if (options.pushValue) {
@@ -625,7 +485,7 @@ export default class BinaryExpressionCompiler extends NodeCompiler<
       }
       default:
         // NOT TESTED
-        sb.assertUnreachable(kind);
+        utils.assertNever(kind);
     }
   }
 }
