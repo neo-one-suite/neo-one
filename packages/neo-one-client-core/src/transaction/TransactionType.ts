@@ -16,7 +16,7 @@ export class InvalidTransactionTypeError extends CustomError {
   public readonly transactionType: number;
   public readonly code: string;
 
-  constructor(transactionType: number) {
+  public constructor(transactionType: number) {
     super(`Expected transaction type, found: ${transactionType.toString(16)}`);
     this.transactionType = transactionType;
     this.code = 'INVALID_TRANSACTION_TYPE';
@@ -24,7 +24,8 @@ export class InvalidTransactionTypeError extends CustomError {
 }
 
 const isTransactionType = (value: number): value is TransactionType =>
-  TransactionType[value] != null;
+  // tslint:disable-next-line strict-type-predicates
+  TransactionType[value] !== undefined;
 
 export const assertTransactionType = (value: number): TransactionType => {
   if (isTransactionType(value)) {

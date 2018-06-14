@@ -30,9 +30,7 @@ async function getWalletInfo({
   walletName: string;
   networkName: string;
 }): Promise<WalletInfo> {
-  const output = await one.execute(
-    `describe wallet ${walletName} --network ${networkName} --json`,
-  );
+  const output = await one.execute(`describe wallet ${walletName} --network ${networkName} --json`);
 
   const description = one.parseJSON(output);
 
@@ -47,7 +45,7 @@ async function getWalletInfo({
 
 async function setupNetwork(networkName: string): Promise<string> {
   await one.execute(`create network ${networkName}`);
-  await new Promise((resolve) => setTimeout(() => resolve(), 10000));
+  await new Promise((resolve) => setTimeout(resolve, 10000));
   const output = await one.execute(`describe network ${networkName} --json`);
 
   const description = one.parseJSON(output);
@@ -119,14 +117,9 @@ async function setupTransaction({
   master: WalletInfo;
   wallet: WalletInfo;
 }): Promise<TransactionResult<TransactionReceipt>> {
-  const transaction = await client.transfer(
-    new BigNumber(1000),
-    common.NEO_ASSET_HASH,
-    wallet.accountID.address,
-    {
-      from: master.accountID,
-    },
-  );
+  const transaction = await client.transfer(new BigNumber(1000), common.NEO_ASSET_HASH, wallet.accountID.address, {
+    from: master.accountID,
+  });
 
   return transaction;
 }
@@ -138,17 +131,13 @@ async function checkWalletBalance({
   walletName: string;
   networkName: string;
 }): Promise<void> {
-  const walletOutput = await one.execute(
-    `describe wallet ${walletName} --network ${networkName} --json`,
-  );
+  const walletOutput = await one.execute(`describe wallet ${walletName} --network ${networkName} --json`);
 
   const walletDescribe = one.parseJSON(walletOutput);
   expect(walletDescribe[7][1].table[1][1]).toEqual('1000');
 }
 
-async function confirmTransaction(
-  transaction: TransactionResult<TransactionReceipt>,
-): Promise<void> {
+async function confirmTransaction(transaction: TransactionResult<TransactionReceipt>): Promise<void> {
   let done = false;
   await Promise.all([
     transaction.confirmed().then(() => {
@@ -166,18 +155,10 @@ async function confirmTransaction(
   ]);
 }
 
-async function getBlockTimes({
-  client,
-  networkName,
-}: {
-  client: Client<any>;
-  networkName: string;
-}): Promise<number[]> {
+async function getBlockTimes({ client, networkName }: { client: Client<any>; networkName: string }): Promise<number[]> {
   const blockCount = await client.read(networkName).getBlockCount();
   const indices = _.range(1, blockCount);
-  const blocks = await Promise.all(
-    indices.map((i) => client.read(networkName).getBlock(i)),
-  );
+  const blocks = await Promise.all(indices.map((i) => client.read(networkName).getBlock(i)));
 
   return blocks.map((block) => block.time);
 }
@@ -187,18 +168,13 @@ describe('DeverloperClient', () => {
     const networkName = 'e2e-1';
     const walletName = 'wallet-1';
 
-    const { developerClient, client, keystore, master } = await setupClients(
-      networkName,
-    );
+    const { developerClient, client, keystore, master } = await setupClients(networkName);
 
     const wallet = await addWallet({ walletName, keystore, networkName });
 
     const transaction = await setupTransaction({ client, master, wallet });
 
-    await Promise.all([
-      confirmTransaction(transaction),
-      developerClient.runConsensusNow(),
-    ]);
+    await Promise.all([confirmTransaction(transaction), developerClient.runConsensusNow()]);
 
     await checkWalletBalance({ walletName, networkName });
   });
@@ -207,14 +183,12 @@ describe('DeverloperClient', () => {
     const networkName = 'e2e-2';
     const walletName = 'wallet-2';
 
-    const { developerClient, client, keystore, master } = await setupClients(
-      networkName,
-    );
+    const { developerClient, client, keystore, master } = await setupClients(networkName);
 
     const wallet = await addWallet({ walletName, keystore, networkName });
 
     await developerClient.updateSettings({ secondsPerBlock: 1 });
-    await new Promise((resolve) => setTimeout(() => resolve(), 15000));
+    await new Promise((resolve) => setTimeout(resolve, 15000));
     const transaction = await setupTransaction({ client, master, wallet });
 
     await confirmTransaction(transaction);
@@ -230,10 +204,10 @@ describe('DeverloperClient', () => {
     const { developerClient, client } = await setupClients(networkName);
 
     await developerClient.updateSettings({ secondsPerBlock });
-    await new Promise((resolve) => setTimeout(() => resolve(), 15000));
+    await new Promise((resolve) => setTimeout(resolve, 15000));
 
     await developerClient.fastForwardOffset(offsetSeconds);
-    await new Promise((resolve) => setTimeout(() => resolve(), 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     const times = await getBlockTimes({ client, networkName });
 
@@ -256,11 +230,11 @@ describe('DeverloperClient', () => {
     const { developerClient, client } = await setupClients(networkName);
 
     await developerClient.updateSettings({ secondsPerBlock });
-    await new Promise((resolve) => setTimeout(() => resolve(), 15000));
+    await new Promise((resolve) => setTimeout(resolve, 15000));
 
     const time = utils.nowSeconds() + offset;
     await developerClient.fastForwardToTime(time);
-    await new Promise((resolve) => setTimeout(() => resolve(), 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     const times = await getBlockTimes({ client, networkName });
 

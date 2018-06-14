@@ -1,12 +1,9 @@
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';
 
 export interface VoidContractParameterJSON {
-  type: 'Void';
+  readonly type: 'Void';
 }
 
 export class VoidContractParameter extends ContractParameterBase<
@@ -14,10 +11,9 @@ export class VoidContractParameter extends ContractParameterBase<
   VoidContractParameterJSON,
   ContractParameterType.Void
 > {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): VoidContractParameter {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): VoidContractParameter {
     super.deserializeContractParameterBaseWireBase(options);
+
     return new this();
   }
 
@@ -28,9 +24,7 @@ export class VoidContractParameter extends ContractParameterBase<
     return false;
   }
 
-  public serializeJSON(
-    context: SerializeJSONContext,
-  ): VoidContractParameterJSON {
+  public serializeJSON(_context: SerializeJSONContext): VoidContractParameterJSON {
     return {
       type: 'Void',
     };

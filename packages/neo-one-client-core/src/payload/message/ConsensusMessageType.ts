@@ -12,7 +12,7 @@ export class InvalidConsensusMessageTypeError extends CustomError {
   public readonly type: number;
   public readonly code: string;
 
-  constructor(type: number) {
+  public constructor(type: number) {
     super(`Expected action type, found: ${type}`);
     this.type = type;
     this.code = 'INVALID_ACTION_TYPE';
@@ -20,11 +20,10 @@ export class InvalidConsensusMessageTypeError extends CustomError {
 }
 
 const isConsensusMessageType = (value: number): value is ConsensusMessageType =>
-  ConsensusMessageType[value] != null;
+  // tslint:disable-next-line strict-type-predicates
+  ConsensusMessageType[value] !== undefined;
 
-export const assertConsensusMessageType = (
-  value: number,
-): ConsensusMessageType => {
+export const assertConsensusMessageType = (value: number): ConsensusMessageType => {
   if (isConsensusMessageType(value)) {
     return value;
   }

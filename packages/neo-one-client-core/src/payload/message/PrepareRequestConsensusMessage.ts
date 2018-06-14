@@ -4,40 +4,32 @@ import { InvalidFormatError } from '../../errors';
 import { DeserializeWireBaseOptions } from '../../Serializable';
 import { MinerTransaction } from '../../transaction';
 import { BinaryWriter } from '../../utils';
-import {
-  ConsensusMessageBase,
-  ConsensusMessageBaseAdd,
-} from './ConsensusMessageBase';
+import { ConsensusMessageBase, ConsensusMessageBaseAdd } from './ConsensusMessageBase';
 import { ConsensusMessageType } from './ConsensusMessageType';
 
 export interface PrepareRequestAdd extends ConsensusMessageBaseAdd {
-  nonce: BN;
-  nextConsensus: UInt160;
-  transactionHashes: UInt256[];
-  minerTransaction: MinerTransaction;
-  signature: Buffer;
+  readonly nonce: BN;
+  readonly nextConsensus: UInt160;
+  readonly transactionHashes: ReadonlyArray<UInt256>;
+  readonly minerTransaction: MinerTransaction;
+  readonly signature: Buffer;
 }
 
 export class PrepareRequestConsensusMessage extends ConsensusMessageBase<
   PrepareRequestConsensusMessage,
   ConsensusMessageType.PrepareRequest
 > {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): PrepareRequestConsensusMessage {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): PrepareRequestConsensusMessage {
     const { reader } = options;
     const message = super.deserializeConsensusMessageBaseWireBase(options);
     const nonce = reader.readUInt64LE();
     const nextConsensus = reader.readUInt160();
     const transactionHashes = reader.readArray(() => reader.readUInt256());
-    const distinctTransactionHashes = new Set(
-      transactionHashes.map((hash) => common.uInt256ToString(hash)),
-    );
+    const distinctTransactionHashes = new Set(transactionHashes.map((hash) => common.uInt256ToString(hash)));
 
     if (distinctTransactionHashes.size !== transactionHashes.length) {
       throw new InvalidFormatError(
-        `Distinct hashes: ${distinctTransactionHashes.size} ` +
-          `Transaction hashes: ${transactionHashes.length}`,
+        `Distinct hashes: ${distinctTransactionHashes.size} ` + `Transaction hashes: ${transactionHashes.length}`,
       );
     }
     const minerTransaction = MinerTransaction.deserializeWireBase(options);
@@ -58,11 +50,11 @@ export class PrepareRequestConsensusMessage extends ConsensusMessageBase<
 
   public readonly nonce: BN;
   public readonly nextConsensus: UInt160;
-  public readonly transactionHashes: UInt256[];
+  public readonly transactionHashes: ReadonlyArray<UInt256>;
   public readonly minerTransaction: MinerTransaction;
   public readonly signature: Buffer;
 
-  constructor({
+  public constructor({
     viewNumber,
     nonce,
     nextConsensus,

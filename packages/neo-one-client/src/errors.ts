@@ -4,14 +4,11 @@ import { ContractParameter, ContractParameterType } from './types';
 
 export class InvalidContractParameterError extends CustomError {
   public readonly parameter: ContractParameter;
-  public readonly expected: ContractParameterType[];
+  public readonly expected: ReadonlyArray<ContractParameterType>;
   public readonly code: string;
 
-  constructor(parameter: ContractParameter, expected: ContractParameterType[]) {
-    super(
-      `Expected one of ${JSON.stringify(expected)} ` +
-        `ContractParameterTypes, found ${parameter.type}`,
-    );
+  public constructor(parameter: ContractParameter, expected: ReadonlyArray<ContractParameterType>) {
+    super(`Expected one of ${JSON.stringify(expected)} ` + `ContractParameterTypes, found ${parameter.type}`);
 
     this.parameter = parameter;
     this.expected = expected;
@@ -22,7 +19,7 @@ export class InvalidContractParameterError extends CustomError {
 export class InvalidArgumentError extends CustomError {
   public readonly code: string;
 
-  constructor(message: string) {
+  public constructor(message: string) {
     super(message);
     this.code = 'INVALID_ARGUMENT';
   }
@@ -31,7 +28,7 @@ export class InvalidArgumentError extends CustomError {
 export class InvalidNamedArgumentError extends InvalidArgumentError {
   public readonly code: string;
 
-  constructor(name: string, argument: {}) {
+  public constructor(name: string, argument: {}) {
     super(`Invalid argument for ${name}: ${String(argument)}`);
     this.code = 'INVALID_NAMED_ARGUMENT';
   }
@@ -40,7 +37,7 @@ export class InvalidNamedArgumentError extends InvalidArgumentError {
 export class InvocationCallError extends CustomError {
   public readonly code: string;
 
-  constructor(message: string) {
+  public constructor(message: string) {
     super(message);
     this.code = 'INVOCATION_CALL';
   }
@@ -49,7 +46,7 @@ export class InvocationCallError extends CustomError {
 export class InvalidEventError extends CustomError {
   public readonly code: string;
 
-  constructor(message: string) {
+  public constructor(message: string) {
     super(message);
     this.code = 'INVALID_EVENT';
   }
@@ -58,7 +55,7 @@ export class InvalidEventError extends CustomError {
 export class InsufficientFundsError extends CustomError {
   public readonly code: string;
 
-  constructor(total: BigNumber, expected: BigNumber) {
+  public constructor(total: BigNumber, expected: BigNumber) {
     super(`Found ${total.toString()} funds, required: ${expected.toString()}.`);
     this.code = 'INSUFFICIENT_FUNDS';
   }
@@ -67,7 +64,7 @@ export class InsufficientFundsError extends CustomError {
 export class NothingToClaimError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('Nothing to claim.');
     this.code = 'NOTHING_TO_CLAIM';
   }
@@ -76,7 +73,7 @@ export class NothingToClaimError extends CustomError {
 export class NothingToIssueError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('Nothing to issue.');
     this.code = 'NOTHING_TO_ISSUE';
   }
@@ -85,7 +82,7 @@ export class NothingToIssueError extends CustomError {
 export class NothingToTransferError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('Nothing to transfer.');
     this.code = 'NOTHING_TO_TRANSFER';
   }
@@ -94,7 +91,7 @@ export class NothingToTransferError extends CustomError {
 export class NoAccountError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('No account exists.');
     this.code = 'NO_ACCOUNT';
   }
@@ -103,7 +100,7 @@ export class NoAccountError extends CustomError {
 export class NoContractDeployedError extends CustomError {
   public readonly code: string;
 
-  constructor(networkType: string) {
+  public constructor(networkType: string) {
     super(`Contract has not been deployed to network ${networkType}`);
     this.code = 'NO_CONTRACT_DEPLOYED';
   }
@@ -112,7 +109,7 @@ export class NoContractDeployedError extends CustomError {
 export class InvalidTransactionError extends CustomError {
   public readonly code: string;
 
-  constructor(message: string) {
+  public constructor(message: string) {
     super(message);
     this.code = 'INVALID_TRANSACTION';
   }
@@ -121,7 +118,7 @@ export class InvalidTransactionError extends CustomError {
 export class InvokeError extends CustomError {
   public readonly code: string;
 
-  constructor(message: string) {
+  public constructor(message: string) {
     super(message);
     this.code = 'INVOKE';
   }
@@ -130,7 +127,7 @@ export class InvokeError extends CustomError {
 export class UnknownBlockError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('Unknown block');
     this.code = 'UNKNOWN_BLOCK';
   }
@@ -139,7 +136,7 @@ export class UnknownBlockError extends CustomError {
 export class RelayTransactionError extends CustomError {
   public readonly code: string;
 
-  constructor(message: string) {
+  public constructor(message: string) {
     super(message);
     this.code = 'RELAY_TRANSACTION';
   }
@@ -148,7 +145,7 @@ export class RelayTransactionError extends CustomError {
 export class UnknownNetworkError extends CustomError {
   public readonly code: string;
 
-  constructor(name: string) {
+  public constructor(name: string) {
     super(`Unknown network ${name}`);
     this.code = 'UNKNOWN_NETWORK';
   }
@@ -157,7 +154,7 @@ export class UnknownNetworkError extends CustomError {
 export class UnknownAccountError extends CustomError {
   public readonly code: string;
 
-  constructor(address: string) {
+  public constructor(address: string) {
     super(`Unknown account ${address}`);
     this.code = 'UNKNOWN_ACCOUNT';
   }
@@ -166,7 +163,7 @@ export class UnknownAccountError extends CustomError {
 export class LockedAccountError extends CustomError {
   public readonly code: string;
 
-  constructor(address: string) {
+  public constructor(address: string) {
     super(`Account ${address} is locked`);
     this.code = 'LOCKED_ACCOUNT';
   }
@@ -175,7 +172,7 @@ export class LockedAccountError extends CustomError {
 export class PasswordRequiredError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('A password is required when creating accounts on the MainNet.');
     this.code = 'PASSWORD_REQUIRED';
   }

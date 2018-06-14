@@ -1,3 +1,3 @@
 export interface NetworkSettingsJSON {
-  issueGASFee: string;
+  readonly issueGASFee: string;
 }

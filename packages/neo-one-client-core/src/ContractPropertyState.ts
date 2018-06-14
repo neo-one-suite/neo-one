@@ -11,49 +11,47 @@ export enum ContractPropertyState {
   HasStorageDynamicInvokePayable = 0x07,
 }
 
+// tslint:disable-next-line variable-name
 export const HasStorage = new Set([
   ContractPropertyState.HasStorage,
   ContractPropertyState.HasStorageDynamicInvoke,
   ContractPropertyState.HasStoragePayable,
   ContractPropertyState.HasStorageDynamicInvokePayable,
-]) as Set<ContractPropertyState>;
+]);
 
+// tslint:disable-next-line variable-name
 export const HasDynamicInvoke = new Set([
   ContractPropertyState.HasDynamicInvoke,
   ContractPropertyState.HasStorageDynamicInvoke,
   ContractPropertyState.HasDynamicInvokePayable,
   ContractPropertyState.HasStorageDynamicInvokePayable,
-]) as Set<ContractPropertyState>;
+]);
 
+// tslint:disable-next-line variable-name
 export const HasPayable = new Set([
   ContractPropertyState.Payable,
   ContractPropertyState.HasStoragePayable,
   ContractPropertyState.HasDynamicInvokePayable,
   ContractPropertyState.HasStorageDynamicInvokePayable,
-]) as Set<ContractPropertyState>;
+]);
 
 export class InvalidContractPropertyStateError extends CustomError {
   public readonly code: string;
   public readonly contractParameterType: number;
 
-  constructor(contractParameterType: number) {
-    super(
-      `Expected contract parameter type, ` +
-        `found: ${contractParameterType.toString(16)}`,
-    );
+  public constructor(contractParameterType: number) {
+    super(`Expected contract parameter type, ` + `found: ${contractParameterType.toString(16)}`);
 
     this.contractParameterType = contractParameterType;
     this.code = 'INVALID_ContractPropertyState';
   }
 }
 
-const isContractPropertyState = (
-  value: number,
-): value is ContractPropertyState => ContractPropertyState[value] != null;
+const isContractPropertyState = (value: number): value is ContractPropertyState =>
+  // tslint:disable-next-line strict-type-predicates
+  ContractPropertyState[value] !== undefined;
 
-export const assertContractPropertyState = (
-  value: number,
-): ContractPropertyState => {
+export const assertContractPropertyState = (value: number): ContractPropertyState => {
   if (isContractPropertyState(value)) {
     return value;
   }
@@ -66,9 +64,9 @@ export const getContractProperties = ({
   hasDynamicInvoke,
   payable,
 }: {
-  hasStorage: boolean;
-  hasDynamicInvoke: boolean;
-  payable: boolean;
+  readonly hasStorage: boolean;
+  readonly hasDynamicInvoke: boolean;
+  readonly payable: boolean;
 }): ContractPropertyState => {
   if (hasStorage && hasDynamicInvoke && payable) {
     return ContractPropertyState.HasStorageDynamicInvokePayable;

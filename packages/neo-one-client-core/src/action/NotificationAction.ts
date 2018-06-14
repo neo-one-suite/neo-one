@@ -1,37 +1,24 @@
-import {
-  ContractParameter,
-  ContractParameterJSON,
-  deserializeContractParameterWireBase,
-} from '../contractParameter';
-import {
-  DeserializeWireBaseOptions,
-  SerializableJSON,
-  SerializeJSONContext,
-} from '../Serializable';
+import { ContractParameter, ContractParameterJSON, deserializeContractParameterWireBase } from '../contractParameter';
+import { DeserializeWireBaseOptions, SerializableJSON, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter } from '../utils';
 import { ActionBase, ActionBaseAdd, ActionBaseJSON } from './ActionBase';
 import { ActionType } from './ActionType';
 
 export interface NotificationAdd extends ActionBaseAdd {
-  args: ContractParameter[];
+  readonly args: ReadonlyArray<ContractParameter>;
 }
 
 export interface NotificationActionJSON extends ActionBaseJSON {
-  type: 'Notification';
-  args: ContractParameterJSON[];
+  readonly type: 'Notification';
+  readonly args: ReadonlyArray<ContractParameterJSON>;
 }
 
-export class NotificationAction
-  extends ActionBase<NotificationAction, ActionType.Notification>
+export class NotificationAction extends ActionBase<NotificationAction, ActionType.Notification>
   implements SerializableJSON<NotificationActionJSON> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): NotificationAction {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): NotificationAction {
     const { reader } = options;
     const action = super.deserializeActionBaseWireBase(options);
-    const args = reader.readArray(() =>
-      deserializeContractParameterWireBase(options),
-    );
+    const args = reader.readArray(() => deserializeContractParameterWireBase(options));
 
     return new this({
       version: action.version,
@@ -41,9 +28,9 @@ export class NotificationAction
     });
   }
 
-  public readonly args: ContractParameter[];
+  public readonly args: ReadonlyArray<ContractParameter>;
 
-  constructor({ version, index, scriptHash, args }: NotificationAdd) {
+  public constructor({ version, index, scriptHash, args }: NotificationAdd) {
     super({
       type: ActionType.Notification,
       version,
@@ -61,6 +48,7 @@ export class NotificationAction
 
   public serializeJSON(context: SerializeJSONContext): NotificationActionJSON {
     const action = super.serializeActionBaseJSON(context);
+
     return {
       type: 'Notification',
       version: action.version,

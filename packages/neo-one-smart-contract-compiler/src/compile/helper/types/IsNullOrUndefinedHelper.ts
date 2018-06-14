@@ -6,10 +6,11 @@ import { Helper } from '../Helper';
 
 // Input: [val]
 // Output: [boolean]
-export class IsNullOrUndefinedHelper extends Helper<Node> {
+export class IsNullOrUndefinedHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

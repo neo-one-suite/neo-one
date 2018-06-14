@@ -24,57 +24,46 @@ import {
   SerializeJSONContext,
   SerializeWire,
 } from './Serializable';
-import {
-  BinaryReader,
-  BinaryWriter,
-  IOHelper,
-  JSONHelper,
-  utils,
-} from './utils';
+import { BinaryReader, BinaryWriter, IOHelper, JSONHelper, utils } from './utils';
 
 export interface ContractKey {
-  hash: UInt160;
+  readonly hash: UInt160;
 }
 export interface ContractAdd {
-  hash?: UInt160;
-  version?: number;
-  script: Buffer;
-  parameterList: ContractParameterType[];
-  returnType: ContractParameterType;
-  contractProperties: ContractPropertyState;
-  name: string;
-  codeVersion: string;
-  author: string;
-  email: string;
-  description: string;
+  readonly hash?: UInt160;
+  readonly version?: number;
+  readonly script: Buffer;
+  readonly parameterList: ReadonlyArray<ContractParameterType>;
+  readonly returnType: ContractParameterType;
+  readonly contractProperties: ContractPropertyState;
+  readonly name: string;
+  readonly codeVersion: string;
+  readonly author: string;
+  readonly email: string;
+  readonly description: string;
 }
 
 export interface ContractJSON {
-  version: number;
-  hash: string;
-  script: string;
-  parameters: ContractParameterTypeJSON[];
-  returntype: ContractParameterTypeJSON;
-  name: string;
-  code_version: string;
-  author: string;
-  email: string;
-  description: string;
-  properties: {
-    storage: boolean;
-    dynamic_invoke: boolean;
-    payable: boolean;
+  readonly version: number;
+  readonly hash: string;
+  readonly script: string;
+  readonly parameters: ReadonlyArray<ContractParameterTypeJSON>;
+  readonly returntype: ContractParameterTypeJSON;
+  readonly name: string;
+  readonly code_version: string;
+  readonly author: string;
+  readonly email: string;
+  readonly description: string;
+  readonly properties: {
+    readonly storage: boolean;
+    readonly dynamic_invoke: boolean;
+    readonly payable: boolean;
   };
 }
 
 export class Contract extends BaseState
-  implements
-    SerializableWire<Contract>,
-    SerializableJSON<ContractJSON>,
-    Equatable {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): Contract {
+  implements SerializableWire<Contract>, SerializableJSON<ContractJSON>, Equatable {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): Contract {
     return deserializeContractWireBase({
       context: options.context,
       reader: options.reader,
@@ -89,7 +78,7 @@ export class Contract extends BaseState
   }
 
   public readonly script: Buffer;
-  public readonly parameterList: ContractParameterType[];
+  public readonly parameterList: ReadonlyArray<ContractParameterType>;
   public readonly returnType: ContractParameterType;
   public readonly name: string;
   public readonly codeVersion: string;
@@ -100,18 +89,10 @@ export class Contract extends BaseState
   public readonly hasStorage: boolean;
   public readonly hasDynamicInvoke: boolean;
   public readonly payable: boolean;
-  public readonly equals: Equals = utils.equals(Contract, (other) =>
-    common.uInt160Equal(this.hash, other.hash),
-  );
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
-  private readonly hashInternal = utils.lazy(() =>
-    crypto.toScriptHash(this.script),
-  );
-  private readonly hashHexInternal = utils.lazy(() =>
-    common.uInt160ToHex(this.hash),
-  );
+  public readonly equals: Equals = utils.equals(Contract, (other) => common.uInt160Equal(this.hash, other.hash));
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
+  private readonly hashInternal = utils.lazy(() => crypto.toScriptHash(this.script));
+  private readonly hashHexInternal = utils.lazy(() => common.uInt160ToHex(this.hash));
   private readonly contractSizeInternal = utils.lazy(() =>
     sizeOfContract({
       script: this.script,
@@ -124,7 +105,7 @@ export class Contract extends BaseState
     }),
   );
 
-  constructor({
+  public constructor({
     version,
     script,
     parameterList,
@@ -168,14 +149,12 @@ export class Contract extends BaseState
     serializeContractWireBase({ writer, contract: this });
   }
 
-  public serializeJSON(context: SerializeJSONContext): ContractJSON {
+  public serializeJSON(_context: SerializeJSONContext): ContractJSON {
     return {
       version: this.version,
       hash: JSONHelper.writeUInt160(this.hash),
       script: JSONHelper.writeBuffer(this.script),
-      parameters: this.parameterList.map((parameter) =>
-        toJSONContractParameterType(parameter),
-      ),
+      parameters: this.parameterList.map(toJSONContractParameterType),
 
       returntype: toJSONContractParameterType(this.returnType),
       name: this.name,
@@ -202,19 +181,19 @@ export const sizeOfContract = ({
   description,
   publishVersion,
 }: {
-  script: Buffer;
-  parameterList: ContractParameterType[];
-  name: string;
-  codeVersion: string;
-  author: string;
-  email: string;
-  description: string;
-  publishVersion?: number;
+  readonly script: Buffer;
+  readonly parameterList: ReadonlyArray<ContractParameterType>;
+  readonly name: string;
+  readonly codeVersion: string;
+  readonly author: string;
+  readonly email: string;
+  readonly description: string;
+  readonly publishVersion?: number;
 }) =>
   IOHelper.sizeOfVarBytesLE(script) +
-  IOHelper.sizeOfVarBytesLE(Buffer.from(parameterList)) +
+  IOHelper.sizeOfVarBytesLE(Buffer.from(parameterList as ContractParameterType[])) +
   IOHelper.sizeOfUInt8 +
-  (publishVersion == null ? IOHelper.sizeOfBoolean : 0) +
+  (publishVersion === undefined ? IOHelper.sizeOfBoolean : 0) +
   IOHelper.sizeOfVarString(name) +
   IOHelper.sizeOfVarString(codeVersion) +
   IOHelper.sizeOfVarString(author) +
@@ -225,16 +204,14 @@ export const deserializeContractWireBase = ({
   reader,
   publishVersion,
 }: {
-  publishVersion?: number;
+  readonly publishVersion?: number;
 } & DeserializeWireBaseOptions): Contract => {
   const script = reader.readVarBytesLE();
-  const parameterList = [...reader.readVarBytesLE()].map((value) =>
-    assertContractParameterType(value),
-  );
+  const parameterList = [...reader.readVarBytesLE()].map(assertContractParameterType);
 
   const returnType = assertContractParameterType(reader.readUInt8());
   const contractProperties =
-    publishVersion == null || publishVersion >= 1
+    publishVersion === undefined || publishVersion >= 1
       ? assertContractPropertyState(reader.readUInt8())
       : ContractPropertyState.NoProperty;
   const name = reader.readVarString(252);
@@ -261,14 +238,14 @@ export const serializeContractWireBase = ({
   contract,
   publishVersion,
 }: {
-  writer: BinaryWriter;
-  contract: Contract;
-  publishVersion?: number;
+  readonly writer: BinaryWriter;
+  readonly contract: Contract;
+  readonly publishVersion?: number;
 }): void => {
   writer.writeVarBytesLE(contract.script);
-  writer.writeVarBytesLE(Buffer.from(contract.parameterList));
+  writer.writeVarBytesLE(Buffer.from(contract.parameterList as ContractParameterType[]));
   writer.writeUInt8(contract.returnType);
-  if (publishVersion == null || publishVersion >= 1) {
+  if (publishVersion === undefined || publishVersion >= 1) {
     writer.writeUInt8(contract.contractProperties);
   }
   writer.writeVarString(contract.name);

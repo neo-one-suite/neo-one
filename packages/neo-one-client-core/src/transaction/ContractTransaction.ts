@@ -1,45 +1,26 @@
 import { InvalidFormatError } from '../errors';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { IOHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
-import {
-  TransactionBase,
-  TransactionBaseAdd,
-  TransactionBaseJSON,
-} from './TransactionBase';
+import { TransactionBase, TransactionBaseAdd, TransactionBaseJSON } from './TransactionBase';
 import { TransactionType } from './TransactionType';
 
 export type ContractTransactionAdd = TransactionBaseAdd;
 
 export interface ContractTransactionJSON extends TransactionBaseJSON {
-  type: 'ContractTransaction';
+  readonly type: 'ContractTransaction';
 }
 
-export class ContractTransaction extends TransactionBase<
-  TransactionType.Contract,
-  ContractTransactionJSON
-> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): ContractTransaction {
-    const { type, version } = super.deserializeTransactionBaseStartWireBase(
-      options,
-    );
+export class ContractTransaction extends TransactionBase<TransactionType.Contract, ContractTransactionJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): ContractTransaction {
+    const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Contract) {
       throw new InvalidFormatError();
     }
 
-    const {
-      attributes,
-      inputs,
-      outputs,
-      scripts,
-    } = super.deserializeTransactionBaseEndWireBase(options);
+    const { attributes, inputs, outputs, scripts } = super.deserializeTransactionBaseEndWireBase(options);
 
     return new this({
       version,
@@ -50,18 +31,9 @@ export class ContractTransaction extends TransactionBase<
     });
   }
 
-  protected readonly sizeExclusive: () => number = utils.lazy(
-    () => IOHelper.sizeOfUInt8,
-  );
+  protected readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8);
 
-  constructor({
-    version,
-    attributes,
-    inputs,
-    outputs,
-    scripts,
-    hash,
-  }: TransactionBaseAdd) {
+  public constructor({ version, attributes, inputs, outputs, scripts, hash }: TransactionBaseAdd) {
     super({
       version,
       type: TransactionType.Contract,
@@ -78,27 +50,23 @@ export class ContractTransaction extends TransactionBase<
   }
 
   public clone({
-    scripts,
-    attributes,
+    scripts = this.scripts,
+    attributes = this.attributes,
   }: {
-    scripts?: Witness[];
-    attributes?: Attribute[];
+    readonly scripts?: ReadonlyArray<Witness>;
+    readonly attributes?: ReadonlyArray<Attribute>;
   }): ContractTransaction {
     return new ContractTransaction({
       version: this.version,
-      attributes: attributes || this.attributes,
+      attributes,
       inputs: this.inputs,
       outputs: this.outputs,
-      scripts: scripts || this.scripts,
+      scripts,
     });
   }
 
-  public async serializeJSON(
-    context: SerializeJSONContext,
-  ): Promise<ContractTransactionJSON> {
-    const transactionBaseJSON = await super.serializeTransactionBaseJSON(
-      context,
-    );
+  public async serializeJSON(context: SerializeJSONContext): Promise<ContractTransactionJSON> {
+    const transactionBaseJSON = await super.serializeTransactionBaseJSON(context);
 
     return {
       ...transactionBaseJSON,

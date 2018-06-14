@@ -1,9 +1,4 @@
-import {
-  ContractParameter,
-  ContractParameterType,
-  InvocationResult,
-  VMState,
-} from '@neo-one/client-core';
+import { ContractParameter, ContractParameterType, InvocationResult, VMState } from '@neo-one/client-core';
 import BN from 'bn.js';
 
 export const checkResult = (result: InvocationResult) => {
@@ -18,16 +13,11 @@ const checkStackLength = (result: InvocationResult, length: number) => {
   }
 
   if (result.stack.length !== length) {
-    throw new Error(
-      `Result stack had length ${result.stack.length}. Expected ${length}.`,
-    );
+    throw new Error(`Result stack had length ${result.stack.length}. Expected ${length}.`);
   }
 };
 
-const throwBadType = (
-  item: ContractParameter,
-  type: ContractParameterType,
-): any => {
+const throwBadType = (item: ContractParameter, type: ContractParameterType): any => {
   throw new Error(`Expected stack element to be ${type}, was ${item.type}`);
 };
 

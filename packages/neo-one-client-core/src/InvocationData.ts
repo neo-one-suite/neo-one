@@ -1,9 +1,6 @@
 import BN from 'bn.js';
 import { common, ECPoint, UInt160, UInt256 } from './common';
-import {
-  deserializeInvocationResultWireBase,
-  InvocationResult,
-} from './invocationResult';
+import { deserializeInvocationResultWireBase, InvocationResult } from './invocationResult';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -14,52 +11,51 @@ import {
 import { BinaryReader, BinaryWriter, IOHelper, utils } from './utils';
 
 export interface InvocationDataAdd {
-  hash: UInt256;
-  assetHash?: UInt256 | null;
-  contractHashes: UInt160[];
-  deletedContractHashes: UInt160[];
-  migratedContractHashes: Array<[UInt160, UInt160]>;
-  voteUpdates: Array<[UInt160, ECPoint[]]>;
-  blockIndex: number;
-  transactionIndex: number;
-  actionIndexStart: BN;
-  actionIndexStop: BN;
-  result: InvocationResult;
+  readonly hash: UInt256;
+  readonly assetHash?: UInt256;
+  readonly contractHashes: ReadonlyArray<UInt160>;
+  readonly deletedContractHashes: ReadonlyArray<UInt160>;
+  readonly migratedContractHashes: ReadonlyArray<[UInt160, UInt160]>;
+  readonly voteUpdates: ReadonlyArray<[UInt160, ReadonlyArray<ECPoint>]>;
+  readonly blockIndex: number;
+  readonly transactionIndex: number;
+  readonly actionIndexStart: BN;
+  readonly actionIndexStop: BN;
+  readonly result: InvocationResult;
 }
 
 export interface InvocationDataKey {
-  hash: UInt256;
+  readonly hash: UInt256;
 }
 
 export class InvocationData implements SerializableWire<InvocationData> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): InvocationData {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): InvocationData {
     const { reader } = options;
     const hash = reader.readUInt256();
     const assetHash = reader.readUInt256();
     const contractHashes = reader.readArray(() => reader.readUInt160());
     const deletedContractHashes = reader.readArray(() => reader.readUInt160());
-    const migratedContractHashes = reader.readArray(() => {
+    const migratedContractHashes = reader.readArray<[UInt160, UInt160]>(() => {
       const from = reader.readUInt160();
       const to = reader.readUInt160();
-      return [from, to] as [UInt160, UInt160];
+
+      return [from, to];
     });
-    const voteUpdates = reader.readArray(() => {
+    const voteUpdates = reader.readArray<[UInt160, ReadonlyArray<ECPoint>]>(() => {
       const address = reader.readUInt160();
-      const votes = reader.readArray(() => reader.readECPoint());
-      return [address, votes] as [UInt160, ECPoint[]];
+      const votes = reader.readArray<ECPoint>(() => reader.readECPoint());
+
+      return [address, votes];
     });
     const blockIndex = reader.readUInt32LE();
     const transactionIndex = reader.readUInt32LE();
     const actionIndexStart = reader.readUInt64LE();
     const actionIndexStop = reader.readUInt64LE();
     const result = deserializeInvocationResultWireBase(options);
+
     return new this({
       hash,
-      assetHash: common.uInt256Equal(assetHash, common.ZERO_UINT256)
-        ? undefined
-        : assetHash,
+      assetHash: common.uInt256Equal(assetHash, common.ZERO_UINT256) ? undefined : assetHash,
       contractHashes,
       deletedContractHashes,
       migratedContractHashes,
@@ -72,9 +68,7 @@ export class InvocationData implements SerializableWire<InvocationData> {
     });
   }
 
-  public static deserializeWire(
-    options: DeserializeWireOptions,
-  ): InvocationData {
+  public static deserializeWire(options: DeserializeWireOptions): InvocationData {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),
@@ -82,22 +76,20 @@ export class InvocationData implements SerializableWire<InvocationData> {
   }
 
   public readonly hash: UInt256;
-  public readonly assetHash: UInt256 | null | undefined;
-  public readonly contractHashes: UInt160[];
-  public readonly deletedContractHashes: UInt160[];
-  public readonly migratedContractHashes: Array<[UInt160, UInt160]>;
-  public readonly voteUpdates: Array<[UInt160, ECPoint[]]>;
+  public readonly assetHash: UInt256 | undefined;
+  public readonly contractHashes: ReadonlyArray<UInt160>;
+  public readonly deletedContractHashes: ReadonlyArray<UInt160>;
+  public readonly migratedContractHashes: ReadonlyArray<[UInt160, UInt160]>;
+  public readonly voteUpdates: ReadonlyArray<[UInt160, ReadonlyArray<ECPoint>]>;
   public readonly blockIndex: number;
   public readonly transactionIndex: number;
   public readonly actionIndexStart: BN;
   public readonly actionIndexStop: BN;
   public readonly result: InvocationResult;
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 
-  constructor({
+  public constructor({
     hash,
     assetHash,
     contractHashes,
@@ -125,25 +117,12 @@ export class InvocationData implements SerializableWire<InvocationData> {
       () =>
         IOHelper.sizeOfUInt256 +
         IOHelper.sizeOfUInt256 +
-        IOHelper.sizeOfArray(
-          this.contractHashes,
-          () => IOHelper.sizeOfUInt160,
-        ) +
-        IOHelper.sizeOfArray(
-          this.deletedContractHashes,
-          () => IOHelper.sizeOfUInt160,
-        ) +
-        IOHelper.sizeOfArray(
-          this.migratedContractHashes,
-          () => IOHelper.sizeOfUInt160,
-        ) +
+        IOHelper.sizeOfArray(this.contractHashes, () => IOHelper.sizeOfUInt160) +
+        IOHelper.sizeOfArray(this.deletedContractHashes, () => IOHelper.sizeOfUInt160) +
+        IOHelper.sizeOfArray(this.migratedContractHashes, () => IOHelper.sizeOfUInt160) +
         IOHelper.sizeOfArray(
           this.voteUpdates,
-          (value) =>
-            IOHelper.sizeOfUInt160 +
-            IOHelper.sizeOfArray(value[1], (val) =>
-              IOHelper.sizeOfECPoint(val),
-            ),
+          (value) => IOHelper.sizeOfUInt160 + IOHelper.sizeOfArray(value[1], (val) => IOHelper.sizeOfECPoint(val)),
         ) +
         IOHelper.sizeOfUInt32LE +
         IOHelper.sizeOfUInt32LE +
@@ -159,7 +138,7 @@ export class InvocationData implements SerializableWire<InvocationData> {
 
   public serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt256(this.hash);
-    writer.writeUInt256(this.assetHash || common.ZERO_UINT256);
+    writer.writeUInt256(this.assetHash === undefined ? common.ZERO_UINT256 : this.assetHash);
     writer.writeArray(this.contractHashes, (contractHash) => {
       writer.writeUInt160(contractHash);
     });

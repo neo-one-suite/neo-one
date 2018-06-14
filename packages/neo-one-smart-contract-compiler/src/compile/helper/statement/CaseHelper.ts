@@ -5,17 +5,17 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface Case {
-  condition: () => void;
-  whenTrue: () => void;
+  readonly condition: () => void;
+  readonly whenTrue: () => void;
 }
 
 // Input: []
 // Output: []
 export class CaseHelper extends Helper {
-  private readonly cases: Case[];
+  private readonly cases: ReadonlyArray<Case>;
   private readonly defaultCase: () => void;
 
-  constructor(cases: Case[], defaultCase: () => void) {
+  public constructor(cases: ReadonlyArray<Case>, defaultCase: () => void) {
     super();
     this.cases = cases;
     this.defaultCase = defaultCase;
@@ -25,12 +25,7 @@ export class CaseHelper extends Helper {
     this.addCase(sb, node, options);
   }
 
-  public addCase(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    idx: number = 0,
-  ): void {
+  public addCase(sb: ScriptBuilder, node: Node, options: VisitOptions, idx = 0): void {
     if (idx >= this.cases.length) {
       this.defaultCase();
     } else {

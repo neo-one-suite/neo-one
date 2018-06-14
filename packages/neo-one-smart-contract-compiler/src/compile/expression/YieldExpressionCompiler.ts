@@ -4,16 +4,10 @@ import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export default class YieldExpressionCompiler extends NodeCompiler<
-  YieldExpression
-> {
+export class YieldExpressionCompiler extends NodeCompiler<YieldExpression> {
   public readonly kind: SyntaxKind = SyntaxKind.YieldExpression;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    expr: YieldExpression,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, expr: YieldExpression, _options: VisitOptions): void {
     sb.reportUnsupported(expr);
   }
 }

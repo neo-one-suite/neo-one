@@ -1,12 +1,9 @@
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';
 
 export interface InteropInterfaceContractParameterJSON {
-  type: 'InteropInterface';
+  readonly type: 'InteropInterface';
 }
 
 export class InteropInterfaceContractParameter extends ContractParameterBase<
@@ -14,19 +11,16 @@ export class InteropInterfaceContractParameter extends ContractParameterBase<
   InteropInterfaceContractParameterJSON,
   ContractParameterType.InteropInterface
 > {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): InteropInterfaceContractParameter {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): InteropInterfaceContractParameter {
     super.deserializeContractParameterBaseWireBase(options);
+
     return new this();
   }
 
   public readonly type = ContractParameterType.InteropInterface;
   public readonly size: number = 0;
 
-  public serializeJSON(
-    context: SerializeJSONContext,
-  ): InteropInterfaceContractParameterJSON {
+  public serializeJSON(_context: SerializeJSONContext): InteropInterfaceContractParameterJSON {
     return {
       type: 'InteropInterface',
     };

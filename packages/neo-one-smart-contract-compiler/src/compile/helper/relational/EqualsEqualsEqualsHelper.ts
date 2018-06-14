@@ -7,17 +7,17 @@ import { Helper } from '../Helper';
 import * as typeUtils from '../../../typeUtils';
 
 export interface EqualsEqualsEqualsHelperOptions {
-  left: Node;
-  right: Node;
+  readonly left: Node;
+  readonly right: Node;
 }
 
 // Input: []
 // Output: [boolean]
-export class EqualsEqualsEqualsHelper extends Helper<Node> {
-  private left: Node;
-  private right: Node;
+export class EqualsEqualsEqualsHelper extends Helper {
+  private readonly left: Node;
+  private readonly right: Node;
 
-  constructor(options: EqualsEqualsEqualsHelperOptions) {
+  public constructor(options: EqualsEqualsEqualsHelperOptions) {
     super();
     this.left = options.left;
     this.right = options.right;
@@ -29,6 +29,7 @@ export class EqualsEqualsEqualsHelper extends Helper<Node> {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

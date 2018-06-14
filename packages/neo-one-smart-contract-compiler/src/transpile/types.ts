@@ -1,14 +1,14 @@
 import { ABI } from '@neo-one/client';
-import Ast, { SourceFile } from 'ts-simple-ast';
+import Project, { SourceFile } from 'ts-simple-ast';
 import { Context } from '../Context';
 
 export interface TranspileResult {
-  ast: Ast;
-  sourceFile: SourceFile;
-  abi: ABI;
-  context: Context;
+  readonly ast: Project;
+  readonly sourceFile: SourceFile;
+  readonly abi: ABI;
+  readonly context: Context;
 }
 
 export interface VisitOptions {
-  isSmartContract: boolean;
+  readonly isSmartContract: boolean;
 }

@@ -3,38 +3,33 @@ import { Node } from 'ts-simple-ast';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import {
-  FuncProperty,
-  InternalFunctionProperties,
-} from './InternalFunctionProperties';
+import { FuncProperty, InternalFunctionProperties } from './InternalFunctionProperties';
 
 // Input: [objectVal, this]
 // Output: [objectVal]
 export interface BindSingleFunctionHelperOptions {
-  type: 'single';
-  property: FuncProperty;
-  overwrite: boolean;
+  readonly type: 'single';
+  readonly property: FuncProperty;
+  readonly overwrite: boolean;
 }
 export interface BindBothFunctionHelperOptions {
-  type: 'both';
-  overwrite: boolean;
+  readonly type: 'both';
+  readonly overwrite: boolean;
 }
 
-export type BindFunctionObjectThisHelperOptions =
-  | BindSingleFunctionHelperOptions
-  | BindBothFunctionHelperOptions;
+export type BindFunctionObjectThisHelperOptions = BindSingleFunctionHelperOptions | BindBothFunctionHelperOptions;
 
 // Input: [objectVal, this]
 // Output: [objectVal]
 export class BindFunctionObjectThisHelper extends Helper {
-  private property: FuncProperty;
-  private both: boolean;
-  private overwrite: boolean;
+  private readonly property: FuncProperty;
+  private readonly both: boolean;
+  private readonly overwrite: boolean;
 
-  constructor(options: BindFunctionObjectThisHelperOptions) {
+  public constructor(options: BindFunctionObjectThisHelperOptions) {
     super();
     if (options.type === 'both') {
-      this.property = InternalFunctionProperties.CALL;
+      this.property = InternalFunctionProperties.Call;
       this.both = true;
     } else {
       this.property = options.property;
@@ -46,6 +41,7 @@ export class BindFunctionObjectThisHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 
@@ -53,18 +49,14 @@ export class BindFunctionObjectThisHelper extends Helper {
     sb.emitHelper(
       node,
       options,
-      sb.helpers.cloneFunctionObject(
-        this.both
-          ? { type: 'both' }
-          : { type: 'single', property: this.property },
-      ),
+      sb.helpers.cloneFunctionObject(this.both ? { type: 'both' } : { type: 'single', property: this.property }),
     );
     // [this, objectVal]
     sb.emitOp(node, 'SWAP');
 
     if (this.both) {
-      this.bindThis(sb, node, options, InternalFunctionProperties.CALL);
-      this.bindThis(sb, node, options, InternalFunctionProperties.CONSTRUCT);
+      this.bindThis(sb, node, options, InternalFunctionProperties.Call);
+      this.bindThis(sb, node, options, InternalFunctionProperties.Construct);
     } else {
       this.bindThis(sb, node, options, this.property);
     }
@@ -72,12 +64,7 @@ export class BindFunctionObjectThisHelper extends Helper {
     sb.emitOp(node, 'DROP');
   }
 
-  private bindThis(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    property: FuncProperty,
-  ): void {
+  private bindThis(sb: ScriptBuilder, node: Node, options: VisitOptions, property: FuncProperty): void {
     // [this, objectVal, this]
     sb.emitOp(node, 'TUCK');
     // [objectVal, this, objectVal, this]
@@ -87,11 +74,7 @@ export class BindFunctionObjectThisHelper extends Helper {
     // [func, this, objectVal, this]
     sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
     // [func, objectVal, this]
-    sb.emitHelper(
-      node,
-      options,
-      sb.helpers.bindFunctionThis({ overwrite: this.overwrite }),
-    );
+    sb.emitHelper(node, options, sb.helpers.bindFunctionThis({ overwrite: this.overwrite }));
     // [objectVal, this]
     sb.emitOp(node, 'DROP');
     // [this, objectVal]

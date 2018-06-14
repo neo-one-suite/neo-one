@@ -8,7 +8,7 @@ import { Helper } from '../Helper';
 import * as constants from '../../../constants';
 
 const isValidParent = (node?: Node) =>
-  node != null &&
+  node !== undefined &&
   (TypeGuards.isTryStatement(node) ||
     TypeGuards.isFunctionLikeDeclaration(node) ||
     TypeGuards.isArrowFunction(node) ||
@@ -37,27 +37,22 @@ export class HandleCompletionHelper extends Helper {
         whenFalse: () => {
           let parent = node.getParent();
           if (!isValidParent(parent)) {
-            parent = node.getParentWhile(
-              (parentNode) => !isValidParent(parentNode),
-            );
-            if (parent != null) {
+            parent = node.getParentWhile((parentNode) => !isValidParent(parentNode));
+            if (parent !== undefined) {
               parent = parent.getParent();
             }
           }
 
-          if (
-            TypeGuards.isSourceFile(node) ||
-            (parent != null && TypeGuards.isSourceFile(parent))
-          ) {
+          if (TypeGuards.isSourceFile(node) || (parent !== undefined && TypeGuards.isSourceFile(parent))) {
             sb.emitOp(node, 'THROW');
-          } else if (parent == null) {
+          } else if (parent === undefined) {
             sb.reportError(
               node,
               'Something went wrong, could not find a valid parent node.',
               DiagnosticCode.SOMETHING_WENT_WRONG,
             );
           } else if (TypeGuards.isTryStatement(parent)) {
-            if (options.catchPC == null) {
+            if (options.catchPC === undefined) {
               sb.reportError(
                 node,
                 'Something went wrong. Expected a catch jump location.',

@@ -14,26 +14,22 @@ export class ToNumberHelper extends TypedHelper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 
-    if (this.type != null) {
+    if (this.type !== undefined) {
       this.convertType(sb, node, options, this.type);
     } else {
       this.convertUnknown(sb, node, options);
     }
   }
 
-  private convertType(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    type: Type,
-  ): void {
+  private convertType(sb: ScriptBuilder, node: Node, options: VisitOptions, type: Type): void {
     if (typeUtils.isOnlyUndefined(type)) {
       this.convertUndefined(sb, node, options);
     } else if (typeUtils.isOnlyNull(type)) {
-      this.convertNull(sb, node, options);
+      this.convertNull(sb, node);
     } else if (typeUtils.isOnlyBoolean(type)) {
       this.convertBoolean(sb, node, options);
     } else if (typeUtils.isOnlyNumber(type)) {
@@ -49,30 +45,18 @@ export class ToNumberHelper extends TypedHelper {
     }
   }
 
-  private convertUndefined(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private convertUndefined(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     sb.emitHelper(node, options, sb.helpers.throwTypeError);
   }
 
-  private convertNull(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private convertNull(sb: ScriptBuilder, node: Node): void {
     // []
     sb.emitOp(node, 'DROP');
     // [0]
     sb.emitPushInt(node, 0);
   }
 
-  private convertBoolean(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private convertBoolean(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     sb.emitHelper(
       node,
       options,
@@ -92,36 +76,20 @@ export class ToNumberHelper extends TypedHelper {
     );
   }
 
-  private convertNumber(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private convertNumber(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [value]
     sb.emitHelper(node, options, sb.helpers.getNumber);
   }
 
-  private convertString(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private convertString(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     sb.emitHelper(node, options, sb.helpers.throwTypeError);
   }
 
-  private convertSymbol(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private convertSymbol(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     sb.emitHelper(node, options, sb.helpers.throwTypeError);
   }
 
-  private convertObject(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private convertObject(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [primitive]
     sb.emitHelper(
       node,
@@ -136,17 +104,8 @@ export class ToNumberHelper extends TypedHelper {
     this.convertUnknown(sb, node, options, true);
   }
 
-  private convertUnknown(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    shouldThrowOnObject: boolean = false,
-  ): void {
-    const emitIf = (
-      check: Helper<Node>,
-      whenTrue: () => void,
-      whenFalse: () => void,
-    ) =>
+  private convertUnknown(sb: ScriptBuilder, node: Node, options: VisitOptions, shouldThrowOnObject = false): void {
+    const emitIf = (check: Helper, whenTrue: () => void, whenFalse: () => void) =>
       sb.emitHelper(
         node,
         options,
@@ -172,7 +131,7 @@ export class ToNumberHelper extends TypedHelper {
           () =>
             emitIf(
               sb.helpers.isNull,
-              () => this.convertNull(sb, node, options),
+              () => this.convertNull(sb, node),
               () =>
                 emitIf(
                   sb.helpers.isBoolean,
@@ -185,14 +144,13 @@ export class ToNumberHelper extends TypedHelper {
                         emitIf(
                           sb.helpers.isSymbol,
                           () => this.convertSymbol(sb, node, options),
-                          () =>
-                            shouldThrowOnObject
-                              ? sb.emitHelper(
-                                  node,
-                                  options,
-                                  sb.helpers.throwTypeError,
-                                )
-                              : this.convertObject(sb, node, options),
+                          () => {
+                            if (shouldThrowOnObject) {
+                              sb.emitHelper(node, options, sb.helpers.throwTypeError);
+                            } else {
+                              this.convertObject(sb, node, options);
+                            }
+                          },
                         ),
                     ),
                 ),

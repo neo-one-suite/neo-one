@@ -1,3 +1,4 @@
+// tslint:disable readonly-keyword readonly-array no-object-mutation strict-boolean-expressions
 import {
   Address,
   constant,
@@ -22,21 +23,12 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   public abstract readonly icoAmount: Fixed<Decimals>;
   public abstract readonly maxLimitedRoundAmount: Fixed<Decimals>;
   private readonly kyc: SetStorage<Address> = new SetStorage();
-  private readonly tokensPerAssetLimitedRound: MapStorage<
-    Hash256,
-    Fixed<Decimals>
-  > = new MapStorage();
-  private readonly tokensPerAsset: MapStorage<
-    Hash256,
-    Fixed<Decimals>
-  > = new MapStorage();
-  private readonly limitedRoundRemaining: MapStorage<
-    Address,
-    Fixed<Decimals>
-  > = new MapStorage();
+  private readonly tokensPerAssetLimitedRound: MapStorage<Hash256, Fixed<Decimals>> = new MapStorage();
+  private readonly tokensPerAsset: MapStorage<Hash256, Fixed<Decimals>> = new MapStorage();
+  private readonly limitedRoundRemaining: MapStorage<Address, Fixed<Decimals>> = new MapStorage();
   private icoRemaining: Fixed<Decimals> = this.icoAmount;
 
-  constructor(
+  public constructor(
     owner: Address,
     public readonly startTimeSeconds: Integer,
     public readonly limitedRoundDurationSeconds: Integer,
@@ -50,11 +42,11 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   @verify
   public mintTokens(): void {
     if (!this.hasStarted()) {
-      this.onRefund();
+      onRefund();
       throw new Error('Crowdsale has not started');
     }
     if (this.hasEnded()) {
-      this.onRefund();
+      onRefund();
       throw new Error('Crowdsale has ended');
     }
 
@@ -65,7 +57,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
 
     const sender = references[0].address;
     if (!this.canParticipate(sender)) {
-      this.onRefund();
+      onRefund();
       throw new Error('Address has not been whitelised');
     }
     const amount = getCurrentTransaction()
@@ -74,26 +66,25 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
         const amountPerAsset = this.isLimitedRound()
           ? this.tokensPerAssetLimitedRound.get(output.asset)
           : this.tokensPerAsset.get(output.asset);
-        if (amountPerAsset == null) {
-          this.onRefund();
-          throw new Error(
-            `Asset ${output.asset} is not accepted for the crowdsale`,
-          );
+        if (amountPerAsset === null) {
+          onRefund();
+          throw new Error(`Asset ${output.asset} is not accepted for the crowdsale`);
         }
         const asset = getAsset(output.asset);
         const normalizedValue = output.value / 10 ** (8 - asset.precision);
+
         return acc + normalizedValue * amountPerAsset;
       }, 0);
 
     if (amount > this.icoRemaining) {
-      this.onRefund();
+      onRefund();
       throw new Error('Amount is greater than remaining ICO tokens');
     }
 
     if (this.isLimitedRound()) {
       const remaining = this.getRemainingLimitedRound(sender);
       if (amount > remaining) {
-        this.onRefund();
+        onRefund();
         throw new Error('Limited round maximum contribution reached.');
       }
       this.limitedRoundRemaining.set(sender, remaining - amount);
@@ -115,10 +106,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
     return this.tokensPerAsset.get(asset) || 0;
   }
 
-  public setLimitedRoundExchange(
-    asset: Hash256,
-    tokens: Fixed<Decimals>,
-  ): void {
+  public setLimitedRoundExchange(asset: Hash256, tokens: Fixed<Decimals>): void {
     verifySender(this.owner);
     if (this.hasStarted()) {
       throw new Error('Cannot change token amount once crowdsale has started');
@@ -134,7 +122,8 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   @constant
   public getRemainingLimitedRound(address: Address): Fixed<Decimals> {
     const remaining = this.limitedRoundRemaining.get(address);
-    return remaining == null ? this.maxLimitedRoundAmount : remaining;
+
+    return remaining === null ? this.maxLimitedRoundAmount : remaining;
   }
 
   public endICO(): void {
@@ -172,14 +161,6 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   }
 
   private isLimitedRound(): boolean {
-    return (
-      this.hasStarted() &&
-      getCurrentTime() <
-        this.startTimeSeconds + this.limitedRoundDurationSeconds
-    );
-  }
-
-  private onRefund(): void {
-    onRefund();
+    return this.hasStarted() && getCurrentTime() < this.startTimeSeconds + this.limitedRoundDurationSeconds;
   }
 }

@@ -1,15 +1,12 @@
 import { common, ECPoint } from '../common';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';
 
 export interface PublicKeyContractParameterJSON {
-  type: 'PublicKey';
-  value: string;
+  readonly type: 'PublicKey';
+  readonly value: string;
 }
 
 export class PublicKeyContractParameter extends ContractParameterBase<
@@ -17,9 +14,7 @@ export class PublicKeyContractParameter extends ContractParameterBase<
   PublicKeyContractParameterJSON,
   ContractParameterType.PublicKey
 > {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): PublicKeyContractParameter {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): PublicKeyContractParameter {
     const { reader } = options;
     super.deserializeContractParameterBaseWireBase(options);
     const value = reader.readECPoint();
@@ -31,7 +26,7 @@ export class PublicKeyContractParameter extends ContractParameterBase<
   public readonly value: ECPoint;
   private readonly sizeInternal: () => number;
 
-  constructor(value: ECPoint) {
+  public constructor(value: ECPoint) {
     super();
     this.value = value;
     this.sizeInternal = utils.lazy(() => IOHelper.sizeOfECPoint(this.value));
@@ -50,9 +45,7 @@ export class PublicKeyContractParameter extends ContractParameterBase<
     writer.writeECPoint(this.value);
   }
 
-  public serializeJSON(
-    context: SerializeJSONContext,
-  ): PublicKeyContractParameterJSON {
+  public serializeJSON(_context: SerializeJSONContext): PublicKeyContractParameterJSON {
     return {
       type: 'PublicKey',
       value: JSONHelper.writeECPoint(this.value),

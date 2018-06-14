@@ -7,13 +7,14 @@ import { Types } from './Types';
 
 // Input: [value]
 // Output: [val]
-export abstract class CreatePrimitiveHelper extends Helper<Node> {
-  protected length = 2;
-  protected abstract type: Types;
+export abstract class CreatePrimitiveHelper extends Helper {
+  protected readonly length: number = 2;
+  protected abstract readonly type: Types;
 
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

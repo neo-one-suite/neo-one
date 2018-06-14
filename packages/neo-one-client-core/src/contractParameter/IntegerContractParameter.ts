@@ -1,15 +1,12 @@
 import BN from 'bn.js';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, utils } from '../utils';
 import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';
 
 export interface IntegerContractParameterJSON {
-  type: 'Integer';
-  value: string;
+  readonly type: 'Integer';
+  readonly value: string;
 }
 
 export class IntegerContractParameter extends ContractParameterBase<
@@ -17,9 +14,7 @@ export class IntegerContractParameter extends ContractParameterBase<
   IntegerContractParameterJSON,
   ContractParameterType.Integer
 > {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): IntegerContractParameter {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): IntegerContractParameter {
     const { reader } = options;
     super.deserializeContractParameterBaseWireBase(options);
     const value = utils.fromSignedBuffer(reader.readVarBytesLE());
@@ -31,12 +26,10 @@ export class IntegerContractParameter extends ContractParameterBase<
   public readonly value: BN;
   private readonly sizeInternal: () => number;
 
-  constructor(value: BN) {
+  public constructor(value: BN) {
     super();
     this.value = value;
-    this.sizeInternal = utils.lazy(() =>
-      IOHelper.sizeOfVarBytesLE(utils.toSignedBuffer(this.value)),
-    );
+    this.sizeInternal = utils.lazy(() => IOHelper.sizeOfVarBytesLE(utils.toSignedBuffer(this.value)));
   }
 
   public get size(): number {
@@ -56,9 +49,7 @@ export class IntegerContractParameter extends ContractParameterBase<
     writer.writeVarBytesLE(utils.toSignedBuffer(this.value));
   }
 
-  public serializeJSON(
-    context: SerializeJSONContext,
-  ): IntegerContractParameterJSON {
+  public serializeJSON(_context: SerializeJSONContext): IntegerContractParameterJSON {
     return {
       type: 'Integer',
       value: this.value.toString(10),

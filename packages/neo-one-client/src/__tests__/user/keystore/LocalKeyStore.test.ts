@@ -2,12 +2,7 @@ import { common, crypto } from '@neo-one/client-core';
 import { LockedAccountError, UnknownAccountError } from '../../../errors';
 import * as helpers from '../../../helpers';
 import { UserAccount, UserAccountID } from '../../../types';
-import {
-  LocalKeyStore,
-  LockedWallet,
-  UnlockedWallet,
-  Wallet,
-} from '../../../user/keystore/LocalKeyStore';
+import { LocalKeyStore, LockedWallet, UnlockedWallet, Wallet } from '../../../user/keystore/LocalKeyStore';
 
 describe('LocalKeyStore', () => {
   const id1: UserAccountID = {
@@ -188,9 +183,7 @@ describe('LocalKeyStore', () => {
       name: account2.name,
     });
 
-    expect(result).rejects.toEqual(
-      new Error('Expected private key or password and NEP-2 key'),
-    );
+    expect(result).rejects.toEqual(new Error('Expected private key or password and NEP-2 key'));
   });
 
   test('addAccount sets privateKey when given nep2+password', async () => {
@@ -217,16 +210,10 @@ describe('LocalKeyStore', () => {
       type: 'unlocked',
     };
 
-    (helpers as any).privateKeyToPublicKey = jest.fn(
-      () => accountMain.publicKey,
-    );
-    (helpers as any).publicKeyToScriptHash = jest.fn(
-      () => accountMain.scriptHash,
-    );
+    (helpers as any).privateKeyToPublicKey = jest.fn(() => accountMain.publicKey);
+    (helpers as any).publicKeyToScriptHash = jest.fn(() => accountMain.scriptHash);
     (helpers as any).scriptHashToAddress = jest.fn(() => idMain.address);
-    (helpers as any).decryptNEP2 = jest.fn(() =>
-      Promise.resolve(walletMain.privateKey),
-    );
+    (helpers as any).decryptNEP2 = jest.fn(() => Promise.resolve(walletMain.privateKey));
 
     const result = await localKeyStore.addAccount({
       network: 'main',
@@ -261,16 +248,10 @@ describe('LocalKeyStore', () => {
       type: 'unlocked',
     };
 
-    (helpers as any).privateKeyToPublicKey = jest.fn(
-      () => accountMain.publicKey,
-    );
-    (helpers as any).publicKeyToScriptHash = jest.fn(
-      () => accountMain.scriptHash,
-    );
+    (helpers as any).privateKeyToPublicKey = jest.fn(() => accountMain.publicKey);
+    (helpers as any).publicKeyToScriptHash = jest.fn(() => accountMain.scriptHash);
     (helpers as any).scriptHashToAddress = jest.fn(() => idMain.address);
-    (helpers as any).encryptNEP2 = jest.fn(() =>
-      Promise.resolve(walletMain.nep2),
-    );
+    (helpers as any).encryptNEP2 = jest.fn(() => Promise.resolve(walletMain.nep2));
 
     const result = await localKeyStore.addAccount({
       network: 'main',
@@ -533,9 +514,7 @@ describe('LocalKeyStore', () => {
         id: id1,
         password: 'pass',
       }),
-    ).rejects.toThrow(new Error(
-      'Unexpected error, privateKey and NEP2 were both null.',
-    ) as any);
+    ).rejects.toThrow(new Error('Unexpected error, privateKey and NEP2 were both null.') as any);
   });
 
   test('lockWallet', async () => {

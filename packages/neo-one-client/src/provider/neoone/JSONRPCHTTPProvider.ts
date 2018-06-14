@@ -2,7 +2,7 @@ import { Monitor } from '@neo-one/monitor';
 import { labels, utils } from '@neo-one/utils';
 import DataLoader from 'dataloader';
 import stringify from 'fast-stable-stringify';
-import fetch from 'isomorphic-fetch';
+import _fetch from 'isomorphic-fetch';
 import { UnknownBlockError } from '../../errors';
 import { HTTPError, InvalidRPCResponseError, JSONRPCError } from './errors';
 import { JSONRPCProvider, JSONRPCRequest } from './JSONRPCProvider';
@@ -13,18 +13,18 @@ const WATCH_TIMEOUT_MS = 5000;
 const PARSE_ERROR_CODE = -32700;
 const PARSE_ERROR_MESSAGE = 'Parse error';
 
-const instrumentFetch = (
-  doFetch: (headers: object) => Promise<any>,
+const instrumentFetch = async <T extends { readonly status: number }>(
+  doFetch: (headers: object) => Promise<T>,
   endpoint: string,
   type: 'fetch' | 'watch',
   monitor?: Monitor,
-  monitors?: Monitor[],
+  monitors: ReadonlyArray<Monitor> = [],
 ) => {
   const headers = {
     'Content-Type': 'application/json',
   };
 
-  if (monitor == null) {
+  if (monitor === undefined) {
     return doFetch(headers);
   }
 
@@ -36,11 +36,13 @@ const instrumentFetch = (
     })
     .captureSpanLog(
       async (span) => {
-        span.inject(monitor.formats.HTTP, headers);
+        // tslint:disable-next-line no-any
+        span.inject(monitor.formats.HTTP, headers as any);
         let status = -1;
         try {
           const resp = await doFetch(headers);
-          ({ status } = resp);
+          status = resp.status;
+
           return resp;
         } finally {
           span.setLabels({ [monitor.labels.HTTP_STATUS_CODE]: status });
@@ -49,43 +51,42 @@ const instrumentFetch = (
       {
         name: 'http_client_request',
         level: { log: 'verbose', span: 'info' },
-        references: (monitors || [])
-          .slice(1)
-          .map((parent) => monitor.childOf(parent)),
+        references: monitors.slice(1).map((parent) => monitor.childOf(parent)),
         trace: true,
       },
     );
 };
 
-const request = async ({
+const doRequest = async ({
   endpoint,
   requests,
   timeoutMS,
-  tries: triesIn,
+  tries,
 }: {
-  endpoint: string;
-  requests: ReadonlyArray<{ monitor?: Monitor; request: object }>;
-  timeoutMS: number;
-  tries: number;
+  readonly endpoint: string;
+  readonly requests: ReadonlyArray<{ readonly monitor?: Monitor; readonly request: object }>;
+  readonly timeoutMS: number;
+  readonly tries: number;
 }) => {
   const monitors = requests.map((req) => req.monitor).filter(utils.notNull);
   const monitor = monitors[0];
   const body = JSON.stringify(requests.map((req) => req.request));
 
-  let tries = triesIn;
+  let remainingTries = tries;
   let parseErrorTries = 3;
   let result;
-  let finalError;
-  while (tries >= 0) {
+  let finalError: Error | undefined;
+  // tslint:disable-next-line no-loop-statement
+  while (remainingTries >= 0) {
     try {
-      // eslint-disable-next-line
       const response = await instrumentFetch(
-        (headers) =>
-          fetch(endpoint, {
+        async (headers) =>
+          _fetch(endpoint, {
             method: 'POST',
             headers,
             body,
             timeout: timeoutMS,
+            // tslint:disable-next-line no-any
           } as any),
         endpoint,
         'fetch',
@@ -94,11 +95,11 @@ const request = async ({
       );
 
       if (!response.ok) {
-        let text = null;
+        let text;
         try {
           // eslint-disable-next-line
           text = await response.text();
-        } catch (error) {
+        } catch {
           // Ignore errors
         }
         throw new HTTPError(response.status, text);
@@ -107,9 +108,11 @@ const request = async ({
       result = await response.json();
       if (Array.isArray(result)) {
         return result;
-      } else if (
+      }
+
+      if (
         typeof result === 'object' &&
-        result.error != null &&
+        result.error !== undefined &&
         typeof result.error === 'object' &&
         typeof result.error.code === 'number' &&
         typeof result.error.message === 'string'
@@ -119,7 +122,7 @@ const request = async ({
           result.error.message === PARSE_ERROR_MESSAGE &&
           parseErrorTries > 0
         ) {
-          tries += 1;
+          remainingTries += 1;
           parseErrorTries -= 1;
         } else {
           throw new JSONRPCError(result.error);
@@ -129,9 +132,9 @@ const request = async ({
       finalError = error;
     }
 
-    tries -= 1;
+    remainingTries -= 1;
   }
-  if (finalError != null) {
+  if (finalError !== undefined) {
     throw finalError;
   }
 
@@ -140,22 +143,23 @@ const request = async ({
 
 const watchSingle = async ({
   endpoint,
-  request: req,
+  req,
   timeoutMS,
   monitor,
 }: {
-  endpoint: string;
-  request: object;
-  timeoutMS: number;
-  monitor?: Monitor;
+  readonly endpoint: string;
+  readonly req: object;
+  readonly timeoutMS: number;
+  readonly monitor?: Monitor;
 }) => {
   const response = await instrumentFetch(
-    (headers) =>
-      fetch(endpoint, {
+    async (headers) =>
+      _fetch(endpoint, {
         method: 'POST',
         headers,
         body: JSON.stringify(req),
         timeout: timeoutMS + WATCH_TIMEOUT_MS,
+        // tslint:disable-next-line no-any
       } as any),
     endpoint,
     'watch',
@@ -163,24 +167,22 @@ const watchSingle = async ({
   );
 
   if (!response.ok) {
-    let text = null;
+    let text: string | undefined;
     try {
       text = await response.text();
-    } catch (error) {
+    } catch {
       // Ignore errors
     }
     throw new HTTPError(response.status, text);
   }
-  const result = await response.json();
-  return result;
+
+  return response.json();
 };
 
+// tslint:disable-next-line no-any
 const handleResponse = (responseJSON: any): any => {
-  if (responseJSON.error != null) {
-    if (
-      responseJSON.error.code === -100 &&
-      responseJSON.error.message === 'Unknown block'
-    ) {
+  if (responseJSON.error !== undefined) {
+    if (responseJSON.error.code === -100 && responseJSON.error.message === 'Unknown block') {
       throw new UnknownBlockError();
     }
     throw new JSONRPCError(responseJSON.error);
@@ -191,31 +193,32 @@ const handleResponse = (responseJSON: any): any => {
 
 export class JSONRPCHTTPProvider implements JSONRPCProvider {
   public readonly endpoint: string;
-  public readonly batcher: DataLoader<{ monitor?: Monitor; request: any }, any>;
+  // tslint:disable-next-line no-any
+  public readonly batcher: DataLoader<{ readonly monitor?: Monitor; readonly request: any }, any>;
 
-  constructor(endpoint: string) {
+  public constructor(endpoint: string) {
     this.endpoint = endpoint;
     this.batcher = new DataLoader(
       async (requests) => {
         this.batcher.clearAll();
-        const result = await request({
+
+        return doRequest({
           endpoint,
           requests,
           tries: 1,
           timeoutMS: TIMEOUT_MS,
         });
-
-        return result;
       },
       {
         maxBatchSize: 25,
-        cacheKeyFn: (value: any) => stringify(value.request),
+        cacheKeyFn: (value) => stringify(value.request),
       },
     );
   }
 
-  public request(req: JSONRPCRequest, monitor?: Monitor): Promise<any> {
-    if (monitor != null) {
+  // tslint:disable-next-line no-any
+  public async request(req: JSONRPCRequest, monitor?: Monitor): Promise<any> {
+    if (monitor !== undefined) {
       return monitor
         .at('jsonrpc_http_provider')
         .withLabels({
@@ -223,7 +226,7 @@ export class JSONRPCHTTPProvider implements JSONRPCProvider {
           [monitor.labels.RPC_METHOD]: req.method,
           [monitor.labels.SPAN_KIND]: 'client',
         })
-        .captureSpanLog((span) => this.requestInternal(req, span), {
+        .captureSpanLog(async (span) => this.requestInternal(req, span), {
           name: 'jsonrpc_client_request',
           level: { log: 'verbose', span: 'info' },
           error: { level: 'verbose' },
@@ -234,20 +237,18 @@ export class JSONRPCHTTPProvider implements JSONRPCProvider {
     return this.requestInternal(req);
   }
 
-  private async requestInternal(
-    req: JSONRPCRequest,
-    monitor?: Monitor,
-  ): Promise<any> {
+  // tslint:disable-next-line no-any
+  private async requestInternal(req: JSONRPCRequest, monitor?: Monitor): Promise<any> {
     let response;
-    const { watchTimeoutMS } = req;
-    if (watchTimeoutMS != null) {
+    const { watchTimeoutMS, params = [] } = req;
+    if (watchTimeoutMS !== undefined) {
       response = await watchSingle({
         endpoint: this.endpoint,
-        request: {
+        req: {
           jsonrpc: '2.0',
           id: 1,
           method: req.method,
-          params: (req.params || []).concat([watchTimeoutMS]),
+          params: params.concat([watchTimeoutMS]),
         },
 
         timeoutMS: watchTimeoutMS,
@@ -259,8 +260,8 @@ export class JSONRPCHTTPProvider implements JSONRPCProvider {
         request: {
           jsonrpc: '2.0',
           id: 1,
-          params: [],
-          ...req,
+          method: req.method,
+          params,
         },
       });
     }

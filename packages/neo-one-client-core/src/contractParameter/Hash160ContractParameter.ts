@@ -1,15 +1,12 @@
 import { common, UInt160 } from '../common';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';
 
 export interface Hash160ContractParameterJSON {
-  type: 'Hash160';
-  value: string;
+  readonly type: 'Hash160';
+  readonly value: string;
 }
 
 export class Hash160ContractParameter extends ContractParameterBase<
@@ -17,9 +14,7 @@ export class Hash160ContractParameter extends ContractParameterBase<
   Hash160ContractParameterJSON,
   ContractParameterType.Hash160
 > {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): Hash160ContractParameter {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): Hash160ContractParameter {
     const { reader } = options;
     super.deserializeContractParameterBaseWireBase(options);
     const value = reader.readUInt160();
@@ -31,7 +26,7 @@ export class Hash160ContractParameter extends ContractParameterBase<
   public readonly value: UInt160;
   private readonly sizeInternal: () => number;
 
-  constructor(value: UInt160) {
+  public constructor(value: UInt160) {
     super();
     this.value = value;
     this.sizeInternal = utils.lazy(() => IOHelper.sizeOfUInt160);
@@ -50,9 +45,7 @@ export class Hash160ContractParameter extends ContractParameterBase<
     writer.writeUInt160(this.value);
   }
 
-  public serializeJSON(
-    context: SerializeJSONContext,
-  ): Hash160ContractParameterJSON {
+  public serializeJSON(_context: SerializeJSONContext): Hash160ContractParameterJSON {
     return {
       type: 'Hash160',
       value: JSONHelper.writeUInt160(this.value),

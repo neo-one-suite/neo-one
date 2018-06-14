@@ -8,17 +8,13 @@ import { AddConstructorObjectHelper } from './AddConstructorObjectHelper';
 // Input: [objectPrototypeVal, globalObjectVal]
 // Output: [objectPrototypeVal, globalObjectVal]
 export class AddErrorObjectHelper extends AddConstructorObjectHelper {
-  protected name: string = 'Error';
+  protected readonly name = 'Error';
 
-  protected addConstructorProperties(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  protected addConstructorProperties(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [objectVal, objectVal, globalObjectVal]
     sb.emitOp(node, 'DUP');
     // ['construct', objectVal, objectVal, globalObjectVal]
-    sb.emitPushString(node, InternalFunctionProperties.CONSTRUCT);
+    sb.emitPushString(node, InternalFunctionProperties.Construct);
     // [func, 'construct', objectVal, objectVal, globalObjectVal]
     sb.emitHelper(
       node,

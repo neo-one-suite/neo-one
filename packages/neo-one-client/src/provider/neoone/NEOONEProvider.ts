@@ -19,34 +19,33 @@ import {
 import { NEOONEDataProvider } from './NEOONEDataProvider';
 
 export interface NEOONEProviderOptions {
-  network: NetworkType;
-  rpcURL: string;
+  readonly network: NetworkType;
+  readonly rpcURL: string;
 }
 
 export class NEOONEProvider {
-  public readonly networks$: Observable<NetworkType[]>;
-  private readonly networksInternal$: BehaviorSubject<NetworkType[]>;
-  private readonly providers: { [type: string]: NEOONEDataProvider };
+  public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
+  private readonly networksInternal$: BehaviorSubject<ReadonlyArray<NetworkType>>;
+  private readonly mutableProviders: { [K in string]?: NEOONEDataProvider };
 
-  constructor(
+  public constructor(
     input: {
-      mainRPCURL?: string;
-      testRPCURL?: string;
-      options?: NEOONEProviderOptions[];
+      readonly mainRPCURL?: string;
+      readonly testRPCURL?: string;
+      readonly options?: ReadonlyArray<NEOONEProviderOptions>;
     } = {},
   ) {
-    const {
-      mainRPCURL: mainRPCURLIn,
-      testRPCURL: testRPCURLIn,
-      options,
-    } = input;
-    this.networksInternal$ = new BehaviorSubject([] as NetworkType[]);
+    const { mainRPCURL = networkConfigs.MAIN_URL, testRPCURL = networkConfigs.TEST_URL, options = [] } = input;
+    this.networksInternal$ = new BehaviorSubject([] as ReadonlyArray<NetworkType>);
     this.networks$ = this.networksInternal$;
-    this.providers = {};
+    this.mutableProviders = {};
 
+    // tslint:disable-next-line no-let
     let hasMain = false;
+    // tslint:disable-next-line no-let
     let hasTest = false;
-    const networks = (options || []).map(({ network, rpcURL }) => {
+    // tslint:disable-next-line no-let
+    let networks = options.map(({ network, rpcURL }) => {
       if (network === networkConfigs.MAIN) {
         hasMain = true;
       }
@@ -55,7 +54,7 @@ export class NEOONEProvider {
         hasTest = true;
       }
 
-      this.providers[network] = new NEOONEDataProvider({
+      this.mutableProviders[network] = new NEOONEDataProvider({
         network,
         rpcURL,
       });
@@ -64,74 +63,57 @@ export class NEOONEProvider {
     });
 
     if (!hasMain) {
-      const mainRPCURL =
-        mainRPCURLIn == null ? networkConfigs.MAIN_URL : mainRPCURLIn;
-      this.providers.main = new NEOONEDataProvider({
+      this.mutableProviders.main = new NEOONEDataProvider({
         network: networkConfigs.MAIN,
         rpcURL: mainRPCURL,
       });
 
-      networks.push(networkConfigs.MAIN);
+      networks = networks.concat([networkConfigs.MAIN]);
     }
 
     if (!hasTest) {
-      const testRPCURL =
-        testRPCURLIn == null ? networkConfigs.TEST_URL : testRPCURLIn;
-      this.providers.test = new NEOONEDataProvider({
+      this.mutableProviders.test = new NEOONEDataProvider({
         network: networkConfigs.TEST,
         rpcURL: testRPCURL,
       });
 
-      networks.push(networkConfigs.TEST);
+      networks = networks.concat([networkConfigs.TEST]);
     }
 
     this.networksInternal$.next(networks);
   }
 
-  public getNetworks(): NetworkType[] {
+  public getNetworks(): ReadonlyArray<NetworkType> {
     return this.networksInternal$.getValue();
   }
 
-  public addNetwork({
-    network,
-    rpcURL,
-  }: {
-    network: NetworkType;
-    rpcURL: string;
-  }): void {
-    this.providers[network] = new NEOONEDataProvider({ network, rpcURL });
-    const networks = this.networksInternal$.value.filter(
-      (net) => network !== net,
-    );
-    networks.push(network);
+  public addNetwork({ network, rpcURL }: { readonly network: NetworkType; readonly rpcURL: string }): void {
+    this.mutableProviders[network] = new NEOONEDataProvider({ network, rpcURL });
+    const networks = this.networksInternal$.value.filter((net) => network !== net).concat([network]);
     this.networksInternal$.next(networks);
   }
 
-  public getUnclaimed(
+  public async getUnclaimed(
     network: NetworkType,
     address: AddressString,
     monitor?: Monitor,
-  ): Promise<{ unclaimed: Input[]; amount: BigNumber }> {
+  ): Promise<{ readonly unclaimed: ReadonlyArray<Input>; readonly amount: BigNumber }> {
     return this.getProvider(network).getUnclaimed(address, monitor);
   }
 
-  public getUnspentOutputs(
+  public async getUnspentOutputs(
     network: NetworkType,
     address: AddressString,
     monitor?: Monitor,
-  ): Promise<UnspentOutput[]> {
+  ): Promise<ReadonlyArray<UnspentOutput>> {
     return this.getProvider(network).getUnspentOutputs(address, monitor);
   }
 
-  public relayTransaction(
-    network: NetworkType,
-    transaction: string,
-    monitor?: Monitor,
-  ): Promise<Transaction> {
+  public async relayTransaction(network: NetworkType, transaction: string, monitor?: Monitor): Promise<Transaction> {
     return this.getProvider(network).relayTransaction(transaction, monitor);
   }
 
-  public getTransactionReceipt(
+  public async getTransactionReceipt(
     network: NetworkType,
     hash: Hash256String,
     options?: GetOptions,
@@ -139,7 +121,7 @@ export class NEOONEProvider {
     return this.getProvider(network).getTransactionReceipt(hash, options);
   }
 
-  public getInvocationData(
+  public async getInvocationData(
     network: NetworkType,
     hash: Hash256String,
     monitor?: Monitor,
@@ -147,18 +129,11 @@ export class NEOONEProvider {
     return this.getProvider(network).getInvocationData(hash, monitor);
   }
 
-  public testInvoke(
-    network: NetworkType,
-    transaction: string,
-    monitor?: Monitor,
-  ): Promise<RawInvocationResult> {
+  public async testInvoke(network: NetworkType, transaction: string, monitor?: Monitor): Promise<RawInvocationResult> {
     return this.getProvider(network).testInvoke(transaction, monitor);
   }
 
-  public getNetworkSettings(
-    network: NetworkType,
-    monitor?: Monitor,
-  ): Promise<NetworkSettings> {
+  public async getNetworkSettings(network: NetworkType, monitor?: Monitor): Promise<NetworkSettings> {
     return this.getProvider(network).getNetworkSettings(monitor);
   }
 
@@ -167,8 +142,8 @@ export class NEOONEProvider {
   }
 
   private getProvider(network: NetworkType): NEOONEDataProvider {
-    const provider = this.providers[network];
-    if (provider == null) {
+    const provider = this.mutableProviders[network];
+    if (provider === undefined) {
       throw new UnknownNetworkError(network);
     }
 

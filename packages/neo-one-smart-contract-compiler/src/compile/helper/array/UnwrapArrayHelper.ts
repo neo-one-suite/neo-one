@@ -10,6 +10,7 @@ export class UnwrapArrayHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

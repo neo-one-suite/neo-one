@@ -9,23 +9,20 @@ import { Name, Scope } from './Scope';
 import * as constants from '../../constants';
 
 class IdentifierName implements Name {
-  public nameBrand: number = 0;
-  constructor(public readonly value: string) {}
+  public readonly nameBrand = 0;
+  public constructor(public readonly value: string) {}
 }
 
 export class ResolvedScope implements Scope {
-  private position: number = 0;
-  private variables: { [name: string]: number } = {};
-  private uniqueVariables: Map<Name, number> = new Map();
-  private scopeLength: number;
-  private addScope: boolean;
-  private scopeCount: number;
+  private mutablePosition = 0;
+  private readonly mutableVariables: { [K in string]?: number } = {};
+  private readonly uniqueVariables: Map<Name, number> = new Map();
+  private readonly scopeLength: number;
+  private readonly addScope: boolean;
+  private readonly scopeCount: number;
 
-  constructor(
-    private readonly variableCount: number,
-    private readonly parent?: ResolvedScope | undefined,
-  ) {
-    if (this.parent == null) {
+  public constructor(private readonly variableCount: number, private readonly parent?: ResolvedScope | undefined) {
+    if (this.parent === undefined) {
       this.addScope = true;
       this.scopeCount = 1;
       this.scopeLength = 1;
@@ -38,34 +35,30 @@ export class ResolvedScope implements Scope {
 
   public add(name: string): Name {
     const identifier = new IdentifierName(name);
-    const existing = this.variables[name];
-    if (existing != null) {
+    const existing = this.mutableVariables[name];
+    if (existing !== undefined) {
       return identifier;
     }
 
-    this.variables[identifier.value] = this.position;
-    this.position += 1;
-    if (this.position > this.variableCount) {
+    this.mutableVariables[identifier.value] = this.mutablePosition;
+    this.mutablePosition += 1;
+    if (this.mutablePosition > this.variableCount) {
       throw new Error(
-        `Something went wrong. Name: ${name} Position: ${
-          this.position
-        } Count: ${this.variableCount}`,
+        `Something went wrong. Name: ${name} Position: ${this.mutablePosition} Count: ${this.variableCount}`,
       );
     }
+
     return identifier;
   }
 
   public addUnique(): Name {
     const name = { nameBrand: 0 };
-    this.uniqueVariables.set(name, this.position);
-    this.position += 1;
-    if (this.position > this.variableCount) {
-      throw new Error(
-        `Something went wrong. Position: ${this.position} Count: ${
-          this.variableCount
-        }`,
-      );
+    this.uniqueVariables.set(name, this.mutablePosition);
+    this.mutablePosition += 1;
+    if (this.mutablePosition > this.variableCount) {
+      throw new Error(`Something went wrong. Position: ${this.mutablePosition} Count: ${this.variableCount}`);
     }
+
     return name;
   }
 
@@ -76,26 +69,15 @@ export class ResolvedScope implements Scope {
     optionsIn: VisitOptions,
     name: Name | string,
     scopeLength: number = this.scopeLength,
-    scopePosition: number = 0,
+    scopePosition = 0,
   ): void {
     const options = sb.pushValueOptions(optionsIn);
     const position = this.getPosition(name);
-    if (position == null) {
-      if (this.parent == null) {
-        sb.reportError(
-          node,
-          `Unknown reference: ${name}`,
-          DiagnosticCode.REFERENCE_ERROR,
-        );
+    if (position === undefined) {
+      if (this.parent === undefined) {
+        sb.reportError(node, `Unknown reference: ${name}`, DiagnosticCode.REFERENCE_ERROR);
       } else {
-        this.parent.set(
-          sb,
-          node,
-          options,
-          name,
-          scopeLength,
-          scopePosition + this.scopeCount,
-        );
+        this.parent.set(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }
     } else {
       // [normal]
@@ -117,34 +99,19 @@ export class ResolvedScope implements Scope {
     options: VisitOptions,
     name: Name | string,
     scopeLength: number = this.scopeLength,
-    scopePosition: number = 0,
+    scopePosition = 0,
   ): void {
     const position = this.getPosition(name);
-    if (position == null) {
-      if (this.parent == null) {
+    if (position === undefined) {
+      if (this.parent === undefined) {
         if (typeof name === 'string' && sb.helpers.globalProperties.has(name)) {
           // [val]
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.getGlobalProperty({ property: name }),
-          );
+          sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: name }));
         } else {
-          sb.reportError(
-            node,
-            `Unknown reference: ${name}`,
-            DiagnosticCode.REFERENCE_ERROR,
-          );
+          sb.reportError(node, `Unknown reference: ${name}`, DiagnosticCode.REFERENCE_ERROR);
         }
       } else {
-        this.parent.get(
-          sb,
-          node,
-          options,
-          name,
-          scopeLength,
-          scopePosition + this.scopeCount,
-        );
+        this.parent.get(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }
     } else {
       this.loadScope(sb, node, scopeLength, scopePosition);
@@ -154,7 +121,7 @@ export class ResolvedScope implements Scope {
     }
   }
 
-  public getThis(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public getThis(sb: ScriptBuilder, node: Node, _options: VisitOptions): void {
     // [[scopes, this]]
     this.loadAll(sb, node);
     // [1, [scopes, this]]
@@ -163,7 +130,7 @@ export class ResolvedScope implements Scope {
     sb.emitOp(node, 'PICKITEM');
   }
 
-  public setThis(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public setThis(sb: ScriptBuilder, node: Node, _options: VisitOptions): void {
     // [[scopes, this], val]
     this.loadAll(sb, node);
     // [1, [scopes, this], val]
@@ -175,7 +142,7 @@ export class ResolvedScope implements Scope {
   }
 
   public getGlobal(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
-    if (this.parent == null) {
+    if (this.parent === undefined) {
       // [[scopes, this, global]]
       this.loadAll(sb, node);
       // [2, [scopes, this, global]]
@@ -188,7 +155,7 @@ export class ResolvedScope implements Scope {
   }
 
   public setGlobal(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
-    if (this.parent == null) {
+    if (this.parent === undefined) {
       // [[scopes, this, global], val]
       this.loadAll(sb, node);
       // [[scopes, this, global], val, [scopes, this, global]]
@@ -213,22 +180,14 @@ export class ResolvedScope implements Scope {
   }
 
   public hasBinding(name: string): boolean {
-    return (
-      this.variables[name] != null ||
-      (this.parent != null && this.parent.hasBinding(name))
-    );
+    return this.mutableVariables[name] !== undefined || (this.parent !== undefined && this.parent.hasBinding(name));
   }
 
-  public pushAll(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public pushAll(sb: ScriptBuilder, node: Node, _options: VisitOptions): void {
     sb.emitOp(node, 'DUPFROMALTSTACK');
   }
 
-  public emit(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    func: (options: VisitOptions) => void,
-  ): void {
+  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions, func: (options: VisitOptions) => void): void {
     if (this.addScope) {
       this.surround(sb, node, options, func);
     } else {
@@ -236,25 +195,12 @@ export class ResolvedScope implements Scope {
     }
   }
 
-  private surround(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    func: (options: VisitOptions) => void,
-  ): void {
-    if (this.parent == null) {
+  private surround(sb: ScriptBuilder, node: Node, options: VisitOptions, func: (options: VisitOptions) => void): void {
+    if (this.parent === undefined) {
       // [global]
-      sb.emitHelper(
-        node,
-        sb.pushValueOptions(options),
-        sb.helpers.createUndefined,
-      );
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
       // [this, global]
-      sb.emitHelper(
-        node,
-        sb.pushValueOptions(options),
-        sb.helpers.createUndefined,
-      );
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
       // [0, this, global]
       sb.emitPushInt(node, 0);
       // [scopes, this, global]
@@ -295,17 +241,9 @@ export class ResolvedScope implements Scope {
       // [errorString, scope, idx, scope, scopes]
       sb.emitPushString(node, 'Referenced variable before it was defined');
       // [error, scope, idx, scope, scopes]
-      sb.emitHelper(
-        node,
-        sb.pushValueOptions(options),
-        sb.helpers.createString,
-      );
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createString);
       // [throw, scope, idx, scope, scopes]
-      sb.emitHelper(
-        node,
-        sb.pushValueOptions(options),
-        sb.helpers.createThrowCompletion,
-      );
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createThrowCompletion);
       // [idx, scope, scopes]
       sb.emitOp(node, 'APPEND');
       // [idx, scope, scopes]
@@ -319,18 +257,18 @@ export class ResolvedScope implements Scope {
     sb.emitOp(node, 'APPEND');
 
     const { breakPC, continuePC, catchPC } = options;
-    const nonLocal = breakPC != null || continuePC != null || catchPC != null;
+    const nonLocal = breakPC !== undefined || continuePC !== undefined || catchPC !== undefined;
     sb.withProgramCounter((pc) => {
       let innerOptions = options;
-      if (breakPC != null) {
+      if (breakPC !== undefined) {
         innerOptions = sb.breakPCOptions(innerOptions, pc.getLast());
       }
 
-      if (continuePC != null) {
+      if (continuePC !== undefined) {
         innerOptions = sb.continuePCOptions(innerOptions, pc.getLast());
       }
 
-      if (catchPC != null) {
+      if (catchPC !== undefined) {
         innerOptions = sb.catchPCOptions(innerOptions, pc.getLast());
       }
 
@@ -340,7 +278,7 @@ export class ResolvedScope implements Scope {
       }
     });
 
-    if (this.parent == null) {
+    if (this.parent === undefined) {
       // [[scopes, undefined]]
       sb.emitOp(node, 'FROMALTSTACK');
       sb.emitOp(node, 'DROP');
@@ -370,14 +308,9 @@ export class ResolvedScope implements Scope {
     }
   }
 
-  private emitNonLocal(
-    sb: ScriptBuilder,
-    node: Node,
-    completion: number,
-    pc: ProgramCounter | undefined,
-  ): void {
-    if (pc != null) {
-      sb.withProgramCounter((innerPC) => {
+  private emitNonLocal(sb: ScriptBuilder, node: Node, completion: number, pc: ProgramCounter | undefined): void {
+    if (pc !== undefined) {
+      sb.withProgramCounter(() => {
         sb.emitOp(node, 'DUP');
         sb.emitPushInt(node, completion);
         sb.emitOp(node, 'NUMEQUAL');
@@ -386,22 +319,19 @@ export class ResolvedScope implements Scope {
     }
   }
 
-  private getPosition(name: Name | string): number | null | undefined {
+  private getPosition(name: Name | string): number | undefined {
     if (typeof name === 'string') {
-      return this.variables[name];
-    } else if (name instanceof IdentifierName) {
-      return this.variables[name.value];
+      return this.mutableVariables[name];
+    }
+
+    if (name instanceof IdentifierName) {
+      return this.mutableVariables[name.value];
     }
 
     return this.uniqueVariables.get(name);
   }
 
-  private loadScope(
-    sb: ScriptBuilder,
-    node: Node,
-    scopeLength: number,
-    scopePosition: number,
-  ): void {
+  private loadScope(sb: ScriptBuilder, node: Node, scopeLength: number, scopePosition: number): void {
     this.loadAll(sb, node);
     // [0,[scopes, this]]
     sb.emitPushInt(node, 0);

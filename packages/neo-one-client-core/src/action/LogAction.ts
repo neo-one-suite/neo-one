@@ -1,26 +1,19 @@
-import {
-  DeserializeWireBaseOptions,
-  SerializableJSON,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializableJSON, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter } from '../utils';
 import { ActionBase, ActionBaseAdd, ActionBaseJSON } from './ActionBase';
 import { ActionType } from './ActionType';
 
 export interface LogAdd extends ActionBaseAdd {
-  message: string;
+  readonly message: string;
 }
 
 export interface LogActionJSON extends ActionBaseJSON {
-  type: 'Log';
-  message: string;
+  readonly type: 'Log';
+  readonly message: string;
 }
 
-export class LogAction extends ActionBase<LogAction, ActionType.Log>
-  implements SerializableJSON<LogActionJSON> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): LogAction {
+export class LogAction extends ActionBase<LogAction, ActionType.Log> implements SerializableJSON<LogActionJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): LogAction {
     const { reader } = options;
     const action = super.deserializeActionBaseWireBase(options);
     const message = reader.readVarString(1024);
@@ -35,7 +28,7 @@ export class LogAction extends ActionBase<LogAction, ActionType.Log>
 
   public readonly message: string;
 
-  constructor({ version, index, scriptHash, message }: LogAdd) {
+  public constructor({ version, index, scriptHash, message }: LogAdd) {
     super({
       type: ActionType.Log,
       version,
@@ -53,6 +46,7 @@ export class LogAction extends ActionBase<LogAction, ActionType.Log>
 
   public serializeJSON(context: SerializeJSONContext): LogActionJSON {
     const action = super.serializeActionBaseJSON(context);
+
     return {
       type: 'Log',
       version: action.version,

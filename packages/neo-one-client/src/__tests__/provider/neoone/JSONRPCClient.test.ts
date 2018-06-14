@@ -175,7 +175,7 @@ describe('JSONRPCClient', () => {
   for (const testCase of testCases) {
     const { method, args } = testCase;
     let expectedResult: any = expected;
-    if (testCase.result != null) {
+    if (testCase.result != undefined) {
       expectedResult = testCase.result;
     }
 
@@ -195,15 +195,11 @@ describe('JSONRPCClient', () => {
 
     const result = provider.sendTransactionRaw('');
 
-    await expect(result).rejects.toEqual(
-      new RelayTransactionError('Relay transaction failed.'),
-    );
+    await expect(result).rejects.toEqual(new RelayTransactionError('Relay transaction failed.'));
   });
 
   test('relayTransaction throws RelayTransactionError', async () => {
-    jsonProvider.request = jest.fn(() =>
-      Promise.reject(new JSONRPCError({ code: -110, message: '' })),
-    );
+    jsonProvider.request = jest.fn(() => Promise.reject(new JSONRPCError({ code: -110, message: '' })));
 
     const result = provider.relayTransaction('');
 

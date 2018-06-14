@@ -22,7 +22,7 @@ export class InvalidAssetTypeError extends CustomError {
   public readonly assetType: number;
   public readonly code: string;
 
-  constructor(assetType: number) {
+  public constructor(assetType: number) {
     super(`Expected asset type, found: ${assetType.toString(16)}`);
     this.assetType = assetType;
     this.code = 'INVALID_ASSET_TYPE';
@@ -30,7 +30,8 @@ export class InvalidAssetTypeError extends CustomError {
 }
 
 const isAssetType = (assetType: number): assetType is AssetType =>
-  AssetType[assetType] != null;
+  // tslint:disable-next-line strict-type-predicates
+  AssetType[assetType] !== undefined;
 
 export const assertAssetType = (assetType: number): AssetType => {
   if (!isAssetType(assetType)) {
@@ -42,14 +43,13 @@ export const assertAssetType = (assetType: number): AssetType => {
 
 export type AssetTypeJSON = keyof typeof AssetType;
 
-export const toJSONAssetType = (type: AssetType): AssetTypeJSON =>
-  assertAssetTypeJSON(AssetType[type]);
+export const toJSONAssetType = (type: AssetType): AssetTypeJSON => assertAssetTypeJSON(AssetType[type]);
 
 export class InvalidAssetTypeJSONError extends CustomError {
   public readonly code: string;
   public readonly type: string;
 
-  constructor(type: string) {
+  public constructor(type: string) {
     super(`Invalid AssetType: ${type}`);
     this.type = type;
     this.code = 'INVALID_ASSET_TYPE_JSON';
@@ -57,7 +57,8 @@ export class InvalidAssetTypeJSONError extends CustomError {
 }
 
 const isAssetTypeJSON = (assetType: string): assetType is AssetTypeJSON =>
-  AssetType[assetType as any] != null;
+  // tslint:disable-next-line strict-type-predicates no-any
+  AssetType[assetType as any] !== undefined;
 
 export const assertAssetTypeJSON = (type: string): AssetTypeJSON => {
   if (!isAssetTypeJSON(type)) {
@@ -67,9 +68,7 @@ export const assertAssetTypeJSON = (type: string): AssetTypeJSON => {
   return type;
 };
 
-const JSONToAssetType: { [K in AssetTypeJSON]: AssetType } = _.invert(
-  AssetType,
-) as any;
+// tslint:disable-next-line variable-name no-any
+const JSONToAssetType: { [K in AssetTypeJSON]: AssetType } = _.invert(AssetType) as any;
 
-export const toAssetType = (type: AssetTypeJSON): AssetType =>
-  JSONToAssetType[type];
+export const toAssetType = (type: AssetTypeJSON): AssetType => JSONToAssetType[type];

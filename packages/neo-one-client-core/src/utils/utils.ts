@@ -40,14 +40,13 @@ const toSignedBuffer = (value: BN): Buffer => {
 
 const getBoolean = (value: Buffer): boolean => value.some((byte) => byte !== 0);
 
-const booleanToBuffer = (value: boolean): Buffer =>
-  Buffer.from([value ? 1 : 0]);
+const booleanToBuffer = (value: boolean): Buffer => Buffer.from([value ? 1 : 0]);
 
 const toASCII = (bytes: Buffer) => {
   let result = '';
-  for (let i = 0; i < bytes.length; i += 1) {
+  _.range(bytes.length).forEach((i) => {
     result += String.fromCharCode(bytes.readUInt8(i));
-  }
+  });
 
   return result;
 };
@@ -60,18 +59,16 @@ const calculateClaimAmount = async ({
   generationAmount,
   getSystemFee,
 }: {
-  coins: Array<{
-    value: BN;
-    startHeight: number;
-    endHeight: number;
+  readonly coins: ReadonlyArray<{
+    readonly value: BN;
+    readonly startHeight: number;
+    readonly endHeight: number;
   }>;
-  decrementInterval: number;
-  generationAmount: number[];
-  getSystemFee: (index: number) => Promise<BN>;
+  readonly decrementInterval: number;
+  readonly generationAmount: ReadonlyArray<number>;
+  readonly getSystemFee: (index: number) => Promise<BN>;
 }): Promise<BN> => {
-  const grouped = Object.values(
-    _.groupBy(coins, (coin) => `${coin.startHeight}:${coin.endHeight}`),
-  );
+  const grouped = Object.values(_.groupBy(coins, (coin) => `${coin.startHeight}:${coin.endHeight}`));
 
   const claimed = await Promise.all(
     grouped.map(async (coinsGroup) => {
@@ -93,10 +90,9 @@ const calculateClaimAmount = async ({
           iend = decrementInterval;
         }
 
+        // tslint:disable-next-line no-loop-statement
         while (ustart < uend) {
-          amount = amount.addn(
-            (decrementInterval - istart) * generationAmount[ustart],
-          );
+          amount = amount.addn((decrementInterval - istart) * generationAmount[ustart]);
 
           ustart += 1;
           istart = 0;
@@ -107,32 +103,22 @@ const calculateClaimAmount = async ({
 
       const [sysFeeEnd, sysFeeStart] = await Promise.all([
         getSystemFee(endHeight - 1),
-        startHeight === 0
-          ? Promise.resolve(ZERO)
-          : getSystemFee(startHeight - 1),
+        startHeight === 0 ? Promise.resolve(ZERO) : getSystemFee(startHeight - 1),
       ]);
 
       amount = amount.add(sysFeeEnd.sub(sysFeeStart).div(ONE_HUNDRED_MILLION));
-      const totalValue = coinsGroup.reduce(
-        (acc, { value }) => acc.add(value),
-        ZERO,
-      );
+      const totalValue = coinsGroup.reduce((acc, { value }) => acc.add(value), ZERO);
 
       return [totalValue, amount];
     }),
   );
 
-  return claimed.reduce(
-    (acc, [value, amount]) =>
-      acc.add(value.div(ONE_HUNDRED_MILLION).mul(amount)),
-    ZERO,
-  );
+  return claimed.reduce((acc, [value, amount]) => acc.add(value.div(ONE_HUNDRED_MILLION).mul(amount)), ZERO);
 };
 
 const randomUInt = (): number => Math.floor(Math.random() * UINT_MAX_NUMBER);
 
-const randomUInt64 = (): BN =>
-  new BN(crypto.randomBytes(8).toString('hex'), 16);
+const randomUInt64 = (): BN => new BN(crypto.randomBytes(8).toString('hex'), 16);
 
 export const utils = {
   FD: new BN(0xfd),

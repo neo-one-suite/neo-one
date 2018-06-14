@@ -1,22 +1,12 @@
-import {
-  createDeserializeWire,
-  DeserializeWire,
-  DeserializeWireBaseOptions,
-} from '../Serializable';
+import { createDeserializeWire, DeserializeWireBaseOptions } from '../Serializable';
 import { assertVMState, VMState } from '../vm';
-import { InvocationResultError } from './InvocationResultError';
-import { InvocationResultErrorJSON } from './InvocationResultError';
-import { InvocationResultSuccess } from './InvocationResultSuccess';
-import { InvocationResultSuccessJSON } from './InvocationResultSuccess';
+import { InvocationResultError, InvocationResultErrorJSON } from './InvocationResultError';
+import { InvocationResultSuccess, InvocationResultSuccessJSON } from './InvocationResultSuccess';
 
 export type InvocationResult = InvocationResultSuccess | InvocationResultError;
-export type InvocationResultJSON =
-  | InvocationResultSuccessJSON
-  | InvocationResultErrorJSON;
+export type InvocationResultJSON = InvocationResultSuccessJSON | InvocationResultErrorJSON;
 
-export const deserializeInvocationResultWireBase = (
-  options: DeserializeWireBaseOptions,
-): InvocationResult => {
+export const deserializeInvocationResultWireBase = (options: DeserializeWireBaseOptions): InvocationResult => {
   const { reader } = options;
   const state = assertVMState(reader.clone().readUInt8());
   switch (state) {
@@ -29,6 +19,4 @@ export const deserializeInvocationResultWireBase = (
   }
 };
 
-export const deserializeInvocationResultWire: DeserializeWire<
-  InvocationResult
-> = createDeserializeWire(deserializeInvocationResultWireBase);
+export const deserializeInvocationResultWire = createDeserializeWire(deserializeInvocationResultWireBase);

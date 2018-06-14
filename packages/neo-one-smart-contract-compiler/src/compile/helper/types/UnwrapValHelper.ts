@@ -7,10 +7,11 @@ import { Helper } from '../Helper';
 // Input: [val]
 // Output: [value]
 // Must not be undefined or null
-export class UnwrapValHelper extends Helper<Node> {
+export class UnwrapValHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

@@ -11,23 +11,23 @@ export enum ScriptContainerType {
 
 export type ScriptContainer =
   | {
-      type: ScriptContainerType.Transaction;
-      value: Transaction;
+      readonly type: ScriptContainerType.Transaction;
+      readonly value: Transaction;
     }
   | {
-      type: ScriptContainerType.Block;
-      value: Block;
+      readonly type: ScriptContainerType.Block;
+      readonly value: Block;
     }
   | {
-      type: ScriptContainerType.Consensus;
-      value: ConsensusPayload;
+      readonly type: ScriptContainerType.Consensus;
+      readonly value: ConsensusPayload;
     };
 
 export class InvalidScriptContainerTypeError extends CustomError {
   public readonly value: number;
   public readonly code: string;
 
-  constructor(value: number) {
+  public constructor(value: number) {
     super(`Expected script container type, found: ${value.toString(16)}`);
     this.value = value;
     this.code = 'INVALID_SCRIPT_CONTAINER_TYPE';
@@ -35,11 +35,10 @@ export class InvalidScriptContainerTypeError extends CustomError {
 }
 
 const isScriptContainerType = (value: number): value is ScriptContainerType =>
-  ScriptContainerType[value] != null;
+  // tslint:disable-next-line strict-type-predicates
+  ScriptContainerType[value] !== undefined;
 
-export const assertScriptContainerType = (
-  value: number,
-): ScriptContainerType => {
+export const assertScriptContainerType = (value: number): ScriptContainerType => {
   if (isScriptContainerType(value)) {
     return value;
   }

@@ -29,6 +29,15 @@
         "../@types/*"
       ]
     },
+    "plugins": [
+      {
+        "name": "tslint-language-service",
+        "alwaysShowRuleFailuresAsWarnings": false,
+        "ignoreDefinitionFiles": true,
+        "disableNoUnusedVariableRule": true,
+        "supressWhileTypeErrorsPresent": false
+      }
+    ],
     "pretty": true,
     "strict": true,
     "strictFunctionTypes": true,

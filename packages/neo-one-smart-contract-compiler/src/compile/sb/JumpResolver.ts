@@ -1,3 +1,4 @@
+// tslint:disable
 import _ from 'lodash';
 
 import { Call, Jmp, Jump } from '../pc';
@@ -21,9 +22,9 @@ abstract class CodePoint {
   }
 
   public resolvePC(): number {
-    if (this.pcInternal == null) {
+    if (this.pcInternal == undefined) {
       this.pcInternal = 0;
-      if (this.prev == null) {
+      if (this.prev == undefined) {
         this.pcInternal = 0;
       } else {
         this.pcInternal = this.prev.pc + this.prev.length;
@@ -34,10 +35,10 @@ abstract class CodePoint {
   }
 
   public resetPC(): void {
-    if (this.pcInternal != null) {
+    if (this.pcInternal != undefined) {
       this.pcInternal = undefined;
       let next = this.next;
-      while (next != null) {
+      while (next != undefined) {
         next.pcInternal = undefined;
         next = next.next;
       }
@@ -47,7 +48,7 @@ abstract class CodePoint {
   public get totalLength(): number {
     let length = this.length;
     let next = this.next;
-    while (next != null) {
+    while (next != undefined) {
       length += next.length;
       next = next.next;
     }
@@ -75,25 +76,22 @@ abstract class CodePoint {
     let self: CodePoint | undefined = this;
     let skipJump = false;
     let ret: CodePoint = this;
-    while (self != null) {
+    while (self != undefined) {
       const target = targets[0];
-      if (target == null) {
+      if (target == undefined) {
         return ret;
       }
 
       let length = 0;
-      if (self.next != null && !skipJump) {
+      if (self.next != undefined && !skipJump) {
         length = 3;
       }
 
       let next: CodePoint | undefined = self.next;
       let nextSkipJump = false;
       if (
-        (target.isMax &&
-          self.pc + self.length + length >
-            target.pc + target.getPostOffset()) ||
-        (!target.isMax &&
-          self.pc >= target.pc + target.getPostOffset() - length)
+        (target.isMax && self.pc + self.length + length > target.pc + target.getPostOffset()) ||
+        (!target.isMax && self.pc >= target.pc + target.getPostOffset() - length)
       ) {
         next = self;
         if (skipJump) {
@@ -120,18 +118,14 @@ abstract class CodePoint {
     }
 
     if (targets.length > 0) {
-      throw new Error(
-        `Failed to insert all targets. Something went wrong. Remaining: ${
-          targets.length
-        }`,
-      );
+      throw new Error(`Failed to insert all targets. Something went wrong. Remaining: ${targets.length}`);
     }
 
     return ret;
   }
 
   public insertBefore(point: CodePoint): void {
-    if (this.prev != null) {
+    if (this.prev != undefined) {
       this.prev.next = point;
       point.prev = this.prev;
     }
@@ -141,7 +135,7 @@ abstract class CodePoint {
   }
 
   public insertAfter(point: CodePoint): void {
-    if (this.next != null) {
+    if (this.next != undefined) {
       this.next.prev = point;
       point.next = this.next;
     }
@@ -151,12 +145,12 @@ abstract class CodePoint {
   }
 
   public replace(point: CodePoint): void {
-    if (this.prev != null) {
+    if (this.prev != undefined) {
       this.prev.next = point;
       point.prevInternal = this.prev;
     }
 
-    if (this.next != null) {
+    if (this.next != undefined) {
       if (point.length === this.length) {
         this.next.prevInternal = point;
       } else {
@@ -169,9 +163,9 @@ abstract class CodePoint {
 }
 
 class JumpCodePoint extends CodePoint {
-  public length: number = 3;
+  public length = 3;
 
-  constructor(
+  public constructor(
     public readonly type: 'JMP' | 'JMPIF' | 'JMPIFNOT' | 'CALL',
     private targetInternal?: CodePoint | NewJump,
   ) {
@@ -179,7 +173,7 @@ class JumpCodePoint extends CodePoint {
   }
 
   public get target(): CodePoint | NewJump {
-    if (this.targetInternal == null) {
+    if (this.targetInternal == undefined) {
       throw new Error('Target not set');
     }
 
@@ -200,9 +194,7 @@ class JumpCodePoint extends CodePoint {
 
   public get offset(): number {
     if (this.target.pc === this.pc) {
-      throw new Error(
-        'Something went wrong. Found equal target pc and current pc.',
-      );
+      throw new Error('Something went wrong. Found equal target pc and current pc.');
     }
     return this.target.pc - this.pc;
   }
@@ -211,25 +203,21 @@ class JumpCodePoint extends CodePoint {
 class BufferCodePoint extends CodePoint {
   public readonly length: number;
 
-  constructor(public readonly value: Buffer) {
+  public constructor(public readonly value: Buffer) {
     super();
     this.length = value.length;
   }
 }
 
 class NewJump {
-  public length: number = 3;
+  public length = 3;
   private sourceInternal: JumpCodePoint | NewJump | undefined;
   private internalPostOffset: number | undefined;
 
-  constructor(
-    public readonly pc: number,
-    public readonly isMax: boolean,
-    public target: CodePoint | NewJump,
-  ) {}
+  public constructor(public readonly pc: number, public readonly isMax: boolean, public target: CodePoint | NewJump) {}
 
   public get source(): JumpCodePoint | NewJump {
-    if (this.sourceInternal == null) {
+    if (this.sourceInternal == undefined) {
       throw new Error('NewJump source is not set');
     }
 
@@ -266,15 +254,13 @@ class NewJump {
 
   public get offset(): number {
     if (this.target.pc === this.pc) {
-      throw new Error(
-        'Something went wrong. Found equal target pc and current pc.',
-      );
+      throw new Error('Something went wrong. Found equal target pc and current pc.');
     }
     return this.target.pc - this.pc;
   }
 
   public getPostOffset(): number {
-    if (this.internalPostOffset == null) {
+    if (this.internalPostOffset == undefined) {
       throw new Error('Not resolved');
     }
 
@@ -305,16 +291,14 @@ export class JumpResolver {
       first = result[0];
       newTargets = result[1];
       const sortedNewTargets = _.sortBy(newTargets, (target) => target.pc);
-      sortedNewTargets.forEach((target) =>
-        target.resolvePostOffset(sortedNewTargets),
-      );
+      sortedNewTargets.forEach((target) => target.resolvePostOffset(sortedNewTargets));
       first = first.insertJumps(sortedNewTargets);
     } while (newTargets.length > 0);
 
     this.resolvePC(first);
     let current: CodePoint | undefined = first;
     const out: Array<Buffer | Jump> = [];
-    while (current != null) {
+    while (current != undefined) {
       if (current instanceof JumpCodePoint) {
         const pc = new KnownProgramCounter(current.target.pc);
         if (current.type === 'CALL') {
@@ -338,10 +322,10 @@ export class JumpResolver {
 
     let ret: CodePoint = codePoint;
     let value: CodePoint | undefined = codePoint;
-    while (value != null) {
+    while (value != undefined) {
       if (value instanceof JumpCodePoint) {
         const result = this.getTarget(value);
-        if (result == null) {
+        if (result == undefined) {
           value = value.next;
         } else {
           const [newValue, newValueTargets] = result;
@@ -360,26 +344,16 @@ export class JumpResolver {
     return [ret, newTargets];
   }
 
-  private getTarget(
-    value: JumpCodePoint,
-  ): [JumpCodePoint, NewJump[]] | undefined {
-    if (
-      (value.isForwardJump && value.offset > MAX_JUMP) ||
-      (value.isReverseJump && value.offset < -MAX_JUMP)
-    ) {
+  private getTarget(value: JumpCodePoint): [JumpCodePoint, NewJump[]] | undefined {
+    if ((value.isForwardJump && value.offset > MAX_JUMP) || (value.isReverseJump && value.offset < -MAX_JUMP)) {
       const isMax = value.isForwardJump;
       const newOffset = isMax ? JUMP_OFFSET : -JUMP_OFFSET;
       if (value.target instanceof NewJump) {
         throw new Error('Something went wrong. Unexpected jump target.');
       }
-      const newValueTargets = this.getNewTarget(
-        new NewJump(value.pc + newOffset, isMax, value.target),
-      );
+      const newValueTargets = this.getNewTarget(new NewJump(value.pc + newOffset, isMax, value.target));
       const newValueTarget = newValueTargets[0];
-      const newValue: JumpCodePoint = new JumpCodePoint(
-        value.type,
-        newValueTarget,
-      );
+      const newValue: JumpCodePoint = new JumpCodePoint(value.type, newValueTarget);
       newValueTarget.source = newValue;
       value.target.sources.delete(value);
       [...value.sources].forEach((source) => {
@@ -394,20 +368,13 @@ export class JumpResolver {
   }
 
   private getNewTarget(value: NewJump): NewJump[] {
-    if (
-      (value.isForwardJump && value.offset > MAX_JUMP) ||
-      (value.isReverseJump && value.offset < -MAX_JUMP)
-    ) {
+    if ((value.isForwardJump && value.offset > MAX_JUMP) || (value.isReverseJump && value.offset < -MAX_JUMP)) {
       const isMax = value.isForwardJump;
       const newOffset = isMax ? JUMP_OFFSET : -JUMP_OFFSET;
       if (value.target instanceof NewJump) {
         throw new Error('Something went wrong. Unexpected jump target.');
       }
-      const newValueTarget = new NewJump(
-        value.pc + newOffset,
-        isMax,
-        value.target,
-      );
+      const newValueTarget = new NewJump(value.pc + newOffset, isMax, value.target);
       value.target = newValueTarget;
       newValueTarget.source = value;
       const newTargets = this.getNewTarget(newValueTarget);
@@ -443,7 +410,7 @@ export class JumpResolver {
           codePoints[targetPC].sources.add(jumpCodePoint);
         } else {
           jumpCodePoint = new JumpCodePoint(value.op);
-          if (sources[targetPC] == null) {
+          if (sources[targetPC] == undefined) {
             sources[targetPC] = [];
           }
           sources[targetPC].push(jumpCodePoint);
@@ -454,7 +421,7 @@ export class JumpResolver {
       }
 
       const pcSources = sources[pc];
-      if (pcSources != null) {
+      if (pcSources != undefined) {
         delete sources[pc];
         pcSources.forEach((source) => {
           source.target = codePoint;
@@ -475,7 +442,7 @@ export class JumpResolver {
   private resolvePC(codePoint: CodePoint): void {
     codePoint.resetPC();
     let current: CodePoint | undefined = codePoint;
-    while (current != null) {
+    while (current != undefined) {
       current.resolvePC();
       current = current.next;
     }

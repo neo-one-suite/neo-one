@@ -1,9 +1,8 @@
-export function lazyAsync<Input, Value>(
-  getValue: (input: Input) => Promise<Value>,
-): (input: Input) => Promise<Value> {
+export function lazyAsync<Input, Value>(getValue: (input: Input) => Promise<Value>): (input: Input) => Promise<Value> {
   let valuePromise: Promise<Value> | undefined;
-  return (input) => {
-    if (valuePromise == null) {
+
+  return async (input) => {
+    if (valuePromise === undefined) {
       valuePromise = getValue(input);
     }
 

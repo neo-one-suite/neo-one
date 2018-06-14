@@ -55,9 +55,9 @@ describe('createReadSmartContract', () => {
     Object.entries(mock).forEach(([key, maybeMock]) => {
       // @ts-ignore
       if (
-        maybeMock != null &&
-        (maybeMock as any).mock != null &&
-        (maybeMock as any).mock.calls != null
+        maybeMock != undefined &&
+        (maybeMock as any).mock != undefined &&
+        (maybeMock as any).mock.calls != undefined
       ) {
         // @ts-ignore
         expect(maybeMock.mock.calls).toMatchSnapshot(`${name}.${key}`);

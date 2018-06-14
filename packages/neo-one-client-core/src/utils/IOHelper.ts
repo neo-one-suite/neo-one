@@ -28,41 +28,36 @@ const sizeOfVarUIntLE = (valueIn: number | BN): number => {
 
   if (value.lt(utils.FD)) {
     return sizeOfUInt8;
-  } else if (value.lte(utils.FFFF)) {
+  }
+
+  if (value.lte(utils.FFFF)) {
     return sizeOfUInt8 + sizeOfUInt16LE;
-  } else if (value.lte(utils.FFFFFFFF)) {
+  }
+
+  if (value.lte(utils.FFFFFFFF)) {
     return sizeOfUInt8 + sizeOfUInt32LE;
   }
 
   return sizeOfUInt8 + sizeOfUInt64LE;
 };
 
-const sizeOfVarBytesLE = (value: Buffer): number =>
-  sizeOfVarUIntLE(value.length) + value.length;
+const sizeOfVarBytesLE = (value: Buffer): number => sizeOfVarUIntLE(value.length) + value.length;
 
-const sizeOfVarString = (value: string): number =>
-  sizeOfVarBytesLE(Buffer.from(value, 'utf8'));
+const sizeOfVarString = (value: string): number => sizeOfVarBytesLE(Buffer.from(value, 'utf8'));
 
 const sizeOfFixedString = (length: number): number => length;
 
-function sizeOfArray<T>(values: T[], sizeOf: (value: T) => number): number {
-  return values.reduce(
-    (acc, value) => acc + sizeOf(value),
-    sizeOfVarUIntLE(values.length),
-  );
+function sizeOfArray<T>(values: ReadonlyArray<T>, sizeOf: (value: T) => number): number {
+  return values.reduce((acc, value) => acc + sizeOf(value), sizeOfVarUIntLE(values.length));
 }
 
-function sizeOfObject<T>(
-  obj: T,
-  sizeOf: (key: keyof T, value: T[keyof T]) => number,
-): number {
+function sizeOfObject<T>(obj: T, sizeOf: (key: keyof T, value: T[keyof T]) => number): number {
   const entries = Object.entries(obj) as Array<[keyof T, T[keyof T]]>;
-  return entries.reduce(
-    (acc, [key, value]) => acc + sizeOf(key, value),
-    entries.length,
-  );
+
+  return entries.reduce((acc, [key, value]) => acc + sizeOf(key, value), entries.length);
 }
 
+// tslint:disable-next-line variable-name
 export const IOHelper = {
   sizeOfUInt8,
   sizeOfBoolean,

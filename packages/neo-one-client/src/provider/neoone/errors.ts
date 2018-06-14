@@ -1,16 +1,17 @@
 import { CustomError } from '@neo-one/utils';
 
 export interface JSONRPCErrorResponse {
-  code: number;
-  message: string;
-  data?: any;
+  readonly code: number;
+  readonly message: string;
+  // tslint:disable-next-line no-any
+  readonly data?: any;
 }
 
 export class JSONRPCError extends CustomError {
   public readonly responseError: JSONRPCErrorResponse;
   public readonly code: string;
 
-  constructor(responseError: JSONRPCErrorResponse) {
+  public constructor(responseError: JSONRPCErrorResponse) {
     super(responseError.message);
     this.responseError = responseError;
     this.code = 'JSON_RPC';
@@ -20,7 +21,7 @@ export class JSONRPCError extends CustomError {
 export class InvalidRPCResponseError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('Did not receive valid rpc response');
     this.code = 'INVALID_RPC_RESPONSE';
   }
@@ -28,15 +29,11 @@ export class InvalidRPCResponseError extends CustomError {
 
 export class HTTPError extends CustomError {
   public readonly status: number;
-  public readonly text: string | null;
+  public readonly text: string | undefined;
   public readonly code: string;
 
-  constructor(status: number, text: string | null) {
-    let message = `HTTP Error ${status}`;
-    if (text != null) {
-      message = `${message}: ${text}`;
-    }
-    super(message);
+  public constructor(status: number, text?: string) {
+    super(text === undefined ? `HTTP Error ${status}` : `HTTP Error ${status}: ${text}`);
     this.status = status;
     this.text = text;
     this.code = 'HTTP';
@@ -46,7 +43,7 @@ export class HTTPError extends CustomError {
 export class MissingTransactionDataError extends CustomError {
   public readonly code: string = 'MISSING_TRANSACTION_DATA';
 
-  constructor(hash: string) {
+  public constructor(hash: string) {
     super(`Missing transaction data for transaction ${hash}`);
   }
 }

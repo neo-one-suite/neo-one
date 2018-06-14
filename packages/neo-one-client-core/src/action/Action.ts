@@ -1,22 +1,17 @@
+import { utils } from '@neo-one/utils';
 import BN from 'bn.js';
-import {
-  createDeserializeWire,
-  DeserializeWire,
-  DeserializeWireBaseOptions,
-} from '../Serializable';
+import { createDeserializeWire, DeserializeWireBaseOptions } from '../Serializable';
 import { ActionType, assertActionType } from './ActionType';
-import { LogAction } from './LogAction';
-import { LogActionJSON } from './LogAction';
-import { NotificationAction } from './NotificationAction';
-import { NotificationActionJSON } from './NotificationAction';
+import { LogAction, LogActionJSON } from './LogAction';
+import { NotificationAction, NotificationActionJSON } from './NotificationAction';
 
 export interface ActionsKey {
-  indexStart?: BN;
-  indexStop?: BN;
+  readonly indexStart?: BN;
+  readonly indexStop?: BN;
 }
 
 export interface ActionKey {
-  index: BN;
+  readonly index: BN;
 }
 
 export type Action = LogAction | NotificationAction;
@@ -25,9 +20,7 @@ export type ActionJSON = NotificationActionJSON | LogActionJSON;
 
 export type ActionTypeJSON = ActionJSON['type'];
 
-export const deserializeActionWireBase = (
-  options: DeserializeWireBaseOptions,
-): Action => {
+export const deserializeActionWireBase = (options: DeserializeWireBaseOptions): Action => {
   const { reader } = options;
   const type = assertActionType(reader.clone().readUInt8());
   switch (type) {
@@ -35,9 +28,10 @@ export const deserializeActionWireBase = (
       return LogAction.deserializeWireBase(options);
     case ActionType.Notification:
       return NotificationAction.deserializeWireBase(options);
+    default:
+      utils.assertNever(type);
+      throw new Error('For TS');
   }
 };
 
-export const deserializeActionWire: DeserializeWire<
-  Action
-> = createDeserializeWire(deserializeActionWireBase);
+export const deserializeActionWire = createDeserializeWire(deserializeActionWireBase);

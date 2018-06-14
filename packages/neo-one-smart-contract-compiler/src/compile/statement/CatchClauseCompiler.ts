@@ -7,13 +7,9 @@ import { VisitOptions } from '../types';
 export class CatchClauseCompiler extends NodeCompiler<CatchClause> {
   public readonly kind: SyntaxKind = SyntaxKind.CatchClause;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: CatchClause,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: CatchClause, options: VisitOptions): void {
     const variable = node.getVariableDeclaration();
-    if (variable == null) {
+    if (variable === undefined) {
       sb.visit(node.getBlock(), options);
     } else {
       sb.withScope(node, options, (innerOptions) => {

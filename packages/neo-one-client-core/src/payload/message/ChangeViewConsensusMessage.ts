@@ -1,23 +1,18 @@
 import { InvalidFormatError } from '../../errors';
 import { DeserializeWireBaseOptions } from '../../Serializable';
 import { BinaryWriter } from '../../utils';
-import {
-  ConsensusMessageBase,
-  ConsensusMessageBaseAdd,
-} from './ConsensusMessageBase';
+import { ConsensusMessageBase, ConsensusMessageBaseAdd } from './ConsensusMessageBase';
 import { ConsensusMessageType } from './ConsensusMessageType';
 
 export interface ChangeViewAdd extends ConsensusMessageBaseAdd {
-  newViewNumber: number;
+  readonly newViewNumber: number;
 }
 
 export class ChangeViewConsensusMessage extends ConsensusMessageBase<
   ChangeViewConsensusMessage,
   ConsensusMessageType.ChangeView
 > {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): ChangeViewConsensusMessage {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): ChangeViewConsensusMessage {
     const { reader } = options;
     const message = super.deserializeConsensusMessageBaseWireBase(options);
     const newViewNumber = reader.readUInt8();
@@ -33,7 +28,7 @@ export class ChangeViewConsensusMessage extends ConsensusMessageBase<
 
   public readonly newViewNumber: number;
 
-  constructor({ viewNumber, newViewNumber }: ChangeViewAdd) {
+  public constructor({ viewNumber, newViewNumber }: ChangeViewAdd) {
     super({
       type: ConsensusMessageType.ChangeView,
       viewNumber,

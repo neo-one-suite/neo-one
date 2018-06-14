@@ -6,7 +6,7 @@ import { Helper } from '../Helper';
 
 // Input: []
 // Output: []
-export class ThrowTypeErrorHelper extends Helper<Node> {
+export class ThrowTypeErrorHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // ['TypeError']
     sb.emitPushString(node, 'TypeError');

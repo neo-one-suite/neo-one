@@ -31,77 +31,64 @@ import { VerifyScript } from './vm';
 import { Witness } from './Witness';
 
 export interface BlockAdd {
-  version?: number;
-  previousHash: UInt256;
-  merkleRoot?: UInt256;
-  timestamp: number;
-  index: number;
-  consensusData: BN;
-  nextConsensus: UInt160;
-  script?: Witness;
-  hash?: UInt256;
-  transactions: Transaction[];
+  readonly version?: number;
+  readonly previousHash: UInt256;
+  readonly merkleRoot?: UInt256;
+  readonly timestamp: number;
+  readonly index: number;
+  readonly consensusData: BN;
+  readonly nextConsensus: UInt160;
+  readonly script?: Witness;
+  readonly hash?: UInt256;
+  readonly transactions: ReadonlyArray<Transaction>;
 }
 
 export interface BlockKey {
-  hashOrIndex: UInt256 | number;
+  readonly hashOrIndex: UInt256 | number;
 }
 
 export interface BlockVerifyOptions {
-  genesisBlock: Block;
-  tryGetBlock: (block: BlockKey) => Promise<Block | null>;
-  tryGetHeader: (header: HeaderKey) => Promise<Header | null>;
-  isSpent: (key: OutputKey) => Promise<boolean>;
-  getAsset: (key: AssetKey) => Promise<Asset>;
-  getOutput: (key: OutputKey) => Promise<Output>;
-  tryGetAccount: (key: AccountKey) => Promise<Account | null>;
-  getValidators: (transactions: Transaction[]) => Promise<ECPoint[]>;
-  standbyValidators: ECPoint[];
-  getAllValidators: () => Promise<Validator[]>;
-  calculateClaimAmount: (inputs: Input[]) => Promise<BN>;
-  verifyScript: VerifyScript;
-  currentHeight: number;
-  governingToken: RegisterTransaction;
-  utilityToken: RegisterTransaction;
-  fees: { [K in TransactionType]?: BN };
-  registerValidatorFee: BN;
-  completely?: boolean;
+  readonly genesisBlock: Block;
+  readonly tryGetBlock: (block: BlockKey) => Promise<Block | undefined>;
+  readonly tryGetHeader: (header: HeaderKey) => Promise<Header | undefined>;
+  readonly isSpent: (key: OutputKey) => Promise<boolean>;
+  readonly getAsset: (key: AssetKey) => Promise<Asset>;
+  readonly getOutput: (key: OutputKey) => Promise<Output>;
+  readonly tryGetAccount: (key: AccountKey) => Promise<Account | undefined>;
+  readonly getValidators: (transactions: ReadonlyArray<Transaction>) => Promise<ReadonlyArray<ECPoint>>;
+  readonly standbyValidators: ReadonlyArray<ECPoint>;
+  readonly getAllValidators: () => Promise<ReadonlyArray<Validator>>;
+  readonly calculateClaimAmount: (inputs: ReadonlyArray<Input>) => Promise<BN>;
+  readonly verifyScript: VerifyScript;
+  readonly currentHeight: number;
+  readonly governingToken: RegisterTransaction;
+  readonly utilityToken: RegisterTransaction;
+  readonly fees: { [K in TransactionType]?: BN };
+  readonly registerValidatorFee: BN;
+  readonly completely?: boolean;
 }
 
 export interface BlockJSON extends BlockBaseJSON {
-  tx: TransactionJSON[];
+  readonly tx: ReadonlyArray<TransactionJSON>;
 }
 
-export class Block extends BlockBase
-  implements SerializableWire<Block>, SerializableJSON<BlockJSON> {
-  public static async calculateNetworkFee(
-    context: FeeContext,
-    transactions: Transaction[],
-  ): Promise<BN> {
-    const fees = await Promise.all(
-      transactions.map((transaction) => transaction.getNetworkFee(context)),
-    );
+export class Block extends BlockBase implements SerializableWire<Block>, SerializableJSON<BlockJSON> {
+  public static async calculateNetworkFee(context: FeeContext, transactions: ReadonlyArray<Transaction>): Promise<BN> {
+    const fees = await Promise.all(transactions.map(async (transaction) => transaction.getNetworkFee(context)));
 
     return fees.reduce((acc, fee) => acc.add(fee), utils.ZERO);
   }
 
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): Block {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): Block {
     const { reader } = options;
     const blockBase = super.deserializeBlockBaseWireBase(options);
-    const transactions = reader.readArray(
-      () => deserializeTransactionWireBase(options),
-      0x10000,
-    );
+    const transactions = reader.readArray(() => deserializeTransactionWireBase(options), 0x10000);
 
     if (transactions.length === 0) {
       throw new InvalidFormatError();
     }
 
-    const merkleRoot = MerkleTree.computeRoot(
-      transactions.map((transaction) => transaction.hash),
-    );
+    const merkleRoot = MerkleTree.computeRoot(transactions.map((transaction) => transaction.hash));
 
     if (!common.uInt256Equal(merkleRoot, blockBase.merkleRoot)) {
       throw new InvalidFormatError();
@@ -127,7 +114,7 @@ export class Block extends BlockBase
     });
   }
 
-  public readonly transactions: Transaction[];
+  public readonly transactions: ReadonlyArray<Transaction>;
   protected readonly sizeExclusive = utils.lazy(() =>
     IOHelper.sizeOfArray(this.transactions, (transaction) => transaction.size),
   );
@@ -145,10 +132,9 @@ export class Block extends BlockBase
       }),
   );
 
-  constructor({
+  public constructor({
     version,
     previousHash,
-    merkleRoot,
     timestamp,
     index,
     consensusData,
@@ -156,15 +142,12 @@ export class Block extends BlockBase
     script,
     hash,
     transactions,
+    merkleRoot = MerkleTree.computeRoot(transactions.map((transaction) => transaction.hash)),
   }: BlockAdd) {
     super({
       version,
       previousHash,
-      merkleRoot:
-        merkleRoot ||
-        MerkleTree.computeRoot(
-          transactions.map((transaction) => transaction.hash),
-        ),
+      merkleRoot,
 
       timestamp,
       index,
@@ -185,8 +168,8 @@ export class Block extends BlockBase
     transactions,
     script,
   }: {
-    transactions: Transaction[];
-    script: Witness;
+    readonly transactions: ReadonlyArray<Transaction>;
+    readonly script: Witness;
   }): Block {
     return new Block({
       version: this.version,
@@ -206,10 +189,7 @@ export class Block extends BlockBase
   }
 
   public getSystemFee(context: FeeContext): BN {
-    return this.transactions.reduce(
-      (acc, transaction) => acc.add(transaction.getSystemFee(context)),
-      utils.ZERO,
-    );
+    return this.transactions.reduce((acc, transaction) => acc.add(transaction.getSystemFee(context)), utils.ZERO);
   }
 
   public async verify(options: BlockVerifyOptions): Promise<void> {
@@ -218,29 +198,20 @@ export class Block extends BlockBase
     if (
       this.transactions.length === 0 ||
       this.transactions[0].type !== TransactionType.Miner ||
-      this.transactions
-        .slice(1)
-        .some((transaction) => transaction.type === TransactionType.Miner)
+      this.transactions.slice(1).some((transaction) => transaction.type === TransactionType.Miner)
     ) {
       throw new VerifyError('Invalid miner transaction in block.');
     }
 
-    await Promise.all([
-      this.verifyBase(options),
-      completely ? this.verifyComplete(options) : Promise.resolve(),
-    ]);
+    await Promise.all([this.verifyBase(options), completely ? this.verifyComplete(options) : Promise.resolve()]);
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
-    writer.writeArray(this.transactions, (transaction) =>
-      transaction.serializeWireBase(writer),
-    );
+    writer.writeArray(this.transactions, (transaction) => transaction.serializeWireBase(writer));
   }
 
-  public async serializeJSON(
-    context: SerializeJSONContext,
-  ): Promise<BlockJSON> {
+  public async serializeJSON(context: SerializeJSONContext): Promise<BlockJSON> {
     const blockBaseJSON = super.serializeBlockBaseJSON(context);
 
     return {
@@ -255,10 +226,7 @@ export class Block extends BlockBase
       script: blockBaseJSON.script,
       tx: await Promise.all(
         this.transactions.map(
-          (transaction) =>
-            transaction.serializeJSON(context) as
-              | TransactionJSON
-              | PromiseLike<TransactionJSON>,
+          (transaction) => transaction.serializeJSON(context) as TransactionJSON | PromiseLike<TransactionJSON>,
         ),
       ),
       size: blockBaseJSON.size,
@@ -277,7 +245,7 @@ export class Block extends BlockBase
     }
 
     const existingBlock = await tryGetBlock({ hashOrIndex: this.hash });
-    if (existingBlock != null) {
+    if (existingBlock !== undefined) {
       return;
     }
 
@@ -285,7 +253,7 @@ export class Block extends BlockBase
       hashOrIndex: this.previousHash,
     });
 
-    if (previousHeader == null) {
+    if (previousHeader === undefined) {
       throw new VerifyError('Previous header does not exist.');
     }
 
@@ -312,23 +280,16 @@ export class Block extends BlockBase
     ]);
   }
 
-  private async verifyConsensus({
-    getValidators,
-  }: BlockVerifyOptions): Promise<void> {
+  private async verifyConsensus({ getValidators }: BlockVerifyOptions): Promise<void> {
     const validators = await getValidators(this.transactions);
-    if (
-      !common.uInt160Equal(
-        this.nextConsensus,
-        crypto.getConsensusAddress(validators),
-      )
-    ) {
+    if (!common.uInt160Equal(this.nextConsensus, crypto.getConsensusAddress(validators))) {
       throw new VerifyError('Invalid next consensus address');
     }
   }
 
   private async verifyTransactions(options: BlockVerifyOptions): Promise<void> {
     await Promise.all(
-      this.transactions.map((transaction) =>
+      this.transactions.map(async (transaction) =>
         transaction.verify({
           isSpent: options.isSpent,
           getAsset: options.getAsset,
@@ -357,11 +318,9 @@ export class Block extends BlockBase
       registerValidatorFee: options.registerValidatorFee,
     });
 
-    const minerTransaction = this.transactions.find(
-      (transaction) => transaction.type === TransactionType.Miner,
-    );
+    const minerTransaction = this.transactions.find((transaction) => transaction.type === TransactionType.Miner);
 
-    if (minerTransaction == null) {
+    if (minerTransaction === undefined) {
       throw new VerifyError('Missing miner transaction');
     }
 

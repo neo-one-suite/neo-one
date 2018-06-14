@@ -1,3 +1,4 @@
+// tslint:disable readonly-keyword readonly-array no-object-mutation prefer-switch
 class Token {
   public readonly name: string = 'TestToken';
   public readonly decimals: number = 8;
@@ -6,12 +7,8 @@ class Token {
   private readonly ownerKey: string = 'owner';
 
   public deploy(owner: Buffer): boolean {
-    syscall(
-      'Neo.Storage.Put',
-      syscall('Neo.Storage.GetContext'),
-      this.ownerKey,
-      owner,
-    );
+    syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), this.ownerKey, owner);
+
     return true;
   }
 
@@ -25,11 +22,7 @@ class Token {
 
   public balanceOf(addr: Buffer): number {
     return (
-      (syscall(
-        'Neo.Storage.Get',
-        syscall('Neo.Storage.GetContext'),
-        this.getKey(addr),
-      ) as number | undefined) || 0
+      (syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), this.getKey(addr)) as number | undefined) || 0
     );
   }
 
@@ -39,45 +32,26 @@ class Token {
 
   private get supply(): number {
     return (
-      (syscall(
-        'Neo.Storage.Get',
-        syscall('Neo.Storage.GetContext'),
-        this.totalSupplyKey,
-      ) as number | undefined) || 0
+      (syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), this.totalSupplyKey) as number | undefined) || 0
     );
   }
 
   private set supply(value: number) {
-    syscall(
-      'Neo.Storage.Put',
-      syscall('Neo.Storage.GetContext'),
-      this.totalSupplyKey,
-      value,
-    );
+    syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), this.totalSupplyKey, value);
   }
 
   public issue(addr: Buffer, amount: number): void {
     if (syscall('Neo.Runtime.CheckWitness', this.getOwner())) {
       this.setBalance(addr, this.balanceOf(addr) + amount);
       this.supply += amount;
-      syscall(
-        'Neo.Runtime.Notify',
-        'transfer',
-        syscall('System.ExecutionEngine.GetExecutingScriptHash'),
-        addr,
-        amount,
-      );
+      syscall('Neo.Runtime.Notify', 'transfer', syscall('System.ExecutionEngine.GetExecutingScriptHash'), addr, amount);
     } else {
       throw new Error('Invalid witness');
     }
   }
 
   public getOwner(): Buffer {
-    return syscall(
-      'Neo.Storage.Get',
-      syscall('Neo.Storage.GetContext'),
-      this.ownerKey,
-    ) as Buffer;
+    return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), this.ownerKey) as Buffer;
   }
 
   private doTransfer(from: Buffer, to: Buffer, amount: number): void {
@@ -97,14 +71,10 @@ class Token {
   }
 
   private setBalance(addr: Buffer, amount: number): void {
-    syscall(
-      'Neo.Storage.Put',
-      syscall('Neo.Storage.GetContext'),
-      this.getKey(addr),
-      amount,
-    );
+    syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), this.getKey(addr), amount);
   }
 
+  // tslint:disable-next-line
   private getKey(addr: Buffer): Buffer {
     return Buffer.concat([syscall('Neo.Runtime.Serialize', 'balances'), addr]);
   }
@@ -130,11 +100,7 @@ if (syscall('Neo.Runtime.GetTrigger') === 0x10) {
     const args = syscall('Neo.Runtime.GetArgument', 1) as [Buffer];
     syscall('Neo.Runtime.Return', token.balanceOf(args[0]));
   } else if (method === 'transfer') {
-    const args = syscall('Neo.Runtime.GetArgument', 1) as [
-      Buffer,
-      Buffer,
-      number
-    ];
+    const args = syscall('Neo.Runtime.GetArgument', 1) as [Buffer, Buffer, number];
     token.transfer(args[0], args[1], args[2]);
     syscall('Neo.Runtime.Return', true);
   } else if (method === 'issue') {

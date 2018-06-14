@@ -36,5 +36,10 @@
   "dependencies": {
     "@neo-one/smart-contract": "^1.0.0-alpha.5",
     "@neo-one/smart-contract-test": "^1.0.0-alpha.10"
+  },
+  "devDependencies": {
+    "@neo-one/client": "^1.0.0-alpha.55",
+    "app-root-dir": "^1.0.2",
+    "bignumber.js": "^7.2.1"
   }
 }

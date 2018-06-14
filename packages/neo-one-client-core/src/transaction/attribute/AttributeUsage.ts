@@ -45,11 +45,8 @@ export class InvalidAttributeUsageError extends CustomError {
   public readonly transactionAttributeUsage: number;
   public readonly code: string;
 
-  constructor(transactionAttributeUsage: number) {
-    super(
-      `Expected transaction attribute usage, ` +
-        `found: ${transactionAttributeUsage.toString(16)}`,
-    );
+  public constructor(transactionAttributeUsage: number) {
+    super(`Expected transaction attribute usage, ` + `found: ${transactionAttributeUsage.toString(16)}`);
 
     this.transactionAttributeUsage = transactionAttributeUsage;
     this.code = 'INVALID_ATTRIBUTE_USAGE';
@@ -57,7 +54,8 @@ export class InvalidAttributeUsageError extends CustomError {
 }
 
 const isAttributeUsage = (value: number): value is AttributeUsage =>
-  AttributeUsage[value] != null;
+  // tslint:disable-next-line strict-type-predicates
+  AttributeUsage[value] !== undefined;
 
 export const assertAttributeUsage = (value: number): AttributeUsage => {
   if (isAttributeUsage(value)) {
@@ -71,11 +69,8 @@ export class InvalidAttributeUsageJSONError extends CustomError {
   public readonly code: string;
   public readonly transactionAttributeUsage: string;
 
-  constructor(transactionAttributeUsage: string) {
-    super(
-      `Expected transaction attribute usage, ` +
-        `found: ${transactionAttributeUsage}`,
-    );
+  public constructor(transactionAttributeUsage: string) {
+    super(`Expected transaction attribute usage, ` + `found: ${transactionAttributeUsage}`);
 
     this.code = 'INVALID_ATTRIBUTE_USAGE_JSON';
     this.transactionAttributeUsage = transactionAttributeUsage;
@@ -84,13 +79,12 @@ export class InvalidAttributeUsageJSONError extends CustomError {
 
 export type AttributeUsageJSON = keyof typeof AttributeUsage;
 
-export const toJSONAttributeUsage = (
-  usage: AttributeUsage,
-): AttributeUsageJSON => assertAttributeUsageJSON(AttributeUsage[usage]);
+export const toJSONAttributeUsage = (usage: AttributeUsage): AttributeUsageJSON =>
+  assertAttributeUsageJSON(AttributeUsage[usage]);
 
-export const isAttributeUsageJSON = (
-  usage: string,
-): usage is AttributeUsageJSON => AttributeUsage[usage as any] != null;
+export const isAttributeUsageJSON = (usage: string): usage is AttributeUsageJSON =>
+  // tslint:disable-next-line strict-type-predicates no-any
+  AttributeUsage[usage as any] !== undefined;
 
 export const assertAttributeUsageJSON = (usage: string): AttributeUsageJSON => {
   if (isAttributeUsageJSON(usage)) {

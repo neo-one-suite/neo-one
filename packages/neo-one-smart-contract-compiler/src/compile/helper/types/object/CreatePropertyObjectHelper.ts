@@ -6,7 +6,7 @@ import { Helper } from '../../Helper';
 
 // Input: [pobj]
 // Output: [objectVal]
-export class CreatePropertyObjectHelper extends Helper<Node> {
+export class CreatePropertyObjectHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (options.pushValue) {
       const obj = sb.scope.addUnique();
@@ -40,11 +40,7 @@ export class CreatePropertyObjectHelper extends Helper<Node> {
             // [val, key, objectVal]
             sb.emitOp(node, 'PICKITEM');
             // []
-            sb.emitHelper(
-              node,
-              options,
-              sb.helpers.setDataPropertyObjectProperty,
-            );
+            sb.emitHelper(node, options, sb.helpers.setDataPropertyObjectProperty);
           },
         }),
       );

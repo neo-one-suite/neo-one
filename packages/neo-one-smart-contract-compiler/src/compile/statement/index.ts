@@ -23,7 +23,8 @@ import { VariableStatementCompiler } from './VariableStatementCompiler';
 import { WhileStatementCompiler } from './WhileStatementCompiler';
 import { WithStatementCompiler } from './WithStatementCompiler';
 
-export default [
+// tslint:disable-next-line export-name readonly-array
+export const statements = [
   BlockCompiler,
   BreakStatementCompiler,
   CaseBlockCompiler,

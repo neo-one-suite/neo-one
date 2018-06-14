@@ -6,19 +6,19 @@ import { Helper } from '../Helper';
 
 // Input: [globalObjectVal]
 // Output: [objectPrototypeVal, globalObjectVal]
-export class AddObjectObjectHelper extends Helper<Node> {
+export class AddObjectObjectHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [globalObjectVal, globalObjectVal]
     sb.emitOp(node, 'DUP');
 
-    /* create object prototype */
+    // create object prototype
     // [objectPrototypeVal, globalObjectVal, globalObjectVal]
     sb.emitHelper(node, options, sb.helpers.createObject);
     // [objectPrototypeVal, objectPrototypeVal, globalObjectVal, globalObjectVal]
     sb.emitOp(node, 'DUP');
 
-    /* create object */
+    // create object
     // [objectVal, objectPrototypeVal, objectPrototypeVal, globalObjectVal, globalObjectVal]
     sb.emitHelper(node, options, sb.helpers.createObject);
     // [objectVal, objectPrototypeVal, objectVal, objectPrototypeVal, globalObjectVal, globalObjectVal]

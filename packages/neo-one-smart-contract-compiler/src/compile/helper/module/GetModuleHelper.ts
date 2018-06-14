@@ -5,15 +5,15 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface GetModuleHelperOptions {
-  moduleIndex: number;
+  readonly moduleIndex: number;
 }
 
 // Input: [globalObjectVal]
 // Output: [exports]
 export class GetModuleHelper extends Helper {
-  private moduleIndex: number;
+  private readonly moduleIndex: number;
 
-  constructor(options: GetModuleHelperOptions) {
+  public constructor(options: GetModuleHelperOptions) {
     super();
     this.moduleIndex = options.moduleIndex;
   }

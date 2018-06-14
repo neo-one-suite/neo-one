@@ -1,14 +1,5 @@
 // tslint:disable ban-types
-import {
-  DiagnosticCategory,
-  Identifier,
-  Node,
-  Symbol,
-  ts,
-  Type,
-  TypeFlags,
-  TypeGuards,
-} from 'ts-simple-ast';
+import { DiagnosticCategory, Identifier, Node, Symbol, ts, Type, TypeFlags, TypeGuards } from 'ts-simple-ast';
 
 import { CompilerDiagnostic } from './CompilerDiagnostic';
 import { DiagnosticCode } from './DiagnosticCode';
@@ -17,36 +8,28 @@ import { Globals, LibAliases, LibAliasesWithReset, Libs } from './symbols';
 import * as typeUtils from './typeUtils';
 
 export class Context {
-  public readonly diagnostics: ts.Diagnostic[] = [];
+  private readonly mutableDiagnostics: ts.Diagnostic[] = [];
 
-  constructor(
+  public constructor(
     public readonly globals: Globals,
     public readonly libs: Libs,
     public readonly libAliases: LibAliasesWithReset,
   ) {}
 
-  public reportError(node: Node, message: string, code: DiagnosticCode): void {
-    this.diagnostics.push(
-      new CompilerDiagnostic(node, message, code, DiagnosticCategory.Error),
-    );
+  public get diagnostics(): ReadonlyArray<ts.Diagnostic> {
+    return this.mutableDiagnostics;
   }
 
-  public reportWarning(
-    node: Node,
-    message: string,
-    code: DiagnosticCode,
-  ): void {
-    this.diagnostics.push(
-      new CompilerDiagnostic(node, message, code, DiagnosticCategory.Warning),
-    );
+  public reportError(node: Node, message: string, code: DiagnosticCode): void {
+    this.mutableDiagnostics.push(new CompilerDiagnostic(node, message, code, DiagnosticCategory.Error));
+  }
+
+  public reportWarning(node: Node, message: string, code: DiagnosticCode): void {
+    this.mutableDiagnostics.push(new CompilerDiagnostic(node, message, code, DiagnosticCategory.Warning));
   }
 
   public reportUnsupported(node: Node): void {
-    this.reportError(
-      node,
-      'Unsupported syntax',
-      DiagnosticCode.UNSUPPORTED_SYNTAX,
-    );
+    this.reportError(node, 'Unsupported syntax', DiagnosticCode.UNSUPPORTED_SYNTAX);
   }
 
   public reportTypeError(node: Node): void {
@@ -66,14 +49,14 @@ export class Context {
     );
   }
 
-  public getType(node: Node, required: boolean = false): Type | undefined {
+  public getType(node: Node, required = false): Type | undefined {
     let type = this.getNotAnyType(node.getType());
 
-    if (type == null && TypeGuards.isExpression(node)) {
+    if (type === undefined && TypeGuards.isExpression(node)) {
       type = this.getNotAnyType(node.getContextualType());
     }
 
-    if (type == null) {
+    if (type === undefined) {
       if (required) {
         this.reportTypeError(node);
       } else {
@@ -84,17 +67,13 @@ export class Context {
     return type;
   }
 
-  public getTypeOfSymbol(
-    symbol: Symbol | undefined,
-    node: Node,
-    required: boolean = false,
-  ): Type | undefined {
-    if (symbol == null) {
+  public getTypeOfSymbol(symbol: Symbol | undefined, node: Node, required = false): Type | undefined {
+    if (symbol === undefined) {
       return undefined;
     }
 
     const type = this.getNotAnyType(symbol.getTypeAtLocation(node));
-    if (type == null) {
+    if (type === undefined) {
       if (required) {
         this.reportTypeError(node);
       } else {
@@ -105,9 +84,9 @@ export class Context {
     return type;
   }
 
-  public getSymbol(node: Node, required: boolean = false): Symbol | undefined {
+  public getSymbol(node: Node, required = false): Symbol | undefined {
     const symbol = node.getSymbol();
-    if (symbol == null) {
+    if (symbol === undefined) {
       const message = 'Could not determine source symbol.';
       if (required) {
         this.reportError(node, message, DiagnosticCode.UNKNOWN_SYMBOL);
@@ -119,24 +98,20 @@ export class Context {
     }
 
     const aliased = symbol.getAliasedSymbol();
-    if (aliased != null) {
+    if (aliased !== undefined) {
       return aliased;
     }
 
     return symbol;
   }
 
-  public getSymbolForType(
-    node: Node,
-    type: Type | undefined,
-    required: boolean = false,
-  ): Symbol | undefined {
-    if (type == null) {
+  public getSymbolForType(node: Node, type: Type | undefined, required = false): Symbol | undefined {
+    if (type === undefined) {
       return undefined;
     }
 
     const symbol = type.getSymbol();
-    if (symbol == null) {
+    if (symbol === undefined) {
       const message = `Could not determine source symbol for type: ${type.getText()}.`;
       if (required) {
         this.reportError(node, message, DiagnosticCode.UNKNOWN_SYMBOL);
@@ -148,79 +123,35 @@ export class Context {
     }
 
     const aliased = symbol.getAliasedSymbol();
-    if (aliased != null) {
+    if (aliased !== undefined) {
       return aliased;
     }
 
     return symbol;
   }
 
-  public assertUnreachable(value: never): never {
-    throw new Error('Should not be reached.');
+  public isOnlyGlobal(node: Node, type: Type | undefined, name: keyof Globals): boolean {
+    return this.isSymbolic(type) && this.isGlobalSymbol(node, this.getSymbolForType(node, type), name);
   }
 
-  public assertNotNull<T>(value: T | undefined | null): T {
-    if (value == null) {
-      throw new Error('Something went wrong. Unexpected null.');
-    }
-
-    return value;
+  public isGlobal(node: Node, type: Type | undefined, name: keyof Globals): boolean {
+    return this.isSymbolic(type) && this.isGlobalSymbol(node, this.getSymbolForType(node, type), name);
   }
 
-  public isOnlyGlobal(
-    node: Node,
-    type: Type | undefined,
-    name: keyof Globals,
-  ): boolean {
-    return (
-      this.isSymbolic(type) &&
-      this.isGlobalSymbol(node, this.getSymbolForType(node, type), name)
-    );
-  }
-
-  public isGlobal(
-    node: Node,
-    type: Type | undefined,
-    name: keyof Globals,
-  ): boolean {
-    return (
-      this.isSymbolic(type) &&
-      this.isGlobalSymbol(node, this.getSymbolForType(node, type), name)
-    );
-  }
-
-  public isGlobalSymbol(
-    node: Node,
-    symbol: Symbol | undefined,
-    name: keyof Globals,
-  ): boolean {
+  public isGlobalSymbol(_node: Node, symbol: Symbol | undefined, name: keyof Globals): boolean {
     return symbol === this.globals[name];
   }
 
-  public isOnlyLib(
-    node: Node,
-    type: Type | undefined,
-    name: keyof Libs,
-  ): boolean {
-    return (
-      this.isSymbolic(type) &&
-      this.isLibSymbol(node, this.getSymbolForType(node, type), name)
-    );
+  public isOnlyLib(node: Node, type: Type | undefined, name: keyof Libs): boolean {
+    return this.isSymbolic(type) && this.isLibSymbol(node, this.getSymbolForType(node, type), name);
   }
 
-  public isLibSymbol(
-    node: Node,
-    symbol: Symbol | undefined,
-    name: keyof Libs,
-  ): boolean {
+  public isLibSymbol(_node: Node, symbol: Symbol | undefined, name: keyof Libs): boolean {
     return symbol === this.libs[name];
   }
 
-  public isLibAlias(
-    identifier: Identifier | undefined,
-    name: keyof LibAliases,
-  ): boolean {
-    if (identifier == null) {
+  public isLibAlias(identifier: Identifier | undefined, name: keyof LibAliases): boolean {
+    if (identifier === undefined) {
       return false;
     }
 
@@ -229,7 +160,7 @@ export class Context {
 
   private isSymbolic(type: Type | undefined): boolean {
     return (
-      type == null ||
+      type === undefined ||
       (!typeUtils.isLiteral(type) &&
         !typeUtils.isPrimitive(type) &&
         !typeUtils.isTuple(type) &&
@@ -240,7 +171,7 @@ export class Context {
 
   private getNotAnyType(type: Type | undefined): Type | undefined {
     // tslint:disable-next-line no-bitwise
-    if (type == null || (type.getFlags() & TypeFlags.Any) !== 0) {
+    if (type === undefined || (type.getFlags() & TypeFlags.Any) !== 0) {
       return undefined;
     }
 

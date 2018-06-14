@@ -7,11 +7,7 @@ import { Helper } from '../Helper';
 // Input: [argsArray]
 // Output: []
 export class ParametersHelper extends Helper<Node & SignaturedDeclaration> {
-  public emit(
-    sb: ScriptBuilder,
-    node: Node & SignaturedDeclaration,
-    optionsIn: VisitOptions,
-  ): void {
+  public emit(sb: ScriptBuilder, node: Node & SignaturedDeclaration, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [argsarr]
     node.getParameters().forEach((param, idx) => {
@@ -19,9 +15,8 @@ export class ParametersHelper extends Helper<Node & SignaturedDeclaration> {
 
       const initializer = param.getInitializer();
       if (param.isRestParameter()) {
-        // TODO: Support me, currently commented out to allow for createEventHandler
         // sb.reportUnsupported(param);
-      } else if (initializer != null) {
+      } else if (initializer !== undefined) {
         sb.emitHelper(
           param,
           sb.noPushValueOptions(options),
@@ -55,11 +50,7 @@ export class ParametersHelper extends Helper<Node & SignaturedDeclaration> {
                 sb.helpers.if({
                   condition: () => {
                     // [isUndefined, arg, argsarr]
-                    sb.emitHelper(
-                      param,
-                      sb.pushValueOptions(options),
-                      sb.helpers.isUndefined,
-                    );
+                    sb.emitHelper(param, sb.pushValueOptions(options), sb.helpers.isUndefined);
                   },
                   whenTrue: () => {
                     // [argsarr]
@@ -89,11 +80,7 @@ export class ParametersHelper extends Helper<Node & SignaturedDeclaration> {
             },
             whenTrue: () => {
               // [undefinedVal, argsarr]
-              sb.emitHelper(
-                param,
-                sb.pushValueOptions(options),
-                sb.helpers.createUndefined,
-              );
+              sb.emitHelper(param, sb.pushValueOptions(options), sb.helpers.createUndefined);
             },
             whenFalse: () => {
               // [argsarr, argsarr]

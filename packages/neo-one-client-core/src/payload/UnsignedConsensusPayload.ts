@@ -11,19 +11,16 @@ import { BinaryReader, BinaryWriter } from '../utils';
 import { ConsensusMessage, deserializeConsensusMessageWire } from './message';
 
 export interface UnsignedConsensusPayloadAdd {
-  version: number;
-  previousHash: UInt256;
-  blockIndex: number;
-  validatorIndex: number;
-  timestamp?: number;
-  consensusMessage: ConsensusMessage;
+  readonly version: number;
+  readonly previousHash: UInt256;
+  readonly blockIndex: number;
+  readonly validatorIndex: number;
+  readonly timestamp?: number;
+  readonly consensusMessage: ConsensusMessage;
 }
 
-export class UnsignedConsensusPayload
-  implements SerializableWire<UnsignedConsensusPayload> {
-  public static readonly deserializeUnsignedConsensusPayloadWireBase = (
-    options: DeserializeWireBaseOptions,
-  ) => {
+export class UnsignedConsensusPayload implements SerializableWire<UnsignedConsensusPayload> {
+  public static readonly deserializeUnsignedConsensusPayloadWireBase = (options: DeserializeWireBaseOptions) => {
     const { reader } = options;
     const version = reader.readUInt32LE();
     const previousHash = reader.readUInt256();
@@ -46,15 +43,11 @@ export class UnsignedConsensusPayload
     };
   };
 
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): UnsignedConsensusPayload {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): UnsignedConsensusPayload {
     return new this(this.deserializeUnsignedConsensusPayloadWireBase(options));
   }
 
-  public static deserializeWire(
-    options: DeserializeWireOptions,
-  ): UnsignedConsensusPayload {
+  public static deserializeWire(options: DeserializeWireOptions): UnsignedConsensusPayload {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),
@@ -67,11 +60,9 @@ export class UnsignedConsensusPayload
   public readonly validatorIndex: number;
   public readonly timestamp: number;
   public readonly consensusMessage: ConsensusMessage;
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  constructor({
+  public constructor({
     version,
     previousHash,
     blockIndex,
@@ -83,7 +74,7 @@ export class UnsignedConsensusPayload
     this.previousHash = previousHash;
     this.blockIndex = blockIndex;
     this.validatorIndex = validatorIndex;
-    this.timestamp = timestamp == null ? commonUtils.nowSeconds() : timestamp;
+    this.timestamp = timestamp === undefined ? commonUtils.nowSeconds() : timestamp;
     this.consensusMessage = consensusMessage;
   }
 

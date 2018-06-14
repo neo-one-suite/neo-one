@@ -11,45 +11,34 @@ import {
   SerializeJSONContext,
   SerializeWire,
 } from './Serializable';
-import {
-  BinaryReader,
-  BinaryWriter,
-  IOHelper,
-  JSONHelper,
-  utils,
-} from './utils';
+import { BinaryReader, BinaryWriter, IOHelper, JSONHelper, utils } from './utils';
 
 export interface ValidatorKey {
-  publicKey: ECPoint;
+  readonly publicKey: ECPoint;
 }
 
 export interface ValidatorAdd {
-  version?: number;
-  publicKey: ECPoint;
-  registered?: boolean;
-  votes?: BN;
+  readonly version?: number;
+  readonly publicKey: ECPoint;
+  readonly registered?: boolean;
+  readonly votes?: BN;
 }
 
 export interface ValidatorUpdate {
-  registered?: boolean;
-  votes?: BN;
+  readonly registered?: boolean;
+  readonly votes?: BN;
 }
 
 export interface ValidatorJSON {
-  version: number;
-  publicKey: string;
-  registered: boolean;
-  votes: string;
+  readonly version: number;
+  readonly publicKey: string;
+  readonly registered: boolean;
+  readonly votes: string;
 }
 
 export class Validator extends BaseState
-  implements
-    SerializableWire<Validator>,
-    Equatable,
-    SerializableJSON<ValidatorJSON> {
-  public static deserializeWireBase({
-    reader,
-  }: DeserializeWireBaseOptions): Validator {
+  implements SerializableWire<Validator>, Equatable, SerializableJSON<ValidatorJSON> {
+  public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): Validator {
     const version = reader.readUInt8();
     const publicKey = reader.readECPoint();
     const registered = reader.readBoolean();
@@ -71,21 +60,16 @@ export class Validator extends BaseState
   public readonly equals: Equals = utils.equals(Validator, (other) =>
     common.ecPointEqual(this.publicKey, other.publicKey),
   );
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 
-  constructor({ version, publicKey, registered, votes }: ValidatorAdd) {
+  public constructor({ version, publicKey, registered = false, votes = utils.ZERO }: ValidatorAdd) {
     super({ version });
     this.publicKey = publicKey;
-    this.registered = registered == null ? false : registered;
-    this.votes = votes == null ? utils.ZERO : votes;
+    this.registered = registered;
+    this.votes = votes;
     this.sizeInternal = utils.lazy(
-      () =>
-        IOHelper.sizeOfECPoint(this.publicKey) +
-        IOHelper.sizeOfBoolean +
-        IOHelper.sizeOfFixed8,
+      () => IOHelper.sizeOfECPoint(this.publicKey) + IOHelper.sizeOfBoolean + IOHelper.sizeOfFixed8,
     );
   }
 
@@ -93,12 +77,12 @@ export class Validator extends BaseState
     return this.sizeInternal();
   }
 
-  public update({ votes, registered }: ValidatorUpdate): Validator {
+  public update({ votes = this.votes, registered = this.registered }: ValidatorUpdate): Validator {
     return new Validator({
       version: this.version,
       publicKey: this.publicKey,
-      registered: registered == null ? this.registered : registered,
-      votes: votes == null ? this.votes : votes,
+      registered,
+      votes,
     });
   }
 
@@ -109,7 +93,7 @@ export class Validator extends BaseState
     writer.writeFixed8(this.votes);
   }
 
-  public serializeJSON(context: SerializeJSONContext): ValidatorJSON {
+  public serializeJSON(_context: SerializeJSONContext): ValidatorJSON {
     return {
       version: this.version,
       publicKey: JSONHelper.writeECPoint(this.publicKey),

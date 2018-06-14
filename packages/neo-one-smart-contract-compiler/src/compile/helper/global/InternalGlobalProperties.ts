@@ -1,4 +1,4 @@
 export enum InternalGlobalProperties {
-  MODULES = 'modules',
-  ARGUMENTS = 'arguments',
+  Modules = 'modules',
+  Arguments = 'arguments',
 }

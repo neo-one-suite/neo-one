@@ -1,10 +1,6 @@
 import BigNumber from 'bignumber.js';
 import * as abis from '../../__data__/abis';
-import {
-  InvalidArgumentError,
-  InvalidEventError,
-  InvocationCallError,
-} from '../../errors';
+import { InvalidArgumentError, InvalidEventError, InvocationCallError } from '../../errors';
 import * as common from '../../sc/common';
 import { ABIParameter, ActionRaw, ContractParameter } from '../../types';
 
@@ -96,9 +92,7 @@ describe('common', () => {
       common.convertAction({ action, events: { event1: abis.abiEvent() } });
     }
 
-    expect(testError).toThrow(new InvalidEventError(
-      'Notification had no arguments',
-    ) as any);
+    expect(testError).toThrow(new InvalidEventError('Notification had no arguments') as any);
   });
 
   test('convertAction throws error on missing event property', () => {
@@ -120,9 +114,7 @@ describe('common', () => {
       common.convertAction({ action, events });
     }
 
-    expect(testError).toThrow(new InvalidEventError(
-      `Unknown event ${String((action.args[0] as any).value)}`,
-    ) as any);
+    expect(testError).toThrow(new InvalidEventError(`Unknown event ${String((action.args[0] as any).value)}`) as any);
   });
 
   test('convertAction on notification action', () => {
@@ -131,11 +123,9 @@ describe('common', () => {
       args: [contractParameter, contractParameter],
       version: 0,
       blockIndex: 1,
-      blockHash:
-        '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca',
+      blockHash: '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca',
       transactionIndex: 2,
-      transactionHash:
-        '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89cb',
+      transactionHash: '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89cb',
       index: 2,
       globalIndex: new BigNumber(3),
       scriptHash: '0x3775292229eccdf904f16fff8e83e7cffdc0f0ce',
@@ -257,9 +247,7 @@ describe('common', () => {
       });
     }
 
-    expect(testError).toThrow(new InvocationCallError(
-      resultCall.message,
-    ) as any);
+    expect(testError).toThrow(new InvocationCallError(resultCall.message) as any);
   });
 
   test('convertCallResult', () => {
@@ -320,8 +308,7 @@ describe('common', () => {
     }
 
     expect(testError).toThrow(new InvalidArgumentError(
-      `Expected parameters length (${parameters.length}) to equal params ` +
-        `length (${params.length}).`,
+      `Expected parameters length (${parameters.length}) to equal params ` + `length (${params.length}).`,
     ) as any);
   });
 });

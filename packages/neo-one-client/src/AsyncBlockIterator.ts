@@ -2,10 +2,10 @@ import { Monitor } from '@neo-one/monitor';
 import _ from 'lodash';
 import { Block, BlockFilter, GetOptions } from './types';
 
-type Item = { type: 'value'; value: Block } | { type: 'error'; error: Error };
+type Item = { readonly type: 'value'; readonly value: Block } | { readonly type: 'error'; readonly error: Error };
 interface Resolver {
-  resolve: (value: IteratorResult<Block>) => void;
-  reject: (reason: Error) => void;
+  readonly resolve: (value: IteratorResult<Block>) => void;
+  readonly reject: (reason: Error) => void;
 }
 
 interface Client {
@@ -14,10 +14,10 @@ interface Client {
 }
 
 interface AsyncBlockIteratorOptions {
-  client: Client;
-  filter: BlockFilter;
-  fetchTimeoutMS?: number;
-  batchSize?: number;
+  readonly client: Client;
+  readonly filter: BlockFilter;
+  readonly fetchTimeoutMS?: number;
+  readonly batchSize?: number;
 }
 
 const FETCH_TIMEOUT_MS = 20000;
@@ -26,63 +26,61 @@ const BATCH_SIZE = 10;
 
 export class AsyncBlockIterator implements AsyncIterator<Block> {
   private readonly client: Client;
-  private readonly items: Item[];
-  private resolvers: Resolver[];
-  private doneInternal: boolean;
-  private currentIndex: number;
-  private fetching: boolean;
-  private startHeight: number | null;
+  private readonly mutableItems: Item[];
+  private mutableResolvers: Resolver[];
+  private mutableDone: boolean;
+  private mutableCurrentIndex: number;
+  private mutableFetching: boolean;
+  private mutableStartHeight: number | undefined;
   private readonly indexStop: number | undefined;
   private readonly fetchTimeoutMS: number;
   private readonly batchSize: number;
   private readonly monitor: Monitor | undefined;
 
-  constructor({
+  public constructor({
     client,
-    filter,
-    fetchTimeoutMS,
-    batchSize,
+    filter: { indexStart = 0, indexStop, monitor },
+    fetchTimeoutMS = FETCH_TIMEOUT_MS,
+    batchSize = BATCH_SIZE,
   }: AsyncBlockIteratorOptions) {
     this.client = client;
-    this.items = [];
-    this.resolvers = [];
-    this.doneInternal = false;
-    this.currentIndex = filter.indexStart || 0;
-    this.fetching = false;
-    this.startHeight = null;
-    this.indexStop = filter.indexStop;
-    this.fetchTimeoutMS =
-      fetchTimeoutMS == null ? FETCH_TIMEOUT_MS : fetchTimeoutMS;
-    this.batchSize = batchSize == null ? BATCH_SIZE : batchSize;
-    this.monitor =
-      filter.monitor == null
-        ? undefined
-        : filter.monitor.at('async_block_iterator');
+    this.mutableItems = [];
+    this.mutableResolvers = [];
+    this.mutableDone = false;
+    this.mutableCurrentIndex = indexStart;
+    this.mutableFetching = false;
+    this.indexStop = indexStop;
+    this.fetchTimeoutMS = fetchTimeoutMS;
+    this.batchSize = batchSize;
+    this.monitor = monitor === undefined ? undefined : monitor.at('async_block_iterator');
   }
 
   public [Symbol.asyncIterator]() {
     return this;
   }
 
-  public next(): Promise<IteratorResult<Block>> {
-    if (!this.doneInternal) {
+  public async next(): Promise<IteratorResult<Block>> {
+    if (!this.mutableDone) {
       this.fetch();
     }
 
-    const item = this.items.shift();
-    if (item != null) {
+    const item = this.mutableItems.shift();
+    if (item !== undefined) {
       if (item.type === 'error') {
         return Promise.reject(item.error);
       }
+
       return Promise.resolve({ done: false, value: item.value });
     }
 
-    if (this.doneInternal) {
+    if (this.mutableDone) {
+      // tslint:disable-next-line no-any
       return Promise.resolve({ done: true } as any);
     }
 
-    return new Promise((resolve, reject) => {
-      this.resolvers.push({ resolve, reject });
+    // tslint:disable-next-line promise-must-complete
+    return new Promise<IteratorResult<Block>>((resolve, reject) => {
+      this.mutableResolvers.push({ resolve, reject });
     });
   }
 
@@ -95,12 +93,12 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
   }
 
   private push(item: Item): void {
-    if (this.doneInternal) {
+    if (this.mutableDone) {
       throw new Error('AsyncBlockIterator already ended');
     }
 
-    const resolver = this.resolvers.shift();
-    if (resolver != null) {
+    const resolver = this.mutableResolvers.shift();
+    if (resolver !== undefined) {
       const { resolve, reject } = resolver;
       if (item.type === 'error') {
         reject(item.error);
@@ -108,41 +106,43 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
         resolve({ done: false, value: item.value });
       }
     } else {
-      this.items.push(item);
+      this.mutableItems.push(item);
     }
   }
 
   private done(): void {
-    this.resolvers.forEach(({ resolve }) => resolve({ done: true } as any));
-    this.resolvers = [];
-    this.doneInternal = true;
+    // tslint:disable-next-line no-any
+    this.mutableResolvers.forEach(({ resolve }) => resolve({ done: true } as any));
+    // tslint:disable-next-line no-any
+    this.mutableResolvers = [];
+    this.mutableDone = true;
   }
 
   private fetch(): void {
-    if (this.fetching) {
+    if (this.mutableFetching) {
       return;
     }
-    this.fetching = true;
+    this.mutableFetching = true;
     this.asyncFetch()
       .then(() => {
-        this.fetching = false;
+        this.mutableFetching = false;
       })
       .catch((error) => {
-        this.fetching = false;
+        this.mutableFetching = false;
         this.error(error);
       });
   }
 
   private async asyncFetch(): Promise<void> {
-    let startHeight = this.startHeight;
-    if (startHeight == null) {
+    let startHeight = this.mutableStartHeight;
+    if (startHeight === undefined) {
       const blockCount = await this.client.getBlockCount(this.monitor);
       startHeight = blockCount - 1;
-      this.startHeight = startHeight;
+      this.mutableStartHeight = startHeight;
     }
 
-    const index = this.currentIndex;
-    if (this.indexStop != null && index >= this.indexStop) {
+    const index = this.mutableCurrentIndex;
+    if (this.indexStop !== undefined && index >= this.indexStop) {
       this.done();
     } else if (index >= startHeight) {
       const [block, newStartHeight] = await Promise.all([
@@ -151,32 +151,29 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
         this.client.getBlockCount(this.monitor),
       ]);
 
-      this.currentIndex += 1;
+      this.mutableCurrentIndex += 1;
       this.write(block);
-      this.startHeight = newStartHeight;
+      this.mutableStartHeight = newStartHeight;
     } else {
-      let toFetch = Math.min(
-        QUEUE_SIZE - this.items.length,
-        startHeight - index,
-      );
+      let toFetch = Math.min(QUEUE_SIZE - this.mutableItems.length, startHeight - index);
 
-      if (this.indexStop != null) {
+      if (this.indexStop !== undefined) {
         toFetch = Math.min(toFetch, this.indexStop - index);
       }
-      for (const chunk of _.chunk(_.range(0, toFetch), this.batchSize)) {
-        // eslint-disable-next-line
-        const blocks = await Promise.all(
-          chunk.map((offset) => this.fetchOne(index + offset, true)),
-        );
 
-        this.currentIndex += chunk.length;
+      // tslint:disable-next-line no-loop-statement
+      for (const chunk of _.chunk(_.range(0, toFetch), this.batchSize)) {
+        const blocks = await Promise.all(chunk.map(async (offset) => this.fetchOne(index + offset, true)));
+
+        this.mutableCurrentIndex += chunk.length;
         blocks.forEach((block) => this.write(block));
       }
     }
   }
 
-  private async fetchOne(index: number, isBatch?: boolean): Promise<Block> {
+  private async fetchOne(index: number, isBatch = false): Promise<Block> {
     try {
+      // tslint:disable-next-line no-unnecessary-local-variable prefer-immediate-return
       const block = await this.client.getBlock(
         index,
         isBatch
@@ -189,13 +186,14 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
             },
       );
 
+      // tslint:disable-next-line no-var-before-return
       return block;
     } catch (error) {
       if (error.code === 'UNKNOWN_BLOCK') {
         return this.fetchOne(index, isBatch);
       }
 
-      throw error;
+      throw error as Error;
     }
   }
 }

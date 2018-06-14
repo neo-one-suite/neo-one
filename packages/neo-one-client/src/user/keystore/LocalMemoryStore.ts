@@ -3,25 +3,23 @@ import { Wallet } from './LocalKeyStore';
 export class LocalMemoryStore {
   public readonly type: string;
 
-  constructor(type?: string) {
-    this.type = type == null ? 'memory' : type;
+  public constructor(type?: string) {
+    this.type = type === undefined ? 'memory' : type;
   }
 
-  public getWallets(): Promise<Wallet[]> {
+  public async getWallets(): Promise<ReadonlyArray<Wallet>> {
     return Promise.resolve([]);
   }
 
-  public getWalletsSync(): Wallet[] {
+  public getWalletsSync(): ReadonlyArray<Wallet> {
     return [];
   }
 
-  // eslint-disable-next-line
-  public saveWallet(wallet: Wallet): Promise<void> {
+  public async saveWallet(_wallet: Wallet): Promise<void> {
     return Promise.resolve();
   }
 
-  // eslint-disable-next-line
-  public deleteWallet(wallet: Wallet): Promise<void> {
+  public async deleteWallet(_wallet: Wallet): Promise<void> {
     return Promise.resolve();
   }
 }

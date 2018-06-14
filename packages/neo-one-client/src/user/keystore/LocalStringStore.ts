@@ -3,26 +3,24 @@ import * as networks from '../../networks';
 import { Wallet as LocalWallet } from './LocalKeyStore';
 
 interface Storage {
-  setItem: (key: string, value: string) => Promise<void>;
-  getItem: (key: string) => Promise<string>;
-  removeItem: (key: string) => Promise<void>;
-  getAllKeys: () => Promise<string[]>;
+  readonly setItem: (key: string, value: string) => Promise<void>;
+  readonly getItem: (key: string) => Promise<string>;
+  readonly removeItem: (key: string) => Promise<void>;
+  readonly getAllKeys: () => Promise<ReadonlyArray<string>>;
 }
 
 export class LocalStringStore {
   public readonly type: string;
   public readonly storage: Storage;
 
-  constructor({ type, storage }: { type: string; storage: Storage }) {
+  public constructor({ type, storage }: { readonly type: string; readonly storage: Storage }) {
     this.type = type;
     this.storage = storage;
   }
 
-  public async getWallets(): Promise<LocalWallet[]> {
+  public async getWallets(): Promise<ReadonlyArray<LocalWallet>> {
     const keys = await this.storage.getAllKeys();
-    const values = await Promise.all(
-      keys.map((key) => this.storage.getItem(key)),
-    );
+    const values = await Promise.all(keys.map(async (key) => this.storage.getItem(key)));
 
     return values.map((value) => JSON.parse(value));
   }
@@ -30,7 +28,7 @@ export class LocalStringStore {
   public async saveWallet(wallet: LocalWallet): Promise<void> {
     let safeWallet = wallet;
     if (wallet.account.id.network === networks.MAIN) {
-      if (wallet.nep2 == null) {
+      if (wallet.nep2 === undefined) {
         throw new PasswordRequiredError();
       }
       safeWallet = {
@@ -40,10 +38,7 @@ export class LocalStringStore {
       };
     }
 
-    await this.storage.setItem(
-      this.getKey(safeWallet),
-      JSON.stringify(safeWallet),
-    );
+    await this.storage.setItem(this.getKey(safeWallet), JSON.stringify(safeWallet));
   }
 
   public async deleteWallet(wallet: LocalWallet): Promise<void> {

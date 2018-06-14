@@ -1,23 +1,14 @@
-import {
-  createDeserializeWire,
-  DeserializeWire,
-  DeserializeWireBaseOptions,
-} from '../../Serializable';
+import { utils } from '@neo-one/utils';
+import { createDeserializeWire, DeserializeWireBaseOptions } from '../../Serializable';
 import { assertAttributeUsage, AttributeUsage } from './AttributeUsage';
 import { BufferAttribute } from './BufferAttribute';
 import { ECPointAttribute } from './ECPointAttribute';
 import { UInt160Attribute } from './UInt160Attribute';
 import { UInt256Attribute } from './UInt256Attribute';
 
-export type Attribute =
-  | BufferAttribute
-  | ECPointAttribute
-  | UInt160Attribute
-  | UInt256Attribute;
+export type Attribute = BufferAttribute | ECPointAttribute | UInt160Attribute | UInt256Attribute;
 
-export const deserializeAttributeWireBase = (
-  options: DeserializeWireBaseOptions,
-): Attribute => {
+export const deserializeAttributeWireBase = (options: DeserializeWireBaseOptions): Attribute => {
   const { reader } = options;
   const usage = assertAttributeUsage(reader.clone().readUInt8());
   switch (usage) {
@@ -63,9 +54,10 @@ export const deserializeAttributeWireBase = (
     case AttributeUsage.Remark14:
     case AttributeUsage.Remark15:
       return BufferAttribute.deserializeWireBase(options);
+    default:
+      utils.assertNever(usage);
+      throw new Error('For TS');
   }
 };
 
-export const deserializeAttributeWire: DeserializeWire<
-  Attribute
-> = createDeserializeWire(deserializeAttributeWireBase);
+export const deserializeAttributeWire = createDeserializeWire(deserializeAttributeWireBase);

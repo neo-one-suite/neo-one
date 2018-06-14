@@ -1,8 +1,5 @@
 import BN from 'bn.js';
-import {
-  ContractParameter,
-  deserializeContractParameterWireBase,
-} from '../contractParameter';
+import { ContractParameter, deserializeContractParameterWireBase } from '../contractParameter';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -15,29 +12,26 @@ import { assertVMState, VMState } from '../vm';
 import { InvocationResult } from './InvocationResult';
 
 export interface InvocationResultBaseAdd<T extends VMState> {
-  state: T;
-  gasConsumed: BN;
-  gasCost: BN;
-  stack: ContractParameter[];
+  readonly state: T;
+  readonly gasConsumed: BN;
+  readonly gasCost: BN;
+  readonly stack: ReadonlyArray<ContractParameter>;
 }
 
-export abstract class InvocationResultBase<T extends VMState>
-  implements SerializableWire<InvocationResult> {
+export abstract class InvocationResultBase<T extends VMState = VMState> implements SerializableWire<InvocationResult> {
   public static deserializeInvocationResultWireBase(
     options: DeserializeWireBaseOptions,
   ): {
-    state: VMState;
-    gasConsumed: BN;
-    gasCost: BN;
-    stack: ContractParameter[];
+    readonly state: VMState;
+    readonly gasConsumed: BN;
+    readonly gasCost: BN;
+    readonly stack: ReadonlyArray<ContractParameter>;
   } {
     const { reader } = options;
     const state = reader.readUInt8();
     const gasConsumed = reader.readFixed8();
     const gasCost = reader.readFixed8();
-    const stack = reader.readArray(() =>
-      deserializeContractParameterWireBase(options),
-    );
+    const stack = reader.readArray(() => deserializeContractParameterWireBase(options));
 
     return {
       state: assertVMState(state),
@@ -47,15 +41,11 @@ export abstract class InvocationResultBase<T extends VMState>
     };
   }
 
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): InvocationResultBase<any> {
+  public static deserializeWireBase(_options: DeserializeWireBaseOptions): InvocationResultBase {
     throw new Error('Not Implemented');
   }
 
-  public static deserializeWire(
-    options: DeserializeWireOptions,
-  ): InvocationResultBase<any> {
+  public static deserializeWire(options: DeserializeWireOptions): InvocationResultBase {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),
@@ -65,19 +55,12 @@ export abstract class InvocationResultBase<T extends VMState>
   public readonly state: T;
   public readonly gasConsumed: BN;
   public readonly gasCost: BN;
-  public readonly stack: ContractParameter[];
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
+  public readonly stack: ReadonlyArray<ContractParameter>;
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   protected readonly sizeExclusive: () => number;
   private readonly sizeInternal: () => number;
 
-  constructor({
-    state,
-    gasConsumed,
-    gasCost,
-    stack,
-  }: InvocationResultBaseAdd<T>) {
+  public constructor({ state, gasConsumed, gasCost, stack }: InvocationResultBaseAdd<T>) {
     this.state = state;
     this.gasConsumed = gasConsumed;
     this.gasCost = gasCost;
@@ -101,8 +84,6 @@ export abstract class InvocationResultBase<T extends VMState>
     writer.writeUInt8(this.state);
     writer.writeFixed8(this.gasConsumed);
     writer.writeFixed8(this.gasCost);
-    writer.writeArray(this.stack, (contractParameter) =>
-      contractParameter.serializeWireBase(writer),
-    );
+    writer.writeArray(this.stack, (contractParameter) => contractParameter.serializeWireBase(writer));
   }
 }

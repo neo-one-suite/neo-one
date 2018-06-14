@@ -9,12 +9,8 @@ export class InvalidStateDescriptorTypeError extends CustomError {
   public readonly stateDescriptorType: number;
   public readonly code: string;
 
-  constructor(stateDescriptorType: number) {
-    super(
-      `Expected state descriptor type, found: ${stateDescriptorType.toString(
-        16,
-      )}`,
-    );
+  public constructor(stateDescriptorType: number) {
+    super(`Expected state descriptor type, found: ${stateDescriptorType.toString(16)}`);
 
     this.stateDescriptorType = stateDescriptorType;
     this.code = 'INVALID_STATE_DESCRIPTOR_TYPE';
@@ -22,11 +18,10 @@ export class InvalidStateDescriptorTypeError extends CustomError {
 }
 
 const isStateDescriptorType = (value: number): value is StateDescriptorType =>
-  StateDescriptorType[value] != null;
+  // tslint:disable-next-line strict-type-predicates
+  StateDescriptorType[value] !== undefined;
 
-export const assertStateDescriptorType = (
-  value: number,
-): StateDescriptorType => {
+export const assertStateDescriptorType = (value: number): StateDescriptorType => {
   if (isStateDescriptorType(value)) {
     return value;
   }

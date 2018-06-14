@@ -1,13 +1,15 @@
 import { Monitor } from '@neo-one/monitor';
 
 export interface JSONRPCRequest {
-  method: string;
-  params?: any;
-  watchTimeoutMS?: number;
+  readonly method: string;
+  // tslint:disable-next-line no-any
+  readonly params?: any;
+  readonly watchTimeoutMS?: number;
 }
 
+// tslint:disable-next-line no-any
 export type JSONRPCResponse = any;
 
 export interface JSONRPCProvider {
-  request(req: JSONRPCRequest, monitor?: Monitor): Promise<JSONRPCResponse>;
+  readonly request: (req: JSONRPCRequest, monitor?: Monitor) => Promise<JSONRPCResponse>;
 }

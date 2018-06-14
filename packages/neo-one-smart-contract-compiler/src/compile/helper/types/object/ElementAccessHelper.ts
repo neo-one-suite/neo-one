@@ -1,4 +1,4 @@
-import { ElementAccessExpression, Node, ts, Type } from 'ts-simple-ast';
+import { ElementAccessExpression, Node, Type } from 'ts-simple-ast';
 
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
@@ -9,11 +9,7 @@ import * as typeUtils from '../../../../typeUtils';
 // Input: [val]
 // Output: [val]
 export class ElementAccessHelper extends Helper<ElementAccessExpression> {
-  public emit(
-    sb: ScriptBuilder,
-    expr: ElementAccessExpression,
-    optionsIn: VisitOptions,
-  ): void {
+  public emit(sb: ScriptBuilder, expr: ElementAccessExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
     const value = expr.getExpression();
     const valueType = sb.getType(value);
@@ -21,11 +17,7 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
     const propType = sb.getType(prop);
 
     // [objectVal]
-    sb.emitHelper(
-      value,
-      options,
-      sb.helpers.toObject({ type: sb.getType(value) }),
-    );
+    sb.emitHelper(value, options, sb.helpers.toObject({ type: sb.getType(value) }));
 
     // [propVal, objectVal]
     sb.visit(prop, options);
@@ -49,14 +41,7 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
         this.setProperty(sb, prop, options, valueIndex);
       } else if (typeUtils.isOnlyNumber(propType)) {
         // []
-        this.setNumberProperty(
-          sb,
-          prop,
-          options,
-          propType,
-          valueType,
-          valueIndex,
-        );
+        this.setNumberProperty(sb, prop, options, propType, valueType, valueIndex);
       } else if (typeUtils.isOnlySymbol(propType)) {
         // [propString, objectVal]
         sb.emitHelper(prop, options, sb.helpers.getSymbol);
@@ -92,14 +77,7 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
                 },
                 whenTrue: () => {
                   // []
-                  this.setNumberProperty(
-                    sb,
-                    prop,
-                    options,
-                    propType,
-                    valueType,
-                    valueIndex,
-                  );
+                  this.setNumberProperty(sb, prop, options, propType, valueType, valueIndex);
                 },
               },
             ],
@@ -146,11 +124,7 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
                   // [propString, objectVal]
                   sb.emitHelper(prop, options, sb.helpers.getString);
                   // [val]
-                  sb.emitHelper(
-                    expr,
-                    options,
-                    sb.helpers.getPropertyObjectProperty,
-                  );
+                  sb.emitHelper(expr, options, sb.helpers.getPropertyObjectProperty);
                 },
               },
               {
@@ -162,13 +136,7 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
                 },
                 whenTrue: () => {
                   // [val]
-                  this.getNumberProperty(
-                    sb,
-                    prop,
-                    options,
-                    propType,
-                    valueType,
-                  );
+                  this.getNumberProperty(sb, prop, options, propType, valueType);
                 },
               },
             ],
@@ -192,8 +160,8 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
     sb: ScriptBuilder,
     node: Node,
     options: VisitOptions,
-    propType: Type<ts.Type> | undefined,
-    valueType: Type<ts.Type> | undefined,
+    propType: Type | undefined,
+    valueType: Type | undefined,
   ): void {
     if (typeUtils.isOnlyArray(valueType) || typeUtils.isOnlyTuple(valueType)) {
       sb.emitHelper(node, options, sb.helpers.getNumber);
@@ -215,11 +183,7 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
           },
           whenFalse: () => {
             // [propString, objectVal]
-            sb.emitHelper(
-              node,
-              options,
-              sb.helpers.toString({ type: propType }),
-            );
+            sb.emitHelper(node, options, sb.helpers.toString({ type: propType }));
             // [val]
             sb.emitHelper(node, options, sb.helpers.getPropertyObjectProperty);
           },
@@ -228,12 +192,7 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
     }
   }
 
-  private setProperty(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    index: number,
-  ): void {
+  private setProperty(sb: ScriptBuilder, node: Node, options: VisitOptions, index: number): void {
     // [val, propString, objectVal]
     this.pickValue(sb, node, options, index);
     // []
@@ -244,8 +203,8 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
     sb: ScriptBuilder,
     node: Node,
     options: VisitOptions,
-    propType: Type<ts.Type> | undefined,
-    valueType: Type<ts.Type> | undefined,
+    propType: Type | undefined,
+    valueType: Type | undefined,
     index: number,
   ): void {
     if (typeUtils.isOnlyArray(valueType) || typeUtils.isOnlyTuple(valueType)) {
@@ -266,11 +225,7 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
           },
           whenFalse: () => {
             // [propString, objectVal]
-            sb.emitHelper(
-              node,
-              options,
-              sb.helpers.toString({ type: propType }),
-            );
+            sb.emitHelper(node, options, sb.helpers.toString({ type: propType }));
             // []
             this.setProperty(sb, node, options, index);
           },
@@ -279,53 +234,30 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
     }
   }
 
-  private setArrayIndex(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    index: number,
-  ): void {
+  private setArrayIndex(sb: ScriptBuilder, node: Node, options: VisitOptions, index: number): void {
     // [val, propNumber, objectVal]
     this.pickValue(sb, node, options, index);
     // []
     sb.emitHelper(node, options, sb.helpers.setArrayIndex);
   }
 
-  private setSymbol(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    index: number,
-  ): void {
+  private setSymbol(sb: ScriptBuilder, node: Node, options: VisitOptions, index: number): void {
     // [val, propString, objectVal]
     this.pickValue(sb, node, options, index);
     // []
     sb.emitHelper(node, options, sb.helpers.setSymbolObjectProperty);
   }
 
-  private isArrayInstance(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private isArrayInstance(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [objectVal, propVal, objectVal]
     sb.emitOp(node, 'OVER');
     // [Array, objectVal, propVal, objectVal]
-    sb.emitHelper(
-      node,
-      options,
-      sb.helpers.getGlobalProperty({ property: 'Array' }),
-    );
+    sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Array' }));
     // [isArray, propVal, objectVal]
     sb.emitHelper(node, options, sb.helpers.instanceof);
   }
 
-  private pickValue(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    index: number,
-  ): void {
+  private pickValue(sb: ScriptBuilder, node: Node, _options: VisitOptions, index: number): void {
     if (index === 2) {
       sb.emitOp(node, 'ROT');
     } else {

@@ -1,9 +1,6 @@
 import { Equals } from '../../Equatable';
 import { InvalidFormatError } from '../../errors';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../../Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../../utils';
 import { AttributeBase, AttributeJSON } from './AttributeBase';
 import { AttributeUsage, toJSONAttributeUsage } from './AttributeUsage';
@@ -29,17 +26,12 @@ export type BufferAttributeUsage =
   | 0xff;
 
 export interface BufferAttributeAdd {
-  usage: BufferAttributeUsage;
-  value: Buffer;
+  readonly usage: BufferAttributeUsage;
+  readonly value: Buffer;
 }
 
-export class BufferAttribute extends AttributeBase<
-  BufferAttributeUsage,
-  Buffer
-> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): BufferAttribute {
+export class BufferAttribute extends AttributeBase<BufferAttributeUsage, Buffer> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): BufferAttribute {
     const { reader } = options;
     const { usage } = super.deserializeAttributeWireBase(options);
     if (
@@ -66,12 +58,8 @@ export class BufferAttribute extends AttributeBase<
     ) {
       throw new InvalidFormatError();
     }
-    let value;
-    if (usage === AttributeUsage.DescriptionUrl) {
-      value = reader.readBytes(reader.readUInt8());
-    } else {
-      value = reader.readVarBytesLE();
-    }
+    const value =
+      usage === AttributeUsage.DescriptionUrl ? reader.readBytes(reader.readUInt8()) : reader.readVarBytesLE();
 
     return new BufferAttribute({ usage, value });
   }
@@ -84,16 +72,14 @@ export class BufferAttribute extends AttributeBase<
     (other) => this.usage === other.usage && this.value.equals(other.value),
   );
 
-  constructor({ usage, value }: BufferAttributeAdd) {
+  public constructor({ usage, value }: BufferAttributeAdd) {
     super();
     this.usage = usage;
     this.value = value;
-    if (this.usage === AttributeUsage.DescriptionUrl) {
-      this.size =
-        IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt8 + this.value.length;
-    } else {
-      this.size = IOHelper.sizeOfUInt8 + IOHelper.sizeOfVarBytesLE(this.value);
-    }
+    this.size =
+      this.usage === AttributeUsage.DescriptionUrl
+        ? IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt8 + this.value.length
+        : IOHelper.sizeOfUInt8 + IOHelper.sizeOfVarBytesLE(this.value);
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
@@ -106,7 +92,7 @@ export class BufferAttribute extends AttributeBase<
     }
   }
 
-  public serializeJSON(context: SerializeJSONContext): AttributeJSON {
+  public serializeJSON(_context: SerializeJSONContext): AttributeJSON {
     return {
       usage: toJSONAttributeUsage(this.usage),
       data: JSONHelper.writeBuffer(this.value),

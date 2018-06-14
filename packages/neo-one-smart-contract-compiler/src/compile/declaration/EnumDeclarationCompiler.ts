@@ -7,11 +7,7 @@ import { VisitOptions } from '../types';
 export class EnumDeclarationCompiler extends NodeCompiler<EnumDeclaration> {
   public readonly kind: SyntaxKind = SyntaxKind.EnumDeclaration;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    decl: EnumDeclaration,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, decl: EnumDeclaration, _options: VisitOptions): void {
     sb.reportUnsupported(decl);
   }
 }

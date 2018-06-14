@@ -2,22 +2,20 @@ import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
 
 export function weightedFilter<T>(
-  input: T[],
+  input: ReadonlyArray<T>,
   startIn: number,
   endIn: number,
   getValueIn: (value: T) => BN,
-): Array<[T, BigNumber]> {
+): ReadonlyArray<[T, BigNumber]> {
   const start = new BigNumber(startIn);
   const end = new BigNumber(endIn);
   const getValue = (value: T) => new BigNumber(getValueIn(value).toString(10));
-  const amount = input.reduce(
-    (acc, value) => acc.plus(getValue(value)),
-    new BigNumber(0),
-  );
+  const amount = input.reduce((acc, value) => acc.plus(getValue(value)), new BigNumber(0));
 
   let sum = new BigNumber(0);
   let current = new BigNumber(0);
-  const result = [];
+  const mutableResult: Array<[T, BigNumber]> = [];
+  // tslint:disable-next-line no-loop-statement
   for (const value of input) {
     if (current.gte(end)) {
       break;
@@ -31,22 +29,16 @@ export function weightedFilter<T>(
       continue;
     }
     if (old.lt(start)) {
-      if (current.gt(end)) {
-        weight = end.minus(start).times(amount);
-      } else {
-        weight = current.minus(start).times(amount);
-      }
+      weight = current.gt(end) ? end.minus(start).times(amount) : current.minus(start).times(amount);
     } else if (current.gt(end)) {
       weight = end.minus(old).times(amount);
     }
 
-    result.push([
+    mutableResult.push([
       value,
-      weight.gte(0)
-        ? weight.integerValue(BigNumber.ROUND_FLOOR)
-        : weight.integerValue(BigNumber.ROUND_CEIL),
-    ] as [T, BigNumber]);
+      weight.gte(0) ? weight.integerValue(BigNumber.ROUND_FLOOR) : weight.integerValue(BigNumber.ROUND_CEIL),
+    ]);
   }
 
-  return result;
+  return mutableResult;
 }

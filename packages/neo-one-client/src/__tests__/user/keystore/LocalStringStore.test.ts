@@ -91,7 +91,7 @@ describe('LocalStringStore', () => {
       },
 
       privateKey: 'privateKey1',
-      nep2: null,
+      nep2: undefined,
     };
 
     const result = localStringStore.saveWallet(passWallet);
@@ -123,7 +123,7 @@ describe('LocalStringStore', () => {
 
     await localStringStore.saveWallet(passWallet);
     (passWallet as any).type = 'locked';
-    delete passWallet.privateKey;
+    delete (passWallet as any).privateKey;
     expected.push(passWallet);
     await expect(localStringStore.getWallets()).resolves.toEqual(expected);
   });

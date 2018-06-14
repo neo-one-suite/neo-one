@@ -11,7 +11,7 @@ export class GetBufferValueHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // ['data', objectVal]
-    sb.emitPushString(node, InternalBufferProperties.DATA);
+    sb.emitPushString(node, InternalBufferProperties.Data);
     // [byteArray]
     sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
   }

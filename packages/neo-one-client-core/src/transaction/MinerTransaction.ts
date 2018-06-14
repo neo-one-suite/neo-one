@@ -1,10 +1,7 @@
 import BN from 'bn.js';
 import { common } from '../common';
 import { InvalidFormatError, VerifyError } from '../errors';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
@@ -18,25 +15,18 @@ import {
 import { TransactionType } from './TransactionType';
 
 export interface MinerTransactionAdd extends TransactionBaseAdd {
-  nonce: number;
+  readonly nonce: number;
 }
 
 export interface MinerTransactionJSON extends TransactionBaseJSON {
-  type: 'MinerTransaction';
-  nonce: number;
+  readonly type: 'MinerTransaction';
+  readonly nonce: number;
 }
 
-export class MinerTransaction extends TransactionBase<
-  TransactionType.Miner,
-  MinerTransactionJSON
-> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): MinerTransaction {
+export class MinerTransaction extends TransactionBase<TransactionType.Miner, MinerTransactionJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): MinerTransaction {
     const { reader } = options;
-    const { type, version } = super.deserializeTransactionBaseStartWireBase(
-      options,
-    );
+    const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Miner) {
       throw new InvalidFormatError();
@@ -44,12 +34,7 @@ export class MinerTransaction extends TransactionBase<
 
     const nonce = reader.readUInt32LE();
 
-    const {
-      attributes,
-      inputs,
-      outputs,
-      scripts,
-    } = super.deserializeTransactionBaseEndWireBase(options);
+    const { attributes, inputs, outputs, scripts } = super.deserializeTransactionBaseEndWireBase(options);
 
     return new this({
       version,
@@ -62,19 +47,9 @@ export class MinerTransaction extends TransactionBase<
   }
 
   public readonly nonce: number;
-  protected readonly sizeExclusive: () => number = utils.lazy(
-    () => IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt32LE,
-  );
+  protected readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt32LE);
 
-  constructor({
-    version,
-    attributes,
-    inputs,
-    outputs,
-    scripts,
-    hash,
-    nonce,
-  }: MinerTransactionAdd) {
+  public constructor({ version, attributes, inputs, outputs, scripts, hash, nonce }: MinerTransactionAdd) {
     super({
       version,
       type: TransactionType.Miner,
@@ -93,18 +68,18 @@ export class MinerTransaction extends TransactionBase<
   }
 
   public clone({
-    scripts,
-    attributes,
+    scripts = this.scripts,
+    attributes = this.attributes,
   }: {
-    scripts?: Witness[];
-    attributes?: Attribute[];
+    readonly scripts?: ReadonlyArray<Witness>;
+    readonly attributes?: ReadonlyArray<Attribute>;
   }): MinerTransaction {
     return new MinerTransaction({
       version: this.version,
-      attributes: attributes || this.attributes,
+      attributes,
       inputs: this.inputs,
       outputs: this.outputs,
-      scripts: scripts || this.scripts,
+      scripts,
       nonce: this.nonce,
     });
   }
@@ -113,12 +88,8 @@ export class MinerTransaction extends TransactionBase<
     writer.writeUInt32LE(this.nonce);
   }
 
-  public async serializeJSON(
-    context: SerializeJSONContext,
-  ): Promise<MinerTransactionJSON> {
-    const transactionBaseJSON = await super.serializeTransactionBaseJSON(
-      context,
-    );
+  public async serializeJSON(context: SerializeJSONContext): Promise<MinerTransactionJSON> {
+    const transactionBaseJSON = await super.serializeTransactionBaseJSON(context);
 
     return {
       ...transactionBaseJSON,
@@ -127,7 +98,7 @@ export class MinerTransaction extends TransactionBase<
     };
   }
 
-  public async getNetworkFee(context: FeeContext): Promise<BN> {
+  public async getNetworkFee(_context: FeeContext): Promise<BN> {
     return utils.ZERO;
   }
 
@@ -135,24 +106,14 @@ export class MinerTransaction extends TransactionBase<
     await Promise.all([super.verify(options), this.verifyInternal(options)]);
   }
 
-  private async verifyInternal(
-    options: TransactionVerifyOptions,
-  ): Promise<void> {
+  private async verifyInternal(options: TransactionVerifyOptions): Promise<void> {
     const { getOutput, utilityToken } = options;
     const results = await this.getTransactionResults({ getOutput });
-    const resultsIssue = Object.entries(results).filter(([_, value]) =>
-      value.lt(utils.ZERO),
-    );
+    // tslint:disable-next-line no-unused
+    const resultsIssue = Object.entries(results).filter(([_, value]) => value.lt(utils.ZERO));
 
-    if (
-      resultsIssue.some(
-        ([assetHex, _]) =>
-          !common.uInt256Equal(
-            common.hexToUInt256(assetHex),
-            utilityToken.hash,
-          ),
-      )
-    ) {
+    // tslint:disable-next-line no-unused
+    if (resultsIssue.some(([assetHex, _]) => !common.uInt256Equal(common.hexToUInt256(assetHex), utilityToken.hash))) {
       throw new VerifyError('Invalid miner result');
     }
   }

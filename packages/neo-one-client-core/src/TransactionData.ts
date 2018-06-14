@@ -11,30 +11,27 @@ import {
 import { BinaryReader, BinaryWriter, IOHelper, utils } from './utils';
 
 export interface TransactionDataAdd {
-  version?: number;
-  hash: UInt256;
-  blockHash: UInt256;
-  startHeight: number;
-  index: number;
-  globalIndex: BN;
-  endHeights?: { [index: number]: number };
-  claimed?: { [index: number]: boolean };
+  readonly version?: number;
+  readonly hash: UInt256;
+  readonly blockHash: UInt256;
+  readonly startHeight: number;
+  readonly index: number;
+  readonly globalIndex: BN;
+  readonly endHeights?: { readonly [index: number]: number };
+  readonly claimed?: { readonly [index: number]: boolean };
 }
 
 export interface TransactionDataUpdate {
-  endHeights?: { [index: number]: number };
-  claimed?: { [index: number]: boolean };
+  readonly endHeights?: { readonly [index: number]: number };
+  readonly claimed?: { readonly [index: number]: boolean };
 }
 
 export interface TransactionDataKey {
-  hash: UInt256;
+  readonly hash: UInt256;
 }
 
-export class TransactionData extends BaseState
-  implements SerializableWire<TransactionData> {
-  public static deserializeWireBase({
-    reader,
-  }: DeserializeWireBaseOptions): TransactionData {
+export class TransactionData extends BaseState implements SerializableWire<TransactionData> {
+  public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): TransactionData {
     const version = reader.readUInt8();
     const hash = reader.readUInt256();
     const blockHash = reader.readUInt256();
@@ -44,11 +41,13 @@ export class TransactionData extends BaseState
     const endHeights = reader.readObject(() => {
       const key = reader.readUInt32LE();
       const value = reader.readUInt32LE();
+
       return { key, value };
     });
     const claimed = reader.readObject(() => {
       const key = reader.readUInt32LE();
       const value = reader.readBoolean();
+
       return { key, value };
     });
 
@@ -64,9 +63,7 @@ export class TransactionData extends BaseState
     });
   }
 
-  public static deserializeWire(
-    options: DeserializeWireOptions,
-  ): TransactionData {
+  public static deserializeWire(options: DeserializeWireOptions): TransactionData {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),
@@ -79,25 +76,23 @@ export class TransactionData extends BaseState
   public readonly index: number;
   public readonly globalIndex: BN;
   public readonly endHeights: {
-    [index: number]: number;
+    readonly [index: number]: number;
   };
   public readonly claimed: {
-    [index: number]: boolean;
+    readonly [index: number]: boolean;
   };
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 
-  constructor({
+  public constructor({
     version,
     hash,
     blockHash,
     startHeight,
     index,
     globalIndex,
-    endHeights,
-    claimed,
+    endHeights = {},
+    claimed = {},
   }: TransactionDataAdd) {
     super({ version });
     this.hash = hash;
@@ -105,21 +100,15 @@ export class TransactionData extends BaseState
     this.startHeight = startHeight;
     this.index = index;
     this.globalIndex = globalIndex;
-    this.endHeights = endHeights || {};
-    this.claimed = claimed || {};
+    this.endHeights = endHeights;
+    this.claimed = claimed;
     this.sizeInternal = utils.lazy(
       () =>
         IOHelper.sizeOfUInt8 +
         IOHelper.sizeOfUInt256 +
         IOHelper.sizeOfUInt32LE +
-        IOHelper.sizeOfObject(
-          this.endHeights,
-          () => IOHelper.sizeOfUInt32LE + IOHelper.sizeOfUInt32LE,
-        ) +
-        IOHelper.sizeOfObject(
-          this.claimed,
-          () => IOHelper.sizeOfUInt32LE + IOHelper.sizeOfBoolean,
-        ),
+        IOHelper.sizeOfObject(this.endHeights, () => IOHelper.sizeOfUInt32LE + IOHelper.sizeOfUInt32LE) +
+        IOHelper.sizeOfObject(this.claimed, () => IOHelper.sizeOfUInt32LE + IOHelper.sizeOfBoolean),
     );
   }
 
@@ -127,10 +116,7 @@ export class TransactionData extends BaseState
     return this.sizeInternal();
   }
 
-  public update({
-    endHeights,
-    claimed,
-  }: TransactionDataUpdate): TransactionData {
+  public update({ endHeights = this.endHeights, claimed = this.claimed }: TransactionDataUpdate): TransactionData {
     return new TransactionData({
       version: this.version,
       hash: this.hash,
@@ -138,8 +124,8 @@ export class TransactionData extends BaseState
       startHeight: this.startHeight,
       index: this.index,
       globalIndex: this.globalIndex,
-      endHeights: endHeights == null ? this.endHeights : endHeights,
-      claimed: claimed == null ? this.claimed : claimed,
+      endHeights,
+      claimed,
     });
   }
 

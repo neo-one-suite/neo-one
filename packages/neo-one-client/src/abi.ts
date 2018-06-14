@@ -78,13 +78,8 @@ export const NEP5_STATIC = (decimals: number): ABI => ({
   ],
 });
 
-export const NEP5 = async (
-  client: ReadClient<any>,
-  hash: Hash160String,
-): Promise<ABI> => {
-  const decimalsBigNumber = await client
-    .smartContract(hash, { functions: [decimalsFunction] })
-    .decimals();
+export const NEP5 = async (client: ReadClient, hash: Hash160String): Promise<ABI> => {
+  const decimalsBigNumber = await client.smartContract(hash, { functions: [decimalsFunction] }).decimals();
   const decimals = decimalsBigNumber.toNumber();
 
   return NEP5_STATIC(decimals);

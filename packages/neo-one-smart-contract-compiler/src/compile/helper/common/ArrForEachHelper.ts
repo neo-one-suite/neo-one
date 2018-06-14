@@ -5,8 +5,8 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface ArrForEachHelperOptions {
-  each: () => void;
-  withIndex?: boolean;
+  readonly each: () => void;
+  readonly withIndex?: boolean;
 }
 
 // Input: [array]
@@ -15,7 +15,7 @@ export class ArrForEachHelper extends Helper {
   private readonly each: () => void;
   private readonly withIndex: boolean;
 
-  constructor(options: ArrForEachHelperOptions) {
+  public constructor(options: ArrForEachHelperOptions) {
     super();
     this.each = options.each;
     this.withIndex = options.withIndex || false;
@@ -24,6 +24,7 @@ export class ArrForEachHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

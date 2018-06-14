@@ -11,7 +11,7 @@ export class GetModulesHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (options.pushValue) {
       // ['modules', globalObjectVal]
-      sb.emitPushString(node, InternalGlobalProperties.MODULES);
+      sb.emitPushString(node, InternalGlobalProperties.Modules);
       // [modules]
       sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
     }

@@ -1,4 +1,4 @@
-import { Node, ts, Type } from 'ts-simple-ast';
+import { Node, Type } from 'ts-simple-ast';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -7,17 +7,17 @@ import { Helper } from '../Helper';
 import * as typeUtils from '../../../typeUtils';
 
 export interface EqualsEqualsHelperOptions {
-  left: Node;
-  right: Node;
+  readonly left: Node;
+  readonly right: Node;
 }
 
 // Input: []
 // Output: [boolean]
-export class EqualsEqualsHelper extends Helper<Node> {
-  private left: Node;
-  private right: Node;
+export class EqualsEqualsHelper extends Helper {
+  private readonly left: Node;
+  private readonly right: Node;
 
-  constructor(options: EqualsEqualsHelperOptions) {
+  public constructor(options: EqualsEqualsHelperOptions) {
     super();
     this.left = options.left;
     this.right = options.right;
@@ -27,31 +27,22 @@ export class EqualsEqualsHelper extends Helper<Node> {
     if (!options.pushValue) {
       sb.visit(this.left, options);
       sb.visit(this.right, options);
+
       return;
     }
 
     const leftType = sb.getType(this.left);
     const rightType = sb.getType(this.right);
-    if (leftType != null && rightType != null) {
+    if (leftType !== undefined && rightType !== undefined) {
       this.equalsEqualsType(sb, node, options, leftType, rightType);
     } else {
       this.equalsEqualsUnknown(sb, node, options);
     }
   }
 
-  public equalsEqualsType(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-    leftType: Type<ts.Type>,
-    rightType: Type<ts.Type>,
-  ): void {
+  public equalsEqualsType(sb: ScriptBuilder, node: Node, options: VisitOptions, leftType: Type, rightType: Type): void {
     if (typeUtils.isSame(leftType, rightType)) {
-      sb.emitHelper(
-        node,
-        options,
-        sb.helpers.equalsEqualsEquals({ left: this.left, right: this.right }),
-      );
+      sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ left: this.left, right: this.right }));
     } else if (
       (typeUtils.hasNull(leftType) || typeUtils.hasUndefined(leftType)) &&
       (typeUtils.isOnlyUndefined(rightType) || typeUtils.isOnlyNull(rightType))
@@ -81,11 +72,7 @@ export class EqualsEqualsHelper extends Helper<Node> {
       // [left]
       sb.visit(this.left, options);
       // [leftNumber]
-      sb.emitHelper(
-        this.left,
-        options,
-        sb.helpers.toNumber({ type: sb.getType(this.left) }),
-      );
+      sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.getType(this.left) }));
       // [leftNumberVal]
       sb.emitHelper(this.left, options, sb.helpers.createNumber);
       // [right, leftNumberVal]
@@ -111,11 +98,7 @@ export class EqualsEqualsHelper extends Helper<Node> {
       // [right, left]
       sb.visit(this.right, options);
       // [rightNumber, left]
-      sb.emitHelper(
-        this.right,
-        options,
-        sb.helpers.toNumber({ type: sb.getType(this.right) }),
-      );
+      sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.getType(this.right) }));
       // [rightNumberVal, left]
       sb.emitHelper(this.right, options, sb.helpers.createNumber);
       // [equals]
@@ -125,36 +108,20 @@ export class EqualsEqualsHelper extends Helper<Node> {
     }
   }
 
-  public equalsEqualsLeftNumberRightBooleanOrString(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  public equalsEqualsLeftNumberRightBooleanOrString(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [rightNumber, left]
-    sb.emitHelper(
-      this.right,
-      options,
-      sb.helpers.toNumber({ type: sb.getType(this.right) }),
-    );
+    sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.getType(this.right) }));
     // [rightNumber, left]
     sb.emitHelper(this.right, options, sb.helpers.createNumber);
     // [equals]
     sb.emitHelper(node, options, sb.helpers.equalsEqualsEqualsNumber);
   }
 
-  public equalsEqualsRightNumberLeftBooleanOrString(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  public equalsEqualsRightNumberLeftBooleanOrString(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [left, right]
     sb.emitOp(node, 'SWAP');
     // [leftNumber, right]
-    sb.emitHelper(
-      this.left,
-      options,
-      sb.helpers.toNumber({ type: sb.getType(this.left) }),
-    );
+    sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.getType(this.left) }));
     // [leftNumber, right]
     sb.emitHelper(this.left, options, sb.helpers.createNumber);
     // [right, leftNumber]
@@ -163,11 +130,7 @@ export class EqualsEqualsHelper extends Helper<Node> {
     sb.emitHelper(node, options, sb.helpers.equalsEqualsEqualsNumber);
   }
 
-  public equalsEqualsUnknown(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  public equalsEqualsUnknown(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     const copy = () => {
       // [right, left, right]
       sb.emitOp(this.right, 'TUCK');
@@ -244,11 +207,7 @@ export class EqualsEqualsHelper extends Helper<Node> {
           // [left, right]
           sb.emitOp(node, 'SWAP');
           // [leftNumber, right]
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.toNumber({ type: sb.getType(this.left) }),
-          );
+          sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.getType(this.left) }));
           // [leftNumber, right]
           sb.emitHelper(node, options, sb.helpers.createNumber);
           // [right, leftNumber]
@@ -288,11 +247,7 @@ export class EqualsEqualsHelper extends Helper<Node> {
         },
         whenTrue: () => {
           // [rightNumber, left]
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.toNumber({ type: sb.getType(this.right) }),
-          );
+          sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.getType(this.right) }));
           // [rightNumber, left]
           sb.emitHelper(node, options, sb.helpers.createNumber);
           this.equalsEqualsRightNumberLeftBooleanOrString(sb, node, options);
@@ -305,19 +260,11 @@ export class EqualsEqualsHelper extends Helper<Node> {
       options,
       sb.helpers.case(cases, () => {
         // [rightPrim, left]
-        sb.emitHelper(
-          node,
-          options,
-          sb.helpers.toPrimitive({ type: sb.getType(this.right) }),
-        );
+        sb.emitHelper(node, options, sb.helpers.toPrimitive({ type: sb.getType(this.right) }));
         // [left, rightPrim]
         sb.emitOp(node, 'SWAP');
         // [leftPrim, rightPrim]
-        sb.emitHelper(
-          node,
-          options,
-          sb.helpers.toPrimitive({ type: sb.getType(this.left) }),
-        );
+        sb.emitHelper(node, options, sb.helpers.toPrimitive({ type: sb.getType(this.left) }));
         // [rightPrim, leftPrim]
         sb.emitOp(node, 'SWAP');
         sb.emitHelper(

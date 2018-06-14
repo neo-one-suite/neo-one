@@ -24,7 +24,9 @@ import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
+// tslint:disable-next-line no-submodule-imports
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
+// tslint:disable-next-line no-submodule-imports
 import { flatMap, flatten } from 'ix/asynciterable/pipe/index';
 import _ from 'lodash';
 import { AsyncBlockIterator } from '../../AsyncBlockIterator';
@@ -46,7 +48,6 @@ import {
   Hash160String,
   Hash256String,
   Input,
-  IssueTransaction,
   NetworkSettings,
   NetworkType,
   Options,
@@ -67,53 +68,43 @@ import { JSONRPCClient } from './JSONRPCClient';
 import { JSONRPCHTTPProvider } from './JSONRPCHTTPProvider';
 
 export interface NEOONEDataProviderOptions {
-  network: NetworkType;
-  rpcURL: string;
-  iterBlocksFetchTimeoutMS?: number;
-  iterBlocksBatchSize?: number;
+  readonly network: NetworkType;
+  readonly rpcURL: string;
+  readonly iterBlocksFetchTimeoutMS?: number;
+  readonly iterBlocksBatchSize?: number;
 }
 
 export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
   public readonly network: NetworkType;
-  private client: JSONRPCClient;
+  private mutableClient: JSONRPCClient;
   private readonly iterBlocksFetchTimeoutMS: number | undefined;
   private readonly iterBlocksBatchSize: number | undefined;
 
-  constructor({
-    network,
-    rpcURL,
-    iterBlocksFetchTimeoutMS,
-    iterBlocksBatchSize,
-  }: NEOONEDataProviderOptions) {
+  public constructor({ network, rpcURL, iterBlocksFetchTimeoutMS, iterBlocksBatchSize }: NEOONEDataProviderOptions) {
     this.network = network;
-    this.client = new JSONRPCClient(new JSONRPCHTTPProvider(rpcURL));
+    this.mutableClient = new JSONRPCClient(new JSONRPCHTTPProvider(rpcURL));
     this.iterBlocksFetchTimeoutMS = iterBlocksFetchTimeoutMS;
     this.iterBlocksBatchSize = iterBlocksBatchSize;
   }
 
   public setRPCURL(rpcURL: string): void {
-    this.client = new JSONRPCClient(new JSONRPCHTTPProvider(rpcURL));
+    this.mutableClient = new JSONRPCClient(new JSONRPCHTTPProvider(rpcURL));
   }
 
-  public getUnclaimed(
+  public async getUnclaimed(
     address: AddressString,
     monitor?: Monitor,
-  ): Promise<{ unclaimed: Input[]; amount: BigNumber }> {
+  ): Promise<{ readonly unclaimed: ReadonlyArray<Input>; readonly amount: BigNumber }> {
     return this.capture(
       async (span) => {
         const account = await this.getAccountInternal(address, span);
         const amounts = await Promise.all(
-          account.unclaimed.map((input) =>
-            this.client.getClaimAmount(input, span),
-          ),
+          account.unclaimed.map(async (input) => this.mutableClient.getClaimAmount(input, span)),
         );
 
         return {
           unclaimed: account.unclaimed,
-          amount: amounts.reduce(
-            (acc, amount) => acc.plus(amount),
-            utils.ZERO_BIG_NUMBER,
-          ),
+          amount: amounts.reduce((acc, amount) => acc.plus(amount), utils.ZERO_BIG_NUMBER),
         };
       },
       'neo_get_unclaimed',
@@ -121,23 +112,17 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     );
   }
 
-  public async getUnspentOutputs(
-    address: AddressString,
-    monitor?: Monitor,
-  ): Promise<UnspentOutput[]> {
+  public async getUnspentOutputs(address: AddressString, monitor?: Monitor): Promise<ReadonlyArray<UnspentOutput>> {
     return this.capture(
       async (span) => {
         const account = await this.getAccountInternal(address, span);
         const outputs = await Promise.all(
           account.unspent.map(
-            async (input): Promise<UnspentOutput | null> => {
-              const outputJSON = await this.client.getUnspentOutput(
-                input,
-                span,
-              );
+            async (input): Promise<UnspentOutput | undefined> => {
+              const outputJSON = await this.mutableClient.getUnspentOutput(input, span);
 
-              if (outputJSON == null) {
-                return null;
+              if (outputJSON === undefined) {
+                return undefined;
               }
 
               const output = this.convertOutput(outputJSON);
@@ -160,31 +145,23 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     );
   }
 
-  public async relayTransaction(
-    transaction: string,
-    monitor?: Monitor,
-  ): Promise<Transaction> {
-    const result = await this.client.relayTransaction(transaction, monitor);
+  public async relayTransaction(transaction: string, monitor?: Monitor): Promise<Transaction> {
+    const result = await this.mutableClient.relayTransaction(transaction, monitor);
+
     return this.convertTransaction(result);
   }
 
-  public getTransactionReceipt(
-    hash: Hash256String,
-    options?: GetOptions,
-  ): Promise<TransactionReceipt> {
-    return this.client.getTransactionReceipt(hash, options);
+  public async getTransactionReceipt(hash: Hash256String, options?: GetOptions): Promise<TransactionReceipt> {
+    return this.mutableClient.getTransactionReceipt(hash, options);
   }
 
-  public async getInvocationData(
-    hash: Hash256String,
-    monitor?: Monitor,
-  ): Promise<RawInvocationData> {
+  public async getInvocationData(hash: Hash256String, monitor?: Monitor): Promise<RawInvocationData> {
     const [invocationData, transaction] = await Promise.all([
-      this.client.getInvocationData(hash, monitor),
-      this.client.getTransaction(hash, monitor),
+      this.mutableClient.getInvocationData(hash, monitor),
+      this.mutableClient.getTransaction(hash, monitor),
     ]);
 
-    if (transaction.data == null) {
+    if (transaction.data === undefined) {
       throw new MissingTransactionDataError(hash);
     }
 
@@ -197,46 +174,38 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     );
   }
 
-  public async testInvoke(
-    transaction: string,
-    monitor?: Monitor,
-  ): Promise<RawInvocationResult> {
-    const result = await this.client.testInvocation(transaction, monitor);
+  public async testInvoke(transaction: string, monitor?: Monitor): Promise<RawInvocationResult> {
+    const result = await this.mutableClient.testInvocation(transaction, monitor);
+
     return this.convertInvocationResult(result);
   }
 
-  public async getAccount(
-    address: AddressString,
-    monitor?: Monitor,
-  ): Promise<Account> {
+  public async getAccount(address: AddressString, monitor?: Monitor): Promise<Account> {
     const account = await this.getAccountInternal(address, monitor);
+
     return {
       address,
       frozen: account.frozen,
       votes: account.votes,
-      balances: account.balances.reduce(
-        (acc: Account['balances'], { asset, value }) => {
-          acc[asset] = new BigNumber(value);
-          return acc;
-        },
+      balances: account.balances.reduce<Account['balances']>(
+        (acc, { asset, value }) => ({
+          ...acc,
+          [asset]: new BigNumber(value),
+        }),
         {},
       ),
     };
   }
 
-  public async getAsset(
-    hash: Hash256String,
-    monitor?: Monitor,
-  ): Promise<Asset> {
-    const asset = await this.client.getAsset(hash, monitor);
+  public async getAsset(hash: Hash256String, monitor?: Monitor): Promise<Asset> {
+    const asset = await this.mutableClient.getAsset(hash, monitor);
+
     return this.convertAsset(asset);
   }
 
-  public async getBlock(
-    hashOrIndex: Hash256String | number,
-    options?: GetOptions,
-  ): Promise<Block> {
-    const block = await this.client.getBlock(hashOrIndex, options);
+  public async getBlock(hashOrIndex: Hash256String | number, options?: GetOptions): Promise<Block> {
+    const block = await this.mutableClient.getBlock(hashOrIndex, options);
+
     return this.convertBlock(block);
   }
 
@@ -251,72 +220,58 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     );
   }
 
-  public getBestBlockHash(monitor?: Monitor): Promise<Hash256String> {
-    return this.client.getBestBlockHash(monitor);
+  public async getBestBlockHash(monitor?: Monitor): Promise<Hash256String> {
+    return this.mutableClient.getBestBlockHash(monitor);
   }
 
-  public getBlockCount(monitor?: Monitor): Promise<number> {
-    return this.client.getBlockCount(monitor);
+  public async getBlockCount(monitor?: Monitor): Promise<number> {
+    return this.mutableClient.getBlockCount(monitor);
   }
 
-  public async getContract(
-    hash: Hash160String,
-    monitor?: Monitor,
-  ): Promise<Contract> {
-    const contract = await this.client.getContract(hash, monitor);
+  public async getContract(hash: Hash160String, monitor?: Monitor): Promise<Contract> {
+    const contract = await this.mutableClient.getContract(hash, monitor);
+
     return this.convertContract(contract);
   }
 
-  public getMemPool(monitor?: Monitor): Promise<Hash256String[]> {
-    return this.client.getMemPool(monitor);
+  public async getMemPool(monitor?: Monitor): Promise<ReadonlyArray<Hash256String>> {
+    return this.mutableClient.getMemPool(monitor);
   }
 
-  public async getTransaction(
-    hash: Hash256String,
-    monitor?: Monitor,
-  ): Promise<Transaction> {
-    const transaction = await this.client.getTransaction(hash, monitor);
+  public async getTransaction(hash: Hash256String, monitor?: Monitor): Promise<Transaction> {
+    const transaction = await this.mutableClient.getTransaction(hash, monitor);
+
     return this.convertTransaction(transaction);
   }
 
-  public getValidators(monitor?: Monitor): Promise<Validator[]> {
-    return this.client
+  public async getValidators(monitor?: Monitor): Promise<ReadonlyArray<Validator>> {
+    return this.mutableClient
       .getValidators(monitor)
-      .then((validators) =>
-        validators.map((validator) => this.convertValidator(validator)),
-      );
+      .then((validators) => validators.map((validator) => this.convertValidator(validator)));
   }
 
-  public getConnectedPeers(monitor?: Monitor): Promise<Peer[]> {
-    return this.client.getConnectedPeers(monitor);
+  public async getConnectedPeers(monitor?: Monitor): Promise<ReadonlyArray<Peer>> {
+    return this.mutableClient.getConnectedPeers(monitor);
   }
 
   public async getNetworkSettings(monitor?: Monitor): Promise<NetworkSettings> {
-    const settings = await this.client.getNetworkSettings(monitor);
+    const settings = await this.mutableClient.getNetworkSettings(monitor);
+
     return this.convertNetworkSettings(settings);
   }
 
-  public getStorage(
-    hash: Hash160String,
-    key: BufferString,
-    monitor?: Monitor,
-  ): Promise<StorageItem> {
-    return this.client.getStorageItem(hash, key, monitor);
+  public async getStorage(hash: Hash160String, key: BufferString, monitor?: Monitor): Promise<StorageItem> {
+    return this.mutableClient.getStorageItem(hash, key, monitor);
   }
 
-  public iterStorage(
-    hash: Hash160String,
-    monitor?: Monitor,
-  ): AsyncIterable<StorageItem> {
+  public iterStorage(hash: Hash160String, monitor?: Monitor): AsyncIterable<StorageItem> {
     return AsyncIterableX.from(
-      this.client
-        .getAllStorage(hash, monitor)
-        .then((res) => AsyncIterableX.from(res)),
+      this.mutableClient.getAllStorage(hash, monitor).then((res) => AsyncIterableX.from(res)),
+      // tslint:disable-next-line no-any
     ).pipe(flatten<StorageItem>() as any);
   }
 
-  public iterActionsRaw(filterIn?: BlockFilter): AsyncIterable<ActionRaw> {
-    const filter = filterIn || {};
+  public iterActionsRaw(filter: BlockFilter = {}): AsyncIterable<ActionRaw> {
     return AsyncIterableX.from(
       this.iterBlocks({
         indexStart: filter.indexStart,
@@ -328,7 +283,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
         const actions = _.flatten(
           block.transactions.map((transaction) => {
             if (transaction.type === 'InvocationTransaction') {
-              return transaction.invocationData.actions;
+              return [...transaction.invocationData.actions];
             }
 
             return [];
@@ -340,10 +295,10 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     );
   }
 
-  public call(
+  public async call(
     contract: Hash160String,
     method: string,
-    params: Array<ScriptBuilderParam | null>,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
     monitor?: Monitor,
   ): Promise<RawInvocationResult> {
     const testTransaction = new CoreInvocationTransaction({
@@ -356,30 +311,27 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
       }),
     });
 
-    return this.testInvoke(
-      testTransaction.serializeWire().toString('hex'),
-      monitor,
-    );
+    return this.testInvoke(testTransaction.serializeWire().toString('hex'), monitor);
   }
 
-  public runConsensusNow(monitor?: Monitor): Promise<void> {
-    return this.client.runConsensusNow(monitor);
+  public async runConsensusNow(monitor?: Monitor): Promise<void> {
+    return this.mutableClient.runConsensusNow(monitor);
   }
 
-  public updateSettings(options: Options, monitor?: Monitor): Promise<void> {
-    return this.client.updateSettings(options, monitor);
+  public async updateSettings(options: Options, monitor?: Monitor): Promise<void> {
+    return this.mutableClient.updateSettings(options, monitor);
   }
 
-  public fastForwardOffset(seconds: number, monitor?: Monitor): Promise<void> {
-    return this.client.fastForwardOffset(seconds, monitor);
+  public async fastForwardOffset(seconds: number, monitor?: Monitor): Promise<void> {
+    return this.mutableClient.fastForwardOffset(seconds, monitor);
   }
 
-  public fastForwardToTime(seconds: number, monitor?: Monitor): Promise<void> {
-    return this.client.fastForwardToTime(seconds, monitor);
+  public async fastForwardToTime(seconds: number, monitor?: Monitor): Promise<void> {
+    return this.mutableClient.fastForwardToTime(seconds, monitor);
   }
 
-  public reset(monitor?: Monitor): Promise<void> {
-    return this.client.reset(monitor);
+  public async reset(monitor?: Monitor): Promise<void> {
+    return this.mutableClient.reset(monitor);
   }
 
   private convertBlock(block: BlockJSON): Block {
@@ -394,9 +346,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
       nextConsensus: block.nextconsensus,
       script: block.script,
       size: block.size,
-      transactions: block.tx.map((transaction) =>
-        this.convertConfirmedTransaction(transaction),
-      ),
+      transactions: block.tx.map((transaction) => this.convertConfirmedTransaction(transaction)),
     };
   }
 
@@ -409,16 +359,13 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
         script: invocation.script,
         gas: new BigNumber(invocation.gas),
       }),
-
       (converted) => converted,
     );
   }
 
-  private convertConfirmedTransaction(
-    transaction: TransactionJSON,
-  ): ConfirmedTransaction {
-    if (transaction.data == null) {
-      throw new Error('Unexpected null data');
+  private convertConfirmedTransaction(transaction: TransactionJSON): ConfirmedTransaction {
+    if (transaction.data === undefined) {
+      throw new Error('Unexpected undefined data');
     }
     const data = {
       blockHash: transaction.data.blockHash,
@@ -430,8 +377,8 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     return this.convertTransactionBase(
       transaction,
       (invocation, transactionBase) => {
-        if (invocation.invocationData == null || transaction.data == null) {
-          throw new Error('Unexpected null data');
+        if (invocation.invocationData === undefined || transaction.data === undefined) {
+          throw new Error('Unexpected undefined data');
         }
 
         const invocationData = this.convertInvocationData(
@@ -451,18 +398,14 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
           invocationData,
         };
       },
-      (converted) => ({ ...converted, data } as ConfirmedTransaction),
+      // tslint:disable-next-line no-any
+      (converted) => ({ ...converted, data } as any),
     );
   }
 
-  private convertTransactionBase<
-    Result extends Transaction | ConfirmedTransaction
-  >(
+  private convertTransactionBase<Result extends Transaction | ConfirmedTransaction>(
     transaction: TransactionJSON,
-    convertInvocation: (
-      invocation: InvocationTransactionJSON,
-      transactionBase: TransactionBase,
-    ) => Result,
+    convertInvocation: (invocation: InvocationTransactionJSON, transactionBase: TransactionBase) => Result,
     convertTransaction: (transaction: Transaction) => Result,
   ): Result {
     const transactionBase = {
@@ -505,7 +448,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
         converted = {
           ...transactionBase,
           type: 'IssueTransaction',
-        } as IssueTransaction;
+        };
         break;
       case 'MinerTransaction':
         converted = {
@@ -527,9 +470,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
           type: 'RegisterTransaction',
           asset: {
             type: transaction.asset.type,
-            name: Array.isArray(transaction.asset.name)
-              ? transaction.asset.name[0].name
-              : transaction.asset.name,
+            name: Array.isArray(transaction.asset.name) ? transaction.asset.name[0].name : transaction.asset.name,
             amount: new BigNumber(transaction.asset.amount),
             precision: transaction.asset.precision,
             owner: transaction.asset.owner,
@@ -552,14 +493,15 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     return convertTransaction(converted);
   }
 
-  private convertAttributes(attributes: AttributeJSON[]): Attribute[] {
+  private convertAttributes(attributes: ReadonlyArray<AttributeJSON>): ReadonlyArray<Attribute> {
     return attributes.map((attribute) => ({
+      // tslint:disable-next-line no-any
       usage: attribute.usage as any,
       data: attribute.data,
     }));
   }
 
-  private convertOutputs(outputs: OutputJSON[]): Output[] {
+  private convertOutputs(outputs: ReadonlyArray<OutputJSON>): ReadonlyArray<Output> {
     return outputs.map((output) => this.convertOutput(output));
   }
 
@@ -600,30 +542,19 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
   ): RawInvocationData {
     return {
       result: this.convertInvocationResult(data.result),
-      asset: data.asset == null ? data.asset : this.convertAsset(data.asset),
-      contracts: data.contracts.map((contract) =>
-        this.convertContract(contract),
-      ),
+      asset: data.asset === undefined ? data.asset : this.convertAsset(data.asset),
+      contracts: data.contracts.map((contract) => this.convertContract(contract)),
 
       deletedContractHashes: data.deletedContractHashes,
       migratedContractHashes: data.migratedContractHashes,
       voteUpdates: data.voteUpdates,
       actions: data.actions.map((action, idx) =>
-        this.convertAction(
-          blockHash,
-          blockIndex,
-          transactionHash,
-          transactionIndex,
-          idx,
-          action,
-        ),
+        this.convertAction(blockHash, blockIndex, transactionHash, transactionIndex, idx, action),
       ),
     };
   }
 
-  private convertInvocationResult(
-    result: InvocationResultJSON,
-  ): RawInvocationResult {
+  private convertInvocationResult(result: InvocationResultJSON): RawInvocationResult {
     if (result.state === VMState.Fault) {
       return {
         state: 'FAULT',
@@ -643,16 +574,12 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
   }
 
   private convertContractParameters(
-    parameters: ContractParameterJSON[],
-  ): ContractParameter[] {
-    return parameters.map((parameter) =>
-      this.convertContractParameter(parameter),
-    );
+    parameters: ReadonlyArray<ContractParameterJSON>,
+  ): ReadonlyArray<ContractParameter> {
+    return parameters.map((parameter) => this.convertContractParameter(parameter));
   }
 
-  private convertContractParameter(
-    parameter: ContractParameterJSON,
-  ): ContractParameter {
+  private convertContractParameter(parameter: ContractParameterJSON): ContractParameter {
     if (parameter.type === 'Integer') {
       return {
         type: 'Integer',
@@ -720,16 +647,11 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     let name;
     if (Array.isArray(assetName)) {
       const enName = assetName.find(({ lang }) => lang === 'en');
-      if (enName == null) {
-        // eslint-disable-next-line
-        name = assetName[0].name;
-      } else {
-        // eslint-disable-next-line
-        name = enName.name;
-      }
+      name = enName === undefined ? assetName[0].name : enName.name;
     } else {
       name = assetName;
     }
+
     return {
       hash: asset.id,
       type: asset.type,
@@ -745,27 +667,18 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     };
   }
 
-  private getAccountInternal(
-    address: AddressString,
-    monitor?: Monitor,
-  ): Promise<AccountJSON> {
-    return this.client.getAccount(address, monitor);
+  private async getAccountInternal(address: AddressString, monitor?: Monitor): Promise<AccountJSON> {
+    return this.mutableClient.getAccount(address, monitor);
   }
 
-  private convertNetworkSettings(
-    settings: NetworkSettingsJSON,
-  ): NetworkSettings {
+  private convertNetworkSettings(settings: NetworkSettingsJSON): NetworkSettings {
     return {
       issueGASFee: new BigNumber(settings.issueGASFee),
     };
   }
 
-  private capture<T>(
-    func: (monitor?: Monitor) => Promise<T>,
-    name: string,
-    monitor?: Monitor,
-  ): Promise<T> {
-    if (monitor == null) {
+  private async capture<T>(func: (monitor?: Monitor) => Promise<T>, name: string, monitor?: Monitor): Promise<T> {
+    if (monitor === undefined) {
       return func();
     }
 

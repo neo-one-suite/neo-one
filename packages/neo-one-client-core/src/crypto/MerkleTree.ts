@@ -1,3 +1,4 @@
+// tslint:disable readonly-keyword no-object-mutation no-array-mutation
 import { CustomError } from '@neo-one/utils';
 import { common, UInt256 } from '../common';
 import { crypto } from './crypto';
@@ -5,7 +6,7 @@ import { crypto } from './crypto';
 class InvalidMerkleTreeException extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('Invalid Merkle tree.');
     this.code = 'INVALID_MERKLE_TREE';
   }
@@ -13,20 +14,20 @@ class InvalidMerkleTreeException extends CustomError {
 
 class MerkleTreeNode {
   public readonly hash: UInt256;
-  public leftChild: MerkleTreeNode | null | undefined;
-  public rightChild: MerkleTreeNode | null | undefined;
-  public parent: MerkleTreeNode | null | undefined;
+  public leftChild: MerkleTreeNode | undefined;
+  public rightChild: MerkleTreeNode | undefined;
+  public parent: MerkleTreeNode | undefined;
 
-  constructor({
+  public constructor({
     hash,
     leftChild,
     rightChild,
     parent,
   }: {
-    hash: UInt256;
-    leftChild?: MerkleTreeNode;
-    rightChild?: MerkleTreeNode;
-    parent?: MerkleTreeNode;
+    readonly hash: UInt256;
+    readonly leftChild?: MerkleTreeNode;
+    readonly rightChild?: MerkleTreeNode;
+    readonly parent?: MerkleTreeNode;
   }) {
     this.hash = hash;
     this.leftChild = leftChild;
@@ -40,17 +41,18 @@ class MerkleTreeNode {
       parent,
     });
 
-    if (this.leftChild != null) {
+    if (this.leftChild !== undefined) {
       self.leftChild = this.leftChild.clone(self);
     }
-    if (this.rightChild != null) {
+    if (this.rightChild !== undefined) {
       self.rightChild = this.rightChild.clone(self);
     }
+
     return self;
   }
 }
 
-const build = (leavesIn: MerkleTreeNode[]): MerkleTreeNode => {
+const build = (leavesIn: ReadonlyArray<MerkleTreeNode>): MerkleTreeNode => {
   const leaves = leavesIn;
   if (leaves.length === 0) {
     throw new InvalidMerkleTreeException();
@@ -61,23 +63,15 @@ const build = (leavesIn: MerkleTreeNode[]): MerkleTreeNode => {
 
   const parents = [];
   const length = Math.floor((leaves.length + 1) / 2);
+  // tslint:disable-next-line no-loop-statement
   for (let i = 0; i < length; i += 1) {
     const leftChild = leaves[i * 2];
 
-    let rightChild;
-    if (i * 2 + 1 === leaves.length) {
-      rightChild = leftChild;
-    } else {
-      rightChild = leaves[i * 2 + 1];
-    }
+    const rightChild = i * 2 + 1 === leaves.length ? leftChild : leaves[i * 2 + 1];
     const node = new MerkleTreeNode({
       hash: crypto.hash256(
-        Buffer.concat([
-          common.uInt256ToBuffer(leftChild.hash),
-          common.uInt256ToBuffer(rightChild.hash),
-        ]),
+        Buffer.concat([common.uInt256ToBuffer(leftChild.hash), common.uInt256ToBuffer(rightChild.hash)]),
       ),
-
       leftChild,
       rightChild,
     });
@@ -93,85 +87,77 @@ const build = (leavesIn: MerkleTreeNode[]): MerkleTreeNode => {
   return build(parents);
 };
 
-const trim = (
-  node: MerkleTreeNode,
-  index: number,
-  depth: number,
-  flags: boolean[],
-) => {
+const trim = (node: MerkleTreeNode, index: number, depth: number, flags: ReadonlyArray<boolean>) => {
   const { leftChild, rightChild } = node;
-  if (depth === 1 || leftChild == null) {
+  if (depth === 1 || leftChild === undefined) {
     return;
   }
 
   if (depth === 2) {
     if (!flags[index * 2] && !flags[index * 2 + 1]) {
-      // eslint-disable-next-line
-      node.leftChild = null;
-      // eslint-disable-next-line
-      node.rightChild = null;
+      node.leftChild = undefined;
+      node.rightChild = undefined;
     }
-  } else if (rightChild != null) {
+  } else if (rightChild !== undefined) {
     trim(leftChild, index * 2, depth - 1, flags);
     trim(rightChild, index * 2 + 1, depth - 1, flags);
-    if (leftChild.leftChild == null && rightChild.rightChild == null) {
-      // eslint-disable-next-line
-      node.leftChild = null;
-      // eslint-disable-next-line
-      node.rightChild = null;
+    if (leftChild.leftChild === undefined && rightChild.rightChild === undefined) {
+      node.leftChild = undefined;
+      node.rightChild = undefined;
     }
   }
 };
 
-const depthFirstSearchWorker = (
-  node: MerkleTreeNode,
-  hashes: UInt256[],
-): void => {
+const depthFirstSearchWorker = (node: MerkleTreeNode, mutableHashes: UInt256[]): void => {
   const { leftChild, rightChild } = node;
-  if (leftChild == null || rightChild == null) {
-    hashes.push(node.hash);
+  if (leftChild === undefined || rightChild === undefined) {
+    mutableHashes.push(node.hash);
   } else {
-    depthFirstSearchWorker(leftChild, hashes);
-    depthFirstSearchWorker(rightChild, hashes);
+    depthFirstSearchWorker(leftChild, mutableHashes);
+    depthFirstSearchWorker(rightChild, mutableHashes);
   }
 };
 
-const depthFirstSearch = (node: MerkleTreeNode): UInt256[] => {
-  const hashes: UInt256[] = [];
-  depthFirstSearchWorker(node, hashes);
-  return hashes;
+const depthFirstSearch = (node: MerkleTreeNode): ReadonlyArray<UInt256> => {
+  const mutableHashes: UInt256[] = [];
+  depthFirstSearchWorker(node, mutableHashes);
+
+  return mutableHashes;
 };
 
 export class MerkleTree {
-  public static computeRoot(hashes: UInt256[]): UInt256 {
+  public static computeRoot(hashes: ReadonlyArray<UInt256>): UInt256 {
     const tree = new this(hashes);
+
     return tree.root.hash;
   }
 
   public readonly root: MerkleTreeNode;
   public readonly depth: number;
 
-  constructor(hashesOrNode: UInt256[] | MerkleTreeNode) {
+  public constructor(hashesOrNode: ReadonlyArray<UInt256> | MerkleTreeNode) {
     this.root = Array.isArray(hashesOrNode)
       ? build(hashesOrNode.map((hash) => new MerkleTreeNode({ hash })))
-      : hashesOrNode;
+      : (hashesOrNode as MerkleTreeNode);
     this.depth = 1;
-    for (let node = this.root; node.leftChild != null; node = node.leftChild) {
+    // tslint:disable-next-line no-loop-statement no-let
+    for (let node = this.root; node.leftChild !== undefined; node = node.leftChild) {
       this.depth += 1;
     }
   }
 
-  public trim(flags: boolean[]): MerkleTree {
+  public trim(flags: ReadonlyArray<boolean>): MerkleTree {
     const result = this.root.clone();
     trim(result, 0, this.depth, flags);
+
     return new MerkleTree(result);
   }
 
-  public depthFirstSearch(): UInt256[] {
+  public depthFirstSearch(): ReadonlyArray<UInt256> {
     return depthFirstSearch(this.root);
   }
 
-  public toHashArray(): UInt256[] {
+  public toHashArray(): ReadonlyArray<UInt256> {
     return this.depthFirstSearch();
   }
 }

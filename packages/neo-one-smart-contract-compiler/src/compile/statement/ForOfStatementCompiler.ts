@@ -7,11 +7,7 @@ import { VisitOptions } from '../types';
 export class ForOfStatementCompiler extends NodeCompiler<ForOfStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.ForOfStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: ForOfStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: ForOfStatement, _options: VisitOptions): void {
     sb.reportUnsupported(node);
   }
 }

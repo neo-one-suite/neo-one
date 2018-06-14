@@ -8,26 +8,18 @@ import { AddConstructorObjectHelper } from './AddConstructorObjectHelper';
 // Input: [objectPrototypeVal, globalObjectVal]
 // Output: [objectPrototypeVal, globalObjectVal]
 export class AddBufferObjectHelper extends AddConstructorObjectHelper {
-  protected name: string = 'Buffer';
+  protected readonly name = 'Buffer';
 
-  protected addConstructorProperties(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  protected addConstructorProperties(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     this.addConstructor(sb, node, options);
     this.addConcat(sb, node, options);
   }
 
-  private addConstructor(
-    sb: ScriptBuilder,
-    node: Node,
-    options: VisitOptions,
-  ): void {
+  private addConstructor(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [objectVal, objectVal, globalObjectVal]
     sb.emitOp(node, 'DUP');
     // ['construct', objectVal, objectVal, globalObjectVal]
-    sb.emitPushString(node, InternalFunctionProperties.CONSTRUCT);
+    sb.emitPushString(node, InternalFunctionProperties.Construct);
     // [func, 'construct', objectVal, objectVal, globalObjectVal]
     sb.emitHelper(
       node,
@@ -45,11 +37,7 @@ export class AddBufferObjectHelper extends AddConstructorObjectHelper {
     sb.emitHelper(node, options, sb.helpers.setInternalObjectProperty);
   }
 
-  private addConcat(
-    sb: ScriptBuilder,
-    node: Node,
-    outerOptions: VisitOptions,
-  ): void {
+  private addConcat(sb: ScriptBuilder, node: Node, outerOptions: VisitOptions): void {
     this.addMethod(sb, node, outerOptions, 'concat', (options) => {
       // [0, argsarr]
       sb.emitPushInt(node, 0);

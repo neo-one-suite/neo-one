@@ -9,7 +9,7 @@ export class InvalidActionTypeError extends CustomError {
   public readonly type: number;
   public readonly code: string;
 
-  constructor(type: number) {
+  public constructor(type: number) {
     super(`Expected action type, found: ${type}`);
     this.type = type;
     this.code = 'INVALID_ACTION_TYPE';
@@ -17,7 +17,8 @@ export class InvalidActionTypeError extends CustomError {
 }
 
 const isActionType = (value: number): value is ActionType =>
-  ActionType[value] != null;
+  // tslint:disable-next-line strict-type-predicates
+  ActionType[value] !== undefined;
 
 export const assertActionType = (value: number): ActionType => {
   if (isActionType(value)) {

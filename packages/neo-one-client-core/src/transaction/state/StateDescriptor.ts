@@ -1,3 +1,4 @@
+import { utils as commonUtils } from '@neo-one/utils';
 import BN from 'bn.js';
 import { common, UInt160Hex } from '../../common';
 import { crypto } from '../../crypto';
@@ -11,45 +12,31 @@ import {
   SerializeJSONContext,
   SerializeWire,
 } from '../../Serializable';
-import {
-  BinaryReader,
-  BinaryWriter,
-  IOHelper,
-  JSONHelper,
-  utils,
-} from '../../utils';
+import { BinaryReader, BinaryWriter, IOHelper, JSONHelper, utils } from '../../utils';
 import { FeeContext, TransactionVerifyOptions } from '../TransactionBase';
-import {
-  assertStateDescriptorType,
-  StateDescriptorType,
-} from './StateDescriptorType';
+import { assertStateDescriptorType, StateDescriptorType } from './StateDescriptorType';
 
 export interface StateDescriptorAdd {
-  type: StateDescriptorType;
-  key: Buffer;
-  field: string;
-  value: Buffer;
+  readonly type: StateDescriptorType;
+  readonly key: Buffer;
+  readonly field: string;
+  readonly value: Buffer;
 }
 
 export type StateDescriptorTypeJSON = keyof typeof StateDescriptorType;
 
 export interface StateDescriptorJSON {
-  type: StateDescriptorTypeJSON;
-  key: string;
-  field: string;
-  value: string;
+  readonly type: StateDescriptorTypeJSON;
+  readonly key: string;
+  readonly field: string;
+  readonly value: string;
 }
 
 const VOTES = 'Votes';
 const REGISTERED = 'Registered';
 
-export class StateDescriptor
-  implements
-    SerializableWire<StateDescriptor>,
-    SerializableJSON<StateDescriptorJSON> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): StateDescriptor {
+export class StateDescriptor implements SerializableWire<StateDescriptor>, SerializableJSON<StateDescriptorJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): StateDescriptor {
     const { reader } = options;
     const type = assertStateDescriptorType(reader.readUInt8());
     const key = reader.readVarBytesLE(100);
@@ -57,7 +44,7 @@ export class StateDescriptor
     const value = reader.readVarBytesLE(65535);
 
     switch (type) {
-      case StateDescriptorType.Validator:
+      case StateDescriptorType.Account:
         if (key.length !== 20) {
           throw new InvalidFormatError();
         }
@@ -73,6 +60,8 @@ export class StateDescriptor
           throw new InvalidFormatError();
         }
         break;
+      default:
+        commonUtils.assertNever(type);
     }
 
     return new this({
@@ -83,9 +72,7 @@ export class StateDescriptor
     });
   }
 
-  public static deserializeWire(
-    options: DeserializeWireOptions,
-  ): StateDescriptor {
+  public static deserializeWire(options: DeserializeWireOptions): StateDescriptor {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),
@@ -96,9 +83,7 @@ export class StateDescriptor
   public readonly key: Buffer;
   public readonly field: string;
   public readonly value: Buffer;
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal = utils.lazy(
     () =>
       IOHelper.sizeOfUInt8 +
@@ -107,7 +92,7 @@ export class StateDescriptor
       IOHelper.sizeOfVarBytesLE(this.value),
   );
 
-  constructor({ type, key, field, value }: StateDescriptorAdd) {
+  public constructor({ type, key, field, value }: StateDescriptorAdd) {
     this.type = type;
     this.key = key;
     this.field = field;
@@ -127,31 +112,37 @@ export class StateDescriptor
         if (this.value.some((byte) => byte !== 0)) {
           return context.registerValidatorFee;
         }
+
         return utils.ZERO;
+      default:
+        commonUtils.assertNever(type);
+        throw new Error('For TS');
     }
   }
 
-  public getScriptHashesForVerifying(): UInt160Hex[] {
+  public getScriptHashesForVerifying(): ReadonlyArray<UInt160Hex> {
     const { type } = this;
     switch (type) {
       case StateDescriptorType.Account:
         return [common.uInt160ToHex(common.bufferToUInt160(this.key))];
       case StateDescriptorType.Validator:
-        return [
-          common.uInt160ToHex(
-            crypto.getVerificationScriptHash(common.bufferToECPoint(this.key)),
-          ),
-        ];
+        return [common.uInt160ToHex(crypto.getVerificationScriptHash(common.bufferToECPoint(this.key)))];
+      default:
+        commonUtils.assertNever(type);
+        throw new Error('For TS');
     }
   }
 
-  public verify(options: TransactionVerifyOptions): Promise<void> {
+  public async verify(options: TransactionVerifyOptions): Promise<void> {
     const { type } = this;
     switch (type) {
       case StateDescriptorType.Account:
         return this.verifyAccount(options);
       case StateDescriptorType.Validator:
         return this.verifyValidator();
+      default:
+        commonUtils.assertNever(type);
+        throw new Error('For TS');
     }
   }
 
@@ -162,7 +153,7 @@ export class StateDescriptor
     writer.writeVarBytesLE(this.value);
   }
 
-  public serializeJSON(context: SerializeJSONContext): StateDescriptorJSON {
+  public serializeJSON(_context: SerializeJSONContext): StateDescriptorJSON {
     return {
       type: this.getJSONType(),
       key: JSONHelper.writeBuffer(this.key),
@@ -175,21 +166,16 @@ export class StateDescriptor
     return StateDescriptorType[this.type] as StateDescriptorTypeJSON;
   }
 
-  private async verifyAccount(
-    options: TransactionVerifyOptions,
-  ): Promise<void> {
+  private async verifyAccount(options: TransactionVerifyOptions): Promise<void> {
     if (this.field !== VOTES) {
       throw new VerifyError(`Invalid field ${this.field}`);
     }
 
     const reader = new BinaryReader(this.value);
     const hash = common.bufferToUInt160(this.key);
-    const [account, validators] = await Promise.all([
-      options.tryGetAccount({ hash }),
-      options.getAllValidators(),
-    ]);
+    const [account, validators] = await Promise.all([options.tryGetAccount({ hash }), options.getAllValidators()]);
 
-    if (account == null || account.isFrozen) {
+    if (account === undefined || account.isFrozen) {
       throw new VerifyError('Account is frozen');
     }
 
@@ -207,11 +193,11 @@ export class StateDescriptor
           .map((key) => common.ecPointToHex(key)),
       );
 
-      for (const publicKey of publicKeys) {
+      publicKeys.forEach((publicKey) => {
         if (!validatorPublicKeysSet.has(common.ecPointToHex(publicKey))) {
           throw new VerifyError('Invalid validator public key');
         }
-      }
+      });
     }
   }
 

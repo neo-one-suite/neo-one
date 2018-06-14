@@ -39,8 +39,6 @@ describe('LocalMemoryStore', () => {
   });
 
   test('deleteWallet', async () => {
-    await expect(
-      localMemoryStore.deleteWallet(wallet),
-    ).resolves.toBeUndefined();
+    await expect(localMemoryStore.deleteWallet(wallet)).resolves.toBeUndefined();
   });
 });

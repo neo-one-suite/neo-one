@@ -1,4 +1,3 @@
-import { ABIEvent } from '@neo-one/client';
 import { Param as ScriptBuilderParam } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
@@ -7,6 +6,7 @@ import { filter, map } from 'ix/asynciterable/pipe/index';
 import { ReadClient } from '../ReadClient';
 import {
   ABI,
+  ABIEvent,
   ABIFunction,
   ABIParameter,
   Action,
@@ -25,14 +25,15 @@ const getParams = ({
   parameters,
   params: paramsIn,
 }: {
-  parameters: ABIParameter[];
-  params: any[];
-}): { params: Array<ScriptBuilderParam | null>; monitor?: Monitor } => {
+  readonly parameters: ReadonlyArray<ABIParameter>;
+  // tslint:disable-next-line no-any
+  readonly params: ReadonlyArray<any>;
+}): { readonly params: ReadonlyArray<ScriptBuilderParam | undefined>; readonly monitor?: Monitor } => {
   let params = paramsIn;
   const finalArg = params[params.length - 1];
   let monitor;
   if (
-    finalArg != null &&
+    finalArg != undefined &&
     typeof finalArg === 'object' &&
     !Array.isArray(finalArg) &&
     !BigNumber.isBigNumber(finalArg)
@@ -42,53 +43,52 @@ const getParams = ({
   }
 
   const { converted } = common.convertParams({ params, parameters });
+
   return { params: converted, monitor };
 };
 
 const createCall = ({
   hash,
   client,
-  func: { name, parameters, returnType },
+  func: { name, parameters = [], returnType },
 }: {
-  hash: Hash160String;
-  client: ReadClient<any>;
-  func: ABIFunction;
-}) => async (...args: any[]): Promise<Param | null> => {
+  readonly hash: Hash160String;
+  readonly client: ReadClient;
+  readonly func: ABIFunction;
+  // tslint:disable-next-line no-any
+}) => async (...args: any[]): Promise<Param | undefined> => {
   const { params, monitor } = getParams({
-    parameters: parameters || [],
+    parameters,
     params: args,
   });
 
   const result = await client.call(hash, name, params, monitor);
+
   return common.convertCallResult({ returnType, result });
 };
 
 export const createReadSmartContract = ({
   hash,
-  abi,
+  abi: { events: abiEvents = [], functions },
   client,
 }: {
-  hash: Hash160String;
-  abi: ABI;
-  client: ReadClient<any>;
+  readonly hash: Hash160String;
+  readonly abi: ABI;
+  readonly client: ReadClient;
 }): ReadSmartContract => {
-  const events = (abi.events || []).reduce(
-    (acc: { [key: string]: ABIEvent }, event) => {
-      acc[event.name] = event;
-      return acc;
-    },
+  const events = abiEvents.reduce<{ [key: string]: ABIEvent }>(
+    (acc, event) => ({
+      ...acc,
+      [event.name]: event,
+    }),
     {},
   );
 
-  const iterActionsRaw = (filterIn?: BlockFilter): AsyncIterable<ActionRaw> => {
-    const blockFilter = filterIn || {};
-    return AsyncIterableX.from(client.iterActionsRaw(blockFilter)).pipe(
-      filter((action) => action.scriptHash === hash),
-    );
-  };
+  const iterActionsRaw = (blockFilter: BlockFilter = {}): AsyncIterable<ActionRaw> =>
+    // tslint:disable-next-line possible-timing-attack
+    AsyncIterableX.from(client.iterActionsRaw(blockFilter)).pipe(filter((action) => action.scriptHash === hash));
 
-  const convertAction = (action: ActionRaw): Action =>
-    common.convertAction({ action, events });
+  const convertAction = (action: ActionRaw): Action => common.convertAction({ action, events });
 
   const iterActions = (filterIn?: BlockFilter): AsyncIterable<Action> =>
     AsyncIterableX.from(iterActionsRaw(filterIn)).pipe(map(convertAction));
@@ -97,7 +97,7 @@ export const createReadSmartContract = ({
     AsyncIterableX.from(iterActions(actionFilter)).pipe(
       map((action) => {
         if (action.type === 'Log') {
-          return null;
+          return undefined;
         }
 
         return action;
@@ -109,7 +109,7 @@ export const createReadSmartContract = ({
     AsyncIterableX.from(iterActions(actionFilter)).pipe(
       map((action) => {
         if (action.type === 'Event') {
-          return null;
+          return undefined;
         }
 
         return action;
@@ -117,23 +117,23 @@ export const createReadSmartContract = ({
       filter(Boolean),
     );
 
-  const iterStorage = (): AsyncIterable<StorageItem> =>
-    client.iterStorage(hash);
+  const iterStorage = (): AsyncIterable<StorageItem> => client.iterStorage(hash);
 
-  const smartContract: ReadSmartContract = {
-    iterActionsRaw,
-    iterActions,
-    iterEvents,
-    iterLogs,
-    iterStorage,
-    convertAction,
-  };
-
-  abi.functions.forEach((func) => {
-    if (func.constant) {
-      smartContract[func.name] = createCall({ client, hash, func });
-    }
-  });
-
-  return smartContract;
+  return functions.reduce<ReadSmartContract>(
+    (acc, func) =>
+      func.constant === true
+        ? {
+            ...acc,
+            [func.name]: createCall({ client, hash, func }),
+          }
+        : acc,
+    {
+      iterActionsRaw,
+      iterActions,
+      iterEvents,
+      iterLogs,
+      iterStorage,
+      convertAction,
+    },
+  );
 };

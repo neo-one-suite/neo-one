@@ -7,7 +7,7 @@ export class ProgramCounterHelper {
   private readonly first: KnownProgramCounter;
   private readonly last: LastProgramCounter;
 
-  constructor(pc: () => number) {
+  public constructor(pc: () => number) {
     this.pc = pc;
     this.first = new KnownProgramCounter(this.pc());
     this.last = new LastProgramCounter(this.pc());

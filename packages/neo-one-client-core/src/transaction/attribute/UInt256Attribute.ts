@@ -1,10 +1,7 @@
 import { common, UInt256 } from '../../common';
 import { Equals } from '../../Equatable';
 import { InvalidFormatError } from '../../errors';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../../Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../../utils';
 import { AttributeBase, AttributeJSON } from './AttributeBase';
 import { AttributeUsage, toJSONAttributeUsage } from './AttributeUsage';
@@ -29,17 +26,12 @@ export type UInt256AttributeUsage =
   | 0xaf;
 
 export interface UInt256AttributeAdd {
-  usage: UInt256AttributeUsage;
-  value: UInt256;
+  readonly usage: UInt256AttributeUsage;
+  readonly value: UInt256;
 }
 
-export class UInt256Attribute extends AttributeBase<
-  UInt256AttributeUsage,
-  UInt256
-> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): UInt256Attribute {
+export class UInt256Attribute extends AttributeBase<UInt256AttributeUsage, UInt256> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): UInt256Attribute {
     const { reader } = options;
     const { usage } = super.deserializeAttributeWireBase(options);
     if (
@@ -66,6 +58,7 @@ export class UInt256Attribute extends AttributeBase<
       throw new InvalidFormatError();
     }
     const value = reader.readUInt256();
+
     return new this({ usage, value });
   }
 
@@ -74,12 +67,10 @@ export class UInt256Attribute extends AttributeBase<
   public readonly size: number;
   public readonly equals: Equals = utils.equals(
     UInt256Attribute,
-    (other) =>
-      this.usage === other.usage &&
-      common.uInt256Equal(this.value, other.value),
+    (other) => this.usage === other.usage && common.uInt256Equal(this.value, other.value),
   );
 
-  constructor({ usage, value }: UInt256AttributeAdd) {
+  public constructor({ usage, value }: UInt256AttributeAdd) {
     super();
     this.usage = usage;
     this.value = value;
@@ -90,7 +81,7 @@ export class UInt256Attribute extends AttributeBase<
     writer.writeUInt256(this.value);
   }
 
-  public serializeJSON(context: SerializeJSONContext): AttributeJSON {
+  public serializeJSON(_context: SerializeJSONContext): AttributeJSON {
     return {
       usage: toJSONAttributeUsage(this.usage),
       data: JSONHelper.writeUInt256(this.value),

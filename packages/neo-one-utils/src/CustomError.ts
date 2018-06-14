@@ -13,9 +13,7 @@ function inherits(subClass, superClass) {
     },
   });
   if (superClass) {
-    Object.setPrototypeOf
-      ? Object.setPrototypeOf(subClass, superClass)
-      : (subClass.__proto__ = superClass);
+    Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : (subClass.__proto__ = superClass);
   }
 }
 

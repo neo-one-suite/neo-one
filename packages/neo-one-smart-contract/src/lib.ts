@@ -1,33 +1,31 @@
+// tslint:disable readonly-array no-object-mutation no-unused
 export type Address = Buffer;
 export type Hash256 = Buffer;
 export type PublicKey = Buffer;
 export type Signature = Buffer;
 export interface FixedTag<T extends number> {
-  __decimals: T;
+  readonly __decimals: T;
 }
 export type Fixed<T extends number> = number | (number & FixedTag<T>);
 export type Integer = Fixed<0>;
 export type Fixed8 = Fixed<8>;
 
 export abstract class SmartContract {
-  constructor(public readonly owner: Address) {}
+  public constructor(public readonly owner: Address) {}
 
   protected get address(): Address {
     return syscall('System.ExecutionEngine.GetExecutingScriptHash');
   }
 }
 
-export class MapStorage<
-  K extends SerializableValue,
-  V extends SerializableValue
-> {
-  constructor(private readonly prefix?: Buffer) {}
+export class MapStorage<K extends SerializableValue, V extends SerializableValue> {
+  public constructor(private readonly prefix?: Buffer) {}
 
   public get(keyIn: K): V | null {
     return syscall(
       'Neo.Storage.Get',
       syscall('Neo.Storage.GetContext'),
-      this.prefix == null
+      this.prefix === undefined
         ? syscall('Neo.Runtime.Serialize', keyIn)
         : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)]),
     ) as V | null;
@@ -37,7 +35,7 @@ export class MapStorage<
     syscall(
       'Neo.Storage.Put',
       syscall('Neo.Storage.GetContext'),
-      this.prefix == null
+      this.prefix === undefined
         ? syscall('Neo.Runtime.Serialize', keyIn)
         : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)]),
       value,
@@ -46,18 +44,16 @@ export class MapStorage<
 }
 
 export class SetStorage<K extends SerializableValue> {
-  constructor(private readonly prefix?: Buffer) {}
+  public constructor(private readonly prefix?: Buffer) {}
 
   public has(keyIn: K): boolean {
     return (
       syscall(
         'Neo.Storage.Get',
         syscall('Neo.Storage.GetContext'),
-        this.prefix == null
+        this.prefix === undefined
           ? syscall('Neo.Runtime.Serialize', keyIn)
-          : Buffer.concat(
-              [this.prefix, syscall('Neo.Runtime.Serialize', keyIn)],
-            ),
+          : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)]),
       ) === true
     );
   }
@@ -66,7 +62,7 @@ export class SetStorage<K extends SerializableValue> {
     syscall(
       'Neo.Storage.Put',
       syscall('Neo.Storage.GetContext'),
-      this.prefix == null
+      this.prefix === undefined
         ? syscall('Neo.Runtime.Serialize', keyIn)
         : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)]),
       true,
@@ -75,7 +71,7 @@ export class SetStorage<K extends SerializableValue> {
 }
 
 export class Output {
-  constructor(private readonly output: OutputBase) {}
+  public constructor(private readonly output: OutputBase) {}
 
   public get address(): Address {
     return syscall('Neo.Output.GetScriptHash', this.output);
@@ -91,7 +87,7 @@ export class Output {
 }
 
 export class Input {
-  constructor(private readonly input: InputBase) {}
+  public constructor(private readonly input: InputBase) {}
 
   public get hash(): Hash256 {
     return syscall('Neo.Input.GetHash', this.input);
@@ -143,7 +139,7 @@ export type AttributeUsage =
   | 0xff; // REMARK15
 
 export class Attribute {
-  constructor(private readonly attribute: AttributeBase) {}
+  public constructor(private readonly attribute: AttributeBase) {}
 
   public get usage(): AttributeUsage {
     return syscall('Neo.Attribute.GetUsage', this.attribute) as AttributeUsage;
@@ -168,7 +164,7 @@ export type TransactionType =
 export class Transaction {
   private readonly transaction: TransactionBase;
 
-  constructor(transaction: TransactionBase) {
+  public constructor(transaction: TransactionBase) {
     this.transaction = transaction;
   }
 
@@ -177,40 +173,27 @@ export class Transaction {
   }
 
   public get type(): TransactionType {
-    return syscall(
-      'Neo.Transaction.GetType',
-      this.transaction,
-    ) as TransactionType;
+    return syscall('Neo.Transaction.GetType', this.transaction) as TransactionType;
   }
 
   public get attributes(): Attribute[] {
-    return syscall('Neo.Transaction.GetAttributes', this.transaction).map(
-      (attribute) => new Attribute(attribute),
-    );
+    return syscall('Neo.Transaction.GetAttributes', this.transaction).map((attribute) => new Attribute(attribute));
   }
 
   public get outputs(): Output[] {
-    return syscall('Neo.Transaction.GetOutputs', this.transaction).map(
-      (output) => new Output(output),
-    );
+    return syscall('Neo.Transaction.GetOutputs', this.transaction).map((output) => new Output(output));
   }
 
   public get inputs(): Input[] {
-    return syscall('Neo.Transaction.GetInputs', this.transaction).map(
-      (input) => new Input(input),
-    );
+    return syscall('Neo.Transaction.GetInputs', this.transaction).map((input) => new Input(input));
   }
 
   public get references(): Output[] {
-    return syscall('Neo.Transaction.GetReferences', this.transaction).map(
-      (output) => new Output(output),
-    );
+    return syscall('Neo.Transaction.GetReferences', this.transaction).map((output) => new Output(output));
   }
 
   public get unspentOutputs(): Output[] {
-    return syscall('Neo.Transaction.GetUnspentCoins', this.transaction).map(
-      (output) => new Output(output),
-    );
+    return syscall('Neo.Transaction.GetUnspentCoins', this.transaction).map((output) => new Output(output));
   }
 
   public get script(): Buffer {
@@ -219,7 +202,7 @@ export class Transaction {
 }
 
 export abstract class BaseBlock<T extends HeaderBase | BlockBase> {
-  constructor(protected readonly block: T) {}
+  public constructor(protected readonly block: T) {}
 
   public get hash(): Hash256 {
     return syscall('Neo.Header.GetHash', this.block);
@@ -261,20 +244,16 @@ export class Block extends BaseBlock<BlockBase> {
   }
 
   public get transactions(): Transaction[] {
-    return syscall('Neo.Block.GetTransactions', this.block).map(
-      (transaction) => new Transaction(transaction),
-    );
+    return syscall('Neo.Block.GetTransactions', this.block).map((transaction) => new Transaction(transaction));
   }
 
   public getTransaction(index: Integer): Transaction {
-    return new Transaction(
-      syscall('Neo.Block.GetTransaction', this.block, index),
-    );
+    return new Transaction(syscall('Neo.Block.GetTransaction', this.block, index));
   }
 }
 
 export class Account {
-  constructor(private readonly account: AccountBase) {}
+  public constructor(private readonly account: AccountBase) {}
 
   public get hash(): Address {
     return syscall('Neo.Account.GetScriptHash', this.account);
@@ -304,7 +283,7 @@ export type AssetType =
   | 0x60; // Token
 
 export class Asset {
-  constructor(private readonly asset: AssetBase) {}
+  public constructor(private readonly asset: AssetBase) {}
 
   public get hash(): Hash256 {
     return syscall('Neo.Asset.GetAssetId', this.asset);
@@ -340,7 +319,7 @@ export class Asset {
 }
 
 export class Contract extends Account {
-  constructor(private readonly contract: ContractBase, account: AccountBase) {
+  public constructor(private readonly contract: ContractBase, account: AccountBase) {
     super(account);
   }
 
@@ -392,32 +371,20 @@ export function getValidators(): PublicKey[] {
 }
 
 export function getContract(address: Address): Contract {
-  return new Contract(
-    syscall('Neo.Blockchain.GetContract', address),
-    syscall('Neo.Blockchain.GetAccount', address),
-  );
+  return new Contract(syscall('Neo.Blockchain.GetContract', address), syscall('Neo.Blockchain.GetAccount', address));
 }
 
-export function verify(
-  target: any,
-  propertyKey: string,
-  descriptor: PropertyDescriptor,
-): void {
+// tslint:disable-next-line no-any
+export function verify(target: any, propertyKey: string, descriptor: PropertyDescriptor): void {
   throw new Error('This should be transpiled.');
 }
-export function constant(
-  target: any,
-  propertyKey: string,
-  descriptor: PropertyDescriptor,
-): void {
+// tslint:disable-next-line no-any
+export function constant(target: any, propertyKey: string, descriptor: PropertyDescriptor): void {
   throw new Error('This should be transpiled.');
 }
 
 export function createEventHandler(name: string): () => void;
-export function createEventHandler<A0>(
-  name: string,
-  arg0Name: string,
-): (arg0: A0) => void;
+export function createEventHandler<A0>(name: string, arg0Name: string): (arg0: A0) => void;
 export function createEventHandler<A0, A1>(
   name: string,
   arg0Name: string,
@@ -431,8 +398,9 @@ export function createEventHandler<A0, A1, A2>(
 ): (arg0: A0, arg1: A1, arg2: A2) => void;
 export function createEventHandler(
   name: string,
-  // tslint:disable-next-line
+  // tslint:disable-next-line no-any
   ...args: any[]
-): (...args: any[]) => void {
+): // tslint:disable-next-line no-any
+(...args: any[]) => void {
   throw new Error('This should be transpiled');
 }

@@ -6,23 +6,11 @@ import { contractParameters as parameters } from '../../sc/parameters';
 
 describe('parameters', () => {
   describe('check parameters of correct type', () => {
-    const testCases = [
-      'String',
-      'Hash160',
-      'Hash256',
-      'PublicKey',
-      'Boolean',
-      'Signature',
-      'InteropInterface',
-      'Void',
-    ];
+    const testCases = ['String', 'Hash160', 'Hash256', 'PublicKey', 'Boolean', 'Signature', 'InteropInterface', 'Void'];
 
     for (const param of testCases) {
       test(param, () => {
-        const result = (parameters as any)[param](
-          (contracts as any)[param],
-          (abis.parameters as any)[param] as any,
-        );
+        const result = (parameters as any)[param]((contracts as any)[param], (abis.parameters as any)[param]);
 
         expect(result).toEqual((contracts as any)[param].value);
       });
@@ -30,19 +18,13 @@ describe('parameters', () => {
 
     test('Integer', () => {
       common.fixedToDecimal = jest.fn(() => contracts.Integer.value);
-      const result = parameters.Integer(
-        (contracts as any).Integer,
-        (abis.parameters as any).Integer,
-      );
+      const result = parameters.Integer((contracts as any).Integer, (abis.parameters as any).Integer);
 
       expect(result).toEqual(contracts.Integer.value);
     });
 
     test('Array', () => {
-      const result = parameters.Array(
-        (contracts as any).Array,
-        (abis.returns as any).Array,
-      );
+      const result = parameters.Array((contracts as any).Array, (abis.returns as any).Array);
 
       expect(result).toEqual([contracts.Array.value[0].value]);
     });
@@ -53,19 +35,13 @@ describe('parameters', () => {
         value: [{ type: 'Boolean', value: false }],
       };
 
-      const result = parameters.Boolean(
-        boolArray as any,
-        (abis.parameters as any).Boolean,
-      );
+      const result = parameters.Boolean(boolArray as any, (abis.parameters as any).Boolean);
 
       expect(result).toEqual(false);
     });
 
     test('nullable parameter', () => {
-      const result = parameters.String(
-        null as any,
-        (abis.parameters as any).String,
-      );
+      const result = parameters.String(null as any, (abis.parameters as any).String);
 
       expect(result).toBeNull();
     });
@@ -77,43 +53,26 @@ describe('parameters', () => {
   });
 
   describe('incorrect parameter types throw errors', () => {
-    const errorTestCases = [
-      'String',
-      'Hash160',
-      'Hash256',
-      'PublicKey',
-      'Integer',
-      'Signature',
-      'Array',
-    ];
+    const errorTestCases = ['String', 'Hash160', 'Hash256', 'PublicKey', 'Integer', 'Signature', 'Array'];
 
     for (const param of errorTestCases) {
       test(`${param} throws error`, () => {
         function testError() {
-          return (parameters as any)[param](
-            contracts.Void,
-            (abis.parameters as any)[param] as any,
-          );
+          return (parameters as any)[param](contracts.Void, (abis.parameters as any)[param]);
         }
 
         let options = [param, 'ByteArray'];
         if (param === 'Array' || param === 'Signature') {
           options = [param];
         }
-        expect(testError).toThrow(new InvalidContractParameterError(
-          (contracts as any).Void,
-          options as any,
-        ) as any);
+        expect(testError).toThrow(new InvalidContractParameterError((contracts as any).Void, options as any) as any);
       });
     }
 
     test('Array to byte array error', () => {
       function testError() {
         // @ts-ignore
-        return parameters.ByteArray(
-          contracts.Array as any,
-          (abis.parameters as any).ByteArray,
-        );
+        return parameters.ByteArray(contracts.Array as any, (abis.parameters as any).ByteArray);
       }
 
       expect(testError).toThrow(
@@ -164,20 +123,17 @@ describe('parameters', () => {
       const { param } = testCase;
 
       test(`${param} from bytearray`, () => {
-        if (testCase.json != null) {
+        if (testCase.json != undefined) {
           // @ts-ignore
           JSONHelper[testCase.json] = jest.fn(() => contracts.ByteArray.value);
         }
 
-        if (testCase.common != null) {
+        if (testCase.common != undefined) {
           // @ts-ignore
           common[testCase.common] = jest.fn(() => contracts.ByteArray.value);
         }
 
-        const result = (parameters as any)[param](
-          contracts.ByteArray,
-          (abis.parameters as any)[param] as any,
-        );
+        const result = (parameters as any)[param](contracts.ByteArray, (abis.parameters as any)[param]);
 
         expect(result).toEqual(contracts.ByteArray.value);
       });
@@ -192,10 +148,7 @@ describe('parameters', () => {
         // do nothing
       });
       // @ts-ignore
-      const result = parameters.Integer(
-        contracts.ByteArray as any,
-        (abis.parameters as any).Integer,
-      );
+      const result = parameters.Integer(contracts.ByteArray as any, (abis.parameters as any).Integer);
 
       expect(result).toEqual(contracts.ByteArray.value);
     });
@@ -241,26 +194,23 @@ describe('parameters', () => {
       const { param } = testCase;
 
       test(`${param} to bytearray`, () => {
-        if (testCase.json != null) {
+        if (testCase.json != undefined) {
           // @ts-ignore
           JSONHelper[testCase.json] = jest.fn(() => contracts[param].value);
         }
 
-        if (testCase.utils != null) {
+        if (testCase.utils != undefined) {
           // @ts-ignore
           utils[testCase.utils] = jest.fn(() => contracts[param].value);
         }
 
-        if (testCase.common != null) {
+        if (testCase.common != undefined) {
           // @ts-ignore
           common[testCase.common] = jest.fn(() => contracts[param].value);
         }
 
         // @ts-ignore
-        const result = parameters.ByteArray(
-          (contracts as any)[param],
-          (abis.parameters as any).ByteArray,
-        );
+        const result = parameters.ByteArray((contracts as any)[param], (abis.parameters as any).ByteArray);
 
         // @ts-ignore
         expect(result).toEqual(contracts[param].value.toString('hex'));
@@ -271,10 +221,7 @@ describe('parameters', () => {
       const expected = Buffer.from(contracts.String.value, 'utf-8');
 
       // @ts-ignore
-      const result = parameters.ByteArray(
-        contracts.String as any,
-        (abis.parameters as any).ByteArray,
-      );
+      const result = parameters.ByteArray(contracts.String as any, (abis.parameters as any).ByteArray);
 
       expect(result).toEqual(expected.toString('hex'));
     });
@@ -283,10 +230,7 @@ describe('parameters', () => {
       const expected = Buffer.alloc(0, 0);
 
       // @ts-ignore
-      const result = parameters.ByteArray(
-        contracts.InteropInterface as any,
-        (abis.parameters as any).ByteArray,
-      );
+      const result = parameters.ByteArray(contracts.InteropInterface as any, (abis.parameters as any).ByteArray);
 
       expect(result).toEqual(expected.toString('hex'));
     });
@@ -295,10 +239,7 @@ describe('parameters', () => {
       const expected = Buffer.alloc(0, 0);
 
       // @ts-ignore
-      const result = parameters.ByteArray(
-        contracts.Void as any,
-        (abis.parameters as any).ByteArray,
-      );
+      const result = parameters.ByteArray(contracts.Void as any, (abis.parameters as any).ByteArray);
 
       expect(result).toEqual(expected.toString('hex'));
     });

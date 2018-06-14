@@ -4,5 +4,5 @@ import { Types } from '../Types';
 // Input: [val]
 // Output: [boolean]
 export class IsUndefinedHelper extends IsHelper {
-  protected type = Types.Undefined;
+  protected readonly type = Types.Undefined;
 }

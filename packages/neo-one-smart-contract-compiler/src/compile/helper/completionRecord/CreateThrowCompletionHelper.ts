@@ -6,10 +6,11 @@ import { Helper } from '../Helper';
 
 // Input: [errorVal]
 // Output: [completion]
-export class CreateThrowCompletionHelper extends Helper<Node> {
+export class CreateThrowCompletionHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

@@ -1,14 +1,14 @@
 import { ProgramCounter } from './ProgramCounter';
 
 export class DeferredProgramCounter extends ProgramCounter {
-  private pc: ProgramCounter | undefined;
+  private mutablePC: ProgramCounter | undefined;
 
-  constructor(private readonly offset?: number) {
+  public constructor(private readonly offset: number = 0) {
     super();
   }
 
   public plus(offset: number): ProgramCounter {
-    return new DeferredProgramCounter((this.offset || 0) + offset);
+    return new DeferredProgramCounter(this.offset + offset);
   }
 
   public equals(other: ProgramCounter): boolean {
@@ -16,14 +16,14 @@ export class DeferredProgramCounter extends ProgramCounter {
   }
 
   public setPC(pc: ProgramCounter): void {
-    this.pc = pc;
+    this.mutablePC = pc;
   }
 
   public getPC(): number {
-    if (this.pc == null) {
+    if (this.mutablePC === undefined) {
       throw new Error('Unknown PC');
     }
 
-    return this.pc.getPC() + (this.offset || 0);
+    return this.mutablePC.getPC() + this.offset;
   }
 }

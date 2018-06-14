@@ -4,6 +4,6 @@ import { Types } from '../Types';
 // Input: []
 // Output: [undefinedVal]
 export class CreateUndefinedHelper extends CreatePrimitiveHelper {
-  protected length = 1;
-  protected type = Types.Undefined;
+  protected readonly length = 1;
+  protected readonly type = Types.Undefined;
 }

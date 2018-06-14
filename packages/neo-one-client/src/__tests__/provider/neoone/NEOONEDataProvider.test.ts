@@ -11,10 +11,7 @@ function createExpectedInvocationResult(options: object) {
     state: 'HALT',
     gasConsumed: new BigNumber('0'),
     gasCost: new BigNumber('0'),
-    stack: [
-      { type: 'Integer', value: new BN(1) },
-      { type: 'Array', value: [{ type: 'Void' }] },
-    ],
+    stack: [{ type: 'Integer', value: new BN(1) }, { type: 'Array', value: [{ type: 'Void' }] }],
   };
 
   if (options) {
@@ -32,10 +29,7 @@ function createInvocationResultJSON(options: object) {
     state: VMState.Halt,
     gas_consumed: '0',
     gas_cost: '0',
-    stack: [
-      { type: 'Integer', value: '1' },
-      { type: 'Array', value: [{ type: 'Void' }] },
-    ],
+    stack: [{ type: 'Integer', value: '1' }, { type: 'Array', value: [{ type: 'Void' }] }],
   };
 
   if (options) {
@@ -118,11 +112,9 @@ function createExpectedContract(options: object) {
     },
   };
 
-  if (options) {
-    for (const option of Object.keys(options)) {
-      // @ts-ignore
-      contract[option] = options[option];
-    }
+  for (const option of Object.keys(options)) {
+    // @ts-ignore
+    contract[option] = options[option];
   }
 
   return contract;
@@ -157,10 +149,7 @@ function createContractJSON(options: object) {
   return contract;
 }
 
-function createExpectedInvocationData(
-  extra: object,
-  options: { hash?: string } = { hash: undefined },
-) {
+function createExpectedInvocationData(extra: object, options: { hash?: string } = { hash: undefined }) {
   const invocation = {
     result: createExpectedInvocationResult({}),
     asset: createExpectedAsset({}),
@@ -176,7 +165,7 @@ function createExpectedInvocationData(
         blockIndex: 4,
         blockHash: '3',
         transactionIndex: 5,
-        transactionHash: options.hash == null ? '0' : options.hash,
+        transactionHash: options.hash == undefined ? '0' : options.hash,
         index: 0,
         globalIndex: new BigNumber(3),
         scriptHash: '3',
@@ -189,7 +178,7 @@ function createExpectedInvocationData(
         blockIndex: 4,
         blockHash: '3',
         transactionIndex: 5,
-        transactionHash: options.hash == null ? '0' : options.hash,
+        transactionHash: options.hash == undefined ? '0' : options.hash,
         index: 1,
         globalIndex: new BigNumber(4),
         scriptHash: '2',
@@ -302,7 +291,7 @@ function createTransactionJSON(
 ) {
   const transaction = {
     type,
-    txid: options.hash == null ? '0' : options.hash,
+    txid: options.hash == undefined ? '0' : options.hash,
     size: 0,
     version: 1,
     attributes: [createAttributeJSON({})],
@@ -333,11 +322,7 @@ function createTransactionJSON(
   return transaction;
 }
 
-function createExpectedTransaction(
-  type: string,
-  extra: object,
-  options: { noData: boolean } = { noData: false },
-) {
+function createExpectedTransaction(type: string, extra: object, options: { noData: boolean } = { noData: false }) {
   const transaction = {
     type,
     txid: '0',
@@ -371,13 +356,8 @@ function createExpectedTransaction(
   return transaction;
 }
 
-function createExpectedRegisterTransaction(
-  nameOption: object,
-  options: { noData: boolean } = { noData: false },
-) {
-  const { type, name, amount, precision, owner, admin } = createExpectedAsset(
-    nameOption,
-  );
+function createExpectedRegisterTransaction(nameOption: object, options: { noData: boolean } = { noData: false }) {
+  const { type, name, amount, precision, owner, admin } = createExpectedAsset(nameOption);
 
   return createExpectedTransaction(
     'RegisterTransaction',
@@ -390,9 +370,7 @@ function createExpectedRegisterTransaction(
 }
 
 function createRegisterTransactionJSON(nameOption: object) {
-  const { type, name, amount, precision, owner, admin } = createAssetJSON(
-    nameOption,
-  );
+  const { type, name, amount, precision, owner, admin } = createAssetJSON(nameOption);
 
   return createTransactionJSON('RegisterTransaction', {
     asset: { type, name, amount, precision, owner, admin },
@@ -434,9 +412,7 @@ describe('NEOONEDataProvider', () => {
     );
 
     // @ts-ignore
-    (provider as any).client.getClaimAmount = jest.fn(() =>
-      Promise.resolve([new BigNumber('1')]),
-    );
+    (provider as any).client.getClaimAmount = jest.fn(() => Promise.resolve([new BigNumber('1')]));
 
     const result = await provider.getUnclaimed(keys[0].address);
     expect(result).toEqual(expected);
@@ -487,11 +463,7 @@ describe('NEOONEDataProvider', () => {
   describe('_ConvertTransactionBase types', () => {
     const testCases = [
       {
-        expected: createExpectedTransaction(
-          'MinerTransaction',
-          { nonce: 10 },
-          { noData: true },
-        ),
+        expected: createExpectedTransaction('MinerTransaction', { nonce: 10 }, { noData: true }),
 
         transactionJSON: createTransactionJSON('MinerTransaction', {
           nonce: 10,
@@ -499,11 +471,7 @@ describe('NEOONEDataProvider', () => {
       },
 
       {
-        expected: createExpectedTransaction(
-          'ClaimTransaction',
-          { claims: [] },
-          { noData: true },
-        ),
+        expected: createExpectedTransaction('ClaimTransaction', { claims: [] }, { noData: true }),
 
         transactionJSON: createTransactionJSON('ClaimTransaction', {
           claims: [],
@@ -511,11 +479,7 @@ describe('NEOONEDataProvider', () => {
       },
 
       {
-        expected: createExpectedTransaction(
-          'ContractTransaction',
-          {},
-          { noData: true },
-        ),
+        expected: createExpectedTransaction('ContractTransaction', {}, { noData: true }),
 
         transactionJSON: createTransactionJSON('ContractTransaction', {}),
       },
@@ -536,11 +500,7 @@ describe('NEOONEDataProvider', () => {
       },
 
       {
-        expected: createExpectedTransaction(
-          'IssueTransaction',
-          {},
-          { noData: true },
-        ),
+        expected: createExpectedTransaction('IssueTransaction', {}, { noData: true }),
 
         transactionJSON: createTransactionJSON('IssueTransaction', {}),
       },
@@ -561,19 +521,13 @@ describe('NEOONEDataProvider', () => {
       },
 
       {
-        expected: createExpectedRegisterTransaction(
-          { name: '10' },
-          { noData: true },
-        ),
+        expected: createExpectedRegisterTransaction({ name: '10' }, { noData: true }),
 
         transactionJSON: createRegisterTransactionJSON({ name: '10' }),
       },
 
       {
-        expected: createExpectedRegisterTransaction(
-          { name: '10' },
-          { noData: true },
-        ),
+        expected: createExpectedRegisterTransaction({ name: '10' }, { noData: true }),
 
         transactionJSON: createRegisterTransactionJSON({
           name: [{ name: '10' }],
@@ -618,9 +572,7 @@ describe('NEOONEDataProvider', () => {
       // eslint-disable-next-line
       test(`relayTransaction with ${transactionJSON.type}`, async () => {
         // @ts-ignore
-        (provider as any).client.relayTransaction = jest.fn(() =>
-          Promise.resolve(transactionJSON),
-        );
+        (provider as any).client.relayTransaction = jest.fn(() => Promise.resolve(transactionJSON));
 
         const result = await provider.relayTransaction('');
         expect(result).toEqual(expected);
@@ -631,41 +583,26 @@ describe('NEOONEDataProvider', () => {
   test('getTransactionReceipt', async () => {
     const expected = '';
     // @ts-ignore
-    (provider as any).client.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve(expected),
-    );
+    (provider as any).client.getTransactionReceipt = jest.fn(() => Promise.resolve(expected));
 
-    const result = provider.getTransactionReceipt(
-      (transactions as any).register.hash,
-    );
+    const result = provider.getTransactionReceipt((transactions as any).register.hash);
     expect(result).resolves.toEqual(expected);
   });
 
   test('getInvocationData', async () => {
-    const expected = createExpectedInvocationData(
-      {},
-      { hash: (transactions as any).register.hash },
-    );
+    const expected = createExpectedInvocationData({}, { hash: (transactions as any).register.hash });
 
     // @ts-ignore
-    (provider as any).client.getInvocationData = jest.fn(() =>
-      Promise.resolve(createInvocationDataJSON({})),
-    );
+    (provider as any).client.getInvocationData = jest.fn(() => Promise.resolve(createInvocationDataJSON({})));
 
     // @ts-ignore
     (provider as any).client.getTransaction = jest.fn(() =>
       Promise.resolve(
-        createTransactionJSON(
-          'InvocationTransaction',
-          {},
-          { hash: (transactions as any).register.hash },
-        ),
+        createTransactionJSON('InvocationTransaction', {}, { hash: (transactions as any).register.hash }),
       ),
     );
 
-    const result = await provider.getInvocationData(
-      (transactions as any).register.hash,
-    );
+    const result = await provider.getInvocationData((transactions as any).register.hash);
     expect(result).toEqual(expected);
   });
 
@@ -677,9 +614,7 @@ describe('NEOONEDataProvider', () => {
 
     // @ts-ignore
     (provider as any).client.testInvocation = jest.fn(() =>
-      Promise.resolve(
-        createInvocationResultJSON({ state: VMState.Fault, message: '10' }),
-      ),
+      Promise.resolve(createInvocationResultJSON({ state: VMState.Fault, message: '10' })),
     );
 
     const result = provider.testInvoke('');
@@ -711,9 +646,7 @@ describe('NEOONEDataProvider', () => {
     const expected = createExpectedAsset({ name: 'blarg' });
     // @ts-ignore
     (provider as any).client.getAsset = jest.fn(() =>
-      Promise.resolve(
-        createAssetJSON({ name: [{ lang: 'en', name: 'blarg' }] }),
-      ),
+      Promise.resolve(createAssetJSON({ name: [{ lang: 'en', name: 'blarg' }] })),
     );
 
     const result = provider.getAsset((transactions as any).register.hash);
@@ -724,9 +657,7 @@ describe('NEOONEDataProvider', () => {
     const expected = createExpectedAsset({ name: 'blarg' });
     // @ts-ignore
     (provider as any).client.getAsset = jest.fn(() =>
-      Promise.resolve(
-        createAssetJSON({ name: [{ lang: 'bl', name: 'blarg' }] }),
-      ),
+      Promise.resolve(createAssetJSON({ name: [{ lang: 'bl', name: 'blarg' }] })),
     );
 
     const result = provider.getAsset((transactions as any).register.hash);
@@ -785,9 +716,7 @@ describe('NEOONEDataProvider', () => {
   test('getBestBlockHash', async () => {
     const expected = {};
     // @ts-ignore
-    (provider as any).client.getBestBlockHash = jest.fn(() =>
-      Promise.resolve({}),
-    );
+    (provider as any).client.getBestBlockHash = jest.fn(() => Promise.resolve({}));
 
     const result = provider.getBestBlockHash();
     await expect(result).resolves.toEqual(expected);
@@ -805,9 +734,7 @@ describe('NEOONEDataProvider', () => {
   test('getContract', async () => {
     const expected = createExpectedContract({});
     // @ts-ignore
-    (provider as any).client.getContract = jest.fn(() =>
-      Promise.resolve(createContractJSON({})),
-    );
+    (provider as any).client.getContract = jest.fn(() => Promise.resolve(createContractJSON({})));
 
     const result = provider.getContract((transactions as any).register.hash);
     await expect(result).resolves.toEqual(expected);
@@ -851,30 +778,18 @@ describe('NEOONEDataProvider', () => {
   test('getConnectedPeers', async () => {
     const expected = {};
     // @ts-ignore
-    (provider as any).client.getConnectedPeers = jest.fn(() =>
-      Promise.resolve({}),
-    );
+    (provider as any).client.getConnectedPeers = jest.fn(() => Promise.resolve({}));
 
     const result = provider.getConnectedPeers();
     await expect(result).resolves.toEqual(expected);
   });
 
   test('getTransaction', async () => {
-    const expected = createExpectedTransaction(
-      'ClaimTransaction',
-      { claims: [] },
-      { noData: true },
-    );
+    const expected = createExpectedTransaction('ClaimTransaction', { claims: [] }, { noData: true });
 
     // @ts-ignore
     (provider as any).client.getTransaction = jest.fn(() =>
-      Promise.resolve(
-        createTransactionJSON(
-          'ClaimTransaction',
-          { claims: [] },
-          { noData: true },
-        ),
-      ),
+      Promise.resolve(createTransactionJSON('ClaimTransaction', { claims: [] }, { noData: true })),
     );
 
     const result = provider.getTransaction((transactions as any).register.hash);
@@ -884,9 +799,7 @@ describe('NEOONEDataProvider', () => {
   test('getNetworkSettings', async () => {
     const expected = { issueGASFee: new BigNumber('0') };
     // @ts-ignore
-    (provider as any).client.getNetworkSettings = jest.fn(() =>
-      Promise.resolve({ issueGASFee: '0' }),
-    );
+    (provider as any).client.getNetworkSettings = jest.fn(() => Promise.resolve({ issueGASFee: '0' }));
 
     const result = provider.getNetworkSettings();
     expect(result).resolves.toEqual(expected);
@@ -919,9 +832,7 @@ describe('NEOONEDataProvider', () => {
   test('getStorage', async () => {
     const expected = {};
     // @ts-ignore
-    (provider as any).client.getStorageItem = jest.fn(() =>
-      Promise.resolve({}),
-    );
+    (provider as any).client.getStorageItem = jest.fn(() => Promise.resolve({}));
 
     const result = provider.getStorage((transactions as any).register.hash, '');
     await expect(result).resolves.toEqual(expected);
@@ -932,13 +843,9 @@ describe('NEOONEDataProvider', () => {
     // @ts-ignore
     const expected = [storage];
     // @ts-ignore
-    (provider as any).client.getAllStorage = jest.fn(() =>
-      Promise.resolve([storage]),
-    );
+    (provider as any).client.getAllStorage = jest.fn(() => Promise.resolve([storage]));
 
-    const result = await toArray(
-      provider.iterStorage((transactions as any).register.hash),
-    );
+    const result = await toArray(provider.iterStorage((transactions as any).register.hash));
 
     expect(result).toEqual(expected);
   });
@@ -973,9 +880,7 @@ describe('NEOONEDataProvider', () => {
     // @ts-ignore
     provider.iterBlocks = jest.fn(() => AsyncIterableX.from([block]));
 
-    const result = await toArray(
-      provider.iterActionsRaw({ indexStart: 1, indexStop: 2 }),
-    );
+    const result = await toArray(provider.iterActionsRaw({ indexStart: 1, indexStop: 2 }));
 
     expect(result).toEqual(expected);
   });
@@ -1006,9 +911,7 @@ describe('NEOONEDataProvider', () => {
 
     // @ts-ignore
     (provider as any).client.testInvocation = jest.fn(() =>
-      Promise.resolve(
-        createInvocationResultJSON({ state: VMState.Fault, message: '10' }),
-      ),
+      Promise.resolve(createInvocationResultJSON({ state: VMState.Fault, message: '10' })),
     );
 
     const result = await provider.call(contract, method, params);
@@ -1022,9 +925,7 @@ describe('NEOONEDataProvider', () => {
     const result = provider.runConsensusNow();
 
     expect(result).toBeUndefined();
-    expect((provider as any).client.runConsensusNow).toHaveBeenCalledWith(
-      undefined,
-    );
+    expect((provider as any).client.runConsensusNow).toHaveBeenCalledWith(undefined);
     expect((provider as any).client.runConsensusNow).toHaveBeenCalledTimes(1);
   });
 
@@ -1035,10 +936,7 @@ describe('NEOONEDataProvider', () => {
     const result = provider.updateSettings(options);
 
     expect(result).toBeUndefined();
-    expect((provider as any).client.updateSettings).toHaveBeenCalledWith(
-      options,
-      undefined,
-    );
+    expect((provider as any).client.updateSettings).toHaveBeenCalledWith(options, undefined);
 
     expect((provider as any).client.updateSettings).toHaveBeenCalledTimes(1);
   });
@@ -1050,10 +948,7 @@ describe('NEOONEDataProvider', () => {
     const result = provider.fastForwardOffset(offset);
 
     expect(result).toBeUndefined();
-    expect((provider as any).client.fastForwardOffset).toHaveBeenCalledWith(
-      offset,
-      undefined,
-    );
+    expect((provider as any).client.fastForwardOffset).toHaveBeenCalledWith(offset, undefined);
 
     expect((provider as any).client.fastForwardOffset).toHaveBeenCalledTimes(1);
   });
@@ -1065,10 +960,7 @@ describe('NEOONEDataProvider', () => {
     const result = provider.fastForwardToTime(time);
 
     expect(result).toBeUndefined();
-    expect((provider as any).client.fastForwardToTime).toHaveBeenCalledWith(
-      time,
-      undefined,
-    );
+    expect((provider as any).client.fastForwardToTime).toHaveBeenCalledWith(time, undefined);
 
     expect((provider as any).client.fastForwardToTime).toHaveBeenCalledTimes(1);
   });

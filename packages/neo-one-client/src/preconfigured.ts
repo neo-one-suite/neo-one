@@ -1,39 +1,39 @@
 import * as networks from './networks';
-import {
-  NEOONEDataProvider,
-  NEOONEProvider,
-  NEOONEProviderOptions,
-} from './provider';
+import { NEOONEDataProvider, NEOONEProvider, NEOONEProviderOptions } from './provider';
 import { ReadClient } from './ReadClient';
 import { NetworkType } from './types';
 
-export const provider = (options?: {
-  mainRPCURL?: string;
-  testRPCURL?: string;
-  options?: NEOONEProviderOptions[];
-}) => new NEOONEProvider(options || {});
+export const provider = (
+  options: {
+    readonly mainRPCURL?: string;
+    readonly testRPCURL?: string;
+    readonly options?: ReadonlyArray<NEOONEProviderOptions>;
+  } = {},
+) => new NEOONEProvider(options);
 
 export const mainReadClient = (
-  options: { rpcURL?: string; iterBlocksFetchTimeoutMS?: number } = {},
+  options: { readonly rpcURL?: string; readonly iterBlocksFetchTimeoutMS?: number } = {},
 ) => {
-  const { rpcURL, iterBlocksFetchTimeoutMS } = options;
+  const { rpcURL = networks.MAIN_URL, iterBlocksFetchTimeoutMS } = options;
+
   return new ReadClient(
     new NEOONEDataProvider({
       network: networks.MAIN,
-      rpcURL: rpcURL == null ? networks.MAIN_URL : rpcURL,
+      rpcURL,
       iterBlocksFetchTimeoutMS,
     }),
   );
 };
 
 export const testReadClient = (
-  options: { rpcURL?: string; iterBlocksFetchTimeoutMS?: number } = {},
+  options: { readonly rpcURL?: string; readonly iterBlocksFetchTimeoutMS?: number } = {},
 ) => {
-  const { rpcURL, iterBlocksFetchTimeoutMS } = options;
+  const { rpcURL = networks.TEST_URL, iterBlocksFetchTimeoutMS } = options;
+
   return new ReadClient(
     new NEOONEDataProvider({
       network: networks.TEST,
-      rpcURL: rpcURL == null ? networks.TEST_URL : rpcURL,
+      rpcURL,
       iterBlocksFetchTimeoutMS,
     }),
   );
@@ -44,9 +44,9 @@ export const createReadClient = ({
   rpcURL,
   iterBlocksFetchTimeoutMS,
 }: {
-  network: NetworkType;
-  rpcURL: string;
-  iterBlocksFetchTimeoutMS?: number;
+  readonly network: NetworkType;
+  readonly rpcURL: string;
+  readonly iterBlocksFetchTimeoutMS?: number;
 }) =>
   new ReadClient(
     new NEOONEDataProvider({

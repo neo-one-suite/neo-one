@@ -26,7 +26,7 @@ export type LogField =
 export type Label = string;
 export type LabelValue = string | number | boolean | void | null;
 export interface Labels {
-  [label: string]: LabelValue;
+  readonly [label: string]: LabelValue;
 }
 
 /* General guidelines -
@@ -39,18 +39,12 @@ export interface Labels {
   - Force metrics and spans to be logged by using metricLevel and spanLevel
     respectively at verbose or higher.
 */
-export type LogLevel =
-  | 'error'
-  | 'warn'
-  | 'info'
-  | 'verbose'
-  | 'debug'
-  | 'silly';
+export type LogLevel = 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'silly';
 export type LogLevelOption =
   | LogLevel
   | {
-      log: LogLevel;
-      span?: LogLevel;
+      readonly log: LogLevel;
+      readonly span?: LogLevel;
     };
 
 export enum KnownLabel {
@@ -136,301 +130,280 @@ export enum Format {
   TEXT = 'text_map',
   BINARY = 'binary',
 }
-export type Carrier = any;
+export interface Carrier {
+  readonly __carrier: undefined;
+}
 
 export interface CollectedLoggerLogOptions {
-  name: string;
-  level: LogLevel;
-  message?: string;
-  labels?: Labels;
-  data?: Labels;
-  error?: {
-    message?: string;
-    stack?: string;
-    code?: string;
+  readonly name: string;
+  readonly level: LogLevel;
+  readonly message?: string;
+  readonly labels?: Labels;
+  readonly data?: Labels;
+  readonly error?: {
+    readonly message?: string;
+    readonly stack?: string;
+    readonly code?: string;
   };
 }
 
 export interface MetricOptions {
-  name: string;
-  help?: string;
-  labelNames?: Label[];
-  labels?: Labels[];
+  readonly name: string;
+  readonly help?: string;
+  readonly labelNames?: ReadonlyArray<Label>;
+  readonly labels?: ReadonlyArray<Labels>;
 }
 
 export interface BucketedMetricOptions extends MetricOptions {
-  buckets?: number[];
+  readonly buckets?: ReadonlyArray<number>;
 }
 
 export interface PercentiledMetricOptions extends MetricOptions {
-  percentiles?: number[];
+  readonly percentiles?: ReadonlyArray<number>;
 }
 
-export type AllMetricOptions =
-  | MetricOptions
-  | BucketedMetricOptions
-  | PercentiledMetricOptions;
+export type AllMetricOptions = MetricOptions | BucketedMetricOptions | PercentiledMetricOptions;
 
 export interface MetricValue {
-  countOrLabels?: Labels | number;
-  count?: number;
+  readonly countOrLabels?: Labels | number;
+  readonly count?: number;
 }
 
-export interface CollectedMetric<
-  T extends MetricOptions | BucketedMetricOptions
-> {
-  metric: T;
-  values: MetricValue[];
+export interface CollectedMetric<T extends MetricOptions | BucketedMetricOptions> {
+  readonly metric: T;
+  readonly values: ReadonlyArray<MetricValue>;
 }
-export interface CollectedMetrics<
-  T extends MetricOptions | BucketedMetricOptions
-> {
-  [name: string]: CollectedMetric<T>;
+export interface CollectedMetrics<T extends MetricOptions | BucketedMetricOptions> {
+  readonly [name: string]: CollectedMetric<T>;
 }
 
 export interface MetricCollection {
-  counters: CollectedMetrics<MetricOptions>;
-  histograms: CollectedMetrics<BucketedMetricOptions>;
+  readonly counters: CollectedMetrics<MetricOptions>;
+  readonly histograms: CollectedMetrics<BucketedMetricOptions>;
 }
 
 export interface Report {
-  logs: CollectedLoggerLogOptions[];
-  metrics: MetricCollection;
+  readonly logs: ReadonlyArray<CollectedLoggerLogOptions>;
+  readonly metrics: MetricCollection;
 }
 
 export interface CounterBase {
+  // tslint:disable no-method-signature
   inc(count?: number): void;
   inc(labels?: Labels, count?: number): void;
+  // tslint:enable no-method-signature
 }
 
 export interface Counter extends CounterBase {
-  getLabelNames(): Label[];
+  readonly getLabelNames: () => ReadonlyArray<Label>;
 }
 
 export interface GaugeBase {
+  // tslint:disable no-method-signature
   inc(count?: number): void;
   inc(labels?: Labels, count?: number): void;
   dec(count?: number): void;
   dec(labels?: Labels, count?: number): void;
   set(value: number): void;
   set(labels: Labels, value: number): void;
+  // tslint:enable no-method-signature
 }
 
 export interface Gauge extends GaugeBase {
-  getLabelNames(): Label[];
+  readonly getLabelNames: () => ReadonlyArray<Label>;
 }
 
 export interface HistogramBase {
+  // tslint:disable no-method-signature
   observe(value: number): void;
   observe(labels: Labels, value: number): void;
+  // tslint:enable no-method-signature
 }
 
 export interface Histogram extends HistogramBase {
-  getLabelNames(): Label[];
+  readonly getLabelNames: () => ReadonlyArray<Label>;
 }
 
 export interface SummaryBase {
+  // tslint:disable no-method-signature
   observe(value: number): void;
   observe(labels: Labels, value: number): void;
+  // tslint:enable no-method-signature
 }
 
 export interface Summary extends SummaryBase {
-  getLabelNames(): Label[];
+  readonly getLabelNames: () => ReadonlyArray<Label>;
 }
 
 export type Metric = Counter | Gauge | Histogram | Summary;
 
 export interface MetricsFactory {
-  createCounter(options: MetricOptions): Counter;
-  createGauge(options: MetricOptions): Gauge;
-  createHistogram(options: BucketedMetricOptions): Histogram;
-  createSummary(options: PercentiledMetricOptions): Summary;
+  readonly createCounter: (options: MetricOptions) => Counter;
+  readonly createGauge: (options: MetricOptions) => Gauge;
+  readonly createHistogram: (options: BucketedMetricOptions) => Histogram;
+  readonly createSummary: (options: PercentiledMetricOptions) => Summary;
 
-  setFactory(factory: MetricsFactory): void;
+  readonly setFactory: (factory: MetricsFactory) => void;
 }
 
 export interface LogOptions {
-  name: string;
-  message?: string; // Human readable string.
-  level?: LogLevel;
-  metric?: Counter;
+  readonly name: string;
+  readonly message?: string; // Human readable string.
+  readonly level?: LogLevel;
+  readonly metric?: Counter;
 
-  error?: {
-    metric?: Counter;
-    error?: Error | null;
-    message?: string;
-    level?: LogLevel;
+  readonly error?: {
+    readonly metric?: Counter;
+    readonly error?: Error | null;
+    readonly message?: string;
+    readonly level?: LogLevel;
   };
 }
 
 export interface CaptureLogOptions {
-  name: string;
-  message?: string;
-  level?: LogLevel;
+  readonly name: string;
+  readonly message?: string;
+  readonly level?: LogLevel;
 
-  metric?: Counter;
+  readonly metric?: Counter;
 
-  error?:
+  readonly error?:
     | string
     | {
-        metric?: Counter;
-        message?: string;
-        level?: LogLevel;
+        readonly metric?: Counter;
+        readonly message?: string;
+        readonly level?: LogLevel;
       };
 }
 
 export interface LogErrorOptions {
-  name: string;
-  message?: string;
-  error: Error;
-  level?: LogLevel;
-  metric?: Counter;
+  readonly name: string;
+  readonly message?: string;
+  readonly error: Error;
+  readonly level?: LogLevel;
+  readonly metric?: Counter;
 }
 
 export interface Reference {
-  __brand: 'Reference';
+  readonly __brand: 'Reference';
 }
 
 export interface SpanOptions {
-  name: string;
-  level?: LogLevel;
+  readonly name: string;
+  readonly level?: LogLevel;
 
-  metric?: {
-    total: Histogram | Summary;
-    error: Counter;
+  readonly metric?: {
+    readonly total: Histogram | Summary;
+    readonly error: Counter;
   };
 
-  references?: Array<Reference | void>;
-  trace?: boolean; // Is this allowed to be a top level span?
+  readonly references?: ReadonlyArray<Reference | void>;
+  readonly trace?: boolean; // Is this allowed to be a top level span?
 }
 
 export interface CaptureSpanOptions {
-  name: string;
-  level?: LogLevel;
+  readonly name: string;
+  readonly level?: LogLevel;
 
-  metric?: {
-    total: Histogram | Summary;
-    error: Counter;
+  readonly metric?: {
+    readonly total: Histogram | Summary;
+    readonly error: Counter;
   };
 
-  references?: Array<Reference | void>;
-  trace?: boolean; // Is this allowed to be a top level span?
+  readonly references?: ReadonlyArray<Reference | void>;
+  readonly trace?: boolean; // Is this allowed to be a top level span?
 }
 
 export interface CaptureSpanLogOptions {
-  name: string;
-  message?: string;
-  level?: LogLevelOption;
+  readonly name: string;
+  readonly message?: string;
+  readonly level?: LogLevelOption;
 
-  metric?: {
-    total: Histogram | Summary;
-    error: Counter;
+  readonly metric?: {
+    readonly total: Histogram | Summary;
+    readonly error: Counter;
   };
 
-  error?:
+  readonly error?:
     | string
     | {
-        message?: string;
-        level?: LogLevel;
+        readonly message?: string;
+        readonly level?: LogLevel;
       };
-  references?: Array<Reference | void>;
-  trace?: boolean; // Is this allowed to be a top level span?
+  readonly references?: ReadonlyArray<Reference | void>;
+  readonly trace?: boolean; // Is this allowed to be a top level span?
 }
 
 /*
 Usage:
-Do you want to count something? monitor.getCounter
 Do you want to log a message? monitor.log
 Do you want to add metadata to all subsequent monitoring? monitor.withLabels
 Do you want to time something? monitor.startSpan
 Did you enter a new component? monitor.at
 */
 export interface Monitor {
-  labels: typeof KnownLabel;
-  formats: typeof Format;
-  at(component: string): Monitor;
-  withLabels(labels: Labels): Monitor;
-  withData(data: Labels): Monitor;
-  forContext(ctx: Context): Monitor;
-  forMessage(message: IncomingMessage): Monitor;
+  readonly labels: typeof KnownLabel;
+  readonly formats: typeof Format;
+  readonly at: (component: string) => Monitor;
+  readonly withLabels: (labels: Labels) => Monitor;
+  readonly withData: (data: Labels) => Monitor;
+  readonly forContext: (ctx: Context) => Monitor;
+  readonly forMessage: (message: IncomingMessage) => Monitor;
 
-  log(options: LogOptions): void;
-  captureLog<TResult>(
-    // eslint-disable-next-line
-    func: (monitor: CaptureMonitor) => TResult,
-    options: CaptureLogOptions,
-  ): TResult;
-  captureLog<TResult>(
-    // eslint-disable-next-line
-    func: (monitor: CaptureMonitor) => Promise<TResult>,
-    options: CaptureLogOptions,
-  ): Promise<TResult>;
-  logError(options: LogErrorOptions): void;
+  readonly log: (options: LogOptions) => void;
+  readonly captureLog: <TResult>(func: (monitor: CaptureMonitor) => TResult, options: CaptureLogOptions) => TResult;
+  readonly logError: (options: LogErrorOptions) => void;
 
-  // eslint-disable-next-line
-  startSpan(options: SpanOptions): Span;
-  captureSpan<TResult>(
-    // eslint-disable-next-line
-    func: (span: CaptureMonitor) => TResult,
-    options: CaptureSpanOptions,
-  ): TResult;
-  captureSpan<TResult>(
-    // eslint-disable-next-line
-    func: (span: CaptureMonitor) => Promise<TResult>,
-    options: CaptureSpanOptions,
-  ): Promise<TResult>;
-  captureSpanLog<TResult>(
-    // eslint-disable-next-line
+  readonly startSpan: (options: SpanOptions) => Span;
+  readonly captureSpan: <TResult>(func: (span: CaptureMonitor) => TResult, options: CaptureSpanOptions) => TResult;
+  readonly captureSpanLog: <TResult>(
     func: (span: CaptureMonitor) => TResult,
     options: CaptureSpanLogOptions,
-  ): TResult;
-  captureSpanLog<TResult>(
-    // eslint-disable-next-line
-    func: (span: CaptureMonitor) => Promise<TResult>,
-    options: CaptureSpanLogOptions,
-  ): Promise<TResult>;
+  ) => TResult;
 
-  childOf(span: SpanContext | Monitor): Reference;
-  childOf(span: void): void;
-  followsFrom(span: SpanContext | Monitor): Reference;
-  followsFrom(span: void): void;
-  extract(format: Format, carrier: Carrier): SpanContext | null;
-  inject(format: Format, carrier: Carrier): void;
+  readonly childOf: <T extends SpanContext | Monitor | undefined>(
+    span: T,
+  ) => T extends undefined ? undefined : Reference;
+  readonly followsFrom: <T extends SpanContext | Monitor | undefined>(
+    span: T,
+  ) => T extends undefined ? undefined : Reference;
+  readonly extract: (format: Format, carrier: Carrier) => SpanContext | null;
+  readonly inject: (format: Format, carrier: Carrier) => void;
 
   // Equivalent of performance.now() in the browser and perf_hooks in node
   // Used for comparisons, value is in milliseconds with microsecond decimals.
-  now(): number;
+  readonly now: () => number;
   // now() / 1000
-  nowSeconds(): number;
-  serveMetrics(port: number): void;
-  report(report: Report): void;
+  readonly nowSeconds: () => number;
+  readonly serveMetrics: (port: number) => void;
+  readonly report: (report: Report) => void;
 
-  close(callback: () => void): void;
+  readonly close: (callback: () => void) => void;
 }
 
 export interface SpanContext {
-  __brand: 'SpanContext';
+  readonly __brand: 'SpanContext';
 }
 
 export interface CaptureMonitor extends Monitor {
-  setLabels(labels: Labels): void;
-  setData(data: Labels): void;
+  readonly setLabels: (labels: Labels) => void;
+  readonly setData: (data: Labels) => void;
 }
 
 export interface Span extends CaptureMonitor {
-  end(error?: boolean): void;
+  readonly end: (error?: boolean) => void;
 }
 
 export interface LoggerLogOptions {
-  name: string;
-  level: LogLevel;
-  message?: string;
-  labels?: Labels;
-  data?: Labels;
-  error?: Error | null;
+  readonly name: string;
+  readonly level: LogLevel;
+  readonly message?: string;
+  readonly labels?: Labels;
+  readonly data?: Labels;
+  readonly error?: Error | null;
 }
 
 export interface Logger {
-  log(options: LoggerLogOptions): void;
-  close(callback: () => void): void;
+  readonly log: (options: LoggerLogOptions) => void;
+  readonly close: (callback: () => void) => void;
 }

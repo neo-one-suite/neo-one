@@ -7,11 +7,7 @@ import { VisitOptions } from '../types';
 export class LabeledStatementCompiler extends NodeCompiler<LabeledStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.LabeledStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: LabeledStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: LabeledStatement, _options: VisitOptions): void {
     sb.reportUnsupported(node);
   }
 }

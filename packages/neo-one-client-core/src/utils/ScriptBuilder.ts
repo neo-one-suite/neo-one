@@ -9,7 +9,7 @@ export class UnknownOpError extends CustomError {
   public readonly byteCode: string;
   public readonly code: string;
 
-  constructor(byteCode: string) {
+  public constructor(byteCode: string) {
     super(`Unknown op: ${byteCode}`);
     this.byteCode = byteCode;
     this.code = 'UNKNOWN_OP';
@@ -19,34 +19,29 @@ export class UnknownOpError extends CustomError {
 export class InvalidParamError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('Invalid Param');
     this.code = 'INVALID_PARAM';
   }
 }
 
-export interface ParamArray extends Array<Param | null> {}
-export type Param =
-  | BN
-  | number
-  | UInt160
-  | UInt256
-  | ECPoint
-  | string
-  | Buffer
-  | boolean
-  | ParamArray;
+export interface ParamArray extends Array<Param | undefined> {}
+export type Param = BN | number | UInt160 | UInt256 | ECPoint | string | Buffer | boolean | ParamArray;
 
 export class ScriptBuilder {
-  public readonly buffers: Buffer[];
+  private readonly mutableBuffers: Buffer[];
 
-  constructor() {
-    this.buffers = [];
+  public constructor() {
+    this.mutableBuffers = [];
+  }
+
+  public get buffers(): ReadonlyArray<Buffer> {
+    return this.mutableBuffers;
   }
 
   public emitPush(value: Buffer): this {
     if (value.length <= Op.PUSHBYTES75) {
-      this.emitOpByte(value.length as any, value);
+      this.emitOpByte(value.length, value);
     } else if (value.length < 0x100) {
       this.emitOp('PUSHDATA1');
       this.emitUInt8(value.length);
@@ -69,24 +64,28 @@ export class ScriptBuilder {
   public emitUInt8(value: number): this {
     const buff = Buffer.allocUnsafe(1);
     buff.writeUInt8(value, 0);
+
     return this.emit(buff);
   }
 
   public emitUInt16LE(value: number): this {
     const buff = Buffer.allocUnsafe(2);
     buff.writeUInt16LE(value, 0);
+
     return this.emit(buff);
   }
 
   public emitInt16LE(value: number): this {
     const buff = Buffer.allocUnsafe(2);
     buff.writeInt16LE(value, 0);
+
     return this.emit(buff);
   }
 
   public emitUInt32LE(value: number): this {
     const buff = Buffer.allocUnsafe(4);
     buff.writeUInt32LE(value, 0);
+
     return this.emit(buff);
   }
 
@@ -94,9 +93,13 @@ export class ScriptBuilder {
     const value = new BN(valueIn);
     if (value.eq(utils.NEGATIVE_ONE)) {
       return this.emitOp('PUSHM1');
-    } else if (value.eq(utils.ZERO)) {
+    }
+
+    if (value.eq(utils.ZERO)) {
       return this.emitOp('PUSH0');
-    } else if (value.gt(utils.ZERO) && value.lt(utils.SIXTEEN)) {
+    }
+
+    if (value.gt(utils.ZERO) && value.lt(utils.SIXTEEN)) {
       return this.emitOpByte(Op.PUSH1 - 1 + value.toNumber());
     }
 
@@ -123,53 +126,73 @@ export class ScriptBuilder {
     return this.emitOp(value ? 'PUSH1' : 'PUSH0');
   }
 
-  public emitOp(op: OpCode, buffer?: Buffer | null): this {
+  public emitOp(op: OpCode, buffer?: Buffer | undefined): this {
     this.emitOpByte(Op[op], buffer);
+
     return this;
   }
 
-  public emitPushParam(param: Param | null): this {
-    if (param == null) {
+  public emitPushParam(param: Param | undefined): this {
+    if (param === undefined) {
       return this.emitPush(Buffer.alloc(0, 0));
-    } else if (Array.isArray(param)) {
+    }
+
+    if (Array.isArray(param)) {
       return this.emitPushArray(param);
-    } else if (common.isUInt160(param)) {
+    }
+
+    if (common.isUInt160(param)) {
       return this.emitPushUInt160(common.asUInt160(param));
-    } else if (common.isUInt256(param)) {
+    }
+
+    if (common.isUInt256(param)) {
       return this.emitPushUInt256(common.asUInt256(param));
-    } else if (common.isECPoint(param)) {
+    }
+
+    if (common.isECPoint(param)) {
       return this.emitPushECPoint(common.asECPoint(param));
-    } else if (typeof param === 'number' || param instanceof BN) {
+    }
+
+    if (typeof param === 'number' || param instanceof BN) {
       return this.emitPushInt(param);
-    } else if (typeof param === 'string') {
+    }
+
+    if (typeof param === 'string') {
       return this.emitPushString(param);
-    } else if (typeof param === 'boolean') {
+    }
+
+    if (typeof param === 'boolean') {
       return this.emitPushBoolean(param);
-    } else if (param instanceof Buffer) {
+    }
+
+    if (param instanceof Buffer) {
       return this.emitPush(param);
     }
 
     throw new InvalidParamError();
   }
 
-  public emitPushParams(...params: Array<Param | null>): this {
+  // tslint:disable-next-line readonly-array
+  public emitPushParams(...params: Array<Param | undefined>): this {
+    // tslint:disable-next-line no-loop-statement
     for (let i = params.length - 1; i >= 0; i -= 1) {
       this.emitPushParam(params[i]);
     }
+
     return this;
   }
 
-  public emitPushArray(params: Array<Param | null>): this {
+  public emitPushArray(params: ReadonlyArray<Param | undefined>): this {
     this.emitPushParams(...params);
     this.emitPushParam(params.length);
+
     return this.emitOp('PACK');
   }
 
-  public emitAppCallInvocation(
-    operation: string,
-    ...params: Array<Param | null>
-  ): this {
+  // tslint:disable-next-line readonly-array
+  public emitAppCallInvocation(operation: string, ...params: Array<Param | undefined>): this {
     this.emitPushArray(params);
+
     return this.emitPushParam(operation);
   }
 
@@ -177,50 +200,47 @@ export class ScriptBuilder {
     return this.emitOp('APPCALL', common.uInt160ToBuffer(scriptHash));
   }
 
-  public emitAppCall(
-    scriptHash: UInt160,
-    operation: string,
-    ...params: Array<Param | null>
-  ): this {
+  // tslint:disable-next-line readonly-array
+  public emitAppCall(scriptHash: UInt160, operation: string, ...params: Array<Param | undefined>): this {
     this.emitAppCallInvocation(operation, ...params);
+
     return this.emitAppCallVerification(scriptHash);
   }
 
-  public emitTailCall(
-    scriptHash: UInt160,
-    operation: string,
-    ...params: Array<Param | null>
-  ): this {
+  // tslint:disable-next-line readonly-array
+  public emitTailCall(scriptHash: UInt160, operation: string, ...params: Array<Param | undefined>): this {
     this.emitAppCallInvocation(operation, ...params);
+
     return this.emitOp('TAILCALL', common.uInt160ToBuffer(scriptHash));
   }
 
-  public emitSysCall(
-    sysCall: SysCallName,
-    ...params: Array<Param | null>
-  ): this {
+  // tslint:disable-next-line readonly-array
+  public emitSysCall(sysCall: SysCallName, ...params: Array<Param | undefined>): this {
     this.emitPushParams(...params);
     const sysCallBuffer = Buffer.from(sysCall, 'ascii');
     const writer = new BinaryWriter();
     writer.writeVarBytesLE(sysCallBuffer);
+
     return this.emitOp('SYSCALL', writer.toBuffer());
   }
 
-  public emitOpByte(byteCode: ByteCode, buffer?: Buffer | null): this {
+  public emitOpByte(byteCode: ByteCode, buffer?: Buffer | undefined): this {
     const byteCodeBuffer = ByteBuffer[byteCode];
     this.emit(byteCodeBuffer);
     this.emit(buffer);
+
     return this;
   }
 
-  public emit(buffer?: Buffer | null): this {
-    if (buffer != null) {
-      this.buffers.push(buffer);
+  public emit(buffer?: Buffer | undefined): this {
+    if (buffer !== undefined) {
+      this.mutableBuffers.push(buffer);
     }
+
     return this;
   }
 
   public build(): Buffer {
-    return Buffer.concat(this.buffers);
+    return Buffer.concat(this.mutableBuffers);
   }
 }

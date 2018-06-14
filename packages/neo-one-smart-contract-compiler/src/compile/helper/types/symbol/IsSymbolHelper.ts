@@ -4,5 +4,5 @@ import { Types } from '../Types';
 // Input: [val]
 // Output: [boolean]
 export class IsSymbolHelper extends IsHelper {
-  protected type = Types.Symbol;
+  protected readonly type = Types.Symbol;
 }

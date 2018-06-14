@@ -1,10 +1,7 @@
 import { common, ECPoint, UInt160Hex } from '../common';
 import { crypto } from '../crypto';
 import { InvalidFormatError, VerifyError } from '../errors';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
@@ -18,26 +15,19 @@ import {
 import { TransactionType } from './TransactionType';
 
 export interface EnrollmentTransactionAdd extends TransactionBaseAdd {
-  publicKey: ECPoint;
+  readonly publicKey: ECPoint;
 }
 
 export interface EnrollmentTransactionJSON extends TransactionBaseJSON {
-  type: 'EnrollmentTransaction';
-  pubkey: string;
+  readonly type: 'EnrollmentTransaction';
+  readonly pubkey: string;
 }
 
-export class EnrollmentTransaction extends TransactionBase<
-  TransactionType.Enrollment,
-  EnrollmentTransactionJSON
-> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): EnrollmentTransaction {
+export class EnrollmentTransaction extends TransactionBase<TransactionType.Enrollment, EnrollmentTransactionJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): EnrollmentTransaction {
     const { reader } = options;
 
-    const { type, version } = super.deserializeTransactionBaseStartWireBase(
-      options,
-    );
+    const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Enrollment) {
       throw new InvalidFormatError();
@@ -45,12 +35,7 @@ export class EnrollmentTransaction extends TransactionBase<
 
     const publicKey = reader.readECPoint();
 
-    const {
-      attributes,
-      inputs,
-      outputs,
-      scripts,
-    } = super.deserializeTransactionBaseEndWireBase(options);
+    const { attributes, inputs, outputs, scripts } = super.deserializeTransactionBaseEndWireBase(options);
 
     return new this({
       version,
@@ -70,15 +55,7 @@ export class EnrollmentTransaction extends TransactionBase<
     options: TransactionGetScriptHashesForVerifyingOptions,
   ) => Promise<Set<UInt160Hex>>;
 
-  constructor({
-    version,
-    attributes,
-    inputs,
-    outputs,
-    scripts,
-    hash,
-    publicKey,
-  }: EnrollmentTransactionAdd) {
+  public constructor({ version, attributes, inputs, outputs, scripts, hash, publicKey }: EnrollmentTransactionAdd) {
     super({
       version,
       type: TransactionType.Enrollment,
@@ -98,27 +75,25 @@ export class EnrollmentTransaction extends TransactionBase<
     this.enrollmentGetScriptHashesForVerifyingInternal = utils.lazyAsync(
       async (options: TransactionGetScriptHashesForVerifyingOptions) => {
         const hashes = await super.getScriptHashesForVerifying(options);
-        return new Set([
-          ...hashes,
-          common.uInt160ToHex(crypto.getVerificationScriptHash(this.publicKey)),
-        ]);
+
+        return new Set([...hashes, common.uInt160ToHex(crypto.getVerificationScriptHash(this.publicKey))]);
       },
     );
   }
 
   public clone({
-    scripts,
-    attributes,
+    scripts = this.scripts,
+    attributes = this.attributes,
   }: {
-    scripts?: Witness[];
-    attributes?: Attribute[];
+    readonly scripts?: ReadonlyArray<Witness>;
+    readonly attributes?: ReadonlyArray<Attribute>;
   }): EnrollmentTransaction {
     return new EnrollmentTransaction({
       version: this.version,
-      attributes: attributes || this.attributes,
+      attributes,
       inputs: this.inputs,
       outputs: this.outputs,
-      scripts: scripts || this.scripts,
+      scripts,
       publicKey: this.publicKey,
     });
   }
@@ -127,12 +102,8 @@ export class EnrollmentTransaction extends TransactionBase<
     writer.writeECPoint(this.publicKey);
   }
 
-  public async serializeJSON(
-    context: SerializeJSONContext,
-  ): Promise<EnrollmentTransactionJSON> {
-    const transactionBaseJSON = await super.serializeTransactionBaseJSON(
-      context,
-    );
+  public async serializeJSON(context: SerializeJSONContext): Promise<EnrollmentTransactionJSON> {
+    const transactionBaseJSON = await super.serializeTransactionBaseJSON(context);
 
     return {
       ...transactionBaseJSON,
@@ -147,7 +118,7 @@ export class EnrollmentTransaction extends TransactionBase<
     return this.enrollmentGetScriptHashesForVerifyingInternal(options);
   }
 
-  public async verify(options: TransactionVerifyOptions): Promise<void> {
+  public async verify(_options: TransactionVerifyOptions): Promise<void> {
     throw new VerifyError('Enrollment transactions are obsolete');
   }
 }

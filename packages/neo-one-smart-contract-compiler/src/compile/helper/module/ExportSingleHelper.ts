@@ -10,7 +10,7 @@ import { ExportHelperOptions } from './ExportHelper';
 export class ExportSingleHelper extends Helper {
   private readonly options: ExportHelperOptions;
 
-  constructor(options: ExportHelperOptions) {
+  public constructor(options: ExportHelperOptions) {
     super();
     this.options = options;
   }

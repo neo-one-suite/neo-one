@@ -6,11 +6,12 @@ import { Helper } from '../../Helper';
 
 // Input: [constructorObjectVal, objectVal]
 // Output: [boolean]
-export class InstanceofHelper extends Helper<Node> {
+export class InstanceofHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

@@ -1,64 +1,68 @@
 import BN from 'bn.js';
-import {
-  common,
-  ECPoint,
-  UInt160,
-  UInt160Hex,
-  UInt256,
-  UInt256Hex,
-} from '../common';
+import { common, ECPoint, UInt160, UInt160Hex, UInt256, UInt256Hex } from '../common';
 import { InvalidFormatError } from '../errors';
 import { utils } from './utils';
 
 export class BinaryWriter {
-  public readonly buffer: Buffer[];
+  private readonly mutableBuffer: Buffer[];
 
-  constructor() {
-    this.buffer = [];
+  public constructor() {
+    this.mutableBuffer = [];
+  }
+
+  public get buffer(): ReadonlyArray<Buffer> {
+    return this.mutableBuffer;
   }
 
   public toBuffer(): Buffer {
-    return Buffer.concat(this.buffer);
+    return Buffer.concat(this.mutableBuffer);
   }
 
   public writeBytes(value: Buffer): this {
-    this.buffer.push(value);
+    this.mutableBuffer.push(value);
+
     return this;
   }
 
   public writeUInt8(value: number): this {
     const buffer = Buffer.allocUnsafe(1);
     buffer.writeUInt8(value, 0);
+
     return this.writeBytes(buffer);
   }
 
   public writeInt16LE(value: number): this {
     const buffer = Buffer.allocUnsafe(2);
     buffer.writeInt16LE(value, 0);
+
     return this.writeBytes(buffer);
   }
 
   public writeUInt16LE(value: number): this {
     const buffer = Buffer.allocUnsafe(2);
     buffer.writeUInt16LE(value, 0);
+
     return this.writeBytes(buffer);
   }
 
   public writeUInt16BE(value: number): this {
     const buffer = Buffer.allocUnsafe(2);
     buffer.writeUInt16BE(value, 0);
+
     return this.writeBytes(buffer);
   }
 
   public writeInt32LE(value: number): this {
     const buffer = Buffer.allocUnsafe(4);
     buffer.writeInt32LE(value, 0);
+
     return this.writeBytes(buffer);
   }
 
   public writeUInt32LE(value: number): this {
     const buffer = Buffer.allocUnsafe(4);
     buffer.writeUInt32LE(value, 0);
+
     return this.writeBytes(buffer);
   }
 
@@ -72,6 +76,7 @@ export class BinaryWriter {
 
   public writeBoolean(value: boolean): this {
     this.writeBytes(Buffer.from([value ? 1 : 0]));
+
     return this;
   }
 
@@ -106,26 +111,26 @@ export class BinaryWriter {
     return this;
   }
 
-  public writeArray<T>(values: T[], write: (value: T) => void): this {
+  public writeArray<T>(values: ReadonlyArray<T>, write: (value: T) => void): this {
     this.writeVarUIntLE(values.length);
-    values.forEach((value) => write(value));
+    values.forEach(write);
+
     return this;
   }
 
-  public writeObject<T, K extends keyof T>(
-    value: T,
-    write: (key: K, value: T[K]) => void,
-  ): this {
+  public writeObject<T, K extends keyof T>(value: T, write: (key: K, value: T[K]) => void): this {
     const entries = Object.entries(value) as Array<[K, T[K]]>;
     this.writeVarUIntLE(entries.length);
-    for (const [key, val] of entries) {
+    entries.forEach(([key, val]) => {
       write(key, val);
-    }
+    });
+
     return this;
   }
 
   public writeVarBytesLE(value: Buffer): this {
     this.writeVarUIntLE(value.length);
+
     return this.writeBytes(value);
   }
 
@@ -153,9 +158,10 @@ export class BinaryWriter {
 
   public writeVarString(value: string, max?: number): this {
     let buffer = Buffer.from(value, 'utf8');
-    if (max != null) {
+    if (max !== undefined) {
       buffer = buffer.slice(0, max);
     }
+
     return this.writeVarBytesLE(buffer);
   }
 

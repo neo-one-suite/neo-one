@@ -9,12 +9,7 @@ import {
   NothingToIssueError,
   NothingToTransferError,
 } from '../../errors';
-import {
-  AssetRegister,
-  AttributeArg,
-  ContractRegister,
-  Transfer,
-} from '../../types';
+import { AssetRegister, AttributeArg, ContractRegister, Transfer } from '../../types';
 import { LocalUserAccountProvider } from '../../user/LocalUserAccountProvider';
 import * as clientUtils from '../../utils';
 
@@ -43,8 +38,7 @@ describe('LocalUserAccountProvider', () => {
       asset: common.NEO_ASSET_HASH,
       value: new BigNumber('1'),
       address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid:
-        '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
       vout: 1,
     },
 
@@ -52,8 +46,7 @@ describe('LocalUserAccountProvider', () => {
       asset: common.NEO_ASSET_HASH,
       value: new BigNumber('7'),
       address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid:
-        '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045d',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045d',
       vout: 2,
     },
 
@@ -61,8 +54,7 @@ describe('LocalUserAccountProvider', () => {
       asset: common.GAS_ASSET_HASH,
       value: new BigNumber('11'),
       address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid:
-        '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045e',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045e',
       vout: 3,
     },
   };
@@ -96,11 +88,7 @@ describe('LocalUserAccountProvider', () => {
 
   const verifyMock = (name: string, mock: any) => {
     Object.entries(mock).forEach(([key, maybeMock]: [string, any]) => {
-      if (
-        maybeMock != null &&
-        maybeMock.mock != null &&
-        maybeMock.mock.calls != null
-      ) {
+      if (maybeMock != undefined && maybeMock.mock != undefined && maybeMock.mock.calls != undefined) {
         expect(maybeMock.mock.calls).toMatchSnapshot(`${name}.${key}`);
       }
     });
@@ -221,9 +209,7 @@ describe('LocalUserAccountProvider', () => {
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve([unspent]));
 
     const result = localUserAccountProvider.transfer(transfers, options);
-    await expect(result).rejects.toEqual(
-      new InsufficientFundsError(new BigNumber('5'), new BigNumber('10')),
-    );
+    await expect(result).rejects.toEqual(new InsufficientFundsError(new BigNumber('5'), new BigNumber('10')));
 
     verifyMocks();
   });
@@ -240,13 +226,9 @@ describe('LocalUserAccountProvider', () => {
     const unspent = [outputs.oneNEO, outputs.elevenGAS];
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     keystore.sign = jest.fn(() => witness);
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve('receiptDummy'),
-    );
+    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
 
     const result = await localUserAccountProvider.transfer(transfers, options);
 
@@ -277,13 +259,9 @@ describe('LocalUserAccountProvider', () => {
 
       provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
       keystore.sign = jest.fn(() => witness);
-      provider.relayTransaction = jest.fn(() =>
-        Promise.resolve('transactionDummy'),
-      );
+      provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
-      provider.getTransactionReceipt = jest.fn(() =>
-        Promise.resolve('receiptDummy'),
-      );
+      provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
 
       const result = await localUserAccountProvider.transfer(transfers, {
         from: options.from,
@@ -325,8 +303,7 @@ describe('LocalUserAccountProvider', () => {
         Promise.resolve({
           unclaimed: [
             {
-              txid:
-                '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+              txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
               vout: 2,
             },
           ],
@@ -335,13 +312,9 @@ describe('LocalUserAccountProvider', () => {
         }),
       );
 
-      provider.relayTransaction = jest.fn(() =>
-        Promise.resolve('transactionDummy'),
-      );
+      provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
-      provider.getTransactionReceipt = jest.fn(() =>
-        Promise.resolve('receiptDummy'),
-      );
+      provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
 
       const result = await localUserAccountProvider.claim({
         from: options.from,
@@ -376,8 +349,7 @@ describe('LocalUserAccountProvider', () => {
       Promise.resolve({
         unclaimed: [
           {
-            txid:
-              '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+            txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
             vout: 2,
           },
         ],
@@ -388,9 +360,7 @@ describe('LocalUserAccountProvider', () => {
 
     // Force flow to accept script attributes to test error handling
     const result = localUserAccountProvider.claim(errorOptions as any);
-    await expect(result).rejects.toEqual(
-      new InvalidTransactionError('Something went wrong!'),
-    );
+    await expect(result).rejects.toEqual(new InvalidTransactionError('Something went wrong!'));
 
     verifyMocks();
   });
@@ -413,8 +383,7 @@ describe('LocalUserAccountProvider', () => {
       Promise.resolve({
         unclaimed: [
           {
-            txid:
-              '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+            txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
             vout: 2,
           },
         ],
@@ -425,9 +394,7 @@ describe('LocalUserAccountProvider', () => {
 
     // Force flow to accept script attributes to test error handling
     const result = localUserAccountProvider.claim(errorOptions as any);
-    await expect(result).rejects.toEqual(
-      new InvalidTransactionError('Something went wrong!'),
-    );
+    await expect(result).rejects.toEqual(new InvalidTransactionError('Something went wrong!'));
 
     verifyMocks();
   });
@@ -436,9 +403,7 @@ describe('LocalUserAccountProvider', () => {
     const unspent = [outputs.elevenGAS];
     const errorOptions = {
       from: id1,
-      attributes: [
-        { usage: 'Script', data: '0xcef0c0fddfe7838eff6ff104f9cdec2922297537' },
-      ],
+      attributes: [{ usage: 'Script', data: '0xcef0c0fddfe7838eff6ff104f9cdec2922297537' }],
 
       networkFee: new BigNumber('1'),
     };
@@ -449,8 +414,7 @@ describe('LocalUserAccountProvider', () => {
       Promise.resolve({
         unclaimed: [
           {
-            txid:
-              '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+            txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
             vout: 2,
           },
         ],
@@ -461,9 +425,7 @@ describe('LocalUserAccountProvider', () => {
 
     // Force flow to accept script attributes to test error handling
     const result = localUserAccountProvider.claim(errorOptions as any);
-    await expect(result).rejects.toEqual(
-      new InvalidTransactionError('Something went wrong!'),
-    );
+    await expect(result).rejects.toEqual(new InvalidTransactionError('Something went wrong!'));
 
     verifyMocks();
   });
@@ -487,8 +449,7 @@ describe('LocalUserAccountProvider', () => {
       Promise.resolve({
         unclaimed: [
           {
-            txid:
-              '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+            txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
             vout: 2,
           },
         ],
@@ -499,9 +460,7 @@ describe('LocalUserAccountProvider', () => {
 
     // Force flow to accept script attributes to test error handling
     const result = localUserAccountProvider.claim(errorOptions as any);
-    await expect(result).rejects.toEqual(
-      new InvalidTransactionError('Something went wrong!'),
-    );
+    await expect(result).rejects.toEqual(new InvalidTransactionError('Something went wrong!'));
 
     verifyMocks();
   });
@@ -526,18 +485,9 @@ describe('LocalUserAccountProvider', () => {
     keystore.sign = jest.fn(() => witness);
     provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
 
-    const result = localUserAccountProvider.invoke(
-      contract,
-      method,
-      params,
-      paramsZipped,
-      verify,
-      errorOptions,
-    );
+    const result = localUserAccountProvider.invoke(contract, method, params, paramsZipped, verify, errorOptions);
 
-    await expect(result).rejects.toEqual(
-      new InvalidTransactionError('Something went wrong!'),
-    );
+    await expect(result).rejects.toEqual(new InvalidTransactionError('Something went wrong!'));
 
     verifyMocks();
   });
@@ -597,19 +547,14 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve('receiptDummy'),
-    );
+    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
 
     const result = await localUserAccountProvider.publish(contract, options);
     await expect(result.confirmed()).rejects.toEqual(
       new InvalidTransactionError(
-        'Something went wrong! Expected a contract' +
-          ' to have been created, but none was found',
+        'Something went wrong! Expected a contract' + ' to have been created, but none was found',
       ),
     );
 
@@ -644,9 +589,7 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -699,9 +642,7 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -732,8 +673,7 @@ describe('LocalUserAccountProvider', () => {
       name: 'testAsset',
       amount: new BigNumber('5'),
       precision: 0,
-      owner:
-        '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+      owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
       admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
       issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
     };
@@ -745,13 +685,11 @@ describe('LocalUserAccountProvider', () => {
     provider.getInvocationData = jest.fn(() =>
       Promise.resolve({
         result: results.halt,
-        asset: null,
+        asset: undefined,
       }),
     );
 
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -764,8 +702,7 @@ describe('LocalUserAccountProvider', () => {
     const result = await localUserAccountProvider.registerAsset(asset, options);
     await expect(result.confirmed()).rejects.toEqual(
       new InvalidTransactionError(
-        'Something went wrong! Expected a asset to have been created, ' +
-          'but none was found',
+        'Something went wrong! Expected a asset to have been created, ' + 'but none was found',
       ),
     );
 
@@ -778,8 +715,7 @@ describe('LocalUserAccountProvider', () => {
       name: 'testAsset',
       amount: new BigNumber('5'),
       precision: 0,
-      owner:
-        '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+      owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
       admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
       issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
     };
@@ -796,9 +732,7 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -829,8 +763,7 @@ describe('LocalUserAccountProvider', () => {
       name: 'testAsset',
       amount: new BigNumber('5'),
       precision: 0,
-      owner:
-        '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+      owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
       admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
       issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
     };
@@ -846,9 +779,7 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -879,8 +810,7 @@ describe('LocalUserAccountProvider', () => {
       name: 'testAsset',
       amount: new BigNumber('5'),
       precision: 0,
-      owner:
-        '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+      owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
       admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
       issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
     };
@@ -896,9 +826,7 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -955,13 +883,9 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve('receiptDummy'),
-    );
+    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
 
     const result = await localUserAccountProvider.issue(transfers, options);
 
@@ -981,9 +905,7 @@ describe('LocalUserAccountProvider', () => {
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     keystore.sign = jest.fn(() => witness);
     provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -1000,13 +922,7 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    const result = await localUserAccountProvider.invoke(
-      contract,
-      method,
-      params,
-      paramsZipped,
-      verify,
-    );
+    const result = await localUserAccountProvider.invoke(contract, method, params, paramsZipped, verify);
 
     await expect(result.confirmed()).resolves.toEqual({
       blockIndex: 0,
@@ -1023,12 +939,8 @@ describe('LocalUserAccountProvider', () => {
     const contract = '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9';
     const method = 'testMethod';
     const testBN = clientUtils.bigNumberToBN(new BigNumber('1'), 1);
-    const params = ['param1', [null], testBN];
-    const paramsZipped: any[] = [
-      ['String', 'param1'],
-      ['Array', [null]],
-      ['BigNumber', new BigNumber('1')],
-    ];
+    const params = ['param1', [undefined], testBN];
+    const paramsZipped: any[] = [['String', 'param1'], ['Array', [undefined]], ['BigNumber', new BigNumber('1')]];
 
     const verify = true;
     const unspent = [outputs.sevenNEO, outputs.elevenGAS];
@@ -1036,9 +948,7 @@ describe('LocalUserAccountProvider', () => {
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     keystore.sign = jest.fn(() => witness);
     provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
-    provider.relayTransaction = jest.fn(() =>
-      Promise.resolve('transactionDummy'),
-    );
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -1055,13 +965,7 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    const result = await localUserAccountProvider.invoke(
-      contract,
-      method,
-      params,
-      paramsZipped,
-      verify,
-    );
+    const result = await localUserAccountProvider.invoke(contract, method, params, paramsZipped, verify);
 
     await expect(result.confirmed()).resolves.toEqual({
       blockIndex: 0,
@@ -1083,11 +987,7 @@ describe('LocalUserAccountProvider', () => {
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
 
-    const result = await localUserAccountProvider.call(
-      contract,
-      method,
-      params,
-    );
+    const result = await localUserAccountProvider.call(contract, method, params);
 
     expect(result).toEqual(results.halt);
     verifyMocks();
@@ -1101,12 +1001,7 @@ describe('LocalUserAccountProvider', () => {
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
 
-    const result = await localUserAccountProvider.call(
-      contract,
-      method,
-      params,
-      options,
-    );
+    const result = await localUserAccountProvider.call(contract, method, params, options);
 
     expect(result).toEqual(results.halt);
     verifyMocks();

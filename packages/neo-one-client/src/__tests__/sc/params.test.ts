@@ -35,10 +35,7 @@ describe('params', () => {
     (args as any).assertPublicKey = jest.fn(() => expected);
     common.stringToECPoint = jest.fn(() => expected);
 
-    const result = params.PublicKey(
-      expected,
-      (abis.parameters as any).PublicKey,
-    );
+    const result = params.PublicKey(expected, (abis.parameters as any).PublicKey);
     expect(result).toEqual(expected);
   });
 
@@ -60,20 +57,14 @@ describe('params', () => {
   test('ByteArray param', () => {
     (args as any).assertBuffer = jest.fn(() => expected);
 
-    const result = params.ByteArray(
-      expected,
-      (abis.parameters as any).ByteArray,
-    );
+    const result = params.ByteArray(expected, (abis.parameters as any).ByteArray);
     expect(result).toEqual(Buffer.from(expected, 'hex'));
   });
 
   test('Signature param', () => {
     (args as any).assertBuffer = jest.fn(() => expected);
 
-    const result = params.Signature(
-      expected,
-      (abis.parameters as any).Signature,
-    );
+    const result = params.Signature(expected, (abis.parameters as any).Signature);
     expect(result).toEqual(Buffer.from(expected, 'hex'));
   });
 
@@ -82,9 +73,7 @@ describe('params', () => {
       params.Array(expected, (abis.returns as any).Array);
     }
 
-    expect(testError).toThrow(new InvalidArgumentError(
-      `Expected Array, found: ${expected}`,
-    ) as any);
+    expect(testError).toThrow(new InvalidArgumentError(`Expected Array, found: ${expected}`) as any);
   });
 
   test('Array param', () => {
@@ -96,15 +85,10 @@ describe('params', () => {
 
   test('InteropInterface param throws error', () => {
     function testError() {
-      params.InteropInterface(
-        expected,
-        (abis.parameters as any).InteropInterface,
-      );
+      params.InteropInterface(expected, (abis.parameters as any).InteropInterface);
     }
 
-    expect(testError).toThrow(new InvalidArgumentError(
-      `InteropInterface is not a valid parameter`,
-    ) as any);
+    expect(testError).toThrow(new InvalidArgumentError(`InteropInterface is not a valid parameter`) as any);
   });
 
   test('Void param throws error', () => {
@@ -112,13 +96,11 @@ describe('params', () => {
       params.Void(expected, (abis.parameters as any).Void);
     }
 
-    expect(testError).toThrow(new InvalidArgumentError(
-      `Expected Void: ${String(expected)}`,
-    ) as any);
+    expect(testError).toThrow(new InvalidArgumentError(`Expected Void: ${String(expected)}`) as any);
   });
 
   test('Void param', () => {
-    const result = params.Void(null, (abis.parameters as any).Void);
+    const result = params.Void(undefined, (abis.parameters as any).Void);
 
     expect(result).toBeNull();
   });

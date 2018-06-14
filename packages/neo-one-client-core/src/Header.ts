@@ -12,17 +12,14 @@ import { BinaryReader, BinaryWriter, IOHelper, utils } from './utils';
 
 export type HeaderAdd = BlockBaseAdd;
 export interface HeaderKey {
-  hashOrIndex: UInt256 | number;
+  readonly hashOrIndex: UInt256 | number;
 }
 
 // tslint:disable-next-line
 export interface HeaderJSON extends BlockBaseJSON {}
 
-export class Header extends BlockBase
-  implements SerializableWire<Header>, SerializableJSON<HeaderJSON> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): Header {
+export class Header extends BlockBase implements SerializableWire<Header>, SerializableJSON<HeaderJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): Header {
     const { reader } = options;
     const blockBase = super.deserializeBlockBaseWireBase(options);
     if (reader.readUInt8() !== 0) {
@@ -48,18 +45,14 @@ export class Header extends BlockBase
     });
   }
 
-  protected readonly sizeExclusive: () => number = utils.lazy(
-    () => IOHelper.sizeOfUInt8,
-  );
+  protected readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8);
 
   public serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
     writer.writeUInt8(0);
   }
 
-  public async serializeJSON(
-    context: SerializeJSONContext,
-  ): Promise<HeaderJSON> {
+  public async serializeJSON(context: SerializeJSONContext): Promise<HeaderJSON> {
     return super.serializeBlockBaseJSON(context);
   }
 }

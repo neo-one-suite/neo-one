@@ -6,11 +6,12 @@ import { Helper } from '../Helper';
 
 // Input: [numberVal, numberVal]
 // Output: [boolean]
-export class EqualsEqualsEqualsNumberHelper extends Helper<Node> {
+export class EqualsEqualsEqualsNumberHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

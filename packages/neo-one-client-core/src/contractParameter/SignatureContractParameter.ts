@@ -1,14 +1,11 @@
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';
 
 export interface SignatureContractParameterJSON {
-  type: 'Signature';
-  value: string;
+  readonly type: 'Signature';
+  readonly value: string;
 }
 
 export class SignatureContractParameter extends ContractParameterBase<
@@ -16,9 +13,7 @@ export class SignatureContractParameter extends ContractParameterBase<
   SignatureContractParameterJSON,
   ContractParameterType.Signature
 > {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): SignatureContractParameter {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): SignatureContractParameter {
     const { reader } = options;
     super.deserializeContractParameterBaseWireBase(options);
     const value = reader.readVarBytesLE();
@@ -30,7 +25,7 @@ export class SignatureContractParameter extends ContractParameterBase<
   public readonly value: Buffer;
   private readonly sizeInternal: () => number;
 
-  constructor(value: Buffer) {
+  public constructor(value: Buffer) {
     super();
     this.value = value;
     this.sizeInternal = utils.lazy(() => IOHelper.sizeOfVarBytesLE(this.value));
@@ -49,9 +44,7 @@ export class SignatureContractParameter extends ContractParameterBase<
     writer.writeVarBytesLE(this.value);
   }
 
-  public serializeJSON(
-    context: SerializeJSONContext,
-  ): SignatureContractParameterJSON {
+  public serializeJSON(_context: SerializeJSONContext): SignatureContractParameterJSON {
     return {
       type: 'Signature',
       value: JSONHelper.writeBuffer(this.value),

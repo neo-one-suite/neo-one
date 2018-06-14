@@ -7,10 +7,11 @@ import { Types } from '../Types';
 
 // Input: [objectVal]
 // Output: [objectVal]
-export class ShallowCloneObjectHelper extends Helper<Node> {
+export class ShallowCloneObjectHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 
@@ -46,7 +47,7 @@ export class ShallowCloneObjectHelper extends Helper<Node> {
     // [objectType, object]
     sb.emitPushInt(node, Types.Object);
 
-    /* create object */
+    // create object
     // [2, objectType, object]
     sb.emitPushInt(node, 2);
     // [objectVal]

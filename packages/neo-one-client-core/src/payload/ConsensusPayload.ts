@@ -3,40 +3,29 @@ import { crypto } from '../crypto';
 import { Equals, Equatable } from '../Equatable';
 import { InvalidFormatError, VerifyError } from '../errors';
 import { ScriptContainerType } from '../ScriptContainer';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableWire,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableWire } from '../Serializable';
 import { BinaryReader, BinaryWriter, utils } from '../utils';
 import { VerifyScript } from '../vm';
 import { Witness } from '../Witness';
-import {
-  UnsignedConsensusPayload,
-  UnsignedConsensusPayloadAdd,
-} from './UnsignedConsensusPayload';
+import { UnsignedConsensusPayload, UnsignedConsensusPayloadAdd } from './UnsignedConsensusPayload';
 
 export interface ConsensusPayloadAdd extends UnsignedConsensusPayloadAdd {
-  script: Witness;
+  readonly script: Witness;
 }
 
 export interface ConsensusPayloadGetScriptHashesForVerifyingOptions {
-  getValidators: () => Promise<ECPoint[]>;
-  currentBlockHash: UInt256;
+  readonly getValidators: () => Promise<ReadonlyArray<ECPoint>>;
+  readonly currentBlockHash: UInt256;
 }
 
-export interface ConsensusPayloadVerifyOptions
-  extends ConsensusPayloadGetScriptHashesForVerifyingOptions {
-  currentIndex: number;
-  verifyScript: VerifyScript;
+export interface ConsensusPayloadVerifyOptions extends ConsensusPayloadGetScriptHashesForVerifyingOptions {
+  readonly currentIndex: number;
+  readonly verifyScript: VerifyScript;
 }
 
 export class ConsensusPayload extends UnsignedConsensusPayload
   implements SerializableWire<ConsensusPayload>, Equatable {
-  public static sign(
-    payload: UnsignedConsensusPayload,
-    key: PrivateKey,
-  ): ConsensusPayload {
+  public static sign(payload: UnsignedConsensusPayload, key: PrivateKey): ConsensusPayload {
     return new ConsensusPayload({
       version: payload.version,
       previousHash: payload.previousHash,
@@ -48,9 +37,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
     });
   }
 
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): ConsensusPayload {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): ConsensusPayload {
     const { reader } = options;
     const {
       version,
@@ -76,9 +63,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
     });
   }
 
-  public static deserializeWire(
-    options: DeserializeWireOptions,
-  ): ConsensusPayload {
+  public static deserializeWire(options: DeserializeWireOptions): ConsensusPayload {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),
@@ -86,15 +71,11 @@ export class ConsensusPayload extends UnsignedConsensusPayload
   }
 
   public readonly script: Witness;
-  public readonly equals: Equals = utils.equals(
-    this.constructor as typeof ConsensusPayload,
-    (other) => common.uInt256Equal(this.hash, other.hash),
+  public readonly equals: Equals = utils.equals(this.constructor as typeof ConsensusPayload, (other) =>
+    common.uInt256Equal(this.hash, other.hash),
   );
   public readonly getScriptHashesForVerifying = utils.lazyAsync(
-    async ({
-      getValidators,
-      currentBlockHash,
-    }: ConsensusPayloadGetScriptHashesForVerifyingOptions) => {
+    async ({ getValidators, currentBlockHash }: ConsensusPayloadGetScriptHashesForVerifyingOptions) => {
       if (!common.uInt256Equal(this.previousHash, currentBlockHash)) {
         throw new VerifyError('Previous hash not equal to current block hash');
       }
@@ -103,22 +84,14 @@ export class ConsensusPayload extends UnsignedConsensusPayload
         throw new VerifyError('Invalid validator index');
       }
 
-      return new Set([
-        common.uInt160ToHex(
-          crypto.getVerificationScriptHash(validators[this.validatorIndex]),
-        ),
-      ]);
+      return new Set([common.uInt160ToHex(crypto.getVerificationScriptHash(validators[this.validatorIndex]))]);
     },
   );
-  private readonly hashInternal = utils.lazy(() =>
-    crypto.hash256(this.message),
-  );
-  private readonly hashHexInternal = utils.lazy(() =>
-    common.uInt256ToHex(this.hash),
-  );
+  private readonly hashInternal = utils.lazy(() => crypto.hash256(this.message));
+  private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
   private readonly messageInternal = utils.lazy(() => this.serializeUnsigned());
 
-  constructor({
+  public constructor({
     version,
     previousHash,
     blockIndex,
@@ -154,6 +127,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
   public serializeUnsigned(): Buffer {
     const writer = new BinaryWriter();
     super.serializeWireBase(writer);
+
     return writer.toBuffer();
   }
 
@@ -187,7 +161,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
     };
 
     await Promise.all(
-      [...scriptHashes].map((hash) =>
+      [...scriptHashes].map(async (hash) =>
         verifyScript({
           scriptContainer,
           hash: common.hexToUInt160(hash),

@@ -1,10 +1,7 @@
 import BN from 'bn.js';
 import { common, UInt160Hex } from '../common';
 import { InvalidFormatError, VerifyError } from '../errors';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { IOHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
@@ -22,30 +19,18 @@ import { TransactionType } from './TransactionType';
 export interface IssueTransactionAdd extends TransactionBaseAdd {}
 
 export interface IssueTransactionJSON extends TransactionBaseJSON {
-  type: 'IssueTransaction';
+  readonly type: 'IssueTransaction';
 }
 
-export class IssueTransaction extends TransactionBase<
-  typeof TransactionType.Issue,
-  IssueTransactionJSON
-> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): IssueTransaction {
-    const { type, version } = super.deserializeTransactionBaseStartWireBase(
-      options,
-    );
+export class IssueTransaction extends TransactionBase<typeof TransactionType.Issue, IssueTransactionJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): IssueTransaction {
+    const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Issue) {
       throw new InvalidFormatError();
     }
 
-    const {
-      attributes,
-      inputs,
-      outputs,
-      scripts,
-    } = super.deserializeTransactionBaseEndWireBase(options);
+    const { attributes, inputs, outputs, scripts } = super.deserializeTransactionBaseEndWireBase(options);
 
     return new this({
       version,
@@ -56,21 +41,12 @@ export class IssueTransaction extends TransactionBase<
     });
   }
 
-  protected readonly sizeExclusive: () => number = utils.lazy(
-    () => IOHelper.sizeOfUInt8,
-  );
+  protected readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8);
   private readonly issueGetScriptHashesForVerifyingInternal: (
     options: TransactionGetScriptHashesForVerifyingOptions,
   ) => Promise<Set<UInt160Hex>>;
 
-  constructor({
-    version,
-    attributes,
-    inputs,
-    outputs,
-    scripts,
-    hash,
-  }: IssueTransactionAdd) {
+  public constructor({ version, attributes, inputs, outputs, scripts, hash }: IssueTransactionAdd) {
     super({
       version,
       type: TransactionType.Issue,
@@ -89,10 +65,12 @@ export class IssueTransaction extends TransactionBase<
         const { getOutput, getAsset } = options;
         const [hashes, issuerHashes] = await Promise.all([
           super.getScriptHashesForVerifying(options),
-          this.getTransactionResults({ getOutput }).then((results) =>
+          this.getTransactionResults({ getOutput }).then(async (results) =>
             Promise.all(
               Object.entries(results)
+                // tslint:disable-next-line no-unused
                 .filter(([_, value]) => value.lt(utils.ZERO))
+                // tslint:disable-next-line no-unused
                 .map(async ([assetHash, _]) => {
                   const asset = await getAsset({
                     hash: common.hexToUInt256(assetHash),
@@ -110,27 +88,23 @@ export class IssueTransaction extends TransactionBase<
   }
 
   public clone({
-    scripts,
-    attributes,
+    scripts = this.scripts,
+    attributes = this.attributes,
   }: {
-    scripts?: Witness[];
-    attributes?: Attribute[];
+    readonly scripts?: ReadonlyArray<Witness>;
+    readonly attributes?: ReadonlyArray<Attribute>;
   }): IssueTransaction {
     return new IssueTransaction({
       version: this.version,
-      attributes: attributes || this.attributes,
+      attributes,
       inputs: this.inputs,
       outputs: this.outputs,
-      scripts: scripts || this.scripts,
+      scripts,
     });
   }
 
-  public async serializeJSON(
-    context: SerializeJSONContext,
-  ): Promise<IssueTransactionJSON> {
-    const transactionBaseJSON = await super.serializeTransactionBaseJSON(
-      context,
-    );
+  public async serializeJSON(context: SerializeJSONContext): Promise<IssueTransactionJSON> {
+    const transactionBaseJSON = await super.serializeTransactionBaseJSON(context);
 
     return {
       ...transactionBaseJSON,
@@ -167,9 +141,7 @@ export class IssueTransaction extends TransactionBase<
     await Promise.all([super.verify(options), this.verifyInternal(options)]);
   }
 
-  private async verifyInternal(
-    options: TransactionVerifyOptions,
-  ): Promise<void> {
+  private async verifyInternal(options: TransactionVerifyOptions): Promise<void> {
     const { getOutput, getAsset, memPool = [] } = options;
     const results = await this.getTransactionResults({ getOutput });
     await Promise.all(

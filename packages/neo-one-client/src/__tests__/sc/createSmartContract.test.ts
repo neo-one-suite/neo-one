@@ -14,9 +14,9 @@ describe('createSmartContract', () => {
     Object.entries(mock).forEach(([key, maybeMock]) => {
       // @ts-ignore
       if (
-        maybeMock != null &&
-        (maybeMock as any).mock != null &&
-        (maybeMock as any).mock.calls != null
+        maybeMock != undefined &&
+        (maybeMock as any).mock != undefined &&
+        (maybeMock as any).mock.calls != undefined
       ) {
         // @ts-ignore
         expect(maybeMock.mock.calls).toMatchSnapshot(`${name}.${key}`);
@@ -116,8 +116,7 @@ describe('createSmartContract', () => {
       type: 'Event',
       args: [contracts.String, contracts.Integer],
       blockIndex: 1,
-      blockHash:
-        '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca',
+      blockHash: '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca',
       transactionIndex: 2,
     };
 
@@ -180,8 +179,7 @@ describe('createSmartContract', () => {
       type: 'Event',
       args: [contracts.String, contracts.Integer],
       blockIndex: 1,
-      blockHash:
-        '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca',
+      blockHash: '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca',
       transactionIndex: 2,
     };
 

@@ -1,18 +1,10 @@
 import BN from 'bn.js';
 import { AssetNameJSON } from '../Asset';
-import {
-  assertAssetType,
-  AssetType,
-  AssetTypeJSON,
-  toJSONAssetType,
-} from '../AssetType';
+import { assertAssetType, AssetType, AssetTypeJSON, toJSONAssetType } from '../AssetType';
 import { common, ECPoint, UInt160, UInt160Hex } from '../common';
 import { crypto } from '../crypto';
 import { InvalidFormatError, VerifyError } from '../errors';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
@@ -36,33 +28,26 @@ interface Asset {
 }
 
 export interface RegisterTransactionAdd extends TransactionBaseAdd {
-  asset: Asset;
+  readonly asset: Asset;
 }
 
 export interface RegisterTransactionJSON extends TransactionBaseJSON {
-  type: 'RegisterTransaction';
-  asset: {
-    type: AssetTypeJSON;
-    name: AssetNameJSON;
-    amount: string;
-    precision: number;
-    owner: string;
-    admin: string;
+  readonly type: 'RegisterTransaction';
+  readonly asset: {
+    readonly type: AssetTypeJSON;
+    readonly name: AssetNameJSON;
+    readonly amount: string;
+    readonly precision: number;
+    readonly owner: string;
+    readonly admin: string;
   };
 }
 
-export class RegisterTransaction extends TransactionBase<
-  typeof TransactionType.Register,
-  RegisterTransactionJSON
-> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): RegisterTransaction {
+export class RegisterTransaction extends TransactionBase<typeof TransactionType.Register, RegisterTransactionJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): RegisterTransaction {
     const { reader } = options;
 
-    const { type, version } = super.deserializeTransactionBaseStartWireBase(
-      options,
-    );
+    const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Register) {
       throw new InvalidFormatError();
@@ -75,12 +60,7 @@ export class RegisterTransaction extends TransactionBase<
     const owner = reader.readECPoint();
     const admin = reader.readUInt160();
 
-    const {
-      attributes,
-      inputs,
-      outputs,
-      scripts,
-    } = super.deserializeTransactionBaseEndWireBase(options);
+    const { attributes, inputs, outputs, scripts } = super.deserializeTransactionBaseEndWireBase(options);
 
     return new this({
       version,
@@ -114,15 +94,7 @@ export class RegisterTransaction extends TransactionBase<
     options: TransactionGetScriptHashesForVerifyingOptions,
   ) => Promise<Set<UInt160Hex>>;
 
-  constructor({
-    version,
-    attributes,
-    inputs,
-    outputs,
-    scripts,
-    hash,
-    asset,
-  }: RegisterTransactionAdd) {
+  public constructor({ version, attributes, inputs, outputs, scripts, hash, asset }: RegisterTransactionAdd) {
     super({
       version,
       type: TransactionType.Register,
@@ -150,9 +122,7 @@ export class RegisterTransaction extends TransactionBase<
     this.registerGetScriptHashesForVerifyingInternal = utils.lazyAsync(
       async (options: TransactionGetScriptHashesForVerifyingOptions) => {
         const hashes = await super.getScriptHashesForVerifying(options);
-        const scriptHash = common.uInt160ToHex(
-          crypto.getVerificationScriptHash(this.asset.owner),
-        );
+        const scriptHash = common.uInt160ToHex(crypto.getVerificationScriptHash(this.asset.owner));
 
         return new Set([...hashes, scriptHash]);
       },
@@ -160,18 +130,18 @@ export class RegisterTransaction extends TransactionBase<
   }
 
   public clone({
-    scripts,
-    attributes,
+    scripts = this.scripts,
+    attributes = this.attributes,
   }: {
-    scripts?: Witness[];
-    attributes?: Attribute[];
+    readonly scripts?: ReadonlyArray<Witness>;
+    readonly attributes?: ReadonlyArray<Attribute>;
   }): RegisterTransaction {
     return new RegisterTransaction({
       version: this.version,
-      attributes: attributes || this.attributes,
+      attributes,
       inputs: this.inputs,
       outputs: this.outputs,
-      scripts: scripts || this.scripts,
+      scripts,
       hash: this.hash,
       asset: this.asset,
     });
@@ -186,17 +156,13 @@ export class RegisterTransaction extends TransactionBase<
     writer.writeUInt160(this.asset.admin);
   }
 
-  public async serializeJSON(
-    context: SerializeJSONContext,
-  ): Promise<RegisterTransactionJSON> {
-    const transactionBaseJSON = await super.serializeTransactionBaseJSON(
-      context,
-    );
+  public async serializeJSON(context: SerializeJSONContext): Promise<RegisterTransactionJSON> {
+    const transactionBaseJSON = await super.serializeTransactionBaseJSON(context);
 
     let { name } = this.asset;
     try {
       name = JSON.parse(name);
-    } catch (error) {
+    } catch {
       // ignore errors
     }
 
@@ -218,10 +184,7 @@ export class RegisterTransaction extends TransactionBase<
   }
 
   public getSystemFee(context: FeeContext): BN {
-    if (
-      this.asset.type === AssetType.GoverningToken ||
-      this.asset.type === AssetType.UtilityToken
-    ) {
+    if (this.asset.type === AssetType.GoverningToken || this.asset.type === AssetType.UtilityToken) {
       return utils.ZERO;
     }
 
@@ -234,7 +197,7 @@ export class RegisterTransaction extends TransactionBase<
     return this.registerGetScriptHashesForVerifyingInternal(options);
   }
 
-  public async verify(options: TransactionVerifyOptions): Promise<void> {
+  public async verify(_options: TransactionVerifyOptions): Promise<void> {
     throw new VerifyError('Enrollment transactions are obsolete');
   }
 }

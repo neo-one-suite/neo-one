@@ -5,25 +5,23 @@ import { VisitOptions } from '../../../types';
 import { Helper } from '../../Helper';
 
 export interface SetObjectAccessorPropertyHelperBaseOptions {
-  hasSet?: boolean;
-  hasGet?: boolean;
+  readonly hasSet?: boolean;
+  readonly hasGet?: boolean;
 }
 
 // Input: [?getObjectVal, ?setObjectVal, stringProp, objectVal]
 // Output: []
-export abstract class SetObjectAccessorPropertyHelperBase extends Helper<Node> {
+export abstract class SetObjectAccessorPropertyHelperBase extends Helper {
   private readonly hasSet: boolean;
   private readonly hasGet: boolean;
 
-  constructor({ hasSet, hasGet }: SetObjectAccessorPropertyHelperBaseOptions) {
+  public constructor({ hasSet = false, hasGet = false }: SetObjectAccessorPropertyHelperBaseOptions) {
     super();
-    this.hasSet = hasSet == null ? false : hasSet;
-    this.hasGet = hasGet == null ? false : hasGet;
+    this.hasSet = hasSet;
+    this.hasGet = hasGet;
 
     if (!(this.hasSet || this.hasGet)) {
-      throw new Error(
-        'Something went wrong. Must have either a getter or setter',
-      );
+      throw new Error('Something went wrong. Must have either a getter or setter');
     }
   }
 
@@ -54,5 +52,5 @@ export abstract class SetObjectAccessorPropertyHelperBase extends Helper<Node> {
     sb.emitOp(node, 'SETITEM');
   }
 
-  protected abstract getObject(sb: ScriptBuilder): Helper<Node>;
+  protected abstract getObject(sb: ScriptBuilder): Helper;
 }

@@ -38,9 +38,7 @@ describe('arg assertions', () => {
 
     {
       method: 'assertHash256',
-      args: [
-        '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca',
-      ],
+      args: ['0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca'],
     },
 
     {
@@ -50,9 +48,7 @@ describe('arg assertions', () => {
 
     {
       method: 'assertPublicKey',
-      args: [
-        '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
-      ],
+      args: ['02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef'],
     },
 
     {
@@ -236,126 +232,98 @@ describe('arg assertions', () => {
       method: 'assertString',
       message: 'assertString throws error on non-string',
       args: [name, dummyInt],
-      error: new InvalidArgumentError(
-        `Expected string for name, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected string for name, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertString',
       message: 'assertString throws error on missing param',
       args: [name],
-      error: new InvalidArgumentError(
-        `Expected string for name, found: undefined`,
-      ),
+      error: new InvalidArgumentError(`Expected string for name, found: undefined`),
     },
 
     {
       method: 'assertAddress',
       message: 'assertAddress throws error on non-string',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Address argument was not a string: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Address argument was not a string: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertAddress',
       message: 'assertAddress throws error on missing/null param',
       args: [null],
-      error: new InvalidArgumentError(
-        `Address argument was not a string: ${String(null)}`,
-      ),
+      error: new InvalidArgumentError(`Address argument was not a string: ${String(null)}`),
     },
 
     {
       method: 'assertAddress',
       message: 'assertAddress throws error on malformed address',
       args: [dummyString],
-      error: new InvalidArgumentError(
-        `Invalid address: ${String(dummyString)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid address: ${String(dummyString)}`),
     },
 
     {
       method: 'assertHash160',
       message: 'assertHash160 throws error on non string',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Expected string for Hash160, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected string for Hash160, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertHash160',
       message: 'assertHash160 throws error on missing 0x prefix',
       args: [dummyString],
-      error: new InvalidArgumentError(
-        `Hash160 must start with '0x', found: ${String(dummyString)}`,
-      ),
+      error: new InvalidArgumentError(`Hash160 must start with '0x', found: ${String(dummyString)}`),
     },
 
     {
       method: 'assertHash160',
       message: 'assertHash160 throws error on malformed hash160',
       args: [`0x${dummyString}`],
-      error: new InvalidArgumentError(
-        `Invalid Hash160 param, found: 0x${String(dummyString)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid Hash160 param, found: 0x${String(dummyString)}`),
     },
 
     {
       method: 'assertHash256',
       message: 'assertHash256 throws error on non string',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Expected string for Hash256, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected string for Hash256, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertHash256',
       message: 'assertHash256 throws error on missing 0x prefix',
       args: [dummyString],
-      error: new InvalidArgumentError(
-        `Hash256 must start with '0x', found: ${String(dummyString)}`,
-      ),
+      error: new InvalidArgumentError(`Hash256 must start with '0x', found: ${String(dummyString)}`),
     },
 
     {
       method: 'assertHash256',
       message: 'assertHash256 throws error on malformed hash256',
       args: [`0x${dummyString}`],
-      error: new InvalidArgumentError(
-        `Invalid Hash256 param, found: 0x${String(dummyString)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid Hash256 param, found: 0x${String(dummyString)}`),
     },
 
     {
       method: 'assertBuffer',
       message: 'assertBuffer throws error on non hex string',
       args: [dummyString],
-      error: new InvalidArgumentError(
-        `Expected hex string, found: ${String(dummyString)}`,
-      ),
+      error: new InvalidArgumentError(`Expected hex string, found: ${String(dummyString)}`),
     },
 
     {
       method: 'assertBuffer',
       message: 'assertBuffer throws error on non string',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Expected string for Buffer, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected string for Buffer, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertPublicKey',
       message: 'assertPublicKey throws error on unbufferable param',
       args: [dummyString],
-      error: new InvalidArgumentError(
-        `Expected hex string, found: ${String(dummyString)}`,
-      ),
+      error: new InvalidArgumentError(`Expected hex string, found: ${String(dummyString)}`),
     },
 
     {
@@ -369,9 +337,7 @@ describe('arg assertions', () => {
       method: 'assertBigNumber',
       message: 'assertBigNumber throws error on non bignumber',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Expected BigNumber, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected BigNumber, found: ${String(dummyInt)}`),
     },
 
     {
@@ -385,27 +351,21 @@ describe('arg assertions', () => {
       method: 'assertBoolean',
       message: 'assertBoolean throws error on null',
       args: [null],
-      error: new InvalidArgumentError(
-        `Expected boolean, found: ${String(null)}`,
-      ),
+      error: new InvalidArgumentError(`Expected boolean, found: ${String(null)}`),
     },
 
     {
       method: 'assertBoolean',
       message: 'assertBoolean throws error on non bool',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Expected boolean, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected boolean, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertNumber',
       message: 'assertNumber throws error on null',
       args: [null],
-      error: new InvalidArgumentError(
-        `Expected number, found: ${String(null)}`,
-      ),
+      error: new InvalidArgumentError(`Expected number, found: ${String(null)}`),
     },
 
     {
@@ -433,9 +393,7 @@ describe('arg assertions', () => {
       method: 'assertBlockFilter',
       message: 'assertBlockFilter throws error on non object',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Invalid BlockFilter param, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid BlockFilter param, found: ${String(dummyInt)}`),
     },
 
     {
@@ -478,219 +436,169 @@ describe('arg assertions', () => {
       method: 'assertGetOptions',
       message: 'assertGetOptions throws error on invalid timeout field',
       args: [{ timeout: dummyString }],
-      error: new InvalidArgumentError(
-        `Invalid GetOptions param, found: ${String({ timeout: dummyString })}`,
-      ),
+      error: new InvalidArgumentError(`Invalid GetOptions param, found: ${String({ timeout: dummyString })}`),
     },
 
     {
       method: 'assertGetOptions',
       message: 'assertGetOptions throws error on non object',
       args: [dummyString],
-      error: new InvalidArgumentError(
-        `Invalid GetOptions param, found: ${dummyString}`,
-      ),
+      error: new InvalidArgumentError(`Invalid GetOptions param, found: ${dummyString}`),
     },
 
     {
       method: 'assertABIReturn',
       message: 'assertABIReturn throws error on null',
       args: [null],
-      error: new InvalidArgumentError(
-        `Invalid ABI return, found: ${String(null)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI return, found: ${String(null)}`),
     },
 
     {
       method: 'assertABIReturn',
       message: 'assertABIReturn throws error on non object',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Invalid ABI return, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI return, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABIReturn',
       message: 'assertABIReturn throws error on non number type for Integer',
-      args: [
-        { type: 'Array', value: { type: 'Integer', decimals: dummyString } },
-      ],
+      args: [{ type: 'Array', value: { type: 'Integer', decimals: dummyString } }],
 
-      error: new InvalidArgumentError(
-        `Expected number, found: ${String(dummyString)}`,
-      ),
+      error: new InvalidArgumentError(`Expected number, found: ${String(dummyString)}`),
     },
 
     {
       method: 'assertABIReturn',
       message: 'assertABIReturn throws error on invalid ABI type',
       args: [{ type: 'INVALID' }],
-      error: new InvalidArgumentError(
-        `Invalid ABI return, found: ${String({ type: 'INVALID' })}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI return, found: ${String({ type: 'INVALID' })}`),
     },
 
     {
       method: 'assertABIParameter',
       message: 'assertABIParameter throws error on non string name',
       args: [{ name: dummyInt }],
-      error: new InvalidArgumentError(
-        `Expected string for name, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected string for name, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABIParameter',
       message: 'assertABIParameter throws error on non ABIReturn',
       args: [{ name, type: 'INVALID' }],
-      error: new InvalidArgumentError(
-        `Invalid ABI return, found: ${String({ type: 'INVALID' })}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI return, found: ${String({ type: 'INVALID' })}`),
     },
 
     {
       method: 'assertABIParameter',
       message: 'assertABIParameter throws error on null',
       args: [null],
-      error: new InvalidArgumentError(
-        `Invalid ABI parameter, found: ${String(null)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI parameter, found: ${String(null)}`),
     },
 
     {
       method: 'assertABIParameter',
       message: 'assertABIParameter throws error on non object',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Invalid ABI parameter, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI parameter, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABIFunction',
       message: 'assertABIFunction throws error on non string name',
       args: [{ name: dummyInt }],
-      error: new InvalidArgumentError(
-        `Expected string for name, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected string for name, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABIFunction',
       message: 'assertABIFunction throws error on non bool constant',
       args: [{ name, constant: dummyInt }],
-      error: new InvalidArgumentError(
-        `Expected boolean, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected boolean, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABIFunction',
       message: 'assertABIFunction throws error on null',
       args: [null],
-      error: new InvalidArgumentError(
-        `Invalid ABI function, found: ${String(null)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI function, found: ${String(null)}`),
     },
 
     {
       method: 'assertABIFunction',
       message: 'assertABIFunction throws error on non object',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Invalid ABI function, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI function, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABIFunction',
       message: 'assertABIFunction throws error on non ABIParameter parameters',
       args: [{ name, parameters: [null] }],
-      error: new InvalidArgumentError(
-        `Invalid ABI parameter, found: ${String(null)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI parameter, found: ${String(null)}`),
     },
 
     {
       method: 'assertABIFunction',
       message: 'assertABIFunction throws error on non Array parameters',
       args: [{ name, parameters: dummyInt }],
-      error: new InvalidArgumentError(
-        `Expected Array, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected Array, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABIFunction',
       message: 'assertABIFunction throws error on invalid returnType',
       args: [{ name, returnType: dummyInt }],
-      error: new InvalidArgumentError(
-        `Invalid ABI return, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI return, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABIEvent',
       message: 'assertABIEvent throws error on null',
       args: [null],
-      error: new InvalidArgumentError(
-        `Invalid ABI event, found: ${String(null)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI event, found: ${String(null)}`),
     },
 
     {
       method: 'assertABIEvent',
       message: 'assertABIEvent throws error on non object',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Invalid ABI event, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI event, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABIEvent',
       message: 'assertABIEvent throws error on non string name',
       args: [{ name: dummyInt }],
-      error: new InvalidArgumentError(
-        `Expected string for name, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected string for name, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABIEvent',
       message: 'assertABIEvent throws error on non array parameters',
       args: [{ name, parameters: dummyInt }],
-      error: new InvalidArgumentError(
-        `Expected Array, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected Array, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABIEvent',
       message: 'assertABIEvent throws error on non ABIParameter parameters',
       args: [{ name, parameters: [dummyInt] }],
-      error: new InvalidArgumentError(
-        `Invalid ABI parameter, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI parameter, found: ${String(dummyInt)}`),
     },
 
     {
       method: 'assertABI',
       message: 'assertABI throws error on null',
       args: [null],
-      error: new InvalidArgumentError(
-        `Invalid ABI param, found: ${String(null)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI param, found: ${String(null)}`),
     },
 
     {
       method: 'assertABI',
       message: 'assertABI throws error on non object',
       args: [dummyInt],
-      error: new InvalidArgumentError(
-        `Invalid ABI param, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI param, found: ${String(dummyInt)}`),
     },
 
     {
@@ -715,9 +623,7 @@ describe('arg assertions', () => {
         },
       ],
 
-      error: new InvalidArgumentError(
-        `Invalid ABI function, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI function, found: ${String(dummyInt)}`),
     },
 
     {
@@ -743,9 +649,7 @@ describe('arg assertions', () => {
         },
       ],
 
-      error: new InvalidArgumentError(
-        `Invalid ABI event, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Invalid ABI event, found: ${String(dummyInt)}`),
     },
 
     {
@@ -766,12 +670,9 @@ describe('arg assertions', () => {
 
     {
       method: 'assertTransactionOptions',
-      message:
-        'assertTransactionOptions throws error on non BigNumber networkFee',
+      message: 'assertTransactionOptions throws error on non BigNumber networkFee',
       args: [{ attributes: [], networkFee: dummyInt }],
-      error: new InvalidArgumentError(
-        `Expected BigNumber, found: ${String(dummyInt)}`,
-      ),
+      error: new InvalidArgumentError(`Expected BigNumber, found: ${String(dummyInt)}`),
     },
   ] as any;
 
@@ -793,9 +694,6 @@ describe('arg assertions', () => {
     function testError() {
       assertArgs.assertTransactionOptions(arg);
     }
-    expect(testError).toThrow(new InvalidNamedArgumentError(
-      'AttributeArg',
-      dummyInt,
-    ) as any);
+    expect(testError).toThrow(new InvalidNamedArgumentError('AttributeArg', dummyInt) as any);
   });
 });

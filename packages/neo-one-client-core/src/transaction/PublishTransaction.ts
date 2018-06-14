@@ -6,40 +6,25 @@ import {
   sizeOfContract,
 } from '../Contract';
 import { InvalidFormatError, VerifyError } from '../errors';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
-import {
-  TransactionBase,
-  TransactionBaseAdd,
-  TransactionBaseJSON,
-  TransactionVerifyOptions,
-} from './TransactionBase';
+import { TransactionBase, TransactionBaseAdd, TransactionBaseJSON, TransactionVerifyOptions } from './TransactionBase';
 import { TransactionType } from './TransactionType';
 
 export interface PublishTransactionAdd extends TransactionBaseAdd {
-  contract: Contract;
+  readonly contract: Contract;
 }
 
 export interface PublishTransactionJSON extends TransactionBaseJSON {
-  type: 'PublishTransaction';
-  contract: ContractJSON;
+  readonly type: 'PublishTransaction';
+  readonly contract: ContractJSON;
 }
 
-export class PublishTransaction extends TransactionBase<
-  TransactionType.Publish,
-  PublishTransactionJSON
-> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): PublishTransaction {
-    const { type, version } = super.deserializeTransactionBaseStartWireBase(
-      options,
-    );
+export class PublishTransaction extends TransactionBase<TransactionType.Publish, PublishTransactionJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): PublishTransaction {
+    const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Publish) {
       throw new InvalidFormatError();
@@ -50,12 +35,7 @@ export class PublishTransaction extends TransactionBase<
       publishVersion: version,
     });
 
-    const {
-      attributes,
-      inputs,
-      outputs,
-      scripts,
-    } = super.deserializeTransactionBaseEndWireBase(options);
+    const { attributes, inputs, outputs, scripts } = super.deserializeTransactionBaseEndWireBase(options);
 
     return new this({
       version,
@@ -84,15 +64,7 @@ export class PublishTransaction extends TransactionBase<
       }),
   );
 
-  constructor({
-    version,
-    attributes,
-    inputs,
-    outputs,
-    scripts,
-    hash,
-    contract,
-  }: PublishTransactionAdd) {
+  public constructor({ version, attributes, inputs, outputs, scripts, hash, contract }: PublishTransactionAdd) {
     super({
       version,
       type: TransactionType.Publish,
@@ -111,18 +83,18 @@ export class PublishTransaction extends TransactionBase<
   }
 
   public clone({
-    scripts,
-    attributes,
+    scripts = this.scripts,
+    attributes = this.attributes,
   }: {
-    scripts?: Witness[];
-    attributes?: Attribute[];
+    readonly scripts?: ReadonlyArray<Witness>;
+    readonly attributes?: ReadonlyArray<Attribute>;
   }): PublishTransaction {
     return new PublishTransaction({
       version: this.version,
-      attributes: attributes || this.attributes,
+      attributes,
       inputs: this.inputs,
       outputs: this.outputs,
-      scripts: scripts || this.scripts,
+      scripts,
       contract: this.contract,
     });
   }
@@ -135,12 +107,8 @@ export class PublishTransaction extends TransactionBase<
     });
   }
 
-  public async serializeJSON(
-    context: SerializeJSONContext,
-  ): Promise<PublishTransactionJSON> {
-    const transactionBaseJSON = await super.serializeTransactionBaseJSON(
-      context,
-    );
+  public async serializeJSON(context: SerializeJSONContext): Promise<PublishTransactionJSON> {
+    const transactionBaseJSON = await super.serializeTransactionBaseJSON(context);
 
     return {
       ...transactionBaseJSON,
@@ -149,7 +117,7 @@ export class PublishTransaction extends TransactionBase<
     };
   }
 
-  public async verify(options: TransactionVerifyOptions): Promise<void> {
+  public async verify(_options: TransactionVerifyOptions): Promise<void> {
     throw new VerifyError('Enrollment transactions are obsolete');
   }
 }

@@ -6,125 +6,109 @@ import {
   Op,
   OpCode,
   ScriptBuilder as ClientScriptBuilder,
-  SysCall,
+  SysCallName,
   UnknownOpError,
   utils,
 } from '@neo-one/client-core';
+import { utils as commonUtils } from '@neo-one/utils';
 import BN from 'bn.js';
-import Ast, { Node, SourceFile, Symbol, Type } from 'ts-simple-ast';
+import Project, { Node, SourceFile, Symbol, Type } from 'ts-simple-ast';
 
 import { Context } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { Helper, Helpers } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
-import {
-  Call,
-  DeferredProgramCounter,
-  Jmp,
-  Jump,
-  ProgramCounter,
-  ProgramCounterHelper,
-} from '../pc';
+import { Call, DeferredProgramCounter, Jmp, Jump, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
 import { VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
-import { Bytecode, CaptureResult, ScriptBuilder } from './ScriptBuilder';
+import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode } from './ScriptBuilder';
 
 import { Globals } from '../../symbols';
-import declarations from '../declaration';
-import decorator from '../decorator';
-import expression from '../expression';
-import file from '../file';
-import statement from '../statement';
+import { declarations } from '../declaration';
+import { decorators } from '../decorator';
+import { expressions } from '../expression';
+import { files } from '../file';
+import { statements } from '../statement';
 import { JumpResolver } from './JumpResolver';
 
-const compilers = [declarations, decorator, expression, file, statement];
+const compilers: ReadonlyArray<ReadonlyArray<new () => NodeCompiler>> = [
+  declarations,
+  decorators,
+  expressions,
+  files,
+  statements,
+];
 
-interface Compilers {
-  [kind: number]: NodeCompiler<any>;
-}
+type Compilers = { [K in number]?: NodeCompiler };
 
-export abstract class BaseScriptBuilder<TScope extends Scope>
-  implements ScriptBuilder {
+export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptBuilder {
   public readonly jumpTable: JumpTable = new JumpTable();
-  private currentScope: TScope | undefined;
+  private mutableCurrentScope: TScope | undefined;
   private readonly compilers: Compilers;
-  private bytecode: Bytecode;
-  private pc: number;
-  private jumpTablePC: DeferredProgramCounter = new DeferredProgramCounter();
-  private capturedBytecode: Bytecode | undefined = undefined;
+  private readonly mutableBytecode: SingleBytecode[] = [];
+  private mutablePC = 0;
+  private readonly jumpTablePC: DeferredProgramCounter = new DeferredProgramCounter();
+  // tslint:disable-next-line readonly-array
+  private mutableCapturedBytecode: SingleBytecode[] | undefined;
   private readonly nodes: Map<Node, number> = new Map();
-  private readonly moduleMap: { [filePath: string]: number } = {};
-  private readonly reverseModuleMap: { [index: number]: string } = {};
-  private readonly exportMap: { [filePath: string]: Set<string> } = {};
-  private nextModuleIndex = 0;
-  private currentModuleIndex = 0;
+  private readonly mutableModuleMap: { [K in string]?: number } = {};
+  private readonly mutableReverseModuleMap: { [K in number]?: string } = {};
+  private readonly mutableExportMap: { [K in string]?: Set<string> } = {};
+  private mutableNextModuleIndex = 0;
+  private mutableCurrentModuleIndex = 0;
 
-  constructor(
+  public constructor(
     private readonly context: Context,
     public readonly helpers: Helpers,
-    protected readonly ast: Ast,
+    protected readonly ast: Project,
     private readonly sourceFile: SourceFile,
-    private readonly allHelpers: Helper[] = [],
+    private readonly allHelpers: ReadonlyArray<Helper> = [],
   ) {
-    this.bytecode = [];
-    this.pc = 0;
-    this.currentScope = undefined;
-    this.compilers = (compilers as Array<Array<new () => NodeCompiler<any>>>)
-      .reduce((acc, kindCompilers) => acc.concat(kindCompilers), [])
-      .reduce(
-        (acc, KindCompiler) => {
-          const kindCompiler = new KindCompiler();
-          if (acc[kindCompiler.kind] != null) {
-            throw new Error(
-              `Found duplicate compiler for kind ${kindCompiler.kind}`,
-            );
-          }
+    this.compilers = compilers
+      .reduce<ReadonlyArray<new () => NodeCompiler>>((acc, kindCompilers) => acc.concat(kindCompilers), [])
+      .reduce<Compilers>((acc, kindCompilerClass) => {
+        const kindCompiler = new kindCompilerClass();
+        if (acc[kindCompiler.kind] !== undefined) {
+          throw new Error(`Found duplicate compiler for kind ${kindCompiler.kind}`);
+        }
 
-          acc[kindCompiler.kind] = kindCompiler;
-          return acc;
-        },
-        {} as Compilers,
-      );
+        acc[kindCompiler.kind] = kindCompiler;
+
+        return acc;
+      }, {});
   }
 
-  get scope(): TScope {
-    if (this.currentScope == null) {
+  public get scope(): TScope {
+    if (this.mutableCurrentScope === undefined) {
       throw new Error('Scope has not been set');
     }
-    return this.currentScope;
+
+    return this.mutableCurrentScope;
   }
 
-  get moduleIndex(): number {
-    return this.currentModuleIndex;
+  public get moduleIndex(): number {
+    return this.mutableCurrentModuleIndex;
   }
 
   public process(): void {
     const sourceFile = this.sourceFile;
     const { bytecode } = this.capture(() => {
-      this.moduleMap[sourceFile.getFilePath()] = this.nextModuleIndex;
-      this.reverseModuleMap[this.nextModuleIndex] = sourceFile.getFilePath();
-      this.currentModuleIndex = this.nextModuleIndex;
-      this.nextModuleIndex += 1;
+      this.mutableModuleMap[sourceFile.getFilePath()] = this.mutableNextModuleIndex;
+      this.mutableReverseModuleMap[this.mutableNextModuleIndex] = sourceFile.getFilePath();
+      this.mutableCurrentModuleIndex = this.mutableNextModuleIndex;
+      this.mutableNextModuleIndex += 1;
 
-      this.currentScope = this.createScope(sourceFile, 0, undefined);
+      this.mutableCurrentScope = this.createScope(sourceFile, 0, undefined);
       this.nodes.set(sourceFile, 0);
       const options = {};
-      this.currentScope.emit(this, sourceFile, options, (innerOptions) => {
+      this.mutableCurrentScope.emit(this, sourceFile, options, (innerOptions) => {
         // []
-        this.emitHelper(
-          sourceFile,
-          this.pushValueOptions(options),
-          this.helpers.setGlobalObject,
-        );
+        this.emitHelper(sourceFile, this.pushValueOptions(options), this.helpers.setGlobalObject);
         // [globalObjectVal]
         this.scope.getGlobal(this, sourceFile, this.pushValueOptions(options));
         // []
-        this.emitHelper(
-          sourceFile,
-          this.pushValueOptions(options),
-          this.helpers.addEmptyModule,
-        );
+        this.emitHelper(sourceFile, this.pushValueOptions(options), this.helpers.addEmptyModule);
         // []
         this.allHelpers.forEach((helper) => {
           helper.emitGlobal(this, sourceFile, innerOptions);
@@ -142,51 +126,41 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
   }
 
   public getFinalBytecode(): Buffer {
-    const bytecode = new JumpResolver().process(
-      this.bytecode.map(([_, value]) => value),
-    );
+    // tslint:disable-next-line no-unused
+    const bytecode = new JumpResolver().process(this.mutableBytecode.map(([_, value]) => value));
     let pc = 0;
     const buffers = bytecode.map((valueIn) => {
       let value = valueIn;
       if (value instanceof Jump) {
         const offsetPC = new BN(value.pc.getPC()).sub(new BN(pc));
-        // @ts-ignore
         const jumpPC = offsetPC.toTwos(16);
-        const byteCodeBuffer = ByteBuffer[Op[value.op]];
-        if (byteCodeBuffer == null) {
-          throw new Error(
-            'Something went wrong, could not find bytecode buffer',
-          );
+        const byteCodeBuffer = ByteBuffer[Op[value.op]] as Buffer | undefined;
+        if (byteCodeBuffer === undefined) {
+          throw new Error('Something went wrong, could not find bytecode buffer');
         }
-        value = Buffer.concat([
-          byteCodeBuffer,
-          jumpPC.toArrayLike(Buffer, 'le', 2),
-        ]);
+        value = Buffer.concat([byteCodeBuffer, jumpPC.toArrayLike(Buffer, 'le', 2)]);
       }
 
       pc += value.length;
+
       return value;
-    }) as Buffer[];
+    });
 
     return Buffer.concat(buffers);
   }
 
   public visit(node: Node, options: VisitOptions): void {
     const compiler = this.compilers[node.compilerNode.kind];
-    if (compiler == null) {
+    if (compiler === undefined) {
       this.reportUnsupported(node);
     } else {
       compiler.visitNode(this, node, options);
     }
   }
 
-  public withScope(
-    node: Node,
-    options: VisitOptions,
-    func: (options: VisitOptions) => void,
-  ): void {
+  public withScope(node: Node, options: VisitOptions, func: (options: VisitOptions) => void): void {
     let index = this.nodes.get(node);
-    if (index == null) {
+    if (index === undefined) {
       index = 0;
     } else {
       index += 1;
@@ -194,25 +168,21 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
 
     this.nodes.set(node, index);
 
-    const currentScope = this.currentScope;
-    this.currentScope = this.createScope(node, index, currentScope);
-    this.currentScope.emit(this, node, options, func);
-    this.currentScope = currentScope;
+    const currentScope = this.mutableCurrentScope;
+    this.mutableCurrentScope = this.createScope(node, index, currentScope);
+    this.mutableCurrentScope.emit(this, node, options, func);
+    this.mutableCurrentScope = currentScope;
   }
 
   public withProgramCounter(func: (pc: ProgramCounterHelper) => void): void {
-    const pc = new ProgramCounterHelper(() => this.pc);
+    const pc = new ProgramCounterHelper(() => this.mutablePC);
     func(pc);
     pc.setLast();
   }
 
-  public emitOp(
-    node: Node,
-    code: OpCode,
-    buffer?: Buffer | null | undefined,
-  ): void {
-    const bytecode = Op[code];
-    if (bytecode == null) {
+  public emitOp(node: Node, code: OpCode, buffer?: Buffer | undefined): void {
+    const bytecode = Op[code] as Op | undefined;
+    if (bytecode === undefined) {
       throw new UnknownOpError(code);
     }
     this.emitOpByte(node, bytecode, buffer);
@@ -221,14 +191,14 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
   public emitPushInt(node: Node, valueIn: number | BN): void {
     const value = new BN(valueIn);
     if (value.eq(utils.NEGATIVE_ONE)) {
-      return this.emitOp(node, 'PUSHM1');
+      this.emitOp(node, 'PUSHM1');
     } else if (value.eq(utils.ZERO)) {
-      return this.emitPush(node, utils.toSignedBuffer(value));
+      this.emitPush(node, utils.toSignedBuffer(value));
     } else if (value.gt(utils.ZERO) && value.lt(utils.SIXTEEN)) {
-      return this.emitOpByte(node, Op.PUSH1 - 1 + value.toNumber());
+      this.emitOpByte(node, Op.PUSH1 - 1 + value.toNumber());
+    } else {
+      this.emitPush(node, utils.toSignedBuffer(value));
     }
-
-    return this.emitPush(node, utils.toSignedBuffer(value));
   }
 
   public emitPushBoolean(node: Node, value: boolean): void {
@@ -236,27 +206,19 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
   }
 
   public emitPushString(node: Node, value: string): void {
-    return this.emitPush(node, this.toBuffer(value));
+    this.emitPush(node, this.toBuffer(value));
   }
 
-  public emitJmp(
-    node: Node,
-    code: 'JMP' | 'JMPIF' | 'JMPIFNOT',
-    pc: ProgramCounter,
-  ): void {
+  public emitJmp(node: Node, code: 'JMP' | 'JMPIF' | 'JMPIFNOT', pc: ProgramCounter): void {
     this.emitJump(node, new Jmp(code, pc));
   }
 
-  public emitHelper<T extends Node>(
-    node: T,
-    options: VisitOptions,
-    helper: Helper<T>,
-  ): void {
+  public emitHelper<T extends Node>(node: T, options: VisitOptions, helper: Helper<T>): void {
     helper.emit(this, node, options);
   }
 
   public emitBytecode(bytecode: Bytecode): void {
-    const pc = this.pc;
+    const pc = this.mutablePC;
     bytecode.forEach(([node, code]) => {
       if (code instanceof Call) {
         this.emitJump(node, code);
@@ -274,7 +236,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
     this.emitJump(node, new Call(this.jumpTablePC));
   }
 
-  public emitSysCall(node: Node, name: SysCall): void {
+  public emitSysCall(node: Node, name: SysCallName): void {
     const sysCallBuffer = Buffer.from(name, 'ascii');
     const writer = new BinaryWriter();
     writer.writeVarBytesLE(sysCallBuffer);
@@ -284,60 +246,53 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
   public loadModule(sourceFile: SourceFile): void {
     const options = {};
 
-    let moduleIndex = this.moduleMap[sourceFile.getFilePath()];
-    if (moduleIndex == null) {
-      moduleIndex = this.nextModuleIndex;
-      this.nextModuleIndex += 1;
-      this.moduleMap[sourceFile.getFilePath()] = moduleIndex;
-      this.reverseModuleMap[moduleIndex] = sourceFile.getFilePath();
+    let moduleIndex = this.mutableModuleMap[sourceFile.getFilePath()];
+    if (moduleIndex === undefined) {
+      moduleIndex = this.mutableNextModuleIndex;
+      this.mutableNextModuleIndex += 1;
+      this.mutableModuleMap[sourceFile.getFilePath()] = moduleIndex;
+      this.mutableReverseModuleMap[moduleIndex] = sourceFile.getFilePath();
 
-      const currentScope = this.currentScope;
-      this.currentScope = this.createScope(sourceFile, 0, undefined);
+      const currentScope = this.mutableCurrentScope;
+      this.mutableCurrentScope = this.createScope(sourceFile, 0, undefined);
 
-      const currentModuleIndex = this.currentModuleIndex;
-      this.currentModuleIndex = moduleIndex;
+      const currentModuleIndex = this.mutableCurrentModuleIndex;
+      this.mutableCurrentModuleIndex = moduleIndex;
 
       // [globalObjectVal]
       this.scope.getGlobal(this, sourceFile, this.pushValueOptions(options));
       // [globalObjectVal, globalObjectVal]
       this.emitOp(sourceFile, 'DUP');
       // [globalObjectVal]
-      this.emitHelper(
-        sourceFile,
-        this.pushValueOptions(options),
-        this.helpers.addEmptyModule,
-      );
+      this.emitHelper(sourceFile, this.pushValueOptions(options), this.helpers.addEmptyModule);
 
-      this.currentScope.emit(this, sourceFile, options, (innerOptions) => {
+      this.mutableCurrentScope.emit(this, sourceFile, options, (innerOptions) => {
         // []
         this.scope.setGlobal(this, sourceFile, options);
         this.visit(sourceFile, innerOptions);
       });
 
-      this.currentScope = currentScope;
-      this.currentModuleIndex = currentModuleIndex;
+      this.mutableCurrentScope = currentScope;
+      this.mutableCurrentModuleIndex = currentModuleIndex;
     }
 
     // [globalObjectVal]
     this.scope.getGlobal(this, sourceFile, this.pushValueOptions(options));
     // [exports]
-    this.emitHelper(
-      sourceFile,
-      this.pushValueOptions(options),
-      this.helpers.getModule({ moduleIndex }),
-    );
+    this.emitHelper(sourceFile, this.pushValueOptions(options), this.helpers.getModule({ moduleIndex }));
   }
 
   public capture(func: () => void): CaptureResult {
-    const originalCapturedBytecode = this.capturedBytecode;
-    this.capturedBytecode = [];
-    const originalPC = this.pc;
-    this.pc = 0;
+    const originalCapturedBytecode = this.mutableCapturedBytecode;
+    this.mutableCapturedBytecode = [];
+    const originalPC = this.mutablePC;
+    this.mutablePC = 0;
     func();
-    const capturedBytecode = this.capturedBytecode;
-    this.capturedBytecode = originalCapturedBytecode;
-    const capturedLength = this.pc;
-    this.pc = originalPC;
+    const capturedBytecode = this.mutableCapturedBytecode;
+    this.mutableCapturedBytecode = originalCapturedBytecode;
+    const capturedLength = this.mutablePC;
+    this.mutablePC = originalPC;
+
     return { length: capturedLength, bytecode: capturedBytecode };
   }
 
@@ -374,28 +329,19 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
     return { ...options, pushValue: false, setValue: false };
   }
 
-  public breakPCOptions(
-    options: VisitOptions,
-    pc: ProgramCounter,
-  ): VisitOptions {
+  public breakPCOptions(options: VisitOptions, pc: ProgramCounter): VisitOptions {
     return { ...options, breakPC: pc };
   }
 
-  public continuePCOptions(
-    options: VisitOptions,
-    pc: ProgramCounter,
-  ): VisitOptions {
+  public continuePCOptions(options: VisitOptions, pc: ProgramCounter): VisitOptions {
     return { ...options, continuePC: pc };
   }
 
-  public catchPCOptions(
-    options: VisitOptions,
-    pc: ProgramCounter,
-  ): VisitOptions {
+  public catchPCOptions(options: VisitOptions, pc: ProgramCounter): VisitOptions {
     return { ...options, catchPC: pc };
   }
 
-  public castOptions(options: VisitOptions, cast: Type): VisitOptions {
+  public castOptions(options: VisitOptions, cast?: Type | undefined): VisitOptions {
     return { ...options, cast };
   }
 
@@ -403,10 +349,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
     return { ...options, cast: undefined };
   }
 
-  public superClassOptions(
-    options: VisitOptions,
-    superClass: Name,
-  ): VisitOptions {
+  public superClassOptions(options: VisitOptions, superClass: Name): VisitOptions {
     return { ...options, superClass };
   }
 
@@ -422,72 +365,43 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
     this.context.reportUnsupported(node);
   }
 
-  public getType(node: Node, required: boolean = false): Type | undefined {
+  public getType(node: Node, required = false): Type | undefined {
     return this.context.getType(node, required);
   }
 
-  public getSymbol(node: Node, required: boolean = false): Symbol | undefined {
+  public getSymbol(node: Node, required = false): Symbol | undefined {
     return this.context.getSymbol(node, required);
   }
 
-  public isOnlyGlobal(
-    node: Node,
-    type: Type | undefined,
-    name: keyof Globals,
-  ): boolean {
+  public isOnlyGlobal(node: Node, type: Type | undefined, name: keyof Globals): boolean {
     return this.context.isOnlyGlobal(node, type, name);
   }
 
-  public isGlobal(
-    node: Node,
-    type: Type | undefined,
-    name: keyof Globals,
-  ): boolean {
+  public isGlobal(node: Node, type: Type | undefined, name: keyof Globals): boolean {
     return this.context.isGlobal(node, type, name);
   }
 
-  public isGlobalSymbol(
-    node: Node,
-    symbol: Symbol | undefined,
-    name: keyof Globals,
-  ): boolean {
+  public isGlobalSymbol(node: Node, symbol: Symbol | undefined, name: keyof Globals): boolean {
     return this.context.isGlobalSymbol(node, symbol, name);
   }
 
   public hasExport(sourceFile: SourceFile, name: string): boolean {
-    return (this.exportMap[sourceFile.getFilePath()] || new Set()).has(name);
+    const exported = this.mutableExportMap[sourceFile.getFilePath()];
+
+    return exported !== undefined && exported.has(name);
   }
 
   public addExport(name: string): void {
-    const filePath = this.assertNotNull(
-      this.reverseModuleMap[this.currentModuleIndex],
-    );
-    let fileExports = this.exportMap[filePath];
-    if (fileExports == null) {
-      fileExports = new Set();
-      this.exportMap[filePath] = fileExports;
+    const filePath = commonUtils.nullthrows(this.mutableReverseModuleMap[this.mutableCurrentModuleIndex]);
+    let fileExports = this.mutableExportMap[filePath];
+    if (fileExports === undefined) {
+      this.mutableExportMap[filePath] = fileExports = new Set();
     }
 
     fileExports.add(name);
   }
 
-  public assertUnreachable(value: never): never {
-    throw new Error('Should not be reached.');
-  }
-
-  public assertNotNull<T>(value: T | undefined | null): T {
-    return this.context.assertNotNull(value);
-  }
-
-  public filterNotNull<T>(value: T | undefined | null): value is T {
-    return value != null;
-  }
-
-  protected abstract createScope(
-    node: Node,
-    index: number,
-    parent: TScope | undefined,
-  ): TScope;
+  protected abstract createScope(node: Node, index: number, parent: TScope | undefined): TScope;
 
   private emitPush(node: Node, value: Buffer): void {
     if (value.length <= Op.PUSHBYTES75) {
@@ -524,14 +438,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
     }
   }
 
-  private emitOpByte(
-    node: Node,
-    byteCode: ByteCode,
-    buffer?: Buffer | null | undefined,
-  ): void {
+  private emitOpByte(node: Node, byteCode: ByteCode, buffer?: Buffer | undefined): void {
     const byteCodeBuffer = ByteBuffer[byteCode];
     let value = byteCodeBuffer;
-    if (buffer != null) {
+    if (buffer !== undefined) {
       value = Buffer.concat([byteCodeBuffer, buffer]);
     }
     this.emitRaw(node, value);
@@ -539,19 +449,19 @@ export abstract class BaseScriptBuilder<TScope extends Scope>
 
   private emitRaw(node: Node, value: Buffer): void {
     this.push(node, value);
-    this.pc += value.length;
+    this.mutablePC += value.length;
   }
 
   private emitJump(node: Node, jump: Jump): void {
     this.push(node, jump);
-    this.pc += 3;
+    this.mutablePC += 3;
   }
 
   private push(node: Node, value: Buffer | Jump): void {
-    if (this.capturedBytecode != null) {
-      this.capturedBytecode.push([node, value]);
+    if (this.mutableCapturedBytecode !== undefined) {
+      this.mutableCapturedBytecode.push([node, value]);
     } else {
-      this.bytecode.push([node, value]);
+      this.mutableBytecode.push([node, value]);
     }
   }
 }

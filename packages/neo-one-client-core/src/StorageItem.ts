@@ -9,48 +9,36 @@ import {
   SerializeJSONContext,
   SerializeWire,
 } from './Serializable';
-import {
-  BinaryReader,
-  BinaryWriter,
-  IOHelper,
-  JSONHelper,
-  utils,
-} from './utils';
+import { BinaryReader, BinaryWriter, IOHelper, JSONHelper, utils } from './utils';
 
 export interface StorageItemAdd {
-  hash: UInt160;
-  key: Buffer;
-  value: Buffer;
+  readonly hash: UInt160;
+  readonly key: Buffer;
+  readonly value: Buffer;
 }
 
 export interface StorageItemUpdate {
-  value: Buffer;
+  readonly value: Buffer;
 }
 
 export interface StorageItemsKey {
-  hash?: UInt160;
-  prefix?: Buffer;
+  readonly hash?: UInt160;
+  readonly prefix?: Buffer;
 }
 
 export interface StorageItemKey {
-  hash: UInt160;
-  key: Buffer;
+  readonly hash: UInt160;
+  readonly key: Buffer;
 }
 
 export interface StorageItemJSON {
-  hash: string;
-  key: string;
-  value: string;
+  readonly hash: string;
+  readonly key: string;
+  readonly value: string;
 }
 
-export class StorageItem
-  implements
-    SerializableWire<StorageItem>,
-    Equatable,
-    SerializableJSON<StorageItemJSON> {
-  public static deserializeWireBase({
-    reader,
-  }: DeserializeWireBaseOptions): StorageItem {
+export class StorageItem implements SerializableWire<StorageItem>, Equatable, SerializableJSON<StorageItemJSON> {
+  public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): StorageItem {
     const hash = reader.readUInt160();
     const key = reader.readVarBytesLE();
     const value = reader.readVarBytesLE();
@@ -75,24 +63,17 @@ export class StorageItem
   public readonly equals: Equals = utils.equals(
     StorageItem,
     (other) =>
-      common.uInt160Equal(this.hash, other.hash) &&
-      this.key.equals(other.key) &&
-      this.value.equals(other.value),
+      common.uInt160Equal(this.hash, other.hash) && this.key.equals(other.key) && this.value.equals(other.value),
   );
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 
-  constructor({ hash, key, value }: StorageItemAdd) {
+  public constructor({ hash, key, value }: StorageItemAdd) {
     this.hash = hash;
     this.key = key;
     this.value = value;
     this.sizeInternal = utils.lazy(
-      () =>
-        IOHelper.sizeOfUInt160 +
-        IOHelper.sizeOfVarBytesLE(this.key) +
-        IOHelper.sizeOfVarBytesLE(this.value),
+      () => IOHelper.sizeOfUInt160 + IOHelper.sizeOfVarBytesLE(this.key) + IOHelper.sizeOfVarBytesLE(this.value),
     );
   }
 
@@ -114,7 +95,7 @@ export class StorageItem
     writer.writeVarBytesLE(this.value);
   }
 
-  public serializeJSON(context: SerializeJSONContext): StorageItemJSON {
+  public serializeJSON(_context: SerializeJSONContext): StorageItemJSON {
     return {
       hash: JSONHelper.writeUInt160(this.hash),
       key: JSONHelper.writeBuffer(this.key),

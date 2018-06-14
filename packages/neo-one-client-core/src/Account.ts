@@ -13,131 +13,39 @@ import {
   SerializeWire,
 } from './Serializable';
 import { InputJSON } from './transaction';
-import {
-  BinaryReader,
-  BinaryWriter,
-  IOHelper,
-  JSONHelper,
-  utils,
-} from './utils';
+import { BinaryReader, BinaryWriter, IOHelper, JSONHelper, utils } from './utils';
 
 export interface AccountKey {
-  hash: UInt160;
+  readonly hash: UInt160;
 }
 export interface AccountAdd {
-  version?: number;
-  hash: UInt160;
-  isFrozen?: boolean;
-  votes?: ECPoint[];
-  balances?: {
-    [assetHash: string]: BN;
-  };
+  readonly version?: number;
+  readonly hash: UInt160;
+  readonly isFrozen?: boolean;
+  readonly votes?: ReadonlyArray<ECPoint>;
+  readonly balances?: { readonly [AssetHash in string]?: BN };
 }
 
 export interface AccountUpdate {
-  isFrozen?: boolean;
-  votes?: ECPoint[];
-  balances?: {
-    [assetHash: string]: BN;
+  readonly isFrozen?: boolean;
+  readonly votes?: ReadonlyArray<ECPoint>;
+  readonly balances?: {
+    readonly [assetHash: string]: BN;
   };
 }
 
 export interface AccountJSON {
-  version: number;
-  script_hash: string;
-  frozen: boolean;
-  votes: string[];
-  balances: Array<{ asset: string; value: string }>;
-  unspent: InputJSON[];
-  unclaimed: InputJSON[];
+  readonly version: number;
+  readonly script_hash: string;
+  readonly frozen: boolean;
+  readonly votes: ReadonlyArray<string>;
+  readonly balances: ReadonlyArray<{ readonly asset: string; readonly value: string }>;
+  readonly unspent: ReadonlyArray<InputJSON>;
+  readonly unclaimed: ReadonlyArray<InputJSON>;
 }
 
-export class Account extends BaseState
-  implements
-    SerializableWire<Account>,
-    SerializableJSON<AccountJSON>,
-    Equatable {
-  public readonly hash: UInt160;
-  public readonly hashHex: UInt160Hex;
-  public readonly isFrozen: boolean;
-  public readonly votes: ECPoint[];
-  public readonly balances: {
-    [assetHash: string]: BN;
-  };
-  public readonly equals: Equals = utils.equals(Account, (other) =>
-    common.uInt160Equal(this.hash, other.hash),
-  );
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
-  private readonly sizeInternal: () => number;
-
-  constructor({ version, hash, isFrozen, votes, balances }: AccountAdd) {
-    super({ version });
-    this.hash = hash;
-    this.hashHex = common.uInt160ToHex(hash);
-    this.isFrozen = isFrozen || false;
-    this.votes = votes || [];
-    this.balances = balances || {};
-    this.sizeInternal = utils.lazy(
-      () =>
-        IOHelper.sizeOfUInt8 +
-        IOHelper.sizeOfUInt160 +
-        IOHelper.sizeOfBoolean +
-        IOHelper.sizeOfArray(this.votes, (vote) =>
-          IOHelper.sizeOfECPoint(vote),
-        ) +
-        IOHelper.sizeOfObject(
-          this.balances,
-          () => IOHelper.sizeOfUInt256 + IOHelper.sizeOfFixed8,
-        ),
-    );
-  }
-
-  public get size(): number {
-    return this.sizeInternal();
-  }
-
-  public isDeletable(): boolean {
-    const balances = Object.values(this.balances);
-    return (
-      !this.isFrozen &&
-      this.votes.length === 0 &&
-      (balances.length === 0 ||
-        balances.every((value) => value.lte(utils.ZERO)))
-    );
-  }
-
-  public getBalance(asset: UInt256Hex): BN {
-    return this.balances[asset] || utils.ZERO;
-  }
-
-  public update({ isFrozen, votes, balances }: AccountUpdate): Account {
-    return new Account({
-      hash: this.hash,
-      isFrozen: isFrozen == null ? this.isFrozen : isFrozen,
-      votes: votes == null ? this.votes : votes,
-      balances: balances == null ? this.balances : balances,
-    });
-  }
-
-  public serializeWireBase(writer: BinaryWriter): void {
-    writer.writeUInt8(this.version);
-    writer.writeUInt160(this.hash);
-    writer.writeBoolean(this.isFrozen);
-    writer.writeArray(this.votes, (vote) => {
-      writer.writeECPoint(vote);
-    });
-    const balances = _.pickBy(this.balances, (value) =>
-      value.gt(utils.ZERO),
-    ) as { [assetHash: string]: BN };
-    writer.writeObject(balances, (key: string, value: BN) => {
-      writer.writeUInt256(common.stringToUInt256(key));
-      writer.writeFixed8(value);
-    });
-  }
-
-  public deserializeWireBase(options: DeserializeWireBaseOptions): Account {
+export class Account extends BaseState implements SerializableWire<Account>, SerializableJSON<AccountJSON>, Equatable {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): Account {
     const { reader } = options;
     const version = reader.readUInt8();
     const hash = reader.readUInt160();
@@ -146,6 +54,7 @@ export class Account extends BaseState
     const balances = reader.readObject(() => {
       const key = common.uInt256ToHex(reader.readUInt256());
       const value = reader.readFixed8();
+
       return { key, value };
     });
 
@@ -158,20 +67,86 @@ export class Account extends BaseState
     });
   }
 
-  public deserializeWire(options: DeserializeWireOptions): Account {
+  public static deserializeWire(options: DeserializeWireOptions): Account {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),
     });
   }
 
-  public async serializeJSON(
-    context: SerializeJSONContext,
-  ): Promise<AccountJSON> {
-    const [unspent, unclaimed] = await Promise.all([
-      context.getUnspent(this.hash),
-      context.getUnclaimed(this.hash),
-    ]);
+  public readonly hash: UInt160;
+  public readonly hashHex: UInt160Hex;
+  public readonly isFrozen: boolean;
+  public readonly votes: ReadonlyArray<ECPoint>;
+  public readonly balances: { readonly [AssetHash in string]?: BN };
+  public readonly equals: Equals = utils.equals(Account, (other) => common.uInt160Equal(this.hash, other.hash));
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
+  private readonly sizeInternal: () => number;
+
+  public constructor({ version, hash, isFrozen = false, votes = [], balances = {} }: AccountAdd) {
+    super({ version });
+    this.hash = hash;
+    this.hashHex = common.uInt160ToHex(hash);
+    this.isFrozen = isFrozen;
+    this.votes = votes;
+    this.balances = balances;
+    this.sizeInternal = utils.lazy(
+      () =>
+        IOHelper.sizeOfUInt8 +
+        IOHelper.sizeOfUInt160 +
+        IOHelper.sizeOfBoolean +
+        IOHelper.sizeOfArray(this.votes, (vote) => IOHelper.sizeOfECPoint(vote)) +
+        IOHelper.sizeOfObject(this.balances, () => IOHelper.sizeOfUInt256 + IOHelper.sizeOfFixed8),
+    );
+  }
+
+  public get size(): number {
+    return this.sizeInternal();
+  }
+
+  public isDeletable(): boolean {
+    const balances = Object.values(this.balances);
+
+    return (
+      !this.isFrozen &&
+      this.votes.length === 0 &&
+      (balances.length === 0 || balances.every((value) => value !== undefined && value.lte(utils.ZERO)))
+    );
+  }
+
+  public getBalance(asset: UInt256Hex): BN {
+    const balance = this.balances[asset];
+
+    return balance === undefined ? utils.ZERO : balance;
+  }
+
+  public update({ isFrozen = this.isFrozen, votes = this.votes, balances = this.balances }: AccountUpdate): Account {
+    return new Account({
+      hash: this.hash,
+      isFrozen,
+      votes,
+      balances,
+    });
+  }
+
+  public serializeWireBase(writer: BinaryWriter): void {
+    writer.writeUInt8(this.version);
+    writer.writeUInt160(this.hash);
+    writer.writeBoolean(this.isFrozen);
+    writer.writeArray(this.votes, (vote) => {
+      writer.writeECPoint(vote);
+    });
+    const balances = _.pickBy(this.balances, (value) => value !== undefined && value.gt(utils.ZERO)) as {
+      [assetHash: string]: BN;
+    };
+    writer.writeObject(balances, (key: string, value) => {
+      writer.writeUInt256(common.stringToUInt256(key));
+      writer.writeFixed8(value);
+    });
+  }
+
+  public async serializeJSON(context: SerializeJSONContext): Promise<AccountJSON> {
+    const [unspent, unclaimed] = await Promise.all([context.getUnspent(this.hash), context.getUnclaimed(this.hash)]);
 
     return {
       version: this.version,
@@ -180,7 +155,8 @@ export class Account extends BaseState
       votes: this.votes.map((vote) => JSONHelper.writeECPoint(vote)),
       balances: Object.entries(this.balances).map(([asset, value]) => ({
         asset: JSONHelper.writeUInt256(asset),
-        value: JSONHelper.writeFixed8(value),
+        // tslint:disable-next-line no-non-null-assertion
+        value: JSONHelper.writeFixed8(value!),
       })),
 
       unspent: unspent.map((input) => input.serializeJSON(context)),

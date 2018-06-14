@@ -18,66 +18,40 @@ import {
 import * as utils from '../utils';
 
 export const params = {
-  String: (
-    param: Param | null,
-    parameter: StringABI,
-  ): ScriptBuilderParam | null => args.assertString('String', param),
-  Hash160: (
-    param: Param | null,
-    parameter: Hash160ABI,
-  ): ScriptBuilderParam | null =>
+  String: (param: Param | undefined, _parameter: StringABI): ScriptBuilderParam | undefined =>
+    args.assertString('String', param),
+  Hash160: (param: Param | undefined, _parameter: Hash160ABI): ScriptBuilderParam | undefined =>
     common.stringToUInt160(args.assertHash160(param)),
-  Hash256: (
-    param: Param | null,
-    parameter: Hash256ABI,
-  ): ScriptBuilderParam | null =>
+  Hash256: (param: Param | undefined, _parameter: Hash256ABI): ScriptBuilderParam | undefined =>
     common.stringToUInt256(args.assertHash256(param)),
-  PublicKey: (
-    param: Param | null,
-    parameter: PublicKeyABI,
-  ): ScriptBuilderParam | null =>
+  PublicKey: (param: Param | undefined, _parameter: PublicKeyABI): ScriptBuilderParam | undefined =>
     common.stringToECPoint(args.assertPublicKey(param)),
-  Integer: (
-    param: Param | null,
-    parameter: IntegerABI,
-  ): ScriptBuilderParam | null => {
+  Integer: (param: Param | undefined, _parameter: IntegerABI): ScriptBuilderParam | undefined => {
     const value = args.assertBigNumber(param);
-    return utils.bigNumberToBN(value, parameter.decimals);
+
+    return utils.bigNumberToBN(value, _parameter.decimals);
   },
-  Boolean: (
-    param: Param | null,
-    parameter: BooleanABI,
-  ): ScriptBuilderParam | null => args.assertBoolean(param),
-  ByteArray: (
-    param: Param | null,
-    parameter: ByteArrayABI,
-  ): ScriptBuilderParam | null => Buffer.from(args.assertBuffer(param), 'hex'),
-  Signature: (
-    param: Param | null,
-    parameter: SignatureABI,
-  ): ScriptBuilderParam | null => Buffer.from(args.assertBuffer(param), 'hex'),
-  Array: (
-    param: Param | null,
-    parameter: ArrayABI,
-  ): ScriptBuilderParam | null => {
+  Boolean: (param: Param | undefined, _parameter: BooleanABI): ScriptBuilderParam | undefined =>
+    args.assertBoolean(param),
+  ByteArray: (param: Param | undefined, _parameter: ByteArrayABI): ScriptBuilderParam | undefined =>
+    Buffer.from(args.assertBuffer(param), 'hex'),
+  Signature: (param: Param | undefined, _parameter: SignatureABI): ScriptBuilderParam | undefined =>
+    Buffer.from(args.assertBuffer(param), 'hex'),
+  Array: (param: Param | undefined, parameter: ArrayABI): ScriptBuilderParam | undefined => {
     if (!Array.isArray(param)) {
       throw new InvalidArgumentError(`Expected Array, found: ${String(param)}`);
     }
     const { value } = parameter;
+    // tslint:disable-next-line no-any
     const checker = params[value.type] as any;
+
     return param.map((val) => checker(val, value));
   },
-  InteropInterface: (
-    param: Param | null,
-    parameter: InteropInterfaceABI,
-  ): ScriptBuilderParam | null => {
-    throw new InvalidArgumentError('InteropInterface is not a valid parameter');
+  InteropInterface: (_param: Param | undefined, _parameter: InteropInterfaceABI): ScriptBuilderParam | undefined => {
+    throw new InvalidArgumentError('InteropInterface is not a valid _parameter');
   },
-  Void: (
-    param: Param | null,
-    parameter: VoidABI,
-  ): ScriptBuilderParam | null => {
-    if (param != null) {
+  Void: (param: Param | undefined, _parameter: VoidABI): ScriptBuilderParam | undefined => {
+    if (param !== undefined) {
       throw new InvalidArgumentError(`Expected Void: ${String(param)}`);
     }
 

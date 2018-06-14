@@ -7,11 +7,7 @@ import { VisitOptions } from '../types';
 export class WithStatementCompiler extends NodeCompiler<WithStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.WithStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: WithStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: WithStatement, _options: VisitOptions): void {
     sb.reportUnsupported(node);
   }
 }

@@ -1,10 +1,4 @@
-import {
-  AssetType,
-  common,
-  crypto,
-  RegisterTransaction,
-  ScriptBuilder,
-} from '@neo-one/client-core';
+import { AssetType, common, crypto, RegisterTransaction, ScriptBuilder } from '@neo-one/client-core';
 
 const scriptBuilder = new ScriptBuilder();
 scriptBuilder.emitOp('PUSH1');

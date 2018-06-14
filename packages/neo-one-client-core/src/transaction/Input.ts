@@ -9,31 +9,23 @@ import {
   SerializeJSONContext,
   SerializeWire,
 } from '../Serializable';
-import {
-  BinaryReader,
-  BinaryWriter,
-  IOHelper,
-  JSONHelper,
-  utils,
-} from '../utils';
+import { BinaryReader, BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 
 export interface InputAdd {
-  hash: UInt256;
-  index: number;
+  readonly hash: UInt256;
+  readonly index: number;
 }
 
 export interface InputJSON {
-  txid: string;
-  vout: number;
+  readonly txid: string;
+  readonly vout: number;
 }
 
-export class Input
-  implements SerializableWire<Input>, Equatable, SerializableJSON<InputJSON> {
-  public static deserializeWireBase({
-    reader,
-  }: DeserializeWireBaseOptions): Input {
+export class Input implements SerializableWire<Input>, Equatable, SerializableJSON<InputJSON> {
+  public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): Input {
     const hash = reader.readUInt256();
     const index = reader.readUInt16LE();
+
     return new this({ hash, index });
   }
 
@@ -46,18 +38,14 @@ export class Input
 
   public readonly hash: UInt256;
   public readonly index: number;
-  public readonly size: number =
-    IOHelper.sizeOfUInt256 + IOHelper.sizeOfUInt16LE;
+  public readonly size: number = IOHelper.sizeOfUInt256 + IOHelper.sizeOfUInt16LE;
   public readonly equals: Equals = utils.equals(
     Input,
-    (other) =>
-      common.uInt256Equal(this.hash, other.hash) && other.index === this.index,
+    (other) => common.uInt256Equal(this.hash, other.hash) && other.index === this.index,
   );
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  constructor({ hash, index }: InputAdd) {
+  public constructor({ hash, index }: InputAdd) {
     this.hash = hash;
     this.index = index;
   }
@@ -67,7 +55,7 @@ export class Input
     writer.writeUInt16LE(this.index);
   }
 
-  public serializeJSON(context: SerializeJSONContext): InputJSON {
+  public serializeJSON(_context: SerializeJSONContext): InputJSON {
     return {
       txid: JSONHelper.writeUInt256(this.hash),
       vout: this.index,

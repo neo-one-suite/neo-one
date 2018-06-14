@@ -9,11 +9,7 @@ import { DESERIALIZE_NAME, getTypes, invokeDeserialize } from './serialize';
 // Input: [val]
 // Output: []
 export class GenericDeserializeHelper extends Helper {
-  public emitGlobal(
-    sb: ScriptBuilder,
-    node: Node,
-    optionsIn: VisitOptions,
-  ): void {
+  public emitGlobal(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
     // [globalObjectVal]
@@ -41,11 +37,7 @@ export class GenericDeserializeHelper extends Helper {
                 },
                 whenTrue: () => {
                   forType.deserialize();
-                  sb.emitHelper(
-                    node,
-                    sb.pushValueOptions(options),
-                    sb.helpers.createNormalCompletion,
-                  );
+                  sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createNormalCompletion);
                   sb.emitOp(node, 'RET');
                 },
               })),
@@ -63,7 +55,7 @@ export class GenericDeserializeHelper extends Helper {
       node,
       options,
       sb.helpers.createFunctionObject({
-        property: InternalFunctionProperties.CALL,
+        property: InternalFunctionProperties.Call,
       }),
     );
     // []
@@ -73,6 +65,7 @@ export class GenericDeserializeHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

@@ -1,14 +1,11 @@
-import {
-  common,
-  Param as ScriptBuilderParam,
-  ScriptBuilder,
-} from '@neo-one/client-core';
+import { common, Param as ScriptBuilderParam, ScriptBuilder } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
 import { Hash160String } from './types';
 
 export const bigNumberToBN = (value: BigNumber, decimals: number): BN => {
   const dBigNumber = new BigNumber(10 ** decimals);
+
   return new BN(value.times(dBigNumber).toString(), 10);
 };
 
@@ -16,8 +13,8 @@ export const getInvokeMethodInvocationScript = ({
   method,
   params,
 }: {
-  method: string;
-  params: Array<ScriptBuilderParam | null>;
+  readonly method: string;
+  readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
 }): Buffer => {
   const sb = new ScriptBuilder();
   sb.emitAppCallInvocation(method, ...params);
@@ -30,9 +27,9 @@ export const getInvokeMethodScript = ({
   method,
   params,
 }: {
-  hash: Hash160String;
-  method: string;
-  params: Array<ScriptBuilderParam | null>;
+  readonly hash: Hash160String;
+  readonly method: string;
+  readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
 }): Buffer => {
   const sb = new ScriptBuilder();
   sb.emitAppCall(common.stringToUInt160(hash), method, ...params);

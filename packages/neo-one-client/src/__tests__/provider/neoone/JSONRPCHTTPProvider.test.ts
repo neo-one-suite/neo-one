@@ -1,10 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { UnknownBlockError } from '../../../errors';
-import {
-  HTTPError,
-  InvalidRPCResponseError,
-  JSONRPCError,
-} from '../../../provider/neoone/errors';
+import { HTTPError, InvalidRPCResponseError, JSONRPCError } from '../../../provider/neoone/errors';
 import { JSONRPCHTTPProvider } from '../../../provider/neoone/JSONRPCHTTPProvider';
 
 jest.mock('isomorphic-fetch');
@@ -110,9 +106,7 @@ describe('JSONRPCHTTPProvider', () => {
 
     const result = provider.request(req);
 
-    await expect(result).rejects.toEqual(
-      new HTTPError(status, expected as any),
-    );
+    await expect(result).rejects.toEqual(new HTTPError(status, expected as any));
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
@@ -176,9 +170,7 @@ describe('JSONRPCHTTPProvider', () => {
 
     const result = provider.request(reqTimeout);
 
-    await expect(result).rejects.toEqual(
-      new HTTPError(status, expected as any),
-    );
+    await expect(result).rejects.toEqual(new HTTPError(status, expected as any));
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
@@ -224,11 +216,7 @@ describe('JSONRPCHTTPProvider', () => {
       }),
     );
 
-    const results = Promise.all([
-      provider.request(req),
-      provider.request(req),
-      provider.request(req),
-    ]);
+    const results = Promise.all([provider.request(req), provider.request(req), provider.request(req)]);
 
     await expect(results.then((res) => res[0])).resolves.toBe(expected);
     expect(fetch).toHaveBeenCalledTimes(1);

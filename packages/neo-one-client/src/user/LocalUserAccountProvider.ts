@@ -40,6 +40,7 @@ import {
   AddressString,
   AssetRegister,
   Attribute,
+  AttributeArg,
   ContractRegister,
   DataProvider,
   GetOptions,
@@ -78,48 +79,36 @@ import { converters } from './converters';
 
 export interface KeyStore {
   readonly type: string;
-  readonly currentAccount$: Observable<UserAccount | null>;
-  readonly getCurrentAccount: () => UserAccount | null;
-  readonly accounts$: Observable<UserAccount[]>;
-  readonly getAccounts: () => UserAccount[];
-  readonly selectAccount: (
-    id?: UserAccountID,
-    monitor?: Monitor,
-  ) => Promise<void>;
-  readonly deleteAccount: (
-    id: UserAccountID,
-    monitor?: Monitor,
-  ) => Promise<void>;
-  readonly updateAccountName: (
-    options: UpdateAccountNameOptions,
-  ) => Promise<void>;
+  readonly currentAccount$: Observable<UserAccount | undefined>;
+  readonly getCurrentAccount: () => UserAccount | undefined;
+  readonly accounts$: Observable<ReadonlyArray<UserAccount>>;
+  readonly getAccounts: () => ReadonlyArray<UserAccount>;
+  readonly selectAccount: (id?: UserAccountID, monitor?: Monitor) => Promise<void>;
+  readonly deleteAccount: (id: UserAccountID, monitor?: Monitor) => Promise<void>;
+  readonly updateAccountName: (options: UpdateAccountNameOptions) => Promise<void>;
   readonly sign: (
     options: {
-      account: UserAccountID;
-      message: string;
-      monitor?: Monitor;
+      readonly account: UserAccountID;
+      readonly message: string;
+      readonly monitor?: Monitor;
     },
   ) => Promise<Witness>;
 }
 
 export interface Provider {
-  readonly networks$: Observable<NetworkType[]>;
-  readonly getNetworks: () => NetworkType[];
+  readonly networks$: Observable<ReadonlyArray<NetworkType>>;
+  readonly getNetworks: () => ReadonlyArray<NetworkType>;
   readonly getUnclaimed: (
     network: NetworkType,
     address: AddressString,
     monitor?: Monitor,
-  ) => Promise<{ unclaimed: Input[]; amount: BigNumber }>;
+  ) => Promise<{ readonly unclaimed: ReadonlyArray<Input>; readonly amount: BigNumber }>;
   readonly getUnspentOutputs: (
     network: NetworkType,
     address: AddressString,
     monitor?: Monitor,
-  ) => Promise<UnspentOutput[]>;
-  readonly relayTransaction: (
-    network: NetworkType,
-    transaction: string,
-    monitor?: Monitor,
-  ) => Promise<Transaction>;
+  ) => Promise<ReadonlyArray<UnspentOutput>>;
+  readonly relayTransaction: (network: NetworkType, transaction: string, monitor?: Monitor) => Promise<Transaction>;
   readonly getTransactionReceipt: (
     network: NetworkType,
     hash: Hash256String,
@@ -130,29 +119,22 @@ export interface Provider {
     hash: Hash256String,
     monitor?: Monitor,
   ) => Promise<RawInvocationData>;
-  readonly testInvoke: (
-    network: NetworkType,
-    transaction: string,
-    monitor?: Monitor,
-  ) => Promise<RawInvocationResult>;
-  readonly getNetworkSettings: (
-    network: NetworkType,
-    monitor?: Monitor,
-  ) => Promise<NetworkSettings>;
+  readonly testInvoke: (network: NetworkType, transaction: string, monitor?: Monitor) => Promise<RawInvocationResult>;
+  readonly getNetworkSettings: (network: NetworkType, monitor?: Monitor) => Promise<NetworkSettings>;
   readonly read: (network: NetworkType) => DataProvider;
 }
 
 interface TransactionOptionsFull {
-  from: UserAccountID;
-  attributes: Attribute[];
-  networkFee: BigNumber;
-  monitor?: Monitor;
+  readonly from: UserAccountID;
+  readonly attributes: ReadonlyArray<Attribute>;
+  readonly networkFee: BigNumber;
+  readonly monitor?: Monitor;
 }
 
-const NEO_ONE_ATTRIBUTE = {
+const NEO_ONE_ATTRIBUTE: AttributeArg = {
   usage: 'Remark15',
   data: Buffer.from('neo-one', 'utf8').toString('hex'),
-} as Attribute;
+};
 
 const NEO_TRANSFER_DURATION_SECONDS = metrics.createHistogram({
   name: 'neo_transfer_duration_seconds',
@@ -180,24 +162,16 @@ const NEO_INVOKE_RAW_FAILURES_TOTAL = metrics.createCounter({
   labelNames: [labelNames.INVOKE_RAW_METHOD],
 });
 
-export class LocalUserAccountProvider<
-  TKeyStore extends KeyStore,
-  TProvider extends Provider
-> implements UserAccountProvider {
+export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider extends Provider>
+  implements UserAccountProvider {
   public readonly type: string;
-  public readonly currentAccount$: Observable<UserAccount | null>;
-  public readonly accounts$: Observable<UserAccount[]>;
-  public readonly networks$: Observable<NetworkType[]>;
+  public readonly currentAccount$: Observable<UserAccount | undefined>;
+  public readonly accounts$: Observable<ReadonlyArray<UserAccount>>;
+  public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
   public readonly keystore: TKeyStore;
   public readonly provider: TProvider;
 
-  constructor({
-    keystore,
-    provider,
-  }: {
-    keystore: TKeyStore;
-    provider: TProvider;
-  }) {
+  public constructor({ keystore, provider }: { readonly keystore: TKeyStore; readonly provider: TProvider }) {
     this.type = keystore.type;
     this.keystore = keystore;
     this.provider = provider;
@@ -207,28 +181,23 @@ export class LocalUserAccountProvider<
     this.networks$ = provider.networks$;
   }
 
-  public getCurrentAccount(): UserAccount | null {
+  public getCurrentAccount(): UserAccount | undefined {
     return this.keystore.getCurrentAccount();
   }
 
-  public getAccounts(): UserAccount[] {
+  public getAccounts(): ReadonlyArray<UserAccount> {
     return this.keystore.getAccounts();
   }
 
-  public getNetworks(): NetworkType[] {
+  public getNetworks(): ReadonlyArray<NetworkType> {
     return this.provider.getNetworks();
   }
 
   public async transfer(
-    transfers: Transfer[],
+    transfers: ReadonlyArray<Transfer>,
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>> {
-    const {
-      from,
-      attributes,
-      networkFee,
-      monitor,
-    } = this.getTransactionOptions(options);
+    const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
       async (span) => {
@@ -268,15 +237,8 @@ export class LocalUserAccountProvider<
     );
   }
 
-  public async claim(
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt>> {
-    const {
-      from,
-      attributes,
-      networkFee,
-      monitor,
-    } = this.getTransactionOptions(options);
+  public async claim(options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt>> {
+    const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
       async (span) => {
@@ -329,7 +291,7 @@ export class LocalUserAccountProvider<
     );
   }
 
-  public publish(
+  public async publish(
     contractIn: ContractRegister,
     options?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt>> {
@@ -339,9 +301,7 @@ export class LocalUserAccountProvider<
         toContractParameterType(assertContractParameterTypeJSON(parameter)),
       ),
 
-      returnType: toContractParameterType(
-        assertContractParameterTypeJSON(contractIn.returnType),
-      ),
+      returnType: toContractParameterType(assertContractParameterTypeJSON(contractIn.returnType)),
 
       name: contractIn.name,
       codeVersion: contractIn.codeVersion,
@@ -359,7 +319,7 @@ export class LocalUserAccountProvider<
     sb.emitSysCall(
       'Neo.Contract.Create',
       contract.script,
-      Buffer.from(contract.parameterList),
+      Buffer.from([...contract.parameterList]),
       contract.returnType,
       contract.contractProperties,
       contract.name,
@@ -378,17 +338,14 @@ export class LocalUserAccountProvider<
           result = this.getInvocationResultError(data.result);
         } else {
           const [createdContract] = data.contracts;
-          if (createdContract == null) {
+          // tslint:disable-next-line strict-type-predicates
+          if (createdContract === undefined) {
             throw new InvalidTransactionError(
-              'Something went wrong! Expected a contract to have been created, ' +
-                'but none was found',
+              'Something went wrong! Expected a contract to have been created, ' + 'but none was found',
             );
           }
 
-          result = this.getInvocationResultSuccess(
-            data.result,
-            createdContract,
-          );
+          result = this.getInvocationResultSuccess(data.result, createdContract);
         }
 
         return {
@@ -402,7 +359,7 @@ export class LocalUserAccountProvider<
     });
   }
 
-  public registerAsset(
+  public async registerAsset(
     asset: AssetRegister,
     options?: TransactionOptions,
   ): Promise<TransactionResult<RegisterAssetReceipt>> {
@@ -428,10 +385,9 @@ export class LocalUserAccountProvider<
           result = this.getInvocationResultError(data.result);
         } else {
           const createdAsset = data.asset;
-          if (createdAsset == null) {
+          if (createdAsset === undefined) {
             throw new InvalidTransactionError(
-              'Something went wrong! Expected a asset to have been created, ' +
-                'but none was found',
+              'Something went wrong! Expected a asset to have been created, ' + 'but none was found',
             );
           }
 
@@ -450,22 +406,14 @@ export class LocalUserAccountProvider<
   }
 
   public async issue(
-    transfers: Transfer[],
+    transfers: ReadonlyArray<Transfer>,
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt>> {
-    const {
-      from,
-      attributes,
-      networkFee,
-      monitor,
-    } = this.getTransactionOptions(options);
+    const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
       async (span) => {
-        const settings = await this.provider.getNetworkSettings(
-          from.network,
-          span,
-        );
+        const settings = await this.provider.getNetworkSettings(from.network, span);
 
         const { inputs, outputs } = await this.getTransfersInputOutputs({
           transfers: [],
@@ -507,15 +455,16 @@ export class LocalUserAccountProvider<
     );
   }
 
-  public invoke(
+  public async invoke(
     contract: Hash160String,
     method: string,
-    params: Array<ScriptBuilderParam | null>,
-    paramsZipped: Array<[string, Param | null]>,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
-    optionsIn?: InvokeTransactionOptions,
+    options: InvokeTransactionOptions = {},
   ): Promise<TransactionResult<InvokeReceiptInternal>> {
-    const options = optionsIn || {};
+    const { attributes = [] } = options;
+
     return this.invokeRaw({
       script: clientUtils.getInvokeMethodScript({
         hash: contract,
@@ -525,16 +474,12 @@ export class LocalUserAccountProvider<
 
       options: {
         from: options.from,
-        attributes: (options.attributes || []).concat(
+        attributes: attributes.concat(
           [
             {
               usage: 'Remark14',
               data: Buffer.from(
-                `neo-one-invoke:${this.getInvokeAttributeTag(
-                  contract,
-                  method,
-                  paramsZipped,
-                )}`,
+                `neo-one-invoke:${this.getInvokeAttributeTag(contract, method, paramsZipped)}`,
                 'utf8',
               ).toString('hex'),
             },
@@ -542,8 +487,9 @@ export class LocalUserAccountProvider<
               ? ({
                   usage: 'Script',
                   data: contract,
+                  // tslint:disable-next-line no-any
                 } as any)
-              : null,
+              : undefined,
           ].filter(commonUtils.notNull),
         ),
         networkFee: options.networkFee,
@@ -566,7 +512,7 @@ export class LocalUserAccountProvider<
 
               verification: Buffer.alloc(0, 0),
             })
-          : null,
+          : undefined,
       ].filter(commonUtils.notNull),
       method: 'invoke',
       labels: {
@@ -575,18 +521,13 @@ export class LocalUserAccountProvider<
     });
   }
 
-  public call(
+  public async call(
     contract: Hash160String,
     method: string,
-    params: Array<ScriptBuilderParam | null>,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
     options: TransactionOptions = {},
   ): Promise<RawInvocationResult> {
-    const {
-      from,
-      attributes,
-      networkFee,
-      monitor,
-    } = this.getTransactionOptions(options);
+    const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
       async (span) => {
@@ -610,11 +551,7 @@ export class LocalUserAccountProvider<
           }),
         });
 
-        return this.provider.testInvoke(
-          from.network,
-          testTransaction.serializeWire().toString('hex'),
-          span,
-        );
+        return this.provider.testInvoke(from.network, testTransaction.serializeWire().toString('hex'), span);
       },
       {
         name: 'neo_call',
@@ -627,23 +564,15 @@ export class LocalUserAccountProvider<
     );
   }
 
-  public async selectAccount(
-    id?: UserAccountID,
-    monitor?: Monitor,
-  ): Promise<void> {
+  public async selectAccount(id?: UserAccountID, monitor?: Monitor): Promise<void> {
     await this.keystore.selectAccount(id, monitor);
   }
 
-  public async deleteAccount(
-    id: UserAccountID,
-    monitor?: Monitor,
-  ): Promise<void> {
+  public async deleteAccount(id: UserAccountID, monitor?: Monitor): Promise<void> {
     await this.keystore.deleteAccount(id, monitor);
   }
 
-  public async updateAccountName(
-    options: UpdateAccountNameOptions,
-  ): Promise<void> {
+  public async updateAccountName(options: UpdateAccountNameOptions): Promise<void> {
     await this.keystore.updateAccountName(options);
   }
 
@@ -651,18 +580,14 @@ export class LocalUserAccountProvider<
     return this.provider.read(network);
   }
 
-  private getTransactionOptions(
-    optionsIn?: TransactionOptions | InvokeTransactionOptions,
-  ): TransactionOptionsFull {
-    const options = optionsIn || {};
-    // $FlowFixMe
-    const attributes = options.attributes || ([] as Attribute[]);
+  private getTransactionOptions(options: TransactionOptions | InvokeTransactionOptions = {}): TransactionOptionsFull {
+    const { attributes = [], networkFee = utils.ZERO_BIG_NUMBER } = options;
 
     const { from: fromIn } = options;
     let from = fromIn;
-    if (from == null) {
+    if (from === undefined) {
       const fromAccount = this.getCurrentAccount();
-      if (fromAccount == null) {
+      if (fromAccount === undefined) {
         throw new NoAccountError();
       }
       from = fromAccount.id;
@@ -670,15 +595,13 @@ export class LocalUserAccountProvider<
 
     return {
       from,
-      attributes: attributes.concat(NEO_ONE_ATTRIBUTE),
-      networkFee: options.networkFee || utils.ZERO_BIG_NUMBER,
+      attributes: attributes.concat([NEO_ONE_ATTRIBUTE]),
+      networkFee,
       monitor: options.monitor,
     };
   }
 
-  private getInvocationResultError(
-    result: RawInvocationResultError,
-  ): InvocationResultError {
+  private getInvocationResultError(result: RawInvocationResultError): InvocationResultError {
     return {
       state: result.state,
       gasConsumed: result.gasConsumed,
@@ -687,10 +610,7 @@ export class LocalUserAccountProvider<
     };
   }
 
-  private getInvocationResultSuccess<T>(
-    result: RawInvocationResultSuccess,
-    value: T,
-  ): InvocationResultSuccess<T> {
+  private getInvocationResultSuccess<T>(result: RawInvocationResultSuccess, value: T): InvocationResultSuccess<T> {
     return {
       state: result.state,
       gasConsumed: result.gasConsumed,
@@ -704,36 +624,29 @@ export class LocalUserAccountProvider<
     options = {},
     onConfirm,
     method,
-    scripts: scriptsIn,
-    labels,
+    scripts = [],
+    labels = {},
   }: {
-    script: Buffer;
-    options?: TransactionOptions | InvokeTransactionOptions;
-    onConfirm: (
+    readonly script: Buffer;
+    readonly options?: TransactionOptions | InvokeTransactionOptions;
+    readonly onConfirm: (
       options: {
-        transaction: Transaction;
-        data: RawInvocationData;
-        receipt: TransactionReceipt;
+        readonly transaction: Transaction;
+        readonly data: RawInvocationData;
+        readonly receipt: TransactionReceipt;
       },
     ) => Promise<T> | T;
-    method: string;
-    scripts?: WitnessModel[];
-    labels?: Labels;
+    readonly method: string;
+    readonly scripts?: ReadonlyArray<WitnessModel>;
+    readonly labels?: Labels;
   }): Promise<TransactionResult<T>> {
-    const {
-      from,
-      attributes: attributesIn,
-      networkFee,
-      monitor,
-    } = this.getTransactionOptions(options);
+    const { from, attributes: attributesIn, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
       async (span) => {
-        const transfers = (options as any).transfers || [];
-        const {
-          inputs: testInputs,
-          outputs: testOutputs,
-        } = await this.getTransfersInputOutputs({
+        const transfersIn = (options as InvokeTransactionOptions).transfers;
+        const transfers = transfersIn === undefined ? [] : transfersIn;
+        const { inputs: testInputs, outputs: testOutputs } = await this.getTransfersInputOutputs({
           transfers,
           from,
           gas: networkFee,
@@ -744,8 +657,6 @@ export class LocalUserAccountProvider<
           usage: 'Remark15',
           data: Buffer.from(`${utils.randomUInt()}`, 'utf8').toString('hex'),
         });
-
-        const scripts = scriptsIn || [];
 
         const testTransaction = new InvocationTransaction({
           version: 1,
@@ -789,13 +700,9 @@ export class LocalUserAccountProvider<
           from,
           transaction: invokeTransaction,
           onConfirm: async ({ transaction, receipt }) => {
-            const data = await this.provider.getInvocationData(
-              from.network,
-              transaction.txid,
-            );
+            const data = await this.provider.getInvocationData(from.network, transaction.txid);
 
-            const res = await onConfirm({ transaction, receipt, data });
-            return res;
+            return onConfirm({ transaction, receipt, data });
           },
           monitor: span,
         });
@@ -803,7 +710,7 @@ export class LocalUserAccountProvider<
       {
         name: 'neo_invoke_raw',
         labels: {
-          ...(labels || {}),
+          ...labels,
           [labelNames.INVOKE_RAW_METHOD]: method,
         },
 
@@ -817,21 +724,21 @@ export class LocalUserAccountProvider<
     );
   }
 
-  private sendTransaction<T>({
+  private async sendTransaction<T>({
     transaction: transactionUnsignedIn,
     from,
     onConfirm,
     monitor,
   }: {
-    transaction: TransactionModel;
-    from: UserAccountID;
-    onConfirm: (
+    readonly transaction: TransactionModel;
+    readonly from: UserAccountID;
+    readonly onConfirm: (
       options: {
-        transaction: Transaction;
-        receipt: TransactionReceipt;
+        readonly transaction: Transaction;
+        readonly receipt: TransactionReceipt;
       },
     ) => Promise<T>;
-    monitor?: Monitor;
+    readonly monitor?: Monitor;
   }): Promise<TransactionResult<T>> {
     return this.capture(
       async (span) => {
@@ -839,11 +746,11 @@ export class LocalUserAccountProvider<
         const scriptHash = addressToScriptHash(from.address);
         if (
           transactionUnsigned.inputs.length === 0 &&
-          ((transactionUnsigned as any).claims == null ||
-            /* istanbul ignore next */
+          // tslint:disable no-any
+          ((transactionUnsigned as any).claims == undefined ||
             !Array.isArray((transactionUnsigned as any).claims) ||
-            /* istanbul ignore next */
             (transactionUnsigned as any).claims.length === 0)
+          // tslint:enable no-any
         ) {
           transactionUnsigned = transactionUnsigned.clone({
             attributes: transactionUnsigned.attributes.concat(
@@ -877,16 +784,13 @@ export class LocalUserAccountProvider<
 
         return {
           transaction,
+          // tslint:disable-next-line no-unnecessary-type-annotation
           confirmed: async (optionsIn: GetOptions = {}): Promise<T> => {
-            const options = { ...optionsIn };
-            if (options.timeoutMS == null) {
-              options.timeoutMS = 120000;
-            }
-            const receipt = await this.provider.getTransactionReceipt(
-              from.network,
-              transaction.txid,
-              options,
-            );
+            const options = {
+              ...optionsIn,
+              timeoutMS: optionsIn.timeoutMS === undefined ? 120000 : optionsIn.timeoutMS,
+            };
+            const receipt = await this.provider.getTransactionReceipt(from.network, transaction.txid, options);
 
             return onConfirm({ transaction, receipt });
           },
@@ -919,22 +823,16 @@ export class LocalUserAccountProvider<
     scriptHash,
     witness,
   }: {
-    transaction: TransactionModel;
-    scriptHash: Hash160String;
-    witness: WitnessModel;
+    readonly transaction: TransactionModel;
+    readonly scriptHash: Hash160String;
+    readonly witness: WitnessModel;
   }): TransactionModel {
     const scriptAttributes = transaction.attributes.filter(
-      (attribute): attribute is UInt160Attribute =>
-        attribute.usage === AttributeUsage.Script,
+      (attribute): attribute is UInt160Attribute => attribute.usage === AttributeUsage.Script,
     );
-    const scriptHashes = scriptAttributes.map((attribute) =>
-      common.uInt160ToString(attribute.value),
-    );
+    const scriptHashes = scriptAttributes.map((attribute) => common.uInt160ToString(attribute.value));
 
-    if (
-      scriptHashes.length === 2 ||
-      (scriptHashes.length === 1 && scriptHashes[0] !== scriptHash)
-    ) {
+    if (scriptHashes.length === 2 || (scriptHashes.length === 1 && scriptHashes[0] !== scriptHash)) {
       let otherHash = scriptHashes[0];
       if (scriptHashes.length === 2) {
         const [first, second] = scriptHashes;
@@ -945,23 +843,21 @@ export class LocalUserAccountProvider<
         otherHash = first === scriptHash ? second : first;
       }
 
-      const otherScript = transaction.scripts[0];
-      if (otherScript == null || transaction.scripts.length !== 1) {
+      if (transaction.scripts.length !== 1) {
         throw new InvalidTransactionError('Something went wrong!');
       }
 
+      const otherScript = transaction.scripts[0];
+
       return transaction.clone({
-        scripts: _.sortBy(
-          [[scriptHash, witness], [otherHash, otherScript]] as Array<
-            [string, WitnessModel]
-          >,
+        scripts: _.sortBy<[string, WitnessModel]>(
+          [[scriptHash, witness], [otherHash, otherScript]],
           (value) => value[0],
-        ).map((value: [string, WitnessModel]) => value[1]),
+        ).map((value) => value[1]),
       });
-    } else if (
-      scriptHashes.length === 0 ||
-      (scriptHashes.length === 1 && scriptHashes[0] === scriptHash)
-    ) {
+    }
+
+    if (scriptHashes.length === 0 || (scriptHashes.length === 1 && scriptHashes[0] === scriptHash)) {
       if (transaction.scripts.length !== 0) {
         throw new InvalidTransactionError('Something went wrong!');
       }
@@ -974,53 +870,44 @@ export class LocalUserAccountProvider<
 
   private async getTransfersInputOutputs({
     from,
-    transfers: transfersIn,
+    transfers,
     gas,
     monitor,
   }: {
-    from: UserAccountID;
-    transfers: Transfer[];
-    gas: BigNumber;
-    monitor?: Monitor;
-  }): Promise<{ outputs: Output[]; inputs: Input[] }> {
-    const transfers = transfersIn.map((transfer) => ({
-      to: transfer.to,
-      asset: transfer.asset,
-      amount: transfer.amount,
-    })) as Array<{
-      to?: AddressString;
-      asset: Hash256String;
-      amount: BigNumber;
-    }>;
-
+    readonly from: UserAccountID;
+    readonly transfers: ReadonlyArray<Transfer>;
+    readonly gas: BigNumber;
+    readonly monitor?: Monitor;
+  }): Promise<{ readonly outputs: ReadonlyArray<Output>; readonly inputs: ReadonlyArray<Input> }> {
     if (transfers.length === 0 && gas.lte(utils.ZERO_BIG_NUMBER)) {
       return { inputs: [], outputs: [] };
     }
 
-    const allOutputs = await this.provider.getUnspentOutputs(
-      from.network,
-      from.address,
-      monitor,
-    );
+    const allOutputs = await this.provider.getUnspentOutputs(from.network, from.address, monitor);
 
     return Object.values(
       _.groupBy(
         gas.isEqualTo(utils.ZERO_BIG_NUMBER)
           ? transfers
-          : transfers.concat({
-              amount: gas,
-              asset: common.GAS_ASSET_HASH,
-            }),
+          : transfers.concat([
+              {
+                amount: gas,
+                asset: common.GAS_ASSET_HASH,
+                // tslint:disable-next-line no-any
+              } as any,
+            ]),
         ({ asset }) => asset,
       ),
     ).reduce(
       (acc, toByAsset) => {
         const { asset } = toByAsset[0];
-        const assetResults = toByAsset.reduce(
-          (
-            { remaining, remainingOutputs, inputs, outputs: innerOutputs },
-            { amount, to },
-          ) => {
+        const assetResults = toByAsset.reduce<{
+          remaining: BigNumber;
+          remainingOutputs: ReadonlyArray<UnspentOutput>;
+          inputs: ReadonlyArray<Input>;
+          outputs: ReadonlyArray<Output>;
+        }>(
+          ({ remaining, remainingOutputs, inputs, outputs: innerOutputs }, { amount, to }) => {
             const result = this.getTransferInputOutputs({
               from: from.address,
               to,
@@ -1039,21 +926,21 @@ export class LocalUserAccountProvider<
           },
           {
             remaining: utils.ZERO_BIG_NUMBER,
-            remainingOutputs: allOutputs.filter(
-              (output) => output.asset === asset,
-            ),
-            inputs: [] as Input[],
-            outputs: [] as Output[],
+            remainingOutputs: allOutputs.filter((output) => output.asset === asset),
+            inputs: [],
+            outputs: [],
           },
         );
 
-        const outputs = acc.outputs.concat(assetResults.outputs);
+        let outputs = acc.outputs.concat(assetResults.outputs);
         if (assetResults.remaining.gt(utils.ZERO_BIG_NUMBER)) {
-          outputs.push({
-            address: from.address,
-            asset,
-            value: assetResults.remaining,
-          } as Output);
+          outputs = outputs.concat([
+            {
+              address: from.address,
+              asset,
+              value: assetResults.remaining,
+            },
+          ]);
         }
 
         return {
@@ -1072,23 +959,23 @@ export class LocalUserAccountProvider<
     remainingOutputs,
     remaining,
   }: {
-    from: AddressString;
-    to?: AddressString;
-    amount: BigNumber;
-    asset: Hash256String;
-    remainingOutputs: UnspentOutput[];
-    remaining: BigNumber;
+    readonly from: AddressString;
+    readonly to?: AddressString;
+    readonly amount: BigNumber;
+    readonly asset: Hash256String;
+    readonly remainingOutputs: ReadonlyArray<UnspentOutput>;
+    readonly remaining: BigNumber;
   }): {
-    inputs: Input[];
-    outputs: Output[];
-    remainingOutputs: UnspentOutput[];
-    remaining: BigNumber;
+    readonly inputs: ReadonlyArray<Input>;
+    readonly outputs: ReadonlyArray<Output>;
+    readonly remainingOutputs: ReadonlyArray<UnspentOutput>;
+    readonly remaining: BigNumber;
   } {
     const amount = originalAmount.minus(remaining);
 
-    const outputs =
-      to == null
-        ? ([] as Output[])
+    const outputs: Output[] =
+      to === undefined
+        ? []
         : [
             {
               address: to,
@@ -1106,14 +993,9 @@ export class LocalUserAccountProvider<
       };
     }
 
-    const outputsOrdered = remainingOutputs
-      .sort((coinA, coinB) => coinA.value.comparedTo(coinB.value))
-      .reverse();
+    const outputsOrdered = remainingOutputs.sort((coinA, coinB) => coinA.value.comparedTo(coinB.value)).reverse();
 
-    const sum = outputsOrdered.reduce(
-      (acc: BigNumber, coin) => acc.plus(coin.value),
-      utils.ZERO_BIG_NUMBER,
-    );
+    const sum = outputsOrdered.reduce<BigNumber>((acc, coin) => acc.plus(coin.value), utils.ZERO_BIG_NUMBER);
 
     if (sum.lt(amount)) {
       throw new InsufficientFundsError(sum, amount);
@@ -1122,6 +1004,7 @@ export class LocalUserAccountProvider<
     // find input coins
     let k = 0;
     let amountRemaining = amount.plus(utils.ZERO_BIG_NUMBER);
+    // tslint:disable-next-line no-loop-statement
     while (outputsOrdered[k].value.lte(amountRemaining)) {
       amountRemaining = amountRemaining.minus(outputsOrdered[k].value);
       if (amountRemaining.isEqualTo(utils.ZERO_BIG_NUMBER)) {
@@ -1131,17 +1014,18 @@ export class LocalUserAccountProvider<
     }
 
     let coinAmount = utils.ZERO_BIG_NUMBER;
-    const inputs = [] as Input[];
+    const mutableInputs: Input[] = [];
+    // tslint:disable-next-line no-loop-statement
     for (let i = 0; i < k + 1; i += 1) {
       coinAmount = coinAmount.plus(outputsOrdered[i].value);
-      inputs.push({
+      mutableInputs.push({
         txid: outputsOrdered[i].txid,
         vout: outputsOrdered[i].vout,
       });
     }
 
     return {
-      inputs,
+      inputs: mutableInputs,
       outputs,
       remainingOutputs: outputsOrdered.slice(k + 1),
       remaining: coinAmount.minus(amount),
@@ -1151,20 +1035,17 @@ export class LocalUserAccountProvider<
   private getInvokeAttributeTag(
     contract: Hash160String,
     method: string,
-    paramsZipped: Array<[string, Param | null]>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
   ): string {
     return JSON.stringify({
       contract,
       method,
-      params: paramsZipped.map(([name, param]) => [
-        name,
-        this.paramToJSON(param),
-      ]),
+      params: paramsZipped.map(([name, param]) => [name, this.paramToJSON(param)]),
     });
   }
 
-  private paramToJSON(param: Param | null): ParamJSON | null {
-    if (param == null) {
+  private paramToJSON(param: Param | undefined): ParamJSON | undefined {
+    if (param === undefined) {
       return param;
     }
 
@@ -1172,22 +1053,22 @@ export class LocalUserAccountProvider<
       return param.map((value) => this.paramToJSON(value));
     }
 
-    if (BigNumber.isBigNumber(param)) {
+    if (BigNumber.isBigNumber(param) || param instanceof BigNumber) {
       return param.toString();
     }
 
-    return param as any;
+    return param;
   }
 
-  private convertAttributes(attributes: Attribute[]): AttributeModel[] {
+  private convertAttributes(attributes: ReadonlyArray<Attribute>): ReadonlyArray<AttributeModel> {
     return attributes.map((attribute) => converters.attribute(attribute));
   }
 
-  private convertInputs(inputs: Input[]): InputModel[] {
+  private convertInputs(inputs: ReadonlyArray<Input>): ReadonlyArray<InputModel> {
     return inputs.map((input) => converters.input(input));
   }
 
-  private convertOutputs(outputs: Output[]): OutputModel[] {
+  private convertOutputs(outputs: ReadonlyArray<Output>): ReadonlyArray<OutputModel> {
     return outputs.map((output) => converters.output(output));
   }
 
@@ -1195,27 +1076,26 @@ export class LocalUserAccountProvider<
     return converters.witness(script);
   }
 
-  private capture<T>(
+  private async capture<T>(
     func: (monitor?: Monitor) => Promise<T>,
     {
       name,
-      labels: labelsIn,
+      labels = {},
       metric,
     }: {
-      name: string;
-      labels?: Labels;
-      metric?: {
-        total: Histogram;
-        error: Counter;
+      readonly name: string;
+      readonly labels?: Labels;
+      readonly metric?: {
+        readonly total: Histogram;
+        readonly error: Counter;
       };
     },
     monitor?: Monitor,
   ): Promise<T> {
-    if (monitor == null) {
+    if (monitor === undefined) {
       return func();
     }
 
-    const labels = labelsIn || {};
     return monitor
       .at('local_user_account_provider')
       .withLabels(labels)

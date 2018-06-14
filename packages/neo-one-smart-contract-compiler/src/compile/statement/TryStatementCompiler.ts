@@ -7,21 +7,14 @@ import { VisitOptions } from '../types';
 export class TryStatementCompiler extends NodeCompiler<TryStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.TryStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: TryStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: TryStatement, options: VisitOptions): void {
     const catchClause = node.getCatchClause();
-    if (catchClause == null) {
+    if (catchClause === undefined) {
       sb.visit(node.getTryBlock(), options);
     } else {
       sb.withProgramCounter((pc) => {
         sb.withProgramCounter((innerPC) => {
-          sb.visit(
-            node.getTryBlock(),
-            sb.catchPCOptions(options, innerPC.getLast()),
-          );
+          sb.visit(node.getTryBlock(), sb.catchPCOptions(options, innerPC.getLast()));
           sb.emitJmp(node, 'JMP', pc.getLast());
         });
 
@@ -30,7 +23,7 @@ export class TryStatementCompiler extends NodeCompiler<TryStatement> {
     }
 
     const finallyBlock = node.getFinallyBlock();
-    if (finallyBlock != null) {
+    if (finallyBlock !== undefined) {
       sb.reportUnsupported(finallyBlock);
     }
   }

@@ -1,14 +1,11 @@
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';
 
 export interface ByteArrayContractParameterJSON {
-  type: 'ByteArray';
-  value: string;
+  readonly type: 'ByteArray';
+  readonly value: string;
 }
 
 export class ByteArrayContractParameter extends ContractParameterBase<
@@ -16,9 +13,7 @@ export class ByteArrayContractParameter extends ContractParameterBase<
   ByteArrayContractParameterJSON,
   ContractParameterType.ByteArray
 > {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): ByteArrayContractParameter {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): ByteArrayContractParameter {
     const { reader } = options;
     super.deserializeContractParameterBaseWireBase(options);
     const value = reader.readVarBytesLE();
@@ -30,7 +25,7 @@ export class ByteArrayContractParameter extends ContractParameterBase<
   public readonly value: Buffer;
   private readonly sizeInternal: () => number;
 
-  constructor(value: Buffer) {
+  public constructor(value: Buffer) {
     super();
     this.value = value;
     this.sizeInternal = utils.lazy(() => IOHelper.sizeOfVarBytesLE(this.value));
@@ -49,9 +44,7 @@ export class ByteArrayContractParameter extends ContractParameterBase<
     writer.writeVarBytesLE(this.value);
   }
 
-  public serializeJSON(
-    context: SerializeJSONContext,
-  ): ByteArrayContractParameterJSON {
+  public serializeJSON(_context: SerializeJSONContext): ByteArrayContractParameterJSON {
     return {
       type: 'ByteArray',
       value: JSONHelper.writeBuffer(this.value),

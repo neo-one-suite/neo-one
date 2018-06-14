@@ -247,6 +247,7 @@ const updateCompilerOptions = (source: string, compilerOptions: Object) => {
     },
     typeRoots: [
       path.resolve(dir, '..', '..', 'node_modules', '@types'),
+      path.resolve(dir, '..', '..', '@types', 'roots'),
     ],
   };
 }

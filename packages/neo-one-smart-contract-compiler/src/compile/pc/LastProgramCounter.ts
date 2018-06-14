@@ -1,48 +1,39 @@
 import { ProgramCounter } from './ProgramCounter';
 
 export class LastProgramCounter extends ProgramCounter {
-  private pc: number | undefined;
-  private readonly children: LastProgramCounter[] = [];
+  private mutablePC: number | undefined;
+  private readonly mutableChildren: LastProgramCounter[] = [];
 
-  constructor(
-    private readonly startPC: number,
-    private readonly offset?: number,
-  ) {
+  public constructor(private readonly startPC: number, private readonly offset: number = 0) {
     super();
   }
 
   public plus(offset: number): ProgramCounter {
-    const pc = new LastProgramCounter(
-      this.startPC,
-      (this.offset || 0) + offset,
-    );
-    this.children.push(pc);
-    if (this.pc != null) {
-      pc.setPC(this.pc);
+    const pc = new LastProgramCounter(this.startPC, this.offset + offset);
+    this.mutableChildren.push(pc);
+    if (this.mutablePC !== undefined) {
+      pc.setPC(this.mutablePC);
     }
+
     return pc;
   }
 
   public equals(other: ProgramCounter): boolean {
-    return (
-      other instanceof LastProgramCounter &&
-      this.startPC === other.startPC &&
-      this.offset === other.offset
-    );
+    return other instanceof LastProgramCounter && this.startPC === other.startPC && this.offset === other.offset;
   }
 
   public setPC(pc: number): void {
-    this.pc = pc;
-    this.children.forEach((child) => {
+    this.mutablePC = pc;
+    this.mutableChildren.forEach((child) => {
       child.setPC(pc);
     });
   }
 
   public getPC(): number {
-    if (this.pc == null) {
+    if (this.mutablePC === undefined) {
       throw new Error('Unknown PC');
     }
 
-    return this.pc + (this.offset || 0);
+    return this.mutablePC + this.offset;
   }
 }

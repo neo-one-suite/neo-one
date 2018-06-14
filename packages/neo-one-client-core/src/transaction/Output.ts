@@ -10,13 +10,7 @@ import {
   SerializeJSONContext,
   SerializeWire,
 } from '../Serializable';
-import {
-  BinaryReader,
-  BinaryWriter,
-  IOHelper,
-  JSONHelper,
-  utils,
-} from '../utils';
+import { BinaryReader, BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 
 export interface OutputKey {
   readonly hash: UInt256;
@@ -24,25 +18,24 @@ export interface OutputKey {
 }
 
 export interface OutputAdd {
-  asset: UInt256;
-  value: BN;
-  address: UInt160;
+  readonly asset: UInt256;
+  readonly value: BN;
+  readonly address: UInt160;
 }
 
 export interface OutputJSON {
-  n: number;
-  asset: string;
-  value: string;
-  address: string;
+  readonly n: number;
+  readonly asset: string;
+  readonly value: string;
+  readonly address: string;
 }
 
 export class Output implements SerializableWire<Output>, Equatable {
-  public static deserializeWireBase({
-    reader,
-  }: DeserializeWireBaseOptions): Output {
+  public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): Output {
     const asset = reader.readUInt256();
     const value = reader.readFixed8();
     const address = reader.readUInt160();
+
     return new this({ asset, value, address });
   }
 
@@ -56,11 +49,8 @@ export class Output implements SerializableWire<Output>, Equatable {
   public readonly asset: UInt256;
   public readonly value: BN;
   public readonly address: UInt160;
-  public readonly size: number =
-    IOHelper.sizeOfUInt256 + IOHelper.sizeOfUInt16LE + IOHelper.sizeOfUInt160;
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
+  public readonly size: number = IOHelper.sizeOfUInt256 + IOHelper.sizeOfUInt16LE + IOHelper.sizeOfUInt160;
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly equals: Equals = utils.equals(
     Output,
     (other) =>
@@ -69,7 +59,7 @@ export class Output implements SerializableWire<Output>, Equatable {
       common.uInt160Equal(this.address, other.address),
   );
 
-  constructor({ asset, value, address }: OutputAdd) {
+  public constructor({ asset, value, address }: OutputAdd) {
     this.asset = asset;
     this.value = value;
     this.address = address;
@@ -81,10 +71,7 @@ export class Output implements SerializableWire<Output>, Equatable {
     writer.writeUInt160(this.address);
   }
 
-  public serializeJSON(
-    context: SerializeJSONContext,
-    index: number,
-  ): OutputJSON {
+  public serializeJSON(context: SerializeJSONContext, index: number): OutputJSON {
     return {
       n: index,
       asset: JSONHelper.writeUInt256(this.asset),

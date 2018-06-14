@@ -7,11 +7,7 @@ import { VisitOptions } from '../types';
 export class IfStatementCompiler extends NodeCompiler<IfStatement> {
   public readonly kind: SyntaxKind = SyntaxKind.IfStatement;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    node: IfStatement,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, node: IfStatement, options: VisitOptions): void {
     const condition = () => {
       const cond = node.getExpression();
       sb.visit(cond, sb.pushValueOptions(options));
@@ -30,7 +26,7 @@ export class IfStatementCompiler extends NodeCompiler<IfStatement> {
 
     let whenFalse;
     const nodeWhenFalse = node.getElseStatement();
-    if (nodeWhenFalse != null) {
+    if (nodeWhenFalse !== undefined) {
       whenFalse = () => {
         sb.visit(nodeWhenFalse, options);
       };

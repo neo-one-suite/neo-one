@@ -66,9 +66,7 @@ describe('Client', () => {
       client = new Client({});
     }
 
-    expect(testError).toThrow(new Error(
-      'At least one provider is required',
-    ) as any);
+    expect(testError).toThrow(new Error('At least one provider is required') as any);
   });
 
   test('Client constructor throws error on mismatched provider type', () => {
@@ -83,9 +81,7 @@ describe('Client', () => {
       });
     }
 
-    expect(testError).toThrow(new Error(
-      'Provider keys must be named the same as their type',
-    ) as any);
+    expect(testError).toThrow(new Error('Provider keys must be named the same as their type') as any);
   });
 
   test('Client constructor sets up currentAcount$ observable', async () => {
@@ -116,13 +112,11 @@ describe('Client', () => {
 
     const result = client.selectAccount(accountID);
 
-    await expect(result).rejects.toEqual(
-      new UnknownAccountError(accountID.address),
-    );
+    await expect(result).rejects.toEqual(new UnknownAccountError(accountID.address));
   });
 
   test('selectAccount', async () => {
-    provider2.selectAccount = jest.fn(() => Promise.resolve());
+    (provider2 as any).selectAccount = jest.fn(() => Promise.resolve());
 
     expect(client.getCurrentAccount()).toEqual(account1);
     await client.selectAccount(id2);
@@ -154,7 +148,7 @@ describe('Client', () => {
 
   test('deleteAccount', async () => {
     const mocked = jest.fn(() => Promise.resolve());
-    provider2.deleteAccount = mocked;
+    (provider2 as any).deleteAccount = mocked;
 
     await client.deleteAccount(id2);
     expect(mocked.mock.calls).toMatchSnapshot();
@@ -162,7 +156,7 @@ describe('Client', () => {
 
   test('updateAccountName', async () => {
     const mocked = jest.fn(() => Promise.resolve());
-    provider2.updateAccountName = mocked;
+    (provider2 as any).updateAccountName = mocked;
 
     await client.updateAccountName({ id: id2, name: 'newName' });
     expect(mocked.mock.calls).toMatchSnapshot();
@@ -179,7 +173,7 @@ describe('Client', () => {
     const mocked = jest.fn(() => {
       // do nothing
     });
-    provider1.read = mocked;
+    (provider1 as any).read = mocked;
 
     const result = client.read('net1');
     expect(result).toMatchSnapshot();
@@ -277,13 +271,11 @@ describe('Client', () => {
     const expected = '10';
 
     let providerMethod: string = method;
-    if (testCase.providerMethod != null) {
+    if (testCase.providerMethod != undefined) {
       providerMethod = testCase.providerMethod;
     }
     test(method, async () => {
-      (provider1 as any)[providerMethod] = jest.fn(() =>
-        Promise.resolve(expected),
-      );
+      (provider1 as any)[providerMethod] = jest.fn(() => Promise.resolve(expected));
 
       if (method === 'claim' || method === 'publish') {
         (argAssertions as any).assertTransactionOptions = jest.fn(() => true);

@@ -6,7 +6,7 @@ import { Helper } from '../../Helper';
 
 // Input: [val, stringProp, objectVal]
 // Output: [val]
-export abstract class SetObjectPropertyHelperBase extends Helper<Node> {
+export abstract class SetObjectPropertyHelperBase extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     // [objectVal, val, stringProp]
     sb.emitOp(node, 'ROT');
@@ -42,11 +42,7 @@ export abstract class SetObjectPropertyHelperBase extends Helper<Node> {
           // [setObjectVal, objectVal, argsarr]
           sb.emitOp(node, 'ROT');
           // [val]
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.invokeCall({ bindThis: true, noArgs: false }),
-          );
+          sb.emitHelper(node, options, sb.helpers.invokeCall({ bindThis: true, noArgs: false }));
         },
         dataExists: () => {
           // [propVal, stringProp, val]
@@ -73,6 +69,6 @@ export abstract class SetObjectPropertyHelperBase extends Helper<Node> {
     );
   }
 
-  protected abstract getObject(sb: ScriptBuilder): Helper<Node>;
-  protected abstract setDataProperty(sb: ScriptBuilder): Helper<Node>;
+  protected abstract getObject(sb: ScriptBuilder): Helper;
+  protected abstract setDataProperty(sb: ScriptBuilder): Helper;
 }

@@ -1,10 +1,7 @@
 import BN from 'bn.js';
 import { common, UInt160Hex } from '../common';
 import { InvalidFormatError, VerifyError } from '../errors';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
@@ -21,26 +18,19 @@ import {
 import { TransactionType } from './TransactionType';
 
 export interface ClaimTransactionAdd extends TransactionBaseAdd {
-  claims: Input[];
+  readonly claims: ReadonlyArray<Input>;
 }
 
 export interface ClaimTransactionJSON extends TransactionBaseJSON {
-  type: 'ClaimTransaction';
-  claims: InputJSON[];
+  readonly type: 'ClaimTransaction';
+  readonly claims: ReadonlyArray<InputJSON>;
 }
 
-export class ClaimTransaction extends TransactionBase<
-  TransactionType.Claim,
-  ClaimTransactionJSON
-> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): ClaimTransaction {
+export class ClaimTransaction extends TransactionBase<TransactionType.Claim, ClaimTransactionJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): ClaimTransaction {
     const { reader } = options;
 
-    const { type, version } = super.deserializeTransactionBaseStartWireBase(
-      options,
-    );
+    const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Claim) {
       throw new InvalidFormatError();
@@ -48,12 +38,7 @@ export class ClaimTransaction extends TransactionBase<
 
     const claims = reader.readArray(() => Input.deserializeWireBase(options));
 
-    const {
-      attributes,
-      inputs,
-      outputs,
-      scripts,
-    } = super.deserializeTransactionBaseEndWireBase(options);
+    const { attributes, inputs, outputs, scripts } = super.deserializeTransactionBaseEndWireBase(options);
 
     return new this({
       version,
@@ -65,25 +50,15 @@ export class ClaimTransaction extends TransactionBase<
     });
   }
 
-  public readonly claims: Input[];
+  public readonly claims: ReadonlyArray<Input>;
   protected readonly sizeExclusive: () => number = utils.lazy(
-    () =>
-      IOHelper.sizeOfUInt8 +
-      IOHelper.sizeOfArray(this.claims, (claim) => claim.size),
+    () => IOHelper.sizeOfUInt8 + IOHelper.sizeOfArray(this.claims, (claim) => claim.size),
   );
   private readonly claimGetScriptHashesForVerifyingInternal: (
     options: TransactionGetScriptHashesForVerifyingOptions,
   ) => Promise<Set<UInt160Hex>>;
 
-  constructor({
-    version,
-    attributes,
-    inputs,
-    outputs,
-    scripts,
-    hash,
-    claims,
-  }: ClaimTransactionAdd) {
+  public constructor({ version, attributes, inputs, outputs, scripts, hash, claims }: ClaimTransactionAdd) {
     super({
       version,
       type: TransactionType.Claim,
@@ -112,6 +87,7 @@ export class ClaimTransaction extends TransactionBase<
           Promise.all(
             this.claims.map(async (claim) => {
               const output = await getOutput(claim);
+
               return common.uInt160ToHex(output.address);
             }),
           ),
@@ -123,18 +99,18 @@ export class ClaimTransaction extends TransactionBase<
   }
 
   public clone({
-    scripts,
-    attributes,
+    scripts = this.scripts,
+    attributes = this.attributes,
   }: {
-    scripts?: Witness[];
-    attributes?: Attribute[];
+    readonly scripts?: ReadonlyArray<Witness>;
+    readonly attributes?: ReadonlyArray<Attribute>;
   }): ClaimTransaction {
     return new ClaimTransaction({
       version: this.version,
-      attributes: attributes || this.attributes,
+      attributes,
       inputs: this.inputs,
       outputs: this.outputs,
-      scripts: scripts || this.scripts,
+      scripts,
       claims: this.claims,
     });
   }
@@ -145,7 +121,7 @@ export class ClaimTransaction extends TransactionBase<
     });
   }
 
-  public async getNetworkFee(context: FeeContext): Promise<BN> {
+  public async getNetworkFee(_context: FeeContext): Promise<BN> {
     return utils.ZERO;
   }
 
@@ -159,12 +135,8 @@ export class ClaimTransaction extends TransactionBase<
     await Promise.all([super.verify(options), this.verifyInternal(options)]);
   }
 
-  public async serializeJSON(
-    context: SerializeJSONContext,
-  ): Promise<ClaimTransactionJSON> {
-    const transactionBaseJSON = await super.serializeTransactionBaseJSON(
-      context,
-    );
+  public async serializeJSON(context: SerializeJSONContext): Promise<ClaimTransactionJSON> {
+    const transactionBaseJSON = await super.serializeTransactionBaseJSON(context);
 
     return {
       ...transactionBaseJSON,
@@ -173,15 +145,8 @@ export class ClaimTransaction extends TransactionBase<
     };
   }
 
-  private async verifyInternal(
-    options: TransactionVerifyOptions,
-  ): Promise<void> {
-    const {
-      calculateClaimAmount,
-      getOutput,
-      utilityToken,
-      memPool = [],
-    } = options;
+  private async verifyInternal(options: TransactionVerifyOptions): Promise<void> {
+    const { calculateClaimAmount, getOutput, utilityToken, memPool = [] } = options;
     if (hasDuplicateInputs(this.claims)) {
       throw new VerifyError('Duplicate claims');
     }
@@ -194,7 +159,7 @@ export class ClaimTransaction extends TransactionBase<
           hasIntersectingInputs(this.claims, transaction.claims),
       )
     ) {
-      throw new VerifyError('Dupliate claims in mempool');
+      throw new VerifyError('Duplicate claims in mempool');
     }
     const [results, claimAmount] = await Promise.all([
       this.getTransactionResults({ getOutput }),
@@ -203,11 +168,12 @@ export class ClaimTransaction extends TransactionBase<
       }),
     ]);
 
-    const result = Object.entries(results).find(([assetHex, __]) =>
+    // tslint:disable-next-line no-unused
+    const result = Object.entries(results).find(([assetHex, _value]) =>
       common.uInt256Equal(common.hexToUInt256(assetHex), utilityToken.hash),
     );
 
-    if (result == null || result[1].gt(utils.ZERO)) {
+    if (result === undefined || result[1].gt(utils.ZERO)) {
       throw new VerifyError('Invalid claim value');
     }
 

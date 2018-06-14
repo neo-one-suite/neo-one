@@ -63,9 +63,7 @@ describe('AsyncBlockIterator', () => {
   });
 
   test('should retry fetch on UnknownBlockError', async () => {
-    client.getBlock.mockImplementationOnce(() =>
-      Promise.reject(new UnknownBlockError()),
-    );
+    client.getBlock.mockImplementationOnce(() => Promise.reject(new UnknownBlockError()));
 
     await verifyBlockIterator();
   });

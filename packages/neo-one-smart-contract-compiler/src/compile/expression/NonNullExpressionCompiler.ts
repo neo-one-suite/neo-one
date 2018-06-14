@@ -4,15 +4,9 @@ import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export default class NonNullExpressionCompiler extends NodeCompiler<
-  NonNullExpression
-> {
+export class NonNullExpressionCompiler extends NodeCompiler<NonNullExpression> {
   public readonly kind: SyntaxKind = SyntaxKind.NonNullExpression;
-  public visitNode(
-    sb: ScriptBuilder,
-    expr: NonNullExpression,
-    options: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, expr: NonNullExpression, _options: VisitOptions): void {
     sb.reportUnsupported(expr);
   }
 }

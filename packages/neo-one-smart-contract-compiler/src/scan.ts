@@ -1,28 +1,30 @@
-import { ClassDeclaration } from 'ts-simple-ast';
+import { TypeGuards } from 'ts-simple-ast';
 
 import { getLibs } from './symbols';
 import * as utils from './utils';
 
-export interface Contracts {
-  [file: string]: string[];
-}
+export type Contracts = { [K in string]?: ReadonlyArray<string> };
 
 export const scan = async (dir: string): Promise<Contracts> => {
   const ast = await utils.getAst(dir);
   const libs = getLibs(ast);
-  const smartContract = libs.SmartContract.getDeclarations()[0] as ClassDeclaration;
-  return smartContract.getDerivedClasses().reduce(
-    (acc, derived) => {
-      if (!derived.isAbstract()) {
-        const file = derived.getSourceFile().getFilePath();
-        if (acc[file] == null) {
-          acc[file] = [];
-        }
-        acc[file].push(derived.getNameOrThrow());
-      }
+  const smartContract = libs.SmartContract.getDeclarations()[0];
+  if (!TypeGuards.isClassDeclaration(smartContract)) {
+    throw new Error('Something went wrong!');
+  }
 
-      return acc;
-    },
-    {} as Contracts,
-  );
+  return smartContract.getDerivedClasses().reduce<Contracts>((acc, derived) => {
+    if (!derived.isAbstract()) {
+      const file = derived.getSourceFile().getFilePath();
+      const name = derived.getNameOrThrow();
+      const files = acc[file];
+
+      return {
+        ...acc,
+        [file]: files === undefined ? [name] : files.concat([name]),
+      };
+    }
+
+    return acc;
+  }, {});
 };

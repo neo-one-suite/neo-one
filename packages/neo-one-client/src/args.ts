@@ -1,3 +1,4 @@
+// tslint:disable no-any
 import { common } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -22,20 +23,15 @@ import {
 import { converters } from './user/converters';
 
 export const assertString = (name: string, param: any): string => {
-  if (param == null || typeof param !== 'string') {
-    throw new InvalidArgumentError(
-      `Expected string for ${name}, found: ${String(param)}`,
-    );
+  if (param == undefined || typeof param !== 'string') {
+    throw new InvalidArgumentError(`Expected string for ${name}, found: ${String(param)}`);
   }
 
   return param;
 };
 
-export const assertNullableString = (
-  name: string,
-  param?: any,
-): string | null | undefined => {
-  if (param == null) {
+export const assertNullableString = (name: string, param?: any): string | null | undefined => {
+  if (param == undefined) {
     return param;
   }
 
@@ -43,15 +39,13 @@ export const assertNullableString = (
 };
 
 export const assertAddress = (address: any): AddressString => {
-  if (address == null || typeof address !== 'string') {
-    throw new InvalidArgumentError(
-      `Address argument was not a string: ${String(address)}`,
-    );
+  if (address == undefined || typeof address !== 'string') {
+    throw new InvalidArgumentError(`Address argument was not a string: ${String(address)}`);
   }
 
   try {
     addressToScriptHash(address);
-  } catch (error) {
+  } catch {
     throw new InvalidArgumentError(`Invalid address: ${address}`);
   }
 
@@ -62,17 +56,13 @@ export const assertHash160 = (hash: any): Hash160String => {
   const value = assertString('Hash160', hash);
 
   if (!value.startsWith('0x')) {
-    throw new InvalidArgumentError(
-      `Hash160 must start with '0x', found: ${String(hash)}`,
-    );
+    throw new InvalidArgumentError(`Hash160 must start with '0x', found: ${String(hash)}`);
   }
 
   try {
     common.stringToUInt160(value);
-  } catch (error) {
-    throw new InvalidArgumentError(
-      `Invalid Hash160 param, found: ${String(hash)}`,
-    );
+  } catch {
+    throw new InvalidArgumentError(`Invalid Hash160 param, found: ${String(hash)}`);
   }
 
   return value;
@@ -82,17 +72,13 @@ export const assertHash256 = (hash: any): Hash256String => {
   const value = assertString('Hash256', hash);
 
   if (!value.startsWith('0x')) {
-    throw new InvalidArgumentError(
-      `Hash256 must start with '0x', found: ${String(hash)}`,
-    );
+    throw new InvalidArgumentError(`Hash256 must start with '0x', found: ${String(hash)}`);
   }
 
   try {
     common.stringToUInt256(value);
-  } catch (error) {
-    throw new InvalidArgumentError(
-      `Invalid Hash256 param, found: ${String(hash)}`,
-    );
+  } catch {
+    throw new InvalidArgumentError(`Invalid Hash256 param, found: ${String(hash)}`);
   }
 
   return value;
@@ -101,9 +87,7 @@ export const assertHash256 = (hash: any): Hash256String => {
 export const assertBuffer = (buffer: any): BufferString => {
   const value = assertString('Buffer', buffer);
   if (Buffer.from(value, 'hex').toString('hex') !== value.toLowerCase()) {
-    throw new InvalidArgumentError(
-      `Expected hex string, found: ${String(buffer)}`,
-    );
+    throw new InvalidArgumentError(`Expected hex string, found: ${String(buffer)}`);
   }
 
   return value;
@@ -113,28 +97,23 @@ export const assertPublicKey = (publicKey: any): PublicKeyString => {
   const value = assertBuffer(publicKey);
   try {
     common.stringToECPoint(value);
+
     return value;
-  } catch (error) {
-    throw new InvalidArgumentError(
-      `Expected PublicKey, found: ${String(publicKey)}`,
-    );
+  } catch {
+    throw new InvalidArgumentError(`Expected PublicKey, found: ${String(publicKey)}`);
   }
 };
 
 export const assertBigNumber = (value: any): BigNumber => {
-  if (value == null || !BigNumber.isBigNumber(value)) {
-    throw new InvalidArgumentError(
-      `Expected BigNumber, found: ${String(value)}`,
-    );
+  if (value == undefined || !BigNumber.isBigNumber(value)) {
+    throw new InvalidArgumentError(`Expected BigNumber, found: ${String(value)}`);
   }
 
-  return value as any;
+  return value;
 };
 
-export const assertNullableBigNumber = (
-  value: any,
-): BigNumber | null | undefined => {
-  if (value == null) {
+export const assertNullableBigNumber = (value: any): BigNumber | null | undefined => {
+  if (value == undefined) {
     return value;
   }
 
@@ -142,7 +121,7 @@ export const assertNullableBigNumber = (
 };
 
 export const assertBoolean = (value: any): boolean => {
-  if (value == null || typeof value !== 'boolean') {
+  if (value == undefined || typeof value !== 'boolean') {
     throw new InvalidArgumentError(`Expected boolean, found: ${String(value)}`);
   }
 
@@ -150,7 +129,7 @@ export const assertBoolean = (value: any): boolean => {
 };
 
 export const assertNumber = (value: any): number => {
-  if (value == null || typeof value !== 'number') {
+  if (value == undefined || typeof value !== 'number') {
     throw new InvalidArgumentError(`Expected number, found: ${String(value)}`);
   }
 
@@ -158,14 +137,14 @@ export const assertNumber = (value: any): number => {
 };
 
 export const assertNullableNumber = (value: any): number | null | undefined => {
-  if (value != null && typeof value !== 'number') {
+  if (value != undefined && typeof value !== 'number') {
     throw new InvalidArgumentError(`Expected number, found: ${String(value)}`);
   }
 
   return value;
 };
 
-export const assertArray = (value: any): Array<{}> => {
+export const assertArray = (value: any): ReadonlyArray<{}> => {
   if (!Array.isArray(value)) {
     throw new InvalidArgumentError(`Expected Array, found: ${String(value)}`);
   }
@@ -173,72 +152,52 @@ export const assertArray = (value: any): Array<{}> => {
   return value;
 };
 
-export const assertBlockFilter = (
-  filter: any,
-): BlockFilter | null | undefined => {
-  if (filter == null) {
+export const assertBlockFilter = (filter: any): BlockFilter | null | undefined => {
+  if (filter == undefined) {
     return filter;
   }
 
   if (typeof filter !== 'object') {
-    throw new InvalidArgumentError(
-      `Invalid BlockFilter param, found: ${String(filter)}`,
-    );
+    throw new InvalidArgumentError(`Invalid BlockFilter param, found: ${String(filter)}`);
   }
 
   if (_.isEmpty(filter)) {
     return {} as any;
   }
 
-  if (filter.indexStart != null && typeof filter.indexStart !== 'number') {
-    throw new InvalidArgumentError(
-      `Invalid BlockFilter param, found: ${String(filter)}`,
-    );
+  if (filter.indexStart != undefined && typeof filter.indexStart !== 'number') {
+    throw new InvalidArgumentError(`Invalid BlockFilter param, found: ${String(filter)}`);
   }
 
-  if (filter.indexStop != null && typeof filter.indexStop !== 'number') {
-    throw new InvalidArgumentError(
-      `Invalid BlockFilter param, found: ${String(filter)}`,
-    );
+  if (filter.indexStop != undefined && typeof filter.indexStop !== 'number') {
+    throw new InvalidArgumentError(`Invalid BlockFilter param, found: ${String(filter)}`);
   }
 
-  if (
-    filter.indexStart != null &&
-    filter.indexStop != null &&
-    filter.indexStart > filter.indexStop
-  ) {
-    throw new InvalidArgumentError(
-      `Invalid BlockFilter param, found: ${String(filter)}`,
-    );
+  if (filter.indexStart != undefined && filter.indexStop != undefined && filter.indexStart > filter.indexStop) {
+    throw new InvalidArgumentError(`Invalid BlockFilter param, found: ${String(filter)}`);
   }
 
-  return filter as any;
+  return filter;
 };
 
-export const assertGetOptions = (
-  options: any,
-): GetOptions | null | undefined => {
-  if (options == null) {
+export const assertGetOptions = (options: any): GetOptions | null | undefined => {
+  if (options == undefined) {
     return options;
   }
 
   if (typeof options !== 'object') {
-    throw new InvalidArgumentError(
-      `Invalid GetOptions param, found: ${String(options)}`,
-    );
+    throw new InvalidArgumentError(`Invalid GetOptions param, found: ${String(options)}`);
   }
 
   if (_.isEmpty(options)) {
     return {} as any;
   }
 
-  if (options.timeout != null && typeof options.timeout !== 'number') {
-    throw new InvalidArgumentError(
-      `Invalid GetOptions param, found: ${String(options)}`,
-    );
+  if (options.timeout != undefined && typeof options.timeout !== 'number') {
+    throw new InvalidArgumentError(`Invalid GetOptions param, found: ${String(options)}`);
   }
 
-  return options as any;
+  return options;
 };
 
 const ABI_TYPES = new Set([
@@ -256,16 +215,12 @@ const ABI_TYPES = new Set([
 ]);
 
 export const assertABIReturn = (value: any): ABIReturn => {
-  if (value == null || typeof value !== 'object') {
-    throw new InvalidArgumentError(
-      `Invalid ABI return, found: ${String(value)}`,
-    );
+  if (value == undefined || typeof value !== 'object') {
+    throw new InvalidArgumentError(`Invalid ABI return, found: ${String(value)}`);
   }
 
   if (!ABI_TYPES.has(value.type)) {
-    throw new InvalidArgumentError(
-      `Invalid ABI return, found: ${String(value)}`,
-    );
+    throw new InvalidArgumentError(`Invalid ABI return, found: ${String(value)}`);
   }
 
   if (value.type === 'Array') {
@@ -274,85 +229,75 @@ export const assertABIReturn = (value: any): ABIReturn => {
     assertNumber(value.decimals);
   }
 
-  return value as any;
+  return value;
 };
 
 export const assertABIParameter = (value: any): ABIParameter => {
-  if (value == null || typeof value !== 'object') {
-    throw new InvalidArgumentError(
-      `Invalid ABI parameter, found: ${String(value)}`,
-    );
+  if (value == undefined || typeof value !== 'object') {
+    throw new InvalidArgumentError(`Invalid ABI parameter, found: ${String(value)}`);
   }
 
   assertString('name', value.name);
   assertABIReturn(value);
-  return value as any;
+
+  return value;
 };
 
 export const assertABIFunction = (value: any): ABIFunction => {
-  if (value == null || typeof value !== 'object') {
-    throw new InvalidArgumentError(
-      `Invalid ABI function, found: ${String(value)}`,
-    );
+  if (value == undefined || typeof value !== 'object') {
+    throw new InvalidArgumentError(`Invalid ABI function, found: ${String(value)}`);
   }
 
   assertString('name', value.name);
-  if (value.constant != null) {
+  if (value.constant != undefined) {
     assertBoolean(value.constant);
   }
 
-  if (value.parameters != null) {
-    assertArray(value.parameters).map((parameter) =>
-      assertABIParameter(parameter),
-    );
+  if (value.parameters != undefined) {
+    assertArray(value.parameters).forEach(assertABIParameter);
   }
 
   assertABIReturn(value.returnType);
 
-  return value as any;
+  return value;
 };
 
 export const assertABIEvent = (value: any): ABIEvent => {
-  if (value == null || typeof value !== 'object') {
-    throw new InvalidArgumentError(
-      `Invalid ABI event, found: ${String(value)}`,
-    );
+  if (value == undefined || typeof value !== 'object') {
+    throw new InvalidArgumentError(`Invalid ABI event, found: ${String(value)}`);
   }
 
   assertString('name', value.name);
-  assertArray(value.parameters).map((parameter) =>
-    assertABIParameter(parameter),
-  );
+  assertArray(value.parameters).forEach(assertABIParameter);
 
-  return value as any;
+  return value;
 };
 
 export const assertABI = (abi: any): ABI => {
-  if (abi == null || typeof abi !== 'object') {
+  if (abi == undefined || typeof abi !== 'object') {
     throw new InvalidArgumentError(`Invalid ABI param, found: ${String(abi)}`);
   }
 
-  assertArray(abi.functions).map((value) => assertABIFunction(value));
-  if (abi.events != null) {
-    assertArray(abi.events).map((event) => assertABIEvent(event));
+  assertArray(abi.functions).forEach(assertABIFunction);
+  if (abi.events != undefined) {
+    assertArray(abi.events).forEach(assertABIEvent);
   }
 
-  return abi as any;
+  return abi;
 };
 
 export const assertAttributeArg = (attribute?: any): AttributeArg => {
   try {
-    converters.attribute(attribute as any);
-    return attribute as any;
-  } catch (error) {
+    converters.attribute(attribute);
+
+    return attribute;
+  } catch {
     throw new InvalidNamedArgumentError('AttributeArg', attribute);
   }
 };
 
-export const assertTransactionOptions = (
-  options?: any,
-): TransactionOptions | null | undefined => {
-  if (options == null) {
+export const assertTransactionOptions = (options?: any): TransactionOptions | null | undefined => {
+  if (options == undefined) {
     return options;
   }
 
@@ -361,7 +306,7 @@ export const assertTransactionOptions = (
   }
 
   const { from } = options;
-  if (from != null) {
+  if (from != undefined) {
     if (typeof from !== 'object') {
       throw new InvalidNamedArgumentError('TransactionOptions', options);
     }
@@ -369,7 +314,7 @@ export const assertTransactionOptions = (
     assertString('TransactionOptions', from.address);
   }
 
-  if (options.attributes != null) {
+  if (options.attributes != undefined) {
     if (!Array.isArray(options.attributes)) {
       throw new InvalidNamedArgumentError('TransactionOptions', options);
     }
@@ -380,5 +325,5 @@ export const assertTransactionOptions = (
 
   assertNullableBigNumber(options.networkFee);
 
-  return options as any;
+  return options;
 };

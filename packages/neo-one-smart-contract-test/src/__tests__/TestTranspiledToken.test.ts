@@ -1,9 +1,5 @@
-import {
-  abi,
-  addressToScriptHash,
-  createPrivateKey,
-  privateKeyToScriptHash,
-} from '@neo-one/client';
+// tslint:disable no-unsafe-any
+import { abi, addressToScriptHash, createPrivateKey, privateKeyToScriptHash } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
 import appRootDir from 'app-root-dir';
@@ -12,7 +8,7 @@ import path from 'path';
 import { cleanupTest } from '../cleanupTest';
 import { setupBasicTest } from '../setupBasicTest';
 
-const setup = () => {
+const setup = async () => {
   const nep5 = abi.NEP5_STATIC(4);
 
   return setupBasicTest({
@@ -54,14 +50,7 @@ describe('TestTranspiledToken', () => {
   });
 
   test('properties + issue + balanceOf + totalSupply + transfer', async () => {
-    const {
-      networkName,
-      keystore,
-      developerClient,
-      smartContract,
-      masterAccountID,
-      masterPrivateKey,
-    } = await setup();
+    const { networkName, keystore, developerClient, smartContract, masterAccountID, masterPrivateKey } = await setup();
 
     const [nameResult, decimalsResult, symbolResult] = await Promise.all([
       smartContract.name(),
@@ -81,15 +70,10 @@ describe('TestTranspiledToken', () => {
 
     const owner = privateKeyToScriptHash(masterPrivateKey);
     let result = await smartContract.deploy(owner, { from: masterAccountID });
-    let [receipt] = await Promise.all([
-      result.confirmed({ timeoutMS: 30000 }),
-      developerClient.runConsensusNow(),
-    ]);
+    let [receipt] = await Promise.all([result.confirmed({ timeoutMS: 30000 }), developerClient.runConsensusNow()]);
 
     expect(receipt.result.state).toEqual('HALT');
-    expect(receipt.result.gasConsumed.toString()).toMatchSnapshot(
-      'deploy consumed',
-    );
+    expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
     expect(receipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
     expect(receipt.result.value).toBeTruthy();
 
@@ -97,9 +81,7 @@ describe('TestTranspiledToken', () => {
     expect(value).toEqual(owner);
 
     const issueValue = new BigNumber('100');
-    value = await smartContract.balanceOf(
-      addressToScriptHash(masterAccountID.address),
-    );
+    value = await smartContract.balanceOf(addressToScriptHash(masterAccountID.address));
     expect(value.toString()).toEqual(issueValue.toString());
 
     value = await smartContract.totalSupply();
@@ -112,25 +94,16 @@ describe('TestTranspiledToken', () => {
       transferValue,
       { from: masterAccountID },
     );
-    [receipt] = await Promise.all([
-      result.confirmed(),
-      developerClient.runConsensusNow(),
-    ]);
+    [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
 
     expect(receipt.result.state).toEqual('HALT');
-    expect(receipt.result.gasConsumed.toString()).toMatchSnapshot(
-      'transfer consume',
-    );
+    expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('transfer consume');
     expect(receipt.result.gasCost.toString()).toMatchSnapshot('transfer cost');
 
-    value = await smartContract.balanceOf(
-      addressToScriptHash(masterAccountID.address),
-    );
+    value = await smartContract.balanceOf(addressToScriptHash(masterAccountID.address));
     expect(value.toString()).toEqual(transferValue.toString());
 
-    value = await smartContract.balanceOf(
-      addressToScriptHash(account0.address),
-    );
+    value = await smartContract.balanceOf(addressToScriptHash(account0.address));
     expect(value.toString()).toEqual(transferValue.toString());
 
     value = await smartContract.totalSupply();

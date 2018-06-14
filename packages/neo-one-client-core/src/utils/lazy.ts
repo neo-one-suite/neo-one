@@ -1,7 +1,8 @@
 export function lazy<Value>(getValue: () => Value): () => Value {
   let value: Value | undefined;
+
   return () => {
-    if (value == null) {
+    if (value === undefined) {
       value = getValue();
     }
 

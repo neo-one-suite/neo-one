@@ -10,16 +10,15 @@ import {
   Action,
   ActionRaw,
   Event,
-  GetOptions,
   Hash160String,
   InvokeReceipt,
   Log,
   Param,
   SmartContract,
   SmartContractDefinition,
+  SmartContractNetworkDefinition,
   TransactionOptions,
   TransactionResult,
-  UserAccountID,
 } from '../types';
 import * as common from './common';
 
@@ -29,21 +28,22 @@ const getParamsAndOptions = ({
   args,
   client,
 }: {
-  definition: SmartContractDefinition;
-  parameters: ABIParameter[];
-  args: any[];
-  client: Client<any>;
+  readonly definition: SmartContractDefinition;
+  readonly parameters: ReadonlyArray<ABIParameter>;
+  // tslint:disable-next-line no-any
+  readonly args: ReadonlyArray<any>;
+  readonly client: Client;
 }): {
-  params: Array<ScriptBuilderParam | null>;
-  paramsZipped: Array<[string, Param | null]>;
-  options: any;
-  hash: Hash160String;
+  readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
+  readonly paramsZipped: ReadonlyArray<[string, Param | undefined]>;
+  readonly options: TransactionOptions;
+  readonly hash: Hash160String;
 } => {
-  const finalArg = args[args.length - 1];
+  const finalArg = args[args.length - 1] as {} | undefined;
   let params = args;
   let options: TransactionOptions = {};
   if (
-    finalArg != null &&
+    finalArg !== undefined &&
     typeof finalArg === 'object' &&
     !Array.isArray(finalArg) &&
     !BigNumber.isBigNumber(finalArg)
@@ -52,10 +52,10 @@ const getParamsAndOptions = ({
     options = finalArg;
   }
 
-  let from: UserAccountID | undefined = options.from;
-  if (from == null) {
+  let from = options.from;
+  if (from === undefined) {
     const currentAccount = client.getCurrentAccount();
-    if (currentAccount == null) {
+    if (currentAccount === undefined) {
       throw new NoAccountError();
     }
     from = currentAccount.id;
@@ -65,12 +65,13 @@ const getParamsAndOptions = ({
     };
   }
 
-  const contractNetwork = networks[from.network];
-  if (contractNetwork == null) {
+  const contractNetwork = networks[from.network] as SmartContractNetworkDefinition | undefined;
+  if (contractNetwork === undefined) {
     throw new NoContractDeployedError(from.network);
   }
 
   const { converted, zipped } = common.convertParams({ params, parameters });
+
   return {
     params: converted,
     paramsZipped: zipped,
@@ -83,13 +84,17 @@ const convertActions = ({
   actions,
   events,
 }: {
-  actions: ActionRaw[];
-  events: ABIEvent[];
-}): Action[] => {
-  const eventsObj = events.reduce((acc: { [key: string]: ABIEvent }, event) => {
-    acc[event.name] = event;
-    return acc;
-  }, {});
+  readonly actions: ReadonlyArray<ActionRaw>;
+  readonly events: ReadonlyArray<ABIEvent>;
+}): ReadonlyArray<Action> => {
+  const eventsObj = events.reduce<{ [key: string]: ABIEvent }>(
+    (acc, event) => ({
+      ...acc,
+      [event.name]: event,
+    }),
+    {},
+  );
+
   return actions.map((action) =>
     common.convertAction({
       action,
@@ -101,64 +106,57 @@ const convertActions = ({
 const createCall = ({
   definition,
   client,
-  func: { name, parameters, returnType },
+  func: { name, parameters = [], returnType },
 }: {
-  definition: SmartContractDefinition;
-  client: Client<any>;
-  func: ABIFunction;
-}) => async (...args: any[]): Promise<Param | null> => {
+  readonly definition: SmartContractDefinition;
+  readonly client: Client;
+  readonly func: ABIFunction;
+  // tslint:disable-next-line no-any
+}) => async (...args: any[]): Promise<Param | undefined> => {
   const { params, options, hash } = getParamsAndOptions({
     definition,
-    parameters: parameters || [],
+    parameters,
     args,
     client,
   });
 
   const result = await client.call(hash, name, params, options);
+
   return common.convertCallResult({ returnType, result });
 };
 
-const filterEvents = (actions: Array<Event | Log>): Event[] =>
-  actions
-    .map((action) => (action.type === 'Event' ? action : null))
-    .filter(commonUtils.notNull);
-const filterLogs = (actions: Array<Event | Log>): Log[] =>
-  actions
-    .map((action) => (action.type === 'Log' ? action : null))
-    .filter(commonUtils.notNull);
+const filterEvents = (actions: ReadonlyArray<Event | Log>): ReadonlyArray<Event> =>
+  actions.map((action) => (action.type === 'Event' ? action : undefined)).filter(commonUtils.notNull);
+const filterLogs = (actions: ReadonlyArray<Event | Log>): ReadonlyArray<Log> =>
+  actions.map((action) => (action.type === 'Log' ? action : undefined)).filter(commonUtils.notNull);
 
 const createInvoke = ({
   definition,
   client,
-  func: { name, parameters, returnType, verify },
+  func: { name, parameters = [], returnType, verify = false },
 }: {
-  definition: SmartContractDefinition;
-  client: Client<any>;
-  func: ABIFunction;
+  readonly definition: SmartContractDefinition;
+  readonly client: Client;
+  readonly func: ABIFunction;
+  // tslint:disable-next-line no-any
 }) => async (...args: any[]): Promise<TransactionResult<InvokeReceipt>> => {
   const { params, paramsZipped, options, hash } = getParamsAndOptions({
     definition,
-    parameters: parameters || [],
+    parameters,
     args,
     client,
   });
 
-  const result = await client.invoke(
-    hash,
-    name,
-    params,
-    paramsZipped,
-    !!verify,
-    options,
-  );
+  const result = await client.invoke(hash, name, params, paramsZipped, verify, options);
 
   return {
     transaction: result.transaction,
-    confirmed: async (getOptions?: GetOptions): Promise<InvokeReceipt> => {
+    confirmed: async (getOptions?): Promise<InvokeReceipt> => {
       const receipt = await result.confirmed(getOptions);
+      const { events = [] } = definition.abi;
       const actions = convertActions({
         actions: receipt.actions,
-        events: definition.abi.events || [],
+        events,
       });
 
       return {
@@ -181,25 +179,24 @@ export const createSmartContract = ({
   definition,
   client,
 }: {
-  definition: SmartContractDefinition;
-  client: Client<any>;
-}): SmartContract => {
-  const smartContract: SmartContract = {};
-  definition.abi.functions.forEach((func) => {
-    if (func.constant) {
-      smartContract[func.name] = createCall({
-        definition,
-        client,
-        func,
-      });
-    } else {
-      smartContract[func.name] = createInvoke({
-        definition,
-        client,
-        func,
-      });
-    }
-  });
-
-  return smartContract;
-};
+  readonly definition: SmartContractDefinition;
+  readonly client: Client;
+}): SmartContract =>
+  definition.abi.functions.reduce<SmartContract>(
+    (acc, func) => ({
+      ...acc,
+      [func.name]:
+        func.constant === true
+          ? createCall({
+              definition,
+              client,
+              func,
+            })
+          : createInvoke({
+              definition,
+              client,
+              func,
+            }),
+    }),
+    {},
+  );

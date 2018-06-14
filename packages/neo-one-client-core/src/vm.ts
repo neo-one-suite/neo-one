@@ -5,9 +5,9 @@ import { ScriptContainer } from './ScriptContainer';
 import { Witness } from './Witness';
 
 export interface VerifyScriptOptions {
-  scriptContainer: ScriptContainer;
-  hash: UInt160;
-  witness: Witness;
+  readonly scriptContainer: ScriptContainer;
+  readonly hash: UInt160;
+  readonly witness: Witness;
 }
 
 export type VerifyScript = (options: VerifyScriptOptions) => Promise<void>;
@@ -200,13 +200,17 @@ export type OpCode = keyof typeof Op;
 
 export type ByteCode = Op;
 
+// tslint:disable-next-line variable-name no-any
 export const Byte: { [K in ByteCode]: OpCode } = _.invert(Op) as any;
+// tslint:disable-next-line variable-name
 export const ByteBuffer: { [K in ByteCode]: Buffer } = _.fromPairs(
   Object.values(Op).map((byteCode) => [byteCode, Buffer.from([byteCode])]),
+  // tslint:disable-next-line no-any
 ) as any;
 
 export const isByteCode = (value: number): value is ByteCode =>
-  Op[value] != null;
+  // tslint:disable-next-line strict-type-predicates
+  Op[value] !== undefined;
 
 export const assertByteCode = (value: number): ByteCode => {
   if (isByteCode(value)) {
@@ -307,14 +311,15 @@ export class InvalidSysCallError extends CustomError {
   public readonly code = InvalidSysCallError.code;
   public readonly value: string;
 
-  constructor(value: string) {
+  public constructor(value: string) {
     super(`Expected sys call name, found: ${value}`);
     this.value = value;
   }
 }
 
 const isSysCall = (value: string): value is SysCall =>
-  SysCall[value as any] != null;
+  // tslint:disable-next-line strict-type-predicates no-any
+  SysCall[value as any] !== undefined;
 
 export const assertSysCall = (value: string): SysCall => {
   if (isSysCall(value)) {
@@ -327,7 +332,7 @@ export class InvalidVMStateError extends CustomError {
   public static readonly code = 'INVALID_VM_STATE';
   public readonly code = InvalidVMStateError.code;
 
-  constructor(state: number) {
+  public constructor(state: number) {
     super(`Invalid VM State: ${state}`);
   }
 }
@@ -339,7 +344,9 @@ export enum VMState {
   Break = 0x04,
 }
 
-const isVMState = (state: number): state is VMState => VMState[state] != null;
+const isVMState = (state: number): state is VMState =>
+  // tslint:disable-next-line strict-type-predicates
+  VMState[state] !== undefined;
 
 export const assertVMState = (state: number): VMState => {
   if (isVMState(state)) {

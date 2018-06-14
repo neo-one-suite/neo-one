@@ -7,30 +7,27 @@ import { Helper } from '../Helper';
 import { InternalFunctionProperties } from './InternalFunctionProperties';
 
 export interface InvokeCallHelperOptions {
-  bindThis?: boolean;
-  overwriteThis?: boolean;
-  noArgs?: boolean;
+  readonly bindThis?: boolean;
+  readonly overwriteThis?: boolean;
+  readonly noArgs?: boolean;
 }
 
 // Input: [objectVal, ?thisVal, ?argsarray]
 // Output: [val]
 export class InvokeCallHelper extends Helper {
-  public static getKey(
-    options: InvokeCallHelperOptions = { bindThis: false, noArgs: false },
-  ): string {
+  public static getKey(options: InvokeCallHelperOptions = { bindThis: false, noArgs: false }): string {
     const bindThis = options.bindThis || false;
     const overwriteThis = options.overwriteThis || false;
     const noArgs = options.noArgs || false;
+
     return stringify({ bindThis, overwriteThis, noArgs });
   }
 
-  private bindThis: boolean;
-  private overwriteThis: boolean;
-  private noArgs: boolean;
+  private readonly bindThis: boolean;
+  private readonly overwriteThis: boolean;
+  private readonly noArgs: boolean;
 
-  constructor(
-    options: InvokeCallHelperOptions = { bindThis: false, noArgs: false },
-  ) {
+  public constructor(options: InvokeCallHelperOptions = { bindThis: false, noArgs: false }) {
     super();
     this.bindThis = options.bindThis || false;
     this.overwriteThis = options.overwriteThis || false;
@@ -40,16 +37,12 @@ export class InvokeCallHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // ['call', objectVal, ?thisVal, ?argsarray]
-    sb.emitPushString(node, InternalFunctionProperties.CALL);
+    sb.emitPushString(node, InternalFunctionProperties.Call);
     // [func, ?thisVal, ?argsarray]
     sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
     if (this.bindThis) {
       // [func, ?argsarray]
-      sb.emitHelper(
-        node,
-        options,
-        sb.helpers.bindFunctionThis({ overwrite: this.overwriteThis }),
-      );
+      sb.emitHelper(node, options, sb.helpers.bindFunctionThis({ overwrite: this.overwriteThis }));
     }
     if (this.noArgs) {
       // [0, func]

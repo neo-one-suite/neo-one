@@ -6,7 +6,7 @@ import { Helper } from '../Helper';
 import { BlockchainInterfaceName } from './InternalBlockchainInterfaceProperties';
 
 export interface IsBlockchainInterfaceHelperOptions {
-  name: BlockchainInterfaceName;
+  readonly name: BlockchainInterfaceName;
 }
 
 // Input: [objectVal]
@@ -14,7 +14,7 @@ export interface IsBlockchainInterfaceHelperOptions {
 export class IsBlockchainInterfaceHelper extends Helper {
   private readonly name: BlockchainInterfaceName;
 
-  constructor(options: IsBlockchainInterfaceHelperOptions) {
+  public constructor(options: IsBlockchainInterfaceHelperOptions) {
     super();
     this.name = options.name;
   }
@@ -22,6 +22,7 @@ export class IsBlockchainInterfaceHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 

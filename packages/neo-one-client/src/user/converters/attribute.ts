@@ -11,7 +11,9 @@ import {
 import { InvalidNamedArgumentError } from '../../errors';
 import { Attribute as ClientAttribute } from '../../types';
 
+// tslint:disable-next-line cyclomatic-complexity
 export const attribute = (attributeLike: ClientAttribute): Attribute => {
+  // tslint:disable-next-line strict-type-predicates
   if (typeof attributeLike !== 'object') {
     throw new InvalidNamedArgumentError('attribute', attributeLike);
   }
@@ -19,51 +21,48 @@ export const attribute = (attributeLike: ClientAttribute): Attribute => {
   let usage;
   try {
     usage = toAttributeUsage(attributeLike.usage);
-  } catch (error) {
+  } catch {
     throw new InvalidNamedArgumentError('attribute', attributeLike);
   }
 
-  if (
-    usage === AttributeUsage.DescriptionUrl ||
-    usage === AttributeUsage.Description ||
-    usage === AttributeUsage.Remark ||
-    usage === AttributeUsage.Remark1 ||
-    usage === AttributeUsage.Remark2 ||
-    usage === AttributeUsage.Remark3 ||
-    usage === AttributeUsage.Remark4 ||
-    usage === AttributeUsage.Remark5 ||
-    usage === AttributeUsage.Remark6 ||
-    usage === AttributeUsage.Remark7 ||
-    usage === AttributeUsage.Remark8 ||
-    usage === AttributeUsage.Remark9 ||
-    usage === AttributeUsage.Remark10 ||
-    usage === AttributeUsage.Remark11 ||
-    usage === AttributeUsage.Remark12 ||
-    usage === AttributeUsage.Remark13 ||
-    usage === AttributeUsage.Remark14 ||
-    usage === AttributeUsage.Remark15
-  ) {
-    return new BufferAttribute({
-      usage,
-      value: Buffer.from(attributeLike.data, 'hex'),
-    });
-  } else if (
-    usage === AttributeUsage.ECDH02 ||
-    usage === AttributeUsage.ECDH03
-  ) {
-    return new ECPointAttribute({
-      usage,
-      value: common.stringToECPoint(attributeLike.data),
-    });
-  } else if (usage === AttributeUsage.Script) {
-    return new UInt160Attribute({
-      usage,
-      value: common.stringToUInt160(attributeLike.data),
-    });
-  } else {
-    return new UInt256Attribute({
-      usage,
-      value: common.stringToUInt256(attributeLike.data),
-    });
+  switch (usage) {
+    case AttributeUsage.DescriptionUrl:
+    case AttributeUsage.Description:
+    case AttributeUsage.Remark:
+    case AttributeUsage.Remark1:
+    case AttributeUsage.Remark2:
+    case AttributeUsage.Remark3:
+    case AttributeUsage.Remark4:
+    case AttributeUsage.Remark5:
+    case AttributeUsage.Remark6:
+    case AttributeUsage.Remark7:
+    case AttributeUsage.Remark8:
+    case AttributeUsage.Remark9:
+    case AttributeUsage.Remark10:
+    case AttributeUsage.Remark11:
+    case AttributeUsage.Remark12:
+    case AttributeUsage.Remark13:
+    case AttributeUsage.Remark14:
+    case AttributeUsage.Remark15:
+      return new BufferAttribute({
+        usage,
+        value: Buffer.from(attributeLike.data, 'hex'),
+      });
+    case AttributeUsage.ECDH02:
+    case AttributeUsage.ECDH03:
+      return new ECPointAttribute({
+        usage,
+        value: common.stringToECPoint(attributeLike.data),
+      });
+    case AttributeUsage.Script:
+      return new UInt160Attribute({
+        usage,
+        value: common.stringToUInt160(attributeLike.data),
+      });
+    default:
+      return new UInt256Attribute({
+        usage,
+        value: common.stringToUInt256(attributeLike.data),
+      });
   }
 };

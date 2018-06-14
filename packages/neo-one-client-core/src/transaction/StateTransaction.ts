@@ -1,10 +1,7 @@
 import BN from 'bn.js';
 import { UInt160Hex } from '../common';
 import { InvalidFormatError } from '../errors';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
@@ -20,40 +17,26 @@ import {
 import { TransactionType } from './TransactionType';
 
 export interface StateTransactionAdd extends TransactionBaseAdd {
-  descriptors: StateDescriptor[];
+  readonly descriptors: ReadonlyArray<StateDescriptor>;
 }
 
 export interface StateTransactionJSON extends TransactionBaseJSON {
-  type: 'StateTransaction';
-  descriptors: StateDescriptorJSON[];
+  readonly type: 'StateTransaction';
+  readonly descriptors: ReadonlyArray<StateDescriptorJSON>;
 }
 
-export class StateTransaction extends TransactionBase<
-  TransactionType.State,
-  StateTransactionJSON
-> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): StateTransaction {
+export class StateTransaction extends TransactionBase<TransactionType.State, StateTransactionJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): StateTransaction {
     const { reader } = options;
-    const { type, version } = super.deserializeTransactionBaseStartWireBase(
-      options,
-    );
+    const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.State) {
       throw new InvalidFormatError();
     }
 
-    const descriptors = reader.readArray(() =>
-      StateDescriptor.deserializeWireBase(options),
-    );
+    const descriptors = reader.readArray(() => StateDescriptor.deserializeWireBase(options));
 
-    const {
-      attributes,
-      inputs,
-      outputs,
-      scripts,
-    } = super.deserializeTransactionBaseEndWireBase(options);
+    const { attributes, inputs, outputs, scripts } = super.deserializeTransactionBaseEndWireBase(options);
 
     return new this({
       version,
@@ -65,25 +48,15 @@ export class StateTransaction extends TransactionBase<
     });
   }
 
-  public readonly descriptors: StateDescriptor[];
+  public readonly descriptors: ReadonlyArray<StateDescriptor>;
   protected readonly sizeExclusive: () => number = utils.lazy(
-    () =>
-      super.size +
-      IOHelper.sizeOfArray(this.descriptors, (descriptor) => descriptor.size),
+    () => super.size + IOHelper.sizeOfArray(this.descriptors, (descriptor) => descriptor.size),
   );
   private readonly stateGetScriptHashesForVerifyingInternal: (
     options: TransactionGetScriptHashesForVerifyingOptions,
   ) => Promise<Set<UInt160Hex>>;
 
-  constructor({
-    version,
-    attributes,
-    inputs,
-    outputs,
-    scripts,
-    hash,
-    descriptors,
-  }: StateTransactionAdd) {
+  public constructor({ version, attributes, inputs, outputs, scripts, hash, descriptors }: StateTransactionAdd) {
     super({
       version,
       type: TransactionType.State,
@@ -102,23 +75,20 @@ export class StateTransaction extends TransactionBase<
 
     this.stateGetScriptHashesForVerifyingInternal = utils.lazyAsync(
       async (options: TransactionGetScriptHashesForVerifyingOptions) => {
-        const hashes = await super.getScriptHashesForVerifying(options);
-        for (const descriptor of this.descriptors) {
-          for (const scriptHash of descriptor.getScriptHashesForVerifying()) {
-            hashes.add(scriptHash);
-          }
-        }
+        const mutableHashes = await super.getScriptHashesForVerifying(options);
+        this.descriptors.forEach((descriptor) => {
+          descriptor.getScriptHashesForVerifying().forEach((scriptHash) => {
+            mutableHashes.add(scriptHash);
+          });
+        });
 
-        return hashes;
+        return mutableHashes;
       },
     );
   }
 
   public getSystemFee(context: FeeContext): BN {
-    return this.descriptors.reduce(
-      (value, descriptor) => value.add(descriptor.getSystemFee(context)),
-      utils.ZERO,
-    );
+    return this.descriptors.reduce((value, descriptor) => value.add(descriptor.getSystemFee(context)), utils.ZERO);
   }
 
   public async getScriptHashesForVerifying(
@@ -128,18 +98,18 @@ export class StateTransaction extends TransactionBase<
   }
 
   public clone({
-    scripts,
-    attributes,
+    scripts = this.scripts,
+    attributes = this.attributes,
   }: {
-    scripts?: Witness[];
-    attributes?: Attribute[];
+    readonly scripts?: ReadonlyArray<Witness>;
+    readonly attributes?: ReadonlyArray<Attribute>;
   }): StateTransaction {
     return new StateTransaction({
       version: this.version,
-      attributes: attributes || this.attributes,
+      attributes,
       inputs: this.inputs,
       outputs: this.outputs,
-      scripts: scripts || this.scripts,
+      scripts,
       descriptors: this.descriptors,
     });
   }
@@ -150,19 +120,13 @@ export class StateTransaction extends TransactionBase<
     });
   }
 
-  public async serializeJSON(
-    context: SerializeJSONContext,
-  ): Promise<StateTransactionJSON> {
-    const transactionBaseJSON = await super.serializeTransactionBaseJSON(
-      context,
-    );
+  public async serializeJSON(context: SerializeJSONContext): Promise<StateTransactionJSON> {
+    const transactionBaseJSON = await super.serializeTransactionBaseJSON(context);
 
     return {
       ...transactionBaseJSON,
       type: 'StateTransaction',
-      descriptors: this.descriptors.map((descriptor) =>
-        descriptor.serializeJSON(context),
-      ),
+      descriptors: this.descriptors.map((descriptor) => descriptor.serializeJSON(context)),
     };
   }
 
@@ -170,11 +134,7 @@ export class StateTransaction extends TransactionBase<
     await Promise.all([super.verify(options), this.verifyInternal(options)]);
   }
 
-  private async verifyInternal(
-    options: TransactionVerifyOptions,
-  ): Promise<void> {
-    await Promise.all(
-      this.descriptors.map((descriptor) => descriptor.verify(options)),
-    );
+  private async verifyInternal(options: TransactionVerifyOptions): Promise<void> {
+    await Promise.all(this.descriptors.map(async (descriptor) => descriptor.verify(options)));
   }
 }

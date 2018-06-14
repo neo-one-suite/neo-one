@@ -1,3 +1,3 @@
 export enum InternalBufferProperties {
-  DATA = 'Data',
+  Data = 'Data',
 }

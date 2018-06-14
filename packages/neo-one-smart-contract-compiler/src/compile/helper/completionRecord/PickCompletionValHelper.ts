@@ -6,7 +6,7 @@ import { Helper } from '../Helper';
 
 // Input: [completion]
 // Output: [val]
-export class PickCompletionValHelper extends Helper<Node> {
+export class PickCompletionValHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (options.pushValue) {
       // [completion, completion]

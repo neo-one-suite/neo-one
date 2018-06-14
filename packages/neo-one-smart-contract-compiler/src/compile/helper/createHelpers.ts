@@ -177,235 +177,198 @@ import {
 } from './types';
 
 export interface Helpers {
-  arrFilter: (options: ArrFilterHelperOptions) => ArrFilterHelper;
-  arrMap: (options: ArrMapHelperOptions) => ArrMapHelper;
-  arrForEach: (options: ArrForEachHelperOptions) => ArrForEachHelper;
-  cloneArray: CloneArrayHelper;
-  extendArray: ExtendArrayHelper;
-  forType: (options: ForTypeHelperOptions) => ForTypeHelper;
-  genericDeserialize: GenericDeserializeHelper;
-  genericSerialize: GenericSerializeHelper;
+  readonly arrFilter: (options: ArrFilterHelperOptions) => ArrFilterHelper;
+  readonly arrMap: (options: ArrMapHelperOptions) => ArrMapHelper;
+  readonly arrForEach: (options: ArrForEachHelperOptions) => ArrForEachHelper;
+  readonly cloneArray: CloneArrayHelper;
+  readonly extendArray: ExtendArrayHelper;
+  readonly forType: (options: ForTypeHelperOptions) => ForTypeHelper;
+  readonly genericDeserialize: GenericDeserializeHelper;
+  readonly genericSerialize: GenericSerializeHelper;
 
-  equalsEqualsEquals: (
-    options: EqualsEqualsEqualsHelperOptions,
-  ) => EqualsEqualsEqualsHelper;
-  equalsEqualsEqualsNumber: EqualsEqualsEqualsNumberHelper;
-  equalsEqualsEqualsSameType: EqualsEqualsEqualsSameTypeHelper;
-  equalsEqualsEqualsUnknown: EqualsEqualsEqualsUnknownHelper;
-  equalsEquals: (options: EqualsEqualsHelperOptions) => EqualsEqualsHelper;
-  lessThan: (options: LessThanHelperOptions) => LessThanHelper;
-  processStatements: (
-    options: ProcessStatementsHelperOptions,
-  ) => ProcessStatementsHelper;
+  readonly equalsEqualsEquals: (options: EqualsEqualsEqualsHelperOptions) => EqualsEqualsEqualsHelper;
+  readonly equalsEqualsEqualsNumber: EqualsEqualsEqualsNumberHelper;
+  readonly equalsEqualsEqualsSameType: EqualsEqualsEqualsSameTypeHelper;
+  readonly equalsEqualsEqualsUnknown: EqualsEqualsEqualsUnknownHelper;
+  readonly equalsEquals: (options: EqualsEqualsHelperOptions) => EqualsEqualsHelper;
+  readonly lessThan: (options: LessThanHelperOptions) => LessThanHelper;
+  readonly processStatements: (options: ProcessStatementsHelperOptions) => ProcessStatementsHelper;
 
-  args: ArgumentsHelper;
-  bindFunctionObjectThis: (
-    options: BindFunctionObjectThisHelperOptions,
-  ) => BindFunctionObjectThisHelper;
-  bindFunctionThis: (
-    options: BindFunctionThisHelperOptions,
-  ) => BindFunctionThisHelper;
-  call: CallHelper;
-  cloneFunction: CloneFunctionHelper;
-  cloneFunctionObject: (
-    options: CloneFunctionObjectHelperOptions,
-  ) => CloneFunctionObjectHelper;
-  createCallArray: CreateCallArrayHelper;
-  createConstructArray: (
-    options: CreateConstructArrayHelperOptions,
-  ) => CreateConstructArrayHelper;
-  createFunctionArray: (
-    options: CreateFunctionArrayHelperOptions,
-  ) => CreateFunctionArrayHelper;
-  createFunctionObject: (
-    options: CreateFunctionObjectHelperOptions,
-  ) => CreateFunctionObjectHelper;
-  function: (options: FunctionHelperOptions) => FunctionHelper;
-  invokeCall: (options?: InvokeCallHelperOptions) => InvokeCallHelper;
-  invokeConstruct: (
-    options?: InvokeConstructHelperOptions,
-  ) => InvokeConstructHelper;
-  new: (options?: NewHelperOptions) => NewHelper;
-  parameters: ParametersHelper;
+  readonly args: ArgumentsHelper;
+  readonly bindFunctionObjectThis: (options: BindFunctionObjectThisHelperOptions) => BindFunctionObjectThisHelper;
+  readonly bindFunctionThis: (options: BindFunctionThisHelperOptions) => BindFunctionThisHelper;
+  readonly call: CallHelper;
+  readonly cloneFunction: CloneFunctionHelper;
+  readonly cloneFunctionObject: (options: CloneFunctionObjectHelperOptions) => CloneFunctionObjectHelper;
+  readonly createCallArray: CreateCallArrayHelper;
+  readonly createConstructArray: (options: CreateConstructArrayHelperOptions) => CreateConstructArrayHelper;
+  readonly createFunctionArray: (options: CreateFunctionArrayHelperOptions) => CreateFunctionArrayHelper;
+  readonly createFunctionObject: (options: CreateFunctionObjectHelperOptions) => CreateFunctionObjectHelper;
+  readonly function: (options: FunctionHelperOptions) => FunctionHelper;
+  readonly invokeCall: (options?: InvokeCallHelperOptions) => InvokeCallHelper;
+  readonly invokeConstruct: (options?: InvokeConstructHelperOptions) => InvokeConstructHelper;
+  readonly new: (options?: NewHelperOptions) => NewHelper;
+  readonly parameters: ParametersHelper;
 
-  forLoop: (options: ForLoopHelperOptions) => ForLoopHelper;
-  if: (options: IfHelperOptions) => IfHelper;
-  case: (cases: Case[], defaultCase: () => void) => CaseHelper;
-  createCompletion: CreateCompletionHelper;
-  createNormalCompletion: CreateNormalCompletionHelper;
-  createThrowCompletion: CreateThrowCompletionHelper;
-  getCompletionError: GetCompletionErrorHelper;
-  getCompletionVal: GetCompletionValHelper;
-  handleCompletion: HandleCompletionHelper;
-  pickCompletionVal: PickCompletionValHelper;
-  throw: ThrowHelper;
-  throwTypeError: ThrowTypeErrorHelper;
-  createBoolean: CreateBooleanHelper;
-  createNull: CreateNullHelper;
-  createNumber: CreateNumberHelper;
-  createObject: CreateObjectHelper;
-  createString: CreateStringHelper;
-  createSymbol: CreateSymbolHelper;
-  createUndefined: CreateUndefinedHelper;
-  isBoolean: IsBooleanHelper;
-  isNull: IsNullHelper;
-  isNumber: IsNumberHelper;
-  isObject: IsObjectHelper;
-  isString: IsStringHelper;
-  isSymbol: IsSymbolHelper;
-  isUndefined: IsUndefinedHelper;
-  isNullOrUndefined: IsNullOrUndefinedHelper;
-  isSameType: IsSameTypeHelper;
-  getBoolean: GetBooleanHelper;
-  getNumber: GetNumberHelper;
-  getString: GetStringHelper;
-  getSymbol: GetSymbolHelper;
-  getObject: GetObjectHelper;
-  toBoolean: (options: TypedHelperOptions) => ToBooleanHelper;
-  toString: (options: TypedHelperOptions) => ToStringHelper;
-  toNumber: (options: TypedHelperOptions) => ToNumberHelper;
-  toObject: (options: TypedHelperOptions) => ToObjectHelper;
-  toPrimitive: (options: ToPrimitiveHelperOptions) => ToPrimitiveHelper;
-  getSymbolObject: GetSymbolObjectHelper;
-  getSymbolObjectProperty: GetSymbolObjectPropertyHelper;
-  setSymbolObjectProperty: SetSymbolObjectPropertyHelper;
-  setDataSymbolObjectProperty: SetDataSymbolObjectPropertyHelper;
-  setAccessorSymbolObjectProperty: (
+  readonly forLoop: (options: ForLoopHelperOptions) => ForLoopHelper;
+  readonly if: (options: IfHelperOptions) => IfHelper;
+  readonly case: (cases: ReadonlyArray<Case>, defaultCase: () => void) => CaseHelper;
+  readonly createCompletion: CreateCompletionHelper;
+  readonly createNormalCompletion: CreateNormalCompletionHelper;
+  readonly createThrowCompletion: CreateThrowCompletionHelper;
+  readonly getCompletionError: GetCompletionErrorHelper;
+  readonly getCompletionVal: GetCompletionValHelper;
+  readonly handleCompletion: HandleCompletionHelper;
+  readonly pickCompletionVal: PickCompletionValHelper;
+  readonly throw: ThrowHelper;
+  readonly throwTypeError: ThrowTypeErrorHelper;
+  readonly createBoolean: CreateBooleanHelper;
+  readonly createNull: CreateNullHelper;
+  readonly createNumber: CreateNumberHelper;
+  readonly createObject: CreateObjectHelper;
+  readonly createString: CreateStringHelper;
+  readonly createSymbol: CreateSymbolHelper;
+  readonly createUndefined: CreateUndefinedHelper;
+  readonly isBoolean: IsBooleanHelper;
+  readonly isNull: IsNullHelper;
+  readonly isNumber: IsNumberHelper;
+  readonly isObject: IsObjectHelper;
+  readonly isString: IsStringHelper;
+  readonly isSymbol: IsSymbolHelper;
+  readonly isUndefined: IsUndefinedHelper;
+  readonly isNullOrUndefined: IsNullOrUndefinedHelper;
+  readonly isSameType: IsSameTypeHelper;
+  readonly getBoolean: GetBooleanHelper;
+  readonly getNumber: GetNumberHelper;
+  readonly getString: GetStringHelper;
+  readonly getSymbol: GetSymbolHelper;
+  readonly getObject: GetObjectHelper;
+  readonly toBoolean: (options: TypedHelperOptions) => ToBooleanHelper;
+  readonly toString: (options: TypedHelperOptions) => ToStringHelper;
+  readonly toNumber: (options: TypedHelperOptions) => ToNumberHelper;
+  readonly toObject: (options: TypedHelperOptions) => ToObjectHelper;
+  readonly toPrimitive: (options: ToPrimitiveHelperOptions) => ToPrimitiveHelper;
+  readonly getSymbolObject: GetSymbolObjectHelper;
+  readonly getSymbolObjectProperty: GetSymbolObjectPropertyHelper;
+  readonly setSymbolObjectProperty: SetSymbolObjectPropertyHelper;
+  readonly setDataSymbolObjectProperty: SetDataSymbolObjectPropertyHelper;
+  readonly setAccessorSymbolObjectProperty: (
     options: SetObjectAccessorPropertyHelperBaseOptions,
   ) => SetAccessorSymbolObjectPropertyHelper;
-  getPropertyObject: GetPropertyObjectHelper;
-  getPropertyObjectProperty: GetPropertyObjectPropertyHelper;
-  setPropertyObjectProperty: SetPropertyObjectPropertyHelper;
-  setDataPropertyObjectProperty: SetDataPropertyObjectPropertyHelper;
-  setAccessorPropertyObjectProperty: (
+  readonly getPropertyObject: GetPropertyObjectHelper;
+  readonly getPropertyObjectProperty: GetPropertyObjectPropertyHelper;
+  readonly setPropertyObjectProperty: SetPropertyObjectPropertyHelper;
+  readonly setDataPropertyObjectProperty: SetDataPropertyObjectPropertyHelper;
+  readonly setAccessorPropertyObjectProperty: (
     options: SetObjectAccessorPropertyHelperBaseOptions,
   ) => SetAccessorPropertyObjectPropertyHelper;
-  getInternalObject: GetInternalObjectHelper;
-  getInternalObjectProperty: GetInternalObjectPropertyHelper;
-  setInternalObjectProperty: SetInternalObjectPropertyHelper;
-  shallowCloneObject: ShallowCloneObjectHelper;
-  shallowCloneObj: ShallowCloneObjHelper;
-  elementAccess: ElementAccessHelper;
-  unwrapType: UnwrapTypeHelper;
-  unwrapVal: UnwrapValHelper;
-  instanceof: InstanceofHelper;
-  createPropertyObject: CreatePropertyObjectHelper;
-  findObjectProperty: (
-    options: FindObjectPropertyHelperOptions,
-  ) => FindObjectPropertyHelper;
+  readonly getInternalObject: GetInternalObjectHelper;
+  readonly getInternalObjectProperty: GetInternalObjectPropertyHelper;
+  readonly setInternalObjectProperty: SetInternalObjectPropertyHelper;
+  readonly shallowCloneObject: ShallowCloneObjectHelper;
+  readonly shallowCloneObj: ShallowCloneObjHelper;
+  readonly elementAccess: ElementAccessHelper;
+  readonly unwrapType: UnwrapTypeHelper;
+  readonly unwrapVal: UnwrapValHelper;
+  readonly instanceof: InstanceofHelper;
+  readonly createPropertyObject: CreatePropertyObjectHelper;
+  readonly findObjectProperty: (options: FindObjectPropertyHelperOptions) => FindObjectPropertyHelper;
 
-  getArrayValue: GetArrayValueHelper;
-  createArray: CreateArrayHelper;
-  setArrayValue: SetArrayValueHelper;
-  getArrayIndex: GetArrayIndexHelper;
-  setArrayIndex: SetArrayIndexHelper;
-  wrapArray: WrapArrayHelper;
-  unwrapArray: UnwrapArrayHelper;
+  readonly getArrayValue: GetArrayValueHelper;
+  readonly createArray: CreateArrayHelper;
+  readonly setArrayValue: SetArrayValueHelper;
+  readonly getArrayIndex: GetArrayIndexHelper;
+  readonly setArrayIndex: SetArrayIndexHelper;
+  readonly wrapArray: WrapArrayHelper;
+  readonly unwrapArray: UnwrapArrayHelper;
 
-  createBuffer: CreateBufferHelper;
-  getBufferValue: GetBufferValueHelper;
-  setBufferValue: SetBufferValueHelper;
-  unwrapBuffer: UnwrapBufferHelper;
-  wrapBuffer: WrapBufferHelper;
+  readonly createBuffer: CreateBufferHelper;
+  readonly getBufferValue: GetBufferValueHelper;
+  readonly setBufferValue: SetBufferValueHelper;
+  readonly unwrapBuffer: UnwrapBufferHelper;
+  readonly wrapBuffer: WrapBufferHelper;
 
-  export: (options: ExportHelperOptions) => ExportHelper;
-  exportSingle: (options: ExportHelperOptions) => ExportSingleHelper;
-  getModule: (options: GetModuleHelperOptions) => GetModuleHelper;
-  getCurrentModule: GetCurrentModuleHelper;
-  getModules: GetModulesHelper;
-  addEmptyModule: AddEmptyModuleHelper;
+  readonly export: (options: ExportHelperOptions) => ExportHelper;
+  readonly exportSingle: (options: ExportHelperOptions) => ExportSingleHelper;
+  readonly getModule: (options: GetModuleHelperOptions) => GetModuleHelper;
+  readonly getCurrentModule: GetCurrentModuleHelper;
+  readonly getModules: GetModulesHelper;
+  readonly addEmptyModule: AddEmptyModuleHelper;
 
-  isBlockchainInterface: (
-    options: IsBlockchainInterfaceHelperOptions,
-  ) => IsBlockchainInterfaceHelper;
-  wrapBlockchainInterface: (
-    options: WrapBlockchainInterfaceHelperOptions,
-  ) => WrapBlockchainInterfaceHelper;
-  unwrapBlockchainInterface: UnwrapBlockchainInterfaceHelper;
+  readonly isBlockchainInterface: (options: IsBlockchainInterfaceHelperOptions) => IsBlockchainInterfaceHelper;
+  readonly wrapBlockchainInterface: (options: WrapBlockchainInterfaceHelperOptions) => WrapBlockchainInterfaceHelper;
+  readonly unwrapBlockchainInterface: UnwrapBlockchainInterfaceHelper;
 
-  addArguments: AddArgumentsHelper;
-  addArrayObject: AddArrayObjectHelper;
-  addBooleanObject: AddBooleanObjectHelper;
-  addBufferObject: AddBufferObjectHelper;
-  addErrorObject: AddErrorObjectHelper;
-  addModules: AddModulesHelper;
-  addNumberObject: AddNumberObjectHelper;
-  addObjectObject: AddObjectObjectHelper;
-  addStringObject: AddStringObjectHelper;
-  addSymbolObject: AddSymbolObjectHelper;
-  setGlobalObject: SetGlobalObjectHelper;
-  getArgument: (options: TypedHelperOptions) => GetArgumentHelper;
-  getGlobalProperty: (
-    options: GetGlobalPropertyHelperOptions,
-  ) => GetGlobalPropertyHelper;
-  globalProperties: Set<string>;
+  readonly addArguments: AddArgumentsHelper;
+  readonly addArrayObject: AddArrayObjectHelper;
+  readonly addBooleanObject: AddBooleanObjectHelper;
+  readonly addBufferObject: AddBufferObjectHelper;
+  readonly addErrorObject: AddErrorObjectHelper;
+  readonly addModules: AddModulesHelper;
+  readonly addNumberObject: AddNumberObjectHelper;
+  readonly addObjectObject: AddObjectObjectHelper;
+  readonly addStringObject: AddStringObjectHelper;
+  readonly addSymbolObject: AddSymbolObjectHelper;
+  readonly setGlobalObject: SetGlobalObjectHelper;
+  readonly getArgument: (options: TypedHelperOptions) => GetArgumentHelper;
+  readonly getGlobalProperty: (options: GetGlobalPropertyHelperOptions) => GetGlobalPropertyHelper;
+  readonly globalProperties: Set<string>;
 }
 
 export const createHelpers = (): Helpers => {
-  const cache: { [key: string]: Helper } = {};
+  const mutableCache: { [K in string]?: Helper } = {};
 
   function memoized<Options, T extends Helper>(
-    HelperClass: (new (options: Options) => T) & KeyedHelper<Options>,
+    helperClass: (new (options: Options) => T) & KeyedHelper<Options>,
   ): (options: Options) => T {
     return (options: Options) => {
-      const key = HelperClass.getKey(options);
-      if (cache[key] == null) {
-        cache[key] = new HelperClass(options);
+      const key = helperClass.getKey(options);
+      let value = mutableCache[key];
+      if (value === undefined) {
+        mutableCache[key] = value = new helperClass(options);
       }
 
-      return cache[key] as T;
+      return value as T;
     };
   }
 
   return {
-    arrFilter: (options: ArrFilterHelperOptions) =>
-      new ArrFilterHelper(options),
-    arrMap: (options: ArrMapHelperOptions) => new ArrMapHelper(options),
-    arrForEach: (options: ArrForEachHelperOptions) =>
-      new ArrForEachHelper(options),
+    arrFilter: (options) => new ArrFilterHelper(options),
+    arrMap: (options) => new ArrMapHelper(options),
+    arrForEach: (options) => new ArrForEachHelper(options),
     cloneArray: new CloneArrayHelper(),
     extendArray: new ExtendArrayHelper(),
-    forType: (options: ForTypeHelperOptions) => new ForTypeHelper(options),
+    forType: (options) => new ForTypeHelper(options),
     genericDeserialize: new GenericDeserializeHelper(),
     genericSerialize: new GenericSerializeHelper(),
 
-    equalsEqualsEquals: (options: EqualsEqualsEqualsHelperOptions) =>
-      new EqualsEqualsEqualsHelper(options),
+    equalsEqualsEquals: (options) => new EqualsEqualsEqualsHelper(options),
     equalsEqualsEqualsNumber: new EqualsEqualsEqualsNumberHelper(),
     equalsEqualsEqualsSameType: new EqualsEqualsEqualsSameTypeHelper(),
     equalsEqualsEqualsUnknown: new EqualsEqualsEqualsUnknownHelper(),
-    equalsEquals: (options: EqualsEqualsHelperOptions) =>
-      new EqualsEqualsHelper(options),
-    lessThan: (options: LessThanHelperOptions) => new LessThanHelper(options),
+    equalsEquals: (options) => new EqualsEqualsHelper(options),
+    lessThan: (options) => new LessThanHelper(options),
     processStatements: (options) => new ProcessStatementsHelper(options),
 
     args: new ArgumentsHelper(),
-    bindFunctionObjectThis: (options: BindFunctionObjectThisHelperOptions) =>
-      new BindFunctionObjectThisHelper(options),
-    bindFunctionThis: (options: BindFunctionThisHelperOptions) =>
-      new BindFunctionThisHelper(options),
+    bindFunctionObjectThis: (options) => new BindFunctionObjectThisHelper(options),
+    bindFunctionThis: (options) => new BindFunctionThisHelper(options),
     call: new CallHelper(),
     cloneFunction: new CloneFunctionHelper(),
-    cloneFunctionObject: (options: CloneFunctionObjectHelperOptions) =>
-      new CloneFunctionObjectHelper(options),
+    cloneFunctionObject: (options) => new CloneFunctionObjectHelper(options),
     createCallArray: new CreateCallArrayHelper(),
-    createConstructArray: (options: CreateConstructArrayHelperOptions) =>
-      new CreateConstructArrayHelper(options),
-    createFunctionArray: (options: CreateFunctionArrayHelperOptions) =>
-      new CreateFunctionArrayHelper(options),
-    createFunctionObject: (options: CreateFunctionObjectHelperOptions) =>
-      new CreateFunctionObjectHelper(options),
-    function: (options: FunctionHelperOptions) => new FunctionHelper(options),
+    createConstructArray: (options) => new CreateConstructArrayHelper(options),
+    createFunctionArray: (options) => new CreateFunctionArrayHelper(options),
+    createFunctionObject: (options) => new CreateFunctionObjectHelper(options),
+    function: (options) => new FunctionHelper(options),
     invokeCall: memoized(InvokeCallHelper),
-    invokeConstruct: (options?: InvokeConstructHelperOptions) =>
-      new InvokeConstructHelper(options),
-    new: (options?: NewHelperOptions) => new NewHelper(options),
+    invokeConstruct: (options?) => new InvokeConstructHelper(options),
+    new: (options?) => new NewHelper(options),
     parameters: new ParametersHelper(),
 
     forLoop: (options) => new ForLoopHelper(options),
     if: (options) => new IfHelper(options),
-    case: (cases: Case[], defaultCase: () => void) =>
-      new CaseHelper(cases, defaultCase),
+    case: (cases, defaultCase) => new CaseHelper(cases, defaultCase),
     createCompletion: new CreateCompletionHelper(),
     createNormalCompletion: new CreateNormalCompletionHelper(),
     createThrowCompletion: new CreateThrowCompletionHelper(),
@@ -436,25 +399,21 @@ export const createHelpers = (): Helpers => {
     getString: new GetStringHelper(),
     getSymbol: new GetSymbolHelper(),
     getObject: new GetObjectHelper(),
-    toBoolean: (options: TypedHelperOptions) => new ToBooleanHelper(options),
-    toString: (options: TypedHelperOptions) => new ToStringHelper(options),
-    toNumber: (options: TypedHelperOptions) => new ToNumberHelper(options),
-    toObject: (options: TypedHelperOptions) => new ToObjectHelper(options),
+    toBoolean: (options) => new ToBooleanHelper(options),
+    toString: (options) => new ToStringHelper(options),
+    toNumber: (options) => new ToNumberHelper(options),
+    toObject: (options) => new ToObjectHelper(options),
     toPrimitive: (options) => new ToPrimitiveHelper(options),
     getSymbolObject: new GetSymbolObjectHelper(),
     getSymbolObjectProperty: new GetSymbolObjectPropertyHelper(),
     setSymbolObjectProperty: new SetSymbolObjectPropertyHelper(),
     setDataSymbolObjectProperty: new SetDataSymbolObjectPropertyHelper(),
-    setAccessorSymbolObjectProperty: (
-      options: SetObjectAccessorPropertyHelperBaseOptions,
-    ) => new SetAccessorSymbolObjectPropertyHelper(options),
+    setAccessorSymbolObjectProperty: (options) => new SetAccessorSymbolObjectPropertyHelper(options),
     getPropertyObject: new GetPropertyObjectHelper(),
     getPropertyObjectProperty: new GetPropertyObjectPropertyHelper(),
     setPropertyObjectProperty: new SetPropertyObjectPropertyHelper(),
     setDataPropertyObjectProperty: new SetDataPropertyObjectPropertyHelper(),
-    setAccessorPropertyObjectProperty: (
-      options: SetObjectAccessorPropertyHelperBaseOptions,
-    ) => new SetAccessorPropertyObjectPropertyHelper(options),
+    setAccessorPropertyObjectProperty: (options) => new SetAccessorPropertyObjectPropertyHelper(options),
     getInternalObject: new GetInternalObjectHelper(),
     getInternalObjectProperty: new GetInternalObjectPropertyHelper(),
     setInternalObjectProperty: new SetInternalObjectPropertyHelper(),
@@ -465,8 +424,7 @@ export const createHelpers = (): Helpers => {
     unwrapVal: new UnwrapValHelper(),
     instanceof: new InstanceofHelper(),
     createPropertyObject: new CreatePropertyObjectHelper(),
-    findObjectProperty: (options: FindObjectPropertyHelperOptions) =>
-      new FindObjectPropertyHelper(options),
+    findObjectProperty: (options) => new FindObjectPropertyHelper(options),
 
     getArrayValue: new GetArrayValueHelper(),
     createArray: new CreateArrayHelper(),
@@ -482,19 +440,15 @@ export const createHelpers = (): Helpers => {
     unwrapBuffer: new UnwrapBufferHelper(),
     wrapBuffer: new WrapBufferHelper(),
 
-    export: (options: ExportHelperOptions) => new ExportHelper(options),
-    exportSingle: (options: ExportHelperOptions) =>
-      new ExportSingleHelper(options),
-    getModule: (options: GetModuleHelperOptions) =>
-      new GetModuleHelper(options),
+    export: (options) => new ExportHelper(options),
+    exportSingle: (options) => new ExportSingleHelper(options),
+    getModule: (options) => new GetModuleHelper(options),
     getCurrentModule: new GetCurrentModuleHelper(),
     getModules: new GetModulesHelper(),
     addEmptyModule: new AddEmptyModuleHelper(),
 
-    isBlockchainInterface: (options: IsBlockchainInterfaceHelperOptions) =>
-      new IsBlockchainInterfaceHelper(options),
-    wrapBlockchainInterface: (options: WrapBlockchainInterfaceHelperOptions) =>
-      new WrapBlockchainInterfaceHelper(options),
+    isBlockchainInterface: (options) => new IsBlockchainInterfaceHelper(options),
+    wrapBlockchainInterface: (options) => new WrapBlockchainInterfaceHelper(options),
     unwrapBlockchainInterface: new UnwrapBlockchainInterfaceHelper(),
 
     addArguments: new AddArgumentsHelper(),
@@ -508,10 +462,8 @@ export const createHelpers = (): Helpers => {
     addStringObject: new AddStringObjectHelper(),
     addSymbolObject: new AddSymbolObjectHelper(),
     setGlobalObject: new SetGlobalObjectHelper(),
-    getArgument: (options: TypedHelperOptions) =>
-      new GetArgumentHelper(options),
-    getGlobalProperty: (options: GetGlobalPropertyHelperOptions) =>
-      new GetGlobalPropertyHelper(options),
+    getArgument: (options) => new GetArgumentHelper(options),
+    getGlobalProperty: (options) => new GetGlobalPropertyHelper(options),
     globalProperties: GLOBAL_PROPERTIES,
   };
 };

@@ -1,17 +1,12 @@
+// tslint:disable no-import-side-effect
 import '@babel/polyfill';
 import appRootDir from 'app-root-dir';
 import * as fs from 'fs-extra';
 import path from 'path';
-import {
-  BLOCKCHAIN_INTERFACES,
-  SYSCALLS,
-  TYPE_ALIASES,
-} from '../compile/syscalls';
+import { BLOCKCHAIN_INTERFACES, SYSCALLS, TYPE_ALIASES } from '../compile/syscalls';
 
 const run = async () => {
-  const types = TYPE_ALIASES.map((alias) => `  ${alias.toDeclaration()}`).join(
-    '\n',
-  );
+  const types = TYPE_ALIASES.map((alias) => `  ${alias.toDeclaration()}`).join('\n');
   const interfaces = BLOCKCHAIN_INTERFACES.map(
     (name) =>
       `  interface ${name} {
@@ -69,13 +64,7 @@ export {
   createEventHandler,
 } from './lib';
 `;
-  const filePath = path.resolve(
-    appRootDir.get(),
-    'packages',
-    'neo-one-smart-contract',
-    'src',
-    'index.d.ts',
-  );
+  const filePath = path.resolve(appRootDir.get(), 'packages', 'neo-one-smart-contract', 'src', 'index.d.ts');
   await fs.writeFile(filePath, content);
 };
 

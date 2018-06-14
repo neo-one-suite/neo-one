@@ -1,22 +1,17 @@
 import { DeserializeWireBaseOptions } from '../../Serializable';
 import { BinaryWriter } from '../../utils';
-import {
-  ConsensusMessageBase,
-  ConsensusMessageBaseAdd,
-} from './ConsensusMessageBase';
+import { ConsensusMessageBase, ConsensusMessageBaseAdd } from './ConsensusMessageBase';
 import { ConsensusMessageType } from './ConsensusMessageType';
 
 export interface PrepareResponseAdd extends ConsensusMessageBaseAdd {
-  signature: Buffer;
+  readonly signature: Buffer;
 }
 
 export class PrepareResponseConsensusMessage extends ConsensusMessageBase<
   PrepareResponseConsensusMessage,
   ConsensusMessageType.PrepareResponse
 > {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): PrepareResponseConsensusMessage {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): PrepareResponseConsensusMessage {
     const { reader } = options;
     const message = super.deserializeConsensusMessageBaseWireBase(options);
     const signature = reader.readBytes(64);
@@ -29,7 +24,7 @@ export class PrepareResponseConsensusMessage extends ConsensusMessageBase<
 
   public readonly signature: Buffer;
 
-  constructor({ viewNumber, signature }: PrepareResponseAdd) {
+  public constructor({ viewNumber, signature }: PrepareResponseAdd) {
     super({
       type: ConsensusMessageType.PrepareResponse,
       viewNumber,

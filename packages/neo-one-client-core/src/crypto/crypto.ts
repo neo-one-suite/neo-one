@@ -1,17 +1,14 @@
+// tslint:disable no-any no-array-mutation
 import ECKey from '@neo-one/ec-key';
-import { CustomError } from '@neo-one/utils';
-import bs58 from 'bs58';
+import { CustomError, utils } from '@neo-one/utils';
+import base58 from 'bs58';
 import xor from 'buffer-xor';
 import cryptoLib from 'crypto';
 import { ec as EC, KeyPair } from 'elliptic';
 import scrypt from 'scrypt-js';
 import WIF from 'wif';
 import { common, ECPoint, PrivateKey, UInt160, UInt256 } from '../common';
-import {
-  InvalidFormatError,
-  InvalidNumberOfKeysError,
-  TooManyPublicKeysError,
-} from '../errors';
+import { InvalidFormatError, InvalidNumberOfKeysError, TooManyPublicKeysError } from '../errors';
 import { ScriptBuilder } from '../utils';
 import { Witness } from '../Witness';
 
@@ -20,7 +17,7 @@ const ec = new EC('p256') as any;
 export class Base58CheckError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('Base58 Check Decode Error.');
     this.code = 'BASE_58_CHECK';
   }
@@ -30,7 +27,7 @@ export class InvalidAddressError extends CustomError {
   public readonly address: string;
   public readonly code: string;
 
-  constructor(address: string) {
+  public constructor(address: string) {
     super(`Invalid Address: ${address}`);
     this.address = address;
     this.code = 'INVALID_ADDRESS';
@@ -55,35 +52,26 @@ const rmd160 = (value: Buffer): Buffer =>
     .update(value)
     .digest();
 
-const hash160 = (value: Buffer): UInt160 =>
-  common.bufferToUInt160(rmd160(sha256(value)));
+const hash160 = (value: Buffer): UInt160 => common.bufferToUInt160(rmd160(sha256(value)));
 
-const hash256 = (value: Buffer): UInt256 =>
-  common.bufferToUInt256(sha256(sha256(value)));
+const hash256 = (value: Buffer): UInt256 => common.bufferToUInt256(sha256(sha256(value)));
 
-const sign = ({
-  message,
-  privateKey,
-}: {
-  message: Buffer;
-  privateKey: PrivateKey;
-}): Buffer => {
+const sign = ({ message, privateKey }: { readonly message: Buffer; readonly privateKey: PrivateKey }): Buffer => {
   const sig = ec.sign(sha256(message), common.privateKeyToBuffer(privateKey));
-  return Buffer.concat([
-    sig.r.toArrayLike(Buffer, 'be', 32),
-    sig.s.toArrayLike(Buffer, 'be', 32),
-  ]);
+
+  return Buffer.concat([sig.r.toArrayLike(Buffer, 'be', 32), sig.s.toArrayLike(Buffer, 'be', 32)]);
 };
 
 class InvalidSignatureError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('Invalid Signature');
     this.code = 'INVALID_SIGNATURE';
   }
 }
 
+// tslint:disable readonly-array
 const rmPadding = (buf: number[]): number[] => {
   let i = 0;
   const len = buf.length - 1;
@@ -94,12 +82,14 @@ const rmPadding = (buf: number[]): number[] => {
   if (i === 0) {
     return buf;
   }
+
   return buf.slice(i);
 };
 
 const constructLength = (arr: number[], len: number): void => {
   if (len < 0x80) {
     arr.push(len);
+
     return;
   }
   // tslint:disable-next-line
@@ -119,9 +109,9 @@ const verify = ({
   signature: signatureIn,
   publicKey,
 }: {
-  message: Buffer;
-  signature: Buffer;
-  publicKey: ECPoint;
+  readonly message: Buffer;
+  readonly signature: Buffer;
+  readonly publicKey: ECPoint;
 }) => {
   if (signatureIn.length !== 64) {
     throw new InvalidSignatureError();
@@ -157,19 +147,17 @@ const verify = ({
 
   const key = new ECKey({
     crv: 'P-256',
-    publicKey: Buffer.from(
-      ec.keyFromPublic(publicKey).getPublic(false, 'hex'),
-      'hex',
-    ),
+    publicKey: Buffer.from(ec.keyFromPublic(publicKey).getPublic(false, 'hex'), 'hex'),
   });
 
   return (key.createVerify('SHA256').update(message) as any).verify(signature);
 };
+// tslint:enable readonly-array
 
 class InvalidPrivateKeyError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('Invalid Private Key');
     this.code = 'INVALID_PRIVATE_KEY';
   }
@@ -178,10 +166,11 @@ class InvalidPrivateKeyError extends CustomError {
 const toECPointFromKeyPair = (pair: KeyPair): ECPoint =>
   common.bufferToECPoint(Buffer.from(pair.getPublic(true, 'hex'), 'hex'));
 
-const publicKeyCache: { [key: string]: ECPoint } = {};
+const mutablePublicKeyCache: { [K in string]?: ECPoint } = {};
 const privateKeyToPublicKey = (privateKey: PrivateKey): ECPoint => {
   const privateKeyHex = common.privateKeyToString(privateKey);
-  if (publicKeyCache[privateKeyHex] == null) {
+  let publicKey = mutablePublicKeyCache[privateKeyHex];
+  if (publicKey === undefined) {
     const key = ec.keyFromPrivate(common.privateKeyToBuffer(privateKey));
     key.getPublic(true, 'hex');
     const { result } = key.validate();
@@ -189,31 +178,27 @@ const privateKeyToPublicKey = (privateKey: PrivateKey): ECPoint => {
       throw new InvalidPrivateKeyError();
     }
 
-    publicKeyCache[privateKeyHex] = toECPointFromKeyPair(key);
+    mutablePublicKeyCache[privateKeyHex] = publicKey = toECPointFromKeyPair(key);
   }
 
-  return publicKeyCache[privateKeyHex];
+  return publicKey;
 };
 
-const createKeyPair = (): { privateKey: PrivateKey; publicKey: ECPoint } => {
+const createKeyPair = (): { readonly privateKey: PrivateKey; readonly publicKey: ECPoint } => {
   const key = ec.genKeyPair();
 
   return {
-    privateKey: common.bufferToPrivateKey(
-      key.getPrivate().toArrayLike(Buffer, 'be'),
-    ),
+    privateKey: common.bufferToPrivateKey(key.getPrivate().toArrayLike(Buffer, 'be')),
     publicKey: toECPointFromKeyPair(key),
   };
 };
 
-const createPrivateKey = (): PrivateKey =>
-  common.bufferToPrivateKey(cryptoLib.randomBytes(32));
+const createPrivateKey = (): PrivateKey => common.bufferToPrivateKey(cryptoLib.randomBytes(32));
 
-const toScriptHash = (value: Buffer): UInt160 => hash160(value);
+const toScriptHash = hash160;
 
 // Takes various formats and converts to standard ECPoint
-const toECPoint = (publicKey: Buffer): ECPoint =>
-  toECPointFromKeyPair(ec.keyFromPublic(publicKey));
+const toECPoint = (publicKey: Buffer): ECPoint => toECPointFromKeyPair(ec.keyFromPublic(publicKey));
 
 const isInfinity = (ecPoint: ECPoint): boolean =>
   ec
@@ -221,16 +206,16 @@ const isInfinity = (ecPoint: ECPoint): boolean =>
     .getPublic()
     .isInfinity();
 
-const base58Checksum = (buffer: Buffer): Buffer =>
-  common.uInt256ToBuffer(hash256(buffer)).slice(0, 4);
+const base58Checksum = (buffer: Buffer): Buffer => common.uInt256ToBuffer(hash256(buffer)).slice(0, 4);
 
 const base58CheckEncode = (buffer: Buffer): string => {
   const checksum = base58Checksum(buffer);
-  return bs58.encode(Buffer.concat([buffer, checksum]));
+
+  return base58.encode(Buffer.concat([buffer, checksum]));
 };
 
 const base58CheckDecode = (value: string): Buffer => {
-  const buffer = Buffer.from(bs58.decode(value));
+  const buffer = Buffer.from(base58.decode(value));
   const payload = buffer.slice(0, -4);
   const checksum = buffer.slice(-4);
   const payloadChecksum = base58Checksum(payload);
@@ -245,21 +230,22 @@ const scriptHashToAddress = ({
   addressVersion,
   scriptHash,
 }: {
-  addressVersion: number;
-  scriptHash: UInt160;
+  readonly addressVersion: number;
+  readonly scriptHash: UInt160;
 }): string => {
-  const buffer = Buffer.allocUnsafe(21);
-  buffer[0] = addressVersion;
-  common.uInt160ToBuffer(scriptHash).copy(buffer, 1);
-  return base58CheckEncode(buffer);
+  const mutableBuffer = Buffer.allocUnsafe(21);
+  mutableBuffer[0] = addressVersion;
+  common.uInt160ToBuffer(scriptHash).copy(mutableBuffer, 1);
+
+  return base58CheckEncode(mutableBuffer);
 };
 
 const addressToScriptHash = ({
   addressVersion,
   address,
 }: {
-  addressVersion: number;
-  address: string;
+  readonly addressVersion: number;
+  readonly address: string;
 }): UInt160 => {
   const decodedAddress = base58CheckDecode(address);
   if (decodedAddress.length !== 21 || decodedAddress[0] !== addressVersion) {
@@ -272,38 +258,32 @@ const addressToScriptHash = ({
 const createInvocationScriptForSignature = (signature: Buffer): Buffer => {
   const builder = new ScriptBuilder();
   builder.emitPush(signature);
+
   return builder.build();
 };
 
-const createInvocationScript = (
-  message: Buffer,
-  privateKey: PrivateKey,
-): Buffer => createInvocationScriptForSignature(sign({ message, privateKey }));
+const createInvocationScript = (message: Buffer, privateKey: PrivateKey): Buffer =>
+  createInvocationScriptForSignature(sign({ message, privateKey }));
 
 const createVerificationScript = (publicKey: ECPoint): Buffer => {
   const builder = new ScriptBuilder();
   builder.emitPushECPoint(publicKey);
   builder.emitOp('CHECKSIG');
+
   return builder.build();
 };
 
-const createWitnessForSignature = (
-  signature: Buffer,
-  publicKey: ECPoint,
-): Witness => {
+const createWitnessForSignature = (signature: Buffer, publicKey: ECPoint): Witness => {
   const verification = createVerificationScript(publicKey);
   const invocation = createInvocationScriptForSignature(signature);
+
   return new Witness({ verification, invocation });
 };
 
 const createWitness = (message: Buffer, privateKey: PrivateKey): Witness =>
-  createWitnessForSignature(
-    sign({ message, privateKey }),
-    privateKeyToPublicKey(privateKey),
-  );
+  createWitnessForSignature(sign({ message, privateKey }), privateKeyToPublicKey(privateKey));
 
-const getVerificationScriptHash = (publicKey: ECPoint): UInt160 =>
-  toScriptHash(createVerificationScript(publicKey));
+const getVerificationScriptHash = (publicKey: ECPoint): UInt160 => toScriptHash(createVerificationScript(publicKey));
 
 const compareKeys = (a: KeyPair, b: KeyPair): number => {
   const aPublic = a.getPublic();
@@ -316,16 +296,13 @@ const compareKeys = (a: KeyPair, b: KeyPair): number => {
   return aPublic.getY().cmp(bPublic.getY());
 };
 
-const sortKeys = (publicKeys: ECPoint[]): ECPoint[] =>
+const sortKeys = (publicKeys: ReadonlyArray<ECPoint>): ReadonlyArray<ECPoint> =>
   publicKeys
     .map((publicKey) => ec.keyFromPublic(publicKey))
     .sort(compareKeys)
-    .map((keyPair) => toECPointFromKeyPair(keyPair));
+    .map(toECPointFromKeyPair);
 
-const createMultiSignatureVerificationScript = (
-  mIn: number,
-  publicKeys: ECPoint[],
-) => {
+const createMultiSignatureVerificationScript = (mIn: number, publicKeys: ReadonlyArray<ECPoint>) => {
   const m = Math.floor(mIn);
   if (!(m >= 1 && m <= publicKeys.length && publicKeys.length <= 1024)) {
     throw new InvalidNumberOfKeysError();
@@ -338,82 +315,63 @@ const createMultiSignatureVerificationScript = (
   const builder = new ScriptBuilder();
   builder.emitPushInt(m);
   const publicKeysSorted = sortKeys(publicKeys);
-  for (const ecPoint of publicKeysSorted) {
+  publicKeysSorted.forEach((ecPoint) => {
     builder.emitPushECPoint(ecPoint);
-  }
+  });
   builder.emitPushInt(publicKeysSorted.length);
   builder.emitOp('CHECKMULTISIG');
+
   return builder.build();
 };
 
-const createMultiSignatureInvocationScript = (signatures: Buffer[]): Buffer => {
+const createMultiSignatureInvocationScript = (signatures: ReadonlyArray<Buffer>): Buffer => {
   const builder = new ScriptBuilder();
-  for (const signature of signatures) {
+  signatures.forEach((signature) => {
     builder.emitPush(signature);
-  }
+  });
+
   return builder.build();
 };
 
 const createMultiSignatureWitness = (
   mIn: number,
-  publicKeys: ECPoint[],
-  publicKeyToSignature: { [key: string]: Buffer },
+  publicKeys: ReadonlyArray<ECPoint>,
+  publicKeyToSignature: { readonly [key: string]: Buffer },
 ): Witness => {
   const m = Math.floor(mIn);
   const publicKeysSorted = sortKeys(publicKeys);
-  const signatures = [];
-  for (const publicKey of publicKeysSorted) {
-    const signature = publicKeyToSignature[common.ecPointToHex(publicKey)];
-    if (signature != null) {
-      signatures.push(signature);
-    }
-  }
+  const signatures = publicKeysSorted
+    .map((publicKey) => publicKeyToSignature[common.ecPointToHex(publicKey)])
+    .filter(utils.notNull);
   if (signatures.length !== m) {
     throw new Error('Invalid signatures');
   }
 
-  const verification = createMultiSignatureVerificationScript(
-    m,
-    publicKeysSorted,
-  );
-
+  const verification = createMultiSignatureVerificationScript(m, publicKeysSorted);
   const invocation = createMultiSignatureInvocationScript(signatures);
+
   return new Witness({ verification, invocation });
 };
 
-const getConsensusAddress = (validators: ECPoint[]): UInt160 =>
+const getConsensusAddress = (validators: ReadonlyArray<ECPoint>): UInt160 =>
   toScriptHash(
-    createMultiSignatureVerificationScript(
-      Math.floor(validators.length - (validators.length - 1) / 3),
-      validators,
-    ),
+    createMultiSignatureVerificationScript(Math.floor(validators.length - (validators.length - 1) / 3), validators),
   );
 
-const wifToPrivateKey = (
-  wif: string,
-  privateKeyVersion: number,
-): PrivateKey => {
+const wifToPrivateKey = (wif: string, privateKeyVersion: number): PrivateKey => {
   const privateKeyDecoded = base58CheckDecode(wif);
 
-  if (
-    privateKeyDecoded.length !== 34 ||
-    privateKeyDecoded[0] !== privateKeyVersion ||
-    privateKeyDecoded[33] !== 0x01
-  ) {
+  if (privateKeyDecoded.length !== 34 || privateKeyDecoded[0] !== privateKeyVersion || privateKeyDecoded[33] !== 0x01) {
     throw new InvalidFormatError();
   }
 
   return common.bufferToPrivateKey(privateKeyDecoded.slice(1, 33));
 };
 
-const privateKeyToWIF = (
-  privateKey: PrivateKey,
-  privateKeyVersion: number,
-): string =>
+const privateKeyToWIF = (privateKey: PrivateKey, privateKeyVersion: number): string =>
   WIF.encode(privateKeyVersion, common.privateKeyToBuffer(privateKey), true);
 
-const publicKeyToScriptHash = (publicKey: ECPoint): UInt160 =>
-  getVerificationScriptHash(publicKey);
+const publicKeyToScriptHash = getVerificationScriptHash;
 
 const privateKeyToScriptHash = (privateKey: PrivateKey): UInt160 =>
   publicKeyToScriptHash(privateKeyToPublicKey(privateKey));
@@ -422,8 +380,8 @@ const privateKeyToAddress = ({
   addressVersion,
   privateKey,
 }: {
-  addressVersion: number;
-  privateKey: PrivateKey;
+  readonly addressVersion: number;
+  readonly privateKey: PrivateKey;
 }): string =>
   scriptHashToAddress({
     addressVersion,
@@ -442,14 +400,14 @@ const NEP2_ONE = 0x42;
 const NEP2_TWO = 0xe0;
 const NEP2_CIPHER = 'aes-256-ecb';
 
-const getNEP2Derived = ({
+const getNEP2Derived = async ({
   password,
   salt,
 }: {
-  password: string;
-  salt: Buffer;
+  readonly password: string;
+  readonly salt: Buffer;
 }): Promise<Buffer> =>
-  new Promise((resolve, reject) =>
+  new Promise<Buffer>((resolve, reject) =>
     scrypt(
       Buffer.from(password.normalize('NFKC'), 'utf8'),
       salt,
@@ -457,8 +415,8 @@ const getNEP2Derived = ({
       NEP2_KDFPARAMS.r,
       NEP2_KDFPARAMS.p,
       NEP2_KDFPARAMS.dklen,
-      (error, progress, key) => {
-        if (error != null) {
+      (error, _progress, key) => {
+        if (error !== undefined) {
           reject(error);
         } else if (key) {
           resolve(Buffer.from(key));
@@ -471,17 +429,15 @@ const getNEP2Salt = ({
   addressVersion,
   privateKey,
 }: {
-  addressVersion: number;
-  privateKey: PrivateKey;
+  readonly addressVersion: number;
+  readonly privateKey: PrivateKey;
 }) => {
   const address = privateKeyToAddress({
     addressVersion,
     privateKey,
   });
 
-  return common
-    .uInt256ToBuffer(hash256(Buffer.from(address, 'latin1')))
-    .slice(0, 4);
+  return common.uInt256ToBuffer(hash256(Buffer.from(address, 'latin1'))).slice(0, 4);
 };
 
 const encryptNEP2 = async ({
@@ -489,9 +445,9 @@ const encryptNEP2 = async ({
   password,
   privateKey,
 }: {
-  addressVersion: number;
-  password: string;
-  privateKey: PrivateKey;
+  readonly addressVersion: number;
+  readonly password: string;
+  readonly privateKey: PrivateKey;
 }): Promise<string> => {
   const salt = getNEP2Salt({ addressVersion, privateKey });
 
@@ -499,11 +455,7 @@ const encryptNEP2 = async ({
   const derived1 = derived.slice(0, 32);
   const derived2 = derived.slice(32, 64);
 
-  const cipher = cryptoLib.createCipheriv(
-    NEP2_CIPHER,
-    derived2,
-    Buffer.alloc(0, 0),
-  );
+  const cipher = cryptoLib.createCipheriv(NEP2_CIPHER, derived2, Buffer.alloc(0, 0));
 
   cipher.setAutoPadding(false);
   cipher.end(xor(privateKey, derived1));
@@ -529,7 +481,7 @@ const isNEP2 = (encryptedKey: string): boolean => {
       decoded.readUInt8(1) === NEP2_ONE &&
       decoded.readUInt8(2) === NEP2_TWO
     );
-  } catch (error) {
+  } catch {
     return false;
   }
 };
@@ -539,9 +491,9 @@ const decryptNEP2 = async ({
   encryptedKey,
   password,
 }: {
-  addressVersion: number;
-  encryptedKey: string;
-  password: string;
+  readonly addressVersion: number;
+  readonly encryptedKey: string;
+  readonly password: string;
 }): Promise<PrivateKey> => {
   const decoded = base58CheckDecode(encryptedKey);
 
@@ -559,11 +511,7 @@ const decryptNEP2 = async ({
   const derived1 = derived.slice(0, 32);
   const derived2 = derived.slice(32, 64);
 
-  const decipher = cryptoLib.createDecipheriv(
-    NEP2_CIPHER,
-    derived2,
-    Buffer.alloc(0, 0),
-  );
+  const decipher = cryptoLib.createDecipheriv(NEP2_CIPHER, derived2, Buffer.alloc(0, 0));
 
   decipher.setAutoPadding(false);
   decipher.end(decoded.slice(7, 7 + 32));

@@ -12,11 +12,7 @@ export class GetCurrentModuleHelper extends Helper {
       // [globalObjectVal]
       sb.scope.getGlobal(sb, node, options);
       // [exports]
-      sb.emitHelper(
-        node,
-        options,
-        sb.helpers.getModule({ moduleIndex: sb.moduleIndex }),
-      );
+      sb.emitHelper(node, options, sb.helpers.getModule({ moduleIndex: sb.moduleIndex }));
     }
   }
 }

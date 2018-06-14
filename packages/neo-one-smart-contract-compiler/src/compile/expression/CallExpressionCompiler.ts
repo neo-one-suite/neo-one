@@ -1,4 +1,4 @@
-import { CallExpression, SyntaxKind, TypeGuards } from 'ts-simple-ast';
+import { CallExpression, Node, SyntaxKind, TypeGuards } from 'ts-simple-ast';
 
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { NodeCompiler } from '../NodeCompiler';
@@ -6,22 +6,14 @@ import { ScriptBuilder } from '../sb';
 import { SYSCALLS } from '../syscalls';
 import { VisitOptions } from '../types';
 
-export default class CallExpressionCompiler extends NodeCompiler<
-  CallExpression
-> {
+export class CallExpressionCompiler extends NodeCompiler<CallExpression> {
   public readonly kind: SyntaxKind = SyntaxKind.CallExpression;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    expr: CallExpression,
-    optionsIn: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, expr: CallExpression, optionsIn: VisitOptions): void {
     const func = expr.getExpression();
-    if (
-      TypeGuards.isIdentifier(func) &&
-      sb.isGlobalSymbol(func, sb.getSymbol(func), 'syscall')
-    ) {
+    if (TypeGuards.isIdentifier(func) && sb.isGlobalSymbol(func, sb.getSymbol(func), 'syscall')) {
       this.handleSysCall(sb, expr, optionsIn);
+
       return;
     }
 
@@ -31,14 +23,12 @@ export default class CallExpressionCompiler extends NodeCompiler<
 
     if (TypeGuards.isSuperExpression(func)) {
       this.handleSuperConstruct(sb, expr, options);
+
       return;
     }
 
     let bindThis;
-    if (
-      TypeGuards.isElementAccessExpression(func) ||
-      TypeGuards.isPropertyAccessExpression(func)
-    ) {
+    if (TypeGuards.isElementAccessExpression(func) || TypeGuards.isPropertyAccessExpression(func)) {
       bindThis = true;
 
       const lhs = func.getExpression();
@@ -76,12 +66,8 @@ export default class CallExpressionCompiler extends NodeCompiler<
     }
   }
 
-  private handleSysCall(
-    sb: ScriptBuilder,
-    node: CallExpression,
-    options: VisitOptions,
-  ): void {
-    const sysCallName = node.getArguments()[0];
+  private handleSysCall(sb: ScriptBuilder, node: CallExpression, options: VisitOptions): void {
+    const sysCallName = node.getArguments()[0] as Node | undefined;
 
     const reportError = () => {
       sb.reportError(
@@ -90,30 +76,25 @@ export default class CallExpressionCompiler extends NodeCompiler<
         DiagnosticCode.INVALID_SYS_CALL,
       );
     };
-    if (sysCallName == null || !TypeGuards.isStringLiteral(sysCallName)) {
+    if (sysCallName === undefined || !TypeGuards.isStringLiteral(sysCallName)) {
       reportError();
+
       return;
     }
 
     const sysCallKey = sysCallName.getLiteralValue() as keyof typeof SYSCALLS;
-    const sysCall = SYSCALLS[sysCallKey];
-    if (sysCall == null) {
+    const sysCall = SYSCALLS[sysCallKey] as typeof SYSCALLS[keyof typeof SYSCALLS] | undefined;
+    if (sysCall === undefined) {
       reportError();
     } else {
       sysCall.handleCall(sb, node, options);
     }
   }
 
-  private handleSuperConstruct(
-    sb: ScriptBuilder,
-    node: CallExpression,
-    options: VisitOptions,
-  ): void {
+  private handleSuperConstruct(sb: ScriptBuilder, node: CallExpression, options: VisitOptions): void {
     const superClass = options.superClass;
-    if (superClass == null) {
-      throw new Error(
-        'Something went wrong, expected super class to be defined.',
-      );
+    if (superClass === undefined) {
+      throw new Error('Something went wrong, expected super class to be defined.');
     }
     // [thisValue, argsarr]
     sb.scope.getThis(sb, node, options);

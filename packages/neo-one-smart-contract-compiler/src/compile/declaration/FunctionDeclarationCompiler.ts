@@ -5,16 +5,10 @@ import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class FunctionDeclarationCompiler extends NodeCompiler<
-  FunctionDeclaration
-> {
+export class FunctionDeclarationCompiler extends NodeCompiler<FunctionDeclaration> {
   public readonly kind: SyntaxKind = SyntaxKind.FunctionDeclaration;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    decl: FunctionDeclaration,
-    optionsIn: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, decl: FunctionDeclaration, optionsIn: VisitOptions): void {
     if (!decl.isImplementation()) {
       return;
     }
@@ -28,7 +22,7 @@ export class FunctionDeclarationCompiler extends NodeCompiler<
       decl,
       options,
       sb.helpers.createFunctionObject({
-        property: InternalFunctionProperties.CALL,
+        property: InternalFunctionProperties.Call,
       }),
     );
     if (decl.isNamedExport() || decl.isDefaultExport()) {

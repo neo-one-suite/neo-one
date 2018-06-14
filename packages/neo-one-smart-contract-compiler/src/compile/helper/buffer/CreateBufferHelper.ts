@@ -10,11 +10,7 @@ export class CreateBufferHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (options.pushValue) {
       // [Buffer]
-      sb.emitHelper(
-        node,
-        options,
-        sb.helpers.getGlobalProperty({ property: 'Buffer' }),
-      );
+      sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Buffer' }));
       // [objectVal]
       sb.emitHelper(node, options, sb.helpers.new({ noArgs: true }));
     }

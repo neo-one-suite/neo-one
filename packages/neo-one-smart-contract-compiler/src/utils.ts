@@ -1,14 +1,12 @@
 // tslint:disable ban-types
-import Ast, { SourceFile, ts } from 'ts-simple-ast';
+import Project, { SourceFile, ts } from 'ts-simple-ast';
 
 import appRootDir from 'app-root-dir';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
-const findRoot = async (
-  dir: string | string[],
-  filename: string,
-): Promise<string | null> => {
+// tslint:disable-next-line readonly-array
+const findRoot = async (dir: string | string[], filename: string): Promise<string | undefined> => {
   let start = dir;
 
   if (typeof start === 'string') {
@@ -18,9 +16,10 @@ const findRoot = async (
     start = start.split(path.sep);
   }
   if (!start.length) {
-    return null;
+    return undefined;
   }
 
+  // tslint:disable-next-line no-array-mutation
   start.pop();
   const currentDir = start.join(path.sep);
   const file = path.join(currentDir, filename);
@@ -32,66 +31,58 @@ const findRoot = async (
   return findRoot(start, filename);
 };
 
-export const makeAst = async (dir: string): Promise<Ast> => {
+export const makeAst = async (dir: string): Promise<Project> => {
   const [localSCConfig, defaultConfig] = await Promise.all([
     findRoot(dir, 'tsconfig.sc.json'),
-    findRoot(
-      require.resolve('@neo-one/smart-contract-compiler'),
-      'tsconfig.default.json',
-    ),
+    findRoot(require.resolve('@neo-one/smart-contract-compiler'), 'tsconfig.default.json'),
   ]);
   const tsConfigFilePath = localSCConfig || defaultConfig;
 
-  if (tsConfigFilePath == null) {
+  if (tsConfigFilePath === undefined) {
     throw new Error('tsconfig.json not found in path');
   }
 
-  const res = ts.readConfigFile(tsConfigFilePath, (value) =>
-    fs.readFileSync(value, 'utf8'),
-  );
+  const res = ts.readConfigFile(tsConfigFilePath, (value) => fs.readFileSync(value, 'utf8'));
   const parseConfigHost = {
     fileExists: fs.existsSync,
     readDirectory: ts.sys.readDirectory,
     readFile: ts.sys.readFile,
     useCaseSensitiveFileNames: true,
   };
-  const parsed = ts.parseJsonConfigFileContent(
-    res.config,
-    parseConfigHost,
-    path.dirname(tsConfigFilePath),
-  );
+  const parsed = ts.parseJsonConfigFileContent(res.config, parseConfigHost, path.dirname(tsConfigFilePath));
 
-  return new Ast({ compilerOptions: parsed.options });
+  return new Project({ compilerOptions: parsed.options });
 };
 
-export const getAst = async (dir: string): Promise<Ast> => {
+export const getAst = async (dir: string): Promise<Project> => {
   const ast = await makeAst(dir);
   ast.addExistingSourceFiles(path.join(dir, '**', '*.ts'));
   // For some reason this forces Ast to resolve references. Do not remove.
   ast.getPreEmitDiagnostics();
+
   return ast;
 };
 
-export const getAstForPath = async (filePath: string): Promise<Ast> => {
+export const getAstForPath = async (filePath: string): Promise<Project> => {
   const ast = await makeAst(path.dirname(filePath));
   ast.addExistingSourceFiles(filePath);
   // For some reason this forces Ast to resolve references. Do not remove.
   ast.getPreEmitDiagnostics();
+
   return ast;
 };
 
 export const getAstForSnippet = async (
   code: string,
-): Promise<{ ast: Ast; sourceFile: SourceFile }> => {
+): Promise<{ readonly ast: Project; readonly sourceFile: SourceFile }> => {
   const ast = await makeAst(appRootDir.get());
   const sourceFile = ast.createSourceFile('code.ts', code);
   // For some reason this forces Ast to resolve references. Do not remove.
   ast.getPreEmitDiagnostics();
+
   return { ast, sourceFile };
 };
 
-export function notNull<TValue>(
-  value: TValue | null | undefined,
-): value is TValue {
-  return value != null;
+export function notNull<TValue>(value: TValue | null | undefined): value is TValue {
+  return value != undefined;
 }

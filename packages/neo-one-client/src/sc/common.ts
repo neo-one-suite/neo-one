@@ -1,10 +1,6 @@
 import { Param as ScriptBuilderParam } from '@neo-one/client-core';
 import _ from 'lodash';
-import {
-  InvalidArgumentError,
-  InvalidEventError,
-  InvocationCallError,
-} from '../errors';
+import { InvalidArgumentError, InvalidEventError, InvocationCallError } from '../errors';
 import {
   ABIEvent,
   ABIParameter,
@@ -24,43 +20,44 @@ export const convertParameter = ({
   type,
   parameter,
 }: {
-  type: ABIParameter | ABIReturn;
-  parameter: ContractParameter;
-}): Param | null => (contractParameters[type.type] as any)(parameter, type);
+  readonly type: ABIParameter | ABIReturn;
+  readonly parameter: ContractParameter;
+  // tslint:disable-next-line no-any
+}): Param | undefined => (contractParameters[type.type] as any)(parameter, type);
 
 export const getParametersObject = ({
   abiParameters,
   parameters,
 }: {
-  abiParameters: ABIParameter[];
-  parameters: ContractParameter[];
+  readonly abiParameters: ReadonlyArray<ABIParameter>;
+  readonly parameters: ReadonlyArray<ContractParameter>;
 }): EventParameters => {
   if (abiParameters.length !== parameters.length) {
     throw new InvalidArgumentError(
-      `Expected ABI parameters length (${abiParameters.length}) to equal ` +
-        `parameters length (${parameters.length})`,
+      `Expected ABI parameters length (${abiParameters.length}) to equal ` + `parameters length (${parameters.length})`,
     );
   }
 
-  const zipped = _.zip(abiParameters, parameters) as Array<
-    [ABIParameter, ContractParameter]
-  >;
-  return zipped.reduce((acc: EventParameters, [abiParameter, parameter]) => {
-    acc[abiParameter.name] = convertParameter({
-      type: abiParameter,
-      parameter,
-    });
+  const zipped = _.zip(abiParameters, parameters) as Array<[ABIParameter, ContractParameter]>;
 
-    return acc;
-  }, {});
+  return zipped.reduce<EventParameters>(
+    (acc, [abiParameter, parameter]) => ({
+      ...acc,
+      [abiParameter.name]: convertParameter({
+        type: abiParameter,
+        parameter,
+      }),
+    }),
+    {},
+  );
 };
 
 export const convertAction = ({
   action,
   events,
 }: {
-  action: ActionRaw;
-  events: { [key: string]: ABIEvent };
+  readonly action: ActionRaw;
+  readonly events: { readonly [K in string]?: ABIEvent };
 }): Action => {
   if (action.type === 'Log') {
     return action;
@@ -73,7 +70,7 @@ export const convertAction = ({
 
   const event = converters.toString(args[0]);
   const eventSpec = events[event];
-  if (eventSpec == null) {
+  if (eventSpec === undefined) {
     throw new InvalidEventError(`Unknown event ${event}`);
   }
 
@@ -99,9 +96,9 @@ export const convertInvocationResult = ({
   returnType,
   result,
 }: {
-  returnType: ABIReturn;
-  result: RawInvocationResult;
-}): InvocationResult<Param | null> => {
+  readonly returnType: ABIReturn;
+  readonly result: RawInvocationResult;
+}): InvocationResult<Param | undefined> => {
   const { gasConsumed, gasCost } = result;
   if (result.state === 'FAULT') {
     return {
@@ -113,8 +110,9 @@ export const convertInvocationResult = ({
   }
 
   const contractParameter = result.stack[0];
-  let value = null;
-  if (contractParameter != null) {
+  let value;
+  // tslint:disable-next-line strict-type-predicates
+  if (contractParameter !== undefined) {
     value = convertParameter({
       type: returnType,
       parameter: contractParameter,
@@ -128,16 +126,17 @@ export const convertCallResult = ({
   returnType,
   result,
 }: {
-  returnType: ABIReturn;
-  result: RawInvocationResult;
-}): Param | null => {
+  readonly returnType: ABIReturn;
+  readonly result: RawInvocationResult;
+}): Param | undefined => {
   if (result.state === 'FAULT') {
     throw new InvocationCallError(result.message);
   }
 
   const contractParameter = result.stack[0];
-  let value = null;
-  if (contractParameter != null) {
+  let value;
+  // tslint:disable-next-line strict-type-predicates
+  if (contractParameter !== undefined) {
     value = convertParameter({
       type: returnType,
       parameter: contractParameter,
@@ -151,26 +150,23 @@ export const convertParams = ({
   parameters,
   params,
 }: {
-  parameters: ABIParameter[];
-  params: Array<Param | null>;
+  readonly parameters: ReadonlyArray<ABIParameter>;
+  readonly params: ReadonlyArray<Param | undefined>;
 }): {
-  converted: Array<ScriptBuilderParam | null>;
-  zipped: Array<[string, Param | null]>;
+  readonly converted: ReadonlyArray<ScriptBuilderParam | undefined>;
+  readonly zipped: ReadonlyArray<[string, Param | undefined]>;
 } => {
   if (parameters.length !== params.length) {
     throw new InvalidArgumentError(
-      `Expected parameters length (${parameters.length}) to equal params ` +
-        `length (${params.length}).`,
+      `Expected parameters length (${parameters.length}) to equal params ` + `length (${params.length}).`,
     );
   }
 
-  const zip = _.zip(parameters, params) as Array<[ABIParameter, Param | null]>;
-  const converted = zip.map(([parameter, param]) =>
-    (paramCheckers[parameter.type] as any)(param, parameter),
-  );
-  const zipped = zip.map(
-    ([parameter, param]) => [parameter.name, param] as [string, Param | null],
-  );
+  const zip = _.zip(parameters, params) as Array<[ABIParameter, Param | undefined]>;
+  // tslint:disable-next-line no-any
+  const converted = zip.map(([parameter, param]) => (paramCheckers[parameter.type] as any)(param, parameter));
+  // tslint:disable-next-line no-useless-cast
+  const zipped = zip.map(([parameter, param]) => [parameter.name, param] as [string, Param | undefined]);
 
   return { converted, zipped };
 };

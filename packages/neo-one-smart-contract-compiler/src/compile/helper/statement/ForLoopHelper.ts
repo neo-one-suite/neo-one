@@ -6,11 +6,11 @@ import { Helper } from '../Helper';
 
 export type ForLoopHelperFunction = (() => void) | undefined;
 export interface ForLoopHelperOptions {
-  each: (options: VisitOptions) => void;
-  initializer?: ForLoopHelperFunction;
-  condition: ForLoopHelperFunction;
-  incrementor?: ForLoopHelperFunction;
-  withScope?: boolean;
+  readonly each: (options: VisitOptions) => void;
+  readonly initializer?: ForLoopHelperFunction;
+  readonly condition: ForLoopHelperFunction;
+  readonly incrementor?: ForLoopHelperFunction;
+  readonly withScope?: boolean;
 }
 
 export class ForLoopHelper extends Helper {
@@ -20,19 +20,13 @@ export class ForLoopHelper extends Helper {
   private readonly incrementor: ForLoopHelperFunction;
   private readonly withScope: boolean;
 
-  constructor({
-    each,
-    initializer,
-    condition,
-    incrementor,
-    withScope,
-  }: ForLoopHelperOptions) {
+  public constructor({ each, initializer, condition, incrementor, withScope = true }: ForLoopHelperOptions) {
     super();
     this.each = each;
     this.initializer = initializer;
     this.condition = condition;
     this.incrementor = incrementor;
-    this.withScope = withScope == null ? true : withScope;
+    this.withScope = withScope;
   }
 
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
@@ -46,12 +40,12 @@ export class ForLoopHelper extends Helper {
   }
 
   private emitLoop(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
-    if (this.initializer != null) {
+    if (this.initializer !== undefined) {
       this.initializer();
     }
 
     sb.withProgramCounter((loopPC) => {
-      if (this.condition != null) {
+      if (this.condition !== undefined) {
         this.condition();
       }
 
@@ -62,12 +56,7 @@ export class ForLoopHelper extends Helper {
       sb.withProgramCounter((breakPC) => {
         sb.withProgramCounter((innerPC) => {
           sb.withProgramCounter((continuePC) => {
-            this.each(
-              sb.breakPCOptions(
-                sb.continuePCOptions(options, continuePC.getLast()),
-                breakPC.getLast(),
-              ),
-            );
+            this.each(sb.breakPCOptions(sb.continuePCOptions(options, continuePC.getLast()), breakPC.getLast()));
             sb.emitJmp(node, 'JMP', innerPC.getLast());
           });
 
@@ -75,7 +64,7 @@ export class ForLoopHelper extends Helper {
           sb.emitOp(node, 'DROP');
         });
 
-        if (this.incrementor != null) {
+        if (this.incrementor !== undefined) {
           this.incrementor();
         }
 

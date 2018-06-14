@@ -40,10 +40,10 @@ export const parameters = {
 };
 
 export const abiFunction = (
-  constant: boolean = false,
+  constant = false,
   params: ABIParameter[] = [parameters.String],
-  verify: boolean = false,
-  name: string = 'funcName',
+  verify = false,
+  name = 'funcName',
   returnType: ABIReturn = returns.Void,
 ): ABIFunction => ({
   name,
@@ -53,18 +53,12 @@ export const abiFunction = (
   returnType,
 });
 
-export const abiEvent = (
-  name: string = 'eventName',
-  params: ABIParameter[] = [parameters.String],
-): ABIEvent => ({
+export const abiEvent = (name = 'eventName', params: ABIParameter[] = [parameters.String]): ABIEvent => ({
   name,
   parameters: params,
 });
 
-export const abi = (
-  functions: ABIFunction[] = [abiFunction()],
-  events: ABIEvent[] = [],
-): ABI => ({
+export const abi = (functions: ABIFunction[] = [abiFunction()], events: ABIEvent[] = []): ABI => ({
   functions,
   events,
 });

@@ -40,9 +40,7 @@ const tests = {
   ECPoint: {
     usages: ['ECDH02', 'ECDH03'],
     data: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
-    value: common.stringToECPoint(
-      '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
-    ),
+    value: common.stringToECPoint('02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef'),
 
     constructor: ECPointAttribute,
   },
@@ -76,9 +74,7 @@ const tests = {
     ],
 
     data: '798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca',
-    value: common.stringToUInt256(
-      '798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca',
-    ),
+    value: common.stringToUInt256('798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca'),
 
     constructor: UInt256Attribute,
   },
@@ -107,10 +103,7 @@ describe('attribute', () => {
       attribute(false as any);
     }
 
-    expect(testError).toThrow(new InvalidNamedArgumentError(
-      'attribute',
-      false,
-    ) as any);
+    expect(testError).toThrow(new InvalidNamedArgumentError('attribute', false) as any);
   });
 
   test('throws error on usage', () => {
@@ -119,9 +112,6 @@ describe('attribute', () => {
       attribute(badAttribute as any);
     }
 
-    expect(testError).toThrow(new InvalidNamedArgumentError(
-      'attribute',
-      badAttribute,
-    ) as any);
+    expect(testError).toThrow(new InvalidNamedArgumentError('attribute', badAttribute) as any);
   });
 });

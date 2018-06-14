@@ -3,7 +3,7 @@ import { DeveloperProvider, Options } from './types';
 export class DeveloperClient {
   private readonly developerProvider: DeveloperProvider;
 
-  constructor(developerProvider: DeveloperProvider) {
+  public constructor(developerProvider: DeveloperProvider) {
     this.developerProvider = developerProvider;
   }
 

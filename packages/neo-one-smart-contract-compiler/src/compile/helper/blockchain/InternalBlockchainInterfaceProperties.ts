@@ -13,5 +13,5 @@ export type BlockchainInterfaceName =
   | 'StorageIteratorBase';
 
 export enum InternalBlockchainInterfaceProperties {
-  BLOCKCHAIN_INTERFACE = 'BlockchainInterface',
+  BlockchainInterface = 'BlockchainInterface',
 }

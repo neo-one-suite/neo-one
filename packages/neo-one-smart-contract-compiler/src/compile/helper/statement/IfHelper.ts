@@ -5,9 +5,9 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface IfHelperOptions {
-  condition: () => void;
-  whenTrue?: () => void;
-  whenFalse?: (() => void) | undefined;
+  readonly condition: () => void;
+  readonly whenTrue?: () => void;
+  readonly whenFalse?: (() => void) | undefined;
 }
 
 export class IfHelper extends Helper {
@@ -15,18 +15,18 @@ export class IfHelper extends Helper {
   private readonly whenTrue: (() => void) | undefined;
   private readonly whenFalse: (() => void) | undefined;
 
-  constructor({ condition, whenTrue, whenFalse }: IfHelperOptions) {
+  public constructor({ condition, whenTrue, whenFalse }: IfHelperOptions) {
     super();
     this.condition = condition;
     this.whenTrue = whenTrue;
     this.whenFalse = whenFalse;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: Node, _options: VisitOptions): void {
     this.condition();
     const { whenTrue, whenFalse } = this;
-    if (whenTrue == null) {
-      if (whenFalse == null) {
+    if (whenTrue === undefined) {
+      if (whenFalse === undefined) {
         throw new Error('If statement must have a true or false value');
       }
       sb.withProgramCounter((endPC) => {
@@ -38,12 +38,12 @@ export class IfHelper extends Helper {
         sb.withProgramCounter((whenTruePC) => {
           sb.emitJmp(node, 'JMPIFNOT', whenTruePC.getLast());
           whenTrue();
-          if (this.whenFalse != null) {
+          if (this.whenFalse !== undefined) {
             sb.emitJmp(node, 'JMP', whenFalsePC.getLast());
           }
         });
 
-        if (this.whenFalse != null) {
+        if (this.whenFalse !== undefined) {
           this.whenFalse();
         }
       });

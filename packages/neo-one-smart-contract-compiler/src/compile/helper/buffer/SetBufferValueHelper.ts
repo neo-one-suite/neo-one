@@ -11,7 +11,7 @@ export class SetBufferValueHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // ['data', byteArray, objectVal]
-    sb.emitPushString(node, InternalBufferProperties.DATA);
+    sb.emitPushString(node, InternalBufferProperties.Data);
     // [byteArray, 'data', objectVal]
     sb.emitOp(node, 'SWAP');
     // []

@@ -1,27 +1,15 @@
+import { utils } from '@neo-one/utils';
 import { UInt256 } from '../common';
-import {
-  createDeserializeWire,
-  DeserializeWire,
-  DeserializeWireBaseOptions,
-} from '../Serializable';
-import { ClaimTransaction } from './ClaimTransaction';
-import { ClaimTransactionJSON } from './ClaimTransaction';
-import { ContractTransactionJSON } from './ContractTransaction';
-import { ContractTransaction } from './ContractTransaction';
-import { EnrollmentTransactionJSON } from './EnrollmentTransaction';
-import { EnrollmentTransaction } from './EnrollmentTransaction';
-import { InvocationTransaction } from './InvocationTransaction';
-import { InvocationTransactionJSON } from './InvocationTransaction';
-import { IssueTransactionJSON } from './IssueTransaction';
-import { IssueTransaction } from './IssueTransaction';
-import { MinerTransactionJSON } from './MinerTransaction';
-import { MinerTransaction } from './MinerTransaction';
-import { PublishTransaction } from './PublishTransaction';
-import { PublishTransactionJSON } from './PublishTransaction';
-import { RegisterTransaction } from './RegisterTransaction';
-import { RegisterTransactionJSON } from './RegisterTransaction';
-import { StateTransaction } from './StateTransaction';
-import { StateTransactionJSON } from './StateTransaction';
+import { createDeserializeWire, DeserializeWireBaseOptions } from '../Serializable';
+import { ClaimTransaction, ClaimTransactionJSON } from './ClaimTransaction';
+import { ContractTransaction, ContractTransactionJSON } from './ContractTransaction';
+import { EnrollmentTransaction, EnrollmentTransactionJSON } from './EnrollmentTransaction';
+import { InvocationTransaction, InvocationTransactionJSON } from './InvocationTransaction';
+import { IssueTransaction, IssueTransactionJSON } from './IssueTransaction';
+import { MinerTransaction, MinerTransactionJSON } from './MinerTransaction';
+import { PublishTransaction, PublishTransactionJSON } from './PublishTransaction';
+import { RegisterTransaction, RegisterTransactionJSON } from './RegisterTransaction';
+import { StateTransaction, StateTransactionJSON } from './StateTransaction';
 import { assertTransactionType, TransactionType } from './TransactionType';
 
 export type Transaction =
@@ -47,18 +35,16 @@ export type TransactionJSON =
   | InvocationTransactionJSON;
 
 export interface TransactionReceiptJSON {
-  blockIndex: number;
-  blockHash: string;
-  transactionIndex: number;
+  readonly blockIndex: number;
+  readonly blockHash: string;
+  readonly transactionIndex: number;
 }
 
 export interface TransactionKey {
-  hash: UInt256;
+  readonly hash: UInt256;
 }
 
-export const deserializeTransactionWireBase = (
-  options: DeserializeWireBaseOptions,
-): Transaction => {
+export const deserializeTransactionWireBase = (options: DeserializeWireBaseOptions): Transaction => {
   const { reader } = options;
   const type = assertTransactionType(reader.clone().readUInt8());
   switch (type) {
@@ -80,9 +66,10 @@ export const deserializeTransactionWireBase = (
       return PublishTransaction.deserializeWireBase(options);
     case TransactionType.Invocation:
       return InvocationTransaction.deserializeWireBase(options);
+    default:
+      utils.assertNever(type);
+      throw new Error('For TS');
   }
 };
 
-export const deserializeTransactionWire: DeserializeWire<
-  Transaction
-> = createDeserializeWire(deserializeTransactionWireBase);
+export const deserializeTransactionWire = createDeserializeWire(deserializeTransactionWireBase);

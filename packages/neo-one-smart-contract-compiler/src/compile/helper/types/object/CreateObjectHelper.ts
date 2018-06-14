@@ -7,22 +7,22 @@ import { Types } from '../Types';
 
 // Input: []
 // Output: [objectVal]
-export class CreateObjectHelper extends Helper<Node> {
+export class CreateObjectHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (options.pushValue) {
-      /* create internal object */
+      // create internal object
       // [iobj]
       sb.emitOp(node, 'NEWMAP');
 
-      /* create symbol obj */
+      // create symbol obj
       // [sobj, iobj]
       sb.emitOp(node, 'NEWMAP');
 
-      /* create obj */
+      // create obj
       // [pobj, sobj, iobj]
       sb.emitOp(node, 'NEWMAP');
 
-      /* create object array */
+      // create object array
       // [3, pobj, sobj, iobj]
       sb.emitPushInt(node, 3);
       // [object]
@@ -31,7 +31,7 @@ export class CreateObjectHelper extends Helper<Node> {
       // [objectType, object]
       sb.emitPushInt(node, Types.Object);
 
-      /* create object */
+      // create object
       // [2, objectType, object]
       sb.emitPushInt(node, 2);
       // [objectVal]

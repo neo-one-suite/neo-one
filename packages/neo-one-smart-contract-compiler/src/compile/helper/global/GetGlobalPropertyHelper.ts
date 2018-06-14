@@ -5,15 +5,15 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface GetGlobalPropertyHelperOptions {
-  property: string;
+  readonly property: string;
 }
 
 // Input: []
 // Output: [val]
-export class GetGlobalPropertyHelper extends Helper<Node> {
+export class GetGlobalPropertyHelper extends Helper {
   private readonly property: string;
 
-  constructor(options: GetGlobalPropertyHelperOptions) {
+  public constructor(options: GetGlobalPropertyHelperOptions) {
     super();
     this.property = options.property;
   }

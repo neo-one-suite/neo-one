@@ -8,16 +8,12 @@ import { VisitOptions } from '../types';
 export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
   public readonly kind: SyntaxKind = SyntaxKind.ClassDeclaration;
 
-  public visitNode(
-    sb: ScriptBuilder,
-    decl: ClassDeclaration,
-    optionsIn: VisitOptions,
-  ): void {
+  public visitNode(sb: ScriptBuilder, decl: ClassDeclaration, optionsIn: VisitOptions): void {
     let options = sb.pushValueOptions(sb.noSuperClassOptions(optionsIn));
     const name = sb.scope.add(decl.getNameOrThrow());
     const extendsExpr = decl.getExtends();
     let superClassIn;
-    if (extendsExpr != null) {
+    if (extendsExpr !== undefined) {
       superClassIn = sb.scope.addUnique();
       options = sb.superClassOptions(options, superClassIn);
       // [superClass]
@@ -27,7 +23,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
     }
     const superClass = superClassIn;
 
-    /* Create constructor function */
+    // Create constructor function
     // [farr]
     sb.emitHelper(
       decl,
@@ -35,15 +31,13 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
       sb.helpers.createConstructArray({
         body: () => {
           // [argsarr]
-          const ctorImpl = decl
-            .getConstructors()
-            .find((ctor) => ctor.isImplementation());
+          const ctorImpl = decl.getConstructors().find((ctor) => ctor.isImplementation());
           // Default value assignments
-          if (ctorImpl != null) {
+          if (ctorImpl !== undefined) {
             // []
             sb.emitHelper(ctorImpl, options, sb.helpers.parameters);
             // Super call statement
-          } else if (superClass != null && extendsExpr != null) {
+          } else if (superClass !== undefined && extendsExpr !== undefined) {
             // [thisObjectVal, argsarr]
             sb.scope.getThis(sb, decl, options);
             // [ctor, thisObjectVal, argsarr]
@@ -64,24 +58,20 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
             .filter(TypeGuards.isPropertyDeclaration)
             .forEach((property) => {
               const initializer = property.getInitializer();
-              if (initializer != null) {
+              if (initializer !== undefined) {
                 sb.emitOp(decl, 'DUP');
                 // [prop, thisObjectVal, thisObjectVal]
                 sb.emitPushString(initializer, property.getName());
                 // [init, prop, thisObjectVal, thisObjectVal]
                 sb.visit(initializer, options);
                 // [thisObjectVal]
-                sb.emitHelper(
-                  initializer,
-                  options,
-                  sb.helpers.setDataPropertyObjectProperty,
-                );
+                sb.emitHelper(initializer, options, sb.helpers.setDataPropertyObjectProperty);
               }
             });
           // []
           sb.emitOp(decl, 'DROP');
           // Constructor statements
-          if (ctorImpl != null) {
+          if (ctorImpl !== undefined) {
             sb.visit(ctorImpl.getBodyOrThrow(), options);
           }
         },
@@ -93,11 +83,11 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
       decl,
       options,
       sb.helpers.createFunctionObject({
-        property: InternalFunctionProperties.CONSTRUCT,
+        property: InternalFunctionProperties.Construct,
       }),
     );
 
-    /* Create prototype */
+    // Create prototype
     // [fobjectVal, fobjectVal]
     sb.emitOp(decl, 'DUP');
     // ['prototype', fobjectVal, fobjectVal]
@@ -127,15 +117,11 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
           decl,
           options,
           sb.helpers.createFunctionObject({
-            property: InternalFunctionProperties.CALL,
+            property: InternalFunctionProperties.Call,
           }),
         );
         // [objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitHelper(
-          method,
-          options,
-          sb.helpers.setDataPropertyObjectProperty,
-        );
+        sb.emitHelper(method, options, sb.helpers.setDataPropertyObjectProperty);
       }
     });
 
@@ -154,18 +140,18 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
           decl,
           options,
           sb.helpers.createFunctionObject({
-            property: InternalFunctionProperties.CALL,
+            property: InternalFunctionProperties.Call,
           }),
         );
         const getAccessor = accessor.getGetAccessor();
-        const hasGet = getAccessor != null;
-        if (getAccessor != null) {
+        const hasGet = getAccessor !== undefined;
+        if (getAccessor !== undefined) {
           sb.emitHelper(getAccessor, options, sb.helpers.createCallArray);
           sb.emitHelper(
             decl,
             options,
             sb.helpers.createFunctionObject({
-              property: InternalFunctionProperties.CALL,
+              property: InternalFunctionProperties.Call,
             }),
           );
         }
@@ -182,9 +168,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
 
     decl
       .getGetAccessors()
-      .filter(
-        (accessor) => !accessor.isStatic() && accessor.getSetAccessor() == null,
-      )
+      .filter((accessor) => !accessor.isStatic() && accessor.getSetAccessor() === undefined)
       .forEach((accessor) => {
         // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
         sb.emitOp(accessor, 'DUP');
@@ -197,7 +181,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
           decl,
           options,
           sb.helpers.createFunctionObject({
-            property: InternalFunctionProperties.CALL,
+            property: InternalFunctionProperties.Call,
           }),
         );
         // [objectVal, 'prototype', fobjectVal, fobjectVal]
@@ -211,8 +195,8 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
         );
       });
 
-    /* Set superclass prototype */
-    if (superClass != null && extendsExpr != null) {
+    // Set superclass prototype
+    if (superClass !== undefined && extendsExpr !== undefined) {
       // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
       sb.emitOp(extendsExpr, 'DUP');
       // ['prototype', objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
@@ -224,11 +208,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
       // [superprototype, 'prototype', objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
       sb.emitHelper(extendsExpr, options, sb.helpers.getPropertyObjectProperty);
       // [objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitHelper(
-        extendsExpr,
-        options,
-        sb.helpers.setDataPropertyObjectProperty,
-      );
+      sb.emitHelper(extendsExpr, options, sb.helpers.setDataPropertyObjectProperty);
     }
 
     // [fobjectVal]

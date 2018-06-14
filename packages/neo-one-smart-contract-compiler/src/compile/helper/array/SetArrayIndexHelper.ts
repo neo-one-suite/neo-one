@@ -61,11 +61,7 @@ export class SetArrayIndexHelper extends Helper {
           // [lengthVal, 'length', objectVal, objectVal, indexNumber, val]
           sb.emitHelper(node, options, sb.helpers.createNumber);
           // [objectVal, indexNumber, val]
-          sb.emitHelper(
-            node,
-            options,
-            sb.helpers.setDataPropertyObjectProperty,
-          );
+          sb.emitHelper(node, options, sb.helpers.setDataPropertyObjectProperty);
           // []
           this.setIndex(sb, node, options);
         },

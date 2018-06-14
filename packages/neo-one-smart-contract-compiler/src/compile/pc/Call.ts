@@ -2,7 +2,7 @@ import { Jump } from './Jump';
 import { ProgramCounter } from './ProgramCounter';
 
 export class Call extends Jump {
-  constructor(pc: ProgramCounter) {
+  public constructor(pc: ProgramCounter) {
     super('CALL', pc);
   }
 

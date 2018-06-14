@@ -1,10 +1,7 @@
 import { common, ECPoint } from '../../common';
 import { Equals } from '../../Equatable';
 import { InvalidFormatError } from '../../errors';
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../../Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../../utils';
 import { AttributeBase, AttributeJSON } from './AttributeBase';
 import { AttributeUsage, toJSONAttributeUsage } from './AttributeUsage';
@@ -12,25 +9,18 @@ import { AttributeUsage, toJSONAttributeUsage } from './AttributeUsage';
 export type ECPointAttributeUsage = 0x02 | 0x03;
 
 export interface ECPointAttributeAdd {
-  usage: ECPointAttributeUsage;
-  value: ECPoint;
+  readonly usage: ECPointAttributeUsage;
+  readonly value: ECPoint;
 }
 
-export class ECPointAttribute extends AttributeBase<
-  ECPointAttributeUsage,
-  ECPoint
-> {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): ECPointAttribute {
+export class ECPointAttribute extends AttributeBase<ECPointAttributeUsage, ECPoint> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): ECPointAttribute {
     const { reader } = options;
     const { usage } = super.deserializeAttributeWireBase(options);
     if (!(usage === AttributeUsage.ECDH02 || usage === AttributeUsage.ECDH03)) {
       throw new InvalidFormatError();
     }
-    const value = common.bufferToECPoint(
-      Buffer.concat([Buffer.from([usage]), reader.readBytes(32)]),
-    );
+    const value = common.bufferToECPoint(Buffer.concat([Buffer.from([usage]), reader.readBytes(32)]));
 
     return new this({ usage, value });
   }
@@ -40,12 +30,10 @@ export class ECPointAttribute extends AttributeBase<
   public readonly size: number;
   public readonly equals: Equals = utils.equals(
     ECPointAttribute,
-    (other) =>
-      this.usage === other.usage &&
-      common.ecPointEqual(this.value, other.value),
+    (other) => this.usage === other.usage && common.ecPointEqual(this.value, other.value),
   );
 
-  constructor({ usage, value }: ECPointAttributeAdd) {
+  public constructor({ usage, value }: ECPointAttributeAdd) {
     super();
     this.usage = usage;
     this.value = value;
@@ -57,7 +45,7 @@ export class ECPointAttribute extends AttributeBase<
     writer.writeBytes(common.ecPointToBuffer(this.value).slice(1));
   }
 
-  public serializeJSON(context: SerializeJSONContext): AttributeJSON {
+  public serializeJSON(_context: SerializeJSONContext): AttributeJSON {
     return {
       usage: toJSONAttributeUsage(this.usage),
       data: JSONHelper.writeECPoint(this.value),

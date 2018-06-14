@@ -11,76 +11,55 @@ import { Name, Scope } from '../scope';
 import { VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 
-export type Bytecode = Array<[Node, Buffer | Jump]>;
+export type SingleBytecode = [Node, Buffer | Jump];
+export type Bytecode = ReadonlyArray<SingleBytecode>;
 
 export interface CaptureResult {
-  length: number;
-  bytecode: Bytecode;
+  readonly length: number;
+  readonly bytecode: Bytecode;
 }
 
 export interface ScriptBuilder {
-  scope: Scope;
-  moduleIndex: number;
-  helpers: Helpers;
-  jumpTable: JumpTable;
-  process(): void;
-  visit(node: Node, options: VisitOptions): void;
-  withScope(
-    node: Node,
-    options: VisitOptions,
-    func: (options: VisitOptions) => void,
-  ): void;
-  withProgramCounter(func: (pc: ProgramCounterHelper) => void): void;
-  emitOp(node: Node, code: OpCode): void;
-  emitPushInt(node: Node, value: number | BN): void;
-  emitPushBoolean(node: Node, value: boolean): void;
-  emitPushString(node: Node, value: string): void;
-  emitJmp(
-    node: Node,
-    code: 'JMP' | 'JMPIF' | 'JMPIFNOT',
-    pc: ProgramCounter,
-  ): void;
-  emitHelper<T extends Node>(
-    node: T,
-    options: VisitOptions,
-    helper: Helper<T>,
-  ): void;
-  emitBytecode(bytecode: Bytecode): void;
-  emitCall(node: Node): void;
-  emitSysCall(node: Node, name: SysCallName): void;
-  loadModule(node: SourceFile): void;
-  capture(func: () => void): CaptureResult;
-  toBuffer(value: string): Buffer;
-  plainOptions(options: VisitOptions): VisitOptions;
-  pushValueOptions(options: VisitOptions): VisitOptions;
-  noPushValueOptions(options: VisitOptions): VisitOptions;
-  setValueOptions(options: VisitOptions): VisitOptions;
-  noSetValueOptions(options: VisitOptions): VisitOptions;
-  noValueOptions(options: VisitOptions): VisitOptions;
-  breakPCOptions(options: VisitOptions, pc: ProgramCounter): VisitOptions;
-  continuePCOptions(options: VisitOptions, pc: ProgramCounter): VisitOptions;
-  catchPCOptions(options: VisitOptions, pc: ProgramCounter): VisitOptions;
-  castOptions(options: VisitOptions, type?: Type): VisitOptions;
-  noCastOptions(options: VisitOptions): VisitOptions;
-  superClassOptions(options: VisitOptions, superClass: Name): VisitOptions;
-  noSuperClassOptions(options: VisitOptions): VisitOptions;
-  reportError(node: Node, message: string, code: DiagnosticCode): void;
-  reportUnsupported(node: Node): void;
-  getType(node: Node, required?: boolean): Type | undefined;
-  getSymbol(node: Node, required?: boolean): Symbol | undefined;
-  isOnlyGlobal(
-    node: Node,
-    type: Type | undefined,
-    name: keyof Globals,
-  ): boolean;
-  isGlobal(node: Node, type: Type | undefined, name: keyof Globals): boolean;
-  isGlobalSymbol(
-    node: Node,
-    symbol: Symbol | undefined,
-    name: keyof Globals,
-  ): boolean;
-  hasExport(sourceFile: SourceFile, name: string): boolean;
-  addExport(name: string): void;
-  assertUnreachable(value: never): never;
-  assertNotNull<T>(value: T | undefined | null): T;
+  readonly scope: Scope;
+  readonly moduleIndex: number;
+  readonly helpers: Helpers;
+  readonly jumpTable: JumpTable;
+  readonly process: () => void;
+  readonly visit: (node: Node, options: VisitOptions) => void;
+  readonly withScope: (node: Node, options: VisitOptions, func: (options: VisitOptions) => void) => void;
+  readonly withProgramCounter: (func: (pc: ProgramCounterHelper) => void) => void;
+  readonly emitOp: (node: Node, code: OpCode, value?: Buffer) => void;
+  readonly emitPushInt: (node: Node, value: number | BN) => void;
+  readonly emitPushBoolean: (node: Node, value: boolean) => void;
+  readonly emitPushString: (node: Node, value: string) => void;
+  readonly emitJmp: (node: Node, code: 'JMP' | 'JMPIF' | 'JMPIFNOT', pc: ProgramCounter) => void;
+  readonly emitHelper: <T extends Node>(node: T, options: VisitOptions, helper: Helper<T>) => void;
+  readonly emitBytecode: (bytecode: Bytecode) => void;
+  readonly emitCall: (node: Node) => void;
+  readonly emitSysCall: (node: Node, name: SysCallName) => void;
+  readonly loadModule: (node: SourceFile) => void;
+  readonly capture: (func: () => void) => CaptureResult;
+  readonly toBuffer: (value: string) => Buffer;
+  readonly plainOptions: (options: VisitOptions) => VisitOptions;
+  readonly pushValueOptions: (options: VisitOptions) => VisitOptions;
+  readonly noPushValueOptions: (options: VisitOptions) => VisitOptions;
+  readonly setValueOptions: (options: VisitOptions) => VisitOptions;
+  readonly noSetValueOptions: (options: VisitOptions) => VisitOptions;
+  readonly noValueOptions: (options: VisitOptions) => VisitOptions;
+  readonly breakPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
+  readonly continuePCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
+  readonly catchPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
+  readonly castOptions: (options: VisitOptions, type?: Type) => VisitOptions;
+  readonly noCastOptions: (options: VisitOptions) => VisitOptions;
+  readonly superClassOptions: (options: VisitOptions, superClass: Name) => VisitOptions;
+  readonly noSuperClassOptions: (options: VisitOptions) => VisitOptions;
+  readonly reportError: (node: Node, message: string, code: DiagnosticCode) => void;
+  readonly reportUnsupported: (node: Node) => void;
+  readonly getType: (node: Node, required?: boolean) => Type | undefined;
+  readonly getSymbol: (node: Node, required?: boolean) => Symbol | undefined;
+  readonly isOnlyGlobal: (node: Node, type: Type | undefined, name: keyof Globals) => boolean;
+  readonly isGlobal: (node: Node, type: Type | undefined, name: keyof Globals) => boolean;
+  readonly isGlobalSymbol: (node: Node, symbol: Symbol | undefined, name: keyof Globals) => boolean;
+  readonly hasExport: (sourceFile: SourceFile, name: string) => boolean;
+  readonly addExport: (name: string) => void;
 }

@@ -1,13 +1,7 @@
-import {
-  createDeserializeWire,
-  DeserializeWire,
-  DeserializeWireBaseOptions,
-} from '../../Serializable';
+import { utils } from '@neo-one/utils';
+import { createDeserializeWire, DeserializeWireBaseOptions } from '../../Serializable';
 import { ChangeViewConsensusMessage } from './ChangeViewConsensusMessage';
-import {
-  assertConsensusMessageType,
-  ConsensusMessageType,
-} from './ConsensusMessageType';
+import { assertConsensusMessageType, ConsensusMessageType } from './ConsensusMessageType';
 import { PrepareRequestConsensusMessage } from './PrepareRequestConsensusMessage';
 import { PrepareResponseConsensusMessage } from './PrepareResponseConsensusMessage';
 
@@ -16,9 +10,7 @@ export type ConsensusMessage =
   | PrepareRequestConsensusMessage
   | PrepareResponseConsensusMessage;
 
-export const deserializeConsensusMessageWireBase = (
-  options: DeserializeWireBaseOptions,
-): ConsensusMessage => {
+export const deserializeConsensusMessageWireBase = (options: DeserializeWireBaseOptions): ConsensusMessage => {
   const { reader } = options;
   const type = assertConsensusMessageType(reader.clone().readUInt8());
   switch (type) {
@@ -28,9 +20,10 @@ export const deserializeConsensusMessageWireBase = (
       return PrepareRequestConsensusMessage.deserializeWireBase(options);
     case ConsensusMessageType.PrepareResponse:
       return PrepareResponseConsensusMessage.deserializeWireBase(options);
+    default:
+      utils.assertNever(type);
+      throw new Error('For TS');
   }
 };
 
-export const deserializeConsensusMessageWire: DeserializeWire<
-  ConsensusMessage
-> = createDeserializeWire(deserializeConsensusMessageWireBase);
+export const deserializeConsensusMessageWire = createDeserializeWire(deserializeConsensusMessageWireBase);

@@ -1,5 +1,5 @@
 import { IncomingMessage } from 'http';
-import Koa, { Context } from 'koa';
+import Application, { Context } from 'koa';
 import { Server } from 'net';
 
 import mount from 'koa-mount';
@@ -10,32 +10,30 @@ import { MonitorBase, Tracer } from './MonitorBase';
 import { Logger, LogLevel, Monitor } from './types';
 
 export interface NodeMonitorCreate {
-  service: string;
-  logger?: Logger;
-  tracer?: Tracer;
-  spanLogLevel?: LogLevel;
+  readonly service: string;
+  readonly logger?: Logger;
+  readonly tracer?: Tracer;
+  readonly spanLogLevel?: LogLevel;
 }
 
+const DEFAULT_LOGGER: Logger = {
+  log: () => {
+    // do nothing
+  },
+  close: (callback) => {
+    callback();
+  },
+};
+
 export class NodeMonitor extends MonitorBase {
-  public static create({
-    service,
-    logger,
-    tracer,
-    spanLogLevel,
-  }: NodeMonitorCreate): NodeMonitor {
+  public static create({ service, logger = DEFAULT_LOGGER, tracer, spanLogLevel }: NodeMonitorCreate): NodeMonitor {
     prom.collectDefaultMetrics({ timeout: 4000 });
     gcStats(prom.register)();
+
     return new NodeMonitor({
       service,
       component: service,
-      logger: logger || {
-        log: () => {
-          // do nothing
-        },
-        close: (callback: () => void) => {
-          callback();
-        },
-      },
+      logger,
       tracer,
       // Perfhooks is broken in 8.9 - there's no way to get the current
       // high resolution timestamp. Fix is in 9.8.0.
@@ -44,7 +42,7 @@ export class NodeMonitor extends MonitorBase {
     });
   }
 
-  private server: Server | null = null;
+  private mutableServer: Server | undefined;
 
   public forContext(ctx: Context): Monitor {
     return this.withLabels({
@@ -63,18 +61,18 @@ export class NodeMonitor extends MonitorBase {
   }
 
   public forMessage(message: IncomingMessage): Monitor {
-    const app = new Koa();
+    const app = new Application();
     app.proxy = true;
-    // $FlowFixMe
     app.silent = true;
+    // tslint:disable-next-line no-any
     const ctx = app.createContext(message, undefined as any);
+
     return this.forContext(ctx);
   }
 
   public serveMetrics(port: number): void {
-    const app = new Koa();
+    const app = new Application();
     app.proxy = true;
-    // $FlowFixMe
     app.silent = true;
 
     const monitor = this.at('telemetry');
@@ -92,18 +90,18 @@ export class NodeMonitor extends MonitorBase {
       }),
     );
 
-    this.server = app.listen(port);
+    this.mutableServer = app.listen(port);
   }
 
   protected async closeInternal(): Promise<void> {
     clearInterval(prom.collectDefaultMetrics());
     await Promise.all([
       super.closeInternal(),
-      new Promise((resolve) => {
-        if (this.server == null) {
+      new Promise<void>((resolve) => {
+        if (this.mutableServer === undefined) {
           resolve();
         } else {
-          this.server.close(() => resolve());
+          this.mutableServer.close(resolve);
         }
       }),
     ]);

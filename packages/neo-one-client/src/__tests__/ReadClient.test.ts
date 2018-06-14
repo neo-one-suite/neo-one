@@ -139,10 +139,7 @@ describe('ReadClient', () => {
 
     (createReadSmartContract as any).mockImplementation(() => expected);
 
-    const result = readClient.smartContract(
-      dummyArg.toString(),
-      dummyArg as any,
-    );
+    const result = readClient.smartContract(dummyArg.toString(), dummyArg as any);
 
     expect(result).toEqual(expected);
   });

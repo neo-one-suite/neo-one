@@ -10,7 +10,8 @@ import { TypeAliasDeclarationCompiler } from './TypeAliasDeclarationCompiler';
 import { VariableDeclarationCompiler } from './VariableDeclarationCompiler';
 import { VariableDeclarationListCompiler } from './VariableDeclarationListCompiler';
 
-export default [
+// tslint:disable-next-line export-name readonly-array
+export const declarations = [
   ClassDeclarationCompiler,
   EnumDeclarationCompiler,
   EnumMemberCompiler,

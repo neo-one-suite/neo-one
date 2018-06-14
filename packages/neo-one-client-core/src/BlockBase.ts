@@ -4,49 +4,42 @@ import { crypto } from './crypto';
 import { Equals, Equatable } from './Equatable';
 import { InvalidFormatError, UnsignedBlockError } from './errors';
 import { Header, HeaderKey } from './Header';
-import {
-  createSerializeWire,
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-  SerializeWire,
-} from './Serializable';
+import { createSerializeWire, DeserializeWireBaseOptions, SerializeJSONContext, SerializeWire } from './Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from './utils';
 import { Witness, WitnessJSON } from './Witness';
 
 export interface BlockGetScriptHashesForVerifyingOptions {
-  getHeader: (key: HeaderKey) => Promise<Header>;
+  readonly getHeader: (key: HeaderKey) => Promise<Header>;
 }
 
 export interface BlockBaseAdd {
-  version?: number;
-  previousHash: UInt256;
-  merkleRoot: UInt256;
-  timestamp: number;
-  index: number;
-  consensusData: BN;
-  nextConsensus: UInt160;
-  script?: Witness;
-  hash?: UInt256;
+  readonly version?: number;
+  readonly previousHash: UInt256;
+  readonly merkleRoot: UInt256;
+  readonly timestamp: number;
+  readonly index: number;
+  readonly consensusData: BN;
+  readonly nextConsensus: UInt160;
+  readonly script?: Witness;
+  readonly hash?: UInt256;
 }
 
 export interface BlockBaseJSON {
-  version: number;
-  hash: string;
-  previousblockhash: string;
-  merkleroot: string;
-  time: number;
-  index: number;
-  nonce: string;
-  nextconsensus: string;
-  script: WitnessJSON;
-  size: number;
-  confirmations: number;
+  readonly version: number;
+  readonly hash: string;
+  readonly previousblockhash: string;
+  readonly merkleroot: string;
+  readonly time: number;
+  readonly index: number;
+  readonly nonce: string;
+  readonly nextconsensus: string;
+  readonly script: WitnessJSON;
+  readonly size: number;
+  readonly confirmations: number;
 }
 
 export abstract class BlockBase implements Equatable {
-  public static deserializeBlockBaseWireBase(
-    options: DeserializeWireBaseOptions,
-  ): BlockBaseAdd {
+  public static deserializeBlockBaseWireBase(options: DeserializeWireBaseOptions): BlockBaseAdd {
     const { reader } = options;
 
     const version = reader.readUInt32LE();
@@ -80,16 +73,14 @@ export abstract class BlockBase implements Equatable {
   public readonly index: number;
   public readonly consensusData: BN;
   public readonly nextConsensus: UInt160;
-  public readonly equals: Equals = utils.equals(
-    this.constructor as any,
-    (other: any) => common.uInt256Equal(this.hash, other.hash),
+  // tslint:disable-next-line no-any
+  public readonly equals: Equals = utils.equals(this.constructor as any, (other: any) =>
+    common.uInt256Equal(this.hash, other.hash),
   );
   public readonly getScriptHashesForVerifying = utils.lazyAsync(
     async ({ getHeader }: BlockGetScriptHashesForVerifyingOptions) => {
       if (this.index === 0) {
-        return new Set([
-          common.uInt160ToHex(crypto.toScriptHash(this.script.verification)),
-        ]);
+        return new Set([common.uInt160ToHex(crypto.toScriptHash(this.script.verification))]);
       }
 
       const previousHeader = await getHeader({
@@ -99,16 +90,10 @@ export abstract class BlockBase implements Equatable {
       return new Set([common.uInt160ToHex(previousHeader.nextConsensus)]);
     },
   );
-  public readonly serializeUnsigned: SerializeWire = createSerializeWire(
-    this.serializeUnsignedBase.bind(this),
-  );
-  public readonly serializeWire: SerializeWire = createSerializeWire(
-    this.serializeWireBase.bind(this),
-  );
+  public readonly serializeUnsigned: SerializeWire = createSerializeWire(this.serializeUnsignedBase.bind(this));
+  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly hashInternal: () => UInt256;
-  private readonly hashHexInternal = utils.lazy(() =>
-    common.uInt256ToHex(this.hash),
-  );
+  private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
   private readonly messageInternal = utils.lazy(() => this.serializeUnsigned());
   private readonly scriptInternal: Witness | null | undefined;
   private readonly sizeInternal = utils.lazy(
@@ -125,8 +110,8 @@ export abstract class BlockBase implements Equatable {
       this.sizeExclusive(),
   );
 
-  constructor({
-    version,
+  public constructor({
+    version = 0,
     previousHash,
     merkleRoot,
     timestamp,
@@ -136,7 +121,7 @@ export abstract class BlockBase implements Equatable {
     script,
     hash,
   }: BlockBaseAdd) {
-    this.version = version || 0;
+    this.version = version;
     this.previousHash = previousHash;
     this.merkleRoot = merkleRoot;
     this.timestamp = timestamp;
@@ -145,10 +130,7 @@ export abstract class BlockBase implements Equatable {
     this.nextConsensus = nextConsensus;
     this.scriptInternal = script;
     const hashIn = hash;
-    this.hashInternal =
-      hashIn == null
-        ? utils.lazy(() => crypto.hash256(this.message))
-        : () => hashIn;
+    this.hashInternal = hashIn === undefined ? utils.lazy(() => crypto.hash256(this.message)) : () => hashIn;
   }
 
   public get hash(): UInt256 {
@@ -168,7 +150,7 @@ export abstract class BlockBase implements Equatable {
   }
 
   public get script(): Witness {
-    if (this.scriptInternal == null) {
+    if (this.scriptInternal == undefined) {
       throw new UnsignedBlockError();
     }
 

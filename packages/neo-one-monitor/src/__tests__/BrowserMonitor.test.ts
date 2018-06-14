@@ -109,7 +109,7 @@ describe('BrowserMonitor', () => {
   afterEach(() => {
     collectingMetrics.reset_forTest();
     prom.register.clear();
-    if (reporter != null) {
+    if (reporter != undefined) {
       reporter.close();
     }
   });
@@ -196,7 +196,7 @@ describe('BrowserMonitor', () => {
 
     expect((fetch as any).mock.calls).toMatchSnapshot();
 
-    await new Promise((resolve) => setTimeout(() => resolve(), 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     expect((fetch as any).mock.calls.length).toBeGreaterThanOrEqual(3);
   });
 
@@ -273,7 +273,7 @@ describe('BrowserMonitor', () => {
 
     expect((fetch as any).mock.calls).toMatchSnapshot();
 
-    await new Promise((resolve) => setTimeout(() => resolve(), 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     expect((fetch as any).mock.calls.length).toBeGreaterThanOrEqual(3);
   });
 
@@ -327,9 +327,7 @@ describe('BrowserMonitor', () => {
       nodeMonitor.report(JSON.parse(testReport));
       createHistogramSpy.mockRestore();
 
-      expect(clientHistogramObserve.mock.calls).toEqual(
-        nodeHistogram.observe.mock.calls,
-      );
+      expect(clientHistogramObserve.mock.calls).toEqual(nodeHistogram.observe.mock.calls);
     });
 
     test('logging', () => {

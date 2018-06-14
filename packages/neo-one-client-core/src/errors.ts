@@ -3,8 +3,8 @@ import { CustomError } from '@neo-one/utils';
 export class InvalidFormatError extends CustomError {
   public readonly code: string;
 
-  constructor(reason?: string) {
-    super(`Invalid format${reason == null ? '.' : `: ${reason}`}`);
+  public constructor(reason?: string) {
+    super(`Invalid format${reason === undefined ? '.' : `: ${reason}`}`);
     this.code = 'INVALID_FORMAT';
   }
 }
@@ -12,7 +12,7 @@ export class InvalidFormatError extends CustomError {
 export class VerifyError extends CustomError {
   public readonly code: string;
 
-  constructor(reason: string) {
+  public constructor(reason: string) {
     super(`Verification failed: ${reason}`);
     this.code = 'VERIFY';
   }
@@ -21,7 +21,7 @@ export class VerifyError extends CustomError {
 export class UnsignedBlockError extends CustomError {
   public readonly code: string;
 
-  constructor() {
+  public constructor() {
     super('Block script does not exist because it has not been signed.');
     this.code = 'UNSIGNED_BLOCK';
   }

@@ -10,16 +10,13 @@ export class WrapArrayHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
+
       return;
     }
 
     const invokeArrayConstruct = () => {
       // [Array, argsarr]
-      sb.emitHelper(
-        node,
-        options,
-        sb.helpers.getGlobalProperty({ property: 'Array' }),
-      );
+      sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Array' }));
       // [objectVal]
       sb.emitHelper(node, options, sb.helpers.new());
     };

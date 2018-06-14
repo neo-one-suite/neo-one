@@ -6,7 +6,7 @@ import { Helper } from '../Helper';
 
 // Input: []
 // Output: [globalObjectVal]
-export class SetGlobalObjectHelper extends Helper<Node> {
+export class SetGlobalObjectHelper extends Helper {
   public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 

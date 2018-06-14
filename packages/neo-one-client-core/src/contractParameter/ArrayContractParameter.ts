@@ -5,8 +5,8 @@ import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';
 
 export interface ArrayContractParameterJSON {
-  type: 'Array';
-  value: ContractParameterJSON[];
+  readonly type: 'Array';
+  readonly value: ReadonlyArray<ContractParameterJSON>;
 }
 
 export class ArrayContractParameter extends ContractParameterBase<
@@ -15,15 +15,13 @@ export class ArrayContractParameter extends ContractParameterBase<
   ContractParameterType.Array
 > {
   public readonly type = ContractParameterType.Array;
-  public readonly value: ContractParameter[];
+  public readonly value: ReadonlyArray<ContractParameter>;
   private readonly sizeInternal: () => number;
 
-  constructor(value: ContractParameter[]) {
+  public constructor(value: ReadonlyArray<ContractParameter>) {
     super();
     this.value = value;
-    this.sizeInternal = utils.lazy(() =>
-      IOHelper.sizeOfArray(this.value, (val) => val.size),
-    );
+    this.sizeInternal = utils.lazy(() => IOHelper.sizeOfArray(this.value, (val) => val.size));
   }
 
   public get size(): number {
@@ -36,16 +34,12 @@ export class ArrayContractParameter extends ContractParameterBase<
 
   public serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
-    writer.writeArray(this.value, (parameter) =>
-      parameter.serializeWireBase(writer),
-    );
+    writer.writeArray(this.value, (parameter) => parameter.serializeWireBase(writer));
   }
 
   // deserialize is monkey patched on later
 
-  public serializeJSON(
-    context: SerializeJSONContext,
-  ): ArrayContractParameterJSON {
+  public serializeJSON(context: SerializeJSONContext): ArrayContractParameterJSON {
     return {
       type: 'Array',
       value: this.value.map((val) => val.serializeJSON(context)),

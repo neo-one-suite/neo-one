@@ -3,16 +3,7 @@ import { common } from '../../common';
 import { crypto } from '../../crypto';
 
 for (const key of keys) {
-  const {
-    address,
-    privateKey,
-    publicKey,
-    wif,
-    password,
-    encryptedWIF,
-    scriptHash,
-    name,
-  } = key;
+  const { address, privateKey, publicKey, wif, password, encryptedWIF, scriptHash, name } = key;
 
   describe(`crypto using ${name} key`, () => {
     test('privateKeyToPublicKey', () => {
@@ -42,15 +33,11 @@ for (const key of keys) {
     });
 
     test('privateKeyToWIF', () => {
-      expect(
-        crypto.privateKeyToWIF(privateKey, common.NEO_PRIVATE_KEY_VERSION),
-      ).toEqual(wif);
+      expect(crypto.privateKeyToWIF(privateKey, common.NEO_PRIVATE_KEY_VERSION)).toEqual(wif);
     });
 
     test('wifToPrivateKey', () => {
-      expect(
-        crypto.wifToPrivateKey(wif, common.NEO_PRIVATE_KEY_VERSION),
-      ).toEqual(privateKey);
+      expect(crypto.wifToPrivateKey(wif, common.NEO_PRIVATE_KEY_VERSION)).toEqual(privateKey);
     });
 
     test('privateKeyToScriptHash', () => {

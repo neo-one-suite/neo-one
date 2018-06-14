@@ -1,14 +1,11 @@
-import {
-  DeserializeWireBaseOptions,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, utils } from '../utils';
 import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';
 
 export interface StringContractParameterJSON {
-  type: 'String';
-  value: string;
+  readonly type: 'String';
+  readonly value: string;
 }
 
 export class StringContractParameter extends ContractParameterBase<
@@ -16,9 +13,7 @@ export class StringContractParameter extends ContractParameterBase<
   StringContractParameterJSON,
   ContractParameterType.String
 > {
-  public static deserializeWireBase(
-    options: DeserializeWireBaseOptions,
-  ): StringContractParameter {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): StringContractParameter {
     const { reader } = options;
     super.deserializeContractParameterBaseWireBase(options);
     const value = reader.readVarString();
@@ -30,7 +25,7 @@ export class StringContractParameter extends ContractParameterBase<
   public readonly value: string;
   private readonly sizeInternal: () => number;
 
-  constructor(value: string) {
+  public constructor(value: string) {
     super();
     this.value = value;
     this.sizeInternal = utils.lazy(() => IOHelper.sizeOfVarString(this.value));
@@ -49,9 +44,7 @@ export class StringContractParameter extends ContractParameterBase<
     writer.writeVarString(this.value);
   }
 
-  public serializeJSON(
-    context: SerializeJSONContext,
-  ): StringContractParameterJSON {
+  public serializeJSON(_context: SerializeJSONContext): StringContractParameterJSON {
     return {
       type: 'String',
       value: this.value,
