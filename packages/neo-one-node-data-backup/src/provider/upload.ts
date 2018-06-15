@@ -1,16 +1,8 @@
-/* @flow */
-import type { Writable } from 'stream';
-
+import { Writable } from 'stream';
 import tar from 'tar';
 
-export default async ({
-  dataPath,
-  write,
-}: {|
-  dataPath: string,
-  write: Writable,
-|}) => {
-  await new Promise((resolve, reject) => {
+export const upload = async ({ dataPath, write }: { readonly dataPath: string; readonly write: Writable }) => {
+  await new Promise<void>((resolve, reject) => {
     const read = tar.create(
       {
         gzip: true,
@@ -18,6 +10,7 @@ export default async ({
         strict: true,
         portable: true,
       },
+
       ['.'],
     );
 
