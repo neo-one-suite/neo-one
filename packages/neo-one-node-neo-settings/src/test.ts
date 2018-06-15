@@ -1,21 +1,13 @@
-/* @flow */
-import { TRANSACTION_TYPE, type Settings, common } from '@neo-one/client-core';
+import { common, Settings, TRANSACTION_TYPE } from '@neo-one/client-core';
+import { createCommon } from './common';
 
-import createCommon from './common';
-
-export default (options?: {|
-  privateNet?: boolean,
-  secondsPerBlock?: number,
-  standbyValidators?: Array<string>,
-  address?: string,
-|}): Settings => {
-  const {
-    privateNet,
-    secondsPerBlock,
-    standbyValidators: standbyValidatorsIn,
-    address,
-  } =
-    options || {};
+export const test = (options?: {
+  readonly privateNet?: boolean;
+  readonly secondsPerBlock?: number;
+  readonly standbyValidators?: ReadonlyArray<string>;
+  readonly address?: string;
+}): Settings => {
+  const { privateNet, secondsPerBlock, standbyValidators: standbyValidatorsIn, address } = options || {};
   const standbyValidators = (
     standbyValidatorsIn || [
       '0327da12b5c40200e9f65569476bbff2218da4f32548ff43b6387ec1416a231ee8',
@@ -26,22 +18,20 @@ export default (options?: {|
       '02d02b1873a0863cd042cc717da31cea0d7cf9db32b74d4c72c01b0011503e2e22',
       '034ff5ceeac41acf22cd5ed2da17a6df4dd8358fcb2bfb1a43208ad0feaab2746b',
     ]
-  ).map((value) => common.stringToECPoint(value));
+  ).map((value: string) => common.stringToECPoint(value));
   const commonSettings = createCommon({
     privateNet,
     standbyValidators,
-    address: address == null ? undefined : common.stringToUInt160(address),
+    address: address == undefined ? undefined : common.stringToUInt160(address),
   });
+
   return {
     genesisBlock: commonSettings.genesisBlock,
     governingToken: commonSettings.governingToken,
     utilityToken: commonSettings.utilityToken,
     decrementInterval: commonSettings.decrementInterval,
     generationAmount: commonSettings.generationAmount,
-    secondsPerBlock:
-      secondsPerBlock == null
-        ? commonSettings.secondsPerBlock
-        : secondsPerBlock,
+    secondsPerBlock: secondsPerBlock == undefined ? commonSettings.secondsPerBlock : secondsPerBlock,
     maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
     memPoolSize: commonSettings.memPoolSize,
     fees: {
@@ -50,6 +40,7 @@ export default (options?: {|
       [TRANSACTION_TYPE.PUBLISH]: common.fixed8FromDecimal(5),
       [TRANSACTION_TYPE.REGISTER]: common.fixed8FromDecimal(100),
     },
+
     registerValidatorFee: common.fixed8FromDecimal(1000),
     messageMagic: 1953787457,
     addressVersion: common.NEO_ADDRESS_VERSION,
