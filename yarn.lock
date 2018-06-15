@@ -807,6 +807,13 @@
   dependencies:
     "@types/base-x" "*"
 
+"@types/chokidar@^1.7.5":
+  version "1.7.5"
+  resolved "https://registry.yarnpkg.com/@types/chokidar/-/chokidar-1.7.5.tgz#1fa78c8803e035bed6d98e6949e514b133b0c9b6"
+  dependencies:
+    "@types/events" "*"
+    "@types/node" "*"
+
 "@types/connect@*":
   version "3.4.32"
   resolved "https://registry.npmjs.org/@types/connect/-/connect-3.4.32.tgz#aa0e9616b9435ccad02bc52b5b454ffc2c70ba28"
@@ -833,6 +840,12 @@
 "@types/events@*":
   version "1.2.0"
   resolved "https://registry.npmjs.org/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
+
+"@types/execa@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@types/execa/-/execa-0.9.0.tgz#9b025d2755f17e80beaf9368c3f4f319d8b0fb93"
+  dependencies:
+    "@types/node" "*"
 
 "@types/express-serve-static-core@*":
   version "4.16.0"
@@ -936,13 +949,9 @@
   version "2.0.0"
   resolved "https://registry.npmjs.org/@types/mime/-/mime-2.0.0.tgz#5a7306e367c539b9f6543499de8dd519fac37a8b"
 
-"@types/node-cron@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.npmjs.org/@types/node-cron/-/node-cron-1.2.0.tgz#aefb50be6c09f7e6a1e4c074168698b526c0b543"
-
-"@types/node-fetch@2.1.1":
+"@types/node-fetch@^2.1.1":
   version "2.1.1"
-  resolved "https://registry.npmjs.org/@types/node-fetch/-/node-fetch-2.1.1.tgz#1e8d0abf4c438828ce9c74b45d564a8a93e48cec"
+  resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.1.1.tgz#1e8d0abf4c438828ce9c74b45d564a8a93e48cec"
   dependencies:
     "@types/node" "*"
 
@@ -970,11 +979,9 @@
   dependencies:
     csstype "^2.2.0"
 
-"@types/rollup@0.54.0":
-  version "0.54.0"
-  resolved "https://registry.npmjs.org/@types/rollup/-/rollup-0.54.0.tgz#e3ab3a7b3c1bf92969602dd92a589de39f324a31"
-  dependencies:
-    rollup "*"
+"@types/seamless-immutable@^7.1.1":
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/@types/seamless-immutable/-/seamless-immutable-7.1.1.tgz#44e91ea708a9b16565f8fab2f2d108bb99c41aea"
 
 "@types/serve-static@*":
   version "1.13.2"

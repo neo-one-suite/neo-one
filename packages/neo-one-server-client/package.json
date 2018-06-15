@@ -27,6 +27,7 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
+  "typings": "./src/index.ts",
   "engines": {
     "node": ">=8.9.0"
   },
@@ -37,6 +38,7 @@
     "@neo-one/server-grpc": "^1.0.0-alpha.6",
     "@neo-one/server-plugin": "^1.0.0-alpha.41",
     "@neo-one/utils": "^1.0.0-alpha.35",
+    "env-paths": "^1.0.0",
     "execa": "^0.10.0",
     "fs-extra": "^6.0.1",
     "grpc": "^1.12.2",

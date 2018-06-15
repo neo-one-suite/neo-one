@@ -75,8 +75,15 @@
     "@babel/polyfill": "7.0.0-beta.49",
     "@babel/preset-env": "7.0.0-beta.49",
     "@babel/preset-typescript": "7.0.0-beta.49",
+<<<<<<< HEAD
     "@types/bs58": "3.0.30",
+=======
+    "@babel/register": "7.0.0-beta.49",
+    "@types/bs58": "^3.0.30",
+    "@types/chokidar": "^1.7.5",
+>>>>>>> server typescript conversion
     "@types/core-js": "2.5.0",
+    "@types/execa": "^0.9.0",
     "@types/fs-extra": "5.0.2",
     "@types/google-cloud__storage": "1.1.7",
     "@types/isomorphic-fetch": "0.0.34",
@@ -89,12 +96,17 @@
     "@types/lodash": "4.14.109",
     "@types/lru-cache": "4.1.1",
     "@types/node": "10.1.4",
+<<<<<<< HEAD
     "@types/node-cron": "1.2.0",
     "@types/node-fetch": "2.1.1",
     "@types/rollup": "0.54.0",
     "@types/tar": "4.0.0",
     "@types/through": "0.0.29",
     "app-root-dir": "1.0.2",
+=======
+    "@types/node-fetch": "^2.1.1",
+    "@types/seamless-immutable": "^7.1.1",
+>>>>>>> server typescript conversion
     "babel-core": "7.0.0-bridge.0",
     "fs-extra": "6.0.1",
     "husky": "0.14.3",
