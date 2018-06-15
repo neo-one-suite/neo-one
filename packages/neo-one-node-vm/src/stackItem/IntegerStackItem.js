@@ -94,7 +94,8 @@ export default class IntegerStackItem extends StackItemBase {
     throw new InvalidValueStorageContextStackItemError();
   }
 
-  toContractParameter(): ContractParameter {
+  // eslint-disable-next-line
+  toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new IntegerContractParameter(this.value);
   }
 }

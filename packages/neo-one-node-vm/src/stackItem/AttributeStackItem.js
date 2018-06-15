@@ -16,6 +16,7 @@ import ObjectStackItem from './ObjectStackItem';
 import type { StackItem } from './StackItem';
 import UInt160StackItem from './UInt160StackItem';
 import UInt256StackItem from './UInt256StackItem';
+import StackItemBase from './StackItemBase';
 
 export default class AttributeStackItem extends ObjectStackItem<Attribute> {
   asAttribute(): Attribute {
@@ -51,7 +52,8 @@ export default class AttributeStackItem extends ObjectStackItem<Attribute> {
     return new BufferStackItem(value.value);
   }
 
-  toContractParameter(): ContractParameter {
+  // eslint-disable-next-line
+  toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
     return this.toValueStackItem().toContractParameter();
   }
 

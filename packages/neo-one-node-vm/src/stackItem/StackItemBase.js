@@ -207,7 +207,8 @@ export default class StackItemBase implements Equatable {
     return false;
   }
 
-  toContractParameter(): ContractParameter {
+  // eslint-disable-next-line
+  toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
     throw new Error('Not Implemented');
   }
 

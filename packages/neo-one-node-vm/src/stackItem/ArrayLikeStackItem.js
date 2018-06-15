@@ -5,7 +5,8 @@ import {
   BinaryWriter,
 } from '@neo-one/client-core';
 
-import { InvalidValueBufferError } from './errors';
+import { InvalidValueBufferError, CircularReferenceError } from './errors';
+
 import StackItemBase from './StackItemBase';
 import type { StackItem } from './StackItem';
 import type { StackItemType } from './StackItemType';
@@ -55,9 +56,14 @@ export default class ArrayLikeStackItem extends StackItemBase {
     throw new InvalidValueBufferError();
   }
 
-  toContractParameter(): ContractParameter {
+  toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
+    if (seen.has(this)) {
+      throw new CircularReferenceError();
+    }
+    const newSeen = new Set([...seen]);
+    newSeen.add(this);
     return new ArrayContractParameter(
-      this.value.map((val) => val.toContractParameter()),
+      this.value.map((value) => value.toContractParameter(newSeen)),
     );
   }
 

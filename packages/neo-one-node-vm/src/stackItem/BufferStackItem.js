@@ -35,7 +35,8 @@ export default class BufferStackItem extends StackItemBase {
     return this.value;
   }
 
-  toContractParameter(): ContractParameter {
+  // eslint-disable-next-line
+  toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new ByteArrayContractParameter(this.value);
   }
 }

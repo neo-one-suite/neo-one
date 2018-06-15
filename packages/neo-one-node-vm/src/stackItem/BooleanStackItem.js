@@ -61,7 +61,8 @@ export default class BooleanStackItem extends StackItemBase {
     return this.value ? this.constructor.TRUE : this.constructor.FALSE;
   }
 
-  toContractParameter(): ContractParameter {
+  // eslint-disable-next-line
+  toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new BooleanContractParameter(this.value);
   }
 }

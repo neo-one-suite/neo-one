@@ -60,7 +60,8 @@ export default class StorageContextStackItem extends StackItemBase {
     return new this.constructor(this.value, true);
   }
 
-  toContractParameter(): ContractParameter {
+  // eslint-disable-next-line
+  toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new Hash160ContractParameter(this.value);
   }
 }

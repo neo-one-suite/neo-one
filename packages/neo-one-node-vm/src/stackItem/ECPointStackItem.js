@@ -41,7 +41,8 @@ export default class ECPointStackItem extends StackItemBase {
     return common.ecPointToBuffer(this.value);
   }
 
-  toContractParameter(): ContractParameter {
+  // eslint-disable-next-line
+  toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new PublicKeyContractParameter(this.value);
   }
 }
