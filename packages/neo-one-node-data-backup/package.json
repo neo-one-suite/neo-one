@@ -33,6 +33,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "typings": "./src/index.ts",
   "dependencies": {
     "@google-cloud/storage": "^1.7.0",
     "@neo-one/monitor": "^1.0.0-alpha.30",

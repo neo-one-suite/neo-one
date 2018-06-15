@@ -1,28 +1,25 @@
-/* @flow */
-import type { Monitor } from '@neo-one/monitor';
-
+import { Monitor } from '@neo-one/monitor';
 import fs from 'fs-extra';
+import { getProvider } from './getProvider';
+import { Environment, Options } from './types';
 
-import type { Environment, Options } from './types';
-
-import getProvider from './getProvider';
-
-export default async ({
+export const backup = async ({
   monitor: monitorIn,
   environment,
   options,
-}: {|
-  monitor: Monitor,
-  environment: Environment,
-  options: Options,
-|}) => {
+}: {
+  readonly monitor: Monitor;
+  readonly environment: Environment;
+  readonly options: Options;
+}) => {
   const monitor = monitorIn.at('node_data_backup');
   const provider = getProvider({ environment, options });
-  if (provider == null) {
+  if (provider === undefined) {
     monitor.log({
       name: 'neo_backup_skip_no_provider',
       message: 'Skipping backup due to no provider',
     });
+
     return;
   }
 
