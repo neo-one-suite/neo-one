@@ -1,22 +1,21 @@
-/* @flow */
-import BN from 'bn.js';
 import {
-  ASSET_TYPE,
-  OPCODE_TO_BYTECODE,
-  type ECPoint,
-  type UInt160,
+  AssetType,
   Block,
+  common as coreCommon,
+  crypto,
+  ECPoint,
   IssueTransaction,
   MinerTransaction,
+  OPCODE_TO_BYTECODE,
   Output,
   RegisterTransaction,
   ScriptBuilder,
+  UInt160,
   Witness,
-  common,
-  crypto,
 } from '@neo-one/client-core';
+import BN from 'bn.js';
 
-export const GENERATION_AMOUNT = [
+export const GENERATION_AMOUNT: ReadonlyArray<number> = [
   8,
   7,
   6,
@@ -40,32 +39,33 @@ export const GENERATION_AMOUNT = [
   1,
   1,
 ];
-export const GENERATION_AMOUNT_PRIVATE = [8, 7, 6];
-export const ISSUE_AMOUNT_PRIVATE = common.fixed8FromDecimal(58000000);
+
+export const GENERATION_AMOUNT_PRIVATE: ReadonlyArray<number> = [8, 7, 6];
+export const ISSUE_AMOUNT_PRIVATE = coreCommon.fixed8FromDecimal(58000000);
 export const DECREMENT_INTERVAL = 2000000;
 export const SECONDS_PER_BLOCK = 15;
 export const MAX_TRANSACTION_PER_BLOCK = 500;
 
-type Options = {|
-  standbyValidators: Array<ECPoint>,
-  address?: UInt160,
-  privateNet?: boolean,
-|};
+interface Options {
+  readonly standbyValidators: ReadonlyArray<ECPoint>;
+  readonly address?: UInt160;
+  readonly privateNet?: boolean;
+}
 
-const ONE_HUNDRED_MILLION = common.fixed8FromDecimal(100000000);
+const ONE_HUNDRED_MILLION = coreCommon.fixed8FromDecimal(100000000);
 
 const getGoverningToken = () => {
   const scriptBuilder = new ScriptBuilder();
   scriptBuilder.emitOp('PUSH1');
   const admin = crypto.toScriptHash(scriptBuilder.build());
+
   return new RegisterTransaction({
     asset: {
-      type: ASSET_TYPE.GOVERNING_TOKEN,
-      name:
-        '[{"lang":"zh-CN","name":"小蚁股"},{"lang":"en","name":"AntShare"}]',
+      type: AssetType.GoverningToken,
+      name: '[{"lang":"zh-CN","name":"小蚁股"},{"lang":"en","name":"AntShare"}]',
       amount: ONE_HUNDRED_MILLION,
       precision: 0,
-      owner: common.ECPOINT_INFINITY,
+      owner: coreCommon.ECPOINT_INFINITY,
       admin,
     },
   });
@@ -75,13 +75,14 @@ const getUtilityToken = () => {
   const scriptBuilder = new ScriptBuilder();
   scriptBuilder.emitOp('PUSH0');
   const admin = crypto.toScriptHash(scriptBuilder.build());
+
   return new RegisterTransaction({
     asset: {
-      type: ASSET_TYPE.UTILITY_TOKEN,
+      type: AssetType.UtilityToken,
       name: '[{"lang":"zh-CN","name":"小蚁币"},{"lang":"en","name":"AntCoin"}]',
       amount: ONE_HUNDRED_MILLION,
       precision: 8,
-      owner: common.ECPOINT_INFINITY,
+      owner: coreCommon.ECPOINT_INFINITY,
       admin,
     },
   });
@@ -93,23 +94,22 @@ const getGenesisBlock = ({
   governingToken,
   utilityToken,
   address: addressIn,
-}: {|
-  ...Options,
-  governingToken: RegisterTransaction,
-  utilityToken: RegisterTransaction,
-  address?: UInt160,
-|}) => {
+}:
+  | {
+      readonly governingToken: RegisterTransaction;
+      readonly utilityToken: RegisterTransaction;
+      readonly address?: UInt160;
+    }
+  | Options) => {
   const address =
-    addressIn == null
+    addressIn === undefined
       ? crypto.toScriptHash(
-          crypto.createMultiSignatureVerificationScript(
-            standbyValidators.length / 2 + 1,
-            standbyValidators,
-          ),
+          crypto.createMultiSignatureVerificationScript(standbyValidators.length / 2 + 1, standbyValidators),
         )
       : addressIn;
+
   return new Block({
-    previousHash: common.ZERO_UINT256,
+    previousHash: coreCommon.ZERO_UINT256,
     timestamp: 1468595301,
     index: 0,
     consensusData: new BN(2083236893),
@@ -118,6 +118,7 @@ const getGenesisBlock = ({
       invocation: Buffer.from([]),
       verification: Buffer.from([OPCODE_TO_BYTECODE.PUSH1]),
     }),
+
     transactions: [
       new MinerTransaction({ nonce: 2083236893 }),
       governingToken,
@@ -130,6 +131,7 @@ const getGenesisBlock = ({
             address,
           }),
         ],
+
         scripts: [
           new Witness({
             invocation: Buffer.from([]),
@@ -137,6 +139,7 @@ const getGenesisBlock = ({
           }),
         ],
       }),
+
       privateNet
         ? new IssueTransaction({
             outputs: [
@@ -146,6 +149,7 @@ const getGenesisBlock = ({
                 address,
               }),
             ],
+
             scripts: [
               new Witness({
                 invocation: Buffer.from([]),
@@ -153,15 +157,16 @@ const getGenesisBlock = ({
               }),
             ],
           })
-        : null,
+        : undefined,
     ].filter(Boolean),
   });
 };
 
-export default (optionsIn?: Options) => {
-  const options = optionsIn || {};
+export const common = (optionsIn?: Options) => {
+  const options = optionsIn || ({} as any);
   const governingToken = getGoverningToken();
   const utilityToken = getUtilityToken();
+
   return {
     genesisBlock: getGenesisBlock({
       privateNet: options.privateNet,
@@ -170,12 +175,11 @@ export default (optionsIn?: Options) => {
       utilityToken,
       address: options.address,
     }),
+
     governingToken,
     utilityToken,
     decrementInterval: DECREMENT_INTERVAL,
-    generationAmount: options.privateNet
-      ? GENERATION_AMOUNT_PRIVATE
-      : GENERATION_AMOUNT,
+    generationAmount: options.privateNet ? GENERATION_AMOUNT_PRIVATE : GENERATION_AMOUNT,
     secondsPerBlock: SECONDS_PER_BLOCK,
     maxTransactionsPerBlock: MAX_TRANSACTION_PER_BLOCK,
     memPoolSize: 50000,
