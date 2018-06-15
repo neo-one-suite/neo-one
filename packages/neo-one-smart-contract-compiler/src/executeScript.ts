@@ -5,7 +5,7 @@ import Project, { DiagnosticCategory, SourceFile } from 'ts-simple-ast';
 
 import { test as testNet } from '@neo-one/node-neo-settings';
 import levelUpStorage from '@neo-one/node-storage-levelup';
-import vm from '@neo-one/node-vm';
+import { vm } from '@neo-one/node-vm';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
 

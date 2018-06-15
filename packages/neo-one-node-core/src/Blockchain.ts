@@ -62,7 +62,7 @@ export interface ReadAllStorage<Key, Value> extends ReadStorage<Key, Value> {
 }
 
 export interface ReadGetAllStorage<Key, PartialKey, Value> extends ReadStorage<Key, Value> {
-  readonly getAll: (key: PartialKey) => Observable<Value>;
+  readonly getAll$: (key: PartialKey) => Observable<Value>;
 }
 
 export interface AddMetadataStorage<Value> {
