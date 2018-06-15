@@ -15,7 +15,8 @@
     "exclude": [
       "./packages/*/src/__tests__/**/*",
       "./packages/*/src/__data__/**/*",
-      "./packages/*/src/__e2e__/**/*"
+      "./packages/*/src/__e2e__/**/*",
+      "./packages/*/package.json"
     ]
   },
   "rules": {

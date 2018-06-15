@@ -12,9 +12,9 @@ function assertNever(_value: never): void {
   // do nothing
 }
 
-function isPromise(value: {}): value is Promise<{}> {
-  // tslint:disable-next-line no-any
-  return (value as any).then != undefined && typeof (value as any).then === 'function';
+// tslint:disable-next-line no-any
+function isPromise(value: any): value is Promise<{}> {
+  return value.then != undefined && typeof value.then === 'function';
 }
 
 function notNull<T>(value: T | null | undefined): value is T {

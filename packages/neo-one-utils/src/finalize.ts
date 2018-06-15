@@ -11,7 +11,7 @@ const getID = () => {
 };
 
 export function finalize<T>(
-  func: (value: T | undefined) => Promise<{}> | {},
+  func: (value: T | undefined) => Promise<void> | void,
 ): (source$: Observable<T>) => Observable<T> {
   return (source$) =>
     Observable.create((observer: Observer<T>) => {
