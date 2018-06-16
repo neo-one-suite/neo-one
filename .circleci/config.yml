@@ -23,14 +23,8 @@ aliases:
   - &yarn
     |
       yarn install --non-interactive --cache-folder ~/.cache/yarn --frozen-lockfile
-defaults: &defaults
-  docker:
-    - image: circleci/node:8.9
 
-version: 2
-jobs:
-  test:
-    <<: *defaults
+  - &test
     working_directory: ~/neo-one
     steps:
       - checkout
@@ -44,14 +38,11 @@ jobs:
           name: Prettier
           command: yarn nit
       - run:
-          name: Lint
-          command: yarn lint
-      - run:
-          name: Flow
-          command: yarn flow
-      - run:
           name: Typescript
           command: yarn tsc
+      - run:
+          name: Lint
+          command: yarn lint          
       - run:
           name: Test
           command: yarn test-ci
@@ -59,8 +50,34 @@ jobs:
           name: E2E
           command: yarn e2e-ci
 
+node8.9: &node8.9
+  docker:
+    - image: circleci/node:8.9
+
+node9: &node9
+  docker:
+    - image: circleci/node:9
+
+node10: &node10
+  docker:
+    - image: circleci/node:10
+
+version: 2
+jobs:
+  test8.9:
+    <<: *node8.9
+    <<: *test
+
+  test9:
+    <<: *node9
+    <<: *test
+
+  test10:
+    <<: *node10
+    <<: *test     
+
   deploy-website:
-    <<: *defaults
+    <<: *node8.9
     working_directory: ~/neo-one/website
     steps:
       - checkout:
@@ -88,5 +105,9 @@ workflows:
           filters: *filter-only-master
   test:
     jobs:
-      - test:
+      - test8.9:
           filters: *filter-ignore-gh-pages
+      - test9:
+          filters: *filter-ignore-gh-pages
+      - test10:
+          filters: *filter-ignore-gh-pages          

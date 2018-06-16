@@ -1,7 +1,8 @@
 environment:
   matrix:
-    - nodejs_version: "8.9.0"
+    - nodejs_version: "8.9"
     - nodejs_version: "9"
+    - nodejs_version: "10"
 
 branches:
   only:
