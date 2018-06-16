@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@neo-one/monitor": "^1.0.0-alpha.30",
+    "lodash": "^4.17.5",
     "rxjs": "^6.2.0"
   }
 }

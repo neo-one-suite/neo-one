@@ -53,6 +53,7 @@
     "cli-table2": "^0.2.0",
     "cli-truncate": "^1.1.0",
     "elegant-spinner": "^1.0.1",
+    "env-paths": "^1.0.0",
     "figures": "^2.0.0",
     "fs-extra": "^6.0.1",
     "indent-string": "^3.2.0",

@@ -55,8 +55,9 @@
     ],  
     "ordered-imports": true,
     "quotemark": [
-      true,
-      "single"
+      false,
+      "single",
+      "avoid-escape"
     ],
     "triple-equals": [
       true,

@@ -27,6 +27,7 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "module": "./dist/index.es.js",
+  "typings": "./src/index.ts",
   "engines": {
     "node": ">=8.9.0"
   },
@@ -36,6 +37,7 @@
   "dependencies": {
     "@neo-one/client": "^1.0.0-alpha.55",
     "@neo-one/client-core": "^1.0.0-alpha.41",
+    "@neo-one/monitor": "1.0.0-alpha.30",
     "@neo-one/node": "^1.0.0-alpha.73",
     "@neo-one/node-core": "^1.0.0-alpha.42",
     "@neo-one/node-data-backup": "^1.0.0-alpha.40",
@@ -46,6 +48,7 @@
     "fs-extra": "^6.0.1",
     "lodash": "^4.17.5",
     "node-fetch": "^2.1.2",
-    "rxjs": "^6.2.0"
+    "rxjs": "^6.2.0",
+    "vorpal": "^1.12.0"
   }
 }
