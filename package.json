@@ -102,6 +102,7 @@
     "@types/lodash": "4.14.109",
     "@types/lru-cache": "^4.1.1",
     "@types/node": "10.1.4",
+    "@types/node-cron": "^1.2.0",
     "@types/node-fetch": "^2.1.1",
     "@types/tar": "^4.0.0",
     "@types/through": "^0.0.29",

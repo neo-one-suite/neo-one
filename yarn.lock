@@ -1003,6 +1003,10 @@
   version "2.0.0"
   resolved "https://registry.npmjs.org/@types/mime/-/mime-2.0.0.tgz#5a7306e367c539b9f6543499de8dd519fac37a8b"
 
+"@types/node-cron@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.npmjs.org/@types/node-cron/-/node-cron-1.2.0.tgz#aefb50be6c09f7e6a1e4c074168698b526c0b543"
+
 "@types/node-fetch@^2.1.1":
   version "2.1.1"
   resolved "https://registry.npmjs.org/@types/node-fetch/-/node-fetch-2.1.1.tgz#1e8d0abf4c438828ce9c74b45d564a8a93e48cec"

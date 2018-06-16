@@ -10,7 +10,7 @@ import {
   ErrorCallback,
   ErrorValueCallback,
   AbstractChainedBatch,
-  AbstractBatch
+  AbstractBatch,
 } from 'abstract-leveldown';
 
 export type Bytes = string | Buffer;
@@ -38,12 +38,12 @@ export interface LevelDown extends AbstractLevelDOWN<Bytes, Bytes> {
   getProperty(property: string): string;
   destroy(location: string, cb: ErrorCallback): void;
   repair(location: string, cb: ErrorCallback): void;
-  iterator(options?: LevelDownIteratorOptions): LevelDownIterator
+  iterator(options?: LevelDownIteratorOptions): LevelDownIterator;
 }
 
 interface LevelDownConstructor {
-  new(location: string): LevelDown
-  (location: string): LevelDown
+  new (location: string): LevelDown;
+  (location: string, options: LevelDownOpenOptions | undefined): LevelDown;
 }
 
 export interface LevelDownOpenOptions extends AbstractOpenOptions {
@@ -61,7 +61,7 @@ export interface LevelDownGetOptions extends AbstractGetOptions {
 }
 
 export interface LevelDownPutOptions extends AbstractPutOptions {
-  sync?: boolean
+  sync?: boolean;
 }
 
 export interface LevelDownDelOptions extends AbstractDelOptions {
