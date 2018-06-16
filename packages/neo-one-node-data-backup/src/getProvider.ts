@@ -1,29 +1,29 @@
-/* @flow */
-import type { Environment, Options } from './types';
 import { GCloudProvider, MegaProvider, MultiProvider } from './provider';
+import { Environment, Options } from './types';
 
-export default ({
+export const getProvider = ({
   options,
   environment,
-}: {|
-  options: Options,
-  environment: Environment,
-|}) => {
+}: {
+  readonly options: Options;
+  readonly environment: Environment;
+}) => {
   const { gcloud, mega } = options;
   let provider;
-  if (gcloud != null) {
+  if (gcloud !== undefined) {
     provider = new GCloudProvider({
       environment,
       options: gcloud,
     });
   }
 
-  if (mega != null) {
+  if (mega !== undefined) {
     const megaProvider = new MegaProvider({
       environment,
       options: mega,
     });
-    if (provider == null) {
+
+    if (provider === undefined) {
       provider = megaProvider;
     } else {
       provider = new MultiProvider({

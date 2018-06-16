@@ -1,57 +1,47 @@
-/* @flow */
-import type { Monitor } from '@neo-one/monitor';
-import Storage from '@google-cloud/storage';
-
+import { Storage } from '@google-cloud/storage';
+import { Monitor } from '@neo-one/monitor';
 import path from 'path';
+import { Environment } from '../types';
+import { extract } from './extract';
+import { Provider } from './Provider';
+import { upload } from './upload';
+export interface Options {
+  readonly projectID: string;
+  readonly bucket: string;
+  readonly file: string;
+  readonly writeBytesPerSecond: number;
+}
 
-import type { Environment } from '../types';
-import Provider from './Provider';
+export class GCloudProvider extends Provider {
+  private readonly environment: Environment;
+  private readonly options: Options;
 
-import extract from './extract';
-import upload from './upload';
-
-export type Options = {|
-  projectID: string,
-  bucket: string,
-  file: string,
-  writeBytesPerSecond: number,
-|};
-
-export default class GCloudProvider extends Provider {
-  _environment: Environment;
-  _options: Options;
-
-  constructor({
-    environment,
-    options,
-  }: {|
-    environment: Environment,
-    options: Options,
-  |}) {
+  public constructor({ environment, options }: { readonly environment: Environment; readonly options: Options }) {
     super();
-    this._environment = environment;
-    this._options = options;
+    this.environment = environment;
+    this.options = options;
   }
 
-  async canRestore(): Promise<boolean> {
-    const { projectID, bucket, file } = this._options;
+  public async canRestore(): Promise<boolean> {
+    const { projectID, bucket, file } = this.options;
     const storage = new Storage({ projectId: projectID });
     const result = await storage
       .bucket(bucket)
       .file(file)
       .exists();
+
     return result[0];
   }
 
-  async restore(monitorIn: Monitor): Promise<void> {
+  public async restore(monitorIn: Monitor): Promise<void> {
     const monitor = monitorIn.at('gcloud_provider');
-    const { projectID, bucket, file, writeBytesPerSecond } = this._options;
-    const { dataPath, tmpPath } = this._environment;
+    const { projectID, bucket, file, writeBytesPerSecond } = this.options;
+    const { dataPath, tmpPath } = this.environment;
     const downloadPath = path.resolve(tmpPath, 'storage.db.tar.gz');
 
     const storage = new Storage({ projectId: projectID });
     await monitor.captureSpanLog(
-      () =>
+      async () =>
         storage
           .bucket(bucket)
           .file(file)
@@ -62,7 +52,7 @@ export default class GCloudProvider extends Provider {
     );
 
     await monitor.captureSpanLog(
-      () =>
+      async () =>
         extract({
           downloadPath,
           dataPath,
@@ -74,15 +64,15 @@ export default class GCloudProvider extends Provider {
     );
   }
 
-  async backup(monitorIn: Monitor): Promise<void> {
+  public async backup(monitorIn: Monitor): Promise<void> {
     const monitor = monitorIn.at('gcloud_provider');
-    const { projectID, bucket, file } = this._options;
-    const { dataPath } = this._environment;
+    const { projectID, bucket, file } = this.options;
+    const { dataPath } = this.environment;
 
     const storage = new Storage({ projectId: projectID });
 
     await monitor.captureSpanLog(
-      () =>
+      async () =>
         upload({
           dataPath,
           write: storage

@@ -923,6 +923,12 @@
   dependencies:
     "@types/node" "*"
 
+"@types/google-cloud__storage@^1.1.7":
+  version "1.1.7"
+  resolved "https://registry.npmjs.org/@types/google-cloud__storage/-/google-cloud__storage-1.1.7.tgz#f4b568b163cce16314f32f954f5b7d5c9001fa86"
+  dependencies:
+    "@types/node" "*"
+
 "@types/http-assert@*":
   version "1.3.0"
   resolved "https://registry.npmjs.org/@types/http-assert/-/http-assert-1.3.0.tgz#5e932606153da28e1d04f9043f4912cf61fd55dd"
@@ -1014,6 +1020,12 @@
   dependencies:
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
+
+"@types/tar@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/@types/tar/-/tar-4.0.0.tgz#e3239d969eeb693a012200613860d0eb871c94f0"
+  dependencies:
+    "@types/node" "*"
 
 "@types/through@^0.0.29":
   version "0.0.29"

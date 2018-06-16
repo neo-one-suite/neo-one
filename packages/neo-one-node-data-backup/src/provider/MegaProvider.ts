@@ -1,54 +1,46 @@
-/* @flow */
-import { File, Storage } from 'megajs';
-import type { Monitor } from '@neo-one/monitor';
-
+import { Monitor } from '@neo-one/monitor';
 import fs from 'fs';
+import { File, Storage } from 'megajs';
 import path from 'path';
+import { Environment } from '../types';
+import { extract } from './extract';
+import { Provider } from './Provider';
+import { upload } from './upload';
 
-import type { Environment } from '../types';
-import Provider from './Provider';
+export interface Options {
+  readonly download?: {
+    readonly id: string;
+    readonly key: string;
+    readonly writeBytesPerSecond: number;
+  };
 
-import extract from './extract';
-import upload from './upload';
+  readonly upload?: {
+    readonly email: string;
+    readonly password: string;
+    readonly file: string;
+  };
+}
 
-export type Options = {|
-  download?: {|
-    id: string,
-    key: string,
-    writeBytesPerSecond: number,
-  |},
-  upload?: {|
-    email: string,
-    password: string,
-    file: string,
-  |},
-|};
+export class MegaProvider extends Provider {
+  private readonly environment: Environment;
+  private readonly options: Options;
 
-export default class MegaProvider extends Provider {
-  _environment: Environment;
-  _options: Options;
-
-  constructor({
-    environment,
-    options,
-  }: {|
-    environment: Environment,
-    options: Options,
-  |}) {
+  public constructor({ environment, options }: { readonly environment: Environment; readonly options: Options }) {
     super();
-    this._environment = environment;
-    this._options = options;
+    this.environment = environment;
+    this.options = options;
   }
 
-  async canRestore(): Promise<boolean> {
-    const { download } = this._options;
-    if (download == null) {
+  public async canRestore(): Promise<boolean> {
+    const { download } = this.options;
+    if (download === undefined) {
       return false;
     }
 
     const { id, key } = download;
     const file = new File({ downloadID: id, key });
-    return new Promise((resolve) => {
+
+    return new Promise<boolean>((resolve) => {
       file.loadAttributes((err) => {
         if (err) {
           resolve(false);
@@ -59,20 +51,20 @@ export default class MegaProvider extends Provider {
     });
   }
 
-  async restore(monitorIn: Monitor): Promise<void> {
+  public async restore(monitorIn: Monitor): Promise<void> {
     const monitor = monitorIn.at('mega_provider');
-    const { download } = this._options;
-    if (download == null) {
+    const { download } = this.options;
+    if (download === undefined) {
       return;
     }
 
     const { id, key, writeBytesPerSecond } = download;
-    const { dataPath, tmpPath } = this._environment;
+    const { dataPath, tmpPath } = this.environment;
     const downloadPath = path.resolve(tmpPath, 'storage.db.tar.gz');
 
     await monitor.captureSpanLog(
-      () =>
-        new Promise((resolve, reject) => {
+      async () =>
+        new Promise<void>((resolve, reject) => {
           const read = new File({
             downloadID: id,
             key,
@@ -110,7 +102,7 @@ export default class MegaProvider extends Provider {
     );
 
     await monitor.captureSpanLog(
-      () =>
+      async () =>
         extract({
           downloadPath,
           dataPath,
@@ -122,14 +114,14 @@ export default class MegaProvider extends Provider {
     );
   }
 
-  async backup(monitorIn: Monitor): Promise<void> {
+  public async backup(monitorIn: Monitor): Promise<void> {
     const monitor = monitorIn.at('mega_provider');
-    const { upload: uploadOptions } = this._options;
-    if (uploadOptions == null) {
+    const { upload: uploadOptions } = this.options;
+    if (uploadOptions === undefined) {
       return;
     }
     const { email, password, file } = uploadOptions;
-    const { dataPath } = this._environment;
+    const { dataPath } = this.environment;
 
     await monitor.captureSpanLog(
       async () => {
@@ -138,7 +130,8 @@ export default class MegaProvider extends Provider {
           password,
           autologin: false,
         });
-        await new Promise((resolve, reject) =>
+
+        await new Promise<void>((resolve, reject) =>
           storage.login((innerErr) => {
             if (innerErr) {
               reject(innerErr);
@@ -147,6 +140,7 @@ export default class MegaProvider extends Provider {
             }
           }),
         );
+
         await upload({
           dataPath,
           write: storage.upload(file),

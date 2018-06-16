@@ -1,25 +1,24 @@
-/* @flow */
-import { Throttle } from 'stream-throttle';
-
 import fs from 'fs';
+import { Throttle } from 'stream-throttle';
 import tar from 'tar';
 
-export default async ({
+export const extract = async ({
   downloadPath,
   dataPath,
   writeBytesPerSecond,
-}: {|
-  downloadPath: string,
-  dataPath: string,
-  writeBytesPerSecond: number,
-|}) => {
-  await new Promise((resolve, reject) => {
+}: {
+  readonly downloadPath: string;
+  readonly dataPath: string;
+  readonly writeBytesPerSecond: number;
+}) => {
+  await new Promise<void>((resolve, reject) => {
     const stream = fs.createReadStream(downloadPath);
-    const extract = tar.extract({
+    const tarExtract = tar.extract({
       strip: 0,
       cwd: dataPath,
       strict: true,
     });
+
     const throttle = new Throttle({ rate: writeBytesPerSecond });
 
     let done = false;
@@ -43,9 +42,9 @@ export default async ({
 
     stream.once('error', onError);
     throttle.once('error', onError);
-    extract.once('error', onError);
-    extract.once('finish', onDone);
+    tarExtract.once('error', onError);
+    tarExtract.once('finish', onDone);
 
-    stream.pipe(throttle).pipe(extract);
+    stream.pipe(throttle).pipe(tarExtract);
   });
 };
