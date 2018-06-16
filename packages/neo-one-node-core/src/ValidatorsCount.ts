@@ -11,7 +11,7 @@ import {
   utils,
 } from '@neo-one/client-core';
 import BN from 'bn.js';
-type Votes = ReadonlyArray<BN | null>;
+type Votes = ReadonlyArray<BN | undefined>;
 export interface ValidatorsCountUpdate {
   readonly votes?: Votes;
 }
@@ -63,7 +63,7 @@ export class ValidatorsCount extends BaseState implements SerializableWire<Valid
   public serializeWireBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.version);
     writer.writeArray(this.votes, (value) => {
-      writer.writeFixed8(value === null ? utils.ZERO : value);
+      writer.writeFixed8(value === undefined ? utils.ZERO : value);
     });
   }
 }

@@ -1,6 +1,6 @@
 import { InvocationResult } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
-import Blockchain from '@neo-one/node-blockchain';
+import { Blockchain } from '@neo-one/node-blockchain';
 import Project, { DiagnosticCategory, SourceFile } from 'ts-simple-ast';
 
 import { test as testNet } from '@neo-one/node-neo-settings';

@@ -93,6 +93,7 @@
     "@types/fs-extra": "5.0.2",
     "@types/isomorphic-fetch": "^0.0.34",
     "@types/jest": "23.0.0",
+    "@types/js-priority-queue": "^0.0.5",
     "@types/koa": "2.0.46",
     "@types/koa-mount": "^3.0.1",
     "@types/lodash": "4.14.109",

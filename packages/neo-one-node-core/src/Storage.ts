@@ -61,7 +61,7 @@ export type Change =
 export type ChangeSet = ReadonlyArray<Change>;
 
 interface LatestReadStorage<Key, Value> extends ReadStorage<Key, Value> {
-  readonly tryGetLatest: () => Promise<Value | null>;
+  readonly tryGetLatest: () => Promise<Value | undefined>;
 }
 
 export interface Storage {

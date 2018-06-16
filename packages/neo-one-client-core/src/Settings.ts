@@ -17,7 +17,7 @@ export interface Settings {
   readonly utilityToken: RegisterTransaction;
   readonly decrementInterval: number;
   readonly generationAmount: ReadonlyArray<number>;
-  readonly fees: { [K in TransactionType]: BN };
+  readonly fees: { [K in TransactionType]?: BN };
   readonly registerValidatorFee: BN;
   readonly messageMagic: number;
   readonly addressVersion: number;

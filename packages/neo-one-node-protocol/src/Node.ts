@@ -218,7 +218,7 @@ export class Node implements INode {
     const { network: { listenTCP: { port = 0 } = {} } = {} } = environment;
     this.externalPort = port;
     this.nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
-    // tslint:disable-next-line no-suspicious-comments
+    // tslint:disable-next-line no-suspicious-comment
     // TODO: Figure out how to make typescript compile the package.json appropriately
     this.userAgent = `NEO:neo-one-js:1.0.0`;
 

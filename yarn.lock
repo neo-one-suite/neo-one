@@ -935,6 +935,10 @@
   version "23.0.0"
   resolved "https://registry.npmjs.org/@types/jest/-/jest-23.0.0.tgz#760cac74f00bb9c3075587716d2b3b4435663bc0"
 
+"@types/js-priority-queue@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.npmjs.org/@types/js-priority-queue/-/js-priority-queue-0.0.5.tgz#71065323ae2b87c168ec6a553bf074e29d985e53"
+
 "@types/jss@^9.3.0":
   version "9.5.3"
   resolved "https://registry.npmjs.org/@types/jss/-/jss-9.5.3.tgz#0c106de3fe0b324cd4173fac7dab26c12cda624e"

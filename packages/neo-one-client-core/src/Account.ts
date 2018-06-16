@@ -29,9 +29,7 @@ export interface AccountAdd {
 export interface AccountUpdate {
   readonly isFrozen?: boolean;
   readonly votes?: ReadonlyArray<ECPoint>;
-  readonly balances?: {
-    readonly [assetHash: string]: BN;
-  };
+  readonly balances?: AccountAdd['balances'];
 }
 
 export interface AccountJSON {

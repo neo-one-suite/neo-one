@@ -1,24 +1,21 @@
-/* @flow */
+// tslint:disable no-any no-object-mutation
 import {
-  ATTRIBUTE_USAGE,
+  AttributeUsage,
   BooleanContractParameter,
+  common,
   InvocationTransaction,
   UInt160Attribute,
-  Witness,
-  common,
   utils,
+  Witness,
 } from '@neo-one/client-core';
 import { DefaultMonitor } from '@neo-one/monitor';
-
 import { of as _of } from 'rxjs';
-
-import Blockchain from '../Blockchain';
-
 import { settings } from '../__data__';
+import { Blockchain } from '../Blockchain';
 
 const monitor = DefaultMonitor.create({ service: 'test' });
 
-const createBlockchain = ({ vm, storage }: {| vm: Object, storage: Object |}) =>
+const createBlockchain = async ({ vm, storage }: { readonly vm: any; readonly storage: any }) =>
   Blockchain.create({
     settings,
     storage,
@@ -27,8 +24,8 @@ const createBlockchain = ({ vm, storage }: {| vm: Object, storage: Object |}) =>
   });
 
 describe('Blockchain', () => {
-  let storage;
-  let vm;
+  let storage: any;
+  let vm: any;
   beforeEach(() => {
     const tryNotFound = () => jest.fn(() => undefined);
     const notFound = () =>
@@ -37,74 +34,90 @@ describe('Blockchain', () => {
       });
     storage = {
       account: {
-        all: _of([]),
+        all$: _of([]),
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       accountUnspent: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       accountUnclaimed: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       action: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       asset: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       block: {
         tryGetLatest: jest.fn(async () => settings.genesisBlock),
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       blockData: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       header: {
         tryGetLatest: jest.fn(async () => settings.genesisBlock.header),
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       transaction: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       transactionData: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       output: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       contract: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       storageItem: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       validator: {
-        all: _of([]),
+        all$: _of([]),
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       invocationData: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
+
       validatorsCount: {
         tryGet: tryNotFound(),
         get: notFound(),
       },
     };
+
     vm = {};
   });
   describe('verifyTransaction', () => {
@@ -122,10 +135,11 @@ describe('Blockchain', () => {
             gas: utils.ZERO,
             attributes: [
               new UInt160Attribute({
-                usage: ATTRIBUTE_USAGE.SCRIPT,
+                usage: AttributeUsage.Script,
                 value: common.ZERO_UINT160,
               }),
             ],
+
             scripts: [
               new Witness({
                 invocation: Buffer.alloc(0, 0),
@@ -139,7 +153,7 @@ describe('Blockchain', () => {
       }
 
       expect(error).toBeDefined();
-      if (error != null) {
+      if (error != undefined) {
         expect(error.code).toEqual('SCRIPT_VERIFY');
         expect(error.message).toEqual('Verification did not succeed.');
       }
