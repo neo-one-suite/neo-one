@@ -1,3 +1,4 @@
+// tslint:disable no-dynamic-delete
 import { Monitor } from '@neo-one/monitor';
 import {
   BaseResource,
@@ -45,21 +46,23 @@ interface TaskLists {
   [resource: string]: TaskList;
 }
 
-export class ResourcesManager<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> {
+export class ResourcesManager<
+  Resource extends BaseResource = BaseResource,
+  ResourceOptions extends BaseResourceOptions = BaseResourceOptions
+> {
   public readonly resourceType: ResourceType<Resource, ResourceOptions>;
   public readonly masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>;
   public readonly resources$: Observable<ReadonlyArray<Resource>>;
   private readonly monitor: Monitor;
-  private readonly dataPath: string;
   private readonly pluginManager: PluginManager;
   private readonly portAllocator: PortAllocator;
   private readonly plugin: Plugin;
   private readonly resourceAdapters$: BehaviorSubject<ResourceAdapters<Resource, ResourceOptions>>;
-  private readonly directResourceDependents: {
+  private readonly mutableDirectResourceDependents: {
     // tslint:disable-next-line readonly-keyword readonly-array
     [name: string]: ResourceDependency[];
   };
-  private readonly resourceDependents: {
+  private readonly mutableResourceDependents: {
     // tslint:disable-next-line readonly-keyword readonly-array
     [name: string]: ResourceDependency[];
   };
@@ -68,11 +71,11 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
   private readonly resourcesReady: Ready;
   private readonly directDependentsPath: string;
   private readonly dependenciesPath: string;
-  private readonly createTaskList: TaskLists;
-  private readonly deleteTaskList: TaskLists;
-  private readonly startTaskList: TaskLists;
-  private readonly stopTaskList: TaskLists;
-  private readonly resourceAdaptersStarted: {
+  private readonly mutableCreateTaskList: TaskLists;
+  private readonly mutableDeleteTaskList: TaskLists;
+  private readonly mutableStartTaskList: TaskLists;
+  private readonly mutableStopTaskList: TaskLists;
+  private readonly mutableResourceAdaptersStarted: {
     // tslint:disable-next-line readonly-keyword
     [resource: string]: boolean;
   };
@@ -97,15 +100,14 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
       [labels.RESOURCETYPE_NAME]: resourceType.name,
     });
 
-    this.dataPath = dataPath;
     this.pluginManager = pluginManager;
     this.resourceType = resourceType;
     this.masterResourceAdapter = masterResourceAdapter;
     this.portAllocator = portAllocator;
     this.plugin = this.resourceType.plugin;
     this.resourceAdapters$ = new BehaviorSubject<ResourceAdapters<Resource, ResourceOptions>>({});
-    this.directResourceDependents = {};
-    this.resourceDependents = {};
+    this.mutableDirectResourceDependents = {};
+    this.mutableResourceDependents = {};
     this.mutableCreateHooks = [];
 
     this.resourcesPath = path.resolve(dataPath, RESOURCES_PATH);
@@ -116,12 +118,12 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
     this.directDependentsPath = path.resolve(dataPath, DIRECT_DEPENDENTS_PATH);
     this.dependenciesPath = path.resolve(dataPath, DEPENDENCIES_PATH);
 
-    this.createTaskList = {};
-    this.deleteTaskList = {};
-    this.startTaskList = {};
-    this.stopTaskList = {};
+    this.mutableCreateTaskList = {};
+    this.mutableDeleteTaskList = {};
+    this.mutableStartTaskList = {};
+    this.mutableStopTaskList = {};
 
-    this.resourceAdaptersStarted = {};
+    this.mutableResourceAdaptersStarted = {};
 
     this.resources$ = this.resourceAdapters$.pipe(
       switchMap((resourceAdapters) => {
@@ -184,7 +186,7 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
 
   public create(name: string, options: ResourceOptions): TaskList {
     const { create, start } = this.resourceType.getCRUD();
-    const taskList = this.createTaskList[name] as TaskList | undefined;
+    const taskList = this.mutableCreateTaskList[name] as TaskList | undefined;
     const shouldSkip = taskList !== undefined;
     const resourceAdapter = this.resourceAdapters[name] as ResourceAdapter<Resource, ResourceOptions> | undefined;
     const skip = () => shouldSkip || resourceAdapter !== undefined;
@@ -223,8 +225,7 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
 
           const dependencies = ctx.dependencies === undefined ? [] : ctx.dependencies;
           const dependents = ctx.dependents == undefined ? [] : ctx.dependents;
-          // tslint:disable-next-line no-object-mutation
-          this.directResourceDependents[name] = dependents;
+          this.mutableDirectResourceDependents[name] = dependents;
           this.addDependents({ name, dependencies });
         }
       }
@@ -247,7 +248,6 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
               options,
             ),
         },
-
         {
           title: 'Execute final setup',
           skip,
@@ -291,16 +291,14 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
             }),
         },
       ].filter(utils.notNull),
-      // tslint:disable-next-line no-unused
-      onError: (error, ctx) => {
+      onError: (_error, ctx) => {
         if (!shouldSkip) {
           setFromContext(ctx);
         }
       },
       onDone: (failed) => {
         if (!shouldSkip) {
-          // tslint:disable-next-line no-dynamic-delete no-object-mutation
-          delete this.createTaskList[name];
+          delete this.mutableCreateTaskList[name];
           if (failed) {
             this.delete(name, options)
               .toPromise()
@@ -313,22 +311,20 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
     });
 
     if (!shouldSkip) {
-      // tslint:disable-next-line no-object-mutation
-      this.createTaskList[name] = createTaskList;
+      this.mutableCreateTaskList[name] = createTaskList;
     }
 
     return createTaskList;
   }
 
   public delete(name: string, options: ResourceOptions): TaskList {
-    const deleteTask = this.deleteTaskList[name] as TaskList | undefined;
+    const deleteTask = this.mutableDeleteTaskList[name] as TaskList | undefined;
     const shouldSkip = deleteTask !== undefined;
     const { create, start, stop, delete: del } = this.resourceType.getCRUD();
-    const startTaskList = this.startTaskList[name] as TaskList | undefined;
-    const startStopTasks: Task[] = [];
+    const startTaskList = this.mutableStartTaskList[name] as TaskList | undefined;
+    const mutableStartStopTasks: Task[] = [];
     if (start !== undefined) {
-      // tslint:disable-next-line no-array-mutation
-      startStopTasks.push({
+      mutableStartStopTasks.push({
         title: `Abort ${start.names.ing} ${this.resourceType.names.lower} ${this.getSimpleName(name)}`,
         enabled: () => startTaskList !== undefined,
         task: async (): Promise<void> => {
@@ -339,14 +335,13 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
       });
     }
     if (stop !== undefined) {
-      // tslint:disable-next-line no-array-mutation
-      startStopTasks.push({
+      mutableStartStopTasks.push({
         title: `${stop.names.upper} ${this.resourceType.names.lower} ${this.getSimpleName(name)}`,
-        enabled: () => this.resourceAdaptersStarted[name],
+        enabled: () => this.mutableResourceAdaptersStarted[name],
         task: () => this.stop(name, options),
       });
     }
-    const createTaskList = this.createTaskList[name] as TaskList | undefined;
+    const createTaskList = this.mutableCreateTaskList[name] as TaskList | undefined;
     const resourceAdapter = this.resourceAdapters[name] as ResourceAdapter<Resource, ResourceOptions> | undefined;
     const skip = () => shouldSkip || resourceAdapter === undefined;
     const mainSkip = () => {
@@ -360,8 +355,8 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
 
       return false;
     };
-    const resourceDependents = this.resourceDependents[name] as ResourceDependency[] | undefined;
-    const directResourceDependents = this.directResourceDependents[name] as ResourceDependency[] | undefined;
+    const resourceDependents = this.mutableResourceDependents[name] as ResourceDependency[] | undefined;
+    const directResourceDependents = this.mutableDirectResourceDependents[name] as ResourceDependency[] | undefined;
     const dependents = this.uniqueDeps(
       (resourceDependents === undefined ? [] : resourceDependents).concat(
         directResourceDependents === undefined ? [] : directResourceDependents,
@@ -383,7 +378,7 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
     const deleteTaskList = new TaskList({
       freshContext: true,
       collapse: false,
-      tasks: abortTasks.concat(startStopTasks).concat([
+      tasks: abortTasks.concat(mutableStartStopTasks).concat([
         {
           title: 'Delete dependent resources',
           enabled: () => dependents.length > 0,
@@ -406,7 +401,7 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
           skip: mainSkip,
           task: async () => {
             await this.destroyName(name, resourceAdapter as ResourceAdapter<Resource, ResourceOptions>);
-            await this.portAllocator.releasePort({
+            this.portAllocator.releasePort({
               plugin: this.plugin.name,
               resourceType: this.resourceType.name,
               resource: name,
@@ -418,25 +413,21 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
               fs.remove(this.getDirectDependentsPath(name)),
             ]);
 
-            // tslint:disable-next-line no-object-mutation no-dynamic-delete
-            delete this.resourceDependents[name];
-            // tslint:disable-next-line no-object-mutation no-dynamic-delete
-            delete this.directResourceDependents[name];
+            delete this.mutableResourceDependents[name];
+            delete this.mutableDirectResourceDependents[name];
           },
         },
       ]),
 
       onDone: () => {
         if (!shouldSkip) {
-          // tslint:disable-next-line no-object-mutation no-dynamic-delete
-          delete this.deleteTaskList[name];
+          delete this.mutableDeleteTaskList[name];
         }
       },
     });
 
     if (!shouldSkip) {
-      // tslint:disable-next-line no-object-mutation
-      this.deleteTaskList[name] = deleteTaskList;
+      this.mutableDeleteTaskList[name] = deleteTaskList;
     }
 
     return deleteTaskList;
@@ -457,12 +448,12 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
       });
     }
 
-    const startTaskListName = this.startTaskList[name] as TaskList | undefined;
+    const startTaskListName = this.mutableStartTaskList[name] as TaskList | undefined;
     const shouldSkip = startTaskListName !== undefined;
-    const stopTaskList = this.stopTaskList[name] as TaskList | undefined;
+    const stopTaskList = this.mutableStopTaskList[name] as TaskList | undefined;
     const resourceAdapter = this.resourceAdapters[name] as ResourceAdapter<Resource, ResourceOptions> | undefined;
-    const started = this.resourceAdaptersStarted[name];
-    const directDependents = this.getStartDeps(this.directResourceDependents[name]);
+    const started = this.mutableResourceAdaptersStarted[name];
+    const directDependents = this.getStartDeps(this.mutableDirectResourceDependents[name]);
 
     const startTaskList = new TaskList({
       freshContext: true,
@@ -521,10 +512,8 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
 
       onDone: (failed) => {
         if (!shouldSkip) {
-          // tslint:disable-next-line no-object-mutation
-          this.resourceAdaptersStarted[name] = true;
-          // tslint:disable-next-line no-object-mutation no-dynamic-delete
-          delete this.startTaskList[name];
+          this.mutableResourceAdaptersStarted[name] = true;
+          delete this.mutableStartTaskList[name];
           if (failed) {
             this.stop(name, options)
               .toPromise()
@@ -537,8 +526,7 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
     });
 
     if (!shouldSkip) {
-      // tslint:disable-next-line no-object-mutation
-      this.startTaskList[name] = startTaskList;
+      this.mutableStartTaskList[name] = startTaskList;
     }
 
     return startTaskList;
@@ -558,9 +546,9 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
         resourceType: this.resourceType.names.lower,
       });
     }
-    const stopTaskListName = this.stopTaskList[name] as TaskList | undefined;
+    const stopTaskListName = this.mutableStopTaskList[name] as TaskList | undefined;
     const shouldSkip = stopTaskListName !== undefined;
-    const startTaskList = this.startTaskList[name] as TaskList | undefined;
+    const startTaskList = this.mutableStartTaskList[name] as TaskList | undefined;
     const resourceAdapter = this.resourceAdapters[name] as ResourceAdapter<Resource, ResourceOptions> | undefined;
     const skip = () => shouldSkip || resourceAdapter === undefined;
     const mainSkip = () => {
@@ -574,8 +562,8 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
 
       return false;
     };
-    const dependents = this.getStopDeps(this.resourceDependents[name]);
-    const directDependents = this.getStopDeps(this.directResourceDependents[name]);
+    const dependents = this.getStopDeps(this.mutableResourceDependents[name]);
+    const directDependents = this.getStopDeps(this.mutableDirectResourceDependents[name]);
 
     const stopTaskList = new TaskList({
       freshContext: true,
@@ -618,33 +606,28 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
       ],
 
       onComplete: () => {
-        // tslint:disable-next-line no-object-mutation
-        this.resourceAdaptersStarted[name] = false;
+        this.mutableResourceAdaptersStarted[name] = false;
       },
       onDone: () => {
         if (!shouldSkip) {
-          // tslint:disable-next-line no-object-mutation no-dynamic-delete
-          delete this.stopTaskList[name];
+          delete this.mutableStopTaskList[name];
         }
       },
     });
 
     if (!shouldSkip) {
-      // tslint:disable-next-line no-object-mutation
-      this.stopTaskList[name] = stopTaskList;
+      this.mutableStopTaskList[name] = stopTaskList;
     }
 
     return stopTaskList;
   }
 
   public addDependent(name: string, dependent: ResourceDependency): void {
-    const resourceDependents = this.resourceDependents[name] as ResourceDependency[] | undefined;
+    const resourceDependents = this.mutableResourceDependents[name] as ResourceDependency[] | undefined;
     if (resourceDependents === undefined) {
-      // tslint:disable-next-line no-object-mutation
-      this.resourceDependents[name] = [];
+      this.mutableResourceDependents[name] = [];
     }
-    // tslint:disable-next-line no-array-mutation
-    this.resourceDependents[name].push(dependent);
+    this.mutableResourceDependents[name].push(dependent);
   }
 
   public addCreateHook(hook: CreateHook): void {
@@ -698,8 +681,7 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
                   this.initName(name),
                 ]);
 
-                // tslint:disable-next-line no-object-mutation
-                this.directResourceDependents[name] = [...dependents];
+                this.mutableDirectResourceDependents[name] = [...dependents];
 
                 this.addDependents({ name, dependencies });
 
@@ -847,10 +829,9 @@ export class ResourcesManager<Resource extends BaseResource, ResourceOptions ext
   }
 
   private async destroyName(name: string, resourceAdapter: ResourceAdapter<Resource, ResourceOptions>): Promise<void> {
-    const resourceAdapters = { ...this.resourceAdapters };
-    // tslint:disable-next-line no-object-mutation no-dynamic-delete
-    delete resourceAdapters[name];
-    this.resourceAdapters$.next(resourceAdapters);
+    const mutableResourceAdapters = { ...this.resourceAdapters };
+    delete mutableResourceAdapters[name];
+    this.resourceAdapters$.next(mutableResourceAdapters);
     await resourceAdapter.destroy();
   }
 

@@ -41,7 +41,7 @@ declare class UI {
   };
 }
 
-declare class CommandInstance {
+export declare class CommandInstance {
   log(value: string, ...values: Array<string>): void;
   prompt(prompt: Object | ReadonlyArray<Object>): Promise<Object>;
   delimiter(value: string): void;

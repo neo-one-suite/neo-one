@@ -150,7 +150,7 @@ export class PortAllocator implements IPortAllocator {
     this.persist();
   }
 
-  public async releasePort({
+  public releasePort({
     plugin,
     resourceType,
     resource,
@@ -160,7 +160,7 @@ export class PortAllocator implements IPortAllocator {
     readonly resourceType: string;
     readonly resource: string;
     readonly name?: string;
-  }): Promise<void> {
+  }): void {
     if (
       (this.mutablePorts[plugin] as PluginPorts | undefined) !== undefined &&
       (this.mutablePorts[plugin][resourceType] as ResourcePorts | undefined) !== undefined &&
@@ -187,11 +187,12 @@ export class PortAllocator implements IPortAllocator {
         }
       }
 
-      await this.persist();
+      // tslint:disable-next-line no-floating-promises
+      this.persist();
     }
   }
 
-  public async allocatePort({
+  public allocatePort({
     plugin,
     resourceType,
     resource,
@@ -201,7 +202,7 @@ export class PortAllocator implements IPortAllocator {
     readonly resourceType: string;
     readonly resource: string;
     readonly name: string;
-  }): Promise<number> {
+  }): number {
     if ((this.mutablePorts[plugin] as PluginPorts | undefined) === undefined) {
       this.mutablePorts[plugin] = {};
     }
@@ -216,7 +217,8 @@ export class PortAllocator implements IPortAllocator {
 
     if ((this.mutablePorts[plugin][resourceType][resource][name] as number | undefined) === undefined) {
       this.mutablePorts[plugin][resourceType][resource][name] = this.getNextPort();
-      await this.persist();
+      // tslint:disable-next-line no-floating-promises
+      this.persist();
     }
 
     return this.mutablePorts[plugin][resourceType][resource][name];

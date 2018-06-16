@@ -10,8 +10,8 @@ export interface Request$Options<ResourceOptions extends object> {
 }
 
 export class CRUDResource<
-  Resource extends BaseResource,
-  ResourceOptions extends BaseResourceOptions
+  Resource extends BaseResource = BaseResource,
+  ResourceOptions extends BaseResourceOptions = BaseResourceOptions
 > extends CRUDResourceBase<Resource, ResourceOptions> {
   public request$(_options: Request$Options<ResourceOptions>): Observable<ModifyResourceResponse> {
     throw new Error('Not Implemented');

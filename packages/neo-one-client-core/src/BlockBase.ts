@@ -95,7 +95,7 @@ export abstract class BlockBase implements Equatable {
   private readonly hashInternal: () => UInt256;
   private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
   private readonly messageInternal = utils.lazy(() => this.serializeUnsigned());
-  private readonly scriptInternal: Witness | null | undefined;
+  private readonly scriptInternal: Witness | undefined;
   private readonly sizeInternal = utils.lazy(
     () =>
       IOHelper.sizeOfUInt32LE +
@@ -150,7 +150,7 @@ export abstract class BlockBase implements Equatable {
   }
 
   public get script(): Witness {
-    if (this.scriptInternal == undefined) {
+    if (this.scriptInternal === undefined) {
       throw new UnsignedBlockError();
     }
 

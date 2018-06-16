@@ -176,10 +176,9 @@ export interface CLIArgs {
   readonly shutdown: (
     options: {
       readonly exitCode: number;
-      readonly error?: Error | null;
+      readonly error?: Error;
     },
   ) => void;
-  // tslint:disable-next-line readonly-array
   mutableShutdownFuncs: Array<() => void>;
   readonly logConfig$: Subject<LogConfig>;
   readonly vorpal: Vorpal;
@@ -190,7 +189,6 @@ export interface CLIArgs {
     readonly serverPort?: number;
     readonly minPort?: number;
   };
-
   readonly paths: Paths;
 }
 // tslint:disable-next-line no-any
@@ -219,8 +217,7 @@ export interface InteractiveCLI {
       readonly plugin: string;
       readonly resourceType: string;
     },
-  ) => // tslint:disable-next-line no-any
-  ResourceType<any, any>;
+  ) => ResourceType;
 }
 
 export interface InteractiveCLIArgs {
@@ -244,8 +241,7 @@ export interface PortAllocator {
       readonly resource: string;
       readonly name: string;
     },
-  ) => Promise<number>;
-
+  ) => number;
   readonly releasePort: (
     options: {
       readonly plugin: string;
@@ -253,7 +249,7 @@ export interface PortAllocator {
       readonly resource: string;
       readonly name?: string;
     },
-  ) => Promise<void>;
+  ) => void;
 }
 
 export interface ResourcesManager<

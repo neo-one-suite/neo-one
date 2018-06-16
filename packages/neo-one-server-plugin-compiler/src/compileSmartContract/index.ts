@@ -6,10 +6,10 @@ import { compileCSharpSmartContract } from './compileCSharpSmartContract';
 import { compilePythonSmartContract } from './compilePythonSmartContract';
 
 export interface CompileResult {
-  readonly abi?: ABI | null;
-  readonly hasStorage?: boolean | null;
-  readonly hasDynamicInvoke?: boolean | null;
-  readonly payable?: boolean | null;
+  readonly abi?: ABI;
+  readonly hasStorage?: boolean;
+  readonly hasDynamicInvoke?: boolean;
+  readonly payable?: boolean;
 }
 
 export const compileSmartContract = async ({

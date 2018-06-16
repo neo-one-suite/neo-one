@@ -29,7 +29,7 @@
   "module": "./dist/index.es.js",
   "typings": "./src/index.ts",
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   },
   "publishConfig": {
     "access": "public"
@@ -47,8 +47,8 @@
     "bn.js": "^4.11.8",
     "ip-address": "^5.8.9",
     "ix": "^2.3.5",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.10",
     "lru-cache": "^4.1.3",
-    "rxjs": "^6.2.0"
+    "rxjs": "^6.2.1"
   }
 }

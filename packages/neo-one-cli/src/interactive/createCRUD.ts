@@ -36,15 +36,14 @@ const addCommonResource = ({
 }: {
   readonly cli: InteractiveCLI;
   readonly command: Command;
-  // tslint:disable-next-line no-any
-  readonly crud: CRUDResourceBase<any, any>;
+  readonly crud: CRUDResourceBase;
 }) => {
   command.autocomplete({
     data: async () => crud.getCLIAutocomplete({ cli }),
   });
 };
 
-const addCommon = ({ command, crud }: { readonly command: Command; readonly crud: CRUDBase<any, any> }) => {
+const addCommon = ({ command, crud }: { readonly command: Command; readonly crud: CRUDBase }) => {
   crud.options.forEach(({ option, description }) => {
     command.option(option, description);
   });
@@ -56,15 +55,14 @@ const addCommon = ({ command, crud }: { readonly command: Command; readonly crud
 // tslint:disable-next-line no-any
 type Spinners = any;
 
-const getSymbol = (task: TaskStatus, spinners: Spinners) => {
-  if (spinners[task.id] == undefined) {
-    // tslint:disable-next-line no-object-mutation
-    spinners[task.id] = elegantSpinner();
+const getSymbol = (task: TaskStatus, mutableSpinners: Spinners) => {
+  if (mutableSpinners[task.id] == undefined) {
+    mutableSpinners[task.id] = elegantSpinner();
   }
 
   const hasSubtasks = task.subtasks !== undefined && task.subtasks.length > 0;
   if (task.pending) {
-    return hasSubtasks ? pointer : chalk.yellow(spinners[task.id]());
+    return hasSubtasks ? pointer : chalk.yellow(mutableSpinners[task.id]());
   }
 
   if (task.complete) {
@@ -83,13 +81,12 @@ const getSymbol = (task: TaskStatus, spinners: Spinners) => {
 };
 
 const renderTasks = (tasks: ReadonlyArray<TaskStatus>, spinners: Spinners, level = 0): string => {
-  let output: string[] = [];
+  let mutableOutput: string[] = [];
 
   tasks.forEach((task) => {
     const skippedStr = task.skipped !== undefined ? ` ${chalk.dim('[skipped]')}` : '';
 
-    // tslint:disable-next-line: no-array-mutation
-    output.push(indentString(` ${getSymbol(task, spinners)} ${task.title}${skippedStr}`, level, '  '));
+    mutableOutput.push(indentString(` ${getSymbol(task, spinners)} ${task.title}${skippedStr}`, level, '  '));
 
     if ((task.pending && task.message !== undefined) || task.skipped !== false || task.error !== undefined) {
       let data = task.error;
@@ -110,8 +107,7 @@ const renderTasks = (tasks: ReadonlyArray<TaskStatus>, spinners: Spinners, level
         );
 
         const out = indentString(`${figures.arrowRight} ${data}`, level, '  ');
-        // tslint:disable-next-line no-array-mutation
-        output.push(`   ${chalk.gray(cliTruncate(out, (process.stdout.columns as number) - 3))}`);
+        mutableOutput.push(`   ${chalk.gray(cliTruncate(out, (process.stdout.columns as number) - 3))}`);
       }
     }
 
@@ -120,11 +116,11 @@ const renderTasks = (tasks: ReadonlyArray<TaskStatus>, spinners: Spinners, level
       task.subtasks !== undefined &&
       task.subtasks.length > 0
     ) {
-      output = output.concat(renderTasks(task.subtasks, spinners, level + 1));
+      mutableOutput = mutableOutput.concat(renderTasks(task.subtasks, spinners, level + 1));
     }
   });
 
-  return output.join('\n');
+  return mutableOutput.join('\n');
 };
 
 const promptDelete = async ({
@@ -133,8 +129,7 @@ const promptDelete = async ({
   name,
 }: {
   readonly cli: InteractiveCLI;
-  // tslint:disable-next-line no-any
-  readonly crud: CRUDResource<any, any>;
+  readonly crud: CRUDResource;
   readonly name: string;
 }) =>
   cli.prompt([
@@ -145,8 +140,8 @@ const promptDelete = async ({
       message: `Are you sure you want to delete ${crud.resourceType.name} ${name}?`,
     },
   ]);
-// tslint:disable-next-line no-any
-const createResource = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly crud: CRUDResource<any, any> }) => {
+
+const createResource = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly crud: CRUDResource }) => {
   let cancel$ = new ReplaySubject<void>();
   const command = cli.vorpal
     .command(crud.command, crud.help)
@@ -224,8 +219,7 @@ const createResource = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
 
   return command;
 };
-// tslint:disable-next-line no-any
-const createGet = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly crud: GetCRUD<any, any> }) => {
+const createGet = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly crud: GetCRUD }) => {
   let cancel$ = new ReplaySubject<string>();
   const { resourceType } = crud;
   const command = cli.vorpal
@@ -275,8 +269,7 @@ const createGet = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly crud:
 
   return command;
 };
-// tslint:disable-next-line no-any
-const createDescribe = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly crud: DescribeCRUD<any, any> }) => {
+const createDescribe = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly crud: DescribeCRUD }) => {
   let cancel$ = new ReplaySubject<string>();
   const { resourceType } = crud;
   const command = cli.vorpal
@@ -304,7 +297,7 @@ const createDescribe = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
         })
         .pipe(
           map((resource) => {
-            if (resource == undefined) {
+            if (resource === undefined) {
               throw new Error(`${resourceType.names.capital} ${args.name} does not exist`);
             }
             const table = resourceType.getDescribeTable(resource);
@@ -318,7 +311,7 @@ const createDescribe = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
 
       cancel$ = new ReplaySubject();
       cancel$.next('start');
-      const print$ = cancel$.pipe(switchMap((event) => (event === 'cancel' ? empty() : resource$)));
+      const print$ = cancel$.pipe(switchMap((event) => (event === 'cancel' ? EMPTY : resource$)));
 
       await crud.preExecCLI({ name, cli, options });
 
@@ -344,26 +337,20 @@ const createDescribe = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
 };
 
 export const createCRUD = ({ cli, plugin }: { readonly cli: InteractiveCLI; readonly plugin: Plugin }) => {
-  const commands: Command[] = [];
+  const mutableCommands: Command[] = [];
   plugin.resourceTypes.forEach((resourceType) => {
     const crud = resourceType.getCRUD();
-    // tslint:disable-next-line no-array-mutation
-    commands.push(createResource({ cli, crud: crud.create }));
-    // tslint:disable-next-line no-array-mutation
-    commands.push(createResource({ cli, crud: crud.delete }));
+    mutableCommands.push(createResource({ cli, crud: crud.create }));
+    mutableCommands.push(createResource({ cli, crud: crud.delete }));
     if (crud.start !== undefined) {
-      // tslint:disable-next-line no-array-mutation
-      commands.push(createResource({ cli, crud: crud.start }));
+      mutableCommands.push(createResource({ cli, crud: crud.start }));
     }
     if (crud.stop !== undefined) {
-      // tslint:disable-next-line no-array-mutation
-      commands.push(createResource({ cli, crud: crud.stop }));
+      mutableCommands.push(createResource({ cli, crud: crud.stop }));
     }
-    // tslint:disable-next-line no-array-mutation
-    commands.push(createGet({ cli, crud: crud.get }));
-    // tslint:disable-next-line no-array-mutation
-    commands.push(createDescribe({ cli, crud: crud.describe }));
+    mutableCommands.push(createGet({ cli, crud: crud.get }));
+    mutableCommands.push(createDescribe({ cli, crud: crud.describe }));
   });
 
-  return commands;
+  return mutableCommands;
 };

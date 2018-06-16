@@ -36,19 +36,16 @@ export const createServerConfig = ({
       server: {
         port: serverPort === undefined ? 40100 : serverPort,
       },
-
       log: {
         level: 'info',
         maxSize: 10 * 1024 * 1024,
         maxFiles: 5,
       },
-
       ports: {
         min: minPort === undefined ? 40200 : minPort,
         max: (minPort === undefined ? 40200 : minPort) + 1000,
       },
     },
-
     schema: {
       type: 'object',
       required: ['paths', 'log', 'server'],
@@ -64,7 +61,6 @@ export const createServerConfig = ({
             temp: { type: 'string' },
           },
         },
-
         server: {
           type: 'object',
           required: ['port'],
@@ -72,7 +68,6 @@ export const createServerConfig = ({
             port: { type: 'number' },
           },
         },
-
         log: {
           type: 'object',
           required: ['level', 'maxSize', 'maxFiles'],
@@ -82,7 +77,6 @@ export const createServerConfig = ({
             maxFiles: { type: 'number' },
           },
         },
-
         ports: {
           type: 'object',
           required: ['min', 'max'],

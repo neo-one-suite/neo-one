@@ -13,8 +13,7 @@ export const activateNetwork = (plugin: NetworkPlugin) => ({ cli }: InteractiveC
     .autocomplete({
       data: async () => plugin.networkResourceType.getCRUD().describe.getCLIAutocomplete({ cli }),
     })
-    // tslint:disable-next-line no-any
-    .action(async (args: any) => {
+    .action(async (args) => {
       const resource = await plugin.networkResourceType
         .getResource$({
           name: args.name,
@@ -23,7 +22,7 @@ export const activateNetwork = (plugin: NetworkPlugin) => ({ cli }: InteractiveC
         })
         .pipe(take(1))
         .toPromise();
-      if (resource === null) {
+      if (resource === undefined) {
         throw new Error(`Network ${args.name} does not exist.`);
       }
 

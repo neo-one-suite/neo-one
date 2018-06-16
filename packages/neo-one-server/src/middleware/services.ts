@@ -8,8 +8,7 @@ import {
   TaskStatus,
 } from '@neo-one/server-plugin';
 import { Context } from 'mali';
-import { EMPTY, Observable, of as _of } from 'rxjs';
-import { Observer } from 'rxjs/Observer';
+import { EMPTY, Observable, Observer, of as _of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import pkg from '../../package.json';
 import { ResourcesManager } from '../ResourcesManager';
@@ -34,8 +33,7 @@ function makeObservable$<TData>(ctx: Context): Observable<TData> {
 export const services = ({ server }: { readonly server: Server }) => {
   async function handleCRUD<TRequest extends CRUDRequest, TStartRequest extends CRUDRequestStart>(
     ctx: Context,
-    // tslint:disable-next-line no-any
-    createTaskList: (request: TStartRequest, resourcesManager: ResourcesManager<any, any>) => TaskList,
+    createTaskList: (request: TStartRequest, resourcesManager: ResourcesManager) => TaskList,
   ): Promise<void> {
     const requests$ = makeObservable$<TRequest | TStartRequest>(ctx);
     let taskList: TaskList | undefined;

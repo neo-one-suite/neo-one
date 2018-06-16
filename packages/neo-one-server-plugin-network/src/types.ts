@@ -11,9 +11,9 @@ export interface NodeSettings {
   readonly secondsPerBlock?: number;
   readonly standbyValidators?: ReadonlyArray<string>;
   readonly address?: string;
-  readonly rpcPort?: number;
-  readonly listenTCPPort?: number;
-  readonly telemetryPort?: number;
+  readonly rpcPort: number;
+  readonly listenTCPPort: number;
+  readonly telemetryPort: number;
   readonly consensus: {
     readonly enabled: boolean;
     readonly options: {

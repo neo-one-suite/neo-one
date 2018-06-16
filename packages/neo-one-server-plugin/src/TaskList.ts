@@ -54,10 +54,8 @@ class TaskWrapper {
       collapse,
     });
 
-    // tslint:disable-next-line no-unused
-    this.skip = task.skip === undefined ? (ctx) => false : task.skip;
-    // tslint:disable-next-line no-unused
-    this.getEnabled = task.enabled === undefined ? (ctx) => true : task.enabled;
+    this.skip = task.skip === undefined ? (_ctx) => false : task.skip;
+    this.getEnabled = task.enabled === undefined ? (_ctx) => true : task.enabled;
     this.mutableAborted = false;
   }
 
@@ -213,16 +211,29 @@ export class TaskList {
     );
 
     this.concurrent = concurrent || false;
-    // tslint:disable-next-line no-unused no-empty
-    this.onError = onError === undefined ? (error, ctx) => {} : onError;
-    // tslint:disable-next-line no-empty
-    this.onComplete = onComplete === undefined ? () => {} : onComplete;
-    // tslint:disable-next-line no-unused no-empty
-    this.onDone = onDone === undefined ? (failed) => {} : onDone;
+    this.onError =
+      onError === undefined
+        ? (_error, _ctx) => {
+            // do nothing
+          }
+        : onError;
+    this.onComplete =
+      onComplete === undefined
+        ? () => {
+            // do nothing
+          }
+        : onComplete;
+    this.onDone =
+      onDone === undefined
+        ? (_failed) => {
+            // do nothing
+          }
+        : onDone;
     this.initialContext = initialContext === undefined ? {} : initialContext;
     this.freshContext = freshContext || false;
-    // tslint:disable-next-line no-unused no-empty
-    this.mutableSuperOnError = (error) => {};
+    this.mutableSuperOnError = (_error) => {
+      // do nothing
+    };
 
     this.statusInternal$ = new ReplaySubject(1);
   }

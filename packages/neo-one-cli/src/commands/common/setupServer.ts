@@ -13,13 +13,11 @@ export const setupServer = (
     minPort: serverArgs.minPort,
   });
 
-  // tslint:disable-next-line deprecation
   const logSubscription = combineLatest(
     serverConfig.config$.pipe(
       map((config) => config.paths.log),
       distinctUntilChanged(),
     ),
-
     serverConfig.config$.pipe(
       map((config) => config.log),
       distinctUntilChanged(),
@@ -39,7 +37,7 @@ export const setupServer = (
 
   return {
     monitor: monitor.at('server'),
-    shutdownFuncs: mutableShutdownFuncs,
+    mutableShutdownFuncs,
     shutdown,
     serverConfig,
   };

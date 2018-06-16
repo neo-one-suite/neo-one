@@ -15,12 +15,12 @@ export class MergeScanSubscriber<T, R> extends OuterSubscriber<T, R> {
   private active = false;
   private index = 0;
   private readonly accumulator: (acc: R | undefined, value: T) => ObservableInput<R>;
-  private acc: R | null;
+  private acc: R | undefined;
 
   public constructor(
     destination: Subscriber<R>,
     accumulator: (acc: R | undefined, value: T) => ObservableInput<R>,
-    acc: R | null,
+    acc: R | undefined,
   ) {
     super(destination);
     this.accumulator = accumulator;
@@ -58,7 +58,7 @@ export class MergeScanSubscriber<T, R> extends OuterSubscriber<T, R> {
       const { index, destination } = this;
       this.index += 1;
       try {
-        const result = this.accumulator(this.acc === null ? undefined : this.acc, value);
+        const result = this.accumulator(this.acc, value);
 
         this.active = true;
         this._innerSub(result, value, index);
@@ -91,7 +91,7 @@ export class MergeScanSubscriber<T, R> extends OuterSubscriber<T, R> {
 
 export class MergeScanOperator<T, R> implements Operator<T, R> {
   public readonly accumulator: (acc: R | undefined, value: T) => ObservableInput<R>;
-  public readonly seed: R | null | undefined;
+  public readonly seed: R | undefined | undefined;
   public constructor(accumulator: (acc: R | undefined, value: T) => ObservableInput<R>, seed?: R) {
     this.accumulator = accumulator;
     this.seed = seed;

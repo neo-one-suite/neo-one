@@ -1,5 +1,5 @@
 import { Monitor } from '@neo-one/monitor';
-import FullNode from '@neo-one/node';
+import { FullNode } from '@neo-one/node';
 import { createMain, createTest } from '@neo-one/node-neo-settings';
 import { Config } from '@neo-one/server-plugin';
 import fs from 'fs-extra';
@@ -72,16 +72,13 @@ export const createFullNode = async ({
         node: nodeEnvironment,
         telemetry: telemetryEnvironment,
       },
-
       options$: nodeConfig.config$.pipe(
         map((config) => config.options),
         distinctUntilChanged(),
       ),
-
       chainFile,
       dumpChainFile,
     },
-
     onError,
   );
 };

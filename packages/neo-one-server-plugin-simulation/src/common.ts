@@ -1,10 +1,9 @@
 import execa from 'execa';
-import { Observable } from 'rxjs';
-import { Observer } from 'rxjs/Observer';
+import { Observable, Observer } from 'rxjs';
 
 // tslint:disable-next-line export-name
-export const executeHook = (cmd: string, cwd: string) =>
-  Observable.create((observer: Observer<string | Buffer>) => {
+export const executeHook = (cmd: string, cwd: string): Observable<string> =>
+  Observable.create((observer: Observer<string>) => {
     observer.next(cmd);
     let running = true;
     const child = execa.shell(cmd, {
@@ -14,10 +13,10 @@ export const executeHook = (cmd: string, cwd: string) =>
       shell: true,
     });
 
-    child.stdout.on('data', (message) => {
+    child.stdout.on('data', (message: string) => {
       observer.next(message);
     });
-    child.stderr.on('data', (message) => {
+    child.stderr.on('data', (message: string) => {
       observer.next(message);
     });
     child.on('error', (err) => {

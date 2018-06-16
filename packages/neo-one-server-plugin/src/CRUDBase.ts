@@ -19,7 +19,10 @@ export interface Names extends NamesIn {
   readonly upper: string;
 }
 
-export interface CRUDBaseOptions<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> {
+export interface CRUDBaseOptions<
+  Resource extends BaseResource = BaseResource,
+  ResourceOptions extends BaseResourceOptions = BaseResourceOptions
+> {
   readonly name: string;
   readonly names?: NamesIn;
 
@@ -43,7 +46,10 @@ export interface GetCLIResourceOptions {
   readonly options: any;
 }
 
-export class CRUDBase<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> {
+export class CRUDBase<
+  Resource extends BaseResource = BaseResource,
+  ResourceOptions extends BaseResourceOptions = BaseResourceOptions
+> {
   public readonly name: string;
   public readonly names: Names;
   public readonly command: string;

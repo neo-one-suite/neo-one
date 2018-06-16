@@ -61,10 +61,6 @@ export class CombinedAbortSignal extends AbortSignal {
     });
   }
 
-  public check(): void {
-    this.signals.forEach((signal) => signal.check());
-  }
-
   public toString() {
     return '[object CombinedAbortSignal]';
   }

@@ -10,7 +10,7 @@ export const compileContracts = {
     if (targetContract === undefined) {
       throw new Error('For Flow');
     }
-    // tslint:disable-next-line no-array-mutation
+
     ctx.mutableDependencies.push(
       ...targetContract.compileContracts.map((contract) => ({
         plugin: compilerConstants.PLUGIN,
@@ -35,7 +35,6 @@ export const compileContracts = {
               hasStorage: contract.hasStorage,
             }),
       })),
-
       concurrent: true,
     });
   },

@@ -55,12 +55,10 @@ export class ContractResourceType extends ResourceType<Contract, ContractResourc
 
   public async createMasterResourceAdapter({
     binary,
-    portAllocator,
   }: MasterResourceAdapterOptions): Promise<MasterResourceAdapter<Contract, ContractResourceOptions>> {
     return new MasterContractResourceAdapter({
       resourceType: this,
       binary,
-      portAllocator,
     });
   }
 
@@ -74,12 +72,10 @@ export class ContractResourceType extends ResourceType<Contract, ContractResourc
         resourceType: this,
         aliases: ['delete csc'],
       }),
-
       get: new GetCRUD({
         resourceType: this,
         aliases: ['get csc'],
       }),
-
       describe: new DescribeCRUD({
         resourceType: this,
         aliases: ['describe csc'],

@@ -16,27 +16,19 @@ import {
 
 export interface ResourceTypeOptions {
   readonly plugin: Plugin;
-
   readonly name: string;
-
   readonly names: {
     readonly capital: string;
-
     readonly capitalPlural: string;
-
     readonly lower: string;
-
     readonly lowerPlural: string;
   };
 }
 
 export interface MasterResourceAdapterOptions {
   readonly pluginManager: PluginManager;
-
   readonly dataPath: string;
-
   readonly binary: Binary;
-
   readonly portAllocator: PortAllocator;
 }
 
@@ -67,11 +59,7 @@ export class ResourceType<
 
   // Filter resources for return by getResources$. Passed the options given by
   // CRUDCLI#getOptions or CRUDCLI#getAutocompleteOptions.
-  public filterResources(
-    resources: ReadonlyArray<Resource>,
-    // tslint:disable-next-line no-unused
-    options: ResourceOptions,
-  ): ReadonlyArray<Resource> {
+  public filterResources(resources: ReadonlyArray<Resource>, _options: ResourceOptions): ReadonlyArray<Resource> {
     return resources;
   }
 
@@ -80,17 +68,14 @@ export class ResourceType<
     client,
     options,
   }: GetResource$Options<ResourceOptions>): Observable<Resource | undefined> {
-    return (
-      client
-        .getResource$({
-          plugin: this.plugin.name,
-          resourceType: this.name,
-          name,
-          options,
-        })
-        // tslint:disable-next-line no-any
-        .pipe(map((resource) => resource as any))
-    );
+    return client
+      .getResource$({
+        plugin: this.plugin.name,
+        resourceType: this.name,
+        name,
+        options,
+      })
+      .pipe(map((resource) => resource as Resource | undefined));
   }
 
   public async getResource({
@@ -108,8 +93,7 @@ export class ResourceType<
   }
 
   public async createMasterResourceAdapter(
-    // tslint:disable-next-line no-unused
-    options: MasterResourceAdapterOptions,
+    _options: MasterResourceAdapterOptions,
   ): Promise<MasterResourceAdapter<Resource, ResourceOptions>> {
     return Promise.reject(new Error('Not Implemented'));
   }

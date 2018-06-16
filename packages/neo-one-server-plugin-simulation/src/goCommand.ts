@@ -9,18 +9,13 @@ export const goCommand = ({ cli }: InteractiveCLIArgs) =>
       `${theme.title} is currently in an early alpha state. ` +
         'Some features are not implemented and there may be unexpected bugs.',
     );
-
     cli.vorpal.log(
       `Follow us at ${theme.accent('https://twitter.com/neo_one_suite')} ` + 'for frequent development updates!',
     );
-
     cli.vorpal.log(
       'Like the project? Star us on github: ' + `${theme.accent('https://github.com/neo-one-suite/neo-one')}.`,
     );
-
     cli.vorpal.log('Documentation is available at ' + `${theme.accent('https://neo-one.io')}.`);
-
     cli.vorpal.log(`To get started with a react template app, run ` + `${theme.command(runCommand)}`);
-
     cli.vorpal.log(`Once it's setup, run ${theme.command(startCommand)} to start ` + 'the app!');
   });

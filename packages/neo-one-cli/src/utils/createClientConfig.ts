@@ -21,7 +21,6 @@ export const createClientConfig = ({ paths }: { readonly paths: Paths }): Config
         maxFiles: 5,
       },
     },
-
     schema: {
       type: 'object',
       required: ['paths', 'log'],
@@ -37,7 +36,6 @@ export const createClientConfig = ({ paths }: { readonly paths: Paths }): Config
             temp: { type: 'string' },
           },
         },
-
         log: {
           type: 'object',
           required: ['level', 'maxSize', 'maxFiles'],

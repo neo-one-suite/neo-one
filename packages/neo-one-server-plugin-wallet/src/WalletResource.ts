@@ -9,7 +9,7 @@ import {
 } from '@neo-one/client';
 import { common } from '@neo-one/client-core';
 import { compoundName, DescribeTable, PluginManager } from '@neo-one/server-plugin';
-import { constants as networkConstants, Network, NetworkType } from '@neo-one/server-plugin-network';
+import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import { labels } from '@neo-one/utils';
 import fs from 'fs-extra';
 import path from 'path';
@@ -224,13 +224,11 @@ export class WalletResource {
   private readonly name: string;
   private readonly baseName: string;
   private readonly networkName: string;
-  private readonly networkType: NetworkType;
   private readonly address: string;
   private readonly dataPath: string;
   private readonly walletPath: string;
   private readonly clientNetworkType: ClientNetworkType;
   private mutableInitial: InitialOptions | undefined;
-  private mutableDeleted: boolean;
   private mutableNeoBalance: string | undefined;
   private mutableGasBalance: string | undefined;
   private mutableBalance: ReadonlyArray<Coin>;
@@ -262,15 +260,6 @@ export class WalletResource {
     this.clientNetworkType = clientNetworkType;
     this.mutableInitial = initial;
 
-    if (networkName === NetworkType.Main) {
-      this.networkType = NetworkType.Main;
-    } else if (networkName === NetworkType.Test) {
-      this.networkType = NetworkType.Test;
-    } else {
-      this.networkType = NetworkType.Private;
-    }
-
-    this.mutableDeleted = false;
     this.mutableBalance = [];
 
     this.network$ = getNetwork$({ pluginManager, networkName });
@@ -302,7 +291,6 @@ export class WalletResource {
   }
 
   public async delete(): Promise<void> {
-    this.mutableDeleted = true;
     await this.client.providers.file.keystore.deleteAccount(this.walletID);
     await fs.remove(this.dataPath);
   }
@@ -370,7 +358,6 @@ export class WalletResource {
         network: this.networkName,
         address: this.address,
       },
-
       address: this.address,
       unlocked: this.unlocked,
       neoBalance: this.mutableNeoBalance === undefined ? 'Unknown' : this.mutableNeoBalance,

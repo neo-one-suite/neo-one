@@ -96,7 +96,6 @@ export class WalletPlugin extends Plugin {
           }
         },
       },
-
       {
         name: 'deactivate network',
         hook: async ({ cli }) => {

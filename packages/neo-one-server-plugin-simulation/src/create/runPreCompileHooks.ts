@@ -1,5 +1,6 @@
 import { TaskList } from '@neo-one/server-plugin';
 import fs from 'fs-extra';
+import { Observable } from 'rxjs';
 import { executeHook } from '../common';
 import { CreateContext } from './types';
 
@@ -19,10 +20,9 @@ export const runPreCompileHooks = {
             await fs.writeJSON(configPath, preCompileConfig);
           },
         },
-
         {
           title: 'Run hooks',
-          task: (ctx: CreateContext): void => {
+          task: (ctx: CreateContext): Observable<string> => {
             const { preCompile, simulationPath } = ctx.options;
             if (preCompile === undefined) {
               throw new Error('For Flow');

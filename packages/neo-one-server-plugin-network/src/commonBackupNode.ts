@@ -1,4 +1,4 @@
-import FullNode from '@neo-one/node';
+import { FullNode } from '@neo-one/node';
 import { BackupRestoreOptions } from '@neo-one/node-data-backup';
 import { CLIArgs } from '@neo-one/server-plugin';
 import path from 'path';

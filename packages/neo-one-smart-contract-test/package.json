@@ -29,7 +29,7 @@
   "module": "./dist/index.es.js",
   "types": "./src/index.ts",
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   },
   "publishConfig": {
     "access": "public"
@@ -41,9 +41,9 @@
     "@neo-one/node-neo-settings": "^1.0.0-alpha.41",
     "@neo-one/smart-contract-compiler": "^1.0.0-alpha.10",
     "@neo-one/utils": "^1.0.0-alpha.35",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.10",
     "memdown": "^3.0.0",
-    "rxjs": "^6.2.0",
+    "rxjs": "^6.2.1",
     "ts-simple-ast": "^12.4.0"
   },
   "devDependencies": {

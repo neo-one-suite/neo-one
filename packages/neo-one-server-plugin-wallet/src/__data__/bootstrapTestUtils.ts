@@ -43,7 +43,7 @@ const TOKEN_HASHES: { readonly [tokenName: string]: string } = {
   GreenToken: '0xa204296a3841bc03da6c700c22603bbbda01bee7',
 };
 
-function expectNotNull<T>(value: T | null | typeof undefined): T {
+function expectNotNull<T>(value: T | null | undefined): T {
   if (value == undefined) {
     expect(value).toBeTruthy();
     throw new Error('For Flow');

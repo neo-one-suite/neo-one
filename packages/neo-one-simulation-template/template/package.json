@@ -33,6 +33,6 @@
   "license": "MIT",
   "main": "./src/index.js",
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   }
 }

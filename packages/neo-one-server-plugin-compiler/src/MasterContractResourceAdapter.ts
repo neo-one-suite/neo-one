@@ -1,24 +1,20 @@
-import { Binary, PortAllocator, ResourceAdapter, ResourceAdapterOptions, TaskList } from '@neo-one/server-plugin';
+import { Binary, ResourceAdapter, ResourceAdapterOptions, TaskList } from '@neo-one/server-plugin';
 import { ContractResourceAdapter, ContractResourceAdapterInitOptions } from './ContractResourceAdapter';
 import { Contract, ContractResourceOptions, ContractResourceType } from './ContractResourceType';
 
 export class MasterContractResourceAdapter {
   private readonly resourceType: ContractResourceType;
   private readonly binary: Binary;
-  private readonly portAllocator: PortAllocator;
 
   public constructor({
     resourceType,
     binary,
-    portAllocator,
   }: {
     readonly resourceType: ContractResourceType;
     readonly binary: Binary;
-    readonly portAllocator: PortAllocator;
   }) {
     this.resourceType = resourceType;
     this.binary = binary;
-    this.portAllocator = portAllocator;
   }
 
   public async initResourceAdapter(

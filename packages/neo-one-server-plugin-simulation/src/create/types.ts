@@ -25,7 +25,6 @@ export interface Options {
       readonly hasStorage?: boolean;
       readonly payable?: boolean;
     }>;
-
     readonly deployContracts?: ReadonlyArray<{
       readonly baseName: string;
       readonly name: string;
@@ -37,7 +36,6 @@ export interface Options {
       };
     }>;
   };
-
   readonly wallets?: ReadonlyArray<{
     readonly name: string;
     readonly baseName: string;
@@ -46,11 +44,9 @@ export interface Options {
     readonly neo?: BigNumber;
     readonly gas?: BigNumber;
   }>;
-
   readonly network?: {
     readonly name: string;
   };
-
   readonly preCompile?: string;
   readonly preCompileConfig?: SimulationPreCompileOutputConfig;
   readonly createHook?: string;
@@ -63,7 +59,6 @@ export interface CreateContext {
   readonly createOptions: SimulationResourceAdapterCreateOptions;
   readonly options: Options;
   mutableDependencies: ResourceDependency[];
-  readonly dependents: ReadonlyArray<ResourceDependency>;
   readonly resourceAdapter: SimulationResourceAdapter;
   readonly pluginManager: PluginManager;
   readonly client: Client;

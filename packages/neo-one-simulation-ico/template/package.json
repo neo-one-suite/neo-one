@@ -3,11 +3,11 @@
   "version": "1.0.0-alpha.56",
   "private": true,
   "dependencies": {
-    "@babel/polyfill": "7.0.0-beta.49",
+    "@babel/polyfill": "7.0.0-beta.51",
     "@neo-one/client": "^1.0.0-alpha.55",
     "material-ui": "1.0.0-beta.43",
-    "react": "16.4.0",
-    "react-dom": "16.4.0",
+    "react": "16.4.1",
+    "react-dom": "16.4.1",
     "react-scripts": "1.1.4",
     "recompose": "0.27.1",
     "typeface-roboto": "0.0.54"

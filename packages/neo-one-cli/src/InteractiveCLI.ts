@@ -25,7 +25,7 @@ import ora from 'ora';
 import path from 'path';
 import { BehaviorSubject, combineLatest, defer, Observable } from 'rxjs';
 import { distinctUntilChanged, map, mergeScan, publishReplay, refCount, switchMap, take } from 'rxjs/operators';
-import Vorpal, { Args } from 'vorpal';
+import Vorpal, { Args, CommandInstance } from 'vorpal';
 import pkg from '../package.json';
 import { commands, createPlugin } from './interactive';
 import { ClientConfig, createBinary, createClientConfig, setupCLI } from './utils';
@@ -67,18 +67,19 @@ interface Sessions {
 
 export class InteractiveCLI {
   public readonly vorpal: Vorpal;
-  public mutableClient: Client;
-  public mutableClientConfig: Config<ClientConfig>;
   public readonly debug: boolean;
-  public mutableMonitor: Monitor | undefined;
-  private readonly sessions: Sessions;
+  private readonly mutableSessions: Sessions;
   private readonly sessions$: BehaviorSubject<Sessions>;
   // tslint:disable-next-line readonly-keyword readonly-array
-  private readonly preHooks: { [command: string]: CLIHook[] };
+  private readonly mutablePreHooks: { [command: string]: CLIHook[] };
   // tslint:disable-next-line readonly-keyword readonly-array
-  private readonly postHooks: { [command: string]: CLIHook[] };
+  private readonly mutablePostHooks: { [command: string]: CLIHook[] };
   private mutableDelimiter: Array<{ readonly key: string; readonly name: string }>;
-  private mutablePlugins: { [name: string]: Plugin };
+  // tslint:disable-next-line readonly-keyword readonly-array
+  private readonly mutablePlugins: { [name: string]: Plugin };
+  private mutableClient: Client | undefined;
+  private mutableClientConfig: Config<ClientConfig> | undefined;
+  private mutableMonitor: Monitor | undefined;
   private readonly serverConfig: {
     readonly dir?: string;
     readonly serverPort?: number;
@@ -99,33 +100,55 @@ export class InteractiveCLI {
   }) {
     this.vorpal = new Vorpal().version(pkg.version);
     this.debug = debug;
-    this.sessions = {};
+    this.mutableSessions = {};
     this.sessions$ = new BehaviorSubject<Session>({});
-    this.preHooks = {};
-    this.postHooks = {};
+    this.mutablePreHooks = {};
+    this.mutablePostHooks = {};
     this.mutableDelimiter = [];
-    this.plugins = {};
+    this.mutablePlugins = {};
     this.serverConfig = { dir, serverPort, minPort };
   }
 
+  public get monitor(): Monitor {
+    if (this.mutableMonitor === undefined) {
+      throw new Error('Something went wrong');
+    }
+
+    return this.mutableMonitor;
+  }
+
+  public get client(): Client {
+    if (this.mutableClient === undefined) {
+      throw new Error('Something went wrong');
+    }
+
+    return this.mutableClient;
+  }
+
+  public get clientConfig(): Config<ClientConfig> {
+    if (this.mutableClientConfig === undefined) {
+      throw new Error('Something went wrong');
+    }
+
+    return this.mutableClientConfig;
+  }
+
   public async getSession(plugin: string): Promise<Session> {
-    return this.sessions[plugin] === undefined ? {} : this.sessions[plugin];
+    return this.mutableSessions[plugin] === undefined ? {} : this.mutableSessions[plugin];
   }
 
   public updateSession(plugin: string, session: Session): void {
-    // tslint:disable-next-line no-object-mutation
-    this.sessions[plugin] = session;
-    this.sessions$.next(this.sessions);
+    this.mutableSessions[plugin] = session;
+    this.sessions$.next(this.mutableSessions);
   }
 
   public mergeSession(plugin: string, session: Session): void {
-    // tslint:disable-next-line no-object-mutation
-    this.sessions[plugin] = {
-      ...(this.sessions[plugin] === undefined ? {} : this.sessions[plugin]),
+    this.mutableSessions[plugin] = {
+      ...(this.mutableSessions[plugin] === undefined ? {} : this.mutableSessions[plugin]),
       ...session,
     };
 
-    this.sessions$.next(this.sessions);
+    this.sessions$.next(this.mutableSessions);
   }
 
   public getSession$(plugin: string): Observable<Session> {
@@ -146,14 +169,6 @@ export class InteractiveCLI {
   public resetDelimiter(): void {
     this.mutableDelimiter = [];
     this.setDelimiter();
-  }
-
-  public get monitor(): Monitor {
-    if (this.mutableMonitor === undefined) {
-      throw new Error('Attempted to access monitor before it was available');
-    }
-
-    return this.mutableMonitor;
   }
 
   public async start(argv: ReadonlyArray<string>): Promise<void> {
@@ -264,11 +279,7 @@ export class InteractiveCLI {
         undefined,
         1,
       ),
-
-      switchMap(() =>
-        this.mutableClient.getPlugins$().pipe(map((pluginName) => this.registerPlugin(monitor, pluginName))),
-      ),
-
+      switchMap(() => this.client.getPlugins$().pipe(map((pluginName) => this.registerPlugin(monitor, pluginName)))),
       publishReplay(1),
       refCount(),
     );
@@ -300,7 +311,7 @@ export class InteractiveCLI {
 
     mutableShutdownFuncs.push(() => subscription.unsubscribe());
     await start$.pipe(take(1)).toPromise();
-    const plugins = await this.mutableClient.getAllPlugins();
+    const plugins = await this.client.getAllPlugins();
     plugins.forEach((plugin) => this.registerPlugin(monitor, plugin));
 
     if (!isShutdown) {
@@ -317,27 +328,23 @@ export class InteractiveCLI {
   }
 
   public registerPreHook(nameIn: string, hook: CLIHook): void {
-    const preHook = this.preHooks[nameIn] as CLIHook[] | undefined;
+    const preHook = this.mutablePreHooks[nameIn] as CLIHook[] | undefined;
     if (preHook === undefined) {
-      // tslint:disable-next-line no-object-mutation
-      this.preHooks[nameIn] = [];
+      this.mutablePreHooks[nameIn] = [];
     }
-    // tslint:disable-next-line no-array-mutation
-    this.preHooks[nameIn].push(hook);
+    this.mutablePreHooks[nameIn].push(hook);
   }
 
   public registerPostHook(nameIn: string, hook: CLIHook): void {
-    const postHook = this.postHooks[nameIn] as CLIHook[] | undefined;
+    const postHook = this.mutablePostHooks[nameIn] as CLIHook[] | undefined;
     if (postHook === undefined) {
-      // tslint:disable-next-line no-object-mutation
-      this.postHooks[nameIn] = [];
+      this.mutablePostHooks[nameIn] = [];
     }
-    // tslint:disable-next-line no-array-mutation
-    this.postHooks[nameIn].push(hook);
+    this.mutablePostHooks[nameIn].push(hook);
   }
 
   public async executeCommandPreHooks(nameIn: string, args: Args): Promise<void> {
-    const preHooks = this.preHooks[nameIn] as CLIHook[] | undefined;
+    const preHooks = this.mutablePreHooks[nameIn] as CLIHook[] | undefined;
     if (preHooks !== undefined) {
       // tslint:disable-next-line no-loop-statement
       for (const preHook of preHooks) {
@@ -347,7 +354,7 @@ export class InteractiveCLI {
   }
 
   public async executeCommandPostHooks(nameIn: string, args: Args): Promise<void> {
-    const postHooks = this.postHooks[nameIn] as CLIHook[] | undefined;
+    const postHooks = this.mutablePostHooks[nameIn] as CLIHook[] | undefined;
     if (postHooks !== undefined) {
       // tslint:disable-next-line no-loop-statement
       for (const postHook of postHooks) {
@@ -385,9 +392,8 @@ export class InteractiveCLI {
   }: {
     readonly plugin: string;
     readonly resourceType: string;
-    // tslint:disable-next-line no-any
-  }): ResourceType<any, any> {
-    const plugin = this.plugins[pluginName] as Plugin | undefined;
+  }): ResourceType {
+    const plugin = this.mutablePlugins[pluginName] as Plugin | undefined;
     if (plugin === undefined) {
       throw new PluginNotInstalledError(pluginName);
     }
@@ -407,7 +413,7 @@ export class InteractiveCLI {
     return [
       ['Interactive CLI Log Path', this.mutableLogPath === undefined ? 'Unknown' : this.mutableLogPath],
 
-      ['Interactive CLI Config Path', this.mutableClientConfig.configPath],
+      ['Interactive CLI Config Path', this.clientConfig.configPath],
     ];
   }
   // tslint:disable-next-line no-any
@@ -443,8 +449,9 @@ export class InteractiveCLI {
   }
 
   private getDescribe(describeTable: DescribeTable): string {
-    const table = getTable();
-    table.push(
+    const mutableTable = getTable();
+    // @ts-ignore
+    mutableTable.push(
       ...describeTable.map(([keyIn, value]) => {
         const key = `${keyIn}:`;
         if (typeof value === 'string') {
@@ -458,25 +465,28 @@ export class InteractiveCLI {
       }),
     );
 
-    return table.toString();
+    return mutableTable.toString();
   }
 
   private getList(listTable: ListTable): string {
-    const table = getTable(listTable[0]);
-    table.push(...listTable.slice(1));
-    return table.toString();
+    // @ts-ignore
+    const mutableTable = getTable(listTable[0]);
+    // @ts-ignore
+    mutableTable.push(...listTable.slice(1));
+
+    return mutableTable.toString();
   }
 
   private getPrint(printIn?: ((value: string) => void)): ((value: string) => void) {
     let print = printIn;
-    if (print == undefined) {
-      if (this.vorpal.activeCommand != undefined) {
-        print = this.vorpal.activeCommand.log.bind(this.vorpal.activeCommand);
-      } else {
-        print = this.vorpal.log.bind(this.vorpal);
-      }
+    if (print === undefined) {
+      print =
+        (this.vorpal.activeCommand as CommandInstance | undefined | null) != undefined
+          ? this.vorpal.activeCommand.log.bind(this.vorpal.activeCommand)
+          : this.vorpal.log.bind(this.vorpal);
     }
 
+    // tslint:disable-next-line no-any
     return print as any;
   }
 }

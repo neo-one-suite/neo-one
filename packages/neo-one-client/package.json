@@ -33,7 +33,7 @@
     "./dist/index.es.js": "./dist/index.browser.es.js"
   },
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   },
   "publishConfig": {
     "access": "public"
@@ -47,9 +47,9 @@
     "bn.js": "^4.11.8",
     "dataloader": "^1.4.0",
     "fast-stable-stringify": "^1.0.0",
-    "isomorphic-fetch": "^2.2.1",
+    "cross-fetch": "^2.2.1",
     "ix": "^2.3.5",
-    "lodash": "^4.17.5",
-    "rxjs": "^6.2.0"
+    "lodash": "^4.17.10",
+    "rxjs": "^6.2.1"
   }
 }

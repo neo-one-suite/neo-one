@@ -72,8 +72,7 @@ export class ContractResourceAdapter {
 
         {
           title: 'Compile smart contract',
-          // tslint:disable-next-line no-any
-          task: async (ctx: any) => {
+          task: async (ctx) => {
             if (options.scPath === undefined) {
               throw new Error('Something went wrong, smart contract path was null.');
             }
@@ -84,7 +83,7 @@ export class ContractResourceAdapter {
                 binary: staticOptions.binary,
               });
 
-              if (abi == undefined) {
+              if (abi === undefined) {
                 abi = options.abi;
               }
 
@@ -120,8 +119,7 @@ export class ContractResourceAdapter {
 
         {
           title: 'Save ABI and configuration',
-          // tslint:disable-next-line no-any
-          task: async (ctx: any) => {
+          task: async (ctx) => {
             const { abi, hasDynamicInvoke, hasStorage, payable, script } = ctx;
             await Promise.all([
               fs.writeJSON(staticOptions.abiPath, abi),
@@ -169,7 +167,6 @@ export class ContractResourceAdapter {
   public readonly resource$: Observable<Contract>;
   private readonly name: string;
   private readonly dataPath: string;
-  private readonly binary: Binary;
   private readonly resourceType: ContractResourceType;
   private readonly avmPath: string;
   private readonly abiPath: string;
@@ -184,7 +181,6 @@ export class ContractResourceAdapter {
   public constructor({
     name,
     dataPath,
-    binary,
     resourceType,
     avmPath,
     abiPath,
@@ -197,7 +193,6 @@ export class ContractResourceAdapter {
   }: ContractResourceAdapterOptions) {
     this.name = name;
     this.dataPath = dataPath;
-    this.binary = binary;
     this.resourceType = resourceType;
     this.avmPath = avmPath;
     this.abiPath = abiPath;
@@ -210,7 +205,6 @@ export class ContractResourceAdapter {
 
     this.update$ = new ReplaySubject(1);
     this.resource$ = this.update$.pipe(
-      // tslint:disable-next-line deprecation
       switchMap<void, Contract>(() =>
         _of({
           plugin: this.resourceType.plugin.name,

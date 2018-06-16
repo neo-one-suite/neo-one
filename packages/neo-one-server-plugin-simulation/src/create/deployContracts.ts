@@ -21,7 +21,6 @@ export const deployContracts = {
       tasks: deployContractsArray.map((contract) => ({
         title: `Deploy ${contract.baseName}`,
         task: () => {
-          // tslint:disable-next-line no-array-mutation
           ctx.mutableDependencies.push({
             plugin: walletConstants.PLUGIN,
             resourceType: walletConstants.SMART_CONTRACT_RESOURCE_TYPE,
@@ -40,7 +39,6 @@ export const deployContracts = {
             });
         },
       })),
-
       concurrent: true,
     });
   },

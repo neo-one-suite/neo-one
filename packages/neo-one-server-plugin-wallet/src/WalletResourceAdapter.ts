@@ -29,8 +29,7 @@ export class WalletResourceAdapter {
       tasks: [
         {
           title: 'Create wallet resource',
-          // tslint:disable-next-line no-any
-          task: async (ctx: any) => {
+          task: async (ctx) => {
             const walletResource = await WalletResource.createNew({
               client,
               pluginManager,
@@ -87,10 +86,8 @@ export class WalletResourceAdapter {
 
   public readonly walletResource: WalletResource;
   public readonly resource$: Observable<Wallet>;
-  private readonly resourceType: WalletResourceType;
 
-  public constructor({ resourceType, walletResource }: WalletResourceAdapterOptions) {
-    this.resourceType = resourceType;
+  public constructor({ walletResource }: WalletResourceAdapterOptions) {
     this.walletResource = walletResource;
 
     this.resource$ = walletResource.resource$;
@@ -128,6 +125,8 @@ export class WalletResourceAdapter {
             }
 
             await this.walletResource.unlock({ password });
+
+            return undefined;
           },
         },
       ],

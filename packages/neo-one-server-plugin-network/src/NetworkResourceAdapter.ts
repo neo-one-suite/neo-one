@@ -268,7 +268,6 @@ export class NetworkResourceAdapter {
           privateNet: false,
         },
       },
-
       seeds: DEFAULT_MAIN_SEEDS.map(createEndpoint),
       rpcEndpoints: [
         'http://seed1.cityofzion.io:8080',
@@ -318,7 +317,7 @@ export class NetworkResourceAdapter {
   }
 
   private static createNodeAdapter(
-    { resourceType, binary, portAllocator }: NetworkResourceAdapterStaticOptions,
+    { resourceType, binary }: NetworkResourceAdapterStaticOptions,
     { name, dataPath, settings, options }: NodeOptions,
   ): NodeAdapter {
     if (options.type === undefined || options.type === 'neo-one') {
@@ -327,7 +326,6 @@ export class NetworkResourceAdapter {
         name,
         binary,
         dataPath,
-        portAllocator,
         settings,
       });
     }
@@ -409,9 +407,7 @@ export class NetworkResourceAdapter {
   public readonly resource$: Observable<Network>;
   private readonly name: string;
   private readonly type: NetworkType;
-  private readonly binary: Binary;
   private readonly dataPath: string;
-  private readonly portAllocator: PortAllocator;
   private readonly resourceType: NetworkResourceType;
   private readonly nodesPath: string;
   private readonly nodesOptionsPath: string;
@@ -421,9 +417,7 @@ export class NetworkResourceAdapter {
   public constructor({
     name,
     type,
-    binary,
     dataPath,
-    portAllocator,
     resourceType,
     nodesPath,
     nodesOptionsPath,
@@ -431,9 +425,7 @@ export class NetworkResourceAdapter {
   }: NetworkResourceAdapterOptions) {
     this.name = name;
     this.type = type;
-    this.binary = binary;
     this.dataPath = dataPath;
-    this.portAllocator = portAllocator;
     this.resourceType = resourceType;
     this.nodesPath = nodesPath;
     this.nodesOptionsPath = nodesOptionsPath;
@@ -478,7 +470,6 @@ export class NetworkResourceAdapter {
           }),
         ),
       ),
-
       shareReplay(1),
     );
   }
@@ -537,7 +528,6 @@ export class NetworkResourceAdapter {
                   await node.start();
                 },
               })),
-
               concurrent: true,
             }),
         },
@@ -558,7 +548,6 @@ export class NetworkResourceAdapter {
                   await node.stop();
                 },
               })),
-
               concurrent: true,
             }),
         },

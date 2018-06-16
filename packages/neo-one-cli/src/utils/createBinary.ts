@@ -1,4 +1,3 @@
-// tslint:disable no-array-mutation
 import { Binary } from '@neo-one/server-plugin';
 import { DIR_OPTION, MIN_PORT_OPTION, SERVER_PORT_OPTION, STATIC_NEO_ONE_OPTION } from '../constants';
 
@@ -15,21 +14,21 @@ export const createBinary = (
   },
 ): Binary => {
   const [cmd] = argv;
-  const firstArgs = [argv[1], STATIC_NEO_ONE_OPTION];
+  const mutableFirstArgs = [argv[1], STATIC_NEO_ONE_OPTION];
   if (dir !== undefined) {
-    firstArgs.push(DIR_OPTION);
-    firstArgs.push(dir);
+    mutableFirstArgs.push(DIR_OPTION);
+    mutableFirstArgs.push(dir);
   }
 
   if (serverPort !== undefined) {
-    firstArgs.push(SERVER_PORT_OPTION);
-    firstArgs.push(`${serverPort}`);
+    mutableFirstArgs.push(SERVER_PORT_OPTION);
+    mutableFirstArgs.push(`${serverPort}`);
   }
 
   if (minPort !== undefined) {
-    firstArgs.push(MIN_PORT_OPTION);
-    firstArgs.push(`${minPort}`);
+    mutableFirstArgs.push(MIN_PORT_OPTION);
+    mutableFirstArgs.push(`${minPort}`);
   }
 
-  return { cmd, firstArgs };
+  return { cmd, firstArgs: mutableFirstArgs };
 };

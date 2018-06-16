@@ -1,6 +1,6 @@
 import { Asset, NEOONEProvider, privateKeyToAddress } from '@neo-one/client';
 import * as bootstrapTestUtils from '../__data__/bootstrapTestUtils';
-import { ASSET_INFO, AssetInfo, DEFAULT_PRIVATE_KEYS, TOKEN_INFO } from '../bootstrap';
+import { ASSET_INFO, DEFAULT_PRIVATE_KEYS, TOKEN_INFO } from '../bootstrap';
 
 describe('bootstrap with rpc', () => {
   test('bootstrap - rpc', async () => {

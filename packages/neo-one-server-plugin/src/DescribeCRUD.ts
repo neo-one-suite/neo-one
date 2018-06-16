@@ -12,8 +12,8 @@ export interface DescribeCRUDOptions<Resource extends BaseResource, ResourceOpti
 }
 
 export class DescribeCRUD<
-  Resource extends BaseResource,
-  ResourceOptions extends BaseResourceOptions
+  Resource extends BaseResource = BaseResource,
+  ResourceOptions extends BaseResourceOptions = BaseResourceOptions
 > extends CRUDResourceBase<Resource, ResourceOptions> {
   public constructor({
     resourceType,

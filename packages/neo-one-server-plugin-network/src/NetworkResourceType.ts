@@ -67,14 +67,12 @@ export class NetworkResourceType extends ResourceType<Network, NetworkResourceOp
         resourceType: this,
         aliases: ['stop net'],
       }),
-
       delete: new DeleteNetworkCRUD({ resourceType: this }),
       create: new CreateNetworkCRUD({ resourceType: this }),
       get: new GetCRUD({
         resourceType: this,
         aliases: ['get net'],
       }),
-
       describe: new DescribeCRUD({
         resourceType: this,
         aliases: ['describe net'],

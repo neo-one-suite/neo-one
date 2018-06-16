@@ -8,8 +8,7 @@ import {
   ModifyResourceResponse,
 } from '@neo-one/server-plugin';
 import grpc from 'grpc';
-import { Observable, Subject } from 'rxjs';
-import { Observer } from 'rxjs/Observer';
+import { Observable, Observer, Subject } from 'rxjs';
 import { filter, map, publishReplay, refCount, take } from 'rxjs/operators';
 import { ReadError } from './errors';
 

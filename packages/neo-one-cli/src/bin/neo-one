@@ -1,18 +1,12 @@
 #! /usr/bin/env node
-/* @flow */
+// tslint:disable-next-line no-import-side-effect
 import '@babel/polyfill';
-import {
-  STATIC_NEO_ONE_OPTION,
-  DIR_OPTION,
-  SERVER_PORT_OPTION,
-  MIN_PORT_OPTION,
-  InteractiveCLI,
-  CLI,
-} from '../';
+import { CLI, DIR_OPTION, InteractiveCLI, MIN_PORT_OPTION, SERVER_PORT_OPTION, STATIC_NEO_ONE_OPTION } from '../';
 
+// tslint:disable-next-line no-let
 let { argv } = process;
 const debugIdx = argv.indexOf('--debug');
-const debug = debugIdx !== -1
+const debug = debugIdx !== -1;
 if (debug) {
   argv = argv.slice(0, debugIdx).concat(argv.slice(debugIdx + 1));
 }
@@ -23,7 +17,7 @@ if (isStatic) {
   argv = argv.slice(0, staticIdx).concat(argv.slice(staticIdx + 1));
 }
 
-const quoteArgs = (args: Array<string>): Array<string> =>
+const quoteArgs = (args) =>
   args.map((arg, idx) => {
     if (idx === 0) {
       return arg;
@@ -36,10 +30,7 @@ const quoteArgs = (args: Array<string>): Array<string> =>
     return arg;
   });
 
-const extractOption = (
-  argsIn: Array<string>,
-  option: string,
-): [Array<string>, ?string] => {
+const extractOption = (argsIn, option) => {
   let args = argsIn;
   const index = args.indexOf(option);
   let value;
@@ -51,20 +42,20 @@ const extractOption = (
   return [args, value];
 };
 
-let result = extractOption(argv, DIR_OPTION);
-([argv] = result);
+const result = extractOption(argv, DIR_OPTION);
+[argv] = result;
 const dir = result[1];
 
 result = extractOption(argv, SERVER_PORT_OPTION);
-([argv] = result);
-const serverPort = result[1] == null ? undefined : parseInt(result[1], 10);
-
+[argv] = result;
+const serverPort = result[1] == undefined ? undefined : parseInt(result[1], 10);
 
 result = extractOption(argv, MIN_PORT_OPTION);
-([argv] = result);
-const minPort = result[1] == null ? undefined : parseInt(result[1], 10);
+[argv] = result;
+const minPort = result[1] == undefined ? undefined : parseInt(result[1], 10);
 
 if (isStatic) {
+  // tslint:disable-next-line no-floating-promises
   new CLI({
     debug,
     dir,
@@ -72,6 +63,7 @@ if (isStatic) {
     minPort,
   }).start(quoteArgs(argv));
 } else {
+  // tslint:disable-next-line no-floating-promises
   new InteractiveCLI({
     debug,
     dir,

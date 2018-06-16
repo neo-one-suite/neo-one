@@ -1,8 +1,8 @@
 import { Monitor } from '@neo-one/monitor';
 import { Blockchain } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
+import fetch from 'cross-fetch';
 import _ from 'lodash';
-import fetch, { Response } from 'node-fetch';
 
 const fetchCount = async (monitor: Monitor, endpoint: string, timeoutMS: number): Promise<number | undefined> =>
   monitor
@@ -29,6 +29,7 @@ const fetchCount = async (monitor: Monitor, endpoint: string, timeoutMS: number)
                 id: 4,
               },
             ]),
+            // @ts-ignore
             timeout: timeoutMS,
           });
 

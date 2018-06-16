@@ -47,7 +47,6 @@ export interface SmartContractResourceOptions {
     readonly name: string;
     readonly register: SmartContractRegister;
   };
-
   readonly hash?: string;
 }
 

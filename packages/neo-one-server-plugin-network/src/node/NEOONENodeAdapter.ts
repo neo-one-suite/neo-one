@@ -1,12 +1,12 @@
 import { Monitor } from '@neo-one/monitor';
-import { Environment as FullNodeEnvironment, Options as FullNodeOptions } from '@neo-one/node';
+import { FullNodeEnvironment, FullNodeOptions } from '@neo-one/node';
 import { createEndpoint, EndpointConfig } from '@neo-one/node-core';
-import { Binary, Config, DescribeTable, killProcess, PortAllocator } from '@neo-one/server-plugin';
+import { Binary, Config, DescribeTable, killProcess } from '@neo-one/server-plugin';
 import { ChildProcess } from 'child_process';
+import fetch from 'cross-fetch';
 import execa from 'execa';
 import fs from 'fs-extra';
 import _ from 'lodash';
-import fetch from 'node-fetch';
 import path from 'path';
 import { take } from 'rxjs/operators';
 import { NodeSettings } from '../types';
@@ -64,42 +64,34 @@ const makeDefaultConfig = (dataPath: string): NodeConfig => ({
     maxSize: 10 * 1024 * 1024,
     maxFiles: 5,
   },
-
   settings: {
     test: false,
   },
-
   environment: {
     dataPath: path.resolve(dataPath, 'node'),
     rpc: {},
     node: { network: {} },
   },
-
   options: {
     node: {
       consensus: {
         enabled: false,
         options: { privateKey: 'default', privateNet: false },
       },
-
       network: {
         seeds: DEFAULT_SEEDS.map(createEndpoint),
       },
-
       rpcURLs: [...DEFAULT_RPC_URLS],
     },
-
     rpc: {
       server: {
         keepAliveTimeout: 60000,
       },
-
       liveHealthCheck: {
         rpcURLs: DEFAULT_RPC_URLS,
         offset: 1,
         timeoutMS: 5000,
       },
-
       readyHealthCheck: {
         rpcURLs: DEFAULT_RPC_URLS,
         offset: 1,
@@ -132,7 +124,6 @@ export const createNodeConfig = ({
             maxFiles: { type: 'number' },
           },
         },
-
         settings: {
           type: 'object',
           required: ['test'],
@@ -143,7 +134,6 @@ export const createNodeConfig = ({
             standbyValidators: { type: 'array', items: { type: 'string' } },
           },
         },
-
         environment: {
           type: 'object',
           required: ['dataPath', 'rpc', 'node'],
@@ -205,7 +195,6 @@ export const createNodeConfig = ({
             },
           },
         },
-
         options: {
           type: 'object',
           required: ['node', 'rpc'],
@@ -229,7 +218,6 @@ export const createNodeConfig = ({
                     },
                   },
                 },
-
                 network: {
                   type: 'object',
                   required: ['seeds'],
@@ -238,11 +226,9 @@ export const createNodeConfig = ({
                     maxConnectedPeers: { type: 'number' },
                   },
                 },
-
                 rpcURLs: { type: 'array', items: { type: 'string' } },
               },
             },
-
             rpc: {
               type: 'object',
               required: ['server', 'liveHealthCheck', 'readyHealthCheck'],
@@ -254,7 +240,6 @@ export const createNodeConfig = ({
                     keepAliveTimeout: { type: 'number' },
                   },
                 },
-
                 liveHealthCheck: {
                   type: 'object',
                   required: ['rpcURLs', 'offset', 'timeoutMS'],
@@ -264,7 +249,6 @@ export const createNodeConfig = ({
                     timeoutMS: { type: 'number' },
                   },
                 },
-
                 readyHealthCheck: {
                   type: 'object',
                   required: ['rpcURLs', 'offset', 'timeoutMS'],
@@ -280,7 +264,6 @@ export const createNodeConfig = ({
         },
       },
     },
-
     configPath: dataPath,
   });
 
@@ -293,14 +276,12 @@ export class NEOONENodeAdapter extends NodeAdapter {
     name,
     binary,
     dataPath,
-    portAllocator,
     settings,
   }: {
     readonly monitor: Monitor;
     readonly name: string;
     readonly binary: Binary;
     readonly dataPath: string;
-    readonly portAllocator: PortAllocator;
     readonly settings: NodeSettings;
   }) {
     super({
@@ -308,13 +289,8 @@ export class NEOONENodeAdapter extends NodeAdapter {
       name,
       binary,
       dataPath,
-      portAllocator,
       settings,
     });
-  }
-
-  public async create(): Promise<void> {
-    await this.writeSettings(this.mutableSettings);
   }
 
   public getDebug(): DescribeTable {
@@ -324,34 +300,6 @@ export class NEOONENodeAdapter extends NodeAdapter {
         ['Process ID', this.mutableProcess === undefined ? 'null' : `${this.mutableProcess.pid}`],
         ['Config Path', this.mutableConfig === undefined ? 'null' : this.mutableConfig.configPath],
       ]);
-  }
-
-  public async update(settings: NodeSettings): Promise<void> {
-    const restart = await this.writeSettings(settings);
-    if (restart && this.mutableProcess !== undefined) {
-      await this.stop();
-      await this.start();
-    }
-  }
-
-  public async start(): Promise<void> {
-    if (this.mutableProcess === undefined) {
-      const child = execa(this.binary.cmd, this.binary.firstArgs.concat(['start', 'node', this.dataPath]), {
-        // @ts-ignore
-        windowsHide: true,
-        stdio: 'ignore',
-      });
-
-      this.mutableProcess = child;
-    }
-  }
-
-  public async stop(): Promise<void> {
-    const child = this.mutableProcess;
-    this.mutableProcess = undefined;
-    if (child !== undefined) {
-      await killProcess(child.pid);
-    }
   }
 
   public getNodeStatus(): NodeStatus {
@@ -370,11 +318,44 @@ export class NEOONENodeAdapter extends NodeAdapter {
     return this.checkRPC('/ready_health_check', timeoutMS);
   }
 
+  protected async createInternal(): Promise<void> {
+    await this.writeSettings(this.mutableSettings);
+  }
+
+  protected async updateInternal(settings: NodeSettings): Promise<void> {
+    const restart = await this.writeSettings(settings);
+    if (restart && this.mutableProcess !== undefined) {
+      await this.stop();
+      await this.start();
+    }
+  }
+
+  protected async startInternal(): Promise<void> {
+    if (this.mutableProcess === undefined) {
+      const child = execa(this.binary.cmd, this.binary.firstArgs.concat(['start', 'node', this.dataPath]), {
+        // @ts-ignore
+        windowsHide: true,
+        stdio: 'ignore',
+      });
+
+      this.mutableProcess = child;
+    }
+  }
+
+  protected async stopInternal(): Promise<void> {
+    const child = this.mutableProcess;
+    this.mutableProcess = undefined;
+    if (child !== undefined) {
+      await killProcess(child.pid);
+    }
+  }
+
   private async checkRPC(rpcPath: string, timeoutMS: number): Promise<boolean> {
     try {
       const response = await fetch(this.getAddress(rpcPath), {
         timeout: timeoutMS,
-      });
+        // tslint:disable-next-line no-any
+      } as any);
 
       return response.status === 200;
     } catch (error) {
@@ -423,7 +404,6 @@ export class NEOONENodeAdapter extends NodeAdapter {
         maxSize: 10 * 1024 * 1024,
         maxFiles: 5,
       },
-
       settings: {
         test: settings.isTestNet,
         privateNet: settings.privateNet,
@@ -431,7 +411,6 @@ export class NEOONENodeAdapter extends NodeAdapter {
         standbyValidators: settings.standbyValidators,
         address: settings.address,
       },
-
       environment: {
         dataPath: path.resolve(this.dataPath, 'chain'),
         rpc: {
@@ -440,7 +419,6 @@ export class NEOONENodeAdapter extends NodeAdapter {
             host: '0.0.0.0',
           },
         },
-
         node: {
           network: {
             listenTCP: {
@@ -449,33 +427,27 @@ export class NEOONENodeAdapter extends NodeAdapter {
             },
           },
         },
-
         telemetry: {
           port: settings.telemetryPort,
         },
       },
-
       options: {
         node: {
           consensus: settings.consensus,
           network: {
             seeds: settings.seeds,
           },
-
           rpcURLs: settings.rpcEndpoints,
         },
-
         rpc: {
           server: {
             keepAliveTimeout: 60000,
           },
-
           liveHealthCheck: {
             rpcURLs: settings.rpcEndpoints,
             offset: 1,
             timeoutMS: 5000,
           },
-
           readyHealthCheck: {
             rpcURLs: settings.rpcEndpoints,
             offset: 1,

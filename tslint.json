@@ -133,7 +133,7 @@
     "readonly-keyword": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable"] }],
     "readonly-array": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable"] }],
     "no-let": [true, "ignore-local"],
-    "no-array-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable"] }],
+    "no-array-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "ctx.mutable"] }],
     "no-object-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "app.proxy", "app.silent", "ctx."] }],
     "no-method-signature": true,
     "no-loop-statement": true,
@@ -164,8 +164,6 @@
     "use-primitive-type": true,
     "no-map-without-usage": true,
     "rxjs-finnish": true,
-    "rxjs-no-deep-operators": true,
-    "rxjs-no-ignored-error": true,
-    "rxjs-no-patched": true
+    "rxjs-no-ignored-error": true
   }
 }

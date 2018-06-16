@@ -9,7 +9,7 @@ export const createNetwork = {
     if (network === undefined) {
       throw new Error('For Flow');
     }
-    // tslint:disable-next-line no-array-mutation
+
     ctx.mutableDependencies.push({
       plugin: networkConstants.PLUGIN,
       resourceType: networkConstants.NETWORK_RESOURCE_TYPE,

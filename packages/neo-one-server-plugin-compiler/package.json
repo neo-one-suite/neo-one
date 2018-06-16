@@ -29,7 +29,7 @@
   "module": "./dist/index.es.js",
   "typings": "./src/index.ts",
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   },
   "publishConfig": {
     "access": "public"
@@ -42,7 +42,7 @@
     "@neo-one/utils": "^1.0.0-alpha.35",
     "execa": "^0.10.0",
     "fs-extra": "^6.0.1",
-    "lodash": "^4.17.5",
-    "rxjs": "^6.2.0"
+    "lodash": "^4.17.10",
+    "rxjs": "^6.2.1"
   }
 }

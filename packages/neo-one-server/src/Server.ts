@@ -128,12 +128,10 @@ export class Server {
                 dataPath: this.dataPath,
                 serverVersion: VERSION,
               });
-              // tslint:disable-next-line no-object-mutation
               this.mutableServerDebug.pidPath = manager.pidPath;
 
               const pid = await manager.checkAlive(serverConfig.port);
               if (pid === undefined) {
-                // tslint:disable-next-line no-object-mutation
                 this.mutableServerDebug.pid = process.pid;
 
                 await manager.writePID(process.pid);
@@ -164,7 +162,6 @@ export class Server {
             });
             app.use(context({ monitor: this.monitor }));
             app.use(servicesMiddleware({ server: this }));
-            // tslint:disable-next-line no-object-mutation
             this.mutableServerDebug.port = serverConfig.port;
             app.start(`0.0.0.0:${serverConfig.port}`);
             this.monitor.log({
@@ -207,7 +204,7 @@ export class Server {
     ];
   }
 
-  private getValue(value?: string | number | null): string {
-    return value == undefined ? 'Not Set' : `${value}`;
+  private getValue(value?: string | number): string {
+    return value === undefined ? 'Not Set' : `${value}`;
   }
 }

@@ -79,8 +79,7 @@ export class SimulationResourceAdapter {
       options,
     });
 
-    // tslint:disable-next-line no-any
-    const dependencies: any[] = [];
+    const dependencies: string[] = [];
     const resourceAdapter = this.createResourceAdapter({
       staticOptions,
       createOptions,
@@ -103,7 +102,6 @@ export class SimulationResourceAdapter {
         client,
         pluginManager,
       },
-
       tasks: [
         {
           title: 'Initialize simulation [1]',
@@ -114,7 +112,6 @@ export class SimulationResourceAdapter {
               collapse: false,
             }),
         },
-
         {
           title: 'Initialize simulation [2]',
           task: () =>
@@ -123,7 +120,6 @@ export class SimulationResourceAdapter {
               collapse: false,
             }),
         },
-
         {
           title: 'Initialize simulation [3]',
           enabled: (ctx: CreateContext) => setupWalletsEnabled(ctx) || deployContractsEnabled(ctx),
@@ -134,11 +130,9 @@ export class SimulationResourceAdapter {
               collapse: false,
             }),
         },
-
         writeSimulationConfig,
         runCreateHooks,
       ],
-
       collapse: false,
     });
   }
@@ -222,7 +216,6 @@ export class SimulationResourceAdapter {
   private readonly name: string;
   private readonly dataPath: string;
   private readonly resourceType: SimulationResourceType;
-  private readonly createOptionsPath: string;
   private readonly simulationPath: string;
   private readonly simulationPackage: string;
   private readonly simulationConfig: SimulationConfig;
@@ -234,7 +227,6 @@ export class SimulationResourceAdapter {
     name,
     dataPath,
     resourceType,
-    createOptionsPath,
     simulationPath,
     simulationPackage,
     simulationConfig,
@@ -245,7 +237,6 @@ export class SimulationResourceAdapter {
     this.simulationPath = simulationPath;
     this.simulationPackage = simulationPackage;
     this.simulationConfig = simulationConfig;
-    this.createOptionsPath = createOptionsPath;
     this.state = 'stopped';
     this.mutableSubprocesses = [];
 

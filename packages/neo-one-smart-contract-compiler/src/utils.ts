@@ -82,7 +82,3 @@ export const getAstForSnippet = async (
 
   return { ast, sourceFile };
 };
-
-export function notNull<TValue>(value: TValue | null | undefined): value is TValue {
-  return value != undefined;
-}

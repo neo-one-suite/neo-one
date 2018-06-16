@@ -13,7 +13,6 @@ export const constants = {
       name: MASTER_WALLET,
       names: [network],
     }),
-
   makeWallet: ({ network, name }: { readonly network: string; readonly name: string }) =>
     compoundName.make({ name, names: [network] }),
   extractWallet: (name: string): { readonly network: string; readonly name: string } => {

@@ -43,7 +43,7 @@ export const createMonitor = ({
         const { error, ...rest } = logMessage;
 
         let message: typeof rest & { stack?: string | undefined } = { ...rest };
-        if (error != undefined) {
+        if (error !== undefined) {
           message = {
             ...message,
             stack: error.stack,

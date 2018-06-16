@@ -52,15 +52,17 @@ const getWallets = async ({ pluginManager, options }: CommonOptions): Promise<Wa
     return {};
   }
 
-  const wallets = (walletsIn === undefined ? [] : walletsIn).map((wallet) => ({
-    name: wallet.name,
-    network: wallet.network,
-  }));
-  // tslint:disable-next-line no-array-mutation
-  wallets.push({
-    name: walletConstants.makeMasterWallet(network.name),
-    network: network.name,
-  });
+  const wallets = (walletsIn === undefined ? [] : walletsIn)
+    .map((wallet) => ({
+      name: wallet.name,
+      network: wallet.network,
+    }))
+    .concat([
+      {
+        name: walletConstants.makeMasterWallet(network.name),
+        network: network.name,
+      },
+    ]);
 
   const walletResources = await Promise.all(
     wallets.map(
@@ -87,21 +89,22 @@ const getWallets = async ({ pluginManager, options }: CommonOptions): Promise<Wa
     }),
   );
 
-  return walletResources.reduce<WalletsOutputConfig>((acc: WalletsOutputConfig, wallet: Wallet) => {
+  return walletResources.reduce<WalletsOutputConfig>((acc, wallet) => {
     const { name } = walletConstants.extractWallet(wallet.name);
     if (wallet.wif === undefined) {
       throw new Error('Something went wrong.');
     }
-    // tslint:disable-next-line no-object-mutation
-    acc[name] = {
-      address: wallet.address,
-      scriptHash: wallet.scriptHash,
-      publicKey: wallet.publicKey,
-      wif: wallet.wif,
-      privateKey: wifToPrivateKey(wallet.wif),
-    };
 
-    return acc;
+    return {
+      ...acc,
+      [name]: {
+        address: wallet.address,
+        scriptHash: wallet.scriptHash,
+        publicKey: wallet.publicKey,
+        wif: wallet.wif,
+        privateKey: wifToPrivateKey(wallet.wif),
+      },
+    };
   }, {});
 };
 
@@ -137,12 +140,10 @@ const getCompiledContracts = async ({
   );
 
   return contractResources.reduce<CompiledContractsOutputConfig>(
-    (acc: CompiledContractsOutputConfig, contract: Contract) => {
-      // tslint:disable-next-line no-object-mutation
-      acc[contract.name] = { abi: contract.abi };
-
-      return acc;
-    },
+    (acc, contract) => ({
+      ...acc,
+      [contract.name]: { abi: contract.abi },
+    }),
     {},
   );
 };
@@ -181,19 +182,17 @@ const getDeployedContracts = async ({
     }),
   );
 
-  return contractResources.reduce<DeployedContractsOutputConfig>(
-    (acc: DeployedContractsOutputConfig, contract: SmartContract) => {
-      const { name } = walletConstants.extractContract(contract.name);
-      // tslint:disable-next-line no-object-mutation
-      acc[name] = {
+  return contractResources.reduce<DeployedContractsOutputConfig>((acc, contract) => {
+    const { name } = walletConstants.extractContract(contract.name);
+
+    return {
+      ...acc,
+      [name]: {
         hash: contract.hash,
         abi: contract.abi,
-      };
-
-      return acc;
-    },
-    {},
-  );
+      },
+    };
+  }, {});
 };
 
 const getSimulationConfiguration = async (common: CommonOptions): Promise<SimulationOutputConfig> => {

@@ -31,7 +31,6 @@ interface NewSmartContractResourceOptions {
     readonly name: string;
     readonly register: SmartContractRegister;
   };
-
   readonly hash?: string;
   readonly wallet?: string;
   readonly dataPath: string;
@@ -108,7 +107,6 @@ export class SmartContractResource {
             payable: compiledContract.payable,
           },
         },
-
         {
           from: wallet.accountID,
         },

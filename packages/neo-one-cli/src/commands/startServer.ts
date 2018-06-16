@@ -5,7 +5,7 @@ import { setupServer } from './common';
 export const startServer = (args: CLIArgs) => {
   const { vorpal, binary } = args;
   vorpal.command('start server', `Starts the ${name.title} server`).action(async () => {
-    const { monitor, serverConfig, shutdown, shutdownFuncs } = setupServer('server', args);
+    const { monitor, serverConfig, shutdown, mutableShutdownFuncs } = setupServer('server', args);
 
     const subscription = Server.init$({
       monitor,
@@ -31,7 +31,6 @@ export const startServer = (args: CLIArgs) => {
         shutdown({ exitCode: 1 });
       },
     });
-    // tslint:disable-next-line no-array-mutation
-    shutdownFuncs.push(() => subscription.unsubscribe());
+    mutableShutdownFuncs.push(() => subscription.unsubscribe());
   });
 };

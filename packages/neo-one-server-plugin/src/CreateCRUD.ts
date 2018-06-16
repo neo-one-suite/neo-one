@@ -53,10 +53,7 @@ export class CreateCRUD<
     this.startOnCreate = startOnCreate;
   }
 
-  public async getAutocomplete(
-    // tslint:disable-next-line no-unused
-    options: GetCLIAutocompleteOptions,
-  ): Promise<ReadonlyArray<string>> {
+  public async getAutocomplete(_options: GetCLIAutocompleteOptions): Promise<ReadonlyArray<string>> {
     return Promise.resolve(this.autocomplete);
   }
 

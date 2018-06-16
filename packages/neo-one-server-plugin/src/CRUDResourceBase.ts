@@ -31,8 +31,8 @@ export interface GetCLINameOptions<ResourceOptions extends BaseResourceOptions> 
 }
 
 export class CRUDResourceBase<
-  Resource extends BaseResource,
-  ResourceOptions extends BaseResourceOptions
+  Resource extends BaseResource = BaseResource,
+  ResourceOptions extends BaseResourceOptions = BaseResourceOptions
 > extends CRUDBase<Resource, ResourceOptions> {
   public constructor({
     name,

@@ -1,10 +1,11 @@
 import { plugins as pluginsUtil } from '@neo-one/server';
 import { Client, createServerConfig } from '@neo-one/server-client';
-import { CLIArgs, Paths, paths as defaultPaths } from '@neo-one/server-plugin';
+import { CLIArgs, paths as defaultPaths } from '@neo-one/server-plugin';
+import { Paths } from 'env-paths';
 import path from 'path';
 import { map, take } from 'rxjs/operators';
 import Vorpal from 'vorpal';
-import { pkg } from '../package.json';
+import pkg from '../package.json';
 import { commands } from './commands';
 import { createBinary, setupCLI } from './utils';
 
@@ -45,19 +46,19 @@ export class CLI {
     const vorpal = new Vorpal();
     vorpal.version(pkg.version);
 
-    const { monitor, config$: logConfig$, shutdownFuncs, shutdown } = setupCLI({
+    const { monitor, config$: logConfig$, mutableShutdownFuncs, shutdown } = setupCLI({
       logConsole: false,
       vorpal,
       debug: this.debug,
     });
 
-    const cliArgs = {
+    const cliArgs: CLIArgs = {
       monitor,
       vorpal,
       debug: this.debug,
       binary: createBinary(argv, this.serverConfig),
       shutdown,
-      shutdownFuncs,
+      mutableShutdownFuncs,
       logConfig$,
       serverArgs: this.serverConfig,
       paths: this.paths,
@@ -73,20 +74,21 @@ export class CLI {
       }
     }
 
-    vorpal.exec(cmd);
+    await vorpal.exec(cmd);
   }
 
   private exists(vorpalIn: Vorpal, cmd: string): boolean {
+    // tslint:disable-next-line no-any
     const vorpal = vorpalIn as any;
     const result = vorpal.util.parseCommand(cmd, vorpal.commands);
+
     return result.match != undefined;
   }
 
   private installDefaultPlugins(cliArgs: CLIArgs): void {
-    // tslint:disable-next-line no-loop-statement
-    for (const plugin of pluginsUtil.DEFAULT_PLUGINS) {
+    pluginsUtil.DEFAULT_PLUGINS.forEach((plugin) => {
       this.installPlugin(plugin, cliArgs);
-    }
+    });
   }
 
   private async installPlugins(cliArgs: CLIArgs): Promise<void> {
@@ -104,10 +106,9 @@ export class CLI {
       .toPromise();
     const client = new Client({ port });
     const plugins = await client.getAllPlugins();
-    // tslint:disable-next-line no-loop-statement
-    for (const plugin of plugins) {
+    plugins.forEach((plugin) => {
       this.installPlugin(plugin, cliArgs);
-    }
+    });
   }
 
   private installPlugin(pluginName: string, cliArgs: CLIArgs): void {

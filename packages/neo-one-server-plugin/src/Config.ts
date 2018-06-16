@@ -2,8 +2,7 @@ import ajv from 'ajv';
 import chokidar from 'chokidar';
 import fs from 'fs-extra';
 import path from 'path';
-import { defer, Observable } from 'rxjs';
-import { Observer } from 'rxjs/Observer';
+import { defer, Observable, Observer } from 'rxjs';
 import { distinctUntilChanged, mergeScan, switchMap } from 'rxjs/operators';
 import SeamlessImmutable from 'seamless-immutable';
 

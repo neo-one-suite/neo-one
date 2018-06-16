@@ -139,7 +139,6 @@ export const getOptions = ({
     simulationConfig,
     simulationPath,
     templatePath: requireResolve(simulationPackage, simulationConfig.templateDir),
-
     targetContract,
     wallets,
     network,
@@ -150,7 +149,6 @@ export const getOptions = ({
       simulationPath,
       simulationConfig.configPath === undefined ? 'neo-one.json' : simulationConfig.configPath,
     ),
-
     options,
   };
 };

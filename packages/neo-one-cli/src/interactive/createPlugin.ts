@@ -9,10 +9,12 @@ export const createPlugin = ({ cli, plugin }: { readonly cli: InteractiveCLI; re
     plugin.interactive.map((interactiveCommand) => interactiveCommand({ cli })),
   );
 
-  commands.forEach((command) => {
+  // tslint:disable-next-line no-any
+  commands.forEach((command: any) => {
     const fn = command.fn;
     let cancelled = false;
-    command.action(async (args) => {
+    // tslint:disable-next-line no-any
+    command.action(async (args: any) => {
       try {
         cancelled = false;
         await cli.executeCommandPreHooks(command.name, args);
@@ -31,7 +33,7 @@ export const createPlugin = ({ cli, plugin }: { readonly cli: InteractiveCLI; re
     });
 
     const cancel = command.cancel;
-    if (cancel != undefined) {
+    if (cancel !== undefined) {
       command.cancel(() => {
         cancelled = true;
         cancel();

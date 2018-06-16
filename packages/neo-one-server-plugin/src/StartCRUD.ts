@@ -28,7 +28,7 @@ export class StartCRUD<Resource extends BaseResource, ResourceOptions extends Ba
   public constructor({
     name = 'start',
     resourceType,
-    help,
+    help = nameToHelp(name, resourceType.names.lower),
     aliases,
     options,
     autocomplete,
@@ -36,7 +36,7 @@ export class StartCRUD<Resource extends BaseResource, ResourceOptions extends Ba
     super({
       name,
       resourceType,
-      help: help === undefined ? nameToHelp(name, resourceType.names.lower) : help,
+      help,
       aliases,
       options,
       autocomplete,

@@ -23,7 +23,6 @@ export const setupWallets = {
               {
                 title: 'Create wallet',
                 task: () => {
-                  // tslint:disable-next-line no-array-mutation
                   ctx.mutableDependencies.push({
                     plugin: walletConstants.PLUGIN,
                     resourceType: walletConstants.WALLET_RESOURCE_TYPE,
@@ -90,7 +89,6 @@ export const setupWallets = {
             ],
           }),
       })),
-
       concurrent: true,
     });
   },

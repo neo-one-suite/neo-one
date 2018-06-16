@@ -46,8 +46,7 @@ export class SmartContractResourceAdapter {
       tasks: [
         {
           title: 'Deploy smart contract',
-          // tslint:disable-next-line no-any
-          task: async (ctx: any) => {
+          task: async (ctx) => {
             const smartContractResource = await SmartContractResource.createNew({
               pluginManager,
               resourceType,
@@ -83,11 +82,9 @@ export class SmartContractResourceAdapter {
   }
 
   public readonly resource$: Observable<SmartContract>;
-  private readonly resourceType: SmartContractResourceType;
   private readonly smartContractResource: SmartContractResource;
 
-  public constructor({ resourceType, smartContractResource }: SmartContractResourceAdapterOptions) {
-    this.resourceType = resourceType;
+  public constructor({ smartContractResource }: SmartContractResourceAdapterOptions) {
     this.smartContractResource = smartContractResource;
 
     this.resource$ = smartContractResource.resource$;

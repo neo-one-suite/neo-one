@@ -58,6 +58,6 @@ export const startNode = ({ vorpal, monitor, shutdown, mutableShutdownFuncs, log
       });
 
       node.start();
-      mutableShutdownFuncs.push(() => node.stop());
+      mutableShutdownFuncs.push(async () => node.stop());
     });
 };

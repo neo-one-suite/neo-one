@@ -1,8 +1,9 @@
 import { Monitor } from '@neo-one/monitor';
 import { labels, utils } from '@neo-one/utils';
+// tslint:disable-next-line match-default-export-name
+import _fetch from 'cross-fetch';
 import DataLoader from 'dataloader';
 import stringify from 'fast-stable-stringify';
-import _fetch from 'isomorphic-fetch';
 import { UnknownBlockError } from '../../errors';
 import { HTTPError, InvalidRPCResponseError, JSONRPCError } from './errors';
 import { JSONRPCProvider, JSONRPCRequest } from './JSONRPCProvider';

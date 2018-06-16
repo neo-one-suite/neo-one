@@ -22,10 +22,10 @@ export interface GetCRUDOptions<Resource extends BaseResource, ResourceOptions e
   readonly autocomplete?: ReadonlyArray<string>;
 }
 
-export class GetCRUD<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> extends CRUDBase<
-  Resource,
-  ResourceOptions
-> {
+export class GetCRUD<
+  Resource extends BaseResource = BaseResource,
+  ResourceOptions extends BaseResourceOptions = BaseResourceOptions
+> extends CRUDBase<Resource, ResourceOptions> {
   public constructor({
     resourceType,
     help,
@@ -45,14 +45,12 @@ export class GetCRUD<Resource extends BaseResource, ResourceOptions extends Base
   }
 
   // Function to execute before the command.
-  // tslint:disable-next-line no-unused
-  public async preExecCLI(options: ExecCLIOptions<ResourceOptions>): Promise<void> {
+  public async preExecCLI(_options: ExecCLIOptions<ResourceOptions>): Promise<void> {
     return Promise.resolve();
   }
 
   // Function to execute after the command.
-  // tslint:disable-next-line no-unused
-  public async postExecCLI(options: ExecCLIOptions<ResourceOptions>): Promise<void> {
+  public async postExecCLI(_options: ExecCLIOptions<ResourceOptions>): Promise<void> {
     return Promise.resolve();
   }
 
@@ -60,15 +58,12 @@ export class GetCRUD<Resource extends BaseResource, ResourceOptions extends Base
     client,
     options,
   }: GetResources$Options<ResourceOptions>): Observable<ReadonlyArray<Resource>> {
-    return (
-      client
-        .getResources$({
-          plugin: this.resourceType.plugin.name,
-          resourceType: this.resourceType.name,
-          options,
-        })
-        // tslint:disable-next-line no-any
-        .pipe(map((resources) => resources.map((resource) => resource as any)))
-    );
+    return client
+      .getResources$({
+        plugin: this.resourceType.plugin.name,
+        resourceType: this.resourceType.name,
+        options,
+      })
+      .pipe(map((resources) => resources.map((resource) => resource as Resource)));
   }
 }
