@@ -2,18 +2,19 @@ import { Monitor } from '@neo-one/monitor';
 import { Plugin } from '@neo-one/server-plugin';
 import { labels } from '@neo-one/utils';
 
-const DEFAULT_PLUGINS = [
+const DEFAULT_PLUGINS: ReadonlyArray<string> = [
   '@neo-one/server-plugin-network',
   '@neo-one/server-plugin-wallet',
   '@neo-one/server-plugin-compiler',
   '@neo-one/server-plugin-simulation',
 ];
 
-const getPlugin = ({ monitor, pluginName }: { monitor: Monitor; pluginName: string }): Plugin => {
+const getPlugin = ({ monitor, pluginName }: { readonly monitor: Monitor; readonly pluginName: string }): Plugin => {
   try {
-    // $FlowFixMe
-    const module = require(pluginName); // eslint-disable-line
-    const PluginClass = module.default == null ? module : module.default;
+    const module = require(pluginName);
+    // tslint:disable-next-line variable-name
+    const PluginClass = module.default === undefined ? module : module.default;
+
     return new PluginClass({ monitor });
   } catch (error) {
     monitor.withLabels({ [labels.PLUGIN_NAME]: pluginName }).logError({
@@ -26,9 +27,10 @@ const getPlugin = ({ monitor, pluginName }: { monitor: Monitor; pluginName: stri
   }
 };
 
-const cleanPluginName = ({ pluginName }: { pluginName: string }) => pluginName.replace('@', '').replace('/', '-');
+const cleanPluginName = ({ pluginName }: { readonly pluginName: string }) =>
+  pluginName.replace('@', '').replace('/', '-');
 
-export default {
+export const plugins = {
   DEFAULT_PLUGINS,
   getPlugin,
   cleanPluginName,

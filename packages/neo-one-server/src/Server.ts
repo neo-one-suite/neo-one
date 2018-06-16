@@ -1,60 +1,30 @@
-import { Binary, DescribeTable, Config } from '@neo-one/server-plugin';
-import Mali from 'mali';
 import { Monitor } from '@neo-one/monitor';
-import { Observable, combineLatest, defer } from 'rxjs';
-import { ServerConfig } from '@neo-one/server-client';
-import { ServerManager } from '@neo-one/server-client';
-import { distinctUntilChanged, map, mergeScan, switchMap } from 'rxjs/operators';
+import { ServerConfig, ServerManager } from '@neo-one/server-client';
+import { proto } from '@neo-one/server-grpc';
+import { Binary, Config, DescribeTable } from '@neo-one/server-plugin';
 import { finalize } from '@neo-one/utils';
+import Mali, { Context } from 'mali';
 import path from 'path';
-import proto from '@neo-one/server-grpc';
-import { PluginManager } from './PluginManager';
-import { PortAllocator } from './PortAllocator';
+import { combineLatest, defer, Observable } from 'rxjs';
+import { distinctUntilChanged, map, mergeScan, switchMap } from 'rxjs/operators';
+import pkg from '../package.json';
 import { ServerRunningError } from './errors';
 import { context, services as servicesMiddleware } from './middleware';
-import { pkg } from '../package.json';
+import { PluginManager } from './PluginManager';
+import { PortAllocator } from './PortAllocator';
 
 export const VERSION = pkg.version;
 const PLUGIN_PATH = 'plugin';
 
 export class Server {
-  public readonly serverConfig: Config<ServerConfig>;
-  public readonly dataPath: string;
-  public readonly pluginManager: PluginManager;
-  private readonly monitor: Monitor;
-  private readonly serverDebug: {
-    port?: number;
-    pid?: number;
-    pidPath?: string;
-  };
-
-  constructor({
-    monitor,
-    serverConfig,
-    dataPath,
-    pluginManager,
-  }: {
-    monitor: Monitor;
-    serverConfig: Config<ServerConfig>;
-    dataPath: string;
-    pluginManager: PluginManager;
-  }) {
-    this.monitor = monitor.at('server');
-    this.serverConfig = serverConfig;
-    this.dataPath = dataPath;
-    this.pluginManager = pluginManager;
-
-    this.serverDebug = {} as any;
-  }
-
   public static init$({
     monitor,
     binary,
     serverConfig,
   }: {
-    monitor: Monitor;
-    binary: Binary;
-    serverConfig: Config<ServerConfig>;
+    readonly monitor: Monitor;
+    readonly binary: Binary;
+    readonly serverConfig: Config<ServerConfig>;
   }): Observable<Server> {
     const dataPath$ = serverConfig.config$.pipe(
       map((config) => config.paths.data),
@@ -69,16 +39,14 @@ export class Server {
       ),
     ).pipe(
       switchMap(([dataPath, ports]) =>
-        defer(async () => {
-          const portAllocator = await PortAllocator.create({
+        defer(async () =>
+          PortAllocator.create({
             monitor,
             dataPath,
             portMin: ports.min,
             portMax: ports.max,
-          });
-
-          return portAllocator;
-        }),
+          }),
+        ),
       ),
     );
 
@@ -93,6 +61,7 @@ export class Server {
           });
 
           await pluginManager.init();
+
           return pluginManager;
         }),
       ),
@@ -115,31 +84,64 @@ export class Server {
     );
   }
 
+  public readonly serverConfig: Config<ServerConfig>;
+  public readonly dataPath: string;
+  public readonly pluginManager: PluginManager;
+  private readonly monitor: Monitor;
+  private readonly mutableServerDebug: {
+    // tslint:disable-next-line readonly-keyword
+    port?: number;
+    // tslint:disable-next-line readonly-keyword
+    pid?: number;
+    // tslint:disable-next-line readonly-keyword
+    pidPath?: string;
+  };
+
+  public constructor({
+    monitor,
+    serverConfig,
+    dataPath,
+    pluginManager,
+  }: {
+    readonly monitor: Monitor;
+    readonly serverConfig: Config<ServerConfig>;
+    readonly dataPath: string;
+    readonly pluginManager: PluginManager;
+  }) {
+    this.monitor = monitor.at('server');
+    this.serverConfig = serverConfig;
+    this.dataPath = dataPath;
+    this.pluginManager = pluginManager;
+
+    this.mutableServerDebug = {};
+  }
+
   public start$(): Observable<void> {
     return this.serverConfig.config$.pipe(
       map((config) => config.server),
       distinctUntilChanged(),
-      mergeScan(
+      mergeScan<ServerConfig['server'], Mali | undefined>(
         (prevApp, serverConfig) =>
           defer(async () => {
-            if (prevApp == null) {
+            if (prevApp === undefined) {
               const manager = new ServerManager({
                 dataPath: this.dataPath,
                 serverVersion: VERSION,
               });
-
-              this.serverDebug.pidPath = manager.pidPath;
+              // tslint:disable-next-line no-object-mutation
+              this.mutableServerDebug.pidPath = manager.pidPath;
 
               const pid = await manager.checkAlive(serverConfig.port);
-              if (pid == null) {
-                this.serverDebug.pid = process.pid;
+              if (pid === undefined) {
+                // tslint:disable-next-line no-object-mutation
+                this.mutableServerDebug.pid = process.pid;
 
-                manager.writePID(process.pid);
+                await manager.writePID(process.pid);
               } else if (pid !== process.pid) {
                 throw new ServerRunningError(pid);
               }
             } else {
-              await prevApp.close().catch((error) => {
+              await prevApp.close().catch((error: Error) => {
                 this.monitor.logError({
                   name: 'grpc_app_close_error',
                   message: 'Failed to close previous app',
@@ -149,9 +151,9 @@ export class Server {
             }
             const app = new Mali(proto);
             app.silent = false;
-            app.on('error', (error, ctx) => {
+            app.on('error', (error: Error, ctx: Context) => {
               let monitor = this.monitor;
-              if (ctx != null && ctx.state != null && ctx.state.monitor != null) {
+              if (ctx != undefined && ctx.state != undefined && ctx.state.monitor != undefined) {
                 ({ monitor } = ctx.state);
               }
               monitor.logError({
@@ -162,7 +164,8 @@ export class Server {
             });
             app.use(context({ monitor: this.monitor }));
             app.use(servicesMiddleware({ server: this }));
-            this.serverDebug.port = serverConfig.port;
+            // tslint:disable-next-line no-object-mutation
+            this.mutableServerDebug.port = serverConfig.port;
             app.start(`0.0.0.0:${serverConfig.port}`);
             this.monitor.log({
               name: 'server_listen',
@@ -175,9 +178,8 @@ export class Server {
         undefined,
         1,
       ),
-
-      finalize(async (app) => {
-        if (app != null) {
+      finalize<Mali | undefined>(async (app) => {
+        if (app !== undefined) {
           await app.close();
         }
       }),
@@ -199,13 +201,13 @@ export class Server {
 
   private getServerDebug(): DescribeTable {
     return [
-      ['Port', this.getValue(this.serverDebug.port)],
-      ['Process ID', this.getValue(this.serverDebug.pid)],
-      ['Process ID Path', this.getValue(this.serverDebug.pidPath)],
+      ['Port', this.getValue(this.mutableServerDebug.port)],
+      ['Process ID', this.getValue(this.mutableServerDebug.pid)],
+      ['Process ID Path', this.getValue(this.mutableServerDebug.pidPath)],
     ];
   }
 
   private getValue(value?: string | number | null): string {
-    return value == null ? 'Not Set' : `${value}`;
+    return value == undefined ? 'Not Set' : `${value}`;
   }
 }

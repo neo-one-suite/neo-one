@@ -33,7 +33,7 @@ const watchConfig$ = (file: string): Observable<Event> =>
 
 export class Config<TConfig extends object> {
   public readonly config$: Observable<TConfig>;
-  protected readonly configPath: string;
+  public readonly configPath: string;
   private readonly defaultConfig: TConfig;
   // tslint:disable-next-line no-any
   private readonly validateConfig: any;

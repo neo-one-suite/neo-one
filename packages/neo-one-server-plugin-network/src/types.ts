@@ -1,15 +1,19 @@
-export type NetworkType = 'main' | 'test' | 'private';
+export enum NetworkType {
+  Main = 'main',
+  Test = 'test',
+  Private = 'private',
+}
 
 export interface NodeSettings {
   readonly type: NetworkType;
-  readonly isTestNet: boolean;
+  readonly isTestNet?: boolean;
   readonly privateNet?: boolean;
   readonly secondsPerBlock?: number;
   readonly standbyValidators?: ReadonlyArray<string>;
   readonly address?: string;
-  readonly rpcPort: number;
-  readonly listenTCPPort: number;
-  readonly telemetryPort: number;
+  readonly rpcPort?: number;
+  readonly listenTCPPort?: number;
+  readonly telemetryPort?: number;
   readonly consensus: {
     readonly enabled: boolean;
     readonly options: {

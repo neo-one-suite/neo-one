@@ -27,8 +27,8 @@ export class NetworkPlugin extends Plugin {
       lowerPlural: 'networks',
     };
   }
-  // tslint:disable-next-line no-any
-  public get resourceTypes(): ReadonlyArray<ResourceType<any, any>> {
+
+  public get resourceTypes(): ReadonlyArray<ResourceType> {
     return [this.networkResourceType];
   }
 

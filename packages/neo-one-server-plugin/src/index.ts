@@ -29,7 +29,7 @@ export { ResourceAdapter } from './ResourceAdapter';
 export { MasterResourceAdapter, ResourceDependency, ResourceAdapterOptions } from './MasterResourceAdapter';
 export { CLIHookConfig, CreateHookConfig } from './Plugin';
 export { MasterResourceAdapterOptions } from './ResourceType';
-export { TaskContext } from './TaskList';
+export { Task, TaskContext } from './TaskList';
 export {
   AllResources,
   BaseResource,
@@ -53,5 +53,6 @@ export {
   ReadRequest,
   ResourceState,
   Session,
+  SubDescribeTable,
   TaskStatus,
 } from './types';

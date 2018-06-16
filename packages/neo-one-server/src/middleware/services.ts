@@ -1,63 +1,75 @@
 import {
+  areTasksDone,
   CRUDRequest,
   CRUDRequestStart,
-  ReadResponse,
   ReadRequest,
+  ReadResponse,
   TaskList,
   TaskStatus,
-  areTasksDone,
 } from '@neo-one/server-plugin';
 import { Context } from 'mali';
-import { Observable, of as _of } from 'rxjs';
+import { EMPTY, Observable, of as _of } from 'rxjs';
+import { Observer } from 'rxjs/Observer';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import pkg from '../../package.json';
 import { ResourcesManager } from '../ResourcesManager';
 import { Server } from '../Server';
-import { pkg } from '../../package.json';
 
-const makeObservable = (ctx: Context): Observable<any> =>
-  Observable.create((observer) => {
-    ctx.req.on('data', (value) => {
+function makeObservable$<TData>(ctx: Context): Observable<TData> {
+  return Observable.create((observer: Observer<TData>) => {
+    ctx.req.on('data', (value: TData) => {
       observer.next(value);
     });
-    ctx.req.on('error', (error) => {
+    ctx.req.on('error', (error: Error) => {
       observer.error(error);
     });
     ctx.req.on('end', () => {
       observer.complete();
     });
+
     return () => ctx.req.destroy();
   });
+}
 
-export default ({ server }: { server: Server }) => {
+export const services = ({ server }: { readonly server: Server }) => {
   async function handleCRUD<TRequest extends CRUDRequest, TStartRequest extends CRUDRequestStart>(
     ctx: Context,
+    // tslint:disable-next-line no-any
     createTaskList: (request: TStartRequest, resourcesManager: ResourcesManager<any, any>) => TaskList,
   ): Promise<void> {
-    const requests$ = makeObservable(ctx);
-    let taskList;
+    const requests$ = makeObservable$<TRequest | TStartRequest>(ctx);
+    let taskList: TaskList | undefined;
     let done = false;
     await requests$
       .pipe(
-        switchMap((request: TRequest) => {
+        switchMap((request: TRequest | TStartRequest) => {
           switch (request.type) {
             case 'start':
-              if (taskList == null) {
+              if (taskList === undefined) {
                 taskList = createTaskList(
+                  // tslint:disable-next-line no-any
                   request as any,
                   server.pluginManager.getResourcesManager({
-                    plugin: request.plugin,
-                    resourceType: request.resourceType,
+                    // tslint:disable-next-line no-any
+                    plugin: (request as any).plugin,
+                    // tslint:disable-next-line no-any
+                    resourceType: (request as any).resourceType,
                   }),
                 );
               }
+
               return taskList.status$;
             case 'abort':
+              if (taskList === undefined) {
+                return EMPTY;
+              }
+
               return taskList.abort$();
             default:
-              throw new Error(`Unknown request: ${request.type}`);
+              throw new Error('Unknown request');
           }
         }),
-        map((tasks: TaskStatus[]) => {
+        map((tasks: ReadonlyArray<TaskStatus>) => {
           if (!done) {
             ctx.res.write({ tasks: JSON.stringify(tasks) });
             if (areTasksDone(tasks)) {
@@ -70,17 +82,20 @@ export default ({ server }: { server: Server }) => {
       .toPromise();
   }
 
+  // tslint:disable-next-line no-any
   async function handleRead(ctx: Context, createObservable$: (request: any) => Observable<any>): Promise<void> {
-    const requests$ = makeObservable(ctx);
-    let observable$;
+    const requests$ = makeObservable$<ReadRequest>(ctx);
+    // tslint:disable-next-line no-any
+    let observable$: Observable<any> | undefined;
     await requests$
       .pipe(
         switchMap((request: ReadRequest) => {
           switch (request.type) {
             case 'start':
-              if (observable$ == null) {
+              if (observable$ === undefined) {
                 observable$ = createObservable$(request).pipe(map((response) => ({ type: 'response', response })));
               }
+
               return observable$;
             case 'abort':
               return _of({ type: 'aborted' });
@@ -95,10 +110,7 @@ export default ({ server }: { server: Server }) => {
         catchError((error) =>
           _of({
             type: 'error',
-            code:
-              (error as any).code == null || typeof (error as any).code !== 'string'
-                ? 'UNKNOWN_ERROR'
-                : (error as any).code,
+            code: error.code == undefined || typeof error.code !== 'string' ? 'UNKNOWN_ERROR' : error.code,
             message: error.message,
           }),
         ),
@@ -159,7 +171,7 @@ export default ({ server }: { server: Server }) => {
           })
           .pipe(
             map((value) => ({
-              resource: value == null ? value : JSON.stringify(value),
+              resource: value === undefined ? value : JSON.stringify(value),
             })),
           ),
       );

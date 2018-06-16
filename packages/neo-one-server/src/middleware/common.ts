@@ -1,17 +1,18 @@
-import { Context } from 'mali';
-import GRPCError from 'grpc-error';
 import { Monitor } from '@neo-one/monitor';
 import grpc from 'grpc';
+import GRPCError from 'grpc-error';
+import { Context } from 'mali';
 
-// eslint-disable-next-line
+// tslint:disable-next-line export-name
 export const getMonitor = (ctx: Context): Monitor => {
   const { state } = ctx;
-  if (state == null) {
+  if (state == undefined) {
     throw new GRPCError('Programming error', grpc.status.INTERNAL);
   }
   const { monitor } = state;
-  if (monitor == null) {
+  if (monitor == undefined) {
     throw new GRPCError('Programming error', grpc.status.INTERNAL);
   }
+
   return monitor;
 };

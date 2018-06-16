@@ -4,7 +4,8 @@ import { map } from 'rxjs/operators';
 import { getTaskError, getTasksError, isTaskDone } from './tasks';
 import { TaskStatus } from './types';
 
-export type TaskContext = object;
+// tslint:disable-next-line no-any
+export type TaskContext = any;
 type SkipFn = (ctx: TaskContext) => string | boolean;
 type EnabledFn = (ctx: TaskContext) => boolean;
 type OnErrorFn = (error: Error, ctx: TaskContext) => void;

@@ -1,55 +1,65 @@
-import { Observable, ReplaySubject, Subject, combineLatest, concat, of as _of } from 'rxjs';
-import { AllResources, Binary, DescribeTable, Plugin, pluginResourceTypeUtil } from '@neo-one/server-plugin';
 import { Monitor } from '@neo-one/monitor';
 import { PluginNotInstalledError, UnknownPluginResourceType } from '@neo-one/server-client';
-import _ from 'lodash';
+import {
+  AllResources,
+  BaseResource,
+  Binary,
+  DescribeTable,
+  Plugin,
+  pluginResourceTypeUtil,
+  SubDescribeTable,
+} from '@neo-one/server-plugin';
 import fs from 'fs-extra';
-import { map, shareReplay, switchMap } from 'rxjs/operators';
+import _ from 'lodash';
 import path from 'path';
+import { combineLatest, concat, Observable, of as _of, ReplaySubject, Subject } from 'rxjs';
+import { map, shareReplay, switchMap } from 'rxjs/operators';
 import toposort from 'toposort';
-import { utils } from '@neo-one/utils';
 import { PluginDependencyNotMetError } from './errors';
+import { plugins as pluginsUtil } from './plugins';
 import { PortAllocator } from './PortAllocator';
 import { Ready } from './Ready';
 import { ResourcesManager } from './ResourcesManager';
-import { pluginsUtil } from './plugins';
 
 const MANAGER_PATH = 'manager';
 const MASTER_PATH = 'master';
 const PLUGINS_READY_PATH = 'ready';
 
 interface ResourcesManagers {
+  // tslint:disable-next-line readonly-keyword
   [plugin: string]: {
+    // tslint:disable-next-line no-any readonly-keyword
     [resourceType: string]: ResourcesManager<any, any>;
   };
 }
 
 interface Plugins {
+  // tslint:disable-next-line readonly-keyword
   [plugin: string]: Plugin;
 }
 
 export class PluginManager {
+  public readonly allResources$: Observable<AllResources>;
+  public mutablePlugins: Plugins;
+  public readonly plugins$: ReplaySubject<string>;
   private readonly monitor: Monitor;
   private readonly binary: Binary;
   private readonly portAllocator: PortAllocator;
   private readonly dataPath: string;
   private readonly resourcesManagers: ResourcesManagers;
-  private readonly plugins: Plugins;
-  public readonly plugins$: ReplaySubject<string>;
   private readonly ready: Ready;
   private readonly update$: Subject<void>;
-  public readonly allResources$: Observable<AllResources>;
 
-  constructor({
+  public constructor({
     monitor,
     binary,
     portAllocator,
     dataPath,
   }: {
-    monitor: Monitor;
-    binary: Binary;
-    portAllocator: PortAllocator;
-    dataPath: string;
+    readonly monitor: Monitor;
+    readonly binary: Binary;
+    readonly portAllocator: PortAllocator;
+    readonly dataPath: string;
   }) {
     this.monitor = monitor.at('plugin_manager');
     this.binary = binary;
@@ -57,7 +67,7 @@ export class PluginManager {
     this.dataPath = dataPath;
 
     this.resourcesManagers = {};
-    this.plugins = {};
+    this.mutablePlugins = {};
     this.plugins$ = new ReplaySubject();
     this.ready = new Ready({
       dir: path.resolve(dataPath, PLUGINS_READY_PATH),
@@ -69,12 +79,12 @@ export class PluginManager {
         concat(
           _of([]),
           combineLatest(
-            utils.entries(this.resourcesManagers).reduce(
+            Object.entries(this.resourcesManagers).reduce<Array<Observable<[string, ReadonlyArray<BaseResource>]>>>(
               (acc, [pluginName, pluginResourcesManagers]) =>
                 acc.concat(
-                  utils.entries(pluginResourcesManagers).map(([resourceType, resourcesManager]) =>
+                  Object.entries(pluginResourcesManagers).map(([resourceType, resourcesManager]) =>
                     resourcesManager.resources$.pipe(
-                      map((resources) => [
+                      map<ReadonlyArray<BaseResource>, [string, ReadonlyArray<BaseResource>]>((resources) => [
                         pluginResourceTypeUtil.make({
                           plugin: pluginName,
                           resourceType,
@@ -99,8 +109,8 @@ export class PluginManager {
     this.allResources$.subscribe().unsubscribe();
   }
 
-  public get plugins(): string[] {
-    return Object.keys(this.plugins);
+  public get plugins(): ReadonlyArray<string> {
+    return Object.keys(this.mutablePlugins);
   }
 
   public async init(): Promise<void> {
@@ -111,17 +121,20 @@ export class PluginManager {
 
   public async reset(): Promise<void> {
     await Promise.all([
-      Promise.all(utils.values(this.plugins).map((plugin) => plugin.reset())),
+      Promise.all(Object.values(this.mutablePlugins).map(async (plugin) => plugin.reset())),
       Promise.all(
-        utils
-          .values(this.resourcesManagers)
-          .reduce((acc, managers) => acc.concat(utils.values(managers)), [])
-          .map((manager) => manager.reset()),
+        Object.values(this.resourcesManagers)
+          // tslint:disable-next-line no-any
+          .reduce((acc: Array<ResourcesManager<any, any>>, managers) => acc.concat(Object.values(managers)), [])
+          // tslint:disable-next-line no-any
+          .map(async (manager: ResourcesManager<any, any>) => {
+            await manager.reset();
+          }),
       ),
     ]);
   }
 
-  public async registerPlugins(pluginNames: string[]): Promise<void> {
+  public async registerPlugins(pluginNames: ReadonlyArray<string>): Promise<void> {
     const plugins = pluginNames.map((pluginName) =>
       pluginsUtil.getPlugin({
         monitor: this.monitor,
@@ -129,30 +142,70 @@ export class PluginManager {
       }),
     );
 
-    const graph = plugins.reduce((acc, plugin) => acc.concat(plugin.dependencies.map((dep) => [plugin.name, dep])), []);
+    const graph = plugins.reduce<ReadonlyArray<[string, string]>>(
+      (acc, plugin) => acc.concat(plugin.dependencies.map<[string, string]>((dep) => [plugin.name, dep])),
+      [],
+    );
 
-    const sorted = toposort(graph).reverse();
-    const pluginNameToPlugin = plugins.reduce((acc, plugin) => {
+    const sorted = _.reverse(toposort(graph));
+    const pluginNameToPlugin = plugins.reduce<{ [pluginName: string]: Plugin }>((acc, plugin) => {
+      // tslint:disable-next-line no-object-mutation
       acc[plugin.name] = plugin;
+
       return acc;
     }, {});
     const noDepPlugins = plugins.filter((plugin) => plugin.dependencies.length === 0);
 
-    await Promise.all(noDepPlugins.map((plugin) => this.registerPlugin(plugin)));
+    await Promise.all(noDepPlugins.map(async (plugin) => this.registerPlugin(plugin)));
 
+    // tslint:disable-next-line no-loop-statement
     for (const pluginName of sorted) {
-      const plugin = pluginNameToPlugin[pluginName];
+      const plugin = pluginNameToPlugin[pluginName] as Plugin | undefined;
       // The later plugins will fail with missing dependency
-      if (plugin != null) {
-        // eslint-disable-next-line
+      if (plugin !== undefined) {
         await this.registerPlugin(pluginNameToPlugin[pluginName]);
       }
     }
   }
 
+  public getResourcesManager({
+    plugin: pluginName,
+    resourceType: resourceTypeName,
+  }: {
+    readonly plugin: string;
+    readonly resourceType: string;
+    // tslint:disable-next-line no-any
+  }): ResourcesManager<any, any> {
+    const plugin = this.mutablePlugins[pluginName];
+    // tslint:disable-next-line strict-type-predicates
+    if (plugin === undefined) {
+      throw new PluginNotInstalledError(pluginName);
+    }
+    const resourceType = plugin.resourceTypeByName[resourceTypeName];
+    // tslint:disable-next-line strict-type-predicates
+    if (resourceType === undefined) {
+      throw new UnknownPluginResourceType({
+        plugin: pluginName,
+        resourceType: resourceTypeName,
+      });
+    }
+
+    return this.resourcesManagers[pluginName][resourceTypeName];
+  }
+
+  public getDebug(): DescribeTable {
+    return [
+      ['Binary', `${this.binary.cmd} ${this.binary.firstArgs.join(' ')}`],
+      ['Port Allocator', { type: 'describe', table: this.portAllocator.getDebug() }],
+      ['Resources Managers', { type: 'describe', table: this.getResourcesManagersDebug() }],
+    ];
+  }
+
   private async registerPlugin(plugin: Plugin): Promise<void> {
+    // tslint:disable-next-line no-loop-statement
     for (const dependency of plugin.dependencies) {
-      if (this.plugins[dependency] == null) {
+      // tslint:disable-next-line strict-type-predicates
+      if (this.mutablePlugins[dependency] === undefined) {
         throw new PluginDependencyNotMetError({
           plugin: plugin.name,
           dependency,
@@ -160,7 +213,8 @@ export class PluginManager {
       }
     }
 
-    this.plugins[plugin.name] = plugin;
+    this.mutablePlugins[plugin.name] = plugin;
+    // tslint:disable-next-line no-object-mutation
     this.resourcesManagers[plugin.name] = {};
     const resourcesManagers = await Promise.all(
       plugin.resourceTypes.map(async (resourceType) => {
@@ -203,67 +257,42 @@ export class PluginManager {
 
     await this.ready.write(plugin.name);
     resourcesManagers.forEach(({ resourceType, resourcesManager }) => {
+      // tslint:disable-next-line no-object-mutation
       this.resourcesManagers[plugin.name][resourceType] = resourcesManager;
     });
     this.plugins$.next(plugin.name);
     this.update$.next();
   }
 
-  public getResourcesManager({
-    plugin: pluginName,
-    resourceType: resourceTypeName,
-  }: {
-    plugin: string;
-    resourceType: string;
-  }): ResourcesManager<any, any> {
-    const plugin = this.plugins[pluginName];
-    if (plugin == null) {
-      throw new PluginNotInstalledError(pluginName);
-    }
-    const resourceType = plugin.resourceTypeByName[resourceTypeName];
-    if (resourceType == null) {
-      throw new UnknownPluginResourceType({
-        plugin: pluginName,
-        resourceType: resourceTypeName,
-      });
-    }
-
-    return this.resourcesManagers[pluginName][resourceTypeName];
-  }
-
-  private getResourcesManagerDataPath(options: { plugin: string; resourceType: string }): string {
+  private getResourcesManagerDataPath(options: { readonly plugin: string; readonly resourceType: string }): string {
     return path.resolve(this.getPluginPath(options), MANAGER_PATH);
   }
 
-  private getMasterResourceAdapterDataPath(options: { plugin: string; resourceType: string }): string {
+  private getMasterResourceAdapterDataPath(options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+  }): string {
     return path.resolve(this.getPluginPath(options), MASTER_PATH);
   }
 
-  private getPluginPath({ plugin, resourceType }: { plugin: string; resourceType: string }): string {
+  private getPluginPath({ plugin, resourceType }: { readonly plugin: string; readonly resourceType: string }): string {
     return path.resolve(this.dataPath, pluginsUtil.cleanPluginName({ pluginName: plugin }), resourceType);
   }
 
-  public getDebug(): DescribeTable {
-    return [
-      ['Binary', `${this.binary.cmd} ${this.binary.firstArgs.join(' ')}`],
-      ['Port Allocator', { type: 'describe', table: this.portAllocator.getDebug() }],
-
-      ['Resources Managers', { type: 'describe', table: this.getResourcesManagersDebug() }],
-    ];
-  }
-
   private getResourcesManagersDebug(): DescribeTable {
-    return utils.entries(this.resourcesManagers).map(([pluginName, resourceTypeManagers]) => [
-      pluginName.slice('@neo-one/server-plugin-'.length),
-      {
-        type: 'describe',
-        table: utils
-          .entries(resourceTypeManagers)
-          .map(([resourceType, resourcesManager]) => [
-            resourceType,
-            { type: 'describe', table: resourcesManager.getDebug() },
-          ]),
-      },
-    ]);
+    return Object.entries(this.resourcesManagers).map<[string, SubDescribeTable]>(
+      ([pluginName, resourceTypeManagers]) => [
+        pluginName.slice('@neo-one/server-plugin-'.length),
+        {
+          type: 'describe',
+          table: Object.entries(resourceTypeManagers).map<[string, SubDescribeTable]>(
+            ([resourceType, resourcesManager]) => [
+              resourceType,
+              { type: 'describe', table: resourcesManager.getDebug() },
+            ],
+          ),
+        },
+      ],
+    );
   }
 }

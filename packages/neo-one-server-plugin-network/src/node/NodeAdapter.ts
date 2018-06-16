@@ -99,52 +99,43 @@ export class NodeAdapter {
             ['Type', this.mutableSettings.type],
             [
               'Is Test Net',
-              // tslint:disable-next-line strict-type-predicates quotemark
               this.mutableSettings.isTestNet === undefined ? "'null'" : JSON.stringify(this.mutableSettings.isTestNet),
             ],
 
             [
               'Seconds Per Block',
               this.mutableSettings.secondsPerBlock === undefined
-                ? // tslint:disable-next-line quotemark
-                  "'null'"
+                ? "'null'"
                 : JSON.stringify(this.mutableSettings.secondsPerBlock),
             ],
 
             [
               'Standby Validators',
               this.mutableSettings.standbyValidators === undefined
-                ? // tslint:disable-next-line quotemark
-                  "'null'"
+                ? "'null'"
                 : JSON.stringify(this.mutableSettings.standbyValidators, undefined, 2),
             ],
 
             [
               'Address',
-              // tslint:disable-next-line quotemark
               this.mutableSettings.address === undefined ? "'null'" : JSON.stringify(this.mutableSettings.address),
             ],
             [
               'RPC Port',
-              // tslint:disable-next-line strict-type-predicates quotemark
               this.mutableSettings.rpcPort === undefined ? "'null'" : JSON.stringify(this.mutableSettings.rpcPort),
             ],
 
             [
               'Listen TCP Port',
-              // tslint:disable-next-line strict-type-predicates
               this.mutableSettings.listenTCPPort === undefined
-                ? // tslint:disable-next-line quotemark
-                  "'null'"
+                ? "'null'"
                 : JSON.stringify(this.mutableSettings.listenTCPPort),
             ],
 
             [
               'Telemetry Port',
-              // tslint:disable-next-line strict-type-predicates
               this.mutableSettings.telemetryPort === undefined
-                ? // tslint:disable-next-line quotemark
-                  "'null'"
+                ? "'null'"
                 : JSON.stringify(this.mutableSettings.telemetryPort),
             ],
 
@@ -225,7 +216,7 @@ export class NodeAdapter {
     throw new Error('Not Implemented');
   }
 
-  private async live(timeoutSeconds: number): Promise<void> {
+  public async live(timeoutSeconds: number): Promise<void> {
     const start = utils.nowSeconds();
     // tslint:disable-next-line no-loop-statement
     while (utils.nowSeconds() - start < timeoutSeconds) {

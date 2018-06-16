@@ -8,15 +8,12 @@ import { ResourceType } from './ResourceType';
 import { Task, TaskList } from './TaskList';
 
 export type ListTable = ReadonlyArray<ReadonlyArray<string>>;
+export interface SubDescribeTable {
+  readonly type: 'describe';
+  readonly table: DescribeTable;
+}
 export type DescribeTable = ReadonlyArray<
-  [
-    string,
-
-
-      | string
-      | { readonly type: 'list'; readonly table: ListTable }
-      | { readonly type: 'describe'; readonly table: DescribeTable }
-  ]
+  [string, string | { readonly type: 'list'; readonly table: ListTable } | SubDescribeTable]
 >;
 
 export type ResourceState = 'started' | 'stopped';
@@ -105,7 +102,7 @@ export interface Client {
       readonly name: string;
       readonly options: BaseResourceOptions;
     },
-  ) => Observable<BaseResource | null>;
+  ) => Observable<BaseResource | undefined>;
   readonly getResource: (
     options: {
       readonly plugin: string;
@@ -113,7 +110,7 @@ export interface Client {
       readonly name: string;
       readonly options: BaseResourceOptions;
     },
-  ) => Promise<BaseResource | null>;
+  ) => Promise<BaseResource | undefined>;
   readonly createResource$: (
     options: {
       readonly plugin: string;
@@ -183,7 +180,7 @@ export interface CLIArgs {
     },
   ) => void;
   // tslint:disable-next-line readonly-array
-  readonly shutdownFuncs: Array<() => void>;
+  mutableShutdownFuncs: Array<() => void>;
   readonly logConfig$: Subject<LogConfig>;
   readonly vorpal: Vorpal;
   readonly debug: boolean;
@@ -196,8 +193,8 @@ export interface CLIArgs {
 
   readonly paths: Paths;
 }
-
-export type Session = object;
+// tslint:disable-next-line no-any
+export type Session = any;
 
 export interface InteractiveCLI {
   readonly vorpal: Vorpal;
@@ -210,8 +207,9 @@ export interface InteractiveCLI {
   readonly addDelimiter: (key: string, name: string) => void;
   readonly removeDelimiter: (key: string) => void;
   readonly resetDelimiter: () => void;
-  readonly prompt: (questions: ReadonlyArray<object>) => Promise<object>;
-  readonly monitor: Monitor;
+  // tslint:disable-next-line no-any
+  readonly prompt: (questions: ReadonlyArray<object>) => Promise<any>;
+  readonly monitor: Monitor | undefined;
   readonly exec: (command: string) => Promise<void>;
   readonly printDescribe: (describeTable: DescribeTable, log?: (value: string) => void) => void;
 
@@ -246,7 +244,7 @@ export interface PortAllocator {
       readonly resource: string;
       readonly name: string;
     },
-  ) => number;
+  ) => Promise<number>;
 
   readonly releasePort: (
     options: {
@@ -255,7 +253,7 @@ export interface PortAllocator {
       readonly resource: string;
       readonly name?: string;
     },
-  ) => void;
+  ) => Promise<void>;
 }
 
 export interface ResourcesManager<
@@ -265,7 +263,7 @@ export interface ResourcesManager<
   readonly getResources$: (options: ResourceOptions) => Observable<ReadonlyArray<Resource>>;
   readonly getResource$: (
     options: { readonly name: string; readonly options: ResourceOptions },
-  ) => Observable<Resource | null>;
+  ) => Observable<Resource | undefined>;
   readonly getResourceAdapter: (name: string) => ResourceAdapter<Resource, ResourceOptions>;
   // tslint:disable-next-line no-any
   readonly masterResourceAdapter: any;

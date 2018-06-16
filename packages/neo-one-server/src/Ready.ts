@@ -6,13 +6,14 @@ const EXT = '.ready';
 export class Ready {
   public readonly dir: string;
 
-  constructor({ dir }: { dir: string }) {
+  public constructor({ dir }: { readonly dir: string }) {
     this.dir = dir;
   }
 
   public async check(name: string): Promise<boolean> {
     try {
       const result = await fs.readFile(this.getFilePath(name), 'utf8');
+
       return result === name;
     } catch (error) {
       if (error.code === 'ENOENT') {
@@ -27,10 +28,11 @@ export class Ready {
     await fs.writeFile(this.getFilePath(name), name);
   }
 
-  public async getAll(): Promise<string[]> {
+  public async getAll(): Promise<ReadonlyArray<string>> {
     try {
       const files = await fs.readdir(this.dir);
-      return Promise.all(files.map((file) => fs.readFile(path.resolve(this.dir, file), 'utf8')));
+
+      return Promise.all(files.map(async (file) => fs.readFile(path.resolve(this.dir, file), 'utf8')));
     } catch (error) {
       if (error.code === 'ENOENT') {
         return [];

@@ -1,2 +1,2 @@
-export { default as context } from './context';
-export { default as services } from './services';
+export { context } from './context';
+export { services } from './services';

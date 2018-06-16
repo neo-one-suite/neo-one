@@ -1,7 +1,14 @@
 import { createReadClient } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
-import { createEndpoint } from '@neo-one/node-core';
-import { Binary, DescribeTable, PortAllocator, ResourceState, TaskList } from '@neo-one/server-plugin';
+import { createEndpoint, EndpointConfig } from '@neo-one/node-core';
+import {
+  Binary,
+  DescribeTable,
+  PortAllocator,
+  ResourceState,
+  SubDescribeTable,
+  TaskList,
+} from '@neo-one/server-plugin';
 import { labels } from '@neo-one/utils';
 import fs from 'fs-extra';
 import _ from 'lodash';
@@ -10,7 +17,7 @@ import { BehaviorSubject, combineLatest, Observable, timer } from 'rxjs';
 import { concatMap, shareReplay, switchMap } from 'rxjs/operators';
 import { constants } from './constants';
 import { Network, NetworkResourceOptions, NetworkResourceType } from './NetworkResourceType';
-import { NEOONENodeAdapter, NodeAdapter } from './node';
+import { NEOONENodeAdapter, Node, NodeAdapter } from './node';
 import { NetworkType, NodeSettings } from './types';
 
 export interface NodeOptions {
@@ -42,6 +49,27 @@ export interface NetworkResourceAdapterOptions extends NetworkResourceAdapterSta
   readonly nodes: ReadonlyArray<NodeAdapter>;
 }
 
+const DEFAULT_MAIN_SEEDS: ReadonlyArray<EndpointConfig> = [
+  { type: 'tcp', host: 'seed1.cityofzion.io', port: 10333 },
+  { type: 'tcp', host: 'seed2.cityofzion.io', port: 10333 },
+  { type: 'tcp', host: 'seed3.cityofzion.io', port: 10333 },
+  { type: 'tcp', host: 'seed4.cityofzion.io', port: 10333 },
+  { type: 'tcp', host: 'seed5.cityofzion.io', port: 10333 },
+  { type: 'tcp', host: 'seed1.neo.org', port: 10333 },
+  { type: 'tcp', host: 'seed2.neo.org', port: 10333 },
+  { type: 'tcp', host: 'seed3.neo.org', port: 10333 },
+  { type: 'tcp', host: 'seed4.neo.org', port: 10333 },
+  { type: 'tcp', host: 'seed5.neo.org', port: 10333 },
+];
+
+const DEFAULT_TEST_SEEDS: ReadonlyArray<EndpointConfig> = [
+  { type: 'tcp', host: 'seed1.neo.org', port: 20333 },
+  { type: 'tcp', host: 'seed2.neo.org', port: 20333 },
+  { type: 'tcp', host: 'seed3.neo.org', port: 20333 },
+  { type: 'tcp', host: 'seed4.neo.org', port: 20333 },
+  { type: 'tcp', host: 'seed5.neo.org', port: 20333 },
+];
+
 export class NetworkResourceAdapter {
   public static async init(options: NetworkResourceAdapterInitOptions): Promise<NetworkResourceAdapter> {
     const staticOptions = this.getStaticOptions(options);
@@ -69,20 +97,20 @@ export class NetworkResourceAdapter {
 
   public static create(adapterOptions: NetworkResourceAdapterInitOptions, options: NetworkResourceOptions): TaskList {
     const staticOptions = this.getStaticOptions(adapterOptions);
-    let type: string;
-    let nodeSettings;
+    let type: NodeOptions['type'];
+    let nodeSettings: ReadonlyArray<[string, NodeSettings]>;
     if (staticOptions.name === constants.NETWORK_NAME.MAIN) {
-      type = constants.NETWORK_TYPE.MAIN;
+      type = NetworkType.Main;
       nodeSettings = [[staticOptions.name, this.getMainSettings(staticOptions)]];
     } else if (staticOptions.name === constants.NETWORK_NAME.TEST) {
-      type = constants.NETWORK_TYPE.TEST;
+      type = NetworkType.Test;
       nodeSettings = [[staticOptions.name, this.getTestSettings(staticOptions)]];
     } else {
-      type = constants.NETWORK_TYPE.PRIVATE;
+      type = NetworkType.Private;
       nodeSettings = this.getPrivateNetSettings(staticOptions);
     }
 
-    const nodeOptionss = nodeSettings.map(([name, settings]) => ({
+    const nodeOptionss = nodeSettings.map<NodeOptions>(([name, settings]) => ({
       type,
       name,
       dataPath: path.resolve(staticOptions.nodesPath, name),
@@ -90,7 +118,7 @@ export class NetworkResourceAdapter {
       options,
     }));
 
-    const nodeOptionsAndNodes = nodeOptionss.map((nodeOptions) => [
+    const nodeOptionsAndNodes = nodeOptionss.map<[NodeOptions, NodeAdapter]>((nodeOptions) => [
       nodeOptions,
       this.createNodeAdapter(staticOptions, nodeOptions),
     ]);
@@ -189,12 +217,12 @@ export class NetworkResourceAdapter {
     const secondsPerBlock = 15;
     const standbyValidators = configuration.map(({ publicKey }) => common.ecPointToString(publicKey));
 
-    return configuration.map((config) => {
+    return configuration.map<[string, NodeSettings]>((config) => {
       const { name, rpcPort, listenTCPPort, telemetryPort, privateKey } = config;
       const otherConfiguration = configuration.filter(({ name: otherName }) => name !== otherName);
 
       const settings = {
-        type: 'private',
+        type: NetworkType.Private,
         isTestNet: false,
         rpcPort,
         listenTCPPort,
@@ -228,7 +256,7 @@ export class NetworkResourceAdapter {
 
   private static getMainSettings(options: NetworkResourceAdapterStaticOptions): NodeSettings {
     return {
-      type: 'main',
+      type: NetworkType.Main,
       isTestNet: false,
       rpcPort: this.getRPCPort(options, options.name),
       listenTCPPort: this.getListenTCPPort(options, options.name),
@@ -241,18 +269,7 @@ export class NetworkResourceAdapter {
         },
       },
 
-      seeds: [
-        { type: 'tcp', host: 'seed1.cityofzion.io', port: 10333 },
-        { type: 'tcp', host: 'seed2.cityofzion.io', port: 10333 },
-        { type: 'tcp', host: 'seed3.cityofzion.io', port: 10333 },
-        { type: 'tcp', host: 'seed4.cityofzion.io', port: 10333 },
-        { type: 'tcp', host: 'seed5.cityofzion.io', port: 10333 },
-        { type: 'tcp', host: 'seed1.neo.org', port: 10333 },
-        { type: 'tcp', host: 'seed2.neo.org', port: 10333 },
-        { type: 'tcp', host: 'seed3.neo.org', port: 10333 },
-        { type: 'tcp', host: 'seed4.neo.org', port: 10333 },
-        { type: 'tcp', host: 'seed5.neo.org', port: 10333 },
-      ].map(createEndpoint),
+      seeds: DEFAULT_MAIN_SEEDS.map(createEndpoint),
       rpcEndpoints: [
         'http://seed1.cityofzion.io:8080',
         'http://seed2.cityofzion.io:8080',
@@ -271,7 +288,7 @@ export class NetworkResourceAdapter {
 
   private static getTestSettings(options: NetworkResourceAdapterStaticOptions): NodeSettings {
     return {
-      type: 'test',
+      type: NetworkType.Test,
       isTestNet: true,
       rpcPort: this.getRPCPort(options, options.name),
       listenTCPPort: this.getListenTCPPort(options, options.name),
@@ -284,13 +301,7 @@ export class NetworkResourceAdapter {
         },
       },
 
-      seeds: [
-        { type: 'tcp', host: 'seed1.neo.org', port: 20333 },
-        { type: 'tcp', host: 'seed2.neo.org', port: 20333 },
-        { type: 'tcp', host: 'seed3.neo.org', port: 20333 },
-        { type: 'tcp', host: 'seed4.neo.org', port: 20333 },
-        { type: 'tcp', host: 'seed5.neo.org', port: 20333 },
-      ].map(createEndpoint),
+      seeds: DEFAULT_TEST_SEEDS.map(createEndpoint),
       rpcEndpoints: [
         'http://test1.cityofzion.io:8880',
         'http://test2.cityofzion.io:8880',
@@ -435,10 +446,11 @@ export class NetworkResourceAdapter {
           // tslint:disable-next-line no-unused
           concatMap(async ([time, currentNodes]) => {
             const readyNode =
-              currentNodes.find((node) => node.ready) || currentNodes.find((node) => node.live) || currentNodes[0];
+              currentNodes.find((node) => node.ready) ||
+              currentNodes.find((node) => node.live) ||
+              (currentNodes[0] as Node | undefined);
             let height;
             let peers;
-            // tslint:disable-next-line strict-type-predicates
             if (readyNode !== undefined) {
               const client = createReadClient({
                 network: this.name,
@@ -482,7 +494,10 @@ export class NetworkResourceAdapter {
         'Nodes',
         {
           type: 'describe',
-          table: this.nodes.map((node) => [node.name, { type: 'describe', table: node.getDebug() }]),
+          table: this.nodes.map<[string, SubDescribeTable]>((node) => [
+            node.name,
+            { type: 'describe', table: node.getDebug() },
+          ]),
         },
       ],
     ];
@@ -496,8 +511,7 @@ export class NetworkResourceAdapter {
     this.nodes$.next([]);
   }
 
-  // tslint:disable-next-line no-unused
-  public delete(options: NetworkResourceOptions): TaskList {
+  public delete(_options: NetworkResourceOptions): TaskList {
     return new TaskList({
       tasks: [
         {
@@ -510,8 +524,7 @@ export class NetworkResourceAdapter {
     });
   }
 
-  // tslint:disable-next-line no-unused
-  public start(options: NetworkResourceOptions): TaskList {
+  public start(_options: NetworkResourceOptions): TaskList {
     return new TaskList({
       tasks: [
         {
@@ -532,8 +545,7 @@ export class NetworkResourceAdapter {
     });
   }
 
-  // tslint:disable-next-line no-unused
-  public stop(options: NetworkResourceOptions): TaskList {
+  public stop(_options: NetworkResourceOptions): TaskList {
     return new TaskList({
       tasks: [
         {

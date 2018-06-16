@@ -3,12 +3,11 @@ import { BackupRestoreOptions } from '@neo-one/node-data-backup';
 import { CLIArgs } from '@neo-one/server-plugin';
 import path from 'path';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { Command } from 'vorpal';
+import { Args, Command } from 'vorpal';
 import { createFullNode } from './createFullNode';
 import { createNEOONENodeConfig } from './node';
 
-// tslint:disable-next-line no-any
-const getOption = ({ vorpal, shutdown }: CLIArgs, options: any, key: string): string | undefined => {
+const getOption = ({ vorpal, shutdown }: CLIArgs, options: Args['options'], key: string): string | undefined => {
   const value = options[key];
   if (value == undefined) {
     vorpal.activeCommand.log(`--${key} is required.`);
@@ -30,10 +29,9 @@ export const addOptions = (command: Command) => {
 
 export const processArgs = async (
   cliArgs: CLIArgs,
-  // tslint:disable-next-line no-any
-  args: any,
+  args: Args,
 ): Promise<{ readonly node: FullNode; readonly options: BackupRestoreOptions } | undefined> => {
-  const { vorpal, monitor, shutdown, shutdownFuncs, logConfig$ } = cliArgs;
+  const { vorpal, monitor, shutdown, mutableShutdownFuncs, logConfig$ } = cliArgs;
   const { dataPath, provider, options: cliOptions } = args;
   let mega;
   let gcloud;
@@ -88,8 +86,7 @@ export const processArgs = async (
       })),
     )
     .subscribe(logConfig$);
-  // tslint:disable-next-line no-array-mutation
-  shutdownFuncs.push(() => logSubscription.unsubscribe());
+  mutableShutdownFuncs.push(() => logSubscription.unsubscribe());
 
   const node = await createFullNode({
     dataPath,

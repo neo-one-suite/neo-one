@@ -4,13 +4,12 @@ import { distinctUntilChanged, map } from 'rxjs/operators';
 import { createFullNode } from './createFullNode';
 import { createNEOONENodeConfig } from './node';
 
-export const startNode = ({ vorpal, monitor, shutdown, shutdownFuncs, logConfig$ }: CLIArgs) => {
+export const startNode = ({ vorpal, monitor, shutdown, mutableShutdownFuncs, logConfig$ }: CLIArgs) => {
   vorpal
     .command('start node <dataPath>', `Starts a full node`)
     .option('-c, --chain <chain>', 'Path of a chain.acc file to bootstrap the node')
     .option('-d --dump <dump>', 'Path to dump a chain.acc file to')
-    // tslint:disable-next-line no-any
-    .action(async (args: any) => {
+    .action(async (args) => {
       const { dataPath, options: cliOptions } = args;
 
       const nodeConfig = createNEOONENodeConfig({ dataPath });
@@ -29,8 +28,7 @@ export const startNode = ({ vorpal, monitor, shutdown, shutdownFuncs, logConfig$
           })),
         )
         .subscribe(logConfig$);
-      // tslint:disable-next-line no-array-mutation
-      shutdownFuncs.push(() => logSubscription.unsubscribe());
+      mutableShutdownFuncs.push(() => logSubscription.unsubscribe());
 
       let chainFile;
       if (cliOptions.chain != undefined) {
@@ -60,7 +58,6 @@ export const startNode = ({ vorpal, monitor, shutdown, shutdownFuncs, logConfig$
       });
 
       node.start();
-      // tslint:disable-next-line no-array-mutation
-      shutdownFuncs.push(() => node.stop());
+      mutableShutdownFuncs.push(() => node.stop());
     });
 };

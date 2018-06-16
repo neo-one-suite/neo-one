@@ -75,7 +75,11 @@ export class ResourceType<
     return resources;
   }
 
-  public getResource$({ name, client, options }: GetResource$Options<ResourceOptions>): Observable<Resource | null> {
+  public getResource$({
+    name,
+    client,
+    options,
+  }: GetResource$Options<ResourceOptions>): Observable<Resource | undefined> {
     return (
       client
         .getResource$({
@@ -89,7 +93,11 @@ export class ResourceType<
     );
   }
 
-  public async getResource({ name, client, options }: GetResource$Options<ResourceOptions>): Promise<Resource | null> {
+  public async getResource({
+    name,
+    client,
+    options,
+  }: GetResource$Options<ResourceOptions>): Promise<Resource | undefined> {
     return this.getResource$({
       name,
       client,

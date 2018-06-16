@@ -1,6 +1,6 @@
 import { Monitor } from '@neo-one/monitor';
 import { Environment as FullNodeEnvironment, Options as FullNodeOptions } from '@neo-one/node';
-import { createEndpoint } from '@neo-one/node-core';
+import { createEndpoint, EndpointConfig } from '@neo-one/node-core';
 import { Binary, Config, DescribeTable, killProcess, PortAllocator } from '@neo-one/server-plugin';
 import { ChildProcess } from 'child_process';
 import execa from 'execa';
@@ -20,7 +20,7 @@ export interface NodeConfig {
   };
 
   readonly settings: {
-    readonly test: boolean;
+    readonly test?: boolean;
     readonly privateNet?: boolean;
     readonly secondsPerBlock?: number;
     readonly standbyValidators?: ReadonlyArray<string>;
@@ -43,6 +43,19 @@ const DEFAULT_RPC_URLS: ReadonlyArray<string> = [
   'http://seed4.neo.org:10332',
   'http://seed5.neo.org:10332',
   'http://api.otcgo.cn:10332',
+];
+
+const DEFAULT_SEEDS: ReadonlyArray<EndpointConfig> = [
+  { type: 'tcp', host: 'seed1.cityofzion.io', port: 10333 },
+  { type: 'tcp', host: 'seed2.cityofzion.io', port: 10333 },
+  { type: 'tcp', host: 'seed3.cityofzion.io', port: 10333 },
+  { type: 'tcp', host: 'seed4.cityofzion.io', port: 10333 },
+  { type: 'tcp', host: 'seed5.cityofzion.io', port: 10333 },
+  { type: 'tcp', host: 'seed1.neo.org', port: 10333 },
+  { type: 'tcp', host: 'seed2.neo.org', port: 10333 },
+  { type: 'tcp', host: 'seed3.neo.org', port: 10333 },
+  { type: 'tcp', host: 'seed4.neo.org', port: 10333 },
+  { type: 'tcp', host: 'seed5.neo.org', port: 10333 },
 ];
 
 const makeDefaultConfig = (dataPath: string): NodeConfig => ({
@@ -70,21 +83,10 @@ const makeDefaultConfig = (dataPath: string): NodeConfig => ({
       },
 
       network: {
-        seeds: [
-          { type: 'tcp', host: 'seed1.cityofzion.io', port: 10333 },
-          { type: 'tcp', host: 'seed2.cityofzion.io', port: 10333 },
-          { type: 'tcp', host: 'seed3.cityofzion.io', port: 10333 },
-          { type: 'tcp', host: 'seed4.cityofzion.io', port: 10333 },
-          { type: 'tcp', host: 'seed5.cityofzion.io', port: 10333 },
-          { type: 'tcp', host: 'seed1.neo.org', port: 10333 },
-          { type: 'tcp', host: 'seed2.neo.org', port: 10333 },
-          { type: 'tcp', host: 'seed3.neo.org', port: 10333 },
-          { type: 'tcp', host: 'seed4.neo.org', port: 10333 },
-          { type: 'tcp', host: 'seed5.neo.org', port: 10333 },
-        ].map(createEndpoint),
+        seeds: DEFAULT_SEEDS.map(createEndpoint),
       },
 
-      rpcURLs: DEFAULT_RPC_URLS,
+      rpcURLs: [...DEFAULT_RPC_URLS],
     },
 
     rpc: {
@@ -356,7 +358,7 @@ export class NEOONENodeAdapter extends NodeAdapter {
     return {
       rpcAddress: this.getAddress('/rpc'),
       tcpAddress: `localhost:${this.mutableSettings.listenTCPPort}`,
-      telemetryAddress: `http://localhost:${this.settings.telemetryPort}/metrics`,
+      telemetryAddress: `http://localhost:${this.mutableSettings.telemetryPort}/metrics`,
     };
   }
 
@@ -389,7 +391,7 @@ export class NEOONENodeAdapter extends NodeAdapter {
   }
 
   private getAddress(rpcPath: string): string {
-    return `http://localhost:${this.settings.rpcPort}${rpcPath}`;
+    return `http://localhost:${this.mutableSettings.rpcPort}${rpcPath}`;
   }
 
   private async writeSettings(settings: NodeSettings): Promise<boolean> {
@@ -457,8 +459,7 @@ export class NEOONENodeAdapter extends NodeAdapter {
         node: {
           consensus: settings.consensus,
           network: {
-            // tslint:disable-next-line no-any
-            seeds: settings.seeds as any,
+            seeds: settings.seeds,
           },
 
           rpcURLs: settings.rpcEndpoints,

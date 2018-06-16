@@ -1,3 +1,3 @@
-export { default as Server, VERSION } from './Server';
+export { Server, VERSION } from './Server';
 
-export { default as plugins } from './plugins';
+export { plugins } from './plugins';

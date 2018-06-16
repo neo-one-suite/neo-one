@@ -9,8 +9,8 @@ import { BaseResource, BaseResourceOptions } from './types';
 
 export interface CRUDOptions<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> {
   readonly resourceType: ResourceType<Resource, ResourceOptions>;
-  readonly start?: StartCRUD<Resource, ResourceOptions> | null;
-  readonly stop?: StopCRUD<Resource, ResourceOptions> | null;
+  readonly start?: StartCRUD<Resource, ResourceOptions> | undefined;
+  readonly stop?: StopCRUD<Resource, ResourceOptions> | undefined;
   readonly delete?: DeleteCRUD<Resource, ResourceOptions>;
   readonly create?: CreateCRUD<Resource, ResourceOptions>;
   readonly get?: GetCRUD<Resource, ResourceOptions>;
@@ -19,8 +19,8 @@ export interface CRUDOptions<Resource extends BaseResource, ResourceOptions exte
 
 export class CRUD<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> {
   public readonly resourceType: ResourceType<Resource, ResourceOptions>;
-  public readonly start: StartCRUD<Resource, ResourceOptions> | null;
-  public readonly stop: StopCRUD<Resource, ResourceOptions> | null;
+  public readonly start: StartCRUD<Resource, ResourceOptions> | undefined;
+  public readonly stop: StopCRUD<Resource, ResourceOptions> | undefined;
   public readonly delete: DeleteCRUD<Resource, ResourceOptions>;
   public readonly create: CreateCRUD<Resource, ResourceOptions>;
   public readonly get: GetCRUD<Resource, ResourceOptions>;

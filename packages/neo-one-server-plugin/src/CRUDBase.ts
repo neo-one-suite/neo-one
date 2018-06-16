@@ -37,8 +37,10 @@ export interface CRUDBaseOptions<Resource extends BaseResource, ResourceOptions 
 
 export interface GetCLIResourceOptions {
   readonly cli: InteractiveCLI;
-  readonly args: object;
-  readonly options: object;
+  // tslint:disable-next-line no-any
+  readonly args: any;
+  // tslint:disable-next-line no-any
+  readonly options: any;
 }
 
 export class CRUDBase<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> {
@@ -92,7 +94,6 @@ export class CRUDBase<Resource extends BaseResource, ResourceOptions extends Bas
   }
 
   public async getCLIResourceOptions({ options }: GetCLIResourceOptions): Promise<ResourceOptions> {
-    // tslint:disable-next-line no-any
-    return Promise.resolve(options as any);
+    return Promise.resolve(options);
   }
 }
