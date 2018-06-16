@@ -1,20 +1,19 @@
-/* @flow */
-import type { Blockchain } from '@neo-one/node-core';
-import type { Context } from 'koa';
-
-import checkReady, { type Options as CheckReadyOptions } from './checkReady';
+import { Blockchain } from '@neo-one/node-core';
+import { Context } from 'koa';
+import { checkReady, Options as CheckReadyOptions } from './checkReady';
 import { getMonitor } from './common';
 
 export type Options = CheckReadyOptions;
 
-export default ({
+export const liveHealthCheck = ({
   blockchain,
   options,
-}: {|
-  blockchain: Blockchain,
-  options: Options,
-|}) => {
-  let lastBlockIndex;
+}: {
+  readonly blockchain: Blockchain;
+  readonly options: Options;
+}) => {
+  let lastBlockIndex: number | undefined;
+
   return {
     name: 'liveHealthCheck',
     path: '/live_health_check',
@@ -23,7 +22,7 @@ export default ({
       const ready = await checkReady({ monitor, blockchain, options });
       if (
         ready ||
-        lastBlockIndex == null ||
+        lastBlockIndex === undefined ||
         lastBlockIndex < blockchain.currentBlockIndex ||
         blockchain.isPersistingBlock
       ) {

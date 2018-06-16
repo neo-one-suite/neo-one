@@ -1,63 +1,59 @@
-/* @flow */
-import type { Context, Middleware } from 'koa';
 import {
-  TRANSACTION_TYPE,
-  type TransactionData,
   Account,
-  Input,
-  InvocationTransaction,
-  JSONHelper,
   common,
   crypto,
   deserializeTransactionWire,
+  Input,
+  InvocationTransaction,
+  JSONHelper,
+  Transaction,
+  TransactionData,
+  TransactionJSON,
+  TransactionType,
+  utils,
 } from '@neo-one/client-core';
-import {
-  type Blockchain,
-  type Node,
-  getEndpointConfig,
-} from '@neo-one/node-core';
-import { KnownLabel, type Monitor, metrics } from '@neo-one/monitor';
-
+import { KnownLabel, metrics, Monitor } from '@neo-one/monitor';
+import { Blockchain, getEndpointConfig, Node } from '@neo-one/node-core';
+import { Context, Middleware } from 'koa';
 import compose from 'koa-compose';
 import compress from 'koa-compress';
 import { filter, switchMap, take, timeout, toArray } from 'rxjs/operators';
-import { utils } from '@neo-one/utils';
-
-import bodyParser from './bodyParser';
+import { bodyParser } from './bodyParser';
 import { getMonitor } from './common';
-
 export type HandlerPrimitive = string | number | boolean;
-
 export type HandlerResult =
-  | ?Object
-  | ?Array<Object | HandlerPrimitive>
-  | ?HandlerPrimitive
+  | object
+  | undefined
+  | ReadonlyArray<object | HandlerPrimitive>
+  | undefined
+  | HandlerPrimitive
+  | undefined
   | void;
-export type Handler = (
-  args: Array<any>,
-  monitor: Monitor,
-  ctx: Context,
-) => Promise<HandlerResult>;
-type Handlers = { [method: string]: Handler };
+// tslint:disable-next-line no-any
+export type Handler = ((args: ReadonlyArray<any>, monitor: Monitor, ctx: Context) => Promise<HandlerResult>);
 
-type JSONRPCRequest = {
-  jsonrpc: '2.0',
-  id?: ?number,
-  method: string,
-  params?: Array<any> | Object,
-};
+interface Handlers {
+  readonly [method: string]: Handler;
+}
+
+interface JSONRPCRequest {
+  readonly jsonrpc: '2.0';
+  readonly id?: number | undefined;
+  readonly method: string;
+  readonly params?: ReadonlyArray<object> | object;
+}
 
 export class JSONRPCError {
-  code: number;
-  message: string;
+  public readonly code: number;
+  public readonly message: string;
 
-  constructor(code: number, message: string) {
+  public constructor(code: number, message: string) {
     this.code = code;
     this.message = message;
   }
 }
 
-const RPC_METHODS = {
+const RPC_METHODS: { readonly [key: string]: string } = {
   getaccountstate: 'getaccountstate',
   getassetstate: 'getassetstate',
   getbestblockhash: 'getbestblockhash',
@@ -96,15 +92,17 @@ const RPC_METHODS = {
   INVALID: 'INVALID',
 };
 
-const rpcLabelNames = [KnownLabel.RPC_METHOD];
-const rpcLabels = utils.values(RPC_METHODS).map((method) => ({
+const rpcLabelNames: ReadonlyArray<string> = [KnownLabel.RPC_METHOD];
+const rpcLabels = Object.values(RPC_METHODS).map((method) => ({
   [KnownLabel.RPC_METHOD]: method,
 }));
+
 const SINGLE_REQUESTS_HISTOGRAM = metrics.createHistogram({
   name: 'http_jsonrpc_server_single_request_duration_seconds',
   labelNames: rpcLabelNames,
   labels: rpcLabels,
 });
+
 const SINGLE_REQUEST_ERRORS_COUNTER = metrics.createCounter({
   name: 'http_jsonrpc_server_single_request_failures_total',
   labelNames: rpcLabelNames,
@@ -112,19 +110,16 @@ const SINGLE_REQUEST_ERRORS_COUNTER = metrics.createCounter({
 });
 
 const jsonrpc = (handlers: Handlers): Middleware => {
-  const validateRequest = (ctx: Context, request: Object): JSONRPCRequest => {
+  // tslint:disable-next-line no-any
+  const validateRequest = (_ctx: Context, request: any): JSONRPCRequest => {
     if (
-      request != null &&
+      request !== undefined &&
       typeof request === 'object' &&
       request.jsonrpc === '2.0' &&
-      request.method != null &&
+      request.method !== undefined &&
       typeof request.method === 'string' &&
-      (request.params == null ||
-        Array.isArray(request.params) ||
-        typeof request.params === 'object') &&
-      (request.id == null ||
-        typeof request.id === 'string' ||
-        typeof request.id === 'number')
+      (request.params === undefined || Array.isArray(request.params) || typeof request.params === 'object') &&
+      (request.id === undefined || typeof request.id === 'string' || typeof request.id === 'number')
     ) {
       return request;
     }
@@ -132,11 +127,8 @@ const jsonrpc = (handlers: Handlers): Middleware => {
     throw new JSONRPCError(-32600, 'Invalid Request');
   };
 
-  const handleSingleRequest = async (
-    monitor: Monitor,
-    ctx: Context,
-    requestIn: any,
-  ) =>
+  // tslint:disable-next-line no-any
+  const handleSingleRequest = async (monitor: Monitor, ctx: Context, requestIn: any) =>
     monitor.captureSpanLog(
       async (span) => {
         let request;
@@ -144,35 +136,39 @@ const jsonrpc = (handlers: Handlers): Middleware => {
           request = validateRequest(ctx, requestIn);
         } finally {
           let method = RPC_METHODS.UNKNOWN;
-          if (request != null) {
+          if (request !== undefined) {
             ({ method } = request);
           } else if (typeof requestIn === 'object') {
             ({ method } = requestIn);
           }
 
-          if (RPC_METHODS[method] == null) {
+          if ((RPC_METHODS[method] as string | undefined) === undefined) {
             method = RPC_METHODS.INVALID;
           }
 
           span.setLabels({ [span.labels.RPC_METHOD]: method });
         }
-        const handler = handlers[request.method];
-        if (handler == null) {
+        const handler = handlers[request.method] as Handler | undefined;
+        if (handler === undefined) {
           throw new JSONRPCError(-32601, 'Method not found');
         }
 
-        let { params } = request;
-        if (params == null) {
-          params = [];
-        } else if (!Array.isArray(params)) {
-          params = [params];
+        const { params } = request;
+        let handlerParams: ReadonlyArray<object>;
+        if (params === undefined) {
+          handlerParams = [];
+        } else if (Array.isArray(params)) {
+          handlerParams = params;
+        } else {
+          handlerParams = [params];
         }
 
-        const result = await handler(params, monitor, ctx);
+        const result = await handler(handlerParams, monitor, ctx);
+
         return {
           jsonrpc: '2.0',
           result,
-          id: request.id == null ? null : request.id,
+          id: request.id === undefined ? undefined : request.id,
         };
       },
       {
@@ -181,44 +177,38 @@ const jsonrpc = (handlers: Handlers): Middleware => {
           total: SINGLE_REQUESTS_HISTOGRAM,
           error: SINGLE_REQUEST_ERRORS_COUNTER,
         },
+
         level: { log: 'verbose', span: 'info' },
       },
     );
 
-  const handleRequest = (monitor: Monitor, ctx: Context, request: mixed) => {
+  const handleRequest = (monitor: Monitor, ctx: Context, request: {}) => {
     if (Array.isArray(request)) {
-      return Promise.all(
-        request.map((batchRequest) =>
-          handleSingleRequest(monitor, ctx, batchRequest),
-        ),
-      );
+      return Promise.all(request.map(async (batchRequest) => handleSingleRequest(monitor, ctx, batchRequest)));
     }
 
     return handleSingleRequest(monitor, ctx, request);
   };
 
-  const handleRequestSafe = async (
-    monitor: Monitor,
-    ctx: Context,
-    request: mixed,
-  ): Promise<Object | Array<any>> => {
+  const handleRequestSafe = async (monitor: Monitor, ctx: Context, request: {}): Promise<object | object[]> => {
     try {
-      const result = await monitor.captureSpanLog(
-        (span) => handleRequest(span, ctx, request),
-        {
-          name: 'http_jsonrpc_server_request',
-          level: { log: 'verbose', span: 'info' },
-        },
-      );
+      // tslint:disable-next-line prefer-immediate-return
+      const result = await monitor.captureSpanLog(async (span) => handleRequest(span, ctx, request), {
+        name: 'http_jsonrpc_server_request',
+        level: { log: 'verbose', span: 'info' },
+      });
+
+      // tslint:disable-next-line no-var-before-return
       return result;
     } catch (error) {
       let errorResponse = {
         code: -32603,
         message: 'Internal error',
       };
+
       if (
-        error.code != null &&
-        error.message != null &&
+        error.code !== undefined &&
+        error.message !== undefined &&
         typeof error.code === 'number' &&
         typeof error.message === 'string'
       ) {
@@ -228,7 +218,7 @@ const jsonrpc = (handlers: Handlers): Middleware => {
       return {
         jsonrpc: '2.0',
         error: errorResponse,
-        id: null,
+        id: undefined,
       };
     }
   };
@@ -241,16 +231,12 @@ const jsonrpc = (handlers: Handlers): Middleware => {
         return ctx.throw(415);
       }
 
-      const { fields } = ctx.request;
+      // tslint:disable-next-line no-any
+      const { fields } = ctx.request as any;
       const monitor = getMonitor(ctx);
-      const result = await handleRequestSafe(
-        monitor.withLabels({ [monitor.labels.RPC_TYPE]: 'jsonrpc' }),
-        ctx,
-        fields,
-      );
-      ctx.body = result;
+      const result = await handleRequestSafe(monitor.withLabels({ [monitor.labels.RPC_TYPE]: 'jsonrpc' }), ctx, fields);
 
-      return undefined;
+      ctx.body = result;
     },
   ]);
 };
@@ -261,27 +247,22 @@ const getTransactionReceipt = (value: TransactionData) => ({
   transactionIndex: value.index,
 });
 
-export default ({
-  blockchain,
-  node,
-}: {|
-  blockchain: Blockchain,
-  node: Node,
-|}) => {
+export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; readonly node: Node }) => {
   const checkHeight = (height: number) => {
     if (height < 0 && height > blockchain.currentBlockIndex) {
       throw new JSONRPCError(-100, 'Invalid Height');
     }
   };
 
-  const handlers = {
+  const handlers: Handlers = {
     [RPC_METHODS.getaccountstate]: async (args) => {
       const hash = crypto.addressToScriptHash({
         addressVersion: blockchain.settings.addressVersion,
         address: args[0],
       });
+
       let account = await blockchain.account.tryGet({ hash });
-      if (account == null) {
+      if (account === undefined) {
         account = new Account({ hash });
       }
 
@@ -292,14 +273,13 @@ export default ({
         hash: JSONHelper.readUInt256(args[0]),
       });
 
-      if (asset == null) {
+      if (asset === undefined) {
         throw new JSONRPCError(-100, 'Unknown asset');
       }
 
       return asset.serializeJSON(blockchain.serializeJSONContext);
     },
-    [RPC_METHODS.getbestblockhash]: async () =>
-      JSONHelper.writeUInt256(blockchain.currentBlock.hash),
+    [RPC_METHODS.getbestblockhash]: async () => JSONHelper.writeUInt256(blockchain.currentBlock.hash),
     [RPC_METHODS.getblock]: async (args) => {
       let hashOrIndex = args[0];
       if (typeof args[0] === 'string') {
@@ -307,37 +287,35 @@ export default ({
       }
 
       let watchTimeoutMS;
-      if (args[1] != null && typeof args[1] === 'number' && args[1] !== 1) {
+      if (args[1] !== undefined && typeof args[1] === 'number' && args[1] !== 1) {
         // eslint-disable-next-line
         watchTimeoutMS = args[1];
-      } else if (args[2] != null && typeof args[2] === 'number') {
+      } else if (args[2] !== undefined && typeof args[2] === 'number') {
         // eslint-disable-next-line
         watchTimeoutMS = args[2];
       }
 
       let block = await blockchain.block.tryGet({ hashOrIndex });
-      if (block == null) {
-        if (watchTimeoutMS == null) {
+      if (block === undefined) {
+        if (watchTimeoutMS === undefined) {
           throw new JSONRPCError(-100, 'Unknown block');
         }
         try {
           block = await blockchain.block$
             .pipe(
-              filter(
-                (value) => value.hashHex === args[0] || value.index === args[0],
-              ),
+              filter((value) => value.hashHex === args[0] || value.index === args[0]),
+
               take(1),
               timeout(new Date(Date.now() + watchTimeoutMS)),
             )
             .toPromise();
-        } catch (error) {
+        } catch {
           throw new JSONRPCError(-100, 'Unknown block');
         }
       }
 
       if (args[1] === true || args[1] === 1) {
-        const json = await block.serializeJSON(blockchain.serializeJSONContext);
-        return json;
+        return block.serializeJSON(blockchain.serializeJSONContext);
       }
 
       return block.serializeWire().toString('hex');
@@ -347,6 +325,7 @@ export default ({
       const height = args[0];
       checkHeight(height);
       const block = await blockchain.block.get({ hashOrIndex: height });
+
       return JSONHelper.writeUInt256(block.hash);
     },
     [RPC_METHODS.getblocksysfee]: async (args) => {
@@ -356,38 +335,34 @@ export default ({
       const blockData = await blockchain.blockData.get({
         hash: header.hash,
       });
+
       return blockData.systemFee.toString(10);
     },
     [RPC_METHODS.getconnectioncount]: async () => node.connectedPeers.length,
     [RPC_METHODS.getcontractstate]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
       const contract = await blockchain.contract.tryGet({ hash });
-      if (contract == null) {
+      if (contract === undefined) {
         throw new JSONRPCError(-100, 'Unknown contract');
       }
 
       return contract.serializeJSON(blockchain.serializeJSONContext);
     },
     [RPC_METHODS.getrawmempool]: async () =>
-      utils
-        .values(node.memPool)
-        .map((transaction) => JSONHelper.writeUInt256(transaction.hash)),
+      Object.values(node.memPool).map((transaction) => JSONHelper.writeUInt256(transaction.hash)),
     [RPC_METHODS.getrawtransaction]: async (args) => {
       const hash = JSONHelper.readUInt256(args[0]);
 
-      let transaction = node.memPool[common.uInt256ToHex(hash)];
-      if (transaction == null) {
+      let transaction = node.memPool[common.uInt256ToHex(hash)] as Transaction | undefined;
+      if (transaction === undefined) {
         transaction = await blockchain.transaction.tryGet({ hash });
       }
-      if (transaction == null) {
+      if (transaction === undefined) {
         throw new JSONRPCError(-100, 'Unknown transaction');
       }
 
       if (args[1] === true || args[1] === 1) {
-        const json = await transaction.serializeJSON(
-          blockchain.serializeJSONContext,
-        );
-        return json;
+        return transaction.serializeJSON(blockchain.serializeJSONContext);
       }
 
       return transaction.serializeWire().toString('hex');
@@ -396,7 +371,8 @@ export default ({
       const hash = JSONHelper.readUInt160(args[0]);
       const key = Buffer.from(args[1], 'hex');
       const item = await blockchain.storageItem.tryGet({ hash, key });
-      return item == null ? null : item.value.toString('hex');
+
+      return item === undefined ? undefined : item.value.toString('hex');
     },
     [RPC_METHODS.gettxout]: async (args) => {
       const hash = JSONHelper.readUInt256(args[0]);
@@ -405,12 +381,12 @@ export default ({
         blockchain.output.tryGet({ hash, index }),
         blockchain.transactionData.tryGet({ hash }),
       ]);
-      if (spentCoins != null && spentCoins.endHeights[index] != null) {
-        return null;
+
+      if (spentCoins !== undefined && (spentCoins.endHeights[index] as number | undefined) !== undefined) {
+        return undefined;
       }
-      return output == null
-        ? null
-        : output.serializeJSON(blockchain.serializeJSONContext, index);
+
+      return output === undefined ? undefined : output.serializeJSON(blockchain.serializeJSONContext, index);
     },
     [RPC_METHODS.invoke]: async () => {
       throw new JSONRPCError(-101, 'Not implemented');
@@ -421,6 +397,7 @@ export default ({
     [RPC_METHODS.invokescript]: async (args) => {
       const script = JSONHelper.readBuffer(args[0]);
       const result = await blockchain.invokeScript(script);
+
       return result.serializeJSON(blockchain.serializeJSONContext);
     },
     [RPC_METHODS.sendrawtransaction]: async (args) => {
@@ -428,10 +405,12 @@ export default ({
         context: blockchain.deserializeWireContext,
         buffer: JSONHelper.readBuffer(args[0]),
       });
+
       try {
         await node.relayTransaction(transaction, true);
+
         return true;
-      } catch (error) {
+      } catch {
         return false;
       }
     },
@@ -445,42 +424,43 @@ export default ({
           addressVersion: blockchain.settings.addressVersion,
           address: args[0],
         });
-      } catch (error) {
+      } catch {
         // Ignore errors
       }
 
-      return { address: args[0], isvalid: scriptHash != null };
+      return { address: args[0], isvalid: scriptHash !== undefined };
     },
     [RPC_METHODS.getpeers]: async () => ({
       connected: node.connectedPeers.map((endpoint) => {
         const { host, port } = getEndpointConfig(endpoint);
+
         return { address: host, port };
       }),
     }),
+
     // Extended
     [RPC_METHODS.relaytransaction]: async (args) => {
       const transaction = deserializeTransactionWire({
         context: blockchain.deserializeWireContext,
         buffer: JSONHelper.readBuffer(args[0]),
       });
+
       try {
-        const [transactionJSON] = await Promise.all([
+        const [transactionJSON] = await Promise.all<TransactionJSON, void>([
           transaction.serializeJSON(blockchain.serializeJSONContext),
           node.relayTransaction(transaction, true),
         ]);
+
         return transactionJSON;
       } catch (error) {
-        throw new JSONRPCError(
-          -110,
-          `Relay transaction failed: ${error.message}`,
-        );
+        throw new JSONRPCError(-110, `Relay transaction failed: ${error.message}`);
       }
     },
     [RPC_METHODS.getoutput]: async (args) => {
       const hash = JSONHelper.readUInt256(args[0]);
       const index = args[1];
       const output = await blockchain.output.tryGet({ hash, index });
-      if (output == null) {
+      if (output === undefined) {
         throw new JSONRPCError(-100, 'Unknown output');
       }
 
@@ -496,6 +476,7 @@ export default ({
             index,
           }),
         ]);
+
         return common.fixed8ToDecimal(value).toString();
       } catch (error) {
         throw new JSONRPCError(-102, error.message);
@@ -504,20 +485,21 @@ export default ({
     [RPC_METHODS.getallstorage]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
       const items = await blockchain.storageItem
-        .getAll({ hash })
+        .getAll$({ hash })
         .pipe(toArray())
         .toPromise();
-      return items.map((item) =>
-        item.serializeJSON(blockchain.serializeJSONContext),
-      );
+
+      return items.map((item) => item.serializeJSON(blockchain.serializeJSONContext));
     },
     [RPC_METHODS.testinvocation]: async (args) => {
       const transaction = deserializeTransactionWire({
         context: blockchain.deserializeWireContext,
         buffer: JSONHelper.readBuffer(args[0]),
       });
+
       if (transaction instanceof InvocationTransaction) {
         const result = await blockchain.invokeTransaction(transaction);
+
         return result.serializeJSON(blockchain.serializeJSONContext);
       }
 
@@ -529,14 +511,14 @@ export default ({
       });
 
       let watchTimeoutMS;
-      if (args[1] != null && typeof args[1] === 'number') {
+      if (args[1] !== undefined && typeof args[1] === 'number') {
         // eslint-disable-next-line
         watchTimeoutMS = args[1];
       }
 
       let result;
-      if (transactionData == null) {
-        if (watchTimeoutMS == null) {
+      if (transactionData === undefined) {
+        if (watchTimeoutMS === undefined) {
           throw new JSONRPCError(-100, 'Unknown transaction');
         }
 
@@ -547,14 +529,15 @@ export default ({
                 const data = await blockchain.transactionData.tryGet({
                   hash: JSONHelper.readUInt256(args[0]),
                 });
-                return data == null ? null : getTransactionReceipt(data);
+
+                return data === undefined ? undefined : getTransactionReceipt(data);
               }),
-              filter((receipt) => receipt != null),
+              filter((receipt) => receipt !== undefined),
               take(1),
               timeout(new Date(Date.now() + watchTimeoutMS)),
             )
             .toPromise();
-        } catch (error) {
+        } catch {
           throw new JSONRPCError(-100, 'Unknown transaction');
         }
       } else {
@@ -568,27 +551,23 @@ export default ({
         hash: JSONHelper.readUInt256(args[0]),
       });
 
-      const result = await transaction.serializeJSON(
-        blockchain.serializeJSONContext,
-      );
-      if (result.invocationData == null) {
+      const result = await transaction.serializeJSON(blockchain.serializeJSONContext);
+
+      if (result.type !== 'InvocationTransaction' || result.invocationData === undefined) {
         throw new JSONRPCError(-103, 'Invalid InvocationTransaction');
       }
 
       return result.invocationData;
     },
     [RPC_METHODS.getvalidators]: async () => {
-      const validators = await blockchain.validator.all
-        .pipe(toArray())
-        .toPromise();
-      return validators.map((validator) =>
-        validator.serializeJSON(blockchain.serializeJSONContext),
-      );
+      const validators = await blockchain.validator.all$.pipe(toArray()).toPromise();
+
+      return validators.map((validator) => validator.serializeJSON(blockchain.serializeJSONContext));
     },
     [RPC_METHODS.getnetworksettings]: async () => {
-      const issueGASFee = common.fixed8ToDecimal(
-        blockchain.settings.fees[TRANSACTION_TYPE.ISSUE],
-      );
+      const fee = blockchain.settings.fees[TransactionType.Issue];
+      const issueGASFee = common.fixed8ToDecimal(fee === undefined ? utils.ZERO : fee);
+
       return {
         issueGASFee: issueGASFee.toString(),
       };
@@ -599,6 +578,7 @@ export default ({
       } else {
         throw new Error('This node does not support triggering consensus.');
       }
+
       return true;
     },
     [RPC_METHODS.updatesettings]: async (args) => {
@@ -609,6 +589,7 @@ export default ({
       };
 
       blockchain.updateSettings(newSettings);
+
       return true;
     },
     [RPC_METHODS.fastforwardoffset]: async (args) => {
@@ -621,7 +602,7 @@ export default ({
       return true;
     },
     [RPC_METHODS.fastforwardtotime]: async (args) => {
-      if (node.consensus != null) {
+      if (node.consensus !== undefined) {
         await node.consensus.fastForwardToTime(args[0]);
       } else {
         throw new Error('This node does not support fast forwarding.');
@@ -630,11 +611,11 @@ export default ({
       return true;
     },
     [RPC_METHODS.reset]: async () => {
-      if (node.consensus != null) {
+      if (node.consensus !== undefined) {
         await node.consensus.pause();
       }
       await blockchain.reset();
-      if (node.consensus != null) {
+      if (node.consensus !== undefined) {
         await node.consensus.resume();
       }
 

@@ -1,26 +1,22 @@
-/* @flow */
-import type { Context } from 'koa';
-import { KnownLabel, type Monitor, metrics } from '@neo-one/monitor';
-
+import { KnownLabel, metrics, Monitor } from '@neo-one/monitor';
+import { Context } from 'koa';
 import { getMonitor } from './common';
 
-const labelNames = [
-  KnownLabel.HTTP_PATH,
-  KnownLabel.HTTP_STATUS_CODE,
-  KnownLabel.HTTP_METHOD,
-];
+const labelNames: ReadonlyArray<string> = [KnownLabel.HTTP_PATH, KnownLabel.HTTP_STATUS_CODE, KnownLabel.HTTP_METHOD];
+
 const REQUESTS_HISTOGRAM = metrics.createHistogram({
   name: 'http_server_request_duration_seconds',
   labelNames,
 });
+
 const REQUEST_ERRORS_COUNTER = metrics.createCounter({
   name: 'http_server_request_failures_total',
   labelNames,
 });
 
-export default ({ monitor }: {| monitor: Monitor |}) => async (
+export const context = ({ monitor }: { readonly monitor: Monitor }) => async (
   ctx: Context,
-  next: () => Promise<void>,
+  next: (() => Promise<void>),
 ) => {
   await monitor.forContext(ctx).captureSpanLog(
     async (span) => {
@@ -32,8 +28,10 @@ export default ({ monitor }: {| monitor: Monitor |}) => async (
           [monitor.labels.HTTP_STATUS_CODE]: ctx.status,
           [monitor.labels.HTTP_PATH]: 'unknown',
         });
-        const { router, routerName } = ctx;
-        if (router != null && routerName != null) {
+
+        // tslint:disable-next-line no-any
+        const { router, routerName } = ctx as any;
+        if (router != undefined && routerName != undefined) {
           const layer = router.route(routerName);
           if (layer) {
             span.setLabels({
@@ -50,23 +48,20 @@ export default ({ monitor }: {| monitor: Monitor |}) => async (
         total: REQUESTS_HISTOGRAM,
         error: REQUEST_ERRORS_COUNTER,
       },
-      references: [
-        monitor.childOf(monitor.extract(monitor.formats.HTTP, ctx.headers)),
-      ],
+
+      references: [monitor.childOf(monitor.extract(monitor.formats.HTTP, ctx.headers))],
+
       trace: true,
     },
   );
 };
 
-export const onError = ({ monitor: monitorIn }: {| monitor: Monitor |}) => (
-  error: Error,
-  ctx?: Context,
-) => {
+export const onError = ({ monitor: monitorIn }: { readonly monitor: Monitor }) => (error: Error, ctx?: Context) => {
   let monitor = monitorIn;
-  if (ctx != null) {
+  if (ctx !== undefined) {
     try {
       monitor = getMonitor(ctx);
-    } catch (err) {
+    } catch {
       // Ignore errors
     }
   }
