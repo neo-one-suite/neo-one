@@ -32,6 +32,7 @@ import _ from 'lodash';
 import LRU from 'lru-cache';
 import { defer, EMPTY, merge, Observable, timer } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
+import pkg from '../package.json';
 import { Command } from './Command';
 import { Consensus, ConsensusOptions } from './consensus';
 import { AlreadyConnectedError, NegotiationError } from './errors';
@@ -218,9 +219,7 @@ export class Node implements INode {
     const { network: { listenTCP: { port = 0 } = {} } = {} } = environment;
     this.externalPort = port;
     this.nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
-    // tslint:disable-next-line no-suspicious-comment
-    // TODO: Figure out how to make typescript compile the package.json appropriately
-    this.userAgent = `NEO:neo-one-js:1.0.0`;
+    this.userAgent = `NEO:neo-one-js:${pkg.version}`;
 
     this.mutableMemPool = {};
     this.knownBlockHashes = createScalingBloomFilter();
