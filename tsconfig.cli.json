@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "baseUrl": "./packages",
+    "target": "esnext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "declaration": false,
+    "experimentalDecorators": true,
+    "lib": [
+      "dom",
+      "esnext"
+    ],
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@neo-one/ec-key": [
+        "../@types/@neo-one/ec-key"
+      ],
+      "@neo-one/*": [
+        "./neo-one-*/src"
+      ],
+      "*": [
+        "../@types/*"
+      ]
+    },
+    "pretty": true,
+    "strict": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "typeRoots": [
+      "./node_modules/@types/",
+      "./packages/neo-one-smart-contract",
+      "./@types/roots"
+    ]
+  }
+}

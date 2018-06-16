@@ -1,6 +1,6 @@
 declare module 'app-root-dir' {
   const appRootDir: {
-    get: () => string,
+    get: () => string;
   };
-  export default appRootDir;
+  export = appRootDir;
 }

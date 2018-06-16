@@ -1,9 +1,8 @@
-/* @flow */
-/* eslint-disable import/no-extraneous-dependencies */
-import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
+// tslint:disable no-implicit-dependencies no-any no-loop-statement prefer-immediate-return no-var-before-return no-console
 import { NEOONEDataProvider, scriptHashToAddress } from '@neo-one/client';
-import { toArray } from 'ix/asynciterable/toarray';
 import { utils } from '@neo-one/client-core';
+import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
+import { toArray } from 'ix/asynciterable/toarray';
 
 // const oneRPCURL = 'https://neotracker.io/rpc';
 // const waitMS = 65000
@@ -11,7 +10,7 @@ const oneRPCURL = 'http://localhost:40200/rpc';
 const waitMS = 1000;
 const testRPCURL = 'http://seed3.cityofzion.io:8080';
 
-const hashes = [
+const hashes: ReadonlyArray<string> = [
   '0x8a4d2865d01ec8e6add72e3dfdd20c12f44834e3',
   '0xce3a97d7cfaa770a5e51c5b12cd1d015fbb5f87d',
   '0xd3cce84d0800172d09c88ccad61130611bd047a4',
@@ -55,6 +54,7 @@ const oneProvider = new NEOONEDataProvider({
   network: 'main',
   rpcURL: oneRPCURL,
 });
+
 const testProvider = new NEOONEDataProvider({
   network: 'main',
   rpcURL: testRPCURL,
@@ -63,18 +63,19 @@ const testProvider = new NEOONEDataProvider({
 const convertNumber = (value: string) => {
   try {
     return utils.fromSignedBuffer(Buffer.from(value, 'hex')).toString(10);
-  } catch (error) {
+  } catch {
     return value;
   }
 };
 
 const isEqual = (item: any, testItem: any) => {
-  if (testItem == null) {
+  if (testItem == undefined) {
     return false;
   }
 
   const { value } = item;
   const { value: testValue } = testItem;
+
   return value === testValue;
 };
 
@@ -88,16 +89,15 @@ const reverse = (value: string) => {
       current = '';
     }
   }
+
   return result;
 };
 
 const logItem = (item: any) => {
   try {
-    // eslint-disable-next-line
     console.log(item.value);
-    // eslint-disable-next-line
     console.log(convertNumber(item.value));
-  } catch (error) {
+  } catch {
     // Ignore errors
   }
 };
@@ -107,14 +107,13 @@ const getStorage = async (provider: any, item: any): Promise<any> => {
   let error;
   while (tries >= 0) {
     try {
-      // eslint-disable-next-line
       const result = await provider.getStorage(item.hash, item.key);
+
       return result;
     } catch (err) {
       error = err;
       tries -= 1;
-      // eslint-disable-next-line
-      await new Promise((resolve) => setTimeout(() => resolve(), waitMS));
+      await new Promise<void>((resolve) => setTimeout(resolve, waitMS));
     }
   }
 
@@ -122,17 +121,17 @@ const getStorage = async (provider: any, item: any): Promise<any> => {
 };
 
 const verifyStorage = async (hash: string): Promise<void> => {
-  const storageItems = await toArray(
-    AsyncIterableX.from(oneProvider.iterStorage(hash)),
-  );
+  const storageItems = await toArray(AsyncIterableX.from(oneProvider.iterStorage(hash)));
+
   await Promise.all(
     storageItems.map(async (itemIn) => {
       let [currentItem, testItem] = await Promise.all([
         getStorage(oneProvider, itemIn),
         getStorage(testProvider, itemIn),
       ]);
+
       if (!isEqual(currentItem, testItem)) {
-        await new Promise((resolve) => setTimeout(() => resolve(), 5000));
+        await new Promise<void>((resolve) => setTimeout(resolve, 5000));
         [currentItem, testItem] = await Promise.all([
           getStorage(oneProvider, itemIn),
           getStorage(testProvider, itemIn),
@@ -140,26 +139,20 @@ const verifyStorage = async (hash: string): Promise<void> => {
       }
 
       if (!isEqual(currentItem, testItem)) {
-        // eslint-disable-next-line
         console.log('NOT EQUAL:');
-        // eslint-disable-next-line
         console.log(currentItem.hash);
-        // eslint-disable-next-line
         console.log(currentItem.key);
         try {
-          // eslint-disable-next-line
           console.log(scriptHashToAddress(`0x${reverse(currentItem.key)}`));
-        } catch (error) {
+        } catch {
           try {
-            // eslint-disable-next-line
             console.log(Buffer.from(currentItem.key, 'hex').toString('utf8'));
-          } catch (err) {
+          } catch {
             // Ignore errors
           }
         }
         logItem(currentItem);
         logItem(testItem);
-        // eslint-disable-next-line
         console.log('\n');
       }
     }),
@@ -167,37 +160,27 @@ const verifyStorage = async (hash: string): Promise<void> => {
 };
 
 const test = async () => {
-  const [oneCount, testCount] = await Promise.all([
-    oneProvider.getBlockCount(),
-    testProvider.getBlockCount(),
-  ]);
+  const [oneCount, testCount] = await Promise.all([oneProvider.getBlockCount(), testProvider.getBlockCount()]);
+
   if (oneCount === testCount) {
-    // eslint-disable-next-line
     console.log(`Current block: ${oneCount - 1}`);
     for (const hash of hashes) {
-      // eslint-disable-next-line
       console.log(`Testing ${hash}`);
-      // eslint-disable-next-line
       await verifyStorage(hash);
-      // eslint-disable-next-line
       console.log(`Done testing ${hash}`);
     }
   } else {
-    // eslint-disable-next-line
-    console.log(
-      `Height mismatched, one: ${oneCount - 1} test: ${testCount - 1}`,
-    );
-    // eslint-disable-next-line
+    console.log(`Height mismatched, one: ${oneCount - 1} test: ${testCount - 1}`);
+
     console.log('Bailing...');
   }
 };
 
 test()
-  .catch((error) => {
-    // eslint-disable-next-line
-    console.error(error);
-    process.exit(1);
-  })
   .then(() => {
     process.exit(0);
+  })
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
   });

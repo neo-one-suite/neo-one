@@ -2,9 +2,8 @@
 const NodeEnvironment = require('jest-environment-node');
 
 const _ = require('lodash');
-const { exec } = require('child_process');
+const execa = require('execa');
 const fs = require('fs-extra');
-const spawn = require('cross-spawn');
 const tmp = require('tmp');
 
 class One {
@@ -13,10 +12,8 @@ class One {
     this.dirName = this.dir.name;
     this.serverPort = _.random(10000, 50000);
     this.minPort = this.serverPort + 1;
-    const command = this._createCommand(
-      'start server --debug --static-neo-one',
-    );
-    this.server = spawn(command.split(' ')[0], command.split(' ').slice(1));
+    const command = this._createCommand('start server --debug --static-neo-one');
+    this.server = execa(command.split(' ')[0], command.split(' ').slice(1));
 
     let stdout = '';
     const listener = (res) => {
@@ -91,32 +88,20 @@ class One {
   }
 
   _createCommand(command) {
-    return `node ./packages/neo-one-cli/dist/bin/neo-one ${command} --dir ${
-      this.dirName
-    } --server-port ${this.serverPort} --min-port ${this.minPort}`;
+    return `node ./packages/neo-one-cli/dist/bin/neo-one ${command} --dir ${this.dirName} --server-port ${
+      this.serverPort
+    } --min-port ${this.minPort}`;
   }
 
   _exec(command) {
-    return new Promise((resolve, reject) =>
-      exec(
-        this._createCommand(command),
-        {
-          maxBuffer: 20000 * 1024,
-          windowsHide: true,
-        },
-        (error, stdout, stderr) => {
-          if (error) {
-            reject(
-              new Error(
-                `STDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n\nERROR:\n${error.toString()}`,
-              ),
-            );
-          } else {
-            resolve(stdout);
-          }
-        },
-      ),
-    );
+    return execa(command.split(' ')[0], command.split(' ').slice(1), {
+      maxBuffer: 20000 * 1024,
+      windowsHide: true,
+    })
+      .then(({ stdout }) => stdout)
+      .catch((error) => {
+        throw new Error(`STDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n\nERROR:\n${error.toString()}`);
+      });
   }
 }
 

@@ -1,6 +1,5 @@
-module.exports = ({ modules, useBuiltIns, targets, typescript }) => ({
+module.exports = ({ modules, useBuiltIns, targets }) => ({
   presets: [
-    typescript ? '@babel/preset-typescript' : null,
     [
       '@babel/preset-env',
       {
@@ -9,20 +8,14 @@ module.exports = ({ modules, useBuiltIns, targets, typescript }) => ({
         targets: targets == null ? { node: '8.9.0' } : targets,
       },
     ],
-  ].filter(Boolean),
+  ],
   plugins: [
     '@babel/plugin-proposal-async-generator-functions',
-    typescript
-      ? null
-      : [
-          '@babel/plugin-transform-flow-strip-types',
-          { requireDirective: true },
-        ],
     '@babel/plugin-proposal-class-properties',
     '@babel/plugin-proposal-object-rest-spread',
     '@babel/plugin-proposal-export-namespace-from',
     '@babel/plugin-proposal-optional-catch-binding',
-  ].filter(Boolean),
+  ],
 });
 
 module.exports.default = module.exports;

@@ -1,6 +1,0 @@
-decls/ix.js
-packages/*/dist/**
-packages/neo-one-client-core/src/utils/AsyncIteratorBase.js.flow
-**/__generated__/**
-migrate/**
-**/*.ts
