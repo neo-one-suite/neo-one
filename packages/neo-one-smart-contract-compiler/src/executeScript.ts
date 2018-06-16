@@ -4,7 +4,7 @@ import { Blockchain } from '@neo-one/node-blockchain';
 import Project, { DiagnosticCategory, SourceFile } from 'ts-simple-ast';
 
 import { test as testNet } from '@neo-one/node-neo-settings';
-import levelUpStorage from '@neo-one/node-storage-levelup';
+import { storage } from '@neo-one/node-storage-levelup';
 import { vm } from '@neo-one/node-vm';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
@@ -19,7 +19,7 @@ export const executeScript = async (
 ): Promise<InvocationResult> => {
   const blockchain = await Blockchain.create({
     settings: testNet,
-    storage: levelUpStorage({
+    storage: storage({
       context: { messageMagic: testNet.messageMagic },
       db: LevelUp(MemDown()),
     }),

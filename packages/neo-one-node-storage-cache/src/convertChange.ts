@@ -1,13 +1,13 @@
-/* @flow */
-import {
-  type AddChange,
-  type Change,
-  type DeleteChange,
-} from '@neo-one/node-core';
-
+import { AddChange, Change, DeleteChange } from '@neo-one/node-core';
 import { keys } from '@neo-one/node-storage-common';
+import { utils } from '@neo-one/utils';
 
-const convertAddChange = (changeIn: AddChange) => {
+export type CacheChange =
+  // tslint:disable-next-line no-any
+  | { readonly type: 'add'; readonly model: string; readonly key: string; readonly value: any }
+  | { readonly type: 'delete'; readonly model: string; readonly key: string };
+
+const convertAddChange = (changeIn: AddChange): ReadonlyArray<CacheChange> => {
   const change = changeIn;
   switch (change.type) {
     case 'account':
@@ -19,6 +19,7 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
+
     case 'accountUnclaimed':
       return [
         {
@@ -28,9 +29,11 @@ const convertAddChange = (changeIn: AddChange) => {
             hash: change.value.hash,
             input: change.value.input,
           }),
+
           value: change.value,
         },
       ];
+
     case 'accountUnspent':
       return [
         {
@@ -40,9 +43,11 @@ const convertAddChange = (changeIn: AddChange) => {
             hash: change.value.hash,
             input: change.value.input,
           }),
+
           value: change.value,
         },
       ];
+
     case 'action':
       return [
         {
@@ -51,9 +56,11 @@ const convertAddChange = (changeIn: AddChange) => {
           key: keys.typeKeyToSerializeKeyString.action({
             index: change.value.index,
           }),
+
           value: change.value,
         },
       ];
+
     case 'asset':
       return [
         {
@@ -63,6 +70,7 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
+
     case 'block':
       return [
         {
@@ -71,6 +79,7 @@ const convertAddChange = (changeIn: AddChange) => {
           key: keys.typeKeyToSerializeKeyString.block(change.value),
           value: change.value,
         },
+
         {
           type: 'add',
           model: 'block',
@@ -78,6 +87,7 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
+
     case 'blockData':
       return [
         {
@@ -87,6 +97,7 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
+
     case 'header':
       return [
         {
@@ -95,6 +106,7 @@ const convertAddChange = (changeIn: AddChange) => {
           key: keys.typeKeyToSerializeKeyString.header(change.value),
           value: change.value,
         },
+
         {
           type: 'add',
           model: 'header',
@@ -102,6 +114,7 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
+
     case 'transaction':
       return [
         {
@@ -111,6 +124,7 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
+
     case 'output':
       return [
         {
@@ -120,9 +134,11 @@ const convertAddChange = (changeIn: AddChange) => {
             hash: change.value.hash,
             index: change.value.index,
           }),
+
           value: change.value.output,
         },
       ];
+
     case 'transactionData':
       return [
         {
@@ -132,6 +148,7 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
+
     case 'contract':
       return [
         {
@@ -141,6 +158,7 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
+
     case 'storageItem':
       return [
         {
@@ -150,9 +168,11 @@ const convertAddChange = (changeIn: AddChange) => {
             hash: change.value.hash,
             key: change.value.key,
           }),
+
           value: change.value,
         },
       ];
+
     case 'validator':
       return [
         {
@@ -161,9 +181,11 @@ const convertAddChange = (changeIn: AddChange) => {
           key: keys.typeKeyToSerializeKeyString.validator({
             publicKey: change.value.publicKey,
           }),
+
           value: change.value,
         },
       ];
+
     case 'invocationData':
       return [
         {
@@ -173,6 +195,7 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
+
     case 'validatorsCount':
       return [
         {
@@ -182,14 +205,14 @@ const convertAddChange = (changeIn: AddChange) => {
           value: change.value,
         },
       ];
+
     default:
-      // eslint-disable-next-line
-      (change.type: empty);
-      throw new Error('For Flow');
+      utils.assertNever(change);
+      throw new Error('For TS');
   }
 };
 
-const convertDeleteChange = (change: DeleteChange) => {
+const convertDeleteChange = (change: DeleteChange): CacheChange => {
   switch (change.type) {
     case 'account':
       return {
@@ -197,51 +220,57 @@ const convertDeleteChange = (change: DeleteChange) => {
         model: 'account',
         key: keys.typeKeyToSerializeKeyString.account(change.key),
       };
+
     case 'accountUnclaimed':
       return {
         type: 'delete',
         model: 'accountUnclaimed',
         key: keys.typeKeyToSerializeKeyString.accountUnclaimed(change.key),
       };
+
     case 'accountUnspent':
       return {
         type: 'delete',
         model: 'accountUnspent',
         key: keys.typeKeyToSerializeKeyString.accountUnclaimed(change.key),
       };
+
     case 'contract':
       return {
         type: 'delete',
         model: 'contract',
         key: keys.typeKeyToSerializeKeyString.contract(change.key),
       };
+
     case 'storageItem':
       return {
         type: 'delete',
         model: 'storageItem',
         key: keys.typeKeyToSerializeKeyString.storageItem(change.key),
       };
+
     case 'validator':
       return {
         type: 'delete',
         model: 'validator',
         key: keys.typeKeyToSerializeKeyString.validator(change.key),
       };
+
     default:
-      // eslint-disable-next-line
-      (change.type: empty);
-      throw new Error('For Flow');
+      utils.assertNever(change);
+      throw new Error('For TS');
   }
 };
 
-export default (change: Change) => {
+export const convertChange = (change: Change) => {
   if (change.type === 'add') {
     return convertAddChange(change.change);
-  } else if (change.type === 'delete') {
+  }
+
+  if (change.type === 'delete') {
     return [convertDeleteChange(change.change)];
   }
 
-  // eslint-disable-next-line
-  (change.type: empty);
-  throw new Error('For Flow');
+  utils.assertNever(change);
+  throw new Error('For TS');
 };

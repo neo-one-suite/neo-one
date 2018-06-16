@@ -1,9 +1,7 @@
-/* @flow */
-import { Observable } from 'rxjs';
-import { type Readable } from 'stream';
+import { Observable, Observer } from 'rxjs';
 
-export default (getStream: () => Readable): Observable<Buffer> =>
-  Observable.create((observer) => {
+export const streamToObservable = (getStream: (() => NodeJS.ReadableStream)): Observable<Buffer> =>
+  Observable.create((observer: Observer<Buffer>) => {
     const stream = getStream();
     let done = false;
     const cleanup = () => {
@@ -31,5 +29,5 @@ export default (getStream: () => Readable): Observable<Buffer> =>
     stream.once('end', onEnd);
     stream.on('data', onData);
 
-    return () => cleanup();
+    return cleanup;
   });

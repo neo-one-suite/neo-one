@@ -1,18 +1,12 @@
-/* @flow */
-import {
-  type AddChange,
-  type Change,
-  type DeleteChange,
-} from '@neo-one/node-core';
-
+import { AddChange, Change, DeleteChange } from '@neo-one/node-core';
 import { keys } from '@neo-one/node-storage-common';
-
-import { type LevelUpChange } from './types';
+import { utils } from '@neo-one/utils';
+// tslint:disable-next-line no-implicit-dependencies
+import { AbstractBatch } from 'abstract-leveldown';
+import * as common from './common';
 import { UnknownChangeTypeError, UnknownTypeError } from './errors';
 
-import * as common from './common';
-
-const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
+const convertAddChange = (changeIn: AddChange): ReadonlyArray<AbstractBatch> => {
   const change = changeIn;
   switch (change.type) {
     case 'account':
@@ -23,6 +17,7 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           value: change.value.serializeWire(),
         },
       ];
+
     case 'accountUnspent':
       return [
         {
@@ -31,9 +26,11 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
             hash: change.value.hash,
             input: change.value.input,
           }),
+
           value: change.value.serializeWire(),
         },
       ];
+
     case 'accountUnclaimed':
       return [
         {
@@ -42,9 +39,11 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
             hash: change.value.hash,
             input: change.value.input,
           }),
+
           value: change.value.serializeWire(),
         },
       ];
+
     case 'action':
       return [
         {
@@ -52,9 +51,11 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           key: keys.typeKeyToSerializeKey.action({
             index: change.value.index,
           }),
+
           value: change.value.serializeWire(),
         },
       ];
+
     case 'asset':
       return [
         {
@@ -63,6 +64,7 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           value: change.value.serializeWire(),
         },
       ];
+
     case 'block':
       return [
         {
@@ -70,12 +72,14 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           key: keys.typeKeyToSerializeKey.block(change.value),
           value: change.value.serializeWire(),
         },
+
         {
           type: 'put',
           key: keys.maxBlockHashKey,
           value: common.serializeBlockHash(change.value.hash),
         },
       ];
+
     case 'blockData':
       return [
         {
@@ -84,6 +88,7 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           value: change.value.serializeWire(),
         },
       ];
+
     case 'header':
       return [
         {
@@ -91,17 +96,20 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           key: keys.typeKeyToSerializeKey.header(change.value),
           value: change.value.serializeWire(),
         },
+
         {
           type: 'put',
           key: keys.maxHeaderHashKey,
           value: common.serializeHeaderHash(change.value.hash),
         },
+
         {
           type: 'put',
           key: keys.serializeHeaderIndexHashKey(change.value.index),
           value: common.serializeHeaderHash(change.value.hash),
         },
       ];
+
     case 'transaction':
       return [
         {
@@ -110,6 +118,7 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           value: change.value.serializeWire(),
         },
       ];
+
     case 'output':
       return [
         {
@@ -118,9 +127,11 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
             hash: change.value.hash,
             index: change.value.index,
           }),
+
           value: change.value.output.serializeWire(),
         },
       ];
+
     case 'transactionData':
       return [
         {
@@ -129,6 +140,7 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           value: change.value.serializeWire(),
         },
       ];
+
     case 'contract':
       return [
         {
@@ -137,6 +149,7 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           value: change.value.serializeWire(),
         },
       ];
+
     case 'storageItem':
       return [
         {
@@ -145,9 +158,11 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
             hash: change.value.hash,
             key: change.value.key,
           }),
+
           value: change.value.serializeWire(),
         },
       ];
+
     case 'validator':
       return [
         {
@@ -155,9 +170,11 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           key: keys.typeKeyToSerializeKey.validator({
             publicKey: change.value.publicKey,
           }),
+
           value: change.value.serializeWire(),
         },
       ];
+
     case 'invocationData':
       return [
         {
@@ -166,6 +183,7 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           value: change.value.serializeWire(),
         },
       ];
+
     case 'validatorsCount':
       return [
         {
@@ -174,60 +192,66 @@ const convertAddChange = (changeIn: AddChange): Array<LevelUpChange> => {
           value: change.value.serializeWire(),
         },
       ];
+
     default:
-      // eslint-disable-next-line
-      (change.type: empty);
+      utils.assertNever(change);
       throw new UnknownTypeError();
   }
 };
 
-const convertDeleteChange = (change: DeleteChange): LevelUpChange => {
+const convertDeleteChange = (change: DeleteChange): AbstractBatch => {
   switch (change.type) {
     case 'account':
       return {
         type: 'del',
         key: keys.typeKeyToSerializeKey.account(change.key),
       };
+
     case 'accountUnspent':
       return {
         type: 'del',
         key: keys.typeKeyToSerializeKey.accountUnspent(change.key),
       };
+
     case 'accountUnclaimed':
       return {
         type: 'del',
         key: keys.typeKeyToSerializeKey.accountUnclaimed(change.key),
       };
+
     case 'contract':
       return {
         type: 'del',
         key: keys.typeKeyToSerializeKey.contract(change.key),
       };
+
     case 'storageItem':
       return {
         type: 'del',
         key: keys.typeKeyToSerializeKey.storageItem(change.key),
       };
+
     case 'validator':
       return {
         type: 'del',
         key: keys.typeKeyToSerializeKey.validator(change.key),
       };
+
     default:
-      // eslint-disable-next-line
-      (change.type: empty);
+      utils.assertNever(change);
       throw new UnknownTypeError();
   }
 };
 
-export default (change: Change): Array<LevelUpChange> => {
+export const convertChange = (change: Change): ReadonlyArray<AbstractBatch> => {
   if (change.type === 'add') {
     return convertAddChange(change.change);
-  } else if (change.type === 'delete') {
+  }
+
+  if (change.type === 'delete') {
     return [convertDeleteChange(change.change)];
   }
 
-  // eslint-disable-next-line
-  (change.type: empty);
+  utils.assertNever(change);
   throw new UnknownChangeTypeError();
 };

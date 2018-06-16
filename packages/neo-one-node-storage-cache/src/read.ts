@@ -1,22 +1,17 @@
-/* @flow */
-import type LRU from 'lru-cache';
-import {
-  type ReadAllStorage,
-  type ReadGetAllStorage,
-  type ReadStorage,
-} from '@neo-one/node-core';
+import { ReadAllStorage, ReadGetAllStorage, ReadStorage } from '@neo-one/node-core';
+import LRU from 'lru-cache';
 
-type SerializeKeyString<Key> = (key: Key) => string;
+type SerializeKeyString<Key> = ((key: Key) => string);
 
 export function createReadStorage<Key, Value>({
   cache,
   storage,
   serializeKeyString,
-}: {|
-  cache: LRU,
-  storage: ReadStorage<Key, Value>,
-  serializeKeyString: SerializeKeyString<Key>,
-|}): ReadStorage<Key, Value> {
+}: {
+  readonly cache: LRU.Cache<string, Value>;
+  readonly storage: ReadStorage<Key, Value>;
+  readonly serializeKeyString: SerializeKeyString<Key>;
+}): ReadStorage<Key, Value> {
   const get = async (key: Key): Promise<Value> => {
     const keyString = serializeKeyString(key);
     const value = cache.get(keyString);
@@ -26,11 +21,12 @@ export function createReadStorage<Key, Value>({
 
     return storage.get(key).then((val) => {
       cache.set(keyString, val);
+
       return val;
     });
   };
 
-  const tryGet = async (key: Key): Promise<?Value> => {
+  const tryGet = async (key: Key): Promise<Value | undefined> => {
     const keyString = serializeKeyString(key);
     const value = cache.get(keyString);
     if (value !== undefined) {
@@ -38,9 +34,10 @@ export function createReadStorage<Key, Value>({
     }
 
     return storage.tryGet(key).then((val) => {
-      if (val != null) {
+      if (val !== undefined) {
         cache.set(keyString, val);
       }
+
       return val;
     });
   };
@@ -52,11 +49,11 @@ export function createReadAllStorage<Key, Value>({
   cache,
   storage,
   serializeKeyString,
-}: {|
-  cache: LRU,
-  storage: ReadAllStorage<Key, Value>,
-  serializeKeyString: SerializeKeyString<Key>,
-|}): ReadAllStorage<Key, Value> {
+}: {
+  readonly cache: LRU.Cache<string, Value>;
+  readonly storage: ReadAllStorage<Key, Value>;
+  readonly serializeKeyString: SerializeKeyString<Key>;
+}): ReadAllStorage<Key, Value> {
   const readStorage = createReadStorage({
     cache,
     storage,
@@ -66,7 +63,7 @@ export function createReadAllStorage<Key, Value>({
   return {
     get: readStorage.get,
     tryGet: readStorage.tryGet,
-    all: storage.all,
+    all$: storage.all$,
   };
 }
 
@@ -74,11 +71,11 @@ export function createReadGetAllStorage<Key, Keys, Value>({
   cache,
   storage,
   serializeKeyString,
-}: {|
-  cache: LRU,
-  storage: ReadGetAllStorage<Key, Keys, Value>,
-  serializeKeyString: SerializeKeyString<Key>,
-|}): ReadGetAllStorage<Key, Keys, Value> {
+}: {
+  readonly cache: LRU.Cache<string, Value>;
+  readonly storage: ReadGetAllStorage<Key, Keys, Value>;
+  readonly serializeKeyString: SerializeKeyString<Key>;
+}): ReadGetAllStorage<Key, Keys, Value> {
   const readStorage = createReadStorage({
     cache,
     storage,
@@ -88,6 +85,6 @@ export function createReadGetAllStorage<Key, Keys, Value>({
   return {
     get: readStorage.get,
     tryGet: readStorage.tryGet,
-    getAll: storage.getAll,
+    getAll$: storage.getAll$,
   };
 }
