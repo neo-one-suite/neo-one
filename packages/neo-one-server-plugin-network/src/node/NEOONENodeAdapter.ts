@@ -2,7 +2,6 @@ import { Monitor } from '@neo-one/monitor';
 import { FullNodeEnvironment, FullNodeOptions } from '@neo-one/node';
 import { createEndpoint, EndpointConfig } from '@neo-one/node-core';
 import { Binary, Config, DescribeTable, killProcess } from '@neo-one/server-plugin';
-import { ChildProcess } from 'child_process';
 import fetch from 'cross-fetch';
 import execa from 'execa';
 import fs from 'fs-extra';
@@ -269,7 +268,7 @@ export const createNodeConfig = ({
 
 export class NEOONENodeAdapter extends NodeAdapter {
   private mutableConfig: Config<NodeConfig> | undefined;
-  private mutableProcess: ChildProcess | undefined;
+  private mutableProcess: execa.ExecaChildProcess | undefined;
 
   public constructor({
     monitor,
@@ -310,11 +309,11 @@ export class NEOONENodeAdapter extends NodeAdapter {
     };
   }
 
-  public async isLive(timeoutMS: number): Promise<boolean> {
+  protected async isLive(timeoutMS: number): Promise<boolean> {
     return this.checkRPC('/live_health_check', timeoutMS);
   }
 
-  public async isReady(timeoutMS: number): Promise<boolean> {
+  protected async isReady(timeoutMS: number): Promise<boolean> {
     return this.checkRPC('/ready_health_check', timeoutMS);
   }
 
@@ -339,6 +338,14 @@ export class NEOONENodeAdapter extends NodeAdapter {
       });
 
       this.mutableProcess = child;
+      // tslint:disable-next-line no-floating-promises
+      child
+        .then(() => {
+          this.mutableProcess = undefined;
+        })
+        .catch(() => {
+          this.mutableProcess = undefined;
+        });
     }
   }
 

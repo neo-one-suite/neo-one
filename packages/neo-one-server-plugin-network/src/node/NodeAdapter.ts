@@ -1,8 +1,8 @@
 import { Monitor } from '@neo-one/monitor';
 import { Binary, DescribeTable } from '@neo-one/server-plugin';
 import { labels, utils } from '@neo-one/utils';
-import { concat, defer, Observable, of as _of, timer } from 'rxjs';
-import { concatMap, map, shareReplay } from 'rxjs/operators';
+import { concat, Observable, of as _of, timer } from 'rxjs';
+import { concatMap, shareReplay } from 'rxjs/operators';
 import { NodeSettings } from '../types';
 
 export interface Node {
@@ -59,15 +59,9 @@ export abstract class NodeAdapter {
         telemetryAddress,
       }),
       timer(0, 6000).pipe(
-        concatMap(() =>
-          defer(async () => {
-            const [ready, live] = await Promise.all([this.isReady(5000), this.isLive(5000)]);
-
-            return { ready, live };
-          }),
-        ),
-        map(({ ready, live }) => {
+        concatMap(async () => {
           const config = this.getNodeStatus();
+          const [ready, live] = await Promise.all([this.isReady(5000), this.isLive(5000)]);
 
           return {
             name: this.name,
@@ -173,8 +167,6 @@ export abstract class NodeAdapter {
   }
 
   public abstract getNodeStatus(): NodeStatus;
-  public abstract async isLive(_timeoutMS: number): Promise<boolean>;
-  public abstract async isReady(_timeoutMS: number): Promise<boolean>;
 
   public async live(timeoutSeconds: number): Promise<void> {
     const start = utils.nowSeconds();
@@ -187,8 +179,12 @@ export abstract class NodeAdapter {
 
       await new Promise<void>((resolve) => setTimeout(resolve, (timeoutSeconds / 10) * 1000));
     }
+
+    throw new Error(`Node ${this.name} did not start.`);
   }
 
+  protected abstract async isLive(_timeoutMS: number): Promise<boolean>;
+  protected abstract async isReady(_timeoutMS: number): Promise<boolean>;
   protected abstract async createInternal(): Promise<void>;
   protected abstract async updateInternal(_settings: NodeSettings): Promise<void>;
   protected abstract async startInternal(): Promise<void>;

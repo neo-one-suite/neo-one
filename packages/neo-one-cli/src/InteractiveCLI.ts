@@ -86,6 +86,7 @@ export class InteractiveCLI {
     readonly minPort?: number;
   };
   private mutableLogPath: string | undefined;
+  private mutableThrowError = false;
 
   public constructor({
     debug,
@@ -107,6 +108,10 @@ export class InteractiveCLI {
     this.mutableDelimiter = [];
     this.mutablePlugins = {};
     this.serverConfig = { dir, serverPort, minPort };
+  }
+
+  public get throwError(): boolean {
+    return this.mutableThrowError;
   }
 
   public get monitor(): Monitor {
@@ -318,8 +323,13 @@ export class InteractiveCLI {
       commands.forEach((command) => command(this));
       const args = argv.slice(2);
       if (args.length > 0) {
-        await this.vorpal.exec(args.join(' '));
-        shutdown({ exitCode: 0 });
+        try {
+          this.mutableThrowError = true;
+          await this.vorpal.exec(args.join(' '));
+          shutdown({ exitCode: 0 });
+        } catch {
+          shutdown({ exitCode: 1 });
+        }
       } else {
         this.resetDelimiter();
         this.vorpal.history(name.cli).show();

@@ -193,24 +193,24 @@ export class TaskList {
 
   public constructor({
     tasks,
-    concurrent,
+    concurrent = false,
     onError,
     onComplete,
     onDone,
-    initialContext,
-    freshContext,
-    collapse,
+    initialContext = {},
+    freshContext = false,
+    collapse = true,
   }: TaskListOptions) {
     this.tasks = tasks.map(
       (task) =>
         new TaskWrapper({
           task,
           taskList: this,
-          collapse: collapse === undefined ? true : collapse,
+          collapse,
         }),
     );
 
-    this.concurrent = concurrent || false;
+    this.concurrent = concurrent;
     this.onError =
       onError === undefined
         ? (_error, _ctx) => {
@@ -229,8 +229,8 @@ export class TaskList {
             // do nothing
           }
         : onDone;
-    this.initialContext = initialContext === undefined ? {} : initialContext;
-    this.freshContext = freshContext || false;
+    this.initialContext = initialContext;
+    this.freshContext = freshContext;
     this.mutableSuperOnError = (_error) => {
       // do nothing
     };
@@ -262,23 +262,16 @@ export class TaskList {
     this.mutableSuperOnError = onError;
   }
 
-  public async run(ctxIn?: TaskContext): Promise<void> {
+  public async run(ctxIn: TaskContext = {}): Promise<void> {
     if (this.mutableSubscription !== undefined) {
       return;
     }
 
-    let ctx = ctxIn === undefined ? {} : ctxIn;
-    if (this.freshContext) {
-      ctx = {};
-    }
-
-    ctx = Object.entries(this.initialContext).reduce(
-      (acc, [key, value]) => ({
-        ...acc,
-        [key]: value,
-      }),
-      ctx,
-    );
+    const ctx = this.freshContext ? {} : ctxIn;
+    Object.entries(this.initialContext).forEach(([key, value]) => {
+      // tslint:disable-next-line no-object-mutation
+      ctx[key] = value;
+    });
     this.checkAll(ctx);
 
     this.mutableSubscription = combineLatest(this.tasks.map((task) => task.status$))

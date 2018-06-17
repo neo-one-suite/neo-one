@@ -1,5 +1,9 @@
-export { NetworkPlugin } from './NetworkPlugin';
+import { NetworkPlugin } from './NetworkPlugin';
+
 export { constants } from './constants';
 export { NEOONENodeConfig } from './node';
 export { Network } from './NetworkResourceType';
 export { NetworkType } from './types';
+
+// tslint:disable-next-line no-default-export export-name
+export default NetworkPlugin;

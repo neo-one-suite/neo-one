@@ -5,9 +5,6 @@ import path from 'path';
 import { Subject } from 'rxjs';
 import { createLogger, format, transports } from 'winston';
 
-// tslint:disable-next-line no-import-side-effect
-import './patchWinston';
-
 export const createMonitor = ({
   logConsole,
   debug,

@@ -16,6 +16,7 @@ import { Server } from '../Server';
 
 function makeObservable$<TData>(ctx: Context): Observable<TData> {
   return Observable.create((observer: Observer<TData>) => {
+    let completed = false;
     ctx.req.on('data', (value: TData) => {
       observer.next(value);
     });
@@ -23,10 +24,15 @@ function makeObservable$<TData>(ctx: Context): Observable<TData> {
       observer.error(error);
     });
     ctx.req.on('end', () => {
+      completed = true;
       observer.complete();
     });
 
-    return () => ctx.req.destroy();
+    return () => {
+      if (!completed) {
+        ctx.req.destroy();
+      }
+    };
   });
 }
 
@@ -85,6 +91,7 @@ export const services = ({ server }: { readonly server: Server }) => {
     const requests$ = makeObservable$<ReadRequest>(ctx);
     // tslint:disable-next-line no-any
     let observable$: Observable<any> | undefined;
+    let done = false;
     await requests$
       .pipe(
         switchMap((request: ReadRequest) => {
@@ -112,11 +119,13 @@ export const services = ({ server }: { readonly server: Server }) => {
             message: error.message,
           }),
         ),
-
         map((response: ReadResponse) => {
-          ctx.res.write(response);
-          if (response.type === 'aborted' || response.type === 'error') {
-            ctx.res.end();
+          if (!done) {
+            ctx.res.write(response);
+            if (response.type === 'aborted' || response.type === 'error') {
+              done = true;
+              ctx.res.end();
+            }
           }
         }),
       )

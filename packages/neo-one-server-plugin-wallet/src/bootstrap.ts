@@ -299,13 +299,9 @@ async function initializeWallets({
 
   await Promise.all([developerClient.runConsensusNow(), firstTransactionBatch.confirmed()]);
 
-  const secondTransferBatch = await Promise.all(
-    utils.zip(firstWalletBatch, secondWalletBatch).map(async ([from, wallet]) => createTransfers({ wallet, from })),
-  );
-
   const secondTransactionBatch = await Promise.all(
-    utils.zip(firstWalletBatch, secondTransferBatch).map(async ([from, transfer]) =>
-      client.transfer(transfer, {
+    utils.zip(firstWalletBatch, secondWalletBatch).map(async ([from, wallet]) =>
+      client.transfer(await createTransfers({ wallet, from }), {
         from: from.accountID,
       }),
     ),
@@ -779,7 +775,6 @@ const publishContract = async ({
         payable: true,
       },
     },
-
     { from: wallet.accountID },
   );
 

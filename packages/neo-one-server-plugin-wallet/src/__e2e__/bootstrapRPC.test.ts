@@ -12,13 +12,13 @@ describe('bootstrap with rpc', () => {
         options: [{ network, rpcURL }],
       }).read(network);
 
-      const assets: { [hash: string]: Asset } = {};
+      const mutableAssets: { [hash: string]: Asset } = {};
       const getAsset = async (assetHash: string) => {
-        if (assets[assetHash] === undefined) {
-          assets[assetHash] = await provider.getAsset(assetHash);
+        if ((mutableAssets[assetHash] as Asset | undefined) === undefined) {
+          mutableAssets[assetHash] = await provider.getAsset(assetHash);
         }
 
-        return assets[assetHash];
+        return mutableAssets[assetHash];
       };
 
       const getWallet = async (privateKey: string, name: string) => {
@@ -68,6 +68,6 @@ describe('bootstrap with rpc', () => {
       };
     };
 
-    await bootstrapTestUtils.testBootstrap(getCommand, 10, 'boottest-rpc', getInfo, '48953');
+    await bootstrapTestUtils.testBootstrap(getCommand, 10, 'priv', getInfo, '48953');
   });
 });

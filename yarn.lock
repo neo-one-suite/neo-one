@@ -1145,6 +1145,10 @@
   dependencies:
     "@types/node" "*"
 
+"@types/yargs@^11.0.0":
+  version "11.0.0"
+  resolved "https://registry.npmjs.org/@types/yargs/-/yargs-11.0.0.tgz#124b9ed9c65b7091cc36da59ae12cbd47d8745ea"
+
 JSONStream@^1.0.4:
   version "1.3.3"
   resolved "https://registry.npmjs.org/JSONStream/-/JSONStream-1.3.3.tgz#27b4b8fbbfeab4e71bcf551e7f27be8d952239bf"
@@ -6418,6 +6422,15 @@ jest-jasmine2@^23.1.0:
     jest-snapshot "^23.0.1"
     jest-util "^23.1.0"
     pretty-format "^23.0.1"
+
+jest-junit@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/jest-junit/-/jest-junit-5.0.0.tgz#30ed3317c325165c2458ed2649f09d6e214ffab8"
+  dependencies:
+    jest-validate "^23.0.1"
+    mkdirp "^0.5.1"
+    strip-ansi "^4.0.0"
+    xml "^1.0.1"
 
 jest-leak-detector@^23.0.1:
   version "23.0.1"
@@ -11803,6 +11816,10 @@ xml-name-validator@^2.0.1:
 xml-name-validator@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/xml-name-validator/-/xml-name-validator-3.0.0.tgz#6ae73e06de4d8c6e47f9fb181f78d648ad457c6a"
+
+xml@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/xml/-/xml-1.0.1.tgz#78ba72020029c5bc87b8a81a3cfcd74b4a2fc1e5"
 
 xregexp@4.0.0:
   version "4.0.0"

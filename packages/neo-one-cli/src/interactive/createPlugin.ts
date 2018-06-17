@@ -11,7 +11,7 @@ export const createPlugin = ({ cli, plugin }: { readonly cli: InteractiveCLI; re
 
   // tslint:disable-next-line no-any
   commands.forEach((command: any) => {
-    const fn = command.fn;
+    const fn = command._fn;
     let cancelled = false;
     // tslint:disable-next-line no-any
     command.action(async (args: any) => {
@@ -29,6 +29,10 @@ export const createPlugin = ({ cli, plugin }: { readonly cli: InteractiveCLI; re
           error,
           message: `Command ${command.name} failed.`,
         });
+
+        if (cli.throwError) {
+          throw error;
+        }
       }
     });
 

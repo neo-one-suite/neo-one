@@ -139,7 +139,7 @@ export class ResourcesManager<
   }
 
   private get resourceAdapters(): ResourceAdapters<Resource, ResourceOptions> {
-    return this.resourceAdapters$.value;
+    return this.resourceAdapters$.getValue();
   }
 
   public async reset(): Promise<void> {
@@ -391,8 +391,10 @@ export class ResourcesManager<
           skip,
           task: () => {
             if (resourceAdapter !== undefined) {
-              resourceAdapter.delete(options);
+              return resourceAdapter.delete(options);
             }
+
+            return undefined;
           },
         },
 
@@ -504,8 +506,10 @@ export class ResourcesManager<
           },
           task: () => {
             if (resourceAdapter !== undefined) {
-              resourceAdapter.start(options);
+              return resourceAdapter.start(options);
             }
+
+            return undefined;
           },
         },
       ],
@@ -592,8 +596,10 @@ export class ResourcesManager<
           skip,
           task: () => {
             if (resourceAdapter !== undefined) {
-              resourceAdapter.stop(options);
+              return resourceAdapter.stop(options);
             }
+
+            return undefined;
           },
         },
 

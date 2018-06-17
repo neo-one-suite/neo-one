@@ -3,6 +3,11 @@
   "tslint.autoFixOnSave": true,
   "typescript.format.insertSpaceBeforeFunctionParenthesis": false,
   "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+  "typescript.format.enable": false,
+  "javascript.format.enable": false,
+  "typescript.preferences.quoteStyle": "single",
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.autoImportSuggestions.enabled": true,
   "editor.formatOnPaste": false,
   "editor.formatOnSave": true,
   "cSpell.language": "en"

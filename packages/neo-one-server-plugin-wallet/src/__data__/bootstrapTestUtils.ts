@@ -6,6 +6,12 @@ import _ from 'lodash';
 import { ASSET_INFO, compileSmartContract, TOKEN_INFO, TokenInfo } from '../bootstrap';
 import { constants } from '../constants';
 
+const TOKEN_HASHES: { readonly [key: string]: string } = {
+  RedToken: '0xf30b143036410a36490061d57f9dd778366da376',
+  BlueToken: '0xd823f16894607d63f09423eaa35c05e15f9c45b0',
+  GreenToken: '0xf40cd75ab60f279b4372a39152152700a054e0a1',
+};
+
 export async function getNetworkInfo(
   network: string,
 ): Promise<{
@@ -37,16 +43,10 @@ const ASSET_WALLET_ADDRESSES = new Set(ASSET_INFO.map(({ privateKey }) => privat
 
 const TOKEN_WALLET_ADDRESSES = new Set(TOKEN_INFO.map(({ privateKey }) => privateKeyToAddress(privateKey)));
 
-const TOKEN_HASHES: { readonly [tokenName: string]: string } = {
-  RedToken: '0x6937b11039ba775836c32682738bac4e4922d671',
-  BlueToken: '0xeeb5765790d7a43dbf7026cf8c1164bb9188055b',
-  GreenToken: '0xa204296a3841bc03da6c700c22603bbbda01bee7',
-};
-
 function expectNotNull<T>(value: T | null | undefined): T {
   if (value == undefined) {
     expect(value).toBeTruthy();
-    throw new Error('For Flow');
+    throw new Error('For TS');
   }
 
   return value;

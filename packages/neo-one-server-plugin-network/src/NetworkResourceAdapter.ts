@@ -9,12 +9,12 @@ import {
   SubDescribeTable,
   TaskList,
 } from '@neo-one/server-plugin';
-import { labels } from '@neo-one/utils';
+import { labels, mergeScanLatest } from '@neo-one/utils';
 import fs from 'fs-extra';
 import _ from 'lodash';
 import path from 'path';
 import { BehaviorSubject, combineLatest, Observable, timer } from 'rxjs';
-import { concatMap, shareReplay, switchMap } from 'rxjs/operators';
+import { shareReplay, switchMap } from 'rxjs/operators';
 import { constants } from './constants';
 import { Network, NetworkResourceOptions, NetworkResourceType } from './NetworkResourceType';
 import { NEOONENodeAdapter, Node, NodeAdapter } from './node';
@@ -139,7 +139,6 @@ export class NetworkResourceAdapter {
 
         dependencies: [],
       },
-
       tasks: [
         {
           title: 'Create data directories',
@@ -147,7 +146,6 @@ export class NetworkResourceAdapter {
             await Promise.all([fs.ensureDir(staticOptions.nodesPath), fs.ensureDir(staticOptions.nodesOptionsPath)]);
           },
         },
-
         {
           title: 'Create nodes',
           task: () =>
@@ -157,21 +155,6 @@ export class NetworkResourceAdapter {
                 task: async () => {
                   await this.writeNodeOptions(staticOptions, nodeOptions);
                   await node.create();
-                },
-              })),
-
-              concurrent: true,
-            }),
-        },
-
-        {
-          title: 'Wait for network to be alive',
-          task: () =>
-            new TaskList({
-              tasks: nodeOptionsAndNodes.map(([nodeOptions, node]) => ({
-                title: `Waiting for node ${nodeOptions.name}`,
-                task: async () => {
-                  await node.live(5);
                 },
               })),
 
@@ -435,39 +418,41 @@ export class NetworkResourceAdapter {
     this.resource$ = this.nodes$.pipe(
       switchMap((nodes) =>
         combineLatest(timer(0, 2500), combineLatest(nodes.map((node) => node.node$))).pipe(
-          // tslint:disable-next-line no-unused
-          concatMap(async ([time, currentNodes]) => {
-            const readyNode =
-              currentNodes.find((node) => node.ready) ||
-              currentNodes.find((node) => node.live) ||
-              (currentNodes[0] as Node | undefined);
-            let height;
-            let peers;
-            if (readyNode !== undefined) {
-              const client = createReadClient({
-                network: this.name,
-                rpcURL: readyNode.rpcAddress,
-              });
+          mergeScanLatest<[number, ReadonlyArray<Node>], Network | undefined>(
+            // tslint:disable-next-line no-unused
+            async (_prev, [_time, currentNodes]): Promise<Network> => {
+              const readyNode =
+                currentNodes.find((node) => node.ready) ||
+                currentNodes.find((node) => node.live) ||
+                (currentNodes[0] as Node | undefined);
+              let height;
+              let peers;
+              if (readyNode !== undefined) {
+                const client = createReadClient({
+                  network: this.name,
+                  rpcURL: readyNode.rpcAddress,
+                });
 
-              try {
-                [height, peers] = await Promise.all([client.getBlockCount(), client.getConnectedPeers()]);
-              } catch {
-                // ignore errors
+                try {
+                  [height, peers] = await Promise.all([client.getBlockCount(), client.getConnectedPeers()]);
+                } catch {
+                  // ignore errors
+                }
               }
-            }
 
-            return {
-              plugin: this.resourceType.plugin.name,
-              resourceType: this.resourceType.name,
-              name: this.name,
-              baseName: this.name,
-              state: this.state,
-              type: this.type,
-              height,
-              peers: peers === undefined ? peers : peers.length,
-              nodes: currentNodes,
-            };
-          }),
+              return {
+                plugin: this.resourceType.plugin.name,
+                resourceType: this.resourceType.name,
+                name: this.name,
+                baseName: this.name,
+                state: this.state,
+                type: this.type,
+                height,
+                peers: peers === undefined ? peers : peers.length,
+                nodes: currentNodes,
+              };
+            },
+          ),
         ),
       ),
       shareReplay(1),
@@ -528,6 +513,20 @@ export class NetworkResourceAdapter {
                   await node.start();
                 },
               })),
+              concurrent: true,
+            }),
+        },
+        {
+          title: 'Wait for network to be alive',
+          task: () =>
+            new TaskList({
+              tasks: this.nodes.map((node) => ({
+                title: `Waiting for node ${node.name}`,
+                task: async () => {
+                  await node.live(10);
+                },
+              })),
+
               concurrent: true,
             }),
         },

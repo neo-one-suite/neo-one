@@ -918,7 +918,7 @@ export class WriteBatchBlockchain {
               values.map<[UInt256, BN]>(([_address, asset, value]) => [asset, value]),
               spent === undefined ? [] : spent,
               claimed === undefined ? [] : claimed,
-              outs === undefined ? [] : outputs,
+              outs === undefined ? [] : outs,
               changes === undefined ? [] : changes,
             );
           }),

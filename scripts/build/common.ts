@@ -1,7 +1,7 @@
 // tslint:disable no-console
 import * as appRootDir from 'app-root-dir';
+import * as execa from 'execa';
 import * as fs from 'fs-extra';
-import * as _ from 'lodash';
 import * as path from 'path';
 import {
   OutputOptions,
@@ -42,7 +42,7 @@ const getPackagePath = (pkg: string, ...parts: string[]) => path.resolve(appRoot
 
 const getPackageJSON = (pkg: string) => JSON.parse(fs.readFileSync(getPackagePath(pkg, 'package.json'), 'utf-8'));
 
-const pkgs = fs
+export const pkgs = fs
   .readdirSync('packages')
   .filter((file) => !file.startsWith('.'))
   .filter((pkg) => fs.pathExistsSync(getPackagePath(pkg, 'package.json')))
@@ -366,17 +366,21 @@ const startWatcher = async (pkg: string, watcher: Watcher): Promise<void> =>
     });
   });
 
-export const watchJavascript = async () => {
-  const watchConfigss = await Promise.all(
-    pkgs.map<Promise<Array<[string, RollupWatchOptions]>>>(async (pkg) => {
-      const entries = await getEntries(pkg);
+export const watchJavascriptPkg = async (pkg: string) => {
+  const entries = await getEntries(pkg);
 
-      return entries.map<[string, RollupWatchOptions]>((entry) => [pkg, createWatchConfig({ pkg, entry })]);
+  await startWatcher(pkg, watch(entries.map((entry) => createWatchConfig({ pkg, entry }))));
+};
+
+export const watchJavascript = async () => {
+  await Promise.all(
+    pkgs.map(async (pkg) => {
+      const tsNode = path.resolve(appRootDir.get(), 'node_modules', '.bin', 'ts-node');
+      const watchPkg = path.resolve(appRootDir.get(), 'scripts', 'build', 'entry', 'watchPkg.ts');
+      const proc = execa(tsNode, ['--project', 'tsconfig.cli.json', watchPkg, '-p', pkg]);
+      proc.stdout.pipe(process.stdout);
+      proc.stderr.pipe(process.stderr);
+      await proc;
     }),
   );
-
-  // tslint:disable-next-line no-loop-statement
-  for (const [pkg, watchConfig] of _.flatten<[string, RollupWatchOptions]>(watchConfigss)) {
-    await startWatcher(pkg, watch([watchConfig]));
-  }
 };
