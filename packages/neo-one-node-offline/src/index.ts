@@ -95,12 +95,11 @@ const getStream = (chain: Chain): Readable => {
 const getCount = async (stream: Readable): Promise<number> => {
   let count = stream.read(4);
   // tslint:disable-next-line no-loop-statement
-  while (count === undefined) {
+  while (count == undefined) {
     await new Promise<void>((resolve) => setTimeout(resolve, 250));
     count = stream.read(4);
   }
 
-  // $FlowFixMe
   return count.readUInt32LE(0);
 };
 
