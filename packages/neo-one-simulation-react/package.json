@@ -31,7 +31,7 @@
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
   "main": "./dist/index.js",
-  "module": "./dist/index.es.js",
+  "module": "./dist/index.mjs",
   "engines": {
     "node": ">=10.4.1"
   },
@@ -44,5 +44,6 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0-beta.51",
     "@neo-one/simulation-utils": "^1.0.0-alpha.9"
-  }
+  },
+  "noCompile": true
 }

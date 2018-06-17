@@ -5,7 +5,7 @@ module.exports = ({ modules, useBuiltIns, targets }) => ({
       {
         useBuiltIns: useBuiltIns == null ? false : useBuiltIns,
         modules,
-        targets: targets == null ? { node: '8.9.0' } : targets,
+        targets: targets == null ? { node: '10.4.1' } : targets,
       },
     ],
   ],

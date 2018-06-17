@@ -1,8 +1,17 @@
+// tslint:disable no-console
 import * as appRootDir from 'app-root-dir';
 import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
-import { OutputOptions, rollup, RollupSingleFileBuild, RollupWatchOptions, watch, WatcherOptions } from 'rollup';
+import {
+  OutputOptions,
+  rollup,
+  RollupSingleFileBuild,
+  RollupWatchOptions,
+  watch,
+  Watcher,
+  WatcherOptions,
+} from 'rollup';
 // @ts-ignore
 import * as babel from 'rollup-plugin-babel';
 // @ts-ignore
@@ -67,6 +76,7 @@ const dependencies = [
 
 const updateCompilerOptions = (pkg: string, compilerOptions: object) => ({
   ...compilerOptions,
+  rootDirs: pkgs.map((subPkg) => getPackagePath(subPkg, 'src')),
   baseUrl: getPackagePath(pkg, 'src'),
   target: 'esnext',
   module: 'esnext',
@@ -98,14 +108,18 @@ const getCompilerOptions = (pkg: string) => {
   return updateCompilerOptions(pkg, options);
 };
 
+interface EntryOutput {
+  readonly format: Format;
+  readonly output: string;
+  readonly banner?: string;
+}
+
 interface EntryConfig {
   readonly entry: Entry;
   readonly input: string;
   readonly includeDeps: boolean;
-  readonly outputs: ReadonlyArray<{
-    readonly format: Format;
-    readonly output: string;
-  }>;
+  readonly outputs: ReadonlyArray<EntryOutput>;
+  readonly useBuiltIns?: string | boolean;
 }
 
 const getBinConfigs = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
@@ -119,10 +133,12 @@ const getBinConfigs = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> =
       input: path.resolve(binPath, file),
       // Should we include deps? What about polyfills?
       includeDeps: false,
+      useBuiltIns: 'entry',
       outputs: [
         {
           format: Format.cjs,
-          output: getPackagePath('dist', 'bin', path.basename(file)),
+          output: getPackagePath(pkg, 'dist', 'bin', path.basename(file, '.ts')),
+          banner: '#!/usr/bin/env node',
         },
       ],
     }));
@@ -140,7 +156,7 @@ const getEntries = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
     getBinConfigs(pkg),
   ]);
   let result = binConfigs;
-  const outputDir = getPackagePath(pkg, 'dit');
+  const outputDir = getPackagePath(pkg, 'dist');
   if (existsIndex) {
     result = result.concat([
       {
@@ -154,7 +170,7 @@ const getEntries = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
           },
           {
             format: Format.es,
-            output: path.resolve(outputDir, 'index.es.js'),
+            output: path.resolve(outputDir, 'index.mjs'),
           },
         ],
       },
@@ -173,7 +189,7 @@ const getEntries = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
           },
           {
             format: Format.es,
-            output: path.resolve(outputDir, 'index.browser.es.js'),
+            output: path.resolve(outputDir, 'index.browser.mjs'),
           },
         ],
       },
@@ -196,7 +212,7 @@ const getBabelConfigFull = ({
   ...getBabelConfig({
     modules,
     useBuiltIns,
-    targets: entry === 'node' ? { node: '8.9.0' } : { browsers: ['> 1%', 'last 2 versions', 'not ie <= 10'] },
+    targets: entry === 'node' ? { node: '10.4.1' } : { browsers: ['> 1%', 'last 2 versions', 'not ie <= 10'] },
   }),
 });
 
@@ -225,12 +241,15 @@ const createRollupInput = ({ pkg, entry }: { readonly pkg: string; readonly entr
     typescript({
       tsconfigOverride: {
         compilerOptions: getCompilerOptions(pkg),
+        include: [getPackagePath(pkg, 'src')],
       },
       check: false,
+      clean: true,
+      typescript: ts,
     }),
     babel({
       exclude: path.join('node_modules', '**'),
-      ...getBabelConfigFull({ modules: false, entry: entry.entry }),
+      ...getBabelConfigFull({ modules: false, entry: entry.entry, useBuiltIns: entry.useBuiltIns }),
     }),
     sourcemaps(),
   ],
@@ -238,32 +257,29 @@ const createRollupInput = ({ pkg, entry }: { readonly pkg: string; readonly entr
 
 const createRollupOutput = ({
   pkg,
-  format,
-  file,
+  output,
 }: {
   readonly pkg: string;
-  readonly format: Format;
-  readonly file: string;
+  readonly output: EntryOutput;
 }): OutputOptions => ({
-  file,
-  format,
+  file: output.output,
+  format: output.format,
   name: pkg,
   sourcemap: process.env.NEO_ONE_BUILD_INLINE_SOURCEMAP === 'true' ? 'inline' : true,
   exports: 'named',
+  banner: output.banner,
 });
 
 const writeBundle = async ({
   pkg,
   bundle,
-  format,
-  file,
+  output,
 }: {
   readonly pkg: string;
   readonly bundle: RollupSingleFileBuild;
-  readonly format: Format;
-  readonly file: string;
+  readonly output: EntryOutput;
 }) => {
-  await bundle.write(createRollupOutput({ pkg, format, file }));
+  await bundle.write(createRollupOutput({ pkg, output }));
 };
 
 const writeBundles = async ({
@@ -276,12 +292,11 @@ const writeBundles = async ({
   readonly entry: EntryConfig;
 }) => {
   await Promise.all(
-    entry.outputs.map(async ({ format, output }) =>
+    entry.outputs.map(async (output) =>
       writeBundle({
         pkg,
         bundle,
-        format,
-        file: output,
+        output,
       }),
     ),
   );
@@ -294,12 +309,17 @@ const rollupJavascript = async ({ pkg, entry }: { readonly pkg: string; readonly
 };
 
 export const compileJavascript = async ({ pkg }: { readonly pkg: string }): Promise<void> => {
+  const start = Date.now();
   const entries = await getEntries(pkg);
   await Promise.all(entries.map(async (entry) => rollupJavascript({ pkg, entry })));
+  console.log(`Built ${pkg} in ${((Date.now() - start) / 1000).toFixed(2)} seconds`);
 };
 
 export const buildJavascript = async () => {
-  await Promise.all(pkgs.map(async (pkg) => compileJavascript({ pkg })));
+  // tslint:disable-next-line no-loop-statement
+  for (const pkg of pkgs) {
+    await compileJavascript({ pkg });
+  }
 };
 
 const createRollupWatch = ({ pkg }: { readonly pkg: string }): WatcherOptions => ({
@@ -314,33 +334,46 @@ const createWatchConfig = ({
 }): RollupWatchOptions => ({
   ...createRollupInput({ pkg, entry }),
   // tslint:disable-next-line no-any no-map-without-usage
-  output: entry.outputs.map(({ format, output }) => createRollupOutput({ format, pkg, file: output })) as any,
+  output: entry.outputs.map((output) => createRollupOutput({ pkg, output })) as any,
   watch: createRollupWatch({ pkg }),
 });
 
+const startWatcher = async (pkg: string, watcher: Watcher): Promise<void> =>
+  new Promise<void>((promiseResolve) => {
+    let resolved = false;
+    const doResolve = () => {
+      if (!resolved) {
+        resolved = true;
+        promiseResolve();
+      }
+    };
+
+    watcher.on('event', (event) => {
+      // tslint:disable-next-line prefer-switch
+      if (event.code === 'BUNDLE_START') {
+        console.log(`Building ${pkg}...`);
+      } else if (event.code === 'BUNDLE_END') {
+        console.log(`${pkg} done.`);
+        doResolve();
+      } else if (event.code === 'ERROR') {
+        console.log(`${pkg} error.`);
+        console.log(event);
+        doResolve();
+      }
+    });
+  });
+
 export const watchJavascript = async () => {
   const watchConfigss = await Promise.all(
-    pkgs.map(async (pkg) => {
+    pkgs.map<Promise<Array<[string, RollupWatchOptions]>>>(async (pkg) => {
       const entries = await getEntries(pkg);
 
-      return entries.map((entry) => createWatchConfig({ pkg, entry }));
+      return entries.map<[string, RollupWatchOptions]>((entry) => [pkg, createWatchConfig({ pkg, entry })]);
     }),
   );
-  const watcher = watch(_.flatten(watchConfigss));
 
-  watcher.on('event', (event) => {
-    // tslint:disable-next-line prefer-switch
-    if (event.code === 'BUNDLE_START') {
-      // tslint:disable-next-line no-console
-      console.log('Building bundle...');
-    } else if (event.code === 'BUNDLE_END') {
-      // tslint:disable-next-line no-console
-      console.log('Done.');
-    } else if (event.code === 'ERROR') {
-      // tslint:disable-next-line no-console
-      console.log('Error.');
-      // tslint:disable-next-line no-console
-      console.log(event);
-    }
-  });
+  // tslint:disable-next-line no-loop-statement
+  for (const [pkg, watchConfig] of _.flatten<[string, RollupWatchOptions]>(watchConfigss)) {
+    await startWatcher(pkg, watch([watchConfig]));
+  }
 };

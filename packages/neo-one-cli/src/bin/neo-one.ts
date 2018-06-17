@@ -1,4 +1,3 @@
-#! /usr/bin/env node
 // tslint:disable-next-line no-import-side-effect
 import '@babel/polyfill';
 import { CLI, DIR_OPTION, InteractiveCLI, MIN_PORT_OPTION, SERVER_PORT_OPTION, STATIC_NEO_ONE_OPTION } from '../';
@@ -17,7 +16,7 @@ if (isStatic) {
   argv = argv.slice(0, staticIdx).concat(argv.slice(staticIdx + 1));
 }
 
-const quoteArgs = (args) =>
+const quoteArgs = (args: ReadonlyArray<string>): ReadonlyArray<string> =>
   args.map((arg, idx) => {
     if (idx === 0) {
       return arg;
@@ -30,7 +29,8 @@ const quoteArgs = (args) =>
     return arg;
   });
 
-const extractOption = (argsIn, option) => {
+// tslint:disable-next-line readonly-array
+const extractOption = (argsIn: string[], option: string): [string[], string | undefined] => {
   let args = argsIn;
   const index = args.indexOf(option);
   let value;
@@ -42,17 +42,20 @@ const extractOption = (argsIn, option) => {
   return [args, value];
 };
 
-const result = extractOption(argv, DIR_OPTION);
+// tslint:disable-next-line no-let
+let result = extractOption(argv, DIR_OPTION);
 [argv] = result;
 const dir = result[1];
 
 result = extractOption(argv, SERVER_PORT_OPTION);
 [argv] = result;
-const serverPort = result[1] == undefined ? undefined : parseInt(result[1], 10);
+const serverPortOut = result[1];
+const serverPort = serverPortOut === undefined ? undefined : parseInt(serverPortOut, 10);
 
 result = extractOption(argv, MIN_PORT_OPTION);
 [argv] = result;
-const minPort = result[1] == undefined ? undefined : parseInt(result[1], 10);
+const minPortOut = result[1];
+const minPort = minPortOut === undefined ? undefined : parseInt(minPortOut, 10);
 
 if (isStatic) {
   // tslint:disable-next-line no-floating-promises
