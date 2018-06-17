@@ -1,8 +1,6 @@
 environment:
   matrix:
-    - nodejs_version: "8.9"
-    - nodejs_version: "9"
-    - nodejs_version: "10"
+    - nodejs_version: "10.4.1"
 
 branches:
   only:
@@ -25,8 +23,8 @@ cache:
   - "%LOCALAPPDATA%\\Yarn"
 
 test_script:
-  - yarn run test --verbose
-  - yarn run e2e --verbose
+  - yarn run test-ci --verbose
+  - yarn run e2e-ci --verbose
 
 # Don't actually build.
 build: off

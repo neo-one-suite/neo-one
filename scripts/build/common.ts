@@ -49,6 +49,7 @@ const pkgs = fs
   .filter((pkg) => !getPackageJSON(pkg).noCompile);
 
 const builtIns: ReadonlyArray<string> = [
+  'core-js',
   'child_process',
   'crypto',
   'events',
@@ -92,6 +93,8 @@ const updateCompilerOptions = (pkg: string, compilerOptions: object) => ({
     getPackagePath(pkg, '..', '..', '@types', 'roots'),
   ],
   plugins: [],
+  isolatedModules: true,
+  skipLibCheck: true,
 });
 
 const getCompilerOptions = (pkg: string) => {

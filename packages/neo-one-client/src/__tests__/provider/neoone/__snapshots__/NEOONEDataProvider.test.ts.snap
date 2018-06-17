@@ -23,13 +23,15 @@ Object {
 }
 `;
 
-exports[`NEOONEDataProvider iterBlocks - null iterBlocksFetchTimeoutMS 1`] = `
+exports[`NEOONEDataProvider iterBlocks - undefined iterBlocksFetchTimeoutMS 1`] = `
 FromAsyncIterable {
   "_selector": [Function],
   "_source": AsyncBlockIterator {
     "batchSize": 10,
     "client": NEOONEDataProvider {
-      "client": JSONRPCClient {
+      "iterBlocksBatchSize": undefined,
+      "iterBlocksFetchTimeoutMS": undefined,
+      "mutableClient": JSONRPCClient {
         "provider": JSONRPCHTTPProvider {
           "batcher": DataLoader {
             "_batchLoadFn": [Function],
@@ -43,19 +45,16 @@ FromAsyncIterable {
           "endpoint": "bar",
         },
       },
-      "iterBlocksBatchSize": undefined,
-      "iterBlocksFetchTimeoutMS": undefined,
       "network": "foo",
     },
-    "currentIndex": 1,
-    "doneInternal": false,
     "fetchTimeoutMS": 20000,
-    "fetching": false,
     "indexStop": 2,
-    "items": Array [],
     "monitor": undefined,
-    "resolvers": Array [],
-    "startHeight": null,
+    "mutableCurrentIndex": 1,
+    "mutableDone": false,
+    "mutableFetching": false,
+    "mutableItems": Array [],
+    "mutableResolvers": Array [],
   },
 }
 `;
@@ -66,7 +65,9 @@ FromAsyncIterable {
   "_source": AsyncBlockIterator {
     "batchSize": 10,
     "client": NEOONEDataProvider {
-      "client": JSONRPCClient {
+      "iterBlocksBatchSize": undefined,
+      "iterBlocksFetchTimeoutMS": 1000,
+      "mutableClient": JSONRPCClient {
         "provider": JSONRPCHTTPProvider {
           "batcher": DataLoader {
             "_batchLoadFn": [Function],
@@ -80,26 +81,25 @@ FromAsyncIterable {
           "endpoint": "bar",
         },
       },
-      "iterBlocksBatchSize": undefined,
-      "iterBlocksFetchTimeoutMS": 1000,
       "network": "foo",
     },
-    "currentIndex": 0,
-    "doneInternal": false,
     "fetchTimeoutMS": 1000,
-    "fetching": false,
     "indexStop": undefined,
-    "items": Array [],
     "monitor": undefined,
-    "resolvers": Array [],
-    "startHeight": null,
+    "mutableCurrentIndex": 0,
+    "mutableDone": false,
+    "mutableFetching": false,
+    "mutableItems": Array [],
+    "mutableResolvers": Array [],
   },
 }
 `;
 
 exports[`NEOONEDataProvider setRPCURL 1`] = `
 NEOONEDataProvider {
-  "client": JSONRPCClient {
+  "iterBlocksBatchSize": undefined,
+  "iterBlocksFetchTimeoutMS": 1000,
+  "mutableClient": JSONRPCClient {
     "provider": JSONRPCHTTPProvider {
       "batcher": DataLoader {
         "_batchLoadFn": [Function],
@@ -113,8 +113,6 @@ NEOONEDataProvider {
       "endpoint": "buzz",
     },
   },
-  "iterBlocksBatchSize": undefined,
-  "iterBlocksFetchTimeoutMS": 1000,
   "network": "foo",
 }
 `;

@@ -49,11 +49,15 @@
     "tsc": "tsc",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.ts\"",
     "nit:template": "prettier --config .prettierrc --list-different \"packages/*/template/**/*.js\" --parser flow",
-    "nit:scripts": "prettier --config .prettierrc --list-different \"scripts/**/*.ts\"",
+    "nit:scripts:ts": "prettier --config .prettierrc --list-different \"scripts/**/*.ts\"",
+    "nit:scripts:js": "prettier --config .prettierrc --list-different \"scripts/**/*.js\" --parser flow",
+    "nit:scripts": "yarn run nit:scripts:ts && yarn run nit:scripts:js",
     "nit": "yarn run nit:source && yarn run nit:template && yarn run nit:scripts",
     "prettier:source": "prettier --config .prettierrc --write \"packages/*/src/**/*.ts\"",
     "prettier:template": "prettier --config .prettierrc --write \"packages/*/template/**/*.js\" --parser flow",
-    "prettier:scripts": "prettier --config .prettierrc --write \"scripts/**/*.ts\"",
+    "prettier:scripts:ts": "prettier --config .prettierrc --write \"scripts/**/*.ts\"",
+    "prettier:scripts:js": "prettier --config .prettierrc --write \"scripts/**/*.js\" --parser flow",
+    "prettier:scripts": "yarn run prettier:scripts:ts && yarn run prettier:scripts:js",
     "prettier:all": "yarn run prettier:source && yarn run prettier:template && yarn run prettier:scripts",
     "lint": "tslint --project .",
     "docker:windows:build": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/build-windowsservercore:ltsc2016 -f Dockerfile.build && eval $(docker-machine env -unset) && popd",
@@ -161,25 +165,7 @@
     ],
     "globals": {
       "ts-jest": {
-        "babelConfig": {
-          "presets": [
-            "@babel/preset-typescript",
-            [
-              "@babel/preset-env",
-              {
-                "useBuiltIns": false,
-                "modules": "commonjs"
-              }
-            ]
-          ],
-          "plugins": [
-            "@babel/plugin-proposal-async-generator-functions",
-            "@babel/plugin-proposal-class-properties",
-            "@babel/plugin-proposal-object-rest-spread",
-            "@babel/plugin-proposal-export-namespace-from",
-            "@babel/plugin-proposal-optional-catch-binding"
-          ]
-        }
+        "useBabelrc": true
       }
     },
     "moduleFileExtensions": [
@@ -193,9 +179,7 @@
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "<rootDir>/decls/.*",
-      "<rootDir>/packages/neo-one-node-neo-settings/src/test.js",
-      "<rootDir>/migrate/.*",
+      "<rootDir>/packages/neo-one-node-neo-settings/src/test.ts",
       "<rootDir>/packages/.*/template/.*",
       "<rootDir>/packages/.*/__e2e__/.*"
     ],

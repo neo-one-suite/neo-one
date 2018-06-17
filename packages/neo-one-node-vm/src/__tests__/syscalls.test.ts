@@ -411,7 +411,7 @@ const SYSCALLS: TestCase[] = [
     result: [new ArrayStackItem([new ValidatorStackItem(new Validator({ publicKey: keys[0].publicKey }))])],
 
     mock: ({ blockchain }) => {
-      blockchain.validator.all = {
+      blockchain.validator.all$ = {
         pipe: () => ({
           toPromise: () => [new ValidatorStackItem(new Validator({ publicKey: keys[0].publicKey }))],
         }),
@@ -444,7 +444,7 @@ const SYSCALLS: TestCase[] = [
     name: 'Neo.Blockchain.GetContract',
     result: [new BufferStackItem(Buffer.alloc(0, 0))],
     mock: ({ blockchain }) => {
-      blockchain.contract.tryGet = jest.fn(() => Promise.resolve(null));
+      blockchain.contract.tryGet = jest.fn(() => Promise.resolve(undefined));
     },
     args: [scriptAttributeHash],
     gas: FEES.ONE_HUNDRED,
@@ -1538,7 +1538,7 @@ const SYSCALLS: TestCase[] = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of());
+      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of());
     },
     gas: FEES.ONE,
   },
@@ -1805,7 +1805,7 @@ const SYSCALLS: TestCase[] = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of(Buffer.alloc(1, 1), Buffer.alloc(1, 2)));
+      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(Buffer.alloc(1, 1), Buffer.alloc(1, 2)));
     },
     gas: FEES.ONE,
   },
@@ -1841,7 +1841,7 @@ const SYSCALLS: TestCase[] = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of());
+      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of());
     },
     gas: FEES.ONE,
   },
@@ -1910,7 +1910,7 @@ const SYSCALLS: TestCase[] = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of(nextItem));
+      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
     gas: FEES.ONE,
   },
@@ -1979,7 +1979,7 @@ const SYSCALLS: TestCase[] = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of(nextItem));
+      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
     gas: FEES.ONE,
   },
@@ -2035,7 +2035,7 @@ const SYSCALLS: TestCase[] = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of(nextItem));
+      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
     gas: FEES.ONE,
   },
@@ -2091,7 +2091,7 @@ const SYSCALLS: TestCase[] = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll = jest.fn(() => AsyncIterableX.of(nextItem));
+      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
     gas: FEES.ONE,
   },
@@ -2231,7 +2231,7 @@ const SYSCALLS: TestCase[] = [
     mock: ({ blockchain }) => {
       blockchain.contract.tryGet = jest.fn(() => Promise.resolve());
       blockchain.contract.add = jest.fn(() => Promise.resolve());
-      blockchain.storageItem.getAll = jest.fn(() => of());
+      blockchain.storageItem.getAll$ = jest.fn(() => of());
     },
     gas: common.FIVE_HUNDRED_FIXED8,
   },
@@ -2448,7 +2448,7 @@ const SYSCALLS: TestCase[] = [
 ] as TestCase[];
 
 const handleCall = (sb: ScriptBuilder, call: Call) => {
-  if (call.args != null) {
+  if (call.args != undefined) {
     // eslint-disable-next-line
     handleArgs(sb, call.args);
   }
@@ -2463,7 +2463,12 @@ const handleCall = (sb: ScriptBuilder, call: Call) => {
 const handleArgs = (sb: ScriptBuilder, args: Arg[]) => {
   for (let i = args.length - 1; i >= 0; i -= 1) {
     const arg = args[i];
-    if (arg != null && typeof arg === 'object' && (arg as any).type === 'calls' && (arg as any).calls != null) {
+    if (
+      arg != undefined &&
+      typeof arg === 'object' &&
+      (arg as any).type === 'calls' &&
+      (arg as any).calls != undefined
+    ) {
       (((arg as any).calls as any) as Call[]).forEach((call) => {
         handleCall(sb, call);
       });
@@ -2475,7 +2480,7 @@ const handleArgs = (sb: ScriptBuilder, args: Arg[]) => {
 
 describe('syscalls', () => {
   const filterMethods = (value: any): any => {
-    if (value == null) {
+    if (value == undefined) {
       return value;
     } else if (Array.isArray(value)) {
       return value.map((val) => filterMethods(val));
@@ -2550,7 +2555,7 @@ describe('syscalls', () => {
       const gasLeft = common.ONE_HUNDRED_MILLION_FIXED8;
       let stack: ReadonlyArray<StackItem> = [];
 
-      if (mock != null) {
+      if (mock != undefined) {
         mock({ blockchain });
       }
 

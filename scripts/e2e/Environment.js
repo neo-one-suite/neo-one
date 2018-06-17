@@ -24,9 +24,7 @@ class One {
     let tries = 6;
     let ready = false;
     while (!ready && tries >= 0) {
-      // eslint-disable-next-line
       await new Promise((resolve) => setTimeout(() => resolve(), 5000));
-      // eslint-disable-next-line
       const result = await this._exec('check server --static-neo-one');
       try {
         ready = JSON.parse(result);
@@ -74,12 +72,10 @@ class One {
     let finalError;
     while (Date.now() - start < timeoutMS) {
       try {
-        // eslint-disable-next-line
         await func();
         return;
       } catch (error) {
         finalError = error;
-        // eslint-disable-next-line
         await new Promise((resolve) => setTimeout(() => resolve(), 1000));
       }
     }
@@ -93,14 +89,17 @@ class One {
     } --min-port ${this.minPort}`;
   }
 
-  _exec(command) {
+  _exec(commandIn) {
+    const command = this._createCommand(commandIn);
     return execa(command.split(' ')[0], command.split(' ').slice(1), {
       maxBuffer: 20000 * 1024,
       windowsHide: true,
     })
       .then(({ stdout }) => stdout)
       .catch((error) => {
-        throw new Error(`STDOUT:\n${stdout}\n\nSTDERR:\n${stderr}\n\nERROR:\n${error.toString()}`);
+        throw new Error(
+          `Command:\n${command}\n\nSTDOUT:\n${error.stdout}\n\nSTDERR:\n${error.stderr}\n\nERROR:\n${error.toString()}`,
+        );
       });
   }
 }
@@ -114,7 +113,9 @@ class E2EEnvironment extends NodeEnvironment {
   }
 
   async teardown() {
-    await this.global.one._teardown();
+    if (this.global.one != undefined) {
+      await this.global.one._teardown();
+    }
     await super.teardown();
   }
 

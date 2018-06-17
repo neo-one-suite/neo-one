@@ -50,7 +50,7 @@ const executeSimple = ({
     triggerType: TriggerType.Application,
     action: NULL_ACTION,
     gas: gas || utils.ZERO,
-    skipWitnessVerify: skipWitnessVerify == null ? true : skipWitnessVerify,
+    skipWitnessVerify: skipWitnessVerify == undefined ? true : skipWitnessVerify,
     persistingBlock,
     listeners,
   });
@@ -71,7 +71,7 @@ describe('execute', () => {
 
   const expectThrow = (result: ExecuteScriptsResult) => {
     expect(result.errorMessage).toBeDefined();
-    if (result.errorMessage != null) {
+    if (result.errorMessage != undefined) {
       expect(result.errorMessage.split('\n')[0]).toMatchSnapshot();
     }
     expect(result.state).toEqual(VMState.Fault);
@@ -89,7 +89,7 @@ describe('execute', () => {
   };
 
   const checkResult = (result: ExecuteScriptsResult) => {
-    if (result.errorMessage != null) {
+    if (result.errorMessage != undefined) {
       throw new Error(result.errorMessage);
     }
 
@@ -151,7 +151,7 @@ describe('execute', () => {
       if (state === VMState.Fault) {
         const { errorMessage } = result;
         expect(errorMessage).toBeDefined();
-        if (errorMessage != null) {
+        if (errorMessage != undefined) {
           expect(errorMessage.split('\n')[0]).toMatchSnapshot();
         }
       } else {
@@ -530,7 +530,7 @@ describe('execute', () => {
 
       const testTransfer = ({ count, success, gas }: { count: number; success: boolean; gas?: string }) => {
         it(`should ${success ? '' : 'not '}handle ${count} transfers${
-          gas == null ? '' : ` with ${gas} gas`
+          gas == undefined ? '' : ` with ${gas} gas`
         }`, async () => {
           await mintTokens();
           const value = new BN(10);
@@ -551,7 +551,7 @@ describe('execute', () => {
               script: sb.build(),
             }),
 
-            gas: gas == null ? undefined : neoBN(gas),
+            gas: gas == undefined ? undefined : neoBN(gas),
           });
 
           if (success) {

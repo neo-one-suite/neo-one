@@ -127,7 +127,7 @@ const executeNext = async ({
     }
     context = {
       ...context,
-      stack: _.reverse([...results]).concat(context.stack),
+      stack: _.reverse(results).concat(context.stack),
     };
   } else if (results !== undefined) {
     throw new UnknownError(context);
@@ -140,7 +140,7 @@ const executeNext = async ({
 
     context = {
       ...context,
-      stackAlt: _.reverse([...resultsAlt]).concat(context.stackAlt),
+      stackAlt: _.reverse(resultsAlt).concat(context.stackAlt),
     };
   } else if (resultsAlt !== undefined) {
     throw new UnknownError(context);
@@ -229,7 +229,7 @@ export const executeScript = async ({
     pushOnly: !!pushOnly,
     scriptHash,
     callingScriptHash,
-    entryScriptHash,
+    entryScriptHash: entryScriptHash === undefined ? scriptHash : entryScriptHash,
     pc: 0,
     depth,
     stack,

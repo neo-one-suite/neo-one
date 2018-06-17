@@ -416,7 +416,7 @@ const getNEP2Derived = async ({
       NEP2_KDFPARAMS.p,
       NEP2_KDFPARAMS.dklen,
       (error, _progress, key) => {
-        if (error !== undefined) {
+        if (error != undefined) {
           reject(error);
         } else if (key) {
           resolve(Buffer.from(key));

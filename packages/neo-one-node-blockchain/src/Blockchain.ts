@@ -784,8 +784,8 @@ export class Blockchain {
   private createWriteBlockchain(): WriteBatchBlockchain {
     return new WriteBatchBlockchain({
       settings: this.settings,
-      currentBlock: this.currentBlock,
-      currentHeader: this.currentHeader,
+      currentBlock: this.mutableCurrentBlock,
+      currentHeader: this.mutableCurrentHeader,
       storage: this.storage,
       vm: this.vm,
       getValidators: this.getValidators,

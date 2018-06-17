@@ -1065,7 +1065,7 @@ const OPCODES = ([
         args: [keys[0].publicKey, signature0],
         result: [new BooleanStackItem(true)],
         mockTransaction: ({ transaction }) => {
-          transaction.message = jest.fn(() => Buffer.alloc(32, 10));
+          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
         },
         gas: FEES.ONE_HUNDRED,
       },
@@ -1096,7 +1096,7 @@ const OPCODES = ([
         args: [[keys[0].publicKey, keys[1].publicKey], [signature0, signature1]],
         result: [new BooleanStackItem(true)],
         mockTransaction: ({ transaction }) => {
-          transaction.message = jest.fn(() => Buffer.alloc(32, 10));
+          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
         },
         gas: FEES.ONE_HUNDRED.mul(new BN(2)),
       },
@@ -1107,7 +1107,7 @@ const OPCODES = ([
 
         result: [new BooleanStackItem(true)],
         mockTransaction: ({ transaction }) => {
-          transaction.message = jest.fn(() => Buffer.alloc(32, 10));
+          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
         },
         gas: FEES.ONE_HUNDRED.mul(new BN(2)),
       },
@@ -1118,7 +1118,7 @@ const OPCODES = ([
 
         result: [new BooleanStackItem(true)],
         mockTransaction: ({ transaction }) => {
-          transaction.message = jest.fn(() => Buffer.alloc(32, 10));
+          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
         },
         gas: FEES.ONE_HUNDRED.mul(new BN(3)),
       },
@@ -1129,7 +1129,7 @@ const OPCODES = ([
 
         result: [new BooleanStackItem(true)],
         mockTransaction: ({ transaction }) => {
-          transaction.message = jest.fn(() => Buffer.alloc(32, 10));
+          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
         },
         gas: FEES.ONE_HUNDRED.mul(new BN(3)),
       },
@@ -1147,7 +1147,7 @@ const OPCODES = ([
 
         result: [new BooleanStackItem(false)],
         mockTransaction: ({ transaction }) => {
-          transaction.message = jest.fn(() => Buffer.alloc(32, 10));
+          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
         },
         gas: FEES.ONE_HUNDRED.mul(new BN(2)),
       },

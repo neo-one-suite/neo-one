@@ -55,7 +55,6 @@ export interface ExecutionContext {
     readonly run: (
       input: { readonly monitor: Monitor; readonly context: ExecutionContext },
     ) => Promise<ExecutionContext>;
-
     readonly executeScript: (
       input: {
         readonly monitor: Monitor;
@@ -68,7 +67,6 @@ export interface ExecutionContext {
       },
     ) => Promise<ExecutionContext>;
   };
-
   readonly code: Buffer;
   readonly pushOnly: boolean;
   readonly scriptHash: UInt160;

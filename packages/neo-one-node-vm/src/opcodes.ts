@@ -264,7 +264,6 @@ const OPCODE_PAIRS = [
             ...context,
             pc: context.pc + idx,
           },
-
           results: [new BufferStackItem(context.code.slice(context.pc, context.pc + idx))],
         }),
       }),

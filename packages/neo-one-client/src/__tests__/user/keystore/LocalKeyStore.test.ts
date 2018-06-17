@@ -262,7 +262,7 @@ describe('LocalKeyStore', () => {
     expect(result).toEqual(walletMain);
   });
 
-  test('construct with null network', async () => {
+  test('construct with undefined network', async () => {
     wallets = [];
     localKeyStore = new LocalKeyStore({ store });
     expect(localKeyStore.wallets).toEqual({});
@@ -302,12 +302,12 @@ describe('LocalKeyStore', () => {
     expect(localKeyStore.getCurrentAccount()).toEqual(account2);
   });
 
-  test('selectAccount with null id', async () => {
+  test('selectAccount with undefined id', async () => {
     expect(localKeyStore.getCurrentAccount()).toEqual(account1);
 
     await localKeyStore.selectAccount();
 
-    expect(localKeyStore.getCurrentAccount()).toEqual(null);
+    expect(localKeyStore.getCurrentAccount()).toEqual(undefined);
   });
 
   test('updateAccountName - unlocked wallet', async () => {
@@ -499,7 +499,7 @@ describe('LocalKeyStore', () => {
     });
   });
 
-  test('unlockWallet throws error on null nep2 & private key', async () => {
+  test('unlockWallet throws error on undefined nep2 & private key', async () => {
     const walletError = {
       account: account1,
       privateKey: undefined,
@@ -514,7 +514,7 @@ describe('LocalKeyStore', () => {
         id: id1,
         password: 'pass',
       }),
-    ).rejects.toThrow(new Error('Unexpected error, privateKey and NEP2 were both null.') as any);
+    ).rejects.toThrow('Unexpected error, privateKey and NEP2 were both undefined.');
   });
 
   test('lockWallet', async () => {
@@ -529,7 +529,7 @@ describe('LocalKeyStore', () => {
     expect(localKeyStore.wallets).toEqual({ net1: { addr1: walletUpdated } });
   });
 
-  test('lockWallet - null nep2 or privateKey - already locked', async () => {
+  test('lockWallet - undefined nep2 or privateKey - already locked', async () => {
     const walletUpdated: LockedWallet = {
       type: 'locked',
       account: account1,

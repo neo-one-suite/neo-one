@@ -5,5 +5,5 @@ export default function(
   r: number,
   p: number,
   dklen: number,
-  callback: (error: Error | undefined, progress: number, key: Array<number> | undefined) => void,
+  callback: (error: Error | undefined | null, progress: number, key: Array<number> | undefined) => void,
 ): void;

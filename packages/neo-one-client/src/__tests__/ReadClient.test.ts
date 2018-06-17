@@ -127,7 +127,7 @@ describe('ReadClient', () => {
 
       provider[providerMethod] = jest.fn(() => expected);
 
-      const result = (readClient as any)[method](...args);
+      const result = await (readClient as any)[method](...args);
 
       expect(result).toEqual(expected);
     });

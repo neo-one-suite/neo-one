@@ -11,8 +11,8 @@ describe('JSONRPCHTTPProvider', () => {
   const expectedReq = {
     jsonrpc: '2.0',
     id: 1,
-    params: [],
     ...req,
+    params: [],
   };
 
   let provider = new JSONRPCHTTPProvider(endpoint);

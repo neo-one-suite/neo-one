@@ -33,7 +33,7 @@ describe('createSmartContract', () => {
     const abi = abis.abi([func]);
     const definition = { networks, abi };
     // @ts-ignore
-    client.getCurrentAccount = jest.fn(() => null);
+    client.getCurrentAccount = jest.fn(() => undefined);
 
     const smartContract = createSmartContract({ definition, client });
 
@@ -78,7 +78,7 @@ describe('createSmartContract', () => {
     verifyMocks();
   });
 
-  test('createCall - null params', async () => {
+  test('createCall - undefined params', async () => {
     const expected = '10';
     const func = {
       name: 'funcName',
@@ -163,7 +163,7 @@ describe('createSmartContract', () => {
     verifyMocks();
   });
 
-  test('createInvoke null events & params', async () => {
+  test('createInvoke undefined events & params', async () => {
     const func = {
       name: 'funcName',
       constant: false,

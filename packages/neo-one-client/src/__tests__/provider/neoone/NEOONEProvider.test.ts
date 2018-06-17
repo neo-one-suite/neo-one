@@ -114,7 +114,7 @@ describe('NEOONEProvider', () => {
     // eslint-disable-next-line
     test(method, async () => {
       // @ts-ignore
-      provider.providers[network][method] = jest.fn(() => expected);
+      provider.mutableProviders[network][method] = jest.fn(() => expected);
       // @ts-ignore
       const result = await provider[method](...args);
       expect(result).toEqual(expected);

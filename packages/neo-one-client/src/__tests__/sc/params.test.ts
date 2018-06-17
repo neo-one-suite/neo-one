@@ -102,6 +102,6 @@ describe('params', () => {
   test('Void param', () => {
     const result = params.Void(undefined, (abis.parameters as any).Void);
 
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 });

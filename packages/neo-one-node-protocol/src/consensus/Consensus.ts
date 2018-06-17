@@ -78,10 +78,7 @@ export class Consensus {
         return options;
       }),
       mergeScanLatest<InternalOptions, void>(async (_, options) => {
-        this.mutableStartPromise = this.start(options).then(() => {
-          this.mutableStartPromise = undefined;
-        });
-        await this.mutableStartPromise;
+        await this.doStart(options);
       }),
       finalize(async () => {
         await this.pause();
@@ -149,7 +146,20 @@ export class Consensus {
 
   public async resume(): Promise<void> {
     const options = await this.options$.pipe(take(1)).toPromise();
-    this.mutableStartPromise = this.start(options);
+    // tslint:disable-next-line no-floating-promises
+    this.doStart(options);
+  }
+
+  private async doStart(options: InternalOptions): Promise<void> {
+    let completed = false;
+    const mutableStartPromise = this.start(options).then(() => {
+      completed = true;
+      this.mutableStartPromise = undefined;
+    });
+    if (!completed) {
+      this.mutableStartPromise = mutableStartPromise;
+      await this.mutableStartPromise;
+    }
   }
 
   private async start(options: InternalOptions): Promise<void> {

@@ -1,10 +1,21 @@
 {
+  "globals": {
+    "ts-jest": {
+      "useBabelrc": true
+    }
+  },
+  "moduleFileExtensions": [
+    "ts",
+    "tsx",
+    "js",
+    "jsx",
+    "json",
+    "node"
+  ],  
   "testEnvironment": "./scripts/e2e/Environment",
   "testPathIgnorePatterns": [
     "/node_modules/",
-    "<rootDir>/decls/.*",
-    "<rootDir>/packages/neo-one-node-neo-settings/src/test.js",
-    "<rootDir>/migrate/.*",
+    "<rootDir>/packages/neo-one-node-neo-settings/src/test.ts",
     "<rootDir>/packages/.*/template/.*",
     "<rootDir>/packages/.*/__tests__/.*"
   ],
@@ -13,5 +24,13 @@
     "./scripts/serializers/bn.js",
     "./scripts/serializers/buffer.js"
   ],
-  "setupTestFrameworkScriptFile": "./scripts/e2e/jestSetup.js"
+  "setupTestFrameworkScriptFile": "./scripts/e2e/jestSetup.js",
+  "transform": {
+    "^.+\\.tsx?$": "ts-jest"
+  },
+  "transformIgnorePatterns": [
+    "<rootDir>/node_modules/(?!ix)",
+    "<rootDir>/packages/.*/dist/.*"
+  ],  
+  "testRegex": "(/__e2e__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$"
 }

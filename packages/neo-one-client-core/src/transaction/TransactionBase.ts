@@ -207,7 +207,7 @@ export abstract class TransactionBase<
     },
   );
   private readonly getReferencesInternal = utils.lazyAsync(async ({ getOutput }: GetReferencesOptions) =>
-    Promise.all(this.inputs.map(getOutput)),
+    Promise.all(this.inputs.map(async (input) => getOutput(input))),
   );
   private readonly getTransactionResultsInternal = utils.lazyAsync(
     async ({ getOutput }: GetTransactionResultsOptions): Promise<{ readonly [K in string]?: BN }> => {

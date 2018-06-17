@@ -2,6 +2,7 @@ import { keys } from '../../__data__';
 import { common } from '../../common';
 import { crypto } from '../../crypto';
 
+// tslint:disable-next-line no-loop-statement
 for (const key of keys) {
   const { address, privateKey, publicKey, wif, password, encryptedWIF, scriptHash, name } = key;
 

@@ -218,8 +218,7 @@ export const rpcServer$ = ({
           ),
         undefined,
       ),
-      // tslint:disable-next-line no-any
-      finalize<any>(finalizeServer),
+      finalize<HandleServerResult<http.Server | https.Server> | undefined>(finalizeServer),
     );
   }
 
