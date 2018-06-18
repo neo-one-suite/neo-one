@@ -6,6 +6,9 @@ Array [
     "fakeEnd",
     Object {
       "body": "{\\"logs\\":[{\\"name\\":\\"log1\\",\\"level\\":\\"info\\",\\"message\\":\\"test1\\",\\"labels\\":{\\"label1\\":10},\\"data\\":{\\"data1\\":\\"20\\"}}],\\"metrics\\":{\\"counters\\":{\\"http_report_metrics_requests_total\\":{\\"metric\\":{\\"name\\":\\"http_report_metrics_requests_total\\"},\\"values\\":[{\\"countOrLabels\\":0}]},\\"http_report_metrics_failures_total\\":{\\"metric\\":{\\"name\\":\\"http_report_metrics_failures_total\\"},\\"values\\":[{\\"countOrLabels\\":0}]},\\"counter1\\":{\\"metric\\":{\\"name\\":\\"counter1\\",\\"help\\":\\"helpCount\\",\\"labelNames\\":[\\"label1\\",\\"label2\\"]},\\"values\\":[{\\"countOrLabels\\":5},{\\"countOrLabels\\":4}]}},\\"histograms\\":{}}}",
+      "headers": Object {
+        "content-type": "application/json",
+      },
       "method": "POST",
     },
   ],
@@ -13,6 +16,9 @@ Array [
     "fakeEnd",
     Object {
       "body": "{\\"logs\\":[],\\"metrics\\":{\\"counters\\":{\\"http_report_metrics_requests_total\\":{\\"metric\\":{\\"name\\":\\"http_report_metrics_requests_total\\"},\\"values\\":[{}]},\\"http_report_metrics_failures_total\\":{\\"metric\\":{\\"name\\":\\"http_report_metrics_failures_total\\"},\\"values\\":[{}]},\\"counter1\\":{\\"metric\\":{\\"name\\":\\"counter1\\",\\"help\\":\\"helpCount\\",\\"labelNames\\":[\\"label1\\",\\"label2\\"]},\\"values\\":[]}},\\"histograms\\":{\\"histogram1\\":{\\"metric\\":{\\"name\\":\\"histogram1\\",\\"help\\":\\"helpHist\\",\\"labelNames\\":[\\"histLabel1\\",\\"histLabel2\\"]},\\"values\\":[{\\"countOrLabels\\":{\\"histLabel1\\":14},\\"count\\":3}]}}}}",
+      "headers": Object {
+        "content-type": "application/json",
+      },
       "method": "POST",
     },
   ],
@@ -25,6 +31,9 @@ Array [
     "fakeEnd",
     Object {
       "body": "{\\"logs\\":[{\\"name\\":\\"log1\\",\\"level\\":\\"info\\",\\"message\\":\\"test1\\",\\"labels\\":{\\"label1\\":10},\\"data\\":{\\"data1\\":\\"20\\"}}],\\"metrics\\":{\\"counters\\":{\\"http_report_metrics_requests_total\\":{\\"metric\\":{\\"name\\":\\"http_report_metrics_requests_total\\"},\\"values\\":[{\\"countOrLabels\\":0}]},\\"http_report_metrics_failures_total\\":{\\"metric\\":{\\"name\\":\\"http_report_metrics_failures_total\\"},\\"values\\":[{\\"countOrLabels\\":0}]},\\"counter1\\":{\\"metric\\":{\\"name\\":\\"counter1\\",\\"help\\":\\"helpCount\\",\\"labelNames\\":[\\"label1\\",\\"label2\\"]},\\"values\\":[{\\"countOrLabels\\":5},{\\"countOrLabels\\":4}]}},\\"histograms\\":{}}}",
+      "headers": Object {
+        "content-type": "application/json",
+      },
       "method": "POST",
     },
   ],
@@ -32,6 +41,9 @@ Array [
     "fakeEnd",
     Object {
       "body": "{\\"logs\\":[],\\"metrics\\":{\\"counters\\":{\\"http_report_metrics_requests_total\\":{\\"metric\\":{\\"name\\":\\"http_report_metrics_requests_total\\"},\\"values\\":[{}]},\\"http_report_metrics_failures_total\\":{\\"metric\\":{\\"name\\":\\"http_report_metrics_failures_total\\"},\\"values\\":[]},\\"counter1\\":{\\"metric\\":{\\"name\\":\\"counter1\\",\\"help\\":\\"helpCount\\",\\"labelNames\\":[\\"label1\\",\\"label2\\"]},\\"values\\":[]}},\\"histograms\\":{\\"histogram1\\":{\\"metric\\":{\\"name\\":\\"histogram1\\",\\"help\\":\\"helpHist\\",\\"labelNames\\":[\\"histLabel1\\",\\"histLabel2\\"]},\\"values\\":[{\\"countOrLabels\\":{\\"histLabel1\\":14},\\"count\\":3}]}}}}",
+      "headers": Object {
+        "content-type": "application/json",
+      },
       "method": "POST",
     },
   ],
