@@ -30,7 +30,7 @@
   "typings": "./src/index.ts",
   "browser": {
     "./dist/index.js": "./dist/index.browser.js",
-    "./dist/index.es.js": "./dist/index.browser.es.js"
+    "./dist/index.mjs": "./dist/index.browser.mjs"
   },
   "engines": {
     "node": ">=10.4.1"
