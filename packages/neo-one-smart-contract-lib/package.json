@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@neo-one/client": "^1.0.0-alpha.58",
-    "app-root-dir": "^1.0.2",
-    "bignumber.js": "^7.2.1"
+    "app-root-dir": "1.0.2",
+    "bignumber.js": "7.2.1"
   }
 }
