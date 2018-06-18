@@ -50,7 +50,7 @@ export class StorageContextStackItem extends StackItemBase {
     return new StorageContextStackItem(this.value, true);
   }
 
-  public toContractParameter(): ContractParameter {
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new Hash160ContractParameter(this.value);
   }
 }

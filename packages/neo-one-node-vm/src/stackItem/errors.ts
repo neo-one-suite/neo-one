@@ -8,6 +8,14 @@ export class InvalidValueArrayError extends CustomError {
   }
 }
 
+export class CircularReferenceError extends CustomError {
+  public readonly code = 'CIRCULAR_REFERENCE_ERROR';
+
+  public constructor() {
+    super('Circular Reference Error');
+  }
+}
+
 export class InvalidValueBufferError extends CustomError {
   public readonly code = 'INVALID_VALUE_BUFFER';
 

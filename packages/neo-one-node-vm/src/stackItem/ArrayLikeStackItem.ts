@@ -1,6 +1,6 @@
 // tslint:disable readonly-array
 import { ArrayContractParameter, BinaryWriter, ContractParameter } from '@neo-one/client-core';
-import { InvalidValueBufferError } from './errors';
+import { CircularReferenceError, InvalidValueBufferError } from './errors';
 import { StackItem } from './StackItem';
 import { StackItemBase } from './StackItemBase';
 import { StackItemType } from './StackItemType';
@@ -50,8 +50,14 @@ export class ArrayLikeStackItem extends StackItemBase {
     throw new InvalidValueBufferError();
   }
 
-  public toContractParameter(): ContractParameter {
-    return new ArrayContractParameter(this.value.map((val) => val.toContractParameter()));
+  public toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
+    if (seen.has(this)) {
+      throw new CircularReferenceError();
+    }
+    const newSeen = new Set([...seen]);
+    newSeen.add(this);
+
+    return new ArrayContractParameter(this.value.map((val) => val.toContractParameter(newSeen)));
   }
 
   public get size(): number {

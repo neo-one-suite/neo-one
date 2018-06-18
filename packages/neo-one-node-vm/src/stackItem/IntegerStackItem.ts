@@ -87,7 +87,7 @@ export class IntegerStackItem extends StackItemBase {
     throw new InvalidValueStorageContextStackItemError();
   }
 
-  public toContractParameter(): ContractParameter {
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new IntegerContractParameter(this.value);
   }
 }
