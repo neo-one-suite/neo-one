@@ -1,10 +1,11 @@
-import { Storage } from '@google-cloud/storage';
+import Storage from '@google-cloud/storage';
 import { Monitor } from '@neo-one/monitor';
 import path from 'path';
 import { Environment } from '../types';
 import { extract } from './extract';
 import { Provider } from './Provider';
 import { upload } from './upload';
+
 export interface Options {
   readonly projectID: string;
   readonly bucket: string;
@@ -24,7 +25,7 @@ export class GCloudProvider extends Provider {
 
   public async canRestore(): Promise<boolean> {
     const { projectID, bucket, file } = this.options;
-    const storage = new Storage({ projectId: projectID });
+    const storage = Storage({ projectId: projectID });
     const result = await storage
       .bucket(bucket)
       .file(file)
@@ -39,7 +40,7 @@ export class GCloudProvider extends Provider {
     const { dataPath, tmpPath } = this.environment;
     const downloadPath = path.resolve(tmpPath, 'storage.db.tar.gz');
 
-    const storage = new Storage({ projectId: projectID });
+    const storage = Storage({ projectId: projectID });
     await monitor.captureSpanLog(
       async () =>
         storage
@@ -69,7 +70,7 @@ export class GCloudProvider extends Provider {
     const { projectID, bucket, file } = this.options;
     const { dataPath } = this.environment;
 
-    const storage = new Storage({ projectId: projectID });
+    const storage = Storage({ projectId: projectID });
 
     await monitor.captureSpanLog(
       async () =>
