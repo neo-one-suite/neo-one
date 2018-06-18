@@ -1,8 +1,8 @@
 // tslint:disable no-import-side-effect
 import '@babel/polyfill';
-import appRootDir from 'app-root-dir';
+import * as appRootDir from 'app-root-dir';
 import * as fs from 'fs-extra';
-import path from 'path';
+import * as path from 'path';
 import { BLOCKCHAIN_INTERFACES, SYSCALLS, TYPE_ALIASES } from '../compile/syscalls';
 
 const run = async () => {
