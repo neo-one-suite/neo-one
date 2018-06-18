@@ -17,7 +17,11 @@ export const createTracer = (tracer: opentracing.Tracer = new opentracing.Tracer
     startSpan: (name, options): TracerSpan => tracer.startSpan(name, options as any) as any,
     childOf: (span): TracerReference => opentracing.childOf(getSpan(span)) as any,
     followsFrom: (span): TracerReference => opentracing.followsFrom(getSpan(span)) as any,
-    extract: (format, carrier): SpanContext | null => tracer.extract(format, carrier) as any,
+    extract: (format, carrier): SpanContext | undefined => {
+      const result = tracer.extract(format, carrier) as any;
+
+      return result == undefined ? undefined : result;
+    },
     inject: (context, format, carrier): void => tracer.inject(context, format, carrier),
     close: (callback) => {
       if ((tracer as any).close == undefined) {

@@ -6,12 +6,14 @@ describe('exported api', () => {
     'ReadClient',
     'DeveloperClient',
     // ./user
+    'LocalWallet',
     'LocalUserAccountProvider',
     'LocalKeyStore',
     'LocalMemoryStore',
     'LocalStringStore',
     'NEOONEDataProvider',
     'NEOONEProvider',
+    'UnlockedWallet',
     'disassembleByteCode',
     'abi',
     // ./helpers

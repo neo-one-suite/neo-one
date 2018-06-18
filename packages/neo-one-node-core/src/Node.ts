@@ -14,5 +14,5 @@ export interface Node {
   readonly relayTransaction: (transaction: Transaction, throwVerifyError?: boolean) => Promise<void>;
   readonly connectedPeers: ReadonlyArray<Endpoint>;
   readonly memPool: { readonly [hash: string]: Transaction };
-  readonly consensus: Consensus | null;
+  readonly consensus: Consensus | undefined;
 }

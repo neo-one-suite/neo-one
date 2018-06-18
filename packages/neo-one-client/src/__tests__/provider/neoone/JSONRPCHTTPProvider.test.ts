@@ -1,9 +1,9 @@
-import fetch from 'isomorphic-fetch';
+import fetch from 'cross-fetch';
 import { UnknownBlockError } from '../../../errors';
 import { HTTPError, InvalidRPCResponseError, JSONRPCError } from '../../../provider/neoone/errors';
 import { JSONRPCHTTPProvider } from '../../../provider/neoone/JSONRPCHTTPProvider';
 
-jest.mock('isomorphic-fetch');
+jest.mock('cross-fetch');
 
 describe('JSONRPCHTTPProvider', () => {
   const endpoint = 'foobar';
@@ -11,8 +11,8 @@ describe('JSONRPCHTTPProvider', () => {
   const expectedReq = {
     jsonrpc: '2.0',
     id: 1,
-    params: [],
     ...req,
+    params: [],
   };
 
   let provider = new JSONRPCHTTPProvider(endpoint);

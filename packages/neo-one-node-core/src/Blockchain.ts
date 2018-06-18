@@ -49,12 +49,12 @@ import { ValidatorsCount, ValidatorsCountUpdate } from './ValidatorsCount';
 
 export interface ReadMetadataStorage<Value> {
   readonly get: () => Promise<Value>;
-  readonly tryGet: () => Promise<Value | null>;
+  readonly tryGet: () => Promise<Value | undefined>;
 }
 
 export interface ReadStorage<Key, Value> {
   readonly get: (key: Key) => Promise<Value>;
-  readonly tryGet: (key: Key) => Promise<Value | null>;
+  readonly tryGet: (key: Key) => Promise<Value | undefined>;
 }
 
 export interface ReadAllStorage<Key, Value> extends ReadStorage<Key, Value> {
@@ -62,7 +62,7 @@ export interface ReadAllStorage<Key, Value> extends ReadStorage<Key, Value> {
 }
 
 export interface ReadGetAllStorage<Key, PartialKey, Value> extends ReadStorage<Key, Value> {
-  readonly getAll: (key: PartialKey) => Observable<Value>;
+  readonly getAll$: (key: PartialKey) => Observable<Value>;
 }
 
 export interface AddMetadataStorage<Value> {

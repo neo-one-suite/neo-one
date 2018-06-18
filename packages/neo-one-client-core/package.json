@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-core",
-  "version": "1.0.0-alpha.41",
+  "version": "1.0.0-alpha.43",
   "keywords": [
     "neo",
     "NEO",
@@ -26,23 +26,23 @@
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
   "main": "./dist/index.js",
-  "module": "./dist/index.es.js",
+  "module": "./dist/index.mjs",
   "typings": "./src/index.ts",
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
     "@neo-one/ec-key": "^0.0.3",
-    "@neo-one/utils": "^1.0.0-alpha.35",
+    "@neo-one/utils": "^1.0.0-alpha.37",
     "bignumber.js": "^7.2.1",
     "bn.js": "^4.11.8",
     "bs58": "^4.0.1",
     "buffer-xor": "^2.0.2",
     "elliptic": "^6.4.0",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.10",
     "scrypt-js": "^2.0.3",
     "wif": "^2.0.6"
   }

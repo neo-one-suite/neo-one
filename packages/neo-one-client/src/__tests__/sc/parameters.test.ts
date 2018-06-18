@@ -41,14 +41,14 @@ describe('parameters', () => {
     });
 
     test('nullable parameter', () => {
-      const result = parameters.String(null as any, (abis.parameters as any).String);
+      const result = parameters.String(undefined as any, (abis.parameters as any).String);
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
     });
 
     test('nullable abi', () => {
-      const result = parameters.Array(null as any, (abis.returns as any).Array);
-      expect(result).toBeNull();
+      const result = parameters.Array(undefined as any, (abis.returns as any).Array);
+      expect(result).toBeUndefined();
     });
   });
 

@@ -1,26 +1,20 @@
-module.exports = ({ modules, useBuiltIns, targets, typescript }) => ({
+module.exports = ({ modules, useBuiltIns, targets }) => ({
   presets: [
-    typescript ? '@babel/preset-typescript' : null,
     [
       '@babel/preset-env',
       {
-        useBuiltIns: useBuiltIns == null ? false : useBuiltIns,
+        useBuiltIns: useBuiltIns == undefined ? false : useBuiltIns,
         modules,
-        targets: targets == null ? { node: '8.9.0' } : targets,
+        targets: targets == undefined ? { node: '10.4.1' } : targets,
       },
     ],
-  ].filter(Boolean),
+  ],
   plugins: [
     '@babel/plugin-proposal-async-generator-functions',
-    typescript
-      ? null
-      : [
-          '@babel/plugin-transform-flow-strip-types',
-          { requireDirective: true },
-        ],
     '@babel/plugin-proposal-class-properties',
-    '@babel/plugin-proposal-object-rest-spread',
-    '@babel/plugin-proposal-export-namespace-from',
+    targets == undefined || (typeof targets === 'object' && targets.node != undefined)
+      ? undefined
+      : ['@babel/plugin-proposal-object-rest-spread'],
     '@babel/plugin-proposal-optional-catch-binding',
   ].filter(Boolean),
 });

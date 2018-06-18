@@ -274,4 +274,5 @@ export const common = {
   fixed8ToDecimal,
   fixedFromDecimal,
   fixedToDecimal,
+  reverse,
 };

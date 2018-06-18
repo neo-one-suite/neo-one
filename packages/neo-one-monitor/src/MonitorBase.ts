@@ -57,7 +57,7 @@ export interface Tracer {
   readonly startSpan: (name: string, options?: TracerStartSpanOptions) => TracerSpan;
   readonly childOf: (span: SpanContext | TracerSpan) => TracerReference;
   readonly followsFrom: (span: SpanContext | TracerSpan) => TracerReference;
-  readonly extract: (format: Format, carrier: Carrier) => SpanContext | null;
+  readonly extract: (format: Format, carrier: Carrier) => SpanContext | undefined;
   readonly inject: (context: SpanContext, format: Format, carrier: Carrier) => void;
   readonly close: (callback: () => void) => void;
 }
@@ -144,7 +144,7 @@ interface CommonLogOptions {
 
   readonly error?: {
     readonly metric?: Counter;
-    readonly error?: Error | null;
+    readonly error?: Error | undefined;
     readonly message?: string;
     readonly level?: LogLevel;
   };
@@ -226,7 +226,7 @@ export class MonitorBase implements Span {
     }
     const errorObjFinal = errorObj;
     const log = cloned ? this : this.clone();
-    const doLog = (error?: Error | null) =>
+    const doLog = (error?: Error | undefined) =>
       log.commonLog({
         name: options.name,
         message: options.message,
@@ -437,7 +437,7 @@ export class MonitorBase implements Span {
     return new FollowsFromReference(span as any) as any;
   }
 
-  public extract(format: Format, carrier: Carrier): SpanContext | null {
+  public extract(format: Format, carrier: Carrier): SpanContext | undefined {
     return this.tracer.extract(format, carrier);
   }
 
@@ -553,7 +553,7 @@ export class MonitorBase implements Span {
         [KnownLabel.ERROR_KIND]: this.getErrorKind(errorObj),
       };
       const errorLevel = error.level === undefined ? 'error' : error.level;
-      if (errorObj != undefined) {
+      if (errorObj !== undefined) {
         incrementMetric(error.metric);
         logLevel = errorLevel;
         const { message: errorMessage } = error;
@@ -587,7 +587,7 @@ export class MonitorBase implements Span {
         };
         if (error !== undefined) {
           const { error: errorObj } = error;
-          if (errorObj != undefined) {
+          if (errorObj !== undefined) {
             spanLog = {
               ...spanLog,
               [this.labels.ERROR_OBJECT]: errorObj,
@@ -601,8 +601,8 @@ export class MonitorBase implements Span {
     }
   }
 
-  private getErrorKind(error?: Error | null): string {
-    if (error == undefined) {
+  private getErrorKind(error?: Error | undefined): string {
+    if (error === undefined) {
       return 'n/a';
     }
 
@@ -658,7 +658,7 @@ export class MonitorBase implements Span {
         const tagLabels = convertTagLabels(labels);
         Object.keys(tagLabels).forEach((key) => {
           const value = tagLabels[key];
-          if (value != undefined) {
+          if (value !== undefined) {
             tracerSpan.setTag(key, value);
           }
         });

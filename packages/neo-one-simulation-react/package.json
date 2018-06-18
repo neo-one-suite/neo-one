@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/simulation-react",
-  "version": "1.0.0-alpha.17",
+  "version": "1.0.0-alpha.18",
   "keywords": [
     "neo",
     "NEO",
@@ -31,9 +31,9 @@
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
   "main": "./dist/index.js",
-  "module": "./dist/index.es.js",
+  "module": "./dist/index.mjs",
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   },
   "publishConfig": {
     "access": "public"
@@ -42,7 +42,8 @@
     "neo-one-simulation-react-post-create": "./dist/bin/post-create"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.0.0-beta.44",
-    "@neo-one/simulation-utils": "^1.0.0-alpha.9"
-  }
+    "@babel/polyfill": "^7.0.0-beta.51",
+    "@neo-one/simulation-utils": "^1.0.0-alpha.10"
+  },
+  "noCompile": true
 }

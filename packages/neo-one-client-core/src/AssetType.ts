@@ -1,5 +1,4 @@
 import { CustomError } from '@neo-one/utils';
-import _ from 'lodash';
 
 export enum AssetType {
   CreditFlag = 0x40,
@@ -68,7 +67,4 @@ export const assertAssetTypeJSON = (type: string): AssetTypeJSON => {
   return type;
 };
 
-// tslint:disable-next-line variable-name no-any
-const JSONToAssetType: { [K in AssetTypeJSON]: AssetType } = _.invert(AssetType) as any;
-
-export const toAssetType = (type: AssetTypeJSON): AssetType => JSONToAssetType[type];
+export const toAssetType = (type: AssetTypeJSON): AssetType => AssetType[type];

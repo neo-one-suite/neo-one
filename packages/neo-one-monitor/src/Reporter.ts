@@ -73,6 +73,7 @@ export class Reporter {
   private async report(report: Report): Promise<Response> {
     return fetch(this.endpoint, {
       method: 'POST',
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify(report),
     });
   }

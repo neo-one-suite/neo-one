@@ -1,7 +1,6 @@
 environment:
   matrix:
-    - nodejs_version: "8.9.0"
-    - nodejs_version: "9"
+    - nodejs_version: "10.4.1"
 
 branches:
   only:
@@ -13,7 +12,8 @@ init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 install:
-  - ps: Install-Product node $env:nodejs_version x64
+  # - ps: Install-Product node $env:nodejs_version x64
+  - ps: Update-NodeJsInstallation $env:nodejs_version x64
   - node --version
   - yarn --version
   - yarn install --non-interactive --frozen-lockfile
@@ -24,8 +24,8 @@ cache:
   - "%LOCALAPPDATA%\\Yarn"
 
 test_script:
-  - yarn run test --verbose
-  - yarn run e2e --verbose
+  - yarn run test-ci --verbose
+  - yarn run e2e-ci --verbose
 
 # Don't actually build.
 build: off

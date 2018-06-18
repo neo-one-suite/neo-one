@@ -29,10 +29,7 @@ export const setupClient = async (client) => {
 export const getContracts = (client) => {
   const contracts = {};
   for (const name of Object.keys(config.deployedContracts)) {
-    contracts[name] = client.smartContract(
-      config.deployedContracts[name].hash,
-      config.deployedContracts[name].abi,
-    );
+    contracts[name] = client.smartContract(config.deployedContracts[name].hash, config.deployedContracts[name].abi);
   }
 
   return contracts;

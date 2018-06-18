@@ -24,7 +24,7 @@ export type LogField =
   | 'stack';
 
 export type Label = string;
-export type LabelValue = string | number | boolean | void | null;
+export type LabelValue = string | number | boolean | void | undefined;
 export interface Labels {
   readonly [label: string]: LabelValue;
 }
@@ -254,7 +254,7 @@ export interface LogOptions {
 
   readonly error?: {
     readonly metric?: Counter;
-    readonly error?: Error | null;
+    readonly error?: Error | undefined;
     readonly message?: string;
     readonly level?: LogLevel;
   };
@@ -367,7 +367,7 @@ export interface Monitor {
   readonly followsFrom: <T extends SpanContext | Monitor | undefined>(
     span: T,
   ) => T extends undefined ? undefined : Reference;
-  readonly extract: (format: Format, carrier: Carrier) => SpanContext | null;
+  readonly extract: (format: Format, carrier: Carrier) => SpanContext | undefined;
   readonly inject: (format: Format, carrier: Carrier) => void;
 
   // Equivalent of performance.now() in the browser and perf_hooks in node
@@ -400,7 +400,7 @@ export interface LoggerLogOptions {
   readonly message?: string;
   readonly labels?: Labels;
   readonly data?: Labels;
-  readonly error?: Error | null;
+  readonly error?: Error | undefined;
 }
 
 export interface Logger {

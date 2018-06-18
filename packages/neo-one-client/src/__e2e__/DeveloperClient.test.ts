@@ -12,43 +12,54 @@ import { LocalMemoryStore } from '../user/keystore/LocalMemoryStore';
 import { LocalUserAccountProvider } from '../user/LocalUserAccountProvider';
 
 interface WalletInfo {
-  privateKey: string;
-  accountID: UserAccountID;
+  readonly privateKey: string;
+  readonly accountID: UserAccountID;
 }
 
 interface SetupClientsReturn {
-  developerClient: DeveloperClient;
-  client: Client<any>;
-  keystore: LocalKeyStore;
-  master: WalletInfo;
+  readonly developerClient: DeveloperClient;
+  readonly client: Client;
+  readonly keystore: LocalKeyStore;
+  readonly master: WalletInfo;
+}
+
+function expectNotNull<T>(value: T | null | undefined): T {
+  if (value == undefined) {
+    expect(value).toBeTruthy();
+    throw new Error('For TS');
+  }
+
+  return value;
 }
 
 async function getWalletInfo({
   walletName,
   networkName,
 }: {
-  walletName: string;
-  networkName: string;
+  readonly walletName: string;
+  readonly networkName: string;
 }): Promise<WalletInfo> {
   const output = await one.execute(`describe wallet ${walletName} --network ${networkName} --json`);
 
-  const description = one.parseJSON(output);
+  const wallet = one.parseJSON(output);
 
   return {
-    privateKey: description[3][1],
+    // tslint:disable-next-line no-any
+    privateKey: expectNotNull(wallet.find((value: any) => value[0] === 'Private Key'))[1],
     accountID: {
       network: networkName,
-      address: description[5][1],
+      // tslint:disable-next-line no-any
+      address: expectNotNull(wallet.find((value: any) => value[0] === 'Address'))[1],
     },
   };
 }
 
 async function setupNetwork(networkName: string): Promise<string> {
   await one.execute(`create network ${networkName}`);
-  await new Promise((resolve) => setTimeout(resolve, 10000));
   const output = await one.execute(`describe network ${networkName} --json`);
 
   const description = one.parseJSON(output);
+
   return description[3][1].table[1][3];
 }
 
@@ -57,9 +68,9 @@ async function addWallet({
   keystore,
   networkName,
 }: {
-  walletName: string;
-  keystore: LocalKeyStore;
-  networkName: string;
+  readonly walletName: string;
+  readonly keystore: LocalKeyStore;
+  readonly networkName: string;
 }): Promise<WalletInfo> {
   if (walletName !== 'master') {
     await one.execute(`create wallet ${walletName} --network ${networkName}`);
@@ -113,57 +124,47 @@ async function setupTransaction({
   master,
   wallet,
 }: {
-  client: Client<any>;
-  master: WalletInfo;
-  wallet: WalletInfo;
+  readonly client: Client;
+  readonly master: WalletInfo;
+  readonly wallet: WalletInfo;
 }): Promise<TransactionResult<TransactionReceipt>> {
-  const transaction = await client.transfer(new BigNumber(1000), common.NEO_ASSET_HASH, wallet.accountID.address, {
+  return client.transfer(new BigNumber(1000), common.NEO_ASSET_HASH, wallet.accountID.address, {
     from: master.accountID,
   });
-
-  return transaction;
 }
 
 async function checkWalletBalance({
   walletName,
   networkName,
 }: {
-  walletName: string;
-  networkName: string;
+  readonly walletName: string;
+  readonly networkName: string;
 }): Promise<void> {
   const walletOutput = await one.execute(`describe wallet ${walletName} --network ${networkName} --json`);
 
   const walletDescribe = one.parseJSON(walletOutput);
-  expect(walletDescribe[7][1].table[1][1]).toEqual('1000');
+  expect(walletDescribe[8][1].table[1][1]).toEqual('1000');
 }
 
 async function confirmTransaction(transaction: TransactionResult<TransactionReceipt>): Promise<void> {
-  let done = false;
-  await Promise.all([
-    transaction.confirmed().then(() => {
-      done = true;
-    }),
-    new Promise((resolve, reject) =>
-      setTimeout(() => {
-        if (done) {
-          resolve();
-        } else {
-          reject(new Error('Timed out'));
-        }
-      }, 2000),
-    ),
-  ]);
+  await transaction.confirmed({ timeoutMS: 2000 });
 }
 
-async function getBlockTimes({ client, networkName }: { client: Client<any>; networkName: string }): Promise<number[]> {
+async function getBlockTimes({
+  client,
+  networkName,
+}: {
+  readonly client: Client;
+  readonly networkName: string;
+}): Promise<ReadonlyArray<number>> {
   const blockCount = await client.read(networkName).getBlockCount();
   const indices = _.range(1, blockCount);
-  const blocks = await Promise.all(indices.map((i) => client.read(networkName).getBlock(i)));
+  const blocks = await Promise.all(indices.map(async (i) => client.read(networkName).getBlock(i)));
 
   return blocks.map((block) => block.time);
 }
 
-describe('DeverloperClient', () => {
+describe('DeveloperClient', () => {
   test('runConsensusNow', async () => {
     const networkName = 'e2e-1';
     const walletName = 'wallet-1';
@@ -188,9 +189,9 @@ describe('DeverloperClient', () => {
     const wallet = await addWallet({ walletName, keystore, networkName });
 
     await developerClient.updateSettings({ secondsPerBlock: 1 });
-    await new Promise((resolve) => setTimeout(resolve, 15000));
-    const transaction = await setupTransaction({ client, master, wallet });
+    await developerClient.reset();
 
+    const transaction = await setupTransaction({ client, master, wallet });
     await confirmTransaction(transaction);
 
     await checkWalletBalance({ walletName, networkName });
@@ -204,14 +205,15 @@ describe('DeverloperClient', () => {
     const { developerClient, client } = await setupClients(networkName);
 
     await developerClient.updateSettings({ secondsPerBlock });
-    await new Promise((resolve) => setTimeout(resolve, 15000));
+    await developerClient.reset();
+    await new Promise<void>((resolve) => setTimeout(resolve, 5000));
 
     await developerClient.fastForwardOffset(offsetSeconds);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise<void>((resolve) => setTimeout(resolve, 5000));
 
     const times = await getBlockTimes({ client, networkName });
-
     let offsetFound = false;
+    // tslint:disable-next-line no-loop-statement
     for (let i = 0; i < times.length - 1; i += 1) {
       const offset = times[i + 1] - times[i];
       if (offset >= offsetSeconds) {
@@ -230,16 +232,15 @@ describe('DeverloperClient', () => {
     const { developerClient, client } = await setupClients(networkName);
 
     await developerClient.updateSettings({ secondsPerBlock });
-    await new Promise((resolve) => setTimeout(resolve, 15000));
+    await developerClient.reset();
+    await new Promise<void>((resolve) => setTimeout(resolve, 5000));
 
     const time = utils.nowSeconds() + offset;
     await developerClient.fastForwardToTime(time);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise<void>((resolve) => setTimeout(resolve, 5000));
 
     const times = await getBlockTimes({ client, networkName });
-
     const timeFound = times.find((blockTime) => blockTime >= time);
-
     expect(timeFound).toBeDefined();
   });
 });

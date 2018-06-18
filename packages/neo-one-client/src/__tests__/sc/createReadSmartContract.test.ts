@@ -42,7 +42,7 @@ describe('createReadSmartContract', () => {
       },
 
       {
-        name: 'nullName',
+        name: 'undefinedName',
         constant: false,
         returnType: abis.returns.Void,
       },
@@ -69,7 +69,7 @@ describe('createReadSmartContract', () => {
     verifyMock('common', common);
   };
 
-  let nullEventsContract = createReadSmartContract({
+  let undefinedEventsContract = createReadSmartContract({
     hash,
     abi: abiNull,
     client,
@@ -88,7 +88,7 @@ describe('createReadSmartContract', () => {
     // @ts-ignore
     client.iterActionsRaw = jest.fn(() => expected);
 
-    nullEventsContract = createReadSmartContract({
+    undefinedEventsContract = createReadSmartContract({
       hash,
       abi: abiNull,
       client,
@@ -104,9 +104,9 @@ describe('createReadSmartContract', () => {
     const result = await readContract[abi.functions[0].name]();
     expect(result).toEqual(expected);
 
-    const nullEventsResult = await nullEventsContract[abi.functions[0].name]();
-    expect(nullEventsResult).toEqual(expected);
-    expect(nullEventsContract.nulName).toBeUndefined();
+    const undefinedEventsResult = await undefinedEventsContract[abi.functions[0].name]();
+    expect(undefinedEventsResult).toEqual(expected);
+    expect(undefinedEventsContract.nulName).toBeUndefined();
     verifyMocks();
   });
 
@@ -169,7 +169,7 @@ describe('createReadSmartContract', () => {
     // @ts-ignore
     client.iterStorage = jest.fn(() => expected);
 
-    const result = nullEventsContract.iterStorage();
+    const result = undefinedEventsContract.iterStorage();
     expect(result).toEqual(expected);
     verifyMocks();
   });

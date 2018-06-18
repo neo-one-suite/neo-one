@@ -237,12 +237,9 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
         },
       ];
 
-      // eslint-disable-next-line
       options = args[3];
     } else {
-      // eslint-disable-next-line
       transfers = args[0];
-      // eslint-disable-next-line
       options = args[1];
     }
 

@@ -2,7 +2,9 @@
 
 exports[`NEOONEProvider read 1`] = `
 NEOONEDataProvider {
-  "client": JSONRPCClient {
+  "iterBlocksBatchSize": undefined,
+  "iterBlocksFetchTimeoutMS": undefined,
+  "mutableClient": JSONRPCClient {
     "provider": JSONRPCHTTPProvider {
       "batcher": DataLoader {
         "_batchLoadFn": [Function],
@@ -16,8 +18,6 @@ NEOONEDataProvider {
       "endpoint": "rpc",
     },
   },
-  "iterBlocksBatchSize": undefined,
-  "iterBlocksFetchTimeoutMS": undefined,
   "network": "net",
 }
 `;

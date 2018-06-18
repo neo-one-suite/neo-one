@@ -107,12 +107,9 @@ export default class Main extends Component {
           <h1 className="Main-title">Welcome to NEO•ONE</h1>
         </header>
         <p className="Main-intro">
-          To get started developing a decentralized app, edit{' '}
-          <code>src/Main.js</code> and save to reload.
+          To get started developing a decentralized app, edit <code>src/Main.js</code> and save to reload.
         </p>
-        <p className="Main-intro">
-          Try out the Hello World smart contract below!
-        </p>
+        <p className="Main-intro">Try out the Hello World smart contract below!</p>
         <form className="Main-invoke-form" onSubmit={this._handleSubmit}>
           <label htmlFor="invoke">
             Hello

@@ -48,7 +48,7 @@ export const params = {
     return param.map((val) => checker(val, value));
   },
   InteropInterface: (_param: Param | undefined, _parameter: InteropInterfaceABI): ScriptBuilderParam | undefined => {
-    throw new InvalidArgumentError('InteropInterface is not a valid _parameter');
+    throw new InvalidArgumentError('InteropInterface is not a valid parameter');
   },
   Void: (param: Param | undefined, _parameter: VoidABI): ScriptBuilderParam | undefined => {
     if (param !== undefined) {

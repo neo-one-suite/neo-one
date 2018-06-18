@@ -1,15 +1,15 @@
 aliases:
   - &restore-yarn-cache
     keys:
-      - v1-yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - v2-yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
       # Fallback in case checksum fails
-      - v1-yarn-{{ .Branch }}-
+      - v2-yarn-{{ .Branch }}-
 
   - &save-yarn-cache
     paths:
       - node_modules
       - ~/.cache/yarn
-    key: v1-yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
+    key: v2-yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
   - &filter-only-master
     branches:
@@ -23,14 +23,8 @@ aliases:
   - &yarn
     |
       yarn install --non-interactive --cache-folder ~/.cache/yarn --frozen-lockfile
-defaults: &defaults
-  docker:
-    - image: circleci/node:8.9
 
-version: 2
-jobs:
-  test:
-    <<: *defaults
+  - &test
     working_directory: ~/neo-one
     steps:
       - checkout
@@ -44,23 +38,38 @@ jobs:
           name: Prettier
           command: yarn nit
       - run:
-          name: Lint
-          command: yarn lint
-      - run:
-          name: Flow
-          command: yarn flow
-      - run:
           name: Typescript
           command: yarn tsc
       - run:
+          name: Lint
+          command: yarn lint          
+      - run:
           name: Test
-          command: yarn test-ci
+          command: yarn test-ci --testResultsProcessor="jest-junit"
+          environment:
+            JEST_JUNIT_OUTPUT: reports/jest/results.xml
       - run:
           name: E2E
-          command: yarn e2e-ci
+          command: yarn e2e-ci --testResultsProcessor="jest-junit"
+          environment:
+            JEST_JUNIT_OUTPUT: reports/jest-e2e/results.xml
+      - store_test_results:
+          path: reports
+      - store_artifacts:
+          path: reports
+
+node10: &node10
+  docker:
+    - image: circleci/node:10.4.1
+
+version: 2
+jobs:
+  test10:
+    <<: *node10
+    <<: *test     
 
   deploy-website:
-    <<: *defaults
+    <<: *node10
     working_directory: ~/neo-one/website
     steps:
       - checkout:
@@ -88,5 +97,5 @@ workflows:
           filters: *filter-only-master
   test:
     jobs:
-      - test:
-          filters: *filter-ignore-gh-pages
+      - test10:
+          filters: *filter-ignore-gh-pages          

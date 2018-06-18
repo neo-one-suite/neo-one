@@ -61,7 +61,7 @@ describe('Client', () => {
     client = new Client({ test1: provider1, test2: provider2 } as any);
   });
 
-  test('Client constructor throws error on null client', () => {
+  test('Client constructor throws error on undefined client', () => {
     function testError() {
       client = new Client({});
     }

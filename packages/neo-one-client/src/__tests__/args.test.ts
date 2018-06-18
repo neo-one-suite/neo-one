@@ -23,7 +23,7 @@ describe('arg assertions', () => {
 
     {
       method: 'assertNullableString',
-      args: [name, null],
+      args: [name, undefined],
     },
 
     {
@@ -58,7 +58,7 @@ describe('arg assertions', () => {
 
     {
       method: 'assertNullableBigNumber',
-      args: [null],
+      args: [undefined],
     },
 
     {
@@ -83,7 +83,7 @@ describe('arg assertions', () => {
 
     {
       method: 'assertNullableNumber',
-      args: [null],
+      args: [undefined],
     },
 
     {
@@ -93,7 +93,7 @@ describe('arg assertions', () => {
 
     {
       method: 'assertBlockFilter',
-      args: [null],
+      args: [undefined],
     },
 
     {
@@ -108,7 +108,7 @@ describe('arg assertions', () => {
 
     {
       method: 'assertGetOptions',
-      args: [null],
+      args: [undefined],
     },
 
     {
@@ -200,12 +200,12 @@ describe('arg assertions', () => {
 
     {
       method: 'assertTransactionOptions',
-      args: [null],
+      args: [undefined],
     },
 
     {
       method: 'assertTransactionOptions',
-      args: [{ networkFee: null }],
+      args: [{ networkFee: undefined }],
     },
   ] as any;
 
@@ -251,9 +251,9 @@ describe('arg assertions', () => {
 
     {
       method: 'assertAddress',
-      message: 'assertAddress throws error on missing/null param',
-      args: [null],
-      error: new InvalidArgumentError(`Address argument was not a string: ${String(null)}`),
+      message: 'assertAddress throws error on missing/undefined param',
+      args: [undefined],
+      error: new InvalidArgumentError(`Address argument was not a string: ${String(undefined)}`),
     },
 
     {
@@ -349,9 +349,9 @@ describe('arg assertions', () => {
 
     {
       method: 'assertBoolean',
-      message: 'assertBoolean throws error on null',
-      args: [null],
-      error: new InvalidArgumentError(`Expected boolean, found: ${String(null)}`),
+      message: 'assertBoolean throws error on undefined',
+      args: [undefined],
+      error: new InvalidArgumentError(`Expected boolean, found: ${String(undefined)}`),
     },
 
     {
@@ -363,9 +363,9 @@ describe('arg assertions', () => {
 
     {
       method: 'assertNumber',
-      message: 'assertNumber throws error on null',
-      args: [null],
-      error: new InvalidArgumentError(`Expected number, found: ${String(null)}`),
+      message: 'assertNumber throws error on undefined',
+      args: [undefined],
+      error: new InvalidArgumentError(`Expected number, found: ${String(undefined)}`),
     },
 
     {
@@ -377,7 +377,7 @@ describe('arg assertions', () => {
 
     {
       method: 'assertNullableNumber',
-      message: 'assertNullableNumber throws error on non null or number',
+      message: 'assertNullableNumber throws error on non undefined or number',
       args: [dummyString],
       error: new InvalidArgumentError(`Expected number, found: ${dummyString}`),
     },
@@ -448,9 +448,9 @@ describe('arg assertions', () => {
 
     {
       method: 'assertABIReturn',
-      message: 'assertABIReturn throws error on null',
-      args: [null],
-      error: new InvalidArgumentError(`Invalid ABI return, found: ${String(null)}`),
+      message: 'assertABIReturn throws error on undefined',
+      args: [undefined],
+      error: new InvalidArgumentError(`Invalid ABI return, found: ${String(undefined)}`),
     },
 
     {
@@ -491,9 +491,9 @@ describe('arg assertions', () => {
 
     {
       method: 'assertABIParameter',
-      message: 'assertABIParameter throws error on null',
-      args: [null],
-      error: new InvalidArgumentError(`Invalid ABI parameter, found: ${String(null)}`),
+      message: 'assertABIParameter throws error on undefined',
+      args: [undefined],
+      error: new InvalidArgumentError(`Invalid ABI parameter, found: ${String(undefined)}`),
     },
 
     {
@@ -519,9 +519,9 @@ describe('arg assertions', () => {
 
     {
       method: 'assertABIFunction',
-      message: 'assertABIFunction throws error on null',
-      args: [null],
-      error: new InvalidArgumentError(`Invalid ABI function, found: ${String(null)}`),
+      message: 'assertABIFunction throws error on undefined',
+      args: [undefined],
+      error: new InvalidArgumentError(`Invalid ABI function, found: ${String(undefined)}`),
     },
 
     {
@@ -534,8 +534,8 @@ describe('arg assertions', () => {
     {
       method: 'assertABIFunction',
       message: 'assertABIFunction throws error on non ABIParameter parameters',
-      args: [{ name, parameters: [null] }],
-      error: new InvalidArgumentError(`Invalid ABI parameter, found: ${String(null)}`),
+      args: [{ name, parameters: [undefined] }],
+      error: new InvalidArgumentError(`Invalid ABI parameter, found: ${String(undefined)}`),
     },
 
     {
@@ -554,9 +554,9 @@ describe('arg assertions', () => {
 
     {
       method: 'assertABIEvent',
-      message: 'assertABIEvent throws error on null',
-      args: [null],
-      error: new InvalidArgumentError(`Invalid ABI event, found: ${String(null)}`),
+      message: 'assertABIEvent throws error on undefined',
+      args: [undefined],
+      error: new InvalidArgumentError(`Invalid ABI event, found: ${String(undefined)}`),
     },
 
     {
@@ -589,9 +589,9 @@ describe('arg assertions', () => {
 
     {
       method: 'assertABI',
-      message: 'assertABI throws error on null',
-      args: [null],
-      error: new InvalidArgumentError(`Invalid ABI param, found: ${String(null)}`),
+      message: 'assertABI throws error on undefined',
+      args: [undefined],
+      error: new InvalidArgumentError(`Invalid ABI param, found: ${String(undefined)}`),
     },
 
     {

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-network",
-  "version": "1.0.0-alpha.73",
+  "version": "1.0.0-alpha.75",
   "keywords": [
     "neo",
     "NEO",
@@ -26,26 +26,29 @@
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
   "main": "./dist/index.js",
-  "module": "./dist/index.es.js",
+  "module": "./dist/index.mjs",
+  "typings": "./src/index.ts",
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.55",
-    "@neo-one/client-core": "^1.0.0-alpha.41",
-    "@neo-one/node": "^1.0.0-alpha.73",
-    "@neo-one/node-core": "^1.0.0-alpha.42",
-    "@neo-one/node-data-backup": "^1.0.0-alpha.40",
-    "@neo-one/node-neo-settings": "^1.0.0-alpha.41",
-    "@neo-one/server-plugin": "^1.0.0-alpha.41",
-    "@neo-one/utils": "^1.0.0-alpha.35",
+    "@neo-one/client": "^1.0.0-alpha.57",
+    "@neo-one/client-core": "^1.0.0-alpha.43",
+    "@neo-one/monitor": "^1.0.0-alpha.32",
+    "@neo-one/node": "^1.0.0-alpha.75",
+    "@neo-one/node-core": "^1.0.0-alpha.44",
+    "@neo-one/node-data-backup": "^1.0.0-alpha.42",
+    "@neo-one/node-neo-settings": "^1.0.0-alpha.43",
+    "@neo-one/server-plugin": "^1.0.0-alpha.43",
+    "@neo-one/utils": "^1.0.0-alpha.37",
+    "cross-fetch": "^2.2.1",
     "execa": "^0.10.0",
     "fs-extra": "^6.0.1",
-    "lodash": "^4.17.5",
-    "node-fetch": "^2.1.2",
-    "rxjs": "^6.2.0"
+    "lodash": "^4.17.10",
+    "rxjs": "^6.2.1",
+    "vorpal": "^1.12.0"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-alpha.6",
   "keywords": [
     "neo",
     "NEO",
@@ -27,7 +27,7 @@
   "license": "MIT",
   "main": "./src/index.ts",
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   },
   "publishConfig": {
     "access": "public"

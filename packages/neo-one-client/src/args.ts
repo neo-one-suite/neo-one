@@ -30,9 +30,9 @@ export const assertString = (name: string, param: any): string => {
   return param;
 };
 
-export const assertNullableString = (name: string, param?: any): string | null | undefined => {
+export const assertNullableString = (name: string, param?: any): string | undefined => {
   if (param == undefined) {
-    return param;
+    return undefined;
   }
 
   return assertString(name, param);
@@ -112,9 +112,9 @@ export const assertBigNumber = (value: any): BigNumber => {
   return value;
 };
 
-export const assertNullableBigNumber = (value: any): BigNumber | null | undefined => {
+export const assertNullableBigNumber = (value: any): BigNumber | undefined => {
   if (value == undefined) {
-    return value;
+    return undefined;
   }
 
   return assertBigNumber(value);
@@ -136,12 +136,12 @@ export const assertNumber = (value: any): number => {
   return value;
 };
 
-export const assertNullableNumber = (value: any): number | null | undefined => {
+export const assertNullableNumber = (value: any): number | undefined => {
   if (value != undefined && typeof value !== 'number') {
     throw new InvalidArgumentError(`Expected number, found: ${String(value)}`);
   }
 
-  return value;
+  return value == undefined ? undefined : value;
 };
 
 export const assertArray = (value: any): ReadonlyArray<{}> => {
@@ -152,9 +152,9 @@ export const assertArray = (value: any): ReadonlyArray<{}> => {
   return value;
 };
 
-export const assertBlockFilter = (filter: any): BlockFilter | null | undefined => {
+export const assertBlockFilter = (filter: any): BlockFilter | undefined => {
   if (filter == undefined) {
-    return filter;
+    return undefined;
   }
 
   if (typeof filter !== 'object') {
@@ -180,9 +180,9 @@ export const assertBlockFilter = (filter: any): BlockFilter | null | undefined =
   return filter;
 };
 
-export const assertGetOptions = (options: any): GetOptions | null | undefined => {
+export const assertGetOptions = (options: any): GetOptions | undefined => {
   if (options == undefined) {
-    return options;
+    return undefined;
   }
 
   if (typeof options !== 'object') {
@@ -296,9 +296,9 @@ export const assertAttributeArg = (attribute?: any): AttributeArg => {
   }
 };
 
-export const assertTransactionOptions = (options?: any): TransactionOptions | null | undefined => {
+export const assertTransactionOptions = (options?: any): TransactionOptions | undefined => {
   if (options == undefined) {
-    return options;
+    return undefined;
   }
 
   if (typeof options !== 'object') {

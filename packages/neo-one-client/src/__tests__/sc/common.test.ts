@@ -204,7 +204,7 @@ describe('common', () => {
     expect(result).toEqual(expected);
   });
 
-  test('convertInvocationResult - invocation success with null stack', () => {
+  test('convertInvocationResult - invocation success with undefined stack', () => {
     const returnType = { type: 'String' };
     const invokeResult = {
       state: 'HALT',
@@ -217,7 +217,7 @@ describe('common', () => {
       state: invokeResult.state,
       gasConsumed: invokeResult.gasConsumed,
       gasCost: invokeResult.gasCost,
-      value: null,
+      value: undefined,
     };
 
     // @ts-ignore
@@ -270,7 +270,7 @@ describe('common', () => {
     expect(result).toEqual(expected);
   });
 
-  test('convertCallResult on null stack', () => {
+  test('convertCallResult on undefined stack', () => {
     const returnType = { type: 'String' };
     const resultCall = {
       state: 'HALT',
@@ -285,7 +285,7 @@ describe('common', () => {
       result: resultCall,
     });
 
-    expect(result).toBeNull();
+    expect(result).toBeUndefined();
   });
 
   test('convertParams', () => {

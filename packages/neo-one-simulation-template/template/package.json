@@ -1,7 +1,7 @@
 {
   "name": "@neo-one/simulation-template-template",
   "private": true,
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "keywords": [
     "neo",
     "NEO",
@@ -33,6 +33,6 @@
   "license": "MIT",
   "main": "./src/index.js",
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   }
 }

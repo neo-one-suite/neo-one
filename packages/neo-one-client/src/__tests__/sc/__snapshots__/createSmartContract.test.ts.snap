@@ -12,7 +12,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createCall - null params: client.call 1`] = `
+exports[`createSmartContract createCall - undefined params: client.call 1`] = `
 Array [
   Array [
     "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
@@ -29,13 +29,13 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createCall - null params: client.getCurrentAccount 1`] = `
+exports[`createSmartContract createCall - undefined params: client.getCurrentAccount 1`] = `
 Array [
   Array [],
 ]
 `;
 
-exports[`createSmartContract createCall - null params: common.convertCallResult 1`] = `
+exports[`createSmartContract createCall - undefined params: common.convertCallResult 1`] = `
 Array [
   Array [
     Object {
@@ -48,7 +48,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createCall - null params: common.convertParams 1`] = `
+exports[`createSmartContract createCall - undefined params: common.convertParams 1`] = `
 Array [
   Array [
     Object {
@@ -111,7 +111,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createInvoke null events & params: client.call 1`] = `
+exports[`createSmartContract createInvoke undefined events & params: client.call 1`] = `
 Array [
   Array [
     "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
@@ -128,13 +128,13 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createInvoke null events & params: client.getCurrentAccount 1`] = `
+exports[`createSmartContract createInvoke undefined events & params: client.getCurrentAccount 1`] = `
 Array [
   Array [],
 ]
 `;
 
-exports[`createSmartContract createInvoke null events & params: client.invoke 1`] = `
+exports[`createSmartContract createInvoke undefined events & params: client.invoke 1`] = `
 Array [
   Array [
     "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
@@ -156,7 +156,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createInvoke null events & params: common.convertAction 1`] = `
+exports[`createSmartContract createInvoke undefined events & params: common.convertAction 1`] = `
 Array [
   Array [
     Object {
@@ -190,7 +190,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createInvoke null events & params: common.convertCallResult 1`] = `
+exports[`createSmartContract createInvoke undefined events & params: common.convertCallResult 1`] = `
 Array [
   Array [
     Object {
@@ -203,7 +203,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createInvoke null events & params: common.convertInvocationResult 1`] = `
+exports[`createSmartContract createInvoke undefined events & params: common.convertInvocationResult 1`] = `
 Array [
   Array [
     Object {
@@ -216,7 +216,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createInvoke null events & params: common.convertParams 1`] = `
+exports[`createSmartContract createInvoke undefined events & params: common.convertParams 1`] = `
 Array [
   Array [
     Object {

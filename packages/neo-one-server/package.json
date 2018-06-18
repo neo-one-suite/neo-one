@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server",
-  "version": "1.0.0-alpha.76",
+  "version": "1.0.0-alpha.78",
   "keywords": [
     "neo",
     "NEO",
@@ -26,31 +26,32 @@
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
   "main": "./dist/index.js",
-  "module": "./dist/index.es.js",
+  "module": "./dist/index.mjs",
+  "typings": "./src/index.ts",
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0-alpha.30",
-    "@neo-one/server-client": "^1.0.0-alpha.42",
-    "@neo-one/server-grpc": "^1.0.0-alpha.6",
-    "@neo-one/server-plugin": "^1.0.0-alpha.41",
-    "@neo-one/server-plugin-compiler": "^1.0.0-alpha.56",
-    "@neo-one/server-plugin-network": "^1.0.0-alpha.73",
-    "@neo-one/server-plugin-simulation": "^1.0.0-alpha.76",
-    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.76",
-    "@neo-one/utils": "^1.0.0-alpha.35",
+    "@neo-one/monitor": "^1.0.0-alpha.32",
+    "@neo-one/server-client": "^1.0.0-alpha.44",
+    "@neo-one/server-grpc": "^1.0.0-alpha.7",
+    "@neo-one/server-plugin": "^1.0.0-alpha.43",
+    "@neo-one/server-plugin-compiler": "^1.0.0-alpha.58",
+    "@neo-one/server-plugin-network": "^1.0.0-alpha.75",
+    "@neo-one/server-plugin-simulation": "^1.0.0-alpha.78",
+    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.78",
+    "@neo-one/utils": "^1.0.0-alpha.37",
     "fs-extra": "^6.0.1",
-    "grpc": "^1.12.2",
+    "grpc": "^1.13.0-pre1",
     "grpc-error": "^1.0.0",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.10",
     "mali": "^0.7.1",
     "mali-compose": "^1.0.0",
     "mali-onerror": "^0.1.1",
-    "rxjs": "^6.2.0",
+    "rxjs": "^6.2.1",
     "toposort": "^2.0.2",
     "uuid": "^3.2.1"
   }

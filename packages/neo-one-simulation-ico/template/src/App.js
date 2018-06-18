@@ -1,12 +1,5 @@
 /* @flow */
-import {
-  type HOC,
-  compose,
-  lifecycle,
-  pure,
-  withContext,
-  withProps,
-} from 'recompose';
+import { type HOC, compose, lifecycle, pure, withContext, withProps } from 'recompose';
 import * as React from 'react';
 import CssBaseline from 'material-ui/CssBaseline';
 
@@ -42,10 +35,7 @@ const enhance: HOC<*, *> = compose(
       setupClient(client);
     },
   }),
-  withContext(
-    { client: () => null, coinContract: () => null },
-    ({ coinContract }) => ({ client, coinContract }),
-  ),
+  withContext({ client: () => null, coinContract: () => null }, ({ coinContract }) => ({ client, coinContract })),
   pure,
 );
 

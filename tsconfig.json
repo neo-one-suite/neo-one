@@ -6,6 +6,7 @@
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "declaration": false,
     "experimentalDecorators": true,
     "lib": [
@@ -22,6 +23,12 @@
       "@neo-one/ec-key": [
         "../@types/@neo-one/ec-key"
       ],
+      "@neo-one/boa": [
+        "../@types/@neo-one/boa"
+      ],
+      "@neo-one/csharp": [
+        "../@types/@neo-one/csharp"
+      ],            
       "@neo-one/*": [
         "./neo-one-*/src"
       ],
@@ -39,6 +46,7 @@
       }
     ],
     "pretty": true,
+    "skipLibCheck": true,
     "strict": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,

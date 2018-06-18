@@ -12,7 +12,7 @@ const value = new BigNumber('10');
 const expectedValue = clientUtils.bigNumberToBN(value, 8);
 
 describe('output', () => {
-  test('convert to output - null addressVersion', () => {
+  test('convert to output - undefined addressVersion', () => {
     const testOutput = output({
       address,
       asset: assetHash,

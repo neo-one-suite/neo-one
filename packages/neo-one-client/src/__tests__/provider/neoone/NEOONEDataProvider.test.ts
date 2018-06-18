@@ -405,14 +405,14 @@ describe('NEOONEDataProvider', () => {
   test('getUnclaimed', async () => {
     const expected = { unclaimed: ['val'], amount: new BigNumber('1') };
     // @ts-ignore
-    (provider as any).client.getAccount = jest.fn(() =>
+    (provider as any).mutableClient.getAccount = jest.fn(() =>
       Promise.resolve({
         unclaimed: ['val'],
       }),
     );
 
     // @ts-ignore
-    (provider as any).client.getClaimAmount = jest.fn(() => Promise.resolve([new BigNumber('1')]));
+    (provider as any).mutableClient.getClaimAmount = jest.fn(() => Promise.resolve([new BigNumber('1')]));
 
     const result = await provider.getUnclaimed(keys[0].address);
     expect(result).toEqual(expected);
@@ -430,7 +430,7 @@ describe('NEOONEDataProvider', () => {
     ];
 
     // @ts-ignore
-    (provider as any).client.getAccount = jest.fn(() =>
+    (provider as any).mutableClient.getAccount = jest.fn(() =>
       Promise.resolve({
         unspent: [
           {
@@ -438,13 +438,13 @@ describe('NEOONEDataProvider', () => {
             vout: 0,
           },
 
-          null,
+          undefined,
         ],
       }),
     );
 
     // @ts-ignore
-    (provider as any).client.getUnspentOutput = jest
+    (provider as any).mutableClient.getUnspentOutput = jest
       .fn()
       .mockReturnValueOnce(
         Promise.resolve({
@@ -453,11 +453,11 @@ describe('NEOONEDataProvider', () => {
           address: '',
         }),
       )
-      .mockReturnValueOnce(null);
+      .mockReturnValueOnce(undefined);
 
     const result = await provider.getUnspentOutputs(keys[0].address);
     expect(result).toEqual(expected);
-    expect((provider as any).client.getUnspentOutput).toHaveBeenCalledTimes(2);
+    expect((provider as any).mutableClient.getUnspentOutput).toHaveBeenCalledTimes(2);
   });
 
   describe('_ConvertTransactionBase types', () => {
@@ -572,7 +572,7 @@ describe('NEOONEDataProvider', () => {
       // eslint-disable-next-line
       test(`relayTransaction with ${transactionJSON.type}`, async () => {
         // @ts-ignore
-        (provider as any).client.relayTransaction = jest.fn(() => Promise.resolve(transactionJSON));
+        (provider as any).mutableClient.relayTransaction = jest.fn(() => Promise.resolve(transactionJSON));
 
         const result = await provider.relayTransaction('');
         expect(result).toEqual(expected);
@@ -583,7 +583,7 @@ describe('NEOONEDataProvider', () => {
   test('getTransactionReceipt', async () => {
     const expected = '';
     // @ts-ignore
-    (provider as any).client.getTransactionReceipt = jest.fn(() => Promise.resolve(expected));
+    (provider as any).mutableClient.getTransactionReceipt = jest.fn(() => Promise.resolve(expected));
 
     const result = provider.getTransactionReceipt((transactions as any).register.hash);
     expect(result).resolves.toEqual(expected);
@@ -593,10 +593,10 @@ describe('NEOONEDataProvider', () => {
     const expected = createExpectedInvocationData({}, { hash: (transactions as any).register.hash });
 
     // @ts-ignore
-    (provider as any).client.getInvocationData = jest.fn(() => Promise.resolve(createInvocationDataJSON({})));
+    (provider as any).mutableClient.getInvocationData = jest.fn(() => Promise.resolve(createInvocationDataJSON({})));
 
     // @ts-ignore
-    (provider as any).client.getTransaction = jest.fn(() =>
+    (provider as any).mutableClient.getTransaction = jest.fn(() =>
       Promise.resolve(
         createTransactionJSON('InvocationTransaction', {}, { hash: (transactions as any).register.hash }),
       ),
@@ -613,7 +613,7 @@ describe('NEOONEDataProvider', () => {
     });
 
     // @ts-ignore
-    (provider as any).client.testInvocation = jest.fn(() =>
+    (provider as any).mutableClient.testInvocation = jest.fn(() =>
       Promise.resolve(createInvocationResultJSON({ state: VMState.Fault, message: '10' })),
     );
 
@@ -630,7 +630,7 @@ describe('NEOONEDataProvider', () => {
     };
 
     // @ts-ignore
-    (provider as any).client.getAccount = jest.fn(() =>
+    (provider as any).mutableClient.getAccount = jest.fn(() =>
       Promise.resolve({
         frozen: false,
         votes: 0,
@@ -645,7 +645,7 @@ describe('NEOONEDataProvider', () => {
   test('getAsset with multiple languages', async () => {
     const expected = createExpectedAsset({ name: 'blarg' });
     // @ts-ignore
-    (provider as any).client.getAsset = jest.fn(() =>
+    (provider as any).mutableClient.getAsset = jest.fn(() =>
       Promise.resolve(createAssetJSON({ name: [{ lang: 'en', name: 'blarg' }] })),
     );
 
@@ -656,7 +656,7 @@ describe('NEOONEDataProvider', () => {
   test('getAsset with multiple languages - no english name', async () => {
     const expected = createExpectedAsset({ name: 'blarg' });
     // @ts-ignore
-    (provider as any).client.getAsset = jest.fn(() =>
+    (provider as any).mutableClient.getAsset = jest.fn(() =>
       Promise.resolve(createAssetJSON({ name: [{ lang: 'bl', name: 'blarg' }] })),
     );
 
@@ -680,13 +680,13 @@ describe('NEOONEDataProvider', () => {
         createExpectedTransaction('InvocationTransaction', {
           gas: new BigNumber('10'),
           script: '11',
-          invocationData: createExpectedInvocationData({ asset: null }),
+          invocationData: createExpectedInvocationData({ asset: undefined }),
         }),
       ],
     };
 
     // @ts-ignore
-    (provider as any).client.getBlock = jest.fn(() =>
+    (provider as any).mutableClient.getBlock = jest.fn(() =>
       Promise.resolve({
         version: 0,
         hash: '',
@@ -703,7 +703,7 @@ describe('NEOONEDataProvider', () => {
           createTransactionJSON('InvocationTransaction', {
             gas: '10',
             script: '11',
-            invocationData: createInvocationDataJSON({ asset: null }),
+            invocationData: createInvocationDataJSON({ asset: undefined }),
           }),
         ],
       }),
@@ -716,7 +716,7 @@ describe('NEOONEDataProvider', () => {
   test('getBestBlockHash', async () => {
     const expected = {};
     // @ts-ignore
-    (provider as any).client.getBestBlockHash = jest.fn(() => Promise.resolve({}));
+    (provider as any).mutableClient.getBestBlockHash = jest.fn(() => Promise.resolve({}));
 
     const result = provider.getBestBlockHash();
     await expect(result).resolves.toEqual(expected);
@@ -725,7 +725,7 @@ describe('NEOONEDataProvider', () => {
   test('getBlockCount', async () => {
     const expected = {};
     // @ts-ignore
-    (provider as any).client.getBlockCount = jest.fn(() => Promise.resolve({}));
+    (provider as any).mutableClient.getBlockCount = jest.fn(() => Promise.resolve({}));
 
     const result = provider.getBlockCount();
     await expect(result).resolves.toEqual(expected);
@@ -734,7 +734,7 @@ describe('NEOONEDataProvider', () => {
   test('getContract', async () => {
     const expected = createExpectedContract({});
     // @ts-ignore
-    (provider as any).client.getContract = jest.fn(() => Promise.resolve(createContractJSON({})));
+    (provider as any).mutableClient.getContract = jest.fn(() => Promise.resolve(createContractJSON({})));
 
     const result = provider.getContract((transactions as any).register.hash);
     await expect(result).resolves.toEqual(expected);
@@ -743,7 +743,7 @@ describe('NEOONEDataProvider', () => {
   test('getMemPool', async () => {
     const expected = {};
     // @ts-ignore
-    (provider as any).client.getMemPool = jest.fn(() => Promise.resolve({}));
+    (provider as any).mutableClient.getMemPool = jest.fn(() => Promise.resolve({}));
 
     const result = provider.getMemPool();
     await expect(result).resolves.toEqual(expected);
@@ -760,7 +760,7 @@ describe('NEOONEDataProvider', () => {
     ];
 
     // @ts-ignore
-    (provider as any).client.getValidators = jest.fn(() =>
+    (provider as any).mutableClient.getValidators = jest.fn(() =>
       Promise.resolve([
         {
           version: 0,
@@ -778,7 +778,7 @@ describe('NEOONEDataProvider', () => {
   test('getConnectedPeers', async () => {
     const expected = {};
     // @ts-ignore
-    (provider as any).client.getConnectedPeers = jest.fn(() => Promise.resolve({}));
+    (provider as any).mutableClient.getConnectedPeers = jest.fn(() => Promise.resolve({}));
 
     const result = provider.getConnectedPeers();
     await expect(result).resolves.toEqual(expected);
@@ -788,7 +788,7 @@ describe('NEOONEDataProvider', () => {
     const expected = createExpectedTransaction('ClaimTransaction', { claims: [] }, { noData: true });
 
     // @ts-ignore
-    (provider as any).client.getTransaction = jest.fn(() =>
+    (provider as any).mutableClient.getTransaction = jest.fn(() =>
       Promise.resolve(createTransactionJSON('ClaimTransaction', { claims: [] }, { noData: true })),
     );
 
@@ -799,40 +799,40 @@ describe('NEOONEDataProvider', () => {
   test('getNetworkSettings', async () => {
     const expected = { issueGASFee: new BigNumber('0') };
     // @ts-ignore
-    (provider as any).client.getNetworkSettings = jest.fn(() => Promise.resolve({ issueGASFee: '0' }));
+    (provider as any).mutableClient.getNetworkSettings = jest.fn(() => Promise.resolve({ issueGASFee: '0' }));
 
     const result = provider.getNetworkSettings();
     expect(result).resolves.toEqual(expected);
   });
 
-  test('_convertConfirmedTransaction throws null data error', async () => {
+  test('_convertConfirmedTransaction throws undefined data error', async () => {
     function testError() {
       // @ts-ignore
       provider.convertConfirmedTransaction(
         // @ts-ignore
-        createTransactionJSON('ContractTransaction', { data: null }),
+        createTransactionJSON('ContractTransaction', { data: undefined }),
       );
     }
-    expect(testError).toThrow(new Error('Unexpected null data') as any);
+    expect(testError).toThrow(new Error('Unexpected undefined data') as any);
   });
 
-  test('_convertConfirmedTransaction with InvocationTransaction throws null data error', async () => {
+  test('_convertConfirmedTransaction with InvocationTransaction throws undefined data error', async () => {
     function testError() {
       // @ts-ignore
       provider.convertConfirmedTransaction(
         // @ts-ignore
         createTransactionJSON('InvocationTransaction', {
-          invocationData: null,
+          invocationData: undefined,
         }),
       );
     }
-    expect(testError).toThrow(new Error('Unexpected null data') as any);
+    expect(testError).toThrow(new Error('Unexpected undefined data') as any);
   });
 
   test('getStorage', async () => {
     const expected = {};
     // @ts-ignore
-    (provider as any).client.getStorageItem = jest.fn(() => Promise.resolve({}));
+    (provider as any).mutableClient.getStorageItem = jest.fn(() => Promise.resolve({}));
 
     const result = provider.getStorage((transactions as any).register.hash, '');
     await expect(result).resolves.toEqual(expected);
@@ -843,14 +843,14 @@ describe('NEOONEDataProvider', () => {
     // @ts-ignore
     const expected = [storage];
     // @ts-ignore
-    (provider as any).client.getAllStorage = jest.fn(() => Promise.resolve([storage]));
+    (provider as any).mutableClient.getAllStorage = jest.fn(() => Promise.resolve([storage]));
 
     const result = await toArray(provider.iterStorage((transactions as any).register.hash));
 
     expect(result).toEqual(expected);
   });
 
-  test('iterBlocks - null iterBlocksFetchTimeoutMS', async () => {
+  test('iterBlocks - undefined iterBlocksFetchTimeoutMS', async () => {
     provider = new NEOONEDataProvider({
       network,
       rpcURL,
@@ -885,7 +885,7 @@ describe('NEOONEDataProvider', () => {
     expect(result).toEqual(expected);
   });
 
-  test('iterActions null filter', async () => {
+  test('iterActions undefined filter', async () => {
     const expected = ['0'];
     const block = {
       transactions: [
@@ -910,7 +910,7 @@ describe('NEOONEDataProvider', () => {
     const params = ['param1'];
 
     // @ts-ignore
-    (provider as any).client.testInvocation = jest.fn(() =>
+    (provider as any).mutableClient.testInvocation = jest.fn(() =>
       Promise.resolve(createInvocationResultJSON({ state: VMState.Fault, message: '10' })),
     );
 
@@ -918,50 +918,50 @@ describe('NEOONEDataProvider', () => {
     expect(result).toMatchSnapshot();
   });
 
-  test('runConsensusNow', () => {
+  test('runConsensusNow', async () => {
     // @ts-ignore
-    (provider as any).client.runConsensusNow = jest.fn();
+    (provider as any).mutableClient.runConsensusNow = jest.fn();
 
-    const result = provider.runConsensusNow();
+    const result = await provider.runConsensusNow();
 
     expect(result).toBeUndefined();
-    expect((provider as any).client.runConsensusNow).toHaveBeenCalledWith(undefined);
-    expect((provider as any).client.runConsensusNow).toHaveBeenCalledTimes(1);
+    expect((provider as any).mutableClient.runConsensusNow).toHaveBeenCalledWith(undefined);
+    expect((provider as any).mutableClient.runConsensusNow).toHaveBeenCalledTimes(1);
   });
 
-  test('updateSettings', () => {
+  test('updateSettings', async () => {
     const options = { secondsPerBlock: 10 };
     // @ts-ignore
-    (provider as any).client.updateSettings = jest.fn();
-    const result = provider.updateSettings(options);
+    (provider as any).mutableClient.updateSettings = jest.fn();
+    const result = await provider.updateSettings(options);
 
     expect(result).toBeUndefined();
-    expect((provider as any).client.updateSettings).toHaveBeenCalledWith(options, undefined);
+    expect((provider as any).mutableClient.updateSettings).toHaveBeenCalledWith(options, undefined);
 
-    expect((provider as any).client.updateSettings).toHaveBeenCalledTimes(1);
+    expect((provider as any).mutableClient.updateSettings).toHaveBeenCalledTimes(1);
   });
 
-  test('fastForwardOffset', () => {
+  test('fastForwardOffset', async () => {
     const offset = 10;
     // @ts-ignore
-    (provider as any).client.fastForwardOffset = jest.fn();
-    const result = provider.fastForwardOffset(offset);
+    (provider as any).mutableClient.fastForwardOffset = jest.fn();
+    const result = await provider.fastForwardOffset(offset);
 
     expect(result).toBeUndefined();
-    expect((provider as any).client.fastForwardOffset).toHaveBeenCalledWith(offset, undefined);
+    expect((provider as any).mutableClient.fastForwardOffset).toHaveBeenCalledWith(offset, undefined);
 
-    expect((provider as any).client.fastForwardOffset).toHaveBeenCalledTimes(1);
+    expect((provider as any).mutableClient.fastForwardOffset).toHaveBeenCalledTimes(1);
   });
 
-  test('fastForwardToTime', () => {
+  test('fastForwardToTime', async () => {
     const time = 10;
     // @ts-ignore
-    (provider as any).client.fastForwardToTime = jest.fn();
-    const result = provider.fastForwardToTime(time);
+    (provider as any).mutableClient.fastForwardToTime = jest.fn();
+    const result = await provider.fastForwardToTime(time);
 
     expect(result).toBeUndefined();
-    expect((provider as any).client.fastForwardToTime).toHaveBeenCalledWith(time, undefined);
+    expect((provider as any).mutableClient.fastForwardToTime).toHaveBeenCalledWith(time, undefined);
 
-    expect((provider as any).client.fastForwardToTime).toHaveBeenCalledTimes(1);
+    expect((provider as any).mutableClient.fastForwardToTime).toHaveBeenCalledTimes(1);
   });
 });

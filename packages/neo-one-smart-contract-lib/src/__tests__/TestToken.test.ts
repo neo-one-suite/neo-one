@@ -14,6 +14,6 @@ testToken({
     }) as Promise<TransactionResult<InvokeReceipt>>,
   issueValue: new BigNumber('100'),
   transferValue: new BigNumber('10'),
-  contractHash: '0xcda5ae3ce34a488a7e6642b42ec2d853553d4ef8',
+  contractHash: '0x728debdef21d035523583843adda67b43f464aac',
   dir: 'token',
 });

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-client",
-  "version": "1.0.0-alpha.42",
+  "version": "1.0.0-alpha.44",
   "keywords": [
     "neo",
     "NEO",
@@ -26,21 +26,23 @@
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
   "main": "./dist/index.js",
-  "module": "./dist/index.es.js",
+  "module": "./dist/index.mjs",
+  "typings": "./src/index.ts",
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.4.1"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/server-grpc": "^1.0.0-alpha.6",
-    "@neo-one/server-plugin": "^1.0.0-alpha.41",
-    "@neo-one/utils": "^1.0.0-alpha.35",
+    "@neo-one/server-grpc": "^1.0.0-alpha.7",
+    "@neo-one/server-plugin": "^1.0.0-alpha.43",
+    "@neo-one/utils": "^1.0.0-alpha.37",
+    "env-paths": "^1.0.0",
     "execa": "^0.10.0",
     "fs-extra": "^6.0.1",
-    "grpc": "^1.12.2",
+    "grpc": "^1.13.0-pre1",
     "is-running": "^2.1.0",
-    "rxjs": "^6.2.0"
+    "rxjs": "^6.2.1"
   }
 }
