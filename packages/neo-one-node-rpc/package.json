@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-rpc",
-  "version": "1.0.0-alpha.58",
+  "version": "1.0.0-alpha.59",
   "keywords": [
     "neo",
     "NEO",
@@ -35,10 +35,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.41",
-    "@neo-one/monitor": "^1.0.0-alpha.30",
-    "@neo-one/node-core": "^1.0.0-alpha.42",
-    "@neo-one/utils": "^1.0.0-alpha.35",
+    "@neo-one/client-core": "^1.0.0-alpha.42",
+    "@neo-one/monitor": "^1.0.0-alpha.31",
+    "@neo-one/node-core": "^1.0.0-alpha.43",
+    "@neo-one/utils": "^1.0.0-alpha.36",
     "cross-fetch": "^2.2.1",
     "koa": "^2.5.1",
     "koa-better-body": "^3.0.4",

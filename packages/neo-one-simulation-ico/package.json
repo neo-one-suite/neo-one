@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/simulation-ico",
-  "version": "1.0.0-alpha.20",
+  "version": "1.0.0-alpha.21",
   "keywords": [
     "neo",
     "NEO",
@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0-beta.51",
-    "@neo-one/simulation-utils": "^1.0.0-alpha.9",
+    "@neo-one/simulation-utils": "^1.0.0-alpha.10",
     "fs-extra": "^6.0.1",
     "nunjucks": "^3.1.3"
   },

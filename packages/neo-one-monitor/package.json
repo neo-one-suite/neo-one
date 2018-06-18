@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/monitor",
-  "version": "1.0.0-alpha.30",
+  "version": "1.0.0-alpha.31",
   "keywords": [
     "neo",
     "NEO",
@@ -39,7 +39,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/utils": "^1.0.0-alpha.35",
+    "@neo-one/utils": "^1.0.0-alpha.36",
     "koa": "^2.5.1",
     "koa-mount": "^3.0.0",
     "lodash": "^4.17.10",
