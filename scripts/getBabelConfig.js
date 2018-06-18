@@ -3,19 +3,20 @@ module.exports = ({ modules, useBuiltIns, targets }) => ({
     [
       '@babel/preset-env',
       {
-        useBuiltIns: useBuiltIns == null ? false : useBuiltIns,
+        useBuiltIns: useBuiltIns == undefined ? false : useBuiltIns,
         modules,
-        targets: targets == null ? { node: '10.4.1' } : targets,
+        targets: targets == undefined ? { node: '10.4.1' } : targets,
       },
     ],
   ],
   plugins: [
     '@babel/plugin-proposal-async-generator-functions',
     '@babel/plugin-proposal-class-properties',
-    '@babel/plugin-proposal-object-rest-spread',
-    '@babel/plugin-proposal-export-namespace-from',
+    targets == undefined || (typeof targets === 'object' && targets.node != undefined)
+      ? undefined
+      : ['@babel/plugin-proposal-object-rest-spread'],
     '@babel/plugin-proposal-optional-catch-binding',
-  ],
+  ].filter(Boolean),
 });
 
 module.exports.default = module.exports;

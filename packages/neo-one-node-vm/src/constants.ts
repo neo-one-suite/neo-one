@@ -111,7 +111,6 @@ export interface Op {
   readonly item: number;
   readonly fee: BN;
   readonly invoke: OpInvoke;
-  readonly context: ExecutionContext;
 }
 export interface SysCall {
   readonly name: SysCallName;

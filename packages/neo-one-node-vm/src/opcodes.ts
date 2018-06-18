@@ -40,10 +40,29 @@ import {
 } from './stackItem';
 import { lookupSysCall } from './syscalls';
 import { vmUtils } from './vmUtils';
+
+export type CreateOp = (
+  input: CreateOpArgs,
+) => {
+  readonly op: Op;
+  readonly context: ExecutionContext;
+};
+
+interface OpStatic {
+  readonly type: 'op';
+  readonly op: Op;
+}
+
+interface OpCreate {
+  readonly type: 'create';
+  readonly create: CreateOp;
+}
+
+type OpObject = OpStatic | OpCreate;
+
 export interface CreateOpArgs {
   readonly context: ExecutionContext;
 }
-export type CreateOp = (input: CreateOpArgs) => Op;
 
 export const createOp = ({
   name,
@@ -71,7 +90,7 @@ export const createOp = ({
   readonly item?: number;
   readonly fee?: BN;
   readonly invoke: OpInvoke;
-}): CreateOp => ({ context }) => {
+}): OpStatic => {
   let fee = feeIn;
   if (fee === undefined) {
     const byteCode = OpCodeToByteCode[name];
@@ -79,19 +98,21 @@ export const createOp = ({
   }
 
   return {
-    name,
-    in: _in,
-    inAlt,
-    out,
-    outAlt,
-    modify,
-    modifyAlt,
-    invocation,
-    array,
-    item,
-    fee,
-    invoke,
-    context,
+    type: 'op',
+    op: {
+      name,
+      in: _in,
+      inAlt,
+      out,
+      outAlt,
+      modify,
+      modifyAlt,
+      invocation,
+      array,
+      item,
+      fee,
+      invoke,
+    },
   };
 };
 
@@ -168,78 +189,81 @@ const jump = ({ name, checkTrue }: { readonly name: OpCode; readonly checkTrue?:
 
 const isDynamic = (hash: UInt160) => common.uInt160ToBuffer(hash).every((value) => value === 0);
 
-const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: boolean }) => ({
-  context: contextIn,
-}: CreateOpArgs) => {
-  const hashIn = common.bufferToUInt160(contextIn.code.slice(contextIn.pc, contextIn.pc + 20));
+const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: boolean }): OpCreate => ({
+  type: 'create',
+  create: ({ context: contextIn }) => {
+    const hashIn = common.bufferToUInt160(contextIn.code.slice(contextIn.pc, contextIn.pc + 20));
 
-  return createOp({
-    name,
-    in: isDynamic(hashIn) ? 1 : 0,
-    invocation: tailCall ? 0 : 1,
-    fee: FEES.TEN,
-    invoke: async ({ monitor, context, args }) => {
-      const { pc, scriptHash } = context;
-      let hash = common.bufferToUInt160(context.code.slice(pc, pc + 20));
-      if (isDynamic(hash)) {
-        hash = common.bufferToUInt160(args[0].asBuffer());
+    const { op } = createOp({
+      name,
+      in: isDynamic(hashIn) ? 1 : 0,
+      invocation: tailCall ? 0 : 1,
+      fee: FEES.TEN,
+      invoke: async ({ monitor, context, args }) => {
+        const { pc, scriptHash } = context;
+        let hash = common.bufferToUInt160(context.code.slice(pc, pc + 20));
+        if (isDynamic(hash)) {
+          hash = common.bufferToUInt160(args[0].asBuffer());
 
-        const executingContract = await context.blockchain.contract.get({
-          hash: scriptHash,
-        });
+          const executingContract = await context.blockchain.contract.get({
+            hash: scriptHash,
+          });
 
-        if (!executingContract.hasDynamicInvoke) {
-          throw new ContractNoDynamicInvokeError(context, common.uInt160ToString(scriptHash));
+          if (!executingContract.hasDynamicInvoke) {
+            throw new ContractNoDynamicInvokeError(context, common.uInt160ToString(scriptHash));
+          }
         }
-      }
-      const contract = await context.blockchain.contract.get({ hash });
-      const resultContext = await context.engine.executeScript({
-        monitor,
-        code: contract.script,
-        blockchain: context.blockchain,
-        init: context.init,
-        gasLeft: context.gasLeft,
-        options: {
-          stack: context.stack,
-          stackAlt: context.stackAlt,
-          depth: tailCall ? context.depth : context.depth + 1,
-          createdContracts: context.createdContracts,
-          scriptHash: context.scriptHash,
-          entryScriptHash: context.entryScriptHash,
-        },
-      });
-
-      let { state } = resultContext;
-      if (state === VMState.Halt) {
-        // If it's a tail call, then the final recursive call executes the rest
-        // of the script, and we just return immediately here.
-        state = tailCall ? VMState.Halt : context.state;
-      }
-
-      return {
-        context: {
-          state,
-          errorMessage: resultContext.errorMessage,
+        const contract = await context.blockchain.contract.get({ hash });
+        const resultContext = await context.engine.executeScript({
+          monitor,
+          code: contract.script,
           blockchain: context.blockchain,
           init: context.init,
-          engine: context.engine,
-          code: context.code,
-          pushOnly: context.pushOnly,
-          scriptHash: context.scriptHash,
-          callingScriptHash: context.callingScriptHash,
-          entryScriptHash: context.entryScriptHash,
-          pc: pc + 20,
-          depth: context.depth,
-          ...getResultContext(resultContext),
-        },
-      };
-    },
-  })({ context: contextIn });
-};
+          gasLeft: context.gasLeft,
+          options: {
+            stack: context.stack,
+            stackAlt: context.stackAlt,
+            depth: tailCall ? context.depth : context.depth + 1,
+            createdContracts: context.createdContracts,
+            scriptHash: context.scriptHash,
+            entryScriptHash: context.entryScriptHash,
+          },
+        });
+
+        let { state } = resultContext;
+        if (state === VMState.Halt) {
+          // If it's a tail call, then the final recursive call executes the rest
+          // of the script, and we just return immediately here.
+          state = tailCall ? VMState.Halt : context.state;
+        }
+
+        return {
+          context: {
+            state,
+            errorMessage: resultContext.errorMessage,
+            blockchain: context.blockchain,
+            init: context.init,
+            engine: context.engine,
+            code: context.code,
+            pushOnly: context.pushOnly,
+            scriptHash: context.scriptHash,
+            callingScriptHash: context.callingScriptHash,
+            entryScriptHash: context.entryScriptHash,
+            pc: pc + 20,
+            depth: context.depth,
+            ...getResultContext(resultContext),
+          },
+        };
+      },
+    });
+
+    return { op, context: contextIn };
+  },
+});
 
 const JMP = jump({ name: 'JMP' });
 
-const OPCODE_PAIRS = [
+const OPCODE_PAIRS = ([
   [
     0x00,
     createOp({
@@ -251,9 +275,9 @@ const OPCODE_PAIRS = [
       }),
     }),
   ],
-]
+] as ReadonlyArray<[number, OpObject]>)
   .concat(
-    _.range(0x01, 0x4c).map((idx) => [
+    _.range(0x01, 0x4c).map<[number, OpObject]>((idx) => [
       idx,
       createOp({
         // tslint:disable-next-line no-any
@@ -276,7 +300,7 @@ const OPCODE_PAIRS = [
     [0x4f, pushNumber({ name: 'PUSHM1', value: -1 })],
   ])
   .concat(
-    _.range(0x51, 0x61).map((idx) => {
+    _.range(0x51, 0x61).map<[number, OpObject]>((idx) => {
       const value = idx - 0x50;
 
       // tslint:disable-next-line no-any
@@ -291,7 +315,6 @@ const OPCODE_PAIRS = [
         invoke: ({ context }) => ({ context }),
       }),
     ],
-
     [0x62, JMP],
     [0x63, jump({ name: 'JMPIF', checkTrue: true })],
     [0x64, jump({ name: 'JMPIFNOT', checkTrue: false })],
@@ -306,10 +329,10 @@ const OPCODE_PAIRS = [
           // Execute JMP in place of current op codes pc using same context
           // Continue running after JMP until done
           // Set current pc to pc + 2
-          const op = JMP({ context });
+          const { op } = JMP;
           const { context: startContext } = await op.invoke({
             monitor,
-            context: op.context,
+            context,
             args: [],
             argsAlt: [],
           });
@@ -333,7 +356,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0x66,
       createOp({
@@ -343,31 +365,34 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [0x67, call({ name: 'APPCALL' })],
     [
       0x68,
-      ({ context }) => {
-        const sysCall = lookupSysCall({ context });
+      {
+        type: 'create',
+        create: ({ context }) => {
+          const sysCall = lookupSysCall({ context });
 
-        return {
-          name: 'SYSCALL',
-          in: sysCall.in,
-          inAlt: sysCall.inAlt,
-          out: sysCall.out,
-          outAlt: sysCall.outAlt,
-          modify: sysCall.modify,
-          modifyAlt: sysCall.modifyAlt,
-          invocation: sysCall.invocation,
-          array: sysCall.array,
-          item: sysCall.item,
-          fee: sysCall.fee,
-          invoke: sysCall.invoke,
-          context: sysCall.context,
-        };
+          return {
+            op: {
+              name: 'SYSCALL',
+              in: sysCall.in,
+              inAlt: sysCall.inAlt,
+              out: sysCall.out,
+              outAlt: sysCall.outAlt,
+              modify: sysCall.modify,
+              modifyAlt: sysCall.modifyAlt,
+              invocation: sysCall.invocation,
+              array: sysCall.array,
+              item: sysCall.item,
+              fee: sysCall.fee,
+              invoke: sysCall.invoke,
+            },
+            context: sysCall.context,
+          };
+        },
       },
     ],
-
     [0x69, call({ name: 'TAILCALL', tailCall: true })],
     [
       0x6a,
@@ -383,7 +408,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x6b,
       createOp({
@@ -396,7 +420,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x6c,
       createOp({
@@ -409,7 +432,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x6d,
       createOp({
@@ -433,7 +455,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0x72,
       createOp({
@@ -453,7 +474,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0x73,
       createOp({
@@ -480,7 +500,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0x74,
       createOp({
@@ -492,7 +511,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x75,
       createOp({
@@ -501,7 +519,6 @@ const OPCODE_PAIRS = [
         invoke: ({ context }) => ({ context }),
       }),
     ],
-
     [
       0x76,
       createOp({
@@ -514,7 +531,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x77,
       createOp({
@@ -527,7 +543,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x78,
       createOp({
@@ -540,7 +555,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x79,
       createOp({
@@ -560,7 +574,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0x7a,
       createOp({
@@ -590,7 +603,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0x7b,
       createOp({
@@ -603,7 +615,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x7c,
       createOp({
@@ -616,7 +627,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x7d,
       createOp({
@@ -629,7 +639,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x7e,
       createOp({
@@ -642,7 +651,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x7f,
       createOp({
@@ -667,7 +675,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0x80,
       createOp({
@@ -687,7 +694,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0x81,
       createOp({
@@ -712,7 +718,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0x82,
       createOp({
@@ -725,7 +730,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x83,
       createOp({
@@ -742,7 +746,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x84,
       createOp({
@@ -757,7 +760,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x85,
       createOp({
@@ -772,7 +774,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x86,
       createOp({
@@ -787,7 +788,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x87,
       createOp({
@@ -800,7 +800,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     // [0x88, createOp({
     //   name: 'OP_EQUALVERIFY',
     //   invoke: ({ context }: OpInvokeArgs) => ({ context }),
@@ -825,7 +824,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x8c,
       createOp({
@@ -838,7 +836,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x8d,
       createOp({
@@ -860,7 +857,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0x8f,
       createOp({
@@ -873,7 +869,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x90,
       createOp({
@@ -886,7 +881,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x91,
       createOp({
@@ -899,7 +893,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x92,
       createOp({
@@ -912,7 +905,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x93,
       createOp({
@@ -925,7 +917,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x94,
       createOp({
@@ -938,7 +929,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x95,
       createOp({
@@ -951,7 +941,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x96,
       createOp({
@@ -964,7 +953,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x97,
       createOp({
@@ -977,7 +965,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x98,
       createOp({
@@ -990,7 +977,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x99,
       createOp({
@@ -1003,7 +989,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x9a,
       createOp({
@@ -1016,7 +1001,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x9b,
       createOp({
@@ -1029,7 +1013,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x9c,
       createOp({
@@ -1042,7 +1025,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x9e,
       createOp({
@@ -1055,7 +1037,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0x9f,
       createOp({
@@ -1068,7 +1049,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xa0,
       createOp({
@@ -1081,7 +1061,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xa1,
       createOp({
@@ -1094,7 +1073,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xa2,
       createOp({
@@ -1107,7 +1085,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xa3,
       createOp({
@@ -1120,7 +1097,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xa4,
       createOp({
@@ -1133,7 +1109,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xa5,
       createOp({
@@ -1150,7 +1125,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xa7,
       createOp({
@@ -1164,7 +1138,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xa8,
       createOp({
@@ -1178,7 +1151,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xa9,
       createOp({
@@ -1192,7 +1164,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xaa,
       createOp({
@@ -1206,7 +1177,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xac,
       createOp({
@@ -1235,7 +1205,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0xad,
       createOp({
@@ -1264,96 +1233,99 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0xae,
-      ({ context: contextIn }) => {
-        const { stack } = contextIn;
-        const top = stack[0] as StackItem | undefined;
-        let pubKeyCount = 0;
-        let _in;
-        if (top === undefined || top.isArray()) {
-          if (top !== undefined) {
-            pubKeyCount = top.asArray().length;
-          }
-          _in = 1;
-        } else {
-          pubKeyCount = vmUtils.toNumber(contextIn, top.asBigInteger());
-          if (pubKeyCount <= 0) {
-            throw new InvalidCheckMultisigArgumentsError(contextIn);
-          }
-          _in = pubKeyCount + 1;
-        }
-
-        const next = stack[_in] as StackItem | undefined;
-        if (next === undefined || next.isArray()) {
-          _in += 1;
-        } else {
-          const sigCount = vmUtils.toNumber(contextIn, next.asBigInteger());
-          if (sigCount < 0) {
-            throw new InvalidCheckMultisigArgumentsError(contextIn);
-          }
-          _in += sigCount + 1;
-        }
-
-        return createOp({
-          name: 'CHECKMULTISIG',
-          in: _in,
-          out: 1,
-          fee: pubKeyCount === 0 ? FEES.ONE : FEES.ONE_HUNDRED.mul(new BN(pubKeyCount)),
-          invoke: ({ context, args }) => {
-            let index;
-            let publicKeys;
-            if (args[0].isArray()) {
-              index = 1;
-              publicKeys = args[0].asArray().map((value) => value.asECPoint());
-            } else {
-              const count = vmUtils.toNumber(context, args[0].asBigInteger());
-              index = count + 1;
-              publicKeys = args.slice(1, index).map((value) => value.asECPoint());
+      {
+        type: 'create',
+        create: ({ context: contextIn }) => {
+          const { stack } = contextIn;
+          const top = stack[0] as StackItem | undefined;
+          let pubKeyCount = 0;
+          let _in;
+          if (top === undefined || top.isArray()) {
+            if (top !== undefined) {
+              pubKeyCount = top.asArray().length;
             }
-
-            const signatures = args[index].isArray()
-              ? args[index].asArray().map((value) => value.asBuffer())
-              : args.slice(index + 1).map((value) => value.asBuffer());
-
-            if (publicKeys.length === 0 || signatures.length === 0 || signatures.length > publicKeys.length) {
-              throw new InvalidCheckMultisigArgumentsError(context);
+            _in = 1;
+          } else {
+            pubKeyCount = vmUtils.toNumber(contextIn, top.asBigInteger());
+            if (pubKeyCount <= 0) {
+              throw new InvalidCheckMultisigArgumentsError(contextIn);
             }
+            _in = pubKeyCount + 1;
+          }
 
-            let result = true;
-            const n = publicKeys.length;
-            const m = signatures.length;
-            try {
-              // tslint:disable-next-line no-loop-statement
-              for (let i = 0, j = 0; result && i < m && j < n; ) {
-                const currentResult = crypto.verify({
-                  message: context.init.scriptContainer.value.message,
-                  signature: signatures[i],
-                  publicKey: publicKeys[j],
-                });
+          const next = stack[_in] as StackItem | undefined;
+          if (next === undefined || next.isArray()) {
+            _in += 1;
+          } else {
+            const sigCount = vmUtils.toNumber(contextIn, next.asBigInteger());
+            if (sigCount < 0) {
+              throw new InvalidCheckMultisigArgumentsError(contextIn);
+            }
+            _in += sigCount + 1;
+          }
 
-                if (currentResult) {
-                  i += 1;
-                }
-                j += 1;
-                if (m - i > n - j) {
-                  result = false;
-                }
+          const { op } = createOp({
+            name: 'CHECKMULTISIG',
+            in: _in,
+            out: 1,
+            fee: pubKeyCount === 0 ? FEES.ONE : FEES.ONE_HUNDRED.mul(new BN(pubKeyCount)),
+            invoke: ({ context, args }) => {
+              let index;
+              let publicKeys;
+              if (args[0].isArray()) {
+                index = 1;
+                publicKeys = args[0].asArray().map((value) => value.asECPoint());
+              } else {
+                const count = vmUtils.toNumber(context, args[0].asBigInteger());
+                index = count + 1;
+                publicKeys = args.slice(1, index).map((value) => value.asECPoint());
               }
-            } catch {
-              result = false;
-            }
 
-            return {
-              context,
-              results: [new BooleanStackItem(result)],
-            };
-          },
-        })({ context: contextIn });
+              const signatures = args[index].isArray()
+                ? args[index].asArray().map((value) => value.asBuffer())
+                : args.slice(index + 1).map((value) => value.asBuffer());
+
+              if (publicKeys.length === 0 || signatures.length === 0 || signatures.length > publicKeys.length) {
+                throw new InvalidCheckMultisigArgumentsError(context);
+              }
+
+              let result = true;
+              const n = publicKeys.length;
+              const m = signatures.length;
+              try {
+                // tslint:disable-next-line no-loop-statement
+                for (let i = 0, j = 0; result && i < m && j < n; ) {
+                  const currentResult = crypto.verify({
+                    message: context.init.scriptContainer.value.message,
+                    signature: signatures[i],
+                    publicKey: publicKeys[j],
+                  });
+
+                  if (currentResult) {
+                    i += 1;
+                  }
+                  j += 1;
+                  if (m - i > n - j) {
+                    result = false;
+                  }
+                }
+              } catch {
+                result = false;
+              }
+
+              return {
+                context,
+                results: [new BooleanStackItem(result)],
+              };
+            },
+          });
+
+          return { op, context: contextIn };
+        },
       },
     ],
-
     [
       0xc0,
       createOp({
@@ -1366,62 +1338,69 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xc1,
-      ({ context: contextIn }) => {
-        const { stack } = contextIn;
-        const top = stack[0] as StackItem | undefined;
-        let _in;
-        if (top === undefined) {
-          // This will cause the op to throw once it's executed.
-          _in = 1;
-        } else {
-          _in = vmUtils.toNumber(contextIn, top.asBigInteger()) + 1;
+      {
+        type: 'create',
+        create: ({ context: contextIn }) => {
+          const { stack } = contextIn;
+          const top = stack[0] as StackItem | undefined;
+          let _in;
+          if (top === undefined) {
+            // This will cause the op to throw once it's executed.
+            _in = 1;
+          } else {
+            _in = vmUtils.toNumber(contextIn, top.asBigInteger()) + 1;
 
-          if (_in < 0) {
-            throw new InvalidPackCountError(contextIn);
+            if (_in < 0) {
+              throw new InvalidPackCountError(contextIn);
+            }
           }
-        }
 
-        return createOp({
-          name: 'PACK',
-          in: _in,
-          out: 1,
-          invoke: ({ context, args }) => ({
-            context,
-            results: [new ArrayStackItem(args.slice(1))],
-          }),
-        })({ context: contextIn });
+          const { op } = createOp({
+            name: 'PACK',
+            in: _in,
+            out: 1,
+            invoke: ({ context, args }) => ({
+              context,
+              results: [new ArrayStackItem(args.slice(1))],
+            }),
+          });
+
+          return { op, context: contextIn };
+        },
       },
     ],
-
     [
       0xc2,
-      ({ context: contextIn }) => {
-        const { stack } = contextIn;
-        const top = stack[0] as StackItem | undefined;
-        const out = top === undefined ? 1 : top.asArray().length + 1;
+      {
+        type: 'create',
+        create: ({ context: contextIn }) => {
+          const { stack } = contextIn;
+          const top = stack[0] as StackItem | undefined;
+          const out = top === undefined ? 1 : top.asArray().length + 1;
 
-        return createOp({
-          name: 'UNPACK',
-          in: 1,
-          out,
-          invoke: ({ context, args }) => {
-            const arr = args[0].asArray();
-            const mutableResults = [];
-            // tslint:disable-next-line no-loop-statement
-            for (let i = arr.length - 1; i >= 0; i -= 1) {
-              mutableResults.push(arr[i]);
-            }
-            mutableResults.push(new IntegerStackItem(new BN(arr.length)));
+          const { op } = createOp({
+            name: 'UNPACK',
+            in: 1,
+            out,
+            invoke: ({ context, args }) => {
+              const arr = args[0].asArray();
+              const mutableResults = [];
+              // tslint:disable-next-line no-loop-statement
+              for (let i = arr.length - 1; i >= 0; i -= 1) {
+                mutableResults.push(arr[i]);
+              }
+              mutableResults.push(new IntegerStackItem(new BN(arr.length)));
 
-            return { context, results: mutableResults };
-          },
-        })({ context: contextIn });
+              return { context, results: mutableResults };
+            },
+          });
+
+          return { op, context: contextIn };
+        },
       },
     ],
-
     [
       0xc3,
       createOp({
@@ -1449,7 +1428,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0xc4,
       createOp({
@@ -1480,7 +1458,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0xc5,
       createOp({
@@ -1497,7 +1474,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xc6,
       createOp({
@@ -1514,7 +1490,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xc7,
       createOp({
@@ -1526,7 +1501,6 @@ const OPCODE_PAIRS = [
         }),
       }),
     ],
-
     [
       0xc8,
       createOp({
@@ -1544,7 +1518,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0xc9,
       createOp({
@@ -1558,7 +1531,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0xca,
       createOp({
@@ -1584,7 +1556,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0xcb,
       createOp({
@@ -1615,7 +1586,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0xcc,
       createOp({
@@ -1629,7 +1599,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0xcd,
       createOp({
@@ -1645,7 +1614,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0xf0,
       createOp({
@@ -1655,7 +1623,6 @@ const OPCODE_PAIRS = [
         },
       }),
     ],
-
     [
       0xf1,
       createOp({
@@ -1672,23 +1639,32 @@ const OPCODE_PAIRS = [
     ],
   ]);
 
-export const OPCODES = _.fromPairs(OPCODE_PAIRS) as { readonly [Byte in number]?: CreateOp };
+export const OPCODES = _.fromPairs(OPCODE_PAIRS) as { readonly [Byte in number]?: OpObject };
+const STATIC_OPCODES = _.fromPairs(OPCODE_PAIRS.filter((value): value is [number, OpStatic] => value[1].type === 'op'));
+const CREATE_OPCODES = _.fromPairs(
+  OPCODE_PAIRS.filter((value): value is [number, OpCreate] => value[1].type === 'create'),
+);
 
 export const lookupOp = ({ context }: { readonly context: ExecutionContext }) => {
   const opCode = context.code[context.pc];
-  const create = OPCODES[opCode];
+
+  if (context.pushOnly && opCode > OpCodeToByteCode.PUSH16 && opCode !== OpCodeToByteCode.RET) {
+    throw new PushOnlyError(context, opCode);
+  }
+
+  const op = STATIC_OPCODES[opCode] as OpStatic | undefined;
+  const newContext = {
+    ...context,
+    pc: context.pc + 1,
+  };
+  if (op !== undefined) {
+    return { op: op.op, context: newContext };
+  }
+
+  const create = CREATE_OPCODES[opCode] as OpCreate | undefined;
   if (create === undefined) {
     throw new UnknownOpError(context, `${opCode}`);
   }
 
-  if (opCode > OpCodeToByteCode.PUSH16 && opCode !== OpCodeToByteCode.RET && context.pushOnly) {
-    throw new PushOnlyError(context, opCode);
-  }
-
-  return create({
-    context: {
-      ...context,
-      pc: context.pc + 1,
-    },
-  });
+  return create.create({ context: newContext });
 };

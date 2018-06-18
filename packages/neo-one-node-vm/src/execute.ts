@@ -8,7 +8,6 @@ import {
   VMListeners,
   WriteBlockchain,
 } from '@neo-one/node-core';
-import { labels } from '@neo-one/utils';
 import BN from 'bn.js';
 import _ from 'lodash';
 import {
@@ -55,9 +54,8 @@ const executeNext = async ({
     };
   }
 
-  const op = lookupOp({ context });
-  // eslint-disable-next-line
-  context = op.context;
+  const { op, context: opContext } = lookupOp({ context });
+  context = opContext;
 
   if (context.stack.length < op.in) {
     throw new StackUnderflowError(context, op.name, context.stack.length, op.in);
@@ -101,13 +99,7 @@ const executeNext = async ({
 
   let result;
   try {
-    result = await monitor
-      .withLabels({ [labels.OP_CODE]: op.name })
-      .captureSpanLog((span) => op.invoke({ monitor: span, context, args, argsAlt }), {
-        name: 'neo_execute_op',
-        level: { log: 'debug', span: 'debug' },
-        error: { level: 'debug' },
-      });
+    result = await op.invoke({ monitor, context, args, argsAlt });
   } catch (error) {
     if (error.code === 'VM_ERROR') {
       throw error;
