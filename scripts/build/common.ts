@@ -153,9 +153,10 @@ const getBinConfigs = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> =
 const getEntries = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
   const dir = getPackagePath(pkg, 'src');
   const index = path.join(dir, 'index.ts');
+  const indexBrowser = path.join(dir, 'index.browser.ts');
   const [existsIndex, existsIndexBrowser, binConfigs] = await Promise.all([
-    fs.pathExists(path.join(dir, 'index.ts')),
-    fs.pathExists(path.join(dir, 'index.browser.ts')),
+    fs.pathExists(index),
+    fs.pathExists(indexBrowser),
     getBinConfigs(pkg),
   ]);
   let result = binConfigs;
@@ -183,7 +184,7 @@ const getEntries = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
     result = result.concat([
       {
         entry: Entry.browser,
-        input: index,
+        input: indexBrowser,
         includeDeps: false,
         outputs: [
           {
