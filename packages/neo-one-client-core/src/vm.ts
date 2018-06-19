@@ -283,6 +283,7 @@ export enum SysCall {
   'Neo.Storage.Find' = 'Neo.Storage.Find',
   'Neo.StorageContext.AsReadOnly' = 'Neo.StorageContext.AsReadOnly',
   'Neo.Enumerator.Create' = 'Neo.Enumerator.Create',
+  'Neo.Iterator.Create' = 'Neo.Iterator.Create',
   'Neo.Enumerator.Next' = 'Neo.Enumerator.Next',
   'Neo.Iterator.Key' = 'Neo.Iterator.Key',
   'Neo.Enumerator.Value' = 'Neo.Enumerator.Value',
