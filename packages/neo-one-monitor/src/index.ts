@@ -1,5 +1,6 @@
 export { CollectingLogger } from './CollectingLogger';
 export { NodeMonitor as DefaultMonitor } from './NodeMonitor';
+export { BrowserMonitor } from './BrowserMonitor';
 export { Reporter } from './Reporter';
 export { metrics } from './NoOpMetricsFactory';
 export { nodeMetrics as defaultMetrics } from './NodeMetricsFactory';
