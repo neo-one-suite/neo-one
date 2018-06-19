@@ -53,7 +53,7 @@ import {
 import { PeerData } from './PeerData';
 
 const messageReceivedLabelNames: ReadonlyArray<string> = [labels.COMMAND_NAME];
-const messageReceivedLabels = Object.values(Command).map((command) => ({
+const messageReceivedLabels = Object.keys(Command).map((command) => ({
   [labels.COMMAND_NAME]: command,
 }));
 
@@ -80,9 +80,9 @@ export interface Options {
     readonly enabled: boolean;
     readonly options: ConsensusOptions;
   };
-
   readonly network?: NetworkOptions;
   readonly rpcURLs?: ReadonlyArray<string>;
+  readonly unhealthyPeerSeconds?: number;
 }
 
 const createPeerBloomFilter = ({
@@ -114,12 +114,12 @@ const GET_BLOCKS_BUFFER = GET_BLOCKS_COUNT / 3;
 const GET_BLOCKS_TIME_MS = 10000;
 const GET_BLOCKS_THROTTLE_MS = 1000;
 const GET_BLOCKS_CLOSE_COUNT = 2;
-const UNHEALTHY_PEER_SECONDS = 120;
+const UNHEALTHY_PEER_SECONDS = 300;
 const LOCAL_HOST_ADDRESSES = new Set(['', '0.0.0.0', 'localhost', '127.0.0.1', '::', '::1']);
 
 interface PeerHealth {
   readonly healthy: boolean;
-  readonly blockIndex: number;
+  readonly blockIndex: number | undefined;
   readonly checkTimeSeconds: number;
 }
 
@@ -143,6 +143,7 @@ export class Node implements INode {
   private mutableGetBlocksRequestTime: number | undefined;
   private mutableGetBlocksRequestsCount: number;
   private mutableBestPeer: ConnectedPeer<Message, PeerData> | undefined;
+  private mutableUnhealthyPeerSeconds = UNHEALTHY_PEER_SECONDS;
   private readonly consensusCache: LRU.Cache<string, ConsensusPayload>;
   // tslint:disable-next-line readonly-keyword
   private readonly mutableBlockIndex: { [endpoint: string]: number };
@@ -295,7 +296,13 @@ export class Node implements INode {
       }),
     );
 
-    return merge(network$, consensus$);
+    const options$ = this.options$.pipe(
+      map(({ unhealthyPeerSeconds = UNHEALTHY_PEER_SECONDS }) => {
+        this.mutableUnhealthyPeerSeconds = unhealthyPeerSeconds;
+      }),
+    );
+
+    return merge(network$, consensus$, options$);
   }
 
   public async relayTransaction(transaction: Transaction, throwVerifyError = false): Promise<void> {
@@ -466,7 +473,7 @@ export class Node implements INode {
   };
   private readonly checkPeerHealth = (peer: ConnectedPeer<Message, PeerData>, prevHealth?: PeerHealth) => {
     const checkTimeSeconds = commonUtils.nowSeconds();
-    const blockIndex = this.mutableBlockIndex[peer.endpoint];
+    const blockIndex = this.mutableBlockIndex[peer.endpoint] as number | undefined;
 
     // If first check -> healthy
     if (prevHealth === undefined) {
@@ -474,7 +481,7 @@ export class Node implements INode {
     }
 
     // If seen new block -> healthy + update check time
-    if (prevHealth.blockIndex < blockIndex) {
+    if (prevHealth.blockIndex !== undefined && blockIndex !== undefined && prevHealth.blockIndex < blockIndex) {
       return { healthy: true, checkTimeSeconds, blockIndex };
     }
 
@@ -482,7 +489,7 @@ export class Node implements INode {
     // time -> healthy
     if (
       prevHealth.blockIndex === blockIndex &&
-      commonUtils.nowSeconds() - prevHealth.checkTimeSeconds < UNHEALTHY_PEER_SECONDS
+      commonUtils.nowSeconds() - prevHealth.checkTimeSeconds < this.mutableUnhealthyPeerSeconds
     ) {
       return {
         healthy: true,

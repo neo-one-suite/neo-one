@@ -32,7 +32,7 @@ export class BufferStackItem extends StackItemBase {
     return this.value;
   }
 
-  public toContractParameter(): ContractParameter {
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new ByteArrayContractParameter(this.value);
   }
 }
