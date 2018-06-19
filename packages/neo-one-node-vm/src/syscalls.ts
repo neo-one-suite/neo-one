@@ -1097,6 +1097,24 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     },
   }),
 
+  'Neo.Iterator.Create': createSysCall({
+    name: 'Neo.Iterator.Create',
+    in: 1,
+    out: 1,
+    invoke: async ({ context, args }) => {
+      const iterable = AsyncIterableX.from(
+        commonUtils
+          .zip(args[0].asMapStackItem().keysArray(), args[0].asMapStackItem().valuesArray())
+          .map(([key, value]) => ({ key, value })),
+      );
+
+      return {
+        context,
+        results: [new IteratorStackItem(new StackItemIterator(iterable[Symbol.asyncIterator]()))],
+      };
+    },
+  }),
+
   'Neo.Iterator.Key': createSysCall({
     name: 'Neo.Iterator.Key',
     in: 1,

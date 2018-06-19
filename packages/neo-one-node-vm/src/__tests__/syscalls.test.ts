@@ -1593,6 +1593,46 @@ const SYSCALLS: TestCase[] = [
         type: 'calls',
         calls: [
           {
+            name: 'Neo.Iterator.Create',
+            type: 'sys',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'NEWMAP',
+                    type: 'op',
+                  },
+
+                  {
+                    name: 'DUP',
+                    type: 'op',
+                  },
+
+                  {
+                    name: 'SETITEM',
+                    type: 'op',
+                    args: [Buffer.from('value', 'utf8'), Buffer.from('key', 'utf8')],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+
+    result: [new BooleanStackItem(true)],
+    gas: FEES.ONE,
+  },
+
+  {
+    name: 'Neo.Enumerator.Next',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
             name: 'Neo.Enumerator.Create',
             type: 'sys',
             args: [[new BN(0)]],

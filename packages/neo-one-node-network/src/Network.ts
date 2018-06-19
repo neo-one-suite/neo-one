@@ -244,7 +244,8 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
             const peer = this.mutableConnectedPeers[endpoint];
             if (peer !== undefined) {
               peer.close();
-              ({ [endpoint]: _unused, ...this.mutableConnectedPeers } = this.mutableConnectedPeers);
+              const { [peer.endpoint]: _unused, ...mutableConnectedPeers } = this.mutableConnectedPeers;
+              this.mutableConnectedPeers = mutableConnectedPeers;
             }
           });
 
