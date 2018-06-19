@@ -53,7 +53,7 @@ import {
 import { PeerData } from './PeerData';
 
 const messageReceivedLabelNames: ReadonlyArray<string> = [labels.COMMAND_NAME];
-const messageReceivedLabels = Object.values(Command).map((command) => ({
+const messageReceivedLabels = Object.keys(Command).map((command) => ({
   [labels.COMMAND_NAME]: command,
 }));
 
