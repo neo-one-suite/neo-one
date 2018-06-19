@@ -50,16 +50,24 @@ export interface NetworkResourceAdapterOptions extends NetworkResourceAdapterSta
 }
 
 const DEFAULT_MAIN_SEEDS: ReadonlyArray<EndpointConfig> = [
-  { type: 'tcp', host: 'seed1.cityofzion.io', port: 10333 },
-  { type: 'tcp', host: 'seed2.cityofzion.io', port: 10333 },
-  { type: 'tcp', host: 'seed3.cityofzion.io', port: 10333 },
-  { type: 'tcp', host: 'seed4.cityofzion.io', port: 10333 },
-  { type: 'tcp', host: 'seed5.cityofzion.io', port: 10333 },
-  { type: 'tcp', host: 'seed1.neo.org', port: 10333 },
-  { type: 'tcp', host: 'seed2.neo.org', port: 10333 },
-  { type: 'tcp', host: 'seed3.neo.org', port: 10333 },
-  { type: 'tcp', host: 'seed4.neo.org', port: 10333 },
-  { type: 'tcp', host: 'seed5.neo.org', port: 10333 },
+  { type: 'tcp', host: 'seed1.switcheo.network', port: 10333 },
+  { type: 'tcp', host: 'seed2.switcheo.network', port: 10333 },
+  { type: 'tcp', host: 'seed3.switcheo.network', port: 10333 },
+  { type: 'tcp', host: 'seed4.switcheo.network', port: 10333 },
+  { type: 'tcp', host: 'seed1.travala.com', port: 10333 },
+  { type: 'tcp', host: 'seed2.travala.com', port: 10333 },
+  { type: 'tcp', host: 'seed3.travala.com', port: 10333 },
+  { type: 'tcp', host: 'seed4.travala.com', port: 10333 },
+  { type: 'tcp', host: 'node1.sgp1.bridgeprotocol.io', port: 10333 },
+  { type: 'tcp', host: 'node1.nyc3.bridgeprotocol.io', port: 10333 },
+  { type: 'tcp', host: 'node1.ams2.bridgeprotocol.io', port: 10333 },
+  { type: 'tcp', host: 'seed1.aphelion-neo.com', port: 10333 },
+  { type: 'tcp', host: 'seed2.aphelion-neo.com', port: 10333 },
+  { type: 'tcp', host: 'seed3.aphelion-neo.com', port: 10333 },
+  { type: 'tcp', host: 'seed4.aphelion-neo.com', port: 10333 },
+  { type: 'tcp', host: 'seed1.o3node.org', port: 10333 },
+  { type: 'tcp', host: 'seed2.o3node.org', port: 10333 },
+  { type: 'tcp', host: 'seed3.o3node.org', port: 10333 },
 ];
 
 const DEFAULT_TEST_SEEDS: ReadonlyArray<EndpointConfig> = [
