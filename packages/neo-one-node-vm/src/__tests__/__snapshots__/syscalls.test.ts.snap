@@ -835,36 +835,15 @@ exports[`syscalls Neo.Enumerator.Next 11`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Next 12`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Next 13`] = `
-Array [
-  Array [
-    Object {
-      "hash": "686302f409a2f3a10c2a7e547703d5032b877c75",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Enumerator.Next 13`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Next 14`] = `
-Array [
-  Array [
-    Object {
-      "hash": "686302f409a2f3a10c2a7e547703d5032b877c75",
-      "prefix": "01",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Enumerator.Next 14`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Next 15`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Next 16`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Next 17`] = `Array []`;
-
-exports[`syscalls Neo.Enumerator.Next 18`] = `Array []`;
-
-exports[`syscalls Neo.Enumerator.Next 19`] = `
+exports[`syscalls Neo.Enumerator.Next 17`] = `
 Array [
   Array [
     Object {
@@ -874,7 +853,7 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Enumerator.Next 20`] = `
+exports[`syscalls Neo.Enumerator.Next 18`] = `
 Array [
   Array [
     Object {
@@ -885,13 +864,42 @@ Array [
 ]
 `;
 
+exports[`syscalls Neo.Enumerator.Next 19`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Next 20`] = `Array []`;
+
 exports[`syscalls Neo.Enumerator.Next 21`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Next 22`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Next 23`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Next 23`] = `
+Array [
+  Array [
+    Object {
+      "hash": "686302f409a2f3a10c2a7e547703d5032b877c75",
+    },
+  ],
+]
+`;
 
-exports[`syscalls Neo.Enumerator.Next 24`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Next 24`] = `
+Array [
+  Array [
+    Object {
+      "hash": "686302f409a2f3a10c2a7e547703d5032b877c75",
+      "prefix": "01",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Enumerator.Next 25`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Next 26`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Next 27`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Next 28`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Value 1`] = `Array []`;
 
