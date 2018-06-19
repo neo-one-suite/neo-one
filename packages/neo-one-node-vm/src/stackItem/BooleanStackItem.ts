@@ -56,7 +56,7 @@ export class BooleanStackItem extends StackItemBase {
     return this.value ? BooleanStackItem.TRUE : BooleanStackItem.FALSE;
   }
 
-  public toContractParameter(): ContractParameter {
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new BooleanContractParameter(this.value);
   }
 }

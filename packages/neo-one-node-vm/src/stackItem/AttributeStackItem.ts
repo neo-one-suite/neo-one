@@ -12,6 +12,7 @@ import { BufferStackItem } from './BufferStackItem';
 import { ECPointStackItem } from './ECPointStackItem';
 import { ObjectStackItem } from './ObjectStackItem';
 import { StackItem } from './StackItem';
+import { StackItemBase } from './StackItemBase';
 import { UInt160StackItem } from './UInt160StackItem';
 import { UInt256StackItem } from './UInt256StackItem';
 
@@ -53,7 +54,7 @@ export class AttributeStackItem extends ObjectStackItem<Attribute> {
     return new BufferStackItem(value.value);
   }
 
-  public toContractParameter(): ContractParameter {
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
     return this.toValueStackItem().toContractParameter();
   }
 

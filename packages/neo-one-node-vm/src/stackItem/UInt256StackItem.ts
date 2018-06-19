@@ -36,7 +36,7 @@ export class UInt256StackItem extends StackItemBase {
     return common.uInt256ToBuffer(this.value);
   }
 
-  public toContractParameter(): ContractParameter {
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new Hash256ContractParameter(this.value);
   }
 }

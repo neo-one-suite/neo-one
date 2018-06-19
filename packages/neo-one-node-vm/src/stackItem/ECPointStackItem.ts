@@ -36,7 +36,7 @@ export class ECPointStackItem extends StackItemBase {
     return common.ecPointToBuffer(this.value);
   }
 
-  public toContractParameter(): ContractParameter {
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new PublicKeyContractParameter(this.value);
   }
 }

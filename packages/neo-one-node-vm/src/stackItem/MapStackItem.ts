@@ -54,7 +54,7 @@ export class MapStackItem extends StackItemBase {
     throw new InvalidValueBufferError();
   }
 
-  public toContractParameter(): ContractParameter {
+  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new InteropInterfaceContractParameter();
   }
 
