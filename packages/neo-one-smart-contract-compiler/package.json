@@ -46,7 +46,7 @@
     "@neo-one/smart-contract": "^1.0.0-alpha.6",
     "@neo-one/smart-contract-internal": "^1.0.0-alpha.3",
     "@neo-one/utils": "^1.0.0-alpha.38",
-    "@types/node": "^10.1.4",
+    "@types/node": "^10.3.4",
     "app-root-dir": "^1.0.2",
     "bn.js": "^4.11.8",
     "fs-extra": "^6.0.1",

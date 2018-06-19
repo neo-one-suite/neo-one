@@ -117,7 +117,7 @@
 
 "@babel/helper-module-imports@7.0.0-beta.49":
   version "7.0.0-beta.49"
-  resolved "https://registry.yarnpkg.com/@babel/helper-module-imports/-/helper-module-imports-7.0.0-beta.49.tgz#41d7d59891016c493432a46f7464446552890c75"
+  resolved "https://registry.npmjs.org/@babel/helper-module-imports/-/helper-module-imports-7.0.0-beta.49.tgz#41d7d59891016c493432a46f7464446552890c75"
   dependencies:
     "@babel/types" "7.0.0-beta.49"
     lodash "^4.17.5"
@@ -593,7 +593,7 @@
 
 "@babel/types@7.0.0-beta.49":
   version "7.0.0-beta.49"
-  resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.0.0-beta.49.tgz#b7e3b1c3f4d4cfe11bdf8c89f1efd5e1617b87a6"
+  resolved "https://registry.npmjs.org/@babel/types/-/types-7.0.0-beta.49.tgz#b7e3b1c3f4d4cfe11bdf8c89f1efd5e1617b87a6"
   dependencies:
     esutils "^2.0.2"
     lodash "^4.17.5"
@@ -877,16 +877,16 @@
   version "3.0.0"
   resolved "https://registry.npmjs.org/@types/indent-string/-/indent-string-3.0.0.tgz#9ebb391ceda548926f5819ad16405349641b999f"
 
-"@types/inquirer@0.0.41":
-  version "0.0.41"
-  resolved "https://registry.npmjs.org/@types/inquirer/-/inquirer-0.0.41.tgz#0c33027dcd0b0dde234e22afa454f2c75d8b30d2"
+"@types/inquirer@0.0.42":
+  version "0.0.42"
+  resolved "https://registry.npmjs.org/@types/inquirer/-/inquirer-0.0.42.tgz#2310fd8623053bead72247adae416aa32bacdf0c"
   dependencies:
     "@types/rx" "*"
     "@types/through" "*"
 
-"@types/jest@23.1.0":
-  version "23.1.0"
-  resolved "https://registry.npmjs.org/@types/jest/-/jest-23.1.0.tgz#8054dd838ba23dc331794d26456b86c7e50bf0f6"
+"@types/jest@23.1.1":
+  version "23.1.1"
+  resolved "https://registry.npmjs.org/@types/jest/-/jest-23.1.1.tgz#c54ab1a5f41aa693c0957222dd10414416d0c87b"
 
 "@types/js-priority-queue@0.0.5":
   version "0.0.5"
@@ -931,9 +931,9 @@
     "@types/koa-compose" "*"
     "@types/node" "*"
 
-"@types/lodash@4.14.109":
-  version "4.14.109"
-  resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.109.tgz#b1c4442239730bf35cabaf493c772b18c045886d"
+"@types/lodash@4.14.110":
+  version "4.14.110"
+  resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.110.tgz#fb07498f84152947f30ea09d89207ca07123461e"
 
 "@types/log-symbols@2.0.0":
   version "2.0.0"
@@ -961,9 +961,9 @@
   version "1.2.0"
   resolved "https://registry.npmjs.org/@types/node-cron/-/node-cron-1.2.0.tgz#aefb50be6c09f7e6a1e4c074168698b526c0b543"
 
-"@types/node@*", "@types/node@10.3.3", "@types/node@^10.1.4":
-  version "10.3.3"
-  resolved "https://registry.npmjs.org/@types/node/-/node-10.3.3.tgz#8798d9e39af2fa604f715ee6a6b19796528e46c3"
+"@types/node@*", "@types/node@10.3.4", "@types/node@^10.3.4":
+  version "10.3.4"
+  resolved "https://registry.npmjs.org/@types/node/-/node-10.3.4.tgz#c74e8aec19e555df44609b8057311052a2c84d9e"
 
 "@types/node@^8.9.4":
   version "8.10.20"
@@ -977,7 +977,7 @@
 
 "@types/protobufjs@6.0.0":
   version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@types/protobufjs/-/protobufjs-6.0.0.tgz#aeabb43f9507bb19c8adfb479584c151082353e4"
+  resolved "https://registry.npmjs.org/@types/protobufjs/-/protobufjs-6.0.0.tgz#aeabb43f9507bb19c8adfb479584c151082353e4"
   dependencies:
     protobufjs "*"
 
@@ -1108,7 +1108,7 @@
 
 "@types/yargs@11.0.0":
   version "11.0.0"
-  resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-11.0.0.tgz#124b9ed9c65b7091cc36da59ae12cbd47d8745ea"
+  resolved "https://registry.npmjs.org/@types/yargs/-/yargs-11.0.0.tgz#124b9ed9c65b7091cc36da59ae12cbd47d8745ea"
 
 JSONStream@^1.0.4:
   version "1.3.3"
@@ -1867,9 +1867,9 @@ chokidar@^1.6.0:
   optionalDependencies:
     fsevents "^1.0.0"
 
-chokidar@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.npmjs.org/chokidar/-/chokidar-2.0.3.tgz#dcbd4f6cbb2a55b4799ba8a840ac527e5f4b1176"
+chokidar@^2.0.3, chokidar@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.npmjs.org/chokidar/-/chokidar-2.0.4.tgz#356ff4e2b0e8e43e322d18a372460bbcf3accd26"
   dependencies:
     anymatch "^2.0.0"
     async-each "^1.0.0"
@@ -1878,12 +1878,13 @@ chokidar@^2.0.3:
     inherits "^2.0.1"
     is-binary-path "^1.0.0"
     is-glob "^4.0.0"
+    lodash.debounce "^4.0.8"
     normalize-path "^2.1.1"
     path-is-absolute "^1.0.0"
     readdirp "^2.0.0"
-    upath "^1.0.0"
+    upath "^1.0.5"
   optionalDependencies:
-    fsevents "^1.1.2"
+    fsevents "^1.2.2"
 
 chownr@^1.0.1:
   version "1.0.1"
@@ -2327,7 +2328,7 @@ cosmiconfig@^5.0.2:
     js-yaml "^3.9.0"
     parse-json "^4.0.0"
 
-coveralls@^3.0.0:
+coveralls@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npmjs.org/coveralls/-/coveralls-3.0.1.tgz#12e15914eaa29204e56869a5ece7b9e1492d2ae2"
   dependencies:
@@ -2781,7 +2782,7 @@ exec-sh@^0.2.0:
 
 execa@0.10.0, execa@^0.10.0:
   version "0.10.0"
-  resolved "https://registry.yarnpkg.com/execa/-/execa-0.10.0.tgz#ff456a8f53f90f8eccc71a96d11bdfc7f082cb50"
+  resolved "https://registry.npmjs.org/execa/-/execa-0.10.0.tgz#ff456a8f53f90f8eccc71a96d11bdfc7f082cb50"
   dependencies:
     cross-spawn "^6.0.0"
     get-stream "^3.0.0"
@@ -3162,7 +3163,7 @@ fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
 
-fsevents@^1.0.0, fsevents@^1.1.2, fsevents@^1.2.3:
+fsevents@^1.0.0, fsevents@^1.2.2, fsevents@^1.2.3:
   version "1.2.4"
   resolved "https://registry.npmjs.org/fsevents/-/fsevents-1.2.4.tgz#f41dcb1af2582af3692da36fc55cbd8e1041c426"
   dependencies:
@@ -4343,7 +4344,7 @@ jest-jasmine2@^23.1.0:
 
 jest-junit@5.0.0:
   version "5.0.0"
-  resolved "https://registry.yarnpkg.com/jest-junit/-/jest-junit-5.0.0.tgz#30ed3317c325165c2458ed2649f09d6e214ffab8"
+  resolved "https://registry.npmjs.org/jest-junit/-/jest-junit-5.0.0.tgz#30ed3317c325165c2458ed2649f09d6e214ffab8"
   dependencies:
     jest-validate "^23.0.1"
     mkdirp "^0.5.1"
@@ -5050,6 +5051,10 @@ lodash.concat@^4.5.0:
   version "4.5.0"
   resolved "https://registry.npmjs.org/lodash.concat/-/lodash.concat-4.5.0.tgz#b053ae02e4a8008582e7256b9d02bda6d0380395"
 
+lodash.debounce@^4.0.8:
+  version "4.0.8"
+  resolved "https://registry.npmjs.org/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
+
 lodash.find@^4.6.0:
   version "4.6.0"
   resolved "https://registry.npmjs.org/lodash.find/-/lodash.find-4.6.0.tgz#cb0704d47ab71789ffa0de8b97dd926fb88b13b1"
@@ -5119,7 +5124,7 @@ lodash.values@^4.3.0:
   version "4.3.0"
   resolved "https://registry.npmjs.org/lodash.values/-/lodash.values-4.3.0.tgz#a3a6c2b0ebecc5c2cba1c17e6e620fe81b53d347"
 
-lodash@4.17.10, lodash@^4.13.1, lodash@^4.17.0, lodash@^4.17.10, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.1:
+lodash@4.17.10, lodash@^4.13.1, lodash@^4.17.10, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.1:
   version "4.17.10"
   resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
 
@@ -5245,12 +5250,12 @@ mali-onerror@^0.1.1:
     error-inject "^1.0.0"
     mali-call-types "^0.1.0"
 
-mali@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.npmjs.org/mali/-/mali-0.7.1.tgz#991aded73e9b2542536d604ba9ed325c7e9ae0ac"
+mali@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.npmjs.org/mali/-/mali-0.8.0.tgz#9b3570b16d5c7e7acf82484951fc07cf319e138f"
   dependencies:
     ascallback "^1.1.1"
-    coveralls "^3.0.0"
+    coveralls "^3.0.1"
     delegates "^1.0.0"
     destroy "^1.0.4"
     ee-first "^1.1.1"
@@ -5258,7 +5263,7 @@ mali@^0.7.1:
     grpc-create-metadata "^3.0.0"
     grpc-inspect "^0.5.0"
     is-stream "^1.1.0"
-    lodash "^4.17.0"
+    lodash "^4.17.10"
     lodash.camelcase "^4.3.0"
     lodash.concat "^4.5.0"
     lodash.find "^4.6.0"
@@ -5734,8 +5739,8 @@ number-is-nan@^1.0.0:
   resolved "https://registry.npmjs.org/number-is-nan/-/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
 
 nwsapi@^2.0.0:
-  version "2.0.3"
-  resolved "https://registry.npmjs.org/nwsapi/-/nwsapi-2.0.3.tgz#3f4010d6c943f34018d3dfb5f2fbc0de90476959"
+  version "2.0.4"
+  resolved "https://registry.npmjs.org/nwsapi/-/nwsapi-2.0.4.tgz#dc79040a5f77b97716dc79565fc7fc3ef7d50570"
 
 oauth-sign@~0.8.2:
   version "0.8.2"
@@ -5754,8 +5759,8 @@ object-copy@^0.1.0:
     kind-of "^3.0.3"
 
 object-keys@^1.0.8:
-  version "1.0.11"
-  resolved "https://registry.npmjs.org/object-keys/-/object-keys-1.0.11.tgz#c54601778ad560f1142ce0e01bcca8b56d13426d"
+  version "1.0.12"
+  resolved "https://registry.npmjs.org/object-keys/-/object-keys-1.0.12.tgz#09c53855377575310cca62f55bb334abff7b3ed2"
 
 object-visit@^1.0.0:
   version "1.0.1"
@@ -6578,7 +6583,7 @@ ripemd160@^2.0.1:
 
 rollup-plugin-babel@4.0.0-beta.5:
   version "4.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-babel/-/rollup-plugin-babel-4.0.0-beta.5.tgz#1968a72a0be9414a2b073689cf747874cbf0a12b"
+  resolved "https://registry.npmjs.org/rollup-plugin-babel/-/rollup-plugin-babel-4.0.0-beta.5.tgz#1968a72a0be9414a2b073689cf747874cbf0a12b"
   dependencies:
     "@babel/helper-module-imports" "7.0.0-beta.49"
     rollup-pluginutils "^2.0.1"
@@ -6665,9 +6670,9 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.npmjs.org/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs-tslint-rules@4.4.1:
-  version "4.4.1"
-  resolved "https://registry.npmjs.org/rxjs-tslint-rules/-/rxjs-tslint-rules-4.4.1.tgz#6832b5565cdc5e95b7793f702ce5df70c558063a"
+rxjs-tslint-rules@4.4.2:
+  version "4.4.2"
+  resolved "https://registry.npmjs.org/rxjs-tslint-rules/-/rxjs-tslint-rules-4.4.2.tgz#9d2912a0274c772044d82bf50fa09c4793296a0b"
   dependencies:
     "@phenomnomnominal/tsquery" "^1.0.5"
     decamelize "^2.0.0"
@@ -7583,7 +7588,7 @@ unzip-response@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/unzip-response/-/unzip-response-2.0.1.tgz#d2f0f737d16b0615e72a6935ed04214572d56f97"
 
-upath@^1.0.0:
+upath@^1.0.5:
   version "1.1.0"
   resolved "https://registry.npmjs.org/upath/-/upath-1.1.0.tgz#35256597e46a581db4793d0ce47fa9aebfc9fabd"
 
