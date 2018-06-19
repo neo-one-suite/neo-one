@@ -877,9 +877,9 @@
   version "3.0.0"
   resolved "https://registry.npmjs.org/@types/indent-string/-/indent-string-3.0.0.tgz#9ebb391ceda548926f5819ad16405349641b999f"
 
-"@types/inquirer@0.0.41":
-  version "0.0.41"
-  resolved "https://registry.npmjs.org/@types/inquirer/-/inquirer-0.0.41.tgz#0c33027dcd0b0dde234e22afa454f2c75d8b30d2"
+"@types/inquirer@0.0.42":
+  version "0.0.42"
+  resolved "https://registry.yarnpkg.com/@types/inquirer/-/inquirer-0.0.42.tgz#2310fd8623053bead72247adae416aa32bacdf0c"
   dependencies:
     "@types/rx" "*"
     "@types/through" "*"
