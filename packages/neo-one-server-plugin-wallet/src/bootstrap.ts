@@ -251,7 +251,8 @@ async function createTransfers({
 }: {
   readonly wallet: WalletData;
   readonly from?: WalletData;
-}): Promise<ReadonlyArray<Transfer>> {
+  // tslint:disable-next-line readonly-array
+}): Promise<Transfer[]> {
   let neo;
   let gas;
   if (from === undefined) {
@@ -291,7 +292,7 @@ async function initializeWallets({
   const [firstWalletBatch, secondWalletBatch] = _.chunk(wallets, wallets.length / 2);
 
   const firstTransferBatchRaw = await Promise.all(firstWalletBatch.map(async (wallet) => createTransfers({ wallet })));
-  const firstTransferBatch = _.flatten<ReadonlyArray<Transfer>>(firstTransferBatchRaw);
+  const firstTransferBatch = _.flatten<Transfer>(firstTransferBatchRaw);
 
   const firstTransactionBatch = await client.transfer(firstTransferBatch, {
     from: master.accountID,

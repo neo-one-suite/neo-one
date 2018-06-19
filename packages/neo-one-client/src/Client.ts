@@ -1,4 +1,5 @@
 import { Param as ScriptBuilderParam } from '@neo-one/client-core';
+import BigNumber from 'bignumber.js';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { filter, map, switchMap, take } from 'rxjs/operators';
 import * as argAssertions from './args';
@@ -6,9 +7,11 @@ import { UnknownAccountError, UnknownNetworkError } from './errors';
 import { ReadClient } from './ReadClient';
 import { createSmartContract } from './sc';
 import {
+  AddressString,
   AssetRegister,
   ContractRegister,
   Hash160String,
+  Hash256String,
   InvokeReceiptInternal,
   InvokeTransactionOptions,
   NetworkType,
@@ -141,6 +144,16 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
     return [...new Set(providers.reduce((acc: NetworkType[], provider) => acc.concat(provider.getNetworks()), []))];
   }
 
+  public async transfer(
+    amount: BigNumber,
+    asset: Hash256String,
+    to: AddressString,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
+  public async transfer(
+    transfers: ReadonlyArray<Transfer>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
   // tslint:disable-next-line readonly-array no-any
   public async transfer(...args: any[]): Promise<TransactionResult<TransactionReceipt>> {
     const { transfers, options } = this.getTransfersOptions(args);
@@ -170,6 +183,16 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
     return this.getProvider(options).registerAsset(asset, options);
   }
 
+  public async issue(
+    amount: BigNumber,
+    asset: Hash256String,
+    to: AddressString,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
+  public async issue(
+    transfers: ReadonlyArray<Transfer>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt>>;
   // tslint:disable-next-line readonly-array no-any
   public async issue(...args: any[]): Promise<TransactionResult<TransactionReceipt>> {
     const { transfers, options } = this.getTransfersOptions(args);

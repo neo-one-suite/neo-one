@@ -69,18 +69,23 @@ export const setupWallets = {
                       .toPromise() as Promise<WalletResource>,
                   ]);
 
+                  const masterWallet = {
+                    network: wallet.network,
+                    address: masterResource.address,
+                  };
+
                   // tslint:disable-next-line no-any
                   let transferNEO: Promise<any> = Promise.resolve();
                   if (wallet.neo !== undefined) {
                     transferNEO = ctx.client.transfer(wallet.neo, common.NEO_ASSET_HASH, walletResource.address, {
-                      from: masterResource.address,
+                      from: masterWallet,
                     });
                   }
                   // tslint:disable-next-line no-any
                   let transferGAS: Promise<any> = Promise.resolve();
                   if (wallet.gas !== undefined) {
                     transferGAS = ctx.client.transfer(wallet.gas, common.GAS_ASSET_HASH, walletResource.address, {
-                      from: masterResource.address,
+                      from: masterWallet,
                     });
                   }
                   await Promise.all([transferNEO, transferGAS]);
