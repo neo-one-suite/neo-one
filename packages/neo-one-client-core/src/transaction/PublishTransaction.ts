@@ -50,7 +50,6 @@ export class PublishTransaction extends TransactionBase<TransactionType.Publish,
   public readonly contract: Contract;
   protected readonly sizeExclusive: () => number = utils.lazy(
     () =>
-      super.size +
       IOHelper.sizeOfUInt8 +
       sizeOfContract({
         script: this.contract.script,
