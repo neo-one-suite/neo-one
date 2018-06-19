@@ -19,10 +19,6 @@
       "git add",
       "yarn test --findRelatedTests --ci --passWithNoTests -w 4"
     ],
-    "packages/*/template/**/*.js": [
-      "yarn run prettier --write --config .prettierrc --parser flow",
-      "git add"
-    ],
     "scripts/**/*.js": [
       "yarn run prettier --write --config .prettierrc --parser flow",
       "git add"
@@ -49,17 +45,15 @@
     "e2e-ci": "jest --config e2e.json -w 1",
     "tsc": "tsc",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.ts\"",
-    "nit:template": "prettier --config .prettierrc --list-different \"packages/*/template/**/*.js\" --parser flow",
     "nit:scripts:ts": "prettier --config .prettierrc --list-different \"scripts/**/*.ts\"",
     "nit:scripts:js": "prettier --config .prettierrc --list-different \"scripts/**/*.js\" --parser flow",
     "nit:scripts": "yarn run nit:scripts:ts && yarn run nit:scripts:js",
-    "nit": "yarn run nit:source && yarn run nit:template && yarn run nit:scripts",
+    "nit": "yarn run nit:source && yarn run nit:scripts",
     "prettier:source": "prettier --config .prettierrc --write \"packages/*/src/**/*.ts\"",
-    "prettier:template": "prettier --config .prettierrc --write \"packages/*/template/**/*.js\" --parser flow",
     "prettier:scripts:ts": "prettier --config .prettierrc --write \"scripts/**/*.ts\"",
     "prettier:scripts:js": "prettier --config .prettierrc --write \"scripts/**/*.js\" --parser flow",
     "prettier:scripts": "yarn run prettier:scripts:ts && yarn run prettier:scripts:js",
-    "prettier:all": "yarn run prettier:source && yarn run prettier:template && yarn run prettier:scripts",
+    "prettier:all": "yarn run prettier:source && yarn run prettier:scripts",
     "lint": "tslint --project .",
     "docker:windows:build": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/build-windowsservercore:ltsc2016 -f Dockerfile.build && eval $(docker-machine env -unset) && popd",
     "docker:windows:test": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/test-windowsservercore:ltsc2016 -f Dockerfile.test && eval $(docker-machine env -unset) && popd",
