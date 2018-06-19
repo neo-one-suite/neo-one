@@ -156,6 +156,7 @@ import {
   IsStringHelper,
   IsSymbolHelper,
   IsUndefinedHelper,
+  PackObjectHelper,
   SetAccessorPropertyObjectPropertyHelper,
   SetAccessorSymbolObjectPropertyHelper,
   SetDataPropertyObjectPropertyHelper,
@@ -269,6 +270,7 @@ export interface Helpers {
   readonly shallowCloneObj: ShallowCloneObjHelper;
   readonly elementAccess: ElementAccessHelper;
   readonly unwrapType: UnwrapTypeHelper;
+  readonly packObject: PackObjectHelper;
   readonly unwrapVal: UnwrapValHelper;
   readonly instanceof: InstanceofHelper;
   readonly createPropertyObject: CreatePropertyObjectHelper;
@@ -419,6 +421,7 @@ export const createHelpers = (): Helpers => {
     setInternalObjectProperty: new SetInternalObjectPropertyHelper(),
     shallowCloneObject: new ShallowCloneObjectHelper(),
     shallowCloneObj: new ShallowCloneObjHelper(),
+    packObject: new PackObjectHelper(),
     elementAccess: new ElementAccessHelper(),
     unwrapType: new UnwrapTypeHelper(),
     unwrapVal: new UnwrapValHelper(),
