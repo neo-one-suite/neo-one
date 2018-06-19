@@ -355,13 +355,13 @@ export class BinaryExpressionCompiler extends NodeCompiler<BinaryExpression> {
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case SyntaxKind.ExclamationEqualsToken:
-        // Tested, but skipping some relating to null, true & false
+        // Tested, but skipping some relating to string ToNumber conversion
         sb.emitHelper(node, options, sb.helpers.equalsEquals({ left, right }));
         sb.emitOp(node, 'NOT');
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case SyntaxKind.EqualsEqualsToken:
-        // Tested, but skipping some relating to null, true & false
+        // Tested, but skipping some relating to string ToNumber conversion
         sb.emitHelper(node, options, sb.helpers.equalsEquals({ left, right }));
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;

@@ -49,10 +49,8 @@ export class EqualsEqualsHelper extends Helper {
     ) {
       // [left]
       sb.visit(this.left, options);
-      // [right, left]
-      sb.visit(this.right, options);
       // [left]
-      sb.emitOp(this.right, 'DROP');
+      sb.visit(this.right, sb.noPushValueOptions(options));
       // [equals]
       sb.emitHelper(node, options, sb.helpers.isNullOrUndefined);
     } else if (
@@ -132,9 +130,11 @@ export class EqualsEqualsHelper extends Helper {
 
   public equalsEqualsUnknown(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
     const copy = () => {
-      // [right, left, right]
+      // [left, right]
+      sb.emitOp(this.right, 'SWAP');
+      // [left, right, left]
       sb.emitOp(this.right, 'TUCK');
-      // [left, right, left, right]
+      // [right, left, right, left]
       sb.emitOp(this.right, 'OVER');
     };
 
@@ -167,12 +167,14 @@ export class EqualsEqualsHelper extends Helper {
           sb.emitOp(node, 'BOOLOR');
         },
         whenTrue: () => {
-          // [left]
-          sb.emitOp(node, 'DROP');
-          // []
-          sb.emitOp(node, 'DROP');
+          // [isNullOrUndefined, left]
+          sb.emitHelper(node, options, sb.helpers.isNullOrUndefined);
+          // [left, rightIsNullOrUndefined]
+          sb.emitOp(node, 'SWAP');
+          // [leftIsNullOrUndefined, rightIsNullOrUndefined]
+          sb.emitHelper(node, options, sb.helpers.isNullOrUndefined);
           // [equals]
-          sb.emitPushBoolean(node, true);
+          sb.emitOp(node, 'EQUAL');
         },
       },
       {
