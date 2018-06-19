@@ -17,9 +17,10 @@ export interface Globals {
   readonly OutputBase: Symbol;
   readonly TransactionBase: Symbol;
   readonly ValidatorBase: Symbol;
+  readonly EnumeratorBase: Symbol;
+  readonly IteratorBase: Symbol;
   readonly StorageContextBase: Symbol;
   readonly StorageContextReadOnlyBase: Symbol;
-  readonly StorageIteratorBase: Symbol;
   readonly syscall: Symbol;
 }
 
@@ -94,7 +95,8 @@ export const getGlobals = (ast: Project): Globals => {
     ValidatorBase: neoGlobal.getInterfaceOrThrow('ValidatorBase').getSymbolOrThrow(),
     StorageContextBase: neoGlobal.getInterfaceOrThrow('StorageContextBase').getSymbolOrThrow(),
     StorageContextReadOnlyBase: neoGlobal.getInterfaceOrThrow('StorageContextReadOnlyBase').getSymbolOrThrow(),
-    StorageIteratorBase: neoGlobal.getInterfaceOrThrow('StorageIteratorBase').getSymbolOrThrow(),
+    EnumeratorBase: neoGlobal.getInterfaceOrThrow('EnumeratorBase').getSymbolOrThrow(),
+    IteratorBase: neoGlobal.getInterfaceOrThrow('IteratorBase').getSymbolOrThrow(),
     syscall: neoGlobal.getFunctionOrThrow('syscall').getSymbolOrThrow(),
   };
 };

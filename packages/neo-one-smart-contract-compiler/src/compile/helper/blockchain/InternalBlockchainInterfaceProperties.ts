@@ -9,9 +9,10 @@ export type BlockchainInterfaceName =
   | 'OutputBase'
   | 'TransactionBase'
   | 'ValidatorBase'
-  | 'StorageContextBase'
   | 'StorageContextReadOnlyBase'
-  | 'StorageIteratorBase';
+  | 'EnumeratorBase'
+  | 'IteratorBase'
+  | 'StorageContextBase';
 
 export enum InternalBlockchainInterfaceProperties {
   BlockchainInterface = 'BlockchainInterface',
