@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-test",
-  "version": "1.0.0-alpha.16",
+  "version": "1.0.0-alpha.17",
   "keywords": [
     "neo",
     "NEO",
@@ -35,12 +35,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.60",
-    "@neo-one/monitor": "^1.0.0-alpha.33",
-    "@neo-one/node": "^1.0.0-alpha.79",
-    "@neo-one/node-neo-settings": "^1.0.0-alpha.46",
-    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.15",
-    "@neo-one/utils": "^1.0.0-alpha.38",
+    "@neo-one/client": "^1.0.0-alpha.61",
+    "@neo-one/monitor": "^1.0.0-alpha.34",
+    "@neo-one/node": "^1.0.0-alpha.80",
+    "@neo-one/node-neo-settings": "^1.0.0-alpha.47",
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.16",
+    "@neo-one/utils": "^1.0.0-alpha.39",
     "lodash": "^4.17.10",
     "memdown": "^3.0.0",
     "rxjs": "^6.2.1",
