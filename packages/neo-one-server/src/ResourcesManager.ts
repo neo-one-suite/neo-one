@@ -843,8 +843,6 @@ export class ResourcesManager<
 
   private getSimpleName(nameIn: string): string {
     return compoundName.extract(nameIn).name;
-
-    return name;
   }
 
   private getDirectDependentsPath(name: string): string {

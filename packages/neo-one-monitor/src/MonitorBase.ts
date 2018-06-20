@@ -219,9 +219,7 @@ export class MonitorBase implements Span {
   // tslint:disable-next-line no-any
   public captureLog(func: (monitor: CaptureMonitor) => any, options: CaptureLogOptions, cloned = false): any {
     let { error: errorObj } = options;
-    if (errorObj === undefined) {
-      errorObj = undefined;
-    } else if (typeof errorObj === 'string') {
+    if (errorObj !== undefined && typeof errorObj === 'string') {
       errorObj = { metric: undefined, message: errorObj, level: 'error' };
     }
     const errorObjFinal = errorObj;

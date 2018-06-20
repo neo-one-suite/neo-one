@@ -1,23 +1,24 @@
-import BN from 'bn.js';
-import { NULL_ACTION, TriggerType, ExecuteScriptsResult, VMListeners } from '@neo-one/node-core';
+// tslint:disable no-any no-let no-object-mutation no-empty
 import {
-  ScriptContainerType,
-  VMState,
-  UInt160,
-  UInt160Attribute,
-  UInt256Attribute,
+  common,
+  crypto,
   Input,
   InvocationTransaction,
   Output,
   ScriptBuilder,
-  common,
-  crypto,
+  ScriptContainerType,
+  UInt160,
+  UInt160Attribute,
+  UInt256Attribute,
   utils,
+  VMState,
 } from '@neo-one/client-core';
 import { DefaultMonitor } from '@neo-one/monitor';
+import { ExecuteScriptsResult, NULL_ACTION, TriggerType, VMListeners } from '@neo-one/node-core';
+import BN from 'bn.js';
 import _ from 'lodash';
-import { execute } from '../execute';
 import { assets, createBlockchain, testUtils, transactions } from '../__data__';
+import { execute } from '../execute';
 
 const monitor = DefaultMonitor.create({
   service: 'test',
@@ -25,18 +26,18 @@ const monitor = DefaultMonitor.create({
 
 let listeners: VMListeners;
 
-const executeSimple = ({
+const executeSimple = async ({
   blockchain,
   transaction,
-  gas,
+  gas = utils.ZERO,
   persistingBlock,
   skipWitnessVerify,
 }: {
-  blockchain: any;
-  transaction: InvocationTransaction;
-  gas?: BN;
-  persistingBlock?: any;
-  skipWitnessVerify?: boolean;
+  readonly blockchain: any;
+  readonly transaction: InvocationTransaction;
+  readonly gas?: BN;
+  readonly persistingBlock?: any;
+  readonly skipWitnessVerify?: boolean;
 }) =>
   execute({
     monitor,
@@ -49,8 +50,8 @@ const executeSimple = ({
 
     triggerType: TriggerType.Application,
     action: NULL_ACTION,
-    gas: gas || utils.ZERO,
-    skipWitnessVerify: skipWitnessVerify == undefined ? true : skipWitnessVerify,
+    gas,
+    skipWitnessVerify: skipWitnessVerify === undefined ? true : skipWitnessVerify,
     persistingBlock,
     listeners,
   });
@@ -71,7 +72,7 @@ describe('execute', () => {
 
   const expectThrow = (result: ExecuteScriptsResult) => {
     expect(result.errorMessage).toBeDefined();
-    if (result.errorMessage != undefined) {
+    if (result.errorMessage !== undefined) {
       expect(result.errorMessage.split('\n')[0]).toMatchSnapshot();
     }
     expect(result.state).toEqual(VMState.Fault);
@@ -89,7 +90,7 @@ describe('execute', () => {
   };
 
   const checkResult = (result: ExecuteScriptsResult) => {
-    if (result.errorMessage != undefined) {
+    if (result.errorMessage !== undefined) {
       throw new Error(result.errorMessage);
     }
 
@@ -132,15 +133,15 @@ describe('execute', () => {
 
   const testKYC = (name: string, gas: BN, state: number) => {
     it(name, async () => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve(transactions.kycContract));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve(transactions.kycContract));
 
-      blockchain.storageItem.add = jest.fn(() => Promise.resolve());
-      blockchain.storageItem.get = jest.fn(() => Promise.resolve({ value: Buffer.alloc(20, 0) }));
+      blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
+      blockchain.storageItem.get = jest.fn(async () => Promise.resolve({ value: Buffer.alloc(20, 0) }));
 
-      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve({ value: Buffer.alloc(20, 0) }));
+      blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve({ value: Buffer.alloc(20, 0) }));
 
-      blockchain.storageItem.update = jest.fn(() => Promise.resolve());
-      blockchain.action.add = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.update = jest.fn(async () => Promise.resolve());
+      blockchain.action.add = jest.fn(async () => Promise.resolve());
 
       const result = await executeSimple({
         blockchain,
@@ -151,7 +152,7 @@ describe('execute', () => {
       if (state === VMState.Fault) {
         const { errorMessage } = result;
         expect(errorMessage).toBeDefined();
-        if (errorMessage != undefined) {
+        if (errorMessage !== undefined) {
           expect(errorMessage.split('\n')[0]).toMatchSnapshot();
         }
       } else {
@@ -169,20 +170,21 @@ describe('execute', () => {
   testKYC('should not fail kyc transaction with sufficient gas', common.ONE_HUNDRED_MILLION_FIXED8, VMState.Halt);
 
   it('should refund on mintTokens with insufficient presale', async () => {
-    blockchain.contract.get = jest.fn(() => Promise.resolve(transactions.kycContract));
+    blockchain.contract.get = jest.fn(async () => Promise.resolve(transactions.kycContract));
 
-    blockchain.storageItem.tryGet = jest.fn((item) => {
+    blockchain.storageItem.tryGet = jest.fn(async (item) => {
       if (item.key.toString('utf8') === 'sale_paused') {
         return Promise.resolve({ value: Buffer.alloc(1, 0) });
       }
       if (item.key.toString('utf8').startsWith('kyc_ok')) {
         return Promise.resolve({ value: Buffer.alloc(1, 1) });
       }
+
       return Promise.resolve({ value: Buffer.alloc(20, 0) });
     });
-    blockchain.storageItem.get = jest.fn(() => Promise.resolve({ value: Buffer.alloc(20, 0) }));
+    blockchain.storageItem.get = jest.fn(async () => Promise.resolve({ value: Buffer.alloc(20, 0) }));
 
-    blockchain.output.get = jest.fn(() =>
+    blockchain.output.get = jest.fn(async () =>
       Promise.resolve(
         new Output({
           asset: common.stringToUInt256(common.NEO_ASSET_HASH),
@@ -192,7 +194,7 @@ describe('execute', () => {
       ),
     );
 
-    blockchain.action.add = jest.fn(() => Promise.resolve());
+    blockchain.action.add = jest.fn(async () => Promise.resolve());
     blockchain.currentBlock.index = 1920286;
 
     const result = await executeSimple({
@@ -221,12 +223,12 @@ describe('execute', () => {
     testUtils.expectItemBNEquals(item, value);
   };
 
-  const expectConciergeItemBNEquals = (key: Buffer | UInt160, value: string) =>
+  const expectConciergeItemBNEquals = async (key: Buffer | UInt160, value: string) =>
     expectItemBNEquals(conciergeContract.hash, key, value);
 
   const conciergeSenderAddress = common.bufferToUInt160(Buffer.alloc(20, 10));
   const mockConciergeMintOutput = () => {
-    blockchain.output.get = jest.fn(() =>
+    blockchain.output.get = jest.fn(async () =>
       Promise.resolve(
         new Output({
           address: conciergeSenderAddress,
@@ -268,7 +270,7 @@ describe('execute', () => {
   const conciergePreSaleBeginTime = 1518598800;
   const conciergeMainSaleBeginTime = 1522486800;
 
-  const conciergeDeploy = () =>
+  const conciergeDeploy = async () =>
     executeSetupScript(new ScriptBuilder().emitAppCall(conciergeContract.hash, 'deploy').build());
 
   describe('concierge', () => {
@@ -367,7 +369,7 @@ describe('execute', () => {
         });
 
         it('when whitelist sale period and not whitelisted real world', async () => {
-          blockchain.output.get = jest.fn(() =>
+          blockchain.output.get = jest.fn(async () =>
             Promise.resolve(
               new Output({
                 address: conciergeSenderAddress,
@@ -530,7 +532,7 @@ describe('execute', () => {
 
       const testTransfer = ({ count, success, gas }: { count: number; success: boolean; gas?: string }) => {
         it(`should ${success ? '' : 'not '}handle ${count} transfers${
-          gas == undefined ? '' : ` with ${gas} gas`
+          gas === undefined ? '' : ` with ${gas} gas`
         }`, async () => {
           await mintTokens();
           const value = new BN(10);
@@ -551,17 +553,17 @@ describe('execute', () => {
               script: sb.build(),
             }),
 
-            gas: gas == undefined ? undefined : neoBN(gas),
+            gas: gas === undefined ? undefined : neoBN(gas),
           });
 
           if (success) {
-            await expectSuccess(result);
+            expectSuccess(result);
             const expectedValue = value.mul(new BN(count));
             await expectConciergeItemBNEquals(conciergeSenderAddress, senderValue.sub(expectedValue).toString(10));
 
             await expectConciergeItemBNEquals(receiverAddress, expectedValue.toString(10));
           } else {
-            await expectThrow(result);
+            expectThrow(result);
           }
           testUtils.verifyListeners(listeners);
         });
@@ -594,7 +596,7 @@ describe('execute', () => {
 
   const { switcheoTokenContract } = transactions;
 
-  const expectSwitcheoItemBNEquals = (key: Buffer | UInt160, value: string) =>
+  const expectSwitcheoItemBNEquals = async (key: Buffer | UInt160, value: string) =>
     expectItemBNEquals(switcheoTokenContract.hash, key, value);
 
   const switcheoTokenSenderAddress = common.bufferToUInt160(Buffer.alloc(20, 7));

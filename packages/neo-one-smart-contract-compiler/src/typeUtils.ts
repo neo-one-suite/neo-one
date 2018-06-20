@@ -97,7 +97,7 @@ export const hasPrimitive = (type: Type): boolean => hasType(type, isPrimitive);
 
 export const isOnlyObject = (type?: Type): boolean => isOnly(type, (tpe) => !isPrimitive(tpe));
 
-export const isArray = (type?: Type): boolean => type !== undefined && getType(type).isArray();
+export const isArray = (type?: Type): type is Type => type !== undefined && getType(type).isArray();
 
 export const isOnlyArray = (type?: Type): boolean => isOnly(type, isArray);
 

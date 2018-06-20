@@ -278,10 +278,7 @@ class ArrayValue extends SimpleSysCallType {
 
   public isType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
     return (
-      typeUtils.isArray(type) &&
-      !typeUtils.isTuple(type) &&
-      type !== undefined &&
-      this.valueType().isType(sb, node, type.getArrayType())
+      typeUtils.isArray(type) && !typeUtils.isTuple(type) && this.valueType().isType(sb, node, type.getArrayType())
     );
   }
 
@@ -476,10 +473,7 @@ const StorageKey = new UnionValue([BufferValue, StringValue]);
 const StorageValue = new UnionValue([BufferValue, NumberValue, StringValue, BooleanValue]);
 
 export class TypeAlias {
-  public constructor(private readonly name: string, private readonly declaration: string) {
-    this.name = name;
-    this.declaration = declaration;
-  }
+  public constructor(private readonly name: string, private readonly declaration: string) {}
 
   public toSignature(): string {
     return this.name;
