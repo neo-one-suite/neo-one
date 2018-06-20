@@ -93,38 +93,58 @@ export class SummaryProxy extends MetricProxy<SummaryBase> implements Summary {
 }
 
 export class MetricsFactoryProxy implements MetricsFactory {
+  protected mutableCounters: { [K in string]?: Counter } = {};
+  protected mutableHistograms: { [K in string]?: Histogram } = {};
+  protected mutableGauges: { [K in string]?: Gauge } = {};
+  protected mutableSummaries: { [K in string]?: Summary } = {};
+
   private mutableFactory: MetricsFactory | undefined;
 
+  public reset_forTest(): void {
+    this.mutableCounters = {};
+    this.mutableHistograms = {};
+    this.mutableGauges = {};
+    this.mutableSummaries = {};
+  }
+
   public createCounter(options: MetricOptions): Counter {
-    if (this.mutableFactory !== undefined) {
-      return this.mutableFactory.createCounter(options);
+    let counter = this.mutableCounters[options.name];
+    if (counter === undefined) {
+      counter = this.createCounterHelper(options);
+      this.mutableCounters[options.name] = counter;
     }
 
-    return this.createCounterInternal(options);
+    return counter;
   }
 
   public createGauge(options: MetricOptions): Gauge {
-    if (this.mutableFactory !== undefined) {
-      return this.mutableFactory.createGauge(options);
+    let gauge = this.mutableGauges[options.name];
+    if (gauge === undefined) {
+      gauge = this.createGaugeHelper(options);
+      this.mutableGauges[options.name] = gauge;
     }
 
-    return this.createGaugeInternal(options);
+    return gauge;
   }
 
-  public createHistogram(options: BucketedMetricOptions): Histogram {
-    if (this.mutableFactory !== undefined) {
-      return this.mutableFactory.createHistogram(options);
+  public createHistogram(options: MetricOptions): Histogram {
+    let histogram = this.mutableHistograms[options.name];
+    if (histogram === undefined) {
+      histogram = this.createHistogramHelper(options);
+      this.mutableHistograms[options.name] = histogram;
     }
 
-    return this.createHistogramInternal(options);
+    return histogram;
   }
 
-  public createSummary(options: PercentiledMetricOptions): Summary {
-    if (this.mutableFactory !== undefined) {
-      return this.mutableFactory.createSummary(options);
+  public createSummary(options: MetricOptions): Summary {
+    let summary = this.mutableSummaries[options.name];
+    if (summary === undefined) {
+      summary = this.createSummaryHelper(options);
+      this.mutableSummaries[options.name] = summary;
     }
 
-    return this.createSummaryInternal(options);
+    return summary;
   }
 
   public setFactory(mutableFactory: MetricsFactory): void {
@@ -160,5 +180,37 @@ export class MetricsFactoryProxy implements MetricsFactory {
     }
 
     return construct;
+  }
+
+  private createCounterHelper(options: MetricOptions): Counter {
+    if (this.mutableFactory !== undefined) {
+      return this.mutableFactory.createCounter(options);
+    }
+
+    return this.createCounterInternal(options);
+  }
+
+  private createGaugeHelper(options: MetricOptions): Gauge {
+    if (this.mutableFactory !== undefined) {
+      return this.mutableFactory.createGauge(options);
+    }
+
+    return this.createGaugeInternal(options);
+  }
+
+  private createHistogramHelper(options: BucketedMetricOptions): Histogram {
+    if (this.mutableFactory !== undefined) {
+      return this.mutableFactory.createHistogram(options);
+    }
+
+    return this.createHistogramInternal(options);
+  }
+
+  private createSummaryHelper(options: PercentiledMetricOptions): Summary {
+    if (this.mutableFactory !== undefined) {
+      return this.mutableFactory.createSummary(options);
+    }
+
+    return this.createSummaryInternal(options);
   }
 }

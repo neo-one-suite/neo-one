@@ -1,11 +1,8 @@
-import { BucketedMetricOptions, Counter, Histogram, Logger, MetricOptions, Report } from './types';
+import { Logger, Report } from './types';
 
 import { metrics } from './NoOpMetricsFactory';
 
 export class ReportHandler {
-  private readonly mutableCounters: { [K in string]?: Counter } = {};
-  private readonly mutableHistograms: { [K in string]?: Histogram } = {};
-
   public constructor(private readonly logger: Logger) {}
 
   public report(report: Report): void {
@@ -33,7 +30,7 @@ export class ReportHandler {
     });
 
     Object.values(report.metrics.counters).forEach((counterMetric) => {
-      const counter = this.getCounter(counterMetric.metric);
+      const counter = metrics.createCounter(counterMetric.metric);
       counterMetric.values.forEach((value) => {
         if (typeof value.countOrLabels === 'number') {
           counter.inc(value.countOrLabels);
@@ -46,7 +43,7 @@ export class ReportHandler {
     });
 
     Object.values(report.metrics.histograms).forEach((histMetric) => {
-      const histogram = this.getHistogram(histMetric.metric);
+      const histogram = metrics.createHistogram(histMetric.metric);
       histMetric.values.forEach((value) => {
         if (typeof value.countOrLabels === 'number') {
           histogram.observe(value.countOrLabels);
@@ -55,25 +52,5 @@ export class ReportHandler {
         }
       });
     });
-  }
-
-  private getCounter(options: MetricOptions): Counter {
-    let counter = this.mutableCounters[options.name];
-    if (counter === undefined) {
-      counter = metrics.createCounter(options);
-      this.mutableCounters[options.name] = counter;
-    }
-
-    return counter;
-  }
-
-  private getHistogram(options: BucketedMetricOptions): Histogram {
-    let histogram = this.mutableHistograms[options.name];
-    if (histogram === undefined) {
-      histogram = metrics.createHistogram(options);
-      this.mutableHistograms[options.name] = histogram;
-    }
-
-    return histogram;
   }
 }
