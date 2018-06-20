@@ -10,5 +10,6 @@
   "typescript.autoImportSuggestions.enabled": true,
   "editor.formatOnPaste": false,
   "editor.formatOnSave": true,
-  "cSpell.language": "en"
+  "cSpell.language": "en",
+  "deepscan.enable": true
 }
