@@ -47,25 +47,26 @@ class CollectingHistogram extends CollectingMetric<BucketedMetricOptions> implem
 }
 
 export class CollectingMetricsFactory extends MetricsFactoryProxy {
-  private mutableCounters: { [K in string]: CollectingCounter } = {};
-  private mutableHistograms: { [K in string]: CollectingHistogram } = {};
+  private mutableCollectingCounters: { [K in string]: CollectingCounter } = {};
+  private mutableCollectingHistograms: { [K in string]: CollectingHistogram } = {};
 
   public collect(): MetricCollection {
     const currentMetrics = this.serializeJSON();
-    Object.values(this.mutableCounters).forEach((metric) => metric.reset());
-    Object.values(this.mutableHistograms).forEach((metric) => metric.reset());
+    Object.values(this.mutableCollectingCounters).forEach((metric) => metric.reset());
+    Object.values(this.mutableCollectingHistograms).forEach((metric) => metric.reset());
 
     return currentMetrics;
   }
 
   public reset_forTest(): void {
-    this.mutableCounters = {};
-    this.mutableHistograms = {};
+    super.reset_forTest();
+    this.mutableCollectingCounters = {};
+    this.mutableCollectingHistograms = {};
   }
 
   protected createCounterInternal(options: MetricOptions): Counter {
     const counter = new CollectingCounter(options);
-    this.mutableCounters[counter.metric.name] = counter;
+    this.mutableCollectingCounters[counter.metric.name] = counter;
 
     return this.initializeMetric(
       new CounterProxy(counter, options.labelNames),
@@ -77,7 +78,7 @@ export class CollectingMetricsFactory extends MetricsFactoryProxy {
 
   protected createHistogramInternal(options: BucketedMetricOptions): Histogram {
     const histogram = new CollectingHistogram(options);
-    this.mutableHistograms[histogram.metric.name] = histogram;
+    this.mutableCollectingHistograms[histogram.metric.name] = histogram;
 
     return this.initializeMetric(
       new HistogramProxy(histogram, options.labelNames),
@@ -89,14 +90,14 @@ export class CollectingMetricsFactory extends MetricsFactoryProxy {
 
   private serializeJSON(): MetricCollection {
     return {
-      counters: Object.entries(this.mutableCounters).reduce<CollectedMetrics<MetricOptions>>(
+      counters: Object.entries(this.mutableCollectingCounters).reduce<CollectedMetrics<MetricOptions>>(
         (accMetric, [name, metric]) => ({
           ...accMetric,
           [name]: metric.toJSON(),
         }),
         {},
       ),
-      histograms: Object.entries(this.mutableHistograms).reduce<CollectedMetrics<BucketedMetricOptions>>(
+      histograms: Object.entries(this.mutableCollectingHistograms).reduce<CollectedMetrics<BucketedMetricOptions>>(
         (accMetric, [name, metric]) => ({
           ...accMetric,
           [name]: metric.toJSON(),

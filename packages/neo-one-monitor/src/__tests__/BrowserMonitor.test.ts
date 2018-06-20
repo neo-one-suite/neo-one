@@ -99,17 +99,18 @@ describe('BrowserMonitor', () => {
   };
 
   let logger = new CollectingLogger();
-  let reporter: Reporter | null;
+  let reporter: Reporter | undefined;
   beforeEach(() => {
     logger = new CollectingLogger();
-    reporter = null;
+    reporter = undefined;
     metrics.setFactory(collectingMetrics);
   });
 
   afterEach(() => {
     collectingMetrics.reset_forTest();
+    metrics.reset_forTest();
     prom.register.clear();
-    if (reporter != undefined) {
+    if (reporter !== undefined) {
       reporter.close();
     }
   });
@@ -163,7 +164,8 @@ describe('BrowserMonitor', () => {
   });
 
   test('Reporter - POST success', async () => {
-    (global as any).fetch = jest.fn(() => Promise.resolve({ ok: true }));
+    // tslint:disable-next-line no-object-mutation no-any
+    (global as any).fetch = jest.fn(async () => Promise.resolve({ ok: true }));
 
     reporter = new Reporter({
       logger,
@@ -196,7 +198,7 @@ describe('BrowserMonitor', () => {
 
     expect((fetch as any).mock.calls).toMatchSnapshot();
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
     expect((fetch as any).mock.calls.length).toBeGreaterThanOrEqual(3);
   });
 

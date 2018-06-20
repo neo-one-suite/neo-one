@@ -238,6 +238,7 @@ export interface Summary extends SummaryBase {
 export type Metric = Counter | Gauge | Histogram | Summary;
 
 export interface MetricsFactory {
+  readonly reset_forTest: () => void;
   readonly createCounter: (options: MetricOptions) => Counter;
   readonly createGauge: (options: MetricOptions) => Gauge;
   readonly createHistogram: (options: BucketedMetricOptions) => Histogram;
