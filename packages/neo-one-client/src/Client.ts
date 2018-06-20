@@ -39,7 +39,6 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
   public static inject(provider: UserAccountProvider): void {
     mutableClients.forEach((client) => client.inject(provider));
   }
-
   public readonly currentAccount$: Observable<UserAccount | undefined>;
   public readonly accounts$: Observable<ReadonlyArray<UserAccount>>;
   public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
@@ -102,6 +101,7 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
   }
 
   public getAccount(id: UserAccountID): UserAccount {
+    argAssertions.assertUserAccountID(id);
     const provider = this.getProvider({ from: id });
     const account = provider
       .getAccounts()
@@ -115,16 +115,19 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
   }
 
   public async selectAccount(id?: UserAccountID): Promise<void> {
+    argAssertions.assertUserAccountID(id);
     const provider = this.getProvider({ from: id });
     await provider.selectAccount(id);
     this.selectedProvider$.next(provider);
   }
 
   public async deleteAccount(id: UserAccountID): Promise<void> {
+    argAssertions.assertUserAccountID(id);
     await this.getProvider({ from: id }).deleteAccount(id);
   }
 
   public async updateAccountName({ id, name }: UpdateAccountNameOptions): Promise<void> {
+    argAssertions.assertUpdateAccountNameOptions({ id, name });
     await this.getProvider({ from: id }).updateAccountName({ id, name });
   }
 
@@ -173,6 +176,7 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
     options?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt>> {
     argAssertions.assertTransactionOptions(options);
+    argAssertions.assertContractRegister(contract);
 
     return this.getProvider(options).publish(contract, options);
   }
@@ -181,6 +185,9 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
     asset: AssetRegister,
     options?: TransactionOptions,
   ): Promise<TransactionResult<RegisterAssetReceipt>> {
+    argAssertions.assertAssetRegister(asset);
+    argAssertions.assertTransactionOptions(options);
+
     return this.getProvider(options).registerAsset(asset, options);
   }
 
@@ -206,6 +213,8 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
   }
 
   public smartContract(definition: SmartContractDefinition): SmartContract {
+    argAssertions.assertSmartContractDefinition(definition);
+
     return createSmartContract({ definition, client: this });
   }
 
@@ -232,6 +241,9 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
     options?: InvokeTransactionOptions,
     sourceMap?: RawSourceMap,
   ): Promise<TransactionResult<InvokeReceiptInternal>> {
+    argAssertions.assertHash160(contract);
+    argAssertions.assertBoolean(verify);
+
     return this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMap);
   }
 
@@ -241,6 +253,9 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     options?: TransactionOptions,
   ): Promise<RawInvocationResult> {
+    argAssertions.assertHash160(contract);
+    argAssertions.assertTransactionOptions(options);
+
     return this.getProvider(options).call(contract, method, params, options);
   }
 
@@ -251,6 +266,7 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
     readonly transfers: ReadonlyArray<Transfer>;
     readonly options?: TransactionOptions;
   } {
+    argAssertions.assertTransfers(args);
     let transfers;
     let options;
     if (args.length >= 3) {

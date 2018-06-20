@@ -11,7 +11,7 @@ export type AddressString = string;
 export type PublicKeyString = string;
 // Hex PrivateKey
 export type PrivateKeyString = string;
-// Hex Buffer, e.g. 02028a99826ed
+// Hex Buffer, e.g. cef0c0fdcfe7838eff6ff104f9cdec2922297537
 export type BufferString = string;
 // NEO Hash160 string, e.g. 0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9
 export type Hash160String = string;

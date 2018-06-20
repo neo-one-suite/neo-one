@@ -1,17 +1,17 @@
+import BigNumber from 'bignumber.js';
 import { of } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { transactions } from '../__data__';
 import * as argAssertions from '../args';
 import { Client } from '../Client';
-import { UnknownAccountError, UnknownNetworkError } from '../errors';
+import { InvalidArgumentError, UnknownNetworkError } from '../errors';
 import { createSmartContract } from '../sc/createSmartContract';
 import { UserAccountProvider } from '../types';
 
 jest.mock('../sc/createSmartContract');
 
 describe('Client', () => {
-  const id1 = { network: 'net1', address: 'addr1' };
-  const id2 = { network: 'net2', address: 'addr2' };
+  const id1 = { network: 'net1', address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' };
+  const id2 = { network: 'net2', address: 'Aew1QakLBrMqn9pmYpVrgwKPXCqTfzd6sZ' };
   const account1 = {
     type: 'test1',
     id: id1,
@@ -112,7 +112,9 @@ describe('Client', () => {
 
     const result = client.selectAccount(accountID);
 
-    await expect(result).rejects.toEqual(new UnknownAccountError(accountID.address));
+    await expect(result).rejects.toEqual(
+      new InvalidArgumentError(`Invalid argument for UserAccountID: Error: Invalid address: ${accountID.address}`),
+    );
   });
 
   test('selectAccount', async () => {
@@ -143,7 +145,9 @@ describe('Client', () => {
     function testError() {
       return client.getAccount(idFake);
     }
-    expect(testError).toThrow(new UnknownAccountError(idFake.address) as any);
+    expect(testError).toThrow(new InvalidArgumentError(
+      `Invalid argument for UserAccountID: Error: Invalid address: ${idFake.address}`,
+    ) as any);
   });
 
   test('deleteAccount', async () => {
@@ -225,12 +229,29 @@ describe('Client', () => {
 
     {
       method: 'transfer',
-      args: [0, 1],
+      args: [
+        [
+          {
+            amount: new BigNumber(10),
+            asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+            to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          },
+        ],
+        undefined,
+      ],
     },
 
     {
       method: 'transfer',
-      args: [0, 1, 2],
+      args: [
+        [
+          {
+            amount: new BigNumber(10),
+            asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+            to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          },
+        ],
+      ],
     },
 
     {
@@ -240,28 +261,63 @@ describe('Client', () => {
 
     {
       method: 'publish',
-      args: ['contract'],
+      args: [
+        {
+          script: '02028a99826e',
+          parameters: ['Signature'],
+          returnType: 'Signature',
+          name: 'contract',
+          codeVersion: 'codeVersion',
+          author: 'author',
+          email: 'email',
+          description: 'description',
+          properties: {
+            storage: true,
+            dynamicInvoke: true,
+            payable: true,
+          },
+        },
+      ],
     },
 
     {
       method: 'registerAsset',
-      args: [transactions.register.asset],
+      args: [
+        {
+          assetType: 'CreditFlag',
+          name: 'asset',
+          amount: new BigNumber(10),
+          precision: 20,
+          owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
     },
 
     {
       method: 'issue',
-      args: [0, 1],
+      args: [
+        [
+          {
+            amount: new BigNumber(10),
+            asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+            to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          },
+        ],
+        undefined,
+      ],
     },
 
     {
       method: 'invoke',
-      args: [0, 1, 2, 3, 4],
+      args: ['0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9', 1, 2, 3, true],
       providerMethod: 'invoke',
     },
 
     {
       method: 'call',
-      args: [0, 1, 2],
+      args: ['0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9', 1, 2],
       providerMethod: 'call',
     },
   ];
@@ -270,7 +326,7 @@ describe('Client', () => {
     const { method, args } = testCase;
     const expected = '10';
 
-    let providerMethod: string = method;
+    let providerMethod = method;
     if (testCase.providerMethod != undefined) {
       providerMethod = testCase.providerMethod;
     }
@@ -286,7 +342,16 @@ describe('Client', () => {
   }
 
   test('smartContract', () => {
-    const expected = '10';
+    const expected = {
+      networks: {
+        main: {
+          hash: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9',
+        },
+      },
+      abi: {
+        functions: [],
+      },
+    };
     (createSmartContract as any).mockImplementation(() => expected);
     const result = client.smartContract(expected as any);
     expect(result).toEqual(expected);
