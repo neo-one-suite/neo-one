@@ -11,7 +11,6 @@ import {
   MetricCollection,
   MetricOptions,
   MetricValue,
-  PercentiledMetricOptions,
 } from './types';
 
 class CollectingMetric<T extends MetricOptions | BucketedMetricOptions> {
@@ -68,24 +67,14 @@ export class CollectingMetricsFactory extends MetricsFactoryProxy {
     const counter = new CollectingCounter(options);
     this.mutableCollectingCounters[counter.metric.name] = counter;
 
-    return this.initializeMetric(
-      new CounterProxy(counter, options.labelNames),
-      options,
-      (metric) => metric.inc(0),
-      (metric, labels) => metric.inc(labels, 0),
-    );
+    return new CounterProxy(counter, options.labelNames);
   }
 
   protected createHistogramInternal(options: BucketedMetricOptions): Histogram {
     const histogram = new CollectingHistogram(options);
     this.mutableCollectingHistograms[histogram.metric.name] = histogram;
 
-    return this.initializeMetric(
-      new HistogramProxy(histogram, options.labelNames),
-      options,
-      (metric) => metric.observe(0),
-      (metric, labels) => metric.observe(labels, 0),
-    );
+    return new HistogramProxy(histogram, options.labelNames);
   }
 
   private serializeJSON(): MetricCollection {
@@ -105,23 +94,6 @@ export class CollectingMetricsFactory extends MetricsFactoryProxy {
         {},
       ),
     };
-  }
-
-  private initializeMetric<T extends CounterBase | HistogramBase>(
-    metric: T,
-    { labelNames, labels = [] }: MetricOptions | BucketedMetricOptions | PercentiledMetricOptions,
-    init: (metric: T) => void,
-    initLabels: (metric: T, labels: Labels) => void,
-  ): T {
-    if (labelNames === undefined) {
-      init(metric);
-    } else {
-      labels.forEach((labelSet) => {
-        initLabels(metric, labelSet);
-      });
-    }
-
-    return metric;
   }
 }
 
