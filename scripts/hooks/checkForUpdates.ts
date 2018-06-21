@@ -10,15 +10,19 @@ const doCheck = async (files: string) => {
   const changedFiles = changedFilesToArray(files);
   const lockChanged = changedFiles.some((file) => yarnLock.test(file));
   if (lockChanged) {
-    await execa('yarn', ['install'], {
+    console.log('yarn.lock changed, executing `yarn install`');
+    const childProc = execa('yarn', ['install'], {
       cwd: appRootDir.get(),
-      stdio: 'inherit',
     });
+    childProc.stdout.pipe(process.stdout);
+    childProc.stderr.pipe(process.stderr);
+    await childProc;
   }
 };
 
 const run = async (gitCommand: string) => {
-  const { stdout } = await execa(gitCommand);
+  const splitCommand = gitCommand.split(' ');
+  const { stdout } = await execa(splitCommand[0], splitCommand.slice(1));
   await doCheck(stdout);
 };
 
