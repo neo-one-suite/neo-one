@@ -30,7 +30,6 @@
   },
   "scripts": {
     "lint-staged": "lint-staged",
-    "precommit": "lint-staged && tsc && tslint --project .",
     "bootstrap": "yarn run build && lerna bootstrap",
     "build": "rm -rf ./packages/*/dist && yarn run ts-node --max-old-space-size 8192 --project tsconfig.cli.json ./scripts/build/entry/build.ts",
     "watch": "yarn run ts-node --max-old-space-size 8192 --project tsconfig.cli.json ./scripts/build/entry/watch.ts",
@@ -59,8 +58,16 @@
     "docker:windows:test": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/test-windowsservercore:ltsc2016 -f Dockerfile.test && eval $(docker-machine env -unset) && popd",
     "docker:linux:build": "pushd ./scripts/docker/linux && eval $(docker-machine env -unset) && docker build . -t neo-one/build-linux:8.9.3 -f Dockerfile.build && popd",
     "docker:linux:test": "pushd ./scripts/docker/linux && eval $(docker-machine env -unset) && docker build . -t neo-one/test-linux:8.9.3 -f Dockerfile.test && popd",
-    "verify-storage": "ts-node --max-old-space-size=8192 ./scripts/verify/storage.ts",
-    "generate-sc-types": "ts-node ./packages/neo-one-smart-contract-compiler/src/scripts/generateTypes.ts"
+    "verify-storage": "ts-node --project tsconfig.cli.json --max-old-space-size=8192 ./scripts/verify/storage.ts",
+    "generate-sc-types": "ts-node --project tsconfig.cli.json ./packages/neo-one-smart-contract-compiler/src/scripts/generateTypes.ts"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && tsc && tslint --project .",
+      "post-checkout": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-checkout.ts",
+      "post-checkout": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-merge.ts",
+      "post-rewrite": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-rewrite.ts"
+    }
   },
   "devDependencies": {
     "@babel/cli": "7.0.0-beta.51",
@@ -108,7 +115,7 @@
     "babel-core": "7.0.0-bridge.0",
     "execa": "0.10.0",
     "fs-extra": "6.0.1",
-    "husky": "0.14.3",
+    "husky": "^1.0.0-rc.9",
     "jest": "23.1.0",
     "jest-environment-node": "23.1.0",
     "jest-junit": "5.1.0",
