@@ -913,9 +913,9 @@
   dependencies:
     "@types/koa" "*"
 
-"@types/koa-router@7.0.28":
-  version "7.0.28"
-  resolved "https://registry.npmjs.org/@types/koa-router/-/koa-router-7.0.28.tgz#67487c862a831099aed8864a8996bfa7e989edc0"
+"@types/koa-router@7.0.29":
+  version "7.0.29"
+  resolved "https://registry.yarnpkg.com/@types/koa-router/-/koa-router-7.0.29.tgz#efdd3c39297944e8a55764f7909abcfd9bf51ca6"
   dependencies:
     "@types/koa" "*"
 
@@ -1079,9 +1079,9 @@
     "@types/rx-lite-time" "*"
     "@types/rx-lite-virtualtime" "*"
 
-"@types/seamless-immutable@7.1.1":
-  version "7.1.1"
-  resolved "https://registry.npmjs.org/@types/seamless-immutable/-/seamless-immutable-7.1.1.tgz#44e91ea708a9b16565f8fab2f2d108bb99c41aea"
+"@types/seamless-immutable@7.1.2":
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/@types/seamless-immutable/-/seamless-immutable-7.1.2.tgz#024e2375a74d2a228e48c0b5a89db9e67fb3bf0d"
 
 "@types/serve-static@*":
   version "1.13.2"
