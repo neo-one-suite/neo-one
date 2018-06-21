@@ -17,7 +17,8 @@
     "packages/*/src/**/*.ts": [
       "yarn run prettier --write --config .prettierrc",
       "git add",
-      "yarn test --findRelatedTests --ci --passWithNoTests -w 4"
+      "yarn test --findRelatedTests --ci --passWithNoTests -w 4",
+      "yarn run lint"
     ],
     "scripts/**/*.js": [
       "yarn run prettier --write --config .prettierrc --parser flow",
@@ -25,7 +26,8 @@
     ],
     "scripts/**/*.ts": [
       "yarn run prettier --write --config .prettierrc",
-      "git add"
+      "git add",
+      "yarn run lint"
     ]
   },
   "scripts": {
@@ -63,7 +65,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged && tsc && tslint --project .",
+      "pre-commit": "lint-staged && echo \"Executing tsc...\" && tsc",
       "post-checkout": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-checkout.ts $HUSKY_GIT_PARAMS",
       "post-checkout": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-merge.ts $HUSKY_GIT_PARAMS",
       "post-rewrite": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-rewrite.ts $HUSKY_GIT_PARAMS"
