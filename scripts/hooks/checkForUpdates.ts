@@ -11,7 +11,7 @@ const doCheck = async (files: string) => {
   const lockChanged = changedFiles.some((file) => yarnLock.test(file));
   if (lockChanged) {
     console.log('yarn.lock changed, executing `yarn install`');
-    const childProc = execa('yarn', ['install'], {
+    const childProc = execa('yarn', ['install', '--non-interactive', '--frozen-lockfile'], {
       cwd: appRootDir.get(),
     });
     childProc.stdout.pipe(process.stdout);
