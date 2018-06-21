@@ -64,9 +64,9 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged && tsc && tslint --project .",
-      "post-checkout": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-checkout.ts",
-      "post-checkout": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-merge.ts",
-      "post-rewrite": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-rewrite.ts"
+      "post-checkout": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-checkout.ts $HUSKY_GIT_PARAMS",
+      "post-checkout": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-merge.ts $HUSKY_GIT_PARAMS",
+      "post-rewrite": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-rewrite.ts $HUSKY_GIT_PARAMS"
     }
   },
   "devDependencies": {
