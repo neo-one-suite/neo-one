@@ -913,9 +913,9 @@
   dependencies:
     "@types/koa" "*"
 
-"@types/koa-router@7.0.28":
-  version "7.0.28"
-  resolved "https://registry.npmjs.org/@types/koa-router/-/koa-router-7.0.28.tgz#67487c862a831099aed8864a8996bfa7e989edc0"
+"@types/koa-router@7.0.29":
+  version "7.0.29"
+  resolved "https://registry.yarnpkg.com/@types/koa-router/-/koa-router-7.0.29.tgz#efdd3c39297944e8a55764f7909abcfd9bf51ca6"
   dependencies:
     "@types/koa" "*"
 
@@ -1079,9 +1079,9 @@
     "@types/rx-lite-time" "*"
     "@types/rx-lite-virtualtime" "*"
 
-"@types/seamless-immutable@7.1.1":
-  version "7.1.1"
-  resolved "https://registry.npmjs.org/@types/seamless-immutable/-/seamless-immutable-7.1.1.tgz#44e91ea708a9b16565f8fab2f2d108bb99c41aea"
+"@types/seamless-immutable@7.1.2":
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/@types/seamless-immutable/-/seamless-immutable-7.1.2.tgz#024e2375a74d2a228e48c0b5a89db9e67fb3bf0d"
 
 "@types/serve-static@*":
   version "1.13.2"
@@ -1701,7 +1701,7 @@ buffer-fill@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/buffer-fill/-/buffer-fill-1.0.0.tgz#f8f78b76789888ef39f205cd637f68e702122b2c"
 
-buffer-from@^1.0.0:
+buffer-from@^1.0.0, buffer-from@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.0.tgz#87fcaa3a298358e0ade6e442cfce840740d1ad04"
 
@@ -4342,9 +4342,9 @@ jest-jasmine2@^23.1.0:
     jest-util "^23.1.0"
     pretty-format "^23.0.1"
 
-jest-junit@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.npmjs.org/jest-junit/-/jest-junit-5.0.0.tgz#30ed3317c325165c2458ed2649f09d6e214ffab8"
+jest-junit@5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/jest-junit/-/jest-junit-5.1.0.tgz#e8e497d810a829bf02783125aab74b5df6caa8fe"
   dependencies:
     jest-validate "^23.0.1"
     mkdirp "^0.5.1"
@@ -7372,11 +7372,12 @@ ts-jest@22.4.6:
     source-map-support "^0.5.5"
     yargs "^11.0.0"
 
-ts-node@6.1.1:
-  version "6.1.1"
-  resolved "https://registry.npmjs.org/ts-node/-/ts-node-6.1.1.tgz#19607140acb06150441fcdb61be11f73f7b6657e"
+ts-node@6.1.2:
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-6.1.2.tgz#3221ca727a84bc66db1de8b647896621e38e8eaf"
   dependencies:
     arrify "^1.0.0"
+    buffer-from "^1.1.0"
     diff "^3.1.0"
     make-error "^1.1.1"
     minimist "^1.2.0"
