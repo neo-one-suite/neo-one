@@ -223,11 +223,11 @@ describe('BrowserMonitor', () => {
         counters: {
           [requestCounter.name]: {
             metric: requestCounter,
-            values: [{ countOrLabels: 0 }],
+            values: [],
           },
           [failuresCounter.name]: {
             metric: failuresCounter,
-            values: [{ countOrLabels: 0 }],
+            values: [],
           },
           [counterResult1.metric.name]: counterResult1,
         },
