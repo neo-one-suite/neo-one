@@ -1,11 +1,12 @@
 // tslint:disable ban-types
-import { ABIEvent, ABIFunction, ABIParameter, ABIReturn } from '@neo-one/client';
+import { ABIEvent, ABIFunction, ABIParameter, ABIReturn, ContractParameterType } from '@neo-one/client';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import Project, {
   CallExpression,
   ClassDeclaration,
   ClassInstanceMemberTypes,
+  FunctionDeclaration,
   Identifier,
   Node,
   SourceFile,
@@ -22,7 +23,7 @@ import { Globals, LibAliases, Libs } from '../../symbols';
 import * as typeUtils from '../../typeUtils';
 import { declarations } from '../declaration';
 import { NodeTranspiler } from '../NodeTranspiler';
-import { TranspileResult, VisitOptions } from '../types';
+import { Contract, TranspileResult, VisitOptions } from '../types';
 import { Transpiler } from './Transpiler';
 
 const transpilers: ReadonlyArray<ReadonlyArray<new () => NodeTranspiler>> = [declarations];
@@ -30,6 +31,22 @@ const transpilers: ReadonlyArray<ReadonlyArray<new () => NodeTranspiler>> = [dec
 type Transpilers = { [K in number]?: NodeTranspiler };
 
 const BYTE_ARRAY_RETURN: ABIReturn = { type: 'ByteArray' };
+const PARAMETERS: ReadonlyArray<ContractParameterType> = ['String', 'ByteArray'];
+const RETURN_TYPE = 'ByteArray';
+const createDefaultContract = (name: string): Contract => ({
+  parameters: PARAMETERS,
+  returnType: RETURN_TYPE,
+  name,
+  codeVersion: '1.0',
+  author: 'unknown',
+  email: 'unknown',
+  description: '',
+  properties: {
+    storage: true,
+    dynamicInvoke: true,
+    payable: true,
+  },
+});
 
 export class NEOTranspiler implements Transpiler {
   private readonly transpilers: Transpilers;
@@ -63,6 +80,7 @@ export class NEOTranspiler implements Transpiler {
     this.visit(this.smartContract, { isSmartContract: true });
     this.context.libAliases.reset();
     const functions = this.processSmartContract(file);
+    const contract = this.processContract(file);
     this.strip();
 
     return {
@@ -70,6 +88,7 @@ export class NEOTranspiler implements Transpiler {
       sourceFile: file,
       abi: { functions, events },
       context: this.context,
+      contract,
     };
   }
 
@@ -330,6 +349,125 @@ export class NEOTranspiler implements Transpiler {
     file.addStatements(statements);
 
     return mutableFunctions;
+  }
+
+  private processContract(file: SourceFile): Contract {
+    const name = this.smartContract.getNameOrThrow();
+    const defaultContract = createDefaultContract(name);
+    const smartContract = file.getClassOrThrow(name);
+
+    const properties = smartContract.getType().getProperty('properties');
+
+    if (properties === undefined) {
+      this.reportError(
+        smartContract,
+        'Invalid smart contract properties definition.',
+        DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
+      );
+
+      return defaultContract;
+    }
+
+    const decls = properties
+      .getDeclarations()
+      .filter(TypeGuards.isPropertyDeclaration)
+      .filter((prop) => prop.getInitializer() !== undefined);
+    if (decls.length !== 1) {
+      this.reportError(
+        smartContract,
+        'Invalid smart contract properties definition.',
+        DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
+      );
+
+      return defaultContract;
+    }
+
+    const decl = decls[0];
+    const initializer = decl.getInitializerOrThrow();
+
+    if (!TypeGuards.isObjectLiteralExpression(initializer)) {
+      this.reportError(
+        smartContract,
+        'Invalid smart contract properties definition.',
+        DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
+      );
+
+      return defaultContract;
+    }
+
+    const contract: { [key: string]: string } = {};
+    // tslint:disable-next-line no-loop-statement
+    for (const property of initializer.getProperties()) {
+      if (!TypeGuards.isPropertyAssignment(property)) {
+        this.reportError(
+          smartContract,
+          'Invalid smart contract properties definition.',
+          DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
+        );
+
+        return defaultContract;
+      }
+
+      const key = property.getName();
+      const value = property.getInitializer();
+      if (value === undefined || !TypeGuards.isLiteralExpression(value)) {
+        this.reportError(
+          smartContract,
+          'Invalid smart contract properties definition.',
+          DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
+        );
+
+        return defaultContract;
+      }
+
+      // tslint:disable-next-line no-object-mutation
+      contract[key] = value.getLiteralText();
+    }
+
+    // tslint:disable-next-line no-object-literal-type-assertion
+    return {
+      ...contract,
+      name,
+      parameters: PARAMETERS,
+      returnType: RETURN_TYPE,
+      properties: this.getProperties(),
+    } as Contract;
+  }
+
+  private getProperties(): Contract['properties'] {
+    const decls = this.context.globals.syscall.getDeclarations();
+
+    return {
+      dynamicInvoke: false,
+      storage: this.isSyscallUsed(decls, 'Neo.Storage.Put'),
+      payable: this.isSyscallUsed(decls, 'Neo.Transaction.GetOutputs'),
+    };
+  }
+
+  private isSyscallUsed(decls: ReadonlyArray<Node>, name: string): boolean {
+    const syscall = this.findSyscall(decls, name);
+
+    if (!TypeGuards.isReferenceFindableNode(syscall)) {
+      throw new Error('Something went wrong!');
+    }
+
+    return syscall.findReferencesAsNodes().length > 0;
+  }
+
+  private findSyscall(decls: ReadonlyArray<Node>, name: string): FunctionDeclaration {
+    const syscallDecl = decls.filter(TypeGuards.isFunctionDeclaration).find(
+      (decl) =>
+        decl
+          .getParameterOrThrow('name')
+          .getTypeNodeOrThrow()
+          .getText() === `'${name}'`,
+    );
+
+    if (syscallDecl === undefined) {
+      throw new Error('Something went wrong.');
+    }
+
+    return syscallDecl;
   }
 
   private processProperty(symbol: Symbol): ReadonlyArray<[ClassInstanceMemberTypes, ABIFunction]> {

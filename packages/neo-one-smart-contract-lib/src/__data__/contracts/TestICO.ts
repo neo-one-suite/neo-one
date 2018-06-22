@@ -11,6 +11,12 @@ export class TestICO extends ICO<8> {
   public readonly symbol: string = 'TT';
   public readonly icoAmount: Fixed<8> = 5000_00000000;
   public readonly maxLimitedRoundAmount: Fixed<8> = 1_00000000;
+  protected readonly properties = {
+    codeVersion: '1.0',
+    author: 'dicarlo2',
+    email: 'alex.dicarlo@neotracker.io',
+    description: 'The TestICO',
+  };
 
   public constructor(owner: Address, startTimeSeconds: Integer) {
     super(

@@ -1,6 +1,7 @@
 import {
   ABI,
   Client,
+  ContractRegister,
   DeveloperClient,
   LocalKeyStore,
   LocalMemoryStore,
@@ -14,9 +15,9 @@ import { DiagnosticCategory, ts } from 'ts-simple-ast';
 import { createNode } from './createNode';
 
 export interface Options {
-  readonly script: Buffer;
   readonly abi: ABI;
   readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
+  readonly contract: ContractRegister;
   readonly ignoreWarnings?: boolean;
 }
 
@@ -59,7 +60,7 @@ export const setupTest = async (getContract: () => Promise<Options>): Promise<Re
   });
   const developerClient = new DeveloperClient(provider.read(networkName));
 
-  const { script, diagnostics, abi, ignoreWarnings } = await getContract();
+  const { contract, diagnostics, abi, ignoreWarnings } = await getContract();
   const error = diagnostics.find((diagnostic) => diagnostic.category === DiagnosticCategory.Error);
   if (error !== undefined) {
     throw new Error(`Compilation error: ${error.messageText} at ${error.source}`);
@@ -73,21 +74,7 @@ export const setupTest = async (getContract: () => Promise<Options>): Promise<Re
   // Give RPC server a chance to startup.
   await new Promise<void>((resolve) => setTimeout(resolve, 5000));
 
-  const result = await client.publish({
-    script: script.toString('hex'),
-    parameters: ['String', 'Array'],
-    returnType: 'ByteArray',
-    name: 'TestContract',
-    codeVersion: '1.0',
-    author: 'test',
-    email: 'test@test.com',
-    description: 'test',
-    properties: {
-      storage: true,
-      dynamicInvoke: true,
-      payable: true,
-    },
-  });
+  const result = await client.publish(contract);
 
   const [receipt] = await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
   if (receipt.result.state === 'FAULT') {

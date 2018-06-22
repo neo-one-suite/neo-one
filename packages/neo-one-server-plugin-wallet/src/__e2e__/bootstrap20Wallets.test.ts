@@ -7,7 +7,7 @@ describe('bootstrap 20 wallets', () => {
       20,
       'boottest-2',
       bootstrapTestUtils.getDefaultInfo,
-      '48908',
+      '49408',
     );
   });
 });
