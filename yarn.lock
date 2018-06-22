@@ -913,9 +913,9 @@
   dependencies:
     "@types/koa" "*"
 
-"@types/koa-router@7.0.29":
-  version "7.0.29"
-  resolved "https://registry.npmjs.org/@types/koa-router/-/koa-router-7.0.29.tgz#efdd3c39297944e8a55764f7909abcfd9bf51ca6"
+"@types/koa-router@7.0.30":
+  version "7.0.30"
+  resolved "https://registry.yarnpkg.com/@types/koa-router/-/koa-router-7.0.30.tgz#636f399bff7c43f83c016b971b028c3f6316ea26"
   dependencies:
     "@types/koa" "*"
 
