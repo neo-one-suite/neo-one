@@ -30,7 +30,7 @@ import { decorators } from '../decorator';
 import { expressions } from '../expression';
 import { files } from '../file';
 import { statements } from '../statement';
-import { JumpResolver } from './JumpResolver';
+import { resolveJumps } from './resolveJumps';
 
 const compilers: ReadonlyArray<ReadonlyArray<new () => NodeCompiler>> = [
   declarations,
@@ -126,14 +126,21 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public getFinalBytecode(): Buffer {
-    // tslint:disable-next-line no-unused
-    const bytecode = new JumpResolver().process(this.mutableBytecode.map(([_, value]) => value));
+    const bytecode = resolveJumps(this.mutableBytecode);
     let pc = 0;
-    const buffers = bytecode.map((valueIn) => {
+    // tslint:disable-next-line no-unused
+    const buffers = bytecode.map(([node, valueIn]) => {
       let value = valueIn;
       if (value instanceof Jump) {
         const offsetPC = new BN(value.pc.getPC()).sub(new BN(pc));
         const jumpPC = offsetPC.toTwos(16);
+        if (jumpPC.fromTwos(16).toNumber() !== value.pc.getPC() - pc) {
+          throw new Error(
+            `Something went wrong, expected 2's complement of ${value.pc.getPC() - pc}, found: ${jumpPC
+              .fromTwos(16)
+              .toNumber()}`,
+          );
+        }
         const byteCodeBuffer = ByteBuffer[Op[value.op]] as Buffer | undefined;
         if (byteCodeBuffer === undefined) {
           throw new Error('Something went wrong, could not find bytecode buffer');
