@@ -1,4 +1,4 @@
-import { Param as ScriptBuilderParam } from '@neo-one/client-core';
+import { ContractParameterTypeJSON, Param as ScriptBuilderParam } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
@@ -24,18 +24,7 @@ export interface Peer {
   readonly port: number;
 }
 
-export type ContractParameterType =
-  | 'Signature'
-  | 'Boolean'
-  | 'Integer'
-  | 'Hash160'
-  | 'Hash256'
-  | 'ByteArray'
-  | 'PublicKey'
-  | 'String'
-  | 'Array'
-  | 'InteropInterface'
-  | 'Void';
+export type ContractParameterType = ContractParameterTypeJSON;
 
 export interface SignatureContractParameter {
   readonly type: 'Signature';

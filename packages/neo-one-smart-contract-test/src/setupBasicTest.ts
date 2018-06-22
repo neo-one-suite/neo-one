@@ -11,7 +11,26 @@ export interface SetupBasicTestOptions {
 
 export const setupBasicTest = async ({ contractPath, abi, ignoreWarnings }: SetupBasicTestOptions): Promise<Result> =>
   setupTest(async () => {
-    const { code: script, context } = await compileScript(contractPath);
+    const { code, context } = await compileScript(contractPath);
 
-    return { script, diagnostics: context.diagnostics, abi, ignoreWarnings };
+    return {
+      contract: {
+        script: code.toString('hex'),
+        parameters: ['String', 'Array'],
+        returnType: 'ByteArray',
+        name: 'TestContract',
+        codeVersion: '1.0',
+        author: 'test',
+        email: 'test@test.com',
+        description: 'test',
+        properties: {
+          storage: true,
+          dynamicInvoke: true,
+          payable: true,
+        },
+      },
+      diagnostics: context.diagnostics,
+      abi,
+      ignoreWarnings,
+    };
   });

@@ -210,8 +210,8 @@ export interface InteractiveCLI {
   readonly monitor: Monitor | undefined;
   readonly exec: (command: string) => Promise<void>;
   readonly printDescribe: (describeTable: DescribeTable, log?: (value: string) => void) => void;
-
   readonly printList: (listTable: ListTable, log?: (value: string) => void) => void;
+  readonly print: (value: string) => void;
   readonly getResourceType: (
     options: {
       readonly plugin: string;

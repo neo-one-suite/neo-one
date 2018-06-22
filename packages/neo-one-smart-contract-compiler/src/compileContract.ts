@@ -1,4 +1,4 @@
-import { ABI } from '@neo-one/client';
+import { ABI, ContractRegister } from '@neo-one/client';
 import { ts } from 'ts-simple-ast';
 import { compile } from './compile';
 import { transpile } from './transpile';
@@ -10,15 +10,15 @@ export interface CompileContractOptions {
 }
 
 export interface CompileContractResult {
-  readonly code: Buffer;
-  readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
   readonly abi: ABI;
+  readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
+  readonly contract: ContractRegister;
 }
 
 export const compileContract = async ({ filePath, name }: CompileContractOptions): Promise<CompileContractResult> => {
   const ast = await utils.getAstForPath(filePath);
   const smartContract = ast.getSourceFileOrThrow(filePath).getClassOrThrow(name);
-  const { ast: transpiledAst, sourceFile, abi, context } = transpile({
+  const { ast: transpiledAst, sourceFile, abi, context, contract } = transpile({
     ast,
     smartContract,
   });
@@ -29,8 +29,11 @@ export const compileContract = async ({ filePath, name }: CompileContractOptions
   });
 
   return {
-    code,
     diagnostics: finalContext.diagnostics,
     abi,
+    contract: {
+      ...contract,
+      script: code.toString('hex'),
+    },
   };
 };

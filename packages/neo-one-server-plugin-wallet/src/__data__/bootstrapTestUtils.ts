@@ -6,11 +6,9 @@ import _ from 'lodash';
 import { ASSET_INFO, compileSmartContract, TOKEN_INFO, TokenInfo } from '../bootstrap';
 import { constants } from '../constants';
 
-const TOKEN_HASHES: { readonly [key: string]: string } = {
-  RedToken: '0xf30b143036410a36490061d57f9dd778366da376',
-  BlueToken: '0xd823f16894607d63f09423eaa35c05e15f9c45b0',
-  GreenToken: '0xf40cd75ab60f279b4372a39152152700a054e0a1',
-};
+interface Tokens {
+  readonly [key: string]: string;
+}
 
 export async function getNetworkInfo(
   network: string,
@@ -57,16 +55,24 @@ const getCoin = (wallet: Wallet, test: (coin: Coin) => boolean) => expectNotNull
 const getAssetCoin = (wallet: Wallet, asset: string) => getCoin(wallet, (coin) => coin.asset === asset);
 const getAssetNameCoin = (wallet: Wallet, name: string) => getCoin(wallet, (coin) => coin.name === name);
 
-const getSmartContract = async ({ token, client }: { readonly token: TokenInfo; readonly client: ReadClient }) => {
+const getSmartContract = async ({
+  token,
+  client,
+  tokens,
+}: {
+  readonly token: TokenInfo;
+  readonly client: ReadClient;
+  readonly tokens: Tokens;
+}) => {
   const { abi } = await compileSmartContract(token.name);
 
-  return client.smartContract(TOKEN_HASHES[token.name], abi);
+  return client.smartContract(tokens[token.name], abi);
 };
 
-const getSmartContracts = async ({ client }: { readonly client: ReadClient }) =>
+const getSmartContracts = async ({ client, tokens }: { readonly client: ReadClient; readonly tokens: Tokens }) =>
   Promise.all(
     TOKEN_INFO.map(async (token) => {
-      const smartContract = await getSmartContract({ token, client });
+      const smartContract = await getSmartContract({ token, client, tokens });
 
       return { token, smartContract };
     }),
@@ -164,11 +170,13 @@ const testTokens = async ({
   transferWallets,
   client,
   tokenGas,
+  tokens,
 }: {
   readonly wallets: ReadonlyArray<Wallet>;
   readonly transferWallets: ReadonlyArray<Wallet>;
   readonly client: ReadClient;
   readonly tokenGas: string;
+  readonly tokens: Tokens;
 }) => {
   const addressToWallet = getAddressToWallet(wallets);
   // Order is important here due to the idx % 2 check below
@@ -177,7 +185,7 @@ const testTokens = async ({
   );
   expect(tokenWallets.length).toEqual(TOKEN_INFO.length);
 
-  const tokenAndSmartContracts = await getSmartContracts({ client });
+  const tokenAndSmartContracts = await getSmartContracts({ client, tokens });
 
   await Promise.all(
     utils.zip(tokenAndSmartContracts, tokenWallets).map(async ([{ token, smartContract }, wallet], idx) => {
@@ -218,6 +226,32 @@ const testTokens = async ({
       );
     }),
   );
+};
+
+const testContract = async ({
+  client,
+  name,
+  hash,
+}: {
+  readonly client: ReadClient;
+  readonly name: string;
+  readonly hash: string;
+}) => {
+  const contract = await client.getContract(hash);
+  expect(contract.name).toEqual(name);
+  expect(contract.codeVersion).toEqual('1.0');
+  expect(contract.parameters).toEqual(['String', 'ByteArray']);
+  expect(contract.returnType).toEqual('ByteArray');
+  expect(contract.author).toEqual('dicarlo2');
+  expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
+  expect(contract.description).toEqual(`The ${name}`);
+  expect(contract.properties.dynamicInvoke).toBeFalsy();
+  expect(contract.properties.payable).toBeTruthy();
+  expect(contract.properties.storage).toBeTruthy();
+};
+
+const testContracts = async ({ client, tokens }: { readonly client: ReadClient; readonly tokens: Tokens }) => {
+  await Promise.all(Object.entries(tokens).map(async ([name, hash]) => testContract({ client, name, hash })));
 };
 
 export interface Info {
@@ -274,7 +308,19 @@ export async function testBootstrap(
   const { rpcURL } = await getNetworkInfo(network);
   const command = await getCommand({ network, rpcURL });
 
-  await one.execute(command);
+  const stdout = await one.execute(command);
+  const tokens = stdout
+    .trim()
+    .split('\n')
+    .slice(-3)
+    .reduce<Tokens>((acc, value) => {
+      const [name, hash] = value.split(':');
+
+      return {
+        ...acc,
+        [name]: hash,
+      };
+    }, {});
 
   const [{ height }, { wallets }] = await Promise.all([getNetworkInfo(network), getInfo({ network, rpcURL })]);
 
@@ -307,5 +353,6 @@ export async function testBootstrap(
 
   testTransfersAndClaims({ transferWallets });
   testAssets({ wallets, transferWallets });
-  await testTokens({ wallets, transferWallets, client, tokenGas });
+  await testTokens({ wallets, transferWallets, client, tokenGas, tokens });
+  await testContracts({ client, tokens });
 }

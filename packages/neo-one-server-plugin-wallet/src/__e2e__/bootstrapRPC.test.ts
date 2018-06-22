@@ -68,6 +68,6 @@ describe('bootstrap with rpc', () => {
       };
     };
 
-    await bootstrapTestUtils.testBootstrap(getCommand, 10, 'priv', getInfo, '48953');
+    await bootstrapTestUtils.testBootstrap(getCommand, 10, 'priv', getInfo, '49453');
   });
 });

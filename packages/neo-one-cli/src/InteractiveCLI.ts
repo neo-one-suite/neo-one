@@ -396,6 +396,10 @@ export class InteractiveCLI {
     this.getPrint(print)(this.getList(listTable));
   }
 
+  public print(value: string, print?: ((value: string) => void)): void {
+    this.getPrint(print)(value);
+  }
+
   public getResourceType({
     plugin: pluginName,
     resourceType: resourceTypeName,

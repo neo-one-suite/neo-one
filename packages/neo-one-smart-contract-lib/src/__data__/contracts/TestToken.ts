@@ -9,6 +9,12 @@ export class TestToken extends Token<4> {
   public readonly name: string = 'TestToken';
   public readonly decimals: 4 = 4;
   public readonly symbol: string = 'TT';
+  protected readonly properties = {
+    codeVersion: '1.0',
+    author: 'dicarlo2',
+    email: 'alex.dicarlo@neotracker.io',
+    description: 'The TestToken',
+  };
 
   public constructor(owner: Address) {
     super(owner);

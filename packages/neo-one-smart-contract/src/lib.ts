@@ -10,7 +10,16 @@ export type Fixed<T extends number> = number | (number & FixedTag<T>);
 export type Integer = Fixed<0>;
 export type Fixed8 = Fixed<8>;
 
+export interface ContractProperties {
+  readonly codeVersion: string;
+  readonly author: string;
+  readonly email: string;
+  readonly description: string;
+}
+
 export abstract class SmartContract {
+  protected abstract readonly properties: ContractProperties;
+
   public constructor(public readonly owner: Address) {}
 
   protected get address(): Address {

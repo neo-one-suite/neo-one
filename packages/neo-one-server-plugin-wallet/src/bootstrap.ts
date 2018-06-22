@@ -2,6 +2,7 @@ import {
   ABI,
   AssetType,
   Client,
+  ContractRegister,
   createPrivateKey,
   DeveloperClient,
   Hash256String,
@@ -727,7 +728,7 @@ const findContracts = async (current: string): Promise<string> => {
 };
 
 interface CompileResult {
-  readonly code: Buffer;
+  readonly contract: ContractRegister;
   readonly abi: ABI;
   readonly name: string;
 }
@@ -735,12 +736,12 @@ interface CompileResult {
 export const compileSmartContract = async (contractName: string): Promise<CompileResult> => {
   const dir = await findContracts(require.resolve('@neo-one/server-plugin-wallet'));
 
-  const { script: code, abi } = await findAndCompileContract({
+  const { contract, abi } = await findAndCompileContract({
     dir,
     contractName,
   });
 
-  return { code, abi, name: contractName };
+  return { contract, abi, name: contractName };
 };
 
 const compileSmartContracts = async (contractNames: ReadonlyArray<string>): Promise<ReadonlyArray<CompileResult>> =>
@@ -751,37 +752,18 @@ const compileSmartContracts = async (contractNames: ReadonlyArray<string>): Prom
 const publishContract = async ({
   wallet,
   client,
-  result: { code, name },
+  result: { contract },
 }: {
   readonly wallet: WalletData;
   readonly isRPC: boolean;
   readonly client: Client;
   readonly result: CompileResult;
-}): Promise<TransactionResult<PublishReceipt>> =>
-  client.publish(
-    {
-      // tslint:disable-next-line no-suspicious-comment
-      // TODO: Get all of these directly from smart contract compilation
-      script: code.toString('hex'),
-      parameters: ['String', 'Array'],
-      returnType: 'ByteArray',
-      name,
-      codeVersion: '1.0',
-      author: 'test',
-      email: 'test@test.com',
-      description: 'test',
-      properties: {
-        storage: true,
-        dynamicInvoke: true,
-        payable: true,
-      },
-    },
-    { from: wallet.accountID },
-  );
+}): Promise<TransactionResult<PublishReceipt>> => client.publish(contract, { from: wallet.accountID });
 
 interface TokenWithWallet extends TokenInfo {
   readonly wallet: WalletData;
   readonly smartContract: SmartContract;
+  readonly hash: string;
 }
 
 const publishTokens = async ({
@@ -825,15 +807,16 @@ const publishTokens = async ({
         throw new Error(receipt.result.message);
       }
 
+      const hash = receipt.result.value.hash;
       const smartContract = client.smartContract({
         networks: {
-          [wallet.accountID.network]: { hash: receipt.result.value.hash },
+          [wallet.accountID.network]: { hash },
         },
 
         abi: compileResult.abi,
       });
 
-      return { ...token, smartContract, wallet };
+      return { ...token, smartContract, wallet, hash };
     });
 
   const deployResults = await Promise.all(
@@ -1085,7 +1068,13 @@ export const bootstrap = (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs)
         spinner.succeed();
 
         await developerClient.updateSettings({ secondsPerBlock: 15 });
+
+        cli.print('Published contracts:');
+        tokens.forEach(({ name, hash }) => {
+          cli.print(`${name}:${hash}`);
+        });
       } catch (error) {
         spinner.fail(error);
+        throw error;
       }
     });
