@@ -43,6 +43,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]
@@ -90,6 +91,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]
@@ -152,6 +154,7 @@ Array [
         "network": "test",
       },
     },
+    undefined,
   ],
 ]
 `;
@@ -198,6 +201,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]
@@ -211,6 +215,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]
@@ -268,6 +273,7 @@ Array [
         "network": "test",
       },
     },
+    undefined,
   ],
 ]
 `;
@@ -334,6 +340,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]
@@ -347,6 +354,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]
