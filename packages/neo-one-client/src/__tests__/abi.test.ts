@@ -99,7 +99,7 @@ describe('abi', () => {
       ],
     };
 
-    const result = await NEP5(client, hash);
+    const result = await NEP5({ client, hash });
     expect(result).toEqual(expected);
   });
 });

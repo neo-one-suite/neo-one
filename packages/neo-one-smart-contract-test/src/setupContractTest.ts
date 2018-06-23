@@ -14,10 +14,10 @@ export const setupContractTest = async ({
   ignoreWarnings,
 }: SetupContractTestOptions): Promise<Result> =>
   setupTest(async () => {
-    const { contract, diagnostics, abi } = await findAndCompileContract({
+    const result = await findAndCompileContract({
       dir,
       contractName,
     });
 
-    return { contract, diagnostics, abi, ignoreWarnings };
+    return { ...result, ignoreWarnings };
   });

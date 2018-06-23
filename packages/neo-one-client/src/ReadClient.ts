@@ -3,7 +3,6 @@ import { Monitor } from '@neo-one/monitor';
 import * as args from './args';
 import { createReadSmartContract } from './sc';
 import {
-  ABI,
   Account,
   ActionRaw,
   AddressString,
@@ -19,6 +18,7 @@ import {
   Peer,
   RawInvocationResult,
   ReadSmartContract,
+  ReadSmartContractDefinition,
   StorageItem,
   Transaction,
   Validator,
@@ -91,11 +91,11 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
     return this.dataProvider.getConnectedPeers(monitor);
   }
 
-  public smartContract(hash: Hash160String, abi: ABI): ReadSmartContract {
-    args.assertHash160(hash);
-    args.assertABI(abi);
+  public smartContract(definition: ReadSmartContractDefinition): ReadSmartContract {
+    args.assertHash160(definition.hash);
+    args.assertABI(definition.abi);
 
-    return createReadSmartContract({ hash, abi, client: this });
+    return createReadSmartContract({ definition, client: this });
   }
 
   public async getStorage(hash: Hash160String, key: BufferString, monitor?: Monitor): Promise<StorageItem> {

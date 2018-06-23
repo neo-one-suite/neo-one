@@ -39,6 +39,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@babel/code-frame": "^7.0.0-beta.51",
     "@neo-one/client-core": "^1.0.0-alpha.48",
     "@neo-one/monitor": "^1.0.0-alpha.35",
     "@neo-one/node-neo-settings": "^1.0.0-alpha.48",
@@ -50,6 +51,7 @@
     "fast-stable-stringify": "^1.0.0",
     "ix": "^2.3.5",
     "lodash": "^4.17.10",
-    "rxjs": "^6.2.1"
+    "rxjs": "^6.2.1",
+    "source-map": "^0.7.3"
   }
 }

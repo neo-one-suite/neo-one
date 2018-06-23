@@ -11,9 +11,10 @@ export interface SetupBasicTestOptions {
 
 export const setupBasicTest = async ({ contractPath, abi, ignoreWarnings }: SetupBasicTestOptions): Promise<Result> =>
   setupTest(async () => {
-    const { code, context } = await compileScript(contractPath);
+    const { code, context, sourceMap } = await compileScript(contractPath);
 
     return {
+      sourceMap,
       contract: {
         script: code.toString('hex'),
         parameters: ['String', 'Array'],

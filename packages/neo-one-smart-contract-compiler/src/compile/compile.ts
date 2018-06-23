@@ -42,7 +42,7 @@ export const compile = ({
   emittingScriptBuilder.process();
 
   return {
-    code: emittingScriptBuilder.getFinalBytecode(),
+    ...emittingScriptBuilder.getFinalResult(),
     context,
   };
 };

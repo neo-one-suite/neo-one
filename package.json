@@ -67,7 +67,7 @@
     "hooks": {
       "pre-commit": "lint-staged && echo \"Executing tsc...\" && tsc",
       "post-checkout": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-checkout.ts $HUSKY_GIT_PARAMS",
-      "post-checkout": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-merge.ts $HUSKY_GIT_PARAMS",
+      "post-merge": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-merge.ts $HUSKY_GIT_PARAMS",
       "post-rewrite": "ts-node --project tsconfig.cli.json ./scripts/hooks/post-rewrite.ts $HUSKY_GIT_PARAMS"
     }
   },
@@ -109,6 +109,7 @@
     "@types/protobufjs": "6.0.0",
     "@types/rollup": "0.54.0",
     "@types/seamless-immutable": "7.1.2",
+    "@types/source-map": "^0.5.7",
     "@types/strip-ansi": "3.0.0",
     "@types/tar": "4.0.0",
     "@types/through": "0.0.29",
@@ -127,6 +128,7 @@
     "prettier": "1.13.5",
     "rollup": "0.61.1",
     "rollup-plugin-babel": "4.0.0-beta.5",
+    "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-json": "3.0.0",
     "rollup-plugin-node-resolve": "3.3.0",
     "rollup-plugin-replace": "2.0.0",

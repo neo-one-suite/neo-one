@@ -1,4 +1,5 @@
 import { ABI, ContractRegister } from '@neo-one/client';
+import { RawSourceMap } from 'source-map';
 import { ts } from 'ts-simple-ast';
 import { compile } from './compile';
 import { transpile } from './transpile';
@@ -13,6 +14,7 @@ export interface CompileContractResult {
   readonly abi: ABI;
   readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
   readonly contract: ContractRegister;
+  readonly sourceMap: RawSourceMap;
 }
 
 export const compileContract = async ({ filePath, name }: CompileContractOptions): Promise<CompileContractResult> => {
@@ -22,7 +24,7 @@ export const compileContract = async ({ filePath, name }: CompileContractOptions
     ast,
     smartContract,
   });
-  const { code, context: finalContext } = compile({
+  const { code, context: finalContext, sourceMap } = compile({
     ast: transpiledAst,
     sourceFile,
     context,
@@ -30,6 +32,7 @@ export const compileContract = async ({ filePath, name }: CompileContractOptions
 
   return {
     diagnostics: finalContext.diagnostics,
+    sourceMap,
     abi,
     contract: {
       ...contract,

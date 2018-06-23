@@ -3,12 +3,18 @@ import { CustomError } from '@neo-one/utils';
 import BN from 'bn.js';
 import { ExecutionContext } from './constants';
 
+const getLine = (context: ExecutionContext): number => {
+  const bytecode = disassembleByteCode(context.code);
+  // tslint:disable-next-line no-unused
+  const result = [...bytecode.entries()].find(([idx, { pc }]) => context.pc === pc);
+
+  return result === undefined ? 0 : result[0];
+};
+
 const getMessage = (context: ExecutionContext, message: string): string => {
-  const debug = disassembleByteCode(context.code).join('\n');
-  const stack = context.stack.map((item) => item.toString()).join('\n');
   const { pc } = context;
 
-  return `${message}\nPC: ${pc}\nCode:\n${debug}\nStack:\n${stack}`;
+  return `${message}\nPC:${pc}\nLine:${getLine(context)}`;
 };
 
 export class VMError extends CustomError {

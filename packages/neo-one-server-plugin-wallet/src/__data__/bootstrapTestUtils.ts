@@ -64,9 +64,9 @@ const getSmartContract = async ({
   readonly client: ReadClient;
   readonly tokens: Tokens;
 }) => {
-  const { abi } = await compileSmartContract(token.name);
+  const { abi, sourceMap } = await compileSmartContract(token.name);
 
-  return client.smartContract(tokens[token.name], abi);
+  return client.smartContract({ hash: tokens[token.name], abi, sourceMap });
 };
 
 const getSmartContracts = async ({ client, tokens }: { readonly client: ReadClient; readonly tokens: Tokens }) =>

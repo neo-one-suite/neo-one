@@ -12,6 +12,7 @@ import {
 } from '@neo-one/client-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import BN from 'bn.js';
+import { SourceMapGenerator } from 'source-map';
 import Project, { Node, SourceFile, Symbol, Type } from 'ts-simple-ast';
 
 import { Context } from '../../Context';
@@ -20,7 +21,7 @@ import { Helper, Helpers } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
 import { Call, DeferredProgramCounter, Jmp, Jump, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
-import { VisitOptions } from '../types';
+import { ScriptBuilderResult, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode } from './ScriptBuilder';
 
@@ -125,11 +126,15 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     this.emitBytecode(bytecode);
   }
 
-  public getFinalBytecode(): Buffer {
+  public getFinalResult(): ScriptBuilderResult {
     const bytecode = resolveJumps(this.mutableBytecode);
     let pc = 0;
+
+    const sourceMapGenerator = new SourceMapGenerator();
+    const addedFiles = new Set<string>();
+
     // tslint:disable-next-line no-unused
-    const buffers = bytecode.map(([node, valueIn]) => {
+    const buffers = bytecode.map(([node, valueIn], idx) => {
       let value = valueIn;
       if (value instanceof Jump) {
         const offsetPC = new BN(value.pc.getPC()).sub(new BN(pc));
@@ -148,12 +153,26 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         value = Buffer.concat([byteCodeBuffer, jumpPC.toArrayLike(Buffer, 'le', 2)]);
       }
 
+      const filePath = node.getSourceFile().getFilePath();
+      sourceMapGenerator.addMapping({
+        generated: { line: idx + 1, column: 0 },
+        original: { line: node.getStartLineNumber(false), column: node.getStartLinePos(false) },
+        source: filePath,
+      });
+      if (!addedFiles.has(filePath)) {
+        addedFiles.add(filePath);
+        sourceMapGenerator.setSourceContent(filePath, node.getSourceFile().getFullText());
+      }
+
       pc += value.length;
 
       return value;
     });
 
-    return Buffer.concat(buffers);
+    return {
+      code: Buffer.concat(buffers),
+      sourceMap: sourceMapGenerator.toJSON(),
+    };
   }
 
   public visit(node: Node, options: VisitOptions): void {

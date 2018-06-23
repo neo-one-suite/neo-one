@@ -10,7 +10,12 @@ const createHexString = (bytes: Buffer): string => {
   return `0x${mutableResult}`;
 };
 
-export const disassembleByteCode = (bytes: Buffer): ReadonlyArray<string> => {
+interface Line {
+  readonly pc: number;
+  readonly value: string;
+}
+
+export const disassembleByteCode = (bytes: Buffer): ReadonlyArray<Line> => {
   const reader = new BinaryReader(bytes);
 
   const mutableResult: Array<[number, OpCode | 'UNKNOWN', string | undefined]> = [];
@@ -53,7 +58,8 @@ export const disassembleByteCode = (bytes: Buffer): ReadonlyArray<string> => {
     }
   }
 
-  return mutableResult.map(
-    ([index, opCode, val]) => `${index.toString().padStart(4, '0')}:${opCode}${val === undefined ? '' : ` ${val}`}`,
-  );
+  return mutableResult.map(([index, opCode, val]) => ({
+    pc: index,
+    value: `${index.toString().padStart(4, '0')}:${opCode}${val === undefined ? '' : ` ${val}`}`,
+  }));
 };

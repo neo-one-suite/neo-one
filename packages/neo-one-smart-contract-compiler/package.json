@@ -54,6 +54,7 @@
     "lodash": "^4.17.10",
     "memdown": "^3.0.0",
     "safe-stable-stringify": "^1.0.1",
+    "source-map": "^0.7.3",
     "ts-simple-ast": "^12.4.0"
   }
 }
