@@ -1,7 +1,12 @@
 import { Address, createEventHandler, Fixed, verifySender } from '@neo-one/smart-contract';
 import { Token } from '@neo-one/smart-contract-lib';
 
-const onTransfer = createEventHandler<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
+const onTransfer = createEventHandler<Address | undefined, Address | undefined, Fixed<8>>(
+  'transfer',
+  'from',
+  'to',
+  'amount',
+);
 const onApprove = createEventHandler<Address, Address, Fixed<8>>('approve', 'owner', 'spender', 'amount');
 
 export abstract class SimpleToken extends Token<8> {
@@ -13,7 +18,7 @@ export abstract class SimpleToken extends Token<8> {
     this.issue(owner, amount);
   }
 
-  protected onTransfer(from: Address, to: Address, amount: Fixed<8>): void {
+  protected onTransfer(from: Address | undefined, to: Address | undefined, amount: Fixed<8>): void {
     onTransfer(from, to, amount);
   }
 

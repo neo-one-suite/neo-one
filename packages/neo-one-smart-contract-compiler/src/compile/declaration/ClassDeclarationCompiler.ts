@@ -56,6 +56,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
           decl
             .getInstanceProperties()
             .filter(TypeGuards.isPropertyDeclaration)
+            .filter((property) => !property.isAbstract())
             .forEach((property) => {
               const initializer = property.getInitializer();
               if (initializer !== undefined) {

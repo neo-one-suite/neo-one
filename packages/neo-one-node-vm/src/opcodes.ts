@@ -1412,7 +1412,7 @@ const OPCODE_PAIRS = ([
             const index = vmUtils.toNumber(context, args[0].asBigInteger());
             const val = args[1].asArray();
             if (index < 0 || index >= val.length) {
-              throw new InvalidPickItemKeyError(context);
+              throw new InvalidPickItemKeyError(context, `${index}`, JSON.stringify(args[1].toJSON()));
             }
 
             return { context, results: [val[index]] };
@@ -1421,7 +1421,7 @@ const OPCODE_PAIRS = ([
           const key = args[0];
           const value = args[1].asMapStackItem();
           if (!value.has(key)) {
-            throw new InvalidPickItemKeyError(context);
+            throw new InvalidPickItemKeyError(context, key.toKeyString(), JSON.stringify(args[1].toJSON()));
           }
 
           return { context, results: [value.get(key)] };

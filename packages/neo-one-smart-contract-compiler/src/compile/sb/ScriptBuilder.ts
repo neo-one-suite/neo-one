@@ -59,6 +59,7 @@ export interface ScriptBuilder {
   readonly getSymbol: (node: Node, required?: boolean) => Symbol | undefined;
   readonly isOnlyGlobal: (node: Node, type: Type | undefined, name: keyof Globals) => boolean;
   readonly isGlobal: (node: Node, type: Type | undefined, name: keyof Globals) => boolean;
+  readonly hasGlobal: (node: Node, type: Type | undefined, name: keyof Globals) => boolean;
   readonly isGlobalSymbol: (node: Node, symbol: Symbol | undefined, name: keyof Globals) => boolean;
   readonly hasExport: (sourceFile: SourceFile, name: string) => boolean;
   readonly addExport: (name: string) => void;

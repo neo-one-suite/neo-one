@@ -161,7 +161,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
       });
       if (!addedFiles.has(filePath)) {
         addedFiles.add(filePath);
-        sourceMapGenerator.setSourceContent(filePath, node.getSourceFile().getFullText());
+        sourceMapGenerator.setSourceContent(filePath, node.getSourceFile().getText());
       }
 
       pc += value.length;
@@ -405,6 +405,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   public isGlobal(node: Node, type: Type | undefined, name: keyof Globals): boolean {
     return this.context.isGlobal(node, type, name);
+  }
+
+  public hasGlobal(node: Node, type: Type | undefined, name: keyof Globals): boolean {
+    return this.context.hasGlobal(node, type, name);
   }
 
   public isGlobalSymbol(node: Node, symbol: Symbol | undefined, name: keyof Globals): boolean {

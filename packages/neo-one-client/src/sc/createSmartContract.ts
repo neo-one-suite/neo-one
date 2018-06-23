@@ -147,7 +147,7 @@ const createInvoke = ({
     client,
   });
 
-  const result = await client.invoke(hash, name, params, paramsZipped, verify, options);
+  const result = await client.invoke(hash, name, params, paramsZipped, verify, options, definition.sourceMap);
 
   return {
     transaction: result.transaction,

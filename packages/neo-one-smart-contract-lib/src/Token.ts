@@ -49,13 +49,13 @@ export abstract class Token<Decimals extends number> extends SmartContract {
     return this.supply;
   }
 
-  protected abstract onTransfer(from: Address, to: Address, amount: Fixed<Decimals>): void;
+  protected abstract onTransfer(from: Address | undefined, to: Address | undefined, amount: Fixed<Decimals>): void;
   protected abstract onApprove(owner: Address, spender: Address, amount: Fixed<Decimals>): void;
 
   protected issue(addr: Address, amount: Fixed<Decimals>): void {
     this.balances.set(addr, this.balanceOf(addr) + amount);
     this.supply += amount;
-    this.onTransfer(this.address, addr, amount);
+    this.onTransfer(undefined, addr, amount);
   }
 
   private doTransfer(from: Address, to: Address, amount: Fixed<Decimals>): void {

@@ -2,7 +2,12 @@ import { Address, createEventHandler, Fixed, verifySender } from '@neo-one/smart
 // tslint:disable-next-line no-implicit-dependencies
 import { Token } from '@neo-one/smart-contract-lib';
 
-const onTransfer = createEventHandler<Address, Address, Fixed<4>>('transfer', 'from', 'to', 'amount');
+const onTransfer = createEventHandler<Address | undefined, Address | undefined, Fixed<4>>(
+  'transfer',
+  'from',
+  'to',
+  'amount',
+);
 const onApprove = createEventHandler<Address, Address, Fixed<4>>('approve', 'owner', 'spender', 'amount');
 
 export class TestToken extends Token<4> {
@@ -22,7 +27,7 @@ export class TestToken extends Token<4> {
     this.issue(owner, 100_0000);
   }
 
-  protected onTransfer(from: Address, to: Address, amount: Fixed<4>): void {
+  protected onTransfer(from: Address | undefined, to: Address | undefined, amount: Fixed<4>): void {
     onTransfer(from, to, amount);
   }
 

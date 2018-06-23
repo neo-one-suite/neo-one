@@ -678,6 +678,7 @@ export interface UserAccountProvider {
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
     options?: InvokeTransactionOptions,
+    sourceMap?: RawSourceMap,
   ) => Promise<TransactionResult<InvokeReceiptInternal>>;
   readonly call: (
     contract: Hash160String,

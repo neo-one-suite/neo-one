@@ -193,56 +193,49 @@ const addJumpStations = (node: Node, codePoint: CodePoint, maxOffset: number): v
   }
 
   let mutableReverseTarget = secondCodePoint;
-  let firstNoForward = true;
+  let forwardDone = false;
   let mutableCurrent: CodePoint | undefined = mutableFirstCodePoint;
   let firstJumpStation: JumpStationCodePoint | undefined;
-  const finalForwardTargetPC = mutableFirstCodePoint.target.pc;
-  let addedLength = 0;
   // tslint:disable-next-line no-loop-statement
   while (mutableCurrent !== undefined) {
-    const reversePC = firstJumpStation === undefined ? 0 : mutableReverseTarget.pc + 3;
-    if (mutableCurrent.pc - reversePC + 9 > maxOffset) {
-      let hasForward = finalForwardTargetPC + addedLength + 9 > mutableCurrent.pc;
-      let target: CodePoint | undefined;
-      if (!hasForward && firstNoForward) {
-        hasForward = true;
-        target = mutableFirstCodePoint.target;
-        firstNoForward = false;
-      }
-
-      // tslint:disable-next-line no-unnecessary-type-annotation
-      const mutableJumpStation: JumpStationCodePoint = new JumpStationCodePoint(node, hasForward, mutableReverseTarget);
-      if (target !== undefined) {
-        mutableJumpStation.target = target;
-      }
-      if (mutableReverseTarget instanceof JumpStationCodePoint) {
-        mutableReverseTarget.target = mutableJumpStation;
-      }
-      if (firstJumpStation === undefined) {
-        firstJumpStation = mutableJumpStation;
-      }
-      mutableReverseTarget = mutableJumpStation;
-      addedLength += mutableJumpStation.length;
-
-      const mutablePrev = mutableCurrent.prev;
-      if (mutablePrev !== undefined) {
-        const mutableNext = mutablePrev.next;
-        if (mutableNext !== undefined) {
-          mutableNext.prev = mutableJumpStation;
-        }
-        mutableJumpStation.next = mutableNext;
-
-        mutablePrev.next = mutableJumpStation;
-        mutableJumpStation.prev = mutablePrev;
-      }
-    }
-
     if (
       mutableCurrent instanceof JumpCodePoint &&
       mutableCurrent.isReverseJump &&
       mutableCurrent.pc - mutableCurrent.target.pc > maxOffset
     ) {
       mutableCurrent.target = mutableReverseTarget;
+    }
+
+    const reversePC = mutableReverseTarget.pc + (firstJumpStation === undefined ? 0 : 3);
+    const mutableNext = mutableCurrent.next;
+    if (mutableNext !== undefined && mutableNext.pc - reversePC + 9 > maxOffset) {
+      const hasForward = !forwardDone && mutableFirstCodePoint.target.pc - maxOffset >= mutableNext.pc;
+      let mutableJumpStation: JumpStationCodePoint;
+      if (!hasForward && !forwardDone) {
+        mutableJumpStation = new JumpStationCodePoint(node, true, mutableReverseTarget);
+        mutableJumpStation.target = mutableFirstCodePoint.target;
+        if (mutableReverseTarget instanceof JumpStationCodePoint) {
+          mutableReverseTarget.target = mutableJumpStation;
+        }
+        forwardDone = true;
+      } else {
+        mutableJumpStation = new JumpStationCodePoint(node, hasForward, mutableReverseTarget);
+        if (hasForward && mutableReverseTarget instanceof JumpStationCodePoint) {
+          mutableReverseTarget.target = mutableJumpStation;
+        }
+      }
+
+      if (firstJumpStation === undefined) {
+        firstJumpStation = mutableJumpStation;
+      }
+      mutableReverseTarget = mutableJumpStation;
+
+      mutableCurrent.next = mutableJumpStation;
+      mutableJumpStation.next = mutableNext;
+      mutableNext.prev = mutableJumpStation;
+      mutableJumpStation.prev = mutableCurrent;
+
+      codePoint.resolveAllPCs();
     }
 
     mutableCurrent = mutableCurrent.next;
@@ -285,10 +278,10 @@ const getBytecode = (first: CodePoint): Bytecode => {
       const target = current.target;
       const reverseTarget = new Jmp('JMP', getTargetPC(current, current.reverseTarget));
       if (target === undefined) {
-        mutableOut.push([current.node, new Jmp('JMP', new KnownProgramCounter(current.pc + 6))]);
+        mutableOut.push([current.node, new Jmp('JMP', new KnownProgramCounter(current.pc + current.length))]);
         mutableOut.push([current.node, reverseTarget]);
       } else {
-        mutableOut.push([current.node, new Jmp('JMP', new KnownProgramCounter(current.pc + 9))]);
+        mutableOut.push([current.node, new Jmp('JMP', new KnownProgramCounter(current.pc + current.length))]);
         mutableOut.push([current.node, reverseTarget]);
         mutableOut.push([current.node, new Jmp('JMP', getTargetPC(current, target))]);
       }

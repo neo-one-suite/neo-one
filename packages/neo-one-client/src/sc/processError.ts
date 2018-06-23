@@ -48,14 +48,25 @@ export const processError = async ({ message, sourceMap }: Options): Promise<str
   }
 
   return SourceMapConsumer.with(sourceMap, undefined, async (consumer) => {
-    const splitMessage = message.trim().split('\n');
-    const line = splitMessage.find((splitLine) => splitLine.startsWith('Line:'));
+    const mutableMessage = message.trim().split('\n');
+    const line = mutableMessage.find((splitLine) => splitLine.startsWith('Line:'));
     if (line !== undefined) {
-      const errorMessage = splitMessage.filter((splitLine) => !splitLine.startsWith('Line:')).join('\n');
+      const lineIndex = mutableMessage.indexOf(line);
+      if (lineIndex === -1) {
+        return message;
+      }
+
       const lineNumber = parseInt(line.split(':')[1], 10);
       const positionMessage = getSourceMapPosition({ lineNumber, consumer });
+      if (positionMessage === undefined) {
+        return message;
+      }
 
-      return positionMessage === undefined ? errorMessage : `${errorMessage}\n${positionMessage}`;
+      mutableMessage[lineIndex] = `\n${positionMessage}\n`;
+
+      return mutableMessage
+        .filter((splitLine) => !splitLine.startsWith('Line:') && !splitLine.startsWith('PC:'))
+        .join('\n');
     }
 
     return message;

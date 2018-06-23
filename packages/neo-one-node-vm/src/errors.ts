@@ -13,8 +13,9 @@ const getLine = (context: ExecutionContext): number => {
 
 const getMessage = (context: ExecutionContext, message: string): string => {
   const { pc } = context;
+  const stack = context.stack.map((item) => item.toString()).join('\n');
 
-  return `${message}\nPC:${pc}\nLine:${getLine(context)}`;
+  return `${message}\nPC:${pc}\nStack:\n${stack}\nLine:${getLine(context)}`;
 };
 
 export class VMError extends CustomError {
@@ -203,8 +204,8 @@ export class InvalidPackCountError extends VMError {
 }
 
 export class InvalidPickItemKeyError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid PICKITEM Index');
+  public constructor(context: ExecutionContext, key: string, value: string) {
+    super(context, `Invalid PICKITEM Index: ${key}. Value: ${value}`);
   }
 }
 
