@@ -3,7 +3,7 @@ import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import { filter, map } from 'ix/asynciterable/pipe/index';
-import { RawSourceMap } from '../../node_modules/source-map/source-map';
+import { RawSourceMap } from 'source-map';
 import { ReadClient } from '../ReadClient';
 import {
   ABIEvent,

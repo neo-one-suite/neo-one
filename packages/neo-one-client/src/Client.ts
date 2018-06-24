@@ -2,7 +2,7 @@ import { Param as ScriptBuilderParam } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { filter, map, switchMap, take } from 'rxjs/operators';
-import { RawSourceMap } from '../node_modules/source-map/source-map';
+import { RawSourceMap } from 'source-map';
 import * as argAssertions from './args';
 import { UnknownAccountError, UnknownNetworkError } from './errors';
 import { ReadClient } from './ReadClient';

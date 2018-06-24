@@ -21,12 +21,13 @@ import {
   utils,
   Witness as WitnessModel,
 } from '@neo-one/client-core';
+import { processError } from '@neo-one/client-switch';
 import { Counter, Histogram, Labels, metrics, Monitor } from '@neo-one/monitor';
 import { labels as labelNames, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { Observable } from 'rxjs';
-import { RawSourceMap } from '../../node_modules/source-map/source-map';
+import { RawSourceMap } from 'source-map';
 import {
   InsufficientFundsError,
   InvalidTransactionError,
@@ -37,7 +38,6 @@ import {
   NothingToTransferError,
 } from '../errors';
 import { addressToScriptHash } from '../helpers';
-import { processError } from '../sc/processError';
 import {
   AddressString,
   AssetRegister,

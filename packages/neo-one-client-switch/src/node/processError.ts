@@ -1,6 +1,7 @@
 // @ts-ignore
 import { codeFrameColumns } from '@babel/code-frame';
-import { RawSourceMap, SourceMapConsumer } from 'source-map';
+import { SourceMapConsumer } from 'source-map';
+import { ProcessErrorOptions } from '../common';
 
 const MESSAGE_INDENT = '    ';
 
@@ -37,12 +38,7 @@ const getSourceMapPosition = ({
   return getRenderedCallsite(sourceContent, line, column === null ? undefined : column);
 };
 
-interface Options {
-  readonly message: string;
-  readonly sourceMap?: RawSourceMap;
-}
-
-export const processError = async ({ message, sourceMap }: Options): Promise<string> => {
+export const processError = async ({ message, sourceMap }: ProcessErrorOptions): Promise<string> => {
   if (sourceMap === undefined) {
     return message;
   }
