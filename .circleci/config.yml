@@ -60,7 +60,7 @@ aliases:
 
 node10: &node10
   docker:
-    - image: circleci/node:10.4.1@sha256:9e0db57ec38299fa1bbb666fa9e869031090c566c0c2623584adfdff6cc1f449
+    - image: circleci/node:10.5.0@sha256:de36894a21213e95a15ae412981429bb94c2b94710ccc161f628a31e92bb44ca
 
 version: 2
 jobs:
