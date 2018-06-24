@@ -18,6 +18,8 @@ export interface NetworkAddressAdd {
   readonly services: BN;
 }
 
+const BYTE_LENGTH = 16;
+
 export class NetworkAddress implements SerializableWire<NetworkAddress> {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): NetworkAddress {
     const timestamp = reader.readUInt32LE();
@@ -83,7 +85,8 @@ export class NetworkAddress implements SerializableWire<NetworkAddress> {
     }
     writer.writeUInt32LE(this.timestamp);
     writer.writeUInt64LE(this.services);
-    writer.writeBytes(Buffer.from(address.toByteArray()));
+    const addressSerialized = Buffer.from(address.toByteArray());
+    writer.writeBytes(Buffer.concat([Buffer.alloc(BYTE_LENGTH - addressSerialized.length, 0), addressSerialized]));
     writer.writeUInt16BE(this.port);
   }
 }
