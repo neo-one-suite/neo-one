@@ -21,7 +21,7 @@ export const addOptions = (command: Command) => {
   command
     .option('--gcloud-project-id <projectID>', 'Google Cloud project id')
     .option('--gcloud-bucket <bucket>', 'Google Cloud bucket')
-    .option('--gcloud-file <file>', 'Google Cloud file name')
+    .option('--gcloud-prefix <file>', 'Google Cloud prefix')
     .option('--mega-email <email>', 'Mega email')
     .option('--mega-password <password>', 'Mega password')
     .option('--mega-file <file>', 'Mega file name');
@@ -52,14 +52,14 @@ export const processArgs = async (
   } else if (provider === 'gcloud') {
     const projectID = getOption(cliArgs, cliOptions, 'gcloud-project-id');
     const bucket = getOption(cliArgs, cliOptions, 'gcloud-bucket');
-    const file = getOption(cliArgs, cliOptions, 'gcloud-file');
-    if (projectID === undefined || bucket === undefined || file === undefined) {
+    const prefix = getOption(cliArgs, cliOptions, 'gcloud-prefix');
+    if (projectID === undefined || bucket === undefined || prefix === undefined) {
       return undefined;
     }
     gcloud = {
       projectID,
       bucket,
-      file,
+      prefix,
       writeBytesPerSecond: 50000000,
     };
   } else {
