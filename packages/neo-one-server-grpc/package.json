@@ -35,6 +35,6 @@
     "access": "public"
   },
   "dependencies": {
-    "google-protobuf": "^3.5.0"
+    "google-protobuf": "^3.6.0"
   }
 }
