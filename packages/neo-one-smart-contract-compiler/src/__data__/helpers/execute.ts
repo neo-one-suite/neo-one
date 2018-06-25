@@ -7,9 +7,10 @@ import path from 'path';
 import { executeScript } from '../../executeScript';
 import * as utils from '../../utils';
 import { checkResult } from './extractors';
-import { monitor } from './monitor';
+import { getMonitor } from './getMonitor';
 
 const execute = async (ast: Ast, sourceFile: SourceFile, prelude?: Buffer) => {
+  const monitor = getMonitor();
   const result = await executeScript(monitor, ast, sourceFile, prelude);
   checkResult(result);
   return result;
