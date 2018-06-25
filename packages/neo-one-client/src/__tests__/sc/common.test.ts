@@ -153,7 +153,7 @@ describe('common', () => {
     expect(result).toEqual(expected);
   });
 
-  test('convertInvocationResult - invocation error', () => {
+  test('convertInvocationResult - invocation error', async () => {
     const returnType = { type: 'Void' };
     const invokeResult = {
       state: 'FAULT',
@@ -171,7 +171,7 @@ describe('common', () => {
     };
 
     // @ts-ignore
-    const result = common.convertInvocationResult({
+    const result = await common.convertInvocationResult({
       returnType,
       result: invokeResult,
     });
@@ -179,7 +179,7 @@ describe('common', () => {
     expect(result).toEqual(expected);
   });
 
-  test('convertInvocationResult - invocation succeess', () => {
+  test('convertInvocationResult - invocation succeess', async () => {
     const returnType = { type: 'String' };
     const invokeResult = {
       state: 'HALT',
@@ -196,7 +196,7 @@ describe('common', () => {
     };
 
     // @ts-ignore
-    const result = common.convertInvocationResult({
+    const result = await common.convertInvocationResult({
       returnType,
       result: invokeResult,
     });
@@ -204,7 +204,7 @@ describe('common', () => {
     expect(result).toEqual(expected);
   });
 
-  test('convertInvocationResult - invocation success with undefined stack', () => {
+  test('convertInvocationResult - invocation success with undefined stack', async () => {
     const returnType = { type: 'String' };
     const invokeResult = {
       state: 'HALT',
@@ -221,7 +221,7 @@ describe('common', () => {
     };
 
     // @ts-ignore
-    const result = common.convertInvocationResult({
+    const result = await common.convertInvocationResult({
       returnType,
       result: invokeResult,
     });
@@ -229,7 +229,7 @@ describe('common', () => {
     expect(result).toEqual(expected);
   });
 
-  test('convertCallResult throws error on fault', () => {
+  test('convertCallResult throws error on fault', async () => {
     const returnType = { type: 'String' };
     const resultCall = {
       state: 'FAULT',
@@ -239,7 +239,7 @@ describe('common', () => {
       message: 'testMsg',
     };
 
-    function testError() {
+    async function testError() {
       // @ts-ignore
       return common.convertCallResult({
         returnType,
@@ -247,10 +247,10 @@ describe('common', () => {
       });
     }
 
-    expect(testError).toThrow(new InvocationCallError(resultCall.message) as any);
+    await expect(testError()).rejects.toEqual(new InvocationCallError(resultCall.message) as any);
   });
 
-  test('convertCallResult', () => {
+  test('convertCallResult', async () => {
     const returnType = { type: 'String' };
     const resultCall = {
       state: 'HALT',
@@ -262,7 +262,7 @@ describe('common', () => {
     const expected = 'test';
 
     // @ts-ignore
-    const result = common.convertCallResult({
+    const result = await common.convertCallResult({
       returnType,
       result: resultCall,
     });
@@ -270,7 +270,7 @@ describe('common', () => {
     expect(result).toEqual(expected);
   });
 
-  test('convertCallResult on undefined stack', () => {
+  test('convertCallResult on undefined stack', async () => {
     const returnType = { type: 'String' };
     const resultCall = {
       state: 'HALT',
@@ -280,7 +280,7 @@ describe('common', () => {
     };
 
     // @ts-ignore
-    const result = common.convertCallResult({
+    const result = await common.convertCallResult({
       returnType,
       result: resultCall,
     });

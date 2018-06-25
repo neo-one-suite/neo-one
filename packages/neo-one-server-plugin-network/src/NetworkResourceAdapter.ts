@@ -531,7 +531,7 @@ export class NetworkResourceAdapter {
               tasks: this.nodes.map((node) => ({
                 title: `Waiting for node ${node.name}`,
                 task: async () => {
-                  await node.live(15);
+                  await node.live(30);
                 },
               })),
 

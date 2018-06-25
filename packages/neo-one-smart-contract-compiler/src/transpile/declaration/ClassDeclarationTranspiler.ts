@@ -9,7 +9,6 @@ import {
 } from 'ts-simple-ast';
 
 import { DiagnosticCode } from '../../DiagnosticCode';
-import * as typeUtils from '../../typeUtils';
 import { NodeTranspiler } from '../NodeTranspiler';
 import { Transpiler } from '../transpiler';
 import { VisitOptions } from '../types';
@@ -108,15 +107,12 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ClassDeclaration>
       ) {
         const name = TypeGuards.isPropertyDeclaration(property) ? property.getName() : property.getNameOrThrow();
         const type = property.getType();
-        const typeNode = property.getTypeNode();
 
-        if (typeNode === undefined) {
-          transpiler.reportError(property, 'Could not determine type of property.', DiagnosticCode.UNKNOWN_TYPE);
-        } else if (
-          typeUtils.isOnlyPrimitive(type) ||
-          transpiler.isFixedType(property, type) ||
-          transpiler.isOnlyGlobal(property, type, 'Buffer')
-        ) {
+        if (transpiler.isOnlyLib(property, type, 'MapStorage')) {
+          property.setInitializer(`new MapStorage(syscall('Neo.Runtime.Serialize', '${name}'))`);
+        } else if (transpiler.isOnlyLib(property, type, 'SetStorage')) {
+          property.setInitializer(`new SetStorage(syscall('Neo.Runtime.Serialize', '${name}'))`);
+        } else {
           if (TypeGuards.isParameterDeclaration(property)) {
             bodyText += `this.${property.getName()} = ${property.getName()};`;
           }
@@ -132,11 +128,12 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ClassDeclaration>
           }
 
           if (addAccessors) {
+            const typeText = transpiler.getTypeText(property, type);
             node.addGetAccessor({
               name,
-              returnType: typeNode.getText(),
+              returnType: typeText,
               bodyText: `
-              return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), '${name}') as ${typeNode.getText()};
+              return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), '${name}') as ${typeText};
               `,
               scope: property.getScope(),
             });
@@ -145,22 +142,16 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ClassDeclaration>
               parameters: [
                 {
                   name,
-                  type: typeNode.getText(),
+                  type: typeText,
                 },
               ],
               bodyText: `
               syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), '${name}', ${name});
               `,
-              scope: property.getScope(),
+              scope: property.isReadonly() ? Scope.Protected : property.getScope(),
             });
             property.remove();
           }
-        } else if (transpiler.isOnlyLib(property, type, 'MapStorage')) {
-          property.setInitializer(`new MapStorage(syscall('Neo.Runtime.Serialize', '${name}'))`);
-        } else if (transpiler.isOnlyLib(property, type, 'SetStorage')) {
-          property.setInitializer(`new SetStorage(syscall('Neo.Runtime.Serialize', '${name}'))`);
-        } else {
-          transpiler.reportError(property, 'Unsupported SmartContract property.', DiagnosticCode.UNSUPPORTED_SYNTAX);
         }
       }
     });

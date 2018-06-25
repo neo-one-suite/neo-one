@@ -12,6 +12,7 @@ import {
 } from '@neo-one/client-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import BN from 'bn.js';
+import { SourceMapGenerator } from 'source-map';
 import Project, { Node, SourceFile, Symbol, Type } from 'ts-simple-ast';
 
 import { Context } from '../../Context';
@@ -20,7 +21,7 @@ import { Helper, Helpers } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
 import { Call, DeferredProgramCounter, Jmp, Jump, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
-import { VisitOptions } from '../types';
+import { ScriptBuilderResult, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode } from './ScriptBuilder';
 
@@ -30,7 +31,7 @@ import { decorators } from '../decorator';
 import { expressions } from '../expression';
 import { files } from '../file';
 import { statements } from '../statement';
-import { JumpResolver } from './JumpResolver';
+import { resolveJumps } from './resolveJumps';
 
 const compilers: ReadonlyArray<ReadonlyArray<new () => NodeCompiler>> = [
   declarations,
@@ -125,15 +126,26 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     this.emitBytecode(bytecode);
   }
 
-  public getFinalBytecode(): Buffer {
-    // tslint:disable-next-line no-unused
-    const bytecode = new JumpResolver().process(this.mutableBytecode.map(([_, value]) => value));
+  public getFinalResult(): ScriptBuilderResult {
+    const bytecode = resolveJumps(this.mutableBytecode);
     let pc = 0;
-    const buffers = bytecode.map((valueIn) => {
+
+    const sourceMapGenerator = new SourceMapGenerator();
+    const addedFiles = new Set<string>();
+
+    // tslint:disable-next-line no-unused
+    const buffers = bytecode.map(([node, valueIn], idx) => {
       let value = valueIn;
       if (value instanceof Jump) {
         const offsetPC = new BN(value.pc.getPC()).sub(new BN(pc));
         const jumpPC = offsetPC.toTwos(16);
+        if (jumpPC.fromTwos(16).toNumber() !== value.pc.getPC() - pc) {
+          throw new Error(
+            `Something went wrong, expected 2's complement of ${value.pc.getPC() - pc}, found: ${jumpPC
+              .fromTwos(16)
+              .toNumber()}`,
+          );
+        }
         const byteCodeBuffer = ByteBuffer[Op[value.op]] as Buffer | undefined;
         if (byteCodeBuffer === undefined) {
           throw new Error('Something went wrong, could not find bytecode buffer');
@@ -141,12 +153,26 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         value = Buffer.concat([byteCodeBuffer, jumpPC.toArrayLike(Buffer, 'le', 2)]);
       }
 
+      const filePath = node.getSourceFile().getFilePath();
+      sourceMapGenerator.addMapping({
+        generated: { line: idx + 1, column: 0 },
+        original: { line: node.getStartLineNumber(false), column: node.getStartLinePos(false) },
+        source: filePath,
+      });
+      if (!addedFiles.has(filePath)) {
+        addedFiles.add(filePath);
+        sourceMapGenerator.setSourceContent(filePath, node.getSourceFile().getText());
+      }
+
       pc += value.length;
 
       return value;
     });
 
-    return Buffer.concat(buffers);
+    return {
+      code: Buffer.concat(buffers),
+      sourceMap: sourceMapGenerator.toJSON(),
+    };
   }
 
   public visit(node: Node, options: VisitOptions): void {
@@ -379,6 +405,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   public isGlobal(node: Node, type: Type | undefined, name: keyof Globals): boolean {
     return this.context.isGlobal(node, type, name);
+  }
+
+  public hasGlobal(node: Node, type: Type | undefined, name: keyof Globals): boolean {
+    return this.context.hasGlobal(node, type, name);
   }
 
   public isGlobalSymbol(node: Node, symbol: Symbol | undefined, name: keyof Globals): boolean {

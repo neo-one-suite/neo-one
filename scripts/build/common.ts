@@ -15,6 +15,8 @@ import {
 // @ts-ignore
 import * as babel from 'rollup-plugin-babel';
 // @ts-ignore
+import * as commonjs from 'rollup-plugin-commonjs';
+// @ts-ignore
 import * as json from 'rollup-plugin-json';
 // @ts-ignore
 import * as resolve from 'rollup-plugin-node-resolve';
@@ -233,6 +235,7 @@ const createRollupInput = ({ pkg, entry }: { readonly pkg: string; readonly entr
       preferBuiltins: true,
       extensions: ['.js', '.ts'],
     }),
+    commonjs({}),
     replace({
       include: 'node_modules/JSONStream/index.js',
       values: {

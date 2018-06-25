@@ -10,11 +10,12 @@ import {
   SmartContract,
   UserAccountID,
 } from '@neo-one/client';
+import { CompileContractResult } from '@neo-one/smart-contract-compiler';
 import { DiagnosticCategory, ts } from 'ts-simple-ast';
 
 import { createNode } from './createNode';
 
-export interface Options {
+export interface Options extends CompileContractResult {
   readonly abi: ABI;
   readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
   readonly contract: ContractRegister;
@@ -60,7 +61,7 @@ export const setupTest = async (getContract: () => Promise<Options>): Promise<Re
   });
   const developerClient = new DeveloperClient(provider.read(networkName));
 
-  const { contract, diagnostics, abi, ignoreWarnings } = await getContract();
+  const { contract, sourceMap, diagnostics, abi, ignoreWarnings } = await getContract();
   const error = diagnostics.find((diagnostic) => diagnostic.category === DiagnosticCategory.Error);
   if (error !== undefined) {
     throw new Error(`Compilation error: ${error.messageText} at ${error.source}`);
@@ -84,6 +85,7 @@ export const setupTest = async (getContract: () => Promise<Options>): Promise<Re
   const smartContract = client.smartContract({
     networks: { [networkName]: { hash: receipt.result.value.hash } },
     abi,
+    sourceMap,
   });
 
   return {

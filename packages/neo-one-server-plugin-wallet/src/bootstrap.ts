@@ -1,8 +1,6 @@
 import {
-  ABI,
   AssetType,
   Client,
-  ContractRegister,
   createPrivateKey,
   DeveloperClient,
   Hash256String,
@@ -24,7 +22,7 @@ import {
 import { common } from '@neo-one/client-core';
 import { GetCLIResourceOptions, InteractiveCLI, InteractiveCLIArgs } from '@neo-one/server-plugin';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
-import { findAndCompileContract } from '@neo-one/smart-contract-compiler';
+import { CompileContractResult, findAndCompileContract } from '@neo-one/smart-contract-compiler';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import fs from 'fs-extra';
@@ -727,25 +725,18 @@ const findContracts = async (current: string): Promise<string> => {
   return findContracts(path.dirname(current));
 };
 
-interface CompileResult {
-  readonly contract: ContractRegister;
-  readonly abi: ABI;
-  readonly name: string;
-}
-
-export const compileSmartContract = async (contractName: string): Promise<CompileResult> => {
+export const compileSmartContract = async (contractName: string): Promise<CompileContractResult> => {
   const dir = await findContracts(require.resolve('@neo-one/server-plugin-wallet'));
 
-  const { contract, abi } = await findAndCompileContract({
+  return findAndCompileContract({
     dir,
     contractName,
   });
-
-  return { contract, abi, name: contractName };
 };
 
-const compileSmartContracts = async (contractNames: ReadonlyArray<string>): Promise<ReadonlyArray<CompileResult>> =>
-  Promise.all(contractNames.map(compileSmartContract));
+const compileSmartContracts = async (
+  contractNames: ReadonlyArray<string>,
+): Promise<ReadonlyArray<CompileContractResult>> => Promise.all(contractNames.map(compileSmartContract));
 
 // tslint:disable-next-line no-suspicious-comment
 // TODO: Support using neo-one cli for compiling/publishing when !isRPC
@@ -757,7 +748,7 @@ const publishContract = async ({
   readonly wallet: WalletData;
   readonly isRPC: boolean;
   readonly client: Client;
-  readonly result: CompileResult;
+  readonly result: CompileContractResult;
 }): Promise<TransactionResult<PublishReceipt>> => client.publish(contract, { from: wallet.accountID });
 
 interface TokenWithWallet extends TokenInfo {
@@ -812,8 +803,8 @@ const publishTokens = async ({
         networks: {
           [wallet.accountID.network]: { hash },
         },
-
         abi: compileResult.abi,
+        sourceMap: compileResult.sourceMap,
       });
 
       return { ...token, smartContract, wallet, hash };

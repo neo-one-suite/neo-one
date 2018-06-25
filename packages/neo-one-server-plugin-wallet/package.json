@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-wallet",
-  "version": "1.0.0-alpha.84",
+  "version": "1.0.0-alpha.86",
   "keywords": [
     "neo",
     "NEO",
@@ -33,14 +33,14 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.62",
-    "@neo-one/client-core": "^1.0.0-alpha.48",
-    "@neo-one/server-plugin": "^1.0.0-alpha.47",
-    "@neo-one/server-plugin-compiler": "^1.0.0-alpha.63",
-    "@neo-one/server-plugin-network": "^1.0.0-alpha.81",
-    "@neo-one/smart-contract": "^1.0.0-alpha.6",
-    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.17",
-    "@neo-one/smart-contract-lib": "^1.0.0-alpha.18",
+    "@neo-one/client": "^1.0.0-alpha.64",
+    "@neo-one/client-core": "^1.0.0-alpha.50",
+    "@neo-one/server-plugin": "^1.0.0-alpha.48",
+    "@neo-one/server-plugin-compiler": "^1.0.0-alpha.65",
+    "@neo-one/server-plugin-network": "^1.0.0-alpha.83",
+    "@neo-one/smart-contract": "^1.0.0-alpha.7",
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.19",
+    "@neo-one/smart-contract-lib": "^1.0.0-alpha.20",
     "@neo-one/utils": "^1.0.0-alpha.40",
     "bignumber.js": "^7.2.1",
     "fs-extra": "^6.0.1",

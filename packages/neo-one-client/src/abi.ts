@@ -1,3 +1,4 @@
+import { RawSourceMap } from 'source-map';
 import { ReadClient } from './ReadClient';
 import { ABI, ABIFunction, Hash160String } from './types';
 
@@ -78,8 +79,18 @@ export const NEP5_STATIC = (decimals: number): ABI => ({
   ],
 });
 
-export const NEP5 = async (client: ReadClient, hash: Hash160String): Promise<ABI> => {
-  const decimalsBigNumber = await client.smartContract(hash, { functions: [decimalsFunction] }).decimals();
+export const NEP5 = async ({
+  client,
+  hash,
+  sourceMap,
+}: {
+  readonly client: ReadClient;
+  readonly hash: Hash160String;
+  readonly sourceMap?: RawSourceMap;
+}): Promise<ABI> => {
+  const decimalsBigNumber = await client
+    .smartContract({ hash, abi: { functions: [decimalsFunction] }, sourceMap })
+    .decimals();
   const decimals = decimalsBigNumber.toNumber();
 
   return NEP5_STATIC(decimals);

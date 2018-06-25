@@ -144,6 +144,7 @@ export class MegaProvider extends Provider {
         await upload({
           dataPath,
           write: storage.upload(file),
+          fileList: ['.'],
         });
       },
       {

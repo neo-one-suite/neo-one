@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-client",
-  "version": "1.0.0-alpha.48",
+  "version": "1.0.0-alpha.49",
   "keywords": [
     "neo",
     "NEO",
@@ -35,8 +35,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/server-grpc": "^1.0.0-alpha.7",
-    "@neo-one/server-plugin": "^1.0.0-alpha.47",
+    "@neo-one/server-grpc": "^1.0.0-alpha.8",
+    "@neo-one/server-plugin": "^1.0.0-alpha.48",
     "@neo-one/utils": "^1.0.0-alpha.40",
     "env-paths": "^1.0.0",
     "execa": "^0.10.0",

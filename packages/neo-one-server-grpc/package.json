@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-grpc",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0-alpha.8",
   "keywords": [
     "neo",
     "NEO",
@@ -35,6 +35,6 @@
     "access": "public"
   },
   "dependencies": {
-    "google-protobuf": "^3.5.0"
+    "google-protobuf": "^3.6.0"
   }
 }

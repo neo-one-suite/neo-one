@@ -80,6 +80,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
   Array [
@@ -88,6 +89,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]
@@ -174,6 +176,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
   Array [
@@ -182,6 +185,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]
@@ -268,6 +272,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
   Array [
@@ -276,6 +281,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]
@@ -362,6 +368,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
   Array [
@@ -370,6 +377,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]
@@ -458,6 +466,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
   Array [
@@ -466,6 +475,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]
@@ -502,6 +512,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
   Array [
@@ -510,6 +521,7 @@ Array [
       "returnType": Object {
         "type": "Void",
       },
+      "sourceMap": undefined,
     },
   ],
 ]

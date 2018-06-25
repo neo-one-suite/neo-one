@@ -83,6 +83,12 @@ export class NEOTranspiler implements Transpiler {
     const contract = this.processContract(file);
     this.strip();
 
+    this.ast.getSourceFiles().forEach((sourceFile) => {
+      if (!sourceFile.isDeclarationFile()) {
+        sourceFile.formatText();
+      }
+    });
+
     return {
       ast: this.ast,
       sourceFile: file,
@@ -109,6 +115,10 @@ export class NEOTranspiler implements Transpiler {
 
   public getTypeOfSymbol(symbol: Symbol | undefined, node: Node): Type | undefined {
     return this.context.getTypeOfSymbol(symbol, node);
+  }
+
+  public getTypeText(node: Node, type: Type): string {
+    return this.ast.getTypeChecker().getTypeText(type, node);
   }
 
   public getSymbol(node: Node): Symbol | undefined {
@@ -270,7 +280,7 @@ export class NEOTranspiler implements Transpiler {
         if (method.getParameters().length > 0) {
           const argsTypes = method
             .getParameters()
-            .map((param) => this.getTypeText(param, this.getType(param)))
+            .map((param) => this.getFinalTypeText(param, this.getType(param)))
             .join(',');
           argsStatement = `const args = syscall('Neo.Runtime.GetArgument', 1) as [${argsTypes}];\n`;
           args = method
@@ -286,7 +296,7 @@ export class NEOTranspiler implements Transpiler {
           if (method === '${name}') {
             ${argsStatement}${call};
           }
-        `;
+        `.trim();
       } else if (
         TypeGuards.isGetAccessorDeclaration(method) ||
         TypeGuards.isPropertyDeclaration(method) ||
@@ -296,15 +306,15 @@ export class NEOTranspiler implements Transpiler {
           if (method === '${name}') {
             syscall('Neo.Runtime.Return', contract.${name});
           }
-        `;
+        `.trim();
       } else {
         const param = method.getParameters()[0];
-        const typeText = this.getTypeText(param, this.getType(param));
+        const typeText = this.getFinalTypeText(param, this.getType(param));
         methodSwitch = `
           if (method === 'set${name[0].toUpperCase()}${name.slice(1)}') {
             contract.${name} = (syscall('Neo.Runtime.GetArgument', 1) as [${typeText}])[0];
           }
-        `;
+        `.trim();
       }
 
       mutableApplicationSwitches.push(methodSwitch);
@@ -325,7 +335,7 @@ export class NEOTranspiler implements Transpiler {
       if (!syscall('Neo.Runtime.CheckWitness', contract.owner)) {
         throw new Error('Invalid witness');
       }
-    `;
+    `.trim();
     if (mutableVerifySwitches.length > 0) {
       verifyFallback = `else {
         ${verifyFallback}
@@ -336,8 +346,7 @@ export class NEOTranspiler implements Transpiler {
       const contract = new ${this.smartContract.getName()}();
       const method = syscall('Neo.Runtime.GetArgument', 0) as string;
       if (syscall('Neo.Runtime.GetTrigger') === 0x10) {
-        ${mutableApplicationSwitches.join(' else ')}
-        ${applicationFallback}
+        ${mutableApplicationSwitches.join(' else ')}${applicationFallback}
       } else if (syscall('Neo.Runtime.GetTrigger') === 0x00) {
         ${mutableVerifySwitches.join(' else ')}
         ${verifyFallback}
@@ -709,19 +718,59 @@ export class NEOTranspiler implements Transpiler {
   }
 
   private getIdentifier(node: TypeNode | undefined): Identifier | undefined {
-    return node === undefined ? node : node.getFirstChildByKind(SyntaxKind.Identifier);
+    return node === undefined ? node : node.getFirstDescendantByKind(SyntaxKind.Identifier);
   }
 
-  private getTypeText(node: Node, type: Type | undefined): string {
+  private getFinalTypeText(node: Node, type: Type | undefined): string {
     let typeText = 'any';
     if (type === undefined) {
       this.reportError(node, 'Unknown type', DiagnosticCode.UNKNOWN_TYPE);
     } else if (this.isFixedType(node, type)) {
       typeText = 'number';
     } else {
-      typeText = type.getText();
+      typeText = this.getTypeText(node, type);
     }
 
     return typeText;
   }
 }
+
+// Source map code
+// // const host = (this.ast.getProgram().compilerObject as any).getEmitHost();
+// const program = this.ast.getProgram().compilerObject;
+// const host = {
+//   getPrependNodes: () => [],
+//   getCanonicalFileName: (fileName) => (ts.sys.useCaseSensitiveFileNames ? fileName : fileName.toLowerCase()),
+//   getCommonSourceDirectory: program.getCommonSourceDirectory,
+//   getCompilerOptions: program.getCompilerOptions,
+//   getCurrentDirectory: program.getCurrentDirectory,
+//   getNewLine: () => NewLineKind.LineFeed,
+//   getSourceFile: program.getSourceFile,
+//   getSourceFileByPath: program.getSourceFileByPath,
+//   getSourceFiles: program.getSourceFiles,
+//   isSourceFileFromExternalLibrary: program.isSourceFileFromExternalLibrary,
+//   writeFile: ts.sys.writeFile,
+//   readFile: (f) => ts.sys.readFile(f),
+//   fileExists: (f) => ts.sys.fileExists(f),
+//   directoryExists: (d) => ts.sys.directoryExists(d),
+// };
+// const writer = (ts as any).createTextWriter(host.getNewLine());
+// const sourceMap = (ts as any).createSourceMapWriter(host, writer, {
+//   ...this.ast.getCompilerOptions(),
+//   sourceMap: true,
+// });
+// sourceMap.initialize(file.getFilePath(), `${file.getFilePath()}.map`);
+
+// const printer = ts.createPrinter(
+//   { ...this.ast.getCompilerOptions() } as any,
+//   {
+//     onEmitSourceMapOfNode: sourceMap.emitNodeWithSourceMap,
+//     onEmitSourceMapOfToken: sourceMap.emitTokenWithSourceMap,
+//     onEmitSourceMapOfPosition: sourceMap.emitPos,
+//     onSetSourceFile: sourceMap.setSourceFile,
+//   } as any,
+// );
+
+// const result = printer.printFile(file.compilerNode);
+// console.log(sourceMap.getText());
+// console.log(result);

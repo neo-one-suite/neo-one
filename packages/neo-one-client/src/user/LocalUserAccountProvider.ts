@@ -21,11 +21,13 @@ import {
   utils,
   Witness as WitnessModel,
 } from '@neo-one/client-core';
+import { processError } from '@neo-one/client-switch';
 import { Counter, Histogram, Labels, metrics, Monitor } from '@neo-one/monitor';
 import { labels as labelNames, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { Observable } from 'rxjs';
+import { RawSourceMap } from 'source-map';
 import {
   InsufficientFundsError,
   InvalidTransactionError,
@@ -462,6 +464,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
     options: InvokeTransactionOptions = {},
+    sourceMap?: RawSourceMap,
   ): Promise<TransactionResult<InvokeReceiptInternal>> {
     const { attributes = [] } = options;
 
@@ -518,6 +521,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       labels: {
         [labelNames.INVOKE_METHOD]: method,
       },
+      sourceMap,
     });
   }
 
@@ -626,6 +630,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     method,
     scripts = [],
     labels = {},
+    sourceMap,
   }: {
     readonly script: Buffer;
     readonly options?: TransactionOptions | InvokeTransactionOptions;
@@ -639,6 +644,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly method: string;
     readonly scripts?: ReadonlyArray<WitnessModel>;
     readonly labels?: Labels;
+    readonly sourceMap?: RawSourceMap;
   }): Promise<TransactionResult<T>> {
     const { from, attributes: attributesIn, networkFee, monitor } = this.getTransactionOptions(options);
 
@@ -675,7 +681,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         );
 
         if (result.state === 'FAULT') {
-          throw new InvokeError(result.message);
+          const errorMessage = await processError({ message: result.message, sourceMap });
+
+          throw new InvokeError(errorMessage);
         }
 
         const gas = result.gasConsumed.integerValue(BigNumber.ROUND_UP);

@@ -2,6 +2,7 @@ import { Param as ScriptBuilderParam } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { filter, map, switchMap, take } from 'rxjs/operators';
+import { RawSourceMap } from 'source-map';
 import * as argAssertions from './args';
 import { UnknownAccountError, UnknownNetworkError } from './errors';
 import { ReadClient } from './ReadClient';
@@ -229,8 +230,9 @@ export class Client<TUserAccountProviders extends { readonly [K in string]: User
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
     options?: InvokeTransactionOptions,
+    sourceMap?: RawSourceMap,
   ): Promise<TransactionResult<InvokeReceiptInternal>> {
-    return this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options);
+    return this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMap);
   }
 
   public async call(

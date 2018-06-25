@@ -1,7 +1,15 @@
 import { Writable } from 'stream';
 import tar from 'tar';
 
-export const upload = async ({ dataPath, write }: { readonly dataPath: string; readonly write: Writable }) => {
+export const upload = async ({
+  dataPath,
+  fileList,
+  write,
+}: {
+  readonly dataPath: string;
+  readonly fileList: ReadonlyArray<string>;
+  readonly write: Writable;
+}) => {
   await new Promise<void>((resolve, reject) => {
     const read = tar.create(
       {
@@ -10,8 +18,7 @@ export const upload = async ({ dataPath, write }: { readonly dataPath: string; r
         strict: true,
         portable: true,
       },
-
-      ['.'],
+      fileList,
     );
 
     let done = false;

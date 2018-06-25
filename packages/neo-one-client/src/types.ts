@@ -3,6 +3,7 @@ import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
 import { Observable } from 'rxjs';
+import { RawSourceMap } from 'source-map';
 
 // A NEO address string, e.g. APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR
 export type AddressString = string;
@@ -677,6 +678,7 @@ export interface UserAccountProvider {
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
     options?: InvokeTransactionOptions,
+    sourceMap?: RawSourceMap,
   ) => Promise<TransactionResult<InvokeReceiptInternal>>;
   readonly call: (
     contract: Hash160String,
@@ -834,6 +836,13 @@ export interface SmartContractNetworksDefinition {
 export interface SmartContractDefinition {
   readonly networks: SmartContractNetworksDefinition;
   readonly abi: ABI;
+  readonly sourceMap?: RawSourceMap;
+}
+
+export interface ReadSmartContractDefinition {
+  readonly hash: Hash160String;
+  readonly abi: ABI;
+  readonly sourceMap?: RawSourceMap;
 }
 
 export interface SmartContract {

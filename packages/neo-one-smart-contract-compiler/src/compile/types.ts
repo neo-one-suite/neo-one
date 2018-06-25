@@ -1,3 +1,4 @@
+import { RawSourceMap } from 'source-map';
 import { Type } from 'ts-simple-ast';
 
 import { Context } from '../Context';
@@ -15,7 +16,10 @@ export interface VisitOptions {
   readonly superClass?: Name | undefined;
 }
 
-export interface CompileResult {
+export interface ScriptBuilderResult {
   readonly code: Buffer;
+  readonly sourceMap: RawSourceMap;
+}
+export interface CompileResult extends ScriptBuilderResult {
   readonly context: Context;
 }

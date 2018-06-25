@@ -3,9 +3,9 @@ import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import { filter, map } from 'ix/asynciterable/pipe/index';
+import { RawSourceMap } from 'source-map';
 import { ReadClient } from '../ReadClient';
 import {
-  ABI,
   ABIEvent,
   ABIFunction,
   ABIParameter,
@@ -17,6 +17,7 @@ import {
   Log,
   Param,
   ReadSmartContract,
+  ReadSmartContractDefinition,
   StorageItem,
 } from '../types';
 import * as common from './common';
@@ -51,10 +52,12 @@ const createCall = ({
   hash,
   client,
   func: { name, parameters = [], returnType },
+  sourceMap,
 }: {
   readonly hash: Hash160String;
   readonly client: ReadClient;
   readonly func: ABIFunction;
+  readonly sourceMap?: RawSourceMap;
   // tslint:disable-next-line no-any
 }) => async (...args: any[]): Promise<Param | undefined> => {
   const { params, monitor } = getParams({
@@ -64,16 +67,18 @@ const createCall = ({
 
   const result = await client.call(hash, name, params, monitor);
 
-  return common.convertCallResult({ returnType, result });
+  return common.convertCallResult({ returnType, result, sourceMap });
 };
 
 export const createReadSmartContract = ({
-  hash,
-  abi: { events: abiEvents = [], functions },
+  definition: {
+    hash,
+    abi: { events: abiEvents = [], functions },
+    sourceMap,
+  },
   client,
 }: {
-  readonly hash: Hash160String;
-  readonly abi: ABI;
+  readonly definition: ReadSmartContractDefinition;
   readonly client: ReadClient;
 }): ReadSmartContract => {
   const events = abiEvents.reduce<{ [key: string]: ABIEvent }>(
@@ -124,7 +129,7 @@ export const createReadSmartContract = ({
       func.constant === true
         ? {
             ...acc,
-            [func.name]: createCall({ client, hash, func }),
+            [func.name]: createCall({ client, hash, func, sourceMap }),
           }
         : acc,
     {

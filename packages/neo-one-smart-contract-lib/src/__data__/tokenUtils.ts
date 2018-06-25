@@ -15,33 +15,23 @@ import appRootDir from 'app-root-dir';
 import path from 'path';
 
 export interface DeployOptions {
-  masterPrivateKey: string;
-  masterAccountID: UserAccountID;
-  smartContract: SmartContract;
+  readonly masterPrivateKey: string;
+  readonly masterAccountID: UserAccountID;
+  readonly smartContract: SmartContract;
 }
 
 export interface Options {
-  contractName: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  deploy: (options: DeployOptions) => Promise<TransactionResult<InvokeReceipt>>;
-  issueValue: BigNumber;
-  transferValue: BigNumber;
-  contractHash: string;
-  dir: string;
+  readonly contractName: string;
+  readonly name: string;
+  readonly symbol: string;
+  readonly decimals: number;
+  readonly deploy: (options: DeployOptions) => Promise<TransactionResult<InvokeReceipt>>;
+  readonly issueValue: BigNumber;
+  readonly transferValue: BigNumber;
+  readonly dir: string;
 }
 
-export const testToken = ({
-  contractName,
-  name,
-  symbol,
-  decimals,
-  deploy,
-  issueValue,
-  transferValue,
-  contractHash,
-}: Options) => {
+export const testToken = ({ contractName, name, symbol, decimals, deploy, issueValue, transferValue }: Options) => {
   const setup = async () =>
     setupContractTest({
       dir: path.resolve(appRootDir.get(), 'packages', 'neo-one-smart-contract-lib', 'src', '__data__', 'contracts'),
@@ -97,9 +87,9 @@ export const testToken = ({
       expect(receipt.events).toHaveLength(1);
       let event = receipt.events[0];
       expect(event.name).toEqual('transfer');
-      expect(event.parameters.from).toEqual(contractHash);
+      expect(event.parameters.from).toEqual(undefined);
       expect(event.parameters.to).toEqual(privateKeyToScriptHash(masterPrivateKey));
-      if (event.parameters.amount == undefined) {
+      if (event.parameters.amount === undefined) {
         expect(event.parameters.amount).toBeTruthy();
         throw new Error('For TS');
       }
@@ -131,7 +121,7 @@ export const testToken = ({
       expect(event.name).toEqual('transfer');
       expect(event.parameters.from).toEqual(privateKeyToScriptHash(masterPrivateKey));
       expect(event.parameters.to).toEqual(addressToScriptHash(account0.address));
-      if (event.parameters.amount == undefined) {
+      if (event.parameters.amount === undefined) {
         expect(event.parameters.amount).toBeTruthy();
         throw new Error('For TS');
       }

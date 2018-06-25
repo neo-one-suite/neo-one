@@ -1,5 +1,7 @@
 import { Param as ScriptBuilderParam } from '@neo-one/client-core';
+import { processError } from '@neo-one/client-switch';
 import _ from 'lodash';
+import { RawSourceMap } from 'source-map';
 import { InvalidArgumentError, InvalidEventError, InvocationCallError } from '../errors';
 import {
   ABIEvent,
@@ -92,20 +94,24 @@ export const convertAction = ({
   };
 };
 
-export const convertInvocationResult = ({
+export const convertInvocationResult = async ({
   returnType,
   result,
+  sourceMap,
 }: {
   readonly returnType: ABIReturn;
   readonly result: RawInvocationResult;
-}): InvocationResult<Param | undefined> => {
+  readonly sourceMap?: RawSourceMap;
+}): Promise<InvocationResult<Param | undefined>> => {
   const { gasConsumed, gasCost } = result;
   if (result.state === 'FAULT') {
+    const message = await processError({ message: result.message, sourceMap });
+
     return {
       state: result.state,
       gasConsumed,
       gasCost,
-      message: result.message,
+      message,
     };
   }
 
@@ -122,15 +128,18 @@ export const convertInvocationResult = ({
   return { state: result.state, gasConsumed, gasCost, value };
 };
 
-export const convertCallResult = ({
+export const convertCallResult = async ({
   returnType,
   result,
+  sourceMap,
 }: {
   readonly returnType: ABIReturn;
   readonly result: RawInvocationResult;
-}): Param | undefined => {
+  readonly sourceMap?: RawSourceMap;
+}): Promise<Param | undefined> => {
   if (result.state === 'FAULT') {
-    throw new InvocationCallError(result.message);
+    const errorMessage = await processError({ message: result.message, sourceMap });
+    throw new InvocationCallError(errorMessage);
   }
 
   const contractParameter = result.stack[0];

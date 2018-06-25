@@ -7,7 +7,7 @@ describe('bootstrap default', () => {
       10,
       'boottest-1',
       bootstrapTestUtils.getDefaultInfo,
-      '49453',
+      '49454',
     );
   });
 });

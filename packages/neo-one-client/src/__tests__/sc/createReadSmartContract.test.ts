@@ -70,12 +70,14 @@ describe('createReadSmartContract', () => {
   };
 
   let undefinedEventsContract = createReadSmartContract({
-    hash,
-    abi: abiNull,
+    definition: {
+      hash,
+      abi: abiNull,
+    },
     client,
   });
 
-  let readContract = createReadSmartContract({ hash, abi, client });
+  let readContract = createReadSmartContract({ definition: { hash, abi }, client });
 
   beforeEach(() => {
     client = {} as any;
@@ -89,12 +91,14 @@ describe('createReadSmartContract', () => {
     client.iterActionsRaw = jest.fn(() => expected);
 
     undefinedEventsContract = createReadSmartContract({
-      hash,
-      abi: abiNull,
+      definition: {
+        hash,
+        abi: abiNull,
+      },
       client,
     });
 
-    readContract = createReadSmartContract({ hash, abi, client });
+    readContract = createReadSmartContract({ definition: { hash, abi }, client });
   });
 
   test('smartContract creation - createCall', async () => {

@@ -3,12 +3,19 @@ import { CustomError } from '@neo-one/utils';
 import BN from 'bn.js';
 import { ExecutionContext } from './constants';
 
-const getMessage = (context: ExecutionContext, message: string): string => {
-  const debug = disassembleByteCode(context.code).join('\n');
-  const stack = context.stack.map((item) => item.toString()).join('\n');
-  const { pc } = context;
+const getLine = (context: ExecutionContext): number => {
+  const bytecode = disassembleByteCode(context.code);
+  // tslint:disable-next-line no-unused
+  const result = [...bytecode.entries()].find(([idx, { pc }]) => context.pc === pc);
 
-  return `${message}\nPC: ${pc}\nCode:\n${debug}\nStack:\n${stack}`;
+  return result === undefined ? 0 : result[0];
+};
+
+const getMessage = (context: ExecutionContext, message: string): string => {
+  const { pc } = context;
+  const stack = context.stack.map((item) => item.toString()).join('\n');
+
+  return `${message}\nPC:${pc}\nStack:\n${stack}\nLine:${getLine(context)}`;
 };
 
 export class VMError extends CustomError {
@@ -197,8 +204,8 @@ export class InvalidPackCountError extends VMError {
 }
 
 export class InvalidPickItemKeyError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid PICKITEM Index');
+  public constructor(context: ExecutionContext, key: string, value: string) {
+    super(context, `Invalid PICKITEM Index: ${key}. Value: ${value}`);
   }
 }
 

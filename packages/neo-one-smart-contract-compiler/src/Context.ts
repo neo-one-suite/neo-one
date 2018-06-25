@@ -138,6 +138,13 @@ export class Context {
     return this.isSymbolic(type) && this.isGlobalSymbol(node, this.getSymbolForType(node, type), name);
   }
 
+  public hasGlobal(node: Node, type: Type | undefined, name: keyof Globals): boolean {
+    return typeUtils.hasType(
+      type,
+      (testType) => this.isSymbolic(testType) && this.isGlobalSymbol(node, this.getSymbolForType(node, testType), name),
+    );
+  }
+
   public isGlobalSymbol(_node: Node, symbol: Symbol | undefined, name: keyof Globals): boolean {
     return symbol === this.globals[name];
   }
