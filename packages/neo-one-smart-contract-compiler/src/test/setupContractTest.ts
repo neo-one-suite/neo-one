@@ -1,4 +1,4 @@
-import { findAndCompileContract } from '@neo-one/smart-contract-compiler';
+import { findAndCompileContract } from '../findAndCompileContract';
 
 import { Result, setupTest } from './setupTest';
 
