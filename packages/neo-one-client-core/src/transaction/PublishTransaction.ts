@@ -10,6 +10,8 @@ import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializabl
 import { BinaryWriter, IOHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
+import { Input } from './Input';
+import { Output } from './Output';
 import { TransactionBase, TransactionBaseAdd, TransactionBaseJSON, TransactionVerifyOptions } from './TransactionBase';
 import { TransactionType } from './TransactionType';
 
@@ -84,15 +86,19 @@ export class PublishTransaction extends TransactionBase<TransactionType.Publish,
   public clone({
     scripts = this.scripts,
     attributes = this.attributes,
+    inputs = this.inputs,
+    outputs = this.outputs,
   }: {
     readonly scripts?: ReadonlyArray<Witness>;
     readonly attributes?: ReadonlyArray<Attribute>;
+    readonly inputs?: ReadonlyArray<Input>;
+    readonly outputs?: ReadonlyArray<Output>;
   }): PublishTransaction {
     return new PublishTransaction({
       version: this.version,
       attributes,
-      inputs: this.inputs,
-      outputs: this.outputs,
+      inputs,
+      outputs,
       scripts,
       contract: this.contract,
     });

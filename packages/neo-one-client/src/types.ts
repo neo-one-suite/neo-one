@@ -271,13 +271,7 @@ export interface Output {
   readonly address: AddressString;
 }
 
-export interface UnspentOutput {
-  readonly asset: Hash256String;
-  readonly value: BigNumber;
-  readonly address: AddressString;
-  readonly txid: Hash256String;
-  readonly vout: number;
-}
+export interface UnspentOutput extends Input, Output {}
 
 export interface Witness {
   readonly invocation: BufferString;

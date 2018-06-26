@@ -7,6 +7,7 @@ import { Witness } from '../Witness';
 import { Attribute } from './attribute';
 import { hasDuplicateInputs, hasIntersectingInputs } from './common';
 import { Input, InputJSON } from './Input';
+import { Output } from './Output';
 import {
   FeeContext,
   TransactionBase,
@@ -101,15 +102,19 @@ export class ClaimTransaction extends TransactionBase<TransactionType.Claim, Cla
   public clone({
     scripts = this.scripts,
     attributes = this.attributes,
+    inputs = this.inputs,
+    outputs = this.outputs,
   }: {
     readonly scripts?: ReadonlyArray<Witness>;
     readonly attributes?: ReadonlyArray<Attribute>;
+    readonly inputs?: ReadonlyArray<Input>;
+    readonly outputs?: ReadonlyArray<Output>;
   }): ClaimTransaction {
     return new ClaimTransaction({
       version: this.version,
       attributes,
-      inputs: this.inputs,
-      outputs: this.outputs,
+      inputs,
+      outputs,
       scripts,
       claims: this.claims,
     });

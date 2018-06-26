@@ -10,6 +10,8 @@ import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializabl
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
+import { Input } from './Input';
+import { Output } from './Output';
 import {
   FeeContext,
   TransactionBase,
@@ -114,15 +116,19 @@ export class InvocationTransaction extends TransactionBase<TransactionType.Invoc
   public clone({
     scripts = this.scripts,
     attributes = this.attributes,
+    inputs = this.inputs,
+    outputs = this.outputs,
   }: {
     readonly scripts?: ReadonlyArray<Witness>;
     readonly attributes?: ReadonlyArray<Attribute>;
+    readonly inputs?: ReadonlyArray<Input>;
+    readonly outputs?: ReadonlyArray<Output>;
   }): InvocationTransaction {
     return new InvocationTransaction({
       version: this.version,
       attributes,
-      inputs: this.inputs,
-      outputs: this.outputs,
+      inputs,
+      outputs,
       scripts,
       gas: this.gas,
       script: this.script,

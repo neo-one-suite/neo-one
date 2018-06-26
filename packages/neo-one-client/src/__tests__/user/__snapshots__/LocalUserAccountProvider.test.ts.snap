@@ -1,5 +1,51 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`LocalUserAccountProvider blank transaction consolidates: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "800002f000ff076e656f2d6f6e65065a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f02005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f03005d044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f04005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f05005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60004e7253000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider blank transaction consolidates: provider.getBlockCount 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider blank transaction consolidates: provider.getTransactionReceipt 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider blank transaction consolidates: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider blank transaction consolidates: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "800002f000ff076e656f2d6f6e65065a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f02005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f03005d044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f04005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f05005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60004e7253000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
 exports[`LocalUserAccountProvider call with no options: keystore.getCurrentAccount 1`] = `
 Array [
   Array [],
@@ -48,6 +94,62 @@ Array [
   Array [
     "net1",
     "d1012906706172616d3151c10a746573744d6574686f6467f91d6b7085db7c5aaf09f19eeec1ca3c0db2c6ec0010a5d4e800000002f000ff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f060001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce00",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim consolidates: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "0200015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11368c02487f020002f000ff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f060001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60004e7253000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim consolidates: provider.getBlockCount 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim consolidates: provider.getTransactionReceipt 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider claim consolidates: provider.getUnclaimed 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim consolidates: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider claim consolidates: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "0200015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11368c02487f020002f000ff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f060001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60004e7253000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
     undefined,
   ],
 ]
@@ -196,6 +298,107 @@ Array [
   Array [
     "net1",
     "0200015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11368c02487f020002f000ff076e656f2d6f6e65015e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f060002e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000a3e111000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider consolidate prioritizes any asset with a return output: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "800002f000ff076e656f2d6f6e65025c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f09005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0700025c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f00c2eb0b000000009847e26135152874355e324afd5cc99f002acb335c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f00c2eb0b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider consolidate prioritizes any asset with a return output: provider.getBlockCount 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider consolidate prioritizes any asset with a return output: provider.getTransactionReceipt 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider consolidate prioritizes any asset with a return output: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider consolidate prioritizes any asset with a return output: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "800002f000ff076e656f2d6f6e65025c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f09005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0700025c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f00c2eb0b000000009847e26135152874355e324afd5cc99f002acb335c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f00c2eb0b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider consolidation prioritizes NEO/GAS for new outputs: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "800002f000ff076e656f2d6f6e65065a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f02005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f03005d044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f04005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f05005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60004e7253000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider consolidation prioritizes NEO/GAS for new outputs: provider.getBlockCount 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider consolidation prioritizes NEO/GAS for new outputs: provider.getTransactionReceipt 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider consolidation prioritizes NEO/GAS for new outputs: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider consolidation prioritizes NEO/GAS for new outputs: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "800002f000ff076e656f2d6f6e65065a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f02005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f03005d044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f04005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f05005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60004e7253000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
     undefined,
   ],
 ]
@@ -712,7 +915,7 @@ Array [
         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
         "network": "net1",
       },
-      "message": "800002f000ff076e656f2d6f6e65025d044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f03005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600039b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50046c323000000009847e26135152874355e324afd5cc99f002acb339b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "message": "800002f000ff076e656f2d6f6e65025a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f03005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600039b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50046c323000000009847e26135152874355e324afd5cc99f002acb339b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
       "monitor": undefined,
     },
   ],
@@ -753,7 +956,7 @@ exports[`LocalUserAccountProvider multi-input-fix networkFee-throws: provider.re
 Array [
   Array [
     "net1",
-    "800002f000ff076e656f2d6f6e65025d044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f03005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600039b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50046c323000000009847e26135152874355e324afd5cc99f002acb339b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    "800002f000ff076e656f2d6f6e65025a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f03005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600039b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50046c323000000009847e26135152874355e324afd5cc99f002acb339b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
     undefined,
   ],
 ]
@@ -767,7 +970,7 @@ Array [
         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
         "network": "net1",
       },
-      "message": "800002f000ff076e656f2d6f6e65015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "message": "800002f000ff076e656f2d6f6e65015a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
       "monitor": undefined,
     },
   ],
@@ -777,7 +980,7 @@ Array [
         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
         "network": "net1",
       },
-      "message": "800002f000ff076e656f2d6f6e65015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "message": "800002f000ff076e656f2d6f6e65015a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
       "monitor": undefined,
     },
   ],
@@ -814,12 +1017,12 @@ exports[`LocalUserAccountProvider multi-input-fix updates-on-new-block: provider
 Array [
   Array [
     "net1",
-    "800002f000ff076e656f2d6f6e65015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    "800002f000ff076e656f2d6f6e65015a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
     undefined,
   ],
   Array [
     "net1",
-    "800002f000ff076e656f2d6f6e65015c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    "800002f000ff076e656f2d6f6e65015a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
     undefined,
   ],
 ]
@@ -1456,6 +1659,116 @@ exports[`LocalUserAccountProvider selectAccount: provider.getBlockCount 1`] = `A
 
 exports[`LocalUserAccountProvider selectAccount: provider.relayTransaction 1`] = `Array []`;
 
+exports[`LocalUserAccountProvider transaction consolidates GAS when network fee present: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "800002f000ff076e656f2d6f6e65035a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f06005d044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0400029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000009847e26135152874355e324afd5cc99f002acb33e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transaction consolidates GAS when network fee present: provider.getBlockCount 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transaction consolidates GAS when network fee present: provider.getTransactionReceipt 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider transaction consolidates GAS when network fee present: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transaction consolidates GAS when network fee present: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "800002f000ff076e656f2d6f6e65035a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f06005d044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0400029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500e1f505000000009847e26135152874355e324afd5cc99f002acb33e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transaction consolidates: keystore.sign 1`] = `
+Array [
+  Array [
+    Object {
+      "account": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "net1",
+      },
+      "message": "800002f000ff076e656f2d6f6e65055a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f03005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f02005d044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f04005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600039b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500a3e111000000009847e26135152874355e324afd5cc99f002acb339b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50027b929000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60008c8647000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "monitor": undefined,
+    },
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transaction consolidates: provider.getBlockCount 1`] = `
+Array [
+  Array [
+    "net1",
+    undefined,
+  ],
+  Array [
+    "net1",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transaction consolidates: provider.getTransactionReceipt 1`] = `Array []`;
+
+exports[`LocalUserAccountProvider transaction consolidates: provider.getUnspentOutputs 1`] = `
+Array [
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+  Array [
+    "net1",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`LocalUserAccountProvider transaction consolidates: provider.relayTransaction 1`] = `
+Array [
+  Array [
+    "net1",
+    "800002f000ff076e656f2d6f6e65055a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f03005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f02005d044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f04005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600039b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc500a3e111000000009847e26135152874355e324afd5cc99f002acb339b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50027b929000000003775292229eccdf904f16fff8e83e7cffdc0f0cee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60008c8647000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    undefined,
+  ],
+]
+`;
+
 exports[`LocalUserAccountProvider transfer 0: keystore.sign 1`] = `
 Array [
   Array [
@@ -1561,7 +1874,7 @@ Array [
         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
         "network": "net1",
       },
-      "message": "800002f000ff076e656f2d6f6e65055c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33",
+      "message": "800002f000ff076e656f2d6f6e65055a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33",
       "monitor": undefined,
     },
   ],
@@ -1603,7 +1916,7 @@ exports[`LocalUserAccountProvider transfer without network fee: provider.relayTr
 Array [
   Array [
     "net1",
-    "800002f000ff076e656f2d6f6e65055c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33010602028a99826e0602028a99826e",
+    "800002f000ff076e656f2d6f6e65055a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0100019b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33010602028a99826e0602028a99826e",
     undefined,
   ],
 ]
@@ -1617,7 +1930,7 @@ Array [
         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
         "network": "net1",
       },
-      "message": "800002f000ff076e656f2d6f6e65065c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "message": "800002f000ff076e656f2d6f6e65065a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce",
       "monitor": undefined,
     },
   ],
@@ -1659,7 +1972,7 @@ exports[`LocalUserAccountProvider transfer: provider.relayTransaction 1`] = `
 Array [
   Array [
     "net1",
-    "800002f000ff076e656f2d6f6e65065c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005c044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
+    "800002f000ff076e656f2d6f6e65065a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005a044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f01005e044e69819d0cc3bda0f1ea04b9db7c02ae066f1f8e2ce4c97a11388c02487f0600029b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc50065cd1d000000009847e26135152874355e324afd5cc99f002acb33e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c6000ca9a3b000000003775292229eccdf904f16fff8e83e7cffdc0f0ce010602028a99826e0602028a99826e",
     undefined,
   ],
 ]

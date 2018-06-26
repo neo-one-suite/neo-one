@@ -30,7 +30,9 @@ export interface OutputJSON {
   readonly address: string;
 }
 
+const SIZE = IOHelper.sizeOfUInt256 + IOHelper.sizeOfFixed8 + IOHelper.sizeOfUInt160;
 export class Output implements SerializableWire<Output>, Equatable {
+  public static readonly size: number = SIZE;
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): Output {
     const asset = reader.readUInt256();
     const value = reader.readFixed8();
@@ -49,7 +51,7 @@ export class Output implements SerializableWire<Output>, Equatable {
   public readonly asset: UInt256;
   public readonly value: BN;
   public readonly address: UInt160;
-  public readonly size: number = IOHelper.sizeOfUInt256 + IOHelper.sizeOfUInt16LE + IOHelper.sizeOfUInt160;
+  public readonly size: number = SIZE;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly equals: Equals = utils.equals(
     Output,
@@ -63,6 +65,14 @@ export class Output implements SerializableWire<Output>, Equatable {
     this.asset = asset;
     this.value = value;
     this.address = address;
+  }
+
+  public clone({ value = this.value }: { readonly value?: BN }): Output {
+    return new Output({
+      asset: this.asset,
+      value,
+      address: this.address,
+    });
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
