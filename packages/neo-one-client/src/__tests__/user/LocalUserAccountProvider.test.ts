@@ -1,3 +1,4 @@
+// tslint:disable
 import { common, utils } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import {
@@ -41,21 +42,40 @@ describe('LocalUserAccountProvider', () => {
       txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
       vout: 1,
     },
-
+    twoNEO: {
+      asset: common.NEO_ASSET_HASH,
+      value: new BigNumber('1'),
+      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+      vout: 2,
+    },
     sevenNEO: {
       asset: common.NEO_ASSET_HASH,
       value: new BigNumber('7'),
       address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
       txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045d',
-      vout: 2,
+      vout: 3,
     },
-
+    oneGAS: {
+      asset: common.GAS_ASSET_HASH,
+      value: new BigNumber('2'),
+      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045e',
+      vout: 4,
+    },
+    twoGAS: {
+      asset: common.GAS_ASSET_HASH,
+      value: new BigNumber('2'),
+      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045e',
+      vout: 5,
+    },
     elevenGAS: {
       asset: common.GAS_ASSET_HASH,
       value: new BigNumber('11'),
       address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
       txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045e',
-      vout: 3,
+      vout: 6,
     },
   };
 
@@ -101,6 +121,8 @@ describe('LocalUserAccountProvider', () => {
   beforeEach(() => {
     keystore = {};
     provider = {};
+    provider.getBlockCount = jest.fn(() => Promise.resolve(0));
+    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
     localUserAccountProvider = new LocalUserAccountProvider({
       keystore,
       provider,
@@ -120,7 +142,6 @@ describe('LocalUserAccountProvider', () => {
   test('getAccounts', () => {
     const expected = [account1];
     keystore.getAccounts = jest.fn(() => expected);
-
     const result = localUserAccountProvider.getAccounts();
     expect(result).toEqual(expected);
     verifyMocks();
@@ -129,7 +150,6 @@ describe('LocalUserAccountProvider', () => {
   test('getNetworks', () => {
     const expected = ['main', 'test', 'net1'];
     provider.getNetworks = jest.fn(() => expected);
-
     const result = localUserAccountProvider.getNetworks();
     expect(result).toEqual(expected);
     verifyMocks();
@@ -137,21 +157,18 @@ describe('LocalUserAccountProvider', () => {
 
   test('selectAccount', async () => {
     keystore.selectAccount = jest.fn(() => Promise.resolve());
-
     await localUserAccountProvider.selectAccount(id1);
     verifyMocks();
   });
 
   test('deleteAccount', async () => {
     keystore.deleteAccount = jest.fn(() => Promise.resolve());
-
     await localUserAccountProvider.deleteAccount(id1);
     verifyMocks();
   });
 
   test('updateAccountName', async () => {
     keystore.updateAccountName = jest.fn(() => Promise.resolve());
-
     await localUserAccountProvider.updateAccountName({
       id: id1,
       name: 'newName',
@@ -163,7 +180,6 @@ describe('LocalUserAccountProvider', () => {
   test('read', async () => {
     const expected = '10';
     provider.read = jest.fn(() => expected);
-
     const result = localUserAccountProvider.read('main');
     expect(result).toEqual(expected);
     verifyMocks();
@@ -172,9 +188,7 @@ describe('LocalUserAccountProvider', () => {
   test('transfer throws error on empty transfers', async () => {
     const transfers: Transfer[] = [];
     keystore.getCurrentAccount = jest.fn(() => account1);
-
     const result = localUserAccountProvider.transfer(transfers);
-
     await expect(result).rejects.toEqual(new NothingToTransferError());
     verifyMocks();
   });
@@ -182,9 +196,7 @@ describe('LocalUserAccountProvider', () => {
   test('transfer throws error on missing account', async () => {
     const transfers: Transfer[] = [];
     keystore.getCurrentAccount = jest.fn();
-
     const result = localUserAccountProvider.transfer(transfers);
-
     await expect(result).rejects.toEqual(new NoAccountError());
     verifyMocks();
   });
@@ -226,12 +238,8 @@ describe('LocalUserAccountProvider', () => {
     const unspent = [outputs.oneNEO, outputs.elevenGAS];
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     keystore.sign = jest.fn(() => witness);
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
-
     provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
-
     const result = await localUserAccountProvider.transfer(transfers, options);
-
     expect(result.transaction).toEqual('transactionDummy');
     await expect(result.confirmed()).resolves.toEqual('receiptDummy');
     verifyMocks();
@@ -259,7 +267,6 @@ describe('LocalUserAccountProvider', () => {
 
       provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
       keystore.sign = jest.fn(() => witness);
-      provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
       provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
 
@@ -311,8 +318,6 @@ describe('LocalUserAccountProvider', () => {
           amount: new BigNumber('3'),
         }),
       );
-
-      provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
       provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
 
@@ -547,8 +552,6 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
-
     provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
 
     const result = await localUserAccountProvider.publish(contract, options);
@@ -588,8 +591,6 @@ describe('LocalUserAccountProvider', () => {
         contracts: [],
       }),
     );
-
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -642,8 +643,6 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
-
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
         blockIndex: 0,
@@ -689,8 +688,6 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
-
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
         blockIndex: 0,
@@ -731,8 +728,6 @@ describe('LocalUserAccountProvider', () => {
         asset,
       }),
     );
-
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -779,8 +774,6 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
-
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
         blockIndex: 0,
@@ -825,8 +818,6 @@ describe('LocalUserAccountProvider', () => {
         asset,
       }),
     );
-
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -883,8 +874,6 @@ describe('LocalUserAccountProvider', () => {
       }),
     );
 
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
-
     provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
 
     const result = await localUserAccountProvider.issue(transfers, options);
@@ -905,7 +894,6 @@ describe('LocalUserAccountProvider', () => {
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     keystore.sign = jest.fn(() => witness);
     provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -948,7 +936,6 @@ describe('LocalUserAccountProvider', () => {
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     keystore.sign = jest.fn(() => witness);
     provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -1004,6 +991,89 @@ describe('LocalUserAccountProvider', () => {
     const result = await localUserAccountProvider.call(contract, method, params, options);
 
     expect(result).toEqual(results.halt);
+    verifyMocks();
+  });
+
+  test(`multi-input-fix networkFee-throws`, async () => {
+    const transfers1 = [
+      {
+        amount: new BigNumber('6'),
+        asset: common.NEO_ASSET_HASH,
+        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
+      },
+    ];
+    const transfers2 = [
+      {
+        amount: new BigNumber('1'),
+        asset: common.NEO_ASSET_HASH,
+        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
+      },
+    ];
+
+    const unspent1 = [outputs.sevenNEO, outputs.oneNEO, outputs.elevenGAS];
+
+    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent1));
+    keystore.sign = jest.fn(() => witness);
+
+    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+
+    const result1 = await localUserAccountProvider.transfer(transfers1, {
+      from: options.from,
+      attributes: options.attributes,
+      networkFee: new BigNumber('1'),
+    });
+
+    const result2 = localUserAccountProvider.transfer(transfers2, {
+      from: options.from,
+      attributes: options.attributes,
+      networkFee: new BigNumber('1'),
+    });
+    await result1;
+    // @ts-ignore
+    expect(localUserAccountProvider.mutableUsedOutputs.size).toEqual(2);
+    await expect(result2).rejects.toThrow();
+    verifyMocks();
+  });
+
+  test('multi-input-fix updates-on-new-block', async () => {
+    const transfers1 = [
+      {
+        amount: new BigNumber('1'),
+        asset: common.NEO_ASSET_HASH,
+        to: id1.address,
+      },
+    ];
+    const transfers2 = [
+      {
+        amount: new BigNumber('1'),
+        asset: common.NEO_ASSET_HASH,
+        to: id1.address,
+      },
+    ];
+    const unspent = [outputs.oneNEO];
+
+    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
+    keystore.sign = jest.fn(() => witness);
+    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+
+    const result1 = await localUserAccountProvider.transfer(transfers1, {
+      from: options.from,
+      attributes: options.attributes,
+      networkFee: undefined,
+    });
+
+    provider.getBlockCount = jest.fn(() => Promise.resolve(1));
+
+    const result2 = await localUserAccountProvider.transfer(transfers2, {
+      from: options.from,
+      attributes: options.attributes,
+      networkFee: undefined,
+    });
+
+    await result1;
+    // @ts-ignore
+    expect(localUserAccountProvider.mutableUsedOutputs.size).toEqual(1);
+    expect(result2).toHaveProperty('transaction');
     verifyMocks();
   });
 });
