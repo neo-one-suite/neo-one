@@ -1,5 +1,5 @@
 // tslint:disable no-any
-import { common } from '@neo-one/client-core';
+import { assertAssetType, assertContractParameterType, common } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { InvalidArgumentError, InvalidNamedArgumentError } from './errors';
@@ -11,14 +11,24 @@ import {
   ABIParameter,
   ABIReturn,
   AddressString,
+  AssetRegister,
   AttributeArg,
   BlockFilter,
   BufferString,
+  ContractRegister,
   GetOptions,
   Hash160String,
   Hash256String,
+  NetworkType,
   PublicKeyString,
+  SmartContractDefinition,
   TransactionOptions,
+  TransactionReceipt,
+  TransactionResult,
+  Transfer,
+  UpdateAccountNameOptions,
+  UserAccount,
+  UserAccountID,
 } from './types';
 import { converters } from './user/converters';
 
@@ -326,4 +336,162 @@ export const assertTransactionOptions = (options?: any): TransactionOptions | un
   assertNullableBigNumber(options.networkFee);
 
   return options;
+};
+
+const assertStringSimple = (value?: any) => {
+  if (typeof value === 'string') {
+    return value;
+  }
+  throw new InvalidArgumentError(`Expected string, found: ${value}`);
+};
+
+// new general Type-based assert functions
+export const assertAssetRegister = (register?: any): AssetRegister => {
+  try {
+    assertAssetType(register.assetType);
+    assertStringSimple(register.name);
+    assertBigNumber(register.amount);
+    assertNumber(register.precision);
+    assertPublicKey(register.owner);
+    assertAddress(register.admin);
+    assertAddress(register.issuer);
+  } catch (e) {
+    throw new InvalidNamedArgumentError(`AssetRegister`, e);
+  }
+
+  return register;
+};
+
+export const assertContractRegister = (register?: any): ContractRegister => {
+  try {
+    assertBuffer(register.script);
+    register.parameters.forEach(assertContractParameterType);
+    assertContractParameterType(register.returnType);
+    assertStringSimple(register.name);
+    assertStringSimple(register.codeVersion);
+    assertStringSimple(register.author);
+    assertStringSimple(register.email);
+    assertStringSimple(register.description);
+    assertBoolean(register.properties.storage);
+    assertBoolean(register.properties.dynamicInvoke);
+    assertBoolean(register.properties.payable);
+  } catch (e) {
+    throw new InvalidNamedArgumentError(`ContractRegister`, e);
+  }
+
+  return register;
+};
+
+export const assertSmartContractDefinition = (definition?: any): SmartContractDefinition => {
+  try {
+    Object.values(definition.networks).forEach((network: any) => assertHash160(network.hash));
+    assertABI(definition.abi);
+  } catch (e) {
+    throw new InvalidNamedArgumentError(`SmartContractDefinition`, e);
+  }
+
+  return definition;
+};
+
+export const assertTransactionReceipt = (receipt?: any): TransactionReceipt => {
+  try {
+    assertNumber(receipt.blockIndex);
+    assertHash256(receipt.blockHash);
+    assertNumber(receipt.transactionIndex);
+  } catch (e) {
+    throw new InvalidNamedArgumentError(`TransactionReceipt`, e);
+  }
+
+  return receipt;
+};
+
+export const assertTransactionResult = (result?: any): TransactionResult<TransactionReceipt> => {
+  try {
+    assertTransactionReceipt(result.receipt);
+  } catch (e) {
+    throw new InvalidNamedArgumentError(`TransactionResult`, e);
+  }
+
+  return result;
+};
+
+export const assertTransfer = (transfer?: any): Transfer => {
+  try {
+    assertBigNumber(transfer.amount);
+    assertHash256(transfer.asset);
+    assertAddress(transfer.to);
+  } catch (e) {
+    throw new InvalidNamedArgumentError(`Transfer`, e);
+  }
+
+  return transfer;
+};
+
+export const assertTransfers = (args?: ReadonlyArray<any>): any => {
+  if (args === undefined) {
+    throw new InvalidArgumentError('getTransfersOptions undefined args');
+  }
+  try {
+    if (args.length >= 3) {
+      assertBigNumber(args[0]);
+      assertHash256(args[1]);
+      assertAddress(args[2]);
+      assertTransactionOptions(args[3]);
+    } else {
+      Object.values(args[0]).forEach(assertTransfer);
+      assertTransactionOptions(args[1]);
+    }
+  } catch (e) {
+    throw new InvalidNamedArgumentError(`Transfers`, e);
+  }
+
+  return args;
+};
+
+export const assertUpdateAccountNameOptions = (options?: any): UpdateAccountNameOptions => {
+  try {
+    assertUserAccountID(options.id);
+    assertStringSimple(options.name);
+  } catch (e) {
+    throw new InvalidNamedArgumentError(`UpdateAccountNameOptions`, e);
+  }
+
+  return options;
+};
+
+export const assertUserAccount = (account?: any): UserAccount => {
+  try {
+    assertStringSimple(account.type);
+    assertUserAccountID(account.id);
+    assertStringSimple(account.name);
+    assertHash160(account.scriptHash);
+    assertPublicKey(account.publicKey);
+    assertBoolean(account.configurableName);
+    assertBoolean(account.deletable);
+  } catch (e) {
+    throw new InvalidNamedArgumentError(`UserAccount`, e);
+  }
+
+  return account;
+};
+
+export const assertUserAccountID = (ID?: any): UserAccountID => {
+  try {
+    assertNetworkType(ID.network);
+    assertAddress(ID.address);
+  } catch (e) {
+    throw new InvalidNamedArgumentError(`UserAccountID`, e);
+  }
+
+  return ID;
+};
+
+export const assertNetworkType = (network?: any): NetworkType => {
+  try {
+    assertStringSimple(network);
+  } catch {
+    throw new InvalidArgumentError(`Expected network string, found: ${network}`);
+  }
+
+  return network;
 };

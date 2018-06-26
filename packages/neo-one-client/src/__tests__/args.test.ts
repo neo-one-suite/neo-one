@@ -207,6 +207,123 @@ describe('arg assertions', () => {
       method: 'assertTransactionOptions',
       args: [{ networkFee: undefined }],
     },
+
+    {
+      method: 'assertAssetRegister',
+      args: [
+        {
+          assetType: 'CreditFlag',
+          name: 'asset',
+          amount: new BigNumber(10),
+          precision: 20,
+          owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+    },
+    {
+      method: 'assertContractRegister',
+      args: [
+        {
+          script: '02028a99826e',
+          parameters: ['Signature'],
+          returnType: 'Signature',
+          name: 'contract',
+          codeVersion: 'codeVersion',
+          author: 'author',
+          email: 'email',
+          description: 'description',
+          properties: {
+            storage: true,
+            dynamicInvoke: true,
+            payable: true,
+          },
+        },
+      ],
+    },
+    {
+      method: 'assertTransactionReceipt',
+      args: [
+        {
+          blockIndex: 10,
+          blockHash: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+          transactionIndex: 5,
+        },
+      ],
+    },
+    {
+      method: 'assertTransfer',
+      args: [
+        {
+          amount: new BigNumber(10),
+          asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+          to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+    },
+    {
+      method: 'assertTransfers',
+      args: [
+        [
+          new BigNumber(10),
+          '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+          'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          undefined,
+        ],
+      ],
+    },
+    {
+      method: 'assertTransfers',
+      args: [
+        [
+          [
+            {
+              amount: new BigNumber(10),
+              asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+              to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+            },
+          ],
+          undefined,
+        ],
+      ],
+    },
+    {
+      method: 'assertUpdateAccountNameOptions',
+      args: [
+        {
+          id: { network: 'test', address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' },
+          name: 'options',
+        },
+      ],
+    },
+    {
+      method: 'assertUserAccount',
+      args: [
+        {
+          type: 'MEGA BIG USER MAN',
+          id: { network: 'test', address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' },
+          name: 'options',
+          scriptHash: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9',
+          publicKey: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          configurableName: true,
+          deletable: true,
+        },
+      ],
+    },
+    {
+      method: 'assertUserAccountID',
+      args: [
+        {
+          network: 'test',
+          address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+    },
+    {
+      method: 'assertNetworkType',
+      args: ['test'],
+    },
   ] as any;
 
   for (const testCase of workingTestCases) {
@@ -673,6 +790,594 @@ describe('arg assertions', () => {
       message: 'assertTransactionOptions throws error on non BigNumber networkFee',
       args: [{ attributes: [], networkFee: dummyInt }],
       error: new InvalidArgumentError(`Expected BigNumber, found: ${String(dummyInt)}`),
+    },
+
+    {
+      method: 'assertAssetRegister',
+      message: 'assertAssetRegister throws error on invalid assetType',
+      args: [
+        {
+          assetType: dummyString,
+          name: 'asset',
+          amount: new BigNumber('10'),
+          precision: 5,
+          owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+      error: new InvalidNamedArgumentError(`AssetRegister`, `Error: Expected asset type, found: ${dummyString}`),
+    },
+    {
+      method: 'assertAssetRegister',
+      message: 'assertAssetRegister throws error on invalid name',
+      args: [
+        {
+          assetType: 'CreditFlag',
+          name: dummyInt,
+          amount: new BigNumber('10'),
+          precision: 5,
+          owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+      error: new InvalidNamedArgumentError(`AssetRegister`, `Error: Expected string, found: ${dummyInt}`),
+    },
+    {
+      method: 'assertAssetRegister',
+      message: 'assertAssetRegister throws error on invalid amount',
+      args: [
+        {
+          assetType: 'CreditFlag',
+          name: 'asset',
+          amount: dummyInt,
+          precision: 5,
+          owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+      error: new InvalidNamedArgumentError(`AssetRegister`, `Error: Expected BigNumber, found: ${dummyInt}`),
+    },
+    {
+      method: 'assertAssetRegister',
+      message: 'assertAssetRegister throws error on invalid precision',
+      args: [
+        {
+          assetType: 'CreditFlag',
+          name: 'asset',
+          amount: new BigNumber('10'),
+          precision: bigNum,
+          owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+      error: new InvalidNamedArgumentError(`AssetRegister`, `Error: Expected number, found: ${bigNum}`),
+    },
+    {
+      method: 'assertAssetRegister',
+      message: 'assertAssetRegister throws error on invalid Public Key',
+      args: [
+        {
+          assetType: 'CreditFlag',
+          name: 'asset',
+          amount: new BigNumber('10'),
+          precision: 5,
+          owner: dummyString,
+          admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+      error: new InvalidNamedArgumentError(`AssetRegister`, `Error: Expected hex string, found: ${dummyString}`),
+    },
+    {
+      method: 'assertAssetRegister',
+      message: 'assertAssetRegister throws error on invalid admin Address',
+      args: [
+        {
+          assetType: 'CreditFlag',
+          name: 'asset',
+          amount: new BigNumber('10'),
+          precision: 10,
+          owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          admin: dummyString,
+          issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+      error: new InvalidNamedArgumentError(`AssetRegister`, `Error: Invalid address: ${dummyString}`),
+    },
+    {
+      method: 'assertAssetRegister',
+      message: 'assertAssetRegister throws error on invalid issuer Address',
+      args: [
+        {
+          assetType: 'CreditFlag',
+          name: 'asset',
+          amount: new BigNumber('10'),
+          precision: 10,
+          owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          issuer: dummyString,
+        },
+      ],
+      error: new InvalidArgumentError(`Invalid argument for AssetRegister: Error: Invalid address: ${dummyString}`),
+    },
+    {
+      method: 'assertContractRegister',
+      message: 'assertContractRegister throws error on invalid Buffer',
+      args: [
+        {
+          script: dummyString,
+          parameters: ['Signature'],
+          returnType: 'Signature',
+          name: 'contract',
+          codeVersion: 'codeVersion',
+          author: 'author',
+          email: 'email',
+          description: 'description',
+          properties: {
+            storage: true,
+            dynamicInvoke: true,
+            payable: true,
+          },
+        },
+      ],
+      error: new InvalidNamedArgumentError(`ContractRegister`, `Error: Expected hex string, found: ${dummyString}`),
+    },
+    {
+      method: 'assertContractRegister',
+      message: 'assertContractRegister throws error on invalid Parameter type',
+      args: [
+        {
+          script: '02028a99826e',
+          parameters: [dummyString],
+          returnType: 'Signature',
+          name: 'contract',
+          codeVersion: 'codeVersion',
+          author: 'author',
+          email: 'email',
+          description: 'description',
+          properties: {
+            storage: true,
+            dynamicInvoke: true,
+            payable: true,
+          },
+        },
+      ],
+      error: new InvalidNamedArgumentError(
+        `ContractRegister`,
+        `Error: Expected contract parameter type, found: ${dummyString}`,
+      ),
+    },
+    {
+      method: 'assertContractRegister',
+      message: 'assertContractRegister throws error on invalid Parameter type',
+      args: [
+        {
+          script: '02028a99826e',
+          parameters: ['Signature'],
+          returnType: dummyString,
+          name: 'contract',
+          codeVersion: 'codeVersion',
+          author: 'author',
+          email: 'email',
+          description: 'description',
+          properties: {
+            storage: true,
+            dynamicInvoke: true,
+            payable: true,
+          },
+        },
+      ],
+      error: new InvalidNamedArgumentError(
+        `ContractRegister`,
+        `Error: Expected contract parameter type, found: ${dummyString}`,
+      ),
+    },
+    {
+      method: 'assertContractRegister',
+      message: 'assertContractRegister throws error on invalid String type',
+      args: [
+        {
+          script: '02028a99826e',
+          parameters: ['Signature'],
+          returnType: 'Signature',
+          name: 'contract',
+          codeVersion: bigNum,
+          author: 'author',
+          email: 'email',
+          description: 'description',
+          properties: {
+            storage: true,
+            dynamicInvoke: true,
+            payable: true,
+          },
+        },
+      ],
+      error: new InvalidNamedArgumentError(`ContractRegister`, `Error: Expected string, found: ${bigNum}`),
+    },
+    {
+      method: 'assertContractRegister',
+      message: 'assertContractRegister throws error on invalid Parameter type',
+      args: [
+        {
+          script: '02028a99826e',
+          parameters: ['Signature'],
+          returnType: 'Signature',
+          name: 'contract',
+          codeVersion: 'codeVersion',
+          author: 'author',
+          email: 'email',
+          description: 'description',
+          properties: {
+            storage: bigNum,
+            dynamicInvoke: true,
+            payable: true,
+          },
+        },
+      ],
+      error: new InvalidNamedArgumentError(`ContractRegister`, `Error: Expected boolean, found: ${bigNum}`),
+    },
+    {
+      method: 'assertTransactionReceipt',
+      message: 'assertTransactionReceipt throws error on invalid blockIndex',
+      args: [
+        {
+          blockIndex: bigNum,
+          blockHash: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+          transactionIndex: 5,
+        },
+      ],
+      error: new InvalidNamedArgumentError(`TransactionReceipt`, `Error: Expected number, found: ${bigNum}`),
+    },
+    {
+      method: 'assertTransactionReceipt',
+      message: 'assertTransactionReceipt throws error on invalid blockHash',
+      args: [
+        {
+          blockIndex: 10,
+          blockHash: dummyString,
+          transactionIndex: 5,
+        },
+      ],
+      error: new InvalidNamedArgumentError(
+        `TransactionReceipt`,
+        `Error: Hash256 must start with '0x', found: ${dummyString}`,
+      ),
+    },
+    {
+      method: 'assertTransactionReceipt',
+      message: 'assertTransactionReceipt throws error on invalid transactionIndex',
+      args: [
+        {
+          blockIndex: 10,
+          blockHash: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+          transactionIndex: bigNum,
+        },
+      ],
+      error: new InvalidNamedArgumentError(`TransactionReceipt`, `Error: Expected number, found: ${bigNum}`),
+    },
+    {
+      method: 'assertTransfer',
+      message: 'assertTransfer throws error on invalid amount',
+      args: [
+        {
+          amount: dummyInt,
+          asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+          to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+      error: new InvalidNamedArgumentError(`Transfer`, `Error: Expected BigNumber, found: ${dummyInt}`),
+    },
+    {
+      method: 'assertTransfer',
+      message: 'assertTransfer throws error on invalid asset',
+      args: [
+        {
+          amount: new BigNumber(10),
+          asset: dummyString,
+          to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+      error: new InvalidNamedArgumentError(`Transfer`, `Error: Hash256 must start with '0x', found: ${dummyString}`),
+    },
+    {
+      method: 'assertTransfer',
+      message: 'assertTransfer throws error on invalid to address',
+      args: [
+        {
+          amount: new BigNumber(10),
+          asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+          to: dummyString,
+        },
+      ],
+      error: new InvalidNamedArgumentError(`Transfer`, `Error: Invalid address: ${dummyString}`),
+    },
+    {
+      method: 'assertTransfers',
+      message: 'assertTransfers (type 1) throws error on invalid amount',
+      args: [
+        [
+          dummyInt,
+          '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+          'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          undefined,
+        ],
+      ],
+      error: new InvalidNamedArgumentError(`Transfers`, `Error: Expected BigNumber, found: ${dummyInt}`),
+    },
+    {
+      method: 'assertTransfers',
+      message: 'assertTransfers (type 1) throws error on invalid asset',
+      args: [[new BigNumber(10), dummyString, 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR', undefined]],
+      error: new InvalidNamedArgumentError(`Transfers`, `Error: Hash256 must start with '0x', found: ${dummyString}`),
+    },
+    {
+      method: 'assertTransfers',
+      message: 'assertTransfers (type 1) throws error on invalid address',
+      args: [
+        [
+          new BigNumber(10),
+          '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+          dummyString,
+          undefined,
+        ],
+      ],
+      error: new InvalidNamedArgumentError(`Transfers`, `Error: Invalid address: ${dummyString}`),
+    },
+    {
+      method: 'assertTransfers',
+      message: 'assertTransfers (type 1) throws error on invalid transaction options',
+      args: [
+        [
+          new BigNumber(10),
+          '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+          'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+          dummyString,
+        ],
+      ],
+      error: new InvalidNamedArgumentError(
+        `Transfers`,
+        `Error: Invalid argument for TransactionOptions: ${dummyString}`,
+      ),
+    },
+    {
+      method: 'assertTransfers',
+      message: 'assertTransfers (type 2) throws error on invalid transfer',
+      args: [
+        [
+          [
+            {
+              amount: dummyInt,
+              asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+              to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+            },
+          ],
+          undefined,
+        ],
+      ],
+      error: new InvalidArgumentError(
+        `Invalid argument for Transfers: Error: Invalid argument for Transfer: Error: Expected BigNumber, found: ${dummyInt}`,
+      ),
+    },
+    {
+      method: 'assertTransfers',
+      message: 'assertTransfers (type 2) throws error on invalid transactionOptions',
+      args: [
+        [
+          [
+            {
+              amount: new BigNumber(10),
+              asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+              to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+            },
+          ],
+          dummyString,
+        ],
+      ],
+      error: new InvalidNamedArgumentError(
+        `Transfers`,
+        `Error: Invalid argument for TransactionOptions: ${dummyString}`,
+      ),
+    },
+    {
+      method: 'assertUpdateAccountNameOptions',
+      message: 'assertUpdatedAccountNameOptions throws error on invalid id network',
+      args: [
+        {
+          id: { network: dummyInt, address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' },
+          name: 'options',
+        },
+      ],
+      error: new InvalidArgumentError(
+        `Invalid argument for UpdateAccountNameOptions: Error: Invalid argument for UserAccountID: Error: Expected network string, found: ${dummyInt}`,
+      ),
+    },
+    {
+      method: 'assertUpdateAccountNameOptions',
+      message: 'assertUpdatedAccountNameOptions throws error on invalid id address',
+      args: [
+        {
+          id: { network: 'test', address: dummyString },
+          name: 'options',
+        },
+      ],
+      error: new InvalidArgumentError(
+        `Invalid argument for UpdateAccountNameOptions: Error: Invalid argument for UserAccountID: Error: Invalid address: ${dummyString}`,
+      ),
+    },
+    {
+      method: 'assertUpdateAccountNameOptions',
+      message: 'assertUpdatedAccountNameOptions throws error on invalid name',
+      args: [
+        {
+          id: { network: 'test', address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' },
+          name: dummyInt,
+        },
+      ],
+      error: new InvalidNamedArgumentError(`UpdateAccountNameOptions`, `Error: Expected string, found: ${dummyInt}`),
+    },
+    {
+      method: 'assertUserAccount',
+      message: 'assertUserAccount throws error on invalid type',
+      args: [
+        {
+          type: dummyInt,
+          id: { network: 'test', address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' },
+          name: 'options',
+          scriptHash: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9',
+          publicKey: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          configurableName: true,
+          deletable: true,
+        },
+      ],
+      error: new InvalidNamedArgumentError(`UserAccount`, `Error: Expected string, found: ${dummyInt}`),
+    },
+    {
+      method: 'assertUserAccount',
+      message: 'assertUserAccount throws error on invalid id network',
+      args: [
+        {
+          type: 'MEGA BIG USER MAN',
+          id: { network: dummyInt, address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' },
+          name: 'options',
+          scriptHash: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9',
+          publicKey: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          configurableName: true,
+          deletable: true,
+        },
+      ],
+      error: new InvalidArgumentError(
+        `Invalid argument for UserAccount: Error: Invalid argument for UserAccountID: Error: Expected network string, found: ${dummyInt}`,
+      ),
+    },
+    {
+      method: 'assertUserAccount',
+      message: 'assertUserAccount throws error on invalid id address',
+      args: [
+        {
+          type: 'MEGA BIG USER MAN',
+          id: { network: 'test', address: dummyString },
+          name: 'options',
+          scriptHash: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9',
+          publicKey: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          configurableName: true,
+          deletable: true,
+        },
+      ],
+      error: new InvalidArgumentError(
+        `Invalid argument for UserAccount: Error: Invalid argument for UserAccountID: Error: Invalid address: ${dummyString}`,
+      ),
+    },
+    {
+      method: 'assertUserAccount',
+      message: 'assertUserAccount throws error on invalid name',
+      args: [
+        {
+          type: 'MEGA BIG USER MAN',
+          id: { network: 'test', address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' },
+          name: dummyInt,
+          scriptHash: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9',
+          publicKey: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          configurableName: true,
+          deletable: true,
+        },
+      ],
+      error: new InvalidNamedArgumentError(`UserAccount`, `Error: Expected string, found: ${dummyInt}`),
+    },
+    {
+      method: 'assertUserAccount',
+      message: 'assertUserAccount throws error on invalid scriptHash',
+      args: [
+        {
+          type: 'MEGA BIG USER MAN',
+          id: { network: 'test', address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' },
+          name: 'options',
+          scriptHash: dummyString,
+          publicKey: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          configurableName: true,
+          deletable: true,
+        },
+      ],
+      error: new InvalidNamedArgumentError(`UserAccount`, `Error: Hash160 must start with '0x', found: ${dummyString}`),
+    },
+    {
+      method: 'assertUserAccount',
+      message: 'assertUserAccount throws error on invalid publicKey',
+      args: [
+        {
+          type: 'MEGA BIG USER MAN',
+          id: { network: 'test', address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' },
+          name: 'options',
+          scriptHash: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9',
+          publicKey: dummyString,
+          configurableName: true,
+          deletable: true,
+        },
+      ],
+      error: new InvalidNamedArgumentError(`UserAccount`, `Error: Expected hex string, found: ${dummyString}`),
+    },
+    {
+      method: 'assertUserAccount',
+      message: 'assertUserAccount throws error on invalid configurableName value',
+      args: [
+        {
+          type: 'MEGA BIG USER MAN',
+          id: { network: 'test', address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' },
+          name: 'options',
+          scriptHash: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9',
+          publicKey: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          configurableName: dummyInt,
+          deletable: true,
+        },
+      ],
+      error: new InvalidNamedArgumentError(`UserAccount`, `Error: Expected boolean, found: ${dummyInt}`),
+    },
+    {
+      method: 'assertUserAccount',
+      message: 'assertUserAccount throws error on invalid deletable value',
+      args: [
+        {
+          type: 'MEGA BIG USER MAN',
+          id: { network: 'test', address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' },
+          name: 'options',
+          scriptHash: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9',
+          publicKey: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+          configurableName: true,
+          deletable: dummyInt,
+        },
+      ],
+      error: new InvalidNamedArgumentError(`UserAccount`, `Error: Expected boolean, found: ${dummyInt}`),
+    },
+    {
+      method: 'assertUserAccountID',
+      message: 'assertUserAccountID throws error on invalid network string',
+      args: [
+        {
+          network: dummyInt,
+          address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+        },
+      ],
+      error: new InvalidNamedArgumentError(`UserAccountID`, `Error: Expected network string, found: ${dummyInt}`),
+    },
+    {
+      method: 'assertUserAccountID',
+      message: 'assertUserAccountID throws error on invalid address',
+      args: [
+        {
+          network: 'test',
+          address: dummyString,
+        },
+      ],
+      error: new InvalidNamedArgumentError(`UserAccountID`, `Error: Invalid address: ${dummyString}`),
+    },
+    {
+      method: 'assertNetworkType',
+      message: 'assertNetworkType throws error on invalid network string',
+      args: [dummyInt],
+      error: new InvalidArgumentError(`Expected network string, found: ${dummyInt}`),
     },
   ] as any;
 
