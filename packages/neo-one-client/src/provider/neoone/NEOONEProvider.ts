@@ -137,6 +137,10 @@ export class NEOONEProvider {
     return this.getProvider(network).getNetworkSettings(monitor);
   }
 
+  public async getBlockCount(network: NetworkType, monitor?: Monitor): Promise<number> {
+    return this.getProvider(network).getBlockCount(monitor);
+  }
+
   public read(network: NetworkType): NEOONEDataProvider {
     return this.getProvider(network);
   }

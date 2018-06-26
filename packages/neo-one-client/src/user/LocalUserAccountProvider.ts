@@ -29,6 +29,7 @@ import _ from 'lodash';
 import { Observable } from 'rxjs';
 import { RawSourceMap } from 'source-map';
 import {
+  FundsInUseError,
   InsufficientFundsError,
   InvalidTransactionError,
   InvokeError,
@@ -123,6 +124,7 @@ export interface Provider {
   ) => Promise<RawInvocationData>;
   readonly testInvoke: (network: NetworkType, transaction: string, monitor?: Monitor) => Promise<RawInvocationResult>;
   readonly getNetworkSettings: (network: NetworkType, monitor?: Monitor) => Promise<NetworkSettings>;
+  readonly getBlockCount: (network: NetworkType, monitor?: Monitor) => Promise<number>;
   readonly read: (network: NetworkType) => DataProvider;
 }
 
@@ -172,6 +174,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
   public readonly keystore: TKeyStore;
   public readonly provider: TProvider;
+  private readonly mutableUsedOutputs: Set<string>;
+  private mutableBlockCount: number;
 
   public constructor({ keystore, provider }: { readonly keystore: TKeyStore; readonly provider: TProvider }) {
     this.type = keystore.type;
@@ -181,6 +185,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     this.currentAccount$ = keystore.currentAccount$;
     this.accounts$ = keystore.accounts$;
     this.networks$ = provider.networks$;
+
+    this.mutableBlockCount = 0;
+    this.mutableUsedOutputs = new Set<string>();
   }
 
   public getCurrentAccount(): UserAccount | undefined {
@@ -790,6 +797,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           span,
         );
 
+        transactionUnsignedIn.inputs.forEach((transfer) =>
+          this.mutableUsedOutputs.add(`${common.uInt256ToString(transfer.hash)}:${transfer.index}`),
+        );
+
         return {
           transaction,
           // tslint:disable-next-line no-unnecessary-type-annotation
@@ -890,8 +901,17 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     if (transfers.length === 0 && gas.lte(utils.ZERO_BIG_NUMBER)) {
       return { inputs: [], outputs: [] };
     }
+    const [newBlockCount, allOutputsIn] = await Promise.all([
+      this.provider.getBlockCount(from.network, monitor),
+      this.provider.getUnspentOutputs(from.network, from.address, monitor),
+    ]);
 
-    const allOutputs = await this.provider.getUnspentOutputs(from.network, from.address, monitor);
+    if (newBlockCount !== this.mutableBlockCount) {
+      this.mutableUsedOutputs.clear();
+      this.mutableBlockCount = newBlockCount;
+    }
+    const allOutputs = allOutputsIn.filter((output) => !this.mutableUsedOutputs.has(`${output.txid}:${output.vout}`));
+    const wasFiltered = allOutputsIn.length !== allOutputs.length;
 
     return Object.values(
       _.groupBy(
@@ -923,6 +943,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
               amount,
               remainingOutputs,
               remaining,
+              wasFiltered,
             });
 
             return {
@@ -966,6 +987,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     asset,
     remainingOutputs,
     remaining,
+    wasFiltered,
   }: {
     readonly from: AddressString;
     readonly to?: AddressString;
@@ -973,6 +995,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly asset: Hash256String;
     readonly remainingOutputs: ReadonlyArray<UnspentOutput>;
     readonly remaining: BigNumber;
+    readonly wasFiltered: boolean;
   }): {
     readonly inputs: ReadonlyArray<Input>;
     readonly outputs: ReadonlyArray<Output>;
@@ -1006,6 +1029,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     const sum = outputsOrdered.reduce<BigNumber>((acc, coin) => acc.plus(coin.value), utils.ZERO_BIG_NUMBER);
 
     if (sum.lt(amount)) {
+      if (wasFiltered) {
+        throw new FundsInUseError(sum, amount, this.mutableUsedOutputs.size);
+      }
       throw new InsufficientFundsError(sum, amount);
     }
 
