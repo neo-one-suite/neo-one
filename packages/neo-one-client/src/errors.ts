@@ -61,6 +61,17 @@ export class InsufficientFundsError extends CustomError {
   }
 }
 
+export class FundsInUseError extends CustomError {
+  public readonly code: string;
+
+  public constructor(total: BigNumber, expected: BigNumber, numInputs: number) {
+    super(
+      `Found ${total.toString()} funds, required: ${expected.toString()}; You have ${numInputs} input(s) on the current block, try transfer again on the next`,
+    );
+    this.code = 'FUNDS_IN_USE';
+  }
+}
+
 export class NothingToClaimError extends CustomError {
   public readonly code: string;
 
