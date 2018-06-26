@@ -1,5 +1,5 @@
 import { ABI } from '@neo-one/client';
-import { compileScript } from '@neo-one/smart-contract-compiler';
+import { compileScript } from '../compile';
 
 import { Result, setupTest } from './setupTest';
 

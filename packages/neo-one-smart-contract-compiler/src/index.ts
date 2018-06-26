@@ -5,4 +5,5 @@ export * from './findAndCompileContract';
 export * from './findContract';
 export * from './scan';
 export * from './symbols';
+export * from './test';
 export * from './utils';
