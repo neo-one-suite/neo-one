@@ -35,7 +35,7 @@
   "noCompile": true,
   "dependencies": {
     "@neo-one/smart-contract": "^1.0.0-alpha.7",
-    "@neo-one/smart-contract-test": "^1.0.0-alpha.20"
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.19"
   },
   "devDependencies": {
     "@neo-one/client": "^1.0.0-alpha.64",

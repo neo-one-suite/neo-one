@@ -10,12 +10,12 @@ import {
   SmartContract,
   UserAccountID,
 } from '@neo-one/client';
-import { CompileContractResult } from '@neo-one/smart-contract-compiler';
 import { DiagnosticCategory, ts } from 'ts-simple-ast';
+import { CompileContractResult } from '../compileContract';
 
 import { createNode } from './createNode';
 
-export interface Options extends CompileContractResult {
+export interface TestOptions extends CompileContractResult {
   readonly abi: ABI;
   readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
   readonly contract: ContractRegister;
@@ -34,7 +34,7 @@ export interface Result {
   readonly masterPrivateKey: string;
 }
 
-export const setupTest = async (getContract: () => Promise<Options>): Promise<Result> => {
+export const setupTest = async (getContract: () => Promise<TestOptions>): Promise<Result> => {
   const { privateKey, rpcURL } = await createNode();
   const networkName = 'priv';
   const masterWalletName = 'master';

@@ -5,21 +5,21 @@ import BigNumber from 'bignumber.js';
 import appRootDir from 'app-root-dir';
 import path from 'path';
 
-import { cleanupTest } from '../cleanupTest';
-import { setupBasicTest } from '../setupBasicTest';
+import { cleanupTest } from '../../test/cleanupTest';
+import { setupBasicTest } from '../../test/setupBasicTest';
 
 const setup = async () => {
-  const nep5 = abi.NEP5_STATIC(4);
+  const nep5 = abi.NEP5_STATIC(8);
 
   return setupBasicTest({
     contractPath: path.resolve(
       appRootDir.get(),
       'packages',
-      'neo-one-smart-contract-test',
+      'neo-one-smart-contract-compiler',
       'src',
       '__data__',
       'contracts',
-      'TestTranspiledToken.ts',
+      'Token.ts',
     ),
     abi: {
       functions: nep5.functions.concat([
@@ -27,6 +27,21 @@ const setup = async () => {
           name: 'owner',
           constant: true,
           returnType: { type: 'Hash160' },
+        },
+        {
+          name: 'issue',
+          parameters: [
+            {
+              name: 'addr',
+              type: 'Hash160',
+            },
+            {
+              name: 'amount',
+              type: 'Integer',
+              decimals: 8,
+            },
+          ],
+          returnType: { type: 'Boolean' },
         },
         {
           name: 'deploy',
@@ -44,7 +59,7 @@ const setup = async () => {
   });
 };
 
-describe('TestTranspiledToken', () => {
+describe('Token', () => {
   afterEach(async () => {
     await cleanupTest();
   });
@@ -58,30 +73,49 @@ describe('TestTranspiledToken', () => {
       smartContract.symbol(),
     ]);
     expect(nameResult).toEqual('TestToken');
-    expect(decimalsResult.toString()).toEqual('4');
+    expect(decimalsResult.toString()).toEqual('8');
     expect(symbolResult).toEqual('TT');
 
-    const wallet0 = await keystore.addAccount({
-      network: networkName,
-      name: 'wallet0',
-      privateKey: createPrivateKey(),
-    });
+    const [wallet0, wallet1] = await Promise.all([
+      keystore.addAccount({
+        network: networkName,
+        name: 'wallet0',
+        privateKey: createPrivateKey(),
+      }),
+      keystore.addAccount({
+        network: networkName,
+        name: 'wallet1',
+        privateKey: createPrivateKey(),
+      }),
+    ]);
     const account0 = wallet0.account.id;
+    const account1 = wallet1.account.id;
 
     const owner = privateKeyToScriptHash(masterPrivateKey);
     let result = await smartContract.deploy(owner, { from: masterAccountID });
-    let [receipt] = await Promise.all([result.confirmed({ timeoutMS: 30000 }), developerClient.runConsensusNow()]);
+    let [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
 
     expect(receipt.result.state).toEqual('HALT');
     expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
     expect(receipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
     expect(receipt.result.value).toBeTruthy();
 
-    let value = await smartContract.owner();
-    expect(value).toEqual(owner);
+    const ownerValue = await smartContract.owner();
+    expect(ownerValue).toEqual(owner);
+
+    const supply = await smartContract.totalSupply();
+    expect(supply.toString(10)).toEqual('0');
 
     const issueValue = new BigNumber('100');
-    value = await smartContract.balanceOf(addressToScriptHash(masterAccountID.address));
+    result = await smartContract.issue(addressToScriptHash(account0.address), issueValue, { from: masterAccountID });
+    [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
+
+    expect(receipt.result.state).toEqual('HALT');
+    expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('issue consume');
+    expect(receipt.result.gasCost.toString()).toMatchSnapshot('issue cost');
+    expect(receipt.result.value).toBeTruthy();
+
+    let value = await smartContract.balanceOf(addressToScriptHash(account0.address));
     expect(value.toString()).toEqual(issueValue.toString());
 
     value = await smartContract.totalSupply();
@@ -89,21 +123,22 @@ describe('TestTranspiledToken', () => {
 
     const transferValue = issueValue.div(2);
     result = await smartContract.transfer(
-      addressToScriptHash(masterAccountID.address),
       addressToScriptHash(account0.address),
+      addressToScriptHash(account1.address),
       transferValue,
-      { from: masterAccountID },
+      { from: account0 },
     );
     [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
 
     expect(receipt.result.state).toEqual('HALT');
     expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('transfer consume');
     expect(receipt.result.gasCost.toString()).toMatchSnapshot('transfer cost');
-
-    value = await smartContract.balanceOf(addressToScriptHash(masterAccountID.address));
-    expect(value.toString()).toEqual(transferValue.toString());
+    expect(receipt.result.value).toBeTruthy();
 
     value = await smartContract.balanceOf(addressToScriptHash(account0.address));
+    expect(value.toString()).toEqual(transferValue.toString());
+
+    value = await smartContract.balanceOf(addressToScriptHash(account1.address));
     expect(value.toString()).toEqual(transferValue.toString());
 
     value = await smartContract.totalSupply();
