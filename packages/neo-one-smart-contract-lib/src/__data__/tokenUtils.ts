@@ -8,7 +8,7 @@ import {
   TransactionResult,
   UserAccountID,
 } from '@neo-one/client';
-import { cleanupTest, setupContractTest } from '@neo-one/smart-contract-test';
+import { cleanupTest, setupContractTest } from '@neo-one/smart-contract-compiler';
 import BigNumber from 'bignumber.js';
 
 import appRootDir from 'app-root-dir';
