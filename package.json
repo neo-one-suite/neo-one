@@ -152,7 +152,7 @@
   "resolutions": {
     "ajv": "6.5.1",
     "babel-core": "7.0.0-bridge.0",
-    "babel-jest": "23.0.1",
+    "babel-jest": "23.2.0",
     "bn.js": "4.11.8",
     "grpc": "1.13.0-pre1"
   },
