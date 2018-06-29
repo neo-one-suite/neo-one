@@ -33,9 +33,9 @@
   "scripts": {
     "lint-staged": "lint-staged",
     "bootstrap": "yarn run build && lerna bootstrap",
-    "build": "rm -rf ./packages/*/dist && yarn run yarn run ts-node ./scripts/build/entry/build.ts",
-    "watch": "yarn run yarn run ts-node ./scripts/build/entry/watch.ts",
-    "watch-pkg": "yarn run yarn run ts-node ./scripts/build/entry/watchPkg.ts",
+    "build": "rm -rf ./packages/*/dist && yarn run ts-node ./scripts/build/entry/build.ts",
+    "watch": "yarn run ts-node ./scripts/build/entry/watch.ts",
+    "watch-pkg": "yarn run ts-node ./scripts/build/entry/watchPkg.ts",
     "publish": "yarn run build && lerna publish",
     "pretest-coverage": "yarn run ts-node ./scripts/test/pretest.ts",
     "posttest-coverage": "yarn run ts-node ./scripts/test/posttest.ts",
