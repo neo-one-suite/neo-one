@@ -1,5 +1,6 @@
 import * as abi from './abi';
 import * as networks from './networks';
+import * as typeGuards from './typeGuards';
 
 export { Client } from './Client';
 export { ReadClient } from './ReadClient';
@@ -21,4 +22,4 @@ export * from './helpers';
 export * from './preconfigured';
 export * from './types';
 
-export { abi, networks };
+export { abi, networks, typeGuards };
