@@ -36,6 +36,7 @@ describe('exported api', () => {
     'mainReadClient',
     'testReadClient',
     'createReadClient',
+    'typeGuards',
   ];
 
   test('has expected keys', () => {
