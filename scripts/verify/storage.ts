@@ -42,7 +42,8 @@ const hashes: ReadonlyArray<string> = [
   '0x8a570d34a4081086e90ccbecdb04df1f71bf5e0b',
   '0xe8f98440ad0d7a6e76d84fb1c3d3f8a16e162e97',
   '0x40bb36a54bf28872b6ffdfa7fbc6480900e58448',
-  '0x81c089ab996fc89c468a26c0a88d23ae2f34b5c0',
+  // Too much storage to iterate through.
+  // '0x81c089ab996fc89c468a26c0a88d23ae2f34b5c0',
   '0x0ec5712e0f7c63e4b0fea31029a28cea5e9d551f',
   '0x06fa8be9b6609d963e8fc63977b9f8dc5f10895f',
   '0xacbc532904b6b51b5ea6d19b803d78af70e7e6f9',
@@ -144,6 +145,7 @@ const getStorage = async (provider: any, item: any): Promise<any> => {
 const verifyStorage = async (hash: string): Promise<void> => {
   const storageItems = await toArray(AsyncIterableX.from(oneProvider.iterStorage(hash)));
 
+  let totalEqual = 0;
   await Promise.all(
     storageItems.map(async (itemIn) => {
       let [currentItem, testItem] = await Promise.all([
@@ -175,9 +177,12 @@ const verifyStorage = async (hash: string): Promise<void> => {
         logItem(currentItem);
         logItem(testItem);
         console.log('\n');
+      } else {
+        totalEqual += 1;
       }
     }),
   );
+  console.log(`Total Equal: ${totalEqual}`);
 };
 
 const test = async () => {
