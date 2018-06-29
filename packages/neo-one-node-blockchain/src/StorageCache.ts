@@ -178,23 +178,23 @@ class ReadAllStorageCache<Key, Value> extends ReadStorageCache<Key, Value, Value
     this.getKeyFromValue = options.getKeyFromValue;
 
     this.all$ = concat(
+      this.readAllStorage.all$.pipe(
+        concatMap((value) => {
+          const trackedChange = this.tryGetTracked(this.getKeyFromValue(value));
+
+          if (trackedChange !== undefined) {
+            return EMPTY;
+          }
+
+          return _of(value);
+        }),
+      ),
       defer(() =>
         _of(
           ...Object.values(this.mutableValues)
             .map((value) => (value.type === 'add' ? value.value : undefined))
             .filter(commonUtils.notNull),
         ),
-      ),
-      this.readAllStorage.all$.pipe(
-        concatMap((value) => {
-          const trackedChange = this.tryGetTracked(this.getKeyFromValue(value));
-
-          if (trackedChange !== undefined && trackedChange.type === 'delete') {
-            return EMPTY;
-          }
-
-          return _of(value);
-        }),
       ),
     );
   }
@@ -235,26 +235,29 @@ class ReadGetAllStorageCache<Key, PartialKey, Value> extends ReadStorageCache<Ke
     this.getKeyFromValue = options.getKeyFromValue;
     this.matchesPartialKey = options.matchesPartialKey;
 
-    this.getAll$ = (key: PartialKey): Observable<Value> => {
-      const createdValues = Object.values(this.mutableValues)
-        .map((value) => (value.type === 'add' && this.matchesPartialKey(value.value, key) ? value.value : undefined))
-        .filter(commonUtils.notNull);
-
-      return concat(
-        _of(...createdValues),
+    this.getAll$ = (key: PartialKey): Observable<Value> =>
+      concat(
         this.readGetAllStorage.getAll$(key).pipe(
           concatMap((value) => {
             const trackedChange = this.tryGetTracked(this.getKeyFromValue(value));
 
-            if (trackedChange !== undefined && trackedChange.type === 'delete') {
+            if (trackedChange !== undefined) {
               return EMPTY;
             }
 
             return _of(value);
           }),
         ),
+        defer(() =>
+          _of(
+            ...Object.values(this.mutableValues)
+              .map(
+                (value) => (value.type === 'add' && this.matchesPartialKey(value.value, key) ? value.value : undefined),
+              )
+              .filter(commonUtils.notNull),
+          ),
+        ),
       );
-    };
   }
 }
 type AddFunc<Value> = ((value: Value, force?: boolean) => Promise<void>);
