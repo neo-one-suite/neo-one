@@ -98,7 +98,8 @@ const isEqual = (item: any, testItem: any) => {
   const { value } = item;
   const { value: testValue } = testItem;
 
-  return value === testValue;
+  // tslint:disable-next-line triple-equals
+  return (value == undefined && value == testValue) || value === testValue;
 };
 
 const reverse = (value: string) => {
