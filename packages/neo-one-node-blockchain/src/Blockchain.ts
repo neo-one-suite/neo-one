@@ -606,8 +606,9 @@ export class Blockchain {
 
     const [asset, contracts, actions] = await Promise.all([
       data.assetHash === undefined ? Promise.resolve(undefined) : this.storage.asset.get({ hash: data.assetHash }),
-      Promise.all(data.contractHashes.map(async (contractHash) => this.storage.contract.get({ hash: contractHash }))),
-
+      Promise.all(
+        data.contractHashes.map(async (contractHash) => this.storage.contract.tryGet({ hash: contractHash })),
+      ),
       data.actionIndexStart.eq(data.actionIndexStop)
         ? Promise.resolve([])
         : this.storage.action
@@ -621,7 +622,7 @@ export class Blockchain {
 
     return {
       asset,
-      contracts,
+      contracts: contracts.filter(commonUtils.notNull),
       deletedContractHashes: data.deletedContractHashes,
       migratedContractHashes: data.migratedContractHashes,
       voteUpdates: data.voteUpdates,

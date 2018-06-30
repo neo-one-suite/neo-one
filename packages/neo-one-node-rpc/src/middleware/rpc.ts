@@ -196,6 +196,7 @@ const jsonrpc = (handlers: Handlers): Middleware => {
       const result = await monitor.captureSpanLog(async (span) => handleRequest(span, ctx, request), {
         name: 'http_jsonrpc_server_request',
         level: { log: 'verbose', span: 'info' },
+        error: {},
       });
 
       // tslint:disable-next-line no-var-before-return
@@ -203,7 +204,7 @@ const jsonrpc = (handlers: Handlers): Middleware => {
     } catch (error) {
       let errorResponse = {
         code: -32603,
-        message: 'Internal error',
+        message: error.message === undefined ? 'Internal error' : error.message,
       };
 
       if (
