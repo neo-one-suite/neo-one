@@ -53,12 +53,14 @@ import { Monitor } from '@neo-one/monitor';
 import {
   AccountUnclaimed,
   AccountUnclaimedKey,
+  AccountUnclaimedsKey,
   AccountUnspent,
   AccountUnspentKey,
+  AccountUnspentsKey,
+  BlockchainStorage,
   BlockData,
   BlockDataKey,
   ChangeSet,
-  Storage,
   TriggerType,
   ValidatorsCount,
   ValidatorsCountUpdate,
@@ -78,6 +80,7 @@ import {
   ReadAddUpdateMetadataStorageCache,
   ReadAddUpdateStorageCache,
   ReadAllAddUpdateDeleteStorageCache,
+  ReadGetAllAddDeleteStorageCache,
   ReadGetAllAddStorageCache,
   ReadGetAllAddUpdateDeleteStorageCache,
 } from './StorageCache';
@@ -87,17 +90,19 @@ interface WriteBatchBlockchainOptions {
   readonly settings: WriteBlockchain['settings'];
   readonly currentBlock: WriteBlockchain['currentBlock'] | undefined;
   readonly currentHeader: WriteBlockchain['currentHeader'] | undefined;
-  readonly storage: Storage;
+  readonly storage: BlockchainStorage;
   readonly vm: VM;
   readonly getValidators: WriteBlockchain['getValidators'];
 }
 
 interface Caches {
   readonly account: ReadAllAddUpdateDeleteStorageCache<AccountKey, Account, AccountUpdate>;
-
-  readonly accountUnspent: ReadAddDeleteStorageCache<AccountUnspentKey, AccountUnspent>;
-  readonly accountUnclaimed: ReadAddDeleteStorageCache<AccountUnclaimedKey, AccountUnclaimed>;
-
+  readonly accountUnspent: ReadGetAllAddDeleteStorageCache<AccountUnspentKey, AccountUnspentsKey, AccountUnspent>;
+  readonly accountUnclaimed: ReadGetAllAddDeleteStorageCache<
+    AccountUnclaimedKey,
+    AccountUnclaimedsKey,
+    AccountUnclaimed
+  >;
   readonly action: ReadGetAllAddStorageCache<ActionKey, ActionsKey, Action>;
   readonly asset: ReadAddUpdateStorageCache<AssetKey, Asset, AssetUpdate>;
   readonly block: BlockLikeStorageCache<Block>;
@@ -105,7 +110,6 @@ interface Caches {
   readonly header: BlockLikeStorageCache<Header>;
   readonly transaction: ReadAddStorageCache<TransactionKey, Transaction>;
   readonly transactionData: ReadAddUpdateStorageCache<TransactionDataKey, TransactionData, TransactionDataUpdate>;
-
   readonly output: OutputStorageCache;
   readonly contract: ReadAddDeleteStorageCache<ContractKey, Contract>;
   readonly storageItem: ReadGetAllAddUpdateDeleteStorageCache<
@@ -114,9 +118,7 @@ interface Caches {
     StorageItem,
     StorageItemUpdate
   >;
-
   readonly validator: ReadAllAddUpdateDeleteStorageCache<ValidatorKey, Validator, ValidatorUpdate>;
-
   readonly invocationData: ReadAddStorageCache<InvocationDataKey, InvocationData>;
   readonly validatorsCount: ReadAddUpdateMetadataStorageCache<ValidatorsCount, ValidatorsCountUpdate>;
 }
@@ -135,8 +137,16 @@ interface OutputWithInput {
 export class WriteBatchBlockchain {
   public readonly settings: WriteBlockchain['settings'];
   public readonly account: ReadAllAddUpdateDeleteStorageCache<AccountKey, Account, AccountUpdate>;
-  public readonly accountUnspent: ReadAddDeleteStorageCache<AccountUnspentKey, AccountUnspent>;
-  public readonly accountUnclaimed: ReadAddDeleteStorageCache<AccountUnclaimedKey, AccountUnclaimed>;
+  public readonly accountUnspent: ReadGetAllAddDeleteStorageCache<
+    AccountUnspentKey,
+    AccountUnspentsKey,
+    AccountUnspent
+  >;
+  public readonly accountUnclaimed: ReadGetAllAddDeleteStorageCache<
+    AccountUnclaimedKey,
+    AccountUnclaimedsKey,
+    AccountUnclaimed
+  >;
   public readonly action: ReadGetAllAddStorageCache<ActionKey, ActionsKey, Action>;
   public readonly asset: ReadAddUpdateStorageCache<AssetKey, Asset, AssetUpdate>;
   public readonly block: BlockLikeStorageCache<Block>;
@@ -162,7 +172,7 @@ export class WriteBatchBlockchain {
   public readonly getValidators: WriteBlockchain['getValidators'];
   private readonly currentBlockInternal: WriteBlockchain['currentBlock'] | undefined;
   private readonly currentHeaderInternal: WriteBlockchain['currentHeader'] | undefined;
-  private readonly storage: Storage;
+  private mutableStorage: BlockchainStorage;
   private readonly vm: VM;
   private readonly caches: Caches;
 
@@ -170,96 +180,87 @@ export class WriteBatchBlockchain {
     this.settings = options.settings;
     this.currentBlockInternal = options.currentBlock;
     this.currentHeaderInternal = options.currentHeader;
-    this.storage = options.storage;
+    this.mutableStorage = options.storage;
     this.vm = options.vm;
     this.getValidators = options.getValidators;
 
-    const output = new OutputStorageCache(this.storage.output);
+    const output = new OutputStorageCache(() => this.storage.output);
     this.caches = {
       account: new ReadAllAddUpdateDeleteStorageCache({
         name: 'account',
-        readAllStorage: this.storage.account,
+        readAllStorage: () => this.storage.account,
         update: (value, update) => value.update(update),
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt160ToString(key.hash),
         createAddChange: (value) => ({ type: 'account', value }),
         createDeleteChange: (key) => ({ type: 'account', key }),
       }),
-
-      accountUnspent: new ReadAddDeleteStorageCache({
+      accountUnspent: new ReadGetAllAddDeleteStorageCache({
         name: 'accountUnspent',
-        readStorage: this.storage.accountUnspent,
+        readGetAllStorage: () => this.storage.accountUnspent,
         getKeyFromValue: (value) => ({ hash: value.hash, input: value.input }),
         getKeyString: (key) =>
           `${common.uInt160ToString(key.hash)}:${common.uInt256ToString(key.input.hash)}:${key.input.index}`,
+        matchesPartialKey: (value, key) => common.uInt160Equal(value.hash, key.hash),
         createAddChange: (value) => ({ type: 'accountUnspent', value }),
         createDeleteChange: (key) => ({ type: 'accountUnspent', key }),
       }),
-
-      accountUnclaimed: new ReadAddDeleteStorageCache({
+      accountUnclaimed: new ReadGetAllAddDeleteStorageCache({
         name: 'accountUnclaimed',
-        readStorage: this.storage.accountUnclaimed,
+        readGetAllStorage: () => this.storage.accountUnclaimed,
         getKeyFromValue: (value) => ({ hash: value.hash, input: value.input }),
         getKeyString: (key) =>
           `${common.uInt160ToString(key.hash)}:${common.uInt256ToString(key.input.hash)}:${key.input.index}`,
+        matchesPartialKey: (value, key) => common.uInt160Equal(value.hash, key.hash),
         createAddChange: (value) => ({ type: 'accountUnclaimed', value }),
         createDeleteChange: (key) => ({ type: 'accountUnclaimed', key }),
       }),
-
       action: new ReadGetAllAddStorageCache({
         name: 'action',
-        readGetAllStorage: this.storage.action,
+        readGetAllStorage: () => this.storage.action,
         getKeyFromValue: (value) => ({
           index: value.index,
         }),
-
         getKeyString: (key) => key.index.toString(10),
-        matchesPartialKey: (_value, _key) => {
-          throw new Error('Not implemented');
-        },
+        matchesPartialKey: (value, key) =>
+          (key.indexStart === undefined || value.index.gte(key.indexStart)) &&
+          (key.indexStop === undefined || value.index.lte(key.indexStop)),
         createAddChange: (value) => ({ type: 'action', value }),
       }),
-
       asset: new ReadAddUpdateStorageCache({
         name: 'asset',
-        readStorage: this.storage.asset,
+        readStorage: () => this.storage.asset,
         update: (value, update) => value.update(update),
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
         createAddChange: (value) => ({ type: 'asset', value }),
       }),
-
       block: new BlockLikeStorageCache({
         name: 'block',
-        readStorage: {
+        readStorage: () => ({
           get: this.storage.block.get,
           tryGet: this.storage.block.tryGet,
-        },
-
+        }),
         createAddChange: (value) => ({ type: 'block', value }),
       }),
-
       blockData: new ReadAddStorageCache({
         name: 'blockData',
-        readStorage: this.storage.blockData,
+        readStorage: () => this.storage.blockData,
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
         createAddChange: (value) => ({ type: 'blockData', value }),
       }),
-
       header: new BlockLikeStorageCache({
         name: 'header',
-        readStorage: {
+        readStorage: () => ({
           get: this.storage.header.get,
           tryGet: this.storage.header.tryGet,
-        },
-
+        }),
         createAddChange: (value) => ({ type: 'header', value }),
       }),
-
       transaction: new ReadAddStorageCache({
         name: 'transaction',
-        readStorage: this.storage.transaction,
+        readStorage: () => this.storage.transaction,
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
         createAddChange: (value) => ({ type: 'transaction', value }),
@@ -269,35 +270,31 @@ export class WriteBatchBlockchain {
           );
         },
       }),
-
       transactionData: new ReadAddUpdateStorageCache({
         name: 'transactionData',
-        readStorage: this.storage.transactionData,
+        readStorage: () => this.storage.transactionData,
         update: (value, update) => value.update(update),
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
         createAddChange: (value) => ({ type: 'transactionData', value }),
       }),
-
       output,
       contract: new ReadAddDeleteStorageCache({
         name: 'contract',
-        readStorage: this.storage.contract,
+        readStorage: () => this.storage.contract,
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt160ToString(key.hash),
         createAddChange: (value) => ({ type: 'contract', value }),
         createDeleteChange: (key) => ({ type: 'contract', key }),
       }),
-
       storageItem: new ReadGetAllAddUpdateDeleteStorageCache({
         name: 'storageItem',
-        readGetAllStorage: this.storage.storageItem,
+        readGetAllStorage: () => this.storage.storageItem,
         update: (value, update) => value.update(update),
         getKeyFromValue: (value) => ({
           hash: value.hash,
           key: value.key,
         }),
-
         getKeyString: (key) => `${common.uInt160ToString(key.hash)}:${key.key.toString('hex')}`,
         matchesPartialKey: (value, key) =>
           (key.hash === undefined || common.uInt160Equal(value.hash, key.hash)) &&
@@ -305,28 +302,25 @@ export class WriteBatchBlockchain {
         createAddChange: (value) => ({ type: 'storageItem', value }),
         createDeleteChange: (key) => ({ type: 'storageItem', key }),
       }),
-
       validator: new ReadAllAddUpdateDeleteStorageCache({
         name: 'validator',
-        readAllStorage: this.storage.validator,
+        readAllStorage: () => this.storage.validator,
         getKeyFromValue: (value) => ({ publicKey: value.publicKey }),
         getKeyString: (key) => common.ecPointToString(key.publicKey),
         createAddChange: (value) => ({ type: 'validator', value }),
         update: (value, update) => value.update(update),
         createDeleteChange: (key) => ({ type: 'validator', key }),
       }),
-
       invocationData: new ReadAddStorageCache({
         name: 'invocationData',
-        readStorage: this.storage.invocationData,
+        readStorage: () => this.storage.invocationData,
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
         createAddChange: (value) => ({ type: 'invocationData', value }),
       }),
-
       validatorsCount: new ReadAddUpdateMetadataStorageCache({
         name: 'validatorsCount',
-        readStorage: this.storage.validatorsCount,
+        readStorage: () => this.storage.validatorsCount,
         createAddChange: (value) => ({ type: 'validatorsCount', value }),
         update: (value, update) => value.update(update),
       }),
@@ -348,6 +342,14 @@ export class WriteBatchBlockchain {
     this.validator = this.caches.validator;
     this.invocationData = this.caches.invocationData;
     this.validatorsCount = this.caches.validatorsCount;
+  }
+
+  public get storage(): BlockchainStorage {
+    return this.mutableStorage;
+  }
+
+  public setStorage(storage: BlockchainStorage): void {
+    this.mutableStorage = storage;
   }
 
   public get currentBlock(): Block {
@@ -1077,7 +1079,7 @@ export class WriteBatchBlockchain {
 }
 
 /*
-     
+
      Possibly broken on TestNet:
      if (
        block.index !== 31331 && // Just seems like a bad script - unknown op
@@ -1113,5 +1115,5 @@ export class WriteBatchBlockchain {
        console.error(error);
        throw error;
      }
-     
+
      */

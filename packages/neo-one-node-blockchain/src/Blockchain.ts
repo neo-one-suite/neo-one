@@ -50,6 +50,7 @@ export interface CreateBlockchainOptions {
 }
 export interface BlockchainOptions extends CreateBlockchainOptions {
   readonly currentBlock: BlockchainType['currentBlock'] | undefined;
+  readonly previousBlock: BlockchainType['previousBlock'] | undefined;
   readonly currentHeader: BlockchainType['currentHeader'] | undefined;
 }
 
@@ -100,10 +101,15 @@ export class Blockchain {
       storage.block.tryGetLatest(),
       storage.header.tryGetLatest(),
     ]);
+    let previousBlock;
+    if (currentBlock !== undefined) {
+      previousBlock = await storage.block.tryGet({ hashOrIndex: currentBlock.index - 1 });
+    }
 
     const blockchain = new Blockchain({
       currentBlock,
       currentHeader,
+      previousBlock,
       settings,
       storage,
       vm,
@@ -124,40 +130,28 @@ export class Blockchain {
   public readonly deserializeWireContext: BlockchainType['deserializeWireContext'];
   public readonly serializeJSONContext: BlockchainType['serializeJSONContext'];
   public readonly feeContext: BlockchainType['feeContext'];
-  public readonly account: BlockchainType['account'];
-  public readonly accountUnclaimed: BlockchainType['accountUnclaimed'];
-  public readonly accountUnspent: BlockchainType['accountUnspent'];
-  public readonly action: BlockchainType['action'];
-  public readonly asset: BlockchainType['asset'];
-  public readonly block: BlockchainType['block'];
-  public readonly blockData: BlockchainType['blockData'];
-  public readonly header: BlockchainType['header'];
-  public readonly transaction: BlockchainType['transaction'];
-  public readonly transactionData: BlockchainType['transactionData'];
-  public readonly output: BlockchainType['output'];
-  public readonly contract: BlockchainType['contract'];
-  public readonly storageItem: BlockchainType['storageItem'];
-  public readonly validator: BlockchainType['validator'];
-  public readonly invocationData: BlockchainType['invocationData'];
-  public readonly validatorsCount: BlockchainType['validatorsCount'];
-  public readonly monitor: Monitor;
-  public readonly settings$: BehaviorSubject<Settings>;
-  public readonly storage: Storage;
-  public mutableCurrentBlock: BlockchainType['currentBlock'] | undefined;
-  public mutableCurrentHeader: BlockchainType['currentHeader'] | undefined;
-  public mutablePersistingBlocks = false;
-  public mutableBlockQueue: PriorityQueue<Entry> = new PriorityQueue({
+
+  private readonly monitor: Monitor;
+  private readonly settings$: BehaviorSubject<Settings>;
+  private readonly storage: Storage;
+  private mutableCurrentBlock: BlockchainType['currentBlock'] | undefined;
+  private mutablePreviousBlock: BlockchainType['currentBlock'] | undefined;
+  private mutableCurrentHeader: BlockchainType['currentHeader'] | undefined;
+  private mutablePersistingBlocks = false;
+  private mutableBlockQueue: PriorityQueue<Entry> = new PriorityQueue({
     comparator: (a, b) => a.block.index - b.block.index,
   });
-  public mutableInQueue: Set<number> = new Set();
-  public readonly vm: VM;
-  public mutableRunning = false;
-  public mutableDoneRunningResolve: (() => void) | undefined;
-  public mutableBlock$: Subject<Block> = new Subject();
+  private mutableInQueue: Set<string> = new Set();
+  private readonly vm: VM;
+  private mutableRunning = false;
+  private mutableDoneRunningResolve: (() => void) | undefined;
+  private mutableBlock$: Subject<Block> = new Subject();
+  private mutableWriteBlockchain: WriteBatchBlockchain | undefined;
 
   public constructor(options: BlockchainOptions) {
     this.storage = options.storage;
     this.mutableCurrentBlock = options.currentBlock;
+    this.mutablePreviousBlock = options.previousBlock;
     this.mutableCurrentHeader = options.currentHeader;
     this.vm = options.vm;
 
@@ -165,53 +159,171 @@ export class Blockchain {
     this.monitor = options.monitor.at(NAMESPACE);
     NEO_BLOCKCHAIN_BLOCK_INDEX_GAUGE.set(this.currentBlockIndex);
     NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE.set(this.currentBlockIndex);
-    this.account = this.storage.account;
-    this.accountUnclaimed = this.storage.accountUnclaimed;
-    this.accountUnspent = this.storage.accountUnspent;
-    this.action = this.storage.action;
-    this.asset = this.storage.asset;
-    this.block = {
-      get: this.storage.block.get,
-      tryGet: this.storage.block.tryGet,
-    };
 
-    this.blockData = this.storage.blockData;
-    this.header = {
-      get: this.storage.header.get,
-      tryGet: this.storage.header.tryGet,
-    };
-
-    this.transaction = this.storage.transaction;
-    this.transactionData = this.storage.transactionData;
-    this.output = this.storage.output;
-    this.contract = this.storage.contract;
-    this.storageItem = this.storage.storageItem;
-    this.validator = this.storage.validator;
-    this.invocationData = this.storage.invocationData;
-    this.validatorsCount = this.storage.validatorsCount;
-
+    // tslint:disable-next-line no-this-assignment
+    const self = this;
     this.deserializeWireContext = {
-      messageMagic: this.settings.messageMagic,
+      get messageMagic() {
+        return self.settings.messageMagic;
+      },
     };
 
     this.feeContext = {
-      getOutput: this.output.get,
-      governingToken: this.settings.governingToken,
-      utilityToken: this.settings.utilityToken,
-      fees: this.settings.fees,
-      registerValidatorFee: this.settings.registerValidatorFee,
+      get getOutput() {
+        return self.output.get;
+      },
+      get governingToken() {
+        return self.settings.governingToken;
+      },
+      get utilityToken() {
+        return self.settings.utilityToken;
+      },
+      get fees() {
+        return self.settings.fees;
+      },
+      get registerValidatorFee() {
+        return self.settings.registerValidatorFee;
+      },
     };
 
     this.serializeJSONContext = {
-      addressVersion: this.settings.addressVersion,
-      feeContext: this.feeContext,
-      tryGetInvocationData: this.tryGetInvocationData,
-      tryGetTransactionData: this.tryGetTransactionData,
-      getUnclaimed: this.getUnclaimed,
-      getUnspent: this.getUnspent,
+      get addressVersion() {
+        return self.settings.addressVersion;
+      },
+      get feeContext() {
+        return self.feeContext;
+      },
+      get tryGetInvocationData() {
+        return self.tryGetInvocationData;
+      },
+      get tryGetTransactionData() {
+        return self.tryGetTransactionData;
+      },
+      get getUnclaimed() {
+        return self.getUnclaimed;
+      },
+      get getUnspent() {
+        return self.getUnspent;
+      },
     };
 
+    this.mutableWriteBlockchain = this.createWriteBlockchain();
+
     this.start();
+  }
+
+  public get settings(): Settings {
+    return this.settings$.getValue();
+  }
+
+  public get currentBlock(): Block {
+    if (this.mutableCurrentBlock === undefined) {
+      throw new GenesisBlockNotRegisteredError();
+    }
+
+    return this.mutableCurrentBlock;
+  }
+
+  public get previousBlock(): Block | undefined {
+    return this.mutablePreviousBlock;
+  }
+
+  public get currentHeader(): Header {
+    if (this.mutableCurrentHeader === undefined) {
+      throw new GenesisBlockNotRegisteredError();
+    }
+
+    return this.mutableCurrentHeader;
+  }
+
+  public get currentBlockIndex(): number {
+    return this.mutableCurrentBlock === undefined ? -1 : this.currentBlock.index;
+  }
+
+  public get block$(): Observable<Block> {
+    return this.mutableBlock$;
+  }
+
+  public get isPersistingBlock(): boolean {
+    return this.mutablePersistingBlocks;
+  }
+
+  public get account(): BlockchainType['account'] {
+    return this.mutableWriteBlockchain === undefined ? this.storage.account : this.mutableWriteBlockchain.account;
+  }
+
+  public get accountUnclaimed(): BlockchainType['accountUnclaimed'] {
+    return this.mutableWriteBlockchain === undefined
+      ? this.storage.accountUnclaimed
+      : this.mutableWriteBlockchain.accountUnclaimed;
+  }
+
+  public get accountUnspent(): BlockchainType['accountUnspent'] {
+    return this.mutableWriteBlockchain === undefined
+      ? this.storage.accountUnspent
+      : this.mutableWriteBlockchain.accountUnspent;
+  }
+
+  public get action(): BlockchainType['action'] {
+    return this.mutableWriteBlockchain === undefined ? this.storage.action : this.mutableWriteBlockchain.action;
+  }
+
+  public get asset(): BlockchainType['asset'] {
+    return this.mutableWriteBlockchain === undefined ? this.storage.asset : this.mutableWriteBlockchain.asset;
+  }
+
+  public get block(): BlockchainType['block'] {
+    return this.mutableWriteBlockchain === undefined ? this.storage.block : this.mutableWriteBlockchain.block;
+  }
+
+  public get blockData(): BlockchainType['blockData'] {
+    return this.mutableWriteBlockchain === undefined ? this.storage.blockData : this.mutableWriteBlockchain.blockData;
+  }
+
+  public get header(): BlockchainType['header'] {
+    return this.mutableWriteBlockchain === undefined ? this.storage.header : this.mutableWriteBlockchain.header;
+  }
+
+  public get transaction(): BlockchainType['transaction'] {
+    return this.mutableWriteBlockchain === undefined
+      ? this.storage.transaction
+      : this.mutableWriteBlockchain.transaction;
+  }
+
+  public get transactionData(): BlockchainType['transactionData'] {
+    return this.mutableWriteBlockchain === undefined
+      ? this.storage.transactionData
+      : this.mutableWriteBlockchain.transactionData;
+  }
+
+  public get output(): BlockchainType['output'] {
+    return this.mutableWriteBlockchain === undefined ? this.storage.output : this.mutableWriteBlockchain.output;
+  }
+
+  public get contract(): BlockchainType['contract'] {
+    return this.mutableWriteBlockchain === undefined ? this.storage.contract : this.mutableWriteBlockchain.contract;
+  }
+
+  public get storageItem(): BlockchainType['storageItem'] {
+    return this.mutableWriteBlockchain === undefined
+      ? this.storage.storageItem
+      : this.mutableWriteBlockchain.storageItem;
+  }
+
+  public get validator(): BlockchainType['validator'] {
+    return this.mutableWriteBlockchain === undefined ? this.storage.validator : this.mutableWriteBlockchain.validator;
+  }
+
+  public get invocationData(): BlockchainType['invocationData'] {
+    return this.mutableWriteBlockchain === undefined
+      ? this.storage.invocationData
+      : this.mutableWriteBlockchain.invocationData;
+  }
+
+  public get validatorsCount(): BlockchainType['validatorsCount'] {
+    return this.mutableWriteBlockchain === undefined
+      ? this.storage.validatorsCount
+      : this.mutableWriteBlockchain.validatorsCount;
   }
 
   public async stop(): Promise<void> {
@@ -235,38 +347,6 @@ export class Blockchain {
     this.monitor.log({ name: 'neo_blockchain_stop' });
   }
 
-  public get currentBlock(): Block {
-    if (this.mutableCurrentBlock === undefined) {
-      throw new GenesisBlockNotRegisteredError();
-    }
-
-    return this.mutableCurrentBlock;
-  }
-
-  public get currentHeader(): Header {
-    if (this.mutableCurrentHeader === undefined) {
-      throw new GenesisBlockNotRegisteredError();
-    }
-
-    return this.mutableCurrentHeader;
-  }
-
-  public get currentBlockIndex(): number {
-    return this.mutableCurrentBlock === undefined ? -1 : this.currentBlock.index;
-  }
-
-  public get isPersistingBlock(): boolean {
-    return this.mutablePersistingBlocks;
-  }
-
-  public get settings(): Settings {
-    return this.settings$.getValue();
-  }
-
-  public get block$(): Observable<Block> {
-    return this.mutableBlock$;
-  }
-
   public updateSettings(settings: Settings): void {
     this.settings$.next(settings);
   }
@@ -282,10 +362,10 @@ export class Blockchain {
   }): Promise<void> {
     // tslint:disable-next-line promise-must-complete
     return new Promise<void>((resolve, reject) => {
-      if (this.mutableInQueue.has(block.index)) {
+      if (this.mutableInQueue.has(block.hashHex)) {
         return;
       }
-      this.mutableInQueue.add(block.index);
+      this.mutableInQueue.add(block.hashHex);
 
       this.mutableBlockQueue.queue({
         monitor: this.getMonitor(monitor),
@@ -426,6 +506,9 @@ export class Blockchain {
     await this.storage.reset();
     this.mutableCurrentHeader = undefined;
     this.mutableCurrentBlock = undefined;
+    this.mutablePreviousBlock = undefined;
+    this.mutableWriteBlockchain = undefined;
+    this.mutableWriteBlockchain = this.createWriteBlockchain();
     this.start();
     await this.persistHeaders([this.settings.genesisBlock.header]);
     await this.persistBlock({ block: this.settings.genesisBlock });
@@ -470,11 +553,11 @@ export class Blockchain {
           decrementInterval: this.settings.decrementInterval,
           generationAmount: this.settings.generationAmount,
           getSystemFee: async (index) => {
-            const header = await this.storage.header.get({
+            const header = await this.header.get({
               hashOrIndex: index,
             });
 
-            const blockData = await this.storage.blockData.get({
+            const blockData = await this.blockData.get({
               hash: header.hash,
             });
 
@@ -498,10 +581,34 @@ export class Blockchain {
     try {
       this.cleanBlockQueue();
       entry = this.peekBlockQueue();
+
+      const isForkedBlock =
+        entry !== undefined &&
+        entry.block.index === this.currentBlockIndex &&
+        this.mutableCurrentBlock !== undefined &&
+        !common.uInt256Equal(entry.block.hash, this.mutableCurrentBlock.hash);
       // tslint:disable-next-line no-loop-statement
-      while (this.mutableRunning && entry !== undefined && entry.block.index === this.currentBlockIndex + 1) {
+      while (
+        this.mutableRunning &&
+        entry !== undefined &&
+        ((entry.block.index === this.currentBlockIndex + 1 &&
+          (this.mutableCurrentBlock === undefined ||
+            common.uInt256Equal(entry.block.previousHash, this.mutableCurrentBlock.hash))) ||
+          isForkedBlock)
+      ) {
         entry = this.mutableBlockQueue.dequeue();
         const entryNonNull = entry;
+        if (isForkedBlock) {
+          [this.mutableCurrentBlock, this.mutablePreviousBlock] = await Promise.all([
+            this.block.tryGet({ hashOrIndex: entryNonNull.block.index - 1 }),
+            this.block.tryGet({ hashOrIndex: entryNonNull.block.index - 2 }),
+          ]);
+          this.mutableCurrentHeader =
+            this.mutableCurrentBlock === undefined ? undefined : this.mutableCurrentBlock.header;
+          this.mutableWriteBlockchain = undefined;
+          this.mutableWriteBlockchain = this.createWriteBlockchain();
+        }
+
         await entry.monitor
           .withData({ [labels.NEO_BLOCK_INDEX]: entry.block.index })
           .captureSpanLog(async (span) => this.persistBlockInternal(span, entryNonNull.block, entryNonNull.unsafe), {
@@ -540,9 +647,15 @@ export class Blockchain {
     let entry = this.peekBlockQueue();
     // tslint:disable-next-line no-loop-statement
     while (entry !== undefined && entry.block.index <= this.currentBlockIndex) {
-      this.mutableBlockQueue.dequeue();
-      entry.resolve();
-      entry = this.peekBlockQueue();
+      if (
+        entry.block.index !== this.currentBlockIndex ||
+        this.mutableCurrentBlock === undefined ||
+        common.uInt256Equal(entry.block.hash, this.mutableCurrentBlock.hash)
+      ) {
+        this.mutableBlockQueue.dequeue();
+        entry.resolve();
+        entry = this.peekBlockQueue();
+      }
     }
   }
 
@@ -596,7 +709,7 @@ export class Blockchain {
   private readonly tryGetInvocationData = async (
     transaction: InvocationTransaction,
   ): Promise<SerializableInvocationData | undefined> => {
-    const data = await this.storage.invocationData.tryGet({
+    const data = await this.invocationData.tryGet({
       hash: transaction.hash,
     });
 
@@ -605,13 +718,11 @@ export class Blockchain {
     }
 
     const [asset, contracts, actions] = await Promise.all([
-      data.assetHash === undefined ? Promise.resolve(undefined) : this.storage.asset.get({ hash: data.assetHash }),
-      Promise.all(
-        data.contractHashes.map(async (contractHash) => this.storage.contract.tryGet({ hash: contractHash })),
-      ),
+      data.assetHash === undefined ? Promise.resolve(undefined) : this.asset.get({ hash: data.assetHash }),
+      Promise.all(data.contractHashes.map(async (contractHash) => this.contract.tryGet({ hash: contractHash }))),
       data.actionIndexStart.eq(data.actionIndexStop)
         ? Promise.resolve([])
-        : this.storage.action
+        : this.action
             .getAll$({
               indexStart: data.actionIndexStart,
               indexStop: data.actionIndexStop.sub(utils.ONE),
@@ -633,13 +744,13 @@ export class Blockchain {
   private readonly tryGetTransactionData = async (transaction: TransactionBase): Promise<TransactionData | undefined> =>
     this.transactionData.tryGet({ hash: transaction.hash });
   private readonly getUnclaimed = async (hash: UInt160): Promise<ReadonlyArray<Input>> =>
-    this.storage.accountUnclaimed
+    this.accountUnclaimed
       .getAll$({ hash })
       .pipe(toArray())
       .toPromise()
       .then((values) => values.map((value) => value.input));
   private readonly getUnspent = async (hash: UInt160): Promise<ReadonlyArray<Input>> => {
-    const unspent = await this.storage.accountUnspent
+    const unspent = await this.accountUnspent
       .getAll$({ hash })
       .pipe(toArray())
       .toPromise();
@@ -774,10 +885,17 @@ export class Blockchain {
 
     await blockchain.persistBlock(monitor, block);
 
-    await monitor.captureSpan(async () => this.storage.commit(blockchain.getChangeSet()), {
+    const writeBlockchain = this.mutableWriteBlockchain;
+    if (writeBlockchain === undefined) {
+      throw new Error('Something went wrong');
+    }
+    await monitor.captureSpan(async () => this.storage.commit(writeBlockchain.getChangeSet()), {
       name: 'neo_blockchain_persist_block_commit_storage',
     });
 
+    blockchain.setStorage(this.storage);
+    this.mutableWriteBlockchain = blockchain;
+    this.mutablePreviousBlock = this.mutableCurrentBlock;
     this.mutableCurrentBlock = block;
     this.mutableCurrentHeader = block.header;
   }
@@ -787,7 +905,7 @@ export class Blockchain {
       settings: this.settings,
       currentBlock: this.mutableCurrentBlock,
       currentHeader: this.mutableCurrentHeader,
-      storage: this.storage,
+      storage: this.mutableWriteBlockchain === undefined ? this.storage : this.mutableWriteBlockchain,
       vm: this.vm,
       getValidators: this.getValidators,
     });

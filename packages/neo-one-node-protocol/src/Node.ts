@@ -150,7 +150,8 @@ export class Node implements INode {
   private mutableConsensus: Consensus | undefined;
   private readonly requestBlocks = _.debounce(() => {
     const peer = this.mutableBestPeer;
-    const block = this.blockchain.currentBlock;
+    const previousBlock = this.blockchain.previousBlock;
+    const block = previousBlock === undefined ? this.blockchain.currentBlock : previousBlock;
     if (peer !== undefined && block.index < peer.data.startHeight) {
       if (this.mutableGetBlocksRequestsCount > GET_BLOCKS_CLOSE_COUNT) {
         this.mutableBestPeer = this.findBestPeer(peer);
@@ -740,7 +741,7 @@ export class Node implements INode {
   }
 
   private async persistBlock(block: Block, monitor: Monitor = this.monitor): Promise<void> {
-    if (this.blockchain.currentBlockIndex >= block.index || this.tempKnownBlockHashes.has(block.hashHex)) {
+    if (this.blockchain.currentBlockIndex > block.index || this.tempKnownBlockHashes.has(block.hashHex)) {
       return;
     }
 

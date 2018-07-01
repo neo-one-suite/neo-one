@@ -24,7 +24,7 @@ function createGet<Key, Value>({
 }: {
   // tslint:disable-next-line no-any
   readonly tryGetTracked: ((key: Key) => TrackedChange<Key, any, Value> | undefined);
-  readonly readStorage: ReadStorage<Key, Value>;
+  readonly readStorage: () => ReadStorage<Key, Value>;
 }): GetFunc<Key, Value> {
   return async (key: Key): Promise<Value> => {
     const trackedChange = tryGetTracked(key);
@@ -36,7 +36,7 @@ function createGet<Key, Value>({
       return trackedChange.value;
     }
 
-    return readStorage.get(key);
+    return readStorage().get(key);
   };
 }
 
@@ -46,7 +46,7 @@ function createTryGet<Key, Value>({
 }: {
   // tslint:disable-next-line no-any
   readonly tryGetTracked: ((key: Key) => TrackedChange<Key, any, Value> | undefined);
-  readonly readStorage: ReadStorage<Key, Value>;
+  readonly readStorage: () => ReadStorage<Key, Value>;
 }): TryGetFunc<Key, Value> {
   return async (key: Key): Promise<Value | undefined> => {
     const trackedChange = tryGetTracked(key);
@@ -58,12 +58,12 @@ function createTryGet<Key, Value>({
       return trackedChange.value;
     }
 
-    return readStorage.tryGet(key);
+    return readStorage().tryGet(key);
   };
 }
 
 interface BaseReadStorageCacheOptions<Key, AddValue, Value> {
-  readonly readStorage: ReadStorage<Key, Value>;
+  readonly readStorage: () => ReadStorage<Key, Value>;
   readonly name: string;
   readonly createAddChange: ((value: AddValue) => AddChange);
   readonly createDeleteChange?: ((key: Key) => DeleteChange);
@@ -77,7 +77,7 @@ export class BaseReadStorageCache<Key, AddValue, Value> {
   public readonly name: string;
   // tslint:disable-next-line readonly-keyword
   public readonly mutableValues: { [key: string]: TrackedChange<Key, AddValue, Value> };
-  protected readonly readStorage: ReadStorage<Key, Value>;
+  protected readonly readStorage: () => ReadStorage<Key, Value>;
   protected readonly createAddChange: ((value: AddValue) => AddChange);
   protected readonly createDeleteChange: ((key: Key) => DeleteChange) | undefined;
 
@@ -146,7 +146,7 @@ class ReadStorageCache<Key, AddValue, Value> extends BaseReadStorageCache<Key, A
 }
 
 interface ReadAllStorageCacheOptions<Key, Value> {
-  readonly readAllStorage: ReadAllStorage<Key, Value>;
+  readonly readAllStorage: () => ReadAllStorage<Key, Value>;
   readonly name: string;
   readonly createAddChange: ((value: Value) => AddChange);
   readonly createDeleteChange?: ((key: Key) => DeleteChange);
@@ -157,16 +157,15 @@ interface ReadAllStorageCacheOptions<Key, Value> {
 
 class ReadAllStorageCache<Key, Value> extends ReadStorageCache<Key, Value, Value> {
   public readonly all$: Observable<Value>;
-  protected readonly readAllStorage: ReadAllStorage<Key, Value>;
+  protected readonly readAllStorage: () => ReadAllStorage<Key, Value>;
   protected readonly getKeyFromValue: ((value: Value) => Key);
 
   public constructor(options: ReadAllStorageCacheOptions<Key, Value>) {
     super({
-      readStorage: {
-        get: options.readAllStorage.get,
-        tryGet: options.readAllStorage.tryGet,
-      },
-
+      readStorage: () => ({
+        get: options.readAllStorage().get,
+        tryGet: options.readAllStorage().tryGet,
+      }),
       name: options.name,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
@@ -178,16 +177,18 @@ class ReadAllStorageCache<Key, Value> extends ReadStorageCache<Key, Value, Value
     this.getKeyFromValue = options.getKeyFromValue;
 
     this.all$ = concat(
-      this.readAllStorage.all$.pipe(
-        concatMap((value) => {
-          const trackedChange = this.tryGetTracked(this.getKeyFromValue(value));
+      defer(() =>
+        this.readAllStorage().all$.pipe(
+          concatMap((value) => {
+            const trackedChange = this.tryGetTracked(this.getKeyFromValue(value));
 
-          if (trackedChange !== undefined) {
-            return EMPTY;
-          }
+            if (trackedChange !== undefined) {
+              return EMPTY;
+            }
 
-          return _of(value);
-        }),
+            return _of(value);
+          }),
+        ),
       ),
       defer(() =>
         _of(
@@ -201,7 +202,7 @@ class ReadAllStorageCache<Key, Value> extends ReadStorageCache<Key, Value, Value
 }
 
 interface ReadGetAllStorageCacheOptions<Key, PartialKey, Value> {
-  readonly readGetAllStorage: ReadGetAllStorage<Key, PartialKey, Value>;
+  readonly readGetAllStorage: () => ReadGetAllStorage<Key, PartialKey, Value>;
   readonly name: string;
   readonly createAddChange: ((value: Value) => AddChange);
   readonly createDeleteChange?: ((key: Key) => DeleteChange);
@@ -213,17 +214,16 @@ interface ReadGetAllStorageCacheOptions<Key, PartialKey, Value> {
 
 class ReadGetAllStorageCache<Key, PartialKey, Value> extends ReadStorageCache<Key, Value, Value> {
   public readonly getAll$: ((key: PartialKey) => Observable<Value>);
-  protected readonly readGetAllStorage: ReadGetAllStorage<Key, PartialKey, Value>;
+  protected readonly readGetAllStorage: () => ReadGetAllStorage<Key, PartialKey, Value>;
   protected readonly getKeyFromValue: ((value: Value) => Key);
   protected readonly matchesPartialKey: ((value: Value, key: PartialKey) => boolean);
 
   public constructor(options: ReadGetAllStorageCacheOptions<Key, PartialKey, Value>) {
     super({
-      readStorage: {
-        get: options.readGetAllStorage.get,
-        tryGet: options.readGetAllStorage.tryGet,
-      },
-
+      readStorage: () => ({
+        get: options.readGetAllStorage().get,
+        tryGet: options.readGetAllStorage().tryGet,
+      }),
       name: options.name,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
@@ -237,16 +237,20 @@ class ReadGetAllStorageCache<Key, PartialKey, Value> extends ReadStorageCache<Ke
 
     this.getAll$ = (key: PartialKey): Observable<Value> =>
       concat(
-        this.readGetAllStorage.getAll$(key).pipe(
-          concatMap((value) => {
-            const trackedChange = this.tryGetTracked(this.getKeyFromValue(value));
+        defer(() =>
+          this.readGetAllStorage()
+            .getAll$(key)
+            .pipe(
+              concatMap((value) => {
+                const trackedChange = this.tryGetTracked(this.getKeyFromValue(value));
 
-            if (trackedChange !== undefined) {
-              return EMPTY;
-            }
+                if (trackedChange !== undefined) {
+                  return EMPTY;
+                }
 
-            return _of(value);
-          }),
+                return _of(value);
+              }),
+            ),
         ),
         defer(() =>
           _of(
@@ -451,6 +455,41 @@ export class ReadAddStorageCache<Key, Value> extends ReadStorageCache<Key, Value
   }
 }
 
+interface ReadGetAllAddDeleteStorageCacheOptions<Key, PartialKey, Value>
+  extends ReadGetAllStorageCacheOptions<Key, PartialKey, Value> {
+  readonly getKeyFromValue: ((value: Value) => Key);
+}
+
+export class ReadGetAllAddDeleteStorageCache<Key, PartialKey, Value> extends ReadGetAllStorageCache<
+  Key,
+  PartialKey,
+  Value
+> {
+  public readonly add: AddFunc<Value>;
+  public readonly delete: DeleteFunc<Key>;
+
+  public constructor(options: ReadGetAllAddDeleteStorageCacheOptions<Key, PartialKey, Value>) {
+    super({
+      readGetAllStorage: options.readGetAllStorage,
+      name: options.name,
+      getKeyString: options.getKeyString,
+      createAddChange: options.createAddChange,
+      createDeleteChange: options.createDeleteChange,
+      onAdd: options.onAdd,
+      getKeyFromValue: options.getKeyFromValue,
+      matchesPartialKey: options.matchesPartialKey,
+    });
+
+    this.add = createAdd({
+      cache: this,
+      getKeyFromValue: options.getKeyFromValue,
+      getKeyString: options.getKeyString,
+    });
+
+    this.delete = createDelete({ cache: this });
+  }
+}
+
 interface ReadGetAllAddUpdateDeleteStorageCacheOptions<Key, PartialKey, Value, Update>
   extends ReadGetAllStorageCacheOptions<Key, PartialKey, Value> {
   readonly update: ((value: Value, update: Update) => Value);
@@ -644,7 +683,7 @@ const getOutputValueKeyString = (key: OutputKey): string => `${common.uInt256ToH
 export class OutputStorageCache extends ReadStorageCache<OutputKey, OutputValue, Output> {
   public readonly add: AddFunc<OutputValue>;
 
-  public constructor(readStorage: ReadStorage<OutputKey, Output>) {
+  public constructor(readStorage: () => ReadStorage<OutputKey, Output>) {
     super({
       readStorage,
       name: 'output',
@@ -684,7 +723,7 @@ function createGetMetadata<Key, Value>({
 }: {
   // tslint:disable-next-line no-any
   readonly tryGetTracked: (() => TrackedMetadataChange<any, Value> | undefined);
-  readonly readStorage: ReadMetadataStorage<Value>;
+  readonly readStorage: () => ReadMetadataStorage<Value>;
 }): GetFunc<Key, Value> {
   return async (): Promise<Value> => {
     const trackedChange = tryGetTracked();
@@ -696,7 +735,7 @@ function createGetMetadata<Key, Value>({
       return trackedChange.value;
     }
 
-    return readStorage.get();
+    return readStorage().get();
   };
 }
 
@@ -706,7 +745,7 @@ function createTryGetMetadata<Value>({
 }: {
   // tslint:disable-next-line no-any
   readonly tryGetTracked: (() => TrackedMetadataChange<any, Value> | undefined);
-  readonly readStorage: ReadMetadataStorage<Value>;
+  readonly readStorage: () => ReadMetadataStorage<Value>;
 }): TryGetMetadataFunc<Value> {
   return async (): Promise<Value | undefined> => {
     const trackedChange = tryGetTracked();
@@ -718,12 +757,12 @@ function createTryGetMetadata<Value>({
       return trackedChange.value;
     }
 
-    return readStorage.tryGet();
+    return readStorage().tryGet();
   };
 }
 
 interface BaseReadMetadataStorageCacheOptions<AddValue, Value> {
-  readonly readStorage: ReadMetadataStorage<Value>;
+  readonly readStorage: () => ReadMetadataStorage<Value>;
   readonly name: string;
   readonly createAddChange: ((value: AddValue) => AddChange);
   readonly createDeleteChange?: (() => DeleteChange);
@@ -735,7 +774,7 @@ export class BaseReadMetadataStorageCache<AddValue, Value> {
   public readonly tryGet: TryGetMetadataFunc<Value>;
   public mutableValue: TrackedMetadataChange<AddValue, Value> | undefined;
   public readonly onAdd: ((value: AddValue) => Promise<void>) | undefined;
-  protected readonly readStorage: ReadMetadataStorage<Value>;
+  protected readonly readStorage: () => ReadMetadataStorage<Value>;
   protected readonly name: string;
   protected readonly createAddChange: ((value: AddValue) => AddChange);
   protected readonly createDeleteChange: (() => DeleteChange) | undefined;

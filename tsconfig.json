@@ -36,15 +36,6 @@
         "../@types/*"
       ]
     },
-    "plugins": [
-      {
-        "name": "tslint-language-service",
-        "alwaysShowRuleFailuresAsWarnings": false,
-        "ignoreDefinitionFiles": true,
-        "disableNoUnusedVariableRule": true,
-        "supressWhileTypeErrorsPresent": false
-      }
-    ],
     "pretty": true,
     "skipLibCheck": true,
     "strict": true,
