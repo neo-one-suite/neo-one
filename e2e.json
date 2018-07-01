@@ -6,12 +6,12 @@
     }
   },
   "moduleFileExtensions": [
-    "ts",
-    "tsx",
     "js",
     "jsx",
     "json",
-    "node"
+    "node",
+    "ts",
+    "tsx"
   ],
   "testEnvironment": "./scripts/e2e/Environment",
   "testPathIgnorePatterns": [
@@ -30,7 +30,7 @@
     "^.+\\.tsx?$": "ts-jest"
   },
   "transformIgnorePatterns": [
-    "<rootDir>/node_modules/(?!ix)",
+    "<rootDir>/node_modules/",
     "<rootDir>/packages/.*/dist/.*"
   ],
   "testRegex": "(/__e2e__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$"
