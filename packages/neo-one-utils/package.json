@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/utils",
-  "version": "1.0.0-alpha.40",
+  "version": "1.0.0-alpha.41",
   "keywords": [
     "neo",
     "NEO",
@@ -35,7 +35,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0-alpha.35",
+    "@neo-one/monitor": "^1.0.0-alpha.36",
     "lodash": "^4.17.10",
     "rxjs": "^6.2.1"
   }
