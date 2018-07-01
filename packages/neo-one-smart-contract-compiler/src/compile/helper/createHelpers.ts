@@ -79,6 +79,7 @@ import {
   AddBooleanObjectHelper,
   AddBufferObjectHelper,
   AddErrorObjectHelper,
+  AddMapObjectHelper,
   AddModulesHelper,
   AddNumberObjectHelper,
   AddObjectObjectHelper,
@@ -92,6 +93,7 @@ import {
 } from './global';
 import { Helper } from './Helper';
 import { KeyedHelper } from './KeyedHelper';
+import { CreateMapHelper, GetMapValueHelper, SetMapValueHelper, UnwrapMapHelper, WrapMapHelper } from './map';
 import {
   AddEmptyModuleHelper,
   ExportHelper,
@@ -284,6 +286,12 @@ export interface Helpers {
   readonly wrapArray: WrapArrayHelper;
   readonly unwrapArray: UnwrapArrayHelper;
 
+  readonly getMapValue: GetMapValueHelper;
+  readonly createMap: CreateMapHelper;
+  readonly setMapValue: SetMapValueHelper;
+  readonly wrapMap: WrapMapHelper;
+  readonly unwrapMap: UnwrapMapHelper;
+
   readonly createBuffer: CreateBufferHelper;
   readonly getBufferValue: GetBufferValueHelper;
   readonly setBufferValue: SetBufferValueHelper;
@@ -306,6 +314,7 @@ export interface Helpers {
   readonly addBooleanObject: AddBooleanObjectHelper;
   readonly addBufferObject: AddBufferObjectHelper;
   readonly addErrorObject: AddErrorObjectHelper;
+  readonly addMapObject: AddMapObjectHelper;
   readonly addModules: AddModulesHelper;
   readonly addNumberObject: AddNumberObjectHelper;
   readonly addObjectObject: AddObjectObjectHelper;
@@ -437,6 +446,12 @@ export const createHelpers = (): Helpers => {
     wrapArray: new WrapArrayHelper(),
     unwrapArray: new UnwrapArrayHelper(),
 
+    getMapValue: new GetMapValueHelper(),
+    createMap: new CreateMapHelper(),
+    setMapValue: new SetMapValueHelper(),
+    wrapMap: new WrapMapHelper(),
+    unwrapMap: new UnwrapMapHelper(),
+
     createBuffer: new CreateBufferHelper(),
     getBufferValue: new GetBufferValueHelper(),
     setBufferValue: new SetBufferValueHelper(),
@@ -459,6 +474,7 @@ export const createHelpers = (): Helpers => {
     addBooleanObject: new AddBooleanObjectHelper(),
     addBufferObject: new AddBufferObjectHelper(),
     addErrorObject: new AddErrorObjectHelper(),
+    addMapObject: new AddMapObjectHelper(),
     addModules: new AddModulesHelper(),
     addNumberObject: new AddNumberObjectHelper(),
     addObjectObject: new AddObjectObjectHelper(),

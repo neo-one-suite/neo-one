@@ -4,6 +4,7 @@ export * from './AddArrayObjectHelper';
 export * from './AddBufferObjectHelper';
 export * from './AddBooleanObjectHelper';
 export * from './AddErrorObjectHelper';
+export * from './AddMapObjectHelper';
 export * from './AddModulesHelper';
 export * from './AddNumberObjectHelper';
 export * from './AddObjectObjectHelper';

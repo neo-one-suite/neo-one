@@ -21,6 +21,7 @@ describe('exported api', () => {
     'publicKeyToAddress',
     'scriptHashToAddress',
     'addressToScriptHash',
+    'assets',
     'wifToPrivateKey',
     'privateKeyToWIF',
     'privateKeyToScriptHash',

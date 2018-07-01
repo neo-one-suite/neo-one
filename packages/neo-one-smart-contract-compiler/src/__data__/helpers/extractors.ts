@@ -1,9 +1,12 @@
 import { ContractParameter, ContractParameterType, InvocationResult, VMState } from '@neo-one/client-core';
 import { BN } from 'bn.js';
+import { RawSourceMap } from 'source-map';
+import { processError } from '@neo-one/client-switch';
 
-export const checkResult = (result: InvocationResult) => {
+export const checkResult = async (result: InvocationResult, sourceMap: RawSourceMap) => {
   if (result.state === VMState.Fault) {
-    throw new Error(`Error in execution: ${result.message}`);
+    const message = await processError({ message: result.message, sourceMap });
+    throw new Error(`Error in execution: ${message}`);
   }
 };
 

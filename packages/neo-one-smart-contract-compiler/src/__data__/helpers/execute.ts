@@ -11,8 +11,8 @@ import { getMonitor } from './getMonitor';
 
 const execute = async (ast: Ast, sourceFile: SourceFile, prelude?: Buffer) => {
   const monitor = getMonitor();
-  const result = await executeScript(monitor, ast, sourceFile, prelude);
-  checkResult(result);
+  const { result, sourceMap } = await executeScript(monitor, ast, sourceFile, prelude);
+  await checkResult(result, sourceMap);
   return result;
 };
 
