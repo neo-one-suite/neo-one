@@ -26,9 +26,9 @@ import {
 import { finalize, labels, neverComplete, utils as commonUtils } from '@neo-one/utils';
 import { ScalingBloem } from 'bloem';
 import BloomFilter from 'bloom-filter';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Address6 } from 'ip-address';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import LRU from 'lru-cache';
 import { defer, EMPTY, merge, Observable, timer } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';

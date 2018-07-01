@@ -1,5 +1,5 @@
 import { Endpoint, getEndpointConfig } from '@neo-one/node-core';
-import net from 'net';
+import * as net from 'net';
 import { Duplex } from 'stream';
 import { SocketTimeoutError } from './errors';
 import { Peer } from './Peer';

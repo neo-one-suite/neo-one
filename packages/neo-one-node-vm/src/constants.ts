@@ -1,7 +1,7 @@
 import { Block, common, OpCode, ScriptContainer, SysCallName, UInt160, VMState } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { ExecutionAction, TriggerType, VMListeners, WriteBlockchain } from '@neo-one/node-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { StackItem } from './stackItem';
 
 export const MAX_STACK_SIZE = 2 * 1024;

@@ -1,5 +1,5 @@
-import BN from 'bn.js';
-import _ from 'lodash';
+import { BN } from 'bn.js';
+import * as _ from 'lodash';
 import { BaseState } from './BaseState';
 import { common, ECPoint, UInt160, UInt160Hex, UInt256Hex } from './common';
 import { Equals, Equatable } from './Equatable';

@@ -1,7 +1,7 @@
 import { common, crypto } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { utils } from '@neo-one/utils';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { LockedAccountError, UnknownAccountError } from '../../errors';

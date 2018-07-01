@@ -2,7 +2,7 @@ import { plugins as pluginsUtil } from '@neo-one/server';
 import { Client, createServerConfig } from '@neo-one/server-client';
 import { CLIArgs, paths as defaultPaths } from '@neo-one/server-plugin';
 import { Paths } from 'env-paths';
-import path from 'path';
+import * as path from 'path';
 import { map, take } from 'rxjs/operators';
 import Vorpal from 'vorpal';
 import pkg from '../package.json';

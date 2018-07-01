@@ -66,8 +66,8 @@ import {
   WriteBlockchain,
 } from '@neo-one/node-core';
 import { labels, utils as commonUtils } from '@neo-one/utils';
-import BN from 'bn.js';
-import _ from 'lodash';
+import { BN } from 'bn.js';
+import * as _ from 'lodash';
 import { GenesisBlockNotRegisteredError } from './errors';
 import { AccountChanges, getDescriptorChanges, ValidatorChanges, ValidatorsCountChanges } from './getValidators';
 import {

@@ -1,9 +1,9 @@
 import { IncomingMessage } from 'http';
-import Application, { Context } from 'koa';
+import Application from 'koa';
 import { Server } from 'net';
 
 import mount from 'koa-mount';
-import prom from 'prom-client';
+import * as prom from 'prom-client';
 import gcStats from 'prometheus-gc-stats';
 
 import { MonitorBase, Tracer } from './MonitorBase';
@@ -44,7 +44,7 @@ export class NodeMonitor extends MonitorBase {
 
   private mutableServer: Server | undefined;
 
-  public forContext(ctx: Context): Monitor {
+  public forContext(ctx: Application.Context): Monitor {
     return this.withLabels({
       [this.labels.HTTP_METHOD]: ctx.request.method,
       [this.labels.SPAN_KIND]: 'server',
@@ -85,7 +85,7 @@ export class NodeMonitor extends MonitorBase {
     });
 
     app.use(
-      mount('/metrics', (ctx: Context) => {
+      mount('/metrics', (ctx: Application.Context) => {
         ctx.body = prom.register.metrics();
       }),
     );

@@ -3,7 +3,7 @@ import { PluginManager } from '@neo-one/server-plugin';
 import { constants as compilerConstants, Contract } from '@neo-one/server-plugin-compiler';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import { constants as walletConstants, SmartContract, Wallet } from '@neo-one/server-plugin-wallet';
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import { take } from 'rxjs/operators';
 import {
   CompiledContractsOutputConfig,

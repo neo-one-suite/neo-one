@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { BaseState } from './BaseState';
 import { common, ECPoint } from './common';
 import { Equals, Equatable } from './Equatable';

@@ -1,7 +1,7 @@
 // tslint:disable no-any
 import { assertAssetType, assertContractParameterType, common } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { InvalidArgumentError, InvalidNamedArgumentError } from './errors';
 import { addressToScriptHash } from './helpers';
 import {

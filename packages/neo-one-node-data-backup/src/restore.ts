@@ -1,6 +1,6 @@
 import { Monitor } from '@neo-one/monitor';
-import fs from 'fs-extra';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import { getProvider } from './getProvider';
 import { Environment, Options } from './types';
 

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "alwaysStrict": true,
     "baseUrl": "./packages",
     "target": "esnext",
@@ -20,6 +22,12 @@
     "paths": {
       "@neo-one/ec-key": [
         "../@types/@neo-one/ec-key"
+      ],
+      "@neo-one/boa": [
+        "../@types/@neo-one/boa"
+      ],
+      "@neo-one/csharp": [
+        "../@types/@neo-one/csharp"
       ],
       "@neo-one/*": [
         "./neo-one-*/src"

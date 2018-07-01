@@ -1,5 +1,5 @@
 import { Monitor } from '@neo-one/monitor';
-import grpc from 'grpc';
+import * as grpc from 'grpc';
 import GRPCError from 'grpc-error';
 import { Context } from 'mali';
 

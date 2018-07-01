@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { ArrayLiteralExpression, SyntaxKind } from 'ts-simple-ast';
 
 import { NodeCompiler } from '../NodeCompiler';

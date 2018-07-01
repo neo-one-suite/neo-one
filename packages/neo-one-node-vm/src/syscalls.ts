@@ -23,7 +23,7 @@ import {
   Validator,
 } from '@neo-one/client-core';
 import { utils as commonUtils } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import { map as asyncMap } from 'ix/asynciterable/pipe/index';
 import { defer } from 'rxjs';

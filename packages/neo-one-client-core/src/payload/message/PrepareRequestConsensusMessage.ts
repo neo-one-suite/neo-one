@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { common, UInt160, UInt256 } from '../../common';
 import { InvalidFormatError } from '../../errors';
 import { DeserializeWireBaseOptions } from '../../Serializable';

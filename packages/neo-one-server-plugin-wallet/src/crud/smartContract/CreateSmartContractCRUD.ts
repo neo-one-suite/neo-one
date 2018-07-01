@@ -6,7 +6,7 @@ import {
   InteractiveCLI,
   name,
 } from '@neo-one/server-plugin';
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import { ABIRequiredError, ContractOrHashRequiredError } from '../../errors';
 import {
   SmartContract,

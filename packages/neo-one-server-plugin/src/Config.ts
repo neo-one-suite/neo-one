@@ -1,10 +1,10 @@
-import ajv from 'ajv';
-import chokidar from 'chokidar';
-import fs from 'fs-extra';
-import path from 'path';
+import * as ajv from 'ajv';
+import * as chokidar from 'chokidar';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import { defer, Observable, Observer } from 'rxjs';
 import { distinctUntilChanged, mergeScan, switchMap } from 'rxjs/operators';
-import SeamlessImmutable from 'seamless-immutable';
+import * as SeamlessImmutable from 'seamless-immutable';
 
 const ajvValue = new ajv();
 type Event = 'change';

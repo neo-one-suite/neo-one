@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { common, ECPoint, ECPointHex, UInt160, UInt160Hex, UInt256, UInt256Hex } from '../common';
 
 // tslint:disable-next-line variable-name

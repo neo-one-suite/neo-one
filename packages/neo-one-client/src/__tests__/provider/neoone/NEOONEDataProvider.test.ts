@@ -1,6 +1,6 @@
 import { VMState } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import { toArray } from 'ix/asynciterable/toarray';
 import { keys, transactions } from '../../../__data__';

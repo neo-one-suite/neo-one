@@ -761,6 +761,10 @@
   dependencies:
     "@types/node" "*"
 
+"@types/babel__code-frame@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.npmjs.org/@types/babel__code-frame/-/babel__code-frame-7.0.0.tgz#d5658827984c1e386c1b4ef30699b344d3f732a2"
+
 "@types/base-x@*":
   version "1.0.29"
   resolved "https://registry.npmjs.org/@types/base-x/-/base-x-1.0.29.tgz#8a2d73e4a5c3121757a5f8870cfa4509655186b6"
@@ -857,10 +861,6 @@
 "@types/http-assert@*":
   version "1.3.0"
   resolved "https://registry.npmjs.org/@types/http-assert/-/http-assert-1.3.0.tgz#5e932606153da28e1d04f9043f4912cf61fd55dd"
-
-"@types/indent-string@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.npmjs.org/@types/indent-string/-/indent-string-3.0.0.tgz#9ebb391ceda548926f5819ad16405349641b999f"
 
 "@types/inquirer@0.0.42":
   version "0.0.42"
@@ -969,6 +969,12 @@
 "@types/range-parser@*":
   version "1.2.2"
   resolved "https://registry.npmjs.org/@types/range-parser/-/range-parser-1.2.2.tgz#fa8e1ad1d474688a757140c91de6dace6f4abc8d"
+
+"@types/rollup-plugin-json@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.npmjs.org/@types/rollup-plugin-json/-/rollup-plugin-json-2.3.1.tgz#f059983039f3b797e1146e777fe47e89433cb45e"
+  dependencies:
+    rollup "^0.54.0"
 
 "@types/rollup@0.54.0":
   version "0.54.0"
@@ -1080,10 +1086,6 @@
   resolved "https://registry.npmjs.org/@types/source-map/-/source-map-0.5.7.tgz#165eeb583c1ef00196fe4ef4da5d7832b03b275b"
   dependencies:
     source-map "*"
-
-"@types/strip-ansi@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.npmjs.org/@types/strip-ansi/-/strip-ansi-3.0.0.tgz#9b63d453a6b54aa849182207711a08be8eea48ae"
 
 "@types/tar@4.0.0":
   version "4.0.0"
@@ -3646,7 +3648,7 @@ indent-string@^2.1.0:
   dependencies:
     repeating "^2.0.0"
 
-indent-string@^3.0.0, indent-string@^3.2.0:
+indent-string@^3.0.0:
   version "3.2.0"
   resolved "https://registry.npmjs.org/indent-string/-/indent-string-3.2.0.tgz#4a5fd6d27cc332f37e5419a504dbb837105c9289"
 
@@ -6522,6 +6524,10 @@ rollup@*, rollup@0.62.0:
   dependencies:
     "@types/estree" "0.0.39"
     "@types/node" "*"
+
+rollup@^0.54.0:
+  version "0.54.1"
+  resolved "https://registry.npmjs.org/rollup/-/rollup-0.54.1.tgz#415a5d999421502646cf54b873fc4ce1a7393970"
 
 rsvp@^3.3.3:
   version "3.6.2"

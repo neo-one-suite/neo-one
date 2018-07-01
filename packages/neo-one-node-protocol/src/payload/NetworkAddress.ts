@@ -8,7 +8,7 @@ import {
   SerializableWire,
   SerializeWire,
 } from '@neo-one/client-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Address6 } from 'ip-address';
 
 export interface NetworkAddressAdd {

@@ -19,10 +19,10 @@ import {
   Session,
 } from '@neo-one/server-plugin';
 // tslint:disable-next-line match-default-export-name
-import Table from 'cli-table2';
-import inquirer from 'inquirer';
+import * as Table from 'cli-table2';
+import * as inquirer from 'inquirer';
 import ora from 'ora';
-import path from 'path';
+import * as path from 'path';
 import { BehaviorSubject, combineLatest, defer, Observable } from 'rxjs';
 import { distinctUntilChanged, map, mergeScan, publishReplay, refCount, switchMap, take } from 'rxjs/operators';
 import Vorpal, { Args, CommandInstance } from 'vorpal';

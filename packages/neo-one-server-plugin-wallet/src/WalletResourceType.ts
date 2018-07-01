@@ -15,9 +15,9 @@ import {
   ResourceState,
   ResourceType,
 } from '@neo-one/server-plugin';
-import fs from 'fs-extra';
-import _ from 'lodash';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as _ from 'lodash';
+import * as path from 'path';
 import { AsyncNodeStorage } from 'redux-persist-node-storage';
 import {
   CreateWalletCRUD,

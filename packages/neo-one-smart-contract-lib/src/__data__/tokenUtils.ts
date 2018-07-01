@@ -11,8 +11,8 @@ import {
 import { cleanupTest, setupContractTest } from '@neo-one/smart-contract-compiler';
 import BigNumber from 'bignumber.js';
 
-import appRootDir from 'app-root-dir';
-import path from 'path';
+import * as appRootDir from 'app-root-dir';
+import * as path from 'path';
 
 export interface DeployOptions {
   readonly masterPrivateKey: string;

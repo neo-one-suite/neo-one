@@ -1,8 +1,8 @@
 import { InvocationResult } from '@neo-one/client-core';
 import Ast, { SourceFile } from 'ts-simple-ast';
 
-import appRootDir from 'app-root-dir';
-import path from 'path';
+import * as appRootDir from 'app-root-dir';
+import * as path from 'path';
 
 import { executeScript } from '../../executeScript';
 import * as utils from '../../utils';

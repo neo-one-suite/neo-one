@@ -1,7 +1,7 @@
 import { DefaultMonitor, Monitor } from '@neo-one/monitor';
 import { LogConfig } from '@neo-one/server-plugin';
-import fs from 'fs-extra';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import { Subject } from 'rxjs';
 import { createLogger, format, transports } from 'winston';
 

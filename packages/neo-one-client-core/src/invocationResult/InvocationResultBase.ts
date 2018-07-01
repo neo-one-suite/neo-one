@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { ContractParameter, deserializeContractParameterWireBase } from '../contractParameter';
 import {
   createSerializeWire,

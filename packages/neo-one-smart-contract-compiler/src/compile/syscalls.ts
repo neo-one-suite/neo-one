@@ -1,6 +1,6 @@
 // tslint:disable variable-name no-unused
 import { SysCallName } from '@neo-one/client-core';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { CallExpression, Node, Type } from 'ts-simple-ast';
 import { ScriptBuilder } from './sb';
 import { VisitOptions } from './types';

@@ -10,9 +10,9 @@ import {
   ResourceType,
   SubDescribeTable,
 } from '@neo-one/server-plugin';
-import fs from 'fs-extra';
-import _ from 'lodash';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as _ from 'lodash';
+import * as path from 'path';
 import { combineLatest, concat, Observable, of as _of, ReplaySubject, Subject } from 'rxjs';
 import { map, shareReplay, switchMap } from 'rxjs/operators';
 import toposort from 'toposort';

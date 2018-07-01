@@ -1,6 +1,13 @@
-import { buildJavascript } from '../common';
+import * as yargs from 'yargs';
 
-buildJavascript()
+import { buildJavascript, pkgs } from '../common';
+
+yargs
+  .alias('p', 'package')
+  .describe('p', 'package to watch')
+  .choices('p', pkgs);
+
+buildJavascript(yargs.argv.p)
   .then(() => {
     process.exit(0);
   })

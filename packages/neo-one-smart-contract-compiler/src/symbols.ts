@@ -1,7 +1,7 @@
 // tslint:disable ban-types no-bitwise
 import Project, { Identifier, SourceFile, Symbol, ts } from 'ts-simple-ast';
 
-import path from 'path';
+import * as path from 'path';
 
 export interface Globals {
   readonly Array: Symbol;

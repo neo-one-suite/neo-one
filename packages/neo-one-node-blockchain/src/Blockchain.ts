@@ -25,7 +25,7 @@ import {
 import { metrics, Monitor } from '@neo-one/monitor';
 import { Blockchain as BlockchainType, NULL_ACTION, Storage, TriggerType, VM } from '@neo-one/node-core';
 import { labels, utils as commonUtils } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import PriorityQueue from 'js-priority-queue';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { toArray } from 'rxjs/operators';

@@ -21,7 +21,7 @@ import {
   Contract,
   StorageItem,
 } from '@neo-one/client-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 import { DefaultMonitor } from '@neo-one/monitor';
 import { of } from 'rxjs';

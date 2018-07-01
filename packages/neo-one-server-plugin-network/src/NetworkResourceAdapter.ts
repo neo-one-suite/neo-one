@@ -10,9 +10,9 @@ import {
   TaskList,
 } from '@neo-one/server-plugin';
 import { labels, mergeScanLatest } from '@neo-one/utils';
-import fs from 'fs-extra';
-import _ from 'lodash';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as _ from 'lodash';
+import * as path from 'path';
 import { BehaviorSubject, combineLatest, Observable, timer } from 'rxjs';
 import { shareReplay, switchMap } from 'rxjs/operators';
 import { constants } from './constants';

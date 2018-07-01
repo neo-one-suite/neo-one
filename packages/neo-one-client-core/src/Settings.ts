@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Block } from './Block';
 import { ECPoint } from './common';
 import { RegisterTransaction, TransactionType } from './transaction';

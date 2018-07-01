@@ -17,14 +17,13 @@ import cliTruncate from 'cli-truncate';
 import elegantSpinner from 'elegant-spinner';
 import figures from 'figures';
 // tslint:disable-next-line match-default-export-name
-import indentString from 'indent-string';
-import logSymbols from 'log-symbols';
+import * as logSymbols from 'log-symbols';
 import logUpdate from 'log-update';
 import { EMPTY, ReplaySubject, timer } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 // tslint:disable-next-line match-default-export-name
-import stripAnsi from 'strip-ansi';
 import { Command } from 'vorpal';
+import { indentString, stripAnsi } from './utils';
 
 const pointer = chalk.yellow(figures.pointer);
 const skipped = chalk.yellow(figures.arrowDown);
@@ -86,7 +85,9 @@ const renderTasks = (tasks: ReadonlyArray<TaskStatus>, spinners: Spinners, level
   tasks.forEach((task) => {
     const skippedStr = task.skipped !== undefined ? ` ${chalk.dim('[skipped]')}` : '';
 
-    mutableOutput.push(indentString(` ${getSymbol(task, spinners)} ${task.title}${skippedStr}`, level, '  '));
+    mutableOutput.push(
+      indentString(` ${getSymbol(task, spinners)} ${task.title}${skippedStr}`, level, { indent: '  ' }),
+    );
 
     if ((task.pending && task.message !== undefined) || task.skipped !== false || task.error !== undefined) {
       let data = task.error;
@@ -106,7 +107,7 @@ const renderTasks = (tasks: ReadonlyArray<TaskStatus>, spinners: Spinners, level
             .filter(utils.notNull)[0],
         );
 
-        const out = indentString(`${figures.arrowRight} ${data}`, level, '  ');
+        const out = indentString(`${figures.arrowRight} ${data}`, level, { indent: '  ' });
         mutableOutput.push(`   ${chalk.gray(cliTruncate(out, (process.stdout.columns as number) - 3))}`);
       }
     }

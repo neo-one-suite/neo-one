@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { AssetNameJSON } from '../Asset';
 import { assertAssetType, AssetType, AssetTypeJSON, toJSONAssetType } from '../AssetType';
 import { common, ECPoint, UInt160, UInt160Hex } from '../common';

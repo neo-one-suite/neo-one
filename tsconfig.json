@@ -28,7 +28,7 @@
       ],
       "@neo-one/csharp": [
         "../@types/@neo-one/csharp"
-      ],            
+      ],
       "@neo-one/*": [
         "./neo-one-*/src"
       ],

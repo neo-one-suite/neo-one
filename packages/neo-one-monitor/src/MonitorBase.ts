@@ -2,7 +2,7 @@ import { IncomingMessage } from 'http';
 import { Context } from 'koa';
 
 import { utils } from '@neo-one/utils';
-import _ from 'lodash';
+import * as _ from 'lodash';
 
 import { ReportHandler } from './ReportHandler';
 import {

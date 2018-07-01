@@ -7,7 +7,7 @@ import {
   SerializableWire,
   SerializeWire,
 } from '@neo-one/client-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 
 export const SERVICES = {
   NODE_NETWORK: new BN(1),

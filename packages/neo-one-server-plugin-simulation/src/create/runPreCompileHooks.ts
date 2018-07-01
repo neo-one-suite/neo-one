@@ -1,5 +1,5 @@
 import { TaskList } from '@neo-one/server-plugin';
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import { Observable } from 'rxjs';
 import { executeHook } from '../common';
 import { CreateContext } from './types';

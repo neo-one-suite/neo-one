@@ -25,10 +25,10 @@ import { constants as networkConstants, Network } from '@neo-one/server-plugin-n
 import { CompileContractResult, findAndCompileContract } from '@neo-one/smart-contract-compiler';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import fs from 'fs-extra';
-import _ from 'lodash';
+import * as fs from 'fs-extra';
+import * as _ from 'lodash';
 import ora from 'ora';
-import path from 'path';
+import * as path from 'path';
 import { of as _of } from 'rxjs';
 import { constants } from './constants';
 import { WalletPlugin } from './WalletPlugin';

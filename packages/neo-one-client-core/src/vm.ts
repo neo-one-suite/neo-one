@@ -1,5 +1,5 @@
 import { CustomError } from '@neo-one/utils';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { UInt160 } from './common';
 import { ScriptContainer } from './ScriptContainer';
 import { Witness } from './Witness';

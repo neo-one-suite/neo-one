@@ -1,7 +1,7 @@
 // tslint:disable ban-types
 import { ABIEvent, ABIFunction, ABIParameter, ABIReturn, ContractParameterType } from '@neo-one/client';
 import { utils } from '@neo-one/utils';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import Project, {
   CallExpression,
   ClassDeclaration,

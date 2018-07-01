@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { common, ECPoint, UInt160, UInt160Hex, UInt256, UInt256Hex } from '../common';
 import { InvalidFormatError } from '../errors';
 import { utils } from './utils';

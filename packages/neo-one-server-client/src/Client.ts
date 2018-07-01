@@ -7,7 +7,7 @@ import {
   getTasksError,
   ModifyResourceResponse,
 } from '@neo-one/server-plugin';
-import grpc from 'grpc';
+import * as grpc from 'grpc';
 import { Observable, Observer, Subject } from 'rxjs';
 import { filter, map, publishReplay, refCount, take } from 'rxjs/operators';
 import { ReadError } from './errors';
