@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-core",
-  "version": "1.0.0-alpha.52",
+  "version": "1.0.0-alpha.53",
   "keywords": [
     "neo",
     "NEO",
@@ -35,9 +35,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.51",
-    "@neo-one/monitor": "^1.0.0-alpha.36",
-    "@neo-one/utils": "^1.0.0-alpha.41",
+    "@neo-one/client-core": "^1.0.0-alpha.52",
+    "@neo-one/monitor": "^1.0.0-alpha.37",
+    "@neo-one/utils": "^1.0.0-alpha.42",
     "bn.js": "^4.11.8",
     "rxjs": "^6.2.1"
   }

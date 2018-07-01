@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-lib",
-  "version": "1.0.0-alpha.22",
+  "version": "1.0.0-alpha.23",
   "keywords": [
     "neo",
     "NEO",
@@ -35,10 +35,10 @@
   "noCompile": true,
   "dependencies": {
     "@neo-one/smart-contract": "^1.0.0-alpha.7",
-    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.21"
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.22"
   },
   "devDependencies": {
-    "@neo-one/client": "^1.0.0-alpha.66",
+    "@neo-one/client": "^1.0.0-alpha.67",
     "app-root-dir": "1.0.2",
     "bignumber.js": "7.2.1"
   }
