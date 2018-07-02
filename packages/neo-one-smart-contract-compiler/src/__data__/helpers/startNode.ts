@@ -5,17 +5,14 @@ import {
   DeveloperClient,
   InvocationResult,
   LocalKeyStore,
-  LocalMemoryStore,
-  LocalUserAccountProvider,
-  NEOONEProvider,
   SmartContract,
   UserAccountID,
 } from '@neo-one/client';
 import { common, UInt160 } from '@neo-one/client-core';
-import { DiagnosticCategory, ts } from 'ts-simple-ast';
+import { ts } from 'ts-simple-ast';
 import { compile } from '../../compile';
 import { CompileResult } from '../../compile/types';
-import { createNode } from '../../test/createNode';
+import { testNodeSetup, throwErrorOnDiagnosticErrorOrWarning } from '../../test';
 import * as utils from '../../utils';
 
 export interface Result {
@@ -58,49 +55,14 @@ const getCompiledScript = async (script: string): Promise<CompileResult> => {
 };
 
 export const startNode = async (options: StartNodeOptions = {}): Promise<TestNode> => {
-  const { privateKey, rpcURL } = await createNode();
-
-  // Give RPC server a chance to startup.
-  await new Promise<void>((resolve) => setTimeout(resolve, 5000));
-
-  const networkName = 'priv';
-  const masterWalletName = 'master';
-
-  const keystore = new LocalKeyStore({
-    store: new LocalMemoryStore(),
-  });
-
-  const masterWallet = await keystore.addAccount({
-    network: networkName,
-    name: masterWalletName,
-    privateKey,
-  });
-
-  const provider = new NEOONEProvider({
-    options: [{ network: networkName, rpcURL }],
-  });
-  const localUserAccountProvider = new LocalUserAccountProvider({
-    keystore,
-    provider,
-  });
-  const userAccountProviders = {
-    memory: localUserAccountProvider,
-  };
-  const client = new Client(userAccountProviders);
-
+  const { client, masterWallet, provider, networkName, userAccountProviders } = await testNodeSetup();
   const developerClient = new DeveloperClient(provider.read(networkName), userAccountProviders);
 
   return {
-    async addContract(script: string): Promise<UInt160> {
+    async addContract(script): Promise<UInt160> {
       const { code, context } = await getCompiledScript(script);
-      const error = context.diagnostics.find((diagnostic) => diagnostic.category === DiagnosticCategory.Error);
-      if (error !== undefined) {
-        throw new Error(`Compilation error: ${error.messageText} at ${error.source}`);
-      }
-      const warning = context.diagnostics.find((diagnostic) => diagnostic.category === DiagnosticCategory.Warning);
-      if (warning !== undefined && !options.ignoreWarnings) {
-        throw new Error(`Compilation warning: ${warning.messageText} at ${warning.source}`);
-      }
+
+      throwErrorOnDiagnosticErrorOrWarning(context.diagnostics, options.ignoreWarnings);
 
       const result = await client.publish({
         script: code.toString('hex'),
