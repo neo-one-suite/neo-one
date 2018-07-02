@@ -1,12 +1,12 @@
 import { RawSourceMap } from '../node_modules/source-map/source-map';
 import { ClientBase } from './ClientBase';
 import {
+  BufferString,
   ContractParameter,
   DeveloperProvider,
   Options,
   TransactionOptions,
   UserAccountProvider,
-  BufferString,
 } from './types';
 
 export class DeveloperClient<

@@ -5,6 +5,8 @@ import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializabl
 import { BinaryWriter, IOHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
+import { Input } from './Input';
+import { Output } from './Output';
 import { StateDescriptor, StateDescriptorJSON } from './state';
 import {
   FeeContext,
@@ -100,15 +102,19 @@ export class StateTransaction extends TransactionBase<TransactionType.State, Sta
   public clone({
     scripts = this.scripts,
     attributes = this.attributes,
+    inputs = this.inputs,
+    outputs = this.outputs,
   }: {
     readonly scripts?: ReadonlyArray<Witness>;
     readonly attributes?: ReadonlyArray<Attribute>;
+    readonly inputs?: ReadonlyArray<Input>;
+    readonly outputs?: ReadonlyArray<Output>;
   }): StateTransaction {
     return new StateTransaction({
       version: this.version,
       attributes,
-      inputs: this.inputs,
-      outputs: this.outputs,
+      inputs,
+      outputs,
       scripts,
       descriptors: this.descriptors,
     });
