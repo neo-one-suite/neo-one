@@ -2,8 +2,8 @@
 import { abi, addressToScriptHash, createPrivateKey, privateKeyToScriptHash } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
-import appRootDir from 'app-root-dir';
-import path from 'path';
+import * as appRootDir from 'app-root-dir';
+import * as path from 'path';
 
 import { cleanupTest } from '../../test/cleanupTest';
 import { setupBasicTest } from '../../test/setupBasicTest';

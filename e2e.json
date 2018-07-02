@@ -1,17 +1,18 @@
 {
   "globals": {
     "ts-jest": {
-      "useBabelrc": true
+      "useBabelrc": true,
+      "tsConfigFile": "tsconfig.cli.json"
     }
   },
   "moduleFileExtensions": [
-    "ts",
-    "tsx",
     "js",
     "jsx",
     "json",
-    "node"
-  ],  
+    "node",
+    "ts",
+    "tsx"
+  ],
   "testEnvironment": "./scripts/e2e/Environment",
   "testPathIgnorePatterns": [
     "/node_modules/",
@@ -29,8 +30,8 @@
     "^.+\\.tsx?$": "ts-jest"
   },
   "transformIgnorePatterns": [
-    "<rootDir>/node_modules/(?!ix)",
+    "<rootDir>/node_modules/",
     "<rootDir>/packages/.*/dist/.*"
-  ],  
+  ],
   "testRegex": "(/__e2e__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$"
 }

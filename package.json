@@ -45,7 +45,7 @@
     "e2e": "jest --config e2e.json",
     "e2e-ci": "jest --config e2e.json -w 1",
     "tsc": "tsc",
-    "ts-node": "TS_NODE_PROJECT=tsconfig.cli.json node -r ts-node/register/transpile-only --max-old-space-size=8192",
+    "ts-node": "cross-env TS_NODE_PROJECT=tsconfig.cli.json node -r ts-node/register/transpile-only --max-old-space-size=8192",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.ts\"",
     "nit:scripts:ts": "prettier --config .prettierrc --list-different \"scripts/**/*.ts\"",
     "nit:scripts:js": "prettier --config .prettierrc --list-different \"scripts/**/*.js\" --parser flow",
@@ -84,6 +84,7 @@
     "@babel/preset-env": "7.0.0-beta.51",
     "@babel/preset-typescript": "7.0.0-beta.51",
     "@babel/register": "7.0.0-beta.51",
+    "@types/babel__code-frame": "7.0.0",
     "@types/bs58": "3.0.30",
     "@types/chokidar": "1.7.5",
     "@types/cli-table2": "0.2.1",
@@ -92,7 +93,6 @@
     "@types/figures": "2.0.0",
     "@types/fs-extra": "5.0.3",
     "@types/google-cloud__storage": "1.1.7",
-    "@types/indent-string": "3.0.0",
     "@types/inquirer": "0.0.42",
     "@types/jest": "23.1.3",
     "@types/js-priority-queue": "0.0.5",
@@ -104,19 +104,20 @@
     "@types/log-symbols": "2.0.0",
     "@types/log-update": "2.0.0",
     "@types/lru-cache": "4.1.1",
-    "@types/node": "10.3.6",
+    "@types/node": "10.5.1",
     "@types/node-cron": "1.2.0",
     "@types/ora": "1.3.4",
     "@types/protobufjs": "6.0.0",
     "@types/rollup": "0.54.0",
+    "@types/rollup-plugin-json": "2.3.1",
     "@types/seamless-immutable": "7.1.2",
     "@types/source-map": "0.5.7",
-    "@types/strip-ansi": "3.0.0",
     "@types/tar": "4.0.0",
     "@types/through": "0.0.29",
     "@types/yargs": "11.0.0",
     "app-root-dir": "1.0.2",
     "babel-core": "7.0.0-bridge.0",
+    "cross-env": "5.2.0",
     "execa": "0.10.0",
     "fs-extra": "6.0.1",
     "husky": "1.0.0-rc.9",
@@ -128,30 +129,29 @@
     "lodash": "4.17.10",
     "prettier": "1.13.7",
     "rollup": "0.62.0",
-    "rollup-plugin-babel": "4.0.0-beta.6",
+    "rollup-plugin-babel": "4.0.0-beta.7",
     "rollup-plugin-commonjs": "9.1.3",
     "rollup-plugin-json": "3.0.0",
     "rollup-plugin-node-resolve": "3.3.0",
     "rollup-plugin-replace": "2.0.0",
     "rollup-plugin-sourcemaps": "0.4.2",
     "rollup-plugin-typescript2": "0.15.1",
-    "rxjs-tslint-rules": "4.4.4",
+    "rxjs-tslint-rules": "4.5.0",
     "tmp": "0.0.33",
-    "ts-jest": "22.4.6",
+    "ts-jest": "23.0.0",
     "ts-node": "7.0.0",
     "tslint": "5.10.0",
     "tslint-clean-code": "0.2.7",
     "tslint-config-prettier": "1.13.0",
     "tslint-consistent-codestyle": "1.13.1",
     "tslint-immutable": "4.6.0",
-    "tslint-language-service": "0.9.9",
     "tslint-microsoft-contrib": "5.0.3",
     "tslint-sonarts": "1.7.0",
     "typescript": "2.9.1",
-    "yargs": "11.1.0"
+    "yargs": "12.0.1"
   },
   "resolutions": {
-    "ajv": "6.5.1",
+    "ajv": "6.5.2",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "23.2.0",
     "bn.js": "4.11.8",
@@ -175,16 +175,17 @@
     ],
     "globals": {
       "ts-jest": {
-        "useBabelrc": true
+        "useBabelrc": true,
+        "tsConfigFile": "tsconfig.cli.json"
       }
     },
     "moduleFileExtensions": [
-      "ts",
-      "tsx",
       "js",
       "jsx",
       "json",
-      "node"
+      "node",
+      "ts",
+      "tsx"
     ],
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
@@ -198,7 +199,7 @@
       "^.+\\.tsx?$": "ts-jest"
     },
     "transformIgnorePatterns": [
-      "<rootDir>/node_modules/(?!ix)",
+      "<rootDir>/node_modules/",
       "<rootDir>/packages/.*/dist/.*"
     ],
     "snapshotSerializers": [

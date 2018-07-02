@@ -1,7 +1,7 @@
 import { common } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { Client } from '../Client';
 import { DeveloperClient } from '../DeveloperClient';
 import { wifToPrivateKey } from '../helpers';
@@ -101,15 +101,16 @@ async function setupClients(networkName: string): Promise<SetupClientsReturn> {
   const provider = new NEOONEProvider({
     options: [{ network: networkName, rpcURL }],
   });
-
-  const client = new Client({
-    memory: new LocalUserAccountProvider({
-      keystore,
-      provider,
-    }),
+  const localUserAccountProvider = new LocalUserAccountProvider({
+    keystore,
+    provider,
   });
+  const providers = {
+    memory: localUserAccountProvider,
+  };
+  const client = new Client(providers);
 
-  const developerClient = new DeveloperClient(provider.read(networkName));
+  const developerClient = new DeveloperClient(provider.read(networkName), providers);
 
   return {
     developerClient,

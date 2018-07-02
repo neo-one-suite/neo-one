@@ -7,7 +7,7 @@ yargs
   .describe('p', 'package to watch')
   .choices('p', pkgs);
 
-watchJavascriptPkg(yargs.argv.package).catch((error) => {
+watchJavascriptPkg(yargs.argv.p).catch((error) => {
   // tslint:disable-next-line no-console
   console.error(error);
   process.exit(1);

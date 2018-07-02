@@ -1,6 +1,6 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { Throttle } from 'stream-throttle';
-import tar from 'tar';
+import * as tar from 'tar';
 
 export const extract = async ({
   downloadPath,

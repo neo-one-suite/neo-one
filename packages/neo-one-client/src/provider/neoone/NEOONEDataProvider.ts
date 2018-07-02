@@ -23,12 +23,12 @@ import {
 import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 // tslint:disable-next-line no-submodule-imports
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 // tslint:disable-next-line no-submodule-imports
 import { flatMap, flatten } from 'ix/asynciterable/pipe/index';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { AsyncBlockIterator } from '../../AsyncBlockIterator';
 import {
   Account,

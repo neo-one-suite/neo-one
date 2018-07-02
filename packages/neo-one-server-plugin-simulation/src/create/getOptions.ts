@@ -1,7 +1,7 @@
 import { wifToPrivateKey } from '@neo-one/client';
 import { constants as walletConstants } from '@neo-one/server-plugin-wallet';
 import BigNumber from 'bignumber.js';
-import path from 'path';
+import * as path from 'path';
 import {
   InvalidLanguageError,
   InvalidSimulationConfigError,

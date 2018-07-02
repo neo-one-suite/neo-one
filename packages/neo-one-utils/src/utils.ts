@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import * as _ from 'lodash';
 
 const nowSeconds = (): number => Math.round(Date.now() / 1000);
 

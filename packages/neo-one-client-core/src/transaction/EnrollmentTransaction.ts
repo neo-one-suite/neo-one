@@ -5,6 +5,8 @@ import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializabl
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
+import { Input } from './Input';
+import { Output } from './Output';
 import {
   TransactionBase,
   TransactionBaseAdd,
@@ -84,15 +86,19 @@ export class EnrollmentTransaction extends TransactionBase<TransactionType.Enrol
   public clone({
     scripts = this.scripts,
     attributes = this.attributes,
+    inputs = this.inputs,
+    outputs = this.outputs,
   }: {
     readonly scripts?: ReadonlyArray<Witness>;
     readonly attributes?: ReadonlyArray<Attribute>;
+    readonly inputs?: ReadonlyArray<Input>;
+    readonly outputs?: ReadonlyArray<Output>;
   }): EnrollmentTransaction {
     return new EnrollmentTransaction({
       version: this.version,
       attributes,
-      inputs: this.inputs,
-      outputs: this.outputs,
+      inputs,
+      outputs,
       scripts,
       publicKey: this.publicKey,
     });

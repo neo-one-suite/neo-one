@@ -1,5 +1,5 @@
 import { Monitor } from '@neo-one/monitor';
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import { Environment } from '../types';
 import { Provider } from './Provider';
 

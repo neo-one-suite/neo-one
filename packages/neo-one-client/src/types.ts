@@ -1,7 +1,7 @@
 import { ContractParameterTypeJSON, Param as ScriptBuilderParam } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { RawSourceMap } from 'source-map';
 
@@ -271,13 +271,7 @@ export interface Output {
   readonly address: AddressString;
 }
 
-export interface UnspentOutput {
-  readonly asset: Hash256String;
-  readonly value: BigNumber;
-  readonly address: AddressString;
-  readonly txid: Hash256String;
-  readonly vout: number;
-}
+export interface UnspentOutput extends Input, Output {}
 
 export interface Witness {
   readonly invocation: BufferString;
@@ -538,7 +532,7 @@ export interface TransactionReceipt {
   readonly transactionIndex: number;
 }
 
-export interface InvokeReceiptInternal extends TransactionReceipt {
+export interface RawInvokeReceipt extends TransactionReceipt {
   readonly result: RawInvocationResult;
   readonly actions: ReadonlyArray<ActionRaw>;
 }
@@ -627,7 +621,6 @@ export interface DataProvider {
 
 export interface DeveloperProvider {
   readonly network: NetworkType;
-
   readonly runConsensusNow: (monitor?: Monitor) => Promise<void>;
   readonly updateSettings: (options: Options, monitor?: Monitor) => Promise<void>;
   readonly fastForwardOffset: (seconds: number, monitor?: Monitor) => Promise<void>;
@@ -648,7 +641,11 @@ export interface UserAccountProvider {
   readonly selectAccount: (id?: UserAccountID) => Promise<void>;
   readonly deleteAccount: (id: UserAccountID) => Promise<void>;
   readonly updateAccountName: (options: UpdateAccountNameOptions) => Promise<void>;
-
+  readonly execute: (
+    script: BufferString,
+    options?: TransactionOptions,
+    sourceMap?: RawSourceMap,
+  ) => Promise<TransactionResult<RawInvokeReceipt>>;
   readonly transfer: (
     transfers: ReadonlyArray<Transfer>,
     options?: TransactionOptions,
@@ -679,7 +676,7 @@ export interface UserAccountProvider {
     verify: boolean,
     options?: InvokeTransactionOptions,
     sourceMap?: RawSourceMap,
-  ) => Promise<TransactionResult<InvokeReceiptInternal>>;
+  ) => Promise<TransactionResult<RawInvokeReceipt>>;
   readonly call: (
     contract: Hash160String,
     method: string,

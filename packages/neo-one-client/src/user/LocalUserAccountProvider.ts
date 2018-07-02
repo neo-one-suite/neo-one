@@ -25,7 +25,7 @@ import { processError } from '@neo-one/client-switch';
 import { Counter, Histogram, Labels, metrics, Monitor } from '@neo-one/monitor';
 import { labels as labelNames, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { RawSourceMap } from 'source-map';
 import {
@@ -44,6 +44,7 @@ import {
   AssetRegister,
   Attribute,
   AttributeArg,
+  BufferString,
   ContractRegister,
   DataProvider,
   GetOptions,
@@ -52,7 +53,6 @@ import {
   Input,
   InvocationResultError,
   InvocationResultSuccess,
-  InvokeReceiptInternal,
   InvokeTransactionOptions,
   NetworkSettings,
   NetworkType,
@@ -64,6 +64,7 @@ import {
   RawInvocationResult,
   RawInvocationResultError,
   RawInvocationResultSuccess,
+  RawInvokeReceipt,
   RegisterAssetReceipt,
   Transaction,
   TransactionOptions,
@@ -82,6 +83,7 @@ import { converters } from './converters';
 
 export interface KeyStore {
   readonly type: string;
+  readonly byteLimit?: number;
   readonly currentAccount$: Observable<UserAccount | undefined>;
   readonly getCurrentAccount: () => UserAccount | undefined;
   readonly accounts$: Observable<ReadonlyArray<UserAccount>>;
@@ -217,7 +219,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           monitor: span,
         });
 
-        if (inputs.length === 0) {
+        if (inputs.length === 0 && this.keystore.byteLimit === undefined) {
           throw new NothingToTransferError();
         }
 
@@ -230,6 +232,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         return this.sendTransaction({
           from,
           transaction,
+          inputs,
           onConfirm: async ({ receipt }) => receipt,
           monitor: span,
         });
@@ -282,6 +285,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         });
 
         return this.sendTransaction({
+          inputs,
           from,
           transaction,
           onConfirm: async ({ receipt }) => receipt,
@@ -450,6 +454,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         });
 
         return this.sendTransaction({
+          inputs,
           from,
           transaction,
           onConfirm: async ({ receipt }) => receipt,
@@ -472,7 +477,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     verify: boolean,
     options: InvokeTransactionOptions = {},
     sourceMap?: RawSourceMap,
-  ): Promise<TransactionResult<InvokeReceiptInternal>> {
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
     const { attributes = [] } = options;
 
     return this.invokeRaw({
@@ -505,7 +510,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         networkFee: options.networkFee,
         transfers: options.transfers,
       },
-      onConfirm: ({ receipt, data }): InvokeReceiptInternal => ({
+      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
         blockIndex: receipt.blockIndex,
         blockHash: receipt.blockHash,
         transactionIndex: receipt.transactionIndex,
@@ -528,6 +533,26 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       labels: {
         [labelNames.INVOKE_METHOD]: method,
       },
+      sourceMap,
+    });
+  }
+
+  public async execute(
+    script: BufferString,
+    options?: TransactionOptions,
+    sourceMap?: RawSourceMap,
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
+    return this.invokeRaw({
+      script: Buffer.from(script, 'hex'),
+      options,
+      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
+        blockIndex: receipt.blockIndex,
+        blockHash: receipt.blockHash,
+        transactionIndex: receipt.transactionIndex,
+        result: data.result,
+        actions: data.actions,
+      }),
+      method: 'execute',
       sourceMap,
     });
   }
@@ -713,6 +738,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
         return this.sendTransaction({
           from,
+          inputs,
           transaction: invokeTransaction,
           onConfirm: async ({ transaction, receipt }) => {
             const data = await this.provider.getInvocationData(from.network, transaction.txid);
@@ -740,11 +766,13 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }
 
   private async sendTransaction<T>({
+    inputs,
     transaction: transactionUnsignedIn,
     from,
     onConfirm,
     monitor,
   }: {
+    readonly inputs: ReadonlyArray<UnspentOutput>;
     readonly transaction: TransactionModel;
     readonly from: UserAccountID;
     readonly onConfirm: (
@@ -758,6 +786,15 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     return this.capture(
       async (span) => {
         let transactionUnsigned = transactionUnsignedIn;
+        if (this.keystore.byteLimit !== undefined) {
+          transactionUnsigned = await this.consolidate({
+            inputs,
+            from,
+            transactionUnsignedIn,
+            monitor,
+            byteLimit: this.keystore.byteLimit,
+          });
+        }
         const scriptHash = addressToScriptHash(from.address);
         if (
           transactionUnsigned.inputs.length === 0 &&
@@ -797,7 +834,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           span,
         );
 
-        transactionUnsignedIn.inputs.forEach((transfer) =>
+        transactionUnsigned.inputs.forEach((transfer) =>
           this.mutableUsedOutputs.add(`${common.uInt256ToString(transfer.hash)}:${transfer.index}`),
         );
 
@@ -821,6 +858,169 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
       monitor,
     );
+  }
+
+  private async consolidate({
+    inputs,
+    transactionUnsignedIn,
+    from,
+    monitor,
+    byteLimit,
+  }: {
+    readonly transactionUnsignedIn: TransactionModel;
+    readonly inputs: ReadonlyArray<UnspentOutput>;
+    readonly from: UserAccountID;
+    readonly monitor?: Monitor;
+    readonly byteLimit: number;
+  }): Promise<TransactionModel> {
+    const messageSize = transactionUnsignedIn.serializeUnsigned().length;
+
+    const getMessageSize = ({
+      numNewInputs,
+      numNewOutputs = 0,
+    }: {
+      readonly numNewInputs: number;
+      readonly numNewOutputs?: number;
+    }): number => messageSize + numNewInputs * InputModel.size + numNewOutputs * OutputModel.size;
+
+    const { unspentOutputs: consolidatableUnspents } = await this.getUnspentOutputs({ from, monitor });
+    const assetToUnspentOutputsUnsorted = consolidatableUnspents
+      .filter((unspent) => !inputs.some((input) => unspent.txid === input.txid && unspent.vout === input.vout))
+      .reduce<{ [key: string]: ReadonlyArray<UnspentOutput> }>((acc, unspent) => {
+        if ((acc[unspent.asset] as ReadonlyArray<UnspentOutput> | undefined) !== undefined) {
+          return {
+            ...acc,
+            [unspent.asset]: acc[unspent.asset].concat([unspent]),
+          };
+        }
+
+        return {
+          ...acc,
+          [unspent.asset]: [unspent],
+        };
+      }, {});
+
+    const assetToUnspentOutputs = Object.entries(assetToUnspentOutputsUnsorted).reduce(
+      (acc: typeof assetToUnspentOutputsUnsorted, [_asset, outputs]) => ({
+        ...acc,
+        [_asset]: outputs.sort((coinA, coinB) => coinA.value.comparedTo(coinB.value)),
+      }),
+      assetToUnspentOutputsUnsorted,
+    );
+
+    const { newInputs, updatedOutputs, remainingAssetToUnspentOutputs } = transactionUnsignedIn.outputs.reduce(
+      (
+        acc: {
+          readonly newInputs: ReadonlyArray<InputModel>;
+          readonly updatedOutputs: ReadonlyArray<OutputModel>;
+          readonly remainingAssetToUnspentOutputs: typeof assetToUnspentOutputs;
+        },
+        output,
+      ) => {
+        const asset = common.uInt256ToString(output.asset);
+
+        const unspentOutputsIn = acc.remainingAssetToUnspentOutputs[asset] as ReadonlyArray<UnspentOutput> | undefined;
+
+        const unspentOutputs =
+          unspentOutputsIn === undefined || common.uInt160ToString(output.address) !== addressToScriptHash(from.address)
+            ? []
+            : acc.remainingAssetToUnspentOutputs[asset];
+
+        const tempIns = unspentOutputs.slice(
+          0,
+          Math.max(
+            Math.floor((byteLimit - getMessageSize({ numNewInputs: acc.newInputs.length })) / InputModel.size),
+            0,
+          ),
+        );
+
+        return {
+          newInputs: acc.newInputs.concat(this.convertInputs(tempIns)),
+          updatedOutputs: acc.updatedOutputs.concat([
+            output.clone({
+              value: output.value.add(
+                clientUtils.bigNumberToBN(
+                  tempIns.reduce((left, right) => left.plus(right.value), new BigNumber('0')),
+                  8,
+                ),
+              ),
+            }),
+          ]),
+
+          remainingAssetToUnspentOutputs:
+            unspentOutputsIn === undefined
+              ? acc.remainingAssetToUnspentOutputs
+              : {
+                  ...acc.remainingAssetToUnspentOutputs,
+                  [asset]: unspentOutputsIn.slice(tempIns.length),
+                },
+        };
+      },
+      {
+        newInputs: [],
+        updatedOutputs: [],
+        remainingAssetToUnspentOutputs: assetToUnspentOutputs,
+      },
+    );
+
+    const { finalInputs, newOutputs } = _.sortBy(
+      // tslint:disable-next-line no-unused
+      Object.entries(remainingAssetToUnspentOutputs).filter(([_asset, outputs]) => outputs.length >= 2),
+      ([asset]) => {
+        if (asset === common.NEO_ASSET_HASH) {
+          return 0;
+        }
+
+        if (asset === common.GAS_ASSET_HASH) {
+          return 1;
+        }
+
+        return 2;
+      },
+    ).reduce(
+      (
+        acc: {
+          readonly finalInputs: ReadonlyArray<InputModel>;
+          readonly newOutputs: ReadonlyArray<OutputModel>;
+        },
+        [asset, outputs],
+      ) => {
+        const newUnspents = outputs.slice(
+          0,
+          Math.max(
+            0,
+            Math.floor(
+              (byteLimit -
+                getMessageSize({ numNewInputs: acc.finalInputs.length, numNewOutputs: acc.newOutputs.length }) -
+                OutputModel.size) /
+                InputModel.size,
+            ),
+          ),
+        );
+
+        return {
+          finalInputs: acc.finalInputs.concat(this.convertInputs(newUnspents)),
+          newOutputs:
+            newUnspents.length === 0
+              ? acc.newOutputs
+              : acc.newOutputs.concat(
+                  this.convertOutputs([
+                    {
+                      asset,
+                      value: newUnspents.reduce((left, right) => left.plus(right.value), new BigNumber('0')),
+                      address: from.address,
+                    },
+                  ]),
+                ),
+        };
+      },
+      { finalInputs: newInputs, newOutputs: [] },
+    );
+
+    return transactionUnsignedIn.clone({
+      inputs: transactionUnsignedIn.inputs.concat(finalInputs),
+      outputs: updatedOutputs.concat(newOutputs),
+    });
   }
 
   /*
@@ -887,6 +1087,29 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     throw new InvalidTransactionError('Something went wrong!');
   }
 
+  private async getUnspentOutputs({
+    from,
+    monitor,
+  }: {
+    readonly from: UserAccountID;
+    readonly monitor?: Monitor;
+  }): Promise<{ readonly unspentOutputs: ReadonlyArray<UnspentOutput>; readonly wasFiltered: boolean }> {
+    const [newBlockCount, allUnspentsIn] = await Promise.all([
+      this.provider.getBlockCount(from.network, monitor),
+      this.provider.getUnspentOutputs(from.network, from.address, monitor),
+    ]);
+    if (newBlockCount !== this.mutableBlockCount) {
+      this.mutableUsedOutputs.clear();
+      this.mutableBlockCount = newBlockCount;
+    }
+    const unspentOutputs = allUnspentsIn.filter(
+      (unspent) => !this.mutableUsedOutputs.has(`${unspent.txid}:${unspent.vout}`),
+    );
+    const wasFiltered = allUnspentsIn.length !== unspentOutputs.length;
+
+    return { unspentOutputs, wasFiltered };
+  }
+
   private async getTransfersInputOutputs({
     from,
     transfers,
@@ -897,21 +1120,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly transfers: ReadonlyArray<Transfer>;
     readonly gas: BigNumber;
     readonly monitor?: Monitor;
-  }): Promise<{ readonly outputs: ReadonlyArray<Output>; readonly inputs: ReadonlyArray<Input> }> {
+  }): Promise<{ readonly outputs: ReadonlyArray<Output>; readonly inputs: ReadonlyArray<UnspentOutput> }> {
     if (transfers.length === 0 && gas.lte(utils.ZERO_BIG_NUMBER)) {
       return { inputs: [], outputs: [] };
     }
-    const [newBlockCount, allOutputsIn] = await Promise.all([
-      this.provider.getBlockCount(from.network, monitor),
-      this.provider.getUnspentOutputs(from.network, from.address, monitor),
-    ]);
-
-    if (newBlockCount !== this.mutableBlockCount) {
-      this.mutableUsedOutputs.clear();
-      this.mutableBlockCount = newBlockCount;
-    }
-    const allOutputs = allOutputsIn.filter((output) => !this.mutableUsedOutputs.has(`${output.txid}:${output.vout}`));
-    const wasFiltered = allOutputsIn.length !== allOutputs.length;
+    const { unspentOutputs: allOutputs, wasFiltered } = await this.getUnspentOutputs({ from, monitor });
 
     return Object.values(
       _.groupBy(
@@ -932,7 +1145,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         const assetResults = toByAsset.reduce<{
           remaining: BigNumber;
           remainingOutputs: ReadonlyArray<UnspentOutput>;
-          inputs: ReadonlyArray<Input>;
+          inputs: ReadonlyArray<UnspentOutput>;
           outputs: ReadonlyArray<Output>;
         }>(
           ({ remaining, remainingOutputs, inputs, outputs: innerOutputs }, { amount, to }) => {
@@ -977,7 +1190,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           outputs,
         };
       },
-      { inputs: [] as Input[], outputs: [] as Output[] },
+      { inputs: [] as UnspentOutput[], outputs: [] as Output[] },
     );
   }
 
@@ -997,7 +1210,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly remaining: BigNumber;
     readonly wasFiltered: boolean;
   }): {
-    readonly inputs: ReadonlyArray<Input>;
+    readonly inputs: ReadonlyArray<UnspentOutput>;
     readonly outputs: ReadonlyArray<Output>;
     readonly remainingOutputs: ReadonlyArray<UnspentOutput>;
     readonly remaining: BigNumber;
@@ -1048,14 +1261,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     }
 
     let coinAmount = utils.ZERO_BIG_NUMBER;
-    const mutableInputs: Input[] = [];
+    const mutableInputs: UnspentOutput[] = [];
     // tslint:disable-next-line no-loop-statement
     for (let i = 0; i < k + 1; i += 1) {
       coinAmount = coinAmount.plus(outputsOrdered[i].value);
-      mutableInputs.push({
-        txid: outputsOrdered[i].txid,
-        vout: outputsOrdered[i].vout,
-      });
+      mutableInputs.push(outputsOrdered[i]);
     }
 
     return {

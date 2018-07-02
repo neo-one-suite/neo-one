@@ -1,5 +1,5 @@
 import { utils as commonUtils } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { common, UInt160Hex } from '../../common';
 import { crypto } from '../../crypto';
 import { InvalidFormatError, VerifyError } from '../../errors';

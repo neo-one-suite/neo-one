@@ -1,6 +1,6 @@
 // tslint:disable no-console
 import * as appRootDir from 'app-root-dir';
-import * as execa from 'execa';
+import execa from 'execa';
 
 const changedFilesToArray = (files: string) => files.split('\n');
 

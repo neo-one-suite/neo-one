@@ -1,6 +1,6 @@
 import { backup, BackupRestoreEnvironment, BackupRestoreOptions, restore } from '@neo-one/node-data-backup';
 import { finalize } from '@neo-one/utils';
-import path from 'path';
+import * as path from 'path';
 import { Subscription } from 'rxjs';
 import { fullNode$, FullNodeOptions } from './fullNode$';
 import { getDataPath } from './getDataPath';

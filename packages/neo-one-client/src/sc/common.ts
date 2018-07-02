@@ -1,6 +1,6 @@
 import { Param as ScriptBuilderParam } from '@neo-one/client-core';
 import { processError } from '@neo-one/client-switch';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { RawSourceMap } from 'source-map';
 import { InvalidArgumentError, InvalidEventError, InvocationCallError } from '../errors';
 import {

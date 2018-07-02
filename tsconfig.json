@@ -28,7 +28,7 @@
       ],
       "@neo-one/csharp": [
         "../@types/@neo-one/csharp"
-      ],            
+      ],
       "@neo-one/*": [
         "./neo-one-*/src"
       ],
@@ -36,15 +36,6 @@
         "../@types/*"
       ]
     },
-    "plugins": [
-      {
-        "name": "tslint-language-service",
-        "alwaysShowRuleFailuresAsWarnings": false,
-        "ignoreDefinitionFiles": true,
-        "disableNoUnusedVariableRule": true,
-        "supressWhileTypeErrorsPresent": false
-      }
-    ],
     "pretty": true,
     "skipLibCheck": true,
     "strict": true,

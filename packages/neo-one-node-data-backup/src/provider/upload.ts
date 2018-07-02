@@ -1,5 +1,5 @@
 import { Writable } from 'stream';
-import tar from 'tar';
+import * as tar from 'tar';
 
 export const upload = async ({
   dataPath,

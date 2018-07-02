@@ -1,6 +1,6 @@
 import { BinaryReader, utils } from '@neo-one/client-core';
 import { utils as commonUtils } from '@neo-one/utils';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { ArrayStackItem } from './ArrayStackItem';
 import { BooleanStackItem } from './BooleanStackItem';
 import { BufferStackItem } from './BufferStackItem';

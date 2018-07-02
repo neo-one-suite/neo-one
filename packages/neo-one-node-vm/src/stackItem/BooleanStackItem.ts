@@ -1,5 +1,5 @@
 import { BinaryWriter, BooleanContractParameter, ContractParameter, utils } from '@neo-one/client-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { StackItemBase } from './StackItemBase';
 import { StackItemType } from './StackItemType';
 

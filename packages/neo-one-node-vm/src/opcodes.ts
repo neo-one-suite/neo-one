@@ -1,7 +1,7 @@
 import { common, crypto, Op as OpCodeToByteCode, OpCode, UInt160, utils, VMState } from '@neo-one/client-core';
 import bitwise from 'bitwise';
-import BN from 'bn.js';
-import _ from 'lodash';
+import { BN } from 'bn.js';
+import * as _ from 'lodash';
 import { ExecutionContext, FEES, getResultContext, Op, OpInvoke } from './constants';
 import {
   CodeOverflowError,

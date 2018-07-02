@@ -1,8 +1,8 @@
 import { Monitor } from '@neo-one/monitor';
 import { Blockchain, Node } from '@neo-one/node-core';
 import { finalize } from '@neo-one/utils';
-import http from 'http';
-import https from 'https';
+import * as http from 'http';
+import * as https from 'https';
 import Application from 'koa';
 import Router from 'koa-router';
 import { combineLatest, defer, Observable } from 'rxjs';

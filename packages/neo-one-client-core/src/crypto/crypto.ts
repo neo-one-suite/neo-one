@@ -3,7 +3,7 @@ import ECKey from '@neo-one/ec-key';
 import { CustomError, utils } from '@neo-one/utils';
 import base58 from 'bs58';
 import xor from 'buffer-xor';
-import cryptoLib from 'crypto';
+import * as cryptoLib from 'crypto';
 import { ec as EC, KeyPair } from 'elliptic';
 import scrypt from 'scrypt-js';
 import WIF from 'wif';

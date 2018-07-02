@@ -17,8 +17,8 @@ import {
   ValidatorUpdate,
 } from '@neo-one/client-core';
 import { ValidatorsCount, ValidatorsCountUpdate } from '@neo-one/node-core';
-import BN from 'bn.js';
-import _ from 'lodash';
+import { BN } from 'bn.js';
+import * as _ from 'lodash';
 import { Blockchain } from './Blockchain';
 import { ValidatorCache } from './ValidatorCache';
 

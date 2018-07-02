@@ -1,5 +1,5 @@
 /* @jest-environment jsdom */
-import prom from 'prom-client';
+import * as prom from 'prom-client';
 
 import { CollectingLogger } from '../CollectingLogger';
 import { NodeMonitor } from '../NodeMonitor';

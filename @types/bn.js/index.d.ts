@@ -1,6 +1,6 @@
 declare module 'bn.js' {
   type Endian = 'be' | 'le';
-  export default class BN {
+  export class BN {
     constructor(value: number | BN);
     constructor(value: Buffer, endian?: Endian);
     constructor(value: string, base: number);

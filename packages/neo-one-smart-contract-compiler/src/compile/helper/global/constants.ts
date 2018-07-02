@@ -4,6 +4,7 @@ export const GLOBAL_PROPERTIES = new Set([
   'Boolean',
   'Buffer',
   'Error',
+  'Map',
   'Number',
   'Object',
   'String',

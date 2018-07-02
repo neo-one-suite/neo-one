@@ -4,7 +4,7 @@ import { proto } from '@neo-one/server-grpc';
 import { Binary, Config, DescribeTable } from '@neo-one/server-plugin';
 import { finalize } from '@neo-one/utils';
 import Mali, { Context } from 'mali';
-import path from 'path';
+import * as path from 'path';
 import { combineLatest, defer, Observable } from 'rxjs';
 import { distinctUntilChanged, map, mergeScan, switchMap } from 'rxjs/operators';
 import pkg from '../package.json';

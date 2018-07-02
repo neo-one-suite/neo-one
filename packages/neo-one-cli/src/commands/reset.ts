@@ -1,7 +1,7 @@
 import { VERSION } from '@neo-one/server';
 import { Client, ServerManager } from '@neo-one/server-client';
 import { CLIArgs, name } from '@neo-one/server-plugin';
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import ora from 'ora';
 import { take } from 'rxjs/operators';
 import { setupServer } from './common';

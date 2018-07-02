@@ -10,8 +10,7 @@ import {
   ValidatorKey,
 } from '@neo-one/client-core';
 import { AccountInputKey, AccountInputsKey } from '@neo-one/node-core';
-import BN from 'bn.js';
-// @ts-ignore
+import { BN } from 'bn.js';
 import bytewise from 'bytewise';
 
 const accountKeyPrefix = 'account';

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-storage-common",
-  "version": "1.0.0-alpha.53",
+  "version": "1.0.0-alpha.55",
   "keywords": [
     "neo",
     "NEO",
@@ -35,8 +35,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.50",
-    "@neo-one/node-core": "^1.0.0-alpha.51",
+    "@neo-one/client-core": "^1.0.0-alpha.52",
+    "@neo-one/node-core": "^1.0.0-alpha.53",
     "bn.js": "^4.11.8",
     "bytewise": "^1.1.0"
   }

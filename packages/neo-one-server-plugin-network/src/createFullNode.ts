@@ -2,8 +2,8 @@ import { Monitor } from '@neo-one/monitor';
 import { FullNode } from '@neo-one/node';
 import { createMain, createTest } from '@neo-one/node-neo-settings';
 import { Config } from '@neo-one/server-plugin';
-import fs from 'fs-extra';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import { distinctUntilChanged, map, take } from 'rxjs/operators';
 import { NEOONENodeConfig } from './node';
 

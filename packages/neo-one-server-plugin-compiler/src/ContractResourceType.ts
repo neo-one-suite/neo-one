@@ -11,7 +11,7 @@ import {
   ResourceState,
   ResourceType,
 } from '@neo-one/server-plugin';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { CompilerPlugin } from './CompilerPlugin';
 import { constants } from './constants';
 import { CreateContractCRUD } from './crud';

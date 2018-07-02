@@ -1,10 +1,12 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { common, UInt160Hex } from '../common';
 import { InvalidFormatError, VerifyError } from '../errors';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { IOHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
+import { Input } from './Input';
+import { Output } from './Output';
 import {
   FeeContext,
   TransactionBase,
@@ -90,15 +92,19 @@ export class IssueTransaction extends TransactionBase<typeof TransactionType.Iss
   public clone({
     scripts = this.scripts,
     attributes = this.attributes,
+    inputs = this.inputs,
+    outputs = this.outputs,
   }: {
     readonly scripts?: ReadonlyArray<Witness>;
     readonly attributes?: ReadonlyArray<Attribute>;
+    readonly inputs?: ReadonlyArray<Input>;
+    readonly outputs?: ReadonlyArray<Output>;
   }): IssueTransaction {
     return new IssueTransaction({
       version: this.version,
       attributes,
-      inputs: this.inputs,
-      outputs: this.outputs,
+      inputs,
+      outputs,
       scripts,
     });
   }

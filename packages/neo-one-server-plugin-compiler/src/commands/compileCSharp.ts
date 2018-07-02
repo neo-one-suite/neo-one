@@ -1,8 +1,8 @@
 import csharp from '@neo-one/csharp';
 import { CLIArgs, paths } from '@neo-one/server-plugin';
 import execa from 'execa';
-import fs from 'fs-extra';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 
 export const compileCSharp = ({ vorpal, shutdown, logConfig$ }: CLIArgs) => {
   vorpal

@@ -3,11 +3,11 @@ import { BehaviorSubject } from 'rxjs';
 
 import { addressToScriptHash, createPrivateKey, privateKeyToAddress, privateKeyToPublicKey } from '@neo-one/client';
 import { createMain } from '@neo-one/node-neo-settings';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import MemDown from 'memdown';
 
+import { getMonitor } from '../test/getMonitor';
 import { addCleanup } from './cleanupTest';
-import { getMonitor } from './getMonitor';
 
 const getPort = () => _.random(10000, 50000);
 

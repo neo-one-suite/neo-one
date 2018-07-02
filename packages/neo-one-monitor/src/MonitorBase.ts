@@ -2,7 +2,7 @@ import { IncomingMessage } from 'http';
 import { Context } from 'koa';
 
 import { utils } from '@neo-one/utils';
-import _ from 'lodash';
+import * as _ from 'lodash';
 
 import { ReportHandler } from './ReportHandler';
 import {
@@ -548,7 +548,7 @@ export class MonitorBase implements Span {
       labels = {
         ...labels,
         [KnownLabel.ERROR]: errorObj !== undefined,
-        [KnownLabel.ERROR_KIND]: this.getErrorKind(errorObj),
+        [KnownLabel.ERROR_KIND]: `${this.getErrorKind(errorObj)}`,
       };
       const errorLevel = error.level === undefined ? 'error' : error.level;
       if (errorObj !== undefined) {
@@ -599,7 +599,7 @@ export class MonitorBase implements Span {
     }
   }
 
-  private getErrorKind(error?: Error | undefined): string {
+  private getErrorKind(error?: Error | undefined): string | number {
     if (error === undefined) {
       return 'n/a';
     }

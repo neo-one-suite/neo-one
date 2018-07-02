@@ -16,9 +16,9 @@ import {
   TaskList,
 } from '@neo-one/server-plugin';
 import { labels, utils } from '@neo-one/utils';
-import fs from 'fs-extra';
-import _ from 'lodash';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as _ from 'lodash';
+import * as path from 'path';
 import { BehaviorSubject, combineLatest, Observable, of as _of } from 'rxjs';
 import { filter, map, shareReplay, switchMap, take } from 'rxjs/operators';
 import { ResourceNoStartError, ResourceNoStopError } from './errors';

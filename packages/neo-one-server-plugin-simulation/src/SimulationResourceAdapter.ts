@@ -2,8 +2,8 @@ import { DescribeTable, PluginManager, ResourceState, TaskList } from '@neo-one/
 import { constants as walletConstants, MasterWalletResourceAdapter } from '@neo-one/server-plugin-wallet';
 import { ChildProcess } from 'child_process';
 import execa from 'execa';
-import fs from 'fs-extra';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import {

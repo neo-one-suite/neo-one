@@ -1,7 +1,7 @@
 import { ABI } from '@neo-one/client';
 import { Binary, DescribeTable, TaskList } from '@neo-one/server-plugin';
-import fs from 'fs-extra';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import { Observable, of as _of, ReplaySubject, Subject } from 'rxjs';
 import { shareReplay, switchMap } from 'rxjs/operators';
 import { compileSmartContract } from './compileSmartContract';

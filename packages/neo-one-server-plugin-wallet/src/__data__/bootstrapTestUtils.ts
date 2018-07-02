@@ -2,7 +2,7 @@ import { addressToScriptHash, NEOONEProvider, privateKeyToAddress, ReadClient } 
 import { common } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { ASSET_INFO, compileSmartContract, TOKEN_INFO, TokenInfo } from '../bootstrap';
 import { constants } from '../constants';
 

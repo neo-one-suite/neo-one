@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 
 // tslint:disable-next-line export-name
 export const copyFile = async (path: string, to: string): Promise<void> => {

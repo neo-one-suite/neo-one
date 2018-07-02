@@ -40,7 +40,7 @@ import {
   ValidatorKey,
 } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { AccountUnclaimed, AccountUnclaimedKey, AccountUnclaimedsKey } from './AccountUnclaimed';
 import { AccountUnspent, AccountUnspentKey, AccountUnspentsKey } from './AccountUnspent';
@@ -92,6 +92,7 @@ export interface DeleteStorage<Key> {
 export interface AddUpdateDeleteMetadataStorage<Value, Update>
   extends AddUpdateMetadataStorage<Value, Update>,
     DeleteMetadataStorage {}
+export interface AddDeleteStorage<Key, Value> extends AddStorage<Value>, DeleteStorage<Key> {}
 export interface AddUpdateDeleteStorage<Key, Value, Update>
   extends AddUpdateStorage<Value, Update>,
     DeleteStorage<Key> {}
@@ -102,6 +103,9 @@ interface ReadAddUpdateMetadataStorage<Value, Update>
   extends ReadMetadataStorage<Value>,
     AddUpdateMetadataStorage<Value, Update> {}
 interface ReadAddUpdateStorage<Key, Value, Update> extends ReadStorage<Key, Value>, AddUpdateStorage<Value, Update> {}
+interface ReadGetAllAddDeleteStorage<Key, PartialKey, Value>
+  extends ReadGetAllStorage<Key, PartialKey, Value>,
+    AddDeleteStorage<Key, Value> {}
 interface ReadAllAddStorage<Key, Value> extends ReadAllStorage<Key, Value>, AddStorage<Value> {}
 interface ReadAllAddUpdateDeleteStorage<Key, Value, Update>
   extends ReadAllStorage<Key, Value>,
@@ -114,23 +118,10 @@ interface ReadGetAllAddUpdateDeleteStorage<Key, PartialKey, Value, Update>
   extends ReadGetAllStorage<Key, PartialKey, Value>,
     AddUpdateDeleteStorage<Key, Value, Update> {}
 
-export interface Blockchain {
-  readonly settings: Settings;
-  readonly deserializeWireContext: DeserializeWireContext;
-  readonly serializeJSONContext: SerializeJSONContext;
-  readonly feeContext: FeeContext;
-
-  readonly currentBlock: Block;
-  readonly currentHeader: Header;
-  readonly currentBlockIndex: number;
-  readonly block$: Observable<Block>;
-  readonly isPersistingBlock: boolean;
-
+export interface BlockchainStorage {
   readonly account: ReadAllStorage<AccountKey, Account>;
   readonly accountUnclaimed: ReadGetAllStorage<AccountUnclaimedKey, AccountUnclaimedsKey, AccountUnclaimed>;
-
   readonly accountUnspent: ReadGetAllStorage<AccountUnspentKey, AccountUnspentsKey, AccountUnspent>;
-
   readonly action: ReadGetAllStorage<ActionKey, ActionsKey, Action>;
   readonly asset: ReadStorage<AssetKey, Asset>;
   readonly block: ReadStorage<BlockKey, Block>;
@@ -144,6 +135,20 @@ export interface Blockchain {
   readonly validator: ReadAllStorage<ValidatorKey, Validator>;
   readonly invocationData: ReadStorage<InvocationDataKey, InvocationData>;
   readonly validatorsCount: ReadMetadataStorage<ValidatorsCount>;
+}
+
+export interface Blockchain extends BlockchainStorage {
+  readonly settings: Settings;
+  readonly deserializeWireContext: DeserializeWireContext;
+  readonly serializeJSONContext: SerializeJSONContext;
+  readonly feeContext: FeeContext;
+
+  readonly currentBlock: Block;
+  readonly previousBlock: Block | undefined;
+  readonly currentHeader: Header;
+  readonly currentBlockIndex: number;
+  readonly block$: Observable<Block>;
+  readonly isPersistingBlock: boolean;
 
   readonly persistBlock: (
     options: {
@@ -180,16 +185,13 @@ export interface Blockchain {
 
 export interface WriteBlockchain {
   readonly settings: Blockchain['settings'];
-
   readonly currentBlock: Blockchain['currentBlock'];
   readonly currentHeader: Blockchain['currentHeader'];
   readonly currentBlockIndex: number;
   readonly getValidators: Blockchain['getValidators'];
-
   readonly account: ReadAllAddUpdateDeleteStorage<AccountKey, Account, AccountUpdate>;
-  readonly accountUnclaimed: ReadAddDeleteStorage<AccountUnclaimedKey, AccountUnclaimed>;
-
-  readonly accountUnspent: ReadAddDeleteStorage<AccountUnspentKey, AccountUnspent>;
+  readonly accountUnclaimed: ReadGetAllAddDeleteStorage<AccountUnclaimedKey, AccountUnclaimedsKey, AccountUnclaimed>;
+  readonly accountUnspent: ReadGetAllAddDeleteStorage<AccountUnspentKey, AccountUnspentsKey, AccountUnspent>;
   readonly action: ReadGetAllAddStorage<ActionKey, ActionsKey, Action>;
   readonly asset: ReadAddUpdateStorage<AssetKey, Asset, AssetUpdate>;
   readonly block: ReadAddStorage<BlockKey, Block>;
@@ -197,7 +199,6 @@ export interface WriteBlockchain {
   readonly header: ReadAddStorage<HeaderKey, Header>;
   readonly transaction: ReadAddStorage<TransactionKey, Transaction>;
   readonly transactionData: ReadAddUpdateStorage<TransactionDataKey, TransactionData, TransactionDataUpdate>;
-
   readonly output: Blockchain['output'];
   readonly contract: ReadAddDeleteStorage<ContractKey, Contract>;
   readonly storageItem: ReadGetAllAddUpdateDeleteStorage<
@@ -206,7 +207,6 @@ export interface WriteBlockchain {
     StorageItem,
     StorageItemUpdate
   >;
-
   readonly validator: ReadAllAddStorage<ValidatorKey, Validator>;
   readonly invocationData: ReadAddStorage<InvocationDataKey, InvocationData>;
   readonly validatorsCount: ReadAddUpdateMetadataStorage<ValidatorsCount, ValidatorsCountUpdate>;

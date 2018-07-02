@@ -1,6 +1,6 @@
 // tslint:disable ban-types
 import { OpCode, SysCallName } from '@neo-one/client-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Node, SourceFile, Symbol, Type } from 'ts-simple-ast';
 
 import { DiagnosticCode } from '../../DiagnosticCode';

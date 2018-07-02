@@ -1,5 +1,5 @@
 // tslint:disable
-import { common, utils } from '@neo-one/client-core';
+import { common, utils, Transaction } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import {
   InsufficientFundsError,
@@ -39,28 +39,28 @@ describe('LocalUserAccountProvider', () => {
       asset: common.NEO_ASSET_HASH,
       value: new BigNumber('1'),
       address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045a',
       vout: 1,
     },
     twoNEO: {
       asset: common.NEO_ASSET_HASH,
-      value: new BigNumber('1'),
+      value: new BigNumber('2'),
       address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045a',
       vout: 2,
     },
     sevenNEO: {
       asset: common.NEO_ASSET_HASH,
       value: new BigNumber('7'),
       address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045d',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045a',
       vout: 3,
     },
     oneGAS: {
       asset: common.GAS_ASSET_HASH,
-      value: new BigNumber('2'),
+      value: new BigNumber('1'),
       address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045e',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045d',
       vout: 4,
     },
     twoGAS: {
@@ -76,6 +76,27 @@ describe('LocalUserAccountProvider', () => {
       address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
       txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045e',
       vout: 6,
+    },
+    oneTKY: {
+      asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+      value: new BigNumber('1'),
+      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+      vout: 7,
+    },
+    twoTKY: {
+      asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+      value: new BigNumber('2'),
+      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+      vout: 8,
+    },
+    threeTKY: {
+      asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+      value: new BigNumber('3'),
+      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
+      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+      vout: 9,
     },
   };
 
@@ -1059,7 +1080,6 @@ describe('LocalUserAccountProvider', () => {
     const result1 = await localUserAccountProvider.transfer(transfers1, {
       from: options.from,
       attributes: options.attributes,
-      networkFee: undefined,
     });
 
     provider.getBlockCount = jest.fn(() => Promise.resolve(1));
@@ -1067,13 +1087,207 @@ describe('LocalUserAccountProvider', () => {
     const result2 = await localUserAccountProvider.transfer(transfers2, {
       from: options.from,
       attributes: options.attributes,
-      networkFee: undefined,
     });
 
     await result1;
     // @ts-ignore
     expect(localUserAccountProvider.mutableUsedOutputs.size).toEqual(1);
     expect(result2).toHaveProperty('transaction');
+    verifyMocks();
+  });
+
+  test('transaction consolidates', async () => {
+    const unspent = [outputs.oneNEO, outputs.twoNEO, outputs.sevenNEO, outputs.oneGAS, outputs.elevenGAS];
+    const transfer = [
+      {
+        amount: new BigNumber('3'),
+        asset: common.NEO_ASSET_HASH,
+        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
+      },
+    ];
+    keystore.byteLimit = 800;
+    keystore.sign = jest.fn(() => witness);
+    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
+    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+
+    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
+    await localUserAccountProvider.transfer(transfer, {
+      from: options.from,
+      attributes: options.attributes,
+    });
+    const consolidatedTransaction = spy.mock.calls[0][0].transaction;
+    expect(consolidatedTransaction.serializeUnsigned().length).toEqual(366);
+    expect(consolidatedTransaction.inputs.length).toEqual(5);
+    expect(consolidatedTransaction.outputs.length).toEqual(3);
+
+    spy.mockReset();
+    spy.mockRestore();
+    verifyMocks();
+  });
+
+  test(`claim consolidates`, async () => {
+    const unspent = [outputs.elevenGAS];
+
+    keystore.byteLimit = 500;
+    keystore.sign = jest.fn(() => witness);
+    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
+    provider.getUnclaimed = jest.fn(() =>
+      Promise.resolve({
+        unclaimed: [
+          {
+            txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+            vout: 2,
+          },
+        ],
+
+        amount: new BigNumber('3'),
+      }),
+    );
+    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
+
+    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+
+    await localUserAccountProvider.claim({
+      from: options.from,
+      attributes: options.attributes,
+    });
+
+    const consolidatedTransaction = spy.mock.calls[0][0].transaction;
+    expect(consolidatedTransaction.serializeUnsigned().length).toEqual(145);
+    expect(consolidatedTransaction.inputs.length).toEqual(1);
+    expect(consolidatedTransaction.outputs.length).toEqual(1);
+
+    spy.mockReset();
+    spy.mockRestore();
+    verifyMocks();
+  });
+
+  test(`blank transaction consolidates`, async () => {
+    const unspent = [
+      outputs.oneNEO,
+      outputs.twoNEO,
+      outputs.sevenNEO,
+      outputs.oneGAS,
+      outputs.twoGAS,
+      outputs.elevenGAS,
+    ];
+    keystore.byteLimit = 800;
+    keystore.sign = jest.fn(() => witness);
+    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
+    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+
+    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
+    await localUserAccountProvider.transfer([], {
+      from: options.from,
+      attributes: options.attributes,
+    });
+    const consolidatedTransaction = spy.mock.calls[0][0].transaction;
+    expect(consolidatedTransaction.serializeUnsigned().length).toEqual(340);
+    expect(consolidatedTransaction.inputs.length).toEqual(6);
+    expect(consolidatedTransaction.outputs.length).toEqual(2);
+
+    spy.mockReset();
+    spy.mockRestore();
+    verifyMocks();
+  });
+
+  test(`consolidate prioritizes any asset with a return output`, async () => {
+    const unspent = [
+      outputs.oneTKY,
+      outputs.threeTKY,
+      outputs.oneNEO,
+      outputs.twoNEO,
+      outputs.sevenNEO,
+      outputs.oneGAS,
+      outputs.twoGAS,
+      outputs.elevenGAS,
+    ];
+
+    const transfers = [
+      {
+        amount: new BigNumber('2'),
+        asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
+        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
+      },
+    ];
+
+    keystore.byteLimit = 250;
+    keystore.sign = jest.fn(() => witness);
+    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
+    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+
+    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
+    await localUserAccountProvider.transfer(transfers, {
+      from: options.from,
+      attributes: options.attributes,
+    });
+    const consolidatedTransaction = spy.mock.calls[0][0].transaction as Transaction;
+    expect(consolidatedTransaction.serializeUnsigned().length).toEqual(204);
+    expect(
+      consolidatedTransaction.inputs.every((input) => common.uInt256ToString(input.hash) === outputs.oneTKY.asset),
+    ).toBe(true);
+
+    spy.mockReset();
+    spy.mockRestore();
+    verifyMocks();
+  });
+
+  test(`consolidation prioritizes NEO/GAS for new outputs`, async () => {
+    const unspent = [
+      outputs.oneTKY,
+      outputs.twoTKY,
+      outputs.oneNEO,
+      outputs.twoNEO,
+      outputs.sevenNEO,
+      outputs.oneGAS,
+      outputs.twoGAS,
+      outputs.elevenGAS,
+    ];
+
+    keystore.byteLimit = 400;
+    keystore.sign = jest.fn(() => witness);
+    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
+    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+
+    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
+    await localUserAccountProvider.transfer([], {
+      from: options.from,
+      attributes: options.attributes,
+    });
+    const consolidatedTransaction = spy.mock.calls[0][0].transaction as Transaction;
+    expect(consolidatedTransaction.inputs.some((input) => input.index === 7 || input.index === 8)).toBe(false);
+
+    spy.mockReset();
+    spy.mockRestore();
+    verifyMocks();
+  });
+
+  test('transaction consolidates GAS when network fee present', async () => {
+    const unspent = [outputs.oneNEO, outputs.oneGAS, outputs.elevenGAS];
+    const transfer = [
+      {
+        amount: new BigNumber('1'),
+        asset: common.NEO_ASSET_HASH,
+        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
+      },
+    ];
+    keystore.byteLimit = 800;
+    keystore.sign = jest.fn(() => witness);
+    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
+    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+
+    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
+    await localUserAccountProvider.transfer(transfer, {
+      from: options.from,
+      attributes: options.attributes,
+      networkFee: new BigNumber('2'),
+    });
+    const consolidatedTransaction = spy.mock.calls[0][0].transaction;
+    expect(consolidatedTransaction.inputs.length).toEqual(3);
+    expect(consolidatedTransaction.outputs.length).toEqual(2);
+
+    spy.mockReset();
+    spy.mockRestore();
     verifyMocks();
   });
 });

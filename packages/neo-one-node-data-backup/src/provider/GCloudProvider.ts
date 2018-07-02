@@ -1,4 +1,4 @@
-import Storage, { File } from '@google-cloud/storage';
+import * as Storage from '@google-cloud/storage';
 import { Monitor } from '@neo-one/monitor';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -20,7 +20,7 @@ const METADATA_NAME = 'metadata';
 const MAX_SIZE = 1_000_000_000;
 const KEEP_BACKUP_COUNT = 10;
 
-const extractTime = (prefix: string, file: File) => parseInt(file.name.slice(prefix.length).split('/')[0], 10);
+const extractTime = (prefix: string, file: Storage.File) => parseInt(file.name.slice(prefix.length).split('/')[0], 10);
 
 export class GCloudProvider extends Provider {
   private readonly environment: Environment;
@@ -113,7 +113,7 @@ export class GCloudProvider extends Provider {
       mutableFileLists.push(mutableCurrentFileList);
     }
 
-    const storage = Storage({ projectId: projectID });
+    const storage = new Storage.Storage({ projectId: projectID });
     const time = Math.round(Date.now() / 1000);
     // tslint:disable-next-line no-loop-statement
     for (const [idx, fileList] of mutableFileLists.entries()) {
@@ -159,10 +159,13 @@ export class GCloudProvider extends Provider {
     );
   }
 
-  private async getLatestTime(): Promise<{ readonly time: number | undefined; readonly files: ReadonlyArray<File> }> {
+  private async getLatestTime(): Promise<{
+    readonly time: number | undefined;
+    readonly files: ReadonlyArray<Storage.File>;
+  }> {
     const { bucket, prefix, projectID } = this.options;
 
-    const storage = Storage({ projectId: projectID });
+    const storage = new Storage.Storage({ projectId: projectID });
     const [files] = await storage.bucket(bucket).getFiles({ prefix });
 
     const metadataTimes = files

@@ -1,4 +1,3 @@
-// @ts-ignore
 import { codeFrameColumns } from '@babel/code-frame';
 import { SourceMapConsumer } from 'source-map';
 import { ProcessErrorOptions } from '../common';

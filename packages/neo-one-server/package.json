@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server",
-  "version": "1.0.0-alpha.87",
+  "version": "1.0.0-alpha.89",
   "keywords": [
     "neo",
     "NEO",
@@ -35,24 +35,24 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0-alpha.35",
-    "@neo-one/server-client": "^1.0.0-alpha.49",
-    "@neo-one/server-grpc": "^1.0.0-alpha.8",
-    "@neo-one/server-plugin": "^1.0.0-alpha.48",
-    "@neo-one/server-plugin-compiler": "^1.0.0-alpha.66",
-    "@neo-one/server-plugin-network": "^1.0.0-alpha.84",
-    "@neo-one/server-plugin-simulation": "^1.0.0-alpha.87",
-    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.87",
-    "@neo-one/utils": "^1.0.0-alpha.40",
+    "@neo-one/monitor": "^1.0.0-alpha.37",
+    "@neo-one/server-client": "^1.0.0-alpha.51",
+    "@neo-one/server-grpc": "^1.0.0-alpha.9",
+    "@neo-one/server-plugin": "^1.0.0-alpha.50",
+    "@neo-one/server-plugin-compiler": "^1.0.0-alpha.68",
+    "@neo-one/server-plugin-network": "^1.0.0-alpha.86",
+    "@neo-one/server-plugin-simulation": "^1.0.0-alpha.89",
+    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.89",
+    "@neo-one/utils": "^1.0.0-alpha.42",
     "fs-extra": "^6.0.1",
     "grpc": "^1.13.0-pre1",
     "grpc-error": "^1.0.0",
     "lodash": "^4.17.10",
-    "mali": "^0.8.0",
-    "mali-compose": "^1.0.0",
+    "mali": "^0.8.2",
+    "mali-compose": "^1.1.0",
     "mali-onerror": "^0.1.1",
     "rxjs": "^6.2.1",
     "toposort": "^2.0.2",
-    "uuid": "^3.3.0"
+    "uuid": "^3.3.2"
   }
 }

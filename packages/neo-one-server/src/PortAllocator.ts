@@ -1,7 +1,7 @@
 // tslint:disable readonly-keyword no-loop-statement no-object-mutation no-dynamic-delete
 import { Monitor } from '@neo-one/monitor';
 import { Config, DescribeTable, PortAllocator as IPortAllocator } from '@neo-one/server-plugin';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { take } from 'rxjs/operators';
 
 interface NamePorts {

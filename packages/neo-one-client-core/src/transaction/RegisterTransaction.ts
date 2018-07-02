@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { AssetNameJSON } from '../Asset';
 import { assertAssetType, AssetType, AssetTypeJSON, toJSONAssetType } from '../AssetType';
 import { common, ECPoint, UInt160, UInt160Hex } from '../common';
@@ -8,6 +8,8 @@ import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializabl
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
+import { Input } from './Input';
+import { Output } from './Output';
 import {
   FeeContext,
   TransactionBase,
@@ -132,15 +134,19 @@ export class RegisterTransaction extends TransactionBase<typeof TransactionType.
   public clone({
     scripts = this.scripts,
     attributes = this.attributes,
+    inputs = this.inputs,
+    outputs = this.outputs,
   }: {
     readonly scripts?: ReadonlyArray<Witness>;
     readonly attributes?: ReadonlyArray<Attribute>;
+    readonly inputs?: ReadonlyArray<Input>;
+    readonly outputs?: ReadonlyArray<Output>;
   }): RegisterTransaction {
     return new RegisterTransaction({
       version: this.version,
       attributes,
-      inputs: this.inputs,
-      outputs: this.outputs,
+      inputs,
+      outputs,
       scripts,
       hash: this.hash,
       asset: this.asset,

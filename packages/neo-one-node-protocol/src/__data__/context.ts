@@ -1,5 +1,5 @@
 import { common } from '@neo-one/client-core';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { Context } from '../consensus/context';
 import { keys } from './keys';
 

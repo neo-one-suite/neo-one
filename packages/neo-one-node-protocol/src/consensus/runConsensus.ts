@@ -12,8 +12,8 @@ import {
 } from '@neo-one/client-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
-import _ from 'lodash';
+import { BN } from 'bn.js';
+import * as _ from 'lodash';
 import { Node } from '../Node';
 import {
   checkExpectedView,

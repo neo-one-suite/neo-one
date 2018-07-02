@@ -14,7 +14,7 @@ import {
   Witness,
 } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 
 export const GENERATION_AMOUNT: ReadonlyArray<number> = [
   8,

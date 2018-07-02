@@ -1,10 +1,10 @@
 import { BinaryReader, Block, DeserializeWireContext } from '@neo-one/client-core';
 import { Blockchain } from '@neo-one/node-core';
 import { CustomError } from '@neo-one/utils';
-import fs from 'fs';
-import _ from 'lodash';
+import * as fs from 'fs';
+import * as _ from 'lodash';
 import { Readable, Transform, Writable } from 'stream';
-import zlib from 'zlib';
+import * as zlib from 'zlib';
 
 export class InvalidBlockTransformEncodingError extends CustomError {
   public readonly code: string;

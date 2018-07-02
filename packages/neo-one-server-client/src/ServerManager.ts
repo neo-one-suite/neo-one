@@ -1,9 +1,9 @@
 import { Binary, killProcess } from '@neo-one/server-plugin';
 import { utils } from '@neo-one/utils';
 import execa from 'execa';
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import isRunning from 'is-running';
-import path from 'path';
+import * as path from 'path';
 import { Client } from './Client';
 
 const SERVER_PID = 'server.pid';

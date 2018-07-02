@@ -1,7 +1,7 @@
 // tslint:disable ban-types
 import Project, { SourceFile, ts } from 'ts-simple-ast';
 
-import appRootDir from 'app-root-dir';
+import * as appRootDir from 'app-root-dir';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 

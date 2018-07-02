@@ -1,7 +1,7 @@
 import { FullNode } from '@neo-one/node';
 import { BackupRestoreOptions } from '@neo-one/node-data-backup';
 import { CLIArgs } from '@neo-one/server-plugin';
-import path from 'path';
+import * as path from 'path';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { Args, Command } from 'vorpal';
 import { createFullNode } from './createFullNode';

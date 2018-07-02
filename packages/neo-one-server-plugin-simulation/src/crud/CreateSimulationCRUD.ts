@@ -1,5 +1,5 @@
 import { CreateCRUD, GetCLIResourceOptions } from '@neo-one/server-plugin';
-import path from 'path';
+import * as path from 'path';
 import { Simulation, SimulationResourceOptions, SimulationResourceType } from '../SimulationResourceType';
 
 export class CreateSimulationCRUD extends CreateCRUD<Simulation, SimulationResourceOptions> {

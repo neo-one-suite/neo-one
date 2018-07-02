@@ -1,10 +1,11 @@
 // tslint:disable no-console
 import * as appRootDir from 'app-root-dir';
-import * as execa from 'execa';
+import execa from 'execa';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import {
   OutputOptions,
+  Plugin,
   rollup,
   RollupSingleFileBuild,
   RollupWatchOptions,
@@ -12,20 +13,13 @@ import {
   Watcher,
   WatcherOptions,
 } from 'rollup';
-// @ts-ignore
-import * as babel from 'rollup-plugin-babel';
-// @ts-ignore
-import * as commonjs from 'rollup-plugin-commonjs';
-// @ts-ignore
-import * as json from 'rollup-plugin-json';
-// @ts-ignore
-import * as resolve from 'rollup-plugin-node-resolve';
-// @ts-ignore
-import * as replace from 'rollup-plugin-replace';
-// @ts-ignore
-import * as sourcemaps from 'rollup-plugin-sourcemaps';
-// @ts-ignore
-import * as typescript from 'rollup-plugin-typescript2';
+import babel from 'rollup-plugin-babel';
+import commonjs from 'rollup-plugin-commonjs';
+import json from 'rollup-plugin-json';
+import resolve from 'rollup-plugin-node-resolve';
+import replace from 'rollup-plugin-replace';
+import sourcemaps from 'rollup-plugin-sourcemaps';
+import typescript from 'rollup-plugin-typescript2';
 import * as ts from 'typescript';
 
 import getBabelConfig from '../getBabelConfig';
@@ -243,8 +237,7 @@ const createRollupInput = ({ pkg, entry }: { readonly pkg: string; readonly entr
         '#! /usr/bin/env node': '',
       },
     }),
-    json({ preferConst: true }),
-    // @ts-ignore
+    json({ preferConst: true }) as Plugin,
     typescript({
       tsconfigOverride: {
         compilerOptions: getCompilerOptions(pkg),
@@ -253,7 +246,7 @@ const createRollupInput = ({ pkg, entry }: { readonly pkg: string; readonly entr
       check: false,
       clean: true,
       typescript: ts,
-    }),
+    }) as Plugin,
     babel({
       exclude: path.join('node_modules', '**'),
       ...getBabelConfigFull({ modules: false, entry: entry.entry, useBuiltIns: entry.useBuiltIns }),
@@ -322,10 +315,14 @@ export const compileJavascript = async ({ pkg }: { readonly pkg: string }): Prom
   console.log(`Built ${pkg} in ${((Date.now() - start) / 1000).toFixed(2)} seconds`);
 };
 
-export const buildJavascript = async () => {
-  // tslint:disable-next-line no-loop-statement
-  for (const pkg of pkgs) {
-    await compileJavascript({ pkg });
+export const buildJavascript = async (selectedPkg?: string) => {
+  if (selectedPkg === undefined) {
+    // tslint:disable-next-line no-loop-statement
+    for (const pkg of pkgs) {
+      await compileJavascript({ pkg });
+    }
+  } else {
+    await compileJavascript({ pkg: selectedPkg });
   }
 };
 

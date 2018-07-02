@@ -13,7 +13,7 @@ import {
   TransactionType,
   Witness,
 } from '@neo-one/client-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 
 const GENERATION_AMOUNT: ReadonlyArray<number> = [8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 

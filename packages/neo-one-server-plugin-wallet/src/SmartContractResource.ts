@@ -1,8 +1,8 @@
 import { ABI } from '@neo-one/client';
 import { compoundName, DescribeTable, PluginManager } from '@neo-one/server-plugin';
 import { constants as compilerConstants, Contract } from '@neo-one/server-plugin-compiler';
-import fs from 'fs-extra';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import { Observable, ReplaySubject } from 'rxjs';
 import { map, shareReplay, take } from 'rxjs/operators';
 import { ABIRequiredError, ContractOrHashRequiredError, WalletRequiredError } from './errors';

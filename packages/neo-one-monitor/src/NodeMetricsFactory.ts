@@ -1,4 +1,4 @@
-import prom from 'prom-client';
+import * as prom from 'prom-client';
 
 import { CounterProxy, GaugeProxy, HistogramProxy, MetricsFactoryProxy, SummaryProxy } from './MetricsFactoryProxy';
 import {

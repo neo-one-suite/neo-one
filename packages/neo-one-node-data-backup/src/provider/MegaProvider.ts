@@ -1,7 +1,7 @@
 import { Monitor } from '@neo-one/monitor';
-import fs from 'fs';
+import * as fs from 'fs';
 import { File, Storage } from 'megajs';
-import path from 'path';
+import * as path from 'path';
 import { Environment } from '../types';
 import { extract } from './extract';
 import { Provider } from './Provider';

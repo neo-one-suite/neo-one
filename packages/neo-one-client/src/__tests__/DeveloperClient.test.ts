@@ -1,49 +1,69 @@
 import { DeveloperClient } from '../DeveloperClient';
-import { NEOONEDataProvider } from '../provider/neoone/NEOONEDataProvider';
+import { NEOONEProvider } from '../provider';
+import { LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider } from '../user';
 
 describe('DeveloperClient', () => {
-  const provider = new NEOONEDataProvider({
-    network: 'net',
-    rpcURL: 'rpc',
+  const networkName = 'net';
+  const neoOneProvider = new NEOONEProvider({
+    options: [
+      {
+        network: networkName,
+        rpcURL: 'rpc',
+      },
+    ],
+  });
+  const keystore = new LocalKeyStore({
+    store: new LocalMemoryStore(),
   });
 
-  const developerClient = new DeveloperClient(provider);
+  const localUserAccountProvider = new LocalUserAccountProvider({
+    keystore,
+    provider: neoOneProvider,
+  });
+
+  const providers = {
+    memory: localUserAccountProvider,
+  };
+
+  const provider = neoOneProvider.read(networkName);
+
+  const developerClient = new DeveloperClient(provider, providers);
 
   test('runConsensusNow', async () => {
+    // tslint:disable-next-line no-object-mutation
     provider.runConsensusNow = jest.fn();
-    const result = await developerClient.runConsensusNow();
+    await developerClient.runConsensusNow();
 
-    expect(result).toBeUndefined();
     expect(provider.runConsensusNow).toHaveBeenCalledWith();
     expect(provider.runConsensusNow).toHaveBeenCalledTimes(1);
   });
 
   test('updateSettings', async () => {
     const options = { secondsPerBlock: 10 };
+    // tslint:disable-next-line no-object-mutation
     provider.updateSettings = jest.fn();
-    const result = await developerClient.updateSettings(options);
+    await developerClient.updateSettings(options);
 
-    expect(result).toBeUndefined();
     expect(provider.updateSettings).toHaveBeenCalledWith(options);
     expect(provider.updateSettings).toHaveBeenCalledTimes(1);
   });
 
   test('fastForwardOffset', async () => {
     const offset = 10;
+    // tslint:disable-next-line no-object-mutation
     provider.fastForwardOffset = jest.fn();
-    const result = await developerClient.fastForwardOffset(offset);
+    await developerClient.fastForwardOffset(offset);
 
-    expect(result).toBeUndefined();
     expect(provider.fastForwardOffset).toHaveBeenCalledWith(offset);
     expect(provider.fastForwardOffset).toHaveBeenCalledTimes(1);
   });
 
   test('fastForwardOffset', async () => {
     const time = 10;
+    // tslint:disable-next-line no-object-mutation
     provider.fastForwardToTime = jest.fn();
-    const result = await developerClient.fastForwardToTime(time);
+    await developerClient.fastForwardToTime(time);
 
-    expect(result).toBeUndefined();
     expect(provider.fastForwardOffset).toHaveBeenCalledWith(time);
     expect(provider.fastForwardOffset).toHaveBeenCalledTimes(1);
   });

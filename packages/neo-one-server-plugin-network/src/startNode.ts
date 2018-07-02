@@ -1,5 +1,5 @@
 import { CLIArgs } from '@neo-one/server-plugin';
-import path from 'path';
+import * as path from 'path';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { createFullNode } from './createFullNode';
 import { createNEOONENodeConfig } from './node';

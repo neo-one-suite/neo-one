@@ -1,9 +1,9 @@
 // tslint:disable no-unsafe-any
-import { abi, addressToScriptHash, createPrivateKey, privateKeyToScriptHash } from '@neo-one/client';
+import { abi, addressToScriptHash, createPrivateKey, privateKeyToScriptHash, assets } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
-import appRootDir from 'app-root-dir';
-import path from 'path';
+import * as appRootDir from 'app-root-dir';
+import * as path from 'path';
 
 import { cleanupTest } from '../../test/cleanupTest';
 import { setupBasicTest } from '../../test/setupBasicTest';
@@ -65,7 +65,15 @@ describe('Token', () => {
   });
 
   test('properties + issue + balanceOf + totalSupply + transfer', async () => {
-    const { networkName, keystore, developerClient, smartContract, masterAccountID, masterPrivateKey } = await setup();
+    const {
+      networkName,
+      keystore,
+      developerClient,
+      client,
+      smartContract,
+      masterAccountID,
+      masterPrivateKey,
+    } = await setup();
 
     const [nameResult, decimalsResult, symbolResult] = await Promise.all([
       smartContract.name(),
@@ -90,6 +98,8 @@ describe('Token', () => {
     ]);
     const account0 = wallet0.account.id;
     const account1 = wallet1.account.id;
+
+    await client.transfer(new BigNumber('100'), assets.GAS_ASSET_HASH, account0.address, { from: masterAccountID });
 
     const owner = privateKeyToScriptHash(masterPrivateKey);
     let result = await smartContract.deploy(owner, { from: masterAccountID });

@@ -1,10 +1,12 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { common } from '../common';
 import { InvalidFormatError, VerifyError } from '../errors';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, utils } from '../utils';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
+import { Input } from './Input';
+import { Output } from './Output';
 import {
   FeeContext,
   TransactionBase,
@@ -70,15 +72,19 @@ export class MinerTransaction extends TransactionBase<TransactionType.Miner, Min
   public clone({
     scripts = this.scripts,
     attributes = this.attributes,
+    inputs = this.inputs,
+    outputs = this.outputs,
   }: {
     readonly scripts?: ReadonlyArray<Witness>;
     readonly attributes?: ReadonlyArray<Attribute>;
+    readonly inputs?: ReadonlyArray<Input>;
+    readonly outputs?: ReadonlyArray<Output>;
   }): MinerTransaction {
     return new MinerTransaction({
       version: this.version,
       attributes,
-      inputs: this.inputs,
-      outputs: this.outputs,
+      inputs,
+      outputs,
       scripts,
       nonce: this.nonce,
     });

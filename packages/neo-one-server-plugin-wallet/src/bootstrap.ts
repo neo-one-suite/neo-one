@@ -25,10 +25,10 @@ import { constants as networkConstants, Network } from '@neo-one/server-plugin-n
 import { CompileContractResult, findAndCompileContract } from '@neo-one/smart-contract-compiler';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import fs from 'fs-extra';
-import _ from 'lodash';
+import * as fs from 'fs-extra';
+import * as _ from 'lodash';
 import ora from 'ora';
-import path from 'path';
+import * as path from 'path';
 import { of as _of } from 'rxjs';
 import { constants } from './constants';
 import { WalletPlugin } from './WalletPlugin';
@@ -945,17 +945,18 @@ export const bootstrap = (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs)
         const provider = new NEOONEProvider({
           options: [{ network: network.name, rpcURL: network.rpcURL }],
         });
-
-        const client = new Client({
-          memory: new LocalUserAccountProvider({
-            keystore,
-            provider,
-          }),
+        const localUserAccountProvider = new LocalUserAccountProvider({
+          keystore,
+          provider,
         });
+        const providers = {
+          memory: localUserAccountProvider,
+        };
+        const client = new Client(providers);
 
         await client.selectAccount(master.accountID);
 
-        const developerClient = new DeveloperClient(provider.read(network.name));
+        const developerClient = new DeveloperClient(provider.read(network.name), providers);
 
         spinner.succeed();
 

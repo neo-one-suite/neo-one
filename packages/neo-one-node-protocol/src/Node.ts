@@ -26,9 +26,9 @@ import {
 import { finalize, labels, neverComplete, utils as commonUtils } from '@neo-one/utils';
 import { ScalingBloem } from 'bloem';
 import BloomFilter from 'bloom-filter';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Address6 } from 'ip-address';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import LRU from 'lru-cache';
 import { defer, EMPTY, merge, Observable, timer } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
@@ -150,7 +150,8 @@ export class Node implements INode {
   private mutableConsensus: Consensus | undefined;
   private readonly requestBlocks = _.debounce(() => {
     const peer = this.mutableBestPeer;
-    const block = this.blockchain.currentBlock;
+    const previousBlock = this.blockchain.previousBlock;
+    const block = previousBlock === undefined ? this.blockchain.currentBlock : previousBlock;
     if (peer !== undefined && block.index < peer.data.startHeight) {
       if (this.mutableGetBlocksRequestsCount > GET_BLOCKS_CLOSE_COUNT) {
         this.mutableBestPeer = this.findBestPeer(peer);
@@ -740,7 +741,7 @@ export class Node implements INode {
   }
 
   private async persistBlock(block: Block, monitor: Monitor = this.monitor): Promise<void> {
-    if (this.blockchain.currentBlockIndex >= block.index || this.tempKnownBlockHashes.has(block.hashHex)) {
+    if (this.blockchain.currentBlockIndex > block.index || this.tempKnownBlockHashes.has(block.hashHex)) {
       return;
     }
 

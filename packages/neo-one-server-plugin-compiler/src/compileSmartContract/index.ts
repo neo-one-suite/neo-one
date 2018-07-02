@@ -1,6 +1,6 @@
 import { ABI } from '@neo-one/client';
 import { Binary } from '@neo-one/server-plugin';
-import path from 'path';
+import * as path from 'path';
 import { UnknownSmartContractFormatError } from '../errors';
 import { compileCSharpSmartContract } from './compileCSharpSmartContract';
 import { compilePythonSmartContract } from './compilePythonSmartContract';

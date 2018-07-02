@@ -1,4 +1,5 @@
 import * as abi from './abi';
+import * as assets from './assets';
 import * as networks from './networks';
 import * as typeGuards from './typeGuards';
 
@@ -22,4 +23,4 @@ export * from './helpers';
 export * from './preconfigured';
 export * from './types';
 
-export { abi, networks, typeGuards };
+export { abi, assets, networks, typeGuards };
