@@ -52,7 +52,6 @@ import {
   Input,
   InvocationResultError,
   InvocationResultSuccess,
-  InvokeReceiptInternal,
   InvokeTransactionOptions,
   NetworkSettings,
   NetworkType,
@@ -64,6 +63,7 @@ import {
   RawInvocationResult,
   RawInvocationResultError,
   RawInvocationResultSuccess,
+  RawInvokeReceipt,
   RegisterAssetReceipt,
   Transaction,
   TransactionOptions,
@@ -76,6 +76,7 @@ import {
   UserAccountID,
   UserAccountProvider,
   Witness,
+  BufferString,
 } from '../types';
 import * as clientUtils from '../utils';
 import { converters } from './converters';
@@ -472,7 +473,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     verify: boolean,
     options: InvokeTransactionOptions = {},
     sourceMap?: RawSourceMap,
-  ): Promise<TransactionResult<InvokeReceiptInternal>> {
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
     const { attributes = [] } = options;
 
     return this.invokeRaw({
@@ -505,7 +506,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         networkFee: options.networkFee,
         transfers: options.transfers,
       },
-      onConfirm: ({ receipt, data }): InvokeReceiptInternal => ({
+      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
         blockIndex: receipt.blockIndex,
         blockHash: receipt.blockHash,
         transactionIndex: receipt.transactionIndex,
@@ -528,6 +529,26 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       labels: {
         [labelNames.INVOKE_METHOD]: method,
       },
+      sourceMap,
+    });
+  }
+
+  public async execute(
+    script: BufferString,
+    options?: TransactionOptions,
+    sourceMap?: RawSourceMap,
+  ): Promise<TransactionResult<RawInvokeReceipt>> {
+    return this.invokeRaw({
+      script: Buffer.from(script, 'hex'),
+      options,
+      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
+        blockIndex: receipt.blockIndex,
+        blockHash: receipt.blockHash,
+        transactionIndex: receipt.transactionIndex,
+        result: data.result,
+        actions: data.actions,
+      }),
+      method: 'execute',
       sourceMap,
     });
   }

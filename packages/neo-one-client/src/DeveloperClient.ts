@@ -1,9 +1,22 @@
-import { DeveloperProvider, Options } from './types';
+import { RawSourceMap } from '../node_modules/source-map/source-map';
+import { ClientBase } from './ClientBase';
+import {
+  ContractParameter,
+  DeveloperProvider,
+  Options,
+  TransactionOptions,
+  UserAccountProvider,
+  BufferString,
+} from './types';
 
-export class DeveloperClient {
+export class DeveloperClient<
+  // tslint:disable-next-line no-any
+  TUserAccountProviders extends { readonly [K in string]: UserAccountProvider } = any
+> extends ClientBase<TUserAccountProviders> {
   private readonly developerProvider: DeveloperProvider;
 
-  public constructor(developerProvider: DeveloperProvider) {
+  public constructor(developerProvider: DeveloperProvider, providersIn: TUserAccountProviders) {
+    super(providersIn);
     this.developerProvider = developerProvider;
   }
 
@@ -25,5 +38,27 @@ export class DeveloperClient {
 
   public async reset(): Promise<void> {
     await this.developerProvider.reset();
+  }
+
+  public async execute(
+    script: BufferString,
+    options?: TransactionOptions,
+    sourceMap?: RawSourceMap,
+  ): Promise<ContractParameter> {
+    const result = await this.getProvider(options).execute(script, options, sourceMap);
+
+    const [invokeReceipt] = await Promise.all([
+      result.confirmed({ timeoutMS: 2500 }),
+      this.developerProvider.runConsensusNow(),
+    ]);
+    if (invokeReceipt.result.state === 'FAULT') {
+      throw new Error(invokeReceipt.result.message);
+    }
+
+    if (invokeReceipt.result.stack.length) {
+      return invokeReceipt.result.stack[0];
+    }
+
+    return { type: 'Void' };
   }
 }

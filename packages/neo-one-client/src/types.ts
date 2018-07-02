@@ -538,7 +538,7 @@ export interface TransactionReceipt {
   readonly transactionIndex: number;
 }
 
-export interface InvokeReceiptInternal extends TransactionReceipt {
+export interface RawInvokeReceipt extends TransactionReceipt {
   readonly result: RawInvocationResult;
   readonly actions: ReadonlyArray<ActionRaw>;
 }
@@ -627,7 +627,6 @@ export interface DataProvider {
 
 export interface DeveloperProvider {
   readonly network: NetworkType;
-
   readonly runConsensusNow: (monitor?: Monitor) => Promise<void>;
   readonly updateSettings: (options: Options, monitor?: Monitor) => Promise<void>;
   readonly fastForwardOffset: (seconds: number, monitor?: Monitor) => Promise<void>;
@@ -648,7 +647,11 @@ export interface UserAccountProvider {
   readonly selectAccount: (id?: UserAccountID) => Promise<void>;
   readonly deleteAccount: (id: UserAccountID) => Promise<void>;
   readonly updateAccountName: (options: UpdateAccountNameOptions) => Promise<void>;
-
+  readonly execute: (
+    script: BufferString,
+    options?: TransactionOptions,
+    sourceMap?: RawSourceMap,
+  ) => Promise<TransactionResult<RawInvokeReceipt>>;
   readonly transfer: (
     transfers: ReadonlyArray<Transfer>,
     options?: TransactionOptions,
@@ -679,7 +682,7 @@ export interface UserAccountProvider {
     verify: boolean,
     options?: InvokeTransactionOptions,
     sourceMap?: RawSourceMap,
-  ) => Promise<TransactionResult<InvokeReceiptInternal>>;
+  ) => Promise<TransactionResult<RawInvokeReceipt>>;
   readonly call: (
     contract: Hash160String,
     method: string,

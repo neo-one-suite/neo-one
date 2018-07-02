@@ -101,15 +101,16 @@ async function setupClients(networkName: string): Promise<SetupClientsReturn> {
   const provider = new NEOONEProvider({
     options: [{ network: networkName, rpcURL }],
   });
-
-  const client = new Client({
-    memory: new LocalUserAccountProvider({
-      keystore,
-      provider,
-    }),
+  const localUserAccountProvider = new LocalUserAccountProvider({
+    keystore,
+    provider,
   });
+  const providers = {
+    memory: localUserAccountProvider,
+  };
+  const client = new Client(providers);
 
-  const developerClient = new DeveloperClient(provider.read(networkName));
+  const developerClient = new DeveloperClient(provider.read(networkName), providers);
 
   return {
     developerClient,
