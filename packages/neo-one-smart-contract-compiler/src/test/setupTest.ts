@@ -53,13 +53,16 @@ export const setupTest = async (getContract: () => Promise<TestOptions>): Promis
     options: [{ network: networkName, rpcURL }],
   });
 
-  const client = new Client({
-    memory: new LocalUserAccountProvider({
-      keystore,
-      provider,
-    }),
+  const localUserAccountProvider = new LocalUserAccountProvider({
+    keystore,
+    provider,
   });
-  const developerClient = new DeveloperClient(provider.read(networkName));
+  const userAccountProviders = {
+    memory: localUserAccountProvider,
+  };
+  const client = new Client(userAccountProviders);
+
+  const developerClient = new DeveloperClient(provider.read(networkName), userAccountProviders);
 
   const { contract, sourceMap, diagnostics, abi, ignoreWarnings } = await getContract();
   const error = diagnostics.find((diagnostic) => diagnostic.category === DiagnosticCategory.Error);
