@@ -260,6 +260,7 @@ const OutputValue = new BlockchainInterface('OutputBase');
 const TransactionValue = new BlockchainInterface('TransactionBase');
 const ValidatorValue = new BlockchainInterface('ValidatorBase');
 const StorageContextValue = new BlockchainInterface('StorageContextBase');
+const StorageContextReadOnlyValue = new BlockchainInterface('StorageContextReadOnlyBase');
 const StorageIteratorValue = new BlockchainInterface('StorageIteratorBase');
 
 export const BLOCKCHAIN_INTERFACES = [
@@ -274,6 +275,7 @@ export const BLOCKCHAIN_INTERFACES = [
   TransactionValue,
   ValidatorValue,
   StorageContextValue,
+  StorageContextReadOnlyValue,
   StorageIteratorValue,
 ].map((value) => value.name);
 
@@ -566,7 +568,7 @@ const SerializableValueObjectAlias = new TypeAlias(
 );
 const SerializableValueAlias = new TypeAlias(
   'SerializableValue',
-  'type SerializableValue == undefined | number | string | boolean | Buffer | ' +
+  'type SerializableValue = undefined | number | string | boolean | Buffer | ' +
     `${SerializableValueArrayAlias.toSignature()} | ${SerializableValueObjectAlias.toSignature()}`,
 );
 
@@ -1037,14 +1039,29 @@ export const SYSCALLS = {
     name: 'Neo.Storage.GetContext',
     returnType: StorageContextValue,
   }),
+  'Neo.Storage.GetReadOnlyContext': new SimpleSysCall({
+    name: 'Neo.Storage.GetReadOnlyContext',
+    returnType: StorageContextReadOnlyValue,
+  }),
+  'Neo.StorageContext.AsReadOnly': new SimpleSysCall({
+    name: 'Neo.StorageContext.AsReadOnly',
+    args: [new SysCallArgument('context', StorageContextValue)],
+    returnType: StorageContextReadOnlyValue,
+  }),
   'Neo.Storage.Get': new SimpleSysCall({
     name: 'Neo.Storage.Get',
-    args: [new SysCallArgument('context', StorageContextValue), new SysCallArgument('key', StorageKey)],
+    args: [
+      new SysCallArgument('context', new UnionValue([StorageContextValue, StorageContextReadOnlyValue])),
+      new SysCallArgument('key', StorageKey),
+    ],
     returnType: SerializableValue.addSerialize().handleNull(),
   }),
   'Neo.Storage.Find': new SimpleSysCall({
     name: 'Neo.Storage.Find',
-    args: [new SysCallArgument('context', StorageContextValue), new SysCallArgument('prefix', StorageKey)],
+    args: [
+      new SysCallArgument('context', new UnionValue([StorageContextValue, StorageContextReadOnlyValue])),
+      new SysCallArgument('prefix', StorageKey),
+    ],
     returnType: StorageIteratorValue,
   }),
   'Neo.Enumerator.Next': new SimpleSysCall({

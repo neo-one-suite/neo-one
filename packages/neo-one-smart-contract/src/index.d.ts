@@ -44,12 +44,15 @@ declare global {
   interface StorageContextBase {
     __brand: 'StorageContextBase';
   }
+  interface StorageContextReadOnlyBase {
+    __brand: 'StorageContextReadOnlyBase';
+  }
   interface StorageIteratorBase {
     __brand: 'StorageIteratorBase';
   }
   function syscall(name: 'Neo.Runtime.GetTrigger'): number;
   function syscall(name: 'Neo.Runtime.CheckWitness', witness: Buffer): boolean;
-  function syscall(name: 'Neo.Runtime.Notify', ...args: Array<Buffer | number | string | boolean>): void;
+  function syscall(name: 'Neo.Runtime.Notify', ...args: Array<Buffer | number | string | boolean | undefined>): void;
   function syscall(name: 'Neo.Runtime.Log', value: string): void;
   function syscall(name: 'Neo.Runtime.GetTime'): number;
   function syscall(name: 'Neo.Runtime.Serialize', value: SerializableValue): Buffer;
@@ -58,6 +61,7 @@ declare global {
   function syscall(name: 'Neo.Blockchain.GetHeader', hashOrIndex: Buffer | number): HeaderBase;
   function syscall(name: 'Neo.Blockchain.GetBlock', hashOrIndex: Buffer | number): BlockBase;
   function syscall(name: 'Neo.Blockchain.GetTransaction', hash: Buffer): TransactionBase;
+  function syscall(name: 'Neo.Blockchain.GetTransactionHeight', hash: Buffer): number;
   function syscall(name: 'Neo.Blockchain.GetAccount', hash: Buffer): AccountBase;
   function syscall(name: 'Neo.Blockchain.GetValidators'): Array<Buffer>;
   function syscall(name: 'Neo.Blockchain.GetAsset', hash: Buffer): AssetBase;
@@ -101,11 +105,21 @@ declare global {
   function syscall(name: 'Neo.Asset.GetIssuer', asset: AssetBase): Buffer;
   function syscall(name: 'Neo.Contract.GetScript', contract: ContractBase): Buffer;
   function syscall(name: 'Neo.Storage.GetContext'): StorageContextBase;
-  function syscall(name: 'Neo.Storage.Get', context: StorageContextBase, key: Buffer | string): SerializableValue;
-  function syscall(name: 'Neo.Storage.Find', context: StorageContextBase, prefix: Buffer | string): StorageIteratorBase;
-  function syscall(name: 'Neo.Iterator.Next', iterator: StorageIteratorBase): boolean;
+  function syscall(name: 'Neo.Storage.GetReadOnlyContext'): StorageContextReadOnlyBase;
+  function syscall(name: 'Neo.StorageContext.AsReadOnly', context: StorageContextBase): StorageContextReadOnlyBase;
+  function syscall(
+    name: 'Neo.Storage.Get',
+    context: StorageContextBase | StorageContextReadOnlyBase,
+    key: Buffer | string,
+  ): SerializableValue;
+  function syscall(
+    name: 'Neo.Storage.Find',
+    context: StorageContextBase | StorageContextReadOnlyBase,
+    prefix: Buffer | string,
+  ): StorageIteratorBase;
+  function syscall(name: 'Neo.Enumerator.Next', iterator: StorageIteratorBase): boolean;
   function syscall(name: 'Neo.Iterator.Key', iterator: StorageIteratorBase): Buffer | string;
-  function syscall(name: 'Neo.Iterator.Value', iterator: StorageIteratorBase): Buffer | number | string | boolean;
+  function syscall(name: 'Neo.Enumerator.Value', iterator: StorageIteratorBase): Buffer | number | string | boolean;
   function syscall(name: 'Neo.Account.SetVotes', account: AccountBase, votes: Array<Buffer>): void;
   function syscall(name: 'Neo.Validator.Register', publicKey: Buffer): ValidatorBase;
   function syscall(
