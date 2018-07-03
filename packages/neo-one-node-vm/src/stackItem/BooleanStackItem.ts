@@ -5,7 +5,7 @@ import { StackItemType } from './StackItemType';
 
 export class BooleanStackItem extends StackItemBase {
   public static readonly TRUE = Buffer.from([1]);
-  public static readonly FALSE = Buffer.from([0]);
+  public static readonly FALSE = Buffer.from([]);
   public readonly value: boolean;
 
   public constructor(value: boolean) {
