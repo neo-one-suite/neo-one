@@ -599,18 +599,18 @@
     is-absolute "^1.0.0"
     is-negated-glob "^1.0.0"
 
-"@fimbul/bifrost@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.npmjs.org/@fimbul/bifrost/-/bifrost-0.9.0.tgz#75c7d7ad0c5464f22603b715324ec89c1f50138f"
+"@fimbul/bifrost@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@fimbul/bifrost/-/bifrost-0.11.0.tgz#83cacc21464198b12e3cc1c2204ae6c6d7afd158"
   dependencies:
-    "@fimbul/ymir" "^0.9.0"
+    "@fimbul/ymir" "^0.11.0"
     get-caller-file "^1.0.2"
     tslib "^1.8.1"
     tsutils "^2.24.0"
 
-"@fimbul/ymir@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.npmjs.org/@fimbul/ymir/-/ymir-0.9.0.tgz#64bb9c658a48b584c070e830911c3675dc8e81da"
+"@fimbul/ymir@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@fimbul/ymir/-/ymir-0.11.0.tgz#892a01997f1f80c7e4e437cf5ca51c95994c136f"
   dependencies:
     inversify "^4.10.0"
     reflect-metadata "^0.1.12"
@@ -7309,11 +7309,11 @@ tslint-config-prettier@1.13.0:
   version "1.13.0"
   resolved "https://registry.npmjs.org/tslint-config-prettier/-/tslint-config-prettier-1.13.0.tgz#189e821931ad89e0364e4e292d5c44a14e90ecd6"
 
-tslint-consistent-codestyle@1.13.1:
-  version "1.13.1"
-  resolved "https://registry.npmjs.org/tslint-consistent-codestyle/-/tslint-consistent-codestyle-1.13.1.tgz#7996913453f369f7321c5b49776c2bcf837461aa"
+tslint-consistent-codestyle@1.13.2:
+  version "1.13.2"
+  resolved "https://registry.yarnpkg.com/tslint-consistent-codestyle/-/tslint-consistent-codestyle-1.13.2.tgz#c60662f08a83d62797e47e5d74737470b5e17714"
   dependencies:
-    "@fimbul/bifrost" "^0.9.0"
+    "@fimbul/bifrost" "^0.11.0"
     tslib "^1.7.1"
     tsutils "^2.27.0"
 
