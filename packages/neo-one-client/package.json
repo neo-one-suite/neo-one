@@ -33,7 +33,7 @@
     "./dist/index.mjs": "./dist/index.browser.mjs"
   },
   "engines": {
-    "node": ">=10.6.0"
+    "node": ">=10.5.0"
   },
   "publishConfig": {
     "access": "public"

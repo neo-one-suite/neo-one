@@ -21,7 +21,7 @@
         ],
         "sourceMaps": true,
         "autoAttachChildProcesses": true,
-        "runtimeVersion": "10.6.0"
+        "runtimeVersion": "10.5.0"
       },
       {
         "type": "node",
