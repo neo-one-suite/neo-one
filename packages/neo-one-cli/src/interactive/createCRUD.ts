@@ -149,7 +149,7 @@ const createResource = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
     .action(async (args) => {
       cancel$ = new ReplaySubject<void>();
 
-      if (crud instanceof DeleteCRUD) {
+      if (crud instanceof DeleteCRUD && !args.options.force) {
         const response = await promptDelete({
           cli,
           crud,
@@ -217,6 +217,10 @@ const createResource = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
 
   addCommon({ command, crud });
   addCommonResource({ cli, command, crud });
+
+  if (crud instanceof DeleteCRUD) {
+    command.option('--force', 'Delete without prompting');
+  }
 
   return command;
 };
