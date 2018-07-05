@@ -3416,9 +3416,9 @@ grpc-inspect@^0.5.0:
     lodash "^4.17.2"
     traverse "^0.6.6"
 
-grpc@1.13.0, grpc@^1.0.1, grpc@^1.13.0-pre1:
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/grpc/-/grpc-1.13.0.tgz#cbf884fa5e072edecb15ff019483db74b361e2c6"
+grpc@1.13.0-pre1, grpc@^1.0.1, grpc@^1.13.0-pre1:
+  version "1.13.0-pre1"
+  resolved "https://registry.yarnpkg.com/grpc/-/grpc-1.13.0-pre1.tgz#35eca62f4297f3886d256eeccacfa93cd65f6c73"
   dependencies:
     lodash "^4.17.5"
     nan "^2.0.0"
