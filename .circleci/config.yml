@@ -42,7 +42,7 @@ aliases:
           command: yarn tsc
       - run:
           name: Lint
-          command: yarn lint          
+          command: yarn lint
       - run:
           name: Test
           command: yarn test-ci --testResultsProcessor="jest-junit"
@@ -60,13 +60,13 @@ aliases:
 
 node10: &node10
   docker:
-    - image: circleci/node:10.4.1@sha256:9e0db57ec38299fa1bbb666fa9e869031090c566c0c2623584adfdff6cc1f449
+    - image: circleci/node:10.6.0
 
 version: 2
 jobs:
   test10:
     <<: *node10
-    <<: *test     
+    <<: *test
 
   deploy-website:
     <<: *node10
@@ -98,4 +98,4 @@ workflows:
   test:
     jobs:
       - test10:
-          filters: *filter-ignore-gh-pages          
+          filters: *filter-ignore-gh-pages

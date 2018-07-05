@@ -1,6 +1,6 @@
 environment:
   matrix:
-    - nodejs_version: "10.4.1"
+    - nodejs_version: "10.6.0"
 
 branches:
   only:

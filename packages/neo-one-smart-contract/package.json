@@ -27,7 +27,7 @@
   "license": "MIT",
   "main": "./src/index.ts",
   "engines": {
-    "node": ">=10.4.1"
+    "node": ">=10.6.0"
   },
   "publishConfig": {
     "access": "public"
