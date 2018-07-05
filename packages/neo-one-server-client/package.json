@@ -35,6 +35,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@grpc/proto-loader": "^0.1.0",
     "@neo-one/server-grpc": "^1.0.0-alpha.11",
     "@neo-one/server-plugin": "^1.0.0-alpha.52",
     "@neo-one/utils": "^1.0.0-alpha.44",

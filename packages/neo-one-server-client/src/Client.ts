@@ -1,4 +1,5 @@
 // tslint:disable no-any
+import protoLoader from '@grpc/proto-loader';
 import { proto } from '@neo-one/server-grpc';
 import {
   AllResources,
@@ -12,7 +13,8 @@ import { Observable, Observer, Subject } from 'rxjs';
 import { filter, map, publishReplay, refCount, take } from 'rxjs/operators';
 import { ReadError } from './errors';
 
-const { Server } = grpc.load(proto);
+const packageDefinition = protoLoader.loadSync(proto, {});
+const { Server } = grpc.loadPackageDefinition(packageDefinition);
 
 // tslint:disable-next-line readonly-keyword
 const mutableClients: { [key: number]: typeof Server } = {};
