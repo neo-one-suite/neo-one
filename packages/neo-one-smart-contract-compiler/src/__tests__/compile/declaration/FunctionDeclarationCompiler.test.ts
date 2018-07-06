@@ -41,6 +41,27 @@ if (addThree(2) !== 5) {
     `);
   });
 
+  test('overloading functions', async () => {
+    await helpers.executeString(`
+function getFooBazNum(scheme: "foo"): 484;
+function getFooBazNum(scheme: "baz"): 353;
+function getFooBazNum(scheme: "foo" | "baz"): 484 | 353 {
+  if(scheme == "foo")
+    return 484;
+  return 353;
+}
+
+const fooFooBazNum = getFooBazNum("foo");    // Type 484
+const bazFooBazNum = getFooBazNum("baz");  // Type 353
+if(fooFooBazNum!==484){
+  throw 'Failure';
+}
+if(bazFooBazNum!==353){
+  throw 'Failure';
+}
+    `);
+  });
+
   test('recursive + outer scope bound', async () => {
     await helpers.executeString(`
 let y = 0;

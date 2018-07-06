@@ -1,3 +1,3 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`InterfaceDeclarationCompiler Interface type as value reports error 1`] = `"code.ts (8,28): Unknown reference: Foo"`;
+exports[`InterfaceDeclarationCompiler Sanity Test: accessing invalid property results in error 1`] = `"code.ts (4,13): Property 'balk' does not exist on type '{}'."`;
