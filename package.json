@@ -78,7 +78,7 @@
     "@babel/node": "7.0.0-beta.52",
     "@babel/plugin-proposal-async-generator-functions": "7.0.0-beta.52",
     "@babel/plugin-proposal-class-properties": "7.0.0-beta.52",
-    "@babel/plugin-proposal-object-rest-spread": "7.0.0-beta.52",
+    "@babel/plugin-proposal-object-rest-spread": "7.0.0-beta.51",
     "@babel/plugin-proposal-optional-catch-binding": "7.0.0-beta.52",
     "@babel/polyfill": "7.0.0-beta.52",
     "@babel/preset-env": "7.0.0-beta.52",
