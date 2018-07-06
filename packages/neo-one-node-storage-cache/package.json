@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-storage-cache",
-  "version": "1.0.0-alpha.59",
+  "version": "1.0.0-alpha.60",
   "keywords": [
     "neo",
     "NEO",
@@ -35,10 +35,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.55",
-    "@neo-one/node-core": "^1.0.0-alpha.56",
-    "@neo-one/node-storage-common": "^1.0.0-alpha.58",
-    "@neo-one/utils": "^1.0.0-alpha.45",
+    "@neo-one/client-core": "^1.0.0-alpha.56",
+    "@neo-one/node-core": "^1.0.0-alpha.57",
+    "@neo-one/node-storage-common": "^1.0.0-alpha.59",
+    "@neo-one/utils": "^1.0.0-alpha.46",
     "bytewise": "^1.1.0",
     "lru-cache": "^4.1.3",
     "rxjs": "^6.2.1"
