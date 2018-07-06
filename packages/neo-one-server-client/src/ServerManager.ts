@@ -46,11 +46,11 @@ const waitReachable = async ({ port }: { readonly port: number }) => {
   // tslint:disable-next-line no-loop-statement
   while (utils.nowSeconds() - startTime <= 30) {
     try {
-      await client.wait(1000);
+      await client.wait();
 
       return;
     } catch (error) {
-      await new Promise<void>((resolve) => setTimeout(resolve, 100));
+      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
       lastError = error;
     }
   }

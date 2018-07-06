@@ -16,8 +16,9 @@ import { ReadError } from './errors';
 const packageDefinition = protoLoader.loadSync(proto, {});
 const { Server } = grpc.loadPackageDefinition(packageDefinition);
 
+type GRPCClient = grpc.Client & { readonly [key: string]: any };
 // tslint:disable-next-line readonly-keyword
-const mutableClients: { [key: number]: typeof Server } = {};
+const mutableClients: { [key: number]: GRPCClient } = {};
 
 export class Client {
   private readonly port: number;
@@ -25,25 +26,17 @@ export class Client {
   public constructor({ port, forceNew }: { readonly port: number; readonly forceNew?: boolean }) {
     this.port = port;
 
-    if (mutableClients[port] == undefined || forceNew) {
+    if ((mutableClients[port] as GRPCClient | undefined) === undefined || forceNew) {
       mutableClients[port] = new Server(`localhost:${port}`, grpc.credentials.createInsecure());
     }
   }
 
-  private get client(): typeof Server {
+  private get client(): GRPCClient {
     return mutableClients[this.port];
   }
 
-  public async wait(timeout: number): Promise<void> {
-    await new Promise<void>((resolve, reject) => {
-      this.client.waitForReady(Date.now() + timeout, (error?: Error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
-    });
+  public async wait(): Promise<void> {
+    await this.getVersion();
   }
 
   public async reset(): Promise<void> {
