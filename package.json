@@ -73,7 +73,7 @@
     }
   },
   "devDependencies": {
-    "@babel/cli": "7.0.0-beta.52",
+    "@babel/cli": "7.0.0-beta.51",
     "@babel/core": "7.0.0-beta.52",
     "@babel/node": "7.0.0-beta.52",
     "@babel/plugin-proposal-async-generator-functions": "7.0.0-beta.52",
