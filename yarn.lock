@@ -681,6 +681,12 @@
     through2 "^2.0.0"
     xdg-basedir "^3.0.0"
 
+"@grpc/grpc-js@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-0.2.0.tgz#841b91cd91debdc52ad8414d29d66ba3fe2b184e"
+  dependencies:
+    lodash "^4.17.4"
+
 "@grpc/proto-loader@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@grpc/proto-loader/-/proto-loader-0.1.0.tgz#a79f04678856f32d03e799fe87d06b7321d09f3b"
