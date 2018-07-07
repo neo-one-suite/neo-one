@@ -67,9 +67,9 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged && echo \"Executing tsc...\" && tsc",
-      "post-checkout": "yarn run ts-node ./scripts/hooks/post-checkout.ts $HUSKY_GIT_PARAMS",
-      "post-merge": "yarn run ts-node ./scripts/hooks/post-merge.ts $HUSKY_GIT_PARAMS",
-      "post-rewrite": "yarn run ts-node ./scripts/hooks/post-rewrite.ts $HUSKY_GIT_PARAMS"
+      "post-checkout": "cross-env-shell \"yarn run ts-node ./scripts/hooks/post-checkout.ts $HUSKY_GIT_PARAMS\"",
+      "post-merge": "yarn run ts-node ./scripts/hooks/post-merge.ts",
+      "post-rewrite": "yarn run ts-node ./scripts/hooks/post-rewrite.ts"
     }
   },
   "devDependencies": {
