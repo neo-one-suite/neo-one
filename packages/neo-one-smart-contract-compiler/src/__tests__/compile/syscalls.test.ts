@@ -1,3 +1,4 @@
+import { common } from '@neo-one/client-core';
 import { helpers } from '../../__data__';
 
 describe('syscalls', () => {
@@ -28,6 +29,26 @@ describe('syscalls', () => {
       }
 
       if (deserialized.length !== 3) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('Neo.Runtime.Call', async () => {
+    const node = await helpers.startNode();
+    const contract = await node.addContract(`
+      const x = syscall('Neo.Runtime.GetArgument', 0) as number;
+      const y = syscall('Neo.Runtime.GetArgument', 1) as number;
+      syscall('Neo.Runtime.Return', x * y);
+    `);
+    await node.executeString(`
+      const result = syscall(
+        'Neo.Runtime.Call',
+        Buffer.from("${common.uInt160ToString(contract).slice(2)}", 'hex'),
+        2,
+        3,
+      ) as number;
+      if (result !== 6) {
         throw 'Failure';
       }
     `);

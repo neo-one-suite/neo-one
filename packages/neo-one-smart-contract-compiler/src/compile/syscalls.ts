@@ -1,7 +1,7 @@
 // tslint:disable variable-name no-unused
-import { SysCallName } from '@neo-one/client-core';
+import { common, SysCallName } from '@neo-one/client-core';
 import * as _ from 'lodash';
-import { CallExpression, Node, Type } from 'ts-simple-ast';
+import { CallExpression, Node, Type, TypeGuards } from 'ts-simple-ast';
 import { ScriptBuilder } from './sb';
 import { VisitOptions } from './types';
 
@@ -610,15 +610,15 @@ class Serializable extends SimpleSysCallType {
     this.type.isRuntimeType(sb, node, options);
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type): void {
-    this.type.handleArgument(sb, node, options, type, true);
+  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = true): void {
+    this.type.handleArgument(sb, node, options, type, native);
 
     if (this.shouldSerialize) {
       sb.emitSysCall(node, 'Neo.Runtime.Serialize');
     }
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, typeIn?: Type): void {
+  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, typeIn?: Type, native = true): void {
     let type = typeIn;
     if (
       type !== undefined &&
@@ -634,7 +634,7 @@ class Serializable extends SimpleSysCallType {
         sb.emitSysCall(node, 'Neo.Runtime.Deserialize');
       }
 
-      this.type.handleResult(sb, node, options, type, true);
+      this.type.handleResult(sb, node, options, type, native);
     };
 
     if (this.shouldHandleNull) {
@@ -1219,6 +1219,70 @@ export const SYSCALLS = {
         sb.emitHelper(arg, options, sb.helpers.getArgument({ type: sb.getType(arg) }));
         if (optionsIn.pushValue) {
           returnType.handleResult(sb, node, optionsIn, optionsIn.cast);
+        } else {
+          sb.emitOp(node, 'DROP');
+        }
+      },
+    };
+  })(),
+  'Neo.Runtime.Call': (() => {
+    const name = 'Neo.Runtime.Call';
+    const valueType = SerializableValue;
+    const returnType = valueType;
+
+    return {
+      name,
+      toDeclaration(): string {
+        const sig = valueType.toSignature();
+
+        return `function syscall(name: '${name}', hash: Buffer, ...args: Array<${sig}>): ${returnType.toSignature()};`;
+      },
+      handleCall(sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions): void {
+        const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
+
+        // exprCall  = Buffer.from("1225ACFA1", "hex"),
+        const exprCall = node.getArguments()[1];
+
+        if (!TypeGuards.isCallExpression(exprCall)) {
+          throw new Error('ARG[1] Expecting callExpression ');
+        }
+
+        // exprCallObj = [Buffer.from]
+        const exprCallObj = exprCall.getExpression();
+
+        if (!TypeGuards.isPropertyAccessExpression(exprCallObj)) {
+          throw new Error('Expected: Property Access expression');
+        }
+
+        // exprCallObjName = "Buffer"
+        const exprCallObjName = exprCallObj.getExpression();
+
+        // exprCallObjFnx = "from"
+        const exprCallObjFnxName = exprCallObj.getName();
+
+        if (
+          !(TypeGuards.isIdentifier(exprCallObjName) && exprCallObjName.getText() === 'Buffer') ||
+          !(exprCallObjFnxName === 'from')
+        ) {
+          throw new Error('Expected "Buffer.from" expression');
+        }
+
+        const argContractId = exprCall.getArguments()[0];
+        if (!TypeGuards.isStringLiteral(argContractId)) {
+          throw new Error(`Expected contract identifier with Neo.Runtime.CallContract but got: ${exprCall.getText()}`);
+        }
+
+        const contractIDHex = common.stringToUInt160(argContractId.getLiteralValue());
+        // tslint:disable-next-line no-array-mutation
+        const args = [...node.getArguments().slice(2)].reverse();
+        args.forEach((arg) => {
+          sb.visit(arg, options);
+          valueType.handleArgument(sb, arg, options, sb.getType(arg), false);
+        });
+        sb.emitOp(node, 'APPCALL', contractIDHex);
+
+        if (optionsIn.pushValue) {
+          returnType.handleResult(sb, node, options, optionsIn.cast, false);
         } else {
           sb.emitOp(node, 'DROP');
         }

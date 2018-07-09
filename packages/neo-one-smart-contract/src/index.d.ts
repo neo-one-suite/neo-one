@@ -1,16 +1,9 @@
 declare global {
-  interface SerializableValueArray extends Array<SerializableValue> {}
+  interface SerializableValueArray extends Array<SerializableValue> { }
   interface SerializableValueObject {
-    [key: string]: SerializableValue;
-  }
-  type SerializableValue =
-    | undefined
-    | number
-    | string
-    | boolean
-    | Buffer
-    | SerializableValueArray
-    | SerializableValueObject;
+  [key: string]: SerializableValue;
+}
+  type SerializableValue = undefined | number | string | boolean | Buffer | SerializableValueArray | SerializableValueObject
   interface AccountBase {
     __brand: 'AccountBase';
   }
@@ -107,64 +100,20 @@ declare global {
   function syscall(name: 'Neo.Storage.GetContext'): StorageContextBase;
   function syscall(name: 'Neo.Storage.GetReadOnlyContext'): StorageContextReadOnlyBase;
   function syscall(name: 'Neo.StorageContext.AsReadOnly', context: StorageContextBase): StorageContextReadOnlyBase;
-  function syscall(
-    name: 'Neo.Storage.Get',
-    context: StorageContextBase | StorageContextReadOnlyBase,
-    key: Buffer | string,
-  ): SerializableValue;
-  function syscall(
-    name: 'Neo.Storage.Find',
-    context: StorageContextBase | StorageContextReadOnlyBase,
-    prefix: Buffer | string,
-  ): StorageIteratorBase;
+  function syscall(name: 'Neo.Storage.Get', context: StorageContextBase | StorageContextReadOnlyBase, key: Buffer | string): SerializableValue;
+  function syscall(name: 'Neo.Storage.Find', context: StorageContextBase | StorageContextReadOnlyBase, prefix: Buffer | string): StorageIteratorBase;
   function syscall(name: 'Neo.Enumerator.Next', iterator: StorageIteratorBase): boolean;
   function syscall(name: 'Neo.Iterator.Key', iterator: StorageIteratorBase): Buffer | string;
   function syscall(name: 'Neo.Enumerator.Value', iterator: StorageIteratorBase): Buffer | number | string | boolean;
   function syscall(name: 'Neo.Account.SetVotes', account: AccountBase, votes: Array<Buffer>): void;
   function syscall(name: 'Neo.Validator.Register', publicKey: Buffer): ValidatorBase;
-  function syscall(
-    name: 'Neo.Asset.Create',
-    assetType: number,
-    assetName: string,
-    amount: number,
-    precision: number,
-    owner: Buffer,
-    admin: Buffer,
-    issuer: Buffer,
-  ): AssetBase;
+  function syscall(name: 'Neo.Asset.Create', assetType: number, assetName: string, amount: number, precision: number, owner: Buffer, admin: Buffer, issuer: Buffer): AssetBase;
   function syscall(name: 'Neo.Asset.Renew', asset: AssetBase, years: number): number;
-  function syscall(
-    name: 'Neo.Contract.Create',
-    script: Buffer,
-    parameterList: Buffer,
-    returnType: number,
-    properties: number,
-    contractName: string,
-    codeVersion: string,
-    author: string,
-    email: string,
-    description: string,
-  ): ContractBase;
-  function syscall(
-    name: 'Neo.Contract.Migrate',
-    script: Buffer,
-    parameterList: Buffer,
-    returnType: number,
-    properties: number,
-    contractName: string,
-    codeVersion: string,
-    author: string,
-    email: string,
-    description: string,
-  ): ContractBase;
+  function syscall(name: 'Neo.Contract.Create', script: Buffer, parameterList: Buffer, returnType: number, properties: number, contractName: string, codeVersion: string, author: string, email: string, description: string): ContractBase;
+  function syscall(name: 'Neo.Contract.Migrate', script: Buffer, parameterList: Buffer, returnType: number, properties: number, contractName: string, codeVersion: string, author: string, email: string, description: string): ContractBase;
   function syscall(name: 'Neo.Contract.GetStorageContext', contract: ContractBase): StorageContextBase;
   function syscall(name: 'Neo.Contract.Destroy'): void;
-  function syscall(
-    name: 'Neo.Storage.Put',
-    context: StorageContextBase,
-    key: Buffer | string,
-    value: SerializableValue,
-  ): void;
+  function syscall(name: 'Neo.Storage.Put', context: StorageContextBase, key: Buffer | string, value: SerializableValue): void;
   function syscall(name: 'Neo.Storage.Delete', context: StorageContextBase, key: Buffer | string): void;
   function syscall(name: 'System.ExecutionEngine.GetScriptContainer'): TransactionBase;
   function syscall(name: 'System.ExecutionEngine.GetExecutingScriptHash'): Buffer;
@@ -172,6 +121,7 @@ declare global {
   function syscall(name: 'System.ExecutionEngine.GetEntryScriptHash'): Buffer;
   function syscall(name: 'Neo.Runtime.Return', value: Buffer | number | string | boolean): void;
   function syscall(name: 'Neo.Runtime.GetArgument', idx: number): any;
+  function syscall(name: 'Neo.Runtime.Call', hash: Buffer, ...args: Array<SerializableValue>): SerializableValue;
 }
 
 export {
