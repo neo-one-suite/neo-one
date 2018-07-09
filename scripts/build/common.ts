@@ -212,7 +212,7 @@ const getBabelConfigFull = ({
   ...getBabelConfig({
     modules,
     useBuiltIns,
-    targets: entry === 'node' ? { node: '10.5.0' } : { browsers: ['> 0.1%', 'last 2 versions', 'not ie <= 10'] },
+    targets: entry === 'node' ? { node: '10.6.0' } : { browsers: ['> 0.1%', 'last 2 versions', 'not ie <= 10'] },
   }),
 });
 

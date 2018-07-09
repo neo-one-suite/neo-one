@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/utils",
-  "version": "1.0.0-alpha.46",
+  "version": "1.0.0-alpha.47",
   "keywords": [
     "neo",
     "NEO",
@@ -29,13 +29,13 @@
   "module": "./dist/index.mjs",
   "types": "./src/index.ts",
   "engines": {
-    "node": ">=10.5.0"
+    "node": ">=10.6.0"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0-alpha.41",
+    "@neo-one/monitor": "^1.0.0-alpha.42",
     "lodash": "^4.17.10",
     "rxjs": "^6.2.1"
   }

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/monitor",
-  "version": "1.0.0-alpha.41",
+  "version": "1.0.0-alpha.42",
   "keywords": [
     "neo",
     "NEO",
@@ -33,13 +33,13 @@
     "./dist/index.mjs": "./dist/index.browser.mjs"
   },
   "engines": {
-    "node": ">=10.5.0"
+    "node": ">=10.6.0"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/utils": "^1.0.0-alpha.46",
+    "@neo-one/utils": "^1.0.0-alpha.47",
     "koa": "^2.5.1",
     "koa-mount": "^3.0.0",
     "lodash": "^4.17.10",

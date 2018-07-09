@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-compiler",
-  "version": "1.0.0-alpha.72",
+  "version": "1.0.0-alpha.73",
   "keywords": [
     "neo",
     "NEO",
@@ -29,17 +29,17 @@
   "module": "./dist/index.mjs",
   "typings": "./src/index.ts",
   "engines": {
-    "node": ">=10.5.0"
+    "node": ">=10.6.0"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
     "@neo-one/boa": "^0.0.2",
-    "@neo-one/client": "^1.0.0-alpha.71",
+    "@neo-one/client": "^1.0.0-alpha.72",
     "@neo-one/csharp": "^0.0.1",
-    "@neo-one/server-plugin": "^1.0.0-alpha.54",
-    "@neo-one/utils": "^1.0.0-alpha.46",
+    "@neo-one/server-plugin": "^1.0.0-alpha.55",
+    "@neo-one/utils": "^1.0.0-alpha.47",
     "execa": "^0.10.0",
     "fs-extra": "^6.0.1",
     "lodash": "^4.17.10",
