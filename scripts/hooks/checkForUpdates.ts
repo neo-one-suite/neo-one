@@ -32,7 +32,8 @@ export const checkForUpdates = (gitCommand: string) => {
       process.exit(0);
     })
     .catch((error) => {
+      console.log('Hook failed, you may need to run `yarn install`');
       console.error(error);
-      process.exit(1);
+      process.exit(0);
     });
 };

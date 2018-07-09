@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin",
-  "version": "1.0.0-alpha.54",
+  "version": "1.0.0-alpha.55",
   "keywords": [
     "neo",
     "NEO",
@@ -31,14 +31,14 @@
   "module": "./dist/index.mjs",
   "typings": "./src/index.ts",
   "engines": {
-    "node": ">=10.5.0"
+    "node": ">=10.6.0"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0-alpha.41",
-    "@neo-one/utils": "^1.0.0-alpha.46",
+    "@neo-one/monitor": "^1.0.0-alpha.42",
+    "@neo-one/utils": "^1.0.0-alpha.47",
     "ajv": "^6.5.1",
     "chalk": "^2.4.1",
     "chokidar": "^2.0.4",

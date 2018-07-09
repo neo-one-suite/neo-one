@@ -1,4 +1,5 @@
 // tslint:disable no-any
+import * as grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
 import { proto } from '@neo-one/server-grpc';
 import {
@@ -8,13 +9,13 @@ import {
   getTasksError,
   ModifyResourceResponse,
 } from '@neo-one/server-plugin';
-import * as grpc from 'grpc';
 import { Observable, Observer, Subject } from 'rxjs';
 import { filter, map, publishReplay, refCount, take } from 'rxjs/operators';
 import { ReadError } from './errors';
 
 const packageDefinition = protoLoader.loadSync(proto, {});
-const { Server } = grpc.loadPackageDefinition(packageDefinition);
+// tslint:disable-next-line no-any
+const { Server } = grpc.loadPackageDefinition(packageDefinition) as any;
 
 type GRPCClient = grpc.Client & { readonly [key: string]: any };
 // tslint:disable-next-line readonly-keyword
