@@ -120,7 +120,7 @@
     "cross-env": "5.2.0",
     "execa": "0.10.0",
     "fs-extra": "6.0.1",
-    "husky": "1.0.0-rc.9",
+    "husky": "1.0.0-rc.13",
     "jest": "23.3.0",
     "jest-environment-node": "23.3.0",
     "jest-junit": "5.1.0",
