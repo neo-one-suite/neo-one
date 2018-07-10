@@ -19,6 +19,7 @@
         "../@types/*"
       ]
     },
+    "skipLibCheck": true,
     "strict": true,
     "strictFunctionTypes": true,
     "typeRoots": [

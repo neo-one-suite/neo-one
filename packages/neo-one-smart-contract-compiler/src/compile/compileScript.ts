@@ -9,5 +9,5 @@ export const compileScript = async (scriptPath: string): Promise<CompileResult> 
   const ast = await utils.getAst(path.dirname(scriptPath));
   const sourceFile = ast.getSourceFileOrThrow(scriptPath);
 
-  return compile({ ast, sourceFile });
+  return compile({ ast, sourceFile, addDiagnostics: true });
 };

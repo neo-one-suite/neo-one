@@ -63,24 +63,6 @@ if (addSome(1) !== 1) {
     `);
   });
 
-  test('body is new scope', async () => {
-    await helpers.executeString(`
-function alwaysFive(x: number): number {
-  const x = 5;
-
-  return x;
-}
-
-if (alwaysFive(1) !== 5) {
-  throw 'Failure';
-}
-
-if (alwaysFive(3) !== 5) {
-  throw 'Failure';
-}
-    `);
-  });
-
   test('arguments is new scope', async () => {
     await helpers.executeString(`
 const x = 3;

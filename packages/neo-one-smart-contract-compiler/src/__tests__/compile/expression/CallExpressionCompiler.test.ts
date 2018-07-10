@@ -63,7 +63,7 @@ describe('CallExpressionCompiler', () => {
           return this.getX() + 3;
         }
 
-        private setX(x: number): number {
+        private setX(x: number): void {
           this.x = x;
         }
 

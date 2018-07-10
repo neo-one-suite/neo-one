@@ -132,7 +132,7 @@ describe('ClassDeclarationCompiler', () => {
       }
 
       f.bar = 'baz';
-      if (f.x !== 'baz') {
+      if ((f.x as string) !== 'baz') {
         throw 'Failure';
       }
     `);

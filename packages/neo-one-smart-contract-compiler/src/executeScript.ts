@@ -36,7 +36,7 @@ export const executeScript = async (
     vm,
     monitor,
   });
-  const { code: compiledCode, context, sourceMap } = compile({ ast, sourceFile });
+  const { code: compiledCode, context, sourceMap } = compile({ ast, sourceFile, addDiagnostics: true });
 
   throwOnDiagnosticErrorOrWarning(context.diagnostics, ignoreWarnings);
 

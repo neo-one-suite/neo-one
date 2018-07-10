@@ -10,7 +10,7 @@ import { getDiagnosticMessage } from '../../utils';
 type ExpectOptions = { type: 'error' } | { type: 'warning' };
 
 const compile = (ast: Ast, sourceFile: SourceFile, options: ExpectOptions) => {
-  const { context } = compileScript({ ast, sourceFile });
+  const { context } = compileScript({ ast, sourceFile, addDiagnostics: true });
 
   const expectDiagnostic = (category: DiagnosticCategory) => {
     const diag = context.diagnostics.find((diagnostic) => diagnostic.category === category);

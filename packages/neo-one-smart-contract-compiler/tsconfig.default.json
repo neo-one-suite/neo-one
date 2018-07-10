@@ -10,6 +10,7 @@
     "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
     "strict": true,
     "strictFunctionTypes": true,
     "typeRoots": [

@@ -52,7 +52,7 @@ export interface InvokeValidateResultOptions {
 const getCompiledScript = async (script: string): Promise<CompileResult> => {
   const { ast, sourceFile } = await utils.getAstForSnippet(script);
 
-  return compile({ ast, sourceFile });
+  return compile({ ast, sourceFile, addDiagnostics: true });
 };
 
 export const startNode = async (options: StartNodeOptions = {}): Promise<TestNode> => {

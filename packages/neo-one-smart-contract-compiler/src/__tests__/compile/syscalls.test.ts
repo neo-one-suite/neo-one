@@ -57,7 +57,7 @@ describe('syscalls', () => {
   test('Neo.Runtime.Serialize/Deserialize generic', async () => {
     await helpers.executeString(
       `
-      class Serializer<V> {
+      class Serializer<V extends SerializableValue> {
         public serialize(value: V): Buffer {
           return syscall('Neo.Runtime.Serialize', value);
         }
@@ -67,7 +67,7 @@ describe('syscalls', () => {
         }
       }
 
-      const serializer: Array<Array<number | boolean>> = new Serializer();
+      const serializer = new Serializer<Array<Array<number | boolean>>>();
 
       const foo = [[1], [2, true], [false, 3]];
       const serialized = serializer.serialize(foo);

@@ -1,7 +1,7 @@
 import { helpers } from '../../../__data__';
 
 describe('ElementAccessExpressionCompiler', () => {
-  test('[0, 1, 2][idx] and ["idx"] and properties', async () => {
+  test.skip('[0, 1, 2][idx] and ["idx"] and properties', async () => {
     await helpers.executeString(
       `
       const x = [0];
@@ -10,7 +10,7 @@ describe('ElementAccessExpressionCompiler', () => {
       }
 
       x[2] = 2;
-      if (x.length !== 3) {
+      if ((x.length as any) !== 3) {
         throw 'Failure';
       }
 

@@ -20,6 +20,10 @@ export class Context {
     return this.mutableDiagnostics;
   }
 
+  public addDiagnostics(diagnostics: ReadonlyArray<ts.Diagnostic>): void {
+    this.mutableDiagnostics.push(...diagnostics);
+  }
+
   public reportError(node: Node, message: string, code: DiagnosticCode): void {
     this.mutableDiagnostics.push(new CompilerDiagnostic(node, message, code, DiagnosticCategory.Error));
   }

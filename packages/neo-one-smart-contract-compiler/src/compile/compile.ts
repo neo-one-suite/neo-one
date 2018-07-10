@@ -10,12 +10,14 @@ export interface CompileOptions {
   readonly ast: Project;
   readonly sourceFile: SourceFile;
   readonly context?: Context;
+  readonly addDiagnostics?: boolean;
 }
 
 export const compile = ({
   ast,
   sourceFile,
   context = new Context(getGlobals(ast), getLibs(ast), getLibAliases(ast)),
+  addDiagnostics = false,
 }: CompileOptions): CompileResult => {
   const helpers = createHelpers();
 
@@ -40,6 +42,10 @@ export const compile = ({
     allHelpers: helperScriptBuilder.getHelpers(),
   });
   emittingScriptBuilder.process();
+
+  if (addDiagnostics) {
+    context.addDiagnostics(ast.getPreEmitDiagnostics().map((diagnostic) => diagnostic.compilerObject));
+  }
 
   return {
     ...emittingScriptBuilder.getFinalResult(),
