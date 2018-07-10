@@ -2,7 +2,8 @@ import { helpers } from '../../../__data__';
 
 describe('ElementAccessExpressionCompiler', () => {
   test('[0, 1, 2][idx] and ["idx"] and properties', async () => {
-    await helpers.executeString(`
+    await helpers.executeString(
+      `
       const x = [0];
       if (x.length !== 1) {
         throw 'Failure';
@@ -50,6 +51,8 @@ describe('ElementAccessExpressionCompiler', () => {
       if (x.x !== 6) {
         throw 'Failure';
       }
-    `);
+    `,
+      { ignoreWarnings: true },
+    );
   });
 });

@@ -12,8 +12,9 @@ import { common, UInt160 } from '@neo-one/client-core';
 import { ts } from 'ts-simple-ast';
 import { compile } from '../../compile';
 import { CompileResult } from '../../compile/types';
-import { testNodeSetup, throwErrorOnDiagnosticErrorOrWarning } from '../../test';
+import { testNodeSetup } from '../../test';
 import * as utils from '../../utils';
+import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 
 export interface Result {
   readonly networkName: string;
@@ -62,7 +63,7 @@ export const startNode = async (options: StartNodeOptions = {}): Promise<TestNod
     async addContract(script): Promise<UInt160> {
       const { code, context } = await getCompiledScript(script);
 
-      throwErrorOnDiagnosticErrorOrWarning(context.diagnostics, options.ignoreWarnings);
+      throwOnDiagnosticErrorOrWarning(context.diagnostics, options.ignoreWarnings);
 
       const result = await client.publish({
         script: code.toString('hex'),

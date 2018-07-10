@@ -7,14 +7,25 @@ import { vm } from '@neo-one/node-vm';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
 import { RawSourceMap } from 'source-map';
-import Project, { DiagnosticCategory, SourceFile } from 'ts-simple-ast';
+import Project, { SourceFile } from 'ts-simple-ast';
 import { compile } from './compile';
+import { throwOnDiagnosticErrorOrWarning } from './utils';
+
+export interface ExecuteOptions {
+  readonly prelude?: Buffer;
+  readonly ignoreWarnings?: boolean;
+}
+
+export const EXECUTE_OPTIONS_DEFAULT = {
+  prelude: Buffer.alloc(0, 0),
+  ignoreWarnings: false,
+};
 
 export const executeScript = async (
   monitor: Monitor,
   ast: Project,
   sourceFile: SourceFile,
-  prelude: Buffer = Buffer.alloc(0, 0),
+  { prelude = Buffer.alloc(0, 0), ignoreWarnings = false }: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
 ): Promise<{ readonly result: InvocationResult; readonly sourceMap: RawSourceMap }> => {
   const blockchain = await Blockchain.create({
     settings: testNet,
@@ -26,10 +37,8 @@ export const executeScript = async (
     monitor,
   });
   const { code: compiledCode, context, sourceMap } = compile({ ast, sourceFile });
-  const error = context.diagnostics.find((diagnostic) => diagnostic.category === DiagnosticCategory.Error);
-  if (error !== undefined) {
-    throw new Error(`Compilation error: ${error.messageText} at ${error.source}`);
-  }
+
+  throwOnDiagnosticErrorOrWarning(context.diagnostics, ignoreWarnings);
 
   const result = await blockchain.invokeScript(Buffer.concat([prelude, compiledCode]), monitor);
 

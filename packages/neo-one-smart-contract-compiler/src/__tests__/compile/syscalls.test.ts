@@ -55,7 +55,8 @@ describe('syscalls', () => {
   });
 
   test('Neo.Runtime.Serialize/Deserialize generic', async () => {
-    await helpers.executeString(`
+    await helpers.executeString(
+      `
       class Serializer<V> {
         public serialize(value: V): Buffer {
           return syscall('Neo.Runtime.Serialize', value);
@@ -91,7 +92,9 @@ describe('syscalls', () => {
       if (deserialized[2][1] !== 3) {
         throw 'Failure';
       }
-    `);
+    `,
+      { ignoreWarnings: true },
+    );
   });
 
   test('Neo.Runtime.Notify', async () => {

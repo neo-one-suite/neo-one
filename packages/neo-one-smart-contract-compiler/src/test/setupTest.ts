@@ -10,24 +10,11 @@ import {
   SmartContract,
   UserAccountID,
 } from '@neo-one/client';
-import { DiagnosticCategory, ts } from 'ts-simple-ast';
+import { ts } from 'ts-simple-ast';
 import { CompileContractResult } from '../compileContract';
 
+import { throwOnDiagnosticErrorOrWarning } from '../utils';
 import { createNode } from './createNode';
-
-export function throwErrorOnDiagnosticErrorOrWarning(
-  diagnostics: ReadonlyArray<ts.Diagnostic>,
-  ignoreWarnings?: boolean,
-) {
-  const error = diagnostics.find((diagnostic) => diagnostic.category === DiagnosticCategory.Error);
-  if (error !== undefined) {
-    throw new Error(`Compilation error: ${error.messageText} at ${error.source}`);
-  }
-  const warning = diagnostics.find((diagnostic) => diagnostic.category === DiagnosticCategory.Warning);
-  if (warning !== undefined && !ignoreWarnings) {
-    throw new Error(`Compilation warning: ${warning.messageText} at ${warning.source}`);
-  }
-}
 
 export async function testNodeSetup() {
   const { privateKey, rpcURL } = await createNode();
@@ -86,21 +73,14 @@ export interface Result {
 }
 
 export const setupTest = async (getContract: () => Promise<TestOptions>): Promise<Result> => {
-  const {
-    client,
-    masterWallet,
-    provider,
-    networkName,
-    keystore,
-    privateKey,
-    userAccountProviders,
-  } = await testNodeSetup();
+  const [
+    { client, masterWallet, provider, networkName, keystore, privateKey, userAccountProviders },
+    { contract, sourceMap, diagnostics, abi, ignoreWarnings },
+  ] = await Promise.all([testNodeSetup(), getContract()]);
 
   const developerClient = new DeveloperClient(provider.read(networkName), userAccountProviders);
 
-  const { contract, sourceMap, diagnostics, abi, ignoreWarnings } = await getContract();
-
-  throwErrorOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);
+  throwOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);
 
   const result = await client.publish(contract);
 
