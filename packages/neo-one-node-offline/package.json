@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-offline",
-  "version": "1.0.0-alpha.61",
+  "version": "1.0.0-alpha.62",
   "keywords": [
     "neo",
     "NEO",
@@ -35,9 +35,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.60",
-    "@neo-one/node-core": "^1.0.0-alpha.61",
-    "@neo-one/utils": "^1.0.0-alpha.50",
+    "@neo-one/client-core": "^1.0.0-alpha.61",
+    "@neo-one/node-core": "^1.0.0-alpha.62",
+    "@neo-one/utils": "^1.0.0-alpha.51",
     "lodash": "^4.17.10"
   }
 }
