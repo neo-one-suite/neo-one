@@ -44,6 +44,8 @@ export const pkgs = fs
   .filter((pkg) => fs.pathExistsSync(getPackagePath(pkg, 'package.json')))
   .filter((pkg) => !getPackageJSON(pkg).noCompile);
 
+const pkgNames = pkgs.map((pkg) => getPackageJSON(pkg).name);
+
 const builtIns: ReadonlyArray<string> = [
   'core-js',
   'child_process',
@@ -117,6 +119,7 @@ interface EntryConfig {
   readonly entry: Entry;
   readonly input: string;
   readonly includeDeps: boolean;
+  readonly includeNEOONEDeps: boolean;
   readonly outputs: ReadonlyArray<EntryOutput>;
   readonly useBuiltIns?: string | boolean;
 }
@@ -132,6 +135,7 @@ const getBinConfigs = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> =
       input: path.resolve(binPath, file),
       // Should we include deps? What about polyfills?
       includeDeps: false,
+      includeNEOONEDeps: false,
       useBuiltIns: 'entry',
       outputs: [
         {
@@ -163,6 +167,7 @@ const getEntries = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
         entry: Entry.node,
         input: index,
         includeDeps: false,
+        includeNEOONEDeps: false,
         outputs: [
           {
             format: Format.cjs,
@@ -193,15 +198,7 @@ const getEntries = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
         entry: Entry.browser,
         input: indexBrowser,
         includeDeps: false,
-        outputs: browserOutputs,
-      },
-    ]);
-  } else if (existsIndex) {
-    result = result.concat([
-      {
-        entry: Entry.browser,
-        input: index,
-        includeDeps: false,
+        includeNEOONEDeps: true,
         outputs: browserOutputs,
       },
     ]);
@@ -229,9 +226,21 @@ const getBabelConfigFull = ({
 
 const createRollupInput = ({ pkg, entry }: { readonly pkg: string; readonly entry: EntryConfig }) => ({
   input: entry.input,
-  external: (module: string) =>
-    (entry.includeDeps && builtIns.some((dep) => dep !== pkg && module.startsWith(dep))) ||
-    (!entry.includeDeps && dependencies.some((dep) => dep !== pkg && module.startsWith(dep))),
+  external: (module: string) => {
+    if (entry.includeNEOONEDeps && pkgNames.some((dep) => dep !== pkg && module.startsWith(dep))) {
+      return false;
+    }
+
+    if (entry.includeDeps && builtIns.some((dep) => dep !== pkg && module.startsWith(dep))) {
+      return true;
+    }
+
+    if (!entry.includeDeps && dependencies.some((dep) => dep !== pkg && module.startsWith(dep))) {
+      return true;
+    }
+
+    return false;
+  },
   plugins: [
     resolve({
       module: true,
