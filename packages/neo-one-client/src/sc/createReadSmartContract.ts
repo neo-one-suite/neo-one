@@ -2,7 +2,8 @@ import { Param as ScriptBuilderParam } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
-import { filter, map } from 'ix/asynciterable/pipe/index';
+import { filter } from 'ix/asynciterable/pipe/filter';
+import { map } from 'ix/asynciterable/pipe/map';
 import { RawSourceMap } from 'source-map';
 import { ReadClient } from '../ReadClient';
 import {

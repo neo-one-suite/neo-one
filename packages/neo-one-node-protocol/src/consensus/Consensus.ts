@@ -2,7 +2,7 @@ import { common, ConsensusPayload, crypto, ECPoint, PrivateKey, Transaction, UIn
 import { Monitor } from '@neo-one/monitor';
 import { finalize, mergeScanLatest, utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
-import { scan } from 'ix/asynciterable/pipe/index';
+import { scan } from 'ix/asynciterable/pipe/scan';
 import { Observable } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { Node } from '../Node';

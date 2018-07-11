@@ -27,7 +27,8 @@ import { BN } from 'bn.js';
 // tslint:disable-next-line no-submodule-imports
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
 // tslint:disable-next-line no-submodule-imports
-import { flatMap, flatten } from 'ix/asynciterable/pipe/index';
+import { flatMap } from 'ix/asynciterable/pipe/flatMap';
+import { flatten } from 'ix/asynciterable/pipe/flatten';
 import * as _ from 'lodash';
 import { AsyncBlockIterator } from '../../AsyncBlockIterator';
 import {

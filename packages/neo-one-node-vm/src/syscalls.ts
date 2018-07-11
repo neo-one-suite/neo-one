@@ -25,7 +25,7 @@ import {
 import { utils as commonUtils } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
-import { map as asyncMap } from 'ix/asynciterable/pipe/index';
+import { map as asyncMap } from 'ix/asynciterable/pipe/map';
 import { defer } from 'rxjs';
 import { concatMap, map, toArray } from 'rxjs/operators';
 import { BLOCK_HEIGHT_YEAR, ExecutionContext, FEES, MAX_VOTES, OpInvoke, OpInvokeArgs, SysCall } from './constants';

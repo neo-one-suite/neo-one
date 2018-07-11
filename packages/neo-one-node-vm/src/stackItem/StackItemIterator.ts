@@ -1,5 +1,5 @@
 import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
-import { map } from 'ix/asynciterable/pipe/index';
+import { map } from 'ix/asynciterable/pipe/map';
 import { InvalidStorageStackItemIteratorError } from './errors';
 import { StackItemBase } from './StackItemBase';
 import { StackItemEnumerator } from './StackItemEnumerator';
