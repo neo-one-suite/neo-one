@@ -175,7 +175,7 @@ const getEntries = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
           },
           {
             format: Format.es,
-            output: path.resolve(outputDir, 'index.mjs'),
+            output: path.resolve(outputDir, 'index.esm.js'),
           },
         ],
       },
@@ -189,7 +189,7 @@ const getEntries = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
     },
     {
       format: Format.es,
-      output: path.resolve(outputDir, 'index.browser.mjs'),
+      output: path.resolve(outputDir, 'index.browser.esm.js'),
     },
   ];
   if (existsIndexBrowser) {
@@ -198,7 +198,7 @@ const getEntries = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
         entry: Entry.browser,
         input: indexBrowser,
         includeDeps: false,
-        includeNEOONEDeps: true,
+        includeNEOONEDeps: false,
         outputs: browserOutputs,
       },
     ]);
@@ -246,8 +246,9 @@ const createRollupInput = ({ pkg, entry }: { readonly pkg: string; readonly entr
       module: true,
       jsnext: true,
       main: true,
+      browser: true,
       preferBuiltins: true,
-      extensions: ['.js', '.ts'],
+      extensions: ['.mjs', '.js', '.jsx', '.ts'],
     }),
     commonjs({}),
     replace({

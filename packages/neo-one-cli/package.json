@@ -30,7 +30,7 @@
     "neo-one": "./dist/bin/neo-one"
   },
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.esm.js",
   "typings": "./src/index.ts",
   "engines": {
     "node": ">=10.6.0"

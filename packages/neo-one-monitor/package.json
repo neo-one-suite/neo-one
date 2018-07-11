@@ -26,11 +26,11 @@
   "bugs": "https://github.com/neo-one-suite/neo-one/issues",
   "license": "MIT",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.esm.js",
   "typings": "./src/index.ts",
   "browser": {
     "./dist/index.js": "./dist/index.browser.js",
-    "./dist/index.mjs": "./dist/index.browser.mjs"
+    "./dist/index.esm.js": "./dist/index.browser.esm.js"
   },
   "engines": {
     "node": ">=10.6.0"
