@@ -10,6 +10,7 @@ module.exports = ({ modules, useBuiltIns, targets }) => ({
     ],
   ],
   plugins: [
+    'lodash',
     '@babel/plugin-proposal-async-generator-functions',
     '@babel/plugin-proposal-class-properties',
     targets == undefined || (typeof targets === 'object' && targets.node != undefined)
