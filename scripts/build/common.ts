@@ -227,6 +227,10 @@ const getBabelConfigFull = ({
 const createRollupInput = ({ pkg, entry }: { readonly pkg: string; readonly entry: EntryConfig }) => ({
   input: entry.input,
   external: (module: string) => {
+    if (module.startsWith('@reactivex')) {
+      return false;
+    }
+
     if (entry.includeNEOONEDeps && pkgNames.some((dep) => dep !== pkg && module.startsWith(dep))) {
       return false;
     }
