@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-network",
-  "version": "1.0.0-alpha.92",
+  "version": "1.0.0-alpha.93",
   "keywords": [
     "neo",
     "NEO",
@@ -35,15 +35,15 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.73",
-    "@neo-one/client-core": "^1.0.0-alpha.58",
-    "@neo-one/monitor": "^1.0.0-alpha.43",
-    "@neo-one/node": "^1.0.0-alpha.92",
-    "@neo-one/node-core": "^1.0.0-alpha.59",
-    "@neo-one/node-data-backup": "^1.0.0-alpha.56",
-    "@neo-one/node-neo-settings": "^1.0.0-alpha.58",
-    "@neo-one/server-plugin": "^1.0.0-alpha.56",
-    "@neo-one/utils": "^1.0.0-alpha.48",
+    "@neo-one/client": "^1.0.0-alpha.74",
+    "@neo-one/client-core": "^1.0.0-alpha.59",
+    "@neo-one/monitor": "^1.0.0-alpha.44",
+    "@neo-one/node": "^1.0.0-alpha.93",
+    "@neo-one/node-core": "^1.0.0-alpha.60",
+    "@neo-one/node-data-backup": "^1.0.0-alpha.57",
+    "@neo-one/node-neo-settings": "^1.0.0-alpha.59",
+    "@neo-one/server-plugin": "^1.0.0-alpha.57",
+    "@neo-one/utils": "^1.0.0-alpha.49",
     "cross-fetch": "^2.2.2",
     "execa": "^0.10.0",
     "fs-extra": "^6.0.1",
