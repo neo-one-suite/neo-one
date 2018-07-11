@@ -176,22 +176,33 @@ const getEntries = async (pkg: string): Promise<ReadonlyArray<EntryConfig>> => {
       },
     ]);
   }
+
+  const browserOutputs = [
+    {
+      format: Format.cjs,
+      output: path.resolve(outputDir, 'index.browser.js'),
+    },
+    {
+      format: Format.es,
+      output: path.resolve(outputDir, 'index.browser.mjs'),
+    },
+  ];
   if (existsIndexBrowser) {
     result = result.concat([
       {
         entry: Entry.browser,
         input: indexBrowser,
         includeDeps: false,
-        outputs: [
-          {
-            format: Format.cjs,
-            output: path.resolve(outputDir, 'index.browser.js'),
-          },
-          {
-            format: Format.es,
-            output: path.resolve(outputDir, 'index.browser.mjs'),
-          },
-        ],
+        outputs: browserOutputs,
+      },
+    ]);
+  } else if (existsIndex) {
+    result = result.concat([
+      {
+        entry: Entry.browser,
+        input: index,
+        includeDeps: false,
+        outputs: browserOutputs,
       },
     ]);
   }
