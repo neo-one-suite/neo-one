@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-blockchain",
-  "version": "1.0.0-alpha.64",
+  "version": "1.0.0-alpha.65",
   "keywords": [
     "neo",
     "NEO",
@@ -35,10 +35,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.57",
-    "@neo-one/monitor": "^1.0.0-alpha.42",
-    "@neo-one/node-core": "^1.0.0-alpha.58",
-    "@neo-one/utils": "^1.0.0-alpha.47",
+    "@neo-one/client-core": "^1.0.0-alpha.58",
+    "@neo-one/monitor": "^1.0.0-alpha.43",
+    "@neo-one/node-core": "^1.0.0-alpha.59",
+    "@neo-one/utils": "^1.0.0-alpha.48",
     "bn.js": "^4.11.8",
     "js-priority-queue": "^0.1.5",
     "lodash": "^4.17.10",
