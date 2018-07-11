@@ -1,5 +1,5 @@
-import { AsyncIterableX as AsyncIterable } from 'ix/asynciterable/asynciterablex';
-import { toArray } from 'ix/asynciterable/toarray';
+import { AsyncIterableX as AsyncIterable } from '@reactivex/ix-esnext-esm/asynciterable/asynciterablex';
+import { toArray } from '@reactivex/ix-esnext-esm/asynciterable/toarray';
 import * as _ from 'lodash';
 import { AsyncBlockIterator } from '../AsyncBlockIterator';
 import { UnknownBlockError } from '../errors';

@@ -52,7 +52,7 @@
         },
         "esSpecCompliant": true
       }
-    ],  
+    ],
     "ordered-imports": true,
     "quotemark": [
       false,
@@ -77,7 +77,8 @@
     "no-submodule-imports": [
       true,
       "rxjs",
-      "ix"
+      "ix",
+      "@reactivex"
     ],
     "strict-boolean-expressions": [
       true,

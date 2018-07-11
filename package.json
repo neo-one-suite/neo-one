@@ -117,6 +117,7 @@
     "@types/yargs": "11.1.0",
     "app-root-dir": "1.0.2",
     "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "^23.4.0",
     "babel-plugin-lodash": "^3.3.4",
     "cross-env": "5.2.0",
     "execa": "0.10.0",
@@ -197,10 +198,11 @@
     ],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.tsx?$": "ts-jest",
+      "^.+\\.jsx?$": "babel-jest"
     },
     "transformIgnorePatterns": [
-      "<rootDir>/node_modules/",
+      "<rootDir>/node_modules/(?!@reactivex)",
       "<rootDir>/packages/.*/dist/.*"
     ],
     "snapshotSerializers": [

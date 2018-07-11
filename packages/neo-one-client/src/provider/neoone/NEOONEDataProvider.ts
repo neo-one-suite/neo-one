@@ -22,13 +22,11 @@ import {
 } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
+import { AsyncIterableX } from '@reactivex/ix-esnext-esm/asynciterable/asynciterablex';
+import { flatMap } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatMap';
+import { flatten } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatten';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
-// tslint:disable-next-line no-submodule-imports
-import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
-// tslint:disable-next-line no-submodule-imports
-import { flatMap } from 'ix/asynciterable/pipe/flatMap';
-import { flatten } from 'ix/asynciterable/pipe/flatten';
 import * as _ from 'lodash';
 import { AsyncBlockIterator } from '../../AsyncBlockIterator';
 import {

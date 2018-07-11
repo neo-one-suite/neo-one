@@ -1,8 +1,8 @@
 import { VMState } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
-import { AsyncIterableX } from 'ix/asynciterable/asynciterablex';
-import { toArray } from 'ix/asynciterable/toarray';
+import { AsyncIterableX } from '@reactivex/ix-esnext-esm/asynciterable/asynciterablex';
+import { toArray } from '@reactivex/ix-esnext-esm/asynciterable/toarray';
 import { keys, transactions } from '../../../__data__';
 import { NEOONEDataProvider } from '../../../provider/neoone/NEOONEDataProvider';
 

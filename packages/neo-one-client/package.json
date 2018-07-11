@@ -49,7 +49,7 @@
     "cross-fetch": "^2.2.2",
     "dataloader": "^1.4.0",
     "fast-stable-stringify": "^1.0.0",
-    "ix": "^2.3.5",
+    "@reactivex/ix-esnext-esm": "^2.3.5",
     "lodash": "^4.17.10",
     "rxjs": "^6.2.1",
     "source-map": "^0.7.3"
