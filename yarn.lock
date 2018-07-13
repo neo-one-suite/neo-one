@@ -1460,16 +1460,9 @@ babel-generator@^6.18.0:
     source-map "^0.5.7"
     trim-right "^1.0.1"
 
-babel-jest@23.2.0, babel-jest@^23.2.0:
+babel-jest@23.2.0, babel-jest@^23.2.0, babel-jest@^23.4.0:
   version "23.2.0"
   resolved "https://registry.yarnpkg.com/babel-jest/-/babel-jest-23.2.0.tgz#14a9d6a3f4122dfea6069d37085adf26a53a4dba"
-  dependencies:
-    babel-plugin-istanbul "^4.1.6"
-    babel-preset-jest "^23.2.0"
-
-babel-jest@^23.4.0:
-  version "23.4.0"
-  resolved "https://registry.yarnpkg.com/babel-jest/-/babel-jest-23.4.0.tgz#22c34c392e2176f6a4c367992a7fcff69d2e8557"
   dependencies:
     babel-plugin-istanbul "^4.1.6"
     babel-preset-jest "^23.2.0"
@@ -6748,9 +6741,9 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs-tslint-rules@4.5.1:
-  version "4.5.1"
-  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.5.1.tgz#5e9aa2ba4fc0ff572d5141383d2f3b04f9af65db"
+rxjs-tslint-rules@4.6.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.6.0.tgz#f3ef8fafb7097b904634bed2d4fdcd61d065525c"
   dependencies:
     "@phenomnomnominal/tsquery" "^1.0.5"
     decamelize "^2.0.0"
