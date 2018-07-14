@@ -40,6 +40,7 @@ export class Witness implements SerializableWire<Witness>, SerializableJSON<Witn
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly equals: Equals = utils.equals(
     Witness,
+    this,
     (other) => this.invocation.equals(other.invocation) && this.verification.equals(other.verification),
   );
   private readonly sizeInternal = utils.lazy(

@@ -1,4 +1,5 @@
 // tslint:disable no-any no-let no-object-mutation no-empty
+// wallaby.skip
 import {
   common,
   crypto,
@@ -16,7 +17,7 @@ import {
 import { DefaultMonitor } from '@neo-one/monitor';
 import { ExecuteScriptsResult, NULL_ACTION, TriggerType, VMListeners } from '@neo-one/node-core';
 import { BN } from 'bn.js';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { assets, createBlockchain, testUtils, transactions } from '../__data__';
 import { execute } from '../execute';
 

@@ -19,8 +19,8 @@ export class UnknownOpError extends CustomError {
 export class InvalidParamError extends CustomError {
   public readonly code: string;
 
-  public constructor() {
-    super('Invalid Param');
+  public constructor(paramType?: string) {
+    super(`Invalid Param${paramType === undefined ? '' : `: ${paramType}`}`);
     this.code = 'INVALID_PARAM';
   }
 }
@@ -153,7 +153,7 @@ export class ScriptBuilder {
       return this.emitPushECPoint(common.asECPoint(param));
     }
 
-    if (typeof param === 'number' || param instanceof BN) {
+    if (typeof param === 'number' || BN.isBN(param)) {
       return this.emitPushInt(param);
     }
 
@@ -169,7 +169,7 @@ export class ScriptBuilder {
       return this.emitPush(param);
     }
 
-    throw new InvalidParamError();
+    throw new InvalidParamError(typeof param);
   }
 
   // tslint:disable-next-line readonly-array

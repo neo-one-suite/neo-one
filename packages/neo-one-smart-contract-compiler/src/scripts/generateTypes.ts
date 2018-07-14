@@ -1,5 +1,4 @@
 // tslint:disable no-import-side-effect
-import '@babel/polyfill';
 import * as appRootDir from 'app-root-dir';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -18,7 +17,8 @@ const run = async () => {
     .map((syscall) => `  ${syscall.toDeclaration()}`)
     .join('\n');
 
-  const content = `declare global {
+  const content = `// tslint:disable
+declare global {
 ${types}
 ${interfaces}
 ${syscalls}

@@ -59,10 +59,10 @@ export const getGlobals = (ast: Project): Globals => {
 
   // tslint:disable-next-line no-any
   const typeChecker = ast.getTypeChecker().compilerObject as any;
-  // @ts-ignore
-  const array = new Symbol( // deepscan-disable-line
-    // @ts-ignore
-    ast.global,
+  // tslint:disable-next-line no-any
+  const array = new (Symbol as any)(
+    // tslint:disable-next-line no-any
+    (ast as any).global,
     typeChecker.createArrayType(typeChecker.getAnyType()).symbol as ts.Symbol,
   ).getDeclaredType();
 

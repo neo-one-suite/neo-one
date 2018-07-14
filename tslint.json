@@ -77,7 +77,7 @@
     "no-submodule-imports": [
       true,
       "rxjs",
-      "ix",
+      "@reactivex/ix-esnext-esm",
       "@reactivex"
     ],
     "strict-boolean-expressions": [

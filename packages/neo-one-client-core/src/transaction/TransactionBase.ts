@@ -1,6 +1,6 @@
 import { utils as commonUtils } from '@neo-one/utils';
 import { BN } from 'bn.js';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Account, AccountKey } from '../Account';
 import { Asset, AssetKey } from '../Asset';
 import { AssetType, hasFlag } from '../AssetType';
@@ -169,6 +169,7 @@ export abstract class TransactionBase<
   public readonly equals: Equals = utils.equals(
     // tslint:disable-next-line no-any
     this.constructor as any,
+    this,
     (other: TransactionBase<Type, TransactionJSON>) => common.uInt256Equal(this.hash, other.hash),
   );
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));

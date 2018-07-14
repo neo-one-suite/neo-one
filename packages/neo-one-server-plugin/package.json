@@ -1,41 +1,8 @@
 {
   "name": "@neo-one/server-plugin",
   "version": "1.0.0-alpha.60",
-  "keywords": [
-    "neo",
-    "NEO",
-    "one",
-    "ONE",
-    "blockchain",
-    "neo-one",
-    "neo-one-suite",
-    "neo one",
-    "neo one suite",
-    "NEO ONE",
-    "NEO ONE suite",
-    "NEO•ONE",
-    "NEO•ONE suite",
-    "neo blockchain",
-    "NEO Blockchain",
-    "NEO blockchain",
-    "dapp",
-    "dapps",
-    "plugin",
-    "neo one plugin"
-  ],
   "description": "NEO•ONE Server plugin API.",
-  "repository": "https://github.com/neo-one-suite/neo-one",
-  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
-  "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/index.esm.js",
-  "typings": "./src/index.ts",
-  "engines": {
-    "node": ">=10.6.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
+  "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/monitor": "^1.0.0-alpha.47",
     "@neo-one/utils": "^1.0.0-alpha.52",
@@ -43,10 +10,12 @@
     "chalk": "^2.4.1",
     "chokidar": "^2.0.4",
     "env-paths": "^1.0.0",
+    "esm": "^3.0.69",
     "fs-extra": "^6.0.1",
     "is-running": "^2.1.0",
     "rxjs": "^6.2.1",
     "seamless-immutable": "^7.1.3",
+    "tslib": "^1.9.3",
     "vorpal": "^1.12.0"
   }
 }

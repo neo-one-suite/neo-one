@@ -2,18 +2,24 @@
 const NodeEnvironment = require('jest-environment-node');
 
 const _ = require('lodash');
+const appRootDir = require('app-root-dir');
 const execa = require('execa');
 const fs = require('fs-extra');
+const path = require('path');
 const tmp = require('tmp');
 
 class One {
   async _setup() {
+    if (this.server !== undefined) {
+      return;
+    }
+
     this.dir = tmp.dirSync();
     this.dirName = this.dir.name;
     this.serverPort = _.random(10000, 50000);
     this.minPort = this.serverPort + 1;
-    const command = this._createCommand('start server --debug --static-neo-one');
-    this.server = execa(command.split(' ')[0], command.split(' ').slice(1));
+    const [cmd, args] = this._createCommand('start server --debug --static-neo-one');
+    this.server = execa(cmd, args, this._getEnv());
 
     let stdout = '';
     const listener = (res) => {
@@ -27,7 +33,8 @@ class One {
       await new Promise((resolve) => setTimeout(() => resolve(), 5000));
       const result = await this._exec('check server --static-neo-one');
       try {
-        ready = JSON.parse(result);
+        const lines = result.split('\n').filter((line) => line !== '');
+        ready = JSON.parse(lines[lines.length - 1]);
       } catch (error) {
         // Ignore errors
       }
@@ -43,6 +50,10 @@ class One {
   }
 
   async _teardown() {
+    if (this.server === undefined) {
+      return;
+    }
+
     try {
       await this._exec('reset --static-neo-one');
     } catch (error) {
@@ -55,6 +66,7 @@ class One {
   }
 
   async execute(command) {
+    await this._setup();
     return this._exec(command);
   }
 
@@ -83,33 +95,62 @@ class One {
     throw finalError;
   }
 
-  _createCommand(command) {
-    return `node ./packages/neo-one-cli/dist/bin/neo-one ${command} --dir ${this.dirName} --server-port ${
+  async measureImport(mod) {
+    return this._timeRequire(mod, '');
+  }
+
+  async measureRequire(mod) {
+    return this._timeRequire(mod, '-es2018-cjs');
+  }
+
+  async _timeRequire(mod, ext) {
+    await this._timeRequireSingle(mod, ext);
+
+    return this._timeRequireSingle(mod, ext);
+  }
+
+  async _timeRequireSingle(mod, ext) {
+    const { stdout } = await execa.shell(
+      `node --eval 'const start = Date.now(); require("${mod}${ext}"); console.log(Date.now() - start);'`,
+      { cwd: path.join(appRootDir.get(), 'dist', `neo-one${ext}`) },
+    );
+
+    return parseInt(stdout);
+  }
+
+  _createCommand(commandIn) {
+    const command = `./node_modules/.bin/neo-one ${commandIn} --dir ${this.dirName} --server-port ${
       this.serverPort
     } --min-port ${this.minPort}`;
+    return [command.split(' ')[0], command.split(' ').slice(1)];
   }
 
   _exec(commandIn) {
-    const command = this._createCommand(commandIn);
-    return execa(command.split(' ')[0], command.split(' ').slice(1), {
-      maxBuffer: 20000 * 1024,
-      windowsHide: true,
-    })
+    const [cmd, args] = this._createCommand(commandIn);
+    return execa(cmd, args, this._getEnv())
       .then(({ stdout }) => stdout)
       .catch((error) => {
         throw new Error(
-          `Command:\n${command}\n\nSTDOUT:\n${error.stdout}\n\nSTDERR:\n${error.stderr}\n\nERROR:\n${error.toString()}`,
+          `Command:\n${[cmd].concat(args).join(' ')}\n\nSTDOUT:\n${error.stdout}\n\nSTDERR:\n${
+            error.stderr
+          }\n\nERROR:\n${error.toString()}`,
         );
       });
+  }
+
+  _getEnv() {
+    return {
+      maxBuffer: 20000 * 1024,
+      windowsHide: true,
+      cwd: path.join(appRootDir.get(), 'dist', 'neo-one'),
+    };
   }
 }
 
 class E2EEnvironment extends NodeEnvironment {
   async setup() {
     await super.setup();
-    const one = new One();
-    await one._setup();
-    this.global.one = one;
+    this.global.one = new One();
   }
 
   async teardown() {

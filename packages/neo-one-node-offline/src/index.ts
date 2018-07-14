@@ -2,7 +2,7 @@ import { BinaryReader, Block, DeserializeWireContext } from '@neo-one/client-cor
 import { Blockchain } from '@neo-one/node-core';
 import { CustomError } from '@neo-one/utils';
 import * as fs from 'fs';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Readable, Transform, Writable } from 'stream';
 import * as zlib from 'zlib';
 

@@ -1,4 +1,4 @@
-import { RawSourceMap } from '../node_modules/source-map/source-map';
+import { RawSourceMap } from 'source-map';
 import { ClientBase } from './ClientBase';
 import {
   BufferString,

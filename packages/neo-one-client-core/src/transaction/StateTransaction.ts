@@ -75,9 +75,10 @@ export class StateTransaction extends TransactionBase<TransactionType.State, Sta
       throw new InvalidFormatError();
     }
 
+    const getScriptHashesForVerifying = super.getScriptHashesForVerifying.bind(this);
     this.stateGetScriptHashesForVerifyingInternal = utils.lazyAsync(
       async (options: TransactionGetScriptHashesForVerifyingOptions) => {
-        const mutableHashes = await super.getScriptHashesForVerifying(options);
+        const mutableHashes = await getScriptHashesForVerifying(options);
         this.descriptors.forEach((descriptor) => {
           descriptor.getScriptHashesForVerifying().forEach((scriptHash) => {
             mutableHashes.add(scriptHash);

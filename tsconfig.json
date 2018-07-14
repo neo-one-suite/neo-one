@@ -1,24 +1,11 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "alwaysStrict": true,
     "baseUrl": "./packages",
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "declaration": false,
-    "experimentalDecorators": true,
-    "lib": [
-      "dom",
-      "esnext"
-    ],
-    "sourceMap": true,
-    "noEmit": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": false,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
+
+    "lib": ["dom", "esnext"],
     "paths": {
       "@neo-one/ec-key": [
         "../@types/@neo-one/ec-key"
@@ -36,15 +23,34 @@
         "../@types/*"
       ]
     },
-    "pretty": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true,
     "typeRoots": [
       "./node_modules/@types/",
       "./packages/neo-one-smart-contract",
       "./@types/roots"
-    ]
-  }
+    ],
+
+    "pretty": true,
+
+    "noEmit": true,
+    "declaration": false,
+
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+
+    "alwaysStrict": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmitHelpers": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "allowUnusedLabels": false,
+    "noUnusedParameters": false,
+    "allowUnreachableCode": false,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "exclude": [
+    "dist"
+  ]
 }

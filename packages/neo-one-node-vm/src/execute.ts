@@ -9,7 +9,7 @@ import {
   WriteBlockchain,
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import {
   ExecutionContext,
   ExecutionInit,

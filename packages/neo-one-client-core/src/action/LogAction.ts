@@ -29,12 +29,14 @@ export class LogAction extends ActionBase<LogAction, ActionType.Log> implements 
   public readonly message: string;
 
   public constructor({ version, index, scriptHash, message }: LogAdd) {
-    super({
-      type: ActionType.Log,
+    const options = {
+      // tslint:disable-next-line no-useless-cast
+      type: ActionType.Log as ActionType.Log,
       version,
       index,
       scriptHash,
-    });
+    };
+    super(options);
 
     this.message = message;
   }

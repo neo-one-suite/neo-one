@@ -1,39 +1,8 @@
 {
   "name": "@neo-one/server-client",
   "version": "1.0.0-alpha.61",
-  "keywords": [
-    "neo",
-    "NEO",
-    "one",
-    "ONE",
-    "blockchain",
-    "neo-one",
-    "neo-one-suite",
-    "neo one",
-    "neo one suite",
-    "NEO ONE",
-    "NEO ONE suite",
-    "NEO•ONE",
-    "NEO•ONE suite",
-    "neo blockchain",
-    "NEO Blockchain",
-    "NEO blockchain",
-    "dapp",
-    "dapps"
-  ],
   "description": "NEO•ONE Server client api.",
-  "repository": "https://github.com/neo-one-suite/neo-one",
-  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
-  "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/index.esm.js",
-  "typings": "./src/index.ts",
-  "engines": {
-    "node": ">=10.6.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
+  "main": "./src/index.ts",
   "dependencies": {
     "@grpc/grpc-js": "^0.2.0",
     "@grpc/proto-loader": "^0.1.0",
@@ -41,9 +10,11 @@
     "@neo-one/server-plugin": "^1.0.0-alpha.60",
     "@neo-one/utils": "^1.0.0-alpha.52",
     "env-paths": "^1.0.0",
+    "esm": "^3.0.69",
     "execa": "^0.10.0",
     "fs-extra": "^6.0.1",
     "is-running": "^2.1.0",
-    "rxjs": "^6.2.1"
+    "rxjs": "^6.2.1",
+    "tslib": "^1.9.3"
   }
 }

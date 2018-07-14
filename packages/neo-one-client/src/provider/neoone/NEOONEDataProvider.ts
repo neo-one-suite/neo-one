@@ -27,7 +27,7 @@ import { flatMap } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatMap';
 import { flatten } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatten';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { AsyncBlockIterator } from '../../AsyncBlockIterator';
 import {
   Account,

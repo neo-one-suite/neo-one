@@ -69,6 +69,7 @@ export class BufferAttribute extends AttributeBase<BufferAttributeUsage, Buffer>
   public readonly size: number;
   public readonly equals: Equals = utils.equals(
     BufferAttribute,
+    this,
     (other) => this.usage === other.usage && this.value.equals(other.value),
   );
 

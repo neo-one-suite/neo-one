@@ -1,37 +1,8 @@
 {
   "name": "@neo-one/server-plugin-wallet",
   "version": "1.0.0-alpha.99",
-  "keywords": [
-    "neo",
-    "NEO",
-    "one",
-    "ONE",
-    "blockchain",
-    "neo-one",
-    "neo-one-suite",
-    "neo one",
-    "neo one suite",
-    "NEO ONE",
-    "NEO ONE suite",
-    "NEO•ONE",
-    "NEO•ONE suite",
-    "neo blockchain",
-    "NEO Blockchain",
-    "NEO blockchain"
-  ],
   "description": "NEO•ONE Server wallet plugin.",
-  "repository": "https://github.com/neo-one-suite/neo-one",
-  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
-  "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/index.esm.js",
-  "typings": "./src/index.ts",
-  "engines": {
-    "node": ">=10.6.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
+  "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/client": "^1.0.0-alpha.77",
     "@neo-one/client-core": "^1.0.0-alpha.62",
@@ -43,10 +14,12 @@
     "@neo-one/smart-contract-lib": "^1.0.0-alpha.33",
     "@neo-one/utils": "^1.0.0-alpha.52",
     "bignumber.js": "^7.2.1",
+    "esm": "^3.0.69",
     "fs-extra": "^6.0.1",
     "lodash": "^4.17.10",
     "ora": "^2.1.0",
     "redux-persist-node-storage": "^2.0.0",
-    "rxjs": "^6.2.1"
+    "rxjs": "^6.2.1",
+    "tslib": "^1.9.3"
   }
 }

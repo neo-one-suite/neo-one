@@ -1,43 +1,14 @@
 {
   "name": "@neo-one/node-offline",
   "version": "1.0.0-alpha.63",
-  "keywords": [
-    "neo",
-    "NEO",
-    "one",
-    "ONE",
-    "blockchain",
-    "neo-one",
-    "neo-one-suite",
-    "neo one",
-    "neo one suite",
-    "NEO ONE",
-    "NEO ONE suite",
-    "NEO•ONE",
-    "NEO•ONE suite",
-    "neo blockchain",
-    "NEO Blockchain",
-    "NEO blockchain",
-    "dapp",
-    "dapps"
-  ],
   "description": "NEO•ONE utility for loading serialized blocks (chain.acc) into a node.",
-  "repository": "https://github.com/neo-one-suite/neo-one",
-  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
-  "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/index.esm.js",
-  "typings": "./src/index.ts",
-  "engines": {
-    "node": ">=10.6.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
+  "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/client-core": "^1.0.0-alpha.62",
     "@neo-one/node-core": "^1.0.0-alpha.63",
     "@neo-one/utils": "^1.0.0-alpha.52",
-    "lodash": "^4.17.10"
+    "esm": "^3.0.69",
+    "lodash": "^4.17.10",
+    "tslib": "^1.9.3"
   }
 }

@@ -169,7 +169,7 @@ describe('BrowserMonitor', () => {
 
     reporter = new Reporter({
       logger,
-      timer: 2000,
+      timer: 20,
       endpoint: 'fakeEnd',
     });
 
@@ -198,7 +198,7 @@ describe('BrowserMonitor', () => {
 
     expect((fetch as any).mock.calls).toMatchSnapshot();
 
-    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
+    await new Promise<void>((resolve) => setTimeout(resolve, 20));
     expect((fetch as any).mock.calls.length).toBeGreaterThanOrEqual(3);
   });
 
@@ -207,7 +207,7 @@ describe('BrowserMonitor', () => {
 
     reporter = new Reporter({
       logger,
-      timer: 2000,
+      timer: 20,
       endpoint: 'fakeEnd',
     });
 
@@ -275,7 +275,7 @@ describe('BrowserMonitor', () => {
 
     expect((fetch as any).mock.calls).toMatchSnapshot();
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 20));
     expect((fetch as any).mock.calls.length).toBeGreaterThanOrEqual(3);
   });
 

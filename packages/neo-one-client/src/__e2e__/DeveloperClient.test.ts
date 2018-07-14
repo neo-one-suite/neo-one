@@ -1,7 +1,7 @@
 import { common } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Client } from '../Client';
 import { DeveloperClient } from '../DeveloperClient';
 import { wifToPrivateKey } from '../helpers';

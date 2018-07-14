@@ -62,6 +62,7 @@ export class StorageItem implements SerializableWire<StorageItem>, Equatable, Se
   public readonly value: Buffer;
   public readonly equals: Equals = utils.equals(
     StorageItem,
+    this,
     (other) =>
       common.uInt160Equal(this.hash, other.hash) && this.key.equals(other.key) && this.value.equals(other.value),
   );

@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { ArgumentedNode, Node } from 'ts-simple-ast';
 
 import { ScriptBuilder } from '../../sb';

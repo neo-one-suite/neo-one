@@ -12,7 +12,7 @@ NEOONEDataProvider {
           "cacheKeyFn": [Function],
           "maxBatchSize": 25,
         },
-        "_promiseCache": Array [],
+        "_promiseCache": Map {},
         "_queue": Array [],
       },
       "endpoint": "rpc",

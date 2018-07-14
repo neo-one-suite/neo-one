@@ -19,7 +19,7 @@ import {
   Session,
 } from '@neo-one/server-plugin';
 // tslint:disable-next-line match-default-export-name
-import * as Table from 'cli-table2';
+import Table from 'cli-table2';
 import * as inquirer from 'inquirer';
 import ora from 'ora';
 import * as path from 'path';
@@ -464,8 +464,8 @@ export class InteractiveCLI {
 
   private getDescribe(describeTable: DescribeTable): string {
     const mutableTable = getTable();
-    // @ts-ignore
-    mutableTable.push(
+    // tslint:disable-next-line no-any
+    (mutableTable as any).push(
       ...describeTable.map(([keyIn, value]) => {
         const key = `${keyIn}:`;
         if (typeof value === 'string') {
@@ -483,10 +483,10 @@ export class InteractiveCLI {
   }
 
   private getList(listTable: ListTable): string {
-    // @ts-ignore
-    const mutableTable = getTable(listTable[0]);
-    // @ts-ignore
-    mutableTable.push(...listTable.slice(1));
+    // tslint:disable-next-line no-any
+    const mutableTable = getTable(listTable[0] as any);
+    // tslint:disable-next-line no-any
+    (mutableTable as any).push(...listTable.slice(1));
 
     return mutableTable.toString();
   }

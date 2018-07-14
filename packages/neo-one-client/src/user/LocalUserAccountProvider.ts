@@ -25,7 +25,7 @@ import { processError } from '@neo-one/client-switch';
 import { Counter, Histogram, Labels, metrics, Monitor } from '@neo-one/monitor';
 import { labels as labelNames, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Observable } from 'rxjs';
 import { RawSourceMap } from 'source-map';
 import {

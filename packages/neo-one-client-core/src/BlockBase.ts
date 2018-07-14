@@ -74,7 +74,7 @@ export abstract class BlockBase implements Equatable {
   public readonly consensusData: BN;
   public readonly nextConsensus: UInt160;
   // tslint:disable-next-line no-any
-  public readonly equals: Equals = utils.equals(this.constructor as any, (other: any) =>
+  public readonly equals: Equals = utils.equals(this.constructor as any, this, (other: any) =>
     common.uInt256Equal(this.hash, other.hash),
   );
   public readonly getScriptHashesForVerifying = utils.lazyAsync(

@@ -26,7 +26,7 @@ import { CompileContractResult, findAndCompileContract } from '@neo-one/smart-co
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as fs from 'fs-extra';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import ora from 'ora';
 import * as path from 'path';
 import { of as _of } from 'rxjs';

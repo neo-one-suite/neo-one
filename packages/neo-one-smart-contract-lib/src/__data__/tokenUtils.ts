@@ -11,7 +11,6 @@ import {
 import { cleanupTest, setupContractTest } from '@neo-one/smart-contract-compiler';
 import BigNumber from 'bignumber.js';
 
-import * as appRootDir from 'app-root-dir';
 import * as path from 'path';
 
 export interface DeployOptions {
@@ -34,7 +33,7 @@ export interface Options {
 export const testToken = ({ contractName, name, symbol, decimals, deploy, issueValue, transferValue }: Options) => {
   const setup = async () =>
     setupContractTest({
-      dir: path.resolve(appRootDir.get(), 'packages', 'neo-one-smart-contract-lib', 'src', '__data__', 'contracts'),
+      dir: path.resolve(__dirname, 'contracts'),
       contractName,
     });
 
@@ -77,8 +76,7 @@ export const testToken = ({ contractName, name, symbol, decimals, deploy, issueV
       let [receipt] = await Promise.all([result.confirmed({ timeoutMS: 30000 }), developerClient.runConsensusNow()]);
 
       if (receipt.result.state !== 'HALT') {
-        expect(receipt.result.state).toEqual('HALT');
-        throw new Error('For TS');
+        throw new Error(receipt.result.message);
       }
 
       expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
@@ -110,8 +108,7 @@ export const testToken = ({ contractName, name, symbol, decimals, deploy, issueV
       [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
 
       if (receipt.result.state !== 'HALT') {
-        expect(receipt.result.state).toEqual('HALT');
-        throw new Error('For TS');
+        throw new Error(receipt.result.message);
       }
 
       expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('transfer consume');

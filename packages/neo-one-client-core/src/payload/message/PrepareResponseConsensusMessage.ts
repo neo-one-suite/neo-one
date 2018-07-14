@@ -25,10 +25,12 @@ export class PrepareResponseConsensusMessage extends ConsensusMessageBase<
   public readonly signature: Buffer;
 
   public constructor({ viewNumber, signature }: PrepareResponseAdd) {
-    super({
-      type: ConsensusMessageType.PrepareResponse,
+    const options = {
+      // tslint:disable-next-line no-useless-cast
+      type: ConsensusMessageType.PrepareResponse as ConsensusMessageType.PrepareResponse,
       viewNumber,
-    });
+    };
+    super(options);
 
     this.signature = signature;
   }

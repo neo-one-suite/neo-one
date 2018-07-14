@@ -1,6 +1,6 @@
 // tslint:disable no-any
 import * as grpc from '@grpc/grpc-js';
-import protoLoader from '@grpc/proto-loader';
+import * as protoLoader from '@grpc/proto-loader';
 import { proto } from '@neo-one/server-grpc';
 import {
   AllResources,

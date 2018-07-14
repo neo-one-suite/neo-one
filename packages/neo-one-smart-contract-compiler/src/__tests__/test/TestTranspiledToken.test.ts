@@ -70,7 +70,7 @@ describe('TestTranspiledToken', () => {
 
     const owner = privateKeyToScriptHash(masterPrivateKey);
     let result = await smartContract.deploy(owner, { from: masterAccountID });
-    let [receipt] = await Promise.all([result.confirmed({ timeoutMS: 30000 }), developerClient.runConsensusNow()]);
+    let [receipt] = await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
 
     expect(receipt.result.state).toEqual('HALT');
     expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');

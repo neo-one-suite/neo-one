@@ -12,7 +12,7 @@ import {
 } from '@neo-one/client-core';
 import { Blockchain } from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Node } from '../Node';
 import { ConsensusContext } from './ConsensusContext';
 import {

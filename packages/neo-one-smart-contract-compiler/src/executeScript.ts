@@ -28,9 +28,9 @@ export const executeScript = async (
   { prelude = Buffer.alloc(0, 0), ignoreWarnings = false }: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
 ): Promise<{ readonly result: InvocationResult; readonly sourceMap: RawSourceMap }> => {
   const blockchain = await Blockchain.create({
-    settings: testNet,
+    settings: testNet(),
     storage: storage({
-      context: { messageMagic: testNet.messageMagic },
+      context: { messageMagic: testNet().messageMagic },
       db: LevelUp(MemDown()),
     }),
     vm,

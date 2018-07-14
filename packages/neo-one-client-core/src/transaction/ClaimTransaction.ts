@@ -80,11 +80,12 @@ export class ClaimTransaction extends TransactionBase<TransactionType.Claim, Cla
       throw new InvalidFormatError();
     }
 
+    const getScriptHashesForVerifying = super.getScriptHashesForVerifying.bind(this);
     this.claimGetScriptHashesForVerifyingInternal = utils.lazyAsync(
       async (options: TransactionGetScriptHashesForVerifyingOptions) => {
         const { getOutput } = options;
         const [hashesSet, hashes] = await Promise.all([
-          super.getScriptHashesForVerifying(options),
+          getScriptHashesForVerifying(options),
           Promise.all(
             this.claims.map(async (claim) => {
               const output = await getOutput(claim);

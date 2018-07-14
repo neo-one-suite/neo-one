@@ -1,25 +1,13 @@
 {
   "globals": {
     "ts-jest": {
-      "useBabelrc": true,
-      "tsConfigFile": "tsconfig.cli.json"
+      "skipBabel": true,
+      "tsConfigFile": "tsconfig.jest.json"
     }
   },
-  "moduleFileExtensions": [
-    "js",
-    "jsx",
-    "json",
-    "node",
-    "ts",
-    "tsx"
-  ],
+  "moduleFileExtensions": ["js", "jsx", "json", "node", "ts", "tsx"],
   "testEnvironment": "./scripts/e2e/Environment",
-  "testPathIgnorePatterns": [
-    "/node_modules/",
-    "<rootDir>/packages/neo-one-node-neo-settings/src/test.ts",
-    "<rootDir>/packages/.*/template/.*",
-    "<rootDir>/packages/.*/__tests__/.*"
-  ],
+  "testPathIgnorePatterns": ["/node_modules/"],
   "snapshotSerializers": [
     "./scripts/serializers/blockchain.js",
     "./scripts/serializers/bn.js",
@@ -29,9 +17,19 @@
   "transform": {
     "^.+\\.tsx?$": "ts-jest"
   },
-  "transformIgnorePatterns": [
-    "<rootDir>/node_modules/",
-    "<rootDir>/packages/.*/dist/.*"
+  "moduleNameMapper": {
+    "^@neo-one/ec-key": "@neo-one/ec-key",
+    "^@neo-one/boa": "@neo-one/boa",
+    "^@neo-one/csharp": "@neo-one/csharp",
+    "^@neo-one/(.+)-es2018-cjs": "<rootDir>/dist/neo-one-es2018-cjs/packages/neo-one-$1",
+    "^@neo-one/(.+)": "<rootDir>/dist/neo-one-es2018-cjs/packages/neo-one-$1",
+    "^@reactivex/ix-esnext-esm(.*)": "@reactivex/ix-esnext-cjs$1"
+  },
+  "modulePathIgnorePatterns": [
+    "<rootDir>/package.json",
+    "<rootDir>/packages/[a-z-]+/package.json",
+    "<rootDir>/dist/neo-one[a-z0-9-]+/package.json",
+    "<rootDir>/dist/neo-one[a-z0-9-]+/packages/package.json"
   ],
-  "testRegex": "(/__e2e__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$"
+  "testRegex": "^.*/__e2e__/.*\\.test\\.tsx?$"
 }

@@ -16,7 +16,7 @@ import {
   ResourceType,
 } from '@neo-one/server-plugin';
 import * as fs from 'fs-extra';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as path from 'path';
 import { AsyncNodeStorage } from 'redux-persist-node-storage';
 import {

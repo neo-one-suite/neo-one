@@ -2,6 +2,7 @@
 .env
 
 # Build output folders
+/dist/
 /build/
 /packages/*/lib
 /packages/*/dist

@@ -1,7 +1,8 @@
 // tslint:disable readonly-keyword no-object-mutation
-import { Observable, ObservableInput, OperatorFunction, Subscriber, Subscription, TeardownLogic } from 'rxjs';
+import { Observable, Subscriber, Subscription } from 'rxjs';
 import { Operator } from 'rxjs/internal/Operator';
 import { OuterSubscriber } from 'rxjs/internal/OuterSubscriber';
+import { ObservableInput, OperatorFunction, TeardownLogic } from 'rxjs/internal/types';
 import { subscribeToResult } from 'rxjs/internal/util/subscribeToResult';
 
 type LastValue<R> = { type: 'value'; value: R } | { type: 'empty' };

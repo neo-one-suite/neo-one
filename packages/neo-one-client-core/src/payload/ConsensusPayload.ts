@@ -71,7 +71,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
   }
 
   public readonly script: Witness;
-  public readonly equals: Equals = utils.equals(this.constructor as typeof ConsensusPayload, (other) =>
+  public readonly equals: Equals = utils.equals(this.constructor as typeof ConsensusPayload, this, (other) =>
     common.uInt256Equal(this.hash, other.hash),
   );
   public readonly getScriptHashesForVerifying = utils.lazyAsync(

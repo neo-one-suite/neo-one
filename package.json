@@ -1,14 +1,26 @@
 {
   "name": "neo-one",
-  "version": "0.0.2",
+  "author": "Alex DiCarlo <alexdicarlo@gmail.com>",
+  "version": "0.0.0",
   "description": "NEO•ONE is a suite of tools and frameworks for developing dapps on the NEO blockchain.",
-  "repository": "https://github.com/neo-one-suite/neo-one",
-  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
+  "homepage": "https://neo-one.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neo-one-suite/neo-one.git"
+  },
+  "bugs": {
+    "url": "https://github.com/neo-one-suite/neo-one/issues"
+  },
   "license": "MIT",
+  "keywords": [
+    "neo",
+    "blockchain",
+    "neo-one",
+    "dapp"
+  ],
   "private": true,
   "workspaces": [
-    "packages/*",
-    "packages/*/*"
+    "packages/*"
   ],
   "engines": {
     "node": ">=10.6.0"
@@ -18,7 +30,7 @@
       "yarn run prettier --write --config .prettierrc",
       "git add",
       "yarn test --findRelatedTests --ci --passWithNoTests -w 4",
-      "yarn run lint"
+      "yarn run lint-files"
     ],
     "scripts/**/*.js": [
       "yarn run prettier --write --config .prettierrc --parser flow",
@@ -27,25 +39,24 @@
     "scripts/**/*.ts": [
       "yarn run prettier --write --config .prettierrc",
       "git add",
-      "yarn run lint"
+      "yarn run lint-files"
     ]
   },
   "scripts": {
     "lint-staged": "lint-staged",
-    "bootstrap": "yarn run build && lerna bootstrap",
-    "build": "rm -rf ./packages/*/dist && yarn run ts-node ./scripts/build/entry/build.ts",
-    "watch": "yarn run ts-node ./scripts/build/entry/watch.ts",
-    "watch-pkg": "yarn run ts-node ./scripts/build/entry/watchPkg.ts",
-    "publish": "yarn run build && lerna publish",
-    "pretest-coverage": "yarn run ts-node ./scripts/test/pretest.ts",
-    "posttest-coverage": "yarn run ts-node ./scripts/test/posttest.ts",
+    "gulp": "NODE_OPTIONS=\"--max-old-space-size=8192\" gulp",
+    "build": "yarn run gulp build",
+    "build:e2e": "yarn run gulp buildE2E",
+    "watch": "yarn run gulp watch",
+    "publish": "yarn run gulp publish",
+    "neo-one": "node ./dist/neo-one/packages/neo-one-cli/bin/neo-one",
     "test": "jest",
     "test-coverage": "yarn run test --coverage",
     "test-ci": "jest -w 1",
     "e2e": "jest --config e2e.json",
     "e2e-ci": "jest --config e2e.json -w 1",
     "tsc": "tsc",
-    "ts-node": "cross-env TS_NODE_PROJECT=tsconfig.cli.json node -r ts-node/register/transpile-only --max-old-space-size=8192",
+    "ts-node": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" TS_NODE_PROJECT=tsconfig/tsconfig.es2018.cjs.json node -r ts-node/register/transpile-only",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.ts\"",
     "nit:scripts:ts": "prettier --config .prettierrc --list-different \"scripts/**/*.ts\"",
     "nit:scripts:js": "prettier --config .prettierrc --list-different \"scripts/**/*.js\" --parser flow",
@@ -56,11 +67,8 @@
     "prettier:scripts:js": "prettier --config .prettierrc --write \"scripts/**/*.js\" --parser flow",
     "prettier:scripts": "yarn run prettier:scripts:ts && yarn run prettier:scripts:js",
     "prettier:all": "yarn run prettier:source && yarn run prettier:scripts",
-    "lint": "tslint --project .",
-    "docker:windows:build": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/build-windowsservercore:ltsc2016 -f Dockerfile.build && eval $(docker-machine env -unset) && popd",
-    "docker:windows:test": "pushd ./scripts/docker/windows && eval $(docker-machine env 2016) && docker build . -t neo-one/test-windowsservercore:ltsc2016 -f Dockerfile.test && eval $(docker-machine env -unset) && popd",
-    "docker:linux:build": "pushd ./scripts/docker/linux && eval $(docker-machine env -unset) && docker build . -t neo-one/build-linux:8.9.3 -f Dockerfile.build && popd",
-    "docker:linux:test": "pushd ./scripts/docker/linux && eval $(docker-machine env -unset) && docker build . -t neo-one/test-linux:8.9.3 -f Dockerfile.test && popd",
+    "lint-files": "tslint --project . --format codeFrame",
+    "lint": "yarn run lint-files 'packages/*/src/**/*.ts'",
     "verify-storage": "yarn run ts-node ./scripts/verify/storage.ts",
     "generate-sc-types": "yarn run ts-node ./packages/neo-one-smart-contract-compiler/src/scripts/generateTypes.ts"
   },
@@ -73,17 +81,12 @@
     }
   },
   "devDependencies": {
-    "@babel/cli": "7.0.0-beta.52",
     "@babel/core": "7.0.0-beta.52",
-    "@babel/node": "7.0.0-beta.52",
-    "@babel/plugin-proposal-async-generator-functions": "7.0.0-beta.52",
-    "@babel/plugin-proposal-class-properties": "7.0.0-beta.52",
-    "@babel/plugin-proposal-object-rest-spread": "7.0.0-beta.52",
-    "@babel/plugin-proposal-optional-catch-binding": "7.0.0-beta.52",
-    "@babel/polyfill": "7.0.0-beta.52",
-    "@babel/preset-env": "7.0.0-beta.52",
-    "@babel/preset-typescript": "7.0.0-beta.52",
-    "@babel/register": "7.0.0-beta.52",
+    "@babel/plugin-syntax-dynamic-import": "7.0.0-beta.53",
+    "@babel/plugin-syntax-numeric-separator": "7.0.0-beta.53",
+    "@babel/plugin-syntax-optional-catch-binding": "7.0.0-beta.53",
+    "@babel/plugin-syntax-typescript": "7.0.0-beta.53",
+    "@reactivex/ix-esnext-cjs": "2.3.5",
     "@types/babel__code-frame": "7.0.0",
     "@types/bs58": "3.0.30",
     "@types/chokidar": "1.7.5",
@@ -108,8 +111,6 @@
     "@types/node-cron": "1.2.0",
     "@types/ora": "1.3.4",
     "@types/protobufjs": "6.0.0",
-    "@types/rollup": "0.54.0",
-    "@types/rollup-plugin-json": "2.3.1",
     "@types/seamless-immutable": "7.1.2",
     "@types/source-map": "0.5.7",
     "@types/tar": "4.0.0",
@@ -117,27 +118,32 @@
     "@types/yargs": "11.1.0",
     "app-root-dir": "1.0.2",
     "babel-core": "7.0.0-bridge.0",
-    "babel-jest": "^23.4.0",
-    "babel-plugin-lodash": "^3.3.4",
+    "babel-plugin-jest-hoist": "23.2.0",
+    "babel-plugin-lodash": "3.3.4",
+    "babel-plugin-transform-imports": "1.5.0",
     "cross-env": "5.2.0",
     "execa": "0.10.0",
     "fs-extra": "6.0.1",
+    "gulp": "4.0.0",
+    "gulp-babel": "8.0.0-beta.2",
+    "gulp-banner": "0.1.3",
+    "gulp-filter": "5.1.0",
+    "gulp-json-transform": "0.4.5",
+    "gulp-newer": "1.4.0",
+    "gulp-plumber": "1.2.0",
+    "gulp-rename": "1.3.0",
+    "gulp-replace": "1.0.0",
+    "gulp-sourcemaps": "2.6.4",
+    "gulp-typescript": "5.0.0-alpha.3",
     "husky": "1.0.0-rc.13",
     "jest": "23.4.0",
     "jest-environment-node": "23.4.0",
     "jest-junit": "5.1.0",
+    "json": "9.0.6",
     "lerna": "2.11.0",
     "lint-staged": "7.2.0",
     "lodash": "4.17.10",
     "prettier": "1.13.7",
-    "rollup": "0.62.0",
-    "rollup-plugin-babel": "4.0.0-beta.7",
-    "rollup-plugin-commonjs": "9.1.3",
-    "rollup-plugin-json": "3.0.0",
-    "rollup-plugin-node-resolve": "3.3.0",
-    "rollup-plugin-replace": "2.0.0",
-    "rollup-plugin-sourcemaps": "0.4.2",
-    "rollup-plugin-typescript2": "0.15.1",
     "rxjs-tslint-rules": "4.5.1",
     "tmp": "0.0.33",
     "ts-jest": "23.0.0",
@@ -149,8 +155,7 @@
     "tslint-immutable": "4.6.0",
     "tslint-microsoft-contrib": "5.0.3",
     "tslint-sonarts": "1.7.0",
-    "typescript": "2.9.1",
-    "yargs": "12.0.1"
+    "typescript": "2.9.1"
   },
   "resolutions": {
     "ajv": "6.5.2",
@@ -161,15 +166,11 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "packages/*/src/**/*.(js|ts)",
+      "packages/*/src/**/*.ts",
       "!**/bin/**",
-      "!**/__mocks__/**",
       "!**/__tests__/**",
       "!**/__data__/**",
       "!**/__e2e__/**"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/"
     ],
     "coverageReporters": [
       "json",
@@ -177,8 +178,12 @@
     ],
     "globals": {
       "ts-jest": {
-        "useBabelrc": true,
-        "tsConfigFile": "tsconfig.cli.json"
+        "babel": {
+          "plugins": [
+            "babel-plugin-jest-hoist"
+          ]
+        },
+        "tsConfigFile": "tsconfig.jest.json"
       }
     },
     "moduleFileExtensions": [
@@ -191,24 +196,22 @@
     ],
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
-      "/node_modules/",
-      "<rootDir>/packages/neo-one-node-neo-settings/src/test.ts",
-      "<rootDir>/packages/.*/template/.*",
-      "<rootDir>/packages/.*/__e2e__/.*"
+      "/node_modules/"
     ],
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testRegex": "^.*/__tests__/.*\\.test\\.tsx?$",
     "transform": {
-      "^.+\\.tsx?$": "ts-jest",
-      "^.+\\.jsx?$": "babel-jest"
+      "^.+\\.tsx?$": "ts-jest"
     },
-    "transformIgnorePatterns": [
-      "<rootDir>/node_modules/(?!@reactivex)",
-      "<rootDir>/packages/.*/dist/.*"
-    ],
     "snapshotSerializers": [
       "./scripts/serializers/blockchain.js",
       "./scripts/serializers/bn.js",
       "./scripts/serializers/buffer.js"
+    ],
+    "moduleNameMapper": {
+      "^@reactivex/ix-esnext-esm(.*)": "@reactivex/ix-esnext-cjs$1"
+    },
+    "modulePathIgnorePatterns": [
+      "<rootDir>/dist/.*"
     ],
     "setupTestFrameworkScriptFile": "./scripts/test/jestSetup.js"
   }

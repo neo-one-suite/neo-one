@@ -54,7 +54,7 @@ export class BlockData implements Equatable, SerializableWire<BlockData> {
   public readonly lastGlobalTransactionIndex: BN;
   public readonly lastGlobalActionIndex: BN;
   public readonly systemFee: BN;
-  public readonly equals: Equals = utils.equals(BlockData, (other) => common.uInt256Equal(this.hash, other.hash));
+  public readonly equals: Equals = utils.equals(BlockData, this, (other) => common.uInt256Equal(this.hash, other.hash));
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 

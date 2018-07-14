@@ -11,7 +11,7 @@ import {
 } from '@neo-one/server-plugin';
 import { labels, mergeScanLatest } from '@neo-one/utils';
 import * as fs from 'fs-extra';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as path from 'path';
 import { BehaviorSubject, combineLatest, Observable, timer } from 'rxjs';
 import { shareReplay, switchMap } from 'rxjs/operators';

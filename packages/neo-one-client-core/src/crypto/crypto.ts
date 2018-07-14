@@ -12,7 +12,15 @@ import { InvalidFormatError, InvalidNumberOfKeysError, TooManyPublicKeysError } 
 import { ScriptBuilder } from '../utils';
 import { Witness } from '../Witness';
 
-const ec = new EC('p256') as any;
+// tslint:disable-next-line no-let
+let ecCache: any;
+const ec = () => {
+  if (ecCache === undefined) {
+    ecCache = new EC('p256') as any;
+  }
+
+  return ecCache;
+};
 
 export class Base58CheckError extends CustomError {
   public readonly code: string;
@@ -57,7 +65,7 @@ const hash160 = (value: Buffer): UInt160 => common.bufferToUInt160(rmd160(sha256
 const hash256 = (value: Buffer): UInt256 => common.bufferToUInt256(sha256(sha256(value)));
 
 const sign = ({ message, privateKey }: { readonly message: Buffer; readonly privateKey: PrivateKey }): Buffer => {
-  const sig = ec.sign(sha256(message), common.privateKeyToBuffer(privateKey));
+  const sig = ec().sign(sha256(message), common.privateKeyToBuffer(privateKey));
 
   return Buffer.concat([sig.r.toArrayLike(Buffer, 'be', 32), sig.s.toArrayLike(Buffer, 'be', 32)]);
 };
@@ -147,7 +155,12 @@ const verify = ({
 
   const key = new ECKey({
     crv: 'P-256',
-    publicKey: Buffer.from(ec.keyFromPublic(publicKey).getPublic(false, 'hex'), 'hex'),
+    publicKey: Buffer.from(
+      ec()
+        .keyFromPublic(publicKey)
+        .getPublic(false, 'hex'),
+      'hex',
+    ),
   });
 
   return (key.createVerify('SHA256').update(message) as any).verify(signature);
@@ -171,7 +184,7 @@ const privateKeyToPublicKey = (privateKey: PrivateKey): ECPoint => {
   const privateKeyHex = common.privateKeyToString(privateKey);
   let publicKey = mutablePublicKeyCache[privateKeyHex];
   if (publicKey === undefined) {
-    const key = ec.keyFromPrivate(common.privateKeyToBuffer(privateKey));
+    const key = ec().keyFromPrivate(common.privateKeyToBuffer(privateKey));
     key.getPublic(true, 'hex');
     const { result } = key.validate();
     if (!result) {
@@ -185,7 +198,7 @@ const privateKeyToPublicKey = (privateKey: PrivateKey): ECPoint => {
 };
 
 const createKeyPair = (): { readonly privateKey: PrivateKey; readonly publicKey: ECPoint } => {
-  const key = ec.genKeyPair();
+  const key = ec().genKeyPair();
 
   return {
     privateKey: common.bufferToPrivateKey(key.getPrivate().toArrayLike(Buffer, 'be')),
@@ -198,10 +211,10 @@ const createPrivateKey = (): PrivateKey => common.bufferToPrivateKey(cryptoLib.r
 const toScriptHash = hash160;
 
 // Takes various formats and converts to standard ECPoint
-const toECPoint = (publicKey: Buffer): ECPoint => toECPointFromKeyPair(ec.keyFromPublic(publicKey));
+const toECPoint = (publicKey: Buffer): ECPoint => toECPointFromKeyPair(ec().keyFromPublic(publicKey));
 
 const isInfinity = (ecPoint: ECPoint): boolean =>
-  ec
+  ec()
     .keyFromPublic(ecPoint)
     .getPublic()
     .isInfinity();
@@ -298,7 +311,7 @@ const compareKeys = (a: KeyPair, b: KeyPair): number => {
 
 const sortKeys = (publicKeys: ReadonlyArray<ECPoint>): ReadonlyArray<ECPoint> =>
   publicKeys
-    .map((publicKey) => ec.keyFromPublic(publicKey))
+    .map((publicKey) => ec().keyFromPublic(publicKey))
     .sort(compareKeys)
     .map(toECPointFromKeyPair);
 

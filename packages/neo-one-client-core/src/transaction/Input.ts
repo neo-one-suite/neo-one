@@ -43,6 +43,7 @@ export class Input implements SerializableWire<Input>, Equatable, SerializableJS
   public readonly size: number = SIZE;
   public readonly equals: Equals = utils.equals(
     Input,
+    this,
     (other) => common.uInt256Equal(this.hash, other.hash) && other.index === this.index,
   );
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));

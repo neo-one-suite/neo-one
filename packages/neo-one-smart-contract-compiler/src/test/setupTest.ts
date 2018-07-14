@@ -48,8 +48,6 @@ export async function testNodeSetup() {
   };
   const client = new Client(userAccountProviders);
 
-  // Give RPC server a chance to startup.
-
   return { client, masterWallet, networkName, provider, keystore, privateKey, userAccountProviders };
 }
 

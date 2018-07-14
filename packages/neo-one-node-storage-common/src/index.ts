@@ -1,3 +1,1 @@
-import * as keys from './keys';
-
-export { keys };
+export { keys } from './keys';

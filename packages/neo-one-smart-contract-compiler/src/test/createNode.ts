@@ -4,7 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { addressToScriptHash, createPrivateKey, privateKeyToAddress, privateKeyToPublicKey } from '@neo-one/client';
 import { createMain } from '@neo-one/node-neo-settings';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import MemDown from 'memdown';
 
 import { getMonitor } from '../test/getMonitor';

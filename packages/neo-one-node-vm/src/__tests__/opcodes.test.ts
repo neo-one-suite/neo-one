@@ -16,7 +16,7 @@ import {
 import { DefaultMonitor } from '@neo-one/monitor';
 import { NULL_ACTION, TriggerType } from '@neo-one/node-core';
 import { BN } from 'bn.js';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { keys, transactions } from '../__data__';
 import { ExecutionInit, FEES } from '../constants';
 import { executeScript } from '../execute';
@@ -129,6 +129,8 @@ const signature1 = crypto.sign({
   privateKey: keys[1].privateKey,
 });
 
+// const hugeBuffer = Buffer.alloc(16843009, 0);
+
 const OPCODES = ([
   {
     op: 'PUSH0',
@@ -161,13 +163,12 @@ const OPCODES = ([
         gas: utils.ZERO,
       },
 
-      {
-        op: 'PUSHDATA4',
-        buffer: Buffer.concat([Buffer.from([1, 1, 1, 1]), Buffer.alloc(16843009, 10)]),
-
-        result: [new BufferStackItem(Buffer.alloc(16843009, 10))],
-        gas: utils.ZERO,
-      },
+      // {
+      //   op: 'PUSHDATA4',
+      //   buffer: Buffer.concat([Buffer.from([1, 1, 1, 1]), hugeBuffer]),
+      //   result: [new BufferStackItem(hugeBuffer)],
+      //   gas: utils.ZERO,
+      // },
 
       {
         op: 'PUSHM1',

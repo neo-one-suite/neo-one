@@ -1,7 +1,7 @@
 import { metrics, Monitor } from '@neo-one/monitor';
 import { createEndpoint, Endpoint, getEndpointConfig } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as net from 'net';
 import { Observable, Subscription } from 'rxjs';
 import { Duplex } from 'stream';

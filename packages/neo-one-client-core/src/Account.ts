@@ -1,5 +1,5 @@
 import { BN } from 'bn.js';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { BaseState } from './BaseState';
 import { common, ECPoint, UInt160, UInt160Hex, UInt256Hex } from './common';
 import { Equals, Equatable } from './Equatable';
@@ -77,7 +77,7 @@ export class Account extends BaseState implements SerializableWire<Account>, Ser
   public readonly isFrozen: boolean;
   public readonly votes: ReadonlyArray<ECPoint>;
   public readonly balances: { readonly [AssetHash in string]?: BN };
-  public readonly equals: Equals = utils.equals(Account, (other) => common.uInt160Equal(this.hash, other.hash));
+  public readonly equals: Equals = utils.equals(Account, this, (other) => common.uInt160Equal(this.hash, other.hash));
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 

@@ -57,7 +57,7 @@ export class Validator extends BaseState
   public readonly publicKey: ECPoint;
   public readonly registered: boolean;
   public readonly votes: BN;
-  public readonly equals: Equals = utils.equals(Validator, (other) =>
+  public readonly equals: Equals = utils.equals(Validator, this, (other) =>
     common.ecPointEqual(this.publicKey, other.publicKey),
   );
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));

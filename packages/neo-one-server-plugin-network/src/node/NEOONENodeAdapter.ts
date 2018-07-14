@@ -5,7 +5,7 @@ import { Binary, Config, DescribeTable, killProcess } from '@neo-one/server-plug
 import fetch from 'cross-fetch';
 import execa from 'execa';
 import * as fs from 'fs-extra';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as path from 'path';
 import { take } from 'rxjs/operators';
 import { NodeSettings } from '../types';

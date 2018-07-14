@@ -1,7 +1,7 @@
 import { utils } from '@neo-one/client-core';
 import bitwise from 'bitwise';
 import { BN } from 'bn.js';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { ExecutionContext } from './constants';
 import { NumberTooLargeError, ReadOnlyStorageContextError } from './errors';
 import { StackItem, StorageContextStackItem } from './stackItem';
