@@ -48,7 +48,7 @@
     "build": "yarn run gulp build",
     "build:e2e": "yarn run gulp buildE2E",
     "watch": "yarn run gulp watch",
-    "publish": "yarn run gulp publish",
+    "release": "yarn run gulp release",
     "neo-one": "node ./dist/neo-one/packages/neo-one-cli/bin/neo-one",
     "test": "jest",
     "test-coverage": "yarn run test --coverage",
