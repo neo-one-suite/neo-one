@@ -111,7 +111,7 @@ const globs = {
   ],
   bin: ['packages/*/src/bin/*.ts'],
   pkg: ['packages/*/package.json'],
-  files: ['lerna.json', 'package.json', 'yarn.lock'],
+  files: ['lerna.json', 'yarn.lock'],
   metadata: ['LICENSE', 'README.md', 'CHANGELOG.md'],
 };
 
@@ -333,6 +333,7 @@ const buildAll = ((cache) =>
         copyPkg(format),
         copyMetadata(format),
         copyFiles(format),
+        copyRootPkg(format),
         buildTypescript(format),
         format.module === 'esm' ? 'createIndex' : undefined,
         format === MAIN_FORMAT ? 'buildBin' : undefined,
@@ -351,6 +352,16 @@ const publish = ((cache) =>
       cwd: getDistBaseCWD(format),
       stdio: ['ignore', 'inherit', 'inherit'],
     });
+  }))({});
+
+const rootPkg = { ...pkg, devDependencies: { ...pkg.devDependencies } };
+delete rootPkg.devDependencies.husky;
+delete rootPkg.husky;
+const copyRootPkg = ((cache) =>
+  memoizeTask(cache, async function copyRootPkg(format) {
+    const filePath = path.resolve(getDistBase(format), 'package.json');
+    await fs.ensureDir(path.dirname(filePath));
+    await fs.writeFile(filePath, JSON.stringify(rootPkg, null, 2));
   }))({});
 
 const createIndexFile = async (filePkgs, file, indexContents) => {
@@ -412,6 +423,7 @@ gulp.task('clean', () => fs.remove(DIST));
 gulp.task('copyPkg', gulp.parallel(FORMATS.map((format) => copyPkg(format))));
 gulp.task('copyMetadata', gulp.parallel(FORMATS.map((format) => copyMetadata(format))));
 gulp.task('copyFiles', gulp.parallel(FORMATS.map((format) => copyFiles(format))));
+gulp.task('copyRootPkg', gulp.parallel(FORMATS.map((format) => copyRootPkg(format))));
 gulp.task('buildTypescript', gulp.parallel(FORMATS.map((format) => buildTypescript(format))));
 gulp.task('buildAll', gulp.parallel(FORMATS.map((format) => buildAll(format))));
 gulp.task('install', gulp.parallel(FORMATS.map((format) => install(format))));
