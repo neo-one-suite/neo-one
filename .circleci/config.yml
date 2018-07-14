@@ -45,14 +45,10 @@ aliases:
           command: yarn lint
       - run:
           name: Test
-          command: yarn test-ci --testResultsProcessor="jest-junit"
-          environment:
-            JEST_JUNIT_OUTPUT: reports/jest/results.xml
+          command: yarn test-ci
       - run:
           name: E2E
-          command: yarn e2e-ci --testResultsProcessor="jest-junit"
-          environment:
-            JEST_JUNIT_OUTPUT: reports/jest-e2e/results.xml
+          command: yarn e2e-ci
       - store_test_results:
           path: reports
       - store_artifacts:

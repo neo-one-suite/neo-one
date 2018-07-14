@@ -43,18 +43,17 @@
     ]
   },
   "scripts": {
-    "lint-staged": "lint-staged",
+    "lint-staged": "node ./node_modules/.bin/lint-staged",
     "gulp": "NODE_OPTIONS=\"--max-old-space-size=8192\" gulp",
     "build": "yarn run gulp build",
     "build:e2e": "yarn run gulp buildE2E",
     "watch": "yarn run gulp watch",
     "release": "yarn run gulp release",
     "neo-one": "node ./dist/neo-one/packages/neo-one-cli/bin/neo-one",
-    "test": "jest",
-    "test-coverage": "yarn run test --coverage",
-    "test-ci": "jest -w 1",
-    "e2e": "jest --config e2e.json",
-    "e2e-ci": "jest --config e2e.json -w 1",
+    "test": "jest --projects jest/unit.js",
+    "test-ci": "jest --projects jest/unit-ci.js -w 1",
+    "e2e": "jest --projects jest/e2e.js",
+    "e2e-ci": "jest --projects jest/e2e-ci.js -w 1",
     "tsc": "tsc",
     "ts-node": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" TS_NODE_PROJECT=tsconfig/tsconfig.es2018.cjs.json node -r ts-node/register/transpile-only",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.ts\"",
@@ -163,56 +162,5 @@
     "babel-jest": "23.2.0",
     "bn.js": "4.11.8",
     "grpc": "1.13.0"
-  },
-  "jest": {
-    "collectCoverageFrom": [
-      "packages/*/src/**/*.ts",
-      "!**/bin/**",
-      "!**/__tests__/**",
-      "!**/__data__/**",
-      "!**/__e2e__/**"
-    ],
-    "coverageReporters": [
-      "json",
-      "lcov"
-    ],
-    "globals": {
-      "ts-jest": {
-        "babel": {
-          "plugins": [
-            "babel-plugin-jest-hoist"
-          ]
-        },
-        "tsConfigFile": "tsconfig.jest.json"
-      }
-    },
-    "moduleFileExtensions": [
-      "js",
-      "jsx",
-      "json",
-      "node",
-      "ts",
-      "tsx"
-    ],
-    "testEnvironment": "node",
-    "testPathIgnorePatterns": [
-      "/node_modules/"
-    ],
-    "testRegex": "^.*/__tests__/.*\\.test\\.tsx?$",
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "snapshotSerializers": [
-      "./scripts/serializers/blockchain.js",
-      "./scripts/serializers/bn.js",
-      "./scripts/serializers/buffer.js"
-    ],
-    "moduleNameMapper": {
-      "^@reactivex/ix-esnext-esm(.*)": "@reactivex/ix-esnext-cjs$1"
-    },
-    "modulePathIgnorePatterns": [
-      "<rootDir>/dist/.*"
-    ],
-    "setupTestFrameworkScriptFile": "./scripts/test/jestSetup.js"
   }
 }

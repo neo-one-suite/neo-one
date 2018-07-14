@@ -3,7 +3,7 @@
 module.exports = function(wallaby) {
   return {
     files: [
-      { pattern: 'package.json', instrument: false },
+      { pattern: 'jest/**/*', instrument: false },
       { pattern: 'scripts/serializers/**/*.js', instrument: false },
       { pattern: 'scripts/test/jestSetup.js', instrument: false },
       'packages/*/src/**/*.ts?(x)',
@@ -43,7 +43,7 @@ module.exports = function(wallaby) {
         }),
     },
     setup: function(wallaby) {
-      var jestConfig = require('./package.json').jest;
+      var jestConfig = require('./jest/unit.js');
       jestConfig.moduleNameMapper = {
         '^@neo-one/ec-key': '@neo-one/ec-key',
         '^@neo-one/boa': '@neo-one/boa',
@@ -52,6 +52,7 @@ module.exports = function(wallaby) {
         '^@reactivex/ix-esnext-esm(.*)': '@reactivex/ix-esnext-cjs$1',
       };
       jestConfig.transform = {};
+      delete jestConfig.rootDir;
       wallaby.testFramework.configure(jestConfig);
     },
     hints: {
