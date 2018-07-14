@@ -347,7 +347,7 @@ const install = ((cache) =>
 
 const publish = ((cache) =>
   memoizeTask(cache, async function publish(format) {
-    await execa('yarn', ['lerna', 'exec', '--', path.resolve(appRootDir.get(), 'scripts', 'try-publish')], {
+    await execa('yarn', ['lerna', 'exec', path.resolve(appRootDir.get(), 'scripts', 'try-publish')], {
       cwd: getDistBaseCWD(format),
       stdio: ['ignore', 'inherit', 'inherit'],
     });
