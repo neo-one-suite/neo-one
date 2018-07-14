@@ -23,7 +23,7 @@ import {
 import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-esnext-esm/asynciterable/asynciterablex';
-import { flatMap } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatMap';
+import { flatMap } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatmap';
 import { flatten } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatten';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
