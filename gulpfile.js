@@ -225,8 +225,8 @@ const transformBrowserPackageJSON = (format, orig, file) => ({
   browser:
     format.module === 'esm'
       ? {
-          'src/index.common.js': 'src/index.browser.common.js',
-          'src/index.js': 'src/index.browser.js',
+          './src/index.common.js': './src/index.browser.common.js',
+          './src/index.js': './src/index.browser.js',
         }
       : 'src/index.browser.js',
 });
