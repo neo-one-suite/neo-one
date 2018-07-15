@@ -15,11 +15,11 @@
     "@neo-one/node-storage-levelup": "^1.0.0-alpha.66",
     "@neo-one/node-vm": "^1.0.0-alpha.65",
     "@neo-one/utils": "^1.0.0-alpha.53",
-    "esm": "^3.0.69",
+    "esm": "^3.0.71",
     "leveldown": "^4.0.1",
     "levelup": "^3.1.0",
     "node-cron": "^1.2.1",
-    "rxjs": "^6.2.1",
+    "rxjs": "^6.2.2",
     "tslib": "^1.9.3"
   }
 }

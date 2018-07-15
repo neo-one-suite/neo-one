@@ -6,7 +6,7 @@
   "browser": "./src/index.browser.ts",
   "dependencies": {
     "@babel/code-frame": "^7.0.0-beta.51",
-    "esm": "^3.0.69",
+    "esm": "^3.0.71",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3"
   }

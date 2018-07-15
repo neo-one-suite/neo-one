@@ -7,7 +7,7 @@
     "@neo-one/client-core": "^1.0.0-alpha.63",
     "@neo-one/utils": "^1.0.0-alpha.53",
     "bn.js": "^4.11.8",
-    "esm": "^3.0.69",
+    "esm": "^3.0.71",
     "tslib": "^1.9.3"
   }
 }

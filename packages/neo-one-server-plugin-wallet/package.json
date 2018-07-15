@@ -14,12 +14,12 @@
     "@neo-one/smart-contract-lib": "^1.0.0-alpha.34",
     "@neo-one/utils": "^1.0.0-alpha.53",
     "bignumber.js": "^7.2.1",
-    "esm": "^3.0.69",
+    "esm": "^3.0.71",
     "fs-extra": "^6.0.1",
     "lodash": "^4.17.10",
     "ora": "^2.1.0",
     "redux-persist-node-storage": "^2.0.0",
-    "rxjs": "^6.2.1",
+    "rxjs": "^6.2.2",
     "tslib": "^1.9.3"
   }
 }

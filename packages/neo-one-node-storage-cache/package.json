@@ -9,9 +9,9 @@
     "@neo-one/node-storage-common": "^1.0.0-alpha.66",
     "@neo-one/utils": "^1.0.0-alpha.53",
     "bytewise": "^1.1.0",
-    "esm": "^3.0.69",
+    "esm": "^3.0.71",
     "lru-cache": "^4.1.3",
-    "rxjs": "^6.2.1",
+    "rxjs": "^6.2.2",
     "tslib": "^1.9.3"
   }
 }

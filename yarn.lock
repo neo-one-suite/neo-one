@@ -1117,7 +1117,7 @@ babel-generator@^6.18.0:
     source-map "^0.5.7"
     trim-right "^1.0.1"
 
-babel-jest@23.4.0, babel-jest@^23.4.0:
+babel-jest@^23.4.0:
   version "23.4.0"
   resolved "https://registry.npmjs.org/babel-jest/-/babel-jest-23.4.0.tgz#22c34c392e2176f6a4c367992a7fcff69d2e8557"
   dependencies:
@@ -2586,9 +2586,9 @@ escodegen@^1.9.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-esm@^3.0.69:
-  version "3.0.70"
-  resolved "https://registry.npmjs.org/esm/-/esm-3.0.70.tgz#8b7c13e40e5709a1056117392a3af44eddf0edb5"
+esm@^3.0.71:
+  version "3.0.71"
+  resolved "https://registry.npmjs.org/esm/-/esm-3.0.71.tgz#3824987412d7d8fd7782d2381e990a621519a993"
 
 esprima@^3.1.3:
   version "3.1.3"
@@ -6938,7 +6938,7 @@ rxjs-tslint-rules@4.6.0:
     resolve "^1.4.0"
     tslib "^1.8.0"
 
-rxjs@^6.1.0, rxjs@^6.2.1:
+rxjs@^6.1.0, rxjs@^6.2.2:
   version "6.2.2"
   resolved "https://registry.npmjs.org/rxjs/-/rxjs-6.2.2.tgz#eb75fa3c186ff5289907d06483a77884586e1cf9"
   dependencies:

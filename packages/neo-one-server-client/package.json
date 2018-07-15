@@ -10,11 +10,11 @@
     "@neo-one/server-plugin": "^1.0.0-alpha.61",
     "@neo-one/utils": "^1.0.0-alpha.53",
     "env-paths": "^1.0.0",
-    "esm": "^3.0.69",
+    "esm": "^3.0.71",
     "execa": "^0.10.0",
     "fs-extra": "^6.0.1",
     "is-running": "^2.1.0",
-    "rxjs": "^6.2.1",
+    "rxjs": "^6.2.2",
     "tslib": "^1.9.3"
   }
 }
