@@ -1,0 +1,54 @@
+{
+  "projectName": "neo-one",
+  "projectOwner": "neo-one-suite",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "contributors": [
+    {
+      "login": "dicarlo2",
+      "name": "Alex DiCarlo",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1311014?v=4",
+      "profile": "https://github.com/dicarlo2",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "fundingFinding",
+        "review",
+        "talk"
+      ]
+    },
+    {
+      "login": "afragapane",
+      "name": "Alex Fragapane",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/34611820?v=4",
+      "profile": "https://github.com/afragapane",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "davemneo",
+      "name": "davemneo",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/39564353?v=4",
+      "profile": "https://github.com/davemneo",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "danwbyrne",
+      "name": "Daniel Byrne",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/9561608?v=4",
+      "profile": "http://linkedin.com/in/danwbyrne",
+      "contributions": [
+        "code"
+      ]
+    }
+  ]
+}
