@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/node-offline",
-  "version": "1.0.0-alpha.64",
+  "version": "1.0.0-alpha.65",
   "description": "NEO•ONE utility for loading serialized blocks (chain.acc) into a node.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.63",
-    "@neo-one/node-core": "^1.0.0-alpha.64",
-    "@neo-one/utils": "^1.0.0-alpha.53",
+    "@neo-one/client-core": "^1.0.0-alpha.64",
+    "@neo-one/node-core": "^1.0.0-alpha.65",
+    "@neo-one/utils": "^1.0.0-alpha.54",
     "esm": "^3.0.71",
     "lodash": "^4.17.10",
     "tslib": "^1.9.3"

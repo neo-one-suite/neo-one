@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/node-blockchain",
-  "version": "1.0.0-alpha.70",
+  "version": "1.0.0-alpha.71",
   "description": "NEO•ONE NEO blockchain implementation.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.63",
-    "@neo-one/monitor": "^1.0.0-alpha.48",
-    "@neo-one/node-core": "^1.0.0-alpha.64",
-    "@neo-one/utils": "^1.0.0-alpha.53",
+    "@neo-one/client-core": "^1.0.0-alpha.64",
+    "@neo-one/monitor": "^1.0.0-alpha.49",
+    "@neo-one/node-core": "^1.0.0-alpha.65",
+    "@neo-one/utils": "^1.0.0-alpha.54",
     "bn.js": "^4.11.8",
     "esm": "^3.0.71",
     "js-priority-queue": "^0.1.5",
