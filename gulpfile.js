@@ -474,3 +474,5 @@ gulp.task('e2e', async () => {
 });
 
 gulp.task('release', gulp.series('test', 'build', 'install', 'e2e', 'prepareRelease', 'copyPkg', 'publish'));
+
+gulp.task('fastRelease', gulp.series('build', 'install', 'prepareRelease', 'copyPkg', 'publish'));
