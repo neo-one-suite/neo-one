@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-compiler",
-  "version": "1.0.0-alpha.34",
+  "version": "1.0.0-alpha.35",
   "description": "NEO•ONE TypeScript smart contract compiler.",
   "main": "./src/index.ts",
   "dependencies": {
