@@ -111,6 +111,7 @@ const globs = {
   ],
   bin: ['packages/*/src/bin/*.ts'],
   pkg: ['packages/*/package.json'],
+  pkgFiles: ['packages/*/tsconfig.default.json'],
   files: ['lerna.json', 'yarn.lock'],
   metadata: ['LICENSE', 'README.md', 'CHANGELOG.md'],
 };
@@ -246,6 +247,11 @@ const copyPkg = ((cache) =>
       .pipe(gulp.dest(getDest(format)));
   }))({});
 
+const copyPkgFiles = ((cache) =>
+  memoizeTask(cache, function copyPkgFiles(format) {
+    return gulp.src(globs.pkgFiles).pipe(gulp.dest(getDest(format)));
+  }))({});
+
 const copyMetadata = ((cache) =>
   memoizeTask(cache, function copyMetadata(format) {
     return pkgs.reduce((stream, p) => stream.pipe(gulp.dest(path.join(getDest(format), p))), gulp.src(globs.metadata));
@@ -331,6 +337,7 @@ const buildAll = ((cache) =>
     return gulp.parallel(
       ...[
         copyPkg(format),
+        copyPkgFiles(format),
         copyMetadata(format),
         copyFiles(format),
         copyRootPkg(format),
@@ -421,6 +428,7 @@ gulp.task('buildBin', gulp.parallel('compileBin', 'copyBin'));
 
 gulp.task('clean', () => fs.remove(DIST));
 gulp.task('copyPkg', gulp.parallel(FORMATS.map((format) => copyPkg(format))));
+gulp.task('copyPkgFiles', gulp.parallel(FORMATS.map((format) => copyPkgFiles(format))));
 gulp.task('copyMetadata', gulp.parallel(FORMATS.map((format) => copyMetadata(format))));
 gulp.task('copyFiles', gulp.parallel(FORMATS.map((format) => copyFiles(format))));
 gulp.task('copyRootPkg', gulp.parallel(FORMATS.map((format) => copyRootPkg(format))));

@@ -27,7 +27,7 @@
     "rxjs": "^6.2.2",
     "safe-stable-stringify": "^1.0.1",
     "source-map": "^0.7.3",
-    "ts-simple-ast": "^12.5.0"
+    "ts-simple-ast": "^12.6.0"
   },
   "devDependencies": {
     "app-root-dir": "1.0.2",
