@@ -14,7 +14,7 @@
     "@neo-one/server-plugin-wallet": "^1.0.0-alpha.102",
     "@neo-one/utils": "^1.0.0-alpha.54",
     "esm": "^3.0.71",
-    "fs-extra": "^6.0.1",
+    "fs-extra": "^7.0.0",
     "grpc": "^1.13.0-pre1",
     "grpc-error": "^1.0.0",
     "lodash": "^4.17.10",
