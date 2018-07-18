@@ -1,7 +1,11 @@
 import { common } from '@neo-one/client-core';
 import { helpers } from '../../__data__';
+import { cleanupTest } from '../../test';
 
 describe('syscalls', () => {
+  afterEach(async () => {
+    await cleanupTest();
+  });
   test('Neo.Runtime.GetTime', async () => {
     await helpers.executeString(`
       if (syscall('Neo.Runtime.GetTime') === undefined) {

@@ -18,6 +18,7 @@ install:
   - yarn --version
   - yarn install --non-interactive --frozen-lockfile
   - yarn run build
+  - yarn run build:e2e
 
 cache:
   - node_modules
