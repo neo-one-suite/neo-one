@@ -42,14 +42,17 @@ declare global {
   interface ValidatorBase {
     __brand: 'ValidatorBase';
   }
+  interface EnumeratorBase {
+    __brand: 'EnumeratorBase';
+  }
+  interface IteratorBase {
+    __brand: 'IteratorBase';
+  }
   interface StorageContextBase {
     __brand: 'StorageContextBase';
   }
   interface StorageContextReadOnlyBase {
     __brand: 'StorageContextReadOnlyBase';
-  }
-  interface StorageIteratorBase {
-    __brand: 'StorageIteratorBase';
   }
   function syscall(name: 'Neo.Runtime.GetTrigger'): number;
   function syscall(name: 'Neo.Runtime.CheckWitness', witness: Buffer): boolean;
@@ -117,10 +120,24 @@ declare global {
     name: 'Neo.Storage.Find',
     context: StorageContextBase | StorageContextReadOnlyBase,
     prefix: Buffer | string,
-  ): StorageIteratorBase;
-  function syscall(name: 'Neo.Enumerator.Next', iterator: StorageIteratorBase): boolean;
-  function syscall(name: 'Neo.Iterator.Key', iterator: StorageIteratorBase): Buffer | string;
-  function syscall(name: 'Neo.Enumerator.Value', iterator: StorageIteratorBase): Buffer | number | string | boolean;
+  ): IteratorBase;
+  function syscall<T>(name: 'Neo.Enumerator.Create', value: T[]): EnumeratorBase<T>;
+  function syscall<V>(name: 'Neo.Enumerator.Next', enumerator: EnumeratorBase<V>): boolean;
+  function syscall<A, B>(
+    name: 'Neo.Enumerator.Concat',
+    enumeratorA: EnumeratorBase<A>,
+    enumeratorB: EnumeratorBase<B>,
+  ): EnumeratorBase<A | B>;
+  function syscall<V, T extends EnumeratorBase<V> | IteratorBase<K, V>>(name: 'Neo.Enumerator.Value', enumerator: T): V;
+  function syscall<V, T extends IteratorBase<K, V>>(name: 'Neo.Iterator.Values', iterator: T): EnumeratorBase<V>;
+  function syscall<K, T extends IteratorBase<K, any>>(name: 'Neo.Iterator.Keys', iterator: T): EnumeratorBase<K>;
+  function syscall<K, V>(name: 'Neo.Iterator.Create', value: Map<K, V>): IteratorBase<K, V>;
+  function syscall<A, B, C, D>(
+    name: 'Neo.Enumerator.Concat',
+    iteratorA: IteratorBase<A, C>,
+    iteratorB: IteratorBase<B, D>,
+  ): IteratorBase<A | B, C | D>;
+  function syscall<K>(name: 'Neo.Iterator.Key', iterator: IteratorBase<K, any>): K;
   function syscall(name: 'Neo.Account.SetVotes', account: AccountBase, votes: Array<Buffer>): void;
   function syscall(name: 'Neo.Validator.Register', publicKey: Buffer): ValidatorBase;
   function syscall(

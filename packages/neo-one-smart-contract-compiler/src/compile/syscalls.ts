@@ -261,7 +261,8 @@ const TransactionValue = new BlockchainInterface('TransactionBase');
 const ValidatorValue = new BlockchainInterface('ValidatorBase');
 const StorageContextValue = new BlockchainInterface('StorageContextBase');
 const StorageContextReadOnlyValue = new BlockchainInterface('StorageContextReadOnlyBase');
-const StorageIteratorValue = new BlockchainInterface('StorageIteratorBase');
+const EnumeratorValue = new BlockchainInterface('EnumeratorBase');
+const IteratorValue = new BlockchainInterface('IteratorBase');
 
 export const BLOCKCHAIN_INTERFACES = [
   AccountValue,
@@ -274,9 +275,10 @@ export const BLOCKCHAIN_INTERFACES = [
   OutputValue,
   TransactionValue,
   ValidatorValue,
+  EnumeratorValue,
+  IteratorValue,
   StorageContextValue,
   StorageContextReadOnlyValue,
-  StorageIteratorValue,
 ].map((value) => value.name);
 
 class BufferClass extends SimpleSysCallType {
@@ -542,8 +544,6 @@ class UnionValue extends SimpleSysCallType {
 
 const StorageKey = new UnionValue([BufferValue, StringValue]);
 
-const StorageValue = new UnionValue([BufferValue, NumberValue, StringValue, BooleanValue]);
-
 export class TypeAlias {
   public constructor(private readonly name: string, private readonly declaration: string) {}
 
@@ -706,6 +706,7 @@ export interface SysCall {
 export interface SimpleSysCallOptions {
   readonly name: SysCallName;
   readonly args?: ReadonlyArray<SysCallArgument>;
+  readonly customDeclaration?: string | undefined;
   readonly returnType?: SysCallType;
 }
 
@@ -713,14 +714,20 @@ export class SimpleSysCall implements SysCall {
   public readonly name: SysCallName;
   private readonly args: ReadonlyArray<SysCallArgument>;
   private readonly returnType: SysCallType;
+  private readonly customDeclaration: string | undefined;
 
-  public constructor({ name, args = [], returnType = VoidValue }: SimpleSysCallOptions) {
+  public constructor({ name, args = [], returnType = VoidValue, customDeclaration }: SimpleSysCallOptions) {
     this.name = name;
     this.args = args;
+    this.customDeclaration = customDeclaration;
     this.returnType = returnType;
   }
 
   public toDeclaration(): string {
+    if (this.customDeclaration !== undefined) {
+      return this.customDeclaration;
+    }
+
     const args = [`name: '${this.name}'`].concat(this.args.map((arg) => arg.toSignature()));
 
     return `function syscall(${args.join(', ')}): ${this.returnType.toSignature()};`;
@@ -1062,23 +1069,178 @@ export const SYSCALLS = {
       new SysCallArgument('context', new UnionValue([StorageContextValue, StorageContextReadOnlyValue])),
       new SysCallArgument('prefix', StorageKey),
     ],
-    returnType: StorageIteratorValue,
+    returnType: IteratorValue,
   }),
-  'Neo.Enumerator.Next': new SimpleSysCall({
-    name: 'Neo.Enumerator.Next',
-    args: [new SysCallArgument('iterator', StorageIteratorValue)],
-    returnType: BooleanValue,
-  }),
-  'Neo.Iterator.Key': new SimpleSysCall({
-    name: 'Neo.Iterator.Key',
-    args: [new SysCallArgument('iterator', StorageIteratorValue)],
-    returnType: StorageKey,
-  }),
-  'Neo.Enumerator.Value': new SimpleSysCall({
-    name: 'Neo.Enumerator.Value',
-    args: [new SysCallArgument('iterator', StorageIteratorValue)],
-    returnType: StorageValue,
-  }),
+  'Neo.Enumerator.Create': (() => {
+    const name = 'Neo.Enumerator.Create';
+    const returnType = EnumeratorValue;
+
+    return {
+      name,
+      toDeclaration: () => `function syscall<T>(name: '${name}', value: T[]): EnumeratorBase<T>;`,
+      handleCall: (sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions) => {
+        const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
+        // [arrayVal]
+        sb.visit(node.getArguments()[1], options);
+        // [array]
+        sb.emitHelper(node, options, sb.helpers.unwrapArray);
+        // [enumerator, array]
+        sb.emitSysCall(node, name);
+
+        if (optionsIn.pushValue) {
+          returnType.handleResult(sb, node, options, optionsIn.cast);
+        } else {
+          sb.emitOp(node, 'DROP');
+        }
+      },
+    };
+  })(),
+  'Neo.Enumerator.Next': (() => {
+    const name = 'Neo.Enumerator.Next';
+
+    return new SimpleSysCall({
+      name,
+      args: [new SysCallArgument('enumerator', EnumeratorValue)],
+      returnType: BooleanValue,
+      customDeclaration: `function syscall<V>(name: '${name}', enumerator: EnumeratorBase<V>): boolean;`,
+    });
+  })(),
+  'Neo.Enumerator.Concat': (() => {
+    const name = 'Neo.Enumerator.Concat';
+    const valueType = EnumeratorValue;
+    const returnType = valueType;
+
+    return new SimpleSysCall({
+      name,
+      returnType,
+      args: [new SysCallArgument('enumeratorA', EnumeratorValue), new SysCallArgument('enumeratorB', EnumeratorValue)],
+      customDeclaration: `function syscall<A, B>(name: '${name}', enumeratorA: EnumeratorBase<A>, enumeratorB: EnumeratorBase<B>): EnumeratorBase<A | B>`,
+    });
+  })(),
+  'Neo.Enumerator.Value': (() => {
+    const valueType = EnumeratorValue;
+    const name = 'Neo.Enumerator.Value';
+
+    return {
+      name,
+      toDeclaration: () =>
+        `function syscall<V, T extends EnumeratorBase<V>|IteratorBase<K,V>>(name: '${name}', enumerator: T): V;`,
+      handleCall: (sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions) => {
+        const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
+        const arg = node.getArguments()[1];
+        // [EnumeratorValue]
+        sb.visit(arg, options);
+        // [enumerator]
+        valueType.handleArgument(sb, arg, options, sb.getType(arg));
+
+        sb.emitSysCall(node, name);
+
+        if (!optionsIn.pushValue) {
+          sb.emitOp(node, 'DROP');
+        }
+      },
+    };
+  })(),
+  'Neo.Iterator.Values': (() => {
+    const name = 'Neo.Iterator.Values';
+    const returnType = IteratorValue;
+
+    return new SimpleSysCall({
+      name,
+      returnType,
+      args: [new SysCallArgument('iterator', IteratorValue)],
+      customDeclaration: `function syscall<V, T extends IteratorBase<K,V>>(name: '${name}', iterator: T): EnumeratorBase<V>;`,
+    });
+  })(),
+  'Neo.Iterator.Keys': (() => {
+    const valueType = IteratorValue;
+    const name = 'Neo.Iterator.Keys';
+    const returnType = EnumeratorValue;
+
+    return {
+      name,
+      toDeclaration: () =>
+        `function syscall<K, T extends IteratorBase<K,any>>(name: '${name}', iterator: T): EnumeratorBase<K>;`,
+      handleCall: (sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions) => {
+        const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
+        const arg = node.getArguments()[1];
+        // [IteratorValue]
+        sb.visit(arg, options);
+        // [enumerator]
+        valueType.handleArgument(sb, arg, options, sb.getType(arg));
+
+        sb.emitSysCall(node, name);
+
+        if (optionsIn.pushValue) {
+          returnType.handleResult(sb, node, options, optionsIn.cast);
+        } else {
+          sb.emitOp(node, 'DROP');
+        }
+      },
+    };
+  })(),
+  'Neo.Iterator.Create': (() => {
+    const name = 'Neo.Iterator.Create';
+    const returnType = IteratorValue;
+
+    return {
+      name,
+      toDeclaration: () => `function syscall<K,V>(name: '${name}', value: Map<K,V>): IteratorBase<K,V>;`,
+      handleCall: (sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions) => {
+        const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
+        // [arrayVal]
+        sb.visit(node.getArguments()[1], options);
+        // [array]
+        sb.emitHelper(node, options, sb.helpers.unwrapMap);
+        // [iterator, array]
+        sb.emitSysCall(node, name);
+
+        if (optionsIn.pushValue) {
+          returnType.handleResult(sb, node, options, optionsIn.cast);
+        } else {
+          sb.emitOp(node, 'DROP');
+        }
+      },
+    };
+  })(),
+  'Neo.Iterator.Concat': (() => {
+    const name = 'Neo.Enumerator.Concat';
+    const valueType = IteratorValue;
+    const returnType = valueType;
+
+    return new SimpleSysCall({
+      name,
+      args: [new SysCallArgument('iteratorA', IteratorValue), new SysCallArgument('iteratorB', IteratorValue)],
+      returnType,
+      customDeclaration: `function syscall<A, B, C, D>(name: '${name}', iteratorA: IteratorBase<A,C>, iteratorB: IteratorBase<B,D>): IteratorBase<A|B, C|D>`,
+    });
+  })(),
+  'Neo.Iterator.Key': (() => {
+    const valueType = IteratorValue;
+    const name = 'Neo.Iterator.Key';
+    const args = [new SysCallArgument('iterator', IteratorValue)];
+
+    return {
+      name,
+      args,
+      toDeclaration: () => `function syscall<K>(name: '${name}', iterator: IteratorBase<K, any>): K;`,
+      handleCall: (sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions) => {
+        const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
+        const arg = node.getArguments()[1];
+
+        sb.visit(arg, options);
+
+        valueType.handleArgument(sb, arg, options, sb.getType(arg));
+        sb.emitSysCall(node, name);
+        sb.emitSysCall(node, 'Neo.Runtime.Deserialize');
+        sb.emitHelper(node, options, sb.helpers.genericDeserialize);
+
+        if (!optionsIn.pushValue) {
+          sb.emitOp(node, 'DROP');
+        }
+      },
+    };
+  })(),
   'Neo.Account.SetVotes': new SimpleSysCall({
     name: 'Neo.Account.SetVotes',
     args: [new SysCallArgument('account', AccountValue), new SysCallArgument('votes', new ArrayValue(BufferValue))],
@@ -1204,15 +1366,12 @@ export const SYSCALLS = {
       new ArrayValue(() => returnType),
       new TupleValue(() => returnType),
     ]);
+    const sig = valueType.toSignature();
 
     return {
       name,
-      toDeclaration(): string {
-        const sig = valueType.toSignature();
-
-        return `function syscall(name: '${name}', idx: ${sig}): any;`;
-      },
-      handleCall(sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions): void {
+      toDeclaration: () => `function syscall(name: '${name}', idx: ${sig}): any;`,
+      handleCall: (sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions) => {
         const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
         const arg = node.getArguments()[1];
         sb.visit(arg, options);
