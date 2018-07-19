@@ -111,7 +111,7 @@ class One {
 
   async _timeRequireSingle(mod, ext) {
     const { stdout } = await execa.shell(
-      `node --eval 'const start = Date.now(); require("${mod}${ext}"); console.log(Date.now() - start);'`,
+      `node --eval "const start = Date.now(); require('${mod}${ext}'); console.log(Date.now() - start);"`,
       { cwd: path.join(appRootDir.get(), 'dist', `neo-one${ext}`) },
     );
 

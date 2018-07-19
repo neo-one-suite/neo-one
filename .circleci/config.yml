@@ -35,6 +35,9 @@ aliases:
           name: Build
           command: yarn build
       - run:
+          name: Build E2E
+          command: yarn build:e2e
+      - run:
           name: Prettier
           command: yarn nit
       - run:
