@@ -5,7 +5,7 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/monitor": "^1.0.0-alpha.49",
-    "esm": "^3.0.71",
+    "esm": "^3.0.72",
     "lodash": "^4.17.10",
     "rxjs": "^6.2.2",
     "tslib": "^1.9.3"

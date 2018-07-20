@@ -15,7 +15,7 @@
     "@neo-one/node-storage-levelup": "^1.0.0-alpha.67",
     "@neo-one/node-vm": "^1.0.0-alpha.66",
     "@neo-one/utils": "^1.0.0-alpha.54",
-    "esm": "^3.0.71",
+    "esm": "^3.0.72",
     "leveldown": "^4.0.1",
     "levelup": "^3.1.0",
     "node-cron": "^1.2.1",

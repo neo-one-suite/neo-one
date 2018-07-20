@@ -9,7 +9,7 @@
     "@neo-one/node-storage-common": "^1.0.0-alpha.67",
     "@neo-one/utils": "^1.0.0-alpha.54",
     "bytewise": "^1.1.0",
-    "esm": "^3.0.71",
+    "esm": "^3.0.72",
     "rxjs": "^6.2.2",
     "tslib": "^1.9.3"
   }

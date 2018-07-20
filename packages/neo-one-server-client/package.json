@@ -10,7 +10,7 @@
     "@neo-one/server-plugin": "^1.0.0-alpha.62",
     "@neo-one/utils": "^1.0.0-alpha.54",
     "env-paths": "^1.0.0",
-    "esm": "^3.0.71",
+    "esm": "^3.0.72",
     "execa": "^0.10.0",
     "fs-extra": "^7.0.0",
     "is-running": "^2.1.0",

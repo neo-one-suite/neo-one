@@ -2581,9 +2581,9 @@ escodegen@^1.9.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-esm@^3.0.71:
-  version "3.0.71"
-  resolved "https://registry.npmjs.org/esm/-/esm-3.0.71.tgz#3824987412d7d8fd7782d2381e990a621519a993"
+esm@^3.0.72:
+  version "3.0.72"
+  resolved "https://registry.npmjs.org/esm/-/esm-3.0.72.tgz#8f71b3f54b978bbbcbb9788f7f3569a36578c136"
 
 esprima@^3.1.3:
   version "3.1.3"
@@ -6075,9 +6075,9 @@ ora@^0.2.3:
     cli-spinners "^0.1.2"
     object-assign "^4.0.1"
 
-ora@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.npmjs.org/ora/-/ora-2.1.0.tgz#6caf2830eb924941861ec53a173799e008b51e5b"
+ora@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmjs.org/ora/-/ora-3.0.0.tgz#8179e3525b9aafd99242d63cc206fd64732741d0"
   dependencies:
     chalk "^2.3.1"
     cli-cursor "^2.1.0"
@@ -7736,9 +7736,9 @@ ts-node@7.0.0:
     source-map-support "^0.5.6"
     yn "^2.0.0"
 
-ts-simple-ast@^12.6.2:
-  version "12.6.2"
-  resolved "https://registry.npmjs.org/ts-simple-ast/-/ts-simple-ast-12.6.2.tgz#9fc7bd04320ae475979f6542b6af9b3f2e324b2a"
+ts-simple-ast@^12.7.0:
+  version "12.7.0"
+  resolved "https://registry.npmjs.org/ts-simple-ast/-/ts-simple-ast-12.7.0.tgz#d7ef094ed0ba7b6d6da34e430ad9b68f14c9e3cd"
   dependencies:
     "@dsherret/to-absolute-glob" "^2.0.2"
     code-block-writer "^7.2.1"
@@ -7762,9 +7762,9 @@ tslint-clean-code@0.2.7:
     memoize-decorator "^1.0.2"
     tsutils "2.7.1"
 
-tslint-config-prettier@1.13.0:
-  version "1.13.0"
-  resolved "https://registry.npmjs.org/tslint-config-prettier/-/tslint-config-prettier-1.13.0.tgz#189e821931ad89e0364e4e292d5c44a14e90ecd6"
+tslint-config-prettier@1.14.0:
+  version "1.14.0"
+  resolved "https://registry.npmjs.org/tslint-config-prettier/-/tslint-config-prettier-1.14.0.tgz#860b36634e53f4c70c64c51ff3ef7fd9bbab7676"
 
 tslint-consistent-codestyle@1.13.2:
   version "1.13.2"
@@ -7778,9 +7778,9 @@ tslint-immutable@4.6.0:
   version "4.6.0"
   resolved "https://registry.npmjs.org/tslint-immutable/-/tslint-immutable-4.6.0.tgz#b93f50961c499e331d919084140f5034b84e80af"
 
-tslint-microsoft-contrib@5.0.3:
-  version "5.0.3"
-  resolved "https://registry.npmjs.org/tslint-microsoft-contrib/-/tslint-microsoft-contrib-5.0.3.tgz#6fc3e238179cd72045c2b422e4d655f4183a8d5c"
+tslint-microsoft-contrib@5.1.0:
+  version "5.1.0"
+  resolved "https://registry.npmjs.org/tslint-microsoft-contrib/-/tslint-microsoft-contrib-5.1.0.tgz#777c32d51aba16f4565e47aac749a1631176cd9f"
   dependencies:
     tsutils "^2.12.1"
 

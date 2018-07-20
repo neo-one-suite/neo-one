@@ -7,7 +7,7 @@
     "@neo-one/client-core": "^1.0.0-alpha.64",
     "@neo-one/node-core": "^1.0.0-alpha.65",
     "@neo-one/utils": "^1.0.0-alpha.54",
-    "esm": "^3.0.71",
+    "esm": "^3.0.72",
     "lodash": "^4.17.10",
     "tslib": "^1.9.3"
   }

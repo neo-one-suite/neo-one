@@ -9,7 +9,7 @@
     "@neo-one/node-core": "^1.0.0-alpha.65",
     "@neo-one/utils": "^1.0.0-alpha.54",
     "cross-fetch": "^2.2.2",
-    "esm": "^3.0.71",
+    "esm": "^3.0.72",
     "koa": "^2.5.1",
     "koa-better-body": "^3.0.4",
     "koa-compose": "^4.1.0",
