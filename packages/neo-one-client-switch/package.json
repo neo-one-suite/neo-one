@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-switch",
-  "version": "1.0.0-alpha.77",
+  "version": "1.0.0-alpha.78",
   "description": "NEO•ONE client library for browser/node differences.",
   "main": "./src/index.ts",
   "browser": "./src/index.browser.ts",

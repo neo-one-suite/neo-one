@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/server-plugin",
-  "version": "1.0.0-alpha.62",
+  "version": "1.0.0-alpha.63",
   "description": "NEO•ONE Server plugin API.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0-alpha.49",
-    "@neo-one/utils": "^1.0.0-alpha.54",
+    "@neo-one/monitor": "^1.0.0-alpha.50",
+    "@neo-one/utils": "^1.0.0-alpha.55",
     "ajv": "^6.5.1",
     "chalk": "^2.4.1",
     "chokidar": "^2.0.4",
