@@ -5,7 +5,6 @@ import BigNumber from 'bignumber.js';
 import * as appRootDir from 'app-root-dir';
 import * as path from 'path';
 
-import { cleanupTest } from '../../test/cleanupTest';
 import { setupBasicTest } from '../../test/setupBasicTest';
 
 const setup = async () => {
@@ -60,10 +59,6 @@ const setup = async () => {
 };
 
 describe('Token', () => {
-  afterEach(async () => {
-    await cleanupTest();
-  });
-
   test('properties + issue + balanceOf + totalSupply + transfer', async () => {
     const {
       networkName,

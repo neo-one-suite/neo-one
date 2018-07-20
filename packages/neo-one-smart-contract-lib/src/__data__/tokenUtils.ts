@@ -8,7 +8,7 @@ import {
   TransactionResult,
   UserAccountID,
 } from '@neo-one/client';
-import { cleanupTest, setupContractTest } from '@neo-one/smart-contract-compiler';
+import { setupContractTest } from '@neo-one/smart-contract-compiler';
 import BigNumber from 'bignumber.js';
 
 import * as path from 'path';
@@ -38,10 +38,6 @@ export const testToken = ({ contractName, name, symbol, decimals, deploy, issueV
     });
 
   describe(contractName, () => {
-    afterEach(async () => {
-      await cleanupTest();
-    });
-
     test('properties + issue + balanceOf + totalSupply + transfer', async () => {
       const {
         networkName,

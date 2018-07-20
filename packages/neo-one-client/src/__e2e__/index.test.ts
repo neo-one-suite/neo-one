@@ -44,11 +44,11 @@ describe('exported api', () => {
 
   test('time to import', async () => {
     const time = await one.measureImport('@neo-one/client');
-    expect(time).toBeLessThan(900);
+    expect(time).toBeLessThan(1800);
   });
 
   test('time to require', async () => {
     const time = await one.measureRequire('@neo-one/client');
-    expect(time).toBeLessThan(350);
+    expect(time).toBeLessThan(650);
   });
 });

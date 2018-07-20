@@ -5,11 +5,10 @@ module.exports = {
     babel: {
       plugins: ['babel-plugin-jest-hoist'],
     },
+    path: 'test',
   }),
   displayName: 'unit',
   testRegex: '^.*/__tests__/.*\\.test\\.tsx?$',
-  testEnvironment: 'node',
-  setupTestFrameworkScriptFile: './scripts/test/jestSetup.js',
   moduleNameMapper: {
     '^@reactivex/ix-esnext-esm(.*)': '@reactivex/ix-esnext-cjs$1',
   },

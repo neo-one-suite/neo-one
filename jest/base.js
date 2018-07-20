@@ -1,4 +1,4 @@
-module.exports = ({ babel }) => ({
+module.exports = ({ babel, path }) => ({
   rootDir: '../',
   globals: {
     'ts-jest': {
@@ -17,4 +17,6 @@ module.exports = ({ babel }) => ({
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  testEnvironment: `./scripts/${path}/NodeEnvironment.js`,
+  setupTestFrameworkScriptFile: `./scripts/${path}/jestSetup.js`,
 });

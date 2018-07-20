@@ -9,7 +9,44 @@ const path = require('path');
 const tmp = require('tmp');
 
 class One {
-  async _setup() {
+  constructor() {
+    this.mutableCleanup = [];
+  }
+
+  addCleanup(callback) {
+    this.mutableCleanup.push(callback);
+  }
+
+  async cleanupTest() {
+    const mutableCleanup = this.mutableCleanup;
+    this.mutableCleanup = [];
+    await Promise.all(mutableCleanup.map(async (callback) => callback()));
+  }
+
+  async teardown() {
+    if (this.server === undefined) {
+      return;
+    }
+
+    try {
+      await this._exec('reset --static-neo-one');
+    } catch (error) {
+      this.server.kill('SIGINT');
+      await new Promise((resolve) => setTimeout(() => resolve(), 2500));
+      this.server.kill('SIGTERM');
+    }
+
+    await fs.remove(this.dir.name);
+
+    await this.cleanupTest();
+  }
+
+  async execute(command) {
+    await this.setupCLI();
+    return this._exec(command);
+  }
+
+  async setupCLI() {
     if (this.server !== undefined) {
       return;
     }
@@ -44,30 +81,9 @@ class One {
     this.server.stdout.removeListener('data', listener);
 
     if (!ready) {
-      await this._teardown();
+      await this.teardown();
       throw new Error(`Failed to start NEO-ONE server: ${stdout}`);
     }
-  }
-
-  async _teardown() {
-    if (this.server === undefined) {
-      return;
-    }
-
-    try {
-      await this._exec('reset --static-neo-one');
-    } catch (error) {
-      this.server.kill('SIGINT');
-      await new Promise((resolve) => setTimeout(() => resolve(), 2500));
-      this.server.kill('SIGTERM');
-    }
-
-    await fs.remove(this.dir.name);
-  }
-
-  async execute(command) {
-    await this._setup();
-    return this._exec(command);
   }
 
   parseJSON(value) {
@@ -111,7 +127,7 @@ class One {
 
   async _timeRequireSingle(mod, ext) {
     const { stdout } = await execa.shell(
-      `node --eval 'const start = Date.now(); require("${mod}${ext}"); console.log(Date.now() - start);'`,
+      `node --eval "const start = Date.now(); require('${mod}${ext}'); console.log(Date.now() - start);"`,
       { cwd: path.join(appRootDir.get(), 'dist', `neo-one${ext}`) },
     );
 
@@ -146,23 +162,5 @@ class One {
     };
   }
 }
-
-class E2EEnvironment extends NodeEnvironment {
-  async setup() {
-    await super.setup();
-    this.global.one = new One();
-  }
-
-  async teardown() {
-    if (this.global.one != undefined) {
-      await this.global.one._teardown();
-    }
-    await super.teardown();
-  }
-
-  runScript(script) {
-    return super.runScript(script);
-  }
-}
-
-module.exports = E2EEnvironment;
+module.exports = One;
+module.exports.default = One;

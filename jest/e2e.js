@@ -1,17 +1,9 @@
 const base = require('./base');
 
 module.exports = {
-  ...base({}),
+  ...base({ path: 'e2e' }),
   displayName: 'e2e',
   testRegex: '^.*/__e2e__/.*\\.test\\.tsx?$',
-  globals: {
-    'ts-jest': {
-      skipBabel: true,
-      tsConfigFile: 'tsconfig.jest.json',
-    },
-  },
-  testEnvironment: './scripts/e2e/Environment',
-  setupTestFrameworkScriptFile: './scripts/e2e/jestSetup.js',
   moduleNameMapper: {
     '^@neo-one/ec-key': '@neo-one/ec-key',
     '^@neo-one/boa': '@neo-one/boa',

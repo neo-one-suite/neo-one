@@ -437,7 +437,7 @@ gulp.task('buildAll', gulp.parallel(FORMATS.map((format) => buildAll(format))));
 gulp.task('install', gulp.parallel(FORMATS.map((format) => install(format))));
 gulp.task('publish', gulp.parallel(FORMATS.map((format) => publish(format))));
 
-gulp.task('build', gulp.series('clean', 'buildAll'));
+gulp.task('build', gulp.series('clean', 'buildAll', 'install'));
 
 const buildE2ESeries = (type) =>
   gulp.series(
@@ -473,6 +473,6 @@ gulp.task('e2e', async () => {
   await execa('yarn', ['e2e-ci'], { stdio: ['ignore', 'inherit', 'inherit'] });
 });
 
-gulp.task('release', gulp.series('test', 'build', 'install', 'e2e', 'prepareRelease', 'copyPkg', 'publish'));
+gulp.task('release', gulp.series('test', 'build', 'e2e', 'prepareRelease', 'copyPkg', 'publish'));
 
-gulp.task('fastRelease', gulp.series('build', 'install', 'prepareRelease', 'copyPkg', 'publish'));
+gulp.task('fastRelease', gulp.series('build', 'prepareRelease', 'copyPkg', 'publish'));

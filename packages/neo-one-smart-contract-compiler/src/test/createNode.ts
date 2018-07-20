@@ -8,7 +8,7 @@ import _ from 'lodash';
 import MemDown from 'memdown';
 
 import { getMonitor } from '../test/getMonitor';
-import { addCleanup } from './cleanupTest';
+import { addCleanup } from './addCleanup';
 
 const getPort = () => _.random(10000, 50000);
 
