@@ -56,7 +56,7 @@ export class ImportDeclarationCompiler extends NodeCompiler<ImportDeclaration> {
           sb.emitOp(node, 'PICKITEM');
 
           let name = namedImport.getName();
-          const alias = namedImport.getAliasIdentifier();
+          const alias = namedImport.getAliasNode();
           if (alias !== undefined) {
             name = alias.getText();
           }

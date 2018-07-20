@@ -1,4 +1,4 @@
-import { Block, crypto, ScriptContainer, utils, VMState } from '@neo-one/client-core';
+import { Block, crypto, ScriptContainer, UInt160, utils, VMState } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import {
   ExecuteScriptsResult,
@@ -221,7 +221,7 @@ export const executeScript = async ({
     pushOnly: !!pushOnly,
     scriptHash,
     callingScriptHash,
-    entryScriptHash: entryScriptHash === undefined ? scriptHash : entryScriptHash,
+    entryScriptHash: (entryScriptHash as UInt160 | undefined) === undefined ? scriptHash : entryScriptHash,
     pc: 0,
     depth,
     stack,

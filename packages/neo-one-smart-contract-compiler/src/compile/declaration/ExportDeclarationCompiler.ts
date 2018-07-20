@@ -12,7 +12,7 @@ export class ExportDeclarationCompiler extends NodeCompiler<ExportDeclaration> {
 
     const getName = (namedExport: ExportSpecifier) => {
       let name = namedExport.getNameNode().getText();
-      const alias = namedExport.getAliasIdentifier();
+      const alias = namedExport.getAliasNode();
       if (alias !== undefined) {
         name = alias.getText();
       }
