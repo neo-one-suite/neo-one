@@ -1,4 +1,4 @@
-import { Wallet } from './LocalKeyStore';
+import { Wallet } from './TransportStore';
 
 export class LocalMemoryStore {
   public readonly type: string;

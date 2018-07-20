@@ -349,6 +349,28 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
+"@ledgerhq/hw-transport-node-hid@4.22.0":
+  version "4.22.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-4.22.0.tgz#1ee00dcccd852cb6fb152cd68c781c9689cf9f24"
+  dependencies:
+    "@ledgerhq/hw-transport" "^4.21.0"
+    lodash "^4.17.10"
+    node-hid "^0.7.2"
+    usb "^1.3.2"
+
+"@ledgerhq/hw-transport-u2f@4.21.0":
+  version "4.21.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.21.0.tgz#85695d7e853a5c21af7e7dcb0ce3919f2b65cdd9"
+  dependencies:
+    "@ledgerhq/hw-transport" "^4.21.0"
+    u2f-api "0.2.7"
+
+"@ledgerhq/hw-transport@^4.21.0":
+  version "4.21.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.21.0.tgz#50f85cfe115ba3f9d5bf94755c701e927175794f"
+  dependencies:
+    events "^2.0.0"
+
 "@neo-one/boa@^0.0.2":
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/@neo-one/boa/-/boa-0.0.2.tgz#a9dac47fd7f77b70bc7b96d968fc48b84cc56bd0"
@@ -1427,7 +1449,7 @@ binaryextensions@2:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/binaryextensions/-/binaryextensions-2.1.1.tgz#3209a51ca4a4ad541a3b8d3d6a6d5b83a2485935"
 
-bindings@~1.3.0:
+bindings@^1.3.0, bindings@~1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.3.0.tgz#b346f6ecf6a95f5a815c5839fc7cdb22502f1ed7"
 
@@ -2751,6 +2773,10 @@ event-emitter@^0.3.5:
   dependencies:
     d "1"
     es5-ext "~0.10.14"
+
+events@^2.0.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/events/-/events-2.1.0.tgz#2a9a1e18e6106e0e812aa9ebd4a819b3c29c0ba5"
 
 exec-sh@^0.2.0:
   version "0.2.2"
@@ -5930,7 +5956,7 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-nan@^2.0.0, nan@^2.10.0, nan@^2.9.2, nan@~2.10.0:
+nan@^2.0.0, nan@^2.10.0, nan@^2.8.0, nan@^2.9.2, nan@~2.10.0:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
 
@@ -5991,6 +6017,14 @@ node-fetch@2.1.2:
 node-forge@^0.7.4:
   version "0.7.5"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.7.5.tgz#6c152c345ce11c52f465c2abd957e8639cd674df"
+
+node-hid@^0.7.2:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/node-hid/-/node-hid-0.7.3.tgz#736e9a4dee5eec96c20fbe301e0311bb185cb2f4"
+  dependencies:
+    bindings "^1.3.0"
+    nan "^2.10.0"
+    prebuild-install "^4.0.0"
 
 node-int64@^0.4.0:
   version "0.4.0"
@@ -8081,6 +8115,10 @@ typewise@^1.0.3:
   dependencies:
     typewise-core "^1.2.0"
 
+u2f-api@0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/u2f-api/-/u2f-api-0.2.7.tgz#17bf196b242f6bf72353d9858e6a7566cc192720"
+
 uglify-js@^2.6:
   version "2.8.29"
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-2.8.29.tgz#29c5733148057bb4e1f75df35b7a9cb72e6a59dd"
@@ -8188,6 +8226,13 @@ url-parse-lax@^1.0.0:
 urlgrey@^0.4.4:
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/urlgrey/-/urlgrey-0.4.4.tgz#892fe95960805e85519f1cd4389f2cb4cbb7652f"
+
+usb@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/usb/-/usb-1.3.2.tgz#4563a32323856e26c97dae374b34c66c3d83b5f4"
+  dependencies:
+    nan "^2.8.0"
+    node-pre-gyp "^0.10.0"
 
 use@^3.1.0:
   version "3.1.1"
