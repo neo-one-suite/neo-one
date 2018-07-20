@@ -26,7 +26,6 @@ import * as path from 'path';
 import { BehaviorSubject, combineLatest, defer, Observable } from 'rxjs';
 import { distinctUntilChanged, map, mergeScan, publishReplay, refCount, switchMap, take } from 'rxjs/operators';
 import Vorpal, { Args, CommandInstance } from 'vorpal';
-import pkg from '../package.json';
 import { commands, createPlugin } from './interactive';
 import { ClientConfig, createBinary, createClientConfig, setupCLI } from './utils';
 
@@ -99,7 +98,7 @@ export class InteractiveCLI {
     readonly serverPort?: number;
     readonly minPort?: number;
   }) {
-    this.vorpal = new Vorpal().version(pkg.version);
+    this.vorpal = new Vorpal().version('1.0.0-alpha');
     this.debug = debug;
     this.mutableSessions = {};
     this.sessions$ = new BehaviorSubject<Session>({});

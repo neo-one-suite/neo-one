@@ -5,7 +5,6 @@ import { Paths } from 'env-paths';
 import * as path from 'path';
 import { map, take } from 'rxjs/operators';
 import Vorpal from 'vorpal';
-import pkg from '../package.json';
 import { commands } from './commands';
 import { createBinary, setupCLI } from './utils';
 
@@ -44,7 +43,7 @@ export class CLI {
 
   public async start(argv: ReadonlyArray<string>): Promise<void> {
     const vorpal = new Vorpal();
-    vorpal.version(pkg.version);
+    vorpal.version('1.0.0-alpha');
 
     const { monitor, config$: logConfig$, mutableShutdownFuncs, shutdown } = setupCLI({
       logConsole: false,

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./packages",
     "target": "esnext",
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
 
     "lib": ["dom", "esnext"],
@@ -35,7 +35,7 @@
     "declaration": false,
 
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
+    "resolveJsonModule": false,
     "experimentalDecorators": true,
 
     "alwaysStrict": true,

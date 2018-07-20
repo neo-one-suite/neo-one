@@ -32,7 +32,6 @@ import _ from 'lodash';
 import LRU from 'lru-cache';
 import { defer, EMPTY, merge, Observable, timer } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
-import pkg from '../package.json';
 import { Command } from './Command';
 import { Consensus, ConsensusOptions } from './consensus';
 import { AlreadyConnectedError, NegotiationError } from './errors';
@@ -221,7 +220,7 @@ export class Node implements INode {
     const { network: { listenTCP: { port = 0 } = {} } = {} } = environment;
     this.externalPort = port;
     this.nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
-    this.userAgent = `NEO:neo-one-js:${pkg.version}`;
+    this.userAgent = `NEO:neo-one-js:1.0.0-alpha`;
 
     this.mutableMemPool = {};
     this.knownBlockHashes = createScalingBloomFilter();

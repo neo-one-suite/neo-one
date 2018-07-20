@@ -7,13 +7,12 @@ import Mali, { Context } from 'mali';
 import * as path from 'path';
 import { combineLatest, defer, Observable } from 'rxjs';
 import { distinctUntilChanged, map, mergeScan, switchMap } from 'rxjs/operators';
-import pkg from '../package.json';
 import { ServerRunningError } from './errors';
 import { context, services as servicesMiddleware } from './middleware';
 import { PluginManager } from './PluginManager';
 import { PortAllocator } from './PortAllocator';
 
-export const VERSION = pkg.version;
+export const VERSION = '1.0.0-alpha';
 const PLUGIN_PATH = 'plugin';
 
 export class Server {
