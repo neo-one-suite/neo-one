@@ -265,18 +265,19 @@ interface Options {
 
 export async function getDefaultInfo({ network }: Options): Promise<Info> {
   const outputs = await one.execute(`get wallet --network ${network} --json`);
-  const walletNames = one
+  const walletNames: ReadonlyArray<string> = one
     .parseJSON(outputs)
     .slice(1)
     // tslint:disable-next-line no-any
     .map((info: any) => info[1]);
-  const wallets = await Promise.all(
-    walletNames.map(async (walletName: string) => {
-      const output = await one.execute(`describe wallet ${walletName} --network ${network} --json`);
 
-      const wallet = one.parseJSON(output);
+  const wallets = await walletNames.reduce<Promise<ReadonlyArray<any>>>(async (accPromise, walletName) => {
+    const acc = await accPromise;
+    const output = await one.execute(`describe wallet ${walletName} --network ${network} --json`);
+    const wallet = one.parseJSON(output);
 
-      return {
+    return acc.concat([
+      {
         name: walletName,
         // tslint:disable-next-line no-any
         address: expectNotNull(wallet.find((value: any) => value[0] === 'Address'))[1],
@@ -288,9 +289,9 @@ export async function getDefaultInfo({ network }: Options): Promise<Info> {
             amount,
             asset,
           })),
-      };
-    }),
-  );
+      },
+    ]);
+  }, Promise.resolve([]));
 
   // @ts-ignore
   return { wallets };
@@ -322,7 +323,8 @@ export async function testBootstrap(
       };
     }, {});
 
-  const [{ height }, { wallets }] = await Promise.all([getNetworkInfo(network), getInfo({ network, rpcURL })]);
+  const { height } = await getNetworkInfo(network);
+  const { wallets } = await getInfo({ network, rpcURL });
 
   // numWallets / 2 token transfers
   // tslint:disable-next-line binary-expression-operand-order

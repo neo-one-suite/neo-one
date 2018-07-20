@@ -3,7 +3,7 @@ import ECKey from '@neo-one/ec-key';
 import { CustomError, utils } from '@neo-one/utils';
 import base58 from 'bs58';
 import xor from 'buffer-xor';
-import * as cryptoLib from 'crypto';
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
 import { ec as EC, KeyPair } from 'elliptic';
 import scrypt from 'scrypt-js';
 import WIF from 'wif';
@@ -43,20 +43,17 @@ export class InvalidAddressError extends CustomError {
 }
 
 const sha1 = (value: Buffer): Buffer =>
-  cryptoLib
-    .createHash('sha1')
+  createHash('sha1')
     .update(value)
     .digest();
 
 const sha256 = (value: Buffer): Buffer =>
-  cryptoLib
-    .createHash('sha256')
+  createHash('sha256')
     .update(value)
     .digest();
 
 const rmd160 = (value: Buffer): Buffer =>
-  cryptoLib
-    .createHash('rmd160')
+  createHash('rmd160')
     .update(value)
     .digest();
 
@@ -206,7 +203,7 @@ const createKeyPair = (): { readonly privateKey: PrivateKey; readonly publicKey:
   };
 };
 
-const createPrivateKey = (): PrivateKey => common.bufferToPrivateKey(cryptoLib.randomBytes(32));
+const createPrivateKey = (): PrivateKey => common.bufferToPrivateKey(randomBytes(32));
 
 const toScriptHash = hash160;
 
@@ -468,7 +465,7 @@ const encryptNEP2 = async ({
   const derived1 = derived.slice(0, 32);
   const derived2 = derived.slice(32, 64);
 
-  const cipher = cryptoLib.createCipheriv(NEP2_CIPHER, derived2, Buffer.alloc(0, 0));
+  const cipher = createCipheriv(NEP2_CIPHER, derived2, Buffer.alloc(0, 0));
 
   cipher.setAutoPadding(false);
   cipher.end(xor(privateKey, derived1));
@@ -524,7 +521,7 @@ const decryptNEP2 = async ({
   const derived1 = derived.slice(0, 32);
   const derived2 = derived.slice(32, 64);
 
-  const decipher = cryptoLib.createDecipheriv(NEP2_CIPHER, derived2, Buffer.alloc(0, 0));
+  const decipher = createDecipheriv(NEP2_CIPHER, derived2, Buffer.alloc(0, 0));
 
   decipher.setAutoPadding(false);
   decipher.end(decoded.slice(7, 7 + 32));

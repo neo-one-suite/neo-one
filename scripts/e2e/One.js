@@ -55,7 +55,7 @@ class One {
     this.dirName = this.dir.name;
     this.serverPort = _.random(10000, 50000);
     this.minPort = this.serverPort + 1;
-    const [cmd, args] = this._createCommand('start server --debug --static-neo-one');
+    const [cmd, args] = this._createCommand('start server --static-neo-one');
     this.server = execa(cmd, args, this._getEnv());
 
     let stdout = '';
