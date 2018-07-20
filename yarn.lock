@@ -7850,6 +7850,10 @@ typescript@2.9.1:
   version "2.9.1"
   resolved "https://registry.npmjs.org/typescript/-/typescript-2.9.1.tgz#fdb19d2c67a15d11995fd15640e373e09ab09961"
 
+typescript@^3.1.0-dev.20180717:
+  version "3.1.0-dev.20180717"
+  resolved "https://registry.npmjs.org/typescript/-/typescript-3.1.0-dev.20180717.tgz#a623e4df35ee102641020b1fe9dd5258547be74a"
+
 typewise-core@^1.2, typewise-core@^1.2.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/typewise-core/-/typewise-core-1.2.0.tgz#97eb91805c7f55d2f941748fa50d315d991ef195"
