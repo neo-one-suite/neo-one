@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/node-network",
-  "version": "1.0.0-alpha.70",
+  "version": "1.0.0-alpha.71",
   "description": "NEO•ONE NEO network protocol.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.65",
-    "@neo-one/monitor": "^1.0.0-alpha.50",
-    "@neo-one/node-core": "^1.0.0-alpha.66",
-    "@neo-one/utils": "^1.0.0-alpha.55",
+    "@neo-one/client-core": "^1.0.0-alpha.66",
+    "@neo-one/monitor": "^1.0.0-alpha.51",
+    "@neo-one/node-core": "^1.0.0-alpha.67",
+    "@neo-one/utils": "^1.0.0-alpha.56",
     "esm": "^3.0.72",
     "lodash": "^4.17.10",
     "rxjs": "^6.2.2",
