@@ -377,6 +377,10 @@
   dependencies:
     "@types/base-x" "*"
 
+"@types/caseless@*":
+  version "0.12.1"
+  resolved "https://registry.npmjs.org/@types/caseless/-/caseless-0.12.1.tgz#9794c69c8385d0192acc471a540d1f8e0d16218a"
+
 "@types/chokidar@1.7.5":
   version "1.7.5"
   resolved "https://registry.npmjs.org/@types/chokidar/-/chokidar-1.7.5.tgz#1fa78c8803e035bed6d98e6949e514b133b0c9b6"
@@ -437,17 +441,24 @@
   version "2.0.0"
   resolved "https://registry.npmjs.org/@types/figures/-/figures-2.0.0.tgz#e624a9ad71db49b9c8b9bbd59fe1ad04c443913c"
 
+"@types/form-data@*":
+  version "2.2.1"
+  resolved "https://registry.npmjs.org/@types/form-data/-/form-data-2.2.1.tgz#ee2b3b8eaa11c0938289953606b745b738c54b1e"
+  dependencies:
+    "@types/node" "*"
+
 "@types/fs-extra@5.0.4":
   version "5.0.4"
   resolved "https://registry.npmjs.org/@types/fs-extra/-/fs-extra-5.0.4.tgz#b971134d162cc0497d221adde3dbb67502225599"
   dependencies:
     "@types/node" "*"
 
-"@types/google-cloud__storage@1.1.8":
-  version "1.1.8"
-  resolved "https://registry.npmjs.org/@types/google-cloud__storage/-/google-cloud__storage-1.1.8.tgz#4c41b49ccd5f6f7f30a0419531c4013d751e1b3b"
+"@types/google-cloud__storage@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.npmjs.org/@types/google-cloud__storage/-/google-cloud__storage-1.7.0.tgz#60abb5669f78ed07abb625f556d1f396ee84724e"
   dependencies:
     "@types/node" "*"
+    "@types/request" "*"
 
 "@types/http-assert@*":
   version "1.3.0"
@@ -564,6 +575,15 @@
 "@types/range-parser@*":
   version "1.2.2"
   resolved "https://registry.npmjs.org/@types/range-parser/-/range-parser-1.2.2.tgz#fa8e1ad1d474688a757140c91de6dace6f4abc8d"
+
+"@types/request@*":
+  version "2.47.1"
+  resolved "https://registry.npmjs.org/@types/request/-/request-2.47.1.tgz#25410d3afbdac04c91a94ad9efc9824100735824"
+  dependencies:
+    "@types/caseless" "*"
+    "@types/form-data" "*"
+    "@types/node" "*"
+    "@types/tough-cookie" "*"
 
 "@types/rx-core-binding@*":
   version "4.0.4"
@@ -682,9 +702,13 @@
   dependencies:
     "@types/node" "*"
 
-"@types/yargs@11.1.0":
-  version "11.1.0"
-  resolved "https://registry.npmjs.org/@types/yargs/-/yargs-11.1.0.tgz#923caa0cca53745d83f139eeff4fa7906c52ebce"
+"@types/tough-cookie@*":
+  version "2.3.3"
+  resolved "https://registry.npmjs.org/@types/tough-cookie/-/tough-cookie-2.3.3.tgz#7f226d67d654ec9070e755f46daebf014628e9d9"
+
+"@types/yargs@11.1.1":
+  version "11.1.1"
+  resolved "https://registry.npmjs.org/@types/yargs/-/yargs-11.1.1.tgz#2e724257167fd6b615dbe4e54301e65fe597433f"
 
 JSONStream@^1.0.4:
   version "1.3.3"
@@ -6936,9 +6960,9 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.npmjs.org/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs-tslint-rules@4.6.0:
-  version "4.6.0"
-  resolved "https://registry.npmjs.org/rxjs-tslint-rules/-/rxjs-tslint-rules-4.6.0.tgz#f3ef8fafb7097b904634bed2d4fdcd61d065525c"
+rxjs-tslint-rules@4.7.0:
+  version "4.7.0"
+  resolved "https://registry.npmjs.org/rxjs-tslint-rules/-/rxjs-tslint-rules-4.7.0.tgz#29d01ebb2e340d4119119c84b26af2e498cc1688"
   dependencies:
     "@phenomnomnominal/tsquery" "^1.0.5"
     decamelize "^2.0.0"
