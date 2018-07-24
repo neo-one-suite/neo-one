@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VariableDeclarationListCompiler Assignment with incongruent typing 1`] = `"code.ts (3,14): Type '\\"3\\"' is not assignable to type 'number'."`;
+
+exports[`VariableDeclarationListCompiler Illegal Assignment: once defined with const, X should not be re-assignable. 1`] = `"code.ts (3,7): Cannot assign to 'x' because it is a constant or a read-only property."`;

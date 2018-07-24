@@ -1,20 +1,46 @@
 import { helpers } from '../../../__data__';
 
 describe('InterfaceDeclarationCompiler', () => {
-  test('Interface type as value reports error', async () => {
+  test('Sanity Test: accessing invalid property results in error', async () => {
     await helpers.compileString(
       `
-      interface Foo {
-        bar: string;
-      }
+    var foo = {};
 
-      const foo = {} as Foo;
-
-      if (!(foo instanceof Foo)) {
-        throw 'Failure';
-      }
-    `,
+    if (foo.balk!== undefined) {
+      // above line will throw TypeScript error
+    }
+      `,
       { type: 'error' },
     );
+  });
+
+  test('Create object given interface, using "as {type}"', async () => {
+    await helpers.executeString(`
+    interface Foo {
+      bar: number;
+      baz: string;
+    }
+    var foo = {} as Foo;
+
+    if (foo.bar!== undefined) {
+      throw 'Failure';
+    }
+      `);
+  });
+
+  // Currently unsupported, but valid syntax.
+  test.skip('Create object given interface, using "<{type}>" ', async () => {
+    await helpers.executeString(`
+
+    interface Foo {
+      bar: number;
+      baz: string;
+    }
+    var bar = <Foo>{};
+
+    if (bar.bar!== undefined) {
+      throw 'Failure';
+    }
+      `);
   });
 });
