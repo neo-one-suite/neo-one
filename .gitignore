@@ -8,6 +8,7 @@
 /packages/*/dist
 /packages/*/dist-ts
 .rpt2_cache
+/reports
 
 # Logs
 logs
