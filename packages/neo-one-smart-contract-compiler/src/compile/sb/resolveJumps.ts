@@ -1,11 +1,10 @@
-import { Node } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { Call, Jmp, Jump } from '../pc';
 import { KnownProgramCounter } from '../pc/KnownProgramCounter';
 
 // const MAX_JUMP = 32767;
 const MAX_JUMP = 32000;
-type Bytecode = ReadonlyArray<[Node, Buffer | Jump]>;
+type Bytecode = ReadonlyArray<[ts.Node, Buffer | Jump]>;
 
 abstract class CodePoint {
   public abstract readonly length: number;
@@ -13,7 +12,7 @@ abstract class CodePoint {
   private mutablePrev: CodePoint | undefined;
   private mutableNext: CodePoint | undefined;
 
-  public constructor(public readonly node: Node) {}
+  public constructor(public readonly node: ts.Node) {}
 
   public get pc(): number {
     return this.resolvePC();
@@ -74,7 +73,7 @@ class JumpCodePoint extends CodePoint {
   public readonly length = 3;
   private mutableTarget: CodePoint | undefined;
 
-  public constructor(node: Node, public readonly type: 'JMP' | 'JMPIF' | 'JMPIFNOT' | 'CALL') {
+  public constructor(node: ts.Node, public readonly type: 'JMP' | 'JMPIF' | 'JMPIFNOT' | 'CALL') {
     super(node);
   }
 
@@ -102,7 +101,7 @@ class JumpCodePoint extends CodePoint {
 class BufferCodePoint extends CodePoint {
   public readonly length: number;
 
-  public constructor(node: Node, public readonly value: Buffer) {
+  public constructor(node: ts.Node, public readonly value: Buffer) {
     super(node);
     this.length = value.length;
   }
@@ -112,7 +111,7 @@ class JumpStationCodePoint extends CodePoint {
   public readonly length: number;
   private mutableTarget: CodePoint | undefined;
 
-  public constructor(node: Node, hasForward: boolean, public readonly reverseTarget: CodePoint) {
+  public constructor(node: ts.Node, hasForward: boolean, public readonly reverseTarget: CodePoint) {
     super(node);
     this.length = hasForward ? 9 : 6;
   }
@@ -180,7 +179,7 @@ const getCodePoint = (bytecode: Bytecode): CodePoint => {
   return first;
 };
 
-const addJumpStations = (node: Node, codePoint: CodePoint, maxOffset: number): void => {
+const addJumpStations = (node: ts.Node, codePoint: CodePoint, maxOffset: number): void => {
   codePoint.resolveAllPCs();
 
   const mutableFirstCodePoint = codePoint;
@@ -230,10 +229,13 @@ const addJumpStations = (node: Node, codePoint: CodePoint, maxOffset: number): v
       }
       mutableReverseTarget = mutableJumpStation;
 
-      mutableCurrent.next = mutableJumpStation;
-      mutableJumpStation.next = mutableNext;
-      mutableNext.prev = mutableJumpStation;
-      mutableJumpStation.prev = mutableCurrent;
+      const mutablePrev = mutableCurrent.prev;
+      if (mutablePrev !== undefined) {
+        mutablePrev.next = mutableJumpStation;
+      }
+      mutableCurrent.prev = mutableJumpStation;
+      mutableJumpStation.next = mutableCurrent;
+      mutableJumpStation.prev = mutablePrev;
 
       codePoint.resolveAllPCs();
     }
@@ -262,7 +264,7 @@ const getBytecode = (first: CodePoint): Bytecode => {
   first.resolveAllPCs();
 
   let current: CodePoint | undefined = first;
-  const mutableOut: Array<[Node, Buffer | Jump]> = [];
+  const mutableOut: Array<[ts.Node, Buffer | Jump]> = [];
   // tslint:disable-next-line no-loop-statement
   while (current !== undefined) {
     if (current instanceof JumpCodePoint) {
@@ -295,6 +297,11 @@ const getBytecode = (first: CodePoint): Bytecode => {
 };
 
 export const resolveJumps = (bytecode: Bytecode, maxOffset: number = MAX_JUMP): Bytecode => {
+  const length = bytecode.reduce<number>((acc, value) => (value instanceof Jump ? acc + 3 : acc + value.length), 0);
+  if (length < MAX_JUMP) {
+    return bytecode;
+  }
+
   const codePoint = getCodePoint(bytecode);
   addJumpStations(bytecode[0][0], codePoint, maxOffset);
 

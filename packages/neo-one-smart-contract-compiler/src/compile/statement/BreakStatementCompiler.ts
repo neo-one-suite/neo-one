@@ -1,17 +1,16 @@
-import { BreakStatement, SyntaxKind } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
+import * as constants from '../../constants';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-import * as constants from '../../constants';
+export class BreakStatementCompiler extends NodeCompiler<ts.BreakStatement> {
+  public readonly kind = ts.SyntaxKind.BreakStatement;
 
-export class BreakStatementCompiler extends NodeCompiler<BreakStatement> {
-  public readonly kind: SyntaxKind = SyntaxKind.BreakStatement;
-
-  public visitNode(sb: ScriptBuilder, node: BreakStatement, options: VisitOptions): void {
-    const label = node.getLabel();
+  public visitNode(sb: ScriptBuilder, node: ts.BreakStatement, options: VisitOptions): void {
+    const label = tsUtils.statement.getLabel(node);
     if (label !== undefined) {
       sb.reportUnsupported(label);
     }

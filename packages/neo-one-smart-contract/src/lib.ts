@@ -30,14 +30,14 @@ export abstract class SmartContract {
 export class MapStorage<K extends SerializableValue, V extends SerializableValue> {
   public constructor(private readonly prefix?: Buffer) {}
 
-  public get(keyIn: K): V | null {
+  public get(keyIn: K): V | undefined {
     return syscall(
       'Neo.Storage.Get',
       syscall('Neo.Storage.GetContext'),
       this.prefix === undefined
         ? syscall('Neo.Runtime.Serialize', keyIn)
         : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)]),
-    ) as V | null;
+    ) as V | undefined;
   }
 
   public set(keyIn: K, value: V): void {

@@ -11,12 +11,14 @@ import { common, ECPoint, PrivateKey, UInt160, UInt256 } from '../common';
 import { InvalidFormatError, InvalidNumberOfKeysError, TooManyPublicKeysError } from '../errors';
 import { ScriptBuilder } from '../utils';
 import { Witness } from '../Witness';
+import { p256 } from './precomputed';
 
 // tslint:disable-next-line no-let
 let ecCache: any;
 const ec = () => {
   if (ecCache === undefined) {
-    ecCache = new EC('p256') as any;
+    // tslint:disable-next-line no-any
+    ecCache = new EC(p256) as any;
   }
 
   return ecCache;
@@ -177,6 +179,9 @@ const toECPointFromKeyPair = (pair: KeyPair): ECPoint =>
   common.bufferToECPoint(Buffer.from(pair.getPublic(true, 'hex'), 'hex'));
 
 const mutablePublicKeyCache: { [K in string]?: ECPoint } = {};
+const addPublicKey = (privateKey: PrivateKey, publicKey: ECPoint) => {
+  mutablePublicKeyCache[common.privateKeyToString(privateKey)] = publicKey;
+};
 const privateKeyToPublicKey = (privateKey: PrivateKey): ECPoint => {
   const privateKeyHex = common.privateKeyToString(privateKey);
   let publicKey = mutablePublicKeyCache[privateKeyHex];
@@ -324,7 +329,7 @@ const createMultiSignatureVerificationScript = (mIn: number, publicKeys: Readonl
 
   const builder = new ScriptBuilder();
   builder.emitPushInt(m);
-  const publicKeysSorted = sortKeys(publicKeys);
+  const publicKeysSorted = publicKeys.length === 1 ? publicKeys : sortKeys(publicKeys);
   publicKeysSorted.forEach((ecPoint) => {
     builder.emitPushECPoint(ecPoint);
   });
@@ -349,7 +354,7 @@ const createMultiSignatureWitness = (
   publicKeyToSignature: { readonly [key: string]: Buffer },
 ): Witness => {
   const m = Math.floor(mIn);
-  const publicKeysSorted = sortKeys(publicKeys);
+  const publicKeysSorted = publicKeys.length === 1 ? publicKeys : sortKeys(publicKeys);
   const signatures = publicKeysSorted
     .map((publicKey) => publicKeyToSignature[common.ecPointToHex(publicKey)])
     .filter(utils.notNull);
@@ -538,6 +543,7 @@ const decryptNEP2 = async ({
 };
 
 export const crypto = {
+  addPublicKey,
   sha1,
   sha256,
   hash160,

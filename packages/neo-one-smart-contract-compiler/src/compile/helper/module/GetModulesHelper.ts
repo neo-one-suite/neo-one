@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -8,7 +8,7 @@ import { Helper } from '../Helper';
 // Input: [globalObjectVal]
 // Output: [modules]
 export class GetModulesHelper extends Helper {
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (options.pushValue) {
       // ['modules', globalObjectVal]
       sb.emitPushString(node, InternalGlobalProperties.Modules);

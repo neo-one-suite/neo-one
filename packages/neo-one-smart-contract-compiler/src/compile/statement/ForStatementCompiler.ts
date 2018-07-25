@@ -1,15 +1,15 @@
-import { ForStatement, SyntaxKind } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class ForStatementCompiler extends NodeCompiler<ForStatement> {
-  public readonly kind: SyntaxKind = SyntaxKind.ForStatement;
+export class ForStatementCompiler extends NodeCompiler<ts.ForStatement> {
+  public readonly kind = ts.SyntaxKind.ForStatement;
 
-  public visitNode(sb: ScriptBuilder, node: ForStatement, options: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, node: ts.ForStatement, options: VisitOptions): void {
     let initializer;
-    const exprInitializer = node.getInitializer();
+    const exprInitializer = tsUtils.statement.getInitializer(node);
     if (exprInitializer !== undefined) {
       initializer = () => {
         sb.visit(exprInitializer, sb.noPushValueOptions(options));
@@ -17,7 +17,7 @@ export class ForStatementCompiler extends NodeCompiler<ForStatement> {
     }
 
     let condition;
-    const exprCondition = node.getCondition();
+    const exprCondition = tsUtils.statement.getCondition(node);
     if (exprCondition !== undefined) {
       condition = () => {
         sb.visit(exprCondition, sb.pushValueOptions(options));
@@ -32,7 +32,7 @@ export class ForStatementCompiler extends NodeCompiler<ForStatement> {
     }
 
     let incrementor;
-    const exprIncrementor = node.getIncrementor();
+    const exprIncrementor = tsUtils.statement.getIncrementor(node);
     if (exprIncrementor !== undefined) {
       incrementor = () => {
         sb.visit(exprIncrementor, sb.noPushValueOptions(options));
@@ -47,7 +47,7 @@ export class ForStatementCompiler extends NodeCompiler<ForStatement> {
         condition,
         incrementor,
         each: (innerOptions) => {
-          sb.visit(node.getStatement(), sb.noPushValueOptions(innerOptions));
+          sb.visit(tsUtils.statement.getStatement(node), sb.noPushValueOptions(innerOptions));
         },
       }),
     );

@@ -1,127 +1,137 @@
 // tslint:disable ban-types no-bitwise
-import Project, { Identifier, SourceFile, Symbol, ts } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
 import * as path from 'path';
+import ts from 'typescript';
 
 export interface Globals {
-  readonly Array: Symbol;
-  readonly Buffer: Symbol;
-  readonly process: Symbol;
-  readonly AccountBase: Symbol;
-  readonly AssetBase: Symbol;
-  readonly AttributeBase: Symbol;
-  readonly BlockBase: Symbol;
-  readonly ContractBase: Symbol;
-  readonly HeaderBase: Symbol;
-  readonly InputBase: Symbol;
-  readonly OutputBase: Symbol;
-  readonly TransactionBase: Symbol;
-  readonly ValidatorBase: Symbol;
-  readonly StorageContextBase: Symbol;
-  readonly StorageContextReadOnlyBase: Symbol;
-  readonly StorageIteratorBase: Symbol;
-  readonly syscall: Symbol;
+  readonly Array: ts.Symbol;
+  readonly Buffer: ts.Symbol;
+  readonly BufferFrom: ts.Symbol;
+  readonly BufferEquals: ts.Symbol;
+  readonly process: ts.Symbol;
+  readonly AccountBase: ts.Symbol;
+  readonly AssetBase: ts.Symbol;
+  readonly AttributeBase: ts.Symbol;
+  readonly BlockBase: ts.Symbol;
+  readonly ContractBase: ts.Symbol;
+  readonly HeaderBase: ts.Symbol;
+  readonly InputBase: ts.Symbol;
+  readonly OutputBase: ts.Symbol;
+  readonly TransactionBase: ts.Symbol;
+  readonly ValidatorBase: ts.Symbol;
+  readonly StorageContextBase: ts.Symbol;
+  readonly StorageContextReadOnlyBase: ts.Symbol;
+  readonly StorageIteratorBase: ts.Symbol;
+  readonly syscall: ts.Symbol;
 }
 
-const findInterfaceFile = (ast: Project, name: string): SourceFile | undefined => {
-  const files = ast.getSourceFiles();
-
-  return files.find((file) => {
-    if (!file.isDeclarationFile()) {
-      return false;
-    }
-
-    let bufferInterface = file.getInterface(name);
-    const globalNamespace = file.getNamespace('global');
-    let isGlobalAugmentation = false;
-    if (bufferInterface === undefined && globalNamespace !== undefined) {
-      bufferInterface = globalNamespace.getInterface(name);
-      isGlobalAugmentation = true;
-    }
-
-    if (bufferInterface === undefined) {
-      return false;
-    }
-
-    return isGlobalAugmentation || (bufferInterface.compilerNode.flags & ts.NodeFlags.GlobalAugmentation) !== 0;
-  });
-};
-
-export const getGlobals = (ast: Project): Globals => {
-  let bufferFile = findInterfaceFile(ast, 'Buffer');
-  if (bufferFile === undefined) {
-    bufferFile = ast.addExistingSourceFileIfExists(require.resolve('@types/node/index.d.ts'));
-  }
+export const getGlobals = (program: ts.Program, typeChecker: ts.TypeChecker): Globals => {
+  const bufferFile = tsUtils.file.getSourceFile(program, require.resolve('@types/node/index.d.ts'));
   if (bufferFile === undefined) {
     throw new Error('Could not find Buffer');
   }
-  const buffer = bufferFile.getInterfaceOrThrow('Buffer');
-
-  // tslint:disable-next-line no-any
-  const typeChecker = ast.getTypeChecker().compilerObject as any;
-  // tslint:disable-next-line no-any
-  const array = new (Symbol as any)(
-    // tslint:disable-next-line no-any
-    (ast as any).global,
-    typeChecker.createArrayType(typeChecker.getAnyType()).symbol as ts.Symbol,
-  ).getDeclaredType();
-
-  let neoFile = findInterfaceFile(ast, 'AccountBase');
-  if (neoFile === undefined) {
-    ast.addExistingSourceFiles(path.join(path.dirname(require.resolve('@neo-one/smart-contract')), '**', '*.ts'));
-  }
-
-  neoFile = findInterfaceFile(ast, 'AccountBase');
+  const neoFile = tsUtils.file.getSourceFile(
+    program,
+    path.resolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'index.d.ts'),
+  );
   if (neoFile === undefined) {
     throw new Error('Could not find NEO type definition file');
   }
 
-  const neoGlobal = neoFile.getNamespaceOrThrow('global');
+  const neoGlobal = tsUtils.statement.getNamespaceOrThrow(neoFile, 'global');
+
+  const buffer = tsUtils.node.getSymbolOrThrow(
+    typeChecker,
+    tsUtils.statement.getInterfaceOrThrow(bufferFile, 'Buffer'),
+  );
+
+  const bufferVar = tsUtils.type_.getSymbolOrThrow(
+    tsUtils.type_.getType(typeChecker, tsUtils.statement.getVariableDeclarationOrThrow(bufferFile, 'Buffer')),
+  );
 
   return {
-    Array: array.getSymbolOrThrow(),
-    Buffer: buffer.getSymbolOrThrow(),
-    process: bufferFile.getVariableDeclarationOrThrow('process').getSymbolOrThrow(),
-    AccountBase: neoGlobal.getInterfaceOrThrow('AccountBase').getSymbolOrThrow(),
-    AssetBase: neoGlobal.getInterfaceOrThrow('AssetBase').getSymbolOrThrow(),
-    AttributeBase: neoGlobal.getInterfaceOrThrow('AttributeBase').getSymbolOrThrow(),
-    BlockBase: neoGlobal.getInterfaceOrThrow('BlockBase').getSymbolOrThrow(),
-    ContractBase: neoGlobal.getInterfaceOrThrow('ContractBase').getSymbolOrThrow(),
-    HeaderBase: neoGlobal.getInterfaceOrThrow('HeaderBase').getSymbolOrThrow(),
-    InputBase: neoGlobal.getInterfaceOrThrow('InputBase').getSymbolOrThrow(),
-    OutputBase: neoGlobal.getInterfaceOrThrow('OutputBase').getSymbolOrThrow(),
-    TransactionBase: neoGlobal.getInterfaceOrThrow('TransactionBase').getSymbolOrThrow(),
-    ValidatorBase: neoGlobal.getInterfaceOrThrow('ValidatorBase').getSymbolOrThrow(),
-    StorageContextBase: neoGlobal.getInterfaceOrThrow('StorageContextBase').getSymbolOrThrow(),
-    StorageContextReadOnlyBase: neoGlobal.getInterfaceOrThrow('StorageContextReadOnlyBase').getSymbolOrThrow(),
-    StorageIteratorBase: neoGlobal.getInterfaceOrThrow('StorageIteratorBase').getSymbolOrThrow(),
-    syscall: neoGlobal.getFunctionOrThrow('syscall').getSymbolOrThrow(),
+    Array: tsUtils.type_.getSymbolOrThrow(tsUtils.types.getArrayType(typeChecker)),
+    Buffer: buffer,
+    BufferFrom: tsUtils.symbol.getMemberOrThrow(bufferVar, 'from'),
+    BufferEquals: tsUtils.symbol.getMemberOrThrow(buffer, 'equals'),
+    process: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getVariableDeclarationOrThrow(bufferFile, 'process'),
+    ),
+    AccountBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'AccountBase'),
+    ),
+    AssetBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'AssetBase'),
+    ),
+    AttributeBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'AttributeBase'),
+    ),
+    BlockBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'BlockBase'),
+    ),
+    ContractBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'ContractBase'),
+    ),
+    HeaderBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'HeaderBase'),
+    ),
+    InputBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'InputBase'),
+    ),
+    OutputBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'OutputBase'),
+    ),
+    TransactionBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'TransactionBase'),
+    ),
+    ValidatorBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'ValidatorBase'),
+    ),
+    StorageContextBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'StorageContextBase'),
+    ),
+    StorageContextReadOnlyBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'StorageContextReadOnlyBase'),
+    ),
+    StorageIteratorBase: tsUtils.node.getSymbolOrThrow(
+      typeChecker,
+      tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'StorageIteratorBase'),
+    ),
+    syscall: tsUtils.node.getSymbolOrThrow(typeChecker, tsUtils.statement.getFunctionOrThrow(neoGlobal, 'syscall')),
   };
 };
 
 export interface Libs {
-  readonly SmartContract: Symbol;
-  readonly MapStorage: Symbol;
-  readonly SetStorage: Symbol;
-  readonly Fixed: Symbol;
-  readonly constant: Symbol;
-  readonly verify: Symbol;
-  readonly createEventHandler: Symbol;
+  readonly SmartContract: ts.Symbol;
+  readonly MapStorage: ts.Symbol;
+  readonly SetStorage: ts.Symbol;
+  readonly Fixed: ts.Symbol;
+  readonly constant: ts.Symbol;
+  readonly verify: ts.Symbol;
+  readonly createEventHandler: ts.Symbol;
 }
 
-const findLibFile = (ast: Project): SourceFile | undefined => {
-  const files = ast.getSourceFiles();
+const findLibFile = (program: ts.Program): ts.SourceFile | undefined => {
+  const files = program.getSourceFiles();
 
-  return files.find((file) => file.getClass('MapStorage') !== undefined);
+  return files.find((file) => tsUtils.statement.getClass(file, 'MapStorage') !== undefined);
 };
 
-export const getLibs = (ast: Project): Libs => {
-  let libFileIn = findLibFile(ast);
-  if (libFileIn === undefined) {
-    ast.addExistingSourceFiles(path.join(path.dirname(require.resolve('@neo-one/smart-contract')), '**', '*.ts'));
-  }
-
-  libFileIn = findLibFile(ast);
+export const getLibs = (program: ts.Program, typeChecker: ts.TypeChecker): Libs => {
+  const libFileIn = findLibFile(program);
   if (libFileIn === undefined) {
     throw new Error('Could not find NEO lib file');
   }
@@ -129,36 +139,39 @@ export const getLibs = (ast: Project): Libs => {
   const libFile = libFileIn;
 
   return {
-    get SmartContract(): Symbol {
-      return libFile.getClassOrThrow('SmartContract').getSymbolOrThrow();
+    get SmartContract(): ts.Symbol {
+      return tsUtils.node.getSymbolOrThrow(typeChecker, tsUtils.statement.getClassOrThrow(libFile, 'SmartContract'));
     },
-    get MapStorage(): Symbol {
-      return libFile.getClassOrThrow('MapStorage').getSymbolOrThrow();
+    get MapStorage(): ts.Symbol {
+      return tsUtils.node.getSymbolOrThrow(typeChecker, tsUtils.statement.getClassOrThrow(libFile, 'MapStorage'));
     },
-    get SetStorage(): Symbol {
-      return libFile.getClassOrThrow('SetStorage').getSymbolOrThrow();
+    get SetStorage(): ts.Symbol {
+      return tsUtils.node.getSymbolOrThrow(typeChecker, tsUtils.statement.getClassOrThrow(libFile, 'SetStorage'));
     },
-    get Fixed(): Symbol {
-      return libFile.getTypeAliasOrThrow('Fixed').getSymbolOrThrow();
+    get Fixed(): ts.Symbol {
+      return tsUtils.node.getSymbolOrThrow(typeChecker, tsUtils.statement.getTypeAliasOrThrow(libFile, 'Fixed'));
     },
-    get constant(): Symbol {
-      return libFile.getFunctionOrThrow('constant').getSymbolOrThrow();
+    get constant(): ts.Symbol {
+      return tsUtils.node.getSymbolOrThrow(typeChecker, tsUtils.statement.getFunctionOrThrow(libFile, 'constant'));
     },
-    get verify(): Symbol {
-      return libFile.getFunctionOrThrow('verify').getSymbolOrThrow();
+    get verify(): ts.Symbol {
+      return tsUtils.node.getSymbolOrThrow(typeChecker, tsUtils.statement.getFunctionOrThrow(libFile, 'verify'));
     },
-    get createEventHandler(): Symbol {
-      return libFile.getFunctionOrThrow('createEventHandler').getSymbolOrThrow();
+    get createEventHandler(): ts.Symbol {
+      return tsUtils.node.getSymbolOrThrow(
+        typeChecker,
+        tsUtils.statement.getFunctionOrThrow(libFile, 'createEventHandler'),
+      );
     },
   };
 };
 
 export interface LibAliases {
-  readonly Address: Set<Identifier>;
-  readonly Hash256: Set<Identifier>;
-  readonly Signature: Set<Identifier>;
-  readonly PublicKey: Set<Identifier>;
-  readonly Fixed: Set<Identifier>;
+  readonly Address: Set<ts.Identifier>;
+  readonly Hash256: Set<ts.Identifier>;
+  readonly Signature: Set<ts.Identifier>;
+  readonly PublicKey: Set<ts.Identifier>;
+  readonly Fixed: Set<ts.Identifier>;
 }
 
 export interface LibAliasesWithReset extends LibAliases {
@@ -167,21 +180,16 @@ export interface LibAliasesWithReset extends LibAliases {
 
 // tslint:disable readonly-keyword
 interface LibAliasesOptional {
-  Address?: Set<Identifier>;
-  Hash256?: Set<Identifier>;
-  Signature?: Set<Identifier>;
-  PublicKey?: Set<Identifier>;
-  Fixed?: Set<Identifier>;
+  Address?: Set<ts.Identifier>;
+  Hash256?: Set<ts.Identifier>;
+  Signature?: Set<ts.Identifier>;
+  PublicKey?: Set<ts.Identifier>;
+  Fixed?: Set<ts.Identifier>;
 }
 // tslint:enable readonly-keyword
 
-export const getLibAliases = (ast: Project): LibAliasesWithReset => {
-  let libFileIn = findLibFile(ast);
-  if (libFileIn === undefined) {
-    ast.addExistingSourceFiles(path.join(path.dirname(require.resolve('@neo-one/smart-contract')), '**', '*.ts'));
-  }
-
-  libFileIn = findLibFile(ast);
+export const getLibAliases = (program: ts.Program, languageService: ts.LanguageService): LibAliasesWithReset => {
+  const libFileIn = findLibFile(program);
   if (libFileIn === undefined) {
     throw new Error('Could not find NEO lib file');
   }
@@ -194,7 +202,11 @@ export const getLibAliases = (ast: Project): LibAliasesWithReset => {
     get Address() {
       if (aliases.Address === undefined) {
         // tslint:disable-next-line no-object-mutation
-        aliases.Address = new Set(libFile.getTypeAliasOrThrow('Address').findReferencesAsNodes() as Identifier[]);
+        aliases.Address = new Set(tsUtils.reference.findReferencesAsNodes(
+          program,
+          languageService,
+          tsUtils.statement.getTypeAliasOrThrow(libFile, 'Address'),
+        ) as ts.Identifier[]);
       }
 
       return aliases.Address;
@@ -202,7 +214,11 @@ export const getLibAliases = (ast: Project): LibAliasesWithReset => {
     get Hash256() {
       if (aliases.Hash256 === undefined) {
         // tslint:disable-next-line no-object-mutation
-        aliases.Hash256 = new Set(libFile.getTypeAliasOrThrow('Hash256').findReferencesAsNodes() as Identifier[]);
+        aliases.Hash256 = new Set(tsUtils.reference.findReferencesAsNodes(
+          program,
+          languageService,
+          tsUtils.statement.getTypeAliasOrThrow(libFile, 'Hash256'),
+        ) as ts.Identifier[]);
       }
 
       return aliases.Hash256;
@@ -210,7 +226,11 @@ export const getLibAliases = (ast: Project): LibAliasesWithReset => {
     get Signature() {
       if (aliases.Signature === undefined) {
         // tslint:disable-next-line no-object-mutation
-        aliases.Signature = new Set(libFile.getTypeAliasOrThrow('Signature').findReferencesAsNodes() as Identifier[]);
+        aliases.Signature = new Set(tsUtils.reference.findReferencesAsNodes(
+          program,
+          languageService,
+          tsUtils.statement.getTypeAliasOrThrow(libFile, 'Signature'),
+        ) as ts.Identifier[]);
       }
 
       return aliases.Signature;
@@ -218,7 +238,11 @@ export const getLibAliases = (ast: Project): LibAliasesWithReset => {
     get PublicKey() {
       if (aliases.PublicKey === undefined) {
         // tslint:disable-next-line no-object-mutation
-        aliases.PublicKey = new Set(libFile.getTypeAliasOrThrow('PublicKey').findReferencesAsNodes() as Identifier[]);
+        aliases.PublicKey = new Set(tsUtils.reference.findReferencesAsNodes(
+          program,
+          languageService,
+          tsUtils.statement.getTypeAliasOrThrow(libFile, 'PublicKey'),
+        ) as ts.Identifier[]);
       }
 
       return aliases.PublicKey;
@@ -226,7 +250,11 @@ export const getLibAliases = (ast: Project): LibAliasesWithReset => {
     get Fixed() {
       if (aliases.Fixed === undefined) {
         // tslint:disable-next-line no-object-mutation
-        aliases.Fixed = new Set(libFile.getTypeAliasOrThrow('Fixed').findReferencesAsNodes() as Identifier[]);
+        aliases.Fixed = new Set(tsUtils.reference.findReferencesAsNodes(
+          program,
+          languageService,
+          tsUtils.statement.getTypeAliasOrThrow(libFile, 'Fixed'),
+        ) as ts.Identifier[]);
       }
 
       return aliases.Fixed;

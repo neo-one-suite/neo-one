@@ -1,15 +1,14 @@
-import { Type } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { Helper } from '../Helper';
 import { Types } from '../types/Types';
 
 export interface TypedHelperOptions {
-  readonly type: Type | undefined;
+  readonly type: ts.Type | undefined;
   readonly knownType?: Types;
 }
 
 export abstract class TypedHelper extends Helper {
-  protected readonly type: Type | undefined;
+  protected readonly type: ts.Type | undefined;
   protected readonly knownType: Types | undefined;
 
   public constructor({ knownType, type }: TypedHelperOptions) {

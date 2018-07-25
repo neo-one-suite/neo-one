@@ -576,8 +576,8 @@ export interface Options {
   readonly secondsPerBlock: number;
 }
 
-export interface TransactionResult<TTransactionReceipt> {
-  readonly transaction: Transaction;
+export interface TransactionResult<TTransactionReceipt, TTransaction extends Transaction = Transaction> {
+  readonly transaction: TTransaction;
   readonly confirmed: (options?: GetOptions) => Promise<TTransactionReceipt>;
 }
 
@@ -606,6 +606,7 @@ export interface DataProvider {
   readonly getContract: (hash: Hash160String, monitor?: Monitor) => Promise<Contract>;
   readonly getMemPool: (monitor?: Monitor) => Promise<ReadonlyArray<Hash256String>>;
   readonly getTransaction: (hash: Hash256String, monitor?: Monitor) => Promise<Transaction>;
+  readonly getOutput: (input: Input, monitor?: Monitor) => Promise<Output>;
   readonly getValidators: (monitor?: Monitor) => Promise<ReadonlyArray<Validator>>;
   readonly getConnectedPeers: (monitor?: Monitor) => Promise<ReadonlyArray<Peer>>;
   readonly getStorage: (hash: Hash160String, key: BufferString, monitor?: Monitor) => Promise<StorageItem>;
@@ -643,9 +644,9 @@ export interface UserAccountProvider {
   readonly updateAccountName: (options: UpdateAccountNameOptions) => Promise<void>;
   readonly execute: (
     script: BufferString,
-    options?: TransactionOptions,
+    options?: InvokeTransactionOptions,
     sourceMap?: RawSourceMap,
-  ) => Promise<TransactionResult<RawInvokeReceipt>>;
+  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
   readonly transfer: (
     transfers: ReadonlyArray<Transfer>,
     options?: TransactionOptions,

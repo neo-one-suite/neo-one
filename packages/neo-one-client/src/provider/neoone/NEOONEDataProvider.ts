@@ -243,6 +243,12 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     return this.convertTransaction(transaction);
   }
 
+  public async getOutput(input: Input, monitor?: Monitor): Promise<Output> {
+    const output = await this.mutableClient.getOutput(input, monitor);
+
+    return this.convertOutput(output);
+  }
+
   public async getValidators(monitor?: Monitor): Promise<ReadonlyArray<Validator>> {
     return this.mutableClient
       .getValidators(monitor)

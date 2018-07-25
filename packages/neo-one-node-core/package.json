@@ -8,7 +8,6 @@
     "@neo-one/monitor": "^1.0.0-alpha.51",
     "@neo-one/utils": "^1.0.0-alpha.56",
     "bn.js": "^4.11.8",
-    "esm": "^3.0.72",
     "rxjs": "^6.2.2",
     "tslib": "^1.9.3"
   }

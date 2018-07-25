@@ -42,13 +42,8 @@ describe('exported api', () => {
     expect(Object.keys(api).sort()).toEqual(EXPECTED.sort());
   });
 
-  test('time to import', async () => {
-    const time = await one.measureImport('@neo-one/client');
-    expect(time).toBeLessThan(1800);
-  });
-
   test('time to require', async () => {
     const time = await one.measureRequire('@neo-one/client');
-    expect(time).toBeLessThan(650);
+    expect(time).toBeLessThan(1300);
   });
 });

@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -10,7 +10,7 @@ import { AddConstructorObjectHelper } from './AddConstructorObjectHelper';
 export class AddErrorObjectHelper extends AddConstructorObjectHelper {
   protected readonly name = 'Error';
 
-  protected addConstructorProperties(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  protected addConstructorProperties(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [objectVal, objectVal, globalObjectVal]
     sb.emitOp(node, 'DUP');
     // ['construct', objectVal, objectVal, globalObjectVal]

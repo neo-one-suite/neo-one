@@ -24,7 +24,38 @@ aliases:
     |
       yarn install --non-interactive --cache-folder ~/.cache/yarn --frozen-lockfile
 
+  - &lint
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - restore-cache: *restore-yarn-cache
+      - run: *yarn
+      - save-cache: *save-yarn-cache
+      - run:
+          name: Prettier
+          command: yarn nit
+      - run:
+          name: Typescript
+          command: yarn tsc
+      - run:
+          name: Lint
+          command: yarn lint
+
   - &test
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - restore-cache: *restore-yarn-cache
+      - run: *yarn
+      - save-cache: *save-yarn-cache
+      - run:
+          name: Test
+          command: yarn test-ci $(circleci tests glob "**/__tests__/**/*.test.ts" | circleci tests split --split-by=timings)
+      - store_test_results:
+          path: reports
+    parallelism: 4
+
+  - &e2e
     working_directory: ~/neo-one
     steps:
       - checkout
@@ -35,24 +66,11 @@ aliases:
           name: Build
           command: yarn build
       - run:
-          name: Prettier
-          command: yarn nit
-      - run:
-          name: Typescript
-          command: yarn tsc
-      - run:
-          name: Lint
-          command: yarn lint
-      - run:
-          name: Test
-          command: yarn test-ci
-      - run:
           name: E2E
-          command: yarn e2e-ci
+          command: yarn e2e-ci $(circleci tests glob "**/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
       - store_test_results:
           path: reports
-      - store_artifacts:
-          path: reports
+    parallelism: 4
 
 node10: &node10
   docker:
@@ -63,6 +81,14 @@ jobs:
   test10:
     <<: *node10
     <<: *test
+
+  e2e10:
+    <<: *node10
+    <<: *e2e
+
+  lint:
+    <<: *node10
+    <<: *lint
 
   deploy-website:
     <<: *node10
@@ -94,4 +120,8 @@ workflows:
   test:
     jobs:
       - test10:
+          filters: *filter-ignore-gh-pages
+      - e2e10:
+          filters: *filter-ignore-gh-pages
+      - lint:
           filters: *filter-ignore-gh-pages

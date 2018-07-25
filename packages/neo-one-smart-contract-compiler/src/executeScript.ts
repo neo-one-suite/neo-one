@@ -7,8 +7,9 @@ import { vm } from '@neo-one/node-vm';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
 import { RawSourceMap } from 'source-map';
-import Project, { SourceFile } from 'ts-simple-ast';
+import ts from 'typescript';
 import { compile } from './compile';
+import { Context } from './Context';
 import { throwOnDiagnosticErrorOrWarning } from './utils';
 
 export interface ExecuteOptions {
@@ -23,8 +24,8 @@ export const EXECUTE_OPTIONS_DEFAULT = {
 
 export const executeScript = async (
   monitor: Monitor,
-  ast: Project,
-  sourceFile: SourceFile,
+  context: Context,
+  sourceFile: ts.SourceFile,
   { prelude = Buffer.alloc(0, 0), ignoreWarnings = false }: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
 ): Promise<{ readonly result: InvocationResult; readonly sourceMap: RawSourceMap }> => {
   const blockchain = await Blockchain.create({
@@ -36,7 +37,7 @@ export const executeScript = async (
     vm,
     monitor,
   });
-  const { code: compiledCode, context, sourceMap } = compile({ ast, sourceFile, addDiagnostics: true });
+  const { code: compiledCode, sourceMap } = compile({ context, sourceFile });
 
   throwOnDiagnosticErrorOrWarning(context.diagnostics, ignoreWarnings);
 

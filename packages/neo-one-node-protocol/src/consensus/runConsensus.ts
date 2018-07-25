@@ -177,6 +177,10 @@ export const runConsensus = async ({
       requestSentContext = newContext.cloneSignatures({ signatures: mutableSignatures });
     }
 
+    if (privateNet) {
+      return checkSignatures({ node, context: requestSentContext });
+    }
+
     signAndRelay({
       context: requestSentContext,
       node,
@@ -192,10 +196,6 @@ export const runConsensus = async ({
         signature: commonUtils.nullthrows(requestSentContext.signatures[requestSentContext.myIndex]),
       }),
     });
-
-    if (privateNet) {
-      return checkSignatures({ node, context: requestSentContext });
-    }
 
     const { secondsPerBlock } = node.blockchain.settings;
 

@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -38,7 +38,7 @@ export class BindFunctionObjectThisHelper extends Helper {
     this.overwrite = options.overwrite;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
 
@@ -64,7 +64,7 @@ export class BindFunctionObjectThisHelper extends Helper {
     sb.emitOp(node, 'DROP');
   }
 
-  private bindThis(sb: ScriptBuilder, node: Node, options: VisitOptions, property: FuncProperty): void {
+  private bindThis(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, property: FuncProperty): void {
     // [this, objectVal, this]
     sb.emitOp(node, 'TUCK');
     // [objectVal, this, objectVal, this]

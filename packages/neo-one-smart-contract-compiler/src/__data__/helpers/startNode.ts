@@ -7,14 +7,18 @@ import {
   LocalKeyStore,
   SmartContract,
   UserAccountID,
+  LocalWallet,
+  RawInvokeReceipt,
+  InvokeTransactionOptions,
+  InvocationTransaction,
+  ReadClient,
 } from '@neo-one/client';
-import { common, UInt160 } from '@neo-one/client-core';
-import { ts } from 'ts-simple-ast';
+import ts from 'typescript';
 import { compile } from '../../compile';
 import { CompileResult } from '../../compile/types';
 import { testNodeSetup } from '../../test';
-import * as utils from '../../utils';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
+import { createContextForSnippet } from '../../createContext';
 
 export interface Result {
   readonly networkName: string;
@@ -27,9 +31,17 @@ export interface Result {
 }
 
 export interface TestNode {
-  readonly addContract: (script: string) => Promise<UInt160>;
+  readonly addContract: (script: string) => Promise<Contract>;
   // tslint:disable-next-line no-any
-  readonly executeString: (script: string) => Promise<any>;
+  readonly executeString: (
+    script: string,
+    options?: InvokeTransactionOptions,
+  ) => Promise<{ readonly receipt: RawInvokeReceipt; readonly transaction: InvocationTransaction }>;
+  readonly compileScript: (script: string) => Promise<CompileResult>;
+  readonly masterWallet: LocalWallet;
+  readonly client: Client;
+  readonly readClient: ReadClient;
+  readonly developerClient: DeveloperClient;
 }
 
 export interface Options {
@@ -50,9 +62,9 @@ export interface InvokeValidateResultOptions {
 }
 
 const getCompiledScript = async (script: string): Promise<CompileResult> => {
-  const { ast, sourceFile } = await utils.getAstForSnippet(script);
+  const { context, sourceFile } = await createContextForSnippet(script);
 
-  return compile({ ast, sourceFile, addDiagnostics: true });
+  return compile({ context, sourceFile });
 };
 
 export const startNode = async (options: StartNodeOptions = {}): Promise<TestNode> => {
@@ -60,7 +72,7 @@ export const startNode = async (options: StartNodeOptions = {}): Promise<TestNod
   const developerClient = new DeveloperClient(provider.read(networkName), userAccountProviders);
 
   return {
-    async addContract(script): Promise<UInt160> {
+    async addContract(script): Promise<Contract> {
       const { code, context } = await getCompiledScript(script);
 
       throwOnDiagnosticErrorOrWarning(context.diagnostics, options.ignoreWarnings);
@@ -89,18 +101,20 @@ export const startNode = async (options: StartNodeOptions = {}): Promise<TestNod
         throw new Error(publishReceipt.result.message);
       }
 
-      return common.stringToUInt160(publishReceipt.result.value.hash);
+      return publishReceipt.result.value;
     },
-    // tslint:disable-next-line no-any
-    async executeString(script): Promise<any> {
+    async executeString(
+      script,
+      options = {},
+    ): Promise<{ readonly receipt: RawInvokeReceipt; readonly transaction: InvocationTransaction }> {
       const { code, sourceMap } = await getCompiledScript(script);
 
-      const result = await developerClient.execute(code.toString('hex'), { from: masterWallet.account.id }, sourceMap);
-      if (!(result.type === 'Void' || result.type === 'InteropInterface')) {
-        return result.value;
-      }
-
-      return undefined;
+      return developerClient.execute(code.toString('hex'), { from: masterWallet.account.id, ...options }, sourceMap);
     },
+    compileScript: getCompiledScript,
+    client,
+    readClient: client.read(networkName),
+    masterWallet,
+    developerClient,
   };
 };

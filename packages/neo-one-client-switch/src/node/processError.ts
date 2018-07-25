@@ -24,7 +24,7 @@ const getSourceMapPosition = ({
   readonly lineNumber: number;
   readonly consumer: SourceMapConsumer;
 }): string | undefined => {
-  const { source, line, column } = consumer.originalPositionFor({ line: lineNumber, column: 0 });
+  const { source, line, column } = consumer.originalPositionFor({ line: lineNumber, column: 1 });
   if (source === null || line === null) {
     return undefined;
   }

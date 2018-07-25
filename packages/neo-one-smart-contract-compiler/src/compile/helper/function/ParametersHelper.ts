@@ -1,20 +1,26 @@
-import { Node, SignaturedDeclaration } from 'ts-simple-ast';
-
+import { ParameteredNode, tsUtils } from '@neo-one/ts-utils';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 // Input: [argsArray]
 // Output: []
-export class ParametersHelper extends Helper<Node & SignaturedDeclaration> {
-  public emit(sb: ScriptBuilder, node: Node & SignaturedDeclaration, optionsIn: VisitOptions): void {
+export class ParametersHelper extends Helper<ParameteredNode> {
+  public emit(sb: ScriptBuilder, node: ParameteredNode, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [argsarr]
-    node.getParameters().forEach((param, idx) => {
-      const name = sb.scope.add(param.getNameOrThrow());
+    tsUtils.parametered.getParameters(node).forEach((param, idx) => {
+      const nameValue = tsUtils.node.getName(param);
+      if (nameValue === undefined) {
+        sb.reportUnsupported(param);
 
-      const initializer = param.getInitializer();
-      if (param.isRestParameter()) {
+        return;
+      }
+
+      const name = sb.scope.add(nameValue);
+
+      const initializer = tsUtils.initializer.getInitializer(param);
+      if (tsUtils.parameter.isRestParameter(param)) {
         // sb.reportUnsupported(param);
       } else if (initializer !== undefined) {
         sb.emitHelper(
@@ -63,7 +69,7 @@ export class ParametersHelper extends Helper<Node & SignaturedDeclaration> {
             },
           }),
         );
-      } else if (param.isOptional()) {
+      } else if (tsUtils.parameter.isOptional(param)) {
         sb.emitHelper(
           param,
           sb.noPushValueOptions(options),
@@ -101,8 +107,8 @@ export class ParametersHelper extends Helper<Node & SignaturedDeclaration> {
         sb.emitOp(param, 'PICKITEM');
       }
 
-      const decorators = param.getDecorators();
-      if (decorators.length > 0) {
+      const decorators = tsUtils.decoratable.getDecorators(param);
+      if (decorators !== undefined && decorators.length > 0) {
         sb.reportUnsupported(param);
       }
 

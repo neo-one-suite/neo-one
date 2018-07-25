@@ -67,7 +67,7 @@ class One {
     let tries = 6;
     let ready = false;
     while (!ready && tries >= 0) {
-      await new Promise((resolve) => setTimeout(() => resolve(), 5000));
+      await new Promise((resolve) => setTimeout(() => resolve(), 500));
       const result = await this._exec('check server --static-neo-one');
       try {
         const lines = result.split('\n').filter((line) => line !== '');
@@ -111,24 +111,20 @@ class One {
     throw finalError;
   }
 
-  async measureImport(mod) {
-    return this._timeRequire(mod, '');
-  }
-
   async measureRequire(mod) {
-    return this._timeRequire(mod, '-es2018-cjs');
+    return this._timeRequire(mod);
   }
 
-  async _timeRequire(mod, ext) {
-    await this._timeRequireSingle(mod, ext);
+  async _timeRequire(mod) {
+    await this._timeRequireSingle(mod);
 
-    return this._timeRequireSingle(mod, ext);
+    return this._timeRequireSingle(mod);
   }
 
-  async _timeRequireSingle(mod, ext) {
+  async _timeRequireSingle(mod) {
     const { stdout } = await execa.shell(
-      `node --eval "const start = Date.now(); require('${mod}${ext}'); console.log(Date.now() - start);"`,
-      { cwd: path.join(appRootDir.get(), 'dist', `neo-one${ext}`) },
+      `node --eval "const start = Date.now(); require('${mod}'); console.log(Date.now() - start);"`,
+      { cwd: path.join(appRootDir.get(), 'dist', 'neo-one') },
     );
 
     return parseInt(stdout);

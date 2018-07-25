@@ -172,7 +172,7 @@ export class WriteBatchBlockchain {
   public readonly getValidators: WriteBlockchain['getValidators'];
   private readonly currentBlockInternal: WriteBlockchain['currentBlock'] | undefined;
   private readonly currentHeaderInternal: WriteBlockchain['currentHeader'] | undefined;
-  private mutableStorage: BlockchainStorage;
+  private readonly storage: BlockchainStorage;
   private readonly vm: VM;
   private readonly caches: Caches;
 
@@ -180,7 +180,7 @@ export class WriteBatchBlockchain {
     this.settings = options.settings;
     this.currentBlockInternal = options.currentBlock;
     this.currentHeaderInternal = options.currentHeader;
-    this.mutableStorage = options.storage;
+    this.storage = options.storage;
     this.vm = options.vm;
     this.getValidators = options.getValidators;
 
@@ -342,14 +342,6 @@ export class WriteBatchBlockchain {
     this.validator = this.caches.validator;
     this.invocationData = this.caches.invocationData;
     this.validatorsCount = this.caches.validatorsCount;
-  }
-
-  public get storage(): BlockchainStorage {
-    return this.mutableStorage;
-  }
-
-  public setStorage(storage: BlockchainStorage): void {
-    this.mutableStorage = storage;
   }
 
   public get currentBlock(): Block {

@@ -21,19 +21,11 @@ const FORMATS = [
   {
     main: true,
     target: 'es2018',
-    module: 'esm',
-  },
-  {
-    target: 'es2018',
     module: 'cjs',
   },
   {
     target: 'esnext',
     module: 'esm',
-  },
-  {
-    target: 'esnext',
-    module: 'cjs',
   },
 ].map(({ target, module, main }) => ({
   target,
@@ -45,9 +37,7 @@ const FORMATS = [
   project: ts.createProject(`tsconfig/tsconfig.${target}.${module}.json`, { typescript }),
 }));
 const MAIN_FORMAT = FORMATS[0];
-const MAIN_BIN_FORMAT = FORMATS[1];
-const TEST_FORMAT = FORMATS[1];
-const ESM_FORMATS = FORMATS.filter(({ module }) => module === 'esm');
+const MAIN_BIN_FORMAT = FORMATS[0];
 
 function getTaskHash(format, ...args) {
   return [format.target, format.module].concat(args.filter((x) => x !== void 0 && x !== '')).join(`:`);
@@ -131,10 +121,12 @@ const getBin = (format, file) => {
 
   const binFiles = fs.readdirSync(binDir);
   return _.fromPairs(
-    binFiles.map((binFile) => {
-      const fileName = path.basename(binFile, '.ts');
-      return [fileName, `./bin/${fileName}`];
-    }),
+    _.flatMap(
+      binFiles.map((binFile) => {
+        const fileName = path.basename(binFile, '.ts');
+        return [[fileName, `./bin/${fileName}`], [`${fileName}.js`, `./bin/${fileName}.js`]];
+      }),
+    ),
   );
 };
 const DEP_MAPPING = {
@@ -176,25 +168,6 @@ const transformBasePackageJSON = (format, orig, file) => {
     repository: pkg.repository,
     bugs: pkg.bugs,
     keywords: pkg.keywords,
-    esm:
-      format.module === 'esm'
-        ? {
-            await: false,
-            cache: true,
-            cjs: {
-              cache: true,
-              extensions: true,
-              interop: true,
-              mutableNamespace: true,
-              namedExports: true,
-              paths: true,
-              topLevelReturn: false,
-              vars: true,
-            },
-            mainFields: ['main'],
-            mode: 'auto',
-          }
-        : undefined,
     bin,
     dependencies:
       orig.dependencies === undefined
@@ -210,7 +183,7 @@ const transformBasePackageJSON = (format, orig, file) => {
 
 const transformSrcPackageJSON = (format, orig, file) => ({
   ...transformBasePackageJSON(format, orig, file),
-  main: format.module === 'esm' ? 'src/index.common.js' : 'src/index.js',
+  main: 'src/index.js',
   module: format.module === 'esm' ? 'src/index.js' : undefined,
   types: 'src/index.ts',
   sideEffects: false,
@@ -223,13 +196,7 @@ const transformSmartContractPackageJSON = (format, orig, file) => ({
 
 const transformBrowserPackageJSON = (format, orig, file) => ({
   ...transformSrcPackageJSON(format, orig, file),
-  browser:
-    format.module === 'esm'
-      ? {
-          './src/index.common.js': './src/index.browser.common.js',
-          './src/index.js': './src/index.browser.js',
-        }
-      : 'src/index.browser.js',
+  browser: 'src/index.browser.js',
 });
 
 const transformPackageJSON = (format, orig, file) =>
@@ -342,7 +309,6 @@ const buildAll = ((cache) =>
         copyFiles(format),
         copyRootPkg(format),
         buildTypescript(format),
-        format.module === 'esm' ? 'createIndex' : undefined,
         format === MAIN_FORMAT ? 'buildBin' : undefined,
       ].filter((task) => task !== undefined),
     )(done);
@@ -350,7 +316,10 @@ const buildAll = ((cache) =>
 
 const install = ((cache) =>
   memoizeTask(cache, async function install(format) {
-    await execa.shell('yarn install', { cwd: getDistBaseCWD(format), stdio: ['ignore', 'inherit', 'inherit'] });
+    await execa.shell('yarn install --non-interactive --frozen-lockfile --no-progress', {
+      cwd: getDistBaseCWD(format),
+      stdio: ['ignore', 'inherit', 'inherit'],
+    });
   }))({});
 
 const publish = ((cache) =>
@@ -371,32 +340,6 @@ const copyRootPkg = ((cache) =>
     await fs.writeFile(filePath, JSON.stringify(rootPkg, null, 2));
   }))({});
 
-const createIndexFile = async (filePkgs, file, indexContents) => {
-  await Promise.all(
-    filePkgs.map(async (p) => {
-      await Promise.all(
-        ESM_FORMATS.map(async (format) => {
-          const filePath = path.join(getDest(format), p, 'src', file);
-          await fs.mkdirp(path.dirname(filePath));
-          await fs.writeFile(filePath, indexContents);
-        }),
-      );
-    }),
-  );
-};
-const index = `require = require('esm')(module);
-module.exports = require('./index.js');
-`;
-const browserIndex = `require = require('esm')(module);
-module.exports = require('./index.browser.js');
-`;
-gulp.task('createIndex', async () => {
-  await Promise.all([
-    createIndexFile(indexPkgs, 'index.common.js', index),
-    createIndexFile(browserPkgs, 'index.browser.common.js', browserIndex),
-  ]);
-});
-
 const gulpBin = () =>
   gulpReplaceModule(MAIN_FORMAT, gulp.src(globs.bin)).pipe(
     gulpRename((file) => {
@@ -406,7 +349,6 @@ const gulpBin = () =>
 
 const binProject = ts.createProject(MAIN_BIN_FORMAT.tsconfig, { typescript });
 const binBanner = `#!/usr/bin/env node
-require = require('esm')(module);
 require('source-map-support').install({ handleUncaughtExceptions: false, environment: 'node' });
 `;
 gulp.task('compileBin', () =>
@@ -416,15 +358,26 @@ gulp.task('compileBin', () =>
     .pipe(gulpBanner(binBanner))
     .pipe(gulpSourcemaps.mapSources(mapSources))
     .pipe(gulpSourcemaps.write())
+    .pipe(gulp.dest(getDest(MAIN_FORMAT))),
+);
+const bin = (name) => `#! /bin/sh
+DIR="\${0%/*}"
+exec /usr/bin/env node --no-warnings "$DIR/${name}" "$@"
+`;
+gulp.task('createBin', () =>
+  gulp
+    .src(globs.bin)
     .pipe(
       gulpRename((file) => {
+        file.extname = '.js';
+        file.contents = bin(file.basename);
         file.extname = '';
       }),
     )
     .pipe(gulp.dest(getDest(MAIN_FORMAT))),
 );
 gulp.task('copyBin', () => gulpBin().pipe(gulp.dest(getDest(MAIN_FORMAT))));
-gulp.task('buildBin', gulp.parallel('compileBin', 'copyBin'));
+gulp.task('buildBin', gulp.parallel('compileBin', 'createBin', 'copyBin'));
 
 gulp.task('clean', () => fs.remove(DIST));
 gulp.task('copyPkg', gulp.parallel(FORMATS.map((format) => copyPkg(format))));
@@ -439,18 +392,14 @@ gulp.task('publish', gulp.parallel(FORMATS.map((format) => publish(format))));
 
 gulp.task('build', gulp.series('clean', 'buildAll', 'install'));
 
-const buildE2ESeries = (type) =>
-  gulp.series(
-    gulp.parallel(buildAll(MAIN_FORMAT, type), buildAll(TEST_FORMAT, type)),
-    gulp.parallel(install(MAIN_FORMAT), install(TEST_FORMAT)),
-  );
+const buildE2ESeries = (type) => gulp.series(buildAll(MAIN_FORMAT, type), install(MAIN_FORMAT));
 gulp.task('buildE2E', gulp.series('clean', buildE2ESeries()));
 
 gulp.task(
   'watch',
   gulp.series(buildE2ESeries('fast'), function startWatch() {
     noCache = true;
-    gulp.watch(globs.src, gulp.parallel(buildTypescript(MAIN_FORMAT, 'fast'), buildTypescript(TEST_FORMAT, 'fast')));
+    gulp.watch(globs.src, buildTypescript(MAIN_FORMAT, 'fast'));
     gulp.watch(globs.bin, gulp.series('buildBin'));
   }),
 );

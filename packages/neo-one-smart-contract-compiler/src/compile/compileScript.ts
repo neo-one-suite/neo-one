@@ -1,13 +1,11 @@
-import * as path from 'path';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import { createContextForPath } from '../createContext';
+import { compile } from './compile';
 import { CompileResult } from './types';
 
-import * as utils from '../utils';
-import { compile } from './compile';
-
 export const compileScript = async (scriptPath: string): Promise<CompileResult> => {
-  const ast = await utils.getAst(path.dirname(scriptPath));
-  const sourceFile = ast.getSourceFileOrThrow(scriptPath);
+  const context = await createContextForPath(scriptPath);
+  const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, scriptPath);
 
-  return compile({ ast, sourceFile, addDiagnostics: true });
+  return compile({ context, sourceFile });
 };

@@ -26,7 +26,7 @@ export const killProcess = async (pid: number): Promise<void> => {
 
       throw error;
     }
-    await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+    await new Promise<void>((resolve) => setTimeout(resolve, 200));
     alive = isRunning(pid);
     if (!alive) {
       return;

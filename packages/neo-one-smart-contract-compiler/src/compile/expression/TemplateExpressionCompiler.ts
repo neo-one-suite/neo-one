@@ -1,13 +1,12 @@
-import { SyntaxKind, TemplateExpression } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class TemplateExpressionCompiler extends NodeCompiler<TemplateExpression> {
-  public readonly kind: SyntaxKind = SyntaxKind.TemplateExpression;
+export class TemplateExpressionCompiler extends NodeCompiler<ts.TemplateExpression> {
+  public readonly kind = ts.SyntaxKind.TemplateExpression;
 
-  public visitNode(sb: ScriptBuilder, expr: TemplateExpression, _options: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, expr: ts.TemplateExpression, _options: VisitOptions): void {
     sb.reportUnsupported(expr);
   }
 }

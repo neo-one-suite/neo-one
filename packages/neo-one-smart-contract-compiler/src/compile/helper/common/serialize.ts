@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -8,7 +8,7 @@ export enum SerializableType {
   Buffer = 8,
 }
 
-const invokeGlobal = (sb: ScriptBuilder, node: Node, options: VisitOptions, name: string) => {
+const invokeGlobal = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions, name: string) => {
   // [1, val]
   sb.emitPushInt(node, 1);
   // [argsarr]
@@ -25,15 +25,15 @@ const invokeGlobal = (sb: ScriptBuilder, node: Node, options: VisitOptions, name
 
 export const SERIALIZE_NAME = 'genericSerialize';
 
-export const invokeSerialize = (sb: ScriptBuilder, node: Node, options: VisitOptions) =>
+export const invokeSerialize = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) =>
   invokeGlobal(sb, node, options, SERIALIZE_NAME);
 
 export const DESERIALIZE_NAME = 'genericDeserialize';
 
-export const invokeDeserialize = (sb: ScriptBuilder, node: Node, options: VisitOptions) =>
+export const invokeDeserialize = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) =>
   invokeGlobal(sb, node, options, DESERIALIZE_NAME);
 
-export const serializeType = (sb: ScriptBuilder, node: Node, _options: VisitOptions, type: SerializableType) => {
+export const serializeType = (sb: ScriptBuilder, node: ts.Node, _options: VisitOptions, type: SerializableType) => {
   // [type, arr]
   sb.emitPushInt(node, type);
   // [2, type, arr]
@@ -42,14 +42,14 @@ export const serializeType = (sb: ScriptBuilder, node: Node, _options: VisitOpti
   sb.emitOp(node, 'PACK');
 };
 
-export const deserializeType = (sb: ScriptBuilder, node: Node, _options: VisitOptions) => {
+export const deserializeType = (sb: ScriptBuilder, node: ts.Node, _options: VisitOptions) => {
   // [1, arr]
   sb.emitPushInt(node, 1);
   // [value]
   sb.emitOp(node, 'PICKITEM');
 };
 
-const isSerializedType = (sb: ScriptBuilder, node: Node, _options: VisitOptions, type: SerializableType) => {
+const isSerializedType = (sb: ScriptBuilder, node: ts.Node, _options: VisitOptions, type: SerializableType) => {
   // [0, val]
   sb.emitPushInt(node, 0);
   // [type]
@@ -60,7 +60,7 @@ const isSerializedType = (sb: ScriptBuilder, node: Node, _options: VisitOptions,
   sb.emitOp(node, 'NUMEQUAL');
 };
 
-export const getTypes = (sb: ScriptBuilder, node: Node, options: VisitOptions) => [
+export const getTypes = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) => [
   {
     isRuntimeType: () => {
       // [isBoolean]

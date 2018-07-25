@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -32,7 +32,7 @@ export class CloneFunctionObjectHelper extends Helper {
     }
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
 
@@ -53,7 +53,7 @@ export class CloneFunctionObjectHelper extends Helper {
     }
   }
 
-  public cloneFunction(sb: ScriptBuilder, node: Node, options: VisitOptions, property: FuncProperty): void {
+  public cloneFunction(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, property: FuncProperty): void {
     // [objectVal, objectVal]
     sb.emitOp(node, 'DUP');
     // [property, objectVal, objectVal]

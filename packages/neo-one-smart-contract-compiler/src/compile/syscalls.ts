@@ -1,42 +1,41 @@
 // tslint:disable variable-name no-unused
-import { common, SysCallName } from '@neo-one/client-core';
+import { SysCallName } from '@neo-one/client-core';
+import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
-import { CallExpression, Node, Type, TypeGuards } from 'ts-simple-ast';
-import { ScriptBuilder } from './sb';
-import { VisitOptions } from './types';
-
+import ts from 'typescript';
 import { DiagnosticCode } from '../DiagnosticCode';
-import * as typeUtils from '../typeUtils';
 import { deserializeType, SerializableType, serializeType } from './helper';
 import { BlockchainInterfaceName } from './helper/blockchain';
 import { ForType } from './helper/common';
+import { ScriptBuilder } from './sb';
+import { VisitOptions } from './types';
 
 export interface SysCallType {
   readonly name: string;
 
   readonly toSignature: () => string;
-  readonly handleArgument: (sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type) => void;
-  readonly handleResult: (sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type) => void;
+  readonly handleArgument: (sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type) => void;
+  readonly handleResult: (sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type) => void;
 }
 
 abstract class SimpleSysCallType implements SysCallType {
   public abstract readonly name: string;
 
-  public abstract isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean;
-  public abstract hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean;
-  public abstract isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void;
+  public abstract isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean;
+  public abstract hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean;
+  public abstract isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void;
   public abstract handleArgument(
     sb: ScriptBuilder,
-    node: Node,
+    node: ts.Node,
     options: VisitOptions,
-    type?: Type,
+    type?: ts.Type,
     native?: boolean,
   ): void;
   public abstract handleResult(
     sb: ScriptBuilder,
-    node: Node,
+    node: ts.Node,
     options: VisitOptions,
-    type?: Type,
+    type?: ts.Type,
     native?: boolean,
   ): void;
 
@@ -48,23 +47,23 @@ abstract class SimpleSysCallType implements SysCallType {
 class VoidClass extends SimpleSysCallType {
   public readonly name = 'void';
 
-  public isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
+  public isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
     return false;
   }
 
-  public hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
+  public hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
     return false;
   }
 
-  public isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     throw new Error('Should not check void at runtime');
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type): void {
     throw new Error('void should not be an argument');
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     sb.emitHelper(node, options, sb.helpers.createUndefined);
   }
 }
@@ -74,26 +73,26 @@ const VoidValue = new VoidClass();
 class UndefinedClass extends SimpleSysCallType {
   public readonly name = 'undefined';
 
-  public isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    return typeUtils.isOnlyUndefined(type);
+  public isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    return type !== undefined && tsUtils.type_.isOnlyUndefined(type);
   }
 
-  public hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    return typeUtils.hasUndefined(type);
+  public hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    return type !== undefined && tsUtils.type_.hasUndefined(type);
   }
 
-  public isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     sb.emitHelper(node, options, sb.helpers.isUndefined);
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (!native) {
       sb.emitOp(node, 'DROP');
       sb.emitOp(node, 'PUSH0');
     }
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (!native) {
       sb.emitHelper(node, options, sb.helpers.createUndefined);
     }
@@ -105,25 +104,25 @@ const UndefinedValue = new UndefinedClass();
 class NumberClass extends SimpleSysCallType {
   public readonly name = 'number';
 
-  public isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    return typeUtils.isOnlyNumber(type);
+  public isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    return type !== undefined && tsUtils.type_.isOnlyNumberish(type);
   }
 
-  public hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    return typeUtils.hasNumber(type);
+  public hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    return type !== undefined && tsUtils.type_.hasNumberish(type);
   }
 
-  public isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     sb.emitHelper(node, options, sb.helpers.isNumber);
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (!native) {
       sb.emitHelper(node, options, sb.helpers.getNumber);
     }
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (!native) {
       sb.emitHelper(node, options, sb.helpers.createNumber);
     }
@@ -135,25 +134,25 @@ const NumberValue = new NumberClass();
 class StringClass extends SimpleSysCallType {
   public readonly name = 'string';
 
-  public isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    return typeUtils.isOnlyString(type);
+  public isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    return type !== undefined && tsUtils.type_.isOnlyStringish(type);
   }
 
-  public hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    return typeUtils.hasString(type);
+  public hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    return type !== undefined && tsUtils.type_.hasStringish(type);
   }
 
-  public isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     sb.emitHelper(node, options, sb.helpers.isString);
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (!native) {
       sb.emitHelper(node, options, sb.helpers.getString);
     }
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (!native) {
       sb.emitHelper(node, options, sb.helpers.createString);
     }
@@ -165,25 +164,25 @@ const StringValue = new StringClass();
 class BooleanClass extends SimpleSysCallType {
   public readonly name = 'boolean';
 
-  public isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    return typeUtils.isOnlyBoolean(type);
+  public isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    return type !== undefined && tsUtils.type_.isOnlyBooleanish(type);
   }
 
-  public hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    return typeUtils.hasBoolean(type);
+  public hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    return type !== undefined && tsUtils.type_.hasBooleanish(type);
   }
 
-  public isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     sb.emitHelper(node, options, sb.helpers.isBoolean);
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (!native) {
       sb.emitHelper(node, options, sb.helpers.getBoolean);
     }
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (!native) {
       sb.emitHelper(node, options, sb.helpers.createBoolean);
     }
@@ -192,7 +191,7 @@ class BooleanClass extends SimpleSysCallType {
 
 const BooleanValue = new BooleanClass();
 
-const isObject = (sb: ScriptBuilder, node: Node, options: VisitOptions, whenTrue: () => void) => {
+const isObject = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions, whenTrue: () => void) => {
   sb.emitHelper(
     node,
     options,
@@ -220,28 +219,28 @@ class BlockchainInterface extends SimpleSysCallType {
     this.name = name;
   }
 
-  public isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
+  public isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
     return sb.isOnlyGlobal(node, type, this.name);
   }
 
-  public hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
+  public hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
     return sb.hasGlobal(node, type, this.name);
   }
 
-  public isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     isObject(sb, node, options, () =>
       sb.emitHelper(node, options, sb.helpers.isBlockchainInterface({ name: this.name })),
     );
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (native) {
       throw new Error('BlockchainInterface should not be serialized/deserialized from storage');
     }
     sb.emitHelper(node, options, sb.helpers.unwrapBlockchainInterface);
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (native) {
       throw new Error('BlockchainInterface should not be serialized/deserialized from storage');
     }
@@ -282,29 +281,29 @@ export const BLOCKCHAIN_INTERFACES = [
 class BufferClass extends SimpleSysCallType {
   public readonly name: 'Buffer' = 'Buffer';
 
-  public isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
+  public isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
     return sb.isOnlyGlobal(node, type, this.name);
   }
 
-  public hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
+  public hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
     return sb.hasGlobal(node, type, this.name);
   }
 
-  public isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     isObject(sb, node, options, () => {
       sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: this.name }));
       sb.emitHelper(node, options, sb.helpers.instanceof);
     });
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
     if (native) {
       serializeType(sb, node, options, SerializableType.Buffer);
     }
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (native) {
       deserializeType(sb, node, options);
     }
@@ -324,42 +323,45 @@ class ArrayValue extends SimpleSysCallType {
     this.valueType = typeof valueType === 'function' ? valueType : () => valueType;
   }
 
-  public isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
+  public isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
     return (
-      typeUtils.isOnlyArray(type) &&
-      !typeUtils.isOnlyTuple(type) &&
       type !== undefined &&
-      this.valueType().isOnlyType(sb, node, type.getArrayType())
+      tsUtils.type_.isOnlyArray(type) &&
+      this.valueType().isOnlyType(sb, node, tsUtils.type_.getArrayType(type))
     );
   }
 
-  public hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    if (!typeUtils.hasArray(type) && !typeUtils.isTuple(type)) {
+  public hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    if (type === undefined || !tsUtils.type_.hasArray(type)) {
       return false;
     }
 
-    const arrayTypes = typeUtils.getArrayTypes(type);
+    const arrayTypes = tsUtils.type_.getArrayTypes(type);
 
-    return arrayTypes.some(
-      (arrayType) => !typeUtils.isTuple(arrayType) && this.valueType().hasType(sb, node, arrayType.getArrayType()),
-    );
+    return arrayTypes.some((arrayType) => this.valueType().hasType(sb, node, tsUtils.type_.getArrayType(arrayType)));
   }
 
-  public isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     isObject(sb, node, options, () => {
       sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Array' }));
       sb.emitHelper(node, options, sb.helpers.instanceof);
     });
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     sb.emitHelper(node, options, sb.helpers.unwrapArray);
     sb.emitHelper(
       node,
       options,
       sb.helpers.arrMap({
         map: () => {
-          this.valueType().handleArgument(sb, node, options, type === undefined ? type : type.getArrayType(), native);
+          this.valueType().handleArgument(
+            sb,
+            node,
+            options,
+            type === undefined ? type : tsUtils.type_.getArrayType(type),
+            native,
+          );
         },
       }),
     );
@@ -368,7 +370,7 @@ class ArrayValue extends SimpleSysCallType {
     }
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (native) {
       deserializeType(sb, node, options);
     }
@@ -377,7 +379,13 @@ class ArrayValue extends SimpleSysCallType {
       options,
       sb.helpers.arrMap({
         map: () => {
-          this.valueType().handleResult(sb, node, options, type === undefined ? type : type.getArrayType(), native);
+          this.valueType().handleResult(
+            sb,
+            node,
+            options,
+            type === undefined ? type : tsUtils.type_.getArrayType(type),
+            native,
+          );
         },
       }),
     );
@@ -395,38 +403,52 @@ class TupleValue extends SimpleSysCallType {
     this.valueType = typeof valueType === 'function' ? valueType : () => valueType;
   }
 
-  public isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    return (
-      typeUtils.isOnlyTuple(type) &&
-      type !== undefined &&
-      type.getTupleElements().every((tupleType) => this.valueType().isOnlyType(sb, node, tupleType))
-    );
-  }
-
-  public hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    if (!typeUtils.hasTuple(type)) {
+  public isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    if (type === undefined) {
       return false;
     }
 
-    const tupleTypes = typeUtils.getTupleTypes(type);
+    const tupleElements = tsUtils.type_.getTupleElements(type);
 
-    return tupleTypes.some((tupleType) =>
-      tupleType.getTupleElements().every((elementType) => this.valueType().hasType(sb, node, elementType)),
+    return (
+      tupleElements !== undefined &&
+      tupleElements.every((tupleType) => this.valueType().isOnlyType(sb, node, tupleType))
     );
   }
 
-  public isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    if (type === undefined) {
+      return false;
+    }
+
+    if (!tsUtils.type_.hasTuple(type)) {
+      return false;
+    }
+
+    const tupleTypes = tsUtils.type_.getTupleTypes(type);
+
+    return tupleTypes.some((tupleType) => {
+      const innerTupleElements = tsUtils.type_.getTupleElements(tupleType);
+
+      return (
+        innerTupleElements !== undefined &&
+        innerTupleElements.every((elementType) => this.valueType().hasType(sb, node, elementType))
+      );
+    });
+  }
+
+  public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     isObject(sb, node, options, () => {
       sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Array' }));
       sb.emitHelper(node, options, sb.helpers.instanceof);
     });
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     throw new Error('Not Implemented');
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (type === undefined) {
       sb.reportError(
         node,
@@ -442,7 +464,8 @@ class TupleValue extends SimpleSysCallType {
       sb.emitPushInt(node, 0);
       // [arr, ...value]
       sb.emitOp(node, 'NEWARRAY');
-      type.getTupleElements().forEach((tupleType) => {
+      const tupleElements = tsUtils.type_.getTupleElements(type);
+      (tupleElements === undefined ? [] : tupleElements).forEach((tupleType) => {
         // [arr, arr, ...value]
         sb.emitOp(node, 'DUP');
         // [value, arr, arr, ...value]
@@ -468,37 +491,39 @@ class UnionValue extends SimpleSysCallType {
     this.valueTypes = valueTypes;
   }
 
-  public isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    return (
-      (typeUtils.isUnion(type) &&
-        type !== undefined &&
-        type
-          .getUnionTypes()
-          .every((unionType) => this.valueTypes.some((valueType) => valueType.isOnlyType(sb, node, unionType)))) ||
-      (!typeUtils.isUnion(type) &&
-        type !== undefined &&
-        this.valueTypes.some((valueType) => valueType.isOnlyType(sb, node, type)))
+  public isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    if (type === undefined) {
+      return false;
+    }
+
+    const unionTypes = tsUtils.type_.getUnionTypes(type);
+    if (unionTypes === undefined) {
+      return this.valueTypes.some((valueType) => valueType.isOnlyType(sb, node, type));
+    }
+
+    return unionTypes.every((unionType) =>
+      this.valueTypes.some((valueType) => valueType.isOnlyType(sb, node, unionType)),
     );
   }
 
-  public hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
-    return (
-      (typeUtils.isUnion(type) &&
-        type !== undefined &&
-        type
-          .getUnionTypes()
-          .every((unionType) => this.valueTypes.some((valueType) => valueType.hasType(sb, node, unionType)))) ||
-      (!typeUtils.isUnion(type) &&
-        type !== undefined &&
-        this.valueTypes.some((valueType) => valueType.hasType(sb, node, type)))
-    );
+  public hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
+    if (type === undefined) {
+      return false;
+    }
+
+    const unionTypes = tsUtils.type_.getUnionTypes(type);
+    if (unionTypes === undefined) {
+      return this.valueTypes.some((valueType) => valueType.hasType(sb, node, type));
+    }
+
+    return unionTypes.every((unionType) => this.valueTypes.some((valueType) => valueType.hasType(sb, node, unionType)));
   }
 
-  public isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     throw new Error('Union should not be checked at runtime');
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     const foundType = this.valueTypes.find((valueType) => valueType.isOnlyType(sb, node, type));
     if (foundType === undefined) {
       if (native) {
@@ -522,7 +547,7 @@ class UnionValue extends SimpleSysCallType {
     }
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = false): void {
+  public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     const foundType = this.valueTypes.find((valueType) => valueType.isOnlyType(sb, node, type));
     if (foundType === undefined) {
       if (native) {
@@ -598,19 +623,19 @@ class Serializable extends SimpleSysCallType {
     return SerializableValueAlias.toDeclaration();
   }
 
-  public isOnlyType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
+  public isOnlyType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
     return this.type.isOnlyType(sb, node, type);
   }
 
-  public hasType(sb: ScriptBuilder, node: Node, type?: Type): boolean {
+  public hasType(sb: ScriptBuilder, node: ts.Node, type?: ts.Type): boolean {
     return this.type.hasType(sb, node, type);
   }
 
-  public isRuntimeType(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     this.type.isRuntimeType(sb, node, options);
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type, native = true): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = true): void {
     this.type.handleArgument(sb, node, options, type, native);
 
     if (this.shouldSerialize) {
@@ -618,16 +643,12 @@ class Serializable extends SimpleSysCallType {
     }
   }
 
-  public handleResult(sb: ScriptBuilder, node: Node, options: VisitOptions, typeIn?: Type, native = true): void {
-    let type = typeIn;
-    if (
+  public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = true): void {
+    const handleNull =
       type !== undefined &&
       this.shouldHandleNull &&
-      type.isUnion() &&
-      type.getUnionTypes().some((unionType) => typeUtils.isOnlyUndefined(unionType))
-    ) {
-      type = type.getUnionTypes().find((unionType) => !typeUtils.isOnlyUndefined(unionType));
-    }
+      tsUtils.type_.isUnion(type) &&
+      tsUtils.type_.getUnionTypesArray(type).some((unionType) => tsUtils.type_.isOnlyUndefined(unionType));
 
     const handleValue = () => {
       if (this.shouldSerialize) {
@@ -637,7 +658,7 @@ class Serializable extends SimpleSysCallType {
       this.type.handleResult(sb, node, options, type, native);
     };
 
-    if (this.shouldHandleNull) {
+    if (handleNull) {
       sb.emitHelper(
         node,
         options,
@@ -688,7 +709,7 @@ export class SysCallArgument {
     this.type = type;
   }
 
-  public handleArgument(sb: ScriptBuilder, node: Node, options: VisitOptions, type?: Type): void {
+  public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type): void {
     this.type.handleArgument(sb, node, options, type);
   }
 
@@ -700,7 +721,7 @@ export class SysCallArgument {
 export interface SysCall {
   readonly name: string;
   readonly toDeclaration: () => string;
-  readonly handleCall: (sb: ScriptBuilder, node: CallExpression, options: VisitOptions) => void;
+  readonly handleCall: (sb: ScriptBuilder, node: ts.CallExpression, options: VisitOptions) => void;
 }
 
 export interface SimpleSysCallOptions {
@@ -726,9 +747,9 @@ export class SimpleSysCall implements SysCall {
     return `function syscall(${args.join(', ')}): ${this.returnType.toSignature()};`;
   }
 
-  public handleCall(sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions): void {
+  public handleCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
-    const args = _.reverse([...node.getArguments().slice(1)]);
+    const args = _.reverse([...tsUtils.argumented.getArguments(node).slice(1)]);
     args.forEach((arg, idx) => {
       sb.visit(arg, options);
       this.args[args.length - idx - 1].handleArgument(sb, arg, options, sb.getType(arg));
@@ -767,9 +788,9 @@ export const SYSCALLS = {
 
         return `function syscall(name: '${name}', ...args: ${sig}): ${returnType.toSignature()};`;
       },
-      handleCall(sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions): void {
+      handleCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
         const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
-        const args = _.reverse([...node.getArguments().slice(1)]);
+        const args = _.reverse([...tsUtils.argumented.getArguments(node).slice(1)]);
         args.forEach((arg) => {
           sb.visit(arg, options);
           valueType.handleArgument(sb, arg, options, sb.getType(arg));
@@ -1184,9 +1205,9 @@ export const SYSCALLS = {
 
         return `function syscall(name: '${name}', value: ${sig}): ${returnType.toSignature()};`;
       },
-      handleCall(sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions): void {
+      handleCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
         const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
-        const arg = node.getArguments()[1];
+        const arg = tsUtils.argumented.getArguments(node)[1];
         sb.visit(arg, options);
         valueType.handleArgument(sb, arg, options, sb.getType(arg));
       },
@@ -1212,9 +1233,9 @@ export const SYSCALLS = {
 
         return `function syscall(name: '${name}', idx: ${sig}): any;`;
       },
-      handleCall(sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions): void {
+      handleCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
         const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
-        const arg = node.getArguments()[1];
+        const arg = tsUtils.argumented.getArguments(node)[1];
         sb.visit(arg, options);
         sb.emitHelper(arg, options, sb.helpers.getArgument({ type: sb.getType(arg) }));
         if (optionsIn.pushValue) {
@@ -1237,45 +1258,49 @@ export const SYSCALLS = {
 
         return `function syscall(name: '${name}', hash: Buffer, ...args: Array<${sig}>): ${returnType.toSignature()};`;
       },
-      handleCall(sb: ScriptBuilder, node: CallExpression, optionsIn: VisitOptions): void {
+      handleCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
         const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
 
         // exprCall  = Buffer.from("1225ACFA1", "hex"),
-        const exprCall = node.getArguments()[1];
+        const exprCall = tsUtils.argumented.getArguments(node)[1];
 
-        if (!TypeGuards.isCallExpression(exprCall)) {
-          throw new Error('ARG[1] Expecting callExpression ');
+        if (!ts.isCallExpression(exprCall)) {
+          sb.reportUnsupported(node);
+
+          return;
         }
 
-        // exprCallObj = [Buffer.from]
-        const exprCallObj = exprCall.getExpression();
+        const symbol = sb.getSymbol(tsUtils.expression.getExpression(exprCall));
+        if (symbol === undefined || !sb.isGlobalSymbol(node, symbol, 'BufferFrom')) {
+          sb.reportUnsupported(node);
 
-        if (!TypeGuards.isPropertyAccessExpression(exprCallObj)) {
-          throw new Error('Expected: Property Access expression');
+          return;
         }
 
-        // exprCallObjName = "Buffer"
-        const exprCallObjName = exprCallObj.getExpression();
+        const args = tsUtils.argumented.getArguments(exprCall);
+        if (args.length !== 2) {
+          sb.reportUnsupported(node);
 
-        // exprCallObjFnx = "from"
-        const exprCallObjFnxName = exprCallObj.getName();
+          return;
+        }
 
+        const hash = args[0];
+        const encoding = args[1];
         if (
-          !(TypeGuards.isIdentifier(exprCallObjName) && exprCallObjName.getText() === 'Buffer') ||
-          !(exprCallObjFnxName === 'from')
+          !ts.isStringLiteral(hash) ||
+          !ts.isStringLiteral(encoding) ||
+          tsUtils.literal.getLiteralValue(encoding) !== 'hex'
         ) {
-          throw new Error('Expected "Buffer.from" expression');
+          sb.reportUnsupported(node);
+
+          return;
         }
 
-        const argContractId = exprCall.getArguments()[0];
-        if (!TypeGuards.isStringLiteral(argContractId)) {
-          throw new Error(`Expected contract identifier with Neo.Runtime.CallContract but got: ${exprCall.getText()}`);
-        }
+        const contractIDHex = Buffer.from(tsUtils.literal.getLiteralValue(hash), 'hex');
 
-        const contractIDHex = common.stringToUInt160(argContractId.getLiteralValue());
         // tslint:disable-next-line no-array-mutation
-        const args = [...node.getArguments().slice(2)].reverse();
-        args.forEach((arg) => {
+        const callArgs = [...tsUtils.argumented.getArguments(node).slice(2)].reverse();
+        callArgs.forEach((arg) => {
           sb.visit(arg, options);
           valueType.handleArgument(sb, arg, options, sb.getType(arg), false);
         });

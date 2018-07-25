@@ -47,6 +47,7 @@ export namespace finalize {
   export const shutdownPromises = new Map<number, Promise<void>>();
   export const wait = async () => {
     const promises = [...shutdownPromises.values()];
+    shutdownPromises.clear();
     if (promises.length === 0) {
       return;
     }

@@ -1,25 +1,23 @@
-/* eslint-disable */
-
 module.exports = function(wallaby) {
   return {
     files: [
       { pattern: 'jest/**/*', instrument: false },
       { pattern: 'scripts/serializers/**/*.js', instrument: false },
       { pattern: 'scripts/test/jestSetup.js', instrument: false },
+      { pattern: 'package.json', instrument: false },
+      { pattern: 'packages/*/package.json', instrument: false },
+      { pattern: 'tsconfig.json', instrument: false },
+      { pattern: 'tsconfig.sc.json', instrument: false },
+      { pattern: 'packages/*/tsconfig.json', instrument: false },
+      { pattern: 'packages/neo-one-smart-contract-compiler/tsconfig.default.json', instrument: false },
       'packages/*/src/**/*.ts?(x)',
       'packages/*/src/**/*.snap',
-      'packages/*/package.json',
-      '!packages/neo-one-smart-contract-compiler/src/**/*.ts',
-      '!packages/neo-one-smart-contract-lib/src/**/*.ts',
-      '!packages/neo-one-smart-contract/src/**/*.ts',
+      '!packages/neo-one-server-*/src/**/*.ts?(x)',
+      '!packages/neo-one-cli/src/**/*.ts?(x)',
       '!packages/*/src/**/*.test.ts?(x)',
       '!packages/*/src/__e2e__/**/*.ts?(x)',
     ],
-    tests: [
-      'packages/*/src/**/__tests__/**/*.test.ts?(x)',
-      '!packages/neo-one-smart-contract-compiler/src/**/__tests__/**/*.test.ts?(x)',
-      '!packages/neo-one-smart-contract-lib/src/**/__tests__/**/*.test.ts?(x)',
-    ],
+    tests: ['packages/*/src/**/__tests__/**/*.test.ts?(x)'],
     env: {
       type: 'node',
       runner: 'node',

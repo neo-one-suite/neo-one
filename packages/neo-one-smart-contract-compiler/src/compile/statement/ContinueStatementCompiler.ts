@@ -1,17 +1,16 @@
-import { ContinueStatement, SyntaxKind } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
+import * as constants from '../../constants';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-import * as constants from '../../constants';
+export class ContinueStatementCompiler extends NodeCompiler<ts.ContinueStatement> {
+  public readonly kind = ts.SyntaxKind.ContinueStatement;
 
-export class ContinueStatementCompiler extends NodeCompiler<ContinueStatement> {
-  public readonly kind: SyntaxKind = SyntaxKind.ContinueStatement;
-
-  public visitNode(sb: ScriptBuilder, node: ContinueStatement, options: VisitOptions): void {
-    const label = node.getLabel();
+  public visitNode(sb: ScriptBuilder, node: ts.ContinueStatement, options: VisitOptions): void {
+    const label = tsUtils.statement.getLabel(node);
     if (label !== undefined) {
       sb.reportUnsupported(label);
     }

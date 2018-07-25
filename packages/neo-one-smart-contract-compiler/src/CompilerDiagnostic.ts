@@ -1,15 +1,15 @@
-import { DiagnosticCategory, Node, ts } from 'ts-simple-ast';
+import ts from 'typescript';
 
 export class CompilerDiagnostic implements ts.Diagnostic {
   public constructor(
-    private readonly node: Node,
+    private readonly node: ts.Node,
     public readonly messageText: string,
     public readonly code: number,
-    public readonly category: DiagnosticCategory,
+    public readonly category: ts.DiagnosticCategory,
   ) {}
 
-  public get file(): ts.SourceFile | undefined {
-    return this.node.getSourceFile().compilerNode;
+  public get file(): ts.SourceFile {
+    return this.node.getSourceFile();
   }
 
   public get start(): number {

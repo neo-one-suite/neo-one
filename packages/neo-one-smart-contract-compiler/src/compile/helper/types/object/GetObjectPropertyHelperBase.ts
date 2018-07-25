@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
@@ -7,7 +7,7 @@ import { Helper } from '../../Helper';
 // Input: [stringProp, objectVal]
 // Output: [val]
 export abstract class GetObjectPropertyHelperBase extends Helper {
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [objectVal, stringProp, objectVal]
     sb.emitOp(node, 'OVER');
     // [stringProp, objectVal, objectVal]

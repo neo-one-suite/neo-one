@@ -1,4 +1,5 @@
-import { CallExpression, Node, SyntaxKind, TypeGuards } from 'ts-simple-ast';
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { NodeCompiler } from '../NodeCompiler';
@@ -6,33 +7,117 @@ import { ScriptBuilder } from '../sb';
 import { SYSCALLS } from '../syscalls';
 import { VisitOptions } from '../types';
 
-export class CallExpressionCompiler extends NodeCompiler<CallExpression> {
-  public readonly kind: SyntaxKind = SyntaxKind.CallExpression;
+interface SpecialCase {
+  readonly test: (sb: ScriptBuilder, expr: ts.CallExpression, symbol: ts.Symbol) => boolean;
+  readonly handle: (sb: ScriptBuilder, expr: ts.CallExpression, options: VisitOptions) => void;
+}
 
-  public visitNode(sb: ScriptBuilder, expr: CallExpression, optionsIn: VisitOptions): void {
-    const func = expr.getExpression();
-    if (TypeGuards.isIdentifier(func) && sb.isGlobalSymbol(func, sb.getSymbol(func), 'syscall')) {
+const bufferFrom: SpecialCase = {
+  test: (sb, node, symbol) => sb.isGlobalSymbol(node, symbol, 'BufferFrom'),
+  handle: (sb, node, options) => {
+    const args = tsUtils.argumented.getArguments(node);
+    if (args.length !== 2) {
+      sb.reportUnsupported(node);
+
+      return;
+    }
+
+    const hash = args[0];
+    const encoding = args[1];
+    if (!ts.isStringLiteral(hash) || !ts.isStringLiteral(encoding)) {
+      sb.reportUnsupported(node);
+
+      return;
+    }
+
+    if (options.pushValue) {
+      sb.emitPushBuffer(
+        node,
+        Buffer.from(tsUtils.literal.getLiteralValue(hash), tsUtils.literal.getLiteralValue(encoding)),
+      );
+      sb.emitHelper(node, options, sb.helpers.wrapBuffer);
+    }
+  },
+};
+
+const bufferEquals: SpecialCase = {
+  test: (sb, node, symbol) => sb.isGlobalSymbol(node, symbol, 'BufferEquals'),
+  handle: (sb, node, optionsIn) => {
+    const func = tsUtils.expression.getExpression(node);
+    if (!ts.isPropertyAccessExpression(func)) {
+      sb.reportUnsupported(node);
+
+      return;
+    }
+
+    const args = tsUtils.argumented.getArguments(node);
+    if (args.length !== 1) {
+      sb.reportUnsupported(node);
+
+      return;
+    }
+
+    const options = sb.pushValueOptions(optionsIn);
+
+    const lhs = tsUtils.expression.getExpression(func);
+    // [bufferVal]
+    sb.visit(lhs, options);
+    // [buffer]
+    sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
+    // [bufferVal, buffer]
+    sb.visit(args[0], options);
+    // [buffer, buffer]
+    sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
+    // [boolean]
+    sb.emitOp(node, 'EQUAL');
+    // [booleanVal]
+    sb.emitHelper(node, options, sb.helpers.createBoolean);
+
+    if (!optionsIn.pushValue) {
+      sb.emitOp(node, 'DROP');
+    }
+  },
+};
+
+const CASES: ReadonlyArray<SpecialCase> = [bufferFrom, bufferEquals];
+
+export class CallExpressionCompiler extends NodeCompiler<ts.CallExpression> {
+  public readonly kind = ts.SyntaxKind.CallExpression;
+
+  public visitNode(sb: ScriptBuilder, expr: ts.CallExpression, optionsIn: VisitOptions): void {
+    const func = tsUtils.expression.getExpression(expr);
+    const symbol = sb.getSymbol(func);
+    if (ts.isIdentifier(func) && sb.isGlobalSymbol(func, symbol, 'syscall')) {
       this.handleSysCall(sb, expr, optionsIn);
 
       return;
+    }
+
+    if (symbol !== undefined) {
+      const specialCase = CASES.find((cse) => cse.test(sb, expr, symbol));
+      if (specialCase !== undefined) {
+        specialCase.handle(sb, expr, optionsIn);
+
+        return;
+      }
     }
 
     const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
     // [argsarr]
     sb.emitHelper(expr, options, sb.helpers.args);
 
-    if (TypeGuards.isSuperExpression(func)) {
+    if (tsUtils.guards.isSuperExpression(func)) {
       this.handleSuperConstruct(sb, expr, options);
 
       return;
     }
 
     let bindThis;
-    if (TypeGuards.isElementAccessExpression(func) || TypeGuards.isPropertyAccessExpression(func)) {
+    if (ts.isElementAccessExpression(func) || ts.isPropertyAccessExpression(func)) {
       bindThis = true;
 
-      const lhs = func.getExpression();
-      if (TypeGuards.isSuperExpression(lhs)) {
+      const lhs = tsUtils.expression.getExpression(func);
+      if (tsUtils.guards.isSuperExpression(lhs)) {
         // [thisValue, argsarr]
         sb.scope.getThis(sb, lhs, options);
         // [superPrototype, thisValue, argsarr]
@@ -44,14 +129,15 @@ export class CallExpressionCompiler extends NodeCompiler<CallExpression> {
         sb.emitOp(func, 'DUP');
       }
 
-      if (TypeGuards.isElementAccessExpression(func)) {
+      if (ts.isElementAccessExpression(func)) {
         // [objectVal, expr, argsarr]
         sb.emitHelper(func, options, sb.helpers.elementAccess);
       } else {
+        const nameNode = tsUtils.node.getNameNode(func);
         // [name, expr, expr, argsarr]
-        sb.emitPushString(func.getNameNode(), func.getName());
+        sb.emitPushString(nameNode, tsUtils.node.getName(func));
         // [objectVal, expr, argsarr]
-        sb.emitHelper(expr, options, sb.helpers.getPropertyObjectProperty);
+        sb.emitHelper(nameNode, options, sb.helpers.getPropertyObjectProperty);
       }
     } else {
       bindThis = false;
@@ -66,8 +152,8 @@ export class CallExpressionCompiler extends NodeCompiler<CallExpression> {
     }
   }
 
-  private handleSysCall(sb: ScriptBuilder, node: CallExpression, options: VisitOptions): void {
-    const sysCallName = node.getArguments()[0] as Node | undefined;
+  private handleSysCall(sb: ScriptBuilder, node: ts.CallExpression, options: VisitOptions): void {
+    const sysCallName = tsUtils.expression.getArguments(node)[0] as ts.Expression | undefined;
 
     const reportError = () => {
       sb.reportError(
@@ -76,13 +162,13 @@ export class CallExpressionCompiler extends NodeCompiler<CallExpression> {
         DiagnosticCode.INVALID_SYS_CALL,
       );
     };
-    if (sysCallName === undefined || !TypeGuards.isStringLiteral(sysCallName)) {
+    if (sysCallName === undefined || !ts.isStringLiteral(sysCallName)) {
       reportError();
 
       return;
     }
 
-    const sysCallKey = sysCallName.getLiteralValue() as keyof typeof SYSCALLS;
+    const sysCallKey = tsUtils.literal.getLiteralValue(sysCallName) as keyof typeof SYSCALLS;
     const sysCall = SYSCALLS[sysCallKey] as typeof SYSCALLS[keyof typeof SYSCALLS] | undefined;
     if (sysCall === undefined) {
       reportError();
@@ -91,7 +177,7 @@ export class CallExpressionCompiler extends NodeCompiler<CallExpression> {
     }
   }
 
-  private handleSuperConstruct(sb: ScriptBuilder, node: CallExpression, options: VisitOptions): void {
+  private handleSuperConstruct(sb: ScriptBuilder, node: ts.CallExpression, options: VisitOptions): void {
     const superClass = options.superClass;
     if (superClass === undefined) {
       throw new Error('Something went wrong, expected super class to be defined.');

@@ -8,7 +8,6 @@
     "@neo-one/monitor": "^1.0.0-alpha.51",
     "@neo-one/node-core": "^1.0.0-alpha.67",
     "@neo-one/utils": "^1.0.0-alpha.56",
-    "esm": "^3.0.72",
     "lodash": "^4.17.10",
     "rxjs": "^6.2.2",
     "through": "^2.3.8",

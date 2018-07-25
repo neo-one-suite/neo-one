@@ -12,7 +12,7 @@ describe('CallExpressionCompiler', () => {
 
   test('call with arguments', async () => {
     await helpers.executeString(`
-      const foo = (x: number) => x;
+      const foo = (x: number): number => x;
       if (foo(2) !== 2) {
         throw 'Failure';
       }
@@ -150,6 +150,18 @@ describe('CallExpressionCompiler', () => {
 
       const foo = new Foo();
       if (foo.addAll(1, 2, 3) !== 6) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('call returning arrow of Buffer.from', async () => {
+    const hash = '5946158ab93f5f4fd6ba230f1c6c235117eec5f83e65275ac6f93ada9ca60477';
+    await helpers.executeString(`
+
+      const getBufferFrom = () => Buffer.from;
+
+      if (!getBufferFrom()('${hash}', 'hex').equals(Buffer.from('${hash}', 'hex'))) {
         throw 'Failure';
       }
     `);

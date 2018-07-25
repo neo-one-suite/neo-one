@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -10,7 +10,7 @@ import { Helper } from '../Helper';
 export abstract class AddConstructorObjectHelper extends Helper {
   protected abstract readonly name: string;
 
-  public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [globalObjectVal, objectPrototypeVal]
     sb.emitOp(node, 'SWAP');
@@ -64,17 +64,17 @@ export abstract class AddConstructorObjectHelper extends Helper {
     sb.emitHelper(node, options, sb.helpers.setDataPropertyObjectProperty);
   }
 
-  protected addPrototypeProperties(_sb: ScriptBuilder, _node: Node, _options: VisitOptions): void {
+  protected addPrototypeProperties(_sb: ScriptBuilder, _node: ts.Node, _options: VisitOptions): void {
     // do nothing
   }
 
-  protected addConstructorProperties(_sb: ScriptBuilder, _node: Node, _options: VisitOptions): void {
+  protected addConstructorProperties(_sb: ScriptBuilder, _node: ts.Node, _options: VisitOptions): void {
     // do nothing
   }
 
   protected addMethod(
     sb: ScriptBuilder,
-    node: Node,
+    node: ts.Node,
     options: VisitOptions,
     name: string,
     body: (options: VisitOptions) => void,

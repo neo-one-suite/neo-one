@@ -10,7 +10,7 @@ import {
   SmartContract,
   UserAccountID,
 } from '@neo-one/client';
-import { ts } from 'ts-simple-ast';
+import ts from 'typescript';
 import { CompileContractResult } from '../compileContract';
 
 import { throwOnDiagnosticErrorOrWarning } from '../utils';
@@ -25,15 +25,11 @@ export async function testNodeSetup() {
     store: new LocalMemoryStore(),
   });
 
-  const [masterWallet] = await Promise.all([
-    keystore.addAccount({
-      network: networkName,
-      name: masterWalletName,
-      privateKey,
-    }),
-    // Give RPC server a chance to startup.
-    new Promise<void>((resolve) => setTimeout(resolve, 5000)),
-  ]);
+  const masterWallet = await keystore.addAccount({
+    network: networkName,
+    name: masterWalletName,
+    privateKey,
+  });
 
   const provider = new NEOONEProvider({
     options: [{ network: networkName, rpcURL }],

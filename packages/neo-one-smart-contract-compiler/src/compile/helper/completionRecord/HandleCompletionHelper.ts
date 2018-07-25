@@ -1,4 +1,5 @@
-import { Node, TypeGuards } from 'ts-simple-ast';
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 
 import { DiagnosticCode } from '../../../DiagnosticCode';
 import { ScriptBuilder } from '../../sb';
@@ -7,17 +8,17 @@ import { Helper } from '../Helper';
 
 import * as constants from '../../../constants';
 
-const isValidParent = (node?: Node) =>
+const isValidParent = (node?: ts.Node) =>
   node !== undefined &&
-  (TypeGuards.isTryStatement(node) ||
-    TypeGuards.isFunctionLikeDeclaration(node) ||
-    TypeGuards.isArrowFunction(node) ||
-    TypeGuards.isSourceFile(node));
+  (ts.isTryStatement(node) ||
+    tsUtils.guards.isFunctionLikeDeclarationBase(node) ||
+    ts.isArrowFunction(node) ||
+    ts.isSourceFile(node));
 
 // Input: [completion]
 // Output: []
 export class HandleCompletionHelper extends Helper {
-  public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     sb.emitHelper(
       node,
@@ -35,15 +36,13 @@ export class HandleCompletionHelper extends Helper {
           sb.emitOp(node, 'DROP');
         },
         whenFalse: () => {
-          let parent = node.getParent();
-          if (!isValidParent(parent)) {
-            parent = node.getParentWhile((parentNode) => !isValidParent(parentNode));
-            if (parent !== undefined) {
-              parent = parent.getParent();
-            }
+          let parent = tsUtils.node.getParent(node) as ts.Node | undefined;
+          // tslint:disable-next-line no-loop-statement
+          while (parent !== undefined && !isValidParent(parent)) {
+            parent = tsUtils.node.getParent(parent);
           }
 
-          if (TypeGuards.isSourceFile(node) || (parent !== undefined && TypeGuards.isSourceFile(parent))) {
+          if (ts.isSourceFile(node) || (parent !== undefined && ts.isSourceFile(parent))) {
             sb.emitOp(node, 'THROW');
           } else if (parent === undefined) {
             sb.reportError(
@@ -51,7 +50,7 @@ export class HandleCompletionHelper extends Helper {
               'Something went wrong, could not find a valid parent node.',
               DiagnosticCode.SOMETHING_WENT_WRONG,
             );
-          } else if (TypeGuards.isTryStatement(parent)) {
+          } else if (ts.isTryStatement(parent)) {
             if (options.catchPC === undefined) {
               sb.reportError(
                 node,

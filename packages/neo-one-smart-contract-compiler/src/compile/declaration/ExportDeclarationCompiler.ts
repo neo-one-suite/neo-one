@@ -1,49 +1,51 @@
-import { ExportDeclaration, ExportSpecifier, SyntaxKind, TypeGuards } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class ExportDeclarationCompiler extends NodeCompiler<ExportDeclaration> {
-  public readonly kind: SyntaxKind = SyntaxKind.ExportDeclaration;
+export class ExportDeclarationCompiler extends NodeCompiler<ts.ExportDeclaration> {
+  public readonly kind = ts.SyntaxKind.ExportDeclaration;
 
-  public visitNode(sb: ScriptBuilder, node: ExportDeclaration, optionsIn: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, node: ts.ExportDeclaration, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
-    const getName = (namedExport: ExportSpecifier) => {
-      let name = namedExport.getNameNode().getText();
-      const alias = namedExport.getAliasNode();
+    const getName = (namedExport: ts.ExportSpecifier) => {
+      let name = tsUtils.node.getName(namedExport);
+      const alias = tsUtils.importExport.getAliasName(namedExport);
       if (alias !== undefined) {
-        name = alias.getText();
+        name = alias;
       }
 
       return name;
     };
 
-    const moduleSpecifier = node.getModuleSpecifierSourceFile();
+    const moduleSpecifier = tsUtils.importExport.getModuleSpecifierSourceFile(sb.typeChecker, node);
 
     // [exports]
     sb.emitHelper(node, options, sb.helpers.getCurrentModule);
     if (moduleSpecifier === undefined) {
-      node
-        .getNamedExports()
+      tsUtils.exportDeclaration
+        .getNamedExports(node)
         .filter((namedExport) =>
-          namedExport.getLocalTargetDeclarations().some((decl) => !TypeGuards.isTypeAliasDeclaration(decl)),
+          tsUtils.exportSpecifier
+            .getLocalTargetDeclarations(sb.typeChecker, namedExport)
+            .some((decl) => !tsUtils.declaration.isAmbient(decl)),
         )
         .forEach((namedExport) => {
           // [exports, exports]
           sb.emitOp(node, 'DUP');
           // [val, exports, exports]
-          sb.scope.get(sb, node, options, namedExport.getNameNode().getText());
+          sb.scope.get(sb, node, options, tsUtils.node.getName(namedExport));
           // [exports]
           sb.emitHelper(node, options, sb.helpers.export({ name: getName(namedExport) }));
         });
     } else {
       // [moduleExports, exports]
       sb.loadModule(moduleSpecifier);
-      node
-        .getNamedExports()
-        .filter((namedExport) => sb.hasExport(moduleSpecifier, namedExport.getNameNode().getText()))
+      tsUtils.exportDeclaration
+        .getNamedExports(node)
+        .filter((namedExport) => sb.hasExport(moduleSpecifier, tsUtils.node.getName(namedExport)))
         .forEach((namedExport) => {
           // [exports, moduleExports]
           sb.emitOp(node, 'SWAP');
@@ -52,7 +54,7 @@ export class ExportDeclarationCompiler extends NodeCompiler<ExportDeclaration> {
           // [moduleExports, exports, moduleExports, exports]
           sb.emitOp(node, 'OVER');
           // [name, moduleExports, exports, moduleExports, exports]
-          sb.emitPushString(node, namedExport.getNameNode().getText());
+          sb.emitPushString(node, tsUtils.node.getName(namedExport));
           // [val, exports, moduleExports, exports]
           sb.emitOp(node, 'PICKITEM');
           // [moduleExports, exports]

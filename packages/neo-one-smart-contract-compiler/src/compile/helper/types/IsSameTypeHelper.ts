@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -7,7 +7,7 @@ import { Helper } from '../Helper';
 // Input: [val0, val1]
 // Output: [boolean]
 export class IsSameTypeHelper extends Helper {
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
       sb.emitOp(node, 'DROP');

@@ -1,17 +1,17 @@
-import { Node, Type } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface ForType {
-  readonly hasType: (type?: Type) => boolean;
+  readonly hasType: (type?: ts.Type) => boolean;
   readonly isRuntimeType: (options: VisitOptions) => void;
   readonly process: (options: VisitOptions) => void;
 }
 
 export interface ForTypeHelperOptions {
-  readonly type: Type | undefined;
+  readonly type: ts.Type | undefined;
   readonly types: ReadonlyArray<ForType>;
   readonly defaultCase?: (options: VisitOptions) => void;
 }
@@ -19,7 +19,7 @@ export interface ForTypeHelperOptions {
 // Input: [val]
 // Output: []
 export class ForTypeHelper extends Helper {
-  private readonly type: Type | undefined;
+  private readonly type: ts.Type | undefined;
   private readonly types: ReadonlyArray<ForType>;
   private readonly defaultCase: ((options: VisitOptions) => void) | undefined;
 
@@ -30,7 +30,7 @@ export class ForTypeHelper extends Helper {
     this.defaultCase = defaultCase;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const noCastOptions = sb.noCastOptions(optionsIn);
     const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
     const type = this.type === undefined ? optionsIn.cast : this.type;

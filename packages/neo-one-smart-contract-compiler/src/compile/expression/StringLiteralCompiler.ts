@@ -1,14 +1,14 @@
-import { StringLiteral, SyntaxKind } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class StringLiteralCompiler extends NodeCompiler<StringLiteral> {
-  public readonly kind: SyntaxKind = SyntaxKind.StringLiteral;
-  public visitNode(sb: ScriptBuilder, expr: StringLiteral, options: VisitOptions): void {
+export class StringLiteralCompiler extends NodeCompiler<ts.StringLiteral> {
+  public readonly kind = ts.SyntaxKind.StringLiteral;
+  public visitNode(sb: ScriptBuilder, expr: ts.StringLiteral, options: VisitOptions): void {
     if (options.pushValue) {
-      sb.emitPushString(expr, expr.getLiteralValue());
+      sb.emitPushString(expr, tsUtils.literal.getLiteralValue(expr));
       sb.emitHelper(expr, options, sb.helpers.createString);
     }
   }

@@ -1,15 +1,15 @@
-import { PropertyAccessExpression, SyntaxKind } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class PropertyAccessExpressionCompiler extends NodeCompiler<PropertyAccessExpression> {
-  public readonly kind: SyntaxKind = SyntaxKind.PropertyAccessExpression;
+export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAccessExpression> {
+  public readonly kind = ts.SyntaxKind.PropertyAccessExpression;
 
-  public visitNode(sb: ScriptBuilder, expr: PropertyAccessExpression, optionsIn: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, expr: ts.PropertyAccessExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
-    const expression = expr.getExpression();
+    const expression = tsUtils.expression.getExpression(expr);
     // [val]
     sb.visit(expression, options);
     // [objectVal]
@@ -21,7 +21,7 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<PropertyAcces
         sb.emitOp(expression, 'TUCK');
       }
       // [name, objectVal, value, objectVal]
-      sb.emitPushString(expr, expr.getName());
+      sb.emitPushString(expr, tsUtils.node.getName(expr));
       // [value, name, objectVal, objectVal]
       sb.emitOp(expr, 'ROT');
       // [objectVal]
@@ -30,7 +30,7 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<PropertyAcces
 
     if (optionsIn.pushValue || !optionsIn.setValue) {
       // [name, objectVal]
-      sb.emitPushString(expr, expr.getName());
+      sb.emitPushString(expr, tsUtils.node.getName(expr));
       // [value]
       sb.emitHelper(expr, options, sb.helpers.getPropertyObjectProperty);
 

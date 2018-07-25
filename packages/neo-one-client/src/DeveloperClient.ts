@@ -2,10 +2,11 @@ import { RawSourceMap } from 'source-map';
 import { ClientBase } from './ClientBase';
 import {
   BufferString,
-  ContractParameter,
   DeveloperProvider,
+  InvocationTransaction,
+  InvokeTransactionOptions,
   Options,
-  TransactionOptions,
+  RawInvokeReceipt,
   UserAccountProvider,
 } from './types';
 
@@ -42,23 +43,20 @@ export class DeveloperClient<
 
   public async execute(
     script: BufferString,
-    options?: TransactionOptions,
+    options?: InvokeTransactionOptions,
     sourceMap?: RawSourceMap,
-  ): Promise<ContractParameter> {
+  ): Promise<{ readonly receipt: RawInvokeReceipt; readonly transaction: InvocationTransaction }> {
     const result = await this.getProvider(options).execute(script, options, sourceMap);
 
     const [invokeReceipt] = await Promise.all([
-      result.confirmed({ timeoutMS: 2500 }),
+      result.confirmed({ timeoutMS: 1250 }),
       this.developerProvider.runConsensusNow(),
     ]);
+
     if (invokeReceipt.result.state === 'FAULT') {
       throw new Error(invokeReceipt.result.message);
     }
 
-    if (invokeReceipt.result.stack.length) {
-      return invokeReceipt.result.stack[0];
-    }
-
-    return { type: 'Void' };
+    return { receipt: invokeReceipt, transaction: result.transaction };
   }
 }

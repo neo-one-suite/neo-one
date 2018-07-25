@@ -4,7 +4,6 @@
   "description": "NEO•ONE Server GRPC.",
   "main": "./src/index.ts",
   "dependencies": {
-    "esm": "^3.0.72",
     "google-protobuf": "^3.6.0",
     "tslib": "^1.9.3"
   }

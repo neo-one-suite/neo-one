@@ -1,23 +1,23 @@
-import { ClassDeclaration, SyntaxKind, TypeGuards } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { InternalFunctionProperties } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
-  public readonly kind: SyntaxKind = SyntaxKind.ClassDeclaration;
+export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> {
+  public readonly kind = ts.SyntaxKind.ClassDeclaration;
 
-  public visitNode(sb: ScriptBuilder, decl: ClassDeclaration, optionsIn: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, decl: ts.ClassDeclaration, optionsIn: VisitOptions): void {
     let options = sb.pushValueOptions(sb.noSuperClassOptions(optionsIn));
-    const name = sb.scope.add(decl.getNameOrThrow());
-    const extendsExpr = decl.getExtends();
+    const name = sb.scope.add(tsUtils.node.getNameOrThrow(decl));
+    const extendsExpr = tsUtils.class_.getExtends(decl);
     let superClassIn;
     if (extendsExpr !== undefined) {
       superClassIn = sb.scope.addUnique();
       options = sb.superClassOptions(options, superClassIn);
       // [superClass]
-      sb.visit(extendsExpr.getExpression(), options);
+      sb.visit(tsUtils.expression.getExpression(extendsExpr), options);
       // []
       sb.scope.set(sb, extendsExpr, options, superClassIn);
     }
@@ -31,7 +31,8 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
       sb.helpers.createConstructArray({
         body: () => {
           // [argsarr]
-          const ctorImpl = decl.getConstructors().find((ctor) => ctor.isImplementation());
+          const ctorImpl = tsUtils.class_.getConcreteConstructor(decl);
+          const ctorNode = ctorImpl === undefined ? decl : ctorImpl;
           // Default value assignments
           if (ctorImpl !== undefined) {
             // []
@@ -39,11 +40,11 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
             // Super call statement
           } else if (superClass !== undefined && extendsExpr !== undefined) {
             // [thisObjectVal, argsarr]
-            sb.scope.getThis(sb, decl, options);
+            sb.scope.getThis(sb, extendsExpr, options);
             // [ctor, thisObjectVal, argsarr]
-            sb.scope.get(sb, decl, options, superClass);
+            sb.scope.get(sb, extendsExpr, options, superClass);
             // []
-            sb.emitHelper(decl, options, sb.helpers.invokeConstruct());
+            sb.emitHelper(extendsExpr, options, sb.helpers.invokeConstruct());
             // Drop the argsarray, we must not use it
           } else {
             // []
@@ -52,17 +53,16 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
           // Parameter property assignments
           // Member variable assignments
           // [thisObjectVal]
-          sb.scope.getThis(sb, decl, options);
-          decl
-            .getInstanceProperties()
-            .filter(TypeGuards.isPropertyDeclaration)
-            .filter((property) => !property.isAbstract())
+          sb.scope.getThis(sb, ctorNode, options);
+          tsUtils.class_
+            .getConcreteInstanceProperties(decl)
+            .filter(ts.isPropertyDeclaration)
             .forEach((property) => {
-              const initializer = property.getInitializer();
+              const initializer = tsUtils.initializer.getInitializer(property);
               if (initializer !== undefined) {
-                sb.emitOp(decl, 'DUP');
+                sb.emitOp(initializer, 'DUP');
                 // [prop, thisObjectVal, thisObjectVal]
-                sb.emitPushString(initializer, property.getName());
+                sb.emitPushString(initializer, tsUtils.node.getName(property));
                 // [init, prop, thisObjectVal, thisObjectVal]
                 sb.visit(initializer, options);
                 // [thisObjectVal]
@@ -70,10 +70,10 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
               }
             });
           // []
-          sb.emitOp(decl, 'DROP');
+          sb.emitOp(ctorNode, 'DROP');
           // Constructor statements
           if (ctorImpl !== undefined) {
-            sb.visit(ctorImpl.getBodyOrThrow(), options);
+            sb.visit(tsUtils.body.getBodyOrThrow(ctorImpl), options);
           }
         },
       }),
@@ -105,51 +105,49 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
     sb.emitOp(decl, 'ROT');
     // [objectVal, 'prototype', fobjectVal, fobjectVal]
     sb.emitHelper(decl, options, sb.helpers.setDataPropertyObjectProperty);
-    decl.getInstanceMethods().forEach((method) => {
-      if (method.isImplementation()) {
-        // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitOp(method, 'DUP');
-        // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitPushString(method, method.getName());
-        // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitHelper(method, options, sb.helpers.createCallArray);
-        // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitHelper(
-          decl,
-          options,
-          sb.helpers.createFunctionObject({
-            property: InternalFunctionProperties.Call,
-          }),
-        );
-        // [objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitHelper(method, options, sb.helpers.setDataPropertyObjectProperty);
-      }
+    tsUtils.class_.getConcreteInstanceMethods(decl).forEach((method) => {
+      // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitOp(method, 'DUP');
+      // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitPushString(method, tsUtils.node.getName(method));
+      // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitHelper(method, options, sb.helpers.createCallArray);
+      // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitHelper(
+        method,
+        options,
+        sb.helpers.createFunctionObject({
+          property: InternalFunctionProperties.Call,
+        }),
+      );
+      // [objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitHelper(method, options, sb.helpers.setDataPropertyObjectProperty);
     });
 
-    decl
-      .getSetAccessors()
-      .filter((accessor) => !accessor.isStatic())
+    tsUtils.class_
+      .getConcreteInstanceMembers(decl)
+      .filter(ts.isSetAccessor)
       .forEach((accessor) => {
         // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
         sb.emitOp(accessor, 'DUP');
         // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitPushString(accessor, accessor.getName());
+        sb.emitPushString(accessor, tsUtils.node.getName(accessor));
         // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
         sb.emitHelper(accessor, options, sb.helpers.createCallArray);
         // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
         sb.emitHelper(
-          decl,
+          accessor,
           options,
           sb.helpers.createFunctionObject({
             property: InternalFunctionProperties.Call,
           }),
         );
-        const getAccessor = accessor.getGetAccessor();
+        const getAccessor = tsUtils.accessor.getGetAccessor(accessor);
         const hasGet = getAccessor !== undefined;
         if (getAccessor !== undefined) {
           sb.emitHelper(getAccessor, options, sb.helpers.createCallArray);
           sb.emitHelper(
-            decl,
+            getAccessor,
             options,
             sb.helpers.createFunctionObject({
               property: InternalFunctionProperties.Call,
@@ -167,19 +165,20 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
         );
       });
 
-    decl
-      .getGetAccessors()
-      .filter((accessor) => !accessor.isStatic() && accessor.getSetAccessor() === undefined)
+    tsUtils.class_
+      .getConcreteInstanceMembers(decl)
+      .filter(ts.isGetAccessor)
+      .filter((accessor) => tsUtils.accessor.getSetAccessor(accessor) === undefined)
       .forEach((accessor) => {
         // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
         sb.emitOp(accessor, 'DUP');
         // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitPushString(accessor, accessor.getName());
+        sb.emitPushString(accessor, tsUtils.node.getName(accessor));
         // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
         sb.emitHelper(accessor, options, sb.helpers.createCallArray);
         // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
         sb.emitHelper(
-          decl,
+          accessor,
           options,
           sb.helpers.createFunctionObject({
             property: InternalFunctionProperties.Call,
@@ -215,7 +214,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
     // [fobjectVal]
     sb.emitHelper(decl, options, sb.helpers.setDataPropertyObjectProperty);
 
-    if (decl.isNamedExport() || decl.isDefaultExport()) {
+    if (tsUtils.modifier.isNamedExport(decl) || tsUtils.modifier.isDefaultExport(decl)) {
       // [fobjectVal, fobjectVal]
       sb.emitOp(decl, 'DUP');
       // [fobjectVal]
@@ -223,8 +222,8 @@ export class ClassDeclarationCompiler extends NodeCompiler<ClassDeclaration> {
         decl,
         options,
         sb.helpers.exportSingle({
-          name: decl.isNamedExport() ? decl.getNameOrThrow() : undefined,
-          defaultExport: decl.isDefaultExport(),
+          name: tsUtils.modifier.isNamedExport(decl) ? tsUtils.node.getNameOrThrow(decl) : undefined,
+          defaultExport: tsUtils.modifier.isDefaultExport(decl),
         }),
       );
     }

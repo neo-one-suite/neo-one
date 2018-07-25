@@ -1,11 +1,11 @@
 import { ABI, ContractRegister } from '@neo-one/client';
+import { tsUtils } from '@neo-one/ts-utils';
+import _ from 'lodash';
 import { RawSourceMap } from 'source-map';
-import { ts } from 'ts-simple-ast';
+import ts from 'typescript';
 import { compile } from './compile';
-import { Context } from './Context';
-import { getGlobals, getLibAliases, getLibs } from './symbols';
+import { createContextForPath, updateContext } from './createContext';
 import { transpile } from './transpile';
-import * as utils from './utils';
 
 export interface CompileContractOptions {
   readonly filePath: string;
@@ -20,23 +20,21 @@ export interface CompileContractResult {
 }
 
 export const compileContract = async ({ filePath, name }: CompileContractOptions): Promise<CompileContractResult> => {
-  const ast = await utils.getAstForPath(filePath);
-  const initialContext = new Context(getGlobals(ast), getLibs(ast), getLibAliases(ast));
-  const diagnostics = ast.getPreEmitDiagnostics();
-  const smartContract = ast.getSourceFileOrThrow(filePath).getClassOrThrow(name);
-  const { ast: transpiledAst, sourceFile, abi, context, contract } = transpile({
-    ast,
-    smartContract,
-    context: initialContext,
-  });
-  const { code, context: finalContext, sourceMap } = compile({
-    ast: transpiledAst,
-    sourceFile,
+  const transpileContext = await createContextForPath(filePath);
+  const smartContract = tsUtils.statement.getClassOrThrow(
+    tsUtils.file.getSourceFileOrThrow(transpileContext.program, filePath),
+    name,
+  );
+  const { sourceFiles, abi, contract } = transpile({ smartContract, context: transpileContext });
+  const context = updateContext(transpileContext, _.mapValues(sourceFiles, ({ text }) => text));
+
+  const { code, sourceMap } = compile({
+    sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
     context,
   });
 
   return {
-    diagnostics: diagnostics.map((diagnostic) => diagnostic.compilerObject).concat(finalContext.diagnostics),
+    diagnostics: context.diagnostics,
     sourceMap,
     abi,
     contract: {

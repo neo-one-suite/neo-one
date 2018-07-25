@@ -1,21 +1,19 @@
-import { Node, Type } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
-import * as typeUtils from '../../../typeUtils';
-
 export interface EqualsEqualsHelperOptions {
-  readonly left: Node;
-  readonly right: Node;
+  readonly left: ts.Node;
+  readonly right: ts.Node;
 }
 
 // Input: []
 // Output: [boolean]
 export class EqualsEqualsHelper extends Helper {
-  private readonly left: Node;
-  private readonly right: Node;
+  private readonly left: ts.Node;
+  private readonly right: ts.Node;
 
   public constructor(options: EqualsEqualsHelperOptions) {
     super();
@@ -23,7 +21,7 @@ export class EqualsEqualsHelper extends Helper {
     this.right = options.right;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.visit(this.left, options);
       sb.visit(this.right, options);
@@ -40,12 +38,18 @@ export class EqualsEqualsHelper extends Helper {
     }
   }
 
-  public equalsEqualsType(sb: ScriptBuilder, node: Node, options: VisitOptions, leftType: Type, rightType: Type): void {
-    if (typeUtils.isSame(leftType, rightType)) {
+  public equalsEqualsType(
+    sb: ScriptBuilder,
+    node: ts.Node,
+    options: VisitOptions,
+    leftType: ts.Type,
+    rightType: ts.Type,
+  ): void {
+    if (tsUtils.type_.isSame(leftType, rightType)) {
       sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ left: this.left, right: this.right }));
     } else if (
-      (typeUtils.hasNull(leftType) || typeUtils.hasUndefined(leftType)) &&
-      (typeUtils.isOnlyUndefined(rightType) || typeUtils.isOnlyNull(rightType))
+      (tsUtils.type_.hasNull(leftType) || tsUtils.type_.hasUndefined(leftType)) &&
+      (tsUtils.type_.isOnlyUndefined(rightType) || tsUtils.type_.isOnlyNull(rightType))
     ) {
       // [left]
       sb.visit(this.left, options);
@@ -54,8 +58,8 @@ export class EqualsEqualsHelper extends Helper {
       // [equals]
       sb.emitHelper(node, options, sb.helpers.isNullOrUndefined);
     } else if (
-      typeUtils.isOnlyNumber(leftType) &&
-      (typeUtils.isOnlyString(rightType) || typeUtils.isOnlyBoolean(rightType))
+      tsUtils.type_.isOnlyNumberish(leftType) &&
+      (tsUtils.type_.isOnlyStringish(rightType) || tsUtils.type_.isOnlyBooleanish(rightType))
     ) {
       // [left]
       sb.visit(this.left, options);
@@ -64,8 +68,8 @@ export class EqualsEqualsHelper extends Helper {
       // [equals]
       this.equalsEqualsLeftNumberRightBooleanOrString(sb, node, options);
     } else if (
-      typeUtils.isOnlyBoolean(leftType) &&
-      (typeUtils.isOnlyString(rightType) || typeUtils.isOnlyBoolean(rightType))
+      tsUtils.type_.isOnlyBooleanish(leftType) &&
+      (tsUtils.type_.isOnlyStringish(rightType) || tsUtils.type_.isOnlyBooleanish(rightType))
     ) {
       // [left]
       sb.visit(this.left, options);
@@ -78,8 +82,8 @@ export class EqualsEqualsHelper extends Helper {
       // [equals]
       this.equalsEqualsLeftNumberRightBooleanOrString(sb, node, options);
     } else if (
-      (typeUtils.isOnlyString(leftType) || typeUtils.isOnlyBoolean(leftType)) &&
-      typeUtils.isOnlyNumber(rightType)
+      (tsUtils.type_.isOnlyStringish(leftType) || tsUtils.type_.isOnlyBooleanish(leftType)) &&
+      tsUtils.type_.isOnlyNumberish(rightType)
     ) {
       // [left]
       sb.visit(this.left, options);
@@ -88,8 +92,8 @@ export class EqualsEqualsHelper extends Helper {
       // [equals]
       this.equalsEqualsRightNumberLeftBooleanOrString(sb, node, options);
     } else if (
-      (typeUtils.isOnlyString(leftType) || typeUtils.isOnlyBoolean(leftType)) &&
-      typeUtils.isOnlyBoolean(rightType)
+      (tsUtils.type_.isOnlyStringish(leftType) || tsUtils.type_.isOnlyBooleanish(leftType)) &&
+      tsUtils.type_.isOnlyBooleanish(rightType)
     ) {
       // [left]
       sb.visit(this.left, options);
@@ -106,7 +110,7 @@ export class EqualsEqualsHelper extends Helper {
     }
   }
 
-  public equalsEqualsLeftNumberRightBooleanOrString(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public equalsEqualsLeftNumberRightBooleanOrString(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [rightNumber, left]
     sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.getType(this.right) }));
     // [rightNumber, left]
@@ -115,7 +119,7 @@ export class EqualsEqualsHelper extends Helper {
     sb.emitHelper(node, options, sb.helpers.equalsEqualsEqualsNumber);
   }
 
-  public equalsEqualsRightNumberLeftBooleanOrString(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public equalsEqualsRightNumberLeftBooleanOrString(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [left, right]
     sb.emitOp(node, 'SWAP');
     // [leftNumber, right]
@@ -128,7 +132,7 @@ export class EqualsEqualsHelper extends Helper {
     sb.emitHelper(node, options, sb.helpers.equalsEqualsEqualsNumber);
   }
 
-  public equalsEqualsUnknown(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public equalsEqualsUnknown(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     const copy = () => {
       // [left, right]
       sb.emitOp(this.right, 'SWAP');

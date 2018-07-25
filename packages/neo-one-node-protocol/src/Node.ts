@@ -1,4 +1,3 @@
-import { createReadClient } from '@neo-one/client';
 import {
   Block,
   common,
@@ -27,10 +26,11 @@ import { finalize, labels, neverComplete, utils as commonUtils } from '@neo-one/
 import { ScalingBloem } from 'bloem';
 import BloomFilter from 'bloom-filter';
 import { BN } from 'bn.js';
+import fetch from 'cross-fetch';
 import { Address6 } from 'ip-address';
 import _ from 'lodash';
 import LRU from 'lru-cache';
-import { defer, EMPTY, merge, Observable, timer } from 'rxjs';
+import { combineLatest, defer, Observable, of as _of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
 import { Command } from './Command';
 import { Consensus, ConsensusOptions } from './consensus';
@@ -289,10 +289,10 @@ export class Node implements INode {
 
           this.mutableConsensus = mutableConsensus;
 
-          return timer(5000).pipe(switchMap(() => mutableConsensus.start$()));
+          return mutableConsensus.start$();
         }
 
-        return EMPTY;
+        return _of(0);
       }),
     );
 
@@ -302,7 +302,7 @@ export class Node implements INode {
       }),
     );
 
-    return merge(network$, consensus$, options$);
+    return combineLatest(network$, consensus$, options$);
   }
 
   public async relayTransaction(transaction: Transaction, throwVerifyError = false): Promise<void> {
@@ -587,14 +587,38 @@ export class Node implements INode {
   }
 
   private async fetchEndpointsFromRPCURL(rpcURL: string): Promise<void> {
-    const readClient = createReadClient({
-      network: 'doesntmatter',
-      rpcURL,
-    });
-
     try {
-      const peers = await readClient.getConnectedPeers();
-      peers
+      const response = await fetch(rpcURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getpeers',
+          params: [],
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch peers from ${rpcURL}: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (
+        typeof result === 'object' &&
+        result.error !== undefined &&
+        typeof result.error === 'object' &&
+        typeof result.error.code === 'number' &&
+        typeof result.error.message === 'string'
+      ) {
+        throw new Error(result.error);
+      }
+
+      const connected: ReadonlyArray<{ readonly address: string; readonly port: number }> = result.result.connected;
+      connected
         .map((peer) => {
           const { address, port } = peer;
           const host = new Address6(address);

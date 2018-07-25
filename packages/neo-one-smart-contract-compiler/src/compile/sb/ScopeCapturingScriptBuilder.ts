@@ -1,23 +1,22 @@
-import { Node } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { CapturingScope, ResolvedScope } from '../scope';
 import { BaseScriptBuilder } from './BaseScriptBuilder';
 import { ScriptBuilder } from './ScriptBuilder';
 
 export class ScopeCapturingScriptBuilder extends BaseScriptBuilder<CapturingScope> implements ScriptBuilder {
   private readonly mutableScopes: CapturingScope[] = [];
-  private readonly resolvedScopes: Map<Node, Map<number, ResolvedScope>> = new Map();
+  private readonly resolvedScopes: Map<ts.Node, Map<number, ResolvedScope>> = new Map();
 
   public process(): void {
     super.process();
     this.resolveScopes();
   }
 
-  public getScopes(): Map<Node, Map<number, ResolvedScope>> {
+  public getScopes(): Map<ts.Node, Map<number, ResolvedScope>> {
     return this.resolvedScopes;
   }
 
-  protected createScope(node: Node, index: number, parent?: CapturingScope | undefined): CapturingScope {
+  protected createScope(node: ts.Node, index: number, parent?: CapturingScope | undefined): CapturingScope {
     const scope = new CapturingScope(node, index, parent);
     this.mutableScopes.push(scope);
 

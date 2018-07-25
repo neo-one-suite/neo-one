@@ -9,7 +9,7 @@ import {
   SubDescribeTable,
   TaskList,
 } from '@neo-one/server-plugin';
-import { labels, mergeScanLatest } from '@neo-one/utils';
+import { labels, mergeScanLatest, utils } from '@neo-one/utils';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 import * as path from 'path';
@@ -50,24 +50,14 @@ export interface NetworkResourceAdapterOptions extends NetworkResourceAdapterSta
 }
 
 const DEFAULT_MAIN_SEEDS: ReadonlyArray<EndpointConfig> = [
-  { type: 'tcp', host: 'seed1.switcheo.network', port: 10333 },
-  { type: 'tcp', host: 'seed2.switcheo.network', port: 10333 },
-  { type: 'tcp', host: 'seed3.switcheo.network', port: 10333 },
-  { type: 'tcp', host: 'seed4.switcheo.network', port: 10333 },
   { type: 'tcp', host: 'seed1.travala.com', port: 10333 },
   { type: 'tcp', host: 'seed2.travala.com', port: 10333 },
   { type: 'tcp', host: 'seed3.travala.com', port: 10333 },
   { type: 'tcp', host: 'seed4.travala.com', port: 10333 },
-  { type: 'tcp', host: 'node1.sgp1.bridgeprotocol.io', port: 10333 },
-  { type: 'tcp', host: 'node1.nyc3.bridgeprotocol.io', port: 10333 },
-  { type: 'tcp', host: 'node1.ams2.bridgeprotocol.io', port: 10333 },
   { type: 'tcp', host: 'seed1.aphelion-neo.com', port: 10333 },
   { type: 'tcp', host: 'seed2.aphelion-neo.com', port: 10333 },
   { type: 'tcp', host: 'seed3.aphelion-neo.com', port: 10333 },
   { type: 'tcp', host: 'seed4.aphelion-neo.com', port: 10333 },
-  { type: 'tcp', host: 'seed1.o3node.org', port: 10333 },
-  { type: 'tcp', host: 'seed2.o3node.org', port: 10333 },
-  { type: 'tcp', host: 'seed3.o3node.org', port: 10333 },
 ];
 
 const DEFAULT_TEST_SEEDS: ReadonlyArray<EndpointConfig> = [
@@ -261,17 +251,16 @@ export class NetworkResourceAdapter {
       },
       seeds: DEFAULT_MAIN_SEEDS.map(createEndpoint),
       rpcEndpoints: [
-        'http://seed1.cityofzion.io:8080',
-        'http://seed2.cityofzion.io:8080',
-        'http://seed3.cityofzion.io:8080',
-        'http://seed4.cityofzion.io:8080',
-        'http://seed5.cityofzion.io:8080',
-        'https://seed1.neo.org:10332',
-        'http://seed2.neo.org:10332',
-        'http://seed3.neo.org:10332',
-        'http://seed4.neo.org:10332',
-        'http://seed5.neo.org:10332',
-        'http://api.otcgo.cn:10332',
+        'https://pyrpc1.narrative.org:443',
+        'https://pyrpc2.narrative.org:443',
+        'https://pyrpc3.narrative.org:443',
+        'https://pyrpc4.narrative.org:443',
+        'http://seed1.travala.com:10332',
+        'http://seed2.travala.com:10332',
+        'http://seed1.aphelion-neo.com:10332',
+        'http://seed2.aphelion-neo.com:10332',
+        'http://seed3.aphelion-neo.com:10332',
+        'http://seed4.aphelion-neo.com:10332',
       ],
     };
   }
@@ -531,7 +520,13 @@ export class NetworkResourceAdapter {
               tasks: this.nodes.map((node) => ({
                 title: `Waiting for node ${node.name}`,
                 task: async () => {
+                  const start = utils.nowSeconds();
                   await node.live(30);
+
+                  this.resourceType.plugin.monitor.log({
+                    name: 'neo_network_resource_adapter_node_live',
+                    message: `Started in ${utils.nowSeconds() - start} seconds`,
+                  });
                 },
               })),
 

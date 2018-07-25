@@ -15,6 +15,8 @@ import {
   GetOptions,
   Hash160String,
   Hash256String,
+  Input,
+  Output,
   Peer,
   RawInvocationResult,
   ReadSmartContract,
@@ -81,6 +83,10 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
     args.assertHash256(hash);
 
     return this.dataProvider.getTransaction(hash, monitor);
+  }
+
+  public async getOutput(input: Input, monitor?: Monitor): Promise<Output> {
+    return this.dataProvider.getOutput(input, monitor);
   }
 
   public async getValidators(monitor?: Monitor): Promise<ReadonlyArray<Validator>> {

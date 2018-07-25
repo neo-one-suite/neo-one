@@ -9,7 +9,7 @@ import {
   ContractTransaction,
   getContractProperties,
   Input as InputModel,
-  InvocationTransaction,
+  InvocationTransaction as InvocationTransactionModel,
   IssueTransaction,
   Output as OutputModel,
   Param as ScriptBuilderParam,
@@ -53,6 +53,7 @@ import {
   Input,
   InvocationResultError,
   InvocationResultSuccess,
+  InvocationTransaction,
   InvokeTransactionOptions,
   NetworkSettings,
   NetworkType,
@@ -539,9 +540,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
   public async execute(
     script: BufferString,
-    options?: TransactionOptions,
+    options?: InvokeTransactionOptions,
     sourceMap?: RawSourceMap,
-  ): Promise<TransactionResult<RawInvokeReceipt>> {
+  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     return this.invokeRaw({
       script: Buffer.from(script, 'hex'),
       options,
@@ -574,7 +575,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           monitor: span,
         });
 
-        const testTransaction = new InvocationTransaction({
+        const testTransaction = new InvocationTransactionModel({
           version: 1,
           inputs: this.convertInputs(inputs),
           outputs: this.convertOutputs(outputs),
@@ -677,7 +678,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly scripts?: ReadonlyArray<WitnessModel>;
     readonly labels?: Labels;
     readonly sourceMap?: RawSourceMap;
-  }): Promise<TransactionResult<T>> {
+  }): Promise<TransactionResult<T, InvocationTransaction>> {
     const { from, attributes: attributesIn, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
@@ -696,7 +697,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           data: Buffer.from(`${utils.randomUInt()}`, 'utf8').toString('hex'),
         });
 
-        const testTransaction = new InvocationTransaction({
+        const testTransaction = new InvocationTransactionModel({
           version: 1,
           inputs: this.convertInputs(testInputs),
           outputs: this.convertOutputs(testOutputs),
@@ -726,7 +727,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           monitor: span,
         });
 
-        const invokeTransaction = new InvocationTransaction({
+        const invokeTransaction = new InvocationTransactionModel({
           version: 1,
           inputs: this.convertInputs(inputs),
           outputs: this.convertOutputs(outputs),
@@ -736,7 +737,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           scripts,
         });
 
-        return this.sendTransaction({
+        return this.sendTransaction<T, InvocationTransaction>({
           from,
           inputs,
           transaction: invokeTransaction,
@@ -765,7 +766,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     );
   }
 
-  private async sendTransaction<T>({
+  private async sendTransaction<T, TTransaction extends Transaction = Transaction>({
     inputs,
     transaction: transactionUnsignedIn,
     from,
@@ -782,7 +783,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       },
     ) => Promise<T>;
     readonly monitor?: Monitor;
-  }): Promise<TransactionResult<T>> {
+  }): Promise<TransactionResult<T, TTransaction>> {
     return this.capture(
       async (span) => {
         let transactionUnsigned = transactionUnsignedIn;
@@ -839,7 +840,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         );
 
         return {
-          transaction,
+          transaction: transaction as TTransaction,
           // tslint:disable-next-line no-unnecessary-type-annotation
           confirmed: async (optionsIn: GetOptions = {}): Promise<T> => {
             const options = {

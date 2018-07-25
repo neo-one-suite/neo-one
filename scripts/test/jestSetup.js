@@ -1,4 +1,4 @@
-jest.setTimeout(2 * 60 * 1000);
+jest.setTimeout(30 * 1000);
 
 afterEach(async () => {
   await one.cleanupTest();

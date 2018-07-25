@@ -4,6 +4,7 @@
   "description": "NEO•ONE TypeScript smart contract compiler.",
   "main": "./src/index.ts",
   "dependencies": {
+    "@babel/code-frame": "^7.0.0-beta.54",
     "@neo-one/client": "^1.0.0-alpha.81",
     "@neo-one/client-core": "^1.0.0-alpha.66",
     "@neo-one/monitor": "^1.0.0-alpha.51",
@@ -14,20 +15,21 @@
     "@neo-one/node-vm": "^1.0.0-alpha.68",
     "@neo-one/smart-contract": "^1.0.0-alpha.19",
     "@neo-one/smart-contract-internal": "^1.0.0-alpha.3",
+    "@neo-one/ts-utils": "^1.0.0-alpha.37",
     "@neo-one/utils": "^1.0.0-alpha.56",
-    "@types/node": "^10.5.1",
+    "@types/node": "^10.5.4",
     "app-root-dir": "^1.0.2",
     "bn.js": "^4.11.8",
     "cross-fetch": "^2.2.2",
-    "esm": "^3.0.72",
     "fs-extra": "^7.0.0",
+    "glob": "^7.1.2",
     "levelup": "^3.1.0",
     "lodash": "^4.17.10",
     "memdown": "^3.0.0",
     "rxjs": "^6.2.2",
     "safe-stable-stringify": "^1.0.1",
     "source-map": "^0.7.3",
-    "ts-simple-ast": "^12.7.0"
+    "typescript": "3.1.0-dev.20180721"
   },
   "devDependencies": {
     "app-root-dir": "1.0.2",

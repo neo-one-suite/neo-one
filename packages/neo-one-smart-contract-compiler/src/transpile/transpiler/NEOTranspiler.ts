@@ -1,29 +1,16 @@
 // tslint:disable ban-types
 import { ABIEvent, ABIFunction, ABIParameter, ABIReturn, ContractParameterType } from '@neo-one/client';
+import { ClassInstanceMemberType, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
-import Project, {
-  CallExpression,
-  ClassDeclaration,
-  ClassInstanceMemberTypes,
-  FunctionDeclaration,
-  Identifier,
-  Node,
-  SourceFile,
-  Symbol,
-  SyntaxKind,
-  Type,
-  TypeGuards,
-  TypeNode,
-} from 'ts-simple-ast';
+import { RawSourceMap } from 'source-map';
+import ts from 'typescript';
 import { Context } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
-import * as nodeUtils from '../../nodeUtils';
 import { Globals, LibAliases, Libs } from '../../symbols';
-import * as typeUtils from '../../typeUtils';
 import { declarations } from '../declaration';
 import { NodeTranspiler } from '../NodeTranspiler';
-import { Contract, TranspileResult, VisitOptions } from '../types';
+import { Contract, TranspileResult } from '../types';
 import { Transpiler } from './Transpiler';
 
 const transpilers: ReadonlyArray<ReadonlyArray<new () => NodeTranspiler>> = [declarations];
@@ -31,6 +18,7 @@ const transpilers: ReadonlyArray<ReadonlyArray<new () => NodeTranspiler>> = [dec
 type Transpilers = { [K in number]?: NodeTranspiler };
 
 const BYTE_ARRAY_RETURN: ABIReturn = { type: 'ByteArray' };
+const BOOLEAN_RETURN: ABIReturn = { type: 'Boolean' };
 const PARAMETERS: ReadonlyArray<ContractParameterType> = ['String', 'ByteArray'];
 const RETURN_TYPE = 'ByteArray';
 const createDefaultContract = (name: string): Contract => ({
@@ -50,12 +38,9 @@ const createDefaultContract = (name: string): Contract => ({
 
 export class NEOTranspiler implements Transpiler {
   private readonly transpilers: Transpilers;
+  private readonly scheduledTranspile = new Set<ts.Node>();
 
-  public constructor(
-    private readonly context: Context,
-    private readonly ast: Project,
-    private readonly smartContract: ClassDeclaration,
-  ) {
+  public constructor(private readonly context: Context, private readonly smartContract: ts.ClassDeclaration) {
     this.transpilers = transpilers
       .reduce<ReadonlyArray<new () => NodeTranspiler>>(
         (acc: ReadonlyArray<new () => NodeTranspiler>, kindCompilers: ReadonlyArray<new () => NodeTranspiler>) =>
@@ -74,105 +59,261 @@ export class NEOTranspiler implements Transpiler {
       }, {});
   }
 
-  public process(): TranspileResult {
-    const file = this.smartContract.getSourceFile();
-    const events = this.processEvents();
-    this.visit(this.smartContract, { isSmartContract: true });
-    this.context.libAliases.reset();
-    const functions = this.processSmartContract(file);
-    const contract = this.processContract(file);
-    this.strip();
+  public get program(): ts.Program {
+    return this.context.program;
+  }
 
-    this.ast.getSourceFiles().forEach((sourceFile) => {
-      if (!sourceFile.isDeclarationFile()) {
-        sourceFile.formatText();
+  public get typeChecker(): ts.TypeChecker {
+    return this.context.typeChecker;
+  }
+
+  public process(): TranspileResult {
+    const events = this.processEvents();
+    const contract = this.processContract();
+    const { functions, statements: addedStatements } = this.processSmartContract();
+
+    const context: ts.TransformationContext = {
+      getCompilerOptions: (): ts.CompilerOptions => this.program.getCompilerOptions(),
+      startLexicalEnvironment: (): void => {
+        // do nothing
+      },
+      suspendLexicalEnvironment: (): void => {
+        // do nothing
+      },
+      resumeLexicalEnvironment: (): void => {
+        // do nothing
+      },
+      endLexicalEnvironment: (): ts.Statement[] | undefined => undefined,
+      hoistFunctionDeclaration: (): void => {
+        // do nothing
+      },
+      hoistVariableDeclaration: (): void => {
+        // do nothing
+      },
+      requestEmitHelper: (): void => {
+        // do nothing
+      },
+      readEmitHelpers: (): ts.EmitHelper[] | undefined => undefined,
+      enableSubstitution: (): void => {
+        // do nothing
+      },
+      isSubstitutionEnabled: (): boolean => false,
+      onSubstituteNode: (_hint, node) => node,
+      enableEmitNotification: (): void => {
+        // do nothing
+      },
+      isEmitNotificationEnabled: (): boolean => false,
+      onEmitNode: (hint, node, emitCallback) => {
+        emitCallback(hint, node);
+      },
+    };
+
+    const eventStatements: ReadonlyArray<ts.Node> = events
+      .map(({ call }) => {
+        const parent = tsUtils.node.getParent(call);
+        if (ts.isVariableDeclaration(parent)) {
+          const statement = tsUtils.node.getParent(tsUtils.node.getParent(parent));
+          const maybeSourceFile = tsUtils.node.getParent(statement);
+          if (ts.isSourceFile(maybeSourceFile)) {
+            return statement;
+          }
+        }
+
+        return undefined;
+      })
+      .filter(utils.notNull);
+    const eventReplacements = events.reduce<Map<ts.Node, string>>((acc, { replacements }) => {
+      replacements.forEach((value, key) => {
+        acc.set(key, value);
+      });
+
+      return acc;
+    }, new Map());
+    const nodesToRemove = new Set<ts.Node>(eventStatements);
+    const fixedTypeNodes: Set<ts.Node> = new Set(this.getFixedTypeNodes());
+
+    const visitOne = (node: ts.Node): ts.Node => {
+      const transpiler = this.transpilers[node.kind];
+      if (transpiler === undefined) {
+        return node;
       }
-    });
+
+      return transpiler.visitNode(this, node);
+    };
+
+    const replaceEventCall = (name: string, call: ts.CallExpression) => {
+      const args: ReadonlyArray<ts.Expression> = [];
+
+      return tsUtils.setOriginal(
+        ts.createCall(
+          ts.createIdentifier('syscall'),
+          undefined,
+          args
+            .concat([ts.createStringLiteral('Neo.Runtime.Notify'), ts.createStringLiteral(name)])
+            .concat(tsUtils.argumented.getArguments(call)),
+        ),
+        call,
+      );
+    };
+
+    const contractSourceFile = tsUtils.node.getSourceFile(this.smartContract);
+    const sourceFiles = _.fromPairs(
+      this.program
+        .getSourceFiles()
+        .map<[string, { text: string; sourceMap: RawSourceMap }] | undefined>((sourceFile) => {
+          if (!tsUtils.file.isDeclarationFile(sourceFile)) {
+            function visit(node: ts.Node): ts.VisitResult<ts.Node> {
+              if (nodesToRemove.has(node)) {
+                // tslint:disable-next-line no-null-keyword no-any
+                return ts.createNotEmittedStatement(node);
+              }
+
+              if (fixedTypeNodes.has(node)) {
+                return tsUtils.setOriginal(ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword), node);
+              }
+
+              const replacementName = eventReplacements.get(node);
+
+              const transformedNode =
+                replacementName === undefined || !ts.isCallExpression(node)
+                  ? visitOne(node)
+                  : replaceEventCall(replacementName, node);
+
+              return ts.visitEachChild(transformedNode, visit, context);
+            }
+
+            let transformedSourceFile = visit(sourceFile) as ts.SourceFile;
+
+            if (sourceFile === contractSourceFile) {
+              transformedSourceFile = tsUtils.setOriginal(
+                ts.updateSourceFileNode(
+                  transformedSourceFile,
+                  transformedSourceFile.statements.concat(addedStatements),
+                  transformedSourceFile.isDeclarationFile,
+                  transformedSourceFile.referencedFiles,
+                  transformedSourceFile.typeReferenceDirectives,
+                  transformedSourceFile.hasNoDefaultLib,
+                  transformedSourceFile.libReferenceDirectives,
+                ),
+                transformedSourceFile,
+              );
+            }
+
+            const result = tsUtils.print(this.program, sourceFile, transformedSourceFile);
+
+            return [tsUtils.file.getFilePath(sourceFile), result];
+          }
+
+          return undefined;
+        })
+        .filter(utils.notNull),
+    );
 
     return {
-      ast: this.ast,
-      sourceFile: file,
-      abi: { functions, events },
-      context: this.context,
+      sourceFiles,
+      abi: { functions, events: events.map(({ event }) => event).filter(utils.notNull) },
       contract,
     };
   }
 
-  public visit(node: Node, options: VisitOptions): void {
-    const transpiler = this.transpilers[node.compilerNode.kind];
-    if (transpiler !== undefined) {
-      transpiler.visitNode(this, node, options);
+  public scheduleTranspile(node: ts.Node): void {
+    this.scheduledTranspile.add(node);
+  }
+
+  public isSmartContract(node: ts.ClassDeclaration): boolean {
+    if (node === this.smartContract) {
+      return true;
     }
+
+    if (this.isSmartContractType(node, this.getType(node))) {
+      return true;
+    }
+
+    const baseClass = tsUtils.class_.getBaseClass(this.typeChecker, node);
+
+    return baseClass !== undefined && this.isSmartContract(baseClass);
   }
 
-  public isSmartContract(node: ClassDeclaration): boolean {
-    return node === this.smartContract || node.getDerivedClasses().some((derived) => this.isSmartContract(derived));
+  public isSmartContractType(node: ts.Node, type: ts.Type | undefined): boolean {
+    return this.isOnlyLib(node, type, 'SmartContract');
   }
 
-  public getType(node: Node): Type | undefined {
+  public getType(node: ts.Node): ts.Type | undefined {
     return this.context.getType(node);
   }
 
-  public getTypeOfSymbol(symbol: Symbol | undefined, node: Node): Type | undefined {
+  public getTypeOfSymbol(symbol: ts.Symbol | undefined, node: ts.Node): ts.Type | undefined {
     return this.context.getTypeOfSymbol(symbol, node);
   }
 
-  public getTypeText(node: Node, type: Type): string {
-    return this.ast.getTypeChecker().getTypeText(type, node);
+  public getTypeText(node: ts.Node, type: ts.Type): string {
+    return tsUtils.type_.getText(this.context.typeChecker, type, node);
   }
 
-  public getSymbol(node: Node): Symbol | undefined {
+  public getSymbol(node: ts.Node): ts.Symbol | undefined {
     return this.context.getSymbol(node);
   }
 
-  public isOnlyGlobal(node: Node, type: Type | undefined, name: keyof Globals): boolean {
+  public isOnlyGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
     return this.context.isOnlyGlobal(node, type, name);
   }
 
-  public isLibSymbol(node: Node, symbol: Symbol | undefined, name: keyof Libs): boolean {
+  public isLibSymbol(node: ts.Node, symbol: ts.Symbol | undefined, name: keyof Libs): boolean {
     return this.context.isLibSymbol(node, symbol, name);
   }
 
-  public isOnlyLib(node: Node, type: Type | undefined, name: keyof Libs): boolean {
+  public isOnlyLib(node: ts.Node, type: ts.Type | undefined, name: keyof Libs): boolean {
     return this.context.isOnlyLib(node, type, name);
   }
 
-  public isLibAlias(identifier: Identifier | undefined, name: keyof LibAliases): boolean {
+  public isLibAlias(identifier: ts.Identifier | undefined, name: keyof LibAliases): boolean {
     return this.context.isLibAlias(identifier, name);
   }
 
-  public isFixedType(node: Node, type: Type | undefined): boolean {
+  public isFixedType(node: ts.Node, type: ts.Type | undefined): boolean {
     if (type === undefined) {
       return false;
     }
 
-    return this.isLibSymbol(node, type.getAliasSymbol() || type.getSymbol(), 'Fixed');
+    const aliasSymbol = tsUtils.type_.getAliasSymbol(type);
+
+    return this.isLibSymbol(node, aliasSymbol === undefined ? tsUtils.type_.getSymbol(type) : aliasSymbol, 'Fixed');
   }
 
-  public isSmartContractOptions(options: VisitOptions): VisitOptions {
-    return { ...options, isSmartContract: true };
-  }
-
-  public reportError(node: Node, message: string, code: DiagnosticCode): void {
+  public reportError(node: ts.Node, message: string, code: DiagnosticCode): void {
     this.context.reportError(node, message, code);
   }
 
-  public reportUnsupported(node: Node): void {
+  public reportUnsupported(node: ts.Node): void {
     this.context.reportUnsupported(node);
   }
 
-  private processEvents(): ReadonlyArray<ABIEvent> {
-    const decl = this.context.libs.createEventHandler.getValueDeclarationOrThrow();
-    if (!TypeGuards.isReferenceFindableNode(decl)) {
+  public getFinalTypeNode(node: ts.Node, type: ts.Type | undefined, typeNode: ts.TypeNode): ts.TypeNode {
+    if (type === undefined) {
+      this.reportError(node, 'Unknown type', DiagnosticCode.UNKNOWN_TYPE);
+    } else if (this.isFixedType(node, type)) {
+      return ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword);
+    }
+
+    return typeNode;
+  }
+
+  private processEvents(): ReadonlyArray<{
+    readonly event?: ABIEvent;
+    readonly call: ts.CallExpression;
+    readonly replacements: Map<ts.CallExpression, string>;
+  }> {
+    const decl = tsUtils.symbol.getValueDeclarationOrThrow(this.context.libs.createEventHandler);
+    if (decl === undefined || !ts.isFunctionDeclaration(decl)) {
       throw new Error('Something went wrong!');
     }
 
-    const calls = decl
-      .findReferencesAsNodes()
+    const calls = tsUtils.reference
+      .findReferencesAsNodes(this.context.program, this.context.languageService, decl)
       .map((node) => {
-        if (TypeGuards.isIdentifier(node)) {
-          const parent = node.getParent();
-          if (parent !== undefined && TypeGuards.isCallExpression(parent)) {
+        if (ts.isIdentifier(node)) {
+          const parent = tsUtils.node.getParent(node);
+          if (ts.isCallExpression(parent)) {
             return parent;
           }
         }
@@ -181,19 +322,31 @@ export class NEOTranspiler implements Transpiler {
       })
       .filter(utils.notNull);
 
-    return calls.map((call) => this.toABIEvent(call)).filter(utils.notNull);
+    return calls.map((call) => {
+      const result = this.toABIEvent(call);
+
+      return {
+        call,
+        event: result === undefined ? undefined : result.event,
+        replacements: result === undefined ? new Map() : result.replacements,
+      };
+    });
   }
 
-  private toABIEvent(call: CallExpression): ABIEvent | undefined {
-    const nameArg = call.getArguments()[0] as Node | undefined;
-    if (nameArg === undefined || !TypeGuards.isStringLiteral(nameArg)) {
+  private toABIEvent(
+    call: ts.CallExpression,
+  ): { readonly event: ABIEvent; readonly replacements: Map<ts.CallExpression, string> } | undefined {
+    const callArguments = tsUtils.argumented.getArguments(call);
+    const typeArguments = tsUtils.argumented.getTypeArguments(call);
+    const nameArg = callArguments[0] as ts.Node | undefined;
+    if (nameArg === undefined || !ts.isStringLiteral(nameArg)) {
       this.reportError(call, 'Invalid event specification.', DiagnosticCode.INVALID_CONTRACT_EVENT);
 
       return undefined;
     }
 
-    const name = nameArg.getLiteralValue();
-    const parameters = _.zip(call.getArguments().slice(1), call.getTypeArguments())
+    const name = tsUtils.literal.getLiteralValue(nameArg);
+    const parameters = _.zip(callArguments.slice(1), typeArguments === undefined ? [] : typeArguments)
       .map(([paramNameArg, paramTypeNode]) => {
         if (paramNameArg === undefined || paramTypeNode === undefined) {
           this.reportError(call, 'Invalid event specification.', DiagnosticCode.INVALID_CONTRACT_EVENT);
@@ -201,13 +354,13 @@ export class NEOTranspiler implements Transpiler {
           return undefined;
         }
 
-        if (!TypeGuards.isStringLiteral(paramNameArg)) {
+        if (!ts.isStringLiteral(paramNameArg)) {
           this.reportError(paramNameArg, 'Invalid event specification.', DiagnosticCode.INVALID_CONTRACT_EVENT);
 
           return undefined;
         }
 
-        const paramName = paramNameArg.getLiteralValue();
+        const paramName = tsUtils.literal.getLiteralValue(paramNameArg);
 
         return this.toABIParameter(
           paramName,
@@ -218,17 +371,18 @@ export class NEOTranspiler implements Transpiler {
       })
       .filter(utils.notNull);
 
-    const parent = call.getParent();
-    if (parent === undefined || !TypeGuards.isVariableDeclaration(parent)) {
+    const parent = tsUtils.node.getParent(call);
+    const replacements = new Map<ts.CallExpression, string>();
+    if (!ts.isVariableDeclaration(parent)) {
       this.reportError(nameArg, 'Invalid event specification.', DiagnosticCode.INVALID_CONTRACT_EVENT);
     } else {
-      const identifier = parent.getNameNode();
-      identifier
-        .findReferencesAsNodes()
+      const identifier = tsUtils.node.getNameNode(parent);
+      tsUtils.reference
+        .findReferencesAsNodes(this.context.program, this.context.languageService, identifier)
         .map((node) => {
-          if (TypeGuards.isIdentifier(node)) {
-            const nodeParent = node.getParent();
-            if (nodeParent !== undefined && TypeGuards.isCallExpression(nodeParent)) {
+          if (ts.isIdentifier(node)) {
+            const nodeParent = tsUtils.node.getParent(node);
+            if (ts.isCallExpression(nodeParent)) {
               return nodeParent;
             }
           }
@@ -236,86 +390,162 @@ export class NEOTranspiler implements Transpiler {
           return undefined;
         })
         .filter(utils.notNull)
-        .forEach((eventCall) => this.replaceEventCall(name, eventCall));
-
-      parent.remove();
+        .forEach((eventCall) => {
+          replacements.set(eventCall, name);
+        });
     }
 
-    return { name, parameters };
+    return { event: { name, parameters }, replacements };
   }
 
-  private replaceEventCall(name: string, call: CallExpression): void {
-    const args = [`'${name}'`].concat(call.getArguments().map((arg) => arg.getText())).join(', ');
-    call.replaceWithText(`syscall('Neo.Runtime.Notify', ${args})`);
-  }
-
-  private strip(): void {
-    this.context.libAliases.reset();
+  private getFixedTypeNodes(): ReadonlyArray<ts.TypeReferenceNode> {
     const identifiers = [...this.context.libAliases.Fixed];
-    identifiers.forEach((identifier) => {
-      const parent = identifier.getParent();
-      if (parent !== undefined && TypeGuards.isTypeReferenceNode(parent)) {
-        parent.replaceWithText('number');
-      }
-    });
+
+    return identifiers
+      .map((identifier) => tsUtils.node.getParent(identifier))
+      .filter(utils.notNull)
+      .filter(ts.isTypeReferenceNode);
   }
 
-  private processSmartContract(file: SourceFile): ReadonlyArray<ABIFunction> {
-    const smartContract = file.getClassOrThrow(this.smartContract.getNameOrThrow());
-    const methods = smartContract
-      .getType()
-      .getProperties()
+  private processSmartContract(): {
+    readonly functions: ReadonlyArray<ABIFunction>;
+    readonly statements: ReadonlyArray<ts.Statement>;
+  } {
+    const smartContractType = tsUtils.type_.getType(this.context.typeChecker, this.smartContract);
+    let methods = tsUtils.type_
+      .getProperties(smartContractType)
       .map((symbol) => this.processProperty(symbol))
       .reduce((acc, values) => acc.concat(values), []);
+    const ctor = tsUtils.class_.getFirstConcreteConstructor(this.typeChecker, this.smartContract);
+    if (ctor !== undefined) {
+      const ctorType = this.getTypeOfSymbol(this.getSymbol(ctor.parent), ctor.parent);
+      if (ctorType !== undefined) {
+        methods = methods.concat(this.processMethodProperty('deploy', ctor, ctorType.getConstructSignatures(), false));
+      }
+    }
 
-    const mutableVerifySwitches: string[] = [];
-    const mutableApplicationSwitches: string[] = [];
+    const contractIdentifier = ts.createIdentifier('contract');
+    const methodIdentifier = ts.createIdentifier('method');
+
+    const processMethod = (
+      parametered: ts.Node & { readonly parameters: ts.NodeArray<ts.ParameterDeclaration> },
+      name: string,
+      shouldReturn: boolean,
+    ) => {
+      let argsStatement: ts.Statement | undefined;
+      let args: ReadonlyArray<ts.Expression> | undefined;
+      if (tsUtils.parametered.getParameters(parametered).length > 0) {
+        const argsTypes = tsUtils.parametered
+          .getParameters(parametered)
+          .map((param) => this.getFinalTypeNode(param, this.getType(param), tsUtils.type_.getTypeNode(param)));
+        const argsIdentifier = ts.createIdentifier('args');
+        argsStatement = ts.createVariableStatement(
+          undefined,
+          ts.createVariableDeclarationList(
+            [
+              ts.createVariableDeclaration(
+                argsIdentifier,
+                undefined,
+                ts.createAsExpression(
+                  ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                    ts.createStringLiteral('Neo.Runtime.GetArgument'),
+                    ts.createNumericLiteral('1'),
+                  ]),
+                  ts.createTupleTypeNode(argsTypes),
+                ),
+              ),
+            ],
+            ts.NodeFlags.Const,
+          ),
+        );
+        args = tsUtils.parametered
+          .getParameters(parametered)
+          .map((_param, idx) => ts.createElementAccess(argsIdentifier, idx));
+      }
+      let call = ts.createCall(ts.createPropertyAccess(contractIdentifier, name), undefined, args);
+      if (shouldReturn) {
+        call = ts.createCall(ts.createIdentifier('syscall'), undefined, [
+          ts.createStringLiteral('Neo.Runtime.Return'),
+          call,
+        ]);
+      }
+
+      const callStatement = ts.createExpressionStatement(call);
+
+      return argsStatement === undefined ? callStatement : ts.createBlock([argsStatement, callStatement]);
+    };
+
+    const mutableVerifySwitches: ts.IfStatement[] = [];
+    const mutableApplicationSwitches: ts.IfStatement[] = [];
     const mutableFunctions: ABIFunction[] = [];
     methods.forEach(([method, func]) => {
-      const name = TypeGuards.isParameterDeclaration(method) ? method.getNameOrThrow() : method.getName();
-      let methodSwitch;
-      if (TypeGuards.isMethodDeclaration(method)) {
-        let argsStatement = '';
-        let args = '';
-        if (method.getParameters().length > 0) {
-          const argsTypes = method
-            .getParameters()
-            .map((param) => this.getFinalTypeText(param, this.getType(param)))
-            .join(',');
-          argsStatement = `const args = syscall('Neo.Runtime.GetArgument', 1) as [${argsTypes}];\n`;
-          args = method
-            .getParameters()
-            .map((_param, idx) => `args[${idx}]`)
-            .join(', ');
-        }
-        let call = `contract.${name}(${args})`;
-        if (!typeUtils.isVoid(method.getReturnType())) {
-          call = `syscall('Neo.Runtime.Return', ${call})`;
-        }
-        methodSwitch = `
-          if (method === '${name}') {
-            ${argsStatement}${call};
-          }
-        `.trim();
+      const name = ts.isConstructorDeclaration(method)
+        ? 'deploy'
+        : tsUtils.guards.isParameterDeclaration(method)
+          ? tsUtils.node.getNameOrThrow(method)
+          : tsUtils.node.getName(method);
+      let methodStatement: ts.Statement;
+
+      let condition = ts.createBinary(
+        methodIdentifier,
+        ts.SyntaxKind.EqualsEqualsEqualsToken,
+        ts.createStringLiteral(name),
+      );
+
+      if (ts.isMethodDeclaration(method)) {
+        const returnType = this.getType(method);
+        const shouldReturn = returnType !== undefined && !tsUtils.type_.isVoidish(returnType);
+        methodStatement = processMethod(method, name, shouldReturn);
+      } else if (ts.isConstructorDeclaration(method)) {
+        methodStatement = processMethod(method, name, true);
       } else if (
-        TypeGuards.isGetAccessorDeclaration(method) ||
-        TypeGuards.isPropertyDeclaration(method) ||
-        TypeGuards.isParameterDeclaration(method)
+        ts.isGetAccessorDeclaration(method) ||
+        ts.isPropertyDeclaration(method) ||
+        tsUtils.guards.isParameterDeclaration(method)
       ) {
-        methodSwitch = `
-          if (method === '${name}') {
-            syscall('Neo.Runtime.Return', contract.${name});
-          }
-        `.trim();
+        methodStatement = ts.createExpressionStatement(
+          ts.createCall(ts.createIdentifier('syscall'), undefined, [
+            ts.createStringLiteral('Neo.Runtime.Return'),
+            tsUtils.modifier.isReadonly(method) && tsUtils.initializer.getInitializer(method) === undefined
+              ? ts.createCall(
+                  ts.createPropertyAccess(contractIdentifier, `get${name[0].toUpperCase()}${name.slice(1)}`),
+                  undefined,
+                  [],
+                )
+              : ts.createPropertyAccess(contractIdentifier, name),
+          ]),
+        );
       } else {
-        const param = method.getParameters()[0];
-        const typeText = this.getFinalTypeText(param, this.getType(param));
-        methodSwitch = `
-          if (method === 'set${name[0].toUpperCase()}${name.slice(1)}') {
-            contract.${name} = (syscall('Neo.Runtime.GetArgument', 1) as [${typeText}])[0];
-          }
-        `.trim();
+        const param = tsUtils.parametered.getParameters(method)[0];
+
+        condition = ts.createBinary(
+          methodIdentifier,
+          ts.SyntaxKind.EqualsEqualsEqualsToken,
+          ts.createStringLiteral(`set${name[0].toUpperCase()}${name.slice(1)}`),
+        );
+        methodStatement = ts.createExpressionStatement(
+          ts.createBinary(
+            ts.createPropertyAccess(contractIdentifier, name),
+            ts.SyntaxKind.EqualsToken,
+            ts.createElementAccess(
+              ts.createParen(
+                ts.createAsExpression(
+                  ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                    ts.createStringLiteral('Neo.Runtime.GetArgument'),
+                    ts.createNumericLiteral('1'),
+                  ]),
+                  ts.createTupleTypeNode([
+                    this.getFinalTypeNode(param, this.getType(param), tsUtils.type_.getTypeNode(param)),
+                  ]),
+                ),
+              ),
+              0,
+            ),
+          ),
+        );
       }
+
+      const methodSwitch = tsUtils.setOriginal(ts.createIf(condition, methodStatement), method);
 
       mutableApplicationSwitches.push(methodSwitch);
       if (func.verify) {
@@ -325,51 +555,105 @@ export class NEOTranspiler implements Transpiler {
       mutableFunctions.push(func);
     });
 
-    const applicationFallback =
-      mutableApplicationSwitches.length === 0
-        ? 'throw new Error('
-        : ` else {
-        throw new Error('Unknown method');
-      }`;
-    let verifyFallback = `
-      if (!syscall('Neo.Runtime.CheckWitness', contract.owner)) {
-        throw new Error('Invalid witness');
+    const applicationFallback = ts.createThrow(
+      ts.createNew(ts.createIdentifier('Error'), undefined, [ts.createStringLiteral('Unknown method')]),
+    );
+    const verifyFallback = ts.createIf(
+      ts.createPrefix(
+        ts.SyntaxKind.ExclamationToken,
+        ts.createCall(ts.createIdentifier('syscall'), undefined, [
+          ts.createStringLiteral('Neo.Runtime.CheckWitness'),
+          ts.createPropertyAccess(contractIdentifier, 'owner'),
+        ]),
+      ),
+      ts.createThrow(
+        ts.createNew(ts.createIdentifier('Error'), undefined, [ts.createStringLiteral('Invalid witness')]),
+      ),
+    );
+
+    function makeIfElse(ifStatements: ReadonlyArray<ts.IfStatement>, finalStatement: ts.Statement): ts.Statement {
+      if (ifStatements.length === 0) {
+        return finalStatement;
       }
-    `.trim();
-    if (mutableVerifySwitches.length > 0) {
-      verifyFallback = `else {
-        ${verifyFallback}
-      }`;
+
+      return ts.createIf(
+        ifStatements[0].expression,
+        ifStatements[0].thenStatement,
+        makeIfElse(ifStatements.slice(1), finalStatement),
+      );
     }
 
-    const statements = `
-      const contract = new ${this.smartContract.getName()}();
-      const method = syscall('Neo.Runtime.GetArgument', 0) as string;
-      if (syscall('Neo.Runtime.GetTrigger') === 0x10) {
-        ${mutableApplicationSwitches.join(' else ')}${applicationFallback}
-      } else if (syscall('Neo.Runtime.GetTrigger') === 0x00) {
-        ${mutableVerifySwitches.join(' else ')}
-        ${verifyFallback}
-      } else {
-        throw new Error('Unsupported trigger');
-      }
-    `;
+    const statements = [
+      ts.createVariableStatement(
+        undefined,
+        ts.createVariableDeclarationList(
+          [
+            ts.createVariableDeclaration(
+              contractIdentifier,
+              undefined,
+              ts.createNew(ts.createIdentifier(tsUtils.node.getNameOrThrow(this.smartContract)), undefined, []),
+            ),
+          ],
+          ts.NodeFlags.Const,
+        ),
+      ),
+      ts.createVariableStatement(
+        undefined,
+        ts.createVariableDeclarationList(
+          [
+            ts.createVariableDeclaration(
+              methodIdentifier,
+              undefined,
+              ts.createAsExpression(
+                ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                  ts.createStringLiteral('Neo.Runtime.GetArgument'),
+                  ts.createNumericLiteral('0'),
+                ]),
+                ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              ),
+            ),
+          ],
+          ts.NodeFlags.Const,
+        ),
+      ),
+      ts.createIf(
+        ts.createBinary(
+          ts.createCall(ts.createIdentifier('syscall'), undefined, [ts.createStringLiteral('Neo.Runtime.GetTrigger')]),
+          ts.SyntaxKind.EqualsEqualsEqualsToken,
+          ts.createNumericLiteral(`${0x10}`),
+        ),
+        makeIfElse(mutableApplicationSwitches, applicationFallback),
+        ts.createIf(
+          ts.createBinary(
+            ts.createCall(ts.createIdentifier('syscall'), undefined, [
+              ts.createStringLiteral('Neo.Runtime.GetTrigger'),
+            ]),
+            ts.SyntaxKind.EqualsEqualsEqualsToken,
+            ts.createNumericLiteral(`${0x00}`),
+          ),
+          makeIfElse(mutableVerifySwitches, verifyFallback),
+          ts.createThrow(
+            ts.createNew(ts.createIdentifier('Error'), undefined, [ts.createStringLiteral('Unsupported trigger')]),
+          ),
+        ),
+      ),
+    ];
 
-    file.addStatements(statements);
-
-    return mutableFunctions;
+    return { functions: mutableFunctions, statements };
   }
 
-  private processContract(file: SourceFile): Contract {
-    const name = this.smartContract.getNameOrThrow();
+  private processContract(): Contract {
+    const name = tsUtils.node.getNameOrThrow(this.smartContract);
     const defaultContract = createDefaultContract(name);
-    const smartContract = file.getClassOrThrow(name);
 
-    const properties = smartContract.getType().getProperty('properties');
+    const properties = tsUtils.type_.getProperty(
+      tsUtils.type_.getType(this.context.typeChecker, this.smartContract),
+      'properties',
+    );
 
     if (properties === undefined) {
       this.reportError(
-        smartContract,
+        this.smartContract,
         'Invalid smart contract properties definition.',
         DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
       );
@@ -377,13 +661,13 @@ export class NEOTranspiler implements Transpiler {
       return defaultContract;
     }
 
-    const decls = properties
-      .getDeclarations()
-      .filter(TypeGuards.isPropertyDeclaration)
-      .filter((prop) => prop.getInitializer() !== undefined);
+    const decls = tsUtils.symbol
+      .getDeclarations(properties)
+      .filter(ts.isPropertyDeclaration)
+      .filter((prop) => tsUtils.initializer.getInitializer(prop) !== undefined);
     if (decls.length !== 1) {
       this.reportError(
-        smartContract,
+        this.smartContract,
         'Invalid smart contract properties definition.',
         DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
       );
@@ -392,11 +676,11 @@ export class NEOTranspiler implements Transpiler {
     }
 
     const decl = decls[0];
-    const initializer = decl.getInitializerOrThrow();
+    const initializer = tsUtils.initializer.getInitializerOrThrow(decl);
 
-    if (!TypeGuards.isObjectLiteralExpression(initializer)) {
+    if (!ts.isObjectLiteralExpression(initializer)) {
       this.reportError(
-        smartContract,
+        this.smartContract,
         'Invalid smart contract properties definition.',
         DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
       );
@@ -406,10 +690,10 @@ export class NEOTranspiler implements Transpiler {
 
     const contract: { [key: string]: string } = {};
     // tslint:disable-next-line no-loop-statement
-    for (const property of initializer.getProperties()) {
-      if (!TypeGuards.isPropertyAssignment(property)) {
+    for (const property of tsUtils.object_.getProperties(initializer)) {
+      if (!ts.isPropertyAssignment(property)) {
         this.reportError(
-          smartContract,
+          this.smartContract,
           'Invalid smart contract properties definition.',
           DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
         );
@@ -417,11 +701,11 @@ export class NEOTranspiler implements Transpiler {
         return defaultContract;
       }
 
-      const key = property.getName();
-      const value = property.getInitializer();
-      if (value === undefined || !TypeGuards.isLiteralExpression(value)) {
+      const key = tsUtils.node.getName(property);
+      const value = tsUtils.initializer.getInitializer(property);
+      if (value === undefined || !ts.isLiteralExpression(value)) {
         this.reportError(
-          smartContract,
+          this.smartContract,
           'Invalid smart contract properties definition.',
           DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
         );
@@ -430,7 +714,7 @@ export class NEOTranspiler implements Transpiler {
       }
 
       // tslint:disable-next-line no-object-mutation
-      contract[key] = value.getLiteralText();
+      contract[key] = tsUtils.literal.getLiteralValue(value);
     }
 
     // tslint:disable-next-line no-object-literal-type-assertion
@@ -444,7 +728,7 @@ export class NEOTranspiler implements Transpiler {
   }
 
   private getProperties(): Contract['properties'] {
-    const decls = this.context.globals.syscall.getDeclarations();
+    const decls = tsUtils.symbol.getDeclarations(this.context.globals.syscall);
 
     return {
       dynamicInvoke: false,
@@ -453,46 +737,59 @@ export class NEOTranspiler implements Transpiler {
     };
   }
 
-  private isSyscallUsed(decls: ReadonlyArray<Node>, name: string): boolean {
+  private isSyscallUsed(decls: ReadonlyArray<ts.Node>, name: string): boolean {
     const syscall = this.findSyscall(decls, name);
 
-    if (!TypeGuards.isReferenceFindableNode(syscall)) {
+    if (!ts.isFunctionDeclaration(syscall)) {
       throw new Error('Something went wrong!');
     }
 
-    return syscall.findReferencesAsNodes().length > 0;
+    return (
+      tsUtils.reference.findReferencesAsNodes(this.context.program, this.context.languageService, syscall).length > 0
+    );
   }
 
-  private findSyscall(decls: ReadonlyArray<Node>, name: string): FunctionDeclaration {
-    const syscallDecl = decls.filter(TypeGuards.isFunctionDeclaration).find(
-      (decl) =>
-        decl
-          .getParameterOrThrow('name')
-          .getTypeNodeOrThrow()
-          .getText() === `'${name}'`,
-    );
+  private findSyscall(decls: ReadonlyArray<ts.Node>, name: string): ts.FunctionDeclaration {
+    const syscallDecl = decls.filter(ts.isFunctionDeclaration).find((decl) => {
+      const param = tsUtils.parametered.getParameterOrThrow(decl, 'name');
+      const type = this.getType(param);
+
+      if (type !== undefined) {
+        const typeText = tsUtils.type_.getText(this.context.typeChecker, type, param).slice(1, -1);
+
+        return typeText === name;
+      }
+
+      return false;
+    });
 
     if (syscallDecl === undefined) {
-      throw new Error('Something went wrong.');
+      throw new Error(`Something went wrong. Could not find syscall ${name}`);
     }
 
     return syscallDecl;
   }
 
-  private processProperty(symbol: Symbol): ReadonlyArray<[ClassInstanceMemberTypes, ABIFunction]> {
-    const decls = symbol
-      .getDeclarations()
-      .filter((symbolDecl) => !TypeGuards.isMethodDeclaration(symbolDecl) || symbolDecl.isImplementation());
+  private processProperty(
+    symbol: ts.Symbol,
+  ): ReadonlyArray<[ClassInstanceMemberType | ts.ConstructorDeclaration, ABIFunction]> {
+    const decls = tsUtils.symbol
+      .getDeclarations(symbol)
+      .filter(
+        (symbolDecl) =>
+          !(ts.isMethodDeclaration(symbolDecl) || ts.isConstructorDeclaration(symbolDecl)) ||
+          tsUtils.overload.isImplementation(symbolDecl),
+      );
     if (
       !(
         decls.length === 1 ||
         (decls.length === 2 &&
-          decls.some((accessor) => TypeGuards.isGetAccessorDeclaration(accessor)) &&
-          decls.some((accessor) => TypeGuards.isSetAccessorDeclaration(accessor)))
+          decls.some((accessor) => ts.isGetAccessorDeclaration(accessor)) &&
+          decls.some((accessor) => ts.isSetAccessorDeclaration(accessor)))
       )
     ) {
       this.reportError(
-        symbol.getDeclarations()[0],
+        tsUtils.symbol.getDeclarations(symbol)[0],
         'Invalid contract function. Resolved to multiple implementation declarations.',
         DiagnosticCode.INVALID_CONTRACT_METHOD,
       );
@@ -502,11 +799,11 @@ export class NEOTranspiler implements Transpiler {
     const decl = decls[0];
     if (
       !(
-        TypeGuards.isMethodDeclaration(decl) ||
-        TypeGuards.isPropertyDeclaration(decl) ||
-        TypeGuards.isGetAccessorDeclaration(decl) ||
-        TypeGuards.isSetAccessorDeclaration(decl) ||
-        TypeGuards.isParameterDeclaration(decl)
+        ts.isMethodDeclaration(decl) ||
+        ts.isPropertyDeclaration(decl) ||
+        ts.isGetAccessorDeclaration(decl) ||
+        ts.isSetAccessorDeclaration(decl) ||
+        ts.isParameterPropertyDeclaration(decl)
       )
     ) {
       return [];
@@ -518,12 +815,20 @@ export class NEOTranspiler implements Transpiler {
       return [];
     }
 
-    if (TypeGuards.isGetAccessorDeclaration(decl) || TypeGuards.isSetAccessorDeclaration(decl)) {
-      const getDecl = TypeGuards.isGetAccessorDeclaration(decl) ? decl : decl.getGetAccessor();
-      const setDecl = TypeGuards.isSetAccessorDeclaration(decl) ? decl : decl.getSetAccessor();
-      const mutableResult: Array<[ClassInstanceMemberTypes, ABIFunction]> = [];
-      if (getDecl !== undefined && nodeUtils.isPublic(getDecl)) {
-        const retType = this.toABIReturn(getDecl, type, this.getIdentifier(getDecl.getReturnTypeNode()));
+    if (!tsUtils.modifier.isPublic(decl)) {
+      return [];
+    }
+
+    if (ts.isGetAccessorDeclaration(decl) || ts.isSetAccessorDeclaration(decl)) {
+      const getDecl = ts.isGetAccessorDeclaration(decl) ? decl : tsUtils.accessor.getGetAccessor(decl);
+      const setDecl = ts.isSetAccessorDeclaration(decl) ? decl : tsUtils.accessor.getSetAccessor(decl);
+      const mutableResult: Array<[ClassInstanceMemberType, ABIFunction]> = [];
+      if (getDecl !== undefined) {
+        const retType = this.toABIReturn(
+          getDecl,
+          type,
+          this.getIdentifier(tsUtils.declaration.getReturnTypeNode(getDecl)),
+        );
         mutableResult.push([
           getDecl,
           {
@@ -540,8 +845,12 @@ export class NEOTranspiler implements Transpiler {
         ]);
       }
 
-      if (setDecl !== undefined && nodeUtils.isPublic(setDecl)) {
-        const retType = this.toABIReturn(setDecl, type, this.getIdentifier(setDecl.getParameters()[0].getTypeNode()));
+      if (setDecl !== undefined) {
+        const retType = this.toABIReturn(
+          setDecl,
+          type,
+          this.getIdentifier(tsUtils.type_.getTypeNode(tsUtils.parametered.getParameters(setDecl)[0])),
+        );
         mutableResult.push([
           setDecl,
           {
@@ -550,7 +859,7 @@ export class NEOTranspiler implements Transpiler {
             verify: this.hasVerify(setDecl),
             parameters: [
               {
-                name: setDecl.getParameters()[0].getNameOrThrow(),
+                name: tsUtils.node.getNameOrThrow(tsUtils.parametered.getParameters(setDecl)[0]),
                 ...(retType === undefined
                   ? {
                       type: 'ByteArray',
@@ -566,46 +875,12 @@ export class NEOTranspiler implements Transpiler {
       return mutableResult;
     }
 
-    if (!nodeUtils.isPublic(decl)) {
-      return [];
-    }
-
     const verify = this.hasVerify(decl);
-    if (TypeGuards.isMethodDeclaration(decl)) {
-      const callSignatures = type.getCallSignatures();
-      if (callSignatures.length !== 1) {
-        this.reportError(
-          decl,
-          'Invalid contract function. Resolved to multiple call signatures.',
-          DiagnosticCode.INVALID_CONTRACT_METHOD,
-        );
-
-        return [];
-      }
-      const callSignature = callSignatures[0];
-
-      const parameters = callSignature
-        .getParameters()
-        .map((parameter) => this.paramToABIParameter(parameter))
-        .filter(utils.notNull);
-      const currentReturnType = this.toABIReturn(
-        decl,
-        callSignature.getReturnType(),
-        this.getIdentifier(decl.getReturnTypeNode()),
-      );
-      const constant = this.hasDecorator(decl, 'constant');
-      const currentFunc = {
-        name,
-        constant,
-        verify,
-        parameters,
-        returnType: currentReturnType === undefined ? BYTE_ARRAY_RETURN : currentReturnType,
-      };
-
-      return [[decl, currentFunc]];
+    if (ts.isMethodDeclaration(decl)) {
+      return this.processMethodProperty(name, decl, type.getCallSignatures(), verify);
     }
 
-    const returnType = this.toABIReturn(decl, type, this.getIdentifier(decl.getTypeNode()));
+    const returnType = this.toABIReturn(decl, type, this.getIdentifier(tsUtils.type_.getTypeNode(decl)));
     const func = {
       name,
       constant: true,
@@ -616,28 +891,82 @@ export class NEOTranspiler implements Transpiler {
     return [[decl, func]];
   }
 
-  private hasVerify(decl: ClassInstanceMemberTypes): boolean {
+  private processMethodProperty(
+    name: string,
+    decl: ts.ConstructorDeclaration | ts.MethodDeclaration,
+    callSignatures: ReadonlyArray<ts.Signature>,
+    verify: boolean,
+  ): ReadonlyArray<[ClassInstanceMemberType | ts.ConstructorDeclaration, ABIFunction]> {
+    if (callSignatures.length !== 1) {
+      this.reportError(
+        decl,
+        'Invalid contract function. Resolved to multiple call signatures.',
+        DiagnosticCode.INVALID_CONTRACT_METHOD,
+      );
+
+      return [];
+    }
+    const callSignature = callSignatures[0];
+
+    const parameters = callSignature
+      .getParameters()
+      .map((parameter) => this.paramToABIParameter(parameter))
+      .filter(utils.notNull);
+    const currentReturnType = ts.isConstructorDeclaration(decl)
+      ? BOOLEAN_RETURN
+      : this.toABIReturn(
+          decl,
+          callSignature.getReturnType(),
+          this.getIdentifier(tsUtils.declaration.getReturnTypeNode(decl)),
+        );
+    const constant = this.hasDecorator(decl, 'constant');
+    const currentFunc = {
+      name,
+      constant,
+      verify,
+      parameters,
+      returnType: currentReturnType === undefined ? BYTE_ARRAY_RETURN : currentReturnType,
+    };
+
+    return [[decl, currentFunc]];
+  }
+
+  private hasVerify(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
     return this.hasDecorator(decl, 'verify');
   }
 
-  private hasDecorator(decl: ClassInstanceMemberTypes, name: 'verify' | 'constant'): boolean {
-    return decl
-      .getDecorators()
-      .some((decorator) => this.isOnlyLib(decorator.getExpression(), this.getType(decorator.getExpression()), name));
+  private hasDecorator(
+    decl: ClassInstanceMemberType | ts.ConstructorDeclaration,
+    name: 'verify' | 'constant',
+  ): boolean {
+    const decorators = tsUtils.decoratable.getDecorators(decl);
+
+    return decorators === undefined
+      ? false
+      : decorators.some((decorator) =>
+          this.isOnlyLib(
+            tsUtils.expression.getExpression(decorator),
+            this.getType(tsUtils.expression.getExpression(decorator)),
+            name,
+          ),
+        );
   }
 
-  private paramToABIParameter(param: Symbol): ABIParameter | undefined {
-    const decl = utils.nullthrows(param.getDeclarations()[0]);
-    const id = TypeGuards.isParameterDeclaration(decl) ? this.getIdentifier(decl.getTypeNode()) : undefined;
+  private paramToABIParameter(param: ts.Symbol): ABIParameter | undefined {
+    const decls = tsUtils.symbol.getDeclarations(param);
+    const decl = utils.nullthrows(decls[0]);
+    const id = tsUtils.guards.isParameterDeclaration(decl)
+      ? this.getIdentifier(tsUtils.type_.getTypeNode(decl))
+      : undefined;
 
-    return this.toABIParameter(param.getName(), decl, this.getTypeOfSymbol(param, decl), id);
+    return this.toABIParameter(tsUtils.symbol.getName(param), decl, this.getTypeOfSymbol(param, decl), id);
   }
 
   private toABIParameter(
     name: string,
-    node: Node,
-    resolvedType: Type | undefined,
-    typeIdentifier?: Identifier,
+    node: ts.Node,
+    resolvedType: ts.Type | undefined,
+    typeIdentifier?: ts.Identifier,
   ): ABIParameter | undefined {
     const type = this.toABIReturn(node, resolvedType, typeIdentifier);
     if (type === undefined) {
@@ -647,14 +976,18 @@ export class NEOTranspiler implements Transpiler {
     return { ...type, name };
   }
 
-  private toABIReturn(node: Node, resolvedType: Type | undefined, typeIdentifier?: Identifier): ABIReturn | undefined {
+  private toABIReturn(
+    node: ts.Node,
+    resolvedType: ts.Type | undefined,
+    typeIdentifier?: ts.Identifier,
+  ): ABIReturn | undefined {
     if (resolvedType === undefined && typeIdentifier === undefined) {
       this.reportError(node, 'Could not detect ABI, unknown type.', DiagnosticCode.UNKNOWN_TYPE);
 
       return undefined;
     }
 
-    if (typeUtils.isOnlyBoolean(resolvedType)) {
+    if (resolvedType !== undefined && tsUtils.type_.isOnlyBooleanish(resolvedType)) {
       return { type: 'Boolean' };
     }
 
@@ -674,32 +1007,41 @@ export class NEOTranspiler implements Transpiler {
       return { type: 'PublicKey' };
     }
 
-    if (typeUtils.isVoid(resolvedType)) {
+    if (resolvedType === undefined) {
+      this.reportError(node, 'Invalid contract type.', DiagnosticCode.INVALID_CONTRACT_TYPE);
+
+      return undefined;
+    }
+
+    if (tsUtils.type_.isOnlyVoidish(resolvedType)) {
       return { type: 'Void' };
     }
 
-    if (typeUtils.isOnlyString(resolvedType)) {
+    if (tsUtils.type_.isOnlyStringish(resolvedType)) {
       return { type: 'String' };
     }
 
-    if (typeUtils.isOnlyNumberLiteral(resolvedType)) {
+    if (tsUtils.type_.isOnlyNumberLiteral(resolvedType)) {
       return { type: 'Integer', decimals: 0 };
     }
 
-    if (this.isFixedType(node, resolvedType) && resolvedType !== undefined) {
+    if (this.isFixedType(node, resolvedType)) {
       const decimals = this.getFixedDecimals(resolvedType);
 
       return { type: 'Integer', decimals };
     }
 
-    if (typeUtils.isOnlyNumber(resolvedType)) {
+    if (tsUtils.type_.isOnlyNumberish(resolvedType)) {
       return { type: 'Integer', decimals: 0 };
     }
 
-    if (typeUtils.isOnlyArray(resolvedType) && resolvedType !== undefined) {
-      const value = this.toABIReturn(node, resolvedType.getTypeArguments()[0]);
-      if (value !== undefined) {
-        return { type: 'Array', value };
+    if (tsUtils.type_.isOnlyArray(resolvedType)) {
+      const typeArguments = tsUtils.type_.getTypeArguments(resolvedType);
+      if (typeArguments !== undefined) {
+        const value = this.toABIReturn(node, typeArguments[0]);
+        if (value !== undefined) {
+          return { type: 'Array', value };
+        }
       }
     }
 
@@ -712,26 +1054,24 @@ export class NEOTranspiler implements Transpiler {
     return undefined;
   }
 
-  private getFixedDecimals(type: Type): number {
-    // tslint:disable-next-line no-any
-    return (type.getUnionTypes()[1].getIntersectionTypes()[1].compilerType as any).typeArguments[0].value;
-  }
-
-  private getIdentifier(node: TypeNode | undefined): Identifier | undefined {
-    return node === undefined ? node : node.getFirstDescendantByKind(SyntaxKind.Identifier);
-  }
-
-  private getFinalTypeText(node: Node, type: Type | undefined): string {
-    let typeText = 'any';
-    if (type === undefined) {
-      this.reportError(node, 'Unknown type', DiagnosticCode.UNKNOWN_TYPE);
-    } else if (this.isFixedType(node, type)) {
-      typeText = 'number';
-    } else {
-      typeText = this.getTypeText(node, type);
+  private getFixedDecimals(type: ts.Type): number {
+    const unionTypes = tsUtils.type_.getUnionTypes(type);
+    if (unionTypes !== undefined && unionTypes.length === 2) {
+      const intersectionTypes = tsUtils.type_.getIntersectionTypes(unionTypes[1]);
+      if (intersectionTypes !== undefined && intersectionTypes.length === 2) {
+        const typeArguments = tsUtils.type_.getTypeArguments(intersectionTypes[1]);
+        if (typeArguments !== undefined && typeArguments.length === 1) {
+          // tslint:disable-next-line no-any
+          return (typeArguments[0] as any).value;
+        }
+      }
     }
 
-    return typeText;
+    throw new Error('Something went wrong');
+  }
+
+  private getIdentifier(node: ts.TypeNode | undefined): ts.Identifier | undefined {
+    return node === undefined ? node : tsUtils.node.getFirstDescendantByKind(node, ts.SyntaxKind.Identifier);
   }
 }
 
