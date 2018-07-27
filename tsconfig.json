@@ -41,6 +41,7 @@
     "alwaysStrict": true,
     "strict": true,
     "skipLibCheck": true,
+    "sourceMap": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
     "allowUnusedLabels": false,
