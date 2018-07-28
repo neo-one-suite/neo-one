@@ -14,6 +14,7 @@ const jsonTransform = require('gulp-json-transform');
 const gulpSourcemaps = require('gulp-sourcemaps');
 const ts = require('gulp-typescript');
 const path = require('path');
+const through2 = require('through2');
 const typescript = require('typescript');
 const pkg = require('./package.json');
 
@@ -310,6 +311,8 @@ const buildAll = ((cache) =>
         copyRootPkg(format),
         buildTypescript(format),
         format === MAIN_FORMAT ? 'buildBin' : undefined,
+        format === MAIN_FORMAT ? 'createBin' : undefined,
+        format === MAIN_FORMAT ? 'copyBin' : undefined,
       ].filter((task) => task !== undefined),
     )(done);
   }))({});
@@ -360,18 +363,24 @@ gulp.task('compileBin', () =>
     .pipe(gulpSourcemaps.write())
     .pipe(gulp.dest(getDest(MAIN_FORMAT))),
 );
-const bin = (name) => `#! /bin/sh
-DIR="\${0%/*}"
-exec /usr/bin/env node --no-warnings "$DIR/${name}" "$@"
+const bin = (name) => `#!/usr/bin/env node
+const crossEnv = require('cross-env');
+const path = require('path');
+
+crossEnv(['NODE_NO_WARNINGS=1', path.resolve(__dirname, '${name}')].concat(process.argv.slice(2)));
 `;
 gulp.task('createBin', () =>
   gulp
     .src(globs.bin)
     .pipe(
-      gulpRename((file) => {
-        file.extname = '.js';
-        file.contents = bin(file.basename);
+      through2.obj(function(file, enc, callback) {
+        file.dirname = file.dirname.slice(0, -'/src/bin'.length) + '/bin';
         file.extname = '';
+        file.contents = Buffer.from(bin(`${path.basename(file.basename, '.ts')}.js`), 'utf8');
+
+        this.push(file);
+
+        callback();
       }),
     )
     .pipe(gulp.dest(getDest(MAIN_FORMAT))),

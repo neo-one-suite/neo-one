@@ -17,6 +17,7 @@
     "chalk": "^2.4.1",
     "cli-table2": "^0.2.0",
     "cli-truncate": "^1.1.0",
+    "cross-env": "^5.2.0",
     "elegant-spinner": "^1.0.1",
     "env-paths": "^1.0.0",
     "figures": "^2.0.0",
