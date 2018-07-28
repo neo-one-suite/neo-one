@@ -50,7 +50,7 @@ aliases:
       - save-cache: *save-yarn-cache
       - run:
           name: Test
-          command: yarn test-ci $(circleci tests glob "**/__tests__/**/*.test.ts" | circleci tests split --split-by=timings)
+          command: yarn test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings)
       - store_test_results:
           path: reports
     parallelism: 4
@@ -67,7 +67,7 @@ aliases:
           command: yarn build
       - run:
           name: E2E
-          command: yarn e2e-ci $(circleci tests glob "**/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
+          command: yarn e2e-ci $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
       - store_test_results:
           path: reports
     parallelism: 4
