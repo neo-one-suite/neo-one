@@ -104,7 +104,7 @@
     "@types/koa": "2.0.46",
     "@types/koa-compress": "2.0.8",
     "@types/koa-mount": "3.0.1",
-    "@types/koa-router": "7.0.30",
+    "@types/koa-router": "7.0.31",
     "@types/lodash": "4.14.112",
     "@types/log-symbols": "2.0.0",
     "@types/log-update": "2.0.0",
