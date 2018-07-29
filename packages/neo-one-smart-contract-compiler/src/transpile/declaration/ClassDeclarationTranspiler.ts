@@ -11,11 +11,8 @@ const DEPLOY_METHOD = 'deploy';
 const createAccessors = (transpiler: Transpiler, property: ts.Declaration): ReadonlyArray<ts.ClassElement> => {
   const name = tsUtils.node.getNameOrThrow(property);
   const type = tsUtils.type_.getType(transpiler.typeChecker, property);
-  const typeNode = transpiler.getFinalTypeNode(
-    property,
-    type,
-    tsUtils.type_.typeToTypeNodeOrThrow(transpiler.typeChecker, type, property),
-  );
+  const originalTypeNode = tsUtils.type_.typeToTypeNodeOrThrow(transpiler.typeChecker, type, property);
+  const typeNode = tsUtils.setOriginal(transpiler.getFinalTypeNode(property, type, originalTypeNode), originalTypeNode);
   let getAccess = ts.ModifierFlags.Private;
   if (tsUtils.modifier.isPublic(property)) {
     getAccess = ts.ModifierFlags.Public;
@@ -33,7 +30,7 @@ const createAccessors = (transpiler: Transpiler, property: ts.Declaration): Read
 
   return [
     createGet
-      ? tsUtils.setOriginal(
+      ? tsUtils.setOriginalRecursive(
           ts.createMethod(
             undefined,
             ts.createModifiersFromModifierFlags(ts.ModifierFlags.Public),
@@ -48,7 +45,7 @@ const createAccessors = (transpiler: Transpiler, property: ts.Declaration): Read
           property,
         )
       : undefined,
-    tsUtils.setOriginal(
+    tsUtils.setOriginalRecursive(
       ts.createGetAccessor(
         undefined,
         ts.createModifiersFromModifierFlags(getAccess),
@@ -72,7 +69,7 @@ const createAccessors = (transpiler: Transpiler, property: ts.Declaration): Read
       ),
       property,
     ),
-    tsUtils.setOriginal(
+    tsUtils.setOriginalRecursive(
       ts.createSetAccessor(
         undefined,
         ts.createModifiersFromModifierFlags(setAccess),
@@ -133,7 +130,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
                 undefined,
                 undefined,
                 param.dotDotDotToken,
-                ts.createIdentifier(`p${idx}`),
+                tsUtils.setOriginal(ts.createIdentifier(`p${idx}`), param),
                 param.questionToken,
                 param.type,
                 param.initializer,
@@ -142,12 +139,15 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
             ),
           );
         bodyStatements = [
-          tsUtils.setOriginal(
+          tsUtils.setOriginalRecursive(
             ts.createExpressionStatement(
               ts.createCall(
                 ts.createPropertyAccess(ts.createSuper(), DEPLOY_METHOD),
                 undefined,
-                parameters.map((param) => tsUtils.node.getNameNode(param)).filter(ts.isIdentifier),
+                parameters
+                  .map((param) => tsUtils.node.getNameNode(param))
+                  .filter(ts.isIdentifier)
+                  .map((param) => tsUtils.markOriginal(param)),
               ),
             ),
             node,
@@ -163,12 +163,12 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
           const lhsrExpr = tsUtils.expression.getExpression(callExpr);
           if (tsUtils.guards.isSuperExpression(lhsrExpr)) {
             superDeployStatements = [
-              tsUtils.setOriginal(
+              tsUtils.setOriginalRecursive(
                 ts.createExpressionStatement(
                   ts.createCall(
                     ts.createPropertyAccess(ts.createSuper(), DEPLOY_METHOD),
                     undefined,
-                    tsUtils.argumented.getArguments(callExpr),
+                    tsUtils.argumented.getArguments(callExpr).map((arg) => tsUtils.markOriginal(arg)),
                   ),
                 ),
                 firstStatement,
@@ -179,10 +179,13 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
         }
       }
 
-      bodyStatements = superDeployStatements
-        .concat(firstStatement === undefined ? [] : [firstStatement])
-        .concat(tsUtils.statement.getStatements(ctor).slice(1));
-      parameters = tsUtils.parametered.getParameters(ctor);
+      bodyStatements = superDeployStatements.concat(firstStatement === undefined ? [] : [firstStatement]).concat(
+        tsUtils.statement
+          .getStatements(ctor)
+          .slice(1)
+          .map((statement) => tsUtils.markOriginal(statement)),
+      );
+      parameters = tsUtils.parametered.getParameters(ctor).map((param) => tsUtils.markOriginal(param));
     }
 
     const mutableBodyStatements = [...bodyStatements];
@@ -202,12 +205,15 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
                 property.name,
                 property.questionToken === undefined ? property.exclamationToken : property.questionToken,
                 property.type,
-                ts.createNew(ts.createIdentifier('MapStorage'), undefined, [
-                  ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                    ts.createStringLiteral('Neo.Runtime.Serialize'),
-                    ts.createStringLiteral(name),
+                tsUtils.setOriginalRecursive(
+                  ts.createNew(ts.createIdentifier('MapStorage'), undefined, [
+                    ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                      ts.createStringLiteral('Neo.Runtime.Serialize'),
+                      ts.createStringLiteral(name),
+                    ]),
                   ]),
-                ]),
+                  property,
+                ),
               ),
               property,
             );
@@ -221,12 +227,15 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
                 property.name,
                 property.questionToken === undefined ? property.exclamationToken : property.questionToken,
                 property.type,
-                ts.createNew(ts.createIdentifier('SetStorage'), undefined, [
-                  ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                    ts.createStringLiteral('Neo.Runtime.Serialize'),
-                    ts.createStringLiteral(name),
+                tsUtils.setOriginalRecursive(
+                  ts.createNew(ts.createIdentifier('SetStorage'), undefined, [
+                    ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                      ts.createStringLiteral('Neo.Runtime.Serialize'),
+                      ts.createStringLiteral(name),
+                    ]),
                   ]),
-                ]),
+                  property,
+                ),
               ),
               property,
             );
@@ -239,9 +248,13 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
               addAccessors = false;
             } else {
               mutableBodyStatements.push(
-                tsUtils.setOriginal(
+                tsUtils.setOriginalRecursive(
                   ts.createExpressionStatement(
-                    ts.createBinary(ts.createPropertyAccess(ts.createThis(), name), ts.SyntaxKind.EqualsToken, init),
+                    ts.createBinary(
+                      ts.createPropertyAccess(ts.createThis(), name),
+                      ts.SyntaxKind.EqualsToken,
+                      tsUtils.markOriginal(init),
+                    ),
                   ),
                   property,
                 ),
@@ -255,7 +268,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
         }
 
         if (tsUtils.guards.isParameterDeclaration(property)) {
-          const name = tsUtils.node.getNameNodeOrThrow(property);
+          const name = tsUtils.markOriginal(tsUtils.node.getNameNodeOrThrow(property));
 
           mutableBodyStatements.push(
             tsUtils.setOriginal(
@@ -273,7 +286,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
       }),
     );
 
-    const deployMethod = tsUtils.setOriginal(
+    const deployMethod = tsUtils.setOriginalRecursive(
       ts.createMethod(
         undefined,
         [ts.createModifier(ts.SyntaxKind.PublicKeyword)],

@@ -17,6 +17,11 @@ const transpilers: ReadonlyArray<ReadonlyArray<new () => NodeTranspiler>> = [dec
 
 type Transpilers = { [K in number]?: NodeTranspiler };
 
+interface Switch {
+  readonly statement: ts.IfStatement;
+  readonly original: ts.Node;
+}
+
 const BYTE_ARRAY_RETURN: ABIReturn = { type: 'ByteArray' };
 const BOOLEAN_RETURN: ABIReturn = { type: 'Boolean' };
 const PARAMETERS: ReadonlyArray<ContractParameterType> = ['String', 'ByteArray'];
@@ -144,13 +149,13 @@ export class NEOTranspiler implements Transpiler {
     const replaceEventCall = (name: string, call: ts.CallExpression) => {
       const args: ReadonlyArray<ts.Expression> = [];
 
-      return tsUtils.setOriginal(
+      return tsUtils.setOriginalRecursive(
         ts.createCall(
           ts.createIdentifier('syscall'),
           undefined,
           args
             .concat([ts.createStringLiteral('Neo.Runtime.Notify'), ts.createStringLiteral(name)])
-            .concat(tsUtils.argumented.getArguments(call)),
+            .concat(tsUtils.argumented.getArguments(call).map((node) => tsUtils.markOriginal(node))),
         ),
         call,
       );
@@ -292,7 +297,7 @@ export class NEOTranspiler implements Transpiler {
     if (type === undefined) {
       this.reportError(node, 'Unknown type', DiagnosticCode.UNKNOWN_TYPE);
     } else if (this.isFixedType(node, type)) {
-      return ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword);
+      return tsUtils.setOriginal(ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword), typeNode);
     }
 
     return typeNode;
@@ -424,8 +429,8 @@ export class NEOTranspiler implements Transpiler {
       }
     }
 
-    const contractIdentifier = ts.createIdentifier('contract');
-    const methodIdentifier = ts.createIdentifier('method');
+    const contractIdentifier = 'contract';
+    const methodIdentifier = 'method';
 
     const processMethod = (
       parametered: ts.Node & { readonly parameters: ts.NodeArray<ts.ParameterDeclaration> },
@@ -451,7 +456,7 @@ export class NEOTranspiler implements Transpiler {
                     ts.createStringLiteral('Neo.Runtime.GetArgument'),
                     ts.createNumericLiteral('1'),
                   ]),
-                  ts.createTupleTypeNode(argsTypes),
+                  ts.createTupleTypeNode(argsTypes.map((node) => tsUtils.markOriginal(node))),
                 ),
               ),
             ],
@@ -460,9 +465,9 @@ export class NEOTranspiler implements Transpiler {
         );
         args = tsUtils.parametered
           .getParameters(parametered)
-          .map((_param, idx) => ts.createElementAccess(argsIdentifier, idx));
+          .map((param, idx) => tsUtils.setOriginal(ts.createElementAccess(argsIdentifier, idx), param));
       }
-      let call = ts.createCall(ts.createPropertyAccess(contractIdentifier, name), undefined, args);
+      let call = ts.createCall(ts.createPropertyAccess(ts.createIdentifier(contractIdentifier), name), undefined, args);
       if (shouldReturn) {
         call = ts.createCall(ts.createIdentifier('syscall'), undefined, [
           ts.createStringLiteral('Neo.Runtime.Return'),
@@ -472,11 +477,14 @@ export class NEOTranspiler implements Transpiler {
 
       const callStatement = ts.createExpressionStatement(call);
 
-      return argsStatement === undefined ? callStatement : ts.createBlock([argsStatement, callStatement]);
+      return tsUtils.setOriginalRecursive(
+        argsStatement === undefined ? callStatement : ts.createBlock([argsStatement, callStatement]),
+        parametered,
+      );
     };
 
-    const mutableVerifySwitches: ts.IfStatement[] = [];
-    const mutableApplicationSwitches: ts.IfStatement[] = [];
+    const mutableVerifySwitches: Switch[] = [];
+    const mutableApplicationSwitches: Switch[] = [];
     const mutableFunctions: ABIFunction[] = [];
     methods.forEach(([method, func]) => {
       const name = ts.isConstructorDeclaration(method)
@@ -487,7 +495,7 @@ export class NEOTranspiler implements Transpiler {
       let methodStatement: ts.Statement;
 
       let condition = ts.createBinary(
-        methodIdentifier,
+        ts.createIdentifier(methodIdentifier),
         ts.SyntaxKind.EqualsEqualsEqualsToken,
         ts.createStringLiteral(name),
       );
@@ -508,24 +516,27 @@ export class NEOTranspiler implements Transpiler {
             ts.createStringLiteral('Neo.Runtime.Return'),
             tsUtils.modifier.isReadonly(method) && tsUtils.initializer.getInitializer(method) === undefined
               ? ts.createCall(
-                  ts.createPropertyAccess(contractIdentifier, `get${name[0].toUpperCase()}${name.slice(1)}`),
+                  ts.createPropertyAccess(
+                    ts.createIdentifier(contractIdentifier),
+                    `get${name[0].toUpperCase()}${name.slice(1)}`,
+                  ),
                   undefined,
                   [],
                 )
-              : ts.createPropertyAccess(contractIdentifier, name),
+              : ts.createPropertyAccess(ts.createIdentifier(contractIdentifier), name),
           ]),
         );
       } else {
         const param = tsUtils.parametered.getParameters(method)[0];
 
         condition = ts.createBinary(
-          methodIdentifier,
+          ts.createIdentifier(methodIdentifier),
           ts.SyntaxKind.EqualsEqualsEqualsToken,
           ts.createStringLiteral(`set${name[0].toUpperCase()}${name.slice(1)}`),
         );
         methodStatement = ts.createExpressionStatement(
           ts.createBinary(
-            ts.createPropertyAccess(contractIdentifier, name),
+            ts.createPropertyAccess(ts.createIdentifier(contractIdentifier), name),
             ts.SyntaxKind.EqualsToken,
             ts.createElementAccess(
               ts.createParen(
@@ -545,97 +556,119 @@ export class NEOTranspiler implements Transpiler {
         );
       }
 
-      const methodSwitch = tsUtils.setOriginal(ts.createIf(condition, methodStatement), method);
+      const methodSwitch = tsUtils.setOriginalRecursive(ts.createIf(condition, methodStatement), method);
 
-      mutableApplicationSwitches.push(methodSwitch);
+      const value = { statement: methodSwitch, original: method };
+      mutableApplicationSwitches.push(value);
       if (func.verify) {
-        mutableVerifySwitches.push(methodSwitch);
+        mutableVerifySwitches.push(value);
       }
 
       mutableFunctions.push(func);
     });
 
-    const applicationFallback = ts.createThrow(
-      ts.createNew(ts.createIdentifier('Error'), undefined, [ts.createStringLiteral('Unknown method')]),
+    const applicationFallback = tsUtils.setOriginalRecursive(
+      ts.createThrow(ts.createNew(ts.createIdentifier('Error'), undefined, [ts.createStringLiteral('Unknown method')])),
+      this.smartContract,
     );
-    const verifyFallback = ts.createIf(
-      ts.createPrefix(
-        ts.SyntaxKind.ExclamationToken,
-        ts.createCall(ts.createIdentifier('syscall'), undefined, [
-          ts.createStringLiteral('Neo.Runtime.CheckWitness'),
-          ts.createPropertyAccess(contractIdentifier, 'owner'),
-        ]),
+    const verifyFallback = tsUtils.setOriginalRecursive(
+      ts.createIf(
+        ts.createPrefix(
+          ts.SyntaxKind.ExclamationToken,
+          ts.createCall(ts.createIdentifier('syscall'), undefined, [
+            ts.createStringLiteral('Neo.Runtime.CheckWitness'),
+            ts.createPropertyAccess(ts.createIdentifier(contractIdentifier), 'owner'),
+          ]),
+        ),
+        ts.createThrow(
+          ts.createNew(ts.createIdentifier('Error'), undefined, [ts.createStringLiteral('Invalid witness')]),
+        ),
       ),
-      ts.createThrow(
-        ts.createNew(ts.createIdentifier('Error'), undefined, [ts.createStringLiteral('Invalid witness')]),
-      ),
+      this.smartContract,
     );
 
-    function makeIfElse(ifStatements: ReadonlyArray<ts.IfStatement>, finalStatement: ts.Statement): ts.Statement {
+    function makeIfElse(ifStatements: ReadonlyArray<Switch>, finalStatement: ts.Statement): ts.Statement {
       if (ifStatements.length === 0) {
         return finalStatement;
       }
 
-      return ts.createIf(
-        ifStatements[0].expression,
-        ifStatements[0].thenStatement,
-        makeIfElse(ifStatements.slice(1), finalStatement),
+      return tsUtils.setOriginal(
+        ts.createIf(
+          ifStatements[0].statement.expression,
+          ifStatements[0].statement.thenStatement,
+          makeIfElse(ifStatements.slice(1), finalStatement),
+        ),
+        ifStatements[0].original,
       );
     }
 
     const statements = [
-      ts.createVariableStatement(
-        undefined,
-        ts.createVariableDeclarationList(
-          [
-            ts.createVariableDeclaration(
-              contractIdentifier,
-              undefined,
-              ts.createNew(ts.createIdentifier(tsUtils.node.getNameOrThrow(this.smartContract)), undefined, []),
-            ),
-          ],
-          ts.NodeFlags.Const,
-        ),
-      ),
-      ts.createVariableStatement(
-        undefined,
-        ts.createVariableDeclarationList(
-          [
-            ts.createVariableDeclaration(
-              methodIdentifier,
-              undefined,
-              ts.createAsExpression(
-                ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                  ts.createStringLiteral('Neo.Runtime.GetArgument'),
-                  ts.createNumericLiteral('0'),
-                ]),
-                ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+      tsUtils.setOriginalRecursive(
+        ts.createVariableStatement(
+          undefined,
+          ts.createVariableDeclarationList(
+            [
+              ts.createVariableDeclaration(
+                contractIdentifier,
+                undefined,
+                ts.createNew(ts.createIdentifier(tsUtils.node.getNameOrThrow(this.smartContract)), undefined, []),
               ),
-            ),
-          ],
-          ts.NodeFlags.Const,
+            ],
+            ts.NodeFlags.Const,
+          ),
         ),
+        this.smartContract,
       ),
-      ts.createIf(
-        ts.createBinary(
-          ts.createCall(ts.createIdentifier('syscall'), undefined, [ts.createStringLiteral('Neo.Runtime.GetTrigger')]),
-          ts.SyntaxKind.EqualsEqualsEqualsToken,
-          ts.createNumericLiteral(`${0x10}`),
+      tsUtils.setOriginalRecursive(
+        ts.createVariableStatement(
+          undefined,
+          ts.createVariableDeclarationList(
+            [
+              ts.createVariableDeclaration(
+                methodIdentifier,
+                undefined,
+                ts.createAsExpression(
+                  ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                    ts.createStringLiteral('Neo.Runtime.GetArgument'),
+                    ts.createNumericLiteral('0'),
+                  ]),
+                  ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                ),
+              ),
+            ],
+            ts.NodeFlags.Const,
+          ),
         ),
-        makeIfElse(mutableApplicationSwitches, applicationFallback),
+        this.smartContract,
+      ),
+      tsUtils.setOriginalRecursive(
         ts.createIf(
-          ts.createBinary(
-            ts.createCall(ts.createIdentifier('syscall'), undefined, [
-              ts.createStringLiteral('Neo.Runtime.GetTrigger'),
-            ]),
-            ts.SyntaxKind.EqualsEqualsEqualsToken,
-            ts.createNumericLiteral(`${0x00}`),
+          tsUtils.setOriginal(
+            ts.createBinary(
+              ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                ts.createStringLiteral('Neo.Runtime.GetTrigger'),
+              ]),
+              ts.SyntaxKind.EqualsEqualsEqualsToken,
+              ts.createNumericLiteral(`${0x10}`),
+            ),
+            this.smartContract,
           ),
-          makeIfElse(mutableVerifySwitches, verifyFallback),
-          ts.createThrow(
-            ts.createNew(ts.createIdentifier('Error'), undefined, [ts.createStringLiteral('Unsupported trigger')]),
+          makeIfElse(mutableApplicationSwitches, applicationFallback),
+          ts.createIf(
+            ts.createBinary(
+              ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                ts.createStringLiteral('Neo.Runtime.GetTrigger'),
+              ]),
+              ts.SyntaxKind.EqualsEqualsEqualsToken,
+              ts.createNumericLiteral(`${0x00}`),
+            ),
+            makeIfElse(mutableVerifySwitches, verifyFallback),
+            ts.createThrow(
+              ts.createNew(ts.createIdentifier('Error'), undefined, [ts.createStringLiteral('Unsupported trigger')]),
+            ),
           ),
         ),
+        this.smartContract,
       ),
     ];
 

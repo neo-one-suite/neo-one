@@ -55,5 +55,75 @@ export const print = (programIn: ts.Program, original: ts.SourceFile, file: ts.S
   };
 };
 
-export const setOriginal = <T extends ts.Node>(node: T, original: ts.Node): T =>
-  ts.setSourceMapRange(ts.setOriginalNode(node, original), original);
+export const markOriginal = <T extends ts.Node>(node: T): T => {
+  // tslint:disable-next-line no-any no-object-mutation
+  (node as any).__originalSet = true;
+
+  return node;
+};
+
+export const setOriginal = <T extends ts.Node>(node: T, original: ts.Node): T => {
+  // tslint:disable-next-line no-any
+  if (!(node as any).__originalSet) {
+    const transformedNode = ts.setSourceMapRange(ts.setOriginalNode(node, original), original);
+
+    return markOriginal(transformedNode);
+  }
+
+  return node;
+};
+
+const context: ts.TransformationContext = {
+  // tslint:disable-next-line no-any
+  getCompilerOptions: (): ts.CompilerOptions => ({} as any),
+  startLexicalEnvironment: (): void => {
+    // do nothing
+  },
+  suspendLexicalEnvironment: (): void => {
+    // do nothing
+  },
+  resumeLexicalEnvironment: (): void => {
+    // do nothing
+  },
+
+  endLexicalEnvironment: () => undefined,
+  hoistFunctionDeclaration: (): void => {
+    // do nothing
+  },
+  hoistVariableDeclaration: (): void => {
+    // do nothing
+  },
+  requestEmitHelper: (): void => {
+    // do nothing
+  },
+  readEmitHelpers: () => undefined,
+  enableSubstitution: (): void => {
+    // do nothing
+  },
+  isSubstitutionEnabled: (): boolean => false,
+  onSubstituteNode: (_hint, node) => node,
+  enableEmitNotification: (): void => {
+    // do nothing
+  },
+  isEmitNotificationEnabled: (): boolean => false,
+  onEmitNode: (hint, node, emitCallback) => {
+    emitCallback(hint, node);
+  },
+};
+
+export const setOriginalRecursive = <T extends ts.Node>(start: T, original: ts.Node): T => {
+  const seen = new Set();
+
+  function visit(node: ts.Node): ts.VisitResult<ts.Node> {
+    if (seen.has(node)) {
+      return node;
+    }
+    seen.add(node);
+
+    const transformedNode = setOriginal(node, original);
+
+    return ts.visitEachChild(transformedNode, visit, context);
+  }
+
+  return visit(start) as T;
+};
