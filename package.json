@@ -51,7 +51,7 @@
     "release": "yarn run gulp release",
     "neo-one": "node ./dist/neo-one/packages/neo-one-cli/bin/neo-one",
     "test": "jest --config jest/unit.js",
-    "test-ci": "jest --config jest/unit-ci.js --ci -w 2",
+    "test-ci": "jest --config jest/unit-ci.js --ci -w 1",
     "e2e": "jest --config jest/e2e.js",
     "e2e-ci": "jest --config jest/e2e-ci.js --ci -w 1",
     "report-coverage": "yarn run nyc report --report=json && yarn run codecov -f coverage/*.json",
