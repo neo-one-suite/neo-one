@@ -11,7 +11,7 @@ After cloning the NEO•ONE repository, you will see a few top-level folders in 
 - [.github](https://github.com/neo-one-suite/neo-one/tree/master/.github) contains markdown documents consumed by GitHub like issue templates.
 - [decls](https://github.com/neo-one-suite/neo-one/tree/master/decls) contains [Flow] type declarations for external packages. Note that we prefer to fork [flow-typed](https://github.com/flowtype/flow-typed) definitions directly into this folder in case we need to make changes.
 - [docs](https://github.com/neo-one-suite/neo-one/tree/master/docs) contains all of the Markdown documentation that appears on this site.
-- [packages](https://github.com/neo-one-suite/neo-one/tree/master/decls) contains metadata (such as `package.json`) and the source code (`src` subdirectory) for all packages in the NEO•ONE repository. **If your change is related to the code, the src subdirectory of each package is where you’ll spend most of your time.**
+- [packages](https://github.com/neo-one-suite/neo-one/tree/master/packages) contains metadata (such as `package.json`) and the source code (`src` subdirectory) for all packages in the NEO•ONE repository. **If your change is related to the code, the src subdirectory of each package is where you’ll spend most of your time.**
 - [scripts](https://github.com/neo-one-suite/neo-one/tree/master/scripts) contains scripts and other supporting files for building and testing.
 - [website](https://github.com/neo-one-suite/neo-one/tree/master/website) contains the code necessary for this site.
 
