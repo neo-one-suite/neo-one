@@ -9,5 +9,5 @@ if [[ "$version" = "$published" ]]; then
 else
   echo "📦  Publishing: $package@$version (published: $published)"
   # Switch to yarn publish --non-interactive once it's released
-  npm publish $@
+  yarn publish --non-interactive $@
 fi
