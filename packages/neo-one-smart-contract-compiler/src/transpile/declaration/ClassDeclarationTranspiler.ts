@@ -12,7 +12,7 @@ const createAccessors = (transpiler: Transpiler, property: ts.Declaration): Read
   const name = tsUtils.node.getNameOrThrow(property);
   const type = tsUtils.type_.getType(transpiler.typeChecker, property);
   const originalTypeNode = tsUtils.type_.typeToTypeNodeOrThrow(transpiler.typeChecker, type, property);
-  const typeNode = tsUtils.setOriginal(transpiler.getFinalTypeNode(property, type, originalTypeNode), originalTypeNode);
+  const typeNode = transpiler.getFinalTypeNode(property, type, originalTypeNode);
   let getAccess = ts.ModifierFlags.Private;
   if (tsUtils.modifier.isPublic(property)) {
     getAccess = ts.ModifierFlags.Public;

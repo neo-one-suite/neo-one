@@ -15,7 +15,7 @@ import {
   NetworkType,
   Param,
   PublishReceipt,
-  RawInvocationResult,
+  RawCallReceipt,
   RawInvokeReceipt,
   RegisterAssetReceipt,
   SmartContract,
@@ -145,7 +145,7 @@ export class Client<
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     options?: TransactionOptions,
-  ): Promise<RawInvocationResult> {
+  ): Promise<RawCallReceipt> {
     argAssertions.assertHash160(contract);
     argAssertions.assertTransactionOptions(options);
 

@@ -67,7 +67,7 @@ describe('createSmartContract', () => {
     // @ts-ignore
     common.convertParams = jest.fn(() => params);
     // @ts-ignore
-    client.call = jest.fn(() => Promise.resolve());
+    client.call = jest.fn(() => Promise.resolve({ result: {}, actions: [] }));
     // @ts-ignore
     common.convertCallResult = jest.fn(() => expected);
 
@@ -93,7 +93,7 @@ describe('createSmartContract', () => {
     // @ts-ignore
     common.convertParams = jest.fn(() => params);
     // @ts-ignore
-    client.call = jest.fn(() => Promise.resolve());
+    client.call = jest.fn(() => Promise.resolve({ result: {}, actions: [] }));
     // @ts-ignore
     common.convertCallResult = jest.fn(() => expected);
 

@@ -1,5 +1,7 @@
+import commonDir from 'commondir';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
+import * as file_ from './file';
 
 interface Result {
   readonly text: string;
@@ -30,6 +32,7 @@ export const print = (programIn: ts.Program, original: ts.SourceFile, file: ts.S
   const writer = compiler.createTextWriter('\n');
   const sourceMap = compiler.createSourceMapWriter(host, writer, {
     ...program.getCompilerOptions(),
+    sourceRoot: commonDir(programIn.getRootFileNames()),
     sourceMap: true,
   });
   sourceMap.initialize(file.fileName, `${file.fileName}.map`);
@@ -59,15 +62,21 @@ export const markOriginal = <T extends ts.Node>(node: T): T => {
   // tslint:disable-next-line no-any no-object-mutation
   (node as any).__originalSet = true;
 
-  return node;
+  return ts.setSourceMapRange(node, file_.createSourceMapRange(node));
 };
 
 export const setOriginal = <T extends ts.Node>(node: T, original: ts.Node): T => {
   // tslint:disable-next-line no-any
   if (!(node as any).__originalSet) {
-    const transformedNode = ts.setSourceMapRange(ts.setOriginalNode(node, original), original);
+    const transformedNode = ts.setSourceMapRange(
+      ts.setOriginalNode(node, original),
+      file_.createSourceMapRange(original),
+    );
 
-    return markOriginal(transformedNode);
+    // tslint:disable-next-line no-any no-object-mutation
+    (node as any).__originalSet = true;
+
+    return transformedNode;
   }
 
   return node;

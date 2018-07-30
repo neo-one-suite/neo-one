@@ -66,9 +66,9 @@ const createCall = ({
     params: args,
   });
 
-  const result = await client.call(hash, name, params, monitor);
+  const receipt = await client.call(hash, name, params, monitor);
 
-  return common.convertCallResult({ returnType, result, sourceMap });
+  return common.convertCallResult({ returnType, result: receipt.result, actions: receipt.actions, sourceMap });
 };
 
 export const createReadSmartContract = ({

@@ -1,4 +1,4 @@
-import { InvocationResult } from '@neo-one/client-core';
+import { CallReceiptJSON } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { test as testNet } from '@neo-one/node-neo-settings';
@@ -27,7 +27,7 @@ export const executeScript = async (
   context: Context,
   sourceFile: ts.SourceFile,
   { prelude = Buffer.alloc(0, 0), ignoreWarnings = false }: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
-): Promise<{ readonly result: InvocationResult; readonly sourceMap: RawSourceMap }> => {
+): Promise<{ readonly receipt: CallReceiptJSON; readonly sourceMap: RawSourceMap }> => {
   const blockchain = await Blockchain.create({
     settings: testNet(),
     storage: storage({
@@ -37,11 +37,17 @@ export const executeScript = async (
     vm,
     monitor,
   });
-  const { code: compiledCode, sourceMap } = compile({ context, sourceFile });
+  const { code: compiledCode, sourceMap } = await compile({ context, sourceFile });
 
   throwOnDiagnosticErrorOrWarning(context.diagnostics, ignoreWarnings);
 
-  const result = await blockchain.invokeScript(Buffer.concat([prelude, compiledCode]), monitor);
+  const receipt = await blockchain.invokeScript(Buffer.concat([prelude, compiledCode]), monitor);
 
-  return { result, sourceMap };
+  return {
+    receipt: {
+      result: receipt.result.serializeJSON(blockchain.serializeJSONContext),
+      actions: receipt.actions.map((action) => action.serializeJSON(blockchain.serializeJSONContext)),
+    },
+    sourceMap,
+  };
 };

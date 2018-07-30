@@ -39,7 +39,8 @@ exports[`createSmartContract createCall - undefined params: common.convertCallRe
 Array [
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -87,7 +88,8 @@ exports[`createSmartContract createCall: common.convertCallResult 1`] = `
 Array [
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -197,7 +199,8 @@ exports[`createSmartContract createInvoke undefined events & params: common.conv
 Array [
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -211,6 +214,27 @@ exports[`createSmartContract createInvoke undefined events & params: common.conv
 Array [
   Array [
     Object {
+      "actions": Array [
+        Object {
+          "args": Array [
+            Object {
+              "type": "String",
+              "value": "stringVal",
+            },
+            Object {
+              "type": "Integer",
+              "value": "100000000000",
+            },
+          ],
+          "blockHash": "0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+          "blockIndex": 1,
+          "transactionIndex": 2,
+          "type": "Event",
+        },
+        Object {
+          "type": "Log",
+        },
+      ],
       "result": undefined,
       "returnType": Object {
         "type": "Void",
@@ -336,7 +360,8 @@ exports[`createSmartContract createInvoke: common.convertCallResult 1`] = `
 Array [
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -350,6 +375,27 @@ exports[`createSmartContract createInvoke: common.convertInvocationResult 1`] = 
 Array [
   Array [
     Object {
+      "actions": Array [
+        Object {
+          "args": Array [
+            Object {
+              "type": "String",
+              "value": "stringVal",
+            },
+            Object {
+              "type": "Integer",
+              "value": "100000000000",
+            },
+          ],
+          "blockHash": "0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca",
+          "blockIndex": 1,
+          "transactionIndex": 2,
+          "type": "Event",
+        },
+        Object {
+          "type": "Log",
+        },
+      ],
       "result": undefined,
       "returnType": Object {
         "type": "Void",

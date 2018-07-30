@@ -18,7 +18,7 @@ import {
   Input,
   Output,
   Peer,
-  RawInvocationResult,
+  RawCallReceipt,
   ReadSmartContract,
   ReadSmartContractDefinition,
   StorageItem,
@@ -128,7 +128,7 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     monitor?: Monitor,
-  ): Promise<RawInvocationResult> {
+  ): Promise<RawCallReceipt> {
     return this.dataProvider.call(contract, method, params, monitor);
   }
 }

@@ -15,6 +15,7 @@ import {
   Param,
   RawInvocationResult,
 } from '../types';
+import { extractErrorTrace } from '../utils';
 import { contractParameters, converters } from './parameters';
 import { params as paramCheckers } from './params';
 
@@ -97,15 +98,21 @@ export const convertAction = ({
 export const convertInvocationResult = async ({
   returnType,
   result,
+  actions,
   sourceMap,
 }: {
   readonly returnType: ABIReturn;
   readonly result: RawInvocationResult;
+  readonly actions: ReadonlyArray<ActionRaw>;
   readonly sourceMap?: RawSourceMap;
 }): Promise<InvocationResult<Param | undefined>> => {
   const { gasConsumed, gasCost } = result;
   if (result.state === 'FAULT') {
-    const message = await processError({ message: result.message, sourceMap });
+    const message = await processError({
+      ...extractErrorTrace(actions),
+      message: result.message,
+      sourceMap,
+    });
 
     return {
       state: result.state,
@@ -131,14 +138,16 @@ export const convertInvocationResult = async ({
 export const convertCallResult = async ({
   returnType,
   result,
+  actions,
   sourceMap,
 }: {
   readonly returnType: ABIReturn;
   readonly result: RawInvocationResult;
+  readonly actions: ReadonlyArray<ActionRaw>;
   readonly sourceMap?: RawSourceMap;
 }): Promise<Param | undefined> => {
   if (result.state === 'FAULT') {
-    const errorMessage = await processError({ message: result.message, sourceMap });
+    const errorMessage = await processError({ ...extractErrorTrace(actions), message: result.message, sourceMap });
     throw new InvocationCallError(errorMessage);
   }
 

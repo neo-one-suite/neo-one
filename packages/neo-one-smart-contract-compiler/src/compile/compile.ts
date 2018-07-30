@@ -1,3 +1,4 @@
+import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../Context';
 import { createHelpers } from './helper';
@@ -7,9 +8,10 @@ import { CompileResult } from './types';
 export interface CompileOptions {
   readonly sourceFile: ts.SourceFile;
   readonly context: Context;
+  readonly sourceMaps?: { readonly [filePath: string]: RawSourceMap };
 }
 
-export const compile = ({ context, sourceFile }: CompileOptions): CompileResult => {
+export const compile = async ({ context, sourceFile, sourceMaps = {} }: CompileOptions): Promise<CompileResult> => {
   const helpers = createHelpers();
 
   const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, sourceFile);
@@ -32,8 +34,10 @@ export const compile = ({ context, sourceFile }: CompileOptions): CompileResult 
   });
   emittingScriptBuilder.process();
 
+  const finalResult = await emittingScriptBuilder.getFinalResult(sourceMaps);
+
   return {
-    ...emittingScriptBuilder.getFinalResult(),
+    ...finalResult,
     context,
   };
 };

@@ -1,13 +1,16 @@
 import {
+  Action,
   Block,
+  CallReceipt,
   common,
   ConsensusPayload,
   crypto,
   ECPoint,
   Header,
   Input,
-  InvocationResult,
   InvocationTransaction,
+  LogAction,
+  NotificationAction,
   Output,
   OutputKey,
   ScriptBuilder,
@@ -456,7 +459,7 @@ export class Blockchain {
     }
   }
 
-  public async invokeScript(script: Buffer, monitor?: Monitor): Promise<InvocationResult> {
+  public async invokeScript(script: Buffer, monitor?: Monitor): Promise<CallReceipt> {
     const transaction = new InvocationTransaction({
       script,
       gas: common.ONE_HUNDRED_FIXED8,
@@ -465,10 +468,12 @@ export class Blockchain {
     return this.invokeTransaction(transaction, monitor);
   }
 
-  public async invokeTransaction(transaction: InvocationTransaction, monitor?: Monitor): Promise<InvocationResult> {
+  public async invokeTransaction(transaction: InvocationTransaction, monitor?: Monitor): Promise<CallReceipt> {
     const blockchain = this.createWriteBlockchain();
 
-    return wrapExecuteScripts(async () =>
+    const mutableActions: Action[] = [];
+    let globalActionIndex = new BN(0);
+    const result = await wrapExecuteScripts(async () =>
       this.vm.executeScripts({
         monitor: this.getMonitor(monitor),
         scripts: [{ code: transaction.script }],
@@ -477,6 +482,30 @@ export class Blockchain {
           type: ScriptContainerType.Transaction,
           value: transaction,
         },
+        listeners: {
+          onLog: ({ message, scriptHash }) => {
+            mutableActions.push(
+              new LogAction({
+                index: globalActionIndex,
+                scriptHash,
+                message,
+              }),
+            );
+
+            globalActionIndex = globalActionIndex.add(utils.ONE);
+          },
+          onNotify: ({ args, scriptHash }) => {
+            mutableActions.push(
+              new NotificationAction({
+                index: globalActionIndex,
+                scriptHash,
+                args,
+              }),
+            );
+
+            globalActionIndex = globalActionIndex.add(utils.ONE);
+          },
+        },
 
         triggerType: TriggerType.Application,
         action: NULL_ACTION,
@@ -484,6 +513,11 @@ export class Blockchain {
         skipWitnessVerify: true,
       }),
     );
+
+    return {
+      result,
+      actions: mutableActions,
+    };
   }
 
   public async reset(): Promise<void> {

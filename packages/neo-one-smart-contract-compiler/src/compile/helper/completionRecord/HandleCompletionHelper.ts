@@ -42,6 +42,16 @@ export class HandleCompletionHelper extends Helper {
             parent = tsUtils.node.getParent(parent);
           }
 
+          // [number]
+          sb.emitLine(node);
+          // ['trace', number]
+          sb.emitPushString(node, 'trace');
+          // [2, 'trace', number]
+          sb.emitPushInt(node, 2);
+          // [array]
+          sb.emitOp(node, 'PACK');
+          // []
+          sb.emitSysCall(node, 'Neo.Runtime.Notify');
           if (ts.isSourceFile(node) || (parent !== undefined && ts.isSourceFile(parent))) {
             sb.emitOp(node, 'THROW');
           } else if (parent === undefined) {

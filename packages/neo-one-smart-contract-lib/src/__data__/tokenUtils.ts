@@ -1,7 +1,6 @@
 // tslint:disable no-unsafe-any
 import {
   addressToScriptHash,
-  createPrivateKey,
   InvokeReceipt,
   privateKeyToScriptHash,
   SmartContract,
@@ -9,6 +8,7 @@ import {
   UserAccountID,
 } from '@neo-one/client';
 import { SetupTestResult } from '@neo-one/smart-contract-compiler';
+import { crypto, common } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 
 export interface DeployOptions {
@@ -27,41 +27,57 @@ export interface Options {
   readonly transferValue: BigNumber;
 }
 
+const TO = {
+  PRIVATE_KEY: '536f1e9f0466f6cd5b2ea5374d00f038786daa0f0e892161d6b0cb4d6b154740',
+  PUBLIC_KEY: '03463b7a0afc41ff1f6a386190f99bafd1deca48f4026aeac95435731af278cb7d',
+};
+
+const ZERO = {
+  PRIVATE_KEY: '9c111f04a34b3a07600fe701d308dce6e20c86268c105f21c2f30e9fef7e7968',
+  PUBLIC_KEY: '027f73dbc47133b08a4bc0fc04589fc76525baaf3bebe71bdd78053d559c41db70',
+};
+
 export const testToken = async ({ setup, name, symbol, decimals, deploy, issueValue, transferValue }: Options) => {
+  crypto.addPublicKey(common.stringToPrivateKey(TO.PRIVATE_KEY), common.stringToECPoint(TO.PUBLIC_KEY));
+  crypto.addPublicKey(common.stringToPrivateKey(ZERO.PRIVATE_KEY), common.stringToECPoint(ZERO.PUBLIC_KEY));
+
   const { networkName, keystore, developerClient, smartContract, masterAccountID, masterPrivateKey } = await setup();
 
-  const [nameResult, decimalsResult, symbolResult] = await Promise.all([
+  const [nameResult, decimalsResult, symbolResult, wallet0, deployResult] = await Promise.all([
     smartContract.name(),
     smartContract.decimals(),
     smartContract.symbol(),
+    keystore.addAccount({
+      network: networkName,
+      name: 'wallet0',
+      privateKey: TO.PRIVATE_KEY,
+    }),
+    deploy({
+      masterPrivateKey,
+      masterAccountID,
+      smartContract,
+    }),
   ]);
   expect(nameResult).toEqual(name);
   expect(decimalsResult.toString()).toEqual(`${decimals}`);
   expect(symbolResult).toEqual(symbol);
 
-  const wallet0 = await keystore.addAccount({
-    network: networkName,
-    name: 'wallet0',
-    privateKey: createPrivateKey(),
-  });
   const account0 = wallet0.account.id;
 
-  let result = await deploy({
-    masterPrivateKey,
-    masterAccountID,
-    smartContract,
-  });
-  let [receipt] = await Promise.all([result.confirmed({ timeoutMS: 30000 }), developerClient.runConsensusNow()]);
+  const [deployReceipt] = await Promise.all([
+    deployResult.confirmed({ timeoutMS: 2500 }),
+    developerClient.runConsensusNow(),
+  ]);
 
-  if (receipt.result.state !== 'HALT') {
-    throw new Error(receipt.result.message);
+  if (deployReceipt.result.state !== 'HALT') {
+    throw new Error(deployReceipt.result.message);
   }
 
-  expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
-  expect(receipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
-  expect(receipt.result.value).toBeTruthy();
-  expect(receipt.events).toHaveLength(1);
-  let event = receipt.events[0];
+  expect(deployReceipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
+  expect(deployReceipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
+  expect(deployReceipt.result.value).toBeTruthy();
+  expect(deployReceipt.events).toHaveLength(1);
+  let event = deployReceipt.events[0];
   expect(event.name).toEqual('transfer');
   expect(event.parameters.from).toEqual(undefined);
   expect(event.parameters.to).toEqual(privateKeyToScriptHash(masterPrivateKey));
@@ -71,28 +87,32 @@ export const testToken = async ({ setup, name, symbol, decimals, deploy, issueVa
   }
   expect(event.parameters.amount.toString()).toEqual(issueValue.toString());
 
-  let value = await smartContract.balanceOf(addressToScriptHash(masterAccountID.address));
-  expect(value.toString()).toEqual(issueValue.toString());
+  const [issueBalance, issueTotalSupply, transferResult] = await Promise.all([
+    smartContract.balanceOf(addressToScriptHash(masterAccountID.address)),
+    smartContract.totalSupply(),
+    smartContract.transfer(
+      addressToScriptHash(masterAccountID.address),
+      addressToScriptHash(account0.address),
+      transferValue,
+      { from: masterAccountID },
+    ),
+  ]);
+  expect(issueBalance.toString()).toEqual(issueValue.toString());
+  expect(issueTotalSupply.toString()).toEqual(issueValue.toString());
 
-  value = await smartContract.totalSupply();
-  expect(value.toString()).toEqual(issueValue.toString());
+  const [transferReceipt] = await Promise.all([
+    transferResult.confirmed({ timeoutMS: 2500 }),
+    developerClient.runConsensusNow(),
+  ]);
 
-  result = await smartContract.transfer(
-    addressToScriptHash(masterAccountID.address),
-    addressToScriptHash(account0.address),
-    transferValue,
-    { from: masterAccountID },
-  );
-  [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
-
-  if (receipt.result.state !== 'HALT') {
-    throw new Error(receipt.result.message);
+  if (transferReceipt.result.state !== 'HALT') {
+    throw new Error(transferReceipt.result.message);
   }
 
-  expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('transfer consume');
-  expect(receipt.result.gasCost.toString()).toMatchSnapshot('transfer cost');
-  expect(receipt.events).toHaveLength(1);
-  event = receipt.events[0];
+  expect(transferReceipt.result.gasConsumed.toString()).toMatchSnapshot('transfer consume');
+  expect(transferReceipt.result.gasCost.toString()).toMatchSnapshot('transfer cost');
+  expect(transferReceipt.events).toHaveLength(1);
+  event = transferReceipt.events[0];
   expect(event.name).toEqual('transfer');
   expect(event.parameters.from).toEqual(privateKeyToScriptHash(masterPrivateKey));
   expect(event.parameters.to).toEqual(addressToScriptHash(account0.address));
@@ -102,16 +122,16 @@ export const testToken = async ({ setup, name, symbol, decimals, deploy, issueVa
   }
   expect(event.parameters.amount.toString()).toEqual(transferValue.toString());
 
+  const [transferMasterBalance, transferAccountBalance, transferTotalSupply, transferZeroBalance] = await Promise.all([
+    smartContract.balanceOf(addressToScriptHash(masterAccountID.address)),
+    smartContract.balanceOf(addressToScriptHash(account0.address)),
+    smartContract.totalSupply(),
+    smartContract.balanceOf(privateKeyToScriptHash(ZERO.PRIVATE_KEY)),
+  ]);
+
   const remainingValue = issueValue.minus(transferValue);
-  value = await smartContract.balanceOf(addressToScriptHash(masterAccountID.address));
-  expect(value.toString()).toEqual(remainingValue.toString());
-
-  value = await smartContract.balanceOf(addressToScriptHash(account0.address));
-  expect(value.toString()).toEqual(transferValue.toString());
-
-  value = await smartContract.totalSupply();
-  expect(value.toString()).toEqual(issueValue.toString());
-
-  value = await smartContract.balanceOf(privateKeyToScriptHash(createPrivateKey()));
-  expect(value.toString()).toEqual('0');
+  expect(transferMasterBalance.toString()).toEqual(remainingValue.toString());
+  expect(transferAccountBalance.toString()).toEqual(transferValue.toString());
+  expect(transferTotalSupply.toString()).toEqual(issueValue.toString());
+  expect(transferZeroBalance.toString()).toEqual('0');
 };

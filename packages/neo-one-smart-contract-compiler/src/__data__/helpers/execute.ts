@@ -1,4 +1,4 @@
-import { InvocationResult } from '@neo-one/client-core';
+import { InvocationResultJSON } from '@neo-one/client-core';
 import ts from 'typescript';
 import * as appRootDir from 'app-root-dir';
 import * as path from 'path';
@@ -15,15 +15,15 @@ const execute = async (
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
 ) => {
   const monitor = getMonitor();
-  const { result, sourceMap } = await executeScript(monitor, context, sourceFile, options);
-  await checkResult(result, sourceMap);
-  return result;
+  const { receipt, sourceMap } = await executeScript(monitor, context, sourceFile, options);
+  await checkResult(receipt, sourceMap);
+  return receipt.result;
 };
 
 export const executeString = async (
   code: string,
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
-): Promise<InvocationResult> => {
+): Promise<InvocationResultJSON> => {
   const { context, sourceFile } = await createContextForSnippet(code);
   return execute(context, sourceFile, options);
 };
@@ -31,7 +31,7 @@ export const executeString = async (
 export const executeSnippet = async (
   snippetPath: string,
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
-): Promise<InvocationResult> => {
+): Promise<InvocationResultJSON> => {
   const filePath = path.resolve(
     appRootDir.get(),
     'packages',

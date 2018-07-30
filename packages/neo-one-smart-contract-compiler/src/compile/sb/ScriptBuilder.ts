@@ -7,12 +7,13 @@ import { DiagnosticOptions } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { Globals } from '../../symbols';
 import { Helper, Helpers } from '../helper';
-import { Jump, ProgramCounter, ProgramCounterHelper } from '../pc';
+import { Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
 import { VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 
-export type SingleBytecode = [ts.Node, Buffer | Jump];
+export type SingleBytecodeValue = Buffer | Jump | Line;
+export type SingleBytecode = [ts.Node, SingleBytecodeValue];
 export type Bytecode = ReadonlyArray<SingleBytecode>;
 
 export interface CaptureResult {
@@ -42,6 +43,7 @@ export interface ScriptBuilder {
   readonly emitBytecode: (bytecode: Bytecode) => void;
   readonly emitCall: (node: ts.Node) => void;
   readonly emitSysCall: (node: ts.Node, name: SysCallName) => void;
+  readonly emitLine: (node: ts.Node) => void;
   readonly loadModule: (node: ts.SourceFile) => void;
   readonly capture: (func: () => void) => CaptureResult;
   readonly toBuffer: (value: string) => Buffer;

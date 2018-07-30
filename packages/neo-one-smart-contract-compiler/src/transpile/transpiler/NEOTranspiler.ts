@@ -216,7 +216,38 @@ export class NEOTranspiler implements Transpiler {
 
     return {
       sourceFiles,
-      abi: { functions, events: events.map(({ event }) => event).filter(utils.notNull) },
+      abi: {
+        functions,
+        events: events
+          .map(({ event }) => event)
+          .filter(utils.notNull)
+          .concat([
+            {
+              name: 'trace',
+              parameters: [
+                {
+                  type: 'Integer',
+                  name: 'line',
+                  decimals: 0,
+                },
+              ],
+            },
+            {
+              name: 'error',
+              parameters: [
+                {
+                  type: 'Integer',
+                  name: 'line',
+                  decimals: 0,
+                },
+                {
+                  type: 'String',
+                  name: 'message',
+                },
+              ],
+            },
+          ]),
+      },
       contract,
     };
   }
@@ -300,7 +331,7 @@ export class NEOTranspiler implements Transpiler {
       return tsUtils.setOriginal(ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword), typeNode);
     }
 
-    return typeNode;
+    return tsUtils.markOriginal(typeNode);
   }
 
   private processEvents(): ReadonlyArray<{
@@ -456,7 +487,7 @@ export class NEOTranspiler implements Transpiler {
                     ts.createStringLiteral('Neo.Runtime.GetArgument'),
                     ts.createNumericLiteral('1'),
                   ]),
-                  ts.createTupleTypeNode(argsTypes.map((node) => tsUtils.markOriginal(node))),
+                  ts.createTupleTypeNode(argsTypes),
                 ),
               ),
             ],

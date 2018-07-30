@@ -28,14 +28,15 @@ export const compileContract = async ({ filePath, name }: CompileContractOptions
   const { sourceFiles, abi, contract } = transpile({ smartContract, context: transpileContext });
   const context = updateContext(transpileContext, _.mapValues(sourceFiles, ({ text }) => text));
 
-  const { code, sourceMap } = compile({
+  const { code, sourceMap: finalSourceMap } = await compile({
     sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
     context,
+    sourceMaps: _.mapValues(sourceFiles, ({ sourceMap }) => sourceMap),
   });
 
   return {
     diagnostics: context.diagnostics,
-    sourceMap,
+    sourceMap: finalSourceMap,
     abi,
     contract: {
       ...contract,

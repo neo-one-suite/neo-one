@@ -247,6 +247,11 @@ export interface RawInvocationResultError {
 
 export type RawInvocationResult = RawInvocationResultSuccess | RawInvocationResultError;
 
+export interface RawCallReceipt {
+  readonly result: RawInvocationResult;
+  readonly actions: ReadonlyArray<ActionRaw>;
+}
+
 export interface StorageItem {
   readonly hash: Hash160String;
   readonly key: BufferString;
@@ -617,7 +622,7 @@ export interface DataProvider {
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     monitor?: Monitor,
-  ) => Promise<RawInvocationResult>;
+  ) => Promise<RawCallReceipt>;
 }
 
 export interface DeveloperProvider {
@@ -683,7 +688,7 @@ export interface UserAccountProvider {
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     options?: TransactionOptions,
-  ) => Promise<RawInvocationResult>;
+  ) => Promise<RawCallReceipt>;
 
   readonly read: (network: NetworkType) => DataProvider;
 }

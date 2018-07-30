@@ -13,7 +13,7 @@ import {
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils as commonUtils } from '@neo-one/utils';
 import { BN } from 'bn.js';
-import { SourceMapGenerator } from 'source-map';
+import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import ts from 'typescript';
 import { Context, DiagnosticOptions } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
@@ -24,13 +24,13 @@ import { expressions } from '../expression';
 import { files } from '../file';
 import { Helper, Helpers } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
-import { Call, DeferredProgramCounter, Jmp, Jump, ProgramCounter, ProgramCounterHelper } from '../pc';
+import { Call, DeferredProgramCounter, Jmp, Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
 import { statements } from '../statement';
 import { ScriptBuilderResult, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 import { resolveJumps } from './resolveJumps';
-import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode } from './ScriptBuilder';
+import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode, SingleBytecodeValue } from './ScriptBuilder';
 
 const compilers: ReadonlyArray<ReadonlyArray<new () => NodeCompiler>> = [
   declarations,
@@ -133,7 +133,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     this.mutableProcessedByteCode = bytecode;
   }
 
-  public getFinalResult(): ScriptBuilderResult {
+  public async getFinalResult(sourceMaps: { readonly [filePath: string]: RawSourceMap }): Promise<ScriptBuilderResult> {
     this.withProgramCounter((programCounter) => {
       this.emitJmp(this.sourceFile, 'JMP', programCounter.getLast());
       this.jumpTablePC.setPC(programCounter.getCurrent());
@@ -148,8 +148,8 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     const addedFiles = new Set<string>();
 
     // tslint:disable-next-line no-unused
-    const buffers = bytecode.map(([node, valueIn], idx) => {
-      let value = valueIn;
+    const buffers = bytecode.map(([node, value], idx) => {
+      let finalValue: Buffer;
       if (value instanceof Jump) {
         const offsetPC = new BN(value.pc.getPC()).sub(new BN(pc));
         const jumpPC = offsetPC.toTwos(16);
@@ -164,15 +164,21 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         if (byteCodeBuffer === undefined) {
           throw new Error('Something went wrong, could not find bytecode buffer');
         }
-        value = Buffer.concat([byteCodeBuffer, jumpPC.toArrayLike(Buffer, 'le', 2)]);
+        finalValue = Buffer.concat([byteCodeBuffer, jumpPC.toArrayLike(Buffer, 'le', 2)]);
+      } else if (value instanceof Line) {
+        const currentLine = new BN(idx + 1);
+        const byteCodeBuffer = ByteBuffer[Op.PUSHBYTES4];
+        finalValue = Buffer.concat([byteCodeBuffer, currentLine.toArrayLike(Buffer, 'le', 4)]);
+      } else {
+        finalValue = value;
       }
 
       const sourceFile = tsUtils.node.getSourceFile(node);
       const filePath = tsUtils.file.getFilePath(sourceFile);
       const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
       sourceMapGenerator.addMapping({
-        generated: { line: idx + 1, column: 1 },
-        original: { line: line + 1, column: character + 1 },
+        generated: { line: idx + 1, column: 0 },
+        original: { line: line + 1, column: character },
         source: filePath,
       });
       if (!addedFiles.has(filePath)) {
@@ -180,10 +186,18 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         sourceMapGenerator.setSourceContent(filePath, node.getSourceFile().getFullText());
       }
 
-      pc += value.length;
+      pc += finalValue.length;
 
-      return value;
+      return finalValue;
     });
+
+    await Promise.all(
+      Object.entries(sourceMaps).map(async ([filePath, sourceMap]) => {
+        await SourceMapConsumer.with(sourceMap, undefined, async (consumer) => {
+          sourceMapGenerator.applySourceMap(consumer, filePath);
+        });
+      }),
+    );
 
     return {
       code: Buffer.concat(buffers),
@@ -272,6 +286,8 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         this.emitJump(node, code.plus(pc));
       } else if (code instanceof Jump) {
         throw new Error('Something went wrong.');
+      } else if (code instanceof Line) {
+        this.emitLineRaw(node, code);
       } else {
         this.emitRaw(node, code);
       }
@@ -287,6 +303,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     const writer = new BinaryWriter();
     writer.writeVarBytesLE(sysCallBuffer);
     this.emitOp(node, 'SYSCALL', writer.toBuffer());
+  }
+
+  public emitLine(node: ts.Node): void {
+    this.emitLineRaw(node, new Line());
   }
 
   public loadModule(sourceFile: ts.SourceFile): void {
@@ -507,7 +527,12 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     this.mutablePC += 3;
   }
 
-  private push(node: ts.Node, value: Buffer | Jump): void {
+  private emitLineRaw(node: ts.Node, line: Line): void {
+    this.push(node, line);
+    this.mutablePC += 5;
+  }
+
+  private push(node: ts.Node, value: SingleBytecodeValue): void {
     if (this.mutableCapturedBytecode !== undefined) {
       this.mutableCapturedBytecode.push([node, value]);
     } else {

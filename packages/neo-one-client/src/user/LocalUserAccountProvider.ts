@@ -61,8 +61,8 @@ import {
   Param,
   ParamJSON,
   PublishReceipt,
+  RawCallReceipt,
   RawInvocationData,
-  RawInvocationResult,
   RawInvocationResultError,
   RawInvocationResultSuccess,
   RawInvokeReceipt,
@@ -125,7 +125,7 @@ export interface Provider {
     hash: Hash256String,
     monitor?: Monitor,
   ) => Promise<RawInvocationData>;
-  readonly testInvoke: (network: NetworkType, transaction: string, monitor?: Monitor) => Promise<RawInvocationResult>;
+  readonly testInvoke: (network: NetworkType, transaction: string, monitor?: Monitor) => Promise<RawCallReceipt>;
   readonly getNetworkSettings: (network: NetworkType, monitor?: Monitor) => Promise<NetworkSettings>;
   readonly getBlockCount: (network: NetworkType, monitor?: Monitor) => Promise<number>;
   readonly read: (network: NetworkType) => DataProvider;
@@ -563,7 +563,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     options: TransactionOptions = {},
-  ): Promise<RawInvocationResult> {
+  ): Promise<RawCallReceipt> {
     const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
@@ -707,19 +707,23 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           scripts,
         });
 
-        const result = await this.provider.testInvoke(
+        const callReceipt = await this.provider.testInvoke(
           from.network,
           testTransaction.serializeWire().toString('hex'),
           span,
         );
 
-        if (result.state === 'FAULT') {
-          const errorMessage = await processError({ message: result.message, sourceMap });
+        if (callReceipt.result.state === 'FAULT') {
+          const errorMessage = await processError({
+            ...clientUtils.extractErrorTrace(callReceipt.actions),
+            message: callReceipt.result.message,
+            sourceMap,
+          });
 
           throw new InvokeError(errorMessage);
         }
 
-        const gas = result.gasConsumed.integerValue(BigNumber.ROUND_UP);
+        const gas = callReceipt.result.gasConsumed.integerValue(BigNumber.ROUND_UP);
         const { inputs, outputs } = await this.getTransfersInputOutputs({
           transfers,
           from,
