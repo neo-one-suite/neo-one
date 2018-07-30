@@ -86,7 +86,10 @@
     }
   },
   "nyc": {
-    "reporter": ["lcov", "text"],
+    "reporter": [
+      "lcov",
+      "text"
+    ],
     "tempDirectory": "./coverage"
   },
   "devDependencies": {
@@ -128,7 +131,7 @@
     "@types/tar": "4.0.0",
     "@types/through": "0.0.29",
     "@types/yargs": "11.1.1",
-    "all-contributors-cli": "5.2.1",
+    "all-contributors-cli": "5.3.0",
     "app-root-dir": "1.0.2",
     "babel-core": "7.0.0-bridge.0",
     "babel-plugin-jest-hoist": "23.2.0",
