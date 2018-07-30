@@ -174,7 +174,7 @@
     "tslint-immutable": "4.6.0",
     "tslint-microsoft-contrib": "5.1.0",
     "tslint-sonarts": "1.7.0",
-    "typescript": "3.1.0-dev.20180721"
+    "typescript": "3.1.0-dev.20180728"
   },
   "resolutions": {
     "ajv": "6.5.2",

@@ -8077,9 +8077,9 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@3.1.0-dev.20180721:
-  version "3.1.0-dev.20180721"
-  resolved "https://registry.npmjs.org/typescript/-/typescript-3.1.0-dev.20180721.tgz#690467dccdf00c2910611ce3eb8efcffd5f43dbd"
+typescript@3.1.0-dev.20180728:
+  version "3.1.0-dev.20180728"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.0-dev.20180728.tgz#013a376f1bd17243de42bb5bd16e7a98e0e25feb"
 
 typewise-core@^1.2, typewise-core@^1.2.0:
   version "1.2.0"
