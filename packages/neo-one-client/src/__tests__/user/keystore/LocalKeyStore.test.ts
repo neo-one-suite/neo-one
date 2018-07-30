@@ -183,7 +183,7 @@ describe('LocalKeyStore', () => {
       name: account2.name,
     });
 
-    expect(result).rejects.toEqual(new Error('Expected private key or password and NEP-2 key'));
+    await expect(result).rejects.toEqual(new Error('Expected private key or password and NEP-2 key'));
   });
 
   test('addAccount sets privateKey when given nep2+password', async () => {
