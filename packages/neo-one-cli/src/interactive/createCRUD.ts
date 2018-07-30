@@ -151,6 +151,7 @@ const createResource = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
   let cancel$ = new ReplaySubject<void>();
   const command = cli.vorpal
     .command(crud.command, crud.help)
+    .option('--no-progress', "Don't output progress. Typically used for CI scenarios")
     .action(async (args) => {
       cancel$ = new ReplaySubject<void>();
 
@@ -187,6 +188,10 @@ const createResource = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
         client: cli.client,
       });
 
+      if (!args.options.progress) {
+        cli.print(`${crud.names.ingUpper} ${name}...`);
+      }
+
       await crud.preExecCLI({ name, cli, options });
 
       const spinners = {};
@@ -194,8 +199,13 @@ const createResource = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
         .pipe(
           switchMap(({ tasks }) => {
             if (areTasksDone(tasks)) {
-              logUpdate(renderTasks(tasks, spinners));
-              logUpdate.done();
+              if (args.options.progress) {
+                logUpdate(renderTasks(tasks, spinners));
+                logUpdate.done();
+              } else {
+                cli.print(renderTasks(tasks, spinners));
+              }
+
               cancel$.complete();
               const error = getTasksError(tasks);
               if (error !== undefined) {
@@ -205,11 +215,15 @@ const createResource = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
               return EMPTY;
             }
 
-            return timer(0, 50).pipe(
-              map(() => {
-                logUpdate(renderTasks(tasks, spinners));
-              }),
-            );
+            if (args.options.progress) {
+              return timer(0, 50).pipe(
+                map(() => {
+                  logUpdate(renderTasks(tasks, spinners));
+                }),
+              );
+            }
+
+            return EMPTY;
           }),
         )
         .toPromise();

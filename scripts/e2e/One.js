@@ -134,7 +134,18 @@ class One {
     const command = `./node_modules/.bin/neo-one ${commandIn} --dir ${this.dirName} --server-port ${
       this.serverPort
     } --min-port ${this.minPort}`;
-    return [command.split(' ')[0], command.split(' ').slice(1)];
+    let additionalArgs = [];
+    if (commandIn.startsWith('create') || commandIn.startsWith('delete')) {
+      additionalArgs = ['--no-progress'];
+    }
+
+    return [
+      command.split(' ')[0],
+      command
+        .split(' ')
+        .slice(1)
+        .concat(additionalArgs),
+    ];
   }
 
   _exec(commandIn) {
