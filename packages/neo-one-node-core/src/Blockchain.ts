@@ -10,6 +10,7 @@ import {
   AssetUpdate,
   Block,
   BlockKey,
+  CallReceipt,
   ConsensusPayload,
   Contract,
   ContractKey,
@@ -21,7 +22,6 @@ import {
   Input,
   InvocationData,
   InvocationDataKey,
-  InvocationResult,
   InvocationTransaction,
   Output,
   OutputKey,
@@ -174,8 +174,8 @@ export interface Blockchain extends BlockchainStorage {
     monitor?: Monitor,
   ) => Promise<ReadonlyArray<ECPoint>>;
 
-  readonly invokeScript: (script: Buffer, monitor?: Monitor) => Promise<InvocationResult>;
-  readonly invokeTransaction: (transaction: InvocationTransaction, monitor?: Monitor) => Promise<InvocationResult>;
+  readonly invokeScript: (script: Buffer, monitor?: Monitor) => Promise<CallReceipt>;
+  readonly invokeTransaction: (transaction: InvocationTransaction, monitor?: Monitor) => Promise<CallReceipt>;
   readonly calculateClaimAmount: (inputs: ReadonlyArray<Input>, monitor?: Monitor) => Promise<BN>;
 
   readonly updateSettings: (settings: Settings) => void;

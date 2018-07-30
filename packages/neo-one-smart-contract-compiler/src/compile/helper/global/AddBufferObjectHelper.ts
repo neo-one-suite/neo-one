@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -10,12 +10,12 @@ import { AddConstructorObjectHelper } from './AddConstructorObjectHelper';
 export class AddBufferObjectHelper extends AddConstructorObjectHelper {
   protected readonly name = 'Buffer';
 
-  protected addConstructorProperties(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  protected addConstructorProperties(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     this.addConstructor(sb, node, options);
     this.addConcat(sb, node, options);
   }
 
-  private addConstructor(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  private addConstructor(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [objectVal, objectVal, globalObjectVal]
     sb.emitOp(node, 'DUP');
     // ['construct', objectVal, objectVal, globalObjectVal]
@@ -37,7 +37,7 @@ export class AddBufferObjectHelper extends AddConstructorObjectHelper {
     sb.emitHelper(node, options, sb.helpers.setInternalObjectProperty);
   }
 
-  private addConcat(sb: ScriptBuilder, node: Node, outerOptions: VisitOptions): void {
+  private addConcat(sb: ScriptBuilder, node: ts.Node, outerOptions: VisitOptions): void {
     this.addMethod(sb, node, outerOptions, 'concat', (options) => {
       // [0, argsarr]
       sb.emitPushInt(node, 0);

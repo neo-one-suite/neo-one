@@ -1,5 +1,5 @@
 import { Monitor } from '@neo-one/monitor';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Block, BlockFilter, GetOptions } from './types';
 
 type Item = { readonly type: 'value'; readonly value: Block } | { readonly type: 'error'; readonly error: Error };

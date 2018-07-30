@@ -8,7 +8,7 @@ import {
   ResourceState,
   ResourceType,
 } from '@neo-one/server-plugin';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { constants } from './constants';
 import {
   CreateSmartContractCRUD,

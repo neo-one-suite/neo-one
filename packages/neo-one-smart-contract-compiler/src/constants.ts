@@ -1,4 +1,4 @@
-import { SyntaxKind } from 'ts-simple-ast';
+import ts from 'typescript';
 
 export const MAIN_FUNCTION = 'main';
 export const NORMAL_COMPLETION = 0;
@@ -7,17 +7,17 @@ export const CONTINUE_COMPLETION = 2;
 export const CATCH_COMPLETION = 3;
 
 export const ASSIGNMENT_OPERATORS = new Set([
-  SyntaxKind.EqualsToken,
-  SyntaxKind.PlusEqualsToken,
-  SyntaxKind.MinusEqualsToken,
-  SyntaxKind.AsteriskAsteriskEqualsToken,
-  SyntaxKind.AsteriskEqualsToken,
-  SyntaxKind.SlashEqualsToken,
-  SyntaxKind.PercentEqualsToken,
-  SyntaxKind.AmpersandEqualsToken,
-  SyntaxKind.BarEqualsToken,
-  SyntaxKind.CaretEqualsToken,
-  SyntaxKind.LessThanLessThanEqualsToken,
-  SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken,
-  SyntaxKind.GreaterThanGreaterThanEqualsToken,
+  ts.SyntaxKind.EqualsToken,
+  ts.SyntaxKind.PlusEqualsToken,
+  ts.SyntaxKind.MinusEqualsToken,
+  ts.SyntaxKind.AsteriskAsteriskEqualsToken,
+  ts.SyntaxKind.AsteriskEqualsToken,
+  ts.SyntaxKind.SlashEqualsToken,
+  ts.SyntaxKind.PercentEqualsToken,
+  ts.SyntaxKind.AmpersandEqualsToken,
+  ts.SyntaxKind.BarEqualsToken,
+  ts.SyntaxKind.CaretEqualsToken,
+  ts.SyntaxKind.LessThanLessThanEqualsToken,
+  ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken,
+  ts.SyntaxKind.GreaterThanGreaterThanEqualsToken,
 ]);

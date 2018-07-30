@@ -1,14 +1,14 @@
-import { ReturnStatement, SyntaxKind } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class ReturnStatementCompiler extends NodeCompiler<ReturnStatement> {
-  public readonly kind: SyntaxKind = SyntaxKind.ReturnStatement;
+export class ReturnStatementCompiler extends NodeCompiler<ts.ReturnStatement> {
+  public readonly kind = ts.SyntaxKind.ReturnStatement;
 
-  public visitNode(sb: ScriptBuilder, node: ReturnStatement, options: VisitOptions): void {
-    const expr = node.getExpression();
+  public visitNode(sb: ScriptBuilder, node: ts.ReturnStatement, options: VisitOptions): void {
+    const expr = tsUtils.expression.getExpression(node);
     if (expr === undefined) {
       sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
     } else {

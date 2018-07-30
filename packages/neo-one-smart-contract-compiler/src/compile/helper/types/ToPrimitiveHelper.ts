@@ -1,15 +1,14 @@
-import { Node, Type } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
-import * as typeUtils from '../../../typeUtils';
 import { Types } from './Types';
 
 export type PreferredType = 'default' | 'string' | 'number';
 export interface ToPrimitiveHelperOptions {
-  readonly type: Type | undefined;
+  readonly type: ts.Type | undefined;
   readonly knownType?: Types;
   readonly preferredType?: PreferredType;
 }
@@ -18,7 +17,7 @@ export interface ToPrimitiveHelperOptions {
 // Input: [val]
 // Output: [val]
 export class ToPrimitiveHelper extends Helper {
-  private readonly type: Type | undefined;
+  private readonly type: ts.Type | undefined;
   private readonly knownType: Types | undefined;
   private readonly preferredType: PreferredType;
 
@@ -29,14 +28,14 @@ export class ToPrimitiveHelper extends Helper {
     this.preferredType = preferredType;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
 
       return;
     }
 
-    if (!typeUtils.isOnlyPrimitive(this.type)) {
+    if (this.type === undefined || !tsUtils.type_.isOnlyPrimitiveish(this.type)) {
       if (this.type === undefined && this.knownType !== Types.Object) {
         this.toPrimitive(sb, node, options);
       } else {
@@ -45,7 +44,7 @@ export class ToPrimitiveHelper extends Helper {
     }
   }
 
-  private toPrimitive(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  private toPrimitive(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     sb.emitHelper(
       node,
       options,
@@ -63,7 +62,7 @@ export class ToPrimitiveHelper extends Helper {
     );
   }
 
-  private toPrimitiveObject(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  private toPrimitiveObject(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [value, value]
     sb.emitOp(node, 'DUP');
     // [symbol, value, value]
@@ -106,7 +105,7 @@ export class ToPrimitiveHelper extends Helper {
 
   private tryConvert(
     sb: ScriptBuilder,
-    node: Node,
+    node: ts.Node,
     options: VisitOptions,
     preferredType: 'string' | 'number' | 'default',
   ): void {

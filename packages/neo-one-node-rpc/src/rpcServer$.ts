@@ -1,12 +1,12 @@
 import { Monitor } from '@neo-one/monitor';
 import { Blockchain, Node } from '@neo-one/node-core';
-import { finalize } from '@neo-one/utils';
+import { finalize, mergeScanLatest } from '@neo-one/utils';
 import * as http from 'http';
 import * as https from 'https';
 import Application from 'koa';
 import Router from 'koa-router';
 import { combineLatest, defer, Observable } from 'rxjs';
-import { distinctUntilChanged, map, mergeScan, publishReplay, refCount } from 'rxjs/operators';
+import { distinctUntilChanged, map, publishReplay, refCount } from 'rxjs/operators';
 import {
   context,
   cors,
@@ -54,7 +54,7 @@ type Listener = ((request: http.IncomingMessage, response: http.ServerResponse) 
 interface HandleServerResult<T extends http.Server | https.Server> {
   readonly server: T | undefined;
   readonly listener: Listener | undefined;
-  readonly app: Application;
+  readonly app: Application | undefined;
 }
 
 async function handleServer<T extends http.Server | https.Server, TOptions extends ListenOptions>({
@@ -204,7 +204,7 @@ export const rpcServer$ = ({
         distinctUntilChanged(),
       ),
     ).pipe(
-      mergeScan<[Application, number], HandleServerResult<http.Server | https.Server> | undefined>(
+      mergeScanLatest<[Application, number], HandleServerResult<http.Server | https.Server> | undefined>(
         (prevResult, [app, keepAliveTimeout]) =>
           defer(async () =>
             handleServer({

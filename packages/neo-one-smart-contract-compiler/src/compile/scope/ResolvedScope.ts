@@ -1,5 +1,4 @@
-import { Node } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { ProgramCounter } from '../pc';
 import { ScriptBuilder } from '../sb';
@@ -65,7 +64,7 @@ export class ResolvedScope implements Scope {
   // [value]
   public set(
     sb: ScriptBuilder,
-    node: Node,
+    node: ts.Node,
     optionsIn: VisitOptions,
     name: Name | string,
     scopeLength: number = this.scopeLength,
@@ -95,7 +94,7 @@ export class ResolvedScope implements Scope {
 
   public get(
     sb: ScriptBuilder,
-    node: Node,
+    node: ts.Node,
     options: VisitOptions,
     name: Name | string,
     scopeLength: number = this.scopeLength,
@@ -121,7 +120,7 @@ export class ResolvedScope implements Scope {
     }
   }
 
-  public getThis(sb: ScriptBuilder, node: Node, _options: VisitOptions): void {
+  public getThis(sb: ScriptBuilder, node: ts.Node, _options: VisitOptions): void {
     // [[scopes, this]]
     this.loadAll(sb, node);
     // [1, [scopes, this]]
@@ -130,7 +129,7 @@ export class ResolvedScope implements Scope {
     sb.emitOp(node, 'PICKITEM');
   }
 
-  public setThis(sb: ScriptBuilder, node: Node, _options: VisitOptions): void {
+  public setThis(sb: ScriptBuilder, node: ts.Node, _options: VisitOptions): void {
     // [[scopes, this], val]
     this.loadAll(sb, node);
     // [1, [scopes, this], val]
@@ -141,7 +140,7 @@ export class ResolvedScope implements Scope {
     sb.emitOp(node, 'SETITEM');
   }
 
-  public getGlobal(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public getGlobal(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (this.parent === undefined) {
       // [[scopes, this, global]]
       this.loadAll(sb, node);
@@ -154,7 +153,7 @@ export class ResolvedScope implements Scope {
     }
   }
 
-  public setGlobal(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public setGlobal(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (this.parent === undefined) {
       // [[scopes, this, global], val]
       this.loadAll(sb, node);
@@ -183,11 +182,11 @@ export class ResolvedScope implements Scope {
     return this.mutableVariables[name] !== undefined || (this.parent !== undefined && this.parent.hasBinding(name));
   }
 
-  public pushAll(sb: ScriptBuilder, node: Node, _options: VisitOptions): void {
+  public pushAll(sb: ScriptBuilder, node: ts.Node, _options: VisitOptions): void {
     sb.emitOp(node, 'DUPFROMALTSTACK');
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions, func: (options: VisitOptions) => void): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, func: (options: VisitOptions) => void): void {
     if (this.addScope) {
       this.surround(sb, node, options, func);
     } else {
@@ -195,7 +194,12 @@ export class ResolvedScope implements Scope {
     }
   }
 
-  private surround(sb: ScriptBuilder, node: Node, options: VisitOptions, func: (options: VisitOptions) => void): void {
+  private surround(
+    sb: ScriptBuilder,
+    node: ts.Node,
+    options: VisitOptions,
+    func: (options: VisitOptions) => void,
+  ): void {
     if (this.parent === undefined) {
       // [global]
       sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
@@ -308,7 +312,7 @@ export class ResolvedScope implements Scope {
     }
   }
 
-  private emitNonLocal(sb: ScriptBuilder, node: Node, completion: number, pc: ProgramCounter | undefined): void {
+  private emitNonLocal(sb: ScriptBuilder, node: ts.Node, completion: number, pc: ProgramCounter | undefined): void {
     if (pc !== undefined) {
       sb.withProgramCounter(() => {
         sb.emitOp(node, 'DUP');
@@ -331,7 +335,7 @@ export class ResolvedScope implements Scope {
     return this.uniqueVariables.get(name);
   }
 
-  private loadScope(sb: ScriptBuilder, node: Node, scopeLength: number, scopePosition: number): void {
+  private loadScope(sb: ScriptBuilder, node: ts.Node, scopeLength: number, scopePosition: number): void {
     this.loadAll(sb, node);
     // [0,[scopes, this]]
     sb.emitPushInt(node, 0);
@@ -343,7 +347,7 @@ export class ResolvedScope implements Scope {
     sb.emitOp(node, 'PICKITEM');
   }
 
-  private loadAll(sb: ScriptBuilder, node: Node): void {
+  private loadAll(sb: ScriptBuilder, node: ts.Node): void {
     // [[scopes, this]]
     sb.emitOp(node, 'DUPFROMALTSTACK');
   }

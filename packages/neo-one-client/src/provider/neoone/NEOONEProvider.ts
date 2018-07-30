@@ -10,8 +10,8 @@ import {
   Input,
   NetworkSettings,
   NetworkType,
+  RawCallReceipt,
   RawInvocationData,
-  RawInvocationResult,
   Transaction,
   TransactionReceipt,
   UnspentOutput,
@@ -129,7 +129,7 @@ export class NEOONEProvider {
     return this.getProvider(network).getInvocationData(hash, monitor);
   }
 
-  public async testInvoke(network: NetworkType, transaction: string, monitor?: Monitor): Promise<RawInvocationResult> {
+  public async testInvoke(network: NetworkType, transaction: string, monitor?: Monitor): Promise<RawCallReceipt> {
     return this.getProvider(network).testInvoke(transaction, monitor);
   }
 

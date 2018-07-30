@@ -1,9 +1,9 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { Bytecode, ScriptBuilder } from '../sb';
 
 interface JumpResult {
-  readonly node: Node;
+  readonly node: ts.Node;
   readonly jumpNumber: number;
   readonly bytecode: Bytecode;
 }
@@ -12,7 +12,7 @@ export class JumpTable {
   private mutableJumpNumber = 0;
   private readonly mutableTable: JumpResult[] = [];
 
-  public add(sb: ScriptBuilder, node: Node, body: () => void): number {
+  public add(sb: ScriptBuilder, node: ts.Node, body: () => void): number {
     const jumpNumber = this.mutableJumpNumber;
     this.mutableJumpNumber += 1;
     const { bytecode } = sb.capture(() => {
@@ -23,7 +23,7 @@ export class JumpTable {
     return jumpNumber;
   }
 
-  public emitTable(sb: ScriptBuilder, outerNode: Node): void {
+  public emitTable(sb: ScriptBuilder, outerNode: ts.Node): void {
     this.mutableTable.forEach(({ node, jumpNumber, bytecode }) => {
       sb.emitHelper(
         node,

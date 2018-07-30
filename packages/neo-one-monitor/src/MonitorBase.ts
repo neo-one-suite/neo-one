@@ -2,7 +2,7 @@ import { IncomingMessage } from 'http';
 import { Context } from 'koa';
 
 import { utils } from '@neo-one/utils';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { ReportHandler } from './ReportHandler';
 import {
@@ -702,8 +702,8 @@ export class MonitorBase implements Span {
       mergedData = { ...this.mutableData, ...mergeData };
     }
 
-    // @ts-ignore
-    return new this.constructor({
+    // tslint:disable-next-line no-any
+    return new (this.constructor as any)({
       service: this.service,
       component: component === undefined ? this.component : component,
       logger: this.logger,

@@ -1,32 +1,42 @@
-import * as ajv from 'ajv';
-import * as chokidar from 'chokidar';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { defer, Observable, Observer } from 'rxjs';
 import { distinctUntilChanged, mergeScan, switchMap } from 'rxjs/operators';
-import * as SeamlessImmutable from 'seamless-immutable';
+import SeamlessImmutable from 'seamless-immutable';
 
-const ajvValue = new ajv();
 type Event = 'change';
 
 const watchConfig$ = (file: string): Observable<Event> =>
   Observable.create((observer: Observer<string>) => {
-    const watcher = chokidar.watch(file, { ignoreInitial: false });
-    watcher.on('add', () => {
-      observer.next('change');
-    });
-    watcher.on('change', () => {
-      observer.next('change');
-    });
-    watcher.on('error', (error: Error) => {
-      observer.error(error);
-    });
-    watcher.on('unlink', () => {
-      observer.error(new Error('Configuration file deleted.'));
-    });
+    // import('chokidar').FSWatcher
+    // tslint:disable-next-line no-any
+    let watcher: any | undefined;
+    let closed = false;
+    import('chokidar')
+      .then((chokidar) => {
+        if (!closed) {
+          watcher = chokidar.watch(file, { ignoreInitial: false });
+          watcher.on('add', () => {
+            observer.next('change');
+          });
+          watcher.on('change', () => {
+            observer.next('change');
+          });
+          watcher.on('error', (error: Error) => {
+            observer.error(error);
+          });
+          watcher.on('unlink', () => {
+            observer.error(new Error('Configuration file deleted.'));
+          });
+        }
+      })
+      .catch((error) => observer.error(error));
 
     return () => {
-      watcher.close();
+      closed = true;
+      if (watcher !== undefined) {
+        watcher.close();
+      }
     };
   });
 
@@ -35,7 +45,9 @@ export class Config<TConfig extends object> {
   public readonly configPath: string;
   private readonly defaultConfig: TConfig;
   // tslint:disable-next-line no-any
-  private readonly validateConfig: any;
+  private readonly schema: any;
+  // tslint:disable-next-line no-any
+  private mutableValidateConfig: any;
 
   public constructor({
     name: configName,
@@ -51,7 +63,7 @@ export class Config<TConfig extends object> {
   }) {
     this.configPath = path.resolve(configPath, `${configName}.json`);
     this.defaultConfig = defaultConfig;
-    this.validateConfig = ajvValue.compile(schema);
+    this.schema = schema;
     this.config$ = defer(async () => this.getConfig()).pipe(
       switchMap((config) =>
         watchConfig$(this.configPath).pipe(
@@ -61,12 +73,10 @@ export class Config<TConfig extends object> {
 
       distinctUntilChanged(),
     );
-
-    this.validate(this.defaultConfig);
   }
 
   public async update({ config }: { readonly config: TConfig }): Promise<TConfig> {
-    this.validate(config);
+    await this.validate(config);
     await fs.ensureDir(path.dirname(this.configPath));
     await fs.writeFile(this.configPath, JSON.stringify(config));
 
@@ -86,7 +96,7 @@ export class Config<TConfig extends object> {
     }
 
     const currentConfig = JSON.parse(contents);
-    this.validate(currentConfig);
+    await this.validate(currentConfig);
 
     if (config !== undefined) {
       // tslint:disable-next-line no-any
@@ -98,13 +108,29 @@ export class Config<TConfig extends object> {
     return currentConfig;
   }
 
-  private validate(config: TConfig): void {
-    const isValid = this.validateConfig(config);
+  private async validate(config: TConfig): Promise<void> {
+    const validateConfig = await this.getValidateConfig();
+    const isValid = validateConfig(config);
     if (!isValid) {
       const error = new Error('Invalid config');
       // tslint:disable-next-line no-object-mutation no-any
-      (error as any).errors = this.validateConfig.errors;
+      (error as any).errors = validateConfig.errors;
       throw error;
     }
+  }
+
+  // Promise<import('ajv').ValidateFunction>
+  // tslint:disable-next-line no-any
+  private async getValidateConfig(): Promise<any> {
+    if (this.mutableValidateConfig !== undefined) {
+      return this.mutableValidateConfig;
+    }
+
+    const ajv = await import('ajv');
+    // tslint:disable-next-line no-any
+    const validateConfig = new ajv.default().compile(this.schema);
+    this.mutableValidateConfig = validateConfig;
+
+    return validateConfig;
   }
 }

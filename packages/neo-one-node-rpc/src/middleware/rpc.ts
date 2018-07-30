@@ -397,9 +397,12 @@ export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; rea
     },
     [RPC_METHODS.invokescript]: async (args) => {
       const script = JSONHelper.readBuffer(args[0]);
-      const result = await blockchain.invokeScript(script);
+      const receipt = await blockchain.invokeScript(script);
 
-      return result.serializeJSON(blockchain.serializeJSONContext);
+      return {
+        result: receipt.result.serializeJSON(blockchain.serializeJSONContext),
+        actions: receipt.actions.map((action) => action.serializeJSON(blockchain.serializeJSONContext)),
+      };
     },
     [RPC_METHODS.sendrawtransaction]: async (args) => {
       const transaction = deserializeTransactionWire({
@@ -499,9 +502,12 @@ export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; rea
       });
 
       if (transaction instanceof InvocationTransaction) {
-        const result = await blockchain.invokeTransaction(transaction);
+        const receipt = await blockchain.invokeTransaction(transaction);
 
-        return result.serializeJSON(blockchain.serializeJSONContext);
+        return {
+          result: receipt.result.serializeJSON(blockchain.serializeJSONContext),
+          actions: receipt.actions.map((action) => action.serializeJSON(blockchain.serializeJSONContext)),
+        };
       }
 
       throw new JSONRPCError(-103, 'Invalid InvocationTransaction');

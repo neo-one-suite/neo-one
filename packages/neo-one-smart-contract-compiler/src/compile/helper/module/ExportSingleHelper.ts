@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -15,7 +15,7 @@ export class ExportSingleHelper extends Helper {
     this.options = options;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [exports, val]
     sb.emitHelper(node, options, sb.helpers.getCurrentModule);

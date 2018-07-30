@@ -509,7 +509,7 @@ describe('LocalUserAccountProvider', () => {
     keystore.getCurrentAccount = jest.fn(() => account1);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     keystore.sign = jest.fn(() => witness);
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
 
     const result = localUserAccountProvider.invoke(contract, method, params, paramsZipped, verify, errorOptions);
 
@@ -538,7 +538,7 @@ describe('LocalUserAccountProvider', () => {
     const unspent = [outputs.elevenGAS];
     keystore.sign = jest.fn(() => witness);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.fault));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.fault, actions: [] }));
 
     const result = localUserAccountProvider.publish(contract, options);
     await expect(result).rejects.toEqual(new InvokeError('testMessage'));
@@ -565,7 +565,7 @@ describe('LocalUserAccountProvider', () => {
     const unspent = [outputs.elevenGAS];
     keystore.sign = jest.fn(() => witness);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
     provider.getInvocationData = jest.fn(() =>
       Promise.resolve({
         result: results.halt,
@@ -605,7 +605,7 @@ describe('LocalUserAccountProvider', () => {
     const unspent = [outputs.elevenGAS];
     keystore.sign = jest.fn(() => witness);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
     provider.getInvocationData = jest.fn(() =>
       Promise.resolve({
         result: results.fault,
@@ -656,7 +656,7 @@ describe('LocalUserAccountProvider', () => {
     const unspent = [outputs.elevenGAS];
     keystore.sign = jest.fn(() => witness);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
     provider.getInvocationData = jest.fn(() =>
       Promise.resolve({
         result: results.halt,
@@ -701,7 +701,7 @@ describe('LocalUserAccountProvider', () => {
     const unspent = [outputs.elevenGAS];
     keystore.sign = jest.fn(() => witness);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
     provider.getInvocationData = jest.fn(() =>
       Promise.resolve({
         result: results.halt,
@@ -742,7 +742,7 @@ describe('LocalUserAccountProvider', () => {
     keystore.getCurrentAccount = jest.fn(() => account1);
     keystore.sign = jest.fn(() => witness);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
     provider.getInvocationData = jest.fn(() =>
       Promise.resolve({
         result: results.fault,
@@ -787,7 +787,7 @@ describe('LocalUserAccountProvider', () => {
     const unspent = [outputs.elevenGAS];
     keystore.sign = jest.fn(() => witness);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
     provider.getInvocationData = jest.fn(() =>
       Promise.resolve({
         result: results.fault,
@@ -832,7 +832,7 @@ describe('LocalUserAccountProvider', () => {
     const unspent = [outputs.elevenGAS];
     keystore.sign = jest.fn(() => witness);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
     provider.getInvocationData = jest.fn(() =>
       Promise.resolve({
         result: results.halt,
@@ -914,7 +914,7 @@ describe('LocalUserAccountProvider', () => {
     keystore.getCurrentAccount = jest.fn(() => account1);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     keystore.sign = jest.fn(() => witness);
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -956,7 +956,7 @@ describe('LocalUserAccountProvider', () => {
     keystore.getCurrentAccount = jest.fn(() => account1);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     keystore.sign = jest.fn(() => witness);
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
 
     provider.getTransactionReceipt = jest.fn(() =>
       Promise.resolve({
@@ -993,11 +993,11 @@ describe('LocalUserAccountProvider', () => {
     const unspent = [outputs.sevenNEO, outputs.elevenGAS];
     keystore.getCurrentAccount = jest.fn(() => account1);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
 
     const result = await localUserAccountProvider.call(contract, method, params);
 
-    expect(result).toEqual(results.halt);
+    expect(result).toEqual({ result: results.halt, actions: [] });
     verifyMocks();
   });
 
@@ -1007,11 +1007,11 @@ describe('LocalUserAccountProvider', () => {
     const params = ['param1'];
     const unspent = [outputs.sevenNEO, outputs.elevenGAS];
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve(results.halt));
+    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
 
     const result = await localUserAccountProvider.call(contract, method, params, options);
 
-    expect(result).toEqual(results.halt);
+    expect(result).toEqual({ result: results.halt, actions: [] });
     verifyMocks();
   });
 

@@ -1,20 +1,26 @@
-import { FunctionDeclaration, SyntaxKind } from 'ts-simple-ast';
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 
 import { InternalFunctionProperties } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
+import { Name } from '../scope';
 import { VisitOptions } from '../types';
 
-export class FunctionDeclarationCompiler extends NodeCompiler<FunctionDeclaration> {
-  public readonly kind: SyntaxKind = SyntaxKind.FunctionDeclaration;
+export class FunctionDeclarationCompiler extends NodeCompiler<ts.FunctionDeclaration> {
+  public readonly kind = ts.SyntaxKind.FunctionDeclaration;
 
-  public visitNode(sb: ScriptBuilder, decl: FunctionDeclaration, optionsIn: VisitOptions): void {
-    if (!decl.isImplementation()) {
+  public visitNode(sb: ScriptBuilder, decl: ts.FunctionDeclaration, optionsIn: VisitOptions): void {
+    if (!tsUtils.overload.isImplementation(decl)) {
       return;
     }
 
     const options = sb.pushValueOptions(optionsIn);
-    const name = sb.scope.add(decl.getName());
+    let name: Name | undefined;
+    const declName = tsUtils.node.getName(decl);
+    if (declName !== undefined) {
+      name = sb.scope.add(tsUtils.node.getNameOrThrow(decl));
+    }
     // [callArray]
     sb.emitHelper(decl, options, sb.helpers.createCallArray);
     // [callObjectVal]
@@ -25,7 +31,7 @@ export class FunctionDeclarationCompiler extends NodeCompiler<FunctionDeclaratio
         property: InternalFunctionProperties.Call,
       }),
     );
-    if (decl.isNamedExport() || decl.isDefaultExport()) {
+    if (tsUtils.modifier.isNamedExport(decl) || tsUtils.modifier.isDefaultExport(decl)) {
       // [callObjectVal, callObjectVal]
       sb.emitOp(decl, 'DUP');
       // [callObjectVal]
@@ -33,12 +39,17 @@ export class FunctionDeclarationCompiler extends NodeCompiler<FunctionDeclaratio
         decl,
         options,
         sb.helpers.exportSingle({
-          name: decl.isNamedExport() ? decl.getName() : undefined,
-          defaultExport: decl.isDefaultExport(),
+          name: tsUtils.modifier.isNamedExport(decl) ? tsUtils.node.getNameOrThrow(decl) : undefined,
+          defaultExport: tsUtils.modifier.isDefaultExport(decl),
         }),
       );
     }
-    // []
-    sb.scope.set(sb, decl, options, name);
+    if (name === undefined) {
+      // []
+      sb.emitOp(decl, 'DROP');
+    } else {
+      // []
+      sb.scope.set(sb, decl, options, name);
+    }
   }
 }

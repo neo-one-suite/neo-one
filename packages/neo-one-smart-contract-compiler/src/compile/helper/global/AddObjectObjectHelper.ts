@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -7,7 +7,7 @@ import { Helper } from '../Helper';
 // Input: [globalObjectVal]
 // Output: [objectPrototypeVal, globalObjectVal]
 export class AddObjectObjectHelper extends Helper {
-  public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [globalObjectVal, globalObjectVal]
     sb.emitOp(node, 'DUP');

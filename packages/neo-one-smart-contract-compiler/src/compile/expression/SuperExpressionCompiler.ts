@@ -1,13 +1,12 @@
-import { SuperExpression, SyntaxKind } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class SuperExpressionCompiler extends NodeCompiler<SuperExpression> {
-  public readonly kind: SyntaxKind = SyntaxKind.SuperKeyword;
+export class SuperExpressionCompiler extends NodeCompiler<ts.SuperExpression> {
+  public readonly kind = ts.SyntaxKind.SuperKeyword;
 
-  public visitNode(sb: ScriptBuilder, expr: SuperExpression, options: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, expr: ts.SuperExpression, options: VisitOptions): void {
     if (options.pushValue) {
       const superClass = options.superClass;
       if (superClass === undefined) {

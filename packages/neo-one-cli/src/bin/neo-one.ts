@@ -1,6 +1,12 @@
-// tslint:disable-next-line no-import-side-effect
-import '@babel/polyfill';
-import { CLI, DIR_OPTION, InteractiveCLI, MIN_PORT_OPTION, SERVER_PORT_OPTION, STATIC_NEO_ONE_OPTION } from '../';
+import {
+  CLI,
+  DIR_OPTION,
+  InteractiveCLI,
+  MIN_PORT_OPTION,
+  SERVER_PORT_OPTION,
+  STATIC_NEO_ONE_OPTION,
+  // tslint:disable-next-line no-implicit-dependencies
+} from '@neo-one/cli';
 
 // tslint:disable-next-line no-let
 let { argv } = process;

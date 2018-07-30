@@ -11,7 +11,8 @@ describe('BooleanLiteralCompiler', () => {
 
   test('false', async () => {
     await helpers.executeString(`
-      if (false) {
+      const x: boolean = false as boolean;
+      if (x) {
         throw 'Failure';
       }
     `);

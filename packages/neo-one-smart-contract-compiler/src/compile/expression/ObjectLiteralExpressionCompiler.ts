@@ -1,34 +1,30 @@
-import { ObjectLiteralExpression, SyntaxKind, TypeGuards } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { InternalFunctionProperties } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class ObjectLiteralExpressionCompiler extends NodeCompiler<ObjectLiteralExpression> {
-  public readonly kind: SyntaxKind = SyntaxKind.ObjectLiteralExpression;
+export class ObjectLiteralExpressionCompiler extends NodeCompiler<ts.ObjectLiteralExpression> {
+  public readonly kind = ts.SyntaxKind.ObjectLiteralExpression;
 
-  public visitNode(sb: ScriptBuilder, node: ObjectLiteralExpression, optionsIn: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, node: ts.ObjectLiteralExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [objectVal]
     sb.emitHelper(node, options, sb.helpers.createObject);
-    node.getProperties().forEach((prop) => {
+    tsUtils.object_.getProperties(node).forEach((prop) => {
       // [objectVal, objectVal]
       sb.emitOp(node, 'DUP');
-      if (
-        TypeGuards.isPropertyAssignment(prop) ||
-        TypeGuards.isShorthandPropertyAssignment(prop) ||
-        TypeGuards.isMethodDeclaration(prop)
-      ) {
+      if (ts.isPropertyAssignment(prop) || ts.isShorthandPropertyAssignment(prop) || ts.isMethodDeclaration(prop)) {
         // [propString, objectVal, objectVal]
-        sb.emitPushString(prop, prop.getName());
-        if (TypeGuards.isPropertyAssignment(prop)) {
+        sb.emitPushString(prop, tsUtils.node.getName(prop));
+        if (ts.isPropertyAssignment(prop)) {
           // [val, propString, objectVal, objectVal]
-          sb.visit(prop.getInitializerOrThrow(), options);
-        } else if (TypeGuards.isShorthandPropertyAssignment(prop)) {
+          sb.visit(tsUtils.initializer.getInitializerOrThrow(prop), options);
+        } else if (ts.isShorthandPropertyAssignment(prop)) {
           // [val, propString, objectVal, objectVal]
-          sb.visit(prop.getNameNode(), options);
-        } else if (TypeGuards.isMethodDeclaration(prop)) {
+          sb.visit(tsUtils.node.getNameNode(prop), options);
+        } else if (ts.isMethodDeclaration(prop)) {
           // [callArr, propString, objectVal, objectVal]
           sb.emitHelper(prop, options, sb.helpers.createCallArray);
           // [callObj, propString, objectVal, objectVal]

@@ -1,4 +1,4 @@
-import * as Storage from '@google-cloud/storage';
+import { File } from '@google-cloud/storage';
 import { Monitor } from '@neo-one/monitor';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -20,7 +20,7 @@ const METADATA_NAME = 'metadata';
 const MAX_SIZE = 1_000_000_000;
 const KEEP_BACKUP_COUNT = 10;
 
-const extractTime = (prefix: string, file: Storage.File) => parseInt(file.name.slice(prefix.length).split('/')[0], 10);
+const extractTime = (prefix: string, file: File) => parseInt(file.name.slice(prefix.length).split('/')[0], 10);
 
 export class GCloudProvider extends Provider {
   private readonly environment: Environment;
@@ -82,7 +82,7 @@ export class GCloudProvider extends Provider {
 
   public async backup(monitorIn: Monitor): Promise<void> {
     const monitor = monitorIn.at('gcloud_provider');
-    const { projectID, bucket, prefix, keepBackupCount = KEEP_BACKUP_COUNT, maxSizeBytes = MAX_SIZE } = this.options;
+    const { bucket, prefix, keepBackupCount = KEEP_BACKUP_COUNT, maxSizeBytes = MAX_SIZE } = this.options;
     const { dataPath } = this.environment;
 
     const files = await fs.readdir(dataPath);
@@ -113,7 +113,7 @@ export class GCloudProvider extends Provider {
       mutableFileLists.push(mutableCurrentFileList);
     }
 
-    const storage = new Storage.Storage({ projectId: projectID });
+    const storage = await this.getStorage();
     const time = Math.round(Date.now() / 1000);
     // tslint:disable-next-line no-loop-statement
     for (const [idx, fileList] of mutableFileLists.entries()) {
@@ -161,11 +161,11 @@ export class GCloudProvider extends Provider {
 
   private async getLatestTime(): Promise<{
     readonly time: number | undefined;
-    readonly files: ReadonlyArray<Storage.File>;
+    readonly files: ReadonlyArray<File>;
   }> {
-    const { bucket, prefix, projectID } = this.options;
+    const { bucket, prefix } = this.options;
 
-    const storage = new Storage.Storage({ projectId: projectID });
+    const storage = await this.getStorage();
     const [files] = await storage.bucket(bucket).getFiles({ prefix });
 
     const metadataTimes = files
@@ -177,5 +177,11 @@ export class GCloudProvider extends Provider {
     const time = metadataTimes[metadataTimes.length - 1] as number | undefined;
 
     return { time, files };
+  }
+
+  private async getStorage() {
+    const storage = await import('@google-cloud/storage');
+
+    return new storage.Storage({ projectId: this.options.projectID });
   }
 }

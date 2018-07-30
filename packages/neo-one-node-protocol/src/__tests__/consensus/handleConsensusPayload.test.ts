@@ -1,3 +1,4 @@
+// wallaby.skip
 import {
   ChangeViewConsensusMessage,
   ConsensusMessage,

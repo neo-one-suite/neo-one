@@ -1,5 +1,4 @@
-import { Node } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -22,7 +21,7 @@ export class WrapBlockchainInterfaceHelper extends Helper {
     this.name = options.name;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
 

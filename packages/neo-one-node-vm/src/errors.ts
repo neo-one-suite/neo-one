@@ -8,7 +8,9 @@ const getLine = (context: ExecutionContext): number => {
   // tslint:disable-next-line no-unused
   const result = [...bytecode.entries()].find(([idx, { pc }]) => context.pc === pc);
 
-  return result === undefined ? 0 : result[0];
+  // NOTE: We don't do result[0] + 1 because context.pc will be the next pc, not the one that
+  //       the error was thrown on. (Line numbers are 1-indexed)
+  return result === undefined ? 1 : result[0];
 };
 
 const getMessage = (context: ExecutionContext, message: string): string => {

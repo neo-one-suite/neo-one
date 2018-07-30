@@ -1,21 +1,33 @@
 {
   "compilerOptions": {
-    "alwaysStrict": true,
     "target": "esnext",
     "module": "commonjs",
-    "declaration": true,
-    "experimentalDecorators": true,
+    "moduleResolution": "node",
+
+    "lib": ["es5", "es2015"],
+    "typeRoots": ["./node_modules/@neo-one/smart-contract"],
+
+    "pretty": true,
+
     "noEmit": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": false,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
+    "declaration": false,
+
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": false,
+    "experimentalDecorators": true,
+
+    "alwaysStrict": true,
     "strict": true,
-    "strictFunctionTypes": true,
-    "typeRoots": [
-      "./node_modules/@types/",
-      "./node_modules/@neo-one/smart-contract"
-    ]
-  }
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "allowUnusedLabels": false,
+    "noUnusedParameters": false,
+    "allowUnreachableCode": false,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "exclude": [
+    "**/*"
+  ]
 }

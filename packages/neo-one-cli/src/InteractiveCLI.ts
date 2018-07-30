@@ -19,14 +19,13 @@ import {
   Session,
 } from '@neo-one/server-plugin';
 // tslint:disable-next-line match-default-export-name
-import * as Table from 'cli-table2';
+import Table from 'cli-table2';
 import * as inquirer from 'inquirer';
 import ora from 'ora';
 import * as path from 'path';
 import { BehaviorSubject, combineLatest, defer, Observable } from 'rxjs';
 import { distinctUntilChanged, map, mergeScan, publishReplay, refCount, switchMap, take } from 'rxjs/operators';
 import Vorpal, { Args, CommandInstance } from 'vorpal';
-import pkg from '../package.json';
 import { commands, createPlugin } from './interactive';
 import { ClientConfig, createBinary, createClientConfig, setupCLI } from './utils';
 
@@ -99,7 +98,7 @@ export class InteractiveCLI {
     readonly serverPort?: number;
     readonly minPort?: number;
   }) {
-    this.vorpal = new Vorpal().version(pkg.version);
+    this.vorpal = new Vorpal().version('1.0.0-alpha');
     this.debug = debug;
     this.mutableSessions = {};
     this.sessions$ = new BehaviorSubject<Session>({});
@@ -202,15 +201,9 @@ export class InteractiveCLI {
     };
 
     const logSubscription = combineLatest(
-      this.mutableClientConfig.config$.pipe(
-        map((config) => config.paths.log),
-        distinctUntilChanged(),
-      ),
+      this.mutableClientConfig.config$.pipe(map((config) => config.paths.log), distinctUntilChanged()),
 
-      this.mutableClientConfig.config$.pipe(
-        map((config) => config.log),
-        distinctUntilChanged(),
-      ),
+      this.mutableClientConfig.config$.pipe(map((config) => config.log), distinctUntilChanged()),
     )
       .pipe(
         map(([logPath, config]) => {
@@ -464,8 +457,8 @@ export class InteractiveCLI {
 
   private getDescribe(describeTable: DescribeTable): string {
     const mutableTable = getTable();
-    // @ts-ignore
-    mutableTable.push(
+    // tslint:disable-next-line no-any
+    (mutableTable as any).push(
       ...describeTable.map(([keyIn, value]) => {
         const key = `${keyIn}:`;
         if (typeof value === 'string') {
@@ -483,10 +476,10 @@ export class InteractiveCLI {
   }
 
   private getList(listTable: ListTable): string {
-    // @ts-ignore
-    const mutableTable = getTable(listTable[0]);
-    // @ts-ignore
-    mutableTable.push(...listTable.slice(1));
+    // tslint:disable-next-line no-any
+    const mutableTable = getTable(listTable[0] as any);
+    // tslint:disable-next-line no-any
+    (mutableTable as any).push(...listTable.slice(1));
 
     return mutableTable.toString();
   }

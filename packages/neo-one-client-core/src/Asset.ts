@@ -130,7 +130,7 @@ export class Asset extends BaseState implements SerializableWire<Asset>, Seriali
   public readonly issuer: UInt160;
   public readonly expiration: number;
   public readonly isFrozen: boolean;
-  public readonly equals: Equals = utils.equals(Asset, (other) => common.uInt256Equal(this.hash, other.hash));
+  public readonly equals: Equals = utils.equals(Asset, this, (other) => common.uInt256Equal(this.hash, other.hash));
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 

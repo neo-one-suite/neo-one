@@ -1,10 +1,8 @@
-import { Node, SyntaxKind } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { Transpiler } from './transpiler';
-import { VisitOptions } from './types';
 
-export abstract class NodeTranspiler<TNode = Node> {
-  public abstract readonly kind: SyntaxKind;
+export abstract class NodeTranspiler<TNode extends ts.Node = ts.Node> {
+  public abstract readonly kind: TNode extends ts.Node & { readonly kind: infer TKind } ? TKind : never;
 
-  public abstract visitNode(transpiler: Transpiler, node: TNode, options: VisitOptions): void;
+  public abstract visitNode(transpiler: Transpiler, node: TNode): TNode;
 }

@@ -5,7 +5,7 @@ import { Binary, Config, DescribeTable, killProcess } from '@neo-one/server-plug
 import fetch from 'cross-fetch';
 import execa from 'execa';
 import * as fs from 'fs-extra';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as path from 'path';
 import { take } from 'rxjs/operators';
 import { NodeSettings } from '../types';
@@ -31,30 +31,27 @@ export interface NodeConfig {
 }
 
 const DEFAULT_RPC_URLS: ReadonlyArray<string> = [
-  'http://seed1.cityofzion.io:8080',
-  'http://seed2.cityofzion.io:8080',
-  'http://seed3.cityofzion.io:8080',
-  'http://seed4.cityofzion.io:8080',
-  'http://seed5.cityofzion.io:8080',
-  'https://seed1.neo.org:10332',
-  'http://seed2.neo.org:10332',
-  'http://seed3.neo.org:10332',
-  'http://seed4.neo.org:10332',
-  'http://seed5.neo.org:10332',
-  'http://api.otcgo.cn:10332',
+  'https://pyrpc1.narrative.org:443',
+  'https://pyrpc2.narrative.org:443',
+  'https://pyrpc3.narrative.org:443',
+  'https://pyrpc4.narrative.org:443',
+  'http://seed1.travala.com:10332',
+  'http://seed2.travala.com:10332',
+  'http://seed1.aphelion-neo.com:10332',
+  'http://seed2.aphelion-neo.com:10332',
+  'http://seed3.aphelion-neo.com:10332',
+  'http://seed4.aphelion-neo.com:10332',
 ];
 
 const DEFAULT_SEEDS: ReadonlyArray<EndpointConfig> = [
-  { type: 'tcp', host: 'seed1.cityofzion.io', port: 10333 },
-  { type: 'tcp', host: 'seed2.cityofzion.io', port: 10333 },
-  { type: 'tcp', host: 'seed3.cityofzion.io', port: 10333 },
-  { type: 'tcp', host: 'seed4.cityofzion.io', port: 10333 },
-  { type: 'tcp', host: 'seed5.cityofzion.io', port: 10333 },
-  { type: 'tcp', host: 'seed1.neo.org', port: 10333 },
-  { type: 'tcp', host: 'seed2.neo.org', port: 10333 },
-  { type: 'tcp', host: 'seed3.neo.org', port: 10333 },
-  { type: 'tcp', host: 'seed4.neo.org', port: 10333 },
-  { type: 'tcp', host: 'seed5.neo.org', port: 10333 },
+  { type: 'tcp', host: 'seed1.travala.com', port: 10333 },
+  { type: 'tcp', host: 'seed2.travala.com', port: 10333 },
+  { type: 'tcp', host: 'seed3.travala.com', port: 10333 },
+  { type: 'tcp', host: 'seed4.travala.com', port: 10333 },
+  { type: 'tcp', host: 'seed1.aphelion-neo.com', port: 10333 },
+  { type: 'tcp', host: 'seed2.aphelion-neo.com', port: 10333 },
+  { type: 'tcp', host: 'seed3.aphelion-neo.com', port: 10333 },
+  { type: 'tcp', host: 'seed4.aphelion-neo.com', port: 10333 },
 ];
 
 const makeDefaultConfig = (dataPath: string): NodeConfig => ({
@@ -309,12 +306,12 @@ export class NEOONENodeAdapter extends NodeAdapter {
     };
   }
 
-  protected async isLive(timeoutMS: number): Promise<boolean> {
-    return this.checkRPC('/live_health_check', timeoutMS);
+  protected async isLive(): Promise<boolean> {
+    return this.checkRPC('/live_health_check');
   }
 
-  protected async isReady(timeoutMS: number): Promise<boolean> {
-    return this.checkRPC('/ready_health_check', timeoutMS);
+  protected async isReady(): Promise<boolean> {
+    return this.checkRPC('/ready_health_check');
   }
 
   protected async createInternal(): Promise<void> {
@@ -341,9 +338,20 @@ export class NEOONENodeAdapter extends NodeAdapter {
       // tslint:disable-next-line no-floating-promises
       child
         .then(() => {
+          this.monitor.log({
+            name: 'neo_node_adapter_node_exit',
+            message: 'Child process exited',
+          });
+
           this.mutableProcess = undefined;
         })
-        .catch(() => {
+        .catch((error: Error) => {
+          this.monitor.logError({
+            name: 'neo_node_adapter_node_error',
+            message: 'Child process exited with an error.',
+            error,
+          });
+
           this.mutableProcess = undefined;
         });
     }
@@ -357,14 +365,11 @@ export class NEOONENodeAdapter extends NodeAdapter {
     }
   }
 
-  private async checkRPC(rpcPath: string, timeoutMS: number): Promise<boolean> {
+  private async checkRPC(rpcPath: string): Promise<boolean> {
     try {
-      const response = await fetch(this.getAddress(rpcPath), {
-        timeout: timeoutMS,
-        // tslint:disable-next-line no-any
-      } as any);
+      const response = await fetch(this.getAddress(rpcPath));
 
-      return response.status === 200;
+      return response.ok;
     } catch (error) {
       if (error.code !== 'ECONNREFUSED') {
         this.monitor.withData({ [this.monitor.labels.HTTP_PATH]: rpcPath }).logError({

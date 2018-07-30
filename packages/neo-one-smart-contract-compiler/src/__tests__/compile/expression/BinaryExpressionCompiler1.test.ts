@@ -1,21 +1,14 @@
 import { helpers } from '../../../__data__';
 
 describe('BinaryExpressionCompiler', () => {
-  test('false || false [BarBarToken]', async () => {
-    await helpers.executeString(`
-      if (false || false) {
-        throw 'Failure';
-      }
-    `);
-  });
-
   test('true || short-circuit [BarBarToken]', async () => {
     await helpers.executeString(`
       const fail = () => {
         throw 'Failure';
       };
 
-      if (!(true || fail())) {
+      const x: boolean = true as boolean;
+      if (!(x || fail())) {
         throw 'Failure';
       }
     `);

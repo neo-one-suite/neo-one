@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -11,13 +11,13 @@ import { AddConstructorObjectHelper } from './AddConstructorObjectHelper';
 export class AddArrayObjectHelper extends AddConstructorObjectHelper {
   protected readonly name = 'Array';
 
-  protected addPrototypeProperties(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  protected addPrototypeProperties(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     this.addMap(sb, node, options);
     this.addFilter(sb, node, options);
     this.addReduce(sb, node, options);
   }
 
-  protected addConstructorProperties(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  protected addConstructorProperties(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [objectVal, objectVal, globalObjectVal]
     sb.emitOp(node, 'DUP');
     // ['construct', objectVal, objectVal, globalObjectVal]
@@ -122,15 +122,15 @@ export class AddArrayObjectHelper extends AddConstructorObjectHelper {
     sb.emitHelper(node, options, sb.helpers.setInternalObjectProperty);
   }
 
-  private addMap(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  private addMap(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     this.addMapLike(sb, node, options, 'map', sb.helpers.arrMap);
   }
 
-  private addFilter(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  private addFilter(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     this.addMapLike(sb, node, options, 'filter', sb.helpers.arrFilter);
   }
 
-  private addReduce(sb: ScriptBuilder, node: Node, outerOptions: VisitOptions): void {
+  private addReduce(sb: ScriptBuilder, node: ts.Node, outerOptions: VisitOptions): void {
     this.addMethod(sb, node, outerOptions, 'reduce', (options) => {
       const func = sb.scope.addUnique();
       const accum = sb.scope.addUnique();
@@ -214,7 +214,7 @@ export class AddArrayObjectHelper extends AddConstructorObjectHelper {
 
   private addMapLike(
     sb: ScriptBuilder,
-    node: Node,
+    node: ts.Node,
     outerOptions: VisitOptions,
     name: string,
     helper: ((options: { readonly map: () => void; readonly withIndex: boolean }) => Helper),

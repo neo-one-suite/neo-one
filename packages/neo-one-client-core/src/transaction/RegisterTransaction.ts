@@ -121,9 +121,10 @@ export class RegisterTransaction extends TransactionBase<typeof TransactionType.
       throw new InvalidFormatError();
     }
 
+    const getScriptHashesForVerifying = super.getScriptHashesForVerifying.bind(this);
     this.registerGetScriptHashesForVerifyingInternal = utils.lazyAsync(
       async (options: TransactionGetScriptHashesForVerifyingOptions) => {
-        const hashes = await super.getScriptHashesForVerifying(options);
+        const hashes = await getScriptHashesForVerifying(options);
         const scriptHash = common.uInt160ToHex(crypto.getVerificationScriptHash(this.asset.owner));
 
         return new Set([...hashes, scriptHash]);

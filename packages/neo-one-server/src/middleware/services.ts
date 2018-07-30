@@ -10,7 +10,6 @@ import {
 import { Context } from 'mali';
 import { EMPTY, Observable, Observer, of as _of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import pkg from '../../package.json';
 import { ResourcesManager } from '../ResourcesManager';
 import { Server } from '../Server';
 
@@ -138,7 +137,7 @@ export const services = ({ server }: { readonly server: Server }) => {
       ctx.res = {};
     },
     getVersion: async (ctx: Context) => {
-      ctx.res = { version: pkg.version };
+      ctx.res = { version: '1.0.0-alpha' };
     },
     getDebug: async (ctx: Context) => {
       ctx.res = { debug: JSON.stringify(server.getDebug()) };

@@ -5,7 +5,6 @@ import BigNumber from 'bignumber.js';
 import * as appRootDir from 'app-root-dir';
 import * as path from 'path';
 
-import { cleanupTest } from '../../test/cleanupTest';
 import { setupBasicTest } from '../../test/setupBasicTest';
 
 const setup = async () => {
@@ -45,10 +44,6 @@ const setup = async () => {
 };
 
 describe('TestTranspiledToken', () => {
-  afterEach(async () => {
-    await cleanupTest();
-  });
-
   test('properties + issue + balanceOf + totalSupply + transfer', async () => {
     const { networkName, keystore, developerClient, smartContract, masterAccountID, masterPrivateKey } = await setup();
 
@@ -70,7 +65,7 @@ describe('TestTranspiledToken', () => {
 
     const owner = privateKeyToScriptHash(masterPrivateKey);
     let result = await smartContract.deploy(owner, { from: masterAccountID });
-    let [receipt] = await Promise.all([result.confirmed({ timeoutMS: 30000 }), developerClient.runConsensusNow()]);
+    let [receipt] = await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
 
     expect(receipt.result.state).toEqual('HALT');
     expect(receipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');

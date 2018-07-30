@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -18,7 +18,7 @@ export class FunctionHelper extends Helper {
     this.body = body;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (options.pushValue) {
       const jump = sb.jumpTable.add(sb, node, () => {
         this.body();

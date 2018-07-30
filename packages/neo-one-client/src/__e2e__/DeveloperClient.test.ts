@@ -1,15 +1,19 @@
 import { common } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import * as _ from 'lodash';
-import { Client } from '../Client';
-import { DeveloperClient } from '../DeveloperClient';
-import { wifToPrivateKey } from '../helpers';
-import { NEOONEProvider } from '../provider/neoone/NEOONEProvider';
-import { TransactionReceipt, TransactionResult, UserAccountID } from '../types';
-import { LocalKeyStore } from '../user/keystore/LocalKeyStore';
-import { LocalMemoryStore } from '../user/keystore/LocalMemoryStore';
-import { LocalUserAccountProvider } from '../user/LocalUserAccountProvider';
+import _ from 'lodash';
+import {
+  Client,
+  DeveloperClient,
+  wifToPrivateKey,
+  NEOONEProvider,
+  TransactionReceipt,
+  LocalKeyStore,
+  LocalMemoryStore,
+  LocalUserAccountProvider,
+  TransactionResult,
+  UserAccountID,
+} from '@neo-one/client';
 
 interface WalletInfo {
   readonly privateKey: string;
@@ -21,15 +25,6 @@ interface SetupClientsReturn {
   readonly client: Client;
   readonly keystore: LocalKeyStore;
   readonly master: WalletInfo;
-}
-
-function expectNotNull<T>(value: T | null | undefined): T {
-  if (value == undefined) {
-    expect(value).toBeTruthy();
-    throw new Error('For TS');
-  }
-
-  return value;
 }
 
 async function getWalletInfo({
@@ -44,12 +39,10 @@ async function getWalletInfo({
   const wallet = one.parseJSON(output);
 
   return {
-    // tslint:disable-next-line no-any
-    privateKey: expectNotNull(wallet.find((value: any) => value[0] === 'Private Key'))[1],
+    privateKey: wallet.wif,
     accountID: {
       network: networkName,
-      // tslint:disable-next-line no-any
-      address: expectNotNull(wallet.find((value: any) => value[0] === 'Address'))[1],
+      address: wallet.address,
     },
   };
 }
@@ -58,9 +51,9 @@ async function setupNetwork(networkName: string): Promise<string> {
   await one.execute(`create network ${networkName}`);
   const output = await one.execute(`describe network ${networkName} --json`);
 
-  const description = one.parseJSON(output);
+  const network = one.parseJSON(output);
 
-  return description[3][1].table[1][3];
+  return network.nodes[0].rpcAddress;
 }
 
 async function addWallet({
@@ -143,8 +136,8 @@ async function checkWalletBalance({
 }): Promise<void> {
   const walletOutput = await one.execute(`describe wallet ${walletName} --network ${networkName} --json`);
 
-  const walletDescribe = one.parseJSON(walletOutput);
-  expect(walletDescribe[8][1].table[1][1]).toEqual('1000');
+  const wallet = one.parseJSON(walletOutput);
+  expect(wallet.balance[0].amount).toEqual('1000');
 }
 
 async function confirmTransaction(transaction: TransactionResult<TransactionReceipt>): Promise<void> {
@@ -207,10 +200,10 @@ describe('DeveloperClient', () => {
 
     await developerClient.updateSettings({ secondsPerBlock });
     await developerClient.reset();
-    await new Promise<void>((resolve) => setTimeout(resolve, 5000));
+    await new Promise<void>((resolve) => setTimeout(resolve, 2500));
 
     await developerClient.fastForwardOffset(offsetSeconds);
-    await new Promise<void>((resolve) => setTimeout(resolve, 5000));
+    await new Promise<void>((resolve) => setTimeout(resolve, 2500));
 
     const times = await getBlockTimes({ client, networkName });
     let offsetFound = false;
@@ -234,11 +227,11 @@ describe('DeveloperClient', () => {
 
     await developerClient.updateSettings({ secondsPerBlock });
     await developerClient.reset();
-    await new Promise<void>((resolve) => setTimeout(resolve, 5000));
+    await new Promise<void>((resolve) => setTimeout(resolve, 2500));
 
     const time = utils.nowSeconds() + offset;
     await developerClient.fastForwardToTime(time);
-    await new Promise<void>((resolve) => setTimeout(resolve, 5000));
+    await new Promise<void>((resolve) => setTimeout(resolve, 2500));
 
     const times = await getBlockTimes({ client, networkName });
     const timeFound = times.find((blockTime) => blockTime >= time);

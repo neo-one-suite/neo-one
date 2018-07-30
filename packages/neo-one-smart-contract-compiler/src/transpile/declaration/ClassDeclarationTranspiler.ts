@@ -1,40 +1,111 @@
-import {
-  ClassDeclaration,
-  MethodDeclaration,
-  ParameterDeclaration,
-  Scope,
-  Statement,
-  SyntaxKind,
-  TypeGuards,
-} from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import { utils } from '@neo-one/utils';
+import _ from 'lodash';
+import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { NodeTranspiler } from '../NodeTranspiler';
 import { Transpiler } from '../transpiler';
-import { VisitOptions } from '../types';
 
 const DEPLOY_METHOD = 'deploy';
 
-export class ClassDeclarationTranspiler extends NodeTranspiler<ClassDeclaration> {
-  public readonly kind: SyntaxKind = SyntaxKind.ClassDeclaration;
-
-  public visitNode(transpiler: Transpiler, node: ClassDeclaration, options: VisitOptions): void {
-    if (options.isSmartContract || transpiler.isSmartContract(node)) {
-      this.transpileSmartContract(transpiler, node, transpiler.isSmartContractOptions(options));
-    }
+const createAccessors = (transpiler: Transpiler, property: ts.Declaration): ReadonlyArray<ts.ClassElement> => {
+  const name = tsUtils.node.getNameOrThrow(property);
+  const type = tsUtils.type_.getType(transpiler.typeChecker, property);
+  const originalTypeNode = tsUtils.type_.typeToTypeNodeOrThrow(transpiler.typeChecker, type, property);
+  const typeNode = transpiler.getFinalTypeNode(property, type, originalTypeNode);
+  let getAccess = ts.ModifierFlags.Private;
+  if (tsUtils.modifier.isPublic(property)) {
+    getAccess = ts.ModifierFlags.Public;
+  } else if (tsUtils.modifier.isProtected(property)) {
+    getAccess = ts.ModifierFlags.Protected;
   }
 
-  private transpileSmartContract(transpiler: Transpiler, node: ClassDeclaration, options: VisitOptions): void {
-    const baseClass = node.getBaseClass();
-    if (baseClass !== undefined) {
-      transpiler.visit(baseClass, options);
-    }
-
-    this.transpileDeploy(transpiler, node);
+  let createGet = false;
+  let setAccess = getAccess;
+  if (tsUtils.modifier.isReadonly(property)) {
+    createGet = true;
+    getAccess = ts.ModifierFlags.Protected;
+    setAccess = ts.ModifierFlags.Protected;
   }
 
-  private transpileDeploy(transpiler: Transpiler, node: ClassDeclaration): void {
-    const existingDeploy = node.getMethod(DEPLOY_METHOD);
+  return [
+    createGet
+      ? tsUtils.setOriginalRecursive(
+          ts.createMethod(
+            undefined,
+            ts.createModifiersFromModifierFlags(ts.ModifierFlags.Public),
+            undefined,
+            `get${name[0].toUpperCase()}${name.slice(1)}`,
+            undefined,
+            undefined,
+            [],
+            typeNode,
+            ts.createBlock([ts.createReturn(ts.createPropertyAccess(ts.createThis(), name))]),
+          ),
+          property,
+        )
+      : undefined,
+    tsUtils.setOriginalRecursive(
+      ts.createGetAccessor(
+        undefined,
+        ts.createModifiersFromModifierFlags(getAccess),
+        name,
+        [],
+        typeNode,
+        ts.createBlock([
+          ts.createReturn(
+            ts.createAsExpression(
+              ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                ts.createStringLiteral('Neo.Storage.Get'),
+                ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                  ts.createStringLiteral('Neo.Storage.GetContext'),
+                ]),
+                ts.createStringLiteral(name),
+              ]),
+              typeNode,
+            ),
+          ),
+        ]),
+      ),
+      property,
+    ),
+    tsUtils.setOriginalRecursive(
+      ts.createSetAccessor(
+        undefined,
+        ts.createModifiersFromModifierFlags(setAccess),
+        name,
+        [ts.createParameter(undefined, undefined, undefined, name, undefined, typeNode, undefined)],
+        ts.createBlock([
+          ts.createExpressionStatement(
+            ts.createCall(ts.createIdentifier('syscall'), undefined, [
+              ts.createStringLiteral('Neo.Storage.Put'),
+              ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                ts.createStringLiteral('Neo.Storage.GetContext'),
+              ]),
+              ts.createStringLiteral(name),
+              ts.createIdentifier(name),
+            ]),
+          ),
+        ]),
+      ),
+      property,
+    ),
+  ].filter(utils.notNull);
+};
+
+export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclaration> {
+  public readonly kind = ts.SyntaxKind.ClassDeclaration;
+
+  public visitNode(transpiler: Transpiler, node: ts.ClassDeclaration): ts.ClassDeclaration {
+    if (transpiler.isSmartContract(node)) {
+      return this.transpileDeploy(transpiler, node);
+    }
+
+    return node;
+  }
+
+  private transpileDeploy(transpiler: Transpiler, node: ts.ClassDeclaration): ts.ClassDeclaration {
+    const existingDeploy = tsUtils.class_.getInstanceMethod(node, DEPLOY_METHOD);
     if (existingDeploy !== undefined) {
       transpiler.reportError(
         existingDeploy,
@@ -42,144 +113,226 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ClassDeclaration>
         DiagnosticCode.UNSUPPORTED_SYNTAX,
       );
 
-      return;
+      return node;
     }
 
-    const ctor = node.getConstructors().find((ctorDecl) => ctorDecl.isImplementation());
-    let bodyText = '';
-    let parameters: ParameterDeclaration[] = [];
+    const ctor = tsUtils.class_.getConcreteConstructor(node);
+    let bodyStatements: ReadonlyArray<ts.Statement> = [];
+    let parameters: ReadonlyArray<ts.ParameterDeclaration> = [];
     if (ctor === undefined) {
-      const baseDeploy = this.getBaseDeploy(transpiler, node);
-      if (baseDeploy !== undefined) {
-        bodyText = `
-          super.deploy(${baseDeploy
-            .getParameters()
-            .map((param) => param.getName())
-            .join(', ')});
-        `;
-        parameters = baseDeploy.getParameters();
+      const baseCtor = this.getBaseConstructor(transpiler, node);
+      if (baseCtor !== undefined) {
+        parameters = tsUtils.parametered
+          .getParameters(baseCtor)
+          .map((param, idx) =>
+            tsUtils.setOriginal(
+              ts.createParameter(
+                undefined,
+                undefined,
+                param.dotDotDotToken,
+                tsUtils.setOriginal(ts.createIdentifier(`p${idx}`), param),
+                param.questionToken,
+                param.type,
+                param.initializer,
+              ),
+              param,
+            ),
+          );
+        bodyStatements = [
+          tsUtils.setOriginalRecursive(
+            ts.createExpressionStatement(
+              ts.createCall(
+                ts.createPropertyAccess(ts.createSuper(), DEPLOY_METHOD),
+                undefined,
+                parameters
+                  .map((param) => tsUtils.node.getNameNode(param))
+                  .filter(ts.isIdentifier)
+                  .map((param) => tsUtils.markOriginal(param)),
+              ),
+            ),
+            node,
+          ),
+        ];
       }
     } else {
-      const firstStatement = ctor.getStatements()[0] as Statement | undefined;
-      if (firstStatement !== undefined && TypeGuards.isExpressionStatement(firstStatement)) {
-        const callExpr = firstStatement.getExpression();
-        if (TypeGuards.isCallExpression(callExpr)) {
-          const lhsrExpr = callExpr.getExpression();
-          if (TypeGuards.isSuperExpression(lhsrExpr)) {
-            firstStatement.replaceWithText(
-              `super.deploy(${callExpr
-                .getArguments()
-                .map((arg) => arg.getText())
-                .join(', ')});`,
-            );
+      let superDeployStatements: ReadonlyArray<ts.Statement> = [];
+      let firstStatement = tsUtils.statement.getStatements(ctor)[0] as ts.Statement | undefined;
+      if (firstStatement !== undefined && ts.isExpressionStatement(firstStatement)) {
+        const callExpr = tsUtils.expression.getExpression(firstStatement);
+        if (ts.isCallExpression(callExpr)) {
+          const lhsrExpr = tsUtils.expression.getExpression(callExpr);
+          if (tsUtils.guards.isSuperExpression(lhsrExpr)) {
+            superDeployStatements = [
+              tsUtils.setOriginalRecursive(
+                ts.createExpressionStatement(
+                  ts.createCall(
+                    ts.createPropertyAccess(ts.createSuper(), DEPLOY_METHOD),
+                    undefined,
+                    tsUtils.argumented.getArguments(callExpr).map((arg) => tsUtils.markOriginal(arg)),
+                  ),
+                ),
+                firstStatement,
+              ),
+            ];
+            firstStatement = undefined;
           }
         }
       }
 
-      bodyText = ctor
-        .getStatements()
-        .map((statement) => statement.getText())
-        .join('\n');
-      parameters = ctor.getParameters();
+      bodyStatements = superDeployStatements.concat(firstStatement === undefined ? [] : [firstStatement]).concat(
+        tsUtils.statement
+          .getStatements(ctor)
+          .slice(1)
+          .map((statement) => tsUtils.markOriginal(statement)),
+      );
+      parameters = tsUtils.parametered.getParameters(ctor).map((param) => tsUtils.markOriginal(param));
     }
 
-    const deployParameters = parameters.map((param) => {
-      const initializer = param.getInitializer();
-      let type = param.getType().getText();
-      const typeNode = param.getTypeNode();
-      if (typeNode !== undefined) {
-        type = typeNode.getText();
-      }
+    const mutableBodyStatements = [...bodyStatements];
 
-      return {
-        name: param.getNameOrThrow(),
-        type,
-        initializer: initializer === undefined ? undefined : initializer.getText(),
-        hasQuestionToken: param.hasQuestionToken(),
-        isRestParameter: param.isRestParameter(),
-      };
-    });
+    const originalInstanceProperties = tsUtils.class_.getInstanceProperties(node);
+    const instanceProperties: ReadonlyArray<ts.ClassElement> = _.flatMap(
+      originalInstanceProperties.map((property) => {
+        if (ts.isPropertyDeclaration(property) && !tsUtils.modifier.isAbstract(property)) {
+          const name = tsUtils.node.getName(property);
+          const type = tsUtils.type_.getType(transpiler.typeChecker, property);
 
-    node.getInstanceProperties().forEach((property) => {
-      if (
-        (TypeGuards.isPropertyDeclaration(property) && !property.isAbstract()) ||
-        TypeGuards.isParameterDeclaration(property)
-      ) {
-        const name = TypeGuards.isPropertyDeclaration(property) ? property.getName() : property.getNameOrThrow();
-        const type = property.getType();
-
-        if (transpiler.isOnlyLib(property, type, 'MapStorage')) {
-          property.setInitializer(`new MapStorage(syscall('Neo.Runtime.Serialize', '${name}'))`);
-        } else if (transpiler.isOnlyLib(property, type, 'SetStorage')) {
-          property.setInitializer(`new SetStorage(syscall('Neo.Runtime.Serialize', '${name}'))`);
-        } else {
-          if (TypeGuards.isParameterDeclaration(property)) {
-            bodyText += `this.${property.getName()} = ${property.getName()};`;
+          if (transpiler.isOnlyLib(property, type, 'MapStorage')) {
+            return tsUtils.setOriginal(
+              ts.createProperty(
+                property.decorators,
+                property.modifiers,
+                property.name,
+                property.questionToken === undefined ? property.exclamationToken : property.questionToken,
+                property.type,
+                tsUtils.setOriginalRecursive(
+                  ts.createNew(ts.createIdentifier('MapStorage'), undefined, [
+                    ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                      ts.createStringLiteral('Neo.Runtime.Serialize'),
+                      ts.createStringLiteral(name),
+                    ]),
+                  ]),
+                  property,
+                ),
+              ),
+              property,
+            );
           }
 
-          const init = property.getInitializer();
+          if (transpiler.isOnlyLib(property, type, 'SetStorage')) {
+            return tsUtils.setOriginal(
+              ts.createProperty(
+                property.decorators,
+                property.modifiers,
+                property.name,
+                property.questionToken === undefined ? property.exclamationToken : property.questionToken,
+                property.type,
+                tsUtils.setOriginalRecursive(
+                  ts.createNew(ts.createIdentifier('SetStorage'), undefined, [
+                    ts.createCall(ts.createIdentifier('syscall'), undefined, [
+                      ts.createStringLiteral('Neo.Runtime.Serialize'),
+                      ts.createStringLiteral(name),
+                    ]),
+                  ]),
+                  property,
+                ),
+              ),
+              property,
+            );
+          }
+
+          const init = tsUtils.initializer.getInitializer(property);
           let addAccessors = true;
-          if (TypeGuards.isPropertyDeclaration(property) && init !== undefined) {
-            if (property.isReadonly()) {
+          if (init !== undefined) {
+            if (tsUtils.modifier.isReadonly(property)) {
               addAccessors = false;
             } else {
-              bodyText += `this.${property.getName()} = ${init.getText()};`;
+              mutableBodyStatements.push(
+                tsUtils.setOriginalRecursive(
+                  ts.createExpressionStatement(
+                    ts.createBinary(
+                      ts.createPropertyAccess(ts.createThis(), name),
+                      ts.SyntaxKind.EqualsToken,
+                      tsUtils.markOriginal(init),
+                    ),
+                  ),
+                  property,
+                ),
+              );
             }
           }
 
           if (addAccessors) {
-            const typeText = transpiler.getTypeText(property, type);
-            node.addGetAccessor({
-              name,
-              returnType: typeText,
-              bodyText: `
-              return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), '${name}') as ${typeText};
-              `,
-              scope: property.getScope(),
-            });
-            node.addSetAccessor({
-              name,
-              parameters: [
-                {
-                  name,
-                  type: typeText,
-                },
-              ],
-              bodyText: `
-              syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), '${name}', ${name});
-              `,
-              scope: property.isReadonly() ? Scope.Protected : property.getScope(),
-            });
-            property.remove();
+            return createAccessors(transpiler, property);
           }
         }
-      }
-    });
 
-    node.addMethod({
-      name: DEPLOY_METHOD,
-      returnType: 'boolean',
-      bodyText: `${bodyText}return true;`,
-      parameters: deployParameters,
-      scope: Scope.Public,
-    });
+        if (tsUtils.guards.isParameterDeclaration(property)) {
+          const name = tsUtils.markOriginal(tsUtils.node.getNameNodeOrThrow(property));
 
-    if (ctor !== undefined) {
-      ctor.remove();
-    }
+          mutableBodyStatements.push(
+            tsUtils.setOriginal(
+              ts.createExpressionStatement(
+                ts.createBinary(ts.createPropertyAccess(ts.createThis(), name), ts.SyntaxKind.EqualsToken, name),
+              ),
+              property,
+            ),
+          );
+
+          return createAccessors(transpiler, property);
+        }
+
+        return property;
+      }),
+    );
+
+    const deployMethod = tsUtils.setOriginalRecursive(
+      ts.createMethod(
+        undefined,
+        [ts.createModifier(ts.SyntaxKind.PublicKeyword)],
+        undefined,
+        DEPLOY_METHOD,
+        undefined,
+        undefined,
+        parameters,
+        ts.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
+        ts.createBlock(mutableBodyStatements.concat([ts.createReturn(ts.createTrue())])),
+      ),
+      ctor === undefined ? node : ctor,
+    );
+
+    const originalInstancePropertiesSet: Set<ts.ClassElement | ts.ParameterPropertyDeclaration> = new Set(
+      originalInstanceProperties,
+    );
+
+    return tsUtils.setOriginal(
+      ts.createClassDeclaration(
+        node.decorators,
+        node.modifiers,
+        node.name,
+        node.typeParameters,
+        node.heritageClauses,
+        instanceProperties.concat(
+          node.members
+            .filter((member) => member !== ctor && !originalInstancePropertiesSet.has(member))
+            .concat([deployMethod]),
+        ),
+      ),
+      node,
+    );
   }
 
-  private getBaseDeploy(transpiler: Transpiler, node: ClassDeclaration): MethodDeclaration | undefined {
-    const baseClass = node.getBaseClass();
+  private getBaseConstructor(transpiler: Transpiler, node: ts.ClassDeclaration): ts.ConstructorDeclaration | undefined {
+    const baseClass = tsUtils.class_.getBaseClass(transpiler.typeChecker, node);
     if (baseClass === undefined) {
       return undefined;
     }
 
-    const deploy = baseClass.getInstanceMethod(DEPLOY_METHOD);
-    if (deploy === undefined) {
-      return this.getBaseDeploy(transpiler, baseClass);
+    const ctor = tsUtils.class_.getConcreteConstructor(baseClass);
+    if (ctor === undefined) {
+      return this.getBaseConstructor(transpiler, baseClass);
     }
 
-    return deploy;
+    return ctor;
   }
 }

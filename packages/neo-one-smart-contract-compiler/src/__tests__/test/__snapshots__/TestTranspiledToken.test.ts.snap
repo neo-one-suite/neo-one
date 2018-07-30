@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TestTranspiledToken properties + issue + balanceOf + totalSupply + transfer: deploy consumed 1`] = `"8.559"`;
+exports[`TestTranspiledToken properties + issue + balanceOf + totalSupply + transfer: deploy consumed 1`] = `"8.571"`;
 
-exports[`TestTranspiledToken properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"18.559"`;
+exports[`TestTranspiledToken properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"18.571"`;
 
-exports[`TestTranspiledToken properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"6.838"`;
+exports[`TestTranspiledToken properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"6.855"`;
 
-exports[`TestTranspiledToken properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"16.838"`;
+exports[`TestTranspiledToken properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"16.855"`;

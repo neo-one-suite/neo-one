@@ -58,10 +58,10 @@ export abstract class NodeAdapter {
         tcpAddress,
         telemetryAddress,
       }),
-      timer(0, 6000).pipe(
+      timer(0, 500).pipe(
         concatMap(async () => {
           const config = this.getNodeStatus();
-          const [ready, live] = await Promise.all([this.isReady(5000), this.isLive(5000)]);
+          const [ready, live] = await Promise.all([this.isReady(), this.isLive()]);
 
           return {
             name: this.name,
@@ -172,19 +172,19 @@ export abstract class NodeAdapter {
     const start = utils.nowSeconds();
     // tslint:disable-next-line no-loop-statement
     while (utils.nowSeconds() - start < timeoutSeconds) {
-      const isLive = await this.isLive(5000);
+      const isLive = await this.isLive();
       if (isLive) {
         return;
       }
 
-      await new Promise<void>((resolve) => setTimeout(resolve, (timeoutSeconds / 10) * 1000));
+      await new Promise<void>((resolve) => setTimeout(resolve, 50));
     }
 
     throw new Error(`Node ${this.name} did not start.`);
   }
 
-  protected abstract async isLive(_timeoutMS: number): Promise<boolean>;
-  protected abstract async isReady(_timeoutMS: number): Promise<boolean>;
+  protected abstract async isLive(): Promise<boolean>;
+  protected abstract async isReady(): Promise<boolean>;
   protected abstract async createInternal(): Promise<void>;
   protected abstract async updateInternal(_settings: NodeSettings): Promise<void>;
   protected abstract async startInternal(): Promise<void>;

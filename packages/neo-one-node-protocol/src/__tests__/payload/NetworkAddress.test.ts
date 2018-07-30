@@ -2,11 +2,12 @@ import { NetworkAddress, SERVICES } from '../../payload';
 
 describe('NetworkAddress', () => {
   test('serde ipv4', () => {
+    const timestamp = Math.round(Date.now() / 1000);
     const address = new NetworkAddress({
       host: '10.8.4.78',
       port: 53788,
       services: SERVICES.NODE_NETWORK,
-      timestamp: Math.round(Date.now() / 1000),
+      timestamp,
     });
 
     const serialized = address.serializeWire();
@@ -17,7 +18,7 @@ describe('NetworkAddress', () => {
       host: '0000:0000:0000:0000:0000:ffff:0a08:044e',
       port: 53788,
       services: SERVICES.NODE_NETWORK,
-      timestamp: Math.round(Date.now() / 1000),
+      timestamp,
     });
     expect(deserialized.host).toEqual(expected.host);
     expect(deserialized.port).toEqual(expected.port);

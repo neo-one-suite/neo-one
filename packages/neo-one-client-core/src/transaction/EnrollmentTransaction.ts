@@ -74,9 +74,10 @@ export class EnrollmentTransaction extends TransactionBase<TransactionType.Enrol
       throw new InvalidFormatError();
     }
 
+    const getScriptHashesForVerifying = super.getScriptHashesForVerifying.bind(this);
     this.enrollmentGetScriptHashesForVerifyingInternal = utils.lazyAsync(
       async (options: TransactionGetScriptHashesForVerifyingOptions) => {
-        const hashes = await super.getScriptHashesForVerifying(options);
+        const hashes = await getScriptHashesForVerifying(options);
 
         return new Set([...hashes, common.uInt160ToHex(crypto.getVerificationScriptHash(this.publicKey))]);
       },

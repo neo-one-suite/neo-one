@@ -1,12 +1,12 @@
-import { AwaitExpression, SyntaxKind } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 
-export class AwaitExpressionCompiler extends NodeCompiler<AwaitExpression> {
-  public readonly kind: SyntaxKind = SyntaxKind.AwaitExpression;
+export class AwaitExpressionCompiler extends NodeCompiler<ts.AwaitExpression> {
+  public readonly kind = ts.SyntaxKind.AwaitExpression;
 
-  public visitNode(sb: ScriptBuilder, expr: AwaitExpression): void {
+  public visitNode(sb: ScriptBuilder, expr: ts.AwaitExpression): void {
     sb.reportUnsupported(expr);
   }
 }

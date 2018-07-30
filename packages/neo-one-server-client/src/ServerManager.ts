@@ -35,7 +35,7 @@ const waitRunning = async ({ pid }: { readonly pid: number }) => {
   const startTime = utils.nowSeconds();
   // tslint:disable-next-line no-loop-statement
   while (!isRunning(pid) && utils.nowSeconds() - startTime <= 5) {
-    await new Promise<void>((resolve) => setTimeout(resolve, 100));
+    await new Promise<void>((resolve) => setTimeout(resolve, 50));
   }
 };
 
@@ -50,7 +50,7 @@ const waitReachable = async ({ port }: { readonly port: number }) => {
 
       return;
     } catch (error) {
-      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+      await new Promise<void>((resolve) => setTimeout(resolve, 50));
       lastError = error;
     }
   }

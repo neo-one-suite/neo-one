@@ -174,6 +174,7 @@ describe('common', () => {
     const result = await common.convertInvocationResult({
       returnType,
       result: invokeResult,
+      actions: [],
     });
 
     expect(result).toEqual(expected);
@@ -199,6 +200,7 @@ describe('common', () => {
     const result = await common.convertInvocationResult({
       returnType,
       result: invokeResult,
+      actions: [],
     });
 
     expect(result).toEqual(expected);
@@ -224,6 +226,7 @@ describe('common', () => {
     const result = await common.convertInvocationResult({
       returnType,
       result: invokeResult,
+      actions: [],
     });
 
     expect(result).toEqual(expected);
@@ -244,6 +247,7 @@ describe('common', () => {
       return common.convertCallResult({
         returnType,
         result: resultCall,
+        actions: [],
       });
     }
 
@@ -265,6 +269,7 @@ describe('common', () => {
     const result = await common.convertCallResult({
       returnType,
       result: resultCall,
+      actions: [],
     });
 
     expect(result).toEqual(expected);
@@ -283,6 +288,7 @@ describe('common', () => {
     const result = await common.convertCallResult({
       returnType,
       result: resultCall,
+      actions: [],
     });
 
     expect(result).toBeUndefined();

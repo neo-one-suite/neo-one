@@ -1,3 +1,5 @@
-/* eslint-disable */
-require('@babel/polyfill');
-jest.setTimeout(300000);
+jest.setTimeout(30 * 1000);
+
+afterEach(async () => {
+  await one.cleanupTest();
+});

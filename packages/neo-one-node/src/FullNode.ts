@@ -19,18 +19,37 @@ export class FullNode {
     return getDataPath(this.options.environment.dataPath);
   }
 
-  public start(): void {
+  public async start(): Promise<void> {
     if (this.mutableSubscription === undefined) {
-      let observer;
-      if (this.onError !== undefined) {
-        const onError = this.onError;
-        observer = {
-          error: onError,
-          complete: () => onError(new Error('Unexpected end')),
+      let resolved = false;
+
+      return new Promise<void>((resolve, reject) => {
+        const handleError = (error: Error) => {
+          if (resolved) {
+            if (this.onError !== undefined) {
+              this.onError(error);
+            }
+          } else {
+            resolved = true;
+            reject(error);
+          }
         };
-      }
-      this.mutableSubscription = fullNode$(this.options).subscribe(observer);
+        this.mutableSubscription = fullNode$(this.options).subscribe({
+          next: () => {
+            if (!resolved) {
+              resolved = true;
+              resolve();
+            }
+          },
+          error: handleError,
+          complete: () => {
+            handleError(new Error('Unexpected end'));
+          },
+        });
+      });
     }
+
+    return Promise.resolve();
   }
 
   public async stop(): Promise<void> {

@@ -4,6 +4,7 @@ export * from './AssetType';
 export * from './BaseState';
 export * from './Block';
 export * from './BlockBase';
+export * from './CallReceipt';
 export * from './Contract';
 export * from './ContractPropertyState';
 export * from './Equatable';

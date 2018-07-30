@@ -1,20 +1,20 @@
+import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
-import { PostfixUnaryExpression, SyntaxKind } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-type AssignmentLike = SyntaxKind.PlusPlusToken | SyntaxKind.MinusMinusToken;
-export class PostfixUnaryExpressionCompiler extends NodeCompiler<PostfixUnaryExpression> {
-  public readonly kind: SyntaxKind = SyntaxKind.PostfixUnaryExpression;
+type AssignmentLike = ts.SyntaxKind.PlusPlusToken | ts.SyntaxKind.MinusMinusToken;
+export class PostfixUnaryExpressionCompiler extends NodeCompiler<ts.PostfixUnaryExpression> {
+  public readonly kind = ts.SyntaxKind.PostfixUnaryExpression;
 
-  public visitNode(sb: ScriptBuilder, expr: PostfixUnaryExpression, options: VisitOptions): void {
-    sb.visit(expr.getOperand(), sb.noSetValueOptions(sb.pushValueOptions(options)));
-    const token = expr.getOperatorToken();
+  public visitNode(sb: ScriptBuilder, expr: ts.PostfixUnaryExpression, options: VisitOptions): void {
+    sb.visit(tsUtils.expression.getOperand(expr), sb.noSetValueOptions(sb.pushValueOptions(options)));
+    const token = tsUtils.expression.getOperator(expr);
     switch (token) {
-      case SyntaxKind.PlusPlusToken:
-      case SyntaxKind.MinusMinusToken:
+      case ts.SyntaxKind.PlusPlusToken:
+      case ts.SyntaxKind.MinusMinusToken:
         this.visitAssignment(sb, token, expr, options);
         break;
       default:
@@ -25,7 +25,7 @@ export class PostfixUnaryExpressionCompiler extends NodeCompiler<PostfixUnaryExp
   private visitAssignment(
     sb: ScriptBuilder,
     token: AssignmentLike,
-    expr: PostfixUnaryExpression,
+    expr: ts.PostfixUnaryExpression,
     options: VisitOptions,
   ): void {
     if (options.pushValue) {
@@ -33,7 +33,7 @@ export class PostfixUnaryExpressionCompiler extends NodeCompiler<PostfixUnaryExp
     }
 
     switch (token) {
-      case SyntaxKind.PlusPlusToken:
+      case ts.SyntaxKind.PlusPlusToken:
         sb.emitHelper(
           expr,
           sb.pushValueOptions(options),
@@ -44,7 +44,7 @@ export class PostfixUnaryExpressionCompiler extends NodeCompiler<PostfixUnaryExp
         sb.emitOp(expr, 'INC');
         sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.createNumber);
         break;
-      case SyntaxKind.MinusMinusToken:
+      case ts.SyntaxKind.MinusMinusToken:
         sb.emitHelper(
           expr,
           sb.pushValueOptions(options),
@@ -59,6 +59,6 @@ export class PostfixUnaryExpressionCompiler extends NodeCompiler<PostfixUnaryExp
         utils.assertNever(token);
     }
 
-    sb.visit(expr.getOperand(), sb.noPushValueOptions(sb.setValueOptions(options)));
+    sb.visit(tsUtils.expression.getOperand(expr), sb.noPushValueOptions(sb.setValueOptions(options)));
   }
 }

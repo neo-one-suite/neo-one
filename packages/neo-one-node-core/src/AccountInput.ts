@@ -51,6 +51,7 @@ export class AccountInput implements Equatable, SerializableWire<AccountInput> {
   public readonly input: Input;
   public readonly equals: Equals = utils.equals(
     AccountInput,
+    this,
     (other) => common.uInt160Equal(this.hash, other.hash) && this.input.equals(other.input),
   );
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));

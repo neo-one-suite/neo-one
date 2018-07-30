@@ -1,39 +1,39 @@
-import Ast, { DiagnosticCategory, SourceFile } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import * as appRootDir from 'app-root-dir';
 import * as path from 'path';
-
 import { compile as compileScript } from '../../compile';
-import * as utils from '../../utils';
 import { getDiagnosticMessage } from '../../utils';
+import { tsUtils } from '@neo-one/ts-utils';
+import { createContextForSnippet, createContextForPath } from '../../createContext';
+import { Context } from '../../Context';
 
 type ExpectOptions = { type: 'error' } | { type: 'warning' };
 
-const compile = (ast: Ast, sourceFile: SourceFile, options: ExpectOptions) => {
-  const { context } = compileScript({ ast, sourceFile, addDiagnostics: true });
+const compile = (context: Context, sourceFile: ts.SourceFile, options: ExpectOptions) => {
+  compileScript({ context, sourceFile });
 
-  const expectDiagnostic = (category: DiagnosticCategory) => {
+  const expectDiagnostic = (category: ts.DiagnosticCategory) => {
     const diag = context.diagnostics.find((diagnostic) => diagnostic.category === category);
     if (diag === undefined) {
       expect(diag).toBeDefined();
     } else {
-      expect(getDiagnosticMessage(diag, true)).toMatchSnapshot();
+      expect(getDiagnosticMessage(diag, { onlyFileName: true, noHighlight: true })).toMatchSnapshot();
     }
   };
 
   if (options.type === 'error') {
-    expectDiagnostic(DiagnosticCategory.Error);
+    expectDiagnostic(ts.DiagnosticCategory.Error);
   }
 
   if (options.type === 'warning') {
-    expectDiagnostic(DiagnosticCategory.Warning);
+    expectDiagnostic(ts.DiagnosticCategory.Warning);
   }
 };
 
 export const compileString = async (code: string, options: ExpectOptions): Promise<void> => {
-  const { ast, sourceFile } = await utils.getAstForSnippet(code);
+  const { context, sourceFile } = await createContextForSnippet(code);
 
-  compile(ast, sourceFile, options);
+  compile(context, sourceFile, options);
 };
 
 export const compileSnippet = async (snippetPath: string, options: ExpectOptions): Promise<void> => {
@@ -45,8 +45,8 @@ export const compileSnippet = async (snippetPath: string, options: ExpectOptions
     '__data__',
     'snippets',
   );
-  const ast = await utils.getAst(dir);
-  const sourceFile = ast.getSourceFileOrThrow(path.resolve(dir, snippetPath));
+  const context = await createContextForPath(snippetPath);
+  const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, path.resolve(dir, snippetPath));
 
-  compile(ast, sourceFile, options);
+  compile(context, sourceFile, options);
 };

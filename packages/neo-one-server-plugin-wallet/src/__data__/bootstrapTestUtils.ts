@@ -2,9 +2,11 @@ import { addressToScriptHash, NEOONEProvider, privateKeyToAddress, ReadClient } 
 import { common } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { ASSET_INFO, compileSmartContract, TOKEN_INFO, TokenInfo } from '../bootstrap';
 import { constants } from '../constants';
+import { Wallet as ResourceWallet } from '../WalletResourceType';
+import { Network as ResourceNetwork } from '@neo-one/server-plugin-network';
 
 interface Tokens {
   readonly [key: string]: string;
@@ -17,11 +19,11 @@ export async function getNetworkInfo(
   readonly rpcURL: string;
 }> {
   const networkOutput = await one.execute(`describe network ${network} --json`);
-  const networkInfo = one.parseJSON(networkOutput);
+  const networkInfo: ResourceNetwork = one.parseJSON(networkOutput);
 
   return {
-    height: parseInt(networkInfo[3][1].table[1][6], 10),
-    rpcURL: networkInfo[3][1].table[1][3],
+    height: networkInfo.height === undefined ? 0 : networkInfo.height,
+    rpcURL: networkInfo.nodes[0].rpcAddress,
   };
 }
 
@@ -265,32 +267,18 @@ interface Options {
 
 export async function getDefaultInfo({ network }: Options): Promise<Info> {
   const outputs = await one.execute(`get wallet --network ${network} --json`);
-  const walletNames = one
+  const wallets: ReadonlyArray<Info> = one
     .parseJSON(outputs)
-    .slice(1)
     // tslint:disable-next-line no-any
-    .map((info: any) => info[1]);
-  const wallets = await Promise.all(
-    walletNames.map(async (walletName: string) => {
-      const output = await one.execute(`describe wallet ${walletName} --network ${network} --json`);
-
-      const wallet = one.parseJSON(output);
-
-      return {
-        name: walletName,
-        // tslint:disable-next-line no-any
-        address: expectNotNull(wallet.find((value: any) => value[0] === 'Address'))[1],
-        // tslint:disable-next-line no-any
-        balance: expectNotNull(wallet.find((value: any) => value[0] === 'Balance'))[1]
-          .table.slice(1)
-          .map(([name, amount, asset]: [string, string, string]) => ({
-            name,
-            amount,
-            asset,
-          })),
-      };
-    }),
-  );
+    .map((info: ResourceWallet) => ({
+      name: info.baseName,
+      address: info.address,
+      balance: info.balance.map(({ assetName, asset, amount }) => ({
+        name: assetName,
+        amount,
+        asset,
+      })),
+    }));
 
   // @ts-ignore
   return { wallets };
@@ -353,6 +341,8 @@ export async function testBootstrap(
 
   testTransfersAndClaims({ transferWallets });
   testAssets({ wallets, transferWallets });
-  await testTokens({ wallets, transferWallets, client, tokenGas, tokens });
-  await testContracts({ client, tokens });
+  await Promise.all([
+    testTokens({ wallets, transferWallets, client, tokenGas, tokens }),
+    testContracts({ client, tokens }),
+  ]);
 }

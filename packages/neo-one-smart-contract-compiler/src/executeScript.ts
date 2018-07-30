@@ -1,4 +1,4 @@
-import { InvocationResult } from '@neo-one/client-core';
+import { CallReceiptJSON } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { test as testNet } from '@neo-one/node-neo-settings';
@@ -7,8 +7,9 @@ import { vm } from '@neo-one/node-vm';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
 import { RawSourceMap } from 'source-map';
-import Project, { SourceFile } from 'ts-simple-ast';
+import ts from 'typescript';
 import { compile } from './compile';
+import { Context } from './Context';
 import { throwOnDiagnosticErrorOrWarning } from './utils';
 
 export interface ExecuteOptions {
@@ -23,24 +24,30 @@ export const EXECUTE_OPTIONS_DEFAULT = {
 
 export const executeScript = async (
   monitor: Monitor,
-  ast: Project,
-  sourceFile: SourceFile,
+  context: Context,
+  sourceFile: ts.SourceFile,
   { prelude = Buffer.alloc(0, 0), ignoreWarnings = false }: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
-): Promise<{ readonly result: InvocationResult; readonly sourceMap: RawSourceMap }> => {
+): Promise<{ readonly receipt: CallReceiptJSON; readonly sourceMap: RawSourceMap }> => {
   const blockchain = await Blockchain.create({
-    settings: testNet,
+    settings: testNet(),
     storage: storage({
-      context: { messageMagic: testNet.messageMagic },
+      context: { messageMagic: testNet().messageMagic },
       db: LevelUp(MemDown()),
     }),
     vm,
     monitor,
   });
-  const { code: compiledCode, context, sourceMap } = compile({ ast, sourceFile, addDiagnostics: true });
+  const { code: compiledCode, sourceMap } = await compile({ context, sourceFile });
 
   throwOnDiagnosticErrorOrWarning(context.diagnostics, ignoreWarnings);
 
-  const result = await blockchain.invokeScript(Buffer.concat([prelude, compiledCode]), monitor);
+  const receipt = await blockchain.invokeScript(Buffer.concat([prelude, compiledCode]), monitor);
 
-  return { result, sourceMap };
+  return {
+    receipt: {
+      result: receipt.result.serializeJSON(blockchain.serializeJSONContext),
+      actions: receipt.actions.map((action) => action.serializeJSON(blockchain.serializeJSONContext)),
+    },
+    sourceMap,
+  };
 };

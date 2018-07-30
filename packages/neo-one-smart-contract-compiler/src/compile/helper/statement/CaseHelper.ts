@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -21,11 +21,11 @@ export class CaseHelper extends Helper {
     this.defaultCase = defaultCase;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     this.addCase(sb, node, options);
   }
 
-  public addCase(sb: ScriptBuilder, node: Node, options: VisitOptions, idx = 0): void {
+  public addCase(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, idx = 0): void {
     if (idx >= this.cases.length) {
       this.defaultCase();
     } else {
