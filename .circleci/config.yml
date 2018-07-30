@@ -40,6 +40,9 @@ aliases:
       - run:
           name: Lint
           command: yarn lint
+      - run:
+          name: Build
+          command: yarn build
 
   - &test
     working_directory: ~/neo-one
@@ -53,7 +56,7 @@ aliases:
           command: yarn test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings)
       - store_test_results:
           path: reports
-    parallelism: 4
+    parallelism: 2
 
   - &e2e
     working_directory: ~/neo-one
@@ -64,13 +67,13 @@ aliases:
       - save-cache: *save-yarn-cache
       - run:
           name: Build
-          command: yarn build
+          command: yarn build:e2e
       - run:
           name: E2E
           command: yarn e2e-ci $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
       - store_test_results:
           path: reports
-    parallelism: 4
+    parallelism: 2
 
 node10: &node10
   docker:
