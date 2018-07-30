@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/node-rpc",
-  "version": "1.0.0-alpha.83",
+  "version": "1.0.0-alpha.84",
   "description": "NEO•ONE RPC server.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.66",
-    "@neo-one/monitor": "^1.0.0-alpha.51",
-    "@neo-one/node-core": "^1.0.0-alpha.67",
-    "@neo-one/utils": "^1.0.0-alpha.56",
+    "@neo-one/client-core": "^1.0.0-alpha.67",
+    "@neo-one/monitor": "^1.0.0-alpha.52",
+    "@neo-one/node-core": "^1.0.0-alpha.68",
+    "@neo-one/utils": "^1.0.0-alpha.57",
     "cross-fetch": "^2.2.2",
     "koa": "^2.5.1",
     "koa-better-body": "^3.0.4",
