@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`IdentifierCompiler identifiers may contain but not start with numbers 1`] = `"code.ts (2,12): Unknown reference: BigVariable"`;
+
+exports[`IdentifierCompiler this is not CSS, identifiers cannot have hyphens 1`] = `"code.ts (2,22): Unknown reference: variable"`;
