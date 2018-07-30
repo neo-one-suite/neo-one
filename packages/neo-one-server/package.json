@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server",
-  "version": "1.0.0-alpha.105",
+  "version": "1.0.0-alpha.106",
   "description": "NEO•ONE Server that NEO•ONE CLI and other clients connect to.",
   "main": "./src/index.ts",
   "dependencies": {
@@ -10,8 +10,8 @@
     "@neo-one/server-plugin": "^1.0.0-alpha.65",
     "@neo-one/server-plugin-compiler": "^1.0.0-alpha.83",
     "@neo-one/server-plugin-network": "^1.0.0-alpha.101",
-    "@neo-one/server-plugin-simulation": "^1.0.0-alpha.105",
-    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.105",
+    "@neo-one/server-plugin-simulation": "^1.0.0-alpha.106",
+    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.106",
     "@neo-one/utils": "^1.0.0-alpha.57",
     "fs-extra": "^7.0.0",
     "grpc": "^1.13.1",
