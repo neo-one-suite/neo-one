@@ -381,7 +381,12 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case ts.SyntaxKind.CommaToken:
+        // [left]
+        sb.visit(left, options);
+        // []
         sb.emitOp(node, 'DROP');
+        // [right]
+        sb.visit(right, options);
         break;
       case ts.SyntaxKind.AsteriskAsteriskToken:
         sb.reportUnsupported(node);

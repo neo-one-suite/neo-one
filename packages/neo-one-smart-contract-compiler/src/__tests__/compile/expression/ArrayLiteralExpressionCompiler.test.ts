@@ -3,8 +3,10 @@ import { helpers } from '../../../__data__';
 describe('ArrayLiteralExpressionCompiler', () => {
   test('[1, foo(), y]', async () => {
     await helpers.executeString(`
-      const foo = () => 2;
+      let i = 1;
+      const foo = () => i++;
       const y = 3;
+      [foo()];
       const x = [1, foo(), 3];
 
       if (x[0] !== 1) {

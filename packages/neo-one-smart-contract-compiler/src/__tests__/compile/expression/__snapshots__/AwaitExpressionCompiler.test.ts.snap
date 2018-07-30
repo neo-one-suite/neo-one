@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AwaitFunctionCompiler await 1`] = `
+"snippetCode.ts (2,7): 'await' expression is only allowed within an async function.
+
+      1 | 
+    > 2 |       await 2;
+        |       ^
+      3 |     
+"
+`;

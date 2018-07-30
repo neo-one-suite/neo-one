@@ -115,21 +115,21 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('x <<= 1 [LessThanLessThanEqualsToken]', async () => {
+  test('x <<= 1 [LessThanLessThanEqualsToken]', async () => {
     await helpers.executeString(`
         let x = 0b011;
         x <<= 1;
-        if (x !== 0b110) {
+        if (x !== 6) {
           throw 'Failure';
         }
       `);
   });
 
-  test.skip('x >>= 1 [GreaterThanGreaterThanEqualsToken]', async () => {
+  test('x >>= 1 [GreaterThanGreaterThanEqualsToken]', async () => {
     await helpers.executeString(`
         let x = 0b011;
         x >>= 1;
-        if (x !== 0b001) {
+        if (x !== 1) {
           throw 'Failure';
         }
       `);
@@ -177,7 +177,7 @@ describe('BinaryExpressionCompiler', () => {
 
   test.skip('1 + "3" === "13" [PlusToken:StringConcatenation:IntLeftStrRight]', async () => {
     await helpers.executeString(`
-      if ('1' + '3' !== '13') {
+      if (1 + '3' !== '13') {
         throw 'Failure';
       }
     `);
@@ -199,7 +199,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('(224 >>> 2) == 56 [GreaterThanGreaterThanGreaterThanToken]', async () => {
+  test('(224 >>> 2) == 56 [GreaterThanGreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
       if ((224 >>> 2) !== 56) {
         throw 'Failure';
@@ -207,7 +207,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('(128 >> 2) == 32 [GreaterThanGreaterThanToken]', async () => {
+  test('(128 >> 2) == 32 [GreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
       if ((128 >> 2) !== 32) {
         throw 'Failure';
@@ -215,7 +215,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('(-234 >> 2) == -59 [GreaterThanGreaterThanToken]', async () => {
+  test('(-234 >> 2) == -59 [GreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
       if ((-234 >> 2) !== -59) {
         throw 'Failure';
@@ -223,15 +223,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('(128 >> 2) == 32 [GreaterThanGreaterThanToken]', async () => {
-    await helpers.executeString(`
-      if ((128 >> 2) !== 32) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test.skip('(256 >> -2) == 0 [GreaterThanGreaterThanToken]', async () => {
+  test('(256 >> -2) == 0 [GreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
       if ((256 >> -2) !== 0) {
         throw 'Failure';
@@ -239,7 +231,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('(-256 >> -2) == -1 [GreaterThanGreaterThanToken]', async () => {
+  test('(-256 >> -2) == -1 [GreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
       if ((-256 >> -2) !== -1) {
         throw 'Failure';
@@ -247,7 +239,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('(32 << 2) == 128 [LessThanLessThanToken]', async () => {
+  test('(32 << 2) == 128 [LessThanLessThanToken]', async () => {
     await helpers.executeString(`
       if ((32 << 2) !== 128) {
         throw 'Failure';
@@ -255,102 +247,9 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('(-24 << 2) == 96 [LessThanLessThanToken]', async () => {
+  test('(-24 << 2) == 96 [LessThanLessThanToken]', async () => {
     await helpers.executeString(`
-      if ((-24 << 2) !== 96)  {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('1 < 1 [LessThanToken]', async () => {
-    await helpers.executeString(`
-      if (1 < 1) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('!(1 < 2) [LessThanToken]', async () => {
-    await helpers.executeString(`
-      if (!(1 < 2)) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('!(2 <= 1) [LessThanEqualsToken]', async () => {
-    await helpers.executeString(`
-      if (2 <= 1) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('2 <= 2 [LessThanEqualsToken]', async () => {
-    await helpers.executeString(`
-      if (!(2 <= 2)) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('1 > 1 [GreaterThanToken]', async () => {
-    await helpers.executeString(`
-      if (1 > 1) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('!(2 > 1) [GreaterThanToken]', async () => {
-    await helpers.executeString(`
-      if (!(2 > 1)) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('1 >= 2 [GreaterThanEqualsToken]', async () => {
-    await helpers.executeString(`
-      if (1 >= 2) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('!(2 >= 2) [GreaterThanEqualsToken]', async () => {
-    await helpers.executeString(`
-      if (!(2 >= 2)) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('false && short-circuit [AmpersandAmpersandToken:short-circuit]', async () => {
-    await helpers.executeString(`
-      const fail = () => {
-        throw 'Failure';
-      };
-
-      const x: boolean = false as boolean;
-      if (x && fail()) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('(0 && true) === 0 [AmpersandAmpersandToken]', async () => {
-    await helpers.executeString(`
-      if (!((0 && true) === 0)) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('( true && 3 ) === 3 [AmpersandAmpersandToken]', async () => {
-    await helpers.executeString(`
-      if (!(true && 3 === 3)) {
+      if ((-24 << 2) !== -96)  {
         throw 'Failure';
       }
     `);

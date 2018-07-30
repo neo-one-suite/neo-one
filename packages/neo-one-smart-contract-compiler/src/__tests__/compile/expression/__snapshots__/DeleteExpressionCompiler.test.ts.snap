@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DeleteExpressionCompiler unsupported 1`] = `
+"snippetCode.ts (2,24): 'string' only refers to a type, but is being used as a value here.
+
+      1 | 
+    > 2 |       const x = { foo: string };
+        |                        ^
+      3 |       delete x.foo;
+      4 |     
+"
+`;

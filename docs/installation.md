@@ -6,7 +6,7 @@ title: Installation
 NEO•ONE was designed from the ground up to be easily installed and used to get your
 dapp up and running quickly.
 
-Install NEO•ONE using [`npm`](https://www.npm.js.com/):
+Install NEO•ONE using [`npm`](https://www.npmjs.com/):
 
 ```
 npm install -g @neo-one/cli

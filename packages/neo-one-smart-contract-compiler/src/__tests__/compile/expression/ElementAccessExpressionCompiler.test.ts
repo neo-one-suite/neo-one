@@ -1,58 +1,31 @@
 import { helpers } from '../../../__data__';
 
 describe('ElementAccessExpressionCompiler', () => {
-  test.skip('[0, 1, 2][idx] and ["idx"] and properties', async () => {
-    await helpers.executeString(
-      `
-      const x = [0];
+  test('[0, 1, 2][idx]', async () => {
+    await helpers.executeString(`
+      const x: Array<number> = [0] as Array<number>;
       if (x.length !== 1) {
         throw 'Failure';
       }
 
-      x[2] = 2;
-      if ((x.length as any) !== 3) {
+      const y: Array<number> = x;
+
+      y[2] = 2;
+      if (y.length !== 3) {
         throw 'Failure';
       }
 
-      if (x[1] !== undefined) {
+      if (y[0] !== 0) {
         throw 'Failure';
       }
 
-      x[1] = 1;
-      x['0x'] = 3;
-      x['1x'] = 4;
-      x['2x'] = 5;
-      x.x = 6;
-
-      if (x[0] !== 0) {
+      if (y[1] !== undefined) {
         throw 'Failure';
       }
 
-      if (x['0x'] !== 3) {
+      if (y[2] !== 2) {
         throw 'Failure';
       }
-
-      if (x[1] !== 1) {
-        throw 'Failure';
-      }
-
-      if (x['1x'] !== 4) {
-        throw 'Failure';
-      }
-
-      if (x[2] !== 2) {
-        throw 'Failure';
-      }
-
-      if (x['2x'] !== 5) {
-        throw 'Failure';
-      }
-
-      if (x.x !== 6) {
-        throw 'Failure';
-      }
-    `,
-      { ignoreWarnings: true },
-    );
+    `);
   });
 });

@@ -1,6 +1,12 @@
 import { helpers } from '../../../__data__';
 
 describe('ArrowFunctionCompiler', () => {
+  test('floating arrow function', async () => {
+    await helpers.executeString(`
+      () => 2;
+    `);
+  });
+
   test('simple arrow function', async () => {
     await helpers.executeString(`
       const foo = () => 2;
@@ -125,6 +131,26 @@ describe('ArrowFunctionCompiler', () => {
       y = 3;
 
       if (createFoo(3)() !== 9) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('arrow capturing this', async () => {
+    await helpers.executeString(`
+      class Foo {
+        private readonly xInternal = 2;
+
+        public getX(): number {
+          const foo = () => this.xInternal;
+
+          return foo();
+        }
+      }
+
+      const foo = new Foo();
+
+      if (foo.getX() !== 2) {
         throw 'Failure';
       }
     `);
