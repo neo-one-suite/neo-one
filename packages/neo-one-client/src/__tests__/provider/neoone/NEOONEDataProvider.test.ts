@@ -586,7 +586,7 @@ describe('NEOONEDataProvider', () => {
     (provider as any).mutableClient.getTransactionReceipt = jest.fn(() => Promise.resolve(expected));
 
     const result = provider.getTransactionReceipt((transactions as any).register.hash);
-    expect(result).resolves.toEqual(expected);
+    await expect(result).resolves.toEqual(expected);
   });
 
   test('getInvocationData', async () => {
@@ -614,11 +614,11 @@ describe('NEOONEDataProvider', () => {
 
     // @ts-ignore
     (provider as any).mutableClient.testInvocation = jest.fn(() =>
-      Promise.resolve(createInvocationResultJSON({ state: VMState.Fault, message: '10' })),
+      Promise.resolve({ result: createInvocationResultJSON({ state: VMState.Fault, message: '10' }), actions: [] }),
     );
 
     const result = provider.testInvoke('');
-    expect(result).resolves.toEqual(expected);
+    await expect(result).resolves.toEqual({ result: expected, actions: [] });
   });
 
   test('getAccount', async () => {
@@ -639,7 +639,7 @@ describe('NEOONEDataProvider', () => {
     );
 
     const result = provider.getAccount(keys[0].address);
-    expect(result).resolves.toEqual(expected);
+    await expect(result).resolves.toEqual(expected);
   });
 
   test('getAsset with multiple languages', async () => {
@@ -650,7 +650,7 @@ describe('NEOONEDataProvider', () => {
     );
 
     const result = provider.getAsset((transactions as any).register.hash);
-    expect(result).resolves.toEqual(expected);
+    await expect(result).resolves.toEqual(expected);
   });
 
   test('getAsset with multiple languages - no english name', async () => {
@@ -661,7 +661,7 @@ describe('NEOONEDataProvider', () => {
     );
 
     const result = provider.getAsset((transactions as any).register.hash);
-    expect(result).resolves.toEqual(expected);
+    await expect(result).resolves.toEqual(expected);
   });
 
   test('getBlock', async () => {
@@ -802,7 +802,7 @@ describe('NEOONEDataProvider', () => {
     (provider as any).mutableClient.getNetworkSettings = jest.fn(() => Promise.resolve({ issueGASFee: '0' }));
 
     const result = provider.getNetworkSettings();
-    expect(result).resolves.toEqual(expected);
+    await expect(result).resolves.toEqual(expected);
   });
 
   test('_convertConfirmedTransaction throws undefined data error', async () => {
