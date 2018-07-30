@@ -29,7 +29,7 @@
     "rxjs": "^6.2.2",
     "safe-stable-stringify": "^1.0.1",
     "source-map": "^0.7.3",
-    "typescript": "3.1.0-dev.20180721"
+    "typescript": "^3.0.1"
   },
   "devDependencies": {
     "app-root-dir": "1.0.2",
