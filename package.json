@@ -55,6 +55,9 @@
     "e2e": "jest --config jest/e2e.js",
     "e2e-ci": "jest --config jest/e2e-ci.js --ci -w 1",
     "tsc": "tsc",
+    "nyc": "./node_modules/.bin/nyc",
+    "codecov": "./node_modules/.bin/codecov",
+    "posttest": "yarn run nyc report --report=json && yarn run codecov -f coverage/*.json",
     "ts-node": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" TS_NODE_PROJECT=tsconfig/tsconfig.es2018.cjs.json node -r ts-node/register/transpile-only",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.ts\"",
     "nit:scripts:ts": "prettier --config .prettierrc --list-different \"scripts/**/*.ts\"",
@@ -83,6 +86,10 @@
       "post-merge": "yarn run ts-node ./scripts/hooks/post-merge.ts",
       "post-rewrite": "yarn run ts-node ./scripts/hooks/post-rewrite.ts"
     }
+  },
+  "nyc": {
+    "reporter": ["lcov", "text"],
+    "tempDirectory": "./coverage"
   },
   "devDependencies": {
     "@babel/core": "7.0.0-beta.55",
@@ -129,6 +136,7 @@
     "babel-plugin-jest-hoist": "23.2.0",
     "babel-plugin-lodash": "3.3.4",
     "babel-plugin-transform-imports": "1.5.0",
+    "codecov":"3.0.4",
     "cross-env": "5.2.0",
     "execa": "0.10.0",
     "fs-extra": "7.0.0",
@@ -151,6 +159,7 @@
     "lerna": "2.11.0",
     "lint-staged": "7.2.0",
     "lodash": "4.17.10",
+    "nyc":"12.0.2",
     "prettier": "1.14.0",
     "rxjs-tslint-rules": "4.7.0",
     "through2": "2.0.3",

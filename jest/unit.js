@@ -13,4 +13,5 @@ module.exports = {
     '^@reactivex/ix-esnext-esm(.*)': '@reactivex/ix-esnext-cjs$1',
   },
   modulePathIgnorePatterns: ['<rootDir>/dist/.*'],
+  coverageReporters: ['json'],
 };

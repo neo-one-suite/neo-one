@@ -53,7 +53,7 @@ aliases:
       - save-cache: *save-yarn-cache
       - run:
           name: Test
-          command: yarn test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings)
+          command: yarn nyc --clean test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
       - store_test_results:
           path: reports
     parallelism: 2
@@ -82,7 +82,7 @@ aliases:
           at: ./
       - run:
           name: E2E
-          command: yarn e2e-ci $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
+          command: yarn nyc --clean e2e-ci $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
       - store_test_results:
           path: reports
     parallelism: 2
