@@ -74,7 +74,6 @@ class Token {
     syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), this.getKey(addr), amount);
   }
 
-  // tslint:disable-next-line
   private getKey(addr: Buffer): Buffer {
     return Buffer.concat([syscall('Neo.Runtime.Serialize', 'balances'), addr]);
   }

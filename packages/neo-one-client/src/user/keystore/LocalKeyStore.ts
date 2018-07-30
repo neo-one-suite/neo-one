@@ -1,7 +1,7 @@
 import { common, crypto } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { utils } from '@neo-one/utils';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { LockedAccountError, UnknownAccountError } from '../../errors';
@@ -59,10 +59,7 @@ export class LocalKeyStore {
   public constructor({ store }: { readonly store: Store }) {
     this.type = store.type;
     this.walletsInternal$ = new BehaviorSubject<Wallets>({});
-    this.wallets$ = this.walletsInternal$.pipe(
-      distinctUntilChanged((a, b) => _.isEqual(a, b)),
-      map(flattenWallets),
-    );
+    this.wallets$ = this.walletsInternal$.pipe(distinctUntilChanged((a, b) => _.isEqual(a, b)), map(flattenWallets));
 
     this.accountsInternal$ = new BehaviorSubject([] as ReadonlyArray<UserAccount>);
     this.wallets$.pipe(map((wallets) => wallets.map(({ account }) => account))).subscribe(this.accountsInternal$);

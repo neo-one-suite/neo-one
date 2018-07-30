@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -29,7 +29,7 @@ export class ForLoopHelper extends Helper {
     this.withScope = withScope;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (this.withScope) {
       sb.withScope(node, options, (innerOptions) => {
         this.emitLoop(sb, node, innerOptions);
@@ -39,7 +39,7 @@ export class ForLoopHelper extends Helper {
     }
   }
 
-  private emitLoop(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  private emitLoop(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (this.initializer !== undefined) {
       this.initializer();
     }

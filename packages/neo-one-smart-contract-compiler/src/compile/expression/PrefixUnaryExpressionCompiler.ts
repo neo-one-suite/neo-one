@@ -1,26 +1,30 @@
+import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
-import { PrefixUnaryExpression, SyntaxKind } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-type AssignmentLike = SyntaxKind.PlusPlusToken | SyntaxKind.MinusMinusToken;
-type ValueLike = SyntaxKind.PlusToken | SyntaxKind.MinusToken | SyntaxKind.TildeToken | SyntaxKind.ExclamationToken;
-export class PrefixUnaryExpressionCompiler extends NodeCompiler<PrefixUnaryExpression> {
-  public readonly kind: SyntaxKind = SyntaxKind.PrefixUnaryExpression;
+type AssignmentLike = ts.SyntaxKind.PlusPlusToken | ts.SyntaxKind.MinusMinusToken;
+type ValueLike =
+  | ts.SyntaxKind.PlusToken
+  | ts.SyntaxKind.MinusToken
+  | ts.SyntaxKind.TildeToken
+  | ts.SyntaxKind.ExclamationToken;
+export class PrefixUnaryExpressionCompiler extends NodeCompiler<ts.PrefixUnaryExpression> {
+  public readonly kind = ts.SyntaxKind.PrefixUnaryExpression;
 
-  public visitNode(sb: ScriptBuilder, expr: PrefixUnaryExpression, options: VisitOptions): void {
-    const token = expr.getOperatorToken();
+  public visitNode(sb: ScriptBuilder, expr: ts.PrefixUnaryExpression, options: VisitOptions): void {
+    const token = tsUtils.expression.getOperator(expr);
     switch (token) {
-      case SyntaxKind.PlusPlusToken:
-      case SyntaxKind.MinusMinusToken:
+      case ts.SyntaxKind.PlusPlusToken:
+      case ts.SyntaxKind.MinusMinusToken:
         this.visitAssignment(sb, token, expr, options);
         break;
-      case SyntaxKind.PlusToken:
-      case SyntaxKind.MinusToken:
-      case SyntaxKind.TildeToken:
-      case SyntaxKind.ExclamationToken:
+      case ts.SyntaxKind.PlusToken:
+      case ts.SyntaxKind.MinusToken:
+      case ts.SyntaxKind.TildeToken:
+      case ts.SyntaxKind.ExclamationToken:
         this.visitValue(sb, token, expr, options);
         break;
       default:
@@ -31,18 +35,18 @@ export class PrefixUnaryExpressionCompiler extends NodeCompiler<PrefixUnaryExpre
   private visitAssignment(
     sb: ScriptBuilder,
     token: AssignmentLike,
-    expr: PrefixUnaryExpression,
+    expr: ts.PrefixUnaryExpression,
     options: VisitOptions,
   ): void {
-    sb.visit(expr.getOperand(), sb.noSetValueOptions(sb.pushValueOptions(options)));
+    sb.visit(tsUtils.expression.getOperand(expr), sb.noSetValueOptions(sb.pushValueOptions(options)));
 
     switch (token) {
-      case SyntaxKind.PlusPlusToken:
+      case ts.SyntaxKind.PlusPlusToken:
         sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.toNumber({ type: sb.getType(expr) }));
         sb.emitOp(expr, 'INC');
         sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.createNumber);
         break;
-      case SyntaxKind.MinusMinusToken:
+      case ts.SyntaxKind.MinusMinusToken:
         sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.toNumber({ type: sb.getType(expr) }));
         sb.emitOp(expr, 'DEC');
         sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.createNumber);
@@ -51,11 +55,11 @@ export class PrefixUnaryExpressionCompiler extends NodeCompiler<PrefixUnaryExpre
         utils.assertNever(token);
     }
 
-    sb.visit(expr.getOperand(), sb.setValueOptions(options));
+    sb.visit(tsUtils.expression.getOperand(expr), sb.setValueOptions(options));
   }
 
-  private visitValue(sb: ScriptBuilder, token: ValueLike, expr: PrefixUnaryExpression, options: VisitOptions): void {
-    const operand = expr.getOperand();
+  private visitValue(sb: ScriptBuilder, token: ValueLike, expr: ts.PrefixUnaryExpression, options: VisitOptions): void {
+    const operand = tsUtils.expression.getOperand(expr);
     sb.visit(operand, sb.noSetValueOptions(sb.pushValueOptions(options)));
     if (!options.pushValue) {
       sb.emitOp(expr, 'DROP');
@@ -64,21 +68,21 @@ export class PrefixUnaryExpressionCompiler extends NodeCompiler<PrefixUnaryExpre
     }
 
     switch (token) {
-      case SyntaxKind.PlusToken:
+      case ts.SyntaxKind.PlusToken:
         sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(expr) }));
         sb.emitHelper(expr, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.MinusToken:
+      case ts.SyntaxKind.MinusToken:
         sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(expr) }));
         sb.emitOp(expr, 'NEGATE');
         sb.emitHelper(expr, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.TildeToken:
+      case ts.SyntaxKind.TildeToken:
         sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(expr) }));
         sb.emitOp(expr, 'INVERT');
         sb.emitHelper(expr, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.ExclamationToken:
+      case ts.SyntaxKind.ExclamationToken:
         sb.emitHelper(operand, options, sb.helpers.toBoolean({ type: sb.getType(operand) }));
         sb.emitOp(expr, 'NOT');
         sb.emitHelper(operand, options, sb.helpers.createBoolean);

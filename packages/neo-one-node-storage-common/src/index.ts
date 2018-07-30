@@ -1,3 +1,2 @@
-import * as keys from './keys';
-
-export { keys };
+// tslint:disable-next-line export-name
+export { keys } from './keys';

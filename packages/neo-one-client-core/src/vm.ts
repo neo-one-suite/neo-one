@@ -1,5 +1,5 @@
 import { CustomError } from '@neo-one/utils';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { UInt160 } from './common';
 import { ScriptContainer } from './ScriptContainer';
 import { Witness } from './Witness';
@@ -202,7 +202,7 @@ export type OpCode = keyof typeof Op;
 export type ByteCode = Op;
 
 // tslint:disable-next-line variable-name no-any
-export const Byte: { [K in ByteCode]: OpCode } = _.invert(Op) as any;
+export const Byte: { [K in ByteCode]: OpCode } = Op as any;
 // tslint:disable-next-line variable-name
 export const ByteBuffer: { [K in ByteCode]: Buffer } = _.fromPairs(
   Object.values(Op).map((byteCode) => [byteCode, Buffer.from([byteCode])]),

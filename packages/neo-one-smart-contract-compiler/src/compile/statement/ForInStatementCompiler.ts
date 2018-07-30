@@ -1,13 +1,12 @@
-import { ForInStatement, SyntaxKind } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class ForInStatementCompiler extends NodeCompiler<ForInStatement> {
-  public readonly kind: SyntaxKind = SyntaxKind.ForInStatement;
+export class ForInStatementCompiler extends NodeCompiler<ts.ForInStatement> {
+  public readonly kind = ts.SyntaxKind.ForInStatement;
 
-  public visitNode(sb: ScriptBuilder, node: ForInStatement, _options: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, node: ts.ForInStatement, _options: VisitOptions): void {
     sb.reportUnsupported(node);
   }
 }

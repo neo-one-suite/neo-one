@@ -1,40 +1,10 @@
 {
   "name": "@neo-one/server-grpc",
-  "version": "1.0.0-alpha.19",
-  "keywords": [
-    "neo",
-    "NEO",
-    "one",
-    "ONE",
-    "blockchain",
-    "neo-one",
-    "neo-one-suite",
-    "neo one",
-    "neo one suite",
-    "NEO ONE",
-    "NEO ONE suite",
-    "NEO•ONE",
-    "NEO•ONE suite",
-    "neo blockchain",
-    "NEO Blockchain",
-    "NEO blockchain",
-    "dapp",
-    "dapps"
-  ],
+  "version": "1.0.0-alpha.22",
   "description": "NEO•ONE Server GRPC.",
-  "repository": "https://github.com/neo-one-suite/neo-one",
-  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
-  "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/index.esm.js",
-  "typings": "./src/index.ts",
-  "engines": {
-    "node": ">=10.6.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
+  "main": "./src/index.ts",
   "dependencies": {
-    "google-protobuf": "^3.6.0"
+    "google-protobuf": "^3.6.0",
+    "tslib": "^1.9.3"
   }
 }

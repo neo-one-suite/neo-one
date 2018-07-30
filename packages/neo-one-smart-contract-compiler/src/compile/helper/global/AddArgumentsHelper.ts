@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -8,7 +8,7 @@ import { InternalGlobalProperties } from './InternalGlobalProperties';
 // Input: [argv, globalObjectVal]
 // Output: []
 export class AddArgumentsHelper extends Helper {
-  public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // ['arguments', argv, globalObjectVal]
     sb.emitPushString(node, InternalGlobalProperties.Arguments);

@@ -89,7 +89,7 @@ export class Contract extends BaseState
   public readonly hasStorage: boolean;
   public readonly hasDynamicInvoke: boolean;
   public readonly payable: boolean;
-  public readonly equals: Equals = utils.equals(Contract, (other) => common.uInt160Equal(this.hash, other.hash));
+  public readonly equals: Equals = utils.equals(Contract, this, (other) => common.uInt160Equal(this.hash, other.hash));
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly hashInternal = utils.lazy(() => crypto.toScriptHash(this.script));
   private readonly hashHexInternal = utils.lazy(() => common.uInt160ToHex(this.hash));

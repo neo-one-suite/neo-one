@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -18,7 +18,7 @@ export class NewHelper extends Helper {
     this.noArgs = options.noArgs || false;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [thisVal, objectVal, ?argsarr]
     sb.emitHelper(node, options, sb.helpers.createObject);

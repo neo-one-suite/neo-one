@@ -1,5 +1,4 @@
-import { Node } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -7,7 +6,7 @@ import { Helper } from '../Helper';
 // Input: [val, indexNumber, objectVal]
 // Output: []
 export class SetArrayIndexHelper extends Helper {
-  public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     sb.emitHelper(
       node,
@@ -69,7 +68,7 @@ export class SetArrayIndexHelper extends Helper {
     );
   }
 
-  private setIndex(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  private setIndex(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [arr, indexNumber, val]
     sb.emitHelper(node, options, sb.helpers.getArrayValue);
     // [indexNumber, arr, val]

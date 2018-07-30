@@ -31,12 +31,14 @@ export class NotificationAction extends ActionBase<NotificationAction, ActionTyp
   public readonly args: ReadonlyArray<ContractParameter>;
 
   public constructor({ version, index, scriptHash, args }: NotificationAdd) {
-    super({
-      type: ActionType.Notification,
+    const options = {
+      // tslint:disable-next-line no-useless-cast
+      type: ActionType.Notification as ActionType.Notification,
       version,
       index,
       scriptHash,
-    });
+    };
+    super(options);
 
     this.args = args;
   }

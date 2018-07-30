@@ -1,5 +1,4 @@
-import { Node } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -7,7 +6,7 @@ import { Helper } from '../Helper';
 // Input: [objectVal]
 // Output: [arr]
 export class UnwrapArrayHelper extends Helper {
-  public emit(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
 

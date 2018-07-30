@@ -3,7 +3,6 @@ import {
   Block,
   common as clientCommon,
   crypto,
-  ECPoint,
   IssueTransaction,
   MinerTransaction,
   Op,
@@ -48,9 +47,9 @@ export const SECONDS_PER_BLOCK = 15;
 export const MAX_TRANSACTION_PER_BLOCK = 500;
 
 interface Options {
-  readonly standbyValidators: ReadonlyArray<ECPoint>;
-  readonly address?: UInt160;
+  readonly address: UInt160;
   readonly privateNet?: boolean;
+  readonly consensusAddress: UInt160;
 }
 
 const ONE_HUNDRED_MILLION = clientCommon.fixed8FromDecimal(100000000);
@@ -89,27 +88,21 @@ const getUtilityToken = () => {
   });
 };
 
-interface GensisBlockOptions extends Options {
+interface GensisBlockOptions {
+  readonly privateNet?: boolean;
   readonly governingToken: RegisterTransaction;
   readonly utilityToken: RegisterTransaction;
-  readonly address?: UInt160;
+  readonly address: UInt160;
+  readonly consensusAddress: UInt160;
 }
 
-const getGenesisBlock = ({
-  privateNet,
-  standbyValidators,
-  governingToken,
-  utilityToken,
-  address = crypto.toScriptHash(
-    crypto.createMultiSignatureVerificationScript(standbyValidators.length / 2 + 1, standbyValidators),
-  ),
-}: GensisBlockOptions) =>
+const getGenesisBlock = ({ privateNet, governingToken, utilityToken, address, consensusAddress }: GensisBlockOptions) =>
   new Block({
     previousHash: clientCommon.ZERO_UINT256,
     timestamp: 1468595301,
     index: 0,
     consensusData: new BN(2083236893),
-    nextConsensus: crypto.getConsensusAddress(standbyValidators),
+    nextConsensus: consensusAddress,
     script: new Witness({
       invocation: Buffer.from([]),
       verification: Buffer.from([Op.PUSH1]),
@@ -154,17 +147,17 @@ const getGenesisBlock = ({
     ].filter(utils.notNull),
   });
 
-export const common = ({ privateNet, standbyValidators, address }: Options) => {
-  const governingToken = getGoverningToken();
+export const common = ({ privateNet, address, consensusAddress }: Options) => {
   const utilityToken = getUtilityToken();
+  const governingToken = getGoverningToken();
 
   return {
     genesisBlock: getGenesisBlock({
       privateNet,
-      standbyValidators,
       governingToken,
       utilityToken,
       address,
+      consensusAddress,
     }),
     governingToken,
     utilityToken,

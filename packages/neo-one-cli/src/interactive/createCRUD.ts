@@ -89,7 +89,12 @@ const renderTasks = (tasks: ReadonlyArray<TaskStatus>, spinners: Spinners, level
       indentString(` ${getSymbol(task, spinners)} ${task.title}${skippedStr}`, level, { indent: '  ' }),
     );
 
-    if ((task.pending && task.message !== undefined) || task.skipped !== false || task.error !== undefined) {
+    if (
+      (task.pending && task.message !== undefined) ||
+      task.skipped !== false ||
+      task.error !== undefined ||
+      task.message !== undefined
+    ) {
       let data = task.error;
       if (data === undefined && task.skipped !== false) {
         if (typeof task.skipped === 'string') {
@@ -242,7 +247,7 @@ const createGet = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly crud:
         map((resources) => {
           const table = resourceType.getListTable(resources);
           if (args.options.json) {
-            cli.vorpal.activeCommand.log(JSON.stringify(table));
+            cli.vorpal.activeCommand.log(JSON.stringify(resources));
           } else {
             cli.printList(table, logUpdate);
           }
@@ -307,7 +312,7 @@ const createDescribe = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
             }
             const table = resourceType.getDescribeTable(resource);
             if (args.options.json) {
-              cli.vorpal.activeCommand.log(JSON.stringify(table));
+              cli.vorpal.activeCommand.log(JSON.stringify(resource));
             } else {
               cli.printDescribe(table, logUpdate);
             }

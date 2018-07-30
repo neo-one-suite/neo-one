@@ -29,10 +29,12 @@ export class ChangeViewConsensusMessage extends ConsensusMessageBase<
   public readonly newViewNumber: number;
 
   public constructor({ viewNumber, newViewNumber }: ChangeViewAdd) {
-    super({
-      type: ConsensusMessageType.ChangeView,
+    const options = {
+      // tslint:disable-next-line no-useless-cast
+      type: ConsensusMessageType.ChangeView as ConsensusMessageType.ChangeView,
       viewNumber,
-    });
+    };
+    super(options);
 
     this.newViewNumber = newViewNumber;
   }

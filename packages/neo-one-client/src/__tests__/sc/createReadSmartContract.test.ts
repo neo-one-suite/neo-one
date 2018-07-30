@@ -82,7 +82,7 @@ describe('createReadSmartContract', () => {
   beforeEach(() => {
     client = {} as any;
     // @ts-ignore
-    client.call = jest.fn(() => Promise.resolve());
+    client.call = jest.fn(() => Promise.resolve({ result: {}, actions: [] }));
     // @ts-ignore
     (common as any).convertParams = jest.fn(() => expected);
     // @ts-ignore

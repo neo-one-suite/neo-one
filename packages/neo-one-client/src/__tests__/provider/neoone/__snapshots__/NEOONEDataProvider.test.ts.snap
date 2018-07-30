@@ -2,24 +2,27 @@
 
 exports[`NEOONEDataProvider call 1`] = `
 Object {
-  "gasConsumed": "0",
-  "gasCost": "0",
-  "message": "10",
-  "stack": Array [
-    Object {
-      "type": "Integer",
-      "value": "1",
-    },
-    Object {
-      "type": "Array",
-      "value": Array [
-        Object {
-          "type": "Void",
-        },
-      ],
-    },
-  ],
-  "state": "FAULT",
+  "actions": Array [],
+  "result": Object {
+    "gasConsumed": "0",
+    "gasCost": "0",
+    "message": "10",
+    "stack": Array [
+      Object {
+        "type": "Integer",
+        "value": "1",
+      },
+      Object {
+        "type": "Array",
+        "value": Array [
+          Object {
+            "type": "Void",
+          },
+        ],
+      },
+    ],
+    "state": "FAULT",
+  },
 }
 `;
 
@@ -39,7 +42,7 @@ FromAsyncIterable {
               "cacheKeyFn": [Function],
               "maxBatchSize": 25,
             },
-            "_promiseCache": Array [],
+            "_promiseCache": Map {},
             "_queue": Array [],
           },
           "endpoint": "bar",
@@ -75,7 +78,7 @@ FromAsyncIterable {
               "cacheKeyFn": [Function],
               "maxBatchSize": 25,
             },
-            "_promiseCache": Array [],
+            "_promiseCache": Map {},
             "_queue": Array [],
           },
           "endpoint": "bar",
@@ -107,7 +110,7 @@ NEOONEDataProvider {
           "cacheKeyFn": [Function],
           "maxBatchSize": 25,
         },
-        "_promiseCache": Array [],
+        "_promiseCache": Map {},
         "_queue": Array [],
       },
       "endpoint": "buzz",

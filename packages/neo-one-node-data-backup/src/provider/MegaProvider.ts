@@ -1,6 +1,5 @@
 import { Monitor } from '@neo-one/monitor';
 import * as fs from 'fs';
-import { File, Storage } from 'megajs';
 import * as path from 'path';
 import { Environment } from '../types';
 import { extract } from './extract';
@@ -38,7 +37,8 @@ export class MegaProvider extends Provider {
     }
 
     const { id, key } = download;
-    const file = new File({ downloadID: id, key });
+    const mega = await this.getMega();
+    const file = new mega.File({ downloadID: id, key });
 
     return new Promise<boolean>((resolve) => {
       file.loadAttributes((err) => {
@@ -63,9 +63,11 @@ export class MegaProvider extends Provider {
     const downloadPath = path.resolve(tmpPath, 'storage.db.tar.gz');
 
     await monitor.captureSpanLog(
-      async () =>
-        new Promise<void>((resolve, reject) => {
-          const read = new File({
+      async () => {
+        const mega = await this.getMega();
+
+        return new Promise<void>((resolve, reject) => {
+          const read = new mega.File({
             downloadID: id,
             key,
           }).download();
@@ -95,7 +97,8 @@ export class MegaProvider extends Provider {
           write.once('finish', onDone);
 
           read.pipe(write);
-        }),
+        });
+      },
       {
         name: 'neo_restore_download',
       },
@@ -125,7 +128,8 @@ export class MegaProvider extends Provider {
 
     await monitor.captureSpanLog(
       async () => {
-        const storage = new Storage({
+        const mega = await this.getMega();
+        const storage = new mega.Storage({
           email,
           password,
           autologin: false,
@@ -151,5 +155,9 @@ export class MegaProvider extends Provider {
         name: 'neo_backup_push',
       },
     );
+  }
+
+  private async getMega() {
+    return import('megajs');
   }
 }

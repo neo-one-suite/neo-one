@@ -1,13 +1,12 @@
-import { SyntaxKind, WithStatement } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class WithStatementCompiler extends NodeCompiler<WithStatement> {
-  public readonly kind: SyntaxKind = SyntaxKind.WithStatement;
+export class WithStatementCompiler extends NodeCompiler<ts.WithStatement> {
+  public readonly kind = ts.SyntaxKind.WithStatement;
 
-  public visitNode(sb: ScriptBuilder, node: WithStatement, _options: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, node: ts.WithStatement, _options: VisitOptions): void {
     sb.reportUnsupported(node);
   }
 }

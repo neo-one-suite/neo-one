@@ -1,13 +1,12 @@
-import { FunctionExpression, SyntaxKind } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class FunctionExpressionCompiler extends NodeCompiler<FunctionExpression> {
-  public readonly kind: SyntaxKind = SyntaxKind.FunctionExpression;
+export class FunctionExpressionCompiler extends NodeCompiler<ts.FunctionExpression> {
+  public readonly kind = ts.SyntaxKind.FunctionExpression;
 
-  public visitNode(sb: ScriptBuilder, expr: FunctionExpression, _options: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, expr: ts.FunctionExpression, _options: VisitOptions): void {
     sb.reportUnsupported(expr);
   }
 }

@@ -1,5 +1,4 @@
-import { Node } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 import { ResolvedScope } from './ResolvedScope';
@@ -10,7 +9,7 @@ export class CapturingScope implements Scope {
   private readonly bindings: Set<string> = new Set();
 
   public constructor(
-    public readonly node: Node,
+    public readonly node: ts.Node,
     public readonly index: number,
     public readonly parent?: CapturingScope | undefined,
   ) {}
@@ -28,27 +27,27 @@ export class CapturingScope implements Scope {
     return { nameBrand: 0 };
   }
 
-  public set(sb: ScriptBuilder, node: Node): void {
+  public set(sb: ScriptBuilder, node: ts.Node): void {
     sb.emitOp(node, 'NOP');
   }
 
-  public get(sb: ScriptBuilder, node: Node): void {
+  public get(sb: ScriptBuilder, node: ts.Node): void {
     sb.emitOp(node, 'NOP');
   }
 
-  public getThis(sb: ScriptBuilder, node: Node): void {
+  public getThis(sb: ScriptBuilder, node: ts.Node): void {
     sb.emitOp(node, 'NOP');
   }
 
-  public setThis(sb: ScriptBuilder, node: Node): void {
+  public setThis(sb: ScriptBuilder, node: ts.Node): void {
     sb.emitOp(node, 'NOP');
   }
 
-  public getGlobal(sb: ScriptBuilder, node: Node): void {
+  public getGlobal(sb: ScriptBuilder, node: ts.Node): void {
     sb.emitOp(node, 'NOP');
   }
 
-  public setGlobal(sb: ScriptBuilder, node: Node): void {
+  public setGlobal(sb: ScriptBuilder, node: ts.Node): void {
     sb.emitOp(node, 'NOP');
   }
 
@@ -56,11 +55,11 @@ export class CapturingScope implements Scope {
     return this.bindings.has(name) || (this.parent !== undefined && this.parent.hasBinding(name));
   }
 
-  public pushAll(sb: ScriptBuilder, node: Node): void {
+  public pushAll(sb: ScriptBuilder, node: ts.Node): void {
     sb.emitOp(node, 'NOP');
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions, func: (options: VisitOptions) => void): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, func: (options: VisitOptions) => void): void {
     sb.emitOp(node, 'NOP');
     func(options);
     sb.emitOp(node, 'NOP');

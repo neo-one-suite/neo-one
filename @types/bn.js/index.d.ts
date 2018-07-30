@@ -95,7 +95,7 @@ declare module 'bn.js' {
     toTwos(width: number): BN;
     fromTwos(width: number): BN;
 
-    static isBN(value: any): boolean;
+    static isBN(value: any): value is BN;
     static min(a: BN, b: BN): BN;
     static max(a: BN, b: BN): BN;
   }

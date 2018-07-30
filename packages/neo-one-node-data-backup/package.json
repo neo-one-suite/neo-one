@@ -1,49 +1,19 @@
 {
   "name": "@neo-one/node-data-backup",
-  "version": "1.0.0-alpha.60",
-  "keywords": [
-    "neo",
-    "NEO",
-    "one",
-    "ONE",
-    "blockchain",
-    "neo-one",
-    "neo-one-suite",
-    "neo one",
-    "neo one suite",
-    "NEO ONE",
-    "NEO ONE suite",
-    "NEO•ONE",
-    "NEO•ONE suite",
-    "neo blockchain",
-    "NEO Blockchain",
-    "NEO blockchain",
-    "dapp",
-    "dapps"
-  ],
+  "version": "1.0.0-alpha.64",
   "description": "NEO•ONE node data path backup and restore.",
-  "repository": "https://github.com/neo-one-suite/neo-one",
-  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
-  "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/index.esm.js",
-  "typings": "./src/index.ts",
-  "engines": {
-    "node": ">=10.6.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
+  "main": "./src/index.ts",
   "dependencies": {
     "@google-cloud/storage": "^1.7.0",
-    "@neo-one/monitor": "^1.0.0-alpha.47",
-    "@neo-one/utils": "^1.0.0-alpha.52",
-    "fs-extra": "^6.0.1",
+    "@neo-one/monitor": "^1.0.0-alpha.51",
+    "@neo-one/utils": "^1.0.0-alpha.56",
+    "fs-extra": "^7.0.0",
     "leveldown": "^4.0.1",
     "levelup": "^3.1.0",
     "megajs": "^0.14.1",
-    "rxjs": "^6.2.1",
+    "rxjs": "^6.2.2",
     "stream-throttle": "^0.1.3",
-    "tar": "^4.4.4"
+    "tar": "^4.4.4",
+    "tslib": "^1.9.3"
   }
 }

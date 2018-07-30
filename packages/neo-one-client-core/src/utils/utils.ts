@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
-import * as crypto from 'crypto';
-import * as _ from 'lodash';
+import { randomBytes } from 'crypto';
+import _ from 'lodash';
 import { equals } from './equals';
 import { lazy } from './lazy';
 import { lazyAsync } from './lazyAsync';
@@ -118,7 +118,7 @@ const calculateClaimAmount = async ({
 
 const randomUInt = (): number => Math.floor(Math.random() * UINT_MAX_NUMBER);
 
-const randomUInt64 = (): BN => new BN(crypto.randomBytes(8).toString('hex'), 16);
+const randomUInt64 = (): BN => new BN(randomBytes(8).toString('hex'), 16);
 
 export const utils = {
   FD: new BN(0xfd),

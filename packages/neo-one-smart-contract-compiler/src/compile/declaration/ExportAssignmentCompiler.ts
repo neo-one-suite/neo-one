@@ -1,19 +1,19 @@
-import { ExportAssignment, SyntaxKind } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class ExportAssignmentCompiler extends NodeCompiler<ExportAssignment> {
-  public readonly kind: SyntaxKind = SyntaxKind.ExportAssignment;
+export class ExportAssignmentCompiler extends NodeCompiler<ts.ExportAssignment> {
+  public readonly kind = ts.SyntaxKind.ExportAssignment;
 
-  public visitNode(sb: ScriptBuilder, node: ExportAssignment, optionsIn: VisitOptions): void {
-    if (node.isExportEquals()) {
+  public visitNode(sb: ScriptBuilder, node: ts.ExportAssignment, optionsIn: VisitOptions): void {
+    if (tsUtils.importExport.isExportEquals(node)) {
       sb.reportUnsupported(node);
     } else {
       const options = sb.pushValueOptions(optionsIn);
       // [val]
-      sb.visit(node.getExpression(), options);
+      sb.visit(tsUtils.expression.getExpression(node), options);
       // []
       sb.emitHelper(node, options, sb.helpers.exportSingle({ defaultExport: true }));
     }

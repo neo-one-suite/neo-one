@@ -1,54 +1,29 @@
+import { common, crypto } from '@neo-one/client-core';
 import { FullNode } from '@neo-one/node';
-import fetch from 'cross-fetch';
-import { BehaviorSubject } from 'rxjs';
-
-import { addressToScriptHash, createPrivateKey, privateKeyToAddress, privateKeyToPublicKey } from '@neo-one/client';
 import { createMain } from '@neo-one/node-neo-settings';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import MemDown from 'memdown';
-
+import { BehaviorSubject } from 'rxjs';
 import { getMonitor } from '../test/getMonitor';
-import { addCleanup } from './cleanupTest';
+import { addCleanup } from './addCleanup';
 
 const getPort = () => _.random(10000, 50000);
 
-const until = async (func: () => Promise<void>, timeoutMSIn?: number) => {
-  const start = Date.now();
-  const timeoutMS = timeoutMSIn === undefined ? 60 * 1000 : timeoutMSIn;
-  let finalError;
-  // tslint:disable-next-line no-loop-statement
-  while (Date.now() - start < timeoutMS) {
-    try {
-      await func();
-
-      return;
-    } catch (error) {
-      finalError = error;
-      await new Promise<void>((resolve) => setTimeout(resolve, 5000));
-    }
-  }
-
-  throw finalError;
-};
-
-const createCheckReady = (port: number) => async () => {
-  const response = await fetch(`http://localhost:${port}/rpc`);
-  if (response.status !== 405) {
-    throw Error(`Node is not ready: ${response.status}. ${response.statusText}`);
-  }
-};
+const PRIVATE_KEY = 'a01dd45345a7899b58e0e35f413beec8199b2b743b402a92b696fdecdaf7a214';
+const PUBLIC_KEY = '023a0eca8e082e3315f1aba8da485d5c11389780d833e94fecc1ea84dca202d685';
+const SCRIPT_HASH = '0xd6ed345f7cf3ea8c980132ddacb403ee2ab760ab';
 
 export const createNode = async () => {
-  const privateKey = createPrivateKey();
   const port = getPort();
+  crypto.addPublicKey(common.stringToPrivateKey(PRIVATE_KEY), common.stringToECPoint(PUBLIC_KEY));
 
   const node = new FullNode(
     {
       monitor: getMonitor(),
       settings: createMain({
         privateNet: true,
-        standbyValidators: [privateKeyToPublicKey(privateKey)],
-        address: addressToScriptHash(privateKeyToAddress(privateKey)),
+        standbyValidators: [PUBLIC_KEY],
+        address: SCRIPT_HASH,
       }),
       environment: {
         dataPath: '/tmp/fakePath/',
@@ -64,7 +39,7 @@ export const createNode = async () => {
           consensus: {
             enabled: true,
             options: {
-              privateKey,
+              privateKey: PRIVATE_KEY,
               privateNet: true,
             },
           },
@@ -80,10 +55,11 @@ export const createNode = async () => {
     },
   );
   addCleanup(async () => node.stop());
-  node.start();
+  await node.start();
 
-  await until(createCheckReady(port), 60000);
-
-  // tslint:disable-next-line no-http-string
-  return { privateKey, node, rpcURL: `http://localhost:${port}/rpc` };
+  return {
+    privateKey: PRIVATE_KEY,
+    node,
+    rpcURL: `http://localhost:${port}/rpc`,
+  };
 };

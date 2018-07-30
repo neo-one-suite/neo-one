@@ -1,11 +1,23 @@
-import { ContractParameter, ContractParameterType, InvocationResult, VMState } from '@neo-one/client-core';
+import {
+  ContractParameter,
+  ContractParameterType,
+  InvocationResult,
+  VMState,
+  CallReceiptJSON,
+} from '@neo-one/client-core';
 import { BN } from 'bn.js';
 import { RawSourceMap } from 'source-map';
 import { processError } from '@neo-one/client-switch';
+import { extractErrorTrace, NEOONEDataProvider } from '@neo-one/client';
 
-export const checkResult = async (result: InvocationResult, sourceMap: RawSourceMap) => {
-  if (result.state === VMState.Fault) {
-    const message = await processError({ message: result.message, sourceMap });
+export const checkResult = async (receiptIn: CallReceiptJSON, sourceMap: RawSourceMap) => {
+  const receipt = (new NEOONEDataProvider({ network: 'meh', rpcURL: 'meh' }) as any).convertCallReceipt(receiptIn);
+  if (receipt.result.state === VMState.Fault) {
+    const message = await processError({
+      ...extractErrorTrace(receipt.actions),
+      message: receipt.result.message,
+      sourceMap,
+    });
     throw new Error(`Error in execution: ${message}`);
   }
 };

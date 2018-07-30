@@ -1,18 +1,20 @@
-import { ImportDeclaration, SyntaxKind } from 'ts-simple-ast';
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export class ImportDeclarationCompiler extends NodeCompiler<ImportDeclaration> {
-  public readonly kind: SyntaxKind = SyntaxKind.ImportDeclaration;
+export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration> {
+  public readonly kind = ts.SyntaxKind.ImportDeclaration;
 
-  public visitNode(sb: ScriptBuilder, node: ImportDeclaration, optionsIn: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, node: ts.ImportDeclaration, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
+    const sourceFile = tsUtils.importExport.getModuleSpecifierSourceFileOrThrow(sb.typeChecker, node);
     // [exports]
-    sb.loadModule(node.getModuleSpecifierSourceFileOrThrow());
+    sb.loadModule(sourceFile);
 
-    const namespaceImport = node.getNamespaceImport();
+    const namespaceImport = tsUtils.importDeclaration.getNamespaceImport(node);
     if (namespaceImport !== undefined) {
       const name = namespaceImport.getText();
       sb.scope.add(name);
@@ -22,12 +24,10 @@ export class ImportDeclarationCompiler extends NodeCompiler<ImportDeclaration> {
       // []
       sb.scope.set(sb, node, options, name);
     } else {
-      const defaultImport = node.getDefaultImport();
-      const namedImports = node
-        .getNamedImports()
-        .filter((namedImport) =>
-          sb.hasExport(namedImport.getImportDeclaration().getModuleSpecifierSourceFileOrThrow(), namedImport.getName()),
-        );
+      const defaultImport = tsUtils.importDeclaration.getDefaultImport(node);
+      const namedImports = tsUtils.importDeclaration
+        .getNamedImports(node)
+        .filter((namedImport) => sb.hasExport(sourceFile, tsUtils.node.getName(namedImport)));
       if (defaultImport !== undefined) {
         if (namedImports.length > 0) {
           // [exports, exports]
@@ -51,14 +51,14 @@ export class ImportDeclarationCompiler extends NodeCompiler<ImportDeclaration> {
           // [exports, exports]
           sb.emitOp(node, 'DUP');
           // [name, exports, exports]
-          sb.emitPushString(node, namedImport.getName());
+          sb.emitPushString(node, tsUtils.node.getName(namedImport));
           // [val, exports]
           sb.emitOp(node, 'PICKITEM');
 
-          let name = namedImport.getName();
-          const alias = namedImport.getAliasIdentifier();
+          let name = tsUtils.node.getName(namedImport);
+          const alias = tsUtils.importExport.getAliasName(namedImport);
           if (alias !== undefined) {
-            name = alias.getText();
+            name = alias;
           }
           sb.scope.add(name);
 

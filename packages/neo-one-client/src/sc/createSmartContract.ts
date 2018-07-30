@@ -120,9 +120,14 @@ const createCall = ({
     client,
   });
 
-  const result = await client.call(hash, name, params, options);
+  const receipt = await client.call(hash, name, params, options);
 
-  return common.convertCallResult({ returnType, result, sourceMap: definition.sourceMap });
+  return common.convertCallResult({
+    returnType,
+    result: receipt.result,
+    actions: receipt.actions,
+    sourceMap: definition.sourceMap,
+  });
 };
 
 const filterEvents = (actions: ReadonlyArray<Event | Log>): ReadonlyArray<Event> =>
@@ -162,6 +167,7 @@ const createInvoke = ({
       const invocationResult = await common.convertInvocationResult({
         returnType,
         result: receipt.result,
+        actions: receipt.actions,
         sourceMap: definition.sourceMap,
       });
 

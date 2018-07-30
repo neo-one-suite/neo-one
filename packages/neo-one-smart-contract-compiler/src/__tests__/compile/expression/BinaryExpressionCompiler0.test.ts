@@ -327,45 +327,14 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('true && true [AmpersandAmpersandToken]', async () => {
-    await helpers.executeString(`
-      if (!(true && true)) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('true && false [AmpersandAmpersandToken]', async () => {
-    await helpers.executeString(`
-      if (true && false) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('!(false && true) [AmpersandAmpersandToken]', async () => {
-    await helpers.executeString(`
-      if (false && true) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('false && false [AmpersandAmpersandToken]', async () => {
-    await helpers.executeString(`
-      if (false && false) {
-        throw 'Failure';
-      }
-    `);
-  });
-
   test('false && short-circuit [AmpersandAmpersandToken:short-circuit]', async () => {
     await helpers.executeString(`
       const fail = () => {
         throw 'Failure';
       };
 
-      if (false && fail()) {
+      const x: boolean = false as boolean;
+      if (x && fail()) {
         throw 'Failure';
       }
     `);
@@ -382,30 +351,6 @@ describe('BinaryExpressionCompiler', () => {
   test('( true && 3 ) === 3 [AmpersandAmpersandToken]', async () => {
     await helpers.executeString(`
       if (!(true && 3 === 3)) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('true || true [BarBarToken]', async () => {
-    await helpers.executeString(`
-      if (!(true || true)) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('true || false [BarBarToken]', async () => {
-    await helpers.executeString(`
-      if (!(true || false)) {
-        throw 'Failure';
-      }
-    `);
-  });
-
-  test('false || true [BarBarToken]', async () => {
-    await helpers.executeString(`
-      if (!(false || true)) {
         throw 'Failure';
       }
     `);

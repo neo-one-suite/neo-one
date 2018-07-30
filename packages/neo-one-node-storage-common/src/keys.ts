@@ -30,15 +30,15 @@ const storageItemKeyPrefix = 'storageItem';
 const validatorKeyPrefix = 'validator';
 const invocationDataKeyPrefix = 'invocationData';
 const settingsPrefix = 'settings';
-export const validatorsCountKeyString = 'validatorsCount';
-export const validatorsCountKey = bytewise.encode([validatorsCountKeyString]);
 
-export const serializeHeaderIndexHashKey = (index: number): Buffer => bytewise.encode([headerHashKeyPrefix, index]);
-export const serializeHeaderIndexHashKeyString = (index: number): string => `${headerHashKeyPrefix}:${index}`;
+const validatorsCountKeyString = 'validatorsCount';
+const validatorsCountKey = bytewise.encode([validatorsCountKeyString]);
 
-export const maxHeaderHashKey = bytewise.encode([settingsPrefix, 'max-header-hash']) as Buffer;
+const serializeHeaderIndexHashKey = (index: number): Buffer => bytewise.encode([headerHashKeyPrefix, index]);
+const serializeHeaderIndexHashKeyString = (index: number): string => `${headerHashKeyPrefix}:${index}`;
 
-export const maxBlockHashKey = bytewise.encode([settingsPrefix, 'max-block-hash']) as Buffer;
+const maxHeaderHashKey = bytewise.encode([settingsPrefix, 'max-header-hash']) as Buffer;
+const maxBlockHashKey = bytewise.encode([settingsPrefix, 'max-block-hash']) as Buffer;
 
 const createSerializeAccountInputKey = (prefix: string) => ({ hash, input }: AccountInputKey): Buffer =>
   bytewise.encode([prefix, common.uInt160ToBuffer(hash), common.uInt256ToBuffer(input.hash), input.index]);
@@ -51,19 +51,17 @@ const createGetAccountInputKeyMin = (prefix: string) => ({ hash }: AccountInputs
 const createGetAccountInputKeyMax = (prefix: string) => ({ hash }: AccountInputsKey): Buffer =>
   bytewise.encode(bytewise.sorts.array.bound.upper([prefix, common.uInt160ToBuffer(hash)]));
 
-export const getAccountUnclaimedKeyMin = createGetAccountInputKeyMin(accountUnclaimedKeyPrefix);
+const getAccountUnclaimedKeyMin = createGetAccountInputKeyMin(accountUnclaimedKeyPrefix);
+const getAccountUnclaimedKeyMax = createGetAccountInputKeyMax(accountUnclaimedKeyPrefix);
 
-export const getAccountUnclaimedKeyMax = createGetAccountInputKeyMax(accountUnclaimedKeyPrefix);
-
-export const getAccountUnspentKeyMin = createGetAccountInputKeyMin(accountUnspentKeyPrefix);
-
-export const getAccountUnspentKeyMax = createGetAccountInputKeyMax(accountUnspentKeyPrefix);
+const getAccountUnspentKeyMin = createGetAccountInputKeyMin(accountUnspentKeyPrefix);
+const getAccountUnspentKeyMax = createGetAccountInputKeyMax(accountUnspentKeyPrefix);
 
 const serializeStorageItemKey = ({ hash, key }: StorageItemKey): Buffer =>
   bytewise.encode([storageItemKeyPrefix, common.uInt160ToBuffer(hash), key]);
 const serializeStorageItemKeyString = ({ hash, key }: StorageItemKey): string =>
   `${storageItemKeyPrefix}:` + `${common.uInt160ToString(hash)}:` + `${key.toString('hex')}`;
-export const getStorageItemKeyMin = ({ hash, prefix }: StorageItemsKey): Buffer => {
+const getStorageItemKeyMin = ({ hash, prefix }: StorageItemsKey): Buffer => {
   if (hash === undefined) {
     return bytewise.encode(bytewise.sorts.array.bound.lower([storageItemKeyPrefix]));
   }
@@ -76,7 +74,7 @@ export const getStorageItemKeyMin = ({ hash, prefix }: StorageItemsKey): Buffer 
     bytewise.sorts.array.bound.lower([storageItemKeyPrefix, common.uInt160ToBuffer(hash), prefix]),
   );
 };
-export const getStorageItemKeyMax = ({ hash, prefix }: StorageItemsKey): Buffer => {
+const getStorageItemKeyMax = ({ hash, prefix }: StorageItemsKey): Buffer => {
   if (hash === undefined) {
     return bytewise.encode(bytewise.sorts.array.bound.upper([storageItemKeyPrefix]));
   }
@@ -92,18 +90,17 @@ export const getStorageItemKeyMax = ({ hash, prefix }: StorageItemsKey): Buffer 
 
 const serializeUInt64 = (value: BN) => value.toArrayLike(Buffer, 'be', 8);
 
-export const serializeActionKey = ({ index }: ActionKey): Buffer =>
-  bytewise.encode([actionKeyPrefix, serializeUInt64(index)]);
-export const serializeActionKeyString = ({ index }: ActionKey): string => `${actionKeyPrefix}:${index.toString(10)}`;
+const serializeActionKey = ({ index }: ActionKey): Buffer => bytewise.encode([actionKeyPrefix, serializeUInt64(index)]);
+const serializeActionKeyString = ({ index }: ActionKey): string => `${actionKeyPrefix}:${index.toString(10)}`;
 
-export const getActionKeyMin = ({ indexStart }: ActionsKey): Buffer =>
+const getActionKeyMin = ({ indexStart }: ActionsKey): Buffer =>
   bytewise.encode(
     bytewise.sorts.array.bound.lower(
       [actionKeyPrefix, indexStart === undefined ? undefined : serializeUInt64(indexStart)].filter(Boolean),
     ),
   );
 
-export const getActionKeyMax = ({ indexStop }: ActionsKey): Buffer =>
+const getActionKeyMax = ({ indexStop }: ActionsKey): Buffer =>
   bytewise.encode(
     bytewise.sorts.array.bound.upper(
       [actionKeyPrefix, indexStop === undefined ? undefined : serializeUInt64(indexStop)].filter(
@@ -116,9 +113,8 @@ const serializeValidatorKey = ({ publicKey }: ValidatorKey): Buffer =>
   bytewise.encode([validatorKeyPrefix, common.ecPointToBuffer(publicKey)]);
 const serializeValidatorKeyString = ({ publicKey }: ValidatorKey): string =>
   `${validatorKeyPrefix}:${common.ecPointToString(publicKey)}`;
-export const validatorMinKey = bytewise.encode(bytewise.sorts.array.bound.lower([validatorKeyPrefix]));
-
-export const validatorMaxKey = bytewise.encode(bytewise.sorts.array.bound.upper([validatorKeyPrefix]));
+const validatorMinKey = bytewise.encode(bytewise.sorts.array.bound.lower([validatorKeyPrefix]));
+const validatorMaxKey = bytewise.encode(bytewise.sorts.array.bound.upper([validatorKeyPrefix]));
 
 const serializeUInt160Key = ({ hash }: { readonly hash: UInt160 }): Buffer => common.uInt160ToBuffer(hash);
 const serializeUInt256Key = ({ hash }: { readonly hash: UInt256 }): Buffer => common.uInt256ToBuffer(hash);
@@ -133,16 +129,15 @@ const createSerializeUInt160KeyString = (prefix: string) => (input: { readonly h
 const createSerializeUInt256KeyString = (prefix: string) => (input: { readonly hash: UInt256 }): string =>
   `${prefix}:${common.uInt256ToString(input.hash)}`;
 
-export const accountMinKey = bytewise.encode(bytewise.sorts.array.bound.lower([accountKeyPrefix]));
-
-export const accountMaxKey = bytewise.encode(bytewise.sorts.array.bound.upper([accountKeyPrefix]));
+const accountMinKey = bytewise.encode(bytewise.sorts.array.bound.lower([accountKeyPrefix]));
+const accountMaxKey = bytewise.encode(bytewise.sorts.array.bound.upper([accountKeyPrefix]));
 
 const serializeOutputKey = ({ index, hash }: OutputKey): Buffer =>
   bytewise.encode([outputKeyPrefix, serializeUInt256Key({ hash }), index]);
 const serializeOutputKeyString = ({ index, hash }: OutputKey): string =>
   `${outputKeyPrefix}:${common.uInt256ToString(hash)}:${index}`;
 
-export const typeKeyToSerializeKey = {
+const typeKeyToSerializeKey = {
   account: createSerializeUInt160Key(accountKeyPrefix),
   accountUnclaimed: createSerializeAccountInputKey(accountUnclaimedKeyPrefix),
   accountUnspent: createSerializeAccountInputKey(accountUnspentKeyPrefix),
@@ -160,7 +155,7 @@ export const typeKeyToSerializeKey = {
   invocationData: createSerializeUInt256Key(invocationDataKeyPrefix),
 };
 
-export const typeKeyToSerializeKeyString = {
+const typeKeyToSerializeKeyString = {
   account: createSerializeUInt160KeyString(accountKeyPrefix),
   accountUnclaimed: createSerializeAccountInputKeyString(accountUnclaimedKeyPrefix),
 
@@ -177,4 +172,29 @@ export const typeKeyToSerializeKeyString = {
   storageItem: serializeStorageItemKeyString,
   validator: serializeValidatorKeyString,
   invocationData: createSerializeUInt256KeyString(invocationDataKeyPrefix),
+};
+
+export const keys = {
+  validatorsCountKeyString,
+  validatorsCountKey,
+  serializeHeaderIndexHashKey,
+  serializeHeaderIndexHashKeyString,
+  maxHeaderHashKey,
+  maxBlockHashKey,
+  getAccountUnclaimedKeyMin,
+  getAccountUnclaimedKeyMax,
+  getAccountUnspentKeyMin,
+  getAccountUnspentKeyMax,
+  getStorageItemKeyMin,
+  getStorageItemKeyMax,
+  serializeActionKey,
+  serializeActionKeyString,
+  getActionKeyMin,
+  getActionKeyMax,
+  validatorMinKey,
+  validatorMaxKey,
+  accountMinKey,
+  accountMaxKey,
+  typeKeyToSerializeKey,
+  typeKeyToSerializeKeyString,
 };

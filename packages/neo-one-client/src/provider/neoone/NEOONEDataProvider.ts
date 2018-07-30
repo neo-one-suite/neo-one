@@ -4,6 +4,7 @@ import {
   AssetJSON,
   AttributeJSON,
   BlockJSON,
+  CallReceiptJSON,
   common,
   ContractJSON,
   ContractParameterJSON,
@@ -23,11 +24,11 @@ import {
 import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-esnext-esm/asynciterable/asynciterablex';
-import { flatMap } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatMap';
+import { flatMap } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatmap';
 import { flatten } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatten';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { AsyncBlockIterator } from '../../AsyncBlockIterator';
 import {
   Account,
@@ -52,6 +53,7 @@ import {
   Options,
   Output,
   Peer,
+  RawCallReceipt,
   RawInvocationData,
   RawInvocationResult,
   StorageItem,
@@ -173,10 +175,10 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     );
   }
 
-  public async testInvoke(transaction: string, monitor?: Monitor): Promise<RawInvocationResult> {
-    const result = await this.mutableClient.testInvocation(transaction, monitor);
+  public async testInvoke(transaction: string, monitor?: Monitor): Promise<RawCallReceipt> {
+    const receipt = await this.mutableClient.testInvocation(transaction, monitor);
 
-    return this.convertInvocationResult(result);
+    return this.convertCallReceipt(receipt);
   }
 
   public async getAccount(address: AddressString, monitor?: Monitor): Promise<Account> {
@@ -243,6 +245,12 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     return this.convertTransaction(transaction);
   }
 
+  public async getOutput(input: Input, monitor?: Monitor): Promise<Output> {
+    const output = await this.mutableClient.getOutput(input, monitor);
+
+    return this.convertOutput(output);
+  }
+
   public async getValidators(monitor?: Monitor): Promise<ReadonlyArray<Validator>> {
     return this.mutableClient
       .getValidators(monitor)
@@ -299,7 +307,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     monitor?: Monitor,
-  ): Promise<RawInvocationResult> {
+  ): Promise<RawCallReceipt> {
     const testTransaction = new CoreInvocationTransaction({
       version: 1,
       gas: common.TEN_THOUSAND_FIXED8,
@@ -331,6 +339,22 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
 
   public async reset(monitor?: Monitor): Promise<void> {
     return this.mutableClient.reset(monitor);
+  }
+
+  private convertCallReceipt(receipt: CallReceiptJSON): RawCallReceipt {
+    return {
+      result: this.convertInvocationResult(receipt.result),
+      actions: receipt.actions.map((action, idx) =>
+        this.convertAction(
+          '0x​​​​​0000000000000000000000000000000000000000000000000000000000000000​​​​​',
+          0,
+          '0x​​​​​0000000000000000000000000000000000000000000000000000000000000000​​​​​',
+          0,
+          idx,
+          action,
+        ),
+      ),
+    };
   }
 
   private convertBlock(block: BlockJSON): Block {

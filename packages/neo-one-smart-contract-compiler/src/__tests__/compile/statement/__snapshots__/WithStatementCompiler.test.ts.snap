@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WithStatementCompiler simple 1`] = `
+"snippetCode.ts (4,7): 'with' statements are not allowed in strict mode.
+
+      2 |       let result = 0;
+      3 |       const x = { y: 1 };
+    > 4 |       with (x) {
+        |       ^
+      5 |         result = y;
+      6 |       }
+      7 | 
+"
+`;

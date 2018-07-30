@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -10,14 +10,14 @@ import { AddConstructorObjectHelper } from './AddConstructorObjectHelper';
 export class AddMapObjectHelper extends AddConstructorObjectHelper {
   protected readonly name = 'Map';
 
-  protected addPrototypeProperties(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  protected addPrototypeProperties(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     this.addClear(sb, node, options);
     this.addDelete(sb, node, options);
     this.addGet(sb, node, options);
     this.addSet(sb, node, options);
   }
 
-  protected addConstructorProperties(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  protected addConstructorProperties(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [objectVal, objectVal, globalObjectVal]
     sb.emitOp(node, 'DUP');
     // ['construct', objectVal, objectVal, globalObjectVal]
@@ -66,7 +66,7 @@ export class AddMapObjectHelper extends AddConstructorObjectHelper {
     sb.emitHelper(node, options, sb.helpers.setInternalObjectProperty);
   }
 
-  private addClear(sb: ScriptBuilder, node: Node, outerOptions: VisitOptions): void {
+  private addClear(sb: ScriptBuilder, node: ts.Node, outerOptions: VisitOptions): void {
     this.addMethod(sb, node, outerOptions, 'clear', (options) => {
       // []
       sb.emitOp(node, 'DROP');
@@ -79,7 +79,7 @@ export class AddMapObjectHelper extends AddConstructorObjectHelper {
     });
   }
 
-  private addDelete(sb: ScriptBuilder, node: Node, outerOptions: VisitOptions): void {
+  private addDelete(sb: ScriptBuilder, node: ts.Node, outerOptions: VisitOptions): void {
     this.addMethod(sb, node, outerOptions, 'delete', (options) => {
       // [argsarr]
       sb.emitPushInt(node, 0);
@@ -110,7 +110,7 @@ export class AddMapObjectHelper extends AddConstructorObjectHelper {
     });
   }
 
-  private addGet(sb: ScriptBuilder, node: Node, outerOptions: VisitOptions): void {
+  private addGet(sb: ScriptBuilder, node: ts.Node, outerOptions: VisitOptions): void {
     this.addMethod(sb, node, outerOptions, 'get', (options) => {
       // [argsarr]
       sb.emitPushInt(node, 0);
@@ -153,7 +153,7 @@ export class AddMapObjectHelper extends AddConstructorObjectHelper {
     });
   }
 
-  private addSet(sb: ScriptBuilder, node: Node, outerOptions: VisitOptions): void {
+  private addSet(sb: ScriptBuilder, node: ts.Node, outerOptions: VisitOptions): void {
     this.addMethod(sb, node, outerOptions, 'set', (options) => {
       // [this, argsarr]
       sb.scope.getThis(sb, node, options);

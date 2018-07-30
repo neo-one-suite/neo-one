@@ -241,10 +241,7 @@ export class SimulationResourceAdapter {
     this.mutableSubprocesses = [];
 
     this.update$ = new ReplaySubject(1);
-    this.resource$ = this.update$.pipe(
-      map(() => this.toResource()),
-      shareReplay(1),
-    );
+    this.resource$ = this.update$.pipe(map(() => this.toResource()), shareReplay(1));
 
     this.update$.next();
   }

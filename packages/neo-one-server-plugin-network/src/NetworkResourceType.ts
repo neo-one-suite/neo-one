@@ -10,7 +10,7 @@ import {
   ResourceType,
   StopCRUD,
 } from '@neo-one/server-plugin';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { constants } from './constants';
 import { CreateNetworkCRUD, DeleteNetworkCRUD, StartNetworkCRUD } from './crud';
 import { MasterNetworkResourceAdapter } from './MasterNetworkResourceAdapter';

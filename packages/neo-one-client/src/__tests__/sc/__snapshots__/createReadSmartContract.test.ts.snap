@@ -76,7 +76,8 @@ exports[`createReadSmartContract iterActions with filter: common.convertCallResu
 Array [
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -85,7 +86,8 @@ Array [
   ],
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -172,7 +174,8 @@ exports[`createReadSmartContract iterActions with no filter: common.convertCallR
 Array [
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -181,7 +184,8 @@ Array [
   ],
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -268,7 +272,8 @@ exports[`createReadSmartContract iterEvents: common.convertCallResult 1`] = `
 Array [
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -277,7 +282,8 @@ Array [
   ],
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -364,7 +370,8 @@ exports[`createReadSmartContract iterLogs: common.convertCallResult 1`] = `
 Array [
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -373,7 +380,8 @@ Array [
   ],
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -462,7 +470,8 @@ exports[`createReadSmartContract iterStorage: common.convertCallResult 1`] = `
 Array [
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -471,7 +480,8 @@ Array [
   ],
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -508,7 +518,8 @@ exports[`createReadSmartContract smartContract creation - createCall: common.con
 Array [
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },
@@ -517,7 +528,8 @@ Array [
   ],
   Array [
     Object {
-      "result": undefined,
+      "actions": Array [],
+      "result": Object {},
       "returnType": Object {
         "type": "Void",
       },

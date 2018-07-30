@@ -62,10 +62,12 @@ export class PrepareRequestConsensusMessage extends ConsensusMessageBase<
     minerTransaction,
     signature,
   }: PrepareRequestAdd) {
-    super({
-      type: ConsensusMessageType.PrepareRequest,
+    const options = {
+      // tslint:disable-next-line no-useless-cast
+      type: ConsensusMessageType.PrepareRequest as ConsensusMessageType.PrepareRequest,
       viewNumber,
-    });
+    };
+    super(options);
 
     this.nonce = nonce;
     this.nextConsensus = nextConsensus;

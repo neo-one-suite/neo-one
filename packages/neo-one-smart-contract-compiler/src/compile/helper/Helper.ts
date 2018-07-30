@@ -1,9 +1,8 @@
-import { Node } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export abstract class Helper<T extends Node = Node> {
+export abstract class Helper<T extends ts.Node = ts.Node> {
   public emitGlobal(_sb: ScriptBuilder, _node: T, _options: VisitOptions): void {
     // do nothing
   }

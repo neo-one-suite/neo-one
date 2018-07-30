@@ -1,5 +1,4 @@
-import { Node } from 'ts-simple-ast';
-
+import ts from 'typescript';
 import { Helper } from '../helper';
 import { VisitOptions } from '../types';
 import { ScopeCapturingScriptBuilder } from './ScopeCapturingScriptBuilder';
@@ -13,7 +12,7 @@ export class HelperCapturingScriptBuilder extends ScopeCapturingScriptBuilder im
     return [...this.mutableCapturedHelpers];
   }
 
-  public emitHelper<T extends Node>(node: T, options: VisitOptions, helper: Helper<T>): void {
+  public emitHelper<T extends ts.Node>(node: T, options: VisitOptions, helper: Helper<T>): void {
     if (!this.mutableCapturedHelpersSet.has(helper)) {
       this.mutableCapturedHelpersSet.add(helper);
       this.mutableCapturedHelpers.push(helper);

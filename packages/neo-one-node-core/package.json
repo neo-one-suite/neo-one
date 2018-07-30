@@ -1,44 +1,14 @@
 {
   "name": "@neo-one/node-core",
-  "version": "1.0.0-alpha.63",
-  "keywords": [
-    "neo",
-    "NEO",
-    "one",
-    "ONE",
-    "blockchain",
-    "neo-one",
-    "neo-one-suite",
-    "neo one",
-    "neo one suite",
-    "NEO ONE",
-    "NEO ONE suite",
-    "NEO•ONE",
-    "NEO•ONE suite",
-    "neo blockchain",
-    "NEO Blockchain",
-    "NEO blockchain",
-    "dapp",
-    "dapps"
-  ],
+  "version": "1.0.0-alpha.67",
   "description": "NEO•ONE core node types.",
-  "repository": "https://github.com/neo-one-suite/neo-one",
-  "bugs": "https://github.com/neo-one-suite/neo-one/issues",
-  "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/index.esm.js",
-  "typings": "./src/index.ts",
-  "engines": {
-    "node": ">=10.6.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
+  "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.62",
-    "@neo-one/monitor": "^1.0.0-alpha.47",
-    "@neo-one/utils": "^1.0.0-alpha.52",
+    "@neo-one/client-core": "^1.0.0-alpha.66",
+    "@neo-one/monitor": "^1.0.0-alpha.51",
+    "@neo-one/utils": "^1.0.0-alpha.56",
     "bn.js": "^4.11.8",
-    "rxjs": "^6.2.1"
+    "rxjs": "^6.2.2",
+    "tslib": "^1.9.3"
   }
 }

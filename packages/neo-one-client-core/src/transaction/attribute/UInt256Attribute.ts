@@ -67,6 +67,7 @@ export class UInt256Attribute extends AttributeBase<UInt256AttributeUsage, UInt2
   public readonly size: number;
   public readonly equals: Equals = utils.equals(
     UInt256Attribute,
+    this,
     (other) => this.usage === other.usage && common.uInt256Equal(this.value, other.value),
   );
 

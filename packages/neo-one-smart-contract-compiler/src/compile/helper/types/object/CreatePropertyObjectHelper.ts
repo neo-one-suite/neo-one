@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
@@ -7,7 +7,7 @@ import { Helper } from '../../Helper';
 // Input: [pobj]
 // Output: [objectVal]
 export class CreatePropertyObjectHelper extends Helper {
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (options.pushValue) {
       const obj = sb.scope.addUnique();
       const pobj = sb.scope.addUnique();

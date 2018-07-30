@@ -1,21 +1,20 @@
-import { Node } from 'ts-simple-ast';
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
-import * as typeUtils from '../../../typeUtils';
-
 export interface EqualsEqualsEqualsHelperOptions {
-  readonly left: Node;
-  readonly right: Node;
+  readonly left: ts.Node;
+  readonly right: ts.Node;
 }
 
 // Input: []
 // Output: [boolean]
 export class EqualsEqualsEqualsHelper extends Helper {
-  private readonly left: Node;
-  private readonly right: Node;
+  private readonly left: ts.Node;
+  private readonly right: ts.Node;
 
   public constructor(options: EqualsEqualsEqualsHelperOptions) {
     super();
@@ -23,7 +22,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
     this.right = options.right;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     sb.visit(this.left, options);
     sb.visit(this.right, options);
     if (!options.pushValue) {
@@ -33,7 +32,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
       return;
     }
 
-    if (typeUtils.isSame(sb.getType(this.left), sb.getType(this.right))) {
+    if (tsUtils.type_.isSame(sb.getType(this.left), sb.getType(this.right))) {
       sb.emitHelper(node, options, sb.helpers.equalsEqualsEqualsSameType);
     } else {
       sb.emitHelper(node, options, sb.helpers.equalsEqualsEqualsUnknown);

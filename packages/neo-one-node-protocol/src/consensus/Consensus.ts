@@ -4,7 +4,7 @@ import { finalize, mergeScanLatest, utils as commonUtils } from '@neo-one/utils'
 import { AsyncIterableX } from '@reactivex/ix-esnext-esm/asynciterable/asynciterablex';
 import { scan } from '@reactivex/ix-esnext-esm/asynciterable/pipe/scan';
 import { Observable } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { Node } from '../Node';
 import { initializeNewConsensus } from './common';
 import { ConsensusContext } from './ConsensusContext';
@@ -70,15 +70,9 @@ export class Consensus {
 
   public start$(): Observable<void> {
     return this.options$.pipe(
-      switchMap(async (options) => {
-        if (this.mutableStartPromise !== undefined) {
-          await this.pause();
-        }
-
-        return options;
-      }),
       mergeScanLatest<InternalOptions, void>(async (_, options) => {
-        await this.doStart(options);
+        await this.pause();
+        this.doStart(options);
       }),
       finalize(async () => {
         await this.pause();
@@ -150,7 +144,8 @@ export class Consensus {
     this.doStart(options);
   }
 
-  private async doStart(options: InternalOptions): Promise<void> {
+  private doStart(options: InternalOptions): void {
+    this.mutableQueue = new ConsensusQueue();
     let completed = false;
     const mutableStartPromise = this.start(options).then(() => {
       completed = true;
@@ -158,7 +153,6 @@ export class Consensus {
     });
     if (!completed) {
       this.mutableStartPromise = mutableStartPromise;
-      await this.mutableStartPromise;
     }
   }
 

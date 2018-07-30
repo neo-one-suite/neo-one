@@ -14,7 +14,7 @@ type OnDoneFn = (failed: boolean) => void;
 export interface Task {
   readonly skip?: SkipFn;
   readonly enabled?: EnabledFn;
-  readonly task: (ctx: TaskContext) => Promise<void> | Observable<string> | TaskList | void;
+  readonly task: (ctx: TaskContext) => Promise<void> | Promise<string> | Observable<string> | TaskList | void;
   readonly title: string;
 }
 
@@ -130,17 +130,18 @@ class TaskWrapper {
         const result = this.task.task(ctx);
 
         let error;
+        let message: string | undefined | void;
         if (result instanceof Observable) {
           await result
             .pipe(
-              map((message) => {
-                status = { ...status, message };
+              map((msg) => {
+                status = { ...status, message: msg };
                 this.status$.next(status);
               }),
             )
             .toPromise();
         } else if (result instanceof Promise) {
-          await result;
+          message = await result;
         } else if (result instanceof TaskList) {
           result.setSuperOnError(onError);
           // tslint:disable-next-line no-floating-promises
@@ -162,6 +163,7 @@ class TaskWrapper {
           ...status,
           pending: false,
           complete: error === undefined,
+          message: message === undefined ? undefined : message,
           error,
         });
       }

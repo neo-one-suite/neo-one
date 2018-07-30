@@ -1,6 +1,5 @@
 // tslint:disable no-any
-import { Node, StatementedNode } from 'ts-simple-ast';
-
+import { StatementedNode, tsUtils } from '@neo-one/ts-utils';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -9,13 +8,13 @@ export interface ProcessStatementsHelperOptions {
   readonly createScope: boolean;
 }
 
-export class ProcessStatementsHelper extends Helper<Node & StatementedNode> {
+export class ProcessStatementsHelper extends Helper<StatementedNode> {
   private readonly createScope: boolean;
   public constructor({ createScope }: ProcessStatementsHelperOptions) {
     super();
     this.createScope = createScope;
   }
-  public emit(sb: ScriptBuilder, node: Node & StatementedNode, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: StatementedNode, options: VisitOptions): void {
     if (this.createScope) {
       sb.withScope(node, options, (innerOptions) => {
         this.emitStatements(sb, node, innerOptions);
@@ -25,20 +24,20 @@ export class ProcessStatementsHelper extends Helper<Node & StatementedNode> {
     }
   }
 
-  private emitStatements(sb: ScriptBuilder, node: Node & StatementedNode, options: VisitOptions): void {
-    node.getFunctions().forEach((func) => {
-      sb.scope.add(func.getName());
+  private emitStatements(sb: ScriptBuilder, node: StatementedNode, options: VisitOptions): void {
+    tsUtils.statement.getFunctions(node).forEach((func) => {
+      const name = tsUtils.node.getName(func);
+      if (name !== undefined) {
+        sb.scope.add(name);
+      }
     });
-    node.getVariableDeclarations().forEach((decl) => {
-      sb.scope.add(decl.getName());
+    tsUtils.statement.getVariableDeclarations(node).forEach((decl) => {
+      const name = tsUtils.node.getName(decl);
+      if (name !== undefined) {
+        sb.scope.add(name);
+      }
     });
-
-    const compilerStatements = (node.compilerNode as any).statements;
-    const statements =
-      compilerStatements === undefined
-        ? node.getStatements()
-        : compilerStatements.map((statement: any) => (node as any).getNodeFromCompilerNode(statement));
-    statements.forEach((statement: any) => {
+    tsUtils.statement.getStatements(node).forEach((statement) => {
       sb.visit(statement, sb.noValueOptions(options));
     });
   }

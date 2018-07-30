@@ -66,7 +66,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
         const amountPerAsset = this.isLimitedRound()
           ? this.tokensPerAssetLimitedRound.get(output.asset)
           : this.tokensPerAsset.get(output.asset);
-        if (amountPerAsset === null) {
+        if (amountPerAsset === undefined) {
           onRefund();
           throw new Error(`Asset ${output.asset} is not accepted for the crowdsale`);
         }
@@ -123,7 +123,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   public getRemainingLimitedRound(address: Address): Fixed<Decimals> {
     const remaining = this.limitedRoundRemaining.get(address);
 
-    return remaining === null ? this.maxLimitedRoundAmount : remaining;
+    return remaining === undefined ? this.maxLimitedRoundAmount : remaining;
   }
 
   public endICO(): void {

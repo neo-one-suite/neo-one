@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -21,7 +21,7 @@ export class ExportHelper extends Helper {
     this.defaultExport = defaultExport || false;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, _optionsIn: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, _optionsIn: VisitOptions): void {
     if (this.name !== undefined) {
       sb.addExport(this.name);
       // [name, val, exports]

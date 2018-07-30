@@ -1,23 +1,22 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
+import { tsUtils } from '@neo-one/ts-utils';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
-import * as typeUtils from '../../../typeUtils';
-
 export interface LessThanHelperOptions {
   readonly leftFirst: boolean;
-  readonly left: Node;
-  readonly right: Node;
+  readonly left: ts.Node;
+  readonly right: ts.Node;
 }
 
 // Input: []
 // Output: [boolean]
 export class LessThanHelper extends Helper {
   private readonly leftFirst: boolean;
-  private readonly left: Node;
-  private readonly right: Node;
+  private readonly left: ts.Node;
+  private readonly right: ts.Node;
 
   public constructor(options: LessThanHelperOptions) {
     super();
@@ -26,7 +25,7 @@ export class LessThanHelper extends Helper {
     this.right = options.right;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (!options.pushValue) {
       if (this.leftFirst) {
         sb.visit(this.left, options);
@@ -89,7 +88,14 @@ export class LessThanHelper extends Helper {
       sb.emitOp(node, 'SWAP');
     }
 
-    if (typeUtils.isOnlyString(sb.getType(this.left)) && typeUtils.isOnlyString(sb.getType(this.right))) {
+    const leftType = sb.getType(this.left);
+    const rightType = sb.getType(this.right);
+    if (
+      leftType !== undefined &&
+      rightType !== undefined &&
+      tsUtils.type_.isOnlyStringish(leftType) &&
+      tsUtils.type_.isOnlyStringish(rightType)
+    ) {
       sb.reportUnsupported(node);
     } else {
       // [rightNumber, leftPrim]

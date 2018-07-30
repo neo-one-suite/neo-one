@@ -66,7 +66,7 @@ export const createMonitor = ({
           transport.once('finish', () => {
             numFlushed += 1;
             if (numFlushes === numFlushed) {
-              setTimeout(doExit, 10);
+              setTimeout(doExit, 30);
             }
           });
 
@@ -74,7 +74,7 @@ export const createMonitor = ({
         });
 
         // Force an exit
-        setTimeout(doExit, 5000);
+        setTimeout(doExit, 250);
       },
     },
   });

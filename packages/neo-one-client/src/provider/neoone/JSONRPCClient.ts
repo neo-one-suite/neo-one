@@ -2,6 +2,7 @@ import {
   AccountJSON,
   AssetJSON,
   BlockJSON,
+  CallReceiptJSON,
   ContractJSON,
   InputJSON,
   InvocationDataJSON,
@@ -195,7 +196,7 @@ export class JSONRPCClient {
     );
   }
 
-  public async testInvocation(value: BufferString, monitor?: Monitor): Promise<InvocationResultJSON> {
+  public async testInvocation(value: BufferString, monitor?: Monitor): Promise<CallReceiptJSON> {
     return this.provider.request(
       {
         method: 'testinvocation',

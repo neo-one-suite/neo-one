@@ -1,19 +1,17 @@
-import { ElementAccessExpression, Node, Type } from 'ts-simple-ast';
-
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
 import { Helper } from '../../Helper';
 
-import * as typeUtils from '../../../../typeUtils';
-
 // Input: [val]
 // Output: [val]
-export class ElementAccessHelper extends Helper<ElementAccessExpression> {
-  public emit(sb: ScriptBuilder, expr: ElementAccessExpression, optionsIn: VisitOptions): void {
+export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
+  public emit(sb: ScriptBuilder, expr: ts.ElementAccessExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
-    const value = expr.getExpression();
+    const value = tsUtils.expression.getExpression(expr);
     const valueType = sb.getType(value);
-    const prop = expr.getArgumentExpressionOrThrow();
+    const prop = tsUtils.expression.getArgumentExpressionOrThrow(expr);
     const propType = sb.getType(prop);
 
     // [objectVal]
@@ -34,15 +32,15 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
         valueIndex = 4;
       }
 
-      if (typeUtils.isOnlyString(propType)) {
+      if (propType !== undefined && tsUtils.type_.isOnlyStringish(propType)) {
         // [propString, objectVal]
         sb.emitHelper(prop, options, sb.helpers.getString);
         // []
         this.setProperty(sb, prop, options, valueIndex);
-      } else if (typeUtils.isOnlyNumber(propType)) {
+      } else if (propType !== undefined && tsUtils.type_.isOnlyNumberish(propType)) {
         // []
         this.setNumberProperty(sb, prop, options, propType, valueType, valueIndex);
-      } else if (typeUtils.isOnlySymbol(propType)) {
+      } else if (propType !== undefined && tsUtils.type_.isOnlySymbolish(propType)) {
         // [propString, objectVal]
         sb.emitHelper(prop, options, sb.helpers.getSymbol);
         // []
@@ -93,15 +91,15 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
     }
 
     if (optionsIn.pushValue || !optionsIn.setValue) {
-      if (typeUtils.isOnlyString(propType)) {
+      if (propType !== undefined && tsUtils.type_.isOnlyStringish(propType)) {
         // [propString, objectVal]
         sb.emitHelper(prop, options, sb.helpers.getString);
         // [val]
         sb.emitHelper(expr, options, sb.helpers.getPropertyObjectProperty);
-      } else if (typeUtils.isOnlyNumber(propType)) {
+      } else if (propType !== undefined && tsUtils.type_.isOnlyNumberish(propType)) {
         // [val]
         this.getNumberProperty(sb, prop, options, propType, valueType);
-      } else if (typeUtils.isOnlySymbol(propType)) {
+      } else if (propType !== undefined && tsUtils.type_.isOnlySymbolish(propType)) {
         // [propString, objectVal]
         sb.emitHelper(prop, options, sb.helpers.getSymbol);
         // [val]
@@ -158,12 +156,12 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
 
   private getNumberProperty(
     sb: ScriptBuilder,
-    node: Node,
+    node: ts.Node,
     options: VisitOptions,
-    propType: Type | undefined,
-    valueType: Type | undefined,
+    propType: ts.Type | undefined,
+    valueType: ts.Type | undefined,
   ): void {
-    if (typeUtils.isOnlyArray(valueType) || typeUtils.isOnlyTuple(valueType)) {
+    if (valueType !== undefined && tsUtils.type_.isOnlyArrayish(valueType)) {
       sb.emitHelper(node, options, sb.helpers.getNumber);
       sb.emitHelper(node, options, sb.helpers.getArrayIndex);
     } else {
@@ -192,7 +190,7 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
     }
   }
 
-  private setProperty(sb: ScriptBuilder, node: Node, options: VisitOptions, index: number): void {
+  private setProperty(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, index: number): void {
     // [val, propString, objectVal]
     this.pickValue(sb, node, options, index);
     // []
@@ -201,13 +199,13 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
 
   private setNumberProperty(
     sb: ScriptBuilder,
-    node: Node,
+    node: ts.Node,
     options: VisitOptions,
-    propType: Type | undefined,
-    valueType: Type | undefined,
+    propType: ts.Type | undefined,
+    valueType: ts.Type | undefined,
     index: number,
   ): void {
-    if (typeUtils.isOnlyArray(valueType) || typeUtils.isOnlyTuple(valueType)) {
+    if (valueType !== undefined && tsUtils.type_.isOnlyArrayish(valueType)) {
       sb.emitHelper(node, options, sb.helpers.getNumber);
       this.setArrayIndex(sb, node, options, index);
     } else {
@@ -234,21 +232,21 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
     }
   }
 
-  private setArrayIndex(sb: ScriptBuilder, node: Node, options: VisitOptions, index: number): void {
+  private setArrayIndex(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, index: number): void {
     // [val, propNumber, objectVal]
     this.pickValue(sb, node, options, index);
     // []
     sb.emitHelper(node, options, sb.helpers.setArrayIndex);
   }
 
-  private setSymbol(sb: ScriptBuilder, node: Node, options: VisitOptions, index: number): void {
+  private setSymbol(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, index: number): void {
     // [val, propString, objectVal]
     this.pickValue(sb, node, options, index);
     // []
     sb.emitHelper(node, options, sb.helpers.setSymbolObjectProperty);
   }
 
-  private isArrayInstance(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  private isArrayInstance(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [objectVal, propVal, objectVal]
     sb.emitOp(node, 'OVER');
     // [Array, objectVal, propVal, objectVal]
@@ -257,7 +255,7 @@ export class ElementAccessHelper extends Helper<ElementAccessExpression> {
     sb.emitHelper(node, options, sb.helpers.instanceof);
   }
 
-  private pickValue(sb: ScriptBuilder, node: Node, _options: VisitOptions, index: number): void {
+  private pickValue(sb: ScriptBuilder, node: ts.Node, _options: VisitOptions, index: number): void {
     if (index === 2) {
       sb.emitOp(node, 'ROT');
     } else {

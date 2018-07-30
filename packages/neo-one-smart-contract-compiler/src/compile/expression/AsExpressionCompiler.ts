@@ -1,20 +1,19 @@
-import { AsExpression, SyntaxKind } from 'ts-simple-ast';
+import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-import * as typeUtils from '../../typeUtils';
+export class AsExpressionCompiler extends NodeCompiler<ts.AsExpression> {
+  public readonly kind = ts.SyntaxKind.AsExpression;
 
-export class AsExpressionCompiler extends NodeCompiler<AsExpression> {
-  public readonly kind: SyntaxKind = SyntaxKind.AsExpression;
-
-  public visitNode(sb: ScriptBuilder, expr: AsExpression, options: VisitOptions): void {
+  public visitNode(sb: ScriptBuilder, expr: ts.AsExpression, options: VisitOptions): void {
     const type = sb.getType(expr);
-    if (options.cast !== undefined && typeUtils.isAnyType(type)) {
-      sb.visit(expr.getExpression(), options);
+    if (options.cast !== undefined && (type === undefined || tsUtils.type_.isAny(type))) {
+      sb.visit(tsUtils.expression.getExpression(expr), options);
     } else {
-      sb.visit(expr.getExpression(), sb.castOptions(options, type));
+      sb.visit(tsUtils.expression.getExpression(expr), sb.castOptions(options, type));
     }
   }
 }

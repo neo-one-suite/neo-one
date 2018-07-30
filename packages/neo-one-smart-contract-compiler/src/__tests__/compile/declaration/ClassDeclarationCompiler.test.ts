@@ -294,8 +294,9 @@ describe('ClassDeclarationCompiler', () => {
     `);
   });
 
-  test.skip('realistic class inheritance', async () => {
-    await helpers.executeString(`
+  test('realistic class inheritance', async () => {
+    const node = await helpers.startNode();
+    const contract = await node.addContract(`
       function verifySender(addr: Buffer): void {
         if (!true) {
           throw new Error('Invalid witness');
@@ -305,13 +306,13 @@ describe('ClassDeclarationCompiler', () => {
       class MapStorage<K extends SerializableValue, V extends SerializableValue> {
         constructor(private readonly prefix?: Buffer) {
         }
-        public get(keyIn: K): V | null {
-          return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), this.prefix == null
+        public get(keyIn: K): V | undefined {
+          return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), this.prefix == undefined
             ? syscall('Neo.Runtime.Serialize', keyIn)
-            : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)])) as (V | null);
+            : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)])) as (V | undefined);
         }
         public set(keyIn: K, value: V): void {
-          syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), this.prefix == null
+          syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), this.prefix == undefined
             ? syscall('Neo.Runtime.Serialize', keyIn)
             : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)]), value);
         }
@@ -323,6 +324,7 @@ describe('ClassDeclarationCompiler', () => {
         }
         public deploy(owner: Buffer): boolean {
           this.owner = owner;
+          return true;
         }
         public get owner(): Buffer {
           return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), 'owner') as Buffer;
@@ -344,10 +346,15 @@ describe('ClassDeclarationCompiler', () => {
         public deploy(owner: Buffer): boolean {
           super.deploy(owner);
           this.supply = 0;
+          return true;
         }
 
         public balanceOf(addr: Buffer): number {
           return this.balances.get(addr) || 0;
+        }
+
+        public getSupply(): number {
+          return this.supply;
         }
 
         private get supply(): number {
@@ -386,6 +393,14 @@ describe('ClassDeclarationCompiler', () => {
       if (!token.deploy(syscall('Neo.Runtime.Serialize', 'owner'))) {
         throw 'Failure';
       }
+
+      if (token.getSupply() !== 1000000) {
+        throw 'Failure';
+      }
+    `);
+
+    await node.executeString(`
+      syscall('Neo.Runtime.Call', ${helpers.getUInt160Hash(contract.hash)});
     `);
   });
 });

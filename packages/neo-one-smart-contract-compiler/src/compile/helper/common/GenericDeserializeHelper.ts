@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -9,7 +9,7 @@ import { DESERIALIZE_NAME, getTypes, invokeDeserialize } from './serialize';
 // Input: [val]
 // Output: []
 export class GenericDeserializeHelper extends Helper {
-  public emitGlobal(sb: ScriptBuilder, node: Node, optionsIn: VisitOptions): void {
+  public emitGlobal(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
     // [globalObjectVal]
@@ -62,7 +62,7 @@ export class GenericDeserializeHelper extends Helper {
     sb.emitHelper(node, options, sb.helpers.setInternalObjectProperty);
   }
 
-  public emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
 

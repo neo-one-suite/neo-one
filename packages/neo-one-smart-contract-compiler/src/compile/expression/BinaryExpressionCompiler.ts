@@ -1,64 +1,64 @@
+import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
-import { BinaryExpression, Expression, Node, SyntaxKind, ts } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-import * as typeUtils from '../../typeUtils';
 import { Helper } from '../helper';
 import { TypedHelperOptions } from '../helper/common';
 
-type ExpressionOperatorKind = ts.BitwiseOperatorOrHigher | SyntaxKind.CommaToken;
-export class BinaryExpressionCompiler extends NodeCompiler<BinaryExpression> {
-  public readonly kind: SyntaxKind = SyntaxKind.BinaryExpression;
+type ExpressionOperatorKind = ts.BitwiseOperatorOrHigher | ts.SyntaxKind.CommaToken;
+export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> {
+  public readonly kind = ts.SyntaxKind.BinaryExpression;
 
-  public visitNode(sb: ScriptBuilder, expr: BinaryExpression, options: VisitOptions): void {
-    const kind = expr.getOperatorToken().getKind();
+  public visitNode(sb: ScriptBuilder, expr: ts.BinaryExpression, options: VisitOptions): void {
+    const kind = tsUtils.expression.getOperatorToken(expr).kind;
 
     switch (kind) {
-      case SyntaxKind.EqualsToken:
-      case SyntaxKind.PlusEqualsToken:
-      case SyntaxKind.MinusEqualsToken:
-      case SyntaxKind.AsteriskAsteriskEqualsToken:
-      case SyntaxKind.AsteriskEqualsToken:
-      case SyntaxKind.SlashEqualsToken:
-      case SyntaxKind.PercentEqualsToken:
-      case SyntaxKind.AmpersandEqualsToken:
-      case SyntaxKind.BarEqualsToken:
-      case SyntaxKind.CaretEqualsToken:
-      case SyntaxKind.LessThanLessThanEqualsToken:
-      case SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
-      case SyntaxKind.GreaterThanGreaterThanEqualsToken:
+      case ts.SyntaxKind.EqualsToken:
+      case ts.SyntaxKind.PlusEqualsToken:
+      case ts.SyntaxKind.MinusEqualsToken:
+      case ts.SyntaxKind.AsteriskAsteriskEqualsToken:
+      case ts.SyntaxKind.AsteriskEqualsToken:
+      case ts.SyntaxKind.SlashEqualsToken:
+      case ts.SyntaxKind.PercentEqualsToken:
+      case ts.SyntaxKind.AmpersandEqualsToken:
+      case ts.SyntaxKind.BarEqualsToken:
+      case ts.SyntaxKind.CaretEqualsToken:
+      case ts.SyntaxKind.LessThanLessThanEqualsToken:
+      case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
+      case ts.SyntaxKind.GreaterThanGreaterThanEqualsToken:
         this.visitAssignmentOperator(sb, kind, expr, options);
         break;
-      case SyntaxKind.AsteriskToken:
-      case SyntaxKind.SlashToken:
-      case SyntaxKind.PercentToken:
-      case SyntaxKind.PlusToken:
-      case SyntaxKind.MinusToken:
-      case SyntaxKind.GreaterThanGreaterThanToken:
-      case SyntaxKind.LessThanLessThanToken:
-      case SyntaxKind.LessThanToken:
-      case SyntaxKind.LessThanEqualsToken:
-      case SyntaxKind.GreaterThanToken:
-      case SyntaxKind.GreaterThanEqualsToken:
-      case SyntaxKind.ExclamationEqualsToken:
-      case SyntaxKind.EqualsEqualsToken:
-      case SyntaxKind.AmpersandToken:
-      case SyntaxKind.BarToken:
-      case SyntaxKind.CaretToken:
-      case SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
-      case SyntaxKind.InKeyword:
-      case SyntaxKind.InstanceOfKeyword:
-      case SyntaxKind.CommaToken:
-      case SyntaxKind.AsteriskAsteriskToken:
-      case SyntaxKind.EqualsEqualsEqualsToken:
-      case SyntaxKind.ExclamationEqualsEqualsToken:
+      case ts.SyntaxKind.AsteriskToken:
+      case ts.SyntaxKind.SlashToken:
+      case ts.SyntaxKind.PercentToken:
+      case ts.SyntaxKind.PlusToken:
+      case ts.SyntaxKind.MinusToken:
+      case ts.SyntaxKind.GreaterThanGreaterThanToken:
+      case ts.SyntaxKind.LessThanLessThanToken:
+      case ts.SyntaxKind.LessThanToken:
+      case ts.SyntaxKind.LessThanEqualsToken:
+      case ts.SyntaxKind.GreaterThanToken:
+      case ts.SyntaxKind.GreaterThanEqualsToken:
+      case ts.SyntaxKind.ExclamationEqualsToken:
+      case ts.SyntaxKind.EqualsEqualsToken:
+      case ts.SyntaxKind.AmpersandToken:
+      case ts.SyntaxKind.BarToken:
+      case ts.SyntaxKind.CaretToken:
+      case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
+      case ts.SyntaxKind.InKeyword:
+      case ts.SyntaxKind.InstanceOfKeyword:
+      case ts.SyntaxKind.CommaToken:
+      case ts.SyntaxKind.AsteriskAsteriskToken:
+      case ts.SyntaxKind.EqualsEqualsEqualsToken:
+      case ts.SyntaxKind.ExclamationEqualsEqualsToken:
         this.visitExpressionOperator(sb, kind, expr, options);
         break;
-      case SyntaxKind.AmpersandAmpersandToken:
-      case SyntaxKind.BarBarToken:
+      case ts.SyntaxKind.AmpersandAmpersandToken:
+      case ts.SyntaxKind.BarBarToken:
         this.visitLogicalExpressionOperator(sb, kind, expr, options);
         break;
       default:
@@ -69,75 +69,64 @@ export class BinaryExpressionCompiler extends NodeCompiler<BinaryExpression> {
   private visitAssignmentOperator(
     sb: ScriptBuilder,
     kind: ts.AssignmentOperator,
-    expr: BinaryExpression,
+    expr: ts.BinaryExpression,
     options: VisitOptions,
   ): void {
-    const left = expr.getLeft();
-    const right = expr.getRight();
-    const token = expr.getOperatorToken();
+    const left = tsUtils.expression.getLeft(expr);
+    const right = tsUtils.expression.getRight(expr);
+    const token = tsUtils.expression.getOperatorToken(expr);
     const pushValueOptions = sb.pushValueOptions(options);
     switch (kind) {
-      case SyntaxKind.EqualsToken:
-        // Tested
-        sb.visit(expr.getRight(), pushValueOptions);
+      case ts.SyntaxKind.EqualsToken:
+        sb.visit(right, pushValueOptions);
         break;
-      case SyntaxKind.PlusEqualsToken:
-        // Tested
-        this.visitExpressionOperatorBase(sb, token, SyntaxKind.PlusToken, left, right, pushValueOptions);
+      case ts.SyntaxKind.PlusEqualsToken:
+        this.visitExpressionOperatorBase(sb, token, ts.SyntaxKind.PlusToken, left, right, pushValueOptions);
         break;
-      case SyntaxKind.MinusEqualsToken:
-        // Tested
-        this.visitExpressionOperatorBase(sb, token, SyntaxKind.MinusToken, left, right, pushValueOptions);
+      case ts.SyntaxKind.MinusEqualsToken:
+        this.visitExpressionOperatorBase(sb, token, ts.SyntaxKind.MinusToken, left, right, pushValueOptions);
         break;
-      case SyntaxKind.AsteriskAsteriskEqualsToken:
+      case ts.SyntaxKind.AsteriskAsteriskEqualsToken:
         // SKIPPED Test: Unsupported
-        this.visitExpressionOperatorBase(sb, token, SyntaxKind.AsteriskAsteriskToken, left, right, pushValueOptions);
+        this.visitExpressionOperatorBase(sb, token, ts.SyntaxKind.AsteriskAsteriskToken, left, right, pushValueOptions);
         break;
-      case SyntaxKind.AsteriskEqualsToken:
-        // Tested
-        this.visitExpressionOperatorBase(sb, token, SyntaxKind.AsteriskToken, left, right, pushValueOptions);
+      case ts.SyntaxKind.AsteriskEqualsToken:
+        this.visitExpressionOperatorBase(sb, token, ts.SyntaxKind.AsteriskToken, left, right, pushValueOptions);
         break;
-      case SyntaxKind.SlashEqualsToken:
-        // Tested
-        this.visitExpressionOperatorBase(sb, token, SyntaxKind.SlashToken, left, right, pushValueOptions);
+      case ts.SyntaxKind.SlashEqualsToken:
+        this.visitExpressionOperatorBase(sb, token, ts.SyntaxKind.SlashToken, left, right, pushValueOptions);
         break;
-      case SyntaxKind.PercentEqualsToken:
-        // Tested
-        this.visitExpressionOperatorBase(sb, token, SyntaxKind.PercentToken, left, right, pushValueOptions);
+      case ts.SyntaxKind.PercentEqualsToken:
+        this.visitExpressionOperatorBase(sb, token, ts.SyntaxKind.PercentToken, left, right, pushValueOptions);
         break;
-      case SyntaxKind.AmpersandEqualsToken:
-        // Tested
-        this.visitExpressionOperatorBase(sb, token, SyntaxKind.AmpersandToken, left, right, pushValueOptions);
+      case ts.SyntaxKind.AmpersandEqualsToken:
+        this.visitExpressionOperatorBase(sb, token, ts.SyntaxKind.AmpersandToken, left, right, pushValueOptions);
         break;
-      case SyntaxKind.BarEqualsToken:
-        // Tested
-        this.visitExpressionOperatorBase(sb, token, SyntaxKind.BarToken, left, right, pushValueOptions);
+      case ts.SyntaxKind.BarEqualsToken:
+        this.visitExpressionOperatorBase(sb, token, ts.SyntaxKind.BarToken, left, right, pushValueOptions);
         break;
-      case SyntaxKind.CaretEqualsToken:
-        // Tested
-        this.visitExpressionOperatorBase(sb, token, SyntaxKind.CaretToken, left, right, pushValueOptions);
+      case ts.SyntaxKind.CaretEqualsToken:
+        this.visitExpressionOperatorBase(sb, token, ts.SyntaxKind.CaretToken, left, right, pushValueOptions);
         break;
-      case SyntaxKind.LessThanLessThanEqualsToken:
-        // Tested
-        this.visitExpressionOperatorBase(sb, token, SyntaxKind.LessThanLessThanToken, left, right, pushValueOptions);
+      case ts.SyntaxKind.LessThanLessThanEqualsToken:
+        this.visitExpressionOperatorBase(sb, token, ts.SyntaxKind.LessThanLessThanToken, left, right, pushValueOptions);
         break;
-      case SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
+      case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken:
         // NOT TESTED
         this.visitExpressionOperatorBase(
           sb,
           token,
-          SyntaxKind.GreaterThanGreaterThanGreaterThanToken,
+          ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken,
           left,
           right,
           pushValueOptions,
         );
         break;
-      case SyntaxKind.GreaterThanGreaterThanEqualsToken:
-        // Tested
+      case ts.SyntaxKind.GreaterThanGreaterThanEqualsToken:
         this.visitExpressionOperatorBase(
           sb,
           token,
-          SyntaxKind.GreaterThanGreaterThanToken,
+          ts.SyntaxKind.GreaterThanGreaterThanToken,
           left,
           right,
           pushValueOptions,
@@ -147,30 +136,37 @@ export class BinaryExpressionCompiler extends NodeCompiler<BinaryExpression> {
         utils.assertNever(kind);
     }
 
-    sb.visit(expr.getLeft(), sb.setValueOptions(options));
+    sb.visit(tsUtils.expression.getLeft(expr), sb.setValueOptions(options));
   }
 
   private visitExpressionOperator(
     sb: ScriptBuilder,
     kind: ExpressionOperatorKind,
-    expr: BinaryExpression,
+    expr: ts.BinaryExpression,
     options: VisitOptions,
   ): void {
-    this.visitExpressionOperatorBase(sb, expr.getOperatorToken(), kind, expr.getLeft(), expr.getRight(), options);
+    this.visitExpressionOperatorBase(
+      sb,
+      tsUtils.expression.getOperatorToken(expr),
+      kind,
+      tsUtils.expression.getLeft(expr),
+      tsUtils.expression.getRight(expr),
+      options,
+    );
   }
 
   private visitLogicalExpressionOperator(
     sb: ScriptBuilder,
     kind: ts.LogicalOperator,
-    expr: BinaryExpression,
+    expr: ts.BinaryExpression,
     options: VisitOptions,
   ): void {
     this.visitLogicalExpressionOperatorBase(
       sb,
-      expr.getOperatorToken(),
+      tsUtils.expression.getOperatorToken(expr),
       kind,
-      expr.getLeft(),
-      expr.getRight(),
+      tsUtils.expression.getLeft(expr),
+      tsUtils.expression.getRight(expr),
       options,
     );
   }
@@ -178,10 +174,10 @@ export class BinaryExpressionCompiler extends NodeCompiler<BinaryExpression> {
   // tslint:disable-next-line cyclomatic-complexity
   private visitExpressionOperatorBase(
     sb: ScriptBuilder,
-    node: Node,
+    node: ts.Node,
     kind: ExpressionOperatorKind,
-    left: Expression,
-    right: Expression,
+    left: ts.Expression,
+    right: ts.Expression,
     options: VisitOptions,
   ): void {
     if (!options.pushValue) {
@@ -210,50 +206,51 @@ export class BinaryExpressionCompiler extends NodeCompiler<BinaryExpression> {
     const leftType = sb.getType(left);
     const rightType = sb.getType(right);
 
-    const isBinaryNumeric = typeUtils.isOnlyNumber(leftType) && typeUtils.isOnlyNumber(rightType);
+    const isBinaryNumeric =
+      leftType !== undefined &&
+      tsUtils.type_.isOnlyNumberish(leftType) &&
+      rightType !== undefined &&
+      tsUtils.type_.isOnlyNumberish(rightType);
 
     switch (kind) {
-      case SyntaxKind.AsteriskToken:
-        // Tested
+      case ts.SyntaxKind.AsteriskToken:
         visitNumeric();
         sb.emitOp(node, 'MUL');
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.SlashToken:
-        // Tested
+      case ts.SyntaxKind.SlashToken:
         visitNumeric();
         sb.emitOp(node, 'DIV');
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.PercentToken:
-        // Tested
+      case ts.SyntaxKind.PercentToken:
         visitNumeric();
         sb.emitOp(node, 'MOD');
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.PlusToken:
-        // Tested: PlusToken:StringConcatenation:StrLeftIntRight
+      case ts.SyntaxKind.PlusToken:
         if (isBinaryNumeric) {
           visitNumeric();
           sb.emitOp(node, 'ADD');
           sb.emitHelper(node, options, sb.helpers.createNumber);
-        } else if (typeUtils.isOnlyString(leftType) && typeUtils.isOnlyString(rightType)) {
-          // Tested: PlusToken:binaryNumeric
+        } else if (
+          leftType !== undefined &&
+          tsUtils.type_.isOnlyStringish(leftType) &&
+          rightType !== undefined &&
+          tsUtils.type_.isOnlyStringish(rightType)
+        ) {
           visit(() => sb.helpers.getString);
           sb.emitOp(node, 'CAT');
           sb.emitHelper(node, options, sb.helpers.createString);
-        } else if (typeUtils.isOnlyString(leftType)) {
-          // SKIPPED: failing test: PlusToken:StringConcatenation:StrLeftIntRight
+        } else if (leftType !== undefined && tsUtils.type_.isOnlyStringish(leftType)) {
           visit(() => sb.helpers.getString, sb.helpers.toString);
           sb.emitOp(node, 'CAT');
           sb.emitHelper(node, options, sb.helpers.createString);
-        } else if (typeUtils.isOnlyString(rightType)) {
-          // SKIPPED: failing test: PlusToken:StringConcatenation:IntLeftStrRight
+        } else if (rightType !== undefined && tsUtils.type_.isOnlyStringish(rightType)) {
           visit(sb.helpers.toString, () => sb.helpers.getString);
           sb.emitOp(node, 'CAT');
           sb.emitHelper(node, options, sb.helpers.createString);
         } else {
-          // NOT TESTED
           // [right, left]
           visit(sb.helpers.toPrimitive);
           // [left, right]
@@ -308,87 +305,72 @@ export class BinaryExpressionCompiler extends NodeCompiler<BinaryExpression> {
           );
         }
         break;
-      case SyntaxKind.MinusToken:
-        // Tested
+      case ts.SyntaxKind.MinusToken:
         visitNumeric();
         sb.emitOp(node, 'SUB');
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.GreaterThanGreaterThanToken:
-        // SKIPPED: failing test
+      case ts.SyntaxKind.GreaterThanGreaterThanToken:
         visitNumeric();
         sb.emitOp(node, 'SHR');
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
-        // SKIPPED: failing test
+      case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
         visitNumeric();
         sb.emitOp(node, 'SHR');
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.LessThanLessThanToken:
-        // SKIPPED: failing test
+      case ts.SyntaxKind.LessThanLessThanToken:
         visitNumeric();
         sb.emitOp(node, 'SHL');
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.LessThanToken:
-        // Tested
+      case ts.SyntaxKind.LessThanToken:
         sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: true, left, right }));
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
-      case SyntaxKind.LessThanEqualsToken:
-        // Tested
+      case ts.SyntaxKind.LessThanEqualsToken:
         sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: false, left: right, right: left }));
         sb.emitOp(node, 'NOT');
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
-      case SyntaxKind.GreaterThanToken:
-        // Tested
+      case ts.SyntaxKind.GreaterThanToken:
         sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: false, left: right, right: left }));
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
-      case SyntaxKind.GreaterThanEqualsToken:
-        // Tested
+      case ts.SyntaxKind.GreaterThanEqualsToken:
         sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: true, left, right }));
         sb.emitOp(node, 'NOT');
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
-      case SyntaxKind.ExclamationEqualsToken:
-        // Tested, but skipping some relating to string ToNumber conversion
+      case ts.SyntaxKind.ExclamationEqualsToken:
         sb.emitHelper(node, options, sb.helpers.equalsEquals({ left, right }));
         sb.emitOp(node, 'NOT');
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
-      case SyntaxKind.EqualsEqualsToken:
-        // Tested, but skipping some relating to string ToNumber conversion
+      case ts.SyntaxKind.EqualsEqualsToken:
         sb.emitHelper(node, options, sb.helpers.equalsEquals({ left, right }));
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
-      case SyntaxKind.AmpersandToken:
-        // Tested
+      case ts.SyntaxKind.AmpersandToken:
         visitNumeric();
         sb.emitOp(node, 'AND');
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.BarToken:
-        // Tested
+      case ts.SyntaxKind.BarToken:
         visitNumeric();
         sb.emitOp(node, 'OR');
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.CaretToken:
-        // Tested
+      case ts.SyntaxKind.CaretToken:
         visitNumeric();
         sb.emitOp(node, 'XOR');
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
-      case SyntaxKind.InKeyword:
-        // SKIPPED Test: Unsupported
+      case ts.SyntaxKind.InKeyword:
         sb.reportUnsupported(node);
         break;
-      case SyntaxKind.InstanceOfKeyword:
-        // Tested
+      case ts.SyntaxKind.InstanceOfKeyword:
         // [left]
         sb.visit(left, options);
         // [right, left]
@@ -398,41 +380,36 @@ export class BinaryExpressionCompiler extends NodeCompiler<BinaryExpression> {
         // [booleanVal]
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
-      case SyntaxKind.CommaToken:
+      case ts.SyntaxKind.CommaToken:
         sb.emitOp(node, 'DROP');
         break;
-      case SyntaxKind.AsteriskAsteriskToken:
-        // SKIPPED Test: Unsupported
+      case ts.SyntaxKind.AsteriskAsteriskToken:
         sb.reportUnsupported(node);
         break;
-      case SyntaxKind.EqualsEqualsEqualsToken:
-        // Tested
+      case ts.SyntaxKind.EqualsEqualsEqualsToken:
         sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ left, right }));
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
-      case SyntaxKind.ExclamationEqualsEqualsToken:
-        // Tested
+      case ts.SyntaxKind.ExclamationEqualsEqualsToken:
         sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ left, right }));
         sb.emitOp(node, 'NOT');
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       default:
-        // NOT TESTED
         utils.assertNever(kind);
     }
   }
 
   private visitLogicalExpressionOperatorBase(
     sb: ScriptBuilder,
-    node: Node,
+    node: ts.Node,
     kind: ts.LogicalOperator,
-    left: Expression,
-    right: Expression,
+    left: ts.Expression,
+    right: ts.Expression,
     options: VisitOptions,
   ): void {
     switch (kind) {
-      case SyntaxKind.AmpersandAmpersandToken: {
-        // Tested
+      case ts.SyntaxKind.AmpersandAmpersandToken: {
         sb.emitHelper(
           node,
           options,
@@ -457,8 +434,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<BinaryExpression> {
         );
         break;
       }
-      case SyntaxKind.BarBarToken: {
-        // Tested
+      case ts.SyntaxKind.BarBarToken: {
         sb.emitHelper(
           node,
           options,
@@ -484,7 +460,6 @@ export class BinaryExpressionCompiler extends NodeCompiler<BinaryExpression> {
         break;
       }
       default:
-        // NOT TESTED
         utils.assertNever(kind);
     }
   }

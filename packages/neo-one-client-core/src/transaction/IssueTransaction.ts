@@ -62,11 +62,12 @@ export class IssueTransaction extends TransactionBase<typeof TransactionType.Iss
     if (this.version > 1) {
       throw new InvalidFormatError();
     }
+    const getScriptHashesForVerifying = super.getScriptHashesForVerifying.bind(this);
     this.issueGetScriptHashesForVerifyingInternal = utils.lazyAsync(
       async (options: TransactionGetScriptHashesForVerifyingOptions) => {
         const { getOutput, getAsset } = options;
         const [hashes, issuerHashes] = await Promise.all([
-          super.getScriptHashesForVerifying(options),
+          getScriptHashesForVerifying(options),
           this.getTransactionResults({ getOutput }).then(async (results) =>
             Promise.all(
               Object.entries(results)

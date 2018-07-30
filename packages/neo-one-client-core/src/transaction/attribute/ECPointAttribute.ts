@@ -30,6 +30,7 @@ export class ECPointAttribute extends AttributeBase<ECPointAttributeUsage, ECPoi
   public readonly size: number;
   public readonly equals: Equals = utils.equals(
     ECPointAttribute,
+    this,
     (other) => this.usage === other.usage && common.ecPointEqual(this.value, other.value),
   );
 

@@ -14,8 +14,8 @@ import LevelDOWN, { LevelDownOpenOptions } from 'leveldown';
 import LevelUp from 'levelup';
 import * as cron from 'node-cron';
 import * as path from 'path';
-import { concat, defer, Observable, Observer, timer } from 'rxjs';
-import { concatMap, distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
+import { concat, defer, EMPTY, Observable, Observer, timer } from 'rxjs';
+import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
 import { getDataPath } from './getDataPath';
 
 interface BackupEnvironment {
@@ -79,16 +79,22 @@ FullNodeOptions): Observable<any> => {
       backupEnv.readyPath === undefined ? path.resolve(environment.dataPath, 'data.ready') : backupEnv.readyPath,
   };
 
-  const restore$ = defer(async () => {
-    const options = await options$.pipe(take(1)).toPromise();
-    if (options.backup !== undefined && options.backup.restore) {
-      await restore({
-        monitor,
-        environment: backupEnvironment,
-        options: options.backup.options,
-      });
-    }
-  });
+  const restore$ = defer(async () => options$.pipe(take(1)).toPromise()).pipe(
+    switchMap((options) => {
+      const backupOptions = options.backup;
+      if (backupOptions !== undefined && backupOptions.restore) {
+        return defer(async () =>
+          restore({
+            monitor,
+            environment: backupEnvironment,
+            options: backupOptions.options,
+          }),
+        );
+      }
+
+      return EMPTY;
+    }),
+  );
 
   const node$ = defer(async () => {
     if (environment.telemetry !== undefined) {
@@ -131,6 +137,7 @@ FullNodeOptions): Observable<any> => {
         await result.storage.close();
       }
     }),
+    distinctUntilChanged((a, b) => a.blockchain === b.blockchain),
     switchMap(({ blockchain }) => {
       const node = new Node({
         monitor,
@@ -144,7 +151,8 @@ FullNodeOptions): Observable<any> => {
 
       return node.start$().pipe(map(() => ({ blockchain, node })));
     }),
-    concatMap(({ node, blockchain }) =>
+    distinctUntilChanged((a, b) => a.blockchain === b.blockchain && a.node === b.node),
+    switchMap(({ node, blockchain }) =>
       rpcServer$({
         monitor,
         blockchain,

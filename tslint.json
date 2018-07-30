@@ -40,6 +40,7 @@
     "no-expression-statement": false,
     "no-parameter-properties": false,
     "prefer-function-over-method": false,
+    "file-name-casing": false,
 
     "trailing-comma": [
       true,
@@ -77,7 +78,7 @@
     "no-submodule-imports": [
       true,
       "rxjs",
-      "ix",
+      "@reactivex/ix-esnext-esm",
       "@reactivex"
     ],
     "strict-boolean-expressions": [

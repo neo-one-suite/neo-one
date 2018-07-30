@@ -30,6 +30,7 @@ export class UInt160Attribute extends AttributeBase<UInt160AttributeUsage, UInt1
   public readonly size: number;
   public readonly equals: Equals = utils.equals(
     UInt160Attribute,
+    this,
     (other) => this.usage === other.usage && common.uInt160Equal(this.value, other.value),
   );
 

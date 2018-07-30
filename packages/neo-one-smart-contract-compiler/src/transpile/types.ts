@@ -1,6 +1,5 @@
 import { ABI, ContractParameterType } from '@neo-one/client';
-import Project, { SourceFile } from 'ts-simple-ast';
-import { Context } from '../Context';
+import { RawSourceMap } from 'source-map';
 
 export interface Contract {
   readonly parameters: ReadonlyArray<ContractParameterType>;
@@ -18,13 +17,12 @@ export interface Contract {
 }
 
 export interface TranspileResult {
-  readonly ast: Project;
-  readonly sourceFile: SourceFile;
+  readonly sourceFiles: {
+    readonly [filePath: string]: {
+      readonly text: string;
+      readonly sourceMap: RawSourceMap;
+    };
+  };
   readonly abi: ABI;
   readonly contract: Contract;
-  readonly context: Context;
-}
-
-export interface VisitOptions {
-  readonly isSmartContract: boolean;
 }

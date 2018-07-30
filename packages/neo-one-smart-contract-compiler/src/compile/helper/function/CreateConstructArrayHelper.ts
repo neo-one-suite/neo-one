@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -21,7 +21,7 @@ export class CreateConstructArrayHelper extends Helper {
     this.withoutScope = withoutScope || false;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, outerOptions: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, outerOptions: VisitOptions): void {
     if (!outerOptions.pushValue) {
       return;
     }

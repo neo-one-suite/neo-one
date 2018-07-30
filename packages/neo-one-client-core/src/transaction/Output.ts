@@ -55,6 +55,7 @@ export class Output implements SerializableWire<Output>, Equatable {
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly equals: Equals = utils.equals(
     Output,
+    this,
     (other) =>
       common.uInt256Equal(this.asset, other.asset) &&
       this.value.eq(other.value) &&

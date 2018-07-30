@@ -3,7 +3,7 @@ import ECKey from '@neo-one/ec-key';
 import { CustomError, utils } from '@neo-one/utils';
 import base58 from 'bs58';
 import xor from 'buffer-xor';
-import * as cryptoLib from 'crypto';
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
 import { ec as EC, KeyPair } from 'elliptic';
 import scrypt from 'scrypt-js';
 import WIF from 'wif';
@@ -11,8 +11,18 @@ import { common, ECPoint, PrivateKey, UInt160, UInt256 } from '../common';
 import { InvalidFormatError, InvalidNumberOfKeysError, TooManyPublicKeysError } from '../errors';
 import { ScriptBuilder } from '../utils';
 import { Witness } from '../Witness';
+import { p256 } from './precomputed';
 
-const ec = new EC('p256') as any;
+// tslint:disable-next-line no-let
+let ecCache: any;
+const ec = () => {
+  if (ecCache === undefined) {
+    // tslint:disable-next-line no-any
+    ecCache = new EC(p256) as any;
+  }
+
+  return ecCache;
+};
 
 export class Base58CheckError extends CustomError {
   public readonly code: string;
@@ -35,20 +45,17 @@ export class InvalidAddressError extends CustomError {
 }
 
 const sha1 = (value: Buffer): Buffer =>
-  cryptoLib
-    .createHash('sha1')
+  createHash('sha1')
     .update(value)
     .digest();
 
 const sha256 = (value: Buffer): Buffer =>
-  cryptoLib
-    .createHash('sha256')
+  createHash('sha256')
     .update(value)
     .digest();
 
 const rmd160 = (value: Buffer): Buffer =>
-  cryptoLib
-    .createHash('rmd160')
+  createHash('rmd160')
     .update(value)
     .digest();
 
@@ -57,7 +64,7 @@ const hash160 = (value: Buffer): UInt160 => common.bufferToUInt160(rmd160(sha256
 const hash256 = (value: Buffer): UInt256 => common.bufferToUInt256(sha256(sha256(value)));
 
 const sign = ({ message, privateKey }: { readonly message: Buffer; readonly privateKey: PrivateKey }): Buffer => {
-  const sig = ec.sign(sha256(message), common.privateKeyToBuffer(privateKey));
+  const sig = ec().sign(sha256(message), common.privateKeyToBuffer(privateKey));
 
   return Buffer.concat([sig.r.toArrayLike(Buffer, 'be', 32), sig.s.toArrayLike(Buffer, 'be', 32)]);
 };
@@ -147,7 +154,12 @@ const verify = ({
 
   const key = new ECKey({
     crv: 'P-256',
-    publicKey: Buffer.from(ec.keyFromPublic(publicKey).getPublic(false, 'hex'), 'hex'),
+    publicKey: Buffer.from(
+      ec()
+        .keyFromPublic(publicKey)
+        .getPublic(false, 'hex'),
+      'hex',
+    ),
   });
 
   return (key.createVerify('SHA256').update(message) as any).verify(signature);
@@ -167,11 +179,14 @@ const toECPointFromKeyPair = (pair: KeyPair): ECPoint =>
   common.bufferToECPoint(Buffer.from(pair.getPublic(true, 'hex'), 'hex'));
 
 const mutablePublicKeyCache: { [K in string]?: ECPoint } = {};
+const addPublicKey = (privateKey: PrivateKey, publicKey: ECPoint) => {
+  mutablePublicKeyCache[common.privateKeyToString(privateKey)] = publicKey;
+};
 const privateKeyToPublicKey = (privateKey: PrivateKey): ECPoint => {
   const privateKeyHex = common.privateKeyToString(privateKey);
   let publicKey = mutablePublicKeyCache[privateKeyHex];
   if (publicKey === undefined) {
-    const key = ec.keyFromPrivate(common.privateKeyToBuffer(privateKey));
+    const key = ec().keyFromPrivate(common.privateKeyToBuffer(privateKey));
     key.getPublic(true, 'hex');
     const { result } = key.validate();
     if (!result) {
@@ -185,7 +200,7 @@ const privateKeyToPublicKey = (privateKey: PrivateKey): ECPoint => {
 };
 
 const createKeyPair = (): { readonly privateKey: PrivateKey; readonly publicKey: ECPoint } => {
-  const key = ec.genKeyPair();
+  const key = ec().genKeyPair();
 
   return {
     privateKey: common.bufferToPrivateKey(key.getPrivate().toArrayLike(Buffer, 'be')),
@@ -193,15 +208,15 @@ const createKeyPair = (): { readonly privateKey: PrivateKey; readonly publicKey:
   };
 };
 
-const createPrivateKey = (): PrivateKey => common.bufferToPrivateKey(cryptoLib.randomBytes(32));
+const createPrivateKey = (): PrivateKey => common.bufferToPrivateKey(randomBytes(32));
 
 const toScriptHash = hash160;
 
 // Takes various formats and converts to standard ECPoint
-const toECPoint = (publicKey: Buffer): ECPoint => toECPointFromKeyPair(ec.keyFromPublic(publicKey));
+const toECPoint = (publicKey: Buffer): ECPoint => toECPointFromKeyPair(ec().keyFromPublic(publicKey));
 
 const isInfinity = (ecPoint: ECPoint): boolean =>
-  ec
+  ec()
     .keyFromPublic(ecPoint)
     .getPublic()
     .isInfinity();
@@ -298,7 +313,7 @@ const compareKeys = (a: KeyPair, b: KeyPair): number => {
 
 const sortKeys = (publicKeys: ReadonlyArray<ECPoint>): ReadonlyArray<ECPoint> =>
   publicKeys
-    .map((publicKey) => ec.keyFromPublic(publicKey))
+    .map((publicKey) => ec().keyFromPublic(publicKey))
     .sort(compareKeys)
     .map(toECPointFromKeyPair);
 
@@ -314,7 +329,7 @@ const createMultiSignatureVerificationScript = (mIn: number, publicKeys: Readonl
 
   const builder = new ScriptBuilder();
   builder.emitPushInt(m);
-  const publicKeysSorted = sortKeys(publicKeys);
+  const publicKeysSorted = publicKeys.length === 1 ? publicKeys : sortKeys(publicKeys);
   publicKeysSorted.forEach((ecPoint) => {
     builder.emitPushECPoint(ecPoint);
   });
@@ -339,7 +354,7 @@ const createMultiSignatureWitness = (
   publicKeyToSignature: { readonly [key: string]: Buffer },
 ): Witness => {
   const m = Math.floor(mIn);
-  const publicKeysSorted = sortKeys(publicKeys);
+  const publicKeysSorted = publicKeys.length === 1 ? publicKeys : sortKeys(publicKeys);
   const signatures = publicKeysSorted
     .map((publicKey) => publicKeyToSignature[common.ecPointToHex(publicKey)])
     .filter(utils.notNull);
@@ -455,7 +470,7 @@ const encryptNEP2 = async ({
   const derived1 = derived.slice(0, 32);
   const derived2 = derived.slice(32, 64);
 
-  const cipher = cryptoLib.createCipheriv(NEP2_CIPHER, derived2, Buffer.alloc(0, 0));
+  const cipher = createCipheriv(NEP2_CIPHER, derived2, Buffer.alloc(0, 0));
 
   cipher.setAutoPadding(false);
   cipher.end(xor(privateKey, derived1));
@@ -511,7 +526,7 @@ const decryptNEP2 = async ({
   const derived1 = derived.slice(0, 32);
   const derived2 = derived.slice(32, 64);
 
-  const decipher = cryptoLib.createDecipheriv(NEP2_CIPHER, derived2, Buffer.alloc(0, 0));
+  const decipher = createDecipheriv(NEP2_CIPHER, derived2, Buffer.alloc(0, 0));
 
   decipher.setAutoPadding(false);
   decipher.end(decoded.slice(7, 7 + 32));
@@ -528,6 +543,7 @@ const decryptNEP2 = async ({
 };
 
 export const crypto = {
+  addPublicKey,
   sha1,
   sha256,
   hash160,

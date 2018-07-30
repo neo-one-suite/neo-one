@@ -911,7 +911,7 @@ describe('NEOONEDataProvider', () => {
 
     // @ts-ignore
     (provider as any).mutableClient.testInvocation = jest.fn(() =>
-      Promise.resolve(createInvocationResultJSON({ state: VMState.Fault, message: '10' })),
+      Promise.resolve({ result: createInvocationResultJSON({ state: VMState.Fault, message: '10' }), actions: [] }),
     );
 
     const result = await provider.call(contract, method, params);

@@ -42,6 +42,10 @@ export class ConsensusQueue implements AsyncIterator<Event> {
   }
 
   public write(value: Event): void {
+    if (value.type === 'handlePersistBlock') {
+      this.clear();
+    }
+
     this.push({ type: 'value', value });
   }
 

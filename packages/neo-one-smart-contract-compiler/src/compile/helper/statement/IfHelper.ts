@@ -1,4 +1,4 @@
-import { Node } from 'ts-simple-ast';
+import ts from 'typescript';
 
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -22,7 +22,7 @@ export class IfHelper extends Helper {
     this.whenFalse = whenFalse;
   }
 
-  public emit(sb: ScriptBuilder, node: Node, _options: VisitOptions): void {
+  public emit(sb: ScriptBuilder, node: ts.Node, _options: VisitOptions): void {
     this.condition();
     const { whenTrue, whenFalse } = this;
     if (whenTrue === undefined) {
