@@ -18,6 +18,7 @@ import ts from 'typescript';
 import { Context, DiagnosticOptions } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { Globals } from '../../symbols';
+import { binding } from '../binding';
 import { declarations } from '../declaration';
 import { decorators } from '../decorator';
 import { expressions } from '../expression';
@@ -38,6 +39,7 @@ const compilers: ReadonlyArray<ReadonlyArray<new () => NodeCompiler>> = [
   expressions,
   files,
   statements,
+  binding,
 ];
 
 type Compilers = { [K in number]?: NodeCompiler };

@@ -10,14 +10,19 @@ export class VariableDeclarationCompiler extends NodeCompiler<ts.VariableDeclara
 
   public visitNode(sb: ScriptBuilder, node: ts.VariableDeclaration, options: VisitOptions): void {
     const nameNode = tsUtils.node.getNameNode(node);
-    if (ts.isArrayBindingPattern(nameNode) || ts.isObjectBindingPattern(nameNode)) {
-      sb.reportUnsupported(node);
-    } else {
-      const name = sb.scope.add(tsUtils.node.getNameOrThrow(node));
-      const expr = tsUtils.initializer.getInitializer(node);
-      if (expr !== undefined) {
-        sb.visit(expr, sb.pushValueOptions(options));
-        sb.scope.set(sb, node, options, name);
+    const expr = tsUtils.initializer.getInitializer(node);
+
+    if (ts.isIdentifier(nameNode)) {
+      sb.scope.add(tsUtils.node.getText(nameNode));
+    }
+
+    if (expr !== undefined) {
+      sb.visit(expr, sb.pushValueOptions(options));
+
+      if (ts.isIdentifier(nameNode)) {
+        sb.scope.set(sb, node, options, tsUtils.node.getText(nameNode));
+      } else {
+        sb.visit(nameNode, options);
       }
     }
   }

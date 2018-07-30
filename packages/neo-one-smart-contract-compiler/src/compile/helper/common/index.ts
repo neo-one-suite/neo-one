@@ -1,6 +1,7 @@
 export * from './ArrFilterHelper';
 export * from './ArrForEachHelper';
 export * from './ArrMapHelper';
+export * from './ArrSliceHelper';
 export * from './CloneArrayHelper';
 export * from './ExtendArrayHelper';
 export * from './ForTypeHelper';

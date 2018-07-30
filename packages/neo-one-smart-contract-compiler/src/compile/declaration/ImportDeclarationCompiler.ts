@@ -24,10 +24,16 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
       // []
       sb.scope.set(sb, node, options, name);
     } else {
+      const getImportName = (namedImport: ts.ImportSpecifier) => {
+        const alias = tsUtils.node.getPropertyNameNode(namedImport);
+
+        return alias === undefined ? tsUtils.node.getName(namedImport) : tsUtils.node.getText(alias);
+      };
+
       const defaultImport = tsUtils.importDeclaration.getDefaultImport(node);
       const namedImports = tsUtils.importDeclaration
         .getNamedImports(node)
-        .filter((namedImport) => sb.hasExport(sourceFile, tsUtils.node.getName(namedImport)));
+        .filter((namedImport) => sb.hasExport(sourceFile, getImportName(namedImport)));
       if (defaultImport !== undefined) {
         if (namedImports.length > 0) {
           // [exports, exports]
@@ -48,18 +54,16 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
 
       if (namedImports.length > 0) {
         namedImports.forEach((namedImport) => {
+          const importName = getImportName(namedImport);
+
           // [exports, exports]
           sb.emitOp(node, 'DUP');
           // [name, exports, exports]
-          sb.emitPushString(node, tsUtils.node.getName(namedImport));
+          sb.emitPushString(node, importName);
           // [val, exports]
           sb.emitOp(node, 'PICKITEM');
 
-          let name = tsUtils.node.getName(namedImport);
-          const alias = tsUtils.importExport.getAliasName(namedImport);
-          if (alias !== undefined) {
-            name = alias;
-          }
+          const name = tsUtils.node.getName(namedImport);
           sb.scope.add(name);
 
           // [exports]

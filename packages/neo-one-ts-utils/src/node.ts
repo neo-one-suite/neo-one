@@ -18,10 +18,7 @@ export function getNameNode(node: PropertyNameableNode): ts.PropertyName | undef
 export function getNameNode(node: BindingNameableNode): ts.BindingName | undefined;
 export function getNameNode(node: AnyNameableNode): ts.Identifier | ts.PropertyName | ts.BindingName | undefined;
 export function getNameNode(node: any): ts.Identifier | ts.PropertyName | ts.BindingName | undefined {
-  const propertyName = utils.getValueOrUndefined(node.propertyName);
-  const name = utils.getValueOrUndefined(node.name);
-
-  return propertyName === undefined ? name : propertyName;
+  return utils.getValueOrUndefined(node.name);
 }
 
 export function getNameNodeOrThrow(node: NameableNode | NamedNode): ts.Identifier;
@@ -50,6 +47,22 @@ export function getNameOrThrow(
 ): string {
   // tslint:disable-next-line no-any
   return utils.throwIfNullOrUndefined(getName(node as any), 'name');
+}
+
+type PropertyNameNameableNode = ts.Node & { readonly propertyName?: ts.PropertyName };
+
+export function getPropertyNameNode(node: PropertyNameNameableNode): ts.PropertyName | undefined {
+  return utils.getValueOrUndefined(node.propertyName);
+}
+
+type DotDotDotTokenNode = ts.Node & { readonly dotDotDotToken?: ts.DotDotDotToken };
+
+export function getDotDotDotToken(node: DotDotDotTokenNode): ts.DotDotDotToken | undefined {
+  return utils.getValueOrUndefined(node.dotDotDotToken);
+}
+
+export function getText(node: ts.Node): string {
+  return node.getText();
 }
 
 export function getParentSyntaxList(node: ts.Node) {

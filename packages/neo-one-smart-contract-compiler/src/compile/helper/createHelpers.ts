@@ -28,6 +28,8 @@ import {
   ArrForEachHelperOptions,
   ArrMapHelper,
   ArrMapHelperOptions,
+  ArrSliceHelper,
+  ArrSliceHelperOptions,
   CloneArrayHelper,
   ExtendArrayHelper,
   ForTypeHelper,
@@ -159,6 +161,9 @@ import {
   IsSymbolHelper,
   IsUndefinedHelper,
   PackObjectHelper,
+  PickObjectPropertiesHelper,
+  PickPropertyObjectPropertiesHelper,
+  PickSymbolObjectPropertiesHelper,
   SetAccessorPropertyObjectPropertyHelper,
   SetAccessorSymbolObjectPropertyHelper,
   SetDataPropertyObjectPropertyHelper,
@@ -183,6 +188,7 @@ export interface Helpers {
   readonly arrFilter: (options: ArrFilterHelperOptions) => ArrFilterHelper;
   readonly arrMap: (options: ArrMapHelperOptions) => ArrMapHelper;
   readonly arrForEach: (options: ArrForEachHelperOptions) => ArrForEachHelper;
+  readonly arrSlice: (options?: ArrSliceHelperOptions) => ArrSliceHelper;
   readonly cloneArray: CloneArrayHelper;
   readonly extendArray: ExtendArrayHelper;
   readonly forType: (options: ForTypeHelperOptions) => ForTypeHelper;
@@ -273,6 +279,9 @@ export interface Helpers {
   readonly elementAccess: ElementAccessHelper;
   readonly unwrapType: UnwrapTypeHelper;
   readonly packObject: PackObjectHelper;
+  readonly pickObjectProperties: PickObjectPropertiesHelper;
+  readonly pickPropertyObjectProperties: PickPropertyObjectPropertiesHelper;
+  readonly pickSymbolObjectProperties: PickSymbolObjectPropertiesHelper;
   readonly unwrapVal: UnwrapValHelper;
   readonly instanceof: InstanceofHelper;
   readonly createPropertyObject: CreatePropertyObjectHelper;
@@ -347,6 +356,7 @@ export const createHelpers = (): Helpers => {
     arrFilter: (options) => new ArrFilterHelper(options),
     arrMap: (options) => new ArrMapHelper(options),
     arrForEach: (options) => new ArrForEachHelper(options),
+    arrSlice: (options = {}) => new ArrSliceHelper(options),
     cloneArray: new CloneArrayHelper(),
     extendArray: new ExtendArrayHelper(),
     forType: (options) => new ForTypeHelper(options),
@@ -431,6 +441,9 @@ export const createHelpers = (): Helpers => {
     shallowCloneObject: new ShallowCloneObjectHelper(),
     shallowCloneObj: new ShallowCloneObjHelper(),
     packObject: new PackObjectHelper(),
+    pickObjectProperties: new PickObjectPropertiesHelper(),
+    pickPropertyObjectProperties: new PickPropertyObjectPropertiesHelper(),
+    pickSymbolObjectProperties: new PickSymbolObjectPropertiesHelper(),
     elementAccess: new ElementAccessHelper(),
     unwrapType: new UnwrapTypeHelper(),
     unwrapVal: new UnwrapValHelper(),

@@ -4,9 +4,7 @@ import * as symbol from './symbol';
 import * as utils from './utils';
 
 export function getAliasNode(node: ts.ImportSpecifier | ts.ExportSpecifier): ts.Identifier | undefined {
-  const propertyName = utils.getValueOrUndefined(node.propertyName);
-
-  return propertyName === undefined ? undefined : utils.getValueOrUndefined(node.name);
+  return utils.getValueOrUndefined(node.propertyName);
 }
 
 export function getAliasName(node: ts.ImportSpecifier | ts.ExportSpecifier): string | undefined {
