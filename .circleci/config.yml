@@ -58,7 +58,7 @@ aliases:
           path: reports
     parallelism: 2
 
-  - &e2e
+  - &build-e2e
     working_directory: ~/neo-one
     steps:
       - checkout
@@ -68,6 +68,18 @@ aliases:
       - run:
           name: Build
           command: yarn build:e2e
+      - persist_to_workspace:
+          root: ~/neo-one
+          paths:
+            - dist
+            - node_modules
+
+  - &e2e
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
       - run:
           name: E2E
           command: yarn e2e-ci $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
@@ -88,6 +100,10 @@ jobs:
   e2e10:
     <<: *node10
     <<: *e2e
+
+  build-e2e10:
+    <<: *node10
+    <<: *build-e2e
 
   lint:
     <<: *node10
@@ -122,9 +138,13 @@ workflows:
           filters: *filter-only-master
   test:
     jobs:
+      - build-e2e10:
+          filters: *filter-ignore-gh-pages
       - test10:
           filters: *filter-ignore-gh-pages
-      - e2e10:
-          filters: *filter-ignore-gh-pages
       - lint:
+          filters: *filter-ignore-gh-pages
+      - e2e10:
+          requires:
+            - build-e2e10
           filters: *filter-ignore-gh-pages
