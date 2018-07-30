@@ -149,7 +149,24 @@ describe('CallExpressionCompiler', () => {
       }
 
       const foo = new Foo();
+
       if (foo.addAll(1, 2, 3) !== 6) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('method call - element access', async () => {
+    await helpers.executeString(`
+      class Foo {
+        public addAll(x: number, y: number, z: number): number {
+          return x + y + z;
+        }
+      }
+
+      const foo = new Foo();
+
+      if (foo['addAll'](1, 2, 3) !== 6) {
         throw 'Failure';
       }
     `);
