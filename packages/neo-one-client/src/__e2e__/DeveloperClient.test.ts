@@ -1,17 +1,13 @@
-import { common } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
-import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import {
   Client,
   DeveloperClient,
   wifToPrivateKey,
   NEOONEProvider,
-  TransactionReceipt,
   LocalKeyStore,
   LocalMemoryStore,
   LocalUserAccountProvider,
-  TransactionResult,
   UserAccountID,
 } from '@neo-one/client';
 
@@ -113,37 +109,6 @@ async function setupClients(networkName: string): Promise<SetupClientsReturn> {
   };
 }
 
-async function setupTransaction({
-  client,
-  master,
-  wallet,
-}: {
-  readonly client: Client;
-  readonly master: WalletInfo;
-  readonly wallet: WalletInfo;
-}): Promise<TransactionResult<TransactionReceipt>> {
-  return client.transfer(new BigNumber(1000), common.NEO_ASSET_HASH, wallet.accountID.address, {
-    from: master.accountID,
-  });
-}
-
-async function checkWalletBalance({
-  walletName,
-  networkName,
-}: {
-  readonly walletName: string;
-  readonly networkName: string;
-}): Promise<void> {
-  const walletOutput = await one.execute(`describe wallet ${walletName} --network ${networkName} --json`);
-
-  const wallet = one.parseJSON(walletOutput);
-  expect(wallet.balance[0].amount).toEqual('1000');
-}
-
-async function confirmTransaction(transaction: TransactionResult<TransactionReceipt>): Promise<void> {
-  await transaction.confirmed({ timeoutMS: 2000 });
-}
-
 async function getBlockTimes({
   client,
   networkName,
@@ -159,38 +124,6 @@ async function getBlockTimes({
 }
 
 describe('DeveloperClient', () => {
-  test('runConsensusNow', async () => {
-    const networkName = 'e2e-1';
-    const walletName = 'wallet-1';
-
-    const { developerClient, client, keystore, master } = await setupClients(networkName);
-
-    const wallet = await addWallet({ walletName, keystore, networkName });
-
-    const transaction = await setupTransaction({ client, master, wallet });
-
-    await Promise.all([confirmTransaction(transaction), developerClient.runConsensusNow()]);
-
-    await checkWalletBalance({ walletName, networkName });
-  });
-
-  test('updateSettings', async () => {
-    const networkName = 'e2e-2';
-    const walletName = 'wallet-2';
-
-    const { developerClient, client, keystore, master } = await setupClients(networkName);
-
-    const wallet = await addWallet({ walletName, keystore, networkName });
-
-    await developerClient.updateSettings({ secondsPerBlock: 1 });
-    await developerClient.reset();
-
-    const transaction = await setupTransaction({ client, master, wallet });
-    await confirmTransaction(transaction);
-
-    await checkWalletBalance({ walletName, networkName });
-  });
-
   test('fastForwardOffset', async () => {
     const networkName = 'e2e-3';
     const secondsPerBlock = 1;
