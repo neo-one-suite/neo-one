@@ -6,7 +6,7 @@ import { VisitOptions } from '../types';
 export class NotEmittedStatementCompiler extends NodeCompiler<ts.NotEmittedStatement> {
   public readonly kind = ts.SyntaxKind.NotEmittedStatement;
 
-  public visitNode(sb: ScriptBuilder, node: ts.NotEmittedStatement, _options: VisitOptions): void {
-    sb.reportUnsupported(node);
+  public visitNode(_sb: ScriptBuilder, _node: ts.NotEmittedStatement, _options: VisitOptions): void {
+    // Do nothing
   }
 }
