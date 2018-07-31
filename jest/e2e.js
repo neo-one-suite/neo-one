@@ -16,5 +16,4 @@ module.exports = {
     '<rootDir>/dist/neo-one[a-z0-9-]+/package.json',
     '<rootDir>/dist/neo-one[a-z0-9-]+/packages/package.json',
   ],
-  coverageReporters: ['json'],
 };

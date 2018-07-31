@@ -3,7 +3,13 @@ const base = require('./base');
 module.exports = {
   ...base({
     babel: {
-      plugins: ['babel-plugin-jest-hoist'],
+      plugins: [
+        'babel-plugin-dynamic-import-node',
+        '@babel/plugin-syntax-dynamic-import',
+        '@babel/plugin-syntax-optional-catch-binding',
+        '@babel/plugin-syntax-numeric-separator',
+        'babel-plugin-jest-hoist',
+      ],
     },
     path: 'test',
   }),
@@ -14,4 +20,11 @@ module.exports = {
   },
   modulePathIgnorePatterns: ['<rootDir>/dist/.*'],
   coverageReporters: ['json'],
+  collectCoverageFrom: [
+    'packages/*/src/**/*.ts',
+    '!packages/*/src/**/*.d.ts',
+    '!packages/*/src/__tests__/*.ts',
+    '!packages/*/src/__e2e__/*.ts',
+    '!packages/*/src/__data__/*.ts',
+  ],
 };
