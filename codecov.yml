@@ -1,2 +1,13 @@
+codecov:
+  ci:
+    - !appveyor
+
+ignore:
+  - "jest"
+  - "scripts/e2e"
+
 fixes:
   - "dist/neo-one::"
+
+comment:
+  layout: "reach, diff, flags, files"

@@ -60,7 +60,7 @@ aliases:
           command: yarn test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
       - run:
           name: Upload Unit Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json
+          command: yarn run codecov -f coverage/coverage-final.json -F unit
           when: always
       - store_test_results:
           path: reports
@@ -93,7 +93,7 @@ aliases:
           command: yarn nyc --reporter json yarn e2e-ci $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
       - run:
           name: Upload E2E Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json
+          command: yarn run codecov -f coverage/coverage-final.json -F e2e
           when: always
       - store_test_results:
           path: reports
