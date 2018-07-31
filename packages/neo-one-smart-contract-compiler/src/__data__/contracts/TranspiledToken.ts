@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 // tslint:disable readonly-array no-object-mutation prefer-switch
 import { Address, Fixed, MapStorage, SmartContract, verifySender } from './transpiledLib';
 

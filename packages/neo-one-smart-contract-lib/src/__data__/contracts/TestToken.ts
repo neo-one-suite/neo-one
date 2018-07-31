@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 import { Address, createEventHandler, Fixed, verifySender } from '@neo-one/smart-contract';
 // tslint:disable-next-line no-implicit-dependencies
 import { Token } from '@neo-one/smart-contract-lib';

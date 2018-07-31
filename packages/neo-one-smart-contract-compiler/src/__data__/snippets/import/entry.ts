@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 /* tslint:disable no-string-throw */
 import * as bar from './bar';
 import baz from './baz';

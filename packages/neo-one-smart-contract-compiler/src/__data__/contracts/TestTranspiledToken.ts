@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 // tslint:disable prefer-switch
 import { Address, verifySender } from './transpiledLib';
 import { Token } from './TranspiledToken';

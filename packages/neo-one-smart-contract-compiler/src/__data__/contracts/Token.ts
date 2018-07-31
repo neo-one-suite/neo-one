@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 // tslint:disable readonly-keyword readonly-array no-object-mutation prefer-switch
 class Token {
   public readonly name: string = 'TestToken';

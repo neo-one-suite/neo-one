@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 export {
   Address,
   Hash256,

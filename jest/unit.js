@@ -27,4 +27,12 @@ module.exports = {
     '!packages/*/src/__e2e__/*.ts',
     '!packages/*/src/__data__/*.ts',
   ],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/packages/.*/src/__data__/contracts/.*',
+    '<rootDir>/packages/.*/src/__data__/snippets/.*',
+    '<rootDir>/packages/neo-one-smart-contract-compiler/src/scripts/generateTypes.ts',
+    '<rootDir>/packages/neo-one-smart-contract-lib/src/.*',
+    '<rootDir>/packages/neo-one-smart-contract/src/.*',
+  ],
 };

@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 // tslint:disable readonly-array no-object-mutation no-unused
 export type Address = Buffer;
 export type Hash256 = Buffer;
