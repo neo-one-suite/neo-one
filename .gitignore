@@ -9,6 +9,7 @@
 /packages/*/dist-ts
 .rpt2_cache
 /reports
+.nyc_output
 
 # Logs
 logs

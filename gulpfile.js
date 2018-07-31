@@ -91,7 +91,7 @@ const pkgNames = pkgJSONs.map(([_p, pkgJSON]) => pkgJSON.name);
 const pkgNamesSet = new Set(pkgNames);
 
 const globs = {
-  src: [
+  originalSrc: [
     'packages/*/src/**/*.ts',
     'packages/*/proto/**/*.proto',
     '!packages/*/src/**/*.test.ts',
@@ -99,6 +99,15 @@ const globs = {
     '!packages/*/src/__tests__/**/*',
     '!packages/*/src/__e2e__/**/*',
     '!packages/*/src/bin/**/*',
+  ],
+  src: (format) => [
+    `${getDistBase(format)}/packages/*/src/**/*.ts`,
+    `${getDistBase(format)}/packages/*/proto/**/*.proto`,
+    `!${getDistBase(format)}/packages/*/src/**/*.test.ts`,
+    `!${getDistBase(format)}/packages/*/src/__data__/**/*`,
+    `!${getDistBase(format)}/packages/*/src/__tests__/**/*`,
+    `!${getDistBase(format)}/packages/*/src/__e2e__/**/*`,
+    `!${getDistBase(format)}/packages/*/src/bin/**/*`,
   ],
   bin: ['packages/*/src/bin/*.ts'],
   pkg: ['packages/*/package.json'],
@@ -240,7 +249,7 @@ const gulpReplaceModule = (format, stream, quote = "'") =>
     .reduce((streamIn, [moduleName, replaceName]) => streamIn.pipe(gulpReplace(moduleName, replaceName)), stream);
 const copyTypescript = ((cache) =>
   memoizeTask(cache, function copyTypescript(format, _done, type) {
-    return gulpReplaceModule(format, addFast(format, gulp.src(globs.src), type === 'fast')).pipe(
+    return gulpReplaceModule(format, addFast(format, gulp.src(globs.originalSrc), type === 'fast')).pipe(
       gulp.dest(getDest(format)),
     );
   }))({});
@@ -250,8 +259,12 @@ const compileTypescript = ((cache) =>
   memoizeTask(cache, function compileTypescript(format, _done, type) {
     return gulpReplaceModule(
       format,
-      addFast(format, gulp.src(globs.src), type === 'fast')
-        .pipe(gulpFilter(['**', '!**/*.proto'].concat(smartContractPkgs.map((p) => `!packages/${p}/**/*`))))
+      addFast(format, gulp.src(globs.src(format)), type === 'fast')
+        .pipe(
+          gulpFilter(
+            ['**', '!**/*.proto'].concat(smartContractPkgs.map((p) => `!${getDistBase(format)}/packages/${p}/**/*`)),
+          ),
+        )
         .pipe(gulpSourcemaps.init())
         .pipe(
           gulpBabel({
@@ -297,11 +310,11 @@ const compileTypescript = ((cache) =>
   }))({});
 const buildTypescript = ((cache) =>
   memoizeTask(cache, function buildTypescript(format, done, type) {
-    return gulp.parallel(copyTypescript(format, type), compileTypescript(format, type))(done);
+    return gulp.series(copyTypescript(format, type), compileTypescript(format, type))(done);
   }))({});
 
 const buildAll = ((cache) =>
-  memoizeTask(cache, function buildAll(format, done) {
+  memoizeTask(cache, function buildAll(format, done, type) {
     return gulp.parallel(
       ...[
         copyPkg(format),
@@ -309,7 +322,7 @@ const buildAll = ((cache) =>
         copyMetadata(format),
         copyFiles(format),
         copyRootPkg(format),
-        buildTypescript(format),
+        buildTypescript(format, type),
         format === MAIN_FORMAT ? 'buildBin' : undefined,
         format === MAIN_FORMAT ? 'createBin' : undefined,
         format === MAIN_FORMAT ? 'copyBin' : undefined,
@@ -408,7 +421,7 @@ gulp.task(
   'watch',
   gulp.series(buildE2ESeries('fast'), function startWatch() {
     noCache = true;
-    gulp.watch(globs.src, buildTypescript(MAIN_FORMAT, 'fast'));
+    gulp.watch(globs.src(MAIN_FORMAT), buildTypescript(MAIN_FORMAT, 'fast'));
     gulp.watch(globs.bin, gulp.series('buildBin'));
   }),
 );

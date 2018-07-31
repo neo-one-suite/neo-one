@@ -1,6 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-const NodeEnvironment = require('jest-environment-node');
-
 const _ = require('lodash');
 const appRootDir = require('app-root-dir');
 const execa = require('execa');
@@ -64,7 +61,7 @@ class One {
     };
     this.server.stdout.on('data', listener);
 
-    let tries = 6;
+    let tries = 12;
     let ready = false;
     while (!ready && tries >= 0) {
       await new Promise((resolve) => setTimeout(() => resolve(), 500));

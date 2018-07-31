@@ -54,7 +54,6 @@
     "test-ci": "jest --config jest/unit-ci.js --ci -w 1",
     "e2e": "jest --config jest/e2e.js",
     "e2e-ci": "jest --config jest/e2e-ci.js --ci -w 1",
-    "report-coverage": "yarn run nyc report --report=json && yarn run codecov -f coverage/*.json",
     "tsc": "tsc",
     "ts-node": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" TS_NODE_PROJECT=tsconfig/tsconfig.es2018.cjs.json node -r ts-node/register/transpile-only",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.ts\"",
@@ -84,13 +83,6 @@
       "post-merge": "yarn run ts-node ./scripts/hooks/post-merge.ts",
       "post-rewrite": "yarn run ts-node ./scripts/hooks/post-rewrite.ts"
     }
-  },
-  "nyc": {
-    "reporter": [
-      "lcov",
-      "text"
-    ],
-    "tempDirectory": "./coverage"
   },
   "devDependencies": {
     "@babel/core": "7.0.0-beta.55",
