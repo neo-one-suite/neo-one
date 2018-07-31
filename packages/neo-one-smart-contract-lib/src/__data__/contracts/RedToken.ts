@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { Address, Fixed } from '@neo-one/smart-contract';
 import { SimpleToken } from './SimpleToken';
 

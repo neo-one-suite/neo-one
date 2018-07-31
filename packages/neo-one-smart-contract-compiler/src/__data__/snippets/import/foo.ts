@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 export type Address = string;
 export const foo = 'foo';
 

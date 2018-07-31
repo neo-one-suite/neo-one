@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 // tslint:disable readonly-keyword readonly-array no-object-mutation strict-boolean-expressions
 import { Address, constant, Fixed, MapStorage, SmartContract, verifySender } from '@neo-one/smart-contract';
 

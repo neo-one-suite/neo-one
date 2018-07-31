@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 let val = 0;
 
 const x = 3;

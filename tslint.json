@@ -124,7 +124,7 @@
     "no-increment-decrement": true,
     "no-invalid-regexp": true,
     "no-regex-spaces": true,
-    "no-single-line-block-comment": true,
+    "no-single-line-block-comment": false,
     "no-suspicious-comment": true,
     "no-unnecessary-field-initialization": true,
     "possible-timing-attack": true,

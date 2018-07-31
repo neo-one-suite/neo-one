@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { SmartContract, Address } from '@neo-one/smart-contract';
 
 export class SourceMapContract extends SmartContract {

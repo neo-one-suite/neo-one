@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { Address, createEventHandler, Fixed, Integer } from '@neo-one/smart-contract';
 
 import { ICO } from '../../ICO';

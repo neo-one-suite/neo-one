@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 // tslint:disable no-import-side-effect
 import * as appRootDir from 'app-root-dir';
 import * as fs from 'fs-extra';
