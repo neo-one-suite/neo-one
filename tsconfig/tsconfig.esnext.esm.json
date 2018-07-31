@@ -1,6 +1,14 @@
 {
   "extends": "./tsconfig.esm.json",
   "compilerOptions": {
-    "target": "esnext"
+    "target": "esnext",
+    "paths": {
+      "@neo-one/*-esnext-esm": [
+        "./neo-one-*/src"
+      ],
+      "*": [
+        "../@types/*"
+      ]
+    }
   }
 }
