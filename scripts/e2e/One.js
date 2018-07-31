@@ -56,15 +56,27 @@ class One {
     this.server = execa(cmd, args, this._getEnv());
 
     let stdout = '';
-    const listener = (res) => {
+    const stdoutListener = (res) => {
       stdout += res;
     };
-    this.server.stdout.on('data', listener);
+    this.server.stdout.on('data', stdoutListener);
 
-    let tries = 12;
+    let stderr = '';
+    const stderrListener = (res) => {
+      stderr += res;
+    };
+    this.server.stderr.on('data', stderrListener);
+
+    let exited = false;
+    const exitListener = () => {
+      exited = true;
+    };
+    this.server.on('exit', exitListener);
+
+    let tries = 60;
     let ready = false;
-    while (!ready && tries >= 0) {
-      await new Promise((resolve) => setTimeout(() => resolve(), 500));
+    while (!ready && !exited && tries >= 0) {
+      await new Promise((resolve) => setTimeout(() => resolve(), 1000));
       const result = await this._exec('check server --static-neo-one');
       try {
         const lines = result.split('\n').filter((line) => line !== '');
@@ -75,11 +87,13 @@ class One {
       tries -= 1;
     }
 
-    this.server.stdout.removeListener('data', listener);
+    this.server.stdout.removeListener('data', stdoutListener);
+    this.server.stdout.removeListener('data', stderrListener);
+    this.server.removeListener('exit', exitListener);
 
     if (!ready) {
       await this.teardown();
-      throw new Error(`Failed to start NEO-ONE server: ${stdout}`);
+      throw new Error(`Failed to start NEO-ONE server.\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}`);
     }
   }
 
