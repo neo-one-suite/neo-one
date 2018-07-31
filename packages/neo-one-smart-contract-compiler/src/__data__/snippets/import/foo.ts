@@ -6,3 +6,5 @@ export abstract class SmartContract {
     return 'foo';
   }
 }
+
+export default class FooSmartContract extends SmartContract {}

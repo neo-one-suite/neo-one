@@ -304,7 +304,8 @@ const compileTypescript = ((cache) =>
         )
         .pipe(type === 'fast' ? format.fastProject() : format.project())
         .pipe(gulpSourcemaps.mapSources(mapSources))
-        .pipe(gulpSourcemaps.write()),
+        .pipe(gulpSourcemaps.write())
+        .pipe(gulpReplace('rxjs/internal', `rxjs/${format.module === 'esm' ? '_esm2015/' : ''}internal`)),
       format.module === 'esm' ? "'" : '"',
     ).pipe(gulp.dest(getDest(format)));
   }))({});

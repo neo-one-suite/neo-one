@@ -2,7 +2,7 @@
 import * as bar from './bar';
 import baz from './baz';
 import { foo } from './foo';
-import { Address, foo as foo2, SmartContract } from './foo2';
+import { Address, foo as foo2, SmartContract, Foo2SmartContract } from './foo2';
 
 if (foo !== 'foo') {
   throw 'Failure';
@@ -34,5 +34,11 @@ class Qux extends SmartContract {}
 const qux = new Qux();
 
 if (qux.foo !== 'foo') {
+  throw 'Failure';
+}
+
+const fooSC = new Foo2SmartContract();
+
+if (fooSC.foo !== 'foo') {
   throw 'Failure';
 }

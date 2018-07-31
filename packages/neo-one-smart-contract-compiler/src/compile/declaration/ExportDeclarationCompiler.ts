@@ -20,6 +20,8 @@ export class ExportDeclarationCompiler extends NodeCompiler<ts.ExportDeclaration
       return name;
     };
 
+    const getExportName = (namedExport: ts.ExportSpecifier) => tsUtils.node.getName(namedExport);
+
     const moduleSpecifier = tsUtils.importExport.getModuleSpecifierSourceFile(sb.typeChecker, node);
 
     // [exports]
@@ -32,20 +34,28 @@ export class ExportDeclarationCompiler extends NodeCompiler<ts.ExportDeclaration
             .getLocalTargetDeclarations(sb.typeChecker, namedExport)
             .some((decl) => !tsUtils.declaration.isAmbient(decl)),
         )
+        .filter((namedExport) => {
+          const symbol = sb.getSymbol(namedExport);
+
+          return (
+            symbol !== undefined &&
+            tsUtils.symbol.getDeclarations(symbol).some((decl) => !tsUtils.declaration.isAmbient(decl))
+          );
+        })
         .forEach((namedExport) => {
           // [exports, exports]
           sb.emitOp(node, 'DUP');
           // [val, exports, exports]
-          sb.scope.get(sb, node, options, tsUtils.node.getName(namedExport));
+          sb.scope.get(sb, node, options, getName(namedExport));
           // [exports]
-          sb.emitHelper(node, options, sb.helpers.export({ name: getName(namedExport) }));
+          sb.emitHelper(node, options, sb.helpers.export({ name: getExportName(namedExport) }));
         });
     } else {
       // [moduleExports, exports]
       sb.loadModule(moduleSpecifier);
       tsUtils.exportDeclaration
         .getNamedExports(node)
-        .filter((namedExport) => sb.hasExport(moduleSpecifier, tsUtils.node.getName(namedExport)))
+        .filter((namedExport) => sb.hasExport(moduleSpecifier, getName(namedExport)))
         .forEach((namedExport) => {
           // [exports, moduleExports]
           sb.emitOp(node, 'SWAP');
@@ -54,11 +64,11 @@ export class ExportDeclarationCompiler extends NodeCompiler<ts.ExportDeclaration
           // [moduleExports, exports, moduleExports, exports]
           sb.emitOp(node, 'OVER');
           // [name, moduleExports, exports, moduleExports, exports]
-          sb.emitPushString(node, tsUtils.node.getName(namedExport));
+          sb.emitPushString(node, getName(namedExport));
           // [val, exports, moduleExports, exports]
           sb.emitOp(node, 'PICKITEM');
           // [moduleExports, exports]
-          sb.emitHelper(node, options, sb.helpers.export({ name: getName(namedExport) }));
+          sb.emitHelper(node, options, sb.helpers.export({ name: getExportName(namedExport) }));
         });
       // [exports]
       sb.emitOp(node, 'DROP');
