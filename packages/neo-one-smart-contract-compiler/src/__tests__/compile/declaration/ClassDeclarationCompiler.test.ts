@@ -294,6 +294,24 @@ describe('ClassDeclarationCompiler', () => {
     `);
   });
 
+  test('decorators', async () => {
+    await helpers.compileString(
+      `
+      function verify(target: any, propertyKey: string, descriptor: PropertyDescriptor): void {
+        throw new Error('This should be transpiled.');
+      }
+
+      class Foo {
+        @verify
+        public bar(): number {
+          return 10;
+        }
+      }
+    `,
+      { type: 'error' },
+    );
+  });
+
   test('realistic class inheritance', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`

@@ -9,6 +9,7 @@ export * from './CreateConstructArrayHelper';
 export * from './CreateFunctionArrayHelper';
 export * from './CreateFunctionObjectHelper';
 export * from './FunctionHelper';
+export * from './FunctionLikeHelper';
 export * from './InternalFunctionProperties';
 export * from './InvokeCallHelper';
 export * from './InvokeConstructHelper';

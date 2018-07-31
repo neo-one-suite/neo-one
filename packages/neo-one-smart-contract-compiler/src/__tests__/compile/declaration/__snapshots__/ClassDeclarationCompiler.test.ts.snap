@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ClassDeclarationCompiler decorators 1`] = `
+"snippetCode.ts (7,9): Unsupported syntax
+
+       5 | 
+       6 |       class Foo {
+    >  7 |         @verify
+         |         ^
+       8 |         public bar(): number {
+       9 |           return 10;
+      10 |         }
+"
+`;

@@ -97,4 +97,62 @@ describe('FunctionDeclarationCompiler', () => {
       }
     `);
   });
+
+  test('bind parameters', async () => {
+    await helpers.executeString(`
+      function foo({ x = 5 }: { readonly x?: number } = { x: 10 }): number {
+        return x;
+      }
+
+      if (foo() !== 10) {
+        throw 'Failure';
+      }
+
+      if (foo({}) !== 5) {
+        throw 'Failure';
+      }
+
+      if (foo({ x: 1 }) !== 1) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('rest parameter', async () => {
+    await helpers.executeString(`
+      function foo(x: number, ...y: number[]): number[] {
+        return y;
+      }
+
+      const [a, b, c] = foo(1, 2, 3, 4);
+
+      if (a !== 2) {
+        throw 'Failure';
+      }
+
+      if (b !== 3) {
+        throw 'Failure';
+      }
+
+      if (c !== 4) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('optional parameter', async () => {
+    await helpers.executeString(`
+      function foo(x?: number): number {
+        return x === undefined ? 10 : x;
+      }
+
+      if (foo() !== 10) {
+        throw 'Failure';
+      }
+
+      if (foo(1) !== 1) {
+        throw 'Failure';
+      }
+    `);
+  });
 });

@@ -67,6 +67,7 @@ import {
   CreateFunctionObjectHelperOptions,
   FunctionHelper,
   FunctionHelperOptions,
+  FunctionLikeHelper,
   InvokeCallHelper,
   InvokeCallHelperOptions,
   InvokeConstructHelper,
@@ -214,6 +215,7 @@ export interface Helpers {
   readonly createFunctionArray: (options: CreateFunctionArrayHelperOptions) => CreateFunctionArrayHelper;
   readonly createFunctionObject: (options: CreateFunctionObjectHelperOptions) => CreateFunctionObjectHelper;
   readonly function: (options: FunctionHelperOptions) => FunctionHelper;
+  readonly functionLike: FunctionLikeHelper;
   readonly invokeCall: (options?: InvokeCallHelperOptions) => InvokeCallHelper;
   readonly invokeConstruct: (options?: InvokeConstructHelperOptions) => InvokeConstructHelper;
   readonly new: (options?: NewHelperOptions) => NewHelper;
@@ -382,6 +384,7 @@ export const createHelpers = (): Helpers => {
     createFunctionArray: (options) => new CreateFunctionArrayHelper(options),
     createFunctionObject: (options) => new CreateFunctionObjectHelper(options),
     function: (options) => new FunctionHelper(options),
+    functionLike: new FunctionLikeHelper(),
     invokeCall: memoized(InvokeCallHelper),
     invokeConstruct: (options?) => new InvokeConstructHelper(options),
     new: (options?) => new NewHelper(options),

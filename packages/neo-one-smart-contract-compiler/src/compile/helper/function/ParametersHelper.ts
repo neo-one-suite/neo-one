@@ -1,4 +1,5 @@
 import { ParameteredNode, tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -8,21 +9,20 @@ import { Helper } from '../Helper';
 export class ParametersHelper extends Helper<ParameteredNode> {
   public emit(sb: ScriptBuilder, node: ParameteredNode, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
-    // [argsarr]
-    tsUtils.parametered.getParameters(node).forEach((param, idx) => {
-      const nameValue = tsUtils.node.getName(param);
-      if (nameValue === undefined) {
-        sb.reportUnsupported(param);
 
-        return;
+    const params = tsUtils.parametered.getParameters(node);
+    const restElement = params.find((param) => tsUtils.parameter.isRestParameter(param));
+    const parameters = restElement === undefined ? [...params] : params.slice(0, -1);
+    // [argsarr]
+    parameters.forEach((param, idx) => {
+      const nameNode = tsUtils.node.getNameNode(param);
+
+      if (ts.isIdentifier(nameNode)) {
+        sb.scope.add(tsUtils.node.getText(nameNode));
       }
 
-      const name = sb.scope.add(nameValue);
-
       const initializer = tsUtils.initializer.getInitializer(param);
-      if (tsUtils.parameter.isRestParameter(param)) {
-        // sb.reportUnsupported(param);
-      } else if (initializer !== undefined) {
+      if (initializer !== undefined) {
         sb.emitHelper(
           param,
           sb.noPushValueOptions(options),
@@ -107,15 +107,28 @@ export class ParametersHelper extends Helper<ParameteredNode> {
         sb.emitOp(param, 'PICKITEM');
       }
 
-      const decorators = tsUtils.decoratable.getDecorators(param);
-      if (decorators !== undefined && decorators.length > 0) {
-        sb.reportUnsupported(param);
-      }
-
       // [argsarr]
-      sb.scope.set(sb, param, sb.plainOptions(options), name);
+      if (ts.isIdentifier(nameNode)) {
+        sb.scope.set(sb, node, options, tsUtils.node.getText(nameNode));
+      } else {
+        sb.visit(nameNode, options);
+      }
     });
-    // []
-    sb.emitOp(node, 'DROP');
+
+    if (restElement === undefined) {
+      // []
+      sb.emitOp(node, 'DROP');
+    } else {
+      sb.scope.add(tsUtils.node.getNameOrThrow(restElement));
+
+      // [number, argsarr]
+      sb.emitPushInt(node, parameters.length + 1);
+      // [arr]
+      sb.emitHelper(node, options, sb.helpers.arrSlice({ hasEnd: false }));
+      // [arrayVal]
+      sb.emitHelper(node, options, sb.helpers.wrapArray);
+      // []
+      sb.scope.set(sb, node, options, tsUtils.node.getNameOrThrow(restElement));
+    }
   }
 }

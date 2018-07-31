@@ -124,6 +124,13 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       sb.emitHelper(method, options, sb.helpers.setDataPropertyObjectProperty);
     });
 
+    tsUtils.class_.getConcreteMembers(decl).forEach((member) => {
+      const decorators = tsUtils.decoratable.getDecorators(member);
+      if (decorators !== undefined && decorators.length > 0) {
+        sb.reportUnsupported(decorators[0]);
+      }
+    });
+
     tsUtils.class_
       .getConcreteInstanceMembers(decl)
       .filter(ts.isSetAccessor)

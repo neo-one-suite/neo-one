@@ -161,6 +161,9 @@ export class NEOTranspiler implements Transpiler {
       );
     };
 
+    const isLibDecorator = (node: ts.Decorator): boolean =>
+      this.isDecorator(node, 'verify') || this.isDecorator(node, 'constant');
+
     const contractSourceFile = tsUtils.node.getSourceFile(this.smartContract);
     const sourceFiles = _.fromPairs(
       this.program
@@ -175,6 +178,10 @@ export class NEOTranspiler implements Transpiler {
 
               if (fixedTypeNodes.has(node)) {
                 return tsUtils.setOriginal(ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword), node);
+              }
+
+              if (ts.isDecorator(node) && isLibDecorator(node)) {
+                return ts.createOmittedExpression();
               }
 
               const replacementName = eventReplacements.get(node);
@@ -1005,15 +1012,15 @@ export class NEOTranspiler implements Transpiler {
   ): boolean {
     const decorators = tsUtils.decoratable.getDecorators(decl);
 
-    return decorators === undefined
-      ? false
-      : decorators.some((decorator) =>
-          this.isOnlyLib(
-            tsUtils.expression.getExpression(decorator),
-            this.getType(tsUtils.expression.getExpression(decorator)),
-            name,
-          ),
-        );
+    return decorators === undefined ? false : decorators.some((decorator) => this.isDecorator(decorator, name));
+  }
+
+  private isDecorator(decorator: ts.Decorator, name: 'verify' | 'constant'): boolean {
+    return this.isOnlyLib(
+      tsUtils.expression.getExpression(decorator),
+      this.getType(tsUtils.expression.getExpression(decorator)),
+      name,
+    );
   }
 
   private paramToABIParameter(param: ts.Symbol): ABIParameter | undefined {

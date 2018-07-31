@@ -6,7 +6,7 @@ import { VisitOptions } from '../types';
 export class FunctionExpressionCompiler extends NodeCompiler<ts.FunctionExpression> {
   public readonly kind = ts.SyntaxKind.FunctionExpression;
 
-  public visitNode(sb: ScriptBuilder, expr: ts.FunctionExpression, _options: VisitOptions): void {
-    sb.reportUnsupported(expr);
+  public visitNode(sb: ScriptBuilder, node: ts.FunctionExpression, options: VisitOptions): void {
+    sb.emitHelper(node, options, sb.helpers.functionLike);
   }
 }
