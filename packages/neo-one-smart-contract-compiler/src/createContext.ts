@@ -135,6 +135,8 @@ const createProgram = (
     getCurrentDirectory: () => process.cwd(),
     getCompilationSettings: () => options,
     getDefaultLibFileName: (opts) => ts.getDefaultLibFilePath(opts),
+    useCaseSensitiveFileNames: () => ts.sys.useCaseSensitiveFileNames,
+    getNewLine: () => ts.sys.newLine,
     fileExists: ts.sys.fileExists,
     readFile: ts.sys.readFile,
     readDirectory: ts.sys.readDirectory,
@@ -165,7 +167,7 @@ const createProgram = (
 
   modifyHost(servicesHost);
 
-  const languageService = ts.createLanguageService(servicesHost, ts.createDocumentRegistry());
+  const languageService = ts.createLanguageService(servicesHost);
   const program = languageService.getProgram();
   if (program === undefined) {
     throw new Error('Something went wrong');
