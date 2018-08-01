@@ -294,6 +294,63 @@ describe('ClassDeclarationCompiler', () => {
     `);
   });
 
+  test('static methods and properties', async () => {
+    await helpers.executeString(`
+      class Foo {
+        private static bInternal: string = 'b';
+        public static getA(): string {
+          return 'a';
+        }
+
+        public static get b(): string {
+          return this.bInternal;
+        }
+
+        public static set b(value: string) {
+          this.bInternal = value;
+        }
+      }
+
+      class Bar extends Foo {
+        public static get c(): string {
+          return 'c';
+        }
+      }
+
+      class Qux extends Bar {
+        public static getA(): string {
+          return super.getA() + 'c';
+        }
+      }
+
+      class Baz extends Bar {
+        public static getA(): string {
+          return super.getA() + super.b + super.c;
+        }
+      }
+
+      if (Foo.getA() !== 'a') {
+        throw 'Failure';
+      }
+
+      if (Bar.getA() !== 'a') {
+        throw 'Failure';
+      }
+
+      if (Bar.c !== 'c') {
+        throw 'Failure';
+      }
+
+      if (Baz.getA() !== 'abc') {
+        throw 'Failure';
+      }
+
+      if (Qux.getA() !== 'ac') {
+        throw 'Failure';
+      }
+    `);
+  });
+
   test('decorators', async () => {
     await helpers.compileString(
       `

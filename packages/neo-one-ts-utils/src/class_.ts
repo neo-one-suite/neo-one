@@ -151,6 +151,12 @@ export function getConcreteStaticMembers(
   return getConcreteMembers(node).filter(isClassStaticMember);
 }
 
+export function getConcreteStaticMethods(
+  node: ts.ClassDeclaration | ts.ClassExpression,
+): ReadonlyArray<ts.MethodDeclaration> {
+  return getConcreteStaticMembers(node).filter(ts.isMethodDeclaration);
+}
+
 export function getConstructors(
   node: ts.ClassDeclaration | ts.ClassExpression,
 ): ReadonlyArray<ts.ConstructorDeclaration> {

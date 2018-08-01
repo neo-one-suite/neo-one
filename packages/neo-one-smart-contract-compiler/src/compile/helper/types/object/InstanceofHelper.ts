@@ -25,8 +25,8 @@ export class InstanceofHelper extends Helper {
     const prepareLoop = () => {
       // [objectVal, objectVal, prototypeVal]
       sb.emitOp(node, 'DUP');
-      // ['prototype', objectVal, objectVal, prototypeVal]
-      sb.emitPushString(node, 'prototype');
+      // ['__proto__', objectVal, objectVal, prototypeVal]
+      sb.emitPushString(node, '__proto__');
       // [nextPrototypeVal, objectVal, prototypeVal]
       sb.emitHelper(node, options, sb.helpers.getPropertyObjectProperty);
       // [nextPrototypeVal, nextPrototypeVal, objectVal, prototypeVal]

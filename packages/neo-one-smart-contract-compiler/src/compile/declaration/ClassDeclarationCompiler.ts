@@ -23,6 +23,20 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
     }
     const superClass = superClassIn;
 
+    const addProperty = (property: ts.PropertyDeclaration) => {
+      const initializer = tsUtils.initializer.getInitializer(property);
+      if (initializer !== undefined) {
+        // [thisObjectVal, thisObjectVal]
+        sb.emitOp(initializer, 'DUP');
+        // [prop, thisObjectVal, thisObjectVal]
+        sb.emitPushString(initializer, tsUtils.node.getName(property));
+        // [init, prop, thisObjectVal, thisObjectVal]
+        sb.visit(initializer, options);
+        // [thisObjectVal]
+        sb.emitHelper(initializer, options, sb.helpers.setDataPropertyObjectProperty);
+      }
+    };
+
     // Create constructor function
     // [farr]
     sb.emitHelper(
@@ -58,16 +72,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
             .getConcreteInstanceProperties(decl)
             .filter(ts.isPropertyDeclaration)
             .forEach((property) => {
-              const initializer = tsUtils.initializer.getInitializer(property);
-              if (initializer !== undefined) {
-                sb.emitOp(initializer, 'DUP');
-                // [prop, thisObjectVal, thisObjectVal]
-                sb.emitPushString(initializer, tsUtils.node.getName(property));
-                // [init, prop, thisObjectVal, thisObjectVal]
-                sb.visit(initializer, options);
-                // [thisObjectVal]
-                sb.emitHelper(initializer, options, sb.helpers.setDataPropertyObjectProperty);
-              }
+              addProperty(property);
             });
           // []
           sb.emitOp(ctorNode, 'DROP');
@@ -105,7 +110,8 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
     sb.emitOp(decl, 'ROT');
     // [objectVal, 'prototype', fobjectVal, fobjectVal]
     sb.emitHelper(decl, options, sb.helpers.setDataPropertyObjectProperty);
-    tsUtils.class_.getConcreteInstanceMethods(decl).forEach((method) => {
+
+    const addMethod = (method: ts.MethodDeclaration) => {
       // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
       sb.emitOp(method, 'DUP');
       // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
@@ -122,6 +128,10 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       );
       // [objectVal, 'prototype', fobjectVal, fobjectVal]
       sb.emitHelper(method, options, sb.helpers.setDataPropertyObjectProperty);
+    };
+
+    tsUtils.class_.getConcreteInstanceMethods(decl).forEach((method) => {
+      addMethod(method);
     });
 
     tsUtils.class_.getConcreteMembers(decl).forEach((member) => {
@@ -131,86 +141,94 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       }
     });
 
-    tsUtils.class_
-      .getConcreteInstanceMembers(decl)
-      .filter(ts.isSetAccessor)
-      .forEach((accessor) => {
-        // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitOp(accessor, 'DUP');
-        // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitPushString(accessor, tsUtils.node.getName(accessor));
-        // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitHelper(accessor, options, sb.helpers.createCallArray);
-        // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+    const addSetAccessor = (accessor: ts.SetAccessorDeclaration) => {
+      // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitOp(accessor, 'DUP');
+      // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitPushString(accessor, tsUtils.node.getName(accessor));
+      // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitHelper(accessor, options, sb.helpers.createCallArray);
+      // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitHelper(
+        accessor,
+        options,
+        sb.helpers.createFunctionObject({
+          property: InternalFunctionProperties.Call,
+        }),
+      );
+      const getAccessor = tsUtils.accessor.getGetAccessor(accessor);
+      const hasGet = getAccessor !== undefined;
+      if (getAccessor !== undefined) {
+        sb.emitHelper(getAccessor, options, sb.helpers.createCallArray);
         sb.emitHelper(
-          accessor,
+          getAccessor,
           options,
           sb.helpers.createFunctionObject({
             property: InternalFunctionProperties.Call,
           }),
         );
-        const getAccessor = tsUtils.accessor.getGetAccessor(accessor);
-        const hasGet = getAccessor !== undefined;
-        if (getAccessor !== undefined) {
-          sb.emitHelper(getAccessor, options, sb.helpers.createCallArray);
-          sb.emitHelper(
-            getAccessor,
-            options,
-            sb.helpers.createFunctionObject({
-              property: InternalFunctionProperties.Call,
-            }),
-          );
-        }
-        // [objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitHelper(
-          accessor,
-          options,
-          sb.helpers.setAccessorPropertyObjectProperty({
-            hasSet: true,
-            hasGet,
-          }),
-        );
+      }
+      // [objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitHelper(
+        accessor,
+        options,
+        sb.helpers.setAccessorPropertyObjectProperty({
+          hasSet: true,
+          hasGet,
+        }),
+      );
+    };
+
+    tsUtils.class_
+      .getConcreteInstanceMembers(decl)
+      .filter(ts.isSetAccessor)
+      .forEach((accessor) => {
+        addSetAccessor(accessor);
       });
+
+    const addGetAccessor = (accessor: ts.GetAccessorDeclaration) => {
+      // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitOp(accessor, 'DUP');
+      // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitPushString(accessor, tsUtils.node.getName(accessor));
+      // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitHelper(accessor, options, sb.helpers.createCallArray);
+      // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitHelper(
+        accessor,
+        options,
+        sb.helpers.createFunctionObject({
+          property: InternalFunctionProperties.Call,
+        }),
+      );
+      // [objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitHelper(
+        accessor,
+        options,
+        sb.helpers.setAccessorPropertyObjectProperty({
+          hasSet: false,
+          hasGet: true,
+        }),
+      );
+    };
 
     tsUtils.class_
       .getConcreteInstanceMembers(decl)
       .filter(ts.isGetAccessor)
       .filter((accessor) => tsUtils.accessor.getSetAccessor(accessor) === undefined)
       .forEach((accessor) => {
-        // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitOp(accessor, 'DUP');
-        // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitPushString(accessor, tsUtils.node.getName(accessor));
-        // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitHelper(accessor, options, sb.helpers.createCallArray);
-        // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitHelper(
-          accessor,
-          options,
-          sb.helpers.createFunctionObject({
-            property: InternalFunctionProperties.Call,
-          }),
-        );
-        // [objectVal, 'prototype', fobjectVal, fobjectVal]
-        sb.emitHelper(
-          accessor,
-          options,
-          sb.helpers.setAccessorPropertyObjectProperty({
-            hasSet: false,
-            hasGet: true,
-          }),
-        );
+        addGetAccessor(accessor);
       });
 
     // Set superclass prototype
     if (superClass !== undefined && extendsExpr !== undefined) {
       // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
       sb.emitOp(extendsExpr, 'DUP');
-      // ['prototype', objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitPushString(extendsExpr, 'prototype');
-      // [superobjectVal, 'prototype', objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      // ['__proto__', objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitPushString(extendsExpr, '__proto__');
+      // [superobjectVal, '__proto__', objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
       sb.scope.get(sb, extendsExpr, options, superClass);
-      // ['prototype', superobjectVal, 'prototype', objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      // ['prototype', superobjectVal, '__proto__', objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
       sb.emitPushString(extendsExpr, 'prototype');
       // [superprototype, 'prototype', objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
       sb.emitHelper(extendsExpr, options, sb.helpers.getPropertyObjectProperty);
@@ -220,6 +238,41 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
 
     // [fobjectVal]
     sb.emitHelper(decl, options, sb.helpers.setDataPropertyObjectProperty);
+
+    tsUtils.class_
+      .getConcreteStaticProperties(decl)
+      .filter(ts.isPropertyDeclaration)
+      .forEach((property) => {
+        addProperty(property);
+      });
+    tsUtils.class_.getConcreteStaticMethods(decl).forEach((method) => {
+      addMethod(method);
+    });
+    tsUtils.class_
+      .getConcreteStaticMembers(decl)
+      .filter(ts.isSetAccessor)
+      .forEach((accessor) => {
+        addSetAccessor(accessor);
+      });
+    tsUtils.class_
+      .getConcreteStaticMembers(decl)
+      .filter(ts.isGetAccessor)
+      .filter((accessor) => tsUtils.accessor.getSetAccessor(accessor) === undefined)
+      .forEach((accessor) => {
+        addGetAccessor(accessor);
+      });
+
+    // Set superclass prototype
+    if (superClass !== undefined && extendsExpr !== undefined) {
+      // [fobjectVal, fobjectVal]
+      sb.emitOp(extendsExpr, 'DUP');
+      // ['__proto__', fobjectVal, fobjectVal]
+      sb.emitPushString(extendsExpr, '__proto__');
+      // [superobjectVal, '__proto__', fobjectVal, fobjectVal]
+      sb.scope.get(sb, extendsExpr, options, superClass);
+      // [fobjectVal]
+      sb.emitHelper(extendsExpr, options, sb.helpers.setDataPropertyObjectProperty);
+    }
 
     if (tsUtils.modifier.isNamedExport(decl) || tsUtils.modifier.isDefaultExport(decl)) {
       // [fobjectVal, fobjectVal]

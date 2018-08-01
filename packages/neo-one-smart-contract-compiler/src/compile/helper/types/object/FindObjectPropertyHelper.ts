@@ -71,8 +71,8 @@ export class FindObjectPropertyHelper extends Helper {
           sb.emitOp(node, 'NOT');
           // [pobj, notHasKey, obj, pobj, prop]
           sb.emitOp(node, 'ROT');
-          // ['prototype', pobj, notHasKey, obj, pobj, prop]
-          sb.emitPushString(node, 'prototype');
+          // ['__proto__', pobj, notHasKey, obj, pobj, prop]
+          sb.emitPushString(node, '__proto__');
           // [hasPrototypeKey, notHasKey, obj, pobj, prop]
           sb.emitOp(node, 'HASKEY');
           // [condition, obj, pobj, prop]
@@ -81,8 +81,8 @@ export class FindObjectPropertyHelper extends Helper {
         each: () => {
           // [pobj, prop]
           sb.emitOp(node, 'DROP');
-          // ['prototype', pobj, prop]
-          sb.emitPushString(node, 'prototype');
+          // ['__proto__', pobj, prop]
+          sb.emitPushString(node, '__proto__');
           // [propVal, prop]
           sb.emitOp(node, 'PICKITEM');
           // [0, propVal, prop]

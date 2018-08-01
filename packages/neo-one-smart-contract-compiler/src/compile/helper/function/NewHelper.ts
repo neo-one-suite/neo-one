@@ -35,13 +35,13 @@ export class NewHelper extends Helper {
     sb.emitOp(node, 'TUCK');
     // [objectVal, thisVal, objectVal, thisVal, ?argsarr, thisVal]
     sb.emitOp(node, 'OVER');
-    // ['prototype', objectVal, thisVal, objectVal, thisVal, ?argsarr, thisVal]
-    sb.emitPushString(node, 'prototype');
-    // [objectVal, 'prototype', thisVal, objectVal, thisVal, ?argsarr, thisVal]
+    // ['__proto__', objectVal, thisVal, objectVal, thisVal, ?argsarr, thisVal]
+    sb.emitPushString(node, '__proto__');
+    // [objectVal, '__proto__', thisVal, objectVal, thisVal, ?argsarr, thisVal]
     sb.emitOp(node, 'SWAP');
-    // ['prototype', objectVal, 'prototype', thisVal, objectVal, thisVal, ?argsarr, thisVal]
+    // ['prototype', objectVal, '__proto__', thisVal, objectVal, thisVal, ?argsarr, thisVal]
     sb.emitPushString(node, 'prototype');
-    // [prototype, 'prototype', thisVal, objectVal, thisVal, ?argsarr, thisVal]
+    // [prototype, '__proto__', thisVal, objectVal, thisVal, ?argsarr, thisVal]
     sb.emitHelper(node, options, sb.helpers.getPropertyObjectProperty);
     // [objectVal, thisVal, ?argsarr, thisVal]
     sb.emitHelper(node, options, sb.helpers.setDataPropertyObjectProperty);
