@@ -788,7 +788,7 @@ export class NEOTranspiler implements Transpiler {
 
       const key = tsUtils.node.getName(property);
       const value = tsUtils.initializer.getInitializer(property);
-      if (value === undefined || !ts.isLiteralExpression(value)) {
+      if (!ts.isLiteralExpression(value)) {
         this.reportError(
           this.smartContract,
           'Invalid smart contract properties definition.',
