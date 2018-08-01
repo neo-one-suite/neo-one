@@ -19,7 +19,7 @@ export const print = (programIn: ts.Program, original: ts.SourceFile, file: ts.S
     getCommonSourceDirectory: program.getCommonSourceDirectory,
     getCompilerOptions: program.getCompilerOptions,
     getCurrentDirectory: program.getCurrentDirectory,
-    getNewLine: () => ts.NewLineKind.LineFeed,
+    getNewLine: () => ts.sys.newLine,
     getSourceFile: program.getSourceFile,
     getSourceFileByPath: program.getSourceFileByPath,
     getSourceFiles: program.getSourceFiles,
