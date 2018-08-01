@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MetaPropertyCompiler import.meta 1`] = `"Cannot find global type 'ImportMeta'."`;
