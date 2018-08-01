@@ -38,19 +38,20 @@ interface ErrorConstructor {
 }
 declare const Error: ErrorConstructor;
 
+interface Symbol {}
 interface SymbolConstructor {
   /**
-   * Returns a new unique Symbol value.
-   * @param  description Description of the new Symbol object.
+   * Returns a Symbol object from the global symbol registry matching the given key if found.
+   * Otherwise, returns a new symbol with this key.
+   * @param key key to search for.
    */
-  (description?: string | number): symbol;
+  for(key: string): symbol;
   /**
    * A method that returns the default iterator for an object. Called by the semantics of the
    * for-of statement.
    */
   readonly iterator: symbol;
 }
-
 declare var Symbol: SymbolConstructor;
 
 // Buffer class

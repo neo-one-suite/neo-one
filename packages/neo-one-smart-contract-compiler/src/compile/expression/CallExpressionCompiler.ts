@@ -162,7 +162,25 @@ const consoleLog: SpecialCase = {
   },
 };
 
-const CASES: ReadonlyArray<SpecialCase> = [bufferFrom, bufferEquals, consoleLog];
+const symbolFor: SpecialCase = {
+  test: (sb, node, symbol) => sb.isGlobalSymbol(node, symbol, 'SymbolFor'),
+  handle: (sb, node, optionsIn) => {
+    const options = sb.pushValueOptions(optionsIn);
+    const args = tsUtils.argumented.getArguments(node);
+    // [stringVal]
+    sb.visit(args[0], options);
+    if (optionsIn.pushValue) {
+      // [string]
+      sb.emitHelper(node, options, sb.helpers.toString({ type: sb.getType(args[0]) }));
+      // [symbolVal]
+      sb.emitHelper(node, options, sb.helpers.createSymbol);
+    } else {
+      sb.emitOp(node, 'DROP');
+    }
+  },
+};
+
+const CASES: ReadonlyArray<SpecialCase> = [bufferFrom, bufferEquals, consoleLog, symbolFor];
 
 export class CallExpressionCompiler extends NodeCompiler<ts.CallExpression> {
   public readonly kind = ts.SyntaxKind.CallExpression;

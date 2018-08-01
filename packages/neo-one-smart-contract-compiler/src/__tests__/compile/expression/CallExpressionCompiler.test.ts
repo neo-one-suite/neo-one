@@ -183,4 +183,15 @@ describe('CallExpressionCompiler', () => {
       }
     `);
   });
+
+  test('Symbol', async () => {
+    await helpers.executeString(`
+      const a: symbol = Symbol.for('hello');
+      const b: symbol = Symbol.for('hello');
+
+      if (a !== b) {
+        throw 'Failure';
+      }
+    `);
+  });
 });

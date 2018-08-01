@@ -75,11 +75,12 @@ export class ObjectBindingPatternCompiler extends NodeCompiler<ts.ObjectBindingP
         addStringProp();
         // [val, objectVal]
         sb.emitHelper(element, options, sb.helpers.getPropertyObjectProperty);
-      } else {
-        const propertyNameType = sb.getType(propertyName);
+      } else if (ts.isComputedPropertyName(propertyName)) {
+        const expr = tsUtils.expression.getExpression(propertyName);
+        const propertyNameType = sb.getType(expr);
 
         // [propVal, objectVal, objectVal]
-        sb.visit(propertyName, options);
+        sb.visit(expr, options);
 
         const handleSymbol = () => {
           // [string, objectVal, objectVal]
@@ -120,6 +121,17 @@ export class ObjectBindingPatternCompiler extends NodeCompiler<ts.ObjectBindingP
         } else {
           handleString();
         }
+      } else {
+        // [string, objectVal, objectVal]
+        sb.emitPushString(
+          propertyName,
+          ts.isStringLiteral(propertyName)
+            ? tsUtils.literal.getLiteralValue(propertyName)
+            : `${tsUtils.literal.getLiteralValue(propertyName)}`,
+        );
+        addStringProp();
+        // [val, objectVal]
+        sb.emitHelper(element, options, sb.helpers.getPropertyObjectProperty);
       }
 
       if (initializer !== undefined) {

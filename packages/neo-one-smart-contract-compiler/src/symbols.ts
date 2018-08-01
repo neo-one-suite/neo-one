@@ -8,6 +8,7 @@ export interface Globals {
   readonly Buffer: ts.Symbol;
   readonly BufferFrom: ts.Symbol;
   readonly BufferEquals: ts.Symbol;
+  readonly SymbolFor: ts.Symbol;
   readonly consoleLog: ts.Symbol;
   readonly AccountBase: ts.Symbol;
   readonly AssetBase: ts.Symbol;
@@ -55,12 +56,17 @@ export const getGlobals = (program: ts.Program, typeChecker: ts.TypeChecker): Gl
     tsUtils.type_.getType(typeChecker, tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Buffer')),
   );
 
+  const symbolVar = tsUtils.type_.getSymbolOrThrow(
+    tsUtils.type_.getType(typeChecker, tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Symbol')),
+  );
+
   return {
     Array: tsUtils.type_.getSymbolOrThrow(tsUtils.types.getArrayType(typeChecker)),
     Buffer: buffer,
     BufferFrom: tsUtils.symbol.getMemberOrThrow(bufferVar, 'from'),
     BufferEquals: tsUtils.symbol.getMemberOrThrow(buffer, 'equals'),
     consoleLog: tsUtils.symbol.getMemberOrThrow(nodeConsole, 'log'),
+    SymbolFor: tsUtils.symbol.getMemberOrThrow(symbolVar, 'for'),
     AccountBase: tsUtils.node.getSymbolOrThrow(
       typeChecker,
       tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'AccountBase'),
