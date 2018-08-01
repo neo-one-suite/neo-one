@@ -1,9 +1,9 @@
 import { helpers } from '../../../__data__';
 
-describe('InterfaceDeclarationCompiler', () => {
-  test('interface does not emit', async () => {
+describe('TypeAliasDeclarationCompiler', () => {
+  test('type alias does not emit', async () => {
     await helpers.executeString(`
-      interface Foo {
+      type Foo = {
         bar: string;
       }
 
