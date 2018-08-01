@@ -622,9 +622,13 @@
   version "1.2.0"
   resolved "https://registry.npmjs.org/@types/node-cron/-/node-cron-1.2.0.tgz#aefb50be6c09f7e6a1e4c074168698b526c0b543"
 
-"@types/node@*", "@types/node@10.5.4", "@types/node@^10.1.0", "@types/node@^10.5.4":
+"@types/node@*", "@types/node@^10.1.0":
   version "10.5.4"
   resolved "https://registry.npmjs.org/@types/node/-/node-10.5.4.tgz#6eccc158504357d1da91434d75e86acde94bb10b"
+
+"@types/node@10.5.5", "@types/node@^10.5.5":
+  version "10.5.5"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.5.5.tgz#8e84d24e896cd77b0d4f73df274027e3149ec2ba"
 
 "@types/node@^9.4.6":
   version "9.6.24"
@@ -3483,9 +3487,9 @@ google-p12-pem@^1.0.0:
     node-forge "^0.7.4"
     pify "^3.0.0"
 
-google-protobuf@^3.6.0:
-  version "3.6.0"
-  resolved "https://registry.npmjs.org/google-protobuf/-/google-protobuf-3.6.0.tgz#e2bafb00c20a8734174d8f89e0a842709e2ceed0"
+google-protobuf@^3.6.1:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.6.1.tgz#7ef58e2bea137a93cdaf5cfd5afa5f6abdd92025"
 
 got@^6.7.1:
   version "6.7.1"
@@ -6633,7 +6637,7 @@ preserve@^0.2.0:
   version "0.2.0"
   resolved "https://registry.npmjs.org/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
 
-prettier@1.14.0:
+prettier@1.14.0, prettier@^1.14.0:
   version "1.14.0"
   resolved "https://registry.npmjs.org/prettier/-/prettier-1.14.0.tgz#847c235522035fd988100f1f43cf20a7d24f9372"
 
@@ -7188,9 +7192,9 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.npmjs.org/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs-tslint-rules@4.7.0:
-  version "4.7.0"
-  resolved "https://registry.npmjs.org/rxjs-tslint-rules/-/rxjs-tslint-rules-4.7.0.tgz#29d01ebb2e340d4119119c84b26af2e498cc1688"
+rxjs-tslint-rules@4.7.2:
+  version "4.7.2"
+  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.7.2.tgz#b06fb896ba06c0c5503a77848c3a07a2b0175ec9"
   dependencies:
     "@phenomnomnominal/tsquery" "^1.0.5"
     decamelize "^2.0.0"
