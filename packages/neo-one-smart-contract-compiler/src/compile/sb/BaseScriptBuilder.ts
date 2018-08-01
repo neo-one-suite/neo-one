@@ -20,7 +20,6 @@ import { DiagnosticCode } from '../../DiagnosticCode';
 import { Globals } from '../../symbols';
 import { binding } from '../binding';
 import { declarations } from '../declaration';
-import { decorators } from '../decorator';
 import { expressions } from '../expression';
 import { files } from '../file';
 import { Helper, Helpers } from '../helper';
@@ -35,7 +34,6 @@ import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode, SingleBytecodeV
 
 const compilers: ReadonlyArray<ReadonlyArray<new () => NodeCompiler>> = [
   declarations,
-  decorators,
   expressions,
   files,
   statements,
