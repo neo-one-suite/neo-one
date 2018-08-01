@@ -37,6 +37,8 @@ describe('exported api', () => {
     'createReadClient',
     'typeGuards',
     // ./utils
+    'createConsoleLogMessages',
+    'extractConsoleLogs',
     'extractErrorTrace',
   ];
 
