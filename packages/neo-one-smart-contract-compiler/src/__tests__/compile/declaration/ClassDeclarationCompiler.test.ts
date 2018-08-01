@@ -65,7 +65,7 @@ describe('ClassDeclarationCompiler', () => {
     `);
   });
 
-  test.skip('basic class with optional constructor arguments', async () => {
+  test('basic class with optional constructor arguments', async () => {
     await helpers.executeString(`
       class Foo {
         x: string | undefined;
