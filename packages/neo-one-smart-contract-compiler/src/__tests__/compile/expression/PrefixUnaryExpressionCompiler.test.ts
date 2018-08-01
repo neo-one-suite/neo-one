@@ -19,7 +19,7 @@ describe('PrefixUnaryExpressionCompiler', () => {
 
   test('~', async () => {
     await helpers.executeString(`
-      if (~0b01101 !== 0b10010) {
+      if (~13 !== -14) {
         throw 'Failure';
       }
     `);

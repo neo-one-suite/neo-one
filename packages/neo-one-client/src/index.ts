@@ -24,4 +24,4 @@ export * from './preconfigured';
 export * from './types';
 
 export { abi, assets, networks, typeGuards };
-export { extractErrorTrace } from './utils';
+export { extractErrorTrace, extractConsoleLogs, createConsoleLogMessages } from './utils';

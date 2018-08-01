@@ -16,14 +16,16 @@ export class VariableDeclarationCompiler extends NodeCompiler<ts.VariableDeclara
       sb.scope.add(tsUtils.node.getText(nameNode));
     }
 
-    if (expr !== undefined) {
+    if (expr === undefined) {
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+    } else {
       sb.visit(expr, sb.pushValueOptions(options));
+    }
 
-      if (ts.isIdentifier(nameNode)) {
-        sb.scope.set(sb, node, options, tsUtils.node.getText(nameNode));
-      } else {
-        sb.visit(nameNode, options);
-      }
+    if (ts.isIdentifier(nameNode)) {
+      sb.scope.set(sb, node, options, tsUtils.node.getText(nameNode));
+    } else {
+      sb.visit(nameNode, options);
     }
   }
 }

@@ -80,7 +80,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('(false == "") [EqualsEqualsToken]', async () => {
+  test.skip('(false == "") [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       const a: boolean | string = false as boolean | string;
       const b: boolean | string = '' as boolean | string;
@@ -90,7 +90,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('(false == " ")  [EqualsEqualsToken]', async () => {
+  test.skip('(false == " ")  [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       const a: boolean | string = false as boolean | string;
       const b: boolean | string = ' ' as boolean | string;
@@ -100,7 +100,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('!(false == "a") [EqualsEqualsToken]', async () => {
+  test.skip('!(false == "a") [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       const a: boolean | string = false as boolean | string;
       const b: boolean | string = 'a' as boolean | string;
@@ -110,7 +110,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('(3 == "3") [EqualsEqualsToken]', async () => {
+  test.skip('(3 == "3") [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       const a: number | string = 3 as number | string;
       const b: number | string = '3' as number | string;

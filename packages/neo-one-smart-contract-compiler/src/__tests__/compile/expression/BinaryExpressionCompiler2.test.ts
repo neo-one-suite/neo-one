@@ -96,17 +96,17 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('(127 ^ -6) === -123 [CaretToken]', async () => {
+  test('(127 ^ -6) === -380 [CaretToken]', async () => {
     await helpers.executeString(`
-      if ((127 ^ -6) !== -123) {
+      if ((127 ^ -6) !== -380) {
         throw 'Failure';
       }
     `);
   });
 
-  test('(128 ^ 5) === 133 [CaretToken]', async () => {
+  test('(128 ^ 5) === 388 [CaretToken]', async () => {
     await helpers.executeString(`
-      if ((128 ^ 5) !== 133) {
+      if ((128 ^ 5) !== 388) {
         throw 'Failure';
       }
     `);

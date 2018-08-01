@@ -121,6 +121,20 @@ function hasTypeFlag(type: ts.Type, flag: ts.TypeFlags): boolean {
   return (type.flags & flag) !== 0;
 }
 
+export function getAllTypes(type: ts.Type): ReadonlyArray<ts.Type> {
+  const unionTypes = getUnionTypes(type);
+  if (unionTypes !== undefined) {
+    return unionTypes.reduce<ReadonlyArray<ts.Type>>((acc, unionType) => acc.concat(getAllTypes(unionType)), []);
+  }
+
+  const intersectionTypes = getIntersectionTypes(type);
+  if (intersectionTypes !== undefined) {
+    return intersectionTypes.reduce<ReadonlyArray<ts.Type>>((acc, unionType) => acc.concat(getAllTypes(unionType)), []);
+  }
+
+  return [type];
+}
+
 export function getTypes(type: ts.Type, isType: (type: ts.Type) => boolean): ReadonlyArray<ts.Type> {
   if (isType(type)) {
     return [type];
@@ -248,6 +262,10 @@ export function isSame(a: ts.Type | undefined, b: ts.Type | undefined): boolean 
       (isOnlyNumberish(a) && isOnlyNumberish(b)) ||
       (isOnlySymbolish(a) && isOnlySymbolish(b)))
   );
+}
+
+export function isOnly(type: ts.Type): boolean {
+  return [...new Set(getAllTypes(type))].length === 0;
 }
 
 export function isNull(type: ts.Type): boolean {

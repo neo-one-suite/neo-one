@@ -973,7 +973,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(vmUtils.shiftLeft(args[0].asBigInteger(), args[1].asBigInteger()))],
+          results: [new IntegerStackItem(vmUtils.shiftLeft(args[1].asBigInteger(), args[0].asBigInteger()))],
         }),
       }),
     ],
@@ -985,7 +985,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(vmUtils.shiftRight(args[0].asBigInteger(), args[1].asBigInteger()))],
+          results: [new IntegerStackItem(vmUtils.shiftRight(args[1].asBigInteger(), args[0].asBigInteger()))],
         }),
       }),
     ],

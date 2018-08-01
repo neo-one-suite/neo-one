@@ -70,7 +70,7 @@ export class ArrayBindingPatternCompiler extends NodeCompiler<ts.ArrayBindingPat
       // [arr]
       sb.emitHelper(node, options, sb.helpers.unwrapArray);
       // [number, arr]
-      sb.emitPushInt(node, elements.length + 1);
+      sb.emitPushInt(node, elements.length);
       // [arr]
       sb.emitHelper(node, options, sb.helpers.arrSlice({ hasEnd: false }));
       // [arrayVal]

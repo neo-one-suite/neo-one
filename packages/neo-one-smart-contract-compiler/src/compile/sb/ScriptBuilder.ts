@@ -3,7 +3,7 @@ import { OpCode, SysCallName } from '@neo-one/client-core';
 import { BN } from 'bn.js';
 import ts from 'typescript';
 
-import { DiagnosticOptions } from '../../Context';
+import { Context, DiagnosticOptions } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { Globals } from '../../symbols';
 import { Helper, Helpers } from '../helper';
@@ -25,6 +25,7 @@ export interface ScriptBuilder {
   readonly program: ts.Program;
   readonly typeChecker: ts.TypeChecker;
   readonly languageService: ts.LanguageService;
+  readonly context: Context;
   readonly scope: Scope;
   readonly moduleIndex: number;
   readonly helpers: Helpers;

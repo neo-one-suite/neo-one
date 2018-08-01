@@ -161,6 +161,9 @@ import {
   IsStringHelper,
   IsSymbolHelper,
   IsUndefinedHelper,
+  OmitObjectPropertiesHelper,
+  OmitPropertyObjectPropertiesHelper,
+  OmitSymbolObjectPropertiesHelper,
   PackObjectHelper,
   PickObjectPropertiesHelper,
   PickPropertyObjectPropertiesHelper,
@@ -284,6 +287,9 @@ export interface Helpers {
   readonly pickObjectProperties: PickObjectPropertiesHelper;
   readonly pickPropertyObjectProperties: PickPropertyObjectPropertiesHelper;
   readonly pickSymbolObjectProperties: PickSymbolObjectPropertiesHelper;
+  readonly omitObjectProperties: OmitObjectPropertiesHelper;
+  readonly omitPropertyObjectProperties: OmitPropertyObjectPropertiesHelper;
+  readonly omitSymbolObjectProperties: OmitSymbolObjectPropertiesHelper;
   readonly unwrapVal: UnwrapValHelper;
   readonly instanceof: InstanceofHelper;
   readonly createPropertyObject: CreatePropertyObjectHelper;
@@ -447,6 +453,9 @@ export const createHelpers = (): Helpers => {
     pickObjectProperties: new PickObjectPropertiesHelper(),
     pickPropertyObjectProperties: new PickPropertyObjectPropertiesHelper(),
     pickSymbolObjectProperties: new PickSymbolObjectPropertiesHelper(),
+    omitObjectProperties: new OmitObjectPropertiesHelper(),
+    omitPropertyObjectProperties: new OmitPropertyObjectPropertiesHelper(),
+    omitSymbolObjectProperties: new OmitSymbolObjectPropertiesHelper(),
     elementAccess: new ElementAccessHelper(),
     unwrapType: new UnwrapTypeHelper(),
     unwrapVal: new UnwrapValHelper(),

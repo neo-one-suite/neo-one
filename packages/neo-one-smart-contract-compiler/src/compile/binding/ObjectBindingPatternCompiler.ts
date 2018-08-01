@@ -19,10 +19,16 @@ export class ObjectBindingPatternCompiler extends NodeCompiler<ts.ObjectBindingP
       // do nothing
     };
     if (restElement !== undefined) {
+      // [0]
+      sb.emitPushInt(node, 0);
       // [symbolArr]
       sb.emitOp(node, 'NEWARRAY');
+      // [0]
+      sb.emitPushInt(node, 0);
       // [propertyArr, symbolArr]
       sb.emitOp(node, 'NEWARRAY');
+      // [objectVal, propertyArr, symbolArr]
+      sb.emitOp(node, 'ROT');
       addSymbolProp = () => {
         // [4, val, objectVal, objectVal, propertyArr, symbolArr]
         sb.emitPushInt(restElement, 4);
@@ -153,14 +159,32 @@ export class ObjectBindingPatternCompiler extends NodeCompiler<ts.ObjectBindingP
       const name = tsUtils.node.getNameOrThrow(restElement);
       sb.scope.add(name);
 
-      // [objectVal, propertyArr, symbolArr]
-      sb.emitHelper(restElement, options, sb.helpers.shallowCloneObject);
-      // [symbolArr, objectVal, propertyArr]
+      // [iobj, objectVal, propertyArr, symbolArr]
+      sb.emitOp(node, 'NEWMAP');
+      // [objectVal, iobj, propertyArr, symbolArr]
+      sb.emitOp(node, 'SWAP');
+      // [objectVal, objectVal, iobj, propertyArr, symbolArr]
+      sb.emitOp(node, 'DUP');
+      // [sobj, objectVal, iobj, propertyArr, symbolArr]
+      sb.emitHelper(node, options, sb.helpers.getSymbolObject);
+      // [objectVal, sobj, iobj, propertyArr, symbolArr]
+      sb.emitOp(node, 'SWAP');
+      // [pobj, sobj, iobj, propertyArr, symbolArr]
+      sb.emitHelper(node, options, sb.helpers.getPropertyObject);
+      // [3, pobj, sobj, iobj, propertyArr, symbolArr]
+      sb.emitPushInt(node, 3);
+      // [obj, propertyArr, symbolArr]
+      sb.emitHelper(node, options, sb.helpers.packObject);
+      // [3, objectVal, propertyArr, symbolArr]
+      sb.emitPushInt(node, 3);
+      // [objectVal, propertyArr, symbolArr, objectVal]
+      sb.emitOp(node, 'XTUCK');
+      // [symbolArr, objectVal, propertyArr, objectVal]
       sb.emitOp(restElement, 'ROT');
-      // [propertyArr, symbolArr, objectVal]
+      // [propertyArr, symbolArr, objectVal, objectVal]
       sb.emitOp(restElement, 'ROT');
       // [objectVal]
-      sb.emitHelper(restElement, options, sb.helpers.pickObjectProperties);
+      sb.emitHelper(restElement, options, sb.helpers.omitObjectProperties);
       // []
       sb.scope.set(sb, restElement, options, name);
     }

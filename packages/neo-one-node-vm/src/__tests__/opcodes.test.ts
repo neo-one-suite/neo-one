@@ -839,28 +839,28 @@ const OPCODES = ([
 
       {
         op: 'SHL',
-        args: [new BN(1), new BN(2)],
+        args: [new BN(2), new BN(1)],
         result: [new IntegerStackItem(new BN(4))],
         gas: FEES.ONE,
       },
 
       {
         op: 'SHL',
-        args: [new BN(-1), new BN(2)],
+        args: [new BN(2), new BN(-1)],
         result: [new IntegerStackItem(new BN(-4))],
         gas: FEES.ONE,
       },
 
       {
         op: 'SHR',
-        args: [new BN(4), new BN(2)],
+        args: [new BN(2), new BN(4)],
         result: [new IntegerStackItem(new BN(1))],
         gas: FEES.ONE,
       },
 
       {
         op: 'SHR',
-        args: [new BN(-4), new BN(2)],
+        args: [new BN(2), new BN(-4)],
         result: [new IntegerStackItem(new BN(-2))],
         gas: FEES.ONE,
       },

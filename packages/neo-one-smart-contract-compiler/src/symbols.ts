@@ -8,6 +8,7 @@ export interface Globals {
   readonly Buffer: ts.Symbol;
   readonly BufferFrom: ts.Symbol;
   readonly BufferEquals: ts.Symbol;
+  readonly consoleLog: ts.Symbol;
   readonly process: ts.Symbol;
   readonly AccountBase: ts.Symbol;
   readonly AssetBase: ts.Symbol;
@@ -45,6 +46,11 @@ export const getGlobals = (program: ts.Program, typeChecker: ts.TypeChecker): Gl
     tsUtils.statement.getInterfaceOrThrow(bufferFile, 'Buffer'),
   );
 
+  const nodeConsole = tsUtils.node.getSymbolOrThrow(
+    typeChecker,
+    tsUtils.statement.getInterfaceOrThrow(bufferFile, 'Console'),
+  );
+
   const bufferVar = tsUtils.type_.getSymbolOrThrow(
     tsUtils.type_.getType(typeChecker, tsUtils.statement.getVariableDeclarationOrThrow(bufferFile, 'Buffer')),
   );
@@ -54,6 +60,7 @@ export const getGlobals = (program: ts.Program, typeChecker: ts.TypeChecker): Gl
     Buffer: buffer,
     BufferFrom: tsUtils.symbol.getMemberOrThrow(bufferVar, 'from'),
     BufferEquals: tsUtils.symbol.getMemberOrThrow(buffer, 'equals'),
+    consoleLog: tsUtils.symbol.getMemberOrThrow(nodeConsole, 'log'),
     process: tsUtils.node.getSymbolOrThrow(
       typeChecker,
       tsUtils.statement.getVariableDeclarationOrThrow(bufferFile, 'process'),

@@ -10,7 +10,7 @@ describe('DoStatementCompiler', () => {
         i += 1;
       } while (i < 2);
 
-      if (result !== 3) {
+      if (result !== 2) {
         throw 'Failure';
       }
     `);
@@ -40,11 +40,11 @@ describe('DoStatementCompiler', () => {
       let result = 0;
       do {
         i += 1;
-        if (i < 3) {
+        if (i < 2) {
           continue;
         }
         result += 1;
-      } while (i < 6);
+      } while (i < 4);
 
       if (result !== 3) {
         throw 'Failure';

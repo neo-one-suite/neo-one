@@ -81,8 +81,8 @@ export class ParametersHelper extends Helper<ParameteredNode> {
               sb.emitOp(param, 'ARRAYSIZE');
               // [idx, size, argsarr]
               sb.emitPushInt(param, idx);
-              // [lt, argsarr]
-              sb.emitOp(param, 'LT');
+              // [size <= idx, argsarr]
+              sb.emitOp(param, 'LTE');
             },
             whenTrue: () => {
               // [undefinedVal, argsarr]
@@ -122,7 +122,7 @@ export class ParametersHelper extends Helper<ParameteredNode> {
       sb.scope.add(tsUtils.node.getNameOrThrow(restElement));
 
       // [number, argsarr]
-      sb.emitPushInt(node, parameters.length + 1);
+      sb.emitPushInt(node, parameters.length);
       // [arr]
       sb.emitHelper(node, options, sb.helpers.arrSlice({ hasEnd: false }));
       // [arrayVal]

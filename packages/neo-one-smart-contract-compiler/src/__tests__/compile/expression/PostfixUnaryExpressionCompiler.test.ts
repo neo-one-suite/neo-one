@@ -21,11 +21,11 @@ describe('PostfixUnaryExpressionCompiler', () => {
 
       i--;
 
-      if (i-- !== 3) {
+      if (i-- !== 2) {
         throw 'Failure';
       }
 
-      if (i !== 2) {
+      if (i !== 1) {
         throw 'Failure';
       }
     `);

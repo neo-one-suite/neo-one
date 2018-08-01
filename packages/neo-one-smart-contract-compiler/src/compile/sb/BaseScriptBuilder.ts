@@ -62,7 +62,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   private mutableCurrentModuleIndex = 0;
 
   public constructor(
-    private readonly context: Context,
+    public readonly context: Context,
     public readonly helpers: Helpers,
     private readonly sourceFile: ts.SourceFile,
     private readonly allHelpers: ReadonlyArray<Helper> = [],

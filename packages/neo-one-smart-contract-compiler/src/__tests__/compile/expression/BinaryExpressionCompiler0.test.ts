@@ -117,22 +117,22 @@ describe('BinaryExpressionCompiler', () => {
 
   test('x <<= 1 [LessThanLessThanEqualsToken]', async () => {
     await helpers.executeString(`
-        let x = 0b011;
-        x <<= 1;
-        if (x !== 6) {
-          throw 'Failure';
-        }
-      `);
+      let x = 0b011;
+      x <<= 1;
+      if (x !== 6) {
+        throw 'Failure';
+      }
+    `);
   });
 
   test('x >>= 1 [GreaterThanGreaterThanEqualsToken]', async () => {
     await helpers.executeString(`
-        let x = 0b011;
-        x >>= 1;
-        if (x !== 1) {
-          throw 'Failure';
-        }
-      `);
+      let x = 0b011;
+      x >>= 1;
+      if (x !== 1) {
+        throw 'Failure';
+      }
+    `);
   });
 
   test('1 * 2 == 2 [AsteriskToken]', async () => {
@@ -223,17 +223,17 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('(256 >> -2) == 0 [GreaterThanGreaterThanToken]', async () => {
+  test('(256 >> -2) == 63 [GreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
-      if ((256 >> -2) !== 0) {
+      if ((256 >> -2) !== 63) {
         throw 'Failure';
       }
     `);
   });
 
-  test('(-256 >> -2) == -1 [GreaterThanGreaterThanToken]', async () => {
+  test('(-256 >> -2) == -64 [GreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
-      if ((-256 >> -2) !== -1) {
+      if ((-256 >> -2) !== -64) {
         throw 'Failure';
       }
     `);

@@ -8,6 +8,7 @@ import ts from 'typescript';
 import { Context } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { Globals, LibAliases, Libs } from '../../symbols';
+import { getIdentifier, toABIReturn } from '../../utils';
 import { declarations } from '../declaration';
 import { NodeTranspiler } from '../NodeTranspiler';
 import { Contract, TranspileResult } from '../types';
@@ -253,6 +254,24 @@ export class NEOTranspiler implements Transpiler {
                 },
               ],
             },
+            {
+              name: 'console.log',
+              parameters: [
+                {
+                  type: 'Integer',
+                  name: 'line',
+                  decimals: 0,
+                },
+                {
+                  type: 'Array',
+                  name: 'args',
+                  value: {
+                    type: 'Array',
+                    value: { type: 'ByteArray' },
+                  },
+                },
+              ],
+            },
           ]),
       },
       contract,
@@ -405,12 +424,7 @@ export class NEOTranspiler implements Transpiler {
 
         const paramName = tsUtils.literal.getLiteralValue(paramNameArg);
 
-        return this.toABIParameter(
-          paramName,
-          paramNameArg,
-          this.getType(paramTypeNode),
-          this.getIdentifier(paramTypeNode),
-        );
+        return this.toABIParameter(paramName, paramNameArg, this.getType(paramTypeNode), getIdentifier(paramTypeNode));
       })
       .filter(utils.notNull);
 
@@ -895,10 +909,11 @@ export class NEOTranspiler implements Transpiler {
       const setDecl = ts.isSetAccessorDeclaration(decl) ? decl : tsUtils.accessor.getSetAccessor(decl);
       const mutableResult: Array<[ClassInstanceMemberType, ABIFunction]> = [];
       if (getDecl !== undefined) {
-        const retType = this.toABIReturn(
+        const retType = toABIReturn(
+          this.context,
           getDecl,
           type,
-          this.getIdentifier(tsUtils.declaration.getReturnTypeNode(getDecl)),
+          getIdentifier(tsUtils.declaration.getReturnTypeNode(getDecl)),
         );
         mutableResult.push([
           getDecl,
@@ -917,10 +932,11 @@ export class NEOTranspiler implements Transpiler {
       }
 
       if (setDecl !== undefined) {
-        const retType = this.toABIReturn(
+        const retType = toABIReturn(
+          this.context,
           setDecl,
           type,
-          this.getIdentifier(tsUtils.type_.getTypeNode(tsUtils.parametered.getParameters(setDecl)[0])),
+          getIdentifier(tsUtils.type_.getTypeNode(tsUtils.parametered.getParameters(setDecl)[0])),
         );
         mutableResult.push([
           setDecl,
@@ -951,7 +967,7 @@ export class NEOTranspiler implements Transpiler {
       return this.processMethodProperty(name, decl, type.getCallSignatures(), verify);
     }
 
-    const returnType = this.toABIReturn(decl, type, this.getIdentifier(tsUtils.type_.getTypeNode(decl)));
+    const returnType = toABIReturn(this.context, decl, type, getIdentifier(tsUtils.type_.getTypeNode(decl)));
     const func = {
       name,
       constant: true,
@@ -985,10 +1001,11 @@ export class NEOTranspiler implements Transpiler {
       .filter(utils.notNull);
     const currentReturnType = ts.isConstructorDeclaration(decl)
       ? BOOLEAN_RETURN
-      : this.toABIReturn(
+      : toABIReturn(
+          this.context,
           decl,
           callSignature.getReturnType(),
-          this.getIdentifier(tsUtils.declaration.getReturnTypeNode(decl)),
+          getIdentifier(tsUtils.declaration.getReturnTypeNode(decl)),
         );
     const constant = this.hasDecorator(decl, 'constant');
     const currentFunc = {
@@ -1026,9 +1043,7 @@ export class NEOTranspiler implements Transpiler {
   private paramToABIParameter(param: ts.Symbol): ABIParameter | undefined {
     const decls = tsUtils.symbol.getDeclarations(param);
     const decl = utils.nullthrows(decls[0]);
-    const id = tsUtils.guards.isParameterDeclaration(decl)
-      ? this.getIdentifier(tsUtils.type_.getTypeNode(decl))
-      : undefined;
+    const id = tsUtils.guards.isParameterDeclaration(decl) ? getIdentifier(tsUtils.type_.getTypeNode(decl)) : undefined;
 
     return this.toABIParameter(tsUtils.symbol.getName(param), decl, this.getTypeOfSymbol(param, decl), id);
   }
@@ -1039,149 +1054,11 @@ export class NEOTranspiler implements Transpiler {
     resolvedType: ts.Type | undefined,
     typeIdentifier?: ts.Identifier,
   ): ABIParameter | undefined {
-    const type = this.toABIReturn(node, resolvedType, typeIdentifier);
+    const type = toABIReturn(this.context, node, resolvedType, typeIdentifier);
     if (type === undefined) {
       return undefined;
     }
 
     return { ...type, name };
   }
-
-  private toABIReturn(
-    node: ts.Node,
-    resolvedType: ts.Type | undefined,
-    typeIdentifier?: ts.Identifier,
-  ): ABIReturn | undefined {
-    if (resolvedType === undefined && typeIdentifier === undefined) {
-      this.reportError(node, 'Could not detect ABI, unknown type.', DiagnosticCode.UNKNOWN_TYPE);
-
-      return undefined;
-    }
-
-    if (resolvedType !== undefined && tsUtils.type_.isOnlyBooleanish(resolvedType)) {
-      return { type: 'Boolean' };
-    }
-
-    if (this.isLibAlias(typeIdentifier, 'Address')) {
-      return { type: 'Hash160' };
-    }
-
-    if (this.isLibAlias(typeIdentifier, 'Hash256')) {
-      return { type: 'Hash256' };
-    }
-
-    if (this.isLibAlias(typeIdentifier, 'Signature')) {
-      return { type: 'Signature' };
-    }
-
-    if (this.isLibAlias(typeIdentifier, 'PublicKey')) {
-      return { type: 'PublicKey' };
-    }
-
-    if (resolvedType === undefined) {
-      this.reportError(node, 'Invalid contract type.', DiagnosticCode.INVALID_CONTRACT_TYPE);
-
-      return undefined;
-    }
-
-    if (tsUtils.type_.isOnlyVoidish(resolvedType)) {
-      return { type: 'Void' };
-    }
-
-    if (tsUtils.type_.isOnlyStringish(resolvedType)) {
-      return { type: 'String' };
-    }
-
-    if (tsUtils.type_.isOnlyNumberLiteral(resolvedType)) {
-      return { type: 'Integer', decimals: 0 };
-    }
-
-    if (this.isFixedType(node, resolvedType)) {
-      const decimals = this.getFixedDecimals(resolvedType);
-
-      return { type: 'Integer', decimals };
-    }
-
-    if (tsUtils.type_.isOnlyNumberish(resolvedType)) {
-      return { type: 'Integer', decimals: 0 };
-    }
-
-    if (tsUtils.type_.isOnlyArray(resolvedType)) {
-      const typeArguments = tsUtils.type_.getTypeArguments(resolvedType);
-      if (typeArguments !== undefined) {
-        const value = this.toABIReturn(node, typeArguments[0]);
-        if (value !== undefined) {
-          return { type: 'Array', value };
-        }
-      }
-    }
-
-    if (this.isOnlyGlobal(node, resolvedType, 'Buffer')) {
-      return BYTE_ARRAY_RETURN;
-    }
-
-    this.reportError(node, 'Invalid contract type.', DiagnosticCode.INVALID_CONTRACT_TYPE);
-
-    return undefined;
-  }
-
-  private getFixedDecimals(type: ts.Type): number {
-    const unionTypes = tsUtils.type_.getUnionTypes(type);
-    if (unionTypes !== undefined && unionTypes.length === 2) {
-      const intersectionTypes = tsUtils.type_.getIntersectionTypes(unionTypes[1]);
-      if (intersectionTypes !== undefined && intersectionTypes.length === 2) {
-        const typeArguments = tsUtils.type_.getTypeArguments(intersectionTypes[1]);
-        if (typeArguments !== undefined && typeArguments.length === 1) {
-          // tslint:disable-next-line no-any
-          return (typeArguments[0] as any).value;
-        }
-      }
-    }
-
-    throw new Error('Something went wrong');
-  }
-
-  private getIdentifier(node: ts.TypeNode | undefined): ts.Identifier | undefined {
-    return node === undefined ? node : tsUtils.node.getFirstDescendantByKind(node, ts.SyntaxKind.Identifier);
-  }
 }
-
-// Source map code
-// // const host = (this.ast.getProgram().compilerObject as any).getEmitHost();
-// const program = this.ast.getProgram().compilerObject;
-// const host = {
-//   getPrependNodes: () => [],
-//   getCanonicalFileName: (fileName) => (ts.sys.useCaseSensitiveFileNames ? fileName : fileName.toLowerCase()),
-//   getCommonSourceDirectory: program.getCommonSourceDirectory,
-//   getCompilerOptions: program.getCompilerOptions,
-//   getCurrentDirectory: program.getCurrentDirectory,
-//   getNewLine: () => NewLineKind.LineFeed,
-//   getSourceFile: program.getSourceFile,
-//   getSourceFileByPath: program.getSourceFileByPath,
-//   getSourceFiles: program.getSourceFiles,
-//   isSourceFileFromExternalLibrary: program.isSourceFileFromExternalLibrary,
-//   writeFile: ts.sys.writeFile,
-//   readFile: (f) => ts.sys.readFile(f),
-//   fileExists: (f) => ts.sys.fileExists(f),
-//   directoryExists: (d) => ts.sys.directoryExists(d),
-// };
-// const writer = (ts as any).createTextWriter(host.getNewLine());
-// const sourceMap = (ts as any).createSourceMapWriter(host, writer, {
-//   ...this.ast.getCompilerOptions(),
-//   sourceMap: true,
-// });
-// sourceMap.initialize(file.getFilePath(), `${file.getFilePath()}.map`);
-
-// const printer = ts.createPrinter(
-//   { ...this.ast.getCompilerOptions() } as any,
-//   {
-//     onEmitSourceMapOfNode: sourceMap.emitNodeWithSourceMap,
-//     onEmitSourceMapOfToken: sourceMap.emitTokenWithSourceMap,
-//     onEmitSourceMapOfPosition: sourceMap.emitPos,
-//     onSetSourceFile: sourceMap.setSourceFile,
-//   } as any,
-// );
-
-// const result = printer.printFile(file.compilerNode);
-// console.log(sourceMap.getText());
-// console.log(result);

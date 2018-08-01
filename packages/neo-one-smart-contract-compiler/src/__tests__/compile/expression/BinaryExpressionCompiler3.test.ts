@@ -35,7 +35,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test('0 != "a" [ExclamationEqualsToken]', async () => {
+  test.skip('0 != "a" [ExclamationEqualsToken]', async () => {
     await helpers.executeString(`
       const a: string | number = 0 as string | number;
       const b: string | number = 'a' as string | number;

@@ -8,17 +8,23 @@ import {
 import { BN } from 'bn.js';
 import { RawSourceMap } from 'source-map';
 import { processError } from '@neo-one/client-switch';
-import { extractErrorTrace, NEOONEDataProvider } from '@neo-one/client';
+import { extractErrorTrace, NEOONEDataProvider, RawCallReceipt, createConsoleLogMessages } from '@neo-one/client';
 
 export const checkResult = async (receiptIn: CallReceiptJSON, sourceMap: RawSourceMap) => {
-  const receipt = (new NEOONEDataProvider({ network: 'meh', rpcURL: 'meh' }) as any).convertCallReceipt(receiptIn);
-  if (receipt.result.state === VMState.Fault) {
-    const message = await processError({
-      ...extractErrorTrace(receipt.actions),
-      message: receipt.result.message,
-      sourceMap,
-    });
-    throw new Error(`Error in execution: ${message}`);
+  const receipt: RawCallReceipt = (new NEOONEDataProvider({ network: 'meh', rpcURL: 'meh' }) as any).convertCallReceipt(
+    receiptIn,
+  );
+  if (receipt.result.state === 'FAULT') {
+    const [message, logs] = await Promise.all([
+      processError({
+        ...extractErrorTrace(receipt.actions),
+        message: receipt.result.message,
+        sourceMap,
+      }),
+      createConsoleLogMessages(receipt.actions, sourceMap),
+    ]);
+    const logMessage = logs.length === 0 ? '' : `\n\n${logs.join('\n\n')}`;
+    throw new Error(`Error in execution: ${message}${logMessage}\n`);
   }
 };
 

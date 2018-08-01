@@ -33,7 +33,7 @@ export class GetArrayIndexHelper extends Helper {
           sb.emitHelper(node, options, sb.helpers.getArrayValue);
           // [indexNumber, arr]
           sb.emitOp(node, 'SWAP');
-          // []
+          // [val]
           sb.emitOp(node, 'PICKITEM');
         },
         whenFalse: () => {
