@@ -195,3 +195,5 @@ interface TypedPropertyDescriptor<T> {
   get?: () => T;
   set?: (value: T) => void;
 }
+
+interface TemplateStringsArray extends Array<string> {}

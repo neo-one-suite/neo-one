@@ -56,6 +56,7 @@ import {
   BindFunctionThisHelper,
   BindFunctionThisHelperOptions,
   CallHelper,
+  CallLikeHelper,
   CloneFunctionHelper,
   CloneFunctionObjectHelper,
   CloneFunctionObjectHelperOptions,
@@ -219,6 +220,7 @@ export interface Helpers {
   readonly bindFunctionObjectThis: (options: BindFunctionObjectThisHelperOptions) => BindFunctionObjectThisHelper;
   readonly bindFunctionThis: (options: BindFunctionThisHelperOptions) => BindFunctionThisHelper;
   readonly call: CallHelper;
+  readonly callLike: CallLikeHelper;
   readonly cloneFunction: CloneFunctionHelper;
   readonly cloneFunctionObject: (options: CloneFunctionObjectHelperOptions) => CloneFunctionObjectHelper;
   readonly createCallArray: CreateCallArrayHelper;
@@ -396,6 +398,7 @@ export const createHelpers = (): Helpers => {
     bindFunctionObjectThis: (options) => new BindFunctionObjectThisHelper(options),
     bindFunctionThis: (options) => new BindFunctionThisHelper(options),
     call: new CallHelper(),
+    callLike: new CallLikeHelper(),
     cloneFunction: new CloneFunctionHelper(),
     cloneFunctionObject: (options) => new CloneFunctionObjectHelper(options),
     createCallArray: new CreateCallArrayHelper(),

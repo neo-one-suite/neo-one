@@ -12,6 +12,7 @@ export class AddArrayObjectHelper extends AddConstructorObjectHelper {
   protected readonly name = 'Array';
 
   protected addPrototypeProperties(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
+    this.addForEach(sb, node, options);
     this.addMap(sb, node, options);
     this.addFilter(sb, node, options);
     this.addReduce(sb, node, options);
@@ -120,6 +121,50 @@ export class AddArrayObjectHelper extends AddConstructorObjectHelper {
     );
     // [objectVal, globalObjectVal]
     sb.emitHelper(node, options, sb.helpers.setInternalObjectProperty);
+  }
+
+  private addForEach(sb: ScriptBuilder, node: ts.Node, outerOptions: VisitOptions): void {
+    this.addMethod(sb, node, outerOptions, 'forEach', (options) => {
+      const func = sb.scope.addUnique();
+      // [0, argsarr]
+      sb.emitPushInt(node, 0);
+      // [func]
+      sb.emitOp(node, 'PICKITEM');
+      // []
+      sb.scope.set(sb, node, options, func);
+      // [arrayObjectVal]
+      sb.scope.getThis(sb, node, options);
+      // [arr]
+      sb.emitHelper(node, options, sb.helpers.unwrapArray);
+      // []
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.arrForEach({
+          withIndex: true,
+          each: () => {
+            // [idx, val]
+            sb.emitOp(node, 'SWAP');
+            // [idxVal, val]
+            sb.emitHelper(node, options, sb.helpers.createNumber);
+            // [val, idxVal]
+            sb.emitOp(node, 'SWAP');
+            // [2, val, idxVal]
+            sb.emitPushInt(node, 2);
+            // [argsarr]
+            sb.emitOp(node, 'PACK');
+            // [fObjectVal, argsarr]
+            sb.scope.get(sb, node, options, func);
+            // [val]
+            sb.emitHelper(node, options, sb.helpers.invokeCall());
+            // []
+            sb.emitOp(node, 'DROP');
+          },
+        }),
+      );
+      // [val]
+      sb.emitHelper(node, options, sb.helpers.createUndefined);
+    });
   }
 
   private addMap(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {

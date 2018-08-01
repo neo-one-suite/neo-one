@@ -29,6 +29,7 @@ import { SpreadElementCompiler } from './SpreadElementCompiler';
 import { StringLiteralCompiler } from './StringLiteralCompiler';
 import { SuperExpressionCompiler } from './SuperExpressionCompiler';
 import { TaggedTemplateExpressionCompiler } from './TaggedTemplateExpressionCompiler';
+import { TemplateExpressionCompiler } from './TemplateExpressionCompiler';
 import { ThisExpressionCompiler } from './ThisExpressionCompiler';
 import { TypeAssertionCompiler } from './TypeAssertionCompiler';
 import { TypeOfExpressionCompiler } from './TypeOfExpressionCompiler';
@@ -68,6 +69,7 @@ export const expressions = [
   SpreadElementCompiler,
   StringLiteralCompiler,
   SuperExpressionCompiler,
+  TemplateExpressionCompiler,
   TaggedTemplateExpressionCompiler,
   ThisExpressionCompiler,
   TypeAssertionCompiler,

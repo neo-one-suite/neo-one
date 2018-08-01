@@ -26,20 +26,28 @@
     "node": ">=10.6.0"
   },
   "lint-staged": {
-    "packages/*/src/**/*.ts": [
-      "yarn run prettier --write --config .prettierrc",
-      "git add",
-      "yarn test --findRelatedTests --ci --passWithNoTests -w 4",
-      "yarn run lint-files"
-    ],
-    "scripts/**/*.js": [
-      "yarn run prettier --write --config .prettierrc --parser flow",
-      "git add"
-    ],
-    "scripts/**/*.ts": [
-      "yarn run prettier --write --config .prettierrc",
-      "git add",
-      "yarn run lint-files"
+    "linters": {
+      "packages/*/src/**/*.ts": [
+        "yarn run prettier --write --config .prettierrc",
+        "git add",
+        "yarn test --findRelatedTests --ci --passWithNoTests -w 4",
+        "yarn run lint-files"
+      ],
+      "scripts/**/*.js": [
+        "yarn run prettier --write --config .prettierrc --parser flow",
+        "git add"
+      ],
+      "scripts/**/*.ts": [
+        "yarn run prettier --write --config .prettierrc",
+        "git add",
+        "yarn run lint-files"
+      ]
+    },
+    "ignore": [
+      "packages/neo-one-server-plugin-wallet/src/contracts/*",
+      "packages/neo-one-smart-contract/src/*",
+      "packages/neo-one-smart-contract-lib/src/*",
+      "packages/*/src/__data__/contracts/*"
     ]
   },
   "scripts": {

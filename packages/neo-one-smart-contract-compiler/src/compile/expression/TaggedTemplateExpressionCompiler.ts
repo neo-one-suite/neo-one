@@ -5,7 +5,8 @@ import { VisitOptions } from '../types';
 
 export class TaggedTemplateExpressionCompiler extends NodeCompiler<ts.TaggedTemplateExpression> {
   public readonly kind = ts.SyntaxKind.TaggedTemplateExpression;
-  public visitNode(sb: ScriptBuilder, expr: ts.TaggedTemplateExpression, _options: VisitOptions): void {
-    sb.reportUnsupported(expr);
+
+  public visitNode(sb: ScriptBuilder, node: ts.TaggedTemplateExpression, options: VisitOptions): void {
+    sb.emitHelper(node, options, sb.helpers.callLike);
   }
 }
