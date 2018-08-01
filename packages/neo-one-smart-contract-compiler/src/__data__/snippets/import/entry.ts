@@ -3,6 +3,7 @@ import * as bar from './bar';
 import baz from './baz';
 import { foo } from './foo';
 import { Address, foo as foo2, SmartContract, Foo2SmartContract } from './foo2';
+import incrementValue, { value } from './qux';
 
 if (foo !== 'foo') {
   throw 'Failure';
@@ -19,6 +20,16 @@ if (bar.value() !== 0) {
 bar.incrementValue();
 
 if (bar.value() !== 1) {
+  throw 'Failure';
+}
+
+if (value() !== 0) {
+  throw 'Failure';
+}
+
+incrementValue();
+
+if (value() !== 1) {
   throw 'Failure';
 }
 
