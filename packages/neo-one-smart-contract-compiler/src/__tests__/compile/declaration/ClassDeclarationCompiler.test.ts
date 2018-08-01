@@ -1,4 +1,4 @@
-import { helpers } from '../../../__data__';
+import { keys, helpers } from '../../../__data__';
 
 describe('ClassDeclarationCompiler', () => {
   test('basic class with initializer', async () => {
@@ -470,6 +470,10 @@ describe('ClassDeclarationCompiler', () => {
       }
 
       if (token.getSupply() !== 1000000) {
+        throw 'Failure';
+      }
+
+      if (token.balanceOf(${helpers.getAddressHash(keys[0].address)}) !== 0) {
         throw 'Failure';
       }
     `);

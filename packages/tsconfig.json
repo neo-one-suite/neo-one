@@ -5,7 +5,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
 
-    "lib": [],
+    "noLib": true,
     "paths": {
       "@neo-one/*": [
         "./neo-one-*/src"
@@ -34,6 +34,7 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
+    "neo-one-server-plugin-wallet/src/contracts/*",
     "neo-one-smart-contract-lib/src/*",
     "*/src/__data__/contracts/*"
   ]

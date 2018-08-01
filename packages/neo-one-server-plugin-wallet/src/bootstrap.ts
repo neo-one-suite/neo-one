@@ -22,7 +22,11 @@ import {
 import { common } from '@neo-one/client-core';
 import { GetCLIResourceOptions, InteractiveCLI, InteractiveCLIArgs } from '@neo-one/server-plugin';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
-import { CompileContractResult, findAndCompileContract } from '@neo-one/smart-contract-compiler';
+import {
+  CompileContractResult,
+  findAndCompileContract,
+  throwOnDiagnosticErrorOrWarning,
+} from '@neo-one/smart-contract-compiler';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as fs from 'fs-extra';
@@ -728,10 +732,14 @@ const findContracts = async (current: string): Promise<string> => {
 export const compileSmartContract = async (contractName: string): Promise<CompileContractResult> => {
   const dir = await findContracts(require.resolve('@neo-one/server-plugin-wallet'));
 
-  return findAndCompileContract({
+  const result = await findAndCompileContract({
     dir,
     contractName,
   });
+
+  throwOnDiagnosticErrorOrWarning(result.diagnostics, false);
+
+  return result;
 };
 
 const compileSmartContracts = async (

@@ -111,7 +111,7 @@ const globs = {
   ],
   bin: ['packages/*/src/bin/*.ts'],
   pkg: ['packages/*/package.json'],
-  pkgFiles: ['packages/neo-one-smart-contract/tsconfig.json'],
+  pkgFiles: ['packages/*/tsconfig.json'],
   files: ['lerna.json', 'yarn.lock'],
   metadata: ['LICENSE', 'README.md', 'CHANGELOG.md'],
 };
@@ -422,7 +422,7 @@ gulp.task(
   'watch',
   gulp.series(buildE2ESeries('fast'), function startWatch() {
     noCache = true;
-    gulp.watch(globs.src(MAIN_FORMAT), buildTypescript(MAIN_FORMAT, 'fast'));
+    gulp.watch(globs.originalSrc, buildTypescript(MAIN_FORMAT, 'fast'));
     gulp.watch(globs.bin, gulp.series('buildBin'));
   }),
 );
