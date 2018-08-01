@@ -6,7 +6,7 @@ import { VisitOptions } from '../types';
 export class PartiallyEmittedExpressionCompiler extends NodeCompiler<ts.PartiallyEmittedExpression> {
   public readonly kind = ts.SyntaxKind.PartiallyEmittedExpression;
 
-  public visitNode(sb: ScriptBuilder, expr: ts.PartiallyEmittedExpression, _options: VisitOptions): void {
-    sb.reportUnsupported(expr);
+  public visitNode(_sb: ScriptBuilder, _expr: ts.PartiallyEmittedExpression, _options: VisitOptions): void {
+    // do nothing
   }
 }

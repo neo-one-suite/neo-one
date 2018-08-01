@@ -17,4 +17,13 @@ describe('ImportDeclarationCompiler', () => {
       { type: 'error' },
     );
   });
+
+  test('import = unsupported', async () => {
+    await helpers.compileString(
+      `
+      import x = require('x');
+    `,
+      { type: 'error' },
+    );
+  });
 });

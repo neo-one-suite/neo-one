@@ -5,7 +5,6 @@ import { AwaitExpressionCompiler } from './AwaitExpressionCompiler';
 import { BinaryExpressionCompiler } from './BinaryExpressionCompiler';
 import { FalseBooleanLiteralCompiler, TrueBooleanLiteralCompiler } from './BooleanLiteralCompiler';
 import { CallExpressionCompiler } from './CallExpressionCompiler';
-import { CommaListExpressionCompiler } from './CommaListExpressionCompiler';
 import { ConditionalExpressionCompiler } from './ConditionalExpressionCompiler';
 import { DeleteExpressionCompiler } from './DeleteExpressionCompiler';
 import { ElementAccessExpressionCompiler } from './ElementAccessExpressionCompiler';
@@ -46,7 +45,6 @@ export const expressions = [
   TrueBooleanLiteralCompiler,
   FalseBooleanLiteralCompiler,
   CallExpressionCompiler,
-  CommaListExpressionCompiler,
   ConditionalExpressionCompiler,
   DeleteExpressionCompiler,
   ElementAccessExpressionCompiler,

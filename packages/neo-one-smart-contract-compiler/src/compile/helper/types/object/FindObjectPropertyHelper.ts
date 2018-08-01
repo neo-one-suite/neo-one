@@ -35,82 +35,11 @@ export class FindObjectPropertyHelper extends Helper {
       return;
     }
 
-    // [objectVal, prop]
-    sb.emitOp(node, 'SWAP');
-
-    const prepareLoop = () => {
-      // [objectVal, objectVal, prop]
-      sb.emitOp(node, 'DUP');
-      // [pobj, objectVal, prop]
-      sb.emitHelper(node, options, sb.helpers.getPropertyObject);
-      // [pobj, pobj, objectVal, prop]
-      sb.emitOp(node, 'DUP');
-      // [objectVal, pobj, pobj, prop]
-      sb.emitOp(node, 'ROT');
-      // [obj, pobj, pobj, prop]
-      sb.emitHelper(node, options, this.getObject(sb));
-      // [obj, obj, pobj, pobj, prop]
-      sb.emitOp(node, 'DUP');
-      // [4, obj, obj, pobj, pobj, prop]
-      sb.emitPushInt(node, 4);
-      // [prop, obj, obj, pobj, pobj, prop]
-      sb.emitOp(node, 'PICK');
-    };
-
-    // [prop, obj, obj, pobj, pobj, prop]
-    prepareLoop();
-
     sb.emitHelper(
       node,
       options,
-      sb.helpers.forLoop({
-        condition: () => {
-          // [hasKey, obj, pobj, pobj, prop]
-          sb.emitOp(node, 'HASKEY');
-          // [notHasKey, obj, pobj, pobj, prop]
-          sb.emitOp(node, 'NOT');
-          // [pobj, notHasKey, obj, pobj, prop]
-          sb.emitOp(node, 'ROT');
-          // ['__proto__', pobj, notHasKey, obj, pobj, prop]
-          sb.emitPushString(node, '__proto__');
-          // [hasPrototypeKey, notHasKey, obj, pobj, prop]
-          sb.emitOp(node, 'HASKEY');
-          // [condition, obj, pobj, prop]
-          sb.emitOp(node, 'AND');
-        },
-        each: () => {
-          // [pobj, prop]
-          sb.emitOp(node, 'DROP');
-          // ['__proto__', pobj, prop]
-          sb.emitPushString(node, '__proto__');
-          // [propVal, prop]
-          sb.emitOp(node, 'PICKITEM');
-          // [0, propVal, prop]
-          sb.emitPushInt(node, 0);
-          // [objectVal, prop]
-          sb.emitOp(node, 'PICKITEM');
-          // [prop, obj, obj, pobj, pobj, prop]
-          prepareLoop();
-        },
-        withScope: false,
-      }),
-    );
-    // [obj, prop]
-    sb.emitOp(node, 'NIP');
-    // [obj, prop, obj]
-    sb.emitOp(node, 'TUCK');
-    // [prop, obj, prop, obj]
-    sb.emitOp(node, 'OVER');
-    // [val]
-    sb.emitHelper(
-      node,
-      options,
-      sb.helpers.if({
-        condition: () => {
-          // [hasKey, prop, obj]
-          sb.emitOp(node, 'HASKEY');
-        },
-        whenTrue: () => {
+      sb.helpers.findObjectPropertyBase({
+        whenHasProperty: () => {
           // [propVal]
           sb.emitOp(node, 'PICKITEM');
           // [propVal, propVal]
@@ -136,13 +65,14 @@ export class FindObjectPropertyHelper extends Helper {
             }),
           );
         },
-        whenFalse: () => {
+        whenNotHasProperty: () => {
           // [obj]
           sb.emitOp(node, 'DROP');
           // []
           sb.emitOp(node, 'DROP');
           this.data();
         },
+        getObject: this.getObject,
       }),
     );
   }

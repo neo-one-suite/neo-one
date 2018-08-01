@@ -31,6 +31,7 @@ import {
   ArrSliceHelper,
   ArrSliceHelperOptions,
   CloneArrayHelper,
+  ExpHelper,
   ExtendArrayHelper,
   ForTypeHelper,
   ForTypeHelperOptions,
@@ -139,6 +140,8 @@ import {
   CreateUndefinedHelper,
   ElementAccessHelper,
   FindObjectPropertyHelper,
+  FindObjectPropertyHelperBase,
+  FindObjectPropertyHelperBaseOptions,
   FindObjectPropertyHelperOptions,
   GetBooleanHelper,
   GetInternalObjectHelper,
@@ -151,7 +154,11 @@ import {
   GetSymbolHelper,
   GetSymbolObjectHelper,
   GetSymbolObjectPropertyHelper,
+  InObjectPropertyHelper,
+  InObjectPropertyHelperOptions,
+  InPropertyObjectPropertyHelper,
   InstanceofHelper,
+  InSymbolObjectPropertyHelper,
   IsBooleanHelper,
   IsNullHelper,
   IsNullOrUndefinedHelper,
@@ -198,6 +205,7 @@ export interface Helpers {
   readonly forType: (options: ForTypeHelperOptions) => ForTypeHelper;
   readonly genericDeserialize: GenericDeserializeHelper;
   readonly genericSerialize: GenericSerializeHelper;
+  readonly exp: ExpHelper;
 
   readonly equalsEqualsEquals: (options: EqualsEqualsEqualsHelperOptions) => EqualsEqualsEqualsHelper;
   readonly equalsEqualsEqualsNumber: EqualsEqualsEqualsNumberHelper;
@@ -292,8 +300,12 @@ export interface Helpers {
   readonly omitSymbolObjectProperties: OmitSymbolObjectPropertiesHelper;
   readonly unwrapVal: UnwrapValHelper;
   readonly instanceof: InstanceofHelper;
+  readonly inObjectProperty: (options: InObjectPropertyHelperOptions) => InObjectPropertyHelper;
+  readonly inPropertyObjectProperty: InPropertyObjectPropertyHelper;
+  readonly inSymbolObjectProperty: InSymbolObjectPropertyHelper;
   readonly createPropertyObject: CreatePropertyObjectHelper;
   readonly findObjectProperty: (options: FindObjectPropertyHelperOptions) => FindObjectPropertyHelper;
+  readonly findObjectPropertyBase: (options: FindObjectPropertyHelperBaseOptions) => FindObjectPropertyHelperBase;
 
   readonly getArrayValue: GetArrayValueHelper;
   readonly createArray: CreateArrayHelper;
@@ -370,6 +382,7 @@ export const createHelpers = (): Helpers => {
     forType: (options) => new ForTypeHelper(options),
     genericDeserialize: new GenericDeserializeHelper(),
     genericSerialize: new GenericSerializeHelper(),
+    exp: new ExpHelper(),
 
     equalsEqualsEquals: (options) => new EqualsEqualsEqualsHelper(options),
     equalsEqualsEqualsNumber: new EqualsEqualsEqualsNumberHelper(),
@@ -460,8 +473,12 @@ export const createHelpers = (): Helpers => {
     unwrapType: new UnwrapTypeHelper(),
     unwrapVal: new UnwrapValHelper(),
     instanceof: new InstanceofHelper(),
+    inObjectProperty: (options) => new InObjectPropertyHelper(options),
+    inPropertyObjectProperty: new InPropertyObjectPropertyHelper(),
+    inSymbolObjectProperty: new InSymbolObjectPropertyHelper(),
     createPropertyObject: new CreatePropertyObjectHelper(),
     findObjectProperty: (options) => new FindObjectPropertyHelper(options),
+    findObjectPropertyBase: (options) => new FindObjectPropertyHelperBase(options),
 
     getArrayValue: new GetArrayValueHelper(),
     createArray: new CreateArrayHelper(),

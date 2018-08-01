@@ -6,7 +6,7 @@ import { VisitOptions } from '../types';
 export class OmittedExpressionCompiler extends NodeCompiler<ts.OmittedExpression> {
   public readonly kind = ts.SyntaxKind.OmittedExpression;
 
-  public visitNode(sb: ScriptBuilder, expr: ts.OmittedExpression, _options: VisitOptions): void {
-    sb.reportUnsupported(expr);
+  public visitNode(_sb: ScriptBuilder, _expr: ts.OmittedExpression, _options: VisitOptions): void {
+    // do nothing
   }
 }

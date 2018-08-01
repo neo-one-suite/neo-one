@@ -69,7 +69,58 @@ export class ToStringHelper extends TypedHelper {
   }
 
   private convertNumber(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    sb.emitHelper(node, options, sb.helpers.throwTypeError);
+    // [number]
+    sb.emitHelper(node, options, sb.helpers.getNumber);
+    const n = sb.scope.addUnique();
+    // []
+    sb.scope.set(sb, node, options, n);
+    const accum = sb.scope.addUnique();
+    // [buffer]
+    sb.emitPushBuffer(node, Buffer.from([]));
+    // []
+    sb.scope.set(sb, node, options, accum);
+    sb.emitHelper(
+      node,
+      options,
+      sb.helpers.forLoop({
+        condition: () => {
+          // [n]
+          sb.scope.get(sb, node, options, n);
+          // [0, n]
+          sb.emitPushInt(node, 0);
+          // [n > 0]
+          sb.emitOp(node, 'GT');
+        },
+        each: () => {
+          // [n]
+          sb.scope.get(sb, node, options, n);
+          // [n, n]
+          sb.emitOp(node, 'DUP');
+          // [10, n, n]
+          sb.emitPushInt(node, 10);
+          // [n / 10, n]
+          sb.emitOp(node, 'DIV');
+          // [n]
+          sb.scope.set(sb, node, options, n);
+          // [10, n]
+          sb.emitPushInt(node, 10);
+          // [n % 10]
+          sb.emitOp(node, 'MOD');
+          // [0x30, n % 10]
+          sb.emitPushInt(node, 0x30);
+          // [number]
+          sb.emitOp(node, 'ADD');
+          // [accum, number]
+          sb.scope.get(sb, node, options, accum);
+          // [number + accum]
+          sb.emitOp(node, 'CAT');
+          // []
+          sb.scope.set(sb, node, options, accum);
+        },
+      }),
+    );
+    // [string]
+    sb.scope.get(sb, node, options, accum);
   }
 
   private convertString(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {

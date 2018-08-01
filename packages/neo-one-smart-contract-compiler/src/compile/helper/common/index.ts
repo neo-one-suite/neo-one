@@ -3,6 +3,7 @@ export * from './ArrForEachHelper';
 export * from './ArrMapHelper';
 export * from './ArrSliceHelper';
 export * from './CloneArrayHelper';
+export * from './ExpHelper';
 export * from './ExtendArrayHelper';
 export * from './ForTypeHelper';
 export * from './GenericDeserializeHelper';

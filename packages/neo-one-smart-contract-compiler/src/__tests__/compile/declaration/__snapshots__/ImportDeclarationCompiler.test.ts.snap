@@ -10,3 +10,13 @@ exports[`ImportDeclarationCompiler export = unsupported 1`] = `
       5 |     
 "
 `;
+
+exports[`ImportDeclarationCompiler import = unsupported 1`] = `
+"snippetCode.ts (2,14): 'x' is declared but its value is never read.
+
+      1 | 
+    > 2 |       import x = require('x');
+        |              ^
+      3 |     
+"
+`;

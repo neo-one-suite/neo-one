@@ -49,11 +49,12 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('x **= 3 [AsteriskAsteriskEqualsToken]', async () => {
+  test('x **= 3 [AsteriskAsteriskEqualsToken]', async () => {
     await helpers.executeString(`
       let x = 3;
       x **= 3;
       if (x !== 27) {
+        console.log(x);
         throw 'Failure';
       }
     `);
@@ -175,7 +176,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('1 + "3" === "13" [PlusToken:StringConcatenation:IntLeftStrRight]', async () => {
+  test('1 + "3" === "13" [PlusToken:StringConcatenation:IntLeftStrRight]', async () => {
     await helpers.executeString(`
       if (1 + '3' !== '13') {
         throw 'Failure';
@@ -183,12 +184,35 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('"4" + 2 === "42" [PlusToken:StringConcatenation:StrLeftIntRight]', async () => {
+  test('12 + "3" === "13" [PlusToken:StringConcatenation:IntLeftStrRight]', async () => {
     await helpers.executeString(`
-      if ('4' + 2 !== '42') {
+      if (12 + '3' !== '123') {
         throw 'Failure';
       }
     `);
+  });
+
+  test('"4" + 21 === "421" [PlusToken:StringConcatenation:StrLeftIntRight]', async () => {
+    await helpers.executeString(`
+      if ('4' + 21 !== '421') {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('"4" + 21 === "421" [PlusToken:StringConcatenation:Unknown]', async () => {
+    await helpers.executeString(
+      `
+      const x: string | number = 21 as string | number;
+      const y: any = '4' as any;
+      const z: string = y + x;
+      if (z !== '421') {
+        console.log(z);
+        throw 'Failure';
+      }
+    `,
+      { ignoreWarnings: true },
+    );
   });
 
   test('1 - 2 = -1 [MinusToken]', async () => {
@@ -202,6 +226,16 @@ describe('BinaryExpressionCompiler', () => {
   test('(224 >>> 2) == 56 [GreaterThanGreaterThanGreaterThanToken]', async () => {
     await helpers.executeString(`
       if ((224 >>> 2) !== 56) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('(224 >>>= 2) == 56 [GreaterThanGreaterThanGreaterThanEqualsToken]', async () => {
+    await helpers.executeString(`
+      let x = 224;
+      x >>>= 2;
+      if (x !== 56) {
         throw 'Failure';
       }
     `);

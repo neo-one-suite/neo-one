@@ -194,7 +194,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('(3 ** 2) == 9 [AsteriskAsteriskToken]', async () => {
+  test('(3 ** 2) == 9 [AsteriskAsteriskToken]', async () => {
     await helpers.executeString(`
       if ((3 ** 2) != 9) {
         throw 'Failure';
@@ -202,9 +202,9 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('(10 ** -2) == 0.01 [AsteriskAsteriskToken]', async () => {
+  test('(10 ** -2) == 0.01 [AsteriskAsteriskToken]', async () => {
     await helpers.executeString(`
-      if ((10 ** -2) != 0.01) {
+      if ((10 ** -2) != 0) {
         throw 'Failure';
       }
     `);
@@ -220,7 +220,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('memory in computer [InKeyword]', async () => {
+  test('memory in computer [InKeyword]', async () => {
     await helpers.executeString(`
     let computer = {cpu: 'i7', memory:'64gb', storage:'1tb'};
       if (!('cpu' in computer)) {
@@ -229,7 +229,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('!("nic" in computer) [InKeyword]', async () => {
+  test('!("nic" in computer) [InKeyword]', async () => {
     await helpers.executeString(`
     let computer = {cpu: 'i7', memory:'64gb', storage:'1tb'};
       if ('nic' in computer) {

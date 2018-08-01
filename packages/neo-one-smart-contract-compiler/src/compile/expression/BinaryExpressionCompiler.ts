@@ -258,7 +258,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
           // [left, right, left]
           sb.emitOp(node, 'TUCK');
           // [right, left, right, left]
-          sb.emitOp(node, 'TUCK');
+          sb.emitOp(node, 'OVER');
           // [isString, left, right, left]
           sb.emitHelper(node, options, sb.helpers.isString);
           // [left, isString, right, left]
@@ -368,7 +368,14 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
       case ts.SyntaxKind.InKeyword:
-        sb.reportUnsupported(node);
+        // [objectVal]
+        sb.visit(right, options);
+        // [propVal, objectVal]
+        sb.visit(left, options);
+        // [boolean]
+        sb.emitHelper(node, options, sb.helpers.inObjectProperty({ propType: leftType }));
+        // [booleanVal]
+        sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case ts.SyntaxKind.InstanceOfKeyword:
         // [left]
@@ -389,7 +396,10 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         sb.visit(right, options);
         break;
       case ts.SyntaxKind.AsteriskAsteriskToken:
-        sb.reportUnsupported(node);
+        // [right, left]
+        visitNumeric();
+        sb.emitHelper(node, options, sb.helpers.exp);
+        sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
       case ts.SyntaxKind.EqualsEqualsEqualsToken:
         sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ left, right }));
