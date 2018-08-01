@@ -10,7 +10,7 @@ export class AsExpressionCompiler extends NodeCompiler<ts.AsExpression> {
 
   public visitNode(sb: ScriptBuilder, expr: ts.AsExpression, options: VisitOptions): void {
     const type = sb.getType(expr);
-    if (options.cast !== undefined && (type === undefined || tsUtils.type_.isAny(type))) {
+    if (options.cast !== undefined && type === undefined) {
       sb.visit(tsUtils.expression.getExpression(expr), options);
     } else {
       sb.visit(tsUtils.expression.getExpression(expr), sb.castOptions(options, type));
