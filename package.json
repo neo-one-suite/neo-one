@@ -54,7 +54,7 @@
     "test-ci": "jest --config jest/unit-ci.js --ci -w 1",
     "e2e": "jest --config jest/e2e.js",
     "e2e-ci": "jest --config jest/e2e-ci.js --ci -w 1",
-    "tsc": "tsc",
+    "tsc": "tsc && tsc -p packages",
     "ts-node": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" TS_NODE_PROJECT=tsconfig/tsconfig.es2018.cjs.json node -r ts-node/register/transpile-only",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.ts\"",
     "nit:scripts:ts": "prettier --config .prettierrc --list-different \"scripts/**/*.ts\"",

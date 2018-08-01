@@ -9,7 +9,6 @@ export interface Globals {
   readonly BufferFrom: ts.Symbol;
   readonly BufferEquals: ts.Symbol;
   readonly consoleLog: ts.Symbol;
-  readonly process: ts.Symbol;
   readonly AccountBase: ts.Symbol;
   readonly AssetBase: ts.Symbol;
   readonly AttributeBase: ts.Symbol;
@@ -27,32 +26,33 @@ export interface Globals {
 }
 
 export const getGlobals = (program: ts.Program, typeChecker: ts.TypeChecker): Globals => {
-  const bufferFile = tsUtils.file.getSourceFile(program, require.resolve('@types/node/index.d.ts'));
-  if (bufferFile === undefined) {
+  const globalsFile = tsUtils.file.getSourceFile(
+    program,
+    path.resolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'global.d.ts'),
+  );
+  if (globalsFile === undefined) {
     throw new Error('Could not find Buffer');
   }
-  const neoFile = tsUtils.file.getSourceFile(
+  const neoGlobal = tsUtils.file.getSourceFile(
     program,
-    path.resolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'index.d.ts'),
+    path.resolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'sc.d.ts'),
   );
-  if (neoFile === undefined) {
+  if (neoGlobal === undefined) {
     throw new Error('Could not find NEO type definition file');
   }
 
-  const neoGlobal = tsUtils.statement.getNamespaceOrThrow(neoFile, 'global');
-
   const buffer = tsUtils.node.getSymbolOrThrow(
     typeChecker,
-    tsUtils.statement.getInterfaceOrThrow(bufferFile, 'Buffer'),
+    tsUtils.statement.getInterfaceOrThrow(globalsFile, 'Buffer'),
   );
 
   const nodeConsole = tsUtils.node.getSymbolOrThrow(
     typeChecker,
-    tsUtils.statement.getInterfaceOrThrow(bufferFile, 'Console'),
+    tsUtils.statement.getInterfaceOrThrow(globalsFile, 'Console'),
   );
 
   const bufferVar = tsUtils.type_.getSymbolOrThrow(
-    tsUtils.type_.getType(typeChecker, tsUtils.statement.getVariableDeclarationOrThrow(bufferFile, 'Buffer')),
+    tsUtils.type_.getType(typeChecker, tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Buffer')),
   );
 
   return {
@@ -61,10 +61,6 @@ export const getGlobals = (program: ts.Program, typeChecker: ts.TypeChecker): Gl
     BufferFrom: tsUtils.symbol.getMemberOrThrow(bufferVar, 'from'),
     BufferEquals: tsUtils.symbol.getMemberOrThrow(buffer, 'equals'),
     consoleLog: tsUtils.symbol.getMemberOrThrow(nodeConsole, 'log'),
-    process: tsUtils.node.getSymbolOrThrow(
-      typeChecker,
-      tsUtils.statement.getVariableDeclarationOrThrow(bufferFile, 'process'),
-    ),
     AccountBase: tsUtils.node.getSymbolOrThrow(
       typeChecker,
       tsUtils.statement.getInterfaceOrThrow(neoGlobal, 'AccountBase'),

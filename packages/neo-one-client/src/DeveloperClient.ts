@@ -49,7 +49,7 @@ export class DeveloperClient<
     const result = await this.getProvider(options).execute(script, options, sourceMap);
 
     const [invokeReceipt] = await Promise.all([
-      result.confirmed({ timeoutMS: 1250 }),
+      result.confirmed({ timeoutMS: 5000 }),
       this.developerProvider.runConsensusNow(),
     ]);
 

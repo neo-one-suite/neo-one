@@ -189,11 +189,11 @@ export class AddArrayObjectHelper extends AddConstructorObjectHelper {
             sb.emitOp(node, 'ROT');
             // [indexVal, accum, val]
             sb.emitHelper(node, options, sb.helpers.createNumber);
-            // [accum, indexVal, val]
-            sb.emitOp(node, 'SWAP');
-            // [val, accum, indexVal]
+            // [val, indexVal, accum]
             sb.emitOp(node, 'ROT');
-            // [3, val, accum, indexVal]
+            // [accum, val, indexVal]
+            sb.emitOp(node, 'ROT');
+            // [3, accum, val, indexVal]
             sb.emitPushInt(node, 3);
             // [argsarr]
             sb.emitOp(node, 'PACK');

@@ -1,11 +1,17 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
     "target": "esnext",
     "module": "commonjs",
     "moduleResolution": "node",
 
-    "lib": ["es5", "es2015"],
-    "typeRoots": ["./node_modules/@neo-one/smart-contract"],
+    "lib": [],
+    "paths": {
+      "@neo-one/*": [
+        "./neo-one-*/src"
+      ]
+    },
+    "typeRoots": [],
 
     "pretty": true,
 
@@ -18,7 +24,7 @@
 
     "alwaysStrict": true,
     "strict": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
     "allowUnusedLabels": false,
@@ -27,7 +33,8 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
   },
-  "exclude": [
-    "**/*"
+  "include": [
+    "neo-one-smart-contract-lib/src/*",
+    "*/src/__data__/contracts/*"
   ]
 }

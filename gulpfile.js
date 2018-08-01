@@ -111,7 +111,7 @@ const globs = {
   ],
   bin: ['packages/*/src/bin/*.ts'],
   pkg: ['packages/*/package.json'],
-  pkgFiles: ['packages/*/tsconfig.default.json'],
+  pkgFiles: ['packages/neo-one-smart-contract/tsconfig.json'],
   files: ['lerna.json', 'yarn.lock'],
   metadata: ['LICENSE', 'README.md', 'CHANGELOG.md'],
 };

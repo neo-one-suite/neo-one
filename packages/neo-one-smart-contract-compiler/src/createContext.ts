@@ -53,12 +53,7 @@ const makeContext = async (
     // do nothing
   },
 ): Promise<Context> => {
-  const tsConfigFilePath = path.resolve(
-    require.resolve('@neo-one/smart-contract-compiler'),
-    '..',
-    '..',
-    'tsconfig.default.json',
-  );
+  const tsConfigFilePath = path.resolve(require.resolve('@neo-one/smart-contract'), '..', '..', 'tsconfig.json');
 
   const res = ts.readConfigFile(tsConfigFilePath, (value) => fs.readFileSync(value, 'utf8'));
   const parseConfigHost = {
@@ -109,14 +104,12 @@ const createProgram = (
   const smartContractDir = path.dirname(require.resolve('@neo-one/smart-contract'));
   const smartContractModule = path.resolve(smartContractDir, 'index.ts');
   const smartContractFiles = [
-    path.resolve(smartContractDir, 'index.d.ts'),
+    path.resolve(smartContractDir, 'global.d.ts'),
+    path.resolve(smartContractDir, 'sc.d.ts'),
     smartContractModule,
-    path.resolve(smartContractDir, 'lib.ts'),
   ];
 
-  const rootNames = [
-    ...new Set(rootNamesIn.concat(smartContractFiles).concat(require.resolve('@types/node/index.d.ts'))),
-  ];
+  const rootNames = [...new Set(rootNamesIn.concat(smartContractFiles))];
 
   const mutableFiles: ts.MapLike<{ version: number } | undefined> = {};
   // initialize the list of files
