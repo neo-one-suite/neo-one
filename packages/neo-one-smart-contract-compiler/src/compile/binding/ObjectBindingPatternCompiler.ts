@@ -102,6 +102,7 @@ export class ObjectBindingPatternCompiler extends NodeCompiler<ts.ObjectBindingP
           propertyNameType === undefined ||
           (!tsUtils.type_.isOnlySymbolish(propertyNameType) && tsUtils.type_.hasSymbolish(propertyNameType))
         ) {
+          /* istanbul ignore next */
           sb.emitHelper(
             node,
             options,

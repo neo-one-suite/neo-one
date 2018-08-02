@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EnumDeclarationCompiler enum Foo 1`] = `
+"snippetCode.ts (2,7): Unsupported syntax
+
+      1 | 
+    > 2 |       enum Foo {
+        |       ^
+      3 |         x = 0,
+      4 |       }
+      5 |     
+"
+`;

@@ -113,6 +113,7 @@ export class ObjectLiteralExpressionCompiler extends NodeCompiler<ts.ObjectLiter
             propertyNameType === undefined ||
             (!tsUtils.type_.isOnlySymbolish(propertyNameType) && tsUtils.type_.hasSymbolish(propertyNameType))
           ) {
+            /* istanbul ignore next */
             sb.emitHelper(
               prop,
               options,

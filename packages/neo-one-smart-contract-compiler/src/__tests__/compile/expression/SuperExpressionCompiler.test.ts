@@ -1,7 +1,7 @@
 import { helpers } from '../../../__data__';
 
 describe('SuperExpressionCompiler', () => {
-  test('basic', async () => {
+  test('super instance method', async () => {
     await helpers.executeString(`
       class Animal {
         public readonly animal: string;
@@ -27,9 +27,25 @@ describe('SuperExpressionCompiler', () => {
 
       const d = new Dog();
 
-      if (d.getAnimal() !== 'dog') {
-        throw 'Failure';
+      assertEqual(d.getAnimal(), 'dog');
+    `);
+  });
+
+  test('super class method', async () => {
+    await helpers.executeString(`
+      class Animal {
+        public static getAnimal(): string {
+          return 'dog';
+        }
       }
+
+      class Dog extends Animal {
+        public static getAnimal(): string {
+          return super.getAnimal();
+        }
+      }
+
+      assertEqual(Dog.getAnimal(), 'dog');
     `);
   });
 });

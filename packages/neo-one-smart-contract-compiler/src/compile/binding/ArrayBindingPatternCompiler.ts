@@ -14,6 +14,7 @@ export class ArrayBindingPatternCompiler extends NodeCompiler<ts.ArrayBindingPat
     const elements = restElement === undefined ? [...node.elements] : node.elements.slice(0, -1);
     elements.forEach((element, idx) => {
       if (ts.isOmittedExpression(element)) {
+        /* istanbul ignore next */
         return;
       }
 

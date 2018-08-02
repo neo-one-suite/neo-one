@@ -25,7 +25,6 @@ import { PostfixUnaryExpressionCompiler } from './PostfixUnaryExpressionCompiler
 import { PrefixUnaryExpressionCompiler } from './PrefixUnaryExpressionCompiler';
 import { PropertyAccessExpressionCompiler } from './PropertyAccessExpressionCompiler';
 import { RegularExpressionLiteralCompiler } from './RegularExpressionLiteralCompiler';
-import { SpreadElementCompiler } from './SpreadElementCompiler';
 import { StringLiteralCompiler } from './StringLiteralCompiler';
 import { SuperExpressionCompiler } from './SuperExpressionCompiler';
 import { TaggedTemplateExpressionCompiler } from './TaggedTemplateExpressionCompiler';
@@ -66,7 +65,6 @@ export const expressions = [
   PrefixUnaryExpressionCompiler,
   PropertyAccessExpressionCompiler,
   RegularExpressionLiteralCompiler,
-  SpreadElementCompiler,
   StringLiteralCompiler,
   SuperExpressionCompiler,
   TemplateExpressionCompiler,

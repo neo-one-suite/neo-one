@@ -62,7 +62,8 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         this.visitLogicalExpressionOperator(sb, kind, expr, options);
         break;
       default:
-        sb.reportUnsupported(expr);
+        /* istanbul ignore next */
+        utils.assertNever(kind);
     }
   }
 
@@ -133,6 +134,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         );
         break;
       default:
+        /* istanbul ignore next */
         utils.assertNever(kind);
     }
 
@@ -411,6 +413,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       default:
+        /* istanbul ignore next */
         utils.assertNever(kind);
     }
   }
@@ -475,6 +478,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         break;
       }
       default:
+        /* istanbul ignore next */
         utils.assertNever(kind);
     }
   }

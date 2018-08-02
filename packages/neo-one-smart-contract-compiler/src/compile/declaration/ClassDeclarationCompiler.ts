@@ -40,6 +40,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
     const implementsBuiltIn = impl.find((implType) => {
       const implSymbol = sb.getSymbol(implType);
       if (implSymbol === undefined) {
+        /* istanbul ignore next */
         return false;
       }
 

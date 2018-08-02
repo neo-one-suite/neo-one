@@ -3,7 +3,10 @@ import { keys, helpers } from '../../../__data__';
 describe('ClassDeclarationCompiler', () => {
   test('basic class with initializer', async () => {
     await helpers.executeString(`
-      class Foo {
+      interface X {
+        x: string;
+      }
+      class Foo implements X {
         x: string = 'bar';
       }
 

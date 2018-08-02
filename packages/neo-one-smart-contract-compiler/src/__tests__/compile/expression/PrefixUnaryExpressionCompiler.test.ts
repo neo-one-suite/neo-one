@@ -19,6 +19,7 @@ describe('PrefixUnaryExpressionCompiler', () => {
 
   test('~', async () => {
     await helpers.executeString(`
+      ~13;
       if (~13 !== -14) {
         throw 'Failure';
       }
@@ -54,7 +55,9 @@ describe('PrefixUnaryExpressionCompiler', () => {
         throw 'Failure';
       }
 
-      if (i !== 2) {
+      --i;
+
+      if (i !== 1) {
         throw 'Failure';
       }
     `);

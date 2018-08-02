@@ -1,6 +1,5 @@
 import { ClassDeclarationCompiler } from './ClassDeclarationCompiler';
 import { EnumDeclarationCompiler } from './EnumDeclarationCompiler';
-import { EnumMemberCompiler } from './EnumMemberCompiler';
 import { ExportAssignmentCompiler } from './ExportAssignmentCompiler';
 import { ExportDeclarationCompiler } from './ExportDeclarationCompiler';
 import { FunctionDeclarationCompiler } from './FunctionDeclarationCompiler';
@@ -14,7 +13,6 @@ import { VariableDeclarationListCompiler } from './VariableDeclarationListCompil
 export const declarations = [
   ClassDeclarationCompiler,
   EnumDeclarationCompiler,
-  EnumMemberCompiler,
   ExportAssignmentCompiler,
   ExportDeclarationCompiler,
   FunctionDeclarationCompiler,

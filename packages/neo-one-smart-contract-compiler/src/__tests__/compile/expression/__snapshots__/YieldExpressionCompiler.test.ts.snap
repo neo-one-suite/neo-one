@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`YieldExpressionCompiler yield 1`] = `
+"snippetCode.ts (3,9): Unsupported syntax
+
+      1 | 
+      2 |       function* foo() {
+    > 3 |         yield 'foo';
+        |         ^
+      4 |       }
+      5 |     
+"
+`;

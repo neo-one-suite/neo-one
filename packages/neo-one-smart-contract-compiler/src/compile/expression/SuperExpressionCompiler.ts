@@ -11,13 +11,17 @@ export class SuperExpressionCompiler extends NodeCompiler<ts.SuperExpression> {
     if (options.pushValue) {
       const superClass = options.superClass;
       if (superClass === undefined) {
+        /* istanbul ignore next */
         throw new Error('Something went wrong, expected super class to be defined.');
       }
 
       const methodDeclaration = tsUtils.node.getFirstAncestorByKind(node, ts.SyntaxKind.MethodDeclaration);
+      /* istanbul ignore next */
       if (methodDeclaration === undefined) {
+        /* istanbul ignore next */
         sb.reportUnsupported(node);
 
+        /* istanbul ignore next */
         return;
       }
 

@@ -56,6 +56,7 @@ module.exports = function(wallaby) {
         include: /wallaby\.only/,
         exclude: /wallaby\.skip/,
       },
+      ignoreCoverage: /istanbul ignore next/,
     },
   };
 };

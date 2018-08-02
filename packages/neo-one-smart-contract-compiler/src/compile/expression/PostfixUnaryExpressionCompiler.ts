@@ -18,6 +18,7 @@ export class PostfixUnaryExpressionCompiler extends NodeCompiler<ts.PostfixUnary
         this.visitAssignment(sb, token, expr, options);
         break;
       default:
+        /* istanbul ignore next */
         utils.assertNever(token);
     }
   }
@@ -56,6 +57,7 @@ export class PostfixUnaryExpressionCompiler extends NodeCompiler<ts.PostfixUnary
         sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.createNumber);
         break;
       default:
+        /* istanbul ignore next */
         utils.assertNever(token);
     }
 

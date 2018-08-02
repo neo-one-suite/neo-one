@@ -3,6 +3,7 @@ import { helpers } from '../../../__data__';
 describe('ObjectLiteralExpressionCompiler', () => {
   test('empty object', async () => {
     await helpers.executeString(`
+      ({});
       const x = {};
     `);
   });

@@ -28,6 +28,7 @@ export class PrefixUnaryExpressionCompiler extends NodeCompiler<ts.PrefixUnaryEx
         this.visitValue(sb, token, expr, options);
         break;
       default:
+        /* istanbul ignore next */
         utils.assertNever(token);
     }
   }
@@ -52,6 +53,7 @@ export class PrefixUnaryExpressionCompiler extends NodeCompiler<ts.PrefixUnaryEx
         sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.createNumber);
         break;
       default:
+        /* istanbul ignore next */
         utils.assertNever(token);
     }
 
@@ -88,6 +90,7 @@ export class PrefixUnaryExpressionCompiler extends NodeCompiler<ts.PrefixUnaryEx
         sb.emitHelper(operand, options, sb.helpers.createBoolean);
         break;
       default:
+        /* istanbul ignore next */
         utils.assertNever(token);
     }
   }
