@@ -24,8 +24,8 @@ cache:
   - "%LOCALAPPDATA%\\Yarn"
 
 test_script:
-  - yarn run test-ci --verbose
-  - yarn run e2e-ci --verbose
+  - yarn run test-ci
+  - yarn run e2e-ci
 
 # Don't actually build.
 build: off
