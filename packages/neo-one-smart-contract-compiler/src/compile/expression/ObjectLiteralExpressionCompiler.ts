@@ -169,7 +169,39 @@ export class ObjectLiteralExpressionCompiler extends NodeCompiler<ts.ObjectLiter
         // [objectVal]
         sb.emitHelper(prop, options, sb.helpers.setDataPropertyObjectProperty);
       } else {
-        sb.reportUnsupported(prop);
+        const val = sb.scope.addUnique();
+        const objectVal = sb.scope.addUnique();
+        // [objectVal]
+        sb.scope.set(sb, node, options, objectVal);
+        // [objectVal, objectVal]
+        sb.visit(tsUtils.expression.getExpression(prop), options);
+        // [val, val, objectVal]
+        sb.emitOp(node, 'DUP');
+        // [val, objectVal]
+        sb.scope.set(sb, node, options, val);
+        // [arr, objectVal]
+        sb.emitHelper(node, options, sb.helpers.getPropertyObjectKeys);
+        // [objectVal]
+        sb.emitHelper(
+          node,
+          options,
+          sb.helpers.arrForEach({
+            each: () => {
+              // [objectVal, prop]
+              sb.scope.get(sb, node, options, objectVal);
+              // [prop, objectVal]
+              sb.emitOp(node, 'SWAP');
+              // [val, prop, objectVal]
+              sb.scope.get(sb, node, options, val);
+              // [prop, val, prop, objectVal]
+              sb.emitOp(node, 'OVER');
+              // [val, prop, objectVal]
+              sb.emitHelper(node, options, sb.helpers.getPropertyObjectProperty);
+              // []
+              sb.emitHelper(node, options, sb.helpers.setDataPropertyObjectProperty);
+            },
+          }),
+        );
       }
     });
 

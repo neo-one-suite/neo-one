@@ -13,9 +13,28 @@ describe('ObjectLiteralExpressionCompiler', () => {
         foo: 3 + 2,
       };
 
-      if (x.foo !== 5) {
-        throw 'Failure';
-      }
+      assertEqual(x.foo, 5);
+    `);
+  });
+
+  test('object with numeric property', async () => {
+    await helpers.executeString(`
+      const x = {
+        0: 3 + 2,
+      };
+
+      assertEqual(x['0'], 5);
+    `);
+  });
+
+  test('object with symbol property', async () => {
+    await helpers.executeString(`
+      const foo = Symbol.for('foo');
+      const x = {
+        [foo]: 3 + 2,
+      };
+
+      assertEqual(x[foo], 5);
     `);
   });
 
@@ -24,61 +43,76 @@ describe('ObjectLiteralExpressionCompiler', () => {
       const foo = 3 + 2;
       const x = { foo };
 
-      if (x.foo !== 5) {
-        throw 'Failure';
-      }
+      assertEqual(x.foo, 5);
     `);
   });
 
   test('object with method', async () => {
     await helpers.executeString(`
       const x = {
-        foo() {
+        'foo'() {
           return 3 + 2;
         }
       };
 
-      if (x.foo() !== 5) {
-        throw 'Failure';
-      }
+      assertEqual(x.foo(), 5);
     `);
   });
 
   test('object with getter', async () => {
     await helpers.executeString(`
+      const foo = 'foo';
       const x = {
-        get foo(): number {
+        get [foo](): number {
           return 3 + 2;
+        },
+        set bar(value: string) {
+          // do nothing
         }
       };
 
-      if (x.foo !== 5) {
-        throw 'Failure';
-      }
+      assertEqual(x[foo], 5);
     `);
   });
 
   test('object with getter and setter', async () => {
     await helpers.executeString(`
+      const foo = Symbol.for('foo');
       const x = {
         f: 3,
-        get foo(): number {
+        get [foo](): number {
           return this.f;
         },
-        set foo(value: number) {
+        set [foo](value: number) {
           this.f = value;
         },
       };
 
-      if (x.foo !== 3) {
-        throw 'Failure';
-      }
+      assertEqual(x[foo], 3);
+      x[foo] = 5;
+      assertEqual(x[foo], 5);
+    `);
+  });
 
-      x.foo = 5;
+  test('object with spread', async () => {
+    await helpers.executeString(`
+      const y = {
+        a: 0,
+        get f(): number {
+          return 4;
+        },
+      };
+      const z = {
+        a: 1,
+      };
+      const x = {
+        ...z,
+        f: 3,
+        ...y,
+      };
 
-      if (x.foo !== 5) {
-        throw 'Failure';
-      }
+      assertEqual(x.a, 0);
+      assertEqual(x.f, 4);
     `);
   });
 });
