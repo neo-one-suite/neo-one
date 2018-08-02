@@ -1,6 +1,10 @@
 # NEO•ONE
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=shield)](#contributors)
-[![CircleCI](https://circleci.com/gh/neo-one-suite/neo-one.svg?style=shield)](https://circleci.com/gh/neo-one-suite/neo-one) ![AppVeyor](https://ci.appveyor.com/api/projects/status/a2k7nqrxp33bxu95/branch/master?svg=true) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://neo-one.io/docs/en/contributing.html) [![DeepScan grade](https://deepscan.io/api/projects/1846/branches/8291/badge/grade.svg)](https://deepscan.io/dashboard#view=project&pid=1846&bid=8291) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1639/badge)](https://bestpractices.coreinfrastructure.org/projects/1639)
+[![CircleCI](https://circleci.com/gh/neo-one-suite/neo-one.svg?style=shield)](https://circleci.com/gh/neo-one-suite/neo-one)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/a2k7nqrxp33bxu95/branch/master?svg=true)](https://ci.appveyor.com/project/dicarlo2/neo-one)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://neo-one.io/docs/en/contributing.html)
+[![DeepScan grade](https://deepscan.io/api/projects/1846/branches/8291/badge/grade.svg)](https://deepscan.io/dashboard#view=project&pid=1846&bid=8291)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1639/badge)](https://bestpractices.coreinfrastructure.org/projects/1639)
 
 ## [Documentation](https://neo-one.io)
 
