@@ -2,6 +2,7 @@ import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../../DiagnosticCode';
+import { BuiltInCallable } from '../../builtins';
 import { ScriptBuilder } from '../../sb';
 import { SYSCALLS } from '../../syscalls';
 import { VisitOptions } from '../../types';
@@ -22,6 +23,21 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       this.handleSysCall(sb, expr, optionsIn);
 
       return;
+    }
+
+    if (symbol !== undefined) {
+      const builtin = sb.builtIns.get(symbol);
+      if (builtin !== undefined) {
+        if (!(builtin instanceof BuiltInCallable) || !ts.isCallExpression(expr)) {
+          sb.reportUnsupported(expr);
+
+          return;
+        }
+
+        builtin.emitCall(sb, expr, optionsIn);
+
+        return;
+      }
     }
 
     if (symbol !== undefined && ts.isCallExpression(expr)) {

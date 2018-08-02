@@ -1,12 +1,13 @@
 import { common, Param as ScriptBuilderParam, ScriptBuilder } from '@neo-one/client-core';
 import { ProcessErrorError, ProcessErrorTrace, processTrace } from '@neo-one/client-switch';
+import { deserializeStackItem, StackItem } from '@neo-one/node-vm';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { RawSourceMap } from 'source-map';
 import { converters } from './sc/parameters';
-import { ActionRaw, ByteArrayContractParameter, Hash160String } from './types';
+import { ActionRaw, Hash160String } from './types';
 
 export const bigNumberToBN = (value: BigNumber, decimals: number): BN => {
   const dBigNumber = new BigNumber(10 ** decimals);
@@ -126,31 +127,43 @@ export interface ConsoleLog {
   readonly message: string;
 }
 
-const extractLogArg = ([typeIn, value]: [string, string]): string => {
-  const type = Buffer.from(typeIn, 'hex').toString('utf8');
-
-  const byteArray: ByteArrayContractParameter = { type: 'ByteArray', value };
+const extractMessageFromStackItem = (stackItem: StackItem): string => {
+  const type = stackItem
+    .asArray()[0]
+    .asBigInteger()
+    .toNumber();
 
   switch (type) {
-    case 'Signature':
-      return converters.toSignature(byteArray);
-    case 'Hash160':
-      return converters.toHash160(byteArray);
-    case 'Hash256':
-      return converters.toHash256(byteArray);
-    case 'PublicKey':
-      return converters.toPublicKey(byteArray);
-    case 'ByteArray':
-      return converters.toByteArray(byteArray);
-    case 'String':
-      return converters.toString(byteArray);
-    case 'Integer':
-      return converters.toInteger(byteArray, { type: 'Integer', decimals: 0 }).toString(10);
-    case 'Boolean':
-      return JSON.stringify(converters.toBoolean(byteArray));
+    case 0:
+      return 'undefined';
+    case 1:
+      return 'null';
+    case 2:
+      return JSON.stringify(stackItem.asArray()[1].asBoolean());
+    case 3:
+      return stackItem.asArray()[1].asString();
+    case 4:
+      return `Symbol(${stackItem.asArray()[1].asString()})`;
+    case 5:
+      return JSON.stringify(
+        stackItem
+          .asArray()[1]
+          .asBigInteger()
+          .toNumber(),
+      );
     default:
-      return '(failed to parse log argument)';
+      return `<unknown type ${type}>`;
   }
+};
+
+const extractMessage = (value: Buffer): string => {
+  const stackItems = deserializeStackItem(value)
+    .asArray()[1]
+    .asArray();
+
+  const messages = stackItems.map(extractMessageFromStackItem);
+
+  return messages.join('');
 };
 
 const extractLog = (action: ActionRaw): ConsoleLog | undefined => {
@@ -166,15 +179,9 @@ const extractLog = (action: ActionRaw): ConsoleLog | undefined => {
     }
 
     const line = converters.toInteger(args[1], { type: 'Integer', decimals: 0 }).toNumber();
-    const messageArgs = converters
-      .toArray(args[2], { type: 'Array', value: { type: 'Array', value: { type: 'ByteArray' } } })
-      // tslint:disable-next-line no-unnecessary-callback-wrapper no-any
-      .map((value: any) => extractLogArg(value));
+    const message = extractMessage(Buffer.from(converters.toByteArray(args[2]), 'hex'));
 
-    return {
-      line,
-      message: messageArgs.join(' '),
-    };
+    return { line, message };
   } catch {
     return undefined;
   }

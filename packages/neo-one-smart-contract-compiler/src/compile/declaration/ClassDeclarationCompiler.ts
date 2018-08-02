@@ -1,5 +1,6 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { DiagnosticCode } from '../../DiagnosticCode';
 import { InternalFunctionProperties } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -16,12 +17,42 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
     if (extendsExpr !== undefined) {
       superClassIn = sb.scope.addUnique();
       options = sb.superClassOptions(options, superClassIn);
+      const superClassExpr = tsUtils.expression.getExpression(extendsExpr);
+      if (ts.isIdentifier(superClassExpr)) {
+        const superClassSymbol = sb.getSymbol(superClassExpr);
+        if (superClassSymbol !== undefined) {
+          const builtin = sb.builtIns.get(superClassSymbol);
+          if (builtin !== undefined && !builtin.canExtend) {
+            sb.reportError(superClassExpr, 'Built-ins cannot be extended.', DiagnosticCode.CANNOT_EXTEND_BUILTIN);
+
+            return;
+          }
+        }
+      }
       // [superClass]
       sb.visit(tsUtils.expression.getExpression(extendsExpr), options);
       // []
       sb.scope.set(sb, extendsExpr, options, superClassIn);
     }
     const superClass = superClassIn;
+
+    const impl = tsUtils.class_.getImplementsArray(decl);
+    const implementsBuiltIn = impl.find((implType) => {
+      const implSymbol = sb.getSymbol(implType);
+      if (implSymbol === undefined) {
+        return false;
+      }
+
+      const builtin = sb.builtIns.get(implSymbol);
+
+      return builtin !== undefined && !builtin.canImplement;
+    });
+
+    if (implementsBuiltIn !== undefined) {
+      sb.reportError(decl, 'Built-ins cannot be implemented.', DiagnosticCode.CANNOT_IMPLEMENT_BUILTIN);
+
+      return;
+    }
 
     const addProperty = (property: ts.PropertyDeclaration) => {
       const initializer = tsUtils.initializer.getInitializer(property);

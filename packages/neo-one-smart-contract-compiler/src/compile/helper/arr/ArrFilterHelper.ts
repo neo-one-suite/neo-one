@@ -8,8 +8,8 @@ export interface ArrFilterHelperOptions {
   readonly withIndex?: boolean;
 }
 
-// Input: [array]
-// Output: [array]
+// Input: [arr]
+// Output: [arr]
 export class ArrFilterHelper extends Helper {
   private readonly map: () => void;
   private readonly withIndex: boolean;
@@ -27,49 +27,49 @@ export class ArrFilterHelper extends Helper {
       return;
     }
 
-    // [size, ...array]
+    // [size, ...arr]
     sb.emitOp(node, 'UNPACK');
-    // [0, size, ...array]
+    // [0, size, ...arr]
     sb.emitPushInt(node, 0);
-    // [arr, size, ...array]
+    // [arr, size, ...arr]
     sb.emitOp(node, 'NEWARRAY');
-    // [size, arr, ...array]
+    // [size, arr, ...arr]
     sb.emitOp(node, 'SWAP');
-    // [idx, size, arr, ...array]
+    // [idx, size, arr, ...arr]
     sb.emitPushInt(node, 0);
     sb.emitHelper(
       node,
       options,
       sb.helpers.forLoop({
         condition: () => {
-          // [size, idx, arr, ...array]
+          // [size, idx, arr, ...arr]
           sb.emitOp(node, 'SWAP');
-          // [size, idx, size, arr, ...array]
+          // [size, idx, size, arr, ...arr]
           sb.emitOp(node, 'TUCK');
-          // [idx, size, idx, size, arr, ...array]
+          // [idx, size, idx, size, arr, ...arr]
           sb.emitOp(node, 'OVER');
           // size > idx
-          // [size > idx, idx, size, arr, ...array]
+          // [size > idx, idx, size, arr, ...arr]
           sb.emitOp(node, 'GT');
         },
         each: () => {
-          // [arr, idx, size, ...array]
+          // [arr, idx, size, ...arr]
           sb.emitOp(node, 'ROT');
-          // [idx, arr, idx, size, ...array]
-          sb.emitOp(node, 'OVER');
           if (this.withIndex) {
-            // [4, idx, arr, idx, size, ...array]
+            // [idx, arr, idx, size, ...arr]
+            sb.emitOp(node, 'OVER');
+            // [4, idx, arr, idx, size, ...arr]
             sb.emitPushInt(node, 4);
-            // [value, idx, arr, idx, size, ...array]
+            // [value, idx, arr, idx, size, ...arr]
             sb.emitOp(node, 'ROLL');
-            // [value, idx, value, arr, idx, size, ...array]
+            // [value, idx, value, arr, idx, size, ...arr]
             sb.emitOp(node, 'TUCK');
           } else {
-            // [3, arr, idx, size, ...array]
+            // [3, arr, idx, size, ...arr]
             sb.emitPushInt(node, 3);
-            // [value, arr, idx, size, ...array]
+            // [value, arr, idx, size, ...arr]
             sb.emitOp(node, 'ROLL');
-            // [value, value, arr, idx, size, ...array]
+            // [value, value, arr, idx, size, ...arr]
             sb.emitOp(node, 'DUP');
           }
 
@@ -78,33 +78,31 @@ export class ArrFilterHelper extends Helper {
             options,
             sb.helpers.if({
               condition: () => {
-                // [keepVal, value, arr, idx, size, ...array]
+                // [keep, value, arr, idx, size, ...arr]
                 // tslint:disable-next-line no-map-without-usage
                 this.map();
-                // [keep, value, arr, idx, size, ...array]
-                sb.emitHelper(node, options, sb.helpers.toBoolean({ type: undefined }));
               },
               whenTrue: () => {
-                // [arr, value, arr, idx, size, ...array]
+                // [arr, value, arr, idx, size, ...arr]
                 sb.emitOp(node, 'OVER');
-                // [value, arr, arr, idx, size, ...array]
+                // [value, arr, arr, idx, size, ...arr]
                 sb.emitOp(node, 'SWAP');
-                // [arr, idx, size, ...array]
+                // [arr, idx, size, ...arr]
                 sb.emitOp(node, 'APPEND');
               },
               whenFalse: () => {
-                // [arr, idx, size, ...array]
+                // [arr, idx, size, ...arr]
                 sb.emitOp(node, 'DROP');
               },
             }),
           );
-          // [size, arr, idx, ...array]
+          // [size, arr, idx, ...arr]
           sb.emitOp(node, 'ROT');
-          // [idx, size, arr, ...array]
+          // [idx, size, arr, ...arr]
           sb.emitOp(node, 'ROT');
         },
         incrementor: () => {
-          // [idx, size, arr, ...array]
+          // [idx, size, arr, ...arr]
           sb.emitOp(node, 'INC');
         },
       }),

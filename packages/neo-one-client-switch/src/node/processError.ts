@@ -54,11 +54,7 @@ const processGenericError = async (message: string, sourceMap: RawSourceMap): Pr
         return message;
       }
 
-      mutableMessage[lineIndex] = `\n${positionMessage}\n`;
-
-      return mutableMessage
-        .filter((splitLine) => !splitLine.startsWith('Line:') && !splitLine.startsWith('PC:'))
-        .join('\n');
+      return `${mutableMessage[0]}\n${positionMessage}`;
     }
 
     return message;

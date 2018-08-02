@@ -5,14 +5,18 @@ import { getDiagnosticMessage, pathResolve } from '../../utils';
 import { tsUtils } from '@neo-one/ts-utils';
 import { createContextForSnippet, createContextForPath } from '../../createContext';
 import { Context } from '../../Context';
+import { DiagnosticCode } from '../../DiagnosticCode';
 
-type ExpectOptions = { type: 'error' } | { type: 'warning' };
+type ExpectOptions = { type: 'error'; code?: DiagnosticCode } | { type: 'warning'; code?: DiagnosticCode };
 
 const compile = (context: Context, sourceFile: ts.SourceFile, options: ExpectOptions) => {
   compileScript({ context, sourceFile });
 
   const expectDiagnostic = (category: ts.DiagnosticCategory) => {
-    const diag = context.diagnostics.find((diagnostic) => diagnostic.category === category);
+    const diag = context.diagnostics.find(
+      (diagnostic) =>
+        diagnostic.category === category && (options.code === undefined || diagnostic.code === options.code),
+    );
     if (diag === undefined) {
       expect(diag).toBeDefined();
     } else {

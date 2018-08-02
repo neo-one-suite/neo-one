@@ -50,7 +50,7 @@ export class EqualsEqualsHelper extends Helper {
       tsUtils.type_.isOnly(rightType) &&
       tsUtils.type_.isSame(leftType, rightType)
     ) {
-      sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ left: this.left, right: this.right }));
+      sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ leftType, rightType }));
     } else if (
       (tsUtils.type_.hasNull(leftType) || tsUtils.type_.hasUndefined(leftType)) &&
       (tsUtils.type_.isOnlyUndefined(rightType) || tsUtils.type_.isOnlyNull(rightType))

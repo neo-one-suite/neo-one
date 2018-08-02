@@ -1,4 +1,12 @@
 import {
+  ArrFilterFuncHelper,
+  ArrFilterHelper,
+  ArrFilterHelperOptions,
+  ArrMapFuncHelper,
+  ArrMapHelper,
+  ArrMapHelperOptions,
+} from './arr';
+import {
   CreateArrayHelper,
   GetArrayIndexHelper,
   GetArrayValueHelper,
@@ -22,15 +30,12 @@ import {
   WrapBufferHelper,
 } from './buffer';
 import {
-  ArrFilterHelper,
-  ArrFilterHelperOptions,
   ArrForEachHelper,
   ArrForEachHelperOptions,
-  ArrMapHelper,
-  ArrMapHelperOptions,
   ArrSliceHelper,
   ArrSliceHelperOptions,
   CloneArrayHelper,
+  ConsoleLogHelper,
   ExpHelper,
   ExtendArrayHelper,
   ForTypeHelper,
@@ -70,6 +75,8 @@ import {
   FunctionHelper,
   FunctionHelperOptions,
   FunctionLikeHelper,
+  GetCallableHelper,
+  GetCallableHelperOptions,
   InvokeCallHelper,
   InvokeCallHelperOptions,
   InvokeConstructHelper,
@@ -150,6 +157,7 @@ import {
   GetNumberHelper,
   GetObjectHelper,
   GetPropertyObjectHelper,
+  GetPropertyObjectKeysHelper,
   GetPropertyObjectPropertyHelper,
   GetStringHelper,
   GetSymbolHelper,
@@ -198,7 +206,10 @@ import {
 
 export interface Helpers {
   readonly arrFilter: (options: ArrFilterHelperOptions) => ArrFilterHelper;
+  readonly arrFilterFunc: ArrFilterFuncHelper;
   readonly arrMap: (options: ArrMapHelperOptions) => ArrMapHelper;
+  readonly arrMapFunc: ArrMapFuncHelper;
+
   readonly arrForEach: (options: ArrForEachHelperOptions) => ArrForEachHelper;
   readonly arrSlice: (options?: ArrSliceHelperOptions) => ArrSliceHelper;
   readonly cloneArray: CloneArrayHelper;
@@ -207,6 +218,7 @@ export interface Helpers {
   readonly genericDeserialize: GenericDeserializeHelper;
   readonly genericSerialize: GenericSerializeHelper;
   readonly exp: ExpHelper;
+  readonly consoleLog: ConsoleLogHelper;
 
   readonly equalsEqualsEquals: (options: EqualsEqualsEqualsHelperOptions) => EqualsEqualsEqualsHelper;
   readonly equalsEqualsEqualsNumber: EqualsEqualsEqualsNumberHelper;
@@ -229,6 +241,7 @@ export interface Helpers {
   readonly createFunctionObject: (options: CreateFunctionObjectHelperOptions) => CreateFunctionObjectHelper;
   readonly function: (options: FunctionHelperOptions) => FunctionHelper;
   readonly functionLike: FunctionLikeHelper;
+  readonly getCallable: (options: GetCallableHelperOptions) => GetCallableHelper;
   readonly invokeCall: (options?: InvokeCallHelperOptions) => InvokeCallHelper;
   readonly invokeConstruct: (options?: InvokeConstructHelperOptions) => InvokeConstructHelper;
   readonly new: (options?: NewHelperOptions) => NewHelper;
@@ -280,6 +293,7 @@ export interface Helpers {
     options: SetObjectAccessorPropertyHelperBaseOptions,
   ) => SetAccessorSymbolObjectPropertyHelper;
   readonly getPropertyObject: GetPropertyObjectHelper;
+  readonly getPropertyObjectKeys: GetPropertyObjectKeysHelper;
   readonly getPropertyObjectProperty: GetPropertyObjectPropertyHelper;
   readonly setPropertyObjectProperty: SetPropertyObjectPropertyHelper;
   readonly setDataPropertyObjectProperty: SetDataPropertyObjectPropertyHelper;
@@ -376,7 +390,10 @@ export const createHelpers = (): Helpers => {
 
   return {
     arrFilter: (options) => new ArrFilterHelper(options),
+    arrFilterFunc: new ArrFilterFuncHelper(),
     arrMap: (options) => new ArrMapHelper(options),
+    arrMapFunc: new ArrMapFuncHelper(),
+
     arrForEach: (options) => new ArrForEachHelper(options),
     arrSlice: (options = {}) => new ArrSliceHelper(options),
     cloneArray: new CloneArrayHelper(),
@@ -385,6 +402,7 @@ export const createHelpers = (): Helpers => {
     genericDeserialize: new GenericDeserializeHelper(),
     genericSerialize: new GenericSerializeHelper(),
     exp: new ExpHelper(),
+    consoleLog: new ConsoleLogHelper(),
 
     equalsEqualsEquals: (options) => new EqualsEqualsEqualsHelper(options),
     equalsEqualsEqualsNumber: new EqualsEqualsEqualsNumberHelper(),
@@ -407,6 +425,7 @@ export const createHelpers = (): Helpers => {
     createFunctionObject: (options) => new CreateFunctionObjectHelper(options),
     function: (options) => new FunctionHelper(options),
     functionLike: new FunctionLikeHelper(),
+    getCallable: memoized(GetCallableHelper),
     invokeCall: memoized(InvokeCallHelper),
     invokeConstruct: (options?) => new InvokeConstructHelper(options),
     new: (options?) => new NewHelper(options),
@@ -456,6 +475,7 @@ export const createHelpers = (): Helpers => {
     setDataSymbolObjectProperty: new SetDataSymbolObjectPropertyHelper(),
     setAccessorSymbolObjectProperty: (options) => new SetAccessorSymbolObjectPropertyHelper(options),
     getPropertyObject: new GetPropertyObjectHelper(),
+    getPropertyObjectKeys: new GetPropertyObjectKeysHelper(),
     getPropertyObjectProperty: new GetPropertyObjectPropertyHelper(),
     setPropertyObjectProperty: new SetPropertyObjectPropertyHelper(),
     setDataPropertyObjectProperty: new SetDataPropertyObjectPropertyHelper(),

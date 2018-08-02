@@ -1,4 +1,5 @@
 import { tsUtils } from '@neo-one/ts-utils';
+import { utils } from '@neo-one/utils';
 import * as appRootDir from 'app-root-dir';
 import * as fs from 'fs-extra';
 // tslint:disable-next-line match-default-export-name
@@ -24,7 +25,11 @@ export function updateContext(context: Context, files: { readonly [fileName: str
   const { program, typeChecker, languageService } = createProgram(
     context.program.getCompilerOptions(),
     Object.keys(files),
-    createModifyHostFiles(files),
+    {
+      modifyHost: createModifyHostFiles(files),
+      // tslint:disable-next-line no-any
+      withTestHarness: (context.program as any).__withTestHarness,
+    },
   );
 
   return context.update(
@@ -48,11 +53,30 @@ const doGlob = async (value: string) =>
     }),
   );
 
+export interface CreateContextOptions {
+  readonly withTestHarness?: boolean;
+}
+
+const CREATE_CONTEXT_OPTIONS_DEFAULT = {
+  withTestHarness: false,
+};
+
+const defaultModifyHost = () => {
+  // do nothing
+};
+
+interface MakeContextOptions extends CreateContextOptions {
+  readonly modifyHost?: (host: ts.LanguageServiceHost) => void;
+}
+
+const DEFAULT_MAKE_CONTEXT_OPTIONS = {
+  ...CREATE_CONTEXT_OPTIONS_DEFAULT,
+  modifyHost: defaultModifyHost,
+};
+
 const makeContext = async (
   rootNames: ReadonlyArray<string>,
-  modifyHost: (host: ts.LanguageServiceHost) => void = () => {
-    // do nothing
-  },
+  options: MakeContextOptions = DEFAULT_MAKE_CONTEXT_OPTIONS,
 ): Promise<Context> => {
   const tsConfigFilePath = pathResolve(require.resolve('@neo-one/smart-contract'), '..', '..', 'tsconfig.json');
 
@@ -65,7 +89,7 @@ const makeContext = async (
   };
   const parsed = ts.parseJsonConfigFileContent(res.config, parseConfigHost, path.dirname(tsConfigFilePath));
 
-  const { program, typeChecker, languageService } = createProgram(parsed.options, rootNames, modifyHost);
+  const { program, typeChecker, languageService } = createProgram(parsed.options, rootNames, options);
 
   return createContext(program, typeChecker, languageService);
 };
@@ -98,9 +122,7 @@ const createModifyHostFiles = (files: { readonly [fileName: string]: string | un
 const createProgram = (
   options: ts.CompilerOptions,
   rootNamesIn: ReadonlyArray<string>,
-  modifyHost: (host: ts.LanguageServiceHost) => void = () => {
-    // do nothing
-  },
+  { modifyHost = defaultModifyHost, withTestHarness = false }: MakeContextOptions = DEFAULT_MAKE_CONTEXT_OPTIONS,
 ) => {
   const smartContractDir = path.dirname(require.resolve('@neo-one/smart-contract'));
   const smartContractModule = pathResolve(smartContractDir, 'index.ts');
@@ -108,7 +130,8 @@ const createProgram = (
     pathResolve(smartContractDir, 'global.d.ts'),
     pathResolve(smartContractDir, 'sc.d.ts'),
     smartContractModule,
-  ];
+    withTestHarness ? pathResolve(smartContractDir, 'harness.d.ts') : undefined,
+  ].filter(utils.notNull);
 
   const rootNames = [...new Set(rootNamesIn.concat(smartContractFiles))].map(normalizePath);
 
@@ -174,6 +197,9 @@ const createProgram = (
     throw new Error('Something went wrong');
   }
 
+  // tslint:disable-next-line no-any no-object-mutation
+  (program as any).__withTestHarness = withTestHarness;
+
   return {
     program,
     typeChecker: program.getTypeChecker(),
@@ -181,24 +207,36 @@ const createProgram = (
   };
 };
 
-export const createContextForDir = async (dir: string): Promise<Context> => {
+export const createContextForDir = async (
+  dir: string,
+  options: CreateContextOptions = CREATE_CONTEXT_OPTIONS_DEFAULT,
+): Promise<Context> => {
   const files = await doGlob(path.join(dir, '**', '*.ts'));
 
-  return makeContext(files);
+  return makeContext(files, options);
 };
 
-export const createContextForPath = async (filePath: string): Promise<Context> => makeContext([filePath]);
+export const createContextForPath = async (
+  filePath: string,
+  options: CreateContextOptions = CREATE_CONTEXT_OPTIONS_DEFAULT,
+): Promise<Context> => makeContext([filePath], options);
 
 export interface SnippetResult {
   readonly context: Context;
   readonly sourceFile: ts.SourceFile;
 }
 
-export const createContextForSnippet = async (code: string): Promise<SnippetResult> => {
+export const createContextForSnippet = async (
+  code: string,
+  options: CreateContextOptions = CREATE_CONTEXT_OPTIONS_DEFAULT,
+): Promise<SnippetResult> => {
   const dir = appRootDir.get();
   const fileName = pathResolve(dir, 'snippetCode.ts');
 
-  const context = await makeContext([fileName], createModifyHostFiles({ [fileName]: code }));
+  const context = await makeContext([fileName], {
+    ...options,
+    modifyHost: createModifyHostFiles({ [fileName]: code }),
+  });
   const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, fileName);
 
   return {

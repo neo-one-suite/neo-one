@@ -119,16 +119,22 @@ export function* getDescendants(node: ts.Node): IterableIterator<ts.Node> {
   }
 }
 
+function getTarget(symbol: ts.Symbol): ts.Symbol {
+  const target = (symbol as any).target;
+
+  return target === undefined ? symbol : target;
+}
+
 export function getSymbol(typeChecker: ts.TypeChecker, node: ts.Node): ts.Symbol | undefined {
   // tslint:disable-next-line no-any
   const symbol = utils.getValueOrUndefined((node as any).symbol);
   if (symbol !== undefined) {
-    return symbol;
+    return getTarget(symbol);
   }
 
   const typeCheckerSymbol = utils.getValueOrUndefined(typeChecker.getSymbolAtLocation(node));
   if (typeCheckerSymbol !== undefined) {
-    return typeCheckerSymbol;
+    return getTarget(typeCheckerSymbol);
   }
 
   const nameNode = getNameNode(node);

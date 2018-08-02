@@ -1,10 +1,8 @@
 import stringify from 'safe-stable-stringify';
 import ts from 'typescript';
-
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { InternalFunctionProperties } from './InternalFunctionProperties';
 
 export interface InvokeCallHelperOptions {
   readonly bindThis?: boolean;
@@ -36,14 +34,12 @@ export class InvokeCallHelper extends Helper {
 
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
-    // ['call', objectVal, ?thisVal, ?argsarray]
-    sb.emitPushString(node, InternalFunctionProperties.Call);
-    // [func, ?thisVal, ?argsarray]
-    sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
-    if (this.bindThis) {
-      // [func, ?argsarray]
-      sb.emitHelper(node, options, sb.helpers.bindFunctionThis({ overwrite: this.overwriteThis }));
-    }
+    // [func, ?argsarray]
+    sb.emitHelper(
+      node,
+      options,
+      sb.helpers.getCallable({ bindThis: this.bindThis, overwriteThis: this.overwriteThis }),
+    );
     if (this.noArgs) {
       // [0, func]
       sb.emitPushInt(node, 0);

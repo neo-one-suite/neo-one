@@ -6,25 +6,23 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface EqualsEqualsEqualsHelperOptions {
-  readonly left: ts.Node;
-  readonly right: ts.Node;
+  readonly leftType: ts.Type | undefined;
+  readonly rightType: ts.Type | undefined;
 }
 
-// Input: []
+// Input: [rightVal, leftVal]
 // Output: [boolean]
 export class EqualsEqualsEqualsHelper extends Helper {
-  private readonly left: ts.Node;
-  private readonly right: ts.Node;
+  private readonly leftType: ts.Type | undefined;
+  private readonly rightType: ts.Type | undefined;
 
   public constructor(options: EqualsEqualsEqualsHelperOptions) {
     super();
-    this.left = options.left;
-    this.right = options.right;
+    this.leftType = options.leftType;
+    this.rightType = options.rightType;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    sb.visit(this.left, options);
-    sb.visit(this.right, options);
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
       sb.emitOp(node, 'DROP');
@@ -32,7 +30,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
       return;
     }
 
-    if (tsUtils.type_.isSame(sb.getType(this.left), sb.getType(this.right))) {
+    if (tsUtils.type_.isSame(this.leftType, this.rightType)) {
       sb.emitHelper(node, options, sb.helpers.equalsEqualsEqualsSameType);
     } else {
       sb.emitHelper(node, options, sb.helpers.equalsEqualsEqualsUnknown);

@@ -187,24 +187,20 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
       return;
     }
 
+    const leftType = sb.getType(left);
+    const rightType = sb.getType(right);
+
     const visit = (
       leftHelper: (options: TypedHelperOptions) => Helper,
       rightHelper?: (options: TypedHelperOptions) => Helper,
     ) => {
       sb.visit(left, options);
-      sb.emitHelper(left, options, leftHelper({ type: sb.getType(left) }));
+      sb.emitHelper(left, options, leftHelper({ type: leftType }));
       sb.visit(right, options);
-      sb.emitHelper(
-        right,
-        options,
-        (rightHelper === undefined ? leftHelper : rightHelper)({ type: sb.getType(right) }),
-      );
+      sb.emitHelper(right, options, (rightHelper === undefined ? leftHelper : rightHelper)({ type: rightType }));
     };
 
     const visitNumeric = () => visit(sb.helpers.toNumber);
-
-    const leftType = sb.getType(left);
-    const rightType = sb.getType(right);
 
     const isBinaryNumeric =
       leftType !== undefined &&
@@ -402,11 +398,15 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         sb.emitHelper(node, options, sb.helpers.createNumber);
         break;
       case ts.SyntaxKind.EqualsEqualsEqualsToken:
-        sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ left, right }));
+        sb.visit(left, options);
+        sb.visit(right, options);
+        sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ leftType, rightType }));
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case ts.SyntaxKind.ExclamationEqualsEqualsToken:
-        sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ left, right }));
+        sb.visit(left, options);
+        sb.visit(right, options);
+        sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ leftType, rightType }));
         sb.emitOp(node, 'NOT');
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;

@@ -4,3 +4,6 @@ import { execute } from './execute';
 export const vm = {
   executeScripts: execute,
 };
+
+// tslint:disable-next-line export-name
+export { StackItem, deserializeStackItem } from './stackItem';

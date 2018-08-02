@@ -8,8 +8,8 @@ export interface ArrMapHelperOptions {
   readonly withIndex?: boolean;
 }
 
-// Input: [array]
-// Output: [array]
+// Input: [arr]
+// Output: [arr]
 export class ArrMapHelper extends Helper {
   private readonly map: () => void;
   private readonly withIndex: boolean;

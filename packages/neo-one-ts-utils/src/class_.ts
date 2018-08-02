@@ -53,6 +53,23 @@ export function getExtendsOrThrow(node: ts.ClassDeclaration | ts.ClassExpression
   return utils.throwIfNullOrUndefined(getExtends(node), 'extends expression');
 }
 
+export function getImplements(
+  node: ts.ClassDeclaration | ts.ClassExpression,
+): ReadonlyArray<ts.ExpressionWithTypeArguments> | undefined {
+  const implementsClause = heritage.getHeritageClauseByKind(node, ts.SyntaxKind.ImplementsKeyword);
+  if (implementsClause === undefined) {
+    return undefined;
+  }
+
+  return heritage.getTypeNodes(implementsClause);
+}
+
+export function getImplementsArray(
+  node: ts.ClassDeclaration | ts.ClassExpression,
+): ReadonlyArray<ts.ExpressionWithTypeArguments> {
+  return utils.getArray(getImplements(node));
+}
+
 export function getMembers(node: ts.ClassDeclaration | ts.ClassExpression): ReadonlyArray<ClassMemberType> {
   // tslint:disable-next-line readonly-array
   const members: Array<ts.ClassElement | ts.ParameterPropertyDeclaration> = [...node.members];

@@ -24,7 +24,7 @@ export const executeString = async (
   code: string,
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
 ): Promise<InvocationResultJSON> => {
-  const { context, sourceFile } = await createContextForSnippet(code);
+  const { context, sourceFile } = await createContextForSnippet(code, { withTestHarness: true });
   return execute(context, sourceFile, options);
 };
 
@@ -41,7 +41,7 @@ export const executeSnippet = async (
     'snippets',
     snippetPath,
   );
-  const context = await createContextForPath(filePath);
+  const context = await createContextForPath(filePath, { withTestHarness: true });
   const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, filePath);
 
   return execute(context, sourceFile, options);

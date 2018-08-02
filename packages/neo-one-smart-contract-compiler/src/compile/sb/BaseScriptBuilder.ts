@@ -1,4 +1,3 @@
-// tslint:disable ban-types
 import {
   BinaryWriter,
   ByteBuffer,
@@ -19,6 +18,7 @@ import { Context, DiagnosticOptions } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { Globals } from '../../symbols';
 import { binding } from '../binding';
+import { BuiltIns } from '../builtins';
 import { declarations } from '../declaration';
 import { expressions } from '../expression';
 import { files } from '../file';
@@ -62,6 +62,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   public constructor(
     public readonly context: Context,
     public readonly helpers: Helpers,
+    public readonly builtIns: BuiltIns,
     private readonly sourceFile: ts.SourceFile,
     private readonly allHelpers: ReadonlyArray<Helper> = [],
   ) {

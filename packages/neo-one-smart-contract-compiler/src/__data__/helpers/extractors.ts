@@ -23,8 +23,8 @@ export const checkResult = async (receiptIn: CallReceiptJSON, sourceMap: RawSour
       }),
       createConsoleLogMessages(receipt.actions, sourceMap),
     ]);
-    const logMessage = logs.length === 0 ? '' : `\n\n${logs.join('\n\n')}`;
-    throw new Error(`Error in execution: ${message}${logMessage}\n`);
+    const logMessage = logs.length === 0 ? '' : `\n${logs.join('\n\n')}`;
+    throw new Error(`${message}${logMessage}\n`);
   }
 };
 
