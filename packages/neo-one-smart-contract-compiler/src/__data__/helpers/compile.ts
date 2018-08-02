@@ -1,8 +1,7 @@
 import ts from 'typescript';
 import * as appRootDir from 'app-root-dir';
-import * as path from 'path';
 import { compile as compileScript } from '../../compile';
-import { getDiagnosticMessage } from '../../utils';
+import { getDiagnosticMessage, pathResolve } from '../../utils';
 import { tsUtils } from '@neo-one/ts-utils';
 import { createContextForSnippet, createContextForPath } from '../../createContext';
 import { Context } from '../../Context';
@@ -37,7 +36,7 @@ export const compileString = async (code: string, options: ExpectOptions): Promi
 };
 
 export const compileSnippet = async (snippetPath: string, options: ExpectOptions): Promise<void> => {
-  const dir = path.resolve(
+  const dir = pathResolve(
     appRootDir.get(),
     'packages',
     'neo-one-smart-contract-compiler',
@@ -46,7 +45,7 @@ export const compileSnippet = async (snippetPath: string, options: ExpectOptions
     'snippets',
   );
   const context = await createContextForPath(snippetPath);
-  const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, path.resolve(dir, snippetPath));
+  const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, pathResolve(dir, snippetPath));
 
   compile(context, sourceFile, options);
 };

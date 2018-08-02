@@ -6,6 +6,7 @@ import ts from 'typescript';
 import { compile } from './compile';
 import { createContextForPath, updateContext } from './createContext';
 import { transpile } from './transpile';
+import { normalizePath } from './utils';
 
 export interface CompileContractOptions {
   readonly filePath: string;
@@ -19,7 +20,11 @@ export interface CompileContractResult {
   readonly sourceMap: RawSourceMap;
 }
 
-export const compileContract = async ({ filePath, name }: CompileContractOptions): Promise<CompileContractResult> => {
+export const compileContract = async ({
+  filePath: filePathIn,
+  name,
+}: CompileContractOptions): Promise<CompileContractResult> => {
+  const filePath = normalizePath(filePathIn);
   const transpileContext = await createContextForPath(filePath);
   const smartContract = tsUtils.statement.getClassOrThrow(
     tsUtils.file.getSourceFileOrThrow(transpileContext.program, filePath),

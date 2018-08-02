@@ -1,13 +1,13 @@
 import { InvocationResultJSON } from '@neo-one/client-core';
 import ts from 'typescript';
 import * as appRootDir from 'app-root-dir';
-import * as path from 'path';
 import { tsUtils } from '@neo-one/ts-utils';
 import { executeScript, EXECUTE_OPTIONS_DEFAULT, ExecuteOptions } from '../../executeScript';
 import { getMonitor } from '../../test/getMonitor';
 import { checkResult } from './extractors';
 import { createContextForSnippet, createContextForPath } from '../../createContext';
 import { Context } from '../../Context';
+import { pathResolve } from '../../utils';
 
 const execute = async (
   context: Context,
@@ -32,7 +32,7 @@ export const executeSnippet = async (
   snippetPath: string,
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
 ): Promise<InvocationResultJSON> => {
-  const filePath = path.resolve(
+  const filePath = pathResolve(
     appRootDir.get(),
     'packages',
     'neo-one-smart-contract-compiler',

@@ -1,9 +1,9 @@
 // tslint:disable no-import-side-effect
 import * as appRootDir from 'app-root-dir';
 import * as fs from 'fs-extra';
-import * as path from 'path';
 import { format } from 'prettier';
 import { BLOCKCHAIN_INTERFACES, SYSCALLS, TYPE_ALIASES } from '../compile/syscalls';
+import { pathResolve } from '../utils';
 
 const run = async () => {
   const types = TYPE_ALIASES.map((alias) => `${alias.toDeclaration()}`).join('\n');
@@ -23,7 +23,7 @@ ${types}
 ${interfaces}
 ${syscalls}
 `;
-  const filePath = path.resolve(appRootDir.get(), 'packages', 'neo-one-smart-contract', 'src', 'sc.d.ts');
+  const filePath = pathResolve(appRootDir.get(), 'packages', 'neo-one-smart-contract', 'src', 'sc.d.ts');
   await fs.writeFile(
     filePath,
     format(content, {

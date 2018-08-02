@@ -2,6 +2,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import * as path from 'path';
 import ts from 'typescript';
+import { pathResolve } from './utils';
 
 export interface Globals {
   readonly Array: ts.Symbol;
@@ -29,14 +30,14 @@ export interface Globals {
 export const getGlobals = (program: ts.Program, typeChecker: ts.TypeChecker): Globals => {
   const globalsFile = tsUtils.file.getSourceFile(
     program,
-    path.resolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'global.d.ts'),
+    pathResolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'global.d.ts'),
   );
   if (globalsFile === undefined) {
     throw new Error('Could not find Buffer');
   }
   const neoGlobal = tsUtils.file.getSourceFile(
     program,
-    path.resolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'sc.d.ts'),
+    pathResolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'sc.d.ts'),
   );
   if (neoGlobal === undefined) {
     throw new Error('Could not find NEO type definition file');

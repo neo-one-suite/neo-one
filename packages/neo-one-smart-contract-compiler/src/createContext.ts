@@ -7,6 +7,7 @@ import * as path from 'path';
 import ts from 'typescript';
 import { Context } from './Context';
 import { getGlobals, getLibAliases, getLibs } from './symbols';
+import { normalizePath, pathResolve } from './utils';
 
 function createContext(program: ts.Program, typeChecker: ts.TypeChecker, languageService: ts.LanguageService): Context {
   return new Context(
@@ -53,7 +54,7 @@ const makeContext = async (
     // do nothing
   },
 ): Promise<Context> => {
-  const tsConfigFilePath = path.resolve(require.resolve('@neo-one/smart-contract'), '..', '..', 'tsconfig.json');
+  const tsConfigFilePath = pathResolve(require.resolve('@neo-one/smart-contract'), '..', '..', 'tsconfig.json');
 
   const res = ts.readConfigFile(tsConfigFilePath, (value) => fs.readFileSync(value, 'utf8'));
   const parseConfigHost = {
@@ -102,14 +103,14 @@ const createProgram = (
   },
 ) => {
   const smartContractDir = path.dirname(require.resolve('@neo-one/smart-contract'));
-  const smartContractModule = path.resolve(smartContractDir, 'index.ts');
+  const smartContractModule = pathResolve(smartContractDir, 'index.ts');
   const smartContractFiles = [
-    path.resolve(smartContractDir, 'global.d.ts'),
-    path.resolve(smartContractDir, 'sc.d.ts'),
+    pathResolve(smartContractDir, 'global.d.ts'),
+    pathResolve(smartContractDir, 'sc.d.ts'),
     smartContractModule,
   ];
 
-  const rootNames = [...new Set(rootNamesIn.concat(smartContractFiles))];
+  const rootNames = [...new Set(rootNamesIn.concat(smartContractFiles))].map(normalizePath);
 
   const mutableFiles: ts.MapLike<{ version: number } | undefined> = {};
   // initialize the list of files
@@ -143,7 +144,7 @@ const createProgram = (
     resolveModuleNames,
   };
 
-  const smartContractLibModule = path.resolve(path.dirname(require.resolve('@neo-one/smart-contract-lib')), 'index.ts');
+  const smartContractLibModule = pathResolve(path.dirname(require.resolve('@neo-one/smart-contract-lib')), 'index.ts');
   function resolveModuleNames(moduleNames: string[], containingFile: string): ts.ResolvedModule[] {
     const mutableResolvedModules: ts.ResolvedModule[] = [];
     // tslint:disable-next-line no-loop-statement
@@ -195,7 +196,7 @@ export interface SnippetResult {
 
 export const createContextForSnippet = async (code: string): Promise<SnippetResult> => {
   const dir = appRootDir.get();
-  const fileName = path.resolve(dir, 'snippetCode.ts');
+  const fileName = pathResolve(dir, 'snippetCode.ts');
 
   const context = await makeContext([fileName], createModifyHostFiles({ [fileName]: code }));
   const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, fileName);

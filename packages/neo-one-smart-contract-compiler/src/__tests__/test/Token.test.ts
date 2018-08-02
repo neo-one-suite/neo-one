@@ -1,17 +1,15 @@
 // tslint:disable no-unsafe-any
 import { abi, addressToScriptHash, createPrivateKey, privateKeyToScriptHash, assets } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
-
 import * as appRootDir from 'app-root-dir';
-import * as path from 'path';
-
 import { setupBasicTest } from '../../test/setupBasicTest';
+import { pathResolve } from '../../utils';
 
 const setup = async () => {
   const nep5 = abi.NEP5_STATIC(8);
 
   return setupBasicTest({
-    contractPath: path.resolve(
+    contractPath: pathResolve(
       appRootDir.get(),
       'packages',
       'neo-one-smart-contract-compiler',

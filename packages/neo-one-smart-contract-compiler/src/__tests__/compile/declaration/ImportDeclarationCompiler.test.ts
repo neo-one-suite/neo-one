@@ -1,10 +1,10 @@
 import * as path from 'path';
-
 import { helpers } from '../../../__data__';
+import { normalizePath } from '../../../utils';
 
 describe('ImportDeclarationCompiler', () => {
   test('basic imports at import/entry.ts', async () => {
-    await helpers.executeSnippet(path.join('import', 'entry.ts'));
+    await helpers.executeSnippet(normalizePath(path.join('import', 'entry.ts')));
   });
 
   test('export = unsupported', async () => {

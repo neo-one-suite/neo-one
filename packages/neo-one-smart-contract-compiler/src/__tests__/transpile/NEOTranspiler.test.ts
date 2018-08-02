@@ -1,12 +1,12 @@
-import * as path from 'path';
 import { createContextForPath } from '../../createContext';
 import { tsUtils } from '@neo-one/ts-utils';
 import { transpile } from '../../transpile';
 import { SourceMapConsumer } from 'source-map';
+import { pathResolve } from '../../utils';
 
 describe('NEOTranspiler', () => {
   test('sourcemaps', async () => {
-    const filePath = path.resolve(__dirname, '..', '..', '__data__', 'contracts', 'SourceMapContract.ts');
+    const filePath = pathResolve(__dirname, '..', '..', '__data__', 'contracts', 'SourceMapContract.ts');
     const context = await createContextForPath(filePath);
     const smartContract = tsUtils.statement.getClassOrThrow(
       tsUtils.file.getSourceFileOrThrow(context.program, filePath),
