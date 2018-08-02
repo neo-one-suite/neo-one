@@ -13,53 +13,18 @@ export class ObjectLiteralExpressionCompiler extends NodeCompiler<ts.ObjectLiter
     // [objectVal]
     sb.emitHelper(node, options, sb.helpers.createObject);
     tsUtils.object_.getProperties(node).forEach((prop) => {
-      const handlePossibleSymbol = (propertyNameType: ts.Type | undefined) => {
-        const handleSymbol = () => {
-          // [string, val, objectVal, objectVal]
-          sb.emitHelper(prop, options, sb.helpers.getSymbol);
-          // [val, string, objectVal, objectVal]
-          sb.emitOp(prop, 'SWAP');
-          // [objectVal]
-          sb.emitHelper(prop, options, sb.helpers.setSymbolObjectProperty);
-        };
-
-        const handleString = () => {
-          // [string, val, objectVal, objectVal]
-          sb.emitHelper(prop, options, sb.helpers.toString({ type: propertyNameType }));
-          // [val, string, objectVal, objectVal]
-          sb.emitOp(prop, 'SWAP');
-          // [objectVal]
-          sb.emitHelper(prop, options, sb.helpers.setDataPropertyObjectProperty);
-        };
-
-        if (
-          propertyNameType === undefined ||
-          (!tsUtils.type_.isOnlySymbolish(propertyNameType) && tsUtils.type_.hasSymbolish(propertyNameType))
-        ) {
-          sb.emitHelper(
-            prop,
-            options,
-            sb.helpers.if({
-              condition: () => {
-                // [propVal, propVal, val, objectVal, objectVal]
-                sb.emitOp(prop, 'DUP');
-                // [boolean, propVal, val, objectVal, objectVal]
-                sb.emitHelper(prop, options, sb.helpers.isSymbol);
-              },
-              whenTrue: handleSymbol,
-              whenFalse: handleString,
-            }),
-          );
-        } else if (tsUtils.type_.isOnlySymbolish(propertyNameType)) {
-          handleSymbol();
-        } else {
-          handleString();
-        }
-      };
+      if (ts.isGetAccessorDeclaration(prop) && tsUtils.accessor.getSetAccessor(prop) !== undefined) {
+        return;
+      }
 
       // [objectVal, objectVal]
       sb.emitOp(prop, 'DUP');
-      if (ts.isPropertyAssignment(prop) || ts.isMethodDeclaration(prop)) {
+      if (
+        ts.isPropertyAssignment(prop) ||
+        ts.isMethodDeclaration(prop) ||
+        ts.isGetAccessorDeclaration(prop) ||
+        ts.isSetAccessorDeclaration(prop)
+      ) {
         const propertyName = tsUtils.node.getNameNode(prop);
 
         const visitProp = () => {
@@ -77,15 +42,103 @@ export class ObjectLiteralExpressionCompiler extends NodeCompiler<ts.ObjectLiter
               }),
             );
           }
+
+          if (ts.isSetAccessorDeclaration(prop)) {
+            const getAccessor = tsUtils.accessor.getGetAccessor(prop);
+            if (getAccessor !== undefined) {
+              sb.emitHelper(getAccessor, options, sb.helpers.createCallArray);
+              sb.emitHelper(
+                getAccessor,
+                options,
+                sb.helpers.createFunctionObject({
+                  property: InternalFunctionProperties.Call,
+                }),
+              );
+            }
+          }
+        };
+
+        const setSymbolProperty = () => {
+          if (ts.isSetAccessorDeclaration(prop) || ts.isGetAccessorDeclaration(prop)) {
+            sb.emitHelper(
+              prop,
+              options,
+              sb.helpers.setAccessorSymbolObjectProperty({
+                hasSet: ts.isSetAccessorDeclaration(prop),
+                hasGet: ts.isGetAccessorDeclaration(prop) || tsUtils.accessor.getGetAccessor(prop) !== undefined,
+              }),
+            );
+          } else {
+            // [objectVal]
+            sb.emitHelper(prop, options, sb.helpers.setSymbolObjectProperty);
+          }
+        };
+
+        const setDataProperty = () => {
+          if (ts.isSetAccessorDeclaration(prop) || ts.isGetAccessorDeclaration(prop)) {
+            sb.emitHelper(
+              prop,
+              options,
+              sb.helpers.setAccessorPropertyObjectProperty({
+                hasSet: ts.isSetAccessorDeclaration(prop),
+                hasGet: ts.isGetAccessorDeclaration(prop) || tsUtils.accessor.getGetAccessor(prop) !== undefined,
+              }),
+            );
+          } else {
+            // [objectVal]
+            sb.emitHelper(prop, options, sb.helpers.setDataPropertyObjectProperty);
+          }
+        };
+
+        const handlePossibleSymbol = (propertyNameType: ts.Type | undefined) => {
+          const handleSymbol = () => {
+            // [string, objectVal, objectVal]
+            sb.emitHelper(prop, options, sb.helpers.getSymbol);
+            // [val, string, objectVal, objectVal]
+            visitProp();
+            // [objectVal]
+            setSymbolProperty();
+          };
+
+          const handleString = () => {
+            // [string, objectVal, objectVal]
+            sb.emitHelper(prop, options, sb.helpers.toString({ type: propertyNameType }));
+            // [val, string, objectVal, objectVal]
+            visitProp();
+            // [objectVal]
+            setDataProperty();
+          };
+
+          if (
+            propertyNameType === undefined ||
+            (!tsUtils.type_.isOnlySymbolish(propertyNameType) && tsUtils.type_.hasSymbolish(propertyNameType))
+          ) {
+            sb.emitHelper(
+              prop,
+              options,
+              sb.helpers.if({
+                condition: () => {
+                  // [propVal, propVal, objectVal, objectVal]
+                  sb.emitOp(prop, 'DUP');
+                  // [boolean, propVal, objectVal, objectVal]
+                  sb.emitHelper(prop, options, sb.helpers.isSymbol);
+                },
+                whenTrue: handleSymbol,
+                whenFalse: handleString,
+              }),
+            );
+          } else if (tsUtils.type_.isOnlySymbolish(propertyNameType)) {
+            handleSymbol();
+          } else {
+            handleString();
+          }
         };
 
         if (ts.isComputedPropertyName(propertyName)) {
           const expr = tsUtils.expression.getExpression(propertyName);
           const propertyNameType = sb.getType(expr);
 
-          // [val, objectVal, objectVal]
-          visitProp();
-          // [propVal, val, objectVal, objectVal]
+          // [propVal, objectVal, objectVal]
           sb.visit(expr, options);
           // [objectVal]
           handlePossibleSymbol(propertyNameType);
@@ -105,7 +158,7 @@ export class ObjectLiteralExpressionCompiler extends NodeCompiler<ts.ObjectLiter
           // [val, string, objectVal, objectVal]
           visitProp();
           // [objectVal]
-          sb.emitHelper(prop, options, sb.helpers.setDataPropertyObjectProperty);
+          setDataProperty();
         }
       } else if (ts.isShorthandPropertyAssignment(prop)) {
         const propertyName = tsUtils.node.getNameNode(prop);

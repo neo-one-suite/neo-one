@@ -43,4 +43,42 @@ describe('ObjectLiteralExpressionCompiler', () => {
       }
     `);
   });
+
+  test('object with getter', async () => {
+    await helpers.executeString(`
+      const x = {
+        get foo(): number {
+          return 3 + 2;
+        }
+      };
+
+      if (x.foo !== 5) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('object with getter and setter', async () => {
+    await helpers.executeString(`
+      const x = {
+        f: 3,
+        get foo(): number {
+          return this.f;
+        },
+        set foo(value: number) {
+          this.f = value;
+        },
+      };
+
+      if (x.foo !== 3) {
+        throw 'Failure';
+      }
+
+      x.foo = 5;
+
+      if (x.foo !== 5) {
+        throw 'Failure';
+      }
+    `);
+  });
 });
