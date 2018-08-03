@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Symbol.for cannot be referenced 1`] = `
+"snippetCode.ts (2,21): Built-ins may not be referenced.
+
+      1 | 
+    > 2 |       const value = Symbol.for;
+        |                     ^
+      3 |     
+"
+`;

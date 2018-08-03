@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Symbol cannot be extended 1`] = `
+"snippetCode.ts (2,30): Built-ins cannot be extended.
+
+      1 | 
+    > 2 |       class MySymbol extends Symbol {
+        |                              ^
+      3 |       }
+      4 |     
+"
+`;
+
+exports[`Symbol cannot be implemented 1`] = `
+"snippetCode.ts (2,7): Built-ins cannot be implemented.
+
+      1 | 
+    > 2 |       class MySymbol implements Symbol {
+        |       ^
+      3 |       }
+      4 |     
+"
+`;
+
+exports[`Symbol cannot be referenced 1`] = `
+"snippetCode.ts (2,17): Built-ins may not be referenced.
+
+      1 | 
+    > 2 |       const x = Symbol;
+        |                 ^
+      3 |     
+"
+`;

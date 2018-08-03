@@ -7,6 +7,7 @@ import { AssertEqual } from './assertEqual';
 import { BufferConcat, BufferEquals, BufferFrom, BufferType, BufferValue } from './buffer';
 import { ConsoleLog } from './console';
 import { ObjectKeys, ObjectType, ObjectValue } from './object';
+import { SymbolFor, SymbolIterator, SymbolType, SymbolValue } from './symbol';
 import { BuiltIn } from './types';
 
 export type BuiltIns = Map<ts.Symbol, BuiltIn>;
@@ -21,12 +22,12 @@ export const createBuiltIns = (program: ts.Program, typeChecker: ts.TypeChecker)
 
   const getDeclSymbol = (decl: ts.Declaration): ts.Symbol => {
     const type = tsUtils.type_.getType(typeChecker, decl);
-    const symbol = tsUtils.type_.getSymbol(type);
-    if (symbol === undefined) {
+    const symb = tsUtils.type_.getSymbol(type);
+    if (symb === undefined) {
       return tsUtils.node.getSymbolOrThrow(typeChecker, decl);
     }
 
-    return symbol;
+    return symb;
   };
 
   const array = tsUtils.type_.getSymbolOrThrow(tsUtils.types.getArrayType(typeChecker));
@@ -55,6 +56,14 @@ export const createBuiltIns = (program: ts.Program, typeChecker: ts.TypeChecker)
   builtIns.set(bufferVar, new BufferValue());
   builtIns.set(tsUtils.symbol.getMemberOrThrow(bufferVar, 'concat'), new BufferConcat());
   builtIns.set(tsUtils.symbol.getMemberOrThrow(bufferVar, 'from'), new BufferFrom());
+
+  const symbol = getDeclSymbol(tsUtils.statement.getInterfaceOrThrow(globalsFile, 'Symbol'));
+  builtIns.set(symbol, new SymbolType());
+
+  const symbolVar = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Symbol'));
+  builtIns.set(symbolVar, new SymbolValue());
+  builtIns.set(tsUtils.symbol.getMemberOrThrow(symbolVar, 'for'), new SymbolFor());
+  builtIns.set(tsUtils.symbol.getMemberOrThrow(symbolVar, 'iterator'), new SymbolIterator());
 
   const consoleVar = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'console'));
   builtIns.set(tsUtils.symbol.getMemberOrThrow(consoleVar, 'log'), new ConsoleLog());

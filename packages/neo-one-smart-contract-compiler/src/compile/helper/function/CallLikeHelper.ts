@@ -7,7 +7,6 @@ import { ScriptBuilder } from '../../sb';
 import { SYSCALLS } from '../../syscalls';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { CASES } from './cases';
 
 export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplateExpression> {
   public emit(sb: ScriptBuilder, expr: ts.CallExpression | ts.TaggedTemplateExpression, optionsIn: VisitOptions): void {
@@ -35,15 +34,6 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
         }
 
         builtin.emitCall(sb, expr, optionsIn);
-
-        return;
-      }
-    }
-
-    if (symbol !== undefined && ts.isCallExpression(expr)) {
-      const specialCase = CASES.find((cse) => cse.test(sb, expr, symbol));
-      if (specialCase !== undefined) {
-        specialCase.handle(sb, expr, optionsIn);
 
         return;
       }
