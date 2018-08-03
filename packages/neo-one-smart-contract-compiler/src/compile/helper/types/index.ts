@@ -14,3 +14,4 @@ export * from './IsSameTypeHelper';
 export * from './ToPrimitiveHelper';
 export * from './UnwrapTypeHelper';
 export * from './UnwrapValHelper';
+export * from './WellKnownSymbol';

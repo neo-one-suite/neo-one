@@ -57,6 +57,11 @@ interface SymbolConstructor {
    * for-of statement.
    */
   readonly iterator: symbol;
+  /**
+   * A method that converts an object to a corresponding primitive value.
+   * Called by the ToPrimitive abstract operation.
+   */
+  readonly toPrimitive: symbol;
 }
 declare var Symbol: SymbolConstructor;
 

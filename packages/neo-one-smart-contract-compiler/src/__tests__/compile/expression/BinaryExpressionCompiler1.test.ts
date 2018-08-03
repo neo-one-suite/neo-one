@@ -110,7 +110,7 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('(3 == "3") [EqualsEqualsToken]', async () => {
+  test('(3 == "3") [EqualsEqualsToken]', async () => {
     await helpers.executeString(`
       const a: number | string = 3 as number | string;
       const b: number | string = '3' as number | string;

@@ -138,10 +138,12 @@ export class ForBuiltInTypeHelper extends Helper {
               tsUtils.type_.hasType(
                 type,
                 (tpe) =>
-                  !(
-                    tsUtils.type_.isPrimitiveish(tpe) ||
-                    tsUtils.type_.isArrayish(tpe) ||
-                    sb.isGlobal(node, type, 'Buffer')
+                  !tsUtils.type_.isOnlyType(
+                    tpe,
+                    (tp) =>
+                      tsUtils.type_.isOnlyPrimitiveish(tp) ||
+                      tsUtils.type_.isOnlyArrayish(tp) ||
+                      sb.isGlobal(node, type, 'Buffer'),
                   ),
               ),
             isRuntimeType: (innerOptions) => {

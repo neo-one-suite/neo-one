@@ -1,29 +1,33 @@
 import { helpers } from '../../../__data__';
 
 describe('BinaryExpressionCompiler', () => {
-  test.skip('+ with object toPrimitive number', async () => {
+  test('+ with object toPrimitive number', async () => {
     await helpers.executeString(`
       const sym = Symbol.toPrimitive;
-      const x = {};
-      x[sym] = () => 1;
-      const y = {};
-      y[sym] = () => 2;
+      const x = {
+        [sym]: () => 1,
+      };
+      const y = {
+        [sym]: () => 2,
+      };
 
-      if (x + y !== 3) {
+      if ((+x) + (+y) !== 3) {
         throw 'Failure';
       }
     `);
   });
 
-  test.skip('+ with object toPrimitive string', async () => {
+  test('+ with object toPrimitive string', async () => {
     await helpers.executeString(`
       const sym = Symbol.toPrimitive;
-      const x = {};
-      x[sym] = () => '1';
-      const y = {};
-      y[sym] = () => '2';
+      const x = {
+        [sym]: () => '1',
+      };
+      const y = {
+        [sym]: () => '2',
+      };
 
-      if (x + y !== '12') {
+      if (('' + x) + ('' + y) !== '12') {
         throw 'Failure';
       }
     `);

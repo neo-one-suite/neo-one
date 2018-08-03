@@ -1,10 +1,9 @@
-import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-
 import { Types } from './Types';
+import { WellKnownSymbol } from './WellKnownSymbol';
 
 export type PreferredType = 'default' | 'string' | 'number';
 export interface ToPrimitiveHelperOptions {
@@ -28,140 +27,178 @@ export class ToPrimitiveHelper extends Helper {
     this.preferredType = preferredType;
   }
 
-  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    if (!options.pushValue) {
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
+    if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
 
       return;
     }
 
-    if (this.type === undefined || !tsUtils.type_.isOnlyPrimitiveish(this.type)) {
-      if (this.type === undefined && this.knownType !== Types.Object) {
-        this.toPrimitive(sb, node, options);
-      } else {
-        this.toPrimitiveObject(sb, node, options);
-      }
-    }
-  }
+    const throwTypeError = (options: VisitOptions) => {
+      sb.emitOp(node, 'DROP');
+      sb.emitHelper(node, options, sb.helpers.throwTypeError);
+    };
 
-  private toPrimitive(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    sb.emitHelper(
-      node,
-      options,
-      sb.helpers.if({
-        condition: () => {
-          // [value, value]
-          sb.emitOp(node, 'DUP');
-          // [isObject, value]
-          sb.emitHelper(node, options, sb.helpers.isObject);
-        },
-        whenTrue: () => {
-          this.toPrimitiveObject(sb, node, options);
-        },
-      }),
-    );
-  }
+    const convertArray = (options: VisitOptions) => {
+      sb.emitHelper(node, options, sb.helpers.toString({ type: this.type, knownType: Types.Array }));
+      sb.emitHelper(node, options, sb.helpers.createString);
+    };
 
-  private toPrimitiveObject(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    // [value, value]
-    sb.emitOp(node, 'DUP');
-    // [symbol, value, value]
-    sb.emitPushString(node, '@@toPrimitive');
-    // [toPrimitive, value]
-    sb.emitHelper(node, options, sb.helpers.getSymbolObjectProperty);
-    sb.emitHelper(
-      node,
-      options,
-      sb.helpers.if({
-        condition: () => {
-          // [toPrimitive, toPrimitive, value]
-          sb.emitOp(node, 'DUP');
-          // [isUndefined, toPrimitive, value]
-          sb.emitHelper(node, options, sb.helpers.isUndefined);
-        },
-        whenTrue: () => {
-          // [value]
-          sb.emitOp(node, 'DROP');
-          // [value]
-          this.tryConvert(sb, node, options, this.preferredType);
-        },
-        whenFalse: () => {
-          // [preferredType, toPrimitiveVal, val]
-          sb.emitPushString(node, this.preferredType);
-          // [1, preferredType, toPrimitiveVal, val]
-          sb.emitPushInt(node, 1);
-          // [args, toPrimitiveVal, val]
-          sb.emitOp(node, 'PACK');
-          // [val, args, toPrimitiveVal]
-          sb.emitOp(node, 'ROT');
-          // [toPrimitiveVal, val, args]
-          sb.emitOp(node, 'ROT');
-          // [val]
-          sb.emitHelper(node, options, sb.helpers.invokeCall({ bindThis: true }));
-        },
-      }),
-    );
-  }
+    const convertPrimitive = () => {
+      // do nothing
+    };
 
-  private tryConvert(
-    sb: ScriptBuilder,
-    node: ts.Node,
-    options: VisitOptions,
-    preferredType: 'string' | 'number' | 'default',
-  ): void {
-    const methods = preferredType === 'string' ? ['toString', 'valueOf'] : ['valueOf', 'toString'];
-    // [value, value]
-    sb.emitOp(node, 'DUP');
-    // [method, value]
-    sb.emitPushString(node, methods[0]);
-    // [func, value]
-    sb.emitHelper(node, options, sb.helpers.getPropertyObjectProperty);
-    sb.emitHelper(
-      node,
-      options,
-      sb.helpers.if({
-        condition: () => {
-          // [func, func, value]
-          sb.emitOp(node, 'DUP');
-          // [isUndefined, func, value]
-          sb.emitHelper(node, options, sb.helpers.isUndefined);
-        },
-        whenTrue: () => {
-          // [value]
-          sb.emitOp(node, 'DROP');
-          // [value, value]
-          sb.emitOp(node, 'DUP');
-          // [method, value]
-          sb.emitPushString(node, methods[1]);
+    const convertBuffer = (options: VisitOptions) => {
+      sb.emitOp(node, 'DROP');
+      sb.emitPushString(node, '');
+      sb.emitHelper(node, options, sb.helpers.createString);
+    };
+
+    const convertObject = (options: VisitOptions) => {
+      const convertObjectDone = () => {
+        // [val]
+        sb.emitOp(node, 'NIP');
+      };
+
+      const tryConvert = () => {
+        const methods = this.preferredType === 'string' ? ['toString', 'valueOf'] : ['valueOf', 'toString'];
+        const convert = (innerOptions: VisitOptions) => {
           // [func, value]
-          sb.emitHelper(node, options, sb.helpers.getPropertyObjectProperty);
+          sb.emitHelper(node, innerOptions, sb.helpers.getPropertyObjectProperty);
           sb.emitHelper(
             node,
-            options,
+            innerOptions,
             sb.helpers.if({
               condition: () => {
                 // [func, func, value]
                 sb.emitOp(node, 'DUP');
                 // [isUndefined, func, value]
-                sb.emitHelper(node, options, sb.helpers.isUndefined);
+                sb.emitHelper(node, innerOptions, sb.helpers.isUndefined);
               },
               whenTrue: () => {
                 // [value]
                 sb.emitOp(node, 'DROP');
-                // []
-                sb.emitOp(node, 'DROP');
-                // []
-                sb.emitHelper(node, options, sb.helpers.throwTypeError);
               },
               whenFalse: () => {
-                sb.emitHelper(node, options, sb.helpers.invokeCall({ bindThis: true, noArgs: true }));
+                sb.emitHelper(node, innerOptions, sb.helpers.invokeCall({ bindThis: true, noArgs: true }));
               },
             }),
           );
-        },
-        whenFalse: () => {
-          sb.emitHelper(node, options, sb.helpers.invokeCall({ bindThis: true, noArgs: true }));
-        },
+        };
+
+        const nextConvertObject = (innerOptions: VisitOptions) => {
+          // [val]
+          sb.emitOp(node, 'DROP');
+          // [val, val]
+          sb.emitOp(node, 'DUP');
+          // [method, val, val]
+          sb.emitPushString(node, methods[1]);
+          // [convertedVal]
+          convert(innerOptions);
+
+          sb.emitHelper(
+            node,
+            optionsIn,
+            sb.helpers.forBuiltInType({
+              type: undefined,
+              knownType: undefined,
+              array: throwTypeError,
+              boolean: convertPrimitive,
+              buffer: throwTypeError,
+              null: convertPrimitive,
+              number: convertPrimitive,
+              object: throwTypeError,
+              string: convertPrimitive,
+              symbol: convertPrimitive,
+              undefined: convertPrimitive,
+            }),
+          );
+        };
+
+        // [val, val]
+        sb.emitOp(node, 'DUP');
+        // [val, val, val]
+        sb.emitOp(node, 'DUP');
+        // [method, val, val]
+        sb.emitPushString(node, methods[0]);
+        // [convertedVal, val]
+        convert(optionsIn);
+
+        sb.emitHelper(
+          node,
+          optionsIn,
+          sb.helpers.forBuiltInType({
+            type: undefined,
+            knownType: undefined,
+            array: nextConvertObject,
+            boolean: convertObjectDone,
+            buffer: nextConvertObject,
+            null: convertObjectDone,
+            number: convertObjectDone,
+            object: nextConvertObject,
+            string: convertObjectDone,
+            symbol: convertObjectDone,
+            undefined: convertObjectDone,
+          }),
+        );
+      };
+
+      // [value, value]
+      sb.emitOp(node, 'DUP');
+      // [symbol, value, value]
+      sb.emitPushString(node, WellKnownSymbol.toPrimitive);
+      // [toPrimitive, value]
+      sb.emitHelper(node, options, sb.helpers.getSymbolObjectProperty);
+      // [val]
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.if({
+          condition: () => {
+            // [toPrimitive, toPrimitive, value]
+            sb.emitOp(node, 'DUP');
+            // [isUndefined, toPrimitive, value]
+            sb.emitHelper(node, options, sb.helpers.isUndefined);
+          },
+          whenTrue: () => {
+            // [value]
+            sb.emitOp(node, 'DROP');
+            // [value]
+            tryConvert();
+          },
+          whenFalse: () => {
+            // [preferredType, toPrimitiveVal, val]
+            sb.emitPushString(node, this.preferredType);
+            // [1, preferredType, toPrimitiveVal, val]
+            sb.emitPushInt(node, 1);
+            // [args, toPrimitiveVal, val]
+            sb.emitOp(node, 'PACK');
+            // [val, args, toPrimitiveVal]
+            sb.emitOp(node, 'ROT');
+            // [toPrimitiveVal, val, args]
+            sb.emitOp(node, 'ROT');
+            // [val]
+            sb.emitHelper(node, options, sb.helpers.invokeCall({ bindThis: true }));
+          },
+        }),
+      );
+    };
+
+    sb.emitHelper(
+      node,
+      optionsIn,
+      sb.helpers.forBuiltInType({
+        type: this.type,
+        knownType: this.knownType,
+        array: convertArray,
+        boolean: convertPrimitive,
+        buffer: convertBuffer,
+        null: convertPrimitive,
+        number: convertPrimitive,
+        object: convertObject,
+        string: convertPrimitive,
+        symbol: convertPrimitive,
+        undefined: convertPrimitive,
       }),
     );
   }

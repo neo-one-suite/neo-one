@@ -126,6 +126,7 @@ export class ToStringHelper extends TypedHelper {
     };
 
     const throwTypeError = (options: VisitOptions) => {
+      sb.emitOp(node, 'DROP');
       sb.emitHelper(node, options, sb.helpers.throwTypeError);
     };
 

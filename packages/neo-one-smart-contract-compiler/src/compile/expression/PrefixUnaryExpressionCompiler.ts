@@ -60,27 +60,28 @@ export class PrefixUnaryExpressionCompiler extends NodeCompiler<ts.PrefixUnaryEx
     sb.visit(tsUtils.expression.getOperand(expr), sb.setValueOptions(options));
   }
 
-  private visitValue(sb: ScriptBuilder, token: ValueLike, expr: ts.PrefixUnaryExpression, options: VisitOptions): void {
+  private visitValue(
+    sb: ScriptBuilder,
+    token: ValueLike,
+    expr: ts.PrefixUnaryExpression,
+    optionsIn: VisitOptions,
+  ): void {
+    const options = sb.pushValueOptions(optionsIn);
     const operand = tsUtils.expression.getOperand(expr);
-    sb.visit(operand, sb.noSetValueOptions(sb.pushValueOptions(options)));
-    if (!options.pushValue) {
-      sb.emitOp(expr, 'DROP');
-
-      return;
-    }
+    sb.visit(operand, sb.noSetValueOptions(options));
 
     switch (token) {
       case ts.SyntaxKind.PlusToken:
-        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(expr) }));
+        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(operand) }));
         sb.emitHelper(expr, options, sb.helpers.createNumber);
         break;
       case ts.SyntaxKind.MinusToken:
-        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(expr) }));
+        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(operand) }));
         sb.emitOp(expr, 'NEGATE');
         sb.emitHelper(expr, options, sb.helpers.createNumber);
         break;
       case ts.SyntaxKind.TildeToken:
-        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(expr) }));
+        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(operand) }));
         sb.emitOp(expr, 'INVERT');
         sb.emitHelper(expr, options, sb.helpers.createNumber);
         break;
@@ -92,6 +93,12 @@ export class PrefixUnaryExpressionCompiler extends NodeCompiler<ts.PrefixUnaryEx
       default:
         /* istanbul ignore next */
         utils.assertNever(token);
+    }
+
+    if (!optionsIn.pushValue) {
+      sb.emitOp(expr, 'DROP');
+
+      return;
     }
   }
 }

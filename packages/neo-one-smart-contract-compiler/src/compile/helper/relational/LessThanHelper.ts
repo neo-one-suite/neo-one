@@ -38,6 +38,9 @@ export class LessThanHelper extends Helper {
       return;
     }
 
+    const leftType = sb.getType(this.left);
+    const rightType = sb.getType(this.right);
+
     if (this.leftFirst) {
       // [left]
       sb.visit(this.left, options);
@@ -46,7 +49,7 @@ export class LessThanHelper extends Helper {
         this.left,
         options,
         sb.helpers.toPrimitive({
-          type: sb.getType(this.left),
+          type: leftType,
           preferredType: 'number',
         }),
       );
@@ -57,7 +60,7 @@ export class LessThanHelper extends Helper {
         this.right,
         options,
         sb.helpers.toPrimitive({
-          type: sb.getType(this.right),
+          type: rightType,
           preferredType: 'number',
         }),
       );
@@ -69,7 +72,7 @@ export class LessThanHelper extends Helper {
         this.right,
         options,
         sb.helpers.toPrimitive({
-          type: sb.getType(this.right),
+          type: rightType,
           preferredType: 'number',
         }),
       );
@@ -80,7 +83,7 @@ export class LessThanHelper extends Helper {
         this.left,
         options,
         sb.helpers.toPrimitive({
-          type: sb.getType(this.left),
+          type: leftType,
           preferredType: 'number',
         }),
       );
@@ -88,8 +91,6 @@ export class LessThanHelper extends Helper {
       sb.emitOp(node, 'SWAP');
     }
 
-    const leftType = sb.getType(this.left);
-    const rightType = sb.getType(this.right);
     if (
       leftType !== undefined &&
       rightType !== undefined &&
@@ -99,11 +100,11 @@ export class LessThanHelper extends Helper {
       sb.reportUnsupported(node);
     } else {
       // [rightNumber, leftPrim]
-      sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.getType(this.right) }));
+      sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: rightType }));
       // [leftPrim, rightNumber]
       sb.emitOp(node, 'SWAP');
       // [leftNumber, rightNumber]
-      sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.getType(this.left) }));
+      sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: leftType }));
       // [rightNumber, leftNumber]
       sb.emitOp(node, 'SWAP');
       // [lt]

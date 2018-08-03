@@ -7,7 +7,7 @@ import { AssertEqual } from './assertEqual';
 import { BufferConcat, BufferEquals, BufferFrom, BufferType, BufferValue } from './buffer';
 import { ConsoleLog } from './console';
 import { ObjectKeys, ObjectType, ObjectValue } from './object';
-import { SymbolFor, SymbolIterator, SymbolType, SymbolValue } from './symbol';
+import { SymbolFor, SymbolIterator, SymbolToPrimitive, SymbolType, SymbolValue } from './symbol';
 import { BuiltIn } from './types';
 
 export type BuiltIns = Map<ts.Symbol, BuiltIn>;
@@ -64,6 +64,7 @@ export const createBuiltIns = (program: ts.Program, typeChecker: ts.TypeChecker)
   builtIns.set(symbolVar, new SymbolValue());
   builtIns.set(tsUtils.symbol.getMemberOrThrow(symbolVar, 'for'), new SymbolFor());
   builtIns.set(tsUtils.symbol.getMemberOrThrow(symbolVar, 'iterator'), new SymbolIterator());
+  builtIns.set(tsUtils.symbol.getMemberOrThrow(symbolVar, 'toPrimitive'), new SymbolToPrimitive());
 
   const consoleVar = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'console'));
   builtIns.set(tsUtils.symbol.getMemberOrThrow(consoleVar, 'log'), new ConsoleLog());

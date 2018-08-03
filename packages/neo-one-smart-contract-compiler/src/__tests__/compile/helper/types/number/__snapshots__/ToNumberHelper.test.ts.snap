@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ToNumberHelper null 1`] = `
+"snippetCode.ts (4,7): Cannot find name 'assertEqual'.
+
+      2 |       const value: null = null;
+      3 | 
+    > 4 |       assertEqual(+value, 0);
+        |       ^
+      5 |     
+"
+`;
+
+exports[`ToNumberHelper null or number 1`] = `
+"snippetCode.ts (4,7): Cannot find name 'assertEqual'.
+
+      2 |       const value: null | number = null as null | number;
+      3 | 
+    > 4 |       assertEqual(+value, 0);
+        |       ^
+      5 |     
+"
+`;
+
+exports[`ToNumberHelper symbol 1`] = `
+"snippetCode.ts (2,8): The '+' operator cannot be applied to type 'symbol'.
+
+      1 | 
+    > 2 |       +Symbol.for('a');
+        |        ^
+      3 |     
+"
+`;
+
+exports[`ToNumberHelper undefined 1`] = `
+"snippetCode.ts (6,10): Object is possibly 'undefined'.
+
+      4 |       let error: string | undefined;
+      5 |       try {
+    > 6 |         +value;
+        |          ^
+      7 |       } catch (err) {
+      8 |         error = err;
+      9 |       }
+"
+`;

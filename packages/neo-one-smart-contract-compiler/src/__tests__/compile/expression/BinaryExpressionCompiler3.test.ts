@@ -35,23 +35,11 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
-  test.skip('0 != "a" [ExclamationEqualsToken]', async () => {
-    await helpers.executeString(`
-      const a: string | number = 0 as string | number;
-      const b: string | number = 'a' as string | number;
-      if (!(a != b)) {
-        throw 'Failure';
-      }
-    `);
-  });
-
   test('undefined != "a" [ExclamationEqualsToken]', async () => {
     await helpers.executeString(`
       const a: string | undefined = undefined as string | undefined;
       const b: string | undefined = 'a' as string | undefined;
-      if (!(a != b)) {
-        throw 'Failure';
-      }
+      assertEqual(a != b, true);
     `);
   });
 
