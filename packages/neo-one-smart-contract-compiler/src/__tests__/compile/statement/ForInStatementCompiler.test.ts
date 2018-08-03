@@ -6,8 +6,6 @@ describe('ForInStatementCompiler', () => {
       const x = [1, 2, 3, 4];
       let result = 0;
       for (const a in x) {
-        console.log(a);
-        console.log(typeof a);
         if (a === '3') {
           break;
         }
