@@ -6,8 +6,8 @@ exports[`Token properties + issue + balanceOf + totalSupply + transfer: deploy c
 
 exports[`Token properties + issue + balanceOf + totalSupply + transfer: issue consume 1`] = `"0"`;
 
-exports[`Token properties + issue + balanceOf + totalSupply + transfer: issue cost 1`] = `"5.727"`;
+exports[`Token properties + issue + balanceOf + totalSupply + transfer: issue cost 1`] = `"5.711"`;
 
 exports[`Token properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"0"`;
 
-exports[`Token properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"6.118"`;
+exports[`Token properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"6.094"`;

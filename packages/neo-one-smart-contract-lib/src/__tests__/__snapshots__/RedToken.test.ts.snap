@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: deploy consumed 1`] = `"7.178"`;
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: deploy consumed 1`] = `"7.17"`;
 
-exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"17.178"`;
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"17.17"`;
 
-exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"3.797"`;
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"3.773"`;
 
-exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"13.797"`;
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"13.773"`;

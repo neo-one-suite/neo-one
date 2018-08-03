@@ -140,6 +140,8 @@ import {
   FindObjectPropertyHelperBase,
   FindObjectPropertyHelperBaseOptions,
   FindObjectPropertyHelperOptions,
+  ForBuiltInTypeHelper,
+  ForBuiltInTypeHelperOptions,
   GetArrayIndexHelper,
   GetBooleanHelper,
   GetInternalObjectHelper,
@@ -321,6 +323,8 @@ export interface Helpers {
   readonly findObjectProperty: (options: FindObjectPropertyHelperOptions) => FindObjectPropertyHelper;
   readonly findObjectPropertyBase: (options: FindObjectPropertyHelperBaseOptions) => FindObjectPropertyHelperBase;
 
+  readonly forBuiltInType: (options: ForBuiltInTypeHelperOptions) => ForBuiltInTypeHelper;
+
   readonly arrayLength: ArrayLengthHelper;
   readonly createArray: CreateArrayHelper;
   readonly getArrayIndex: GetArrayIndexHelper;
@@ -499,6 +503,8 @@ export const createHelpers = (): Helpers => {
     createPropertyObject: new CreatePropertyObjectHelper(),
     findObjectProperty: (options) => new FindObjectPropertyHelper(options),
     findObjectPropertyBase: (options) => new FindObjectPropertyHelperBase(options),
+
+    forBuiltInType: (options) => new ForBuiltInTypeHelper(options),
 
     arrayLength: new ArrayLengthHelper(),
     createArray: new CreateArrayHelper(),
