@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ToStringHelper symbol 1`] = `
+"snippetCode.ts (2,12): The '+' operator cannot be applied to type 'symbol'.
+
+      1 | 
+    > 2 |       '' + Symbol.for('a');
+        |            ^
+      3 |     
+"
+`;
