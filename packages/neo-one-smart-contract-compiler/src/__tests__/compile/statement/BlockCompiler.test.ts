@@ -8,14 +8,10 @@ describe('BlockCompiler', () => {
       if (thing === 'outside') {
         let thing = 'inside';
 
-        if (thing !== 'inside') {
-          throw 'Failure';
-        }
+        assertEqual(thing, 'inside');
       }
 
-      if (thing !== 'outside') {
-        throw 'Failure';
-      }
+      assertEqual(thing, 'outside');
     `);
   });
 });

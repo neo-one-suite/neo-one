@@ -2,7 +2,6 @@ import { BlockCompiler } from './BlockCompiler';
 import { BreakStatementCompiler } from './BreakStatementCompiler';
 import { ContinueStatementCompiler } from './ContinueStatementCompiler';
 import { DebuggerStatementCompiler } from './DebuggerStatementCompiler';
-import { DefaultClauseCompiler } from './DefaultClauseCompiler';
 import { DoStatementCompiler } from './DoStatementCompiler';
 import { EmptyStatementCompiler } from './EmptyStatementCompiler';
 import { ExpressionStatementCompiler } from './ExpressionStatementCompiler';
@@ -26,7 +25,6 @@ export const statements = [
   BreakStatementCompiler,
   ContinueStatementCompiler,
   DebuggerStatementCompiler,
-  DefaultClauseCompiler,
   DoStatementCompiler,
   EmptyStatementCompiler,
   ExpressionStatementCompiler,

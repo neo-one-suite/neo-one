@@ -10,6 +10,7 @@ export class ContinueStatementCompiler extends NodeCompiler<ts.ContinueStatement
   public visitNode(sb: ScriptBuilder, node: ts.ContinueStatement, options: VisitOptions): void {
     const label = tsUtils.statement.getLabel(node);
     if (label !== undefined) {
+      /* istanbul ignore next */
       sb.reportUnsupported(label);
     }
 

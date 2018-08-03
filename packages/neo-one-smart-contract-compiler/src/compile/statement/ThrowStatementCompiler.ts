@@ -10,6 +10,7 @@ export class ThrowStatementCompiler extends NodeCompiler<ts.ThrowStatement> {
   public visitNode(sb: ScriptBuilder, node: ts.ThrowStatement, options: VisitOptions): void {
     const expr = tsUtils.expression.getExpression(node);
     if (expr === undefined) {
+      /* istanbul ignore next */
       sb.reportUnsupported(node);
     } else {
       sb.visit(expr, sb.pushValueOptions(options));

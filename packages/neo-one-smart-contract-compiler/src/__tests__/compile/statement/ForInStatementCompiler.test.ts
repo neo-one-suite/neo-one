@@ -16,6 +16,21 @@ describe('ForInStatementCompiler', () => {
     `);
   });
 
+  test('for in maybe array', async () => {
+    await helpers.executeString(`
+      const x: Array<number> | { [key: number]: number } = [1, 2, 3, 4] as Array<number> | { [key: number]: number };
+      let result = 0;
+      for (const a in x) {
+        if (a === '3') {
+          break;
+        }
+        result += (x as Array<number>)[a];
+      }
+
+      assertEqual(result, 6);
+    `);
+  });
+
   test('for in object', async () => {
     await helpers.executeString(`
       const x: { [key: string]: number } = {
