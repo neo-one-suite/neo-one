@@ -1,6 +1,5 @@
 export * from './constants';
 export * from './AddArgumentsHelper';
-export * from './AddBufferObjectHelper';
 export * from './AddBooleanObjectHelper';
 export * from './AddErrorObjectHelper';
 export * from './AddMapObjectHelper';

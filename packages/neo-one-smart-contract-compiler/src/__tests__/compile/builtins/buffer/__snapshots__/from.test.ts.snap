@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Buffer.from cannot be referenced 1`] = `
+"snippetCode.ts (2,20): Built-ins may not be referenced.
+
+      1 | 
+    > 2 |       const keys = Buffer.from;
+        |                    ^
+      3 |     
+"
+`;

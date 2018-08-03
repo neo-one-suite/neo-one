@@ -5,7 +5,6 @@ import { VisitOptions } from '../../types';
 
 export enum SerializableType {
   Array = 7,
-  Buffer = 8,
 }
 
 const invokeGlobal = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions, name: string) => {
@@ -184,24 +183,16 @@ export const getTypes = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions
   },
   {
     isRuntimeType: () => {
-      // [Array, val]
-      sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Buffer' }));
-      // [val instanceof Array]
-      sb.emitHelper(node, options, sb.helpers.instanceof);
+      sb.emitHelper(node, options, sb.helpers.isBuffer);
     },
     serialize: () => {
-      // [bytearray]
-      sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
-      // [arr]
-      serializeType(sb, node, options, SerializableType.Buffer);
+      // do nothing
     },
     isSerializedType: () => {
-      isSerializedType(sb, node, options, SerializableType.Buffer);
+      sb.emitHelper(node, options, sb.helpers.isBuffer);
     },
     deserialize: () => {
-      deserializeType(sb, node, options);
-      // [val]
-      sb.emitHelper(node, options, sb.helpers.wrapBuffer);
+      // do nothing
     },
   },
 ];

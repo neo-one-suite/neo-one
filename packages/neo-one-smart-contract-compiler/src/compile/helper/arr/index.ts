@@ -5,4 +5,5 @@ export * from './ArrForEachHelper';
 export * from './ArrMapFuncHelper';
 export * from './ArrMapHelper';
 export * from './ArrReduceFuncHelper';
+export * from './ArrReduceHelper';
 export * from './ExtendArrHelper';

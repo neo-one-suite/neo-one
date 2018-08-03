@@ -7,7 +7,6 @@ import { pathResolve } from './utils';
 export interface Globals {
   readonly Buffer: ts.Symbol;
   readonly BufferFrom: ts.Symbol;
-  readonly BufferEquals: ts.Symbol;
   readonly SymbolFor: ts.Symbol;
   readonly consoleLog: ts.Symbol;
   readonly AccountBase: ts.Symbol;
@@ -63,7 +62,6 @@ export const getGlobals = (program: ts.Program, typeChecker: ts.TypeChecker): Gl
   return {
     Buffer: buffer,
     BufferFrom: tsUtils.symbol.getMemberOrThrow(bufferVar, 'from'),
-    BufferEquals: tsUtils.symbol.getMemberOrThrow(buffer, 'equals'),
     consoleLog: tsUtils.symbol.getMemberOrThrow(nodeConsole, 'log'),
     SymbolFor: tsUtils.symbol.getMemberOrThrow(symbolVar, 'for'),
     AccountBase: tsUtils.node.getSymbolOrThrow(

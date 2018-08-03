@@ -4,6 +4,7 @@ import ts from 'typescript';
 import { pathResolve } from '../../utils';
 import { ArrayFilter, ArrayForEach, ArrayLength, ArrayMap, ArrayReduce, ArrayType, ArrayValue } from './array';
 import { AssertEqual } from './assertEqual';
+import { BufferConcat, BufferEquals, BufferFrom, BufferType, BufferValue } from './buffer';
 import { ConsoleLog } from './console';
 import { ObjectKeys, ObjectType, ObjectValue } from './object';
 import { BuiltIn } from './types';
@@ -45,6 +46,15 @@ export const createBuiltIns = (program: ts.Program, typeChecker: ts.TypeChecker)
   const objectVar = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Object'));
   builtIns.set(objectVar, new ObjectValue());
   builtIns.set(tsUtils.symbol.getMemberOrThrow(objectVar, 'keys'), new ObjectKeys());
+
+  const buffer = getDeclSymbol(tsUtils.statement.getInterfaceOrThrow(globalsFile, 'Buffer'));
+  builtIns.set(buffer, new BufferType());
+  builtIns.set(tsUtils.symbol.getMemberOrThrow(buffer, 'equals'), new BufferEquals());
+
+  const bufferVar = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Buffer'));
+  builtIns.set(bufferVar, new BufferValue());
+  builtIns.set(tsUtils.symbol.getMemberOrThrow(bufferVar, 'concat'), new BufferConcat());
+  builtIns.set(tsUtils.symbol.getMemberOrThrow(bufferVar, 'from'), new BufferFrom());
 
   const consoleVar = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'console'));
   builtIns.set(tsUtils.symbol.getMemberOrThrow(consoleVar, 'log'), new ConsoleLog());

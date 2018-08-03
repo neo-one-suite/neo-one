@@ -7,4 +7,5 @@ export enum Types {
   Number = 5,
   Object = 6,
   Array = 7,
+  Buffer = 8,
 }

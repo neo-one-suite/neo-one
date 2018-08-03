@@ -1,5 +1,6 @@
 export * from './array';
 export * from './boolean';
+export * from './buffer';
 export * from './null';
 export * from './number';
 export * from './object';

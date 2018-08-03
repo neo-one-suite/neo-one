@@ -290,24 +290,19 @@ class BufferClass extends SimpleSysCallType {
   }
 
   public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    isObject(sb, node, options, () => {
-      sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: this.name }));
-      sb.emitHelper(node, options, sb.helpers.instanceof);
-    });
+    sb.emitHelper(node, options, sb.helpers.isBuffer);
   }
 
   public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
-    sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
-    if (native) {
-      serializeType(sb, node, options, SerializableType.Buffer);
+    if (!native) {
+      sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
     }
   }
 
   public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
-    if (native) {
-      deserializeType(sb, node, options);
+    if (!native) {
+      sb.emitHelper(node, options, sb.helpers.wrapBuffer);
     }
-    sb.emitHelper(node, options, sb.helpers.wrapBuffer);
   }
 }
 
@@ -342,9 +337,7 @@ class ArrayValue extends SimpleSysCallType {
   }
 
   public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    isObject(sb, node, options, () => {
-      sb.emitHelper(node, options, sb.helpers.isArray);
-    });
+    sb.emitHelper(node, options, sb.helpers.isArray);
   }
 
   public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
@@ -437,9 +430,7 @@ class TupleValue extends SimpleSysCallType {
   }
 
   public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    isObject(sb, node, options, () => {
-      sb.emitHelper(node, options, sb.helpers.isArray);
-    });
+    sb.emitHelper(node, options, sb.helpers.isArray);
   }
 
   public handleArgument(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {

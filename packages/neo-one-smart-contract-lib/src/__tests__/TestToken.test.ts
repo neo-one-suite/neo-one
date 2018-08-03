@@ -1,3 +1,4 @@
+// wallaby.skip
 import { InvokeReceipt, privateKeyToScriptHash, TransactionResult } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 import { setupContractTest } from '@neo-one/smart-contract-compiler';

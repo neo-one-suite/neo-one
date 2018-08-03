@@ -9,6 +9,8 @@ import {
   ArrMapHelper,
   ArrMapHelperOptions,
   ArrReduceFuncHelper,
+  ArrReduceHelper,
+  ArrReduceHelperOptions,
   ExtendArrHelper,
 } from './arr';
 import {
@@ -18,13 +20,6 @@ import {
   WrapBlockchainInterfaceHelper,
   WrapBlockchainInterfaceHelperOptions,
 } from './blockchain';
-import {
-  CreateBufferHelper,
-  GetBufferValueHelper,
-  SetBufferValueHelper,
-  UnwrapBufferHelper,
-  WrapBufferHelper,
-} from './buffer';
 import {
   ArrSliceHelper,
   ArrSliceHelperOptions,
@@ -80,7 +75,6 @@ import {
 import {
   AddArgumentsHelper,
   AddBooleanObjectHelper,
-  AddBufferObjectHelper,
   AddErrorObjectHelper,
   AddMapObjectHelper,
   AddModulesHelper,
@@ -130,8 +124,10 @@ import {
 } from './statement';
 import {
   ArrayLengthHelper,
+  ConcatBufferHelper,
   CreateArrayHelper,
   CreateBooleanHelper,
+  CreateBufferHelper,
   CreateNullHelper,
   CreateNumberHelper,
   CreateObjectHelper,
@@ -164,6 +160,7 @@ import {
   InSymbolObjectPropertyHelper,
   IsArrayHelper,
   IsBooleanHelper,
+  IsBufferHelper,
   IsNullHelper,
   IsNullOrUndefinedHelper,
   IsNumberHelper,
@@ -197,9 +194,11 @@ import {
   ToPrimitiveHelperOptions,
   ToStringHelper,
   UnwrapArrayHelper,
+  UnwrapBufferHelper,
   UnwrapTypeHelper,
   UnwrapValHelper,
   WrapArrayHelper,
+  WrapBufferHelper,
 } from './types';
 
 export interface Helpers {
@@ -209,6 +208,7 @@ export interface Helpers {
   readonly arrMapFunc: ArrMapFuncHelper;
   readonly arrForEach: (options: ArrForEachHelperOptions) => ArrForEachHelper;
   readonly arrForEachFunc: ArrForEachFuncHelper;
+  readonly arrReduce: (options: ArrReduceHelperOptions) => ArrReduceHelper;
   readonly arrReduceFunc: ArrReduceFuncHelper;
   readonly extendArr: ExtendArrHelper;
 
@@ -335,9 +335,9 @@ export interface Helpers {
   readonly wrapMap: WrapMapHelper;
   readonly unwrapMap: UnwrapMapHelper;
 
+  readonly concatBuffer: ConcatBufferHelper;
   readonly createBuffer: CreateBufferHelper;
-  readonly getBufferValue: GetBufferValueHelper;
-  readonly setBufferValue: SetBufferValueHelper;
+  readonly isBuffer: IsBufferHelper;
   readonly unwrapBuffer: UnwrapBufferHelper;
   readonly wrapBuffer: WrapBufferHelper;
 
@@ -354,7 +354,6 @@ export interface Helpers {
 
   readonly addArguments: AddArgumentsHelper;
   readonly addBooleanObject: AddBooleanObjectHelper;
-  readonly addBufferObject: AddBufferObjectHelper;
   readonly addErrorObject: AddErrorObjectHelper;
   readonly addMapObject: AddMapObjectHelper;
   readonly addModules: AddModulesHelper;
@@ -392,6 +391,7 @@ export const createHelpers = (): Helpers => {
     arrMapFunc: new ArrMapFuncHelper(),
     arrForEach: (options) => new ArrForEachHelper(options),
     arrForEachFunc: new ArrForEachFuncHelper(),
+    arrReduce: (options) => new ArrReduceHelper(options),
     arrReduceFunc: new ArrReduceFuncHelper(),
     extendArr: new ExtendArrHelper(),
 
@@ -514,9 +514,9 @@ export const createHelpers = (): Helpers => {
     wrapMap: new WrapMapHelper(),
     unwrapMap: new UnwrapMapHelper(),
 
+    concatBuffer: new ConcatBufferHelper(),
     createBuffer: new CreateBufferHelper(),
-    getBufferValue: new GetBufferValueHelper(),
-    setBufferValue: new SetBufferValueHelper(),
+    isBuffer: new IsBufferHelper(),
     unwrapBuffer: new UnwrapBufferHelper(),
     wrapBuffer: new WrapBufferHelper(),
 
@@ -533,7 +533,6 @@ export const createHelpers = (): Helpers => {
 
     addArguments: new AddArgumentsHelper(),
     addBooleanObject: new AddBooleanObjectHelper(),
-    addBufferObject: new AddBufferObjectHelper(),
     addErrorObject: new AddErrorObjectHelper(),
     addMapObject: new AddMapObjectHelper(),
     addModules: new AddModulesHelper(),

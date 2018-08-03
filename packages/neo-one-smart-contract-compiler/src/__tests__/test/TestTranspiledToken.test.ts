@@ -1,3 +1,4 @@
+// wallaby.skip
 // tslint:disable no-unsafe-any
 import { abi, addressToScriptHash, createPrivateKey, privateKeyToScriptHash } from '@neo-one/client';
 import BigNumber from 'bignumber.js';

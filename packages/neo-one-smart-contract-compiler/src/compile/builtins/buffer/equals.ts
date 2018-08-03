@@ -1,21 +1,29 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { SpecialCase } from './types';
+import { ScriptBuilder } from '../../sb';
+import { VisitOptions } from '../../types';
+import { BuiltInBase, BuiltInCall, BuiltInType } from '../types';
 
-export const bufferEquals: SpecialCase = {
-  test: (sb, node, symbol) => sb.isGlobalSymbol(node, symbol, 'BufferEquals'),
-  handle: (sb, node, optionsIn) => {
+// tslint:disable-next-line export-name
+export class BufferEquals extends BuiltInBase implements BuiltInCall {
+  public readonly types = new Set([BuiltInType.Call]);
+
+  public emitCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
     const func = tsUtils.expression.getExpression(node);
     if (!ts.isPropertyAccessExpression(func)) {
+      /* istanbul ignore next */
       sb.reportUnsupported(node);
 
+      /* istanbul ignore next */
       return;
     }
 
     const args = tsUtils.argumented.getArguments(node);
     if (args.length !== 1) {
+      /* istanbul ignore next */
       sb.reportUnsupported(node);
 
+      /* istanbul ignore next */
       return;
     }
 
@@ -38,5 +46,5 @@ export const bufferEquals: SpecialCase = {
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
     }
-  },
-};
+  }
+}

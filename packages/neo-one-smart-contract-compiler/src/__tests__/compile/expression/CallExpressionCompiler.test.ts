@@ -172,18 +172,6 @@ describe('CallExpressionCompiler', () => {
     `);
   });
 
-  test('call returning arrow of Buffer.from', async () => {
-    const hash = '5946158ab93f5f4fd6ba230f1c6c235117eec5f83e65275ac6f93ada9ca60477';
-    await helpers.executeString(`
-
-      const getBufferFrom = () => Buffer.from;
-
-      if (!getBufferFrom()('${hash}', 'hex').equals(Buffer.from('${hash}', 'hex'))) {
-        throw 'Failure';
-      }
-    `);
-  });
-
   test('Symbol', async () => {
     await helpers.executeString(`
       const a: symbol = Symbol.for('hello');
