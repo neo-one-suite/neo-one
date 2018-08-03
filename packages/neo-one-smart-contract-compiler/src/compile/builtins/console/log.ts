@@ -3,10 +3,11 @@ import _ from 'lodash';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltInCallable } from '../types';
+import { BuiltInBase, BuiltInCall, BuiltInType } from '../types';
 
 // tslint:disable-next-line export-name
-export class ConsoleLog extends BuiltInCallable {
+export class ConsoleLog extends BuiltInBase implements BuiltInCall {
+  public readonly types = new Set([BuiltInType.Call]);
   public emitCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     const args = tsUtils.argumented.getArguments(node);

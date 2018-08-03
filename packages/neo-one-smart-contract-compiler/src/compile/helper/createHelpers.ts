@@ -2,20 +2,15 @@ import {
   ArrFilterFuncHelper,
   ArrFilterHelper,
   ArrFilterHelperOptions,
+  ArrForEachFuncHelper,
+  ArrForEachHelper,
+  ArrForEachHelperOptions,
   ArrMapFuncHelper,
   ArrMapHelper,
   ArrMapHelperOptions,
+  ArrReduceFuncHelper,
+  ExtendArrHelper,
 } from './arr';
-import {
-  CreateArrayHelper,
-  GetArrayIndexHelper,
-  GetArrayValueHelper,
-  IsArrayHelper,
-  SetArrayIndexHelper,
-  SetArrayValueHelper,
-  UnwrapArrayHelper,
-  WrapArrayHelper,
-} from './array';
 import {
   IsBlockchainInterfaceHelper,
   IsBlockchainInterfaceHelperOptions,
@@ -31,14 +26,11 @@ import {
   WrapBufferHelper,
 } from './buffer';
 import {
-  ArrForEachHelper,
-  ArrForEachHelperOptions,
   ArrSliceHelper,
   ArrSliceHelperOptions,
   CloneArrayHelper,
   ConsoleLogHelper,
   ExpHelper,
-  ExtendArrayHelper,
   ForTypeHelper,
   ForTypeHelperOptions,
   GenericDeserializeHelper,
@@ -87,7 +79,6 @@ import {
 } from './function';
 import {
   AddArgumentsHelper,
-  AddArrayObjectHelper,
   AddBooleanObjectHelper,
   AddBufferObjectHelper,
   AddErrorObjectHelper,
@@ -138,6 +129,8 @@ import {
   ProcessStatementsHelperOptions,
 } from './statement';
 import {
+  ArrayLengthHelper,
+  CreateArrayHelper,
   CreateBooleanHelper,
   CreateNullHelper,
   CreateNumberHelper,
@@ -151,6 +144,7 @@ import {
   FindObjectPropertyHelperBase,
   FindObjectPropertyHelperBaseOptions,
   FindObjectPropertyHelperOptions,
+  GetArrayIndexHelper,
   GetBooleanHelper,
   GetInternalObjectHelper,
   GetInternalObjectPropertyHelper,
@@ -168,6 +162,7 @@ import {
   InPropertyObjectPropertyHelper,
   InstanceofHelper,
   InSymbolObjectPropertyHelper,
+  IsArrayHelper,
   IsBooleanHelper,
   IsNullHelper,
   IsNullOrUndefinedHelper,
@@ -186,6 +181,7 @@ import {
   PickSymbolObjectPropertiesHelper,
   SetAccessorPropertyObjectPropertyHelper,
   SetAccessorSymbolObjectPropertyHelper,
+  SetArrayIndexHelper,
   SetDataPropertyObjectPropertyHelper,
   SetDataSymbolObjectPropertyHelper,
   SetInternalObjectPropertyHelper,
@@ -200,8 +196,10 @@ import {
   ToPrimitiveHelper,
   ToPrimitiveHelperOptions,
   ToStringHelper,
+  UnwrapArrayHelper,
   UnwrapTypeHelper,
   UnwrapValHelper,
+  WrapArrayHelper,
 } from './types';
 
 export interface Helpers {
@@ -209,11 +207,13 @@ export interface Helpers {
   readonly arrFilterFunc: ArrFilterFuncHelper;
   readonly arrMap: (options: ArrMapHelperOptions) => ArrMapHelper;
   readonly arrMapFunc: ArrMapFuncHelper;
-
   readonly arrForEach: (options: ArrForEachHelperOptions) => ArrForEachHelper;
+  readonly arrForEachFunc: ArrForEachFuncHelper;
+  readonly arrReduceFunc: ArrReduceFuncHelper;
+  readonly extendArr: ExtendArrHelper;
+
   readonly arrSlice: (options?: ArrSliceHelperOptions) => ArrSliceHelper;
   readonly cloneArray: CloneArrayHelper;
-  readonly extendArray: ExtendArrayHelper;
   readonly forType: (options: ForTypeHelperOptions) => ForTypeHelper;
   readonly genericDeserialize: GenericDeserializeHelper;
   readonly genericSerialize: GenericSerializeHelper;
@@ -321,9 +321,8 @@ export interface Helpers {
   readonly findObjectProperty: (options: FindObjectPropertyHelperOptions) => FindObjectPropertyHelper;
   readonly findObjectPropertyBase: (options: FindObjectPropertyHelperBaseOptions) => FindObjectPropertyHelperBase;
 
-  readonly getArrayValue: GetArrayValueHelper;
+  readonly arrayLength: ArrayLengthHelper;
   readonly createArray: CreateArrayHelper;
-  readonly setArrayValue: SetArrayValueHelper;
   readonly getArrayIndex: GetArrayIndexHelper;
   readonly setArrayIndex: SetArrayIndexHelper;
   readonly wrapArray: WrapArrayHelper;
@@ -354,7 +353,6 @@ export interface Helpers {
   readonly unwrapBlockchainInterface: UnwrapBlockchainInterfaceHelper;
 
   readonly addArguments: AddArgumentsHelper;
-  readonly addArrayObject: AddArrayObjectHelper;
   readonly addBooleanObject: AddBooleanObjectHelper;
   readonly addBufferObject: AddBufferObjectHelper;
   readonly addErrorObject: AddErrorObjectHelper;
@@ -392,11 +390,13 @@ export const createHelpers = (): Helpers => {
     arrFilterFunc: new ArrFilterFuncHelper(),
     arrMap: (options) => new ArrMapHelper(options),
     arrMapFunc: new ArrMapFuncHelper(),
-
     arrForEach: (options) => new ArrForEachHelper(options),
+    arrForEachFunc: new ArrForEachFuncHelper(),
+    arrReduceFunc: new ArrReduceFuncHelper(),
+    extendArr: new ExtendArrHelper(),
+
     arrSlice: (options = {}) => new ArrSliceHelper(options),
     cloneArray: new CloneArrayHelper(),
-    extendArray: new ExtendArrayHelper(),
     forType: (options) => new ForTypeHelper(options),
     genericDeserialize: new GenericDeserializeHelper(),
     genericSerialize: new GenericSerializeHelper(),
@@ -500,9 +500,8 @@ export const createHelpers = (): Helpers => {
     findObjectProperty: (options) => new FindObjectPropertyHelper(options),
     findObjectPropertyBase: (options) => new FindObjectPropertyHelperBase(options),
 
-    getArrayValue: new GetArrayValueHelper(),
+    arrayLength: new ArrayLengthHelper(),
     createArray: new CreateArrayHelper(),
-    setArrayValue: new SetArrayValueHelper(),
     getArrayIndex: new GetArrayIndexHelper(),
     setArrayIndex: new SetArrayIndexHelper(),
     wrapArray: new WrapArrayHelper(),
@@ -533,7 +532,6 @@ export const createHelpers = (): Helpers => {
     unwrapBlockchainInterface: new UnwrapBlockchainInterfaceHelper(),
 
     addArguments: new AddArgumentsHelper(),
-    addArrayObject: new AddArrayObjectHelper(),
     addBooleanObject: new AddBooleanObjectHelper(),
     addBufferObject: new AddBufferObjectHelper(),
     addErrorObject: new AddErrorObjectHelper(),

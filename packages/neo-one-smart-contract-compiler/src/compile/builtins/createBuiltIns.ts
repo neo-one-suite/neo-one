@@ -2,7 +2,7 @@ import { tsUtils } from '@neo-one/ts-utils';
 import * as path from 'path';
 import ts from 'typescript';
 import { pathResolve } from '../../utils';
-import { ArrayFilter, ArrayMap, ArrayType, ArrayValue } from './array';
+import { ArrayFilter, ArrayForEach, ArrayLength, ArrayMap, ArrayReduce, ArrayType, ArrayValue } from './array';
 import { AssertEqual } from './assertEqual';
 import { ConsoleLog } from './console';
 import { ObjectKeys, ObjectType, ObjectValue } from './object';
@@ -31,7 +31,10 @@ export const createBuiltIns = (program: ts.Program, typeChecker: ts.TypeChecker)
   const array = tsUtils.type_.getSymbolOrThrow(tsUtils.types.getArrayType(typeChecker));
   builtIns.set(array, new ArrayType());
   builtIns.set(tsUtils.symbol.getMemberOrThrow(array, 'filter'), new ArrayFilter());
+  builtIns.set(tsUtils.symbol.getMemberOrThrow(array, 'forEach'), new ArrayForEach());
+  builtIns.set(tsUtils.symbol.getMemberOrThrow(array, 'length'), new ArrayLength());
   builtIns.set(tsUtils.symbol.getMemberOrThrow(array, 'map'), new ArrayMap());
+  builtIns.set(tsUtils.symbol.getMemberOrThrow(array, 'reduce'), new ArrayReduce());
 
   const arrayVar = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Array'));
   builtIns.set(arrayVar, new ArrayValue());

@@ -93,6 +93,7 @@ export class ToBooleanHelper extends TypedHelper {
               sb.emitOp(node, 'OR');
             },
             whenTrue: () => {
+              sb.emitOp(node, 'DROP');
               sb.emitPushBoolean(node, false);
             },
           },

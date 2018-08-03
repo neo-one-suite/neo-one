@@ -2,10 +2,11 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltInCallable } from '../types';
+import { BuiltInBase, BuiltInCall, BuiltInType } from '../types';
 
 // tslint:disable-next-line export-name
-export class ObjectKeys extends BuiltInCallable {
+export class ObjectKeys extends BuiltInBase implements BuiltInCall {
+  public readonly types = new Set([BuiltInType.Call]);
   public emitCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     const arg = tsUtils.argumented.getArguments(node)[0];

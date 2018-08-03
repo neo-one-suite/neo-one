@@ -1,11 +1,11 @@
 import ts from 'typescript';
-
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
+import { GlobalProperty } from './constants';
 
 export interface GetGlobalPropertyHelperOptions {
-  readonly property: string;
+  readonly property: GlobalProperty;
 }
 
 // Input: []

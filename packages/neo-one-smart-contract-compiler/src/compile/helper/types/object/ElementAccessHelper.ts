@@ -310,10 +310,8 @@ export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
   private isArrayInstance(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [objectVal, propVal, objectVal]
     sb.emitOp(node, 'OVER');
-    // [Array, objectVal, propVal, objectVal]
-    sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Array' }));
     // [isArray, propVal, objectVal]
-    sb.emitHelper(node, options, sb.helpers.instanceof);
+    sb.emitHelper(node, options, sb.helpers.isArray);
   }
 
   private pickValue(sb: ScriptBuilder, node: ts.Node, _options: VisitOptions, index: number): void {

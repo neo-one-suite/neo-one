@@ -143,32 +143,8 @@ export const getTypes = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions
   },
   {
     isRuntimeType: () => {
-      // [Array, val]
-      sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Buffer' }));
-      // [val instanceof Array]
-      sb.emitHelper(node, options, sb.helpers.instanceof);
-    },
-    serialize: () => {
-      // [bytearray]
-      sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
-      // [arr]
-      serializeType(sb, node, options, SerializableType.Buffer);
-    },
-    isSerializedType: () => {
-      isSerializedType(sb, node, options, SerializableType.Buffer);
-    },
-    deserialize: () => {
-      deserializeType(sb, node, options);
-      // [val]
-      sb.emitHelper(node, options, sb.helpers.wrapBuffer);
-    },
-  },
-  {
-    isRuntimeType: () => {
-      // [Array, val]
-      sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Array' }));
-      // [val instanceof Array]
-      sb.emitHelper(node, options, sb.helpers.instanceof);
+      // [boolean]
+      sb.emitHelper(node, options, sb.helpers.isArray);
     },
     serialize: () => {
       // [arr]
@@ -204,6 +180,28 @@ export const getTypes = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions
       );
       // [val]
       sb.emitHelper(node, options, sb.helpers.wrapArray);
+    },
+  },
+  {
+    isRuntimeType: () => {
+      // [Array, val]
+      sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Buffer' }));
+      // [val instanceof Array]
+      sb.emitHelper(node, options, sb.helpers.instanceof);
+    },
+    serialize: () => {
+      // [bytearray]
+      sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
+      // [arr]
+      serializeType(sb, node, options, SerializableType.Buffer);
+    },
+    isSerializedType: () => {
+      isSerializedType(sb, node, options, SerializableType.Buffer);
+    },
+    deserialize: () => {
+      deserializeType(sb, node, options);
+      // [val]
+      sb.emitHelper(node, options, sb.helpers.wrapBuffer);
     },
   },
 ];

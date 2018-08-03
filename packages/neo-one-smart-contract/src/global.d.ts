@@ -122,9 +122,9 @@ interface IterableIterator<T> extends Iterator<T> {
 
 interface Array<T> {
   /**
-   * Gets or sets the length of the array. This is a number one higher than the highest element defined in an array.
+   * Gets the length of the array. This is a number one higher than the highest element defined in an array.
    */
-  length: number;
+  readonly length: number;
   /** Iterator */
   [Symbol.iterator](): IterableIterator<T>;
   /**
@@ -163,12 +163,7 @@ interface Array<T> {
   [n: number]: T;
 }
 
-interface ArrayConstructor {
-  new (arrayLength?: number): any[];
-  new <T>(arrayLength: number): T[];
-  new <T>(...items: T[]): T[];
-}
-
+interface ArrayConstructor {}
 declare const Array: ArrayConstructor;
 
 interface Map<K, V> {

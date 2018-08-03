@@ -343,8 +343,7 @@ class ArrayValue extends SimpleSysCallType {
 
   public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     isObject(sb, node, options, () => {
-      sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Array' }));
-      sb.emitHelper(node, options, sb.helpers.instanceof);
+      sb.emitHelper(node, options, sb.helpers.isArray);
     });
   }
 
@@ -439,8 +438,7 @@ class TupleValue extends SimpleSysCallType {
 
   public isRuntimeType(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     isObject(sb, node, options, () => {
-      sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: 'Array' }));
-      sb.emitHelper(node, options, sb.helpers.instanceof);
+      sb.emitHelper(node, options, sb.helpers.isArray);
     });
   }
 

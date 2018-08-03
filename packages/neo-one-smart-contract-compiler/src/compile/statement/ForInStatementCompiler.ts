@@ -70,9 +70,9 @@ export class ForInStatementCompiler extends NodeCompiler<ts.ForInStatement> {
           withIndex: false,
           each: (innerOptions) => {
             // [stringVal]
-            sb.emitHelper(variable, innerOptions, sb.helpers.createString);
+            sb.emitHelper(variable, sb.pushValueOptions(innerOptions), sb.helpers.createString);
             // []
-            sb.visit(variable, sb.setValueOptions(innerOptions));
+            sb.visit(variable, sb.setValueOptions(sb.noPushValueOptions(innerOptions)));
             // []
             sb.visit(statement, sb.noPushValueOptions(innerOptions));
           },

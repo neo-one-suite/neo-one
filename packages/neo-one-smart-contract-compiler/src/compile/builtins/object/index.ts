@@ -1,6 +1,6 @@
-import { BuiltIn } from '../types';
+import { BuiltInBase } from '../types';
 
 export * from './keys';
 
-export class ObjectValue extends BuiltIn {}
-export class ObjectType extends BuiltIn {}
+export class ObjectValue extends BuiltInBase {}
+export class ObjectType extends BuiltInBase {}

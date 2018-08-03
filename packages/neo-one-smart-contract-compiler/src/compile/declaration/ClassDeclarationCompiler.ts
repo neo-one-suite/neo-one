@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { BuiltInExtend, isBuiltInExtend } from '../builtins';
 import { InternalFunctionProperties } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -18,19 +19,31 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       superClassIn = sb.scope.addUnique();
       options = sb.superClassOptions(options, superClassIn);
       const superClassExpr = tsUtils.expression.getExpression(extendsExpr);
+      let builtin: BuiltInExtend | undefined;
       if (ts.isIdentifier(superClassExpr)) {
         const superClassSymbol = sb.getSymbol(superClassExpr);
         if (superClassSymbol !== undefined) {
-          const builtin = sb.builtIns.get(superClassSymbol);
-          if (builtin !== undefined && !builtin.canExtend) {
-            sb.reportError(superClassExpr, 'Built-ins cannot be extended.', DiagnosticCode.CANNOT_EXTEND_BUILTIN);
+          const foundBuiltin = sb.builtIns.get(superClassSymbol);
+          if (foundBuiltin !== undefined) {
+            if (!isBuiltInExtend(foundBuiltin)) {
+              sb.reportError(superClassExpr, 'Built-ins cannot be extended.', DiagnosticCode.CANNOT_EXTEND_BUILTIN);
 
-            return;
+              return;
+            }
+
+            builtin = foundBuiltin;
           }
         }
       }
-      // [superClass]
-      sb.visit(tsUtils.expression.getExpression(extendsExpr), options);
+
+      if (builtin === undefined) {
+        // [superClass]
+        sb.visit(tsUtils.expression.getExpression(extendsExpr), options);
+      } else {
+        // [superClass]
+        builtin.emitExtend(sb, tsUtils.expression.getExpression(extendsExpr), options);
+      }
+
       // []
       sb.scope.set(sb, extendsExpr, options, superClassIn);
     }

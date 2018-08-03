@@ -20,12 +20,8 @@ export class ArrForEachHelper extends Helper {
     this.withIndex = options.withIndex || false;
   }
 
-  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    if (!options.pushValue) {
-      sb.emitOp(node, 'DROP');
-
-      return;
-    }
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
+    const options = sb.pushValueOptions(optionsIn);
 
     // [size, ...array]
     sb.emitOp(node, 'UNPACK');
@@ -56,7 +52,7 @@ export class ArrForEachHelper extends Helper {
             sb.emitOp(node, 'SWAP');
           }
           // [idx, size, ...array]
-          this.each(innerOptions);
+          this.each(sb.noPushValueOptions(innerOptions));
         },
         incrementor: () => {
           // [idx, size, ...array]

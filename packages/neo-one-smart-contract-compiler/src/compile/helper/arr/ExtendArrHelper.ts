@@ -6,7 +6,7 @@ import { Helper } from '../Helper';
 
 // Input: [length, arr]
 // Output: []
-export class ExtendArrayHelper extends Helper {
+export class ExtendArrHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 

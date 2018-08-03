@@ -2,37 +2,33 @@ import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Array.prototype.map', () => {
-  test('should apply a function over an array', async () => {
-    await helpers.executeString(`
-      const x = [0, 1, 2];
-      const y = x.map((value) => value + 1);
-
-      assertEqual(y.length, 3);
-      assertEqual(y[0], 1);
-      assertEqual(y[1], 2);
-      assertEqual(y[2], 3);
-    `);
-  });
-
-  test('should apply a function over an array with index', async () => {
+  test('should apply a function over an array with an accumulator', async () => {
     await helpers.executeString(`
       const x = [1, 2, 3];
-      const y = x.map((value, idx) => idx + 1);
+      const y = x.reduce((acc, value) => acc + value, 0);
 
-      assertEqual(y.length, 3);
-      assertEqual(y[0], 1);
-      assertEqual(y[1], 2);
-      assertEqual(y[2], 3);
+      assertEqual(y, 6);
     `);
   });
 
-  test('should apply a function over an array without returning the array', async () => {
+  test('should apply a function over an array with index and an accumulator', async () => {
+    await helpers.executeString(`
+      const x = [1, 2, 3];
+      const y = x.reduce((acc, value, idx) => acc + idx + 1, 0);
+
+      assertEqual(y, 6);
+    `);
+  });
+
+  test('should apply a function over an array without returning the accumulator', async () => {
     await helpers.executeString(`
       const x = [1, 2, 3, 4];
       let result = 0;
-      x.map((value) => {
+      x.reduce((acc, value) => {
         result += value;
-      });
+
+        return acc;
+      }, 0);
 
       assertEqual(x.length, 4);
       assertEqual(result, 10);

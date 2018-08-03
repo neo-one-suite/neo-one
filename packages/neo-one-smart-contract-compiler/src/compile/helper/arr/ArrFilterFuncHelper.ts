@@ -45,18 +45,20 @@ export class ArrFilterFuncHelper extends Helper {
           // [size > idx, idx, size, arr, callable, ...arr]
           sb.emitOp(node, 'GT');
         },
-        each: () => {
+        each: (innerOptions) => {
           // [arr, idx, size, callable, ...arr]
           sb.emitOp(node, 'ROT');
           // [idx, arr, idx, size, callable, ...arr]
           sb.emitOp(node, 'OVER');
-          // [5, idx, arr, idx, size, callable, ...arr]
+          // [idxVal, arr, idx, size, callable, ...arr]
+          sb.emitHelper(node, innerOptions, sb.helpers.createNumber);
+          // [5, idxVal, arr, idx, size, callable, ...arr]
           sb.emitPushInt(node, 5);
-          // [value, idx, arr, idx, size, callable, ...arr]
+          // [value, idxVal, arr, idx, size, callable, ...arr]
           sb.emitOp(node, 'ROLL');
-          // [value, idx, value, arr, idx, size, callable, ...arr]
+          // [value, idxVal, value, arr, idx, size, callable, ...arr]
           sb.emitOp(node, 'TUCK');
-          // [2, value, idx, value, arr, idx, size, callable, ...arr]
+          // [2, value, idxVal, value, arr, idx, size, callable, ...arr]
           sb.emitPushInt(node, 2);
           // [argsarr, value, arr, idx, size, callable, ...arr]
           sb.emitOp(node, 'PACK');
@@ -67,14 +69,14 @@ export class ArrFilterFuncHelper extends Helper {
 
           sb.emitHelper(
             node,
-            options,
+            innerOptions,
             sb.helpers.if({
               condition: () => {
                 // [keepVal, value, arr, idx, size, callable, ...arr]
                 // tslint:disable-next-line no-map-without-usage
-                sb.emitHelper(node, options, sb.helpers.call);
+                sb.emitHelper(node, innerOptions, sb.helpers.call);
                 // [keep, value, arr, idx, size, callable, ...arr]
-                sb.emitHelper(node, options, sb.helpers.toBoolean({ type: undefined }));
+                sb.emitHelper(node, innerOptions, sb.helpers.toBoolean({ type: undefined }));
               },
               whenTrue: () => {
                 // [arr, value, arr, idx, size, callable, ...arr]

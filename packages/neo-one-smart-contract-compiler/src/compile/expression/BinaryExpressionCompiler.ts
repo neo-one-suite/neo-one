@@ -6,6 +6,8 @@ import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
+import { DiagnosticCode } from '../../DiagnosticCode';
+import { isBuiltInInstanceOf } from '../builtins';
 import { Helper } from '../helper';
 import { TypedHelperOptions } from '../helper/common';
 
@@ -180,14 +182,9 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
     kind: ExpressionOperatorKind,
     left: ts.Expression,
     right: ts.Expression,
-    options: VisitOptions,
+    optionsIn: VisitOptions,
   ): void {
-    if (!options.pushValue) {
-      sb.visit(left, options);
-      sb.visit(right, options);
-
-      return;
-    }
+    const options = sb.pushValueOptions(optionsIn);
 
     const leftType = sb.getType(left);
     const rightType = sb.getType(right);
@@ -376,14 +373,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
       case ts.SyntaxKind.InstanceOfKeyword:
-        // [left]
-        sb.visit(left, options);
-        // [right, left]
-        sb.visit(right, options);
-        // [left instanceof right]
-        sb.emitHelper(node, options, sb.helpers.instanceof);
-        // [booleanVal]
-        sb.emitHelper(node, options, sb.helpers.createBoolean);
+        this.handleInstanceOf(sb, node, left, right, options);
         break;
       case ts.SyntaxKind.CommaToken:
         // [left]
@@ -415,6 +405,12 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
       default:
         /* istanbul ignore next */
         utils.assertNever(kind);
+    }
+
+    if (!optionsIn.pushValue) {
+      sb.emitOp(node, 'DROP');
+
+      return;
     }
   }
 
@@ -481,5 +477,38 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         /* istanbul ignore next */
         utils.assertNever(kind);
     }
+  }
+
+  private handleInstanceOf(
+    sb: ScriptBuilder,
+    node: ts.Node,
+    left: ts.Expression,
+    right: ts.Expression,
+    options: VisitOptions,
+  ): void {
+    const rightSymbol = sb.getSymbol(right);
+    if (rightSymbol !== undefined) {
+      const builtin = sb.builtIns.get(rightSymbol);
+      if (builtin !== undefined) {
+        if (!isBuiltInInstanceOf(builtin)) {
+          sb.reportError(node, 'Cannot call instanceof on builtin', DiagnosticCode.CANNOT_INSTANCEOF_BUILTIN);
+
+          return;
+        }
+
+        builtin.emitInstanceOf(sb, left, options);
+
+        return;
+      }
+    }
+
+    // [left]
+    sb.visit(left, options);
+    // [right, left]
+    sb.visit(right, options);
+    // [left instanceof right]
+    sb.emitHelper(node, options, sb.helpers.instanceof);
+    // [booleanVal]
+    sb.emitHelper(node, options, sb.helpers.createBoolean);
   }
 }

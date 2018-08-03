@@ -6,4 +6,5 @@ export enum Types {
   Symbol = 4,
   Number = 5,
   Object = 6,
+  Array = 7,
 }

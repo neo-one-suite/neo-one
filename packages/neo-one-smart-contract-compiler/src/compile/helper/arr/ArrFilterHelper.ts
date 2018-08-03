@@ -4,14 +4,14 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface ArrFilterHelperOptions {
-  readonly map: () => void;
+  readonly map: (options: VisitOptions) => void;
   readonly withIndex?: boolean;
 }
 
 // Input: [arr]
 // Output: [arr]
 export class ArrFilterHelper extends Helper {
-  private readonly map: () => void;
+  private readonly map: (options: VisitOptions) => void;
   private readonly withIndex: boolean;
 
   public constructor(options: ArrFilterHelperOptions) {
@@ -52,7 +52,7 @@ export class ArrFilterHelper extends Helper {
           // [size > idx, idx, size, arr, ...arr]
           sb.emitOp(node, 'GT');
         },
-        each: () => {
+        each: (innerOptions) => {
           // [arr, idx, size, ...arr]
           sb.emitOp(node, 'ROT');
           if (this.withIndex) {
@@ -80,7 +80,7 @@ export class ArrFilterHelper extends Helper {
               condition: () => {
                 // [keep, value, arr, idx, size, ...arr]
                 // tslint:disable-next-line no-map-without-usage
-                this.map();
+                this.map(innerOptions);
               },
               whenTrue: () => {
                 // [arr, value, arr, idx, size, ...arr]

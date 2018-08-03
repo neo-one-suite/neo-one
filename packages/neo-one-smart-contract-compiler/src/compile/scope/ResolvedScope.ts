@@ -103,7 +103,8 @@ export class ResolvedScope implements Scope {
       if (this.parent === undefined) {
         if (typeof name === 'string' && sb.helpers.globalProperties.has(name)) {
           // [val]
-          sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: name }));
+          // tslint:disable-next-line no-any
+          sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: name as any }));
         } else {
           sb.reportError(node, `Unknown reference: ${name}`, DiagnosticCode.REFERENCE_ERROR);
         }

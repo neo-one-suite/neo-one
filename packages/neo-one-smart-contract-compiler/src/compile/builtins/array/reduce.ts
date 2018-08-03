@@ -5,7 +5,7 @@ import { VisitOptions } from '../../types';
 import { BuiltInBase, BuiltInCall, BuiltInType } from '../types';
 
 // tslint:disable-next-line export-name
-export class ArrayMap extends BuiltInBase implements BuiltInCall {
+export class ArrayReduce extends BuiltInBase implements BuiltInCall {
   public readonly types = new Set([BuiltInType.Call]);
 
   public emitCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
@@ -20,14 +20,11 @@ export class ArrayMap extends BuiltInBase implements BuiltInCall {
     sb.visit(tsUtils.expression.getExpression(expr), options);
     // [arr]
     sb.emitHelper(node, options, sb.helpers.unwrapArray);
-    // [objectVal, arr]
+    // [val, arr]
+    sb.visit(tsUtils.argumented.getArguments(node)[1], options);
+    // [objectVal, val, arr]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
-    // [arr]
-    sb.emitHelper(node, options, sb.helpers.arrMapFunc);
-    // [arrayVal]
-    sb.emitHelper(node, options, sb.helpers.wrapArray);
-    if (!optionsIn.pushValue) {
-      sb.emitOp(node, 'DROP');
-    }
+    // [val]
+    sb.emitHelper(node, optionsIn, sb.helpers.arrReduceFunc);
   }
 }

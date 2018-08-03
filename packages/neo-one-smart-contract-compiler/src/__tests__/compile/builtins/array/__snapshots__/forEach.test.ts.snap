@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Array.prototype.forEach cannot be referenced 1`] = `
+"snippetCode.ts (3,17): Built-ins may not be referenced.
+
+      1 | 
+      2 |       const x = [0, 1, 2];
+    > 3 |       const y = x.forEach;
+        |                 ^
+      4 |     
+"
+`;

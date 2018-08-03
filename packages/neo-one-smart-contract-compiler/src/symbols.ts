@@ -5,7 +5,6 @@ import ts from 'typescript';
 import { pathResolve } from './utils';
 
 export interface Globals {
-  readonly Array: ts.Symbol;
   readonly Buffer: ts.Symbol;
   readonly BufferFrom: ts.Symbol;
   readonly BufferEquals: ts.Symbol;
@@ -62,7 +61,6 @@ export const getGlobals = (program: ts.Program, typeChecker: ts.TypeChecker): Gl
   );
 
   return {
-    Array: tsUtils.type_.getSymbolOrThrow(tsUtils.types.getArrayType(typeChecker)),
     Buffer: buffer,
     BufferFrom: tsUtils.symbol.getMemberOrThrow(bufferVar, 'from'),
     BufferEquals: tsUtils.symbol.getMemberOrThrow(buffer, 'equals'),

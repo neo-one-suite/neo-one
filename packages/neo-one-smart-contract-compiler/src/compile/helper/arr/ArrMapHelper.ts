@@ -4,14 +4,14 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface ArrMapHelperOptions {
-  readonly map: () => void;
+  readonly map: (options: VisitOptions) => void;
   readonly withIndex?: boolean;
 }
 
 // Input: [arr]
 // Output: [arr]
 export class ArrMapHelper extends Helper {
-  private readonly map: () => void;
+  private readonly map: (options: VisitOptions) => void;
   private readonly withIndex: boolean;
 
   public constructor(options: ArrMapHelperOptions) {
@@ -46,7 +46,7 @@ export class ArrMapHelper extends Helper {
           // [size > idx, idx, size, ...array]
           sb.emitOp(node, 'GT');
         },
-        each: () => {
+        each: (innerOptions) => {
           // [idx, idx, size, ...array]
           sb.emitOp(node, 'DUP');
           // [3, idx, idx, size, ...array]
@@ -72,7 +72,7 @@ export class ArrMapHelper extends Helper {
           }
           // [value, idx + 3, idx, size, ...array]
           // tslint:disable-next-line no-map-without-usage
-          this.map();
+          this.map(innerOptions);
           // [idx + 3, value, idx, size, ...array]
           sb.emitOp(node, 'SWAP');
           // [value, idx, size, ...array]

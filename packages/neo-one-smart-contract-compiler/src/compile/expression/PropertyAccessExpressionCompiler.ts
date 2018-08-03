@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { isBuiltInValue } from '../builtins';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -13,8 +14,14 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
     const symbol = sb.getSymbol(expr);
     if (symbol !== undefined) {
       const builtin = sb.builtIns.get(symbol);
-      if (builtin !== undefined && !builtin.canReference) {
-        sb.reportError(expr, 'Built-ins may not be referenced.', DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY);
+      if (builtin !== undefined) {
+        if (!isBuiltInValue(builtin)) {
+          sb.reportError(expr, 'Built-ins may not be referenced.', DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY);
+
+          return;
+        }
+
+        builtin.emitValue(sb, expr, optionsIn);
 
         return;
       }
