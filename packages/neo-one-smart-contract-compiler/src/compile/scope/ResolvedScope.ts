@@ -79,13 +79,11 @@ export class ResolvedScope implements Scope {
         this.parent.set(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }
     } else {
-      // [normal]
-      sb.emitHelper(node, options, sb.helpers.createNormalCompletion);
-      // [scope, normal]
+      // [scope, val]
       this.loadScope(sb, node, scopeLength, scopePosition);
-      // [position, scope, normal]
+      // [position, scope, val]
       sb.emitPushInt(node, position);
-      // [normal, position, scope]
+      // [val, position, scope]
       sb.emitOp(node, 'ROT');
       // []
       sb.emitOp(node, 'SETITEM');
@@ -113,10 +111,12 @@ export class ResolvedScope implements Scope {
         this.parent.get(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }
     } else {
+      // [scope]
       this.loadScope(sb, node, scopeLength, scopePosition);
+      // [position, scope]
       sb.emitPushInt(node, position);
+      // [val]
       sb.emitOp(node, 'PICKITEM');
-      sb.emitHelper(node, options, sb.helpers.pickCompletionVal);
     }
   }
 
@@ -225,43 +225,14 @@ export class ResolvedScope implements Scope {
     sb.emitPushInt(node, 0);
     // [scopes]
     sb.emitOp(node, 'PICKITEM');
-    // [0, scopes]
-    sb.emitPushInt(node, 0);
     // [scope, scopes]
-    sb.emitOp(node, 'NEWARRAY');
-    // [idx, scope, scopes]
-    sb.emitPushInt(node, 0);
-    sb.withProgramCounter((loopPC) => {
-      // [idx, idx, scope, scopes]
-      sb.emitOp(node, 'DUP');
-      // [count, idx, idx, scope, scopes]
-      sb.emitPushInt(node, this.variableCount);
-      // [idx < count, idx, scope, scopes]
-      sb.emitOp(node, 'LT');
-      // [idx, scope, scopes]
-      sb.emitJmp(node, 'JMPIFNOT', loopPC.getLast());
-      // [scope, idx, scope, scopes]
-      sb.emitOp(node, 'OVER');
-      // [errorString, scope, idx, scope, scopes]
-      sb.emitPushString(node, 'Referenced variable before it was defined');
-      // [error, scope, idx, scope, scopes]
-      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createString);
-      // [throw, scope, idx, scope, scopes]
-      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createThrowCompletion);
-      // [idx, scope, scopes]
-      sb.emitOp(node, 'APPEND');
-      // [idx, scope, scopes]
-      sb.emitOp(node, 'INC');
-      // [idx, scope, scopes]
-      sb.emitJmp(node, 'JMP', loopPC.getFirst());
-    });
-    // [scope, scopes]
-    sb.emitOp(node, 'DROP');
+    sb.emitOp(node, 'NEWMAP');
     // []
     sb.emitOp(node, 'APPEND');
 
-    const { breakPC, continuePC, catchPC } = options;
-    const nonLocal = breakPC !== undefined || continuePC !== undefined || catchPC !== undefined;
+    const { breakPC, continuePC, catchPC, finallyPC } = options;
+    const nonLocal =
+      breakPC !== undefined || continuePC !== undefined || catchPC !== undefined || finallyPC !== undefined;
     sb.withProgramCounter((pc) => {
       let innerOptions = options;
       if (breakPC !== undefined) {
@@ -276,6 +247,10 @@ export class ResolvedScope implements Scope {
         innerOptions = sb.catchPCOptions(innerOptions, pc.getLast());
       }
 
+      if (finallyPC !== undefined) {
+        innerOptions = sb.finallyPCOptions(innerOptions, pc.getLast());
+      }
+
       func(innerOptions);
       if (nonLocal) {
         sb.emitPushInt(node, constants.NORMAL_COMPLETION);
@@ -285,6 +260,7 @@ export class ResolvedScope implements Scope {
     if (this.parent === undefined) {
       // [[scopes, undefined]]
       sb.emitOp(node, 'FROMALTSTACK');
+      // []
       sb.emitOp(node, 'DROP');
     } else {
       // [[scopes, undefined]]
@@ -303,23 +279,21 @@ export class ResolvedScope implements Scope {
       sb.emitOp(node, 'REMOVE');
     }
 
-    this.emitNonLocal(sb, node, constants.BREAK_COMPLETION, breakPC);
-    this.emitNonLocal(sb, node, constants.CONTINUE_COMPLETION, continuePC);
-    this.emitNonLocal(sb, node, constants.CATCH_COMPLETION, catchPC);
-
     if (nonLocal) {
+      this.emitNonLocal(sb, node, constants.BREAK_COMPLETION, breakPC);
+      this.emitNonLocal(sb, node, constants.CONTINUE_COMPLETION, continuePC);
+      this.emitNonLocal(sb, node, constants.THROW_COMPLETION, catchPC);
+      this.emitNonLocal(sb, node, constants.FINALLY_COMPLETION, finallyPC);
       sb.emitOp(node, 'DROP');
     }
   }
 
   private emitNonLocal(sb: ScriptBuilder, node: ts.Node, completion: number, pc: ProgramCounter | undefined): void {
     if (pc !== undefined) {
-      sb.withProgramCounter(() => {
-        sb.emitOp(node, 'DUP');
-        sb.emitPushInt(node, completion);
-        sb.emitOp(node, 'NUMEQUAL');
-        sb.emitJmp(node, 'JMPIF', pc);
-      });
+      sb.emitOp(node, 'DUP');
+      sb.emitPushInt(node, completion);
+      sb.emitOp(node, 'NUMEQUAL');
+      sb.emitJmp(node, 'JMPIF', pc);
     }
   }
 

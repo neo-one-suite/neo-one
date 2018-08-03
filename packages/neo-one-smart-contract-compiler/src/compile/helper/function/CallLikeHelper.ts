@@ -150,11 +150,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       sb.visit(func, options);
     }
 
-    sb.emitHelper(expr, options, sb.helpers.invokeCall({ bindThis }));
-
-    if (!optionsIn.pushValue) {
-      sb.emitOp(expr, 'DROP');
-    }
+    sb.emitHelper(expr, sb.noCastOptions(optionsIn), sb.helpers.invokeCall({ bindThis }));
   }
 
   private handleSysCall(sb: ScriptBuilder, node: ts.CallExpression, options: VisitOptions): void {
@@ -192,6 +188,6 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
     // [ctor, thisValue, argsarr]
     sb.scope.get(sb, node, options, superClass);
     // []
-    sb.emitHelper(node, options, sb.helpers.invokeConstruct());
+    sb.emitHelper(node, sb.noPushValueOptions(options), sb.helpers.invokeConstruct());
   }
 }

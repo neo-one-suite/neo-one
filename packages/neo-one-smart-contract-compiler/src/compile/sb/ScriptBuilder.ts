@@ -58,6 +58,8 @@ export interface ScriptBuilder {
   readonly breakPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
   readonly continuePCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
   readonly catchPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
+  readonly noCatchPCOptions: (options: VisitOptions) => VisitOptions;
+  readonly finallyPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
   readonly castOptions: (options: VisitOptions, type?: ts.Type) => VisitOptions;
   readonly noCastOptions: (options: VisitOptions) => VisitOptions;
   readonly superClassOptions: (options: VisitOptions, superClass: Name) => VisitOptions;

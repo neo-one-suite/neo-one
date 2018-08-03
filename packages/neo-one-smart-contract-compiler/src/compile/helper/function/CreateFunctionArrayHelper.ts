@@ -5,13 +5,13 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface CreateFunctionArrayHelperOptions {
-  readonly body: () => void;
+  readonly body: (options: VisitOptions) => void;
 }
 
 // Input: []
 // Output: [farr]
 export class CreateFunctionArrayHelper extends Helper {
-  private readonly body: () => void;
+  private readonly body: (options: VisitOptions) => void;
 
   public constructor({ body }: CreateFunctionArrayHelperOptions) {
     super();

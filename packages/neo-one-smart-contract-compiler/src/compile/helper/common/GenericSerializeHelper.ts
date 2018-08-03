@@ -37,8 +37,7 @@ export class GenericSerializeHelper extends Helper {
                 },
                 whenTrue: () => {
                   forType.serialize();
-                  sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createNormalCompletion);
-                  sb.emitOp(node, 'RET');
+                  sb.emitHelper(node, options, sb.helpers.return);
                 },
               })),
               () => {

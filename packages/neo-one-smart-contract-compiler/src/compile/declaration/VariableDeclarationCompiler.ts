@@ -17,7 +17,9 @@ export class VariableDeclarationCompiler extends NodeCompiler<ts.VariableDeclara
     }
 
     if (expr === undefined) {
-      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+      if (!options.setValue) {
+        sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+      }
     } else {
       sb.visit(expr, sb.pushValueOptions(options));
     }

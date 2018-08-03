@@ -5,13 +5,13 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface FunctionHelperOptions {
-  readonly body: () => void;
+  readonly body: (options: VisitOptions) => void;
 }
 
 // Input: []
 // Output: [jumpTarget]
 export class FunctionHelper extends Helper {
-  private readonly body: () => void;
+  private readonly body: (options: VisitOptions) => void;
 
   public constructor({ body }: FunctionHelperOptions) {
     super();
@@ -21,10 +21,12 @@ export class FunctionHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (options.pushValue) {
       const jump = sb.jumpTable.add(sb, node, () => {
-        this.body();
-        sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
-        sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createNormalCompletion);
-        sb.emitOp(node, 'RET');
+        const innerOptions = { superClass: options.superClass };
+        this.body(innerOptions);
+        // [val]
+        sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.createUndefined);
+        // []
+        sb.emitHelper(node, innerOptions, sb.helpers.return);
       });
       sb.emitPushInt(node, jump);
     }

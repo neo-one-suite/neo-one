@@ -408,6 +408,14 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     return { ...options, catchPC: pc };
   }
 
+  public noCatchPCOptions(options: VisitOptions): VisitOptions {
+    return { ...options, catchPC: undefined };
+  }
+
+  public finallyPCOptions(options: VisitOptions, pc: ProgramCounter): VisitOptions {
+    return { ...options, finallyPC: pc };
+  }
+
   public castOptions(options: VisitOptions, cast?: ts.Type | undefined): VisitOptions {
     return { ...options, cast };
   }

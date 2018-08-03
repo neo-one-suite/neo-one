@@ -14,6 +14,6 @@ export class NewExpressionCompiler extends NodeCompiler<ts.NewExpression> {
     // [objectVal, argsarr]
     sb.visit(tsUtils.expression.getExpression(expr), options);
     // [thisVal]
-    sb.emitHelper(expr, options, sb.helpers.new());
+    sb.emitHelper(expr, optionsIn, sb.helpers.new());
   }
 }

@@ -7,13 +7,8 @@ describe('FunctionDeclarationCompiler', () => {
         return x + 1;
       }
 
-      if (addOne(1) !== 2) {
-        throw 'Failure';
-      }
-
-      if (addOne(2) !== 3) {
-        throw 'Failure';
-      }
+      assertEqual(addOne(1), 2);
+      assertEqual(addOne(2), 3);
     `);
   });
 

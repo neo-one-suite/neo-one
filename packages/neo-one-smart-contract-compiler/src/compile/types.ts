@@ -10,6 +10,7 @@ export interface VisitOptions {
   readonly catchPC?: ProgramCounter | undefined;
   readonly breakPC?: ProgramCounter | undefined;
   readonly continuePC?: ProgramCounter | undefined;
+  readonly finallyPC?: ProgramCounter | undefined;
   readonly switchExpressionType?: ts.Type | undefined;
   readonly cast?: ts.Type | undefined;
   readonly superClass?: Name | undefined;

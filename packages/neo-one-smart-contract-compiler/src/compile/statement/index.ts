@@ -1,7 +1,5 @@
 import { BlockCompiler } from './BlockCompiler';
 import { BreakStatementCompiler } from './BreakStatementCompiler';
-import { CaseBlockCompiler } from './CaseBlockCompiler';
-import { CaseClauseCompiler } from './CaseClauseCompiler';
 import { CatchClauseCompiler } from './CatchClauseCompiler';
 import { ContinueStatementCompiler } from './ContinueStatementCompiler';
 import { DebuggerStatementCompiler } from './DebuggerStatementCompiler';
@@ -27,8 +25,6 @@ import { WithStatementCompiler } from './WithStatementCompiler';
 export const statements = [
   BlockCompiler,
   BreakStatementCompiler,
-  CaseBlockCompiler,
-  CaseClauseCompiler,
   CatchClauseCompiler,
   ContinueStatementCompiler,
   DebuggerStatementCompiler,

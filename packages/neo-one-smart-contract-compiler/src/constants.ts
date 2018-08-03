@@ -2,9 +2,10 @@ import ts from 'typescript';
 
 export const MAIN_FUNCTION = 'main';
 export const NORMAL_COMPLETION = 0;
-export const BREAK_COMPLETION = 1;
-export const CONTINUE_COMPLETION = 2;
-export const CATCH_COMPLETION = 3;
+export const THROW_COMPLETION = 1;
+export const BREAK_COMPLETION = 2;
+export const CONTINUE_COMPLETION = 3;
+export const FINALLY_COMPLETION = 4;
 
 export const ASSIGNMENT_OPERATORS = new Set([
   ts.SyntaxKind.EqualsToken,

@@ -1,7 +1,20 @@
 import { helpers } from '../../../__data__';
 
 describe('TryStatementCompiler', () => {
-  test.skip('try catch error', async () => {
+  test('try empty catch', async () => {
+    await helpers.executeString(`
+      let caught = false;
+      try {
+        throw 'Failure';
+      } catch {
+        caught = true;
+      }
+
+      assertEqual(caught, true);
+    `);
+  });
+
+  test('try catch error', async () => {
     await helpers.executeString(`
       let error: string | undefined;
       try {
@@ -10,13 +23,11 @@ describe('TryStatementCompiler', () => {
         error = err;
       }
 
-      if (error === undefined) {
-        throw 'Failure';
-      }
+      assertEqual(error, 'Failure');
     `);
   });
 
-  test.skip('try catch no error', async () => {
+  test('try catch no error', async () => {
     await helpers.executeString(`
       let error: string | undefined;
       try {
@@ -25,14 +36,13 @@ describe('TryStatementCompiler', () => {
         error = err;
       }
 
-      if (error !== undefined) {
-        throw 'Failure';
-      }
+      assertEqual(error, undefined);
     `);
   });
 
-  test.skip('try finally error', async () => {
+  test('try finally error', async () => {
     await helpers.executeString(`
+      let err: string | undefined;
       let gotFinally = false;
       try {
         try {
@@ -41,16 +51,15 @@ describe('TryStatementCompiler', () => {
           gotFinally = true;
         }
       } catch (error) {
-        // do nothing
+        err = error;
       }
 
-      if (!gotFinally) {
-        throw 'Failure';
-      }
+      assertEqual(err, 'Hello World');
+      assertEqual(gotFinally, true);
     `);
   });
 
-  test.skip('try finally no error', async () => {
+  test('try finally no error', async () => {
     await helpers.executeString(`
       let gotFinally = false;
       try {
@@ -59,13 +68,11 @@ describe('TryStatementCompiler', () => {
         gotFinally = true;
       }
 
-      if (!gotFinally) {
-        throw 'Failure';
-      }
+      assertEqual(gotFinally, true);
     `);
   });
 
-  test.skip('try catch finally error', async () => {
+  test('try catch finally error', async () => {
     await helpers.executeString(`
       let error: string | undefined;
       let gotFinally = false;
@@ -77,17 +84,12 @@ describe('TryStatementCompiler', () => {
         gotFinally = true;
       }
 
-      if (error === undefined) {
-        throw 'Failure';
-      }
-
-      if (!gotFinally) {
-        throw 'Failure';
-      }
+      assertEqual(error, 'Hello World');
+      assertEqual(gotFinally, true);
     `);
   });
 
-  test.skip('try catch finally no error', async () => {
+  test('try catch finally no error', async () => {
     await helpers.executeString(`
       let error: string | undefined;
       let gotFinally = false;
@@ -99,13 +101,39 @@ describe('TryStatementCompiler', () => {
         gotFinally = true;
       }
 
-      if (error !== undefined) {
-        throw 'Failure';
+      assertEqual(error, undefined);
+      assertEqual(gotFinally, true);
+    `);
+  });
+
+  test('try finally with break', async () => {
+    await helpers.executeString(`
+      let result: string | undefined;
+      while (true) {
+        try {
+          break;
+        } finally {
+          result = 'yay';
+        }
       }
 
-      if (!gotFinally) {
-        throw 'Failure';
+      assertEqual(result, 'yay');
+    `);
+  });
+
+  test('try finally with continue', async () => {
+    await helpers.executeString(`
+      let result: string | undefined;
+      while (true) {
+        try {
+          continue;
+        } finally {
+          result = 'yay';
+          break;
+        }
       }
+
+      assertEqual(result, 'yay');
     `);
   });
 });

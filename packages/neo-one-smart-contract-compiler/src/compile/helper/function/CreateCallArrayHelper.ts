@@ -15,25 +15,21 @@ export class CreateCallArrayHelper extends Helper<BodiedNode | BodyableNode> {
       node,
       outerOptions,
       sb.helpers.createFunctionArray({
-        body: () => {
-          sb.withScope(node, outerOptions, (options) => {
+        body: (innerOptions) => {
+          sb.withScope(node, innerOptions, (options) => {
             sb.emitHelper(node, options, sb.helpers.parameters);
             const body = tsUtils.body.getBodyOrThrow(node);
             if (tsUtils.guards.isExpression(body)) {
               // [val]
-              sb.visit(body, options);
-              // [completion]
-              sb.emitHelper(node, options, sb.helpers.createNormalCompletion);
-              // [completion]
-              sb.emitOp(node, 'RET');
+              sb.visit(body, sb.pushValueOptions(options));
+              // []
+              sb.emitHelper(node, options, sb.helpers.return);
             } else {
               sb.visit(body, options);
               // [undefinedVal]
-              sb.emitHelper(node, options, sb.helpers.createUndefined);
-              // [completion]
-              sb.emitHelper(node, options, sb.helpers.createNormalCompletion);
-              // [completion]
-              sb.emitOp(node, 'RET');
+              sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+              // []
+              sb.emitHelper(node, options, sb.helpers.return);
             }
           });
         },

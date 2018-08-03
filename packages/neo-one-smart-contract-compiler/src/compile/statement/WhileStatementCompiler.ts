@@ -18,8 +18,8 @@ export class WhileStatementCompiler extends NodeCompiler<ts.WhileStatement> {
           sb.visit(expr, options);
           sb.emitHelper(node, options, sb.helpers.toBoolean({ type: sb.getType(expr) }));
         },
-        each: () => {
-          sb.visit(tsUtils.statement.getStatement(node), sb.noPushValueOptions(options));
+        each: (innerOptions) => {
+          sb.visit(tsUtils.statement.getStatement(node), innerOptions);
         },
       }),
     );

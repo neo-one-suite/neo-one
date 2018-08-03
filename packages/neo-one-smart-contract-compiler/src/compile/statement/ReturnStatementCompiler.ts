@@ -15,7 +15,6 @@ export class ReturnStatementCompiler extends NodeCompiler<ts.ReturnStatement> {
       sb.visit(expr, sb.pushValueOptions(options));
     }
 
-    sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createNormalCompletion);
-    sb.emitOp(node, 'RET');
+    sb.emitHelper(node, options, sb.helpers.return);
   }
 }

@@ -90,8 +90,7 @@ export abstract class AddConstructorObjectHelper extends Helper {
       sb.helpers.createFunctionArray({
         body: () => {
           sb.withScope(node, options, body);
-          sb.emitHelper(node, options, sb.helpers.createNormalCompletion);
-          sb.emitOp(node, 'RET');
+          sb.emitHelper(node, options, sb.helpers.return);
         },
       }),
     );

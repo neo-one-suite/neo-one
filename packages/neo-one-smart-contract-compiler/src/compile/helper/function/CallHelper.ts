@@ -80,12 +80,6 @@ export class CallHelper extends Helper {
     sb.emitOp(node, 'FROMALTSTACK');
     sb.emitOp(node, 'DROP');
 
-    if (optionsIn.pushValue) {
-      sb.emitOp(node, 'DUP');
-    }
-    sb.emitHelper(node, options, sb.helpers.handleCompletion);
-    if (optionsIn.pushValue) {
-      sb.emitHelper(node, options, sb.helpers.getCompletionVal);
-    }
+    sb.emitHelper(node, optionsIn, sb.helpers.handleCompletion);
   }
 }

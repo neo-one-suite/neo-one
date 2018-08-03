@@ -32,7 +32,9 @@ export class AssertEqual extends BuiltInCallable {
           );
         },
         whenTrue: () => {
+          // [receivedVal]
           sb.emitOp(node, 'DROP');
+          // []
           sb.emitOp(node, 'DROP');
         },
         whenFalse: () => {

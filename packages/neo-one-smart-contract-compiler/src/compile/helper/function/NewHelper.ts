@@ -46,7 +46,7 @@ export class NewHelper extends Helper {
     // [objectVal, thisVal, ?argsarr, thisVal]
     sb.emitHelper(node, options, sb.helpers.setDataPropertyObjectProperty);
     // [thisVal]
-    sb.emitHelper(node, options, sb.helpers.invokeConstruct({ noArgs: this.noArgs }));
+    sb.emitHelper(node, sb.noPushValueOptions(options), sb.helpers.invokeConstruct({ noArgs: this.noArgs }));
 
     if (!optionsIn.pushValue) {
       // []

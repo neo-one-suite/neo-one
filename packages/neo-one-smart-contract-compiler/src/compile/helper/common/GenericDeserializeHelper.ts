@@ -37,8 +37,7 @@ export class GenericDeserializeHelper extends Helper {
                 },
                 whenTrue: () => {
                   forType.deserialize();
-                  sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createNormalCompletion);
-                  sb.emitOp(node, 'RET');
+                  sb.emitHelper(node, options, sb.helpers.return);
                 },
               })),
               () => {

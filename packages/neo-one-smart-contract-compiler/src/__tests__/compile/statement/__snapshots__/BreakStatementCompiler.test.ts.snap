@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BreakStatementCompiler break label 1`] = `
+"snippetCode.ts (3,7): Unsupported syntax
+
+      1 | 
+      2 |       let result = 0;
+    > 3 |       foo:
+        |       ^
+      4 |       for (let i = 0; i < 10; i++) {
+      5 |         result += 10;
+      6 |         for (let j = 0; j < 10; j++) {
+"
+`;

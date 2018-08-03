@@ -5,14 +5,14 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface CreateConstructArrayHelperOptions {
-  readonly body: () => void;
+  readonly body: (options: VisitOptions) => void;
   readonly withoutScope?: boolean;
 }
 
 // Input: []
 // Output: [farr]
 export class CreateConstructArrayHelper extends Helper {
-  private readonly body: () => void;
+  private readonly body: (options: VisitOptions) => void;
   private readonly withoutScope: boolean;
 
   public constructor({ body, withoutScope }: CreateConstructArrayHelperOptions) {
@@ -28,24 +28,21 @@ export class CreateConstructArrayHelper extends Helper {
 
     const emit = (options: VisitOptions) => {
       // []
-      this.body();
+      this.body(options);
       // [undefinedVal]
-      sb.emitHelper(node, options, sb.helpers.createUndefined);
-      // [completion]
-      sb.emitHelper(node, options, sb.helpers.createNormalCompletion);
-      // [completion]
-      sb.emitOp(node, 'RET');
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+      sb.emitHelper(node, options, sb.helpers.return);
     };
 
     sb.emitHelper(
       node,
       outerOptions,
       sb.helpers.createFunctionArray({
-        body: () => {
+        body: (innerOptions) => {
           if (this.withoutScope) {
-            emit(outerOptions);
+            emit(innerOptions);
           } else {
-            sb.withScope(node, outerOptions, (options) => {
+            sb.withScope(node, innerOptions, (options) => {
               emit(options);
             });
           }

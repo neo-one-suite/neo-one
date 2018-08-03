@@ -36,6 +36,6 @@ export class InvokeConstructHelper extends Helper {
       sb.emitOp(node, 'SWAP');
     }
     // []
-    sb.emitHelper(node, sb.noPushValueOptions(optionsIn), sb.helpers.call);
+    sb.emitHelper(node, optionsIn, sb.helpers.call);
   }
 }

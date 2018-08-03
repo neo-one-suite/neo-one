@@ -44,9 +44,7 @@ export class ThrowHelper extends Helper {
     sb.emitOp(node, 'PACK');
     // [errorVal]
     sb.emitSysCall(node, 'Neo.Runtime.Notify');
-    // [throwCompletion]
-    sb.emitHelper(node, options, sb.helpers.createThrowCompletion);
     // []
-    sb.emitHelper(node, optionsIn, sb.helpers.handleCompletion);
+    sb.emitHelper(node, optionsIn, sb.helpers.throwCompletion);
   }
 }

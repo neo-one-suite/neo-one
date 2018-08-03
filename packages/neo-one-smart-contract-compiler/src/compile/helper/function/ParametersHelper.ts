@@ -122,13 +122,13 @@ export class ParametersHelper extends Helper<ParameteredNode> {
       sb.scope.add(tsUtils.node.getNameOrThrow(restElement));
 
       // [number, argsarr]
-      sb.emitPushInt(node, parameters.length);
+      sb.emitPushInt(restElement, parameters.length);
       // [arr]
-      sb.emitHelper(node, options, sb.helpers.arrSlice({ hasEnd: false }));
+      sb.emitHelper(restElement, options, sb.helpers.arrSlice({ hasEnd: false }));
       // [arrayVal]
-      sb.emitHelper(node, options, sb.helpers.wrapArray);
+      sb.emitHelper(restElement, options, sb.helpers.wrapArray);
       // []
-      sb.scope.set(sb, node, options, tsUtils.node.getNameOrThrow(restElement));
+      sb.scope.set(sb, restElement, options, tsUtils.node.getNameOrThrow(restElement));
     }
   }
 }

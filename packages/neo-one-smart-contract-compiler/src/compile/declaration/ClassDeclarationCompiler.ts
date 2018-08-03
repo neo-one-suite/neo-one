@@ -55,7 +55,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       return;
     }
 
-    const addProperty = (property: ts.PropertyDeclaration) => {
+    const addProperty = (property: ts.PropertyDeclaration, innerOptions: VisitOptions) => {
       const initializer = tsUtils.initializer.getInitializer(property);
       if (initializer !== undefined) {
         // [thisObjectVal, thisObjectVal]
@@ -63,9 +63,9 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
         // [prop, thisObjectVal, thisObjectVal]
         sb.emitPushString(initializer, tsUtils.node.getName(property));
         // [init, prop, thisObjectVal, thisObjectVal]
-        sb.visit(initializer, options);
+        sb.visit(initializer, sb.pushValueOptions(innerOptions));
         // [thisObjectVal]
-        sb.emitHelper(initializer, options, sb.helpers.setDataPropertyObjectProperty);
+        sb.emitHelper(initializer, innerOptions, sb.helpers.setDataPropertyObjectProperty);
       }
     };
 
@@ -75,22 +75,23 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       decl,
       options,
       sb.helpers.createConstructArray({
-        body: () => {
+        body: (innerOptionsIn) => {
+          const innerOptions = sb.pushValueOptions(innerOptionsIn);
           // [argsarr]
           const ctorImpl = tsUtils.class_.getConcreteConstructor(decl);
           const ctorNode = ctorImpl === undefined ? decl : ctorImpl;
           // Default value assignments
           if (ctorImpl !== undefined) {
             // []
-            sb.emitHelper(ctorImpl, options, sb.helpers.parameters);
+            sb.emitHelper(ctorImpl, innerOptions, sb.helpers.parameters);
             // Super call statement
           } else if (superClass !== undefined && extendsExpr !== undefined) {
             // [thisObjectVal, argsarr]
-            sb.scope.getThis(sb, extendsExpr, options);
+            sb.scope.getThis(sb, extendsExpr, innerOptions);
             // [ctor, thisObjectVal, argsarr]
-            sb.scope.get(sb, extendsExpr, options, superClass);
+            sb.scope.get(sb, extendsExpr, innerOptions, superClass);
             // []
-            sb.emitHelper(extendsExpr, options, sb.helpers.invokeConstruct());
+            sb.emitHelper(extendsExpr, sb.noPushValueOptions(innerOptions), sb.helpers.invokeConstruct());
             // Drop the argsarray, we must not use it
           } else {
             // []
@@ -99,18 +100,18 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
           // Parameter property assignments
           // Member variable assignments
           // [thisObjectVal]
-          sb.scope.getThis(sb, ctorNode, options);
+          sb.scope.getThis(sb, ctorNode, innerOptions);
           tsUtils.class_
             .getConcreteInstanceProperties(decl)
             .filter(ts.isPropertyDeclaration)
             .forEach((property) => {
-              addProperty(property);
+              addProperty(property, innerOptions);
             });
           // []
           sb.emitOp(ctorNode, 'DROP');
           // Constructor statements
           if (ctorImpl !== undefined) {
-            sb.visit(tsUtils.body.getBodyOrThrow(ctorImpl), options);
+            sb.visit(tsUtils.body.getBodyOrThrow(ctorImpl), sb.noPushValueOptions(innerOptions));
           }
         },
       }),
@@ -275,7 +276,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       .getConcreteStaticProperties(decl)
       .filter(ts.isPropertyDeclaration)
       .forEach((property) => {
-        addProperty(property);
+        addProperty(property, options);
       });
     tsUtils.class_.getConcreteStaticMethods(decl).forEach((method) => {
       addMethod(method);

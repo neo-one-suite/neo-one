@@ -45,15 +45,14 @@ import {
   TypedHelperOptions,
 } from './common';
 import {
-  CreateCompletionHelper,
-  CreateNormalCompletionHelper,
-  CreateThrowCompletionHelper,
-  GetCompletionErrorHelper,
-  GetCompletionValHelper,
+  BreakHelper,
+  ContinueHelper,
   HandleCompletionHelper,
-  PickCompletionValHelper,
+  ReturnHelper,
+  ThrowCompletionHelper,
+  ThrowHelper,
 } from './completionRecord';
-import { ThrowHelper, ThrowTypeErrorHelper } from './error';
+import { ThrowTypeErrorHelper } from './error';
 import {
   ArgumentsHelper,
   BindFunctionObjectThisHelper,
@@ -250,14 +249,12 @@ export interface Helpers {
   readonly forLoop: (options: ForLoopHelperOptions) => ForLoopHelper;
   readonly if: (options: IfHelperOptions) => IfHelper;
   readonly case: (cases: ReadonlyArray<Case>, defaultCase: () => void) => CaseHelper;
-  readonly createCompletion: CreateCompletionHelper;
-  readonly createNormalCompletion: CreateNormalCompletionHelper;
-  readonly createThrowCompletion: CreateThrowCompletionHelper;
-  readonly getCompletionError: GetCompletionErrorHelper;
-  readonly getCompletionVal: GetCompletionValHelper;
   readonly handleCompletion: HandleCompletionHelper;
-  readonly pickCompletionVal: PickCompletionValHelper;
+  readonly return: ReturnHelper;
   readonly throw: ThrowHelper;
+  readonly break: BreakHelper;
+  readonly continue: ContinueHelper;
+  readonly throwCompletion: ThrowCompletionHelper;
   readonly throwTypeError: ThrowTypeErrorHelper;
   readonly createBoolean: CreateBooleanHelper;
   readonly createNull: CreateNullHelper;
@@ -434,14 +431,12 @@ export const createHelpers = (): Helpers => {
     forLoop: (options) => new ForLoopHelper(options),
     if: (options) => new IfHelper(options),
     case: (cases, defaultCase) => new CaseHelper(cases, defaultCase),
-    createCompletion: new CreateCompletionHelper(),
-    createNormalCompletion: new CreateNormalCompletionHelper(),
-    createThrowCompletion: new CreateThrowCompletionHelper(),
-    getCompletionError: new GetCompletionErrorHelper(),
-    getCompletionVal: new GetCompletionValHelper(),
     handleCompletion: new HandleCompletionHelper(),
-    pickCompletionVal: new PickCompletionValHelper(),
+    return: new ReturnHelper(),
     throw: new ThrowHelper(),
+    break: new BreakHelper(),
+    continue: new ContinueHelper(),
+    throwCompletion: new ThrowCompletionHelper(),
     throwTypeError: new ThrowTypeErrorHelper(),
     createBoolean: new CreateBooleanHelper(),
     createNull: new CreateNullHelper(),
