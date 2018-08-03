@@ -13,8 +13,8 @@ describe('create network', () => {
       expect(description.nodes[0].name).toEqual('test');
       expect(description.nodes[0].live).toBeTruthy();
       expect(description.nodes[0].ready).toBeFalsy();
-      expect(description.height).toBeGreaterThan(50);
-      expect(description.peers).toBeGreaterThan(50);
+      expect(description.height).toBeGreaterThan(5);
+      expect(description.peers).toBeGreaterThan(5);
     });
   });
 });
