@@ -10,6 +10,7 @@ import {
   CreateArrayHelper,
   GetArrayIndexHelper,
   GetArrayValueHelper,
+  IsArrayHelper,
   SetArrayIndexHelper,
   SetArrayValueHelper,
   UnwrapArrayHelper,
@@ -327,6 +328,7 @@ export interface Helpers {
   readonly setArrayIndex: SetArrayIndexHelper;
   readonly wrapArray: WrapArrayHelper;
   readonly unwrapArray: UnwrapArrayHelper;
+  readonly isArray: IsArrayHelper;
 
   readonly getMapValue: GetMapValueHelper;
   readonly createMap: CreateMapHelper;
@@ -505,6 +507,7 @@ export const createHelpers = (): Helpers => {
     setArrayIndex: new SetArrayIndexHelper(),
     wrapArray: new WrapArrayHelper(),
     unwrapArray: new UnwrapArrayHelper(),
+    isArray: new IsArrayHelper(),
 
     getMapValue: new GetMapValueHelper(),
     createMap: new CreateMapHelper(),

@@ -10,4 +10,4 @@ exports[`Token properties + issue + balanceOf + totalSupply + transfer: issue co
 
 exports[`Token properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"0"`;
 
-exports[`Token properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"9.894"`;
+exports[`Token properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"9.903"`;

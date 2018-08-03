@@ -1,4 +1,4 @@
-import { InvocationResultJSON } from '@neo-one/client-core';
+import { CallReceiptJSON } from '@neo-one/client-core';
 import ts from 'typescript';
 import * as appRootDir from 'app-root-dir';
 import { tsUtils } from '@neo-one/ts-utils';
@@ -8,6 +8,7 @@ import { checkResult } from './extractors';
 import { createContextForSnippet, createContextForPath } from '../../createContext';
 import { Context } from '../../Context';
 import { pathResolve } from '../../utils';
+import { RawSourceMap } from 'source-map';
 
 const execute = async (
   context: Context,
@@ -17,13 +18,14 @@ const execute = async (
   const monitor = getMonitor();
   const { receipt, sourceMap } = await executeScript(monitor, context, sourceFile, options);
   await checkResult(receipt, sourceMap);
-  return receipt.result;
+
+  return { receipt, sourceMap };
 };
 
 export const executeString = async (
   code: string,
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
-): Promise<InvocationResultJSON> => {
+): Promise<{ receipt: CallReceiptJSON; sourceMap: RawSourceMap }> => {
   const { context, sourceFile } = await createContextForSnippet(code, { withTestHarness: true });
   return execute(context, sourceFile, options);
 };
@@ -31,7 +33,7 @@ export const executeString = async (
 export const executeSnippet = async (
   snippetPath: string,
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
-): Promise<InvocationResultJSON> => {
+): Promise<{ receipt: CallReceiptJSON; sourceMap: RawSourceMap }> => {
   const filePath = pathResolve(
     appRootDir.get(),
     'packages',

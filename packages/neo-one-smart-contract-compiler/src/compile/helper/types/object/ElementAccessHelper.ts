@@ -33,10 +33,8 @@ export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
       }
 
       if (propType !== undefined && tsUtils.type_.isOnlyStringish(propType)) {
-        // [propString, objectVal]
-        sb.emitHelper(prop, options, sb.helpers.getString);
         // []
-        this.setProperty(sb, prop, options, valueIndex);
+        this.setStringProperty(sb, prop, options, propType, valueType, valueIndex);
       } else if (propType !== undefined && tsUtils.type_.isOnlyNumberish(propType)) {
         // []
         this.setNumberProperty(sb, prop, options, propType, valueType, valueIndex);
@@ -60,10 +58,8 @@ export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
                   sb.emitHelper(prop, options, sb.helpers.isString);
                 },
                 whenTrue: () => {
-                  // [propString, objectVal]
-                  sb.emitHelper(prop, options, sb.helpers.getString);
                   // []
-                  this.setProperty(sb, prop, options, valueIndex);
+                  this.setStringProperty(sb, prop, options, propType, valueType, valueIndex);
                 },
               },
               {
@@ -92,10 +88,8 @@ export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
 
     if (optionsIn.pushValue || !optionsIn.setValue) {
       if (propType !== undefined && tsUtils.type_.isOnlyStringish(propType)) {
-        // [propString, objectVal]
-        sb.emitHelper(prop, options, sb.helpers.getString);
         // [val]
-        sb.emitHelper(expr, options, sb.helpers.getPropertyObjectProperty);
+        this.getStringProperty(sb, prop, options, propType, valueType);
       } else if (propType !== undefined && tsUtils.type_.isOnlyNumberish(propType)) {
         // [val]
         this.getNumberProperty(sb, prop, options, propType, valueType);
@@ -119,10 +113,8 @@ export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
                   sb.emitHelper(prop, options, sb.helpers.isString);
                 },
                 whenTrue: () => {
-                  // [propString, objectVal]
-                  sb.emitHelper(prop, options, sb.helpers.getString);
                   // [val]
-                  sb.emitHelper(expr, options, sb.helpers.getPropertyObjectProperty);
+                  this.getStringProperty(sb, prop, options, propType, valueType);
                 },
               },
               {
@@ -190,11 +182,38 @@ export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
     }
   }
 
-  private setProperty(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, index: number): void {
-    // [val, propString, objectVal]
-    this.pickValue(sb, node, options, index);
-    // []
-    sb.emitHelper(node, options, sb.helpers.setPropertyObjectProperty);
+  private getStringProperty(
+    sb: ScriptBuilder,
+    node: ts.Node,
+    options: VisitOptions,
+    propType: ts.Type | undefined,
+    valueType: ts.Type | undefined,
+  ): void {
+    if (valueType !== undefined && tsUtils.type_.isOnlyArrayish(valueType)) {
+      sb.emitHelper(node, options, sb.helpers.toNumber({ type: propType }));
+      sb.emitHelper(node, options, sb.helpers.getArrayIndex);
+    } else {
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.if({
+          condition: () => {
+            // [isArray, propVal, objectVal]
+            this.isArrayInstance(sb, node, options);
+          },
+          whenTrue: () => {
+            sb.emitHelper(node, options, sb.helpers.toNumber({ type: propType }));
+            sb.emitHelper(node, options, sb.helpers.getArrayIndex);
+          },
+          whenFalse: () => {
+            // [propString, objectVal]
+            sb.emitHelper(node, options, sb.helpers.getString);
+            // [val]
+            sb.emitHelper(node, options, sb.helpers.getPropertyObjectProperty);
+          },
+        }),
+      );
+    }
   }
 
   private setNumberProperty(
@@ -230,6 +249,48 @@ export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
         }),
       );
     }
+  }
+
+  private setStringProperty(
+    sb: ScriptBuilder,
+    node: ts.Node,
+    options: VisitOptions,
+    propType: ts.Type | undefined,
+    valueType: ts.Type | undefined,
+    index: number,
+  ): void {
+    if (valueType !== undefined && tsUtils.type_.isOnlyArrayish(valueType)) {
+      sb.emitHelper(node, options, sb.helpers.toNumber({ type: propType }));
+      this.setArrayIndex(sb, node, options, index);
+    } else {
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.if({
+          condition: () => {
+            // [isArray, propVal, objectVal]
+            this.isArrayInstance(sb, node, options);
+          },
+          whenTrue: () => {
+            sb.emitHelper(node, options, sb.helpers.toNumber({ type: propType }));
+            this.setArrayIndex(sb, node, options, index);
+          },
+          whenFalse: () => {
+            // [propString, objectVal]
+            sb.emitHelper(node, options, sb.helpers.getString);
+            // []
+            this.setProperty(sb, node, options, index);
+          },
+        }),
+      );
+    }
+  }
+
+  private setProperty(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, index: number): void {
+    // [val, propString, objectVal]
+    this.pickValue(sb, node, options, index);
+    // []
+    sb.emitHelper(node, options, sb.helpers.setPropertyObjectProperty);
   }
 
   private setArrayIndex(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, index: number): void {

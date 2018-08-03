@@ -4,6 +4,7 @@ import ts from 'typescript';
 import { pathResolve } from '../../utils';
 import { ArrayFilter, ArrayMap, ArrayType, ArrayValue } from './array';
 import { AssertEqual } from './assertEqual';
+import { ConsoleLog } from './console';
 import { ObjectKeys, ObjectType, ObjectValue } from './object';
 import { BuiltIn } from './types';
 
@@ -41,6 +42,9 @@ export const createBuiltIns = (program: ts.Program, typeChecker: ts.TypeChecker)
   const objectVar = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Object'));
   builtIns.set(objectVar, new ObjectValue());
   builtIns.set(tsUtils.symbol.getMemberOrThrow(objectVar, 'keys'), new ObjectKeys());
+
+  const consoleVar = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'console'));
+  builtIns.set(tsUtils.symbol.getMemberOrThrow(consoleVar, 'log'), new ConsoleLog());
 
   const testHarnessFile = tsUtils.file.getSourceFile(
     program,

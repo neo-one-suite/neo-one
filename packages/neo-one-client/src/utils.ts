@@ -127,7 +127,8 @@ export interface ConsoleLog {
   readonly message: string;
 }
 
-const extractMessageFromStackItem = (stackItem: StackItem): string => {
+// tslint:disable-next-line no-any
+const extractValueFromStackItem = (stackItem: StackItem): any => {
   const type = stackItem
     .asArray()[0]
     .asBigInteger()
@@ -135,25 +136,35 @@ const extractMessageFromStackItem = (stackItem: StackItem): string => {
 
   switch (type) {
     case 0:
-      return 'undefined';
+      return undefined;
     case 1:
-      return 'null';
+      // tslint:disable-next-line no-null-keyword
+      return null;
     case 2:
-      return JSON.stringify(stackItem.asArray()[1].asBoolean());
+      return stackItem.asArray()[1].asBoolean();
     case 3:
       return stackItem.asArray()[1].asString();
     case 4:
       return `Symbol(${stackItem.asArray()[1].asString()})`;
     case 5:
-      return JSON.stringify(
-        stackItem
-          .asArray()[1]
-          .asBigInteger()
-          .toNumber(),
-      );
+      return stackItem
+        .asArray()[1]
+        .asBigInteger()
+        .toNumber();
+    case 7:
+      return stackItem
+        .asArray()[1]
+        .asArray()
+        .map(extractValueFromStackItem);
     default:
       return `<unknown type ${type}>`;
   }
+};
+
+const extractMessageFromStackItem = (stackItem: StackItem): string => {
+  const value = extractValueFromStackItem(stackItem);
+
+  return typeof value === 'string' ? value : JSON.stringify(value);
 };
 
 const extractMessage = (value: Buffer): string => {
@@ -201,11 +212,19 @@ export const extractConsoleLogs = (actions: ReadonlyArray<ActionRaw>): ReadonlyA
   return mutableLogs;
 };
 
+interface LogOptions {
+  readonly bare?: boolean;
+}
+
 export const createConsoleLogMessages = async (
   actions: ReadonlyArray<ActionRaw>,
   sourceMap: RawSourceMap,
+  { bare = false }: LogOptions = { bare: false },
 ): Promise<ReadonlyArray<string>> => {
   const logs = extractConsoleLogs(actions);
+  if (bare) {
+    return logs.map(({ message }) => message);
+  }
   const traces = await processTrace({ trace: logs, sourceMap });
   const zipped = utils.zip(logs, traces);
 

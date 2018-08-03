@@ -132,11 +132,17 @@ export function getBlock(node: ts.CatchClause): ts.Block {
   return node.block;
 }
 
-export function getStatement(node: ts.DoStatement | ts.ForStatement | ts.WhileStatement): ts.Statement {
+export function getStatement(
+  node: ts.DoStatement | ts.ForStatement | ts.WhileStatement | ts.ForInOrOfStatement,
+): ts.Statement {
   return node.statement;
 }
 
-export function getInitializer(node: ts.ForStatement): ts.VariableDeclarationList | ts.Expression | undefined {
+export function getInitializer(node: ts.ForInOrOfStatement): ts.VariableDeclarationList | ts.Expression;
+export function getInitializer(node: ts.ForStatement): ts.VariableDeclarationList | ts.Expression | undefined;
+export function getInitializer(
+  node: ts.ForStatement | ts.ForInOrOfStatement,
+): ts.VariableDeclarationList | ts.Expression | undefined {
   return utils.getValueOrUndefined(node.initializer);
 }
 

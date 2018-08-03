@@ -63,6 +63,22 @@ const isSerializedType = (sb: ScriptBuilder, node: ts.Node, _options: VisitOptio
 export const getTypes = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) => [
   {
     isRuntimeType: () => {
+      // [isNullOrUndefined]
+      sb.emitHelper(node, options, sb.helpers.isNullOrUndefined);
+    },
+    serialize: () => {
+      // do nothing
+    },
+    isSerializedType: () => {
+      // [isNullOrUndefined]
+      sb.emitHelper(node, options, sb.helpers.isNullOrUndefined);
+    },
+    deserialize: () => {
+      // do nothing
+    },
+  },
+  {
+    isRuntimeType: () => {
       // [isBoolean]
       sb.emitHelper(node, options, sb.helpers.isBoolean);
     },
@@ -104,6 +120,22 @@ export const getTypes = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions
     isSerializedType: () => {
       // [isNumber]
       sb.emitHelper(node, options, sb.helpers.isNumber);
+    },
+    deserialize: () => {
+      // do nothing
+    },
+  },
+  {
+    isRuntimeType: () => {
+      // [isSymbol]
+      sb.emitHelper(node, options, sb.helpers.isSymbol);
+    },
+    serialize: () => {
+      // do nothing
+    },
+    isSerializedType: () => {
+      // [isSymbol]
+      sb.emitHelper(node, options, sb.helpers.isSymbol);
     },
     deserialize: () => {
       // do nothing

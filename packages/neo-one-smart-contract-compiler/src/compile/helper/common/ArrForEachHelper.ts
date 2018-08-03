@@ -4,14 +4,14 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface ArrForEachHelperOptions {
-  readonly each: () => void;
+  readonly each: (options: VisitOptions) => void;
   readonly withIndex?: boolean;
 }
 
 // Input: [array]
 // Output: []
 export class ArrForEachHelper extends Helper {
-  private readonly each: () => void;
+  private readonly each: (options: VisitOptions) => void;
   private readonly withIndex: boolean;
 
   public constructor(options: ArrForEachHelperOptions) {
@@ -46,7 +46,7 @@ export class ArrForEachHelper extends Helper {
           // [size > idx, idx, size, ...array]
           sb.emitOp(node, 'GT');
         },
-        each: () => {
+        each: (innerOptions) => {
           // [value, idx, size, ...array]
           sb.emitOp(node, 'ROT');
           if (this.withIndex) {
@@ -56,7 +56,7 @@ export class ArrForEachHelper extends Helper {
             sb.emitOp(node, 'SWAP');
           }
           // [idx, size, ...array]
-          this.each();
+          this.each(innerOptions);
         },
         incrementor: () => {
           // [idx, size, ...array]
