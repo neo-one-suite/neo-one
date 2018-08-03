@@ -58,7 +58,7 @@
     "watch": "yarn run gulp watch",
     "release": "yarn run gulp release",
     "neo-one": "node ./dist/neo-one/packages/neo-one-cli/bin/neo-one",
-    "jest": "NODE_OPTIONS=\"--max-old-space-size=3072\" jest",
+    "jest": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest",
     "test": "yarn run jest --config jest/unit.js",
     "test-ci": "yarn run jest --config jest/unit-ci.js --ci -w 1",
     "e2e": "yarn run jest --config jest/e2e.js",
