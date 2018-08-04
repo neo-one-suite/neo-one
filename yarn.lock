@@ -7916,9 +7916,9 @@ triple-beam@^1.2.0, triple-beam@^1.3.0:
   version "1.3.0"
   resolved "https://registry.npmjs.org/triple-beam/-/triple-beam-1.3.0.tgz#a595214c7298db8339eeeee083e4d10bd8cb8dd9"
 
-ts-jest@23.1.0:
-  version "23.1.0"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-23.1.0.tgz#1d193a3b51d78793062f1f9137629f8921301aa1"
+ts-jest@23.1.2:
+  version "23.1.2"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-23.1.2.tgz#34cd26f3f566924dbd385ad188ae3c3b75757f9e"
   dependencies:
     closest-file-data "^0.1.4"
     fs-extra "6.0.1"
