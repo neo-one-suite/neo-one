@@ -29,14 +29,6 @@ export class SetGlobalObjectHelper extends Helper {
     // [objectPrototypeVal, globalObjectVal]
     sb.emitHelper(node, options, sb.helpers.addObjectObject);
     // [objectPrototypeVal, globalObjectVal]
-    sb.emitHelper(node, options, sb.helpers.addBooleanObject);
-    // [objectPrototypeVal, globalObjectVal]
-    sb.emitHelper(node, options, sb.helpers.addNumberObject);
-    // [objectPrototypeVal, globalObjectVal]
-    sb.emitHelper(node, options, sb.helpers.addStringObject);
-    // [objectPrototypeVal, globalObjectVal]
-    sb.emitHelper(node, options, sb.helpers.addSymbolObject);
-    // [objectPrototypeVal, globalObjectVal]
     sb.emitHelper(node, options, sb.helpers.addMapObject);
     // [objectPrototypeVal, globalObjectVal]
     sb.emitHelper(node, options, sb.helpers.addErrorObject);

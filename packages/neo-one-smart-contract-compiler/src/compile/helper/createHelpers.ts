@@ -8,6 +8,8 @@ import {
   ArrMapFuncHelper,
   ArrMapHelper,
   ArrMapHelperOptions,
+  ArrRangeHelper,
+  ArrRangeHelperOptions,
   ArrReduceFuncHelper,
   ArrReduceHelper,
   ArrReduceHelperOptions,
@@ -210,6 +212,7 @@ export interface Helpers {
   readonly arrMapFunc: ArrMapFuncHelper;
   readonly arrForEach: (options: ArrForEachHelperOptions) => ArrForEachHelper;
   readonly arrForEachFunc: ArrForEachFuncHelper;
+  readonly arrRange: (options: ArrRangeHelperOptions) => ArrRangeHelper;
   readonly arrReduce: (options: ArrReduceHelperOptions) => ArrReduceHelper;
   readonly arrReduceFunc: ArrReduceFuncHelper;
   readonly extendArr: ExtendArrHelper;
@@ -395,6 +398,7 @@ export const createHelpers = (): Helpers => {
     arrMapFunc: new ArrMapFuncHelper(),
     arrForEach: (options) => new ArrForEachHelper(options),
     arrForEachFunc: new ArrForEachFuncHelper(),
+    arrRange: (options) => new ArrRangeHelper(options),
     arrReduce: (options) => new ArrReduceHelper(options),
     arrReduceFunc: new ArrReduceFuncHelper(),
     extendArr: new ExtendArrHelper(),

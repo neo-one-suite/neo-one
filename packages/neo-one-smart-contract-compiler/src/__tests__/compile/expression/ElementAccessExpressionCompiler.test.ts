@@ -4,9 +4,8 @@ describe('ElementAccessExpressionCompiler', () => {
   test('[0, 1, 2][idx]', async () => {
     await helpers.executeString(`
       const x: Array<number> = [0] as Array<number>;
-      if (x.length !== 1) {
-        throw 'Failure';
-      }
+
+      assertEqual(x.length, 1);
 
       const y: Array<number> = x;
 

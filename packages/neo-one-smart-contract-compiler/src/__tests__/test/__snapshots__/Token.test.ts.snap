@@ -2,12 +2,12 @@
 
 exports[`Token properties + issue + balanceOf + totalSupply + transfer: deploy consumed 1`] = `"0"`;
 
-exports[`Token properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"2.52"`;
+exports[`Token properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"2.324"`;
 
 exports[`Token properties + issue + balanceOf + totalSupply + transfer: issue consume 1`] = `"0"`;
 
-exports[`Token properties + issue + balanceOf + totalSupply + transfer: issue cost 1`] = `"5.711"`;
+exports[`Token properties + issue + balanceOf + totalSupply + transfer: issue cost 1`] = `"5.515"`;
 
 exports[`Token properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"0"`;
 
-exports[`Token properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"6.094"`;
+exports[`Token properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"5.898"`;

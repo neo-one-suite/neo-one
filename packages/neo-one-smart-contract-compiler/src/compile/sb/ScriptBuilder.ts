@@ -5,7 +5,7 @@ import ts from 'typescript';
 import { Context, DiagnosticOptions } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { Globals } from '../../symbols';
-import { BuiltIns } from '../builtins';
+import { BuiltIns, BuiltInSymbols } from '../builtins';
 import { Helper, Helpers } from '../helper';
 import { Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
@@ -26,6 +26,7 @@ export interface ScriptBuilder {
   readonly typeChecker: ts.TypeChecker;
   readonly languageService: ts.LanguageService;
   readonly builtIns: BuiltIns;
+  readonly builtInSymbols: BuiltInSymbols;
   readonly context: Context;
   readonly scope: Scope;
   readonly moduleIndex: number;

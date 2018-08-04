@@ -1,7 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
-import { isBuiltInValue } from '../builtins';
+import { isBuiltInMemberValue } from '../builtins';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -12,10 +12,13 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
   public visitNode(sb: ScriptBuilder, expr: ts.PropertyAccessExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
     const symbol = sb.getSymbol(expr);
+    const expression = tsUtils.expression.getExpression(expr);
+    const name = tsUtils.node.getName(expr);
+
     if (symbol !== undefined) {
       const builtin = sb.builtIns.get(symbol);
       if (builtin !== undefined) {
-        if (!isBuiltInValue(builtin)) {
+        if (!isBuiltInMemberValue(builtin)) {
           sb.reportError(expr, 'Built-ins may not be referenced.', DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY);
 
           return;
@@ -27,34 +30,82 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
       }
     }
 
-    const expression = tsUtils.expression.getExpression(expr);
+    const throwTypeError = (innerOptions: VisitOptions) => {
+      sb.emitOp(expression, 'DROP');
+      sb.emitHelper(expression, innerOptions, sb.helpers.throwTypeError);
+    };
+
+    const createProcessBuiltIn = (builtInSymbol: ts.Symbol) => () => {
+      const member = tsUtils.symbol.getMember(builtInSymbol, name);
+      if (member === undefined) {
+        /* istanbul ignore next */
+        sb.reportUnsupported(expr);
+
+        /* istanbul ignore next */
+        return;
+      }
+
+      const builtin = sb.builtIns.get(member);
+      if (builtin === undefined) {
+        /* istanbul ignore next */
+        sb.reportUnsupported(expr);
+
+        /* istanbul ignore next */
+        return;
+      }
+
+      if (!isBuiltInMemberValue(builtin)) {
+        sb.reportError(expr, 'Built-ins may not be referenced.', DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY);
+
+        return;
+      }
+
+      builtin.emitValue(sb, expr, optionsIn, true);
+    };
+
+    const processObject = (innerOptions: VisitOptions) => {
+      sb.emitPushString(tsUtils.node.getNameNode(expr), name);
+      if (optionsIn.pushValue && optionsIn.setValue) {
+        // [objectVal, string, objectVal, val]
+        sb.emitOp(expr, 'OVER');
+        // [string, objectVal, string, objectVal, val]
+        sb.emitOp(expr, 'OVER');
+        // [number, string, objectVal, string, objectVal, val]
+        sb.emitPushInt(expr, 4);
+        // [val, string, objectVal, string, objectVal]
+        sb.emitOp(expr, 'ROLL');
+        // [string, objectVal]
+        sb.emitHelper(expr, innerOptions, sb.helpers.setPropertyObjectProperty);
+        // [val]
+        sb.emitHelper(expr, innerOptions, sb.helpers.getPropertyObjectProperty);
+      } else if (optionsIn.pushValue) {
+        // [val]
+        sb.emitHelper(expr, innerOptions, sb.helpers.getPropertyObjectProperty);
+      } else if (optionsIn.setValue) {
+        // [val, string, objectVal]
+        sb.emitOp(expr, 'ROT');
+        // []
+        sb.emitHelper(expr, innerOptions, sb.helpers.setPropertyObjectProperty);
+      }
+    };
+
     // [val]
     sb.visit(expression, options);
-    // [objectVal]
-    sb.emitHelper(expression, options, sb.helpers.toObject({ type: sb.getType(expression) }));
-
-    if (optionsIn.setValue) {
-      if (optionsIn.pushValue) {
-        // [objectVal, value, objectVal]
-        sb.emitOp(expression, 'TUCK');
-      }
-      // [name, objectVal, value, objectVal]
-      sb.emitPushString(expr, tsUtils.node.getName(expr));
-      // [value, name, objectVal, objectVal]
-      sb.emitOp(expr, 'ROT');
-      // [objectVal]
-      sb.emitHelper(expr, options, sb.helpers.setPropertyObjectProperty);
-    }
-
-    if (optionsIn.pushValue || !optionsIn.setValue) {
-      // [name, objectVal]
-      sb.emitPushString(expr, tsUtils.node.getName(expr));
-      // [value]
-      sb.emitHelper(expr, options, sb.helpers.getPropertyObjectProperty);
-
-      if (!optionsIn.pushValue) {
-        sb.emitOp(expr, 'DROP');
-      }
-    }
+    sb.emitHelper(
+      expression,
+      options,
+      sb.helpers.forBuiltInType({
+        type: sb.getType(expression),
+        array: createProcessBuiltIn(sb.builtInSymbols.array),
+        boolean: createProcessBuiltIn(sb.builtInSymbols.boolean),
+        buffer: createProcessBuiltIn(sb.builtInSymbols.buffer),
+        null: throwTypeError,
+        number: createProcessBuiltIn(sb.builtInSymbols.number),
+        object: processObject,
+        string: createProcessBuiltIn(sb.builtInSymbols.string),
+        symbol: createProcessBuiltIn(sb.builtInSymbols.symbol),
+        undefined: throwTypeError,
+      }),
+    );
   }
 }

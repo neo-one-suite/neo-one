@@ -19,4 +19,12 @@ describe('PropertyAccessExpressionCompiler', () => {
       }
     `);
   });
+
+  test('access array or object property', async () => {
+    await helpers.executeString(`
+      const bar: { length: number } | Array<number> = [1, 2, 3] as { length: number } | Array<number>;
+
+      assertEqual(bar.length, 3);
+    `);
+  });
 });

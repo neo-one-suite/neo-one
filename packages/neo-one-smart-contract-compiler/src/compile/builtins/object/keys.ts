@@ -1,5 +1,6 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { Types } from '../../helper/types/Types';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { BuiltInBase, BuiltInCall, BuiltInType } from '../types';
@@ -10,25 +11,78 @@ export class ObjectKeys extends BuiltInBase implements BuiltInCall {
   public emitCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     const arg = tsUtils.argumented.getArguments(node)[0];
+
+    const processArray = (innerOptions: VisitOptions) => {
+      // [arr]
+      sb.emitHelper(node, innerOptions, sb.helpers.unwrapArray);
+      // [number]
+      sb.emitOp(node, 'ARRAYSIZE');
+      // [arr]
+      sb.emitHelper(
+        node,
+        innerOptions,
+        sb.helpers.arrRange({
+          map: (innerInnerOptions) => {
+            sb.emitHelper(node, innerInnerOptions, sb.helpers.createNumber);
+            sb.emitHelper(node, innerInnerOptions, sb.helpers.toString({ type: undefined, knownType: Types.Number }));
+            sb.emitHelper(node, innerInnerOptions, sb.helpers.createString);
+          },
+        }),
+      );
+      // [arrayVal]
+      sb.emitHelper(node, innerOptions, sb.helpers.wrapArray);
+    };
+
+    const emptyArray = (innerOptions: VisitOptions) => {
+      // []
+      sb.emitOp(node, 'DROP');
+      // [arrayVal]
+      sb.emitHelper(node, innerOptions, sb.helpers.createArray);
+    };
+
+    const throwTypeError = (innerOptions: VisitOptions) => {
+      sb.emitOp(node, 'DROP');
+      sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+    };
+
+    const processObject = (innerOptions: VisitOptions) => {
+      // [arr]
+      sb.emitHelper(node, innerOptions, sb.helpers.getPropertyObjectKeys);
+      // [arr]
+      sb.emitHelper(
+        node,
+        innerOptions,
+        sb.helpers.arrMap({
+          map: () => {
+            // [val]
+            sb.emitHelper(node, innerOptions, sb.helpers.createString);
+          },
+        }),
+      );
+      // [arrayVal]
+      sb.emitHelper(node, innerOptions, sb.helpers.wrapArray);
+    };
+
     // [val]
     sb.visit(arg, options);
     // [objectVal]
-    sb.emitHelper(node, options, sb.helpers.toObject({ type: sb.getType(arg) }));
-    // [arr]
-    sb.emitHelper(node, options, sb.helpers.getPropertyObjectKeys);
-    // [arr]
     sb.emitHelper(
       node,
       options,
-      sb.helpers.arrMap({
-        map: () => {
-          // [val]
-          sb.emitHelper(node, options, sb.helpers.createString);
-        },
+      sb.helpers.forBuiltInType({
+        type: sb.getType(arg),
+        array: processArray,
+        boolean: emptyArray,
+        buffer: emptyArray,
+        null: throwTypeError,
+        number: emptyArray,
+        object: processObject,
+        string: emptyArray,
+        symbol: emptyArray,
+        undefined: throwTypeError,
       }),
     );
-    // [arrayVal]
-    sb.emitHelper(node, options, sb.helpers.wrapArray);
+
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
     }

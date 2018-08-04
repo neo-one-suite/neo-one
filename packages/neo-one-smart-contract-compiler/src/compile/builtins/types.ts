@@ -4,6 +4,7 @@ import { VisitOptions } from '../types';
 
 export enum BuiltInType {
   Value = 'Value',
+  MemberValue = 'MemberValue',
   Call = 'Call',
   Construct = 'Construct',
   InstanceOf = 'InstanceOf',
@@ -16,11 +17,24 @@ export interface BuiltIn {
 }
 
 export interface BuiltInValue extends BuiltIn {
-  readonly emitValue: (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) => void;
+  readonly emitValue: (sb: ScriptBuilder, node: ts.Identifier, options: VisitOptions) => void;
 }
 
 export function isBuiltInValue(value: BuiltIn): value is BuiltInValue {
   return value.types.has(BuiltInType.Value);
+}
+
+export interface BuiltInMemberValue extends BuiltIn {
+  readonly emitValue: (
+    sb: ScriptBuilder,
+    node: ts.PropertyAccessExpression | ts.ElementAccessExpression,
+    options: VisitOptions,
+    visited?: boolean,
+  ) => void;
+}
+
+export function isBuiltInMemberValue(value: BuiltIn): value is BuiltInMemberValue {
+  return value.types.has(BuiltInType.MemberValue);
 }
 
 export interface BuiltInCall extends BuiltIn {

@@ -61,10 +61,32 @@ describe('Object.keys', () => {
     `);
   });
 
-  test('cannot be referenced', async () => {
+  test('should return enumerable own object properties on arrays', async () => {
+    await helpers.executeString(`
+      const foo = [3, 4, 5];
+
+      const keys = Object.keys(foo);
+
+      assertEqual(keys.length, 3);
+      assertEqual(keys[0], '0');
+      assertEqual(keys[1], '1');
+      assertEqual(keys[2], '2');
+    `);
+  });
+
+  test('cannot be property referenced', async () => {
     await helpers.compileString(
       `
       const keys = Object.keys;
+    `,
+      { type: 'error', code: DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY },
+    );
+  });
+
+  test.skip('cannot be element referenced', async () => {
+    await helpers.compileString(
+      `
+      const keys = Object['keys'];
     `,
       { type: 'error', code: DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY },
     );

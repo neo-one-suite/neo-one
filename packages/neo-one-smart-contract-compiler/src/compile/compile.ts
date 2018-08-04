@@ -13,16 +13,17 @@ export interface CompileOptions {
 }
 
 export const compile = async ({ context, sourceFile, sourceMaps = {} }: CompileOptions): Promise<CompileResult> => {
-  const builtIns = createBuiltIns(context.program, context.typeChecker);
+  const { builtIns, builtInSymbols } = createBuiltIns(context.program, context.typeChecker);
   const helpers = createHelpers();
 
-  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, builtIns, sourceFile);
+  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, builtIns, builtInSymbols, sourceFile);
   helperScriptBuilder.process();
 
   const scopeScriptBuilder = new ScopeCapturingScriptBuilder(
     context,
     helpers,
     builtIns,
+    builtInSymbols,
     sourceFile,
     helperScriptBuilder.getHelpers(),
   );
@@ -34,6 +35,7 @@ export const compile = async ({ context, sourceFile, sourceMaps = {} }: CompileO
     sourceFile,
     helpers,
     builtIns,
+    builtInSymbols,
     allHelpers: helperScriptBuilder.getHelpers(),
   });
   emittingScriptBuilder.process();

@@ -1,327 +1,235 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { DiagnosticCode } from '../../../../DiagnosticCode';
+import { isBuiltInMemberValue } from '../../../builtins';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
 import { Helper } from '../../Helper';
+import { Types } from '../Types';
 
 // Input: [val]
 // Output: [val]
 export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
   public emit(sb: ScriptBuilder, expr: ts.ElementAccessExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
+
     const value = tsUtils.expression.getExpression(expr);
     const valueType = sb.getType(value);
     const prop = tsUtils.expression.getArgumentExpressionOrThrow(expr);
     const propType = sb.getType(prop);
 
-    // [objectVal]
-    sb.emitHelper(value, options, sb.helpers.toObject({ type: sb.getType(value) }));
-
-    // [propVal, objectVal]
-    sb.visit(prop, options);
-
-    if (optionsIn.setValue) {
-      let valueIndex = 2;
-      if (optionsIn.pushValue) {
-        // [objectVal, propVal]
-        sb.emitOp(expr, 'SWAP');
-        // [objectVal, propVal, objectVal]
-        sb.emitOp(expr, 'TUCK');
-        // [propVal, objectVal, propVal, objectVal]
-        sb.emitOp(expr, 'OVER');
-        valueIndex = 4;
-      }
-
-      if (propType !== undefined && tsUtils.type_.isOnlyStringish(propType)) {
-        // []
-        this.setStringProperty(sb, prop, options, propType, valueType, valueIndex);
-      } else if (propType !== undefined && tsUtils.type_.isOnlyNumberish(propType)) {
-        // []
-        this.setNumberProperty(sb, prop, options, propType, valueType, valueIndex);
-      } else if (propType !== undefined && tsUtils.type_.isOnlySymbolish(propType)) {
-        // [propString, objectVal]
-        sb.emitHelper(prop, options, sb.helpers.getSymbol);
-        // []
-        this.setSymbol(sb, prop, options, valueIndex);
-      } else {
-        // []
-        sb.emitHelper(
-          prop,
-          options,
-          sb.helpers.case(
-            [
-              {
-                condition: () => {
-                  // [propVal, propVal, objectVal]
-                  sb.emitOp(prop, 'DUP');
-                  // [isString, propVal, objectVal]
-                  sb.emitHelper(prop, options, sb.helpers.isString);
-                },
-                whenTrue: () => {
-                  // []
-                  this.setStringProperty(sb, prop, options, propType, valueType, valueIndex);
-                },
-              },
-              {
-                condition: () => {
-                  // [propVal, propVal, objectVal]
-                  sb.emitOp(prop, 'DUP');
-                  // [isNumber, propVal, objectVal]
-                  sb.emitHelper(prop, options, sb.helpers.isNumber);
-                },
-                whenTrue: () => {
-                  // []
-                  this.setNumberProperty(sb, prop, options, propType, valueType, valueIndex);
-                },
-              },
-            ],
-            () => {
-              // [propString, objectVal]
-              sb.emitHelper(prop, options, sb.helpers.getSymbol);
-              // []
-              this.setSymbol(sb, prop, options, valueIndex);
-            },
-          ),
-        );
-      }
-    }
-
-    if (optionsIn.pushValue || !optionsIn.setValue) {
-      if (propType !== undefined && tsUtils.type_.isOnlyStringish(propType)) {
-        // [val]
-        this.getStringProperty(sb, prop, options, propType, valueType);
-      } else if (propType !== undefined && tsUtils.type_.isOnlyNumberish(propType)) {
-        // [val]
-        this.getNumberProperty(sb, prop, options, propType, valueType);
-      } else if (propType !== undefined && tsUtils.type_.isOnlySymbolish(propType)) {
-        // [propString, objectVal]
-        sb.emitHelper(prop, options, sb.helpers.getSymbol);
-        // [val]
-        sb.emitHelper(expr, options, sb.helpers.getSymbolObjectProperty);
-      } else {
-        // [val]
-        sb.emitHelper(
-          prop,
-          options,
-          sb.helpers.case(
-            [
-              {
-                condition: () => {
-                  // [propVal, propVal, objectVal]
-                  sb.emitOp(prop, 'DUP');
-                  // [propVal, objectVal]
-                  sb.emitHelper(prop, options, sb.helpers.isString);
-                },
-                whenTrue: () => {
-                  // [val]
-                  this.getStringProperty(sb, prop, options, propType, valueType);
-                },
-              },
-              {
-                condition: () => {
-                  // [propVal, propVal, objectVal]
-                  sb.emitOp(prop, 'DUP');
-                  // [propVal, objectVal]
-                  sb.emitHelper(prop, options, sb.helpers.isNumber);
-                },
-                whenTrue: () => {
-                  // [val]
-                  this.getNumberProperty(sb, prop, options, propType, valueType);
-                },
-              },
-            ],
-            () => {
-              // [propString, objectVal]
-              sb.emitHelper(prop, options, sb.helpers.getSymbol);
-              // [val]
-              sb.emitHelper(expr, options, sb.helpers.getSymbolObjectProperty);
-            },
-          ),
-        );
-      }
-    }
-
-    if (!optionsIn.pushValue && !optionsIn.setValue) {
+    const throwTypeError = (innerOptions: VisitOptions) => {
       sb.emitOp(expr, 'DROP');
-    }
-  }
+      sb.emitHelper(expr, innerOptions, sb.helpers.throwTypeError);
+    };
 
-  private getNumberProperty(
-    sb: ScriptBuilder,
-    node: ts.Node,
-    options: VisitOptions,
-    propType: ts.Type | undefined,
-    valueType: ts.Type | undefined,
-  ): void {
-    if (valueType !== undefined && tsUtils.type_.isOnlyArrayish(valueType)) {
-      sb.emitHelper(node, options, sb.helpers.getNumber);
-      sb.emitHelper(node, options, sb.helpers.getArrayIndex);
-    } else {
+    const throwInnerTypeError = (innerOptions: VisitOptions) => {
+      sb.emitOp(expr, 'DROP');
+      throwTypeError(innerOptions);
+    };
+
+    const createProcessBuiltIn = (builtInSymbol: ts.Symbol) => () => {
+      if (!ts.isStringLiteral(prop)) {
+        sb.reportError(expr, 'Cannot index builtin', DiagnosticCode.CANNOT_INDEX_BUILTIN);
+
+        return;
+      }
+
+      const name = tsUtils.literal.getLiteralValue(prop);
+      const member = tsUtils.symbol.getMember(builtInSymbol, name);
+      if (member === undefined) {
+        /* istanbul ignore next */
+        sb.reportUnsupported(expr);
+
+        /* istanbul ignore next */
+        return;
+      }
+
+      const builtin = sb.builtIns.get(member);
+      if (builtin === undefined) {
+        /* istanbul ignore next */
+        sb.reportUnsupported(expr);
+
+        /* istanbul ignore next */
+        return;
+      }
+
+      if (!isBuiltInMemberValue(builtin)) {
+        sb.reportError(expr, 'Built-ins may not be referenced.', DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY);
+
+        return;
+      }
+
+      builtin.emitValue(sb, expr, optionsIn, true);
+    };
+
+    const processArray = (innerOptions: VisitOptions) => {
+      // [propVal, objectVal]
+      sb.visit(prop, innerOptions);
+      if (!optionsIn.pushValue && !optionsIn.setValue) {
+        sb.emitOp(expr, 'DROP');
+        sb.emitOp(expr, 'DROP');
+
+        return;
+      }
+
+      const handleBase = (innerInnerOptions: VisitOptions) => {
+        if (optionsIn.pushValue && optionsIn.setValue) {
+          // [number, number, objectVal, val]
+          sb.emitPushInt(expr, 2);
+          // [val, number, objectVal, val]
+          sb.emitOp(expr, 'PICK');
+          // [val]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.setArrayIndex);
+        } else if (optionsIn.pushValue) {
+          // [val]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.getArrayIndex);
+        } else if (optionsIn.setValue) {
+          // [val, number, objectVal]
+          sb.emitOp(expr, 'ROT');
+          // []
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.setArrayIndex);
+        }
+      };
+
+      const handleNumber = (innerInnerOptions: VisitOptions) => {
+        // [number, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.getNumber);
+        handleBase(innerInnerOptions);
+      };
+
+      const handleString = (innerInnerOptions: VisitOptions) => {
+        // [number, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.toNumber({ type: propType, knownType: Types.String }));
+        handleBase(innerInnerOptions);
+      };
+
       sb.emitHelper(
-        node,
-        options,
-        sb.helpers.if({
-          condition: () => {
-            // [isArray, propVal, objectVal]
-            this.isArrayInstance(sb, node, options);
-          },
-          whenTrue: () => {
-            // [propNumber, objectVal]
-            sb.emitHelper(node, options, sb.helpers.getNumber);
-            // [val]
-            sb.emitHelper(node, options, sb.helpers.getArrayIndex);
-          },
-          whenFalse: () => {
-            // [propString, objectVal]
-            sb.emitHelper(node, options, sb.helpers.toString({ type: propType }));
-            // [val]
-            sb.emitHelper(node, options, sb.helpers.getPropertyObjectProperty);
-          },
+        prop,
+        innerOptions,
+        sb.helpers.forBuiltInType({
+          type: propType,
+          array: processArray,
+          boolean: throwInnerTypeError,
+          buffer: throwInnerTypeError,
+          null: throwInnerTypeError,
+          number: handleNumber,
+          object: throwInnerTypeError,
+          string: handleString,
+          symbol: throwInnerTypeError,
+          undefined: throwInnerTypeError,
         }),
       );
-    }
-  }
+    };
 
-  private getStringProperty(
-    sb: ScriptBuilder,
-    node: ts.Node,
-    options: VisitOptions,
-    propType: ts.Type | undefined,
-    valueType: ts.Type | undefined,
-  ): void {
-    if (valueType !== undefined && tsUtils.type_.isOnlyArrayish(valueType)) {
-      sb.emitHelper(node, options, sb.helpers.toNumber({ type: propType }));
-      sb.emitHelper(node, options, sb.helpers.getArrayIndex);
-    } else {
+    const processObject = (innerOptions: VisitOptions) => {
+      // [propVal, objectVal]
+      sb.visit(prop, innerOptions);
+      if (!optionsIn.pushValue && !optionsIn.setValue) {
+        sb.emitOp(expr, 'DROP');
+        sb.emitOp(expr, 'DROP');
+
+        return;
+      }
+
+      const handleBaseProperty = (innerInnerOptions: VisitOptions) => {
+        if (optionsIn.pushValue && optionsIn.setValue) {
+          // [objectVal, string, objectVal, val]
+          sb.emitOp(expr, 'OVER');
+          // [string, objectVal, string, objectVal, val]
+          sb.emitOp(expr, 'OVER');
+          // [number, string, objectVal, string, objectVal, val]
+          sb.emitPushInt(expr, 4);
+          // [val, string, objectVal, string, objectVal]
+          sb.emitOp(expr, 'ROLL');
+          // [string, objectVal]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.setPropertyObjectProperty);
+          // [val]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.getPropertyObjectProperty);
+        } else if (optionsIn.pushValue) {
+          // [val]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.getPropertyObjectProperty);
+        } else if (optionsIn.setValue) {
+          // [val, string, objectVal]
+          sb.emitOp(expr, 'ROT');
+          // []
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.setPropertyObjectProperty);
+        }
+      };
+
+      const handleNumber = (innerInnerOptions: VisitOptions) => {
+        // [string, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.toString({ type: propType, knownType: Types.Number }));
+        handleBaseProperty(innerInnerOptions);
+      };
+
+      const handleString = (innerInnerOptions: VisitOptions) => {
+        // [string, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.getString);
+        handleBaseProperty(innerInnerOptions);
+      };
+
+      const handleSymbol = (innerInnerOptions: VisitOptions) => {
+        // [string, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.getSymbol);
+
+        if (optionsIn.pushValue && optionsIn.setValue) {
+          // [objectVal, string, objectVal, val]
+          sb.emitOp(expr, 'OVER');
+          // [string, objectVal, string, objectVal, val]
+          sb.emitOp(expr, 'OVER');
+          // [number, string, objectVal, string, objectVal, val]
+          sb.emitPushInt(expr, 4);
+          // [val, string, objectVal, string, objectVal]
+          sb.emitOp(expr, 'ROLL');
+          // [string, objectVal]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.setSymbolObjectProperty);
+          // [val]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.getSymbolObjectProperty);
+        } else if (optionsIn.pushValue) {
+          // [val]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.getSymbolObjectProperty);
+        } else if (optionsIn.setValue) {
+          // [val, string, objectVal]
+          sb.emitOp(expr, 'ROT');
+          // []
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.setSymbolObjectProperty);
+        }
+      };
+
       sb.emitHelper(
-        node,
-        options,
-        sb.helpers.if({
-          condition: () => {
-            // [isArray, propVal, objectVal]
-            this.isArrayInstance(sb, node, options);
-          },
-          whenTrue: () => {
-            sb.emitHelper(node, options, sb.helpers.toNumber({ type: propType }));
-            sb.emitHelper(node, options, sb.helpers.getArrayIndex);
-          },
-          whenFalse: () => {
-            // [propString, objectVal]
-            sb.emitHelper(node, options, sb.helpers.getString);
-            // [val]
-            sb.emitHelper(node, options, sb.helpers.getPropertyObjectProperty);
-          },
+        prop,
+        innerOptions,
+        sb.helpers.forBuiltInType({
+          type: propType,
+          array: processArray,
+          boolean: throwInnerTypeError,
+          buffer: throwInnerTypeError,
+          null: throwInnerTypeError,
+          number: handleNumber,
+          object: throwInnerTypeError,
+          string: handleString,
+          symbol: handleSymbol,
+          undefined: throwInnerTypeError,
         }),
       );
-    }
-  }
+    };
 
-  private setNumberProperty(
-    sb: ScriptBuilder,
-    node: ts.Node,
-    options: VisitOptions,
-    propType: ts.Type | undefined,
-    valueType: ts.Type | undefined,
-    index: number,
-  ): void {
-    if (valueType !== undefined && tsUtils.type_.isOnlyArrayish(valueType)) {
-      sb.emitHelper(node, options, sb.helpers.getNumber);
-      this.setArrayIndex(sb, node, options, index);
-    } else {
-      sb.emitHelper(
-        node,
-        options,
-        sb.helpers.if({
-          condition: () => {
-            // [isArray, propVal, objectVal]
-            this.isArrayInstance(sb, node, options);
-          },
-          whenTrue: () => {
-            sb.emitHelper(node, options, sb.helpers.getNumber);
-            this.setArrayIndex(sb, node, options, index);
-          },
-          whenFalse: () => {
-            // [propString, objectVal]
-            sb.emitHelper(node, options, sb.helpers.toString({ type: propType }));
-            // []
-            this.setProperty(sb, node, options, index);
-          },
-        }),
-      );
-    }
-  }
-
-  private setStringProperty(
-    sb: ScriptBuilder,
-    node: ts.Node,
-    options: VisitOptions,
-    propType: ts.Type | undefined,
-    valueType: ts.Type | undefined,
-    index: number,
-  ): void {
-    if (valueType !== undefined && tsUtils.type_.isOnlyArrayish(valueType)) {
-      sb.emitHelper(node, options, sb.helpers.toNumber({ type: propType }));
-      this.setArrayIndex(sb, node, options, index);
-    } else {
-      sb.emitHelper(
-        node,
-        options,
-        sb.helpers.if({
-          condition: () => {
-            // [isArray, propVal, objectVal]
-            this.isArrayInstance(sb, node, options);
-          },
-          whenTrue: () => {
-            sb.emitHelper(node, options, sb.helpers.toNumber({ type: propType }));
-            this.setArrayIndex(sb, node, options, index);
-          },
-          whenFalse: () => {
-            // [propString, objectVal]
-            sb.emitHelper(node, options, sb.helpers.getString);
-            // []
-            this.setProperty(sb, node, options, index);
-          },
-        }),
-      );
-    }
-  }
-
-  private setProperty(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, index: number): void {
-    // [val, propString, objectVal]
-    this.pickValue(sb, node, options, index);
-    // []
-    sb.emitHelper(node, options, sb.helpers.setPropertyObjectProperty);
-  }
-
-  private setArrayIndex(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, index: number): void {
-    // [val, propNumber, objectVal]
-    this.pickValue(sb, node, options, index);
-    // []
-    sb.emitHelper(node, options, sb.helpers.setArrayIndex);
-  }
-
-  private setSymbol(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, index: number): void {
-    // [val, propString, objectVal]
-    this.pickValue(sb, node, options, index);
-    // []
-    sb.emitHelper(node, options, sb.helpers.setSymbolObjectProperty);
-  }
-
-  private isArrayInstance(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    // [objectVal, propVal, objectVal]
-    sb.emitOp(node, 'OVER');
-    // [isArray, propVal, objectVal]
-    sb.emitHelper(node, options, sb.helpers.isArray);
-  }
-
-  private pickValue(sb: ScriptBuilder, node: ts.Node, _options: VisitOptions, index: number): void {
-    if (index === 2) {
-      sb.emitOp(node, 'ROT');
-    } else {
-      // [index, ...]
-      sb.emitPushInt(node, index);
-      // [val, ...]
-      sb.emitOp(node, 'ROLL');
-    }
+    sb.emitHelper(
+      value,
+      options,
+      sb.helpers.forBuiltInType({
+        type: valueType,
+        array: processArray,
+        boolean: createProcessBuiltIn(sb.builtInSymbols.boolean),
+        buffer: createProcessBuiltIn(sb.builtInSymbols.buffer),
+        null: throwTypeError,
+        number: createProcessBuiltIn(sb.builtInSymbols.number),
+        object: processObject,
+        string: createProcessBuiltIn(sb.builtInSymbols.string),
+        symbol: createProcessBuiltIn(sb.builtInSymbols.symbol),
+        undefined: throwTypeError,
+      }),
+    );
   }
 }
