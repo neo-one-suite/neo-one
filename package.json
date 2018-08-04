@@ -23,7 +23,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=10.6.0"
+    "node": ">=10.8.0"
   },
   "lint-staged": {
     "linters": {
