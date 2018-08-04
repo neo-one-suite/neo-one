@@ -2,6 +2,7 @@ import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../../DiagnosticCode';
+import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import { isBuiltInCall } from '../../builtins';
 import { ScriptBuilder } from '../../sb';
 import { SYSCALLS } from '../../syscalls';
@@ -144,16 +145,12 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
   }
 
   private handleSysCall(sb: ScriptBuilder, node: ts.CallExpression, options: VisitOptions): void {
-    const sysCallName = tsUtils.expression.getArguments(node)[0] as ts.Expression | undefined;
+    const sysCallName = tsUtils.expression.getArguments(node)[0];
 
     const reportError = () => {
-      sb.reportError(
-        node,
-        'First argument to syscall must be a string literal corresponding to a NEO syscall.',
-        DiagnosticCode.INVALID_SYS_CALL,
-      );
+      sb.reportError(sysCallName, DiagnosticCode.InvalidSyscall, DiagnosticMessage.InvalidSyscall);
     };
-    if (sysCallName === undefined || !ts.isStringLiteral(sysCallName)) {
+    if (!ts.isStringLiteral(sysCallName)) {
       reportError();
 
       return;

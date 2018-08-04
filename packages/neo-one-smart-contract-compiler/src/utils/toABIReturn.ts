@@ -2,7 +2,6 @@ import { ABIReturn } from '@neo-one/client';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { Context } from '../Context';
-import { DiagnosticCode } from '../DiagnosticCode';
 import { getFixedDecimals } from './getFixedDecimals';
 import { isFixedType } from './isFixedType';
 
@@ -15,8 +14,6 @@ export function toABIReturn(
   typeIdentifier?: ts.Identifier,
 ): ABIReturn | undefined {
   if (resolvedType === undefined && typeIdentifier === undefined) {
-    context.reportError(node, 'Could not detect ABI, unknown type.', DiagnosticCode.UNKNOWN_TYPE);
-
     return undefined;
   }
 
@@ -41,8 +38,6 @@ export function toABIReturn(
   }
 
   if (resolvedType === undefined) {
-    context.reportError(node, 'Invalid contract type.', DiagnosticCode.INVALID_CONTRACT_TYPE);
-
     return undefined;
   }
 
@@ -81,8 +76,6 @@ export function toABIReturn(
   if (context.isOnlyGlobal(node, resolvedType, 'Buffer')) {
     return BYTE_ARRAY_RETURN;
   }
-
-  context.reportError(node, 'Invalid contract type.', DiagnosticCode.INVALID_CONTRACT_TYPE);
 
   return undefined;
 }

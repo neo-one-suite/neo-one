@@ -1,9 +1,10 @@
 // tslint:disable ban-types
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-
+import { format } from 'util';
 import { CompilerDiagnostic } from './CompilerDiagnostic';
 import { DiagnosticCode } from './DiagnosticCode';
+import { DiagnosticMessage } from './DiagnosticMessage';
 import { Globals, LibAliases, LibAliasesWithReset, Libs } from './symbols';
 
 export interface DiagnosticOptions {
@@ -41,33 +42,35 @@ export class Context {
     this.mutableDiagnostics.push(...diagnostics);
   }
 
-  public reportError(node: ts.Node, message: string, code: DiagnosticCode): void {
-    this.mutableDiagnostics.push(new CompilerDiagnostic(node, message, code, ts.DiagnosticCategory.Error));
+  public reportError(
+    node: ts.Node,
+    code: DiagnosticCode,
+    message: DiagnosticMessage,
+    // tslint:disable-next-line no-any readonly-array
+    ...args: any[]
+  ): void {
+    this.mutableDiagnostics.push(
+      new CompilerDiagnostic(node, this.getDiagnosticMessage(message, ...args), code, ts.DiagnosticCategory.Error),
+    );
   }
 
-  public reportWarning(node: ts.Node, message: string, code: DiagnosticCode): void {
-    this.mutableDiagnostics.push(new CompilerDiagnostic(node, message, code, ts.DiagnosticCategory.Warning));
+  // tslint:disable-next-line no-any readonly-array
+  public reportWarning(node: ts.Node, code: DiagnosticCode, message: DiagnosticMessage, ...args: any[]): void {
+    this.mutableDiagnostics.push(
+      new CompilerDiagnostic(node, this.getDiagnosticMessage(message, ...args), code, ts.DiagnosticCategory.Warning),
+    );
   }
 
   public reportUnsupported(node: ts.Node): void {
-    this.reportError(node, 'Unsupported syntax', DiagnosticCode.UNSUPPORTED_SYNTAX);
+    this.reportError(node, DiagnosticCode.GenericUnsupportedSyntax, DiagnosticMessage.GenericUnsupportedSyntax);
   }
 
   public reportTypeError(node: ts.Node): void {
-    this.reportError(
-      node,
-      'Could not infer type. Please add an explicit type annotation.',
-      DiagnosticCode.UNKNOWN_TYPE,
-    );
+    this.reportError(node, DiagnosticCode.UnknownType, DiagnosticMessage.CouldNotInferType);
   }
 
   public reportTypeWarning(node: ts.Node): void {
-    this.reportWarning(
-      node,
-      'Could not infer type. Deoptimized implementation will be used. Add an explicit type annotation ' +
-        'to optimize the output.',
-      DiagnosticCode.UNKNOWN_TYPE,
-    );
+    this.reportWarning(node, DiagnosticCode.UnknownType, DiagnosticMessage.CouldNotInferTypeDeopt);
   }
 
   public getType(
@@ -120,18 +123,21 @@ export class Context {
     { warning = true, error = false }: DiagnosticOptions = { warning: true, error: false },
   ): ts.Symbol | undefined {
     let symbol = tsUtils.node.getSymbol(this.typeChecker, node);
+    const noWarnOrError = { warning: false, error: false };
+    const type = this.getType(node, noWarnOrError);
     if (symbol === undefined) {
-      const noWarnOrError = { warning: false, error: false };
-      const type = this.getType(node, noWarnOrError);
       symbol = this.getSymbolForType(node, type, noWarnOrError);
     }
 
     if (symbol === undefined) {
-      const message = 'Could not determine source symbol.';
+      if (type !== undefined && !tsUtils.type_.isSymbolic(type)) {
+        return undefined;
+      }
+
       if (error) {
-        this.reportError(node, message, DiagnosticCode.UNKNOWN_SYMBOL);
+        this.reportSymbolError(node);
       } else if (warning) {
-        this.reportWarning(node, message, DiagnosticCode.UNKNOWN_SYMBOL);
+        this.reportSymbolWarning(node);
       }
 
       return undefined;
@@ -160,15 +166,10 @@ export class Context {
         return undefined;
       }
 
-      const message = `Could not determine source symbol for type: ${tsUtils.type_.getText(
-        this.typeChecker,
-        type,
-        node,
-      )}.`;
       if (error) {
-        this.reportError(node, message, DiagnosticCode.UNKNOWN_SYMBOL);
+        this.reportSymbolError(node);
       } else if (warning) {
-        this.reportWarning(node, message, DiagnosticCode.UNKNOWN_SYMBOL);
+        this.reportSymbolWarning(node);
       }
 
       return undefined;
@@ -182,11 +183,11 @@ export class Context {
     return symbol;
   }
 
-  public isOnlyGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
+  public isGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
     return this.isGlobalSymbol(node, this.getSymbolForType(node, type), name);
   }
 
-  public isGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
+  public isOnlyGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
     return this.isGlobalSymbol(node, this.getSymbolForType(node, type), name);
   }
 
@@ -224,5 +225,28 @@ export class Context {
     }
 
     return type;
+  }
+
+  private reportSymbolError(node: ts.Node): void {
+    this.reportError(node, DiagnosticCode.UnknownSymbol, DiagnosticMessage.CouldNotInferSymbol);
+  }
+
+  private reportSymbolWarning(node: ts.Node): void {
+    this.reportError(node, DiagnosticCode.UnknownSymbol, DiagnosticMessage.CouldNotInferSymbolDeopt);
+  }
+
+  // tslint:disable-next-line no-any readonly-array
+  private getDiagnosticMessage(message: DiagnosticMessage, ...args: any[]): string {
+    const match = message.match(/%[dfijoOs]/g);
+    const expectedLength = (match === null ? [] : match).length;
+    if (expectedLength !== args.length) {
+      throw new Error(
+        `The provided arguments length (${
+          args.length
+        }) does not match the required arguments length (${expectedLength})`,
+      );
+    }
+
+    return format(message, ...args);
   }
 }

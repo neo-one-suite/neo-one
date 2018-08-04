@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ImportDeclarationCompiler export = unsupported 1`] = `
-"snippetCode.ts (4,7): Unsupported syntax
+"snippetCode.ts (4,7): Unsupported syntax.
 
       2 |       const x = 'foo';
       3 | 

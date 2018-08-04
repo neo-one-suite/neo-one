@@ -11,7 +11,7 @@ exports[`Object.keys cannot be element referenced 1`] = `
 `;
 
 exports[`Object.keys cannot be property referenced 1`] = `
-"snippetCode.ts (2,20): Built-ins may not be referenced.
+"snippetCode.ts (2,20): Builtin properties cannot be referenced
 
       1 | 
     > 2 |       const keys = Object.keys;

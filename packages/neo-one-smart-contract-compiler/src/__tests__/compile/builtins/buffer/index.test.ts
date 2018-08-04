@@ -8,7 +8,7 @@ describe('Buffer', () => {
       class MyBuffer extends Buffer {
       }
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_EXTEND_BUILTIN },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinExtend },
     );
   });
 
@@ -18,7 +18,7 @@ describe('Buffer', () => {
       class MyBuffer implements Buffer {
       }
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_IMPLEMENT_BUILTIN },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
     );
   });
 
@@ -27,7 +27,7 @@ describe('Buffer', () => {
       `
       const x = Buffer;
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_REFERENCE_BUILTIN },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 });

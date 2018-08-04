@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Object cannot be extended 1`] = `
-"snippetCode.ts (2,30): Built-ins cannot be extended.
+"snippetCode.ts (2,30): Builtins cannot be extended.
 
       1 | 
     > 2 |       class MyObject extends Object {
@@ -23,7 +23,7 @@ exports[`Object cannot be implemented 1`] = `
 `;
 
 exports[`Object cannot be referenced 1`] = `
-"snippetCode.ts (2,17): Built-ins may not be referenced.
+"snippetCode.ts (2,17): Builtins cannot be referenced
 
       1 | 
     > 2 |       const x = Object;

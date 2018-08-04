@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { isBuiltInValue } from '../builtins';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -15,13 +16,13 @@ export class IdentifierCompiler extends NodeCompiler<ts.Identifier> {
       const builtin = sb.builtIns.get(symbol);
       if (builtin !== undefined) {
         if (!isBuiltInValue(builtin)) {
-          sb.reportError(expr, 'Built-ins may not be referenced.', DiagnosticCode.CANNOT_REFERENCE_BUILTIN);
+          sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltin);
 
           return;
         }
 
         if (options.setValue) {
-          sb.reportError(expr, 'Built-ins may not be overriden.', DiagnosticCode.CANNOT_SET_BUILTIN);
+          sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotModifyBuiltin);
 
           return;
         }

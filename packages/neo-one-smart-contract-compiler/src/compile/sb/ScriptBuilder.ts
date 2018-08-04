@@ -4,6 +4,7 @@ import { BN } from 'bn.js';
 import ts from 'typescript';
 import { Context, DiagnosticOptions } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { Globals } from '../../symbols';
 import { BuiltIns, BuiltInSymbols } from '../builtins';
 import { Helper, Helpers } from '../helper';
@@ -65,7 +66,8 @@ export interface ScriptBuilder {
   readonly noCastOptions: (options: VisitOptions) => VisitOptions;
   readonly superClassOptions: (options: VisitOptions, superClass: Name) => VisitOptions;
   readonly noSuperClassOptions: (options: VisitOptions) => VisitOptions;
-  readonly reportError: (node: ts.Node, message: string, code: DiagnosticCode) => void;
+  // tslint:disable-next-line no-any readonly-array
+  readonly reportError: (node: ts.Node, code: DiagnosticCode, message: DiagnosticMessage, ...args: any[]) => void;
   readonly reportUnsupported: (node: ts.Node) => void;
   readonly getType: (node: ts.Node, options?: DiagnosticOptions) => ts.Type | undefined;
   readonly getSymbol: (node: ts.Node, options?: DiagnosticOptions) => ts.Symbol | undefined;

@@ -1,6 +1,5 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { DiagnosticCode } from '../../../DiagnosticCode';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { BuiltInBase, BuiltInMemberValue, BuiltInType } from '../types';
@@ -15,12 +14,6 @@ export class ArrayLength extends BuiltInBase implements BuiltInMemberValue {
     options: VisitOptions,
     visited = false,
   ): void {
-    if (options.setValue) {
-      sb.reportError(node, 'Cannot set array length', DiagnosticCode.CANNOT_SET_BUILTIN);
-
-      return;
-    }
-
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
 

@@ -1,6 +1,5 @@
 import ts from 'typescript';
 import * as constants from '../../../constants';
-import { DiagnosticCode } from '../../../DiagnosticCode';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -12,11 +11,7 @@ export class ContinueHelper extends Helper {
     let pc = options.continuePC;
     if (pc === undefined) {
       /* istanbul ignore next */
-      sb.reportError(
-        node,
-        'Something went wrong. Expected a continue jump location.',
-        DiagnosticCode.SOMETHING_WENT_WRONG,
-      );
+      sb.reportUnsupported(node);
     } else {
       if (options.finallyPC !== undefined) {
         sb.emitPushInt(node, constants.FINALLY_COMPLETION);

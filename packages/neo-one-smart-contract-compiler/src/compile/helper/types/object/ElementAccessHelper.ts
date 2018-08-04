@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
+import { DiagnosticMessage } from '../../../../DiagnosticMessage';
 import { isBuiltInMemberValue } from '../../../builtins';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
@@ -30,7 +31,7 @@ export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
 
     const createProcessBuiltIn = (builtInSymbol: ts.Symbol) => () => {
       if (!ts.isStringLiteral(prop)) {
-        sb.reportError(expr, 'Cannot index builtin', DiagnosticCode.CANNOT_INDEX_BUILTIN);
+        sb.reportError(expr, DiagnosticCode.InvalidBuiltinIndex, DiagnosticMessage.CannotIndexBuiltin);
 
         return;
       }
@@ -55,7 +56,7 @@ export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
       }
 
       if (!isBuiltInMemberValue(builtin)) {
-        sb.reportError(expr, 'Built-ins may not be referenced.', DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY);
+        sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltinProperty);
 
         return;
       }

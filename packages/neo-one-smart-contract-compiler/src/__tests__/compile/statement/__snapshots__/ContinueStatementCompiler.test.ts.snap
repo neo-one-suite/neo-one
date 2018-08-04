@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ContinueStatementCompiler continue label 1`] = `
-"snippetCode.ts (3,7): Unsupported syntax
+"snippetCode.ts (3,7): Unsupported syntax.
 
       1 | 
       2 |       let result = 0;

@@ -4,6 +4,7 @@ import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { DiagnosticCode } from '../DiagnosticCode';
+import { DiagnosticMessage } from '../DiagnosticMessage';
 import { deserializeType, SerializableType, serializeType } from './helper';
 import { BlockchainInterfaceName } from './helper/blockchain';
 import { ForType } from './helper/common';
@@ -439,11 +440,7 @@ class TupleValue extends SimpleSysCallType {
 
   public handleResult(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, type?: ts.Type, native = false): void {
     if (type === undefined) {
-      sb.reportError(
-        node,
-        'Syscall return type must be explicitly casted to expected type.',
-        DiagnosticCode.UNKNOWN_TYPE,
-      );
+      sb.reportError(node, DiagnosticCode.UnknownType, DiagnosticMessage.SyscallReturnTypeExplicitCast);
     } else {
       // [length, ...value]
       sb.emitOp(node, 'UNPACK');
@@ -542,11 +539,7 @@ class UnionValue extends SimpleSysCallType {
       if (native) {
         sb.emitHelper(node, options, sb.helpers.genericDeserialize);
       } else {
-        sb.reportError(
-          node,
-          'Syscall return type must be explicitly casted to expected type.',
-          DiagnosticCode.UNKNOWN_TYPE,
-        );
+        sb.reportError(node, DiagnosticCode.UnknownType, DiagnosticMessage.SyscallReturnTypeExplicitCast);
       }
     } else {
       foundType.handleResult(sb, node, options, type, native);

@@ -16,6 +16,7 @@ import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map'
 import ts from 'typescript';
 import { Context, DiagnosticOptions } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { Globals } from '../../symbols';
 import { binding } from '../binding';
 import { BuiltIns, BuiltInSymbols } from '../builtins';
@@ -433,8 +434,9 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     return { ...options, superClass: undefined };
   }
 
-  public reportError(node: ts.Node, message: string, code: DiagnosticCode): void {
-    this.context.reportError(node, message, code);
+  // tslint:disable-next-line no-any readonly-array
+  public reportError(node: ts.Node, code: DiagnosticCode, message: DiagnosticMessage, ...args: any[]): void {
+    this.context.reportError(node, code, message, ...args);
   }
 
   public reportUnsupported(node: ts.Node): void {

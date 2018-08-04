@@ -8,7 +8,7 @@ describe('Object', () => {
       class MyObject extends Object {
       }
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_EXTEND_BUILTIN },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinExtend },
     );
   });
 
@@ -18,7 +18,7 @@ describe('Object', () => {
       class MyObject implements Object {
       }
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_IMPLEMENT_BUILTIN },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
     );
   });
 
@@ -27,7 +27,7 @@ describe('Object', () => {
       `
       const x = Object;
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_REFERENCE_BUILTIN },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 });

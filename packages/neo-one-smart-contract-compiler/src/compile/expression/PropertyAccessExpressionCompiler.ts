@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { isBuiltInMemberValue } from '../builtins';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -19,7 +20,11 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
       const builtin = sb.builtIns.get(symbol);
       if (builtin !== undefined) {
         if (!isBuiltInMemberValue(builtin)) {
-          sb.reportError(expr, 'Built-ins may not be referenced.', DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY);
+          sb.reportError(
+            expr,
+            DiagnosticCode.InvalidBuiltinReference,
+            DiagnosticMessage.CannotReferenceBuiltinProperty,
+          );
 
           return;
         }
@@ -55,7 +60,7 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
       }
 
       if (!isBuiltInMemberValue(builtin)) {
-        sb.reportError(expr, 'Built-ins may not be referenced.', DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY);
+        sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltinProperty);
 
         return;
       }

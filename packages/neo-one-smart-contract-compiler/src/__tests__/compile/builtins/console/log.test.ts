@@ -95,7 +95,7 @@ describe('console.log', () => {
       `
       const log = console.log;
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 });

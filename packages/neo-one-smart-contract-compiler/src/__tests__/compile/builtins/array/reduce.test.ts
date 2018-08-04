@@ -41,7 +41,7 @@ describe('Array.prototype.map', () => {
       const x = [0, 1, 2];
       const y = x.map;
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 });

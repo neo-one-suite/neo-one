@@ -7,6 +7,7 @@ import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { Globals, LibAliases, Libs } from '../../symbols';
 import { getIdentifier, toABIReturn } from '../../utils';
 import { declarations } from '../declaration';
@@ -342,8 +343,9 @@ export class NEOTranspiler implements Transpiler {
     return this.isLibSymbol(node, aliasSymbol === undefined ? tsUtils.type_.getSymbol(type) : aliasSymbol, 'Fixed');
   }
 
-  public reportError(node: ts.Node, message: string, code: DiagnosticCode): void {
-    this.context.reportError(node, message, code);
+  // tslint:disable-next-line no-any readonly-array
+  public reportError(node: ts.Node, code: DiagnosticCode, message: DiagnosticMessage, ...args: any[]): void {
+    this.context.reportError(node, code, message, ...args);
   }
 
   public reportUnsupported(node: ts.Node): void {
@@ -351,9 +353,7 @@ export class NEOTranspiler implements Transpiler {
   }
 
   public getFinalTypeNode(node: ts.Node, type: ts.Type | undefined, typeNode: ts.TypeNode): ts.TypeNode {
-    if (type === undefined) {
-      this.reportError(node, 'Unknown type', DiagnosticCode.UNKNOWN_TYPE);
-    } else if (this.isFixedType(node, type)) {
+    if (type !== undefined && this.isFixedType(node, type)) {
       return tsUtils.setOriginal(ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword), typeNode);
     }
 
@@ -402,7 +402,11 @@ export class NEOTranspiler implements Transpiler {
     const typeArguments = tsUtils.argumented.getTypeArguments(call);
     const nameArg = callArguments[0] as ts.Node | undefined;
     if (nameArg === undefined || !ts.isStringLiteral(nameArg)) {
-      this.reportError(call, 'Invalid event specification.', DiagnosticCode.INVALID_CONTRACT_EVENT);
+      this.reportError(
+        nameArg === undefined ? call : nameArg,
+        DiagnosticCode.InvalidContractEvent,
+        DiagnosticMessage.InvalidContractEventNameStringLiteral,
+      );
 
       return undefined;
     }
@@ -411,13 +415,21 @@ export class NEOTranspiler implements Transpiler {
     const parameters = _.zip(callArguments.slice(1), typeArguments === undefined ? [] : typeArguments)
       .map(([paramNameArg, paramTypeNode]) => {
         if (paramNameArg === undefined || paramTypeNode === undefined) {
-          this.reportError(call, 'Invalid event specification.', DiagnosticCode.INVALID_CONTRACT_EVENT);
+          this.reportError(
+            call,
+            DiagnosticCode.InvalidContractEvent,
+            DiagnosticMessage.InvalidContractEventMissingType,
+          );
 
           return undefined;
         }
 
         if (!ts.isStringLiteral(paramNameArg)) {
-          this.reportError(paramNameArg, 'Invalid event specification.', DiagnosticCode.INVALID_CONTRACT_EVENT);
+          this.reportError(
+            paramNameArg,
+            DiagnosticCode.InvalidContractEvent,
+            DiagnosticMessage.InvalidContractEventArgStringLiteral,
+          );
 
           return undefined;
         }
@@ -431,7 +443,7 @@ export class NEOTranspiler implements Transpiler {
     const parent = tsUtils.node.getParent(call);
     const replacements = new Map<ts.CallExpression, string>();
     if (!ts.isVariableDeclaration(parent)) {
-      this.reportError(nameArg, 'Invalid event specification.', DiagnosticCode.INVALID_CONTRACT_EVENT);
+      this.reportError(nameArg, DiagnosticCode.InvalidContractEvent, DiagnosticMessage.InvalidContractEventDeclaration);
     } else {
       const identifier = tsUtils.node.getNameNode(parent);
       tsUtils.reference
@@ -739,8 +751,8 @@ export class NEOTranspiler implements Transpiler {
     if (properties === undefined) {
       this.reportError(
         this.smartContract,
-        'Invalid smart contract properties definition.',
-        DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
+        DiagnosticCode.InvalidContractProperties,
+        DiagnosticMessage.InvalidContractPropertiesMissing,
       );
 
       return defaultContract;
@@ -753,8 +765,8 @@ export class NEOTranspiler implements Transpiler {
     if (decls.length !== 1) {
       this.reportError(
         this.smartContract,
-        'Invalid smart contract properties definition.',
-        DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
+        DiagnosticCode.InvalidContractProperties,
+        DiagnosticMessage.InvalidContractPropertiesInitializer,
       );
 
       return defaultContract;
@@ -766,8 +778,8 @@ export class NEOTranspiler implements Transpiler {
     if (!ts.isObjectLiteralExpression(initializer)) {
       this.reportError(
         this.smartContract,
-        'Invalid smart contract properties definition.',
-        DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
+        DiagnosticCode.InvalidContractProperties,
+        DiagnosticMessage.InvalidContractPropertiesInitializer,
       );
 
       return defaultContract;
@@ -778,9 +790,9 @@ export class NEOTranspiler implements Transpiler {
     for (const property of tsUtils.object_.getProperties(initializer)) {
       if (!ts.isPropertyAssignment(property)) {
         this.reportError(
-          this.smartContract,
-          'Invalid smart contract properties definition.',
-          DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
+          property,
+          DiagnosticCode.InvalidContractProperties,
+          DiagnosticMessage.InvalidContractPropertiesInitializer,
         );
 
         return defaultContract;
@@ -790,9 +802,9 @@ export class NEOTranspiler implements Transpiler {
       const value = tsUtils.initializer.getInitializer(property);
       if (!ts.isLiteralExpression(value)) {
         this.reportError(
-          this.smartContract,
-          'Invalid smart contract properties definition.',
-          DiagnosticCode.INVALID_CONTRACT_PROPERTIES,
+          value,
+          DiagnosticCode.InvalidContractProperties,
+          DiagnosticMessage.InvalidContractPropertiesInitializer,
         );
 
         return defaultContract;
@@ -873,11 +885,7 @@ export class NEOTranspiler implements Transpiler {
           decls.some((accessor) => ts.isSetAccessorDeclaration(accessor)))
       )
     ) {
-      this.reportError(
-        tsUtils.symbol.getDeclarations(symbol)[0],
-        'Invalid contract function. Resolved to multiple implementation declarations.',
-        DiagnosticCode.INVALID_CONTRACT_METHOD,
-      );
+      this.reportUnsupported(tsUtils.symbol.getDeclarations(symbol)[0]);
 
       return [];
     }
@@ -987,8 +995,8 @@ export class NEOTranspiler implements Transpiler {
     if (callSignatures.length !== 1) {
       this.reportError(
         decl,
-        'Invalid contract function. Resolved to multiple call signatures.',
-        DiagnosticCode.INVALID_CONTRACT_METHOD,
+        DiagnosticCode.InvalidContractMethod,
+        DiagnosticMessage.InvalidContractMethodMultipleSignatures,
       );
 
       return [];

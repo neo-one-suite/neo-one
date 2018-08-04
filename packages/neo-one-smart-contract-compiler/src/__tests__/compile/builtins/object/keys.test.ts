@@ -79,7 +79,7 @@ describe('Object.keys', () => {
       `
       const keys = Object.keys;
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 
@@ -88,7 +88,7 @@ describe('Object.keys', () => {
       `
       const keys = Object['keys'];
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_REFERENCE_BUILTIN_PROPERTY },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 });

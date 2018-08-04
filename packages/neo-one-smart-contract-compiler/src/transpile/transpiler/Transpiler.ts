@@ -1,5 +1,6 @@
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { Globals, Libs } from '../../symbols';
 
 export interface Transpiler {
@@ -13,6 +14,7 @@ export interface Transpiler {
   readonly isOnlyLib: (node: ts.Node, type: ts.Type | undefined, name: keyof Libs) => boolean;
   readonly isSmartContract: (node: ts.ClassDeclaration) => boolean;
   readonly isFixedType: (node: ts.Node, type: ts.Type | undefined) => boolean;
-  readonly reportError: (node: ts.Node, message: string, code: DiagnosticCode) => void;
+  // tslint:disable-next-line no-any readonly-array
+  readonly reportError: (node: ts.Node, code: DiagnosticCode, message: DiagnosticMessage, ...args: any[]) => void;
   readonly reportUnsupported: (node: ts.Node) => void;
 }

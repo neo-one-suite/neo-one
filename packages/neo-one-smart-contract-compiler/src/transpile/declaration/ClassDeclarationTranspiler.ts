@@ -3,6 +3,7 @@ import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { NodeTranspiler } from '../NodeTranspiler';
 import { Transpiler } from '../transpiler';
 
@@ -107,11 +108,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
   private transpileDeploy(transpiler: Transpiler, node: ts.ClassDeclaration): ts.ClassDeclaration {
     const existingDeploy = tsUtils.class_.getInstanceMethod(node, DEPLOY_METHOD);
     if (existingDeploy !== undefined) {
-      transpiler.reportError(
-        existingDeploy,
-        'The deploy method is reserved in SmartContract instances.',
-        DiagnosticCode.UNSUPPORTED_SYNTAX,
-      );
+      transpiler.reportError(existingDeploy, DiagnosticCode.InvalidContractMethod, DiagnosticMessage.DeployReserved);
 
       return node;
     }

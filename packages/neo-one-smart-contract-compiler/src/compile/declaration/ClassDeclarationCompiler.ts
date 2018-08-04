@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { BuiltInExtend, isBuiltInExtend } from '../builtins';
 import { InternalFunctionProperties } from '../helper';
 import { NodeCompiler } from '../NodeCompiler';
@@ -26,7 +27,11 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
           const foundBuiltin = sb.builtIns.get(superClassSymbol);
           if (foundBuiltin !== undefined) {
             if (!isBuiltInExtend(foundBuiltin)) {
-              sb.reportError(superClassExpr, 'Built-ins cannot be extended.', DiagnosticCode.CANNOT_EXTEND_BUILTIN);
+              sb.reportError(
+                superClassExpr,
+                DiagnosticCode.InvalidBuiltinExtend,
+                DiagnosticMessage.CannotExtendBuiltin,
+              );
 
               return;
             }
@@ -63,7 +68,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
     });
 
     if (implementsBuiltIn !== undefined) {
-      sb.reportError(decl, 'Built-ins cannot be implemented.', DiagnosticCode.CANNOT_IMPLEMENT_BUILTIN);
+      sb.reportError(decl, DiagnosticCode.InvalidBuiltinImplement, DiagnosticMessage.CannotImplementBuiltin);
 
       return;
     }

@@ -7,6 +7,7 @@ import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { isBuiltInInstanceOf } from '../builtins';
 import { Helper } from '../helper';
 import { TypedHelperOptions } from '../helper/common';
@@ -491,7 +492,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
       const builtin = sb.builtIns.get(rightSymbol);
       if (builtin !== undefined) {
         if (!isBuiltInInstanceOf(builtin)) {
-          sb.reportError(node, 'Cannot call instanceof on builtin', DiagnosticCode.CANNOT_INSTANCEOF_BUILTIN);
+          sb.reportError(node, DiagnosticCode.InvalidBuiltinInstanceof, DiagnosticMessage.CannotInstanceofBuiltin);
 
           return;
         }

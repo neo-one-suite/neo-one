@@ -8,7 +8,7 @@ describe('Array', () => {
       class MyArray extends Array<number> {
       }
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_EXTEND_BUILTIN },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinExtend },
     );
   });
 
@@ -18,7 +18,7 @@ describe('Array', () => {
       class MyArray implements Array<number> {
       }
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_IMPLEMENT_BUILTIN },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
     );
   });
 
@@ -27,7 +27,7 @@ describe('Array', () => {
       `
       const x = Array;
     `,
-      { type: 'error', code: DiagnosticCode.CANNOT_REFERENCE_BUILTIN },
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 });

@@ -6,6 +6,7 @@ import { VisitOptions } from '../types';
 import { Name, Scope } from './Scope';
 
 import * as constants from '../../constants';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 
 class IdentifierName implements Name {
   public readonly nameBrand = 0;
@@ -74,7 +75,7 @@ export class ResolvedScope implements Scope {
     const position = this.getPosition(name);
     if (position === undefined) {
       if (this.parent === undefined) {
-        sb.reportError(node, `Unknown reference: ${name}`, DiagnosticCode.REFERENCE_ERROR);
+        sb.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
       } else {
         this.parent.set(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }
@@ -106,7 +107,7 @@ export class ResolvedScope implements Scope {
           // tslint:disable-next-line no-any
           sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: name as any }));
         } else {
-          sb.reportError(node, `Unknown reference: ${name}`, DiagnosticCode.REFERENCE_ERROR);
+          sb.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
         }
       } else {
         this.parent.get(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
