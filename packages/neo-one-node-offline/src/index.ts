@@ -209,8 +209,10 @@ const writeOut = async (blockchain: Blockchain, out: Writable, height: number): 
     for (const block of blocks) {
       const buffer = block.serializeWire();
       const length = Buffer.alloc(4, 0);
-      await new Promise<void>((resolve) => out.write(length, resolve));
-      await new Promise<void>((resolve) => out.write(buffer, resolve));
+      // tslint:disable-next-line no-unnecessary-callback-wrapper
+      await new Promise<void>((resolve) => out.write(length, () => resolve()));
+      // tslint:disable-next-line no-unnecessary-callback-wrapper
+      await new Promise<void>((resolve) => out.write(buffer, () => resolve()));
       processed += 1;
       if (processed >= 100000) {
         // tslint:disable-next-line no-console

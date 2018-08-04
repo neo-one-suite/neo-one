@@ -5,7 +5,7 @@
   "main": "./src/index.ts",
   "browser": "./src/index.browser.ts",
   "dependencies": {
-    "@babel/code-frame": "^7.0.0-beta.55",
+    "@babel/code-frame": "^7.0.0-beta.56",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3"
   }
