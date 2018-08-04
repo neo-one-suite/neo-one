@@ -2,7 +2,7 @@ import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { BlockchainInterfaceName } from './InternalBlockchainInterfaceProperties';
+import { BlockchainInterfaceName } from './BlockchainInterfaceName';
 
 export interface IsBlockchainInterfaceHelperOptions {
   readonly name: BlockchainInterfaceName;

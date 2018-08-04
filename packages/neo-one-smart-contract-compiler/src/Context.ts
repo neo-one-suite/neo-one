@@ -115,6 +115,13 @@ export class Context {
       }
     }
 
+    if (type !== undefined) {
+      const constraintType = tsUtils.type_.getConstraint(type);
+      if (constraintType !== undefined) {
+        return constraintType;
+      }
+    }
+
     return type;
   }
 
@@ -122,18 +129,33 @@ export class Context {
     node: ts.Node,
     { warning = true, error = false }: DiagnosticOptions = { warning: true, error: false },
   ): ts.Symbol | undefined {
-    let symbol = tsUtils.node.getSymbol(this.typeChecker, node);
-    const noWarnOrError = { warning: false, error: false };
-    const type = this.getType(node, noWarnOrError);
+    const symbol = tsUtils.node.getSymbol(this.typeChecker, node);
     if (symbol === undefined) {
-      symbol = this.getSymbolForType(node, type, noWarnOrError);
-    }
-
-    if (symbol === undefined) {
-      if (type !== undefined && !tsUtils.type_.isSymbolic(type)) {
-        return undefined;
+      if (error) {
+        this.reportSymbolError(node);
+      } else if (warning) {
+        this.reportSymbolWarning(node);
       }
 
+      return undefined;
+    }
+
+    const aliased = tsUtils.symbol.getAliasedSymbol(this.typeChecker, symbol);
+    if (aliased !== undefined) {
+      return aliased;
+    }
+
+    return symbol;
+  }
+
+  public getTypeSymbol(
+    node: ts.Node,
+    { warning = true, error = false }: DiagnosticOptions = { warning: true, error: false },
+  ): ts.Symbol | undefined {
+    const noWarnOrError = { warning: false, error: false };
+    const type = this.getType(node, noWarnOrError);
+    const symbol = this.getSymbolForType(node, type, noWarnOrError);
+    if (symbol === undefined) {
       if (error) {
         this.reportSymbolError(node);
       } else if (warning) {

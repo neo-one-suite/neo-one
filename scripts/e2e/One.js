@@ -107,7 +107,7 @@ class One {
 
   async until(func, timeoutMSIn) {
     const start = Date.now();
-    const timeoutMS = timeoutMSIn == null ? 60 * 1000 : timeoutMSIn;
+    const timeoutMS = timeoutMSIn == null ? 90 * 1000 : timeoutMSIn;
     let finalError;
     while (Date.now() - start < timeoutMS) {
       try {

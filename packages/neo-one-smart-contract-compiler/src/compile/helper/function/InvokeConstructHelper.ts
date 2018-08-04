@@ -1,9 +1,8 @@
 import ts from 'typescript';
-
+import { InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { InternalFunctionProperties } from './InternalFunctionProperties';
 
 export interface InvokeConstructHelperOptions {
   readonly noArgs?: boolean;
@@ -22,7 +21,7 @@ export class InvokeConstructHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // ['construct', objectVal, thisObjectVal, ?argsarray]
-    sb.emitPushString(node, InternalFunctionProperties.Construct);
+    sb.emitPushInt(node, InternalObjectProperty.Construct);
     // [func, thisObjectVal, ?argsarray]
     sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
     // [func, ?argsarray]

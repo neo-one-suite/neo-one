@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`IArguments cannot be implemented 1`] = `
+"snippetCode.ts (2,7): Built-ins cannot be implemented.
+
+      1 | 
+    > 2 |       class MyArray implements IArguments {
+        |       ^
+      3 |       }
+      4 |     
+"
+`;
+
+exports[`IArguments cannot be referenced 1`] = `
+"snippetCode.ts (3,19): Builtins cannot be referenced
+
+      1 | 
+      2 |       const y = () => {
+    > 3 |         const x = arguments;
+        |                   ^
+      4 |       }
+      5 |     
+"
+`;

@@ -15,11 +15,7 @@ interface Function {}
 interface FunctionConstructor {}
 declare const Function: FunctionConstructor;
 
-interface IArguments {
-  [index: number]: any;
-  length: number;
-  callee: Function;
-}
+interface IArguments {}
 
 interface Object {}
 interface ObjectConstructor {
@@ -38,9 +34,10 @@ declare const RegExp: RegExpConstructor;
 interface Error {
   message: string;
 }
+interface ErrorPrototype {}
 interface ErrorConstructor {
   new (message?: string): Error;
-  readonly prototype: Error;
+  readonly prototype: ErrorPrototype;
 }
 declare const Error: ErrorConstructor;
 
@@ -70,13 +67,7 @@ type BufferEncoding = 'ascii' | 'utf8' | 'utf16le' | 'ucs2' | 'base64' | 'latin1
 interface Buffer {
   equals(otherBuffer: Buffer): boolean;
 }
-
-/**
- * Raw data is stored in instances of the Buffer class.
- * A Buffer is similar to an array of integers but corresponds to a raw memory allocation outside the V8 heap.  A Buffer cannot be resized.
- * Valid string encodings: 'ascii'|'utf8'|'utf16le'|'ucs2'(alias of 'utf16le')|'base64'|'hex'
- */
-declare var Buffer: {
+interface BufferConstructor {
   /**
    * Creates a new Buffer containing the given JavaScript string {str}.
    * If provided, the {encoding} parameter identifies the character encoding.
@@ -92,7 +83,13 @@ declare var Buffer: {
    * @param list An array of Buffer objects to concatenate
    */
   concat(list: Buffer[]): Buffer;
-};
+}
+/**
+ * Raw data is stored in instances of the Buffer class.
+ * A Buffer is similar to an array of integers but corresponds to a raw memory allocation outside the V8 heap.  A Buffer cannot be resized.
+ * Valid string encodings: 'ascii'|'utf8'|'utf16le'|'ucs2'(alias of 'utf16le')|'base64'|'hex'
+ */
+declare var Buffer: BufferConstructor;
 
 interface Console {
   /**
@@ -164,7 +161,6 @@ interface Array<T> {
 
   [n: number]: T;
 }
-
 interface ArrayConstructor {}
 declare const Array: ArrayConstructor;
 
@@ -174,7 +170,6 @@ interface Map<K, V> {
   get(key: K): V | undefined;
   set(key: K, value: V): this;
 }
-
 interface MapConstructor {
   new <K = any, V = any>(): Map<K, V>;
   readonly prototype: Map<any, any>;

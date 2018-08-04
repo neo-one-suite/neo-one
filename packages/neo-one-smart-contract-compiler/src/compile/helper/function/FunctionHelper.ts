@@ -23,10 +23,6 @@ export class FunctionHelper extends Helper {
       const jump = sb.jumpTable.add(sb, node, () => {
         const innerOptions = { superClass: options.superClass };
         this.body(innerOptions);
-        // [val]
-        sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.createUndefined);
-        // []
-        sb.emitHelper(node, innerOptions, sb.helpers.return);
       });
       sb.emitPushInt(node, jump);
     }

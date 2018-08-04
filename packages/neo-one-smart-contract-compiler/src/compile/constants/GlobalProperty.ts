@@ -1,0 +1,8 @@
+export enum GlobalProperty {
+  Error = 0,
+  Map = 1,
+  Arguments = 2,
+  Modules = 3,
+  GenericSerialize = 4,
+  GenericDeserialize = 5,
+}

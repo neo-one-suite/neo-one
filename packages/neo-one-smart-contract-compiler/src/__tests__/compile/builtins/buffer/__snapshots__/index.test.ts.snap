@@ -1,16 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Buffer cannot be extended 1`] = `
-"snippetCode.ts (2,30): Builtins cannot be extended.
-
-      1 | 
-    > 2 |       class MyBuffer extends Buffer {
-        |                              ^
-      3 |       }
-      4 |     
-"
-`;
-
 exports[`Buffer cannot be implemented 1`] = `
 "snippetCode.ts (2,7): Built-ins cannot be implemented.
 

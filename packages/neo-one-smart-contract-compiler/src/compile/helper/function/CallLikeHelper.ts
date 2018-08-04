@@ -12,7 +12,7 @@ import { Helper } from '../Helper';
 export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplateExpression> {
   public emit(sb: ScriptBuilder, expr: ts.CallExpression | ts.TaggedTemplateExpression, optionsIn: VisitOptions): void {
     const func = ts.isCallExpression(expr) ? tsUtils.expression.getExpression(expr) : tsUtils.template.getTag(expr);
-    const symbol = sb.getSymbol(func);
+    const symbol = sb.getSymbol(func, { warning: false });
     if (ts.isIdentifier(func) && sb.isGlobalSymbol(func, symbol, 'syscall')) {
       if (!ts.isCallExpression(expr)) {
         sb.reportUnsupported(expr);
@@ -27,7 +27,8 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
 
     if (symbol !== undefined) {
       const builtin = sb.builtIns.get(symbol);
-      if (builtin !== undefined) {
+      // We would have reported an error if this was an invalid extend of a builtin.
+      if (builtin !== undefined && !tsUtils.guards.isSuperExpression(func)) {
         if (!isBuiltInCall(builtin) || !ts.isCallExpression(expr)) {
           sb.reportUnsupported(expr);
 

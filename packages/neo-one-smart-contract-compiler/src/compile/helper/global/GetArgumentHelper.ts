@@ -1,9 +1,8 @@
 import ts from 'typescript';
-
+import { GlobalProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { TypedHelper } from '../common';
-import { InternalGlobalProperties } from './InternalGlobalProperties';
 
 // Input: [numberVal]
 // Output: [value]
@@ -14,12 +13,8 @@ export class GetArgumentHelper extends TypedHelper {
 
       return;
     }
-    // [globalObjectVal, numberVal]
-    sb.scope.getGlobal(sb, node, options);
-    // [arguments, globalObjectVal, numberVal]
-    sb.emitPushString(node, InternalGlobalProperties.Arguments);
-    // [argv, numberVal]
-    sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
+    // [argv]
+    sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: GlobalProperty.Arguments }));
     // [numberVal, argv]
     sb.emitOp(node, 'SWAP');
     // [number, argv]

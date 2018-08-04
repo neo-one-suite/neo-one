@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { WellKnownSymbol } from '../../helper/types/WellKnownSymbol';
+import { WellKnownSymbol } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { BuiltInBase, BuiltInMemberValue, BuiltInType } from '../types';

@@ -1,6 +1,5 @@
 import ts from 'typescript';
-
-import { InternalFunctionProperties } from '../helper';
+import { InternalObjectProperty } from '../constants';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -21,7 +20,7 @@ export class ArrowFunctionCompiler extends NodeCompiler<ts.ArrowFunction> {
         expr,
         options,
         sb.helpers.createFunctionObject({
-          property: InternalFunctionProperties.Call,
+          property: InternalObjectProperty.Call,
         }),
       );
     }

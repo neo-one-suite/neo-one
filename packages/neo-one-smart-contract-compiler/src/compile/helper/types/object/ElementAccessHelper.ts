@@ -222,13 +222,13 @@ export class ElementAccessHelper extends Helper<ts.ElementAccessExpression> {
       sb.helpers.forBuiltInType({
         type: valueType,
         array: processArray,
-        boolean: createProcessBuiltIn(sb.builtInSymbols.boolean),
-        buffer: createProcessBuiltIn(sb.builtInSymbols.buffer),
+        boolean: createProcessBuiltIn(sb.builtInSymbols.booleanInstance),
+        buffer: createProcessBuiltIn(sb.builtInSymbols.bufferInstance),
         null: throwTypeError,
-        number: createProcessBuiltIn(sb.builtInSymbols.number),
+        number: createProcessBuiltIn(sb.builtInSymbols.numberInstance),
         object: processObject,
-        string: createProcessBuiltIn(sb.builtInSymbols.string),
-        symbol: createProcessBuiltIn(sb.builtInSymbols.symbol),
+        string: createProcessBuiltIn(sb.builtInSymbols.stringInstance),
+        symbol: createProcessBuiltIn(sb.builtInSymbols.symbolInstance),
         undefined: throwTypeError,
       }),
     );

@@ -15,7 +15,9 @@ export class ArrayLength extends BuiltInBase implements BuiltInMemberValue {
     visited = false,
   ): void {
     if (!options.pushValue) {
-      sb.emitOp(node, 'DROP');
+      if (visited) {
+        sb.emitOp(node, 'DROP');
+      }
 
       return;
     }

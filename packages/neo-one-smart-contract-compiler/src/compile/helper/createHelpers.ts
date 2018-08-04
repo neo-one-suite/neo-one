@@ -22,11 +22,14 @@ import {
   WrapBlockchainInterfaceHelper,
   WrapBlockchainInterfaceHelperOptions,
 } from './blockchain';
+import { CreateClassHelper, CreateClassHelperOptions } from './class';
 import {
   ArrSliceHelper,
   ArrSliceHelperOptions,
   CloneArrayHelper,
   ConsoleLogHelper,
+  DebugLogHelper,
+  DebugLogHelperOptions,
   ExpHelper,
   ForTypeHelper,
   ForTypeHelperOptions,
@@ -42,7 +45,7 @@ import {
   ThrowCompletionHelper,
   ThrowHelper,
 } from './completionRecord';
-import { ThrowTypeErrorHelper } from './error';
+import { CreateErrorHelper, GetErrorClassHelper, ThrowTypeErrorHelper } from './error';
 import {
   ArgumentsHelper,
   BindFunctionObjectThisHelper,
@@ -75,24 +78,14 @@ import {
   ParametersHelper,
 } from './function';
 import {
-  AddArgumentsHelper,
-  AddBooleanObjectHelper,
-  AddErrorObjectHelper,
-  AddMapObjectHelper,
-  AddModulesHelper,
-  AddNumberObjectHelper,
-  AddObjectObjectHelper,
-  AddStringObjectHelper,
-  AddSymbolObjectHelper,
+  CreateGlobalObjectHelper,
   GetArgumentHelper,
   GetGlobalPropertyHelper,
   GetGlobalPropertyHelperOptions,
-  GLOBAL_PROPERTIES,
-  SetGlobalObjectHelper,
 } from './global';
 import { Helper } from './Helper';
 import { KeyedHelper } from './KeyedHelper';
-import { CreateMapHelper, GetMapValueHelper, SetMapValueHelper, UnwrapMapHelper, WrapMapHelper } from './map';
+import { GetMapClassHelper } from './map';
 import {
   AddEmptyModuleHelper,
   ExportHelper,
@@ -206,6 +199,7 @@ import {
 } from './types';
 
 export interface Helpers {
+  // arr
   readonly arrFilter: (options: ArrFilterHelperOptions) => ArrFilterHelper;
   readonly arrFilterFunc: ArrFilterFuncHelper;
   readonly arrMap: (options: ArrMapHelperOptions) => ArrMapHelper;
@@ -217,6 +211,10 @@ export interface Helpers {
   readonly arrReduceFunc: ArrReduceFuncHelper;
   readonly extendArr: ExtendArrHelper;
 
+  // class
+  readonly createClass: (options: CreateClassHelperOptions) => CreateClassHelper;
+
+  // common
   readonly arrSlice: (options?: ArrSliceHelperOptions) => ArrSliceHelper;
   readonly cloneArray: CloneArrayHelper;
   readonly forType: (options: ForTypeHelperOptions) => ForTypeHelper;
@@ -224,6 +222,11 @@ export interface Helpers {
   readonly genericSerialize: GenericSerializeHelper;
   readonly exp: ExpHelper;
   readonly consoleLog: ConsoleLogHelper;
+  readonly debugLog: (options: DebugLogHelperOptions) => DebugLogHelper;
+
+  // error
+  readonly createError: CreateErrorHelper;
+  readonly getErrorClass: GetErrorClassHelper;
 
   readonly equalsEqualsEquals: (options: EqualsEqualsEqualsHelperOptions) => EqualsEqualsEqualsHelper;
   readonly equalsEqualsEqualsNumber: EqualsEqualsEqualsNumberHelper;
@@ -336,11 +339,7 @@ export interface Helpers {
   readonly unwrapArray: UnwrapArrayHelper;
   readonly isArray: IsArrayHelper;
 
-  readonly getMapValue: GetMapValueHelper;
-  readonly createMap: CreateMapHelper;
-  readonly setMapValue: SetMapValueHelper;
-  readonly wrapMap: WrapMapHelper;
-  readonly unwrapMap: UnwrapMapHelper;
+  readonly getMapClass: GetMapClassHelper;
 
   readonly concatBuffer: ConcatBufferHelper;
   readonly createBuffer: CreateBufferHelper;
@@ -359,19 +358,9 @@ export interface Helpers {
   readonly wrapBlockchainInterface: (options: WrapBlockchainInterfaceHelperOptions) => WrapBlockchainInterfaceHelper;
   readonly unwrapBlockchainInterface: UnwrapBlockchainInterfaceHelper;
 
-  readonly addArguments: AddArgumentsHelper;
-  readonly addBooleanObject: AddBooleanObjectHelper;
-  readonly addErrorObject: AddErrorObjectHelper;
-  readonly addMapObject: AddMapObjectHelper;
-  readonly addModules: AddModulesHelper;
-  readonly addNumberObject: AddNumberObjectHelper;
-  readonly addObjectObject: AddObjectObjectHelper;
-  readonly addStringObject: AddStringObjectHelper;
-  readonly addSymbolObject: AddSymbolObjectHelper;
-  readonly setGlobalObject: SetGlobalObjectHelper;
+  readonly createGlobalObject: CreateGlobalObjectHelper;
   readonly getArgument: (options: TypedHelperOptions) => GetArgumentHelper;
   readonly getGlobalProperty: (options: GetGlobalPropertyHelperOptions) => GetGlobalPropertyHelper;
-  readonly globalProperties: Set<string>;
 }
 
 export const createHelpers = (): Helpers => {
@@ -392,6 +381,7 @@ export const createHelpers = (): Helpers => {
   }
 
   return {
+    // arr
     arrFilter: (options) => new ArrFilterHelper(options),
     arrFilterFunc: new ArrFilterFuncHelper(),
     arrMap: (options) => new ArrMapHelper(options),
@@ -403,6 +393,10 @@ export const createHelpers = (): Helpers => {
     arrReduceFunc: new ArrReduceFuncHelper(),
     extendArr: new ExtendArrHelper(),
 
+    // class
+    createClass: (options) => new CreateClassHelper(options),
+
+    // common
     arrSlice: (options = {}) => new ArrSliceHelper(options),
     cloneArray: new CloneArrayHelper(),
     forType: (options) => new ForTypeHelper(options),
@@ -410,6 +404,11 @@ export const createHelpers = (): Helpers => {
     genericSerialize: new GenericSerializeHelper(),
     exp: new ExpHelper(),
     consoleLog: new ConsoleLogHelper(),
+    debugLog: (options) => new DebugLogHelper(options),
+
+    // error
+    createError: new CreateErrorHelper(),
+    getErrorClass: new GetErrorClassHelper(),
 
     equalsEqualsEquals: (options) => new EqualsEqualsEqualsHelper(options),
     equalsEqualsEqualsNumber: new EqualsEqualsEqualsNumberHelper(),
@@ -518,11 +517,7 @@ export const createHelpers = (): Helpers => {
     unwrapArray: new UnwrapArrayHelper(),
     isArray: new IsArrayHelper(),
 
-    getMapValue: new GetMapValueHelper(),
-    createMap: new CreateMapHelper(),
-    setMapValue: new SetMapValueHelper(),
-    wrapMap: new WrapMapHelper(),
-    unwrapMap: new UnwrapMapHelper(),
+    getMapClass: new GetMapClassHelper(),
 
     concatBuffer: new ConcatBufferHelper(),
     createBuffer: new CreateBufferHelper(),
@@ -541,18 +536,8 @@ export const createHelpers = (): Helpers => {
     wrapBlockchainInterface: (options) => new WrapBlockchainInterfaceHelper(options),
     unwrapBlockchainInterface: new UnwrapBlockchainInterfaceHelper(),
 
-    addArguments: new AddArgumentsHelper(),
-    addBooleanObject: new AddBooleanObjectHelper(),
-    addErrorObject: new AddErrorObjectHelper(),
-    addMapObject: new AddMapObjectHelper(),
-    addModules: new AddModulesHelper(),
-    addNumberObject: new AddNumberObjectHelper(),
-    addObjectObject: new AddObjectObjectHelper(),
-    addStringObject: new AddStringObjectHelper(),
-    addSymbolObject: new AddSymbolObjectHelper(),
-    setGlobalObject: new SetGlobalObjectHelper(),
+    createGlobalObject: new CreateGlobalObjectHelper(),
     getArgument: (options) => new GetArgumentHelper(options),
     getGlobalProperty: (options) => new GetGlobalPropertyHelper(options),
-    globalProperties: GLOBAL_PROPERTIES,
   };
 };

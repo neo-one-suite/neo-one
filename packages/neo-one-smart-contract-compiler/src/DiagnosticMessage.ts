@@ -4,7 +4,6 @@ export enum DiagnosticMessage {
   CouldNotInferTypeDeopt = 'Could not infer type. Deoptimized implementation will be used. Add an explicit type annotation ',
   CouldNotInferSymbol = 'Could not infer symbol.',
   CouldNotInferSymbolDeopt = 'Could not infer symbol. Deoptimized implementation will be used.',
-  CannotExtendBuiltin = 'Builtins cannot be extended.',
   CannotImplementBuiltin = 'Built-ins cannot be implemented.',
   CannotReferenceBuiltinProperty = 'Builtin properties cannot be referenced',
   CannotModifyBuiltin = 'Builtins cannot be modified',

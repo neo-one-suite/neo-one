@@ -12,7 +12,6 @@ export * from './CreateFunctionObjectHelper';
 export * from './FunctionHelper';
 export * from './FunctionLikeHelper';
 export * from './GetCallableHelper';
-export * from './InternalFunctionProperties';
 export * from './InvokeCallHelper';
 export * from './InvokeConstructHelper';
 export * from './NewHelper';

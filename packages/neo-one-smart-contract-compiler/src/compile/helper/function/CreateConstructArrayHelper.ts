@@ -6,19 +6,19 @@ import { Helper } from '../Helper';
 
 export interface CreateConstructArrayHelperOptions {
   readonly body: (options: VisitOptions) => void;
-  readonly withoutScope?: boolean;
+  readonly withScope: boolean;
 }
 
 // Input: []
 // Output: [farr]
 export class CreateConstructArrayHelper extends Helper {
   private readonly body: (options: VisitOptions) => void;
-  private readonly withoutScope: boolean;
+  private readonly withScope: boolean;
 
-  public constructor({ body, withoutScope }: CreateConstructArrayHelperOptions) {
+  public constructor({ body, withScope }: CreateConstructArrayHelperOptions) {
     super();
     this.body = body;
-    this.withoutScope = withoutScope || false;
+    this.withScope = withScope;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, outerOptions: VisitOptions): void {
@@ -28,9 +28,10 @@ export class CreateConstructArrayHelper extends Helper {
 
     const emit = (options: VisitOptions) => {
       // []
-      this.body(options);
+      this.body(sb.noPushValueOptions(options));
       // [undefinedVal]
       sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+      // []
       sb.emitHelper(node, options, sb.helpers.return);
     };
 
@@ -39,12 +40,12 @@ export class CreateConstructArrayHelper extends Helper {
       outerOptions,
       sb.helpers.createFunctionArray({
         body: (innerOptions) => {
-          if (this.withoutScope) {
-            emit(innerOptions);
-          } else {
+          if (this.withScope) {
             sb.withScope(node, innerOptions, (options) => {
               emit(options);
             });
+          } else {
+            emit(innerOptions);
           }
         },
       }),

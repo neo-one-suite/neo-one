@@ -1,6 +1,7 @@
 export * from './ArrSliceHelper';
 export * from './CloneArrayHelper';
 export * from './ConsoleLogHelper';
+export * from './DebugLogHelper';
 export * from './ExpHelper';
 export * from './ForTypeHelper';
 export * from './GenericDeserializeHelper';

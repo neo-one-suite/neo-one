@@ -119,16 +119,27 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
       this.nodes.set(sourceFile, 0);
       const options = {};
       this.mutableCurrentScope.emit(this, sourceFile, options, (innerOptions) => {
-        // []
-        this.emitHelper(sourceFile, this.pushValueOptions(options), this.helpers.setGlobalObject);
-        // [globalObjectVal]
-        this.scope.getGlobal(this, sourceFile, this.pushValueOptions(options));
-        // []
+        // [globalObject]
+        this.emitHelper(sourceFile, this.pushValueOptions(options), this.helpers.createGlobalObject);
+        // [globalObject, globalObject]
+        this.emitOp(sourceFile, 'DUP');
+        // [globalObject]
+        this.scope.setGlobal(this, sourceFile, this.pushValueOptions(options));
+        // [globalObject, globalObject]
+        this.emitOp(sourceFile, 'DUP');
+        // [globalObject]
         this.emitHelper(sourceFile, this.pushValueOptions(options), this.helpers.addEmptyModule);
-        // []
+        // [globalObject]
         this.allHelpers.forEach((helper) => {
+          if (helper.needsGlobal) {
+            // [globalObject, globalObject]
+            this.emitOp(sourceFile, 'DUP');
+          }
+          // [globalObject]
           helper.emitGlobal(this, sourceFile, innerOptions);
         });
+        // []
+        this.emitOp(sourceFile, 'DROP');
         this.visit(sourceFile, innerOptions);
       });
     });
@@ -328,11 +339,11 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
       const currentModuleIndex = this.mutableCurrentModuleIndex;
       this.mutableCurrentModuleIndex = moduleIndex;
 
-      // [globalObjectVal]
+      // [globalObject]
       this.scope.getGlobal(this, sourceFile, this.pushValueOptions(options));
-      // [globalObjectVal, globalObjectVal]
+      // [globalObject, globalObject]
       this.emitOp(sourceFile, 'DUP');
-      // [globalObjectVal]
+      // [globalObject]
       this.emitHelper(sourceFile, this.pushValueOptions(options), this.helpers.addEmptyModule);
 
       this.mutableCurrentScope.emit(this, sourceFile, options, (innerOptions) => {

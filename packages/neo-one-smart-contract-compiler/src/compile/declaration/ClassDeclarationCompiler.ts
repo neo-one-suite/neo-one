@@ -1,9 +1,8 @@
-import { tsUtils } from '@neo-one/ts-utils';
+import { PropertyNamedNode, tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
-import { BuiltInExtend, isBuiltInExtend } from '../builtins';
-import { InternalFunctionProperties } from '../helper';
+import { InternalObjectProperty } from '../constants';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -19,36 +18,9 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
     if (extendsExpr !== undefined) {
       superClassIn = sb.scope.addUnique();
       options = sb.superClassOptions(options, superClassIn);
-      const superClassExpr = tsUtils.expression.getExpression(extendsExpr);
-      let builtin: BuiltInExtend | undefined;
-      if (ts.isIdentifier(superClassExpr)) {
-        const superClassSymbol = sb.getSymbol(superClassExpr);
-        if (superClassSymbol !== undefined) {
-          const foundBuiltin = sb.builtIns.get(superClassSymbol);
-          if (foundBuiltin !== undefined) {
-            if (!isBuiltInExtend(foundBuiltin)) {
-              sb.reportError(
-                superClassExpr,
-                DiagnosticCode.InvalidBuiltinExtend,
-                DiagnosticMessage.CannotExtendBuiltin,
-              );
 
-              return;
-            }
-
-            builtin = foundBuiltin;
-          }
-        }
-      }
-
-      if (builtin === undefined) {
-        // [superClass]
-        sb.visit(tsUtils.expression.getExpression(extendsExpr), options);
-      } else {
-        // [superClass]
-        builtin.emitExtend(sb, tsUtils.expression.getExpression(extendsExpr), options);
-      }
-
+      // [superClass]
+      sb.visit(tsUtils.expression.getExpression(extendsExpr), options);
       // []
       sb.scope.set(sb, extendsExpr, options, superClassIn);
     }
@@ -56,7 +28,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
 
     const impl = tsUtils.class_.getImplementsArray(decl);
     const implementsBuiltIn = impl.find((implType) => {
-      const implSymbol = sb.getSymbol(implType);
+      const implSymbol = sb.getSymbol(tsUtils.expression.getExpression(implType));
       if (implSymbol === undefined) {
         /* istanbul ignore next */
         return false;
@@ -73,17 +45,81 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       return;
     }
 
+    const switchProperty = (
+      node: PropertyNamedNode,
+      innerOptions: VisitOptions,
+      handleString: (options: VisitOptions) => void,
+      handleSymbol: (options: VisitOptions) => void,
+    ): void => {
+      const nameNode = tsUtils.node.getNameNode(node);
+      if (ts.isComputedPropertyName(nameNode)) {
+        const expr = tsUtils.expression.getExpression(nameNode);
+        const throwTypeError = (innerInnerOptions: VisitOptions) => {
+          // []
+          sb.emitOp(node, 'DROP');
+          // []
+          sb.emitHelper(node, innerInnerOptions, sb.helpers.throwTypeError);
+        };
+
+        const processString = (innerInnerOptions: VisitOptions) => {
+          // [string]
+          sb.emitHelper(node, innerInnerOptions, sb.helpers.getString);
+          // []
+          handleString(innerInnerOptions);
+        };
+
+        const processSymbol = (innerInnerOptions: VisitOptions) => {
+          // [string, val]
+          sb.emitHelper(node, innerInnerOptions, sb.helpers.getSymbol);
+          // [val, string, val]
+          handleSymbol(innerInnerOptions);
+        };
+
+        sb.visit(expr, sb.pushValueOptions(innerOptions));
+
+        sb.emitHelper(
+          expr,
+          innerOptions,
+          sb.helpers.forBuiltInType({
+            type: sb.getType(expr),
+            array: throwTypeError,
+            boolean: throwTypeError,
+            buffer: throwTypeError,
+            null: throwTypeError,
+            number: throwTypeError,
+            object: throwTypeError,
+            string: processString,
+            symbol: processSymbol,
+            undefined: throwTypeError,
+          }),
+        );
+      } else {
+        // [string, val]
+        sb.emitPushString(node, tsUtils.node.getName(node));
+        // [val, string, val]
+        handleString(innerOptions);
+      }
+    };
+
     const addProperty = (property: ts.PropertyDeclaration, innerOptions: VisitOptions) => {
       const initializer = tsUtils.initializer.getInitializer(property);
       if (initializer !== undefined) {
         // [thisObjectVal, thisObjectVal]
         sb.emitOp(initializer, 'DUP');
-        // [prop, thisObjectVal, thisObjectVal]
-        sb.emitPushString(initializer, tsUtils.node.getName(property));
-        // [init, prop, thisObjectVal, thisObjectVal]
-        sb.visit(initializer, sb.pushValueOptions(innerOptions));
+
         // [thisObjectVal]
-        sb.emitHelper(initializer, innerOptions, sb.helpers.setDataPropertyObjectProperty);
+        switchProperty(
+          property,
+          innerOptions,
+          (innerInnerOptions) => {
+            sb.visit(initializer, sb.pushValueOptions(innerInnerOptions));
+            sb.emitHelper(initializer, innerOptions, sb.helpers.setDataPropertyObjectProperty);
+          },
+          (innerInnerOptions) => {
+            sb.visit(initializer, sb.pushValueOptions(innerInnerOptions));
+            sb.emitHelper(initializer, innerOptions, sb.helpers.setDataSymbolObjectProperty);
+          },
+        );
       }
     };
 
@@ -93,6 +129,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       decl,
       options,
       sb.helpers.createConstructArray({
+        withScope: true,
         body: (innerOptionsIn) => {
           const innerOptions = sb.pushValueOptions(innerOptionsIn);
           // [argsarr]
@@ -140,7 +177,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       decl,
       options,
       sb.helpers.createFunctionObject({
-        property: InternalFunctionProperties.Construct,
+        property: InternalObjectProperty.Construct,
       }),
     );
 
@@ -163,22 +200,35 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
     sb.emitHelper(decl, options, sb.helpers.setDataPropertyObjectProperty);
 
     const addMethod = (method: ts.MethodDeclaration) => {
+      const visit = (innerOptions: VisitOptions) => {
+        // [farr]
+        sb.emitHelper(method, innerOptions, sb.helpers.createCallArray);
+        // [methodObjectVal]
+        sb.emitHelper(
+          method,
+          innerOptions,
+          sb.helpers.createFunctionObject({
+            property: InternalObjectProperty.Call,
+          }),
+        );
+      };
       // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
       sb.emitOp(method, 'DUP');
       // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitPushString(method, tsUtils.node.getName(method));
-      // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitHelper(method, options, sb.helpers.createCallArray);
-      // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitHelper(
+
+      // [objectVal, 'prototype', fobjectVal, fobjectVal]
+      switchProperty(
         method,
         options,
-        sb.helpers.createFunctionObject({
-          property: InternalFunctionProperties.Call,
-        }),
+        (innerOptions) => {
+          visit(innerOptions);
+          sb.emitHelper(method, innerOptions, sb.helpers.setDataPropertyObjectProperty);
+        },
+        (innerOptions) => {
+          visit(innerOptions);
+          sb.emitHelper(method, innerOptions, sb.helpers.setDataSymbolObjectProperty);
+        },
       );
-      // [objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitHelper(method, options, sb.helpers.setDataPropertyObjectProperty);
     };
 
     tsUtils.class_.getConcreteInstanceMethods(decl).forEach((method) => {
@@ -193,40 +243,60 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
     });
 
     const addSetAccessor = (accessor: ts.SetAccessorDeclaration) => {
-      // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitOp(accessor, 'DUP');
-      // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitPushString(accessor, tsUtils.node.getName(accessor));
-      // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitHelper(accessor, options, sb.helpers.createCallArray);
-      // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitHelper(
-        accessor,
-        options,
-        sb.helpers.createFunctionObject({
-          property: InternalFunctionProperties.Call,
-        }),
-      );
-      const getAccessor = tsUtils.accessor.getGetAccessor(accessor);
-      const hasGet = getAccessor !== undefined;
-      if (getAccessor !== undefined) {
-        sb.emitHelper(getAccessor, options, sb.helpers.createCallArray);
+      const visit = (innerOptions: VisitOptions) => {
+        // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+        sb.emitHelper(accessor, innerOptions, sb.helpers.createCallArray);
+        // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
         sb.emitHelper(
-          getAccessor,
-          options,
+          accessor,
+          innerOptions,
           sb.helpers.createFunctionObject({
-            property: InternalFunctionProperties.Call,
+            property: InternalObjectProperty.Call,
           }),
         );
-      }
+        const getAccessor = tsUtils.accessor.getGetAccessor(accessor);
+        const hasGet = getAccessor !== undefined;
+        if (getAccessor !== undefined) {
+          sb.emitHelper(getAccessor, innerOptions, sb.helpers.createCallArray);
+          sb.emitHelper(
+            getAccessor,
+            innerOptions,
+            sb.helpers.createFunctionObject({
+              property: InternalObjectProperty.Call,
+            }),
+          );
+        }
+
+        return hasGet;
+      };
+      // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+      sb.emitOp(accessor, 'DUP');
       // [objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitHelper(
+      switchProperty(
         accessor,
         options,
-        sb.helpers.setAccessorPropertyObjectProperty({
-          hasSet: true,
-          hasGet,
-        }),
+        (innerOptions) => {
+          const hasGet = visit(innerOptions);
+          sb.emitHelper(
+            accessor,
+            options,
+            sb.helpers.setAccessorPropertyObjectProperty({
+              hasSet: true,
+              hasGet,
+            }),
+          );
+        },
+        (innerOptions) => {
+          const hasGet = visit(innerOptions);
+          sb.emitHelper(
+            accessor,
+            options,
+            sb.helpers.setAccessorSymbolObjectProperty({
+              hasSet: true,
+              hasGet,
+            }),
+          );
+        },
       );
     };
 
@@ -238,28 +308,48 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       });
 
     const addGetAccessor = (accessor: ts.GetAccessorDeclaration) => {
+      const visit = (innerOptions: VisitOptions) => {
+        // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+        sb.emitHelper(accessor, innerOptions, sb.helpers.createCallArray);
+        // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
+        sb.emitHelper(
+          accessor,
+          innerOptions,
+          sb.helpers.createFunctionObject({
+            property: InternalObjectProperty.Call,
+          }),
+        );
+      };
       // [objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
       sb.emitOp(accessor, 'DUP');
-      // [name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitPushString(accessor, tsUtils.node.getName(accessor));
-      // [farr, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitHelper(accessor, options, sb.helpers.createCallArray);
-      // [methodObjectVal, name, objectVal, objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitHelper(
-        accessor,
-        options,
-        sb.helpers.createFunctionObject({
-          property: InternalFunctionProperties.Call,
-        }),
-      );
       // [objectVal, 'prototype', fobjectVal, fobjectVal]
-      sb.emitHelper(
+      switchProperty(
         accessor,
         options,
-        sb.helpers.setAccessorPropertyObjectProperty({
-          hasSet: false,
-          hasGet: true,
-        }),
+        (innerOptions) => {
+          visit(innerOptions);
+          // [objectVal, 'prototype', fobjectVal, fobjectVal]
+          sb.emitHelper(
+            accessor,
+            options,
+            sb.helpers.setAccessorPropertyObjectProperty({
+              hasSet: false,
+              hasGet: true,
+            }),
+          );
+        },
+        (innerOptions) => {
+          visit(innerOptions);
+          // [objectVal, 'prototype', fobjectVal, fobjectVal]
+          sb.emitHelper(
+            accessor,
+            options,
+            sb.helpers.setAccessorSymbolObjectProperty({
+              hasSet: false,
+              hasGet: true,
+            }),
+          );
+        },
       );
     };
 

@@ -1,4 +1,4 @@
 import { BuiltInBase } from '../types';
 
-export class NumberValue extends BuiltInBase {}
+export class NumberInstance extends BuiltInBase {}
 export class NumberType extends BuiltInBase {}

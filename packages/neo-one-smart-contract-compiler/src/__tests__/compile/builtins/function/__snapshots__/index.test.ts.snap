@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Function cannot be implemented 1`] = `
+"snippetCode.ts (2,7): Built-ins cannot be implemented.
+
+      1 | 
+    > 2 |       class MyFunction implements Function {
+        |       ^
+      3 |       }
+      4 |     
+"
+`;
+
+exports[`Function cannot be referenced 1`] = `
+"snippetCode.ts (2,17): Builtins cannot be referenced
+
+      1 | 
+    > 2 |       const x = Function;
+        |                 ^
+      3 |     
+"
+`;

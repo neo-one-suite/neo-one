@@ -1,11 +1,9 @@
 import ts from 'typescript';
+import { InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import {
-  BlockchainInterfaceName,
-  InternalBlockchainInterfaceProperties,
-} from './InternalBlockchainInterfaceProperties';
+import { BlockchainInterfaceName } from './BlockchainInterfaceName';
 
 export interface WrapBlockchainInterfaceHelperOptions {
   readonly name: BlockchainInterfaceName;
@@ -44,7 +42,7 @@ export class WrapBlockchainInterfaceHelper extends Helper {
     // [objectVal, blockchainInterface, objectVal]
     sb.emitOp(node, 'OVER');
     // ['blockchain_interface', objectVal, blockchainInterface, objectVal]
-    sb.emitPushString(node, InternalBlockchainInterfaceProperties.BlockchainInterface);
+    sb.emitPushInt(node, InternalObjectProperty.BlockchainInterface);
     // [blockchainInterface, 'blockchain_interface', objectVal, objectVal]
     sb.emitOp(node, 'ROT');
     // [objectVal]

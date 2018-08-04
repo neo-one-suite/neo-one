@@ -1,4 +1,4 @@
-import { WellKnownSymbol } from '../../helper/types/WellKnownSymbol';
+import { WellKnownSymbol } from '../../constants';
 import { WellKnownSymbolBase } from './WellKnownSymbolBase';
 
 // tslint:disable-next-line export-name

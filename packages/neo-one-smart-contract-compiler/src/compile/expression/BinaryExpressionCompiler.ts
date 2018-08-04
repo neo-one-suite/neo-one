@@ -1,16 +1,12 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
-
-import { NodeCompiler } from '../NodeCompiler';
-import { ScriptBuilder } from '../sb';
-import { VisitOptions } from '../types';
-
-import { DiagnosticCode } from '../../DiagnosticCode';
-import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { isBuiltInInstanceOf } from '../builtins';
 import { Helper } from '../helper';
 import { TypedHelperOptions } from '../helper/common';
+import { NodeCompiler } from '../NodeCompiler';
+import { ScriptBuilder } from '../sb';
+import { VisitOptions } from '../types';
 
 type ExpressionOperatorKind = ts.BitwiseOperatorOrHigher | ts.SyntaxKind.CommaToken;
 export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> {
@@ -490,13 +486,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
     const rightSymbol = sb.getSymbol(right);
     if (rightSymbol !== undefined) {
       const builtin = sb.builtIns.get(rightSymbol);
-      if (builtin !== undefined) {
-        if (!isBuiltInInstanceOf(builtin)) {
-          sb.reportError(node, DiagnosticCode.InvalidBuiltinInstanceof, DiagnosticMessage.CannotInstanceofBuiltin);
-
-          return;
-        }
-
+      if (builtin !== undefined && isBuiltInInstanceOf(builtin)) {
         builtin.emitInstanceOf(sb, left, options);
 
         return;

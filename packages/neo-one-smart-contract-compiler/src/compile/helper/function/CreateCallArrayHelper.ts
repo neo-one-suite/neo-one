@@ -1,12 +1,16 @@
-import { BodiedNode, BodyableNode, tsUtils } from '@neo-one/ts-utils';
+import { BodiedNode, BodyableNode, ParameteredNode, tsUtils } from '@neo-one/ts-utils';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 // Input: []
 // Output: [farr]
-export class CreateCallArrayHelper extends Helper<BodiedNode | BodyableNode> {
-  public emit(sb: ScriptBuilder, node: BodiedNode | BodyableNode, outerOptions: VisitOptions): void {
+export class CreateCallArrayHelper extends Helper<(BodiedNode | BodyableNode) & ParameteredNode> {
+  public emit(
+    sb: ScriptBuilder,
+    node: (BodiedNode | BodyableNode) & ParameteredNode,
+    outerOptions: VisitOptions,
+  ): void {
     if (!outerOptions.pushValue) {
       return;
     }

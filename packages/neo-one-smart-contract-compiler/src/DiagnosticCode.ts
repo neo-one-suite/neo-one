@@ -2,7 +2,6 @@ export enum DiagnosticCode {
   GenericUnsupportedSyntax = 0,
   UnknownType,
   UnknownSymbol,
-  InvalidBuiltinExtend,
   InvalidBuiltinReference,
   InvalidBuiltinIndex,
   InvalidBuiltinInstanceof,

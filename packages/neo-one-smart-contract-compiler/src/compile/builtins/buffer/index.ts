@@ -7,7 +7,7 @@ export * from './concat';
 export * from './equals';
 export * from './from';
 
-export class BufferValue extends BuiltInBase implements BuiltInInstanceOf {
+export class BufferInstance extends BuiltInBase implements BuiltInInstanceOf {
   public readonly types = new Set([BuiltInType.InstanceOf]);
 
   public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, options: VisitOptions): void {

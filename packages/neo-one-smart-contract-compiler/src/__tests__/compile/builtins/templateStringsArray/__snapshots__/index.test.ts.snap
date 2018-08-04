@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TemplateStringsArray cannot be implemented 1`] = `
+"snippetCode.ts (2,7): Built-ins cannot be implemented.
+
+      1 | 
+    > 2 |       class MyTemplateStringsArray implements TemplateStringsArray {
+        |       ^
+      3 |       }
+      4 |     
+"
+`;

@@ -2,34 +2,75 @@ import { tsUtils } from '@neo-one/ts-utils';
 import * as path from 'path';
 import ts from 'typescript';
 import { pathResolve } from '../../utils';
-import { ArrayFilter, ArrayForEach, ArrayLength, ArrayMap, ArrayReduce, ArrayType, ArrayValue } from './array';
+import { ArgumentsInstance } from './arguments';
+import { ArrayFilter, ArrayForEach, ArrayInstance, ArrayLength, ArrayMap, ArrayReduce, ArrayType } from './array';
 import { AssertEqual } from './assertEqual';
-import { BooleanValue } from './boolean';
-import { BufferConcat, BufferEquals, BufferFrom, BufferType, BufferValue } from './buffer';
-import { ConsoleLog } from './console';
-import { ObjectKeys, ObjectType, ObjectValue } from './object';
-import { StringType, StringValue } from './string';
-import { SymbolFor, SymbolIterator, SymbolToPrimitive, SymbolType, SymbolValue } from './symbol';
+import { BooleanInstance, BooleanType } from './boolean';
+import { BufferConcat, BufferEquals, BufferFrom, BufferInstance, BufferType } from './buffer';
+import { ConsoleLog, ConsoleType, ConsoleValue } from './console';
+import { ErrorInstance, ErrorType } from './error';
+import { FunctionInstance, FunctionType } from './function';
+import { IterableInstance } from './iterable';
+import { IterableIteratorInstance } from './iterableIterator';
+import { IteratorInstance } from './iterator';
+import { IteratorResultInstance } from './iteratorResult';
+import { MapInstance, MapType } from './map';
+import { NumberInstance, NumberType } from './number';
+import { ObjectInstance, ObjectKeys, ObjectType } from './object';
+import { PropertyDescriptorInstance } from './propertyDescriptor';
+import { RegExpInstance, RegExpType } from './regexp';
+import { StringInstance, StringType } from './string';
+import { SymbolFor, SymbolInstance, SymbolIterator, SymbolToPrimitive, SymbolType } from './symbol';
+import { TemplateStringsArrayInstance } from './templateStringsArray';
+import { TypedPropertyDescriptorInstance } from './typedPropertyDescriptor';
 import { BuiltIn } from './types';
 
 export type BuiltIns = Map<ts.Symbol, BuiltIn>;
 
 export interface BuiltInSymbols {
+  readonly argumentsInstance: ts.Symbol;
+  readonly arrayInstance: ts.Symbol;
+  readonly arrayType: ts.Symbol;
   readonly array: ts.Symbol;
-  readonly arrayClass: ts.Symbol;
+  readonly booleanInstance: ts.Symbol;
+  readonly booleanType: ts.Symbol;
   readonly boolean: ts.Symbol;
-  readonly booleanClass: ts.Symbol;
-  readonly object: ts.Symbol;
-  readonly objectClass: ts.Symbol;
+  readonly bufferInstance: ts.Symbol;
+  readonly bufferType: ts.Symbol;
   readonly buffer: ts.Symbol;
-  readonly bufferClass: ts.Symbol;
+  readonly consoleType: ts.Symbol;
+  readonly console: ts.Symbol;
+  readonly errorInstance: ts.Symbol;
+  readonly errorType: ts.Symbol;
+  readonly error: ts.Symbol;
+  readonly functionInstance: ts.Symbol;
+  readonly functionType: ts.Symbol;
+  readonly function: ts.Symbol;
+  readonly iterableInstance: ts.Symbol;
+  readonly iterableIteratorInstance: ts.Symbol;
+  readonly iteratorInstance: ts.Symbol;
+  readonly iteratorResultInstance: ts.Symbol;
+  readonly mapInstance: ts.Symbol;
+  readonly mapType: ts.Symbol;
+  readonly map: ts.Symbol;
+  readonly objectInstance: ts.Symbol;
+  readonly objectType: ts.Symbol;
+  readonly object: ts.Symbol;
+  readonly regexpInstance: ts.Symbol;
+  readonly regexpType: ts.Symbol;
+  readonly regexp: ts.Symbol;
+  readonly numberInstance: ts.Symbol;
+  readonly numberType: ts.Symbol;
   readonly number: ts.Symbol;
-  readonly numberClass: ts.Symbol;
+  readonly propertyDescriptorInstance: ts.Symbol;
+  readonly stringInstance: ts.Symbol;
+  readonly stringType: ts.Symbol;
   readonly string: ts.Symbol;
-  readonly stringClass: ts.Symbol;
+  readonly symbolInstance: ts.Symbol;
+  readonly symbolType: ts.Symbol;
   readonly symbol: ts.Symbol;
-  readonly symbolClass: ts.Symbol;
-  readonly consoleValue: ts.Symbol;
+  readonly templateStringsArrayInstance: ts.Symbol;
+  readonly typedPropertyDescriptorInstance: ts.Symbol;
 }
 
 export const createBuiltIns = (
@@ -46,71 +87,149 @@ export const createBuiltIns = (
 
   const builtIns = new Map<ts.Symbol, BuiltIn>();
 
-  const getDeclSymbol = (decl: ts.Declaration): ts.Symbol => {
+  const getTypeSymbol = (decl: ts.Declaration): ts.Symbol => {
     const type = tsUtils.type_.getType(typeChecker, decl);
-    const symb = tsUtils.type_.getSymbol(type);
-    if (symb === undefined) {
-      return tsUtils.node.getSymbolOrThrow(typeChecker, decl);
-    }
 
-    return symb;
+    return tsUtils.type_.getSymbolOrThrow(type);
   };
 
-  const array = tsUtils.type_.getSymbolOrThrow(tsUtils.types.getArrayType(typeChecker));
-  builtIns.set(array, new ArrayType());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(array, 'filter'), new ArrayFilter());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(array, 'forEach'), new ArrayForEach());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(array, 'length'), new ArrayLength());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(array, 'map'), new ArrayMap());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(array, 'reduce'), new ArrayReduce());
+  const getDeclSymbol = (decl: ts.Declaration): ts.Symbol => tsUtils.node.getSymbolOrThrow(typeChecker, decl);
 
-  const arrayClass = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Array'));
-  builtIns.set(arrayClass, new ArrayValue());
+  const getInstance = (name: string): ts.Symbol =>
+    getTypeSymbol(tsUtils.statement.getInterfaceOrThrow(globalsFile, name));
+  const getType = (name: string): ts.Symbol => getTypeSymbol(tsUtils.statement.getInterfaceOrThrow(globalsFile, name));
+  const getValue = (name: string): ts.Symbol =>
+    getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, name));
+  const getMember = (sym: ts.Symbol, name: string) => tsUtils.symbol.getMemberOrThrow(sym, name);
 
-  const booleanType = getDeclSymbol(tsUtils.statement.getInterfaceOrThrow(globalsFile, 'Boolean'));
+  // Arguments
+  const argumentsInstance = getInstance('IArguments');
+  builtIns.set(argumentsInstance, new ArgumentsInstance());
 
-  const booleanClass = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Boolean'));
-  builtIns.set(booleanClass, new BooleanValue());
+  // Array
+  const arrayInstance = getInstance('Array');
+  builtIns.set(arrayInstance, new ArrayInstance());
+  builtIns.set(getMember(arrayInstance, 'filter'), new ArrayFilter());
+  builtIns.set(getMember(arrayInstance, 'forEach'), new ArrayForEach());
+  builtIns.set(getMember(arrayInstance, 'length'), new ArrayLength());
+  builtIns.set(getMember(arrayInstance, 'map'), new ArrayMap());
+  builtIns.set(getMember(arrayInstance, 'reduce'), new ArrayReduce());
 
-  const object = getDeclSymbol(tsUtils.statement.getInterfaceOrThrow(globalsFile, 'Object'));
-  builtIns.set(object, new ObjectType());
+  const arrayType = getType('ArrayConstructor');
+  builtIns.set(arrayType, new ArrayType());
 
-  const objectClass = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Object'));
-  builtIns.set(objectClass, new ObjectValue());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(objectClass, 'keys'), new ObjectKeys());
+  // Boolean
+  const booleanInstance = getInstance('Boolean');
+  builtIns.set(booleanInstance, new BooleanInstance());
 
-  const buffer = getDeclSymbol(tsUtils.statement.getInterfaceOrThrow(globalsFile, 'Buffer'));
-  builtIns.set(buffer, new BufferType());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(buffer, 'equals'), new BufferEquals());
+  const booleanType = getType('BooleanConstructor');
+  builtIns.set(booleanType, new BooleanType());
 
-  const bufferClass = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Buffer'));
-  builtIns.set(bufferClass, new BufferValue());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(bufferClass, 'concat'), new BufferConcat());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(bufferClass, 'from'), new BufferFrom());
+  // Buffer
+  const bufferInstance = getInstance('Buffer');
+  builtIns.set(bufferInstance, new BufferInstance());
+  builtIns.set(getMember(bufferInstance, 'equals'), new BufferEquals());
 
-  const numberType = getDeclSymbol(tsUtils.statement.getInterfaceOrThrow(globalsFile, 'Number'));
-  builtIns.set(numberType, new StringType());
+  const bufferType = getType('BufferConstructor');
+  builtIns.set(bufferType, new BufferType());
+  builtIns.set(getMember(bufferType, 'concat'), new BufferConcat());
+  builtIns.set(getMember(bufferType, 'from'), new BufferFrom());
 
-  const numberClass = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Number'));
-  builtIns.set(numberClass, new StringValue());
+  // Console
+  const consoleType = getType('Console');
+  builtIns.set(consoleType, new ConsoleType());
+  builtIns.set(getMember(consoleType, 'log'), new ConsoleLog());
 
-  const stringType = getDeclSymbol(tsUtils.statement.getInterfaceOrThrow(globalsFile, 'String'));
+  const consoleValue = getValue('console');
+  builtIns.set(consoleValue, new ConsoleValue());
+
+  // Error
+  const errorInstance = getInstance('Error');
+  builtIns.set(errorInstance, new ErrorInstance());
+
+  const errorType = getType('ErrorConstructor');
+  builtIns.set(errorType, new ErrorType());
+
+  // Function
+  const functionInstance = getInstance('Function');
+  builtIns.set(functionInstance, new FunctionInstance());
+
+  const functionType = getType('FunctionConstructor');
+  builtIns.set(functionType, new FunctionType());
+
+  // Iterable
+  const iterableInstance = getInstance('Iterable');
+  builtIns.set(iterableInstance, new IterableInstance());
+
+  // IterableIterator
+  const iterableIteratorInstance = getInstance('IterableIterator');
+  builtIns.set(iterableIteratorInstance, new IterableIteratorInstance());
+
+  // Iterator
+  const iteratorInstance = getInstance('Iterator');
+  builtIns.set(iteratorInstance, new IteratorInstance());
+
+  // IteratorResult
+  const iteratorResultInstance = getInstance('IteratorResult');
+  builtIns.set(iteratorResultInstance, new IteratorResultInstance());
+
+  // Map
+  const mapInstance = getInstance('Map');
+  builtIns.set(mapInstance, new MapInstance());
+
+  const mapType = getType('MapConstructor');
+  builtIns.set(mapType, new MapType());
+
+  // Number
+  const numberInstance = getInstance('Number');
+  builtIns.set(numberInstance, new NumberInstance());
+
+  const numberType = getType('NumberConstructor');
+  builtIns.set(numberType, new NumberType());
+
+  // Object
+  const objectInstance = getInstance('Object');
+  builtIns.set(objectInstance, new ObjectInstance());
+
+  const objectType = getType('ObjectConstructor');
+  builtIns.set(objectType, new ObjectType());
+  builtIns.set(getMember(objectType, 'keys'), new ObjectKeys());
+
+  // PropertyDescriptor
+  const propertyDescriptorInstance = getInstance('PropertyDescriptor');
+  builtIns.set(propertyDescriptorInstance, new PropertyDescriptorInstance());
+
+  // RegExp
+  const regexpInstance = getInstance('RegExp');
+  builtIns.set(regexpInstance, new RegExpInstance());
+
+  const regexpType = getType('RegExpConstructor');
+  builtIns.set(regexpType, new RegExpType());
+
+  // String
+  const stringInstance = getInstance('String');
+  builtIns.set(stringInstance, new StringInstance());
+
+  const stringType = getType('String');
   builtIns.set(stringType, new StringType());
 
-  const stringClass = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'String'));
-  builtIns.set(stringClass, new StringValue());
+  // Symbol
+  const symbolInstance = getInstance('Symbol');
+  builtIns.set(symbolInstance, new SymbolInstance());
 
-  const symbol = getDeclSymbol(tsUtils.statement.getInterfaceOrThrow(globalsFile, 'Symbol'));
-  builtIns.set(symbol, new SymbolType());
+  const symbolType = getType('SymbolConstructor');
+  builtIns.set(symbolType, new SymbolType());
+  builtIns.set(getMember(symbolType, 'for'), new SymbolFor());
+  builtIns.set(getMember(symbolType, 'iterator'), new SymbolIterator());
+  builtIns.set(getMember(symbolType, 'toPrimitive'), new SymbolToPrimitive());
 
-  const symbolClass = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'Symbol'));
-  builtIns.set(symbolClass, new SymbolValue());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(symbolClass, 'for'), new SymbolFor());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(symbolClass, 'iterator'), new SymbolIterator());
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(symbolClass, 'toPrimitive'), new SymbolToPrimitive());
+  // TemplateStringsArray
+  const templateStringsArrayInstance = getInstance('TemplateStringsArray');
+  builtIns.set(templateStringsArrayInstance, new TemplateStringsArrayInstance());
 
-  const consoleValue = getDeclSymbol(tsUtils.statement.getVariableDeclarationOrThrow(globalsFile, 'console'));
-  builtIns.set(tsUtils.symbol.getMemberOrThrow(consoleValue, 'log'), new ConsoleLog());
+  // TypedPropertyDescriptor
+  const typedPropertyDescriptorInstance = getInstance('TypedPropertyDescriptor');
+  builtIns.set(typedPropertyDescriptorInstance, new TypedPropertyDescriptorInstance());
 
   const testHarnessFile = tsUtils.file.getSourceFile(
     program,
@@ -126,21 +245,49 @@ export const createBuiltIns = (
   return {
     builtIns,
     builtInSymbols: {
-      array,
-      arrayClass,
-      boolean: booleanType,
-      booleanClass,
-      object,
-      objectClass,
-      buffer,
-      bufferClass,
-      number: numberType,
-      numberClass,
-      string: stringType,
-      stringClass,
-      symbol,
-      symbolClass,
-      consoleValue,
+      argumentsInstance,
+      arrayInstance,
+      arrayType,
+      array: arrayInstance,
+      booleanInstance,
+      booleanType,
+      boolean: booleanInstance,
+      bufferInstance,
+      bufferType,
+      buffer: bufferInstance,
+      consoleType,
+      console: consoleValue,
+      errorInstance,
+      errorType,
+      error: errorInstance,
+      functionInstance,
+      functionType,
+      function: functionInstance,
+      iterableInstance,
+      iterableIteratorInstance,
+      iteratorInstance,
+      iteratorResultInstance,
+      mapInstance,
+      mapType,
+      map: mapInstance,
+      objectInstance,
+      objectType,
+      object: objectInstance,
+      regexpInstance,
+      regexpType,
+      regexp: regexpInstance,
+      numberInstance,
+      numberType,
+      number: numberInstance,
+      propertyDescriptorInstance,
+      stringInstance,
+      stringType,
+      string: stringInstance,
+      symbolInstance,
+      symbolType,
+      symbol: symbolInstance,
+      templateStringsArrayInstance,
+      typedPropertyDescriptorInstance,
     },
   };
 };

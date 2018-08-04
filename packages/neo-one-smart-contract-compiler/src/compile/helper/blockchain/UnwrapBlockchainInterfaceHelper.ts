@@ -1,8 +1,8 @@
 import ts from 'typescript';
+import { InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { InternalBlockchainInterfaceProperties } from './InternalBlockchainInterfaceProperties';
 
 // Input: [objectVal]
 // Output: [blockchainInterface]
@@ -15,8 +15,8 @@ export class UnwrapBlockchainInterfaceHelper extends Helper {
     }
 
     const options = sb.pushValueOptions(optionsIn);
-    // ['blockchain_interface', objectVal]
-    sb.emitPushString(node, InternalBlockchainInterfaceProperties.BlockchainInterface);
+    // [number, objectVal]
+    sb.emitPushInt(node, InternalObjectProperty.BlockchainInterface);
     // [blockchainInterface]
     sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
   }

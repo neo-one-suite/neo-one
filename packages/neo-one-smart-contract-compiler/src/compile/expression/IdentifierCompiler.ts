@@ -27,9 +27,13 @@ export class IdentifierCompiler extends NodeCompiler<ts.Identifier> {
           return;
         }
 
-        if (options.pushValue) {
-          builtin.emitValue(sb, expr, options);
-        }
+        builtin.emitValue(sb, expr, options);
+
+        return;
+      }
+
+      if (tsUtils.symbol.isArgumentsSymbol(sb.typeChecker, symbol)) {
+        sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltin);
 
         return;
       }

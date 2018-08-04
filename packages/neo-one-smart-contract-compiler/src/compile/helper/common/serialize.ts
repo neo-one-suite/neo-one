@@ -1,5 +1,5 @@
 import ts from 'typescript';
-
+import { GlobalProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 
@@ -7,30 +7,22 @@ export enum SerializableType {
   Array = 7,
 }
 
-const invokeGlobal = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions, name: string) => {
+const invokeGlobal = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions, property: GlobalProperty) => {
   // [1, val]
   sb.emitPushInt(node, 1);
   // [argsarr]
   sb.emitOp(node, 'PACK');
-  // [globalObjectVal, argsarr]
-  sb.scope.getGlobal(sb, node, options);
-  // [name, globalObjectVal, argsarr]
-  sb.emitPushString(node, name);
-  // [objectVal, argsarr]
-  sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
+  // [val, argsarr]
+  sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property }));
   // [val]
   sb.emitHelper(node, options, sb.helpers.invokeCall());
 };
 
-export const SERIALIZE_NAME = 'genericSerialize';
-
 export const invokeSerialize = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) =>
-  invokeGlobal(sb, node, options, SERIALIZE_NAME);
-
-export const DESERIALIZE_NAME = 'genericDeserialize';
+  invokeGlobal(sb, node, options, GlobalProperty.GenericSerialize);
 
 export const invokeDeserialize = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) =>
-  invokeGlobal(sb, node, options, DESERIALIZE_NAME);
+  invokeGlobal(sb, node, options, GlobalProperty.GenericDeserialize);
 
 export const serializeType = (sb: ScriptBuilder, node: ts.Node, _options: VisitOptions, type: SerializableType) => {
   // [type, arr]

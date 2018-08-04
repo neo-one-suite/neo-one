@@ -102,13 +102,7 @@ export class ResolvedScope implements Scope {
     const position = this.getPosition(name);
     if (position === undefined) {
       if (this.parent === undefined) {
-        if (typeof name === 'string' && sb.helpers.globalProperties.has(name)) {
-          // [val]
-          // tslint:disable-next-line no-any
-          sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: name as any }));
-        } else {
-          sb.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
-        }
+        sb.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
       } else {
         this.parent.get(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }

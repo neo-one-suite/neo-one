@@ -1,10 +1,10 @@
-import { tsUtils } from '@neo-one/ts-utils';
+import { BodiedNode, ParameteredNode, tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { Name } from '../../scope';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { InternalFunctionProperties } from './InternalFunctionProperties';
 
 // Input: []
 // Output: [farr]
@@ -13,6 +13,8 @@ export class FunctionLikeHelper extends Helper<ts.FunctionDeclaration | ts.Funct
     if (!tsUtils.overload.isImplementation(node)) {
       return;
     }
+    // tslint:disable-next-line no-any
+    const func: BodiedNode & ParameteredNode = node as any;
 
     const options = sb.pushValueOptions(optionsIn);
     let name: Name | undefined;
@@ -21,13 +23,13 @@ export class FunctionLikeHelper extends Helper<ts.FunctionDeclaration | ts.Funct
       name = sb.scope.add(tsUtils.node.getNameOrThrow(node));
     }
     // [callArray]
-    sb.emitHelper(node, options, sb.helpers.createCallArray);
+    sb.emitHelper(func, options, sb.helpers.createCallArray);
     // [callObjectVal]
     sb.emitHelper(
-      node,
+      func,
       options,
       sb.helpers.createFunctionObject({
-        property: InternalFunctionProperties.Call,
+        property: InternalObjectProperty.Call,
       }),
     );
     if (tsUtils.modifier.isNamedExport(node) || tsUtils.modifier.isDefaultExport(node)) {
@@ -43,14 +45,15 @@ export class FunctionLikeHelper extends Helper<ts.FunctionDeclaration | ts.Funct
         }),
       );
     }
-    if (name === undefined) {
-      if (!optionsIn.pushValue) {
+
+    if (!optionsIn.pushValue) {
+      if (name === undefined) {
         // []
         sb.emitOp(node, 'DROP');
+      } else {
+        // []
+        sb.scope.set(sb, node, options, name);
       }
-    } else {
-      // []
-      sb.scope.set(sb, node, options, name);
     }
   }
 }

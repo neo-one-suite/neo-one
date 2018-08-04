@@ -1,10 +1,9 @@
 import stringify from 'safe-stable-stringify';
 import ts from 'typescript';
-
+import { InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { InternalFunctionProperties } from './InternalFunctionProperties';
 
 export interface GetCallableHelperOptions {
   readonly bindThis?: boolean;
@@ -33,7 +32,7 @@ export class GetCallableHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // ['call', objectVal, ?thisVal]
-    sb.emitPushString(node, InternalFunctionProperties.Call);
+    sb.emitPushInt(node, InternalObjectProperty.Call);
     // [func, ?thisVal]
     sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
     if (this.bindThis) {

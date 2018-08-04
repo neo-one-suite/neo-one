@@ -54,7 +54,6 @@ describe('BinaryExpressionCompiler', () => {
       let x = 3;
       x **= 3;
       if (x !== 27) {
-        console.log(x);
         throw 'Failure';
       }
     `);
@@ -207,7 +206,6 @@ describe('BinaryExpressionCompiler', () => {
       const y: any = '4' as any;
       const z: string = y + x;
       if (z !== '421') {
-        console.log(z);
         throw 'Failure';
       }
     `,

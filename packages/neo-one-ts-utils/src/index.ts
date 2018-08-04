@@ -24,6 +24,7 @@ import * as types from './types';
 import * as variable from './variable';
 
 export { ArgumentedNode, BodiedNode, BodyableNode, ParameteredNode } from './base';
+export { PropertyNamedNode } from './node';
 export { StatementedNode } from './statement';
 export { ClassInstanceMemberType } from './class_';
 

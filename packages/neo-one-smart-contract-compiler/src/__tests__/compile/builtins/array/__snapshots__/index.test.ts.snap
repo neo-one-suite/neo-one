@@ -1,16 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Array cannot be extended 1`] = `
-"snippetCode.ts (2,29): Builtins cannot be extended.
-
-      1 | 
-    > 2 |       class MyArray extends Array<number> {
-        |                             ^
-      3 |       }
-      4 |     
-"
-`;
-
 exports[`Array cannot be implemented 1`] = `
 "snippetCode.ts (2,7): Built-ins cannot be implemented.
 

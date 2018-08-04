@@ -40,3 +40,7 @@ export function getMember(node: ts.Symbol, name: string): ts.Symbol | undefined 
 export function getMemberOrThrow(node: ts.Symbol, name: string): ts.Symbol {
   return utils.throwIfNullOrUndefined(getMember(node, name), 'symbol member');
 }
+
+export function isArgumentsSymbol(typeChecker: ts.TypeChecker, node: ts.Symbol): boolean {
+  return typeChecker.isArgumentsSymbol(node);
+}

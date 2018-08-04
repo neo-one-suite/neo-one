@@ -4,7 +4,7 @@ import * as utils from './utils';
 
 type NamedNode = ts.Node & { readonly name: ts.Identifier };
 type NameableNode = ts.Node & { readonly name?: ts.Identifier };
-type PropertyNamedNode = ts.Node & { readonly name: ts.PropertyName };
+export type PropertyNamedNode = ts.Node & { readonly name: ts.PropertyName };
 type PropertyNameableNode = ts.Node & { readonly name?: ts.PropertyName };
 type BindingNamedNode = ts.Node & { readonly name: ts.BindingName };
 type BindingNameableNode = ts.Node & { readonly name?: ts.BindingName };

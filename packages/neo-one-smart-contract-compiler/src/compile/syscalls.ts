@@ -739,9 +739,9 @@ export class SimpleSysCall implements SysCall {
 
     sb.emitSysCall(node, this.name);
 
-    if (optionsIn.pushValue) {
-      this.returnType.handleResult(sb, node, options, optionsIn.cast);
-    } else if (this.returnType !== VoidValue) {
+    this.returnType.handleResult(sb, node, options, optionsIn.cast);
+
+    if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
     }
   }
@@ -1291,7 +1291,9 @@ export const SYSCALLS = {
         if (optionsIn.pushValue) {
           returnType.handleResult(sb, node, options, optionsIn.cast, false);
         } else {
-          sb.emitOp(node, 'DROP');
+          // tslint:disable-next-line
+          // TODO: Replace APPCALL with stack isolation
+          // sb.emitOp(node, 'DROP');
         }
       },
     };

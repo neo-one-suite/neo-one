@@ -1,22 +1,21 @@
 import ts from 'typescript';
-
+import { GlobalProperty, InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { InternalFunctionProperties } from '../function';
 import { Helper } from '../Helper';
-import { getTypes, invokeSerialize, SERIALIZE_NAME } from './serialize';
+import { getTypes, invokeSerialize } from './serialize';
 
 // Input: [val]
 // Output: []
 export class GenericSerializeHelper extends Helper {
+  public readonly needsGlobal = true;
+
   public emitGlobal(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
-    // [globalObjectVal]
-    sb.scope.getGlobal(sb, node, options);
-    // [name, globalObjectVal]
-    sb.emitPushString(node, SERIALIZE_NAME);
-    // [farr, name, globalObjectVal]
+    // [number, globalObject]
+    sb.emitPushInt(node, GlobalProperty.GenericSerialize);
+    // [farr, number, globalObject]
     sb.emitHelper(
       node,
       options,
@@ -49,16 +48,16 @@ export class GenericSerializeHelper extends Helper {
         },
       }),
     );
-    // [objectVal, name, globalObjectVal]
+    // [objectVal, number, globalObject]
     sb.emitHelper(
       node,
       options,
       sb.helpers.createFunctionObject({
-        property: InternalFunctionProperties.Call,
+        property: InternalObjectProperty.Call,
       }),
     );
     // []
-    sb.emitHelper(node, options, sb.helpers.setInternalObjectProperty);
+    sb.emitOp(node, 'SETITEM');
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {

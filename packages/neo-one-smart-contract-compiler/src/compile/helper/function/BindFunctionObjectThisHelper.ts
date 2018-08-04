@@ -1,15 +1,14 @@
 import ts from 'typescript';
-
+import { InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { FuncProperty, InternalFunctionProperties } from './InternalFunctionProperties';
 
 // Input: [objectVal, this]
 // Output: [objectVal]
 export interface BindSingleFunctionHelperOptions {
   readonly type: 'single';
-  readonly property: FuncProperty;
+  readonly property: InternalObjectProperty;
   readonly overwrite: boolean;
 }
 export interface BindBothFunctionHelperOptions {
@@ -22,14 +21,14 @@ export type BindFunctionObjectThisHelperOptions = BindSingleFunctionHelperOption
 // Input: [objectVal, this]
 // Output: [objectVal]
 export class BindFunctionObjectThisHelper extends Helper {
-  private readonly property: FuncProperty;
+  private readonly property: InternalObjectProperty;
   private readonly both: boolean;
   private readonly overwrite: boolean;
 
   public constructor(options: BindFunctionObjectThisHelperOptions) {
     super();
     if (options.type === 'both') {
-      this.property = InternalFunctionProperties.Call;
+      this.property = InternalObjectProperty.Call;
       this.both = true;
     } else {
       this.property = options.property;
@@ -55,8 +54,8 @@ export class BindFunctionObjectThisHelper extends Helper {
     sb.emitOp(node, 'SWAP');
 
     if (this.both) {
-      this.bindThis(sb, node, options, InternalFunctionProperties.Call);
-      this.bindThis(sb, node, options, InternalFunctionProperties.Construct);
+      this.bindThis(sb, node, options, InternalObjectProperty.Call);
+      this.bindThis(sb, node, options, InternalObjectProperty.Construct);
     } else {
       this.bindThis(sb, node, options, this.property);
     }
@@ -64,13 +63,13 @@ export class BindFunctionObjectThisHelper extends Helper {
     sb.emitOp(node, 'DROP');
   }
 
-  private bindThis(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, property: FuncProperty): void {
+  private bindThis(sb: ScriptBuilder, node: ts.Node, options: VisitOptions, property: InternalObjectProperty): void {
     // [this, objectVal, this]
     sb.emitOp(node, 'TUCK');
     // [objectVal, this, objectVal, this]
     sb.emitOp(node, 'OVER');
     // [property, objectVal, this, objectVal, this]
-    sb.emitPushString(node, property);
+    sb.emitPushInt(node, property);
     // [func, this, objectVal, this]
     sb.emitHelper(node, options, sb.helpers.getInternalObjectProperty);
     // [func, objectVal, this]

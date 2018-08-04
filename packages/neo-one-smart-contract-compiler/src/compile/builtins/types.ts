@@ -8,7 +8,6 @@ export enum BuiltInType {
   Call = 'Call',
   Construct = 'Construct',
   InstanceOf = 'InstanceOf',
-  Extend = 'Extend',
 }
 
 export interface BuiltIn {
@@ -59,14 +58,6 @@ export interface BuiltInInstanceOf extends BuiltIn {
 
 export function isBuiltInInstanceOf(value: BuiltIn): value is BuiltInInstanceOf {
   return value.types.has(BuiltInType.InstanceOf);
-}
-
-export interface BuiltInExtend extends BuiltIn {
-  readonly emitExtend: (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) => void;
-}
-
-export function isBuiltInExtend(value: BuiltIn): value is BuiltInExtend {
-  return value.types.has(BuiltInType.Extend);
 }
 
 export class BuiltInBase {

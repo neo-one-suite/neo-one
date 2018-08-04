@@ -2,16 +2,6 @@ import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Array', () => {
-  test('cannot be extended', async () => {
-    await helpers.compileString(
-      `
-      class MyArray extends Array<number> {
-      }
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinExtend },
-    );
-  });
-
   test('cannot be implemented', async () => {
     await helpers.compileString(
       `

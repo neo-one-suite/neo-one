@@ -1,6 +1,6 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { InternalFunctionProperties } from '../helper';
+import { InternalObjectProperty } from '../constants';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -38,7 +38,7 @@ export class ObjectLiteralExpressionCompiler extends NodeCompiler<ts.ObjectLiter
               prop,
               options,
               sb.helpers.createFunctionObject({
-                property: InternalFunctionProperties.Call,
+                property: InternalObjectProperty.Call,
               }),
             );
           }
@@ -51,7 +51,7 @@ export class ObjectLiteralExpressionCompiler extends NodeCompiler<ts.ObjectLiter
                 getAccessor,
                 options,
                 sb.helpers.createFunctionObject({
-                  property: InternalFunctionProperties.Call,
+                  property: InternalObjectProperty.Call,
                 }),
               );
             }
