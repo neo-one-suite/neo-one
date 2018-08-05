@@ -6,6 +6,7 @@ export enum DiagnosticCode {
   InvalidBuiltinIndex,
   InvalidBuiltinInstanceof,
   InvalidBuiltinImplement,
+  InvalidBuiltinModify,
   InvalidContractEvent,
   InvalidContractProperties,
   InvalidContractMethod,

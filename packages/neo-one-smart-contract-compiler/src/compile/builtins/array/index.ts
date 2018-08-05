@@ -12,19 +12,13 @@ export * from './reduce';
 export class ArrayInstance extends BuiltInBase implements BuiltInInstanceOf {
   public readonly types = new Set([BuiltInType.InstanceOf]);
 
-  public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, optionsIn: VisitOptions): void {
-    const options = sb.pushValueOptions(optionsIn);
+  public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, options: VisitOptions): void {
     // [val]
     sb.visit(node, options);
     // [boolean]
     sb.emitHelper(node, options, sb.helpers.isArray);
     // [val]
     sb.emitHelper(node, options, sb.helpers.createBoolean);
-
-    if (!optionsIn.pushValue) {
-      // []
-      sb.emitOp(node, 'DROP');
-    }
   }
 }
 export class ArrayType extends BuiltInBase {}

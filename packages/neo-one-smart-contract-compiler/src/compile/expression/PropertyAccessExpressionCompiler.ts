@@ -11,21 +11,24 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
   public readonly kind = ts.SyntaxKind.PropertyAccessExpression;
 
   public visitNode(sb: ScriptBuilder, expr: ts.PropertyAccessExpression, optionsIn: VisitOptions): void {
-    const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
-    const symbol = sb.getSymbol(expr);
-    const expression = tsUtils.expression.getExpression(expr);
-    const name = tsUtils.node.getName(expr);
+    const value = tsUtils.expression.getExpression(expr);
+    const valueType = sb.getType(value);
+    const name = tsUtils.node.getNameNode(expr);
+    const nameValue = tsUtils.node.getName(expr);
 
+    const symbol = sb.getSymbol(expr, { error: false, warning: false });
     if (symbol !== undefined) {
       const builtin = sb.builtIns.get(symbol);
       if (builtin !== undefined) {
         if (!isBuiltInMemberValue(builtin)) {
+          /* istanbul ignore next */
           sb.reportError(
             expr,
             DiagnosticCode.InvalidBuiltinReference,
             DiagnosticMessage.CannotReferenceBuiltinProperty,
           );
 
+          /* istanbul ignore next */
           return;
         }
 
@@ -36,12 +39,15 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
     }
 
     const throwTypeError = (innerOptions: VisitOptions) => {
-      sb.emitOp(expression, 'DROP');
-      sb.emitHelper(expression, innerOptions, sb.helpers.throwTypeError);
+      // []
+      /* istanbul ignore next */
+      sb.emitOp(expr, 'DROP');
+      /* istanbul ignore next */
+      sb.emitHelper(expr, innerOptions, sb.helpers.throwTypeError);
     };
 
     const createProcessBuiltIn = (builtInSymbol: ts.Symbol) => () => {
-      const member = tsUtils.symbol.getMember(builtInSymbol, name);
+      const member = tsUtils.symbol.getMember(builtInSymbol, nameValue);
       if (member === undefined) {
         /* istanbul ignore next */
         sb.reportUnsupported(expr);
@@ -60,8 +66,10 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
       }
 
       if (!isBuiltInMemberValue(builtin)) {
+        /* istanbul ignore next */
         sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltinProperty);
 
+        /* istanbul ignore next */
         return;
       }
 
@@ -69,7 +77,7 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
     };
 
     const processObject = (innerOptions: VisitOptions) => {
-      sb.emitPushString(tsUtils.node.getNameNode(expr), name);
+      sb.emitPushString(name, nameValue);
       if (optionsIn.pushValue && optionsIn.setValue) {
         // [objectVal, string, objectVal, val]
         sb.emitOp(expr, 'OVER');
@@ -83,24 +91,31 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
         sb.emitHelper(expr, innerOptions, sb.helpers.setPropertyObjectProperty);
         // [val]
         sb.emitHelper(expr, innerOptions, sb.helpers.getPropertyObjectProperty);
-      } else if (optionsIn.pushValue) {
-        // [val]
-        sb.emitHelper(expr, innerOptions, sb.helpers.getPropertyObjectProperty);
       } else if (optionsIn.setValue) {
         // [val, string, objectVal]
         sb.emitOp(expr, 'ROT');
         // []
         sb.emitHelper(expr, innerOptions, sb.helpers.setPropertyObjectProperty);
+      } else {
+        // Handle getter side effects
+        // [val]
+        sb.emitHelper(expr, innerOptions, sb.helpers.getPropertyObjectProperty);
+
+        if (!optionsIn.pushValue) {
+          // []
+          sb.emitOp(expr, 'DROP');
+        }
       }
     };
 
+    const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
     // [val]
-    sb.visit(expression, options);
+    sb.visit(value, options);
     sb.emitHelper(
-      expression,
+      value,
       options,
       sb.helpers.forBuiltInType({
-        type: sb.getType(expression),
+        type: valueType,
         array: createProcessBuiltIn(sb.builtInSymbols.arrayInstance),
         boolean: createProcessBuiltIn(sb.builtInSymbols.booleanInstance),
         buffer: createProcessBuiltIn(sb.builtInSymbols.bufferInstance),

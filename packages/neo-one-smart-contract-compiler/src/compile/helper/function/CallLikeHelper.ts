@@ -4,145 +4,481 @@ import ts from 'typescript';
 import { DiagnosticCode } from '../../../DiagnosticCode';
 import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import { isBuiltInCall } from '../../builtins';
+import { getMembers } from '../../builtins/utils';
+import { Types } from '../../helper/types/Types';
 import { ScriptBuilder } from '../../sb';
 import { SYSCALLS } from '../../syscalls';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplateExpression> {
-  public emit(sb: ScriptBuilder, expr: ts.CallExpression | ts.TaggedTemplateExpression, optionsIn: VisitOptions): void {
-    const func = ts.isCallExpression(expr) ? tsUtils.expression.getExpression(expr) : tsUtils.template.getTag(expr);
-    const symbol = sb.getSymbol(func, { warning: false });
-    if (ts.isIdentifier(func) && sb.isGlobalSymbol(func, symbol, 'syscall')) {
-      if (!ts.isCallExpression(expr)) {
-        sb.reportUnsupported(expr);
+  public readonly kind = ts.SyntaxKind.CallExpression;
+
+  public emit(
+    sb: ScriptBuilder,
+    expression: ts.CallExpression | ts.TaggedTemplateExpression,
+    optionsIn: VisitOptions,
+  ): void {
+    const expr = ts.isCallExpression(expression)
+      ? tsUtils.expression.getExpression(expression)
+      : tsUtils.template.getTag(expression);
+
+    const symbol = sb.getSymbol(expr, { error: false, warning: false });
+    if (symbol !== undefined) {
+      const builtin = sb.builtIns.get(symbol);
+      if (builtin !== undefined && !tsUtils.guards.isSuperExpression(expr)) {
+        // Otherwise, already reported as an error by typescript checker
+        if (isBuiltInCall(builtin)) {
+          builtin.emitCall(sb, expression, optionsIn);
+        }
+
+        return;
+      }
+    }
+
+    if (ts.isIdentifier(expr) && sb.isGlobalSymbol(expr, symbol, 'syscall')) {
+      if (!ts.isCallExpression(expression)) {
+        sb.reportUnsupported(expression);
 
         return;
       }
 
-      this.handleSysCall(sb, expr, optionsIn);
+      this.handleSysCall(sb, expression, optionsIn);
 
       return;
     }
 
-    if (symbol !== undefined) {
-      const builtin = sb.builtIns.get(symbol);
-      // We would have reported an error if this was an invalid extend of a builtin.
-      if (builtin !== undefined && !tsUtils.guards.isSuperExpression(func)) {
-        if (!isBuiltInCall(builtin) || !ts.isCallExpression(expr)) {
+    const throwTypeError = (innerOptions: VisitOptions) => {
+      // []
+      sb.emitOp(expr, 'DROP');
+      sb.emitHelper(expr, innerOptions, sb.helpers.throwTypeError);
+    };
+
+    const handleArguments = (innerOptions: VisitOptions) => {
+      if (ts.isCallExpression(expression)) {
+        // [argsarr]
+        sb.emitHelper(expression, innerOptions, sb.helpers.args);
+      } else {
+        const template = tsUtils.template.getTemplate(expression);
+        if (ts.isNoSubstitutionTemplateLiteral(template)) {
+          // [0]
+          sb.emitPushInt(template, 0);
+          // [literalsArr]
+          sb.emitOp(template, 'NEWARRAY');
+          // [literalsArr, literalsArr]
+          sb.emitOp(template, 'DUP');
+          // [stringVal]
+          sb.visit(template, innerOptions);
+          // [literalsArr]
+          sb.emitOp(template, 'APPEND');
+          // [literalsArrayVal]
+          sb.emitHelper(template, innerOptions, sb.helpers.wrapArray);
+          // [vals.length + 1, literalsArrayVal]
+          sb.emitPushInt(template, 1);
+          // [argsarr]
+          sb.emitOp(template, 'PACK');
+        } else {
+          const head = tsUtils.template.getTemplateHead(template);
+          _.reverse([...tsUtils.template.getTemplateSpans(template)]).forEach((span) => {
+            // [val]
+            sb.visit(tsUtils.expression.getExpression(span), innerOptions);
+          });
+
+          // [0]
+          sb.emitPushInt(template, 0);
+          // [literalsArr]
+          sb.emitOp(template, 'NEWARRAY');
+          // [literalsArr, literalsArr]
+          sb.emitOp(template, 'DUP');
+          // [string, literalsArr, literalsArr]
+          sb.emitPushString(head, tsUtils.literal.getLiteralValue(head));
+          // [stringVal, literalsArr, literalsArr]
+          sb.emitHelper(head, innerOptions, sb.helpers.createString);
+          // [literalsArr]
+          sb.emitOp(head, 'APPEND');
+          tsUtils.template.getTemplateSpans(template).forEach((span) => {
+            const spanLiteral = tsUtils.template.getLiteral(span);
+            // [string, literalsArr, literalsArr]
+            sb.emitOp(spanLiteral, 'DUP');
+            // [string, literalsArr, literalsArr]
+            sb.emitPushString(spanLiteral, tsUtils.literal.getLiteralValue(spanLiteral));
+            // [stringVal, literalsArr, literalsArr]
+            sb.emitHelper(head, innerOptions, sb.helpers.createString);
+            // [literalsArr]
+            sb.emitOp(expr, 'APPEND');
+          });
+          // [literalsArrayVal]
+          sb.emitHelper(template, innerOptions, sb.helpers.wrapArray);
+          // [vals.length + 1, literalsArrayVal]
+          sb.emitPushInt(template, tsUtils.template.getTemplateSpans(template).length + 1);
+          // [argsarr]
+          sb.emitOp(template, 'PACK');
+        }
+      }
+    };
+
+    const handlePropertyVisit = (lhs: ts.Node, innerOptions: VisitOptions) => {
+      if (tsUtils.guards.isSuperExpression(lhs)) {
+        // [thisValue]
+        sb.scope.getThis(sb, lhs, innerOptions);
+        // [superPrototype, thisValue]
+        sb.visit(lhs, innerOptions);
+      } else {
+        // [expr]
+        sb.visit(lhs, innerOptions);
+        // [expr, expr]
+        sb.emitOp(lhs, 'DUP');
+      }
+    };
+
+    if (
+      ts.isCallExpression(expression) &&
+      tsUtils.guards.isSuperExpression(tsUtils.expression.getExpression(expression))
+    ) {
+      const superClass = optionsIn.superClass;
+      if (superClass === undefined) {
+        /* istanbul ignore next */
+        throw new Error('Something went wrong, expected super class to be defined.');
+      }
+      const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
+      // [argsarr]
+      handleArguments(options);
+      // [thisValue, argsarr]
+      sb.scope.getThis(sb, expression, options);
+      // [ctor, thisValue, argsarr]
+      sb.scope.get(sb, expression, options, superClass);
+      // []
+      sb.emitHelper(expression, sb.noPushValueOptions(options), sb.helpers.invokeConstruct());
+    } else if (ts.isPropertyAccessExpression(expr)) {
+      const value = tsUtils.expression.getExpression(expr);
+      const valueType = sb.getType(value);
+      const name = tsUtils.node.getNameNode(expr);
+      const nameValue = tsUtils.node.getName(expr);
+
+      const createProcessBuiltIn = (builtInSymbol: ts.Symbol) => () => {
+        const member = tsUtils.symbol.getMember(builtInSymbol, nameValue);
+        if (member === undefined) {
+          /* istanbul ignore next */
           sb.reportUnsupported(expr);
 
+          /* istanbul ignore next */
           return;
         }
 
-        builtin.emitCall(sb, expr, optionsIn);
+        const builtin = sb.builtIns.get(member);
+        if (builtin === undefined) {
+          /* istanbul ignore next */
+          sb.reportUnsupported(expr);
 
-        return;
+          /* istanbul ignore next */
+          return;
+        }
+
+        if (!isBuiltInCall(builtin)) {
+          /* istanbul ignore next */
+          sb.reportError(
+            expr,
+            DiagnosticCode.InvalidBuiltinReference,
+            DiagnosticMessage.CannotReferenceBuiltinProperty,
+          );
+
+          /* istanbul ignore next */
+          return;
+        }
+
+        // [thisVal]
+        sb.emitOp(expression, 'DROP');
+        builtin.emitCall(sb, expression, optionsIn, true);
+      };
+
+      const processObject = (innerOptions: VisitOptions) => {
+        // [argsarr, objectVal, thisVal]
+        handleArguments(innerOptions);
+        // [thisVal, argsarr, objectVal]
+        sb.emitOp(expr, 'ROT');
+        // [objectVal, thisVal, argsarr]
+        sb.emitOp(expr, 'ROT');
+        // [string, objectVal, objectVal, argsarr]
+        sb.emitPushString(name, nameValue);
+        // [val, objectVal, argsarr]
+        sb.emitHelper(expr, innerOptions, sb.helpers.getPropertyObjectProperty);
+        sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true }));
+      };
+
+      const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
+      // [val, thisVal]
+      handlePropertyVisit(value, options);
+      sb.emitHelper(
+        value,
+        options,
+        sb.helpers.forBuiltInType({
+          type: valueType,
+          array: createProcessBuiltIn(sb.builtInSymbols.arrayInstance),
+          boolean: createProcessBuiltIn(sb.builtInSymbols.booleanInstance),
+          buffer: createProcessBuiltIn(sb.builtInSymbols.bufferInstance),
+          null: throwTypeError,
+          number: createProcessBuiltIn(sb.builtInSymbols.numberInstance),
+          object: processObject,
+          string: createProcessBuiltIn(sb.builtInSymbols.stringInstance),
+          symbol: createProcessBuiltIn(sb.builtInSymbols.symbolInstance),
+          undefined: throwTypeError,
+        }),
+      );
+    } else if (ts.isElementAccessExpression(expr)) {
+      const value = tsUtils.expression.getExpression(expr);
+      const valueType = sb.getType(value);
+      const prop = tsUtils.expression.getArgumentExpressionOrThrow(expr);
+      const propType = sb.getType(prop);
+
+      const valueSymbol = sb.getSymbol(value, { error: false, warning: false });
+      const propSymbol = sb.getSymbol(prop, { error: false, warning: false });
+      if (propSymbol !== undefined) {
+        const builtin = sb.builtIns.get(propSymbol);
+        if (builtin !== undefined && (valueSymbol === undefined || sb.builtIns.has(valueSymbol))) {
+          if (!isBuiltInCall(builtin)) {
+            sb.reportError(
+              expr,
+              DiagnosticCode.InvalidBuiltinReference,
+              DiagnosticMessage.CannotReferenceBuiltinProperty,
+            );
+
+            return;
+          }
+
+          builtin.emitCall(sb, expression, optionsIn);
+
+          return;
+        }
       }
-    }
 
-    const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
-    if (ts.isCallExpression(expr)) {
+      const getCallCases = (instanceSymbol: ts.Symbol, useSymbol = false) =>
+        getMembers(sb, instanceSymbol, isBuiltInCall, (call) => call.canCall(sb, expression, optionsIn), useSymbol).map(
+          ([propName, builtin]) => ({
+            condition: () => {
+              // [string, string, objectVal, thisVal]
+              sb.emitOp(prop, 'DUP');
+              // [string, string, string, objectVal, thisVal]
+              sb.emitPushString(prop, propName);
+              // [boolean, string, objectVal, thisVal]
+              sb.emitOp(prop, 'EQUAL');
+            },
+            whenTrue: () => {
+              // [objectVal, thisVal]
+              sb.emitOp(expr, 'DROP');
+              // [thisVal]
+              sb.emitOp(expr, 'DROP');
+              builtin.emitCall(sb, expression, optionsIn, true);
+            },
+          }),
+        );
+
+      const throwInnerTypeError = (innerOptions: VisitOptions) => {
+        // [objectVal, thisVal]
+        sb.emitOp(expr, 'DROP');
+        // [thisVal]
+        sb.emitOp(expr, 'DROP');
+        throwTypeError(innerOptions);
+      };
+
+      const createHandleProp = (
+        handleString: (options: VisitOptions) => void,
+        handleNumber: (options: VisitOptions) => void,
+        handleSymbol: (options: VisitOptions) => void,
+      ) => (innerOptions: VisitOptions) => {
+        // [propVal, objectVal, thisVal]
+        sb.visit(prop, innerOptions);
+        sb.emitHelper(
+          prop,
+          innerOptions,
+          sb.helpers.forBuiltInType({
+            type: propType,
+            array: throwInnerTypeError,
+            boolean: throwInnerTypeError,
+            buffer: throwInnerTypeError,
+            null: throwInnerTypeError,
+            number: handleNumber,
+            object: throwInnerTypeError,
+            string: handleString,
+            symbol: handleSymbol,
+            undefined: throwInnerTypeError,
+          }),
+        );
+      };
+
+      const createProcessBuiltIn = (builtInSymbol: ts.Symbol) => {
+        const handleStringBase = (innerInnerOptions: VisitOptions) => {
+          sb.emitHelper(
+            expr,
+            innerInnerOptions,
+            sb.helpers.case(getCallCases(builtInSymbol, false), () => {
+              throwInnerTypeError(innerInnerOptions);
+            }),
+          );
+        };
+
+        const handleString = (innerInnerOptions: VisitOptions) => {
+          // [string, objectVal, thisVal]
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getString);
+          handleStringBase(innerInnerOptions);
+        };
+
+        const handleNumber = (innerInnerOptions: VisitOptions) => {
+          // [string, objectVal, thisVal]
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.toString({ type: propType, knownType: Types.Number }));
+          handleStringBase(innerInnerOptions);
+        };
+
+        const handleSymbol = (innerInnerOptions: VisitOptions) => {
+          // [string, objectVal, thisVal]
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getSymbol);
+          sb.emitHelper(
+            expr,
+            innerInnerOptions,
+            sb.helpers.case(getCallCases(builtInSymbol, true), () => {
+              throwInnerTypeError(innerInnerOptions);
+            }),
+          );
+        };
+
+        return createHandleProp(handleString, handleNumber, handleSymbol);
+      };
+
+      const createProcessArray = () => {
+        const handleNumberBase = (innerInnerOptions: VisitOptions) => {
+          // [number, arrayVal]
+          sb.emitOp(expr, 'NIP');
+          // [argsarr, number, arrayVal]
+          handleArguments(innerInnerOptions);
+          // [arrayVal, argsarr, number]
+          sb.emitOp(expr, 'ROT');
+          // [number, arrayVal, argsarr]
+          sb.emitOp(expr, 'ROT');
+          // [arrayVal, number, arrayVal, argsarr]
+          sb.emitOp(expr, 'OVER');
+          // [number, arrayVal, arrayVal, argsarr]
+          sb.emitOp(expr, 'SWAP');
+          // [val, arrayVal, argsarr]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.getArrayIndex);
+          sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true }));
+        };
+
+        const handleString = (innerInnerOptions: VisitOptions) => {
+          // [string, arrayVal, thisVal]
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getString);
+          sb.emitHelper(
+            expr,
+            innerInnerOptions,
+            sb.helpers.case(getCallCases(sb.builtInSymbols.arrayInstance, false), () => {
+              // [stringVal, arrayVal, thisVal]
+              sb.emitHelper(prop, innerInnerOptions, sb.helpers.createString);
+              // [number, arrayVal, thisVal]
+              sb.emitHelper(prop, innerInnerOptions, sb.helpers.toNumber({ type: propType, knownType: Types.String }));
+              handleNumberBase(innerInnerOptions);
+            }),
+          );
+        };
+
+        const handleNumber = (innerInnerOptions: VisitOptions) => {
+          // [number, arrayVal, thisVal]
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getNumber);
+          handleNumberBase(innerInnerOptions);
+        };
+
+        const handleSymbol = (innerInnerOptions: VisitOptions) => {
+          // [string, arrayVal, thisVal]
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getSymbol);
+          sb.emitHelper(
+            expr,
+            innerInnerOptions,
+            sb.helpers.case(getCallCases(sb.builtInSymbols.arrayInstance, true), () => {
+              throwInnerTypeError(innerInnerOptions);
+            }),
+          );
+        };
+
+        return createHandleProp(handleString, handleNumber, handleSymbol);
+      };
+
+      const processObject = (innerOptions: VisitOptions) => {
+        const handleStringBase = (innerInnerOptions: VisitOptions) => {
+          // [val, objectVal, argsarr]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.getPropertyObjectProperty);
+          sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true }));
+        };
+
+        const handleNumber = (innerInnerOptions: VisitOptions) => {
+          // [string, objectVal, objectVal, argsarr]
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.toString({ type: propType, knownType: Types.Number }));
+          handleStringBase(innerInnerOptions);
+        };
+
+        const handleString = (innerInnerOptions: VisitOptions) => {
+          // [string, objectVal, objectVal, argsarr]
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getString);
+          handleStringBase(innerInnerOptions);
+        };
+
+        const handleSymbol = (innerInnerOptions: VisitOptions) => {
+          // [string, objectVal, objectVal, argsarr]
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getSymbol);
+          // [val, objectVal, argsarr]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.getSymbolObjectProperty);
+          sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true }));
+        };
+
+        // [argsarr, objectVal, thisVal]
+        handleArguments(innerOptions);
+        // [thisVal, argsarr, objectVal]
+        sb.emitOp(expression, 'ROT');
+        // [objectVal, thisVal, argsarr]
+        sb.emitOp(expression, 'ROT');
+        // [propVal, objectVal, thisVal, argsarr]
+        sb.visit(prop, innerOptions);
+        sb.emitHelper(
+          prop,
+          innerOptions,
+          sb.helpers.forBuiltInType({
+            type: propType,
+            array: throwInnerTypeError,
+            boolean: throwInnerTypeError,
+            buffer: throwInnerTypeError,
+            null: throwInnerTypeError,
+            number: handleNumber,
+            object: throwInnerTypeError,
+            string: handleString,
+            symbol: handleSymbol,
+            undefined: throwInnerTypeError,
+          }),
+        );
+      };
+
+      const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
+      // [val, thisVal]
+      handlePropertyVisit(value, options);
+      sb.emitHelper(
+        value,
+        options,
+        sb.helpers.forBuiltInType({
+          type: valueType,
+          array: createProcessArray(),
+          boolean: createProcessBuiltIn(sb.builtInSymbols.booleanInstance),
+          buffer: createProcessBuiltIn(sb.builtInSymbols.bufferInstance),
+          null: throwTypeError,
+          number: createProcessBuiltIn(sb.builtInSymbols.numberInstance),
+          object: processObject,
+          string: createProcessBuiltIn(sb.builtInSymbols.stringInstance),
+          symbol: createProcessBuiltIn(sb.builtInSymbols.symbolInstance),
+          undefined: throwTypeError,
+        }),
+      );
+    } else {
+      const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
       // [argsarr]
-      sb.emitHelper(expr, options, sb.helpers.args);
-    } else {
-      const template = tsUtils.template.getTemplate(expr);
-      if (ts.isNoSubstitutionTemplateLiteral(template)) {
-        // [0]
-        sb.emitPushInt(template, 0);
-        // [literalsArr]
-        sb.emitOp(template, 'NEWARRAY');
-        // [literalsArr, literalsArr]
-        sb.emitOp(template, 'DUP');
-        // [stringVal]
-        sb.visit(template, options);
-        // [literalsArr]
-        sb.emitOp(template, 'APPEND');
-        // [literalsArrayVal]
-        sb.emitHelper(template, options, sb.helpers.wrapArray);
-        // [vals.length + 1, literalsArrayVal]
-        sb.emitPushInt(template, 1);
-        // [argsarr]
-        sb.emitOp(template, 'PACK');
-      } else {
-        const head = tsUtils.template.getTemplateHead(template);
-        _.reverse([...tsUtils.template.getTemplateSpans(template)]).forEach((span) => {
-          // [val]
-          sb.visit(tsUtils.expression.getExpression(span), options);
-        });
-
-        // [0]
-        sb.emitPushInt(template, 0);
-        // [literalsArr]
-        sb.emitOp(template, 'NEWARRAY');
-        // [literalsArr, literalsArr]
-        sb.emitOp(template, 'DUP');
-        // [string, literalsArr, literalsArr]
-        sb.emitPushString(head, tsUtils.literal.getLiteralValue(head));
-        // [stringVal, literalsArr, literalsArr]
-        sb.emitHelper(head, options, sb.helpers.createString);
-        // [literalsArr]
-        sb.emitOp(head, 'APPEND');
-        tsUtils.template.getTemplateSpans(template).forEach((span) => {
-          const spanLiteral = tsUtils.template.getLiteral(span);
-          // [string, literalsArr, literalsArr]
-          sb.emitOp(spanLiteral, 'DUP');
-          // [string, literalsArr, literalsArr]
-          sb.emitPushString(spanLiteral, tsUtils.literal.getLiteralValue(spanLiteral));
-          // [stringVal, literalsArr, literalsArr]
-          sb.emitHelper(head, options, sb.helpers.createString);
-          // [literalsArr]
-          sb.emitOp(expr, 'APPEND');
-        });
-        // [literalsArrayVal]
-        sb.emitHelper(template, options, sb.helpers.wrapArray);
-        // [vals.length + 1, literalsArrayVal]
-        sb.emitPushInt(template, tsUtils.template.getTemplateSpans(template).length + 1);
-        // [argsarr]
-        sb.emitOp(template, 'PACK');
-      }
-    }
-
-    if (ts.isCallExpression(expr) && tsUtils.guards.isSuperExpression(func)) {
-      this.handleSuperConstruct(sb, expr, options);
-
-      return;
-    }
-
-    let bindThis;
-    if (ts.isElementAccessExpression(func) || ts.isPropertyAccessExpression(func)) {
-      bindThis = true;
-
-      const lhs = tsUtils.expression.getExpression(func);
-      if (tsUtils.guards.isSuperExpression(lhs)) {
-        // [thisValue, argsarr]
-        sb.scope.getThis(sb, lhs, options);
-        // [superPrototype, thisValue, argsarr]
-        sb.visit(lhs, options);
-      } else {
-        // [expr, argsarr]
-        sb.visit(lhs, options);
-        // [expr, expr, argsarr]
-        sb.emitOp(func, 'DUP');
-      }
-
-      if (ts.isElementAccessExpression(func)) {
-        // [objectVal, expr, argsarr]
-        sb.emitHelper(func, options, sb.helpers.elementAccess);
-      } else {
-        const nameNode = tsUtils.node.getNameNode(func);
-        // [name, expr, expr, argsarr]
-        sb.emitPushString(nameNode, tsUtils.node.getName(func));
-        // [objectVal, expr, argsarr]
-        sb.emitHelper(nameNode, options, sb.helpers.getPropertyObjectProperty);
-      }
-    } else {
-      bindThis = false;
+      handleArguments(options);
       // [objectVal, argsarr]
-      sb.visit(func, options);
+      sb.visit(expr, options);
+      sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: false }));
     }
-
-    sb.emitHelper(expr, sb.noCastOptions(optionsIn), sb.helpers.invokeCall({ bindThis }));
   }
 
   private handleSysCall(sb: ScriptBuilder, node: ts.CallExpression, options: VisitOptions): void {
@@ -164,18 +500,5 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
     } else {
       sysCall.handleCall(sb, node, options);
     }
-  }
-
-  private handleSuperConstruct(sb: ScriptBuilder, node: ts.CallExpression, options: VisitOptions): void {
-    const superClass = options.superClass;
-    if (superClass === undefined) {
-      throw new Error('Something went wrong, expected super class to be defined.');
-    }
-    // [thisValue, argsarr]
-    sb.scope.getThis(sb, node, options);
-    // [ctor, thisValue, argsarr]
-    sb.scope.get(sb, node, options, superClass);
-    // []
-    sb.emitHelper(node, sb.noPushValueOptions(options), sb.helpers.invokeConstruct());
   }
 }

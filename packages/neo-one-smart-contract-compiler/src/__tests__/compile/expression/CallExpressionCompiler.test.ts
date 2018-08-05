@@ -172,6 +172,32 @@ describe('CallExpressionCompiler', () => {
     `);
   });
 
+  test('object with symbol keys', async () => {
+    await helpers.executeString(`
+      const a = Symbol.for('hello');
+      const x = { [a]: () => 1 };
+
+      assertEqual(x[a](), 1);
+    `);
+  });
+
+  test('object with number keys', async () => {
+    await helpers.executeString(`
+      const a = 0;
+      const x = { [a]: () => 1 };
+
+      assertEqual(x[a](), 1);
+    `);
+  });
+
+  test('array with functions', async () => {
+    await helpers.executeString(`
+      const x: [() => number, number] = [function(this: Array<number>) { return this[1]; }, 10];
+
+      assertEqual(x[0](), 10);
+    `);
+  });
+
   test('Symbol', async () => {
     await helpers.executeString(`
       const a: symbol = Symbol.for('hello');
@@ -180,6 +206,41 @@ describe('CallExpressionCompiler', () => {
       if (a !== b) {
         throw 'Failure';
       }
+    `);
+  });
+
+  test('[0, 1, 2].map()', async () => {
+    await helpers.executeString(`
+      interface Arr<T> {
+        map<U>(callbackfn: (value: T, index: number) => U): U[];
+      }
+      const x: Arr<number> | Array<number> = [1, 2, 3] as Arr<number> | Array<number>;
+
+      const y = x.map((value) => value + 1);
+
+      assertEqual(y[0], 2);
+      assertEqual(y[1], 3);
+      assertEqual(y[2], 4);
+    `);
+  });
+
+  test('[0, 1, 2]["map"]()', async () => {
+    await helpers.executeString(`
+      const x = [1, 2, 3];
+
+      const y = x['map']((value) => value + 1);
+
+      assertEqual(y[0], 2);
+      assertEqual(y[1], 3);
+      assertEqual(y[2], 4);
+    `);
+  });
+
+  test.skip('array[Symbol.iterator]()', async () => {
+    await helpers.executeString(`
+      const x = [1, 2, 3];
+
+      assertEqual(x[Symbol.iterator]() !== undefined, true);
     `);
   });
 });

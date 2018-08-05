@@ -2,12 +2,21 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltInBase, BuiltInCall, BuiltInType } from '../types';
+import { BuiltInBase, BuiltInCall, BuiltInType, CallLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
 export class AssertEqual extends BuiltInBase implements BuiltInCall {
   public readonly types = new Set([BuiltInType.Call]);
-  public emitCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
+
+  public canCall(): boolean {
+    return true;
+  }
+
+  public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions): void {
+    if (!ts.isCallExpression(node)) {
+      return;
+    }
+
     const options = sb.pushValueOptions(optionsIn);
     const received = tsUtils.argumented.getArguments(node)[0];
     const expected = tsUtils.argumented.getArguments(node)[1];

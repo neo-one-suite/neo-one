@@ -119,6 +119,7 @@ import {
 } from './statement';
 import {
   ArrayLengthHelper,
+  BufferLengthHelper,
   ConcatBufferHelper,
   CreateArrayHelper,
   CreateBooleanHelper,
@@ -130,7 +131,6 @@ import {
   CreateStringHelper,
   CreateSymbolHelper,
   CreateUndefinedHelper,
-  ElementAccessHelper,
   FindObjectPropertyHelper,
   FindObjectPropertyHelperBase,
   FindObjectPropertyHelperBaseOptions,
@@ -311,7 +311,6 @@ export interface Helpers {
   readonly setInternalObjectProperty: SetInternalObjectPropertyHelper;
   readonly shallowCloneObject: ShallowCloneObjectHelper;
   readonly shallowCloneObj: ShallowCloneObjHelper;
-  readonly elementAccess: ElementAccessHelper;
   readonly unwrapType: UnwrapTypeHelper;
   readonly packObject: PackObjectHelper;
   readonly pickObjectProperties: PickObjectPropertiesHelper;
@@ -341,6 +340,7 @@ export interface Helpers {
 
   readonly getMapClass: GetMapClassHelper;
 
+  readonly bufferLength: BufferLengthHelper;
   readonly concatBuffer: ConcatBufferHelper;
   readonly createBuffer: CreateBufferHelper;
   readonly isBuffer: IsBufferHelper;
@@ -496,7 +496,6 @@ export const createHelpers = (): Helpers => {
     omitObjectProperties: new OmitObjectPropertiesHelper(),
     omitPropertyObjectProperties: new OmitPropertyObjectPropertiesHelper(),
     omitSymbolObjectProperties: new OmitSymbolObjectPropertiesHelper(),
-    elementAccess: new ElementAccessHelper(),
     unwrapType: new UnwrapTypeHelper(),
     unwrapVal: new UnwrapValHelper(),
     instanceof: new InstanceofHelper(),
@@ -519,6 +518,7 @@ export const createHelpers = (): Helpers => {
 
     getMapClass: new GetMapClassHelper(),
 
+    bufferLength: new BufferLengthHelper(),
     concatBuffer: new ConcatBufferHelper(),
     createBuffer: new CreateBufferHelper(),
     isBuffer: new IsBufferHelper(),

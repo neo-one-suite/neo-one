@@ -6,6 +6,7 @@ import { BuiltInBase, BuiltInInstanceOf, BuiltInType } from '../types';
 export * from './concat';
 export * from './equals';
 export * from './from';
+export * from './length';
 
 export class BufferInstance extends BuiltInBase implements BuiltInInstanceOf {
   public readonly types = new Set([BuiltInType.InstanceOf]);

@@ -6,7 +6,7 @@ import { ArgumentsInstance } from './arguments';
 import { ArrayFilter, ArrayForEach, ArrayInstance, ArrayLength, ArrayMap, ArrayReduce, ArrayType } from './array';
 import { AssertEqual } from './assertEqual';
 import { BooleanInstance, BooleanType } from './boolean';
-import { BufferConcat, BufferEquals, BufferFrom, BufferInstance, BufferType } from './buffer';
+import { BufferConcat, BufferEquals, BufferFrom, BufferInstance, BufferLength, BufferType } from './buffer';
 import { ConsoleLog, ConsoleType, ConsoleValue } from './console';
 import { ErrorInstance, ErrorType } from './error';
 import { FunctionInstance, FunctionType } from './function';
@@ -129,6 +129,7 @@ export const createBuiltIns = (
   const bufferInstance = getInstance('Buffer');
   builtIns.set(bufferInstance, new BufferInstance());
   builtIns.set(getMember(bufferInstance, 'equals'), new BufferEquals());
+  builtIns.set(getMember(bufferInstance, 'length'), new BufferLength());
 
   const bufferType = getType('BufferConstructor');
   builtIns.set(bufferType, new BufferType());

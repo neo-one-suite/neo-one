@@ -7,7 +7,7 @@ import { VisitOptions } from '../../types';
 import { BuiltInBase, BuiltInMemberValue, BuiltInType } from '../types';
 
 // tslint:disable-next-line export-name
-export class ArrayLength extends BuiltInBase implements BuiltInMemberValue {
+export class BufferLength extends BuiltInBase implements BuiltInMemberValue {
   public readonly types = new Set([BuiltInType.MemberValue]);
 
   public emitValue(
@@ -36,7 +36,7 @@ export class ArrayLength extends BuiltInBase implements BuiltInMemberValue {
       sb.visit(tsUtils.expression.getExpression(node), options);
     }
     // [number]
-    sb.emitHelper(node, options, sb.helpers.arrayLength);
+    sb.emitHelper(node, options, sb.helpers.bufferLength);
     // [val]
     sb.emitHelper(node, options, sb.helpers.createNumber);
   }

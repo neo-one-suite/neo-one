@@ -3,12 +3,32 @@ import ts from 'typescript';
 import { Types } from '../../helper/types/Types';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltInBase, BuiltInCall, BuiltInType } from '../types';
+import { BuiltInBase, BuiltInCall, BuiltInType, CallLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
 export class ObjectKeys extends BuiltInBase implements BuiltInCall {
   public readonly types = new Set([BuiltInType.Call]);
-  public emitCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
+
+  public canCall(sb: ScriptBuilder, node: CallLikeExpression): boolean {
+    if (!ts.isCallExpression(node)) {
+      return false;
+    }
+
+    const arg = tsUtils.argumented.getArguments(node)[0] as ts.Expression | undefined;
+    if (arg === undefined) {
+      return false;
+    }
+
+    const type = sb.getType(arg, { error: true });
+
+    return type !== undefined && !tsUtils.type_.hasNull(type) && !tsUtils.type_.hasUndefined(type);
+  }
+
+  public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions): void {
+    if (!ts.isCallExpression(node)) {
+      return;
+    }
+
     const options = sb.pushValueOptions(optionsIn);
     const arg = tsUtils.argumented.getArguments(node)[0];
 

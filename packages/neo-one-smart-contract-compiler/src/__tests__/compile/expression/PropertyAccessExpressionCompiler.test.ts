@@ -14,9 +14,19 @@ describe('PropertyAccessExpressionCompiler', () => {
   test('set object property', async () => {
     await helpers.executeString(`
       const bar = { x: '1', y: '2' };
-      if ((bar.x = '2') + bar.y !== '22') {
+      bar.y;
+      bar.y = '1';
+      if ((bar.x = '2') + bar.y !== '21') {
         throw 'failure'
       }
+    `);
+  });
+
+  test('access array', async () => {
+    await helpers.executeString(`
+      const bar = [1, 2, 3];
+
+      assertEqual(bar.length, 3);
     `);
   });
 

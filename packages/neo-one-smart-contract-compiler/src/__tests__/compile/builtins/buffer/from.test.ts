@@ -28,4 +28,13 @@ describe('Buffer.from', () => {
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
+
+  test('cannot be element referenced', async () => {
+    await helpers.compileString(
+      `
+      const keys = Buffer['from'];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
 });

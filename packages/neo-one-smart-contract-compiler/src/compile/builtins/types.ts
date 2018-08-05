@@ -36,8 +36,10 @@ export function isBuiltInMemberValue(value: BuiltIn): value is BuiltInMemberValu
   return value.types.has(BuiltInType.MemberValue);
 }
 
+export type CallLikeExpression = ts.CallExpression | ts.TaggedTemplateExpression;
 export interface BuiltInCall extends BuiltIn {
-  readonly emitCall: (sb: ScriptBuilder, node: ts.CallExpression, options: VisitOptions) => void;
+  readonly canCall: (sb: ScriptBuilder, node: CallLikeExpression, options: VisitOptions) => boolean;
+  readonly emitCall: (sb: ScriptBuilder, node: CallLikeExpression, options: VisitOptions, visited?: boolean) => void;
 }
 
 export function isBuiltInCall(value: BuiltIn): value is BuiltInCall {

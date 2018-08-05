@@ -25,6 +25,7 @@ describe('Object.keys', () => {
       }
 
       const bar = new Bar();
+      Object.keys(bar);
       const keys = Object.keys(bar);
 
       assertEqual(keys.length, 2);
@@ -74,6 +75,35 @@ describe('Object.keys', () => {
     `);
   });
 
+  test('should return an empty array for non-objects', async () => {
+    await helpers.executeString(`
+      const foo = 3;
+
+      const keys = Object.keys(foo);
+
+      assertEqual(keys.length, 0);
+    `);
+  });
+
+  test('should throw a type error for undefined', async () => {
+    await helpers.compileString(
+      `
+      const foo: number | undefined = undefined as number | undefined;
+      let error: string | undefined;
+      let keys: Array<string> | undefined;
+      try {
+        keys = Object.keys(foo);
+      } catch (err) {
+        error = err;
+      }
+
+      assertEqual(error, 'TypeError');
+      assertEqual(keys, undefined);
+    `,
+      { type: 'error' },
+    );
+  });
+
   test('cannot be property referenced', async () => {
     await helpers.compileString(
       `
@@ -83,7 +113,7 @@ describe('Object.keys', () => {
     );
   });
 
-  test.skip('cannot be element referenced', async () => {
+  test('cannot be element referenced', async () => {
     await helpers.compileString(
       `
       const keys = Object['keys'];

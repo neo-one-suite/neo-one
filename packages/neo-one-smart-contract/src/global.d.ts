@@ -65,6 +65,10 @@ declare var Symbol: SymbolConstructor;
 // Buffer class
 type BufferEncoding = 'ascii' | 'utf8' | 'utf16le' | 'ucs2' | 'base64' | 'latin1' | 'hex';
 interface Buffer {
+  /**
+   * Gets the length of the array. This is a number one higher than the highest element defined in an array.
+   */
+  readonly length: number;
   equals(otherBuffer: Buffer): boolean;
 }
 interface BufferConstructor {

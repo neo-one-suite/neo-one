@@ -6,7 +6,7 @@ import { VisitOptions } from '../types';
 export class CallExpressionCompiler extends NodeCompiler<ts.CallExpression> {
   public readonly kind = ts.SyntaxKind.CallExpression;
 
-  public visitNode(sb: ScriptBuilder, node: ts.CallExpression, options: VisitOptions): void {
-    sb.emitHelper(node, options, sb.helpers.callLike);
+  public visitNode(sb: ScriptBuilder, expression: ts.CallExpression, options: VisitOptions): void {
+    sb.emitHelper(expression, options, sb.helpers.callLike);
   }
 }

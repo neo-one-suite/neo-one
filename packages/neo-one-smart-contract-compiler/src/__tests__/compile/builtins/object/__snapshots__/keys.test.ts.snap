@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Object.keys cannot be element referenced 1`] = `
-"snippetCode.ts (2,20): Built-ins may not be referenced.
+"snippetCode.ts (2,20): Builtin properties cannot be referenced
 
       1 | 
     > 2 |       const keys = Object['keys'];
@@ -17,5 +17,19 @@ exports[`Object.keys cannot be property referenced 1`] = `
     > 2 |       const keys = Object.keys;
         |                    ^
       3 |     
+"
+`;
+
+exports[`Object.keys should throw a type error for undefined 1`] = `
+"snippetCode.ts (6,28): Argument of type 'number | undefined' is not assignable to parameter of type '{}'.
+  Type 'undefined' is not assignable to type '{}'.
+
+      4 |       let keys: Array<string> | undefined;
+      5 |       try {
+    > 6 |         keys = Object.keys(foo);
+        |                            ^
+      7 |       } catch (err) {
+      8 |         error = err;
+      9 |       }
 "
 `;

@@ -31,6 +31,10 @@ export function getMembers(node: ts.Symbol): ts.SymbolTable | undefined {
   return utils.getValueOrUndefined(node.members);
 }
 
+export function getMembersOrThrow(node: ts.Symbol): ts.SymbolTable {
+  return utils.throwIfNullOrUndefined(getMembers(node), 'members');
+}
+
 export function getMember(node: ts.Symbol, name: string): ts.Symbol | undefined {
   const members = getMembers(node);
 

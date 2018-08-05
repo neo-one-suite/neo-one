@@ -4,10 +4,12 @@ describe('IterableIterator', () => {
   test('can be implemented', async () => {
     await helpers.executeString(`
       class MyIterator implements Iterator<number> {
-        readonly next = () => ({
-          done: true,
-          value: 0,
-        });
+        public next() {
+          return {
+            done: true,
+            value: 0,
+          };
+        }
       }
 
       class MyIterableIterator extends MyIterator implements IterableIterator<number> {

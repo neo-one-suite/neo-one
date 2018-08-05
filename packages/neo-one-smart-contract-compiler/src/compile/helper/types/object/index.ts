@@ -1,6 +1,5 @@
 export * from './CreateObjectHelper';
 export * from './CreatePropertyObjectHelper';
-export * from './ElementAccessHelper';
 export * from './FindObjectPropertyHelper';
 export * from './FindObjectPropertyHelperBase';
 export * from './GetInternalObjectHelper';

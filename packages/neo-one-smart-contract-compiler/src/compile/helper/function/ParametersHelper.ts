@@ -12,7 +12,9 @@ export class ParametersHelper extends Helper<ParameteredNode> {
 
     const params = tsUtils.parametered.getParameters(node);
     const restElement = params.find((param) => tsUtils.parameter.isRestParameter(param));
-    const parameters = restElement === undefined ? [...params] : params.slice(0, -1);
+    let parameters = restElement === undefined ? [...params] : params.slice(0, -1);
+    parameters =
+      parameters.length > 0 && tsUtils.node.getName(parameters[0]) === 'this' ? parameters.slice(1) : parameters;
     // [argsarr]
     parameters.forEach((param, idx) => {
       const nameNode = tsUtils.node.getNameNode(param);
