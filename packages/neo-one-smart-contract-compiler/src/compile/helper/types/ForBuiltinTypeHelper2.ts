@@ -8,7 +8,7 @@ import { Types } from './Types';
 
 type ProcessType = (options: VisitOptions) => void;
 
-export interface ForBuiltInTypeHelperOptions {
+export interface ForBuiltinTypeHelperOptions {
   readonly type: ts.Type | undefined;
   readonly knownType?: Types;
   readonly array: ProcessType;
@@ -24,7 +24,7 @@ export interface ForBuiltInTypeHelperOptions {
 
 // Input: [val]
 // Output: []
-export class ForBuiltInTypeHelper extends Helper {
+export class ForBuiltinTypeHelper extends Helper {
   private readonly type: ts.Type | undefined;
   private readonly knownType?: Types;
   private readonly array: ProcessType;
@@ -49,7 +49,7 @@ export class ForBuiltInTypeHelper extends Helper {
     string: processString,
     symbol,
     undefined: processUndefined,
-  }: ForBuiltInTypeHelperOptions) {
+  }: ForBuiltinTypeHelperOptions) {
     super();
     this.type = type;
     this.knownType = knownType;

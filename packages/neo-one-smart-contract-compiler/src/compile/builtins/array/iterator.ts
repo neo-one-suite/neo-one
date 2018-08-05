@@ -5,11 +5,11 @@ import { VisitOptions } from '../../types';
 import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class ArrayMap extends BuiltinBase implements BuiltinCall {
+export class ArrayIterator extends BuiltinBase implements BuiltinCall {
   public readonly types = new Set([BuiltinType.Call]);
 
   public canCall(_sb: ScriptBuilder, node: CallLikeExpression): boolean {
-    return ts.isCallExpression(node) && tsUtils.argumented.getArguments(node).length === 1;
+    return ts.isCallExpression(node);
   }
 
   public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions, visited = false): void {
@@ -30,16 +30,7 @@ export class ArrayMap extends BuiltinBase implements BuiltinCall {
       sb.visit(tsUtils.expression.getExpression(expr), options);
     }
 
-    // [arr]
-    sb.emitHelper(node, options, sb.helpers.unwrapArray);
-    // [objectVal, arr]
-    sb.visit(tsUtils.argumented.getArguments(node)[0], options);
-    // [arr]
-    sb.emitHelper(node, options, sb.helpers.arrMapFunc);
-    // [arrayVal]
-    sb.emitHelper(node, options, sb.helpers.wrapArray);
-    if (!optionsIn.pushValue) {
-      sb.emitOp(node, 'DROP');
-    }
+    // [val]
+    sb.emitHelper(node, optionsIn, sb.helpers.createArrayIterableIterator);
   }
 }

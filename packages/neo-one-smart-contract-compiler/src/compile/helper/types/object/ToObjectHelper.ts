@@ -31,7 +31,7 @@ export class ToObjectHelper extends TypedHelper {
     sb.emitHelper(
       node,
       options,
-      sb.helpers.forBuiltInType({
+      sb.helpers.forBuiltinType({
         type: this.type,
         knownType: this.knownType,
         array: emptyObject,

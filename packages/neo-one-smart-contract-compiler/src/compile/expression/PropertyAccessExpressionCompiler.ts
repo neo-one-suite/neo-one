@@ -2,7 +2,7 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
-import { isBuiltInMemberValue } from '../builtins';
+import { isBuiltinMemberValue } from '../builtins';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -16,11 +16,36 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
     const name = tsUtils.node.getNameNode(expr);
     const nameValue = tsUtils.node.getName(expr);
 
-    const symbol = sb.getSymbol(expr, { error: false, warning: false });
-    if (symbol !== undefined) {
-      const builtin = sb.builtIns.get(symbol);
-      if (builtin !== undefined) {
-        if (!isBuiltInMemberValue(builtin)) {
+    const builtin = sb.builtins.getMember(sb.context, value, name);
+    if (builtin !== undefined) {
+      if (!isBuiltinMemberValue(builtin)) {
+        sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltinProperty);
+
+        return;
+      }
+
+      builtin.emitValue(sb, expr, optionsIn);
+
+      return;
+    }
+
+    const throwTypeError = (innerOptions: VisitOptions) => {
+      // []
+      /* istanbul ignore next */
+      sb.emitOp(expr, 'DROP');
+      /* istanbul ignore next */
+      sb.emitHelper(expr, innerOptions, sb.helpers.throwTypeError);
+    };
+
+    const createProcessBuiltin = (valueName: string) => {
+      const member = sb.builtins.getOnlyMember(sb.context, valueName, nameValue);
+
+      if (member === undefined) {
+        return throwTypeError;
+      }
+
+      return () => {
+        if (!isBuiltinMemberValue(member)) {
           /* istanbul ignore next */
           sb.reportError(
             expr,
@@ -32,48 +57,8 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
           return;
         }
 
-        builtin.emitValue(sb, expr, optionsIn);
-
-        return;
-      }
-    }
-
-    const throwTypeError = (innerOptions: VisitOptions) => {
-      // []
-      /* istanbul ignore next */
-      sb.emitOp(expr, 'DROP');
-      /* istanbul ignore next */
-      sb.emitHelper(expr, innerOptions, sb.helpers.throwTypeError);
-    };
-
-    const createProcessBuiltIn = (builtInSymbol: ts.Symbol) => () => {
-      const member = tsUtils.symbol.getMember(builtInSymbol, nameValue);
-      if (member === undefined) {
-        /* istanbul ignore next */
-        sb.reportUnsupported(expr);
-
-        /* istanbul ignore next */
-        return;
-      }
-
-      const builtin = sb.builtIns.get(member);
-      if (builtin === undefined) {
-        /* istanbul ignore next */
-        sb.reportUnsupported(expr);
-
-        /* istanbul ignore next */
-        return;
-      }
-
-      if (!isBuiltInMemberValue(builtin)) {
-        /* istanbul ignore next */
-        sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltinProperty);
-
-        /* istanbul ignore next */
-        return;
-      }
-
-      builtin.emitValue(sb, expr, optionsIn, true);
+        member.emitValue(sb, expr, optionsIn, true);
+      };
     };
 
     const processObject = (innerOptions: VisitOptions) => {
@@ -114,16 +99,16 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
     sb.emitHelper(
       value,
       options,
-      sb.helpers.forBuiltInType({
+      sb.helpers.forBuiltinType({
         type: valueType,
-        array: createProcessBuiltIn(sb.builtInSymbols.arrayInstance),
-        boolean: createProcessBuiltIn(sb.builtInSymbols.booleanInstance),
-        buffer: createProcessBuiltIn(sb.builtInSymbols.bufferInstance),
+        array: createProcessBuiltin('Array'),
+        boolean: createProcessBuiltin('Boolean'),
+        buffer: createProcessBuiltin('Buffer'),
         null: throwTypeError,
-        number: createProcessBuiltIn(sb.builtInSymbols.numberInstance),
+        number: createProcessBuiltin('Number'),
         object: processObject,
-        string: createProcessBuiltIn(sb.builtInSymbols.stringInstance),
-        symbol: createProcessBuiltIn(sb.builtInSymbols.symbolInstance),
+        string: createProcessBuiltin('String'),
+        symbol: createProcessBuiltin('Symbol'),
         undefined: throwTypeError,
       }),
     );

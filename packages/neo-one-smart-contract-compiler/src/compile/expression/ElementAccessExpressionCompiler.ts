@@ -2,8 +2,7 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
-import { isBuiltInMemberValue } from '../builtins';
-import { getMembers } from '../builtins/utils';
+import { isBuiltinMemberValue } from '../builtins';
 import { Types } from '../helper/types/Types';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -18,42 +17,37 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
     const prop = tsUtils.expression.getArgumentExpressionOrThrow(expr);
     const propType = sb.getType(prop);
 
-    const propSymbol = sb.getSymbol(prop, { error: false, warning: false });
-    if (propSymbol !== undefined) {
-      const builtin = sb.builtIns.get(propSymbol);
-      if (builtin !== undefined) {
-        if (!isBuiltInMemberValue(builtin)) {
-          sb.reportError(
-            expr,
-            DiagnosticCode.InvalidBuiltinReference,
-            DiagnosticMessage.CannotReferenceBuiltinProperty,
-          );
-
-          return;
-        }
-
-        builtin.emitValue(sb, expr, optionsIn);
+    const builtinProp = sb.builtins.getMember(sb.context, value, prop);
+    if (builtinProp !== undefined) {
+      if (!isBuiltinMemberValue(builtinProp)) {
+        sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltinProperty);
 
         return;
       }
+
+      builtinProp.emitValue(sb, expr, optionsIn);
+
+      return;
     }
 
-    const getValueCases = (instanceSymbol: ts.Symbol, useSymbol = false) =>
-      getMembers(sb, instanceSymbol, isBuiltInMemberValue, () => true, useSymbol).map(([propName, builtin]) => ({
-        condition: () => {
-          // [string, string, objectVal]
-          sb.emitOp(prop, 'DUP');
-          // [string, string, string, objectVal]
-          sb.emitPushString(prop, propName);
-          // [boolean, string, objectVal]
-          sb.emitOp(prop, 'EQUAL');
-        },
-        whenTrue: () => {
-          // [objectVal]
-          sb.emitOp(expr, 'DROP');
-          builtin.emitValue(sb, expr, optionsIn, true);
-        },
-      }));
+    const getValueCases = (name: string, useSymbol = false) =>
+      sb.builtins
+        .getMembers(sb.context, name, isBuiltinMemberValue, () => true, useSymbol)
+        .map(([propName, builtin]) => ({
+          condition: () => {
+            // [string, string, objectVal]
+            sb.emitOp(prop, 'DUP');
+            // [string, string, string, objectVal]
+            sb.emitPushString(prop, propName);
+            // [boolean, string, objectVal]
+            sb.emitOp(prop, 'EQUAL');
+          },
+          whenTrue: () => {
+            // [objectVal]
+            sb.emitOp(expr, 'DROP');
+            builtin.emitValue(sb, expr, optionsIn, true);
+          },
+        }));
 
     const throwTypeError = (innerOptions: VisitOptions) => {
       // []
@@ -77,7 +71,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
       sb.emitHelper(
         prop,
         innerOptions,
-        sb.helpers.forBuiltInType({
+        sb.helpers.forBuiltinType({
           type: propType,
           array: throwInnerTypeError,
           boolean: throwInnerTypeError,
@@ -92,12 +86,12 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
       );
     };
 
-    const createProcessBuiltIn = (builtInSymbol: ts.Symbol) => {
+    const createProcessBuiltin = (name: string) => {
       const handleStringBase = (innerInnerOptions: VisitOptions) => {
         sb.emitHelper(
           expr,
           innerInnerOptions,
-          sb.helpers.case(getValueCases(builtInSymbol, false), () => {
+          sb.helpers.case(getValueCases(name, false), () => {
             throwInnerTypeError(innerInnerOptions);
           }),
         );
@@ -121,7 +115,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         sb.emitHelper(
           expr,
           innerInnerOptions,
-          sb.helpers.case(getValueCases(builtInSymbol, true), () => {
+          sb.helpers.case(getValueCases(name, true), () => {
             throwInnerTypeError(innerInnerOptions);
           }),
         );
@@ -161,7 +155,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         sb.emitHelper(
           expr,
           innerInnerOptions,
-          sb.helpers.case(getValueCases(sb.builtInSymbols.arrayInstance, false), () => {
+          sb.helpers.case(getValueCases('Array', false), () => {
             // [stringVal, objectVal]
             sb.emitHelper(prop, innerInnerOptions, sb.helpers.createString);
             // [number, objectVal]
@@ -183,7 +177,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         sb.emitHelper(
           expr,
           innerInnerOptions,
-          sb.helpers.case(getValueCases(sb.builtInSymbols.arrayInstance, true), () => {
+          sb.helpers.case(getValueCases('Array', true), () => {
             throwInnerTypeError(innerInnerOptions);
           }),
         );
@@ -270,7 +264,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
       sb.emitHelper(
         prop,
         innerOptions,
-        sb.helpers.forBuiltInType({
+        sb.helpers.forBuiltinType({
           type: propType,
           array: throwInnerTypeError,
           boolean: throwInnerTypeError,
@@ -291,16 +285,16 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
     sb.emitHelper(
       value,
       options,
-      sb.helpers.forBuiltInType({
+      sb.helpers.forBuiltinType({
         type: valueType,
         array: createProcessArray(),
-        boolean: createProcessBuiltIn(sb.builtInSymbols.booleanInstance),
-        buffer: createProcessBuiltIn(sb.builtInSymbols.bufferInstance),
+        boolean: createProcessBuiltin('Boolean'),
+        buffer: createProcessBuiltin('Buffer'),
         null: throwTypeError,
-        number: createProcessBuiltIn(sb.builtInSymbols.numberInstance),
+        number: createProcessBuiltin('Number'),
         object: processObject,
-        string: createProcessBuiltIn(sb.builtInSymbols.stringInstance),
-        symbol: createProcessBuiltIn(sb.builtInSymbols.symbolInstance),
+        string: createProcessBuiltin('String'),
+        symbol: createProcessBuiltin('Symbol'),
         undefined: throwTypeError,
       }),
     );

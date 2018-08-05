@@ -1,6 +1,6 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
-import { BufferFrom } from '../../../../compile/builtins/buffer';
+import { BufferFrom } from '../../../../compile/builtins/buffer/from';
 
 describe('Buffer.from', () => {
   test('should return a buffer from literal values', async () => {

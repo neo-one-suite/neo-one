@@ -2,11 +2,16 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltInBase, BuiltInCall, BuiltInType, CallLikeExpression } from '../types';
+import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
+
+interface HashAndEncoding {
+  readonly hash: string;
+  readonly encoding?: string;
+}
 
 // tslint:disable-next-line export-name
-export class BufferFrom extends BuiltInBase implements BuiltInCall {
-  public readonly types = new Set([BuiltInType.Call]);
+export class BufferFrom extends BuiltinBase implements BuiltinCall {
+  public readonly types = new Set([BuiltinType.Call]);
 
   public canCall(): boolean {
     throw new Error('Something went wrong.');
@@ -29,9 +34,7 @@ export class BufferFrom extends BuiltInBase implements BuiltInCall {
     }
   }
 
-  private getHashAndEncoding(
-    node: CallLikeExpression,
-  ): { readonly hash: string; readonly encoding?: string } | undefined {
+  private getHashAndEncoding(node: CallLikeExpression): HashAndEncoding | undefined {
     if (!ts.isCallExpression(node)) {
       /* istanbul ignore next */
       return undefined;

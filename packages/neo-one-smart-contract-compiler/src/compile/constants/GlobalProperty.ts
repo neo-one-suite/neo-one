@@ -5,4 +5,5 @@ export enum GlobalProperty {
   Modules = 3,
   GenericSerialize = 4,
   GenericDeserialize = 5,
+  ArrayIterableIterator = 6,
 }

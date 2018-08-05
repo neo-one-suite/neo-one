@@ -3,8 +3,7 @@ import _ from 'lodash';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../../DiagnosticCode';
 import { DiagnosticMessage } from '../../../DiagnosticMessage';
-import { isBuiltInCall } from '../../builtins';
-import { getMembers } from '../../builtins/utils';
+import { isBuiltinCall } from '../../builtins';
 import { Types } from '../../helper/types/Types';
 import { ScriptBuilder } from '../../sb';
 import { SYSCALLS } from '../../syscalls';
@@ -23,19 +22,17 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       ? tsUtils.expression.getExpression(expression)
       : tsUtils.template.getTag(expression);
 
-    const symbol = sb.getSymbol(expr, { error: false, warning: false });
-    if (symbol !== undefined) {
-      const builtin = sb.builtIns.get(symbol);
-      if (builtin !== undefined && !tsUtils.guards.isSuperExpression(expr)) {
-        // Otherwise, already reported as an error by typescript checker
-        if (isBuiltInCall(builtin)) {
-          builtin.emitCall(sb, expression, optionsIn);
-        }
-
-        return;
+    const valueBuiltin = sb.builtins.getValue(sb.context, expr);
+    if (valueBuiltin !== undefined && !tsUtils.guards.isSuperExpression(expr)) {
+      // Otherwise, already reported as an error by typescript checker
+      if (isBuiltinCall(valueBuiltin)) {
+        valueBuiltin.emitCall(sb, expression, optionsIn);
       }
+
+      return;
     }
 
+    const symbol = sb.getSymbol(expr, { warning: false, error: false });
     if (ts.isIdentifier(expr) && sb.isGlobalSymbol(expr, symbol, 'syscall')) {
       if (!ts.isCallExpression(expression)) {
         sb.reportUnsupported(expression);
@@ -155,40 +152,47 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       const name = tsUtils.node.getNameNode(expr);
       const nameValue = tsUtils.node.getName(expr);
 
-      const createProcessBuiltIn = (builtInSymbol: ts.Symbol) => () => {
-        const member = tsUtils.symbol.getMember(builtInSymbol, nameValue);
-        if (member === undefined) {
-          /* istanbul ignore next */
-          sb.reportUnsupported(expr);
-
-          /* istanbul ignore next */
-          return;
-        }
-
-        const builtin = sb.builtIns.get(member);
-        if (builtin === undefined) {
-          /* istanbul ignore next */
-          sb.reportUnsupported(expr);
-
-          /* istanbul ignore next */
-          return;
-        }
-
-        if (!isBuiltInCall(builtin)) {
-          /* istanbul ignore next */
+      const builtinProp = sb.builtins.getMember(sb.context, value, name);
+      if (builtinProp !== undefined) {
+        if (!isBuiltinCall(builtinProp)) {
           sb.reportError(
             expr,
             DiagnosticCode.InvalidBuiltinReference,
             DiagnosticMessage.CannotReferenceBuiltinProperty,
           );
 
-          /* istanbul ignore next */
           return;
         }
 
-        // [thisVal]
-        sb.emitOp(expression, 'DROP');
-        builtin.emitCall(sb, expression, optionsIn, true);
+        builtinProp.emitCall(sb, expression, optionsIn);
+
+        return;
+      }
+
+      const createProcessBuiltin = (valueName: string) => {
+        const member = sb.builtins.getOnlyMember(sb.context, valueName, nameValue);
+
+        if (member === undefined) {
+          return throwTypeError;
+        }
+
+        return () => {
+          if (!isBuiltinCall(member)) {
+            /* istanbul ignore next */
+            sb.reportError(
+              expr,
+              DiagnosticCode.InvalidBuiltinReference,
+              DiagnosticMessage.CannotReferenceBuiltinProperty,
+            );
+
+            /* istanbul ignore next */
+            return;
+          }
+
+          // [thisVal]
+          sb.emitOp(expression, 'DROP');
+          member.emitCall(sb, expression, optionsIn, true);
+        };
       };
 
       const processObject = (innerOptions: VisitOptions) => {
@@ -211,16 +215,16 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       sb.emitHelper(
         value,
         options,
-        sb.helpers.forBuiltInType({
+        sb.helpers.forBuiltinType({
           type: valueType,
-          array: createProcessBuiltIn(sb.builtInSymbols.arrayInstance),
-          boolean: createProcessBuiltIn(sb.builtInSymbols.booleanInstance),
-          buffer: createProcessBuiltIn(sb.builtInSymbols.bufferInstance),
+          array: createProcessBuiltin('Array'),
+          boolean: createProcessBuiltin('Boolean'),
+          buffer: createProcessBuiltin('Buffer'),
           null: throwTypeError,
-          number: createProcessBuiltIn(sb.builtInSymbols.numberInstance),
+          number: createProcessBuiltin('Number'),
           object: processObject,
-          string: createProcessBuiltIn(sb.builtInSymbols.stringInstance),
-          symbol: createProcessBuiltIn(sb.builtInSymbols.symbolInstance),
+          string: createProcessBuiltin('String'),
+          symbol: createProcessBuiltin('Symbol'),
           undefined: throwTypeError,
         }),
       );
@@ -230,30 +234,33 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       const prop = tsUtils.expression.getArgumentExpressionOrThrow(expr);
       const propType = sb.getType(prop);
 
-      const valueSymbol = sb.getSymbol(value, { error: false, warning: false });
-      const propSymbol = sb.getSymbol(prop, { error: false, warning: false });
-      if (propSymbol !== undefined) {
-        const builtin = sb.builtIns.get(propSymbol);
-        if (builtin !== undefined && (valueSymbol === undefined || sb.builtIns.has(valueSymbol))) {
-          if (!isBuiltInCall(builtin)) {
-            sb.reportError(
-              expr,
-              DiagnosticCode.InvalidBuiltinReference,
-              DiagnosticMessage.CannotReferenceBuiltinProperty,
-            );
-
-            return;
-          }
-
-          builtin.emitCall(sb, expression, optionsIn);
+      const builtinProp = sb.builtins.getMember(sb.context, value, prop);
+      if (builtinProp !== undefined) {
+        if (!isBuiltinCall(builtinProp)) {
+          sb.reportError(
+            expr,
+            DiagnosticCode.InvalidBuiltinReference,
+            DiagnosticMessage.CannotReferenceBuiltinProperty,
+          );
 
           return;
         }
+
+        builtinProp.emitCall(sb, expression, optionsIn);
+
+        return;
       }
 
-      const getCallCases = (instanceSymbol: ts.Symbol, useSymbol = false) =>
-        getMembers(sb, instanceSymbol, isBuiltInCall, (call) => call.canCall(sb, expression, optionsIn), useSymbol).map(
-          ([propName, builtin]) => ({
+      const getCallCases = (instanceName: string, useSymbol = false) =>
+        sb.builtins
+          .getMembers(
+            sb.context,
+            instanceName,
+            isBuiltinCall,
+            (call) => call.canCall(sb, expression, optionsIn),
+            useSymbol,
+          )
+          .map(([propName, builtin]) => ({
             condition: () => {
               // [string, string, objectVal, thisVal]
               sb.emitOp(prop, 'DUP');
@@ -269,8 +276,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
               sb.emitOp(expr, 'DROP');
               builtin.emitCall(sb, expression, optionsIn, true);
             },
-          }),
-        );
+          }));
 
       const throwInnerTypeError = (innerOptions: VisitOptions) => {
         // [objectVal, thisVal]
@@ -290,7 +296,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
         sb.emitHelper(
           prop,
           innerOptions,
-          sb.helpers.forBuiltInType({
+          sb.helpers.forBuiltinType({
             type: propType,
             array: throwInnerTypeError,
             boolean: throwInnerTypeError,
@@ -305,12 +311,12 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
         );
       };
 
-      const createProcessBuiltIn = (builtInSymbol: ts.Symbol) => {
+      const createProcessBuiltin = (instanceName: string) => {
         const handleStringBase = (innerInnerOptions: VisitOptions) => {
           sb.emitHelper(
             expr,
             innerInnerOptions,
-            sb.helpers.case(getCallCases(builtInSymbol, false), () => {
+            sb.helpers.case(getCallCases(instanceName, false), () => {
               throwInnerTypeError(innerInnerOptions);
             }),
           );
@@ -334,7 +340,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           sb.emitHelper(
             expr,
             innerInnerOptions,
-            sb.helpers.case(getCallCases(builtInSymbol, true), () => {
+            sb.helpers.case(getCallCases(instanceName, true), () => {
               throwInnerTypeError(innerInnerOptions);
             }),
           );
@@ -368,7 +374,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           sb.emitHelper(
             expr,
             innerInnerOptions,
-            sb.helpers.case(getCallCases(sb.builtInSymbols.arrayInstance, false), () => {
+            sb.helpers.case(getCallCases('Array', false), () => {
               // [stringVal, arrayVal, thisVal]
               sb.emitHelper(prop, innerInnerOptions, sb.helpers.createString);
               // [number, arrayVal, thisVal]
@@ -390,7 +396,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           sb.emitHelper(
             expr,
             innerInnerOptions,
-            sb.helpers.case(getCallCases(sb.builtInSymbols.arrayInstance, true), () => {
+            sb.helpers.case(getCallCases('Array', true), () => {
               throwInnerTypeError(innerInnerOptions);
             }),
           );
@@ -437,7 +443,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
         sb.emitHelper(
           prop,
           innerOptions,
-          sb.helpers.forBuiltInType({
+          sb.helpers.forBuiltinType({
             type: propType,
             array: throwInnerTypeError,
             boolean: throwInnerTypeError,
@@ -458,16 +464,16 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       sb.emitHelper(
         value,
         options,
-        sb.helpers.forBuiltInType({
+        sb.helpers.forBuiltinType({
           type: valueType,
           array: createProcessArray(),
-          boolean: createProcessBuiltIn(sb.builtInSymbols.booleanInstance),
-          buffer: createProcessBuiltIn(sb.builtInSymbols.bufferInstance),
+          boolean: createProcessBuiltin('Boolean'),
+          buffer: createProcessBuiltin('Buffer'),
           null: throwTypeError,
-          number: createProcessBuiltIn(sb.builtInSymbols.numberInstance),
+          number: createProcessBuiltin('Number'),
           object: processObject,
-          string: createProcessBuiltIn(sb.builtInSymbols.stringInstance),
-          symbol: createProcessBuiltIn(sb.builtInSymbols.symbolInstance),
+          string: createProcessBuiltin('String'),
+          symbol: createProcessBuiltin('Symbol'),
           undefined: throwTypeError,
         }),
       );

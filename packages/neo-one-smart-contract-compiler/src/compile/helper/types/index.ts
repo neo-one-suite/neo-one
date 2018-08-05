@@ -8,7 +8,7 @@ export * from './string';
 export * from './symbol';
 export * from './undefined';
 
-export * from './ForBuiltInTypeHelper';
+export * from './ForBuiltinTypeHelper';
 export * from './IsNullOrUndefinedHelper';
 export * from './IsSameTypeHelper';
 export * from './ToPrimitiveHelper';

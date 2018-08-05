@@ -19,7 +19,7 @@ import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { Globals } from '../../symbols';
 import { binding } from '../binding';
-import { BuiltIns, BuiltInSymbols } from '../builtins';
+import { Builtins } from '../builtins';
 import { declarations } from '../declaration';
 import { expressions } from '../expression';
 import { files } from '../file';
@@ -63,8 +63,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   public constructor(
     public readonly context: Context,
     public readonly helpers: Helpers,
-    public readonly builtIns: BuiltIns,
-    public readonly builtInSymbols: BuiltInSymbols,
+    public readonly builtins: Builtins,
     private readonly sourceFile: ts.SourceFile,
     private readonly allHelpers: ReadonlyArray<Helper> = [],
   ) {
@@ -460,6 +459,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   public getSymbol(node: ts.Node, options?: DiagnosticOptions): ts.Symbol | undefined {
     return this.context.getSymbol(node, options);
+  }
+
+  public getTypeSymbol(node: ts.Node, options?: DiagnosticOptions): ts.Symbol | undefined {
+    return this.context.getTypeSymbol(node, options);
   }
 
   public isOnlyGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {

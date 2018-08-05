@@ -209,7 +209,7 @@ export class ToStringHelper extends TypedHelper {
       sb.emitHelper(
         node,
         options,
-        sb.helpers.forBuiltInType({
+        sb.helpers.forBuiltinType({
           type: initial ? this.type : undefined,
           knownType: initial ? this.knownType : undefined,
           array: initial ? convertArray : throwTypeError,

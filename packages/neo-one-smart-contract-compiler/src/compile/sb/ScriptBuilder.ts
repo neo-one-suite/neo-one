@@ -6,7 +6,7 @@ import { Context, DiagnosticOptions } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { Globals } from '../../symbols';
-import { BuiltIns, BuiltInSymbols } from '../builtins';
+import { Builtins } from '../builtins';
 import { Helper, Helpers } from '../helper';
 import { Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
@@ -26,8 +26,7 @@ export interface ScriptBuilder {
   readonly program: ts.Program;
   readonly typeChecker: ts.TypeChecker;
   readonly languageService: ts.LanguageService;
-  readonly builtIns: BuiltIns;
-  readonly builtInSymbols: BuiltInSymbols;
+  readonly builtins: Builtins;
   readonly context: Context;
   readonly scope: Scope;
   readonly moduleIndex: number;
@@ -71,6 +70,7 @@ export interface ScriptBuilder {
   readonly reportUnsupported: (node: ts.Node) => void;
   readonly getType: (node: ts.Node, options?: DiagnosticOptions) => ts.Type | undefined;
   readonly getSymbol: (node: ts.Node, options?: DiagnosticOptions) => ts.Symbol | undefined;
+  readonly getTypeSymbol: (node: ts.Node, options?: DiagnosticOptions) => ts.Symbol | undefined;
   readonly isOnlyGlobal: (node: ts.Node, type: ts.Type | undefined, name: keyof Globals) => boolean;
   readonly isGlobal: (node: ts.Node, type: ts.Type | undefined, name: keyof Globals) => boolean;
   readonly hasGlobal: (node: ts.Node, type: ts.Type | undefined, name: keyof Globals) => boolean;

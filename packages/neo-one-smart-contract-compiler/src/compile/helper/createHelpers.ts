@@ -15,6 +15,7 @@ import {
   ArrReduceHelperOptions,
   ExtendArrHelper,
 } from './arr';
+import { CreateArrayIterableIteratorHelper, GetArrayIterableIteratorClassHelper } from './arrayIterableIterator';
 import {
   IsBlockchainInterfaceHelper,
   IsBlockchainInterfaceHelperOptions,
@@ -135,8 +136,8 @@ import {
   FindObjectPropertyHelperBase,
   FindObjectPropertyHelperBaseOptions,
   FindObjectPropertyHelperOptions,
-  ForBuiltInTypeHelper,
-  ForBuiltInTypeHelperOptions,
+  ForBuiltinTypeHelper,
+  ForBuiltinTypeHelperOptions,
   GetArrayIndexHelper,
   GetBooleanHelper,
   GetInternalObjectHelper,
@@ -210,6 +211,10 @@ export interface Helpers {
   readonly arrReduce: (options: ArrReduceHelperOptions) => ArrReduceHelper;
   readonly arrReduceFunc: ArrReduceFuncHelper;
   readonly extendArr: ExtendArrHelper;
+
+  // arrayIterableIterator
+  readonly createArrayIterableIterator: CreateArrayIterableIteratorHelper;
+  readonly getArrayIterableIteratorClass: GetArrayIterableIteratorClassHelper;
 
   // class
   readonly createClass: (options: CreateClassHelperOptions) => CreateClassHelper;
@@ -328,7 +333,7 @@ export interface Helpers {
   readonly findObjectProperty: (options: FindObjectPropertyHelperOptions) => FindObjectPropertyHelper;
   readonly findObjectPropertyBase: (options: FindObjectPropertyHelperBaseOptions) => FindObjectPropertyHelperBase;
 
-  readonly forBuiltInType: (options: ForBuiltInTypeHelperOptions) => ForBuiltInTypeHelper;
+  readonly forBuiltinType: (options: ForBuiltinTypeHelperOptions) => ForBuiltinTypeHelper;
 
   readonly arrayLength: ArrayLengthHelper;
   readonly createArray: CreateArrayHelper;
@@ -392,6 +397,10 @@ export const createHelpers = (): Helpers => {
     arrReduce: (options) => new ArrReduceHelper(options),
     arrReduceFunc: new ArrReduceFuncHelper(),
     extendArr: new ExtendArrHelper(),
+
+    // arrayIterableIterator
+    createArrayIterableIterator: new CreateArrayIterableIteratorHelper(),
+    getArrayIterableIteratorClass: new GetArrayIterableIteratorClassHelper(),
 
     // class
     createClass: (options) => new CreateClassHelper(options),
@@ -506,7 +515,7 @@ export const createHelpers = (): Helpers => {
     findObjectProperty: (options) => new FindObjectPropertyHelper(options),
     findObjectPropertyBase: (options) => new FindObjectPropertyHelperBase(options),
 
-    forBuiltInType: (options) => new ForBuiltInTypeHelper(options),
+    forBuiltinType: (options) => new ForBuiltinTypeHelper(options),
 
     arrayLength: new ArrayLengthHelper(),
     createArray: new CreateArrayHelper(),

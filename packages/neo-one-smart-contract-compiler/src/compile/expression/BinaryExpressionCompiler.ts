@@ -1,7 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
-import { isBuiltInInstanceOf } from '../builtins';
+import { isBuiltinInstanceOf } from '../builtins';
 import { Helper } from '../helper';
 import { TypedHelperOptions } from '../helper/common';
 import { NodeCompiler } from '../NodeCompiler';
@@ -483,14 +483,11 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
     right: ts.Expression,
     options: VisitOptions,
   ): void {
-    const rightSymbol = sb.getSymbol(right);
-    if (rightSymbol !== undefined) {
-      const builtin = sb.builtIns.get(rightSymbol);
-      if (builtin !== undefined && isBuiltInInstanceOf(builtin)) {
-        builtin.emitInstanceOf(sb, left, options);
+    const builtin = sb.builtins.getValue(sb.context, right);
+    if (builtin !== undefined && isBuiltinInstanceOf(builtin)) {
+      builtin.emitInstanceOf(sb, left, options);
 
-        return;
-      }
+      return;
     }
 
     // [left]

@@ -2,11 +2,11 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltInBase, BuiltInCall, BuiltInType, CallLikeExpression } from '../types';
+import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class ArrayReduce extends BuiltInBase implements BuiltInCall {
-  public readonly types = new Set([BuiltInType.Call]);
+export class ArrayReduce extends BuiltinBase implements BuiltinCall {
+  public readonly types = new Set([BuiltinType.Call]);
 
   public canCall(_sb: ScriptBuilder, node: CallLikeExpression): boolean {
     return ts.isCallExpression(node) && tsUtils.argumented.getArguments(node).length === 2;

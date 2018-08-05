@@ -3,11 +3,11 @@ import ts from 'typescript';
 import { Types } from '../../helper/types/Types';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltInBase, BuiltInCall, BuiltInType, CallLikeExpression } from '../types';
+import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class ObjectKeys extends BuiltInBase implements BuiltInCall {
-  public readonly types = new Set([BuiltInType.Call]);
+export class ObjectKeys extends BuiltinBase implements BuiltinCall {
+  public readonly types = new Set([BuiltinType.Call]);
 
   public canCall(): boolean {
     throw new Error('Something went wrong.');
@@ -79,7 +79,7 @@ export class ObjectKeys extends BuiltInBase implements BuiltInCall {
     sb.emitHelper(
       node,
       options,
-      sb.helpers.forBuiltInType({
+      sb.helpers.forBuiltinType({
         type: sb.getType(arg),
         array: processArray,
         boolean: emptyArray,

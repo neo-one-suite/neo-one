@@ -1,7 +1,7 @@
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../Context';
-import { createBuiltIns } from './builtins';
+import { createBuiltins } from './builtins';
 import { createHelpers } from './helper';
 import { EmittingScriptBuilder, HelperCapturingScriptBuilder, ScopeCapturingScriptBuilder } from './sb';
 import { CompileResult } from './types';
@@ -13,17 +13,16 @@ export interface CompileOptions {
 }
 
 export const compile = async ({ context, sourceFile, sourceMaps = {} }: CompileOptions): Promise<CompileResult> => {
-  const { builtIns, builtInSymbols } = createBuiltIns(context.program, context.typeChecker);
+  const builtins = createBuiltins(context);
   const helpers = createHelpers();
 
-  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, builtIns, builtInSymbols, sourceFile);
+  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, builtins, sourceFile);
   helperScriptBuilder.process();
 
   const scopeScriptBuilder = new ScopeCapturingScriptBuilder(
     context,
     helpers,
-    builtIns,
-    builtInSymbols,
+    builtins,
     sourceFile,
     helperScriptBuilder.getHelpers(),
   );
@@ -34,8 +33,7 @@ export const compile = async ({ context, sourceFile, sourceMaps = {} }: CompileO
     scopes: scopeScriptBuilder.getScopes(),
     sourceFile,
     helpers,
-    builtIns,
-    builtInSymbols,
+    builtins,
     allHelpers: helperScriptBuilder.getHelpers(),
   });
   emittingScriptBuilder.process();

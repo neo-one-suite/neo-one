@@ -1538,7 +1538,7 @@ const OPCODE_PAIRS = ([
         in: 2,
         invoke: ({ context, args }) => {
           if (args[1].isArray()) {
-            const index = args[0].asBigInteger().toNumber();
+            const index = vmUtils.toNumber(context, args[0].asBigInteger());
             const mutableValue = args[1].asArray();
             if (index < 0 || index >= mutableValue.length) {
               throw new InvalidRemoveIndexError(context, index);
@@ -1564,7 +1564,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => {
           if (args[1].isArray()) {
-            const index = args[0].asBigInteger().toNumber();
+            const index = vmUtils.toNumber(context, args[0].asBigInteger());
             const val = args[1].asArray();
             if (index < 0) {
               throw new InvalidHasKeyIndexError(context);

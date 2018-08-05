@@ -1,4 +1,4 @@
 export enum WellKnownSymbol {
-  iterator = '@@iterator',
-  toPrimitive = '@@toPrimitive',
+  iterator = 'iterator',
+  toPrimitive = 'toPrimitive',
 }

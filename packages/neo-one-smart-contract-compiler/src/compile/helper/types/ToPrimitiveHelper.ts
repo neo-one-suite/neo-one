@@ -99,7 +99,7 @@ export class ToPrimitiveHelper extends Helper {
           sb.emitHelper(
             node,
             optionsIn,
-            sb.helpers.forBuiltInType({
+            sb.helpers.forBuiltinType({
               type: undefined,
               knownType: undefined,
               array: throwTypeError,
@@ -127,7 +127,7 @@ export class ToPrimitiveHelper extends Helper {
         sb.emitHelper(
           node,
           optionsIn,
-          sb.helpers.forBuiltInType({
+          sb.helpers.forBuiltinType({
             type: undefined,
             knownType: undefined,
             array: nextConvertObject,
@@ -187,7 +187,7 @@ export class ToPrimitiveHelper extends Helper {
     sb.emitHelper(
       node,
       optionsIn,
-      sb.helpers.forBuiltInType({
+      sb.helpers.forBuiltinType({
         type: this.type,
         knownType: this.knownType,
         array: convertArray,

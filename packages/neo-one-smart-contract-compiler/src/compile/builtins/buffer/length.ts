@@ -1,21 +1,15 @@
 import { tsUtils } from '@neo-one/ts-utils';
-import ts from 'typescript';
 import { DiagnosticCode } from '../../../DiagnosticCode';
 import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltInBase, BuiltInMemberValue, BuiltInType } from '../types';
+import { BuiltinBase, BuiltinMemberValue, BuiltinType, MemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class BufferLength extends BuiltInBase implements BuiltInMemberValue {
-  public readonly types = new Set([BuiltInType.MemberValue]);
+export class BufferLength extends BuiltinBase implements BuiltinMemberValue {
+  public readonly types = new Set([BuiltinType.MemberValue]);
 
-  public emitValue(
-    sb: ScriptBuilder,
-    node: ts.PropertyAccessExpression | ts.ElementAccessExpression,
-    options: VisitOptions,
-    visited = false,
-  ): void {
+  public emitValue(sb: ScriptBuilder, node: MemberLikeExpression, options: VisitOptions, visited = false): void {
     if (options.setValue) {
       sb.reportError(node, DiagnosticCode.InvalidBuiltinModify, DiagnosticMessage.CannotModifyBuiltin);
 

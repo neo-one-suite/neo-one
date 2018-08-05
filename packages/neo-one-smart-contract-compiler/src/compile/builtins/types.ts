@@ -2,7 +2,7 @@ import ts from 'typescript';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 
-export enum BuiltInType {
+export enum BuiltinType {
   Value = 'Value',
   MemberValue = 'MemberValue',
   Call = 'Call',
@@ -10,59 +10,55 @@ export enum BuiltInType {
   InstanceOf = 'InstanceOf',
 }
 
-export interface BuiltIn {
-  readonly types: Set<BuiltInType>;
+export interface Builtin {
+  readonly types: Set<BuiltinType>;
   readonly canImplement: boolean;
 }
 
-export interface BuiltInValue extends BuiltIn {
+export interface BuiltinValue extends Builtin {
   readonly emitValue: (sb: ScriptBuilder, node: ts.Identifier, options: VisitOptions) => void;
 }
 
-export function isBuiltInValue(value: BuiltIn): value is BuiltInValue {
-  return value.types.has(BuiltInType.Value);
+export function isBuiltinValue(value: Builtin): value is BuiltinValue {
+  return value.types.has(BuiltinType.Value);
 }
 
-export interface BuiltInMemberValue extends BuiltIn {
-  readonly emitValue: (
-    sb: ScriptBuilder,
-    node: ts.PropertyAccessExpression | ts.ElementAccessExpression,
-    options: VisitOptions,
-    visited?: boolean,
-  ) => void;
+export type MemberLikeExpression = ts.PropertyAccessExpression | ts.ElementAccessExpression;
+export interface BuiltinMemberValue extends Builtin {
+  readonly emitValue: (sb: ScriptBuilder, node: MemberLikeExpression, options: VisitOptions, visited?: boolean) => void;
 }
 
-export function isBuiltInMemberValue(value: BuiltIn): value is BuiltInMemberValue {
-  return value.types.has(BuiltInType.MemberValue);
+export function isBuiltinMemberValue(value: Builtin): value is BuiltinMemberValue {
+  return value.types.has(BuiltinType.MemberValue);
 }
 
 export type CallLikeExpression = ts.CallExpression | ts.TaggedTemplateExpression;
-export interface BuiltInCall extends BuiltIn {
+export interface BuiltinCall extends Builtin {
   readonly canCall: (sb: ScriptBuilder, node: CallLikeExpression, options: VisitOptions) => boolean;
   readonly emitCall: (sb: ScriptBuilder, node: CallLikeExpression, options: VisitOptions, visited?: boolean) => void;
 }
 
-export function isBuiltInCall(value: BuiltIn): value is BuiltInCall {
-  return value.types.has(BuiltInType.Call);
+export function isBuiltinCall(value: Builtin): value is BuiltinCall {
+  return value.types.has(BuiltinType.Call);
 }
 
-export interface BuiltInConstruct extends BuiltIn {
+export interface BuiltinConstruct extends Builtin {
   readonly emitConstruct: (sb: ScriptBuilder, node: ts.NewExpression, options: VisitOptions) => void;
 }
 
-export function isBuiltInConstruct(value: BuiltIn): value is BuiltInConstruct {
-  return value.types.has(BuiltInType.Construct);
+export function isBuiltinConstruct(value: Builtin): value is BuiltinConstruct {
+  return value.types.has(BuiltinType.Construct);
 }
 
-export interface BuiltInInstanceOf extends BuiltIn {
+export interface BuiltinInstanceOf extends Builtin {
   readonly emitInstanceOf: (sb: ScriptBuilder, node: ts.Expression, options: VisitOptions) => void;
 }
 
-export function isBuiltInInstanceOf(value: BuiltIn): value is BuiltInInstanceOf {
-  return value.types.has(BuiltInType.InstanceOf);
+export function isBuiltinInstanceOf(value: Builtin): value is BuiltinInstanceOf {
+  return value.types.has(BuiltinType.InstanceOf);
 }
 
-export class BuiltInBase {
-  public readonly types: Set<BuiltInType> = new Set([]);
+export class BuiltinBase {
+  public readonly types: Set<BuiltinType> = new Set([]);
   public readonly canImplement: boolean = false;
 }

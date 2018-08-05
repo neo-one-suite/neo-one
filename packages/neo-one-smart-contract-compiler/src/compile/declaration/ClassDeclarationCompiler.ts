@@ -27,19 +27,13 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
     const superClass = superClassIn;
 
     const impl = tsUtils.class_.getImplementsArray(decl);
-    const implementsBuiltIn = impl.find((implType) => {
-      const implSymbol = sb.getSymbol(tsUtils.expression.getExpression(implType));
-      if (implSymbol === undefined) {
-        /* istanbul ignore next */
-        return false;
-      }
-
-      const builtin = sb.builtIns.get(implSymbol);
+    const implementsBuiltin = impl.find((implType) => {
+      const builtin = sb.builtins.getInterface(sb.context, tsUtils.expression.getExpression(implType));
 
       return builtin !== undefined && !builtin.canImplement;
     });
 
-    if (implementsBuiltIn !== undefined) {
+    if (implementsBuiltin !== undefined) {
       sb.reportError(decl, DiagnosticCode.InvalidBuiltinImplement, DiagnosticMessage.CannotImplementBuiltin);
 
       return;
@@ -82,7 +76,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
         sb.emitHelper(
           expr,
           innerOptions,
-          sb.helpers.forBuiltInType({
+          sb.helpers.forBuiltinType({
             type: sb.getType(expr),
             array: throwTypeError,
             boolean: throwTypeError,

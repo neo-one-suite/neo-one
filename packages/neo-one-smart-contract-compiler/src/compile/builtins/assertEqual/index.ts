@@ -1,12 +1,13 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { Context } from '../../../Context';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltInBase, BuiltInCall, BuiltInType, CallLikeExpression } from '../types';
+import { Builtins } from '../Builtins';
+import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
 
-// tslint:disable-next-line export-name
-export class AssertEqual extends BuiltInBase implements BuiltInCall {
-  public readonly types = new Set([BuiltInType.Call]);
+export class AssertEqual extends BuiltinBase implements BuiltinCall {
+  public readonly types = new Set([BuiltinType.Call]);
 
   public canCall(): boolean {
     return true;
@@ -72,3 +73,8 @@ export class AssertEqual extends BuiltInBase implements BuiltInCall {
     );
   }
 }
+
+// tslint:disable-next-line export-name
+export const add = (context: Context, builtins: Builtins): void => {
+  builtins.addTestValue(context, 'assertEqual', new AssertEqual());
+};

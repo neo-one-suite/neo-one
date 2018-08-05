@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 import { createConsoleLogMessages, RawCallReceipt, NEOONEDataProvider } from '@neo-one/client';
 import { CallReceiptJSON } from '@neo-one/client-core';
 import { RawSourceMap } from 'source-map';
-import { ConsoleLog } from '../../../../compile/builtins/console';
+import { ConsoleLog } from '../../../../compile/builtins/console/log';
 
 const getMessages = async (receiptIn: CallReceiptJSON, sourceMap: RawSourceMap): Promise<ReadonlyArray<string>> => {
   const receipt: RawCallReceipt = (new NEOONEDataProvider({ network: 'meh', rpcURL: 'meh' }) as any).convertCallReceipt(

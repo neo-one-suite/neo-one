@@ -1,6 +1,14 @@
-import { BuiltInBase } from '../types';
+import { Context } from '../../../Context';
+import { Builtins } from '../Builtins';
+import { BuiltinBase } from '../types';
+import { ConsoleLog } from './log';
 
-export * from './log';
+class ConsoleValue extends BuiltinBase {}
+class ConsoleType extends BuiltinBase {}
 
-export class ConsoleValue extends BuiltInBase {}
-export class ConsoleType extends BuiltInBase {}
+// tslint:disable-next-line export-name
+export const add = (context: Context, builtins: Builtins): void => {
+  builtins.addInterface(context, 'Console', new ConsoleType());
+  builtins.addMember(context, 'Console', 'log', new ConsoleLog());
+  builtins.addValue(context, 'console', new ConsoleValue());
+};

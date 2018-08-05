@@ -1,6 +1,6 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
-import { BufferConcat } from '../../../../compile/builtins/buffer';
+import { BufferConcat } from '../../../../compile/builtins/buffer/concat';
 
 describe('Buffer.concat', () => {
   test('should concat zero buffers', async () => {

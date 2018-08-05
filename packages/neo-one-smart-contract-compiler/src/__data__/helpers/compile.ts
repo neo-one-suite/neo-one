@@ -9,8 +9,8 @@ import { DiagnosticCode } from '../../DiagnosticCode';
 
 type ExpectOptions = { type: 'error'; code?: DiagnosticCode } | { type: 'warning'; code?: DiagnosticCode };
 
-const compile = (context: Context, sourceFile: ts.SourceFile, options: ExpectOptions) => {
-  compileScript({ context, sourceFile });
+const compile = async (context: Context, sourceFile: ts.SourceFile, options: ExpectOptions) => {
+  await compileScript({ context, sourceFile });
 
   const expectDiagnostic = (category: ts.DiagnosticCategory) => {
     const diag = context.diagnostics.find(
@@ -36,7 +36,7 @@ const compile = (context: Context, sourceFile: ts.SourceFile, options: ExpectOpt
 export const compileString = async (code: string, options: ExpectOptions): Promise<void> => {
   const { context, sourceFile } = await createContextForSnippet(code);
 
-  compile(context, sourceFile, options);
+  await compile(context, sourceFile, options);
 };
 
 export const compileSnippet = async (snippetPath: string, options: ExpectOptions): Promise<void> => {
@@ -51,5 +51,5 @@ export const compileSnippet = async (snippetPath: string, options: ExpectOptions
   const context = await createContextForPath(snippetPath);
   const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, pathResolve(dir, snippetPath));
 
-  compile(context, sourceFile, options);
+  await compile(context, sourceFile, options);
 };

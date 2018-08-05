@@ -1,6 +1,6 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
-import { ObjectKeys } from '../../../../compile/builtins/object';
+import { ObjectKeys } from '../../../../compile/builtins/object/keys';
 
 describe('Object.keys', () => {
   test('should return enumerable own instance properties', async () => {

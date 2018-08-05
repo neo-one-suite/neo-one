@@ -2,11 +2,11 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltInBase, BuiltInCall, BuiltInType, CallLikeExpression } from '../types';
+import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class BufferConcat extends BuiltInBase implements BuiltInCall {
-  public readonly types = new Set([BuiltInType.Call]);
+export class BufferConcat extends BuiltinBase implements BuiltinCall {
+  public readonly types = new Set([BuiltinType.Call]);
 
   public canCall(): boolean {
     throw new Error('Something went wrong.');

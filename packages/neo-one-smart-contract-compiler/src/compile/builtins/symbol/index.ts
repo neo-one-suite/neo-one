@@ -1,8 +1,19 @@
-import { BuiltInBase } from '../types';
+import { Context } from '../../../Context';
+import { Builtins } from '../Builtins';
+import { BuiltinBase } from '../types';
+import { SymbolFor } from './for';
+import { SymbolIterator } from './iterator';
+import { SymbolToPrimitive } from './toPrimitive';
 
-export * from './for';
-export * from './iterator';
-export * from './toPrimitive';
+class SymbolInstance extends BuiltinBase {}
+class SymbolConstructor extends BuiltinBase {}
 
-export class SymbolInstance extends BuiltInBase {}
-export class SymbolType extends BuiltInBase {}
+// tslint:disable-next-line export-name
+export const add = (context: Context, builtins: Builtins): void => {
+  builtins.addInterface(context, 'Symbol', new SymbolInstance());
+  builtins.addValue(context, 'Symbol', new SymbolInstance());
+  builtins.addInterface(context, 'SymbolConstructor', new SymbolConstructor());
+  builtins.addMember(context, 'SymbolConstructor', 'for', new SymbolFor());
+  builtins.addMember(context, 'SymbolConstructor', 'iterator', new SymbolIterator());
+  builtins.addMember(context, 'SymbolConstructor', 'toPrimitive', new SymbolToPrimitive());
+};

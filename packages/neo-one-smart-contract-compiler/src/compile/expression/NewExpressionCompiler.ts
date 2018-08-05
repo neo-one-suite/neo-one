@@ -1,6 +1,6 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { isBuiltInConstruct } from '../builtins';
+import { isBuiltinConstruct } from '../builtins';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -11,15 +11,11 @@ export class NewExpressionCompiler extends NodeCompiler<ts.NewExpression> {
   public visitNode(sb: ScriptBuilder, expr: ts.NewExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     const newExpr = tsUtils.expression.getExpression(expr);
-    const newSymbol = sb.getSymbol(newExpr);
+    const builtin = sb.builtins.getValue(sb.context, newExpr);
+    if (builtin !== undefined && isBuiltinConstruct(builtin)) {
+      builtin.emitConstruct(sb, expr, optionsIn);
 
-    if (newSymbol !== undefined) {
-      const builtin = sb.builtIns.get(newSymbol);
-      if (builtin !== undefined && isBuiltInConstruct(builtin)) {
-        builtin.emitConstruct(sb, expr, optionsIn);
-
-        return;
-      }
+      return;
     }
 
     // [argsarr]

@@ -1,6 +1,6 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
-import { SymbolFor } from '../../../../compile/builtins/symbol';
+import { SymbolFor } from '../../../../compile/builtins/symbol/for';
 
 describe('Symbol.for', () => {
   test('should create symbols', async () => {
