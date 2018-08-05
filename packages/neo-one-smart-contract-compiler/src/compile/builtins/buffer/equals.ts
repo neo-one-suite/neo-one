@@ -25,7 +25,8 @@ export class BufferEquals extends BuiltInBase implements BuiltInCall {
 
   public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions): void {
     if (!ts.isCallExpression(node)) {
-      return;
+      /* istanbul ignore next */
+      throw new Error('Something went wrong.');
     }
 
     const func = tsUtils.expression.getExpression(node);

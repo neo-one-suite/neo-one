@@ -1,5 +1,6 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
+import { SymbolFor } from '../../../../compile/builtins/symbol';
 
 describe('Symbol.for', () => {
   test('should create symbols', async () => {
@@ -27,5 +28,9 @@ describe('Symbol.for', () => {
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
+  });
+
+  test('canCall should throw an error', () => {
+    expect(() => new SymbolFor().canCall()).toThrow();
   });
 });

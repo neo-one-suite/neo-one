@@ -8,24 +8,14 @@ import { BuiltInBase, BuiltInCall, BuiltInType, CallLikeExpression } from '../ty
 export class SymbolFor extends BuiltInBase implements BuiltInCall {
   public readonly types = new Set([BuiltInType.Call]);
 
-  public canCall(sb: ScriptBuilder, node: CallLikeExpression): boolean {
-    if (!ts.isCallExpression(node)) {
-      return false;
-    }
-
-    const arg = tsUtils.argumented.getArguments(node)[0] as ts.Expression | undefined;
-    if (arg === undefined) {
-      return false;
-    }
-
-    const type = sb.getType(arg, { error: true });
-
-    return type !== undefined && tsUtils.type_.isOnlyStringish(type);
+  public canCall(): boolean {
+    throw new Error('Something went wrong.');
   }
 
   public emitCall(sb: ScriptBuilder, node: CallLikeExpression, options: VisitOptions): void {
     if (!ts.isCallExpression(node)) {
-      return;
+      /* istanbul ignore next */
+      throw new Error('Something went wrong.');
     }
 
     const arg = tsUtils.argumented.getArguments(node)[0];

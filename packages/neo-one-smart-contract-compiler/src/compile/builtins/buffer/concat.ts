@@ -8,28 +8,14 @@ import { BuiltInBase, BuiltInCall, BuiltInType, CallLikeExpression } from '../ty
 export class BufferConcat extends BuiltInBase implements BuiltInCall {
   public readonly types = new Set([BuiltInType.Call]);
 
-  public canCall(sb: ScriptBuilder, node: CallLikeExpression): boolean {
-    if (!ts.isCallExpression(node)) {
-      return false;
-    }
-
-    const arg = tsUtils.argumented.getArguments(node)[0] as ts.Expression | undefined;
-    if (arg === undefined) {
-      return false;
-    }
-
-    const type = sb.getType(arg, { error: true });
-
-    return (
-      type !== undefined &&
-      tsUtils.type_.isOnlyArrayish(type) &&
-      sb.isGlobal(arg, tsUtils.type_.getArrayTypeOrThrow(type), 'Buffer')
-    );
+  public canCall(): boolean {
+    throw new Error('Something went wrong.');
   }
 
   public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions): void {
     if (!ts.isCallExpression(node)) {
-      return;
+      /* istanbul ignore next */
+      throw new Error('Something went wrong.');
     }
 
     const options = sb.pushValueOptions(optionsIn);

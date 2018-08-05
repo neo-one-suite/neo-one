@@ -1,5 +1,6 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
+import { BufferFrom } from '../../../../compile/builtins/buffer';
 
 describe('Buffer.from', () => {
   test('should return a buffer from literal values', async () => {
@@ -36,5 +37,9 @@ describe('Buffer.from', () => {
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
+  });
+
+  test('canCall should throw an error', () => {
+    expect(() => new BufferFrom().canCall()).toThrow();
   });
 });

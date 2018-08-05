@@ -70,18 +70,21 @@ describe('ClassDeclarationCompiler', () => {
 
   test('basic class with optional constructor arguments', async () => {
     await helpers.executeString(`
-      class Foo {
-        x: string | undefined;
+      const bar: unique symbol = Symbol.for('x');
+      const baz: unique symbol = Symbol.for('baz');
+      interface Bar {}
+      class Foo implements Bar {
+        public [bar]: string | undefined;
+        public [baz]: string = 'baz';
 
         constructor(x?: string) {
-          this.x = x;
+          this[bar] = x;
         }
       }
 
       const f = new Foo();
-      if (f.x !== undefined) {
-        throw 'Failure';
-      }
+      assertEqual(f[bar], undefined);
+      assertEqual(f[baz], 'baz');
     `);
   });
 
@@ -90,7 +93,7 @@ describe('ClassDeclarationCompiler', () => {
       class Foo {
         x: string = 'bar';
 
-        bar(): string {
+        ['bar'](): string {
           return this.x;
         }
       }
@@ -119,6 +122,24 @@ describe('ClassDeclarationCompiler', () => {
     `);
   });
 
+  test('basic class with get symbol accessor', async () => {
+    await helpers.executeString(`
+      const bar = Symbol.for('bar');
+      class Foo {
+        x: string = 'bar';
+
+        public get [bar](): string {
+          return this.x;
+        }
+      }
+
+      const f = new Foo();
+      if (f[bar] !== 'bar') {
+        throw 'Failure';
+      }
+    `);
+  });
+
   test('basic class with set accessor', async () => {
     await helpers.executeString(`
       class Foo {
@@ -135,6 +156,29 @@ describe('ClassDeclarationCompiler', () => {
       }
 
       f.bar = 'baz';
+      if ((f.x as string) !== 'baz') {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('basic class with set symbol accessor', async () => {
+    await helpers.executeString(`
+      const bar = Symbol.for('bar');
+      class Foo {
+        x: string = 'bar';
+
+        public set [bar](x: string) {
+          this.x = x;
+        }
+      }
+
+      const f = new Foo();
+      if (f.x !== 'bar') {
+        throw 'Failure';
+      }
+
+      f[bar] = 'baz';
       if ((f.x as string) !== 'baz') {
         throw 'Failure';
       }
@@ -162,6 +206,33 @@ describe('ClassDeclarationCompiler', () => {
 
       f.bar = 'baz';
       if (f.bar !== 'baz') {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('basic class with get/set symbol accessor', async () => {
+    await helpers.executeString(`
+      const bar = Symbol.for('bar');
+      class Foo {
+        x: string = 'bar';
+
+        public get [bar](): string {
+          return this.x;
+        }
+
+        public set [bar](x: string) {
+          this.x = x;
+        }
+      }
+
+      const f = new Foo();
+      if (f[bar] !== 'bar') {
+        throw 'Failure';
+      }
+
+      f[bar] = 'baz';
+      if (f[bar] !== 'baz') {
         throw 'Failure';
       }
     `);
@@ -198,6 +269,27 @@ describe('ClassDeclarationCompiler', () => {
 
       const f = new Baz();
       if (f.bar() !== 'bar') {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('basic class extended with inherited symbol method', async () => {
+    await helpers.executeString(`
+      const bar = Symbol.for('bar');
+      class Foo {
+        x: string = 'bar';
+
+        [bar](): string {
+          return this.x;
+        }
+      }
+
+      class Baz extends Foo {
+      }
+
+      const f = new Baz();
+      if (f[bar]() !== 'bar') {
         throw 'Failure';
       }
     `);

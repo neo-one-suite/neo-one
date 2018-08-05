@@ -14,13 +14,14 @@ export class ArrayForEach extends BuiltInBase implements BuiltInCall {
 
   public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions, visited = false): void {
     if (!ts.isCallExpression(node)) {
-      return;
+      /* istanbul ignore next */
+      throw new Error('Something went wrong.');
     }
 
     const options = sb.pushValueOptions(optionsIn);
     if (!visited) {
       const expr = tsUtils.expression.getExpression(node);
-      if (!ts.isPropertyAccessExpression(expr) && !ts.isElementAccessExpression(expr)) {
+      if (!ts.isElementAccessExpression(expr) && !ts.isPropertyAccessExpression(expr)) {
         /* istanbul ignore next */
         throw new Error('Something went wrong');
       }
@@ -33,7 +34,7 @@ export class ArrayForEach extends BuiltInBase implements BuiltInCall {
     sb.emitHelper(node, options, sb.helpers.unwrapArray);
     // [objectVal, arr]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
-    // [arr]
+    // []
     sb.emitHelper(node, optionsIn, sb.helpers.arrForEachFunc);
   }
 }

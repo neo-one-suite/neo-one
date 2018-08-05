@@ -14,13 +14,14 @@ export class ArrayFilter extends BuiltInBase implements BuiltInCall {
 
   public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions, visited = false): void {
     if (!ts.isCallExpression(node)) {
-      return;
+      /* istanbul ignore next */
+      throw new Error('Something went wrong.');
     }
 
     const options = sb.pushValueOptions(optionsIn);
     if (!visited) {
       const expr = tsUtils.expression.getExpression(node);
-      if (!ts.isPropertyAccessExpression(expr) && !ts.isElementAccessExpression(expr)) {
+      if (!ts.isElementAccessExpression(expr) && !ts.isPropertyAccessExpression(expr)) {
         /* istanbul ignore next */
         throw new Error('Something went wrong');
       }

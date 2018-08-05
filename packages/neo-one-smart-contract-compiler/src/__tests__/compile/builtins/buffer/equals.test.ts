@@ -6,6 +6,7 @@ describe('Buffer.prototype.equals', () => {
     await helpers.executeString(`
       const x = Buffer.from('5946158ab93f5f4fd6ba230f1c6c235117eec5f83e65275ac6f93ada9ca60477', 'hex');
 
+      x.equals(x);
       assertEqual(x.equals(x), true);
     `);
   });

@@ -1,5 +1,6 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
+import { ObjectKeys } from '../../../../compile/builtins/object';
 
 describe('Object.keys', () => {
   test('should return enumerable own instance properties', async () => {
@@ -120,5 +121,9 @@ describe('Object.keys', () => {
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
+  });
+
+  test('canCall should throw an error', () => {
+    expect(() => new ObjectKeys().canCall()).toThrow();
   });
 });

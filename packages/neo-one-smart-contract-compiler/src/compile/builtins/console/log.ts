@@ -8,17 +8,14 @@ import { BuiltInBase, BuiltInCall, BuiltInType, CallLikeExpression } from '../ty
 // tslint:disable-next-line export-name
 export class ConsoleLog extends BuiltInBase implements BuiltInCall {
   public readonly types = new Set([BuiltInType.Call]);
-  public canCall(_sb: ScriptBuilder, node: CallLikeExpression): boolean {
-    if (!ts.isCallExpression(node)) {
-      return false;
-    }
-
-    return true;
+  public canCall(): boolean {
+    throw new Error('Something went wrong.');
   }
 
   public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions): void {
     if (!ts.isCallExpression(node)) {
-      return;
+      /* istanbul ignore next */
+      throw new Error('Something went wrong.');
     }
 
     const options = sb.pushValueOptions(optionsIn);

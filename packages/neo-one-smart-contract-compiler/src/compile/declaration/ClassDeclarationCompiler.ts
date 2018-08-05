@@ -56,8 +56,10 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
         const expr = tsUtils.expression.getExpression(nameNode);
         const throwTypeError = (innerInnerOptions: VisitOptions) => {
           // []
+          /* istanbul ignore next */
           sb.emitOp(node, 'DROP');
           // []
+          /* istanbul ignore next */
           sb.emitHelper(node, innerInnerOptions, sb.helpers.throwTypeError);
         };
 

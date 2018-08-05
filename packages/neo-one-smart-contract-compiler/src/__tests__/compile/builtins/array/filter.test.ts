@@ -16,7 +16,7 @@ describe('Array.prototype.filter', () => {
   test('should filter an array with a function with idx', async () => {
     await helpers.executeString(`
       const x = [1, 2, 3, 4];
-      const y = x.filter((value, idx) => idx % 2 === 0);
+      const y = x['filter']((value, idx) => idx % 2 === 0);
 
       assertEqual(y.length, 2);
       assertEqual(y[0], 1);

@@ -8,15 +8,17 @@ import { BuiltInBase, BuiltInCall, BuiltInType, CallLikeExpression } from '../ty
 export class BufferFrom extends BuiltInBase implements BuiltInCall {
   public readonly types = new Set([BuiltInType.Call]);
 
-  public canCall(_sb: ScriptBuilder, node: CallLikeExpression): boolean {
-    return this.getHashAndEncoding(node) !== undefined;
+  public canCall(): boolean {
+    throw new Error('Something went wrong.');
   }
 
   public emitCall(sb: ScriptBuilder, node: CallLikeExpression, options: VisitOptions): void {
     const result = this.getHashAndEncoding(node);
     if (result === undefined) {
+      /* istanbul ignore next */
       sb.reportUnsupported(node);
 
+      /* istanbul ignore next */
       return;
     }
 
@@ -31,6 +33,7 @@ export class BufferFrom extends BuiltInBase implements BuiltInCall {
     node: CallLikeExpression,
   ): { readonly hash: string; readonly encoding?: string } | undefined {
     if (!ts.isCallExpression(node)) {
+      /* istanbul ignore next */
       return undefined;
     }
 
@@ -43,6 +46,7 @@ export class BufferFrom extends BuiltInBase implements BuiltInCall {
     const hashArg = args[0];
     const encodingArg = args[1] as ts.Expression | undefined;
     if (!ts.isStringLiteral(hashArg) || (encodingArg !== undefined && !ts.isStringLiteral(encodingArg))) {
+      /* istanbul ignore next */
       return undefined;
     }
     const hash = tsUtils.literal.getLiteralValue(hashArg);
