@@ -85,7 +85,7 @@ export class Builtins {
     const mutableMembers: Array<[string, T]> = [];
     members.forEach((builtin, memberSymbol) => {
       const memberName = tsUtils.symbol.getName(memberSymbol);
-      if (builtin !== undefined && isMember(builtin) && testKey(memberName) && isEligible(builtin)) {
+      if (isMember(builtin) && testKey(memberName) && isEligible(builtin)) {
         mutableMembers.push([modifyKey(memberName), builtin]);
       }
     });
