@@ -60,6 +60,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
       case ts.SyntaxKind.BarBarToken:
         this.visitLogicalExpressionOperator(sb, kind, expr, options);
         break;
+      /* istanbul ignore next */
       default:
         /* istanbul ignore next */
         utils.assertNever(kind);
@@ -132,6 +133,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
           pushValueOptions,
         );
         break;
+      /* istanbul ignore next */
       default:
         /* istanbul ignore next */
         utils.assertNever(kind);
@@ -399,6 +401,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         sb.emitOp(node, 'NOT');
         sb.emitHelper(node, options, sb.helpers.createBoolean);
         break;
+      /* istanbul ignore next */
       default:
         /* istanbul ignore next */
         utils.assertNever(kind);
@@ -470,12 +473,14 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         );
         break;
       }
+      /* istanbul ignore next */
       default:
         /* istanbul ignore next */
         utils.assertNever(kind);
     }
   }
 
+  /* istanbul ignore next */
   private handleInstanceOf(
     sb: ScriptBuilder,
     node: ts.Node,

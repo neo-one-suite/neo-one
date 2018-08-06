@@ -50,7 +50,6 @@ export interface ScriptBuilder {
   readonly loadModule: (node: ts.SourceFile) => void;
   readonly capture: (func: () => void) => CaptureResult;
   readonly toBuffer: (value: string) => Buffer;
-  readonly plainOptions: (options: VisitOptions) => VisitOptions;
   readonly pushValueOptions: (options: VisitOptions) => VisitOptions;
   readonly noPushValueOptions: (options: VisitOptions) => VisitOptions;
   readonly setValueOptions: (options: VisitOptions) => VisitOptions;
@@ -70,7 +69,6 @@ export interface ScriptBuilder {
   readonly reportUnsupported: (node: ts.Node) => void;
   readonly getType: (node: ts.Node, options?: DiagnosticOptions) => ts.Type | undefined;
   readonly getSymbol: (node: ts.Node, options?: DiagnosticOptions) => ts.Symbol | undefined;
-  readonly getTypeSymbol: (node: ts.Node, options?: DiagnosticOptions) => ts.Symbol | undefined;
   readonly isOnlyGlobal: (node: ts.Node, type: ts.Type | undefined, name: keyof Globals) => boolean;
   readonly isGlobal: (node: ts.Node, type: ts.Type | undefined, name: keyof Globals) => boolean;
   readonly hasGlobal: (node: ts.Node, type: ts.Type | undefined, name: keyof Globals) => boolean;

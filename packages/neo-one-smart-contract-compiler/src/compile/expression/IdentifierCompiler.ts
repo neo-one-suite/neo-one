@@ -20,8 +20,10 @@ export class IdentifierCompiler extends NodeCompiler<ts.Identifier> {
       }
 
       if (options.setValue) {
+        /* istanbul ignore next */
         sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotModifyBuiltin);
 
+        /* istanbul ignore next */
         return;
       }
 

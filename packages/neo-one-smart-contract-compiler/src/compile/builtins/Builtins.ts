@@ -152,6 +152,7 @@ export class Builtins {
     }
 
     if (decl === undefined) {
+      /* istanbul ignore next */
       throw new Error('Expected declaration');
     }
 

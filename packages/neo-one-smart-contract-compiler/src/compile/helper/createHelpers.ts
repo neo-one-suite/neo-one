@@ -46,18 +46,14 @@ import {
   ThrowCompletionHelper,
   ThrowHelper,
 } from './completionRecord';
-import { CreateErrorHelper, GetErrorClassHelper, ThrowTypeErrorHelper } from './error';
+import { GetErrorClassHelper, ThrowTypeErrorHelper } from './error';
 import {
   ArgumentsHelper,
-  BindFunctionObjectThisHelper,
-  BindFunctionObjectThisHelperOptions,
   BindFunctionThisHelper,
   BindFunctionThisHelperOptions,
   CallHelper,
   CallLikeHelper,
   CloneFunctionHelper,
-  CloneFunctionObjectHelper,
-  CloneFunctionObjectHelperOptions,
   CreateCallArrayHelper,
   CreateConstructArrayHelper,
   CreateConstructArrayHelperOptions,
@@ -230,7 +226,6 @@ export interface Helpers {
   readonly debugLog: (options: DebugLogHelperOptions) => DebugLogHelper;
 
   // error
-  readonly createError: CreateErrorHelper;
   readonly getErrorClass: GetErrorClassHelper;
 
   readonly equalsEqualsEquals: (options: EqualsEqualsEqualsHelperOptions) => EqualsEqualsEqualsHelper;
@@ -242,12 +237,10 @@ export interface Helpers {
   readonly processStatements: (options: ProcessStatementsHelperOptions) => ProcessStatementsHelper;
 
   readonly args: ArgumentsHelper;
-  readonly bindFunctionObjectThis: (options: BindFunctionObjectThisHelperOptions) => BindFunctionObjectThisHelper;
   readonly bindFunctionThis: (options: BindFunctionThisHelperOptions) => BindFunctionThisHelper;
   readonly call: CallHelper;
   readonly callLike: CallLikeHelper;
   readonly cloneFunction: CloneFunctionHelper;
-  readonly cloneFunctionObject: (options: CloneFunctionObjectHelperOptions) => CloneFunctionObjectHelper;
   readonly createCallArray: CreateCallArrayHelper;
   readonly createConstructArray: (options: CreateConstructArrayHelperOptions) => CreateConstructArrayHelper;
   readonly createFunctionArray: (options: CreateFunctionArrayHelperOptions) => CreateFunctionArrayHelper;
@@ -416,7 +409,6 @@ export const createHelpers = (): Helpers => {
     debugLog: (options) => new DebugLogHelper(options),
 
     // error
-    createError: new CreateErrorHelper(),
     getErrorClass: new GetErrorClassHelper(),
 
     equalsEqualsEquals: (options) => new EqualsEqualsEqualsHelper(options),
@@ -428,12 +420,10 @@ export const createHelpers = (): Helpers => {
     processStatements: (options) => new ProcessStatementsHelper(options),
 
     args: new ArgumentsHelper(),
-    bindFunctionObjectThis: (options) => new BindFunctionObjectThisHelper(options),
     bindFunctionThis: (options) => new BindFunctionThisHelper(options),
     call: new CallHelper(),
     callLike: new CallLikeHelper(),
     cloneFunction: new CloneFunctionHelper(),
-    cloneFunctionObject: (options) => new CloneFunctionObjectHelper(options),
     createCallArray: new CreateCallArrayHelper(),
     createConstructArray: (options) => new CreateConstructArrayHelper(options),
     createFunctionArray: (options) => new CreateFunctionArrayHelper(options),

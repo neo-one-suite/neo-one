@@ -72,6 +72,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
       .reduce<Compilers>((acc, kindCompilerClass) => {
         const kindCompiler = new kindCompilerClass();
         if (acc[kindCompiler.kind] !== undefined) {
+          /* istanbul ignore next */
           throw new Error(`Found duplicate compiler for kind ${kindCompiler.kind}`);
         }
 
@@ -95,6 +96,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   public get scope(): TScope {
     if (this.mutableCurrentScope === undefined) {
+      /* istanbul ignore next */
       throw new Error('Scope has not been set');
     }
 
@@ -167,6 +169,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         const offsetPC = new BN(value.pc.getPC()).sub(new BN(pc));
         const jumpPC = offsetPC.toTwos(16);
         if (jumpPC.fromTwos(16).toNumber() !== value.pc.getPC() - pc) {
+          /* istanbul ignore next */
           throw new Error(
             `Something went wrong, expected 2's complement of ${value.pc.getPC() - pc}, found: ${jumpPC
               .fromTwos(16)
@@ -175,6 +178,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         }
         const byteCodeBuffer = ByteBuffer[Op[value.op]] as Buffer | undefined;
         if (byteCodeBuffer === undefined) {
+          /* istanbul ignore next */
           throw new Error('Something went wrong, could not find bytecode buffer');
         }
         finalValue = Buffer.concat([byteCodeBuffer, jumpPC.toArrayLike(Buffer, 'le', 2)]);
@@ -252,6 +256,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   public emitOp(node: ts.Node, code: OpCode, buffer?: Buffer | undefined): void {
     const bytecode = Op[code] as Op | undefined;
     if (bytecode === undefined) {
+      /* istanbul ignore next */
       throw new UnknownOpError(code);
     }
     this.emitOpByte(node, bytecode, buffer);
@@ -298,6 +303,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
       } else if (code instanceof Jmp) {
         this.emitJump(node, code.plus(pc));
       } else if (code instanceof Jump) {
+        /* istanbul ignore next */
         throw new Error('Something went wrong.');
       } else if (code instanceof Line) {
         this.emitLineRaw(node, code);
@@ -379,15 +385,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     return Buffer.from(value, 'utf8');
   }
 
-  public plainOptions(options: VisitOptions): VisitOptions {
-    return {
-      ...options,
-      pushValue: false,
-      setValue: false,
-      catchPC: undefined,
-    };
-  }
-
   public pushValueOptions(options: VisitOptions): VisitOptions {
     return { ...options, pushValue: true };
   }
@@ -459,10 +456,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   public getSymbol(node: ts.Node, options?: DiagnosticOptions): ts.Symbol | undefined {
     return this.context.getSymbol(node, options);
-  }
-
-  public getTypeSymbol(node: ts.Node, options?: DiagnosticOptions): ts.Symbol | undefined {
-    return this.context.getTypeSymbol(node, options);
   }
 
   public isOnlyGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
