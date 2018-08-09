@@ -2,7 +2,7 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
-import { isBuiltinMemberValue } from '../builtins';
+import { Builtin, isBuiltinInstanceMemberValue, isBuiltinMemberValue } from '../builtins';
 import { Types } from '../helper/types/Types';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -13,26 +13,40 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
 
   public visitNode(sb: ScriptBuilder, expr: ts.ElementAccessExpression, optionsIn: VisitOptions): void {
     const value = tsUtils.expression.getExpression(expr);
-    const valueType = sb.getType(value);
+    const valueType = sb.context.getType(value);
     const prop = tsUtils.expression.getArgumentExpressionOrThrow(expr);
-    const propType = sb.getType(prop);
+    const propType = sb.context.getType(prop);
 
-    const builtinProp = sb.builtins.getMember(sb.context, value, prop);
-    if (builtinProp !== undefined) {
-      if (!isBuiltinMemberValue(builtinProp)) {
-        sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltinProperty);
+    const handleBuiltin = (member: Builtin, visited: boolean) => {
+      if (isBuiltinInstanceMemberValue(member)) {
+        member.emitValue(sb, expr, optionsIn, visited);
 
         return;
       }
 
-      builtinProp.emitValue(sb, expr, optionsIn);
+      if (isBuiltinMemberValue(member)) {
+        member.emitValue(sb, expr, optionsIn);
+
+        return;
+      }
+
+      sb.context.reportError(
+        expr,
+        DiagnosticCode.InvalidBuiltinReference,
+        DiagnosticMessage.CannotReferenceBuiltinProperty,
+      );
+    };
+
+    const builtinProp = sb.context.builtins.getMember(value, prop);
+    if (builtinProp !== undefined) {
+      handleBuiltin(builtinProp, false);
 
       return;
     }
 
     const getValueCases = (name: string, useSymbol = false) =>
-      sb.builtins
-        .getMembers(sb.context, name, isBuiltinMemberValue, () => true, useSymbol)
+      sb.context.builtins
+        .getMembers(name, isBuiltinInstanceMemberValue, () => true, useSymbol)
         .map(([propName, builtin]) => ({
           condition: () => {
             // [string, string, objectVal]
@@ -45,7 +59,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
           whenTrue: () => {
             // [objectVal]
             sb.emitOp(expr, 'DROP');
-            builtin.emitValue(sb, expr, optionsIn, true);
+            handleBuiltin(builtin, true);
           },
         }));
 
@@ -82,6 +96,15 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
           string: handleString,
           symbol: handleSymbol,
           undefined: throwInnerTypeError,
+          transaction: throwInnerTypeError,
+          output: throwInnerTypeError,
+          attribute: throwInnerTypeError,
+          input: throwInnerTypeError,
+          account: throwInnerTypeError,
+          asset: throwInnerTypeError,
+          contract: throwInnerTypeError,
+          header: throwInnerTypeError,
+          block: throwInnerTypeError,
         }),
       );
     };
@@ -99,7 +122,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
 
       const handleString = (innerInnerOptions: VisitOptions) => {
         // [string, objectVal]
-        sb.emitHelper(prop, innerInnerOptions, sb.helpers.getString);
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapString);
         handleStringBase(innerInnerOptions);
       };
 
@@ -111,7 +134,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
 
       const handleSymbol = (innerInnerOptions: VisitOptions) => {
         // [string, objectVal]
-        sb.emitHelper(prop, innerInnerOptions, sb.helpers.getSymbol);
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapSymbol);
         sb.emitHelper(
           expr,
           innerInnerOptions,
@@ -151,13 +174,13 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
 
       const handleString = (innerInnerOptions: VisitOptions) => {
         // [string, objectVal]
-        sb.emitHelper(prop, innerInnerOptions, sb.helpers.getString);
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapString);
         sb.emitHelper(
           expr,
           innerInnerOptions,
           sb.helpers.case(getValueCases('Array', false), () => {
             // [stringVal, objectVal]
-            sb.emitHelper(prop, innerInnerOptions, sb.helpers.createString);
+            sb.emitHelper(prop, innerInnerOptions, sb.helpers.wrapString);
             // [number, objectVal]
             sb.emitHelper(prop, innerInnerOptions, sb.helpers.toNumber({ type: propType, knownType: Types.String }));
             handleNumberBase(innerInnerOptions);
@@ -167,13 +190,13 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
 
       const handleNumber = (innerInnerOptions: VisitOptions) => {
         // [number, objectVal]
-        sb.emitHelper(prop, innerInnerOptions, sb.helpers.getNumber);
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapNumber);
         handleNumberBase(innerInnerOptions);
       };
 
       const handleSymbol = (innerInnerOptions: VisitOptions) => {
         // [string, objectVal]
-        sb.emitHelper(prop, innerInnerOptions, sb.helpers.getSymbol);
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapSymbol);
         sb.emitHelper(
           expr,
           innerInnerOptions,
@@ -220,13 +243,13 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
 
       const handleString = (innerInnerOptions: VisitOptions) => {
         // [string, objectVal]
-        sb.emitHelper(prop, innerInnerOptions, sb.helpers.getString);
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapString);
         handleStringBase(innerInnerOptions);
       };
 
       const handleSymbol = (innerInnerOptions: VisitOptions) => {
         // [string, objectVal]
-        sb.emitHelper(prop, innerInnerOptions, sb.helpers.getSymbol);
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapSymbol);
 
         if (optionsIn.pushValue && optionsIn.setValue) {
           // [objectVal, string, objectVal, val]
@@ -275,6 +298,15 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
           string: handleString,
           symbol: handleSymbol,
           undefined: throwInnerTypeError,
+          transaction: throwInnerTypeError,
+          output: throwInnerTypeError,
+          attribute: throwInnerTypeError,
+          input: throwInnerTypeError,
+          account: throwInnerTypeError,
+          asset: throwInnerTypeError,
+          contract: throwInnerTypeError,
+          header: throwInnerTypeError,
+          block: throwInnerTypeError,
         }),
       );
     };
@@ -296,6 +328,15 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         string: createProcessBuiltin('String'),
         symbol: createProcessBuiltin('Symbol'),
         undefined: throwTypeError,
+        transaction: createProcessBuiltin('TransactionBase'),
+        output: createProcessBuiltin('Output'),
+        attribute: createProcessBuiltin('AttributeBase'),
+        input: createProcessBuiltin('Input'),
+        account: createProcessBuiltin('Account'),
+        asset: createProcessBuiltin('Asset'),
+        contract: createProcessBuiltin('Contract'),
+        header: createProcessBuiltin('Header'),
+        block: createProcessBuiltin('Block'),
       }),
     );
   }

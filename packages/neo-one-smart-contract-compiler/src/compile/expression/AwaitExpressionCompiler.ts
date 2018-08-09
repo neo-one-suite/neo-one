@@ -7,6 +7,6 @@ export class AwaitExpressionCompiler extends NodeCompiler<ts.AwaitExpression> {
   public readonly kind = ts.SyntaxKind.AwaitExpression;
 
   public visitNode(sb: ScriptBuilder, expr: ts.AwaitExpression): void {
-    sb.reportUnsupported(expr);
+    sb.context.reportUnsupported(expr);
   }
 }

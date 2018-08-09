@@ -1,24 +1,24 @@
 import ts from 'typescript';
-import { Context } from '../../../Context';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
-import { BuiltinBase, BuiltinType, BuiltinValue } from '../types';
+import { BuiltinValue } from '../BuiltinValue';
 
-class MapInstance extends BuiltinBase implements BuiltinValue {
+class MapInterface extends BuiltinInterface {
   public readonly canImplement = true;
-  public readonly types = new Set([BuiltinType.Value]);
-
-  public emitValue(sb: ScriptBuilder, node: ts.Identifier, options: VisitOptions): void {
+}
+class MapValue extends BuiltinValue {
+  public emit(sb: ScriptBuilder, node: ts.Identifier, options: VisitOptions): void {
     // [classVal]
     sb.emitHelper(node, options, sb.helpers.getMapClass);
   }
 }
-class MapConstructor extends BuiltinBase {}
+class MapConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name
-export const add = (context: Context, builtins: Builtins): void => {
-  builtins.addInterface(context, 'Map', new MapInstance());
-  builtins.addValue(context, 'Map', new MapInstance());
-  builtins.addInterface(context, 'MapConstructor', new MapConstructor());
+export const add = (builtins: Builtins): void => {
+  builtins.addInterface('Map', new MapInterface());
+  builtins.addValue('Map', new MapValue());
+  builtins.addInterface('MapConstructor', new MapConstructorInterface());
 };

@@ -42,7 +42,7 @@ export abstract class GetObjectPropertyHelperBase extends Helper {
           sb.emitOp(node, 'DROP');
           if (options.pushValue) {
             // [val]
-            sb.emitHelper(node, options, sb.helpers.createUndefined);
+            sb.emitHelper(node, options, sb.helpers.wrapUndefined);
           }
         },
         getObject: this.getObject.bind(this),

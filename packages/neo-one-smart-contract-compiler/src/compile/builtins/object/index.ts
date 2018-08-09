@@ -1,15 +1,16 @@
-import { Context } from '../../../Context';
+import { BuiltinBase } from '../BuiltinBase';
+import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
-import { BuiltinBase } from '../types';
 import { ObjectKeys } from './keys';
 
-class ObjectInstance extends BuiltinBase {}
-class ObjectConstructor extends BuiltinBase {}
+class ObjectInterface extends BuiltinInterface {}
+class ObjectValue extends BuiltinBase {}
+class ObjectConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name
-export const add = (context: Context, builtins: Builtins): void => {
-  builtins.addInterface(context, 'Object', new ObjectInstance());
-  builtins.addValue(context, 'Object', new ObjectInstance());
-  builtins.addInterface(context, 'ObjectConstructor', new ObjectConstructor());
-  builtins.addMember(context, 'ObjectConstructor', 'keys', new ObjectKeys());
+export const add = (builtins: Builtins): void => {
+  builtins.addInterface('Object', new ObjectInterface());
+  builtins.addValue('Object', new ObjectValue());
+  builtins.addInterface('ObjectConstructor', new ObjectConstructorInterface());
+  builtins.addMember('ObjectConstructor', 'keys', new ObjectKeys());
 };

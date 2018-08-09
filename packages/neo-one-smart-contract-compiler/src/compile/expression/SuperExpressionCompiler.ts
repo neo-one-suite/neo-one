@@ -19,7 +19,7 @@ export class SuperExpressionCompiler extends NodeCompiler<ts.SuperExpression> {
       /* istanbul ignore next */
       if (methodDeclaration === undefined) {
         /* istanbul ignore next */
-        sb.reportUnsupported(node);
+        sb.context.reportUnsupported(node);
 
         /* istanbul ignore next */
         return;

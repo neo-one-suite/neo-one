@@ -22,7 +22,7 @@ export class ConditionalExpressionCompiler extends NodeCompiler<ts.ConditionalEx
             condition,
             sb.pushValueOptions(options),
             sb.helpers.toBoolean({
-              type: sb.getType(condition),
+              type: sb.context.getType(condition),
             }),
           );
         },

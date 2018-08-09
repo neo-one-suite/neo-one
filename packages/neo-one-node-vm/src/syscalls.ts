@@ -124,7 +124,7 @@ const getHashOrIndex = ({ arg }: { readonly arg: StackItem }): UInt256 | number 
   const buffer = arg.asBuffer();
   let hashOrIndex;
   if (buffer.length === 32) {
-    hashOrIndex = common.bufferToUInt256(common.reverse(buffer));
+    hashOrIndex = arg.asUInt256();
   } else if (buffer.length <= 5) {
     hashOrIndex = arg.asBigInteger().toNumber();
   }
@@ -747,19 +747,25 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     fee: FEES.TWO_HUNDRED,
     invoke: async ({ context, args }) => {
       const transaction = args[0].asTransaction();
-      const spentCoins = await context.blockchain.transactionData.get({
-        hash: transaction.hash,
-      });
+      // tslint:disable-next-line readonly-array
+      let outputs: StackItem[];
+      if (
+        context.init.scriptContainer.type === ScriptContainerType.Transaction &&
+        context.init.scriptContainer.value.equals(transaction)
+      ) {
+        outputs = context.init.scriptContainer.value.outputs.map((output) => new OutputStackItem(output));
+      } else {
+        const spentCoins = await context.blockchain.transactionData.get({
+          hash: transaction.hash,
+        });
+        outputs = transaction.outputs
+          .filter((_output, idx) => (spentCoins.endHeights[idx] as number | undefined) === undefined)
+          .map((output) => new OutputStackItem(output));
+      }
 
       return {
         context,
-        results: [
-          new ArrayStackItem(
-            transaction.outputs
-              .filter((_output, idx) => (spentCoins.endHeights[idx] as number | undefined) === undefined)
-              .map((output) => new OutputStackItem(output)),
-          ),
-        ],
+        results: [new ArrayStackItem(outputs)],
       };
     },
   }),

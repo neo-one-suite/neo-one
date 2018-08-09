@@ -7,6 +7,6 @@ export class WithStatementCompiler extends NodeCompiler<ts.WithStatement> {
   public readonly kind = ts.SyntaxKind.WithStatement;
 
   public visitNode(sb: ScriptBuilder, node: ts.WithStatement, _options: VisitOptions): void {
-    sb.reportUnsupported(node);
+    sb.context.reportUnsupported(node);
   }
 }

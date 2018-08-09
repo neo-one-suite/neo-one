@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-
+import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -10,7 +11,23 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
 
   public visitNode(sb: ScriptBuilder, node: ts.ImportDeclaration, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
-    const sourceFile = tsUtils.importExport.getModuleSpecifierSourceFileOrThrow(sb.typeChecker, node);
+    const sourceFile = tsUtils.importExport.getModuleSpecifierSourceFile(sb.context.typeChecker, node);
+    if (sourceFile === undefined) {
+      const specifier = tsUtils.importExport.getModuleSpecifier(node);
+      sb.context.reportError(
+        node,
+        DiagnosticCode.UnknownModule,
+        DiagnosticMessage.UnknownModule,
+        specifier === undefined ? 'unknown' : tsUtils.literal.getLiteralValue(specifier),
+      );
+
+      return;
+    }
+
+    if (tsUtils.file.isDeclarationFile(sourceFile)) {
+      return;
+    }
+
     // [exports]
     sb.loadModule(sourceFile);
 

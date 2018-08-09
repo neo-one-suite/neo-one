@@ -1,45 +1,64 @@
 // tslint:disable ban-types
 import { tsUtils } from '@neo-one/ts-utils';
-import ts from 'typescript';
+import _ from 'lodash';
+import ts, { DiagnosticCategory } from 'typescript';
 import { format } from 'util';
+import { AnalysisService } from './analysis';
+import { Builtins, createBuiltins } from './compile/builtins';
 import { CompilerDiagnostic } from './CompilerDiagnostic';
 import { DiagnosticCode } from './DiagnosticCode';
 import { DiagnosticMessage } from './DiagnosticMessage';
-import { Globals, LibAliases, LibAliasesWithReset, Libs } from './symbols';
 
 export interface DiagnosticOptions {
   readonly error?: boolean;
   readonly warning?: boolean;
 }
 
+export const DEFAULT_DIAGNOSTIC_OPTIONS = {
+  error: false,
+  warning: true,
+};
+
+const getErrorKey = (diagnostic: ts.Diagnostic) =>
+  `${diagnostic.file}:${diagnostic.start}:${diagnostic.length}:${diagnostic.code}`;
+const getFullKey = (diagnostic: ts.Diagnostic) =>
+  `${diagnostic.file}:${diagnostic.start}:${diagnostic.length}:${diagnostic.category}:${diagnostic.code}:${
+    diagnostic.messageText
+  }`;
+
 export class Context {
+  public readonly builtins: Builtins;
+  public readonly analysis: AnalysisService;
+
   public constructor(
     public readonly program: ts.Program,
     public readonly typeChecker: ts.TypeChecker,
     public readonly languageService: ts.LanguageService,
-    public readonly globals: Globals,
-    public readonly libs: Libs,
-    public readonly libAliases: LibAliasesWithReset,
     private readonly mutableDiagnostics: ts.Diagnostic[] = ts.getPreEmitDiagnostics(program),
-  ) {}
+  ) {
+    this.builtins = createBuiltins(this);
+    this.analysis = new AnalysisService(this);
+  }
 
   public get diagnostics(): ReadonlyArray<ts.Diagnostic> {
-    return this.mutableDiagnostics;
+    const errorDiagnostics = new Set<string>();
+    // tslint:disable-next-line no-loop-statement
+    for (const diagnostic of this.mutableDiagnostics) {
+      if (diagnostic.category === DiagnosticCategory.Error) {
+        errorDiagnostics.add(getErrorKey(diagnostic));
+      }
+    }
+
+    const diagnostics = this.mutableDiagnostics.filter(
+      (diagnostic) =>
+        diagnostic.category === DiagnosticCategory.Error || !errorDiagnostics.has(getErrorKey(diagnostic)),
+    );
+
+    return _.uniqBy(diagnostics, getFullKey);
   }
 
-  public update(
-    program: ts.Program,
-    typeChecker: ts.TypeChecker,
-    languageService: ts.LanguageService,
-    globals: Globals,
-    libs: Libs,
-    libAliases: LibAliasesWithReset,
-  ): Context {
-    return new Context(program, typeChecker, languageService, globals, libs, libAliases, [...this.mutableDiagnostics]);
-  }
-
-  public addDiagnostics(diagnostics: ReadonlyArray<ts.Diagnostic>): void {
-    this.mutableDiagnostics.push(...diagnostics);
+  public update(program: ts.Program, typeChecker: ts.TypeChecker, languageService: ts.LanguageService): Context {
+    return new Context(program, typeChecker, languageService, [...this.mutableDiagnostics]);
   }
 
   public reportError(
@@ -75,9 +94,12 @@ export class Context {
 
   public getType(
     node: ts.Node,
-    { warning = true, error = false }: DiagnosticOptions = { warning: true, error: false },
+    {
+      warning = DEFAULT_DIAGNOSTIC_OPTIONS.warning,
+      error = DEFAULT_DIAGNOSTIC_OPTIONS.error,
+    }: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ts.Type | undefined {
-    const type = this.getNotAnyType(tsUtils.type_.getType(this.typeChecker, node));
+    const type = this.getNotAnyTypeBase(tsUtils.type_.getType(this.typeChecker, node));
 
     if (type === undefined) {
       if (error) {
@@ -100,13 +122,16 @@ export class Context {
   public getTypeOfSymbol(
     symbol: ts.Symbol | undefined,
     node: ts.Node,
-    { warning = true, error = false }: DiagnosticOptions = { warning: true, error: false },
+    {
+      warning = DEFAULT_DIAGNOSTIC_OPTIONS.warning,
+      error = DEFAULT_DIAGNOSTIC_OPTIONS.error,
+    }: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ts.Type | undefined {
     if (symbol === undefined) {
       return undefined;
     }
 
-    const type = this.getNotAnyType(tsUtils.type_.getTypeAtLocation(this.typeChecker, symbol, node));
+    const type = this.getNotAnyTypeBase(tsUtils.type_.getTypeAtLocation(this.typeChecker, symbol, node));
     if (type === undefined) {
       if (error) {
         this.reportTypeError(node);
@@ -127,7 +152,10 @@ export class Context {
 
   public getSymbol(
     node: ts.Node,
-    { warning = true, error = false }: DiagnosticOptions = { warning: true, error: false },
+    {
+      warning = DEFAULT_DIAGNOSTIC_OPTIONS.warning,
+      error = DEFAULT_DIAGNOSTIC_OPTIONS.error,
+    }: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ts.Symbol | undefined {
     const symbol = tsUtils.node.getSymbol(this.typeChecker, node);
     if (symbol === undefined) {
@@ -150,7 +178,10 @@ export class Context {
 
   public getTypeSymbol(
     node: ts.Node,
-    { warning = true, error = false }: DiagnosticOptions = { warning: true, error: false },
+    {
+      warning = DEFAULT_DIAGNOSTIC_OPTIONS.warning,
+      error = DEFAULT_DIAGNOSTIC_OPTIONS.error,
+    }: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ts.Symbol | undefined {
     const noWarnOrError = { warning: false, error: false };
     const type = this.getType(node, noWarnOrError);
@@ -176,13 +207,20 @@ export class Context {
   public getSymbolForType(
     node: ts.Node,
     type: ts.Type | undefined,
-    { warning = true, error = false }: DiagnosticOptions = { warning: true, error: false },
+    {
+      warning = DEFAULT_DIAGNOSTIC_OPTIONS.warning,
+      error = DEFAULT_DIAGNOSTIC_OPTIONS.error,
+    }: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ts.Symbol | undefined {
     if (type === undefined) {
       return undefined;
     }
 
-    const symbol = tsUtils.type_.getSymbol(type);
+    let symbol = tsUtils.type_.getSymbol(type);
+    if (symbol === undefined) {
+      symbol = tsUtils.type_.getAliasSymbol(type);
+    }
+
     if (symbol === undefined) {
       if (!tsUtils.type_.isSymbolic(type)) {
         return undefined;
@@ -205,42 +243,27 @@ export class Context {
     return symbol;
   }
 
-  public isGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
-    return this.isGlobalSymbol(node, this.getSymbolForType(node, type), name);
-  }
-
-  public isOnlyGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
-    return this.isGlobalSymbol(node, this.getSymbolForType(node, type), name);
-  }
-
-  public hasGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
-    return (
-      type !== undefined &&
-      tsUtils.type_.hasType(type, (testType) => this.isGlobalSymbol(node, this.getSymbolForType(node, testType), name))
-    );
-  }
-
-  public isGlobalSymbol(_node: ts.Node, symbol: ts.Symbol | undefined, name: keyof Globals): boolean {
-    return symbol === this.globals[name];
-  }
-
-  public isOnlyLib(node: ts.Node, type: ts.Type | undefined, name: keyof Libs): boolean {
-    return this.isLibSymbol(node, this.getSymbolForType(node, type), name);
-  }
-
-  public isLibSymbol(_node: ts.Node, symbol: ts.Symbol | undefined, name: keyof Libs): boolean {
-    return symbol === this.libs[name];
-  }
-
-  public isLibAlias(identifier: ts.Identifier | undefined, name: keyof LibAliases): boolean {
-    if (identifier === undefined) {
-      return false;
+  public getNotAnyType(
+    node: ts.Node,
+    typeIn: ts.Type | undefined,
+    {
+      warning = DEFAULT_DIAGNOSTIC_OPTIONS.warning,
+      error = DEFAULT_DIAGNOSTIC_OPTIONS.error,
+    }: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
+  ): ts.Type | undefined {
+    const type = this.getNotAnyTypeBase(typeIn);
+    if (type === undefined) {
+      if (error) {
+        this.reportTypeError(node);
+      } else if (warning) {
+        this.reportTypeWarning(node);
+      }
     }
 
-    return this.libAliases[name].has(identifier);
+    return type;
   }
 
-  private getNotAnyType(type: ts.Type | undefined): ts.Type | undefined {
+  private getNotAnyTypeBase(type: ts.Type | undefined): ts.Type | undefined {
     // tslint:disable-next-line no-bitwise
     if (type === undefined || tsUtils.type_.isAny(type)) {
       return undefined;

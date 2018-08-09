@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AttributeUsage cannot be referenced 1`] = `
+"snippetCode.ts (4,17): Builtins cannot be referenced
+
+      2 |       import { AttributeUsage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const x = AttributeUsage;
+        |                 ^
+      5 |     
+"
+`;

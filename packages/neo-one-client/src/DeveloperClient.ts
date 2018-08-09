@@ -53,10 +53,6 @@ export class DeveloperClient<
       this.developerProvider.runConsensusNow(),
     ]);
 
-    if (invokeReceipt.result.state === 'FAULT') {
-      throw new Error(invokeReceipt.result.message);
-    }
-
     return { receipt: invokeReceipt, transaction: result.transaction };
   }
 }

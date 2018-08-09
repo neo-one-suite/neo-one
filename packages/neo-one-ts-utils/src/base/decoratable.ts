@@ -6,3 +6,7 @@ export type DecoratableNode = ts.Node & { readonly decorators?: ts.NodeArray<ts.
 export function getDecorators(node: DecoratableNode): ReadonlyArray<ts.Decorator> | undefined {
   return utils.getValueOrUndefined(node.decorators);
 }
+
+export function getDecoratorsArray(node: DecoratableNode): ReadonlyArray<ts.Decorator> {
+  return utils.getArray(getDecorators(node));
+}

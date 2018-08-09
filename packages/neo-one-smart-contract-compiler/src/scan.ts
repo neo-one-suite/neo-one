@@ -6,13 +6,13 @@ export type Contracts = { [K in string]?: ReadonlyArray<string> };
 
 export const scan = async (dir: string): Promise<Contracts> => {
   const context = await createContextForDir(dir);
-  const smartContract = tsUtils.symbol.getDeclarations(context.libs.SmartContract)[0];
-  if (!ts.isClassDeclaration(smartContract)) {
+  const smartContract = tsUtils.symbol.getDeclarations(context.builtins.getInterfaceSymbol('SmartContract'))[0];
+  if (!ts.isInterfaceDeclaration(smartContract)) {
     throw new Error('Something went wrong!');
   }
 
   return tsUtils.class_
-    .getDerivedClasses(context.program, context.languageService, smartContract)
+    .getImplementors(context.program, context.languageService, smartContract)
     .reduce<Contracts>((acc, derived) => {
       if (!tsUtils.modifier.isAbstract(derived)) {
         const file = tsUtils.file.getFilePath(tsUtils.node.getSourceFile(derived));

@@ -16,7 +16,7 @@ export class WhileStatementCompiler extends NodeCompiler<ts.WhileStatement> {
         condition: () => {
           const expr = tsUtils.expression.getExpression(node);
           sb.visit(expr, options);
-          sb.emitHelper(node, options, sb.helpers.toBoolean({ type: sb.getType(expr) }));
+          sb.emitHelper(node, options, sb.helpers.toBoolean({ type: sb.context.getType(expr) }));
         },
         each: (innerOptions) => {
           sb.visit(tsUtils.statement.getStatement(node), innerOptions);

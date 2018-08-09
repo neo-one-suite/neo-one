@@ -1,27 +1,27 @@
 // tslint:disable readonly-keyword readonly-array no-object-mutation strict-boolean-expressions
 import {
   Address,
+  Asset,
+  Blockchain,
   constant,
-  createEventHandler,
+  createEventNotifier,
   Fixed,
-  getAsset,
-  getCurrentTime,
-  getCurrentTransaction,
   Hash256,
   Integer,
   MapStorage,
   SetStorage,
+  Transaction,
   verify,
-  verifySender,
 } from '@neo-one/smart-contract';
 
 import { Token } from './Token';
 
-const onRefund = createEventHandler('refund');
+const onRefund = createEventNotifier('refund');
 
 export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   public abstract readonly icoAmount: Fixed<Decimals>;
   public abstract readonly maxLimitedRoundAmount: Fixed<Decimals>;
+  public readonly owner: Address;
   private readonly kyc: SetStorage<Address> = new SetStorage();
   private readonly tokensPerAssetLimitedRound: MapStorage<Hash256, Fixed<Decimals>> = new MapStorage();
   private readonly tokensPerAsset: MapStorage<Hash256, Fixed<Decimals>> = new MapStorage();
@@ -35,7 +35,8 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
     public readonly icoDurationSeconds: Integer,
     public readonly preICOAmount: Fixed<Decimals>,
   ) {
-    super(owner);
+    super();
+    this.owner = owner;
     this.issue(owner, preICOAmount);
   }
 
@@ -50,7 +51,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
       throw new Error('Crowdsale has ended');
     }
 
-    const { references } = getCurrentTransaction();
+    const { references } = Transaction.currentTransaction;
     if (references.length === 0) {
       return;
     }
@@ -60,8 +61,8 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
       onRefund();
       throw new Error('Address has not been whitelised');
     }
-    const amount = getCurrentTransaction()
-      .outputs.filter((output) => output.address.equals(this.address))
+    const amount = Transaction.currentTransaction.outputs
+      .filter((output) => output.address.equals(this.owner))
       .reduce((acc, output) => {
         const amountPerAsset = this.isLimitedRound()
           ? this.tokensPerAssetLimitedRound.get(output.asset)
@@ -70,7 +71,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
           onRefund();
           throw new Error(`Asset ${output.asset} is not accepted for the crowdsale`);
         }
-        const asset = getAsset(output.asset);
+        const asset = Asset.for(output.asset);
         const normalizedValue = output.value / 10 ** (8 - asset.precision);
 
         return acc + normalizedValue * amountPerAsset;
@@ -95,7 +96,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   }
 
   public setExchange(asset: Hash256, tokens: Fixed<Decimals>): void {
-    verifySender(this.owner);
+    Address.verifySender(this.owner);
     if (this.hasStarted()) {
       throw new Error('Cannot change token amount once crowdsale has started');
     }
@@ -107,7 +108,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   }
 
   public setLimitedRoundExchange(asset: Hash256, tokens: Fixed<Decimals>): void {
-    verifySender(this.owner);
+    Address.verifySender(this.owner);
     if (this.hasStarted()) {
       throw new Error('Cannot change token amount once crowdsale has started');
     }
@@ -127,7 +128,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   }
 
   public endICO(): void {
-    verifySender(this.owner);
+    Address.verifySender(this.owner);
     if (this.icoRemaining > 0) {
       if (!this.hasEnded()) {
         throw new Error('ICO has not ended.');
@@ -139,7 +140,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   }
 
   public register(addresses: Address[]): void {
-    verifySender(this.owner);
+    Address.verifySender(this.owner);
     addresses.forEach((addr) => {
       if (!this.kyc.has(addr)) {
         this.kyc.add(addr);
@@ -153,14 +154,14 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   }
 
   private hasStarted(): boolean {
-    return getCurrentTime() >= this.startTimeSeconds;
+    return Blockchain.currentBlockTime >= this.startTimeSeconds;
   }
 
   private hasEnded(): boolean {
-    return getCurrentTime() > this.startTimeSeconds + this.icoDurationSeconds;
+    return Blockchain.currentBlockTime > this.startTimeSeconds + this.icoDurationSeconds;
   }
 
   private isLimitedRound(): boolean {
-    return this.hasStarted() && getCurrentTime() < this.startTimeSeconds + this.limitedRoundDurationSeconds;
+    return this.hasStarted() && Blockchain.currentBlockTime < this.startTimeSeconds + this.limitedRoundDurationSeconds;
   }
 }

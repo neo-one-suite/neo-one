@@ -38,7 +38,7 @@ const toSignedBuffer = (value: BN): Buffer => {
   return normalValue.eq(paddedValue) ? buff : paddedBuff;
 };
 
-const getBoolean = (value: Buffer): boolean => value.some((byte) => byte !== 0);
+const unwrapBoolean = (value: Buffer): boolean => value.some((byte) => byte !== 0);
 
 const booleanToBuffer = (value: boolean): Buffer => Buffer.from([value ? 1 : 0]);
 
@@ -145,7 +145,7 @@ export const utils = {
   ZERO_BIG_NUMBER: new BigNumber(0),
   toSignedBuffer,
   fromSignedBuffer,
-  getBoolean,
+  unwrapBoolean,
   booleanToBuffer,
   toASCII,
   toUTF8,

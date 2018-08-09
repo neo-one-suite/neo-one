@@ -24,6 +24,6 @@ export abstract class IsHelper extends Helper {
     // [type, type]
     sb.emitPushInt(node, this.type);
     // [isType]
-    sb.emitOp(node, 'EQUAL');
+    sb.emitOp(node, 'NUMEQUAL');
   }
 }

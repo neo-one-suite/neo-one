@@ -4,6 +4,7 @@ import ts from 'typescript';
 import { isBuiltinInstanceOf } from '../builtins';
 import { Helper } from '../helper';
 import { TypedHelperOptions } from '../helper/common';
+import { handleTypeAssignment } from '../helper/types';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -60,6 +61,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
       case ts.SyntaxKind.BarBarToken:
         this.visitLogicalExpressionOperator(sb, kind, expr, options);
         break;
+      /* istanbul ignore next */
       default:
         /* istanbul ignore next */
         utils.assertNever(kind);
@@ -132,10 +134,13 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
           pushValueOptions,
         );
         break;
+      /* istanbul ignore next */
       default:
         /* istanbul ignore next */
         utils.assertNever(kind);
     }
+
+    handleTypeAssignment(sb.context, right, left);
 
     sb.visit(tsUtils.expression.getLeft(expr), sb.setValueOptions(options));
   }
@@ -183,8 +188,8 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
   ): void {
     const options = sb.pushValueOptions(optionsIn);
 
-    const leftType = sb.getType(left);
-    const rightType = sb.getType(right);
+    const leftType = sb.context.getType(left);
+    const rightType = sb.context.getType(right);
 
     const visit = (
       leftHelper: (options: TypedHelperOptions) => Helper,
@@ -208,40 +213,40 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
       case ts.SyntaxKind.AsteriskToken:
         visitNumeric();
         sb.emitOp(node, 'MUL');
-        sb.emitHelper(node, options, sb.helpers.createNumber);
+        sb.emitHelper(node, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.SlashToken:
         visitNumeric();
         sb.emitOp(node, 'DIV');
-        sb.emitHelper(node, options, sb.helpers.createNumber);
+        sb.emitHelper(node, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.PercentToken:
         visitNumeric();
         sb.emitOp(node, 'MOD');
-        sb.emitHelper(node, options, sb.helpers.createNumber);
+        sb.emitHelper(node, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.PlusToken:
         if (isBinaryNumeric) {
           visitNumeric();
           sb.emitOp(node, 'ADD');
-          sb.emitHelper(node, options, sb.helpers.createNumber);
+          sb.emitHelper(node, options, sb.helpers.wrapNumber);
         } else if (
           leftType !== undefined &&
           tsUtils.type_.isOnlyStringish(leftType) &&
           rightType !== undefined &&
           tsUtils.type_.isOnlyStringish(rightType)
         ) {
-          visit(() => sb.helpers.getString);
+          visit(() => sb.helpers.unwrapString);
           sb.emitOp(node, 'CAT');
-          sb.emitHelper(node, options, sb.helpers.createString);
+          sb.emitHelper(node, options, sb.helpers.wrapString);
         } else if (leftType !== undefined && tsUtils.type_.isOnlyStringish(leftType)) {
-          visit(() => sb.helpers.getString, sb.helpers.toString);
+          visit(() => sb.helpers.unwrapString, sb.helpers.toString);
           sb.emitOp(node, 'CAT');
-          sb.emitHelper(node, options, sb.helpers.createString);
+          sb.emitHelper(node, options, sb.helpers.wrapString);
         } else if (rightType !== undefined && tsUtils.type_.isOnlyStringish(rightType)) {
-          visit(sb.helpers.toString, () => sb.helpers.getString);
+          visit(sb.helpers.toString, () => sb.helpers.unwrapString);
           sb.emitOp(node, 'CAT');
-          sb.emitHelper(node, options, sb.helpers.createString);
+          sb.emitHelper(node, options, sb.helpers.wrapString);
         } else {
           // [right, left]
           visit(sb.helpers.toPrimitive);
@@ -267,31 +272,31 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
               },
               whenTrue: () => {
                 // [string0, left]
-                sb.emitHelper(node, options, sb.helpers.toString({ type: sb.getType(right) }));
+                sb.emitHelper(node, options, sb.helpers.toString({ type: sb.context.getType(right) }));
                 // [left, string0]
                 sb.emitOp(node, 'SWAP');
                 // [string1, string0]
-                sb.emitHelper(node, options, sb.helpers.toString({ type: sb.getType(left) }));
+                sb.emitHelper(node, options, sb.helpers.toString({ type: sb.context.getType(left) }));
                 // [string0, string1]
                 sb.emitOp(node, 'SWAP');
                 // [string]
                 sb.emitOp(node, 'CAT');
                 // [string]
-                sb.emitHelper(node, options, sb.helpers.createString);
+                sb.emitHelper(node, options, sb.helpers.wrapString);
               },
               whenFalse: () => {
                 // [number0, left]
-                sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.getType(right) }));
+                sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.getType(right) }));
                 // [left, number0]
                 sb.emitOp(node, 'SWAP');
                 // [number1, number0]
-                sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.getType(left) }));
+                sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.getType(left) }));
                 // [number0, number1]
                 sb.emitOp(node, 'SWAP');
                 //  [number]
                 sb.emitOp(node, 'ADD');
                 //  [number]
-                sb.emitHelper(node, options, sb.helpers.createNumber);
+                sb.emitHelper(node, options, sb.helpers.wrapNumber);
               },
             }),
           );
@@ -300,64 +305,64 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
       case ts.SyntaxKind.MinusToken:
         visitNumeric();
         sb.emitOp(node, 'SUB');
-        sb.emitHelper(node, options, sb.helpers.createNumber);
+        sb.emitHelper(node, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.GreaterThanGreaterThanToken:
         visitNumeric();
         sb.emitOp(node, 'SHR');
-        sb.emitHelper(node, options, sb.helpers.createNumber);
+        sb.emitHelper(node, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
         visitNumeric();
         sb.emitOp(node, 'SHR');
-        sb.emitHelper(node, options, sb.helpers.createNumber);
+        sb.emitHelper(node, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.LessThanLessThanToken:
         visitNumeric();
         sb.emitOp(node, 'SHL');
-        sb.emitHelper(node, options, sb.helpers.createNumber);
+        sb.emitHelper(node, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.LessThanToken:
         sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: true, left, right }));
-        sb.emitHelper(node, options, sb.helpers.createBoolean);
+        sb.emitHelper(node, options, sb.helpers.wrapBoolean);
         break;
       case ts.SyntaxKind.LessThanEqualsToken:
         sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: false, left: right, right: left }));
         sb.emitOp(node, 'NOT');
-        sb.emitHelper(node, options, sb.helpers.createBoolean);
+        sb.emitHelper(node, options, sb.helpers.wrapBoolean);
         break;
       case ts.SyntaxKind.GreaterThanToken:
         sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: false, left: right, right: left }));
-        sb.emitHelper(node, options, sb.helpers.createBoolean);
+        sb.emitHelper(node, options, sb.helpers.wrapBoolean);
         break;
       case ts.SyntaxKind.GreaterThanEqualsToken:
         sb.emitHelper(node, options, sb.helpers.lessThan({ leftFirst: true, left, right }));
         sb.emitOp(node, 'NOT');
-        sb.emitHelper(node, options, sb.helpers.createBoolean);
+        sb.emitHelper(node, options, sb.helpers.wrapBoolean);
         break;
       case ts.SyntaxKind.ExclamationEqualsToken:
         sb.emitHelper(node, options, sb.helpers.equalsEquals({ left, right }));
         sb.emitOp(node, 'NOT');
-        sb.emitHelper(node, options, sb.helpers.createBoolean);
+        sb.emitHelper(node, options, sb.helpers.wrapBoolean);
         break;
       case ts.SyntaxKind.EqualsEqualsToken:
         sb.emitHelper(node, options, sb.helpers.equalsEquals({ left, right }));
-        sb.emitHelper(node, options, sb.helpers.createBoolean);
+        sb.emitHelper(node, options, sb.helpers.wrapBoolean);
         break;
       case ts.SyntaxKind.AmpersandToken:
         visitNumeric();
         sb.emitOp(node, 'AND');
-        sb.emitHelper(node, options, sb.helpers.createNumber);
+        sb.emitHelper(node, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.BarToken:
         visitNumeric();
         sb.emitOp(node, 'OR');
-        sb.emitHelper(node, options, sb.helpers.createNumber);
+        sb.emitHelper(node, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.CaretToken:
         visitNumeric();
         sb.emitOp(node, 'XOR');
-        sb.emitHelper(node, options, sb.helpers.createNumber);
+        sb.emitHelper(node, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.InKeyword:
         // [objectVal]
@@ -367,7 +372,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         // [boolean]
         sb.emitHelper(node, options, sb.helpers.inObjectProperty({ propType: leftType }));
         // [booleanVal]
-        sb.emitHelper(node, options, sb.helpers.createBoolean);
+        sb.emitHelper(node, options, sb.helpers.wrapBoolean);
         break;
       case ts.SyntaxKind.InstanceOfKeyword:
         this.handleInstanceOf(sb, node, left, right, options);
@@ -384,21 +389,22 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         // [right, left]
         visitNumeric();
         sb.emitHelper(node, options, sb.helpers.exp);
-        sb.emitHelper(node, options, sb.helpers.createNumber);
+        sb.emitHelper(node, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.EqualsEqualsEqualsToken:
         sb.visit(left, options);
         sb.visit(right, options);
         sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ leftType, rightType }));
-        sb.emitHelper(node, options, sb.helpers.createBoolean);
+        sb.emitHelper(node, options, sb.helpers.wrapBoolean);
         break;
       case ts.SyntaxKind.ExclamationEqualsEqualsToken:
         sb.visit(left, options);
         sb.visit(right, options);
         sb.emitHelper(node, options, sb.helpers.equalsEqualsEquals({ leftType, rightType }));
         sb.emitOp(node, 'NOT');
-        sb.emitHelper(node, options, sb.helpers.createBoolean);
+        sb.emitHelper(node, options, sb.helpers.wrapBoolean);
         break;
+      /* istanbul ignore next */
       default:
         /* istanbul ignore next */
         utils.assertNever(kind);
@@ -433,7 +439,11 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
                 sb.emitOp(left, 'DUP');
               }
               // [leftBoolean, ?left]
-              sb.emitHelper(left, sb.pushValueOptions(options), sb.helpers.toBoolean({ type: sb.getType(left) }));
+              sb.emitHelper(
+                left,
+                sb.pushValueOptions(options),
+                sb.helpers.toBoolean({ type: sb.context.getType(left) }),
+              );
             },
             whenTrue: () => {
               if (options.pushValue) {
@@ -458,7 +468,11 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
                 sb.emitOp(left, 'DUP');
               }
               // [leftBoolean, ?left]
-              sb.emitHelper(left, sb.pushValueOptions(options), sb.helpers.toBoolean({ type: sb.getType(left) }));
+              sb.emitHelper(
+                left,
+                sb.pushValueOptions(options),
+                sb.helpers.toBoolean({ type: sb.context.getType(left) }),
+              );
             },
             whenFalse: () => {
               if (options.pushValue) {
@@ -470,12 +484,14 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         );
         break;
       }
+      /* istanbul ignore next */
       default:
         /* istanbul ignore next */
         utils.assertNever(kind);
     }
   }
 
+  /* istanbul ignore next */
   private handleInstanceOf(
     sb: ScriptBuilder,
     node: ts.Node,
@@ -483,7 +499,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
     right: ts.Expression,
     options: VisitOptions,
   ): void {
-    const builtin = sb.builtins.getValue(sb.context, right);
+    const builtin = sb.context.builtins.getValue(right);
     if (builtin !== undefined && isBuiltinInstanceOf(builtin)) {
       builtin.emitInstanceOf(sb, left, options);
 
@@ -497,6 +513,6 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
     // [left instanceof right]
     sb.emitHelper(node, options, sb.helpers.instanceof);
     // [booleanVal]
-    sb.emitHelper(node, options, sb.helpers.createBoolean);
+    sb.emitHelper(node, options, sb.helpers.wrapBoolean);
   }
 }

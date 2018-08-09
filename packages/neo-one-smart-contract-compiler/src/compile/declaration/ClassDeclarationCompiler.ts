@@ -2,6 +2,7 @@ import { PropertyNamedNode, tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
+import { isBuiltinInterface } from '../builtins';
 import { InternalObjectProperty } from '../constants';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -28,13 +29,13 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
 
     const impl = tsUtils.class_.getImplementsArray(decl);
     const implementsBuiltin = impl.find((implType) => {
-      const builtin = sb.builtins.getInterface(sb.context, tsUtils.expression.getExpression(implType));
+      const builtin = sb.context.builtins.getInterface(tsUtils.expression.getExpression(implType));
 
-      return builtin !== undefined && !builtin.canImplement;
+      return builtin !== undefined && (!isBuiltinInterface(builtin) || !builtin.canImplement);
     });
 
     if (implementsBuiltin !== undefined) {
-      sb.reportError(decl, DiagnosticCode.InvalidBuiltinImplement, DiagnosticMessage.CannotImplementBuiltin);
+      sb.context.reportError(decl, DiagnosticCode.InvalidBuiltinImplement, DiagnosticMessage.CannotImplementBuiltin);
 
       return;
     }
@@ -59,14 +60,14 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
 
         const processString = (innerInnerOptions: VisitOptions) => {
           // [string]
-          sb.emitHelper(node, innerInnerOptions, sb.helpers.getString);
+          sb.emitHelper(node, innerInnerOptions, sb.helpers.unwrapString);
           // []
           handleString(innerInnerOptions);
         };
 
         const processSymbol = (innerInnerOptions: VisitOptions) => {
           // [string, val]
-          sb.emitHelper(node, innerInnerOptions, sb.helpers.getSymbol);
+          sb.emitHelper(node, innerInnerOptions, sb.helpers.unwrapSymbol);
           // [val, string, val]
           handleSymbol(innerInnerOptions);
         };
@@ -77,7 +78,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
           expr,
           innerOptions,
           sb.helpers.forBuiltinType({
-            type: sb.getType(expr),
+            type: sb.context.getType(expr),
             array: throwTypeError,
             boolean: throwTypeError,
             buffer: throwTypeError,
@@ -87,6 +88,15 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
             string: processString,
             symbol: processSymbol,
             undefined: throwTypeError,
+            transaction: throwTypeError,
+            output: throwTypeError,
+            attribute: throwTypeError,
+            input: throwTypeError,
+            account: throwTypeError,
+            asset: throwTypeError,
+            contract: throwTypeError,
+            header: throwTypeError,
+            block: throwTypeError,
           }),
         );
       } else {
@@ -134,7 +144,11 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
           // Default value assignments
           if (ctorImpl !== undefined) {
             // []
-            sb.emitHelper(ctorImpl, innerOptions, sb.helpers.parameters);
+            sb.emitHelper(
+              ctorImpl,
+              innerOptions,
+              sb.helpers.parameters({ params: tsUtils.parametered.getParameters(ctorImpl) }),
+            );
             // Super call statement
           } else if (superClass !== undefined && extendsExpr !== undefined) {
             // [thisObjectVal, argsarr]
@@ -231,10 +245,18 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       addMethod(method);
     });
 
+    const verifySymbol = sb.context.builtins.getValueSymbol('verify');
+    const constantSymbol = sb.context.builtins.getValueSymbol('constant');
     tsUtils.class_.getConcreteMembers(decl).forEach((member) => {
-      const decorators = tsUtils.decoratable.getDecorators(member);
-      if (decorators !== undefined && decorators.length > 0) {
-        sb.reportUnsupported(decorators[0]);
+      const decorators = ts.isMethodDeclaration(member)
+        ? tsUtils.decoratable.getDecoratorsArray(member).filter((decorator) => {
+            const decoratorSymbol = sb.context.getSymbol(tsUtils.expression.getExpression(decorator), { error: true });
+
+            return decoratorSymbol !== verifySymbol && decoratorSymbol !== constantSymbol;
+          })
+        : tsUtils.decoratable.getDecoratorsArray(member);
+      if (decorators.length > 0) {
+        sb.context.reportUnsupported(decorators[0]);
       }
     });
 

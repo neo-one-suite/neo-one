@@ -5,7 +5,7 @@ exports[`Array.prototype.map cannot be referenced 1`] = `
 
       1 | 
       2 |       const x = [0, 1, 2];
-    > 3 |       const y = x.map;
+    > 3 |       const y = x.reduce;
         |                 ^
       4 |     
 "

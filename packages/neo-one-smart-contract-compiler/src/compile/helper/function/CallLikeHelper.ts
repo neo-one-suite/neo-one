@@ -3,10 +3,20 @@ import _ from 'lodash';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../../DiagnosticCode';
 import { DiagnosticMessage } from '../../../DiagnosticMessage';
-import { isBuiltinCall } from '../../builtins';
+import {
+  Builtin,
+  BuiltinInstanceMemberTemplate,
+  isBuiltinCall,
+  isBuiltinInstanceMemberCall,
+  isBuiltinInstanceMemberTemplate,
+  isBuiltinMemberCall,
+  isBuiltinMemberTemplate,
+  isBuiltinTemplate,
+  MemberLikeExpression,
+} from '../../builtins';
+import { BuiltinInstanceMemberCall } from '../../builtins/BuiltinInstanceMemberCall';
 import { Types } from '../../helper/types/Types';
 import { ScriptBuilder } from '../../sb';
-import { SYSCALLS } from '../../syscalls';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
@@ -22,25 +32,16 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       ? tsUtils.expression.getExpression(expression)
       : tsUtils.template.getTag(expression);
 
-    const valueBuiltin = sb.builtins.getValue(sb.context, expr);
+    const valueBuiltin = sb.context.builtins.getValue(expr);
     if (valueBuiltin !== undefined && !tsUtils.guards.isSuperExpression(expr)) {
       // Otherwise, already reported as an error by typescript checker
-      if (isBuiltinCall(valueBuiltin)) {
+      if (ts.isCallExpression(expression) && isBuiltinCall(valueBuiltin)) {
         valueBuiltin.emitCall(sb, expression, optionsIn);
       }
 
-      return;
-    }
-
-    const symbol = sb.getSymbol(expr, { warning: false, error: false });
-    if (ts.isIdentifier(expr) && sb.isGlobalSymbol(expr, symbol, 'syscall')) {
-      if (!ts.isCallExpression(expression)) {
-        sb.reportUnsupported(expression);
-
-        return;
+      if (ts.isTaggedTemplateExpression(expression) && isBuiltinTemplate(valueBuiltin)) {
+        valueBuiltin.emitCall(sb, expression, optionsIn);
       }
-
-      this.handleSysCall(sb, expression, optionsIn);
 
       return;
     }
@@ -90,7 +91,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           // [string, literalsArr, literalsArr]
           sb.emitPushString(head, tsUtils.literal.getLiteralValue(head));
           // [stringVal, literalsArr, literalsArr]
-          sb.emitHelper(head, innerOptions, sb.helpers.createString);
+          sb.emitHelper(head, innerOptions, sb.helpers.wrapString);
           // [literalsArr]
           sb.emitOp(head, 'APPEND');
           tsUtils.template.getTemplateSpans(template).forEach((span) => {
@@ -100,7 +101,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
             // [string, literalsArr, literalsArr]
             sb.emitPushString(spanLiteral, tsUtils.literal.getLiteralValue(spanLiteral));
             // [stringVal, literalsArr, literalsArr]
-            sb.emitHelper(head, innerOptions, sb.helpers.createString);
+            sb.emitHelper(head, innerOptions, sb.helpers.wrapString);
             // [literalsArr]
             sb.emitOp(expr, 'APPEND');
           });
@@ -128,6 +129,40 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       }
     };
 
+    const handleBuiltinMemberCall = (builtinProp: Builtin, memberLike: MemberLikeExpression, visited: boolean) => {
+      if (ts.isCallExpression(expression)) {
+        if (isBuiltinMemberCall(builtinProp)) {
+          builtinProp.emitCall(sb, memberLike, expression, optionsIn);
+
+          return;
+        }
+
+        if (isBuiltinInstanceMemberCall(builtinProp)) {
+          builtinProp.emitCall(sb, memberLike, expression, optionsIn, visited);
+
+          return;
+        }
+      } else if (ts.isTaggedTemplateExpression(expression)) {
+        if (isBuiltinMemberTemplate(builtinProp)) {
+          builtinProp.emitCall(sb, memberLike, expression, optionsIn);
+
+          return;
+        }
+
+        if (isBuiltinInstanceMemberTemplate(builtinProp)) {
+          builtinProp.emitCall(sb, memberLike, expression, optionsIn, visited);
+
+          return;
+        }
+      }
+
+      sb.context.reportError(
+        memberLike,
+        DiagnosticCode.InvalidBuiltinReference,
+        DiagnosticMessage.CannotReferenceBuiltinProperty,
+      );
+    };
+
     if (
       ts.isCallExpression(expression) &&
       tsUtils.guards.isSuperExpression(tsUtils.expression.getExpression(expression))
@@ -148,50 +183,28 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       sb.emitHelper(expression, sb.noPushValueOptions(options), sb.helpers.invokeConstruct());
     } else if (ts.isPropertyAccessExpression(expr)) {
       const value = tsUtils.expression.getExpression(expr);
-      const valueType = sb.getType(value);
+      const valueType = sb.context.getType(value);
       const name = tsUtils.node.getNameNode(expr);
       const nameValue = tsUtils.node.getName(expr);
 
-      const builtinProp = sb.builtins.getMember(sb.context, value, name);
+      const builtinProp = sb.context.builtins.getMember(value, name);
       if (builtinProp !== undefined) {
-        if (!isBuiltinCall(builtinProp)) {
-          sb.reportError(
-            expr,
-            DiagnosticCode.InvalidBuiltinReference,
-            DiagnosticMessage.CannotReferenceBuiltinProperty,
-          );
-
-          return;
-        }
-
-        builtinProp.emitCall(sb, expression, optionsIn);
+        handleBuiltinMemberCall(builtinProp, expr, false);
 
         return;
       }
 
       const createProcessBuiltin = (valueName: string) => {
-        const member = sb.builtins.getOnlyMember(sb.context, valueName, nameValue);
+        const member = sb.context.builtins.getOnlyMember(valueName, nameValue);
 
         if (member === undefined) {
           return throwTypeError;
         }
 
         return () => {
-          if (!isBuiltinCall(member)) {
-            /* istanbul ignore next */
-            sb.reportError(
-              expr,
-              DiagnosticCode.InvalidBuiltinReference,
-              DiagnosticMessage.CannotReferenceBuiltinProperty,
-            );
-
-            /* istanbul ignore next */
-            return;
-          }
-
           // [thisVal]
           sb.emitOp(expression, 'DROP');
-          member.emitCall(sb, expression, optionsIn, true);
+          handleBuiltinMemberCall(member, expr, true);
         };
       };
 
@@ -226,38 +239,43 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           string: createProcessBuiltin('String'),
           symbol: createProcessBuiltin('Symbol'),
           undefined: throwTypeError,
+          transaction: createProcessBuiltin('TransactionBase'),
+          output: createProcessBuiltin('Output'),
+          attribute: createProcessBuiltin('AttributeBase'),
+          input: createProcessBuiltin('Input'),
+          account: createProcessBuiltin('Account'),
+          asset: createProcessBuiltin('Asset'),
+          contract: createProcessBuiltin('Contract'),
+          header: createProcessBuiltin('Header'),
+          block: createProcessBuiltin('Block'),
         }),
       );
     } else if (ts.isElementAccessExpression(expr)) {
       const value = tsUtils.expression.getExpression(expr);
-      const valueType = sb.getType(value);
+      const valueType = sb.context.getType(value);
       const prop = tsUtils.expression.getArgumentExpressionOrThrow(expr);
-      const propType = sb.getType(prop);
+      const propType = sb.context.getType(prop);
 
-      const builtinProp = sb.builtins.getMember(sb.context, value, prop);
+      const builtinProp = sb.context.builtins.getMember(value, prop);
       if (builtinProp !== undefined) {
-        if (!isBuiltinCall(builtinProp)) {
-          sb.reportError(
-            expr,
-            DiagnosticCode.InvalidBuiltinReference,
-            DiagnosticMessage.CannotReferenceBuiltinProperty,
-          );
-
-          return;
-        }
-
-        builtinProp.emitCall(sb, expression, optionsIn);
+        handleBuiltinMemberCall(builtinProp, expr, false);
 
         return;
       }
 
       const getCallCases = (instanceName: string, useSymbol = false) =>
-        sb.builtins
+        sb.context.builtins
           .getMembers(
-            sb.context,
             instanceName,
-            isBuiltinCall,
-            (call) => call.canCall(sb, expression, optionsIn),
+            (call): call is BuiltinInstanceMemberCall | BuiltinInstanceMemberTemplate =>
+              isBuiltinInstanceMemberCall(call) || isBuiltinInstanceMemberTemplate(call),
+            (call) =>
+              (ts.isCallExpression(expression) &&
+                isBuiltinInstanceMemberCall(call) &&
+                call.canCall(sb, expr, expression, optionsIn)) ||
+              (ts.isTaggedTemplateExpression(expression) &&
+                isBuiltinInstanceMemberTemplate(call) &&
+                call.canCall(sb, expr, expression, optionsIn)),
             useSymbol,
           )
           .map(([propName, builtin]) => ({
@@ -274,7 +292,8 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
               sb.emitOp(expr, 'DROP');
               // [thisVal]
               sb.emitOp(expr, 'DROP');
-              builtin.emitCall(sb, expression, optionsIn, true);
+
+              handleBuiltinMemberCall(builtin, expr, true);
             },
           }));
 
@@ -307,6 +326,15 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
             string: handleString,
             symbol: handleSymbol,
             undefined: throwInnerTypeError,
+            transaction: throwInnerTypeError,
+            output: throwInnerTypeError,
+            attribute: throwInnerTypeError,
+            input: throwInnerTypeError,
+            account: throwInnerTypeError,
+            asset: throwInnerTypeError,
+            contract: throwInnerTypeError,
+            header: throwInnerTypeError,
+            block: throwInnerTypeError,
           }),
         );
       };
@@ -324,7 +352,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
 
         const handleString = (innerInnerOptions: VisitOptions) => {
           // [string, objectVal, thisVal]
-          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getString);
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapString);
           handleStringBase(innerInnerOptions);
         };
 
@@ -336,7 +364,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
 
         const handleSymbol = (innerInnerOptions: VisitOptions) => {
           // [string, objectVal, thisVal]
-          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getSymbol);
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapSymbol);
           sb.emitHelper(
             expr,
             innerInnerOptions,
@@ -370,13 +398,13 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
 
         const handleString = (innerInnerOptions: VisitOptions) => {
           // [string, arrayVal, thisVal]
-          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getString);
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapString);
           sb.emitHelper(
             expr,
             innerInnerOptions,
             sb.helpers.case(getCallCases('Array', false), () => {
               // [stringVal, arrayVal, thisVal]
-              sb.emitHelper(prop, innerInnerOptions, sb.helpers.createString);
+              sb.emitHelper(prop, innerInnerOptions, sb.helpers.wrapString);
               // [number, arrayVal, thisVal]
               sb.emitHelper(prop, innerInnerOptions, sb.helpers.toNumber({ type: propType, knownType: Types.String }));
               handleNumberBase(innerInnerOptions);
@@ -386,13 +414,13 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
 
         const handleNumber = (innerInnerOptions: VisitOptions) => {
           // [number, arrayVal, thisVal]
-          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getNumber);
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapNumber);
           handleNumberBase(innerInnerOptions);
         };
 
         const handleSymbol = (innerInnerOptions: VisitOptions) => {
           // [string, arrayVal, thisVal]
-          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getSymbol);
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapSymbol);
           sb.emitHelper(
             expr,
             innerInnerOptions,
@@ -420,13 +448,13 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
 
         const handleString = (innerInnerOptions: VisitOptions) => {
           // [string, objectVal, objectVal, argsarr]
-          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getString);
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapString);
           handleStringBase(innerInnerOptions);
         };
 
         const handleSymbol = (innerInnerOptions: VisitOptions) => {
           // [string, objectVal, objectVal, argsarr]
-          sb.emitHelper(prop, innerInnerOptions, sb.helpers.getSymbol);
+          sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapSymbol);
           // [val, objectVal, argsarr]
           sb.emitHelper(expr, innerInnerOptions, sb.helpers.getSymbolObjectProperty);
           sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true }));
@@ -454,6 +482,15 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
             string: handleString,
             symbol: handleSymbol,
             undefined: throwInnerTypeError,
+            transaction: throwInnerTypeError,
+            output: throwInnerTypeError,
+            attribute: throwInnerTypeError,
+            input: throwInnerTypeError,
+            account: throwInnerTypeError,
+            asset: throwInnerTypeError,
+            contract: throwInnerTypeError,
+            header: throwInnerTypeError,
+            block: throwInnerTypeError,
           }),
         );
       };
@@ -475,6 +512,15 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           string: createProcessBuiltin('String'),
           symbol: createProcessBuiltin('Symbol'),
           undefined: throwTypeError,
+          transaction: createProcessBuiltin('TransactionBase'),
+          output: createProcessBuiltin('Output'),
+          attribute: createProcessBuiltin('AttributeBase'),
+          input: createProcessBuiltin('Input'),
+          account: createProcessBuiltin('Account'),
+          asset: createProcessBuiltin('Asset'),
+          contract: createProcessBuiltin('Contract'),
+          header: createProcessBuiltin('Header'),
+          block: createProcessBuiltin('Block'),
         }),
       );
     } else {
@@ -484,27 +530,6 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       // [objectVal, argsarr]
       sb.visit(expr, options);
       sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: false }));
-    }
-  }
-
-  private handleSysCall(sb: ScriptBuilder, node: ts.CallExpression, options: VisitOptions): void {
-    const sysCallName = tsUtils.expression.getArguments(node)[0];
-
-    const reportError = () => {
-      sb.reportError(sysCallName, DiagnosticCode.InvalidSyscall, DiagnosticMessage.InvalidSyscall);
-    };
-    if (!ts.isStringLiteral(sysCallName)) {
-      reportError();
-
-      return;
-    }
-
-    const sysCallKey = tsUtils.literal.getLiteralValue(sysCallName) as keyof typeof SYSCALLS;
-    const sysCall = SYSCALLS[sysCallKey] as typeof SYSCALLS[keyof typeof SYSCALLS] | undefined;
-    if (sysCall === undefined) {
-      reportError();
-    } else {
-      sysCall.handleCall(sb, node, options);
     }
   }
 }

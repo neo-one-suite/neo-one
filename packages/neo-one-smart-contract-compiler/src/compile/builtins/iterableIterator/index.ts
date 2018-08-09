@@ -1,12 +1,11 @@
-import { Context } from '../../../Context';
+import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
-import { BuiltinBase } from '../types';
 
-class IterableIteratorInstance extends BuiltinBase {
+class IterableIteratorInterface extends BuiltinInterface {
   public readonly canImplement = true;
 }
 
 // tslint:disable-next-line export-name
-export const add = (context: Context, builtins: Builtins): void => {
-  builtins.addInterface(context, 'IterableIterator', new IterableIteratorInstance());
+export const add = (builtins: Builtins): void => {
+  builtins.addInterface('IterableIterator', new IterableIteratorInterface());
 };

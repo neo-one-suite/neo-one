@@ -243,6 +243,56 @@ export function getDerivedClasses(
   return result.filter((value) => value !== node);
 }
 
+function getImplementorsWorker(
+  program: ts.Program,
+  languageService: ts.LanguageService,
+  node: ts.ClassDeclaration | ts.InterfaceDeclaration,
+  seen = new Set<ts.ClassDeclaration | ts.InterfaceDeclaration>(),
+): ReadonlyArray<ts.ClassDeclaration> {
+  if (seen.has(node)) {
+    return [];
+  }
+
+  return reference
+    .findReferencesAsNodes(program, languageService, node)
+    .reduce<ReadonlyArray<ts.ClassDeclaration>>((acc, ref) => {
+      const parent = node_.getParent(ref) as ts.Node | undefined;
+      if (parent === undefined) {
+        return acc;
+      }
+
+      const clause = node_.getParent(parent) as ts.Node | undefined;
+      if (
+        clause === undefined ||
+        !ts.isHeritageClause(clause) ||
+        (!heritage.isImplements(clause) && !heritage.isExtends(clause))
+      ) {
+        return acc;
+      }
+
+      let derived: ts.ClassDeclaration | ts.InterfaceDeclaration | undefined = node_.getFirstAncestorByKind<
+        ts.ClassDeclaration
+      >(clause, ts.SyntaxKind.ClassDeclaration);
+      if (derived === undefined) {
+        derived = node_.getFirstAncestorByKindOrThrow<ts.InterfaceDeclaration>(
+          clause,
+          ts.SyntaxKind.InterfaceDeclaration,
+        );
+      }
+
+      return acc.concat(getImplementorsWorker(program, languageService, derived, seen));
+    }, [])
+    .concat(ts.isClassDeclaration(node) ? [node] : []);
+}
+
+export function getImplementors(
+  program: ts.Program,
+  languageService: ts.LanguageService,
+  node: ts.InterfaceDeclaration,
+): ReadonlyArray<ts.ClassDeclaration> {
+  return getImplementorsWorker(program, languageService, node);
+}
+
 export function getBaseTypes(typeChecker: ts.TypeChecker, node: ts.ClassDeclaration): ReadonlyArray<ts.Type> {
   return type_.getBaseTypesArray(type_.getType(typeChecker, node));
 }

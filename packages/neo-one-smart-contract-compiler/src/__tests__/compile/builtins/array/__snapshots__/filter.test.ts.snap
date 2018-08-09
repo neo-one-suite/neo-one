@@ -1,5 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Array.prototype.filter cannot be "referenced" 1`] = `
+"snippetCode.ts (3,17): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       const x = [0, 1, 2];
+    > 3 |       const y = x['filter'];
+        |                 ^
+      4 |     
+"
+`;
+
 exports[`Array.prototype.filter cannot be referenced 1`] = `
 "snippetCode.ts (3,17): Builtin properties cannot be referenced
 

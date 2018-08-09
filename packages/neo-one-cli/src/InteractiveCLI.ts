@@ -201,9 +201,15 @@ export class InteractiveCLI {
     };
 
     const logSubscription = combineLatest(
-      this.mutableClientConfig.config$.pipe(map((config) => config.paths.log), distinctUntilChanged()),
+      this.mutableClientConfig.config$.pipe(
+        map((config) => config.paths.log),
+        distinctUntilChanged(),
+      ),
 
-      this.mutableClientConfig.config$.pipe(map((config) => config.log), distinctUntilChanged()),
+      this.mutableClientConfig.config$.pipe(
+        map((config) => config.log),
+        distinctUntilChanged(),
+      ),
     )
       .pipe(
         map(([logPath, config]) => {

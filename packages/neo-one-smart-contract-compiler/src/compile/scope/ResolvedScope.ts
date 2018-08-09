@@ -43,6 +43,7 @@ export class ResolvedScope implements Scope {
     this.mutableVariables[identifier.value] = this.mutablePosition;
     this.mutablePosition += 1;
     if (this.mutablePosition > this.variableCount) {
+      /* istanbul ignore next */
       throw new Error(
         `Something went wrong. Name: ${name} Position: ${this.mutablePosition} Count: ${this.variableCount}`,
       );
@@ -56,6 +57,7 @@ export class ResolvedScope implements Scope {
     this.uniqueVariables.set(name, this.mutablePosition);
     this.mutablePosition += 1;
     if (this.mutablePosition > this.variableCount) {
+      /* istanbul ignore next */
       throw new Error(`Something went wrong. Position: ${this.mutablePosition} Count: ${this.variableCount}`);
     }
 
@@ -75,7 +77,8 @@ export class ResolvedScope implements Scope {
     const position = this.getPosition(name);
     if (position === undefined) {
       if (this.parent === undefined) {
-        sb.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
+        /* istanbul ignore next */
+        sb.context.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
       } else {
         this.parent.set(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }
@@ -102,7 +105,7 @@ export class ResolvedScope implements Scope {
     const position = this.getPosition(name);
     if (position === undefined) {
       if (this.parent === undefined) {
-        sb.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
+        sb.context.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
       } else {
         this.parent.get(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }
@@ -123,17 +126,6 @@ export class ResolvedScope implements Scope {
     sb.emitPushInt(node, 1);
     // [this]
     sb.emitOp(node, 'PICKITEM');
-  }
-
-  public setThis(sb: ScriptBuilder, node: ts.Node, _options: VisitOptions): void {
-    // [[scopes, this], val]
-    this.loadAll(sb, node);
-    // [1, [scopes, this], val]
-    sb.emitPushInt(node, 1);
-    // [val, 1, [scopes, this]]
-    sb.emitOp(node, 'ROT');
-    // []
-    sb.emitOp(node, 'SETITEM');
   }
 
   public getGlobal(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -170,12 +162,9 @@ export class ResolvedScope implements Scope {
       // []
       sb.emitOp(node, 'SETITEM');
     } else {
+      /* istanbul ignore next */
       this.parent.setGlobal(sb, node, options);
     }
-  }
-
-  public hasBinding(name: string): boolean {
-    return this.mutableVariables[name] !== undefined || (this.parent !== undefined && this.parent.hasBinding(name));
   }
 
   public pushAll(sb: ScriptBuilder, node: ts.Node, _options: VisitOptions): void {
@@ -198,9 +187,9 @@ export class ResolvedScope implements Scope {
   ): void {
     if (this.parent === undefined) {
       // [global]
-      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
       // [this, global]
-      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
       // [0, this, global]
       sb.emitPushInt(node, 0);
       // [scopes, this, global]

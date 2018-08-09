@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TransactionType cannot be referenced 1`] = `
+"snippetCode.ts (4,17): Builtins cannot be referenced
+
+      2 |       import { TransactionType } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const x = TransactionType;
+        |                 ^
+      5 |     
+"
+`;

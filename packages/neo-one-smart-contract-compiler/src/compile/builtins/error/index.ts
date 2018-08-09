@@ -1,24 +1,24 @@
 import ts from 'typescript';
-import { Context } from '../../../Context';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
-import { BuiltinBase, BuiltinType, BuiltinValue } from '../types';
+import { BuiltinValue } from '../BuiltinValue';
 
-class ErrorInstance extends BuiltinBase implements BuiltinValue {
+class ErrorInterface extends BuiltinInterface {
   public readonly canImplement = true;
-  public readonly types = new Set([BuiltinType.Value]);
-
-  public emitValue(sb: ScriptBuilder, node: ts.Identifier, options: VisitOptions): void {
+}
+class ErrorValue extends BuiltinValue {
+  public emit(sb: ScriptBuilder, node: ts.Identifier, options: VisitOptions): void {
     // [classVal]
     sb.emitHelper(node, options, sb.helpers.getErrorClass);
   }
 }
-class ErrorConstructor extends BuiltinBase {}
+class ErrorConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name
-export const add = (context: Context, builtins: Builtins): void => {
-  builtins.addInterface(context, 'Error', new ErrorInstance());
-  builtins.addValue(context, 'Error', new ErrorInstance());
-  builtins.addInterface(context, 'ErrorConstructor', new ErrorConstructor());
+export const add = (builtins: Builtins): void => {
+  builtins.addInterface('Error', new ErrorInterface());
+  builtins.addValue('Error', new ErrorValue());
+  builtins.addInterface('ErrorConstructor', new ErrorConstructorInterface());
 };

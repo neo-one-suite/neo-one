@@ -1,16 +1,33 @@
-import { ParameteredNode, tsUtils } from '@neo-one/ts-utils';
+import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
+export interface ParametersHelperOptions {
+  readonly params: ReadonlyArray<ts.ParameterDeclaration>;
+  readonly onStack?: boolean;
+  readonly map?: (param: ts.ParameterDeclaration, options: VisitOptions) => void;
+}
+
 // Input: [argsArray]
 // Output: []
-export class ParametersHelper extends Helper<ParameteredNode> {
-  public emit(sb: ScriptBuilder, node: ParameteredNode, optionsIn: VisitOptions): void {
+export class ParametersHelper extends Helper {
+  private readonly params: ReadonlyArray<ts.ParameterDeclaration>;
+  private readonly onStack: boolean;
+  private readonly map?: (param: ts.ParameterDeclaration, options: VisitOptions) => void;
+
+  public constructor(options: ParametersHelperOptions) {
+    super();
+    this.params = options.params;
+    this.onStack = options.onStack === undefined ? false : options.onStack;
+    this.map = options.map;
+  }
+
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
-    const params = tsUtils.parametered.getParameters(node);
+    const params = this.params;
     const restElement = params.find((param) => tsUtils.parameter.isRestParameter(param));
     let parameters = restElement === undefined ? [...params] : params.slice(0, -1);
     parameters =
@@ -88,7 +105,7 @@ export class ParametersHelper extends Helper<ParameteredNode> {
             },
             whenTrue: () => {
               // [undefinedVal, argsarr]
-              sb.emitHelper(param, sb.pushValueOptions(options), sb.helpers.createUndefined);
+              sb.emitHelper(param, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
             },
             whenFalse: () => {
               // [argsarr, argsarr]
@@ -109,10 +126,23 @@ export class ParametersHelper extends Helper<ParameteredNode> {
         sb.emitOp(param, 'PICKITEM');
       }
 
-      // [argsarr]
-      if (ts.isIdentifier(nameNode)) {
+      if (this.map !== undefined) {
+        // tslint:disable-next-line no-map-without-usage
+        this.map(param, options);
+      }
+
+      if (this.onStack) {
+        // [number, val, argsarr]
+        sb.emitPushInt(node, idx + 2);
+        // [val, argsarr, val]
+        sb.emitOp(node, 'XTUCK');
+        // [argsarr, val]
+        sb.emitOp(node, 'DROP');
+      } else if (ts.isIdentifier(nameNode)) {
+        // [argsarr]
         sb.scope.set(sb, node, options, tsUtils.node.getText(nameNode));
       } else {
+        // [argsarr]
         sb.visit(nameNode, options);
       }
     });
@@ -129,8 +159,23 @@ export class ParametersHelper extends Helper<ParameteredNode> {
       sb.emitHelper(restElement, options, sb.helpers.arrSlice({ hasEnd: false }));
       // [arrayVal]
       sb.emitHelper(restElement, options, sb.helpers.wrapArray);
-      // []
-      sb.scope.set(sb, restElement, options, tsUtils.node.getNameOrThrow(restElement));
+
+      if (this.map !== undefined) {
+        // tslint:disable-next-line no-map-without-usage
+        this.map(restElement, options);
+      }
+
+      if (this.onStack) {
+        // [number, val]
+        sb.emitPushInt(node, params.length);
+        // [val, val]
+        sb.emitOp(node, 'XTUCK');
+        // [val]
+        sb.emitOp(node, 'DROP');
+      } else {
+        // []
+        sb.scope.set(sb, restElement, options, tsUtils.node.getNameOrThrow(restElement));
+      }
     }
   }
 }

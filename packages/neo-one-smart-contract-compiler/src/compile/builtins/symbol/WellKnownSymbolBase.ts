@@ -2,18 +2,20 @@ import ts from 'typescript';
 import { WellKnownSymbol } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltinBase, BuiltinMemberValue, BuiltinType } from '../types';
+import { BuiltinMemberValue } from '../BuiltinMemberValue';
 
 type Node = ts.PropertyAccessExpression | ts.ElementAccessExpression;
 
 // tslint:disable-next-line export-name
-export abstract class WellKnownSymbolBase extends BuiltinBase implements BuiltinMemberValue {
-  public readonly types = new Set([BuiltinType.MemberValue]);
+export abstract class WellKnownSymbolBase extends BuiltinMemberValue {
   protected abstract readonly symbol: WellKnownSymbol;
-  public emitValue(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
-    // [string]
-    sb.emitPushString(node, this.symbol);
-    // [symbolVal]
-    sb.emitHelper(node, options, sb.helpers.createSymbol);
+
+  protected emit(sb: ScriptBuilder, node: Node, options: VisitOptions): void {
+    if (options.pushValue) {
+      // [string]
+      sb.emitPushString(node, this.symbol);
+      // [symbolVal]
+      sb.emitHelper(node, options, sb.helpers.wrapSymbol);
+    }
   }
 }

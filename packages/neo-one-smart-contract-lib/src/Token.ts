@@ -1,7 +1,9 @@
 // tslint:disable readonly-keyword readonly-array no-object-mutation strict-boolean-expressions
-import { Address, constant, Fixed, MapStorage, SmartContract, verifySender } from '@neo-one/smart-contract';
+import { Address, constant, ContractProperties, Fixed, MapStorage, SmartContract } from '@neo-one/smart-contract';
 
-export abstract class Token<Decimals extends number> extends SmartContract {
+export abstract class Token<Decimals extends number> implements SmartContract {
+  public abstract owner: Address;
+  public abstract readonly properties: ContractProperties;
   public abstract readonly name: string;
   public abstract readonly decimals: Decimals;
   public abstract readonly symbol: string;
@@ -10,7 +12,7 @@ export abstract class Token<Decimals extends number> extends SmartContract {
   private readonly allowances: MapStorage<[Address, Address], Fixed<Decimals>> = new MapStorage();
 
   public transfer(from: Address, to: Address, amount: Fixed<Decimals>): void {
-    verifySender(from);
+    Address.verifySender(from);
     this.doTransfer(from, to, amount);
   }
 
@@ -25,7 +27,7 @@ export abstract class Token<Decimals extends number> extends SmartContract {
   }
 
   public approve(owner: Address, spender: Address, amount: Fixed<Decimals>): void {
-    verifySender(owner);
+    Address.verifySender(owner);
     const fromValue = this.balanceOf(owner);
     if (fromValue < amount) {
       throw new Error('Insufficient funds');

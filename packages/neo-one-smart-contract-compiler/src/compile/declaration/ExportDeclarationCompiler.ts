@@ -22,7 +22,7 @@ export class ExportDeclarationCompiler extends NodeCompiler<ts.ExportDeclaration
 
     const getExportName = (namedExport: ts.ExportSpecifier) => tsUtils.node.getName(namedExport);
 
-    const moduleSpecifier = tsUtils.importExport.getModuleSpecifierSourceFile(sb.typeChecker, node);
+    const moduleSpecifier = tsUtils.importExport.getModuleSpecifierSourceFile(sb.context.typeChecker, node);
 
     // [exports]
     sb.emitHelper(node, options, sb.helpers.getCurrentModule);
@@ -31,11 +31,11 @@ export class ExportDeclarationCompiler extends NodeCompiler<ts.ExportDeclaration
         .getNamedExports(node)
         .filter((namedExport) =>
           tsUtils.exportSpecifier
-            .getLocalTargetDeclarations(sb.typeChecker, namedExport)
+            .getLocalTargetDeclarations(sb.context.typeChecker, namedExport)
             .some((decl) => !tsUtils.declaration.isAmbient(decl)),
         )
         .filter((namedExport) => {
-          const symbol = sb.getSymbol(namedExport);
+          const symbol = sb.context.getSymbol(namedExport);
 
           return (
             symbol !== undefined &&

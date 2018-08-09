@@ -2,35 +2,36 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
+import { BuiltinInstanceMemberCall } from '../BuiltinInstanceMemberCall';
+import { MemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class ArrayIterator extends BuiltinBase implements BuiltinCall {
-  public readonly types = new Set([BuiltinType.Call]);
-
-  public canCall(_sb: ScriptBuilder, node: CallLikeExpression): boolean {
-    return ts.isCallExpression(node);
+export class ArrayIterator extends BuiltinInstanceMemberCall {
+  public canCall(): boolean {
+    return true;
   }
 
-  public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions, visited = false): void {
-    if (!ts.isCallExpression(node)) {
-      /* istanbul ignore next */
-      throw new Error('Something went wrong.');
-    }
-
-    const options = sb.pushValueOptions(optionsIn);
-    if (!visited) {
-      const expr = tsUtils.expression.getExpression(node);
-      if (!ts.isElementAccessExpression(expr) && !ts.isPropertyAccessExpression(expr)) {
-        /* istanbul ignore next */
-        throw new Error('Something went wrong');
+  public emitCall(
+    sb: ScriptBuilder,
+    func: MemberLikeExpression,
+    node: ts.CallExpression,
+    options: VisitOptions,
+    visited: boolean,
+  ): void {
+    if (!options.pushValue) {
+      if (visited) {
+        // []
+        sb.emitOp(node, 'DROP');
       }
 
+      return;
+    }
+    if (!visited) {
       // [arrayVal]
-      sb.visit(tsUtils.expression.getExpression(expr), options);
+      sb.visit(tsUtils.expression.getExpression(func), options);
     }
 
     // [val]
-    sb.emitHelper(node, optionsIn, sb.helpers.createArrayIterableIterator);
+    sb.emitHelper(node, options, sb.helpers.createArrayIterableIterator);
   }
 }

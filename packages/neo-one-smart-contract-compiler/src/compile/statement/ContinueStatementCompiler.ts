@@ -11,7 +11,7 @@ export class ContinueStatementCompiler extends NodeCompiler<ts.ContinueStatement
     const label = tsUtils.statement.getLabel(node);
     if (label !== undefined) {
       /* istanbul ignore next */
-      sb.reportUnsupported(label);
+      sb.context.reportUnsupported(label);
     }
 
     sb.emitHelper(node, options, sb.helpers.continue);

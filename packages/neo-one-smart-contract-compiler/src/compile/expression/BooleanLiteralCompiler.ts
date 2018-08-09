@@ -10,7 +10,7 @@ export abstract class BooleanLiteralCompiler extends NodeCompiler<ts.BooleanLite
   public visitNode(sb: ScriptBuilder, expr: ts.BooleanLiteral, options: VisitOptions): void {
     if (options.pushValue) {
       sb.emitPushBoolean(expr, this.value);
-      sb.emitHelper(expr, options, sb.helpers.createBoolean);
+      sb.emitHelper(expr, options, sb.helpers.wrapBoolean);
     }
   }
 }

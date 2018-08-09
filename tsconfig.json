@@ -5,7 +5,7 @@
     "module": "esnext",
     "moduleResolution": "node",
 
-    "lib": ["dom", "esnext"],
+    "lib": ["dom", "es5", "esnext"],
     "paths": {
       "@neo-one/ec-key": [
         "../@types/@neo-one/ec-key"

@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createEventNotifier invalid event name 1`] = `
+"snippetCode.ts (5,26): The arguments to createEventNotifier must be string literals.
+
+      3 | 
+      4 |       const foo = 'event';
+    > 5 |       const onTransfer = createEventNotifier(foo);
+        |                          ^
+      6 |       onTransfer();
+      7 |     
+"
+`;

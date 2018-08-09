@@ -10,7 +10,7 @@ export class NoSubstitutionTemplateLiteralCompiler extends NodeCompiler<ts.NoSub
   public visitNode(sb: ScriptBuilder, expr: ts.NoSubstitutionTemplateLiteral, options: VisitOptions): void {
     if (options.pushValue) {
       sb.emitPushString(expr, tsUtils.literal.getLiteralValue(expr));
-      sb.emitHelper(expr, options, sb.helpers.createString);
+      sb.emitHelper(expr, options, sb.helpers.wrapString);
     }
   }
 }

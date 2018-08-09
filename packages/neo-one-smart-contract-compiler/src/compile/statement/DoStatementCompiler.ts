@@ -23,7 +23,7 @@ export class DoStatementCompiler extends NodeCompiler<ts.DoStatement> {
           condition: () => {
             const expr = tsUtils.expression.getExpression(node);
             sb.visit(expr, sb.pushValueOptions(options));
-            sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.toBoolean({ type: sb.getType(expr) }));
+            sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.toBoolean({ type: sb.context.getType(expr) }));
           },
           whenTrue: () => {
             sb.emitJmp(node, 'JMP', pc.getFirst());

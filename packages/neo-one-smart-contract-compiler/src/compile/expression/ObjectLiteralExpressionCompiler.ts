@@ -93,7 +93,7 @@ export class ObjectLiteralExpressionCompiler extends NodeCompiler<ts.ObjectLiter
         const handlePossibleSymbol = (propertyNameType: ts.Type | undefined) => {
           const handleSymbol = () => {
             // [string, objectVal, objectVal]
-            sb.emitHelper(prop, options, sb.helpers.getSymbol);
+            sb.emitHelper(prop, options, sb.helpers.unwrapSymbol);
             // [val, string, objectVal, objectVal]
             visitProp();
             // [objectVal]
@@ -137,7 +137,7 @@ export class ObjectLiteralExpressionCompiler extends NodeCompiler<ts.ObjectLiter
 
         if (ts.isComputedPropertyName(propertyName)) {
           const expr = tsUtils.expression.getExpression(propertyName);
-          const propertyNameType = sb.getType(expr);
+          const propertyNameType = sb.context.getType(expr);
 
           // [propVal, objectVal, objectVal]
           sb.visit(expr, options);

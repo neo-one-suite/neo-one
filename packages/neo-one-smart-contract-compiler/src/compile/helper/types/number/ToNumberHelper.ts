@@ -26,7 +26,7 @@ export class ToNumberHelper extends TypedHelper {
         options,
         sb.helpers.if({
           condition: () => {
-            sb.emitHelper(node, options, sb.helpers.getBoolean);
+            sb.emitHelper(node, options, sb.helpers.unwrapBoolean);
           },
           whenTrue: () => {
             // [1]
@@ -53,7 +53,7 @@ export class ToNumberHelper extends TypedHelper {
 
     const convertNumber = (options: VisitOptions) => {
       // [value]
-      sb.emitHelper(node, options, sb.helpers.getNumber);
+      sb.emitHelper(node, options, sb.helpers.unwrapNumber);
     };
 
     const convertString = (options: VisitOptions) => {
@@ -62,7 +62,7 @@ export class ToNumberHelper extends TypedHelper {
       const accum = sb.scope.addUnique();
 
       // [string]
-      sb.emitHelper(node, options, sb.helpers.getString);
+      sb.emitHelper(node, options, sb.helpers.unwrapString);
       sb.emitHelper(
         node,
         options,
@@ -226,6 +226,15 @@ export class ToNumberHelper extends TypedHelper {
           string: convertString,
           symbol: throwTypeError,
           undefined: throwTypeError,
+          transaction: throwTypeError,
+          output: throwTypeError,
+          attribute: throwTypeError,
+          input: throwTypeError,
+          account: throwTypeError,
+          asset: throwTypeError,
+          contract: throwTypeError,
+          header: throwTypeError,
+          block: throwTypeError,
         }),
       );
     };

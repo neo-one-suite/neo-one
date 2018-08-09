@@ -11,7 +11,7 @@ export class BreakStatementCompiler extends NodeCompiler<ts.BreakStatement> {
     const label = tsUtils.statement.getLabel(node);
     if (label !== undefined) {
       /* istanbul ignore next */
-      sb.reportUnsupported(label);
+      sb.context.reportUnsupported(label);
     }
 
     sb.emitHelper(node, options, sb.helpers.break);

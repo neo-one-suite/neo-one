@@ -2,6 +2,7 @@ import { BodiedNode, BodyableNode, ParameteredNode, tsUtils } from '@neo-one/ts-
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
+import { handleReturnTypeAssignment } from '../types';
 
 // Input: []
 // Output: [farr]
@@ -21,17 +22,18 @@ export class CreateCallArrayHelper extends Helper<(BodiedNode | BodyableNode) & 
       sb.helpers.createFunctionArray({
         body: (innerOptions) => {
           sb.withScope(node, innerOptions, (options) => {
-            sb.emitHelper(node, options, sb.helpers.parameters);
+            sb.emitHelper(node, options, sb.helpers.parameters({ params: tsUtils.parametered.getParameters(node) }));
             const body = tsUtils.body.getBodyOrThrow(node);
             if (tsUtils.guards.isExpression(body)) {
               // [val]
               sb.visit(body, sb.pushValueOptions(options));
+              handleReturnTypeAssignment(sb.context, body);
               // []
               sb.emitHelper(node, options, sb.helpers.return);
             } else {
               sb.visit(body, options);
               // [undefinedVal]
-              sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+              sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
               // []
               sb.emitHelper(node, options, sb.helpers.return);
             }

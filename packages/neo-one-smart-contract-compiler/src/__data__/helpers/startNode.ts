@@ -19,6 +19,7 @@ import { CompileResult } from '../../compile/types';
 import { testNodeSetup } from '../../test';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { createContextForSnippet } from '../../createContext';
+import { checkRawResult } from './extractors';
 
 export interface Result {
   readonly networkName: string;
@@ -62,12 +63,12 @@ export interface InvokeValidateResultOptions {
 }
 
 const getCompiledScript = async (script: string): Promise<CompileResult> => {
-  const { context, sourceFile } = await createContextForSnippet(script);
+  const { context, sourceFile } = await createContextForSnippet(script, { withTestHarness: true });
 
   return compile({ context, sourceFile });
 };
 
-export const startNode = async (options: StartNodeOptions = {}): Promise<TestNode> => {
+export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<TestNode> => {
   const { client, masterWallet, provider, networkName, userAccountProviders } = await testNodeSetup();
   const developerClient = new DeveloperClient(provider.read(networkName), userAccountProviders);
 
@@ -75,7 +76,7 @@ export const startNode = async (options: StartNodeOptions = {}): Promise<TestNod
     async addContract(script): Promise<Contract> {
       const { code, context } = await getCompiledScript(script);
 
-      throwOnDiagnosticErrorOrWarning(context.diagnostics, options.ignoreWarnings);
+      throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
 
       const result = await client.publish({
         script: code.toString('hex'),
@@ -107,9 +108,18 @@ export const startNode = async (options: StartNodeOptions = {}): Promise<TestNod
       script,
       options = {},
     ): Promise<{ readonly receipt: RawInvokeReceipt; readonly transaction: InvocationTransaction }> {
-      const { code, sourceMap } = await getCompiledScript(script);
+      const { code, sourceMap, context } = await getCompiledScript(script);
 
-      return developerClient.execute(code.toString('hex'), { from: masterWallet.account.id, ...options }, sourceMap);
+      throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
+
+      const result = await developerClient.execute(
+        code.toString('hex'),
+        { from: masterWallet.account.id, ...options },
+        sourceMap,
+      );
+      await checkRawResult(result.receipt, sourceMap);
+
+      return result;
     },
     compileScript: getCompiledScript,
     client,

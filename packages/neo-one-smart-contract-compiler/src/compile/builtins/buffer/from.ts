@@ -2,7 +2,8 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
+import { BuiltinMemberCall } from '../BuiltinMemberCall';
+import { MemberLikeExpression } from '../types';
 
 interface HashAndEncoding {
   readonly hash: string;
@@ -10,20 +11,22 @@ interface HashAndEncoding {
 }
 
 // tslint:disable-next-line export-name
-export class BufferFrom extends BuiltinBase implements BuiltinCall {
-  public readonly types = new Set([BuiltinType.Call]);
+export class BufferFrom extends BuiltinMemberCall {
+  public emitCall(
+    sb: ScriptBuilder,
+    _func: MemberLikeExpression,
+    node: ts.CallExpression,
+    options: VisitOptions,
+  ): void {
+    if (tsUtils.argumented.getArguments(node).length < 1) {
+      /* istanbul ignore next */
+      return;
+    }
 
-  public canCall(): boolean {
-    throw new Error('Something went wrong.');
-  }
-
-  public emitCall(sb: ScriptBuilder, node: CallLikeExpression, options: VisitOptions): void {
     const result = this.getHashAndEncoding(node);
     if (result === undefined) {
-      /* istanbul ignore next */
-      sb.reportUnsupported(node);
+      sb.context.reportUnsupported(node);
 
-      /* istanbul ignore next */
       return;
     }
 
@@ -34,18 +37,8 @@ export class BufferFrom extends BuiltinBase implements BuiltinCall {
     }
   }
 
-  private getHashAndEncoding(node: CallLikeExpression): HashAndEncoding | undefined {
-    if (!ts.isCallExpression(node)) {
-      /* istanbul ignore next */
-      return undefined;
-    }
-
+  private getHashAndEncoding(node: ts.CallExpression): HashAndEncoding | undefined {
     const args = tsUtils.argumented.getArguments(node);
-    if (args.length !== 1 && args.length !== 2) {
-      /* istanbul ignore next */
-      return undefined;
-    }
-
     const hashArg = args[0];
     const encodingArg = args[1] as ts.Expression | undefined;
     if (!ts.isStringLiteral(hashArg) || (encodingArg !== undefined && !ts.isStringLiteral(encodingArg))) {

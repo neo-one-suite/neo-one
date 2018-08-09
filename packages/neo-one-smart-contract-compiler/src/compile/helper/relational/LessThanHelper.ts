@@ -38,8 +38,8 @@ export class LessThanHelper extends Helper {
       return;
     }
 
-    const leftType = sb.getType(this.left);
-    const rightType = sb.getType(this.right);
+    const leftType = sb.context.getType(this.left);
+    const rightType = sb.context.getType(this.right);
 
     if (this.leftFirst) {
       // [left]
@@ -97,7 +97,7 @@ export class LessThanHelper extends Helper {
       tsUtils.type_.isOnlyStringish(leftType) &&
       tsUtils.type_.isOnlyStringish(rightType)
     ) {
-      sb.reportUnsupported(node);
+      sb.context.reportUnsupported(node);
     } else {
       // [rightNumber, leftPrim]
       sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: rightType }));

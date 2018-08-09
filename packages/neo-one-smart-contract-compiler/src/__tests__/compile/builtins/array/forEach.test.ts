@@ -1,5 +1,7 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
+import ts from 'typescript';
+import { ArrayForEach } from '../../../../compile/builtins/array/forEach';
 
 describe('Array.prototype.forEach', () => {
   test('should apply a function over an array', async () => {
@@ -19,7 +21,7 @@ describe('Array.prototype.forEach', () => {
     await helpers.executeString(`
       const x = [1, 2, 3];
       let result = 0;
-      x.forEach((value, idx) => {
+      x['forEach']((value, idx) => {
         result += idx;
       });
 
@@ -35,5 +37,23 @@ describe('Array.prototype.forEach', () => {
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
+  });
+
+  test('cannot be "referenced"', async () => {
+    await helpers.compileString(
+      `
+      const x = [0, 1, 2];
+      const y = x['forEach'];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('canCall', () => {
+    const builtin = new ArrayForEach();
+    const expr = ts.createCall(ts.createIdentifier('foo'), undefined, [ts.createIdentifier('bar')]);
+
+    // tslint:disable-next-line no-any
+    expect(builtin.canCall(jest.fn() as any, jest.fn() as any, expr)).toBeTruthy();
   });
 });

@@ -7,6 +7,6 @@ export class DebuggerStatementCompiler extends NodeCompiler<ts.DebuggerStatement
   public readonly kind = ts.SyntaxKind.DebuggerStatement;
 
   public visitNode(sb: ScriptBuilder, node: ts.DebuggerStatement, _options: VisitOptions): void {
-    sb.reportUnsupported(node);
+    sb.context.reportUnsupported(node);
   }
 }

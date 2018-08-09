@@ -1,4 +1,5 @@
 import { helpers } from '../../../__data__';
+import { DiagnosticCode } from '../../../DiagnosticCode';
 
 describe('FunctionDeclarationCompiler', () => {
   test('basic function', async () => {
@@ -77,17 +78,17 @@ describe('FunctionDeclarationCompiler', () => {
 
   test('declaration overloads', async () => {
     await helpers.executeString(`
-      function getNumberOrString(value: true): string;
-      function getNumberOrString(value: false): number;
-      function getNumberOrString(value: boolean): string | number {
+      function unwrapNumberOrString(value: true): string;
+      function unwrapNumberOrString(value: false): number;
+      function unwrapNumberOrString(value: boolean): string | number {
         return value ? 'foo' : 0;
       }
 
-      if (getNumberOrString(true) !== 'foo') {
+      if (unwrapNumberOrString(true) !== 'foo') {
         throw 'Failure';
       }
 
-      if (getNumberOrString(false) !== 0) {
+      if (unwrapNumberOrString(false) !== 0) {
         throw 'Failure';
       }
     `);
@@ -149,5 +150,23 @@ describe('FunctionDeclarationCompiler', () => {
         throw 'Failure';
       }
     `);
+  });
+
+  test('spread arguments unsupported', async () => {
+    await helpers.compileString(
+      `
+      function foo(x: number, ...y: number[]): number[] {
+        return y;
+      }
+
+      const x: [number, number, number, number] = [1, 2, 3, 4]
+      const [a, b, c] = foo(...x);
+
+      assertEqual(a, 2);
+      assertEqual(b, 3);
+      assertEqual(c, 4);
+    `,
+      { type: 'error', code: DiagnosticCode.GenericUnsupportedSyntax },
+    );
   });
 });
