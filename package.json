@@ -96,9 +96,9 @@
   "devDependencies": {
     "@babel/core": "7.0.0-beta.56",
     "@babel/plugin-syntax-dynamic-import": "7.0.0-beta.56",
-    "@babel/plugin-syntax-numeric-separator": "7.0.0-beta.56",
-    "@babel/plugin-syntax-optional-catch-binding": "7.0.0-beta.56",
-    "@babel/plugin-syntax-typescript": "7.0.0-beta.56",
+    "@babel/plugin-syntax-numeric-separator": "7.0.0-rc.0",
+    "@babel/plugin-syntax-optional-catch-binding": "7.0.0-rc.0",
+    "@babel/plugin-syntax-typescript": "7.0.0-rc.0",
     "@reactivex/ix-esnext-cjs": "2.3.5",
     "@reactivex/ix-esnext-esm": "2.3.5",
     "@types/babel__code-frame": "7.0.0",
