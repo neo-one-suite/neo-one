@@ -59,7 +59,10 @@ export class LocalKeyStore {
   public constructor({ store }: { readonly store: Store }) {
     this.type = store.type;
     this.walletsInternal$ = new BehaviorSubject<Wallets>({});
-    this.wallets$ = this.walletsInternal$.pipe(distinctUntilChanged((a, b) => _.isEqual(a, b)), map(flattenWallets));
+    this.wallets$ = this.walletsInternal$.pipe(
+      distinctUntilChanged((a, b) => _.isEqual(a, b)),
+      map(flattenWallets),
+    );
 
     this.accountsInternal$ = new BehaviorSubject([] as ReadonlyArray<UserAccount>);
     this.wallets$.pipe(map((wallets) => wallets.map(({ account }) => account))).subscribe(this.accountsInternal$);

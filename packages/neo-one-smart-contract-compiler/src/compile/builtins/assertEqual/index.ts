@@ -34,7 +34,10 @@ export class AssertEqual extends BuiltinCall {
           sb.emitHelper(
             node,
             options,
-            sb.helpers.equalsEqualsEquals({ leftType: sb.context.getType(received), rightType: sb.context.getType(expected) }),
+            sb.helpers.equalsEqualsEquals({
+              leftType: sb.context.getType(received),
+              rightType: sb.context.getType(expected),
+            }),
           );
         },
         whenTrue: () => {
