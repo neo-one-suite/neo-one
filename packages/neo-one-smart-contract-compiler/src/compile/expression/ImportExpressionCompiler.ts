@@ -8,6 +8,6 @@ export class ImportExpressionCompiler extends NodeCompiler<ts.ImportExpression> 
   public readonly kind = ts.SyntaxKind.ImportKeyword;
 
   public visitNode(sb: ScriptBuilder, expr: ts.ImportExpression, _options: VisitOptions): void {
-    sb.reportUnsupported(expr);
+    sb.context.reportUnsupported(expr);
   }
 }

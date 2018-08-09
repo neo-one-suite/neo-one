@@ -30,7 +30,7 @@ export class InObjectPropertyHelper extends Helper {
 
     const handleSymbol = () => {
       // [string, objectVal]
-      sb.emitHelper(node, options, sb.helpers.getSymbol);
+      sb.emitHelper(node, options, sb.helpers.unwrapSymbol);
       // [boolean]
       sb.emitHelper(node, options, sb.helpers.inSymbolObjectProperty);
     };

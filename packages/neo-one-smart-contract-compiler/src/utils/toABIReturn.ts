@@ -1,51 +1,43 @@
 import { ABIReturn } from '@neo-one/client';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { isOnlyArray, isOnlyBoolean, isOnlyBuffer, isOnlyString } from '../compile/helper/types';
 import { Context } from '../Context';
 import { getFixedDecimals } from './getFixedDecimals';
-import { isFixedType } from './isFixedType';
 
 const BYTE_ARRAY_RETURN: ABIReturn = { type: 'ByteArray' };
 
-export function toABIReturn(
-  context: Context,
-  node: ts.Node,
-  resolvedType: ts.Type | undefined,
-  typeIdentifier?: ts.Identifier,
-): ABIReturn | undefined {
-  if (resolvedType === undefined && typeIdentifier === undefined) {
-    return undefined;
-  }
-
-  if (resolvedType !== undefined && tsUtils.type_.isOnlyBooleanish(resolvedType)) {
-    return { type: 'Boolean' };
-  }
-
-  if (context.isLibAlias(typeIdentifier, 'Address')) {
-    return { type: 'Hash160' };
-  }
-
-  if (context.isLibAlias(typeIdentifier, 'Hash256')) {
-    return { type: 'Hash256' };
-  }
-
-  if (context.isLibAlias(typeIdentifier, 'Signature')) {
-    return { type: 'Signature' };
-  }
-
-  if (context.isLibAlias(typeIdentifier, 'PublicKey')) {
-    return { type: 'PublicKey' };
+export function toABIReturn(context: Context, node: ts.Node, type: ts.Type | undefined): ABIReturn | undefined {
+  let resolvedType = type;
+  if (resolvedType !== undefined && tsUtils.type_.hasUndefinedish(resolvedType)) {
+    resolvedType = tsUtils.type_.getNonNullableType(resolvedType);
   }
 
   if (resolvedType === undefined) {
     return undefined;
   }
 
+  if (isOnlyBoolean(context, node, resolvedType)) {
+    return { type: 'Boolean' };
+  }
+
+  if (context.builtins.isInterface(node, resolvedType, 'Address')) {
+    return { type: 'Hash160' };
+  }
+
+  if (context.builtins.isInterface(node, resolvedType, 'Hash256')) {
+    return { type: 'Hash256' };
+  }
+
+  if (context.builtins.isInterface(node, resolvedType, 'PublicKey')) {
+    return { type: 'PublicKey' };
+  }
+
   if (tsUtils.type_.isOnlyVoidish(resolvedType)) {
     return { type: 'Void' };
   }
 
-  if (tsUtils.type_.isOnlyStringish(resolvedType)) {
+  if (isOnlyString(context, node, resolvedType)) {
     return { type: 'String' };
   }
 
@@ -53,7 +45,7 @@ export function toABIReturn(
     return { type: 'Integer', decimals: 0 };
   }
 
-  if (isFixedType(context, node, resolvedType)) {
+  if (context.builtins.isType(node, resolvedType, 'Fixed')) {
     const decimals = getFixedDecimals(resolvedType);
 
     return { type: 'Integer', decimals };
@@ -63,7 +55,7 @@ export function toABIReturn(
     return { type: 'Integer', decimals: 0 };
   }
 
-  if (tsUtils.type_.isOnlyArray(resolvedType)) {
+  if (isOnlyArray(context, node, resolvedType)) {
     const typeArguments = tsUtils.type_.getTypeArguments(resolvedType);
     if (typeArguments !== undefined) {
       const value = toABIReturn(context, node, typeArguments[0]);
@@ -73,7 +65,7 @@ export function toABIReturn(
     }
   }
 
-  if (context.isOnlyGlobal(node, resolvedType, 'Buffer')) {
+  if (isOnlyBuffer(context, node, resolvedType)) {
     return BYTE_ARRAY_RETURN;
   }
 

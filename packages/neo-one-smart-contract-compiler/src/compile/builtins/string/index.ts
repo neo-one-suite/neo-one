@@ -1,13 +1,14 @@
-import { Context } from '../../../Context';
+import { BuiltinBase } from '../BuiltinBase';
+import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
-import { BuiltinBase } from '../types';
 
-class StringInstance extends BuiltinBase {}
-class StringConstructor extends BuiltinBase {}
+class StringInterface extends BuiltinInterface {}
+class StringValue extends BuiltinBase {}
+class StringConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name
-export const add = (context: Context, builtins: Builtins): void => {
-  builtins.addInterface(context, 'String', new StringInstance());
-  builtins.addValue(context, 'String', new StringInstance());
-  builtins.addInterface(context, 'StringConstructor', new StringConstructor());
+export const add = (builtins: Builtins): void => {
+  builtins.addInterface('String', new StringInterface());
+  builtins.addValue('String', new StringValue());
+  builtins.addInterface('StringConstructor', new StringConstructorInterface());
 };

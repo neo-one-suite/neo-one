@@ -1,17 +1,54 @@
-import { ArgumentedNode, tsUtils } from '@neo-one/ts-utils';
+import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
-
+import ts from 'typescript';
+import { DiagnosticCode } from '../../../DiagnosticCode';
+import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
+import { getHasBuiltins } from '../types';
 
 // Input: []
 // Output: [argsArray]
-export class ArgumentsHelper extends Helper<ArgumentedNode> {
-  public emit(sb: ScriptBuilder, node: ArgumentedNode, options: VisitOptions): void {
+export class ArgumentsHelper extends Helper<ts.CallExpression | ts.NewExpression> {
+  public emit(sb: ScriptBuilder, node: ts.CallExpression | ts.NewExpression, options: VisitOptions): void {
+    const args = tsUtils.argumented.getArgumentsArray(node);
+    if (args.length > 0) {
+      const signatureTypes = sb.context.analysis.extractSignaturesForCall(node, { error: true });
+
+      if (signatureTypes !== undefined) {
+        args.forEach((arg, idx) => {
+          const argType = sb.context.getType(arg, { error: true });
+          if (argType !== undefined) {
+            const mismatch = signatureTypes.some(({ paramDecls, paramTypes }) => {
+              const paramDecl = paramDecls[Math.min(idx, paramDecls.length - 1)];
+              let paramTypeIn = paramTypes.get(paramDecl);
+              if (tsUtils.parameter.isRestParameter(paramDecl) && paramTypeIn !== undefined) {
+                paramTypeIn = tsUtils.type_.getArrayType(paramTypeIn);
+              }
+              const paramType = paramTypeIn;
+              const hasBuiltins = getHasBuiltins(sb.context, arg, argType);
+
+              return (
+                paramType === undefined ||
+                hasBuiltins.some((hasBuiltin) => !hasBuiltin(sb.context, paramDecl, paramType))
+              );
+            });
+
+            if (mismatch) {
+              sb.context.reportError(
+                arg,
+                DiagnosticCode.InvalidBuiltinUsage,
+                DiagnosticMessage.InvalidBuiltinCallArgument,
+              );
+            }
+          }
+        });
+      }
+    }
+
     // Push the arguments
-    const args = _.reverse([...tsUtils.argumented.getArguments(node)]);
-    args.forEach((arg) => {
+    _.reverse([...args]).forEach((arg) => {
       sb.visit(arg, sb.pushValueOptions(options));
     });
     // [length, ...args]

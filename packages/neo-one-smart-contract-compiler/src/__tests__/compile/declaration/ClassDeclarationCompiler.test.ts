@@ -1,4 +1,4 @@
-import { keys, helpers } from '../../../__data__';
+import { helpers } from '../../../__data__';
 
 describe('ClassDeclarationCompiler', () => {
   test('basic class with initializer', async () => {
@@ -110,7 +110,7 @@ describe('ClassDeclarationCompiler', () => {
       class Foo {
         x: string = 'bar';
 
-        public get bar(): string {
+        public get bar() {
           return this.x;
         }
       }
@@ -462,119 +462,5 @@ describe('ClassDeclarationCompiler', () => {
     `,
       { type: 'error' },
     );
-  });
-
-  test('realistic class inheritance', async () => {
-    const node = await helpers.startNode();
-    const contract = await node.addContract(`
-      function verifySender(addr: Buffer): void {
-        if (!true) {
-          throw new Error('Invalid witness');
-        }
-      }
-
-      class MapStorage<K extends SerializableValue, V extends SerializableValue> {
-        constructor(private readonly prefix?: Buffer) {
-        }
-        public get(keyIn: K): V | undefined {
-          return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), this.prefix == undefined
-            ? syscall('Neo.Runtime.Serialize', keyIn)
-            : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)])) as (V | undefined);
-        }
-        public set(keyIn: K, value: V): void {
-          syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), this.prefix == undefined
-            ? syscall('Neo.Runtime.Serialize', keyIn)
-            : Buffer.concat([this.prefix, syscall('Neo.Runtime.Serialize', keyIn)]), value);
-        }
-      }
-
-      abstract class SmartContract {
-        protected get address(): Buffer {
-          return syscall('System.ExecutionEngine.GetExecutingScriptHash');
-        }
-        public deploy(owner: Buffer): boolean {
-          this.owner = owner;
-          return true;
-        }
-        public get owner(): Buffer {
-          return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), 'owner') as Buffer;
-        }
-        public set owner(owner: Buffer) {
-          syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), 'owner', owner);
-        }
-      }
-
-      abstract class Token extends SmartContract {
-        private readonly balances: MapStorage<Buffer, number> =
-          new MapStorage(syscall('Neo.Runtime.Serialize', 'balances'));
-
-        protected issue(addr: Buffer, amount: number): void {
-          this.balances.set(addr, this.balanceOf(addr) + amount);
-          this.supply += amount;
-        }
-
-        public deploy(owner: Buffer): boolean {
-          super.deploy(owner);
-          this.supply = 0;
-          return true;
-        }
-
-        public balanceOf(addr: Buffer): number {
-          return this.balances.get(addr) || 0;
-        }
-
-        public getSupply(): number {
-          return this.supply;
-        }
-
-        private get supply(): number {
-          return syscall('Neo.Storage.Get', syscall('Neo.Storage.GetContext'), 'supply') as number;
-        }
-        private set supply(supply: number) {
-          syscall('Neo.Storage.Put', syscall('Neo.Storage.GetContext'), 'supply', supply);
-        }
-      }
-
-      class TestToken extends Token {
-        public readonly name: string = 'TestToken';
-        public readonly decimals: 4 = 4;
-        public readonly symbol: string = 'TT';
-        public deploy(owner: Buffer): boolean {
-          super.deploy(owner);
-          verifySender(owner);
-          this.issue(owner, 1000000);
-          return true;
-        }
-      }
-
-      const token = new TestToken();
-      if (token.name !== 'TestToken') {
-        throw 'Failure';
-      }
-
-      if (token.decimals !== 4) {
-        throw 'Failure';
-      }
-
-      if (token.symbol !== 'TT') {
-        throw 'Failure';
-      }
-
-      if (!token.deploy(syscall('Neo.Runtime.Serialize', 'owner'))) {
-        throw 'Failure';
-      }
-
-      if (token.getSupply() !== 1000000) {
-        throw 'Failure';
-      }
-
-      if (token.balanceOf(${helpers.getAddressHash(keys[0].address)}) !== 0) {
-        throw 'Failure';
-      }
-    `);
-
-    await node.executeString(`
-      syscall('Neo.Runtime.Call', ${helpers.getUInt160Hash(contract.hash)});
-    `);
   });
 });

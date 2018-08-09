@@ -43,14 +43,14 @@ export class PrefixUnaryExpressionCompiler extends NodeCompiler<ts.PrefixUnaryEx
 
     switch (token) {
       case ts.SyntaxKind.PlusPlusToken:
-        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.toNumber({ type: sb.getType(expr) }));
+        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.toNumber({ type: sb.context.getType(expr) }));
         sb.emitOp(expr, 'INC');
-        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.createNumber);
+        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.MinusMinusToken:
-        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.toNumber({ type: sb.getType(expr) }));
+        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.toNumber({ type: sb.context.getType(expr) }));
         sb.emitOp(expr, 'DEC');
-        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.createNumber);
+        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.wrapNumber);
         break;
       default:
         /* istanbul ignore next */
@@ -72,23 +72,23 @@ export class PrefixUnaryExpressionCompiler extends NodeCompiler<ts.PrefixUnaryEx
 
     switch (token) {
       case ts.SyntaxKind.PlusToken:
-        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(operand) }));
-        sb.emitHelper(expr, options, sb.helpers.createNumber);
+        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.context.getType(operand) }));
+        sb.emitHelper(expr, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.MinusToken:
-        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(operand) }));
+        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.context.getType(operand) }));
         sb.emitOp(expr, 'NEGATE');
-        sb.emitHelper(expr, options, sb.helpers.createNumber);
+        sb.emitHelper(expr, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.TildeToken:
-        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.getType(operand) }));
+        sb.emitHelper(expr, options, sb.helpers.toNumber({ type: sb.context.getType(operand) }));
         sb.emitOp(expr, 'INVERT');
-        sb.emitHelper(expr, options, sb.helpers.createNumber);
+        sb.emitHelper(expr, options, sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.ExclamationToken:
-        sb.emitHelper(operand, options, sb.helpers.toBoolean({ type: sb.getType(operand) }));
+        sb.emitHelper(operand, options, sb.helpers.toBoolean({ type: sb.context.getType(operand) }));
         sb.emitOp(expr, 'NOT');
-        sb.emitHelper(operand, options, sb.helpers.createBoolean);
+        sb.emitHelper(operand, options, sb.helpers.wrapBoolean);
         break;
       default:
         /* istanbul ignore next */

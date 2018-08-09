@@ -1,19 +1,20 @@
-import { Context } from '../../../Context';
+import { BuiltinBase } from '../BuiltinBase';
+import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
-import { BuiltinBase } from '../types';
 import { SymbolFor } from './for';
 import { SymbolIterator } from './iterator';
 import { SymbolToPrimitive } from './toPrimitive';
 
-class SymbolInstance extends BuiltinBase {}
-class SymbolConstructor extends BuiltinBase {}
+class SymbolInterface extends BuiltinInterface {}
+class SymbolValue extends BuiltinBase {}
+class SymbolConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name
-export const add = (context: Context, builtins: Builtins): void => {
-  builtins.addInterface(context, 'Symbol', new SymbolInstance());
-  builtins.addValue(context, 'Symbol', new SymbolInstance());
-  builtins.addInterface(context, 'SymbolConstructor', new SymbolConstructor());
-  builtins.addMember(context, 'SymbolConstructor', 'for', new SymbolFor());
-  builtins.addMember(context, 'SymbolConstructor', 'iterator', new SymbolIterator());
-  builtins.addMember(context, 'SymbolConstructor', 'toPrimitive', new SymbolToPrimitive());
+export const add = (builtins: Builtins): void => {
+  builtins.addInterface('Symbol', new SymbolInterface());
+  builtins.addValue('Symbol', new SymbolValue());
+  builtins.addInterface('SymbolConstructor', new SymbolConstructorInterface());
+  builtins.addMember('SymbolConstructor', 'for', new SymbolFor());
+  builtins.addMember('SymbolConstructor', 'iterator', new SymbolIterator());
+  builtins.addMember('SymbolConstructor', 'toPrimitive', new SymbolToPrimitive());
 };

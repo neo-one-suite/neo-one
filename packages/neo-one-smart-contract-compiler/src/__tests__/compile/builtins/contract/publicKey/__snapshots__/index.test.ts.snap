@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PublicKey cannot be implemented 1`] = `
+"snippetCode.ts (3,7): Built-ins cannot be implemented.
+
+      1 | 
+      2 |       import { PublicKey } from '@neo-one/smart-contract';
+    > 3 |       class MyPublicKey implements PublicKey {
+        |       ^
+      4 |       }
+      5 |     
+"
+`;
+
+exports[`PublicKey cannot be referenced 1`] = `
+"snippetCode.ts (3,17): Builtins cannot be referenced
+
+      1 | 
+      2 |       import { PublicKey } from '@neo-one/smart-contract';
+    > 3 |       const x = PublicKey;
+        |                 ^
+      4 |     
+"
+`;

@@ -2,33 +2,35 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
+import { BuiltinMemberCall } from '../BuiltinMemberCall';
+import { MemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class BufferConcat extends BuiltinBase implements BuiltinCall {
-  public readonly types = new Set([BuiltinType.Call]);
-
-  public canCall(): boolean {
-    throw new Error('Something went wrong.');
-  }
-
-  public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions): void {
-    if (!ts.isCallExpression(node)) {
+export class BufferConcat extends BuiltinMemberCall {
+  public emitCall(
+    sb: ScriptBuilder,
+    _func: MemberLikeExpression,
+    node: ts.CallExpression,
+    optionsIn: VisitOptions,
+  ): void {
+    const options = sb.pushValueOptions(optionsIn);
+    if (tsUtils.argumented.getArguments(node).length < 1) {
       /* istanbul ignore next */
-      throw new Error('Something went wrong.');
+      return;
     }
 
-    const options = sb.pushValueOptions(optionsIn);
     const arg = tsUtils.argumented.getArguments(node)[0];
     // [arrayVal]
     sb.visit(arg, options);
     // [arr]
-    sb.emitHelper(node, options, sb.helpers.unwrapArray);
+    sb.emitHelper(arg, options, sb.helpers.unwrapArray);
     // [buffer]
     sb.emitHelper(node, options, sb.helpers.concatBuffer);
-    // [bufferVal]
-    sb.emitHelper(node, options, sb.helpers.wrapBuffer);
-    if (!optionsIn.pushValue) {
+    if (optionsIn.pushValue) {
+      // [bufferVal]
+      sb.emitHelper(node, options, sb.helpers.wrapBuffer);
+    } else {
+      // []
       sb.emitOp(node, 'DROP');
     }
   }

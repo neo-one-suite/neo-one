@@ -12,7 +12,7 @@ export class ForInStatementCompiler extends NodeCompiler<ts.ForInStatement> {
     const initializer = tsUtils.statement.getInitializer(node);
     if (!ts.isVariableDeclarationList(initializer)) {
       /* istanbul ignore next */
-      sb.reportUnsupported(initializer);
+      sb.context.reportUnsupported(initializer);
 
       /* istanbul ignore next */
       return;
@@ -21,7 +21,7 @@ export class ForInStatementCompiler extends NodeCompiler<ts.ForInStatement> {
     const variables = tsUtils.variable.getDeclarations(initializer);
     if (variables.length !== 1) {
       /* istanbul ignore next */
-      sb.reportUnsupported(initializer);
+      sb.context.reportUnsupported(initializer);
 
       /* istanbul ignore next */
       return;
@@ -30,7 +30,7 @@ export class ForInStatementCompiler extends NodeCompiler<ts.ForInStatement> {
     const variable = variables[0];
     const expression = tsUtils.expression.getExpression(node);
     const statement = tsUtils.statement.getStatement(node);
-    const expressionType = sb.getType(expression);
+    const expressionType = sb.context.getType(expression);
 
     const handleArray = () => {
       // [arr]
@@ -45,11 +45,11 @@ export class ForInStatementCompiler extends NodeCompiler<ts.ForInStatement> {
             // [idx]
             sb.emitOp(variable, 'DROP');
             // [val]
-            sb.emitHelper(variable, options, sb.helpers.createNumber);
+            sb.emitHelper(variable, options, sb.helpers.wrapNumber);
             // [val]
             sb.emitHelper(variable, options, sb.helpers.toString({ type: undefined }));
             // [val]
-            sb.emitHelper(variable, options, sb.helpers.createString);
+            sb.emitHelper(variable, options, sb.helpers.wrapString);
             // []
             sb.visit(variable, sb.setValueOptions(innerOptions));
             // []
@@ -70,7 +70,7 @@ export class ForInStatementCompiler extends NodeCompiler<ts.ForInStatement> {
           withIndex: false,
           each: (innerOptions) => {
             // [stringVal]
-            sb.emitHelper(variable, sb.pushValueOptions(innerOptions), sb.helpers.createString);
+            sb.emitHelper(variable, sb.pushValueOptions(innerOptions), sb.helpers.wrapString);
             // []
             sb.visit(variable, sb.setValueOptions(sb.noPushValueOptions(innerOptions)));
             // []

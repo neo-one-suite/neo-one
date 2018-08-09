@@ -16,6 +16,7 @@ import * as object_ from './object_';
 import * as parameter from './parameter';
 import { markOriginal, print, setOriginal, setOriginalRecursive } from './print';
 import * as reference from './reference';
+import * as signature from './signature';
 import * as statement from './statement';
 import * as symbol from './symbol';
 import * as template from './template';
@@ -51,6 +52,7 @@ export const tsUtils = {
   reference,
   setOriginal,
   setOriginalRecursive,
+  signature,
   statement,
   symbol,
   template,

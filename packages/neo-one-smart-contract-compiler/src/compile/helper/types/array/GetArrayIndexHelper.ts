@@ -43,7 +43,7 @@ export class GetArrayIndexHelper extends Helper {
           // []
           sb.emitOp(node, 'DROP');
           // [val]
-          sb.emitHelper(node, options, sb.helpers.createUndefined);
+          sb.emitHelper(node, options, sb.helpers.wrapUndefined);
         },
       }),
     );

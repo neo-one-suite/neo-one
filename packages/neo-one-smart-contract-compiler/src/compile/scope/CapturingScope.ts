@@ -39,20 +39,12 @@ export class CapturingScope implements Scope {
     sb.emitOp(node, 'NOP');
   }
 
-  public setThis(sb: ScriptBuilder, node: ts.Node): void {
-    sb.emitOp(node, 'NOP');
-  }
-
   public getGlobal(sb: ScriptBuilder, node: ts.Node): void {
     sb.emitOp(node, 'NOP');
   }
 
   public setGlobal(sb: ScriptBuilder, node: ts.Node): void {
     sb.emitOp(node, 'NOP');
-  }
-
-  public hasBinding(name: string): boolean {
-    return this.bindings.has(name) || (this.parent !== undefined && this.parent.hasBinding(name));
   }
 
   public pushAll(sb: ScriptBuilder, node: ts.Node): void {

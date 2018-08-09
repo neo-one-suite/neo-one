@@ -3,21 +3,17 @@ import _ from 'lodash';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
+import { BuiltinMemberCall } from '../BuiltinMemberCall';
+import { MemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class ConsoleLog extends BuiltinBase implements BuiltinCall {
-  public readonly types = new Set([BuiltinType.Call]);
-  public canCall(): boolean {
-    throw new Error('Something went wrong.');
-  }
-
-  public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions): void {
-    if (!ts.isCallExpression(node)) {
-      /* istanbul ignore next */
-      throw new Error('Something went wrong.');
-    }
-
+export class ConsoleLog extends BuiltinMemberCall {
+  public emitCall(
+    sb: ScriptBuilder,
+    _func: MemberLikeExpression,
+    node: ts.CallExpression,
+    optionsIn: VisitOptions,
+  ): void {
     const options = sb.pushValueOptions(optionsIn);
     const args = tsUtils.argumented.getArguments(node);
     // [...arr]

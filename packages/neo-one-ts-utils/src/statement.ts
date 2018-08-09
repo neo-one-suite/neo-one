@@ -116,6 +116,18 @@ export function getFunctionOrThrow(node: StatementedNode, name: string): ts.Func
   return utils.throwIfNullOrUndefined(getFunction(node, name), 'function');
 }
 
+export function getEnums(node: StatementedNode): ReadonlyArray<ts.EnumDeclaration> {
+  return getStatements(node).filter(ts.isEnumDeclaration);
+}
+
+export function getEnum(node: StatementedNode, name: string): ts.EnumDeclaration | undefined {
+  return getEnums(node).find((value) => node_.getName(value) === name);
+}
+
+export function getEnumOrThrow(node: StatementedNode, name: string): ts.EnumDeclaration {
+  return utils.throwIfNullOrUndefined(getEnum(node, name), 'enum');
+}
+
 export function getLabel(node: ts.BreakStatement | ts.ContinueStatement): ts.Identifier | undefined {
   return utils.getValueOrUndefined(node.label);
 }

@@ -8,6 +8,6 @@ export class EnumDeclarationCompiler extends NodeCompiler<ts.EnumDeclaration> {
   public readonly kind = ts.SyntaxKind.EnumDeclaration;
 
   public visitNode(sb: ScriptBuilder, decl: ts.EnumDeclaration, _options: VisitOptions): void {
-    sb.reportUnsupported(decl);
+    sb.context.reportUnsupported(decl);
   }
 }

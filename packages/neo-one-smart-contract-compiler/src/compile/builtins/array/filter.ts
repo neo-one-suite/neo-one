@@ -2,43 +2,43 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
+import { BuiltinInstanceMemberCall } from '../BuiltinInstanceMemberCall';
+import { MemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class ArrayFilter extends BuiltinBase implements BuiltinCall {
-  public readonly types = new Set([BuiltinType.Call]);
-
-  public canCall(_sb: ScriptBuilder, node: CallLikeExpression): boolean {
+export class ArrayFilter extends BuiltinInstanceMemberCall {
+  public canCall(_sb: ScriptBuilder, _func: MemberLikeExpression, node: ts.CallExpression): boolean {
     return ts.isCallExpression(node) && tsUtils.argumented.getArguments(node).length === 1;
   }
 
-  public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions, visited = false): void {
-    if (!ts.isCallExpression(node)) {
-      /* istanbul ignore next */
-      throw new Error('Something went wrong.');
-    }
-
+  public emitCall(
+    sb: ScriptBuilder,
+    func: MemberLikeExpression,
+    node: ts.CallExpression,
+    optionsIn: VisitOptions,
+    visited: boolean,
+  ): void {
     const options = sb.pushValueOptions(optionsIn);
     if (!visited) {
-      const expr = tsUtils.expression.getExpression(node);
-      if (!ts.isElementAccessExpression(expr) && !ts.isPropertyAccessExpression(expr)) {
-        /* istanbul ignore next */
-        throw new Error('Something went wrong');
-      }
-
       // [arrayVal]
-      sb.visit(tsUtils.expression.getExpression(expr), options);
+      sb.visit(tsUtils.expression.getExpression(func), options);
+    }
+
+    if (tsUtils.argumented.getArguments(node).length < 1) {
+      /* istanbul ignore next */
+      return;
     }
 
     // [arr]
-    sb.emitHelper(node, options, sb.helpers.unwrapArray);
+    sb.emitHelper(tsUtils.expression.getExpression(func), options, sb.helpers.unwrapArray);
     // [objectVal, arr]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
     // [arr]
     sb.emitHelper(node, options, sb.helpers.arrFilterFunc);
-    // [arrayVal]
-    sb.emitHelper(node, options, sb.helpers.wrapArray);
-    if (!optionsIn.pushValue) {
+    if (optionsIn.pushValue) {
+      // [arrayVal]
+      sb.emitHelper(node, options, sb.helpers.wrapArray);
+    } else {
       sb.emitOp(node, 'DROP');
     }
   }

@@ -1,5 +1,7 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
+import { ArrayFilter } from '../../../../compile/builtins/array/filter';
+import ts from 'typescript';
 
 describe('Array.prototype.filter', () => {
   test('should filter an array with a function', async () => {
@@ -45,5 +47,23 @@ describe('Array.prototype.filter', () => {
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
+  });
+
+  test('cannot be "referenced"', async () => {
+    await helpers.compileString(
+      `
+      const x = [0, 1, 2];
+      const y = x['filter'];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('canCall', () => {
+    const builtin = new ArrayFilter();
+    const expr = ts.createCall(ts.createIdentifier('foo'), undefined, [ts.createIdentifier('bar')]);
+
+    // tslint:disable-next-line no-any
+    expect(builtin.canCall(jest.fn() as any, jest.fn() as any, expr)).toBeTruthy();
   });
 });

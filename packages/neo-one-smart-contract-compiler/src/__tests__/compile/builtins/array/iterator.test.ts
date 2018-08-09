@@ -1,9 +1,11 @@
 import { helpers } from '../../../../__data__';
+import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Array.prototype[Symbol.iterator]', () => {
   test('should return an iterator over the array', async () => {
     await helpers.executeString(`
       const x = [1, 2, 3];
+      x[Symbol.iterator]();
       const y = x[Symbol.iterator]();
 
       let result = y.next();
@@ -16,10 +18,10 @@ describe('Array.prototype[Symbol.iterator]', () => {
       assertEqual(result.value, 3);
       assertEqual(result.done, false);
       result = y.next();
-      assertEqual(result.value, undefined);
+      assertEqual(result.value as number | undefined, undefined);
       assertEqual(result.done, true);
       result = y.next();
-      assertEqual(result.value, undefined);
+      assertEqual(result.value as number | undefined, undefined);
       assertEqual(result.done, true);
     `);
   });
@@ -30,7 +32,7 @@ describe('Array.prototype[Symbol.iterator]', () => {
       const y = x[Symbol.iterator]();
 
       let result = y.next();
-      assertEqual(result.value, undefined);
+      assertEqual(result.value as number | undefined, undefined);
       assertEqual(result.done, true);
     `);
   });
@@ -55,6 +57,7 @@ describe('Array.prototype[Symbol.iterator]', () => {
         [Symbol.iterator](): IterableIterator<T>;
       }
       const x: Arr<number> | Array<number> = [1, 2, 3] as Arr<number> | Array<number>;
+      x[Symbol.iterator]();
       const y = x[Symbol.iterator]();
 
       let result = y.next();
@@ -67,11 +70,21 @@ describe('Array.prototype[Symbol.iterator]', () => {
       assertEqual(result.value, 3);
       assertEqual(result.done, false);
       result = y.next();
-      assertEqual(result.value, undefined);
+      assertEqual(result.value as number | undefined, undefined);
       assertEqual(result.done, true);
       result = y.next();
-      assertEqual(result.value, undefined);
+      assertEqual(result.value as number | undefined, undefined);
       assertEqual(result.done, true);
     `);
+  });
+
+  test('cannot be referenced', async () => {
+    await helpers.compileString(
+      `
+      const x = [0, 1, 2];
+      const y = x[Symbol.iterator];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
   });
 });

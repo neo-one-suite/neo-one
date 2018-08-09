@@ -4,7 +4,7 @@ describe('TaggedTemplateExpressionCompiler', () => {
   test('f`hello 21`', async () => {
     await helpers.executeString(
       `
-      const f = (literals: TemplateStringsArray, ...placeholders: any[]) => {
+      const f = (literals: TemplateStringsArray, ...placeholders: (string | number)[]) => {
         let out = '';
         literals.forEach((literal, idx) => {
           out += literal;

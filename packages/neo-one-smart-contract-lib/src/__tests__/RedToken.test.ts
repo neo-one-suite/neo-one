@@ -7,11 +7,7 @@ import * as path from 'path';
 
 const issueValue = new BigNumber('1000000');
 
-const setup = async () =>
-  setupContractTest({
-    dir: path.resolve(__dirname, '..', '__data__', 'contracts'),
-    contractName: 'RedToken',
-  });
+const setup = async () => setupContractTest(path.resolve(__dirname, '..', '__data__', 'contracts'), 'RedToken');
 
 describe('RedToken', () => {
   test('properties + issue + balanceOf + totalSupply + transfer', async () => {

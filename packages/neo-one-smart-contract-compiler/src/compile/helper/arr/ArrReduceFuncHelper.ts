@@ -48,7 +48,7 @@ export class ArrReduceFuncHelper extends Helper {
           // [idx, val, idx, size, arr, callable, accum]
           sb.emitOp(node, 'SWAP');
           // [idxVal, val, idx, size, arr, callable, accum]
-          sb.emitHelper(node, options, sb.helpers.createNumber);
+          sb.emitHelper(node, options, sb.helpers.wrapNumber);
           // [val, idxVal, idx, size, arr, callable, accum]
           sb.emitOp(node, 'SWAP');
           // [6, val, idxVal, idx, size, arr, callable, accum]

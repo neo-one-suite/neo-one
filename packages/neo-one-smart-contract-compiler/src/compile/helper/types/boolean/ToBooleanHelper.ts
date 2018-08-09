@@ -21,17 +21,17 @@ export class ToBooleanHelper extends TypedHelper {
     };
 
     const convertBoolean = (innerOptions: VisitOptions) => {
-      sb.emitHelper(node, innerOptions, sb.helpers.getBoolean);
+      sb.emitHelper(node, innerOptions, sb.helpers.unwrapBoolean);
     };
 
     const convertNumber = (innerOptions: VisitOptions) => {
-      sb.emitHelper(node, innerOptions, sb.helpers.getNumber);
+      sb.emitHelper(node, innerOptions, sb.helpers.unwrapNumber);
       sb.emitPushInt(node, 0);
       sb.emitOp(node, 'NUMNOTEQUAL');
     };
 
     const convertString = (innerOptions: VisitOptions) => {
-      sb.emitHelper(node, innerOptions, sb.helpers.getString);
+      sb.emitHelper(node, innerOptions, sb.helpers.unwrapString);
       sb.emitPushString(node, '');
       sb.emitOp(node, 'EQUAL');
       sb.emitOp(node, 'NOT');
@@ -57,6 +57,15 @@ export class ToBooleanHelper extends TypedHelper {
         string: convertString,
         symbol: convertOther,
         undefined: convertUndefinedOrNull,
+        transaction: convertOther,
+        output: convertOther,
+        attribute: convertOther,
+        input: convertOther,
+        account: convertOther,
+        asset: convertOther,
+        contract: convertOther,
+        header: convertOther,
+        block: convertOther,
       }),
     );
   }

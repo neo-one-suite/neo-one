@@ -47,7 +47,7 @@ export class GetMapClassHelper extends Helper {
           clear: (innerOptions) => {
             clear(innerOptions);
             // [val]
-            sb.emitHelper(node, innerOptions, sb.helpers.createUndefined);
+            sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
           },
           delete: (innerOptions) => {
             // [argsarr]
@@ -75,7 +75,7 @@ export class GetMapClassHelper extends Helper {
             // [hasKey]
             sb.emitOp(node, 'REMOVE');
             // [boolVal]
-            sb.emitHelper(node, innerOptions, sb.helpers.createBoolean);
+            sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
           },
           get: (innerOptions) => {
             // [argsarr]
@@ -112,7 +112,7 @@ export class GetMapClassHelper extends Helper {
                   // []
                   sb.emitOp(node, 'DROP');
                   // [undefinedVal]
-                  sb.emitHelper(node, innerOptions, sb.helpers.createUndefined);
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
                 },
               }),
             );

@@ -14,10 +14,7 @@ import { utils as commonUtils } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import ts from 'typescript';
-import { Context, DiagnosticOptions } from '../../Context';
-import { DiagnosticCode } from '../../DiagnosticCode';
-import { DiagnosticMessage } from '../../DiagnosticMessage';
-import { Globals } from '../../symbols';
+import { Context } from '../../Context';
 import { binding } from '../binding';
 import { Builtins } from '../builtins';
 import { declarations } from '../declaration';
@@ -31,7 +28,7 @@ import { statements } from '../statement';
 import { ScriptBuilderResult, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 import { resolveJumps } from './resolveJumps';
-import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode, SingleBytecodeValue } from './ScriptBuilder';
+import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode, SingleBytecodeValue, Tags } from './ScriptBuilder';
 
 const compilers: ReadonlyArray<ReadonlyArray<new () => NodeCompiler>> = [
   declarations,
@@ -53,6 +50,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   // tslint:disable-next-line readonly-array
   private mutableCapturedBytecode: SingleBytecode[] | undefined;
   private mutableProcessedByteCode: ReadonlyArray<SingleBytecode> = [];
+  private mutableCurrentTags: Tags = [];
   private readonly nodes: Map<ts.Node, number> = new Map();
   private readonly mutableModuleMap: { [K in string]?: number } = {};
   private readonly mutableReverseModuleMap: { [K in number]?: string } = {};
@@ -72,6 +70,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
       .reduce<Compilers>((acc, kindCompilerClass) => {
         const kindCompiler = new kindCompilerClass();
         if (acc[kindCompiler.kind] !== undefined) {
+          /* istanbul ignore next */
           throw new Error(`Found duplicate compiler for kind ${kindCompiler.kind}`);
         }
 
@@ -81,20 +80,9 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
       }, {});
   }
 
-  public get program(): ts.Program {
-    return this.context.program;
-  }
-
-  public get typeChecker(): ts.TypeChecker {
-    return this.context.typeChecker;
-  }
-
-  public get languageService(): ts.LanguageService {
-    return this.context.languageService;
-  }
-
   public get scope(): TScope {
     if (this.mutableCurrentScope === undefined) {
+      /* istanbul ignore next */
       throw new Error('Scope has not been set');
     }
 
@@ -160,13 +148,15 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     const sourceMapGenerator = new SourceMapGenerator();
     const addedFiles = new Set<string>();
 
+    const mutableTagToLength: { [tag: string]: number } = {};
     // tslint:disable-next-line no-unused
-    const buffers = bytecode.map(([node, value], idx) => {
+    const buffers = bytecode.map(([node, tags, value], idx) => {
       let finalValue: Buffer;
       if (value instanceof Jump) {
         const offsetPC = new BN(value.pc.getPC()).sub(new BN(pc));
         const jumpPC = offsetPC.toTwos(16);
         if (jumpPC.fromTwos(16).toNumber() !== value.pc.getPC() - pc) {
+          /* istanbul ignore next */
           throw new Error(
             `Something went wrong, expected 2's complement of ${value.pc.getPC() - pc}, found: ${jumpPC
               .fromTwos(16)
@@ -175,6 +165,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         }
         const byteCodeBuffer = ByteBuffer[Op[value.op]] as Buffer | undefined;
         if (byteCodeBuffer === undefined) {
+          /* istanbul ignore next */
           throw new Error('Something went wrong, could not find bytecode buffer');
         }
         finalValue = Buffer.concat([byteCodeBuffer, jumpPC.toArrayLike(Buffer, 'le', 2)]);
@@ -199,6 +190,12 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         sourceMapGenerator.setSourceContent(filePath, node.getSourceFile().getFullText());
       }
 
+      const tag = tags[0] as string | undefined;
+      if (tag !== undefined) {
+        const currentLength = mutableTagToLength[tag] as number | undefined;
+        mutableTagToLength[tag] = currentLength === undefined ? finalValue.length : currentLength + finalValue.length;
+      }
+
       pc += finalValue.length;
 
       return finalValue;
@@ -221,7 +218,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   public visit(node: ts.Node, options: VisitOptions): void {
     const compiler = this.compilers[node.kind];
     if (compiler === undefined) {
-      this.reportUnsupported(node);
+      this.context.reportUnsupported(node);
     } else {
       compiler.visitNode(this, node, options);
     }
@@ -252,6 +249,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   public emitOp(node: ts.Node, code: OpCode, buffer?: Buffer | undefined): void {
     const bytecode = Op[code] as Op | undefined;
     if (bytecode === undefined) {
+      /* istanbul ignore next */
       throw new UnknownOpError(code);
     }
     this.emitOpByte(node, bytecode, buffer);
@@ -287,22 +285,26 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitHelper<T extends ts.Node>(node: T, options: VisitOptions, helper: Helper<T>): void {
+    const prevTags = this.mutableCurrentTags;
+    this.mutableCurrentTags = [helper.constructor.name];
     helper.emit(this, node, options);
+    this.mutableCurrentTags = prevTags;
   }
 
   public emitBytecode(bytecode: Bytecode): void {
     const pc = this.mutablePC;
-    bytecode.forEach(([node, code]) => {
+    bytecode.forEach(([node, tags, code]) => {
       if (code instanceof Call) {
-        this.emitJump(node, code);
+        this.emitJump(node, code, tags);
       } else if (code instanceof Jmp) {
-        this.emitJump(node, code.plus(pc));
+        this.emitJump(node, code.plus(pc), tags);
       } else if (code instanceof Jump) {
+        /* istanbul ignore next */
         throw new Error('Something went wrong.');
       } else if (code instanceof Line) {
-        this.emitLineRaw(node, code);
+        this.emitLineRaw(node, code, tags);
       } else {
-        this.emitRaw(node, code);
+        this.emitRaw(node, code, tags);
       }
     });
   }
@@ -375,19 +377,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     return { length: capturedLength, bytecode: capturedBytecode };
   }
 
-  public toBuffer(value: string): Buffer {
-    return Buffer.from(value, 'utf8');
-  }
-
-  public plainOptions(options: VisitOptions): VisitOptions {
-    return {
-      ...options,
-      pushValue: false,
-      setValue: false,
-      catchPC: undefined,
-    };
-  }
-
   public pushValueOptions(options: VisitOptions): VisitOptions {
     return { ...options, pushValue: true };
   }
@@ -444,43 +433,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     return { ...options, superClass: undefined };
   }
 
-  // tslint:disable-next-line no-any readonly-array
-  public reportError(node: ts.Node, code: DiagnosticCode, message: DiagnosticMessage, ...args: any[]): void {
-    this.context.reportError(node, code, message, ...args);
-  }
-
-  public reportUnsupported(node: ts.Node): void {
-    this.context.reportUnsupported(node);
-  }
-
-  public getType(node: ts.Node, options?: DiagnosticOptions): ts.Type | undefined {
-    return this.context.getType(node, options);
-  }
-
-  public getSymbol(node: ts.Node, options?: DiagnosticOptions): ts.Symbol | undefined {
-    return this.context.getSymbol(node, options);
-  }
-
-  public getTypeSymbol(node: ts.Node, options?: DiagnosticOptions): ts.Symbol | undefined {
-    return this.context.getTypeSymbol(node, options);
-  }
-
-  public isOnlyGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
-    return this.context.isOnlyGlobal(node, type, name);
-  }
-
-  public isGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
-    return this.context.isGlobal(node, type, name);
-  }
-
-  public hasGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
-    return this.context.hasGlobal(node, type, name);
-  }
-
-  public isGlobalSymbol(node: ts.Node, symbol: ts.Symbol | undefined, name: keyof Globals): boolean {
-    return this.context.isGlobalSymbol(node, symbol, name);
-  }
-
   public hasExport(sourceFile: ts.SourceFile, name: string): boolean {
     const exported = this.mutableExportMap[tsUtils.file.getFilePath(sourceFile)];
 
@@ -498,6 +450,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   protected abstract createScope(node: ts.Node, index: number, parent: TScope | undefined): TScope;
+
+  private toBuffer(value: string): Buffer {
+    return Buffer.from(value, 'utf8');
+  }
 
   private emitPush(node: ts.Node, value: Buffer): void {
     if (value.length <= Op.PUSHBYTES75) {
@@ -543,26 +499,26 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     this.emitRaw(node, value);
   }
 
-  private emitRaw(node: ts.Node, value: Buffer): void {
-    this.push(node, value);
+  private emitRaw(node: ts.Node, value: Buffer, tags: Tags = this.mutableCurrentTags): void {
+    this.push(node, tags, value);
     this.mutablePC += value.length;
   }
 
-  private emitJump(node: ts.Node, jump: Jump): void {
-    this.push(node, jump);
+  private emitJump(node: ts.Node, jump: Jump, tags: Tags = this.mutableCurrentTags): void {
+    this.push(node, tags, jump);
     this.mutablePC += 3;
   }
 
-  private emitLineRaw(node: ts.Node, line: Line): void {
-    this.push(node, line);
+  private emitLineRaw(node: ts.Node, line: Line, tags: Tags = this.mutableCurrentTags): void {
+    this.push(node, tags, line);
     this.mutablePC += 5;
   }
 
-  private push(node: ts.Node, value: SingleBytecodeValue): void {
+  private push(node: ts.Node, tags: Tags, value: SingleBytecodeValue): void {
     if (this.mutableCapturedBytecode !== undefined) {
-      this.mutableCapturedBytecode.push([node, value]);
+      this.mutableCapturedBytecode.push([node, tags, value]);
     } else {
-      this.mutableBytecode.push([node, value]);
+      this.mutableBytecode.push([node, tags, value]);
     }
   }
 }

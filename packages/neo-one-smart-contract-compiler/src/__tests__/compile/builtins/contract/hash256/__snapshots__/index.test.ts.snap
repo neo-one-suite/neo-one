@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Hash256 cannot be implemented 1`] = `
+"snippetCode.ts (3,7): Built-ins cannot be implemented.
+
+      1 | 
+      2 |       import { Hash256 } from '@neo-one/smart-contract';
+    > 3 |       class MyHash256 implements Hash256 {
+        |       ^
+      4 |       }
+      5 |     
+"
+`;
+
+exports[`Hash256 cannot be referenced 1`] = `
+"snippetCode.ts (3,17): Builtins cannot be referenced
+
+      1 | 
+      2 |       import { Hash256 } from '@neo-one/smart-contract';
+    > 3 |       const x = Hash256;
+        |                 ^
+      4 |     
+"
+`;

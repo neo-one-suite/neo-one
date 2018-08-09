@@ -53,7 +53,7 @@ export class ArrMapFuncHelper extends Helper {
           // [idx, idx, callable, idx, callable, size, ...arr]
           sb.emitOp(node, 'DUP');
           // [idxVal, idx, callable, idx, callable, size, ...arr]
-          sb.emitHelper(node, options, sb.helpers.createNumber);
+          sb.emitHelper(node, options, sb.helpers.wrapNumber);
           // [idx, idxVal, callable, idx, callable, size, ...arr]
           sb.emitOp(node, 'SWAP');
           // [5, idx, idxVal, callable, idx, callable, size, ...arr]

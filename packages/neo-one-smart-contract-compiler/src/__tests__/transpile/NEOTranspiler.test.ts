@@ -19,7 +19,6 @@ describe('NEOTranspiler', () => {
 
     const {
       deployMethod,
-      superDeploy,
       ctorStatement,
       get,
       set,
@@ -30,21 +29,19 @@ describe('NEOTranspiler', () => {
       getConstructorValueResult,
       getConstructorValue,
     } = await SourceMapConsumer.with(sourceMap, undefined, async (consumer) => {
-      const deployMethod = consumer.originalPositionFor({ line: 14, column: 4 });
-      const superDeploy = consumer.originalPositionFor({ line: 14, column: 73 });
-      const ctorStatement = consumer.originalPositionFor({ line: 14, column: 96 });
-      const get = consumer.originalPositionFor({ line: 3, column: 4 });
-      const set = consumer.originalPositionFor({ line: 4, column: 4 });
-      const newResult = consumer.originalPositionFor({ line: 16, column: 17 });
-      const method = consumer.originalPositionFor({ line: 17, column: 15 });
-      const applicationSwitch = consumer.originalPositionFor({ line: 18, column: 4 });
-      const verifyWitness = consumer.originalPositionFor({ line: 31, column: 14 });
-      const getConstructorValueResult = consumer.originalPositionFor({ line: 19, column: 4 });
-      const getConstructorValue = consumer.originalPositionFor({ line: 20, column: 8 });
+      const deployMethod = consumer.originalPositionFor({ line: 20, column: 4 });
+      const ctorStatement = consumer.originalPositionFor({ line: 22, column: 8 });
+      const get = consumer.originalPositionFor({ line: 5, column: 4 });
+      const set = consumer.originalPositionFor({ line: 6, column: 4 });
+      const newResult = consumer.originalPositionFor({ line: 26, column: 17 });
+      const method = consumer.originalPositionFor({ line: 27, column: 15 });
+      const applicationSwitch = consumer.originalPositionFor({ line: 28, column: 4 });
+      const verifyWitness = consumer.originalPositionFor({ line: 41, column: 14 });
+      const getConstructorValueResult = consumer.originalPositionFor({ line: 31, column: 14 });
+      const getConstructorValue = consumer.originalPositionFor({ line: 32, column: 8 });
 
       return {
         deployMethod,
-        superDeploy,
         ctorStatement,
         get,
         set,
@@ -57,11 +54,9 @@ describe('NEOTranspiler', () => {
       };
     });
 
-    expect(deployMethod.line).toEqual(12);
+    expect(deployMethod.line).toEqual(14);
     expect(deployMethod.column).toEqual(2);
-    expect(superDeploy.line).toEqual(13);
-    expect(superDeploy.column).toEqual(4);
-    expect(ctorStatement.line).toEqual(14);
+    expect(ctorStatement.line).toEqual(16);
     expect(ctorStatement.column).toEqual(4);
     expect(get.line).toEqual(4);
     expect(get.column).toEqual(2);
@@ -75,9 +70,9 @@ describe('NEOTranspiler', () => {
     expect(applicationSwitch.column).toEqual(0);
     expect(verifyWitness.line).toEqual(3);
     expect(verifyWitness.column).toEqual(0);
-    expect(getConstructorValueResult.line).toEqual(17);
+    expect(getConstructorValueResult.line).toEqual(19);
     expect(getConstructorValueResult.column).toEqual(2);
-    expect(getConstructorValue.line).toEqual(17);
+    expect(getConstructorValue.line).toEqual(19);
     expect(getConstructorValue.column).toEqual(2);
   });
 });

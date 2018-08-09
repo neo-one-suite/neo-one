@@ -7,18 +7,10 @@ import glob from 'glob';
 import * as path from 'path';
 import ts from 'typescript';
 import { Context } from './Context';
-import { getGlobals, getLibAliases, getLibs } from './symbols';
 import { normalizePath, pathResolve } from './utils';
 
 function createContext(program: ts.Program, typeChecker: ts.TypeChecker, languageService: ts.LanguageService): Context {
-  return new Context(
-    program,
-    typeChecker,
-    languageService,
-    getGlobals(program, typeChecker),
-    getLibs(program, typeChecker),
-    getLibAliases(program, languageService),
-  );
+  return new Context(program, typeChecker, languageService);
 }
 
 export function updateContext(context: Context, files: { readonly [fileName: string]: string | undefined }): Context {
@@ -32,14 +24,7 @@ export function updateContext(context: Context, files: { readonly [fileName: str
     },
   );
 
-  return context.update(
-    program,
-    typeChecker,
-    languageService,
-    getGlobals(program, typeChecker),
-    getLibs(program, typeChecker),
-    getLibAliases(program, languageService),
-  );
+  return context.update(program, typeChecker, languageService);
 }
 
 const doGlob = async (value: string) =>
@@ -125,10 +110,11 @@ const createProgram = (
   { modifyHost = defaultModifyHost, withTestHarness = false }: MakeContextOptions = DEFAULT_MAKE_CONTEXT_OPTIONS,
 ) => {
   const smartContractDir = path.dirname(require.resolve('@neo-one/smart-contract'));
-  const smartContractModule = pathResolve(smartContractDir, 'index.ts');
+  const smartContractModule = pathResolve(smartContractDir, 'index.d.ts');
+  const smartContractInternalModule = pathResolve(smartContractDir, 'internal.d.ts');
   const smartContractFiles = [
     pathResolve(smartContractDir, 'global.d.ts'),
-    pathResolve(smartContractDir, 'sc.d.ts'),
+    smartContractInternalModule,
     smartContractModule,
     withTestHarness ? pathResolve(smartContractDir, 'harness.d.ts') : undefined,
   ].filter(utils.notNull);
@@ -172,7 +158,10 @@ const createProgram = (
     const mutableResolvedModules: ts.ResolvedModule[] = [];
     // tslint:disable-next-line no-loop-statement
     for (const moduleName of moduleNames) {
-      if (moduleName === '@neo-one/smart-contract') {
+      // tslint:disable-next-line prefer-switch
+      if (moduleName === '@neo-one/smart-contract-internal') {
+        mutableResolvedModules.push({ resolvedFileName: smartContractInternalModule });
+      } else if (moduleName === '@neo-one/smart-contract') {
         mutableResolvedModules.push({ resolvedFileName: smartContractModule });
       } else if (moduleName === '@neo-one/smart-contract-lib') {
         mutableResolvedModules.push({ resolvedFileName: smartContractLibModule });

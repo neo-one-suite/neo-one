@@ -11,7 +11,7 @@ export class ThrowTypeErrorHelper extends Helper {
     // ['TypeError']
     sb.emitPushString(node, 'TypeError');
     // [value]
-    sb.emitHelper(node, options, sb.helpers.createString);
+    sb.emitHelper(node, options, sb.helpers.wrapString);
     // []
     sb.emitHelper(node, options, sb.helpers.throw);
   }

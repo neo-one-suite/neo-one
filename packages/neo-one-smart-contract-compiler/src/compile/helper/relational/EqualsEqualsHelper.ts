@@ -3,6 +3,7 @@ import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
+import { Types } from '../types/Types';
 
 export interface EqualsEqualsHelperOptions {
   readonly left: ts.Node;
@@ -29,8 +30,8 @@ export class EqualsEqualsHelper extends Helper {
       return;
     }
 
-    const leftType = sb.getType(this.left);
-    const rightType = sb.getType(this.right);
+    const leftType = sb.context.getType(this.left);
+    const rightType = sb.context.getType(this.right);
     if (leftType !== undefined && rightType !== undefined) {
       this.equalsEqualsType(sb, node, options, leftType, rightType);
     } else {
@@ -60,7 +61,7 @@ export class EqualsEqualsHelper extends Helper {
       // [left]
       sb.visit(this.right, sb.noPushValueOptions(options));
       // [equals]
-      sb.emitHelper(node, options, sb.helpers.isNullOrUndefined);
+      sb.emitHelper(node, options, sb.helpers.isNullOrUndefined({ type: rightType }));
     } else if (
       tsUtils.type_.isOnlyNumberish(leftType) &&
       (tsUtils.type_.isOnlyStringish(rightType) || tsUtils.type_.isOnlyBooleanish(rightType))
@@ -78,9 +79,9 @@ export class EqualsEqualsHelper extends Helper {
       // [left]
       sb.visit(this.left, options);
       // [leftNumber]
-      sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.getType(this.left) }));
+      sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.context.getType(this.left) }));
       // [leftNumberVal]
-      sb.emitHelper(this.left, options, sb.helpers.createNumber);
+      sb.emitHelper(this.left, options, sb.helpers.wrapNumber);
       // [right, leftNumberVal]
       sb.visit(this.right, options);
       // [equals]
@@ -104,9 +105,9 @@ export class EqualsEqualsHelper extends Helper {
       // [right, left]
       sb.visit(this.right, options);
       // [rightNumber, left]
-      sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.getType(this.right) }));
+      sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.context.getType(this.right) }));
       // [rightNumberVal, left]
-      sb.emitHelper(this.right, options, sb.helpers.createNumber);
+      sb.emitHelper(this.right, options, sb.helpers.wrapNumber);
       // [equals]
       this.equalsEqualsRightNumberLeftBooleanOrString(sb, node, options);
     } else {
@@ -116,24 +117,42 @@ export class EqualsEqualsHelper extends Helper {
 
   public equalsEqualsLeftNumberRightBooleanOrString(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [rightNumber, left]
-    sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.getType(this.right) }));
+    sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.context.getType(this.right) }));
     // [rightNumber, left]
-    sb.emitHelper(this.right, options, sb.helpers.createNumber);
+    sb.emitHelper(this.right, options, sb.helpers.wrapNumber);
     // [equals]
-    sb.emitHelper(node, options, sb.helpers.equalsEqualsEqualsNumber);
+    sb.emitHelper(
+      node,
+      options,
+      sb.helpers.equalsEqualsEquals({
+        leftType: undefined,
+        leftKnownType: Types.Number,
+        rightType: undefined,
+        rightKnownType: Types.Number,
+      }),
+    );
   }
 
   public equalsEqualsRightNumberLeftBooleanOrString(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [left, right]
     sb.emitOp(node, 'SWAP');
     // [leftNumber, right]
-    sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.getType(this.left) }));
+    sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.context.getType(this.left) }));
     // [leftNumber, right]
-    sb.emitHelper(this.left, options, sb.helpers.createNumber);
+    sb.emitHelper(this.left, options, sb.helpers.wrapNumber);
     // [right, leftNumber]
     sb.emitOp(node, 'SWAP');
     // [equals]
-    sb.emitHelper(node, options, sb.helpers.equalsEqualsEqualsNumber);
+    sb.emitHelper(
+      node,
+      options,
+      sb.helpers.equalsEqualsEquals({
+        leftType: undefined,
+        leftKnownType: Types.Number,
+        rightType: undefined,
+        rightKnownType: Types.Number,
+      }),
+    );
   }
 
   public equalsEqualsUnknown(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -156,31 +175,40 @@ export class EqualsEqualsHelper extends Helper {
         condition: () => {
           copy();
           // [right, left]
-          sb.emitHelper(node, options, sb.helpers.isSameType);
+          sb.emitHelper(
+            node,
+            options,
+            sb.helpers.equalsEqualsEquals({
+              leftType: undefined,
+              rightType: undefined,
+            }),
+          );
         },
         whenTrue: () => {
-          sb.emitHelper(node, options, sb.helpers.equalsEqualsEqualsSameType);
+          sb.emitOp(node, 'DROP');
+          sb.emitOp(node, 'DROP');
+          sb.emitPushBoolean(node, true);
         },
       },
       {
         condition: () => {
           copy();
           // [rightIsNullOrUndefined, left, right, left]
-          sb.emitHelper(node, options, sb.helpers.isNullOrUndefined);
+          sb.emitHelper(node, options, sb.helpers.isNullOrUndefined({ type: undefined }));
           // [left, rightIsNullOrUndefined, right, left]
           sb.emitOp(node, 'SWAP');
           // [leftIsNullOrUndefined, rightIsNullOrUndefined, right, left]
-          sb.emitHelper(node, options, sb.helpers.isNullOrUndefined);
+          sb.emitHelper(node, options, sb.helpers.isNullOrUndefined({ type: undefined }));
           // [equals, right, left]
           sb.emitOp(node, 'BOOLOR');
         },
         whenTrue: () => {
           // [isNullOrUndefined, left]
-          sb.emitHelper(node, options, sb.helpers.isNullOrUndefined);
+          sb.emitHelper(node, options, sb.helpers.isNullOrUndefined({ type: undefined }));
           // [left, rightIsNullOrUndefined]
           sb.emitOp(node, 'SWAP');
           // [leftIsNullOrUndefined, rightIsNullOrUndefined]
-          sb.emitHelper(node, options, sb.helpers.isNullOrUndefined);
+          sb.emitHelper(node, options, sb.helpers.isNullOrUndefined({ type: undefined }));
           // [equals]
           sb.emitOp(node, 'EQUAL');
         },
@@ -217,9 +245,9 @@ export class EqualsEqualsHelper extends Helper {
           // [left, right]
           sb.emitOp(node, 'SWAP');
           // [leftNumber, right]
-          sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.getType(this.left) }));
+          sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.getType(this.left) }));
           // [leftNumber, right]
-          sb.emitHelper(node, options, sb.helpers.createNumber);
+          sb.emitHelper(node, options, sb.helpers.wrapNumber);
           // [right, leftNumber]
           sb.emitOp(node, 'SWAP');
           this.equalsEqualsLeftNumberRightBooleanOrString(sb, node, options);
@@ -257,9 +285,9 @@ export class EqualsEqualsHelper extends Helper {
         },
         whenTrue: () => {
           // [rightNumber, left]
-          sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.getType(this.right) }));
+          sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.getType(this.right) }));
           // [rightNumber, left]
-          sb.emitHelper(node, options, sb.helpers.createNumber);
+          sb.emitHelper(node, options, sb.helpers.wrapNumber);
           this.equalsEqualsRightNumberLeftBooleanOrString(sb, node, options);
         },
       },
@@ -270,11 +298,11 @@ export class EqualsEqualsHelper extends Helper {
       options,
       sb.helpers.case(cases, () => {
         // [rightPrim, left]
-        sb.emitHelper(node, options, sb.helpers.toPrimitive({ type: sb.getType(this.right) }));
+        sb.emitHelper(node, options, sb.helpers.toPrimitive({ type: sb.context.getType(this.right) }));
         // [left, rightPrim]
         sb.emitOp(node, 'SWAP');
         // [leftPrim, rightPrim]
-        sb.emitHelper(node, options, sb.helpers.toPrimitive({ type: sb.getType(this.left) }));
+        sb.emitHelper(node, options, sb.helpers.toPrimitive({ type: sb.context.getType(this.left) }));
         // [rightPrim, leftPrim]
         sb.emitOp(node, 'SWAP');
         sb.emitHelper(

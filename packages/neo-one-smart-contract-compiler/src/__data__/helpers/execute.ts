@@ -2,13 +2,13 @@ import { CallReceiptJSON } from '@neo-one/client-core';
 import ts from 'typescript';
 import * as appRootDir from 'app-root-dir';
 import { tsUtils } from '@neo-one/ts-utils';
-import { executeScript, EXECUTE_OPTIONS_DEFAULT, ExecuteOptions } from '../../executeScript';
 import { getMonitor } from '../../test/getMonitor';
 import { checkResult } from './extractors';
 import { createContextForSnippet, createContextForPath } from '../../createContext';
 import { Context } from '../../Context';
 import { pathResolve } from '../../utils';
 import { RawSourceMap } from 'source-map';
+import { executeScript, EXECUTE_OPTIONS_DEFAULT, ExecuteOptions } from './executeScript';
 
 const execute = async (
   context: Context,

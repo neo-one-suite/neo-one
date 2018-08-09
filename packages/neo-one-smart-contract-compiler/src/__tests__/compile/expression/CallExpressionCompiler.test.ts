@@ -47,9 +47,7 @@ describe('CallExpressionCompiler', () => {
         }
       };
 
-      if (foo.y() !== 1) {
-        throw 'Failure';
-      }
+      assertEqual(foo.y(), 1);
     `);
   });
 
@@ -73,13 +71,8 @@ describe('CallExpressionCompiler', () => {
       }
 
       const foo = new Foo();
-      if (foo.bar(1) !== 4) {
-        throw 'Failure';
-      }
-
-      if (foo.bar(2) !== 5) {
-        throw 'Failure';
-      }
+      assertEqual(foo.bar(1), 4);
+      assertEqual(foo.bar(2), 5);
     `);
   });
 

@@ -1,10 +1,9 @@
-import { Context } from '../../../Context';
+import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
-import { BuiltinBase } from '../types';
 
-class ArgumentsInstance extends BuiltinBase {}
+class ArgumentsInstance extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name
-export const add = (context: Context, builtins: Builtins): void => {
-  builtins.addInterface(context, 'IArguments', new ArgumentsInstance());
+export const add = (builtins: Builtins): void => {
+  builtins.addInterface('IArguments', new ArgumentsInstance());
 };

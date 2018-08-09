@@ -30,7 +30,7 @@ export class CreateConstructArrayHelper extends Helper {
       // []
       this.body(sb.noPushValueOptions(options));
       // [undefinedVal]
-      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
       // []
       sb.emitHelper(node, options, sb.helpers.return);
     };

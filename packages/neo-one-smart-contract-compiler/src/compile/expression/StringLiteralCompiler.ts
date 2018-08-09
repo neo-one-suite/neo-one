@@ -9,7 +9,7 @@ export class StringLiteralCompiler extends NodeCompiler<ts.StringLiteral> {
   public visitNode(sb: ScriptBuilder, expr: ts.StringLiteral, options: VisitOptions): void {
     if (options.pushValue) {
       sb.emitPushString(expr, tsUtils.literal.getLiteralValue(expr));
-      sb.emitHelper(expr, options, sb.helpers.createString);
+      sb.emitHelper(expr, options, sb.helpers.wrapString);
     }
   }
 }

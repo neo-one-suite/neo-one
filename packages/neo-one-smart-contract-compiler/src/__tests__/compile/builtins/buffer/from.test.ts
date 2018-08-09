@@ -1,6 +1,5 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
-import { BufferFrom } from '../../../../compile/builtins/buffer/from';
 
 describe('Buffer.from', () => {
   test('should return a buffer from literal values', async () => {
@@ -39,7 +38,12 @@ describe('Buffer.from', () => {
     );
   });
 
-  test('canCall should throw an error', () => {
-    expect(() => new BufferFrom().canCall()).toThrow();
+  test('non-string is unsupported', async () => {
+    await helpers.compileString(
+      `
+      Buffer.from([]);
+    `,
+      { type: 'error', code: DiagnosticCode.GenericUnsupportedSyntax },
+    );
   });
 });

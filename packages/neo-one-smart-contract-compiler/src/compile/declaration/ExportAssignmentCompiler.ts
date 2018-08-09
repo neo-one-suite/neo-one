@@ -9,7 +9,7 @@ export class ExportAssignmentCompiler extends NodeCompiler<ts.ExportAssignment> 
 
   public visitNode(sb: ScriptBuilder, node: ts.ExportAssignment, optionsIn: VisitOptions): void {
     if (tsUtils.importExport.isExportEquals(node)) {
-      sb.reportUnsupported(node);
+      sb.context.reportUnsupported(node);
     } else {
       const options = sb.pushValueOptions(optionsIn);
       // [val]

@@ -119,6 +119,18 @@ export function* getDescendants(node: ts.Node): IterableIterator<ts.Node> {
   }
 }
 
+export function* getDescendantsByKind<TNode extends ts.Node>(
+  node: ts.Node,
+  kind: TNode extends { readonly kind: infer TKind } ? TKind : never,
+): IterableIterator<TNode> {
+  // tslint:disable-next-line no-loop-statement
+  for (const descendant of getDescendants(node)) {
+    if (descendant.kind === kind) {
+      yield descendant as TNode;
+    }
+  }
+}
+
 function getTarget(symbol: ts.Symbol): ts.Symbol {
   const target = (symbol as any).target;
 
@@ -188,6 +200,28 @@ export function getFirstAncestorByKindOrThrow<TNode extends ts.Node>(
 ): TNode {
   // tslint:disable-next-line no-any
   return utils.throwIfNullOrUndefined(getFirstAncestorByKind<TNode>(node, kind as any), 'ancestor');
+}
+
+export function getFirstAncestorByTest<TNode extends ts.Node>(
+  node: ts.Node,
+  isNode: (value: ts.Node) => value is TNode,
+): TNode | undefined {
+  // tslint:disable-next-line no-loop-statement
+  for (const ancestor of getAncestors(node)) {
+    if (isNode(ancestor)) {
+      return ancestor;
+    }
+  }
+
+  return undefined;
+}
+
+export function getFirstAncestorByTestOrThrow<TNode extends ts.Node>(
+  node: ts.Node,
+  isNode: (value: ts.Node) => value is TNode,
+): TNode {
+  // tslint:disable-next-line no-any
+  return utils.throwIfNullOrUndefined(getFirstAncestorByTest<TNode>(node, isNode), 'ancestor');
 }
 
 export function getFirstDescendantByKind<TNode extends ts.Node>(

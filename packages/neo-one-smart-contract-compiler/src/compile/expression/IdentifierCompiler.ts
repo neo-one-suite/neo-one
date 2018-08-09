@@ -11,17 +11,19 @@ export class IdentifierCompiler extends NodeCompiler<ts.Identifier> {
   public readonly kind = ts.SyntaxKind.Identifier;
 
   public visitNode(sb: ScriptBuilder, expr: ts.Identifier, options: VisitOptions): void {
-    const builtin = sb.builtins.getValue(sb.context, expr);
+    const builtin = sb.context.builtins.getValue(expr);
     if (builtin !== undefined) {
       if (!isBuiltinValue(builtin)) {
-        sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltin);
+        sb.context.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltin);
 
         return;
       }
 
       if (options.setValue) {
-        sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotModifyBuiltin);
+        /* istanbul ignore next */
+        sb.context.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotModifyBuiltin);
 
+        /* istanbul ignore next */
         return;
       }
 
@@ -30,9 +32,9 @@ export class IdentifierCompiler extends NodeCompiler<ts.Identifier> {
       return;
     }
 
-    const symbol = sb.getSymbol(expr);
-    if (symbol !== undefined && tsUtils.symbol.isArgumentsSymbol(sb.typeChecker, symbol)) {
-      sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltin);
+    const symbol = sb.context.getSymbol(expr);
+    if (symbol !== undefined && tsUtils.symbol.isArgumentsSymbol(sb.context.typeChecker, symbol)) {
+      sb.context.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltin);
 
       return;
     }
@@ -43,7 +45,7 @@ export class IdentifierCompiler extends NodeCompiler<ts.Identifier> {
 
     if (options.pushValue) {
       if (tsUtils.identifier.isUndefined(expr)) {
-        sb.emitHelper(expr, options, sb.helpers.createUndefined);
+        sb.emitHelper(expr, options, sb.helpers.wrapUndefined);
       } else {
         sb.scope.get(sb, expr, options, expr.getText());
       }

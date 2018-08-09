@@ -15,29 +15,12 @@ describe('ElementAccessExpressionCompiler', () => {
       y['length'];
       const length: 'length' | 'map' = 'length' as 'map' | 'length';
       assertEqual(y[length], 3);
-      if (y.length !== 3) {
-        throw 'Failure';
-      }
-
-      if (y[0] !== 0) {
-        throw 'Failure';
-      }
-
-      if (y[1] !== undefined) {
-        throw 'Failure';
-      }
-
-      if (y[2] !== 2) {
-        throw 'Failure';
-      }
-
-      if ((y[2] += 1) !== 3) {
-        throw 'Failure';
-      }
-
-      if (y[2] !== 3) {
-        throw 'Failure';
-      }
+      assertEqual(y.length, 3);
+      assertEqual(y[0], 0);
+      assertEqual(y[1] as number | undefined, undefined);
+      assertEqual(y[2], 2);
+      assertEqual(y[2] += 1, 3);
+      assertEqual(y[2], 3);
     `);
   });
 

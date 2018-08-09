@@ -32,7 +32,7 @@ export class ExtendArrHelper extends Helper {
           // [arr, arr, length, currentLength]
           sb.emitOp(node, 'DUP');
           // [undefinedVal, arr, arr, length, currentLength]
-          sb.emitHelper(node, options, sb.helpers.createUndefined);
+          sb.emitHelper(node, options, sb.helpers.wrapUndefined);
           // [arr, length, currentLength]
           sb.emitOp(node, 'APPEND');
         },

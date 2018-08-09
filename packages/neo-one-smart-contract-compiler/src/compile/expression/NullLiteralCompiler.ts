@@ -8,7 +8,7 @@ export class NullLiteralCompiler extends NodeCompiler<ts.NullLiteral> {
 
   public visitNode(sb: ScriptBuilder, expr: ts.NullLiteral, options: VisitOptions): void {
     if (options.pushValue) {
-      sb.emitHelper(expr, options, sb.helpers.createNull);
+      sb.emitHelper(expr, options, sb.helpers.wrapNull);
     }
   }
 }

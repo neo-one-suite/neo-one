@@ -51,7 +51,10 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
 
     if (this.getCurrentAccount() === undefined) {
       this.accounts$
-        .pipe(filter((accounts) => accounts.length > 0), take(1))
+        .pipe(
+          filter((accounts) => accounts.length > 0),
+          take(1),
+        )
         .toPromise()
         .then(async (accounts) => {
           const account = accounts[0] as UserAccount | undefined;

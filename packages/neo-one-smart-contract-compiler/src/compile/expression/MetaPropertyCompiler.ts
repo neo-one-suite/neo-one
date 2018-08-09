@@ -7,6 +7,6 @@ export class MetaPropertyCompiler extends NodeCompiler<ts.MetaProperty> {
   public readonly kind = ts.SyntaxKind.MetaProperty;
 
   public visitNode(sb: ScriptBuilder, expr: ts.MetaProperty, _options: VisitOptions): void {
-    sb.reportUnsupported(expr);
+    sb.context.reportUnsupported(expr);
   }
 }
