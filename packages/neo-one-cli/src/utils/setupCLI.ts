@@ -84,7 +84,7 @@ export const setupCLI = ({
   vorpal.sigint(() => {
     // tslint:disable-next-line no-any
     const ui = vorpal.ui as any;
-    if (ui.sigintCount > 1) {
+    if (ui.sigintCalled && Date.now() - ui.sigintTime < 1000) {
       ui.parent.emit('vorpal_exit');
       monitor.log({
         name: 'sigint',
@@ -93,6 +93,7 @@ export const setupCLI = ({
 
       shutdown({ exitCode: 0 });
     } else {
+      ui.sigintCalled = false;
       const text = vorpal.ui.input();
       if (!ui.parent) {
         monitor.log({
@@ -104,16 +105,13 @@ export const setupCLI = ({
       } else if (ui.parent.session.cancelCommands) {
         ui.imprint();
         ui.submit('');
-        ui.sigintCalled = false;
-        ui.sigintCount = 0;
         ui.parent.session.emit('vorpal_command_cancel');
       } else if (String(text).trim() !== '') {
         ui.imprint();
         ui.submit('');
-        ui.sigintCalled = false;
-        ui.sigintCount = 0;
       } else {
-        ui.sigintCalled = false;
+        ui.sigintCalled = true;
+        ui.sigintTime = Date.now();
         ui.delimiter(' ');
         ui.submit('');
         ui.log('(^C again to quit)');
