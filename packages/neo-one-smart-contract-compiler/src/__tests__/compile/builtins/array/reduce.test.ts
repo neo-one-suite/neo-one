@@ -39,7 +39,7 @@ describe('Array.prototype.map', () => {
     await helpers.compileString(
       `
       const x = [0, 1, 2];
-      const y = x.map;
+      const y = x.reduce;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );

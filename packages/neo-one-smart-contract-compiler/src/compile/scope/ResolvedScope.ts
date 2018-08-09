@@ -78,7 +78,7 @@ export class ResolvedScope implements Scope {
     if (position === undefined) {
       if (this.parent === undefined) {
         /* istanbul ignore next */
-        sb.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
+        sb.context.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
       } else {
         this.parent.set(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }
@@ -105,7 +105,7 @@ export class ResolvedScope implements Scope {
     const position = this.getPosition(name);
     if (position === undefined) {
       if (this.parent === undefined) {
-        sb.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
+        sb.context.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
       } else {
         this.parent.get(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }
@@ -187,9 +187,9 @@ export class ResolvedScope implements Scope {
   ): void {
     if (this.parent === undefined) {
       // [global]
-      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
       // [this, global]
-      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+      sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
       // [0, this, global]
       sb.emitPushInt(node, 0);
       // [scopes, this, global]

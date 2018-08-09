@@ -30,7 +30,7 @@ export class ExportHelper extends Helper {
       // [name, val, exports]
       sb.emitPushString(node, 'default');
     } else {
-      sb.reportUnsupported(node);
+      sb.context.reportUnsupported(node);
     }
 
     // [val, name, exports]

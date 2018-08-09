@@ -714,13 +714,16 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         );
 
         if (callReceipt.result.state === 'FAULT') {
-          const errorMessage = await processError({
-            ...clientUtils.extractErrorTrace(callReceipt.actions),
-            message: callReceipt.result.message,
-            sourceMap,
-          });
-
-          throw new InvokeError(errorMessage);
+          const [message, logs] = await Promise.all([
+            processError({
+              ...clientUtils.extractErrorTrace(callReceipt.actions),
+              message: callReceipt.result.message,
+              sourceMap,
+            }),
+            sourceMap === undefined ? [] : clientUtils.createConsoleLogMessages(callReceipt.actions, sourceMap),
+          ]);
+          const logMessage = logs.length === 0 ? '' : `\n${logs.join('\n\n')}`;
+          throw new InvokeError(`${message}${logMessage}\n`);
         }
 
         const gas = callReceipt.result.gasConsumed.integerValue(BigNumber.ROUND_UP);

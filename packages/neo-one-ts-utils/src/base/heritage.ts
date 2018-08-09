@@ -43,3 +43,7 @@ export function getToken(node: ts.HeritageClause): ts.SyntaxKind.ExtendsKeyword 
 export function isExtends(node: ts.HeritageClause): boolean {
   return getToken(node) === ts.SyntaxKind.ExtendsKeyword;
 }
+
+export function isImplements(node: ts.HeritageClause): boolean {
+  return getToken(node) === ts.SyntaxKind.ImplementsKeyword;
+}

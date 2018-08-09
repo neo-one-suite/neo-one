@@ -11,7 +11,7 @@ export class ThrowStatementCompiler extends NodeCompiler<ts.ThrowStatement> {
     const expr = tsUtils.expression.getExpression(node);
     if (expr === undefined) {
       /* istanbul ignore next */
-      sb.reportUnsupported(node);
+      sb.context.reportUnsupported(node);
     } else {
       sb.visit(expr, sb.pushValueOptions(options));
     }

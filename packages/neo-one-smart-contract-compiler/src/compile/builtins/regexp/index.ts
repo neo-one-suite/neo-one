@@ -1,13 +1,14 @@
-import { Context } from '../../../Context';
+import { BuiltinBase } from '../BuiltinBase';
+import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
-import { BuiltinBase } from '../types';
 
-class RegExpInstance extends BuiltinBase {}
-class RegExpConstructor extends BuiltinBase {}
+class RegExpInterface extends BuiltinInterface {}
+class RegExpValue extends BuiltinBase {}
+class RegExpConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name
-export const add = (context: Context, builtins: Builtins): void => {
-  builtins.addInterface(context, 'RegExp', new RegExpInstance());
-  builtins.addValue(context, 'RegExp', new RegExpInstance());
-  builtins.addInterface(context, 'RegExpConstructor', new RegExpConstructor());
+export const add = (builtins: Builtins): void => {
+  builtins.addInterface('RegExp', new RegExpInterface());
+  builtins.addValue('RegExp', new RegExpValue());
+  builtins.addInterface('RegExpConstructor', new RegExpConstructorInterface());
 };

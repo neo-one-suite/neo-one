@@ -30,7 +30,7 @@ export abstract class SetObjectAccessorPropertyHelperBase extends Helper {
 
     if (!(this.hasSet && this.hasGet)) {
       // [val, ?getObjectVal, ?setObjectVal, stringProp, objectVal]
-      sb.emitHelper(node, options, sb.helpers.createUndefined);
+      sb.emitHelper(node, options, sb.helpers.wrapUndefined);
       if (this.hasGet) {
         // [getObjectVal, setObjectVal, stringProp, objectVal]
         sb.emitOp(node, 'SWAP');

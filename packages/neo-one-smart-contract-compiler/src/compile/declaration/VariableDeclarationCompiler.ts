@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 
+import { handleTypeAssignment } from '../helper/types';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -18,10 +19,13 @@ export class VariableDeclarationCompiler extends NodeCompiler<ts.VariableDeclara
 
     if (expr === undefined) {
       if (!options.setValue) {
-        sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.createUndefined);
+        sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
       }
     } else {
       sb.visit(expr, sb.pushValueOptions(options));
+      if (ts.isIdentifier(nameNode)) {
+        handleTypeAssignment(sb.context, expr, node);
+      }
     }
 
     if (ts.isIdentifier(nameNode)) {

@@ -6,4 +6,6 @@ export enum GlobalProperty {
   GenericSerialize = 4,
   GenericDeserialize = 5,
   ArrayIterableIterator = 6,
+  MapStorage = 7,
+  SetStorage = 8,
 }

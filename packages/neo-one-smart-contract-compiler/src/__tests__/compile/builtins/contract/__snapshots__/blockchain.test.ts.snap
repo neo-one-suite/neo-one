@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Blockchain set currentBlockTime 1`] = `
+"snippetCode.ts (4,7): Builtins cannot be modified
+
+      2 |       import { Blockchain } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       Blockchain.currentBlockTime = 10;
+        |       ^
+      5 |     
+"
+`;
+
+exports[`Blockchain set currentHeight 1`] = `
+"snippetCode.ts (4,7): Builtins cannot be modified
+
+      2 |       import { Blockchain } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       Blockchain.currentHeight = 10;
+        |       ^
+      5 |     
+"
+`;

@@ -7,6 +7,6 @@ export class LabeledStatementCompiler extends NodeCompiler<ts.LabeledStatement> 
   public readonly kind = ts.SyntaxKind.LabeledStatement;
 
   public visitNode(sb: ScriptBuilder, node: ts.LabeledStatement, _options: VisitOptions): void {
-    sb.reportUnsupported(node);
+    sb.context.reportUnsupported(node);
   }
 }

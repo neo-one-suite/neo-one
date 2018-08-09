@@ -70,7 +70,7 @@ export class CreateClassHelper extends Helper {
       sb.emitHelper(node, options, sb.helpers.setDataPropertyObjectProperty);
     };
 
-    const createSymbolMethod = (name: string, body: Prop) => {
+    const wrapSymbolMethod = (name: string, body: Prop) => {
       // [prototypeVal, prototypeVal]
       sb.emitOp(node, 'DUP');
       // [name, prototypeVal, prototypeVal]
@@ -90,7 +90,7 @@ export class CreateClassHelper extends Helper {
     });
     // [prototypeVal]
     Object.entries(this.prototypeSymbolMethods).forEach(([name, body]) => {
-      createSymbolMethod(name, body);
+      wrapSymbolMethod(name, body);
     });
 
     // create class
@@ -129,7 +129,7 @@ export class CreateClassHelper extends Helper {
     });
     // [classVal]
     Object.entries(this.classSymbolMethods).forEach(([name, body]) => {
-      createSymbolMethod(name, body);
+      wrapSymbolMethod(name, body);
     });
   }
 }

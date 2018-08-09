@@ -1,73 +1,56 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { isBuffer } from '../../helper/types';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
+import { BuiltinInstanceMemberCall } from '../BuiltinInstanceMemberCall';
+import { MemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class BufferEquals extends BuiltinBase implements BuiltinCall {
-  public readonly types = new Set([BuiltinType.Call]);
-
-  public canCall(sb: ScriptBuilder, node: CallLikeExpression): boolean {
-    if (!ts.isCallExpression(node)) {
-      /* istanbul ignore next */
-      return false;
-    }
-
+export class BufferEquals extends BuiltinInstanceMemberCall {
+  public canCall(sb: ScriptBuilder, _func: MemberLikeExpression, node: ts.CallExpression): boolean {
     const arg = tsUtils.argumented.getArguments(node)[0] as ts.Expression | undefined;
     if (arg === undefined) {
       /* istanbul ignore next */
       return false;
     }
 
-    const type = sb.getType(arg, { error: true });
+    const type = sb.context.getType(arg, { error: true });
 
-    return type !== undefined && sb.isGlobal(arg, type, 'Buffer');
+    return type !== undefined && isBuffer(sb.context, arg, type);
   }
 
-  public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions, visited = false): void {
-    if (!ts.isCallExpression(node)) {
-      /* istanbul ignore next */
-      throw new Error('Something went wrong.');
-    }
-
-    const func = tsUtils.expression.getExpression(node);
-    if (!ts.isPropertyAccessExpression(func) && !ts.isElementAccessExpression(func)) {
-      /* istanbul ignore next */
-      sb.reportUnsupported(node);
-
-      /* istanbul ignore next */
-      return;
-    }
-
-    const args = tsUtils.argumented.getArguments(node);
-    if (args.length !== 1) {
-      /* istanbul ignore next */
-      sb.reportUnsupported(node);
-
-      /* istanbul ignore next */
-      return;
-    }
-
+  public emitCall(
+    sb: ScriptBuilder,
+    func: MemberLikeExpression,
+    node: ts.CallExpression,
+    optionsIn: VisitOptions,
+    visited: boolean,
+  ): void {
     const options = sb.pushValueOptions(optionsIn);
-
-    const lhs = tsUtils.expression.getExpression(func);
     if (!visited) {
-      // [bufferVal]
-      sb.visit(lhs, options);
+      // [arrayVal]
+      sb.visit(tsUtils.expression.getExpression(func), options);
     }
+
+    if (tsUtils.argumented.getArguments(node).length < 1) {
+      /* istanbul ignore next */
+      return;
+    }
+
     // [buffer]
-    sb.emitHelper(lhs, options, sb.helpers.unwrapBuffer);
+    sb.emitHelper(tsUtils.expression.getExpression(func), options, sb.helpers.unwrapBuffer);
     // [bufferVal, buffer]
-    sb.visit(args[0], options);
+    sb.visit(tsUtils.argumented.getArguments(node)[0], options);
     // [buffer, buffer]
-    sb.emitHelper(args[0], options, sb.helpers.unwrapBuffer);
+    sb.emitHelper(tsUtils.argumented.getArguments(node)[0], options, sb.helpers.unwrapBuffer);
     // [boolean]
     sb.emitOp(node, 'EQUAL');
-    // [booleanVal]
-    sb.emitHelper(node, options, sb.helpers.createBoolean);
-
-    if (!optionsIn.pushValue) {
+    if (optionsIn.pushValue) {
+      // [booleanVal]
+      sb.emitHelper(node, options, sb.helpers.wrapBoolean);
+    } else {
+      // []
       sb.emitOp(node, 'DROP');
     }
   }

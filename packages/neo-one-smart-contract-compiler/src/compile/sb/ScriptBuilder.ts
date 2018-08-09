@@ -2,11 +2,7 @@
 import { OpCode, SysCallName } from '@neo-one/client-core';
 import { BN } from 'bn.js';
 import ts from 'typescript';
-import { Context, DiagnosticOptions } from '../../Context';
-import { DiagnosticCode } from '../../DiagnosticCode';
-import { DiagnosticMessage } from '../../DiagnosticMessage';
-import { Globals } from '../../symbols';
-import { Builtins } from '../builtins';
+import { Context } from '../../Context';
 import { Helper, Helpers } from '../helper';
 import { Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
@@ -14,7 +10,8 @@ import { VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 
 export type SingleBytecodeValue = Buffer | Jump | Line;
-export type SingleBytecode = [ts.Node, SingleBytecodeValue];
+export type Tags = ReadonlyArray<string>;
+export type SingleBytecode = [ts.Node, Tags, SingleBytecodeValue];
 export type Bytecode = ReadonlyArray<SingleBytecode>;
 
 export interface CaptureResult {
@@ -23,10 +20,6 @@ export interface CaptureResult {
 }
 
 export interface ScriptBuilder {
-  readonly program: ts.Program;
-  readonly typeChecker: ts.TypeChecker;
-  readonly languageService: ts.LanguageService;
-  readonly builtins: Builtins;
   readonly context: Context;
   readonly scope: Scope;
   readonly moduleIndex: number;
@@ -49,7 +42,6 @@ export interface ScriptBuilder {
   readonly emitLine: (node: ts.Node) => void;
   readonly loadModule: (node: ts.SourceFile) => void;
   readonly capture: (func: () => void) => CaptureResult;
-  readonly toBuffer: (value: string) => Buffer;
   readonly pushValueOptions: (options: VisitOptions) => VisitOptions;
   readonly noPushValueOptions: (options: VisitOptions) => VisitOptions;
   readonly setValueOptions: (options: VisitOptions) => VisitOptions;
@@ -65,14 +57,6 @@ export interface ScriptBuilder {
   readonly superClassOptions: (options: VisitOptions, superClass: Name) => VisitOptions;
   readonly noSuperClassOptions: (options: VisitOptions) => VisitOptions;
   // tslint:disable-next-line no-any readonly-array
-  readonly reportError: (node: ts.Node, code: DiagnosticCode, message: DiagnosticMessage, ...args: any[]) => void;
-  readonly reportUnsupported: (node: ts.Node) => void;
-  readonly getType: (node: ts.Node, options?: DiagnosticOptions) => ts.Type | undefined;
-  readonly getSymbol: (node: ts.Node, options?: DiagnosticOptions) => ts.Symbol | undefined;
-  readonly isOnlyGlobal: (node: ts.Node, type: ts.Type | undefined, name: keyof Globals) => boolean;
-  readonly isGlobal: (node: ts.Node, type: ts.Type | undefined, name: keyof Globals) => boolean;
-  readonly hasGlobal: (node: ts.Node, type: ts.Type | undefined, name: keyof Globals) => boolean;
-  readonly isGlobalSymbol: (node: ts.Node, symbol: ts.Symbol | undefined, name: keyof Globals) => boolean;
   readonly hasExport: (sourceFile: ts.SourceFile, name: string) => boolean;
   readonly addExport: (name: string) => void;
 }

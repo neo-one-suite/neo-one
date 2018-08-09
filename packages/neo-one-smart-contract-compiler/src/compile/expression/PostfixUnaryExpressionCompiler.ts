@@ -39,22 +39,22 @@ export class PostfixUnaryExpressionCompiler extends NodeCompiler<ts.PostfixUnary
           expr,
           sb.pushValueOptions(options),
           sb.helpers.toNumber({
-            type: sb.getType(expr),
+            type: sb.context.getType(expr),
           }),
         );
         sb.emitOp(expr, 'INC');
-        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.createNumber);
+        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.wrapNumber);
         break;
       case ts.SyntaxKind.MinusMinusToken:
         sb.emitHelper(
           expr,
           sb.pushValueOptions(options),
           sb.helpers.toNumber({
-            type: sb.getType(expr),
+            type: sb.context.getType(expr),
           }),
         );
         sb.emitOp(expr, 'DEC');
-        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.createNumber);
+        sb.emitHelper(expr, sb.pushValueOptions(options), sb.helpers.wrapNumber);
         break;
       default:
         /* istanbul ignore next */

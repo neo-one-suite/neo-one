@@ -8,7 +8,7 @@ export class VoidExpressionCompiler extends NodeCompiler<ts.VoidExpression> {
 
   public visitNode(sb: ScriptBuilder, expr: ts.VoidExpression, options: VisitOptions): void {
     if (options.pushValue) {
-      sb.emitHelper(expr, options, sb.helpers.createUndefined);
+      sb.emitHelper(expr, options, sb.helpers.wrapUndefined);
     }
   }
 }

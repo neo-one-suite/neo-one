@@ -1,2 +1,4 @@
-export * from './CreateUndefinedHelper';
+export * from './WrapUndefinedHelper';
 export * from './IsUndefinedHelper';
+
+export * from './typeTests';

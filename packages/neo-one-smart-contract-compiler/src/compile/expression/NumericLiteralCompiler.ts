@@ -10,7 +10,7 @@ export class NumericLiteralCompiler extends NodeCompiler<ts.NumericLiteral> {
   public visitNode(sb: ScriptBuilder, expr: ts.NumericLiteral, options: VisitOptions): void {
     if (options.pushValue) {
       sb.emitPushInt(expr, new BN(expr.text.replace('_', ''), 10));
-      sb.emitHelper(expr, options, sb.helpers.createNumber);
+      sb.emitHelper(expr, options, sb.helpers.wrapNumber);
     }
   }
 }

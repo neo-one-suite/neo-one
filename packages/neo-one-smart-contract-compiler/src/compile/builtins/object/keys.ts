@@ -3,20 +3,20 @@ import ts from 'typescript';
 import { Types } from '../../helper/types/Types';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
+import { BuiltinMemberCall } from '../BuiltinMemberCall';
+import { MemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class ObjectKeys extends BuiltinBase implements BuiltinCall {
-  public readonly types = new Set([BuiltinType.Call]);
-
-  public canCall(): boolean {
-    throw new Error('Something went wrong.');
-  }
-
-  public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions): void {
-    if (!ts.isCallExpression(node)) {
+export class ObjectKeys extends BuiltinMemberCall {
+  public emitCall(
+    sb: ScriptBuilder,
+    _func: MemberLikeExpression,
+    node: ts.CallExpression,
+    optionsIn: VisitOptions,
+  ): void {
+    if (tsUtils.argumented.getArguments(node).length < 1) {
       /* istanbul ignore next */
-      throw new Error('Something went wrong.');
+      return;
     }
 
     const options = sb.pushValueOptions(optionsIn);
@@ -33,9 +33,9 @@ export class ObjectKeys extends BuiltinBase implements BuiltinCall {
         innerOptions,
         sb.helpers.arrRange({
           map: (innerInnerOptions) => {
-            sb.emitHelper(node, innerInnerOptions, sb.helpers.createNumber);
+            sb.emitHelper(node, innerInnerOptions, sb.helpers.wrapNumber);
             sb.emitHelper(node, innerInnerOptions, sb.helpers.toString({ type: undefined, knownType: Types.Number }));
-            sb.emitHelper(node, innerInnerOptions, sb.helpers.createString);
+            sb.emitHelper(node, innerInnerOptions, sb.helpers.wrapString);
           },
         }),
       );
@@ -65,7 +65,7 @@ export class ObjectKeys extends BuiltinBase implements BuiltinCall {
         sb.helpers.arrMap({
           map: () => {
             // [val]
-            sb.emitHelper(node, innerOptions, sb.helpers.createString);
+            sb.emitHelper(node, innerOptions, sb.helpers.wrapString);
           },
         }),
       );
@@ -80,7 +80,7 @@ export class ObjectKeys extends BuiltinBase implements BuiltinCall {
       node,
       options,
       sb.helpers.forBuiltinType({
-        type: sb.getType(arg),
+        type: sb.context.getType(arg),
         array: processArray,
         boolean: emptyArray,
         buffer: emptyArray,
@@ -90,6 +90,15 @@ export class ObjectKeys extends BuiltinBase implements BuiltinCall {
         string: emptyArray,
         symbol: emptyArray,
         undefined: throwTypeError,
+        transaction: emptyArray,
+        output: emptyArray,
+        attribute: emptyArray,
+        input: emptyArray,
+        account: emptyArray,
+        asset: emptyArray,
+        contract: emptyArray,
+        header: emptyArray,
+        block: emptyArray,
       }),
     );
 

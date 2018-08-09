@@ -90,11 +90,11 @@ export class GetArrayIterableIteratorClassHelper extends Helper {
                   // []
                   sb.emitOp(node, 'DROP');
                   // [val]
-                  sb.emitHelper(node, innerOptions, sb.helpers.createUndefined);
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
                   // [done, val]
                   sb.emitPushBoolean(node, true);
                   // [done, val]
-                  sb.emitHelper(node, innerOptions, sb.helpers.createBoolean);
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
                 },
                 whenFalse: () => {
                   // [arrayVal, idx]
@@ -108,7 +108,7 @@ export class GetArrayIterableIteratorClassHelper extends Helper {
                   // [done, val]
                   sb.emitPushBoolean(node, false);
                   // [done, val]
-                  sb.emitHelper(node, innerOptions, sb.helpers.createBoolean);
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
                 },
               }),
             );

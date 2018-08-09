@@ -8,12 +8,11 @@ import ts from 'typescript';
 import { Context } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
-import { Globals, LibAliases, Libs } from '../../symbols';
-import { getIdentifier, toABIReturn } from '../../utils';
+import { toABIReturn } from '../../utils';
 import { declarations } from '../declaration';
 import { NodeTranspiler } from '../NodeTranspiler';
 import { Contract, TranspileResult } from '../types';
-import { Transpiler } from './Transpiler';
+import { ContractIdentifier, InternalIdentifier, Transpiler } from './Transpiler';
 
 const transpilers: ReadonlyArray<ReadonlyArray<new () => NodeTranspiler>> = [declarations];
 
@@ -46,8 +45,12 @@ const createDefaultContract = (name: string): Contract => ({
 export class NEOTranspiler implements Transpiler {
   private readonly transpilers: Transpilers;
   private readonly scheduledTranspile = new Set<ts.Node>();
+  // tslint:disable-next-line readonly-keyword
+  private readonly mutableFileToInternalImports: { [filePath: string]: Set<InternalIdentifier> } = {};
+  // tslint:disable-next-line readonly-keyword
+  private readonly mutableFileToContractImports: { [filePath: string]: Set<ContractIdentifier> } = {};
 
-  public constructor(private readonly context: Context, private readonly smartContract: ts.ClassDeclaration) {
+  public constructor(public readonly context: Context, private readonly smartContract: ts.ClassDeclaration) {
     this.transpilers = transpilers
       .reduce<ReadonlyArray<new () => NodeTranspiler>>(
         (acc: ReadonlyArray<new () => NodeTranspiler>, kindCompilers: ReadonlyArray<new () => NodeTranspiler>) =>
@@ -66,21 +69,13 @@ export class NEOTranspiler implements Transpiler {
       }, {});
   }
 
-  public get program(): ts.Program {
-    return this.context.program;
-  }
-
-  public get typeChecker(): ts.TypeChecker {
-    return this.context.typeChecker;
-  }
-
   public process(): TranspileResult {
     const events = this.processEvents();
     const contract = this.processContract();
     const { functions, statements: addedStatements } = this.processSmartContract();
 
     const context: ts.TransformationContext = {
-      getCompilerOptions: (): ts.CompilerOptions => this.program.getCompilerOptions(),
+      getCompilerOptions: (): ts.CompilerOptions => this.context.program.getCompilerOptions(),
       startLexicalEnvironment: (): void => {
         // do nothing
       },
@@ -115,28 +110,6 @@ export class NEOTranspiler implements Transpiler {
       },
     };
 
-    const eventStatements: ReadonlyArray<ts.Node> = events
-      .map(({ call }) => {
-        const parent = tsUtils.node.getParent(call);
-        if (ts.isVariableDeclaration(parent)) {
-          const statement = tsUtils.node.getParent(tsUtils.node.getParent(parent));
-          const maybeSourceFile = tsUtils.node.getParent(statement);
-          if (ts.isSourceFile(maybeSourceFile)) {
-            return statement;
-          }
-        }
-
-        return undefined;
-      })
-      .filter(utils.notNull);
-    const eventReplacements = events.reduce<Map<ts.Node, string>>((acc, { replacements }) => {
-      replacements.forEach((value, key) => {
-        acc.set(key, value);
-      });
-
-      return acc;
-    }, new Map());
-    const nodesToRemove = new Set<ts.Node>(eventStatements);
     const fixedTypeNodes: Set<ts.Node> = new Set(this.getFixedTypeNodes());
 
     const visitOne = (node: ts.Node): ts.Node => {
@@ -148,50 +121,18 @@ export class NEOTranspiler implements Transpiler {
       return transpiler.visitNode(this, node);
     };
 
-    const replaceEventCall = (name: string, call: ts.CallExpression) => {
-      const args: ReadonlyArray<ts.Expression> = [];
-
-      return tsUtils.setOriginalRecursive(
-        ts.createCall(
-          ts.createIdentifier('syscall'),
-          undefined,
-          args
-            .concat([ts.createStringLiteral('Neo.Runtime.Notify'), ts.createStringLiteral(name)])
-            .concat(tsUtils.argumented.getArguments(call).map((node) => tsUtils.markOriginal(node))),
-        ),
-        call,
-      );
-    };
-
-    const isLibDecorator = (node: ts.Decorator): boolean =>
-      this.isDecorator(node, 'verify') || this.isDecorator(node, 'constant');
-
     const contractSourceFile = tsUtils.node.getSourceFile(this.smartContract);
     const sourceFiles = _.fromPairs(
-      this.program
+      this.context.program
         .getSourceFiles()
         .map<[string, { text: string; sourceMap: RawSourceMap }] | undefined>((sourceFile) => {
           if (!tsUtils.file.isDeclarationFile(sourceFile)) {
             function visit(node: ts.Node): ts.VisitResult<ts.Node> {
-              if (nodesToRemove.has(node)) {
-                // tslint:disable-next-line no-null-keyword no-any
-                return ts.createNotEmittedStatement(node);
-              }
-
               if (fixedTypeNodes.has(node)) {
                 return tsUtils.setOriginal(ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword), node);
               }
 
-              if (ts.isDecorator(node) && isLibDecorator(node)) {
-                return ts.createOmittedExpression();
-              }
-
-              const replacementName = eventReplacements.get(node);
-
-              const transformedNode =
-                replacementName === undefined || !ts.isCallExpression(node)
-                  ? visitOne(node)
-                  : replaceEventCall(replacementName, node);
+              const transformedNode = visitOne(node);
 
               return ts.visitEachChild(transformedNode, visit, context);
             }
@@ -213,7 +154,9 @@ export class NEOTranspiler implements Transpiler {
               );
             }
 
-            const result = tsUtils.print(this.program, sourceFile, transformedSourceFile);
+            transformedSourceFile = this.addImports(transformedSourceFile);
+
+            const result = tsUtils.print(this.context.program, sourceFile, transformedSourceFile);
 
             return [tsUtils.file.getFilePath(sourceFile), result];
           }
@@ -227,53 +170,50 @@ export class NEOTranspiler implements Transpiler {
       sourceFiles,
       abi: {
         functions,
-        events: events
-          .map(({ event }) => event)
-          .filter(utils.notNull)
-          .concat([
-            {
-              name: 'trace',
-              parameters: [
-                {
-                  type: 'Integer',
-                  name: 'line',
-                  decimals: 0,
-                },
-              ],
-            },
-            {
-              name: 'error',
-              parameters: [
-                {
-                  type: 'Integer',
-                  name: 'line',
-                  decimals: 0,
-                },
-                {
-                  type: 'String',
-                  name: 'message',
-                },
-              ],
-            },
-            {
-              name: 'console.log',
-              parameters: [
-                {
-                  type: 'Integer',
-                  name: 'line',
-                  decimals: 0,
-                },
-                {
+        events: events.concat([
+          {
+            name: 'trace',
+            parameters: [
+              {
+                type: 'Integer',
+                name: 'line',
+                decimals: 0,
+              },
+            ],
+          },
+          {
+            name: 'error',
+            parameters: [
+              {
+                type: 'Integer',
+                name: 'line',
+                decimals: 0,
+              },
+              {
+                type: 'String',
+                name: 'message',
+              },
+            ],
+          },
+          {
+            name: 'console.log',
+            parameters: [
+              {
+                type: 'Integer',
+                name: 'line',
+                decimals: 0,
+              },
+              {
+                type: 'Array',
+                name: 'args',
+                value: {
                   type: 'Array',
-                  name: 'args',
-                  value: {
-                    type: 'Array',
-                    value: { type: 'ByteArray' },
-                  },
+                  value: { type: 'ByteArray' },
                 },
-              ],
-            },
-          ]),
+              },
+            ],
+          },
+        ]),
       },
       contract,
     };
@@ -288,59 +228,50 @@ export class NEOTranspiler implements Transpiler {
       return true;
     }
 
-    if (this.isSmartContractType(node, this.getType(node))) {
+    const isSmartContract = tsUtils.class_.getImplementsArray(node).some((implType) => {
+      const testType = this.context.getType(tsUtils.expression.getExpression(implType));
+
+      return testType !== undefined && this.context.builtins.isInterface(node, testType, 'SmartContract');
+    });
+    if (isSmartContract) {
       return true;
     }
 
-    const baseClass = tsUtils.class_.getBaseClass(this.typeChecker, node);
+    const baseClass = tsUtils.class_.getBaseClass(this.context.typeChecker, node);
 
     return baseClass !== undefined && this.isSmartContract(baseClass);
-  }
-
-  public isSmartContractType(node: ts.Node, type: ts.Type | undefined): boolean {
-    return this.isOnlyLib(node, type, 'SmartContract');
-  }
-
-  public getType(node: ts.Node): ts.Type | undefined {
-    return this.context.getType(node);
-  }
-
-  public getTypeOfSymbol(symbol: ts.Symbol | undefined, node: ts.Node): ts.Type | undefined {
-    return this.context.getTypeOfSymbol(symbol, node);
   }
 
   public getTypeText(node: ts.Node, type: ts.Type): string {
     return tsUtils.type_.getText(this.context.typeChecker, type, node);
   }
 
-  public getSymbol(node: ts.Node): ts.Symbol | undefined {
-    return this.context.getSymbol(node);
-  }
-
-  public isOnlyGlobal(node: ts.Node, type: ts.Type | undefined, name: keyof Globals): boolean {
-    return this.context.isOnlyGlobal(node, type, name);
-  }
-
-  public isLibSymbol(node: ts.Node, symbol: ts.Symbol | undefined, name: keyof Libs): boolean {
-    return this.context.isLibSymbol(node, symbol, name);
-  }
-
-  public isOnlyLib(node: ts.Node, type: ts.Type | undefined, name: keyof Libs): boolean {
-    return this.context.isOnlyLib(node, type, name);
-  }
-
-  public isLibAlias(identifier: ts.Identifier | undefined, name: keyof LibAliases): boolean {
-    return this.context.isLibAlias(identifier, name);
-  }
-
-  public isFixedType(node: ts.Node, type: ts.Type | undefined): boolean {
-    if (type === undefined) {
-      return false;
+  public getInternalIdentifier(node: ts.Node, name: InternalIdentifier): string {
+    const sourceFile = ts.isSourceFile(node) ? node : tsUtils.node.getSourceFile(node);
+    const imports = this.mutableFileToInternalImports[tsUtils.file.getFilePath(sourceFile)] as
+      | Set<InternalIdentifier>
+      | undefined;
+    if (imports === undefined) {
+      this.mutableFileToInternalImports[tsUtils.file.getFilePath(sourceFile)] = new Set([name]);
+    } else {
+      imports.add(name);
     }
 
-    const aliasSymbol = tsUtils.type_.getAliasSymbol(type);
+    return this.getInternalImportName(name);
+  }
 
-    return this.isLibSymbol(node, aliasSymbol === undefined ? tsUtils.type_.getSymbol(type) : aliasSymbol, 'Fixed');
+  public getContractIdentifier(node: ts.Node, name: ContractIdentifier): string {
+    const sourceFile = ts.isSourceFile(node) ? node : tsUtils.node.getSourceFile(node);
+    const imports = this.mutableFileToContractImports[tsUtils.file.getFilePath(sourceFile)] as
+      | Set<ContractIdentifier>
+      | undefined;
+    if (imports === undefined) {
+      this.mutableFileToContractImports[tsUtils.file.getFilePath(sourceFile)] = new Set([name]);
+    } else {
+      imports.add(name);
+    }
+
+    return this.getInternalImportName(name);
   }
 
   // tslint:disable-next-line no-any readonly-array
@@ -353,22 +284,84 @@ export class NEOTranspiler implements Transpiler {
   }
 
   public getFinalTypeNode(node: ts.Node, type: ts.Type | undefined, typeNode: ts.TypeNode): ts.TypeNode {
-    if (type !== undefined && this.isFixedType(node, type)) {
+    if (type !== undefined && this.context.builtins.isType(node, type, 'Fixed')) {
       return tsUtils.setOriginal(ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword), typeNode);
     }
 
     return tsUtils.markOriginal(typeNode);
   }
 
-  private processEvents(): ReadonlyArray<{
-    readonly event?: ABIEvent;
-    readonly call: ts.CallExpression;
-    readonly replacements: Map<ts.CallExpression, string>;
-  }> {
-    const decl = tsUtils.symbol.getValueDeclarationOrThrow(this.context.libs.createEventHandler);
-    if (decl === undefined || !ts.isFunctionDeclaration(decl)) {
-      throw new Error('Something went wrong!');
+  private getFixedTypeNodes(): ReadonlyArray<ts.TypeReferenceNode> {
+    const fixedSymbol = this.context.builtins.getTypeSymbol('Fixed');
+    const decl = tsUtils.symbol.getDeclarations(fixedSymbol)[0];
+    const nodes = tsUtils.reference.findReferencesAsNodes(this.context.program, this.context.languageService, decl);
+
+    return nodes
+      .map((identifier) => tsUtils.node.getParent(identifier))
+      .filter(utils.notNull)
+      .filter(ts.isTypeReferenceNode);
+  }
+
+  private getInternalImportName(name: InternalIdentifier | ContractIdentifier): string {
+    return `__internal__${name}`;
+  }
+
+  private addImports(file: ts.SourceFile): ts.SourceFile {
+    const importStatements: ReadonlyArray<ts.Statement> = [
+      this.getModuleImport(
+        this.mutableFileToInternalImports[tsUtils.file.getFilePath(file)],
+        '@neo-one/smart-contract-internal',
+      ),
+      this.getModuleImport(
+        this.mutableFileToContractImports[tsUtils.file.getFilePath(file)],
+        '@neo-one/smart-contract',
+      ),
+    ].filter(utils.notNull);
+
+    if (importStatements.length > 0) {
+      return tsUtils.setOriginal(
+        ts.updateSourceFileNode(
+          file,
+          importStatements.concat(file.statements),
+          file.isDeclarationFile,
+          file.referencedFiles,
+          file.typeReferenceDirectives,
+          file.hasNoDefaultLib,
+          file.libReferenceDirectives,
+        ),
+        file,
+      );
     }
+
+    return file;
+  }
+
+  private getModuleImport(
+    imports: Set<InternalIdentifier | ContractIdentifier> | undefined,
+    moduleName: string,
+  ): ts.ImportDeclaration | undefined {
+    if (imports !== undefined && imports.size > 0) {
+      const importSpecifiers = [...imports].map((foundImport) =>
+        ts.createImportSpecifier(
+          ts.createIdentifier(foundImport),
+          // tslint:disable-next-line no-any
+          ts.createIdentifier(this.getInternalImportName(foundImport)),
+        ),
+      );
+
+      return ts.createImportDeclaration(
+        undefined,
+        undefined,
+        ts.createImportClause(undefined, ts.createNamedImports(importSpecifiers)),
+        ts.createStringLiteral(moduleName),
+      );
+    }
+
+    return undefined;
+  }
+
+  private processEvents(): ReadonlyArray<ABIEvent> {
+    const decl = tsUtils.symbol.getDeclarations(this.context.builtins.getValueSymbol('createEventNotifier'))[0];
 
     const calls = tsUtils.reference
       .findReferencesAsNodes(this.context.program, this.context.languageService, decl)
@@ -384,20 +377,10 @@ export class NEOTranspiler implements Transpiler {
       })
       .filter(utils.notNull);
 
-    return calls.map((call) => {
-      const result = this.toABIEvent(call);
-
-      return {
-        call,
-        event: result === undefined ? undefined : result.event,
-        replacements: result === undefined ? new Map() : result.replacements,
-      };
-    });
+    return calls.map((call) => this.toABIEvent(call)).filter(utils.notNull);
   }
 
-  private toABIEvent(
-    call: ts.CallExpression,
-  ): { readonly event: ABIEvent; readonly replacements: Map<ts.CallExpression, string> } | undefined {
+  private toABIEvent(call: ts.CallExpression): ABIEvent | undefined {
     const callArguments = tsUtils.argumented.getArguments(call);
     const typeArguments = tsUtils.argumented.getTypeArguments(call);
     const nameArg = callArguments[0] as ts.Node | undefined;
@@ -436,44 +419,11 @@ export class NEOTranspiler implements Transpiler {
 
         const paramName = tsUtils.literal.getLiteralValue(paramNameArg);
 
-        return this.toABIParameter(paramName, paramNameArg, this.getType(paramTypeNode), getIdentifier(paramTypeNode));
+        return this.toABIParameter(paramName, paramNameArg, this.context.getType(paramTypeNode));
       })
       .filter(utils.notNull);
 
-    const parent = tsUtils.node.getParent(call);
-    const replacements = new Map<ts.CallExpression, string>();
-    if (!ts.isVariableDeclaration(parent)) {
-      this.reportError(nameArg, DiagnosticCode.InvalidContractEvent, DiagnosticMessage.InvalidContractEventDeclaration);
-    } else {
-      const identifier = tsUtils.node.getNameNode(parent);
-      tsUtils.reference
-        .findReferencesAsNodes(this.context.program, this.context.languageService, identifier)
-        .map((node) => {
-          if (ts.isIdentifier(node)) {
-            const nodeParent = tsUtils.node.getParent(node);
-            if (ts.isCallExpression(nodeParent)) {
-              return nodeParent;
-            }
-          }
-
-          return undefined;
-        })
-        .filter(utils.notNull)
-        .forEach((eventCall) => {
-          replacements.set(eventCall, name);
-        });
-    }
-
-    return { event: { name, parameters }, replacements };
-  }
-
-  private getFixedTypeNodes(): ReadonlyArray<ts.TypeReferenceNode> {
-    const identifiers = [...this.context.libAliases.Fixed];
-
-    return identifiers
-      .map((identifier) => tsUtils.node.getParent(identifier))
-      .filter(utils.notNull)
-      .filter(ts.isTypeReferenceNode);
+    return { name, parameters };
   }
 
   private processSmartContract(): {
@@ -485,9 +435,9 @@ export class NEOTranspiler implements Transpiler {
       .getProperties(smartContractType)
       .map((symbol) => this.processProperty(symbol))
       .reduce((acc, values) => acc.concat(values), []);
-    const ctor = tsUtils.class_.getFirstConcreteConstructor(this.typeChecker, this.smartContract);
+    const ctor = tsUtils.class_.getFirstConcreteConstructor(this.context.typeChecker, this.smartContract);
     if (ctor !== undefined) {
-      const ctorType = this.getTypeOfSymbol(this.getSymbol(ctor.parent), ctor.parent);
+      const ctorType = this.context.getTypeOfSymbol(this.context.getSymbol(ctor.parent), ctor.parent);
       if (ctorType !== undefined) {
         methods = methods.concat(this.processMethodProperty('deploy', ctor, ctorType.getConstructSignatures(), false));
       }
@@ -506,7 +456,7 @@ export class NEOTranspiler implements Transpiler {
       if (tsUtils.parametered.getParameters(parametered).length > 0) {
         const argsTypes = tsUtils.parametered
           .getParameters(parametered)
-          .map((param) => this.getFinalTypeNode(param, this.getType(param), tsUtils.type_.getTypeNode(param)));
+          .map((param) => this.getFinalTypeNode(param, this.context.getType(param), tsUtils.type_.getTypeNode(param)));
         const argsIdentifier = ts.createIdentifier('args');
         argsStatement = ts.createVariableStatement(
           undefined,
@@ -515,12 +465,10 @@ export class NEOTranspiler implements Transpiler {
               ts.createVariableDeclaration(
                 argsIdentifier,
                 undefined,
-                ts.createAsExpression(
-                  ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                    ts.createStringLiteral('Neo.Runtime.GetArgument'),
-                    ts.createNumericLiteral('1'),
-                  ]),
-                  ts.createTupleTypeNode(argsTypes),
+                ts.createCall(
+                  ts.createIdentifier(this.getInternalIdentifier(parametered, 'getArgument')),
+                  [ts.createTupleTypeNode(argsTypes)],
+                  [ts.createNumericLiteral('1')],
                 ),
               ),
             ],
@@ -533,8 +481,7 @@ export class NEOTranspiler implements Transpiler {
       }
       let call = ts.createCall(ts.createPropertyAccess(ts.createIdentifier(contractIdentifier), name), undefined, args);
       if (shouldReturn) {
-        call = ts.createCall(ts.createIdentifier('syscall'), undefined, [
-          ts.createStringLiteral('Neo.Runtime.Return'),
+        call = ts.createCall(ts.createIdentifier(this.getInternalIdentifier(parametered, 'doReturn')), undefined, [
           call,
         ]);
       }
@@ -556,8 +503,12 @@ export class NEOTranspiler implements Transpiler {
         : tsUtils.guards.isParameterDeclaration(method)
           ? tsUtils.node.getNameOrThrow(method)
           : tsUtils.node.getName(method);
-      let methodStatement: ts.Statement;
 
+      if (name === 'properties') {
+        return;
+      }
+
+      let methodStatement: ts.Statement;
       let condition = ts.createBinary(
         ts.createIdentifier(methodIdentifier),
         ts.SyntaxKind.EqualsEqualsEqualsToken,
@@ -565,7 +516,7 @@ export class NEOTranspiler implements Transpiler {
       );
 
       if (ts.isMethodDeclaration(method)) {
-        const returnType = this.getType(method);
+        const returnType = this.context.getType(method);
         const shouldReturn = returnType !== undefined && !tsUtils.type_.isVoidish(returnType);
         methodStatement = processMethod(method, name, shouldReturn);
       } else if (ts.isConstructorDeclaration(method)) {
@@ -576,8 +527,7 @@ export class NEOTranspiler implements Transpiler {
         tsUtils.guards.isParameterDeclaration(method)
       ) {
         methodStatement = ts.createExpressionStatement(
-          ts.createCall(ts.createIdentifier('syscall'), undefined, [
-            ts.createStringLiteral('Neo.Runtime.Return'),
+          ts.createCall(ts.createIdentifier(this.getInternalIdentifier(method, 'doReturn')), undefined, [
             tsUtils.modifier.isReadonly(method) && tsUtils.initializer.getInitializer(method) === undefined
               ? ts.createCall(
                   ts.createPropertyAccess(
@@ -604,14 +554,14 @@ export class NEOTranspiler implements Transpiler {
             ts.SyntaxKind.EqualsToken,
             ts.createElementAccess(
               ts.createParen(
-                ts.createAsExpression(
-                  ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                    ts.createStringLiteral('Neo.Runtime.GetArgument'),
-                    ts.createNumericLiteral('1'),
-                  ]),
-                  ts.createTupleTypeNode([
-                    this.getFinalTypeNode(param, this.getType(param), tsUtils.type_.getTypeNode(param)),
-                  ]),
+                ts.createCall(
+                  ts.createIdentifier(this.getInternalIdentifier(method, 'getArgument')),
+                  [
+                    ts.createTupleTypeNode([
+                      this.getFinalTypeNode(param, this.context.getType(param), tsUtils.type_.getTypeNode(param)),
+                    ]),
+                  ],
+                  [ts.createNumericLiteral('1')],
                 ),
               ),
               0,
@@ -639,10 +589,14 @@ export class NEOTranspiler implements Transpiler {
       ts.createIf(
         ts.createPrefix(
           ts.SyntaxKind.ExclamationToken,
-          ts.createCall(ts.createIdentifier('syscall'), undefined, [
-            ts.createStringLiteral('Neo.Runtime.CheckWitness'),
-            ts.createPropertyAccess(ts.createIdentifier(contractIdentifier), 'owner'),
-          ]),
+          ts.createCall(
+            ts.createPropertyAccess(
+              ts.createIdentifier(this.getContractIdentifier(this.smartContract, 'Address')),
+              'verifySender',
+            ),
+            undefined,
+            [ts.createPropertyAccess(ts.createIdentifier(contractIdentifier), 'owner')],
+          ),
         ),
         ts.createThrow(
           ts.createNew(ts.createIdentifier('Error'), undefined, [ts.createStringLiteral('Invalid witness')]),
@@ -691,12 +645,10 @@ export class NEOTranspiler implements Transpiler {
               ts.createVariableDeclaration(
                 methodIdentifier,
                 undefined,
-                ts.createAsExpression(
-                  ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                    ts.createStringLiteral('Neo.Runtime.GetArgument'),
-                    ts.createNumericLiteral('0'),
-                  ]),
-                  ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                ts.createCall(
+                  ts.createIdentifier(this.getInternalIdentifier(this.smartContract, 'getArgument')),
+                  [ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)],
+                  [ts.createNumericLiteral('0')],
                 ),
               ),
             ],
@@ -709,9 +661,7 @@ export class NEOTranspiler implements Transpiler {
         ts.createIf(
           tsUtils.setOriginal(
             ts.createBinary(
-              ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                ts.createStringLiteral('Neo.Runtime.GetTrigger'),
-              ]),
+              ts.createIdentifier(this.getInternalIdentifier(this.smartContract, 'trigger')),
               ts.SyntaxKind.EqualsEqualsEqualsToken,
               ts.createNumericLiteral(`${0x10}`),
             ),
@@ -720,9 +670,7 @@ export class NEOTranspiler implements Transpiler {
           makeIfElse(mutableApplicationSwitches, applicationFallback),
           ts.createIf(
             ts.createBinary(
-              ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                ts.createStringLiteral('Neo.Runtime.GetTrigger'),
-              ]),
+              ts.createIdentifier(this.getInternalIdentifier(this.smartContract, 'trigger')),
               ts.SyntaxKind.EqualsEqualsEqualsToken,
               ts.createNumericLiteral(`${0x00}`),
             ),
@@ -786,6 +734,7 @@ export class NEOTranspiler implements Transpiler {
     }
 
     const contract: { [key: string]: string } = {};
+    let payable = false;
     // tslint:disable-next-line no-loop-statement
     for (const property of tsUtils.object_.getProperties(initializer)) {
       if (!ts.isPropertyAssignment(property)) {
@@ -800,7 +749,7 @@ export class NEOTranspiler implements Transpiler {
 
       const key = tsUtils.node.getName(property);
       const value = tsUtils.initializer.getInitializer(property);
-      if (!ts.isLiteralExpression(value)) {
+      if (!ts.isLiteralExpression(value) && !tsUtils.guards.isBooleanLiteral(value)) {
         this.reportError(
           value,
           DiagnosticCode.InvalidContractProperties,
@@ -810,8 +759,14 @@ export class NEOTranspiler implements Transpiler {
         return defaultContract;
       }
 
-      // tslint:disable-next-line no-object-mutation
-      contract[key] = tsUtils.literal.getLiteralValue(value);
+      if (key === 'payable') {
+        if (tsUtils.guards.isBooleanLiteral(value)) {
+          payable = value.kind === ts.SyntaxKind.TrueKeyword;
+        }
+      } else if (ts.isLiteralExpression(value)) {
+        // tslint:disable-next-line no-object-mutation
+        contract[key] = tsUtils.literal.getLiteralValue(value);
+      }
     }
 
     // tslint:disable-next-line no-object-literal-type-assertion
@@ -820,51 +775,12 @@ export class NEOTranspiler implements Transpiler {
       name,
       parameters: PARAMETERS,
       returnType: RETURN_TYPE,
-      properties: this.getProperties(),
+      properties: {
+        dynamicInvoke: false,
+        storage: true,
+        payable,
+      },
     } as Contract;
-  }
-
-  private getProperties(): Contract['properties'] {
-    const decls = tsUtils.symbol.getDeclarations(this.context.globals.syscall);
-
-    return {
-      dynamicInvoke: false,
-      storage: this.isSyscallUsed(decls, 'Neo.Storage.Put'),
-      payable: this.isSyscallUsed(decls, 'Neo.Transaction.GetOutputs'),
-    };
-  }
-
-  private isSyscallUsed(decls: ReadonlyArray<ts.Node>, name: string): boolean {
-    const syscall = this.findSyscall(decls, name);
-
-    if (!ts.isFunctionDeclaration(syscall)) {
-      throw new Error('Something went wrong!');
-    }
-
-    return (
-      tsUtils.reference.findReferencesAsNodes(this.context.program, this.context.languageService, syscall).length > 0
-    );
-  }
-
-  private findSyscall(decls: ReadonlyArray<ts.Node>, name: string): ts.FunctionDeclaration {
-    const syscallDecl = decls.filter(ts.isFunctionDeclaration).find((decl) => {
-      const param = tsUtils.parametered.getParameterOrThrow(decl, 'name');
-      const type = this.getType(param);
-
-      if (type !== undefined) {
-        const typeText = tsUtils.type_.getText(this.context.typeChecker, type, param).slice(1, -1);
-
-        return typeText === name;
-      }
-
-      return false;
-    });
-
-    if (syscallDecl === undefined) {
-      throw new Error(`Something went wrong. Could not find syscall ${name}`);
-    }
-
-    return syscallDecl;
   }
 
   private processProperty(
@@ -903,7 +819,7 @@ export class NEOTranspiler implements Transpiler {
     }
 
     const name = symbol.getName();
-    const type = this.getTypeOfSymbol(symbol, decl);
+    const type = this.context.getTypeOfSymbol(symbol, decl);
     if (type === undefined) {
       return [];
     }
@@ -917,12 +833,7 @@ export class NEOTranspiler implements Transpiler {
       const setDecl = ts.isSetAccessorDeclaration(decl) ? decl : tsUtils.accessor.getSetAccessor(decl);
       const mutableResult: Array<[ClassInstanceMemberType, ABIFunction]> = [];
       if (getDecl !== undefined) {
-        const retType = toABIReturn(
-          this.context,
-          getDecl,
-          type,
-          getIdentifier(tsUtils.declaration.getReturnTypeNode(getDecl)),
-        );
+        const retType = toABIReturn(this.context, getDecl, type);
         mutableResult.push([
           getDecl,
           {
@@ -940,12 +851,7 @@ export class NEOTranspiler implements Transpiler {
       }
 
       if (setDecl !== undefined) {
-        const retType = toABIReturn(
-          this.context,
-          setDecl,
-          type,
-          getIdentifier(tsUtils.type_.getTypeNode(tsUtils.parametered.getParameters(setDecl)[0])),
-        );
+        const retType = toABIReturn(this.context, setDecl, type);
         mutableResult.push([
           setDecl,
           {
@@ -975,7 +881,7 @@ export class NEOTranspiler implements Transpiler {
       return this.processMethodProperty(name, decl, type.getCallSignatures(), verify);
     }
 
-    const returnType = toABIReturn(this.context, decl, type, getIdentifier(tsUtils.type_.getTypeNode(decl)));
+    const returnType = toABIReturn(this.context, decl, type);
     const func = {
       name,
       constant: true,
@@ -1009,12 +915,7 @@ export class NEOTranspiler implements Transpiler {
       .filter(utils.notNull);
     const currentReturnType = ts.isConstructorDeclaration(decl)
       ? BOOLEAN_RETURN
-      : toABIReturn(
-          this.context,
-          decl,
-          callSignature.getReturnType(),
-          getIdentifier(tsUtils.declaration.getReturnTypeNode(decl)),
-        );
+      : toABIReturn(this.context, decl, callSignature.getReturnType());
     const constant = this.hasDecorator(decl, 'constant');
     const currentFunc = {
       name,
@@ -1041,28 +942,18 @@ export class NEOTranspiler implements Transpiler {
   }
 
   private isDecorator(decorator: ts.Decorator, name: 'verify' | 'constant'): boolean {
-    return this.isOnlyLib(
-      tsUtils.expression.getExpression(decorator),
-      this.getType(tsUtils.expression.getExpression(decorator)),
-      name,
-    );
+    return this.context.builtins.isValue(tsUtils.expression.getExpression(decorator), name);
   }
 
   private paramToABIParameter(param: ts.Symbol): ABIParameter | undefined {
     const decls = tsUtils.symbol.getDeclarations(param);
     const decl = utils.nullthrows(decls[0]);
-    const id = tsUtils.guards.isParameterDeclaration(decl) ? getIdentifier(tsUtils.type_.getTypeNode(decl)) : undefined;
 
-    return this.toABIParameter(tsUtils.symbol.getName(param), decl, this.getTypeOfSymbol(param, decl), id);
+    return this.toABIParameter(tsUtils.symbol.getName(param), decl, this.context.getTypeOfSymbol(param, decl));
   }
 
-  private toABIParameter(
-    name: string,
-    node: ts.Node,
-    resolvedType: ts.Type | undefined,
-    typeIdentifier?: ts.Identifier,
-  ): ABIParameter | undefined {
-    const type = toABIReturn(this.context, node, resolvedType, typeIdentifier);
+  private toABIParameter(name: string, node: ts.Node, resolvedType: ts.Type | undefined): ABIParameter | undefined {
+    const type = toABIReturn(this.context, node, resolvedType);
     if (type === undefined) {
       return undefined;
     }

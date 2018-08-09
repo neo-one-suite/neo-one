@@ -15,7 +15,7 @@ export function getValueDeclaration(node: ts.Symbol): ts.Declaration | undefined
   return utils.getValueOrUndefined(node.valueDeclaration);
 }
 
-export function getValueDeclarationOrThrow(node: ts.Symbol): ts.Declaration | undefined {
+export function getValueDeclarationOrThrow(node: ts.Symbol): ts.Declaration {
   return utils.throwIfNullOrUndefined(getValueDeclaration(node), 'value declaration');
 }
 
@@ -28,7 +28,9 @@ export function getAliasedSymbol(typeChecker: ts.TypeChecker, node: ts.Symbol): 
 }
 
 export function getMembers(node: ts.Symbol): ts.SymbolTable | undefined {
-  return utils.getValueOrUndefined(node.members);
+  const members = utils.getValueOrUndefined(node.members);
+
+  return members === undefined ? utils.getValueOrUndefined(node.exports) : members;
 }
 
 export function getMembersOrThrow(node: ts.Symbol): ts.SymbolTable {

@@ -14,6 +14,10 @@ export const checkResult = async (receiptIn: CallReceiptJSON, sourceMap: RawSour
   const receipt: RawCallReceipt = (new NEOONEDataProvider({ network: 'meh', rpcURL: 'meh' }) as any).convertCallReceipt(
     receiptIn,
   );
+
+  return checkRawResult(receipt, sourceMap);
+};
+export const checkRawResult = async (receipt: RawCallReceipt, sourceMap: RawSourceMap) => {
   if (receipt.result.state === 'FAULT') {
     const [message, logs] = await Promise.all([
       processError({

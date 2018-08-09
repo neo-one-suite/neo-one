@@ -1,6 +1,5 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
-import { BufferConcat } from '../../../../compile/builtins/buffer/concat';
 
 describe('Buffer.concat', () => {
   test('should concat zero buffers', async () => {
@@ -43,7 +42,12 @@ describe('Buffer.concat', () => {
     );
   });
 
-  test('canCall should throw an error', () => {
-    expect(() => new BufferConcat().canCall()).toThrow();
+  test('cannot be "referenced"', async () => {
+    await helpers.compileString(
+      `
+      const keys = Buffer['concat'];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
   });
 });

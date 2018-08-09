@@ -77,14 +77,14 @@ export class ObjectBindingPatternCompiler extends NodeCompiler<ts.ObjectBindingP
         sb.emitHelper(element, options, sb.helpers.getPropertyObjectProperty);
       } else if (ts.isComputedPropertyName(propertyName)) {
         const expr = tsUtils.expression.getExpression(propertyName);
-        const propertyNameType = sb.getType(expr);
+        const propertyNameType = sb.context.getType(expr);
 
         // [propVal, objectVal, objectVal]
         sb.visit(expr, options);
 
         const handleSymbol = () => {
           // [string, objectVal, objectVal]
-          sb.emitHelper(element, options, sb.helpers.getSymbol);
+          sb.emitHelper(element, options, sb.helpers.unwrapSymbol);
           addSymbolProp();
           // [val, objectVal]
           sb.emitHelper(element, options, sb.helpers.getSymbolObjectProperty);

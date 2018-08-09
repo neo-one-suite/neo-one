@@ -12,7 +12,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
     const initializer = tsUtils.statement.getInitializer(node);
     if (!ts.isVariableDeclarationList(initializer)) {
       /* istanbul ignore next */
-      sb.reportUnsupported(initializer);
+      sb.context.reportUnsupported(initializer);
 
       /* istanbul ignore next */
       return;
@@ -21,7 +21,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
     const variables = tsUtils.variable.getDeclarations(initializer);
     if (variables.length !== 1) {
       /* istanbul ignore next */
-      sb.reportUnsupported(initializer);
+      sb.context.reportUnsupported(initializer);
 
       /* istanbul ignore next */
       return;
@@ -30,11 +30,11 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
     const variable = variables[0];
     const expression = tsUtils.expression.getExpression(node);
     const statement = tsUtils.statement.getStatement(node);
-    const expressionType = sb.getType(expression);
+    const expressionType = sb.context.getType(expression);
 
     if (expressionType === undefined || !tsUtils.type_.isOnlyArrayish(expressionType)) {
       /* istanbul ignore next */
-      sb.reportUnsupported(expression);
+      sb.context.reportUnsupported(expression);
 
       /* istanbul ignore next */
       return;

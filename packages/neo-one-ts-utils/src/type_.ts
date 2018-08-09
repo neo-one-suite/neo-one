@@ -21,9 +21,13 @@ export function getContextualType(typeChecker: ts.TypeChecker, node: ts.Expressi
   return utils.getValueOrUndefined(typeChecker.getContextualType(node));
 }
 
+export function getTypeFromTypeNode(typeChecker: ts.TypeChecker, typeNode: ts.TypeNode): ts.Type {
+  return typeChecker.getTypeFromTypeNode(typeNode);
+}
+
 export function getType(typeChecker: ts.TypeChecker, node: ts.Node): ts.Type {
   // tslint:disable-next-line no-any
-  const typeNode = getTypeNode(node as any) as ts.TypeNode | undefined;
+  const typeNode = ts.isFunctionLike(node) ? undefined : (getTypeNode(node as any) as ts.TypeNode | undefined);
   if (typeNode !== undefined) {
     return typeChecker.getTypeFromTypeNode(typeNode);
   }
@@ -195,6 +199,11 @@ export function isAny(type: ts.Type): boolean {
   return hasTypeFlag(type, ts.TypeFlags.Any);
 }
 
+export function isErrorType(type: ts.Type): boolean {
+  // tslint:disable-next-line no-any
+  return isAny(type) && (type as any).intrinsicName === 'error';
+}
+
 export function isUnion(type: ts.Type): type is ts.UnionType {
   return type.isUnion();
 }
@@ -286,6 +295,15 @@ export function isOnlyUndefined(type: ts.Type): boolean {
 }
 export function hasUndefined(type: ts.Type): boolean {
   return hasType(type, isUndefined);
+}
+export function isUndefinedish(type: ts.Type): boolean {
+  return isUndefined(type) || isVoid(type);
+}
+export function isOnlyUndefinedish(type: ts.Type): boolean {
+  return isOnlyType(type, isUndefinedish);
+}
+export function hasUndefinedish(type: ts.Type): boolean {
+  return hasType(type, isUndefinedish);
 }
 
 export function isNullable(type: ts.Type): boolean {
@@ -467,7 +485,8 @@ export function isPrimitiveish(type: ts.Type): boolean {
     isNumberish(type) ||
     isBooleanish(type) ||
     isStringish(type) ||
-    isSymbolish(type)
+    isSymbolish(type) ||
+    isVoidish(type)
   );
 }
 export function isOnlyPrimitiveish(type: ts.Type): boolean {
@@ -541,4 +560,12 @@ export function isOnlyVoidish(type: ts.Type): boolean {
 }
 export function hasVoidish(type: ts.Type): boolean {
   return hasType(type, isVoidish);
+}
+
+export function getCallSignatures(type: ts.Type): ReadonlyArray<ts.Signature> {
+  return type.getCallSignatures();
+}
+
+export function getNonNullableType(type: ts.Type): ts.Type {
+  return type.getNonNullableType();
 }

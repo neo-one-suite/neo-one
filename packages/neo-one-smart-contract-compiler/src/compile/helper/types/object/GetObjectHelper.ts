@@ -1,5 +1,5 @@
-import { GetPrimitiveHelper } from '../GetPrimitiveHelper';
+import { UnwrapHelper } from '../UnwrapHelper';
 
 // Input: [objectVal]
 // Output: [object]
-export class GetObjectHelper extends GetPrimitiveHelper {}
+export class GetObjectHelper extends UnwrapHelper {}

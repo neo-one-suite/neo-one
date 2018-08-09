@@ -30,7 +30,7 @@ export class ToStringHelper extends TypedHelper {
         options,
         sb.helpers.if({
           condition: () => {
-            sb.emitHelper(node, options, sb.helpers.getBoolean);
+            sb.emitHelper(node, options, sb.helpers.unwrapBoolean);
           },
           whenTrue: () => {
             sb.emitPushString(node, 'true');
@@ -47,7 +47,7 @@ export class ToStringHelper extends TypedHelper {
       const accum = sb.scope.addUnique();
 
       // [number]
-      sb.emitHelper(node, options, sb.helpers.getNumber);
+      sb.emitHelper(node, options, sb.helpers.unwrapNumber);
       sb.emitHelper(
         node,
         options,
@@ -122,7 +122,7 @@ export class ToStringHelper extends TypedHelper {
 
     const convertString = (options: VisitOptions) => {
       // [string]
-      sb.emitHelper(node, options, sb.helpers.getString);
+      sb.emitHelper(node, options, sb.helpers.unwrapString);
     };
 
     const throwTypeError = (options: VisitOptions) => {
@@ -198,7 +198,7 @@ export class ToStringHelper extends TypedHelper {
       );
     };
 
-    const convertBuffer = () => {
+    const convertEmptyString = () => {
       // []
       sb.emitOp(node, 'DROP');
       // [string]
@@ -214,13 +214,22 @@ export class ToStringHelper extends TypedHelper {
           knownType: initial ? this.knownType : undefined,
           array: initial ? convertArray : throwTypeError,
           boolean: convertBoolean,
-          buffer: convertBuffer,
+          buffer: convertEmptyString,
           null: convertNull,
           number: convertNumber,
           object: initial ? convertObject : throwTypeError,
           string: convertString,
           symbol: throwTypeError,
           undefined: convertUndefined,
+          transaction: convertEmptyString,
+          output: convertEmptyString,
+          attribute: convertEmptyString,
+          input: convertEmptyString,
+          account: convertEmptyString,
+          asset: convertEmptyString,
+          contract: convertEmptyString,
+          header: convertEmptyString,
+          block: convertEmptyString,
         }),
       );
     };

@@ -11,8 +11,8 @@ const DEPLOY_METHOD = 'deploy';
 
 const createAccessors = (transpiler: Transpiler, property: ts.Declaration): ReadonlyArray<ts.ClassElement> => {
   const name = tsUtils.node.getNameOrThrow(property);
-  const type = tsUtils.type_.getType(transpiler.typeChecker, property);
-  const originalTypeNode = tsUtils.type_.typeToTypeNodeOrThrow(transpiler.typeChecker, type, property);
+  const type = tsUtils.type_.getType(transpiler.context.typeChecker, property);
+  const originalTypeNode = tsUtils.type_.typeToTypeNodeOrThrow(transpiler.context.typeChecker, type, property);
   const typeNode = transpiler.getFinalTypeNode(property, type, originalTypeNode);
   let getAccess = ts.ModifierFlags.Private;
   if (tsUtils.modifier.isPublic(property)) {
@@ -55,15 +55,10 @@ const createAccessors = (transpiler: Transpiler, property: ts.Declaration): Read
         typeNode,
         ts.createBlock([
           ts.createReturn(
-            ts.createAsExpression(
-              ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                ts.createStringLiteral('Neo.Storage.Get'),
-                ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                  ts.createStringLiteral('Neo.Storage.GetContext'),
-                ]),
-                ts.createStringLiteral(name),
-              ]),
-              typeNode,
+            ts.createCall(
+              ts.createIdentifier(transpiler.getInternalIdentifier(property, 'getStorage')),
+              [typeNode],
+              [ts.createStringLiteral(name)],
             ),
           ),
         ]),
@@ -78,11 +73,7 @@ const createAccessors = (transpiler: Transpiler, property: ts.Declaration): Read
         [ts.createParameter(undefined, undefined, undefined, name, undefined, typeNode, undefined)],
         ts.createBlock([
           ts.createExpressionStatement(
-            ts.createCall(ts.createIdentifier('syscall'), undefined, [
-              ts.createStringLiteral('Neo.Storage.Put'),
-              ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                ts.createStringLiteral('Neo.Storage.GetContext'),
-              ]),
+            ts.createCall(ts.createIdentifier(transpiler.getInternalIdentifier(property, 'putStorage')), undefined, [
               ts.createStringLiteral(name),
               ts.createIdentifier(name),
             ]),
@@ -108,7 +99,11 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
   private transpileDeploy(transpiler: Transpiler, node: ts.ClassDeclaration): ts.ClassDeclaration {
     const existingDeploy = tsUtils.class_.getInstanceMethod(node, DEPLOY_METHOD);
     if (existingDeploy !== undefined) {
-      transpiler.reportError(existingDeploy, DiagnosticCode.InvalidContractMethod, DiagnosticMessage.DeployReserved);
+      transpiler.context.reportError(
+        existingDeploy,
+        DiagnosticCode.InvalidContractMethod,
+        DiagnosticMessage.DeployReserved,
+      );
 
       return node;
     }
@@ -192,9 +187,9 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
       originalInstanceProperties.map((property) => {
         if (ts.isPropertyDeclaration(property) && !tsUtils.modifier.isAbstract(property)) {
           const name = tsUtils.node.getName(property);
-          const type = tsUtils.type_.getType(transpiler.typeChecker, property);
+          const type = tsUtils.type_.getType(transpiler.context.typeChecker, property);
 
-          if (transpiler.isOnlyLib(property, type, 'MapStorage')) {
+          if (transpiler.context.builtins.isInterface(property, type, 'MapStorage')) {
             return tsUtils.setOriginal(
               ts.createProperty(
                 property.decorators,
@@ -204,9 +199,9 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
                 property.type,
                 tsUtils.setOriginalRecursive(
                   ts.createNew(ts.createIdentifier('MapStorage'), undefined, [
-                    ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                      ts.createStringLiteral('Neo.Runtime.Serialize'),
+                    ts.createCall(ts.createPropertyAccess(ts.createIdentifier('Buffer'), 'from'), undefined, [
                       ts.createStringLiteral(name),
+                      ts.createStringLiteral('utf8'),
                     ]),
                   ]),
                   property,
@@ -216,7 +211,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
             );
           }
 
-          if (transpiler.isOnlyLib(property, type, 'SetStorage')) {
+          if (transpiler.context.builtins.isInterface(property, type, 'SetStorage')) {
             return tsUtils.setOriginal(
               ts.createProperty(
                 property.decorators,
@@ -226,9 +221,9 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
                 property.type,
                 tsUtils.setOriginalRecursive(
                   ts.createNew(ts.createIdentifier('SetStorage'), undefined, [
-                    ts.createCall(ts.createIdentifier('syscall'), undefined, [
-                      ts.createStringLiteral('Neo.Runtime.Serialize'),
+                    ts.createCall(ts.createPropertyAccess(ts.createIdentifier('Buffer'), 'from'), undefined, [
                       ts.createStringLiteral(name),
+                      ts.createStringLiteral('utf8'),
                     ]),
                   ]),
                   property,
@@ -320,7 +315,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
   }
 
   private getBaseConstructor(transpiler: Transpiler, node: ts.ClassDeclaration): ts.ConstructorDeclaration | undefined {
-    const baseClass = tsUtils.class_.getBaseClass(transpiler.typeChecker, node);
+    const baseClass = tsUtils.class_.getBaseClass(transpiler.context.typeChecker, node);
     if (baseClass === undefined) {
       return undefined;
     }

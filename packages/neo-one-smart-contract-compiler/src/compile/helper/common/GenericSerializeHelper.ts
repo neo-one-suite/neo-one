@@ -3,7 +3,7 @@ import { GlobalProperty, InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { getTypes, invokeSerialize } from './serialize';
+import { invokeSerialize } from './serialize';
 
 // Input: [val]
 // Output: []
@@ -13,6 +13,16 @@ export class GenericSerializeHelper extends Helper {
   public emitGlobal(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
+    const doNothing = () => {
+      // do nothing
+    };
+
+    const throwTypeError = (innerOptions: VisitOptions) => {
+      // []
+      sb.emitOp(node, 'DROP');
+      sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+    };
+
     // [number, globalObject]
     sb.emitPushInt(node, GlobalProperty.GenericSerialize);
     // [farr, number, globalObject]
@@ -20,31 +30,40 @@ export class GenericSerializeHelper extends Helper {
       node,
       options,
       sb.helpers.createFunctionArray({
-        body: () => {
+        body: (innerOptionsIn) => {
+          const innerOptions = sb.pushValueOptions(innerOptionsIn);
           // [0, argsarr]
           sb.emitPushInt(node, 0);
           // [val]
           sb.emitOp(node, 'PICKITEM');
+          // [val]
           sb.emitHelper(
             node,
-            options,
-            sb.helpers.case(
-              getTypes(sb, node, options).map((forType) => ({
-                condition: () => {
-                  sb.emitOp(node, 'DUP');
-                  forType.isRuntimeType();
-                },
-                whenTrue: () => {
-                  forType.serialize();
-                  sb.emitHelper(node, options, sb.helpers.return);
-                },
-              })),
-              () => {
-                sb.emitOp(node, 'DROP');
-                sb.emitHelper(node, options, sb.helpers.throwTypeError);
-              },
-            ),
+            innerOptions,
+            sb.helpers.forBuiltinType({
+              type: undefined,
+              array: doNothing,
+              boolean: doNothing,
+              buffer: doNothing,
+              null: doNothing,
+              number: doNothing,
+              object: throwTypeError,
+              string: doNothing,
+              symbol: doNothing,
+              undefined: doNothing,
+              transaction: throwTypeError,
+              output: throwTypeError,
+              attribute: throwTypeError,
+              input: throwTypeError,
+              account: throwTypeError,
+              asset: throwTypeError,
+              contract: throwTypeError,
+              header: throwTypeError,
+              block: throwTypeError,
+            }),
           );
+          // []
+          sb.emitHelper(node, innerOptions, sb.helpers.return);
         },
       }),
     );

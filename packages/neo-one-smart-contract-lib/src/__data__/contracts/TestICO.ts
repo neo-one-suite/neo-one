@@ -1,9 +1,9 @@
-import { Address, createEventHandler, Fixed, Integer } from '@neo-one/smart-contract';
+import { Address, createEventNotifier, Fixed, Integer } from '@neo-one/smart-contract';
 
 import { ICO } from '../../ICO';
 
-const onTransfer = createEventHandler<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
-const onApprove = createEventHandler<Address, Address, Fixed<8>>('approve', 'owner', 'spender', 'amount');
+const onTransfer = createEventNotifier<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
+const onApprove = createEventNotifier<Address, Address, Fixed<8>>('approve', 'owner', 'spender', 'amount');
 
 export class TestICO extends ICO<8> {
   public readonly name: string = 'TestToken';
@@ -11,11 +11,12 @@ export class TestICO extends ICO<8> {
   public readonly symbol: string = 'TT';
   public readonly icoAmount: Fixed<8> = 5000_00000000;
   public readonly maxLimitedRoundAmount: Fixed<8> = 1_00000000;
-  protected readonly properties = {
+  public readonly properties = {
     codeVersion: '1.0',
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'The TestICO',
+    payable: true,
   };
 
   public constructor(owner: Address, startTimeSeconds: Integer) {

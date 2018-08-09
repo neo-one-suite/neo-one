@@ -1,6 +1,5 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { Types } from '../helper/types/Types';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -11,53 +10,43 @@ export class TypeOfExpressionCompiler extends NodeCompiler<ts.TypeOfExpression> 
   public visitNode(sb: ScriptBuilder, node: ts.TypeOfExpression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
-    // [expr]
-    sb.visit(tsUtils.expression.getExpression(node), options);
-    // [number]
-    sb.emitHelper(node, options, sb.helpers.unwrapType);
-
-    const condition = (value: Types) => () => {
-      // [number, number]
-      sb.emitOp(node, 'DUP');
-      // [type, number, number]
-      sb.emitPushInt(node, value);
-      // [boolean, number]
-      sb.emitOp(node, 'NUMEQUAL');
-    };
-
-    const whenTrue = (value: string) => () => {
-      // []
+    const expr = tsUtils.expression.getExpression(node);
+    const createPushString = (value: string) => () => {
       sb.emitOp(node, 'DROP');
-      // [string]
       sb.emitPushString(node, value);
     };
 
-    const createCase = (type: Types, value: string) => ({
-      condition: condition(type),
-      whenTrue: whenTrue(value),
-    });
+    const pushObject = createPushString('object');
 
+    // [expr]
+    sb.visit(expr, options);
     sb.emitHelper(
       node,
       options,
-      sb.helpers.case(
-        [
-          createCase(Types.Undefined, 'undefined'),
-          createCase(Types.Null, 'null'),
-          createCase(Types.Boolean, 'boolean'),
-          createCase(Types.String, 'string'),
-          createCase(Types.Symbol, 'symbol'),
-          createCase(Types.Number, 'number'),
-          createCase(Types.Object, 'object'),
-        ],
-        () => {
-          sb.emitOp(node, 'THROW');
-        },
-      ),
+      sb.helpers.forBuiltinType({
+        type: sb.context.getType(expr),
+        array: pushObject,
+        boolean: createPushString('boolean'),
+        buffer: pushObject,
+        null: createPushString('null'),
+        number: createPushString('number'),
+        object: pushObject,
+        string: createPushString('string'),
+        symbol: createPushString('symbol'),
+        undefined: createPushString('undefined'),
+        transaction: pushObject,
+        output: pushObject,
+        attribute: pushObject,
+        input: pushObject,
+        account: pushObject,
+        asset: pushObject,
+        contract: pushObject,
+        header: pushObject,
+        block: pushObject,
+      }),
     );
-
     // [val]
-    sb.emitHelper(node, options, sb.helpers.createString);
+    sb.emitHelper(node, options, sb.helpers.wrapString);
 
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');

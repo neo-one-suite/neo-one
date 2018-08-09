@@ -1,5 +1,7 @@
+import _ from 'lodash';
 import ts from 'typescript';
-
+import { DiagnosticCode } from '../../../DiagnosticCode';
+import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -15,6 +17,7 @@ export interface ForType {
 export interface ForTypeHelperOptions {
   readonly type: ts.Type | undefined;
   readonly types: ReadonlyArray<ForType>;
+  readonly single?: boolean;
   readonly defaultCase?: (options: VisitOptions) => void;
 }
 
@@ -23,12 +26,14 @@ export interface ForTypeHelperOptions {
 export class ForTypeHelper extends Helper {
   private readonly type: ts.Type | undefined;
   private readonly types: ReadonlyArray<ForType>;
+  private readonly single: boolean;
   private readonly defaultCase: ((options: VisitOptions) => void) | undefined;
 
-  public constructor({ type, types, defaultCase }: ForTypeHelperOptions) {
+  public constructor({ type, types, single, defaultCase }: ForTypeHelperOptions) {
     super();
     this.type = type;
     this.types = types;
+    this.single = single === undefined ? false : single;
     this.defaultCase = defaultCase;
   }
 
@@ -51,23 +56,40 @@ export class ForTypeHelper extends Helper {
       }
     }
 
-    const defaultCase =
+    let defaultCase =
       this.defaultCase === undefined
         ? (innerOptions: VisitOptions) => {
             sb.emitOp(node, 'DROP');
             sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
           }
         : this.defaultCase;
+
+    if (this.single && types.length !== 1) {
+      sb.context.reportError(node, DiagnosticCode.UnknownType, DiagnosticMessage.ResolveOneType);
+
+      return;
+    }
+
     if (types.length === 0) {
       defaultCase(noCastOptions);
     } else if (groupedTypes.size === 1) {
       types[0].process(noCastOptions);
     } else {
+      const groupedTypesOrdered = _.sortBy([...groupedTypes.entries()], (value) => value[1].length);
+      let caseTypes = groupedTypesOrdered;
+      if (this.defaultCase === undefined) {
+        caseTypes = groupedTypesOrdered.slice(0, -1);
+        defaultCase = (innerOptions) => {
+          const [processType] = groupedTypesOrdered[groupedTypesOrdered.length - 1];
+          processType(innerOptions);
+        };
+      }
+
       sb.emitHelper(
         node,
         options,
         sb.helpers.case(
-          [...groupedTypes.entries()].map(([processType, forTypes]) => ({
+          caseTypes.map(([processType, forTypes]) => ({
             condition: () => {
               // [val, val]
               sb.emitOp(node, 'DUP');

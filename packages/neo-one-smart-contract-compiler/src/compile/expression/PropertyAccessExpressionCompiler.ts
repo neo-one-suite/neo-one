@@ -2,7 +2,7 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
-import { isBuiltinMemberValue } from '../builtins';
+import { Builtin, isBuiltinInstanceMemberValue, isBuiltinMemberValue } from '../builtins';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -12,19 +12,33 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
 
   public visitNode(sb: ScriptBuilder, expr: ts.PropertyAccessExpression, optionsIn: VisitOptions): void {
     const value = tsUtils.expression.getExpression(expr);
-    const valueType = sb.getType(value);
+    const valueType = sb.context.getType(value);
     const name = tsUtils.node.getNameNode(expr);
     const nameValue = tsUtils.node.getName(expr);
 
-    const builtin = sb.builtins.getMember(sb.context, value, name);
-    if (builtin !== undefined) {
-      if (!isBuiltinMemberValue(builtin)) {
-        sb.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltinProperty);
+    const handleBuiltin = (member: Builtin, visited: boolean) => {
+      if (isBuiltinInstanceMemberValue(member)) {
+        member.emitValue(sb, expr, optionsIn, visited);
 
         return;
       }
 
-      builtin.emitValue(sb, expr, optionsIn);
+      if (isBuiltinMemberValue(member)) {
+        member.emitValue(sb, expr, optionsIn);
+
+        return;
+      }
+
+      sb.context.reportError(
+        expr,
+        DiagnosticCode.InvalidBuiltinReference,
+        DiagnosticMessage.CannotReferenceBuiltinProperty,
+      );
+    };
+
+    const builtin = sb.context.builtins.getMember(value, name);
+    if (builtin !== undefined) {
+      handleBuiltin(builtin, false);
 
       return;
     }
@@ -38,26 +52,14 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
     };
 
     const createProcessBuiltin = (valueName: string) => {
-      const member = sb.builtins.getOnlyMember(sb.context, valueName, nameValue);
+      const member = sb.context.builtins.getOnlyMember(valueName, nameValue);
 
       if (member === undefined) {
         return throwTypeError;
       }
 
       return () => {
-        if (!isBuiltinMemberValue(member)) {
-          /* istanbul ignore next */
-          sb.reportError(
-            expr,
-            DiagnosticCode.InvalidBuiltinReference,
-            DiagnosticMessage.CannotReferenceBuiltinProperty,
-          );
-
-          /* istanbul ignore next */
-          return;
-        }
-
-        member.emitValue(sb, expr, optionsIn, true);
+        handleBuiltin(member, true);
       };
     };
 
@@ -110,6 +112,15 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
         string: createProcessBuiltin('String'),
         symbol: createProcessBuiltin('Symbol'),
         undefined: throwTypeError,
+        transaction: createProcessBuiltin('TransactionBase'),
+        output: createProcessBuiltin('Output'),
+        attribute: createProcessBuiltin('AttributeBase'),
+        input: createProcessBuiltin('Input'),
+        account: createProcessBuiltin('Account'),
+        asset: createProcessBuiltin('Asset'),
+        contract: createProcessBuiltin('Contract'),
+        header: createProcessBuiltin('Header'),
+        block: createProcessBuiltin('Block'),
       }),
     );
   }

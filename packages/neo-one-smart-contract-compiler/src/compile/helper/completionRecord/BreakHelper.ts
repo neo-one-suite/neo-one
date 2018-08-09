@@ -11,7 +11,7 @@ export class BreakHelper extends Helper {
     let pc = options.breakPC;
     if (pc === undefined) {
       /* istanbul ignore next */
-      sb.reportUnsupported(node);
+      sb.context.reportUnsupported(node);
     } else {
       if (options.finallyPC !== undefined) {
         sb.emitPushInt(node, constants.FINALLY_COMPLETION);

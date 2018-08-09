@@ -1,25 +1,19 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { Context } from '../../../Context';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
+import { BuiltinCall } from '../BuiltinCall';
 import { Builtins } from '../Builtins';
-import { BuiltinBase, BuiltinCall, BuiltinType, CallLikeExpression } from '../types';
 
-export class AssertEqual extends BuiltinBase implements BuiltinCall {
-  public readonly types = new Set([BuiltinType.Call]);
+export class AssertEqual extends BuiltinCall {
+  public emitCall(sb: ScriptBuilder, node: ts.CallExpression, optionsIn: VisitOptions): void {
+    const options = sb.pushValueOptions(optionsIn);
 
-  public canCall(): boolean {
-    return true;
-  }
-
-  public emitCall(sb: ScriptBuilder, node: CallLikeExpression, optionsIn: VisitOptions): void {
-    if (!ts.isCallExpression(node)) {
+    if (tsUtils.argumented.getArguments(node).length < 2) {
       /* istanbul ignore next */
       return;
     }
 
-    const options = sb.pushValueOptions(optionsIn);
     const received = tsUtils.argumented.getArguments(node)[0];
     const expected = tsUtils.argumented.getArguments(node)[1];
 
@@ -40,7 +34,7 @@ export class AssertEqual extends BuiltinBase implements BuiltinCall {
           sb.emitHelper(
             node,
             options,
-            sb.helpers.equalsEqualsEquals({ leftType: sb.getType(received), rightType: sb.getType(expected) }),
+            sb.helpers.equalsEqualsEquals({ leftType: sb.context.getType(received), rightType: sb.context.getType(expected) }),
           );
         },
         whenTrue: () => {
@@ -53,13 +47,13 @@ export class AssertEqual extends BuiltinBase implements BuiltinCall {
           // [string, expectedVal, receivedVal]
           sb.emitPushString(node, ' to equal ');
           // [val, expectedVal, receivedVal]
-          sb.emitHelper(node, options, sb.helpers.createString);
+          sb.emitHelper(node, options, sb.helpers.wrapString);
           // [receivedVal, val, expectedVal]
           sb.emitOp(node, 'ROT');
           // [string, receivedVal, val, expectedVal]
           sb.emitPushString(node, 'Expected ');
           // [val, receivedVal, val, expectedVal]
-          sb.emitHelper(node, options, sb.helpers.createString);
+          sb.emitHelper(node, options, sb.helpers.wrapString);
           // [4, val, receivedVal, val, expectedVal]
           sb.emitPushInt(node, 4);
           // [arr]
@@ -75,6 +69,6 @@ export class AssertEqual extends BuiltinBase implements BuiltinCall {
 }
 
 // tslint:disable-next-line export-name
-export const add = (context: Context, builtins: Builtins): void => {
-  builtins.addTestValue(context, 'assertEqual', new AssertEqual());
+export const add = (builtins: Builtins): void => {
+  builtins.addTestValue('assertEqual', new AssertEqual());
 };

@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import { Call, Jmp, Jump, Line } from '../pc';
 import { KnownProgramCounter } from '../pc/KnownProgramCounter';
-import { Bytecode, SingleBytecodeValue } from './ScriptBuilder';
+import { Bytecode, SingleBytecode, Tags } from './ScriptBuilder';
 
 // const MAX_JUMP = 32767;
 const MAX_JUMP = 32000;
@@ -12,7 +12,7 @@ abstract class CodePoint {
   private mutablePrev: CodePoint | undefined;
   private mutableNext: CodePoint | undefined;
 
-  public constructor(public readonly node: ts.Node) {}
+  public constructor(public readonly node: ts.Node, public readonly tags: Tags) {}
 
   public get pc(): number {
     return this.resolvePC();
@@ -58,8 +58,8 @@ class JumpCodePoint extends CodePoint {
   public readonly length = 3;
   private mutableTarget: CodePoint | undefined;
 
-  public constructor(node: ts.Node, public readonly type: 'JMP' | 'JMPIF' | 'JMPIFNOT' | 'CALL') {
-    super(node);
+  public constructor(node: ts.Node, tags: Tags, public readonly type: 'JMP' | 'JMPIF' | 'JMPIFNOT' | 'CALL') {
+    super(node, tags);
   }
 
   public get target(): CodePoint {
@@ -90,8 +90,8 @@ class LineCodePoint extends CodePoint {
 class BufferCodePoint extends CodePoint {
   public readonly length: number;
 
-  public constructor(node: ts.Node, public readonly value: Buffer) {
-    super(node);
+  public constructor(node: ts.Node, tags: Tags, public readonly value: Buffer) {
+    super(node, tags);
     this.length = value.length;
   }
 }
@@ -101,7 +101,7 @@ class JumpStationCodePoint extends CodePoint {
   private mutableTarget: CodePoint | undefined;
 
   public constructor(node: ts.Node, hasForward: boolean, public readonly reverseTarget: CodePoint) {
-    super(node);
+    super(node, ['JumpStation']);
     this.length = hasForward ? 9 : 6;
   }
 
@@ -117,29 +117,29 @@ class JumpStationCodePoint extends CodePoint {
 const getCodePoint = (bytecode: Bytecode): CodePoint => {
   const mutableSources: { [pc: number]: Array<JumpCodePoint | JumpStationCodePoint> } = {};
   const mutableCodePoints: { [pc: number]: CodePoint } = {};
-  const [firstNode, firstBytecode] = bytecode[0];
+  const [firstNode, firstTags, firstBytecode] = bytecode[0];
   if (!(firstBytecode instanceof Jump)) {
     throw new Error('Expected first bytecode to be a jump.');
   }
-  const first = new JumpCodePoint(firstNode, firstBytecode.op);
+  const first = new JumpCodePoint(firstNode, firstTags, firstBytecode.op);
   const jumpTargetPC = firstBytecode.pc.getPC();
   mutableSources[jumpTargetPC] = [first];
   mutableCodePoints[0] = first;
 
   let pc = first.length;
   let mutablePrev: CodePoint = first;
-  bytecode.slice(1).forEach(([node, value]) => {
+  bytecode.slice(1).forEach(([node, tags, value]) => {
     let mutableCodePoint: CodePoint;
     if (value instanceof Jump) {
       const targetPC = value.pc.getPC();
       let mutableJumpCodePoint;
       // We must have created the CodePoint already
       if (targetPC < pc) {
-        mutableJumpCodePoint = new JumpCodePoint(node, value.op);
+        mutableJumpCodePoint = new JumpCodePoint(node, tags, value.op);
         mutableJumpCodePoint.target = mutableCodePoints[targetPC];
         // We will create it in the future, store for later
       } else {
-        mutableJumpCodePoint = new JumpCodePoint(node, value.op);
+        mutableJumpCodePoint = new JumpCodePoint(node, tags, value.op);
         if ((mutableSources[targetPC] as JumpCodePoint[] | undefined) === undefined) {
           mutableSources[targetPC] = [];
         }
@@ -147,9 +147,9 @@ const getCodePoint = (bytecode: Bytecode): CodePoint => {
       }
       mutableCodePoint = mutableJumpCodePoint;
     } else if (value instanceof Line) {
-      mutableCodePoint = new LineCodePoint(node);
+      mutableCodePoint = new LineCodePoint(node, tags);
     } else {
-      mutableCodePoint = new BufferCodePoint(node, value);
+      mutableCodePoint = new BufferCodePoint(node, tags, value);
     }
 
     // Find all sources that we created which target this code point and set their target
@@ -253,31 +253,39 @@ const getBytecode = (first: CodePoint): Bytecode => {
   first.resolveAllPCs();
 
   let current: CodePoint | undefined = first;
-  const mutableOut: Array<[ts.Node, SingleBytecodeValue]> = [];
+  const mutableOut: SingleBytecode[] = [];
   // tslint:disable-next-line no-loop-statement
   while (current !== undefined) {
     if (current instanceof JumpCodePoint) {
       const pc = getTargetPC(current, current.target);
       if (current.type === 'CALL') {
-        mutableOut.push([current.node, new Call(pc)]);
+        mutableOut.push([current.node, current.tags, new Call(pc)]);
       } else {
-        mutableOut.push([current.node, new Jmp(current.type, pc)]);
+        mutableOut.push([current.node, current.tags, new Jmp(current.type, pc)]);
       }
     } else if (current instanceof BufferCodePoint) {
-      mutableOut.push([current.node, current.value]);
+      mutableOut.push([current.node, current.tags, current.value]);
     } else if (current instanceof JumpStationCodePoint) {
       const target = current.target;
       const reverseTarget = new Jmp('JMP', getTargetPC(current, current.reverseTarget));
       if (target === undefined) {
-        mutableOut.push([current.node, new Jmp('JMP', new KnownProgramCounter(current.pc + current.length))]);
-        mutableOut.push([current.node, reverseTarget]);
+        mutableOut.push([
+          current.node,
+          current.tags,
+          new Jmp('JMP', new KnownProgramCounter(current.pc + current.length)),
+        ]);
+        mutableOut.push([current.node, current.tags, reverseTarget]);
       } else {
-        mutableOut.push([current.node, new Jmp('JMP', new KnownProgramCounter(current.pc + current.length))]);
-        mutableOut.push([current.node, reverseTarget]);
-        mutableOut.push([current.node, new Jmp('JMP', getTargetPC(current, target))]);
+        mutableOut.push([
+          current.node,
+          current.tags,
+          new Jmp('JMP', new KnownProgramCounter(current.pc + current.length)),
+        ]);
+        mutableOut.push([current.node, current.tags, reverseTarget]);
+        mutableOut.push([current.node, current.tags, new Jmp('JMP', getTargetPC(current, target))]);
       }
     } else if (current instanceof LineCodePoint) {
-      mutableOut.push([current.node, new Line()]);
+      mutableOut.push([current.node, current.tags, new Line()]);
     } else {
       throw new Error('Something went wrong.');
     }

@@ -173,7 +173,7 @@ const toInteropInterface = (_contractParameter: ContractParameter): undefined =>
 
 const toVoid = (_contractParameter: ContractParameter): undefined => undefined;
 
-function createNullable<Result>(
+function wrapNullable<Result>(
   func: (contractParameter: ContractParameter) => Result,
 ): (contractParameter: ContractParameter) => Result | undefined {
   return (contractParameter) => {
@@ -189,7 +189,7 @@ function createNullable<Result>(
   };
 }
 
-function createNullableABI<Result, ABI>(
+function wrapNullableABI<Result, ABI>(
   func: (contractParameter: ContractParameter, parameter: ABI) => Result,
 ): (contractParameter: ContractParameter, parameter: ABI) => Result | undefined {
   return (contractParameter, parameter) => {
@@ -205,27 +205,27 @@ function createNullableABI<Result, ABI>(
   };
 }
 
-const toStringNullable = createNullable(toString) as (param: ContractParameter) => string | undefined;
+const toStringNullable = wrapNullable(toString) as (param: ContractParameter) => string | undefined;
 
-const toHash160Nullable = createNullable(toHash160) as (param: ContractParameter) => Hash160String | undefined;
-const toHash256Nullable = createNullable(toHash256) as (param: ContractParameter) => Hash256String | undefined;
-const toPublicKeyNullable = createNullable(toPublicKey) as (param: ContractParameter) => PublicKeyString | undefined;
-const toIntegerNullable = createNullableABI(toInteger) as (
+const toHash160Nullable = wrapNullable(toHash160) as (param: ContractParameter) => Hash160String | undefined;
+const toHash256Nullable = wrapNullable(toHash256) as (param: ContractParameter) => Hash256String | undefined;
+const toPublicKeyNullable = wrapNullable(toPublicKey) as (param: ContractParameter) => PublicKeyString | undefined;
+const toIntegerNullable = wrapNullableABI(toInteger) as (
   param: ContractParameter,
   abi: IntegerABI,
 ) => BigNumber | undefined;
-const toBooleanNullable = createNullable(toBoolean) as (param: ContractParameter) => boolean | undefined;
+const toBooleanNullable = wrapNullable(toBoolean) as (param: ContractParameter) => boolean | undefined;
 
-const toSignatureNullable = createNullable(toSignature) as (param: ContractParameter) => SignatureString | undefined;
-const toByteArrayNullable = createNullable(toByteArray) as (param: ContractParameter) => BufferString | undefined;
-const toArrayNullable = createNullableABI(toArray) as (
+const toSignatureNullable = wrapNullable(toSignature) as (param: ContractParameter) => SignatureString | undefined;
+const toByteArrayNullable = wrapNullable(toByteArray) as (param: ContractParameter) => BufferString | undefined;
+const toArrayNullable = wrapNullableABI(toArray) as (
   param: ContractParameter,
   abi: ArrayABI,
 ) => ReadonlyArray<Param | undefined> | undefined;
-const toInteropInterfaceNullable = createNullable(toInteropInterface) as (
+const toInteropInterfaceNullable = wrapNullable(toInteropInterface) as (
   param: ContractParameter,
 ) => undefined | undefined;
-const toVoidNullable = createNullable(toVoid) as (param: ContractParameter) => undefined | undefined;
+const toVoidNullable = wrapNullable(toVoid) as (param: ContractParameter) => undefined | undefined;
 
 export const contractParameters = {
   String: (contractParameter: ContractParameter, _parameter: StringABI): Param | undefined | undefined =>

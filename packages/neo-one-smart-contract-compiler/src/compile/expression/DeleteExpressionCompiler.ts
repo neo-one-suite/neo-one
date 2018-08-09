@@ -7,6 +7,6 @@ export class DeleteExpressionCompiler extends NodeCompiler<ts.DeleteExpression> 
   public readonly kind = ts.SyntaxKind.DeleteExpression;
 
   public visitNode(sb: ScriptBuilder, expr: ts.DeleteExpression, _options: VisitOptions): void {
-    sb.reportUnsupported(expr);
+    sb.context.reportUnsupported(expr);
   }
 }

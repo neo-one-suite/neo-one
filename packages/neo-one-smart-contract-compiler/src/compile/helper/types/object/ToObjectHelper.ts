@@ -43,6 +43,15 @@ export class ToObjectHelper extends TypedHelper {
         string: emptyObject,
         symbol: emptyObject,
         undefined: throwTypeError,
+        transaction: emptyObject,
+        output: emptyObject,
+        attribute: emptyObject,
+        input: emptyObject,
+        account: emptyObject,
+        asset: emptyObject,
+        contract: emptyObject,
+        header: emptyObject,
+        block: emptyObject,
       }),
     );
   }

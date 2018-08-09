@@ -31,7 +31,7 @@ export class ThrowHelper extends Helper {
       }),
     );
     // [string, errorVal]
-    sb.emitHelper(node, options, sb.helpers.getString);
+    sb.emitHelper(node, options, sb.helpers.unwrapString);
     // [number, string, errorVal]
     sb.emitLine(node);
     // [string, number, errorVal]

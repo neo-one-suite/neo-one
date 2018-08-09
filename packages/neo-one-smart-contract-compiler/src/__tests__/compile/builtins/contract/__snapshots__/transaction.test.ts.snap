@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Transaction cannot be implemented 1`] = `
+"snippetCode.ts (4,7): Built-ins cannot be implemented.
+
+      2 |       import { TransactionBase } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class MyTransaction implements TransactionBase {
+        |       ^
+      5 |       }
+      6 |     
+"
+`;
+
+exports[`Transaction cannot be referenced 1`] = `
+"snippetCode.ts (4,17): Builtins cannot be referenced
+
+      2 |       import { Transaction } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const x = Transaction;
+        |                 ^
+      5 |     
+"
+`;

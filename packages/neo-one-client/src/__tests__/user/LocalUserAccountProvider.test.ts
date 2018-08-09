@@ -541,7 +541,7 @@ describe('LocalUserAccountProvider', () => {
     provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.fault, actions: [] }));
 
     const result = localUserAccountProvider.publish(contract, options);
-    await expect(result).rejects.toEqual(new InvokeError('testMessage'));
+    await expect(result).rejects.toEqual(new InvokeError('testMessage\n'));
     verifyMocks();
   });
 

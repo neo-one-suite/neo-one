@@ -1,5 +1,68 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Array cannot be ambiguously referenced - arrow return value 1`] = `
+"snippetCode.ts (5,50): Assignment is ambiguous in relation to the provided expression.
+
+      3 |         readonly length: number;
+      4 |       }
+    > 5 |       const foo = (value: Array<number>): Arr => value;
+        |                                                  ^
+      6 |       const x = [1, 2, 3]
+      7 | 
+      8 |       assertEqual(foo(x).length, 3);
+"
+`;
+
+exports[`Array cannot be ambiguously referenced - assignment 1`] = `
+"snippetCode.ts (6,11): Assignment is ambiguous in relation to the provided expression.
+
+      4 |       }
+      5 |       let x: Arr | undefined;
+    > 6 |       x = [1, 2, 3]
+        |           ^
+      7 | 
+      8 |       assertEqual(x.length, 3);
+      9 |     
+"
+`;
+
+exports[`Array cannot be ambiguously referenced - call 1`] = `
+"snippetCode.ts (8,23): Call parameter is ambiguous in relation to the provided argument.
+
+      6 |       const x = [1, 2, 3]
+      7 | 
+    > 8 |       assertEqual(foo(x), 3);
+        |                       ^
+      9 |     
+"
+`;
+
+exports[`Array cannot be ambiguously referenced - function return value 1`] = `
+"snippetCode.ts (6,16): Assignment is ambiguous in relation to the provided expression.
+
+      4 |       }
+      5 |       const foo = function(value: Array<number>): Arr {
+    > 6 |         return value;
+        |                ^
+      7 |       }
+      8 |       const x = [1, 2, 3]
+      9 | 
+"
+`;
+
+exports[`Array cannot be ambiguously referenced - variable 1`] = `
+"snippetCode.ts (5,22): Assignment is ambiguous in relation to the provided expression.
+
+      3 |         readonly length: number;
+      4 |       }
+    > 5 |       const x: Arr = [1, 2, 3]
+        |                      ^
+      6 | 
+      7 |       assertEqual(x.length, 3);
+      8 |     
+"
+`;
+
 exports[`Array cannot be implemented 1`] = `
 "snippetCode.ts (2,7): Built-ins cannot be implemented.
 

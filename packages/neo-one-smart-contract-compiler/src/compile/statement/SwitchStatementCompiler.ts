@@ -16,7 +16,7 @@ export class SwitchStatementCompiler extends NodeCompiler<ts.SwitchStatement> {
     const options = sb.pushValueOptions(optionsIn);
     sb.withProgramCounter((pc) => {
       const switchExpr = tsUtils.expression.getExpression(node);
-      const switchExprType = sb.getType(switchExpr);
+      const switchExprType = sb.context.getType(switchExpr);
 
       const breakOptions = sb.breakPCOptions(sb.noPushValueOptions(options), pc.getLast());
 
@@ -72,7 +72,7 @@ export class SwitchStatementCompiler extends NodeCompiler<ts.SwitchStatement> {
               sb.emitHelper(
                 expr,
                 options,
-                sb.helpers.equalsEqualsEquals({ leftType: switchExprType, rightType: sb.getType(expr) }),
+                sb.helpers.equalsEqualsEquals({ leftType: switchExprType, rightType: sb.context.getType(expr) }),
               );
               // [boolean, boolean]
               sb.scope.get(sb, node, options, matched);

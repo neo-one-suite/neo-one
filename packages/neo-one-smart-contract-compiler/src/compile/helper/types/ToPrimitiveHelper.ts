@@ -39,9 +39,14 @@ export class ToPrimitiveHelper extends Helper {
       sb.emitHelper(node, options, sb.helpers.throwTypeError);
     };
 
+    const throwInnerTypeError = (options: VisitOptions) => {
+      sb.emitOp(node, 'DROP');
+      throwTypeError(options);
+    };
+
     const convertArray = (options: VisitOptions) => {
       sb.emitHelper(node, options, sb.helpers.toString({ type: this.type, knownType: Types.Array }));
-      sb.emitHelper(node, options, sb.helpers.createString);
+      sb.emitHelper(node, options, sb.helpers.wrapString);
     };
 
     const convertPrimitive = () => {
@@ -51,7 +56,7 @@ export class ToPrimitiveHelper extends Helper {
     const convertBuffer = (options: VisitOptions) => {
       sb.emitOp(node, 'DROP');
       sb.emitPushString(node, '');
-      sb.emitHelper(node, options, sb.helpers.createString);
+      sb.emitHelper(node, options, sb.helpers.wrapString);
     };
 
     const convertObject = (options: VisitOptions) => {
@@ -111,6 +116,15 @@ export class ToPrimitiveHelper extends Helper {
               string: convertPrimitive,
               symbol: convertPrimitive,
               undefined: convertPrimitive,
+              transaction: throwTypeError,
+              output: throwTypeError,
+              attribute: throwTypeError,
+              input: throwTypeError,
+              account: throwTypeError,
+              asset: throwTypeError,
+              contract: throwTypeError,
+              header: throwTypeError,
+              block: throwTypeError,
             }),
           );
         };
@@ -139,6 +153,15 @@ export class ToPrimitiveHelper extends Helper {
             string: convertObjectDone,
             symbol: convertObjectDone,
             undefined: convertObjectDone,
+            transaction: throwInnerTypeError,
+            output: throwInnerTypeError,
+            attribute: throwInnerTypeError,
+            input: throwInnerTypeError,
+            account: throwInnerTypeError,
+            asset: throwInnerTypeError,
+            contract: throwInnerTypeError,
+            header: throwInnerTypeError,
+            block: throwInnerTypeError,
           }),
         );
       };
@@ -199,6 +222,15 @@ export class ToPrimitiveHelper extends Helper {
         string: convertPrimitive,
         symbol: convertPrimitive,
         undefined: convertPrimitive,
+        transaction: throwTypeError,
+        output: throwTypeError,
+        attribute: throwTypeError,
+        input: throwTypeError,
+        account: throwTypeError,
+        asset: throwTypeError,
+        contract: throwTypeError,
+        header: throwTypeError,
+        block: throwTypeError,
       }),
     );
   }

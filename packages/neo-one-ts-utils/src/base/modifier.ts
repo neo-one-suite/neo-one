@@ -24,6 +24,14 @@ export function isAbstract(node: ts.Node): boolean {
   return getAbstractKeyword(node) !== undefined;
 }
 
+export function getConstKeyword(node: ts.Node): ts.Token<ts.SyntaxKind.ConstKeyword> | undefined {
+  return getFirstModifierByKind(node, ts.SyntaxKind.ConstKeyword);
+}
+
+export function isConst(node: ts.Node): boolean {
+  return getConstKeyword(node) !== undefined;
+}
+
 export function getPublicKeyword(node: ts.Node): ts.Token<ts.SyntaxKind.PublicKeyword> | undefined {
   return getFirstModifierByKind(node, ts.SyntaxKind.PublicKeyword);
 }

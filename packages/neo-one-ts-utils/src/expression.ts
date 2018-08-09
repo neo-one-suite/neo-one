@@ -11,6 +11,18 @@ export function getExpression(expression: ExpressionedNode | MaybeExpressionedNo
   return utils.getValueOrUndefined(expression.expression);
 }
 
+export function getExpressionForCall(node: ts.CallLikeExpression): ts.Expression {
+  if (ts.isCallExpression(node) || ts.isNewExpression(node) || ts.isDecorator(node)) {
+    return getExpression(node);
+  }
+
+  if (ts.isJsxSelfClosingElement(node) || ts.isJsxOpeningElement(node)) {
+    return node.tagName;
+  }
+
+  return node.tag;
+}
+
 export function getElements(expression: ts.ArrayLiteralExpression): ReadonlyArray<ts.Expression> {
   const elements = utils.getValueOrUndefined(expression.elements);
 

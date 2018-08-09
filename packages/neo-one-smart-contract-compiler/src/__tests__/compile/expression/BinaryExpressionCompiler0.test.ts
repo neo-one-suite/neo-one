@@ -202,9 +202,9 @@ describe('BinaryExpressionCompiler', () => {
   test('"4" + 21 === "421" [PlusToken:StringConcatenation:Unknown]', async () => {
     await helpers.executeString(
       `
-      const x: string | number = 21 as string | number;
-      const y: any = '4' as any;
-      const z: string = y + x;
+      const x: string = '21';
+      const y: string | number | boolean | object = '4' as string | number | boolean | object;
+      const z: string = (+y) + x;
       if (z !== '421') {
         throw 'Failure';
       }

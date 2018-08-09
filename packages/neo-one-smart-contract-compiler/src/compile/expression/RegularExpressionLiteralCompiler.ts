@@ -6,6 +6,6 @@ import { VisitOptions } from '../types';
 export class RegularExpressionLiteralCompiler extends NodeCompiler<ts.RegularExpressionLiteral> {
   public readonly kind = ts.SyntaxKind.RegularExpressionLiteral;
   public visitNode(sb: ScriptBuilder, expr: ts.RegularExpressionLiteral, _options: VisitOptions): void {
-    sb.reportUnsupported(expr);
+    sb.context.reportUnsupported(expr);
   }
 }

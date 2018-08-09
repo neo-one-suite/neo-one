@@ -1,10 +1,9 @@
-import { Context } from '../../../Context';
+import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
-import { BuiltinBase } from '../types';
 
-class TemplateStringsArrayInstance extends BuiltinBase {}
+class TemplateStringsArrayInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name
-export const add = (context: Context, builtins: Builtins): void => {
-  builtins.addInterface(context, 'TemplateStringsArray', new TemplateStringsArrayInstance());
+export const add = (builtins: Builtins): void => {
+  builtins.addInterface('TemplateStringsArray', new TemplateStringsArrayInterface());
 };

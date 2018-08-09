@@ -38,7 +38,7 @@ export class ArrForEachFuncHelper extends Helper {
           // [idx, idx, size, arr, callable]
           sb.emitOp(node, 'DUP');
           // [idxVal, idx, size, arr, callable]
-          sb.emitHelper(node, options, sb.helpers.createNumber);
+          sb.emitHelper(node, options, sb.helpers.wrapNumber);
           // [3, idxVal, idx, size, arr, callable]
           sb.emitPushInt(node, 3);
           // [arr, idxVal, idx, size, arr, callable]
@@ -76,7 +76,7 @@ export class ArrForEachFuncHelper extends Helper {
     sb.emitOp(node, 'DROP');
 
     if (optionsIn.pushValue) {
-      sb.emitHelper(node, options, sb.helpers.createUndefined);
+      sb.emitHelper(node, options, sb.helpers.wrapUndefined);
     }
   }
 }

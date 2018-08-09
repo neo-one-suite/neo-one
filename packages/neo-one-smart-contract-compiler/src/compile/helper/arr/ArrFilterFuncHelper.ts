@@ -51,7 +51,7 @@ export class ArrFilterFuncHelper extends Helper {
           // [idx, arr, idx, size, callable, ...arr]
           sb.emitOp(node, 'OVER');
           // [idxVal, arr, idx, size, callable, ...arr]
-          sb.emitHelper(node, innerOptions, sb.helpers.createNumber);
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapNumber);
           // [5, idxVal, arr, idx, size, callable, ...arr]
           sb.emitPushInt(node, 5);
           // [value, idxVal, arr, idx, size, callable, ...arr]

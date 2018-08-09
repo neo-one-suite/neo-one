@@ -42,7 +42,7 @@ export class GetErrorClassHelper extends Helper {
                 // [string]
                 sb.emitPushString(node, '');
                 // [val]
-                sb.emitHelper(node, innerOptions, sb.helpers.createString);
+                sb.emitHelper(node, innerOptions, sb.helpers.wrapString);
               },
               whenFalse: () => {
                 // [0, argsarr]

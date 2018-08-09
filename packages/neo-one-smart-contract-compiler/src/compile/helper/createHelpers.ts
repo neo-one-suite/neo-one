@@ -16,13 +16,6 @@ import {
   ExtendArrHelper,
 } from './arr';
 import { CreateArrayIterableIteratorHelper, GetArrayIterableIteratorClassHelper } from './arrayIterableIterator';
-import {
-  IsBlockchainInterfaceHelper,
-  IsBlockchainInterfaceHelperOptions,
-  UnwrapBlockchainInterfaceHelper,
-  WrapBlockchainInterfaceHelper,
-  WrapBlockchainInterfaceHelperOptions,
-} from './blockchain';
 import { CreateClassHelper, CreateClassHelperOptions } from './class';
 import {
   ArrSliceHelper,
@@ -73,6 +66,7 @@ import {
   NewHelper,
   NewHelperOptions,
   ParametersHelper,
+  ParametersHelperOptions,
 } from './function';
 import {
   CreateGlobalObjectHelper,
@@ -96,9 +90,6 @@ import {
 import {
   EqualsEqualsEqualsHelper,
   EqualsEqualsEqualsHelperOptions,
-  EqualsEqualsEqualsNumberHelper,
-  EqualsEqualsEqualsSameTypeHelper,
-  EqualsEqualsEqualsUnknownHelper,
   EqualsEqualsHelper,
   EqualsEqualsHelperOptions,
   LessThanHelper,
@@ -114,20 +105,14 @@ import {
   ProcessStatementsHelper,
   ProcessStatementsHelperOptions,
 } from './statement';
+import { GetMapStorageClassHelper, GetSetStorageClassHelper } from './storage';
 import {
   ArrayLengthHelper,
   BufferLengthHelper,
   ConcatBufferHelper,
   CreateArrayHelper,
-  CreateBooleanHelper,
-  CreateBufferHelper,
-  CreateNullHelper,
-  CreateNumberHelper,
   CreateObjectHelper,
   CreatePropertyObjectHelper,
-  CreateStringHelper,
-  CreateSymbolHelper,
-  CreateUndefinedHelper,
   FindObjectPropertyHelper,
   FindObjectPropertyHelperBase,
   FindObjectPropertyHelperBaseOptions,
@@ -135,16 +120,12 @@ import {
   ForBuiltinTypeHelper,
   ForBuiltinTypeHelperOptions,
   GetArrayIndexHelper,
-  GetBooleanHelper,
   GetInternalObjectHelper,
   GetInternalObjectPropertyHelper,
-  GetNumberHelper,
   GetObjectHelper,
   GetPropertyObjectHelper,
   GetPropertyObjectKeysHelper,
   GetPropertyObjectPropertyHelper,
-  GetStringHelper,
-  GetSymbolHelper,
   GetSymbolObjectHelper,
   GetSymbolObjectPropertyHelper,
   InObjectPropertyHelper,
@@ -153,15 +134,18 @@ import {
   InstanceofHelper,
   InSymbolObjectPropertyHelper,
   IsArrayHelper,
+  IsAttributeHelper,
   IsBooleanHelper,
   IsBufferHelper,
+  IsInputHelper,
   IsNullHelper,
   IsNullOrUndefinedHelper,
   IsNumberHelper,
   IsObjectHelper,
-  IsSameTypeHelper,
+  IsOutputHelper,
   IsStringHelper,
   IsSymbolHelper,
+  IsTransactionHelper,
   IsUndefinedHelper,
   OmitObjectPropertiesHelper,
   OmitPropertyObjectPropertiesHelper,
@@ -188,14 +172,52 @@ import {
   ToPrimitiveHelperOptions,
   ToStringHelper,
   UnwrapArrayHelper,
+  UnwrapAttributeHelper,
+  UnwrapBooleanHelper,
   UnwrapBufferHelper,
-  UnwrapTypeHelper,
+  UnwrapInputHelper,
+  UnwrapNumberHelper,
+  UnwrapObjectHelper,
+  UnwrapOutputHelper,
+  UnwrapStringHelper,
+  UnwrapSymbolHelper,
+  UnwrapTransactionHelper,
   UnwrapValHelper,
+  UnwrapValHelperOptions,
+  UnwrapValRecursiveHelper,
+  UnwrapValRecursiveHelperOptions,
   WrapArrayHelper,
+  WrapArrayValHelper,
+  WrapArrayValHelperOptions,
+  WrapAttributeHelper,
+  WrapBooleanHelper,
   WrapBufferHelper,
+  WrapInputHelper,
+  WrapNullHelper,
+  WrapNumberHelper,
+  WrapObjectHelper,
+  WrapOutputHelper,
+  WrapStringHelper,
+  WrapSymbolHelper,
+  WrapTransactionHelper,
+  WrapUndefinedHelper,
+  WrapValHelper,
+  WrapValHelperOptions,
+  WrapValRecursiveHelper,
+  WrapValRecursiveHelperOptions,
 } from './types';
+import { IsAccountHelper, UnwrapAccountHelper, WrapAccountHelper } from './types/account';
+import { IsAssetHelper, UnwrapAssetHelper, WrapAssetHelper } from './types/asset';
+import { IsBlockHelper, UnwrapBlockHelper, WrapBlockHelper } from './types/block';
+import { IsContractHelper, UnwrapContractHelper, WrapContractHelper } from './types/contract';
+import { IsHeaderHelper, UnwrapHeaderHelper, WrapHeaderHelper } from './types/header';
 
 export interface Helpers {
+  // account
+  readonly isAccount: IsAccountHelper;
+  readonly wrapAccount: WrapAccountHelper;
+  readonly unwrapAccount: UnwrapAccountHelper;
+
   // arr
   readonly arrFilter: (options: ArrFilterHelperOptions) => ArrFilterHelper;
   readonly arrFilterFunc: ArrFilterFuncHelper;
@@ -212,8 +234,23 @@ export interface Helpers {
   readonly createArrayIterableIterator: CreateArrayIterableIteratorHelper;
   readonly getArrayIterableIteratorClass: GetArrayIterableIteratorClassHelper;
 
+  // asset
+  readonly isAsset: IsAssetHelper;
+  readonly wrapAsset: WrapAssetHelper;
+  readonly unwrapAsset: UnwrapAssetHelper;
+
+  // block
+  readonly isBlock: IsBlockHelper;
+  readonly wrapBlock: WrapBlockHelper;
+  readonly unwrapBlock: UnwrapBlockHelper;
+
   // class
   readonly createClass: (options: CreateClassHelperOptions) => CreateClassHelper;
+
+  // contract
+  readonly isContract: IsContractHelper;
+  readonly wrapContract: WrapContractHelper;
+  readonly unwrapContract: UnwrapContractHelper;
 
   // common
   readonly arrSlice: (options?: ArrSliceHelperOptions) => ArrSliceHelper;
@@ -229,9 +266,6 @@ export interface Helpers {
   readonly getErrorClass: GetErrorClassHelper;
 
   readonly equalsEqualsEquals: (options: EqualsEqualsEqualsHelperOptions) => EqualsEqualsEqualsHelper;
-  readonly equalsEqualsEqualsNumber: EqualsEqualsEqualsNumberHelper;
-  readonly equalsEqualsEqualsSameType: EqualsEqualsEqualsSameTypeHelper;
-  readonly equalsEqualsEqualsUnknown: EqualsEqualsEqualsUnknownHelper;
   readonly equalsEquals: (options: EqualsEqualsHelperOptions) => EqualsEqualsHelper;
   readonly lessThan: (options: LessThanHelperOptions) => LessThanHelper;
   readonly processStatements: (options: ProcessStatementsHelperOptions) => ProcessStatementsHelper;
@@ -251,7 +285,7 @@ export interface Helpers {
   readonly invokeCall: (options?: InvokeCallHelperOptions) => InvokeCallHelper;
   readonly invokeConstruct: (options?: InvokeConstructHelperOptions) => InvokeConstructHelper;
   readonly new: (options?: NewHelperOptions) => NewHelper;
-  readonly parameters: ParametersHelper;
+  readonly parameters: (options: ParametersHelperOptions) => ParametersHelper;
 
   readonly forLoop: (options: ForLoopHelperOptions) => ForLoopHelper;
   readonly if: (options: IfHelperOptions) => IfHelper;
@@ -263,13 +297,13 @@ export interface Helpers {
   readonly continue: ContinueHelper;
   readonly throwCompletion: ThrowCompletionHelper;
   readonly throwTypeError: ThrowTypeErrorHelper;
-  readonly createBoolean: CreateBooleanHelper;
-  readonly createNull: CreateNullHelper;
-  readonly createNumber: CreateNumberHelper;
+  readonly wrapBoolean: WrapBooleanHelper;
+  readonly wrapNull: WrapNullHelper;
+  readonly wrapNumber: WrapNumberHelper;
   readonly createObject: CreateObjectHelper;
-  readonly createString: CreateStringHelper;
-  readonly createSymbol: CreateSymbolHelper;
-  readonly createUndefined: CreateUndefinedHelper;
+  readonly wrapString: WrapStringHelper;
+  readonly wrapSymbol: WrapSymbolHelper;
+  readonly wrapUndefined: WrapUndefinedHelper;
   readonly isBoolean: IsBooleanHelper;
   readonly isNull: IsNullHelper;
   readonly isNumber: IsNumberHelper;
@@ -277,12 +311,11 @@ export interface Helpers {
   readonly isString: IsStringHelper;
   readonly isSymbol: IsSymbolHelper;
   readonly isUndefined: IsUndefinedHelper;
-  readonly isNullOrUndefined: IsNullOrUndefinedHelper;
-  readonly isSameType: IsSameTypeHelper;
-  readonly getBoolean: GetBooleanHelper;
-  readonly getNumber: GetNumberHelper;
-  readonly getString: GetStringHelper;
-  readonly getSymbol: GetSymbolHelper;
+  readonly isNullOrUndefined: (options: TypedHelperOptions) => IsNullOrUndefinedHelper;
+  readonly unwrapBoolean: UnwrapBooleanHelper;
+  readonly unwrapNumber: UnwrapNumberHelper;
+  readonly unwrapString: UnwrapStringHelper;
+  readonly unwrapSymbol: UnwrapSymbolHelper;
   readonly getObject: GetObjectHelper;
   readonly toBoolean: (options: TypedHelperOptions) => ToBooleanHelper;
   readonly toString: (options: TypedHelperOptions) => ToStringHelper;
@@ -309,7 +342,6 @@ export interface Helpers {
   readonly setInternalObjectProperty: SetInternalObjectPropertyHelper;
   readonly shallowCloneObject: ShallowCloneObjectHelper;
   readonly shallowCloneObj: ShallowCloneObjHelper;
-  readonly unwrapType: UnwrapTypeHelper;
   readonly packObject: PackObjectHelper;
   readonly pickObjectProperties: PickObjectPropertiesHelper;
   readonly pickPropertyObjectProperties: PickPropertyObjectPropertiesHelper;
@@ -317,7 +349,8 @@ export interface Helpers {
   readonly omitObjectProperties: OmitObjectPropertiesHelper;
   readonly omitPropertyObjectProperties: OmitPropertyObjectPropertiesHelper;
   readonly omitSymbolObjectProperties: OmitSymbolObjectPropertiesHelper;
-  readonly unwrapVal: UnwrapValHelper;
+  readonly wrapObject: WrapObjectHelper;
+  readonly unwrapObject: UnwrapObjectHelper;
   readonly instanceof: InstanceofHelper;
   readonly inObjectProperty: (options: InObjectPropertyHelperOptions) => InObjectPropertyHelper;
   readonly inPropertyObjectProperty: InPropertyObjectPropertyHelper;
@@ -326,8 +359,27 @@ export interface Helpers {
   readonly findObjectProperty: (options: FindObjectPropertyHelperOptions) => FindObjectPropertyHelper;
   readonly findObjectPropertyBase: (options: FindObjectPropertyHelperBaseOptions) => FindObjectPropertyHelperBase;
 
-  readonly forBuiltinType: (options: ForBuiltinTypeHelperOptions) => ForBuiltinTypeHelper;
+  // header
+  readonly isHeader: IsHeaderHelper;
+  readonly wrapHeader: WrapHeaderHelper;
+  readonly unwrapHeader: UnwrapHeaderHelper;
 
+  // map
+  readonly getMapClass: GetMapClassHelper;
+
+  // storage
+  readonly getMapStorageClass: GetMapStorageClassHelper;
+  readonly getSetStorageClass: GetSetStorageClassHelper;
+
+  // types
+  readonly forBuiltinType: (options: ForBuiltinTypeHelperOptions) => ForBuiltinTypeHelper;
+  readonly unwrapVal: (options: UnwrapValHelperOptions) => UnwrapValHelper;
+  readonly wrapVal: (options: WrapValHelperOptions) => WrapValHelper;
+  readonly wrapArrayVal: (options: WrapArrayValHelperOptions) => WrapArrayValHelper;
+  readonly unwrapValRecursive: (options: UnwrapValRecursiveHelperOptions) => UnwrapValRecursiveHelper;
+  readonly wrapValRecursive: (options: WrapValRecursiveHelperOptions) => WrapValRecursiveHelper;
+
+  // types/array
   readonly arrayLength: ArrayLengthHelper;
   readonly createArray: CreateArrayHelper;
   readonly getArrayIndex: GetArrayIndexHelper;
@@ -336,14 +388,33 @@ export interface Helpers {
   readonly unwrapArray: UnwrapArrayHelper;
   readonly isArray: IsArrayHelper;
 
-  readonly getMapClass: GetMapClassHelper;
+  // types/attribute
+  readonly wrapAttribute: WrapAttributeHelper;
+  readonly unwrapAttribute: UnwrapAttributeHelper;
+  readonly isAttribute: IsAttributeHelper;
 
+  // types/buffer
   readonly bufferLength: BufferLengthHelper;
   readonly concatBuffer: ConcatBufferHelper;
-  readonly createBuffer: CreateBufferHelper;
+  readonly createBuffer: WrapBufferHelper;
   readonly isBuffer: IsBufferHelper;
   readonly unwrapBuffer: UnwrapBufferHelper;
   readonly wrapBuffer: WrapBufferHelper;
+
+  // types/input
+  readonly wrapInput: WrapInputHelper;
+  readonly unwrapInput: UnwrapInputHelper;
+  readonly isInput: IsInputHelper;
+
+  // types/output
+  readonly wrapOutput: WrapOutputHelper;
+  readonly unwrapOutput: UnwrapOutputHelper;
+  readonly isOutput: IsOutputHelper;
+
+  // types/transaction
+  readonly wrapTransaction: WrapTransactionHelper;
+  readonly unwrapTransaction: UnwrapTransactionHelper;
+  readonly isTransaction: IsTransactionHelper;
 
   readonly export: (options: ExportHelperOptions) => ExportHelper;
   readonly exportSingle: (options: ExportHelperOptions) => ExportSingleHelper;
@@ -351,10 +422,6 @@ export interface Helpers {
   readonly getCurrentModule: GetCurrentModuleHelper;
   readonly getModules: GetModulesHelper;
   readonly addEmptyModule: AddEmptyModuleHelper;
-
-  readonly isBlockchainInterface: (options: IsBlockchainInterfaceHelperOptions) => IsBlockchainInterfaceHelper;
-  readonly wrapBlockchainInterface: (options: WrapBlockchainInterfaceHelperOptions) => WrapBlockchainInterfaceHelper;
-  readonly unwrapBlockchainInterface: UnwrapBlockchainInterfaceHelper;
 
   readonly createGlobalObject: CreateGlobalObjectHelper;
   readonly getArgument: (options: TypedHelperOptions) => GetArgumentHelper;
@@ -379,6 +446,11 @@ export const createHelpers = (): Helpers => {
   }
 
   return {
+    // account
+    isAccount: new IsAccountHelper(),
+    wrapAccount: new WrapAccountHelper(),
+    unwrapAccount: new UnwrapAccountHelper(),
+
     // arr
     arrFilter: (options) => new ArrFilterHelper(options),
     arrFilterFunc: new ArrFilterFuncHelper(),
@@ -395,8 +467,23 @@ export const createHelpers = (): Helpers => {
     createArrayIterableIterator: new CreateArrayIterableIteratorHelper(),
     getArrayIterableIteratorClass: new GetArrayIterableIteratorClassHelper(),
 
+    // asset
+    isAsset: new IsAssetHelper(),
+    wrapAsset: new WrapAssetHelper(),
+    unwrapAsset: new UnwrapAssetHelper(),
+
+    // block
+    isBlock: new IsBlockHelper(),
+    wrapBlock: new WrapBlockHelper(),
+    unwrapBlock: new UnwrapBlockHelper(),
+
     // class
     createClass: (options) => new CreateClassHelper(options),
+
+    // contract
+    isContract: new IsContractHelper(),
+    wrapContract: new WrapContractHelper(),
+    unwrapContract: new UnwrapContractHelper(),
 
     // common
     arrSlice: (options = {}) => new ArrSliceHelper(options),
@@ -412,9 +499,6 @@ export const createHelpers = (): Helpers => {
     getErrorClass: new GetErrorClassHelper(),
 
     equalsEqualsEquals: (options) => new EqualsEqualsEqualsHelper(options),
-    equalsEqualsEqualsNumber: new EqualsEqualsEqualsNumberHelper(),
-    equalsEqualsEqualsSameType: new EqualsEqualsEqualsSameTypeHelper(),
-    equalsEqualsEqualsUnknown: new EqualsEqualsEqualsUnknownHelper(),
     equalsEquals: (options) => new EqualsEqualsHelper(options),
     lessThan: (options) => new LessThanHelper(options),
     processStatements: (options) => new ProcessStatementsHelper(options),
@@ -434,7 +518,7 @@ export const createHelpers = (): Helpers => {
     invokeCall: memoized(InvokeCallHelper),
     invokeConstruct: (options?) => new InvokeConstructHelper(options),
     new: (options?) => new NewHelper(options),
-    parameters: new ParametersHelper(),
+    parameters: (options) => new ParametersHelper(options),
 
     forLoop: (options) => new ForLoopHelper(options),
     if: (options) => new IfHelper(options),
@@ -446,13 +530,13 @@ export const createHelpers = (): Helpers => {
     continue: new ContinueHelper(),
     throwCompletion: new ThrowCompletionHelper(),
     throwTypeError: new ThrowTypeErrorHelper(),
-    createBoolean: new CreateBooleanHelper(),
-    createNull: new CreateNullHelper(),
-    createNumber: new CreateNumberHelper(),
+    wrapBoolean: new WrapBooleanHelper(),
+    wrapNull: new WrapNullHelper(),
+    wrapNumber: new WrapNumberHelper(),
     createObject: new CreateObjectHelper(),
-    createString: new CreateStringHelper(),
-    createSymbol: new CreateSymbolHelper(),
-    createUndefined: new CreateUndefinedHelper(),
+    wrapString: new WrapStringHelper(),
+    wrapSymbol: new WrapSymbolHelper(),
+    wrapUndefined: new WrapUndefinedHelper(),
     isBoolean: new IsBooleanHelper(),
     isNull: new IsNullHelper(),
     isNumber: new IsNumberHelper(),
@@ -460,12 +544,11 @@ export const createHelpers = (): Helpers => {
     isString: new IsStringHelper(),
     isSymbol: new IsSymbolHelper(),
     isUndefined: new IsUndefinedHelper(),
-    isNullOrUndefined: new IsNullOrUndefinedHelper(),
-    isSameType: new IsSameTypeHelper(),
-    getBoolean: new GetBooleanHelper(),
-    getNumber: new GetNumberHelper(),
-    getString: new GetStringHelper(),
-    getSymbol: new GetSymbolHelper(),
+    isNullOrUndefined: (options) => new IsNullOrUndefinedHelper(options),
+    unwrapBoolean: new UnwrapBooleanHelper(),
+    unwrapNumber: new UnwrapNumberHelper(),
+    unwrapString: new UnwrapStringHelper(),
+    unwrapSymbol: new UnwrapSymbolHelper(),
     getObject: new GetObjectHelper(),
     toBoolean: (options) => new ToBooleanHelper(options),
     toString: (options) => new ToStringHelper(options),
@@ -495,8 +578,8 @@ export const createHelpers = (): Helpers => {
     omitObjectProperties: new OmitObjectPropertiesHelper(),
     omitPropertyObjectProperties: new OmitPropertyObjectPropertiesHelper(),
     omitSymbolObjectProperties: new OmitSymbolObjectPropertiesHelper(),
-    unwrapType: new UnwrapTypeHelper(),
-    unwrapVal: new UnwrapValHelper(),
+    wrapObject: new WrapObjectHelper(),
+    unwrapObject: new UnwrapObjectHelper(),
     instanceof: new InstanceofHelper(),
     inObjectProperty: (options) => new InObjectPropertyHelper(options),
     inPropertyObjectProperty: new InPropertyObjectPropertyHelper(),
@@ -505,8 +588,27 @@ export const createHelpers = (): Helpers => {
     findObjectProperty: (options) => new FindObjectPropertyHelper(options),
     findObjectPropertyBase: (options) => new FindObjectPropertyHelperBase(options),
 
-    forBuiltinType: (options) => new ForBuiltinTypeHelper(options),
+    // header
+    isHeader: new IsHeaderHelper(),
+    wrapHeader: new WrapHeaderHelper(),
+    unwrapHeader: new UnwrapHeaderHelper(),
 
+    // map
+    getMapClass: new GetMapClassHelper(),
+
+    // set
+    getMapStorageClass: new GetMapStorageClassHelper(),
+    getSetStorageClass: new GetSetStorageClassHelper(),
+
+    // types
+    forBuiltinType: (options) => new ForBuiltinTypeHelper(options),
+    unwrapVal: (options) => new UnwrapValHelper(options),
+    wrapVal: (options) => new WrapValHelper(options),
+    wrapArrayVal: (options) => new WrapArrayValHelper(options),
+    unwrapValRecursive: (options) => new UnwrapValRecursiveHelper(options),
+    wrapValRecursive: (options) => new WrapValRecursiveHelper(options),
+
+    // types/array
     arrayLength: new ArrayLengthHelper(),
     createArray: new CreateArrayHelper(),
     getArrayIndex: new GetArrayIndexHelper(),
@@ -515,14 +617,33 @@ export const createHelpers = (): Helpers => {
     unwrapArray: new UnwrapArrayHelper(),
     isArray: new IsArrayHelper(),
 
-    getMapClass: new GetMapClassHelper(),
+    // types/attribute
+    wrapAttribute: new WrapAttributeHelper(),
+    unwrapAttribute: new UnwrapAttributeHelper(),
+    isAttribute: new IsAttributeHelper(),
 
+    // types/buffer
     bufferLength: new BufferLengthHelper(),
     concatBuffer: new ConcatBufferHelper(),
-    createBuffer: new CreateBufferHelper(),
+    createBuffer: new WrapBufferHelper(),
     isBuffer: new IsBufferHelper(),
     unwrapBuffer: new UnwrapBufferHelper(),
     wrapBuffer: new WrapBufferHelper(),
+
+    // types/input
+    wrapInput: new WrapInputHelper(),
+    unwrapInput: new UnwrapInputHelper(),
+    isInput: new IsInputHelper(),
+
+    // types/output
+    wrapOutput: new WrapOutputHelper(),
+    unwrapOutput: new UnwrapOutputHelper(),
+    isOutput: new IsOutputHelper(),
+
+    // types/transaction
+    wrapTransaction: new WrapTransactionHelper(),
+    unwrapTransaction: new UnwrapTransactionHelper(),
+    isTransaction: new IsTransactionHelper(),
 
     export: (options) => new ExportHelper(options),
     exportSingle: (options) => new ExportSingleHelper(options),
@@ -530,10 +651,6 @@ export const createHelpers = (): Helpers => {
     getCurrentModule: new GetCurrentModuleHelper(),
     getModules: new GetModulesHelper(),
     addEmptyModule: new AddEmptyModuleHelper(),
-
-    isBlockchainInterface: (options) => new IsBlockchainInterfaceHelper(options),
-    wrapBlockchainInterface: (options) => new WrapBlockchainInterfaceHelper(options),
-    unwrapBlockchainInterface: new UnwrapBlockchainInterfaceHelper(),
 
     createGlobalObject: new CreateGlobalObjectHelper(),
     getArgument: (options) => new GetArgumentHelper(options),
