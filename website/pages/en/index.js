@@ -10,7 +10,11 @@ const siteConfig = require(process.cwd() + '/siteConfig.js');
 class Button extends React.Component {
   render() {
     return (
-      <a className={'button buttonText ' + (this.props.className || '')} href={this.props.href} target={this.props.target}>
+      <a
+        className={'button buttonText ' + (this.props.className || '')}
+        href={this.props.href}
+        target={this.props.target}
+      >
         {this.props.children}
       </a>
     );
@@ -26,12 +30,8 @@ class GetStartedButton extends React.Component {
     return (
       <Button
         className={'heroButton ' + (this.props.className || '')}
-        href={
-          siteConfig.baseUrl +
-          'docs/' +
-          this.props.language +
-          '/installation.html'
-        }>
+        href={siteConfig.baseUrl + 'docs/' + this.props.language + '/installation.html'}
+      >
         <translate>Get Started</translate>
       </Button>
     );
@@ -45,9 +45,7 @@ class HorizontalTitleContainer extends React.Component {
         <div className={'horizontalTitleLeft headline axiformaMedium ' + (this.props.titleClassName || '')}>
           {this.props.title}
         </div>
-        <div className="horizontalTitleRight axiformaRegular">
-          {this.props.content}
-        </div>
+        <div className="horizontalTitleRight axiformaRegular">{this.props.content}</div>
       </div>
     );
   }
@@ -61,10 +59,7 @@ class Hero extends React.Component {
           <div className="tagLineContainer colContainer">
             <div className="heroContainer colContainer sectionTop">
               <div className="heroLeftInner paddingTop1">
-                <img
-                  src={siteConfig.baseUrl + 'img/tagline.svg'}
-                  alt='Wake up NEO'
-                />
+                <img src={siteConfig.baseUrl + 'img/tagline.svg'} alt="Wake up NEO" />
               </div>
             </div>
             <div className="heroContainer colContainer sectionTop">
@@ -76,18 +71,13 @@ class Hero extends React.Component {
                   <Button className="heroButton heroButtonLeft" href="#try">
                     <translate>Try It Out</translate>
                   </Button>
-                  <GetStartedButton
-                    className="heroButtonMiddle"
-                    language={this.props.language}
-                  />
-                  <Button
-                    className="heroButton heroButtonRight"
-                    href='https://github.com/neo-one-suite/neo-one'>
+                  <GetStartedButton className="heroButtonMiddle" language={this.props.language} />
+                  <Button className="heroButton heroButtonRight" href="https://github.com/neo-one-suite/neo-one">
                     GitHub
                   </Button>
                 </div>
                 <div className="githubContainer">
-                  <div className="githubButton" style={{minHeight: '20px'}}>
+                  <div className="githubButton" style={{ minHeight: '20px' }}>
                     <a
                       className="github-button"
                       href={siteConfig.repoUrl}
@@ -106,7 +96,7 @@ class Hero extends React.Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -122,26 +112,19 @@ class Intro extends React.Component {
               <div>
                 <div className="subheading axiformaRegular">
                   <translate>
-                  Choose NEO•ONE, and make coding, testing and deploying your NEO
-                  blockchain solutions easier, faster, more efficient and much more
-                  satisfying. With our painless, end-to-end, fully integrated and
-                  elevated developer experience, the world of NEO is yours.
+                    Choose NEO•ONE, and make coding, testing and deploying your NEO blockchain solutions easier, faster,
+                    more efficient and much more satisfying. With our painless, end-to-end, fully integrated and
+                    elevated developer experience, the world of NEO is yours.
                   </translate>
                 </div>
                 <div className="subheading axiformaRegular paddingTopHalf">
-                  <translate>
-                  Or… you can continue to use other NEO solutions SDKs and be none the wiser.
-                  </translate>
+                  <translate>Or… you can continue to use other NEO SDKs and be none the wiser.</translate>
                 </div>
                 <div className="subheading axiformaRegular paddingTopHalf">
-                  <translate>
-                  The choice is yours.
-                  </translate>
+                  <translate>The choice is yours.</translate>
                 </div>
                 <div className="subheadingBold axiformaSemiBold paddingTopHalf">
-                  <translate>
-                  Are you ready to kick some apps?
-                  </translate>
+                  <translate>Are you ready to kick some apps?</translate>
                 </div>
               </div>
             }
@@ -161,9 +144,8 @@ class FeaturesIntro extends React.Component {
         content={
           <div className="subheading gray1">
             <translate>
-              Our full arsenal of tools helps you overcome NEO blockchain obstacles, offering effortless
-              start up and application that lets you create, test, deploy and interact with your first
-              contract within 30 minutes.
+              Our full arsenal of tools helps you overcome NEO blockchain obstacles, offering effortless start up that
+              lets you create, test, deploy and interact with your first contract within 30 minutes.
             </translate>
           </div>
         }
@@ -178,27 +160,21 @@ class Feature extends React.Component {
       <div className="featWrapper">
         <div className="feature">
           <div className="featureImage">
-            <img
-              src={siteConfig.baseUrl + this.props.image}
-              alt={this.props.title}
-            />
+            <img src={siteConfig.baseUrl + this.props.image} alt={this.props.title} />
           </div>
           <div className="colContainer">
             <div className="featureNumber">
-              <img
-                src={siteConfig.baseUrl + this.props.number}
-                alt={this.props.index}
-              />
+              <img src={siteConfig.baseUrl + this.props.number} alt={this.props.index} />
             </div>
             <div className="featureTitle primaryLight decimaLight">
-              {this.props.title.map(
-                (value, idx) => <div key={value} className={idx === 0 ? undefined : 'featureTitleText'}>{value}</div>
-              )}
+              {this.props.title.map((value, idx) => (
+                <div key={value} className={idx === 0 ? undefined : 'featureTitleText'}>
+                  {value}
+                </div>
+              ))}
             </div>
           </div>
-          <div className="subheading gray1 paddingTop2 axiformaBook">
-            {this.props.text}
-          </div>
+          <div className="subheading gray1 paddingTop2 axiformaBook">{this.props.text}</div>
         </div>
       </div>
     );
@@ -211,10 +187,12 @@ class CallOut extends React.Component {
       <div className="featWrapper">
         <div className="feature featuresCallOut">
           <div className="headline accent axiformaMedium">
-            <translate>Cryptocurrency may be serious business, but the act of creating and working with it doesn’t have to be.</translate>
+            <translate>
+              Cryptocurrency may be serious business, but the act of creating and working with it doesn’t have to be.
+            </translate>
           </div>
           <div className="subheading gray3 paddingTop2 axiformaRegular">
-            <translate>NEO•ONE makes both coding and implementing Neo blockchain painless and fun.</translate>
+            <translate>NEO•ONE makes both coding and implementing NEO applications painless and fun.</translate>
           </div>
           <div className="paddingTop2 calloutButton">
             <GetStartedButton language={this.props.language} />
@@ -238,23 +216,45 @@ class Features extends React.Component {
               number="img/number1.svg"
               image="img/network.svg"
               title={[<translate>network</translate>, <translate>management</translate>]}
-              text={<translate>Get plugged in by instantly setting up and deploying a private network with plenty of NEO and GAS to play with.</translate>}
+              text={
+                <translate>
+                  Get plugged in by instantly setting up and deploying a private network with plenty of NEO and GAS to
+                  play with.
+                </translate>
+              }
             />
             <Feature
               language={this.props.language}
               index={2}
               number="img/number2.svg"
               image="img/smartcontract.svg"
-              title={[<translate>smart</translate>, <translate>contract</translate>, <translate>development</translate>]}
-              text={<translate>Move fluidly through programs to develop, compile and deploy smart contracts in JavaScript, Python or C# with speed and agility.</translate>}
+              title={[
+                <translate>smart</translate>,
+                <translate>contract</translate>,
+                <translate>development</translate>,
+              ]}
+              text={
+                <translate>
+                  Move fluidly through development, compilation and deployment of smart contracts in TypeScript.
+                </translate>
+              }
             />
             <Feature
               language={this.props.language}
               index={3}
               number="img/number3.svg"
               image="img/testing.svg"
-              title={[<translate>automated</translate>, <translate>contract</translate>, <translate>testing</translate>]}
-              text={<translate>Commence the training sequence and test using the NEO•ONE cli. Write JavaScript unit tests to automate testing for rapid development.</translate>}
+              title={[
+                <translate>automated</translate>,
+                <translate>contract</translate>,
+                <translate>testing</translate>,
+              ]}
+              text={
+                <translate>
+                  Commence the training sequence and test using the NEO•ONE cli. Write TypeScript unit tests to automate
+                  testing for rapid development.
+                </translate>
+              }
             />
             <Feature
               language={this.props.language}
@@ -262,7 +262,12 @@ class Features extends React.Component {
               number="img/number4.svg"
               image="img/debugging.svg"
               title={[<translate>debugging</translate>]}
-              text={<translate>Stick it to squiddies with our integrated debugger that lets you step through smart contract code just like any other programming language.</translate>}
+              text={
+                <translate>
+                  Stick it to squiddies with our integrated debugger that lets you step through smart contract code just
+                  like any other programming language.
+                </translate>
+              }
             />
             <Feature
               language={this.props.language}
@@ -270,13 +275,18 @@ class Features extends React.Component {
               number="img/number5.svg"
               image="img/client.svg"
               title={[<translate>client</translate>]}
-              text={<translate>Interact with NEO and smart contracts in a human-friendly way, with documentation that’s simple to follow and understand.</translate>}
+              text={
+                <translate>
+                  Interact with NEO and smart contracts in a human-friendly way, with documentation that’s simple to
+                  follow and understand.
+                </translate>
+              }
             />
             <CallOut language={this.props.language} />
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -292,24 +302,19 @@ class FeaturesOutro extends React.Component {
               <div>
                 <div className="subheading axiformaRegular">
                   <translate>
-                  Install NEO•ONE directly from npm and let it expand your ability to
-                  code and implement NEO blockchain solutions on Linux, Mac OS and Windows
-                  with NodeJS 8.9.0+.
+                    Install NEO•ONE directly from npm and let it expand your ability to code and implement NEO
+                    blockchain solutions on Linux, Mac OS and Windows with NodeJS 10.8.0+.
                   </translate>
                 </div>
                 <div className="install paddingTop2 paddingBottom2">
-                <div className="installCode">
-                <MarkdownBlock>{
-        `\`\`\`
+                  <div className="installCode">
+                    <MarkdownBlock>{`\`\`\`
 npm install -g @neo-one/cli
-\`\`\``
-                }</MarkdownBlock>
-                </div>
+\`\`\``}</MarkdownBlock>
+                  </div>
                 </div>
                 <div className="subheadingBold axiformaSemiBold">
-                  <translate>
-                    Success is not impossible. It’s inevitable.
-                  </translate>
+                  <translate>Success is not impossible. It’s inevitable.</translate>
                 </div>
               </div>
             }
@@ -324,25 +329,18 @@ class FeatureCallout extends React.Component {
   render() {
     const left = (
       <div className={'featureCalloutImage'}>
-        <img
-          src={siteConfig.baseUrl + this.props.image}
-          alt={this.props.title}
-        />
+        <img src={siteConfig.baseUrl + this.props.image} alt={this.props.title} />
       </div>
     );
 
     const right = (
       <div className={'featureCalloutText'}>
-        <div className="headline gray6 axiformaMedium">
-          {this.props.title}
-        </div>
-        <div className="subheading gray6 paddingTop2 axiformaRegular">
-          {this.props.description}
-        </div>
+        <div className="headline gray6 axiformaMedium">{this.props.title}</div>
+        <div className="subheading gray6 paddingTop2 axiformaRegular">{this.props.description}</div>
       </div>
     );
 
-    const className = "section " + this.props.className;
+    const className = 'section ' + this.props.className;
 
     if (this.props.ltr) {
       return (
@@ -369,10 +367,10 @@ class FeatureCallout extends React.Component {
 class Believers extends React.Component {
   render() {
     const showcase = siteConfig.users
-      .filter(user => {
+      .filter((user) => {
         return user.pinned;
       })
-      .map(user => {
+      .map((user) => {
         return (
           <a key={user.caption} href={user.infoLink}>
             <img src={user.image} title={user.caption} />
@@ -389,8 +387,8 @@ class Believers extends React.Component {
             content={
               <div className="subheading axiformaRegular">
                 <translate>
-                NEO•ONE powers decentralized apps and NEO blockchain integrations
-                for a broad range of projects. See who believes here.
+                  NEO•ONE powers decentralized apps and NEO blockchain integrations for a broad range of projects. See
+                  who believes here.
                 </translate>
               </div>
             }
@@ -417,14 +415,10 @@ class Final extends React.Component {
             title={
               <div>
                 <div>
-                  <translate>
-                  We've taken you this far.
-                  </translate>
+                  <translate>We've taken you this far.</translate>
                 </div>
                 <div>
-                  <translate>
-                  The rest is up to you.
-                  </translate>
+                  <translate>The rest is up to you.</translate>
                 </div>
               </div>
             }
@@ -432,14 +426,12 @@ class Final extends React.Component {
               <div className="finalContainer">
                 <div>
                   <div className="subheading gray1 axiformaRegular">
-                    <translate>
-                      The veil of complexity has been removed and your path is clear.
-                    </translate>
+                    <translate>The veil of complexity has been removed and your path is clear.</translate>
                   </div>
                   <div className="subheading paddingTopHalf gray1 axiformaRegular">
                     <translate>
-                      Let NEO•ONE take you to a new world of capabilities and success
-                      with NEO blockchain app development.
+                      Let NEO•ONE take you to a new world of capabilities and success with NEO blockchain app
+                      development.
                     </translate>
                   </div>
                 </div>
@@ -451,7 +443,7 @@ class Final extends React.Component {
           />
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -468,7 +460,13 @@ class Index extends React.Component {
           className="gray0BG"
           image="img/simulations.png"
           title={<translate>NEO•ONE simulations</translate>}
-          description={<translate>Learn to harness your NEO powers with tutorial simulations that interactively guide you and teach core decentralized app development concepts. Plus, pre-configured, template simulations bootstrap a decentralized app.</translate>}
+          description={
+            <translate>
+              Learn to harness your NEO powers with tutorial simulations that interactively guide you and teach core
+              decentralized app development concepts. Plus, pre-configured template simulations help bootstrap a
+              decentralized app.
+            </translate>
+          }
           ltr
           language={language}
         />
@@ -476,14 +474,25 @@ class Index extends React.Component {
           className="gray2BG"
           image="img/editors.png"
           title={<translate>Atom and VSCode integration</translate>}
-          description={<translate>Overcome obstacles with the power of the NEO•ONE cli directly in your editor. Debugger integration lets you troubleshoot and step through code within your favorite editors with ease.</translate>}
+          description={
+            <translate>
+              Overcome obstacles with the power of the NEO•ONE cli directly in your editor. Debugger integration lets
+              you troubleshoot and step through code within your favorite editors with ease.
+            </translate>
+          }
           language={language}
         />
         <FeatureCallout
           className="gray0BG"
           image="img/plugins.png"
           title={<translate>NEO•ONE plugins</translate>}
-          description={<translate>Extend the functionality and power of NEO•ONE across all worlds with plugins designed to make decentralized app development even easier. Plus, a NEO Tracker plugin extends your vision to explore private networks.</translate>}
+          description={
+            <translate>
+              Extend the functionality and power of NEO•ONE across all worlds with plugins designed to make
+              decentralized app development even easier. Plus, a NEO Tracker plugin extends your vision to explore
+              private networks.
+            </translate>
+          }
           ltr
           language={language}
         />
