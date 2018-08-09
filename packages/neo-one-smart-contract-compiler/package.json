@@ -34,6 +34,6 @@
   "devDependencies": {
     "app-root-dir": "1.0.2",
     "bignumber.js": "7.2.1",
-    "prettier": "1.14.0"
+    "prettier": "1.14.2"
   }
 }
