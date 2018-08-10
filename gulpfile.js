@@ -201,7 +201,7 @@ const transformSrcPackageJSON = (format, orig, file) => ({
 
 const transformSmartContractPackageJSON = (format, orig, file) => ({
   ...transformBasePackageJSON(format, orig, file),
-  main: 'src/index.ts',
+  main: orig.main,
 });
 
 const transformBrowserPackageJSON = (format, orig, file) => ({

@@ -16,7 +16,7 @@ export class LogAction extends ActionBase<LogAction, ActionType.Log> implements 
   public static deserializeWireBase(options: DeserializeWireBaseOptions): LogAction {
     const { reader } = options;
     const action = super.deserializeActionBaseWireBase(options);
-    const message = reader.readVarString(1024);
+    const message = reader.readVarString(10240);
 
     return new this({
       version: action.version,
@@ -43,7 +43,7 @@ export class LogAction extends ActionBase<LogAction, ActionType.Log> implements 
 
   public serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
-    writer.writeVarString(this.message);
+    writer.writeVarString(this.message, 10240);
   }
 
   public serializeJSON(context: SerializeJSONContext): LogActionJSON {
