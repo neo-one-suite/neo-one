@@ -5,5 +5,6 @@ export {
   ProcessConsoleLogOptions,
   disableConsoleLogForTest,
   enableConsoleLogForTest,
+  HWLedger,
 } from './common';
 export * from './node';
