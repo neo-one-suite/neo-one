@@ -20,7 +20,7 @@ const METADATA_NAME = 'metadata';
 const MAX_SIZE = 1_000_000_000;
 const KEEP_BACKUP_COUNT = 10;
 
-const extractTime = (prefix: string, file: File) => parseInt(file.name.slice(prefix.length).split('/')[0], 10);
+const extractTime = (prefix: string, file: File) => parseInt(file.name.slice(prefix.length).split('/')[1], 10);
 
 export class GCloudProvider extends Provider {
   private readonly environment: Environment;
