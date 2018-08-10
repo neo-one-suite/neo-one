@@ -91,8 +91,8 @@ export interface KeyStore {
   readonly accounts$: Observable<ReadonlyArray<UserAccount>>;
   readonly getAccounts: () => ReadonlyArray<UserAccount>;
   readonly selectAccount: (id?: UserAccountID, monitor?: Monitor) => Promise<void>;
-  readonly deleteAccount: (id: UserAccountID, monitor?: Monitor) => Promise<void>;
-  readonly updateAccountName: (options: UpdateAccountNameOptions) => Promise<void>;
+  readonly deleteAccount?: (id: UserAccountID, monitor?: Monitor) => Promise<void>;
+  readonly updateAccountName?: (options: UpdateAccountNameOptions) => Promise<void>;
   readonly sign: (
     options: {
       readonly account: UserAccountID;
@@ -587,11 +587,15 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }
 
   public async deleteAccount(id: UserAccountID, monitor?: Monitor): Promise<void> {
-    await this.keystore.deleteAccount(id, monitor);
+    if (this.keystore.deleteAccount !== undefined) {
+      await this.keystore.deleteAccount(id, monitor);
+    }
   }
 
   public async updateAccountName(options: UpdateAccountNameOptions): Promise<void> {
-    await this.keystore.updateAccountName(options);
+    if (this.keystore.updateAccountName !== undefined) {
+      await this.keystore.updateAccountName(options);
+    }
   }
 
   public read(network: NetworkType): DataProvider {

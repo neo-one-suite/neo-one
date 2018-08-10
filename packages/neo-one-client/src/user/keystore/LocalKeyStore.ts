@@ -387,8 +387,7 @@ export class LocalKeyStore {
 
   private getPrivateKey(id: UserAccountID): BufferString {
     const wallet = this.getWallet({
-      network: id.network,
-      address: id.address,
+      ...id,
     });
 
     if (wallet.type === 'locked') {

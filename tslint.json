@@ -16,6 +16,7 @@
       "./packages/*/src/__tests__/**/*",
       "./packages/*/src/__data__/**/*",
       "./packages/*/src/__e2e__/**/*",
+      "./packages/*/src/__ledger__tests__/**/*",
       "./packages/*/package.json"
     ]
   },
