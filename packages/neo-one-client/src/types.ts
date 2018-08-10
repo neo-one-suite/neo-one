@@ -709,6 +709,7 @@ export interface ReadSmartContract {
   readonly iterLogs: (filter?: BlockFilter) => AsyncIterable<Log>;
   readonly iterActions: (filter?: BlockFilter) => AsyncIterable<Action>;
   readonly iterStorage: () => AsyncIterable<StorageItem>;
+  readonly convertAction: (action: ActionRaw) => Action;
   // tslint:disable-next-line no-any
   readonly [key: string]: any;
 }
