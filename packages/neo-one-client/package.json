@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/client",
-  "version": "1.0.0-alpha.83",
+  "version": "1.0.0-alpha.84",
   "description": "NEO•ONE client APIs for interacting with the NEO blockchain.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.68",
-    "@neo-one/client-switch": "^1.0.0-alpha.80",
+    "@neo-one/client-core": "^1.0.0-alpha.69",
+    "@neo-one/client-switch": "^1.0.0-alpha.81",
     "@neo-one/monitor": "^1.0.0-alpha.53",
-    "@neo-one/node-neo-settings": "^1.0.0-alpha.68",
+    "@neo-one/node-neo-settings": "^1.0.0-alpha.69",
     "@neo-one/utils": "^1.0.0-alpha.58",
     "@reactivex/ix-esnext-esm": "^2.3.5",
     "bignumber.js": "^7.2.1",

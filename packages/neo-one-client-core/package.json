@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-core",
-  "version": "1.0.0-alpha.68",
+  "version": "1.0.0-alpha.69",
   "description": "NEO•ONE core types implementation.",
   "main": "./src/index.ts",
   "dependencies": {
