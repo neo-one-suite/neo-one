@@ -12,7 +12,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createCall - undefined params: client.call 1`] = `
+exports[`createSmartContract createCall - undefined params: client.__call 1`] = `
 Array [
   Array [
     "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
@@ -61,7 +61,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createCall: client.call 1`] = `
+exports[`createSmartContract createCall: client.__call 1`] = `
 Array [
   Array [
     "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
@@ -115,7 +115,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createInvoke undefined events & params: client.call 1`] = `
+exports[`createSmartContract createInvoke undefined events & params: client.__call 1`] = `
 Array [
   Array [
     "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
@@ -132,13 +132,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createInvoke undefined events & params: client.getCurrentAccount 1`] = `
-Array [
-  Array [],
-]
-`;
-
-exports[`createSmartContract createInvoke undefined events & params: client.invoke 1`] = `
+exports[`createSmartContract createInvoke undefined events & params: client.__invoke 1`] = `
 Array [
   Array [
     "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
@@ -158,6 +152,12 @@ Array [
     },
     undefined,
   ],
+]
+`;
+
+exports[`createSmartContract createInvoke undefined events & params: client.getCurrentAccount 1`] = `
+Array [
+  Array [],
 ]
 `;
 
@@ -256,7 +256,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createInvoke: client.call 1`] = `
+exports[`createSmartContract createInvoke: client.__call 1`] = `
 Array [
   Array [
     "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
@@ -273,13 +273,7 @@ Array [
 ]
 `;
 
-exports[`createSmartContract createInvoke: client.getCurrentAccount 1`] = `
-Array [
-  Array [],
-]
-`;
-
-exports[`createSmartContract createInvoke: client.invoke 1`] = `
+exports[`createSmartContract createInvoke: client.__invoke 1`] = `
 Array [
   Array [
     "0x3775292229eccdf904f16fff8e83e7cffdc0f0ce",
@@ -299,6 +293,12 @@ Array [
     },
     undefined,
   ],
+]
+`;
+
+exports[`createSmartContract createInvoke: client.getCurrentAccount 1`] = `
+Array [
+  Array [],
 ]
 `;
 

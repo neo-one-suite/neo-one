@@ -2,7 +2,6 @@ import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { UnknownNetworkError } from '../../errors';
-import * as networkConfigs from '../../networks';
 import {
   AddressString,
   GetOptions,
@@ -28,32 +27,12 @@ export class NEOONEProvider {
   private readonly networksInternal$: BehaviorSubject<ReadonlyArray<NetworkType>>;
   private readonly mutableProviders: { [K in string]?: NEOONEDataProvider };
 
-  public constructor(
-    input: {
-      readonly mainRPCURL?: string;
-      readonly testRPCURL?: string;
-      readonly options?: ReadonlyArray<NEOONEProviderOptions>;
-    } = {},
-  ) {
-    const { mainRPCURL = networkConfigs.MAIN_URL, testRPCURL = networkConfigs.TEST_URL, options = [] } = input;
+  public constructor(options: ReadonlyArray<NEOONEProviderOptions> = []) {
     this.networksInternal$ = new BehaviorSubject([] as ReadonlyArray<NetworkType>);
     this.networks$ = this.networksInternal$;
     this.mutableProviders = {};
 
-    // tslint:disable-next-line no-let
-    let hasMain = false;
-    // tslint:disable-next-line no-let
-    let hasTest = false;
-    // tslint:disable-next-line no-let
-    let networks = options.map(({ network, rpcURL }) => {
-      if (network === networkConfigs.MAIN) {
-        hasMain = true;
-      }
-
-      if (network === networkConfigs.TEST) {
-        hasTest = true;
-      }
-
+    const networks = options.map(({ network, rpcURL }) => {
       this.mutableProviders[network] = new NEOONEDataProvider({
         network,
         rpcURL,
@@ -61,24 +40,6 @@ export class NEOONEProvider {
 
       return network;
     });
-
-    if (!hasMain) {
-      this.mutableProviders.main = new NEOONEDataProvider({
-        network: networkConfigs.MAIN,
-        rpcURL: mainRPCURL,
-      });
-
-      networks = networks.concat([networkConfigs.MAIN]);
-    }
-
-    if (!hasTest) {
-      this.mutableProviders.test = new NEOONEDataProvider({
-        network: networkConfigs.TEST,
-        rpcURL: testRPCURL,
-      });
-
-      networks = networks.concat([networkConfigs.TEST]);
-    }
 
     this.networksInternal$.next(networks);
   }

@@ -310,13 +310,13 @@ describe('Client', () => {
     },
 
     {
-      method: 'invoke',
+      method: '__invoke',
       args: ['0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9', 1, 2, 3, true],
       providerMethod: 'invoke',
     },
 
     {
-      method: 'call',
+      method: '__call',
       args: ['0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9', 1, 2],
       providerMethod: 'call',
     },

@@ -1,20 +1,5 @@
 import { CustomError } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import { ContractParameter, ContractParameterType } from './types';
-
-export class InvalidContractParameterError extends CustomError {
-  public readonly parameter: ContractParameter;
-  public readonly expected: ReadonlyArray<ContractParameterType>;
-  public readonly code: string;
-
-  public constructor(parameter: ContractParameter, expected: ReadonlyArray<ContractParameterType>) {
-    super(`Expected one of ${JSON.stringify(expected)} ` + `ContractParameterTypes, found ${parameter.type}`);
-
-    this.parameter = parameter;
-    this.expected = expected;
-    this.code = 'INVALID_CONTRACT_PARAMETER';
-  }
-}
 
 export class InvalidArgumentError extends CustomError {
   public readonly code: string;

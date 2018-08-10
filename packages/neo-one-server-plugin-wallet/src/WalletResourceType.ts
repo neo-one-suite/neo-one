@@ -3,7 +3,7 @@ import {
   LocalKeyStore,
   LocalStringStore,
   LocalUserAccountProvider,
-  provider,
+  NEOONEProvider,
   UserAccountID,
 } from '@neo-one/client';
 import {
@@ -19,6 +19,7 @@ import * as fs from 'fs-extra';
 import _ from 'lodash';
 import * as path from 'path';
 import { AsyncNodeStorage } from 'redux-persist-node-storage';
+import { constants } from './constants';
 import {
   CreateWalletCRUD,
   DeleteWalletCRUD,
@@ -92,7 +93,7 @@ export class WalletResourceType extends ResourceType<Wallet, WalletResourceOptio
           }),
         }),
 
-        provider: provider(),
+        provider: new NEOONEProvider([{ network: 'main', rpcURL: constants.MAIN_URL }]),
       }),
     });
 

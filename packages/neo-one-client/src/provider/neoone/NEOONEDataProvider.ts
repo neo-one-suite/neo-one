@@ -1,25 +1,23 @@
 import {
   AccountJSON,
-  ActionJSON,
   AssetJSON,
   AttributeJSON,
   BlockJSON,
-  CallReceiptJSON,
   common,
   ContractJSON,
-  ContractParameterJSON,
+  convertAction,
+  convertCallReceipt,
+  convertInvocationResult,
   InvocationDataJSON,
-  InvocationResultJSON,
   InvocationTransaction as CoreInvocationTransaction,
   InvocationTransactionJSON,
   JSONHelper,
   NetworkSettingsJSON,
   OutputJSON,
-  Param as ScriptBuilderParam,
+  ScriptBuilderParam,
   TransactionJSON,
   utils,
   ValidatorJSON,
-  VMState,
 } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
@@ -27,7 +25,6 @@ import { AsyncIterableX } from '@reactivex/ix-esnext-esm/asynciterable/asynciter
 import { flatMap } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatmap';
 import { flatten } from '@reactivex/ix-esnext-esm/asynciterable/pipe/flatten';
 import BigNumber from 'bignumber.js';
-import { BN } from 'bn.js';
 import _ from 'lodash';
 import { AsyncBlockIterator } from '../../AsyncBlockIterator';
 import {
@@ -41,7 +38,6 @@ import {
   BufferString,
   ConfirmedTransaction,
   Contract,
-  ContractParameter,
   DataProvider,
   DeveloperProvider,
   GetOptions,
@@ -55,7 +51,6 @@ import {
   Peer,
   RawCallReceipt,
   RawInvocationData,
-  RawInvocationResult,
   StorageItem,
   Transaction,
   TransactionBase,
@@ -178,7 +173,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
   public async testInvoke(transaction: string, monitor?: Monitor): Promise<RawCallReceipt> {
     const receipt = await this.mutableClient.testInvocation(transaction, monitor);
 
-    return this.convertCallReceipt(receipt);
+    return convertCallReceipt(receipt);
   }
 
   public async getAccount(address: AddressString, monitor?: Monitor): Promise<Account> {
@@ -339,22 +334,6 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
 
   public async reset(monitor?: Monitor): Promise<void> {
     return this.mutableClient.reset(monitor);
-  }
-
-  private convertCallReceipt(receipt: CallReceiptJSON): RawCallReceipt {
-    return {
-      result: this.convertInvocationResult(receipt.result),
-      actions: receipt.actions.map((action, idx) =>
-        this.convertAction(
-          '0x​​​​​0000000000000000000000000000000000000000000000000000000000000000​​​​​',
-          0,
-          '0x​​​​​0000000000000000000000000000000000000000000000000000000000000000​​​​​',
-          0,
-          idx,
-          action,
-        ),
-      ),
-    };
   }
 
   private convertBlock(block: BlockJSON): Block {
@@ -564,7 +543,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     transactionIndex: number,
   ): RawInvocationData {
     return {
-      result: this.convertInvocationResult(data.result),
+      result: convertInvocationResult(data.result),
       asset: data.asset === undefined ? data.asset : this.convertAsset(data.asset),
       contracts: data.contracts.map((contract) => this.convertContract(contract)),
 
@@ -572,51 +551,9 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
       migratedContractHashes: data.migratedContractHashes,
       voteUpdates: data.voteUpdates,
       actions: data.actions.map((action, idx) =>
-        this.convertAction(blockHash, blockIndex, transactionHash, transactionIndex, idx, action),
+        convertAction(blockHash, blockIndex, transactionHash, transactionIndex, idx, action),
       ),
     };
-  }
-
-  private convertInvocationResult(result: InvocationResultJSON): RawInvocationResult {
-    if (result.state === VMState.Fault) {
-      return {
-        state: 'FAULT',
-        gasConsumed: new BigNumber(result.gas_consumed),
-        gasCost: new BigNumber(result.gas_cost),
-        stack: this.convertContractParameters(result.stack),
-        message: result.message,
-      };
-    }
-
-    return {
-      state: 'HALT',
-      gasConsumed: new BigNumber(result.gas_consumed),
-      gasCost: new BigNumber(result.gas_cost),
-      stack: this.convertContractParameters(result.stack),
-    };
-  }
-
-  private convertContractParameters(
-    parameters: ReadonlyArray<ContractParameterJSON>,
-  ): ReadonlyArray<ContractParameter> {
-    return parameters.map((parameter) => this.convertContractParameter(parameter));
-  }
-
-  private convertContractParameter(parameter: ContractParameterJSON): ContractParameter {
-    if (parameter.type === 'Integer') {
-      return {
-        type: 'Integer',
-        value: new BN(parameter.value, 10),
-      };
-    }
-    if (parameter.type === 'Array') {
-      return {
-        type: 'Array',
-        value: this.convertContractParameters(parameter.value),
-      };
-    }
-
-    return parameter;
   }
 
   private convertValidator(validator: ValidatorJSON): Validator {
@@ -625,43 +562,6 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
       publicKey: validator.publicKey,
       registered: validator.registered,
       votes: new BigNumber(validator.votes),
-    };
-  }
-
-  private convertAction(
-    blockHash: string,
-    blockIndex: number,
-    transactionHash: string,
-    transactionIndex: number,
-    index: number,
-    action: ActionJSON,
-  ): ActionRaw {
-    if (action.type === 'Log') {
-      return {
-        type: 'Log',
-        version: action.version,
-        blockIndex,
-        blockHash,
-        transactionIndex,
-        transactionHash,
-        index,
-        globalIndex: JSONHelper.readUInt64(action.index),
-        scriptHash: action.scriptHash,
-        message: action.message,
-      };
-    }
-
-    return {
-      type: 'Notification',
-      version: action.version,
-      blockIndex,
-      blockHash,
-      transactionIndex,
-      transactionHash,
-      index,
-      globalIndex: JSONHelper.readUInt64(action.index),
-      scriptHash: action.scriptHash,
-      args: this.convertContractParameters(action.args),
     };
   }
 

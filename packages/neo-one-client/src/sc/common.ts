@@ -1,5 +1,5 @@
-import { Param as ScriptBuilderParam } from '@neo-one/client-core';
-import { processError } from '@neo-one/client-switch';
+import { contractParameters, converters, ScriptBuilderParam } from '@neo-one/client-core';
+import { processActionsAndMessage } from '@neo-one/client-switch';
 import _ from 'lodash';
 import { RawSourceMap } from 'source-map';
 import { InvalidArgumentError, InvalidEventError, InvocationCallError } from '../errors';
@@ -15,8 +15,6 @@ import {
   Param,
   RawInvocationResult,
 } from '../types';
-import { extractErrorTrace } from '../utils';
-import { contractParameters, converters } from './parameters';
 import { params as paramCheckers } from './params';
 
 export const convertParameter = ({
@@ -108,8 +106,8 @@ export const convertInvocationResult = async ({
 }): Promise<InvocationResult<Param | undefined>> => {
   const { gasConsumed, gasCost } = result;
   if (result.state === 'FAULT') {
-    const message = await processError({
-      ...extractErrorTrace(actions),
+    const message = await processActionsAndMessage({
+      actions,
       message: result.message,
       sourceMap,
     });
@@ -147,8 +145,13 @@ export const convertCallResult = async ({
   readonly sourceMap?: RawSourceMap;
 }): Promise<Param | undefined> => {
   if (result.state === 'FAULT') {
-    const errorMessage = await processError({ ...extractErrorTrace(actions), message: result.message, sourceMap });
-    throw new InvocationCallError(errorMessage);
+    const message = await processActionsAndMessage({
+      actions,
+      message: result.message,
+      sourceMap,
+    });
+
+    throw new InvocationCallError(message);
   }
 
   const contractParameter = result.stack[0];

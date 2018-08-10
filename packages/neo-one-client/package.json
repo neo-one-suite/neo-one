@@ -8,7 +8,6 @@
     "@neo-one/client-switch": "^1.0.0-alpha.79",
     "@neo-one/monitor": "^1.0.0-alpha.52",
     "@neo-one/node-neo-settings": "^1.0.0-alpha.67",
-    "@neo-one/node-vm": "^1.0.0-alpha.69",
     "@neo-one/utils": "^1.0.0-alpha.57",
     "@reactivex/ix-esnext-esm": "^2.3.5",
     "bignumber.js": "^7.2.1",

@@ -1,4 +1,4 @@
-import { Param as ScriptBuilderParam } from '@neo-one/client-core';
+import { ScriptBuilderParam } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { RawSourceMap } from 'source-map';
 import * as argAssertions from './args';
@@ -125,7 +125,7 @@ export class Client<
   }
 
   // internal
-  public async invoke(
+  public async __invoke(
     contract: Hash160String,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
@@ -140,7 +140,7 @@ export class Client<
     return this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMap);
   }
 
-  public async call(
+  public async __call(
     contract: Hash160String,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,

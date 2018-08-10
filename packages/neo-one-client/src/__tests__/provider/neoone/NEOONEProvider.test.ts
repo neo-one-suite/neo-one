@@ -3,34 +3,30 @@ import { UnknownNetworkError } from '../../../errors';
 import * as networkConfigs from '../../../networks';
 import { NEOONEProvider } from '../../../provider/neoone/NEOONEProvider';
 
+const MAIN_URL = 'https://neotracker.io/rpc';
+
 describe('NEOONEProvider', () => {
   const network = 'net';
   const expected = '0';
-  const mainRPCURL = 'foo';
-  const testRPCURL = 'bar';
   const options = [{ network, rpcURL: 'rpc' }];
 
-  let provider = new NEOONEProvider({ mainRPCURL, testRPCURL, options });
+  let provider = new NEOONEProvider(options);
   beforeEach(() => {
-    provider = new NEOONEProvider({ mainRPCURL, testRPCURL, options });
+    provider = new NEOONEProvider(options);
   });
 
   test('NEOONEProvider constructor with no options', async () => {
     const testProvider = new NEOONEProvider();
     const result = await testProvider.getNetworks();
-    expect(result).toEqual(['main', 'test']);
+    expect(result).toEqual([]);
   });
 
   test('NEOONEProvider constructor with main & test', async () => {
-    const testOptions = [
-      { network: networkConfigs.MAIN, rpcURL: networkConfigs.MAIN_URL },
-      { network: networkConfigs.TEST, rpcURL: networkConfigs.TEST_URL },
-    ];
+    const testOptions = [{ network: networkConfigs.MAIN, rpcURL: MAIN_URL }];
 
     const testExpected = testOptions.map((option) => option.network);
 
-    // @ts-ignore
-    const testProvider = new NEOONEProvider({ options: testOptions });
+    const testProvider = new NEOONEProvider(testOptions);
     const result = await testProvider.getNetworks();
     expect(result).toEqual(testExpected);
   });
@@ -48,14 +44,18 @@ describe('NEOONEProvider', () => {
     provider.addNetwork({ network: newNetwork, rpcURL: 'rpc' });
 
     const result = await provider.getNetworks();
-    expect(result).toEqual([network, 'main', 'test', newNetwork]);
+    expect(result).toEqual([network, newNetwork]);
   });
 
   test('addNetwork existing network', async () => {
     provider.addNetwork({ network, rpcURL: 'rpc' });
 
     const result = await provider.getNetworks();
-    expect(result).toEqual(['main', 'test', network]);
+    expect(result).toEqual([network]);
+
+    provider.addNetwork({ network, rpcURL: 'rpc' });
+    const newResult = await provider.getNetworks();
+    expect(newResult).toEqual([network]);
   });
 
   test('read', () => {

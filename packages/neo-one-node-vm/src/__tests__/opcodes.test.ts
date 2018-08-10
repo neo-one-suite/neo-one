@@ -6,7 +6,7 @@ import {
   ContractPropertyState,
   crypto,
   OpCode,
-  Param,
+  ScriptBuilderParam,
   ScriptBuilder,
   ScriptContainerType,
   Transaction,
@@ -47,8 +47,8 @@ interface TestCase extends Op {
   readonly result: ReadonlyArray<StackItem>;
   readonly resultAlt?: ReadonlyArray<StackItem>;
   readonly gas: BN;
-  readonly args?: ReadonlyArray<Param | undefined>;
-  readonly argsAlt?: ReadonlyArray<Param | undefined>;
+  readonly args?: ReadonlyArray<ScriptBuilderParam | undefined>;
+  readonly argsAlt?: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly stackItems?: ReadonlyArray<StackItem>;
   readonly ref?: StackItem;
   // tslint:disable-next-line no-any

@@ -8,9 +8,7 @@ describe('bootstrap with rpc', () => {
       `bootstrap --rpc ${rpcURL} --testing-only --reset`;
 
     const getInfo = async ({ network, rpcURL }: { rpcURL: string; network: string }) => {
-      const provider = new NEOONEProvider({
-        options: [{ network, rpcURL }],
-      }).read(network);
+      const provider = new NEOONEProvider([{ network, rpcURL }]).read(network);
 
       const mutableAssets: { [hash: string]: Asset } = {};
       const getAsset = async (assetHash: string) => {

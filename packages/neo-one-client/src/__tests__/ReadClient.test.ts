@@ -101,13 +101,13 @@ describe('ReadClient', () => {
     },
 
     {
-      method: 'iterActionsRaw',
+      method: '__iterActionsRaw',
       asserts: ['assertBlockFilter'],
       args: [dummyArg],
     },
 
     {
-      method: 'call',
+      method: '__call',
       asserts: [],
       args: [dummyArg, dummyArg.toString(), [dummyArg]],
     },
@@ -117,7 +117,7 @@ describe('ReadClient', () => {
     const { method, asserts, args } = testCase;
     let providerMethod = method;
     if (method.charAt(0) === '_') {
-      providerMethod = method.slice(1);
+      providerMethod = method.slice(2);
     }
 
     test(method, async () => {

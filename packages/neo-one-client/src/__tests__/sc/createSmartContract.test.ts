@@ -67,7 +67,7 @@ describe('createSmartContract', () => {
     // @ts-ignore
     common.convertParams = jest.fn(() => params);
     // @ts-ignore
-    client.call = jest.fn(() => Promise.resolve({ result: {}, actions: [] }));
+    client.__call = jest.fn(() => Promise.resolve({ result: {}, actions: [] }));
     // @ts-ignore
     common.convertCallResult = jest.fn(() => expected);
 
@@ -93,7 +93,7 @@ describe('createSmartContract', () => {
     // @ts-ignore
     common.convertParams = jest.fn(() => params);
     // @ts-ignore
-    client.call = jest.fn(() => Promise.resolve({ result: {}, actions: [] }));
+    client.__call = jest.fn(() => Promise.resolve({ result: {}, actions: [] }));
     // @ts-ignore
     common.convertCallResult = jest.fn(() => expected);
 
@@ -151,7 +151,7 @@ describe('createSmartContract', () => {
       .mockReturnValueOnce(action1)
       .mockReturnValueOnce(action2);
     // @ts-ignore
-    client.invoke = jest.fn(() => Promise.resolve(invokeResult));
+    client.__invoke = jest.fn(() => Promise.resolve(invokeResult));
 
     const smartContract = createSmartContract({ definition, client });
 
@@ -214,7 +214,7 @@ describe('createSmartContract', () => {
       .mockReturnValueOnce(action1)
       .mockReturnValueOnce(action2);
     // @ts-ignore
-    client.invoke = jest.fn(() => Promise.resolve(invokeResult));
+    client.__invoke = jest.fn(() => Promise.resolve(invokeResult));
 
     const smartContract = createSmartContract({ definition, client });
 

@@ -1,9 +1,9 @@
 import { NEP5 } from '../abi';
-import { testReadClient } from '../preconfigured';
+import { createReadClient } from '../preconfigured';
 
 describe('abi', () => {
   test('NEP5', async () => {
-    const client = testReadClient();
+    const client = createReadClient();
     const hash = '0x3775292229eccdf904f16fff8e83e7cffdc0f0ce';
     const decimalsFunction = {
       name: 'decimals',

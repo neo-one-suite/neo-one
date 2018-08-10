@@ -33,4 +33,5 @@ export const constants = {
 
     return { network, name: baseName };
   },
+  MAIN_URL: 'https://neotracker.io/rpc',
 };

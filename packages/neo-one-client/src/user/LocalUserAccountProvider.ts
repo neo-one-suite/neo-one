@@ -3,6 +3,7 @@ import {
   assertContractParameterTypeJSON,
   Attribute as AttributeModel,
   AttributeUsage,
+  bigNumberToBN,
   ClaimTransaction,
   common,
   Contract as ContractModel,
@@ -12,8 +13,8 @@ import {
   InvocationTransaction as InvocationTransactionModel,
   IssueTransaction,
   Output as OutputModel,
-  Param as ScriptBuilderParam,
   ScriptBuilder,
+  ScriptBuilderParam,
   toAssetType,
   toContractParameterType,
   Transaction as TransactionModel,
@@ -21,7 +22,7 @@ import {
   utils,
   Witness as WitnessModel,
 } from '@neo-one/client-core';
-import { processError } from '@neo-one/client-switch';
+import { processActionsAndMessage } from '@neo-one/client-switch';
 import { Counter, Histogram, Labels, metrics, Monitor } from '@neo-one/monitor';
 import { labels as labelNames, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -383,7 +384,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       'Neo.Asset.Create',
       toAssetType(assertAssetTypeJSON(asset.assetType)),
       asset.name,
-      clientUtils.bigNumberToBN(asset.amount, 8),
+      bigNumberToBN(asset.amount, 8),
       asset.precision,
       common.stringToECPoint(asset.owner),
       common.stringToUInt160(addressToScriptHash(asset.admin)),
@@ -538,26 +539,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     });
   }
 
-  public async execute(
-    script: BufferString,
-    options?: InvokeTransactionOptions,
-    sourceMap?: RawSourceMap,
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    return this.invokeRaw({
-      script: Buffer.from(script, 'hex'),
-      options,
-      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
-        blockIndex: receipt.blockIndex,
-        blockHash: receipt.blockHash,
-        transactionIndex: receipt.transactionIndex,
-        result: data.result,
-        actions: data.actions,
-      }),
-      method: 'execute',
-      sourceMap,
-    });
-  }
-
   public async call(
     contract: Hash160String,
     method: string,
@@ -615,6 +596,26 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
   public read(network: NetworkType): DataProvider {
     return this.provider.read(network);
+  }
+
+  public async __execute(
+    script: BufferString,
+    options?: InvokeTransactionOptions,
+    sourceMap?: RawSourceMap,
+  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+    return this.invokeRaw({
+      script: Buffer.from(script, 'hex'),
+      options,
+      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
+        blockIndex: receipt.blockIndex,
+        blockHash: receipt.blockHash,
+        transactionIndex: receipt.transactionIndex,
+        result: data.result,
+        actions: data.actions,
+      }),
+      method: 'execute',
+      sourceMap,
+    });
   }
 
   private getTransactionOptions(options: TransactionOptions | InvokeTransactionOptions = {}): TransactionOptionsFull {
@@ -714,16 +715,12 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         );
 
         if (callReceipt.result.state === 'FAULT') {
-          const [message, logs] = await Promise.all([
-            processError({
-              ...clientUtils.extractErrorTrace(callReceipt.actions),
-              message: callReceipt.result.message,
-              sourceMap,
-            }),
-            sourceMap === undefined ? [] : clientUtils.createConsoleLogMessages(callReceipt.actions, sourceMap),
-          ]);
-          const logMessage = logs.length === 0 ? '' : `\n${logs.join('\n\n')}`;
-          throw new InvokeError(`${message}${logMessage}\n`);
+          const message = await processActionsAndMessage({
+            actions: callReceipt.actions,
+            message: callReceipt.result.message,
+            sourceMap,
+          });
+          throw new InvokeError(message);
         }
 
         const gas = callReceipt.result.gasConsumed.integerValue(BigNumber.ROUND_UP);
@@ -739,7 +736,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           inputs: this.convertInputs(inputs),
           outputs: this.convertOutputs(outputs),
           attributes: this.convertAttributes(attributes),
-          gas: clientUtils.bigNumberToBN(gas, 8),
+          gas: bigNumberToBN(gas, 8),
           script,
           scripts,
         });
@@ -947,10 +944,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           updatedOutputs: acc.updatedOutputs.concat([
             output.clone({
               value: output.value.add(
-                clientUtils.bigNumberToBN(
-                  tempIns.reduce((left, right) => left.plus(right.value), new BigNumber('0')),
-                  8,
-                ),
+                bigNumberToBN(tempIns.reduce((left, right) => left.plus(right.value), new BigNumber('0')), 8),
               ),
             }),
           ]),

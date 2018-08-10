@@ -1,23 +1,9 @@
-import { RawSourceMap } from 'source-map';
-import { ClientBase } from './ClientBase';
-import {
-  BufferString,
-  DeveloperProvider,
-  InvocationTransaction,
-  InvokeTransactionOptions,
-  Options,
-  RawInvokeReceipt,
-  UserAccountProvider,
-} from './types';
+import { DeveloperProvider, Options } from './types';
 
-export class DeveloperClient<
-  // tslint:disable-next-line no-any
-  TUserAccountProviders extends { readonly [K in string]: UserAccountProvider } = any
-> extends ClientBase<TUserAccountProviders> {
+export class DeveloperClient {
   private readonly developerProvider: DeveloperProvider;
 
-  public constructor(developerProvider: DeveloperProvider, providersIn: TUserAccountProviders) {
-    super(providersIn);
+  public constructor(developerProvider: DeveloperProvider) {
     this.developerProvider = developerProvider;
   }
 
@@ -39,20 +25,5 @@ export class DeveloperClient<
 
   public async reset(): Promise<void> {
     await this.developerProvider.reset();
-  }
-
-  public async execute(
-    script: BufferString,
-    options?: InvokeTransactionOptions,
-    sourceMap?: RawSourceMap,
-  ): Promise<{ readonly receipt: RawInvokeReceipt; readonly transaction: InvocationTransaction }> {
-    const result = await this.getProvider(options).execute(script, options, sourceMap);
-
-    const [invokeReceipt] = await Promise.all([
-      result.confirmed({ timeoutMS: 5000 }),
-      this.developerProvider.runConsensusNow(),
-    ]);
-
-    return { receipt: invokeReceipt, transaction: result.transaction };
   }
 }

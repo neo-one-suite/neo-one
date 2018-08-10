@@ -1,57 +1,22 @@
-import * as networks from './networks';
-import { NEOONEDataProvider, NEOONEProvider, NEOONEProviderOptions } from './provider';
+import { Client } from './Client';
+import { NEOONEDataProvider, NEOONEProvider } from './provider';
 import { ReadClient } from './ReadClient';
-import { NetworkType } from './types';
+import { LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider } from './user';
 
-export const provider = (
-  options: {
-    readonly mainRPCURL?: string;
-    readonly testRPCURL?: string;
-    readonly options?: ReadonlyArray<NEOONEProviderOptions>;
-  } = {},
-) => new NEOONEProvider(options);
+const MAIN_URL = 'https://neotracker.io/rpc';
 
-export const mainReadClient = (
-  options: { readonly rpcURL?: string; readonly iterBlocksFetchTimeoutMS?: number } = {},
-) => {
-  const { rpcURL = networks.MAIN_URL, iterBlocksFetchTimeoutMS } = options;
-
-  return new ReadClient(
-    new NEOONEDataProvider({
-      network: networks.MAIN,
-      rpcURL,
-      iterBlocksFetchTimeoutMS,
-    }),
-  );
-};
-
-export const testReadClient = (
-  options: { readonly rpcURL?: string; readonly iterBlocksFetchTimeoutMS?: number } = {},
-) => {
-  const { rpcURL = networks.TEST_URL, iterBlocksFetchTimeoutMS } = options;
-
-  return new ReadClient(
-    new NEOONEDataProvider({
-      network: networks.TEST,
-      rpcURL,
-      iterBlocksFetchTimeoutMS,
-    }),
-  );
-};
-
-export const createReadClient = ({
-  network,
-  rpcURL,
-  iterBlocksFetchTimeoutMS,
-}: {
-  readonly network: NetworkType;
-  readonly rpcURL: string;
-  readonly iterBlocksFetchTimeoutMS?: number;
-}) =>
+export const createReadClient = () =>
   new ReadClient(
     new NEOONEDataProvider({
-      network,
-      rpcURL,
-      iterBlocksFetchTimeoutMS,
+      network: 'main',
+      rpcURL: MAIN_URL,
     }),
   );
+
+export const createClient = () =>
+  new Client({
+    memory: new LocalUserAccountProvider({
+      keystore: new LocalKeyStore({ store: new LocalMemoryStore() }),
+      provider: new NEOONEProvider([{ network: 'main', rpcURL: MAIN_URL }]),
+    }),
+  });

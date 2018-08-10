@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { bigNumberToBN } from '@neo-one/client-core';
+import { bigNumberToBN } from '../client';
 
 export const contracts = {
   Signature: {

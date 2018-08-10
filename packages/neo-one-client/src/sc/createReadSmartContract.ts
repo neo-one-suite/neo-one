@@ -1,4 +1,4 @@
-import { Param as ScriptBuilderParam } from '@neo-one/client-core';
+import { ScriptBuilderParam } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { AsyncIterableX } from '@reactivex/ix-esnext-esm/asynciterable/asynciterablex';
 import { filter } from '@reactivex/ix-esnext-esm/asynciterable/pipe/filter';
@@ -66,7 +66,7 @@ const createCall = ({
     params: args,
   });
 
-  const receipt = await client.call(hash, name, params, monitor);
+  const receipt = await client.__call(hash, name, params, monitor);
 
   return common.convertCallResult({ returnType, result: receipt.result, actions: receipt.actions, sourceMap });
 };
@@ -92,7 +92,7 @@ export const createReadSmartContract = ({
 
   const iterActionsRaw = (blockFilter: BlockFilter = {}): AsyncIterable<ActionRaw> =>
     // tslint:disable-next-line possible-timing-attack
-    AsyncIterableX.from(client.iterActionsRaw(blockFilter)).pipe(filter((action) => action.scriptHash === hash));
+    AsyncIterableX.from(client.__iterActionsRaw(blockFilter)).pipe(filter((action) => action.scriptHash === hash));
 
   const convertAction = (action: ActionRaw): Action => common.convertAction({ action, events });
 
@@ -134,12 +134,10 @@ export const createReadSmartContract = ({
           }
         : acc,
     {
-      iterActionsRaw,
       iterActions,
       iterEvents,
       iterLogs,
       iterStorage,
-      convertAction,
     },
   );
 };

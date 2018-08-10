@@ -119,6 +119,7 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
 
     return [...new Set(providers.reduce((acc: NetworkType[], provider) => acc.concat(provider.getNetworks()), []))];
   }
+
   protected getProvider(options: TransactionOptions | InvokeTransactionOptions = {}): UserAccountProvider {
     const { from } = options;
     if (from === undefined) {

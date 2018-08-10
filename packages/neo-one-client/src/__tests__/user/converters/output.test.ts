@@ -1,15 +1,14 @@
-import { common, crypto } from '@neo-one/client-core';
+import { common, crypto, bigNumberToBN } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { keys, transactions } from '../../../__data__';
 import { output } from '../../../user/converters/output';
-import * as clientUtils from '../../../utils';
 
 const { address } = keys[0];
 
 const assetHash = transactions.register.hashHex;
 
 const value = new BigNumber('10');
-const expectedValue = clientUtils.bigNumberToBN(value, 8);
+const expectedValue = bigNumberToBN(value, 8);
 
 describe('output', () => {
   test('convert to output - undefined addressVersion', () => {

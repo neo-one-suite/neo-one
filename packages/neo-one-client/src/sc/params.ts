@@ -1,4 +1,4 @@
-import { common, Param as ScriptBuilderParam } from '@neo-one/client-core';
+import { bigNumberToBN, common, ScriptBuilderParam } from '@neo-one/client-core';
 import * as args from '../args';
 import { InvalidArgumentError } from '../errors';
 import {
@@ -15,7 +15,6 @@ import {
   StringABI,
   VoidABI,
 } from '../types';
-import * as utils from '../utils';
 
 export const params = {
   String: (param: Param | undefined, _parameter: StringABI): ScriptBuilderParam | undefined =>
@@ -26,10 +25,10 @@ export const params = {
     common.stringToUInt256(args.assertHash256(param)),
   PublicKey: (param: Param | undefined, _parameter: PublicKeyABI): ScriptBuilderParam | undefined =>
     common.stringToECPoint(args.assertPublicKey(param)),
-  Integer: (param: Param | undefined, _parameter: IntegerABI): ScriptBuilderParam | undefined => {
+  Integer: (param: Param | undefined, parameter: IntegerABI): ScriptBuilderParam | undefined => {
     const value = args.assertBigNumber(param);
 
-    return utils.bigNumberToBN(value, _parameter.decimals);
+    return bigNumberToBN(value, parameter.decimals);
   },
   Boolean: (param: Param | undefined, _parameter: BooleanABI): ScriptBuilderParam | undefined =>
     args.assertBoolean(param),

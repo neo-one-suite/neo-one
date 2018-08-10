@@ -1,6 +1,4 @@
-import { networks, NetworkType as ClientNetworkType } from '@neo-one/client';
 import { PluginManager } from '@neo-one/server-plugin';
-import { constants as networkConstants } from '@neo-one/server-plugin-network';
 import { take } from 'rxjs/operators';
 import { constants } from './constants';
 import { WalletRequiredError } from './errors';
@@ -8,17 +6,7 @@ import { MasterWalletResourceAdapter } from './MasterWalletResourceAdapter';
 import { WalletClient } from './types';
 import { Wallet } from './WalletResourceType';
 
-export const getClientNetworkType = (networkName: string): ClientNetworkType => {
-  if (networkName === networkConstants.NETWORK_NAME.MAIN) {
-    return networks.MAIN;
-  }
-  if (networkName === networkConstants.NETWORK_NAME.TEST) {
-    return networks.TEST;
-  }
-
-  return networkName;
-};
-
+// tslint:disable-next-line export-name
 export const getWallet = async ({
   pluginManager,
   walletName,

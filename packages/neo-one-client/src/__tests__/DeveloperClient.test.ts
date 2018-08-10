@@ -1,33 +1,16 @@
 import { DeveloperClient } from '../DeveloperClient';
 import { NEOONEProvider } from '../provider';
-import { LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider } from '../user';
 
 describe('DeveloperClient', () => {
   const networkName = 'net';
-  const neoOneProvider = new NEOONEProvider({
-    options: [
-      {
-        network: networkName,
-        rpcURL: 'rpc',
-      },
-    ],
-  });
-  const keystore = new LocalKeyStore({
-    store: new LocalMemoryStore(),
-  });
-
-  const localUserAccountProvider = new LocalUserAccountProvider({
-    keystore,
-    provider: neoOneProvider,
-  });
-
-  const providers = {
-    memory: localUserAccountProvider,
-  };
-
+  const neoOneProvider = new NEOONEProvider([
+    {
+      network: networkName,
+      rpcURL: 'rpc',
+    },
+  ]);
   const provider = neoOneProvider.read(networkName);
-
-  const developerClient = new DeveloperClient(provider, providers);
+  const developerClient = new DeveloperClient(provider);
 
   test('runConsensusNow', async () => {
     // tslint:disable-next-line no-object-mutation

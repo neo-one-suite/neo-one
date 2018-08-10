@@ -1,4 +1,4 @@
-import { createReadClient } from '@neo-one/client';
+import { NEOONEDataProvider, ReadClient } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
 import { createEndpoint, EndpointConfig } from '@neo-one/node-core';
 import {
@@ -425,10 +425,12 @@ export class NetworkResourceAdapter {
               let height;
               let peers;
               if (readyNode !== undefined) {
-                const client = createReadClient({
-                  network: this.name,
-                  rpcURL: readyNode.rpcAddress,
-                });
+                const client = new ReadClient(
+                  new NEOONEDataProvider({
+                    network: this.name,
+                    rpcURL: readyNode.rpcAddress,
+                  }),
+                );
 
                 try {
                   [height, peers] = await Promise.all([client.getBlockCount(), client.getConnectedPeers()]);

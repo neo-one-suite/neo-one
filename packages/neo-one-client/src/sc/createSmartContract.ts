@@ -1,4 +1,4 @@
-import { Param as ScriptBuilderParam } from '@neo-one/client-core';
+import { ScriptBuilderParam } from '@neo-one/client-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { Client } from '../Client';
@@ -120,7 +120,7 @@ const createCall = ({
     client,
   });
 
-  const receipt = await client.call(hash, name, params, options);
+  const receipt = await client.__call(hash, name, params, options);
 
   return common.convertCallResult({
     returnType,
@@ -152,7 +152,7 @@ const createInvoke = ({
     client,
   });
 
-  const result = await client.invoke(hash, name, params, paramsZipped, verify, options, definition.sourceMap);
+  const result = await client.__invoke(hash, name, params, paramsZipped, verify, options, definition.sourceMap);
 
   return {
     transaction: result.transaction,

@@ -939,9 +939,7 @@ export const bootstrap = (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs)
           tokenWallets,
         });
 
-        const provider = new NEOONEProvider({
-          options: [{ network: network.name, rpcURL: network.rpcURL }],
-        });
+        const provider = new NEOONEProvider([{ network: network.name, rpcURL: network.rpcURL }]);
         const localUserAccountProvider = new LocalUserAccountProvider({
           keystore,
           provider,
@@ -953,7 +951,7 @@ export const bootstrap = (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs)
 
         await client.selectAccount(master.accountID);
 
-        const developerClient = new DeveloperClient(provider.read(network.name), providers);
+        const developerClient = new DeveloperClient(provider.read(network.name));
 
         spinner.succeed();
 

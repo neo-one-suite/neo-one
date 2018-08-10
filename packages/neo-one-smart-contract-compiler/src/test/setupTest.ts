@@ -31,9 +31,7 @@ export async function testNodeSetup() {
     privateKey,
   });
 
-  const provider = new NEOONEProvider({
-    options: [{ network: networkName, rpcURL }],
-  });
+  const provider = new NEOONEProvider([{ network: networkName, rpcURL }]);
 
   const localUserAccountProvider = new LocalUserAccountProvider({
     keystore,
@@ -68,11 +66,11 @@ export interface Result {
 
 export const setupTest = async (getContract: () => Promise<TestOptions>): Promise<Result> => {
   const [
-    { client, masterWallet, provider, networkName, keystore, privateKey, userAccountProviders },
+    { client, masterWallet, provider, networkName, keystore, privateKey },
     { contract, sourceMap, diagnostics, abi, ignoreWarnings },
   ] = await Promise.all([testNodeSetup(), getContract()]);
 
-  const developerClient = new DeveloperClient(provider.read(networkName), userAccountProviders);
+  const developerClient = new DeveloperClient(provider.read(networkName));
 
   throwOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);
 

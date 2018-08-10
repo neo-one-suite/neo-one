@@ -182,6 +182,6 @@ export class GCloudProvider extends Provider {
   private async getStorage() {
     const storage = await import('@google-cloud/storage');
 
-    return new storage.Storage({ projectId: this.options.projectID });
+    return storage.default({ projectId: this.options.projectID });
   }
 }

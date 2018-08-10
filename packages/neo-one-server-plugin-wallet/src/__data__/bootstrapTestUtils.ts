@@ -334,9 +334,7 @@ export async function testBootstrap(
 
   expect(transferWallets.length).toEqual(numWallets);
 
-  const provider = new NEOONEProvider({
-    options: [{ network, rpcURL }],
-  }).read(network);
+  const provider = new NEOONEProvider([{ network, rpcURL }]).read(network);
   const client = new ReadClient(provider);
 
   testTransfersAndClaims({ transferWallets });

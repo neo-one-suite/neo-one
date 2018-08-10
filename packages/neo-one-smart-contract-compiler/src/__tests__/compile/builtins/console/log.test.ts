@@ -1,13 +1,12 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
-import { createConsoleLogMessages, RawCallReceipt, NEOONEDataProvider } from '@neo-one/client';
+import { createConsoleLogMessages } from '@neo-one/client-switch';
+import { convertCallReceipt } from '@neo-one/client-core';
 import { CallReceiptJSON } from '@neo-one/client-core';
 import { RawSourceMap } from 'source-map';
 
 const getMessages = async (receiptIn: CallReceiptJSON, sourceMap: RawSourceMap): Promise<ReadonlyArray<string>> => {
-  const receipt: RawCallReceipt = (new NEOONEDataProvider({ network: 'meh', rpcURL: 'meh' }) as any).convertCallReceipt(
-    receiptIn,
-  );
+  const receipt = convertCallReceipt(receiptIn);
 
   return createConsoleLogMessages(receipt.actions, sourceMap, { bare: true });
 };

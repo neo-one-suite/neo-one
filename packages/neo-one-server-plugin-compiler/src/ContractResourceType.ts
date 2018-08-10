@@ -1,4 +1,5 @@
-import { ABI, disassembleByteCode } from '@neo-one/client';
+import { ABI } from '@neo-one/client';
+import { disassembleByteCode } from '@neo-one/client-core';
 import {
   CRUD,
   DeleteCRUD,

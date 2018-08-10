@@ -1,8 +1,8 @@
 import { common, JSONHelper, utils } from '@neo-one/client-core';
-import * as abis from '../../__data__/abis';
-import { contracts } from '../../__data__/contracts';
-import { InvalidContractParameterError } from '../../errors';
-import { contractParameters as parameters } from '../../sc/parameters';
+import * as abis from '../__data__/abis';
+import { contracts } from '../__data__/contracts';
+import { InvalidContractParameterError } from '../errors';
+import { contractParameters as parameters } from '../parameters';
 
 describe('parameters', () => {
   describe('check parameters of correct type', () => {

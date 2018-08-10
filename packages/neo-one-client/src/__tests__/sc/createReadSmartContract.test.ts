@@ -82,13 +82,13 @@ describe('createReadSmartContract', () => {
   beforeEach(() => {
     client = {} as any;
     // @ts-ignore
-    client.call = jest.fn(() => Promise.resolve({ result: {}, actions: [] }));
+    client.__call = jest.fn(() => Promise.resolve({ result: {}, actions: [] }));
     // @ts-ignore
     (common as any).convertParams = jest.fn(() => expected);
     // @ts-ignore
     (common as any).convertInvocationResult = jest.fn(() => expected);
     // @ts-ignore
-    client.iterActionsRaw = jest.fn(() => expected);
+    client.__iterActionsRaw = jest.fn(() => expected);
 
     undefinedEventsContract = createReadSmartContract({
       definition: {
@@ -133,7 +133,7 @@ describe('createReadSmartContract', () => {
 
   test('iterActions with no filter', async () => {
     // @ts-ignore
-    client.iterActionsRaw = jest.fn(() => expected);
+    client.__iterActionsRaw = jest.fn(() => expected);
     // @ts-ignore
     (common as any).convertAction = jest
       .fn()

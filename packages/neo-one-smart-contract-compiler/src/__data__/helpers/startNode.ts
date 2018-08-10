@@ -8,7 +8,6 @@ import {
   SmartContract,
   UserAccountID,
   LocalWallet,
-  RawInvokeReceipt,
   InvokeTransactionOptions,
   InvocationTransaction,
   ReadClient,
@@ -20,6 +19,7 @@ import { testNodeSetup } from '../../test';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { createContextForSnippet } from '../../createContext';
 import { checkRawResult } from './extractors';
+import { RawInvokeReceipt } from '@neo-one/client-core';
 
 export interface Result {
   readonly networkName: string;
@@ -70,7 +70,7 @@ const getCompiledScript = async (script: string): Promise<CompileResult> => {
 
 export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<TestNode> => {
   const { client, masterWallet, provider, networkName, userAccountProviders } = await testNodeSetup();
-  const developerClient = new DeveloperClient(provider.read(networkName), userAccountProviders);
+  const developerClient = new DeveloperClient(provider.read(networkName));
 
   return {
     async addContract(script): Promise<Contract> {
@@ -112,14 +112,19 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
 
       throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
 
-      const result = await developerClient.execute(
+      const result = await userAccountProviders.memory.__execute(
         code.toString('hex'),
         { from: masterWallet.account.id, ...options },
         sourceMap,
       );
-      await checkRawResult(result.receipt, sourceMap);
 
-      return result;
+      const [invokeReceipt] = await Promise.all([
+        result.confirmed({ timeoutMS: 5000 }),
+        developerClient.runConsensusNow(),
+      ]);
+      await checkRawResult(invokeReceipt, sourceMap);
+
+      return { receipt: invokeReceipt, transaction: result.transaction };
     },
     compileScript: getCompiledScript,
     client,

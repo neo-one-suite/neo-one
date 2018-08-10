@@ -1,11 +1,11 @@
 import {
   createPrivateKey,
-  createReadClient,
   LocalWallet,
-  networks,
+  NEOONEDataProvider,
   NetworkType as ClientNetworkType,
   privateKeyToAddress,
   privateKeyToWIF,
+  ReadClient,
 } from '@neo-one/client';
 import { common } from '@neo-one/client-core';
 import { compoundName, DescribeTable, PluginManager } from '@neo-one/server-plugin';
@@ -15,9 +15,9 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { combineLatest, Observable, timer } from 'rxjs';
 import { concatMap, shareReplay, take } from 'rxjs/operators';
+import { constants } from './constants';
 import { NetworkRequiredError } from './errors';
 import { ReadWalletClient, WalletClient } from './types';
-import { getClientNetworkType } from './utils';
 import { Coin, Wallet, WalletResourceType } from './WalletResourceType';
 
 const getRPCURL = (network?: Network | undefined): string | undefined => {
@@ -45,28 +45,25 @@ const updateClient = ({
   readonly client: WalletClient;
 }): ReadWalletClient => {
   let rpcURL = getRPCURL(network);
-  if (rpcURL === undefined) {
-    if (networkName === networkConstants.NETWORK_NAME.MAIN) {
-      rpcURL = networks.MAIN_URL;
-    } else if (networkName === networkConstants.NETWORK_NAME.TEST) {
-      rpcURL = networks.TEST_URL;
-    }
+  if (rpcURL === undefined && networkName === networkConstants.NETWORK_NAME.MAIN) {
+    rpcURL = constants.MAIN_URL;
   }
 
   if (rpcURL === undefined) {
     throw new NetworkRequiredError();
   }
 
-  const clientNetworkType = getClientNetworkType(networkName);
   client.providers.file.provider.addNetwork({
-    network: clientNetworkType,
+    network: networkName,
     rpcURL,
   });
 
-  return createReadClient({
-    network: clientNetworkType,
-    rpcURL,
-  });
+  return new ReadClient(
+    new NEOONEDataProvider({
+      network: networkName,
+      rpcURL,
+    }),
+  );
 };
 
 const getNetwork$ = ({
@@ -152,7 +149,6 @@ export class WalletResource {
     }
 
     const readClient = updateClient({ networkName, network, client });
-    const clientNetworkType = getClientNetworkType(networkName);
     const privateKey = privateKeyIn === undefined ? createPrivateKey() : privateKeyIn;
     const address = privateKeyToAddress(privateKey);
 
@@ -169,7 +165,7 @@ export class WalletResource {
       address,
       dataPath,
       walletPath,
-      clientNetworkType,
+      clientNetworkType: networkName,
       initial: {
         privateKey,
         password,
@@ -193,7 +189,6 @@ export class WalletResource {
       .pipe(take(1))
       .toPromise();
     const readClient = updateClient({ networkName, network, client });
-    const clientNetworkType = getClientNetworkType(networkName);
 
     const walletPath = this.getWalletPath(dataPath);
     const { address } = await fs.readJSON(walletPath);
@@ -209,7 +204,7 @@ export class WalletResource {
       address,
       dataPath,
       walletPath,
-      clientNetworkType,
+      clientNetworkType: networkName,
     });
   }
 

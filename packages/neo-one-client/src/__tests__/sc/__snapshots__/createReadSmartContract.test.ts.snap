@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`createReadSmartContract iterActions with filter: client.call 1`] = `Array []`;
+exports[`createReadSmartContract iterActions with filter: client.__call 1`] = `Array []`;
 
-exports[`createReadSmartContract iterActions with filter: client.iterActionsRaw 1`] = `
+exports[`createReadSmartContract iterActions with filter: client.__iterActionsRaw 1`] = `
 Array [
   Array [
     Object {
@@ -101,9 +101,9 @@ exports[`createReadSmartContract iterActions with filter: common.convertInvocati
 
 exports[`createReadSmartContract iterActions with filter: common.convertParams 1`] = `Array []`;
 
-exports[`createReadSmartContract iterActions with no filter: client.call 1`] = `Array []`;
+exports[`createReadSmartContract iterActions with no filter: client.__call 1`] = `Array []`;
 
-exports[`createReadSmartContract iterActions with no filter: client.iterActionsRaw 1`] = `
+exports[`createReadSmartContract iterActions with no filter: client.__iterActionsRaw 1`] = `
 Array [
   Array [
     Object {},
@@ -199,9 +199,9 @@ exports[`createReadSmartContract iterActions with no filter: common.convertInvoc
 
 exports[`createReadSmartContract iterActions with no filter: common.convertParams 1`] = `Array []`;
 
-exports[`createReadSmartContract iterEvents: client.call 1`] = `Array []`;
+exports[`createReadSmartContract iterEvents: client.__call 1`] = `Array []`;
 
-exports[`createReadSmartContract iterEvents: client.iterActionsRaw 1`] = `
+exports[`createReadSmartContract iterEvents: client.__iterActionsRaw 1`] = `
 Array [
   Array [
     Object {},
@@ -297,9 +297,9 @@ exports[`createReadSmartContract iterEvents: common.convertInvocationResult 1`] 
 
 exports[`createReadSmartContract iterEvents: common.convertParams 1`] = `Array []`;
 
-exports[`createReadSmartContract iterLogs: client.call 1`] = `Array []`;
+exports[`createReadSmartContract iterLogs: client.__call 1`] = `Array []`;
 
-exports[`createReadSmartContract iterLogs: client.iterActionsRaw 1`] = `
+exports[`createReadSmartContract iterLogs: client.__iterActionsRaw 1`] = `
 Array [
   Array [
     Object {},
@@ -395,9 +395,9 @@ exports[`createReadSmartContract iterLogs: common.convertInvocationResult 1`] = 
 
 exports[`createReadSmartContract iterLogs: common.convertParams 1`] = `Array []`;
 
-exports[`createReadSmartContract iterStorage: client.call 1`] = `Array []`;
+exports[`createReadSmartContract iterStorage: client.__call 1`] = `Array []`;
 
-exports[`createReadSmartContract iterStorage: client.iterActionsRaw 1`] = `Array []`;
+exports[`createReadSmartContract iterStorage: client.__iterActionsRaw 1`] = `Array []`;
 
 exports[`createReadSmartContract iterStorage: client.iterStorage 1`] = `
 Array [
@@ -495,7 +495,7 @@ exports[`createReadSmartContract iterStorage: common.convertInvocationResult 1`]
 
 exports[`createReadSmartContract iterStorage: common.convertParams 1`] = `Array []`;
 
-exports[`createReadSmartContract smartContract creation - createCall: client.call 1`] = `
+exports[`createReadSmartContract smartContract creation - createCall: client.__call 1`] = `
 Array [
   Array [
     "hash",
@@ -512,7 +512,7 @@ Array [
 ]
 `;
 
-exports[`createReadSmartContract smartContract creation - createCall: client.iterActionsRaw 1`] = `Array []`;
+exports[`createReadSmartContract smartContract creation - createCall: client.__iterActionsRaw 1`] = `Array []`;
 
 exports[`createReadSmartContract smartContract creation - createCall: common.convertCallResult 1`] = `
 Array [

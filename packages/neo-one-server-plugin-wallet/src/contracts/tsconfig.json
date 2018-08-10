@@ -1,16 +1,10 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
     "target": "esnext",
     "module": "commonjs",
     "moduleResolution": "node",
 
     "noLib": true,
-    "paths": {
-      "@neo-one/*": [
-        "./neo-one-*/src"
-      ]
-    },
     "typeRoots": [],
 
     "pretty": true,
@@ -32,10 +26,5 @@
     "allowUnreachableCode": false,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
-  },
-  "include": [
-    "neo-one-server-plugin-wallet/src/contracts/*",
-    "neo-one-smart-contract-lib/src/*",
-    "*/src/__data__/contracts/*"
-  ]
+  }
 }

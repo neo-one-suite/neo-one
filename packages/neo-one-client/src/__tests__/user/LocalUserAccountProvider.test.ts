@@ -1,5 +1,5 @@
 // tslint:disable
-import { common, utils, Transaction } from '@neo-one/client-core';
+import { common, utils, Transaction, bigNumberToBN } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import {
   InsufficientFundsError,
@@ -12,7 +12,6 @@ import {
 } from '../../errors';
 import { AssetRegister, AttributeArg, ContractRegister, Transfer } from '../../types';
 import { LocalUserAccountProvider } from '../../user/LocalUserAccountProvider';
-import * as clientUtils from '../../utils';
 
 describe('LocalUserAccountProvider', () => {
   const id1 = {
@@ -541,7 +540,7 @@ describe('LocalUserAccountProvider', () => {
     provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.fault, actions: [] }));
 
     const result = localUserAccountProvider.publish(contract, options);
-    await expect(result).rejects.toEqual(new InvokeError('testMessage\n'));
+    await expect(result).rejects.toEqual(new InvokeError('testMessage'));
     verifyMocks();
   });
 
@@ -947,7 +946,7 @@ describe('LocalUserAccountProvider', () => {
   test('invoke', async () => {
     const contract = '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9';
     const method = 'testMethod';
-    const testBN = clientUtils.bigNumberToBN(new BigNumber('1'), 1);
+    const testBN = bigNumberToBN(new BigNumber('1'), 1);
     const params = ['param1', [undefined], testBN];
     const paramsZipped: any[] = [['String', 'param1'], ['Array', [undefined]], ['BigNumber', new BigNumber('1')]];
 

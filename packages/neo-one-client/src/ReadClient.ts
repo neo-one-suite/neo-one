@@ -1,4 +1,4 @@
-import { Param as ScriptBuilderParam } from '@neo-one/client-core';
+import { ScriptBuilderParam } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import * as args from './args';
 import { createReadSmartContract } from './sc';
@@ -117,13 +117,13 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
     return this.dataProvider.iterStorage(hash, monitor);
   }
 
-  public iterActionsRaw(filter?: BlockFilter): AsyncIterable<ActionRaw> {
+  public __iterActionsRaw(filter?: BlockFilter): AsyncIterable<ActionRaw> {
     args.assertBlockFilter(filter);
 
     return this.dataProvider.iterActionsRaw(filter);
   }
 
-  public async call(
+  public async __call(
     contract: Hash160String,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,

@@ -1,48 +1,41 @@
 import * as api from '@neo-one/client';
 
-describe('exported api', () => {
+describe('@neo-one/client', () => {
   const EXPECTED = [
     'Client',
     'ReadClient',
     'DeveloperClient',
+    'abi',
+    'assets',
+    'typeGuards',
     // ./user
     'LocalUserAccountProvider',
     'LocalKeyStore',
     'LocalMemoryStore',
     'LocalStringStore',
+    // ./provider
     'NEOONEDataProvider',
     'NEOONEProvider',
-    'disassembleByteCode',
-    'abi',
     // ./helpers
-    'publicKeyToScriptHash',
-    'publicKeyToAddress',
-    'scriptHashToAddress',
     'addressToScriptHash',
-    'assets',
-    'wifToPrivateKey',
-    'privateKeyToWIF',
-    'privateKeyToScriptHash',
+    'createPrivateKey',
+    'decryptNEP2',
+    'encryptNEP2',
+    'isNEP2',
     'privateKeyToAddress',
     'privateKeyToPublicKey',
-    'isNEP2',
-    'encryptNEP2',
-    'decryptNEP2',
-    'createPrivateKey',
-    'networks',
+    'privateKeyToScriptHash',
+    'privateKeyToWIF',
+    'publicKeyToAddress',
+    'publicKeyToScriptHash',
+    'scriptHashToAddress',
+    'wifToPrivateKey',
     // ./preconfigured
-    'provider',
-    'mainReadClient',
-    'testReadClient',
+    'createClient',
     'createReadClient',
-    'typeGuards',
-    // ./utils
-    'createConsoleLogMessages',
-    'extractConsoleLogs',
-    'extractErrorTrace',
   ];
 
-  test('has expected keys', () => {
+  test('has expected exports', () => {
     expect(Object.keys(api).sort()).toEqual(EXPECTED.sort());
   });
 

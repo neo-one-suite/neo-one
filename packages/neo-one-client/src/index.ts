@@ -1,27 +1,110 @@
 import * as abi from './abi';
 import * as assets from './assets';
-import * as networks from './networks';
 import * as typeGuards from './typeGuards';
 
 export { Client } from './Client';
 export { ReadClient } from './ReadClient';
 export { DeveloperClient } from './DeveloperClient';
-
-export {
-  LocalUserAccountProvider,
-  LocalKeyStore,
-  LocalMemoryStore,
-  LocalStringStore,
-  Wallet as LocalWallet,
-  UnlockedWallet,
-} from './user';
+export { abi, assets, typeGuards };
+export { LocalKeyStore, LocalMemoryStore, LocalStringStore, LocalUserAccountProvider } from './user';
 export { NEOONEDataProvider, NEOONEProvider } from './provider';
+export {
+  addressToScriptHash,
+  createPrivateKey,
+  decryptNEP2,
+  encryptNEP2,
+  isNEP2,
+  privateKeyToAddress,
+  privateKeyToPublicKey,
+  privateKeyToScriptHash,
+  privateKeyToWIF,
+  publicKeyToAddress,
+  publicKeyToScriptHash,
+  scriptHashToAddress,
+  wifToPrivateKey,
+} from './helpers';
+export { createClient, createReadClient } from './preconfigured';
 
-export { disassembleByteCode } from '@neo-one/client-core';
-
-export * from './helpers';
-export * from './preconfigured';
-export * from './types';
-
-export { abi, assets, networks, typeGuards };
-export { extractErrorTrace, extractConsoleLogs, createConsoleLogMessages } from './utils';
+export { UnlockedWallet, Wallet as LocalWallet } from './user';
+export {
+  ABI,
+  ABIEvent,
+  ABIFunction,
+  ABIParameter,
+  ABIReturn,
+  Account,
+  Action,
+  AddressString,
+  Asset,
+  AssetRegister,
+  AssetType,
+  Attribute,
+  AttributeArg,
+  AttributeUsageBuffer,
+  AttributeUsageHash160,
+  AttributeUsageHash256,
+  AttributeUsagePublicKey,
+  Block,
+  BooleanABIParameter,
+  BooleanABIReturn,
+  BufferString,
+  ByteArrayABIParameter,
+  ByteArrayABIReturn,
+  ClaimTransaction,
+  ConfirmedClaimTransaction,
+  ConfirmedContractTransaction,
+  ConfirmedEnrollmentTransaction,
+  ConfirmedInvocationTransaction,
+  ConfirmedIssueTransaction,
+  ConfirmedMinerTransaction,
+  ConfirmedPublishTransaction,
+  ConfirmedRegisterTransaction,
+  ConfirmedStateTransaction,
+  ConfirmedTransaction,
+  ConfirmedTransactionBase,
+  Contract,
+  ContractParameterType,
+  ContractRegister,
+  ContractTransaction,
+  EnrollmentTransaction,
+  Event,
+  Hash160String,
+  Hash256String,
+  Header,
+  Input,
+  InvocationResult,
+  InvocationResultError,
+  InvocationResultSuccess,
+  InvocationTransaction,
+  InvokeReceipt,
+  InvokeTransactionOptions,
+  IssueTransaction,
+  Log,
+  MinerTransaction,
+  NetworkType,
+  Output,
+  Param,
+  Peer,
+  PublicKeyString,
+  PublishReceipt,
+  PublishTransaction,
+  RawInvocationData,
+  ReadSmartContract,
+  RegisterAssetReceipt,
+  RegisterTransaction,
+  SmartContract,
+  SmartContractDefinition,
+  StateDescriptor,
+  StateTransaction,
+  StorageItem,
+  Transaction,
+  TransactionBase,
+  TransactionOptions,
+  TransactionReceipt,
+  TransactionResult,
+  Transfer,
+  UserAccount,
+  UserAccountID,
+  Validator,
+  Witness,
+} from './types';

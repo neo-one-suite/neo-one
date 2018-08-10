@@ -1,7 +1,7 @@
-import { common, JSONHelper, utils } from '@neo-one/client-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import { InvalidContractParameterError } from '../errors';
+import { common } from './common';
+import { InvalidContractParameterError } from './errors';
 import {
   ArrayABI,
   BooleanABI,
@@ -21,7 +21,8 @@ import {
   SignatureString,
   StringABI,
   VoidABI,
-} from '../types';
+} from './types';
+import { JSONHelper, utils } from './utils';
 
 const toByteArrayBuffer = (contractParameter: ContractParameter): Buffer => {
   let value;
