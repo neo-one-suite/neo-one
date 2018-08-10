@@ -138,6 +138,7 @@ export const createReadSmartContract = ({
       iterEvents,
       iterLogs,
       iterStorage,
+      convertAction,
     },
   );
 };

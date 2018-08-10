@@ -298,7 +298,6 @@ export interface RawInvocationData {
   readonly deletedContractHashes: ReadonlyArray<Hash160String>;
   readonly migratedContractHashes: ReadonlyArray<[Hash160String, Hash160String]>;
   readonly voteUpdates: ReadonlyArray<[AddressString, ReadonlyArray<PublicKeyString>]>;
-  // internal
   readonly result: RawInvocationResult;
   readonly actions: ReadonlyArray<ActionRaw>;
 }
