@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`create network create network main 1`] = `
+Array [
+  "# TYPE neo_blockchain_persist_block_duration_seconds histogram",
+  "# TYPE neo_blockchain_persist_block_failures_total counter",
+  "# TYPE neo_blockchain_block_index gauge",
+  "# TYPE neo_blockchain_persisting_block_index gauge",
+  "# TYPE neo_blockchain_persist_block_latency_seconds histogram",
+  "# TYPE neo_network_peer_closed_total counter",
+  "# TYPE neo_network_peer_connect_total counter",
+  "# TYPE neo_network_peer_connect_failures_total counter",
+  "# TYPE neo_network_connected_peers_total gauge",
+  "# TYPE neo_network_connecting_peers_total gauge",
+  "# TYPE neo_protocol_messages_received_total counter",
+  "# TYPE neo_protocol_messages_failures_total counter",
+  "# TYPE neo_protocol_mempool_size gauge",
+  "# TYPE neo_transfer_duration_seconds histogram",
+  "# TYPE neo_transfer_failures_total counter",
+  "# TYPE neo_claim_duration_seconds histogram",
+  "# TYPE neo_claim_failures_total counter",
+  "# TYPE neo_invoke_raw_duration_seconds histogram",
+  "# TYPE neo_invoke_raw_failures_total counter",
+]
+`;
