@@ -367,6 +367,8 @@ const gulpBin = () =>
 const binProject = ts.createProject(MAIN_BIN_FORMAT.tsconfig, { typescript });
 const binBanner = `#!/usr/bin/env node
 require('source-map-support').install({ handleUncaughtExceptions: false, environment: 'node' });
+const { defaultMetrics, metrics } = require('@neo-one/monitor');
+metrics.setFactory(defaultMetrics);
 `;
 gulp.task('compileBin', () =>
   gulpBin()
