@@ -523,7 +523,13 @@ export class NetworkResourceAdapter {
                 title: `Waiting for node ${node.name}`,
                 task: async () => {
                   const start = utils.nowSeconds();
-                  await node.live(60);
+                  try {
+                    await node.live(30);
+                  } catch {
+                    await node.stop();
+                    await node.start();
+                    await node.live(30);
+                  }
 
                   this.resourceType.plugin.monitor.log({
                     name: 'neo_network_resource_adapter_node_live',
