@@ -13,3 +13,10 @@ export const isBuffer = (context: Context, node: ts.Node, type: ts.Type): boolea
   context.builtins.isInterface(node, type, 'Hash256') ||
   context.builtins.isInterface(node, type, 'PublicKey') ||
   context.builtins.isInterface(node, type, 'Address');
+
+export const isAddress = (context: Context, node: ts.Node, type: ts.Type): boolean =>
+  context.builtins.isInterface(node, type, 'Address');
+export const isHash256 = (context: Context, node: ts.Node, type: ts.Type): boolean =>
+  context.builtins.isInterface(node, type, 'Hash256');
+export const isPublicKey = (context: Context, node: ts.Node, type: ts.Type): boolean =>
+  context.builtins.isInterface(node, type, 'PublicKey');

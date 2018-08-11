@@ -22,7 +22,14 @@ export class GetArgument extends BuiltinCall {
       // [value]
       sb.emitHelper(node, options, sb.helpers.getArgument({ type: sb.context.getType(arg) }));
       // [val]
-      sb.emitHelper(node, options, sb.helpers.wrapValRecursive({ type: sb.context.getType(node, { error: true }) }));
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.wrapValRecursive({
+          checkValue: true,
+          type: sb.context.getType(node, { error: true }),
+        }),
+      );
     } else {
       // []
       sb.emitOp(node, 'DROP');

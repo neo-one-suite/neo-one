@@ -1,20 +1,25 @@
+import { common } from '@neo-one/client-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
+import { isAddress, isHash256, isPublicKey } from './buffer';
 
 export interface WrapValRecursiveHelperOptions {
+  readonly checkValue?: boolean;
   readonly type: ts.Type | undefined;
 }
 
 // Input: [val]
 // Output: [value]
 export class WrapValRecursiveHelper extends Helper {
+  private readonly checkValue: boolean;
   private readonly type: ts.Type | undefined;
   public constructor(options: WrapValRecursiveHelperOptions) {
     super();
+    this.checkValue = options.checkValue === undefined ? false : options.checkValue;
     this.type = options.type;
   }
 
@@ -55,6 +60,7 @@ export class WrapValRecursiveHelper extends Helper {
                     node,
                     innerInnerOptions,
                     sb.helpers.wrapValRecursive({
+                      checkValue: this.checkValue,
                       type:
                         this.type === undefined
                           ? undefined
@@ -80,7 +86,11 @@ export class WrapValRecursiveHelper extends Helper {
               // [value, arr]
               sb.emitOp(node, 'PICKITEM');
               // [val, arr]
-              sb.emitHelper(node, innerOptions, sb.helpers.wrapValRecursive({ type: element }));
+              sb.emitHelper(
+                node,
+                innerOptions,
+                sb.helpers.wrapValRecursive({ checkValue: this.checkValue, type: element }),
+              );
               // [arr, val]
               sb.emitOp(node, 'SWAP');
             });
@@ -97,6 +107,41 @@ export class WrapValRecursiveHelper extends Helper {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
         }),
         buffer: createHandleValue(true, (innerOptions) => {
+          const type = this.type;
+          if (
+            this.checkValue &&
+            type !== undefined &&
+            (isAddress(sb.context, node, type) ||
+              isHash256(sb.context, node, type) ||
+              isPublicKey(sb.context, node, type))
+          ) {
+            // [buffer, buffer]
+            sb.emitOp(node, 'DUP');
+            // [size, buffer]
+            sb.emitOp(node, 'SIZE');
+            // [buffer]
+            sb.emitHelper(
+              node,
+              innerOptions,
+              sb.helpers.if({
+                condition: () => {
+                  const expectedSize = isAddress(sb.context, node, type)
+                    ? common.UINT160_BUFFER_BYTES
+                    : isHash256(sb.context, node, type)
+                      ? common.UINT256_BUFFER_BYTES
+                      : common.ECPOINT_BUFFER_BYTES;
+                  // [number, number, buffer]
+                  sb.emitPushInt(node, expectedSize);
+                  // [boolean, buffer]
+                  sb.emitOp(node, 'NUMEQUAL');
+                },
+                whenFalse: () => {
+                  sb.emitOp(node, 'DROP');
+                  sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+                },
+              }),
+            );
+          }
           sb.emitHelper(node, innerOptions, sb.helpers.wrapBuffer);
         }),
         null: createHandleValue(false, (innerOptions) => {
