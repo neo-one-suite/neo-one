@@ -33,7 +33,7 @@ export const compileContract = async ({
   const { sourceFiles, abi, contract } = transpile({ smartContract, context: transpileContext });
   const context = updateContext(transpileContext, _.mapValues(sourceFiles, ({ text }) => text));
 
-  const { code, sourceMap: finalSourceMap } = await compile({
+  const { code, sourceMap: finalSourceMap, features } = await compile({
     sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
     context,
     sourceMaps: _.mapValues(sourceFiles, ({ sourceMap }) => sourceMap),
@@ -46,6 +46,11 @@ export const compileContract = async ({
     contract: {
       ...contract,
       script: code.toString('hex'),
+      properties: {
+        storage: features.storage,
+        dynamicInvoke: features.dynamicInvoke,
+        payable: contract.properties.payable,
+      },
     },
   };
 };

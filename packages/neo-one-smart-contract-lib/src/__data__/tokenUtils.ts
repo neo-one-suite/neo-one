@@ -18,13 +18,15 @@ export interface DeployOptions {
 }
 
 export interface Options {
-  readonly setup: () => Promise<SetupTestResult>;
+  readonly result: SetupTestResult;
   readonly name: string;
   readonly symbol: string;
   readonly decimals: number;
   readonly deploy: (options: DeployOptions) => Promise<TransactionResult<InvokeReceipt>>;
   readonly issueValue: BigNumber;
   readonly transferValue: BigNumber;
+  readonly description: string;
+  readonly payable: boolean;
 }
 
 const TO = {
@@ -37,17 +39,27 @@ const ZERO = {
   PUBLIC_KEY: '027f73dbc47133b08a4bc0fc04589fc76525baaf3bebe71bdd78053d559c41db70',
 };
 
-export const testToken = async ({ setup, name, symbol, decimals, deploy, issueValue, transferValue }: Options) => {
+export const testToken = async ({
+  result,
+  name,
+  symbol,
+  decimals,
+  deploy,
+  issueValue,
+  transferValue,
+  description,
+  payable,
+}: Options) => {
   crypto.addPublicKey(common.stringToPrivateKey(TO.PRIVATE_KEY), common.stringToECPoint(TO.PUBLIC_KEY));
   crypto.addPublicKey(common.stringToPrivateKey(ZERO.PRIVATE_KEY), common.stringToECPoint(ZERO.PUBLIC_KEY));
 
-  const { networkName, keystore, developerClient, smartContract, masterAccountID, masterPrivateKey } = await setup();
+  const { client, networkName, developerClient, smartContract, masterAccountID, masterPrivateKey } = result;
 
   const [nameResult, decimalsResult, symbolResult, wallet0, deployResult] = await Promise.all([
     smartContract.name(),
     smartContract.decimals(),
     smartContract.symbol(),
-    keystore.addAccount({
+    client.providers.memory.keystore.addAccount({
       network: networkName,
       name: 'wallet0',
       privateKey: TO.PRIVATE_KEY,
@@ -134,4 +146,16 @@ export const testToken = async ({ setup, name, symbol, decimals, deploy, issueVa
   expect(transferAccountBalance.toString()).toEqual(transferValue.toString());
   expect(transferTotalSupply.toString()).toEqual(issueValue.toString());
   expect(transferZeroBalance.toString()).toEqual('0');
+
+  const readClient = await client.read(networkName);
+  const contract = await readClient.getContract(smartContract.definition.networks[networkName].hash);
+  expect(contract.codeVersion).toEqual('1.0');
+  expect(contract.author).toEqual('dicarlo2');
+  expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
+  expect(contract.description).toEqual(description);
+  expect(contract.parameters).toEqual(['String', 'Array']);
+  expect(contract.returnType).toEqual('ByteArray');
+  expect(contract.properties.storage).toBeTruthy();
+  expect(contract.properties.dynamicInvoke).toBeFalsy();
+  expect(contract.properties.payable).toEqual(payable);
 };

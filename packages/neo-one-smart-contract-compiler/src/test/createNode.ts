@@ -13,7 +13,7 @@ const PRIVATE_KEY = 'a01dd45345a7899b58e0e35f413beec8199b2b743b402a92b696fdecdaf
 const PUBLIC_KEY = '023a0eca8e082e3315f1aba8da485d5c11389780d833e94fecc1ea84dca202d685';
 const SCRIPT_HASH = '0xd6ed345f7cf3ea8c980132ddacb403ee2ab760ab';
 
-export const createNode = async () => {
+export const createNode = async (omitCleanup = false) => {
   const port = getPort();
   crypto.addPublicKey(common.stringToPrivateKey(PRIVATE_KEY), common.stringToECPoint(PUBLIC_KEY));
 
@@ -56,7 +56,9 @@ export const createNode = async () => {
       // tslint:enable
     },
   );
-  addCleanup(async () => node.stop());
+  if (!omitCleanup) {
+    addCleanup(async () => node.stop());
+  }
   await node.start();
 
   return {

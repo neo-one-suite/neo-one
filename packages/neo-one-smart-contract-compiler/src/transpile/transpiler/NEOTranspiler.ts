@@ -25,7 +25,7 @@ interface Switch {
 
 const BYTE_ARRAY_RETURN: ABIReturn = { type: 'ByteArray' };
 const BOOLEAN_RETURN: ABIReturn = { type: 'Boolean' };
-const PARAMETERS: ReadonlyArray<ContractParameterType> = ['String', 'ByteArray'];
+const PARAMETERS: ReadonlyArray<ContractParameterType> = ['String', 'Array'];
 const RETURN_TYPE = 'ByteArray';
 const createDefaultContract = (name: string): Contract => ({
   parameters: PARAMETERS,

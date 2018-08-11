@@ -332,7 +332,10 @@ const OPCODE_PAIRS = ([
           const { op } = JMP;
           const { context: startContext } = await op.invoke({
             monitor,
-            context,
+            context: {
+              ...context,
+              callingScriptHash: context.scriptHash,
+            },
             args: [],
             argsAlt: [],
           });
@@ -348,6 +351,7 @@ const OPCODE_PAIRS = ([
           return {
             context: {
               ...resultContext,
+              callingScriptHash: context.callingScriptHash,
               pc: pc + 2,
               state: resultContext.state === VMState.Fault ? VMState.Fault : VMState.None,
               depth: context.depth,

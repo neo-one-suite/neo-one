@@ -242,7 +242,7 @@ const testContract = async ({
   const contract = await client.getContract(hash);
   expect(contract.name).toEqual(name);
   expect(contract.codeVersion).toEqual('1.0');
-  expect(contract.parameters).toEqual(['String', 'ByteArray']);
+  expect(contract.parameters).toEqual(['String', 'Array']);
   expect(contract.returnType).toEqual('ByteArray');
   expect(contract.author).toEqual('dicarlo2');
   expect(contract.email).toEqual('alex.dicarlo@neotracker.io');

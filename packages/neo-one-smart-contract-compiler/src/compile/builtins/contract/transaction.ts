@@ -4,7 +4,6 @@ import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
 import { SysCallInstanceMemberArray } from './SysCallInstanceMemberArray';
 import { SysCallInstanceMemberPrimitive } from './SysCallInstanceMemberPrimitive';
-import { SysCallMemberValue } from './SysCallMemberValue';
 import { ValueFor } from './ValueFor';
 import { ValueInstanceOf } from './ValueInstanceOf';
 
@@ -84,10 +83,5 @@ export const add = (builtins: Builtins): void => {
     'TransactionConstructor',
     'for',
     new ValueFor('Neo.Blockchain.GetTransaction', (sb) => sb.helpers.wrapTransaction),
-  );
-  builtins.addContractMember(
-    'TransactionConstructor',
-    'currentTransaction',
-    new SysCallMemberValue('System.ExecutionEngine.GetScriptContainer', Types.Transaction),
   );
 };

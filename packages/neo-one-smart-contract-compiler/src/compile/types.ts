@@ -16,8 +16,13 @@ export interface VisitOptions {
   readonly superClass?: Name | undefined;
 }
 
+export interface Features {
+  readonly storage: boolean;
+  readonly dynamicInvoke: boolean;
+}
 export interface ScriptBuilderResult {
   readonly code: Buffer;
+  readonly features: Features;
   readonly sourceMap: RawSourceMap;
 }
 export interface CompileResult extends ScriptBuilderResult {

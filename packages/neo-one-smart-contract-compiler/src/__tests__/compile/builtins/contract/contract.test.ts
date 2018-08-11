@@ -13,7 +13,13 @@ describe('Contract', () => {
 
       const contract = Contract.for(Address.from('${contract.hash}'));
 
+      if (contract === undefined) {
+        assertEqual(contract !== undefined, true);
+        throw new Error('For TS');
+      }
+
       assertEqual(contract.script, ${helpers.getBufferHash(contract.script)});
+      assertEqual(contract.payable, true);
     `);
   });
 

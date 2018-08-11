@@ -2,8 +2,8 @@
 
 exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: deploy consumed 1`] = `"0"`;
 
-exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"9.152"`;
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"9.162"`;
 
 exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"0"`;
 
-exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"6.439"`;
+exports[`RedToken properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"6.449"`;

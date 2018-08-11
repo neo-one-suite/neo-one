@@ -16,8 +16,8 @@ import { CompileContractResult } from '../compileContract';
 import { throwOnDiagnosticErrorOrWarning } from '../utils';
 import { createNode } from './createNode';
 
-export async function testNodeSetup() {
-  const { privateKey, rpcURL } = await createNode();
+export async function testNodeSetup(omitCleanup = false) {
+  const { privateKey, rpcURL, node } = await createNode(omitCleanup);
   const networkName = 'priv';
   const masterWalletName = 'master';
 
@@ -42,7 +42,7 @@ export async function testNodeSetup() {
   };
   const client = new Client(userAccountProviders);
 
-  return { client, masterWallet, networkName, provider, keystore, privateKey, userAccountProviders };
+  return { client, masterWallet, networkName, provider, keystore, privateKey, userAccountProviders, node };
 }
 
 export interface TestOptions extends CompileContractResult {
@@ -57,18 +57,18 @@ export interface Result {
   readonly client: Client<{
     readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;
   }>;
-  readonly keystore: LocalKeyStore;
   readonly developerClient: DeveloperClient;
   readonly smartContract: SmartContract;
   readonly masterAccountID: UserAccountID;
   readonly masterPrivateKey: string;
+  readonly cleanup: () => Promise<void>;
 }
 
 export const setupTest = async (getContract: () => Promise<TestOptions>): Promise<Result> => {
   const [
-    { client, masterWallet, provider, networkName, keystore, privateKey },
+    { client, masterWallet, provider, networkName, privateKey, node },
     { contract, sourceMap, diagnostics, abi, ignoreWarnings },
-  ] = await Promise.all([testNodeSetup(), getContract()]);
+  ] = await Promise.all([testNodeSetup(true), getContract()]);
 
   const developerClient = new DeveloperClient(provider.read(networkName));
 
@@ -90,10 +90,10 @@ export const setupTest = async (getContract: () => Promise<TestOptions>): Promis
   return {
     networkName,
     client,
-    keystore,
     developerClient,
     smartContract,
     masterAccountID: masterWallet.account.id,
     masterPrivateKey: privateKey,
+    cleanup: async () => node.stop(),
   };
 };

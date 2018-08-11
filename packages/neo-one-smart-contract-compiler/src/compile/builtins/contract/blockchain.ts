@@ -21,4 +21,9 @@ export const add = (builtins: Builtins): void => {
     'currentHeight',
     new SysCallMemberValue('Neo.Blockchain.GetHeight', Types.Number),
   );
+  builtins.addContractMember(
+    'BlockchainConstructor',
+    'currentTransaction',
+    new SysCallMemberValue('System.ExecutionEngine.GetScriptContainer', Types.Transaction),
+  );
 };

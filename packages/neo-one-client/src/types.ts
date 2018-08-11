@@ -700,6 +700,7 @@ export interface ReadSmartContractDefinition {
 }
 
 export interface SmartContract {
+  readonly definition: SmartContractDefinition;
   // tslint:disable-next-line no-any
   readonly [key: string]: any;
 }

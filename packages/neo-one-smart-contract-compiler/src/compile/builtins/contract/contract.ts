@@ -17,6 +17,11 @@ export const add = (builtins: Builtins): void => {
     'script',
     new SysCallInstanceMemberPrimitive('Neo.Contract.GetScript', Types.Contract, Types.Buffer),
   );
+  builtins.addContractMember(
+    'Contract',
+    'payable',
+    new SysCallInstanceMemberPrimitive('Neo.Contract.IsPayable', Types.Contract, Types.Boolean),
+  );
 
   builtins.addContractInterface('ContractConstructor', new ContractConstructorInterface());
   builtins.addContractMember(

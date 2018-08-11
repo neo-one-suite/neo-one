@@ -25,7 +25,7 @@ import { NodeCompiler } from '../NodeCompiler';
 import { Call, DeferredProgramCounter, Jmp, Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
 import { statements } from '../statement';
-import { ScriptBuilderResult, VisitOptions } from '../types';
+import { Features, ScriptBuilderResult, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 import { resolveJumps } from './resolveJumps';
 import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode, SingleBytecodeValue, Tags } from './ScriptBuilder';
@@ -57,6 +57,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   private readonly mutableExportMap: { [K in string]?: Set<string> } = {};
   private mutableNextModuleIndex = 0;
   private mutableCurrentModuleIndex = 0;
+  private mutableFeatures: Features = { storage: false, dynamicInvoke: false };
 
   public constructor(
     public readonly context: Context,
@@ -212,6 +213,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     return {
       code: Buffer.concat(buffers),
       sourceMap: sourceMapGenerator.toJSON(),
+      features: this.mutableFeatures,
     };
   }
 
@@ -247,6 +249,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitOp(node: ts.Node, code: OpCode, buffer?: Buffer | undefined): void {
+    if ((code === 'APPCALL' || code === 'TAILCALL') && buffer !== undefined && buffer.equals(Buffer.alloc(20, 0))) {
+      this.mutableFeatures = { ...this.mutableFeatures, dynamicInvoke: true };
+    }
+
     const bytecode = Op[code] as Op | undefined;
     if (bytecode === undefined) {
       /* istanbul ignore next */
@@ -314,6 +320,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitSysCall(node: ts.Node, name: SysCallName): void {
+    if (name === 'Neo.Storage.Put' || name === 'Neo.Storage.Delete') {
+      this.mutableFeatures = { ...this.mutableFeatures, storage: true };
+    }
+
     const sysCallBuffer = Buffer.from(name, 'ascii');
     const writer = new BinaryWriter();
     writer.writeVarBytesLE(sysCallBuffer);

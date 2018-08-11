@@ -502,10 +502,6 @@ export interface TransactionConstructor {
    * @returns `Transaction` for the specified `hash`.
    */
   readonly for: (hash: Hash256) => Transaction;
-  /**
-   * `InvocationTransaction` this smart contract is executed in.
-   */
-  readonly currentTransaction: InvocationTransaction;
 }
 export const Transaction: TransactionConstructor;
 
@@ -616,13 +612,22 @@ const contractScript = contract.script;
 ```
  */
 export interface Contract {
+  /**
+   * `Contract` code.
+   */
   readonly script: Buffer;
+  /**
+   * Flag that indicates if the `Contract` supports receiving `Asset`s and NEP-5 tokens.
+   */
+  readonly payable: boolean;
 }
 export interface ContractConstructor {
   /**
-   * @returns `Contract` for the specified `address`.
+   * Returns undefined if a `Contract` does not exist at `address`.
+   *
+   * @returns `Contract` for the specified `address.
    */
-  readonly for: (address: Address) => Contract;
+  readonly for: (address: Address) => Contract | undefined;
 }
 export const Contract: ContractConstructor;
 
@@ -790,9 +795,13 @@ export interface BlockchainConstructor {
    * The index of the latest `Block` persisted to the blockchain.
    */
   readonly currentHeight: number;
+  /**
+   * `InvocationTransaction` this smart contract is executed in.
+   */
+  readonly currentTransaction: InvocationTransaction;
 }
 /**
- * Common information about the current state of the blockchain.
+ * Information about the current state of the blockchain and the current execution.
  */
 export const Blockchain: BlockchainConstructor;
 

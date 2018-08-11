@@ -8,4 +8,5 @@ export enum GlobalProperty {
   ArrayIterableIterator = 6,
   MapStorage = 7,
   SetStorage = 8,
+  CallingScriptHash = 9,
 }

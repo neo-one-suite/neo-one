@@ -1,5 +1,6 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { GlobalProperty } from '../../../constants';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
 import { BuiltinMemberCall } from '../../BuiltinMemberCall';
@@ -23,8 +24,18 @@ export class AddressVerifySender extends BuiltinMemberCall {
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
     // [buffer]
     sb.emitHelper(tsUtils.argumented.getArguments(node)[0], options, sb.helpers.unwrapBuffer);
-    // [boolean]
+    // [buffer, buffer]
+    sb.emitOp(node, 'DUP');
+    // [boolean, buffer]
     sb.emitSysCall(node, 'Neo.Runtime.CheckWitness');
+    // [buffer, boolean]
+    sb.emitOp(node, 'SWAP');
+    // [buffer, buffer, boolean]
+    sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: GlobalProperty.CallingScriptHash }));
+    // [boolean, boolean]
+    sb.emitOp(node, 'EQUAL');
+    // [boolean]
+    sb.emitOp(node, 'BOOLOR');
 
     if (optionsIn.pushValue) {
       // [booleanVal]

@@ -32,6 +32,14 @@ export class CreateGlobalObjectHelper extends Helper {
     sb.emitOp(node, 'NEWARRAY');
     // [map]
     sb.emitOp(node, 'SETITEM');
+    // [map, map]
+    sb.emitOp(node, 'DUP');
+    // [number, map, map]
+    sb.emitPushInt(node, GlobalProperty.CallingScriptHash);
+    // [buffer, number, map, map]
+    sb.emitSysCall(node, 'System.ExecutionEngine.GetCallingScriptHash');
+    // [map]
+    sb.emitOp(node, 'SETITEM');
 
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');

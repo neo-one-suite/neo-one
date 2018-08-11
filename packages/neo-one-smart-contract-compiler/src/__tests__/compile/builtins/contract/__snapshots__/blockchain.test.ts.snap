@@ -21,3 +21,14 @@ exports[`Blockchain set currentHeight 1`] = `
       5 |     
 "
 `;
+
+exports[`Blockchain set currentTransaction 1`] = `
+"snippetCode.ts (4,7): Builtins cannot be modified
+
+      2 |       import { Blockchain } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       Blockchain.currentTransaction = Blockchain.currentTransaction;
+        |       ^
+      5 |     
+"
+`;

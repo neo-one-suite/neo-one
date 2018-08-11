@@ -20,7 +20,7 @@ export class TestToken extends Token<4> {
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'The TestToken',
-    payable: false,
+    payable: true,
   };
 
   public constructor(owner: Address) {

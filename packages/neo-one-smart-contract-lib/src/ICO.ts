@@ -10,7 +10,6 @@ import {
   Integer,
   MapStorage,
   SetStorage,
-  Transaction,
   verify,
 } from '@neo-one/smart-contract';
 
@@ -51,7 +50,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
       throw new Error('Crowdsale has ended');
     }
 
-    const { references } = Transaction.currentTransaction;
+    const { references } = Blockchain.currentTransaction;
     if (references.length === 0) {
       return;
     }
@@ -61,7 +60,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
       onRefund();
       throw new Error('Address has not been whitelised');
     }
-    const amount = Transaction.currentTransaction.outputs
+    const amount = Blockchain.currentTransaction.outputs
       .filter((output) => output.address.equals(this.owner))
       .reduce((acc, output) => {
         const amountPerAsset = this.isLimitedRound()

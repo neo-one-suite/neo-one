@@ -207,5 +207,5 @@ export const createSmartContract = ({
               func,
             }),
     }),
-    {},
+    { definition },
   );
