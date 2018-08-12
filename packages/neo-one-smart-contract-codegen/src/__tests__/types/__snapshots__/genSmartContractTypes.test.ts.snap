@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`genSmartContractTypes NEP5 1`] = `
+"import { Event, Hash160String, InvokeReceipt, ReadSmartContract, SmartContract, TransactionResult } from '@neo-one/client';
+
+export type TokenEvent = TokenTransferEvent
+
+export interface TokenTransferEventParameters {
+  readonly from: Hash160String;
+  readonly to: Hash160String;
+  readonly amount: number;
+}
+export interface TokenTransferEvent extends Event<'transfer', TokenTransferEventParameters> {}
+
+export interface TokenSmartContract extends SmartContract<TokenReadSmartContract> {
+  readonly balanceOf: (account: Hash160String) => Promise<number>;
+  readonly decimals: () => Promise<number>;
+  readonly name: () => Promise<string>;
+  readonly symbol: () => Promise<string>;
+  readonly totalSupply: () => Promise<number>;
+  readonly transfer: (from: Hash160String, to: Hash160String, value: number) => TransactionResult<InvokeReceipt<boolean, TokenEvent>>;
+}
+
+export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {
+  readonly balanceOf: (account: Hash160String) => Promise<number>;
+  readonly decimals: () => Promise<number>;
+  readonly name: () => Promise<string>;
+  readonly symbol: () => Promise<string>;
+  readonly totalSupply: () => Promise<number>;
+}
+"
+`;

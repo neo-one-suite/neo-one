@@ -486,10 +486,10 @@ export type ParamJSON =
 export interface EventParameters {
   readonly [name: string]: Param | undefined;
 }
-export interface Event extends ActionRawBase {
+export interface Event<TName extends string = string, TEventParameters = EventParameters> extends ActionRawBase {
   readonly type: 'Event';
-  readonly name: string;
-  readonly parameters: EventParameters;
+  readonly name: TName;
+  readonly parameters: TEventParameters;
 }
 
 export interface Log extends ActionRawBase {
@@ -546,9 +546,11 @@ export interface InvocationResultError {
 
 export type InvocationResult<TValue> = InvocationResultSuccess<TValue> | InvocationResultError;
 
-export interface InvokeReceipt extends TransactionReceipt {
-  readonly result: InvocationResult<Param | undefined>;
-  readonly events: ReadonlyArray<Event>;
+// tslint:disable-next-line no-any
+export interface InvokeReceipt<TParam extends Param = Param, TEvent extends Event<string, any> = Event>
+  extends TransactionReceipt {
+  readonly result: InvocationResult<TParam>;
+  readonly events: ReadonlyArray<TEvent>;
   readonly logs: ReadonlyArray<Log>;
 }
 
@@ -700,18 +702,27 @@ export interface ReadSmartContractDefinition {
   readonly sourceMap?: RawSourceMap;
 }
 
-export interface SmartContract {
+// tslint:disable-next-line no-any
+export interface SmartContract<TReadSmartContract extends ReadSmartContract<any> = ReadSmartContractAny> {
   readonly definition: SmartContractDefinition;
+  readonly read: (network: NetworkType) => TReadSmartContract;
+}
+
+export interface SmartContractAny extends SmartContract {
   // tslint:disable-next-line no-any
   readonly [key: string]: any;
 }
 
-export interface ReadSmartContract {
-  readonly iterEvents: (filter?: BlockFilter) => AsyncIterable<Event>;
+// tslint:disable-next-line no-any
+export interface ReadSmartContract<TEvent extends Event<string, any> = Event> {
+  readonly iterEvents: (filter?: BlockFilter) => AsyncIterable<TEvent>;
   readonly iterLogs: (filter?: BlockFilter) => AsyncIterable<Log>;
   readonly iterActions: (filter?: BlockFilter) => AsyncIterable<Action>;
   readonly iterStorage: () => AsyncIterable<StorageItem>;
   readonly convertAction: (action: ActionRaw) => Action;
+}
+
+export interface ReadSmartContractAny extends ReadSmartContract {
   // tslint:disable-next-line no-any
   readonly [key: string]: any;
 }

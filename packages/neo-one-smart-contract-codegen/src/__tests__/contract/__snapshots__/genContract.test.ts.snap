@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`genContract Token 1`] = `
+"
+import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';
+import { tokenABI } from './abi';
+import { TokenReadSmartContract, TokenSmartContract } from './types';
+
+const definition: SmartContractDefinition = {
+  networks: {
+  \\"main\\": {
+    \\"hash\\": \\"iamahash\\"
+  }
+},
+  abi: tokenABI,
+};
+
+if (process.env.NODE_ENV !== 'production') {
+  (definition as any).sourceMap = {
+  \\"file\\": \\"file\\",
+  \\"mappings\\": \\"sourcemap\\",
+  \\"names\\": [],
+  \\"sources\\": [],
+  \\"version\\": 0
+}
+}
+
+export const createTokenSmartContract = (
+  client: Client,
+): TokenSmartContract => client.smartContract<TokenSmartContract>(definition);
+
+export const createTokenReadSmartContract = (
+  client: ReadClient,
+): TokenReadSmartContract => client.smartContract<TokenReadSmartContract>({
+  hash: definition.networks[client.dataProvider.network].hash,
+  abi: definition.abi,
+  sourceMap: definition.sourceMap,
+});
+"
+`;

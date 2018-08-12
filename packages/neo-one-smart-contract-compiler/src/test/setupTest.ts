@@ -8,11 +8,11 @@ import {
   LocalUserAccountProvider,
   NEOONEProvider,
   SmartContract,
+  SmartContractAny,
   UserAccountID,
 } from '@neo-one/client';
 import ts from 'typescript';
 import { CompileContractResult } from '../compileContract';
-
 import { throwOnDiagnosticErrorOrWarning } from '../utils';
 import { createNode } from './createNode';
 
@@ -52,19 +52,23 @@ export interface TestOptions extends CompileContractResult {
   readonly ignoreWarnings?: boolean;
 }
 
-export interface Result {
+// tslint:disable-next-line no-any
+export interface Result<TSmartContract extends SmartContract<any> = SmartContractAny> {
   readonly networkName: string;
   readonly client: Client<{
     readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;
   }>;
   readonly developerClient: DeveloperClient;
-  readonly smartContract: SmartContract;
+  readonly smartContract: TSmartContract;
   readonly masterAccountID: UserAccountID;
   readonly masterPrivateKey: string;
   readonly cleanup: () => Promise<void>;
 }
 
-export const setupTest = async (getContract: () => Promise<TestOptions>): Promise<Result> => {
+// tslint:disable-next-line no-any
+export const setupTest = async <TContract extends SmartContract<any> = SmartContractAny>(
+  getContract: () => Promise<TestOptions>,
+): Promise<Result<TContract>> => {
   const [
     { client, masterWallet, provider, networkName, privateKey, node },
     { contract, sourceMap, diagnostics, abi, ignoreWarnings },
@@ -81,7 +85,7 @@ export const setupTest = async (getContract: () => Promise<TestOptions>): Promis
     throw new Error(receipt.result.message);
   }
 
-  const smartContract = client.smartContract({
+  const smartContract = client.smartContract<TContract>({
     networks: { [networkName]: { hash: receipt.result.value.hash } },
     abi,
     sourceMap,

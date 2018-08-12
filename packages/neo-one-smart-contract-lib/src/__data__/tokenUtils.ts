@@ -3,7 +3,7 @@ import {
   addressToScriptHash,
   InvokeReceipt,
   privateKeyToScriptHash,
-  SmartContract,
+  SmartContractAny,
   TransactionResult,
   UserAccountID,
 } from '@neo-one/client';
@@ -14,7 +14,7 @@ import BigNumber from 'bignumber.js';
 export interface DeployOptions {
   readonly masterPrivateKey: string;
   readonly masterAccountID: UserAccountID;
-  readonly smartContract: SmartContract;
+  readonly smartContract: SmartContractAny;
 }
 
 export interface Options {

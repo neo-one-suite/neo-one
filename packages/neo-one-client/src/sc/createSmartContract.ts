@@ -14,7 +14,7 @@ import {
   InvokeReceipt,
   Log,
   Param,
-  SmartContract,
+  SmartContractAny,
   SmartContractDefinition,
   SmartContractNetworkDefinition,
   TransactionOptions,
@@ -190,8 +190,8 @@ export const createSmartContract = ({
 }: {
   readonly definition: SmartContractDefinition;
   readonly client: Client;
-}): SmartContract =>
-  definition.abi.functions.reduce<SmartContract>(
+}): SmartContractAny =>
+  definition.abi.functions.reduce<SmartContractAny>(
     (acc, func) => ({
       ...acc,
       [func.name]:
@@ -207,5 +207,13 @@ export const createSmartContract = ({
               func,
             }),
     }),
-    { definition },
+    {
+      read: (network) =>
+        client.read(network).smartContract({
+          hash: definition.networks[network].hash,
+          abi: definition.abi,
+          sourceMap: definition.sourceMap,
+        }),
+      definition,
+    },
   );

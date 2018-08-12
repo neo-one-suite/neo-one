@@ -2,7 +2,9 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { createContextForDir } from './createContext';
 
-export type Contracts = { [K in string]?: ReadonlyArray<string> };
+export interface Contracts {
+  readonly [key: string]: ReadonlyArray<string>;
+}
 
 export const scan = async (dir: string): Promise<Contracts> => {
   const context = await createContextForDir(dir);
@@ -17,11 +19,11 @@ export const scan = async (dir: string): Promise<Contracts> => {
       if (!tsUtils.modifier.isAbstract(derived)) {
         const file = tsUtils.file.getFilePath(tsUtils.node.getSourceFile(derived));
         const name = tsUtils.node.getNameOrThrow(derived);
-        const files = acc[file];
+        const names = acc[file] as ReadonlyArray<string> | undefined;
 
         return {
           ...acc,
-          [file]: files === undefined ? [name] : files.concat([name]),
+          [file]: names === undefined ? [name] : names.concat([name]),
         };
       }
 

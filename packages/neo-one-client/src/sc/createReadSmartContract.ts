@@ -17,7 +17,7 @@ import {
   Hash160String,
   Log,
   Param,
-  ReadSmartContract,
+  ReadSmartContractAny,
   ReadSmartContractDefinition,
   StorageItem,
 } from '../types';
@@ -81,7 +81,7 @@ export const createReadSmartContract = ({
 }: {
   readonly definition: ReadSmartContractDefinition;
   readonly client: ReadClient;
-}): ReadSmartContract => {
+}): ReadSmartContractAny => {
   const events = abiEvents.reduce<{ [key: string]: ABIEvent }>(
     (acc, event) => ({
       ...acc,
@@ -125,7 +125,7 @@ export const createReadSmartContract = ({
 
   const iterStorage = (): AsyncIterable<StorageItem> => client.iterStorage(hash);
 
-  return functions.reduce<ReadSmartContract>(
+  return functions.reduce<ReadSmartContractAny>(
     (acc, func) =>
       func.constant === true
         ? {

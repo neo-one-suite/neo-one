@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`genTest Token 1`] = `
+"
+import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-compiler';
+import * as path from 'path';
+import { TokenSmartContract } from './types';
+
+export const setupTokenTest = async (): Promise<SetupTestResult<TokenSmartContract>> =>
+  setupContractTest<TokenSmartContract>(
+    path.resolve(__dirname, '../../contracts/Token.ts'),
+    'Token',
+  );
+"
+`;

@@ -20,6 +20,7 @@ import {
   Peer,
   RawCallReceipt,
   ReadSmartContract,
+  ReadSmartContractAny,
   ReadSmartContractDefinition,
   StorageItem,
   Transaction,
@@ -97,11 +98,15 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
     return this.dataProvider.getConnectedPeers(monitor);
   }
 
-  public smartContract(definition: ReadSmartContractDefinition): ReadSmartContract {
+  // tslint:disable-next-line no-any
+  public smartContract<T extends ReadSmartContract<any> = ReadSmartContractAny>(
+    definition: ReadSmartContractDefinition,
+  ): T {
     args.assertHash160(definition.hash);
     args.assertABI(definition.abi);
 
-    return createReadSmartContract({ definition, client: this });
+    // tslint:disable-next-line no-any
+    return createReadSmartContract({ definition, client: this }) as any;
   }
 
   public async getStorage(hash: Hash160String, key: BufferString, monitor?: Monitor): Promise<StorageItem> {

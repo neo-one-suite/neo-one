@@ -19,6 +19,7 @@ import {
   RawInvokeReceipt,
   RegisterAssetReceipt,
   SmartContract,
+  SmartContractAny,
   SmartContractDefinition,
   TransactionOptions,
   TransactionReceipt,
@@ -105,10 +106,12 @@ export class Client<
     return new ReadClient(this.getNetworkProvider(network).read(network));
   }
 
-  public smartContract(definition: SmartContractDefinition): SmartContract {
+  // tslint:disable-next-line no-any
+  public smartContract<T extends SmartContract<any> = SmartContractAny>(definition: SmartContractDefinition): T {
     argAssertions.assertSmartContractDefinition(definition);
 
-    return createSmartContract({ definition, client: this });
+    // tslint:disable-next-line no-any
+    return createSmartContract({ definition, client: this }) as any;
   }
 
   public inject<K>(

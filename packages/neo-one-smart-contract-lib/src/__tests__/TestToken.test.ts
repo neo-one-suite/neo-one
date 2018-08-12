@@ -5,7 +5,8 @@ import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-comp
 import { testToken } from '../__data__';
 import * as path from 'path';
 
-const setup = async () => setupContractTest(path.resolve(__dirname, '..', '__data__', 'contracts'), 'TestToken');
+const setup = async () =>
+  setupContractTest(path.resolve(__dirname, '..', '__data__', 'contracts', 'TestToken.ts'), 'TestToken');
 
 describe('TestToken', () => {
   let result: SetupTestResult;

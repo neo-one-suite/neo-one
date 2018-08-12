@@ -7,7 +7,8 @@ import * as path from 'path';
 
 const issueValue = new BigNumber('1000000');
 
-const setup = async () => setupContractTest(path.resolve(__dirname, '..', '__data__', 'contracts'), 'RedToken');
+const setup = async () =>
+  setupContractTest(path.resolve(__dirname, '..', '__data__', 'contracts', 'RedToken.ts'), 'RedToken');
 
 describe('RedToken', () => {
   let result: SetupTestResult;

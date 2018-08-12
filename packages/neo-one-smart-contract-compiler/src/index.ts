@@ -1,25 +1,27 @@
-import { CompileContractResult } from './compileContract';
-import { findAndCompileContract } from './findAndCompileContract';
+import { SmartContract, SmartContractAny } from '@neo-one/client';
+import { compileContract as compileContractBase, CompileContractResult } from './compileContract';
 import { setupContractTest as setupContractTestBase, SetupTestResult } from './test';
 import { throwOnDiagnosticErrorOrWarning } from './utils';
 
 export const compileContract = async (
-  dir: string,
+  filePath: string,
   contractName: string,
   ignoreWarnings = false,
 ): Promise<CompileContractResult> => {
-  const result = await findAndCompileContract({ dir, contractName });
+  const result = await compileContractBase({ filePath, name: contractName });
 
   throwOnDiagnosticErrorOrWarning(result.diagnostics, ignoreWarnings);
 
   return result;
 };
 
-export const setupContractTest = async (
-  dir: string,
+// tslint:disable-next-line no-any
+export const setupContractTest = async <TSmartContract extends SmartContract<any> = SmartContractAny>(
+  filePath: string,
   contractName: string,
   ignoreWarnings = false,
-): Promise<SetupTestResult> => setupContractTestBase({ dir, contractName, ignoreWarnings });
+): Promise<SetupTestResult<TSmartContract>> =>
+  setupContractTestBase<TSmartContract>({ filePath, contractName, ignoreWarnings });
 
-// tslint:disable-next-line export-name
 export { CompileContractResult, SetupTestResult };
+export { scan, Contracts } from './scan';

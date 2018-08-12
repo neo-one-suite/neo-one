@@ -12,7 +12,7 @@ import {
   privateKeyToPublicKey,
   privateKeyToScriptHash,
   PublishReceipt,
-  SmartContract,
+  SmartContractAny,
   TransactionReceipt,
   TransactionResult,
   Transfer,
@@ -728,7 +728,7 @@ const findContracts = async (current: string): Promise<string> => {
 export const compileSmartContract = async (contractName: string): Promise<CompileContractResult> => {
   const dir = await findContracts(require.resolve('@neo-one/server-plugin-wallet'));
 
-  return compileContract(dir, contractName);
+  return compileContract(path.resolve(dir, `${contractName}.ts`), contractName);
 };
 
 const compileSmartContracts = async (
@@ -750,7 +750,7 @@ const publishContract = async ({
 
 interface TokenWithWallet extends TokenInfo {
   readonly wallet: WalletData;
-  readonly smartContract: SmartContract;
+  readonly smartContract: SmartContractAny;
   readonly hash: string;
 }
 

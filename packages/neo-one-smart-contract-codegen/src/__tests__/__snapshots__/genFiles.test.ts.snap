@@ -1,0 +1,181 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`genFiles Token 1`] = `
+Object {
+  "abi": "// tslint:disable
+import { ABI } from '@neo-one/client';
+
+export const tokenABI: ABI = {
+  events: [
+    {
+      name: 'transfer',
+      parameters: [
+        {
+          name: 'from',
+          type: 'Hash160',
+        },
+        {
+          name: 'to',
+          type: 'Hash160',
+        },
+        {
+          decimals: 4,
+          name: 'amount',
+          type: 'Integer',
+        },
+      ],
+    },
+  ],
+  functions: [
+    {
+      constant: true,
+      name: 'name',
+      returnType: {
+        type: 'String',
+      },
+    },
+    {
+      constant: true,
+      name: 'symbol',
+      returnType: {
+        type: 'String',
+      },
+    },
+    {
+      constant: true,
+      name: 'decimals',
+      returnType: {
+        decimals: 0,
+        type: 'Integer',
+      },
+    },
+    {
+      constant: true,
+      name: 'totalSupply',
+      returnType: {
+        decimals: 4,
+        type: 'Integer',
+      },
+    },
+    {
+      name: 'transfer',
+      parameters: [
+        {
+          name: 'from',
+          type: 'Hash160',
+        },
+        {
+          name: 'to',
+          type: 'Hash160',
+        },
+        {
+          decimals: 4,
+          name: 'value',
+          type: 'Integer',
+        },
+      ],
+      returnType: {
+        type: 'Boolean',
+      },
+    },
+    {
+      constant: true,
+      name: 'balanceOf',
+      parameters: [
+        {
+          name: 'account',
+          type: 'Hash160',
+        },
+      ],
+      returnType: {
+        decimals: 4,
+        type: 'Integer',
+      },
+    },
+  ],
+};
+",
+  "contract": "// tslint:disable
+import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';
+import { tokenABI } from './abi';
+import { TokenReadSmartContract, TokenSmartContract } from './types';
+
+const definition: SmartContractDefinition = {
+  networks: {
+    main: {
+      hash: 'iamahash',
+    },
+  },
+  abi: tokenABI,
+};
+
+if (process.env.NODE_ENV !== 'production') {
+  (definition as any).sourceMap = {
+    file: 'file',
+    mappings: 'sourcemap',
+    names: [],
+    sources: [],
+    version: 0,
+  };
+}
+
+export const createTokenSmartContract = (client: Client): TokenSmartContract =>
+  client.smartContract<TokenSmartContract>(definition);
+
+export const createTokenReadSmartContract = (client: ReadClient): TokenReadSmartContract =>
+  client.smartContract<TokenReadSmartContract>({
+    hash: definition.networks[client.dataProvider.network].hash,
+    abi: definition.abi,
+    sourceMap: definition.sourceMap,
+  });
+",
+  "test": "// tslint:disable
+import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-compiler';
+import * as path from 'path';
+import { TokenSmartContract } from './types';
+
+export const setupTokenTest = async (): Promise<SetupTestResult<TokenSmartContract>> =>
+  setupContractTest<TokenSmartContract>(path.resolve(__dirname, '../../contracts/Token.ts'), 'Token');
+",
+  "types": "// tslint:disable
+import {
+  Event,
+  Hash160String,
+  InvokeReceipt,
+  ReadSmartContract,
+  SmartContract,
+  TransactionResult,
+} from '@neo-one/client';
+
+export type TokenEvent = TokenTransferEvent;
+
+export interface TokenTransferEventParameters {
+  readonly from: Hash160String;
+  readonly to: Hash160String;
+  readonly amount: number;
+}
+export interface TokenTransferEvent extends Event<'transfer', TokenTransferEventParameters> {}
+
+export interface TokenSmartContract extends SmartContract<TokenReadSmartContract> {
+  readonly balanceOf: (account: Hash160String) => Promise<number>;
+  readonly decimals: () => Promise<number>;
+  readonly name: () => Promise<string>;
+  readonly symbol: () => Promise<string>;
+  readonly totalSupply: () => Promise<number>;
+  readonly transfer: (
+    from: Hash160String,
+    to: Hash160String,
+    value: number,
+  ) => TransactionResult<InvokeReceipt<boolean, TokenEvent>>;
+}
+
+export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {
+  readonly balanceOf: (account: Hash160String) => Promise<number>;
+  readonly decimals: () => Promise<number>;
+  readonly name: () => Promise<string>;
+  readonly symbol: () => Promise<string>;
+  readonly totalSupply: () => Promise<number>;
+}
+",
+}
+`;
