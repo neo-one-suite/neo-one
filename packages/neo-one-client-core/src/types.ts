@@ -137,79 +137,61 @@ export interface RawCallReceipt {
   readonly actions: ReadonlyArray<ActionRaw>;
 }
 
-export interface SignatureABIReturn {
-  readonly type: 'Signature';
-}
-export interface BooleanABIReturn {
-  readonly type: 'Boolean';
-}
-export interface Hash160ABIReturn {
-  readonly type: 'Hash160';
-}
-export interface Hash256ABIReturn {
-  readonly type: 'Hash256';
-}
-export interface ByteArrayABIReturn {
-  readonly type: 'ByteArray';
-}
-export interface PublicKeyABIReturn {
-  readonly type: 'PublicKey';
-}
-export interface StringABIReturn {
-  readonly type: 'String';
-}
-export interface InteropInterfaceABIReturn {
-  readonly type: 'InteropInterface';
-}
-export interface VoidABIReturn {
-  readonly type: 'Void';
-}
-export interface IntegerABIReturn {
-  readonly type: 'Integer';
-  readonly decimals: number;
+export interface ABIReturnBase {
+  readonly optional?: boolean;
 }
 
-export interface SignatureABIParameter {
-  readonly name: string;
+export interface SignatureABIReturn extends ABIReturnBase {
   readonly type: 'Signature';
 }
-export interface BooleanABIParameter {
-  readonly name: string;
+export interface BooleanABIReturn extends ABIReturnBase {
   readonly type: 'Boolean';
 }
-export interface Hash160ABIParameter {
-  readonly name: string;
+export interface Hash160ABIReturn extends ABIReturnBase {
   readonly type: 'Hash160';
 }
-export interface Hash256ABIParameter {
-  readonly name: string;
+export interface Hash256ABIReturn extends ABIReturnBase {
   readonly type: 'Hash256';
 }
-export interface ByteArrayABIParameter {
-  readonly name: string;
+export interface ByteArrayABIReturn extends ABIReturnBase {
   readonly type: 'ByteArray';
 }
-export interface PublicKeyABIParameter {
-  readonly name: string;
+export interface PublicKeyABIReturn extends ABIReturnBase {
   readonly type: 'PublicKey';
 }
-export interface StringABIParameter {
-  readonly name: string;
+export interface StringABIReturn extends ABIReturnBase {
   readonly type: 'String';
 }
-export interface InteropInterfaceABIParameter {
-  readonly name: string;
+export interface InteropInterfaceABIReturn extends ABIReturnBase {
   readonly type: 'InteropInterface';
 }
-export interface VoidABIParameter {
-  readonly name: string;
+export interface VoidABIReturn extends ABIReturnBase {
   readonly type: 'Void';
 }
-export interface IntegerABIParameter {
-  readonly name: string;
+export interface IntegerABIReturn extends ABIReturnBase {
   readonly type: 'Integer';
   readonly decimals: number;
 }
+export interface ArrayABIReturn extends ABIReturnBase {
+  readonly type: 'Array';
+  readonly value: ABIReturn;
+}
+
+export interface ABIParameterBase {
+  readonly name: string;
+}
+
+export interface SignatureABIParameter extends ABIParameterBase, SignatureABIReturn {}
+export interface BooleanABIParameter extends ABIParameterBase, BooleanABIReturn {}
+export interface Hash160ABIParameter extends ABIParameterBase, Hash160ABIReturn {}
+export interface Hash256ABIParameter extends ABIParameterBase, Hash256ABIReturn {}
+export interface ByteArrayABIParameter extends ABIParameterBase, ByteArrayABIReturn {}
+export interface PublicKeyABIParameter extends ABIParameterBase, PublicKeyABIReturn {}
+export interface StringABIParameter extends ABIParameterBase, StringABIReturn {}
+export interface InteropInterfaceABIParameter extends ABIParameterBase, InteropInterfaceABIReturn {}
+export interface VoidABIParameter extends ABIParameterBase, VoidABIReturn {}
+export interface IntegerABIParameter extends ABIParameterBase, IntegerABIReturn {}
+export interface ArrayABIParameter extends ABIParameterBase, ArrayABIReturn {}
 
 export type ABIReturn =
   | SignatureABIReturn
@@ -219,7 +201,7 @@ export type ABIReturn =
   | ByteArrayABIReturn
   | PublicKeyABIReturn
   | StringABIReturn
-  | { readonly type: 'Array'; readonly value: ABIReturn }
+  | ArrayABIReturn
   | InteropInterfaceABIReturn
   | VoidABIReturn
   | IntegerABIReturn;
@@ -231,14 +213,12 @@ export type ABIParameter =
   | ByteArrayABIParameter
   | PublicKeyABIParameter
   | StringABIParameter
-  | { readonly name: string; readonly type: 'Array'; readonly value: ABIReturn }
+  | ArrayABIParameter
   | InteropInterfaceABIParameter
   | VoidABIParameter
   | IntegerABIParameter;
 
-export type ArrayABI =
-  | { readonly type: 'Array'; readonly value: ABIReturn }
-  | { readonly name: string; readonly type: 'Array'; readonly value: ABIReturn };
+export type ArrayABI = ArrayABIParameter | ArrayABIReturn;
 export type SignatureABI = SignatureABIParameter | SignatureABIReturn;
 export type BooleanABI = BooleanABIParameter | BooleanABIReturn;
 export type Hash160ABI = Hash160ABIParameter | Hash160ABIReturn;
@@ -268,8 +248,9 @@ export interface ABI {
   readonly events?: ReadonlyArray<ABIEvent>;
 }
 
-export interface ParamArray extends Array<Param | undefined> {}
+export interface ParamArray extends ReadonlyArray<Param> {}
 export type Param =
+  | undefined
   | BigNumber
   | BufferString
   | Hash160String

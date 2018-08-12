@@ -471,8 +471,9 @@ export interface Transfer {
   readonly to: AddressString;
 }
 
-export interface ParamJSONArray extends Array<Param | undefined> {}
+export interface ParamJSONArray extends ReadonlyArray<Param> {}
 export type ParamJSON =
+  | undefined
   | string
   | BufferString
   | Hash160String

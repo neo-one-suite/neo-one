@@ -229,28 +229,28 @@ const toInteropInterfaceNullable = wrapNullable(toInteropInterface) as (
 const toVoidNullable = wrapNullable(toVoid) as (param: ContractParameter) => undefined | undefined;
 
 export const contractParameters = {
-  String: (contractParameter: ContractParameter, _parameter: StringABI): Param | undefined | undefined =>
-    toStringNullable(contractParameter),
-  Hash160: (contractParameter: ContractParameter, _parameter: Hash160ABI): Param | undefined | undefined =>
-    toHash160Nullable(contractParameter),
-  Hash256: (contractParameter: ContractParameter, _parameter: Hash256ABI): Param | undefined | undefined =>
-    toHash256Nullable(contractParameter),
-  PublicKey: (contractParameter: ContractParameter, _parameter: PublicKeyABI): Param | undefined | undefined =>
-    toPublicKeyNullable(contractParameter),
-  Integer: toIntegerNullable,
-  Boolean: (contractParameter: ContractParameter, _parameter: BooleanABI): Param | undefined | undefined =>
-    toBooleanNullable(contractParameter),
-  Signature: (contractParameter: ContractParameter, _parameter: SignatureABI): Param | undefined | undefined =>
-    toSignatureNullable(contractParameter),
-  ByteArray: (contractParameter: ContractParameter, _parameter: ByteArrayABI): Param | undefined | undefined =>
-    toByteArrayNullable(contractParameter),
-  Array: toArrayNullable,
-  InteropInterface: (
-    contractParameter: ContractParameter,
-    _parameter: InteropInterfaceABI,
-  ): Param | undefined | undefined => toInteropInterfaceNullable(contractParameter),
-  Void: (contractParameter: ContractParameter, _parameter: VoidABI): Param | undefined | undefined =>
-    toVoidNullable(contractParameter),
+  String: (contractParameter: ContractParameter, parameter: StringABI): Param | undefined =>
+    parameter.optional ? toStringNullable(contractParameter) : toString(contractParameter),
+  Hash160: (contractParameter: ContractParameter, parameter: Hash160ABI): Param | undefined =>
+    parameter.optional ? toHash160Nullable(contractParameter) : toHash160(contractParameter),
+  Hash256: (contractParameter: ContractParameter, parameter: Hash256ABI): Param | undefined =>
+    parameter.optional ? toHash256Nullable(contractParameter) : toHash256(contractParameter),
+  PublicKey: (contractParameter: ContractParameter, parameter: PublicKeyABI): Param | undefined =>
+    parameter.optional ? toPublicKeyNullable(contractParameter) : toPublicKey(contractParameter),
+  Integer: (contractParameter: ContractParameter, parameter: IntegerABI): Param | undefined =>
+    parameter.optional ? toIntegerNullable(contractParameter, parameter) : toInteger(contractParameter, parameter),
+  Boolean: (contractParameter: ContractParameter, parameter: BooleanABI): Param | undefined =>
+    parameter.optional ? toBooleanNullable(contractParameter) : toBoolean(contractParameter),
+  Signature: (contractParameter: ContractParameter, parameter: SignatureABI): Param | undefined =>
+    parameter.optional ? toSignatureNullable(contractParameter) : toSignature(contractParameter),
+  ByteArray: (contractParameter: ContractParameter, parameter: ByteArrayABI): Param | undefined =>
+    parameter.optional ? toByteArrayNullable(contractParameter) : toByteArray(contractParameter),
+  Array: (contractParameter: ContractParameter, parameter: ArrayABI): Param | undefined =>
+    parameter.optional ? toArrayNullable(contractParameter, parameter) : toArray(contractParameter, parameter),
+  InteropInterface: (contractParameter: ContractParameter, parameter: InteropInterfaceABI): Param | undefined =>
+    parameter.optional ? toInteropInterfaceNullable(contractParameter) : toInteropInterface(contractParameter),
+  Void: (contractParameter: ContractParameter, parameter: VoidABI): Param | undefined =>
+    parameter.optional ? toVoidNullable(contractParameter) : toVoid(contractParameter),
 };
 
 export const converters = {

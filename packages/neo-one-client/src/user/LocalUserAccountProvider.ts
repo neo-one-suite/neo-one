@@ -1290,7 +1290,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     });
   }
 
-  private paramToJSON(param: Param | undefined): ParamJSON | undefined {
+  private paramToJSON(param: Param): ParamJSON | undefined {
     if (param === undefined) {
       return param;
     }
