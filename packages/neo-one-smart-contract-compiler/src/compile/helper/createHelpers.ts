@@ -16,6 +16,7 @@ import {
   ExtendArrHelper,
 } from './arr';
 import { CreateArrayIterableIteratorHelper, GetArrayIterableIteratorClassHelper } from './arrayIterableIterator';
+import { ArrayBindingHelper, ArrayBindingHelperOptions, ObjectBindingHelper, ObjectBindingHelperOptions } from './bind';
 import { CreateClassHelper, CreateClassHelperOptions } from './class';
 import {
   ArrSliceHelper,
@@ -238,6 +239,10 @@ export interface Helpers {
   readonly isAsset: IsAssetHelper;
   readonly wrapAsset: WrapAssetHelper;
   readonly unwrapAsset: UnwrapAssetHelper;
+
+  // bind
+  readonly arrayBinding: (options: ArrayBindingHelperOptions) => ArrayBindingHelper;
+  readonly objectBinding: (options: ObjectBindingHelperOptions) => ObjectBindingHelper;
 
   // block
   readonly isBlock: IsBlockHelper;
@@ -471,6 +476,10 @@ export const createHelpers = (): Helpers => {
     isAsset: new IsAssetHelper(),
     wrapAsset: new WrapAssetHelper(),
     unwrapAsset: new UnwrapAssetHelper(),
+
+    // bind
+    arrayBinding: (options) => new ArrayBindingHelper(options),
+    objectBinding: (options) => new ObjectBindingHelper(options),
 
     // block
     isBlock: new IsBlockHelper(),

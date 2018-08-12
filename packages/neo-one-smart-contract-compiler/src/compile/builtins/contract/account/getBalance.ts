@@ -19,7 +19,7 @@ export class AccountGetBalance extends BuiltinInstanceMemberCall {
     visited: boolean,
   ): void {
     const options = sb.pushValueOptions(optionsIn);
-    if (!visited) {
+    if (!visited && (ts.isPropertyAccessExpression(func) || ts.isElementAccessExpression(func))) {
       // [arrayVal]
       sb.visit(tsUtils.expression.getExpression(func), options);
     }
@@ -30,7 +30,7 @@ export class AccountGetBalance extends BuiltinInstanceMemberCall {
     }
 
     // [account]
-    sb.emitHelper(tsUtils.expression.getExpression(func), options, sb.helpers.unwrapBuffer);
+    sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
     // [bufferVal, account]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
     // [buffer, account]

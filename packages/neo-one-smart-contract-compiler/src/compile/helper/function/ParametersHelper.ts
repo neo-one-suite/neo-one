@@ -35,6 +35,7 @@ export class ParametersHelper extends Helper {
     // [argsarr]
     parameters.forEach((param, idx) => {
       const nameNode = tsUtils.node.getNameNode(param);
+      const paramType = sb.context.getType(param);
 
       if (ts.isIdentifier(nameNode)) {
         sb.scope.add(tsUtils.node.getText(nameNode));
@@ -141,9 +142,10 @@ export class ParametersHelper extends Helper {
       } else if (ts.isIdentifier(nameNode)) {
         // [argsarr]
         sb.scope.set(sb, node, options, tsUtils.node.getText(nameNode));
+      } else if (ts.isArrayBindingPattern(nameNode)) {
+        sb.emitHelper(nameNode, options, sb.helpers.arrayBinding({ type: paramType }));
       } else {
-        // [argsarr]
-        sb.visit(nameNode, options);
+        sb.emitHelper(nameNode, options, sb.helpers.objectBinding({ type: paramType }));
       }
     });
 

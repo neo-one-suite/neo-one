@@ -4,6 +4,7 @@ import { VisitOptions } from '../types';
 
 export enum BuiltinType {
   Value = 'Value',
+  ValueObject = 'ValueObject',
   MemberValue = 'MemberValue',
   InstanceMemberValue = 'InstanceMemberValue',
   Call = 'Call',
@@ -36,7 +37,7 @@ export function isBuiltinValue(value: Builtin): value is BuiltinValue {
   return value.types.has(BuiltinType.Value);
 }
 
-export type MemberLikeExpression = ts.PropertyAccessExpression | ts.ElementAccessExpression;
+export type MemberLikeExpression = ts.PropertyAccessExpression | ts.ElementAccessExpression | ts.BindingElement;
 export interface BuiltinMemberValue extends Builtin {
   readonly emitValue: (sb: ScriptBuilder, node: MemberLikeExpression, options: VisitOptions) => void;
 }
@@ -141,4 +142,12 @@ export interface BuiltinInstanceOf extends Builtin {
 
 export function isBuiltinInstanceOf(value: Builtin): value is BuiltinInstanceOf {
   return value.types.has(BuiltinType.InstanceOf);
+}
+
+export interface BuiltinValueObject extends Builtin {
+  readonly type: string;
+}
+
+export function isBuiltinValueObject(value: Builtin): value is BuiltinValueObject {
+  return value.types.has(BuiltinType.ValueObject);
 }

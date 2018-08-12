@@ -15,23 +15,31 @@ export class VariableDeclarationCompiler extends NodeCompiler<ts.VariableDeclara
 
     if (ts.isIdentifier(nameNode)) {
       sb.scope.add(tsUtils.node.getText(nameNode));
-    }
 
-    if (expr === undefined) {
-      if (!options.setValue) {
-        sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
+      if (expr === undefined) {
+        if (!options.setValue) {
+          sb.emitHelper(node, sb.pushValueOptions(options), sb.helpers.wrapUndefined);
+        }
+      } else {
+        sb.visit(expr, sb.pushValueOptions(options));
+        if (ts.isIdentifier(nameNode)) {
+          handleTypeAssignment(sb.context, expr, node);
+        }
       }
-    } else {
-      sb.visit(expr, sb.pushValueOptions(options));
-      if (ts.isIdentifier(nameNode)) {
-        handleTypeAssignment(sb.context, expr, node);
-      }
-    }
 
-    if (ts.isIdentifier(nameNode)) {
       sb.scope.set(sb, node, options, tsUtils.node.getText(nameNode));
+    } else if (ts.isArrayBindingPattern(nameNode)) {
+      sb.emitHelper(
+        nameNode,
+        options,
+        sb.helpers.arrayBinding({ type: expr === undefined ? undefined : sb.context.getType(expr), value: expr }),
+      );
     } else {
-      sb.visit(nameNode, options);
+      sb.emitHelper(
+        nameNode,
+        options,
+        sb.helpers.objectBinding({ type: expr === undefined ? undefined : sb.context.getType(expr), value: expr }),
+      );
     }
   }
 }

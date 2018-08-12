@@ -7,7 +7,7 @@ export interface TypedHelperOptions {
   readonly knownType?: Types;
 }
 
-export abstract class TypedHelper extends Helper {
+export abstract class TypedHelper<Node extends ts.Node = ts.Node> extends Helper<Node> {
   protected readonly type: ts.Type | undefined;
   protected readonly knownType: Types | undefined;
 

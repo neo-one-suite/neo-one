@@ -1,10 +1,12 @@
 import { Types } from '../../helper/types/Types';
-import { BuiltinBase } from '../BuiltinBase';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
+import { BuiltinValueObject } from '../BuiltinValueObject';
 import { SysCallMemberValue } from './SysCallMemberValue';
 
-class BlockchainValue extends BuiltinBase {}
+class BlockchainValue extends BuiltinValueObject {
+  public readonly type = 'BlockchainConstructor';
+}
 class BlockchainConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name

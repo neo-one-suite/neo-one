@@ -1,4 +1,5 @@
 import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { ScriptBuilder } from '../sb';
@@ -20,7 +21,7 @@ export abstract class BuiltinInstanceMemberValue implements BuiltinInstanceMembe
       return;
     }
 
-    if (!visited) {
+    if (!visited && (ts.isPropertyAccessExpression(node) || ts.isElementAccessExpression(node))) {
       // [val]
       sb.visit(tsUtils.expression.getExpression(node), sb.pushValueOptions(options));
     }

@@ -26,7 +26,7 @@ export class ArrayIterator extends BuiltinInstanceMemberCall {
 
       return;
     }
-    if (!visited) {
+    if (!visited && (ts.isPropertyAccessExpression(func) || ts.isElementAccessExpression(func))) {
       // [arrayVal]
       sb.visit(tsUtils.expression.getExpression(func), options);
     }

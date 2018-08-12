@@ -19,7 +19,7 @@ export class ArrayFilter extends BuiltinInstanceMemberCall {
     visited: boolean,
   ): void {
     const options = sb.pushValueOptions(optionsIn);
-    if (!visited) {
+    if (!visited && (ts.isPropertyAccessExpression(func) || ts.isElementAccessExpression(func))) {
       // [arrayVal]
       sb.visit(tsUtils.expression.getExpression(func), options);
     }
@@ -30,7 +30,7 @@ export class ArrayFilter extends BuiltinInstanceMemberCall {
     }
 
     // [arr]
-    sb.emitHelper(tsUtils.expression.getExpression(func), options, sb.helpers.unwrapArray);
+    sb.emitHelper(node, options, sb.helpers.unwrapArray);
     // [objectVal, arr]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
     // [arr]

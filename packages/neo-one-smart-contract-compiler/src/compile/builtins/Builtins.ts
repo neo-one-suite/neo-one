@@ -4,7 +4,7 @@ import * as path from 'path';
 import ts from 'typescript';
 import { Context, DiagnosticOptions } from '../../Context';
 import { pathResolve } from '../../utils';
-import { Builtin } from './types';
+import { Builtin, isBuiltinValueObject } from './types';
 
 const NO_WARNING_ERROR = { error: false, warning: false };
 
@@ -122,6 +122,12 @@ export class Builtins {
     }
 
     return this.builtinValues.get(valueSymbol);
+  }
+
+  public getValueInterface(value: ts.Node, options: DiagnosticOptions = NO_WARNING_ERROR): string | undefined {
+    const builtinValue = this.getValue(value, options);
+
+    return builtinValue === undefined || !isBuiltinValueObject(builtinValue) ? undefined : builtinValue.type;
   }
 
   public getValueSymbol(value: string): ts.Symbol {

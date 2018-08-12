@@ -1,5 +1,6 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { isOnlyArray } from '../helper/types';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -32,7 +33,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
     const statement = tsUtils.statement.getStatement(node);
     const expressionType = sb.context.getType(expression);
 
-    if (expressionType === undefined || !tsUtils.type_.isOnlyArrayish(expressionType)) {
+    if (expressionType === undefined || !isOnlyArray(sb.context, expression, expressionType)) {
       /* istanbul ignore next */
       sb.context.reportUnsupported(expression);
 

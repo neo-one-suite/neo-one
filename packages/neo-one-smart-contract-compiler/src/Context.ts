@@ -84,6 +84,10 @@ export class Context {
     this.reportError(node, DiagnosticCode.GenericUnsupportedSyntax, DiagnosticMessage.GenericUnsupportedSyntax);
   }
 
+  public reportUnsupportedEfficiency(node: ts.Node): void {
+    this.reportError(node, DiagnosticCode.GenericUnsupportedSyntax, DiagnosticMessage.EfficiencyUnsupportedSyntax);
+  }
+
   public reportTypeError(node: ts.Node): void {
     this.reportError(node, DiagnosticCode.UnknownType, DiagnosticMessage.CouldNotInferType);
   }

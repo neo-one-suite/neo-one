@@ -1,17 +1,38 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { NodeCompiler } from '../NodeCompiler';
-import { ScriptBuilder } from '../sb';
-import { VisitOptions } from '../types';
+import { ScriptBuilder } from '../../sb';
+import { VisitOptions } from '../../types';
+import { TypedHelper, TypedHelperOptions } from '../common';
+import { isOnlyArray } from '../types';
+
+export interface ArrayBindingHelperOptions extends TypedHelperOptions {
+  readonly value?: ts.Node;
+}
 
 // [arrayVal]
-export class ArrayBindingPatternCompiler extends NodeCompiler<ts.ArrayBindingPattern> {
-  public readonly kind = ts.SyntaxKind.ArrayBindingPattern;
+export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
+  private readonly value?: ts.Node;
 
-  public visitNode(sb: ScriptBuilder, node: ts.ArrayBindingPattern, optionsIn: VisitOptions): void {
+  public constructor(options: ArrayBindingHelperOptions) {
+    super(options);
+    this.value = options.value;
+  }
+
+  public emit(sb: ScriptBuilder, node: ts.ArrayBindingPattern, optionsIn: VisitOptions): void {
+    if (this.type === undefined || !isOnlyArray(sb.context, node, this.type)) {
+      sb.context.reportUnsupported(node);
+
+      return;
+    }
+
     const options = sb.pushValueOptions(optionsIn);
     const restElement = node.elements.find((element) => tsUtils.node.getDotDotDotToken(element) !== undefined);
     const elements = restElement === undefined ? [...node.elements] : node.elements.slice(0, -1);
+
+    if (this.value !== undefined) {
+      // [arrayVal]
+      sb.visit(this.value, options);
+    }
     elements.forEach((element, idx) => {
       if (ts.isOmittedExpression(element)) {
         /* istanbul ignore next */
@@ -20,6 +41,7 @@ export class ArrayBindingPatternCompiler extends NodeCompiler<ts.ArrayBindingPat
 
       const name = tsUtils.node.getNameNode(element);
       const initializer = tsUtils.initializer.getInitializer(element);
+      const elementType = sb.context.getType(name);
 
       if (ts.isIdentifier(name)) {
         sb.scope.add(tsUtils.node.getText(name));
@@ -56,9 +78,10 @@ export class ArrayBindingPatternCompiler extends NodeCompiler<ts.ArrayBindingPat
       if (ts.isIdentifier(name)) {
         // [arrayVal]
         sb.scope.set(sb, node, options, tsUtils.node.getText(name));
+      } else if (ts.isArrayBindingPattern(name)) {
+        sb.emitHelper(name, options, sb.helpers.arrayBinding({ type: elementType }));
       } else {
-        // [arrayVal]
-        sb.visit(name, optionsIn);
+        sb.emitHelper(name, options, sb.helpers.objectBinding({ type: elementType }));
       }
     });
 

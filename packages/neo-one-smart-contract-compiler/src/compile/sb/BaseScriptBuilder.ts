@@ -15,7 +15,6 @@ import { BN } from 'bn.js';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../../Context';
-import { binding } from '../binding';
 import { Builtins } from '../builtins';
 import { declarations } from '../declaration';
 import { expressions } from '../expression';
@@ -30,13 +29,7 @@ import { JumpTable } from './JumpTable';
 import { resolveJumps } from './resolveJumps';
 import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode, SingleBytecodeValue, Tags } from './ScriptBuilder';
 
-const compilers: ReadonlyArray<ReadonlyArray<new () => NodeCompiler>> = [
-  declarations,
-  expressions,
-  files,
-  statements,
-  binding,
-];
+const compilers: ReadonlyArray<ReadonlyArray<new () => NodeCompiler>> = [declarations, expressions, files, statements];
 
 type Compilers = { [K in number]?: NodeCompiler };
 

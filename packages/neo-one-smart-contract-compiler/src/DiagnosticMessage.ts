@@ -1,5 +1,6 @@
 export enum DiagnosticMessage {
   GenericUnsupportedSyntax = 'Unsupported syntax.',
+  EfficiencyUnsupportedSyntax = 'Unsupported syntax. This is not supported because it would result in inefficient smart contract code',
   CouldNotInferType = 'Could not infer type. Please add an explicit type annotation.',
   CouldNotInferTypeDeopt = 'Could not infer type. Deoptimized implementation will be used. Add an explicit type annotation ',
   CouldNotInferSymbol = 'Could not infer symbol.',
