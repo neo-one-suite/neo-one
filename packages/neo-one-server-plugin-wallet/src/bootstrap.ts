@@ -19,7 +19,7 @@ import {
   UserAccountID,
   wifToPrivateKey,
 } from '@neo-one/client';
-import { common } from '@neo-one/client-core';
+import { common, crypto } from '@neo-one/client-core';
 import { GetCLIResourceOptions, InteractiveCLI, InteractiveCLIArgs } from '@neo-one/server-plugin';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import { compileContract, CompileContractResult } from '@neo-one/smart-contract-compiler';
@@ -36,19 +36,51 @@ import { Wallet } from './WalletResourceType';
 
 const DEFAULT_NUM_WALLETS = 10;
 export const DEFAULT_MASTER_PRIVATE_KEY = '9e9522c90f4b33cac8a174353ae54651770f3f4dd1de78e74d9b49ba615d7c1f';
+const DEFAULT_MASTER_PUBLIC_KEY = '03396d8a87f1f77be1ca1e2d63ee3c1a642a9c45d3fb1dc2bfdd7ce680043244f2';
 const DEFAULT_NETWORK_NAME = 'priv';
-export const DEFAULT_PRIVATE_KEYS: ReadonlyArray<string> = [
-  'e35ecb8189067a0a06f17f163be3db95c4b7805c81b48af1f4b8bbdfbeeb1afd',
-  '6cad314f75624a26b780368a8b0753d10815ca44c1fca6eb3972484548805d9e',
-  'e91dc6e5fffcae0510ef5a7e41675d024e5b286769b3ff455e71e01a4cf16ef0',
-  'fa38cb00810d173e14631219d8ee689ee183a3d307c3c8bd2e1234d332dd3255',
-  '3ca9e1140253f75dded54a1e73bfd44678d0cbf7b9ee7229dfa2cf06aba6a3b5',
-  '3cdafff958a81f84425b062085aad7a842fd35d980f873aee392116cdd10969d',
-  '48e297109c2a9d46a9f72ad9bcf71ad784e2613695b9455dc1b1a3295955c774',
-  '996b7ff875733a4b4aa92f450923bf64ee0f1b9d8c88028d06cef808221f2fb2',
-  'eeb0940129baed17ae519a228afed2664a7bce372df0885a2675ee4426151a0f',
-  '31efd094e0e299daaae8e08c1f7e99df0d71f8f26b30924274901812a4730992',
+export const DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS: ReadonlyArray<[string, string]> = [
+  [
+    'e35ecb8189067a0a06f17f163be3db95c4b7805c81b48af1f4b8bbdfbeeb1afd',
+    '020266f0d31fa8c1c28cfe8712cc26b6d41ff910deb02341dfe628573178906940',
+  ],
+  [
+    '6cad314f75624a26b780368a8b0753d10815ca44c1fca6eb3972484548805d9e',
+    '02eae8da9a7f159395efb1789fe18134521b5c21315ca216e65f430c8f0a934957',
+  ],
+  [
+    'e91dc6e5fffcae0510ef5a7e41675d024e5b286769b3ff455e71e01a4cf16ef0',
+    '02f6ed86ceb2cdd69fac03872e50860e853e3dbf9873bf3a2fb4313d4366fabf1b',
+  ],
+  [
+    'fa38cb00810d173e14631219d8ee689ee183a3d307c3c8bd2e1234d332dd3255',
+    '022987fb75e1b64bae89b96a3efc978c0562987a7e718071bda2be5e28111534be',
+  ],
+  [
+    '3ca9e1140253f75dded54a1e73bfd44678d0cbf7b9ee7229dfa2cf06aba6a3b5',
+    '02ff4132c82500232c1bc75747e370fa5f4313417213f9896388c259825cc23e3d',
+  ],
+  [
+    '3cdafff958a81f84425b062085aad7a842fd35d980f873aee392116cdd10969d',
+    '0244df8a470957db89cd7b8e3b58c43429b789c3eae8000ed425a9a4e117752e52',
+  ],
+  [
+    '48e297109c2a9d46a9f72ad9bcf71ad784e2613695b9455dc1b1a3295955c774',
+    '03016acb92193f545572b990e43877eefa0a70a22cfba3516bd853c8f301d3a6ae',
+  ],
+  [
+    '996b7ff875733a4b4aa92f450923bf64ee0f1b9d8c88028d06cef808221f2fb2',
+    '037ddc19798d79f99a2ecbd6d0232b9272a15b3e11f18a7e267be5a8cb5e1f27ed',
+  ],
+  [
+    'eeb0940129baed17ae519a228afed2664a7bce372df0885a2675ee4426151a0f',
+    '02ff73b451d289e11d25b503590442dea87227f0eb19b766fdbc158e6ce4e17a24',
+  ],
+  [
+    '31efd094e0e299daaae8e08c1f7e99df0d71f8f26b30924274901812a4730992',
+    '036c6d633f38ebb5be31784031d065bae11cdba2999186c896366ebccf3efe538b',
+  ],
 ];
+export const DEFAULT_PRIVATE_KEYS = DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS.map(([key]) => key);
 
 export interface AssetInfo {
   readonly assetType: AssetType;
@@ -56,6 +88,7 @@ export interface AssetInfo {
   readonly amount: BigNumber;
   readonly precision: number;
   readonly privateKey: string;
+  readonly publicKey: string;
 }
 
 export const ASSET_INFO: ReadonlyArray<AssetInfo> = [
@@ -65,6 +98,7 @@ export const ASSET_INFO: ReadonlyArray<AssetInfo> = [
     amount: new BigNumber(1000000),
     precision: 4,
     privateKey: '7bb05e6087cd116aa5f1da9001736a5350981c4548116e2bc08c9a4f29b3fee4',
+    publicKey: '024ec7428c134451d741383f2ea1c61a92159b072d517e3f8a1a8a6ef1a63948c3',
   },
 
   {
@@ -73,6 +107,7 @@ export const ASSET_INFO: ReadonlyArray<AssetInfo> = [
     amount: new BigNumber(660000),
     precision: 0,
     privateKey: 'c27b96a2854ead7d4b4ef50de2695201fef87d3d46c9b36a6cd113774706748b',
+    publicKey: '02e530f413e225e6b0b179e43a18e0676c724486f3c582eb1e78b2f799b38cdd68',
   },
 
   {
@@ -81,6 +116,7 @@ export const ASSET_INFO: ReadonlyArray<AssetInfo> = [
     amount: new BigNumber(50000000),
     precision: 6,
     privateKey: '8868b8c6152e3ba39e3c31b4774f67fcce3465f41720a408d59bfd34e6980ec3',
+    publicKey: '035a0afe8410cd5df818f9b2734ab64ecd59ed8aa8fb4c5e0257364296524e0c62',
   },
 ];
 
@@ -88,6 +124,7 @@ export interface TokenInfo {
   readonly name: string;
   readonly amount: BigNumber;
   readonly privateKey: string;
+  readonly publicKey: string;
 }
 
 export const TOKEN_INFO: ReadonlyArray<TokenInfo> = [
@@ -95,18 +132,21 @@ export const TOKEN_INFO: ReadonlyArray<TokenInfo> = [
     name: 'RedToken',
     amount: new BigNumber(1000000),
     privateKey: '3fedc9048caf7b75cece9d0db85748e5cb44940ff4d48f6230526db295040df4',
+    publicKey: '024c8991bd84f8f08a96abe2f7be01dff4c65abde974c3ac99135451293b34961e',
   },
 
   {
     name: 'BlueToken',
     amount: new BigNumber(660000),
     privateKey: 'b29b677bf6c1abb7e184d943df10c3b57bedc14a85f9fda21cc93ec1b91be9ae',
+    publicKey: '039c4b0efe9b3dc35a138aad1d8f3a48dfe660b837379f39d49a50f0fc54ee0e0e',
   },
 
   {
     name: 'GreenToken',
     amount: new BigNumber(50000000),
     privateKey: 'b8ec5eb6c6f499240fc431bbf68feee76ef503212e61496f0c8b8804168ae954',
+    publicKey: '02a9f7d888a23c20a45621a504c5d716895e5fd8941c6d7620975101b46ae81527',
   },
 ];
 
@@ -547,6 +587,10 @@ async function getPresetData({
       plugin,
     });
   } else {
+    crypto.addPublicKey(
+      common.stringToPrivateKey(DEFAULT_MASTER_PRIVATE_KEY),
+      common.stringToECPoint(DEFAULT_MASTER_PUBLIC_KEY),
+    );
     master = {
       name: 'master',
       privateKey: DEFAULT_MASTER_PRIVATE_KEY,
@@ -578,6 +622,10 @@ async function getPresetData({
       },
     };
   };
+
+  DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS.forEach(([privateKey, publicKey]) => {
+    crypto.addPublicKey(common.stringToPrivateKey(privateKey), common.stringToECPoint(publicKey));
+  });
 
   const wallets = utils
     .zip(

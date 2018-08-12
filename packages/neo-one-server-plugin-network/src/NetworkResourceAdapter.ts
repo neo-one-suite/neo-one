@@ -11,7 +11,6 @@ import {
 } from '@neo-one/server-plugin';
 import { labels, mergeScanLatest, utils } from '@neo-one/utils';
 import * as fs from 'fs-extra';
-import _ from 'lodash';
 import * as path from 'path';
 import { BehaviorSubject, combineLatest, Observable, timer } from 'rxjs';
 import { shareReplay, switchMap } from 'rxjs/operators';
@@ -179,22 +178,22 @@ export class NetworkResourceAdapter {
     options: NetworkResourceAdapterStaticOptions,
   ): ReadonlyArray<[string, NodeSettings]> {
     const primaryPrivateKey = crypto.wifToPrivateKey(constants.PRIVATE_NET_PRIVATE_KEY, common.NEO_PRIVATE_KEY_VERSION);
+    const primaryPublicKey = common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY);
+    crypto.addPublicKey(primaryPrivateKey, primaryPublicKey);
 
     const primaryAddress = common.uInt160ToString(crypto.privateKeyToScriptHash(primaryPrivateKey));
 
-    const configuration = _.range(0, 1).map((idx) => {
-      const { privateKey, publicKey } = crypto.createKeyPair();
-      const name = `${options.name}-${idx}`;
-
-      return {
-        name,
-        rpcPort: this.getRPCPort(options, name),
-        listenTCPPort: this.getListenTCPPort(options, name),
-        telemetryPort: this.getTelemetryPort(options, name),
-        privateKey,
-        publicKey,
-      };
-    });
+    const configurationName = `${options.name}-0`;
+    const configuration = [
+      {
+        name: configurationName,
+        rpcPort: this.getRPCPort(options, configurationName),
+        listenTCPPort: this.getListenTCPPort(options, configurationName),
+        telemetryPort: this.getTelemetryPort(options, configurationName),
+        privateKey: primaryPrivateKey,
+        publicKey: primaryPublicKey,
+      },
+    ];
     const secondsPerBlock = 15;
     const standbyValidators = configuration.map(({ publicKey }) => common.ecPointToString(publicKey));
 

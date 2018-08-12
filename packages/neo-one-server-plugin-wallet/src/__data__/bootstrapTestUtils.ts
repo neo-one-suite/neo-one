@@ -1,9 +1,15 @@
 import { addressToScriptHash, NEOONEProvider, privateKeyToAddress, ReadClient } from '@neo-one/client';
-import { common } from '@neo-one/client-core';
+import { common, crypto } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { ASSET_INFO, compileSmartContract, TOKEN_INFO, TokenInfo } from '../bootstrap';
+import {
+  ASSET_INFO,
+  compileSmartContract,
+  TOKEN_INFO,
+  TokenInfo,
+  DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS,
+} from '../bootstrap';
 import { constants } from '../constants';
 import { Wallet as ResourceWallet } from '../WalletResourceType';
 import { Network as ResourceNetwork } from '@neo-one/server-plugin-network';
@@ -39,6 +45,15 @@ interface Wallet {
   readonly balance: ReadonlyArray<Coin>;
 }
 
+ASSET_INFO.forEach(({ privateKey, publicKey }) => {
+  crypto.addPublicKey(common.stringToPrivateKey(privateKey), common.stringToECPoint(publicKey));
+});
+TOKEN_INFO.forEach(({ privateKey, publicKey }) => {
+  crypto.addPublicKey(common.stringToPrivateKey(privateKey), common.stringToECPoint(publicKey));
+});
+DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS.forEach(([privateKey, publicKey]) => {
+  crypto.addPublicKey(common.stringToPrivateKey(privateKey), common.stringToECPoint(publicKey));
+});
 const ASSET_WALLET_ADDRESSES = new Set(ASSET_INFO.map(({ privateKey }) => privateKeyToAddress(privateKey)));
 
 const TOKEN_WALLET_ADDRESSES = new Set(TOKEN_INFO.map(({ privateKey }) => privateKeyToAddress(privateKey)));
