@@ -74,19 +74,6 @@ exports[`Address.getSmartContract reports error on invalid argument return - uni
 "
 `;
 
-exports[`Address.getSmartContract reports error on invalid argument return - union string | undefined 1`] = `
-"snippetCode.ts (5,11): Expected type to resolve to one known type
-
-      3 | 
-      4 |         interface Foo {
-    > 5 |           bar(value: number): number | undefined;
-        |           ^
-      6 |         }
-      7 | 
-      8 |         const sc = Address.getSmartContract<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
-"
-`;
-
 exports[`Address.getSmartContract reports error on invalid argument values - Object 1`] = `
 "snippetCode.ts (12,39): Argument of type 'Address' is not assignable to parameter of type 'never'.
 

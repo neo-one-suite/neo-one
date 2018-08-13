@@ -3,7 +3,7 @@ import { CLIOption } from './CRUDBase';
 import { CRUDResource, Request$Options } from './CRUDResource';
 import { GetCLIAutocompleteOptions } from './CRUDResourceBase';
 import { ResourceType } from './ResourceType';
-import { BaseResource, BaseResourceOptions, ModifyResourceResponse } from './types';
+import { BaseResource, BaseResourceOptions, ExecuteTaskListResponse } from './types';
 
 export interface CreateCRUDOptions<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> {
   readonly resourceType: ResourceType<Resource, ResourceOptions>;
@@ -62,7 +62,7 @@ export class CreateCRUD<
     cancel$,
     options,
     client,
-  }: Request$Options<ResourceOptions>): Observable<ModifyResourceResponse> {
+  }: Request$Options<ResourceOptions>): Observable<ExecuteTaskListResponse> {
     return client.createResource$({
       plugin: this.resourceType.plugin.name,
       resourceType: this.resourceType.name,

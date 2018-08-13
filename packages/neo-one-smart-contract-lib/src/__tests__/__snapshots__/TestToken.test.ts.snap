@@ -2,8 +2,8 @@
 
 exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: deploy consumed 1`] = `"0"`;
 
-exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"8.433"`;
+exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"7.95"`;
 
 exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"0"`;
 
-exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"6.019"`;
+exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"5.652"`;

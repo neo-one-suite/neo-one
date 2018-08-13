@@ -18,6 +18,15 @@ export class DoReturn extends BuiltinCall {
       sb.visit(arg, options);
       // [value]
       sb.emitHelper(node, options, sb.helpers.unwrapValRecursive({ type: sb.context.getType(arg) }));
+      // Hack to make sure we only have one return value on the stack.
+      // [number, value]
+      sb.emitOp(node, 'DEPTH');
+      // [arr]
+      sb.emitOp(node, 'PACK');
+      // [number, arr]
+      sb.emitPushInt(node, 0);
+      // [value]
+      sb.emitOp(node, 'PICKITEM');
     }
   }
 }

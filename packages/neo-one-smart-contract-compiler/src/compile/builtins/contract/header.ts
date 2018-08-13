@@ -52,6 +52,8 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'HeaderConstructor',
     'for',
-    new ValueFor('Neo.Blockchain.GetHeader', (sb) => sb.helpers.wrapHeader),
+    new ValueFor('Neo.Blockchain.GetHeader', (sb, node, options) => {
+      sb.emitHelper(node, options, sb.helpers.wrapHeader);
+    }),
   );
 };

@@ -25,9 +25,7 @@ export class PutStorage extends BuiltinCall {
     sb.visit(key, options);
     // [keyBuffer, valBuffer]
     sb.emitSysCall(val, 'Neo.Runtime.Serialize');
-    // [context, keyBuffer, valBuffer]
-    sb.emitSysCall(node, 'Neo.Storage.GetContext');
     // []
-    sb.emitSysCall(node, 'Neo.Storage.Put');
+    sb.emitHelper(node, options, sb.helpers.putStorage);
   }
 }

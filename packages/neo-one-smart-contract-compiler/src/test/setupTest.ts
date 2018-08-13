@@ -50,6 +50,7 @@ export interface TestOptions extends CompileContractResult {
   readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
   readonly contract: ContractRegister;
   readonly ignoreWarnings?: boolean;
+  readonly deploy?: boolean;
 }
 
 // tslint:disable-next-line no-any
@@ -69,35 +70,38 @@ export interface Result<TSmartContract extends SmartContract<any> = SmartContrac
 export const setupTest = async <TContract extends SmartContract<any> = SmartContractAny>(
   getContract: () => Promise<TestOptions>,
 ): Promise<Result<TContract>> => {
-  const [
-    { client, masterWallet, provider, networkName, privateKey, node },
-    { contract, sourceMap, diagnostics, abi, ignoreWarnings },
-  ] = await Promise.all([testNodeSetup(true), getContract()]);
+  const { client, masterWallet, provider, networkName, privateKey, node } = await testNodeSetup(true);
+  try {
+    const { contract, sourceMap, diagnostics, abi, ignoreWarnings, deploy } = await getContract();
 
-  const developerClient = new DeveloperClient(provider.read(networkName));
+    const developerClient = new DeveloperClient(provider.read(networkName));
 
-  throwOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);
+    throwOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);
 
-  const result = await client.publish(contract);
+    const result = await (deploy ? client.publishAndDeploy(contract, abi) : client.publish(contract));
 
-  const [receipt] = await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
-  if (receipt.result.state === 'FAULT') {
-    throw new Error(receipt.result.message);
+    const [receipt] = await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
+    if (receipt.result.state === 'FAULT') {
+      throw new Error(receipt.result.message);
+    }
+
+    const smartContract = client.smartContract<TContract>({
+      networks: { [networkName]: { hash: receipt.result.value.hash } },
+      abi,
+      sourceMap,
+    });
+
+    return {
+      networkName,
+      client,
+      developerClient,
+      smartContract,
+      masterAccountID: masterWallet.account.id,
+      masterPrivateKey: privateKey,
+      cleanup: async () => node.stop(),
+    };
+  } catch (error) {
+    await node.stop();
+    throw error;
   }
-
-  const smartContract = client.smartContract<TContract>({
-    networks: { [networkName]: { hash: receipt.result.value.hash } },
-    abi,
-    sourceMap,
-  });
-
-  return {
-    networkName,
-    client,
-    developerClient,
-    smartContract,
-    masterAccountID: masterWallet.account.id,
-    masterPrivateKey: privateKey,
-    cleanup: async () => node.stop(),
-  };
 };

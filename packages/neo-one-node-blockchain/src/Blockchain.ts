@@ -24,6 +24,7 @@ import {
   utils,
   Validator,
   VerifyScriptOptions,
+  VMState,
 } from '@neo-one/client-core';
 import { metrics, Monitor } from '@neo-one/monitor';
 import { Blockchain as BlockchainType, NULL_ACTION, Storage, TriggerType, VM } from '@neo-one/node-core';
@@ -673,16 +674,21 @@ export class Blockchain {
     const blockchain = this.createWriteBlockchain();
     const result = await this.vm.executeScripts({
       monitor: this.getMonitor(monitor),
-      scripts: [{ code: witness.invocation, pushOnly: true }, { code: verification }],
-
+      scripts: [{ code: witness.invocation }, { code: verification }],
       blockchain,
       scriptContainer,
       triggerType: TriggerType.Verification,
       action: NULL_ACTION,
-      gas: utils.ZERO,
+      gas: utils.ONE_HUNDRED_MILLION,
     });
 
-    const { stack } = result;
+    const { stack, state, errorMessage } = result;
+    if (state === VMState.Fault) {
+      throw new ScriptVerifyError(
+        errorMessage === undefined ? 'Script execution ended in a FAULT state' : errorMessage,
+      );
+    }
+
     if (stack.length !== 1) {
       throw new ScriptVerifyError(
         `Verification did not return one result. This may be a bug in the ` +

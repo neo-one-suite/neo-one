@@ -85,13 +85,13 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
     const transactions = reader.readArray(() => deserializeTransactionWireBase(options), 0x10000);
 
     if (transactions.length === 0) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError('Expected at least one transcaction in the block');
     }
 
     const merkleRoot = MerkleTree.computeRoot(transactions.map((transaction) => transaction.hash));
 
     if (!common.uInt256Equal(merkleRoot, blockBase.merkleRoot)) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError('Invalid merkle root');
     }
 
     return new this({

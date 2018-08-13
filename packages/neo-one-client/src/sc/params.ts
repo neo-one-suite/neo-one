@@ -17,26 +17,34 @@ import {
 } from '../types';
 
 export const params = {
-  String: (param: Param | undefined, _parameter: StringABI): ScriptBuilderParam | undefined =>
-    args.assertString('String', param),
-  Hash160: (param: Param | undefined, _parameter: Hash160ABI): ScriptBuilderParam | undefined =>
-    common.stringToUInt160(args.assertHash160(param)),
-  Hash256: (param: Param | undefined, _parameter: Hash256ABI): ScriptBuilderParam | undefined =>
-    common.stringToUInt256(args.assertHash256(param)),
-  PublicKey: (param: Param | undefined, _parameter: PublicKeyABI): ScriptBuilderParam | undefined =>
-    common.stringToECPoint(args.assertPublicKey(param)),
+  String: (param: Param | undefined, parameter: StringABI): ScriptBuilderParam | undefined =>
+    parameter.optional && param === undefined ? undefined : args.assertString('String', param),
+  Hash160: (param: Param | undefined, parameter: Hash160ABI): ScriptBuilderParam | undefined =>
+    parameter.optional && param === undefined ? undefined : common.stringToUInt160(args.assertHash160(param)),
+  Hash256: (param: Param | undefined, parameter: Hash256ABI): ScriptBuilderParam | undefined =>
+    parameter.optional && param === undefined ? undefined : common.stringToUInt256(args.assertHash256(param)),
+  PublicKey: (param: Param | undefined, parameter: PublicKeyABI): ScriptBuilderParam | undefined =>
+    parameter.optional && param === undefined ? undefined : common.stringToECPoint(args.assertPublicKey(param)),
   Integer: (param: Param | undefined, parameter: IntegerABI): ScriptBuilderParam | undefined => {
+    if (parameter.optional && param === undefined) {
+      return undefined;
+    }
+
     const value = args.assertBigNumber(param);
 
     return bigNumberToBN(value, parameter.decimals);
   },
-  Boolean: (param: Param | undefined, _parameter: BooleanABI): ScriptBuilderParam | undefined =>
-    args.assertBoolean(param),
-  ByteArray: (param: Param | undefined, _parameter: ByteArrayABI): ScriptBuilderParam | undefined =>
-    Buffer.from(args.assertBuffer(param), 'hex'),
-  Signature: (param: Param | undefined, _parameter: SignatureABI): ScriptBuilderParam | undefined =>
-    Buffer.from(args.assertBuffer(param), 'hex'),
+  Boolean: (param: Param | undefined, parameter: BooleanABI): ScriptBuilderParam | undefined =>
+    parameter.optional && param === undefined ? undefined : args.assertBoolean(param),
+  ByteArray: (param: Param | undefined, parameter: ByteArrayABI): ScriptBuilderParam | undefined =>
+    parameter.optional && param === undefined ? undefined : Buffer.from(args.assertBuffer(param), 'hex'),
+  Signature: (param: Param | undefined, parameter: SignatureABI): ScriptBuilderParam | undefined =>
+    parameter.optional && param === undefined ? undefined : Buffer.from(args.assertBuffer(param), 'hex'),
   Array: (param: Param | undefined, parameter: ArrayABI): ScriptBuilderParam | undefined => {
+    if (parameter.optional && param === undefined) {
+      return undefined;
+    }
+
     if (!Array.isArray(param)) {
       throw new InvalidArgumentError(`Expected Array, found: ${String(param)}`);
     }

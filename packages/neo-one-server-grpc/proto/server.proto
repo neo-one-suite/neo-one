@@ -13,6 +13,7 @@ service Server {
   rpc deleteResource(stream DeleteResourceRequest) returns (stream DeleteResourceResponse) {}
   rpc startResource(stream StartResourceRequest) returns (stream StartResourceResponse) {}
   rpc stopResource(stream StopResourceRequest) returns (stream StopResourceResponse) {}
+  rpc executeTaskList(stream ExecuteTaskListRequest) returns (stream ExecuteTaskListResponse) {}
 }
 
 message ResetRequest {
@@ -154,5 +155,15 @@ message StopResourceRequest {
 }
 
 message StopResourceResponse {
+  string tasks = 1;
+}
+
+message ExecuteTaskListRequest {
+  string type = 1;
+  string plugin = 2;
+  string options = 3;
+}
+
+message ExecuteTaskListResponse {
   string tasks = 1;
 }

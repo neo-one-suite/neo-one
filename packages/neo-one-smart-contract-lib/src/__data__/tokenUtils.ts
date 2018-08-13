@@ -6,6 +6,7 @@ import {
   SmartContractAny,
   TransactionResult,
   UserAccountID,
+  Event,
 } from '@neo-one/client';
 import { SetupTestResult } from '@neo-one/smart-contract-compiler';
 import { crypto, common } from '@neo-one/client-core';
@@ -22,7 +23,7 @@ export interface Options {
   readonly name: string;
   readonly symbol: string;
   readonly decimals: number;
-  readonly deploy: (options: DeployOptions) => Promise<TransactionResult<InvokeReceipt>>;
+  readonly deploy?: (options: DeployOptions) => Promise<TransactionResult<InvokeReceipt>>;
   readonly issueValue: BigNumber;
   readonly transferValue: BigNumber;
   readonly description: string;
@@ -64,11 +65,13 @@ export const testToken = async ({
       name: 'wallet0',
       privateKey: TO.PRIVATE_KEY,
     }),
-    deploy({
-      masterPrivateKey,
-      masterAccountID,
-      smartContract,
-    }),
+    deploy === undefined
+      ? Promise.resolve(undefined)
+      : deploy({
+          masterPrivateKey,
+          masterAccountID,
+          smartContract,
+        }),
   ]);
   expect(nameResult).toEqual(name);
   expect(decimalsResult.toString()).toEqual(`${decimals}`);
@@ -76,28 +79,31 @@ export const testToken = async ({
 
   const account0 = wallet0.account.id;
 
-  const [deployReceipt] = await Promise.all([
-    deployResult.confirmed({ timeoutMS: 2500 }),
-    developerClient.runConsensusNow(),
-  ]);
+  let event: Event;
+  if (deployResult !== undefined) {
+    const [deployReceipt] = await Promise.all([
+      deployResult.confirmed({ timeoutMS: 2500 }),
+      developerClient.runConsensusNow(),
+    ]);
 
-  if (deployReceipt.result.state !== 'HALT') {
-    throw new Error(deployReceipt.result.message);
-  }
+    if (deployReceipt.result.state !== 'HALT') {
+      throw new Error(deployReceipt.result.message);
+    }
 
-  expect(deployReceipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
-  expect(deployReceipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
-  expect(deployReceipt.result.value).toBeTruthy();
-  expect(deployReceipt.events).toHaveLength(1);
-  let event = deployReceipt.events[0];
-  expect(event.name).toEqual('transfer');
-  expect(event.parameters.from).toEqual(undefined);
-  expect(event.parameters.to).toEqual(privateKeyToScriptHash(masterPrivateKey));
-  if (event.parameters.amount === undefined) {
-    expect(event.parameters.amount).toBeTruthy();
-    throw new Error('For TS');
+    expect(deployReceipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
+    expect(deployReceipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
+    expect(deployReceipt.result.value).toBeTruthy();
+    expect(deployReceipt.events).toHaveLength(1);
+    event = deployReceipt.events[0];
+    expect(event.name).toEqual('transfer');
+    expect(event.parameters.from).toEqual(undefined);
+    expect(event.parameters.to).toEqual(privateKeyToScriptHash(masterPrivateKey));
+    if (event.parameters.amount === undefined) {
+      expect(event.parameters.amount).toBeTruthy();
+      throw new Error('For TS');
+    }
+    expect(event.parameters.amount.toString()).toEqual(issueValue.toString());
   }
-  expect(event.parameters.amount.toString()).toEqual(issueValue.toString());
 
   const [issueBalance, issueTotalSupply, transferResult] = await Promise.all([
     smartContract.balanceOf(addressToScriptHash(masterAccountID.address)),

@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { CLIOption } from './CRUDBase';
 import { CRUDResource, Request$Options } from './CRUDResource';
 import { ResourceType } from './ResourceType';
-import { BaseResource, BaseResourceOptions, ModifyResourceResponse } from './types';
+import { BaseResource, BaseResourceOptions, ExecuteTaskListResponse } from './types';
 
 export interface StopCRUDOptions<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> {
   readonly name?: string;
@@ -57,7 +57,7 @@ export class StopCRUD<Resource extends BaseResource, ResourceOptions extends Bas
     cancel$,
     options,
     client,
-  }: Request$Options<ResourceOptions>): Observable<ModifyResourceResponse> {
+  }: Request$Options<ResourceOptions>): Observable<ExecuteTaskListResponse> {
     return client.stopResource$({
       plugin: this.resourceType.plugin.name,
       resourceType: this.resourceType.name,

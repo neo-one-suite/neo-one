@@ -15,13 +15,18 @@ export const compileContract = async (
   return result;
 };
 
+export interface SetupContractTestOptions {
+  readonly ignoreWarnings?: boolean;
+  readonly deploy?: boolean;
+}
+
 // tslint:disable-next-line no-any
 export const setupContractTest = async <TSmartContract extends SmartContract<any> = SmartContractAny>(
   filePath: string,
   contractName: string,
-  ignoreWarnings = false,
+  { ignoreWarnings = false, deploy = false }: SetupContractTestOptions = { ignoreWarnings: false, deploy: false },
 ): Promise<SetupTestResult<TSmartContract>> =>
-  setupContractTestBase<TSmartContract>({ filePath, contractName, ignoreWarnings });
+  setupContractTestBase<TSmartContract>({ filePath, contractName, ignoreWarnings, deploy });
 
 export { CompileContractResult, SetupTestResult };
 export { scan, Contracts } from './scan';

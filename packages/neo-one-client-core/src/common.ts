@@ -27,7 +27,7 @@ const asUInt160 = (value: {}): UInt160 => {
     return value;
   }
 
-  throw new InvalidFormatError();
+  throw new InvalidFormatError('Invalid UInt160');
 };
 
 const bufferToUInt160 = asUInt160;
@@ -62,7 +62,7 @@ const asUInt256 = (value: {}): UInt256 => {
     return value;
   }
 
-  throw new InvalidFormatError();
+  throw new InvalidFormatError('Invalid UInt256');
 };
 
 const bufferToUInt256 = asUInt256;
@@ -102,7 +102,7 @@ const asECPoint = (value: {}): ECPoint => {
     return value;
   }
 
-  throw new InvalidFormatError();
+  throw new InvalidFormatError('Invalid ECPoint');
 };
 
 const bufferToECPoint = asECPoint;
@@ -152,7 +152,7 @@ const asPrivateKey = (value: {}): PrivateKey => {
     return value;
   }
 
-  throw new InvalidFormatError();
+  throw new InvalidFormatError('Invalid Private Key');
 };
 
 const bufferToPrivateKey = asPrivateKey;

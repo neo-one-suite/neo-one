@@ -169,6 +169,15 @@ export class PluginManager {
     }
   }
 
+  public getPlugin({ plugin: pluginName }: { readonly plugin: string }): Plugin {
+    const plugin = this.mutablePlugins[pluginName] as Plugin | undefined;
+    if (plugin === undefined) {
+      throw new PluginNotInstalledError(pluginName);
+    }
+
+    return plugin;
+  }
+
   public getResourcesManager({
     plugin: pluginName,
     resourceType: resourceTypeName,
@@ -176,10 +185,7 @@ export class PluginManager {
     readonly plugin: string;
     readonly resourceType: string;
   }): ResourcesManager {
-    const plugin = this.mutablePlugins[pluginName] as Plugin | undefined;
-    if (plugin === undefined) {
-      throw new PluginNotInstalledError(pluginName);
-    }
+    const plugin = this.getPlugin({ plugin: pluginName });
     const resourceType = plugin.resourceTypeByName[resourceTypeName] as ResourceType | undefined;
     if (resourceType === undefined) {
       throw new UnknownPluginResourceType({

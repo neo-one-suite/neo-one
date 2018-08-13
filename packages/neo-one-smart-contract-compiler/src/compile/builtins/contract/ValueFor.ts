@@ -1,7 +1,6 @@
 import { SysCallName } from '@neo-one/client-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { Helper } from '../../helper';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { BuiltinMemberCall } from '../BuiltinMemberCall';
@@ -11,7 +10,7 @@ import { MemberLikeExpression } from '../types';
 export class ValueFor extends BuiltinMemberCall {
   public constructor(
     private readonly syscall: SysCallName,
-    private readonly unwrapHelper: (sb: ScriptBuilder) => Helper,
+    private readonly wrap: (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) => void,
   ) {
     super();
   }
@@ -34,8 +33,8 @@ export class ValueFor extends BuiltinMemberCall {
       sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
       // [account]
       sb.emitSysCall(node, this.syscall);
-      // [accountVal]
-      sb.emitHelper(node, options, this.unwrapHelper(sb));
+      // [val]
+      this.wrap(sb, node, options);
     } else {
       // []
       sb.emitOp(node, 'DROP');

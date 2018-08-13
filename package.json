@@ -47,7 +47,8 @@
       "packages/neo-one-server-plugin-wallet/src/contracts/*",
       "packages/neo-one-smart-contract/src/*",
       "packages/neo-one-smart-contract-lib/src/*",
-      "packages/*/src/__data__/contracts/*"
+      "packages/*/src/__data__/contracts/*",
+      "packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts/*"
     ]
   },
   "scripts": {
@@ -104,7 +105,9 @@
     "@types/bs58": "3.0.30",
     "@types/chokidar": "1.7.5",
     "@types/cli-table2": "0.2.1",
+    "@types/convict": "^4.2.0",
     "@types/core-js": "2.5.0",
+    "@types/cosmiconfig": "^5.0.3",
     "@types/execa": "0.9.0",
     "@types/figures": "2.0.0",
     "@types/fs-extra": "5.0.4",

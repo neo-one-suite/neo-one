@@ -74,22 +74,6 @@ describe('Address.getSmartContract', () => {
     );
   });
 
-  test('reports error on invalid argument return - union string | undefined', async () => {
-    await helpers.compileString(
-      `
-        import { Address } from '@neo-one/smart-contract';
-
-        interface Foo {
-          bar(value: number): number | undefined;
-        }
-
-        const sc = Address.getSmartContract<Foo>(Address.from('${keys[0].address}'));
-        sc.bar(0);
-      `,
-      { type: 'error' },
-    );
-  });
-
   test('reports error on multiple call signatures', async () => {
     await helpers.compileString(
       `

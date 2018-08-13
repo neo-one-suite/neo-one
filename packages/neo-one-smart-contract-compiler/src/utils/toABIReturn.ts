@@ -5,13 +5,18 @@ import { isOnlyArray, isOnlyBoolean, isOnlyBuffer, isOnlyString } from '../compi
 import { Context } from '../Context';
 import { getFixedDecimals } from './getFixedDecimals';
 
-export function toABIReturn(context: Context, node: ts.Node, type: ts.Type | undefined): ABIReturn | undefined {
+export function toABIReturn(
+  context: Context,
+  node: ts.Node,
+  type: ts.Type | undefined,
+  optionalIn = false,
+): ABIReturn | undefined {
   let resolvedType = type;
   if (resolvedType === undefined) {
     return undefined;
   }
 
-  let optional = false;
+  let optional = optionalIn;
   if (tsUtils.type_.hasUndefinedish(resolvedType)) {
     resolvedType = tsUtils.type_.getNonNullableType(resolvedType);
     optional = true;

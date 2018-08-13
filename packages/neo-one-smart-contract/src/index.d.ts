@@ -799,6 +799,10 @@ export interface BlockchainConstructor {
    * `InvocationTransaction` this smart contract is executed in.
    */
   readonly currentTransaction: InvocationTransaction;
+  /**
+   * `Address` of the smart contract.
+   */
+  readonly contractAddress: Address;
 }
 /**
  * Information about the current state of the blockchain and the current execution.

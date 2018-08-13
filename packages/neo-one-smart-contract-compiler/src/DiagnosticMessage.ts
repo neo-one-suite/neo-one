@@ -31,5 +31,5 @@ export enum DiagnosticMessage {
   InvalidPublicKey = 'Argument to PublicKey.from must be a string literal publicKey.',
   EventNotifierArguments = 'The arguments to createEventNotifier must be string literals.',
   InvalidBuiltinCallArgument = 'Call parameter is ambiguous in relation to the provided argument.',
-  InvalidBuiltinAssignment = 'Assignment is ambiguous in relation to the provided expression.',
+  InvalidBuiltinAssignment = 'Assignment (%s => %s) is ambiguous in relation to the provided expression.',
 }

@@ -162,7 +162,6 @@ const run = async ({
         init: context.init,
         engine: context.engine,
         code: context.code,
-        pushOnly: context.pushOnly,
         scriptHash: context.scriptHash,
         callingScriptHash: context.callingScriptHash,
         entryScriptHash: context.entryScriptHash,
@@ -172,6 +171,7 @@ const run = async ({
         stackAlt: context.stackAlt,
         gasLeft: context.gasLeft,
         createdContracts: context.createdContracts,
+        returnValueCount: context.returnValueCount,
       };
     }
   }
@@ -182,7 +182,6 @@ const run = async ({
 export const executeScript = async ({
   monitor,
   code,
-  pushOnly,
   blockchain,
   init,
   gasLeft,
@@ -196,11 +195,12 @@ export const executeScript = async ({
     stack = [],
     stackAlt = [],
     createdContracts = {},
+    returnValueCount = -1,
+    pc = 0,
   } = {},
 }: {
   readonly monitor: Monitor;
   readonly code: Buffer;
-  readonly pushOnly?: boolean;
   readonly blockchain: WriteBlockchain;
   readonly init: ExecutionInit;
   readonly gasLeft: BN;
@@ -216,18 +216,17 @@ export const executeScript = async ({
       run,
       executeScript,
     },
-
     code,
-    pushOnly: !!pushOnly,
     scriptHash,
     callingScriptHash,
     entryScriptHash: (entryScriptHash as UInt160 | undefined) === undefined ? scriptHash : entryScriptHash,
-    pc: 0,
+    pc,
     depth,
     stack,
     stackAlt,
     gasLeft,
     createdContracts,
+    returnValueCount,
   };
 
   return monitor.captureSpanLog(async (span) => run({ monitor: span, context }), {
@@ -244,6 +243,7 @@ export const execute = async ({
   scriptContainer,
   triggerType,
   action,
+  returnValueCount = -1,
   gas: gasIn,
   listeners = {},
   skipWitnessVerify = false,
@@ -256,6 +256,7 @@ export const execute = async ({
   readonly triggerType: TriggerType;
   readonly action: ExecutionAction;
   readonly gas: BN;
+  readonly returnValueCount?: number;
   readonly listeners?: VMListeners;
   readonly skipWitnessVerify?: boolean;
   readonly persistingBlock?: Block;
@@ -297,6 +298,7 @@ export const execute = async ({
         createdContracts: {},
         scriptHash,
         entryScriptHash,
+        returnValueCount,
       };
 
       if (context !== undefined) {
@@ -307,13 +309,13 @@ export const execute = async ({
           createdContracts: context.createdContracts,
           scriptHash,
           entryScriptHash,
+          returnValueCount,
         };
       }
 
       context = await executeScript({
         monitor: span,
         code: script.code,
-        pushOnly: script.pushOnly,
         blockchain,
         init,
         gasLeft: gas,

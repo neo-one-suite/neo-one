@@ -1,32 +1,19 @@
 import {
-  areTasksDone,
   CRUDBase,
   CRUDResource,
   CRUDResourceBase,
   DeleteCRUD,
   DescribeCRUD,
   GetCRUD,
-  getTasksError,
+  handleCLITaskList,
   InteractiveCLI,
   Plugin,
-  TaskStatus,
 } from '@neo-one/server-plugin';
-import { utils } from '@neo-one/utils';
-import chalk from 'chalk';
-import cliTruncate from 'cli-truncate';
-import elegantSpinner from 'elegant-spinner';
-import figures from 'figures';
-// tslint:disable-next-line match-default-export-name
-import * as logSymbols from 'log-symbols';
 import logUpdate from 'log-update';
-import { EMPTY, ReplaySubject, timer } from 'rxjs';
+import { EMPTY, ReplaySubject } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 // tslint:disable-next-line match-default-export-name
 import { Command } from 'vorpal';
-import { indentString, stripAnsi } from './utils';
-
-const pointer = chalk.yellow(figures.pointer);
-const skipped = chalk.yellow(figures.arrowDown);
 
 const addCommonResource = ({
   cli,
@@ -50,83 +37,6 @@ const addCommon = ({ command, crud }: { readonly command: Command; readonly crud
   crud.aliases.forEach((alias) => {
     command.alias(alias);
   });
-};
-// tslint:disable-next-line no-any
-type Spinners = any;
-
-const getSymbol = (task: TaskStatus, mutableSpinners: Spinners) => {
-  if (mutableSpinners[task.id] == undefined) {
-    mutableSpinners[task.id] = elegantSpinner();
-  }
-
-  const hasSubtasks = task.subtasks !== undefined && task.subtasks.length > 0;
-  if (task.pending) {
-    return hasSubtasks ? pointer : chalk.yellow(mutableSpinners[task.id]());
-  }
-
-  if (task.complete) {
-    return logSymbols.success;
-  }
-
-  if (task.error !== undefined) {
-    return hasSubtasks ? pointer : logSymbols.error;
-  }
-
-  if (task.skipped !== undefined) {
-    return skipped;
-  }
-
-  return ' ';
-};
-
-const renderTasks = (tasks: ReadonlyArray<TaskStatus>, spinners: Spinners, level = 0): string => {
-  let mutableOutput: string[] = [];
-
-  tasks.forEach((task) => {
-    const skippedStr = task.skipped !== undefined ? ` ${chalk.dim('[skipped]')}` : '';
-
-    mutableOutput.push(
-      indentString(` ${getSymbol(task, spinners)} ${task.title}${skippedStr}`, level, { indent: '  ' }),
-    );
-
-    if (
-      (task.pending && task.message !== undefined) ||
-      task.skipped !== false ||
-      task.error !== undefined ||
-      task.message !== undefined
-    ) {
-      let data = task.error;
-      if (data === undefined && task.skipped !== false) {
-        if (typeof task.skipped === 'string') {
-          data = task.skipped;
-        }
-      } else if (data === undefined) {
-        data = task.message;
-      }
-
-      if (data !== undefined) {
-        data = stripAnsi(
-          data
-            .trim()
-            .split('\n')
-            .filter(utils.notNull)[0],
-        );
-
-        const out = indentString(`${figures.arrowRight} ${data}`, level, { indent: '  ' });
-        mutableOutput.push(`   ${chalk.gray(cliTruncate(out, (process.stdout.columns as number) - 3))}`);
-      }
-    }
-
-    if (
-      (task.pending || task.error !== undefined || !task.collapse) &&
-      task.subtasks !== undefined &&
-      task.subtasks.length > 0
-    ) {
-      mutableOutput = mutableOutput.concat(renderTasks(task.subtasks, spinners, level + 1));
-    }
-  });
-
-  return mutableOutput.join('\n');
 };
 
 const promptDelete = async ({
@@ -188,45 +98,19 @@ const createResource = ({ cli, crud }: { readonly cli: InteractiveCLI; readonly 
         client: cli.client,
       });
 
-      if (!args.options.progress) {
+      const progress = args.options.progress === undefined || args.options.progress;
+      if (!progress) {
         cli.print(`${crud.names.ingUpper} ${name}...`);
       }
 
       await crud.preExecCLI({ name, cli, options });
 
-      const spinners = {};
-      await response$
-        .pipe(
-          switchMap(({ tasks }) => {
-            if (areTasksDone(tasks)) {
-              if (args.options.progress) {
-                logUpdate(renderTasks(tasks, spinners));
-                logUpdate.done();
-              } else {
-                cli.print(renderTasks(tasks, spinners));
-              }
-
-              cancel$.complete();
-              const error = getTasksError(tasks);
-              if (error !== undefined) {
-                throw new Error(error);
-              }
-
-              return EMPTY;
-            }
-
-            if (args.options.progress) {
-              return timer(0, 50).pipe(
-                map(() => {
-                  logUpdate(renderTasks(tasks, spinners));
-                }),
-              );
-            }
-
-            return EMPTY;
-          }),
-        )
-        .toPromise();
+      await handleCLITaskList({
+        cli,
+        response$,
+        progress,
+        cancel$,
+      });
 
       await crud.postExecCLI({ name, cli, options });
     })

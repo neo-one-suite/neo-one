@@ -1,3 +1,4 @@
+import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../../DiagnosticCode';
@@ -5,6 +6,7 @@ import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
+import { hasUndefined } from '../types';
 
 type Process = (options: VisitOptions) => void;
 
@@ -18,6 +20,7 @@ export interface ForTypeHelperOptions {
   readonly type: ts.Type | undefined;
   readonly types: ReadonlyArray<ForType>;
   readonly single?: boolean;
+  readonly singleUndefined?: (options: VisitOptions) => void;
   readonly defaultCase?: (options: VisitOptions) => void;
 }
 
@@ -27,13 +30,15 @@ export class ForTypeHelper extends Helper {
   private readonly type: ts.Type | undefined;
   private readonly types: ReadonlyArray<ForType>;
   private readonly single: boolean;
+  private readonly singleUndefined: ((options: VisitOptions) => void) | undefined;
   private readonly defaultCase: ((options: VisitOptions) => void) | undefined;
 
-  public constructor({ type, types, single, defaultCase }: ForTypeHelperOptions) {
+  public constructor({ type, types, single, singleUndefined, defaultCase }: ForTypeHelperOptions) {
     super();
     this.type = type;
     this.types = types;
     this.single = single === undefined ? false : single;
+    this.singleUndefined = singleUndefined;
     this.defaultCase = defaultCase;
   }
 
@@ -41,7 +46,18 @@ export class ForTypeHelper extends Helper {
     const noCastOptions = sb.noCastOptions(optionsIn);
     const options = sb.pushValueOptions(sb.noCastOptions(optionsIn));
     // tslint:disable-next-line no-unnecessary-type-annotation
-    const type: ts.Type | undefined = this.type === undefined ? optionsIn.cast : this.type;
+    let typeIn: ts.Type | undefined = this.type === undefined ? optionsIn.cast : this.type;
+    let checkUndefinedSingle = false;
+    if (
+      typeIn !== undefined &&
+      this.single &&
+      hasUndefined(sb.context, node, typeIn) &&
+      this.singleUndefined !== undefined
+    ) {
+      typeIn = tsUtils.type_.getNonNullableType(typeIn);
+      checkUndefinedSingle = true;
+    }
+    const type = typeIn;
     const types = type === undefined ? this.types : this.types.filter((testType) => testType.hasType(type));
 
     // tslint:disable-next-line readonly-array
@@ -73,7 +89,33 @@ export class ForTypeHelper extends Helper {
     if (types.length === 0) {
       defaultCase(noCastOptions);
     } else if (groupedTypes.size === 1) {
-      types[0].process(noCastOptions);
+      const singleUndefined = this.singleUndefined;
+      if (checkUndefinedSingle && singleUndefined !== undefined) {
+        sb.emitHelper(
+          node,
+          options,
+          sb.helpers.if({
+            condition: () => {
+              // [value, value]
+              sb.emitOp(node, 'DUP');
+              // [number, value]
+              sb.emitOp(node, 'SIZE');
+              // [number, number, value]
+              sb.emitPushInt(node, 0);
+              // [boolean, value]
+              sb.emitOp(node, 'NUMEQUAL');
+            },
+            whenTrue: () => {
+              singleUndefined(options);
+            },
+            whenFalse: () => {
+              types[0].process(noCastOptions);
+            },
+          }),
+        );
+      } else {
+        types[0].process(noCastOptions);
+      }
     } else {
       const groupedTypesOrdered = _.sortBy([...groupedTypes.entries()], (value) => value[1].length);
       let caseTypes = groupedTypesOrdered;

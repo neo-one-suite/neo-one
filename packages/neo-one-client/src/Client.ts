@@ -1,4 +1,4 @@
-import { ScriptBuilderParam } from '@neo-one/client-core';
+import { ABI, ScriptBuilderParam } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { RawSourceMap } from 'source-map';
 import * as argAssertions from './args';
@@ -73,6 +73,18 @@ export class Client<
     argAssertions.assertContractRegister(contract);
 
     return this.getProvider(options).publish(contract, options);
+  }
+
+  public async publishAndDeploy(
+    contract: ContractRegister,
+    abi: ABI,
+    params: ReadonlyArray<Param> = [],
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<PublishReceipt>> {
+    argAssertions.assertTransactionOptions(options);
+    argAssertions.assertContractRegister(contract);
+
+    return this.getProvider(options).publishAndDeploy(contract, abi, params, options);
   }
 
   public async registerAsset(

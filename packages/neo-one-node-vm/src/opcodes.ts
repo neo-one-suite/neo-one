@@ -2,19 +2,20 @@ import { common, crypto, Op as OpCodeToByteCode, OpCode, UInt160, utils, VMState
 import bitwise from 'bitwise';
 import { BN } from 'bn.js';
 import _ from 'lodash';
-import { ExecutionContext, FEES, getResultContext, Op, OpInvoke } from './constants';
+import { ExecutionContext, ExecutionStack, FEES, getResultContext, Op, OpInvoke } from './constants';
 import {
   CodeOverflowError,
   ContractNoDynamicInvokeError,
+  InsufficientReturnValueError,
   InvalidCheckMultisigArgumentsError,
   InvalidHasKeyIndexError,
   InvalidPackCountError,
   InvalidPickItemKeyError,
   InvalidRemoveIndexError,
   InvalidSetItemIndexError,
+  InvalidTailCallReturnValueError,
   LeftNegativeError,
   PickNegativeError,
-  PushOnlyError,
   RightLengthError,
   RightNegativeError,
   RollNegativeError,
@@ -227,6 +228,7 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
             createdContracts: context.createdContracts,
             scriptHash: context.scriptHash,
             entryScriptHash: context.entryScriptHash,
+            returnValueCount: -1,
           },
         });
 
@@ -245,13 +247,197 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
             init: context.init,
             engine: context.engine,
             code: context.code,
-            pushOnly: context.pushOnly,
             scriptHash: context.scriptHash,
             callingScriptHash: context.callingScriptHash,
             entryScriptHash: context.entryScriptHash,
             pc: pc + 20,
             depth: context.depth,
+            returnValueCount: context.returnValueCount,
             ...getResultContext(resultContext),
+          },
+        };
+      },
+    });
+
+    return { op, context: contextIn };
+  },
+});
+
+const callIsolated = ({
+  name,
+  dynamicCall,
+  tailCall,
+}: {
+  readonly name: OpCode;
+  readonly dynamicCall?: boolean;
+  readonly tailCall?: boolean;
+}): OpCreate => ({
+  type: 'create',
+  create: ({ context: contextIn }) => {
+    const returnValueCount = contextIn.code.slice(contextIn.pc, contextIn.pc + 1)[0];
+    const parametersCount = contextIn.code.slice(contextIn.pc + 1, contextIn.pc + 2)[0];
+
+    const nextPC = dynamicCall ? contextIn.pc + 2 : contextIn.pc + 22;
+
+    const { op } = createOp({
+      name,
+      in: parametersCount + (dynamicCall ? 1 : 0),
+      invocation: tailCall ? 0 : 1,
+      fee: FEES.TEN,
+      invoke: async ({ monitor, context, args }) => {
+        const { pc, scriptHash } = context;
+        const hash = dynamicCall
+          ? common.bufferToUInt160(args[0].asBuffer())
+          : common.bufferToUInt160(context.code.slice(pc + 2, pc + 22));
+
+        if (tailCall && context.returnValueCount !== returnValueCount) {
+          throw new InvalidTailCallReturnValueError(context, context.returnValueCount, returnValueCount);
+        }
+
+        if (dynamicCall) {
+          const executingContract = await context.blockchain.contract.get({
+            hash: scriptHash,
+          });
+
+          if (!executingContract.hasDynamicInvoke) {
+            throw new ContractNoDynamicInvokeError(context, common.uInt160ToString(scriptHash));
+          }
+        }
+
+        const contract = await context.blockchain.contract.get({ hash });
+        const resultContext = await context.engine.executeScript({
+          monitor,
+          code: contract.script,
+          blockchain: context.blockchain,
+          init: context.init,
+          gasLeft: context.gasLeft,
+          options: {
+            stack: dynamicCall ? args.slice(1) : args,
+            stackAlt: [],
+            depth: tailCall ? context.depth : context.depth + 1,
+            createdContracts: context.createdContracts,
+            scriptHash: context.scriptHash,
+            entryScriptHash: context.entryScriptHash,
+            returnValueCount,
+          },
+        });
+
+        let { state } = resultContext;
+        if (state === VMState.Halt) {
+          // If it's a tail call, then the final recursive call executes the rest
+          // of the script, and we just return immediately here.
+          state = tailCall ? VMState.Halt : context.state;
+        }
+
+        let stack: ExecutionStack = [];
+        if (returnValueCount === -1) {
+          stack = resultContext.stack;
+        } else if (returnValueCount > 0) {
+          if (resultContext.stack.length < returnValueCount) {
+            throw new InsufficientReturnValueError(context, resultContext.stack.length, returnValueCount);
+          }
+
+          stack = resultContext.stack.slice(0, returnValueCount);
+        }
+
+        return {
+          context: {
+            state,
+            errorMessage: resultContext.errorMessage,
+            blockchain: context.blockchain,
+            init: context.init,
+            engine: context.engine,
+            code: context.code,
+            scriptHash: context.scriptHash,
+            callingScriptHash: context.callingScriptHash,
+            entryScriptHash: context.entryScriptHash,
+            pc: nextPC,
+            depth: context.depth,
+            returnValueCount: context.returnValueCount,
+            stack: stack.concat(context.stack),
+            stackAlt: context.stackAlt,
+            gasLeft: resultContext.gasLeft,
+            createdContracts: resultContext.createdContracts,
+          },
+        };
+      },
+    });
+
+    return { op, context: contextIn };
+  },
+});
+
+const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => ({
+  type: 'create',
+  create: ({ context: contextIn }) => {
+    const returnValueCount = contextIn.code.slice(contextIn.pc, contextIn.pc + 1)[0];
+    const parametersCount = contextIn.code.slice(contextIn.pc + 1, contextIn.pc + 2)[0];
+
+    const nextPC = contextIn.pc + 2;
+
+    const { op } = createOp({
+      name,
+      in: parametersCount,
+      invocation: 1,
+      invoke: async ({ monitor, context, args }) => {
+        const { pc } = context;
+
+        const resultContext = await context.engine.executeScript({
+          monitor,
+          code: Buffer.concat([
+            context.code.slice(0, pc - 1),
+            Buffer.from([OpCodeToByteCode.JMP]),
+            context.code.slice(pc),
+          ]),
+          blockchain: context.blockchain,
+          init: context.init,
+          gasLeft: context.gasLeft,
+          options: {
+            stack: args,
+            stackAlt: [],
+            depth: context.depth + 1,
+            createdContracts: context.createdContracts,
+            scriptHash: context.scriptHash,
+            entryScriptHash: context.entryScriptHash,
+            returnValueCount,
+            pc: pc - 1,
+          },
+        });
+
+        let { state } = resultContext;
+        if (state === VMState.Halt) {
+          state = context.state;
+        }
+
+        let stack: ExecutionStack = [];
+        if (returnValueCount === -1) {
+          stack = resultContext.stack;
+        } else if (returnValueCount > 0) {
+          if (resultContext.stack.length < returnValueCount) {
+            throw new InsufficientReturnValueError(context, resultContext.stack.length, returnValueCount);
+          }
+
+          stack = resultContext.stack.slice(0, returnValueCount);
+        }
+
+        return {
+          context: {
+            state,
+            errorMessage: resultContext.errorMessage,
+            blockchain: context.blockchain,
+            init: context.init,
+            engine: context.engine,
+            code: context.code,
+            scriptHash: context.scriptHash,
+            callingScriptHash: context.callingScriptHash,
+            entryScriptHash: context.entryScriptHash,
+            pc: nextPC + 2,
+            depth: context.depth,
+            returnValueCount: context.returnValueCount,
+            stack,
+            stackAlt: context.stackAlt,
+            gasLeft: resultContext.gasLeft,
+            createdContracts: resultContext.createdContracts,
           },
         };
       },
@@ -1618,6 +1804,11 @@ const OPCODE_PAIRS = ([
         },
       }),
     ],
+    [0xe0, functionCallIsolated({ name: 'CALL_I' })],
+    [0xe1, callIsolated({ name: 'CALL_E' })],
+    [0xe2, callIsolated({ name: 'CALL_ED', dynamicCall: true })],
+    [0xe3, callIsolated({ name: 'CALL_ET', tailCall: true })],
+    [0xe4, callIsolated({ name: 'CALL_EDT', tailCall: true, dynamicCall: true })],
     [
       0xf0,
       createOp({
@@ -1651,11 +1842,6 @@ const CREATE_OPCODES = _.fromPairs(
 
 export const lookupOp = ({ context }: { readonly context: ExecutionContext }) => {
   const opCode = context.code[context.pc];
-
-  if (context.pushOnly && opCode > OpCodeToByteCode.PUSH16 && opCode !== OpCodeToByteCode.RET) {
-    throw new PushOnlyError(context, opCode);
-  }
-
   const op = STATIC_OPCODES[opCode] as OpStatic | undefined;
   const newContext = {
     ...context,

@@ -2,6 +2,8 @@ import {
   areTasksDone,
   CRUDRequest,
   CRUDRequestStart,
+  ExecuteTaskListRequest,
+  ExecuteTaskListRequestStart,
   ReadRequest,
   ReadResponse,
   TaskList,
@@ -36,10 +38,10 @@ function makeObservable$<TData>(ctx: Context): Observable<TData> {
 }
 
 export const services = ({ server }: { readonly server: Server }) => {
-  async function handleCRUD<TRequest extends CRUDRequest, TStartRequest extends CRUDRequestStart>(
-    ctx: Context,
-    createTaskList: (request: TStartRequest, resourcesManager: ResourcesManager) => TaskList,
-  ): Promise<void> {
+  async function executeTaskList<
+    TRequest extends ExecuteTaskListRequest,
+    TStartRequest extends ExecuteTaskListRequestStart
+  >(ctx: Context, createTaskList: (request: TStartRequest) => TaskList): Promise<void> {
     const requests$ = makeObservable$<TRequest | TStartRequest>(ctx);
     let taskList: TaskList | undefined;
     let done = false;
@@ -49,16 +51,8 @@ export const services = ({ server }: { readonly server: Server }) => {
           switch (request.type) {
             case 'start':
               if (taskList === undefined) {
-                taskList = createTaskList(
-                  // tslint:disable-next-line no-any
-                  request as any,
-                  server.pluginManager.getResourcesManager({
-                    // tslint:disable-next-line no-any
-                    plugin: (request as any).plugin,
-                    // tslint:disable-next-line no-any
-                    resourceType: (request as any).resourceType,
-                  }),
-                );
+                // tslint:disable-next-line no-any
+                taskList = createTaskList(request as any);
               }
 
               return taskList.status$;
@@ -83,6 +77,22 @@ export const services = ({ server }: { readonly server: Server }) => {
         }),
       )
       .toPromise();
+  }
+  async function handleCRUD<TRequest extends CRUDRequest, TStartRequest extends CRUDRequestStart>(
+    ctx: Context,
+    createTaskList: (request: TStartRequest, resourcesManager: ResourcesManager) => TaskList,
+  ): Promise<void> {
+    return executeTaskList<TRequest, TStartRequest>(ctx, (request) =>
+      createTaskList(
+        request,
+        server.pluginManager.getResourcesManager({
+          // tslint:disable-next-line no-any
+          plugin: (request as any).plugin,
+          // tslint:disable-next-line no-any
+          resourceType: (request as any).resourceType,
+        }),
+      ),
+    );
   }
 
   // tslint:disable-next-line no-any
@@ -200,6 +210,15 @@ export const services = ({ server }: { readonly server: Server }) => {
     stopResource: async (ctx: Context) => {
       await handleCRUD(ctx, (request: CRUDRequestStart, resourceManager) =>
         resourceManager.stop(request.name, JSON.parse(request.options)),
+      );
+    },
+    executeTaskList: async (ctx: Context) => {
+      await executeTaskList(ctx, (request: ExecuteTaskListRequestStart) =>
+        server.pluginManager
+          .getPlugin({
+            plugin: request.plugin,
+          })
+          .executeTaskList(server.pluginManager, request.options),
       );
     },
   };

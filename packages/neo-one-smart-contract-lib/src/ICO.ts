@@ -1,155 +1,68 @@
 // tslint:disable readonly-keyword readonly-array no-object-mutation strict-boolean-expressions
-import {
-  Address,
-  Asset,
-  Blockchain,
-  constant,
-  createEventNotifier,
-  Fixed,
-  Hash256,
-  Integer,
-  MapStorage,
-  SetStorage,
-  verify,
-} from '@neo-one/smart-contract';
+import { Blockchain, constant, createEventNotifier, Fixed, Hash256, Integer, verify } from '@neo-one/smart-contract';
 
 import { Token } from './Token';
 
-const onRefund = createEventNotifier('refund');
+const notifyRefund = createEventNotifier('refund');
 
 export abstract class ICO<Decimals extends number> extends Token<Decimals> {
-  public abstract readonly icoAmount: Fixed<Decimals>;
-  public abstract readonly maxLimitedRoundAmount: Fixed<Decimals>;
-  public readonly owner: Address;
-  private readonly kyc: SetStorage<Address> = new SetStorage();
-  private readonly tokensPerAssetLimitedRound: MapStorage<Hash256, Fixed<Decimals>> = new MapStorage();
-  private readonly tokensPerAsset: MapStorage<Hash256, Fixed<Decimals>> = new MapStorage();
-  private readonly limitedRoundRemaining: MapStorage<Address, Fixed<Decimals>> = new MapStorage();
-  private icoRemaining: Fixed<Decimals> = this.icoAmount;
+  private mutableRemaining: Fixed<Decimals>;
 
   public constructor(
-    owner: Address,
     public readonly startTimeSeconds: Integer,
-    public readonly limitedRoundDurationSeconds: Integer,
     public readonly icoDurationSeconds: Integer,
-    public readonly preICOAmount: Fixed<Decimals>,
+    public readonly icoAmount: Fixed<Decimals>,
+    public readonly amountPerNEO: Fixed<Decimals>,
   ) {
     super();
-    this.owner = owner;
-    this.issue(owner, preICOAmount);
+    this.mutableRemaining = icoAmount;
+  }
+
+  @constant
+  public get remaining(): number {
+    return this.mutableRemaining;
   }
 
   @verify
-  public mintTokens(): void {
-    if (!this.hasStarted()) {
-      onRefund();
-      throw new Error('Crowdsale has not started');
-    }
-    if (this.hasEnded()) {
-      onRefund();
-      throw new Error('Crowdsale has ended');
+  public mintTokens(): boolean {
+    if (!this.hasStarted() || this.hasEnded()) {
+      notifyRefund();
+
+      return false;
     }
 
     const { references } = Blockchain.currentTransaction;
     if (references.length === 0) {
-      return;
+      return false;
     }
-
     const sender = references[0].address;
-    if (!this.canParticipate(sender)) {
-      onRefund();
-      throw new Error('Address has not been whitelised');
-    }
-    const amount = Blockchain.currentTransaction.outputs
-      .filter((output) => output.address.equals(this.owner))
-      .reduce((acc, output) => {
-        const amountPerAsset = this.isLimitedRound()
-          ? this.tokensPerAssetLimitedRound.get(output.asset)
-          : this.tokensPerAsset.get(output.asset);
-        if (amountPerAsset === undefined) {
-          onRefund();
-          throw new Error(`Asset ${output.asset} is not accepted for the crowdsale`);
+
+    let amount = 0;
+    // tslint:disable-next-line no-loop-statement
+    for (const output of Blockchain.currentTransaction.outputs) {
+      if (output.address.equals(Blockchain.contractAddress)) {
+        if (!output.asset.equals(Hash256.NEO)) {
+          notifyRefund();
+
+          return false;
         }
-        const asset = Asset.for(output.asset);
-        const normalizedValue = output.value / 10 ** (8 - asset.precision);
 
-        return acc + normalizedValue * amountPerAsset;
-      }, 0);
-
-    if (amount > this.icoRemaining) {
-      onRefund();
-      throw new Error('Amount is greater than remaining ICO tokens');
-    }
-
-    if (this.isLimitedRound()) {
-      const remaining = this.getRemainingLimitedRound(sender);
-      if (amount > remaining) {
-        onRefund();
-        throw new Error('Limited round maximum contribution reached.');
+        amount += output.value * this.amountPerNEO;
       }
-      this.limitedRoundRemaining.set(sender, remaining - amount);
     }
 
-    this.issue(sender, amount);
-    this.icoRemaining -= amount;
-  }
+    if (amount > this.remaining) {
+      notifyRefund();
 
-  public setExchange(asset: Hash256, tokens: Fixed<Decimals>): void {
-    Address.verifySender(this.owner);
-    if (this.hasStarted()) {
-      throw new Error('Cannot change token amount once crowdsale has started');
+      return false;
     }
-    this.tokensPerAsset.set(asset, tokens);
-  }
 
-  public getExchangeRate(asset: Hash256): Fixed<Decimals> {
-    return this.tokensPerAsset.get(asset) || 0;
-  }
+    this.balances.set(sender, this.balanceOf(sender) + amount);
+    this.mutableRemaining -= amount;
+    this.mutableSupply += amount;
+    this.notifyTransfer(undefined, sender, amount);
 
-  public setLimitedRoundExchange(asset: Hash256, tokens: Fixed<Decimals>): void {
-    Address.verifySender(this.owner);
-    if (this.hasStarted()) {
-      throw new Error('Cannot change token amount once crowdsale has started');
-    }
-    this.tokensPerAssetLimitedRound.set(asset, tokens);
-  }
-
-  @constant
-  public getLimitedRoundExchangeRate(asset: Hash256): Fixed<Decimals> {
-    return this.tokensPerAssetLimitedRound.get(asset) || 0;
-  }
-
-  @constant
-  public getRemainingLimitedRound(address: Address): Fixed<Decimals> {
-    const remaining = this.limitedRoundRemaining.get(address);
-
-    return remaining === undefined ? this.maxLimitedRoundAmount : remaining;
-  }
-
-  public endICO(): void {
-    Address.verifySender(this.owner);
-    if (this.icoRemaining > 0) {
-      if (!this.hasEnded()) {
-        throw new Error('ICO has not ended.');
-      }
-
-      this.icoRemaining = 0;
-      this.issue(this.owner, this.icoRemaining);
-    }
-  }
-
-  public register(addresses: Address[]): void {
-    Address.verifySender(this.owner);
-    addresses.forEach((addr) => {
-      if (!this.kyc.has(addr)) {
-        this.kyc.add(addr);
-      }
-    });
-  }
-
-  @constant
-  public canParticipate(addr: Address): boolean {
-    return this.kyc.has(addr);
+    return true;
   }
 
   private hasStarted(): boolean {
@@ -158,9 +71,5 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
 
   private hasEnded(): boolean {
     return Blockchain.currentBlockTime > this.startTimeSeconds + this.icoDurationSeconds;
-  }
-
-  private isLimitedRound(): boolean {
-    return this.hasStarted() && Blockchain.currentBlockTime < this.startTimeSeconds + this.limitedRoundDurationSeconds;
   }
 }

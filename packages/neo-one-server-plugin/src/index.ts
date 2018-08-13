@@ -1,3 +1,5 @@
+import * as displayUtils from './displayUtils';
+
 export { Config } from './Config';
 export { CreateCRUD } from './CreateCRUD';
 export { CRUD } from './CRUD';
@@ -46,7 +48,7 @@ export {
   InteractiveCommand,
   LogConfig,
   ListTable,
-  ModifyResourceResponse,
+  ExecuteTaskListResponse,
   PluginManager,
   PortAllocator,
   ReadResponse,
@@ -55,4 +57,9 @@ export {
   Session,
   SubDescribeTable,
   TaskStatus,
+  ExecuteTaskListRequest,
+  ExecuteTaskListRequestAbort,
+  ExecuteTaskListRequestStart,
 } from './types';
+export { handleCLITaskList } from './handleCLITaskList';
+export { displayUtils };

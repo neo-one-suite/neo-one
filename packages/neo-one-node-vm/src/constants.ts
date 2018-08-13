@@ -45,6 +45,8 @@ export interface Options {
   readonly createdContracts: CreatedContracts;
   readonly scriptHash: UInt160 | undefined;
   readonly entryScriptHash: UInt160;
+  readonly returnValueCount: number;
+  readonly pc?: number;
 }
 export interface ExecutionContext {
   readonly state: VMState;
@@ -59,7 +61,6 @@ export interface ExecutionContext {
       input: {
         readonly monitor: Monitor;
         readonly code: Buffer;
-        readonly pushOnly?: boolean;
         readonly blockchain: WriteBlockchain;
         readonly init: ExecutionInit;
         readonly gasLeft: BN;
@@ -68,7 +69,6 @@ export interface ExecutionContext {
     ) => Promise<ExecutionContext>;
   };
   readonly code: Buffer;
-  readonly pushOnly: boolean;
   readonly scriptHash: UInt160;
   readonly callingScriptHash: UInt160 | undefined;
   readonly entryScriptHash: UInt160;
@@ -78,6 +78,7 @@ export interface ExecutionContext {
   readonly stackAlt: ExecutionStack;
   readonly gasLeft: BN;
   readonly createdContracts: CreatedContracts;
+  readonly returnValueCount: number;
 }
 
 export const getResultContext = (context: ExecutionContext) => ({

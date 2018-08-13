@@ -22,6 +22,8 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'BlockConstructor',
     'for',
-    new ValueFor('Neo.Blockchain.GetBlock', (sb) => sb.helpers.wrapBlock),
+    new ValueFor('Neo.Blockchain.GetBlock', (sb, node, options) => {
+      sb.emitHelper(node, options, sb.helpers.wrapBlock);
+    }),
   );
 };

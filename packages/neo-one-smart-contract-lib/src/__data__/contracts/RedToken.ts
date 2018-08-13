@@ -12,7 +12,10 @@ export class RedToken extends SimpleToken {
     payable: false,
   };
 
-  public constructor(owner: Address, amount: Fixed<8>) {
+  public constructor(
+    owner: Address = Address.from('0xd6ed345f7cf3ea8c980132ddacb403ee2ab760ab'),
+    amount: Fixed<8> = 1_000_000_00000000,
+  ) {
     super(owner, amount);
   }
 }

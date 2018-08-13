@@ -7,6 +7,7 @@ const DEFAULT_PLUGINS: ReadonlyArray<string> = [
   '@neo-one/server-plugin-wallet',
   '@neo-one/server-plugin-compiler',
   '@neo-one/server-plugin-simulation',
+  '@neo-one/server-plugin-project',
 ];
 
 const getPlugin = ({ monitor, pluginName }: { readonly monitor: Monitor; readonly pluginName: string }): Plugin => {

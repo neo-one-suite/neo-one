@@ -61,9 +61,18 @@ export class EqualsEqualsEqualsHelper extends Helper {
       sb.emitOp(node, 'EQUAL');
     };
 
-    const createProcess = (value: keyof ForBuiltinTypeHelperOptions, type: WrappableType) => (
-      innerOptions: VisitOptions,
-    ) => {
+    const compareNumber = (innerOptions: VisitOptions) => {
+      sb.emitHelper(node, innerOptions, sb.helpers.unwrapNumber);
+      sb.emitOp(node, 'SWAP');
+      sb.emitHelper(node, innerOptions, sb.helpers.unwrapNumber);
+      sb.emitOp(node, 'NUMEQUAL');
+    };
+
+    const createProcess = (
+      value: keyof ForBuiltinTypeHelperOptions,
+      type: WrappableType,
+      compareValue = compare(type),
+    ) => (innerOptions: VisitOptions) => {
       sb.emitOp(node, 'SWAP');
       sb.emitHelper(
         node,
@@ -89,7 +98,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
           contract: pushFalse,
           header: pushFalse,
           block: pushFalse,
-          [value]: compare(type),
+          [value]: compareValue,
         }),
       );
     };
@@ -135,7 +144,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
         boolean: createProcess('boolean', Types.Boolean),
         buffer: createProcess('buffer', Types.Buffer),
         null: createProcessNullOrUndefined('null'),
-        number: createProcess('number', Types.Number),
+        number: createProcess('number', Types.Number, compareNumber),
         object: createProcess('object', Types.Object),
         string: createProcess('string', Types.String),
         symbol: createProcess('symbol', Types.Symbol),

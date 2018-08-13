@@ -641,24 +641,25 @@ export interface UserAccountProvider {
     transfers: ReadonlyArray<Transfer>,
     options?: TransactionOptions,
   ) => Promise<TransactionResult<TransactionReceipt>>;
-
   readonly claim: (options?: TransactionOptions) => Promise<TransactionResult<TransactionReceipt>>;
-
   readonly publish: (
     contract: ContractRegister,
     options?: TransactionOptions,
   ) => Promise<TransactionResult<PublishReceipt>>;
-
+  readonly publishAndDeploy: (
+    contract: ContractRegister,
+    abi: ABI,
+    params: ReadonlyArray<Param>,
+    options?: TransactionOptions,
+  ) => Promise<TransactionResult<PublishReceipt>>;
   readonly registerAsset: (
     asset: AssetRegister,
     options?: TransactionOptions,
   ) => Promise<TransactionResult<RegisterAssetReceipt>>;
-
   readonly issue: (
     transfers: ReadonlyArray<Transfer>,
     options?: TransactionOptions,
   ) => Promise<TransactionResult<TransactionReceipt>>;
-
   readonly invoke: (
     contract: Hash160String,
     method: string,
@@ -674,7 +675,6 @@ export interface UserAccountProvider {
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     options?: TransactionOptions,
   ) => Promise<RawCallReceipt>;
-
   readonly read: (network: NetworkType) => DataProvider;
 }
 

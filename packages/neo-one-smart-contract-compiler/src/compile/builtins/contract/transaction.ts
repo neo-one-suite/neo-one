@@ -82,6 +82,8 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'TransactionConstructor',
     'for',
-    new ValueFor('Neo.Blockchain.GetTransaction', (sb) => sb.helpers.wrapTransaction),
+    new ValueFor('Neo.Blockchain.GetTransaction', (sb, node, options) => {
+      sb.emitHelper(node, options, sb.helpers.wrapTransaction);
+    }),
   );
 };

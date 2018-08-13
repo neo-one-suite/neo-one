@@ -95,12 +95,12 @@ export class BinaryWriter {
 
   public writeFixedString(value: string, length: number): this {
     if (value.length > length) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError('String too long');
     }
 
     const buffer = Buffer.from(value, 'utf8');
     if (buffer.length > length) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError('String buffer length too long');
     }
 
     this.writeBytes(buffer);
@@ -137,7 +137,7 @@ export class BinaryWriter {
   public writeVarUIntLE(valueIn: number | BN): this {
     const value = new BN(valueIn);
     if (value.lt(utils.ZERO)) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError('Expected value to be zero or positive');
     }
 
     if (value.lt(utils.FD)) {

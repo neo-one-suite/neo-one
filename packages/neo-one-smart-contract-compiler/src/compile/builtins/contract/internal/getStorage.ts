@@ -58,10 +58,8 @@ export class GetStorage extends BuiltinCall {
     if (optionsIn.pushValue) {
       // [keyBuffer]
       sb.emitSysCall(key, 'Neo.Runtime.Serialize');
-      // [context, keyBuffer]
-      sb.emitSysCall(node, 'Neo.Storage.GetReadOnlyContext');
       // [value]
-      sb.emitSysCall(node, 'Neo.Storage.Get');
+      sb.emitHelper(node, optionsIn, sb.helpers.getStorage);
       if (shouldHandleNull()) {
         handleNull();
       } else {

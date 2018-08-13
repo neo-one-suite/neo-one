@@ -8,6 +8,10 @@ import { getSingleEventName } from './getSingleEventName';
 const getImportClauses = (text: string) => {
   const mutableClauses: string[] = [];
 
+  if (text.includes('BufferString')) {
+    mutableClauses.push('BufferString');
+  }
+
   if (text.includes('SignatureString')) {
     mutableClauses.push('SignatureString');
   }

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Array cannot be ambiguously referenced - arrow return value 1`] = `
-"snippetCode.ts (5,50): Assignment is ambiguous in relation to the provided expression.
+"snippetCode.ts (5,50): Assignment (number[] => Arr) is ambiguous in relation to the provided expression.
 
       3 |         readonly length: number;
       4 |       }
@@ -14,7 +14,7 @@ exports[`Array cannot be ambiguously referenced - arrow return value 1`] = `
 `;
 
 exports[`Array cannot be ambiguously referenced - assignment 1`] = `
-"snippetCode.ts (6,11): Assignment is ambiguous in relation to the provided expression.
+"snippetCode.ts (6,11): Assignment (number[] => Arr | undefined) is ambiguous in relation to the provided expression.
 
       4 |       }
       5 |       let x: Arr | undefined;
@@ -38,7 +38,7 @@ exports[`Array cannot be ambiguously referenced - call 1`] = `
 `;
 
 exports[`Array cannot be ambiguously referenced - function return value 1`] = `
-"snippetCode.ts (6,16): Assignment is ambiguous in relation to the provided expression.
+"snippetCode.ts (6,16): Assignment (number[] => Arr) is ambiguous in relation to the provided expression.
 
       4 |       }
       5 |       const foo = function(value: Array<number>): Arr {
@@ -51,7 +51,7 @@ exports[`Array cannot be ambiguously referenced - function return value 1`] = `
 `;
 
 exports[`Array cannot be ambiguously referenced - variable 1`] = `
-"snippetCode.ts (5,22): Assignment is ambiguous in relation to the provided expression.
+"snippetCode.ts (5,22): Assignment (number[] => Arr) is ambiguous in relation to the provided expression.
 
       3 |         readonly length: number;
       4 |       }

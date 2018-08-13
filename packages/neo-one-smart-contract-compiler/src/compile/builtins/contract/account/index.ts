@@ -23,6 +23,8 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'AccountConstructor',
     'for',
-    new ValueFor('Neo.Blockchain.GetAccount', (sb) => sb.helpers.wrapAccount),
+    new ValueFor('Neo.Blockchain.GetAccount', (sb, node, options) => {
+      sb.emitHelper(node, options, sb.helpers.wrapAccount);
+    }),
   );
 };

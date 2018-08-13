@@ -1,0 +1,21 @@
+{
+  "name": "@neo-one/server-plugin-project",
+  "version": "1.0.0-alpha.1",
+  "description": "NEO•ONE server plugin for project functionality.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@neo-one/client": "^1.0.0-alpha.86",
+    "@neo-one/client-core": "^1.0.0-alpha.69",
+    "@neo-one/server-plugin": "^1.0.0-alpha.66",
+    "@neo-one/server-plugin-network": "^1.0.0-alpha.105",
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.43",
+    "@neo-one/smart-contract-codegen": "^1.0.0-alpha.43",
+    "@neo-one/utils": "^1.0.0-alpha.58",
+    "convict": "^4.3.2",
+    "cosmiconfig": "^5.0.6",
+    "fs-extra": "^7.0.0",
+    "lodash": "^4.17.10",
+    "rxjs": "^6.2.2",
+    "typescript": "^3.0.1"
+  }
+}

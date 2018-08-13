@@ -248,13 +248,16 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
     const verifySymbol = sb.context.builtins.getValueSymbol('verify');
     const constantSymbol = sb.context.builtins.getValueSymbol('constant');
     tsUtils.class_.getConcreteMembers(decl).forEach((member) => {
-      const decorators = ts.isMethodDeclaration(member)
-        ? tsUtils.decoratable.getDecoratorsArray(member).filter((decorator) => {
-            const decoratorSymbol = sb.context.getSymbol(tsUtils.expression.getExpression(decorator), { error: true });
+      const decorators =
+        ts.isMethodDeclaration(member) || ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member)
+          ? tsUtils.decoratable.getDecoratorsArray(member).filter((decorator) => {
+              const decoratorSymbol = sb.context.getSymbol(tsUtils.expression.getExpression(decorator), {
+                error: true,
+              });
 
-            return decoratorSymbol !== verifySymbol && decoratorSymbol !== constantSymbol;
-          })
-        : tsUtils.decoratable.getDecoratorsArray(member);
+              return decoratorSymbol !== verifySymbol && decoratorSymbol !== constantSymbol;
+            })
+          : tsUtils.decoratable.getDecoratorsArray(member);
       if (decorators.length > 0) {
         sb.context.reportUnsupported(decorators[0]);
       }

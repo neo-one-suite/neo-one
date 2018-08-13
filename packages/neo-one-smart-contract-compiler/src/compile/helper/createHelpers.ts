@@ -106,7 +106,7 @@ import {
   ProcessStatementsHelper,
   ProcessStatementsHelperOptions,
 } from './statement';
-import { GetMapStorageClassHelper, GetSetStorageClassHelper } from './storage';
+import { GetMapStorageClassHelper, GetSetStorageClassHelper, GetStorageHelper, PutStorageHelper } from './storage';
 import {
   ArrayLengthHelper,
   BufferLengthHelper,
@@ -375,6 +375,8 @@ export interface Helpers {
   // storage
   readonly getMapStorageClass: GetMapStorageClassHelper;
   readonly getSetStorageClass: GetSetStorageClassHelper;
+  readonly putStorage: PutStorageHelper;
+  readonly getStorage: GetStorageHelper;
 
   // types
   readonly forBuiltinType: (options: ForBuiltinTypeHelperOptions) => ForBuiltinTypeHelper;
@@ -608,6 +610,8 @@ export const createHelpers = (): Helpers => {
     // set
     getMapStorageClass: new GetMapStorageClassHelper(),
     getSetStorageClass: new GetSetStorageClassHelper(),
+    putStorage: new PutStorageHelper(),
+    getStorage: new GetStorageHelper(),
 
     // types
     forBuiltinType: (options) => new ForBuiltinTypeHelper(options),

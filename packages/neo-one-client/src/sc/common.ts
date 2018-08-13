@@ -177,13 +177,17 @@ export const convertParams = ({
   readonly converted: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly zipped: ReadonlyArray<[string, Param | undefined]>;
 } => {
-  if (parameters.length !== params.length) {
+  if (params.length < parameters.filter((param) => !param.optional).length) {
     throw new InvalidArgumentError(
       `Expected parameters length (${parameters.length}) to equal params ` + `length (${params.length}).`,
     );
   }
 
-  const zip = _.zip(parameters, params) as Array<[ABIParameter, Param | undefined]>;
+  const additionalParams = parameters.length - params.length;
+
+  const zip = _.zip(parameters, params.concat(_.range(0, additionalParams).map(() => undefined))) as Array<
+    [ABIParameter, Param]
+  >;
   // tslint:disable-next-line no-any
   const converted = zip.map(([parameter, param]) => (paramCheckers[parameter.type] as any)(param, parameter));
   // tslint:disable-next-line no-useless-cast

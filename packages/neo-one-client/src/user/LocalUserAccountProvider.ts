@@ -1,4 +1,5 @@
 import {
+  ABI,
   assertAssetTypeJSON,
   assertContractParameterTypeJSON,
   Attribute as AttributeModel,
@@ -8,6 +9,7 @@ import {
   common,
   Contract as ContractModel,
   ContractTransaction,
+  crypto,
   getContractProperties,
   Input as InputModel,
   InvocationTransaction as InvocationTransactionModel,
@@ -40,6 +42,7 @@ import {
   NothingToTransferError,
 } from '../errors';
 import { addressToScriptHash } from '../helpers';
+import { convertParams } from '../sc/common';
 import {
   AddressString,
   AssetRegister,
@@ -307,71 +310,44 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }
 
   public async publish(
-    contractIn: ContractRegister,
+    contract: ContractRegister,
     options?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt>> {
-    const contract = new ContractModel({
-      script: Buffer.from(contractIn.script, 'hex'),
-      parameterList: contractIn.parameters.map((parameter) =>
-        toContractParameterType(assertContractParameterTypeJSON(parameter)),
-      ),
-
-      returnType: toContractParameterType(assertContractParameterTypeJSON(contractIn.returnType)),
-
-      name: contractIn.name,
-      codeVersion: contractIn.codeVersion,
-      author: contractIn.author,
-      email: contractIn.email,
-      description: contractIn.description,
-      contractProperties: getContractProperties({
-        hasDynamicInvoke: contractIn.properties.dynamicInvoke,
-        hasStorage: contractIn.properties.storage,
-        payable: contractIn.properties.payable,
-      }),
-    });
-
-    const sb = new ScriptBuilder();
-    sb.emitSysCall(
-      'Neo.Contract.Create',
-      contract.script,
-      Buffer.from([...contract.parameterList]),
-      contract.returnType,
-      contract.contractProperties,
-      contract.name,
-      contract.codeVersion,
-      contract.author,
-      contract.email,
-      contract.description,
-    );
-
-    return this.invokeRaw({
-      script: sb.build(),
-      options,
-      onConfirm: ({ receipt, data }): PublishReceipt => {
-        let result;
-        if (data.result.state === 'FAULT') {
-          result = this.getInvocationResultError(data.result);
-        } else {
-          const [createdContract] = data.contracts;
-          // tslint:disable-next-line strict-type-predicates
-          if (createdContract === undefined) {
-            throw new InvalidTransactionError(
-              'Something went wrong! Expected a contract to have been created, ' + 'but none was found',
-            );
-          }
-
-          result = this.getInvocationResultSuccess(data.result, createdContract);
-        }
-
-        return {
-          blockIndex: receipt.blockIndex,
-          blockHash: receipt.blockHash,
-          transactionIndex: receipt.transactionIndex,
-          result,
-        };
+    return this.publishBase(
+      'publish',
+      contract,
+      () => {
+        // do nothing,
       },
-      method: 'publish',
-    });
+      options,
+    );
+  }
+
+  public async publishAndDeploy(
+    contract: ContractRegister,
+    abi: ABI,
+    params: ReadonlyArray<Param>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<PublishReceipt>> {
+    return this.publishBase(
+      'publish',
+      contract,
+      (sb) => {
+        const deployFunc = abi.functions.find((func) => func.name === 'deploy');
+        if (deployFunc !== undefined) {
+          // []
+          sb.emitOp('DROP');
+          const hash = crypto.toScriptHash(Buffer.from(contract.script, 'hex'));
+          sb.emitAppCall(
+            hash,
+            'deploy',
+            ...convertParams({ parameters: deployFunc.parameters === undefined ? [] : deployFunc.parameters, params })
+              .converted,
+          );
+        }
+      },
+      options,
+    );
   }
 
   public async registerAsset(
@@ -655,6 +631,75 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       gasCost: result.gasCost,
       value,
     };
+  }
+
+  private async publishBase(
+    method: string,
+    contractIn: ContractRegister,
+    emit: (sb: ScriptBuilder) => void,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<PublishReceipt>> {
+    const contract = new ContractModel({
+      script: Buffer.from(contractIn.script, 'hex'),
+      parameterList: contractIn.parameters.map((parameter) =>
+        toContractParameterType(assertContractParameterTypeJSON(parameter)),
+      ),
+      returnType: toContractParameterType(assertContractParameterTypeJSON(contractIn.returnType)),
+      name: contractIn.name,
+      codeVersion: contractIn.codeVersion,
+      author: contractIn.author,
+      email: contractIn.email,
+      description: contractIn.description,
+      contractProperties: getContractProperties({
+        hasDynamicInvoke: contractIn.properties.dynamicInvoke,
+        hasStorage: contractIn.properties.storage,
+        payable: contractIn.properties.payable,
+      }),
+    });
+
+    const sb = new ScriptBuilder();
+    sb.emitSysCall(
+      'Neo.Contract.Create',
+      contract.script,
+      Buffer.from([...contract.parameterList]),
+      contract.returnType,
+      contract.contractProperties,
+      contract.name,
+      contract.codeVersion,
+      contract.author,
+      contract.email,
+      contract.description,
+    );
+    emit(sb);
+
+    return this.invokeRaw({
+      script: sb.build(),
+      options,
+      onConfirm: ({ receipt, data }): PublishReceipt => {
+        let result;
+        if (data.result.state === 'FAULT') {
+          result = this.getInvocationResultError(data.result);
+        } else {
+          const [createdContract] = data.contracts;
+          // tslint:disable-next-line strict-type-predicates
+          if (createdContract === undefined) {
+            throw new InvalidTransactionError(
+              'Something went wrong! Expected a contract to have been created, ' + 'but none was found',
+            );
+          }
+
+          result = this.getInvocationResultSuccess(data.result, createdContract);
+        }
+
+        return {
+          blockIndex: receipt.blockIndex,
+          blockHash: receipt.blockHash,
+          transactionIndex: receipt.transactionIndex,
+          result,
+        };
+      },
+      method,
+    });
   }
 
   private async invokeRaw<T>({

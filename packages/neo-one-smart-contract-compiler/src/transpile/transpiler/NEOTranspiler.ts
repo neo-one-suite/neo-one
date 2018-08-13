@@ -204,12 +204,8 @@ export class NEOTranspiler implements Transpiler {
                 decimals: 0,
               },
               {
-                type: 'Array',
+                type: 'ByteArray',
                 name: 'args',
-                value: {
-                  type: 'Array',
-                  value: { type: 'ByteArray' },
-                },
               },
             ],
           },
@@ -281,6 +277,19 @@ export class NEOTranspiler implements Transpiler {
 
   public reportUnsupported(node: ts.Node): void {
     this.context.reportUnsupported(node);
+  }
+
+  public getParamTypeNode(
+    node: ts.ParameterDeclaration,
+    type: ts.Type | undefined,
+    typeNode: ts.TypeNode,
+  ): ts.TypeNode {
+    let finalTypeNode = this.getFinalTypeNode(node, type, typeNode);
+    if (tsUtils.initializer.getInitializer(node) !== undefined) {
+      finalTypeNode = ts.createUnionTypeNode([ts.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword), finalTypeNode]);
+    }
+
+    return finalTypeNode;
   }
 
   public getFinalTypeNode(node: ts.Node, type: ts.Type | undefined, typeNode: ts.TypeNode): ts.TypeNode {
@@ -456,7 +465,7 @@ export class NEOTranspiler implements Transpiler {
       if (tsUtils.parametered.getParameters(parametered).length > 0) {
         const argsTypes = tsUtils.parametered
           .getParameters(parametered)
-          .map((param) => this.getFinalTypeNode(param, this.context.getType(param), tsUtils.type_.getTypeNode(param)));
+          .map((param) => this.getParamTypeNode(param, this.context.getType(param), tsUtils.type_.getTypeNode(param)));
         const argsIdentifier = ts.createIdentifier('args');
         argsStatement = ts.createVariableStatement(
           undefined,
@@ -558,7 +567,7 @@ export class NEOTranspiler implements Transpiler {
                   ts.createIdentifier(this.getInternalIdentifier(method, 'getArgument')),
                   [
                     ts.createTupleTypeNode([
-                      this.getFinalTypeNode(param, this.context.getType(param), tsUtils.type_.getTypeNode(param)),
+                      this.getParamTypeNode(param, this.context.getType(param), tsUtils.type_.getTypeNode(param)),
                     ]),
                   ],
                   [ts.createNumericLiteral('1')],
@@ -949,11 +958,21 @@ export class NEOTranspiler implements Transpiler {
     const decls = tsUtils.symbol.getDeclarations(param);
     const decl = utils.nullthrows(decls[0]);
 
-    return this.toABIParameter(tsUtils.symbol.getName(param), decl, this.context.getTypeOfSymbol(param, decl));
+    return this.toABIParameter(
+      tsUtils.symbol.getName(param),
+      decl,
+      this.context.getTypeOfSymbol(param, decl),
+      tsUtils.initializer.getInitializer(decl) !== undefined,
+    );
   }
 
-  private toABIParameter(name: string, node: ts.Node, resolvedType: ts.Type | undefined): ABIParameter | undefined {
-    const type = toABIReturn(this.context, node, resolvedType);
+  private toABIParameter(
+    name: string,
+    node: ts.Node,
+    resolvedType: ts.Type | undefined,
+    optional = false,
+  ): ABIParameter | undefined {
+    const type = toABIReturn(this.context, node, resolvedType, optional);
     if (type === undefined) {
       return undefined;
     }

@@ -38,9 +38,9 @@ class One {
     await this.cleanupTest();
   }
 
-  async execute(command) {
+  async execute(command, options = {}) {
     await this.setupCLI();
-    return this._exec(command);
+    return this._exec(command, options);
   }
 
   async setupCLI() {
@@ -142,9 +142,10 @@ class One {
   }
 
   _createCommand(commandIn) {
-    const command = `./node_modules/.bin/neo-one ${commandIn} --dir ${this.dirName} --server-port ${
-      this.serverPort
-    } --min-port ${this.minPort}`;
+    const cmd = path.resolve(process.cwd(), 'dist', 'neo-one', 'node_modules', '.bin', 'neo-one');
+    const command = `${cmd} ${commandIn} --dir ${this.dirName} --server-port ${this.serverPort} --min-port ${
+      this.minPort
+    }`;
     let additionalArgs = [];
     if (commandIn.startsWith('create') || commandIn.startsWith('delete')) {
       additionalArgs = ['--no-progress'];
@@ -159,9 +160,9 @@ class One {
     ];
   }
 
-  _exec(commandIn) {
+  _exec(commandIn, options = {}) {
     const [cmd, args] = this._createCommand(commandIn);
-    return execa(cmd, args, this._getEnv())
+    return execa(cmd, args, this._getEnv(options))
       .then(({ stdout }) => stdout)
       .catch((error) => {
         throw new Error(
@@ -172,11 +173,11 @@ class One {
       });
   }
 
-  _getEnv() {
+  _getEnv(options = {}) {
     return {
+      ...options,
       maxBuffer: 20000 * 1024,
       windowsHide: true,
-      cwd: path.join(appRootDir.get(), 'dist', 'neo-one'),
     };
   }
 }

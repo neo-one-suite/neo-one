@@ -72,10 +72,8 @@ export const createGet = (sb: ScriptBuilder, node: ts.Node, getKey: Emit, handle
   sb.emitOp(node, 'PICKITEM');
   // [buffer]
   getKey(innerOptions);
-  // [context, buffer]
-  sb.emitSysCall(node, 'Neo.Storage.GetContext');
   // [buffer]
-  sb.emitSysCall(node, 'Neo.Storage.Get');
+  sb.emitHelper(node, innerOptions, sb.helpers.getStorage);
   sb.emitHelper(
     node,
     innerOptions,
@@ -120,10 +118,8 @@ export const createSet = (sb: ScriptBuilder, node: ts.Node, getKey: Emit, handle
   sb.emitSysCall(node, 'Neo.Runtime.Serialize');
   // [bufferKey, bufferVal]
   sb.emitOp(node, 'SWAP');
-  // [context, bufferKey, bufferVal]
-  sb.emitSysCall(node, 'Neo.Storage.GetContext');
   // []
-  sb.emitSysCall(node, 'Neo.Storage.Put');
+  sb.emitHelper(node, innerOptions, sb.helpers.putStorage);
   // [val]
   sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
 };

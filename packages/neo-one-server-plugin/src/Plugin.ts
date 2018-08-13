@@ -1,6 +1,7 @@
 import { Monitor } from '@neo-one/monitor';
 import { ResourceType } from './ResourceType';
-import { CLIArgs, CLIHook, CreateHook, InteractiveCommand } from './types';
+import { TaskList } from './TaskList';
+import { CLIArgs, CLIHook, CreateHook, InteractiveCommand, PluginManager } from './types';
 
 export interface PluginOptions {
   readonly monitor: Monitor;
@@ -88,5 +89,9 @@ export class Plugin {
   // Hook into other plugin's command lifecycle
   public get cliPostHooks(): ReadonlyArray<CLIHookConfig> {
     return [];
+  }
+
+  public executeTaskList(_pluginManager: PluginManager, _options: string): TaskList {
+    throw new Error('Plugin does not define a way to execute task lists.');
   }
 }

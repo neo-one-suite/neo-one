@@ -28,4 +28,9 @@ export const add = (builtins: Builtins): void => {
     'currentTransaction',
     new SysCallMemberValue('System.ExecutionEngine.GetScriptContainer', Types.Transaction),
   );
+  builtins.addContractMember(
+    'BlockchainConstructor',
+    'contractAddress',
+    new SysCallMemberValue('System.ExecutionEngine.GetExecutingScriptHash', Types.Buffer),
+  );
 };

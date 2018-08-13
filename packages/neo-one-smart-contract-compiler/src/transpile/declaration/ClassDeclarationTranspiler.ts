@@ -85,6 +85,18 @@ const createAccessors = (transpiler: Transpiler, property: ts.Declaration): Read
   ].filter(utils.notNull);
 };
 
+const getPropertyTypeNode = (transpiler: Transpiler, property: ts.PropertyDeclaration, type: ts.Type) => {
+  let typeNode = property.type;
+  if (typeNode === undefined) {
+    const newTypeNode = transpiler.context.typeChecker.typeToTypeNode(type, property);
+    if (newTypeNode !== undefined) {
+      typeNode = transpiler.getFinalTypeNode(property, type, newTypeNode);
+    }
+  }
+
+  return typeNode;
+};
+
 export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclaration> {
   public readonly kind = ts.SyntaxKind.ClassDeclaration;
 
@@ -196,7 +208,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
                 property.modifiers,
                 property.name,
                 property.questionToken === undefined ? property.exclamationToken : property.questionToken,
-                property.type,
+                getPropertyTypeNode(transpiler, property, type),
                 tsUtils.setOriginalRecursive(
                   ts.createNew(ts.createIdentifier('MapStorage'), undefined, [
                     ts.createCall(ts.createPropertyAccess(ts.createIdentifier('Buffer'), 'from'), undefined, [
@@ -218,7 +230,7 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
                 property.modifiers,
                 property.name,
                 property.questionToken === undefined ? property.exclamationToken : property.questionToken,
-                property.type,
+                getPropertyTypeNode(transpiler, property, type),
                 tsUtils.setOriginalRecursive(
                   ts.createNew(ts.createIdentifier('SetStorage'), undefined, [
                     ts.createCall(ts.createPropertyAccess(ts.createIdentifier('Buffer'), 'from'), undefined, [

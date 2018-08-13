@@ -193,6 +193,11 @@ export enum Op {
   HASKEY = 0xcb,
   KEYS = 0xcc,
   VALUES = 0xcd,
+  CALL_I = 0xe0,
+  CALL_E = 0xe1,
+  CALL_ED = 0xe2,
+  CALL_ET = 0xe3,
+  CALL_EDT = 0xe4,
   THROW = 0xf0,
   THROWIFNOT = 0xf1,
 }

@@ -21,7 +21,6 @@ export enum TriggerType {
 
 export interface Script {
   readonly code: Buffer;
-  readonly pushOnly?: boolean;
 }
 
 export const NULL_ACTION = {

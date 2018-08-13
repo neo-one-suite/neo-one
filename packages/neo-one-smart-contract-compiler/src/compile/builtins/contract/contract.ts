@@ -27,6 +27,28 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'ContractConstructor',
     'for',
-    new ValueFor('Neo.Blockchain.GetContract', (sb) => sb.helpers.wrapContract),
+    new ValueFor('Neo.Blockchain.GetContract', (sb, node, options) => {
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.if({
+          condition: () => {
+            // [buffer, buffer]
+            sb.emitOp(node, 'DUP');
+            // [buffer, buffer, buffer]
+            sb.emitPushBuffer(node, Buffer.from([]));
+            // [boolean, buffer]
+            sb.emitOp(node, 'EQUAL');
+          },
+          whenTrue: () => {
+            sb.emitOp(node, 'DROP');
+            sb.emitHelper(node, options, sb.helpers.wrapUndefined);
+          },
+          whenFalse: () => {
+            sb.emitHelper(node, options, sb.helpers.wrapContract);
+          },
+        }),
+      );
+    }),
   );
 };

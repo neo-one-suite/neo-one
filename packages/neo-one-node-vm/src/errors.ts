@@ -43,15 +43,6 @@ export class UnknownOpError extends VMError {
   }
 }
 
-export class PushOnlyError extends VMError {
-  public readonly byteCode: number;
-
-  public constructor(context: ExecutionContext, byteCode: number) {
-    super(context, `Push only mode, found non-push byte code: ${byteCode}`);
-    this.byteCode = byteCode;
-  }
-}
-
 export class StackUnderflowError extends VMError {
   public constructor(context: ExecutionContext, op: OpCode, stackLength: number, expected: number) {
     super(context, `Stack Underflow. Op: ${op}. Stack Length: ${stackLength}. ` + `Expected: ${expected}`);
@@ -316,5 +307,17 @@ export class InvalidContractGetStorageContextError extends VMError {
 export class ReadOnlyStorageContextError extends VMError {
   public constructor(context: ExecutionContext) {
     super(context, 'StorageContext is read only');
+  }
+}
+
+export class InsufficientReturnValueError extends VMError {
+  public constructor(context: ExecutionContext, stackSize: number, count: number) {
+    super(context, `Insufficient return values. Found ${stackSize}, expected ${count}`);
+  }
+}
+
+export class InvalidTailCallReturnValueError extends VMError {
+  public constructor(context: ExecutionContext, found: number, expected: number) {
+    super(context, `Invalid tail call return value count. Found ${found}, expected ${expected}`);
   }
 }

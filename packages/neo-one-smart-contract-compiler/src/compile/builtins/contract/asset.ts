@@ -57,6 +57,8 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember(
     'AssetConstructor',
     'for',
-    new ValueFor('Neo.Blockchain.GetAsset', (sb) => sb.helpers.wrapAsset),
+    new ValueFor('Neo.Blockchain.GetAsset', (sb, node, options) => {
+      sb.emitHelper(node, options, sb.helpers.wrapAsset);
+    }),
   );
 };

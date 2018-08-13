@@ -44,7 +44,7 @@ export interface TaskStatus {
   readonly collapse: boolean;
 }
 
-export interface ModifyResourceResponse {
+export interface ExecuteTaskListResponse {
   readonly tasks: ReadonlyArray<TaskStatus>;
 }
 
@@ -66,17 +66,24 @@ export type ReadResponse =
       readonly type: 'aborted';
     };
 
-export interface CRUDRequestStart {
+export interface ExecuteTaskListRequestStart {
   readonly type: 'start';
   readonly plugin: string;
-  readonly resourceType: string;
-  readonly name: string;
   readonly options: string;
 }
 
-export interface CRUDRequestAbort {
+export interface ExecuteTaskListRequestAbort {
   readonly type: 'abort';
 }
+
+export type ExecuteTaskListRequest = ExecuteTaskListRequestStart | ExecuteTaskListRequestAbort;
+
+export interface CRUDRequestStart extends ExecuteTaskListRequestStart {
+  readonly resourceType: string;
+  readonly name: string;
+}
+
+export interface CRUDRequestAbort extends ExecuteTaskListRequestAbort {}
 export type CRUDRequest = CRUDRequestStart | CRUDRequestAbort;
 export interface AllResources {
   readonly [pluginResourceType: string]: ReadonlyArray<BaseResource>;
@@ -119,7 +126,7 @@ export interface Client {
       readonly options: BaseResourceOptions;
       readonly cancel$: Observable<void>;
     },
-  ) => Observable<ModifyResourceResponse>;
+  ) => Observable<ExecuteTaskListResponse>;
   readonly createResource: (
     options: {
       readonly plugin: string;
@@ -137,7 +144,7 @@ export interface Client {
       readonly options: BaseResourceOptions;
       readonly cancel$: Observable<void>;
     },
-  ) => Observable<ModifyResourceResponse>;
+  ) => Observable<ExecuteTaskListResponse>;
   readonly startResource$: (
     options: {
       readonly plugin: string;
@@ -146,7 +153,7 @@ export interface Client {
       readonly options: BaseResourceOptions;
       readonly cancel$: Observable<void>;
     },
-  ) => Observable<ModifyResourceResponse>;
+  ) => Observable<ExecuteTaskListResponse>;
   readonly stopResource$: (
     options: {
       readonly plugin: string;
@@ -155,7 +162,14 @@ export interface Client {
       readonly options: BaseResourceOptions;
       readonly cancel$: Observable<void>;
     },
-  ) => Observable<ModifyResourceResponse>;
+  ) => Observable<ExecuteTaskListResponse>;
+  readonly executeTaskList$: (
+    options: {
+      readonly plugin: string;
+      readonly options: object;
+      readonly cancel$: Observable<void>;
+    },
+  ) => Observable<ExecuteTaskListResponse>;
 }
 
 export interface Binary {

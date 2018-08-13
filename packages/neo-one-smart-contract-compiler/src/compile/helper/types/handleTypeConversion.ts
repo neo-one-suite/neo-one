@@ -15,7 +15,13 @@ export function handleTypeConversion(
     const hasBuiltins = getHasBuiltins(context, fromNode, fromType);
     const mismatch = hasBuiltins.some((hasBuiltin) => !hasBuiltin(context, toNode, toType));
     if (mismatch) {
-      context.reportError(fromNode, DiagnosticCode.InvalidBuiltinUsage, DiagnosticMessage.InvalidBuiltinAssignment);
+      context.reportError(
+        fromNode,
+        DiagnosticCode.InvalidBuiltinUsage,
+        DiagnosticMessage.InvalidBuiltinAssignment,
+        context.typeChecker.typeToString(fromType, fromNode),
+        context.typeChecker.typeToString(toType, toNode),
+      );
     }
   }
 }

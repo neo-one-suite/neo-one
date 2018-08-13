@@ -55,6 +55,7 @@ interface TestCase extends Op {
   readonly mockBlockchain?: (options: { readonly blockchain: any }) => void;
   // tslint:disable-next-line no-any
   readonly mockTransaction?: (options: { readonly transaction: any }) => void;
+  readonly returnValueCount?: number;
 }
 
 const setRef = new ArrayStackItem([new IntegerStackItem(new BN(1))]);
@@ -109,6 +110,22 @@ contractSB.emitOp('PUSH2');
 
 const contract = new Contract({
   script: contractSB.build(),
+  parameterList: [],
+  returnType: ContractParameterType.Void,
+  name: '',
+  codeVersion: '',
+  author: '',
+  email: '',
+  description: '',
+  contractProperties: ContractPropertyState.HasDynamicInvoke,
+});
+
+const multiplyContractSB = new ScriptBuilder();
+multiplyContractSB.emitOp('PUSH2');
+multiplyContractSB.emitOp('MUL');
+
+const multiplyContract = new Contract({
+  script: multiplyContractSB.build(),
   parameterList: [],
   returnType: ContractParameterType.Void,
   name: '',
@@ -400,6 +417,132 @@ const OPCODES = ([
           blockchain.contract.get = jest.fn(async () => Promise.resolve(contract));
         },
         gas: FEES.TEN,
+      },
+      {
+        op: 'CALL_E',
+        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([2]), Buffer.alloc(20, 10)]),
+        args: [new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+      },
+      {
+        op: 'CALL_E',
+        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([1]), Buffer.alloc(20, 10)]),
+        args: [new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+      },
+      {
+        op: 'CALL_E',
+        buffer: Buffer.concat([Buffer.from([2]), Buffer.from([2]), Buffer.alloc(20, 10)]),
+        args: [new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+      },
+      {
+        op: 'CALL_ET',
+        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([2]), Buffer.alloc(20, 10)]),
+        args: [new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+        returnValueCount: 1,
+      },
+      {
+        op: 'CALL_ET',
+        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([1]), Buffer.alloc(20, 10)]),
+        args: [new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+        returnValueCount: 1,
+      },
+      {
+        op: 'CALL_ET',
+        buffer: Buffer.concat([Buffer.from([2]), Buffer.from([2]), Buffer.alloc(20, 10)]),
+        args: [new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+        returnValueCount: 2,
+      },
+      {
+        op: 'CALL_ED',
+        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([2])]),
+        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+      },
+      {
+        op: 'CALL_ED',
+        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([1])]),
+        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+      },
+      {
+        op: 'CALL_ED',
+        buffer: Buffer.concat([Buffer.from([2]), Buffer.from([2])]),
+        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+      },
+      {
+        op: 'CALL_EDT',
+        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([2])]),
+        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+        returnValueCount: 1,
+      },
+      {
+        op: 'CALL_EDT',
+        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([1])]),
+        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+        returnValueCount: 1,
+      },
+      {
+        op: 'CALL_EDT',
+        buffer: Buffer.concat([Buffer.from([2]), Buffer.from([2])]),
+        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
+        mockBlockchain: ({ blockchain }) => {
+          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
+        },
+        gas: FEES.TEN.add(FEES.ONE),
+        returnValueCount: 2,
       },
 
       {
@@ -1387,6 +1530,7 @@ describe('opcodes', () => {
       ref,
       mockBlockchain,
       mockTransaction,
+      returnValueCount,
     } = testCase;
     it(op, async () => {
       const sb = new ScriptBuilder();
@@ -1484,7 +1628,7 @@ describe('opcodes', () => {
         blockchain: blockchain as any,
         init,
         gasLeft,
-        options: { stack, stackAlt } as any,
+        options: { stack, stackAlt, returnValueCount } as any,
       });
 
       expect(context.errorMessage).toBeUndefined();
@@ -1494,15 +1638,16 @@ describe('opcodes', () => {
 
       if (stackItems.length && ref) {
         expect(ref).toEqual(result[0]);
-      } else if (
-        result.length === 1 &&
-        context.stack.length === 1 &&
-        result[0] instanceof IntegerStackItem &&
-        context.stack[0] instanceof IntegerStackItem
-      ) {
-        expect(context.stack[0].asBigInteger().toString(10)).toEqual(result[0].asBigInteger().toString(10));
       } else {
-        expect(context.stack).toEqual(result);
+        expect(context.stack.length).toEqual(result.length);
+        for (const [idx, item] of context.stack.entries()) {
+          const resultItem = result[idx];
+          if (item instanceof IntegerStackItem && resultItem instanceof IntegerStackItem) {
+            expect(item.asBigInteger().toString(10)).toEqual(resultItem.asBigInteger().toString(10));
+          } else {
+            expect(item).toEqual(resultItem);
+          }
+        }
       }
       expect(gasLeft.sub(context.gasLeft).toString(10)).toEqual(gas.toString(10));
     });

@@ -6,8 +6,9 @@ import {
   AllResources,
   BaseResource,
   DescribeTable,
+  ExecuteTaskListRequestStart,
+  ExecuteTaskListResponse,
   getTasksError,
-  ModifyResourceResponse,
 } from '@neo-one/server-plugin';
 import { Observable, Observer, Subject } from 'rxjs';
 import { filter, map, publishReplay, refCount, take } from 'rxjs/operators';
@@ -139,7 +140,7 @@ export class Client {
     readonly name: string;
     readonly options: object;
     readonly cancel$: Observable<void>;
-  }): Observable<ModifyResourceResponse> {
+  }): Observable<ExecuteTaskListResponse> {
     return this.makeCRUD$({
       call: this.client.createResource(),
       plugin,
@@ -202,7 +203,7 @@ export class Client {
     readonly name: string;
     readonly options: any;
     readonly cancel$: Observable<void>;
-  }): Observable<ModifyResourceResponse> {
+  }): Observable<ExecuteTaskListResponse> {
     return this.makeCRUD$({
       call: this.client.deleteResource(),
       plugin,
@@ -225,7 +226,7 @@ export class Client {
     readonly name: string;
     readonly options: object;
     readonly cancel$: Observable<void>;
-  }): Observable<ModifyResourceResponse> {
+  }): Observable<ExecuteTaskListResponse> {
     return this.makeCRUD$({
       call: this.client.startResource(),
       plugin,
@@ -248,13 +249,33 @@ export class Client {
     readonly name: string;
     readonly options: object;
     readonly cancel$: Observable<void>;
-  }): Observable<ModifyResourceResponse> {
+  }): Observable<ExecuteTaskListResponse> {
     return this.makeCRUD$({
       call: this.client.stopResource(),
       plugin,
       resourceType,
       name,
       options,
+      cancel$,
+    });
+  }
+
+  public executeTaskList$({
+    plugin,
+    options,
+    cancel$,
+  }: {
+    readonly plugin: string;
+    readonly options: object;
+    readonly cancel$: Observable<void>;
+  }): Observable<ExecuteTaskListResponse> {
+    return this.makeExecuteTaskList$({
+      call: this.client.executeTaskList(),
+      start: {
+        type: 'start',
+        plugin,
+        options: JSON.stringify(options),
+      },
       cancel$,
     });
   }
@@ -273,19 +294,30 @@ export class Client {
     readonly name: string;
     readonly options: object;
     readonly cancel$: Observable<void>;
-  }): Observable<ModifyResourceResponse> {
-    return this.makeCancellable$(
+  }): Observable<ExecuteTaskListResponse> {
+    return this.makeExecuteTaskList$({
       call,
-      {
+      start: {
         type: 'start',
         plugin,
         resourceType,
         name,
         options: JSON.stringify(options),
       },
-
       cancel$,
-    ).pipe(map((response) => ({ tasks: JSON.parse(response.tasks) })));
+    });
+  }
+
+  private makeExecuteTaskList$<T extends ExecuteTaskListRequestStart = ExecuteTaskListRequestStart>({
+    call,
+    start,
+    cancel$,
+  }: {
+    readonly call: any;
+    readonly start: T;
+    readonly cancel$: Observable<void>;
+  }): Observable<ExecuteTaskListResponse> {
+    return this.makeCancellable$(call, start, cancel$).pipe(map((response) => ({ tasks: JSON.parse(response.tasks) })));
   }
 
   private makeCancellable$(call: any, req: any, cancel$: Observable<void>): Observable<any> {

@@ -305,16 +305,4 @@ describe('common', () => {
     const result = common.convertParams({ parameters, params });
     expect(result).toEqual(expected);
   });
-
-  test('convertParams throws error on mismatched length', () => {
-    const parameters = [abiParameter];
-    const params = ['test1', 'test2'];
-    function testError() {
-      common.convertParams({ parameters, params });
-    }
-
-    expect(testError).toThrow(new InvalidArgumentError(
-      `Expected parameters length (${parameters.length}) to equal params ` + `length (${params.length}).`,
-    ) as any);
-  });
 });
