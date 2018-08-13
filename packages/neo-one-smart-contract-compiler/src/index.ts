@@ -1,3 +1,4 @@
+import * as path from 'path';
 import ts from 'typescript';
 import { compileContract as compileContractBase, CompileContractResult } from './compileContract';
 import { getSemanticDiagnostics as getSemanticDiagnosticsBase } from './getSemanticDiagnostics';
@@ -6,7 +7,7 @@ import { throwOnDiagnosticErrorOrWarning } from './utils';
 export const getSemanticDiagnostics = (
   filePath: string,
   languageService: ts.LanguageService,
-  smartContractDir: string,
+  smartContractDir: string = path.dirname(require.resolve('@neo-one/smart-contract')),
 ): ReadonlyArray<ts.Diagnostic> => getSemanticDiagnosticsBase({ filePath, languageService, smartContractDir });
 
 export const compileContract = (

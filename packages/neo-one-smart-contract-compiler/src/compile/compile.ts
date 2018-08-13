@@ -2,7 +2,12 @@ import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../Context';
 import { createHelpers } from './helper';
-import { EmittingScriptBuilder, HelperCapturingScriptBuilder, ScopeCapturingScriptBuilder } from './sb';
+import {
+  DiagnosticScriptBuilder,
+  EmittingScriptBuilder,
+  HelperCapturingScriptBuilder,
+  ScopeCapturingScriptBuilder,
+} from './sb';
 import { CompileResult } from './types';
 
 export interface BaseCompileOptions {
@@ -13,7 +18,13 @@ export interface CompileOptions extends BaseCompileOptions {
   readonly sourceMaps?: { readonly [filePath: string]: RawSourceMap };
 }
 
-export const compileForDiagnostics = ({ context, sourceFile }: CompileOptions): EmittingScriptBuilder => {
+export const compileForDiagnostics = ({ context, sourceFile }: CompileOptions): void => {
+  const helpers = createHelpers();
+  const scriptBuilder = new DiagnosticScriptBuilder(context, helpers, sourceFile);
+  scriptBuilder.process();
+};
+
+export const compile = ({ context, sourceFile, sourceMaps = {} }: CompileOptions): CompileResult => {
   const helpers = createHelpers();
 
   const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, sourceFile);
@@ -35,12 +46,6 @@ export const compileForDiagnostics = ({ context, sourceFile }: CompileOptions): 
     allHelpers: helperScriptBuilder.getHelpers(),
   });
   emittingScriptBuilder.process();
-
-  return emittingScriptBuilder;
-};
-
-export const compile = ({ context, sourceFile, sourceMaps = {} }: CompileOptions): CompileResult => {
-  const emittingScriptBuilder = compileForDiagnostics({ context, sourceFile });
 
   const finalResult = emittingScriptBuilder.getFinalResult(sourceMaps);
 

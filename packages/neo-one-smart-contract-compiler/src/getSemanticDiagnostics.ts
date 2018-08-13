@@ -13,11 +13,15 @@ export const getSemanticDiagnostics = ({
   readonly languageService: ts.LanguageService;
 }): ReadonlyArray<ts.Diagnostic> => {
   const context = createContextForLanguageService(languageService, smartContractDir);
-  compileForDiagnostics({
-    sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
-    context,
-    sourceMaps: {},
-  });
+  try {
+    compileForDiagnostics({
+      sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
+      context,
+      sourceMaps: {},
+    });
+  } catch {
+    // do nothing, should never happen
+  }
 
   return context.diagnostics;
 };

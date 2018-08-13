@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getSemanticDiagnostics reports errors for a complex single file 1`] = `
+Array [
+  Object {
+    "category": 1,
+    "code": 110015,
+    "column": 37,
+    "file": "complex.ts",
+    "length": 19,
+    "line": 39,
+    "messageText": "Argument to Address.from must be a string literal address.",
+    "source": "neo-one",
+    "start": 960,
+  },
+]
+`;
+
+exports[`getSemanticDiagnostics reports errors for a simple single file 1`] = `
+Array [
+  Object {
+    "category": 1,
+    "code": 110015,
+    "column": 0,
+    "file": "simple.ts",
+    "length": 19,
+    "line": 2,
+    "messageText": "Argument to Address.from must be a string literal address.",
+    "source": "neo-one",
+    "start": 52,
+  },
+]
+`;
