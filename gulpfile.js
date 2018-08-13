@@ -21,7 +21,7 @@ const pkg = require('./package.json');
 const FORMATS = [
   {
     main: true,
-    target: 'es2018',
+    target: 'es2017',
     module: 'cjs',
   },
   {
@@ -112,7 +112,7 @@ const globs = {
   bin: ['packages/*/src/bin/*.ts'],
   pkg: ['packages/*/package.json'],
   pkgFiles: ['packages/*/tsconfig.json'],
-  files: ['lerna.json', 'yarn.lock'],
+  files: ['lerna.json', 'yarn.lock', 'tsconfig.json'],
   metadata: ['LICENSE', 'README.md', 'CHANGELOG.md'],
 };
 
@@ -146,10 +146,12 @@ const DEP_MAPPING = {
       '@reactivex/ix-esnext-esm': '@reactivex/ix-esnext-cjs',
     },
   },
-  es2018: {
-    esm: {},
+  es2017: {
+    esm: {
+      '@reactivex/ix-esnext-esm': '@reactivex/ix-es2015-esm',
+    },
     cjs: {
-      '@reactivex/ix-esnext-esm': '@reactivex/ix-esnext-cjs',
+      '@reactivex/ix-esnext-esm': '@reactivex/ix-es2015-cjs',
     },
   },
 };
@@ -323,6 +325,7 @@ const buildAll = ((cache) =>
         copyMetadata(format),
         copyFiles(format),
         copyRootPkg(format),
+        copyRootTSConfig(format),
         buildTypescript(format, type),
         format === MAIN_FORMAT ? 'buildBin' : undefined,
         format === MAIN_FORMAT ? 'createBin' : undefined,
@@ -355,6 +358,23 @@ const copyRootPkg = ((cache) =>
     const filePath = path.resolve(getDistBase(format), 'package.json');
     await fs.ensureDir(path.dirname(filePath));
     await fs.writeFile(filePath, JSON.stringify(rootPkg, null, 2));
+  }))({});
+
+const copyRootTSConfig = ((cache) =>
+  memoizeTask(cache, async function copyRootTSConfig(format) {
+    const tsconfigContents = await fs.readFile(path.resolve(appRootDir.get(), 'tsconfig.json'), 'utf8');
+    const tsconfig = JSON.parse(tsconfigContents);
+    const suffix = format === MAIN_FORMAT ? '' : `-${format.target}-${format.module}`;
+    tsconfig.compilerOptions.paths = {
+      '@neo-one/ec-key': ['../@types/@neo-one/ec-key'],
+      '@neo-one/boa': ['../@types/@neo-one/boa'],
+      '@neo-one/csharp': ['../@types/@neo-one/csharp'],
+      [`@neo-one/*${suffix}`]: ['./neo-one-*/src'],
+      '*': ['../@types/*'],
+    };
+    const filePath = path.resolve(getDistBase(format), 'tsconfig.json');
+    await fs.ensureDir(path.dirname(filePath));
+    await fs.writeFile(filePath, JSON.stringify(tsconfig, null, 2));
   }))({});
 
 const gulpBin = () =>
@@ -410,6 +430,7 @@ gulp.task('copyPkgFiles', gulp.parallel(FORMATS.map((format) => copyPkgFiles(for
 gulp.task('copyMetadata', gulp.parallel(FORMATS.map((format) => copyMetadata(format))));
 gulp.task('copyFiles', gulp.parallel(FORMATS.map((format) => copyFiles(format))));
 gulp.task('copyRootPkg', gulp.parallel(FORMATS.map((format) => copyRootPkg(format))));
+gulp.task('copyRootTSConfig', gulp.parallel(FORMATS.map((format) => copyRootTSConfig(format))));
 gulp.task('buildTypescript', gulp.parallel(FORMATS.map((format) => buildTypescript(format))));
 gulp.task('buildAll', gulp.parallel(FORMATS.map((format) => buildAll(format))));
 gulp.task('install', gulp.parallel(FORMATS.map((format) => install(format))));

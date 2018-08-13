@@ -1,4 +1,4 @@
-import { Types } from '../../../helper/types/Types';
+import { Types } from '../../../constants';
 import { Builtins } from '../../Builtins';
 import { SysCallValue } from '../SysCallValue';
 import { CreateOrMigrateCall } from './CreateOrMigrateCall';

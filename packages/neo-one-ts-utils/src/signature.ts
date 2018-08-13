@@ -18,7 +18,7 @@ export function isFailure(signature: ts.Signature): boolean {
     sig.typeParameters === undefined &&
     sig.thisParameter === undefined &&
     sig.parameters.length === 0 &&
-    type_.isAny(sig.resolvedReturnType) &&
+    (sig.resolvedReturnType === undefined || type_.isAny(sig.resolvedReturnType)) &&
     sig.resolvedTypePredicate === undefined &&
     sig.minArgumentCount === 0 &&
     !sig.hasRestParameter &&

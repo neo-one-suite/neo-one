@@ -17,15 +17,12 @@ export interface CompileContractResult {
   readonly abi: ABI;
   readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
   readonly contract: ContractRegister;
-  readonly sourceMap: RawSourceMap;
+  readonly sourceMap: Promise<RawSourceMap>;
 }
 
-export const compileContract = async ({
-  filePath: filePathIn,
-  name,
-}: CompileContractOptions): Promise<CompileContractResult> => {
+export const compileContract = ({ filePath: filePathIn, name }: CompileContractOptions): CompileContractResult => {
   const filePath = normalizePath(filePathIn);
-  const transpileContext = await createContextForPath(filePath);
+  const transpileContext = createContextForPath(filePath);
   const smartContract = tsUtils.statement.getClassOrThrow(
     tsUtils.file.getSourceFileOrThrow(transpileContext.program, filePath),
     name,
@@ -33,7 +30,7 @@ export const compileContract = async ({
   const { sourceFiles, abi, contract } = transpile({ smartContract, context: transpileContext });
   const context = updateContext(transpileContext, _.mapValues(sourceFiles, ({ text }) => text));
 
-  const { code, sourceMap: finalSourceMap, features } = await compile({
+  const { code, sourceMap: finalSourceMap, features } = compile({
     sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
     context,
     sourceMaps: _.mapValues(sourceFiles, ({ sourceMap }) => sourceMap),

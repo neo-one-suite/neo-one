@@ -2,7 +2,7 @@ import { CallReceiptJSON } from '@neo-one/client-core';
 import ts from 'typescript';
 import * as appRootDir from 'app-root-dir';
 import { tsUtils } from '@neo-one/ts-utils';
-import { getMonitor } from '../../test/getMonitor';
+import { getMonitor } from './getMonitor';
 import { checkResult } from './extractors';
 import { createContextForSnippet, createContextForPath } from '../../createContext';
 import { Context } from '../../Context';

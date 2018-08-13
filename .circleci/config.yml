@@ -99,12 +99,28 @@ aliases:
           path: reports
     parallelism: 2
 
+node8: &node8
+  docker:
+    - image: circleci/node:8.9.0
+
 node10: &node10
   docker:
     - image: circleci/node:10.8.0
 
 version: 2
 jobs:
+  test8:
+    <<: *node8
+    <<: *test
+
+  e2e8:
+    <<: *node8
+    <<: *e2e
+
+  build-e2e8:
+    <<: *node8
+    <<: *build-e2e
+
   test10:
     <<: *node10
     <<: *test
@@ -148,7 +164,17 @@ workflows:
     jobs:
       - deploy-website:
           filters: *filter-only-master
-  test:
+  test8:
+    jobs:
+      - build-e2e8:
+          filters: *filter-ignore-gh-pages
+      - test8:
+          filters: *filter-ignore-gh-pages
+      - e2e8:
+          requires:
+            - build-e2e8
+          filters: *filter-ignore-gh-pages
+  test10:
     jobs:
       - build-e2e10:
           filters: *filter-ignore-gh-pages

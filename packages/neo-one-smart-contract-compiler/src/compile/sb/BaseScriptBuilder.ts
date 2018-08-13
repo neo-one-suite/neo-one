@@ -15,7 +15,6 @@ import { BN } from 'bn.js';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../../Context';
-import { Builtins } from '../builtins';
 import { declarations } from '../declaration';
 import { expressions } from '../expression';
 import { files } from '../file';
@@ -55,7 +54,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   public constructor(
     public readonly context: Context,
     public readonly helpers: Helpers,
-    public readonly builtins: Builtins,
     private readonly sourceFile: ts.SourceFile,
     private readonly allHelpers: ReadonlyArray<Helper> = [],
   ) {
@@ -128,7 +126,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     this.mutableProcessedByteCode = bytecode;
   }
 
-  public async getFinalResult(sourceMaps: { readonly [filePath: string]: RawSourceMap }): Promise<ScriptBuilderResult> {
+  public getFinalResult(sourceMaps: { readonly [filePath: string]: RawSourceMap }): ScriptBuilderResult {
     this.withProgramCounter((programCounter) => {
       this.emitJmp(this.sourceFile, 'JMP', programCounter.getLast());
       this.jumpTablePC.setPC(programCounter.getCurrent());
@@ -195,17 +193,21 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
       return finalValue;
     });
 
-    await Promise.all(
-      Object.entries(sourceMaps).map(async ([filePath, sourceMap]) => {
-        await SourceMapConsumer.with(sourceMap, undefined, async (consumer) => {
-          sourceMapGenerator.applySourceMap(consumer, filePath);
-        });
-      }),
-    );
+    const sourceMap = (async () => {
+      await Promise.all(
+        Object.entries(sourceMaps).map(async ([filePath, srcMap]) => {
+          await SourceMapConsumer.with(srcMap, undefined, async (consumer) => {
+            sourceMapGenerator.applySourceMap(consumer, filePath);
+          });
+        }),
+      );
+
+      return sourceMapGenerator.toJSON();
+    })();
 
     return {
       code: Buffer.concat(buffers),
-      sourceMap: sourceMapGenerator.toJSON(),
+      sourceMap,
       features: this.mutableFeatures,
     };
   }

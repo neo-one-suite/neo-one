@@ -1,6 +1,5 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
-import * as path from 'path';
 import ts from 'typescript';
 import { Context, DiagnosticOptions } from '../../Context';
 import { pathResolve } from '../../utils';
@@ -390,28 +389,25 @@ export class Builtins {
   private getGlobals(): ts.SourceFile {
     return tsUtils.file.getSourceFileOrThrow(
       this.context.program,
-      pathResolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'global.d.ts'),
+      pathResolve(this.context.smartContractDir, 'global.d.ts'),
     );
   }
 
   private getContract(): ts.SourceFile {
     return tsUtils.file.getSourceFileOrThrow(
       this.context.program,
-      pathResolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'index.d.ts'),
+      pathResolve(this.context.smartContractDir, 'index.d.ts'),
     );
   }
 
   private getInternal(): ts.SourceFile {
     return tsUtils.file.getSourceFileOrThrow(
       this.context.program,
-      pathResolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'internal.d.ts'),
+      pathResolve(this.context.smartContractDir, 'internal.d.ts'),
     );
   }
 
   private getTestGlobals(): ts.SourceFile | undefined {
-    return tsUtils.file.getSourceFile(
-      this.context.program,
-      pathResolve(path.dirname(require.resolve('@neo-one/smart-contract')), 'harness.d.ts'),
-    );
+    return tsUtils.file.getSourceFile(this.context.program, pathResolve(this.context.smartContractDir, 'harness.d.ts'));
   }
 }

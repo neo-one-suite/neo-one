@@ -1,6 +1,6 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { Types } from '../../helper/types/Types';
+import { Types } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { BuiltinMemberCall } from '../BuiltinMemberCall';

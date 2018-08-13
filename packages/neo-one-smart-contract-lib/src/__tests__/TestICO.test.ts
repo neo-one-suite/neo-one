@@ -1,6 +1,6 @@
 // wallaby.skip
 import BigNumber from 'bignumber.js';
-import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-compiler';
+import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-test';
 import * as path from 'path';
 import { privateKeyToScriptHash, assets, scriptHashToAddress, privateKeyToAddress } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';

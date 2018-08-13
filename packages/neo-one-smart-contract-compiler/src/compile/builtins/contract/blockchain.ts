@@ -1,4 +1,4 @@
-import { Types } from '../../helper/types/Types';
+import { Types } from '../../constants';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
 import { BuiltinValueObject } from '../BuiltinValueObject';

@@ -15,7 +15,7 @@ import {
 import ts from 'typescript';
 import { compile } from '../../compile';
 import { CompileResult } from '../../compile/types';
-import { testNodeSetup } from '../../test';
+import { testNodeSetup } from '../../../../neo-one-smart-contract-test/src/setupTest';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { createContextForSnippet } from '../../createContext';
 import { checkRawResult } from './extractors';
@@ -112,17 +112,18 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
 
       throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
 
+      const resolvedSourceMap = await sourceMap;
       const result = await userAccountProviders.memory.__execute(
         code.toString('hex'),
         { from: masterWallet.account.id, ...options },
-        sourceMap,
+        resolvedSourceMap,
       );
 
       const [invokeReceipt] = await Promise.all([
         result.confirmed({ timeoutMS: 5000 }),
         developerClient.runConsensusNow(),
       ]);
-      await checkRawResult(invokeReceipt, sourceMap);
+      await checkRawResult(invokeReceipt, resolvedSourceMap);
 
       return { receipt: invokeReceipt, transaction: result.transaction };
     },

@@ -1,4 +1,5 @@
 /// <reference path="./global.d.ts" />
+/// <reference path="./internal.d.ts" />
 
 declare const OpaqueTagSymbol: unique symbol;
 

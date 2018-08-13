@@ -6,7 +6,7 @@ import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { hasUndefined } from '../types';
+import { hasUndefined } from './undefined';
 
 type Process = (options: VisitOptions) => void;
 

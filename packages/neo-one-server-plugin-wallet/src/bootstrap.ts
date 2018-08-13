@@ -30,6 +30,7 @@ import _ from 'lodash';
 import ora from 'ora';
 import * as path from 'path';
 import { of as _of } from 'rxjs';
+import { RawSourceMap } from 'source-map';
 import { constants } from './constants';
 import { WalletPlugin } from './WalletPlugin';
 import { Wallet } from './WalletResourceType';
@@ -773,15 +774,25 @@ const findContracts = async (current: string): Promise<string> => {
   return findContracts(path.dirname(current));
 };
 
-export const compileSmartContract = async (contractName: string): Promise<CompileContractResult> => {
-  const dir = await findContracts(require.resolve('@neo-one/server-plugin-wallet'));
-
-  return compileContract(path.resolve(dir, `${contractName}.ts`), contractName);
+type ContractResult = Omit<CompileContractResult, 'sourceMap'> & {
+  readonly sourceMap: RawSourceMap;
 };
 
-const compileSmartContracts = async (
-  contractNames: ReadonlyArray<string>,
-): Promise<ReadonlyArray<CompileContractResult>> => Promise.all(contractNames.map(compileSmartContract));
+export const compileSmartContract = async (contractName: string): Promise<ContractResult> => {
+  const dir = await findContracts(require.resolve('@neo-one/server-plugin-wallet'));
+
+  const result = compileContract(path.resolve(dir, `${contractName}.ts`), contractName);
+
+  const sourceMap = await result.sourceMap;
+
+  return {
+    ...result,
+    sourceMap,
+  };
+};
+
+const compileSmartContracts = async (contractNames: ReadonlyArray<string>): Promise<ReadonlyArray<ContractResult>> =>
+  Promise.all(contractNames.map(compileSmartContract));
 
 // tslint:disable-next-line no-suspicious-comment
 // TODO: Support using neo-one cli for compiling/publishing when !isRPC
@@ -793,7 +804,7 @@ const publishContract = async ({
   readonly wallet: WalletData;
   readonly isRPC: boolean;
   readonly client: Client;
-  readonly result: CompileContractResult;
+  readonly result: ContractResult;
 }): Promise<TransactionResult<PublishReceipt>> => client.publish(contract, { from: wallet.accountID });
 
 interface TokenWithWallet extends TokenInfo {

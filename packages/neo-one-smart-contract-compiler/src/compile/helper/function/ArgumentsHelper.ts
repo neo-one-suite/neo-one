@@ -23,7 +23,7 @@ export class ArgumentsHelper extends Helper<ts.CallExpression | ts.NewExpression
             const mismatch = signatureTypes.some(({ paramDecls, paramTypes }) => {
               const paramDecl = paramDecls[Math.min(idx, paramDecls.length - 1)];
               let paramTypeIn = paramTypes.get(paramDecl);
-              if (tsUtils.parameter.isRestParameter(paramDecl) && paramTypeIn !== undefined) {
+              if (paramTypeIn !== undefined && tsUtils.parameter.isRestParameter(paramDecl)) {
                 paramTypeIn = tsUtils.type_.getArrayType(paramTypeIn);
               }
               const paramType = paramTypeIn;

@@ -1,6 +1,6 @@
 import ts from 'typescript';
+import { Types } from '../../constants';
 import { Helper } from '../Helper';
-import { Types } from '../types/Types';
 
 export interface TypedHelperOptions {
   readonly type: ts.Type | undefined;

@@ -9,12 +9,17 @@ import ts from 'typescript';
 import { Context } from './Context';
 import { normalizePath, pathResolve } from './utils';
 
-function createContext(program: ts.Program, typeChecker: ts.TypeChecker, languageService: ts.LanguageService): Context {
-  return new Context(program, typeChecker, languageService);
+function createContext(
+  program: ts.Program,
+  typeChecker: ts.TypeChecker,
+  languageService: ts.LanguageService,
+  smartContractDir: string,
+): Context {
+  return new Context(program, typeChecker, languageService, smartContractDir);
 }
 
 export function updateContext(context: Context, files: { readonly [fileName: string]: string | undefined }): Context {
-  const { program, typeChecker, languageService } = createProgram(
+  const { program, typeChecker, languageService, smartContractDir } = createProgram(
     context.program.getCompilerOptions(),
     Object.keys(files),
     {
@@ -24,7 +29,7 @@ export function updateContext(context: Context, files: { readonly [fileName: str
     },
   );
 
-  return context.update(program, typeChecker, languageService);
+  return context.update(program, typeChecker, languageService, smartContractDir);
 }
 
 const doGlob = async (value: string) =>
@@ -59,10 +64,10 @@ const DEFAULT_MAKE_CONTEXT_OPTIONS = {
   modifyHost: defaultModifyHost,
 };
 
-const makeContext = async (
+const makeContext = (
   rootNames: ReadonlyArray<string>,
   options: MakeContextOptions = DEFAULT_MAKE_CONTEXT_OPTIONS,
-): Promise<Context> => {
+): Context => {
   const tsConfigFilePath = pathResolve(require.resolve('@neo-one/smart-contract'), '..', '..', 'tsconfig.json');
 
   const res = ts.readConfigFile(tsConfigFilePath, (value) => fs.readFileSync(value, 'utf8'));
@@ -74,9 +79,9 @@ const makeContext = async (
   };
   const parsed = ts.parseJsonConfigFileContent(res.config, parseConfigHost, path.dirname(tsConfigFilePath));
 
-  const { program, typeChecker, languageService } = createProgram(parsed.options, rootNames, options);
+  const { program, typeChecker, languageService, smartContractDir } = createProgram(parsed.options, rootNames, options);
 
-  return createContext(program, typeChecker, languageService);
+  return createContext(program, typeChecker, languageService, smartContractDir);
 };
 
 const createModifyHostFiles = (files: { readonly [fileName: string]: string | undefined }) => (
@@ -193,6 +198,7 @@ const createProgram = (
     program,
     typeChecker: program.getTypeChecker(),
     languageService,
+    smartContractDir,
   };
 };
 
@@ -205,24 +211,24 @@ export const createContextForDir = async (
   return makeContext(files, options);
 };
 
-export const createContextForPath = async (
+export const createContextForPath = (
   filePath: string,
   options: CreateContextOptions = CREATE_CONTEXT_OPTIONS_DEFAULT,
-): Promise<Context> => makeContext([filePath], options);
+): Context => makeContext([filePath], options);
 
 export interface SnippetResult {
   readonly context: Context;
   readonly sourceFile: ts.SourceFile;
 }
 
-export const createContextForSnippet = async (
+export const createContextForSnippet = (
   code: string,
   options: CreateContextOptions = CREATE_CONTEXT_OPTIONS_DEFAULT,
-): Promise<SnippetResult> => {
+): SnippetResult => {
   const dir = appRootDir.get();
   const fileName = pathResolve(dir, 'snippetCode.ts');
 
-  const context = await makeContext([fileName], {
+  const context = makeContext([fileName], {
     ...options,
     modifyHost: createModifyHostFiles({ [fileName]: code }),
   });
@@ -232,4 +238,16 @@ export const createContextForSnippet = async (
     context,
     sourceFile,
   };
+};
+
+export const createContextForLanguageService = (
+  languageService: ts.LanguageService,
+  smartContractDir: string,
+): Context => {
+  const program = languageService.getProgram();
+  if (program === undefined) {
+    throw new Error('Something went wrong');
+  }
+
+  return createContext(program, program.getTypeChecker(), languageService, smartContractDir);
 };

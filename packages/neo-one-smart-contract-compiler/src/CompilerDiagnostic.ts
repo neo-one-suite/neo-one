@@ -21,6 +21,6 @@ export class CompilerDiagnostic implements ts.Diagnostic {
   }
 
   public get source(): string {
-    return this.node.getText();
+    return 'neo-one';
   }
 }

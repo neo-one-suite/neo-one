@@ -19,7 +19,7 @@
     "dapp"
   ],
   "engines": {
-    "node": ">=10.8.0"
+    "node": ">=8.9.0"
   },
   "devDependencies": {
     "@neo-one/cli": "^1.0.0-alpha.110",

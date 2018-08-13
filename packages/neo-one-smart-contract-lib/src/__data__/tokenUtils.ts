@@ -8,7 +8,7 @@ import {
   UserAccountID,
   Event,
 } from '@neo-one/client';
-import { SetupTestResult } from '@neo-one/smart-contract-compiler';
+import { SetupTestResult } from '@neo-one/smart-contract-test';
 import { crypto, common } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 

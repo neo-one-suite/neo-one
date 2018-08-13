@@ -18,7 +18,7 @@ export const genTest = ({
   const smartContract = getSmartContractName(name);
 
   return `
-import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-compiler';
+import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-test';
 import * as path from 'path';
 import { ${smartContract} } from '${relativeTypes}';
 

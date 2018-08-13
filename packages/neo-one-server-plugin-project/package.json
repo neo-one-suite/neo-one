@@ -16,6 +16,7 @@
     "fs-extra": "^7.0.0",
     "lodash": "^4.17.10",
     "rxjs": "^6.2.2",
+    "source-map": "^0.7.3",
     "typescript": "^3.0.1"
   }
 }

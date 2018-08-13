@@ -1,8 +1,8 @@
 import ts from 'typescript';
+import { Types } from '../../../constants';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
-import { TypedHelper } from '../../common';
-import { Types } from '../Types';
+import { TypedHelper } from '../TypedHelper';
 
 // Input: [val]
 // Output: [number]

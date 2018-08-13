@@ -1,14 +1,20 @@
-import { SmartContract, SmartContractAny } from '@neo-one/client';
+import ts from 'typescript';
 import { compileContract as compileContractBase, CompileContractResult } from './compileContract';
-import { setupContractTest as setupContractTestBase, SetupTestResult } from './test';
+import { getSemanticDiagnostics as getSemanticDiagnosticsBase } from './getSemanticDiagnostics';
 import { throwOnDiagnosticErrorOrWarning } from './utils';
 
-export const compileContract = async (
+export const getSemanticDiagnostics = (
+  filePath: string,
+  languageService: ts.LanguageService,
+  smartContractDir: string,
+): ReadonlyArray<ts.Diagnostic> => getSemanticDiagnosticsBase({ filePath, languageService, smartContractDir });
+
+export const compileContract = (
   filePath: string,
   contractName: string,
   ignoreWarnings = false,
-): Promise<CompileContractResult> => {
-  const result = await compileContractBase({ filePath, name: contractName });
+): CompileContractResult => {
+  const result = compileContractBase({ filePath, name: contractName });
 
   throwOnDiagnosticErrorOrWarning(result.diagnostics, ignoreWarnings);
 
@@ -20,13 +26,5 @@ export interface SetupContractTestOptions {
   readonly deploy?: boolean;
 }
 
-// tslint:disable-next-line no-any
-export const setupContractTest = async <TSmartContract extends SmartContract<any> = SmartContractAny>(
-  filePath: string,
-  contractName: string,
-  { ignoreWarnings = false, deploy = false }: SetupContractTestOptions = { ignoreWarnings: false, deploy: false },
-): Promise<SetupTestResult<TSmartContract>> =>
-  setupContractTestBase<TSmartContract>({ filePath, contractName, ignoreWarnings, deploy });
-
-export { CompileContractResult, SetupTestResult };
+export { CompileContractResult };
 export { scan, Contracts } from './scan';

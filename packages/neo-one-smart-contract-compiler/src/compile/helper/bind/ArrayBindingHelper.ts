@@ -2,8 +2,7 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { TypedHelper, TypedHelperOptions } from '../common';
-import { isOnlyArray } from '../types';
+import { isOnlyArray, TypedHelper, TypedHelperOptions } from '../types';
 
 export interface ArrayBindingHelperOptions extends TypedHelperOptions {
   readonly value?: ts.Node;

@@ -1,9 +1,9 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { Types } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { Types } from '../types/Types';
 
 export interface EqualsEqualsHelperOptions {
   readonly left: ts.Node;

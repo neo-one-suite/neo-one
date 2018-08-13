@@ -1,9 +1,8 @@
 import ts from 'typescript';
-import { WellKnownSymbol } from '../../constants';
+import { Types, WellKnownSymbol } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { Types } from './Types';
 
 export type PreferredType = 'default' | 'string' | 'number';
 export interface ToPrimitiveHelperOptions {

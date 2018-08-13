@@ -1,7 +1,7 @@
 import * as api from '@neo-one/smart-contract-compiler';
 
 describe('@neo-one/smart-contract-compiler', () => {
-  const EXPECTED = ['compileContract', 'setupContractTest', 'scan'];
+  const EXPECTED = ['compileContract', 'scan', 'getSemanticDiagnostics'];
 
   test('has expected exports', () => {
     expect(Object.keys(api).sort()).toEqual(EXPECTED.sort());

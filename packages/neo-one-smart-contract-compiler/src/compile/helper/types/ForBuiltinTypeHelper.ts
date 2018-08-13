@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
+import { Types } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -20,7 +21,6 @@ import { hasOutput, isOnlyOutput } from './output';
 import { hasString, isOnlyString } from './string';
 import { hasSymbol, isOnlySymbol } from './symbol';
 import { hasTransaction, isOnlyTransaction } from './transaction';
-import { Types } from './Types';
 import { hasUndefined, isOnlyUndefined } from './undefined';
 
 type ProcessType = (options: VisitOptions) => void;

@@ -3,7 +3,7 @@ import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { Builtin, isBuiltinInstanceMemberValue, isBuiltinMemberValue } from '../builtins';
-import { Types } from '../helper/types/Types';
+import { Types } from '../constants';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
