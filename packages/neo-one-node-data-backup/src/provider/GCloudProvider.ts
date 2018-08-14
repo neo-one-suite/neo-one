@@ -1,4 +1,4 @@
-import { File } from '@google-cloud/storage';
+import Storage, { File } from '@google-cloud/storage';
 import { Monitor } from '@neo-one/monitor';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -182,6 +182,7 @@ export class GCloudProvider extends Provider {
   private async getStorage() {
     const storage = await import('@google-cloud/storage');
 
-    return storage.default({ projectId: this.options.projectID });
+    // tslint:disable-next-line no-any
+    return (storage as any).default({ projectId: this.options.projectID }) as Storage;
   }
 }
