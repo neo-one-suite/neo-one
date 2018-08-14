@@ -3,7 +3,7 @@ aliases:
     keys:
       - v2-yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
       # Fallback in case checksum fails
-      - v2-yarn-{{ .Branch }}-
+      - v2-yarn-{{ .Branch }}
 
   - &save-yarn-cache
     paths:
@@ -22,15 +22,13 @@ aliases:
 
   - &yarn
     |
-      yarn install --non-interactive --cache-folder ~/.cache/yarn
+      yarn install --non-interactive
 
   - &lint
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-yarn-cache
       - run: *yarn
-      - save-cache: *save-yarn-cache
       - run:
           name: Prettier
           command: yarn nit
@@ -52,9 +50,7 @@ aliases:
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-yarn-cache
       - run: *yarn
-      - save-cache: *save-yarn-cache
       - run:
           name: Test
           command: yarn test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
@@ -70,9 +66,7 @@ aliases:
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-yarn-cache
       - run: *yarn
-      - save-cache: *save-yarn-cache
       - run:
           name: Build
           command: yarn build:e2e
@@ -153,9 +147,7 @@ jobs:
     steps:
       - checkout:
           path: ~/neo-one
-      - restore-cache: *restore-yarn-cache
       - run: *yarn
-      - save-cache: *save-yarn-cache
       - run:
           name: Install Dependencies
           command: sudo apt install rsync

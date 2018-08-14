@@ -905,6 +905,12 @@
   dependencies:
     tslib "^1.8.0"
 
+"@reactivex/ix-esnext-esm@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@reactivex/ix-esnext-esm/-/ix-esnext-esm-2.3.5.tgz#c62389c6212385ecff152ae2bb0b86dfb47e1988"
+  dependencies:
+    tslib "^1.8.0"
+
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.0.tgz#ecdf48d532c58ea477acfcab80348424f8d0662f"
@@ -2221,8 +2227,8 @@ chownr@^1.0.1:
   resolved "https://registry.yarnpkg.com/chownr/-/chownr-1.0.1.tgz#e2a75042a9551908bebd25b8523d5f9769d79181"
 
 ci-info@^1.0.0:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-1.1.3.tgz#710193264bb05c77b8c90d02f5aaf22216a667b2"
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-1.2.0.tgz#8d1e9cb4051482ff70cd52a89b4b095a8fb635f6"
 
 cipher-base@^1.0.1:
   version "1.0.4"
