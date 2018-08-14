@@ -111,7 +111,7 @@
     "@types/figures": "2.0.0",
     "@types/fs-extra": "5.0.4",
     "@types/glob": "5.0.35",
-    "@types/google-cloud__storage": "1.7.0",
+    "@types/google-cloud__storage": "1.7.1",
     "@types/inquirer": "0.0.42",
     "@types/jest": "23.3.1",
     "@types/js-priority-queue": "0.0.5",

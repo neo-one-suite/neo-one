@@ -1027,9 +1027,9 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
-"@types/google-cloud__storage@1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@types/google-cloud__storage/-/google-cloud__storage-1.7.0.tgz#60abb5669f78ed07abb625f556d1f396ee84724e"
+"@types/google-cloud__storage@1.7.1":
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/@types/google-cloud__storage/-/google-cloud__storage-1.7.1.tgz#904355fe8897c03f6f65d213420686afbf1a882d"
   dependencies:
     "@types/node" "*"
     "@types/request" "*"
