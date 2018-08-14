@@ -270,7 +270,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         ]);
 
         if (unclaimed.length === 0) {
-          throw new NothingToClaimError();
+          throw new NothingToClaimError(from);
         }
 
         const transaction = new ClaimTransaction({

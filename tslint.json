@@ -116,7 +116,8 @@
       true,
       "ban-keywords",
       "check-format",
-      "allow-leading-underscore"
+      "allow-leading-underscore",
+      "allow-pascal-case"
     ],
     "export-name": true,
     "no-control-regex": true,

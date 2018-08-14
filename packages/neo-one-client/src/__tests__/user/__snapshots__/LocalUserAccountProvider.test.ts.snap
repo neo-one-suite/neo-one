@@ -155,6 +155,8 @@ Array [
 ]
 `;
 
+exports[`LocalUserAccountProvider claim throws NothingToClaim error: keystore.getCurrentAccount 1`] = `Array []`;
+
 exports[`LocalUserAccountProvider claim throws NothingToClaim error: provider.getBlockCount 1`] = `
 Array [
   Array [

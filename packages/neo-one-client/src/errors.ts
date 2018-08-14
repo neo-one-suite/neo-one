@@ -1,5 +1,6 @@
-import { CustomError } from '@neo-one/utils';
+import { CustomError, makeErrorWithCode } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
+import { UserAccountID } from './types';
 
 export class InvalidArgumentError extends CustomError {
   public readonly code: string;
@@ -57,14 +58,10 @@ export class FundsInUseError extends CustomError {
   }
 }
 
-export class NothingToClaimError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Nothing to claim.');
-    this.code = 'NOTHING_TO_CLAIM';
-  }
-}
+export const NothingToClaimError = makeErrorWithCode(
+  'NEO_NOTHING_TO_CLAIM',
+  (id: UserAccountID) => `Address ${id.address} on network ${id.network} has nothing to claim.`,
+);
 
 export class NothingToIssueError extends CustomError {
   public readonly code: string;

@@ -6,7 +6,6 @@ import {
   InvalidTransactionError,
   InvokeError,
   NoAccountError,
-  NothingToClaimError,
   NothingToIssueError,
   NothingToTransferError,
 } from '../../errors';
@@ -307,6 +306,7 @@ describe('LocalUserAccountProvider', () => {
 
   test('claim throws NothingToClaim error', async () => {
     const unspent = [outputs.elevenGAS];
+    keystore.getCurrentAccount = jest.fn(() => account1);
     provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
     provider.getUnclaimed = jest.fn(() =>
       Promise.resolve({
@@ -316,7 +316,24 @@ describe('LocalUserAccountProvider', () => {
     );
 
     const result = localUserAccountProvider.claim(options);
-    await expect(result).rejects.toEqual(new NothingToClaimError());
+    let error: Error | undefined;
+    try {
+      await result;
+    } catch (err) {
+      error = err;
+    }
+    if (error === undefined) {
+      expect(error).toBeDefined();
+      throw new Error('For TS');
+    }
+    expect(error).toMatchInlineSnapshot(
+      `[Error [NEO_NOTHING_TO_CLAIM]: Address ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW on network net1 has nothing to claim.]`,
+    );
+    expect(error.stack).toMatchInlineSnapshot(`
+"Error [NEO_NOTHING_TO_CLAIM]: Address ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW on network net1 has nothing to claim.
+    at capture (/Users/dicarlo/projects/neo-one/packages/neo-one-client/src/user/LocalUserAccountProvider.ts:273:17)
+    at process._tickCallback (internal/process/next_tick.js:68:7)"
+`);
     verifyMocks();
   });
 
