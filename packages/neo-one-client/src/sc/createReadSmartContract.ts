@@ -1,8 +1,8 @@
 import { ScriptBuilderParam } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
-import { AsyncIterableX } from '@reactivex/ix-esnext-esm/asynciterable/asynciterablex';
-import { filter } from '@reactivex/ix-esnext-esm/asynciterable/pipe/filter';
-import { map } from '@reactivex/ix-esnext-esm/asynciterable/pipe/map';
+import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/filter';
+import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import BigNumber from 'bignumber.js';
 import { RawSourceMap } from 'source-map';
 import { ReadClient } from '../ReadClient';

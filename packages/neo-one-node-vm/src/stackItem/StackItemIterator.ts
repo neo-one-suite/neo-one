@@ -1,5 +1,5 @@
-import { AsyncIterableX } from '@reactivex/ix-esnext-esm/asynciterable/asynciterablex';
-import { map } from '@reactivex/ix-esnext-esm/asynciterable/pipe/map';
+import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import { InvalidStorageStackItemIteratorError } from './errors';
 import { StackItemBase } from './StackItemBase';
 import { StackItemEnumerator } from './StackItemEnumerator';

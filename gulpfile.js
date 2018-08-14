@@ -141,18 +141,18 @@ const getBin = (format, file) => {
 };
 const DEP_MAPPING = {
   esnext: {
-    esm: {},
+    esm: {
+      '@reactivex/ix-es2015-cjs': '@reactivex/ix-esnext-esm',
+    },
     cjs: {
-      '@reactivex/ix-esnext-esm': '@reactivex/ix-esnext-cjs',
+      '@reactivex/ix-es2015-cjs': '@reactivex/ix-esnext-cjs',
     },
   },
   es2017: {
     esm: {
-      '@reactivex/ix-esnext-esm': '@reactivex/ix-es2015-esm',
+      '@reactivex/ix-es2015-cjs': '@reactivex/ix-es2015-esm',
     },
-    cjs: {
-      '@reactivex/ix-esnext-esm': '@reactivex/ix-es2015-cjs',
-    },
+    cjs: {},
   },
 };
 const mapDep = (format, depName) => {

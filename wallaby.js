@@ -45,7 +45,6 @@ module.exports = function(wallaby) {
         '^@neo-one/boa': '@neo-one/boa',
         '^@neo-one/csharp': '@neo-one/csharp',
         '^@neo-one/(.+)': wallaby.projectCacheDir + '/packages/neo-one-$1/src',
-        '^@reactivex/ix-esnext-esm(.*)': '@reactivex/ix-es2015-cjs$1',
       };
       jestConfig.transform = {};
       delete jestConfig.rootDir;

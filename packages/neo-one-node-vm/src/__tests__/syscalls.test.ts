@@ -22,7 +22,7 @@ import {
   StorageItem,
 } from '@neo-one/client-core';
 import { BN } from 'bn.js';
-import { AsyncIterableX } from '@reactivex/ix-esnext-esm/asynciterable/asynciterablex';
+import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { DefaultMonitor } from '@neo-one/monitor';
 import { of } from 'rxjs';
 import { FEES, BLOCK_HEIGHT_YEAR, ExecutionInit, Options } from '../constants';

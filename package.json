@@ -99,7 +99,6 @@
     "@babel/plugin-syntax-numeric-separator": "7.0.0-rc.1",
     "@babel/plugin-syntax-optional-catch-binding": "7.0.0-rc.1",
     "@babel/plugin-syntax-typescript": "7.0.0-rc.1",
-    "@reactivex/ix-es2015-cjs": "2.3.5",
     "@types/babel__code-frame": "7.0.0",
     "@types/bs58": "3.0.30",
     "@types/chokidar": "1.7.5",

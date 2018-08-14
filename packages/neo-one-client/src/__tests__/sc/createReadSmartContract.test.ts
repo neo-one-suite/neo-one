@@ -1,4 +1,4 @@
-import { toArray } from '@reactivex/ix-esnext-esm/asynciterable/toarray';
+import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
 import * as abis from '../../__data__/abis';
 import * as common from '../../sc/common';
 import { createReadSmartContract } from '../../sc/createReadSmartContract';

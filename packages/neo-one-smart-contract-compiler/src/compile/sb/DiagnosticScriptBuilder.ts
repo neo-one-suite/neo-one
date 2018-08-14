@@ -1,19 +1,16 @@
 import ts from 'typescript';
 import { Helper } from '../helper';
-import { CapturingScope } from '../scope';
+import { DiagnosticScope } from '../scope';
 import { VisitOptions } from '../types';
 import { BaseScriptBuilder } from './BaseScriptBuilder';
 import { ScriptBuilder } from './ScriptBuilder';
 
-export class DiagnosticScriptBuilder extends BaseScriptBuilder<CapturingScope> implements ScriptBuilder {
+export class DiagnosticScriptBuilder extends BaseScriptBuilder<DiagnosticScope> implements ScriptBuilder {
   private readonly mutableCapturedHelpersSet: Set<Helper> = new Set();
-  private readonly mutableCapturedHelpers: Helper[] = [];
-  private readonly mutableScopes: CapturingScope[] = [];
 
   public emitHelper<T extends ts.Node>(node: T, options: VisitOptions, helper: Helper<T>): void {
     if (!this.mutableCapturedHelpersSet.has(helper)) {
       this.mutableCapturedHelpersSet.add(helper);
-      this.mutableCapturedHelpers.push(helper);
       helper.emitGlobal(this, node, options);
     }
     helper.emit(this, node, options);
@@ -59,10 +56,7 @@ export class DiagnosticScriptBuilder extends BaseScriptBuilder<CapturingScope> i
     // do nothing
   }
 
-  protected createScope(node: ts.Node, index: number, parent?: CapturingScope | undefined): CapturingScope {
-    const scope = new CapturingScope(node, index, parent);
-    this.mutableScopes.push(scope);
-
-    return scope;
+  protected createScope(): DiagnosticScope {
+    return new DiagnosticScope();
   }
 }

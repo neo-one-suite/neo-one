@@ -1,8 +1,9 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
+import _ from 'lodash';
 import ts from 'typescript';
 import { Context, DiagnosticOptions } from '../../Context';
-import { createMemoized, nodeKey, pathResolve, typeKey } from '../../utils';
+import { createMemoized, nodeKey, pathResolve, symbolKey, typeKey } from '../../utils';
 import { Builtin, isBuiltinValueObject } from './types';
 
 const NO_WARNING_ERROR = { error: false, warning: false };
@@ -157,31 +158,13 @@ export class Builtins {
       }
 
       const interfaceSymbol = this.getAnyInterfaceSymbol(name);
-
       if (symbol === interfaceSymbol) {
         return true;
       }
 
-      // tslint:disable-next-line no-loop-statement
-      for (const decl of tsUtils.symbol.getDeclarations(interfaceSymbol)) {
-        if (ts.isInterfaceDeclaration(decl)) {
-          // tslint:disable-next-line no-loop-statement
-          for (const clause of tsUtils.heritage.getHeritageClauses(decl)) {
-            // tslint:disable-next-line no-loop-statement
-            for (const type of tsUtils.heritage.getTypeNodes(clause)) {
-              const expr = tsUtils.expression.getExpression(type);
-              if (ts.isIdentifier(expr)) {
-                const isInterface = this.isInterface(node, testType, tsUtils.node.getText(expr), options);
-                if (isInterface) {
-                  return true;
-                }
-              }
-            }
-          }
-        }
-      }
+      const inheritedInterfaceSymbols = this.getInheritedInterfaceSymbols(interfaceSymbol);
 
-      return false;
+      return inheritedInterfaceSymbols.has(symbol);
     });
   }
 
@@ -359,19 +342,50 @@ export class Builtins {
   }
 
   private getInterfaceSymbolMaybe(name: string, file: ts.SourceFile): ts.Symbol | undefined {
-    let decl: ts.Declaration | undefined = tsUtils.statement.getInterface(file, name);
+    return this.getInterfaceSymbols(file)[name];
+  }
 
-    if (decl === undefined) {
-      decl = tsUtils.statement.getEnum(file, name);
-    }
+  private getInterfaceSymbols(file: ts.SourceFile): { readonly [key: string]: ts.Symbol | undefined } {
+    return this.memoized('interface-symbols', tsUtils.file.getFilePath(file), () => {
+      const interfaceDecls: ReadonlyArray<ts.Declaration> = tsUtils.statement.getInterfaces(file);
+      const decls = interfaceDecls.concat(tsUtils.statement.getEnums(file));
 
-    if (decl === undefined) {
-      return undefined;
-    }
+      return _.fromPairs(
+        decls.map((decl) => {
+          const type = tsUtils.type_.getType(this.context.typeChecker, decl);
 
-    const type = tsUtils.type_.getType(this.context.typeChecker, decl);
+          const symbol = tsUtils.type_.getSymbol(type);
 
-    return tsUtils.type_.getSymbol(type);
+          return [tsUtils.node.getName(decl), symbol];
+        }),
+      );
+    });
+  }
+
+  private getInheritedInterfaceSymbols(symbol: ts.Symbol): Set<ts.Symbol> {
+    return this.memoized('inherited-interface-symbols', symbolKey(symbol), () => {
+      const symbols = new Set();
+      // tslint:disable-next-line no-loop-statement
+      for (const decl of tsUtils.symbol.getDeclarations(symbol)) {
+        if (ts.isInterfaceDeclaration(decl)) {
+          // tslint:disable-next-line no-loop-statement
+          for (const clause of tsUtils.heritage.getHeritageClauses(decl)) {
+            // tslint:disable-next-line no-loop-statement
+            for (const type of tsUtils.heritage.getTypeNodes(clause)) {
+              const expr = tsUtils.expression.getExpression(type);
+              if (ts.isIdentifier(expr)) {
+                const interfaceSymbol = this.getAnyInterfaceSymbol(tsUtils.node.getText(expr));
+                this.getInheritedInterfaceSymbols(interfaceSymbol).forEach((inheritedSymbol) => {
+                  symbols.add(inheritedSymbol);
+                });
+              }
+            }
+          }
+        }
+      }
+
+      return symbols;
+    });
   }
 
   private getAnyTypeSymbol(name: string): ts.Symbol {
@@ -383,14 +397,23 @@ export class Builtins {
   }
 
   private getTypeSymbolMaybe(name: string, file: ts.SourceFile): ts.Symbol | undefined {
-    const decl = tsUtils.statement.getTypeAlias(file, name);
-    if (decl === undefined) {
-      return undefined;
-    }
+    return this.getTypeSymbols(file)[name];
+  }
 
-    const type = tsUtils.type_.getType(this.context.typeChecker, decl);
+  private getTypeSymbols(file: ts.SourceFile): { readonly [key: string]: ts.Symbol | undefined } {
+    return this.memoized('type-symbols', tsUtils.file.getFilePath(file), () => {
+      const decls: ReadonlyArray<ts.Declaration> = tsUtils.statement.getTypeAliases(file);
 
-    return tsUtils.type_.getAliasSymbol(type);
+      return _.fromPairs(
+        decls.map((decl) => {
+          const type = tsUtils.type_.getType(this.context.typeChecker, decl);
+
+          const symbol = tsUtils.type_.getAliasSymbol(type);
+
+          return [tsUtils.node.getName(decl), symbol];
+        }),
+      );
+    });
   }
 
   private getFiles(): ReadonlyArray<ts.SourceFile> {
