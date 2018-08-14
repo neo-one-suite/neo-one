@@ -329,11 +329,6 @@ describe('LocalUserAccountProvider', () => {
     expect(error).toMatchInlineSnapshot(
       `[Error [NEO_NOTHING_TO_CLAIM]: Address ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW on network net1 has nothing to claim.]`,
     );
-    expect(error.stack).toMatchInlineSnapshot(`
-"Error [NEO_NOTHING_TO_CLAIM]: Address ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW on network net1 has nothing to claim.
-    at capture (/Users/dicarlo/projects/neo-one/packages/neo-one-client/src/user/LocalUserAccountProvider.ts:273:17)
-    at process._tickCallback (internal/process/next_tick.js:68:7)"
-`);
     verifyMocks();
   });
 
