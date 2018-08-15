@@ -3,7 +3,7 @@ aliases:
     keys:
       - v2-yarn-{{ .Branch }}-{{ checksum "yarn.lock" }}
       # Fallback in case checksum fails
-      - v2-yarn-{{ .Branch }}-
+      - v2-yarn-{{ .Branch }}
 
   - &save-yarn-cache
     paths:
@@ -22,15 +22,13 @@ aliases:
 
   - &yarn
     |
-      yarn install --non-interactive --cache-folder ~/.cache/yarn
+      yarn install --non-interactive
 
   - &lint
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-yarn-cache
       - run: *yarn
-      - save-cache: *save-yarn-cache
       - run:
           name: Prettier
           command: yarn nit
@@ -52,12 +50,42 @@ aliases:
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-yarn-cache
       - run: *yarn
-      - save-cache: *save-yarn-cache
       - run:
           name: Test
           command: yarn test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
+      - run:
+          name: Upload Unit Test Coverage
+          command: yarn run codecov -f coverage/coverage-final.json -F unit
+          when: always
+      - store_test_results:
+          path: reports
+    parallelism: 2
+
+  - &test-8
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - run: *yarn
+      - run:
+          name: Test
+          command: yarn test-ci-8 $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
+      - run:
+          name: Upload Unit Test Coverage
+          command: yarn run codecov -f coverage/coverage-final.json -F unit
+          when: always
+      - store_test_results:
+          path: reports
+    parallelism: 2
+
+  - &test-9
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - run: *yarn
+      - run:
+          name: Test
+          command: yarn test-ci-9 $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
       - run:
           name: Upload Unit Test Coverage
           command: yarn run codecov -f coverage/coverage-final.json -F unit
@@ -70,12 +98,38 @@ aliases:
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-yarn-cache
       - run: *yarn
-      - save-cache: *save-yarn-cache
       - run:
           name: Build
           command: yarn build:e2e
+      - persist_to_workspace:
+          root: ~/neo-one
+          paths:
+            - dist
+            - node_modules
+
+  - &build-e2e-8
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - run: *yarn
+      - run:
+          name: Build
+          command: yarn build:e2e-8
+      - persist_to_workspace:
+          root: ~/neo-one
+          paths:
+            - dist
+            - node_modules
+
+  - &build-e2e-9
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - run: *yarn
+      - run:
+          name: Build
+          command: yarn build:e2e-9
       - persist_to_workspace:
           root: ~/neo-one
           paths:
@@ -91,6 +145,40 @@ aliases:
       - run:
           name: E2E
           command: yarn nyc --reporter json yarn e2e-ci $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
+      - run:
+          name: Upload E2E Test Coverage
+          command: yarn run codecov -f coverage/coverage-final.json -F e2e
+          when: always
+      - store_test_results:
+          path: reports
+    parallelism: 2
+  
+  - &e2e-8
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: E2E
+          command: yarn nyc --reporter json yarn e2e-ci-8 $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
+      - run:
+          name: Upload E2E Test Coverage
+          command: yarn run codecov -f coverage/coverage-final.json -F e2e
+          when: always
+      - store_test_results:
+          path: reports
+    parallelism: 2
+  
+  - &e2e-9
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: E2E
+          command: yarn nyc --reporter json yarn e2e-ci-9 $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
       - run:
           name: Upload E2E Test Coverage
           command: yarn run codecov -f coverage/coverage-final.json -F e2e
@@ -115,23 +203,23 @@ version: 2
 jobs:
   test8:
     <<: *node8
-    <<: *test
+    <<: *test-8
   e2e8:
     <<: *node8
-    <<: *e2e
+    <<: *e2e-8
   build-e2e8:
     <<: *node8
-    <<: *build-e2e
+    <<: *build-e2e-8
 
   test9:
     <<: *node9
-    <<: *test
+    <<: *test-9
   e2e9:
     <<: *node9
-    <<: *e2e
+    <<: *e2e-9
   build-e2e9:
     <<: *node9
-    <<: *build-e2e
+    <<: *build-e2e-9
 
   test10:
     <<: *node10
@@ -153,9 +241,7 @@ jobs:
     steps:
       - checkout:
           path: ~/neo-one
-      - restore-cache: *restore-yarn-cache
       - run: *yarn
-      - save-cache: *save-yarn-cache
       - run:
           name: Install Dependencies
           command: sudo apt install rsync

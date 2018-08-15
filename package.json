@@ -83,7 +83,19 @@
     "verify-storage": "yarn run ts-node ./scripts/verify/storage.ts",
     "create-guards": "yarn run ts-node ./scripts/ts/createGuards.ts",
     "contributors:add": "all-contributors add",
-    "contributors:generate": "all-contributors generate"
+    "contributors:generate": "all-contributors generate",
+    "jest-8": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node --harmony-async-iteration ./node_modules/.bin/jest",
+    "jest-9": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node --harmony ./node_modules/.bin/jest",
+    "test-ci-8": "yarn run jest-8 --config jest/unit-ci.js --ci -w 1",
+    "test-ci-9": "yarn run jest-9 --config jest/unit-ci.js --ci -w 1",
+    "e2e-ci-8": "yarn run jest-8 --config jest/e2e-ci.js --ci -w 1",
+    "e2e-ci-9": "yarn run jest-9 --config jest/e2e-ci.js --ci -w 1",
+    "gulp-8": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node --harmony-async-iteration ./node_modules/.bin/gulp",
+    "gulp-9": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node --harmony ./node_modules/.bin/gulp",
+    "build-8": "yarn run gulp-8 build",
+    "build-9": "yarn run gulp-9 build",
+    "build:e2e-8": "yarn run gulp-8 buildE2E",
+    "build:e2e-9": "yarn run gulp-9 buildE2E"
   },
   "husky": {
     "hooks": {
@@ -99,6 +111,7 @@
     "@babel/plugin-syntax-numeric-separator": "7.0.0-rc.1",
     "@babel/plugin-syntax-optional-catch-binding": "7.0.0-rc.1",
     "@babel/plugin-syntax-typescript": "7.0.0-rc.1",
+    "@reactivex/ix-esnext-esm":"2.3.5",
     "@types/babel__code-frame": "7.0.0",
     "@types/bs58": "3.0.30",
     "@types/chokidar": "1.7.5",

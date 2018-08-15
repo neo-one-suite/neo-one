@@ -336,7 +336,7 @@ const buildAll = ((cache) =>
 
 const install = ((cache) =>
   memoizeTask(cache, async function install(format) {
-    await execa.shell('yarn install --non-interactive --frozen-lockfile --no-progress', {
+    await execa.shell('yarn install --non-interactive --no-progress', {
       cwd: getDistBaseCWD(format),
       stdio: ['ignore', 'inherit', 'inherit'],
     });
