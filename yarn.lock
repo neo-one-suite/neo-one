@@ -905,6 +905,12 @@
   dependencies:
     tslib "^1.8.0"
 
+"@reactivex/ix-esnext-esm@2.3.5":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@reactivex/ix-esnext-esm/-/ix-esnext-esm-2.3.5.tgz#c62389c6212385ecff152ae2bb0b86dfb47e1988"
+  dependencies:
+    tslib "^1.8.0"
+
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.0.tgz#ecdf48d532c58ea477acfcab80348424f8d0662f"
