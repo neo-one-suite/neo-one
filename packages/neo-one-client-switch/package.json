@@ -11,6 +11,8 @@
     "@neo-one/utils": "^1.0.0-alpha.58",
     "lodash": "^4.17.10",
     "source-map": "^0.7.3",
-    "tslib": "^1.9.3"
+    "tslib": "^1.9.3",
+    "@ledgerhq/hw-transport-node-hid": "4.22.0",
+    "@ledgerhq/hw-transport-u2f": "4.21.0"
   }
 }
