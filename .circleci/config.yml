@@ -22,7 +22,7 @@ aliases:
 
   - &yarn
     |
-      yarn install --non-interactive --cache-folder ~/.cache/yarn
+      yarn install --non-interactive --cache-folder ~/.cache/yarn --frozen-lockfile
 
   - &lint
     working_directory: ~/neo-one
@@ -99,40 +99,12 @@ aliases:
           path: reports
     parallelism: 2
 
-node8: &node8
-  docker:
-    - image: circleci/node:8.9.0
-
-node9: &node9
-  docker:
-    - image: circleci/node:9.11.2
-
 node10: &node10
   docker:
-    - image: circleci/node:10.8.0
+    - image: circleci/node:10.9.0
 
 version: 2
 jobs:
-  test8:
-    <<: *node8
-    <<: *test
-  e2e8:
-    <<: *node8
-    <<: *e2e
-  build-e2e8:
-    <<: *node8
-    <<: *build-e2e
-
-  test9:
-    <<: *node9
-    <<: *test
-  e2e9:
-    <<: *node9
-    <<: *e2e
-  build-e2e9:
-    <<: *node9
-    <<: *build-e2e
-
   test10:
     <<: *node10
     <<: *test
@@ -174,26 +146,6 @@ workflows:
     jobs:
       - deploy-website:
           filters: *filter-only-master
-  test8:
-    jobs:
-      - build-e2e8:
-          filters: *filter-ignore-gh-pages
-      - test8:
-          filters: *filter-ignore-gh-pages
-      - e2e8:
-          requires:
-            - build-e2e8
-          filters: *filter-ignore-gh-pages
-  test9:
-    jobs:
-      - build-e2e9:
-          filters: *filter-ignore-gh-pages
-      - test9:
-          filters: *filter-ignore-gh-pages
-      - e2e9:
-          requires:
-            - build-e2e9
-          filters: *filter-ignore-gh-pages
   test10:
     jobs:
       - build-e2e10:

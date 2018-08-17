@@ -303,7 +303,7 @@ class FeaturesOutro extends React.Component {
                 <div className="subheading axiformaRegular">
                   <translate>
                     Install NEO•ONE directly from npm and let it expand your ability to code and implement NEO
-                    blockchain solutions on Linux, Mac OS and Windows with NodeJS 8.9.0+.
+                    blockchain solutions on Linux, Mac OS and Windows with NodeJS 10.9.0+.
                   </translate>
                 </div>
                 <div className="install paddingTop2 paddingBottom2">
