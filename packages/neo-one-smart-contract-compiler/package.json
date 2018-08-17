@@ -27,8 +27,8 @@
     "@neo-one/node-neo-settings": "^1.0.0-alpha.69",
     "@neo-one/node-storage-levelup": "^1.0.0-alpha.72",
     "@neo-one/node-vm": "^1.0.0-alpha.71",
-    "bignumber.js": "^7.2.1",
-    "levelup": "^3.1.1",
-    "memdown": "^3.0.0"
+    "bignumber.js": "7.2.1",
+    "levelup": "3.1.1",
+    "memdown": "3.0.0"
   }
 }
