@@ -109,7 +109,7 @@ node9: &node9
 
 node10: &node10
   docker:
-    - image: circleci/node:10.8.0
+    - image: circleci/node:10.9.0
 
 version: 2
 jobs:
