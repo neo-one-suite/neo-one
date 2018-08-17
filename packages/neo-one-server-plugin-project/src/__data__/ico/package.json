@@ -28,7 +28,7 @@
     "@types/react": "16.4.11",
     "cross-env": "5.2.0",
     "husky": "1.0.0-rc.13",
-    "jest": "23.4.2",
+    "jest": "23.5.0",
     "jest-environment-node": "23.4.0",
     "lint-staged": "7.2.0",
     "prettier": "1.14.2",
