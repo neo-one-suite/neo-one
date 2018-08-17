@@ -1,7 +1,7 @@
-import { common, AttributeUsage } from '@neo-one/client-core';
-import { helpers, keys } from '../../../../__data__';
-import BigNumber from 'bignumber.js';
 import { Attribute, Input, Output } from '@neo-one/client';
+import { AttributeUsage, common } from '@neo-one/client-core';
+import BigNumber from 'bignumber.js';
+import { helpers, keys } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Transaction', () => {
@@ -12,7 +12,7 @@ describe('Transaction', () => {
       `
       import { Hash256, TransactionType, Transaction, } from '@neo-one/smart-contract';
 
-      const transaction = Transaction.for(Hash256.from('${block.transactions[0].txid}'));
+      const transaction = Transaction.for(Hash256.from('${block.transactions[0].hash}'));
 
       assertEqual(transaction.type, TransactionType.Miner);
     `,
@@ -46,8 +46,8 @@ describe('Transaction', () => {
     const checkInput = (idx: number, input: Input) => `
       input = inputs[${idx}];
 
-      assertEqual(input.hash.equals(Hash256.from('${input.txid}')), true)
-      assertEqual(input.index, ${input.vout})
+      assertEqual(input.hash.equals(Hash256.from('${input.hash}')), true)
+      assertEqual(input.index, ${input.index})
       assertEqual(input instanceof Input, true);
     `;
 
@@ -60,12 +60,12 @@ describe('Transaction', () => {
       assertEqual(output instanceof Output, true);
     `;
 
-    const references = await Promise.all(transaction.vin.map(async (input) => node.readClient.getOutput(input)));
+    const references = await Promise.all(transaction.inputs.map(async (input) => node.readClient.getOutput(input)));
 
     await node.executeString(`
       import { TransactionBase, TransactionType, Transaction, Address, Hash256, Attribute, Output, Input, InvocationTransaction, AttributeBase } from '@neo-one/smart-contract';
 
-      const transaction = Transaction.for(Hash256.from('${transaction.txid}')) as InvocationTransaction;
+      const transaction = Transaction.for(Hash256.from('${transaction.hash}')) as InvocationTransaction;
 
       assertEqual(transaction.type, TransactionType.Invocation);
       assertEqual(transaction.script.equals(${helpers.getBufferHash(transaction.script)}), true);
@@ -77,21 +77,21 @@ describe('Transaction', () => {
       ${transaction.attributes.map((attribute, idx) => checkAttribute(idx, attribute)).join('')}
 
       const inputs = transaction.inputs;
-      assertEqual(inputs.length, ${transaction.vin.length});
+      assertEqual(inputs.length, ${transaction.inputs.length});
 
       let input: Input;
-      ${transaction.vin.map((input, idx) => checkInput(idx, input)).join('')}
+      ${transaction.inputs.map((input, idx) => checkInput(idx, input)).join('')}
 
       let outputs = transaction.outputs;
-      assertEqual(outputs.length, ${transaction.vout.length});
+      assertEqual(outputs.length, ${transaction.outputs.length});
 
       let output: Output;
-      ${transaction.vout.map((output, idx) => checkOutput(idx, output)).join('')}
+      ${transaction.outputs.map((output, idx) => checkOutput(idx, output)).join('')}
 
       outputs = transaction.unspentOutputs;
-      assertEqual(outputs.length, ${transaction.vout.length});
+      assertEqual(outputs.length, ${transaction.outputs.length});
 
-      ${transaction.vout.map((output, idx) => checkOutput(idx, output)).join('')}
+      ${transaction.outputs.map((output, idx) => checkOutput(idx, output)).join('')}
 
       outputs = transaction.references;
       assertEqual(outputs.length, ${references.length});
@@ -103,7 +103,7 @@ describe('Transaction', () => {
   });
 
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { TransactionBase } from '@neo-one/smart-contract';
 
@@ -115,7 +115,7 @@ describe('Transaction', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Transaction } from '@neo-one/smart-contract';
 

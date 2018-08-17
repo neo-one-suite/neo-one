@@ -1,28 +1,38 @@
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../Context';
-import { createBuiltins } from './builtins';
 import { createHelpers } from './helper';
-import { EmittingScriptBuilder, HelperCapturingScriptBuilder, ScopeCapturingScriptBuilder } from './sb';
+import {
+  DiagnosticScriptBuilder,
+  EmittingScriptBuilder,
+  HelperCapturingScriptBuilder,
+  ScopeCapturingScriptBuilder,
+} from './sb';
 import { CompileResult } from './types';
 
-export interface CompileOptions {
+export interface BaseCompileOptions {
   readonly sourceFile: ts.SourceFile;
   readonly context: Context;
+}
+export interface CompileOptions extends BaseCompileOptions {
   readonly sourceMaps?: { readonly [filePath: string]: RawSourceMap };
 }
 
-export const compile = async ({ context, sourceFile, sourceMaps = {} }: CompileOptions): Promise<CompileResult> => {
-  const builtins = createBuiltins(context);
+export const compileForDiagnostics = ({ context, sourceFile }: CompileOptions): void => {
+  const helpers = createHelpers();
+  const scriptBuilder = new DiagnosticScriptBuilder(context, helpers, sourceFile);
+  scriptBuilder.process();
+};
+
+export const compile = ({ context, sourceFile, sourceMaps = {} }: CompileOptions): CompileResult => {
   const helpers = createHelpers();
 
-  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, builtins, sourceFile);
+  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, sourceFile);
   helperScriptBuilder.process();
 
   const scopeScriptBuilder = new ScopeCapturingScriptBuilder(
     context,
     helpers,
-    builtins,
     sourceFile,
     helperScriptBuilder.getHelpers(),
   );
@@ -33,12 +43,11 @@ export const compile = async ({ context, sourceFile, sourceMaps = {} }: CompileO
     scopes: scopeScriptBuilder.getScopes(),
     sourceFile,
     helpers,
-    builtins,
     allHelpers: helperScriptBuilder.getHelpers(),
   });
   emittingScriptBuilder.process();
 
-  const finalResult = await emittingScriptBuilder.getFinalResult(sourceMaps);
+  const finalResult = emittingScriptBuilder.getFinalResult(sourceMaps);
 
   return {
     ...finalResult,

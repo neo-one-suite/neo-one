@@ -12,12 +12,12 @@ import {
   StorageItemJSON,
   TransactionJSON,
   TransactionReceiptJSON,
-  ValidatorJSON,
 } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { RelayTransactionError } from '../../errors';
-import { AddressString, BufferString, GetOptions, Hash160String, Hash256String, Options, Peer } from '../../types';
+import { addressToScriptHash } from '../../helpers';
+import { AddressString, BufferString, GetOptions, Hash256String, Options, Peer } from '../../types';
 import { JSONRPCProvider } from './JSONRPCProvider';
 
 export class JSONRPCClient {
@@ -27,13 +27,12 @@ export class JSONRPCClient {
     this.provider = provider;
   }
 
-  public async getAccount(hash: AddressString, monitor?: Monitor): Promise<AccountJSON> {
+  public async getAccount(address: AddressString, monitor?: Monitor): Promise<AccountJSON> {
     return this.provider.request(
       {
         method: 'getaccountstate',
-        params: [hash],
+        params: [address],
       },
-
       monitor,
     );
   }
@@ -44,7 +43,6 @@ export class JSONRPCClient {
         method: 'getassetstate',
         params: [hash],
       },
-
       monitor,
     );
   }
@@ -58,7 +56,6 @@ export class JSONRPCClient {
         params: [hashOrIndex, 1],
         watchTimeoutMS: timeoutMS,
       },
-
       monitor,
     );
   }
@@ -71,11 +68,11 @@ export class JSONRPCClient {
     return this.provider.request({ method: 'getblockcount' }, monitor);
   }
 
-  public async getContract(hash: Hash160String, monitor?: Monitor): Promise<ContractJSON> {
+  public async getContract(address: AddressString, monitor?: Monitor): Promise<ContractJSON> {
     return this.provider.request(
       {
         method: 'getcontractstate',
-        params: [hash],
+        params: [addressToScriptHash(address)],
       },
 
       monitor,
@@ -96,7 +93,9 @@ export class JSONRPCClient {
     );
   }
 
-  public async getStorageItem(hash: Hash160String, key: BufferString, monitor?: Monitor): Promise<StorageItemJSON> {
+  public async getStorageItem(address: AddressString, key: BufferString, monitor?: Monitor): Promise<StorageItemJSON> {
+    const hash = addressToScriptHash(address);
+
     return this.provider
       .request(
         {
@@ -128,24 +127,6 @@ export class JSONRPCClient {
     );
   }
 
-  public async sendTransactionRaw(value: BufferString, monitor?: Monitor): Promise<void> {
-    return this.provider
-      .request(
-        {
-          method: 'sendrawtransaction',
-          params: [value],
-        },
-        monitor,
-      )
-      .then((result) => {
-        if (!result) {
-          throw new RelayTransactionError('Relay transaction failed.');
-        }
-
-        return result;
-      });
-  }
-
   public async relayTransaction(value: BufferString, monitor?: Monitor): Promise<TransactionJSON> {
     return this.provider
       .request(
@@ -160,7 +141,7 @@ export class JSONRPCClient {
           throw new RelayTransactionError(error.responseError.message);
         }
 
-        throw error as Error;
+        throw error;
       });
   }
 
@@ -186,11 +167,11 @@ export class JSONRPCClient {
       .then((res) => new BigNumber(res));
   }
 
-  public async getAllStorage(hash: Hash160String, monitor?: Monitor): Promise<ReadonlyArray<StorageItemJSON>> {
+  public async getAllStorage(address: AddressString, monitor?: Monitor): Promise<ReadonlyArray<StorageItemJSON>> {
     return this.provider.request(
       {
         method: 'getallstorage',
-        params: [hash],
+        params: [addressToScriptHash(address)],
       },
       monitor,
     );
@@ -224,15 +205,6 @@ export class JSONRPCClient {
       {
         method: 'getinvocationdata',
         params: [hash],
-      },
-      monitor,
-    );
-  }
-
-  public async getValidators(monitor?: Monitor): Promise<ReadonlyArray<ValidatorJSON>> {
-    return this.provider.request(
-      {
-        method: 'getvalidators',
       },
       monitor,
     );

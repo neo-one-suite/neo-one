@@ -23,7 +23,7 @@ export interface Features {
 export interface ScriptBuilderResult {
   readonly code: Buffer;
   readonly features: Features;
-  readonly sourceMap: RawSourceMap;
+  readonly sourceMap: Promise<RawSourceMap>;
 }
 export interface CompileResult extends ScriptBuilderResult {
   readonly context: Context;

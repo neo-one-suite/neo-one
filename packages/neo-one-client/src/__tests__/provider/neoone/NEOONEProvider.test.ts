@@ -1,123 +1,147 @@
-import { keys, transactions } from '../../../__data__';
-import { UnknownNetworkError } from '../../../errors';
-import * as networkConfigs from '../../../networks';
-import { NEOONEProvider } from '../../../provider/neoone/NEOONEProvider';
+// tslint:disable no-object-mutation
+import { take } from 'rxjs/operators';
+import { data, factory, keys } from '../../../__data__';
+import { NEOONEDataProvider, NEOONEProvider } from '../../../provider';
 
-const MAIN_URL = 'https://neotracker.io/rpc';
+jest.mock('../../../provider/neoone/NEOONEDataProvider');
 
 describe('NEOONEProvider', () => {
-  const network = 'net';
-  const expected = '0';
-  const options = [{ network, rpcURL: 'rpc' }];
+  const network = 'main';
+  const rpcURL = 'https://neotracker.io/rpc';
 
-  let provider = new NEOONEProvider(options);
+  let provider: NEOONEProvider;
+  let dataProvider: Modifiable<NEOONEDataProvider>;
   beforeEach(() => {
-    provider = new NEOONEProvider(options);
+    provider = new NEOONEProvider([{ network, rpcURL }]);
+    // tslint:disable-next-line no-any
+    dataProvider = (provider as any).mutableProviders[network];
   });
 
-  test('NEOONEProvider constructor with no options', async () => {
-    const testProvider = new NEOONEProvider();
-    const result = await testProvider.getNetworks();
+  test('networks$', async () => {
+    const result = await provider.networks$.pipe(take(1)).toPromise();
+
+    expect(result).toEqual([network]);
+  });
+
+  test('networks$ - no networks', async () => {
+    const prov = new NEOONEProvider();
+
+    const result = await prov.networks$.pipe(take(1)).toPromise();
+
     expect(result).toEqual([]);
   });
 
-  test('NEOONEProvider constructor with main & test', async () => {
-    const testOptions = [{ network: networkConfigs.MAIN, rpcURL: MAIN_URL }];
-
-    const testExpected = testOptions.map((option) => option.network);
-
-    const testProvider = new NEOONEProvider(testOptions);
-    const result = await testProvider.getNetworks();
-    expect(result).toEqual(testExpected);
-  });
-
-  test('getNetworks', async () => {
-    // @ts-ignore
-    provider.networks$.getValue = jest.fn(() => '0');
-
+  test('getNetworks', () => {
     const result = provider.getNetworks();
-    expect(result).toEqual(expected);
+
+    expect(result).toEqual([network]);
   });
 
-  test('addNetwork new network', async () => {
-    const newNetwork = 'newNet';
-    provider.addNetwork({ network: newNetwork, rpcURL: 'rpc' });
+  test('getNetworks - no networks', () => {
+    const prov = new NEOONEProvider();
 
-    const result = await provider.getNetworks();
+    const result = prov.getNetworks();
+
+    expect(result).toEqual([]);
+  });
+
+  test('addNetwork', () => {
+    const newNetwork = 'test';
+
+    provider.addNetwork({ network: newNetwork, rpcURL: 'https://test.neotracker.io/rpc' });
+    const result = provider.getNetworks();
+
     expect(result).toEqual([network, newNetwork]);
   });
 
-  test('addNetwork existing network', async () => {
-    provider.addNetwork({ network, rpcURL: 'rpc' });
+  test('addNetwork - existing network', () => {
+    provider.addNetwork({ network, rpcURL });
+    const result = provider.getNetworks();
 
-    const result = await provider.getNetworks();
     expect(result).toEqual([network]);
+  });
 
-    provider.addNetwork({ network, rpcURL: 'rpc' });
-    const newResult = await provider.getNetworks();
-    expect(newResult).toEqual([network]);
+  test('getUnclaimed', async () => {
+    const expected = { unclaimed: [factory.createInput()], amount: data.bigNumbers.a };
+    dataProvider.getUnclaimed = jest.fn(async () => Promise.resolve(expected));
+
+    const result = await provider.getUnclaimed(network, keys[0].address);
+
+    expect(result).toBe(expected);
+  });
+
+  test('getUnspentOutputs', async () => {
+    const expected = [factory.createInputOutput()];
+    dataProvider.getUnspentOutputs = jest.fn(async () => Promise.resolve(expected));
+
+    const result = await provider.getUnspentOutputs(network, keys[0].address);
+
+    expect(result).toBe(expected);
+  });
+
+  test('relayTransaction', async () => {
+    const expected = factory.createMinerTransaction();
+    dataProvider.relayTransaction = jest.fn(async () => Promise.resolve(expected));
+
+    const result = await provider.relayTransaction(network, data.buffers.a);
+
+    expect(result).toBe(expected);
+  });
+
+  test('getTransactionReceipt', async () => {
+    const expected = factory.createTransactionReceipt();
+    dataProvider.getTransactionReceipt = jest.fn(async () => Promise.resolve(expected));
+
+    const result = await provider.getTransactionReceipt(network, data.hash256s.a);
+
+    expect(result).toBe(expected);
+  });
+
+  test('getInvocationData', async () => {
+    const expected = factory.createRawInvocationData();
+    dataProvider.getInvocationData = jest.fn(async () => Promise.resolve(expected));
+
+    const result = await provider.getInvocationData(network, data.hash256s.a);
+
+    expect(result).toBe(expected);
+  });
+
+  test('testInvoke', async () => {
+    const expected = factory.createRawCallReceipt();
+    dataProvider.testInvoke = jest.fn(async () => Promise.resolve(expected));
+
+    const result = await provider.testInvoke(network, data.buffers.a);
+
+    expect(result).toBe(expected);
+  });
+
+  test('getNetworkSettings', async () => {
+    const expected = factory.createNetworkSettings();
+    dataProvider.getNetworkSettings = jest.fn(async () => Promise.resolve(expected));
+
+    const result = await provider.getNetworkSettings(network);
+
+    expect(result).toBe(expected);
+  });
+
+  test('getBlockCount', async () => {
+    const expected = 10;
+    dataProvider.getBlockCount = jest.fn(async () => Promise.resolve(expected));
+
+    const result = await provider.getBlockCount(network);
+
+    expect(result).toBe(expected);
+  });
+
+  test('getBlockCount - unknown network', async () => {
+    const result = provider.getBlockCount('unknown');
+
+    await expect(result).rejects.toMatchSnapshot();
   });
 
   test('read', () => {
     const result = provider.read(network);
-    expect(result).toMatchSnapshot();
+
+    expect(result).toBe(dataProvider);
   });
-
-  test('_getProvider throws error for unknown network', () => {
-    const fakeNet = 'fake';
-    function testError() {
-      // @ts-ignore
-      provider.getProvider(fakeNet);
-    }
-    expect(testError).toThrow(new UnknownNetworkError(fakeNet) as any);
-  });
-
-  const testCases = [
-    {
-      method: 'getUnclaimed',
-      args: [network, keys[0].address],
-    },
-
-    {
-      method: 'getUnspentOutputs',
-      args: [network, keys[0].address],
-    },
-
-    {
-      method: 'relayTransaction',
-      args: [network, ''],
-    },
-
-    {
-      method: 'getTransactionReceipt',
-      args: [network, transactions.register.hash],
-    },
-
-    {
-      method: 'getInvocationData',
-      args: [network, transactions.register.hash],
-    },
-
-    {
-      method: 'testInvoke',
-      args: [network, ''],
-    },
-
-    {
-      method: 'getNetworkSettings',
-      args: [network],
-    },
-  ];
-
-  for (const testCase of testCases) {
-    const { method, args } = testCase;
-    // eslint-disable-next-line
-    test(method, async () => {
-      // @ts-ignore
-      provider.mutableProviders[network][method] = jest.fn(() => expected);
-      // @ts-ignore
-      const result = await provider[method](...args);
-      expect(result).toEqual(expected);
-    });
-  }
 });

@@ -99,7 +99,6 @@ const getWallets = async ({ pluginManager, options }: CommonOptions): Promise<Wa
       ...acc,
       [name]: {
         address: wallet.address,
-        scriptHash: wallet.scriptHash,
         publicKey: wallet.publicKey,
         wif: wallet.wif,
         privateKey: wifToPrivateKey(wallet.wif),

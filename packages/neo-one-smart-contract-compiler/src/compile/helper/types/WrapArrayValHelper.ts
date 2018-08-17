@@ -1,8 +1,8 @@
 import ts from 'typescript';
+import { WrappableType } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { WrappableType } from './Types';
 
 export interface WrapArrayValHelperOptions {
   readonly type: WrappableType;

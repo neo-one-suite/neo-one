@@ -1,1 +1,3 @@
-export const upperCaseFirst = (value: string): string => `${value[0].toUpperCase()}${value.slice(1)}`;
+import { pascal } from 'change-case';
+
+export const upperCaseFirst = pascal;

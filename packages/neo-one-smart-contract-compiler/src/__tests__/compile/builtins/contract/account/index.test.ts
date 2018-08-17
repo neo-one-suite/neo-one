@@ -1,5 +1,5 @@
-import { helpers } from '../../../../../__data__';
 import { common } from '@neo-one/client-core';
+import { helpers } from '../../../../../__data__';
 import { DiagnosticCode } from '../../../../../DiagnosticCode';
 
 describe('Account', () => {
@@ -12,8 +12,8 @@ describe('Account', () => {
       const address = Address.from('${account.address}');
       const account = Account.for(address);
 
-      account.hash;
-      assertEqual(account.hash.equals(address), true);
+      account.address;
+      assertEqual(account.address.equals(address), true);
       account.getBalance(Hash256.NEO);
       assertEqual(account.getBalance(Hash256.NEO), ${helpers.getDecimal(account.balances[common.NEO_ASSET_HASH])});
 
@@ -27,7 +27,7 @@ describe('Account', () => {
   });
 
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Account } from '@neo-one/smart-contract';
 
@@ -39,7 +39,7 @@ describe('Account', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Account } from '@neo-one/smart-contract';
 

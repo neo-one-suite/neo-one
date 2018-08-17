@@ -1,7 +1,6 @@
-import { CallReceiptJSON, convertCallReceipt } from '@neo-one/client-core';
+import { CallReceiptJSON, convertCallReceipt, RawCallReceipt } from '@neo-one/client-core';
+import { createConsoleLogMessages, extractErrorTrace, processError } from '@neo-one/client-switch';
 import { RawSourceMap } from 'source-map';
-import { processError, extractErrorTrace, createConsoleLogMessages } from '@neo-one/client-switch';
-import { RawCallReceipt } from '@neo-one/client-core';
 
 export const checkResult = async (receiptIn: CallReceiptJSON, sourceMap: RawSourceMap) => {
   const receipt = convertCallReceipt(receiptIn);

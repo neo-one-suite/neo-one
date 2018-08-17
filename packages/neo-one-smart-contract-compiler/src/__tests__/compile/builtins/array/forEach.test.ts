@@ -1,7 +1,7 @@
-import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 import ts from 'typescript';
+import { helpers } from '../../../../__data__';
 import { ArrayForEach } from '../../../../compile/builtins/array/forEach';
+import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Array.prototype.forEach', () => {
   test('should apply a function over an array', async () => {
@@ -30,7 +30,7 @@ describe('Array.prototype.forEach', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x.forEach;
@@ -40,7 +40,7 @@ describe('Array.prototype.forEach', () => {
   });
 
   test('cannot be "referenced"', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x['forEach'];

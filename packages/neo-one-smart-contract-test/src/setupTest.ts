@@ -7,13 +7,14 @@ import {
   LocalMemoryStore,
   LocalUserAccountProvider,
   NEOONEProvider,
+  PublishReceipt,
   SmartContract,
   SmartContractAny,
+  TransactionResult,
   UserAccountID,
 } from '@neo-one/client';
+import { CompileContractResult } from '@neo-one/smart-contract-compiler';
 import ts from 'typescript';
-import { CompileContractResult } from '../compileContract';
-import { throwOnDiagnosticErrorOrWarning } from '../utils';
 import { createNode } from './createNode';
 
 export async function testNodeSetup(omitCleanup = false) {
@@ -49,7 +50,6 @@ export interface TestOptions extends CompileContractResult {
   readonly abi: ABI;
   readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
   readonly contract: ContractRegister;
-  readonly ignoreWarnings?: boolean;
   readonly deploy?: boolean;
 }
 
@@ -72,23 +72,28 @@ export const setupTest = async <TContract extends SmartContract<any> = SmartCont
 ): Promise<Result<TContract>> => {
   const { client, masterWallet, provider, networkName, privateKey, node } = await testNodeSetup(true);
   try {
-    const { contract, sourceMap, diagnostics, abi, ignoreWarnings, deploy } = await getContract();
+    const { contract, sourceMap, abi, deploy } = await getContract();
 
     const developerClient = new DeveloperClient(provider.read(networkName));
 
-    throwOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);
-
-    const result = await (deploy ? client.publishAndDeploy(contract, abi) : client.publish(contract));
+    let result: TransactionResult<PublishReceipt>;
+    // tslint:disable-next-line prefer-conditional-expression
+    if (deploy) {
+      result = await client.publishAndDeploy(contract, abi);
+    } else {
+      result = await client.publish(contract);
+    }
 
     const [receipt] = await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
     if (receipt.result.state === 'FAULT') {
       throw new Error(receipt.result.message);
     }
 
+    const resolvedSourceMap = await sourceMap;
     const smartContract = client.smartContract<TContract>({
-      networks: { [networkName]: { hash: receipt.result.value.hash } },
+      networks: { [networkName]: { address: receipt.result.value.address } },
       abi,
-      sourceMap,
+      sourceMap: resolvedSourceMap,
     });
 
     return {

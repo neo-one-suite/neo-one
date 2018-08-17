@@ -2,7 +2,7 @@ import ts from 'typescript';
 
 export class CompilerDiagnostic implements ts.Diagnostic {
   public constructor(
-    private readonly node: ts.Node,
+    public readonly node: ts.Node,
     public readonly messageText: string,
     public readonly code: number,
     public readonly category: ts.DiagnosticCategory,
@@ -21,6 +21,6 @@ export class CompilerDiagnostic implements ts.Diagnostic {
   }
 
   public get source(): string {
-    return this.node.getText();
+    return 'neo-one';
   }
 }

@@ -1,5 +1,6 @@
+// tslint:disable
 /// <reference path="./global.d.ts" />
-import { SerializableValue, SmartContractValue, Contract } from './index';
+import { Contract, SerializableValue, SmartContractValue } from './index';
 
 export function getArgument<T extends SmartContractValue>(idx: number): T;
 export function doReturn(): void;

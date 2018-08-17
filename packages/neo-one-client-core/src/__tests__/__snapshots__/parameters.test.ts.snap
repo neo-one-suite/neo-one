@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`contractParameters Address - Invalid 1`] = `"Expected one of [\\"Address\\",\\"Buffer\\"] ContractParameterTypes, found Void"`;
+
+exports[`contractParameters Address - defined 1`] = `"ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW"`;
+
+exports[`contractParameters Address - defined 2`] = `"ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW"`;
+
+exports[`contractParameters Address - optional defined 1`] = `"ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW"`;
+
+exports[`contractParameters Array - Invalid 1`] = `"Expected one of [\\"Array\\"] ContractParameterTypes, found Void"`;
+
+exports[`contractParameters Buffer - Address 1`] = `"3775292229eccdf904f16fff8e83e7cffdc0f0ce"`;
+
+exports[`contractParameters Buffer - Array 1`] = `"Expected one of [\\"Signature\\",\\"Boolean\\",\\"Integer\\",\\"Address\\",\\"Hash256\\",\\"Buffer\\",\\"PublicKey\\",\\"String\\",\\"Void\\"] ContractParameterTypes, found Array"`;
+
+exports[`contractParameters Buffer - Array optional 1`] = `"Expected one of [\\"Signature\\",\\"Boolean\\",\\"Integer\\",\\"Address\\",\\"Hash256\\",\\"Buffer\\",\\"PublicKey\\",\\"String\\",\\"Void\\"] ContractParameterTypes, found Array"`;
+
+exports[`contractParameters Buffer - Boolean 1`] = `"01"`;
+
+exports[`contractParameters Buffer - Hash256 1`] = `"3452e7149038e7852cf2a8c9ab72c78bd3776c4b12e18d7536c8a87bd93400b5"`;
+
+exports[`contractParameters Buffer - Integer 1`] = `"00e1f505"`;
+
+exports[`contractParameters Buffer - InteropInterface 1`] = `""`;
+
+exports[`contractParameters Buffer - PublicKey 1`] = `"02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef"`;
+
+exports[`contractParameters Buffer - Signature 1`] = `"b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234"`;
+
+exports[`contractParameters Buffer - String 1`] = `"666f6f"`;
+
+exports[`contractParameters Buffer - Void 1`] = `""`;
+
+exports[`contractParameters Buffer - defined 1`] = `"b500"`;
+
+exports[`contractParameters Buffer - optional defined 1`] = `"b500"`;
+
+exports[`contractParameters Hash256 - Buffer 1`] = `"0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234"`;
+
+exports[`contractParameters Hash256 - Invalid 1`] = `"Expected one of [\\"Hash256\\",\\"Buffer\\"] ContractParameterTypes, found Void"`;
+
+exports[`contractParameters Hash256 - defined 1`] = `"0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234"`;
+
+exports[`contractParameters Hash256 - optional defined 1`] = `"0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234"`;
+
+exports[`contractParameters Integer - Buffer 1`] = `"10000"`;
+
+exports[`contractParameters Integer - Invalid 1`] = `"Expected one of [\\"Integer\\",\\"Buffer\\"] ContractParameterTypes, found Void"`;
+
+exports[`contractParameters Integer - defined 1`] = `"10000"`;
+
+exports[`contractParameters Integer - optional defined 1`] = `"10000"`;
+
+exports[`contractParameters PublicKey - Buffer 1`] = `"02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef"`;
+
+exports[`contractParameters PublicKey - Invalid 1`] = `"Expected one of [\\"PublicKey\\",\\"Buffer\\"] ContractParameterTypes, found Void"`;
+
+exports[`contractParameters PublicKey - defined 1`] = `"02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef"`;
+
+exports[`contractParameters PublicKey - optional defined 1`] = `"02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef"`;
+
+exports[`contractParameters Signature - Invalid 1`] = `"Expected one of [\\"Signature\\"] ContractParameterTypes, found Void"`;
+
+exports[`contractParameters Signature - defined 1`] = `"b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234"`;
+
+exports[`contractParameters Signature - defined 2`] = `"b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234"`;
+
+exports[`contractParameters Signature - optional defined 1`] = `"b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234"`;
+
+exports[`contractParameters String - Invalid 1`] = `"Expected one of [\\"String\\",\\"Buffer\\"] ContractParameterTypes, found Void"`;

@@ -8,11 +8,11 @@ export const toTypeScriptType = (abi: ABIReturn | ABIParameter, includeOptional 
       return addOptional('SignatureString');
     case 'Boolean':
       return addOptional('boolean');
-    case 'Hash160':
-      return addOptional('Hash160String');
+    case 'Address':
+      return addOptional('AddressString');
     case 'Hash256':
       return addOptional('Hash256String');
-    case 'ByteArray':
+    case 'Buffer':
       return addOptional('BufferString');
     case 'PublicKey':
       return addOptional('PublicKeyString');
@@ -20,12 +20,10 @@ export const toTypeScriptType = (abi: ABIReturn | ABIParameter, includeOptional 
       return addOptional('string');
     case 'Array':
       return addOptional(`Array<${toTypeScriptType(abi.value)}>`);
-    case 'InteropInterface':
-      return 'undefined';
     case 'Void':
       return 'undefined';
     case 'Integer':
-      return addOptional('number');
+      return addOptional('BigNumber');
     default:
       utils.assertNever(abi);
       throw new Error('Something went wrong');

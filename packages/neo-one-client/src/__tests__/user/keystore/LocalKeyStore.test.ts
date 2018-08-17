@@ -1,547 +1,287 @@
-import { common, crypto } from '@neo-one/client-core';
-import { LockedAccountError, UnknownAccountError } from '../../../errors';
-import * as helpers from '../../../helpers';
-import { UserAccount, UserAccountID } from '../../../types';
-import { LocalKeyStore, LockedWallet, UnlockedWallet, Wallet } from '../../../user/keystore/LocalKeyStore';
+import { take } from 'rxjs/operators';
+import { addKeysToCrypto, factory, keys } from '../../../__data__';
+import { LocalKeyStore, Store } from '../../../user';
 
 describe('LocalKeyStore', () => {
-  const id1: UserAccountID = {
-    network: 'net1',
-    address: 'addr1',
+  addKeysToCrypto();
+
+  const network = 'local';
+  const type = 'mock';
+  const getWallets = jest.fn();
+  const getWalletsSync = jest.fn();
+  const saveWallet = jest.fn();
+  const deleteWallet = jest.fn();
+  const store: Store = {
+    type,
+    getWallets,
+    getWalletsSync,
+    saveWallet,
+    deleteWallet,
   };
 
-  const id2: UserAccountID = {
-    network: 'net2',
-    address: 'addr2',
-  };
+  const lockedWallet = factory.createLockedWallet();
+  const unlockedWallet = factory.createUnlockedWallet();
 
-  const account1: UserAccount = {
-    type: 'test',
-    id: id1,
-    name: 'name1',
-    scriptHash: 'scriptHash1',
-    publicKey: 'publicKey1',
-    configurableName: true,
-    deletable: true,
-  };
-
-  const account2: UserAccount = {
-    type: 'test',
-    id: id2,
-    name: 'name2',
-    scriptHash: 'scriptHash2',
-    publicKey: 'publicKey2',
-    configurableName: true,
-    deletable: true,
-  };
-
-  const wallet1: UnlockedWallet = {
-    type: 'unlocked',
-    account: account1,
-    privateKey: 'privateKey1',
-    nep2: 'nep21',
-  };
-
-  const wallet2: UnlockedWallet = {
-    type: 'unlocked',
-    account: account2,
-    privateKey: 'privateKey2',
-    nep2: undefined,
-  };
-
-  let wallets: Wallet[] = [wallet1];
-  const store = {
-    type: 'test',
-    getWallets: async () => wallets,
-    saveWallet: (wallet: Wallet) => {
-      wallets.push(wallet);
-      return Promise.resolve();
-    },
-    deleteWallet: (wallet: Wallet) => {
-      wallets.splice(wallets.indexOf(wallet), 1);
-      return Promise.resolve();
-    },
-  };
-
-  let localKeyStore = new LocalKeyStore({ store });
+  let keystore: LocalKeyStore;
   beforeEach(() => {
-    wallets = [wallet1];
-    localKeyStore = new LocalKeyStore({ store });
+    getWallets.mockReset();
+    getWalletsSync.mockReset();
+    saveWallet.mockReset();
+    deleteWallet.mockReset();
+    getWalletsSync.mockImplementation(() => [lockedWallet, unlockedWallet]);
+    getWallets.mockImplementation(() => [lockedWallet, unlockedWallet]);
+    keystore = new LocalKeyStore({ store });
   });
 
-  test('wallets get without sync', () => {
-    localKeyStore = new LocalKeyStore({ store });
+  test('type', () => {
+    const result = keystore.type;
 
-    expect(localKeyStore.wallets).toEqual({});
+    expect(result).toEqual(type);
   });
 
-  test('wallets get with sync', () => {
-    const storeWithSync = {
-      ...store,
-      getWalletsSync: () => wallets,
-    };
+  test('currentAccount$', async () => {
+    const result = await keystore.currentAccount$.pipe(take(1)).toPromise();
 
-    const keyStore = new LocalKeyStore({ store: storeWithSync });
-
-    expect(keyStore.wallets).toEqual({ net1: { addr1: wallet1 } });
+    expect(result).toEqual(lockedWallet.account);
   });
 
-  test('wallets get - same network', async () => {
-    const id = {
-      network: 'net1',
-      address: 'addr',
-    };
+  test('accounts$', async () => {
+    const result = await keystore.accounts$.pipe(take(1)).toPromise();
 
-    const account = {
-      type: 'test',
-      id,
-      name: 'addr',
-      scriptHash: 'scriptHashNew',
-      publicKey: 'publicKeyNew',
-      configurableName: true,
-      deletable: true,
-    };
+    expect(result).toEqual([lockedWallet.account, unlockedWallet.account]);
+  });
 
-    const wallet: UnlockedWallet = {
-      account,
-      privateKey: 'privateKeyNew',
-      nep2: 'nep2New',
-      type: 'unlocked',
-    };
+  test('wallets$', async () => {
+    const result = await keystore.wallets$.pipe(take(1)).toPromise();
 
-    wallets = [wallet1, wallet];
-    const storeWithSync = {
-      ...store,
-      getWalletsSync: () => wallets,
-    };
-
-    localKeyStore = new LocalKeyStore({ store: storeWithSync });
-
-    expect(localKeyStore.wallets).toEqual({
-      net1: { addr1: wallet1, addr: wallet },
-    });
+    expect(result).toEqual([lockedWallet, unlockedWallet]);
   });
 
   test('getCurrentAccount', () => {
-    expect(localKeyStore.getCurrentAccount()).toEqual(account1);
+    const result = keystore.getCurrentAccount();
+
+    expect(result).toEqual(lockedWallet.account);
   });
 
   test('getAccounts', () => {
-    expect(localKeyStore.getAccounts()).toEqual([account1]);
+    const result = keystore.getAccounts();
+
+    expect(result).toEqual([lockedWallet.account, unlockedWallet.account]);
   });
 
-  test('currentAccount', () => {
-    expect(localKeyStore.currentAccount).toEqual(account1);
+  test('wallets', () => {
+    const result = keystore.wallets;
+
+    expect(result).toEqual([lockedWallet, unlockedWallet]);
   });
 
   test('sign', async () => {
-    const witness = {
-      verification: 'ff',
-      invocation: 'aa',
-    };
+    const message = 'hello world';
 
-    crypto.createWitness = jest.fn(() => witness);
-    common.stringToPrivateKey = jest.fn(() => witness);
+    const result = await keystore.sign({ account: unlockedWallet.account.id, message });
 
-    const result = await localKeyStore.sign({
-      account: id1,
-      message: 'm1',
-    });
-
-    expect(result).toEqual({
-      verification: 'ff',
-      invocation: 'aa',
-    });
+    expect(result).toMatchSnapshot();
   });
 
-  test('sign locked account', async () => {
-    const walletLocked: LockedWallet = {
-      type: 'locked',
-      account: account1,
-      nep2: wallet1.nep2 as any,
-    };
+  test('sign - locked', async () => {
+    const message = 'hello world';
 
-    wallets = [walletLocked];
+    const result = keystore.sign({ account: lockedWallet.account.id, message });
 
-    localKeyStore = new LocalKeyStore({ store });
-
-    await expect(
-      localKeyStore.sign({
-        account: id1,
-        message: 'm1',
-      }),
-    ).rejects.toEqual(new LockedAccountError(id1.address));
-  });
-
-  test('addAccount throws error on missing private key & password+nep2', async () => {
-    (helpers as any).privateKeyToPublicKey = jest.fn(() => account2.publicKey);
-    (helpers as any).publicKeyToScriptHash = jest.fn(() => account2.scriptHash);
-    (helpers as any).scriptHashToAddress = jest.fn(() => id2.address);
-
-    const result = localKeyStore.addAccount({
-      network: 'main',
-      name: account2.name,
-    });
-
-    await expect(result).rejects.toEqual(new Error('Expected private key or password and NEP-2 key'));
-  });
-
-  test('addAccount sets privateKey when given nep2+password', async () => {
-    localKeyStore = new LocalKeyStore({ store });
-    const idMain = {
-      network: 'main',
-      address: 'addrMain',
-    };
-
-    const accountMain = {
-      type: 'test',
-      id: idMain,
-      name: 'addrMain',
-      scriptHash: 'scriptHashMain',
-      publicKey: 'publicKeyMain',
-      configurableName: true,
-      deletable: true,
-    };
-
-    const walletMain = {
-      account: accountMain,
-      privateKey: 'privateKeyMain',
-      nep2: 'nep2Main',
-      type: 'unlocked',
-    };
-
-    (helpers as any).privateKeyToPublicKey = jest.fn(() => accountMain.publicKey);
-    (helpers as any).publicKeyToScriptHash = jest.fn(() => accountMain.scriptHash);
-    (helpers as any).scriptHashToAddress = jest.fn(() => idMain.address);
-    (helpers as any).decryptNEP2 = jest.fn(() => Promise.resolve(walletMain.privateKey));
-
-    const result = await localKeyStore.addAccount({
-      network: 'main',
-      password: 'pass',
-      nep2: 'nep2Main',
-    });
-
-    expect(result).toEqual(walletMain);
-  });
-
-  test('addAccount sets nep2 when given privateKey+password and is set to current account', async () => {
-    localKeyStore = new LocalKeyStore({ store });
-    const idMain = {
-      network: 'main',
-      address: 'addrMain',
-    };
-
-    const accountMain = {
-      type: 'test',
-      id: idMain,
-      name: 'addrMain',
-      scriptHash: 'scriptHashMain',
-      publicKey: 'publicKeyMain',
-      configurableName: true,
-      deletable: true,
-    };
-
-    const walletMain = {
-      account: accountMain,
-      privateKey: 'privateKeyMain',
-      nep2: 'nep2Main',
-      type: 'unlocked',
-    };
-
-    (helpers as any).privateKeyToPublicKey = jest.fn(() => accountMain.publicKey);
-    (helpers as any).publicKeyToScriptHash = jest.fn(() => accountMain.scriptHash);
-    (helpers as any).scriptHashToAddress = jest.fn(() => idMain.address);
-    (helpers as any).encryptNEP2 = jest.fn(() => Promise.resolve(walletMain.nep2));
-
-    const result = await localKeyStore.addAccount({
-      network: 'main',
-      privateKey: 'privateKeyMain',
-      password: 'pass',
-    });
-
-    expect(result).toEqual(walletMain);
-  });
-
-  test('construct with undefined network', async () => {
-    wallets = [];
-    localKeyStore = new LocalKeyStore({ store });
-    expect(localKeyStore.wallets).toEqual({});
-  });
-
-  test('addAccount', async () => {
-    (helpers as any).privateKeyToPublicKey = jest.fn(() => account2.publicKey);
-    (helpers as any).publicKeyToScriptHash = jest.fn(() => account2.scriptHash);
-    (helpers as any).scriptHashToAddress = jest.fn(() => id2.address);
-
-    expect(localKeyStore.wallets).toEqual({ net1: { addr1: wallet1 } });
-
-    const result = await localKeyStore.addAccount({
-      network: id2.network,
-      privateKey: 'privateKey2',
-      name: account2.name,
-    });
-
-    expect(result).toEqual(wallet2);
-    expect(localKeyStore.wallets).toEqual({
-      net1: { addr1: wallet1 },
-      net2: { addr2: wallet2 },
-    });
+    await expect(result).rejects.toMatchSnapshot();
   });
 
   test('selectAccount', async () => {
-    expect(localKeyStore.getCurrentAccount()).toEqual(account1);
+    await keystore.selectAccount(unlockedWallet.account.id);
 
-    await localKeyStore.addAccount({
-      network: id2.network,
-      privateKey: 'privateKey2',
-      name: account2.name,
-    });
+    expect(keystore.getCurrentAccount()).toEqual(unlockedWallet.account);
 
-    await localKeyStore.selectAccount(id2);
+    await keystore.selectAccount();
 
-    expect(localKeyStore.getCurrentAccount()).toEqual(account2);
+    expect(keystore.getCurrentAccount()).toEqual(lockedWallet.account);
   });
 
-  test('selectAccount with undefined id', async () => {
-    expect(localKeyStore.getCurrentAccount()).toEqual(account1);
+  test('updateAccountName - locked', async () => {
+    const name = 'new name';
+    await keystore.updateAccountName({ id: lockedWallet.account.id, name });
 
-    await localKeyStore.selectAccount();
-
-    expect(localKeyStore.getCurrentAccount()).toEqual(undefined);
+    expect(saveWallet.mock.calls).toMatchSnapshot();
+    expect(keystore.getWallet(lockedWallet.account.id).account.name).toEqual(name);
   });
 
-  test('updateAccountName - unlocked wallet', async () => {
-    const updateAccount = {
-      type: 'test',
-      id: id1,
-      name: 'newName',
-      scriptHash: 'scriptHash1',
-      publicKey: 'publicKey1',
+  test('updateAccountName - unlocked', async () => {
+    const name = 'new name';
+    await keystore.updateAccountName({ id: unlockedWallet.account.id, name });
+
+    expect(saveWallet.mock.calls).toMatchSnapshot();
+    expect(keystore.getWallet(unlockedWallet.account.id).account.name).toEqual(name);
+  });
+
+  test('getWallet - locked', () => {
+    const result = keystore.getWallet(lockedWallet.account.id);
+
+    expect(result).toEqual(lockedWallet);
+  });
+
+  test('getWallet - unlocked', () => {
+    const result = keystore.getWallet(unlockedWallet.account.id);
+
+    expect(result).toEqual(unlockedWallet);
+  });
+
+  test('getWallet - unknown network', () => {
+    expect(() =>
+      keystore.getWallet({ network: 'unknown', address: unlockedWallet.account.id.address }),
+    ).toThrowErrorMatchingSnapshot();
+  });
+
+  test('getWallet - unknown address', () => {
+    expect(() =>
+      keystore.getWallet({ network: unlockedWallet.account.id.network, address: keys[2].address }),
+    ).toThrowErrorMatchingSnapshot();
+  });
+
+  test('getWallet$', async () => {
+    const result = await keystore
+      .getWallet$(lockedWallet.account.id)
+      .pipe(take(1))
+      .toPromise();
+
+    expect(result).toEqual(lockedWallet);
+  });
+
+  test('getWallet$ - undefined', async () => {
+    const result = await keystore
+      .getWallet$({ network: 'unknown', address: keys[2].address })
+      .pipe(take(1))
+      .toPromise();
+
+    expect(result).toBeUndefined();
+  });
+
+  const createExpectedPrivateKeyWallet = ({ name = keys[2].address, nep2 }: { name?: string; nep2?: string }) => ({
+    type: 'unlocked',
+    account: {
+      type,
+      id: {
+        network,
+        address: keys[2].address,
+      },
+      name,
+      publicKey: keys[2].publicKeyString,
       configurableName: true,
       deletable: true,
-    };
+    },
+    nep2,
+    privateKey: keys[2].privateKeyString,
+  });
 
-    await localKeyStore.updateAccountName({
-      id: id1,
-      name: 'newName',
+  test('addAccount - privateKey', async () => {
+    const result = await keystore.addAccount({ network, privateKey: keys[2].privateKeyString });
+
+    expect(result).toEqual(createExpectedPrivateKeyWallet({}));
+  });
+
+  test('addAccount - privateKey with name', async () => {
+    const name = 'foobar';
+
+    const result = await keystore.addAccount({ network, privateKey: keys[2].privateKeyString, name });
+
+    expect(result).toEqual(createExpectedPrivateKeyWallet({ name }));
+  });
+
+  test('addAccount - privateKey with password', async () => {
+    const result = await keystore.addAccount({
+      network,
+      privateKey: keys[2].privateKeyString,
+      password: keys[2].password,
     });
 
-    const result = localKeyStore.getWallet(id1);
-    expect(result).toEqual({
-      type: 'unlocked',
-      account: updateAccount,
-      privateKey: wallet1.privateKey,
-      nep2: wallet1.nep2,
-    });
+    expect(result).toEqual(createExpectedPrivateKeyWallet({ nep2: keys[2].encryptedWIF }));
   });
 
-  test('updateAccountName - locked wallet', async () => {
-    const updateAccount = {
-      type: 'test',
-      id: id1,
-      name: 'newName',
-      scriptHash: 'scriptHash1',
-      publicKey: 'publicKey1',
-      configurableName: true,
-      deletable: true,
-    };
-
-    const wallet: LockedWallet = {
-      type: 'locked',
-      account: account1,
-      nep2: wallet1.nep2 as any,
-    };
-
-    wallets = [wallet];
-    localKeyStore = new LocalKeyStore({ store });
-
-    await localKeyStore.updateAccountName({
-      id: id1,
-      name: 'newName',
+  test('addAccount - nep2 and password', async () => {
+    const result = await keystore.addAccount({
+      network,
+      nep2: keys[2].encryptedWIF,
+      password: keys[2].password,
     });
 
-    const result = localKeyStore.getWallet(id1);
-    expect(result).toEqual({
-      type: 'locked',
-      account: updateAccount,
-      nep2: wallet1.nep2,
-    });
+    expect(result).toEqual(createExpectedPrivateKeyWallet({ nep2: keys[2].encryptedWIF }));
   });
 
-  test('getWallet throws error on unknown network', async () => {
-    const fakeID = { network: 'fakeNet', address: 'addr1' };
-    function testError() {
-      localKeyStore.getWallet(fakeID);
-    }
-
-    expect(testError).toThrow(new UnknownAccountError(fakeID.address) as any);
-  });
-
-  test('getWallet throws error on unknown address', async () => {
-    const fakeID = { network: 'net1', address: 'fakeAddress' };
-    function testError() {
-      localKeyStore.getWallet(fakeID);
-    }
-
-    expect(testError).toThrow(new UnknownAccountError(fakeID.address) as any);
-  });
-
-  test('getWallet', async () => {
-    const result = await localKeyStore.getWallet(id1);
-    expect(result).toEqual(wallet1);
-  });
-
-  test('deleteAccount - current account', async () => {
-    await localKeyStore.deleteAccount(id1);
-    expect(localKeyStore.wallets).toEqual({ net1: {} });
-    expect(localKeyStore.getCurrentAccount()).toBeUndefined();
-  });
-
-  test('deleteAccount - non current account', async () => {
-    (helpers as any).privateKeyToPublicKey = jest.fn(() => account2.publicKey);
-    (helpers as any).publicKeyToScriptHash = jest.fn(() => account2.scriptHash);
-    (helpers as any).scriptHashToAddress = jest.fn(() => id2.address);
-
-    await localKeyStore.addAccount({
-      network: id2.network,
-      privateKey: 'privateKey2',
-      name: account2.name,
+  test('addAccount - nep2 without password', async () => {
+    const result = keystore.addAccount({
+      network,
+      nep2: keys[2].encryptedWIF,
     });
 
-    await localKeyStore.deleteAccount(id2);
-    expect(localKeyStore.wallets).toEqual({
-      net1: { addr1: wallet1 },
-      net2: {},
-    });
+    await expect(result).rejects.toMatchSnapshot();
   });
 
-  test('addAccount - no current account', async () => {
-    (helpers as any).privateKeyToPublicKey = jest.fn(() => account2.publicKey);
-    (helpers as any).publicKeyToScriptHash = jest.fn(() => account2.scriptHash);
-    (helpers as any).scriptHashToAddress = jest.fn(() => id2.address);
+  test('addAccount - no private key', async () => {
+    const result = keystore.addAccount({ network });
 
-    await localKeyStore.deleteAccount(id1);
-    expect(localKeyStore.currentAccount).toBeUndefined();
-
-    await localKeyStore.addAccount({
-      network: id2.network,
-      privateKey: 'privateKey2',
-      name: account2.name,
-    });
-
-    expect(localKeyStore.currentAccount).toEqual(account2);
+    await expect(result).rejects.toMatchSnapshot();
   });
 
-  test('deleteAccount - network not found', async () => {
-    const fakeID = { network: 'fakeNet', address: 'addr1' };
-    await localKeyStore.deleteAccount(fakeID);
-    expect(localKeyStore.wallets).toEqual({ net1: { addr1: wallet1 } });
+  test('deleteAccount - all and add back', async () => {
+    await keystore.deleteAccount(lockedWallet.account.id);
+
+    expect(keystore.wallets).toHaveLength(1);
+    expect(keystore.wallets[0]).toEqual(unlockedWallet);
+
+    await keystore.deleteAccount(unlockedWallet.account.id);
+
+    expect(keystore.wallets).toHaveLength(0);
+
+    await keystore.addAccount({ network: unlockedWallet.account.id.network, privateKey: unlockedWallet.privateKey });
+
+    expect(keystore.wallets).toHaveLength(1);
+    expect(deleteWallet.mock.calls).toMatchSnapshot();
   });
 
-  test('deleteAccount - address not found', async () => {
-    const fakeID = { network: 'net1', address: 'fakeAddr' };
-    await localKeyStore.deleteAccount(fakeID);
-    expect(localKeyStore.wallets).toEqual({ net1: { addr1: wallet1 } });
+  test('deleteAccount - unknown network', async () => {
+    await keystore.deleteAccount({ network: 'unknown', address: lockedWallet.account.id.address });
+
+    expect(keystore.wallets).toHaveLength(2);
   });
 
-  test('unlockWallet with private key', async () => {
-    await localKeyStore.unlockWallet({
-      id: id1,
-      password: 'pass',
-    });
+  test('deleteAccount - unknown address', async () => {
+    await keystore.deleteAccount({ network: lockedWallet.account.id.network, address: keys[2].address });
 
-    expect(localKeyStore.wallets).toEqual({ net1: { addr1: wallet1 } });
+    expect(keystore.wallets).toHaveLength(2);
   });
 
-  test('unlockWallet with nep2', async () => {
-    const idMain = {
-      network: 'main',
-      address: 'addrMain',
-    };
+  test('unlockWallet', async () => {
+    await keystore.unlockWallet({ id: lockedWallet.account.id, password: keys[0].password });
 
-    const accountMain = {
-      type: 'test',
-      id: idMain,
-      name: 'addrMain',
-      scriptHash: 'scriptHashMain',
-      publicKey: 'publicKeyMain',
-      configurableName: true,
-      deletable: true,
-    };
-
-    const walletMain: LockedWallet = {
-      type: 'locked',
-      account: accountMain,
-      nep2: 'nep2Main',
-    };
-
-    wallets = [walletMain];
-
-    const privateKey = 'privateKeyMain';
-    const walletUpdated = {
-      account: accountMain,
-      privateKey,
-      nep2: 'nep2Main',
-      type: 'unlocked',
-    };
-
-    localKeyStore = new LocalKeyStore({ store });
-
-    (helpers as any).decryptNEP2 = jest.fn(() => Promise.resolve(privateKey));
-
-    await localKeyStore.unlockWallet({
-      id: idMain,
-      password: 'pass',
-    });
-
-    expect(localKeyStore.wallets).toEqual({
-      main: { addrMain: walletUpdated },
-    });
+    expect(keystore.wallets).toHaveLength(2);
+    expect(keystore.wallets[0].type).toBe('unlocked');
+    expect(keystore.wallets[1].type).toBe('unlocked');
   });
 
-  test('unlockWallet throws error on undefined nep2 & private key', async () => {
-    const walletError = {
-      account: account1,
-      privateKey: undefined,
-      nep2: undefined,
-    } as any;
-    wallets = [walletError];
+  test('unlockWallet - already unlocked', async () => {
+    await keystore.unlockWallet({ id: unlockedWallet.account.id, password: keys[1].password });
 
-    localKeyStore = new LocalKeyStore({ store });
-
-    await expect(
-      localKeyStore.unlockWallet({
-        id: id1,
-        password: 'pass',
-      }),
-    ).rejects.toThrow('Unexpected error, privateKey and NEP2 were both undefined.');
+    expect(keystore.wallets).toHaveLength(2);
+    expect(keystore.wallets[0].type).toBe('locked');
+    expect(keystore.wallets[1].type).toBe('unlocked');
   });
 
   test('lockWallet', async () => {
-    const walletUpdated = {
-      type: 'locked',
-      account: account1,
-      nep2: wallet1.nep2,
-    };
+    await keystore.lockWallet(unlockedWallet.account.id);
 
-    await localKeyStore.lockWallet(id1);
-
-    expect(localKeyStore.wallets).toEqual({ net1: { addr1: walletUpdated } });
+    expect(keystore.wallets).toHaveLength(2);
+    expect(keystore.wallets[0].type).toBe('locked');
+    expect(keystore.wallets[1].type).toBe('locked');
   });
 
-  test('lockWallet - undefined nep2 or privateKey - already locked', async () => {
-    const walletUpdated: LockedWallet = {
-      type: 'locked',
-      account: account1,
-      nep2: wallet1.nep2 as any,
-    };
+  test('lockWallet - already locked', async () => {
+    await keystore.lockWallet(lockedWallet.account.id);
 
-    wallets = [walletUpdated];
-
-    localKeyStore = new LocalKeyStore({ store });
-
-    await localKeyStore.lockWallet(id1);
-
-    expect(localKeyStore.wallets).toEqual({ net1: { addr1: walletUpdated } });
+    expect(keystore.wallets).toHaveLength(2);
+    expect(keystore.wallets[0].type).toBe('locked');
+    expect(keystore.wallets[1].type).toBe('unlocked');
   });
 });

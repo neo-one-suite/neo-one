@@ -7,13 +7,13 @@ import {
   GetOptions,
   Hash256String,
   Input,
+  InputOutput,
   NetworkSettings,
   NetworkType,
   RawCallReceipt,
   RawInvocationData,
   Transaction,
   TransactionReceipt,
-  UnspentOutput,
 } from '../../types';
 import { NEOONEDataProvider } from './NEOONEDataProvider';
 
@@ -25,10 +25,11 @@ export interface NEOONEProviderOptions {
 export class NEOONEProvider {
   public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
   private readonly networksInternal$: BehaviorSubject<ReadonlyArray<NetworkType>>;
-  private readonly mutableProviders: { [K in string]?: NEOONEDataProvider };
+  // tslint:disable-next-line readonly-keyword
+  private readonly mutableProviders: { [key: string]: NEOONEDataProvider | undefined };
 
   public constructor(options: ReadonlyArray<NEOONEProviderOptions> = []) {
-    this.networksInternal$ = new BehaviorSubject([] as ReadonlyArray<NetworkType>);
+    this.networksInternal$ = new BehaviorSubject<ReadonlyArray<NetworkType>>([]);
     this.networks$ = this.networksInternal$;
     this.mutableProviders = {};
 
@@ -66,7 +67,7 @@ export class NEOONEProvider {
     network: NetworkType,
     address: AddressString,
     monitor?: Monitor,
-  ): Promise<ReadonlyArray<UnspentOutput>> {
+  ): Promise<ReadonlyArray<InputOutput>> {
     return this.getProvider(network).getUnspentOutputs(address, monitor);
   }
 

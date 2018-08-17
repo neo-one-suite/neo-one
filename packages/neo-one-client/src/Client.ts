@@ -1,7 +1,7 @@
 import { ABI, ScriptBuilderParam } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { RawSourceMap } from 'source-map';
-import * as argAssertions from './args';
+import * as args from './args';
 import { ClientBase } from './ClientBase';
 import { ReadClient } from './ReadClient';
 import { createSmartContract } from './sc';
@@ -9,7 +9,6 @@ import {
   AddressString,
   AssetRegister,
   ContractRegister,
-  Hash160String,
   Hash256String,
   InvokeTransactionOptions,
   NetworkType,
@@ -22,7 +21,6 @@ import {
   SmartContractAny,
   SmartContractDefinition,
   TransactionOptions,
-  TransactionReceipt,
   TransactionResult,
   Transfer,
   UserAccountProvider,
@@ -47,32 +45,27 @@ export class Client<
     asset: Hash256String,
     to: AddressString,
     options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt>>;
-  public async transfer(
-    transfers: ReadonlyArray<Transfer>,
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt>>;
+  ): Promise<TransactionResult>;
+  public async transfer(transfers: ReadonlyArray<Transfer>, options?: TransactionOptions): Promise<TransactionResult>;
   // tslint:disable-next-line readonly-array no-any
-  public async transfer(...args: any[]): Promise<TransactionResult<TransactionReceipt>> {
-    const { transfers, options } = this.getTransfersOptions(args);
+  public async transfer(...argsIn: any[]): Promise<TransactionResult> {
+    const { transfers, options } = this.getTransfersOptions(argsIn);
 
     return this.getProvider(options).transfer(transfers, options);
   }
 
-  public async claim(options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt>> {
-    argAssertions.assertTransactionOptions(options);
-
-    return this.getProvider(options).claim(options);
+  public async claim(options?: TransactionOptions): Promise<TransactionResult> {
+    return this.getProvider(options).claim(args.assertTransactionOptions('options', options));
   }
 
   public async publish(
     contract: ContractRegister,
     options?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt>> {
-    argAssertions.assertTransactionOptions(options);
-    argAssertions.assertContractRegister(contract);
-
-    return this.getProvider(options).publish(contract, options);
+    return this.getProvider(options).publish(
+      args.assertContractRegister('contract', contract),
+      args.assertTransactionOptions('options', options),
+    );
   }
 
   public async publishAndDeploy(
@@ -80,21 +73,25 @@ export class Client<
     abi: ABI,
     params: ReadonlyArray<Param> = [],
     options?: TransactionOptions,
+    sourceMap?: RawSourceMap,
   ): Promise<TransactionResult<PublishReceipt>> {
-    argAssertions.assertTransactionOptions(options);
-    argAssertions.assertContractRegister(contract);
-
-    return this.getProvider(options).publishAndDeploy(contract, abi, params, options);
+    return this.getProvider(options).publishAndDeploy(
+      args.assertContractRegister('contract', contract),
+      args.assertABI('abi', abi),
+      params,
+      args.assertTransactionOptions('options', options),
+      sourceMap,
+    );
   }
 
   public async registerAsset(
     asset: AssetRegister,
     options?: TransactionOptions,
   ): Promise<TransactionResult<RegisterAssetReceipt>> {
-    argAssertions.assertAssetRegister(asset);
-    argAssertions.assertTransactionOptions(options);
-
-    return this.getProvider(options).registerAsset(asset, options);
+    return this.getProvider(options).registerAsset(
+      args.assertAssetRegister('asset', asset),
+      args.assertTransactionOptions('options', options),
+    );
   }
 
   public async issue(
@@ -102,28 +99,28 @@ export class Client<
     asset: Hash256String,
     to: AddressString,
     options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt>>;
-  public async issue(
-    transfers: ReadonlyArray<Transfer>,
-    options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt>>;
+  ): Promise<TransactionResult>;
+  public async issue(transfers: ReadonlyArray<Transfer>, options?: TransactionOptions): Promise<TransactionResult>;
   // tslint:disable-next-line readonly-array no-any
-  public async issue(...args: any[]): Promise<TransactionResult<TransactionReceipt>> {
-    const { transfers, options } = this.getTransfersOptions(args);
+  public async issue(...argsIn: any[]): Promise<TransactionResult> {
+    const { transfers, options } = this.getTransfersOptions(argsIn);
 
     return this.getProvider(options).issue(transfers, options);
   }
 
   public read(network: NetworkType): ReadClient {
-    return new ReadClient(this.getNetworkProvider(network).read(network));
+    return new ReadClient(
+      this.getNetworkProvider(args.assertString('network', network)).read(args.assertString('network', network)),
+    );
   }
 
   // tslint:disable-next-line no-any
   public smartContract<T extends SmartContract<any> = SmartContractAny>(definition: SmartContractDefinition): T {
-    argAssertions.assertSmartContractDefinition(definition);
-
-    // tslint:disable-next-line no-any
-    return createSmartContract({ definition, client: this }) as any;
+    return createSmartContract({
+      definition: args.assertSmartContractDefinition('definition', definition),
+      client: this,
+      // tslint:disable-next-line no-any
+    }) as any;
   }
 
   public inject<K>(
@@ -141,7 +138,7 @@ export class Client<
 
   // internal
   public async __invoke(
-    contract: Hash160String,
+    contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
@@ -149,49 +146,45 @@ export class Client<
     options?: InvokeTransactionOptions,
     sourceMap?: RawSourceMap,
   ): Promise<TransactionResult<RawInvokeReceipt>> {
-    argAssertions.assertHash160(contract);
-    argAssertions.assertBoolean(verify);
-
     return this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMap);
   }
 
   public async __call(
-    contract: Hash160String,
+    contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     options?: TransactionOptions,
   ): Promise<RawCallReceipt> {
-    argAssertions.assertHash160(contract);
-    argAssertions.assertTransactionOptions(options);
-
     return this.getProvider(options).call(contract, method, params, options);
   }
 
   private getTransfersOptions(
     // tslint:disable-next-line no-any
-    args: ReadonlyArray<any>,
+    argsIn: ReadonlyArray<any>,
   ): {
     readonly transfers: ReadonlyArray<Transfer>;
     readonly options?: TransactionOptions;
   } {
-    argAssertions.assertTransfers(args);
     let transfers;
     let options;
-    if (args.length >= 3) {
+    if (argsIn.length >= 3) {
       transfers = [
         {
-          amount: args[0],
-          asset: args[1],
-          to: args[2],
+          amount: argsIn[0],
+          asset: argsIn[1],
+          to: argsIn[2],
         },
       ];
 
-      options = args[3];
+      options = argsIn[3];
     } else {
-      transfers = args[0];
-      options = args[1];
+      transfers = argsIn[0];
+      options = argsIn[1];
     }
 
-    return { transfers, options };
+    return {
+      transfers: args.assertTransfers('transfers', transfers),
+      options: args.assertTransactionOptions('options', options),
+    };
   }
 }

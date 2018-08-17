@@ -1,3 +1,4 @@
+export * from './DiagnosticScriptBuilder';
 export * from './ScopeCapturingScriptBuilder';
 export * from './EmittingScriptBuilder';
 export * from './HelperCapturingScriptBuilder';

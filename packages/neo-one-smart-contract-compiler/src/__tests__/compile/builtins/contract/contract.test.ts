@@ -11,7 +11,7 @@ describe('Contract', () => {
     await node.executeString(`
       import { Contract, Address } from '@neo-one/smart-contract';
 
-      const contract = Contract.for(Address.from('${contract.hash}'));
+      const contract = Contract.for(Address.from('${contract.address}'));
 
       if (contract === undefined) {
         assertEqual(contract !== undefined, true);
@@ -24,7 +24,7 @@ describe('Contract', () => {
   });
 
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Contract } from '@neo-one/smart-contract';
 
@@ -36,7 +36,7 @@ describe('Contract', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Contract } from '@neo-one/smart-contract';
 

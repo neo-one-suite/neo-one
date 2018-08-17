@@ -1,25 +1,27 @@
+// tslint:disable deprecation
 import {
   ABI,
   ABIEvent,
   ABIFunction,
   ABIParameter,
   ABIReturn,
-  ActionRaw,
-  ActionRawBase,
+  AddressABI,
+  AddressABIParameter,
+  AddressABIReturn,
   AddressString,
   ArrayABI,
   BooleanABI,
   BooleanABIParameter,
   BooleanABIReturn,
+  BufferABI,
+  BufferABIParameter,
+  BufferABIReturn,
   BufferString,
-  ByteArrayABI,
-  ByteArrayABIParameter,
-  ByteArrayABIReturn,
+  ClientAddressContractParameter,
   ClientArrayContractParameter,
   ClientBooleanContractParameter,
-  ClientByteArrayContractParameter,
+  ClientBufferContractParameter,
   ClientContractParameter,
-  ClientHash160ContractParameter,
   ClientHash256ContractParameter,
   ClientIntegerContractParameter,
   ClientInteropInterfaceContractParameter,
@@ -27,11 +29,6 @@ import {
   ClientSignatureContractParameter,
   ClientStringContractParameter,
   ClientVoidContractParameter,
-  ContractParameterTypeJSON,
-  Hash160ABI,
-  Hash160ABIParameter,
-  Hash160ABIReturn,
-  Hash160String,
   Hash256ABI,
   Hash256ABIParameter,
   Hash256ABIReturn,
@@ -39,21 +36,21 @@ import {
   IntegerABI,
   IntegerABIParameter,
   IntegerABIReturn,
-  InteropInterfaceABI,
-  InteropInterfaceABIParameter,
-  InteropInterfaceABIReturn,
-  LogRaw,
-  NotificationRaw,
   Param,
+  PrivateKeyString,
   PublicKeyABI,
   PublicKeyABIParameter,
   PublicKeyABIReturn,
   PublicKeyString,
+  RawAction,
+  RawActionBase,
   RawCallReceipt,
   RawInvocationResult,
   RawInvocationResultError,
   RawInvocationResultSuccess,
   RawInvokeReceipt,
+  RawLog,
+  RawNotification,
   ScriptBuilderParam,
   SignatureABI,
   SignatureABIParameter,
@@ -71,9 +68,6 @@ import BigNumber from 'bignumber.js';
 import { Observable } from 'rxjs';
 import { RawSourceMap } from 'source-map';
 
-// Hex PrivateKey
-export type PrivateKeyString = string;
-
 export interface Peer {
   readonly address: string;
   readonly port: number;
@@ -85,22 +79,25 @@ export {
   ABIFunction,
   ABIParameter,
   ABIReturn,
-  ActionRaw,
-  ActionRawBase,
+  RawAction,
+  RawActionBase,
+  AddressABI,
+  AddressABIParameter,
+  AddressABIReturn,
   AddressString,
   ArrayABI,
   BooleanABI,
   BooleanABIParameter,
   BooleanABIReturn,
+  BufferABI,
+  BufferABIParameter,
+  BufferABIReturn,
   BufferString,
-  ByteArrayABI,
-  ByteArrayABIParameter,
-  ByteArrayABIReturn,
+  ClientAddressContractParameter as AddressContractParameter,
   ClientArrayContractParameter as ArrayContractParameter,
   ClientBooleanContractParameter as BooleanContractParameter,
-  ClientByteArrayContractParameter as ByteArrayContractParameter,
+  ClientBufferContractParameter as BufferContractParameter,
   ClientContractParameter as ContractParameter,
-  ClientHash160ContractParameter as Hash160ContractParameter,
   ClientHash256ContractParameter as Hash256ContractParameter,
   ClientIntegerContractParameter as IntegerContractParameter,
   ClientInteropInterfaceContractParameter as InteropInterfaceContractParameter,
@@ -108,10 +105,6 @@ export {
   ClientSignatureContractParameter as SignatureContractParameter,
   ClientStringContractParameter as StringContractParameter,
   ClientVoidContractParameter as VoidContractParameter,
-  Hash160ABI,
-  Hash160ABIParameter,
-  Hash160ABIReturn,
-  Hash160String,
   Hash256ABI,
   Hash256ABIParameter,
   Hash256ABIReturn,
@@ -119,12 +112,10 @@ export {
   IntegerABI,
   IntegerABIParameter,
   IntegerABIReturn,
-  InteropInterfaceABI,
-  InteropInterfaceABIParameter,
-  InteropInterfaceABIReturn,
-  LogRaw,
-  NotificationRaw,
+  RawLog,
+  RawNotification,
   Param,
+  PrivateKeyString,
   PublicKeyABI,
   PublicKeyABIParameter,
   PublicKeyABIReturn,
@@ -146,42 +137,74 @@ export {
   VoidABIReturn,
 };
 
-export type ContractParameterType = ContractParameterTypeJSON;
+export type ContractParameterType = ClientContractParameter['type'];
 
 export interface Account {
   readonly address: AddressString;
-  readonly frozen: boolean;
-  readonly votes: ReadonlyArray<PublicKeyString>;
   readonly balances: {
     readonly [asset: string]: BigNumber;
   };
 }
 
-export type AssetType =
-  | 'CreditFlag'
-  | 'DutyFlag'
-  | 'GoverningToken'
-  | 'UtilityToken'
-  | 'Currency'
-  | 'Share'
-  | 'Invoice'
-  | 'Token';
+export type AssetType = 'Credit' | 'Duty' | 'Governing' | 'Utility' | 'Currency' | 'Share' | 'Invoice' | 'Token';
 
+/**
+ * Attributes of a first class asset.
+ *
+ * Users will typically only interact with the NEO and GAS `Asset`s.
+ *
+ * @example
+ *
+ * const asset = readClient.getAsset(Hash256.NEO);
+ * const neoAmount = asset.amount;
+ *
+ */
 export interface Asset {
+  /**
+   * `Hash256String` of this `Asset`.
+   */
   readonly hash: Hash256String;
+  /**
+   * Type of the `Asset`
+   *
+   * @see AssetType
+   */
   readonly type: AssetType;
   readonly name: string;
+  /**
+   * Total possible supply of the `Asset`
+   */
   readonly amount: BigNumber;
+  /**
+   * Amount currently available of the `Asset`
+   */
   readonly available: BigNumber;
+  /**
+   * Precision (number of decimal places) of the `Asset`
+   */
   readonly precision: number;
+  /**
+   * Owner of the `Asset`.
+   */
   readonly owner: PublicKeyString;
+  /**
+   * Admin of the `Asset`.
+   */
   readonly admin: AddressString;
+  /**
+   * Issuer of the `Asset`.
+   */
   readonly issuer: AddressString;
   readonly expiration: number;
   readonly frozen: boolean;
 }
 
-export type AttributeUsageBuffer =
+/**
+ * `Attribute` usage flag indicating the data is an arbitrary `Buffer`
+ *
+ * @see BufferAttribute
+ */
+export type BufferAttributeUsage =
   | 'DescriptionUrl'
   | 'Description'
   | 'Remark'
@@ -200,10 +223,24 @@ export type AttributeUsageBuffer =
   | 'Remark13'
   | 'Remark14'
   | 'Remark15';
-
-export type AttributeUsagePublicKey = 'ECDH02' | 'ECDH03';
-export type AttributeUsageHash160 = 'Script';
-export type AttributeUsageHash256 =
+/**
+ * `Attribute` usage flag indicating the data is a `PublicKey`
+ *
+ * @see PublicKeyAttribute
+ */
+export type PublicKeyAttributeUsage = 'ECDH02' | 'ECDH03';
+/**
+ * `Attribute` usage flag indicating the data is an `Address`
+ *
+ * @see AddressAttribute
+ */
+export type AddressAttributeUsage = 'Script';
+/**
+ * `Attribute` usage flag indicating the data is a `Hash256`
+ *
+ * @see Hash256Attribute
+ */
+export type Hash256AttributeUsage =
   | 'ContractHash'
   | 'Vote'
   | 'Hash1'
@@ -222,70 +259,164 @@ export type AttributeUsageHash256 =
   | 'Hash14'
   | 'Hash15';
 
-export type AttributeArg =
-  | {
-      readonly usage: AttributeUsageBuffer;
-      readonly data: BufferString;
-    }
-  | {
-      readonly usage: AttributeUsagePublicKey;
-      readonly data: PublicKeyString;
-    }
-  | {
-      readonly usage: AttributeUsageHash256;
-      readonly data: Hash256String;
-    };
+/**
+ * `Attribute` usage flag indicates the type of the data.
+ *
+ * @see BufferAttributeUsage
+ * @see PublicKeyAttributeUsage
+ * @see AddressAttributeUsage
+ * @see Hash256AttributeUsage
+ */
+export type AttributeUsage =
+  | BufferAttributeUsage
+  | AddressAttributeUsage
+  | PublicKeyAttributeUsage
+  | Hash256AttributeUsage;
 
-export type Attribute =
-  | AttributeArg
-  | {
-      readonly usage: AttributeUsageHash160;
-      readonly data: Hash160String;
-    };
+/**
+ * Base interface for `Attribute`s
+ *
+ * @see Attribute
+ */
+export interface AttributeBase {
+  readonly usage: AttributeUsage;
+}
+/**
+ * `Attribute` whose data is an arbitrary `BufferString`.
+ */
+export interface BufferAttribute extends AttributeBase {
+  readonly usage: BufferAttributeUsage;
+  readonly data: BufferString;
+}
+/**
+ * `Attribute` whose data is a `PublicKeyString`.
+ */
+export interface PublicKeyAttribute extends AttributeBase {
+  readonly usage: PublicKeyAttributeUsage;
+  readonly data: PublicKeyString;
+}
+/**
+ * `Attribute` whose data is a `Hash256`.
+ */
+export interface Hash256Attribute extends AttributeBase {
+  readonly usage: Hash256AttributeUsage;
+  readonly data: Hash256String;
+}
+/**
+ * `Attribute` whose data is an `AddressString`.
+ */
+export interface AddressAttribute extends AttributeBase {
+  readonly usage: AddressAttributeUsage;
+  readonly data: AddressString;
+}
+/**
+ * `Attribute`s are used to store additional data on `Transaction`s. Most `Attribute`s are used to store arbitrary data, whereas some, like `AddressAttribute`, have specific uses in the NEO
+ * protocol.
+ */
+export type Attribute = BufferAttribute | PublicKeyAttribute | Hash256Attribute | AddressAttribute;
 
 export interface Contract {
   readonly version: number;
-  readonly hash: Hash160String;
+  /**
+   * `AddressString` of this `Contract`.
+   */
+  readonly address: AddressString;
+  /**
+   * `Contract` code.
+   */
   readonly script: BufferString;
+  /**
+   * Expected parameters of this `Contract`
+   */
   readonly parameters: ReadonlyArray<ContractParameterType>;
+  /**
+   * Return type of this `Contract`
+   */
   readonly returnType: ContractParameterType;
+  /**
+   * Name of this `Contract`. For informational purposes only.
+   */
   readonly name: string;
+  /**
+   * Version of this `Contract`. For informational purposes only.
+   */
   readonly codeVersion: string;
+  /**
+   * Author of this `Contract`. For informational purposes only.
+   */
   readonly author: string;
+  /**
+   * Email of this `Contract`. For informational purposes only.
+   */
   readonly email: string;
+  /**
+   * Description of this `Contract`. For informational purposes only.
+   */
   readonly description: string;
-  readonly properties: {
-    readonly storage: boolean;
-    readonly dynamicInvoke: boolean;
-    readonly payable: boolean;
-  };
+  /**
+   * True if this `Contract` can use storage.
+   */
+  readonly storage: boolean;
+  /**
+   * True if this `Contract` can make dynamic invocations.
+   */
+  readonly dynamicInvoke: boolean;
+  /**
+   * True if this `Contract` accepts first-class `Asset`s and/or tokens.
+   */
+  readonly payable: boolean;
 }
 
 export interface StorageItem {
-  readonly hash: Hash160String;
+  /**
+   * `Contract` address for this `StorageItem`
+   */
+  readonly address: AddressString;
+  /**
+   * Key of this `StorageItem`
+   */
   readonly key: BufferString;
+  /**
+   * Value of this `StorageItem`
+   */
   readonly value: BufferString;
 }
 
-export interface Validator {
-  readonly version: number;
-  readonly publicKey: PublicKeyString;
-  readonly registered: boolean;
-  readonly votes: BigNumber;
-}
-
+/**
+ * `Input`s are a reference to an `Output` of a `Transaction` that has been persisted to the blockchain. The sum of the `value`s of the referenced `Output`s is the total amount transferred in the `Transaction`.
+ */
 export interface Input {
-  readonly txid: Hash256String;
-  readonly vout: number;
+  /**
+   * Hash of the `Transaction` this input references.
+   */
+  readonly hash: Hash256String;
+  /**
+   * `Output` index within the `Transaction` this input references.
+   */
+  readonly index: number;
 }
 
+/**
+ * `Output`s represent the destination `Address` and amount transferred of a given `Asset`.
+ *
+ * The sum of the unspent `Output`s of an `Address` represent the total balance of the `Address`.
+ */
 export interface Output {
+  /**
+   * Hash of the `Asset` that was transferred.
+   */
   readonly asset: Hash256String;
+  /**
+   * Amount transferred.
+   */
   readonly value: BigNumber;
+  /**
+   * Destination `Address`.
+   */
   readonly address: AddressString;
 }
 
-export interface UnspentOutput extends Input, Output {}
+export interface InputOutput extends Input, Output {}
 
 export interface Witness {
   readonly invocation: BufferString;
@@ -295,27 +426,50 @@ export interface Witness {
 export interface RawInvocationData {
   readonly asset?: Asset;
   readonly contracts: ReadonlyArray<Contract>;
-  readonly deletedContractHashes: ReadonlyArray<Hash160String>;
-  readonly migratedContractHashes: ReadonlyArray<[Hash160String, Hash160String]>;
-  readonly voteUpdates: ReadonlyArray<[AddressString, ReadonlyArray<PublicKeyString>]>;
+  readonly deletedContractAddresses: ReadonlyArray<AddressString>;
+  readonly migratedContractAddresses: ReadonlyArray<[AddressString, AddressString]>;
   readonly result: RawInvocationResult;
-  readonly actions: ReadonlyArray<ActionRaw>;
+  readonly actions: ReadonlyArray<RawAction>;
 }
 
+/**
+ * Base interface for all `Transaction`s
+ */
 export interface TransactionBase {
   readonly version: number;
-  readonly txid: Hash256String;
+  /**
+   * `Hash256` of this `Transaction`.
+   */
+  readonly hash: Hash256String;
+  /**
+   * Byte size of this `Transaction`.
+   */
   readonly size: number;
+  /**
+   * `Attribute`s attached to the `Transaction`.
+   *
+   * @see Attribute
+   */
   readonly attributes: ReadonlyArray<Attribute>;
-  readonly vin: ReadonlyArray<Input>;
-  readonly vout: ReadonlyArray<Output>;
+  /**
+   * `Input`s of the `Transaction`.
+   *
+   * @see Input
+   */
+  readonly inputs: ReadonlyArray<Input>;
+  /**
+   * `Output`s of the `Transaction`.
+   *
+   * @see Output
+   */
+  readonly outputs: ReadonlyArray<Output>;
   readonly scripts: ReadonlyArray<Witness>;
   readonly systemFee: BigNumber;
   readonly networkFee: BigNumber;
 }
 
 export interface ConfirmedTransactionBase {
-  readonly data: {
+  readonly receipt: {
     readonly blockHash: Hash256String;
     readonly blockIndex: number;
     readonly index: number;
@@ -323,6 +477,9 @@ export interface ConfirmedTransactionBase {
   };
 }
 
+/**
+ * Claims GAS for a set of spent `Output`s.
+ */
 export interface ClaimTransaction extends TransactionBase {
   readonly type: 'ClaimTransaction';
   readonly claims: ReadonlyArray<Input>;
@@ -330,12 +487,20 @@ export interface ClaimTransaction extends TransactionBase {
 
 export interface ConfirmedClaimTransaction extends ClaimTransaction, ConfirmedTransactionBase {}
 
+/**
+ * Transfers first class `Asset`s
+ */
 export interface ContractTransaction extends TransactionBase {
   readonly type: 'ContractTransaction';
 }
 
 export interface ConfirmedContractTransaction extends ContractTransaction, ConfirmedTransactionBase {}
 
+/**
+ * Enrolls a new validator for a given `PublicKey`.
+ *
+ * @deprecated
+ */
 export interface EnrollmentTransaction extends TransactionBase {
   readonly type: 'EnrollmentTransaction';
   readonly publicKey: PublicKeyString;
@@ -343,12 +508,18 @@ export interface EnrollmentTransaction extends TransactionBase {
 
 export interface ConfirmedEnrollmentTransaction extends EnrollmentTransaction, ConfirmedTransactionBase {}
 
+/**
+ * Issues new currency of a first-class `Asset`.
+ */
 export interface IssueTransaction extends TransactionBase {
   readonly type: 'IssueTransaction';
 }
 
 export interface ConfirmedIssueTransaction extends IssueTransaction, ConfirmedTransactionBase {}
 
+/**
+ * Runs a script in the NEO VM.
+ */
 export interface InvocationTransaction extends TransactionBase {
   readonly type: 'InvocationTransaction';
   readonly script: BufferString;
@@ -359,6 +530,9 @@ export interface ConfirmedInvocationTransaction extends InvocationTransaction, C
   readonly invocationData: RawInvocationData;
 }
 
+/**
+ * First `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
+ */
 export interface MinerTransaction extends TransactionBase {
   readonly type: 'MinerTransaction';
   readonly nonce: number;
@@ -366,6 +540,11 @@ export interface MinerTransaction extends TransactionBase {
 
 export interface ConfirmedMinerTransaction extends MinerTransaction, ConfirmedTransactionBase {}
 
+/**
+ * Registers a new `Contract`
+ *
+ * @deprecated Replaced by `Client#publish`
+ */
 export interface PublishTransaction extends TransactionBase {
   readonly type: 'PublishTransaction';
   readonly contract: Contract;
@@ -373,6 +552,11 @@ export interface PublishTransaction extends TransactionBase {
 
 export interface ConfirmedPublishTransaction extends PublishTransaction, ConfirmedTransactionBase {}
 
+/**
+ * Registers a new first class `Asset`
+ *
+ * @deprecated Replaced by `Client#registerAsset`
+ */
 export interface RegisterTransaction extends TransactionBase {
   readonly type: 'RegisterTransaction';
   readonly asset: {
@@ -387,16 +571,8 @@ export interface RegisterTransaction extends TransactionBase {
 
 export interface ConfirmedRegisterTransaction extends RegisterTransaction, ConfirmedTransactionBase {}
 
-export interface StateDescriptor {
-  readonly type: 'Account' | 'Validator';
-  readonly key: BufferString;
-  readonly field: string;
-  readonly value: BufferString;
-}
-
 export interface StateTransaction extends TransactionBase {
   readonly type: 'StateTransaction';
-  readonly descriptors: ReadonlyArray<StateDescriptor>;
 }
 
 export interface ConfirmedStateTransaction extends StateTransaction, ConfirmedTransactionBase {}
@@ -423,24 +599,42 @@ export type ConfirmedTransaction =
   | ConfirmedInvocationTransaction;
 
 export interface Header {
+  /**
+   * NEO blockchain version
+   */
   readonly version: number;
+  /**
+   * `Block` hash
+   */
   readonly hash: Hash256String;
   readonly previousBlockHash: Hash256String;
   readonly merkleRoot: Hash256String;
+  /**
+   * `Block` time persisted
+   */
   readonly time: number;
+  /**
+   * `Block` index
+   */
   readonly index: number;
   readonly nonce: string;
+  /**
+   * Next consensus address.
+   */
   readonly nextConsensus: AddressString;
   readonly script: Witness;
   readonly size: number;
 }
 
 export interface Block extends Header {
+  /**
+   * `Transaction`s contained in the `Block`.
+   */
   readonly transactions: ReadonlyArray<ConfirmedTransaction>;
 }
 
 export interface AssetRegister {
-  readonly assetType: AssetType;
+  readonly type: AssetType;
   readonly name: string;
   readonly amount: BigNumber;
   readonly precision: number;
@@ -458,11 +652,9 @@ export interface ContractRegister {
   readonly author: string;
   readonly email: string;
   readonly description: string;
-  readonly properties: {
-    readonly storage: boolean;
-    readonly dynamicInvoke: boolean;
-    readonly payable: boolean;
-  };
+  readonly storage: boolean;
+  readonly dynamicInvoke: boolean;
+  readonly payable: boolean;
 }
 
 export interface Transfer {
@@ -476,7 +668,7 @@ export type ParamJSON =
   | undefined
   | string
   | BufferString
-  | Hash160String
+  | AddressString
   | Hash256String
   | AddressString
   | PublicKeyString
@@ -486,13 +678,13 @@ export type ParamJSON =
 export interface EventParameters {
   readonly [name: string]: Param | undefined;
 }
-export interface Event<TName extends string = string, TEventParameters = EventParameters> extends ActionRawBase {
+export interface Event<TName extends string = string, TEventParameters = EventParameters> extends RawActionBase {
   readonly type: 'Event';
   readonly name: TName;
   readonly parameters: TEventParameters;
 }
 
-export interface Log extends ActionRawBase {
+export interface Log extends RawActionBase {
   readonly type: 'Log';
   readonly message: string;
 }
@@ -513,7 +705,6 @@ export interface UserAccount {
   readonly type: string;
   readonly id: UserAccountID;
   readonly name: string;
-  readonly scriptHash: Hash160String;
   readonly publicKey: PublicKeyString;
   readonly configurableName: boolean;
   readonly deletable: boolean;
@@ -521,7 +712,7 @@ export interface UserAccount {
 
 export interface TransactionOptions {
   readonly from?: UserAccountID;
-  readonly attributes?: ReadonlyArray<AttributeArg>;
+  readonly attributes?: ReadonlyArray<Attribute>;
   readonly networkFee?: BigNumber;
   readonly monitor?: Monitor;
 }
@@ -571,7 +762,10 @@ export interface Options {
   readonly secondsPerBlock: number;
 }
 
-export interface TransactionResult<TTransactionReceipt, TTransaction extends Transaction = Transaction> {
+export interface TransactionResult<
+  TTransactionReceipt extends TransactionReceipt = TransactionReceipt,
+  TTransaction extends Transaction = Transaction
+> {
   readonly transaction: TTransaction;
   readonly confirmed: (options?: GetOptions) => Promise<TTransactionReceipt>;
 }
@@ -591,24 +785,22 @@ export interface UpdateAccountNameOptions {
 
 export interface DataProvider {
   readonly network: NetworkType;
-
   readonly getAccount: (address: AddressString, monitor?: Monitor) => Promise<Account>;
   readonly getAsset: (hash: Hash256String, monitor?: Monitor) => Promise<Asset>;
   readonly getBlock: (hashOrIndex: number | Hash256String, options?: GetOptions) => Promise<Block>;
   readonly iterBlocks: (filter?: BlockFilter) => AsyncIterable<Block>;
   readonly getBestBlockHash: (monitor?: Monitor) => Promise<Hash256String>;
   readonly getBlockCount: (monitor?: Monitor) => Promise<number>;
-  readonly getContract: (hash: Hash160String, monitor?: Monitor) => Promise<Contract>;
+  readonly getContract: (address: AddressString, monitor?: Monitor) => Promise<Contract>;
   readonly getMemPool: (monitor?: Monitor) => Promise<ReadonlyArray<Hash256String>>;
   readonly getTransaction: (hash: Hash256String, monitor?: Monitor) => Promise<Transaction>;
   readonly getOutput: (input: Input, monitor?: Monitor) => Promise<Output>;
-  readonly getValidators: (monitor?: Monitor) => Promise<ReadonlyArray<Validator>>;
   readonly getConnectedPeers: (monitor?: Monitor) => Promise<ReadonlyArray<Peer>>;
-  readonly getStorage: (hash: Hash160String, key: BufferString, monitor?: Monitor) => Promise<StorageItem>;
-  readonly iterStorage: (hash: Hash160String, monitor?: Monitor) => AsyncIterable<StorageItem>;
-  readonly iterActionsRaw: (filterIn?: BlockFilter) => AsyncIterable<ActionRaw>;
+  readonly getStorage: (address: AddressString, key: BufferString, monitor?: Monitor) => Promise<StorageItem>;
+  readonly iterStorage: (address: AddressString, monitor?: Monitor) => AsyncIterable<StorageItem>;
+  readonly iterActionsRaw: (filterIn?: BlockFilter) => AsyncIterable<RawAction>;
   readonly call: (
-    contract: Hash160String,
+    contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     monitor?: Monitor,
@@ -637,11 +829,8 @@ export interface UserAccountProvider {
   readonly selectAccount: (id?: UserAccountID) => Promise<void>;
   readonly deleteAccount: (id: UserAccountID) => Promise<void>;
   readonly updateAccountName: (options: UpdateAccountNameOptions) => Promise<void>;
-  readonly transfer: (
-    transfers: ReadonlyArray<Transfer>,
-    options?: TransactionOptions,
-  ) => Promise<TransactionResult<TransactionReceipt>>;
-  readonly claim: (options?: TransactionOptions) => Promise<TransactionResult<TransactionReceipt>>;
+  readonly transfer: (transfers: ReadonlyArray<Transfer>, options?: TransactionOptions) => Promise<TransactionResult>;
+  readonly claim: (options?: TransactionOptions) => Promise<TransactionResult>;
   readonly publish: (
     contract: ContractRegister,
     options?: TransactionOptions,
@@ -651,17 +840,15 @@ export interface UserAccountProvider {
     abi: ABI,
     params: ReadonlyArray<Param>,
     options?: TransactionOptions,
+    sourceMap?: RawSourceMap,
   ) => Promise<TransactionResult<PublishReceipt>>;
   readonly registerAsset: (
     asset: AssetRegister,
     options?: TransactionOptions,
   ) => Promise<TransactionResult<RegisterAssetReceipt>>;
-  readonly issue: (
-    transfers: ReadonlyArray<Transfer>,
-    options?: TransactionOptions,
-  ) => Promise<TransactionResult<TransactionReceipt>>;
+  readonly issue: (transfers: ReadonlyArray<Transfer>, options?: TransactionOptions) => Promise<TransactionResult>;
   readonly invoke: (
-    contract: Hash160String,
+    contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
@@ -670,7 +857,7 @@ export interface UserAccountProvider {
     sourceMap?: RawSourceMap,
   ) => Promise<TransactionResult<RawInvokeReceipt>>;
   readonly call: (
-    contract: Hash160String,
+    contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     options?: TransactionOptions,
@@ -683,7 +870,7 @@ export interface UserAccountProviders {
 }
 
 export interface SmartContractNetworkDefinition {
-  readonly hash: Hash160String;
+  readonly address: AddressString;
 }
 
 export interface SmartContractNetworksDefinition {
@@ -697,7 +884,7 @@ export interface SmartContractDefinition {
 }
 
 export interface ReadSmartContractDefinition {
-  readonly hash: Hash160String;
+  readonly address: AddressString;
   readonly abi: ABI;
   readonly sourceMap?: RawSourceMap;
 }
@@ -715,11 +902,12 @@ export interface SmartContractAny extends SmartContract {
 
 // tslint:disable-next-line no-any
 export interface ReadSmartContract<TEvent extends Event<string, any> = Event> {
+  readonly definition: ReadSmartContractDefinition;
   readonly iterEvents: (filter?: BlockFilter) => AsyncIterable<TEvent>;
   readonly iterLogs: (filter?: BlockFilter) => AsyncIterable<Log>;
   readonly iterActions: (filter?: BlockFilter) => AsyncIterable<Action>;
   readonly iterStorage: () => AsyncIterable<StorageItem>;
-  readonly convertAction: (action: ActionRaw) => Action;
+  readonly convertAction: (action: RawAction) => Action;
 }
 
 export interface ReadSmartContractAny extends ReadSmartContract {

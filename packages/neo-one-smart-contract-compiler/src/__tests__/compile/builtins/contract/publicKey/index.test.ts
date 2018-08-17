@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../../DiagnosticCode';
 
 describe('PublicKey', () => {
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { PublicKey } from '@neo-one/smart-contract';
       class MyPublicKey implements PublicKey {
@@ -14,7 +14,7 @@ describe('PublicKey', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { PublicKey } from '@neo-one/smart-contract';
       const x = PublicKey;

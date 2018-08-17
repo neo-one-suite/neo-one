@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LocalStringStore saveWallet - nep2 undefined 1`] = `[Error: A password is required when creating accounts on the MainNet.]`;

@@ -15,7 +15,7 @@ import {
   MemberLikeExpression,
 } from '../../builtins';
 import { BuiltinInstanceMemberCall } from '../../builtins/BuiltinInstanceMemberCall';
-import { Types } from '../../helper/types/Types';
+import { Types } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';

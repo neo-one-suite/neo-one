@@ -21,18 +21,19 @@ describe('createEventNotifier', () => {
     }
     expect(action.args.length).toEqual(4);
 
+    // tslint:disable-next-line no-any
     const expectArg = (arg: any, type: string, value: any, mapValue: (val: any) => any) => {
       expect(arg.type).toEqual(type);
       expect(mapValue(arg.value)).toEqual(value);
     };
-    expectArg(action.args[0], 'ByteArray', 'event', (val) => Buffer.from(val, 'hex').toString('utf8'));
+    expectArg(action.args[0], 'Buffer', 'event', (val) => Buffer.from(val, 'hex').toString('utf8'));
     expectArg(action.args[1], 'Integer', '10', (val) => val.toString(10));
-    expectArg(action.args[2], 'ByteArray', 'foo', (val) => Buffer.from(val, 'hex').toString('utf8'));
+    expectArg(action.args[2], 'Buffer', 'foo', (val) => Buffer.from(val, 'hex').toString('utf8'));
     expectArg(action.args[3], 'Integer', '1', (val) => val.toString(10));
   });
 
   test('invalid event name', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { createEventNotifier } from '@neo-one/smart-contract';
 

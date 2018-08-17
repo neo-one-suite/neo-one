@@ -8,6 +8,7 @@ import { Builtins, createBuiltins } from './compile/builtins';
 import { CompilerDiagnostic } from './CompilerDiagnostic';
 import { DiagnosticCode } from './DiagnosticCode';
 import { DiagnosticMessage } from './DiagnosticMessage';
+import { createMemoized, nodeKey, symbolKey, typeKey } from './utils';
 
 export interface DiagnosticOptions {
   readonly error?: boolean;
@@ -29,11 +30,13 @@ const getFullKey = (diagnostic: ts.Diagnostic) =>
 export class Context {
   public readonly builtins: Builtins;
   public readonly analysis: AnalysisService;
+  private readonly memoized = createMemoized();
 
   public constructor(
     public readonly program: ts.Program,
     public readonly typeChecker: ts.TypeChecker,
     public readonly languageService: ts.LanguageService,
+    public readonly smartContractDir: string,
     private readonly mutableDiagnostics: ts.Diagnostic[] = ts.getPreEmitDiagnostics(program),
   ) {
     this.builtins = createBuiltins(this);
@@ -57,8 +60,13 @@ export class Context {
     return _.uniqBy(diagnostics, getFullKey);
   }
 
-  public update(program: ts.Program, typeChecker: ts.TypeChecker, languageService: ts.LanguageService): Context {
-    return new Context(program, typeChecker, languageService, [...this.mutableDiagnostics]);
+  public update(
+    program: ts.Program,
+    typeChecker: ts.TypeChecker,
+    languageService: ts.LanguageService,
+    smartContractDir: string,
+  ): Context {
+    return new Context(program, typeChecker, languageService, smartContractDir, [...this.mutableDiagnostics]);
   }
 
   public reportError(
@@ -103,24 +111,26 @@ export class Context {
       error = DEFAULT_DIAGNOSTIC_OPTIONS.error,
     }: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ts.Type | undefined {
-    const type = this.getNotAnyTypeBase(tsUtils.type_.getType(this.typeChecker, node));
+    return this.memoized('type', nodeKey(node), () => {
+      const type = this.getNotAnyTypeBase(tsUtils.type_.getType(this.typeChecker, node));
 
-    if (type === undefined) {
-      if (error) {
-        this.reportTypeError(node);
-      } else if (warning) {
-        this.reportTypeWarning(node);
+      if (type === undefined) {
+        if (error) {
+          this.reportTypeError(node);
+        } else if (warning) {
+          this.reportTypeWarning(node);
+        }
       }
-    }
 
-    if (type !== undefined) {
-      const constraintType = tsUtils.type_.getConstraint(type);
-      if (constraintType !== undefined) {
-        return constraintType;
+      if (type !== undefined) {
+        const constraintType = tsUtils.type_.getConstraint(type);
+        if (constraintType !== undefined) {
+          return constraintType;
+        }
       }
-    }
 
-    return type;
+      return type;
+    });
   }
 
   public getTypeOfSymbol(
@@ -135,23 +145,25 @@ export class Context {
       return undefined;
     }
 
-    const type = this.getNotAnyTypeBase(tsUtils.type_.getTypeAtLocation(this.typeChecker, symbol, node));
-    if (type === undefined) {
-      if (error) {
-        this.reportTypeError(node);
-      } else if (warning) {
-        this.reportTypeWarning(node);
+    return this.memoized('type-of-symbol', `${symbolKey(symbol)}:${nodeKey(node)}`, () => {
+      const type = this.getNotAnyTypeBase(tsUtils.type_.getTypeAtLocation(this.typeChecker, symbol, node));
+      if (type === undefined) {
+        if (error) {
+          this.reportTypeError(node);
+        } else if (warning) {
+          this.reportTypeWarning(node);
+        }
       }
-    }
 
-    if (type !== undefined) {
-      const constraintType = tsUtils.type_.getConstraint(type);
-      if (constraintType !== undefined) {
-        return constraintType;
+      if (type !== undefined) {
+        const constraintType = tsUtils.type_.getConstraint(type);
+        if (constraintType !== undefined) {
+          return constraintType;
+        }
       }
-    }
 
-    return type;
+      return type;
+    });
   }
 
   public getSymbol(
@@ -161,23 +173,25 @@ export class Context {
       error = DEFAULT_DIAGNOSTIC_OPTIONS.error,
     }: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ts.Symbol | undefined {
-    const symbol = tsUtils.node.getSymbol(this.typeChecker, node);
-    if (symbol === undefined) {
-      if (error) {
-        this.reportSymbolError(node);
-      } else if (warning) {
-        this.reportSymbolWarning(node);
+    return this.memoized('symbol', nodeKey(node), () => {
+      const symbol = tsUtils.node.getSymbol(this.typeChecker, node);
+      if (symbol === undefined) {
+        if (error) {
+          this.reportSymbolError(node);
+        } else if (warning) {
+          this.reportSymbolWarning(node);
+        }
+
+        return undefined;
       }
 
-      return undefined;
-    }
+      const aliased = tsUtils.symbol.getAliasedSymbol(this.typeChecker, symbol);
+      if (aliased !== undefined) {
+        return aliased;
+      }
 
-    const aliased = tsUtils.symbol.getAliasedSymbol(this.typeChecker, symbol);
-    if (aliased !== undefined) {
-      return aliased;
-    }
-
-    return symbol;
+      return symbol;
+    });
   }
 
   public getTypeSymbol(
@@ -187,64 +201,50 @@ export class Context {
       error = DEFAULT_DIAGNOSTIC_OPTIONS.error,
     }: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ts.Symbol | undefined {
-    const noWarnOrError = { warning: false, error: false };
-    const type = this.getType(node, noWarnOrError);
-    const symbol = this.getSymbolForType(node, type, noWarnOrError);
-    if (symbol === undefined) {
-      if (error) {
-        this.reportSymbolError(node);
-      } else if (warning) {
-        this.reportSymbolWarning(node);
+    return this.memoized('type-symbol', nodeKey(node), () => {
+      const noWarnOrError = { warning: false, error: false };
+      const type = this.getType(node, noWarnOrError);
+      const symbol = this.getSymbolForType(node, type, noWarnOrError);
+      if (symbol === undefined) {
+        if (error) {
+          this.reportSymbolError(node);
+        } else if (warning) {
+          this.reportSymbolWarning(node);
+        }
+
+        return undefined;
       }
 
-      return undefined;
-    }
-
-    const aliased = tsUtils.symbol.getAliasedSymbol(this.typeChecker, symbol);
-    if (aliased !== undefined) {
-      return aliased;
-    }
-
-    return symbol;
+      return symbol;
+    });
   }
 
   public getSymbolForType(
-    node: ts.Node,
+    _node: ts.Node,
     type: ts.Type | undefined,
-    {
-      warning = DEFAULT_DIAGNOSTIC_OPTIONS.warning,
-      error = DEFAULT_DIAGNOSTIC_OPTIONS.error,
-    }: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
+    _options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ts.Symbol | undefined {
     if (type === undefined) {
       return undefined;
     }
 
-    let symbol = tsUtils.type_.getSymbol(type);
-    if (symbol === undefined) {
-      symbol = tsUtils.type_.getAliasSymbol(type);
-    }
+    return this.memoized('symbol-for-type', typeKey(type), () => {
+      let symbol = tsUtils.type_.getSymbol(type);
+      if (symbol === undefined) {
+        symbol = tsUtils.type_.getAliasSymbol(type);
+      }
 
-    if (symbol === undefined) {
-      if (!tsUtils.type_.isSymbolic(type)) {
+      if (symbol === undefined) {
         return undefined;
       }
 
-      if (error) {
-        this.reportSymbolError(node);
-      } else if (warning) {
-        this.reportSymbolWarning(node);
+      const aliased = tsUtils.symbol.getAliasedSymbol(this.typeChecker, symbol);
+      if (aliased !== undefined) {
+        return aliased;
       }
 
-      return undefined;
-    }
-
-    const aliased = tsUtils.symbol.getAliasedSymbol(this.typeChecker, symbol);
-    if (aliased !== undefined) {
-      return aliased;
-    }
-
-    return symbol;
+      return symbol;
+    });
   }
 
   public getNotAnyType(

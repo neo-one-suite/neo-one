@@ -1,230 +1,298 @@
-import BigNumber from 'bignumber.js';
-import { keys, transactions } from '../../../__data__';
+// tslint:disable no-object-mutation
+import { data, factory, keys } from '../../../__data__';
 import { RelayTransactionError } from '../../../errors';
-import { JSONRPCError } from '../../../provider/neoone/errors';
-import { JSONRPCClient } from '../../../provider/neoone/JSONRPCClient';
+import { JSONRPCClient, JSONRPCError, JSONRPCProvider } from '../../../provider';
 
 describe('JSONRPCClient', () => {
-  const expected = '10';
-  const jsonProvider = { request: jest.fn(() => Promise.resolve(expected)) };
-  const provider = new JSONRPCClient(jsonProvider);
-  const testCases = [
-    {
-      method: 'getAccount',
-      args: [keys[0].address],
-    },
-
-    {
-      method: 'getAsset',
-      args: [transactions.register.hash],
-    },
-
-    {
-      method: 'getBlock',
-      args: [transactions.register.hash],
-    },
-
-    {
-      method: 'getBlock',
-      args: [0],
-    },
-
-    {
-      method: 'getBlock',
-      args: [0, { timeoutMS: 1000 }],
-    },
-
-    {
-      method: 'getBestBlockHash',
-      args: [],
-    },
-
-    {
-      method: 'getBlockCount',
-      args: [],
-    },
-
-    {
-      method: 'getContract',
-      args: [keys[0].scriptHash],
-    },
-
-    {
-      method: 'getMemPool',
-      args: [],
-    },
-
-    {
-      method: 'getTransaction',
-      args: [transactions.register.hash],
-    },
-
-    {
-      method: 'getStorageItem',
-      args: [keys[0].scriptHash, '123'],
-      result: { hash: keys[0].scriptHash, key: '123', value: expected },
-    },
-
-    {
-      method: 'getUnspentOutput',
-      args: [
-        {
-          hash: transactions.register.hash,
-          index: 0,
-        },
-      ],
-    },
-
-    {
-      method: 'testInvokeRaw',
-      args: [Buffer.from('123', 'hex')],
-    },
-
-    {
-      method: 'sendTransactionRaw',
-      args: [''],
-    },
-
-    {
-      method: 'relayTransaction',
-      args: [''],
-    },
-
-    {
-      method: 'getOutput',
-      args: [
-        {
-          hash: transactions.register.hash,
-          index: 0,
-        },
-      ],
-    },
-
-    {
-      method: 'getClaimAmount',
-      args: [
-        {
-          hash: transactions.register.hash,
-          index: 0,
-        },
-      ],
-
-      result: new BigNumber(expected),
-    },
-
-    {
-      method: 'getAllStorage',
-      args: [keys[0].scriptHash],
-    },
-
-    {
-      method: 'testInvocation',
-      args: [Buffer.alloc(1, 0)],
-    },
-
-    {
-      method: 'getTransactionReceipt',
-      args: [keys[0].scriptHash],
-    },
-
-    {
-      method: 'getTransactionReceipt',
-      args: [keys[0].scriptHash, { timeoutMS: 1000 }],
-    },
-
-    {
-      method: 'getInvocationData',
-      args: [keys[0].scriptHash],
-    },
-
-    {
-      method: 'getValidators',
-      args: [],
-    },
-
-    {
-      method: 'getNetworkSettings',
-      args: [],
-    },
-
-    {
-      method: 'runConsensusNow',
-      args: [],
-    },
-
-    {
-      method: 'updateSettings',
-      args: [{ secondsPerBlock: 10 }],
-    },
-
-    {
-      method: 'fastForwardOffset',
-      args: [10],
-    },
-
-    {
-      method: 'fastForwardToTime',
-      args: [10],
-    },
-  ];
+  const mockRequest = jest.fn();
+  const provider: Modifiable<JSONRPCProvider> = { request: mockRequest };
+  const client = new JSONRPCClient(provider);
 
   beforeEach(() => {
-    jsonProvider.request.mockClear();
+    mockRequest.mockReset();
   });
 
-  for (const testCase of testCases) {
-    const { method, args } = testCase;
-    let expectedResult: any = expected;
-    if (testCase.result != undefined) {
-      expectedResult = testCase.result;
-    }
+  test('getAccount', async () => {
+    const value = factory.createAccountJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
 
-    test(method, async () => {
-      // @ts-ignore
-      const result = await provider[method](...args);
+    const result = await client.getAccount(keys[0].address);
 
-      expect(result).toEqual(expectedResult);
-      expect(jsonProvider.request).toHaveBeenCalledTimes(1);
-      expect(jsonProvider.request.mock.calls[0]).toMatchSnapshot();
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getAsset', async () => {
+    const value = factory.createAssetJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getAsset(data.hash256s.a);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getBlock - hash', async () => {
+    const value = factory.createBlockJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getBlock(data.hash256s.a);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getBlock - index', async () => {
+    const value = factory.createBlockJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getBlock(10, { timeoutMS: 1000 });
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getBestBlockHash', async () => {
+    const value = data.hash256s.a;
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getBestBlockHash();
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getBlockCount', async () => {
+    const value = 10;
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getBlockCount();
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getContract', async () => {
+    const value = factory.createContractJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getContract(keys[0].address);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getMemPool', async () => {
+    const value = [data.hash256s.a];
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getMemPool();
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getTransaction', async () => {
+    const value = factory.createInvocationTransactionJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getTransaction(data.hash256s.a);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getStorageItem', async () => {
+    const value = data.buffers.a;
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getStorageItem(keys[0].address, data.buffers.b);
+
+    expect(result).toEqual({
+      hash: keys[0].scriptHashString,
+      key: data.buffers.b,
+      value,
     });
-  }
-
-  test('sendTransactionRaw throws RelayTransactionError', async () => {
-    // @ts-ignore
-    jsonProvider.request = jest.fn(() => Promise.resolve(false));
-
-    const result = provider.sendTransactionRaw('');
-
-    await expect(result).rejects.toEqual(new RelayTransactionError('Relay transaction failed.'));
+    expect(mockRequest.mock.calls).toMatchSnapshot();
   });
 
-  test('relayTransaction throws RelayTransactionError', async () => {
-    jsonProvider.request = jest.fn(() => Promise.reject(new JSONRPCError({ code: -110, message: '' })));
+  test('getUnspentOutput - defined', async () => {
+    const value = factory.createOutputJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
 
-    const result = provider.relayTransaction('');
+    const result = await client.getUnspentOutput(factory.createInputJSON());
 
-    await expect(result).rejects.toEqual(new RelayTransactionError(''));
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
   });
 
-  test('relayTransaction throws error', async () => {
-    const error = new JSONRPCError({ code: -1, message: '' });
-    jsonProvider.request = jest.fn(() => Promise.reject(error));
+  test('getUnspentOutput - undefined', async () => {
+    const value = undefined;
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
 
-    const result = provider.relayTransaction('');
+    const result = await client.getUnspentOutput(factory.createInputJSON());
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('testInvokeRaw', async () => {
+    const value = factory.createInvocationResultSuccessJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.testInvokeRaw(data.buffers.a);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('relayTransaction', async () => {
+    const value = factory.createInvocationTransactionJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.relayTransaction(data.buffers.a);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('relayTransaction - relay error', async () => {
+    const message = 'error';
+    mockRequest.mockImplementationOnce(async () => Promise.reject(new JSONRPCError({ message, code: -110 })));
+
+    const result = client.relayTransaction(data.buffers.a);
+
+    await expect(result).rejects.toEqual(new RelayTransactionError(message));
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('relayTransaction - other error', async () => {
+    const error = new Error('error');
+    mockRequest.mockImplementationOnce(async () => Promise.reject(error));
+
+    const result = client.relayTransaction(data.buffers.a);
 
     await expect(result).rejects.toEqual(error);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getOutput', async () => {
+    const value = factory.createOutputJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getOutput(factory.createInputJSON());
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getClaimAmount', async () => {
+    const value = data.bigNumbers.a.toString(10);
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getClaimAmount(factory.createInputJSON());
+
+    expect(result.toString(10)).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getAllStorage', async () => {
+    const value = [factory.createStorageItemJSON()];
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getAllStorage(keys[0].address);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('testInvocation', async () => {
+    const value = factory.createCallReceiptJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.testInvocation(data.buffers.a);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getTransactionReceipt', async () => {
+    const value = factory.createTransactionReceipt();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getTransactionReceipt(data.hash256s.a, { timeoutMS: 1000 });
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getInvocationData', async () => {
+    const value = factory.createInvocationDataJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getInvocationData(data.hash256s.a);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
   });
 
   test('getConnectedPeers', async () => {
-    const expectedPeer = { connected: [] };
-    const jsonProviderPeer = {
-      request: jest.fn(() => Promise.resolve(expectedPeer)),
-    };
+    const value = { connected: [factory.createPeerJSON()] };
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
 
-    const providerPeer = new JSONRPCClient(jsonProviderPeer);
+    const result = await client.getConnectedPeers();
 
-    const result = await providerPeer.getConnectedPeers();
+    expect(result).toEqual(value.connected);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
 
-    await expect(result).toEqual(expectedPeer.connected);
+  test('getNetworkSettings', async () => {
+    const value = factory.createNetworkSettingsJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getNetworkSettings();
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('runConsensusNow', async () => {
+    mockRequest.mockImplementationOnce(async () => Promise.resolve());
+
+    await client.runConsensusNow();
+
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('updateSettings', async () => {
+    mockRequest.mockImplementationOnce(async () => Promise.resolve());
+
+    await client.updateSettings({ secondsPerBlock: 10 });
+
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('fastForwardOffset', async () => {
+    mockRequest.mockImplementationOnce(async () => Promise.resolve());
+
+    await client.fastForwardOffset(10);
+
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('fastForwardToTime', async () => {
+    mockRequest.mockImplementationOnce(async () => Promise.resolve());
+
+    await client.fastForwardToTime(10);
+
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('reset', async () => {
+    mockRequest.mockImplementationOnce(async () => Promise.resolve());
+
+    await client.reset();
+
+    expect(mockRequest.mock.calls).toMatchSnapshot();
   });
 });

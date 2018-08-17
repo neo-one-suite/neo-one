@@ -15,9 +15,6 @@ module.exports = {
   }),
   displayName: 'unit',
   testRegex: '^.*/__tests__/.*\\.test\\.tsx?$',
-  moduleNameMapper: {
-    '^@reactivex/ix-esnext-esm(.*)': '@reactivex/ix-esnext-cjs$1',
-  },
   modulePathIgnorePatterns: ['<rootDir>/dist/.*'],
   coverageReporters: ['json'],
   collectCoverageFrom: [

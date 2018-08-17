@@ -1,9 +1,10 @@
-// tslint:disable no-any
-import { assertAssetType, assertContractParameterType, common } from '@neo-one/client-core';
+// tslint:disable strict-type-predicates
+import { assertAttributeUsageJSON, common } from '@neo-one/client-core';
+import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { InvalidArgumentError, InvalidNamedArgumentError } from './errors';
-import { addressToScriptHash } from './helpers';
+import { InvalidArgumentError } from './errors';
+import { addressToScriptHash, scriptHashToAddress } from './helpers';
 import {
   ABI,
   ABIEvent,
@@ -12,35 +13,35 @@ import {
   ABIReturn,
   AddressString,
   AssetRegister,
-  AttributeArg,
+  AssetType,
+  Attribute,
+  AttributeUsage,
   BlockFilter,
   BufferString,
+  ContractParameterType,
   ContractRegister,
   GetOptions,
-  Hash160String,
   Hash256String,
-  NetworkType,
   PublicKeyString,
+  ReadSmartContractDefinition,
   SmartContractDefinition,
+  SmartContractNetworkDefinition,
+  SmartContractNetworksDefinition,
   TransactionOptions,
-  TransactionReceipt,
-  TransactionResult,
   Transfer,
   UpdateAccountNameOptions,
-  UserAccount,
   UserAccountID,
 } from './types';
-import { converters } from './user/converters';
 
-export const assertString = (name: string, param: any): string => {
+export const assertString = (name: string, param?: unknown): string => {
   if (param == undefined || typeof param !== 'string') {
-    throw new InvalidArgumentError(`Expected string for ${name}, found: ${String(param)}`);
+    throw new InvalidArgumentError('string', name, param);
   }
 
   return param;
 };
 
-export const assertNullableString = (name: string, param?: any): string | undefined => {
+export const assertNullableString = (name: string, param?: unknown): string | undefined => {
   if (param == undefined) {
     return undefined;
   }
@@ -48,450 +49,575 @@ export const assertNullableString = (name: string, param?: any): string | undefi
   return assertString(name, param);
 };
 
-export const assertAddress = (address: any): AddressString => {
-  if (address == undefined || typeof address !== 'string') {
-    throw new InvalidArgumentError(`Address argument was not a string: ${String(address)}`);
-  }
+export const assertAddress = (name: string, addressIn?: unknown): AddressString => {
+  const address = assertString(name, addressIn);
 
   try {
     addressToScriptHash(address);
-  } catch {
-    throw new InvalidArgumentError(`Invalid address: ${address}`);
-  }
 
-  return address;
+    return address;
+  } catch {
+    try {
+      return scriptHashToAddress(address);
+    } catch {
+      throw new InvalidArgumentError('Address', name, address);
+    }
+  }
 };
 
-export const assertHash160 = (hash: any): Hash160String => {
-  const value = assertString('Hash160', hash);
-
-  if (!value.startsWith('0x')) {
-    throw new InvalidArgumentError(`Hash160 must start with '0x', found: ${String(hash)}`);
-  }
+export const assertHash256 = (name: string, hash?: unknown): Hash256String => {
+  const value = assertString(name, hash);
 
   try {
-    common.stringToUInt160(value);
+    return common.uInt256ToString(common.stringToUInt256(value));
   } catch {
-    throw new InvalidArgumentError(`Invalid Hash160 param, found: ${String(hash)}`);
+    throw new InvalidArgumentError('Hash256', name, value);
   }
-
-  return value;
 };
 
-export const assertHash256 = (hash: any): Hash256String => {
-  const value = assertString('Hash256', hash);
-
-  if (!value.startsWith('0x')) {
-    throw new InvalidArgumentError(`Hash256 must start with '0x', found: ${String(hash)}`);
-  }
-
-  try {
-    common.stringToUInt256(value);
-  } catch {
-    throw new InvalidArgumentError(`Invalid Hash256 param, found: ${String(hash)}`);
-  }
-
-  return value;
-};
-
-export const assertBuffer = (buffer: any): BufferString => {
-  const value = assertString('Buffer', buffer);
+export const assertBuffer = (name: string, buffer?: unknown): BufferString => {
+  const value = assertString(name, buffer);
   if (Buffer.from(value, 'hex').toString('hex') !== value.toLowerCase()) {
-    throw new InvalidArgumentError(`Expected hex string, found: ${String(buffer)}`);
+    throw new InvalidArgumentError('Buffer', name, value);
   }
 
   return value;
 };
 
-export const assertPublicKey = (publicKey: any): PublicKeyString => {
-  const value = assertBuffer(publicKey);
+export const assertPublicKey = (name: string, publicKey?: unknown): PublicKeyString => {
+  const value = assertBuffer(name, publicKey);
   try {
-    common.stringToECPoint(value);
-
-    return value;
+    return common.ecPointToString(common.stringToECPoint(value));
   } catch {
-    throw new InvalidArgumentError(`Expected PublicKey, found: ${String(publicKey)}`);
+    throw new InvalidArgumentError('PublicKey', name, value);
   }
 };
 
-export const assertBigNumber = (value: any): BigNumber => {
+export const assertBigNumber = (name: string, value?: unknown): BigNumber => {
   if (value == undefined || !BigNumber.isBigNumber(value)) {
-    throw new InvalidArgumentError(`Expected BigNumber, found: ${String(value)}`);
+    throw new InvalidArgumentError('BigNumber', name, value);
   }
 
-  return value;
+  return value as BigNumber;
 };
 
-export const assertNullableBigNumber = (value: any): BigNumber | undefined => {
+export const assertNullableBigNumber = (name: string, value?: unknown): BigNumber | undefined => {
   if (value == undefined) {
     return undefined;
   }
 
-  return assertBigNumber(value);
+  return assertBigNumber(name, value);
 };
 
-export const assertBoolean = (value: any): boolean => {
+export const assertBoolean = (name: string, value?: unknown): boolean => {
   if (value == undefined || typeof value !== 'boolean') {
-    throw new InvalidArgumentError(`Expected boolean, found: ${String(value)}`);
+    throw new InvalidArgumentError('boolean', name, value);
   }
 
   return value;
 };
 
-export const assertNumber = (value: any): number => {
+export const assertNullableBoolean = (name: string, value?: unknown): boolean | undefined => {
+  if (value == undefined) {
+    return undefined;
+  }
+
+  return assertBoolean(name, value);
+};
+
+export const assertNumber = (name: string, value?: unknown): number => {
   if (value == undefined || typeof value !== 'number') {
-    throw new InvalidArgumentError(`Expected number, found: ${String(value)}`);
+    throw new InvalidArgumentError('number', name, value);
   }
 
   return value;
 };
 
-export const assertNullableNumber = (value: any): number | undefined => {
-  if (value != undefined && typeof value !== 'number') {
-    throw new InvalidArgumentError(`Expected number, found: ${String(value)}`);
+export const assertNullableNumber = (name: string, value?: unknown): number | undefined => {
+  if (value == undefined) {
+    return undefined;
   }
 
-  return value == undefined ? undefined : value;
+  return assertNumber(name, value);
 };
 
-export const assertArray = (value: any): ReadonlyArray<{}> => {
+export const assertArray = (name: string, value?: unknown): ReadonlyArray<unknown> => {
   if (!Array.isArray(value)) {
-    throw new InvalidArgumentError(`Expected Array, found: ${String(value)}`);
+    throw new InvalidArgumentError('Array', name, value);
   }
 
   return value;
 };
 
-export const assertBlockFilter = (filter: any): BlockFilter | undefined => {
+export const assertNullableArray = (name: string, value?: unknown): ReadonlyArray<unknown> => {
+  if (value == undefined) {
+    return [];
+  }
+
+  return assertArray(name, value);
+};
+
+const isObject = (value?: unknown): value is object => value != undefined && typeof value === 'object';
+const assertProperty = <T, Name extends string, P>(
+  value: T,
+  objectName: string,
+  name: Name,
+  assertType: (name: string, v?: unknown) => P,
+): P => {
+  // tslint:disable-next-line no-any
+  const valueAny: any = value;
+
+  return assertType(`${objectName}.${name}`, valueAny[name]);
+};
+
+export const assertBlockFilter = (name: string, filter?: unknown): BlockFilter | undefined => {
   if (filter == undefined) {
     return undefined;
   }
 
-  if (typeof filter !== 'object') {
-    throw new InvalidArgumentError(`Invalid BlockFilter param, found: ${String(filter)}`);
+  if (!isObject(filter)) {
+    throw new InvalidArgumentError('BlockFilter', name, filter);
   }
 
   if (_.isEmpty(filter)) {
-    return {} as any;
+    return {};
   }
 
-  if (filter.indexStart != undefined && typeof filter.indexStart !== 'number') {
-    throw new InvalidArgumentError(`Invalid BlockFilter param, found: ${String(filter)}`);
+  const output = {
+    indexStart: assertProperty(filter, 'BlockFilter', 'indexStart', assertNullableNumber),
+    indexStop: assertProperty(filter, 'BlockFilter', 'indexStop', assertNullableNumber),
+  };
+
+  if (output.indexStart !== undefined && output.indexStop !== undefined && output.indexStart > output.indexStop) {
+    throw new InvalidArgumentError(
+      'BlockFilter',
+      name,
+      JSON.stringify(filter),
+      'Index start was greater than index stop.',
+    );
   }
 
-  if (filter.indexStop != undefined && typeof filter.indexStop !== 'number') {
-    throw new InvalidArgumentError(`Invalid BlockFilter param, found: ${String(filter)}`);
-  }
-
-  if (filter.indexStart != undefined && filter.indexStop != undefined && filter.indexStart > filter.indexStop) {
-    throw new InvalidArgumentError(`Invalid BlockFilter param, found: ${String(filter)}`);
-  }
-
-  return filter;
+  return output;
 };
 
-export const assertGetOptions = (options: any): GetOptions | undefined => {
+export const assertGetOptions = (name: string, options?: unknown): GetOptions | undefined => {
   if (options == undefined) {
     return undefined;
   }
 
-  if (typeof options !== 'object') {
-    throw new InvalidArgumentError(`Invalid GetOptions param, found: ${String(options)}`);
+  if (!isObject(options)) {
+    throw new InvalidArgumentError('GetOptions', name, options);
   }
 
   if (_.isEmpty(options)) {
-    return {} as any;
+    return {};
   }
 
-  if (options.timeout != undefined && typeof options.timeout !== 'number') {
-    throw new InvalidArgumentError(`Invalid GetOptions param, found: ${String(options)}`);
+  return {
+    timeoutMS: assertProperty(options, 'GetOptions', 'timeoutMS', assertNullableNumber),
+  };
+};
+
+const assertAttributeUsage = (name: string, valueIn?: unknown): AttributeUsage => {
+  const value = assertString(name, valueIn);
+  try {
+    return assertAttributeUsageJSON(value);
+  } catch {
+    throw new InvalidArgumentError('AttributeUsage', name, value);
+  }
+};
+
+export const assertAttribute = (name: string, attribute?: unknown): Attribute => {
+  if (!isObject(attribute)) {
+    throw new InvalidArgumentError('Attribute', name, attribute);
   }
 
-  return options;
+  const usage = assertProperty(attribute, 'Attribute', 'usage', assertAttributeUsage);
+  switch (usage) {
+    case 'ContractHash':
+    case 'Vote':
+    case 'Hash1':
+    case 'Hash2':
+    case 'Hash3':
+    case 'Hash4':
+    case 'Hash5':
+    case 'Hash6':
+    case 'Hash7':
+    case 'Hash8':
+    case 'Hash9':
+    case 'Hash10':
+    case 'Hash11':
+    case 'Hash12':
+    case 'Hash13':
+    case 'Hash14':
+    case 'Hash15':
+      return {
+        usage,
+        data: assertProperty(attribute, 'Attribute', 'data', assertHash256),
+      };
+    case 'Script':
+      return {
+        usage,
+        data: assertProperty(attribute, 'Attribute', 'data', assertAddress),
+      };
+    case 'ECDH02':
+    case 'ECDH03':
+      return {
+        usage,
+        data: assertProperty(attribute, 'Attribute', 'data', assertPublicKey),
+      };
+    case 'DescriptionUrl':
+    case 'Description':
+    case 'Remark':
+    case 'Remark1':
+    case 'Remark2':
+    case 'Remark3':
+    case 'Remark4':
+    case 'Remark5':
+    case 'Remark6':
+    case 'Remark7':
+    case 'Remark8':
+    case 'Remark9':
+    case 'Remark10':
+    case 'Remark11':
+    case 'Remark12':
+    case 'Remark13':
+    case 'Remark14':
+    case 'Remark15':
+      return {
+        usage,
+        data: assertProperty(attribute, 'Attribute', 'data', assertBuffer),
+      };
+    default:
+      /* istanbul ignore next */
+      utils.assertNever(usage);
+      /* istanbul ignore next */
+      throw new Error('For TS');
+  }
+};
+
+export const assertTransactionOptions = (name: string, options?: unknown): TransactionOptions | undefined => {
+  if (options == undefined) {
+    return undefined;
+  }
+
+  if (!isObject(options)) {
+    throw new InvalidArgumentError('TransactionOptions', name, options);
+  }
+
+  return {
+    from: assertProperty(options, 'TransactionOptions', 'from', assertNullableUserAccountID),
+    attributes: assertProperty(options, 'TransactionOptions', 'attributes', assertNullableArray).map((value) =>
+      assertAttribute('TransactionOption.attributes', value),
+    ),
+    networkFee: assertProperty(options, 'TransactionOptions', 'networkFee', assertNullableBigNumber),
+    // tslint:disable-next-line no-any
+    monitor: (options as any).monitor,
+  };
+};
+
+const ASSET_TYPES = new Set(['Credit', 'Duty', 'Governing', 'Utility', 'Currency', 'Share', 'Invoice', 'Token']);
+
+const assertAssetType = (name: string, assetTypeIn?: unknown): AssetType => {
+  const assetType = assertString(name, assetTypeIn);
+
+  if (!ASSET_TYPES.has(assetType)) {
+    throw new InvalidArgumentError('AssetType', name, assetType);
+  }
+
+  return assetType as AssetType;
+};
+
+export const assertAssetRegister = (name: string, register?: unknown): AssetRegister => {
+  if (!isObject(register)) {
+    throw new InvalidArgumentError('AssetRegister', name, register);
+  }
+
+  return {
+    type: assertProperty(register, 'AssetRegister', 'type', assertAssetType),
+    name: assertProperty(register, 'AssetRegister', 'name', assertString),
+    amount: assertProperty(register, 'AssetRegister', 'amount', assertBigNumber),
+    precision: assertProperty(register, 'AssetRegister', 'precision', assertNumber),
+    owner: assertProperty(register, 'AssetRegister', 'owner', assertPublicKey),
+    admin: assertProperty(register, 'AssetRegister', 'admin', assertAddress),
+    issuer: assertProperty(register, 'AssetRegister', 'issuer', assertAddress),
+  };
+};
+const CONTRACT_PARAMETER_TYPES = new Set([
+  'Signature',
+  'Boolean',
+  'Integer',
+  'Address',
+  'Hash256',
+  'Buffer',
+  'PublicKey',
+  'String',
+  'Array',
+  'InteropInterface',
+  'Void',
+]);
+
+const assertContractParameterType = (name: string, valueIn?: unknown): ContractParameterType => {
+  const value = assertString(name, valueIn);
+  if (!CONTRACT_PARAMETER_TYPES.has(value)) {
+    throw new InvalidArgumentError('ContractParameterType', name, value);
+  }
+
+  return value as ContractParameterType;
+};
+
+export const assertContractRegister = (name: string, register?: unknown): ContractRegister => {
+  if (!isObject(register)) {
+    throw new InvalidArgumentError('ContractRegister', name, register);
+  }
+
+  return {
+    script: assertProperty(register, 'ContractRegister', 'script', assertBuffer),
+    parameters: assertProperty(register, 'ContractRegister', 'parameters', assertArray).map((value) =>
+      assertContractParameterType('ContractRegister.parameters', value),
+    ),
+    returnType: assertProperty(register, 'ContractRegister', 'returnType', assertContractParameterType),
+    name: assertProperty(register, 'ContractRegister', 'name', assertString),
+    codeVersion: assertProperty(register, 'ContractRegister', 'codeVersion', assertString),
+    author: assertProperty(register, 'ContractRegister', 'author', assertString),
+    email: assertProperty(register, 'ContractRegister', 'email', assertString),
+    description: assertProperty(register, 'ContractRegister', 'description', assertString),
+    storage: assertProperty(register, 'ContractRegister', 'storage', assertBoolean),
+    dynamicInvoke: assertProperty(register, 'ContractRegister', 'dynamicInvoke', assertBoolean),
+    payable: assertProperty(register, 'ContractRegister', 'payable', assertBoolean),
+  };
 };
 
 const ABI_TYPES = new Set([
   'Signature',
   'Boolean',
-  'Hash160',
+  'Address',
   'Hash256',
-  'ByteArray',
+  'Buffer',
   'PublicKey',
   'String',
-  'InteropInterface',
+  'Array',
   'Void',
   'Integer',
-  'Array',
 ]);
 
-export const assertABIReturn = (value: any): ABIReturn => {
-  if (value == undefined || typeof value !== 'object') {
-    throw new InvalidArgumentError(`Invalid ABI return, found: ${String(value)}`);
+const assertABIType = (name: string, valueIn?: unknown): ABIReturn['type'] => {
+  const value = assertString(name, valueIn);
+
+  if (!ABI_TYPES.has(value)) {
+    throw new InvalidArgumentError('ABIType', name, value);
   }
 
-  if (!ABI_TYPES.has(value.type)) {
-    throw new InvalidArgumentError(`Invalid ABI return, found: ${String(value)}`);
-  }
-
-  if (value.type === 'Array') {
-    assertABIReturn(value.value);
-  } else if (value.type === 'Integer') {
-    assertNumber(value.decimals);
-  }
-
-  return value;
+  return value as ABIReturn['type'];
 };
 
-export const assertABIParameter = (value: any): ABIParameter => {
-  if (value == undefined || typeof value !== 'object') {
-    throw new InvalidArgumentError(`Invalid ABI parameter, found: ${String(value)}`);
+const assertABIReturn = (name: string, value?: unknown): ABIReturn => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ABIReturn', name, value);
   }
 
-  assertString('name', value.name);
-  assertABIReturn(value);
-
-  return value;
-};
-
-export const assertABIFunction = (value: any): ABIFunction => {
-  if (value == undefined || typeof value !== 'object') {
-    throw new InvalidArgumentError(`Invalid ABI function, found: ${String(value)}`);
-  }
-
-  assertString('name', value.name);
-  if (value.constant != undefined) {
-    assertBoolean(value.constant);
-  }
-
-  if (value.parameters != undefined) {
-    assertArray(value.parameters).forEach(assertABIParameter);
-  }
-
-  assertABIReturn(value.returnType);
-
-  return value;
-};
-
-export const assertABIEvent = (value: any): ABIEvent => {
-  if (value == undefined || typeof value !== 'object') {
-    throw new InvalidArgumentError(`Invalid ABI event, found: ${String(value)}`);
-  }
-
-  assertString('name', value.name);
-  assertArray(value.parameters).forEach(assertABIParameter);
-
-  return value;
-};
-
-export const assertABI = (abi: any): ABI => {
-  if (abi == undefined || typeof abi !== 'object') {
-    throw new InvalidArgumentError(`Invalid ABI param, found: ${String(abi)}`);
-  }
-
-  assertArray(abi.functions).forEach(assertABIFunction);
-  if (abi.events != undefined) {
-    assertArray(abi.events).forEach(assertABIEvent);
-  }
-
-  return abi;
-};
-
-export const assertAttributeArg = (attribute?: any): AttributeArg => {
-  try {
-    converters.attribute(attribute);
-
-    return attribute;
-  } catch {
-    throw new InvalidNamedArgumentError('AttributeArg', attribute);
+  const type = assertProperty(value, 'ABIReturn', 'type', assertABIType);
+  const optional = assertProperty(value, 'ABIParameter', 'optional', assertNullableBoolean);
+  switch (type) {
+    case 'Signature':
+      return { type, optional };
+    case 'Boolean':
+      return { type, optional };
+    case 'Address':
+      return { type, optional };
+    case 'Hash256':
+      return { type, optional };
+    case 'Buffer':
+      return { type, optional };
+    case 'PublicKey':
+      return { type, optional };
+    case 'String':
+      return { type, optional };
+    case 'Array':
+      return { type, value: assertProperty(value, 'ABIReturn', 'value', assertABIReturn), optional };
+    case 'Void':
+      return { type, optional };
+    case 'Integer':
+      return { type, decimals: assertProperty(value, 'ABIReturn', 'decimals', assertNumber), optional };
+    default:
+      /* istanbul ignore next */
+      utils.assertNever(type);
+      /* istanbul ignore next */
+      throw new Error('For TS');
   }
 };
 
-export const assertTransactionOptions = (options?: any): TransactionOptions | undefined => {
-  if (options == undefined) {
+const assertABIParameter = (propName: string, value?: unknown): ABIParameter => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ABIParameter', propName, value);
+  }
+
+  const type = assertProperty(value, 'ABIParameter', 'type', assertABIType);
+  const name = assertProperty(value, 'ABIParameter', 'name', assertString);
+  const optional = assertProperty(value, 'ABIParameter', 'optional', assertNullableBoolean);
+  switch (type) {
+    case 'Signature':
+      return { type, name, optional };
+    case 'Boolean':
+      return { type, name, optional };
+    case 'Address':
+      return { type, name, optional };
+    case 'Hash256':
+      return { type, name, optional };
+    case 'Buffer':
+      return { type, name, optional };
+    case 'PublicKey':
+      return { type, name, optional };
+    case 'String':
+      return { type, name, optional };
+    case 'Array':
+      return { type, name, optional, value: assertProperty(value, 'ABIParameter', 'value', assertABIReturn) };
+    case 'Void':
+      return { type, name, optional };
+    case 'Integer':
+      return { type, name, optional, decimals: assertProperty(value, 'ABIParameter', 'decimals', assertNumber) };
+    default:
+      /* istanbul ignore next */
+      utils.assertNever(type);
+      /* istanbul ignore next */
+      throw new Error('For TS');
+  }
+};
+
+const assertABIFunction = (name: string, value?: unknown): ABIFunction => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ABIFunction', name, value);
+  }
+
+  return {
+    name: assertProperty(value, 'ABIFunction', 'name', assertString),
+    constant: assertProperty(value, 'ABIFunction', 'constant', assertNullableBoolean),
+    parameters: assertProperty(value, 'ABIFunction', 'parameters', assertNullableArray).map((parameter) =>
+      assertABIParameter('ABIFunction.parameters', parameter),
+    ),
+    verify: assertProperty(value, 'ABIFunction', 'verify', assertNullableBoolean),
+    returnType: assertProperty(value, 'ABIFunction', 'returnType', assertABIReturn),
+  };
+};
+
+const assertABIEvent = (name: string, value?: unknown): ABIEvent => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ABIEvent', name, value);
+  }
+
+  return {
+    name: assertProperty(value, 'ABIEvent', 'name', assertString),
+    parameters: assertProperty(value, 'ABIEvent', 'parameters', assertNullableArray).map((parameter) =>
+      assertABIParameter('ABIEvent.parameters', parameter),
+    ),
+  };
+};
+
+export const assertABI = (name: string, value?: unknown): ABI => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ABI', name, value);
+  }
+
+  return {
+    functions: assertProperty(value, 'ABI', 'functions', assertNullableArray).map((func) =>
+      assertABIFunction('ABI.functions', func),
+    ),
+    events: assertProperty(value, 'ABI', 'events', assertNullableArray).map((func) =>
+      assertABIEvent('ABI.events', func),
+    ),
+  };
+};
+
+const assertSmartContractNetworkDefinition = (name: string, value?: unknown): SmartContractNetworkDefinition => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('SmartContractNetworkDefinition', name, value);
+  }
+
+  return {
+    address: assertProperty(value, 'SmartContractNetworkDefinition', 'address', assertAddress),
+  };
+};
+
+const assertSmartContractNetworksDefinition = (name: string, value?: unknown): SmartContractNetworksDefinition => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('SmartContractNetworksDefinition', name, value);
+  }
+
+  return _.mapValues(value, (val) =>
+    assertSmartContractNetworkDefinition('SmartContractNetworksDefinition', val),
+  ) as SmartContractNetworksDefinition;
+};
+
+export const assertSmartContractDefinition = (name: string, value?: unknown): SmartContractDefinition => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('SmartContractDefinition', name, value);
+  }
+
+  return {
+    networks: assertProperty(value, 'SmartContractDefinition', 'networks', assertSmartContractNetworksDefinition),
+    abi: assertProperty(value, 'SmartContractDefinition', 'abi', assertABI),
+    // tslint:disable-next-line no-any
+    sourceMap: (value as any).sourceMap,
+  };
+};
+
+export const assertReadSmartContractDefinition = (name: string, value?: unknown): ReadSmartContractDefinition => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ReadSmartContractDefinition', name, value);
+  }
+
+  return {
+    address: assertProperty(value, 'ReadSmartContractDefinition', 'address', assertAddress),
+    abi: assertProperty(value, 'ReadSmartContractDefinition', 'abi', assertABI),
+    // tslint:disable-next-line no-any
+    sourceMap: (value as any).sourceMap,
+  };
+};
+
+export const assertTransfer = (name: string, value?: unknown): Transfer => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('Transfer', name, value);
+  }
+
+  return {
+    amount: assertProperty(value, 'Transfer', 'amount', assertBigNumber),
+    asset: assertProperty(value, 'Transfer', 'asset', assertHash256),
+    to: assertProperty(value, 'Transfer', 'to', assertAddress),
+  };
+};
+
+export const assertTransfers = (name: string, valueIn?: unknown): ReadonlyArray<Transfer> => {
+  const value = assertArray(name, valueIn);
+
+  return value.map((val) => assertTransfer(name, val));
+};
+
+export const assertUserAccountID = (name: string, value?: unknown): UserAccountID => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('UserAccountID', name, value);
+  }
+
+  return {
+    network: assertProperty(value, 'UserAccountID', 'network', assertString),
+    address: assertProperty(value, 'UserAccountID', 'address', assertAddress),
+  };
+};
+
+export const assertNullableUserAccountID = (name: string, value?: unknown): UserAccountID | undefined => {
+  if (value == undefined) {
     return undefined;
   }
 
-  if (typeof options !== 'object') {
-    throw new InvalidNamedArgumentError('TransactionOptions', options);
-  }
-
-  const { from } = options;
-  if (from != undefined) {
-    if (typeof from !== 'object') {
-      throw new InvalidNamedArgumentError('TransactionOptions', options);
-    }
-    assertString('TransactionOptions', from.network);
-    assertString('TransactionOptions', from.address);
-  }
-
-  if (options.attributes != undefined) {
-    if (!Array.isArray(options.attributes)) {
-      throw new InvalidNamedArgumentError('TransactionOptions', options);
-    }
-    options.attributes.forEach((attribute: any) => {
-      assertAttributeArg(attribute);
-    });
-  }
-
-  assertNullableBigNumber(options.networkFee);
-
-  return options;
+  return assertUserAccountID(name, value);
 };
 
-const assertStringSimple = (value?: any) => {
-  if (typeof value === 'string') {
-    return value;
-  }
-  throw new InvalidArgumentError(`Expected string, found: ${value}`);
-};
-
-// new general Type-based assert functions
-export const assertAssetRegister = (register?: any): AssetRegister => {
-  try {
-    assertAssetType(register.assetType);
-    assertStringSimple(register.name);
-    assertBigNumber(register.amount);
-    assertNumber(register.precision);
-    assertPublicKey(register.owner);
-    assertAddress(register.admin);
-    assertAddress(register.issuer);
-  } catch (e) {
-    throw new InvalidNamedArgumentError(`AssetRegister`, e);
+export const assertUpdateAccountNameOptions = (name: string, value?: unknown): UpdateAccountNameOptions => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('UpdateAccountNameOptions', name, value);
   }
 
-  return register;
-};
-
-export const assertContractRegister = (register?: any): ContractRegister => {
-  try {
-    assertBuffer(register.script);
-    register.parameters.forEach(assertContractParameterType);
-    assertContractParameterType(register.returnType);
-    assertStringSimple(register.name);
-    assertStringSimple(register.codeVersion);
-    assertStringSimple(register.author);
-    assertStringSimple(register.email);
-    assertStringSimple(register.description);
-    assertBoolean(register.properties.storage);
-    assertBoolean(register.properties.dynamicInvoke);
-    assertBoolean(register.properties.payable);
-  } catch (e) {
-    throw new InvalidNamedArgumentError(`ContractRegister`, e);
-  }
-
-  return register;
-};
-
-export const assertSmartContractDefinition = (definition?: any): SmartContractDefinition => {
-  try {
-    Object.values(definition.networks).forEach((network: any) => assertHash160(network.hash));
-    assertABI(definition.abi);
-  } catch (e) {
-    throw new InvalidNamedArgumentError(`SmartContractDefinition`, e);
-  }
-
-  return definition;
-};
-
-export const assertTransactionReceipt = (receipt?: any): TransactionReceipt => {
-  try {
-    assertNumber(receipt.blockIndex);
-    assertHash256(receipt.blockHash);
-    assertNumber(receipt.transactionIndex);
-  } catch (e) {
-    throw new InvalidNamedArgumentError(`TransactionReceipt`, e);
-  }
-
-  return receipt;
-};
-
-export const assertTransactionResult = (result?: any): TransactionResult<TransactionReceipt> => {
-  try {
-    assertTransactionReceipt(result.receipt);
-  } catch (e) {
-    throw new InvalidNamedArgumentError(`TransactionResult`, e);
-  }
-
-  return result;
-};
-
-export const assertTransfer = (transfer?: any): Transfer => {
-  try {
-    assertBigNumber(transfer.amount);
-    assertHash256(transfer.asset);
-    assertAddress(transfer.to);
-  } catch (e) {
-    throw new InvalidNamedArgumentError(`Transfer`, e);
-  }
-
-  return transfer;
-};
-
-export const assertTransfers = (args?: ReadonlyArray<any>): any => {
-  if (args === undefined) {
-    throw new InvalidArgumentError('getTransfersOptions undefined args');
-  }
-  try {
-    if (args.length >= 3) {
-      assertBigNumber(args[0]);
-      assertHash256(args[1]);
-      assertAddress(args[2]);
-      assertTransactionOptions(args[3]);
-    } else {
-      Object.values(args[0]).forEach(assertTransfer);
-      assertTransactionOptions(args[1]);
-    }
-  } catch (e) {
-    throw new InvalidNamedArgumentError(`Transfers`, e);
-  }
-
-  return args;
-};
-
-export const assertUpdateAccountNameOptions = (options?: any): UpdateAccountNameOptions => {
-  try {
-    assertUserAccountID(options.id);
-    assertStringSimple(options.name);
-  } catch (e) {
-    throw new InvalidNamedArgumentError(`UpdateAccountNameOptions`, e);
-  }
-
-  return options;
-};
-
-export const assertUserAccount = (account?: any): UserAccount => {
-  try {
-    assertStringSimple(account.type);
-    assertUserAccountID(account.id);
-    assertStringSimple(account.name);
-    assertHash160(account.scriptHash);
-    assertPublicKey(account.publicKey);
-    assertBoolean(account.configurableName);
-    assertBoolean(account.deletable);
-  } catch (e) {
-    throw new InvalidNamedArgumentError(`UserAccount`, e);
-  }
-
-  return account;
-};
-
-export const assertUserAccountID = (ID?: any): UserAccountID => {
-  try {
-    assertNetworkType(ID.network);
-    assertAddress(ID.address);
-  } catch (e) {
-    throw new InvalidNamedArgumentError(`UserAccountID`, e);
-  }
-
-  return ID;
-};
-
-export const assertNetworkType = (network?: any): NetworkType => {
-  try {
-    assertStringSimple(network);
-  } catch {
-    throw new InvalidArgumentError(`Expected network string, found: ${network}`);
-  }
-
-  return network;
+  return {
+    id: assertProperty(value, 'UpdateAccountNameOptions', 'id', assertUserAccountID),
+    name: assertProperty(value, 'UpdateAccountNameOptions', 'name', assertString),
+  };
 };

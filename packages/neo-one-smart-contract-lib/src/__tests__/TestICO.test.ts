@@ -1,9 +1,8 @@
-// wallaby.skip
-import BigNumber from 'bignumber.js';
-import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-compiler';
-import * as path from 'path';
-import { privateKeyToScriptHash, assets, scriptHashToAddress, privateKeyToAddress } from '@neo-one/client';
+import { Hash256, privateKeyToAddress } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
+import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-test';
+import BigNumber from 'bignumber.js';
+import * as path from 'path';
 
 const MINTER = {
   PRIVATE_KEY: '536f1e9f0466f6cd5b2ea5374d00f038786daa0f0e892161d6b0cb4d6b154740',
@@ -25,7 +24,7 @@ describe('TestICO', () => {
 
   test('smart contract', async () => {
     crypto.addPublicKey(common.stringToPrivateKey(MINTER.PRIVATE_KEY), common.stringToECPoint(MINTER.PUBLIC_KEY));
-    const { client, networkName, developerClient, smartContract, masterAccountID, masterPrivateKey } = result;
+    const { client, networkName, developerClient, smartContract, masterAccountID } = result;
 
     const [nameResult, decimalsResult, symbolResult, minter, deployResult] = await Promise.all([
       smartContract.name(),
@@ -36,7 +35,7 @@ describe('TestICO', () => {
         name: 'minter',
         privateKey: MINTER.PRIVATE_KEY,
       }),
-      smartContract.deploy(privateKeyToScriptHash(masterPrivateKey), new BigNumber(Math.round(Date.now() / 1000))),
+      smartContract.deploy(masterAccountID.address, new BigNumber(Math.round(Date.now() / 1000))),
     ]);
     expect(nameResult).toEqual('TestToken');
     expect(decimalsResult.toString()).toEqual('8');
@@ -61,12 +60,12 @@ describe('TestICO', () => {
         [
           {
             amount: new BigNumber(10000),
-            asset: assets.NEO_ASSET_HASH,
+            asset: Hash256.NEO,
             to: privateKeyToAddress(MINTER.PRIVATE_KEY),
           },
           {
             amount: new BigNumber(10000),
-            asset: assets.GAS_ASSET_HASH,
+            asset: Hash256.GAS,
             to: privateKeyToAddress(MINTER.PRIVATE_KEY),
           },
         ],
@@ -85,8 +84,8 @@ describe('TestICO', () => {
       transfers: [
         {
           amount: firstMint,
-          asset: assets.NEO_ASSET_HASH,
-          to: scriptHashToAddress(smartContract.definition.networks[client.providers.memory.getNetworks()[0]].hash),
+          asset: Hash256.NEO,
+          to: smartContract.definition.networks[client.providers.memory.getNetworks()[0]].address,
         },
       ],
     });
@@ -103,7 +102,7 @@ describe('TestICO', () => {
     const event = mintReceipt.events[0];
     expect(event.name).toEqual('transfer');
     expect(event.parameters.from).toBeUndefined();
-    expect(event.parameters.to).toEqual(minter.account.scriptHash);
+    expect(event.parameters.to).toEqual(minter.account.id.address);
     if (event.parameters.amount === undefined) {
       expect(event.parameters.amount).toBeTruthy();
       throw new Error('For TS');
@@ -112,7 +111,7 @@ describe('TestICO', () => {
     expect(event.parameters.amount.toString()).toEqual(firstBalance);
 
     const [minterBalance, mintTotalSupply] = await Promise.all([
-      smartContract.balanceOf(minter.account.scriptHash),
+      smartContract.balanceOf(minter.account.id.address),
       smartContract.totalSupply(),
     ]);
 

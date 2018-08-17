@@ -10,11 +10,11 @@ export const tokenABI: ABI = {
       \\"parameters\\": [
         {
           \\"name\\": \\"from\\",
-          \\"type\\": \\"Hash160\\"
+          \\"type\\": \\"Address\\"
         },
         {
           \\"name\\": \\"to\\",
-          \\"type\\": \\"Hash160\\"
+          \\"type\\": \\"Address\\"
         },
         {
           \\"decimals\\": 4,
@@ -28,43 +28,47 @@ export const tokenABI: ABI = {
     {
       \\"constant\\": true,
       \\"name\\": \\"name\\",
+      \\"parameters\\": [],
       \\"returnType\\": {
-        \\"type\\": \\"String\\"
-      }
+          \\"type\\": \\"String\\"
+        }
     },
     {
       \\"constant\\": true,
       \\"name\\": \\"symbol\\",
+      \\"parameters\\": [],
       \\"returnType\\": {
-        \\"type\\": \\"String\\"
-      }
+          \\"type\\": \\"String\\"
+        }
     },
     {
       \\"constant\\": true,
       \\"name\\": \\"decimals\\",
+      \\"parameters\\": [],
       \\"returnType\\": {
-        \\"decimals\\": 0,
-        \\"type\\": \\"Integer\\"
-      }
+          \\"decimals\\": 0,
+          \\"type\\": \\"Integer\\"
+        }
     },
     {
       \\"constant\\": true,
       \\"name\\": \\"totalSupply\\",
+      \\"parameters\\": [],
       \\"returnType\\": {
-        \\"decimals\\": 4,
-        \\"type\\": \\"Integer\\"
-      }
+          \\"decimals\\": 4,
+          \\"type\\": \\"Integer\\"
+        }
     },
     {
       \\"name\\": \\"transfer\\",
       \\"parameters\\": [
         {
           \\"name\\": \\"from\\",
-          \\"type\\": \\"Hash160\\"
+          \\"type\\": \\"Address\\"
         },
         {
           \\"name\\": \\"to\\",
-          \\"type\\": \\"Hash160\\"
+          \\"type\\": \\"Address\\"
         },
         {
           \\"decimals\\": 4,
@@ -82,7 +86,7 @@ export const tokenABI: ABI = {
       \\"parameters\\": [
         {
           \\"name\\": \\"account\\",
-          \\"type\\": \\"Hash160\\"
+          \\"type\\": \\"Address\\"
         }
       ],
       \\"returnType\\": {

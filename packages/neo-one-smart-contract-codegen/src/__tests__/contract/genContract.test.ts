@@ -10,7 +10,7 @@ describe('genContract', () => {
         abiPath: '/foo/bar/one/generated/Token/abi.ts',
         networksDefinition: {
           main: {
-            hash: 'iamahash',
+            address: 'iamahash',
           },
         },
         sourceMap: {

@@ -2,7 +2,7 @@ import ts from 'typescript';
 import { GlobalProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { TypedHelper } from '../common';
+import { TypedHelper } from '../types';
 
 // Input: [numberVal]
 // Output: [value]

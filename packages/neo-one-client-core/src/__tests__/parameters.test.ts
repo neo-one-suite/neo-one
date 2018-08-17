@@ -1,247 +1,449 @@
-import { common, JSONHelper, utils } from '@neo-one/client-core';
-import * as abis from '../__data__/abis';
-import { contracts } from '../__data__/contracts';
-import { InvalidContractParameterError } from '../errors';
-import { contractParameters as parameters } from '../parameters';
+import { data, keys } from '../__data__';
+import { common } from '../common';
+import { contractParameters, converters } from '../parameters';
+import { BufferContractParameter } from '../types';
+import { utils } from '../utils';
 
-describe('parameters', () => {
-  describe('check parameters of correct type', () => {
-    const testCases = ['String', 'Hash160', 'Hash256', 'PublicKey', 'Boolean', 'Signature', 'InteropInterface', 'Void'];
+describe('contractParameters', () => {
+  const undefinedValue: BufferContractParameter = { type: 'Buffer', value: '' };
 
-    for (const param of testCases) {
-      test(param, () => {
-        const result = (parameters as any)[param]((contracts as any)[param], (abis.parameters as any)[param]);
+  test('String - optional undefined', () => {
+    const result = contractParameters.String(undefinedValue, { type: 'String', optional: true });
 
-        expect(result).toEqual((contracts as any)[param].value);
-      });
-    }
-
-    test('Integer', () => {
-      common.fixedToDecimal = jest.fn(() => contracts.Integer.value);
-      const result = parameters.Integer((contracts as any).Integer, (abis.parameters as any).Integer);
-
-      expect(result).toEqual(contracts.Integer.value);
-    });
-
-    test('Array', () => {
-      const result = parameters.Array((contracts as any).Array, (abis.returns as any).Array);
-
-      expect(result).toEqual([contracts.Array.value[0].value]);
-    });
-
-    test('Boolean from array', () => {
-      const boolArray = {
-        type: 'Array',
-        value: [{ type: 'Boolean', value: false }],
-      };
-
-      const result = parameters.Boolean(boolArray as any, (abis.parameters as any).Boolean);
-
-      expect(result).toEqual(false);
-    });
-
-    test('nullable parameter', () => {
-      const result = parameters.String(undefined as any, { ...(abis.parameters as any).String, optional: true });
-
-      expect(result).toBeUndefined();
-    });
-
-    test('nullable abi', () => {
-      const result = parameters.Array(undefined as any, { ...(abis.returns as any).Array, optional: true });
-      expect(result).toBeUndefined();
-    });
+    expect(result).toBeUndefined();
   });
 
-  describe('incorrect parameter types throw errors', () => {
-    const errorTestCases = ['String', 'Hash160', 'Hash256', 'PublicKey', 'Integer', 'Signature', 'Array'];
+  test('String - optional defined', () => {
+    const value = 'foo';
 
-    for (const param of errorTestCases) {
-      test(`${param} throws error`, () => {
-        function testError() {
-          return (parameters as any)[param](contracts.Void, (abis.parameters as any)[param]);
-        }
+    const result = contractParameters.String({ type: 'String', value }, { type: 'String', optional: true });
 
-        let options = [param, 'ByteArray'];
-        if (param === 'Array' || param === 'Signature') {
-          options = [param];
-        }
-        expect(testError).toThrow(new InvalidContractParameterError((contracts as any).Void, options as any) as any);
-      });
-    }
-
-    test('Array to byte array error', () => {
-      function testError() {
-        // @ts-ignore
-        return parameters.ByteArray(contracts.Array as any, (abis.parameters as any).ByteArray);
-      }
-
-      expect(testError).toThrow(
-        // @ts-ignore
-        new InvalidContractParameterError(contracts.Array, [
-          'Signature',
-          'Boolean',
-          'Integer',
-          'Hash160',
-          'Hash256',
-          'ByteArray',
-          'PublicKey',
-          'String',
-          'InteropInterface',
-          'Void',
-        ]),
-      );
-    });
+    expect(result).toEqual(value);
   });
 
-  describe('parameter converted from byte array', () => {
-    const fromByteArrayCases = [
-      {
-        param: 'String',
-        json: 'readBuffer',
-      },
+  test('String - defined', () => {
+    const value = 'foo';
 
-      {
-        param: 'Hash160',
-        json: 'writeUInt160',
-        common: 'bufferToUInt160',
-      },
+    const result = contractParameters.String({ type: 'String', value }, { type: 'String' });
 
-      {
-        param: 'Hash256',
-        json: 'writeUInt256',
-        common: 'bufferToUInt256',
-      },
-
-      {
-        param: 'PublicKey',
-        json: 'readECPoint',
-        common: 'ecPointToString',
-      },
-    ];
-
-    for (const testCase of fromByteArrayCases) {
-      const { param } = testCase;
-
-      test(`${param} from bytearray`, () => {
-        if (testCase.json != undefined) {
-          // @ts-ignore
-          JSONHelper[testCase.json] = jest.fn(() => contracts.ByteArray.value);
-        }
-
-        if (testCase.common != undefined) {
-          // @ts-ignore
-          common[testCase.common] = jest.fn(() => contracts.ByteArray.value);
-        }
-
-        const result = (parameters as any)[param](contracts.ByteArray, (abis.parameters as any)[param]);
-
-        expect(result).toEqual(contracts.ByteArray.value);
-      });
-    }
-
-    test('Integer from byte array', () => {
-      common.fixedToDecimal = jest.fn(() => contracts.ByteArray.value);
-      utils.fromSignedBuffer = jest.fn(() => {
-        // do nothing
-      });
-      JSONHelper.readBuffer = jest.fn(() => {
-        // do nothing
-      });
-      // @ts-ignore
-      const result = parameters.Integer(contracts.ByteArray as any, (abis.parameters as any).Integer);
-
-      expect(result).toEqual(contracts.ByteArray.value);
-    });
+    expect(result).toEqual(value);
   });
 
-  describe('parameter converted to byte array', () => {
-    const toByteArrayCases = [
-      {
-        param: 'Signature',
-        json: 'readBuffer',
-      },
+  test('String - Buffer', () => {
+    const value = 'foo';
 
-      {
-        param: 'Integer',
-        utils: 'toSignedBuffer',
-      },
+    const result = contractParameters.String(
+      { type: 'Buffer', value: Buffer.from(value, 'utf8').toString('hex') },
+      { type: 'String' },
+    );
 
-      {
-        param: 'Hash160',
-        json: 'readUInt160',
-        common: 'uInt160ToBuffer',
-      },
+    expect(result).toEqual(value);
+  });
 
-      {
-        param: 'Hash256',
-        json: 'readUInt256',
-        common: 'uInt256ToBuffer',
-      },
+  test('String - Invalid', () => {
+    const result = () => contractParameters.String({ type: 'Void' }, { type: 'String' });
 
-      {
-        param: 'ByteArray',
-        json: 'readBuffer',
-      },
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
 
-      {
-        param: 'PublicKey',
-        json: 'readECPoint',
-        common: 'ecPointToBuffer',
-      },
-    ];
+  test('Address - optional undefined', () => {
+    const result = contractParameters.Address(undefinedValue, { type: 'Address', optional: true });
 
-    for (const testCase of toByteArrayCases) {
-      const { param } = testCase;
+    expect(result).toBeUndefined();
+  });
 
-      test(`${param} to bytearray`, () => {
-        if (testCase.json != undefined) {
-          // @ts-ignore
-          JSONHelper[testCase.json] = jest.fn(() => contracts[param].value);
-        }
+  test('Address - optional defined', () => {
+    const value = keys[0].address;
 
-        if (testCase.utils != undefined) {
-          // @ts-ignore
-          utils[testCase.utils] = jest.fn(() => contracts[param].value);
-        }
+    const result = contractParameters.Address({ type: 'Address', value }, { type: 'Address', optional: true });
 
-        if (testCase.common != undefined) {
-          // @ts-ignore
-          common[testCase.common] = jest.fn(() => contracts[param].value);
-        }
+    expect(result).toMatchSnapshot();
+  });
 
-        // @ts-ignore
-        const result = parameters.ByteArray((contracts as any)[param], (abis.parameters as any).ByteArray);
+  test('Address - defined', () => {
+    const value = keys[0].address;
 
-        // @ts-ignore
-        expect(result).toEqual(contracts[param].value.toString('hex'));
-      });
-    }
+    const result = contractParameters.Address({ type: 'Address', value }, { type: 'Address' });
 
-    test('String to byte array', () => {
-      const expected = Buffer.from(contracts.String.value, 'utf-8');
+    expect(result).toMatchSnapshot();
+  });
 
-      // @ts-ignore
-      const result = parameters.ByteArray(contracts.String as any, (abis.parameters as any).ByteArray);
+  test('Address - defined', () => {
+    const value = keys[0].scriptHash;
 
-      expect(result).toEqual(expected.toString('hex'));
+    const result = contractParameters.Address({ type: 'Buffer', value: value.toString('hex') }, { type: 'Address' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Address - Invalid', () => {
+    const result = () => contractParameters.Address({ type: 'Void' }, { type: 'Address' });
+
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
+
+  test('Hash256 - optional undefined', () => {
+    const result = contractParameters.Hash256(undefinedValue, { type: 'Hash256', optional: true });
+
+    expect(result).toBeUndefined();
+  });
+
+  test('Hash256 - optional defined', () => {
+    const value = data.hash256s.a;
+
+    const result = contractParameters.Hash256({ type: 'Hash256', value }, { type: 'Hash256', optional: true });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Hash256 - defined', () => {
+    const value = data.hash256s.a;
+
+    const result = contractParameters.Hash256({ type: 'Hash256', value }, { type: 'Hash256' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Hash256 - Buffer', () => {
+    const value = data.hash256s.a;
+
+    const result = contractParameters.Hash256(
+      { type: 'Buffer', value: common.stringToUInt256(value).toString('hex') },
+      { type: 'Hash256' },
+    );
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Hash256 - Invalid', () => {
+    const result = () => contractParameters.Hash256({ type: 'Void' }, { type: 'Hash256' });
+
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
+
+  test('PublicKey - optional undefined', () => {
+    const result = contractParameters.PublicKey(undefinedValue, { type: 'PublicKey', optional: true });
+
+    expect(result).toBeUndefined();
+  });
+
+  test('PublicKey - optional defined', () => {
+    const value = keys[0].publicKeyString;
+
+    const result = contractParameters.PublicKey({ type: 'PublicKey', value }, { type: 'PublicKey', optional: true });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('PublicKey - defined', () => {
+    const value = keys[0].publicKeyString;
+
+    const result = contractParameters.PublicKey({ type: 'PublicKey', value }, { type: 'PublicKey' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('PublicKey - Buffer', () => {
+    const value = keys[0].publicKey;
+
+    const result = contractParameters.PublicKey(
+      { type: 'Buffer', value: value.toString('hex') },
+      { type: 'PublicKey' },
+    );
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('PublicKey - Invalid', () => {
+    const result = () => contractParameters.PublicKey({ type: 'Void' }, { type: 'PublicKey' });
+
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
+
+  test('Integer - optional undefined', () => {
+    const result = contractParameters.Integer(undefinedValue, { type: 'Integer', optional: true, decimals: 4 });
+
+    expect(result).toBeUndefined();
+  });
+
+  test('Integer - optional defined', () => {
+    const value = data.bns.a;
+
+    const result = contractParameters.Integer(
+      { type: 'Integer', value },
+      { type: 'Integer', optional: true, decimals: 4 },
+    );
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Integer - defined', () => {
+    const value = data.bns.a;
+
+    const result = contractParameters.Integer({ type: 'Integer', value }, { type: 'Integer', decimals: 4 });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Integer - Buffer', () => {
+    const value = data.bns.a;
+
+    const result = contractParameters.Integer(
+      { type: 'Buffer', value: utils.toSignedBuffer(value).toString('hex') },
+      { type: 'Integer', decimals: 4 },
+    );
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Integer - Invalid', () => {
+    const result = () => contractParameters.Integer({ type: 'Void' }, { type: 'Integer', decimals: 4 });
+
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
+
+  test('Boolean - optional undefined', () => {
+    const result = contractParameters.Boolean(undefinedValue, { type: 'Boolean', optional: true });
+
+    expect(result).toBeUndefined();
+  });
+
+  test('Boolean - optional defined', () => {
+    const value = true;
+
+    const result = contractParameters.Boolean({ type: 'Boolean', value }, { type: 'Boolean', optional: true });
+
+    expect(result).toEqual(value);
+  });
+
+  test('Boolean - defined', () => {
+    const value = false;
+
+    const result = contractParameters.Boolean({ type: 'Boolean', value }, { type: 'Boolean' });
+
+    expect(result).toEqual(value);
+  });
+
+  test('Boolean - Array', () => {
+    const value = false;
+
+    const result = contractParameters.Boolean(
+      { type: 'Array', value: [{ type: 'Boolean', value }] },
+      { type: 'Boolean' },
+    );
+
+    expect(result).toEqual(value);
+  });
+
+  test('Buffer - optional undefined', () => {
+    const result = contractParameters.Buffer(undefinedValue, { type: 'Buffer', optional: true });
+
+    expect(result).toBeUndefined();
+  });
+
+  test('Buffer - optional defined', () => {
+    const value = data.buffers.a;
+
+    const result = contractParameters.Buffer({ type: 'Buffer', value }, { type: 'Buffer', optional: true });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Buffer - defined', () => {
+    const value = data.buffers.a;
+
+    const result = contractParameters.Buffer({ type: 'Buffer', value }, { type: 'Buffer' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Buffer - Signature', () => {
+    const value = data.signatures.a;
+
+    const result = contractParameters.Buffer({ type: 'Signature', value }, { type: 'Buffer' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Buffer - Boolean', () => {
+    const value = true;
+
+    const result = contractParameters.Buffer({ type: 'Boolean', value }, { type: 'Buffer' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Buffer - Integer', () => {
+    const value = data.bns.a;
+
+    const result = contractParameters.Buffer({ type: 'Integer', value }, { type: 'Buffer' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Buffer - Address', () => {
+    const value = keys[0].address;
+
+    const result = contractParameters.Buffer({ type: 'Address', value }, { type: 'Buffer' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Buffer - Hash256', () => {
+    const value = data.hash256s.a;
+
+    const result = contractParameters.Buffer({ type: 'Hash256', value }, { type: 'Buffer' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Buffer - PublicKey', () => {
+    const value = keys[0].publicKeyString;
+
+    const result = contractParameters.Buffer({ type: 'PublicKey', value }, { type: 'Buffer' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Buffer - String', () => {
+    const value = 'foo';
+
+    const result = contractParameters.Buffer({ type: 'String', value }, { type: 'Buffer' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Buffer - InteropInterface', () => {
+    const result = contractParameters.Buffer({ type: 'InteropInterface' }, { type: 'Buffer' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Buffer - Void', () => {
+    const result = contractParameters.Buffer({ type: 'Void' }, { type: 'Buffer' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Buffer - Array', () => {
+    const result = () => contractParameters.Buffer({ type: 'Array', value: [] }, { type: 'Buffer' });
+
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
+
+  test('Buffer - Array optional', () => {
+    const result = () => contractParameters.Buffer({ type: 'Array', value: [] }, { type: 'Buffer', optional: true });
+
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
+
+  test('Signature - optional undefined', () => {
+    const result = contractParameters.Signature(undefinedValue, { type: 'Signature', optional: true });
+
+    expect(result).toBeUndefined();
+  });
+
+  test('Signature - optional defined', () => {
+    const value = data.signatures.a;
+
+    const result = contractParameters.Signature({ type: 'Signature', value }, { type: 'Signature', optional: true });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Signature - defined', () => {
+    const value = data.signatures.a;
+
+    const result = contractParameters.Signature({ type: 'Signature', value }, { type: 'Signature' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Signature - defined', () => {
+    const value = data.signatures.a;
+
+    const result = contractParameters.Signature({ type: 'Buffer', value }, { type: 'Signature' });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Signature - Invalid', () => {
+    const result = () => contractParameters.Signature({ type: 'Void' }, { type: 'Signature' });
+
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
+
+  test('Array - optional undefined', () => {
+    const result = contractParameters.Array(undefinedValue, {
+      type: 'Array',
+      optional: true,
+      value: { type: 'Boolean' },
     });
 
-    test('InteropInteface to byte array', () => {
-      const expected = Buffer.alloc(0, 0);
+    expect(result).toBeUndefined();
+  });
 
-      // @ts-ignore
-      const result = parameters.ByteArray(contracts.InteropInterface as any, (abis.parameters as any).ByteArray);
+  test('Array - optional defined', () => {
+    const value = [false];
 
-      expect(result).toEqual(expected.toString('hex'));
-    });
+    const result = contractParameters.Array(
+      { type: 'Array', value: [{ type: 'Boolean', value: false }] },
+      { type: 'Array', optional: true, value: { type: 'Boolean' } },
+    );
 
-    test('Void to byte array', () => {
-      const expected = Buffer.alloc(0, 0);
+    expect(result).toEqual(value);
+  });
 
-      // @ts-ignore
-      const result = parameters.ByteArray(contracts.Void as any, (abis.parameters as any).ByteArray);
+  test('Array - defined', () => {
+    const value = [true];
 
-      expect(result).toEqual(expected.toString('hex'));
-    });
+    const result = contractParameters.Array(
+      { type: 'Array', value: [{ type: 'Boolean', value: true }] },
+      { type: 'Array', value: { type: 'Boolean' } },
+    );
+
+    expect(result).toEqual(value);
+  });
+
+  test('Array - Invalid', () => {
+    const result = () => contractParameters.Array({ type: 'Void' }, { type: 'Array', value: { type: 'Boolean' } });
+
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
+
+  test('InteropInterface - optional undefined', () => {
+    const result = converters.toInteropInterfaceNullable(undefinedValue);
+
+    expect(result).toBeUndefined();
+  });
+
+  test('InteropInterface - optional defined', () => {
+    const result = converters.toInteropInterfaceNullable({ type: 'InteropInterface' });
+
+    expect(result).toEqual(undefined);
+  });
+
+  test('InteropInterface - defined', () => {
+    const result = converters.toInteropInterface({ type: 'InteropInterface' });
+
+    expect(result).toEqual(undefined);
+  });
+
+  test('Void - optional undefined', () => {
+    const result = contractParameters.Void(undefinedValue, { type: 'Void', optional: true });
+
+    expect(result).toBeUndefined();
+  });
+
+  test('Void - optional defined', () => {
+    const result = contractParameters.Void({ type: 'Void' }, { type: 'Void', optional: true });
+
+    expect(result).toEqual(undefined);
+  });
+
+  test('Void - defined', () => {
+    const result = contractParameters.Void({ type: 'Void' }, { type: 'Void' });
+
+    expect(result).toEqual(undefined);
   });
 });

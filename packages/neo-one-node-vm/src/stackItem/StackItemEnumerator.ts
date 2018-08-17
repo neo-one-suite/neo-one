@@ -1,6 +1,6 @@
 import { Equatable } from '@neo-one/client-core';
-import { AsyncIterableX } from '@reactivex/ix-esnext-esm/asynciterable/asynciterablex';
-import { concat } from '@reactivex/ix-esnext-esm/asynciterable/concat';
+import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+import { concat } from '@reactivex/ix-es2015-cjs/asynciterable/concat';
 import { InvalidStorageStackItemEnumeratorError } from './errors';
 import { StackItemBase } from './StackItemBase';
 

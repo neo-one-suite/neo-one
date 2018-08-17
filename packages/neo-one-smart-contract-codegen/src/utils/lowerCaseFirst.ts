@@ -1,1 +1,3 @@
-export const lowerCaseFirst = (value: string): string => `${value[0].toLowerCase()}${value.slice(1)}`;
+import { camel } from 'change-case';
+
+export const lowerCaseFirst = camel;

@@ -16,8 +16,8 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('SignatureString');
   }
 
-  if (text.includes('Hash160String')) {
-    mutableClauses.push('Hash160String');
+  if (text.includes('AddressString')) {
+    mutableClauses.push('AddressString');
   }
 
   if (text.includes('Hash256String')) {
@@ -40,6 +40,10 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('Event');
   }
 
+  if (text.includes('InvokeTransactionOptions')) {
+    mutableClauses.push('InvokeTransactionOptions');
+  }
+
   return mutableClauses;
 };
 
@@ -53,7 +57,9 @@ ${genSmartContract(name, abi)}${genReadSmartContract(name, abi)}`;
   // tslint:disable-next-line no-array-mutation
   importClauses.sort();
 
-  const importDecl = `import { ${importClauses.join(', ')} } from '@neo-one/client';`;
+  const bigNumberImport = text.includes('BigNumber') ? "\nimport BigNumber from 'bignumber.js';" : '';
+
+  const importDecl = `import { ${importClauses.join(', ')} } from '@neo-one/client';${bigNumberImport}`;
   const eventType = `export type ${getEventName(name)} = ${
     events.length === 0 ? '{}' : events.map((event) => getSingleEventName(name, event.name)).join(' | ')
   }`;

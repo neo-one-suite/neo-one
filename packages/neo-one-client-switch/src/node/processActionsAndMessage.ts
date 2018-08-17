@@ -1,4 +1,4 @@
-import { ActionRaw } from '@neo-one/client-core';
+import { RawAction } from '@neo-one/client-core';
 import { RawSourceMap } from 'source-map';
 import { createConsoleLogMessages } from './createConsoleLogMessages';
 import { extractErrorTrace } from './extractErrorTrace';
@@ -9,7 +9,7 @@ export const processActionsAndMessage = async ({
   message: messageIn,
   sourceMap,
 }: {
-  readonly actions: ReadonlyArray<ActionRaw>;
+  readonly actions: ReadonlyArray<RawAction>;
   readonly message: string;
   readonly sourceMap?: RawSourceMap;
 }): Promise<string> => {

@@ -4,8 +4,8 @@ import { createMain } from '@neo-one/node-neo-settings';
 import _ from 'lodash';
 import MemDown from 'memdown';
 import { BehaviorSubject } from 'rxjs';
-import { getMonitor } from '../test/getMonitor';
 import { addCleanup } from './addCleanup';
+import { getMonitor } from './getMonitor';
 
 const getPort = () => _.random(10000, 50000);
 

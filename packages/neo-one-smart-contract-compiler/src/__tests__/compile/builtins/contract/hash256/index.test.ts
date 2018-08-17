@@ -1,10 +1,10 @@
+import { common } from '@neo-one/client-core';
 import { helpers } from '../../../../../__data__';
 import { DiagnosticCode } from '../../../../../DiagnosticCode';
-import { common } from '@neo-one/client-core';
 
 describe('Hash256', () => {
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Hash256 } from '@neo-one/smart-contract';
       class MyHash256 implements Hash256 {
@@ -15,7 +15,7 @@ describe('Hash256', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Hash256 } from '@neo-one/smart-contract';
       const x = Hash256;

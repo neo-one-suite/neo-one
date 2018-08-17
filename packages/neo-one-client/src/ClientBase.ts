@@ -1,6 +1,6 @@
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { filter, map, switchMap, take } from 'rxjs/operators';
-import * as argAssertions from './args';
+import * as args from './args';
 import { UnknownAccountError, UnknownNetworkError } from './errors';
 import {
   InvokeTransactionOptions,
@@ -39,13 +39,11 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
 
     this.accounts$ = this.providers$.pipe(
       switchMap((providers) => combineLatest(Object.values(providers).map((provider) => provider.accounts$))),
-
       map((accountss) => accountss.reduce((acc, accounts) => acc.concat(accounts), [])),
     );
 
     this.networks$ = this.providers$.pipe(
       switchMap((providers) => combineLatest(Object.values(providers).map((provider) => provider.networks$))),
-
       map((networkss) => [...new Set(networkss.reduce((acc, networks) => acc.concat(networks), []))]),
     );
 
@@ -69,42 +67,43 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
   }
 
   public get providers(): TUserAccountProviders {
-    return this.providers$.value;
+    return this.providers$.getValue();
   }
 
-  public getAccount(id: UserAccountID): UserAccount {
-    argAssertions.assertUserAccountID(id);
+  public getAccount(idIn: UserAccountID): UserAccount {
+    const id = args.assertUserAccountID('id', idIn);
     const provider = this.getProvider({ from: id });
     const account = provider
       .getAccounts()
       .find((acct) => acct.id.network === id.network && acct.id.address === id.address);
 
     if (account === undefined) {
+      /* istanbul ignore next */
       throw new UnknownAccountError(id.address);
     }
 
     return account;
   }
 
-  public async selectAccount(id?: UserAccountID): Promise<void> {
-    argAssertions.assertUserAccountID(id);
+  public async selectAccount(idIn?: UserAccountID): Promise<void> {
+    const id = args.assertNullableUserAccountID('id', idIn);
     const provider = this.getProvider({ from: id });
     await provider.selectAccount(id);
     this.selectedProvider$.next(provider);
   }
 
-  public async deleteAccount(id: UserAccountID): Promise<void> {
-    argAssertions.assertUserAccountID(id);
+  public async deleteAccount(idIn: UserAccountID): Promise<void> {
+    const id = args.assertUserAccountID('id', idIn);
     await this.getProvider({ from: id }).deleteAccount(id);
   }
 
-  public async updateAccountName({ id, name }: UpdateAccountNameOptions): Promise<void> {
-    argAssertions.assertUpdateAccountNameOptions({ id, name });
+  public async updateAccountName(options: UpdateAccountNameOptions): Promise<void> {
+    const { id, name } = args.assertUpdateAccountNameOptions('options', options);
     await this.getProvider({ from: id }).updateAccountName({ id, name });
   }
 
   public getCurrentAccount(): UserAccount | undefined {
-    return this.selectedProvider$.value.getCurrentAccount();
+    return this.selectedProvider$.getValue().getCurrentAccount();
   }
 
   public getAccounts(): ReadonlyArray<UserAccount> {
@@ -123,7 +122,7 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
   protected getProvider(options: TransactionOptions | InvokeTransactionOptions = {}): UserAccountProvider {
     const { from } = options;
     if (from === undefined) {
-      return this.selectedProvider$.value;
+      return this.selectedProvider$.getValue();
     }
 
     const providers = Object.values(this.providers);
@@ -143,7 +142,7 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
   protected getNetworkProvider(network: NetworkType): UserAccountProvider {
     const providers = Object.values(this.providers);
     const accountProvider = providers.find((provider) =>
-      provider.getAccounts().some((account) => account.id.network === network),
+      provider.getNetworks().some((providerNetwork) => providerNetwork === network),
     );
 
     if (accountProvider === undefined) {

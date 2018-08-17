@@ -1,359 +1,308 @@
-import BigNumber from 'bignumber.js';
-import { of } from 'rxjs';
+import { of as _of } from 'rxjs';
 import { take } from 'rxjs/operators';
-import * as argAssertions from '../args';
+import { data, factory, keys } from '../__data__';
 import { Client } from '../Client';
-import { InvalidArgumentError, UnknownNetworkError } from '../errors';
-import { createSmartContract } from '../sc/createSmartContract';
-import { UserAccountProvider } from '../types';
-
-jest.mock('../sc/createSmartContract');
+import { Hash256 } from '../Hash256';
+import { TransactionResult, UserAccountProvider } from '../types';
 
 describe('Client', () => {
-  const id1 = { network: 'net1', address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' };
-  const id2 = { network: 'net2', address: 'Aew1QakLBrMqn9pmYpVrgwKPXCqTfzd6sZ' };
-  const account1 = {
-    type: 'test1',
-    id: id1,
-    name: 'account1',
-    scriptHash: 'hash160-1',
-    publicKey: 'pukey-1',
-  };
+  const type = 'memory';
+  const type1 = 'local';
+  const unlockedWallet = factory.createUnlockedWallet();
+  const unlockedWallet1 = factory.createUnlockedWallet({
+    account: factory.createUserAccount({ id: factory.createUserAccountID({ address: keys[2].address }) }),
+  });
+  const lockedWallet = factory.createLockedWallet();
+  const selectAccount = jest.fn();
+  const deleteAccount = jest.fn();
+  const updateAccountName = jest.fn();
+  const commonTransactionResult = factory.createTransactionResult();
+  const claim = jest.fn(() => commonTransactionResult);
+  const publish = jest.fn(() => commonTransactionResult);
+  const publishAndDeploy = jest.fn(() => commonTransactionResult);
+  const registerAsset = jest.fn(() => commonTransactionResult);
+  const readClient = {};
+  const read = jest.fn(() => readClient);
+  const invoke = jest.fn(() => commonTransactionResult);
+  const commonRawCallReceipt = factory.createRawCallReceipt();
+  const call = jest.fn(() => commonRawCallReceipt);
+  let transfer: jest.Mock<TransactionResult>;
+  let transfer1: jest.Mock<TransactionResult>;
+  let issue: jest.Mock<TransactionResult>;
+  let issue1: jest.Mock<TransactionResult>;
 
-  const account2 = {
-    type: 'test2',
-    id: id2,
-    name: 'account2',
-    scriptHash: 'hash160-2',
-    publicKey: 'pubkey-2',
-  };
-
-  const network1 = 'net1';
-  const network2 = 'net2';
-  const provider1: UserAccountProvider = {
-    type: 'test1',
-    currentAccount$: of(account1),
-    accounts$: of([account1]),
-    networks$: of(['net1']),
-    getCurrentAccount: () => account1,
-    getAccounts: () => [account1],
-    getNetworks: () => [network1],
-    deleteAccount: () => [],
-    updateAccountName: () => [],
-    read: () => [],
-  } as any;
-
-  const provider2: UserAccountProvider = {
-    type: 'test2',
-    currentAccount$: of(account2),
-    accounts$: of([account2]),
-    networks$: of(['net2']),
-    getCurrentAccount: () => account2,
-    getAccounts: () => [account2],
-    getNetworks: () => [network2],
-    deleteAccount: () => [],
-    updateAccountName: () => [],
-    read: () => [],
-  } as any;
-
-  let client = new Client({ test1: provider1, test2: provider2 } as any);
+  let provider: UserAccountProvider;
+  let provider1: UserAccountProvider;
+  let client: Client;
   beforeEach(() => {
-    client = new Client({ test1: provider1, test2: provider2 } as any);
+    transfer = jest.fn(() => factory.createTransactionResult());
+    transfer1 = jest.fn(() => factory.createTransactionResult());
+    issue = jest.fn(() => factory.createTransactionResult());
+    issue1 = jest.fn(() => factory.createTransactionResult());
+
+    provider = {
+      type,
+      currentAccount$: _of(unlockedWallet.account),
+      accounts$: _of([unlockedWallet.account]),
+      networks$: _of([unlockedWallet.account.id.network]),
+      getCurrentAccount: jest.fn(() => unlockedWallet.account),
+      getAccounts: jest.fn(() => [unlockedWallet.account]),
+      getNetworks: jest.fn(() => [unlockedWallet.account.id.network]),
+      selectAccount,
+      deleteAccount,
+      updateAccountName,
+      transfer,
+      claim,
+      publish,
+      publishAndDeploy,
+      registerAsset,
+      issue,
+      read,
+      invoke,
+      call,
+    };
+    provider1 = {
+      type: type1,
+      currentAccount$: _of(unlockedWallet1.account),
+      accounts$: _of([unlockedWallet1.account]),
+      networks$: _of([unlockedWallet1.account.id.network]),
+      getCurrentAccount: jest.fn(() => unlockedWallet1.account),
+      getAccounts: jest.fn(() => [unlockedWallet1.account]),
+      getNetworks: jest.fn(() => [unlockedWallet1.account.id.network]),
+      selectAccount: jest.fn(),
+      deleteAccount: jest.fn(),
+      updateAccountName: jest.fn(),
+      transfer: transfer1,
+      claim: jest.fn(),
+      publish: jest.fn(),
+      publishAndDeploy: jest.fn(),
+      registerAsset: jest.fn(),
+      issue: issue1,
+      read: jest.fn(),
+      invoke: jest.fn(),
+      call: jest.fn(),
+    };
+    client = new Client({ [type]: provider, [type1]: provider1 });
   });
 
-  test('Client constructor throws error on undefined client', () => {
-    function testError() {
-      client = new Client({});
-    }
+  test('constructor throws on no provider', () => {
+    const result = () => new Client<{}>({});
 
-    expect(testError).toThrow(new Error('At least one provider is required') as any);
+    expect(result).toThrowErrorMatchingSnapshot();
   });
 
-  test('Client constructor throws error on mismatched provider type', () => {
-    function testError() {
-      client = new Client({
-        test: {
-          type: 'invalid',
-          getCurrentAccount: () => {
-            // do nothing
-          },
-        } as any,
-      });
-    }
+  test('constructor throws on invalid provider key', () => {
+    const result = () => new Client({ ['some-other-type']: provider });
 
-    expect(testError).toThrow(new Error('Provider keys must be named the same as their type') as any);
+    expect(result).toThrowErrorMatchingSnapshot();
   });
 
-  test('Client constructor sets up currentAcount$ observable', async () => {
-    const result = await client.currentAccount$.pipe(take(1)).toPromise();
-    expect(result).toEqual(account1);
-  });
+  test('constructor automatically selects an account', async () => {
+    const localGetCurrentAccount = jest
+      .fn()
+      .mockImplementationOnce(() => undefined)
+      .mockImplementationOnce(() => undefined)
+      .mockImplementationOnce(() => undefined);
+    const localSelectAccount = jest.fn();
 
-  test('Client constructor sets up accounts$ observable', async () => {
-    const result = await client.accounts$.pipe(take(1)).toPromise();
-    expect(result).toEqual([account1, account2]);
-  });
-
-  test('Client constructor sets up networks$ observable', async () => {
-    const result = await client.networks$.pipe(take(1)).toPromise();
-    expect(result).toEqual(['net1', 'net2']);
-  });
-
-  test('get providers', async () => {
-    const result = client.providers;
-    expect(result).toEqual({
-      test1: provider1,
-      test2: provider2,
+    client = new Client({
+      [type]: { ...provider, getCurrentAccount: localGetCurrentAccount, selectAccount: localSelectAccount },
     });
+
+    await new Promise<void>((resolve) => setTimeout(resolve, 10));
+
+    expect(localSelectAccount.mock.calls).toMatchSnapshot();
   });
 
-  test('selectAccount throws error on unknown account', async () => {
-    const accountID = { network: 'fakeNet', address: 'fakeAddr' };
+  test('constructor does not automatically select an account if one exists at the time of selection', async () => {
+    const localGetCurrentAccount = jest
+      .fn()
+      .mockImplementationOnce(() => undefined)
+      .mockImplementationOnce(() => undefined)
+      .mockImplementationOnce(() => unlockedWallet.account);
+    const localSelectAccount = jest.fn();
 
-    const result = client.selectAccount(accountID);
+    client = new Client({
+      [type]: { ...provider, getCurrentAccount: localGetCurrentAccount, selectAccount: localSelectAccount },
+    });
 
-    await expect(result).rejects.toEqual(
-      new InvalidArgumentError(`Invalid argument for UserAccountID: Error: Invalid address: ${accountID.address}`),
-    );
+    await new Promise<void>((resolve) => setTimeout(resolve, 10));
+
+    expect(localSelectAccount.mock.calls).toMatchSnapshot();
   });
 
-  test('selectAccount', async () => {
-    (provider2 as any).selectAccount = jest.fn(() => Promise.resolve());
+  test('currentAccount$', async () => {
+    const result = await client.currentAccount$.pipe(take(1)).toPromise();
 
-    expect(client.getCurrentAccount()).toEqual(account1);
-    await client.selectAccount(id2);
-    expect(client.getCurrentAccount()).toEqual(account2);
+    expect(result).toEqual(unlockedWallet.account);
   });
 
-  test('getAccounts', () => {
-    const expected = [account1, account2];
+  test('accounts$', async () => {
+    const result = await client.accounts$.pipe(take(1)).toPromise();
 
-    const result = client.getAccounts();
-    expect(result).toEqual(expected);
+    expect(result).toEqual([unlockedWallet.account, unlockedWallet1.account]);
+  });
+
+  test('networks$', async () => {
+    const result = await client.networks$.pipe(take(1)).toPromise();
+
+    expect(result).toEqual([unlockedWallet.account.id.network]);
   });
 
   test('getAccount', () => {
-    const expected = account1;
+    const result = client.getAccount(unlockedWallet.account.id);
 
-    const result = client.getAccount(id1);
-    expect(result).toEqual(expected);
+    expect(result).toEqual(unlockedWallet.account);
   });
 
-  test('getAccount throws error on nonexistant account', () => {
-    const idFake = { network: 'fakeNet', address: 'fakeAddr' };
+  test('getAccount - throws on unknown account', () => {
+    const result = () => client.getAccount(lockedWallet.account.id);
 
-    function testError() {
-      return client.getAccount(idFake);
-    }
-    expect(testError).toThrow(new InvalidArgumentError(
-      `Invalid argument for UserAccountID: Error: Invalid address: ${idFake.address}`,
-    ) as any);
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
+
+  test('selectAccount', async () => {
+    await client.selectAccount(unlockedWallet1.account.id);
+
+    expect(selectAccount.mock.calls).toMatchSnapshot();
+    expect(client.getCurrentAccount()).toEqual(unlockedWallet1.account);
   });
 
   test('deleteAccount', async () => {
-    const mocked = jest.fn(() => Promise.resolve());
-    (provider2 as any).deleteAccount = mocked;
+    await client.deleteAccount(unlockedWallet.account.id);
 
-    await client.deleteAccount(id2);
-    expect(mocked.mock.calls).toMatchSnapshot();
+    expect(deleteAccount.mock.calls).toMatchSnapshot();
   });
 
   test('updateAccountName', async () => {
-    const mocked = jest.fn(() => Promise.resolve());
-    (provider2 as any).updateAccountName = mocked;
+    await client.updateAccountName({ id: unlockedWallet.account.id, name: 'newName' });
 
-    await client.updateAccountName({ id: id2, name: 'newName' });
-    expect(mocked.mock.calls).toMatchSnapshot();
+    expect(updateAccountName.mock.calls).toMatchSnapshot();
+  });
+
+  test('getAccounts', () => {
+    const result = client.getAccounts();
+
+    expect(result).toEqual([unlockedWallet.account, unlockedWallet1.account]);
   });
 
   test('getNetworks', () => {
-    const expected = [network1, network2];
-
     const result = client.getNetworks();
-    expect(result).toEqual(expected);
-  });
 
-  test('read', () => {
-    const mocked = jest.fn(() => {
-      // do nothing
-    });
-    (provider1 as any).read = mocked;
-
-    const result = client.read('net1');
-    expect(result).toMatchSnapshot();
-    expect(mocked.mock.calls).toMatchSnapshot();
-  });
-
-  test('read throws error on invalid network', () => {
-    function testError() {
-      return client.read('fakeNet');
-    }
-    expect(testError).toThrow(new UnknownNetworkError('fakeNet') as any);
+    expect(result).toEqual([unlockedWallet.account.id.network]);
   });
 
   test('inject', () => {
-    client = new Client({ test1: provider1 } as any);
+    Client.inject(provider1);
 
-    expect(client.getCurrentAccount()).toEqual(account1);
-    expect(client.providers).toEqual({ test1: provider1 });
-    // any
-    client.inject(provider2);
-
-    expect(client.getCurrentAccount()).toEqual(account2);
-    expect(client.providers).toEqual({
-      test1: provider1,
-      test2: provider2,
-    });
+    expect(client.getCurrentAccount()).toEqual(unlockedWallet1.account);
   });
 
-  test('static inject', () => {
-    client = new Client({ test1: provider1 } as any);
+  test('transfer - simple', async () => {
+    const transactionResult = factory.createTransactionResult();
+    transfer.mockImplementation(() => transactionResult);
 
-    expect(client.getCurrentAccount()).toEqual(account1);
-    expect(client.providers).toEqual({ test1: provider1 });
-    // any
-    Client.inject(provider2);
+    const result = await client.transfer(data.bigNumbers.a, Hash256.NEO, keys[0].address);
 
-    expect(client.getCurrentAccount()).toEqual(account2);
-    expect(client.providers).toEqual({
-      test1: provider1,
-      test2: provider2,
-    });
+    expect(transfer.mock.calls).toMatchSnapshot();
+    expect(result).toEqual(transactionResult);
   });
 
-  const testCases = [
-    {
-      method: 'getCurrentAccount',
-      args: [],
-    },
+  test('transfer - array', async () => {
+    const transactionResult = factory.createTransactionResult();
+    transfer1.mockImplementation(() => transactionResult);
 
-    {
-      method: 'transfer',
-      args: [
-        [
-          {
-            amount: new BigNumber(10),
-            asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-            to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-          },
-        ],
-        undefined,
-      ],
-    },
-
-    {
-      method: 'transfer',
-      args: [
-        [
-          {
-            amount: new BigNumber(10),
-            asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-            to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-          },
-        ],
-      ],
-    },
-
-    {
-      method: 'claim',
-      args: [],
-    },
-
-    {
-      method: 'publish',
-      args: [
-        {
-          script: '02028a99826e',
-          parameters: ['Signature'],
-          returnType: 'Signature',
-          name: 'contract',
-          codeVersion: 'codeVersion',
-          author: 'author',
-          email: 'email',
-          description: 'description',
-          properties: {
-            storage: true,
-            dynamicInvoke: true,
-            payable: true,
-          },
-        },
-      ],
-    },
-
-    {
-      method: 'registerAsset',
-      args: [
-        {
-          assetType: 'CreditFlag',
-          name: 'asset',
-          amount: new BigNumber(10),
-          precision: 20,
-          owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
-          admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-          issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-        },
-      ],
-    },
-
-    {
-      method: 'issue',
-      args: [
-        [
-          {
-            amount: new BigNumber(10),
-            asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-            to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-          },
-        ],
-        undefined,
-      ],
-    },
-
-    {
-      method: '__invoke',
-      args: ['0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9', 1, 2, 3, true],
-      providerMethod: 'invoke',
-    },
-
-    {
-      method: '__call',
-      args: ['0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9', 1, 2],
-      providerMethod: 'call',
-    },
-  ];
-
-  for (const testCase of testCases) {
-    const { method, args } = testCase;
-    const expected = '10';
-
-    let providerMethod = method;
-    if (testCase.providerMethod != undefined) {
-      providerMethod = testCase.providerMethod;
-    }
-    test(method, async () => {
-      (provider1 as any)[providerMethod] = jest.fn(() => Promise.resolve(expected));
-
-      if (method === 'claim' || method === 'publish') {
-        (argAssertions as any).assertTransactionOptions = jest.fn(() => true);
-      }
-      const result = await (client as any)[method](...args);
-      expect(result).toEqual(expected);
+    const result = await client.transfer([{ amount: data.bigNumbers.a, asset: Hash256.NEO, to: keys[0].address }], {
+      from: unlockedWallet1.account.id,
     });
-  }
+
+    expect(transfer1.mock.calls).toMatchSnapshot();
+    expect(result).toEqual(transactionResult);
+  });
+
+  test('claim', async () => {
+    const result = await client.claim();
+
+    expect(transfer.mock.calls).toMatchSnapshot();
+    expect(result).toEqual(commonTransactionResult);
+  });
+
+  test('publish', async () => {
+    const contract = factory.createContractRegister();
+    const result = await client.publish(contract);
+
+    expect(publish.mock.calls).toMatchSnapshot();
+    expect(result).toEqual(commonTransactionResult);
+  });
+
+  test('publishAndDeploy', async () => {
+    const contract = factory.createContractRegister();
+    const result = await client.publishAndDeploy(contract, { functions: [factory.createDeployABIFunction()] });
+
+    expect(publishAndDeploy.mock.calls).toMatchSnapshot();
+    expect(result).toEqual(commonTransactionResult);
+  });
+
+  test('registerAsset', async () => {
+    const asset = factory.createAssetRegister();
+    const result = await client.registerAsset(asset);
+
+    expect(registerAsset.mock.calls).toMatchSnapshot();
+    expect(result).toEqual(commonTransactionResult);
+  });
+
+  test('issue - simple', async () => {
+    const transactionResult = factory.createTransactionResult();
+    issue.mockImplementation(() => transactionResult);
+
+    const result = await client.issue(data.bigNumbers.a, Hash256.NEO, keys[0].address);
+
+    expect(issue.mock.calls).toMatchSnapshot();
+    expect(result).toEqual(transactionResult);
+  });
+
+  test('issue - array', async () => {
+    const transactionResult = factory.createTransactionResult();
+    issue1.mockImplementation(() => transactionResult);
+
+    const result = await client.issue([{ amount: data.bigNumbers.a, asset: Hash256.NEO, to: keys[0].address }], {
+      from: unlockedWallet1.account.id,
+    });
+
+    expect(issue1.mock.calls).toMatchSnapshot();
+    expect(result).toEqual(transactionResult);
+  });
+
+  test('read', () => {
+    const result = client.read(lockedWallet.account.id.network);
+
+    expect(read.mock.calls).toMatchSnapshot();
+    expect(result).toMatchSnapshot();
+  });
+
+  test('read - throws on unknown network', () => {
+    const result = () => client.read('unknown');
+
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
 
   test('smartContract', () => {
-    const expected = {
-      networks: {
-        main: {
-          hash: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9',
-        },
-      },
-      abi: {
-        functions: [],
-      },
-    };
-    (createSmartContract as any).mockImplementation(() => expected);
-    const result = client.smartContract(expected as any);
-    expect(result).toEqual(expected);
+    const result = client.smartContract(factory.createSmartContractDefinition());
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('__invoke', async () => {
+    const result = await client.__invoke(keys[0].address, 'deploy', [], [], true);
+
+    expect(invoke.mock.calls).toMatchSnapshot();
+    expect(result).toEqual(commonTransactionResult);
+  });
+
+  test('__call', async () => {
+    const result = await client.__call(keys[0].address, 'deploy', []);
+
+    expect(call.mock.calls).toMatchSnapshot();
+    expect(result).toEqual(commonRawCallReceipt);
   });
 });

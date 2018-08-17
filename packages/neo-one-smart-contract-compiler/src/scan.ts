@@ -1,13 +1,13 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { Context } from './Context';
 import { createContextForDir } from './createContext';
 
 export interface Contracts {
   readonly [key: string]: ReadonlyArray<string>;
 }
 
-export const scan = async (dir: string): Promise<Contracts> => {
-  const context = await createContextForDir(dir);
+export const scanContext = (context: Context): Contracts => {
   const smartContract = tsUtils.symbol.getDeclarations(context.builtins.getInterfaceSymbol('SmartContract'))[0];
   if (!ts.isInterfaceDeclaration(smartContract)) {
     throw new Error('Something went wrong!');
@@ -29,4 +29,10 @@ export const scan = async (dir: string): Promise<Contracts> => {
 
       return acc;
     }, {});
+};
+
+export const scan = async (dir: string): Promise<Contracts> => {
+  const context = await createContextForDir(dir);
+
+  return scanContext(context);
 };

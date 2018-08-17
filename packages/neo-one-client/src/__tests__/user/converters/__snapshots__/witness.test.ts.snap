@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`witness converts to witness 1`] = `"b500"`;
+
+exports[`witness converts to witness 2`] = `"5f8d70"`;

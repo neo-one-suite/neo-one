@@ -2,7 +2,7 @@ import { helpers } from '../../../__data__';
 
 describe('RegularExpressionLiteralCompiler', () => {
   test('/foo/', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       /foo/
     `,

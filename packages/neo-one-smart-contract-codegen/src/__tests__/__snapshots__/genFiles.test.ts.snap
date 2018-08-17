@@ -12,11 +12,11 @@ export const tokenABI: ABI = {
       parameters: [
         {
           name: 'from',
-          type: 'Hash160',
+          type: 'Address',
         },
         {
           name: 'to',
-          type: 'Hash160',
+          type: 'Address',
         },
         {
           decimals: 4,
@@ -30,6 +30,7 @@ export const tokenABI: ABI = {
     {
       constant: true,
       name: 'name',
+      parameters: [],
       returnType: {
         type: 'String',
       },
@@ -37,6 +38,7 @@ export const tokenABI: ABI = {
     {
       constant: true,
       name: 'symbol',
+      parameters: [],
       returnType: {
         type: 'String',
       },
@@ -44,6 +46,7 @@ export const tokenABI: ABI = {
     {
       constant: true,
       name: 'decimals',
+      parameters: [],
       returnType: {
         decimals: 0,
         type: 'Integer',
@@ -52,6 +55,7 @@ export const tokenABI: ABI = {
     {
       constant: true,
       name: 'totalSupply',
+      parameters: [],
       returnType: {
         decimals: 4,
         type: 'Integer',
@@ -62,11 +66,11 @@ export const tokenABI: ABI = {
       parameters: [
         {
           name: 'from',
-          type: 'Hash160',
+          type: 'Address',
         },
         {
           name: 'to',
-          type: 'Hash160',
+          type: 'Address',
         },
         {
           decimals: 4,
@@ -84,7 +88,7 @@ export const tokenABI: ABI = {
       parameters: [
         {
           name: 'account',
-          type: 'Hash160',
+          type: 'Address',
         },
       ],
       returnType: {
@@ -103,11 +107,21 @@ import { TokenReadSmartContract, TokenSmartContract } from './types';
 const definition: SmartContractDefinition = {
   networks: {
     main: {
-      hash: 'iamahash',
+      address: 'iamahash',
     },
   },
   abi: tokenABI,
 };
+
+export const createTokenSmartContract = (client: Client): TokenSmartContract =>
+  client.smartContract<TokenSmartContract>(definition);
+
+export const createTokenReadSmartContract = (client: ReadClient): TokenReadSmartContract =>
+  client.smartContract<TokenReadSmartContract>({
+    address: definition.networks[client.dataProvider.network].address,
+    abi: definition.abi,
+    sourceMap: definition.sourceMap,
+  });
 
 if (process.env.NODE_ENV !== 'production') {
   (definition as any).sourceMap = {
@@ -118,19 +132,9 @@ if (process.env.NODE_ENV !== 'production') {
     version: 0,
   };
 }
-
-export const createTokenSmartContract = (client: Client): TokenSmartContract =>
-  client.smartContract<TokenSmartContract>(definition);
-
-export const createTokenReadSmartContract = (client: ReadClient): TokenReadSmartContract =>
-  client.smartContract<TokenReadSmartContract>({
-    hash: definition.networks[client.dataProvider.network].hash,
-    abi: definition.abi,
-    sourceMap: definition.sourceMap,
-  });
 ",
   "test": "// tslint:disable
-import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-compiler';
+import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-test';
 import * as path from 'path';
 import { TokenSmartContract } from './types';
 
@@ -139,42 +143,45 @@ export const setupTokenTest = async (): Promise<SetupTestResult<TokenSmartContra
 ",
   "types": "// tslint:disable
 import {
+  AddressString,
   Event,
-  Hash160String,
   InvokeReceipt,
+  InvokeTransactionOptions,
   ReadSmartContract,
   SmartContract,
   TransactionResult,
 } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
 
 export type TokenEvent = TokenTransferEvent;
 
 export interface TokenTransferEventParameters {
-  readonly from: Hash160String;
-  readonly to: Hash160String;
-  readonly amount: number;
+  readonly from: AddressString;
+  readonly to: AddressString;
+  readonly amount: BigNumber;
 }
 export interface TokenTransferEvent extends Event<'transfer', TokenTransferEventParameters> {}
 
 export interface TokenSmartContract extends SmartContract<TokenReadSmartContract> {
-  readonly balanceOf: (account: Hash160String) => Promise<number>;
-  readonly decimals: () => Promise<number>;
+  readonly balanceOf: (account: AddressString) => Promise<BigNumber>;
+  readonly decimals: () => Promise<BigNumber>;
   readonly name: () => Promise<string>;
   readonly symbol: () => Promise<string>;
-  readonly totalSupply: () => Promise<number>;
+  readonly totalSupply: () => Promise<BigNumber>;
   readonly transfer: (
-    from: Hash160String,
-    to: Hash160String,
-    value: number,
-  ) => TransactionResult<InvokeReceipt<boolean, TokenEvent>>;
+    from: AddressString,
+    to: AddressString,
+    value: BigNumber,
+    options?: InvokeTransactionOptions,
+  ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>>>;
 }
 
 export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {
-  readonly balanceOf: (account: Hash160String) => Promise<number>;
-  readonly decimals: () => Promise<number>;
+  readonly balanceOf: (account: AddressString) => Promise<BigNumber>;
+  readonly decimals: () => Promise<BigNumber>;
   readonly name: () => Promise<string>;
   readonly symbol: () => Promise<string>;
-  readonly totalSupply: () => Promise<number>;
+  readonly totalSupply: () => Promise<BigNumber>;
 }
 ",
 }

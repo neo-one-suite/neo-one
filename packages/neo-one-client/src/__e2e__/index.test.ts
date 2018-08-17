@@ -1,3 +1,4 @@
+// tslint:disable-next-line no-implicit-dependencies
 import * as api from '@neo-one/client';
 
 describe('@neo-one/client', () => {
@@ -5,8 +6,8 @@ describe('@neo-one/client', () => {
     'Client',
     'ReadClient',
     'DeveloperClient',
-    'abi',
-    'assets',
+    'Hash256',
+    'nep5',
     'typeGuards',
     // ./user
     'LocalUserAccountProvider',
@@ -36,6 +37,7 @@ describe('@neo-one/client', () => {
   ];
 
   test('has expected exports', () => {
+    // tslint:disable-next-line no-array-mutation no-misleading-array-reverse
     expect(Object.keys(api).sort()).toEqual(EXPECTED.sort());
   });
 

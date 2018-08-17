@@ -2,333 +2,398 @@
 
 exports[`JSONRPCClient fastForwardOffset 1`] = `
 Array [
-  Object {
-    "method": "fastforwardoffset",
-    "params": Array [
-      10,
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "fastforwardoffset",
+      "params": Array [
+        10,
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient fastForwardToTime 1`] = `
 Array [
-  Object {
-    "method": "fastforwardtotime",
-    "params": Array [
-      10,
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "fastforwardtotime",
+      "params": Array [
+        10,
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getAccount 1`] = `
 Array [
-  Object {
-    "method": "getaccountstate",
-    "params": Array [
-      "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getaccountstate",
+      "params": Array [
+        "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getAllStorage 1`] = `
 Array [
-  Object {
-    "method": "getallstorage",
-    "params": Array [
-      "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getallstorage",
+      "params": Array [
+        "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getAsset 1`] = `
 Array [
-  Object {
-    "method": "getassetstate",
-    "params": Array [
-      "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getassetstate",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getBestBlockHash 1`] = `
 Array [
-  Object {
-    "method": "getbestblockhash",
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getbestblockhash",
+    },
+    undefined,
+  ],
 ]
 `;
 
-exports[`JSONRPCClient getBlock 1`] = `
+exports[`JSONRPCClient getBlock - hash 1`] = `
 Array [
-  Object {
-    "method": "getblock",
-    "params": Array [
-      "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
-      1,
-    ],
-    "watchTimeoutMS": undefined,
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getblock",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        1,
+      ],
+      "watchTimeoutMS": undefined,
+    },
+    undefined,
+  ],
 ]
 `;
 
-exports[`JSONRPCClient getBlock 2`] = `
+exports[`JSONRPCClient getBlock - index 1`] = `
 Array [
-  Object {
-    "method": "getblock",
-    "params": Array [
-      0,
-      1,
-    ],
-    "watchTimeoutMS": undefined,
-  },
-  undefined,
-]
-`;
-
-exports[`JSONRPCClient getBlock 3`] = `
-Array [
-  Object {
-    "method": "getblock",
-    "params": Array [
-      0,
-      1,
-    ],
-    "watchTimeoutMS": 1000,
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getblock",
+      "params": Array [
+        10,
+        1,
+      ],
+      "watchTimeoutMS": 1000,
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getBlockCount 1`] = `
 Array [
-  Object {
-    "method": "getblockcount",
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getblockcount",
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getClaimAmount 1`] = `
 Array [
-  Object {
-    "method": "getclaimamount",
-    "params": Array [
-      undefined,
-      undefined,
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getclaimamount",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        2,
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getConnectedPeers 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getpeers",
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getContract 1`] = `
 Array [
-  Object {
-    "method": "getcontractstate",
-    "params": Array [
-      "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getcontractstate",
+      "params": Array [
+        "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getInvocationData 1`] = `
 Array [
-  Object {
-    "method": "getinvocationdata",
-    "params": Array [
-      "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getinvocationdata",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getMemPool 1`] = `
 Array [
-  Object {
-    "method": "getrawmempool",
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getrawmempool",
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getNetworkSettings 1`] = `
 Array [
-  Object {
-    "method": "getnetworksettings",
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getnetworksettings",
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getOutput 1`] = `
 Array [
-  Object {
-    "method": "getoutput",
-    "params": Array [
-      undefined,
-      undefined,
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getoutput",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        2,
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getStorageItem 1`] = `
 Array [
-  Object {
-    "method": "getstorage",
-    "params": Array [
-      "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
-      "123",
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getstorage",
+      "params": Array [
+        "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "5f8d70",
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getTransaction 1`] = `
 Array [
-  Object {
-    "method": "getrawtransaction",
-    "params": Array [
-      "9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5",
-      1,
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "getrawtransaction",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        1,
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient getTransactionReceipt 1`] = `
 Array [
-  Object {
-    "method": "gettransactionreceipt",
-    "params": Array [
-      "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
-    ],
-    "watchTimeoutMS": undefined,
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "gettransactionreceipt",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+      "watchTimeoutMS": 1000,
+    },
+    undefined,
+  ],
 ]
 `;
 
-exports[`JSONRPCClient getTransactionReceipt 2`] = `
+exports[`JSONRPCClient getUnspentOutput - defined 1`] = `
 Array [
-  Object {
-    "method": "gettransactionreceipt",
-    "params": Array [
-      "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
-    ],
-    "watchTimeoutMS": 1000,
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "gettxout",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        2,
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
-exports[`JSONRPCClient getUnspentOutput 1`] = `
+exports[`JSONRPCClient getUnspentOutput - undefined 1`] = `
 Array [
-  Object {
-    "method": "gettxout",
-    "params": Array [
-      undefined,
-      undefined,
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "gettxout",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        2,
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
-exports[`JSONRPCClient getValidators 1`] = `
+exports[`JSONRPCClient relayTransaction - other error 1`] = `
 Array [
-  Object {
-    "method": "getvalidators",
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "relaytransaction",
+      "params": Array [
+        "b500",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient relayTransaction - relay error 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "relaytransaction",
+      "params": Array [
+        "b500",
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient relayTransaction 1`] = `
 Array [
-  Object {
-    "method": "relaytransaction",
-    "params": Array [
-      "",
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "relaytransaction",
+      "params": Array [
+        "b500",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient reset 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "reset",
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient runConsensusNow 1`] = `
 Array [
-  Object {
-    "method": "runconsensusnow",
-  },
-  undefined,
-]
-`;
-
-exports[`JSONRPCClient sendTransactionRaw 1`] = `
-Array [
-  Object {
-    "method": "sendrawtransaction",
-    "params": Array [
-      "",
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "runconsensusnow",
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient testInvocation 1`] = `
 Array [
-  Object {
-    "method": "testinvocation",
-    "params": Array [
-      "00",
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "testinvocation",
+      "params": Array [
+        "b500",
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient testInvokeRaw 1`] = `
 Array [
-  Object {
-    "method": "invokescript",
-    "params": Array [
-      "12",
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "invokescript",
+      "params": Array [
+        "b500",
+      ],
+    },
+    undefined,
+  ],
 ]
 `;
 
 exports[`JSONRPCClient updateSettings 1`] = `
 Array [
-  Object {
-    "method": "updatesettings",
-    "params": Array [
-      Object {
-        "secondsPerBlock": 10,
-      },
-    ],
-  },
-  undefined,
+  Array [
+    Object {
+      "method": "updatesettings",
+      "params": Array [
+        Object {
+          "secondsPerBlock": 10,
+        },
+      ],
+    },
+    undefined,
+  ],
 ]
 `;

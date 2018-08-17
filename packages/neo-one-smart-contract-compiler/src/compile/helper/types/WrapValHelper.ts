@@ -1,9 +1,9 @@
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
+import { Types, WrappableType } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
-import { Types, WrappableType } from './Types';
 
 export interface WrapValHelperOptions {
   readonly type: WrappableType;

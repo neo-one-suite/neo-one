@@ -1,6 +1,6 @@
 import { SysCallName } from '@neo-one/client-core';
 import ts from 'typescript';
-import { WrappableType } from '../../helper/types/Types';
+import { WrappableType } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { BuiltinValue } from '../BuiltinValue';

@@ -1,4 +1,4 @@
-import { abi } from '@neo-one/client';
+import { nep5 } from '@neo-one/client';
 import { genFiles } from '../genFiles';
 
 describe('genFiles', () => {
@@ -11,10 +11,10 @@ describe('genFiles', () => {
         typesPath: '/foo/bar/one/generated/Token/types.ts',
         abiPath: '/foo/bar/one/generated/Token/abi.ts',
         testPath: '/foo/bar/one/generated/Token/setupTest.ts',
-        abi: abi.NEP5_STATIC(4),
+        abi: nep5.abi(4),
         networksDefinition: {
           main: {
-            hash: 'iamahash',
+            address: 'iamahash',
           },
         },
         sourceMap: {

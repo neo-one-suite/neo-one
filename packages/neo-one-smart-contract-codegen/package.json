@@ -7,6 +7,7 @@
     "@neo-one/client": "^1.0.0-alpha.86",
     "@neo-one/client-core": "^1.0.0-alpha.69",
     "@neo-one/utils": "^1.0.0-alpha.58",
+    "change-case": "^3.0.2",
     "lodash": "^4.17.10",
     "prettier": "^1.14.2",
     "safe-stable-stringify": "^1.0.1",

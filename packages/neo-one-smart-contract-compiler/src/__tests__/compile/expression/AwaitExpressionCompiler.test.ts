@@ -2,7 +2,7 @@ import { helpers } from '../../../__data__';
 
 describe('AwaitFunctionCompiler', () => {
   test('await', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       await 2;
     `,

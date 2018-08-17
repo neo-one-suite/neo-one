@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
-import { TypedHelper } from '../../common';
+import { TypedHelper } from '../TypedHelper';
 
 // Input: [val]
 // Output: [boolean]

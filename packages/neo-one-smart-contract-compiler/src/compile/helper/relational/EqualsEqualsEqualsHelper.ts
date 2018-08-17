@@ -1,9 +1,9 @@
 import ts from 'typescript';
+import { Types, WrappableType } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 import { ForBuiltinTypeHelperOptions } from '../types';
-import { Types, WrappableType } from '../types/Types';
 
 export interface EqualsEqualsEqualsHelperOptions {
   readonly leftType: ts.Type | undefined;

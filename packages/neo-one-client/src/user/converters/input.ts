@@ -3,6 +3,6 @@ import { Input as ClientInput } from '../../types';
 
 export const input = (inputLike: ClientInput): Input =>
   new Input({
-    hash: common.stringToUInt256(inputLike.txid),
-    index: inputLike.vout,
+    hash: common.stringToUInt256(inputLike.hash),
+    index: inputLike.index,
   });

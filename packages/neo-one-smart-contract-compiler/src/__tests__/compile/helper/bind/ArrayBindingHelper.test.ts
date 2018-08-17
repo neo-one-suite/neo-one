@@ -15,7 +15,7 @@ describe('ArrayBindingHelper', () => {
     });
 
     test('non-array', async () => {
-      await helpers.compileString(
+      helpers.compileString(
         `
         interface Arr {
           [Symbol.iterator](): IterableIterator<T>;

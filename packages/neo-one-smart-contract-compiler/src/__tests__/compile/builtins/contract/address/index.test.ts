@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../../DiagnosticCode';
 
 describe('Address', () => {
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Address } from '@neo-one/smart-contract';
       class MyAddress implements Address {
@@ -14,7 +14,7 @@ describe('Address', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Address } from '@neo-one/smart-contract';
       const x = Address;

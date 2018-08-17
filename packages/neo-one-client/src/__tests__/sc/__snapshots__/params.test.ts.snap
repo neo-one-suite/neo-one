@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`params Address - defined 1`] = `"3775292229eccdf904f16fff8e83e7cffdc0f0ce"`;
+
+exports[`params Address - optional defined 1`] = `"3775292229eccdf904f16fff8e83e7cffdc0f0ce"`;
+
+exports[`params Buffer - defined 1`] = `"b500"`;
+
+exports[`params Buffer - optional defined 1`] = `"b500"`;
+
+exports[`params Hash256 - defined 1`] = `"3452e7149038e7852cf2a8c9ab72c78bd3776c4b12e18d7536c8a87bd93400b5"`;
+
+exports[`params Hash256 - optional defined 1`] = `"3452e7149038e7852cf2a8c9ab72c78bd3776c4b12e18d7536c8a87bd93400b5"`;
+
+exports[`params Integer - defined 1`] = `"100000"`;
+
+exports[`params Integer - optional defined 1`] = `"100000"`;
+
+exports[`params PublicKey - defined 1`] = `"02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef"`;
+
+exports[`params PublicKey - optional defined 1`] = `"02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef"`;
+
+exports[`params Signature - defined 1`] = `"b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234"`;
+
+exports[`params Signature - optional defined 1`] = `"b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234b50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234"`;
+
+exports[`params Void - defined 1`] = `"Expected Void for paramName, found true"`;

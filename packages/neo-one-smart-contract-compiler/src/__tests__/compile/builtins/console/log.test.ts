@@ -1,9 +1,8 @@
+import { CallReceiptJSON, convertCallReceipt } from '@neo-one/client-core';
+import { createConsoleLogMessages } from '@neo-one/client-switch';
+import { RawSourceMap } from 'source-map';
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
-import { createConsoleLogMessages } from '@neo-one/client-switch';
-import { convertCallReceipt } from '@neo-one/client-core';
-import { CallReceiptJSON } from '@neo-one/client-core';
-import { RawSourceMap } from 'source-map';
 
 const getMessages = async (receiptIn: CallReceiptJSON, sourceMap: RawSourceMap): Promise<ReadonlyArray<string>> => {
   const receipt = convertCallReceipt(receiptIn);
@@ -90,7 +89,7 @@ describe('console.log', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const log = console.log;
     `,

@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`input converts to input 1`] = `"3452e7149038e7852cf2a8c9ab72c78bd3776c4b12e18d7536c8a87bd93400b5"`;

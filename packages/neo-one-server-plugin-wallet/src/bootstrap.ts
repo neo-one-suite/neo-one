@@ -10,10 +10,8 @@ import {
   NEOONEProvider,
   privateKeyToAddress,
   privateKeyToPublicKey,
-  privateKeyToScriptHash,
   PublishReceipt,
   SmartContractAny,
-  TransactionReceipt,
   TransactionResult,
   Transfer,
   UserAccountID,
@@ -30,6 +28,7 @@ import _ from 'lodash';
 import ora from 'ora';
 import * as path from 'path';
 import { of as _of } from 'rxjs';
+import { RawSourceMap } from 'source-map';
 import { constants } from './constants';
 import { WalletPlugin } from './WalletPlugin';
 import { Wallet } from './WalletResourceType';
@@ -83,7 +82,7 @@ export const DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS: ReadonlyArray<[string, string]
 export const DEFAULT_PRIVATE_KEYS = DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS.map(([key]) => key);
 
 export interface AssetInfo {
-  readonly assetType: AssetType;
+  readonly type: AssetType;
   readonly name: string;
   readonly amount: BigNumber;
   readonly precision: number;
@@ -93,7 +92,7 @@ export interface AssetInfo {
 
 export const ASSET_INFO: ReadonlyArray<AssetInfo> = [
   {
-    assetType: 'Token',
+    type: 'Token',
     name: 'redcoin',
     amount: new BigNumber(1000000),
     precision: 4,
@@ -102,7 +101,7 @@ export const ASSET_INFO: ReadonlyArray<AssetInfo> = [
   },
 
   {
-    assetType: 'Token',
+    type: 'Token',
     name: 'bluecoin',
     amount: new BigNumber(660000),
     precision: 0,
@@ -111,7 +110,7 @@ export const ASSET_INFO: ReadonlyArray<AssetInfo> = [
   },
 
   {
-    assetType: 'Currency',
+    type: 'Currency',
     name: 'greencoin',
     amount: new BigNumber(50000000),
     precision: 6,
@@ -425,7 +424,7 @@ async function registerAssets({
     utils.zip(ASSET_INFO, assetWallets).map(async ([asset, wallet]) =>
       client.registerAsset(
         {
-          assetType: asset.assetType,
+          type: asset.type,
           name: asset.name,
           amount: asset.amount,
           precision: asset.precision,
@@ -467,7 +466,7 @@ async function issueAsset({
 }: {
   readonly asset: AssetWithWallet;
   readonly client: Client;
-}): Promise<TransactionResult<TransactionReceipt>> {
+}): Promise<TransactionResult> {
   const transfer = {
     to: asset.wallet.accountID.address,
     asset: asset.hash,
@@ -501,7 +500,7 @@ async function createAssetTransfer({
   readonly wallets: ReadonlyArray<WalletData>;
   readonly asset: AssetWithWallet;
   readonly client: Client;
-}): Promise<TransactionResult<TransactionReceipt>> {
+}): Promise<TransactionResult> {
   const transfers = wallets.map((wallet) => ({
     to: wallet.accountID.address,
     asset: asset.hash,
@@ -773,15 +772,25 @@ const findContracts = async (current: string): Promise<string> => {
   return findContracts(path.dirname(current));
 };
 
-export const compileSmartContract = async (contractName: string): Promise<CompileContractResult> => {
-  const dir = await findContracts(require.resolve('@neo-one/server-plugin-wallet'));
-
-  return compileContract(path.resolve(dir, `${contractName}.ts`), contractName);
+type ContractResult = Omit<CompileContractResult, 'sourceMap'> & {
+  readonly sourceMap: RawSourceMap;
 };
 
-const compileSmartContracts = async (
-  contractNames: ReadonlyArray<string>,
-): Promise<ReadonlyArray<CompileContractResult>> => Promise.all(contractNames.map(compileSmartContract));
+export const compileSmartContract = async (contractName: string): Promise<ContractResult> => {
+  const dir = await findContracts(require.resolve('@neo-one/server-plugin-wallet'));
+
+  const result = compileContract(path.resolve(dir, `${contractName}.ts`), contractName);
+
+  const sourceMap = await result.sourceMap;
+
+  return {
+    ...result,
+    sourceMap,
+  };
+};
+
+const compileSmartContracts = async (contractNames: ReadonlyArray<string>): Promise<ReadonlyArray<ContractResult>> =>
+  Promise.all(contractNames.map(compileSmartContract));
 
 // tslint:disable-next-line no-suspicious-comment
 // TODO: Support using neo-one cli for compiling/publishing when !isRPC
@@ -793,7 +802,7 @@ const publishContract = async ({
   readonly wallet: WalletData;
   readonly isRPC: boolean;
   readonly client: Client;
-  readonly result: CompileContractResult;
+  readonly result: ContractResult;
 }): Promise<TransactionResult<PublishReceipt>> => client.publish(contract, { from: wallet.accountID });
 
 interface TokenWithWallet extends TokenInfo {
@@ -843,21 +852,21 @@ const publishTokens = async ({
         throw new Error(receipt.result.message);
       }
 
-      const hash = receipt.result.value.hash;
+      const address = receipt.result.value.address;
       const smartContract = client.smartContract({
         networks: {
-          [wallet.accountID.network]: { hash },
+          [wallet.accountID.network]: { address },
         },
         abi: compileResult.abi,
         sourceMap: compileResult.sourceMap,
       });
 
-      return { ...token, smartContract, wallet, hash };
+      return { ...token, smartContract, wallet, hash: address };
     });
 
   const deployResults = await Promise.all(
     tokenWithWallets.map(({ smartContract, wallet, amount }) =>
-      smartContract.deploy(privateKeyToScriptHash(wallet.privateKey), amount, {
+      smartContract.deploy(privateKeyToAddress(wallet.privateKey), amount, {
         from: wallet.accountID,
       }),
     ),
@@ -889,8 +898,8 @@ async function transferToken({
   const results = await Promise.all(
     tokens.map(([token, wallet]) =>
       token.smartContract.transfer(
-        privateKeyToScriptHash(token.wallet.privateKey),
-        privateKeyToScriptHash(wallet.privateKey),
+        privateKeyToAddress(token.wallet.privateKey),
+        privateKeyToAddress(wallet.privateKey),
         token.amount
           .div(2)
           .div(count)

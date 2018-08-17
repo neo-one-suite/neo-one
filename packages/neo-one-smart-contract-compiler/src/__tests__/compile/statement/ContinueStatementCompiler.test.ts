@@ -37,7 +37,7 @@ describe('ContinueStatementCompiler', () => {
   });
 
   test('continue label', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       let result = 0;
       foo:

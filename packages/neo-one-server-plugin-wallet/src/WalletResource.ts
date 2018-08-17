@@ -360,7 +360,6 @@ export class WalletResource {
       wif: this.wif,
       nep2: this.wallet.nep2,
       publicKey: this.wallet.account.publicKey,
-      scriptHash: this.wallet.account.scriptHash,
       balance: this.mutableBalance,
     };
   }

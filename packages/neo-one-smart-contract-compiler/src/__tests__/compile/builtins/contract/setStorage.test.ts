@@ -24,7 +24,7 @@ describe('SetStorage', () => {
       interface Contract {
         run(): void;
       }
-      const contract = Address.getSmartContract<Contract>(Address.from('${contract.hash}'));
+      const contract = Address.getSmartContract<Contract>(Address.from('${contract.address}'));
       contract.run();
     `);
   });

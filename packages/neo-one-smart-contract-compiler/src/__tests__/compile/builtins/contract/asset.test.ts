@@ -1,5 +1,5 @@
-import { helpers } from '../../../../__data__';
 import { common } from '@neo-one/client-core';
+import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Asset', () => {
@@ -25,7 +25,7 @@ describe('Asset', () => {
   });
 
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Asset } from '@neo-one/smart-contract';
 
@@ -37,7 +37,7 @@ describe('Asset', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Asset } from '@neo-one/smart-contract';
 

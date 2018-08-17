@@ -1,4 +1,4 @@
-import { Types } from '../Types';
+import { Types } from '../../../constants';
 import { WrapHelper } from '../WrapHelper';
 
 // Input: [boolean]

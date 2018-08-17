@@ -1,10 +1,11 @@
 import { StorageItem, utils } from '@neo-one/client-core';
 
+// tslint:disable-next-line no-any
 export const verifyBlockchainSnapshot = (blockchain: any) => {
   Object.values(blockchain).forEach((obj) => {
     if (typeof obj === 'object') {
       Object.values(obj).forEach((maybeMock) => {
-        if (maybeMock != null && maybeMock.mock != null) {
+        if (maybeMock != undefined && maybeMock.mock != undefined) {
           expect(maybeMock.mock.calls).toMatchSnapshot();
         }
       });
@@ -12,7 +13,9 @@ export const verifyBlockchainSnapshot = (blockchain: any) => {
   });
 };
 
+// tslint:disable-next-line no-any
 export const verifyListeners = (listeners: any) => {
+  // tslint:disable-next-line no-any
   Object.values(listeners).forEach((func: any) => {
     expect(func.mock.calls).toMatchSnapshot();
   });

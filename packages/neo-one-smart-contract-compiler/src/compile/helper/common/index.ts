@@ -3,8 +3,6 @@ export * from './CloneArrayHelper';
 export * from './ConsoleLogHelper';
 export * from './DebugLogHelper';
 export * from './ExpHelper';
-export * from './ForTypeHelper';
 export * from './GenericDeserializeHelper';
 export * from './GenericSerializeHelper';
-export * from './TypedHelper';
 export * from './serialize';

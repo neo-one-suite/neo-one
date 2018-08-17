@@ -9,8 +9,8 @@ import MemDown from 'memdown';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { compile } from '../../compile';
-import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { Context } from '../../Context';
+import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 
 export interface ExecuteOptions {
   readonly prelude?: Buffer;
@@ -37,17 +37,20 @@ export const executeScript = async (
     vm,
     monitor,
   });
-  const { code: compiledCode, sourceMap } = await compile({ context, sourceFile });
+  const { code: compiledCode, sourceMap } = compile({ context, sourceFile });
 
   throwOnDiagnosticErrorOrWarning(context.diagnostics, ignoreWarnings);
 
-  const receipt = await blockchain.invokeScript(Buffer.concat([prelude, compiledCode]), monitor);
+  const [receipt, resolvedSourceMap] = await Promise.all([
+    blockchain.invokeScript(Buffer.concat([prelude, compiledCode]), monitor),
+    sourceMap,
+  ]);
 
   return {
     receipt: {
       result: receipt.result.serializeJSON(blockchain.serializeJSONContext),
       actions: receipt.actions.map((action) => action.serializeJSON(blockchain.serializeJSONContext)),
     },
-    sourceMap,
+    sourceMap: resolvedSourceMap,
   };
 };

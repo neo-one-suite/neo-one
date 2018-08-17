@@ -1,21 +1,13 @@
+import { factory } from '../../../__data__';
 import { witness } from '../../../user/converters/witness';
 
-const invocation = 'cef0c0fdcfe7838eff6ff104f9cdec2922297537';
-const verification = 'fff1d0fdcfe7838eff6ff104f9cdec2922297537';
-
 describe('witness', () => {
-  test('convert to witness', () => {
-    const testWitness = witness({
-      invocation,
-      verification,
-    });
+  test('converts to witness', () => {
+    const value = factory.createWitness();
 
-    expect({
-      invocation: testWitness.invocation,
-      verification: testWitness.verification,
-    }).toEqual({
-      invocation: Buffer.from(invocation, 'hex'),
-      verification: Buffer.from(verification, 'hex'),
-    });
+    const result = witness(value);
+
+    expect(result.invocation).toMatchSnapshot();
+    expect(result.verification).toMatchSnapshot();
   });
 });

@@ -2,7 +2,7 @@ import { helpers, keys } from '../../../../../__data__';
 
 describe('Address.getSmartContract', () => {
   test('reports error on invalid argument values - Object', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
         import { Address } from '@neo-one/smart-contract';
 
@@ -21,7 +21,7 @@ describe('Address.getSmartContract', () => {
   });
 
   test('reports error on invalid argument values - optional Object', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
         import { Address } from '@neo-one/smart-contract';
 
@@ -40,7 +40,7 @@ describe('Address.getSmartContract', () => {
   });
 
   test('reports error on invalid argument return - Object', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
         import { Address } from '@neo-one/smart-contract';
 
@@ -59,7 +59,7 @@ describe('Address.getSmartContract', () => {
   });
 
   test('reports error on invalid argument return - union string | number', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
         import { Address } from '@neo-one/smart-contract';
 
@@ -75,7 +75,7 @@ describe('Address.getSmartContract', () => {
   });
 
   test('reports error on multiple call signatures', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
         import { Address } from '@neo-one/smart-contract';
 
@@ -92,7 +92,7 @@ describe('Address.getSmartContract', () => {
   });
 
   test('reports error on any parameter', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
         import { Address } from '@neo-one/smart-contract';
 
@@ -108,7 +108,7 @@ describe('Address.getSmartContract', () => {
   });
 
   test('reports error on any return', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
         import { Address } from '@neo-one/smart-contract';
 
@@ -124,7 +124,7 @@ describe('Address.getSmartContract', () => {
   });
 
   test('reports error on missing return', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
         import { Address } from '@neo-one/smart-contract';
 
@@ -140,7 +140,7 @@ describe('Address.getSmartContract', () => {
   });
 
   test('reports error on any smart contract type', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
         import { Address } from '@neo-one/smart-contract';
 
@@ -152,7 +152,7 @@ describe('Address.getSmartContract', () => {
   });
 
   test('reports error on non-method properties', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
         import { Address } from '@neo-one/smart-contract';
 
@@ -168,7 +168,7 @@ describe('Address.getSmartContract', () => {
   });
 
   test('reports error on any properties', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
         import { Address } from '@neo-one/smart-contract';
 
@@ -209,8 +209,8 @@ describe('Address.getSmartContract', () => {
       interface Contract {
         run(value: Address): void;
       }
-      const contract = Address.getSmartContract<Contract>(Address.from('${callingContract.hash}'));
-      contract.run(Address.from('${dynamicContract.hash}'));
+      const contract = Address.getSmartContract<Contract>(Address.from('${callingContract.address}'));
+      contract.run(Address.from('${dynamicContract.address}'));
     `);
   });
 });

@@ -5,7 +5,7 @@ import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import { Builtin, isBuiltinInstanceMemberValue, isBuiltinMemberValue } from '../../builtins';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { TypedHelper, TypedHelperOptions } from '../common';
+import { TypedHelper, TypedHelperOptions } from '../types';
 
 export interface ObjectBindingHelperOptions extends TypedHelperOptions {
   readonly value?: ts.Node;

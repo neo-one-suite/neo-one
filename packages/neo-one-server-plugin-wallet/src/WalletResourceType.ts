@@ -52,7 +52,6 @@ export interface Wallet {
   readonly wif: string | undefined;
   readonly nep2: string | undefined;
   readonly publicKey: string;
-  readonly scriptHash: string;
   readonly balance: ReadonlyArray<Coin>;
 }
 
@@ -138,7 +137,6 @@ export class WalletResourceType extends ResourceType<Wallet, WalletResourceOptio
       ['NEP2', resource.nep2 === undefined ? 'N/A' : resource.nep2],
       ['Public Key', resource.publicKey],
       ['Address', resource.address],
-      ['Script Hash', resource.scriptHash],
     ];
 
     return table.concat([

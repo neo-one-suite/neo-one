@@ -1,11 +1,10 @@
-import * as abi from './abi';
-import * as assets from './assets';
+import * as nep5 from './nep5';
 import * as typeGuards from './typeGuards';
 
 export { Client } from './Client';
 export { ReadClient } from './ReadClient';
 export { DeveloperClient } from './DeveloperClient';
-export { abi, assets, typeGuards };
+export { nep5, typeGuards };
 export { LocalKeyStore, LocalMemoryStore, LocalStringStore, LocalUserAccountProvider } from './user';
 export { NEOONEDataProvider, NEOONEProvider } from './provider';
 export {
@@ -24,6 +23,7 @@ export {
   wifToPrivateKey,
 } from './helpers';
 export { createClient, createReadClient } from './preconfigured';
+export { Hash256 } from './Hash256';
 
 export { UnlockedWallet, Wallet as LocalWallet } from './user';
 export {
@@ -34,27 +34,27 @@ export {
   ABIReturn,
   Account,
   Action,
-  ActionRaw,
-  ActionRawBase,
+  RawAction,
+  RawActionBase,
+  AddressContractParameter,
   AddressString,
   ArrayContractParameter,
   Asset,
   AssetRegister,
   AssetType,
   Attribute,
-  AttributeArg,
-  AttributeUsageBuffer,
-  AttributeUsageHash160,
-  AttributeUsageHash256,
-  AttributeUsagePublicKey,
+  AddressAttributeUsage,
+  BufferAttributeUsage,
+  Hash256AttributeUsage,
+  PublicKeyAttributeUsage,
   Block,
   BooleanABIParameter,
   BooleanABIReturn,
   BooleanContractParameter,
+  BufferABIParameter,
+  BufferABIReturn,
+  BufferContractParameter,
   BufferString,
-  ByteArrayABIParameter,
-  ByteArrayABIReturn,
-  ByteArrayContractParameter,
   ClaimTransaction,
   ConfirmedClaimTransaction,
   ConfirmedContractTransaction,
@@ -74,8 +74,6 @@ export {
   ContractTransaction,
   EnrollmentTransaction,
   Event,
-  Hash160ContractParameter,
-  Hash160String,
   Hash256ContractParameter,
   Hash256String,
   Header,
@@ -90,10 +88,10 @@ export {
   InvokeTransactionOptions,
   IssueTransaction,
   Log,
-  LogRaw,
+  RawLog,
   MinerTransaction,
   NetworkType,
-  NotificationRaw,
+  RawNotification,
   Output,
   Param,
   Peer,
@@ -115,7 +113,6 @@ export {
   SmartContractDefinition,
   SmartContractNetworkDefinition,
   SmartContractNetworksDefinition,
-  StateDescriptor,
   StateTransaction,
   StorageItem,
   StringContractParameter,
@@ -127,7 +124,6 @@ export {
   Transfer,
   UserAccount,
   UserAccountID,
-  Validator,
   VoidContractParameter,
   Witness,
 } from './types';

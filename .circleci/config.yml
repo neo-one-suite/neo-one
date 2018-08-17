@@ -101,18 +101,16 @@ aliases:
 
 node10: &node10
   docker:
-    - image: circleci/node:10.8.0
+    - image: circleci/node:10.9.0
 
 version: 2
 jobs:
   test10:
     <<: *node10
     <<: *test
-
   e2e10:
     <<: *node10
     <<: *e2e
-
   build-e2e10:
     <<: *node10
     <<: *build-e2e
@@ -148,7 +146,7 @@ workflows:
     jobs:
       - deploy-website:
           filters: *filter-only-master
-  test:
+  test10:
     jobs:
       - build-e2e10:
           filters: *filter-ignore-gh-pages

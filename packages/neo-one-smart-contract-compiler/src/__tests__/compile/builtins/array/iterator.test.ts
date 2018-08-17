@@ -79,7 +79,7 @@ describe('Array.prototype[Symbol.iterator]', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x[Symbol.iterator];

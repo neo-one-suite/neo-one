@@ -25,7 +25,7 @@ describe('ElementAccessExpressionCompiler', () => {
   });
 
   test('[0, 1, 2]["idx"]', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = [0, 1, 2]
       x['0'];
@@ -99,7 +99,7 @@ describe('ElementAccessExpressionCompiler', () => {
   });
 
   test('buffer["idx"]', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = Buffer.from('3030', 'hex');
       x[1];
@@ -117,7 +117,7 @@ describe('ElementAccessExpressionCompiler', () => {
   });
 
   test('Object["keys"]', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = Object['keys'];
 

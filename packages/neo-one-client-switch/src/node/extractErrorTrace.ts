@@ -1,8 +1,8 @@
-import { ActionRaw, converters } from '@neo-one/client-core';
+import { converters, RawAction } from '@neo-one/client-core';
 import _ from 'lodash';
 import { ProcessErrorError, ProcessErrorTrace } from '../common';
 
-const extractError = (action: ActionRaw): ProcessErrorError | undefined => {
+const extractError = (action: RawAction): ProcessErrorError | undefined => {
   if (action.type === 'Log') {
     return undefined;
   }
@@ -23,7 +23,7 @@ const extractError = (action: ActionRaw): ProcessErrorError | undefined => {
   }
 };
 
-const extractTrace = (action: ActionRaw): ProcessErrorTrace | undefined => {
+const extractTrace = (action: RawAction): ProcessErrorTrace | undefined => {
   if (action.type === 'Log') {
     return undefined;
   }
@@ -43,7 +43,7 @@ const extractTrace = (action: ActionRaw): ProcessErrorTrace | undefined => {
   }
 };
 
-const extractTraces = (actions: ReadonlyArray<ActionRaw>): ReadonlyArray<ProcessErrorTrace> => {
+const extractTraces = (actions: ReadonlyArray<RawAction>): ReadonlyArray<ProcessErrorTrace> => {
   const mutableTraces: ProcessErrorTrace[] = [];
   // tslint:disable-next-line no-loop-statement
   for (const action of actions) {
@@ -63,7 +63,7 @@ const DEFAULT_ERROR = {
 };
 
 export const extractErrorTrace = (
-  actions: ReadonlyArray<ActionRaw>,
+  actions: ReadonlyArray<RawAction>,
 ): {
   readonly error?: ProcessErrorError;
   readonly trace: ReadonlyArray<ProcessErrorTrace>;

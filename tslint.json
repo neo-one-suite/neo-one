@@ -13,9 +13,6 @@
   ],
   "linterOptions": {
     "exclude": [
-      "./packages/*/src/__tests__/**/*",
-      "./packages/*/src/__data__/**/*",
-      "./packages/*/src/__e2e__/**/*",
       "./packages/*/package.json"
     ]
   },
@@ -78,7 +75,7 @@
     "no-submodule-imports": [
       true,
       "rxjs",
-      "@reactivex/ix-esnext-esm",
+      "@reactivex/ix-es2015-cjs",
       "@reactivex"
     ],
     "strict-boolean-expressions": [
@@ -116,7 +113,8 @@
       true,
       "ban-keywords",
       "check-format",
-      "allow-leading-underscore"
+      "allow-leading-underscore",
+      "allow-pascal-case"
     ],
     "export-name": true,
     "no-control-regex": true,

@@ -87,7 +87,7 @@ export class ICO implements SmartContract {
   }
 
   @constant
-  public get remaining(): number {
+  public get remaining(): Fixed<8> {
     return this.mutableRemaining;
   }
 
