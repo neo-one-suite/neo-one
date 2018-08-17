@@ -1,4 +1,5 @@
 import { Network } from '../NetworkResourceType';
+import fetch from 'cross-fetch';
 
 describe('create network', () => {
   test('create network main', async () => {
@@ -15,6 +16,14 @@ describe('create network', () => {
       expect(description.nodes[0].ready).toBeFalsy();
       expect(description.height).toBeGreaterThan(5);
       expect(description.peers).toBeGreaterThan(5);
+
+      const endpoint = description.nodes[0].telemetryAddress;
+      const response = await fetch(endpoint);
+      expect(response.ok).toEqual(true);
+
+      const body = await response.text();
+      const metrics = body.split('\n').filter((line) => line.includes('# TYPE') && line.includes('neo_'));
+      expect(metrics).toMatchSnapshot();
     });
   });
 });
