@@ -1,7 +1,9 @@
 // tslint:disable no-any no-object-mutation readonly-keyword
 import { common, Contract, crypto, StorageItem } from '@neo-one/client-core';
 
-type Storages = { [key: string]: StorageItem };
+interface Storages {
+  [key: string]: StorageItem;
+}
 
 export const createBlockchain = ({ contracts = [] }: { readonly contracts?: ReadonlyArray<Contract> }): any => {
   const blockchain = {
@@ -10,7 +12,6 @@ export const createBlockchain = ({ contracts = [] }: { readonly contracts?: Read
     settings: {
       vm: {},
     },
-
     action: {},
     output: {},
     asset: {},
@@ -22,10 +23,11 @@ export const createBlockchain = ({ contracts = [] }: { readonly contracts?: Read
   if (contracts.length > 0) {
     const scriptHashToContract = contracts.reduce<{ [key: string]: Contract }>((acc, contract) => {
       acc[common.uInt160ToString(crypto.toScriptHash(contract.script))] = contract;
+
       return acc;
     }, {});
     blockchain.contract.get = jest.fn(async ({ hash }) => {
-      const contract = scriptHashToContract[common.uInt160ToString(hash)];
+      const contract = scriptHashToContract[common.uInt160ToString(hash)] as Contract | undefined;
       if (contract === undefined) {
         throw new Error(`Unknown contract: ${common.uInt160ToString(hash)}`);
       }
@@ -59,12 +61,18 @@ export const createBlockchain = ({ contracts = [] }: { readonly contracts?: Read
 
     return item;
   });
-  blockchain.storageItem.tryGet = jest.fn(
-    async ({ hash, key }) => (storage[common.uInt160ToString(hash)] || {})[key.toString('hex')],
-  );
+  blockchain.storageItem.tryGet = jest.fn(async ({ hash, key }) => {
+    const storages = storage[common.uInt160ToString(hash)] as Storages | undefined;
+    if (storages === undefined) {
+      return undefined;
+    }
+
+    return storages[key.toString('hex')];
+  });
 
   blockchain.storageItem.delete = jest.fn(async ({ hash, key }) => {
-    if (storage[common.uInt160ToString(hash)] !== undefined) {
+    if ((storage[common.uInt160ToString(hash)] as Storages | undefined) !== undefined) {
+      // tslint:disable-next-line no-dynamic-delete
       delete storage[common.uInt160ToString(hash)][key.toString('hex')];
     }
   });

@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('IArguments', () => {
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       class MyArray implements IArguments {
       }
@@ -13,7 +13,7 @@ describe('IArguments', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const y = () => {
         const x = arguments;

@@ -2,7 +2,7 @@
 import * as bar from './bar';
 import baz from './baz';
 import { foo } from './foo';
-import { Address, foo as foo2, SmartContract, Foo2SmartContract } from './foo2';
+import { Address, foo as foo2, Foo2SmartContract, SmartContract } from './foo2';
 import incrementValue, { value } from './qux';
 
 if (foo !== 'foo') {

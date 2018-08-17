@@ -20,6 +20,7 @@ const notifyTransfer = createEventNotifier<Address | undefined, Address | undefi
 
 const notifyRefund = createEventNotifier('refund');
 
+// tslint:disable-next-line export-name
 export class ICO implements SmartContract {
   public readonly properties = {
     codeVersion: '1.0',

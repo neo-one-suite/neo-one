@@ -1,0 +1,278 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ReadClient __call 1`] = `
+Array [
+  Array [
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient __iterActionsRaw 1`] = `
+Array [
+  Array [
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getAccount 1`] = `
+Array [
+  Array [
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getAsset 1`] = `
+Array [
+  Array [
+    "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getBestBlockHash 1`] = `
+Array [
+  Array [
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getBlock - number 1`] = `
+Array [
+  Array [
+    0,
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getBlock 1`] = `
+Array [
+  Array [
+    "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getBlockCount 1`] = `
+Array [
+  Array [
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getConnectedPeers 1`] = `
+Array [
+  Array [
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getContract 1`] = `
+Array [
+  Array [
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getMemPool 1`] = `
+Array [
+  Array [
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getOutput 1`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      "index": 0,
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getStorage 1`] = `
+Array [
+  Array [
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "b500",
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient getTransaction 1`] = `
+Array [
+  Array [
+    "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient iterBlocks 1`] = `
+Array [
+  Array [
+    Object {
+      "indexStart": 3,
+      "indexStop": 4,
+    },
+  ],
+]
+`;
+
+exports[`ReadClient iterStorage 1`] = `
+Array [
+  Array [
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "b500",
+    undefined,
+  ],
+]
+`;
+
+exports[`ReadClient smartContract 1`] = `
+Object {
+  "balanceOf": [Function],
+  "convertAction": [Function],
+  "decimals": [Function],
+  "definition": Object {
+    "abi": Object {
+      "events": Array [
+        Object {
+          "name": "transfer",
+          "parameters": Array [
+            Object {
+              "name": "from",
+              "optional": undefined,
+              "type": "Address",
+            },
+            Object {
+              "name": "to",
+              "optional": undefined,
+              "type": "Address",
+            },
+            Object {
+              "decimals": 8,
+              "name": "amount",
+              "optional": undefined,
+              "type": "Integer",
+            },
+          ],
+        },
+      ],
+      "functions": Array [
+        Object {
+          "constant": true,
+          "name": "name",
+          "parameters": Array [],
+          "returnType": Object {
+            "optional": undefined,
+            "type": "String",
+          },
+          "verify": undefined,
+        },
+        Object {
+          "constant": true,
+          "name": "symbol",
+          "parameters": Array [],
+          "returnType": Object {
+            "optional": undefined,
+            "type": "String",
+          },
+          "verify": undefined,
+        },
+        Object {
+          "constant": true,
+          "name": "decimals",
+          "parameters": Array [],
+          "returnType": Object {
+            "decimals": 0,
+            "optional": undefined,
+            "type": "Integer",
+          },
+          "verify": undefined,
+        },
+        Object {
+          "constant": true,
+          "name": "totalSupply",
+          "parameters": Array [],
+          "returnType": Object {
+            "decimals": 8,
+            "optional": undefined,
+            "type": "Integer",
+          },
+          "verify": undefined,
+        },
+        Object {
+          "constant": undefined,
+          "name": "transfer",
+          "parameters": Array [
+            Object {
+              "name": "from",
+              "optional": undefined,
+              "type": "Address",
+            },
+            Object {
+              "name": "to",
+              "optional": undefined,
+              "type": "Address",
+            },
+            Object {
+              "decimals": 8,
+              "name": "value",
+              "optional": undefined,
+              "type": "Integer",
+            },
+          ],
+          "returnType": Object {
+            "optional": undefined,
+            "type": "Boolean",
+          },
+          "verify": undefined,
+        },
+        Object {
+          "constant": true,
+          "name": "balanceOf",
+          "parameters": Array [
+            Object {
+              "name": "account",
+              "optional": undefined,
+              "type": "Address",
+            },
+          ],
+          "returnType": Object {
+            "decimals": 8,
+            "optional": undefined,
+            "type": "Integer",
+          },
+          "verify": undefined,
+        },
+      ],
+    },
+    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "sourceMap": undefined,
+  },
+  "iterActions": [Function],
+  "iterEvents": [Function],
+  "iterLogs": [Function],
+  "iterStorage": [Function],
+  "name": [Function],
+  "symbol": [Function],
+  "totalSupply": [Function],
+}
+`;

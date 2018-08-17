@@ -1,7 +1,7 @@
-import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
-import { ArrayFilter } from '../../../../compile/builtins/array/filter';
 import ts from 'typescript';
+import { helpers } from '../../../../__data__';
+import { ArrayFilter } from '../../../../compile/builtins/array/filter';
+import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Array.prototype.filter', () => {
   test('should filter an array with a function', async () => {
@@ -40,7 +40,7 @@ describe('Array.prototype.filter', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x.filter;
@@ -50,7 +50,7 @@ describe('Array.prototype.filter', () => {
   });
 
   test('cannot be "referenced"', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x['filter'];

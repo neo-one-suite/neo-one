@@ -1,180 +1,131 @@
-import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
-import * as abis from '../../__data__/abis';
-import * as common from '../../sc/common';
-import { createReadSmartContract } from '../../sc/createReadSmartContract';
+// tslint:disable variable-name no-non-null-assertion
+import { AsyncIterableX, toArray } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { data, factory, keys } from '../../__data__';
+import { ReadClient } from '../../ReadClient';
+import { createReadSmartContract } from '../../sc';
+import { Action, DataProvider } from '../../types';
 
 describe('createReadSmartContract', () => {
-  const expectedLog = {
-    version: 0,
-    blockIndex: 1,
-    blockHash: 'blockLogHash',
-    transactionIndex: 2,
-    transactionHash: 'transLogHash',
-    index: 3,
-    type: 'Log',
-    message: 'logMsg',
-    scriptHash: 'hash',
+  const getAccount = jest.fn();
+  const getAsset = jest.fn();
+  const getBlock = jest.fn();
+  const getContract = jest.fn();
+  const iterBlocks = jest.fn();
+  const getBestBlockHash = jest.fn();
+  const getBlockCount = jest.fn();
+  const getMemPool = jest.fn();
+  const getTransaction = jest.fn();
+  const getOutput = jest.fn();
+  const getConnectedPeers = jest.fn();
+  const getStorage = jest.fn();
+  const iterStorage = jest.fn();
+  const smartContract = jest.fn();
+  const __iterActionsRaw = jest.fn();
+  const __call = jest.fn();
+  // tslint:disable-next-line no-any
+  const dataProvider: DataProvider = jest.fn() as any;
+  const client: ReadClient = {
+    dataProvider,
+    getAccount,
+    getAsset,
+    getBlock,
+    getContract,
+    iterBlocks,
+    getBestBlockHash,
+    getBlockCount,
+    getMemPool,
+    getTransaction,
+    getOutput,
+    getConnectedPeers,
+    getStorage,
+    iterStorage,
+    smartContract,
+    __iterActionsRaw,
+    __call,
   };
 
-  const expectedEvent = {
-    version: 4,
-    blockIndex: 5,
-    blockHash: 'blockEventHash',
-    transactionIndex: 6,
-    transactionHash: 'transEventHash',
-    index: 7,
-    type: 'Event',
-    message: 'eventMsg',
-    scriptHash: 'hash',
-    parameters: {},
-    name: 'eventName',
-  };
-
-  const expected = [expectedLog, expectedEvent];
-  const hash = 'hash';
-  const abi = abis.abi([abis.abiFunction(true)], [abis.abiEvent()]);
-  const abiNull = {
-    functions: [
-      {
-        name: 'funcName',
-        constant: true,
-        returnType: abis.returns.Void,
-      },
-
-      {
-        name: 'undefinedName',
-        constant: false,
-        returnType: abis.returns.Void,
-      },
-    ],
-  };
-
-  let client = {} as any;
-
-  const verifyMock = (name: string, mock: any) => {
-    Object.entries(mock).forEach(([key, maybeMock]) => {
-      // @ts-ignore
-      if (
-        maybeMock != undefined &&
-        (maybeMock as any).mock != undefined &&
-        (maybeMock as any).mock.calls != undefined
-      ) {
-        // @ts-ignore
-        expect(maybeMock.mock.calls).toMatchSnapshot(`${name}.${key}`);
-      }
-    });
-  };
-  const verifyMocks = () => {
-    verifyMock('client', client);
-    verifyMock('common', common);
-  };
-
-  let undefinedEventsContract = createReadSmartContract({
-    definition: {
-      hash,
-      abi: abiNull,
-    },
-    client,
-  });
-
-  let readContract = createReadSmartContract({ definition: { hash, abi }, client });
-
+  const definition = factory.createReadSmartContractDefinition();
+  let contract = createReadSmartContract({ definition, client });
   beforeEach(() => {
-    client = {} as any;
-    // @ts-ignore
-    client.__call = jest.fn(() => Promise.resolve({ result: {}, actions: [] }));
-    // @ts-ignore
-    (common as any).convertParams = jest.fn(() => expected);
-    // @ts-ignore
-    (common as any).convertInvocationResult = jest.fn(() => expected);
-    // @ts-ignore
-    client.__iterActionsRaw = jest.fn(() => expected);
-
-    undefinedEventsContract = createReadSmartContract({
-      definition: {
-        hash,
-        abi: abiNull,
-      },
-      client,
-    });
-
-    readContract = createReadSmartContract({ definition: { hash, abi }, client });
+    contract = createReadSmartContract({ definition, client });
   });
 
-  test('smartContract creation - createCall', async () => {
-    // @ts-ignore
-    (common as any).convertCallResult = jest.fn(() => expected);
+  const rawLog = factory.createRawLog({ address: contract.definition.address });
+  const actions = [factory.createRawTransferNotification({ address: contract.definition.address }), rawLog];
+  const otherActions = [
+    factory.createRawTransferNotification({ address: keys[1].address }),
+    factory.createRawLog({ address: keys[1].address }),
+  ];
+  const allActions = actions.concat(otherActions);
 
-    const result = await readContract[abi.functions[0].name]();
-    expect(result).toEqual(expected);
+  const verifyEvent = (event: Action) => {
+    if (event.type !== 'Event') {
+      throw new Error('For TS');
+    }
+    expect(event.address).toEqual(contract.definition.address);
+    expect(event.parameters.from).toEqual(keys[0].address);
+    expect(event.parameters.to).toEqual(keys[1].address);
+    expect(event.parameters.amount).toBeDefined();
+    expect(event.parameters.amount!.toString()).toEqual('10');
+  };
 
-    const undefinedEventsResult = await undefinedEventsContract[abi.functions[0].name]();
-    expect(undefinedEventsResult).toEqual(expected);
-    expect(undefinedEventsContract.nulName).toBeUndefined();
-    verifyMocks();
-  });
+  const verifyLog = (log: Action) => {
+    if (log.type !== 'Log') {
+      throw new Error('For TS');
+    }
+    expect(log.address).toEqual(contract.definition.address);
+    expect(log.message).toEqual(rawLog.message);
+  };
 
-  test('iterActions with filter', async () => {
-    const filter = {
-      indexStart: 0,
-      indexStop: 1,
-    };
+  test('iterActions', async () => {
+    __iterActionsRaw.mockImplementationOnce(() => AsyncIterableX.from(allActions));
 
-    // @ts-ignore
-    (common as any).convertAction = jest
-      .fn()
-      .mockReturnValueOnce(expectedLog)
-      .mockReturnValueOnce(expectedEvent);
+    const result = await toArray(contract.iterActions({ indexStart: 3, indexStop: 5 }));
 
-    const result = await toArray(readContract.iterActions(filter));
-    expect(result).toEqual(expected);
-    verifyMocks();
-  });
-
-  test('iterActions with no filter', async () => {
-    // @ts-ignore
-    client.__iterActionsRaw = jest.fn(() => expected);
-    // @ts-ignore
-    (common as any).convertAction = jest
-      .fn()
-      .mockReturnValueOnce(expectedLog)
-      .mockReturnValueOnce(expectedEvent);
-
-    const result = await toArray(readContract.iterActions());
-    expect(result).toEqual(expected);
-    verifyMocks();
+    expect(result).toHaveLength(2);
+    verifyEvent(result[0]);
+    verifyLog(result[1]);
+    expect(__iterActionsRaw.mock.calls).toMatchSnapshot();
   });
 
   test('iterEvents', async () => {
-    // @ts-ignore
-    (common as any).convertAction = jest
-      .fn()
-      .mockReturnValueOnce(expectedLog)
-      .mockReturnValueOnce(expectedEvent);
+    __iterActionsRaw.mockImplementationOnce(() => AsyncIterableX.from(allActions));
 
-    const result = await toArray(readContract.iterEvents());
-    expect(result).toEqual([expectedEvent]);
-    verifyMocks();
+    const result = await toArray(contract.iterEvents({ indexStart: 3, indexStop: 5 }));
+
+    expect(result).toHaveLength(1);
+    verifyEvent(result[0]);
+    expect(__iterActionsRaw.mock.calls).toMatchSnapshot();
   });
 
   test('iterLogs', async () => {
-    // @ts-ignore
-    (common as any).convertAction = jest
-      .fn()
-      .mockReturnValueOnce(expectedLog)
-      .mockReturnValueOnce(expectedEvent);
+    __iterActionsRaw.mockImplementationOnce(() => AsyncIterableX.from(allActions));
 
-    const result = await toArray(readContract.iterLogs());
-    expect(result).toEqual([expectedLog]);
-    verifyMocks();
+    const result = await toArray(contract.iterLogs({ indexStart: 3, indexStop: 5 }));
+
+    expect(result).toHaveLength(1);
+    verifyLog(result[0]);
+    expect(__iterActionsRaw.mock.calls).toMatchSnapshot();
   });
 
   test('iterStorage', async () => {
-    // @ts-ignore
-    client.iterStorage = jest.fn(() => expected);
+    iterStorage.mockImplementationOnce(() => []);
 
-    const result = undefinedEventsContract.iterStorage();
-    expect(result).toEqual(expected);
-    verifyMocks();
+    await toArray(contract.iterStorage());
+
+    expect(iterStorage.mock.calls).toMatchSnapshot();
+  });
+
+  test('createCall', async () => {
+    const receipt = factory.createRawCallReceipt({
+      result: factory.createRawInvocationResultSuccess({
+        stack: [factory.createIntegerContractParameter({ value: data.bns.a })],
+      }),
+    });
+    __call.mockImplementationOnce(async () => Promise.resolve(receipt));
+
+    const result = await contract.balanceOf(keys[0].address);
+
+    expect(result.toString()).toEqual('1');
   });
 });

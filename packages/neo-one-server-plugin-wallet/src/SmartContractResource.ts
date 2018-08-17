@@ -62,7 +62,7 @@ export class SmartContractResource {
       names: [networkName],
     } = compoundName.extract(name);
 
-    let hash;
+    let address;
     let abi = abiIn;
 
     let contractName;
@@ -95,17 +95,15 @@ export class SmartContractResource {
         {
           script: compiledContract.script,
           parameters: ['String', 'Array'],
-          returnType: 'ByteArray',
+          returnType: 'Buffer',
           name: contract.register.name,
           codeVersion: contract.register.codeVersion,
           author: contract.register.author,
           email: contract.register.email,
           description: contract.register.description,
-          properties: {
-            storage: compiledContract.hasStorage,
-            dynamicInvoke: compiledContract.hasDynamicInvoke,
-            payable: compiledContract.payable,
-          },
+          storage: compiledContract.hasStorage,
+          dynamicInvoke: compiledContract.hasDynamicInvoke,
+          payable: compiledContract.payable,
         },
         {
           from: wallet.accountID,
@@ -114,7 +112,7 @@ export class SmartContractResource {
 
       const receipt = await result.confirmed();
       if (receipt.result.state === 'HALT') {
-        ({ hash } = receipt.result.value);
+        ({ address } = receipt.result.value);
       } else {
         throw new Error(receipt.result.message);
       }
@@ -130,7 +128,7 @@ export class SmartContractResource {
         throw new ABIRequiredError();
       }
 
-      hash = hashIn;
+      address = hashIn;
     }
 
     const configPath = this.getConfigPath(dataPath);
@@ -145,7 +143,7 @@ export class SmartContractResource {
       dataPath,
       configPath,
       abiPath,
-      hash,
+      hash: address,
       abi,
     });
   }

@@ -38,10 +38,6 @@ const definition: SmartContractDefinition = {
   abi: ${abiName},
 };
 
-if (process.env.NODE_ENV !== 'production') {
-  (definition as any).sourceMap = ${stringify(sourceMap, undefined, 2)}
-}
-
 export const ${getCreateSmartContractName(name)} = (
   client: Client,
 ): ${smartContract} => client.smartContract<${smartContract}>(definition);
@@ -49,9 +45,13 @@ export const ${getCreateSmartContractName(name)} = (
 export const ${getCreateReadSmartContractName(name)} = (
   client: ReadClient,
 ): ${readSmartContract} => client.smartContract<${readSmartContract}>({
-  hash: definition.networks[client.dataProvider.network].hash,
+  address: definition.networks[client.dataProvider.network].address,
   abi: definition.abi,
   sourceMap: definition.sourceMap,
 });
+
+if (process.env.NODE_ENV !== 'production') {
+  (definition as any).sourceMap = ${stringify(sourceMap, undefined, 2)}
+}
 `;
 };

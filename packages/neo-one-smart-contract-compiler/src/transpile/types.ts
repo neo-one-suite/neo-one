@@ -9,11 +9,9 @@ export interface Contract {
   readonly author: string;
   readonly email: string;
   readonly description: string;
-  readonly properties: {
-    readonly storage: boolean;
-    readonly dynamicInvoke: boolean;
-    readonly payable: boolean;
-  };
+  readonly storage: boolean;
+  readonly dynamicInvoke: boolean;
+  readonly payable: boolean;
 }
 
 export interface TranspileResult {

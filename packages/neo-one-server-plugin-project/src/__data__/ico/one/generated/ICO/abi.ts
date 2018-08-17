@@ -1,7 +1,7 @@
 // tslint:disable
 import { ABI } from '@neo-one/client';
 
-export const iCOABI: ABI = {
+export const icoABI: ABI = {
   events: [
     {
       name: 'transfer',
@@ -9,12 +9,12 @@ export const iCOABI: ABI = {
         {
           name: 'from',
           optional: true,
-          type: 'Hash160',
+          type: 'Address',
         },
         {
           name: 'to',
           optional: true,
-          type: 'Hash160',
+          type: 'Address',
         },
         {
           decimals: 8,
@@ -62,7 +62,7 @@ export const iCOABI: ABI = {
         },
         {
           name: 'args',
-          type: 'ByteArray',
+          type: 'Buffer',
         },
       ],
     },
@@ -111,7 +111,7 @@ export const iCOABI: ABI = {
       name: 'owner',
       returnType: {
         optional: false,
-        type: 'Hash160',
+        type: 'Address',
       },
       verify: false,
     },
@@ -152,7 +152,7 @@ export const iCOABI: ABI = {
         {
           name: 'address',
           optional: false,
-          type: 'Hash160',
+          type: 'Address',
         },
       ],
       returnType: {
@@ -169,12 +169,12 @@ export const iCOABI: ABI = {
         {
           name: 'from',
           optional: false,
-          type: 'Hash160',
+          type: 'Address',
         },
         {
           name: 'to',
           optional: false,
-          type: 'Hash160',
+          type: 'Address',
         },
         {
           decimals: 8,
@@ -193,7 +193,7 @@ export const iCOABI: ABI = {
       constant: true,
       name: 'remaining',
       returnType: {
-        decimals: 0,
+        decimals: 8,
         optional: false,
         type: 'Integer',
       },
@@ -216,7 +216,7 @@ export const iCOABI: ABI = {
         {
           name: 'owner',
           optional: true,
-          type: 'Hash160',
+          type: 'Address',
         },
         {
           decimals: 0,

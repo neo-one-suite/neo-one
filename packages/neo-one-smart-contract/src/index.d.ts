@@ -1,3 +1,4 @@
+// tslint:disable
 /// <reference path="./global.d.ts" />
 /// <reference path="./internal.d.ts" />
 
@@ -15,12 +16,14 @@ export interface AddressConstructor {
   /**
    * Creates an `Address` from a literal string. Accepts either a NEO address or a script hash.
    *
-   * @example ```
-const accountAddress = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
-```
-   * @example ```
-const contractAddress = Address.from('​​​​​0xcef0c0fdcfe7838eff6ff104f9cdec2922297537​​​​​');
-```
+   * @example
+   *
+   * const accountAddress = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
+   *
+   * @example
+   *
+   * const contractAddress = Address.from('​​​​​0xcef0c0fdcfe7838eff6ff104f9cdec2922297537​​​​​');
+   *
    * @param value Literal string for an `Address`.
    * @returns `Address` for the specified `value`
    */
@@ -30,6 +33,12 @@ const contractAddress = Address.from('​​​​​0xcef0c0fdcfe7838eff6ff104f
    *
    * Smart contracts should invoke this function before taking actions on `Address`es, like transferring tokens, that require the permission of the `Address`.
    *
+   * @example
+   *
+   * if (!Address.verifySender(address)) {
+   *   return false;
+   * }
+   *
    * @returns true if `Address` approved this `Transaction`
    */
   readonly verifySender: (address: Address) => boolean;
@@ -38,16 +47,17 @@ const contractAddress = Address.from('​​​​​0xcef0c0fdcfe7838eff6ff104f
    *
    * `T` is checked for validity and `getSmartContract` will report an error during compilation if the interface is invalid.
    *
-   * @example ```
-interface TransferContract {
-  transfer(from: Address, to: Address, value: Fixed<8>): boolean;
-}
-const contractAddress = Address.from('​​​​​0xcef0c0fdcfe7838eff6ff104f9cdec2922297537​​​​​');
-const contract = Address.getSmartContract<TransferContract>(contractAddress);
-const from = Address.from('ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s');
-const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
-contract.transfer(from, to, 10);
-```
+   * @example
+   *
+   * interface TransferContract {
+   *   transfer(from: Address, to: Address, value: Fixed<8>): boolean;
+   * }
+   * const contractAddress = Address.from('​​​​​0xcef0c0fdcfe7838eff6ff104f9cdec2922297537​​​​​');
+   * const contract = Address.getSmartContract<TransferContract>(contractAddress);
+   * const from = Address.from('ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s');
+   * const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
+   * contract.transfer(from, to, 10);
+   *
    * @param hash `Address` of the smart contract
    * @returns an object representing the underlying smart contract
    */
@@ -67,19 +77,20 @@ export interface Hash256Constructor {
   /**
    * Creates a `Hash256` from a literal string.
    *
-   * @example ```
-const transactionHash = Hash256.from('0xd6572a459b95d9136b7a713c5485ca709f9efa4f08f1c25dd792672d2bd75bfb');
-```
+   * @example
+   *
+   * const transactionHash = Hash256.from('0xd6572a459b95d9136b7a713c5485ca709f9efa4f08f1c25dd792672d2bd75bfb');
+   *
    * @param value Literal string for a `Hash256`.
    * @returns `Hash256` for the specified `value`
    */
   readonly from: (value: string) => Hash256;
   /**
-   * The `Hash256` for the NEO `Asset`.
+   * `Hash256` of the NEO `Asset`.
    */
   readonly NEO: Hash256;
   /**
-   * The `Hash256` for the GAS `Asset`.
+   * `Hash256` of the GAS `Asset`.
    */
   readonly GAS: Hash256;
 }
@@ -95,9 +106,10 @@ export interface PublicKeyConstructor {
   /**
    * Creates a `PublicKey` from a literal string.
    *
-   * @example ```
-const publicKey = PublicKey.from('02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef');
-```
+   * @example
+   *
+   * const publicKey = PublicKey.from('02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef');
+   *
    * @param value Literal string for a `PublicKey`.
    * @returns `PublicKey` for the specified `value`
    */
@@ -123,55 +135,55 @@ export type Fixed8 = Fixed<8>;
 
 export enum TransactionType {
   /**
-   * The first `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
+   * First `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
    *
-   * @see {@link MinerTransaction}
+   * @see MinerTransaction
    */
   Miner = 0x00,
   /**
    * Issues new currency of a first-class `Asset`.
    *
-   * @see {@link IssueTransaction}
+   * @see IssueTransaction
    */
   Issue = 0x01,
   /**
    * Claims GAS for a set of spent `Output`s.
    *
-   * @see {@link ClaimTransaction}
+   * @see ClaimTransaction
    */
   Claim = 0x02,
   /**
    * Enrolls a new validator for a given `PublicKey`.
    *
-   * @see {@link EnrollmentTransaction}
+   * @see EnrollmentTransaction
    * @deprecated
    */
   Enrollment = 0x20,
   /**
    * Registers a new first class `Asset`
    *
-   * @see {@link RegisterTransaction}
-   * @deprecated Replaced by `registerAsset`
+   * @see RegisterTransaction
+   * @deprecated Replaced by `Client#registerAsset`
    */
   Register = 0x40,
   /**
    * Transfers first class `Asset`s
    *
-   * @see {@link ContractTransaction}
+   * @see ContractTransaction
    */
   Contract = 0x80,
   State = 0x90,
   /**
    * Registers a new `Contract`
    *
-   * @see {@link PublishTransaction}
-   * @deprecated Replaced by `publish`
+   * @see PublishTransaction
+   * @deprecated Replaced by `Client#publish`
    */
   Publish = 0xd0,
   /**
    * Runs a script in the NEO VM.
    *
-   * @see {@link InvocationTransaction}
+   * @see InvocationTransaction
    */
   Invocation = 0xd1,
 }
@@ -179,10 +191,10 @@ export enum TransactionType {
 /**
  * `Attribute` usage flag indicates the type of the data.
  *
- * @see {@link BufferAttributeUsage}
- * @see {@link PublicKeyAttributeUsage}
- * @see {@link AddressAttributeUsage}
- * @see {@link Hash256AttributeUsage}
+ * @see BufferAttributeUsage
+ * @see PublicKeyAttributeUsage
+ * @see AddressAttributeUsage
+ * @see Hash256AttributeUsage
  */
 export enum AttributeUsage {
   ContractHash = 0x00,
@@ -228,7 +240,7 @@ export enum AttributeUsage {
 /**
  * `Attribute` usage flag indicating the data is an arbitrary `Buffer`
  *
- * @see {@link BufferAttribute}
+ * @see BufferAttribute
  */
 export type BufferAttributeUsage =
   | AttributeUsage.DescriptionUrl
@@ -252,19 +264,19 @@ export type BufferAttributeUsage =
 /**
  * `Attribute` usage flag indicating the data is a `PublicKey`
  *
- * @see {@link PublicKeyAttribute}
+ * @see PublicKeyAttribute
  */
 export type PublicKeyAttributeUsage = AttributeUsage.ECDH02 | AttributeUsage.ECDH03;
 /**
  * `Attribute` usage flag indicating the data is an `Address`
  *
- * @see {@link AddressAttribute}
+ * @see AddressAttribute
  */
 export type AddressAttributeUsage = AttributeUsage.Script;
 /**
  * `Attribute` usage flag indicating the data is a `Hash256`
  *
- * @see {@link Hash256Attribute}
+ * @see Hash256Attribute
  */
 export type Hash256AttributeUsage =
   | AttributeUsage.ContractHash
@@ -288,7 +300,7 @@ export type Hash256AttributeUsage =
 /**
  * Base interface for `Attribute`s
  *
- * @see {@link Attribute}
+ * @see Attribute
  */
 export interface AttributeBase {
   readonly usage: AttributeUsage;
@@ -339,15 +351,15 @@ export type Attribute = BufferAttribute | PublicKeyAttribute | AddressAttribute 
  */
 export interface Output {
   /**
-   * The destination `Address`.
+   * Destination `Address`.
    */
   readonly address: Address;
   /**
-   * The hash of the `Asset` that was transferred.
+   * Hash of the `Asset` that was transferred.
    */
   readonly asset: Hash256;
   /**
-   * The amount transferred.
+   * Amount transferred.
    */
   readonly value: Fixed8;
 }
@@ -359,11 +371,11 @@ export const Output: OutputConstructor;
  */
 export interface Input {
   /**
-   * The hash of the `Transaction` this input references.
+   * Hash of the `Transaction` this input references.
    */
   readonly hash: Hash256;
   /**
-   * The `Output` index within the `Transaction` this input references.
+   * `Output` index within the `Transaction` this input references.
    */
   readonly index: Integer;
 }
@@ -371,53 +383,53 @@ export interface InputConstructor {}
 export const Input: InputConstructor;
 
 /**
- * The base interface for all `Transaction`s
+ * Base interface for all `Transaction`s
  */
 export interface TransactionBase {
   /**
-   * The `Hash256` of this `Transaction`.
+   * `Hash256` of this `Transaction`.
    */
   readonly hash: Hash256;
   /**
-   * The type of the `Transaction`
-   * @see {@link TransactionType}
+   * Type of the `Transaction`
+   * @see TransactionType
    */
   readonly type: TransactionType;
   /**
    * `Attribute`s attached to the `Transaction`.
    *
-   * @see {@link Attribute}
+   * @see Attribute
    */
   readonly attributes: Attribute[];
   /**
    * `Output`s of the `Transaction`.
    *
-   * @see {@link Output}
+   * @see Output
    */
   readonly outputs: Output[];
   /**
    * `Input`s of the `Transaction`.
    *
-   * @see {@link Input}
+   * @see Input
    */
   readonly inputs: Input[];
   /**
-   * The corresponding `Output`s for the Inputs of the `Transaction`.
+   * Corresponding `Output`s for the Inputs of the `Transaction`.
    *
-   * @see {@link Output}
+   * @see Output
    */
   readonly references: Output[];
   /**
    * `Output`s which have not been spent.
    *
-   * @see {@link Output}
+   * @see Output
    */
   readonly unspentOutputs: Output[];
 }
 export interface TransactionBaseConstructor {}
 export const TransactionBase: TransactionBaseConstructor;
 /**
- * The first `Transaction` in each block which contains the Block rewards for the consensus node that produced the block.
+ * First `Transaction` in each block which contains the Block rewards for the consensus node that produced the block.
  */
 export interface MinerTransaction extends TransactionBase {
   readonly type: TransactionType.Miner;
@@ -445,7 +457,7 @@ export interface EnrollmentTransaction extends TransactionBase {
 /**
  * Registers a new first class `Asset`
  *
- * @deprecated Replaced by `registerAsset`
+ * @deprecated Replaced by `Client#registerAsset`
  */
 export interface RegisterTransaction extends TransactionBase {
   readonly type: TransactionType.Register;
@@ -462,7 +474,7 @@ export interface StateTransaction extends TransactionBase {
 /**
  * Registers a new `Contract`
  *
- * @deprecated Replaced by `publish`
+ * @deprecated Replaced by `Client#publish`
  */
 export interface PublishTransaction extends TransactionBase {
   readonly type: TransactionType.Publish;
@@ -473,7 +485,7 @@ export interface PublishTransaction extends TransactionBase {
 export interface InvocationTransaction extends TransactionBase {
   readonly type: TransactionType.Invocation;
   /**
-   * The code that was executed in NEO VM.
+   * Code that was executed in NEO VM.
    */
   readonly script: Buffer;
 }
@@ -482,11 +494,12 @@ export interface InvocationTransaction extends TransactionBase {
  *
  * Smart contracts are executed within an `InvocationTransaction`.
  *
- * @example ```
-const transactionHash = Hash256.from('0xd6572a459b95d9136b7a713c5485ca709f9efa4f08f1c25dd792672d2bd75bfb');
-const transaction = Transaction.for(transactionHash);
-const transactionOutputs = transaction.outputs;
-```
+ * @example
+ *
+ * const transactionHash = Hash256.from('0xd6572a459b95d9136b7a713c5485ca709f9efa4f08f1c25dd792672d2bd75bfb');
+ * const transaction = Transaction.for(transactionHash);
+ * const transactionOutputs = transaction.outputs;
+ *
  */
 export type Transaction =
   | MinerTransaction
@@ -509,17 +522,18 @@ export const Transaction: TransactionConstructor;
 /**
  * Balance and vote information for an `Address`.
  *
- * @example ```
-const address = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
-const account = Account.for(address);
-const neoBalance = account.getBalance(Hash256.NEO);
-```
+ * @example
+ *
+ * const address = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
+ * const account = Account.for(address);
+ * const neoBalance = account.getBalance(Hash256.NEO);
+ *
  */
 export interface Account {
   /**
-   * The `Address` of this `Account`.
+   * `Address` of this `Account`.
    */
-  readonly hash: Address;
+  readonly address: Address;
   /**
    * Retrieve the balance for a first class `Asset`.
    */
@@ -555,43 +569,44 @@ export enum AssetType {
  *
  * Smart contract authors will typically only interact with the NEO and GAS `Asset`s.
  *
- * @example ```
-const asset = Asset.for(Hash256.NEO);
-const neoAmount = asset.amount;
-```
+ * @example
+ *
+ * const asset = Asset.for(Hash256.NEO);
+ * const neoAmount = asset.amount;
+ *
  */
 export interface Asset {
   /**
-   * The `Hash256` of this `Asset`.
+   * `Hash256` of this `Asset`.
    */
   readonly hash: Hash256;
   /**
-   * The type of the `Asset`
-   * @see {@link AssetType}
+   * Type of the `Asset`
+   * @see AssetType
    */
   readonly type: AssetType;
   /**
-   * The total possible supply of the `Asset`
+   * Total possible supply of the `Asset`
    */
   readonly amount: Fixed8;
   /**
-   * The amount currently available of the `Asset`
+   * Amount currently available of the `Asset`
    */
   readonly available: Fixed8;
   /**
-   * The precision (number of decimal places) of the `Asset`
+   * Precision (number of decimal places) of the `Asset`
    */
   readonly precision: Integer;
   /**
-   * The owner of the `Asset`.
+   * Owner of the `Asset`.
    */
   readonly owner: PublicKey;
   /**
-   * The admin of the `Asset`.
+   * Admin of the `Asset`.
    */
   readonly admin: Address;
   /**
-   * The issuer of the `Asset`.
+   * Issuer of the `Asset`.
    */
   readonly issuer: Address;
 }
@@ -606,11 +621,12 @@ export const Asset: AssetConstructor;
 /**
  * Attributes of a smart contract deployed to the blockchain.
  *
- * @example ```
-const contractAddress = Address.from('​​​​​0xcef0c0fdcfe7838eff6ff104f9cdec2922297537​​​​​');
-const contract = Contract.for(contractAddress);
-const contractScript = contract.script;
-```
+ * @example
+ *
+ * const contractAddress = Address.from('​​​​​0xcef0c0fdcfe7838eff6ff104f9cdec2922297537​​​​​');
+ * const contract = Contract.for(contractAddress);
+ * const contractScript = contract.script;
+ *
  */
 export interface Contract {
   /**
@@ -635,10 +651,11 @@ export const Contract: ContractConstructor;
 /**
  * Attributes of a `Block` persisted to the blockchain. `Header` includes all information except the `Transaction`s.
  *
- * @example ```
-const blockHash = Hash256.from('0xd6572a459b95d9136b7a713c5485ca709f9efa4f08f1c25dd792672d2bd75bfb');
-const header = Header.for(blockHash);
-```
+ * @example
+ *
+ * const blockHash = Hash256.from('0xd6572a459b95d9136b7a713c5485ca709f9efa4f08f1c25dd792672d2bd75bfb');
+ * const header = Header.for(blockHash);
+ *
  */
 export interface Header {
   /**
@@ -669,7 +686,7 @@ export interface Header {
 }
 export interface HeaderConstructor {
   /**
-   * Accepts either the `Hash256` or the index of the `Block`;
+   * Accepts either the `Hash256` or the index of the `Block`.
    *
    * @returns `Header` for the specified `hashOrIndex`.
    */
@@ -679,11 +696,15 @@ export const Header: HeaderConstructor;
 /**
  * Attributes of a `Block` persisted to the blockchain.
  *
- * @example ```
-const genesisBlock = Block.for(0);
-```
+ * @example
+ *
+ * const genesisBlock = Block.for(0);
+ *
  */
 export interface Block extends Header {
+  /**
+   * `Transaction`s contained in the `Block`.
+   */
   readonly transactions: Transaction[];
 }
 export interface BlockConstructor {
@@ -709,20 +730,27 @@ export type SerializableValue = undefined | number | string | boolean | Buffer |
 /**
  * Persistent smart contract storage. When used as a `SmartContract` property the prefix is automatically set to the property name.
  *
- * @example ```
-class Token implements SmartContract {
-  private readonly balances = new MapStorage<Address, Fixed<8>>();
-
-  // Note this is not how one should implement token transfer and is meant for illustration purposes only.
-  public transfer(from: Address, to: Address, amount: Fixed<8>): boolean {
-    const fromBalance = this.balances.get(from);
-    const toBalance = this.balances.get(to);
-    this.balances.set(from, fromBalance - amount);
-    this.balances.set(to, toBalance + amount);
-    return true;
-  }
-}
-```
+ * @example
+ *
+ * class Token implements SmartContract {
+ *  private readonly balances =
+ *    new MapStorage<Address, Fixed<8>>();
+ *
+ *   // Note this is not how one should implement token transfer
+ *   // and is meant for illustration purposes only.
+ *  public transfer(
+ *    from: Address,
+ *    to: Address,
+ *    amount: Fixed<8>,
+ *  ): boolean {
+ *    const fromBalance = this.balances.get(from);
+ *    const toBalance = this.balances.get(to);
+ *    this.balances.set(from, fromBalance - amount);
+ *    this.balances.set(to, toBalance + amount);
+ *    return true;
+ *  }
+ * }
+ *
  */
 export interface MapStorage<K extends SerializableKey, V extends SerializableValue> {
   /**
@@ -751,16 +779,17 @@ export const MapStorage: MapStorageConstructor;
 /**
  * Persistent smart contract set storage. When used as a `SmartContract` property the prefix is automatically set to the property name.
  *
- * @example ```
-class ICO implements SmartContract {
-  private readonly whitelistedAddresses = new SetStorage<Address>();
-
-  // Note this is not how one should implement token transfer and is meant for illustration purposes only.
-  public isWhitelisted(adress: Address): boolean {
-    return this.whitelistedAddresses.has(address);
-  }
-}
-```
+ * @example
+ *
+ * class ICO implements SmartContract {
+ *  private readonly whitelistedAddresses =
+ *    new SetStorage<Address>();
+ *
+ *  public isWhitelisted(adress: Address): boolean {
+ *    return this.whitelistedAddresses.has(address);
+ *  }
+ * }
+ *
  */
 export interface SetStorage<V extends SerializableKey> {
   /**
@@ -786,14 +815,14 @@ export const SetStorage: SetStorageConstructor;
 
 export interface BlockchainConstructor {
   /**
-   * The time of the current `Block`.
+   * Time of the current `Block`.
    *
    * During execution, this is the timestamp of the `Block` that this `Transaction` will be included in.
    * During verification, this is the timestamp of the latest `Block` + 15 seconds which represents the earliest possible timestamp of the `Block` that this `Transaction` will be included in.
    */
   readonly currentBlockTime: number;
   /**
-   * The index of the latest `Block` persisted to the blockchain.
+   * Index of the latest `Block` persisted to the blockchain.
    */
   readonly currentHeight: number;
   /**
@@ -866,13 +895,13 @@ export function createEventNotifier<A0, A1, A2, A3, A4>(
  *
  * Must be explicitly typed and contain string literals for the event name and argument names.
  *
- * @example ```
-const notifyTransfer = createEventNotifier<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
-
-const from = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
-const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
-notifyTransfer(from, to, 200);
-```
+ * @example
+ *
+ * const notifyTransfer = createEventNotifier<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
+ *
+ * const from = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
+ * const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
+ * notifyTransfer(from, to, 200);
  *
  * @param name Event name
  * @param argName Event argument name
@@ -888,7 +917,7 @@ export function createEventNotifier<A0, A1, A2, A3, A4, A5>(
 ): (arg0: A0, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => void;
 
 /**
- * An object with string literals for the contract properties to be used in deployment.
+ * Object with string literals for the contract properties to be used in deployment.
  */
 export interface ContractProperties {
   readonly codeVersion: string;
@@ -902,11 +931,11 @@ export interface ContractProperties {
  */
 export interface SmartContract {
   /**
-   * The owner of the `SmartContract`
+   * Owner of the `SmartContract`
    */
   owner: Address;
   /**
-   * The properties used for deployment of the `SmartContract`
+   * Properties used for deployment of the `SmartContract`
    */
   readonly properties: ContractProperties;
 }

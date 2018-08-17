@@ -19,7 +19,7 @@ describe('TransactionType', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { TransactionType } from '@neo-one/smart-contract';
 

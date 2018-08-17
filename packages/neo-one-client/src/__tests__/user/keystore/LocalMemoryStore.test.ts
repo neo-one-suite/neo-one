@@ -1,44 +1,33 @@
-import { UnlockedWallet } from '../../../user';
+import { factory } from '../../../__data__';
 import { LocalMemoryStore } from '../../../user/keystore/LocalMemoryStore';
 
 describe('LocalMemoryStore', () => {
-  const wallet: UnlockedWallet = {
-    type: 'unlocked',
-    account: {
-      type: 'test',
-      id: {
-        network: 'net',
-        address: 'addr',
-      },
-
-      name: 'name1',
-      scriptHash: 'scriptHash1',
-      publicKey: 'publicKey1',
-      configurableName: true,
-      deletable: true,
-    },
-
-    privateKey: 'privateKey1',
-    nep2: 'nep21',
-  };
-
-  const localMemoryStore = new LocalMemoryStore();
+  const wallet = factory.createUnlockedWallet();
+  const store = new LocalMemoryStore();
 
   test('type', () => {
-    expect(localMemoryStore.type).toEqual('memory');
-    const typeStore = new LocalMemoryStore('newType');
-    expect(typeStore.type).toEqual('newType');
+    expect(store.type).toEqual('memory');
+  });
+
+  test('explicit type', () => {
+    const type = 'foo';
+
+    expect(new LocalMemoryStore(type).type).toEqual(type);
   });
 
   test('getWallets', async () => {
-    await expect(localMemoryStore.getWallets()).resolves.toEqual([]);
+    await expect(store.getWallets()).resolves.toEqual([]);
+  });
+
+  test('getWalletsSync', () => {
+    expect(store.getWalletsSync()).toEqual([]);
   });
 
   test('saveWallet', async () => {
-    await expect(localMemoryStore.saveWallet(wallet)).resolves.toBeUndefined();
+    await expect(store.saveWallet(wallet)).resolves.toBeUndefined();
   });
 
   test('deleteWallet', async () => {
-    await expect(localMemoryStore.deleteWallet(wallet)).resolves.toBeUndefined();
+    await expect(store.deleteWallet(wallet)).resolves.toBeUndefined();
   });
 });

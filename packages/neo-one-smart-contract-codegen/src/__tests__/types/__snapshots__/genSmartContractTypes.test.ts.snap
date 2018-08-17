@@ -1,32 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`genSmartContractTypes NEP5 1`] = `
-"import { Event, Hash160String, InvokeReceipt, ReadSmartContract, SmartContract, TransactionResult } from '@neo-one/client';
+"import { AddressString, Event, InvokeReceipt, InvokeTransactionOptions, ReadSmartContract, SmartContract, TransactionResult } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
 
 export type TokenEvent = TokenTransferEvent
 
 export interface TokenTransferEventParameters {
-  readonly from: Hash160String;
-  readonly to: Hash160String;
-  readonly amount: number;
+  readonly from: AddressString;
+  readonly to: AddressString;
+  readonly amount: BigNumber;
 }
 export interface TokenTransferEvent extends Event<'transfer', TokenTransferEventParameters> {}
 
 export interface TokenSmartContract extends SmartContract<TokenReadSmartContract> {
-  readonly balanceOf: (account: Hash160String) => Promise<number>;
-  readonly decimals: () => Promise<number>;
+  readonly balanceOf: (account: AddressString) => Promise<BigNumber>;
+  readonly decimals: () => Promise<BigNumber>;
   readonly name: () => Promise<string>;
   readonly symbol: () => Promise<string>;
-  readonly totalSupply: () => Promise<number>;
-  readonly transfer: (from: Hash160String, to: Hash160String, value: number) => TransactionResult<InvokeReceipt<boolean, TokenEvent>>;
+  readonly totalSupply: () => Promise<BigNumber>;
+  readonly transfer: (from: AddressString, to: AddressString, value: BigNumber, options?: InvokeTransactionOptions) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>>>;
 }
 
 export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {
-  readonly balanceOf: (account: Hash160String) => Promise<number>;
-  readonly decimals: () => Promise<number>;
+  readonly balanceOf: (account: AddressString) => Promise<BigNumber>;
+  readonly decimals: () => Promise<BigNumber>;
   readonly name: () => Promise<string>;
   readonly symbol: () => Promise<string>;
-  readonly totalSupply: () => Promise<number>;
+  readonly totalSupply: () => Promise<BigNumber>;
 }
 "
 `;

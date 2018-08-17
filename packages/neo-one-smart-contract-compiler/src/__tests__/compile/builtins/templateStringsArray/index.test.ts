@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('TemplateStringsArray', () => {
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       class MyTemplateStringsArray implements TemplateStringsArray {
       }

@@ -1,46 +1,37 @@
-import { common, crypto } from '@neo-one/client-core';
-import { AddressString, Hash160String, PrivateKeyString, PublicKeyString } from './types';
+import { common, crypto, scriptHashToAddress as scriptHashToAddressBase } from '@neo-one/client-core';
+import { AddressString, PrivateKeyString, PublicKeyString } from './types';
 
 export const publicKeyToScriptHash = (publicKey: PublicKeyString): string =>
   common.uInt160ToString(crypto.publicKeyToScriptHash(common.stringToECPoint(publicKey)));
 
-export const publicKeyToAddress = (publicKey: PublicKeyString, addressVersion?: number): AddressString =>
+export const publicKeyToAddress = (publicKey: PublicKeyString): AddressString =>
   crypto.scriptHashToAddress({
-    addressVersion: addressVersion === undefined ? common.NEO_ADDRESS_VERSION : addressVersion,
+    addressVersion: common.NEO_ADDRESS_VERSION,
     scriptHash: crypto.publicKeyToScriptHash(common.stringToECPoint(publicKey)),
   });
 
-export const scriptHashToAddress = (scriptHash: Hash160String, addressVersion?: number): AddressString =>
-  crypto.scriptHashToAddress({
-    addressVersion: addressVersion === undefined ? common.NEO_ADDRESS_VERSION : addressVersion,
-    scriptHash: common.stringToUInt160(scriptHash),
-  });
+export const scriptHashToAddress = scriptHashToAddressBase;
 
-export const addressToScriptHash = (address: AddressString, addressVersion?: number): Hash160String =>
+export const addressToScriptHash = (address: AddressString): string =>
   common.uInt160ToString(
     crypto.addressToScriptHash({
-      addressVersion: addressVersion === undefined ? common.NEO_ADDRESS_VERSION : addressVersion,
+      addressVersion: common.NEO_ADDRESS_VERSION,
       address,
     }),
   );
 
-export const wifToPrivateKey = (wif: string, privateKeyVersion?: number): PrivateKeyString =>
-  common.privateKeyToString(
-    crypto.wifToPrivateKey(wif, privateKeyVersion === undefined ? common.NEO_PRIVATE_KEY_VERSION : privateKeyVersion),
-  );
+export const wifToPrivateKey = (wif: string): PrivateKeyString =>
+  common.privateKeyToString(crypto.wifToPrivateKey(wif, common.NEO_PRIVATE_KEY_VERSION));
 
-export const privateKeyToWIF = (privateKey: PrivateKeyString, privateKeyVersion?: number): string =>
-  crypto.privateKeyToWIF(
-    common.stringToPrivateKey(privateKey),
-    privateKeyVersion === undefined ? common.NEO_PRIVATE_KEY_VERSION : privateKeyVersion,
-  );
+export const privateKeyToWIF = (privateKey: PrivateKeyString): string =>
+  crypto.privateKeyToWIF(common.stringToPrivateKey(privateKey), common.NEO_PRIVATE_KEY_VERSION);
 
-export const privateKeyToScriptHash = (privateKey: PrivateKeyString): Hash160String =>
+export const privateKeyToScriptHash = (privateKey: PrivateKeyString): string =>
   common.uInt160ToString(crypto.privateKeyToScriptHash(common.stringToPrivateKey(privateKey)));
 
-export const privateKeyToAddress = (privateKey: PrivateKeyString, addressVersion?: number): AddressString =>
+export const privateKeyToAddress = (privateKey: PrivateKeyString): AddressString =>
   crypto.privateKeyToAddress({
-    addressVersion: addressVersion === undefined ? common.NEO_ADDRESS_VERSION : addressVersion,
+    addressVersion: common.NEO_ADDRESS_VERSION,
     privateKey: common.stringToPrivateKey(privateKey),
   });
 
@@ -52,14 +43,12 @@ export const isNEP2 = (encryptedKey: string): boolean => crypto.isNEP2(encrypted
 export const encryptNEP2 = async ({
   password,
   privateKey,
-  addressVersion,
 }: {
   readonly password: string;
   readonly privateKey: PrivateKeyString;
-  readonly addressVersion?: number;
 }): Promise<string> =>
   crypto.encryptNEP2({
-    addressVersion: addressVersion === undefined ? common.NEO_ADDRESS_VERSION : addressVersion,
+    addressVersion: common.NEO_ADDRESS_VERSION,
     privateKey: common.stringToPrivateKey(privateKey),
     password,
   });
@@ -67,14 +56,12 @@ export const encryptNEP2 = async ({
 export const decryptNEP2 = async ({
   password,
   encryptedKey,
-  addressVersion,
 }: {
   readonly password: string;
   readonly encryptedKey: string;
-  readonly addressVersion?: number;
-}): Promise<string> => {
+}): Promise<PrivateKeyString> => {
   const privateKey = await crypto.decryptNEP2({
-    addressVersion: addressVersion === undefined ? common.NEO_ADDRESS_VERSION : addressVersion,
+    addressVersion: common.NEO_ADDRESS_VERSION,
     encryptedKey,
     password,
   });

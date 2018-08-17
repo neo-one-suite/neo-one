@@ -8,7 +8,7 @@ describe('ImportDeclarationCompiler', () => {
   });
 
   test('export = unsupported', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = 'foo';
 
@@ -19,7 +19,7 @@ describe('ImportDeclarationCompiler', () => {
   });
 
   test('import = unsupported', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import x = require('x');
     `,

@@ -9,11 +9,23 @@ import { TokenReadSmartContract, TokenSmartContract } from './types';
 const definition: SmartContractDefinition = {
   networks: {
   \\"main\\": {
-    \\"hash\\": \\"iamahash\\"
+    \\"address\\": \\"iamahash\\"
   }
 },
   abi: tokenABI,
 };
+
+export const createTokenSmartContract = (
+  client: Client,
+): TokenSmartContract => client.smartContract<TokenSmartContract>(definition);
+
+export const createTokenReadSmartContract = (
+  client: ReadClient,
+): TokenReadSmartContract => client.smartContract<TokenReadSmartContract>({
+  address: definition.networks[client.dataProvider.network].address,
+  abi: definition.abi,
+  sourceMap: definition.sourceMap,
+});
 
 if (process.env.NODE_ENV !== 'production') {
   (definition as any).sourceMap = {
@@ -24,17 +36,5 @@ if (process.env.NODE_ENV !== 'production') {
   \\"version\\": 0
 }
 }
-
-export const createTokenSmartContract = (
-  client: Client,
-): TokenSmartContract => client.smartContract<TokenSmartContract>(definition);
-
-export const createTokenReadSmartContract = (
-  client: ReadClient,
-): TokenReadSmartContract => client.smartContract<TokenReadSmartContract>({
-  hash: definition.networks[client.dataProvider.network].hash,
-  abi: definition.abi,
-  sourceMap: definition.sourceMap,
-});
 "
 `;

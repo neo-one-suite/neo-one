@@ -1,146 +1,214 @@
-import * as assertArgs from '../args';
+import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
+import { data, factory, keys } from '../__data__';
 import { ReadClient } from '../ReadClient';
-import { createReadSmartContract } from '../sc/createReadSmartContract';
-
-jest.mock('../sc/createReadSmartContract');
+import { DataProvider } from '../types';
 
 describe('ReadClient', () => {
-  let readClient = new ReadClient({} as any);
-  let provider = readClient.dataProvider;
+  const network = 'main';
+  const getAccount = jest.fn();
+  const getAsset = jest.fn();
+  const getBlock = jest.fn();
+  const iterBlocks = jest.fn();
+  const getBestBlockHash = jest.fn();
+  const getBlockCount = jest.fn();
+  const getContract = jest.fn();
+  const getMemPool = jest.fn();
+  const getTransaction = jest.fn();
+  const getOutput = jest.fn();
+  const getConnectedPeers = jest.fn();
+  const getStorage = jest.fn();
+  const iterStorage = jest.fn();
+  const iterActionsRaw = jest.fn();
+  const call = jest.fn();
+  const provider: DataProvider = {
+    network,
+    getAccount,
+    getAsset,
+    getBlock,
+    iterBlocks,
+    getBestBlockHash,
+    getBlockCount,
+    getContract,
+    getMemPool,
+    getTransaction,
+    getOutput,
+    getConnectedPeers,
+    getStorage,
+    iterStorage,
+    iterActionsRaw,
+    call,
+  };
+  let client: ReadClient;
   beforeEach(() => {
-    readClient = new ReadClient({} as any);
-    provider = readClient.dataProvider;
+    client = new ReadClient(provider);
   });
 
-  const expected = '10';
-  const dummyArg = 5;
+  test('getAccount', async () => {
+    const value = factory.createAccount();
+    getAccount.mockImplementationOnce(() => value);
 
-  const testCases = [
-    {
-      method: 'getAccount',
-      asserts: ['assertAddress'],
-      args: [dummyArg],
-    },
+    const result = await client.getAccount(keys[0].address);
 
-    {
-      method: 'getAsset',
-      asserts: ['assertHash256'],
-      args: [dummyArg],
-    },
+    expect(result).toEqual(value);
+    expect(getAccount.mock.calls).toMatchSnapshot();
+  });
 
-    {
-      method: 'getBlock',
-      asserts: ['assertHash256'],
-      args: [dummyArg],
-    },
+  test('getAsset', async () => {
+    const value = factory.createAsset();
+    getAsset.mockImplementationOnce(() => value);
 
-    {
-      method: 'getBlock',
-      asserts: ['assertGetOptions'],
-      args: [dummyArg.toString()],
-    },
+    const result = await client.getAsset(data.hash256s.a);
 
-    {
-      method: 'iterBlocks',
-      asserts: ['assertBlockFilter'],
-      args: [dummyArg],
-    },
+    expect(result).toEqual(value);
+    expect(getAsset.mock.calls).toMatchSnapshot();
+  });
 
-    {
-      method: 'getBestBlockHash',
-      asserts: [],
-      args: [dummyArg],
-    },
+  test('getBlock', async () => {
+    const value = factory.createBlock();
+    getBlock.mockReset();
+    getBlock.mockImplementationOnce(() => value);
 
-    {
-      method: 'getBlockCount',
-      asserts: [],
-      args: [dummyArg],
-    },
+    const result = await client.getBlock(data.hash256s.a);
 
-    {
-      method: 'getContract',
-      asserts: ['assertHash160'],
-      args: [dummyArg],
-    },
+    expect(result).toEqual(value);
+    expect(getBlock.mock.calls).toMatchSnapshot();
+  });
 
-    {
-      method: 'getMemPool',
-      asserts: [],
-      args: [dummyArg],
-    },
+  test('getBlock - number', async () => {
+    const value = factory.createBlock();
+    getBlock.mockReset();
+    getBlock.mockImplementationOnce(() => value);
 
-    {
-      method: 'getTransaction',
-      asserts: ['assertHash256'],
-      args: [dummyArg],
-    },
+    const result = await client.getBlock(0);
 
-    {
-      method: 'getValidators',
-      asserts: [],
-      args: [dummyArg],
-    },
+    expect(result).toEqual(value);
+    expect(getBlock.mock.calls).toMatchSnapshot();
+  });
 
-    {
-      method: 'getConnectedPeers',
-      asserts: [],
-      args: [dummyArg],
-    },
+  test('iterBlocks', async () => {
+    const value = factory.createBlock();
+    iterBlocks.mockImplementationOnce(() => AsyncIterableX.from([value]));
 
-    {
-      method: 'getStorage',
-      asserts: ['assertHash160', 'assertBuffer'],
-      args: [dummyArg],
-    },
+    const result = await toArray(client.iterBlocks({ indexStart: 3, indexStop: 4 }));
 
-    {
-      method: 'iterStorage',
-      asserts: ['assertHash160'],
-      args: [dummyArg],
-    },
+    expect(result).toEqual([value]);
+    expect(iterBlocks.mock.calls).toMatchSnapshot();
+  });
 
-    {
-      method: '__iterActionsRaw',
-      asserts: ['assertBlockFilter'],
-      args: [dummyArg],
-    },
+  test('getBestBlockHash', async () => {
+    const value = data.hash256s.a;
+    getBestBlockHash.mockImplementationOnce(() => value);
 
-    {
-      method: '__call',
-      asserts: [],
-      args: [dummyArg, dummyArg.toString(), [dummyArg]],
-    },
-  ];
+    const result = await client.getBestBlockHash();
 
-  for (const testCase of testCases) {
-    const { method, asserts, args } = testCase;
-    let providerMethod = method;
-    if (method.charAt(0) === '_') {
-      providerMethod = method.slice(2);
-    }
+    expect(result).toEqual(value);
+    expect(getBestBlockHash.mock.calls).toMatchSnapshot();
+  });
 
-    test(method, async () => {
-      for (const assert of asserts) {
-        (assertArgs as any)[assert] = jest.fn(() => expected);
-      }
+  test('getBlockCount', async () => {
+    const value = 10;
+    getBlockCount.mockImplementationOnce(() => value);
 
-      provider[providerMethod] = jest.fn(() => expected);
+    const result = await client.getBlockCount();
 
-      const result = await (readClient as any)[method](...args);
+    expect(result).toEqual(value);
+    expect(getBlockCount.mock.calls).toMatchSnapshot();
+  });
 
-      expect(result).toEqual(expected);
-    });
-  }
+  test('getContract', async () => {
+    const value = factory.createContract();
+    getContract.mockImplementationOnce(() => value);
+
+    const result = await client.getContract(keys[0].address);
+
+    expect(result).toEqual(value);
+    expect(getContract.mock.calls).toMatchSnapshot();
+  });
+
+  test('getMemPool', async () => {
+    const value = [data.hash256s.a];
+    getMemPool.mockImplementationOnce(() => value);
+
+    const result = await client.getMemPool();
+
+    expect(result).toEqual(value);
+    expect(getMemPool.mock.calls).toMatchSnapshot();
+  });
+
+  test('getTransaction', async () => {
+    const value = factory.createContractTransaction();
+    getTransaction.mockImplementationOnce(() => value);
+
+    const result = await client.getTransaction(data.hash256s.a);
+
+    expect(result).toEqual(value);
+    expect(getTransaction.mock.calls).toMatchSnapshot();
+  });
+
+  test('getOutput', async () => {
+    const value = factory.createOutput();
+    getOutput.mockImplementationOnce(() => value);
+
+    const result = await client.getOutput(factory.createInput());
+
+    expect(result).toEqual(value);
+    expect(getOutput.mock.calls).toMatchSnapshot();
+  });
+
+  test('getConnectedPeers', async () => {
+    const value = [factory.createPeerJSON()];
+    getConnectedPeers.mockImplementationOnce(() => value);
+
+    const result = await client.getConnectedPeers();
+
+    expect(result).toEqual(value);
+    expect(getConnectedPeers.mock.calls).toMatchSnapshot();
+  });
 
   test('smartContract', () => {
-    (assertArgs as any).assertHash160 = jest.fn(() => expected);
-    (assertArgs as any).assertABI = jest.fn(() => expected);
+    const result = client.smartContract(factory.createReadSmartContractDefinition());
 
-    (createReadSmartContract as any).mockImplementation(() => expected);
+    expect(result).toMatchSnapshot();
+  });
 
-    const result = readClient.smartContract({ hash: dummyArg.toString(), abi: dummyArg as any });
+  test('getStorage', async () => {
+    const value = factory.createStorageItem();
+    getStorage.mockImplementationOnce(() => value);
 
-    expect(result).toEqual(expected);
+    const result = await client.getStorage(keys[0].address, data.buffers.a);
+
+    expect(result).toEqual(value);
+    expect(getStorage.mock.calls).toMatchSnapshot();
+  });
+
+  test('iterStorage', async () => {
+    const value = [factory.createStorageItem()];
+    iterStorage.mockImplementationOnce(() => AsyncIterableX.from(value));
+
+    const result = await toArray(client.iterStorage(keys[0].address));
+
+    expect(result).toEqual(value);
+    expect(getStorage.mock.calls).toMatchSnapshot();
+  });
+
+  test('__iterActionsRaw', async () => {
+    const value = [factory.createRawNotification()];
+    iterActionsRaw.mockImplementationOnce(() => AsyncIterableX.from(value));
+
+    const result = await toArray(client.__iterActionsRaw());
+
+    expect(result).toEqual(value);
+    expect(iterActionsRaw.mock.calls).toMatchSnapshot();
+  });
+
+  test('__call', async () => {
+    const value = factory.createRawCallReceipt();
+    call.mockImplementationOnce(() => value);
+
+    const result = await client.__call(keys[0].address, 'deploy', []);
+
+    expect(result).toEqual(value);
+    expect(iterActionsRaw.mock.calls).toMatchSnapshot();
   });
 });

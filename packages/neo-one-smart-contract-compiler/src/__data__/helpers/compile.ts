@@ -1,13 +1,15 @@
-import ts from 'typescript';
-import * as appRootDir from 'app-root-dir';
-import { compile as compileScript } from '../../compile';
-import { getDiagnosticMessage, pathResolve } from '../../utils';
 import { tsUtils } from '@neo-one/ts-utils';
-import { createContextForSnippet, createContextForPath } from '../../createContext';
+import * as appRootDir from 'app-root-dir';
+import ts from 'typescript';
+import { compile as compileScript } from '../../compile';
 import { Context } from '../../Context';
+import { createContextForPath, createContextForSnippet } from '../../createContext';
 import { DiagnosticCode } from '../../DiagnosticCode';
+import { getDiagnosticMessage, pathResolve } from '../../utils';
 
-type ExpectOptions = { type: 'error'; code?: DiagnosticCode } | { type: 'warning'; code?: DiagnosticCode };
+type ExpectOptions =
+  | { readonly type: 'error'; readonly code?: DiagnosticCode }
+  | { readonly type: 'warning'; readonly code?: DiagnosticCode };
 
 const compile = (context: Context, sourceFile: ts.SourceFile, options: ExpectOptions) => {
   compileScript({ context, sourceFile });

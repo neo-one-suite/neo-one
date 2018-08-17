@@ -1,6 +1,6 @@
+import { common } from '@neo-one/client-core';
 import { helpers, keys } from '../../../../../__data__';
 import { DiagnosticCode } from '../../../../../DiagnosticCode';
-import { common } from '@neo-one/client-core';
 
 describe('PublicKey.from', () => {
   test('should return an address from literal public key', async () => {
@@ -14,7 +14,7 @@ describe('PublicKey.from', () => {
   });
 
   test('Reports error on invalid public key', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { PublicKey } from '@neo-one/smart-contract';
       const keys = PublicKey.from('abc');
@@ -24,7 +24,7 @@ describe('PublicKey.from', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { PublicKey } from '@neo-one/smart-contract';
       const keys = PublicKey.from;
@@ -34,7 +34,7 @@ describe('PublicKey.from', () => {
   });
 
   test('cannot be element referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { PublicKey } from '@neo-one/smart-contract';
       const keys = PublicKey['from'];

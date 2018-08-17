@@ -1,8 +1,10 @@
+// tslint:disable no-object-mutation
 import { AsyncIterableX as AsyncIterable } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
 import _ from 'lodash';
 import { AsyncBlockIterator } from '../AsyncBlockIterator';
 import { UnknownBlockError } from '../errors';
+import { ReadClient } from '../ReadClient';
 
 const blockCount = 10;
 const blocks = _.range(blockCount).map(() => ({}));
@@ -10,35 +12,37 @@ const filter = {
   indexStop: blockCount,
 };
 
-let client = {} as any;
-let blockIterator = new AsyncBlockIterator({
-  client,
-  filter,
-});
-
 const FETCH_TIMEOUT_MS = 100;
-beforeEach(() => {
-  client = {} as any;
-  blockIterator = new AsyncBlockIterator({
-    client,
-    filter,
-    fetchTimeoutMS: FETCH_TIMEOUT_MS,
-  });
-
-  client.getBlockCount = jest.fn(() => Promise.resolve(blockCount));
-  client.getBlock = jest.fn((index) => Promise.resolve(blocks[index]));
-});
-
-const verifyBlockIterator = async () => {
-  let index = 0;
-  await AsyncIterable.from(blockIterator as any).forEach((value) => {
-    expect(value).toBe(blocks[index]);
-    index += 1;
-  });
-  expect(index).toEqual(blockCount);
-};
 
 describe('AsyncBlockIterator', () => {
+  let client: {
+    getBlockCount: ReturnType<typeof jest.fn>;
+    getBlock: ReturnType<typeof jest.fn>;
+  };
+  let blockIterator: AsyncBlockIterator;
+
+  const verifyBlockIterator = async () => {
+    let index = 0;
+    await AsyncIterable.from(blockIterator).forEach((value) => {
+      expect(value).toBe(blocks[index]);
+      index += 1;
+    });
+    expect(index).toEqual(blockCount);
+  };
+
+  beforeEach(() => {
+    client = {
+      getBlockCount: jest.fn(async () => Promise.resolve(blockCount)),
+      getBlock: jest.fn(async (index) => Promise.resolve(blocks[index])),
+    };
+    blockIterator = new AsyncBlockIterator({
+      // tslint:disable-next-line no-any
+      client: (client as any) as ReadClient,
+      filter,
+      fetchTimeoutMS: FETCH_TIMEOUT_MS,
+    });
+  });
+
   test('should be an AsyncIterator', () => {
     expect(blockIterator[Symbol.asyncIterator]).toBeTruthy();
     expect(blockIterator[Symbol.asyncIterator]()).toBeTruthy();
@@ -51,10 +55,10 @@ describe('AsyncBlockIterator', () => {
   test('should throw an error if the client throws an error', async () => {
     const error = new Error('hello world');
 
-    client.getBlockCount = jest.fn(() => Promise.reject(error));
+    client.getBlockCount = jest.fn(async () => Promise.reject(error));
     let thrownError;
     try {
-      await toArray(AsyncIterable.from(blockIterator as any));
+      await toArray(AsyncIterable.from(blockIterator));
     } catch (err) {
       thrownError = err;
     }
@@ -63,14 +67,14 @@ describe('AsyncBlockIterator', () => {
   });
 
   test('should retry fetch on UnknownBlockError', async () => {
-    client.getBlock.mockImplementationOnce(() => Promise.reject(new UnknownBlockError()));
+    client.getBlock.mockImplementationOnce(async () => Promise.reject(new UnknownBlockError()));
 
     await verifyBlockIterator();
   });
 
   test('should throw on other errors', async () => {
     const error = new Error('error');
-    client.getBlock.mockImplementationOnce(() => Promise.reject(error));
+    client.getBlock.mockImplementationOnce(async () => Promise.reject(error));
     let thrownError;
     try {
       await verifyBlockIterator();

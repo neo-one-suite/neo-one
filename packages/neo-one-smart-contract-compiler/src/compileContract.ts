@@ -43,11 +43,9 @@ export const compileContract = ({ filePath: filePathIn, name }: CompileContractO
     contract: {
       ...contract,
       script: code.toString('hex'),
-      properties: {
-        storage: features.storage,
-        dynamicInvoke: features.dynamicInvoke,
-        payable: contract.properties.payable,
-      },
+      storage: features.storage,
+      dynamicInvoke: features.dynamicInvoke,
+      payable: contract.payable,
     },
   };
 };

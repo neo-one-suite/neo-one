@@ -12,7 +12,7 @@ describe('Array', () => {
   });
 
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       class MyArray implements Array<number> {
       }
@@ -22,7 +22,7 @@ describe('Array', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = Array;
     `,
@@ -52,7 +52,7 @@ describe('Array', () => {
   });
 
   test('cannot be ambiguously referenced - call', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       interface Arr {
         readonly length: number;
@@ -67,7 +67,7 @@ describe('Array', () => {
   });
 
   test('cannot be ambiguously referenced - variable', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       interface Arr {
         readonly length: number;
@@ -81,7 +81,7 @@ describe('Array', () => {
   });
 
   test('cannot be ambiguously referenced - assignment', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       interface Arr {
         readonly length: number;
@@ -117,7 +117,7 @@ describe('Array', () => {
   });
 
   test('cannot be ambiguously referenced - arrow return value', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       interface Arr {
         readonly length: number;
@@ -161,7 +161,7 @@ describe('Array', () => {
   });
 
   test('cannot be ambiguously referenced - function return value', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       interface Arr {
         readonly length: number;

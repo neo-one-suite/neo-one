@@ -4,22 +4,22 @@ import {
   Contract,
   DeveloperClient,
   InvocationResult,
+  InvocationTransaction,
+  InvokeTransactionOptions,
   LocalKeyStore,
+  LocalWallet,
+  ReadClient,
   SmartContract,
   UserAccountID,
-  LocalWallet,
-  InvokeTransactionOptions,
-  InvocationTransaction,
-  ReadClient,
 } from '@neo-one/client';
+import { RawInvokeReceipt } from '@neo-one/client-core';
 import ts from 'typescript';
+import { testNodeSetup } from '../../../../neo-one-smart-contract-test/src/setupTest';
 import { compile } from '../../compile';
 import { CompileResult } from '../../compile/types';
-import { testNodeSetup } from '../../../../neo-one-smart-contract-test/src/setupTest';
-import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { createContextForSnippet } from '../../createContext';
+import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { checkRawResult } from './extractors';
-import { RawInvokeReceipt } from '@neo-one/client-core';
 
 export interface Result {
   readonly networkName: string;
@@ -38,7 +38,7 @@ export interface TestNode {
     script: string,
     options?: InvokeTransactionOptions,
   ) => Promise<{ readonly receipt: RawInvokeReceipt; readonly transaction: InvocationTransaction }>;
-  readonly compileScript: (script: string) => Promise<CompileResult>;
+  readonly compileScript: (script: string) => CompileResult;
   readonly masterWallet: LocalWallet;
   readonly client: Client;
   readonly readClient: ReadClient;
@@ -62,8 +62,8 @@ export interface InvokeValidateResultOptions {
   readonly developerClient: DeveloperClient;
 }
 
-const getCompiledScript = async (script: string): Promise<CompileResult> => {
-  const { context, sourceFile } = await createContextForSnippet(script, { withTestHarness: true });
+const getCompiledScript = (script: string): CompileResult => {
+  const { context, sourceFile } = createContextForSnippet(script, { withTestHarness: true });
 
   return compile({ context, sourceFile });
 };
@@ -74,24 +74,22 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
 
   return {
     async addContract(script): Promise<Contract> {
-      const { code, context } = await getCompiledScript(script);
+      const { code, context } = getCompiledScript(script);
 
       throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
 
       const result = await client.publish({
         script: code.toString('hex'),
         parameters: ['String', 'Array'],
-        returnType: 'ByteArray',
+        returnType: 'Buffer',
         name: 'TestContract',
         codeVersion: '1.0',
         author: 'test',
         email: 'test@test.com',
         description: 'test',
-        properties: {
-          storage: true,
-          dynamicInvoke: true,
-          payable: true,
-        },
+        storage: true,
+        dynamicInvoke: true,
+        payable: true,
       });
 
       const [publishReceipt] = await Promise.all([
@@ -108,7 +106,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       script,
       options = {},
     ): Promise<{ readonly receipt: RawInvokeReceipt; readonly transaction: InvocationTransaction }> {
-      const { code, sourceMap, context } = await getCompiledScript(script);
+      const { code, sourceMap, context } = getCompiledScript(script);
 
       throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
 

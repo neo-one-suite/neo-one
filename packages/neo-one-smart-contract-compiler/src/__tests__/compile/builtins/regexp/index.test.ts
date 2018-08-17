@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('RegExp', () => {
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       class MyRegExp implements RegExp {
       }
@@ -13,7 +13,7 @@ describe('RegExp', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = RegExp;
     `,

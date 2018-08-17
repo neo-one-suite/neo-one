@@ -1,18 +1,18 @@
-import { addressToScriptHash, NEOONEProvider, privateKeyToAddress, ReadClient } from '@neo-one/client';
+import { NEOONEProvider, privateKeyToAddress, ReadClient } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
+import { Network as ResourceNetwork } from '@neo-one/server-plugin-network';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import {
   ASSET_INFO,
   compileSmartContract,
+  DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS,
   TOKEN_INFO,
   TokenInfo,
-  DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS,
 } from '../bootstrap';
 import { constants } from '../constants';
 import { Wallet as ResourceWallet } from '../WalletResourceType';
-import { Network as ResourceNetwork } from '@neo-one/server-plugin-network';
 
 interface Tokens {
   readonly [key: string]: string;
@@ -83,7 +83,7 @@ const getSmartContract = async ({
 }) => {
   const { abi, sourceMap } = await compileSmartContract(token.name);
 
-  return client.smartContract({ hash: tokens[token.name], abi, sourceMap });
+  return client.smartContract({ address: tokens[token.name], abi, sourceMap });
 };
 
 const getSmartContracts = async ({ client, tokens }: { readonly client: ReadClient; readonly tokens: Tokens }) =>
@@ -206,7 +206,7 @@ const testTokens = async ({
 
   await Promise.all(
     utils.zip(tokenAndSmartContracts, tokenWallets).map(async ([{ token, smartContract }, wallet], idx) => {
-      const balance = await smartContract.balanceOf(addressToScriptHash(wallet.address));
+      const balance = await smartContract.balanceOf(wallet.address);
 
       const transferredWallets =
         idx % 2 === 0
@@ -230,7 +230,7 @@ const testTokens = async ({
 
       await Promise.all(
         transferredWallets.map(async (transferredWallet) => {
-          const transferredBalance = await smartContract.balanceOf(addressToScriptHash(transferredWallet.address));
+          const transferredBalance = await smartContract.balanceOf(transferredWallet.address);
 
           expect(transferredBalance.toString()).toEqual(
             token.amount
@@ -258,13 +258,13 @@ const testContract = async ({
   expect(contract.name).toEqual(name);
   expect(contract.codeVersion).toEqual('1.0');
   expect(contract.parameters).toEqual(['String', 'Array']);
-  expect(contract.returnType).toEqual('ByteArray');
+  expect(contract.returnType).toEqual('Buffer');
   expect(contract.author).toEqual('dicarlo2');
   expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
   expect(contract.description).toEqual(`The ${name}`);
-  expect(contract.properties.dynamicInvoke).toBeFalsy();
-  expect(contract.properties.payable).toBeTruthy();
-  expect(contract.properties.storage).toBeTruthy();
+  expect(contract.dynamicInvoke).toBeFalsy();
+  expect(contract.payable).toBeTruthy();
+  expect(contract.storage).toBeTruthy();
 };
 
 const testContracts = async ({ client, tokens }: { readonly client: ReadClient; readonly tokens: Tokens }) => {

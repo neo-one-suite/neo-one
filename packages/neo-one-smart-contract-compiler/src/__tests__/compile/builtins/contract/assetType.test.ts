@@ -18,7 +18,7 @@ describe('AssetType', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { AssetType } from '@neo-one/smart-contract';
 

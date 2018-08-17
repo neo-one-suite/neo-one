@@ -1,6 +1,6 @@
+import { common } from '@neo-one/client-core';
 import { helpers, keys } from '../../../../../__data__';
 import { DiagnosticCode } from '../../../../../DiagnosticCode';
-import { common } from '@neo-one/client-core';
 
 describe('Address.from', () => {
   test('should return an address from literal NEO addresses and script hashes', async () => {
@@ -15,7 +15,7 @@ describe('Address.from', () => {
   });
 
   test('Reports error on invalid address', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Address } from '@neo-one/smart-contract';
       const keys = Address.from('abc');
@@ -25,7 +25,7 @@ describe('Address.from', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Address } from '@neo-one/smart-contract';
       const keys = Address.from;
@@ -35,7 +35,7 @@ describe('Address.from', () => {
   });
 
   test('cannot be element referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Address } from '@neo-one/smart-contract';
       const keys = Address['from'];

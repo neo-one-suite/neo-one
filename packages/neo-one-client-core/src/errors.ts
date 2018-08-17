@@ -1,5 +1,4 @@
 import { CustomError } from '@neo-one/utils';
-import { ContractParameterTypeJSON } from './contractParameter';
 import { ContractParameter } from './types';
 
 export class InvalidFormatError extends CustomError {
@@ -39,10 +38,10 @@ export class InvalidNumberOfKeysError extends CustomError {
 
 export class InvalidContractParameterError extends CustomError {
   public readonly parameter: ContractParameter;
-  public readonly expected: ReadonlyArray<ContractParameterTypeJSON>;
+  public readonly expected: ReadonlyArray<ContractParameter['type']>;
   public readonly code: string;
 
-  public constructor(parameter: ContractParameter, expected: ReadonlyArray<ContractParameterTypeJSON>) {
+  public constructor(parameter: ContractParameter, expected: ReadonlyArray<ContractParameter['type']>) {
     super(`Expected one of ${JSON.stringify(expected)} ` + `ContractParameterTypes, found ${parameter.type}`);
 
     this.parameter = parameter;

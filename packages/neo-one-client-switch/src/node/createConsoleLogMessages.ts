@@ -1,4 +1,4 @@
-import { ActionRaw, converters } from '@neo-one/client-core';
+import { converters, RawAction } from '@neo-one/client-core';
 import { deserializeStackItem, StackItem } from '@neo-one/node-vm';
 import { utils } from '@neo-one/utils';
 import { RawSourceMap } from 'source-map';
@@ -60,7 +60,7 @@ const extractMessage = (value: Buffer): string => {
   return messages.join('');
 };
 
-const extractLog = (action: ActionRaw): ConsoleLog | undefined => {
+const extractLog = (action: RawAction): ConsoleLog | undefined => {
   if (action.type === 'Log') {
     return undefined;
   }
@@ -73,7 +73,7 @@ const extractLog = (action: ActionRaw): ConsoleLog | undefined => {
     }
 
     const line = converters.toInteger(args[1], { type: 'Integer', decimals: 0 }).toNumber();
-    const message = extractMessage(Buffer.from(converters.toByteArray(args[2]), 'hex'));
+    const message = extractMessage(Buffer.from(converters.toBuffer(args[2]), 'hex'));
 
     return { line, message };
   } catch {
@@ -81,7 +81,7 @@ const extractLog = (action: ActionRaw): ConsoleLog | undefined => {
   }
 };
 
-const extractConsoleLogs = (actions: ReadonlyArray<ActionRaw>): ReadonlyArray<ConsoleLog> => {
+const extractConsoleLogs = (actions: ReadonlyArray<RawAction>): ReadonlyArray<ConsoleLog> => {
   const mutableLogs: ConsoleLog[] = [];
   // tslint:disable-next-line no-loop-statement
   for (const action of actions) {
@@ -96,7 +96,7 @@ const extractConsoleLogs = (actions: ReadonlyArray<ActionRaw>): ReadonlyArray<Co
 };
 
 export const createConsoleLogMessages = async (
-  actions: ReadonlyArray<ActionRaw>,
+  actions: ReadonlyArray<RawAction>,
   sourceMap: RawSourceMap,
   { bare = false }: LogOptions = { bare: false },
 ): Promise<ReadonlyArray<string>> => {

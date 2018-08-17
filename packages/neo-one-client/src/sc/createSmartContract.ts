@@ -8,12 +8,12 @@ import {
   ABIFunction,
   ABIParameter,
   Action,
-  ActionRaw,
+  AddressString,
   Event,
-  Hash160String,
   InvokeReceipt,
   Log,
   Param,
+  RawAction,
   SmartContractAny,
   SmartContractDefinition,
   SmartContractNetworkDefinition,
@@ -37,7 +37,7 @@ const getParamsAndOptions = ({
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly paramsZipped: ReadonlyArray<[string, Param | undefined]>;
   readonly options: TransactionOptions;
-  readonly hash: Hash160String;
+  readonly address: AddressString;
 } => {
   const finalArg = args[args.length - 1] as {} | undefined;
   let params = args;
@@ -76,7 +76,7 @@ const getParamsAndOptions = ({
     params: converted,
     paramsZipped: zipped,
     options,
-    hash: contractNetwork.hash,
+    address: contractNetwork.address,
   };
 };
 
@@ -84,7 +84,7 @@ const convertActions = ({
   actions,
   events,
 }: {
-  readonly actions: ReadonlyArray<ActionRaw>;
+  readonly actions: ReadonlyArray<RawAction>;
   readonly events: ReadonlyArray<ABIEvent>;
 }): ReadonlyArray<Action> => {
   const eventsObj = events.reduce<{ [key: string]: ABIEvent }>(
@@ -113,14 +113,14 @@ const createCall = ({
   readonly func: ABIFunction;
   // tslint:disable-next-line no-any
 }) => async (...args: any[]): Promise<Param | undefined> => {
-  const { params, options, hash } = getParamsAndOptions({
+  const { params, options, address } = getParamsAndOptions({
     definition,
     parameters,
     args,
     client,
   });
 
-  const receipt = await client.__call(hash, name, params, options);
+  const receipt = await client.__call(address, name, params, options);
 
   return common.convertCallResult({
     returnType,
@@ -145,14 +145,14 @@ const createInvoke = ({
   readonly func: ABIFunction;
   // tslint:disable-next-line no-any
 }) => async (...args: any[]): Promise<TransactionResult<InvokeReceipt>> => {
-  const { params, paramsZipped, options, hash } = getParamsAndOptions({
+  const { params, paramsZipped, options, address } = getParamsAndOptions({
     definition,
     parameters,
     args,
     client,
   });
 
-  const result = await client.__invoke(hash, name, params, paramsZipped, verify, options, definition.sourceMap);
+  const result = await client.__invoke(address, name, params, paramsZipped, verify, options, definition.sourceMap);
 
   return {
     transaction: result.transaction,
@@ -176,7 +176,6 @@ const createInvoke = ({
         blockHash: receipt.blockHash,
         transactionIndex: receipt.transactionIndex,
         result: invocationResult,
-
         events: filterEvents(actions),
         logs: filterLogs(actions),
       };
@@ -210,7 +209,7 @@ export const createSmartContract = ({
     {
       read: (network) =>
         client.read(network).smartContract({
-          hash: definition.networks[network].hash,
+          address: definition.networks[network].address,
           abi: definition.abi,
           sourceMap: definition.sourceMap,
         }),

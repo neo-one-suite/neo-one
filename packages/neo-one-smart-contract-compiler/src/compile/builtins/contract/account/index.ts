@@ -15,7 +15,7 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractValue('Account', new ValueInstanceOf((sb) => sb.helpers.isAccount));
   builtins.addContractMember(
     'Account',
-    'hash',
+    'address',
     new SysCallInstanceMemberPrimitive('Neo.Account.GetScriptHash', Types.Account, Types.Buffer),
   );
   builtins.addContractMember('Account', 'getBalance', new AccountGetBalance());

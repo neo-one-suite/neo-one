@@ -7,4 +7,5 @@ export abstract class SmartContract {
   }
 }
 
+// tslint:disable-next-line no-default-export
 export default class FooSmartContract extends SmartContract {}

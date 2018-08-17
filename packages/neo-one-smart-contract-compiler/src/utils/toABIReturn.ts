@@ -27,7 +27,7 @@ export function toABIReturn(
   }
 
   if (context.builtins.isInterface(node, resolvedType, 'Address')) {
-    return { type: 'Hash160', optional };
+    return { type: 'Address', optional };
   }
 
   if (context.builtins.isInterface(node, resolvedType, 'Hash256')) {
@@ -71,7 +71,7 @@ export function toABIReturn(
   }
 
   if (isOnlyBuffer(context, node, resolvedType)) {
-    return { type: 'ByteArray', optional };
+    return { type: 'Buffer', optional };
   }
 
   return undefined;

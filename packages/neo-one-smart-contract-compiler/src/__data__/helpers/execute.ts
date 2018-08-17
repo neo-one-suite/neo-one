@@ -1,14 +1,14 @@
 import { CallReceiptJSON } from '@neo-one/client-core';
-import ts from 'typescript';
-import * as appRootDir from 'app-root-dir';
 import { tsUtils } from '@neo-one/ts-utils';
-import { getMonitor } from './getMonitor';
-import { checkResult } from './extractors';
-import { createContextForSnippet, createContextForPath } from '../../createContext';
-import { Context } from '../../Context';
-import { pathResolve } from '../../utils';
+import * as appRootDir from 'app-root-dir';
 import { RawSourceMap } from 'source-map';
-import { executeScript, EXECUTE_OPTIONS_DEFAULT, ExecuteOptions } from './executeScript';
+import ts from 'typescript';
+import { Context } from '../../Context';
+import { createContextForPath, createContextForSnippet } from '../../createContext';
+import { pathResolve } from '../../utils';
+import { EXECUTE_OPTIONS_DEFAULT, ExecuteOptions, executeScript } from './executeScript';
+import { checkResult } from './extractors';
+import { getMonitor } from './getMonitor';
 
 const execute = async (
   context: Context,
@@ -25,15 +25,16 @@ const execute = async (
 export const executeString = async (
   code: string,
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
-): Promise<{ receipt: CallReceiptJSON; sourceMap: RawSourceMap }> => {
-  const { context, sourceFile } = await createContextForSnippet(code, { withTestHarness: true });
+): Promise<{ readonly receipt: CallReceiptJSON; readonly sourceMap: RawSourceMap }> => {
+  const { context, sourceFile } = createContextForSnippet(code, { withTestHarness: true });
+
   return execute(context, sourceFile, options);
 };
 
 export const executeSnippet = async (
   snippetPath: string,
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
-): Promise<{ receipt: CallReceiptJSON; sourceMap: RawSourceMap }> => {
+): Promise<{ readonly receipt: CallReceiptJSON; readonly sourceMap: RawSourceMap }> => {
   const filePath = pathResolve(
     appRootDir.get(),
     'packages',
@@ -43,7 +44,7 @@ export const executeSnippet = async (
     'snippets',
     snippetPath,
   );
-  const context = await createContextForPath(filePath, { withTestHarness: true });
+  const context = createContextForPath(filePath, { withTestHarness: true });
   const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, filePath);
 
   return execute(context, sourceFile, options);

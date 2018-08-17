@@ -37,7 +37,7 @@ describe('ObjectBindingHelper', () => {
     });
 
     test('builtin value computed property', async () => {
-      await helpers.compileString(
+      helpers.compileString(
         `
         import { Blockchain } from '@neo-one/smart-contract';
         const { ['currentTransaction']: currentTransaction } = Blockchain;
@@ -49,7 +49,7 @@ describe('ObjectBindingHelper', () => {
     });
 
     test('builtin value rest property', async () => {
-      await helpers.compileString(
+      helpers.compileString(
         `
         import { Blockchain } from '@neo-one/smart-contract';
         const { currentTransaction, ...rest } = Blockchain;
@@ -61,7 +61,7 @@ describe('ObjectBindingHelper', () => {
     });
 
     test('builtin value unknown property', async () => {
-      await helpers.compileString(
+      helpers.compileString(
         `
         import { Blockchain } from '@neo-one/smart-contract';
         const { 0: something } = Blockchain;
@@ -73,7 +73,7 @@ describe('ObjectBindingHelper', () => {
     });
 
     test('builtin value method property', async () => {
-      await helpers.compileString(
+      helpers.compileString(
         `
         import { Address } from '@neo-one/smart-contract';
         const { verifySender } = Address;
@@ -104,7 +104,7 @@ describe('ObjectBindingHelper', () => {
     });
 
     test('builtin value instance computed property', async () => {
-      await helpers.compileString(
+      helpers.compileString(
         `
         import { Blockchain } from '@neo-one/smart-contract';
         const { ['references']: references } = Blockchain.currentTransaction;
@@ -116,7 +116,7 @@ describe('ObjectBindingHelper', () => {
     });
 
     test('builtin instance value method property', async () => {
-      await helpers.compileString(
+      helpers.compileString(
         `
         import { Account, Address } from '@neo-one/smart-contract';
         const { getBalance } = Account.for(Address.from('${keys[0].address}'));

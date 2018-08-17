@@ -1,56 +1,57 @@
-import { NULL_ACTION, TriggerType } from '@neo-one/node-core';
+// tslint:disable no-object-mutation
 import {
-  Param,
-  OpCode,
-  SysCallName,
-  AttributeUsage,
-  ScriptContainerType,
-  BinaryWriter,
-  InvocationTransaction,
-  UInt160Attribute,
-  ScriptBuilder,
-  common,
-  crypto,
-  Header,
-  Block,
   Account,
-  Validator,
   Asset,
   AssetType,
-  utils,
+  AttributeUsage,
+  BinaryWriter,
+  Block,
+  common,
   Contract,
+  crypto,
+  Header,
+  InvocationTransaction,
+  OpCode,
+  Param,
+  ScriptBuilder,
+  ScriptContainerType,
   StorageItem,
+  SysCallName,
+  UInt160Attribute,
+  utils,
+  Validator,
 } from '@neo-one/client-core';
-import { BN } from 'bn.js';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { DefaultMonitor } from '@neo-one/monitor';
+import { NULL_ACTION, TriggerType, WriteBlockchain } from '@neo-one/node-core';
+import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+import { BN } from 'bn.js';
 import { of } from 'rxjs';
-import { FEES, BLOCK_HEIGHT_YEAR, ExecutionInit, Options } from '../constants';
+import { keys, testUtils, transactions } from '../__data__';
+import { BLOCK_HEIGHT_YEAR, ExecutionInit, FEES, Options } from '../constants';
+import { executeScript } from '../execute';
 import {
-  StackItemType,
-  StackItem,
-  BufferStackItem,
+  AccountStackItem,
+  ArrayStackItem,
+  AssetStackItem,
+  AttributeStackItem,
+  BlockStackItem,
   BooleanStackItem,
+  BufferStackItem,
+  ContractStackItem,
+  ECPointStackItem,
+  HeaderStackItem,
+  InputStackItem,
   IntegerStackItem,
+  MapStackItem,
+  OutputStackItem,
+  StackItem,
+  StackItemType,
   StorageContextStackItem,
   TransactionStackItem,
   UInt160StackItem,
-  HeaderStackItem,
-  BlockStackItem,
-  AccountStackItem,
-  ArrayStackItem,
-  ValidatorStackItem,
-  AssetStackItem,
-  ContractStackItem,
   UInt256StackItem,
-  AttributeStackItem,
-  InputStackItem,
-  OutputStackItem,
-  ECPointStackItem,
-  MapStackItem,
+  ValidatorStackItem,
 } from '../stackItem';
-import { executeScript } from '../execute';
-import { keys, testUtils, transactions } from '../__data__';
 
 const monitor = DefaultMonitor.create({
   service: 'test',
@@ -82,7 +83,7 @@ const account = {
   hash: scriptAttributeHash,
   isFrozen: false,
   votes: [keys[0].publicKey, keys[1].publicKey],
-  balances: { [ASSETHASH1 as any]: new BN(10) },
+  balances: { [ASSETHASH1]: new BN(10) },
 };
 
 const asset = {
@@ -105,38 +106,44 @@ const nextItem = new StorageItem({
 });
 
 interface SysCall {
-  name: SysCallName;
-  type: 'sys';
+  readonly name: SysCallName;
+  readonly type: 'sys';
 
-  args?: Arg[];
+  readonly args?: ReadonlyArray<Arg>;
 }
 
 interface OpCall {
-  name: OpCode;
-  type: 'op';
+  readonly name: OpCode;
+  readonly type: 'op';
 
-  args?: Arg[];
-  buffer?: Buffer;
+  readonly args?: ReadonlyArray<Arg>;
+  readonly buffer?: Buffer;
 }
 type Call = SysCall | OpCall;
 
 interface Calls {
-  type: 'calls';
-  calls: Call[];
+  readonly type: 'calls';
+  readonly calls: ReadonlyArray<Call>;
 }
 type Arg = Param | undefined | Calls;
 
 interface TestCase {
-  name: SysCallName;
-  result: StackItem[] | ((options: { transaction: InvocationTransaction }) => StackItem[] | ((result: any) => void));
+  readonly name: SysCallName;
+  readonly result:
+    | ReadonlyArray<StackItem>
+    | ((
+        options: { readonly transaction: InvocationTransaction },
+      ) => // tslint:disable-next-line no-any
+      ReadonlyArray<StackItem> | ((result: any) => void));
 
-  gas: BN;
-  args?: Arg[];
-  options?: Options;
-  mock?: ((options: { blockchain: any }) => void);
+  readonly gas: BN;
+  readonly args?: ReadonlyArray<Arg>;
+  readonly options?: Options;
+  // tslint:disable-next-line no-any
+  readonly mock?: ((options: { readonly blockchain: any }) => void);
 }
 
-const SYSCALLS: TestCase[] = [
+const SYSCALLS = [
   {
     name: 'Neo.Runtime.GetTrigger',
     result: [new IntegerStackItem(new BN(triggerType))],
@@ -361,7 +368,7 @@ const SYSCALLS: TestCase[] = [
     result: [new HeaderStackItem(new Header(blockBase))],
     args: [Buffer.alloc(32, 3)],
     mock: ({ blockchain }) => {
-      blockchain.header.get = jest.fn(() => Promise.resolve(new Header(blockBase)));
+      blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
     gas: FEES.ONE_HUNDRED,
   },
@@ -371,7 +378,7 @@ const SYSCALLS: TestCase[] = [
     result: [new BlockStackItem(new Block(dummyBlock))],
     args: [Buffer.alloc(32, 3)],
     mock: ({ blockchain }) => {
-      blockchain.block.get = jest.fn(() => Promise.resolve(new Block(dummyBlock)));
+      blockchain.block.get = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
     },
     gas: FEES.TWO_HUNDRED,
   },
@@ -381,7 +388,7 @@ const SYSCALLS: TestCase[] = [
     result: [new TransactionStackItem(transactions.mintTransaction)],
     args: [Buffer.alloc(32, 3)],
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE_HUNDRED,
   },
@@ -391,7 +398,7 @@ const SYSCALLS: TestCase[] = [
     result: [new IntegerStackItem(new BN(10))],
     args: [Buffer.alloc(32, 3)],
     mock: ({ blockchain }) => {
-      blockchain.transactionData.get = jest.fn(() => Promise.resolve({ startHeight: 10 }));
+      blockchain.transactionData.get = jest.fn(async () => Promise.resolve({ startHeight: 10 }));
     },
     gas: FEES.ONE,
   },
@@ -401,7 +408,7 @@ const SYSCALLS: TestCase[] = [
     result: [new AccountStackItem(new Account(account))],
     args: [scriptAttributeHash],
     mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(() => Promise.resolve(new Account(account)));
+      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
     },
     gas: FEES.ONE_HUNDRED,
   },
@@ -424,7 +431,7 @@ const SYSCALLS: TestCase[] = [
     name: 'Neo.Blockchain.GetAsset',
     result: [new AssetStackItem(new Asset(asset))],
     mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(() => Promise.resolve(new Asset(asset)));
+      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
     },
     args: [Buffer.alloc(32, 3)],
     gas: FEES.ONE_HUNDRED,
@@ -434,7 +441,7 @@ const SYSCALLS: TestCase[] = [
     name: 'Neo.Blockchain.GetContract',
     result: [new ContractStackItem(transactions.kycContract)],
     mock: ({ blockchain }) => {
-      blockchain.contract.tryGet = jest.fn(() => Promise.resolve(transactions.kycContract));
+      blockchain.contract.tryGet = jest.fn(async () => Promise.resolve(transactions.kycContract));
     },
     args: [scriptAttributeHash],
     gas: FEES.ONE_HUNDRED,
@@ -444,7 +451,7 @@ const SYSCALLS: TestCase[] = [
     name: 'Neo.Blockchain.GetContract',
     result: [new BufferStackItem(Buffer.alloc(0, 0))],
     mock: ({ blockchain }) => {
-      blockchain.contract.tryGet = jest.fn(() => Promise.resolve(undefined));
+      blockchain.contract.tryGet = jest.fn(async () => Promise.resolve(undefined));
     },
     args: [scriptAttributeHash],
     gas: FEES.ONE_HUNDRED,
@@ -467,7 +474,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.header.get = jest.fn(() => Promise.resolve(new Header(blockBase)));
+      blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
     gas: FEES.ONE,
   },
@@ -489,7 +496,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.header.get = jest.fn(() => Promise.resolve(new Header(blockBase)));
+      blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
     gas: FEES.ONE,
   },
@@ -511,7 +518,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.header.get = jest.fn(() => Promise.resolve(new Header(blockBase)));
+      blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
     gas: FEES.ONE,
   },
@@ -533,7 +540,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.header.get = jest.fn(() => Promise.resolve(new Header(blockBase)));
+      blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
     gas: FEES.ONE,
   },
@@ -555,7 +562,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.header.get = jest.fn(() => Promise.resolve(new Header(blockBase)));
+      blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
     gas: FEES.ONE,
   },
@@ -577,7 +584,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.header.get = jest.fn(() => Promise.resolve(new Header(blockBase)));
+      blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
     gas: FEES.ONE,
   },
@@ -599,7 +606,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.header.get = jest.fn(() => Promise.resolve(new Header(blockBase)));
+      blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
     gas: FEES.ONE,
   },
@@ -621,7 +628,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.header.get = jest.fn(() => Promise.resolve(new Header(blockBase)));
+      blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
     gas: FEES.ONE,
   },
@@ -643,7 +650,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.block.get = jest.fn(() => Promise.resolve(new Block(dummyBlock)));
+      blockchain.block.get = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
     },
     gas: FEES.ONE,
   },
@@ -671,7 +678,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.block.get = jest.fn(() => Promise.resolve(new Block(dummyBlock)));
+      blockchain.block.get = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
     },
     gas: FEES.ONE,
   },
@@ -695,7 +702,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.block.get = jest.fn(() => Promise.resolve(new Block(dummyBlock)));
+      blockchain.block.get = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
     },
     gas: FEES.ONE,
   },
@@ -717,7 +724,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -739,7 +746,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -764,7 +771,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -787,7 +794,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -810,7 +817,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -833,9 +840,9 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
 
-      blockchain.output.get = jest.fn(() => Promise.resolve(transactions.mintTransaction.outputs[0]));
+      blockchain.output.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction.outputs[0]));
     },
     gas: FEES.TWO_HUNDRED,
   },
@@ -858,9 +865,9 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
 
-      blockchain.transactionData.get = jest.fn(() =>
+      blockchain.transactionData.get = jest.fn(async () =>
         Promise.resolve({
           hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
           startHeight: 1,
@@ -888,9 +895,9 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
 
-      blockchain.transactionData.get = jest.fn(() =>
+      blockchain.transactionData.get = jest.fn(async () =>
         Promise.resolve({
           hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
           startHeight: 1,
@@ -918,7 +925,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -952,7 +959,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -986,7 +993,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -1019,7 +1026,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -1053,7 +1060,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -1087,7 +1094,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -1121,7 +1128,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -1155,7 +1162,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(() => Promise.resolve(transactions.mintTransaction));
+      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
     gas: FEES.ONE,
   },
@@ -1177,7 +1184,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(() => Promise.resolve(new Account(account)));
+      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
     },
     gas: FEES.ONE,
   },
@@ -1200,14 +1207,14 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(() => Promise.resolve(new Account(account)));
+      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
     },
     gas: FEES.ONE,
   },
 
   {
     name: 'Neo.Account.GetBalance',
-    result: [new IntegerStackItem(account.balances[ASSETHASH1 as any])],
+    result: [new IntegerStackItem(account.balances[ASSETHASH1])],
     args: [
       {
         type: 'calls',
@@ -1224,9 +1231,9 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(() => Promise.resolve(new Account(account)));
+      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
 
-      blockchain.account.get = jest.fn(() => Promise.resolve(new Account(account)));
+      blockchain.account.get = jest.fn(async () => Promise.resolve(new Account(account)));
     },
     gas: FEES.ONE,
   },
@@ -1250,9 +1257,9 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(() => Promise.resolve(new Account(account)));
+      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
 
-      blockchain.account.get = jest.fn(() => Promise.resolve(new Account(account)));
+      blockchain.account.get = jest.fn(async () => Promise.resolve(new Account(account)));
     },
     gas: FEES.ONE,
   },
@@ -1274,7 +1281,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(() => Promise.resolve(new Asset(asset)));
+      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
     },
     gas: FEES.ONE,
   },
@@ -1296,7 +1303,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(() => Promise.resolve(new Asset(asset)));
+      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
     },
     gas: FEES.ONE,
   },
@@ -1318,7 +1325,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(() => Promise.resolve(new Asset(asset)));
+      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
     },
     gas: FEES.ONE,
   },
@@ -1340,7 +1347,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(() => Promise.resolve(new Asset(asset)));
+      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
     },
     gas: FEES.ONE,
   },
@@ -1362,7 +1369,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(() => Promise.resolve(new Asset(asset)));
+      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
     },
     gas: FEES.ONE,
   },
@@ -1384,7 +1391,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(() => Promise.resolve(new Asset(asset)));
+      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
     },
     gas: FEES.ONE,
   },
@@ -1406,7 +1413,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(() => Promise.resolve(new Asset(asset)));
+      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
     },
     gas: FEES.ONE,
   },
@@ -1428,7 +1435,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(() => Promise.resolve(new Asset(asset)));
+      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
     },
     gas: FEES.ONE,
   },
@@ -1450,7 +1457,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.tryGet = jest.fn(() => Promise.resolve(transactions.kycContract));
+      blockchain.contract.tryGet = jest.fn(async () => Promise.resolve(transactions.kycContract));
     },
     gas: FEES.ONE,
   },
@@ -1472,7 +1479,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.tryGet = jest.fn(() => Promise.resolve(transactions.kycContract));
+      blockchain.contract.tryGet = jest.fn(async () => Promise.resolve(transactions.kycContract));
     },
     gas: FEES.ONE,
   },
@@ -1509,9 +1516,9 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve({ value: Buffer.alloc(10, 1) }));
+      blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve({ value: Buffer.alloc(10, 1) }));
     },
     gas: FEES.ONE_HUNDRED,
   },
@@ -1536,7 +1543,7 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of());
     },
@@ -1843,7 +1850,7 @@ const SYSCALLS: TestCase[] = [
 
     result: [new BooleanStackItem(true)],
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(Buffer.alloc(1, 1), Buffer.alloc(1, 2)));
     },
@@ -1879,7 +1886,7 @@ const SYSCALLS: TestCase[] = [
 
     result: [new BooleanStackItem(false)],
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of());
     },
@@ -1948,7 +1955,7 @@ const SYSCALLS: TestCase[] = [
 
     result: [new BufferStackItem(nextItem.key), new BooleanStackItem(true)],
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
@@ -2017,7 +2024,7 @@ const SYSCALLS: TestCase[] = [
 
     result: [new BufferStackItem(nextItem.value), new BooleanStackItem(true)],
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
@@ -2073,7 +2080,7 @@ const SYSCALLS: TestCase[] = [
 
     result: [new BufferStackItem(nextItem.value)],
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
@@ -2129,7 +2136,7 @@ const SYSCALLS: TestCase[] = [
 
     result: [new BufferStackItem(nextItem.key)],
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
@@ -2155,12 +2162,12 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(() => Promise.resolve(new Account(account)));
+      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
 
-      blockchain.account.get = jest.fn(() => Promise.resolve(new Account(account)));
+      blockchain.account.get = jest.fn(async () => Promise.resolve(new Account(account)));
 
       blockchain.settings.governingToken = { hashHex: ASSETHASH1 };
-      blockchain.account.update = jest.fn(() =>
+      blockchain.account.update = jest.fn(async () =>
         Promise.resolve({
           ...account,
           votes: [keys[2].publicKey],
@@ -2199,7 +2206,7 @@ const SYSCALLS: TestCase[] = [
 
     mock: ({ blockchain }) => {
       blockchain.currentBlock.index = 2 - (2000000 + 1);
-      blockchain.asset.add = jest.fn(() => Promise.resolve());
+      blockchain.asset.add = jest.fn(async () => Promise.resolve());
     },
     gas: common.FIVE_THOUSAND_FIXED8,
   },
@@ -2224,9 +2231,9 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(() => Promise.resolve(new Asset(asset)));
+      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
       blockchain.currentBlock.index = 1;
-      blockchain.asset.update = jest.fn(() => Promise.resolve());
+      blockchain.asset.update = jest.fn(async () => Promise.resolve());
     },
     gas: common.FIVE_THOUSAND_FIXED8.mul(new BN(2)),
   },
@@ -2247,8 +2254,8 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.tryGet = jest.fn(() => Promise.resolve());
-      blockchain.contract.add = jest.fn(() => Promise.resolve());
+      blockchain.contract.tryGet = jest.fn(async () => Promise.resolve());
+      blockchain.contract.add = jest.fn(async () => Promise.resolve());
     },
     gas: common.FIVE_HUNDRED_FIXED8,
   },
@@ -2269,9 +2276,10 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.tryGet = jest.fn(() => Promise.resolve());
-      blockchain.contract.add = jest.fn(() => Promise.resolve());
-      blockchain.storageItem.getAll$ = jest.fn(() => of());
+      blockchain.contract.tryGet = jest.fn(async () => Promise.resolve());
+      blockchain.contract.add = jest.fn(async () => Promise.resolve());
+      blockchain.storageItem.getAll$ = jest.fn(of);
+      blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
     gas: common.FIVE_HUNDRED_FIXED8,
   },
@@ -2283,8 +2291,7 @@ const SYSCALLS: TestCase[] = [
       createdContracts: {
         [transactions.kycContract.hashHex]: Buffer.from('f42c9189cbfc9d582b7039b29e2cf36ec1283f1b', 'hex'),
       },
-    } as any,
-
+    },
     result: [new StorageContextStackItem(transactions.kycContract.hash)],
     gas: FEES.ONE,
   },
@@ -2293,9 +2300,7 @@ const SYSCALLS: TestCase[] = [
     name: 'Neo.Contract.Destroy',
     result: [],
     mock: ({ blockchain }) => {
-      blockchain.contract.tryGet = jest.fn(() => {
-        Promise.resolve();
-      });
+      blockchain.contract.tryGet = jest.fn(async () => Promise.resolve());
     },
     gas: FEES.ONE,
   },
@@ -2319,10 +2324,10 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve());
-      blockchain.storageItem.add = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
+      blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
     gas: FEES.ONE_THOUSAND,
   },
@@ -2346,10 +2351,10 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve());
-      blockchain.storageItem.add = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
+      blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
     gas: FEES.ONE_THOUSAND,
   },
@@ -2373,10 +2378,10 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve());
-      blockchain.storageItem.add = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
+      blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
     gas: FEES.ONE_THOUSAND.mul(new BN(2)),
   },
@@ -2400,10 +2405,10 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve());
-      blockchain.storageItem.add = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
+      blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
     gas: FEES.ONE_THOUSAND,
   },
@@ -2427,10 +2432,10 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.tryGet = jest.fn(() => Promise.resolve());
-      blockchain.storageItem.add = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
+      blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
     gas: FEES.ONE_THOUSAND.mul(new BN(2)),
   },
@@ -2453,9 +2458,9 @@ const SYSCALLS: TestCase[] = [
     ],
 
     mock: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(() => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.delete = jest.fn(() => Promise.resolve());
+      blockchain.storageItem.delete = jest.fn(async () => Promise.resolve());
     },
     gas: FEES.ONE_HUNDRED,
   },
@@ -2485,10 +2490,10 @@ const SYSCALLS: TestCase[] = [
 
     gas: FEES.ONE,
   },
-] as TestCase[];
+] as ReadonlyArray<TestCase>;
 
 const handleCall = (sb: ScriptBuilder, call: Call) => {
-  if (call.args != undefined) {
+  if (call.args !== undefined) {
     // eslint-disable-next-line
     handleArgs(sb, call.args);
   }
@@ -2500,43 +2505,52 @@ const handleCall = (sb: ScriptBuilder, call: Call) => {
   }
 };
 
-const handleArgs = (sb: ScriptBuilder, args: Arg[]) => {
+const handleArgs = (sb: ScriptBuilder, args: ReadonlyArray<Arg>) => {
+  // tslint:disable-next-line no-loop-statement
   for (let i = args.length - 1; i >= 0; i -= 1) {
-    const arg = args[i];
-    if (
-      arg != undefined &&
-      typeof arg === 'object' &&
-      (arg as any).type === 'calls' &&
-      (arg as any).calls != undefined
-    ) {
-      (((arg as any).calls as any) as Call[]).forEach((call) => {
+    // tslint:disable-next-line no-any
+    const arg: any = args[i];
+    if (arg != undefined && typeof arg === 'object' && arg.type === 'calls' && arg.calls != undefined) {
+      // tslint:disable-next-line no-any
+      arg.calls.forEach((call: any) => {
         handleCall(sb, call);
       });
     } else {
-      sb.emitPushParam(arg as any);
+      sb.emitPushParam(arg);
     }
   }
 };
 
 describe('syscalls', () => {
+  // tslint:disable-next-line no-any
   const filterMethods = (value: any): any => {
     if (value == undefined) {
       return value;
-    } else if (Array.isArray(value)) {
-      return value.map((val) => filterMethods(val));
-    } else if (typeof value === 'function') {
+    }
+
+    if (Array.isArray(value)) {
+      return value.map(filterMethods);
+    }
+
+    if (typeof value === 'function') {
       return undefined;
-    } else if (typeof value === 'object') {
+    }
+
+    if (typeof value === 'object') {
+      // tslint:disable-next-line no-any
       const result: { [key: string]: any } = {};
+      // tslint:disable-next-line no-loop-statement
       for (const [key, val] of Object.entries(value)) {
         result[key] = filterMethods(val);
       }
+
       return result;
     }
 
     return value;
   };
 
+  // tslint:disable-next-line no-loop-statement
   for (const testCase of SYSCALLS) {
     const { name, result, gas, args = [], mock, options } = testCase;
     it(name, async () => {
@@ -2569,10 +2583,18 @@ describe('syscalls', () => {
       };
 
       const listeners = {
-        onNotify: jest.fn(() => {}),
-        onLog: jest.fn(() => {}),
-        onMigrateContract: jest.fn(() => {}),
-        onSetVotes: jest.fn(() => {}),
+        onNotify: jest.fn(() => {
+          // do nothing
+        }),
+        onLog: jest.fn(() => {
+          // do nothing
+        }),
+        onMigrateContract: jest.fn(() => {
+          // do nothing
+        }),
+        onSetVotes: jest.fn(() => {
+          // do nothing
+        }),
       };
 
       const block = {
@@ -2589,13 +2611,13 @@ describe('syscalls', () => {
         action: NULL_ACTION,
         listeners,
         skipWitnessVerify: false,
-        persistingBlock: block as any,
+        persistingBlock: block as Block,
       };
 
       const gasLeft = common.ONE_HUNDRED_MILLION_FIXED8;
       let stack: ReadonlyArray<StackItem> = [];
 
-      if (mock != undefined) {
+      if (mock !== undefined) {
         mock({ blockchain });
       }
 
@@ -2606,7 +2628,7 @@ describe('syscalls', () => {
         const argsContext = await executeScript({
           monitor,
           code: argsSB.build(),
-          blockchain: blockchain as any,
+          blockchain: blockchain as WriteBlockchain,
           init,
           gasLeft,
         });
@@ -2618,17 +2640,18 @@ describe('syscalls', () => {
       const context = await executeScript({
         monitor,
         code: transaction.script,
-        blockchain: blockchain as any,
+        blockchain: blockchain as WriteBlockchain,
         init,
         gasLeft,
-        options: options || ({ stack } as any),
+        options: options === undefined ? { stack } : options,
       });
 
       expect(context.errorMessage).toBeUndefined();
       if (Array.isArray(result)) {
         expect(filterMethods(context.stack)).toEqual(filterMethods(result));
       } else {
-        const expectedResult = result({ transaction });
+        // tslint:disable-next-line no-any
+        const expectedResult = (result as any)({ transaction });
         if (Array.isArray(expectedResult)) {
           expect(context.stack).toEqual(expectedResult);
         } else {

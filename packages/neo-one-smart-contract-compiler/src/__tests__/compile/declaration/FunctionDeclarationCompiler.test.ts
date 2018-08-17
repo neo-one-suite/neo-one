@@ -153,7 +153,7 @@ describe('FunctionDeclarationCompiler', () => {
   });
 
   test('spread arguments unsupported', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       function foo(x: number, ...y: number[]): number[] {
         return y;

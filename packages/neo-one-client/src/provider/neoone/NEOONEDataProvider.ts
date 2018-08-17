@@ -1,13 +1,16 @@
 import {
   AccountJSON,
   AssetJSON,
+  AssetTypeJSON,
   AttributeJSON,
   BlockJSON,
   common,
   ContractJSON,
+  ContractParameterTypeJSON,
   convertAction,
   convertCallReceipt,
   convertInvocationResult,
+  InputJSON,
   InvocationDataJSON,
   InvocationTransaction as CoreInvocationTransaction,
   InvocationTransactionJSON,
@@ -15,48 +18,50 @@ import {
   NetworkSettingsJSON,
   OutputJSON,
   ScriptBuilderParam,
+  StorageItemJSON,
   TransactionJSON,
   utils,
-  ValidatorJSON,
 } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
 import { flatten } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatten';
+import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { AsyncBlockIterator } from '../../AsyncBlockIterator';
+import { scriptHashToAddress } from '../../helpers';
 import {
   Account,
-  ActionRaw,
   AddressString,
   Asset,
+  AssetType,
   Attribute,
   Block,
   BlockFilter,
   BufferString,
   ConfirmedTransaction,
   Contract,
+  ContractParameterType,
   DataProvider,
   DeveloperProvider,
   GetOptions,
-  Hash160String,
   Hash256String,
   Input,
+  InputOutput,
   NetworkSettings,
   NetworkType,
   Options,
   Output,
   Peer,
+  RawAction,
   RawCallReceipt,
   RawInvocationData,
   StorageItem,
   Transaction,
   TransactionBase,
   TransactionReceipt,
-  UnspentOutput,
-  Validator,
 } from '../../types';
 import * as clientUtils from '../../utils';
 import { MissingTransactionDataError } from './errors';
@@ -99,7 +104,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
         );
 
         return {
-          unclaimed: account.unclaimed,
+          unclaimed: this.convertInputs(account.unclaimed),
           amount: amounts.reduce((acc, amount) => acc.plus(amount), utils.ZERO_BIG_NUMBER),
         };
       },
@@ -108,13 +113,13 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     );
   }
 
-  public async getUnspentOutputs(address: AddressString, monitor?: Monitor): Promise<ReadonlyArray<UnspentOutput>> {
+  public async getUnspentOutputs(address: AddressString, monitor?: Monitor): Promise<ReadonlyArray<InputOutput>> {
     return this.capture(
       async (span) => {
         const account = await this.getAccountInternal(address, span);
         const outputs = await Promise.all(
           account.unspent.map(
-            async (input): Promise<UnspentOutput | undefined> => {
+            async (input): Promise<InputOutput | undefined> => {
               const outputJSON = await this.mutableClient.getUnspentOutput(input, span);
 
               if (outputJSON === undefined) {
@@ -127,8 +132,8 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
                 asset: output.asset,
                 value: output.value,
                 address: output.address,
-                txid: input.txid,
-                vout: input.vout,
+                hash: input.txid,
+                index: input.vout,
               };
             },
           ),
@@ -181,8 +186,6 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
 
     return {
       address,
-      frozen: account.frozen,
-      votes: account.votes,
       balances: account.balances.reduce<Account['balances']>(
         (acc, { asset, value }) => ({
           ...acc,
@@ -224,8 +227,8 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     return this.mutableClient.getBlockCount(monitor);
   }
 
-  public async getContract(hash: Hash160String, monitor?: Monitor): Promise<Contract> {
-    const contract = await this.mutableClient.getContract(hash, monitor);
+  public async getContract(address: AddressString, monitor?: Monitor): Promise<Contract> {
+    const contract = await this.mutableClient.getContract(address, monitor);
 
     return this.convertContract(contract);
   }
@@ -241,15 +244,15 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
   }
 
   public async getOutput(input: Input, monitor?: Monitor): Promise<Output> {
-    const output = await this.mutableClient.getOutput(input, monitor);
+    const output = await this.mutableClient.getOutput(
+      {
+        txid: input.hash,
+        vout: input.index,
+      },
+      monitor,
+    );
 
     return this.convertOutput(output);
-  }
-
-  public async getValidators(monitor?: Monitor): Promise<ReadonlyArray<Validator>> {
-    return this.mutableClient
-      .getValidators(monitor)
-      .then((validators) => validators.map((validator) => this.convertValidator(validator)));
   }
 
   public async getConnectedPeers(monitor?: Monitor): Promise<ReadonlyArray<Peer>> {
@@ -262,18 +265,23 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     return this.convertNetworkSettings(settings);
   }
 
-  public async getStorage(hash: Hash160String, key: BufferString, monitor?: Monitor): Promise<StorageItem> {
-    return this.mutableClient.getStorageItem(hash, key, monitor);
+  public async getStorage(address: AddressString, key: BufferString, monitor?: Monitor): Promise<StorageItem> {
+    const storageItem = await this.mutableClient.getStorageItem(address, key, monitor);
+
+    return this.convertStorageItem(storageItem);
   }
 
-  public iterStorage(hash: Hash160String, monitor?: Monitor): AsyncIterable<StorageItem> {
+  public iterStorage(address: AddressString, monitor?: Monitor): AsyncIterable<StorageItem> {
     return AsyncIterableX.from(
-      this.mutableClient.getAllStorage(hash, monitor).then((res) => AsyncIterableX.from(res)),
+      this.mutableClient.getAllStorage(address, monitor).then((res) => AsyncIterableX.from(res)),
+    ).pipe(
       // tslint:disable-next-line no-any
-    ).pipe(flatten<StorageItem>() as any);
+      flatten<StorageItem>() as any,
+      map<StorageItemJSON, StorageItem>((storageItem) => this.convertStorageItem(storageItem)),
+    );
   }
 
-  public iterActionsRaw(filter: BlockFilter = {}): AsyncIterable<ActionRaw> {
+  public iterActionsRaw(filter: BlockFilter = {}): AsyncIterable<RawAction> {
     return AsyncIterableX.from(
       this.iterBlocks({
         indexStart: filter.indexStart,
@@ -298,7 +306,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
   }
 
   public async call(
-    contract: Hash160String,
+    contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     monitor?: Monitor,
@@ -307,7 +315,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
       version: 1,
       gas: common.TEN_THOUSAND_FIXED8,
       script: clientUtils.getInvokeMethodScript({
-        hash: contract,
+        address: contract,
         method,
         params,
       }),
@@ -334,6 +342,14 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
 
   public async reset(monitor?: Monitor): Promise<void> {
     return this.mutableClient.reset(monitor);
+  }
+
+  private convertStorageItem(storageItem: StorageItemJSON): StorageItem {
+    return {
+      address: scriptHashToAddress(storageItem.hash),
+      key: storageItem.key,
+      value: storageItem.value,
+    };
   }
 
   private convertBlock(block: BlockJSON): Block {
@@ -396,12 +412,12 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
           type: 'InvocationTransaction',
           script: invocation.script,
           gas: new BigNumber(invocation.gas),
-          data,
+          receipt: data,
           invocationData,
         };
       },
       // tslint:disable-next-line no-any
-      (converted) => ({ ...converted, data } as any),
+      (converted) => ({ ...converted, receipt: data } as any),
     );
   }
 
@@ -411,12 +427,12 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     convertTransaction: (transaction: Transaction) => Result,
   ): Result {
     const transactionBase = {
-      txid: transaction.txid,
+      hash: transaction.txid,
       size: transaction.size,
       version: transaction.version,
       attributes: this.convertAttributes(transaction.attributes),
-      vin: transaction.vin,
-      vout: this.convertOutputs(transaction.vout),
+      inputs: this.convertInputs(transaction.vin),
+      outputs: this.convertOutputs(transaction.vout),
       scripts: transaction.scripts,
       systemFee: new BigNumber(transaction.sys_fee),
       networkFee: new BigNumber(transaction.net_fee),
@@ -428,7 +444,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
         converted = {
           ...transactionBase,
           type: 'ClaimTransaction',
-          claims: transaction.claims,
+          claims: this.convertInputs(transaction.claims),
         };
         break;
       case 'ContractTransaction':
@@ -471,7 +487,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
           ...transactionBase,
           type: 'RegisterTransaction',
           asset: {
-            type: transaction.asset.type,
+            type: this.convertAssetType(transaction.asset.type),
             name: Array.isArray(transaction.asset.name) ? transaction.asset.name[0].name : transaction.asset.name,
             amount: new BigNumber(transaction.asset.amount),
             precision: transaction.asset.precision,
@@ -484,11 +500,12 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
         converted = {
           ...transactionBase,
           type: 'StateTransaction',
-          descriptors: transaction.descriptors,
         };
         break;
       default:
+        /* istanbul ignore next */
         commonUtils.assertNever(transaction);
+        /* istanbul ignore next */
         throw new Error('For TS');
     }
 
@@ -499,8 +516,19 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     return attributes.map((attribute) => ({
       // tslint:disable-next-line no-any
       usage: attribute.usage as any,
-      data: attribute.data,
+      data: attribute.usage === 'Script' ? scriptHashToAddress(attribute.data) : attribute.data,
     }));
+  }
+
+  private convertInputs(inputs: ReadonlyArray<InputJSON>): ReadonlyArray<Input> {
+    return inputs.map((input) => this.convertInput(input));
+  }
+
+  private convertInput(input: InputJSON): Input {
+    return {
+      hash: input.txid,
+      index: input.vout,
+    };
   }
 
   private convertOutputs(outputs: ReadonlyArray<OutputJSON>): ReadonlyArray<Output> {
@@ -518,21 +546,51 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
   private convertContract(contract: ContractJSON): Contract {
     return {
       version: contract.version,
-      hash: contract.hash,
+      address: scriptHashToAddress(contract.hash),
       script: contract.script,
-      parameters: contract.parameters,
-      returnType: contract.returntype,
+      parameters: contract.parameters.map((param) => this.convertContractParameterType(param)),
+      returnType: this.convertContractParameterType(contract.returntype),
       name: contract.name,
       codeVersion: contract.code_version,
       author: contract.author,
       email: contract.email,
       description: contract.description,
-      properties: {
-        storage: contract.properties.storage,
-        dynamicInvoke: contract.properties.dynamic_invoke,
-        payable: contract.properties.payable,
-      },
+      storage: contract.properties.storage,
+      dynamicInvoke: contract.properties.dynamic_invoke,
+      payable: contract.properties.payable,
     };
+  }
+
+  private convertContractParameterType(param: ContractParameterTypeJSON): ContractParameterType {
+    switch (param) {
+      case 'Signature':
+        return 'Signature';
+      case 'Boolean':
+        return 'Boolean';
+      case 'Integer':
+        return 'Integer';
+      case 'Hash160':
+        return 'Address';
+      case 'Hash256':
+        return 'Hash256';
+      case 'ByteArray':
+        return 'Buffer';
+      case 'PublicKey':
+        return 'PublicKey';
+      case 'String':
+        return 'String';
+      case 'Array':
+        return 'Array';
+      case 'InteropInterface':
+        return 'InteropInterface';
+      case 'Void':
+        return 'Void';
+      default:
+        /* istanbul ignore next */
+        commonUtils.assertNever(param);
+        /* istanbul ignore next */
+        throw new Error('For TS');
+    }
   }
 
   private convertInvocationData(
@@ -546,22 +604,14 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
       result: convertInvocationResult(data.result),
       asset: data.asset === undefined ? data.asset : this.convertAsset(data.asset),
       contracts: data.contracts.map((contract) => this.convertContract(contract)),
-
-      deletedContractHashes: data.deletedContractHashes,
-      migratedContractHashes: data.migratedContractHashes,
-      voteUpdates: data.voteUpdates,
+      deletedContractAddresses: data.deletedContractHashes.map(scriptHashToAddress),
+      migratedContractAddresses: data.migratedContractHashes.map<[AddressString, AddressString]>(([hash0, hash1]) => [
+        scriptHashToAddress(hash0),
+        scriptHashToAddress(hash1),
+      ]),
       actions: data.actions.map((action, idx) =>
         convertAction(blockHash, blockIndex, transactionHash, transactionIndex, idx, action),
       ),
-    };
-  }
-
-  private convertValidator(validator: ValidatorJSON): Validator {
-    return {
-      version: validator.version,
-      publicKey: validator.publicKey,
-      registered: validator.registered,
-      votes: new BigNumber(validator.votes),
     };
   }
 
@@ -577,7 +627,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
 
     return {
       hash: asset.id,
-      type: asset.type,
+      type: this.convertAssetType(asset.type),
       name,
       amount: new BigNumber(asset.amount),
       available: new BigNumber(asset.available),
@@ -588,6 +638,32 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
       expiration: asset.expiration,
       frozen: asset.frozen,
     };
+  }
+
+  private convertAssetType(assetType: AssetTypeJSON): AssetType {
+    switch (assetType) {
+      case 'CreditFlag':
+        return 'Credit';
+      case 'DutyFlag':
+        return 'Duty';
+      case 'GoverningToken':
+        return 'Governing';
+      case 'UtilityToken':
+        return 'Utility';
+      case 'Currency':
+        return 'Currency';
+      case 'Share':
+        return 'Share';
+      case 'Invoice':
+        return 'Invoice';
+      case 'Token':
+        return 'Token';
+      default:
+        /* istanbul ignore next */
+        commonUtils.assertNever(assetType);
+        /* istanbul ignore next */
+        throw new Error('For TS');
+    }
   }
 
   private async getAccountInternal(address: AddressString, monitor?: Monitor): Promise<AccountJSON> {

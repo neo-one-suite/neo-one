@@ -794,11 +794,26 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.Migrate 4`] = `Array []`;
+exports[`syscalls Neo.Contract.Migrate 4`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
+      "key": undefined,
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": undefined,
+    },
+  ],
+]
+`;
 
 exports[`syscalls Neo.Contract.Migrate 5`] = `Array []`;
 
-exports[`syscalls Neo.Contract.Migrate 6`] = `
+exports[`syscalls Neo.Contract.Migrate 6`] = `Array []`;
+
+exports[`syscalls Neo.Contract.Migrate 7`] = `
 Array [
   Array [
     Object {
@@ -809,7 +824,7 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.Migrate 7`] = `Array []`;
+exports[`syscalls Neo.Contract.Migrate 8`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Next 1`] = `Array []`;
 

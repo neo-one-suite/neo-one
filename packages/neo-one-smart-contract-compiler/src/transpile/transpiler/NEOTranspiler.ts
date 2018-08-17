@@ -23,10 +23,10 @@ interface Switch {
   readonly original: ts.Node;
 }
 
-const BYTE_ARRAY_RETURN: ABIReturn = { type: 'ByteArray' };
+const BYTE_ARRAY_RETURN: ABIReturn = { type: 'Buffer' };
 const BOOLEAN_RETURN: ABIReturn = { type: 'Boolean' };
 const PARAMETERS: ReadonlyArray<ContractParameterType> = ['String', 'Array'];
-const RETURN_TYPE = 'ByteArray';
+const RETURN_TYPE = 'Buffer';
 const createDefaultContract = (name: string): Contract => ({
   parameters: PARAMETERS,
   returnType: RETURN_TYPE,
@@ -35,11 +35,9 @@ const createDefaultContract = (name: string): Contract => ({
   author: 'unknown',
   email: 'unknown',
   description: '',
-  properties: {
-    storage: true,
-    dynamicInvoke: true,
-    payable: true,
-  },
+  storage: true,
+  dynamicInvoke: true,
+  payable: true,
 });
 
 export class NEOTranspiler implements Transpiler {
@@ -204,7 +202,7 @@ export class NEOTranspiler implements Transpiler {
                 decimals: 0,
               },
               {
-                type: 'ByteArray',
+                type: 'Buffer',
                 name: 'args',
               },
             ],
@@ -778,18 +776,16 @@ export class NEOTranspiler implements Transpiler {
       }
     }
 
-    // tslint:disable-next-line no-object-literal-type-assertion
     return {
       ...contract,
       name,
       parameters: PARAMETERS,
       returnType: RETURN_TYPE,
-      properties: {
-        dynamicInvoke: false,
-        storage: true,
-        payable,
-      },
-    } as Contract;
+      dynamicInvoke: false,
+      storage: true,
+      payable,
+      // tslint:disable-next-line no-any
+    } as any;
   }
 
   private processProperty(
@@ -852,7 +848,7 @@ export class NEOTranspiler implements Transpiler {
             returnType:
               retType === undefined
                 ? {
-                    type: 'ByteArray',
+                    type: 'Buffer',
                   }
                 : retType,
           },
@@ -872,7 +868,7 @@ export class NEOTranspiler implements Transpiler {
                 name: tsUtils.node.getNameOrThrow(tsUtils.parametered.getParameters(setDecl)[0]),
                 ...(retType === undefined
                   ? {
-                      type: 'ByteArray',
+                      type: 'Buffer',
                     }
                   : retType),
               },

@@ -5,13 +5,7 @@ import _ from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { LockedAccountError, UnknownAccountError } from '../../errors';
-import {
-  decryptNEP2,
-  encryptNEP2,
-  privateKeyToPublicKey,
-  publicKeyToScriptHash,
-  scriptHashToAddress,
-} from '../../helpers';
+import { decryptNEP2, encryptNEP2, privateKeyToPublicKey, publicKeyToAddress } from '../../helpers';
 import { BufferString, NetworkType, UpdateAccountNameOptions, UserAccount, UserAccountID, Witness } from '../../types';
 
 export interface LockedWallet {
@@ -87,12 +81,8 @@ export class LocalKeyStore {
     return this.accountsInternal$.getValue();
   }
 
-  public get wallets(): Wallets {
-    return this.walletsInternal$.getValue();
-  }
-
-  public get currentAccount(): UserAccount | undefined {
-    return this.currentAccountInternal$.getValue();
+  public get wallets(): ReadonlyArray<Wallet> {
+    return flattenWallets(this.walletsObj);
   }
 
   public async sign({
@@ -124,6 +114,7 @@ export class LocalKeyStore {
   public async selectAccount(id?: UserAccountID, _monitor?: Monitor): Promise<void> {
     if (id === undefined) {
       this.currentAccountInternal$.next(undefined);
+      this.newCurrentAccount();
     } else {
       const { account } = this.getWallet(id);
       this.currentAccountInternal$.next(account);
@@ -141,7 +132,6 @@ export class LocalKeyStore {
           type: wallet.account.type,
           id: wallet.account.id,
           name,
-          scriptHash: wallet.account.scriptHash,
           publicKey: wallet.account.publicKey,
           deletable: true,
           configurableName: true,
@@ -171,7 +161,7 @@ export class LocalKeyStore {
   }
 
   public getWallet({ address, network }: UserAccountID): Wallet {
-    const wallets = this.wallets[network];
+    const wallets = this.walletsObj[network];
     if (wallets === undefined) {
       throw new UnknownAccountError(address);
     }
@@ -226,8 +216,7 @@ export class LocalKeyStore {
         }
 
         const publicKey = privateKeyToPublicKey(privateKey);
-        const scriptHash = publicKeyToScriptHash(publicKey);
-        const address = scriptHashToAddress(scriptHash);
+        const address = publicKeyToAddress(publicKey);
 
         if (nep2 === undefined && password !== undefined) {
           nep2 = await encryptNEP2({ privateKey, password });
@@ -239,9 +228,7 @@ export class LocalKeyStore {
             network,
             address,
           },
-
           name: name === undefined ? address : name,
-          scriptHash,
           publicKey,
           configurableName: true,
           deletable: true,
@@ -279,7 +266,7 @@ export class LocalKeyStore {
 
     return this.capture(
       async (span) => {
-        const { wallets } = this;
+        const { walletsObj: wallets } = this;
         const networkWalletsIn = wallets[id.network];
         if (networkWalletsIn === undefined) {
           return;
@@ -326,11 +313,6 @@ export class LocalKeyStore {
         const wallet = this.getWallet(id);
         if (wallet.type === 'unlocked') {
           return;
-        }
-
-        // tslint:disable-next-line strict-type-predicates
-        if (wallet.nep2 === undefined) {
-          throw new Error('Unexpected error, privateKey and NEP2 were both undefined.');
         }
 
         const privateKey = await decryptNEP2({
@@ -399,7 +381,7 @@ export class LocalKeyStore {
   }
 
   private updateWallet(wallet: Wallet): void {
-    const { wallets } = this;
+    const { walletsObj: wallets } = this;
     this.walletsInternal$.next({
       ...wallets,
       [wallet.account.id.network]: {
@@ -410,7 +392,7 @@ export class LocalKeyStore {
   }
 
   private newCurrentAccount(): void {
-    const allAccounts = flattenWallets(this.wallets).map(({ account: value }) => value);
+    const allAccounts = this.wallets.map(({ account: value }) => value);
 
     const account = allAccounts[0];
     this.currentAccountInternal$.next(account);
@@ -426,5 +408,13 @@ export class LocalKeyStore {
       level: { log: 'verbose', span: 'info' },
       trace: true,
     });
+  }
+
+  private get walletsObj(): Wallets {
+    return this.walletsInternal$.getValue();
+  }
+
+  private get currentAccount(): UserAccount | undefined {
+    return this.currentAccountInternal$.getValue();
   }
 }

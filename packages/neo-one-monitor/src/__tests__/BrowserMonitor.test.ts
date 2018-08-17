@@ -1,4 +1,5 @@
 /* @jest-environment jsdom */
+// tslint:disable
 import * as prom from 'prom-client';
 
 import { CollectingLogger } from '../CollectingLogger';
@@ -164,7 +165,6 @@ describe('BrowserMonitor', () => {
   });
 
   test('Reporter - POST success', async () => {
-    // tslint:disable-next-line no-object-mutation no-any
     (global as any).fetch = jest.fn(async () => Promise.resolve({ ok: true }));
 
     reporter = new Reporter({

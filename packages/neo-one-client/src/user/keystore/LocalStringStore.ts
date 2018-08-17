@@ -2,7 +2,7 @@ import { PasswordRequiredError } from '../../errors';
 import * as networks from '../../networks';
 import { Wallet as LocalWallet } from './LocalKeyStore';
 
-interface Storage {
+export interface Storage {
   readonly setItem: (key: string, value: string) => Promise<void>;
   readonly getItem: (key: string) => Promise<string>;
   readonly removeItem: (key: string) => Promise<void>;

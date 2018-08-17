@@ -1,15 +1,14 @@
 // tslint:disable no-unsafe-any
 import {
-  addressToScriptHash,
+  Event,
   InvokeReceipt,
-  privateKeyToScriptHash,
+  privateKeyToAddress,
   SmartContractAny,
   TransactionResult,
   UserAccountID,
-  Event,
 } from '@neo-one/client';
+import { common, crypto } from '@neo-one/client-core';
 import { SetupTestResult } from '@neo-one/smart-contract-test';
-import { crypto, common } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 
 export interface DeployOptions {
@@ -97,7 +96,7 @@ export const testToken = async ({
     event = deployReceipt.events[0];
     expect(event.name).toEqual('transfer');
     expect(event.parameters.from).toEqual(undefined);
-    expect(event.parameters.to).toEqual(privateKeyToScriptHash(masterPrivateKey));
+    expect(event.parameters.to).toEqual(privateKeyToAddress(masterPrivateKey));
     if (event.parameters.amount === undefined) {
       expect(event.parameters.amount).toBeTruthy();
       throw new Error('For TS');
@@ -106,14 +105,9 @@ export const testToken = async ({
   }
 
   const [issueBalance, issueTotalSupply, transferResult] = await Promise.all([
-    smartContract.balanceOf(addressToScriptHash(masterAccountID.address)),
+    smartContract.balanceOf(masterAccountID.address),
     smartContract.totalSupply(),
-    smartContract.transfer(
-      addressToScriptHash(masterAccountID.address),
-      addressToScriptHash(account0.address),
-      transferValue,
-      { from: masterAccountID },
-    ),
+    smartContract.transfer(masterAccountID.address, account0.address, transferValue, { from: masterAccountID }),
   ]);
   expect(issueBalance.toString()).toEqual(issueValue.toString());
   expect(issueTotalSupply.toString()).toEqual(issueValue.toString());
@@ -132,8 +126,8 @@ export const testToken = async ({
   expect(transferReceipt.events).toHaveLength(1);
   event = transferReceipt.events[0];
   expect(event.name).toEqual('transfer');
-  expect(event.parameters.from).toEqual(privateKeyToScriptHash(masterPrivateKey));
-  expect(event.parameters.to).toEqual(addressToScriptHash(account0.address));
+  expect(event.parameters.from).toEqual(masterAccountID.address);
+  expect(event.parameters.to).toEqual(account0.address);
   if (event.parameters.amount === undefined) {
     expect(event.parameters.amount).toBeTruthy();
     throw new Error('For TS');
@@ -141,10 +135,10 @@ export const testToken = async ({
   expect(event.parameters.amount.toString()).toEqual(transferValue.toString());
 
   const [transferMasterBalance, transferAccountBalance, transferTotalSupply, transferZeroBalance] = await Promise.all([
-    smartContract.balanceOf(addressToScriptHash(masterAccountID.address)),
-    smartContract.balanceOf(addressToScriptHash(account0.address)),
+    smartContract.balanceOf(masterAccountID.address),
+    smartContract.balanceOf(account0.address),
     smartContract.totalSupply(),
-    smartContract.balanceOf(privateKeyToScriptHash(ZERO.PRIVATE_KEY)),
+    smartContract.balanceOf(privateKeyToAddress(ZERO.PRIVATE_KEY)),
   ]);
 
   const remainingValue = issueValue.minus(transferValue);
@@ -153,15 +147,15 @@ export const testToken = async ({
   expect(transferTotalSupply.toString()).toEqual(issueValue.toString());
   expect(transferZeroBalance.toString()).toEqual('0');
 
-  const readClient = await client.read(networkName);
-  const contract = await readClient.getContract(smartContract.definition.networks[networkName].hash);
+  const readClient = client.read(networkName);
+  const contract = await readClient.getContract(smartContract.definition.networks[networkName].address);
   expect(contract.codeVersion).toEqual('1.0');
   expect(contract.author).toEqual('dicarlo2');
   expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
   expect(contract.description).toEqual(description);
   expect(contract.parameters).toEqual(['String', 'Array']);
-  expect(contract.returnType).toEqual('ByteArray');
-  expect(contract.properties.storage).toBeTruthy();
-  expect(contract.properties.dynamicInvoke).toBeFalsy();
-  expect(contract.properties.payable).toEqual(payable);
+  expect(contract.returnType).toEqual('Buffer');
+  expect(contract.storage).toBeTruthy();
+  expect(contract.dynamicInvoke).toBeFalsy();
+  expect(contract.payable).toEqual(payable);
 };

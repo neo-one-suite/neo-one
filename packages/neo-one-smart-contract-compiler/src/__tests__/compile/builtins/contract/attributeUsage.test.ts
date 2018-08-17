@@ -47,7 +47,7 @@ describe('AttributeUsage', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { AttributeUsage } from '@neo-one/smart-contract';
 

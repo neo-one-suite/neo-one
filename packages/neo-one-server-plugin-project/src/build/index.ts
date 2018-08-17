@@ -134,7 +134,7 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                             take(1),
                           )
                           .toPromise()) as Network;
-                        const [hash, prodNetworksDefinition] = await Promise.all([
+                        const [address, prodNetworksDefinition] = await Promise.all([
                           deployContract(network, contract),
                           Promise.resolve({}),
                         ]);
@@ -142,7 +142,7 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                         // tslint:disable-next-line no-object-mutation
                         getNetworksDefinitions(ctx)[contract.contractName] = {
                           ...prodNetworksDefinition,
-                          [constants.LOCAL_NETWORK_NAME]: { hash },
+                          [constants.LOCAL_NETWORK_NAME]: { address },
                         };
                       },
                     })),

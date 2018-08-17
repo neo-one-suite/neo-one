@@ -26,7 +26,7 @@ describe('Header', () => {
   });
 
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Header } from '@neo-one/smart-contract';
 
@@ -38,7 +38,7 @@ describe('Header', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Header } from '@neo-one/smart-contract';
 

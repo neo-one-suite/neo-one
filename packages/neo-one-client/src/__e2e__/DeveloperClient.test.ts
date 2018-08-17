@@ -1,15 +1,16 @@
-import { utils } from '@neo-one/utils';
-import _ from 'lodash';
 import {
   Client,
   DeveloperClient,
-  wifToPrivateKey,
-  NEOONEProvider,
   LocalKeyStore,
   LocalMemoryStore,
   LocalUserAccountProvider,
+  NEOONEProvider,
   UserAccountID,
+  wifToPrivateKey,
+  // tslint:disable-next-line no-implicit-dependencies
 } from '@neo-one/client';
+import { utils } from '@neo-one/utils';
+import _ from 'lodash';
 
 interface WalletInfo {
   readonly privateKey: string;

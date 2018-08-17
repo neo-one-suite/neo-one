@@ -55,7 +55,7 @@ describe('Array.prototype.map', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x.map;
@@ -65,7 +65,7 @@ describe('Array.prototype.map', () => {
   });
 
   test('cannot be "referenced"', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = [0, 1, 2];
       const y = x['map'];

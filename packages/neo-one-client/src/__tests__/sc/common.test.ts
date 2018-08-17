@@ -1,308 +1,216 @@
-import BigNumber from 'bignumber.js';
-import * as abis from '../../__data__/abis';
-import { InvalidArgumentError, InvalidEventError, InvocationCallError } from '../../errors';
+import { data, factory, keys } from '../../__data__';
 import * as common from '../../sc/common';
-import { ABIParameter, ActionRaw, ContractParameter } from '../../types';
+import { ABIParameter, ContractParameter } from '../../types';
 
 describe('common', () => {
-  const abiParameter: ABIParameter = { name: 'name', type: 'String' };
-  const contractParameter: ContractParameter = {
+  const name = 'firstArg';
+  const parameter: ABIParameter = { type: 'String', name };
+  const value = 'test';
+  const param: ContractParameter = {
     type: 'String',
-    value: 'test',
+    value,
   };
 
   test('convertParameter', () => {
-    const expected = contractParameter.value;
-
     const result = common.convertParameter({
-      type: abiParameter,
-      parameter: contractParameter,
+      type: parameter,
+      parameter: param,
     });
 
-    expect(result).toEqual(expected);
+    expect(result).toEqual(value);
   });
 
   test('getParametersObject', () => {
-    const abiParameters = [abiParameter];
-    const contractParameters = [contractParameter];
-    const expected = { name: 'test' };
-
     const result = common.getParametersObject({
-      abiParameters,
-      parameters: contractParameters,
+      abiParameters: [parameter],
+      parameters: [param],
     });
 
-    expect(result).toEqual(expected);
+    expect(result[name]).toEqual(value);
   });
 
-  test('getParametersObject throws error on mismatched length', () => {
-    const abiParameters = [abiParameter, abiParameter];
-    const contractParameters = [contractParameter];
-
+  test('getParametersObject - throws error on mismatched length', () => {
     function testError() {
       common.getParametersObject({
-        abiParameters,
-        parameters: contractParameters,
+        abiParameters: [parameter, parameter],
+        parameters: [param],
       });
     }
 
-    expect(testError).toThrow(new InvalidArgumentError(
-      `Expected ABI parameters length (${abiParameters.length}) to equal ` +
-        `parameters length (${contractParameters.length})`,
-    ) as any);
+    expect(testError).toThrowErrorMatchingSnapshot();
   });
 
-  test('convertAction returns Log action types immediately', () => {
-    const action: ActionRaw = {
-      version: 0,
-      blockIndex: 1,
-      blockHash: 'blockHash1',
-      transactionIndex: 2,
-      transactionHash: 'transHash1',
-      index: 2,
-      globalIndex: new BigNumber(3),
-      scriptHash: 'scriptHash1',
-      type: 'Log',
-      message: 'msg',
-    };
+  test('convertAction - log', () => {
+    const action = factory.createRawLog();
 
     const result = common.convertAction({
       action,
-      events: { event1: abis.abiEvent() },
+      events: {},
     });
 
     expect(result).toEqual(action);
   });
 
-  test('convertAction throws error on missing args', () => {
-    const action: ActionRaw = {
-      version: 0,
-      blockIndex: 1,
-      blockHash: 'blockHash1',
-      transactionIndex: 2,
-      transactionHash: 'transHash1',
-      index: 2,
-      globalIndex: new BigNumber(3),
-      scriptHash: 'scriptHash1',
-      type: 'Notification',
+  test('convertAction - event', () => {
+    const event = factory.createABIEvent();
+    const action = factory.createRawNotification({
+      args: [
+        factory.createStringContractParameter({ value: event.name }),
+        factory.createAddressContractParameter({ value: keys[0].address }),
+        factory.createAddressContractParameter({ value: keys[1].address }),
+        factory.createIntegerContractParameter({ value: data.bns.a }),
+      ],
+    });
+
+    const result = common.convertAction({
+      action,
+      events: { [event.name]: event },
+    });
+
+    if (result.type !== 'Event') {
+      throw new Error('For TS');
+    }
+    expect(result.parameters.from).toEqual(keys[0].address);
+    expect(result.parameters.to).toEqual(keys[1].address);
+    expect(result.parameters.amount).toBeDefined();
+    // tslint:disable-next-line no-non-null-assertion
+    expect(result.parameters.amount!.toString()).toEqual('1');
+  });
+
+  test('convertAction - missing args event', () => {
+    const event = factory.createABIEvent();
+    const action = factory.createRawNotification({
       args: [],
-    };
-
-    function testError() {
-      common.convertAction({ action, events: { event1: abis.abiEvent() } });
-    }
-
-    expect(testError).toThrow(new InvalidEventError('Notification had no arguments') as any);
-  });
-
-  test('convertAction throws error on missing event property', () => {
-    const action: ActionRaw = {
-      version: 0,
-      blockIndex: 1,
-      blockHash: 'blockHash1',
-      transactionIndex: 2,
-      transactionHash: 'transHash1',
-      index: 2,
-      globalIndex: new BigNumber(3),
-      scriptHash: 'scriptHash1',
-      type: 'Notification',
-      args: [contractParameter],
-    };
-
-    const events = {};
-    function testError() {
-      common.convertAction({ action, events });
-    }
-
-    expect(testError).toThrow(new InvalidEventError(`Unknown event ${String((action.args[0] as any).value)}`) as any);
-  });
-
-  test('convertAction on notification action', () => {
-    const action: ActionRaw = {
-      type: 'Notification',
-      args: [contractParameter, contractParameter],
-      version: 0,
-      blockIndex: 1,
-      blockHash: '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89ca',
-      transactionIndex: 2,
-      transactionHash: '0x798fb9e4f3437e4c9ab83c24f950f0fce98e1d1aaac4fe3f54a66c5d9def89cb',
-      index: 2,
-      globalIndex: new BigNumber(3),
-      scriptHash: '0x3775292229eccdf904f16fff8e83e7cffdc0f0ce',
-    };
-
-    const events = {
-      test: { name: 'test', parameters: [abiParameter] },
-    };
-
-    const expected = {
-      version: action.version,
-      blockIndex: action.blockIndex,
-      blockHash: action.blockHash,
-      transactionIndex: action.transactionIndex,
-      transactionHash: action.transactionHash,
-      index: action.index,
-      globalIndex: action.globalIndex,
-      scriptHash: action.scriptHash,
-      type: 'Event',
-      name: (action.args[0] as any).value,
-      parameters: { name: 'test' },
-    };
-
-    const result = common.convertAction({ action, events });
-    expect(result).toEqual(expected);
-  });
-
-  test('convertInvocationResult - invocation error', async () => {
-    const returnType = { type: 'Void' };
-    const invokeResult = {
-      state: 'FAULT',
-      gasConsumed: new BigNumber('10'),
-      gasCost: new BigNumber('10'),
-      stack: [],
-      message: 'message',
-    };
-
-    const expected = {
-      state: 'FAULT',
-      gasConsumed: new BigNumber('10'),
-      gasCost: new BigNumber('10'),
-      message: 'message',
-    };
-
-    // @ts-ignore
-    const result = await common.convertInvocationResult({
-      returnType,
-      result: invokeResult,
-      actions: [],
     });
 
-    expect(result).toEqual(expected);
-  });
-
-  test('convertInvocationResult - invocation succeess', async () => {
-    const returnType = { type: 'String' };
-    const invokeResult = {
-      state: 'HALT',
-      gasConsumed: new BigNumber('10'),
-      gasCost: new BigNumber('10'),
-      stack: [contractParameter],
-    };
-
-    const expected = {
-      state: invokeResult.state,
-      gasConsumed: invokeResult.gasConsumed,
-      gasCost: invokeResult.gasCost,
-      value: 'test',
-    };
-
-    // @ts-ignore
-    const result = await common.convertInvocationResult({
-      returnType,
-      result: invokeResult,
-      actions: [],
-    });
-
-    expect(result).toEqual(expected);
-  });
-
-  test('convertInvocationResult - invocation success with undefined stack', async () => {
-    const returnType = { type: 'String' };
-    const invokeResult = {
-      state: 'HALT',
-      gasConsumed: new BigNumber('10'),
-      gasCost: new BigNumber('10'),
-      stack: [],
-    };
-
-    const expected = {
-      state: invokeResult.state,
-      gasConsumed: invokeResult.gasConsumed,
-      gasCost: invokeResult.gasCost,
-      value: undefined,
-    };
-
-    // @ts-ignore
-    const result = await common.convertInvocationResult({
-      returnType,
-      result: invokeResult,
-      actions: [],
-    });
-
-    expect(result).toEqual(expected);
-  });
-
-  test('convertCallResult throws error on fault', async () => {
-    const returnType = { type: 'String' };
-    const resultCall = {
-      state: 'FAULT',
-      gasConsumed: new BigNumber('10'),
-      gasCost: new BigNumber('10'),
-      stack: [contractParameter],
-      message: 'testMsg',
-    };
-
-    async function testError() {
-      // @ts-ignore
-      return common.convertCallResult({
-        returnType,
-        result: resultCall,
-        actions: [],
+    const result = () =>
+      common.convertAction({
+        action,
+        events: { [event.name]: event },
       });
+
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
+
+  test('convertAction - unknown event', () => {
+    const event = factory.createABIEvent();
+    const action = factory.createRawNotification({
+      args: [factory.createStringContractParameter({ value: `something-${event.name}` })],
+    });
+
+    const result = () =>
+      common.convertAction({
+        action,
+        events: { [event.name]: event },
+      });
+
+    expect(result).toThrowErrorMatchingSnapshot();
+  });
+
+  test('convertInvocationResult - error', async () => {
+    const rawInvocationResult = factory.createRawInvocationResultError();
+
+    const result = await common.convertInvocationResult({
+      returnType: factory.createStringABIReturn(),
+      result: rawInvocationResult,
+      actions: [factory.createRawNotification()],
+    });
+
+    expect(result.state).toEqual('FAULT');
+    expect(result.gasConsumed).toEqual(rawInvocationResult.gasConsumed);
+    expect(result.gasCost).toEqual(rawInvocationResult.gasCost);
+    if (result.state !== 'FAULT') {
+      throw new Error('For TS');
+    }
+    expect(result.message).toEqual(rawInvocationResult.message);
+  });
+
+  test('convertInvocationResult - value', async () => {
+    const rawInvocationResult = factory.createRawInvocationResultSuccess();
+
+    const result = await common.convertInvocationResult({
+      returnType: factory.createIntegerABIReturn(),
+      result: rawInvocationResult,
+      actions: [factory.createRawNotification()],
+    });
+
+    expect(result.state).toEqual('HALT');
+    expect(result.gasConsumed).toEqual(rawInvocationResult.gasConsumed);
+    expect(result.gasCost).toEqual(rawInvocationResult.gasCost);
+    if (result.state !== 'HALT') {
+      throw new Error('For TS');
     }
 
-    await expect(testError()).rejects.toEqual(new InvocationCallError(resultCall.message) as any);
+    const stackItem = rawInvocationResult.stack[0];
+    if (stackItem.type !== 'Integer' || result.value === undefined) {
+      throw new Error('For TS');
+    }
+    expect(result.value.toString()).toEqual(stackItem.value.toString(10));
   });
 
-  test('convertCallResult', async () => {
-    const returnType = { type: 'String' };
-    const resultCall = {
-      state: 'HALT',
-      gasConsumed: new BigNumber('10'),
-      gasCost: new BigNumber('10'),
-      stack: [contractParameter],
-    };
+  test('convertCallResult - error', async () => {
+    const rawInvocationResult = factory.createRawInvocationResultError();
 
-    const expected = 'test';
-
-    // @ts-ignore
-    const result = await common.convertCallResult({
-      returnType,
-      result: resultCall,
-      actions: [],
+    const result = common.convertCallResult({
+      returnType: factory.createStringABIReturn(),
+      result: rawInvocationResult,
+      actions: [factory.createRawNotification()],
     });
 
-    expect(result).toEqual(expected);
+    await expect(result).rejects.toMatchSnapshot();
   });
 
-  test('convertCallResult on undefined stack', async () => {
-    const returnType = { type: 'String' };
-    const resultCall = {
-      state: 'HALT',
-      gasConsumed: new BigNumber('10'),
-      gasCost: new BigNumber('10'),
-      stack: [],
-    };
+  test('convertCallResult - value', async () => {
+    const rawInvocationResult = factory.createRawInvocationResultSuccess();
 
-    // @ts-ignore
     const result = await common.convertCallResult({
-      returnType,
-      result: resultCall,
-      actions: [],
+      returnType: factory.createIntegerABIReturn(),
+      result: rawInvocationResult,
+      actions: [factory.createRawNotification()],
     });
 
-    expect(result).toBeUndefined();
+    const stackItem = rawInvocationResult.stack[0];
+    if (stackItem.type !== 'Integer' || result === undefined) {
+      throw new Error('For TS');
+    }
+    expect(result.toString()).toEqual(stackItem.value.toString(10));
   });
 
-  test('convertParams', () => {
-    const parameters = [abiParameter];
-    const params = ['test'];
-    const expected = {
-      converted: params,
-      zipped: [['name', 'test']],
-    };
+  test('convertParams - simple', () => {
+    const { converted, zipped } = common.convertParams({
+      parameters: [parameter],
+      params: [param.value],
+    });
 
-    const result = common.convertParams({ parameters, params });
-    expect(result).toEqual(expected);
+    expect(converted).toHaveLength(1);
+    expect(converted[0]).toEqual(param.value);
+    expect(zipped).toHaveLength(1);
+    expect(zipped[0]).toEqual([parameter.name, param.value]);
+  });
+
+  test('convertParams - optional param', () => {
+    const optionalParam = factory.createStringABIParameter({ optional: true });
+    const { converted, zipped } = common.convertParams({
+      parameters: [parameter, optionalParam],
+      params: [param.value],
+    });
+
+    expect(converted).toHaveLength(2);
+    expect(converted[0]).toEqual(param.value);
+    expect(converted[1]).toEqual(undefined);
+    expect(zipped).toHaveLength(2);
+    expect(zipped[0]).toEqual([parameter.name, param.value]);
+    expect(zipped[1]).toEqual([optionalParam.name, undefined]);
+  });
+
+  test('convertParams - missing param', () => {
+    const optionalParam = factory.createStringABIParameter();
+    const result = () =>
+      common.convertParams({
+        parameters: [parameter, optionalParam],
+        params: [param.value],
+      });
+
+    expect(result).toThrowErrorMatchingSnapshot();
   });
 });

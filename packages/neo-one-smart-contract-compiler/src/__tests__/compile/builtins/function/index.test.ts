@@ -3,7 +3,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Function', () => {
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       class MyFunction implements Function {
       }
@@ -13,7 +13,7 @@ describe('Function', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = Function;
     `,

@@ -1,168 +1,66 @@
-import { common, crypto } from '@neo-one/client-core';
+import { addKeysToCrypto, keys } from '../__data__';
 import * as helpers from '../helpers';
 
 describe('helpers', () => {
-  const expected = '10';
-  const dummyArg = 'keyhashpublicprivatewifuintecnep25';
-  const dummyVersion = 573;
-  const testCases = [
-    {
-      method: 'publicKeyToScriptHash',
-      commonMethods: ['uInt160ToString', 'stringToECPoint'],
-      args: [dummyArg],
-    },
+  addKeysToCrypto();
 
-    {
-      method: 'publicKeyToAddress',
-      commonMethods: ['stringToECPoint'],
-      args: [dummyArg],
-    },
+  test('publicKeyToScriptHash', () => {
+    expect(helpers.publicKeyToScriptHash(keys[0].publicKeyString)).toEqual(keys[0].scriptHashString);
+  });
 
-    {
-      method: 'publicKeyToAddress',
-      commonMethods: ['stringToECPoint'],
-      args: [dummyArg, dummyVersion],
-    },
+  test('publicKeyToAddress', () => {
+    expect(helpers.publicKeyToAddress(keys[0].publicKeyString)).toEqual(keys[0].address);
+  });
 
-    {
-      method: 'scriptHashToAddress',
-      commonMethods: ['stringToUInt160'],
-      args: [dummyArg],
-    },
+  test('scriptHashToAddress', () => {
+    expect(helpers.scriptHashToAddress(keys[0].scriptHashString)).toEqual(keys[0].address);
+  });
 
-    {
-      method: 'scriptHashToAddress',
-      commonMethods: ['stringToUInt160'],
-      args: [dummyArg, dummyVersion],
-    },
+  test('addressToScriptHash', () => {
+    expect(helpers.addressToScriptHash(keys[0].address)).toEqual(keys[0].scriptHashString);
+  });
 
-    {
-      method: 'addressToScriptHash',
-      commonMethods: ['uInt160ToString'],
-      args: [dummyArg],
-    },
+  test('wifToPrivateKey', () => {
+    expect(helpers.wifToPrivateKey(keys[0].wif)).toEqual(keys[0].privateKeyString);
+  });
 
-    {
-      method: 'addressToScriptHash',
-      commonMethods: ['uInt160ToString'],
-      args: [dummyArg, dummyVersion],
-    },
+  test('privateKeyToWIF', () => {
+    expect(helpers.privateKeyToWIF(keys[0].privateKeyString)).toEqual(keys[0].wif);
+  });
 
-    {
-      method: 'wifToPrivateKey',
-      commonMethods: ['privateKeyToString'],
-      args: [dummyArg],
-    },
+  test('privateKeyToScriptHash', () => {
+    expect(helpers.privateKeyToScriptHash(keys[0].privateKeyString)).toEqual(keys[0].scriptHashString);
+  });
 
-    {
-      method: 'wifToPrivateKey',
-      commonMethods: ['privateKeyToString'],
-      args: [dummyArg, dummyVersion],
-    },
+  test('privateKeyToAddress', () => {
+    expect(helpers.privateKeyToAddress(keys[0].privateKeyString)).toEqual(keys[0].address);
+  });
 
-    {
-      method: 'privateKeyToWIF',
-      commonMethods: ['stringToPrivateKey'],
-      args: [dummyArg],
-    },
+  test('privateKeyToPublicKey', () => {
+    expect(helpers.privateKeyToPublicKey(keys[0].privateKeyString)).toEqual(keys[0].publicKeyString);
+  });
 
-    {
-      method: 'privateKeyToWIF',
-      commonMethods: ['stringToPrivateKey'],
-      args: [dummyArg, dummyVersion],
-    },
+  test('isNEP2 - false', () => {
+    expect(helpers.isNEP2(keys[0].privateKeyString)).toBeFalsy();
+  });
 
-    {
-      method: 'privateKeyToScriptHash',
-      commonMethods: ['uInt160ToString'],
-      args: [dummyArg],
-    },
+  test('isNEP2 - true', () => {
+    expect(helpers.isNEP2(keys[0].encryptedWIF)).toBeTruthy();
+  });
 
-    {
-      method: 'privateKeyToAddress',
-      commonMethods: ['stringToPrivateKey'],
-      args: [dummyArg],
-    },
+  test('encryptNEP2', async () => {
+    const result = await helpers.encryptNEP2({ password: keys[0].password, privateKey: keys[0].privateKeyString });
 
-    {
-      method: 'privateKeyToAddress',
-      commonMethods: ['stringToPrivateKey'],
-      args: [dummyArg, dummyVersion],
-    },
+    expect(result).toEqual(keys[0].encryptedWIF);
+  });
 
-    {
-      method: 'privateKeyToPublicKey',
-      commonMethods: ['ecPointToString', 'stringToPrivateKey'],
-      args: [dummyArg],
-    },
+  test('decryptNEP2', async () => {
+    const result = await helpers.decryptNEP2({ password: keys[0].password, encryptedKey: keys[0].encryptedWIF });
 
-    {
-      method: 'isNEP2',
-      commonMethods: [],
-      args: [dummyArg],
-    },
+    expect(result).toEqual(keys[0].privateKeyString);
+  });
 
-    {
-      method: 'encryptNEP2',
-      commonMethods: ['stringToPrivateKey'],
-      args: [{ password: dummyArg, privateKey: dummyArg }],
-    },
-
-    {
-      method: 'encryptNEP2',
-      commonMethods: ['stringToPrivateKey'],
-      args: [
-        {
-          password: dummyArg,
-          privateKey: dummyArg,
-          addressVersion: dummyVersion,
-        },
-      ],
-    },
-
-    {
-      method: 'decryptNEP2',
-      commonMethods: ['privateKeyToString'],
-      args: [{ password: dummyArg, privateKey: dummyArg }],
-    },
-
-    {
-      method: 'decryptNEP2',
-      commonMethods: ['privateKeyToString'],
-      args: [
-        {
-          password: dummyArg,
-          privateKey: dummyArg,
-          addressVersion: dummyVersion,
-        },
-      ],
-    },
-
-    {
-      method: 'createPrivateKey',
-      commonMethods: ['privateKeyToString'],
-      args: [],
-    },
-  ] as any;
-
-  for (const testCase of testCases) {
-    const { method, commonMethods, args } = testCase;
-
-    test(method, async () => {
-      for (const commonMethod of commonMethods) {
-        (common as any)[commonMethod] = jest.fn(() => expected);
-      }
-
-      if (method === 'publicKeyToAddress') {
-        crypto.scriptHashToAddress = jest.fn(() => expected);
-        crypto.publicKeyToScriptHash = jest.fn(() => expected);
-      } else {
-        (crypto as any)[method] = jest.fn(() => expected);
-      }
-
-      const result = await (helpers as any)[method](...args);
-
-      expect(result).toEqual(expected);
-    });
-  }
+  test('createPrivateKey', () => {
+    expect(helpers.createPrivateKey()).toBeDefined();
+  });
 });

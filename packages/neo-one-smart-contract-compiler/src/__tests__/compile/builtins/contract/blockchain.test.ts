@@ -1,7 +1,7 @@
+import { common } from '@neo-one/client-core';
+import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
-import BigNumber from 'bignumber.js';
-import { common } from '@neo-one/client-core';
 
 describe('Blockchain', () => {
   test('currentHeight', async () => {
@@ -16,7 +16,7 @@ describe('Blockchain', () => {
   });
 
   test('set currentHeight', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Blockchain } from '@neo-one/smart-contract';
 
@@ -38,7 +38,7 @@ describe('Blockchain', () => {
   });
 
   test('set currentBlockTime', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Blockchain } from '@neo-one/smart-contract';
 
@@ -93,7 +93,7 @@ describe('Blockchain', () => {
   });
 
   test('set currentTransaction', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Blockchain } from '@neo-one/smart-contract';
 

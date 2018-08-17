@@ -1,1304 +1,922 @@
-// tslint:disable
-import { common, utils, Transaction, bigNumberToBN } from '@neo-one/client-core';
+// tslint:disable no-object-mutation
+import { common, deserializeTransactionWire, Input as CoreInput, utils } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
-import {
-  InsufficientFundsError,
-  InvalidTransactionError,
-  InvokeError,
-  NoAccountError,
-  NothingToIssueError,
-  NothingToTransferError,
-} from '../../errors';
-import { AssetRegister, AttributeArg, ContractRegister, Transfer } from '../../types';
-import { LocalUserAccountProvider } from '../../user/LocalUserAccountProvider';
+import { of as _of } from 'rxjs';
+import { data, factory, keys } from '../../__data__';
+import { Hash256 } from '../../Hash256';
+import { ABIParameter, AssetType, Attribute, ContractParameterType, InputOutput, Param } from '../../types';
+import { KeyStore, LocalUserAccountProvider, Provider } from '../../user';
 
 describe('LocalUserAccountProvider', () => {
-  const id1 = {
-    network: 'net1',
-    address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
+  utils.randomUInt = () => 10;
+  const type = 'local';
+  const unlockedWallet = factory.createUnlockedWallet();
+  const accounts = [unlockedWallet.account];
+  const getCurrentAccount = jest.fn(() => unlockedWallet.account);
+  const getAccounts = jest.fn(() => accounts);
+  const selectAccount = jest.fn();
+  const deleteAccount = jest.fn();
+  const updateAccountName = jest.fn();
+  const sign = jest.fn();
+  const keystore: Modifiable<KeyStore> = {
+    type,
+    currentAccount$: _of(unlockedWallet.account),
+    getCurrentAccount,
+    accounts$: _of(accounts),
+    getAccounts,
+    selectAccount,
+    deleteAccount,
+    updateAccountName,
+    sign,
   };
 
-  const account1 = {
-    type: 'test',
-    id: id1,
-    name: 'name1',
-    scriptHash: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9',
-    publicKey: 'publicKey1',
+  const network = unlockedWallet.account.id.network;
+  const networks = [network];
+  const getNetworks = jest.fn(() => networks);
+  const getUnclaimed = jest.fn();
+  const getUnspentOutputs = jest.fn();
+  const relayTransaction = jest.fn();
+  const getTransactionReceipt = jest.fn();
+  const getInvocationData = jest.fn();
+  const testInvoke = jest.fn();
+  const getNetworkSettings = jest.fn();
+  const getBlockCount = jest.fn();
+  const read = jest.fn();
+  const dataProvider: Modifiable<Provider> = {
+    networks$: _of(networks),
+    getNetworks,
+    getUnclaimed,
+    getUnspentOutputs,
+    relayTransaction,
+    getTransactionReceipt,
+    getInvocationData,
+    testInvoke,
+    getNetworkSettings,
+    getBlockCount,
+    read,
   };
 
-  const options = {
-    from: id1,
-    attributes: [{ usage: 'Remark', data: 'testData' }] as AttributeArg[],
-    networkFee: new BigNumber('1'),
-  };
+  const gasInputOutput = factory.createInputOutput({
+    asset: Hash256.GAS,
+    value: new BigNumber('20'),
+  });
 
-  const outputs = {
-    oneNEO: {
-      asset: common.NEO_ASSET_HASH,
-      value: new BigNumber('1'),
-      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045a',
-      vout: 1,
-    },
-    twoNEO: {
-      asset: common.NEO_ASSET_HASH,
-      value: new BigNumber('2'),
-      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045a',
-      vout: 2,
-    },
-    sevenNEO: {
-      asset: common.NEO_ASSET_HASH,
-      value: new BigNumber('7'),
-      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045a',
-      vout: 3,
-    },
-    oneGAS: {
-      asset: common.GAS_ASSET_HASH,
-      value: new BigNumber('1'),
-      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045d',
-      vout: 4,
-    },
-    twoGAS: {
-      asset: common.GAS_ASSET_HASH,
-      value: new BigNumber('2'),
-      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045e',
-      vout: 5,
-    },
-    elevenGAS: {
-      asset: common.GAS_ASSET_HASH,
-      value: new BigNumber('11'),
-      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045e',
-      vout: 6,
-    },
-    oneTKY: {
-      asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-      value: new BigNumber('1'),
-      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-      vout: 7,
-    },
-    twoTKY: {
-      asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-      value: new BigNumber('2'),
-      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-      vout: 8,
-    },
-    threeTKY: {
-      asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-      value: new BigNumber('3'),
-      address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',
-      txid: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-      vout: 9,
-    },
-  };
-
-  const results = {
-    fault: {
-      state: 'FAULT',
-      gasConsumed: new BigNumber('3'),
-      stack: [{ type: 'String', value: 'val' }],
-      message: 'testMessage',
-    },
-
-    halt: {
-      state: 'HALT',
-      gasConsumed: utils.ZERO_BIG_NUMBER,
-      stack: [{ type: 'String', value: 'val' }],
-    },
-  };
-
-  const witness = {
-    invocation: '02028a99826ed',
-    verification: '02028a99826ee',
-  };
-
-  let keystore: any = {};
-  let provider: any = {};
-  let localUserAccountProvider = new LocalUserAccountProvider({
-    keystore,
-    provider,
-  } as any);
-
-  const verifyMock = (name: string, mock: any) => {
-    Object.entries(mock).forEach(([key, maybeMock]: [string, any]) => {
-      if (maybeMock != undefined && maybeMock.mock != undefined && maybeMock.mock.calls != undefined) {
-        expect(maybeMock.mock.calls).toMatchSnapshot(`${name}.${key}`);
-      }
-    });
-  };
-  const verifyMocks = () => {
-    verifyMock('keystore', keystore);
-    verifyMock('provider', provider);
-  };
-
+  let provider: LocalUserAccountProvider<typeof keystore, typeof dataProvider>;
   beforeEach(() => {
-    keystore = {};
-    provider = {};
-    provider.getBlockCount = jest.fn(() => Promise.resolve(0));
-    provider.relayTransaction = jest.fn(() => Promise.resolve('transactionDummy'));
-    localUserAccountProvider = new LocalUserAccountProvider({
-      keystore,
-      provider,
-    } as any);
+    provider = new LocalUserAccountProvider({ keystore, provider: dataProvider });
 
-    utils.randomUInt = () => 10;
+    getCurrentAccount.mockImplementation(() => unlockedWallet.account);
   });
 
   test('getCurrentAccount', () => {
-    keystore.getCurrentAccount = jest.fn(() => account1);
+    const result = provider.getCurrentAccount();
 
-    const result = localUserAccountProvider.getCurrentAccount();
-    expect(result).toEqual(account1);
-    verifyMocks();
+    expect(result).toEqual(unlockedWallet.account);
   });
 
   test('getAccounts', () => {
-    const expected = [account1];
-    keystore.getAccounts = jest.fn(() => expected);
-    const result = localUserAccountProvider.getAccounts();
-    expect(result).toEqual(expected);
-    verifyMocks();
+    const result = provider.getAccounts();
+
+    expect(result).toEqual(accounts);
   });
 
   test('getNetworks', () => {
-    const expected = ['main', 'test', 'net1'];
-    provider.getNetworks = jest.fn(() => expected);
-    const result = localUserAccountProvider.getNetworks();
-    expect(result).toEqual(expected);
-    verifyMocks();
+    const result = provider.getNetworks();
+
+    expect(result).toEqual(networks);
   });
 
-  test('selectAccount', async () => {
-    keystore.selectAccount = jest.fn(() => Promise.resolve());
-    await localUserAccountProvider.selectAccount(id1);
-    verifyMocks();
+  test('transfer', async () => {
+    const transfer = factory.createTransfer();
+    getUnspentOutputs.mockImplementation(async () => Promise.resolve([factory.createInputOutput()]));
+    sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+    const transaction = factory.createContractTransaction();
+    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    const receipt = factory.createTransactionReceipt();
+    getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
+
+    const result = await provider.transfer([transfer]);
+    const confirmResult = await result.confirmed();
+
+    expect(result.transaction).toEqual(transaction);
+    expect(confirmResult).toEqual(receipt);
+
+    expect(sign.mock.calls).toMatchSnapshot();
+    expect(relayTransaction.mock.calls).toMatchSnapshot();
   });
 
-  test('deleteAccount', async () => {
-    keystore.deleteAccount = jest.fn(() => Promise.resolve());
-    await localUserAccountProvider.deleteAccount(id1);
-    verifyMocks();
+  test('transfer - nothing to transfer', async () => {
+    const result = provider.transfer([]);
+
+    await expect(result).rejects.toMatchSnapshot();
   });
 
-  test('updateAccountName', async () => {
-    keystore.updateAccountName = jest.fn(() => Promise.resolve());
-    await localUserAccountProvider.updateAccountName({
-      id: id1,
-      name: 'newName',
-    });
+  test('transfer - no account', async () => {
+    getCurrentAccount.mockImplementation(() => undefined);
+    const result = provider.transfer([]);
 
-    verifyMocks();
+    await expect(result).rejects.toMatchSnapshot();
   });
 
-  test('read', async () => {
-    const expected = '10';
-    provider.read = jest.fn(() => expected);
-    const result = localUserAccountProvider.read('main');
-    expect(result).toEqual(expected);
-    verifyMocks();
+  test('transfer - insufficient funds', async () => {
+    const transfer = factory.createTransfer();
+    getUnspentOutputs.mockImplementation(async () => Promise.resolve([]));
+
+    const result = provider.transfer([transfer]);
+
+    await expect(result).rejects.toMatchSnapshot();
   });
 
-  test('transfer throws error on empty transfers', async () => {
-    const transfers: Transfer[] = [];
-    keystore.getCurrentAccount = jest.fn(() => account1);
-    const result = localUserAccountProvider.transfer(transfers);
-    await expect(result).rejects.toEqual(new NothingToTransferError());
-    verifyMocks();
-  });
-
-  test('transfer throws error on missing account', async () => {
-    const transfers: Transfer[] = [];
-    keystore.getCurrentAccount = jest.fn();
-    const result = localUserAccountProvider.transfer(transfers);
-    await expect(result).rejects.toEqual(new NoAccountError());
-    verifyMocks();
-  });
-
-  test('transfer throws insufficient funds error', async () => {
-    const transfers = [
-      {
-        amount: new BigNumber('10'),
-        asset: 'testAsset',
-        to: 'testAddr',
-      },
-    ];
-
-    const unspent = {
-      asset: 'testAsset',
-      value: new BigNumber('5'),
-      address: 'addr1',
-      txid: 'unspentTxid',
-      vout: 1,
-    };
-
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve([unspent]));
-
-    const result = localUserAccountProvider.transfer(transfers, options);
-    await expect(result).rejects.toEqual(new InsufficientFundsError(new BigNumber('5'), new BigNumber('10')));
-
-    verifyMocks();
-  });
-
-  test('transfer 0', async () => {
-    const transfers = [
-      {
-        amount: utils.ZERO_BIG_NUMBER,
-        asset: common.NEO_ASSET_HASH,
-        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
-      },
-    ];
-
-    const unspent = [outputs.oneNEO, outputs.elevenGAS];
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    keystore.sign = jest.fn(() => witness);
-    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
-    const result = await localUserAccountProvider.transfer(transfers, options);
-    expect(result.transaction).toEqual('transactionDummy');
-    await expect(result.confirmed()).resolves.toEqual('receiptDummy');
-    verifyMocks();
-  });
-
-  const testTransfer = (noGas: boolean) => {
-    test(`transfer${noGas ? ' without network fee' : ''}`, async () => {
-      const transfers = [
-        {
-          amount: new BigNumber('5'),
-          asset: common.NEO_ASSET_HASH,
-          to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
-        },
-      ];
-
-      const unspent = [
-        outputs.oneNEO,
-        outputs.oneNEO,
-        outputs.oneNEO,
-        outputs.oneNEO,
-        outputs.oneNEO,
-        outputs.oneNEO,
-        outputs.elevenGAS,
-      ];
-
-      provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-      keystore.sign = jest.fn(() => witness);
-
-      provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
-
-      const result = await localUserAccountProvider.transfer(transfers, {
-        from: options.from,
-        attributes: options.attributes,
-        networkFee: noGas ? undefined : options.networkFee,
-      });
-
-      expect(result.transaction).toEqual('transactionDummy');
-      await expect(result.confirmed()).resolves.toEqual('receiptDummy');
-      verifyMocks();
-    });
-  };
-
-  testTransfer(true);
-  testTransfer(false);
-
-  test('claim throws NothingToClaim error', async () => {
-    const unspent = [outputs.elevenGAS];
-    keystore.getCurrentAccount = jest.fn(() => account1);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.getUnclaimed = jest.fn(() =>
-      Promise.resolve({
-        unclaimed: [],
-        amount: new BigNumber('0'),
-      }),
+  test('claim', async () => {
+    getUnclaimed.mockImplementation(async () =>
+      Promise.resolve({ unclaimed: [factory.createInput()], amount: data.bigNumbers.a }),
     );
+    sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+    const transaction = factory.createClaimTransaction();
+    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    const receipt = factory.createTransactionReceipt();
+    getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
 
-    const result = localUserAccountProvider.claim(options);
-    let error: Error | undefined;
-    try {
-      await result;
-    } catch (err) {
-      error = err;
-    }
-    if (error === undefined) {
-      expect(error).toBeDefined();
+    const result = await provider.claim();
+    const confirmResult = await result.confirmed();
+
+    expect(result.transaction).toEqual(transaction);
+    expect(confirmResult).toEqual(receipt);
+
+    expect(sign.mock.calls).toMatchSnapshot();
+    expect(relayTransaction.mock.calls).toMatchSnapshot();
+  });
+
+  test('claim - nothing to claim', async () => {
+    getUnclaimed.mockImplementation(async () => Promise.resolve({ unclaimed: [], amount: data.bigNumbers.a }));
+    const result = provider.claim();
+
+    await expect(result).rejects.toMatchSnapshot();
+  });
+
+  test(`publish fault`, async () => {
+    const contract = factory.createContractRegister();
+    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+    testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
+    sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+    const transaction = factory.createPublishTransaction();
+    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    const receipt = factory.createTransactionReceipt();
+    getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
+    const invocationData = factory.createRawInvocationData({
+      result: factory.createRawInvocationResultError(),
+    });
+    getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
+
+    const result = await provider.publish(contract);
+    const confirmResult = await result.confirmed();
+
+    expect(result.transaction).toEqual(transaction);
+    expect(confirmResult.blockHash).toEqual(receipt.blockHash);
+    expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
+    expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
+    expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
+    expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
+    expect(confirmResult.result.state).toEqual('FAULT');
+    if (confirmResult.result.state !== 'FAULT') {
       throw new Error('For TS');
     }
-    expect(error).toMatchInlineSnapshot(
-      `[Error [NEO_NOTHING_TO_CLAIM]: Address ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW on network net1 has nothing to claim.]`,
-    );
-    verifyMocks();
+    expect(confirmResult.result.message).toMatchSnapshot();
+
+    expect(sign.mock.calls).toMatchSnapshot();
+    expect(testInvoke.mock.calls).toMatchSnapshot();
+    expect(relayTransaction.mock.calls).toMatchSnapshot();
   });
 
-  const testClaim = (noGas: boolean) => {
-    test(`claim${noGas ? ' without networkFee' : ''}`, async () => {
-      const unspent = [outputs.elevenGAS];
-
-      keystore.sign = jest.fn(() => witness);
-      provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-      provider.getUnclaimed = jest.fn(() =>
-        Promise.resolve({
-          unclaimed: [
-            {
-              txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-              vout: 2,
-            },
-          ],
-
-          amount: new BigNumber('3'),
+  test(`publish invoke fault`, async () => {
+    const contract = factory.createContractRegister();
+    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+    testInvoke.mockImplementation(async () =>
+      Promise.resolve(
+        factory.createRawCallReceipt({
+          result: factory.createRawInvocationResultError(),
         }),
+      ),
+    );
+
+    const result = provider.publish(contract);
+
+    await expect(result).rejects.toMatchSnapshot();
+  });
+
+  const contractParameterTypes: ReadonlyArray<ContractParameterType> = [
+    'Signature',
+    'Boolean',
+    'Integer',
+    'Address',
+    'Hash256',
+    'Buffer',
+    'PublicKey',
+    'String',
+    'Array',
+    'InteropInterface',
+    'Void',
+  ];
+
+  contractParameterTypes.forEach((returnType) => {
+    test(`publish with return type ${returnType}`, async () => {
+      const contract = factory.createContractRegister({ returnType });
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+      testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createPublishTransaction();
+      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+      const receipt = factory.createTransactionReceipt();
+      getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
+      const invocationData = factory.createRawInvocationData();
+      getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
+
+      const result = await provider.publish(contract);
+      const confirmResult = await result.confirmed();
+
+      expect(result.transaction).toEqual(transaction);
+      expect(confirmResult.blockHash).toEqual(receipt.blockHash);
+      expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
+      expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
+      expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
+      expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
+      expect(confirmResult.result.state).toEqual('HALT');
+      if (confirmResult.result.state !== 'HALT') {
+        throw new Error('For TS');
+      }
+      expect(confirmResult.result.value).toEqual(invocationData.contracts[0]);
+
+      expect(sign.mock.calls).toMatchSnapshot();
+      expect(testInvoke.mock.calls).toMatchSnapshot();
+      expect(relayTransaction.mock.calls).toMatchSnapshot();
+    });
+  });
+
+  const publishAndDeployCases: ReadonlyArray<{
+    readonly name: string;
+    readonly parameters: ReadonlyArray<ABIParameter> | undefined;
+    readonly params: ReadonlyArray<Param>;
+  }> = [
+    {
+      name: 'without params',
+      parameters: undefined,
+      params: [],
+    },
+    {
+      name: 'with params',
+      parameters: [{ type: 'Boolean', name: 'firstArg' }],
+      params: [true],
+    },
+  ];
+
+  publishAndDeployCases.forEach(({ name, parameters, params }) => {
+    test(`publishAndDeploy ${name}`, async () => {
+      const contract = factory.createContractRegister();
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+      testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createPublishTransaction();
+      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+      const receipt = factory.createTransactionReceipt();
+      getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
+      const invocationData = factory.createRawInvocationData();
+      getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
+
+      const result = await provider.publishAndDeploy(
+        contract,
+        { functions: [factory.createDeployABIFunction({ parameters })] },
+        params,
       );
+      const confirmResult = await result.confirmed();
 
-      provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+      expect(result.transaction).toEqual(transaction);
+      expect(confirmResult.blockHash).toEqual(receipt.blockHash);
+      expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
+      expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
+      expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
+      expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
+      expect(confirmResult.result.state).toEqual('HALT');
+      if (confirmResult.result.state !== 'HALT') {
+        throw new Error('For TS');
+      }
+      expect(confirmResult.result.value).toEqual(invocationData.contracts[0]);
 
-      const result = await localUserAccountProvider.claim({
-        from: options.from,
-        attributes: options.attributes,
-        networkFee: noGas ? undefined : options.networkFee,
-      });
-
-      expect(result.transaction).toEqual('transactionDummy');
-      await expect(result.confirmed()).resolves.toEqual('receiptDummy');
-      verifyMocks();
+      expect(sign.mock.calls).toMatchSnapshot();
+      expect(testInvoke.mock.calls).toMatchSnapshot();
+      expect(relayTransaction.mock.calls).toMatchSnapshot();
     });
-  };
-
-  testClaim(true);
-  testClaim(false);
-
-  test('error thrown on 2 script attributes when neither match script hash', async () => {
-    const unspent = [outputs.elevenGAS];
-    const errorOptions = {
-      from: id1,
-      attributes: [
-        { usage: 'Script', data: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9' },
-        { usage: 'Script', data: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9' },
-      ],
-
-      networkFee: new BigNumber('1'),
-    };
-
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.getUnclaimed = jest.fn(() =>
-      Promise.resolve({
-        unclaimed: [
-          {
-            txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-            vout: 2,
-          },
-        ],
-
-        amount: new BigNumber('3'),
-      }),
-    );
-
-    // Force flow to accept script attributes to test error handling
-    const result = localUserAccountProvider.claim(errorOptions as any);
-    await expect(result).rejects.toEqual(new InvalidTransactionError('Something went wrong!'));
-
-    verifyMocks();
   });
 
-  test('error thrown with 2 script attributes and no transaction scripts', async () => {
-    const unspent = [outputs.elevenGAS];
-    const errorOptions = {
-      from: id1,
-      attributes: [
-        { usage: 'Script', data: '0xcef0c0fdcfe7838eff6ff104f9cdec2922297537' },
-        { usage: 'Script', data: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9' },
-      ],
+  const assetTypes: ReadonlyArray<AssetType> = [
+    'Credit',
+    'Duty',
+    'Governing',
+    'Utility',
+    'Currency',
+    'Share',
+    'Invoice',
+    'Token',
+  ];
 
-      networkFee: new BigNumber('1'),
-    };
+  assetTypes.forEach((assetType) => {
+    test(`registerAsset ${assetType}`, async () => {
+      const asset = factory.createAssetRegister({ type: assetType });
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+      testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createRegisterTransaction();
+      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+      const receipt = factory.createTransactionReceipt();
+      getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
+      const invocationData = factory.createRawInvocationData();
+      getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.getUnclaimed = jest.fn(() =>
-      Promise.resolve({
-        unclaimed: [
-          {
-            txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-            vout: 2,
-          },
-        ],
+      const result = await provider.registerAsset(asset);
+      const confirmResult = await result.confirmed();
 
-        amount: new BigNumber('3'),
-      }),
-    );
+      expect(result.transaction).toEqual(transaction);
+      expect(confirmResult.blockHash).toEqual(receipt.blockHash);
+      expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
+      expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
+      expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
+      expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
+      expect(confirmResult.result.state).toEqual('HALT');
+      if (confirmResult.result.state !== 'HALT') {
+        throw new Error('For TS');
+      }
+      expect(confirmResult.result.value).toEqual(invocationData.asset);
 
-    // Force flow to accept script attributes to test error handling
-    const result = localUserAccountProvider.claim(errorOptions as any);
-    await expect(result).rejects.toEqual(new InvalidTransactionError('Something went wrong!'));
-
-    verifyMocks();
-  });
-
-  test('error thrown with 1 script attributes and no transaction scripts', async () => {
-    const unspent = [outputs.elevenGAS];
-    const errorOptions = {
-      from: id1,
-      attributes: [{ usage: 'Script', data: '0xcef0c0fddfe7838eff6ff104f9cdec2922297537' }],
-
-      networkFee: new BigNumber('1'),
-    };
-
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.getUnclaimed = jest.fn(() =>
-      Promise.resolve({
-        unclaimed: [
-          {
-            txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-            vout: 2,
-          },
-        ],
-
-        amount: new BigNumber('3'),
-      }),
-    );
-
-    // Force flow to accept script attributes to test error handling
-    const result = localUserAccountProvider.claim(errorOptions as any);
-    await expect(result).rejects.toEqual(new InvalidTransactionError('Something went wrong!'));
-
-    verifyMocks();
-  });
-
-  test('error thrown with 3+ script attributes', async () => {
-    const unspent = [outputs.elevenGAS];
-    const errorOptions = {
-      from: id1,
-      attributes: [
-        { usage: 'Script', data: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9' },
-        { usage: 'Script', data: '0xcef0c0fdcfe7838eff6ff104f9cdec2922297537' },
-        { usage: 'Script', data: '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9' },
-      ],
-
-      networkFee: new BigNumber('1'),
-    };
-
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.getUnclaimed = jest.fn(() =>
-      Promise.resolve({
-        unclaimed: [
-          {
-            txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-            vout: 2,
-          },
-        ],
-
-        amount: new BigNumber('3'),
-      }),
-    );
-
-    // Force flow to accept script attributes to test error handling
-    const result = localUserAccountProvider.claim(errorOptions as any);
-    await expect(result).rejects.toEqual(new InvalidTransactionError('Something went wrong!'));
-
-    verifyMocks();
-  });
-
-  test('error thrown with with 0 script attributes, but nonzero transaction scripts', async () => {
-    const contract = '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9';
-    const method = 'testMethod';
-    const params: any[] = [];
-    const paramsZipped: any[] = [];
-    const verify = true;
-    const unspent = [outputs.elevenGAS];
-    const errorOptions = {
-      from: id1,
-      attributes: [],
-      networkFee: new BigNumber('1'),
-    };
-
-    // Force no transaction attributes to hit error
-    (localUserAccountProvider as any).convertAttributes = jest.fn(() => []);
-    keystore.getCurrentAccount = jest.fn(() => account1);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    keystore.sign = jest.fn(() => witness);
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
-
-    const result = localUserAccountProvider.invoke(contract, method, params, paramsZipped, verify, errorOptions);
-
-    await expect(result).rejects.toEqual(new InvalidTransactionError('Something went wrong!'));
-
-    verifyMocks();
-  });
-
-  test('publish throws error on invoke fault', async () => {
-    const contract: ContractRegister = {
-      script: '02028a99826ef',
-      parameters: ['String'],
-      returnType: 'String',
-      name: 'nameTest',
-      codeVersion: 'v1',
-      author: 'testAuthor',
-      email: 'testEmail',
-      description: 'testDescription',
-      properties: {
-        storage: true,
-        dynamicInvoke: true,
-        payable: true,
-      },
-    };
-
-    const unspent = [outputs.elevenGAS];
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.fault, actions: [] }));
-
-    const result = localUserAccountProvider.publish(contract, options);
-    await expect(result).rejects.toEqual(new InvokeError('testMessage'));
-    verifyMocks();
-  });
-
-  test('publish throws error when no contracts are created', async () => {
-    const contract: ContractRegister = {
-      script: '02028a99826ef',
-      parameters: ['String'],
-      returnType: 'String',
-      name: 'nameTest',
-      codeVersion: 'v1',
-      author: 'testAuthor',
-      email: 'testEmail',
-      description: 'testDescription',
-      properties: {
-        storage: false,
-        dynamicInvoke: true,
-        payable: true,
-      },
-    };
-
-    const unspent = [outputs.elevenGAS];
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
-    provider.getInvocationData = jest.fn(() =>
-      Promise.resolve({
-        result: results.halt,
-        contracts: [],
-      }),
-    );
-
-    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
-
-    const result = await localUserAccountProvider.publish(contract, options);
-    await expect(result.confirmed()).rejects.toEqual(
-      new InvalidTransactionError(
-        'Something went wrong! Expected a contract' + ' to have been created, but none was found',
-      ),
-    );
-
-    verifyMocks();
-  });
-
-  test('publish - result fault', async () => {
-    const contract: ContractRegister = {
-      script: '02028a99826ef',
-      parameters: ['String'],
-      returnType: 'String',
-      name: 'nameTest',
-      codeVersion: 'v1',
-      author: 'testAuthor',
-      email: 'testEmail',
-      description: 'testDescription',
-      properties: {
-        storage: false,
-        dynamicInvoke: false,
-        payable: true,
-      },
-    };
-
-    const unspent = [outputs.elevenGAS];
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
-    provider.getInvocationData = jest.fn(() =>
-      Promise.resolve({
-        result: results.fault,
-        contracts: [],
-      }),
-    );
-
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve({
-        blockIndex: 0,
-        blockHash: 'blkHash1',
-        transactionIndex: 1,
-      }),
-    );
-
-    const result = await localUserAccountProvider.publish(contract, options);
-    await expect(result.confirmed()).resolves.toEqual({
-      blockIndex: 0,
-      blockHash: 'blkHash1',
-      transactionIndex: 1,
-      result: {
-        state: results.fault.state,
-        gasConsumed: results.fault.gasConsumed,
-        message: results.fault.message,
-      },
+      expect(sign.mock.calls).toMatchSnapshot();
+      expect(testInvoke.mock.calls).toMatchSnapshot();
+      expect(relayTransaction.mock.calls).toMatchSnapshot();
     });
-
-    verifyMocks();
   });
 
-  test('publish - result success', async () => {
-    const contract: ContractRegister = {
-      script: '02028a99826ef',
-      parameters: ['String'],
-      returnType: 'String',
-      name: 'nameTest',
-      codeVersion: 'v1',
-      author: 'testAuthor',
-      email: 'testEmail',
-      description: 'testDescription',
-      properties: {
-        storage: true,
-        dynamicInvoke: false,
-        payable: true,
-      },
-    };
+  test(`registerAsset fault`, async () => {
+    const asset = factory.createAssetRegister();
+    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+    sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+    const transaction = factory.createRegisterTransaction();
+    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    const receipt = factory.createTransactionReceipt();
+    getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
+    testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
+    const invocationData = factory.createRawInvocationData({ result: factory.createRawInvocationResultError() });
+    getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-    const unspent = [outputs.elevenGAS];
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
-    provider.getInvocationData = jest.fn(() =>
-      Promise.resolve({
-        result: results.halt,
-        contracts: [contract],
-      }),
-    );
+    const result = await provider.registerAsset(asset);
+    const confirmResult = await result.confirmed();
 
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve({
-        blockIndex: 0,
-        blockHash: 'blkHash1',
-        transactionIndex: 1,
-      }),
-    );
+    expect(result.transaction).toEqual(transaction);
+    expect(confirmResult.blockHash).toEqual(receipt.blockHash);
+    expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
+    expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
+    expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
+    expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
+    expect(confirmResult.result.state).toEqual('FAULT');
+    if (confirmResult.result.state !== 'FAULT') {
+      throw new Error('For TS');
+    }
+    expect(confirmResult.result.message).toMatchSnapshot();
 
-    const result = await localUserAccountProvider.publish(contract, options);
-    await expect(result.confirmed()).resolves.toEqual({
-      blockIndex: 0,
-      blockHash: 'blkHash1',
-      transactionIndex: 1,
-      result: {
-        state: results.halt.state,
-        gasConsumed: results.halt.gasConsumed,
-        value: contract,
-      },
-    });
-
-    verifyMocks();
-  });
-
-  test('registerAsset throws error on missing asset', async () => {
-    const asset: AssetRegister = {
-      assetType: 'Currency',
-      name: 'testAsset',
-      amount: new BigNumber('5'),
-      precision: 0,
-      owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
-      admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-      issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-    };
-
-    const unspent = [outputs.elevenGAS];
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
-    provider.getInvocationData = jest.fn(() =>
-      Promise.resolve({
-        result: results.halt,
-        asset: undefined,
-      }),
-    );
-
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve({
-        blockIndex: 0,
-        blockHash: 'blkHash1',
-        transactionIndex: 1,
-      }),
-    );
-
-    const result = await localUserAccountProvider.registerAsset(asset, options);
-    await expect(result.confirmed()).rejects.toEqual(
-      new InvalidTransactionError(
-        'Something went wrong! Expected a asset to have been created, ' + 'but none was found',
-      ),
-    );
-
-    verifyMocks();
-  });
-
-  test('registerAsset with no options', async () => {
-    const asset: AssetRegister = {
-      assetType: 'Currency',
-      name: 'testAsset',
-      amount: new BigNumber('5'),
-      precision: 0,
-      owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
-      admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-      issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-    };
-
-    const unspent = [outputs.elevenGAS];
-    keystore.getCurrentAccount = jest.fn(() => account1);
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
-    provider.getInvocationData = jest.fn(() =>
-      Promise.resolve({
-        result: results.fault,
-        asset,
-      }),
-    );
-
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve({
-        blockIndex: 0,
-        blockHash: 'blkHash1',
-        transactionIndex: 1,
-      }),
-    );
-
-    const result = await localUserAccountProvider.registerAsset(asset);
-    await expect(result.confirmed({ timeoutMS: 10 })).resolves.toEqual({
-      blockIndex: 0,
-      blockHash: 'blkHash1',
-      transactionIndex: 1,
-      result: {
-        state: results.fault.state,
-        gasConsumed: results.fault.gasConsumed,
-        message: results.fault.message,
-      },
-    });
-
-    verifyMocks();
-  });
-
-  test('registerAsset - result fault', async () => {
-    const asset: AssetRegister = {
-      assetType: 'Currency',
-      name: 'testAsset',
-      amount: new BigNumber('5'),
-      precision: 0,
-      owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
-      admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-      issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-    };
-
-    const unspent = [outputs.elevenGAS];
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
-    provider.getInvocationData = jest.fn(() =>
-      Promise.resolve({
-        result: results.fault,
-        asset,
-      }),
-    );
-
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve({
-        blockIndex: 0,
-        blockHash: 'blkHash1',
-        transactionIndex: 1,
-      }),
-    );
-
-    const result = await localUserAccountProvider.registerAsset(asset, options);
-    await expect(result.confirmed()).resolves.toEqual({
-      blockIndex: 0,
-      blockHash: 'blkHash1',
-      transactionIndex: 1,
-      result: {
-        state: results.fault.state,
-        gasConsumed: results.fault.gasConsumed,
-        message: results.fault.message,
-      },
-    });
-
-    verifyMocks();
-  });
-
-  test('registerAsset - result success', async () => {
-    const asset: AssetRegister = {
-      assetType: 'Currency',
-      name: 'testAsset',
-      amount: new BigNumber('5'),
-      precision: 0,
-      owner: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
-      admin: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-      issuer: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-    };
-
-    const unspent = [outputs.elevenGAS];
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
-    provider.getInvocationData = jest.fn(() =>
-      Promise.resolve({
-        result: results.halt,
-        asset,
-      }),
-    );
-
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve({
-        blockIndex: 0,
-        blockHash: 'blkHash1',
-        transactionIndex: 1,
-      }),
-    );
-
-    const result = await localUserAccountProvider.registerAsset(asset, options);
-    await expect(result.confirmed()).resolves.toEqual({
-      blockIndex: 0,
-      blockHash: 'blkHash1',
-      transactionIndex: 1,
-      result: {
-        state: results.halt.state,
-        gasConsumed: results.halt.gasConsumed,
-        value: asset,
-      },
-    });
-
-    verifyMocks();
-  });
-
-  test('issue throws error on no inputs', async () => {
-    const transfers: any[] = [];
-    keystore.getCurrentAccount = jest.fn(() => account1);
-    provider.getNetworkSettings = jest.fn(() =>
-      Promise.resolve({
-        issueGASFee: utils.ZERO_BIG_NUMBER,
-      }),
-    );
-
-    const result = localUserAccountProvider.issue(transfers);
-    await expect(result).rejects.toEqual(new NothingToIssueError());
-    verifyMocks();
+    expect(sign.mock.calls).toMatchSnapshot();
+    expect(testInvoke.mock.calls).toMatchSnapshot();
+    expect(relayTransaction.mock.calls).toMatchSnapshot();
   });
 
   test('issue', async () => {
-    const transfers = [
-      {
-        amount: new BigNumber('5'),
-        asset: common.NEO_ASSET_HASH,
-        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
-      },
-    ];
-
-    const unspent = [outputs.sevenNEO, outputs.elevenGAS];
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    keystore.sign = jest.fn(() => witness);
-    provider.getNetworkSettings = jest.fn(() =>
-      Promise.resolve({
-        issueGASFee: new BigNumber('2'),
-      }),
+    const transfer = factory.createTransfer();
+    getNetworkSettings.mockImplementation(async () =>
+      Promise.resolve(factory.createNetworkSettings({ issueGASFee: gasInputOutput.value })),
     );
+    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+    sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+    const transaction = factory.createIssueTransaction();
+    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    const receipt = factory.createTransactionReceipt();
+    getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
 
-    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+    const result = await provider.issue([transfer]);
+    const confirmResult = await result.confirmed();
 
-    const result = await localUserAccountProvider.issue(transfers, options);
+    expect(result.transaction).toEqual(transaction);
+    expect(confirmResult).toEqual(receipt);
 
-    expect(result.transaction).toEqual('transactionDummy');
-    await expect(result.confirmed()).resolves.toEqual('receiptDummy');
-    verifyMocks();
+    expect(sign.mock.calls).toMatchSnapshot();
+    expect(relayTransaction.mock.calls).toMatchSnapshot();
   });
 
-  test('invoke with no options', async () => {
-    const contract = '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9';
-    const method = 'testMethod';
-    const params: any[] = [];
-    const paramsZipped: any[] = [];
-    const verify = false;
-    const unspent = [outputs.sevenNEO, outputs.elevenGAS];
-    keystore.getCurrentAccount = jest.fn(() => account1);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    keystore.sign = jest.fn(() => witness);
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
+  test('issue - nothing to issue', async () => {
+    const result = provider.issue([]);
 
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve({
-        blockIndex: 0,
-        blockHash: 'blkHash1',
-        transactionIndex: 1,
-      }),
-    );
+    await expect(result).rejects.toMatchSnapshot();
+  });
 
-    provider.getInvocationData = jest.fn(() =>
-      Promise.resolve({
-        result: results.halt,
-        actions: ['action1'],
-      }),
-    );
+  const invokeTestCases = [true, false];
 
-    const result = await localUserAccountProvider.invoke(contract, method, params, paramsZipped, verify);
+  invokeTestCases.forEach((verify) => {
+    test(`invoke ${verify ? 'verify' : 'no verify'}`, async () => {
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+      testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createRegisterTransaction();
+      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+      const receipt = factory.createTransactionReceipt();
+      getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
+      const invocationData = factory.createRawInvocationData();
+      getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-    await expect(result.confirmed()).resolves.toEqual({
-      blockIndex: 0,
-      blockHash: 'blkHash1',
-      transactionIndex: 1,
-      result: results.halt,
-      actions: ['action1'],
+      const result = await provider.invoke(keys[0].address, 'foo', [true], [['firstArg', true]], verify);
+      const confirmResult = await result.confirmed();
+
+      expect(result.transaction).toEqual(transaction);
+      expect(confirmResult.blockHash).toEqual(receipt.blockHash);
+      expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
+      expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
+      expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
+      expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
+      expect(confirmResult.result.state).toEqual('HALT');
+      if (confirmResult.result.state !== 'HALT') {
+        throw new Error('For TS');
+      }
+      expect(confirmResult.result).toEqual(invocationData.result);
+
+      expect(sign.mock.calls).toMatchSnapshot();
+      expect(testInvoke.mock.calls).toMatchSnapshot();
+      expect(relayTransaction.mock.calls).toMatchSnapshot();
     });
-
-    verifyMocks();
-  });
-
-  test('invoke', async () => {
-    const contract = '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9';
-    const method = 'testMethod';
-    const testBN = bigNumberToBN(new BigNumber('1'), 1);
-    const params = ['param1', [undefined], testBN];
-    const paramsZipped: any[] = [['String', 'param1'], ['Array', [undefined]], ['BigNumber', new BigNumber('1')]];
-
-    const verify = true;
-    const unspent = [outputs.sevenNEO, outputs.elevenGAS];
-    keystore.getCurrentAccount = jest.fn(() => account1);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    keystore.sign = jest.fn(() => witness);
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
-
-    provider.getTransactionReceipt = jest.fn(() =>
-      Promise.resolve({
-        blockIndex: 0,
-        blockHash: 'blkHash1',
-        transactionIndex: 1,
-      }),
-    );
-
-    provider.getInvocationData = jest.fn(() =>
-      Promise.resolve({
-        result: results.halt,
-        actions: ['action1'],
-      }),
-    );
-
-    const result = await localUserAccountProvider.invoke(contract, method, params, paramsZipped, verify);
-
-    await expect(result.confirmed()).resolves.toEqual({
-      blockIndex: 0,
-      blockHash: 'blkHash1',
-      transactionIndex: 1,
-      result: results.halt,
-      actions: ['action1'],
-    });
-
-    verifyMocks();
-  });
-
-  test('call with no options', async () => {
-    const contract = '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9';
-    const method = 'testMethod';
-    const params: any[] = [];
-    const unspent = [outputs.sevenNEO, outputs.elevenGAS];
-    keystore.getCurrentAccount = jest.fn(() => account1);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
-
-    const result = await localUserAccountProvider.call(contract, method, params);
-
-    expect(result).toEqual({ result: results.halt, actions: [] });
-    verifyMocks();
   });
 
   test('call', async () => {
-    const contract = '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9';
-    const method = 'testMethod';
-    const params = ['param1'];
-    const unspent = [outputs.sevenNEO, outputs.elevenGAS];
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.testInvoke = jest.fn(() => Promise.resolve({ result: results.halt, actions: [] }));
+    const receipt = factory.createRawCallReceipt();
+    testInvoke.mockImplementation(async () => Promise.resolve(receipt));
 
-    const result = await localUserAccountProvider.call(contract, method, params, options);
+    const result = await provider.call(keys[0].address, 'foo', [true]);
 
-    expect(result).toEqual({ result: results.halt, actions: [] });
-    verifyMocks();
+    expect(result).toEqual(receipt);
+
+    expect(testInvoke.mock.calls).toMatchSnapshot();
   });
 
-  test(`multi-input-fix networkFee-throws`, async () => {
-    const transfers1 = [
-      {
-        amount: new BigNumber('6'),
-        asset: common.NEO_ASSET_HASH,
-        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
-      },
-    ];
-    const transfers2 = [
-      {
-        amount: new BigNumber('1'),
-        asset: common.NEO_ASSET_HASH,
-        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
-      },
-    ];
+  test('selectAccount', async () => {
+    await provider.selectAccount();
 
-    const unspent1 = [outputs.sevenNEO, outputs.oneNEO, outputs.elevenGAS];
-
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent1));
-    keystore.sign = jest.fn(() => witness);
-
-    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
-
-    const result1 = await localUserAccountProvider.transfer(transfers1, {
-      from: options.from,
-      attributes: options.attributes,
-      networkFee: new BigNumber('1'),
-    });
-
-    const result2 = localUserAccountProvider.transfer(transfers2, {
-      from: options.from,
-      attributes: options.attributes,
-      networkFee: new BigNumber('1'),
-    });
-    await result1;
-    // @ts-ignore
-    expect(localUserAccountProvider.mutableUsedOutputs.size).toEqual(2);
-    await expect(result2).rejects.toThrow();
-    verifyMocks();
+    expect(selectAccount.mock.calls).toMatchSnapshot();
   });
 
-  test('multi-input-fix updates-on-new-block', async () => {
-    const transfers1 = [
-      {
-        amount: new BigNumber('1'),
-        asset: common.NEO_ASSET_HASH,
-        to: id1.address,
-      },
-    ];
-    const transfers2 = [
-      {
-        amount: new BigNumber('1'),
-        asset: common.NEO_ASSET_HASH,
-        to: id1.address,
-      },
-    ];
-    const unspent = [outputs.oneNEO];
+  test('deleteAccount', async () => {
+    await provider.deleteAccount(unlockedWallet.account.id);
 
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    keystore.sign = jest.fn(() => witness);
-    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
-
-    const result1 = await localUserAccountProvider.transfer(transfers1, {
-      from: options.from,
-      attributes: options.attributes,
-    });
-
-    provider.getBlockCount = jest.fn(() => Promise.resolve(1));
-
-    const result2 = await localUserAccountProvider.transfer(transfers2, {
-      from: options.from,
-      attributes: options.attributes,
-    });
-
-    await result1;
-    // @ts-ignore
-    expect(localUserAccountProvider.mutableUsedOutputs.size).toEqual(1);
-    expect(result2).toHaveProperty('transaction');
-    verifyMocks();
+    expect(deleteAccount.mock.calls).toMatchSnapshot();
   });
 
-  test('transaction consolidates', async () => {
-    const unspent = [outputs.oneNEO, outputs.twoNEO, outputs.sevenNEO, outputs.oneGAS, outputs.elevenGAS];
-    const transfer = [
-      {
-        amount: new BigNumber('3'),
-        asset: common.NEO_ASSET_HASH,
-        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
-      },
-    ];
-    keystore.byteLimit = 800;
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+  test('updateAccountName', async () => {
+    await provider.updateAccountName({ id: unlockedWallet.account.id, name: 'foo' });
 
-    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
-    await localUserAccountProvider.transfer(transfer, {
-      from: options.from,
-      attributes: options.attributes,
-    });
-    const consolidatedTransaction = spy.mock.calls[0][0].transaction;
-    expect(consolidatedTransaction.serializeUnsigned().length).toEqual(366);
-    expect(consolidatedTransaction.inputs.length).toEqual(5);
-    expect(consolidatedTransaction.outputs.length).toEqual(3);
-
-    spy.mockReset();
-    spy.mockRestore();
-    verifyMocks();
+    expect(updateAccountName.mock.calls).toMatchSnapshot();
   });
 
-  test(`claim consolidates`, async () => {
-    const unspent = [outputs.elevenGAS];
+  test('read', async () => {
+    provider.read(network);
 
-    keystore.byteLimit = 500;
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.getUnclaimed = jest.fn(() =>
-      Promise.resolve({
-        unclaimed: [
+    expect(read.mock.calls).toMatchSnapshot();
+  });
+
+  test('__execute', async () => {
+    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+    testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
+    sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+    const transaction = factory.createRegisterTransaction();
+    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    const receipt = factory.createTransactionReceipt();
+    getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
+    const invocationData = factory.createRawInvocationData();
+    getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
+
+    const result = await provider.__execute(data.buffers.a);
+    const confirmResult = await result.confirmed();
+
+    expect(result.transaction).toEqual(transaction);
+    expect(confirmResult.blockHash).toEqual(receipt.blockHash);
+    expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
+    expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
+    expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
+    expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
+    expect(confirmResult.result.state).toEqual('HALT');
+    if (confirmResult.result.state !== 'HALT') {
+      throw new Error('For TS');
+    }
+    expect(confirmResult.result).toEqual(invocationData.result);
+
+    expect(sign.mock.calls).toMatchSnapshot();
+    expect(testInvoke.mock.calls).toMatchSnapshot();
+    expect(relayTransaction.mock.calls).toMatchSnapshot();
+  });
+
+  describe('consolidation + multi-inputs', () => {
+    const outputs = {
+      oneNEO: {
+        asset: Hash256.NEO,
+        value: new BigNumber('1'),
+        address: keys[1].address,
+        hash: data.hash256s.a,
+        index: 1,
+      },
+      twoNEO: {
+        asset: Hash256.NEO,
+        value: new BigNumber('2'),
+        address: keys[1].address,
+        hash: data.hash256s.a,
+        index: 2,
+      },
+      sevenNEO: {
+        asset: Hash256.NEO,
+        value: new BigNumber('7'),
+        address: keys[1].address,
+        hash: data.hash256s.a,
+        index: 3,
+      },
+      oneGAS: {
+        asset: Hash256.GAS,
+        value: new BigNumber('1'),
+        address: keys[1].address,
+        hash: data.hash256s.b,
+        index: 4,
+      },
+      twoGAS: {
+        asset: Hash256.GAS,
+        value: new BigNumber('2'),
+        address: keys[1].address,
+        hash: data.hash256s.c,
+        index: 5,
+      },
+      elevenGAS: {
+        asset: Hash256.GAS,
+        value: new BigNumber('11'),
+        address: keys[1].address,
+        hash: data.hash256s.c,
+        index: 6,
+      },
+      oneTKY: {
+        asset: data.hash256s.d,
+        value: new BigNumber('1'),
+        address: keys[1].address,
+        hash: data.hash256s.e,
+        index: 7,
+      },
+      twoTKY: {
+        asset: data.hash256s.d,
+        value: new BigNumber('2'),
+        address: keys[1].address,
+        hash: data.hash256s.e,
+        index: 8,
+      },
+      threeTKY: {
+        asset: data.hash256s.d,
+        value: new BigNumber('3'),
+        address: keys[1].address,
+        hash: data.hash256s.e,
+        index: 9,
+      },
+    };
+
+    const attribute: Attribute = {
+      usage: 'Remark',
+      data: 'testData',
+    };
+
+    const options = {
+      attributes: [attribute],
+    };
+
+    const context = {
+      messageMagic: 0,
+    };
+
+    test('throws on reused inputs', async () => {
+      const unspent = [outputs.sevenNEO, outputs.oneNEO, outputs.elevenGAS];
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createContractTransaction();
+      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+
+      await provider.transfer(
+        [
           {
-            txid: '0x7f48028c36117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-            vout: 2,
+            amount: new BigNumber('6'),
+            asset: Hash256.NEO,
+            to: keys[0].address,
           },
         ],
+        { networkFee: new BigNumber('1') },
+      );
+      const result1 = provider.transfer(
+        [
+          {
+            amount: new BigNumber('1'),
+            asset: Hash256.NEO,
+            to: keys[0].address,
+          },
+        ],
+        { networkFee: new BigNumber('1') },
+      );
 
+      await expect(result1).rejects.toMatchSnapshot();
+    });
+
+    test('updates on new block', async () => {
+      const unspent = [outputs.sevenNEO, outputs.oneNEO, outputs.elevenGAS];
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createContractTransaction();
+      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+      getBlockCount.mockImplementation(async () => Promise.resolve(0));
+
+      await provider.transfer(
+        [
+          {
+            amount: new BigNumber('6'),
+            asset: Hash256.NEO,
+            to: keys[0].address,
+          },
+        ],
+        { networkFee: new BigNumber('1') },
+      );
+
+      getBlockCount.mockImplementation(async () => Promise.resolve(1));
+
+      await provider.transfer(
+        [
+          {
+            amount: new BigNumber('1'),
+            asset: Hash256.NEO,
+            to: keys[0].address,
+          },
+        ],
+        { networkFee: new BigNumber('1') },
+      );
+    });
+
+    test('transfer - consolidate all', async () => {
+      const byteLimit = 800;
+      keystore.byteLimit = byteLimit;
+      const unspent = [outputs.oneNEO, outputs.twoNEO, outputs.sevenNEO, outputs.oneGAS, outputs.elevenGAS];
+      const transfer = {
         amount: new BigNumber('3'),
-      }),
-    );
-    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
+        asset: Hash256.NEO,
+        to: keys[0].address,
+      };
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createContractTransaction();
+      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+        const coreTransaction = deserializeTransactionWire({
+          context,
+          buffer: Buffer.from(transactionSerialized, 'hex'),
+        });
+        expect(coreTransaction.serializeWire().length <= byteLimit).toBeTruthy();
+        expect(coreTransaction.inputs.length).toEqual(unspent.length);
+        expect(coreTransaction.outputs.length).toEqual(3);
 
-    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+        return Promise.resolve(transaction);
+      });
+      const receipt = factory.createTransactionReceipt();
+      getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
 
-    await localUserAccountProvider.claim({
-      from: options.from,
-      attributes: options.attributes,
+      const result = await provider.transfer([transfer], options);
+      const confirmResult = await result.confirmed();
+
+      expect(result.transaction).toEqual(transaction);
+      expect(confirmResult).toEqual(receipt);
+
+      expect(sign.mock.calls).toMatchSnapshot();
+      expect(relayTransaction.mock.calls).toMatchSnapshot();
     });
 
-    const consolidatedTransaction = spy.mock.calls[0][0].transaction;
-    expect(consolidatedTransaction.serializeUnsigned().length).toEqual(145);
-    expect(consolidatedTransaction.inputs.length).toEqual(1);
-    expect(consolidatedTransaction.outputs.length).toEqual(1);
+    test('claim - consolidate one', async () => {
+      const byteLimit = 500;
+      keystore.byteLimit = byteLimit;
+      const unspent = [outputs.elevenGAS];
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      getUnclaimed.mockImplementation(async () =>
+        Promise.resolve({
+          unclaimed: [
+            {
+              hash: data.hash256s.a,
+              index: 2,
+            },
+          ],
+          amount: new BigNumber('3'),
+        }),
+      );
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createClaimTransaction();
+      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+        const coreTransaction = deserializeTransactionWire({
+          context,
+          buffer: Buffer.from(transactionSerialized, 'hex'),
+        });
+        expect(coreTransaction.serializeWire().length <= byteLimit).toBeTruthy();
+        expect(coreTransaction.inputs.length).toEqual(unspent.length);
+        expect(coreTransaction.outputs.length).toEqual(1);
 
-    spy.mockReset();
-    spy.mockRestore();
-    verifyMocks();
-  });
+        return Promise.resolve(transaction);
+      });
+      const receipt = factory.createTransactionReceipt();
+      getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
 
-  test(`blank transaction consolidates`, async () => {
-    const unspent = [
-      outputs.oneNEO,
-      outputs.twoNEO,
-      outputs.sevenNEO,
-      outputs.oneGAS,
-      outputs.twoGAS,
-      outputs.elevenGAS,
-    ];
-    keystore.byteLimit = 800;
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+      const result = await provider.claim(options);
+      const confirmResult = await result.confirmed();
 
-    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
-    await localUserAccountProvider.transfer([], {
-      from: options.from,
-      attributes: options.attributes,
+      expect(result.transaction).toEqual(transaction);
+      expect(confirmResult).toEqual(receipt);
+
+      expect(sign.mock.calls).toMatchSnapshot();
+      expect(relayTransaction.mock.calls).toMatchSnapshot();
     });
-    const consolidatedTransaction = spy.mock.calls[0][0].transaction;
-    expect(consolidatedTransaction.serializeUnsigned().length).toEqual(340);
-    expect(consolidatedTransaction.inputs.length).toEqual(6);
-    expect(consolidatedTransaction.outputs.length).toEqual(2);
 
-    spy.mockReset();
-    spy.mockRestore();
-    verifyMocks();
-  });
+    test('transfer none - consolidate all', async () => {
+      const byteLimit = 800;
+      keystore.byteLimit = byteLimit;
+      const unspent = [
+        outputs.oneNEO,
+        outputs.twoNEO,
+        outputs.sevenNEO,
+        outputs.oneGAS,
+        outputs.twoGAS,
+        outputs.elevenGAS,
+      ];
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createContractTransaction();
+      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+        const coreTransaction = deserializeTransactionWire({
+          context,
+          buffer: Buffer.from(transactionSerialized, 'hex'),
+        });
+        expect(coreTransaction.serializeWire().length <= byteLimit).toBeTruthy();
+        expect(coreTransaction.inputs.length).toEqual(unspent.length);
+        expect(coreTransaction.outputs.length).toEqual(2);
 
-  test(`consolidate prioritizes any asset with a return output`, async () => {
-    const unspent = [
-      outputs.oneTKY,
-      outputs.threeTKY,
-      outputs.oneNEO,
-      outputs.twoNEO,
-      outputs.sevenNEO,
-      outputs.oneGAS,
-      outputs.twoGAS,
-      outputs.elevenGAS,
-    ];
+        return Promise.resolve(transaction);
+      });
+      const receipt = factory.createTransactionReceipt();
+      getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
 
-    const transfers = [
-      {
+      const result = await provider.transfer([], options);
+      const confirmResult = await result.confirmed();
+
+      expect(result.transaction).toEqual(transaction);
+      expect(confirmResult).toEqual(receipt);
+
+      expect(sign.mock.calls).toMatchSnapshot();
+      expect(relayTransaction.mock.calls).toMatchSnapshot();
+    });
+
+    test('transfer one - consolidate prioritizes outputs', async () => {
+      const byteLimit = 250;
+      keystore.byteLimit = byteLimit;
+      const transfer = {
         amount: new BigNumber('2'),
-        asset: '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c',
-        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
-      },
-    ];
+        asset: outputs.oneTKY.asset,
+        to: keys[0].address,
+      };
+      const unspent = [
+        outputs.oneTKY,
+        outputs.threeTKY,
+        outputs.oneNEO,
+        outputs.twoNEO,
+        outputs.sevenNEO,
+        outputs.oneGAS,
+        outputs.twoGAS,
+        outputs.elevenGAS,
+      ];
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createContractTransaction();
+      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+        const coreTransaction = deserializeTransactionWire({
+          context,
+          buffer: Buffer.from(transactionSerialized, 'hex'),
+        });
+        expect(coreTransaction.serializeWire().length <= byteLimit).toBeTruthy();
+        expect(coreTransaction.inputs.length).toEqual(2);
+        expect(common.uInt256ToString(coreTransaction.inputs[0].hash)).toEqual(outputs.oneTKY.hash);
+        expect(common.uInt256ToString(coreTransaction.inputs[1].hash)).toEqual(outputs.threeTKY.hash);
+        expect(coreTransaction.outputs.length).toEqual(2);
+        expect(coreTransaction.outputs[0].value.toString(10)).toEqual('200000000');
+        expect(coreTransaction.outputs[1].value.toString(10)).toEqual('200000000');
 
-    keystore.byteLimit = 250;
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+        return Promise.resolve(transaction);
+      });
+      const receipt = factory.createTransactionReceipt();
+      getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
 
-    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
-    await localUserAccountProvider.transfer(transfers, {
-      from: options.from,
-      attributes: options.attributes,
+      const result = await provider.transfer([transfer], options);
+      const confirmResult = await result.confirmed();
+
+      expect(result.transaction).toEqual(transaction);
+      expect(confirmResult).toEqual(receipt);
+
+      expect(sign.mock.calls).toMatchSnapshot();
+      expect(relayTransaction.mock.calls).toMatchSnapshot();
     });
-    const consolidatedTransaction = spy.mock.calls[0][0].transaction as Transaction;
-    expect(consolidatedTransaction.serializeUnsigned().length).toEqual(204);
-    expect(
-      consolidatedTransaction.inputs.every((input) => common.uInt256ToString(input.hash) === outputs.oneTKY.asset),
-    ).toBe(true);
 
-    spy.mockReset();
-    spy.mockRestore();
-    verifyMocks();
-  });
+    const verifyInput = (result: CoreInput, input: InputOutput) => {
+      expect(common.uInt256ToString(result.hash)).toEqual(input.hash);
+      expect(result.index).toEqual(input.index);
+    };
 
-  test(`consolidation prioritizes NEO/GAS for new outputs`, async () => {
-    const unspent = [
-      outputs.oneTKY,
-      outputs.twoTKY,
-      outputs.oneNEO,
-      outputs.twoNEO,
-      outputs.sevenNEO,
-      outputs.oneGAS,
-      outputs.twoGAS,
-      outputs.elevenGAS,
-    ];
+    test('transfer one - consolidate prioritizes NEO/GAS for new outputs', async () => {
+      const byteLimit = 400;
+      keystore.byteLimit = byteLimit;
+      const unspent = [
+        outputs.oneTKY,
+        outputs.threeTKY,
+        outputs.oneNEO,
+        outputs.twoNEO,
+        outputs.sevenNEO,
+        outputs.oneGAS,
+        outputs.twoGAS,
+        outputs.elevenGAS,
+      ];
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createContractTransaction();
+      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+        const coreTransaction = deserializeTransactionWire({
+          context,
+          buffer: Buffer.from(transactionSerialized, 'hex'),
+        });
+        expect(coreTransaction.serializeWire().length <= byteLimit).toBeTruthy();
+        expect(coreTransaction.inputs.length).toEqual(6);
+        verifyInput(coreTransaction.inputs[0], outputs.oneNEO);
+        verifyInput(coreTransaction.inputs[1], outputs.twoNEO);
+        verifyInput(coreTransaction.inputs[2], outputs.sevenNEO);
+        verifyInput(coreTransaction.inputs[3], outputs.oneGAS);
+        verifyInput(coreTransaction.inputs[4], outputs.twoGAS);
+        verifyInput(coreTransaction.inputs[5], outputs.elevenGAS);
+        expect(coreTransaction.outputs.length).toEqual(2);
+        expect(coreTransaction.outputs[0].value.toString(10)).toEqual('1000000000');
+        expect(coreTransaction.outputs[1].value.toString(10)).toEqual('1400000000');
 
-    keystore.byteLimit = 400;
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+        return Promise.resolve(transaction);
+      });
+      const receipt = factory.createTransactionReceipt();
+      getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
 
-    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
-    await localUserAccountProvider.transfer([], {
-      from: options.from,
-      attributes: options.attributes,
+      const result = await provider.transfer([], options);
+      const confirmResult = await result.confirmed();
+
+      expect(result.transaction).toEqual(transaction);
+      expect(confirmResult).toEqual(receipt);
+
+      expect(sign.mock.calls).toMatchSnapshot();
+      expect(relayTransaction.mock.calls).toMatchSnapshot();
     });
-    const consolidatedTransaction = spy.mock.calls[0][0].transaction as Transaction;
-    expect(consolidatedTransaction.inputs.some((input) => input.index === 7 || input.index === 8)).toBe(false);
 
-    spy.mockReset();
-    spy.mockRestore();
-    verifyMocks();
-  });
-
-  test('transaction consolidates GAS when network fee present', async () => {
-    const unspent = [outputs.oneNEO, outputs.oneGAS, outputs.elevenGAS];
-    const transfer = [
-      {
+    test('transfer one - consolidate GAS when network fee is present', async () => {
+      const byteLimit = 800;
+      keystore.byteLimit = byteLimit;
+      const transfer = {
         amount: new BigNumber('1'),
-        asset: common.NEO_ASSET_HASH,
-        to: 'AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx',
-      },
-    ];
-    keystore.byteLimit = 800;
-    keystore.sign = jest.fn(() => witness);
-    provider.getUnspentOutputs = jest.fn(() => Promise.resolve(unspent));
-    provider.getTransactionReceipt = jest.fn(() => Promise.resolve('receiptDummy'));
+        asset: Hash256.NEO,
+        to: keys[0].address,
+      };
+      const unspent = [outputs.oneNEO, outputs.oneGAS, outputs.elevenGAS];
+      getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+      const transaction = factory.createContractTransaction();
+      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+        const coreTransaction = deserializeTransactionWire({
+          context,
+          buffer: Buffer.from(transactionSerialized, 'hex'),
+        });
+        expect(coreTransaction.serializeWire().length <= byteLimit).toBeTruthy();
+        expect(coreTransaction.inputs.length).toEqual(3);
+        verifyInput(coreTransaction.inputs[0], outputs.oneNEO);
+        verifyInput(coreTransaction.inputs[1], outputs.elevenGAS);
+        verifyInput(coreTransaction.inputs[2], outputs.oneGAS);
+        expect(coreTransaction.outputs.length).toEqual(2);
+        expect(coreTransaction.outputs[0].value.toString(10)).toEqual('100000000');
+        expect(coreTransaction.outputs[1].value.toString(10)).toEqual('1000000000');
 
-    const spy = jest.spyOn(localUserAccountProvider, 'addWitness' as any);
-    await localUserAccountProvider.transfer(transfer, {
-      from: options.from,
-      attributes: options.attributes,
-      networkFee: new BigNumber('2'),
+        return Promise.resolve(transaction);
+      });
+      const receipt = factory.createTransactionReceipt();
+      getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
+
+      const result = await provider.transfer([transfer], {
+        ...options,
+        networkFee: new BigNumber('2'),
+      });
+      const confirmResult = await result.confirmed();
+
+      expect(result.transaction).toEqual(transaction);
+      expect(confirmResult).toEqual(receipt);
+
+      expect(sign.mock.calls).toMatchSnapshot();
+      expect(relayTransaction.mock.calls).toMatchSnapshot();
     });
-    const consolidatedTransaction = spy.mock.calls[0][0].transaction;
-    expect(consolidatedTransaction.inputs.length).toEqual(3);
-    expect(consolidatedTransaction.outputs.length).toEqual(2);
-
-    spy.mockReset();
-    spy.mockRestore();
-    verifyMocks();
   });
 });

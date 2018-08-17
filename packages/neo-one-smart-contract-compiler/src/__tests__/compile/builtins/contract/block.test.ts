@@ -21,18 +21,18 @@ describe('Block', () => {
       assertEqual(block.time, ${block.time});
       assertEqual(block.nextConsensus, Address.from('${block.nextConsensus}'));
       assertEqual(block.transactions.length, 5);
-      assertEqual(block.transactions[0].hash, Hash256.from('${block.transactions[0].txid}'));
-      assertEqual(block.transactions[1].hash, Hash256.from('${block.transactions[1].txid}'));
-      assertEqual(block.transactions[2].hash, Hash256.from('${block.transactions[2].txid}'));
-      assertEqual(block.transactions[3].hash, Hash256.from('${block.transactions[3].txid}'));
-      assertEqual(block.transactions[4].hash, Hash256.from('${block.transactions[4].txid}'));
+      assertEqual(block.transactions[0].hash, Hash256.from('${block.transactions[0].hash}'));
+      assertEqual(block.transactions[1].hash, Hash256.from('${block.transactions[1].hash}'));
+      assertEqual(block.transactions[2].hash, Hash256.from('${block.transactions[2].hash}'));
+      assertEqual(block.transactions[3].hash, Hash256.from('${block.transactions[3].hash}'));
+      assertEqual(block.transactions[4].hash, Hash256.from('${block.transactions[4].hash}'));
       assertEqual(block instanceof Header, false);
       assertEqual(block instanceof Block, true);
     `);
   });
 
   test('cannot be implemented', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Block } from '@neo-one/smart-contract';
 
@@ -44,7 +44,7 @@ describe('Block', () => {
   });
 
   test('cannot be referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       import { Block } from '@neo-one/smart-contract';
 

@@ -1,5 +1,5 @@
-import { common } from '@neo-one/client-core';
 import { addressToScriptHash } from '@neo-one/client';
+import { common } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 
 export const getUInt160Hash = (value: string) =>

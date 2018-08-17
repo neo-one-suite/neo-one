@@ -1,12 +1,12 @@
+import { common, ContractParameterType, ContractPropertyState, crypto } from '@neo-one/client-core';
 import { helpers } from '../../../../../__data__';
-import { ContractParameterType, common, crypto, ContractPropertyState } from '@neo-one/client-core';
 
 describe('Contract functions', () => {
   test('migrate', async () => {
     const node = await helpers.startNode();
     const parameterList = Buffer.from([ContractParameterType.String]);
 
-    const { code: newContract } = await node.compileScript(`
+    const { code: newContract } = node.compileScript(`
       import { getArgument, getStorage, doReturn, destroy } from '@neo-one/smart-contract-internal';
 
       const method = getArgument<string>(0);
@@ -55,7 +55,7 @@ describe('Contract functions', () => {
         deploy: () => void;
         migrate: () => void;
       }
-      const contract = Address.getSmartContract<Contract>(Address.from('${contract.hash}'));
+      const contract = Address.getSmartContract<Contract>(Address.from('${contract.address}'));
       assertEqual(contract.deploy(), undefined);
       contract.migrate();
 
@@ -69,7 +69,7 @@ describe('Contract functions', () => {
       assertEqual(newContract.destroy(), true);
     `);
 
-    await expect(node.readClient.getContract(contract.hash)).rejects.toBeDefined();
+    await expect(node.readClient.getContract(contract.address)).rejects.toBeDefined();
     await expect(node.readClient.getContract(newContractHash)).rejects.toBeDefined();
   });
 
@@ -77,7 +77,7 @@ describe('Contract functions', () => {
     const node = await helpers.startNode();
     const parameterList = Buffer.from([ContractParameterType.String]);
 
-    const { code: newContract } = await node.compileScript(`
+    const { code: newContract } = node.compileScript(`
       import { getArgument, doReturn } from '@neo-one/smart-contract-internal';
 
       const method = getArgument<string>(0);
@@ -112,7 +112,7 @@ describe('Contract functions', () => {
       interface Contract {
         create: () => void;
       }
-      const contract = Address.getSmartContract<Contract>(Address.from('${contract.hash}'));
+      const contract = Address.getSmartContract<Contract>(Address.from('${contract.address}'));
       contract.create();
 
       interface NewContract {
@@ -126,9 +126,9 @@ describe('Contract functions', () => {
     const createdContract = await node.readClient.getContract(newContractHash);
     expect(createdContract.script).toEqual(newContract.toString('hex'));
     expect(createdContract.parameters).toEqual(['String']);
-    expect(createdContract.properties.storage).toBeTruthy();
-    expect(createdContract.properties.dynamicInvoke).toBeTruthy();
-    expect(createdContract.properties.payable).toBeTruthy();
+    expect(createdContract.storage).toBeTruthy();
+    expect(createdContract.dynamicInvoke).toBeTruthy();
+    expect(createdContract.payable).toBeTruthy();
     expect(createdContract.codeVersion).toEqual('2.0');
     expect(createdContract.author).toEqual('me');
     expect(createdContract.email).toEqual('me@me.com');

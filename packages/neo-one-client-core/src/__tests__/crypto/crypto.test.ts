@@ -1,5 +1,6 @@
 import { keys } from '../../__data__';
-import { common, crypto } from '@neo-one/client-core';
+import { common } from '../../common';
+import { crypto } from '../../crypto';
 
 // tslint:disable-next-line no-loop-statement
 for (const key of keys) {

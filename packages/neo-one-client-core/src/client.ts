@@ -1,12 +1,21 @@
+import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import { ActionJSON } from './action';
 import { CallReceiptJSON } from './CallReceipt';
+import { common } from './common';
 import { ContractParameterJSON } from './contractParameter';
+import { crypto } from './crypto';
 import { InvocationResultJSON } from './invocationResult';
-import { ActionRaw, ContractParameter, RawCallReceipt, RawInvocationResult } from './types';
+import { AddressString, ContractParameter, RawAction, RawCallReceipt, RawInvocationResult } from './types';
 import { JSONHelper } from './utils';
 import { VMState } from './vm';
+
+export const scriptHashToAddress = (scriptHash: string): AddressString =>
+  crypto.scriptHashToAddress({
+    addressVersion: common.NEO_ADDRESS_VERSION,
+    scriptHash: common.stringToUInt160(scriptHash),
+  });
 
 export function convertCallReceipt(receipt: CallReceiptJSON): RawCallReceipt {
   return {
@@ -31,7 +40,7 @@ export function convertAction(
   transactionIndex: number,
   index: number,
   action: ActionJSON,
-): ActionRaw {
+): RawAction {
   if (action.type === 'Log') {
     return {
       type: 'Log',
@@ -42,7 +51,7 @@ export function convertAction(
       transactionHash,
       index,
       globalIndex: JSONHelper.readUInt64(action.index),
-      scriptHash: action.scriptHash,
+      address: scriptHashToAddress(action.scriptHash),
       message: action.message,
     };
   }
@@ -56,7 +65,7 @@ export function convertAction(
     transactionHash,
     index,
     globalIndex: JSONHelper.readUInt64(action.index),
-    scriptHash: action.scriptHash,
+    address: scriptHashToAddress(action.scriptHash),
     args: convertContractParameters(action.args),
   };
 }
@@ -87,20 +96,45 @@ export function convertContractParameters(
 }
 
 export function convertContractParameter(parameter: ContractParameterJSON): ContractParameter {
-  if (parameter.type === 'Integer') {
-    return {
-      type: 'Integer',
-      value: new BN(parameter.value, 10),
-    };
+  switch (parameter.type) {
+    case 'Array':
+      return {
+        type: 'Array',
+        value: convertContractParameters(parameter.value),
+      };
+    case 'Boolean':
+      return parameter;
+    case 'ByteArray':
+      return {
+        type: 'Buffer',
+        value: parameter.value,
+      };
+    case 'Hash160':
+      return {
+        type: 'Address',
+        value: scriptHashToAddress(parameter.value),
+      };
+    case 'Hash256':
+      return parameter;
+    case 'Integer':
+      return {
+        type: 'Integer',
+        value: new BN(parameter.value, 10),
+      };
+    case 'InteropInterface':
+      return parameter;
+    case 'PublicKey':
+      return parameter;
+    case 'Signature':
+      return parameter;
+    case 'String':
+      return parameter;
+    case 'Void':
+      return parameter;
+    default:
+      utils.assertNever(parameter);
+      throw new Error('For TS');
   }
-  if (parameter.type === 'Array') {
-    return {
-      type: 'Array',
-      value: convertContractParameters(parameter.value),
-    };
-  }
-
-  return parameter;
 }
 
 export const bigNumberToBN = (value: BigNumber, decimals: number): BN => {

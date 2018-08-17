@@ -4,7 +4,6 @@ import * as args from './args';
 import { createReadSmartContract } from './sc';
 import {
   Account,
-  ActionRaw,
   AddressString,
   Asset,
   Block,
@@ -13,18 +12,17 @@ import {
   Contract,
   DataProvider,
   GetOptions,
-  Hash160String,
   Hash256String,
   Input,
   Output,
   Peer,
+  RawAction,
   RawCallReceipt,
   ReadSmartContract,
   ReadSmartContractAny,
   ReadSmartContractDefinition,
   StorageItem,
   Transaction,
-  Validator,
 } from './types';
 
 export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
@@ -35,31 +33,24 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
   }
 
   public async getAccount(address: AddressString, monitor?: Monitor): Promise<Account> {
-    args.assertAddress(address);
-
-    return this.dataProvider.getAccount(address, monitor);
+    return this.dataProvider.getAccount(args.assertAddress('address', address), monitor);
   }
 
   public async getAsset(hash: Hash256String, monitor?: Monitor): Promise<Asset> {
-    args.assertHash256(hash);
-
-    return this.dataProvider.getAsset(hash, monitor);
+    return this.dataProvider.getAsset(args.assertHash256('hash', hash), monitor);
   }
 
-  public async getBlock(hash: number | Hash256String, options?: GetOptions): Promise<Block> {
-    args.assertGetOptions(options);
-
+  public async getBlock(hash: number | Hash256String, optionsIn?: GetOptions): Promise<Block> {
+    const options = args.assertGetOptions('options', optionsIn);
     if (typeof hash === 'number') {
       return this.dataProvider.getBlock(hash, options);
     }
 
-    return this.dataProvider.getBlock(args.assertHash256(hash));
+    return this.dataProvider.getBlock(args.assertHash256('hash', hash), options);
   }
 
   public iterBlocks(filter?: BlockFilter): AsyncIterable<Block> {
-    args.assertBlockFilter(filter);
-
-    return this.dataProvider.iterBlocks(filter);
+    return this.dataProvider.iterBlocks(args.assertBlockFilter('filter', filter));
   }
 
   public async getBestBlockHash(monitor?: Monitor): Promise<Hash256String> {
@@ -70,10 +61,8 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
     return this.dataProvider.getBlockCount(monitor);
   }
 
-  public async getContract(hash: Hash160String, monitor?: Monitor): Promise<Contract> {
-    args.assertHash160(hash);
-
-    return this.dataProvider.getContract(hash, monitor);
+  public async getContract(address: AddressString, monitor?: Monitor): Promise<Contract> {
+    return this.dataProvider.getContract(args.assertAddress('address', address), monitor);
   }
 
   public async getMemPool(monitor?: Monitor): Promise<ReadonlyArray<Hash256String>> {
@@ -81,17 +70,11 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
   }
 
   public async getTransaction(hash: Hash256String, monitor?: Monitor): Promise<Transaction> {
-    args.assertHash256(hash);
-
-    return this.dataProvider.getTransaction(hash, monitor);
+    return this.dataProvider.getTransaction(args.assertHash256('hash', hash), monitor);
   }
 
   public async getOutput(input: Input, monitor?: Monitor): Promise<Output> {
     return this.dataProvider.getOutput(input, monitor);
-  }
-
-  public async getValidators(monitor?: Monitor): Promise<ReadonlyArray<Validator>> {
-    return this.dataProvider.getValidators(monitor);
   }
 
   public async getConnectedPeers(monitor?: Monitor): Promise<ReadonlyArray<Peer>> {
@@ -102,34 +85,27 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
   public smartContract<T extends ReadSmartContract<any> = ReadSmartContractAny>(
     definition: ReadSmartContractDefinition,
   ): T {
-    args.assertHash160(definition.hash);
-    args.assertABI(definition.abi);
-
-    // tslint:disable-next-line no-any
-    return createReadSmartContract({ definition, client: this }) as any;
+    return createReadSmartContract({
+      definition: args.assertReadSmartContractDefinition('definition', definition),
+      client: this,
+      // tslint:disable-next-line no-any
+    }) as any;
   }
 
-  public async getStorage(hash: Hash160String, key: BufferString, monitor?: Monitor): Promise<StorageItem> {
-    args.assertHash160(hash);
-    args.assertBuffer(key);
-
-    return this.dataProvider.getStorage(hash, key, monitor);
+  public async getStorage(address: AddressString, key: BufferString, monitor?: Monitor): Promise<StorageItem> {
+    return this.dataProvider.getStorage(args.assertAddress('address', address), args.assertBuffer('key', key), monitor);
   }
 
-  public iterStorage(hash: Hash160String, monitor?: Monitor): AsyncIterable<StorageItem> {
-    args.assertHash160(hash);
-
-    return this.dataProvider.iterStorage(hash, monitor);
+  public iterStorage(address: AddressString, monitor?: Monitor): AsyncIterable<StorageItem> {
+    return this.dataProvider.iterStorage(args.assertAddress('address', address), monitor);
   }
 
-  public __iterActionsRaw(filter?: BlockFilter): AsyncIterable<ActionRaw> {
-    args.assertBlockFilter(filter);
-
-    return this.dataProvider.iterActionsRaw(filter);
+  public __iterActionsRaw(filter?: BlockFilter): AsyncIterable<RawAction> {
+    return this.dataProvider.iterActionsRaw(args.assertBlockFilter('filter', filter));
   }
 
   public async __call(
-    contract: Hash160String,
+    contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     monitor?: Monitor,

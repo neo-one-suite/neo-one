@@ -1,12 +1,10 @@
-import { bigNumberToBN, common, crypto, Output } from '@neo-one/client-core';
+import { bigNumberToBN, common, Output } from '@neo-one/client-core';
+import { addressToScriptHash } from '../../helpers';
 import { Output as ClientOutput } from '../../types';
 
-export const output = (outputLike: ClientOutput, addressVersion?: number): Output =>
+export const output = (outputLike: ClientOutput): Output =>
   new Output({
-    address: crypto.addressToScriptHash({
-      address: outputLike.address,
-      addressVersion: addressVersion === undefined ? common.NEO_ADDRESS_VERSION : addressVersion,
-    }),
+    address: common.stringToUInt160(addressToScriptHash(outputLike.address)),
     asset: common.stringToUInt256(outputLike.asset),
     value: bigNumberToBN(outputLike.value, 8),
   });

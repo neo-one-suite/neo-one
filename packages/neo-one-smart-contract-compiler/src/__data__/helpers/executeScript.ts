@@ -9,8 +9,8 @@ import MemDown from 'memdown';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { compile } from '../../compile';
-import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { Context } from '../../Context';
+import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 
 export interface ExecuteOptions {
   readonly prelude?: Buffer;

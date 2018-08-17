@@ -1,19 +1,19 @@
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { common } from './common';
+import { crypto } from './crypto';
 import { InvalidContractParameterError } from './errors';
 import {
+  AddressABI,
+  AddressString,
   ArrayABI,
   BooleanABI,
+  BufferABI,
   BufferString,
-  ByteArrayABI,
   ContractParameter,
-  Hash160ABI,
-  Hash160String,
   Hash256ABI,
   Hash256String,
   IntegerABI,
-  InteropInterfaceABI,
   Param,
   PublicKeyABI,
   PublicKeyString,
@@ -24,7 +24,7 @@ import {
 } from './types';
 import { JSONHelper, utils } from './utils';
 
-const toByteArrayBuffer = (contractParameter: ContractParameter): Buffer => {
+const toBufferBuffer = (contractParameter: ContractParameter): Buffer => {
   let value;
   switch (contractParameter.type) {
     case 'Signature':
@@ -36,13 +36,18 @@ const toByteArrayBuffer = (contractParameter: ContractParameter): Buffer => {
     case 'Integer':
       value = utils.toSignedBuffer(contractParameter.value);
       break;
-    case 'Hash160':
-      value = common.uInt160ToBuffer(JSONHelper.readUInt160(contractParameter.value));
+    case 'Address':
+      value = common.uInt160ToBuffer(
+        crypto.addressToScriptHash({
+          addressVersion: common.NEO_ADDRESS_VERSION,
+          address: contractParameter.value,
+        }),
+      );
       break;
     case 'Hash256':
       value = common.uInt256ToBuffer(JSONHelper.readUInt256(contractParameter.value));
       break;
-    case 'ByteArray':
+    case 'Buffer':
       value = JSONHelper.readBuffer(contractParameter.value);
       break;
     case 'PublicKey':
@@ -56,12 +61,11 @@ const toByteArrayBuffer = (contractParameter: ContractParameter): Buffer => {
         'Signature',
         'Boolean',
         'Integer',
-        'Hash160',
+        'Address',
         'Hash256',
-        'ByteArray',
+        'Buffer',
         'PublicKey',
         'String',
-        'InteropInterface',
         'Void',
       ]);
     case 'InteropInterface':
@@ -71,22 +75,24 @@ const toByteArrayBuffer = (contractParameter: ContractParameter): Buffer => {
       value = Buffer.alloc(0, 0);
       break;
     default:
+      /* istanbul ignore next */
       commonUtils.assertNever(contractParameter);
-      throw new Error('For Flow');
+      /* istanbul ignore next */
+      throw new Error('For TS');
   }
 
   return value;
 };
 
-const toByteArray = (contractParameter: ContractParameter): BufferString =>
-  toByteArrayBuffer(contractParameter).toString('hex');
+const toBuffer = (contractParameter: ContractParameter): BufferString =>
+  toBufferBuffer(contractParameter).toString('hex');
 
 const toBoolean = (contractParameter: ContractParameter): boolean => {
   if (contractParameter.type === 'Array') {
     return contractParameter.value.some(toBoolean);
   }
 
-  return toByteArrayBuffer(contractParameter).some((value) => value !== 0);
+  return toBufferBuffer(contractParameter).some((value) => value !== 0);
 };
 
 const toString = (contractParameter: ContractParameter): string => {
@@ -94,23 +100,26 @@ const toString = (contractParameter: ContractParameter): string => {
     return contractParameter.value;
   }
 
-  if (contractParameter.type === 'ByteArray') {
+  if (contractParameter.type === 'Buffer') {
     return JSONHelper.readBuffer(contractParameter.value).toString('utf8');
   }
 
-  throw new InvalidContractParameterError(contractParameter, ['String', 'ByteArray']);
+  throw new InvalidContractParameterError(contractParameter, ['String', 'Buffer']);
 };
 
-const toHash160 = (contractParameter: ContractParameter): Hash160String => {
-  if (contractParameter.type === 'Hash160') {
+const toAddress = (contractParameter: ContractParameter): AddressString => {
+  if (contractParameter.type === 'Address') {
     return contractParameter.value;
   }
 
-  if (contractParameter.type === 'ByteArray') {
-    return JSONHelper.writeUInt160(common.bufferToUInt160(JSONHelper.readBuffer(contractParameter.value)));
+  if (contractParameter.type === 'Buffer') {
+    return crypto.scriptHashToAddress({
+      scriptHash: common.bufferToUInt160(JSONHelper.readBuffer(contractParameter.value)),
+      addressVersion: common.NEO_ADDRESS_VERSION,
+    });
   }
 
-  throw new InvalidContractParameterError(contractParameter, ['Hash160', 'ByteArray']);
+  throw new InvalidContractParameterError(contractParameter, ['Address', 'Buffer']);
 };
 
 const toHash256 = (contractParameter: ContractParameter): Hash256String => {
@@ -118,11 +127,11 @@ const toHash256 = (contractParameter: ContractParameter): Hash256String => {
     return contractParameter.value;
   }
 
-  if (contractParameter.type === 'ByteArray') {
+  if (contractParameter.type === 'Buffer') {
     return JSONHelper.writeUInt256(common.bufferToUInt256(JSONHelper.readBuffer(contractParameter.value)));
   }
 
-  throw new InvalidContractParameterError(contractParameter, ['Hash256', 'ByteArray']);
+  throw new InvalidContractParameterError(contractParameter, ['Hash256', 'Buffer']);
 };
 
 const toPublicKey = (contractParameter: ContractParameter): PublicKeyString => {
@@ -130,21 +139,21 @@ const toPublicKey = (contractParameter: ContractParameter): PublicKeyString => {
     return contractParameter.value;
   }
 
-  if (contractParameter.type === 'ByteArray') {
+  if (contractParameter.type === 'Buffer') {
     return common.ecPointToString(JSONHelper.readECPoint(contractParameter.value));
   }
 
-  throw new InvalidContractParameterError(contractParameter, ['PublicKey', 'ByteArray']);
+  throw new InvalidContractParameterError(contractParameter, ['PublicKey', 'Buffer']);
 };
 
 const toInteger = (contractParameter: ContractParameter, parameter: IntegerABI): BigNumber => {
   let value;
   if (contractParameter.type === 'Integer') {
     value = contractParameter.value;
-  } else if (contractParameter.type === 'ByteArray') {
+  } else if (contractParameter.type === 'Buffer') {
     value = utils.fromSignedBuffer(JSONHelper.readBuffer(contractParameter.value));
   } else {
-    throw new InvalidContractParameterError(contractParameter, ['Integer', 'ByteArray']);
+    throw new InvalidContractParameterError(contractParameter, ['Integer', 'Buffer']);
   }
 
   return common.fixedToDecimal(value, parameter.decimals);
@@ -152,6 +161,10 @@ const toInteger = (contractParameter: ContractParameter, parameter: IntegerABI):
 
 const toSignature = (contractParameter: ContractParameter): SignatureString => {
   if (contractParameter.type === 'Signature') {
+    return contractParameter.value;
+  }
+
+  if (contractParameter.type === 'Buffer' && contractParameter.value.length === 128) {
     return contractParameter.value;
   }
 
@@ -179,6 +192,14 @@ function wrapNullable<Result>(
 ): (contractParameter: ContractParameter) => Result | undefined {
   return (contractParameter) => {
     try {
+      if (contractParameter.type === 'Buffer' && contractParameter.value.length === 0) {
+        return undefined;
+      }
+
+      if (contractParameter.type === 'Void') {
+        return undefined;
+      }
+
       return func(contractParameter);
     } catch (error) {
       if (error.code === 'INVALID_CONTRACT_PARAMETER' || error.code === 'INVALID_CONTRACT_PARAMETER_TYPE_JSON') {
@@ -195,6 +216,10 @@ function wrapNullableABI<Result, ABI>(
 ): (contractParameter: ContractParameter, parameter: ABI) => Result | undefined {
   return (contractParameter, parameter) => {
     try {
+      if (contractParameter.type === 'Buffer' && contractParameter.value.length === 0) {
+        return undefined;
+      }
+
       return func(contractParameter, parameter);
     } catch (error) {
       if (error.code === 'INVALID_CONTRACT_PARAMETER' || error.code === 'INVALID_CONTRACT_PARAMETER_TYPE_JSON') {
@@ -208,7 +233,7 @@ function wrapNullableABI<Result, ABI>(
 
 const toStringNullable = wrapNullable(toString) as (param: ContractParameter) => string | undefined;
 
-const toHash160Nullable = wrapNullable(toHash160) as (param: ContractParameter) => Hash160String | undefined;
+const toAddressNullable = wrapNullable(toAddress) as (param: ContractParameter) => AddressString | undefined;
 const toHash256Nullable = wrapNullable(toHash256) as (param: ContractParameter) => Hash256String | undefined;
 const toPublicKeyNullable = wrapNullable(toPublicKey) as (param: ContractParameter) => PublicKeyString | undefined;
 const toIntegerNullable = wrapNullableABI(toInteger) as (
@@ -218,7 +243,7 @@ const toIntegerNullable = wrapNullableABI(toInteger) as (
 const toBooleanNullable = wrapNullable(toBoolean) as (param: ContractParameter) => boolean | undefined;
 
 const toSignatureNullable = wrapNullable(toSignature) as (param: ContractParameter) => SignatureString | undefined;
-const toByteArrayNullable = wrapNullable(toByteArray) as (param: ContractParameter) => BufferString | undefined;
+const toBufferNullable = wrapNullable(toBuffer) as (param: ContractParameter) => BufferString | undefined;
 const toArrayNullable = wrapNullableABI(toArray) as (
   param: ContractParameter,
   abi: ArrayABI,
@@ -231,8 +256,8 @@ const toVoidNullable = wrapNullable(toVoid) as (param: ContractParameter) => und
 export const contractParameters = {
   String: (contractParameter: ContractParameter, parameter: StringABI): Param | undefined =>
     parameter.optional ? toStringNullable(contractParameter) : toString(contractParameter),
-  Hash160: (contractParameter: ContractParameter, parameter: Hash160ABI): Param | undefined =>
-    parameter.optional ? toHash160Nullable(contractParameter) : toHash160(contractParameter),
+  Address: (contractParameter: ContractParameter, parameter: AddressABI): Param | undefined =>
+    parameter.optional ? toAddressNullable(contractParameter) : toAddress(contractParameter),
   Hash256: (contractParameter: ContractParameter, parameter: Hash256ABI): Param | undefined =>
     parameter.optional ? toHash256Nullable(contractParameter) : toHash256(contractParameter),
   PublicKey: (contractParameter: ContractParameter, parameter: PublicKeyABI): Param | undefined =>
@@ -243,12 +268,10 @@ export const contractParameters = {
     parameter.optional ? toBooleanNullable(contractParameter) : toBoolean(contractParameter),
   Signature: (contractParameter: ContractParameter, parameter: SignatureABI): Param | undefined =>
     parameter.optional ? toSignatureNullable(contractParameter) : toSignature(contractParameter),
-  ByteArray: (contractParameter: ContractParameter, parameter: ByteArrayABI): Param | undefined =>
-    parameter.optional ? toByteArrayNullable(contractParameter) : toByteArray(contractParameter),
+  Buffer: (contractParameter: ContractParameter, parameter: BufferABI): Param | undefined =>
+    parameter.optional ? toBufferNullable(contractParameter) : toBuffer(contractParameter),
   Array: (contractParameter: ContractParameter, parameter: ArrayABI): Param | undefined =>
     parameter.optional ? toArrayNullable(contractParameter, parameter) : toArray(contractParameter, parameter),
-  InteropInterface: (contractParameter: ContractParameter, parameter: InteropInterfaceABI): Param | undefined =>
-    parameter.optional ? toInteropInterfaceNullable(contractParameter) : toInteropInterface(contractParameter),
   Void: (contractParameter: ContractParameter, parameter: VoidABI): Param | undefined =>
     parameter.optional ? toVoidNullable(contractParameter) : toVoid(contractParameter),
 };
@@ -256,8 +279,8 @@ export const contractParameters = {
 export const converters = {
   toString,
   toStringNullable,
-  toHash160,
-  toHash160Nullable,
+  toAddress,
+  toAddressNullable,
   toHash256,
   toHash256Nullable,
   toPublicKey,
@@ -268,8 +291,8 @@ export const converters = {
   toBooleanNullable,
   toSignature,
   toSignatureNullable,
-  toByteArray,
-  toByteArrayNullable,
+  toBuffer,
+  toBufferNullable,
   toArray,
   toArrayNullable,
   toInteropInterface,

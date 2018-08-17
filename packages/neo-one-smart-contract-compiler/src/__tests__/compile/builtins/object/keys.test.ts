@@ -86,7 +86,7 @@ describe('Object.keys', () => {
   });
 
   test('should throw a type error for undefined', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const foo: number | undefined = undefined as number | undefined;
       let error: string | undefined;
@@ -105,7 +105,7 @@ describe('Object.keys', () => {
   });
 
   test('cannot be property referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const keys = Object.keys;
     `,
@@ -114,7 +114,7 @@ describe('Object.keys', () => {
   });
 
   test('cannot be element referenced', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const keys = Object['keys'];
     `,

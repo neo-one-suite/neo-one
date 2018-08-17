@@ -7,8 +7,10 @@ import {
   LocalMemoryStore,
   LocalUserAccountProvider,
   NEOONEProvider,
+  PublishReceipt,
   SmartContract,
   SmartContractAny,
+  TransactionResult,
   UserAccountID,
 } from '@neo-one/client';
 import { CompileContractResult } from '@neo-one/smart-contract-compiler';
@@ -74,7 +76,13 @@ export const setupTest = async <TContract extends SmartContract<any> = SmartCont
 
     const developerClient = new DeveloperClient(provider.read(networkName));
 
-    const result = await (deploy ? client.publishAndDeploy(contract, abi) : client.publish(contract));
+    let result: TransactionResult<PublishReceipt>;
+    // tslint:disable-next-line prefer-conditional-expression
+    if (deploy) {
+      result = await client.publishAndDeploy(contract, abi);
+    } else {
+      result = await client.publish(contract);
+    }
 
     const [receipt] = await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
     if (receipt.result.state === 'FAULT') {
@@ -83,7 +91,7 @@ export const setupTest = async <TContract extends SmartContract<any> = SmartCont
 
     const resolvedSourceMap = await sourceMap;
     const smartContract = client.smartContract<TContract>({
-      networks: { [networkName]: { hash: receipt.result.value.hash } },
+      networks: { [networkName]: { address: receipt.result.value.address } },
       abi,
       sourceMap: resolvedSourceMap,
     });

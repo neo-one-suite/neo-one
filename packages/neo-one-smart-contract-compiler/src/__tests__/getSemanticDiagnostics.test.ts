@@ -1,10 +1,10 @@
 import * as appRootDir from 'app-root-dir';
-import { getSemanticDiagnostics } from '../getSemanticDiagnostics';
-import { createContextForPath } from '../createContext';
 import * as path from 'path';
-import { pathResolve } from '../utils';
 import ts from 'typescript';
 import { CompilerDiagnostic } from '../CompilerDiagnostic';
+import { createContextForPath } from '../createContext';
+import { getSemanticDiagnostics } from '../getSemanticDiagnostics';
+import { pathResolve } from '../utils';
 
 const serializeDiagnostic = (diagnostic: ts.Diagnostic) => {
   let line: number | undefined;
@@ -14,6 +14,7 @@ const serializeDiagnostic = (diagnostic: ts.Diagnostic) => {
     line = result.line;
     column = result.character;
   }
+
   return {
     category: diagnostic.category,
     code: diagnostic.code,

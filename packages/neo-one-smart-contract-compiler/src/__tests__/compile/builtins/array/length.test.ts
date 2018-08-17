@@ -23,7 +23,7 @@ describe('Array.prototype.length', () => {
   });
 
   test('cannot set the length of an array', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x = [1, 2, 3];
       x.length = 4;
@@ -33,7 +33,7 @@ describe('Array.prototype.length', () => {
   });
 
   test('cannot set the "length" of an array', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       const x: { length: number } | Array<number> = [1, 2, 3] as { length: number } | Array<number>;
       const a = 'length';

@@ -2,23 +2,18 @@ import { CustomError, makeErrorWithCode } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { UserAccountID } from './types';
 
-export class InvalidArgumentError extends CustomError {
-  public readonly code: string;
+export const InvalidArgumentError = makeErrorWithCode(
+  'INVALID_ARGUMENT',
+  // tslint:disable-next-line no-any
+  (typeName: string, argumentName: string, value: any, extra?: string) =>
+    `Expected ${typeName} for ${argumentName}, found ${String(value)}${extra === undefined ? '' : `. ${extra}`}`,
+);
 
-  public constructor(message: string) {
-    super(message);
-    this.code = 'INVALID_ARGUMENT';
-  }
-}
-
-export class InvalidNamedArgumentError extends InvalidArgumentError {
-  public readonly code: string;
-
-  public constructor(name: string, argument: {}) {
-    super(`Invalid argument for ${name}: ${String(argument)}`);
-    this.code = 'INVALID_NAMED_ARGUMENT';
-  }
-}
+export const InvalidContractArgumentCountError = makeErrorWithCode(
+  'INVALID_CONTRACT_ARGUMENT_COUNT',
+  // tslint:disable-next-line no-any
+  (expectedLength: number, foundLength: number) => `Expected ${expectedLength} parameters, found ${foundLength}.`,
+);
 
 export class InvocationCallError extends CustomError {
   public readonly code: string;

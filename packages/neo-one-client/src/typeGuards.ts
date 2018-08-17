@@ -1,15 +1,18 @@
+// tslint:disable deprecation
 import {
   ABIParameter,
   ABIReturn,
   Action,
-  ActionRaw,
+  AddressABIParameter,
+  AddressABIReturn,
+  AddressContractParameter,
   ArrayContractParameter,
   BooleanABIParameter,
   BooleanABIReturn,
   BooleanContractParameter,
-  ByteArrayABIParameter,
-  ByteArrayABIReturn,
-  ByteArrayContractParameter,
+  BufferABIParameter,
+  BufferABIReturn,
+  BufferContractParameter,
   ClaimTransaction,
   ConfirmedClaimTransaction,
   ConfirmedContractTransaction,
@@ -25,17 +28,12 @@ import {
   ContractTransaction,
   EnrollmentTransaction,
   Event,
-  Hash160ABIParameter,
-  Hash160ABIReturn,
-  Hash160ContractParameter,
   Hash256ABIParameter,
   Hash256ABIReturn,
   Hash256ContractParameter,
   IntegerABIParameter,
   IntegerABIReturn,
   IntegerContractParameter,
-  InteropInterfaceABIParameter,
-  InteropInterfaceABIReturn,
   InteropInterfaceContractParameter,
   InvocationResult,
   InvocationResultError,
@@ -43,16 +41,17 @@ import {
   InvocationTransaction,
   IssueTransaction,
   Log,
-  LogRaw,
   MinerTransaction,
-  NotificationRaw,
   PublicKeyABIParameter,
   PublicKeyABIReturn,
   PublicKeyContractParameter,
   PublishTransaction,
+  RawAction,
   RawInvocationResult,
   RawInvocationResultError,
   RawInvocationResultSuccess,
+  RawLog,
+  RawNotification,
   RegisterTransaction,
   SignatureABIParameter,
   SignatureABIReturn,
@@ -74,12 +73,12 @@ export const isBooleanContractParameter = (parameter: ContractParameter): parame
   parameter.type === 'Boolean';
 export const isIntegerContractParameter = (parameter: ContractParameter): parameter is IntegerContractParameter =>
   parameter.type === 'Integer';
-export const isHash160ContractParameter = (parameter: ContractParameter): parameter is Hash160ContractParameter =>
-  parameter.type === 'Hash160';
+export const isAddressContractParameter = (parameter: ContractParameter): parameter is AddressContractParameter =>
+  parameter.type === 'Address';
 export const isHash256ContractParameter = (parameter: ContractParameter): parameter is Hash256ContractParameter =>
   parameter.type === 'Hash256';
-export const isByteArrayContractParameter = (parameter: ContractParameter): parameter is ByteArrayContractParameter =>
-  parameter.type === 'ByteArray';
+export const isBufferContractParameter = (parameter: ContractParameter): parameter is BufferContractParameter =>
+  parameter.type === 'Buffer';
 export const isPublicKeyContractParameter = (parameter: ContractParameter): parameter is PublicKeyContractParameter =>
   parameter.type === 'PublicKey';
 export const isStringContractParameter = (parameter: ContractParameter): parameter is StringContractParameter =>
@@ -150,8 +149,8 @@ export const isConfirmedStateTransaction = (
 // Actions
 export const isEvent = (action: Action): action is Event => action.type === 'Event';
 export const isLog = (action: Action): action is Log => action.type === 'Log';
-export const isLogRaw = (action: ActionRaw): action is LogRaw => action.type === 'Log';
-export const isNotificationRaw = (action: ActionRaw): action is NotificationRaw => action.type === 'Notification';
+export const isRawLog = (action: RawAction): action is RawLog => action.type === 'Log';
+export const isRawNotification = (action: RawAction): action is RawNotification => action.type === 'Notification';
 
 // Invocation Results
 export const isInvocationResultSuccess = <T>(result: InvocationResult<T>): result is InvocationResultSuccess<T> =>
@@ -164,15 +163,12 @@ export const isSignatureABIReturn = (parameter: ABIReturn): parameter is Signatu
   parameter.type === 'Signature';
 export const isBooleanABIReturn = (parameter: ABIReturn): parameter is BooleanABIReturn => parameter.type === 'Boolean';
 export const isIntegerABIReturn = (parameter: ABIReturn): parameter is IntegerABIReturn => parameter.type === 'Integer';
-export const isHash160ABIReturn = (parameter: ABIReturn): parameter is Hash160ABIReturn => parameter.type === 'Hash160';
+export const isAddressABIReturn = (parameter: ABIReturn): parameter is AddressABIReturn => parameter.type === 'Address';
 export const isHash256ABIReturn = (parameter: ABIReturn): parameter is Hash256ABIReturn => parameter.type === 'Hash256';
-export const isByteArrayABIReturn = (parameter: ABIReturn): parameter is ByteArrayABIReturn =>
-  parameter.type === 'ByteArray';
+export const isBufferABIReturn = (parameter: ABIReturn): parameter is BufferABIReturn => parameter.type === 'Buffer';
 export const isPublicKeyABIReturn = (parameter: ABIReturn): parameter is PublicKeyABIReturn =>
   parameter.type === 'PublicKey';
 export const isStringABIReturn = (parameter: ABIReturn): parameter is StringABIReturn => parameter.type === 'String';
-export const isInteropInterfaceABIReturn = (parameter: ABIReturn): parameter is InteropInterfaceABIReturn =>
-  parameter.type === 'InteropInterface';
 export const isVoidABIReturn = (parameter: ABIReturn): parameter is VoidABIReturn => parameter.type === 'Void';
 
 // ABI Parameters
@@ -182,16 +178,14 @@ export const isBooleanABIParameter = (parameter: ABIParameter): parameter is Boo
   parameter.type === 'Boolean';
 export const isIntegerABIParameter = (parameter: ABIParameter): parameter is IntegerABIParameter =>
   parameter.type === 'Integer';
-export const isHash160ABIParameter = (parameter: ABIParameter): parameter is Hash160ABIParameter =>
-  parameter.type === 'Hash160';
+export const isAddressABIParameter = (parameter: ABIParameter): parameter is AddressABIParameter =>
+  parameter.type === 'Address';
 export const isHash256ABIParameter = (parameter: ABIParameter): parameter is Hash256ABIParameter =>
   parameter.type === 'Hash256';
-export const isByteArrayABIParameter = (parameter: ABIParameter): parameter is ByteArrayABIParameter =>
-  parameter.type === 'ByteArray';
+export const isBufferABIParameter = (parameter: ABIParameter): parameter is BufferABIParameter =>
+  parameter.type === 'Buffer';
 export const isPublicKeyABIParameter = (parameter: ABIParameter): parameter is PublicKeyABIParameter =>
   parameter.type === 'PublicKey';
 export const isStringABIParameter = (parameter: ABIParameter): parameter is StringABIParameter =>
   parameter.type === 'String';
-export const isInteropInterfaceABIParameter = (parameter: ABIParameter): parameter is InteropInterfaceABIParameter =>
-  parameter.type === 'InteropInterface';
 export const isVoidABIParameter = (parameter: ABIParameter): parameter is VoidABIParameter => parameter.type === 'Void';

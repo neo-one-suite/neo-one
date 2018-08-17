@@ -2,7 +2,7 @@ import { helpers } from '../../../__data__';
 
 describe('YieldExpressionCompiler', () => {
   test('yield', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       function* foo() {
         yield 'foo';

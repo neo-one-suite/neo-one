@@ -2,7 +2,7 @@ import { helpers } from '../../../__data__';
 
 describe('DebuggerStatementCompiler', () => {
   test('simple', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       let result = 0;
 

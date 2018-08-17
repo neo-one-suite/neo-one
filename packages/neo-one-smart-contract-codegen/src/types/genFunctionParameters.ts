@@ -8,16 +8,16 @@ interface ParamAcc {
 }
 
 export const genFunctionParameters = (abi: ABIFunction): string =>
-  abi.parameters === undefined
-    ? ''
-    : _.reverse(
-        _.reverse([...abi.parameters]).reduce<ParamAcc>(
-          (acc, param) => ({
-            hasRequired: acc.hasRequired || !param.optional,
-            acc: acc.acc.concat(
-              `${param.name}${!acc.hasRequired && param.optional ? '?' : ''}: ${toTypeScriptType(param, false)}`,
-            ),
-          }),
-          { hasRequired: false, acc: [] },
-        ).acc,
-      ).join(', ');
+  _.reverse(
+    _.reverse([...(abi.parameters === undefined ? [] : abi.parameters)]).reduce<ParamAcc>(
+      (acc, param) => ({
+        hasRequired: acc.hasRequired || !param.optional,
+        acc: acc.acc.concat(
+          `${param.name}${!acc.hasRequired && param.optional ? '?' : ''}: ${toTypeScriptType(param, false)}`,
+        ),
+      }),
+      { hasRequired: false, acc: [] },
+    ).acc,
+  )
+    .concat(abi.constant ? [] : ['options?: InvokeTransactionOptions'])
+    .join(', ');

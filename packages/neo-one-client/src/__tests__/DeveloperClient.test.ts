@@ -1,8 +1,9 @@
+// tslint:disable no-object-mutation
 import { DeveloperClient } from '../DeveloperClient';
 import { NEOONEProvider } from '../provider';
 
 describe('DeveloperClient', () => {
-  const networkName = 'net';
+  const networkName = 'main';
   const neoOneProvider = new NEOONEProvider([
     {
       network: networkName,
@@ -13,7 +14,6 @@ describe('DeveloperClient', () => {
   const developerClient = new DeveloperClient(provider);
 
   test('runConsensusNow', async () => {
-    // tslint:disable-next-line no-object-mutation
     provider.runConsensusNow = jest.fn();
     await developerClient.runConsensusNow();
 
@@ -23,7 +23,6 @@ describe('DeveloperClient', () => {
 
   test('updateSettings', async () => {
     const options = { secondsPerBlock: 10 };
-    // tslint:disable-next-line no-object-mutation
     provider.updateSettings = jest.fn();
     await developerClient.updateSettings(options);
 
@@ -33,7 +32,6 @@ describe('DeveloperClient', () => {
 
   test('fastForwardOffset', async () => {
     const offset = 10;
-    // tslint:disable-next-line no-object-mutation
     provider.fastForwardOffset = jest.fn();
     await developerClient.fastForwardOffset(offset);
 
@@ -43,11 +41,18 @@ describe('DeveloperClient', () => {
 
   test('fastForwardOffset', async () => {
     const time = 10;
-    // tslint:disable-next-line no-object-mutation
     provider.fastForwardToTime = jest.fn();
     await developerClient.fastForwardToTime(time);
 
     expect(provider.fastForwardOffset).toHaveBeenCalledWith(time);
     expect(provider.fastForwardOffset).toHaveBeenCalledTimes(1);
+  });
+
+  test('reset', async () => {
+    provider.reset = jest.fn();
+    await developerClient.reset();
+
+    expect(provider.reset).toHaveBeenCalledWith();
+    expect(provider.reset).toHaveBeenCalledTimes(1);
   });
 });

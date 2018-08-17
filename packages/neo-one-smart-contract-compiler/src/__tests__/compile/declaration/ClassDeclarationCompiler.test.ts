@@ -447,7 +447,7 @@ describe('ClassDeclarationCompiler', () => {
   });
 
   test('decorators', async () => {
-    await helpers.compileString(
+    helpers.compileString(
       `
       function verify(target: any, propertyKey: string, descriptor: PropertyDescriptor): void {
         throw new Error('This should be transpiled.');

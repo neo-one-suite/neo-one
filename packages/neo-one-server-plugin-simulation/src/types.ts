@@ -85,8 +85,6 @@ export interface NetworkOutputConfig {
 export interface WalletOutputConfig {
   readonly address: string;
 
-  readonly scriptHash: string;
-
   readonly publicKey: string;
 
   readonly wif: string;

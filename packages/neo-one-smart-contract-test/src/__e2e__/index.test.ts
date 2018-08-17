@@ -1,9 +1,11 @@
+// tslint:disable-next-line no-implicit-dependencies
 import * as api from '@neo-one/smart-contract-test';
 
 describe('@neo-one/smart-contract-test', () => {
   const EXPECTED = ['setupContractTest'];
 
   test('has expected exports', () => {
+    // tslint:disable-next-line no-array-mutation no-misleading-array-reverse
     expect(Object.keys(api).sort()).toEqual(EXPECTED.sort());
   });
 
