@@ -1,5 +1,5 @@
-import { Network } from '../NetworkResourceType';
 import fetch from 'cross-fetch';
+import { Network } from '../NetworkResourceType';
 
 describe('create network', () => {
   test('create network main', async () => {
