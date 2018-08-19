@@ -3,6 +3,7 @@ import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { Client } from '../Client';
 import { NoContractDeployedError } from '../errors';
+import { events as traceEvents } from '../trace';
 import {
   ABIEvent,
   ABIFunction,
@@ -84,7 +85,7 @@ const convertActions = ({
   readonly actions: ReadonlyArray<RawAction>;
   readonly events: ReadonlyArray<ABIEvent>;
 }): ReadonlyArray<Action> => {
-  const eventsObj = events.reduce<{ [key: string]: ABIEvent }>(
+  const eventsObj = traceEvents.concat(events).reduce<{ [key: string]: ABIEvent }>(
     (acc, event) => ({
       ...acc,
       [event.name]: event,

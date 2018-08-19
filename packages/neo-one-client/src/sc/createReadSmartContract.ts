@@ -5,6 +5,7 @@ import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/filter';
 import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import BigNumber from 'bignumber.js';
 import { ReadClient } from '../ReadClient';
+import { events as traceEvents } from '../trace';
 import {
   ABIEvent,
   ABIFunction,
@@ -83,7 +84,7 @@ export const createReadSmartContract = ({
     abi: { events: abiEvents = [], functions },
     sourceMaps,
   } = definition;
-  const events = abiEvents.reduce<{ [key: string]: ABIEvent }>(
+  const events = traceEvents.concat(abiEvents).reduce<{ [key: string]: ABIEvent }>(
     (acc, event) => ({
       ...acc,
       [event.name]: event,

@@ -1,7 +1,6 @@
 // tslint:disable
 import {
   AddressString,
-  BufferString,
   Event,
   InvokeReceipt,
   InvokeTransactionOptions,
@@ -11,7 +10,7 @@ import {
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
-export type ICOEvent = ICOTransferEvent | ICORefundEvent | ICOTraceEvent | ICOErrorEvent | ICOConsoleLogEvent;
+export type ICOEvent = ICOTransferEvent | ICORefundEvent;
 
 export interface ICOTransferEventParameters {
   readonly from: AddressString | undefined;
@@ -21,20 +20,6 @@ export interface ICOTransferEventParameters {
 export interface ICOTransferEvent extends Event<'transfer', ICOTransferEventParameters> {}
 export interface ICORefundEventParameters {}
 export interface ICORefundEvent extends Event<'refund', ICORefundEventParameters> {}
-export interface ICOTraceEventParameters {
-  readonly line: BigNumber;
-}
-export interface ICOTraceEvent extends Event<'trace', ICOTraceEventParameters> {}
-export interface ICOErrorEventParameters {
-  readonly line: BigNumber;
-  readonly message: string;
-}
-export interface ICOErrorEvent extends Event<'error', ICOErrorEventParameters> {}
-export interface ICOConsoleLogEventParameters {
-  readonly line: BigNumber;
-  readonly args: BufferString;
-}
-export interface ICOConsoleLogEvent extends Event<'console.log', ICOConsoleLogEventParameters> {}
 
 export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
   readonly amountPerNEO: () => Promise<BigNumber>;

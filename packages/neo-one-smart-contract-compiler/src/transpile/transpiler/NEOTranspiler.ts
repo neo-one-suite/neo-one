@@ -168,46 +168,7 @@ export class NEOTranspiler implements Transpiler {
       sourceFiles,
       abi: {
         functions,
-        events: events.concat([
-          {
-            name: 'trace',
-            parameters: [
-              {
-                type: 'Integer',
-                name: 'line',
-                decimals: 0,
-              },
-            ],
-          },
-          {
-            name: 'error',
-            parameters: [
-              {
-                type: 'Integer',
-                name: 'line',
-                decimals: 0,
-              },
-              {
-                type: 'String',
-                name: 'message',
-              },
-            ],
-          },
-          {
-            name: 'console.log',
-            parameters: [
-              {
-                type: 'Integer',
-                name: 'line',
-                decimals: 0,
-              },
-              {
-                type: 'Buffer',
-                name: 'args',
-              },
-            ],
-          },
-        ]),
+        events,
       },
       contract,
     };

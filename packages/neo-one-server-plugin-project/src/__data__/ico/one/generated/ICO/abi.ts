@@ -28,44 +28,6 @@ export const icoABI: ABI = {
       name: 'refund',
       parameters: [],
     },
-    {
-      name: 'trace',
-      parameters: [
-        {
-          decimals: 0,
-          name: 'line',
-          type: 'Integer',
-        },
-      ],
-    },
-    {
-      name: 'error',
-      parameters: [
-        {
-          decimals: 0,
-          name: 'line',
-          type: 'Integer',
-        },
-        {
-          name: 'message',
-          type: 'String',
-        },
-      ],
-    },
-    {
-      name: 'console.log',
-      parameters: [
-        {
-          decimals: 0,
-          name: 'line',
-          type: 'Integer',
-        },
-        {
-          name: 'args',
-          type: 'Buffer',
-        },
-      ],
-    },
   ],
   functions: [
     {

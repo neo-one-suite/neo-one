@@ -1,7 +1,6 @@
 // tslint:disable
 import {
   AddressString,
-  BufferString,
   Event,
   InvokeReceipt,
   InvokeTransactionOptions,
@@ -11,7 +10,7 @@ import {
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
-export type TokenEvent = TokenTransferEvent | TokenTraceEvent | TokenErrorEvent | TokenConsoleLogEvent;
+export type TokenEvent = TokenTransferEvent;
 
 export interface TokenTransferEventParameters {
   readonly from: AddressString | undefined;
@@ -19,20 +18,6 @@ export interface TokenTransferEventParameters {
   readonly amount: BigNumber;
 }
 export interface TokenTransferEvent extends Event<'transfer', TokenTransferEventParameters> {}
-export interface TokenTraceEventParameters {
-  readonly line: BigNumber;
-}
-export interface TokenTraceEvent extends Event<'trace', TokenTraceEventParameters> {}
-export interface TokenErrorEventParameters {
-  readonly line: BigNumber;
-  readonly message: string;
-}
-export interface TokenErrorEvent extends Event<'error', TokenErrorEventParameters> {}
-export interface TokenConsoleLogEventParameters {
-  readonly line: BigNumber;
-  readonly args: BufferString;
-}
-export interface TokenConsoleLogEvent extends Event<'console.log', TokenConsoleLogEventParameters> {}
 
 export interface TokenSmartContract extends SmartContract<TokenReadSmartContract> {
   readonly balanceOf: (address: AddressString) => Promise<BigNumber>;
