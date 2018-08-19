@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/utils",
-  "version": "1.0.0-alpha.58",
+  "version": "1.0.0-alpha.59",
   "description": "NEO•ONE shared utils.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0-alpha.53",
+    "@neo-one/monitor": "^1.0.0-alpha.54",
     "lodash": "^4.17.10",
     "rxjs": "^6.2.2",
     "tslib": "^1.9.3"

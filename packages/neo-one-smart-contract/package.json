@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract",
-  "version": "1.0.0-alpha.22",
+  "version": "1.0.0-alpha.23",
   "description": "NEO•ONE smart contract apis.",
   "main": "./src/index.d.ts",
   "smartContract": true

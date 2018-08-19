@@ -1,14 +1,14 @@
 {
   "name": "@neo-one/server-client",
-  "version": "1.0.0-alpha.67",
+  "version": "1.0.0-alpha.68",
   "description": "NEO•ONE Server client api.",
   "main": "./src/index.ts",
   "dependencies": {
     "@grpc/grpc-js": "^0.2.0",
     "@grpc/proto-loader": "^0.3.0",
-    "@neo-one/server-grpc": "^1.0.0-alpha.24",
-    "@neo-one/server-plugin": "^1.0.0-alpha.66",
-    "@neo-one/utils": "^1.0.0-alpha.58",
+    "@neo-one/server-grpc": "^1.0.0-alpha.25",
+    "@neo-one/server-plugin": "^1.0.0-alpha.67",
+    "@neo-one/utils": "^1.0.0-alpha.59",
     "env-paths": "^1.0.0",
     "execa": "^0.10.0",
     "fs-extra": "^7.0.0",

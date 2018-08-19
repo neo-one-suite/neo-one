@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/node-storage-levelup",
-  "version": "1.0.0-alpha.72",
+  "version": "1.0.0-alpha.73",
   "description": "NEO•ONE levelup node storage.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.69",
-    "@neo-one/node-core": "^1.0.0-alpha.70",
-    "@neo-one/node-storage-common": "^1.0.0-alpha.72",
-    "@neo-one/utils": "^1.0.0-alpha.58",
+    "@neo-one/client-core": "^1.0.0-alpha.70",
+    "@neo-one/node-core": "^1.0.0-alpha.71",
+    "@neo-one/node-storage-common": "^1.0.0-alpha.73",
+    "@neo-one/utils": "^1.0.0-alpha.59",
     "bytewise": "^1.1.0",
     "rxjs": "^6.2.2",
     "tslib": "^1.9.3"
