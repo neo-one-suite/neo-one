@@ -1,2 +1,7 @@
-export * from './common';
+export {
+  LogOptions,
+  ProcessActionsAndMessageOptions,
+  ProcessConsoleLogOptions,
+  disableConsoleLogForTest,
+} from './common';
 export * from './browser';

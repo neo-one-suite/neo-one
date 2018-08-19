@@ -9,3 +9,101 @@ exports[`console.log cannot be referenced 1`] = `
       3 |     
 "
 `;
+
+exports[`console.log should handle logs across contracts 1`] = `
+Array [
+  "calling second contract
+  at console.log('calling second contract') (snippetCode.ts:9:6)",
+  "calling invoke
+  at console.log('calling invoke') (secondContract.ts:15:6)",
+  "calling run
+  at console.log('calling run') (secondContract.ts:9:8)",
+  "calling foo
+  at console.log('calling foo') (firstContract.ts:11:6)",
+  "calling bar
+  at console.log('calling bar') (firstContract.ts:6:8)",
+  "bar
+  at console.log('bar') (firstContract.ts:3:8)",
+  "done calling bar
+  at console.log('done calling bar') (firstContract.ts:8:8)",
+  "done calling foo
+  at console.log('done calling foo') (firstContract.ts:13:6)",
+  "done calling run
+  at console.log('done calling run') (secondContract.ts:12:8)",
+  "done calling invoke
+  at console.log('done calling invoke') (secondContract.ts:17:6)",
+  "done
+  at console.log('done') (snippetCode.ts:11:6)",
+]
+`;
+
+exports[`console.log should handle multiple log 1`] = `
+Array [
+  "calling foo
+  at console.log('calling foo') (snippetCode.ts:11:6)",
+  "calling bar
+  at console.log('calling bar') (snippetCode.ts:6:8)",
+  "bar
+  at console.log('bar') (snippetCode.ts:3:8)",
+  "done calling bar
+  at console.log('done calling bar') (snippetCode.ts:8:8)",
+  "done
+  at console.log('done') (snippetCode.ts:13:6)",
+]
+`;
+
+exports[`console.log should log arrays 1`] = `
+Array [
+  "[[1,2,3],[\\"a\\"],[[\\"Symbol(b)\\"]]]
+  at console.log([[1, 2, 3], ['a'], [[Symbol.for('b')]]]) (snippetCode.ts:2:6)",
+]
+`;
+
+exports[`console.log should log booleans 1`] = `
+Array [
+  "truefalse
+  at console.log(true, false) (snippetCode.ts:2:6)",
+]
+`;
+
+exports[`console.log should log buffers 1`] = `
+Array [
+  "ab
+  at console.log(Buffer.from('ab', 'hex')) (snippetCode.ts:2:6)",
+]
+`;
+
+exports[`console.log should log null 1`] = `
+Array [
+  "null
+  at console.log(null) (snippetCode.ts:2:6)",
+]
+`;
+
+exports[`console.log should log numbers 1`] = `
+Array [
+  "01
+  at console.log(0, 1) (snippetCode.ts:2:6)",
+]
+`;
+
+exports[`console.log should log strings 1`] = `
+Array [
+  "hello world
+  at console.log('hello ', 'world') (snippetCode.ts:2:6)",
+]
+`;
+
+exports[`console.log should log symbols 1`] = `
+Array [
+  "Symbol(a)
+  at console.log(Symbol.for('a')) (snippetCode.ts:2:6)",
+]
+`;
+
+exports[`console.log should log undefined 1`] = `
+Array [
+  "
+  at console.log(undefined) (snippetCode.ts:2:6)",
+]
+`;

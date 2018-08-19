@@ -7,7 +7,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 const getMessages = async (receiptIn: CallReceiptJSON, sourceMaps: SourceMaps): Promise<ReadonlyArray<string>> => {
   const receipt = convertCallReceipt(receiptIn);
 
-  return createConsoleLogMessages(receipt.actions, sourceMaps, { bare: true });
+  return createConsoleLogMessages(receipt.actions, sourceMaps, { onlyFileName: true });
 };
 
 describe('console.log', () => {
@@ -19,7 +19,7 @@ describe('console.log', () => {
     const messages = await getMessages(receipt, sourceMaps);
 
     expect(messages.length).toEqual(1);
-    expect(messages[0]).toEqual('hello world');
+    expect(messages).toMatchSnapshot();
   });
 
   test('should log numbers', async () => {
@@ -29,8 +29,7 @@ describe('console.log', () => {
 
     const messages = await getMessages(receipt, sourceMaps);
 
-    expect(messages.length).toEqual(1);
-    expect(messages[0]).toEqual('01');
+    expect(messages).toMatchSnapshot();
   });
 
   test('should log booleans', async () => {
@@ -40,8 +39,7 @@ describe('console.log', () => {
 
     const messages = await getMessages(receipt, sourceMaps);
 
-    expect(messages.length).toEqual(1);
-    expect(messages[0]).toEqual('truefalse');
+    expect(messages).toMatchSnapshot();
   });
 
   test('should log symbols', async () => {
@@ -51,8 +49,7 @@ describe('console.log', () => {
 
     const messages = await getMessages(receipt, sourceMaps);
 
-    expect(messages.length).toEqual(1);
-    expect(messages[0]).toEqual('Symbol(a)');
+    expect(messages).toMatchSnapshot();
   });
 
   test('should log undefined', async () => {
@@ -62,8 +59,7 @@ describe('console.log', () => {
 
     const messages = await getMessages(receipt, sourceMaps);
 
-    expect(messages.length).toEqual(1);
-    expect(messages[0]).toEqual('');
+    expect(messages).toMatchSnapshot();
   });
 
   test('should log null', async () => {
@@ -73,8 +69,7 @@ describe('console.log', () => {
 
     const messages = await getMessages(receipt, sourceMaps);
 
-    expect(messages.length).toEqual(1);
-    expect(messages[0]).toEqual('null');
+    expect(messages).toMatchSnapshot();
   });
 
   test('should log arrays', async () => {
@@ -84,8 +79,98 @@ describe('console.log', () => {
 
     const messages = await getMessages(receipt, sourceMaps);
 
-    expect(messages.length).toEqual(1);
-    expect(messages[0]).toEqual('[[1,2,3],["a"],[["Symbol(b)"]]]');
+    expect(messages).toMatchSnapshot();
+  });
+
+  test('should log buffers', async () => {
+    const { receipt, sourceMaps } = await helpers.executeString(`
+      console.log(Buffer.from('ab', 'hex'));
+    `);
+
+    const messages = await getMessages(receipt, sourceMaps);
+
+    expect(messages).toMatchSnapshot();
+  });
+
+  test('should handle multiple log', async () => {
+    const { receipt, sourceMaps } = await helpers.executeString(`
+      const bar = () => {
+        console.log('bar');
+      }
+      const foo = () => {
+        console.log('calling bar');
+        bar();
+        console.log('done calling bar');
+      };
+
+      console.log('calling foo');
+      foo();
+      console.log('done');
+    `);
+
+    const messages = await getMessages(receipt, sourceMaps);
+
+    expect(messages).toMatchSnapshot();
+  });
+
+  test('should handle logs across contracts', async () => {
+    const node = await helpers.startNode();
+    const firstContract = await node.addContract(
+      `
+      const bar = () => {
+        console.log('bar');
+      }
+      const foo = () => {
+        console.log('calling bar');
+        bar();
+        console.log('done calling bar');
+      };
+
+      console.log('calling foo');
+      foo();
+      console.log('done calling foo');
+    `,
+      { fileName: 'firstContract.ts' },
+    );
+
+    const secondContract = await node.addContract(
+      `
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        readonly run: () => void;
+      }
+
+      const invoke = () => {
+        console.log('calling run');
+        const contract = SmartContract.for<Contract>(Address.from('${firstContract.address}'));
+        contract.run();
+        console.log('done calling run');
+      };
+
+      console.log('calling invoke');
+      invoke();
+      console.log('done calling invoke');
+    `,
+      { fileName: 'secondContract.ts' },
+    );
+
+    const { receipt, sourceMaps } = await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        readonly run: () => void;
+      }
+
+      const contract = SmartContract.for<Contract>(Address.from('${secondContract.address}'));
+      console.log('calling second contract');
+      contract.run();
+      console.log('done');
+    `);
+
+    const messages = await createConsoleLogMessages(receipt.actions, sourceMaps, { onlyFileName: true });
+
+    expect(messages).toMatchSnapshot();
   });
 
   test('cannot be referenced', async () => {

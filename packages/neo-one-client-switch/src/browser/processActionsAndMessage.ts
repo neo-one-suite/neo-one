@@ -1,10 +1,12 @@
-import { RawAction } from '@neo-one/client-core';
-import { SourceMaps } from '../common';
+import { processActionsAndMessage as processActionsAndMessageBase, ProcessActionsAndMessageOptions } from '../common';
+import { initializeSourceMap } from './initializeSourceMap';
 
-export const processActionsAndMessage = async ({
-  message,
-}: {
-  readonly actions: ReadonlyArray<RawAction>;
-  readonly message: string;
-  readonly sourceMaps?: SourceMaps;
-}): Promise<string> => message;
+export const processActionsAndMessage = async (options: ProcessActionsAndMessageOptions): Promise<string> => {
+  if (process.env.NODE_ENV === 'PRODUCTION') {
+    return options.message;
+  }
+
+  initializeSourceMap();
+
+  return processActionsAndMessageBase(options);
+};

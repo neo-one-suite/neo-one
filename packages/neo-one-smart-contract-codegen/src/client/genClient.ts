@@ -15,7 +15,7 @@ export const genClient = ({
   `
 import { Client, LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider, NEOONEProvider, UserAccountProvider } from '@neo-one/client';
 
-type DefaultUserAccountProviders = {
+export type DefaultUserAccountProviders = {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>,
 }
 const getDefaultUserAccountProviders = (provider: NEOONEProvider): DefaultUserAccountProviders => ({

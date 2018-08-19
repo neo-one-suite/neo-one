@@ -8,7 +8,7 @@ import {
   UserAccountProvider,
 } from '@neo-one/client';
 
-type DefaultUserAccountProviders = {
+export type DefaultUserAccountProviders = {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;
 };
 const getDefaultUserAccountProviders = (provider: NEOONEProvider): DefaultUserAccountProviders => ({
@@ -27,7 +27,7 @@ export const createClient = <
 >(
   getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders as any,
 ): Client<TUserAccountProviders> => {
-  const provider = new NEOONEProvider([{ network: 'local', rpcURL: 'http://localhost:48297/rpc' }]);
+  const provider = new NEOONEProvider([{ network: 'local', rpcURL: 'http://localhost:40008/rpc' }]);
   const userAccountProviders = getUserAccountProviders(provider);
 
   const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);

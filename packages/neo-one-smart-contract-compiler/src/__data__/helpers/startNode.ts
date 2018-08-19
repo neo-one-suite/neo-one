@@ -36,14 +36,22 @@ export interface Result {
   readonly masterPrivateKey: string;
 }
 
+interface AddContractOptions {
+  readonly fileName?: string;
+}
+
 export interface TestNode {
-  readonly addContract: (script: string) => Promise<Contract>;
+  readonly addContract: (script: string, options?: AddContractOptions) => Promise<Contract>;
   readonly addContractFromSnippet: (snippetPath: string, linked?: LinkedContracts) => Promise<Contract>;
   // tslint:disable-next-line no-any
   readonly executeString: (
     script: string,
     options?: InvokeTransactionOptions,
-  ) => Promise<{ readonly receipt: RawInvokeReceipt; readonly transaction: InvocationTransaction }>;
+  ) => Promise<{
+    readonly receipt: RawInvokeReceipt;
+    readonly transaction: InvocationTransaction;
+    readonly sourceMaps: SourceMaps;
+  }>;
   readonly compileScript: (script: string) => CompileResult;
   readonly masterWallet: LocalWallet;
   readonly client: Client;
@@ -68,8 +76,8 @@ export interface InvokeValidateResultOptions {
   readonly developerClient: DeveloperClient;
 }
 
-const getCompiledScript = (script: string): CompileResult => {
-  const { context, sourceFile } = createContextForSnippet(script, { withTestHarness: true });
+const getCompiledScript = (script: string, fileName?: string): CompileResult => {
+  const { context, sourceFile } = createContextForSnippet(script, { fileName, withTestHarness: true });
 
   return compile({ context, sourceFile });
 };
@@ -109,13 +117,13 @@ const publish = async (
 };
 
 export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<TestNode> => {
-  const { client, masterWallet, provider, networkName, userAccountProviders } = await setupTestNode();
+  const { client, masterWallet, provider, networkName, userAccountProviders } = await setupTestNode(false);
   const developerClient = new DeveloperClient(provider.read(networkName));
   const mutableSourceMaps: Modifiable<SourceMaps> = {};
 
   return {
-    async addContract(script): Promise<Contract> {
-      const { code, context, sourceMap } = getCompiledScript(script);
+    async addContract(script, options = {}): Promise<Contract> {
+      const { code, context, sourceMap } = getCompiledScript(script, options.fileName);
 
       const [result, resolvedSourceMap] = await Promise.all([
         publish(client, developerClient, context, code, outerOptions.ignoreWarnings),
@@ -147,10 +155,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
 
       return result;
     },
-    async executeString(
-      script,
-      options = {},
-    ): Promise<{ readonly receipt: RawInvokeReceipt; readonly transaction: InvocationTransaction }> {
+    async executeString(script, options = {}) {
       const { code, sourceMap, context } = getCompiledScript(script);
 
       throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
@@ -168,7 +173,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       ]);
       await checkRawResult(invokeReceipt, mutableSourceMaps);
 
-      return { receipt: invokeReceipt, transaction: result.transaction };
+      return { receipt: invokeReceipt, transaction: result.transaction, sourceMaps: mutableSourceMaps };
     },
     compileScript: getCompiledScript,
     client,

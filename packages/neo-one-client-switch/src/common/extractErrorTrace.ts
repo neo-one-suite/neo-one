@@ -1,6 +1,6 @@
 import { converters, RawAction } from '@neo-one/client-core';
 import _ from 'lodash';
-import { ProcessErrorError, ProcessErrorTrace } from '../common';
+import { ProcessErrorError, ProcessErrorTrace } from './processError';
 
 const extractError = (action: RawAction): ProcessErrorError | undefined => {
   if (action.type === 'Log') {

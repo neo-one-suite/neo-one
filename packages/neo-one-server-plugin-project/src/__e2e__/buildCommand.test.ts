@@ -69,15 +69,18 @@ const getClients = async (
 
 const getContracts = async (client: Client, networkName: string): Promise<ReadonlyArray<Contract>> => {
   const readClient = client.read(networkName);
-  const blockHeight = await readClient.getBlockCount();
 
   const mutableContracts: Contract[] = [];
   // tslint:disable-next-line no-loop-statement
-  for await (const block of readClient.iterBlocks({ indexStop: blockHeight })) {
+  for await (const block of readClient.iterBlocks({ indexStart: 0 })) {
     // tslint:disable-next-line no-loop-statement
     for (const transaction of block.transactions) {
       if (transaction.type === 'InvocationTransaction' && transaction.invocationData.contracts.length > 0) {
         mutableContracts.push(transaction.invocationData.contracts[0]);
+
+        if (mutableContracts.length === 2) {
+          return mutableContracts;
+        }
       }
     }
   }

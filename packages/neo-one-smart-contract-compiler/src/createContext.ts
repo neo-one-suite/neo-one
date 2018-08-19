@@ -47,6 +47,10 @@ export interface CreateContextOptions {
   readonly withTestHarness?: boolean;
 }
 
+export interface CreateContextSnippetOptions extends CreateContextOptions {
+  readonly fileName?: string;
+}
+
 const CREATE_CONTEXT_OPTIONS_DEFAULT = {
   withTestHarness: false,
 };
@@ -223,13 +227,13 @@ export interface SnippetResult {
 
 export const createContextForSnippet = (
   code: string,
-  options: CreateContextOptions = CREATE_CONTEXT_OPTIONS_DEFAULT,
+  { fileName: fileNameIn, ...rest }: CreateContextSnippetOptions = CREATE_CONTEXT_OPTIONS_DEFAULT,
 ): SnippetResult => {
   const dir = appRootDir.get();
-  const fileName = pathResolve(dir, 'snippetCode.ts');
+  const fileName = pathResolve(dir, fileNameIn === undefined ? 'snippetCode.ts' : fileNameIn);
 
   const context = makeContext([fileName], {
-    ...options,
+    ...rest,
     modifyHost: createModifyHostFiles({ [fileName]: code }),
   });
   const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, fileName);

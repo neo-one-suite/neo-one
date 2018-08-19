@@ -1,5 +1,5 @@
 import { contractParameters, converters, ScriptBuilderParam } from '@neo-one/client-core';
-import { processActionsAndMessage } from '@neo-one/client-switch';
+import { processActionsAndMessage, processConsoleLogMessages } from '@neo-one/client-switch';
 import _ from 'lodash';
 import { InvalidContractArgumentCountError, InvalidEventError, InvocationCallError } from '../errors';
 import {
@@ -117,6 +117,8 @@ export const convertInvocationResult = async ({
       message,
     };
   }
+
+  await processConsoleLogMessages({ actions, sourceMaps });
 
   const contractParameter = result.stack[0];
   const value = convertParameter({

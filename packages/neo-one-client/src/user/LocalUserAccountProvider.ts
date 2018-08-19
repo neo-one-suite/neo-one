@@ -22,7 +22,7 @@ import {
   utils,
   Witness as WitnessModel,
 } from '@neo-one/client-core';
-import { processActionsAndMessage, processError } from '@neo-one/client-switch';
+import { processActionsAndMessage, processConsoleLogMessages } from '@neo-one/client-switch';
 import { Counter, Histogram, Labels, metrics, Monitor } from '@neo-one/monitor';
 import { labels as labelNames, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -440,7 +440,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             );
           }
 
-          result = this.getInvocationResultSuccess(data.result, createdAsset);
+          result = await this.getInvocationResultSuccess(data, data.result, createdAsset);
         }
 
         return {
@@ -687,7 +687,17 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     };
   }
 
-  private getInvocationResultSuccess<T>(result: RawInvocationResultSuccess, value: T): InvocationResultSuccess<T> {
+  private async getInvocationResultSuccess<T>(
+    data: RawInvocationData,
+    result: RawInvocationResultSuccess,
+    value: T,
+    sourceMaps: SourceMaps = {},
+  ): Promise<InvocationResultSuccess<T>> {
+    await processConsoleLogMessages({
+      actions: data.actions,
+      sourceMaps,
+    });
+
     return {
       state: result.state,
       gasConsumed: result.gasConsumed,
@@ -750,7 +760,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             );
           }
 
-          result = this.getInvocationResultSuccess(data.result, createdContract);
+          result = await this.getInvocationResultSuccess(data, data.result, createdContract, sourceMaps);
         }
 
         return {
@@ -830,6 +840,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           throw new InvokeError(message);
         }
 
+        await processConsoleLogMessages({ actions: callReceipt.actions, sourceMaps });
+
         const gas = callReceipt.result.gasConsumed.integerValue(BigNumber.ROUND_UP);
         const { inputs, outputs } = await this.getTransfersInputOutputs({
           transfers,
@@ -865,7 +877,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           // tslint:disable-next-line:no-var-before-return
           return result;
         } catch (error) {
-          const message = await processError({
+          const message = await processActionsAndMessage({
+            actions: [],
             message: error.message,
             sourceMaps,
           });

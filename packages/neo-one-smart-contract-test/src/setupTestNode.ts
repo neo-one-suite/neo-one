@@ -1,8 +1,8 @@
 import { Client, LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider, NEOONEProvider } from '@neo-one/client';
 import { createNode } from './createNode';
 
-export const setupTestNode = async () => {
-  const { privateKey, rpcURL, node } = await createNode(true);
+export const setupTestNode = async (omitCleanup = true) => {
+  const { privateKey, rpcURL, node } = await createNode(omitCleanup);
   const networkName = 'priv';
   const masterWalletName = 'master';
 
