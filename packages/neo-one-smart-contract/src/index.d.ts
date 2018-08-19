@@ -42,26 +42,6 @@ export interface AddressConstructor {
    * @returns true if `Address` approved this `Transaction`
    */
   readonly verifySender: (address: Address) => boolean;
-  /**
-   * Returns an object representing a contract at `address` with the given type `T`.
-   *
-   * `T` is checked for validity and `getSmartContract` will report an error during compilation if the interface is invalid.
-   *
-   * @example
-   *
-   * interface TransferContract {
-   *   transfer(from: Address, to: Address, value: Fixed<8>): boolean;
-   * }
-   * const contractAddress = Address.from('​​​​​0xcef0c0fdcfe7838eff6ff104f9cdec2922297537​​​​​');
-   * const contract = Address.getSmartContract<TransferContract>(contractAddress);
-   * const from = Address.from('ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s');
-   * const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
-   * contract.transfer(from, to, 10);
-   *
-   * @param hash `Address` of the smart contract
-   * @returns an object representing the underlying smart contract
-   */
-  readonly getSmartContract: <T>(hash: T extends IsValidSmartContract<T> ? Address : never) => T;
 }
 export const Address: AddressConstructor;
 
@@ -859,7 +839,7 @@ type IsValidSmartContract<T> = {
     ? Parameters<T[K]> extends SmartContractValue[]
       ? ReturnType<T[K]> extends SmartContractValue ? T[K] : never
       : never
-    : never
+    : T[K]
 };
 
 export function createEventNotifier(name: string): () => void;
@@ -939,6 +919,58 @@ export interface SmartContract {
    */
   readonly properties: ContractProperties;
 }
+export interface SmartContractConstructor {
+  /**
+   * Returns an object representing a contract at `address` with the given type `T`.
+   *
+   * `T` is checked for validity and `getSmartContract` will report an error during compilation if the interface is invalid.
+   *
+   * @example
+   *
+   * interface TransferContract {
+   *   transfer(from: Address, to: Address, value: Fixed<8>): boolean;
+   * }
+   * const contractAddress = Address.from('0xcef0c0fdcfe7838eff6ff104f9cdec2922297537');
+   * const contract = SmartContract.for<TransferContract>(contractAddress);
+   * const from = Address.from('ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s');
+   * const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
+   * contract.transfer(from, to, 10);
+   *
+   * @param hash `Address` of the smart contract
+   * @returns an object representing the underlying smart contract
+   */
+  readonly for: <T>(hash: T extends IsValidSmartContract<T> ? Address : never) => T;
+}
+export const SmartContract: SmartContractConstructor;
+
+/**
+ * Additonal properties available for linked smart contracts.
+ */
+export interface LinkedSmartContract {
+  /**
+   * `Address` of the `LinkedSmartContract`.
+   */
+  readonly address: Address;
+}
+export interface LinkedSmartContractConstructor {
+  /**
+   * Returns an object representing a statically linked contract `T`.
+   *
+   * `T` is checked for validity and `getLinkedSmartContract` will report an error during compilation if the interface is invalid.
+   *
+   * @example
+   *
+   * import { Token } from './Token';
+   * const contract = LinkedSmartContract.for<Token>();
+   * const from = Address.from('ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s');
+   * const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
+   * contract.transfer(from, to, 10);
+   *
+   * @returns an object representing the underlying smart contract
+   */
+  readonly for: <T extends SmartContract>() => T extends IsValidSmartContract<T> ? T & LinkedSmartContract : never;
+}
+export const LinkedSmartContract: LinkedSmartContractConstructor;
 
 /**
  * Marks a `SmartContract` method to be verified before execution.

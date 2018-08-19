@@ -1,3 +1,4 @@
+import { UInt160 } from '@neo-one/client-core';
 import ts from 'typescript';
 import { Helper } from '../helper';
 import { DiagnosticScope } from '../scope';
@@ -54,6 +55,10 @@ export class DiagnosticScriptBuilder extends BaseScriptBuilder<DiagnosticScope> 
 
   public emitLine(): void {
     // do nothing
+  }
+
+  public getLinkedScriptHash(): UInt160 | undefined {
+    return undefined;
   }
 
   protected createScope(): DiagnosticScope {

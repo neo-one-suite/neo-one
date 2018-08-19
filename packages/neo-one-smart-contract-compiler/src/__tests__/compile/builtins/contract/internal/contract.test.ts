@@ -50,12 +50,12 @@ describe('Contract functions', () => {
     `);
 
     await node.executeString(`
-      import { Address } from '@neo-one/smart-contract';
+      import { Address, SmartContract } from '@neo-one/smart-contract';
       interface Contract {
         deploy: () => void;
         migrate: () => void;
       }
-      const contract = Address.getSmartContract<Contract>(Address.from('${contract.address}'));
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
       assertEqual(contract.deploy(), undefined);
       contract.migrate();
 
@@ -64,7 +64,7 @@ describe('Contract functions', () => {
         destroy: () => boolean;
       }
 
-      const newContract = Address.getSmartContract<NewContract>(Address.from('${newContractHash}'));
+      const newContract = SmartContract.for<NewContract>(Address.from('${newContractHash}'));
       assertEqual(newContract.test(), 10);
       assertEqual(newContract.destroy(), true);
     `);
@@ -108,18 +108,18 @@ describe('Contract functions', () => {
     `);
 
     await node.executeString(`
-      import { Address } from '@neo-one/smart-contract';
+      import { Address, SmartContract } from '@neo-one/smart-contract';
       interface Contract {
         create: () => void;
       }
-      const contract = Address.getSmartContract<Contract>(Address.from('${contract.address}'));
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
       contract.create();
 
       interface NewContract {
         test: () => number;
       }
 
-      const newContract = Address.getSmartContract<NewContract>(Address.from('${newContractHash}'));
+      const newContract = SmartContract.for<NewContract>(Address.from('${newContractHash}'));
       assertEqual(newContract.test(), 10);
     `);
 

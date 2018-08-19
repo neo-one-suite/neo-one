@@ -126,7 +126,7 @@ const createCall = ({
     returnType,
     result: receipt.result,
     actions: receipt.actions,
-    sourceMap: definition.sourceMap,
+    sourceMaps: definition.sourceMaps,
   });
 };
 
@@ -152,7 +152,7 @@ const createInvoke = ({
     client,
   });
 
-  const result = await client.__invoke(address, name, params, paramsZipped, verify, options, definition.sourceMap);
+  const result = await client.__invoke(address, name, params, paramsZipped, verify, options, definition.sourceMaps);
 
   return {
     transaction: result.transaction,
@@ -168,7 +168,7 @@ const createInvoke = ({
         returnType,
         result: receipt.result,
         actions: receipt.actions,
-        sourceMap: definition.sourceMap,
+        sourceMaps: definition.sourceMaps,
       });
 
       return {
@@ -211,7 +211,7 @@ export const createSmartContract = ({
         client.read(network).smartContract({
           address: definition.networks[network].address,
           abi: definition.abi,
-          sourceMap: definition.sourceMap,
+          sourceMaps: definition.sourceMaps,
         }),
       definition,
     },

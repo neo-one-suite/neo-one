@@ -49,9 +49,9 @@ export function getNameOrThrow(
   return utils.throwIfNullOrUndefined(getName(node as any), 'name');
 }
 
-type PropertyNameNameableNode = ts.Node & { readonly propertyName?: ts.PropertyName };
+type PropertyNameNameableNode<T extends ts.PropertyName> = ts.Node & { readonly propertyName?: T };
 
-export function getPropertyNameNode(node: PropertyNameNameableNode): ts.PropertyName | undefined {
+export function getPropertyNameNode<T extends ts.PropertyName>(node: PropertyNameNameableNode<T>): T | undefined {
   return utils.getValueOrUndefined(node.propertyName);
 }
 
@@ -278,4 +278,9 @@ export function getDescendantAtPos(nodeIn: ts.Node, pos: number): ts.Node | unde
 
     node = nextNode;
   }
+}
+
+export function isPartOfTypeNode(node: ts.Node): boolean {
+  // tslint:disable-next-line no-any
+  return (ts as any).isPartOfTypeNode(node);
 }

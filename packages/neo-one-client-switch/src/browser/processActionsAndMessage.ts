@@ -1,10 +1,10 @@
 import { RawAction } from '@neo-one/client-core';
-import { RawSourceMap } from 'source-map';
+import { SourceMaps } from '../common';
 
 export const processActionsAndMessage = async ({
   message,
 }: {
   readonly actions: ReadonlyArray<RawAction>;
   readonly message: string;
-  readonly sourceMap?: RawSourceMap;
+  readonly sourceMaps?: SourceMaps;
 }): Promise<string> => message;

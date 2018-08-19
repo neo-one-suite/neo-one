@@ -1,5 +1,5 @@
 // tslint:disable ban-types
-import { OpCode, SysCallName } from '@neo-one/client-core';
+import { OpCode, SysCallName, UInt160 } from '@neo-one/client-core';
 import { BN } from 'bn.js';
 import ts from 'typescript';
 import { Context } from '../../Context';
@@ -40,6 +40,7 @@ export interface ScriptBuilder {
   readonly emitCall: (node: ts.Node) => void;
   readonly emitSysCall: (node: ts.Node, name: SysCallName) => void;
   readonly emitLine: (node: ts.Node) => void;
+  readonly getLinkedScriptHash: (node: ts.Node, filePath: string, smartContractClass: string) => UInt160 | undefined;
   readonly loadModule: (node: ts.SourceFile) => void;
   readonly capture: (func: () => void) => CaptureResult;
   readonly pushValueOptions: (options: VisitOptions) => VisitOptions;

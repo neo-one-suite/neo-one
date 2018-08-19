@@ -38,8 +38,6 @@ export interface ICOConsoleLogEvent extends Event<'console.log', ICOConsoleLogEv
 
 export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
   readonly amountPerNEO: () => Promise<BigNumber>;
-  readonly balanceOf: (address: AddressString) => Promise<BigNumber>;
-  readonly decimals: () => Promise<BigNumber>;
   readonly deploy: (
     owner?: AddressString,
     startTimeSeconds?: BigNumber,
@@ -50,29 +48,15 @@ export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
   readonly mintTokens: (
     options?: InvokeTransactionOptions,
   ) => Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>>>;
-  readonly name: () => Promise<string>;
   readonly owner: () => Promise<AddressString>;
   readonly remaining: () => Promise<BigNumber>;
   readonly startTimeSeconds: () => Promise<BigNumber>;
-  readonly symbol: () => Promise<string>;
-  readonly totalSupply: () => Promise<BigNumber>;
-  readonly transfer: (
-    from: AddressString,
-    to: AddressString,
-    amount: BigNumber,
-    options?: InvokeTransactionOptions,
-  ) => Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>>>;
 }
 
 export interface ICOReadSmartContract extends ReadSmartContract<ICOEvent> {
   readonly amountPerNEO: () => Promise<BigNumber>;
-  readonly balanceOf: (address: AddressString) => Promise<BigNumber>;
-  readonly decimals: () => Promise<BigNumber>;
   readonly icoDurationSeconds: () => Promise<BigNumber>;
-  readonly name: () => Promise<string>;
   readonly owner: () => Promise<AddressString>;
   readonly remaining: () => Promise<BigNumber>;
   readonly startTimeSeconds: () => Promise<BigNumber>;
-  readonly symbol: () => Promise<string>;
-  readonly totalSupply: () => Promise<BigNumber>;
 }

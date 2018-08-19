@@ -9,9 +9,9 @@ import { getMonitor } from './getMonitor';
 
 const getPort = () => _.random(10000, 50000);
 
-const PRIVATE_KEY = 'a01dd45345a7899b58e0e35f413beec8199b2b743b402a92b696fdecdaf7a214';
-const PUBLIC_KEY = '023a0eca8e082e3315f1aba8da485d5c11389780d833e94fecc1ea84dca202d685';
-const SCRIPT_HASH = '0xd6ed345f7cf3ea8c980132ddacb403ee2ab760ab';
+const PRIVATE_KEY = 'e35fa5d1652c4c65e296c86e63a3da6939bc471b741845be636e2daa320dc770';
+const PUBLIC_KEY = '0248be3c070df745a60f3b8b494efcc6caf90244d803a9a72fe95d9bae2120ec70';
+const SCRIPT_HASH = '0x1d92de69e2b1d980079af8d79fbff5fe69521aab';
 
 export const createNode = async (omitCleanup = false) => {
   const port = getPort();

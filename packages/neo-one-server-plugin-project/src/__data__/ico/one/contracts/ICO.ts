@@ -1,23 +1,16 @@
 import {
   Address,
   Blockchain,
+  constant,
   createEventNotifier,
   Fixed,
   Hash256,
   Integer,
-  MapStorage,
+  LinkedSmartContract,
   SmartContract,
   verify,
-  Contract,
-  constant,
 } from '@neo-one/smart-contract';
-
-const notifyTransfer = createEventNotifier<Address | undefined, Address | undefined, Fixed<8>>(
-  'transfer',
-  'from',
-  'to',
-  'amount',
-);
+import { Token } from './Token';
 
 const notifyRefund = createEventNotifier('refund');
 
@@ -29,13 +22,8 @@ export class ICO implements SmartContract {
     description: 'NEO•ONE ICO',
     payable: true,
   };
-  public readonly name = 'One';
-  public readonly symbol = 'ONE';
-  public readonly decimals = 8;
   public readonly amountPerNEO = 10;
   private mutableRemaining: Fixed<8> = 10_000_000_000_00000000;
-  private mutableSupply: Fixed<8> = 0;
-  private readonly balances = new MapStorage<Address, Fixed<8>>();
 
   public constructor(
     public readonly owner: Address = Address.from('AXNajBTQLxWHwc9sKyXcc4UdbJvp3arYDG'),
@@ -45,45 +33,6 @@ export class ICO implements SmartContract {
     if (!Address.verifySender(owner)) {
       throw new Error('Sender was not the owner.');
     }
-  }
-
-  @constant
-  public get totalSupply(): Fixed<8> {
-    return this.mutableSupply;
-  }
-
-  @constant
-  public balanceOf(address: Address): Fixed<8> {
-    const balance = this.balances.get(address);
-
-    return balance === undefined ? 0 : balance;
-  }
-
-  public transfer(from: Address, to: Address, amount: Fixed<8>): boolean {
-    if (amount < 0) {
-      throw new Error(`Amount must be greater than 0: ${amount}`);
-    }
-
-    if (!Address.verifySender(from)) {
-      return false;
-    }
-
-    const contract = Contract.for(to);
-    if (contract !== undefined && !contract.payable) {
-      return false;
-    }
-
-    const fromBalance = this.balanceOf(from);
-    if (fromBalance < amount) {
-      return false;
-    }
-
-    const toBalance = this.balanceOf(to);
-    this.balances.set(from, fromBalance - amount);
-    this.balances.set(to, toBalance + amount);
-    notifyTransfer(from, to, amount);
-
-    return true;
   }
 
   @constant
@@ -125,12 +74,20 @@ export class ICO implements SmartContract {
       return false;
     }
 
-    this.balances.set(sender, this.balanceOf(sender) + amount);
-    this.mutableRemaining -= amount;
-    this.mutableSupply += amount;
-    notifyTransfer(undefined, sender, amount);
+    if (amount === 0) {
+      return false;
+    }
 
-    return true;
+    const token = LinkedSmartContract.for<Token>();
+    if (token.issue(sender, amount)) {
+      this.mutableRemaining -= amount;
+
+      return true;
+    }
+
+    notifyRefund();
+
+    return false;
   }
 
   private hasStarted(): boolean {

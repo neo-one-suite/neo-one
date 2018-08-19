@@ -265,7 +265,7 @@ Object {
       ],
     },
     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-    "sourceMap": undefined,
+    "sourceMaps": undefined,
   },
   "iterActions": [Function],
   "iterEvents": [Function],

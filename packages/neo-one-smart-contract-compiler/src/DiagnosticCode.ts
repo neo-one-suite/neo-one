@@ -19,4 +19,5 @@ export enum DiagnosticCode {
   MultipleSignatures,
   UnknownModule,
   ReferenceError,
+  InvalidLinkedSmartContract,
 }

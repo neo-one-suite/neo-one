@@ -19,12 +19,12 @@ describe('MapStorage', () => {
     `);
 
     await node.executeString(`
-      import { Address } from '@neo-one/smart-contract';
+      import { Address, SmartContract } from '@neo-one/smart-contract';
 
       interface Contract {
         run(): void;
       }
-      const contract = Address.getSmartContract<Contract>(Address.from('${contract.address}'));
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
       contract.run();
     `);
   });

@@ -8,7 +8,7 @@ import {
   UserAccountID,
 } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
-import { SetupTestResult } from '@neo-one/smart-contract-test';
+import { withContracts } from '@neo-one/smart-contract-test';
 import BigNumber from 'bignumber.js';
 
 export interface DeployOptions {
@@ -18,8 +18,9 @@ export interface DeployOptions {
 }
 
 export interface Options {
-  readonly result: SetupTestResult;
   readonly name: string;
+  readonly smartContractName: string;
+  readonly filePath: string;
   readonly symbol: string;
   readonly decimals: number;
   readonly deploy?: (options: DeployOptions) => Promise<TransactionResult<InvokeReceipt>>;
@@ -40,10 +41,11 @@ const ZERO = {
 };
 
 export const testToken = async ({
-  result,
   name,
+  filePath,
   symbol,
   decimals,
+  smartContractName,
   deploy,
   issueValue,
   transferValue,
@@ -53,109 +55,126 @@ export const testToken = async ({
   crypto.addPublicKey(common.stringToPrivateKey(TO.PRIVATE_KEY), common.stringToECPoint(TO.PUBLIC_KEY));
   crypto.addPublicKey(common.stringToPrivateKey(ZERO.PRIVATE_KEY), common.stringToECPoint(ZERO.PUBLIC_KEY));
 
-  const { client, networkName, developerClient, smartContract, masterAccountID, masterPrivateKey } = result;
-
-  const [nameResult, decimalsResult, symbolResult, wallet0, deployResult] = await Promise.all([
-    smartContract.name(),
-    smartContract.decimals(),
-    smartContract.symbol(),
-    client.providers.memory.keystore.addAccount({
-      network: networkName,
-      name: 'wallet0',
-      privateKey: TO.PRIVATE_KEY,
-    }),
-    deploy === undefined
-      ? Promise.resolve(undefined)
-      : deploy({
-          masterPrivateKey,
-          masterAccountID,
-          smartContract,
+  await withContracts(
+    [
+      {
+        name,
+        filePath,
+      },
+    ],
+    async (options) => {
+      const { client, networkName, developerClient, masterAccountID, masterPrivateKey } = options;
+      // tslint:disable-next-line no-any
+      const smartContract: SmartContractAny = (options as any)[smartContractName];
+      const [nameResult, decimalsResult, symbolResult, wallet0, deployResult] = await Promise.all([
+        smartContract.name(),
+        smartContract.decimals(),
+        smartContract.symbol(),
+        client.providers.memory.keystore.addAccount({
+          network: networkName,
+          name: 'wallet0',
+          privateKey: TO.PRIVATE_KEY,
         }),
-  ]);
-  expect(nameResult).toEqual(name);
-  expect(decimalsResult.toString()).toEqual(`${decimals}`);
-  expect(symbolResult).toEqual(symbol);
+        deploy === undefined
+          ? Promise.resolve(undefined)
+          : deploy({
+              masterPrivateKey,
+              masterAccountID,
+              smartContract,
+            }),
+      ]);
+      expect(nameResult).toEqual(name);
+      expect(decimalsResult.toString()).toEqual(`${decimals}`);
+      expect(symbolResult).toEqual(symbol);
 
-  const account0 = wallet0.account.id;
+      const account0 = wallet0.account.id;
 
-  let event: Event;
-  if (deployResult !== undefined) {
-    const [deployReceipt] = await Promise.all([
-      deployResult.confirmed({ timeoutMS: 2500 }),
-      developerClient.runConsensusNow(),
-    ]);
+      let event: Event;
+      if (deployResult !== undefined) {
+        const [deployReceipt] = await Promise.all([
+          deployResult.confirmed({ timeoutMS: 2500 }),
+          developerClient.runConsensusNow(),
+        ]);
 
-    if (deployReceipt.result.state !== 'HALT') {
-      throw new Error(deployReceipt.result.message);
-    }
+        if (deployReceipt.result.state !== 'HALT') {
+          throw new Error(deployReceipt.result.message);
+        }
 
-    expect(deployReceipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
-    expect(deployReceipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
-    expect(deployReceipt.result.value).toBeTruthy();
-    expect(deployReceipt.events).toHaveLength(1);
-    event = deployReceipt.events[0];
-    expect(event.name).toEqual('transfer');
-    expect(event.parameters.from).toEqual(undefined);
-    expect(event.parameters.to).toEqual(privateKeyToAddress(masterPrivateKey));
-    if (event.parameters.amount === undefined) {
-      expect(event.parameters.amount).toBeTruthy();
-      throw new Error('For TS');
-    }
-    expect(event.parameters.amount.toString()).toEqual(issueValue.toString());
-  }
+        expect(deployReceipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
+        expect(deployReceipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
+        expect(deployReceipt.result.value).toBeTruthy();
+        expect(deployReceipt.events).toHaveLength(1);
+        event = deployReceipt.events[0];
+        expect(event.name).toEqual('transfer');
+        expect(event.parameters.from).toEqual(undefined);
+        expect(event.parameters.to).toEqual(privateKeyToAddress(masterPrivateKey));
+        if (event.parameters.amount === undefined) {
+          expect(event.parameters.amount).toBeTruthy();
+          throw new Error('For TS');
+        }
+        expect(event.parameters.amount.toString()).toEqual(issueValue.toString());
+      }
 
-  const [issueBalance, issueTotalSupply, transferResult] = await Promise.all([
-    smartContract.balanceOf(masterAccountID.address),
-    smartContract.totalSupply(),
-    smartContract.transfer(masterAccountID.address, account0.address, transferValue, { from: masterAccountID }),
-  ]);
-  expect(issueBalance.toString()).toEqual(issueValue.toString());
-  expect(issueTotalSupply.toString()).toEqual(issueValue.toString());
+      const [issueBalance, issueTotalSupply, transferResult] = await Promise.all([
+        smartContract.balanceOf(masterAccountID.address),
+        smartContract.totalSupply(),
+        smartContract.transfer(masterAccountID.address, account0.address, transferValue, { from: masterAccountID }),
+      ]);
+      expect(issueBalance.toString()).toEqual(issueValue.toString());
+      expect(issueTotalSupply.toString()).toEqual(issueValue.toString());
 
-  const [transferReceipt] = await Promise.all([
-    transferResult.confirmed({ timeoutMS: 2500 }),
-    developerClient.runConsensusNow(),
-  ]);
+      const [transferReceipt] = await Promise.all([
+        transferResult.confirmed({ timeoutMS: 2500 }),
+        developerClient.runConsensusNow(),
+      ]);
 
-  if (transferReceipt.result.state !== 'HALT') {
-    throw new Error(transferReceipt.result.message);
-  }
+      if (transferReceipt.result.state !== 'HALT') {
+        throw new Error(transferReceipt.result.message);
+      }
 
-  expect(transferReceipt.result.gasConsumed.toString()).toMatchSnapshot('transfer consume');
-  expect(transferReceipt.result.gasCost.toString()).toMatchSnapshot('transfer cost');
-  expect(transferReceipt.events).toHaveLength(1);
-  event = transferReceipt.events[0];
-  expect(event.name).toEqual('transfer');
-  expect(event.parameters.from).toEqual(masterAccountID.address);
-  expect(event.parameters.to).toEqual(account0.address);
-  if (event.parameters.amount === undefined) {
-    expect(event.parameters.amount).toBeTruthy();
-    throw new Error('For TS');
-  }
-  expect(event.parameters.amount.toString()).toEqual(transferValue.toString());
+      expect(transferReceipt.result.gasConsumed.toString()).toMatchSnapshot('transfer consume');
+      expect(transferReceipt.result.gasCost.toString()).toMatchSnapshot('transfer cost');
+      expect(transferReceipt.events).toHaveLength(1);
+      event = transferReceipt.events[0];
+      expect(event.name).toEqual('transfer');
+      expect(event.parameters.from).toEqual(masterAccountID.address);
+      expect(event.parameters.to).toEqual(account0.address);
+      if (event.parameters.amount === undefined) {
+        expect(event.parameters.amount).toBeTruthy();
+        throw new Error('For TS');
+      }
+      expect(event.parameters.amount.toString()).toEqual(transferValue.toString());
 
-  const [transferMasterBalance, transferAccountBalance, transferTotalSupply, transferZeroBalance] = await Promise.all([
-    smartContract.balanceOf(masterAccountID.address),
-    smartContract.balanceOf(account0.address),
-    smartContract.totalSupply(),
-    smartContract.balanceOf(privateKeyToAddress(ZERO.PRIVATE_KEY)),
-  ]);
+      const [
+        transferMasterBalance,
+        transferAccountBalance,
+        transferTotalSupply,
+        transferZeroBalance,
+      ] = await Promise.all([
+        smartContract.balanceOf(masterAccountID.address),
+        smartContract.balanceOf(account0.address),
+        smartContract.totalSupply(),
+        smartContract.balanceOf(privateKeyToAddress(ZERO.PRIVATE_KEY)),
+      ]);
 
-  const remainingValue = issueValue.minus(transferValue);
-  expect(transferMasterBalance.toString()).toEqual(remainingValue.toString());
-  expect(transferAccountBalance.toString()).toEqual(transferValue.toString());
-  expect(transferTotalSupply.toString()).toEqual(issueValue.toString());
-  expect(transferZeroBalance.toString()).toEqual('0');
+      const remainingValue = issueValue.minus(transferValue);
+      expect(transferMasterBalance.toString()).toEqual(remainingValue.toString());
+      expect(transferAccountBalance.toString()).toEqual(transferValue.toString());
+      expect(transferTotalSupply.toString()).toEqual(issueValue.toString());
+      expect(transferZeroBalance.toString()).toEqual('0');
 
-  const readClient = client.read(networkName);
-  const contract = await readClient.getContract(smartContract.definition.networks[networkName].address);
-  expect(contract.codeVersion).toEqual('1.0');
-  expect(contract.author).toEqual('dicarlo2');
-  expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
-  expect(contract.description).toEqual(description);
-  expect(contract.parameters).toEqual(['String', 'Array']);
-  expect(contract.returnType).toEqual('Buffer');
-  expect(contract.storage).toBeTruthy();
-  expect(contract.dynamicInvoke).toBeFalsy();
-  expect(contract.payable).toEqual(payable);
+      const readClient = client.read(networkName);
+      const contract = await readClient.getContract(smartContract.definition.networks[networkName].address);
+      expect(contract.codeVersion).toEqual('1.0');
+      expect(contract.author).toEqual('dicarlo2');
+      expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
+      expect(contract.description).toEqual(description);
+      expect(contract.parameters).toEqual(['String', 'Array']);
+      expect(contract.returnType).toEqual('Buffer');
+      expect(contract.storage).toBeTruthy();
+      expect(contract.dynamicInvoke).toBeFalsy();
+      expect(contract.payable).toEqual(payable);
+    },
+    { deploy: deploy === undefined },
+  );
 };

@@ -3,6 +3,7 @@
 exports[`genContract Token 1`] = `
 "
 import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';
+import { sourceMaps } from '../sourceMaps';
 import { tokenABI } from './abi';
 import { TokenReadSmartContract, TokenSmartContract } from './types';
 
@@ -13,6 +14,7 @@ const definition: SmartContractDefinition = {
   }
 },
   abi: tokenABI,
+  sourceMaps,
 };
 
 export const createTokenSmartContract = (
@@ -24,17 +26,7 @@ export const createTokenReadSmartContract = (
 ): TokenReadSmartContract => client.smartContract<TokenReadSmartContract>({
   address: definition.networks[client.dataProvider.network].address,
   abi: definition.abi,
-  sourceMap: definition.sourceMap,
+  sourceMaps: definition.sourceMaps,
 });
-
-if (process.env.NODE_ENV !== 'production') {
-  (definition as any).sourceMap = {
-  \\"file\\": \\"file\\",
-  \\"mappings\\": \\"sourcemap\\",
-  \\"names\\": [],
-  \\"sources\\": [],
-  \\"version\\": 0
-}
-}
 "
 `;

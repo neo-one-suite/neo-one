@@ -7,4 +7,5 @@ export * from './ArrMapHelper';
 export * from './ArrRangeHelper';
 export * from './ArrReduceFuncHelper';
 export * from './ArrReduceHelper';
+export * from './ArrSomeHelper';
 export * from './ExtendArrHelper';

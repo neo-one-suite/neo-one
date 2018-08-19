@@ -840,7 +840,7 @@ export interface UserAccountProvider {
     abi: ABI,
     params: ReadonlyArray<Param>,
     options?: TransactionOptions,
-    sourceMap?: RawSourceMap,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<PublishReceipt>>;
   readonly registerAsset: (
     asset: AssetRegister,
@@ -854,7 +854,7 @@ export interface UserAccountProvider {
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
     options?: InvokeTransactionOptions,
-    sourceMap?: RawSourceMap,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<RawInvokeReceipt>>;
   readonly call: (
     contract: AddressString,
@@ -880,13 +880,13 @@ export interface SmartContractNetworksDefinition {
 export interface SmartContractDefinition {
   readonly networks: SmartContractNetworksDefinition;
   readonly abi: ABI;
-  readonly sourceMap?: RawSourceMap;
+  readonly sourceMaps?: SourceMaps;
 }
 
 export interface ReadSmartContractDefinition {
   readonly address: AddressString;
   readonly abi: ABI;
-  readonly sourceMap?: RawSourceMap;
+  readonly sourceMaps?: SourceMaps;
 }
 
 // tslint:disable-next-line no-any
@@ -913,4 +913,8 @@ export interface ReadSmartContract<TEvent extends Event<string, any> = Event> {
 export interface ReadSmartContractAny extends ReadSmartContract {
   // tslint:disable-next-line no-any
   readonly [key: string]: any;
+}
+
+export interface SourceMaps {
+  readonly [address: string]: RawSourceMap;
 }

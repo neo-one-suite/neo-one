@@ -1,11 +1,11 @@
 import { converters, RawAction } from '@neo-one/client-core';
 import { deserializeStackItem, StackItem } from '@neo-one/node-vm';
 import { utils } from '@neo-one/utils';
-import { RawSourceMap } from 'source-map';
-import { LogOptions } from '../common';
+import { LogOptions, SourceMaps } from '../common';
 import { processTrace } from './processTrace';
 
 interface ConsoleLog {
+  readonly address: string;
   readonly line: number;
   readonly message: string;
 }
@@ -75,7 +75,7 @@ const extractLog = (action: RawAction): ConsoleLog | undefined => {
     const line = converters.toInteger(args[1], { type: 'Integer', decimals: 0 }).toNumber();
     const message = extractMessage(Buffer.from(converters.toBuffer(args[2]), 'hex'));
 
-    return { line, message };
+    return { address: action.address, line, message };
   } catch {
     return undefined;
   }
@@ -97,14 +97,14 @@ const extractConsoleLogs = (actions: ReadonlyArray<RawAction>): ReadonlyArray<Co
 
 export const createConsoleLogMessages = async (
   actions: ReadonlyArray<RawAction>,
-  sourceMap: RawSourceMap,
+  sourceMaps: SourceMaps = {},
   { bare = false }: LogOptions = { bare: false },
 ): Promise<ReadonlyArray<string>> => {
   const logs = extractConsoleLogs(actions);
   if (bare) {
     return logs.map(({ message }) => message);
   }
-  const traces = await processTrace({ trace: logs, sourceMap });
+  const traces = await processTrace({ trace: logs, sourceMaps });
   const zipped = utils.zip(logs, traces);
 
   return zipped.map(([{ message }, trace]) => {

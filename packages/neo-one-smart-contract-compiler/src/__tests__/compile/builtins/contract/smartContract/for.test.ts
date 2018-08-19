@@ -1,10 +1,10 @@
 import { helpers, keys } from '../../../../../__data__';
 
-describe('Address.getSmartContract', () => {
+describe('SmartContract.for', () => {
   test('reports error on invalid argument values - Object', async () => {
     helpers.compileString(
       `
-        import { Address } from '@neo-one/smart-contract';
+        import { Address, SmartContract } from '@neo-one/smart-contract';
 
         interface Baz {
           readonly x: string;
@@ -14,7 +14,7 @@ describe('Address.getSmartContract', () => {
           bar(value: Baz): number;
         }
 
-        Address.getSmartContract<Foo>(Address.from('${keys[0].address}'));
+        SmartContract.for<Foo>(Address.from('${keys[0].address}'));
       `,
       { type: 'error' },
     );
@@ -23,7 +23,7 @@ describe('Address.getSmartContract', () => {
   test('reports error on invalid argument values - optional Object', async () => {
     helpers.compileString(
       `
-        import { Address } from '@neo-one/smart-contract';
+        import { Address, SmartContract } from '@neo-one/smart-contract';
 
         interface Baz {
           readonly x: string;
@@ -33,7 +33,7 @@ describe('Address.getSmartContract', () => {
           bar(value?: Baz): number;
         }
 
-        Address.getSmartContract<Foo>(Address.from('${keys[0].address}'));
+        SmartContract.for<Foo>(Address.from('${keys[0].address}'));
       `,
       { type: 'error' },
     );
@@ -42,7 +42,7 @@ describe('Address.getSmartContract', () => {
   test('reports error on invalid argument return - Object', async () => {
     helpers.compileString(
       `
-        import { Address } from '@neo-one/smart-contract';
+        import { Address, SmartContract } from '@neo-one/smart-contract';
 
         interface Baz {
           readonly x: string;
@@ -52,7 +52,7 @@ describe('Address.getSmartContract', () => {
           bar(value: number): Baz;
         }
 
-        Address.getSmartContract<Foo>(Address.from('${keys[0].address}'));
+        SmartContract.for<Foo>(Address.from('${keys[0].address}'));
       `,
       { type: 'error' },
     );
@@ -61,13 +61,13 @@ describe('Address.getSmartContract', () => {
   test('reports error on invalid argument return - union string | number', async () => {
     helpers.compileString(
       `
-        import { Address } from '@neo-one/smart-contract';
+        import { Address, SmartContract } from '@neo-one/smart-contract';
 
         interface Foo {
           bar(value: number): number | string;
         }
 
-        const sc = Address.getSmartContract<Foo>(Address.from('${keys[0].address}'));
+        const sc = SmartContract.for<Foo>(Address.from('${keys[0].address}'));
         sc.bar(0);
       `,
       { type: 'error' },
@@ -77,14 +77,14 @@ describe('Address.getSmartContract', () => {
   test('reports error on multiple call signatures', async () => {
     helpers.compileString(
       `
-        import { Address } from '@neo-one/smart-contract';
+        import { Address, SmartContract } from '@neo-one/smart-contract';
 
         interface Foo {
           bar(value: number): number | undefined;
           bar(value: string): string | undefined;
         }
 
-        const sc = Address.getSmartContract<Foo>(Address.from('${keys[0].address}'));
+        const sc = SmartContract.for<Foo>(Address.from('${keys[0].address}'));
         sc.bar(0);
       `,
       { type: 'error' },
@@ -94,13 +94,13 @@ describe('Address.getSmartContract', () => {
   test('reports error on any parameter', async () => {
     helpers.compileString(
       `
-        import { Address } from '@neo-one/smart-contract';
+        import { Address, SmartContract } from '@neo-one/smart-contract';
 
         interface Foo {
           bar(value: any): number | undefined;
         }
 
-        const sc = Address.getSmartContract<Foo>(Address.from('${keys[0].address}'));
+        const sc = SmartContract.for<Foo>(Address.from('${keys[0].address}'));
         sc.bar(0);
       `,
       { type: 'error' },
@@ -110,13 +110,13 @@ describe('Address.getSmartContract', () => {
   test('reports error on any return', async () => {
     helpers.compileString(
       `
-        import { Address } from '@neo-one/smart-contract';
+        import { Address, SmartContract } from '@neo-one/smart-contract';
 
         interface Foo {
           bar(value: number): any;
         }
 
-        const sc = Address.getSmartContract<Foo>(Address.from('${keys[0].address}'));
+        const sc = SmartContract.for<Foo>(Address.from('${keys[0].address}'));
         sc.bar(0);
       `,
       { type: 'error' },
@@ -126,13 +126,13 @@ describe('Address.getSmartContract', () => {
   test('reports error on missing return', async () => {
     helpers.compileString(
       `
-        import { Address } from '@neo-one/smart-contract';
+        import { Address, SmartContract } from '@neo-one/smart-contract';
 
         interface Foo {
           bar(value: number);
         }
 
-        const sc = Address.getSmartContract<Foo>(Address.from('${keys[0].address}'));
+        const sc = SmartContract.for<Foo>(Address.from('${keys[0].address}'));
         sc.bar(0);
       `,
       { type: 'error' },
@@ -142,25 +142,9 @@ describe('Address.getSmartContract', () => {
   test('reports error on any smart contract type', async () => {
     helpers.compileString(
       `
-        import { Address } from '@neo-one/smart-contract';
+        import { Address, SmartContract } from '@neo-one/smart-contract';
 
-        const sc = Address.getSmartContract<any>(Address.from('${keys[0].address}'));
-        sc.bar(0);
-      `,
-      { type: 'error' },
-    );
-  });
-
-  test('reports error on non-method properties', async () => {
-    helpers.compileString(
-      `
-        import { Address } from '@neo-one/smart-contract';
-
-        interface Foo {
-          bar: number;
-        }
-
-        const sc = Address.getSmartContract<Foo>(Address.from('${keys[0].address}'));
+        const sc = SmartContract.for<any>(Address.from('${keys[0].address}'));
         sc.bar(0);
       `,
       { type: 'error' },
@@ -170,13 +154,13 @@ describe('Address.getSmartContract', () => {
   test('reports error on any properties', async () => {
     helpers.compileString(
       `
-        import { Address } from '@neo-one/smart-contract';
+        import { Address, SmartContract } from '@neo-one/smart-contract';
 
         interface Foo {
           bar: any;
         }
 
-        const sc = Address.getSmartContract<Foo>(Address.from('${keys[0].address}'));
+        const sc = SmartContract.for<Foo>(Address.from('${keys[0].address}'));
         sc.bar(0);
       `,
       { type: 'error' },
@@ -193,23 +177,23 @@ describe('Address.getSmartContract', () => {
     `);
 
     const callingContract = await node.addContract(`
-      import { Address } from '@neo-one/smart-contract';
+      import { Address, SmartContract } from '@neo-one/smart-contract';
       import { getArgument } from '@neo-one/smart-contract-internal';
 
       interface Contract {
         run(value: number): boolean;
       }
-      const contract = Address.getSmartContract<Contract>(getArgument<[Address]>(1)[0]);
+      const contract = SmartContract.for<Contract>(getArgument<[Address]>(1)[0]);
       assertEqual(contract.run(10), true);
     `);
 
     await node.executeString(`
-      import { Address } from '@neo-one/smart-contract';
+      import { Address, SmartContract } from '@neo-one/smart-contract';
 
       interface Contract {
         run(value: Address): void;
       }
-      const contract = Address.getSmartContract<Contract>(Address.from('${callingContract.address}'));
+      const contract = SmartContract.for<Contract>(Address.from('${callingContract.address}'));
       contract.run(Address.from('${dynamicContract.address}'));
     `);
   });

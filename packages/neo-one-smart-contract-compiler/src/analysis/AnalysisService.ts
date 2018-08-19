@@ -6,6 +6,7 @@ import ts from 'typescript';
 import { Context, DEFAULT_DIAGNOSTIC_OPTIONS, DiagnosticOptions } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
+import { createMemoized, nodeKey } from '../utils';
 
 export interface SignatureTypes {
   readonly paramDecls: ReadonlyArray<ts.ParameterDeclaration>;
@@ -14,6 +15,7 @@ export interface SignatureTypes {
 }
 
 export class AnalysisService {
+  private readonly memoized = createMemoized();
   public constructor(private readonly context: Context) {}
 
   public getFunctionReturnType(
@@ -65,6 +67,10 @@ export class AnalysisService {
   ): SignatureTypes | undefined {
     const signatures = type === undefined ? undefined : tsUtils.type_.getCallSignatures(type);
     if (signatures === undefined) {
+      return undefined;
+    }
+
+    if (signatures.length === 0) {
       return undefined;
     }
 
@@ -130,17 +136,19 @@ export class AnalysisService {
   }
 
   public extractLiteralAddress(original: ts.Expression): UInt160 | undefined {
-    return this.extractLiteral(
-      original,
-      'AddressConstructor',
-      (value) => {
-        try {
-          return common.stringToUInt160(addressToScriptHash(value));
-        } catch {
-          return common.stringToUInt160(value);
-        }
-      },
-      common.bufferToUInt160,
+    return this.memoized('extract-literal-address', nodeKey(original), () =>
+      this.extractLiteral(
+        original,
+        'AddressConstructor',
+        (value) => {
+          try {
+            return common.stringToUInt160(addressToScriptHash(value));
+          } catch {
+            return common.stringToUInt160(value);
+          }
+        },
+        common.bufferToUInt160,
+      ),
     );
   }
 

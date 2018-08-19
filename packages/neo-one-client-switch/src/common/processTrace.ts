@@ -1,6 +1,7 @@
-import { RawSourceMap } from 'source-map';
+import { SourceMaps } from './processActionsAndMessage';
 
 export interface ProcessTraceTrace {
+  readonly address: string;
   readonly line: number;
 }
 
@@ -13,5 +14,5 @@ export interface ProcessTraceResult {
 
 export interface ProcessTraceOptions {
   readonly trace: ReadonlyArray<ProcessTraceTrace>;
-  readonly sourceMap?: RawSourceMap;
+  readonly sourceMaps?: SourceMaps;
 }

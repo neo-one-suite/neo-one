@@ -1,30 +1,34 @@
-import { SmartContractNetworksDefinition } from '@neo-one/client';
+import { ABI, SmartContractNetworksDefinition } from '@neo-one/client';
 import { genFiles } from '@neo-one/smart-contract-codegen';
 import fs from 'fs-extra';
 import * as path from 'path';
+import { RawSourceMap } from 'source-map';
 import { ProjectConfig } from '../types';
-import { ContractResult } from './compileContract';
 
 export const generateCode = async (
   project: ProjectConfig,
-  contractResult: ContractResult,
+  contractResult: {
+    readonly filePath: string;
+    readonly name: string;
+    readonly abi: ABI;
+    readonly sourceMap: RawSourceMap;
+  },
   networksDefinition: SmartContractNetworksDefinition,
 ) => {
-  const base = path.resolve(project.paths.generated, contractResult.contractName);
+  const base = path.resolve(project.paths.generated, contractResult.name);
+  const sourceMapsPath = path.resolve(project.paths.generated, 'sourceMaps.ts');
   const typesPath = path.resolve(base, 'types.ts');
   const abiPath = path.resolve(base, 'abi.ts');
   const createContractPath = path.resolve(base, 'contract.ts');
-  const testPath = path.resolve(base, 'test.ts');
-  const { abi, contract, types, test } = genFiles({
-    name: contractResult.contractName,
+  const { abi, contract, types } = genFiles({
+    name: contractResult.name,
     networksDefinition,
     contractPath: contractResult.filePath,
     typesPath,
     abiPath,
     createContractPath,
-    testPath,
     abi: contractResult.abi,
-    sourceMap: contractResult.sourceMap,
+    sourceMapsPath,
   });
 
   await fs.ensureDir(base);
@@ -32,6 +36,5 @@ export const generateCode = async (
     fs.writeFile(abiPath, abi),
     fs.writeFile(createContractPath, contract),
     fs.writeFile(typesPath, types),
-    fs.writeFile(testPath, test),
   ]);
 };

@@ -15,6 +15,7 @@ const extractError = (action: RawAction): ProcessErrorError | undefined => {
     }
 
     return {
+      address: action.address,
       line: converters.toInteger(args[2], { type: 'Integer', decimals: 0 }).toNumber(),
       message: converters.toString(args[1]),
     };
@@ -36,6 +37,7 @@ const extractTrace = (action: RawAction): ProcessErrorTrace | undefined => {
     }
 
     return {
+      address: action.address,
       line: converters.toInteger(args[1], { type: 'Integer', decimals: 0 }).toNumber(),
     };
   } catch {

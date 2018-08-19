@@ -1,22 +1,22 @@
+import { SourceMaps } from '@neo-one/client';
 import { CallReceiptJSON, convertCallReceipt, RawCallReceipt } from '@neo-one/client-core';
 import { createConsoleLogMessages, extractErrorTrace, processError } from '@neo-one/client-switch';
-import { RawSourceMap } from 'source-map';
 
-export const checkResult = async (receiptIn: CallReceiptJSON, sourceMap: RawSourceMap) => {
+export const checkResult = async (receiptIn: CallReceiptJSON, sourceMaps: SourceMaps) => {
   const receipt = convertCallReceipt(receiptIn);
 
-  return checkRawResult(receipt, sourceMap);
+  return checkRawResult(receipt, sourceMaps);
 };
 
-export const checkRawResult = async (receipt: RawCallReceipt, sourceMap: RawSourceMap) => {
+export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: SourceMaps) => {
   if (receipt.result.state === 'FAULT') {
     const [message, logs] = await Promise.all([
       processError({
         ...extractErrorTrace(receipt.actions),
         message: receipt.result.message,
-        sourceMap,
+        sourceMaps,
       }),
-      createConsoleLogMessages(receipt.actions, sourceMap),
+      createConsoleLogMessages(receipt.actions, sourceMaps),
     ]);
     const logMessage = logs.length === 0 ? '' : `\n${logs.join('\n\n')}`;
     throw new Error(`${message}${logMessage}\n`);

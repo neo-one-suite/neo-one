@@ -9,16 +9,21 @@ import {
   LocalKeyStore,
   LocalWallet,
   ReadClient,
+  scriptHashToAddress,
   SmartContract,
+  SourceMaps,
   UserAccountID,
 } from '@neo-one/client';
-import { RawInvokeReceipt } from '@neo-one/client-core';
+import { common, crypto, RawInvokeReceipt } from '@neo-one/client-core';
+import { tsUtils } from '@neo-one/ts-utils';
+import * as appRootDir from 'app-root-dir';
 import ts from 'typescript';
-import { testNodeSetup } from '../../../../neo-one-smart-contract-test/src/setupTest';
+import { setupTestNode } from '../../../../neo-one-smart-contract-test/src/setupTestNode';
 import { compile } from '../../compile';
-import { CompileResult } from '../../compile/types';
-import { createContextForSnippet } from '../../createContext';
-import { throwOnDiagnosticErrorOrWarning } from '../../utils';
+import { CompileResult, LinkedContracts } from '../../compile/types';
+import { Context } from '../../Context';
+import { createContextForPath, createContextForSnippet } from '../../createContext';
+import { pathResolve, throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { checkRawResult } from './extractors';
 
 export interface Result {
@@ -33,6 +38,7 @@ export interface Result {
 
 export interface TestNode {
   readonly addContract: (script: string) => Promise<Contract>;
+  readonly addContractFromSnippet: (snippetPath: string, linked?: LinkedContracts) => Promise<Contract>;
   // tslint:disable-next-line no-any
   readonly executeString: (
     script: string,
@@ -68,39 +74,78 @@ const getCompiledScript = (script: string): CompileResult => {
   return compile({ context, sourceFile });
 };
 
+const publish = async (
+  client: Client,
+  developerClient: DeveloperClient,
+  context: Context,
+  code: Buffer,
+  ignoreWarnings?: boolean,
+): Promise<Contract> => {
+  throwOnDiagnosticErrorOrWarning(context.diagnostics, ignoreWarnings);
+
+  const result = await client.publish({
+    script: code.toString('hex'),
+    parameters: ['String', 'Array'],
+    returnType: 'Buffer',
+    name: 'TestContract',
+    codeVersion: '1.0',
+    author: 'test',
+    email: 'test@test.com',
+    description: 'test',
+    storage: true,
+    dynamicInvoke: true,
+    payable: true,
+  });
+
+  const [publishReceipt] = await Promise.all([
+    result.confirmed({ timeoutMS: 2500 }),
+    developerClient.runConsensusNow(),
+  ]);
+  if (publishReceipt.result.state === 'FAULT') {
+    throw new Error(publishReceipt.result.message);
+  }
+
+  return publishReceipt.result.value;
+};
+
 export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<TestNode> => {
-  const { client, masterWallet, provider, networkName, userAccountProviders } = await testNodeSetup();
+  const { client, masterWallet, provider, networkName, userAccountProviders } = await setupTestNode();
   const developerClient = new DeveloperClient(provider.read(networkName));
+  const mutableSourceMaps: Modifiable<SourceMaps> = {};
 
   return {
     async addContract(script): Promise<Contract> {
-      const { code, context } = getCompiledScript(script);
+      const { code, context, sourceMap } = getCompiledScript(script);
 
-      throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
-
-      const result = await client.publish({
-        script: code.toString('hex'),
-        parameters: ['String', 'Array'],
-        returnType: 'Buffer',
-        name: 'TestContract',
-        codeVersion: '1.0',
-        author: 'test',
-        email: 'test@test.com',
-        description: 'test',
-        storage: true,
-        dynamicInvoke: true,
-        payable: true,
-      });
-
-      const [publishReceipt] = await Promise.all([
-        result.confirmed({ timeoutMS: 2500 }),
-        developerClient.runConsensusNow(),
+      const [result, resolvedSourceMap] = await Promise.all([
+        publish(client, developerClient, context, code, outerOptions.ignoreWarnings),
+        sourceMap,
       ]);
-      if (publishReceipt.result.state === 'FAULT') {
-        throw new Error(publishReceipt.result.message);
-      }
+      mutableSourceMaps[result.address] = resolvedSourceMap;
 
-      return publishReceipt.result.value;
+      return result;
+    },
+    async addContractFromSnippet(snippetPath, linked = {}): Promise<Contract> {
+      const filePath = pathResolve(
+        appRootDir.get(),
+        'packages',
+        'neo-one-smart-contract-compiler',
+        'src',
+        '__data__',
+        'snippets',
+        snippetPath,
+      );
+      const context = createContextForPath(filePath, { withTestHarness: true });
+      const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, filePath);
+      const { code, sourceMap } = compile({ context, sourceFile, linked });
+
+      const [result, resolvedSourceMap] = await Promise.all([
+        publish(client, developerClient, context, code, outerOptions.ignoreWarnings),
+        sourceMap,
+      ]);
+      mutableSourceMaps[result.address] = resolvedSourceMap;
+
+      return result;
     },
     async executeString(
       script,
@@ -110,18 +155,18 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
 
       throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
 
-      const resolvedSourceMap = await sourceMap;
+      mutableSourceMaps[scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(code)))] = await sourceMap;
       const result = await userAccountProviders.memory.__execute(
         code.toString('hex'),
         { from: masterWallet.account.id, ...options },
-        resolvedSourceMap,
+        mutableSourceMaps,
       );
 
       const [invokeReceipt] = await Promise.all([
         result.confirmed({ timeoutMS: 5000 }),
         developerClient.runConsensusNow(),
       ]);
-      await checkRawResult(invokeReceipt, resolvedSourceMap);
+      await checkRawResult(invokeReceipt, mutableSourceMaps);
 
       return { receipt: invokeReceipt, transaction: result.transaction };
     },

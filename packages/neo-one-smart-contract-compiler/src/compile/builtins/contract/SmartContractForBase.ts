@@ -1,28 +1,20 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
-import { InternalObjectProperty } from '../../../constants';
-import { ScriptBuilder } from '../../../sb';
-import { VisitOptions } from '../../../types';
-import { BuiltinMemberCall } from '../../BuiltinMemberCall';
-import { MemberLikeExpression } from '../../types';
+import { InternalObjectProperty } from '../../constants';
+import { ScriptBuilder } from '../../sb';
+import { VisitOptions } from '../../types';
+import { BuiltinMemberCall } from '../BuiltinMemberCall';
+import { MemberLikeExpression } from '../types';
 
-// tslint:disable-next-line export-name
-export class AddressGetSmartContract extends BuiltinMemberCall {
+export abstract class SmartContractForBase extends BuiltinMemberCall {
   public emitCall(
     sb: ScriptBuilder,
-    _func: MemberLikeExpression,
+    func: MemberLikeExpression,
     node: ts.CallExpression,
     optionsIn: VisitOptions,
   ): void {
-    if (tsUtils.argumented.getArguments(node).length < 1) {
-      /* istanbul ignore next */
-      return;
-    }
-
     const options = sb.pushValueOptions(optionsIn);
-    const arg = tsUtils.argumented.getArguments(node)[0];
-    const scriptHash = sb.context.analysis.extractLiteralAddress(arg);
     const returnType = sb.context.getType(node, { error: true });
     if (returnType === undefined) {
       return;
@@ -39,7 +31,14 @@ export class AddressGetSmartContract extends BuiltinMemberCall {
       const propNode = tsUtils.symbol.getValueDeclarationOrThrow(prop);
       const result = sb.context.analysis.extractSignatureForType(propNode, propType, { error: true });
       if (result === undefined) {
-        return undefined;
+        // Must be a property, not a method
+        return {
+          paramDecls: [],
+          paramTypes: new Map<ts.ParameterDeclaration, ts.Type | undefined>(),
+          returnType: propType,
+          prop: propNode,
+          propName,
+        };
       }
 
       return { ...result, prop: propNode, propName };
@@ -60,29 +59,6 @@ export class AddressGetSmartContract extends BuiltinMemberCall {
         sb.helpers.createFunctionArray({
           body: (innerOptionsIn) => {
             const innerOptions = sb.pushValueOptions(innerOptionsIn);
-
-            // Save the current state of the stack
-            // [depth, argsarr, ...stack]
-            sb.emitOp(prop, 'DEPTH');
-            // [argsarr, ...stack, argsarr]
-            sb.emitOp(prop, 'XTUCK');
-            // [...stack, argsarr]
-            sb.emitOp(prop, 'DROP');
-            // [depth, ...stack, argsarr]
-            sb.emitOp(prop, 'DEPTH');
-            // [depth - 1, ...stack, argsarr]
-            sb.emitOp(prop, 'DEC');
-            // [stack, argsarr]
-            sb.emitOp(prop, 'PACK');
-            // [scopes, stack, argsarr]
-            sb.emitOp(prop, 'FROMALTSTACK');
-            // [stack, scopes, argsarr]
-            sb.emitOp(prop, 'SWAP');
-            // [scopes, argsarr]
-            sb.emitOp(prop, 'TOALTSTACK');
-            // [argsarr]
-            sb.emitOp(prop, 'TOALTSTACK');
-
             // [...params]
             sb.emitHelper(
               prop,
@@ -101,44 +77,19 @@ export class AddressGetSmartContract extends BuiltinMemberCall {
               }),
             );
             // [length, ...params]
-            sb.emitOp(prop, 'DEPTH');
+            sb.emitPushInt(prop, paramDecls.length);
             // [params]
             sb.emitOp(prop, 'PACK');
             // [string, params]
             sb.emitPushString(prop, propName);
 
-            if (scriptHash === undefined) {
-              // [bufferVal, string, params]
-              sb.visit(arg, innerOptions);
-              // [buffer, string, params]
-              sb.emitHelper(prop, innerOptions, sb.helpers.unwrapBuffer);
-              // [result]
-              sb.emitOp(prop, 'APPCALL', Buffer.alloc(20, 0));
-            } else {
-              // [result]
-              sb.emitOp(prop, 'APPCALL', scriptHash);
-            }
+            const isVoidReturn = propReturnType !== undefined && tsUtils.type_.isVoid(propReturnType);
+            const callBuffer = Buffer.from([isVoidReturn ? 0 : 1, 2]);
+            this.emitInvoke(sb, func, node, prop, callBuffer, innerOptions);
 
-            const restoreStack = () => {
-              // [scopes, retVal]
-              sb.emitOp(prop, 'FROMALTSTACK');
-              // [stack, scopes, retVal]
-              sb.emitOp(prop, 'FROMALTSTACK');
-              // [scopes, stack, retVal]
-              sb.emitOp(prop, 'SWAP');
-              // [stack, retVal]
-              sb.emitOp(prop, 'TOALTSTACK');
-              // [length, ...stack, retVal]
-              sb.emitOp(prop, 'UNPACK');
-              // [retVal, ...stack]
-              sb.emitOp(prop, 'ROLL');
-            };
-
-            if (propReturnType !== undefined && tsUtils.type_.isVoid(propReturnType)) {
+            if (isVoidReturn) {
               sb.emitHelper(prop, innerOptions, sb.helpers.wrapUndefined);
-              restoreStack();
             } else {
-              restoreStack();
               // [val]
               sb.emitHelper(
                 prop,
@@ -166,8 +117,29 @@ export class AddressGetSmartContract extends BuiltinMemberCall {
       sb.emitHelper(prop, options, sb.helpers.setDataPropertyObjectProperty);
     });
 
+    // [objectVal]
+    this.emitAdditionalProperties(sb, func, node, options);
+
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
     }
   }
+
+  protected emitAdditionalProperties(
+    _sb: ScriptBuilder,
+    _func: MemberLikeExpression,
+    _node: ts.CallExpression,
+    _options: VisitOptions,
+  ): void {
+    // do nothing
+  }
+
+  protected abstract emitInvoke(
+    sb: ScriptBuilder,
+    func: MemberLikeExpression,
+    node: ts.CallExpression,
+    prop: ts.Declaration,
+    callBuffer: Buffer,
+    optionsIn: VisitOptions,
+  ): void;
 }

@@ -1,7 +1,6 @@
 import { contractParameters, converters, ScriptBuilderParam } from '@neo-one/client-core';
 import { processActionsAndMessage } from '@neo-one/client-switch';
 import _ from 'lodash';
-import { RawSourceMap } from 'source-map';
 import { InvalidContractArgumentCountError, InvalidEventError, InvocationCallError } from '../errors';
 import {
   ABIEvent,
@@ -14,6 +13,7 @@ import {
   Param,
   RawAction,
   RawInvocationResult,
+  SourceMaps,
 } from '../types';
 import { params as paramCheckers } from './params';
 
@@ -95,19 +95,19 @@ export const convertInvocationResult = async ({
   returnType,
   result,
   actions,
-  sourceMap,
+  sourceMaps,
 }: {
   readonly returnType: ABIReturn;
   readonly result: RawInvocationResult;
   readonly actions: ReadonlyArray<RawAction>;
-  readonly sourceMap?: RawSourceMap;
+  readonly sourceMaps?: SourceMaps;
 }): Promise<InvocationResult<Param | undefined>> => {
   const { gasConsumed, gasCost } = result;
   if (result.state === 'FAULT') {
     const message = await processActionsAndMessage({
       actions,
       message: result.message,
-      sourceMap,
+      sourceMaps,
     });
 
     return {
@@ -131,14 +131,14 @@ export const convertCallResult = async ({
   returnType,
   result: resultIn,
   actions,
-  sourceMap,
+  sourceMaps,
 }: {
   readonly returnType: ABIReturn;
   readonly result: RawInvocationResult;
   readonly actions: ReadonlyArray<RawAction>;
-  readonly sourceMap?: RawSourceMap;
+  readonly sourceMaps?: SourceMaps;
 }): Promise<Param | undefined> => {
-  const result = await convertInvocationResult({ returnType, result: resultIn, actions, sourceMap });
+  const result = await convertInvocationResult({ returnType, result: resultIn, actions, sourceMaps });
   if (result.state === 'FAULT') {
     throw new InvocationCallError(result.message);
   }

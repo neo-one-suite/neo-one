@@ -101,6 +101,7 @@ export const tokenABI: ABI = {
 ",
   "contract": "// tslint:disable
 import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';
+import { sourceMaps } from '../sourceMaps';
 import { tokenABI } from './abi';
 import { TokenReadSmartContract, TokenSmartContract } from './types';
 
@@ -111,6 +112,7 @@ const definition: SmartContractDefinition = {
     },
   },
   abi: tokenABI,
+  sourceMaps,
 };
 
 export const createTokenSmartContract = (client: Client): TokenSmartContract =>
@@ -120,26 +122,8 @@ export const createTokenReadSmartContract = (client: ReadClient): TokenReadSmart
   client.smartContract<TokenReadSmartContract>({
     address: definition.networks[client.dataProvider.network].address,
     abi: definition.abi,
-    sourceMap: definition.sourceMap,
+    sourceMaps: definition.sourceMaps,
   });
-
-if (process.env.NODE_ENV !== 'production') {
-  (definition as any).sourceMap = {
-    file: 'file',
-    mappings: 'sourcemap',
-    names: [],
-    sources: [],
-    version: 0,
-  };
-}
-",
-  "test": "// tslint:disable
-import { setupContractTest, SetupTestResult } from '@neo-one/smart-contract-test';
-import * as path from 'path';
-import { TokenSmartContract } from './types';
-
-export const setupTokenTest = async (): Promise<SetupTestResult<TokenSmartContract>> =>
-  setupContractTest<TokenSmartContract>(path.resolve(__dirname, '../../contracts/Token.ts'), 'Token');
 ",
   "types": "// tslint:disable
 import {

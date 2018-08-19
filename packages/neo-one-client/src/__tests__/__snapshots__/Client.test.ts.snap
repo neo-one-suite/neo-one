@@ -20,7 +20,7 @@ Array [
     Array [],
     true,
     undefined,
-    undefined,
+    Object {},
   ],
 ]
 `;
@@ -155,7 +155,7 @@ Array [
     },
     Array [],
     undefined,
-    undefined,
+    Object {},
   ],
 ]
 `;
@@ -318,7 +318,7 @@ Object {
         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
       },
     },
-    "sourceMap": undefined,
+    "sourceMaps": undefined,
   },
   "name": [Function],
   "read": [Function],

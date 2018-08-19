@@ -55,8 +55,8 @@ describe('NEOTranspiler', () => {
     expect(method.column).toEqual(0);
     expect(applicationSwitch.line).toEqual(3);
     expect(applicationSwitch.column).toEqual(0);
-    expect(verifyWitness.line).toEqual(3);
-    expect(verifyWitness.column).toEqual(0);
+    expect(verifyWitness.line).toEqual(5);
+    expect(verifyWitness.column).toEqual(2);
     expect(getConstructorValueResult.line).toEqual(19);
     expect(getConstructorValueResult.column).toEqual(2);
     expect(getConstructorValue.line).toEqual(19);

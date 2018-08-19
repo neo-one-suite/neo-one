@@ -1,4 +1,4 @@
-import { disassembleByteCode, OpCode } from '@neo-one/client-core';
+import { common, disassembleByteCode, OpCode } from '@neo-one/client-core';
 import { CustomError } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { ExecutionContext } from './constants';
@@ -17,7 +17,9 @@ const getMessage = (context: ExecutionContext, message: string): string => {
   const { pc } = context;
   const stack = context.stack.map((item) => item.toString()).join('\n');
 
-  return `${message}\nPC:${pc}\nStack:\n${stack}\nLine:${getLine(context)}`;
+  return `${message}\nPC:${pc}\nStack:\n${stack}\nLine:${getLine(context)}\nScript Hash:${common.uInt160ToString(
+    context.scriptHash,
+  )}`;
 };
 
 export class VMError extends CustomError {

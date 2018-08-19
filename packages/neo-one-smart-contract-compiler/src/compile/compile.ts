@@ -8,32 +8,37 @@ import {
   HelperCapturingScriptBuilder,
   ScopeCapturingScriptBuilder,
 } from './sb';
-import { CompileResult } from './types';
+import { CompileResult, LinkedContracts } from './types';
 
 export interface BaseCompileOptions {
   readonly sourceFile: ts.SourceFile;
   readonly context: Context;
 }
-export interface CompileOptions extends BaseCompileOptions {
+export interface WithLinked {
+  readonly linked?: LinkedContracts;
+}
+export interface DiagnosticCompileOptions extends BaseCompileOptions {
   readonly sourceMaps?: { readonly [filePath: string]: RawSourceMap };
 }
+export interface CompileOptions extends DiagnosticCompileOptions, WithLinked {}
 
-export const compileForDiagnostics = ({ context, sourceFile }: CompileOptions): void => {
+export const compileForDiagnostics = ({ context, sourceFile }: DiagnosticCompileOptions): void => {
   const helpers = createHelpers();
   const scriptBuilder = new DiagnosticScriptBuilder(context, helpers, sourceFile);
   scriptBuilder.process();
 };
 
-export const compile = ({ context, sourceFile, sourceMaps = {} }: CompileOptions): CompileResult => {
+export const compile = ({ context, sourceFile, linked = {}, sourceMaps = {} }: CompileOptions): CompileResult => {
   const helpers = createHelpers();
 
-  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, sourceFile);
+  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, sourceFile, linked);
   helperScriptBuilder.process();
 
   const scopeScriptBuilder = new ScopeCapturingScriptBuilder(
     context,
     helpers,
     sourceFile,
+    linked,
     helperScriptBuilder.getHelpers(),
   );
   scopeScriptBuilder.process();
@@ -43,6 +48,7 @@ export const compile = ({ context, sourceFile, sourceMaps = {} }: CompileOptions
     scopes: scopeScriptBuilder.getScopes(),
     sourceFile,
     helpers,
+    linked,
     allHelpers: helperScriptBuilder.getHelpers(),
   });
   emittingScriptBuilder.process();

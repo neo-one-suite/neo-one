@@ -858,7 +858,7 @@ const publishTokens = async ({
           [wallet.accountID.network]: { address },
         },
         abi: compileResult.abi,
-        sourceMap: compileResult.sourceMap,
+        sourceMaps: { [address]: compileResult.sourceMap },
       });
 
       return { ...token, smartContract, wallet, hash: address };

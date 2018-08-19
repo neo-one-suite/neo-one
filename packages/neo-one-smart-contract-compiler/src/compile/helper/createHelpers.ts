@@ -13,6 +13,8 @@ import {
   ArrReduceFuncHelper,
   ArrReduceHelper,
   ArrReduceHelperOptions,
+  ArrSomeHelper,
+  ArrSomeHelperOptions,
   ExtendArrHelper,
 } from './arr';
 import { CreateArrayIterableIteratorHelper, GetArrayIterableIteratorClassHelper } from './arrayIterableIterator';
@@ -229,6 +231,7 @@ export interface Helpers {
   readonly arrRange: (options: ArrRangeHelperOptions) => ArrRangeHelper;
   readonly arrReduce: (options: ArrReduceHelperOptions) => ArrReduceHelper;
   readonly arrReduceFunc: ArrReduceFuncHelper;
+  readonly arrSome: (options: ArrSomeHelperOptions) => ArrSomeHelper;
   readonly extendArr: ExtendArrHelper;
 
   // arrayIterableIterator
@@ -468,6 +471,7 @@ export const createHelpers = (): Helpers => {
     arrRange: (options) => new ArrRangeHelper(options),
     arrReduce: (options) => new ArrReduceHelper(options),
     arrReduceFunc: new ArrReduceFuncHelper(),
+    arrSome: (options) => new ArrSomeHelper(options),
     extendArr: new ExtendArrHelper(),
 
     // arrayIterableIterator

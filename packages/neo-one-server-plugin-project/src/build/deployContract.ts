@@ -6,13 +6,18 @@ import {
   LocalMemoryStore,
   LocalUserAccountProvider,
   NEOONEProvider,
+  SourceMaps,
   wifToPrivateKey,
 } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import { ContractResult } from './compileContract';
 
-export const deployContract = async (network: Network, contract: ContractResult): Promise<AddressString> => {
+export const deployContract = async (
+  network: Network,
+  contract: ContractResult,
+  sourceMaps: SourceMaps,
+): Promise<AddressString> => {
   crypto.addPublicKey(
     common.stringToPrivateKey(wifToPrivateKey(networkConstants.PRIVATE_NET_PRIVATE_KEY)),
     common.stringToECPoint(networkConstants.PRIVATE_NET_PUBLIC_KEY),
@@ -46,7 +51,7 @@ export const deployContract = async (network: Network, contract: ContractResult)
     // do nothing
   }
 
-  const result = await client.publishAndDeploy(contract.contract, contract.abi);
+  const result = await client.publishAndDeploy(contract.contract, contract.abi, [], undefined, sourceMaps);
   const [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
 
   if (receipt.result.state === 'FAULT') {

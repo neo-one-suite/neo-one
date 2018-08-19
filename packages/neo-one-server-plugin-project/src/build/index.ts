@@ -1,6 +1,8 @@
-import { SmartContractNetworksDefinition } from '@neo-one/client';
+import { scriptHashToAddress, SmartContractNetworksDefinition, SourceMaps } from '@neo-one/client';
+import { common, crypto } from '@neo-one/client-core';
 import { PluginManager, TaskList } from '@neo-one/server-plugin';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
+import { Contracts as ContractPaths } from '@neo-one/smart-contract-compiler';
 import { utils } from '@neo-one/utils';
 import * as path from 'path';
 import { filter, take } from 'rxjs/operators';
@@ -8,13 +10,14 @@ import { DiagnosticCategory } from 'typescript';
 import { constants } from '../constants';
 import { loadProject } from '../loadProject';
 import { BuildTaskListOptions, ProjectConfig } from '../types';
-import { compileContract, ContractResult } from './compileContract';
+import { compileContract } from './compileContract';
 import { deployContract } from './deployContract';
-import { Contracts as ContractPaths, findContracts } from './findContracts';
+import { findContracts } from './findContracts';
 import { generateCode } from './generateCode';
+import { CommonCodeContract, generateCommonCode } from './generateCommonCode';
 
 // tslint:disable-next-line readonly-array
-type Contracts = ContractResult[];
+type Contracts = CommonCodeContract[];
 interface NetworksDefinitions {
   // tslint:disable-next-line readonly-keyword
   [contractName: string]: SmartContractNetworksDefinition;
@@ -51,25 +54,6 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
         title: 'Find contracts',
         task: async (ctx) => {
           ctx.contractPaths = await findContracts(getProject(ctx));
-        },
-      },
-      {
-        title: 'Compile contracts',
-        task: (ctx) => {
-          ctx.contracts = [];
-
-          return new TaskList({
-            concurrent: true,
-            tasks: getContractPaths(ctx).map((contract) => ({
-              title: `Compile ${contract.contractName}`,
-              task: async () => {
-                const result = await compileContract(contract);
-
-                // tslint:disable-next-line no-array-mutation
-                getContracts(ctx).push(result);
-              },
-            })),
-          });
         },
       },
       {
@@ -112,21 +96,22 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                 title: 'Deploy',
                 task: (ctx) => {
                   ctx.networksDefinitions = {};
+                  ctx.contracts = [];
+                  const mutableLinked: { [filePath: string]: { [name: string]: string } } = {};
+                  const mutableSourceMaps: Modifiable<SourceMaps> = {};
 
                   return new TaskList({
-                    concurrent: true,
-                    tasks: getContracts(ctx).map((contract) => ({
-                      title: `Deploy ${contract.contractName}`,
-                      skip: () => {
+                    tasks: getContractPaths(ctx).map((contractPath) => ({
+                      title: `Deploy ${contractPath.name}`,
+                      task: async () => {
+                        const contract = await compileContract(contractPath.filePath, contractPath.name, mutableLinked);
+
                         if (
                           contract.diagnostics.some((diagnostic) => diagnostic.category === DiagnosticCategory.Error)
                         ) {
-                          return 'Compilation error.';
+                          throw new Error('Compilation error.');
                         }
 
-                        return false;
-                      },
-                      task: async () => {
                         const network = (await getNetworkResourceManager(pluginManager)
                           .getResource$({ name: getNetworkName(getProjectName(ctx)), options: {} })
                           .pipe(
@@ -134,13 +119,27 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                             take(1),
                           )
                           .toPromise()) as Network;
-                        const [address, prodNetworksDefinition] = await Promise.all([
-                          deployContract(network, contract),
+                        const address = scriptHashToAddress(
+                          common.uInt160ToString(crypto.toScriptHash(Buffer.from(contract.contract.script, 'hex'))),
+                        );
+                        mutableSourceMaps[address] = contract.sourceMap;
+                        const [prodNetworksDefinition] = await Promise.all<SmartContractNetworksDefinition, string>([
                           Promise.resolve({}),
+                          deployContract(network, contract, mutableSourceMaps),
                         ]);
 
+                        mutableLinked[contractPath.filePath] = { [contractPath.name]: address };
+
+                        // tslint:disable-next-line no-array-mutation
+                        getContracts(ctx).push({
+                          ...contract,
+                          addresses: [address].concat(
+                            Object.values(prodNetworksDefinition).map(({ address: value }) => value),
+                          ),
+                        });
+
                         // tslint:disable-next-line no-object-mutation
-                        getNetworksDefinitions(ctx)[contract.contractName] = {
+                        getNetworksDefinitions(ctx)[contract.name] = {
                           ...prodNetworksDefinition,
                           [constants.LOCAL_NETWORK_NAME]: { address },
                         };
@@ -164,22 +163,33 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                   new TaskList({
                     concurrent: true,
                     tasks: getContracts(ctx)
-                      .filter(({ contractName }) => {
-                        const networksDefinition = getNetworksDefinitions(ctx)[contractName] as
+                      .filter(({ name }) => {
+                        const networksDefinition = getNetworksDefinitions(ctx)[name] as
                           | SmartContractNetworksDefinition
                           | undefined;
 
                         return networksDefinition !== undefined;
                       })
                       .map((contract) => ({
-                        title: `Generate ${contract.contractName} code`,
+                        title: `Generate ${contract.name} code`,
                         task: async () => {
                           const project = getProject(ctx);
-                          const networksDefinition = getNetworksDefinitions(ctx)[contract.contractName];
+                          const networksDefinition = getNetworksDefinitions(ctx)[contract.name];
 
                           await generateCode(project, contract, networksDefinition);
                         },
-                      })),
+                      }))
+                      .concat([
+                        {
+                          title: 'Generate common code',
+                          task: async () => {
+                            const project = getProject(ctx);
+                            const contracts = getContracts(ctx);
+
+                            await generateCommonCode(project, contracts);
+                          },
+                        },
+                      ]),
                   }),
               },
             ],

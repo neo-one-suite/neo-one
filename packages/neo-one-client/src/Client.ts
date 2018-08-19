@@ -1,6 +1,5 @@
 import { ABI, ScriptBuilderParam } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
-import { RawSourceMap } from 'source-map';
 import * as args from './args';
 import { ClientBase } from './ClientBase';
 import { ReadClient } from './ReadClient';
@@ -20,6 +19,7 @@ import {
   SmartContract,
   SmartContractAny,
   SmartContractDefinition,
+  SourceMaps,
   TransactionOptions,
   TransactionResult,
   Transfer,
@@ -73,14 +73,14 @@ export class Client<
     abi: ABI,
     params: ReadonlyArray<Param> = [],
     options?: TransactionOptions,
-    sourceMap?: RawSourceMap,
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<PublishReceipt>> {
     return this.getProvider(options).publishAndDeploy(
       args.assertContractRegister('contract', contract),
       args.assertABI('abi', abi),
       params,
       args.assertTransactionOptions('options', options),
-      sourceMap,
+      sourceMaps,
     );
   }
 
@@ -144,9 +144,9 @@ export class Client<
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
     options?: InvokeTransactionOptions,
-    sourceMap?: RawSourceMap,
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt>> {
-    return this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMap);
+    return this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMaps);
   }
 
   public async __call(
