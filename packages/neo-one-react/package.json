@@ -1,0 +1,11 @@
+{
+  "name": "@neo-one/react",
+  "version": "1.0.0-alpha.1",
+  "description": "NEO•ONE React utilities.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "react": "^16.4.2",
+    "rxjs": "^6.2.2",
+    "tslib": "^1.9.3"
+  }
+}
