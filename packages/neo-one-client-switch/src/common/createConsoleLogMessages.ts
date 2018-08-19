@@ -1,6 +1,7 @@
 import { converters, RawAction } from '@neo-one/client-core';
 import { deserializeStackItem, StackItem } from '@neo-one/node-vm';
 import { utils } from '@neo-one/utils';
+import _ from 'lodash';
 import { SourceMaps } from '../common';
 import { processTrace } from './processTrace';
 
@@ -40,7 +41,20 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
         .asBigInteger()
         .toNumber();
     case 6:
-      return '<console.log(object) is not supported>';
+      return _.fromPairs(
+        utils.zip(
+          stackItem
+            .asArray()[1]
+            .asArray()[0]
+            .asArray()
+            .map(extractValueFromStackItem),
+          stackItem
+            .asArray()[1]
+            .asArray()[1]
+            .asArray()
+            .map(extractValueFromStackItem),
+        ),
+      );
     case 7:
       return stackItem
         .asArray()[1]

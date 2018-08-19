@@ -9,4 +9,5 @@ export enum GlobalProperty {
   MapStorage = 7,
   SetStorage = 8,
   CallingScriptHash = 9,
+  GenericLogSerialize = 10,
 }

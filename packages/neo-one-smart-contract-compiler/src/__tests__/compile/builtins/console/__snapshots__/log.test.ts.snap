@@ -87,6 +87,13 @@ Array [
 ]
 `;
 
+exports[`console.log should log objects 1`] = `
+Array [
+  "{\\"a\\":\\"a\\",\\"b\\":[{\\"a\\":\\"a\\"}]}
+  at console.log({ (snippetCode.ts:2:6)",
+]
+`;
+
 exports[`console.log should log strings 1`] = `
 Array [
   "hello world

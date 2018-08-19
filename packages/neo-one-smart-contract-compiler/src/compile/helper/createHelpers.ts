@@ -29,6 +29,7 @@ import {
   DebugLogHelperOptions,
   ExpHelper,
   GenericDeserializeHelper,
+  GenericLogSerializeHelper,
   GenericSerializeHelper,
 } from './common';
 import {
@@ -128,6 +129,7 @@ import {
   GetPropertyObjectHelper,
   GetPropertyObjectKeysHelper,
   GetPropertyObjectPropertyHelper,
+  GetPropertyObjectValuesHelper,
   GetSymbolObjectHelper,
   GetSymbolObjectPropertyHelper,
   InObjectPropertyHelper,
@@ -265,6 +267,7 @@ export interface Helpers {
   readonly cloneArray: CloneArrayHelper;
   readonly forType: (options: ForTypeHelperOptions) => ForTypeHelper;
   readonly genericDeserialize: GenericDeserializeHelper;
+  readonly genericLogSerialize: GenericLogSerializeHelper;
   readonly genericSerialize: GenericSerializeHelper;
   readonly exp: ExpHelper;
   readonly consoleLog: ConsoleLogHelper;
@@ -339,6 +342,7 @@ export interface Helpers {
   ) => SetAccessorSymbolObjectPropertyHelper;
   readonly getPropertyObject: GetPropertyObjectHelper;
   readonly getPropertyObjectKeys: GetPropertyObjectKeysHelper;
+  readonly getPropertyObjectValues: GetPropertyObjectValuesHelper;
   readonly getPropertyObjectProperty: GetPropertyObjectPropertyHelper;
   readonly setPropertyObjectProperty: SetPropertyObjectPropertyHelper;
   readonly setDataPropertyObjectProperty: SetDataPropertyObjectPropertyHelper;
@@ -505,6 +509,7 @@ export const createHelpers = (): Helpers => {
     cloneArray: new CloneArrayHelper(),
     forType: (options) => new ForTypeHelper(options),
     genericDeserialize: new GenericDeserializeHelper(),
+    genericLogSerialize: new GenericLogSerializeHelper(),
     genericSerialize: new GenericSerializeHelper(),
     exp: new ExpHelper(),
     consoleLog: new ConsoleLogHelper(),
@@ -577,6 +582,7 @@ export const createHelpers = (): Helpers => {
     setAccessorSymbolObjectProperty: (options) => new SetAccessorSymbolObjectPropertyHelper(options),
     getPropertyObject: new GetPropertyObjectHelper(),
     getPropertyObjectKeys: new GetPropertyObjectKeysHelper(),
+    getPropertyObjectValues: new GetPropertyObjectValuesHelper(),
     getPropertyObjectProperty: new GetPropertyObjectPropertyHelper(),
     setPropertyObjectProperty: new SetPropertyObjectPropertyHelper(),
     setDataPropertyObjectProperty: new SetDataPropertyObjectPropertyHelper(),

@@ -92,6 +92,19 @@ describe('console.log', () => {
     expect(messages).toMatchSnapshot();
   });
 
+  test('should log objects', async () => {
+    const { receipt, sourceMaps } = await helpers.executeString(`
+      console.log({
+        a: 'a',
+        b: [{ a: 'a' }],
+      });
+    `);
+
+    const messages = await getMessages(receipt, sourceMaps);
+
+    expect(messages).toMatchSnapshot();
+  });
+
   test('should handle multiple log', async () => {
     const { receipt, sourceMaps } = await helpers.executeString(`
       const bar = () => {

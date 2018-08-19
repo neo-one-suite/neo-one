@@ -17,5 +17,8 @@ const invokeGlobal = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions, p
 export const invokeSerialize = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) =>
   invokeGlobal(sb, node, options, GlobalProperty.GenericSerialize);
 
+export const invokeLogSerialize = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) =>
+  invokeGlobal(sb, node, options, GlobalProperty.GenericLogSerialize);
+
 export const invokeDeserialize = (sb: ScriptBuilder, node: ts.Node, options: VisitOptions) =>
   invokeGlobal(sb, node, options, GlobalProperty.GenericDeserialize);

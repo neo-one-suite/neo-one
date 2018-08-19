@@ -63,9 +63,9 @@ export class ObjectKeys extends BuiltinMemberCall {
         node,
         innerOptions,
         sb.helpers.arrMap({
-          map: () => {
+          map: (innerInnerOptions) => {
             // [val]
-            sb.emitHelper(node, innerOptions, sb.helpers.wrapString);
+            sb.emitHelper(node, innerInnerOptions, sb.helpers.wrapString);
           },
         }),
       );

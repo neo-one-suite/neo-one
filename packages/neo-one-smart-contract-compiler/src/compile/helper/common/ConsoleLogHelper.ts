@@ -11,7 +11,7 @@ export class ConsoleLogHelper extends Helper {
     // [arrayVal]
     sb.emitHelper(node, options, sb.helpers.wrapArray);
     // [value]
-    sb.emitHelper(node, options, sb.helpers.genericSerialize);
+    sb.emitHelper(node, options, sb.helpers.genericLogSerialize);
     // [buffer]
     sb.emitSysCall(node, 'Neo.Runtime.Serialize');
     // [line, buffer]

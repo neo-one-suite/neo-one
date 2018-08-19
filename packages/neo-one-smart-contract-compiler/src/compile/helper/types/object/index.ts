@@ -8,6 +8,7 @@ export * from './GetObjectHelper';
 export * from './GetPropertyObjectHelper';
 export * from './GetPropertyObjectKeysHelper';
 export * from './GetPropertyObjectPropertyHelper';
+export * from './GetPropertyObjectValuesHelper';
 export * from './GetSymbolObjectHelper';
 export * from './GetSymbolObjectPropertyHelper';
 export * from './InstanceofHelper';

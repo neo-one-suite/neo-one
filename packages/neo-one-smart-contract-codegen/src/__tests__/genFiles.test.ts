@@ -2,7 +2,7 @@ import { nep5 } from '@neo-one/client';
 import { genFiles } from '../genFiles';
 
 describe('genFiles', () => {
-  test.only('Token', () => {
+  test('Token', () => {
     expect(
       genFiles({
         name: 'Token',
