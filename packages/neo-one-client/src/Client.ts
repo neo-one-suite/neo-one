@@ -10,6 +10,7 @@ import { ReadClient } from './ReadClient';
 import { createSmartContract } from './sc';
 import {
   ABI,
+  Account,
   AddressString,
   AssetRegister,
   Block,
