@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/smart-contract-codegen",
-  "version": "1.0.0-alpha.45",
+  "version": "1.0.0-alpha.46",
   "description": "NEO•ONE TypeScript smart contract codegen.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.88",
+    "@neo-one/client": "^1.0.0-alpha.89",
     "@neo-one/client-core": "^1.0.0-alpha.70",
     "@neo-one/utils": "^1.0.0-alpha.59",
     "change-case": "^3.0.2",
