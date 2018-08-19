@@ -2,7 +2,7 @@ import { ScriptBuilderParam } from '@neo-one/client-core';
 import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { combineLatest, from, Observable, ReplaySubject } from 'rxjs';
+import { combineLatest, Observable, Observer, ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map, multicast, refCount, switchMap } from 'rxjs/operators';
 import * as args from './args';
 import { ClientBase } from './ClientBase';
@@ -48,7 +48,9 @@ export class Client<
     readonly network: NetworkType;
   }> = this.currentNetwork$.pipe(
     switchMap((network) =>
-      from(toObservable(this.read(network).iterBlocks())).pipe(map((block) => ({ block, network }))),
+      Observable.create((observer: Observer<Block>) =>
+        toObservable(this.read(network).iterBlocks()).subscribe(observer),
+      ).pipe(map((block) => ({ block, network }))),
     ),
     multicast(() => new ReplaySubject(1)),
     refCount(),

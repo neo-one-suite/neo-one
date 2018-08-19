@@ -181,6 +181,7 @@ export const rpcServer$ = ({
       router.use(cors).post(rpcMiddleware.name, rpcMiddleware.path, rpcMiddleware.middleware);
 
       app.use(router.routes());
+      app.use(cors);
       app.use(router.allowedMethods());
 
       return app;
