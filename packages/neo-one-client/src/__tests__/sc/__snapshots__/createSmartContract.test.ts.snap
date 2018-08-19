@@ -1,7 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`createSmartContract createInvoke - no account 1`] = `[Error: No account exists.]`;
-
 exports[`createSmartContract createInvoke - no network 1`] = `[Error: Contract has not been deployed to network local]`;
 
 exports[`createSmartContract read 1`] = `

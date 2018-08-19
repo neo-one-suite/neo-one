@@ -1,12 +1,18 @@
-import { ABI, ScriptBuilderParam } from '@neo-one/client-core';
+import { ScriptBuilderParam } from '@neo-one/client-core';
+import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable';
 import BigNumber from 'bignumber.js';
+import _ from 'lodash';
+import { combineLatest, from, Observable, ReplaySubject } from 'rxjs';
+import { distinctUntilChanged, map, multicast, refCount, switchMap } from 'rxjs/operators';
 import * as args from './args';
 import { ClientBase } from './ClientBase';
 import { ReadClient } from './ReadClient';
 import { createSmartContract } from './sc';
 import {
+  ABI,
   AddressString,
   AssetRegister,
+  Block,
   ContractRegister,
   Hash256String,
   InvokeTransactionOptions,
@@ -23,6 +29,7 @@ import {
   TransactionOptions,
   TransactionResult,
   Transfer,
+  UserAccount,
   UserAccountProvider,
 } from './types';
 const mutableClients: Client[] = [];
@@ -34,6 +41,38 @@ export class Client<
   public static inject(provider: UserAccountProvider): void {
     mutableClients.forEach((client) => client.inject(provider));
   }
+
+  public readonly block$: Observable<{
+    readonly block: Block;
+    readonly network: NetworkType;
+  }> = this.currentNetwork$.pipe(
+    switchMap((network) =>
+      from(toObservable(this.read(network).iterBlocks())).pipe(map((block) => ({ block, network }))),
+    ),
+    multicast(() => new ReplaySubject(1)),
+    refCount(),
+  );
+
+  public readonly accountState$: Observable<
+    | {
+        readonly currentAccount: UserAccount;
+        readonly account: Account;
+      }
+    | undefined
+  > = combineLatest(this.currentAccount$, this.block$).pipe(
+    switchMap(async ([currentAccount]) => {
+      if (currentAccount === undefined) {
+        return undefined;
+      }
+
+      const account = await this.read(currentAccount.id.network).getAccount(currentAccount.id.address);
+
+      return { currentAccount, account };
+    }),
+    distinctUntilChanged((a, b) => _.isEqual(a, b)),
+    multicast(() => new ReplaySubject(1)),
+    refCount(),
+  );
 
   public constructor(providersIn: TUserAccountProviders) {
     super(providersIn);

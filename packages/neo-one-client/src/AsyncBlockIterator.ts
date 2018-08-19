@@ -29,7 +29,7 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
   private readonly mutableItems: Item[];
   private mutableResolvers: Resolver[];
   private mutableDone: boolean;
-  private mutableCurrentIndex: number;
+  private mutableCurrentIndex: number | undefined;
   private mutableFetching: boolean;
   private mutableStartHeight: number | undefined;
   private readonly indexStop: number | undefined;
@@ -39,7 +39,7 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
 
   public constructor({
     client,
-    filter: { indexStart = 0, indexStop, monitor },
+    filter: { indexStart, indexStop, monitor },
     fetchTimeoutMS = FETCH_TIMEOUT_MS,
     batchSize = BATCH_SIZE,
   }: AsyncBlockIteratorOptions) {
@@ -135,13 +135,27 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
 
   private async asyncFetch(): Promise<void> {
     let startHeight = this.mutableStartHeight;
-    if (startHeight === undefined) {
+    let indexIn = this.mutableCurrentIndex;
+    if (startHeight === undefined || indexIn === undefined) {
       const blockCount = await this.client.getBlockCount(this.monitor);
-      startHeight = blockCount - 1;
-      this.mutableStartHeight = startHeight;
+      if (startHeight === undefined) {
+        startHeight = blockCount - 1;
+        this.mutableStartHeight = startHeight;
+      }
+      if (indexIn === undefined) {
+        indexIn = blockCount - 1;
+        this.mutableCurrentIndex = indexIn;
+      }
     }
+    const index = indexIn;
 
-    const index = this.mutableCurrentIndex;
+    const incIndex = (value: number) => {
+      if (this.mutableCurrentIndex === undefined) {
+        throw new Error('Something went wrong!');
+      }
+      this.mutableCurrentIndex += value;
+    };
+
     if (this.indexStop !== undefined && index >= this.indexStop) {
       this.done();
     } else if (index >= startHeight) {
@@ -151,7 +165,7 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
         this.client.getBlockCount(this.monitor),
       ]);
 
-      this.mutableCurrentIndex += 1;
+      incIndex(1);
       this.write(block);
       this.mutableStartHeight = newStartHeight;
     } else {
@@ -165,7 +179,7 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
       for (const chunk of _.chunk(_.range(0, toFetch), this.batchSize)) {
         const blocks = await Promise.all(chunk.map(async (offset) => this.fetchOne(index + offset, true)));
 
-        this.mutableCurrentIndex += chunk.length;
+        incIndex(chunk.length);
         blocks.forEach((block) => this.write(block));
       }
     }

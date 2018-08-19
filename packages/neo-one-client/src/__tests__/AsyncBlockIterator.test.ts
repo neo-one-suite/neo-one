@@ -9,6 +9,7 @@ import { ReadClient } from '../ReadClient';
 const blockCount = 10;
 const blocks = _.range(blockCount).map(() => ({}));
 const filter = {
+  indexStart: 0,
   indexStop: blockCount,
 };
 

@@ -1,7 +1,8 @@
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { filter, map, switchMap, take } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, switchMap, take } from 'rxjs/operators';
 import * as args from './args';
 import { UnknownAccountError, UnknownNetworkError } from './errors';
+import * as networksConstant from './networks';
 import {
   InvokeTransactionOptions,
   NetworkType,
@@ -15,9 +16,11 @@ import {
 export class ClientBase<TUserAccountProviders extends { readonly [K in string]: UserAccountProvider }> {
   public readonly currentAccount$: Observable<UserAccount | undefined>;
   public readonly accounts$: Observable<ReadonlyArray<UserAccount>>;
+  public readonly currentNetwork$: Observable<NetworkType>;
   public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
   protected readonly providers$: BehaviorSubject<TUserAccountProviders>;
   protected readonly selectedProvider$: BehaviorSubject<UserAccountProvider>;
+  private readonly currentNetworkInternal$: BehaviorSubject<NetworkType>;
 
   public constructor(providersIn: TUserAccountProviders) {
     const providersArray = Object.values(providersIn);
@@ -46,6 +49,22 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
       switchMap((providers) => combineLatest(Object.values(providers).map((provider) => provider.networks$))),
       map((networkss) => [...new Set(networkss.reduce((acc, networks) => acc.concat(networks), []))]),
     );
+
+    this.currentNetworkInternal$ = new BehaviorSubject(providerIn.getNetworks()[0]);
+    combineLatest(this.currentAccount$, this.selectedProvider$)
+      .pipe(
+        map(([currentAccount, provider]) => {
+          if (currentAccount !== undefined) {
+            return currentAccount.id.network;
+          }
+
+          const mainNetwork = provider.getNetworks().find((network) => network === networksConstant.MAIN);
+
+          return mainNetwork === undefined ? provider.getNetworks()[0] : mainNetwork;
+        }),
+      )
+      .subscribe(this.currentNetworkInternal$);
+    this.currentNetwork$ = this.currentNetworkInternal$.pipe(distinctUntilChanged());
 
     if (this.getCurrentAccount() === undefined) {
       this.accounts$
@@ -104,6 +123,10 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
 
   public getCurrentAccount(): UserAccount | undefined {
     return this.selectedProvider$.getValue().getCurrentAccount();
+  }
+
+  public getCurrentNetwork(): NetworkType {
+    return this.currentNetworkInternal$.getValue();
   }
 
   public getAccounts(): ReadonlyArray<UserAccount> {

@@ -94,16 +94,6 @@ describe('createSmartContract', () => {
     expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
   });
 
-  test('createInvoke - no account', async () => {
-    getCurrentAccount.mockImplementationOnce(() => undefined);
-
-    const result = contract.transfer(keys[0].address, keys[1].address, data.bigNumbers.a, {
-      transfers: [factory.createTransfer()],
-    });
-
-    await expect(result).rejects.toMatchSnapshot();
-  });
-
   test('createInvoke - no network', async () => {
     getCurrentAccount.mockImplementationOnce(() => ({ id: { network: 'local', address: keys[0].address } }));
 

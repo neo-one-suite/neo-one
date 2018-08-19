@@ -2,7 +2,7 @@ import { ScriptBuilderParam } from '@neo-one/client-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { Client } from '../Client';
-import { NoAccountError, NoContractDeployedError } from '../errors';
+import { NoContractDeployedError } from '../errors';
 import {
   ABIEvent,
   ABIFunction,
@@ -41,7 +41,7 @@ const getParamsAndOptions = ({
 } => {
   const finalArg = args[args.length - 1] as {} | undefined;
   let params = args;
-  let options: TransactionOptions = {};
+  let optionsIn: TransactionOptions = {};
   if (
     finalArg !== undefined &&
     typeof finalArg === 'object' &&
@@ -49,25 +49,22 @@ const getParamsAndOptions = ({
     !BigNumber.isBigNumber(finalArg)
   ) {
     params = args.slice(0, -1);
-    options = finalArg;
+    optionsIn = finalArg;
   }
 
-  let from = options.from;
-  if (from === undefined) {
-    const currentAccount = client.getCurrentAccount();
-    if (currentAccount === undefined) {
-      throw new NoAccountError();
-    }
-    from = currentAccount.id;
-    options = {
-      ...options,
-      from,
-    };
-  }
+  const currentAccount = client.getCurrentAccount();
+  const options =
+    optionsIn.from === undefined && currentAccount !== undefined
+      ? {
+          ...optionsIn,
+          from: currentAccount.id,
+        }
+      : optionsIn;
+  const network = options.from === undefined ? client.getCurrentNetwork() : options.from.network;
 
-  const contractNetwork = networks[from.network] as SmartContractNetworkDefinition | undefined;
+  const contractNetwork = networks[network] as SmartContractNetworkDefinition | undefined;
   if (contractNetwork === undefined) {
-    throw new NoContractDeployedError(from.network);
+    throw new NoContractDeployedError(network);
   }
 
   const { converted, zipped } = common.convertParams({ params, parameters });
