@@ -36,6 +36,7 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": false,
     "experimentalDecorators": true,
+    "jsx": "react",
 
     "alwaysStrict": true,
     "strict": true,

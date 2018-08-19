@@ -8,6 +8,7 @@ describe('genCommonFiles', () => {
         contractsPaths,
         commonTypesPath: '/foo/bar/one/generated/types.ts',
         testPath: '/foo/bar/one/generated/test.ts',
+        reactPath: '/foo/bar/one/generated/react.ts',
       }),
     ).toMatchSnapshot();
   });

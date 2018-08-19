@@ -5,5 +5,6 @@ export interface ContractPaths {
   readonly addresses: ReadonlyArray<string>;
   readonly sourceMap: RawSourceMap;
   readonly contractPath: string;
+  readonly createContractPath: string;
   readonly typesPath: string;
 }

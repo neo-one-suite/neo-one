@@ -15,14 +15,17 @@ export const generateCommonCode = async (project: ProjectConfig, contracts: Read
     addresses,
     contractPath: filePath,
     typesPath: path.resolve(project.paths.generated, name, 'types.ts'),
+    createContractPath: path.resolve(project.paths.generated, name, 'contract.ts'),
   }));
   const testPath = path.resolve(project.paths.generated, 'test.ts');
   const commonTypesPath = path.resolve(project.paths.generated, 'types.ts');
   const sourceMapsPath = path.resolve(project.paths.generated, 'sourceMaps.ts');
-  const { test, commonTypes, sourceMaps } = genCommonFiles({
+  const reactPath = path.resolve(project.paths.generated, 'react.tsx');
+  const { test, react, commonTypes, sourceMaps } = genCommonFiles({
     contractsPaths,
     testPath,
     commonTypesPath,
+    reactPath,
   });
 
   await fs.ensureDir(project.paths.generated);
@@ -30,5 +33,6 @@ export const generateCommonCode = async (project: ProjectConfig, contracts: Read
     fs.writeFile(testPath, test),
     fs.writeFile(commonTypesPath, commonTypes),
     fs.writeFile(sourceMapsPath, sourceMaps),
+    fs.writeFile(reactPath, react),
   ]);
 };
