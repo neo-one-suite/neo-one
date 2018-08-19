@@ -10,8 +10,26 @@ export const genTest = ({
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly testPath: string;
   readonly commonTypesPath: string;
-}): string =>
-  `
+}) => ({
+  js: `
+import { withContracts as withContractsBase } from '@neo-one/smart-contract-test';
+import * as path from 'path';
+
+export const withContracts = async (test, options) =>
+  withContractsBase(
+    [${contractsPaths
+      .map(
+        ({ name, contractPath }) =>
+          `{ name: '${name}', filePath: path.resolve(__dirname, '${normalizePath(
+            path.relative(path.dirname(testPath), contractPath),
+          )}') }`,
+      )
+      .join(', ')}],
+    test,
+    options,
+  );
+`,
+  ts: `
 import { TestOptions, withContracts as withContractsBase, WithContractsOptions } from '@neo-one/smart-contract-test';
 import * as path from 'path';
 import { Contracts } from '${getRelativeImport(testPath, commonTypesPath)}';
@@ -32,4 +50,5 @@ export const withContracts = async (
     test,
     options,
   );
-`;
+`,
+});

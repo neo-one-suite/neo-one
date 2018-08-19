@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import * as path from 'path';
 import { RawSourceMap } from 'source-map';
 import { ProjectConfig } from '../types';
-import { getCommonPaths, getContractPaths } from './paths';
+import { getCommonPaths, getContractPaths, getTSPath } from './paths';
 
 export const generateCode = async (
   project: ProjectConfig,
@@ -15,6 +15,7 @@ export const generateCode = async (
     readonly sourceMap: RawSourceMap;
   },
   networksDefinition: SmartContractNetworksDefinition,
+  javascript: boolean,
 ) => {
   const base = path.resolve(project.paths.generated, contractResult.name);
   const sourceMapsPath = getCommonPaths(project).sourceMapsPath;
@@ -31,9 +32,13 @@ export const generateCode = async (
   });
 
   await fs.ensureDir(base);
-  await Promise.all([
-    fs.writeFile(abiPath, abi),
-    fs.writeFile(createContractPath, contract),
-    fs.writeFile(typesPath, types),
-  ]);
+  if (javascript) {
+    await Promise.all([fs.writeFile(abiPath, abi.js), fs.writeFile(createContractPath, contract.js)]);
+  } else {
+    await Promise.all([
+      fs.writeFile(getTSPath(abiPath), abi.ts),
+      fs.writeFile(getTSPath(createContractPath), contract.ts),
+      fs.writeFile(getTSPath(typesPath), types.ts),
+    ]);
+  }
 };

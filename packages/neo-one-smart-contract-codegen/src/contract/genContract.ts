@@ -20,23 +20,46 @@ export const genContract = ({
   readonly abiPath: string;
   readonly sourceMapsPath: string;
   readonly networksDefinition: SmartContractNetworksDefinition;
-}): string => {
+}) => {
   const relativeTypes = getRelativeImport(createContractPath, typesPath);
   const smartContract = getSmartContractName(name);
   const readSmartContract = getReadSmartContractName(name);
   const relativeABI = getRelativeImport(createContractPath, abiPath);
   const relativeSourceMaps = getRelativeImport(createContractPath, sourceMapsPath);
   const abiName = getABIName(name);
-  const sourceMapsImport = `\nimport { sourceMaps } from '${relativeSourceMaps}';`;
+  const sourceMapsImport = `import { sourceMaps } from '${relativeSourceMaps}';`;
 
-  return `
+  return {
+    js: `${abiName >= 'sourceMaps' ? `${sourceMapsImport}\n` : ''}import { ${abiName} } from '${relativeABI}';${
+      abiName >= 'sourceMaps' ? '' : `\n${sourceMapsImport}`
+    }
+
+const definition = {
+  networks: ${stringify(networksDefinition, undefined, 2)},
+  abi: ${abiName},
+  sourceMaps,
+};
+
+export const ${getCreateSmartContractName(name)} = (
+  client,
+) => client.smartContract(definition);
+
+export const ${getCreateReadSmartContractName(name)} = (
+  client,
+) => client.smartContract({
+  address: definition.networks[client.dataProvider.network].address,
+  abi: definition.abi,
+  sourceMaps: definition.sourceMaps,
+});
+  `,
+    ts: `
 import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';${
-    abiName >= 'sourceMaps' ? sourceMapsImport : ''
-  }
+      abiName >= 'sourceMaps' ? sourceMapsImport : ''
+    }
 import { ${abiName} } from '${relativeABI}';
 import { ${readSmartContract}, ${smartContract} } from '${relativeTypes}';${
-    abiName >= 'sourceMaps' ? '' : sourceMapsImport
-  }
+      abiName >= 'sourceMaps' ? '' : sourceMapsImport
+    }
 
 const definition: SmartContractDefinition = {
   networks: ${stringify(networksDefinition, undefined, 2)},
@@ -55,5 +78,6 @@ export const ${getCreateReadSmartContractName(name)} = (
   abi: definition.abi,
   sourceMaps: definition.sourceMaps,
 });
-`;
+`,
+  };
 };

@@ -2,7 +2,7 @@ import { genCommonFiles, NetworkDefinition } from '@neo-one/smart-contract-codeg
 import fs from 'fs-extra';
 import { ProjectConfig } from '../types';
 import { ContractResult } from './compileContract';
-import { getCommonPaths, getContractPaths } from './paths';
+import { getCommonPaths, getContractPaths, getTSPath } from './paths';
 
 export type CommonCodeContract = ContractResult & {
   readonly addresses: ReadonlyArray<string>;
@@ -14,6 +14,7 @@ export const generateCommonCode = async (
   devNetworkName: string,
   masterPrivateKey: string,
   networks: ReadonlyArray<NetworkDefinition>,
+  javascript: boolean,
 ) => {
   const contractsPaths = contracts.map(({ name, filePath, sourceMap, addresses }) => ({
     ...getContractPaths(project, { name, filePath }),
@@ -36,12 +37,22 @@ export const generateCommonCode = async (
   });
 
   await fs.ensureDir(project.paths.generated);
-  await Promise.all([
-    fs.writeFile(sourceMapsPath, sourceMaps),
-    fs.writeFile(testPath, test),
-    fs.writeFile(commonTypesPath, commonTypes),
-    fs.writeFile(reactPath, react),
-    fs.writeFile(clientPath, client),
-    fs.writeFile(generatedPath, generated),
-  ]);
+  if (javascript) {
+    await Promise.all([
+      fs.writeFile(sourceMapsPath, sourceMaps.js),
+      fs.writeFile(testPath, test.js),
+      fs.writeFile(reactPath, react.js),
+      fs.writeFile(clientPath, client.js),
+      fs.writeFile(generatedPath, generated.js),
+    ]);
+  } else {
+    await Promise.all([
+      fs.writeFile(getTSPath(sourceMapsPath), sourceMaps.ts),
+      fs.writeFile(getTSPath(testPath), test.ts),
+      fs.writeFile(getTSPath(reactPath), react.ts),
+      fs.writeFile(getTSPath(clientPath), client.ts),
+      fs.writeFile(getTSPath(generatedPath), generated.ts),
+      fs.writeFile(getTSPath(commonTypesPath), commonTypes.ts),
+    ]);
+  }
 };

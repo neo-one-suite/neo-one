@@ -1,7 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`genSmartContractTypes NEP5 1`] = `
-"import { AddressString, Event, InvokeReceipt, InvokeTransactionOptions, ReadSmartContract, SmartContract, TransactionResult } from '@neo-one/client';
+Object {
+  "ts": "import { AddressString, Event, InvokeReceipt, InvokeTransactionOptions, ReadSmartContract, SmartContract, TransactionResult } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
 export type TokenEvent = TokenTransferEvent
@@ -29,5 +30,6 @@ export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {
   readonly symbol: () => Promise<string>;
   readonly totalSupply: () => Promise<BigNumber>;
 }
-"
+",
+}
 `;

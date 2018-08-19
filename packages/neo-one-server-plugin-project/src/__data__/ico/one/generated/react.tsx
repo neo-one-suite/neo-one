@@ -1,4 +1,5 @@
 // tslint:disable
+/* eslint-disable */
 import { Client } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from './types';
@@ -21,7 +22,6 @@ export const ContractsProvider = <TClient extends Client>({
   children,
 }: ContractsProviderProps<TClient>) => {
   const client = clientIn === undefined ? createClient() : clientIn;
-
   return (
     <Context.Provider
       value={{

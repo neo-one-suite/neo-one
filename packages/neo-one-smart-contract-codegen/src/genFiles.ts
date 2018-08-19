@@ -2,12 +2,13 @@ import { ABI, SmartContractNetworksDefinition } from '@neo-one/client';
 import { genABI } from './abi';
 import { genContract } from './contract';
 import { formatFile } from './formatFile';
+import { FileResult } from './type';
 import { genSmartContractTypes } from './types';
 
 export interface FilesResult {
-  readonly abi: string;
-  readonly contract: string;
-  readonly types: string;
+  readonly abi: FileResult;
+  readonly contract: FileResult;
+  readonly types: FileResult;
 }
 
 export const genFiles = ({

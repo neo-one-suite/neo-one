@@ -1,4 +1,5 @@
 // tslint:disable
+/* eslint-disable */
 import {
   Client,
   LocalKeyStore,
@@ -27,9 +28,8 @@ export const createClient = <
 >(
   getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders as any,
 ): Client<TUserAccountProviders> => {
-  const provider = new NEOONEProvider([{ network: 'local', rpcURL: 'http://localhost:42993/rpc' }]);
+  const provider = new NEOONEProvider([{ network: 'local', rpcURL: 'http://localhost:33444/rpc' }]);
   const userAccountProviders = getUserAccountProviders(provider);
-
   const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
   const localUserAccountProvider = localUserAccountProviders.find(
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
@@ -48,6 +48,5 @@ export const createClient = <
         });
     }
   }
-
   return new Client(userAccountProviders);
 };

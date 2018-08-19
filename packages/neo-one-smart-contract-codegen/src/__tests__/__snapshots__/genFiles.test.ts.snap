@@ -2,7 +2,105 @@
 
 exports[`genFiles Token 1`] = `
 Object {
-  "abi": "// tslint:disable
+  "abi": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+export const tokenABI = {
+  events: [
+    {
+      name: 'transfer',
+      parameters: [
+        {
+          name: 'from',
+          type: 'Address',
+        },
+        {
+          name: 'to',
+          type: 'Address',
+        },
+        {
+          decimals: 4,
+          name: 'amount',
+          type: 'Integer',
+        },
+      ],
+    },
+  ],
+  functions: [
+    {
+      constant: true,
+      name: 'name',
+      parameters: [],
+      returnType: {
+        type: 'String',
+      },
+    },
+    {
+      constant: true,
+      name: 'symbol',
+      parameters: [],
+      returnType: {
+        type: 'String',
+      },
+    },
+    {
+      constant: true,
+      name: 'decimals',
+      parameters: [],
+      returnType: {
+        decimals: 0,
+        type: 'Integer',
+      },
+    },
+    {
+      constant: true,
+      name: 'totalSupply',
+      parameters: [],
+      returnType: {
+        decimals: 4,
+        type: 'Integer',
+      },
+    },
+    {
+      name: 'transfer',
+      parameters: [
+        {
+          name: 'from',
+          type: 'Address',
+        },
+        {
+          name: 'to',
+          type: 'Address',
+        },
+        {
+          decimals: 4,
+          name: 'value',
+          type: 'Integer',
+        },
+      ],
+      returnType: {
+        type: 'Boolean',
+      },
+    },
+    {
+      constant: true,
+      name: 'balanceOf',
+      parameters: [
+        {
+          name: 'account',
+          type: 'Address',
+        },
+      ],
+      returnType: {
+        decimals: 4,
+        type: 'Integer',
+      },
+    },
+  ],
+};
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
 import { ABI } from '@neo-one/client';
 
 export const tokenABI: ABI = {
@@ -99,7 +197,34 @@ export const tokenABI: ABI = {
   ],
 };
 ",
-  "contract": "// tslint:disable
+  },
+  "contract": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+import { sourceMaps } from '../sourceMaps';
+import { tokenABI } from './abi';
+
+const definition = {
+  networks: {
+    main: {
+      address: 'iamahash',
+    },
+  },
+  abi: tokenABI,
+  sourceMaps,
+};
+
+export const createTokenSmartContract = (client) => client.smartContract(definition);
+
+export const createTokenReadSmartContract = (client) =>
+  client.smartContract({
+    address: definition.networks[client.dataProvider.network].address,
+    abi: definition.abi,
+    sourceMaps: definition.sourceMaps,
+  });
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
 import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';
 import { sourceMaps } from '../sourceMaps';
 import { tokenABI } from './abi';
@@ -125,7 +250,11 @@ export const createTokenReadSmartContract = (client: ReadClient): TokenReadSmart
     sourceMaps: definition.sourceMaps,
   });
 ",
-  "types": "// tslint:disable
+  },
+  "types": Object {
+    "js": undefined,
+    "ts": "// tslint:disable
+/* eslint-disable */
 import {
   AddressString,
   Event,
@@ -168,5 +297,6 @@ export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {
   readonly totalSupply: () => Promise<BigNumber>;
 }
 ",
+  },
 }
 `;

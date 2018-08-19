@@ -9,3 +9,8 @@ export interface ContractPaths {
   readonly abiPath: string;
   readonly typesPath: string;
 }
+
+export interface FileResult {
+  readonly ts: string;
+  readonly js?: string;
+}

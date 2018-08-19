@@ -6,10 +6,10 @@ describe('genGenerated', () => {
     expect(
       genGenerated({
         contractsPaths,
-        commonTypesPath: '/foo/bar/one/generated/types.ts',
-        reactPath: '/foo/bar/one/generated/react.tsx',
-        clientPath: '/foo/bar/one/generated/client.ts',
-        generatedPath: '/foo/bar/one/generated/index.ts',
+        commonTypesPath: '/foo/bar/one/generated/types.js',
+        reactPath: '/foo/bar/one/generated/react.jsx',
+        clientPath: '/foo/bar/one/generated/client.js',
+        generatedPath: '/foo/bar/one/generated/index.js',
       }),
     ).toMatchSnapshot();
   });

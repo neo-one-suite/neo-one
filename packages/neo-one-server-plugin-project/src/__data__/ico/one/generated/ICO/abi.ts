@@ -1,4 +1,5 @@
 // tslint:disable
+/* eslint-disable */
 import { ABI } from '@neo-one/client';
 
 export const icoABI: ABI = {

@@ -47,7 +47,7 @@ const getImportClauses = (text: string) => {
   return mutableClauses;
 };
 
-export const genSmartContractTypes = (name: string, abi: ABI): string => {
+export const genSmartContractTypes = (name: string, abi: ABI) => {
   const events = abi.events === undefined ? [] : abi.events;
   const text = `
 ${events.map((event) => genEvent(name, event)).join('\n')}
@@ -64,8 +64,10 @@ ${genSmartContract(name, abi)}${genReadSmartContract(name, abi)}`;
     events.length === 0 ? '{}' : events.map((event) => getSingleEventName(name, event.name)).join(' | ')
   }`;
 
-  return `${importDecl}
+  return {
+    ts: `${importDecl}
 
 ${eventType}
-${text}`;
+${text}`,
+  };
 };

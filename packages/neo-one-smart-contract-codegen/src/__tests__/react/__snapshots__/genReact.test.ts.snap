@@ -1,7 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`genReact Token 1`] = `
-"
+Object {
+  "js": "
+import * as React from 'react';
+import { createClient } from './client';
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
+
+const Context = React.createContext(undefined);
+
+export const ContractsProvider = ({ client: clientIn, children }) => {
+  const client = clientIn === undefined ? createClient() : clientIn;
+
+  return (
+    <Context.Provider
+      value={{
+        client,
+        token: createTokenSmartContract(client),
+      ico: createICOSmartContract(client),
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
+};
+
+export const WithContracts = ({ children }) => (
+  <Context.Consumer>
+    {children}
+  </Context.Consumer>
+);
+",
+  "ts": "
 import { Client } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from './types';
@@ -21,7 +52,6 @@ export interface ContractsProviderProps<TClient extends Client> {
 }
 export const ContractsProvider = <TClient extends Client>({ client: clientIn, children }: ContractsProviderProps<TClient>) => {
   const client = clientIn === undefined ? createClient() : clientIn;
-
   return (
     <Context.Provider
       value={{
@@ -43,5 +73,6 @@ export const WithContracts = <TClient extends Client>({ children }: WithContract
     {children}
   </Context.Consumer>
 );
-"
+  ",
+}
 `;

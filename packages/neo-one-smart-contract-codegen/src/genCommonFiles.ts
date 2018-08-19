@@ -5,15 +5,15 @@ import { genGenerated } from './generated';
 import { genReact } from './react';
 import { genSourceMaps } from './sourceMaps';
 import { genTest } from './test';
-import { ContractPaths } from './type';
+import { ContractPaths, FileResult } from './type';
 
 export interface CommonFilesResult {
-  readonly test: string;
-  readonly commonTypes: string;
-  readonly sourceMaps: string;
-  readonly react: string;
-  readonly client: string;
-  readonly generated: string;
+  readonly test: FileResult;
+  readonly commonTypes: FileResult;
+  readonly sourceMaps: FileResult;
+  readonly react: FileResult;
+  readonly client: FileResult;
+  readonly generated: FileResult;
 }
 
 export const genCommonFiles = ({

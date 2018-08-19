@@ -215,7 +215,7 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                           const project = getProject(ctx);
                           const networksDefinition = getSmartContractNetworksDefinitions(ctx)[contract.name];
 
-                          await generateCode(project, contract, networksDefinition);
+                          await generateCode(project, contract, networksDefinition, options.javascript);
                         },
                       }))
                       .concat([
@@ -229,6 +229,7 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                               // tslint:disable-next-line no-non-null-assertion
                               getWallet(ctx).wif!,
                               getNetworkDefinitions(ctx),
+                              options.javascript,
                             );
                           },
                         },

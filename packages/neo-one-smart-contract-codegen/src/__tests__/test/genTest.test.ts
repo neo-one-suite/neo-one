@@ -6,8 +6,8 @@ describe('genTest', () => {
     expect(
       genTest({
         contractsPaths,
-        commonTypesPath: '/foo/bar/one/generated/types.ts',
-        testPath: '/foo/bar/one/generated/test.ts',
+        commonTypesPath: '/foo/bar/one/generated/types.js',
+        testPath: '/foo/bar/one/generated/test.js',
       }),
     ).toMatchSnapshot();
   });

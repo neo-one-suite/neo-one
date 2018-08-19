@@ -2,7 +2,48 @@
 
 exports[`genCommonFiles Token 1`] = `
 Object {
-  "client": "// tslint:disable
+  "client": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+import { Client, LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider, NEOONEProvider } from '@neo-one/client';
+
+const getDefaultUserAccountProviders = (provider) => ({
+  memory: new LocalUserAccountProvider({
+    keystore: new LocalKeyStore({ store: new LocalMemoryStore() }),
+    provider,
+  }),
+});
+
+const isLocalUserAccountProvider = (userAccountProvider) => userAccountProvider instanceof LocalUserAccountProvider;
+
+export const createClient = (getUserAccountProviders = getDefaultUserAccountProviders) => {
+  const provider = new NEOONEProvider([{ network: 'local', rpcURL: 'http://localhost:4500/rpc' }]);
+  const userAccountProviders = getUserAccountProviders(provider);
+
+  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
+  const localUserAccountProvider = localUserAccountProviders.find(
+    (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
+  );
+  if (localUserAccountProvider !== undefined) {
+    const localKeyStore = localUserAccountProvider.keystore;
+    if (localKeyStore instanceof LocalKeyStore) {
+      localKeyStore
+        .addAccount({
+          network: 'local',
+          name: 'master',
+          privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
+        })
+        .catch(() => {
+          // do nothing
+        });
+    }
+  }
+
+  return new Client(userAccountProviders);
+};
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
 import {
   Client,
   LocalKeyStore,
@@ -33,7 +74,6 @@ export const createClient = <
 ): Client<TUserAccountProviders> => {
   const provider = new NEOONEProvider([{ network: 'local', rpcURL: 'http://localhost:4500/rpc' }]);
   const userAccountProviders = getUserAccountProviders(provider);
-
   const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
   const localUserAccountProvider = localUserAccountProviders.find(
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
@@ -52,11 +92,14 @@ export const createClient = <
         });
     }
   }
-
   return new Client(userAccountProviders);
 };
 ",
-  "commonTypes": "// tslint:disable
+  },
+  "commonTypes": Object {
+    "js": undefined,
+    "ts": "// tslint:disable
+/* eslint-disable */
 import { ICOSmartContract } from './ICO/types';
 import { TokenSmartContract } from './Token/types';
 
@@ -65,7 +108,19 @@ export interface Contracts {
   readonly token: TokenSmartContract;
 }
 ",
-  "generated": "// tslint:disable
+  },
+  "generated": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+export * from './react';
+export * from './client';
+export * from './Token/contract';
+export * from './Token/abi';
+export * from './ICO/contract';
+export * from './ICO/abi';
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
 export * from './types';
 export * from './react';
 export * from './client';
@@ -76,7 +131,37 @@ export * from './ICO/contract';
 export * from './ICO/types';
 export * from './ICO/abi';
 ",
-  "react": "// tslint:disable
+  },
+  "react": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+import * as React from 'react';
+import { createClient } from './client';
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
+
+const Context = React.createContext(undefined);
+
+export const ContractsProvider = ({ client: clientIn, children }) => {
+  const client = clientIn === undefined ? createClient() : clientIn;
+
+  return (
+    <Context.Provider
+      value={{
+        client,
+        token: createTokenSmartContract(client),
+        ico: createICOSmartContract(client),
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
+};
+
+export const WithContracts = ({ children }) => <Context.Consumer>{children}</Context.Consumer>;
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
 import { Client } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from './types';
@@ -99,7 +184,6 @@ export const ContractsProvider = <TClient extends Client>({
   children,
 }: ContractsProviderProps<TClient>) => {
   const client = clientIn === undefined ? createClient() : clientIn;
-
   return (
     <Context.Provider
       value={{
@@ -120,11 +204,40 @@ export const WithContracts = <TClient extends Client>({ children }: WithContract
   <Context.Consumer>{children}</Context.Consumer>
 );
 ",
-  "sourceMaps": "// tslint:disable
+  },
+  "sourceMaps": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+let sourceMapsIn = {};
+
+if (process.env.NODE_ENV !== 'production') {
+  const token = {
+    file: 'file',
+    mappings: 'sourcemap',
+    names: [],
+    sources: [],
+    version: 0,
+  };
+  const ico = {
+    file: 'file',
+    mappings: 'sourcemap',
+    names: [],
+    sources: [],
+    version: 0,
+  };
+  sourceMapsIn = {
+    AV6PhAq1FHBeCMsNUPMWzpUFxvXRFwHoLn: token,
+    ATfAohZQ5iuGDXWjcHxLAj8WXwQchGLXhi: ico,
+  };
+}
+
+export const sourceMaps = sourceMapsIn;
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
 import { SourceMaps } from '@neo-one/client';
 
 let sourceMapsIn: SourceMaps = {};
-
 if (process.env.NODE_ENV !== 'production') {
   const token: any = {
     file: 'file',
@@ -148,7 +261,25 @@ if (process.env.NODE_ENV !== 'production') {
 
 export const sourceMaps = sourceMapsIn;
 ",
-  "test": "// tslint:disable
+  },
+  "test": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+import { withContracts as withContractsBase } from '@neo-one/smart-contract-test';
+import * as path from 'path';
+
+export const withContracts = async (test, options) =>
+  withContractsBase(
+    [
+      { name: 'Token', filePath: path.resolve(__dirname, '../contracts/Token.ts') },
+      { name: 'ICO', filePath: path.resolve(__dirname, '../contracts/ICO.ts') },
+    ],
+    test,
+    options,
+  );
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
 import { TestOptions, withContracts as withContractsBase, WithContractsOptions } from '@neo-one/smart-contract-test';
 import * as path from 'path';
 import { Contracts } from './types';
@@ -166,5 +297,6 @@ export const withContracts = async (
     options,
   );
 ",
+  },
 }
 `;

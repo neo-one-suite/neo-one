@@ -1,4 +1,5 @@
 // tslint:disable
+/* eslint-disable */
 import { ICOSmartContract } from './ICO/types';
 import { TokenSmartContract } from './Token/types';
 

@@ -1,8 +1,8 @@
 // tslint:disable
+/* eslint-disable */
 import { SourceMaps } from '@neo-one/client';
 
 let sourceMapsIn: SourceMaps = {};
-
 if (process.env.NODE_ENV !== 'production') {
   const token: any = {
     mappings:

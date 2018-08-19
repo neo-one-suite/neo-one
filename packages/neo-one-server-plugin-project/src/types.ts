@@ -3,6 +3,7 @@ import * as path from 'path';
 export interface BuildTaskListOptions {
   readonly command: 'build';
   readonly rootDir: string;
+  readonly javascript: boolean;
 }
 
 export type ExecuteTaskListOptions = BuildTaskListOptions;

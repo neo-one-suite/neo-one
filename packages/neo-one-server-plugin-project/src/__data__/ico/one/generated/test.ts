@@ -1,4 +1,5 @@
 // tslint:disable
+/* eslint-disable */
 import { TestOptions, withContracts as withContractsBase, WithContractsOptions } from '@neo-one/smart-contract-test';
 import * as path from 'path';
 import { Contracts } from './types';

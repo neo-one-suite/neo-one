@@ -1,7 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`genGenerated Token 1`] = `
-"
+Object {
+  "js": "
+export * from './react';
+export * from './client';
+export * from './Token/contract';
+export * from './Token/abi';
+export * from './ICO/contract';
+export * from './ICO/abi';
+",
+  "ts": "
 export * from './types';
 export * from './react';
 export * from './client';
@@ -11,5 +20,6 @@ export * from './Token/abi';
 export * from './ICO/contract';
 export * from './ICO/types';
 export * from './ICO/abi';
-"
+",
+}
 `;

@@ -12,8 +12,43 @@ export const genReact = ({
   readonly reactPath: string;
   readonly commonTypesPath: string;
   readonly clientPath: string;
-}): string =>
-  `
+}) => ({
+  js: `
+import * as React from 'react';
+import { createClient } from '${getRelativeImport(reactPath, clientPath)}';
+${contractsPaths
+    .map(
+      ({ name, createContractPath }) =>
+        `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(reactPath, createContractPath)}';`,
+    )
+    .join('\n')}
+
+const Context = React.createContext(undefined);
+
+export const ContractsProvider = ({ client: clientIn, children }) => {
+  const client = clientIn === undefined ? createClient() : clientIn;
+
+  return (
+    <Context.Provider
+      value={{
+        client,
+        ${contractsPaths
+          .map(({ name }) => `${lowerCaseFirst(name)}: ${getCreateSmartContractName(name)}(client),`)
+          .join('\n      ')}
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
+};
+
+export const WithContracts = ({ children }) => (
+  <Context.Consumer>
+    {children}
+  </Context.Consumer>
+);
+`,
+  ts: `
 import { Client } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from '${getRelativeImport(reactPath, commonTypesPath)}';
@@ -37,7 +72,6 @@ export interface ContractsProviderProps<TClient extends Client> {
 }
 export const ContractsProvider = <TClient extends Client>({ client: clientIn, children }: ContractsProviderProps<TClient>) => {
   const client = clientIn === undefined ? createClient() : clientIn;
-
   return (
     <Context.Provider
       value={{
@@ -60,4 +94,5 @@ export const WithContracts = <TClient extends Client>({ children }: WithContract
     {children}
   </Context.Consumer>
 );
-`;
+  `,
+});

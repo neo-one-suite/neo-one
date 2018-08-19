@@ -6,7 +6,7 @@ describe('genCommonTypes', () => {
     expect(
       genCommonTypes({
         contractsPaths,
-        commonTypesPath: '/foo/bar/one/generated/types.ts',
+        commonTypesPath: '/foo/bar/one/generated/types.js',
       }),
     ).toMatchSnapshot();
   });
