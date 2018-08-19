@@ -27,6 +27,7 @@ import {
   SmartContractDefinition,
   SmartContractNetworkDefinition,
   SmartContractNetworksDefinition,
+  SourceMaps,
   TransactionOptions,
   Transfer,
   UpdateAccountNameOptions,
@@ -548,6 +549,18 @@ const assertSmartContractNetworksDefinition = (name: string, value?: unknown): S
   ) as SmartContractNetworksDefinition;
 };
 
+const assertSourceMaps = (name: string, value?: unknown): SourceMaps | undefined => {
+  if (value == undefined) {
+    return undefined;
+  }
+
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('SourceMaps', name, value);
+  }
+
+  return _.mapKeys(value, (_value, key) => assertAddress('SourceMaps[key]', key));
+};
+
 export const assertSmartContractDefinition = (name: string, value?: unknown): SmartContractDefinition => {
   if (!isObject(value)) {
     throw new InvalidArgumentError('SmartContractDefinition', name, value);
@@ -556,8 +569,7 @@ export const assertSmartContractDefinition = (name: string, value?: unknown): Sm
   return {
     networks: assertProperty(value, 'SmartContractDefinition', 'networks', assertSmartContractNetworksDefinition),
     abi: assertProperty(value, 'SmartContractDefinition', 'abi', assertABI),
-    // tslint:disable-next-line no-any
-    sourceMap: (value as any).sourceMap,
+    sourceMaps: assertProperty(value, 'SmartContractDefinition', 'sourceMaps', assertSourceMaps),
   };
 };
 
@@ -569,8 +581,7 @@ export const assertReadSmartContractDefinition = (name: string, value?: unknown)
   return {
     address: assertProperty(value, 'ReadSmartContractDefinition', 'address', assertAddress),
     abi: assertProperty(value, 'ReadSmartContractDefinition', 'abi', assertABI),
-    // tslint:disable-next-line no-any
-    sourceMap: (value as any).sourceMap,
+    sourceMaps: assertProperty(value, 'ReadSmartContractDefinition', 'sourceMaps', assertSourceMaps),
   };
 };
 

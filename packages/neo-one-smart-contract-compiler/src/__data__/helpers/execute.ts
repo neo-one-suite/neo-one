@@ -1,7 +1,5 @@
-import { CallReceiptJSON } from '@neo-one/client-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import * as appRootDir from 'app-root-dir';
-import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../../Context';
 import { createContextForPath, createContextForSnippet } from '../../createContext';
@@ -16,25 +14,19 @@ const execute = async (
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
 ) => {
   const monitor = getMonitor();
-  const { receipt, sourceMap } = await executeScript(monitor, context, sourceFile, options);
-  await checkResult(receipt, sourceMap);
+  const { receipt, sourceMaps } = await executeScript(monitor, context, sourceFile, options);
+  await checkResult(receipt, sourceMaps);
 
-  return { receipt, sourceMap };
+  return { receipt, sourceMaps };
 };
 
-export const executeString = async (
-  code: string,
-  options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
-): Promise<{ readonly receipt: CallReceiptJSON; readonly sourceMap: RawSourceMap }> => {
+export const executeString = async (code: string, options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT) => {
   const { context, sourceFile } = createContextForSnippet(code, { withTestHarness: true });
 
   return execute(context, sourceFile, options);
 };
 
-export const executeSnippet = async (
-  snippetPath: string,
-  options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
-): Promise<{ readonly receipt: CallReceiptJSON; readonly sourceMap: RawSourceMap }> => {
+export const executeSnippet = async (snippetPath: string, options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT) => {
   const filePath = pathResolve(
     appRootDir.get(),
     'packages',

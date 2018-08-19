@@ -10,6 +10,7 @@
     "@neo-one/node": "^1.0.0-alpha.104",
     "@neo-one/node-neo-settings": "^1.0.0-alpha.69",
     "@neo-one/smart-contract-compiler": "^1.0.0-alpha.43",
+    "change-case": "^3.0.2",
     "lodash": "^4.17.10",
     "memdown": "^3.0.0",
     "rxjs": "^6.2.2",

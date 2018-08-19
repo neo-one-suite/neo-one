@@ -1,0 +1,123 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SmartContract.for reports error on any parameter 1`] = `
+"snippetCode.ts (5,11): Could not infer type. Please add an explicit type annotation.
+
+      3 | 
+      4 |         interface Foo {
+    > 5 |           bar(value: any): number | undefined;
+        |           ^
+      6 |         }
+      7 | 
+      8 |         const sc = SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+"
+`;
+
+exports[`SmartContract.for reports error on any properties 1`] = `
+"snippetCode.ts (8,43): Argument of type 'Address' is not assignable to parameter of type 'never'.
+
+       6 |         }
+       7 | 
+    >  8 |         const sc = SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+         |                                           ^
+       9 |         sc.bar(0);
+      10 |       
+"
+`;
+
+exports[`SmartContract.for reports error on any return 1`] = `
+"snippetCode.ts (5,11): Could not infer type. Please add an explicit type annotation.
+
+      3 | 
+      4 |         interface Foo {
+    > 5 |           bar(value: number): any;
+        |           ^
+      6 |         }
+      7 | 
+      8 |         const sc = SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+"
+`;
+
+exports[`SmartContract.for reports error on any smart contract type 1`] = `
+"snippetCode.ts (4,20): Could not infer type. Please add an explicit type annotation.
+
+      2 |         import { Address, SmartContract } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |         const sc = SmartContract.for<any>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+        |                    ^
+      5 |         sc.bar(0);
+      6 |       
+"
+`;
+
+exports[`SmartContract.for reports error on invalid argument return - Object 1`] = `
+"snippetCode.ts (12,32): Argument of type 'Address' is not assignable to parameter of type 'never'.
+
+      10 |         }
+      11 | 
+    > 12 |         SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+         |                                ^
+      13 |       
+"
+`;
+
+exports[`SmartContract.for reports error on invalid argument return - union string | number 1`] = `
+"snippetCode.ts (5,11): Expected type to resolve to one known type
+
+      3 | 
+      4 |         interface Foo {
+    > 5 |           bar(value: number): number | string;
+        |           ^
+      6 |         }
+      7 | 
+      8 |         const sc = SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+"
+`;
+
+exports[`SmartContract.for reports error on invalid argument values - Object 1`] = `
+"snippetCode.ts (12,32): Argument of type 'Address' is not assignable to parameter of type 'never'.
+
+      10 |         }
+      11 | 
+    > 12 |         SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+         |                                ^
+      13 |       
+"
+`;
+
+exports[`SmartContract.for reports error on invalid argument values - optional Object 1`] = `
+"snippetCode.ts (12,32): Argument of type 'Address' is not assignable to parameter of type 'never'.
+
+      10 |         }
+      11 | 
+    > 12 |         SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+         |                                ^
+      13 |       
+"
+`;
+
+exports[`SmartContract.for reports error on missing return 1`] = `
+"snippetCode.ts (5,11): 'bar', which lacks return-type annotation, implicitly has an 'any' return type.
+
+      3 | 
+      4 |         interface Foo {
+    > 5 |           bar(value: number);
+        |           ^
+      6 |         }
+      7 | 
+      8 |         const sc = SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
+"
+`;
+
+exports[`SmartContract.for reports error on multiple call signatures 1`] = `
+"snippetCode.ts (5,11): Found multiple call signatures for property. Only one call signature is allowed.
+
+      3 | 
+      4 |         interface Foo {
+    > 5 |           bar(value: number): number | undefined;
+        |           ^
+      6 |           bar(value: string): string | undefined;
+      7 |         }
+      8 | 
+"
+`;

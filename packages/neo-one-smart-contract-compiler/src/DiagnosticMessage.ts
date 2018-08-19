@@ -32,4 +32,6 @@ export enum DiagnosticMessage {
   EventNotifierArguments = 'The arguments to createEventNotifier must be string literals.',
   InvalidBuiltinCallArgument = 'Call parameter is ambiguous in relation to the provided argument.',
   InvalidBuiltinAssignment = 'Assignment (%s => %s) is ambiguous in relation to the provided expression.',
+  InvalidLinkedSmartContractDeclaration = 'Expected a valid declaration for a linked smart contract.',
+  InvalidLinkedSmartContractMissing = 'Missing linked smart contract dependency %s',
 }

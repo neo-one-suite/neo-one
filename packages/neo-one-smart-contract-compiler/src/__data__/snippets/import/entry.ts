@@ -4,6 +4,7 @@ import baz from './baz';
 import { foo } from './foo';
 import { Address, foo as foo2, Foo2SmartContract, SmartContract } from './foo2';
 import incrementValue, { value } from './qux';
+import { FooType } from './type';
 
 if (foo !== 'foo') {
   throw 'Failure';
@@ -41,7 +42,11 @@ if (baz !== 'baz') {
   throw 'Failure';
 }
 
-class Qux extends SmartContract {}
+class Qux extends SmartContract {
+  public useFooType(fooType: FooType): string {
+    return fooType.bar;
+  }
+}
 const qux = new Qux();
 
 if (qux.foo !== 'foo') {

@@ -13,10 +13,12 @@ import { add as addHash256 } from './hash256';
 import { add as addHeader } from './header';
 import { add as addInput } from './input';
 import { add as addInternal } from './internal';
+import { add as addLinkedSmartContract } from './linkedSmartContract';
 import { add as addMapStorage } from './mapStorage';
 import { add as addOutput } from './output';
 import { add as addPublicKey } from './publicKey';
 import { add as addSetStorage } from './setStorage';
+import { add as addSmartContract } from './smartContract';
 import { add as addTransaction } from './transaction';
 import { add as addTransactionType } from './transactionType';
 
@@ -42,4 +44,6 @@ export const add = (builtins: Builtins): void => {
   addCreateEventNotifier(builtins);
   addHeader(builtins);
   addTransactionType(builtins);
+  addSmartContract(builtins);
+  addLinkedSmartContract(builtins);
 };

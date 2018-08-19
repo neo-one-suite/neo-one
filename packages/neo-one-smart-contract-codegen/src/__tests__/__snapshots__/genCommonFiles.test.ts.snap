@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`genCommonFiles Token 1`] = `
+Object {
+  "commonTypes": "// tslint:disable
+import { ICOSmartContract } from './ICO/types';
+import { TokenSmartContract } from './Token/types';
+
+export interface Contracts {
+  readonly ico: ICOSmartContract;
+  readonly token: TokenSmartContract;
+}
+",
+  "sourceMaps": "// tslint:disable
+import { SourceMaps } from '@neo-one/client';
+
+let sourceMapsIn: SourceMaps = {};
+
+if (process.env.NODE_ENV !== 'production') {
+  const token: any = {
+    file: 'file',
+    mappings: 'sourcemap',
+    names: [],
+    sources: [],
+    version: 0,
+  };
+  const ico: any = {
+    file: 'file',
+    mappings: 'sourcemap',
+    names: [],
+    sources: [],
+    version: 0,
+  };
+  sourceMapsIn = {
+    AV6PhAq1FHBeCMsNUPMWzpUFxvXRFwHoLn: token,
+    ATfAohZQ5iuGDXWjcHxLAj8WXwQchGLXhi: ico,
+  };
+}
+
+export const sourceMaps = sourceMapsIn;
+",
+  "test": "// tslint:disable
+import { TestOptions, withContracts as withContractsBase, WithContractsOptions } from '@neo-one/smart-contract-test';
+import * as path from 'path';
+import { Contracts } from './types';
+
+export const withContracts = async (
+  test: (contracts: Contracts & TestOptions) => Promise<void>,
+  options?: WithContractsOptions,
+): Promise<void> =>
+  withContractsBase<Contracts>(
+    [
+      { name: 'Token', filePath: path.resolve(__dirname, '../contracts/Token.ts') },
+      { name: 'ICO', filePath: path.resolve(__dirname, '../contracts/ICO.ts') },
+    ],
+    test,
+    options,
+  );
+",
+}
+`;

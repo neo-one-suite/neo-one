@@ -1,6 +1,5 @@
 import { SmartContractNetworksDefinition } from '@neo-one/client';
 import stringify from 'safe-stable-stringify';
-import { RawSourceMap } from 'source-map';
 import { getABIName } from '../abi';
 import { getReadSmartContractName, getSmartContractName } from '../types';
 import { getRelativeImport } from '../utils';
@@ -11,31 +10,38 @@ export const genContract = ({
   name,
   createContractPath,
   typesPath,
+  sourceMapsPath,
   abiPath,
   networksDefinition,
-  sourceMap,
 }: {
   readonly name: string;
   readonly createContractPath: string;
   readonly typesPath: string;
   readonly abiPath: string;
+  readonly sourceMapsPath: string;
   readonly networksDefinition: SmartContractNetworksDefinition;
-  readonly sourceMap: RawSourceMap;
 }): string => {
   const relativeTypes = getRelativeImport(createContractPath, typesPath);
   const smartContract = getSmartContractName(name);
   const readSmartContract = getReadSmartContractName(name);
   const relativeABI = getRelativeImport(createContractPath, abiPath);
+  const relativeSourceMaps = getRelativeImport(createContractPath, sourceMapsPath);
   const abiName = getABIName(name);
+  const sourceMapsImport = `\nimport { sourceMaps } from '${relativeSourceMaps}';`;
 
   return `
-import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';
+import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';${
+    abiName >= 'sourceMaps' ? sourceMapsImport : ''
+  }
 import { ${abiName} } from '${relativeABI}';
-import { ${readSmartContract}, ${smartContract} } from '${relativeTypes}';
+import { ${readSmartContract}, ${smartContract} } from '${relativeTypes}';${
+    abiName >= 'sourceMaps' ? '' : sourceMapsImport
+  }
 
 const definition: SmartContractDefinition = {
   networks: ${stringify(networksDefinition, undefined, 2)},
   abi: ${abiName},
+  sourceMaps,
 };
 
 export const ${getCreateSmartContractName(name)} = (
@@ -47,11 +53,7 @@ export const ${getCreateReadSmartContractName(name)} = (
 ): ${readSmartContract} => client.smartContract<${readSmartContract}>({
   address: definition.networks[client.dataProvider.network].address,
   abi: definition.abi,
-  sourceMap: definition.sourceMap,
+  sourceMaps: definition.sourceMaps,
 });
-
-if (process.env.NODE_ENV !== 'production') {
-  (definition as any).sourceMap = ${stringify(sourceMap, undefined, 2)}
-}
 `;
 };

@@ -3,12 +3,12 @@ import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
-import { compile } from './compile';
+import { compile, WithLinked } from './compile';
 import { createContextForPath, updateContext } from './createContext';
 import { transpile } from './transpile';
 import { normalizePath } from './utils';
 
-export interface CompileContractOptions {
+export interface CompileContractOptions extends WithLinked {
   readonly filePath: string;
   readonly name: string;
 }
@@ -20,7 +20,11 @@ export interface CompileContractResult {
   readonly sourceMap: Promise<RawSourceMap>;
 }
 
-export const compileContract = ({ filePath: filePathIn, name }: CompileContractOptions): CompileContractResult => {
+export const compileContract = ({
+  filePath: filePathIn,
+  name,
+  linked,
+}: CompileContractOptions): CompileContractResult => {
   const filePath = normalizePath(filePathIn);
   const transpileContext = createContextForPath(filePath);
   const smartContract = tsUtils.statement.getClassOrThrow(
@@ -33,6 +37,7 @@ export const compileContract = ({ filePath: filePathIn, name }: CompileContractO
   const { code, sourceMap: finalSourceMap, features } = compile({
     sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
     context,
+    linked,
     sourceMaps: _.mapValues(sourceFiles, ({ sourceMap }) => sourceMap),
   });
 

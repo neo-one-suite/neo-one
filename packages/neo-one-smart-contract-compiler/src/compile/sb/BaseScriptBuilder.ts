@@ -2,10 +2,13 @@ import {
   BinaryWriter,
   ByteBuffer,
   ByteCode,
+  common,
+  crypto,
   Op,
   OpCode,
   ScriptBuilder as ClientScriptBuilder,
   SysCallName,
+  UInt160,
   UnknownOpError,
   utils,
 } from '@neo-one/client-core';
@@ -15,6 +18,8 @@ import { BN } from 'bn.js';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../../Context';
+import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { declarations } from '../declaration';
 import { expressions } from '../expression';
 import { files } from '../file';
@@ -23,7 +28,7 @@ import { NodeCompiler } from '../NodeCompiler';
 import { Call, DeferredProgramCounter, Jmp, Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
 import { statements } from '../statement';
-import { Features, ScriptBuilderResult, VisitOptions } from '../types';
+import { Features, LinkedContracts, ScriptBuilderResult, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 import { resolveJumps } from './resolveJumps';
 import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode, SingleBytecodeValue, Tags } from './ScriptBuilder';
@@ -55,6 +60,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     public readonly context: Context,
     public readonly helpers: Helpers,
     private readonly sourceFile: ts.SourceFile,
+    private readonly linked: LinkedContracts = {},
     private readonly allHelpers: ReadonlyArray<Helper> = [],
   ) {
     this.compilers = compilers
@@ -380,6 +386,35 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     this.mutablePC = originalPC;
 
     return { length: capturedLength, bytecode: capturedBytecode };
+  }
+
+  public getLinkedScriptHash(node: ts.Node, filePath: string, smartContractClass: string): UInt160 | undefined {
+    const reportError = () => {
+      this.context.reportError(
+        node,
+        DiagnosticCode.InvalidLinkedSmartContract,
+        DiagnosticMessage.InvalidLinkedSmartContractMissing,
+        smartContractClass,
+      );
+    };
+    const fileLinked = this.linked[filePath] as { [smartContractClass: string]: string } | undefined;
+    if (fileLinked === undefined) {
+      reportError();
+
+      return undefined;
+    }
+
+    const address = fileLinked[smartContractClass] as string | undefined;
+    if (address === undefined) {
+      reportError();
+
+      return undefined;
+    }
+
+    return crypto.addressToScriptHash({
+      addressVersion: common.NEO_ADDRESS_VERSION,
+      address,
+    });
   }
 
   public pushValueOptions(options: VisitOptions): VisitOptions {

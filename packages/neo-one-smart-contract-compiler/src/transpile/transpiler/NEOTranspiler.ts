@@ -503,6 +503,7 @@ export class NEOTranspiler implements Transpiler {
 
     const mutableVerifySwitches: Switch[] = [];
     const mutableApplicationSwitches: Switch[] = [];
+    const mutableApplicationVerifySwitches: Switch[] = [];
     const mutableFunctions: ABIFunction[] = [];
     methods.forEach(([method, func]) => {
       const name = ts.isConstructorDeclaration(method)
@@ -583,6 +584,8 @@ export class NEOTranspiler implements Transpiler {
       mutableApplicationSwitches.push(value);
       if (func.verify) {
         mutableVerifySwitches.push(value);
+      } else {
+        mutableApplicationVerifySwitches.push(value);
       }
 
       mutableFunctions.push(func);
@@ -626,6 +629,18 @@ export class NEOTranspiler implements Transpiler {
         ifStatements[0].original,
       );
     }
+
+    const skipSwitch: Switch = {
+      statement: ts.createIf(
+        ts.createCall(
+          ts.createIdentifier(this.getInternalIdentifier(this.smartContract, 'shouldSkipVerify')),
+          undefined,
+          undefined,
+        ),
+        makeIfElse(mutableApplicationVerifySwitches, applicationFallback),
+      ),
+      original: this.smartContract,
+    };
 
     const statements = [
       tsUtils.setOriginalRecursive(
@@ -681,7 +696,7 @@ export class NEOTranspiler implements Transpiler {
               ts.SyntaxKind.EqualsEqualsEqualsToken,
               ts.createNumericLiteral(`${0x00}`),
             ),
-            makeIfElse(mutableVerifySwitches, verifyFallback),
+            makeIfElse(mutableVerifySwitches.concat([skipSwitch]), verifyFallback),
             ts.createThrow(
               ts.createNew(ts.createIdentifier('Error'), undefined, [ts.createStringLiteral('Unsupported trigger')]),
             ),

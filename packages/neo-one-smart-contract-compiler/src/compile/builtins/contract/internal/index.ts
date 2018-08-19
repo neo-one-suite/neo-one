@@ -7,6 +7,7 @@ import { DoReturn } from './doReturn';
 import { GetArgument } from './getArgument';
 import { GetStorage } from './getStorage';
 import { PutStorage } from './putStorage';
+import { ShouldSkipVerify } from './shouldSkipVerify';
 
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
@@ -18,4 +19,5 @@ export const add = (builtins: Builtins): void => {
   builtins.addInternalValue('getStorage', new GetStorage());
   builtins.addInternalValue('putStorage', new PutStorage());
   builtins.addInternalValue('trigger', new SysCallValue('Neo.Runtime.GetTrigger', Types.Number));
+  builtins.addInternalValue('shouldSkipVerify', new ShouldSkipVerify());
 };

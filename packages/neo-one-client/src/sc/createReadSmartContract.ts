@@ -4,7 +4,6 @@ import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciter
 import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/filter';
 import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import BigNumber from 'bignumber.js';
-import { RawSourceMap } from 'source-map';
 import { ReadClient } from '../ReadClient';
 import {
   ABIEvent,
@@ -19,6 +18,7 @@ import {
   RawAction,
   ReadSmartContractAny,
   ReadSmartContractDefinition,
+  SourceMaps,
   StorageItem,
 } from '../types';
 import * as common from './common';
@@ -53,12 +53,12 @@ const createCall = ({
   address,
   client,
   func: { name, parameters = [], returnType },
-  sourceMap,
+  sourceMaps,
 }: {
   readonly address: AddressString;
   readonly client: ReadClient;
   readonly func: ABIFunction;
-  readonly sourceMap?: RawSourceMap;
+  readonly sourceMaps?: SourceMaps;
   // tslint:disable-next-line no-any
 }) => async (...args: any[]): Promise<Param | undefined> => {
   const { params, monitor } = getParams({
@@ -68,7 +68,7 @@ const createCall = ({
 
   const receipt = await client.__call(address, name, params, monitor);
 
-  return common.convertCallResult({ returnType, result: receipt.result, actions: receipt.actions, sourceMap });
+  return common.convertCallResult({ returnType, result: receipt.result, actions: receipt.actions, sourceMaps });
 };
 
 export const createReadSmartContract = ({
@@ -81,7 +81,7 @@ export const createReadSmartContract = ({
   const {
     address,
     abi: { events: abiEvents = [], functions },
-    sourceMap,
+    sourceMaps,
   } = definition;
   const events = abiEvents.reduce<{ [key: string]: ABIEvent }>(
     (acc, event) => ({
@@ -130,7 +130,7 @@ export const createReadSmartContract = ({
       func.constant === true
         ? {
             ...acc,
-            [func.name]: createCall({ client, address, func, sourceMap }),
+            [func.name]: createCall({ client, address, func, sourceMaps }),
           }
         : acc,
     {

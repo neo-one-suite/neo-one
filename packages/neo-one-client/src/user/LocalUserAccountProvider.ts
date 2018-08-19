@@ -22,13 +22,12 @@ import {
   utils,
   Witness as WitnessModel,
 } from '@neo-one/client-core';
-import { processActionsAndMessage } from '@neo-one/client-switch';
+import { processActionsAndMessage, processError } from '@neo-one/client-switch';
 import { Counter, Histogram, Labels, metrics, Monitor } from '@neo-one/monitor';
 import { labels as labelNames, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { Observable } from 'rxjs';
-import { RawSourceMap } from 'source-map';
 import {
   FundsInUseError,
   InsufficientFundsError,
@@ -71,6 +70,7 @@ import {
   RawInvocationResultSuccess,
   RawInvokeReceipt,
   RegisterAssetReceipt,
+  SourceMaps,
   Transaction,
   TransactionOptions,
   TransactionReceipt,
@@ -382,7 +382,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     abi: ABI,
     params: ReadonlyArray<Param>,
     options?: TransactionOptions,
-    sourceMap?: RawSourceMap,
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<PublishReceipt>> {
     return this.publishBase(
       'publish',
@@ -402,7 +402,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           sb.emitOp('THROWIFNOT');
         }
       },
-      sourceMap,
+      sourceMaps,
       options,
     );
   }
@@ -508,7 +508,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
     options: InvokeTransactionOptions = {},
-    sourceMap?: RawSourceMap,
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt>> {
     const { attributes = [] } = options;
 
@@ -564,7 +564,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       labels: {
         [labelNames.INVOKE_METHOD]: method,
       },
-      sourceMap,
+      sourceMaps,
     });
   }
 
@@ -630,7 +630,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   public async __execute(
     script: BufferString,
     options?: InvokeTransactionOptions,
-    sourceMap?: RawSourceMap,
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     return this.invokeRaw({
       script: Buffer.from(script, 'hex'),
@@ -643,7 +643,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         actions: data.actions,
       }),
       method: 'execute',
-      sourceMap,
+      sourceMaps,
     });
   }
 
@@ -671,12 +671,12 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   private async getInvocationResultError(
     data: RawInvocationData,
     result: RawInvocationResultError,
-    sourceMap?: RawSourceMap,
+    sourceMaps: SourceMaps = {},
   ): Promise<InvocationResultError> {
     const message = await processActionsAndMessage({
       actions: data.actions,
       message: result.message,
-      sourceMap,
+      sourceMaps,
     });
 
     return {
@@ -700,7 +700,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     method: string,
     contractIn: ContractRegister,
     emit: (sb: ScriptBuilder) => void,
-    sourceMap?: RawSourceMap,
+    sourceMaps: SourceMaps = {},
     options?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt>> {
     const contract = new ContractModel({
@@ -740,7 +740,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       onConfirm: async ({ receipt, data }): Promise<PublishReceipt> => {
         let result;
         if (data.result.state === 'FAULT') {
-          result = await this.getInvocationResultError(data, data.result, sourceMap);
+          result = await this.getInvocationResultError(data, data.result, sourceMaps);
         } else {
           const createdContract = data.contracts[0] as Contract | undefined;
           if (createdContract === undefined) {
@@ -771,7 +771,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     method,
     scripts = [],
     labels = {},
-    sourceMap,
+    sourceMaps,
   }: {
     readonly script: Buffer;
     readonly options?: TransactionOptions | InvokeTransactionOptions;
@@ -785,7 +785,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly method: string;
     readonly scripts?: ReadonlyArray<WitnessModel>;
     readonly labels?: Labels;
-    readonly sourceMap?: RawSourceMap;
+    readonly sourceMaps?: SourceMaps;
   }): Promise<TransactionResult<T, InvocationTransaction>> {
     const { from, attributes: attributesIn, networkFee, monitor } = this.getTransactionOptions(options);
 
@@ -825,7 +825,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           const message = await processActionsAndMessage({
             actions: callReceipt.actions,
             message: callReceipt.result.message,
-            sourceMap,
+            sourceMaps,
           });
           throw new InvokeError(message);
         }
@@ -848,17 +848,30 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           scripts,
         });
 
-        return this.sendTransaction<T, InvocationTransaction>({
-          from,
-          inputs,
-          transaction: invokeTransaction,
-          onConfirm: async ({ transaction, receipt }) => {
-            const data = await this.provider.getInvocationData(from.network, transaction.hash);
+        try {
+          // tslint:disable-next-line prefer-immediate-return
+          const result = await this.sendTransaction<T, InvocationTransaction>({
+            from,
+            inputs,
+            transaction: invokeTransaction,
+            onConfirm: async ({ transaction, receipt }) => {
+              const data = await this.provider.getInvocationData(from.network, transaction.hash);
 
-            return onConfirm({ transaction, receipt, data });
-          },
-          monitor: span,
-        });
+              return onConfirm({ transaction, receipt, data });
+            },
+            monitor: span,
+          });
+
+          // tslint:disable-next-line:no-var-before-return
+          return result;
+        } catch (error) {
+          const message = await processError({
+            message: error.message,
+            sourceMaps,
+          });
+
+          throw new Error(message);
+        }
       },
       {
         name: 'neo_invoke_raw',

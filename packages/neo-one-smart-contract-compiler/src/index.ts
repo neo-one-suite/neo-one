@@ -1,5 +1,6 @@
 import * as path from 'path';
 import ts from 'typescript';
+import { LinkedContracts } from './compile/types';
 import { compileContract as compileContractBase, CompileContractResult } from './compileContract';
 import { getSemanticDiagnostics as getSemanticDiagnosticsBase } from './getSemanticDiagnostics';
 import { throwOnDiagnosticErrorOrWarning } from './utils';
@@ -13,19 +14,15 @@ export const getSemanticDiagnostics = (
 export const compileContract = (
   filePath: string,
   contractName: string,
+  linked: LinkedContracts = {},
   ignoreWarnings = false,
 ): CompileContractResult => {
-  const result = compileContractBase({ filePath, name: contractName });
+  const result = compileContractBase({ filePath, name: contractName, linked });
 
   throwOnDiagnosticErrorOrWarning(result.diagnostics, ignoreWarnings);
 
   return result;
 };
 
-export interface SetupContractTestOptions {
-  readonly ignoreWarnings?: boolean;
-  readonly deploy?: boolean;
-}
-
-export { CompileContractResult };
+export { CompileContractResult, LinkedContracts };
 export { scan, Contracts } from './scan';

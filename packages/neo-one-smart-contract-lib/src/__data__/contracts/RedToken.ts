@@ -13,7 +13,7 @@ export class RedToken extends SimpleToken {
   };
 
   public constructor(
-    owner: Address = Address.from('0xd6ed345f7cf3ea8c980132ddacb403ee2ab760ab'),
+    owner: Address = Address.from('AXNajBTQLxWHwc9sKyXcc4UdbJvp3arYDG'),
     amount: Fixed<8> = 1_000_000_00000000,
   ) {
     super(owner, amount);

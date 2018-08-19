@@ -1,6 +1,8 @@
 import { codeFrameColumns } from '@babel/code-frame';
+import { scriptHashToAddress } from '@neo-one/client-core';
+import _ from 'lodash';
 import { RawSourceMap, SourceMapConsumer } from 'source-map';
-import { ProcessErrorError, ProcessErrorOptions, ProcessErrorTrace } from '../common';
+import { ProcessErrorError, ProcessErrorOptions, ProcessErrorTrace, SourceMaps } from '../common';
 import { getChunk } from './utils';
 
 const MESSAGE_INDENT = '  ';
@@ -38,35 +40,47 @@ const getSourceMapPosition = ({
   return getRenderedCallsite(sourceContent, line, column === null ? undefined : column + 1);
 };
 
-const processGenericError = async (message: string, sourceMap: RawSourceMap): Promise<string> =>
-  SourceMapConsumer.with(sourceMap, undefined, async (consumer) => {
-    const mutableMessage = message.trim().split('\n');
-    const line = mutableMessage.find((splitLine) => splitLine.startsWith('Line:'));
-    if (line !== undefined) {
-      const lineIndex = mutableMessage.indexOf(line);
-      if (lineIndex === -1) {
-        return message;
-      }
+const processGenericError = async (message: string, sourceMaps: SourceMaps): Promise<string> => {
+  const mutableMessage = message.trim().split('\n');
+  const scriptHash = mutableMessage.find((splitLine) => splitLine.startsWith('Script Hash:'));
+  let address: string | undefined;
+  if (scriptHash !== undefined) {
+    address = scriptHashToAddress(scriptHash.split(':')[1]);
+  }
 
-      const lineNumber = parseInt(line.split(':')[1], 10);
-      const positionMessage = getSourceMapPosition({ lineNumber, consumer });
-      if (positionMessage === undefined) {
-        return message;
-      }
+  let sourceMap = Object.values(sourceMaps)[0];
+  if (address !== undefined && (sourceMaps[address] as RawSourceMap | undefined) !== undefined) {
+    sourceMap = sourceMaps[address];
+  }
 
-      return `${mutableMessage[0]}\n${positionMessage}`;
+  const line = mutableMessage.find((splitLine) => splitLine.startsWith('Line:'));
+  if (line === undefined) {
+    return message;
+  }
+
+  return SourceMapConsumer.with(sourceMap, undefined, async (consumer) => {
+    const lineNumber = parseInt(line.split(':')[1], 10);
+    const positionMessage = getSourceMapPosition({ lineNumber, consumer });
+    if (positionMessage === undefined) {
+      return message;
     }
 
-    return message;
+    return `${mutableMessage[0]}\n${positionMessage}`;
   });
+};
 
 const processTraceError = async (
   message: string,
   error: ProcessErrorError,
   trace: ReadonlyArray<ProcessErrorTrace>,
-  sourceMap: RawSourceMap,
-): Promise<string> =>
-  SourceMapConsumer.with(sourceMap, undefined, async (consumer) => {
+  sourceMaps: SourceMaps,
+): Promise<string> => {
+  let sourceMap = Object.values(sourceMaps)[0];
+  if ((sourceMaps[error.address] as RawSourceMap | undefined) !== undefined) {
+    sourceMap = sourceMaps[error.address];
+  }
+
+  return SourceMapConsumer.with(sourceMap, undefined, async (consumer) => {
     const positionMessage = getSourceMapPosition({ lineNumber: error.line, consumer });
     if (positionMessage === undefined) {
       return message;
@@ -100,15 +114,21 @@ const processTraceError = async (
 
     return `Error: ${error.message}\n${positionMessage}${mutableTraceLines.join('\n')}`;
   });
+};
 
-export const processError = async ({ message, error, trace, sourceMap }: ProcessErrorOptions): Promise<string> => {
-  if (sourceMap === undefined) {
+export const processError = async ({
+  message,
+  error,
+  trace = [],
+  sourceMaps,
+}: ProcessErrorOptions): Promise<string> => {
+  if (sourceMaps === undefined || _.isEmpty(sourceMaps)) {
     return message;
   }
 
   if (error === undefined) {
-    return processGenericError(message, sourceMap);
+    return processGenericError(message, sourceMaps);
   }
 
-  return processTraceError(message, error, trace, sourceMap);
+  return processTraceError(message, error, trace, sourceMaps);
 };

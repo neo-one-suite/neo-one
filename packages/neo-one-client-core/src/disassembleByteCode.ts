@@ -1,3 +1,4 @@
+// tslint:disable prefer-switch
 import { BinaryReader, utils } from './utils';
 import { assertByteCode, Byte, Op, OpCode } from './vm';
 
@@ -43,7 +44,6 @@ export const disassembleByteCode = (bytes: Buffer): ReadonlyArray<Line> => {
         numBytes = reader.readInt32LE();
       }
       mutableResult.push([pc, opCode, createHexString(reader.readBytes(numBytes))]);
-      // tslint:disable-next-line prefer-switch
     } else if (byte === Op.JMP || byte === Op.JMPIF || byte === Op.JMPIFNOT || byte === Op.CALL) {
       mutableResult.push([pc, opCode, `${reader.readInt16LE()}`]);
     } else if (byte === Op.APPCALL || byte === Op.TAILCALL) {
@@ -53,6 +53,22 @@ export const disassembleByteCode = (bytes: Buffer): ReadonlyArray<Line> => {
     } else if (byte === Op.SYSCALL) {
       mutableResult.push([pc, opCode, utils.toASCII(reader.readVarBytesLE(252))]);
       // tslint:disable-next-line strict-type-predicate
+    } else if (byte === Op.CALL_E || byte === Op.CALL_ET) {
+      const returnValueCount = reader.readBytes(1);
+      const parametersCount = reader.readBytes(1);
+      const mutableAppBytes = [...reader.readBytes(20)];
+      mutableAppBytes.reverse();
+      mutableResult.push([
+        pc,
+        opCode,
+        `${createHexString(returnValueCount)} ${createHexString(parametersCount)} ${createHexString(
+          Buffer.from(mutableAppBytes),
+        )}`,
+      ]);
+    } else if (byte === Op.CALL_ED || byte === Op.CALL_EDT || byte === Op.CALL_I) {
+      const returnValueCount = reader.readBytes(1);
+      const parametersCount = reader.readBytes(1);
+      mutableResult.push([pc, opCode, `${createHexString(returnValueCount)} ${createHexString(parametersCount)}`]);
     } else {
       mutableResult.push([pc, opCode, undefined]);
     }

@@ -1,7 +1,13 @@
 import ts from 'typescript';
 import { Context } from '../../Context';
 
-export type InternalIdentifier = 'getArgument' | 'doReturn' | 'trigger' | 'putStorage' | 'getStorage';
+export type InternalIdentifier =
+  | 'getArgument'
+  | 'doReturn'
+  | 'trigger'
+  | 'putStorage'
+  | 'getStorage'
+  | 'shouldSkipVerify';
 export type ContractIdentifier = 'Address';
 
 export interface Transpiler {

@@ -1,4 +1,4 @@
-import { tsUtils } from '@neo-one/ts-utils';
+import { AnyNameableNode, tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
@@ -28,6 +28,10 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
       return;
     }
 
+    if (!this.hasValueReference(sb, node)) {
+      return;
+    }
+
     // [exports]
     sb.loadModule(sourceFile);
 
@@ -41,16 +45,8 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
       // []
       sb.scope.set(sb, node, options, name);
     } else {
-      const getImportName = (namedImport: ts.ImportSpecifier) => {
-        const alias = tsUtils.node.getPropertyNameNode(namedImport);
-
-        return alias === undefined ? tsUtils.node.getName(namedImport) : tsUtils.node.getText(alias);
-      };
-
       const defaultImport = tsUtils.importDeclaration.getDefaultImport(node);
-      const namedImports = tsUtils.importDeclaration
-        .getNamedImports(node)
-        .filter((namedImport) => sb.hasExport(sourceFile, getImportName(namedImport)));
+      const namedImports = this.getExportedNamedImports(sb, node, sourceFile);
       if (defaultImport !== undefined) {
         if (namedImports.length > 0) {
           // [exports, exports]
@@ -71,7 +67,7 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
 
       if (namedImports.length > 0) {
         namedImports.forEach((namedImport) => {
-          const importName = getImportName(namedImport);
+          const importName = this.getImportName(namedImport);
 
           // [exports, exports]
           sb.emitOp(node, 'DUP');
@@ -90,5 +86,63 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
         sb.emitOp(node, 'DROP');
       }
     }
+  }
+
+  private hasValueReference(sb: ScriptBuilder, node: ts.ImportDeclaration): boolean {
+    const currentSourceFile = tsUtils.node.getSourceFile(node);
+
+    const namespaceImport = tsUtils.importDeclaration.getNamespaceImport(node);
+    if (namespaceImport !== undefined && this.hasLocalValueReferences(sb, currentSourceFile, namespaceImport)) {
+      return true;
+    }
+
+    const defaultImport = tsUtils.importDeclaration.getDefaultImport(node);
+    if (defaultImport !== undefined && this.hasLocalValueReferences(sb, currentSourceFile, defaultImport)) {
+      return true;
+    }
+
+    const namedImports = tsUtils.importDeclaration.getNamedImports(node);
+    if (
+      namedImports.some((namedImport) =>
+        this.hasLocalValueReferences(sb, currentSourceFile, this.getImportNameNode(namedImport)),
+      )
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private hasLocalValueReferences(sb: ScriptBuilder, currentSourceFile: ts.SourceFile, node: AnyNameableNode): boolean {
+    const references = tsUtils.reference.findReferencesAsNodes(sb.context.program, sb.context.languageService, node);
+
+    return references.some(
+      (reference) =>
+        tsUtils.node.getSourceFile(reference) === currentSourceFile &&
+        tsUtils.node.getFirstAncestorByTest(reference, ts.isImportDeclaration) === undefined &&
+        !tsUtils.node.isPartOfTypeNode(reference),
+    );
+  }
+
+  private getExportedNamedImports(
+    sb: ScriptBuilder,
+    node: ts.ImportDeclaration,
+    sourceFile: ts.SourceFile,
+  ): ReadonlyArray<ts.ImportSpecifier> {
+    return tsUtils.importDeclaration
+      .getNamedImports(node)
+      .filter((namedImport) => sb.hasExport(sourceFile, this.getImportName(namedImport)));
+  }
+
+  private getImportName(node: ts.ImportSpecifier): string {
+    const alias = tsUtils.node.getPropertyNameNode(node);
+
+    return alias === undefined ? tsUtils.node.getName(node) : tsUtils.node.getText(alias);
+  }
+
+  private getImportNameNode(node: ts.ImportSpecifier): ts.ImportSpecifier | ts.Identifier {
+    const alias = tsUtils.node.getPropertyNameNode(node);
+
+    return alias === undefined ? node : alias;
   }
 }

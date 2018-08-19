@@ -4,6 +4,12 @@ import { Context } from '../Context';
 import { ProgramCounter } from './pc';
 import { Name } from './scope';
 
+export interface LinkedContracts {
+  readonly [filePath: string]: {
+    readonly [smartContractClass: string]: string;
+  };
+}
+
 export interface VisitOptions {
   readonly pushValue?: boolean | undefined;
   readonly setValue?: boolean | undefined;

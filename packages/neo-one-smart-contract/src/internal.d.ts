@@ -30,4 +30,5 @@ export function migrate(
 ): Contract;
 export function putStorage(key: SerializableValue, value: SerializableValue): void;
 export function getStorage<T extends SerializableValue>(key: SerializableValue): T;
+export function shouldSkipVerify(): boolean;
 export const trigger: number;
