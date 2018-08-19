@@ -2,7 +2,6 @@
 
 exports[`genGenerated Token 1`] = `
 "
-export * from './test';
 export * from './types';
 export * from './react';
 export * from './client';

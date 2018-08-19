@@ -7,21 +7,18 @@ const createExport = (generatedPath: string, importPath: string) =>
 
 export const genGenerated = ({
   contractsPaths,
-  testPath,
   commonTypesPath,
   reactPath,
   clientPath,
   generatedPath,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
-  readonly testPath: string;
   readonly commonTypesPath: string;
   readonly reactPath: string;
   readonly clientPath: string;
   readonly generatedPath: string;
 }): string =>
   `
-${createExport(generatedPath, testPath)}
 ${createExport(generatedPath, commonTypesPath)}
 ${createExport(generatedPath, reactPath)}
 ${createExport(generatedPath, clientPath)}

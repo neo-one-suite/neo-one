@@ -4,7 +4,7 @@ import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { InvalidArgumentError } from './errors';
-import { addressToScriptHash, scriptHashToAddress } from './helpers';
+import { addressToScriptHash, privateKeyToPublicKey, scriptHashToAddress, wifToPrivateKey } from './helpers';
 import {
   ABI,
   ABIEvent,
@@ -22,6 +22,7 @@ import {
   ContractRegister,
   GetOptions,
   Hash256String,
+  PrivateKeyString,
   PublicKeyString,
   ReadSmartContractDefinition,
   SmartContractDefinition,
@@ -631,4 +632,19 @@ export const assertUpdateAccountNameOptions = (name: string, value?: unknown): U
     id: assertProperty(value, 'UpdateAccountNameOptions', 'id', assertUserAccountID),
     name: assertProperty(value, 'UpdateAccountNameOptions', 'name', assertString),
   };
+};
+
+export const assertPrivateKey = (name: string, valueIn?: unknown): PrivateKeyString => {
+  const value = assertString(name, valueIn);
+  try {
+    privateKeyToPublicKey(value);
+
+    return value;
+  } catch {
+    try {
+      return wifToPrivateKey(value);
+    } catch {
+      throw new InvalidArgumentError('PrivateKey', name, value);
+    }
+  }
 };

@@ -1,5 +1,4 @@
 // tslint:disable
-export * from './test';
 export * from './types';
 export * from './react';
 export * from './client';

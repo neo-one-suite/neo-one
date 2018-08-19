@@ -10,6 +10,7 @@
     "@neo-one/server-plugin-network": "^1.0.0-alpha.106",
     "@neo-one/smart-contract-codegen": "^1.0.0-alpha.44",
     "@neo-one/smart-contract-compiler": "^1.0.0-alpha.44",
+    "@neo-one/smart-contract-test": "^1.0.0-alpha.44",
     "@neo-one/utils": "^1.0.0-alpha.59",
     "convict": "^4.3.2",
     "cosmiconfig": "^5.0.6",

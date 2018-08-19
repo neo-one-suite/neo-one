@@ -4,6 +4,7 @@ import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
+import * as args from '../../args';
 import { LockedAccountError, UnknownAccountError } from '../../errors';
 import { decryptNEP2, encryptNEP2, privateKeyToPublicKey, publicKeyToAddress } from '../../helpers';
 import { BufferString, NetworkType, UpdateAccountNameOptions, UserAccount, UserAccountID, Witness } from '../../types';
@@ -206,15 +207,16 @@ export class LocalKeyStore {
 
     return this.capture(
       async (span) => {
-        let privateKey = privateKeyIn;
+        let pk = privateKeyIn;
         let nep2 = nep2In;
-        if (privateKey === undefined) {
+        if (pk === undefined) {
           if (nep2 === undefined || password === undefined) {
             throw new Error('Expected private key or password and NEP-2 key');
           }
-          privateKey = await decryptNEP2({ encryptedKey: nep2, password });
+          pk = await decryptNEP2({ encryptedKey: nep2, password });
         }
 
+        const privateKey = args.assertPrivateKey('privateKey', pk);
         const publicKey = privateKeyToPublicKey(privateKey);
         const address = publicKeyToAddress(publicKey);
 

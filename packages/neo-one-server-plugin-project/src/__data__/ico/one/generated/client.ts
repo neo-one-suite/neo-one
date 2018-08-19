@@ -27,7 +27,7 @@ export const createClient = <
 >(
   getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders as any,
 ): Client<TUserAccountProviders> => {
-  const provider = new NEOONEProvider([{ network: 'local', rpcURL: 'http://localhost:47863/rpc' }]);
+  const provider = new NEOONEProvider([{ network: 'local', rpcURL: 'http://localhost:48297/rpc' }]);
   const userAccountProviders = getUserAccountProviders(provider);
 
   const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);

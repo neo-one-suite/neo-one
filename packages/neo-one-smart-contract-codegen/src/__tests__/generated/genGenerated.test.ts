@@ -7,7 +7,6 @@ describe('genGenerated', () => {
       genGenerated({
         contractsPaths,
         commonTypesPath: '/foo/bar/one/generated/types.ts',
-        testPath: '/foo/bar/one/generated/test.ts',
         reactPath: '/foo/bar/one/generated/react.tsx',
         clientPath: '/foo/bar/one/generated/client.ts',
         generatedPath: '/foo/bar/one/generated/index.ts',

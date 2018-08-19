@@ -45,7 +45,6 @@ export const genCommonFiles = ({
   const generatedFile = formatFile(
     genGenerated({
       contractsPaths,
-      testPath,
       commonTypesPath,
       reactPath,
       clientPath,
