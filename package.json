@@ -27,7 +27,7 @@
   },
   "lint-staged": {
     "linters": {
-      "packages/*/src/**/*.ts": [
+      "packages/*/src/**/*.{ts,tsx}": [
         "yarn run prettier --write --config .prettierrc",
         "git add",
         "yarn test --findRelatedTests --ci --passWithNoTests -w 4",

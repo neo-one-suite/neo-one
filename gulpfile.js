@@ -92,18 +92,18 @@ const pkgNamesSet = new Set(pkgNames);
 
 const globs = {
   originalSrc: [
-    'packages/*/src/**/*.ts',
+    'packages/*/src/**/*.{ts,tsx}',
     'packages/*/proto/**/*.proto',
-    '!packages/*/src/**/*.test.ts',
+    '!packages/*/src/**/*.test.{ts,tsx}',
     '!packages/*/src/__data__/**/*',
     '!packages/*/src/__tests__/**/*',
     '!packages/*/src/__e2e__/**/*',
     '!packages/*/src/bin/**/*',
   ],
   src: (format) => [
-    `${getDistBase(format)}/packages/*/src/**/*.ts`,
+    `${getDistBase(format)}/packages/*/src/**/*.{ts,tsx}`,
     `${getDistBase(format)}/packages/*/proto/**/*.proto`,
-    `!${getDistBase(format)}/packages/*/src/**/*.test.ts`,
+    `!${getDistBase(format)}/packages/*/src/**/*.test.{ts,tsx}`,
     `!${getDistBase(format)}/packages/*/src/__data__/**/*`,
     `!${getDistBase(format)}/packages/*/src/__tests__/**/*`,
     `!${getDistBase(format)}/packages/*/src/__e2e__/**/*`,
