@@ -1,14 +1,16 @@
 import { contractsPaths } from '../../__data__/contractsPaths';
-import { genReact } from '../../react';
+import { genGenerated } from '../../generated';
 
-describe('genReact', () => {
+describe('genGenerated', () => {
   test('Token', () => {
     expect(
-      genReact({
+      genGenerated({
         contractsPaths,
         commonTypesPath: '/foo/bar/one/generated/types.ts',
-        reactPath: '/foo/bar/one/generated/react.ts',
+        testPath: '/foo/bar/one/generated/test.ts',
+        reactPath: '/foo/bar/one/generated/react.tsx',
         clientPath: '/foo/bar/one/generated/client.ts',
+        generatedPath: '/foo/bar/one/generated/index.ts',
       }),
     ).toMatchSnapshot();
   });

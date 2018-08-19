@@ -1,5 +1,6 @@
 import { InteractiveCommand, Plugin, PluginManager, TaskList } from '@neo-one/server-plugin';
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
+import { constants as walletConstants } from '@neo-one/server-plugin-wallet';
 import { utils } from '@neo-one/utils';
 import { build } from './build';
 import { buildCommand } from './buildCommand';
@@ -26,7 +27,7 @@ export class ProjectPlugin extends Plugin {
   }
 
   public get dependencies(): ReadonlyArray<string> {
-    return [networkConstants.PLUGIN];
+    return [networkConstants.PLUGIN, walletConstants.PLUGIN];
   }
 
   public get interactive(): ReadonlyArray<InteractiveCommand> {

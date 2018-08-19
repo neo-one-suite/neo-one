@@ -6,15 +6,18 @@ export const genReact = ({
   contractsPaths,
   reactPath,
   commonTypesPath,
+  clientPath,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly reactPath: string;
   readonly commonTypesPath: string;
+  readonly clientPath: string;
 }): string =>
   `
 import { Client } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from '${getRelativeImport(reactPath, commonTypesPath)}';
+import { createClient } from '${getRelativeImport(reactPath, clientPath)}';
 ${contractsPaths
     .map(
       ({ name, createContractPath }) =>
@@ -29,21 +32,25 @@ export type ContractsWithClient<TClient extends Client> = Contracts & WithClient
 const Context: any = React.createContext<ContractsWithClient<Client>>(undefined as any);
 
 export interface ContractsProviderProps<TClient extends Client> {
-  readonly client: TClient;
+  readonly client?: TClient;
   readonly children?: React.ReactNode;
 }
-export const ContractsProvider = <TClient extends Client>({ client, children }: ContractsProviderProps<TClient>) => (
-  <Context.Provider
-    value={{
-      client,
-      ${contractsPaths
-        .map(({ name }) => `${lowerCaseFirst(name)}: ${getCreateSmartContractName(name)}(client),`)
-        .join('\n      ')}
-    }}
-  >
-    {children}
-  </Context.Provider>
-);
+export const ContractsProvider = <TClient extends Client>({ client: clientIn, children }: ContractsProviderProps<TClient>) => {
+  const client = clientIn === undefined ? createClient() : clientIn;
+
+  return (
+    <Context.Provider
+      value={{
+        client,
+        ${contractsPaths
+          .map(({ name }) => `${lowerCaseFirst(name)}: ${getCreateSmartContractName(name)}(client),`)
+          .join('\n      ')}
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
+};
 
 export interface WithContractsProps<TClient extends Client> {
   readonly children: (contracts: ContractsWithClient<TClient>) => React.ReactNode;

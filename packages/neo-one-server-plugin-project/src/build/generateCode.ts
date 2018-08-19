@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import * as path from 'path';
 import { RawSourceMap } from 'source-map';
 import { ProjectConfig } from '../types';
+import { getCommonPaths, getContractPaths } from './paths';
 
 export const generateCode = async (
   project: ProjectConfig,
@@ -16,10 +17,8 @@ export const generateCode = async (
   networksDefinition: SmartContractNetworksDefinition,
 ) => {
   const base = path.resolve(project.paths.generated, contractResult.name);
-  const sourceMapsPath = path.resolve(project.paths.generated, 'sourceMaps.ts');
-  const typesPath = path.resolve(base, 'types.ts');
-  const abiPath = path.resolve(base, 'abi.ts');
-  const createContractPath = path.resolve(base, 'contract.ts');
+  const sourceMapsPath = getCommonPaths(project).sourceMapsPath;
+  const { typesPath, abiPath, createContractPath } = getContractPaths(project, contractResult);
   const { abi, contract, types } = genFiles({
     name: contractResult.name,
     networksDefinition,

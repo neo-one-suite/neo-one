@@ -125,6 +125,7 @@ export {
   Transfer,
   UserAccount,
   UserAccountID,
+  UserAccountProvider,
   VoidContractParameter,
   Witness,
 } from './types';

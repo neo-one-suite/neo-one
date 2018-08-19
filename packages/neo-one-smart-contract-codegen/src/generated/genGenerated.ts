@@ -1,0 +1,31 @@
+import _ from 'lodash';
+import { ContractPaths } from '../type';
+import { getRelativeImport } from '../utils';
+
+const createExport = (generatedPath: string, importPath: string) =>
+  `export * from '${getRelativeImport(generatedPath, importPath)}';`;
+
+export const genGenerated = ({
+  contractsPaths,
+  testPath,
+  commonTypesPath,
+  reactPath,
+  clientPath,
+  generatedPath,
+}: {
+  readonly contractsPaths: ReadonlyArray<ContractPaths>;
+  readonly testPath: string;
+  readonly commonTypesPath: string;
+  readonly reactPath: string;
+  readonly clientPath: string;
+  readonly generatedPath: string;
+}): string =>
+  `
+${createExport(generatedPath, testPath)}
+${createExport(generatedPath, commonTypesPath)}
+${createExport(generatedPath, reactPath)}
+${createExport(generatedPath, clientPath)}
+${_.flatMap(contractsPaths, ({ createContractPath, typesPath, abiPath }) => [createContractPath, typesPath, abiPath])
+    .map((importPath) => createExport(generatedPath, importPath))
+    .join('\n')}
+`;
