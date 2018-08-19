@@ -48,6 +48,7 @@ export const executeScript = async (
   const [receipt, resolvedSourceMap] = await Promise.all([blockchain.invokeScript(code, monitor), sourceMap]);
 
   const address = scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(code)));
+  await blockchain.stop();
 
   return {
     receipt: {
