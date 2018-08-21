@@ -12,7 +12,7 @@
     "@neo-one/server-plugin-wallet": "^1.0.0-alpha.114",
     "@neo-one/utils": "^1.0.0-alpha.59",
     "bignumber.js": "^7.2.1",
-    "execa": "^0.10.0",
+    "execa": "^0.11.0",
     "fs-extra": "^7.0.0",
     "lodash": "^4.17.10",
     "rxjs": "^6.2.2",
