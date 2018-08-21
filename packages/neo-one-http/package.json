@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/http",
-  "version": "1.0.0-alpha.89",
+  "version": "1.0.0-alpha.90",
   "description": "NEO•ONE http utilities.",
   "main": "./src/index.ts",
   "dependencies": {

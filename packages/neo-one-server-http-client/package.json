@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-http-client",
-  "version": "1.0.0-alpha.68",
+  "version": "1.0.0-alpha.69",
   "description": "NEO•ONE Server http client api.",
   "main": "./src/index.ts",
   "dependencies": {

@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/react",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "NEO•ONE React utilities.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.89",
-    "@neo-one/server-http-client": "^1.0.0-alpha.68",
+    "@neo-one/client": "^1.0.0-alpha.90",
+    "@neo-one/server-http-client": "^1.0.0-alpha.69",
     "bignumber.js": "^7.2.1",
     "react": "^16.4.2",
     "react-datetime-picker": "^1.5.0",
