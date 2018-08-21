@@ -1,0 +1,16 @@
+{
+  "name": "@neo-one/http",
+  "version": "1.0.0-alpha.89",
+  "description": "NEO•ONE http utilities.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@neo-one/monitor": "^1.0.0-alpha.54",
+    "@neo-one/utils": "^1.0.0-alpha.59",
+    "koa": "^2.5.2",
+    "koa-better-body": "^3.0.4",
+    "koa-convert": "^1.2.0",
+    "koa-cors": "^0.0.16",
+    "rxjs": "^6.2.2",
+    "tslib": "^1.9.3"
+  }
+}

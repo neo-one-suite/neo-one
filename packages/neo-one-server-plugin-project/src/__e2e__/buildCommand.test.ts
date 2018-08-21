@@ -45,7 +45,6 @@ const getClients = async (
   wallet: Wallet,
 ): Promise<{
   readonly client: Client;
-  readonly developerClient: DeveloperClient;
 }> => {
   const keystore = new LocalKeyStore({ store: new LocalMemoryStore() });
 
@@ -62,9 +61,7 @@ const getClients = async (
   const localUserAccountProvider = new LocalUserAccountProvider({ keystore, provider });
   const client = new Client({ memory: localUserAccountProvider });
 
-  const developerClient = new DeveloperClient(provider.read(LOCAL));
-
-  return { client, developerClient };
+  return { client };
 };
 
 const getContracts = async (client: Client, networkName: string): Promise<ReadonlyArray<Contract>> => {
@@ -121,6 +118,12 @@ const getGeneratedTokenCode = (): {
 
   return { abi, contract: { createSmartContract, createReadSmartContract } };
 };
+
+const getGeneratedCommonCode = (): {
+  readonly createClient: () => Client;
+  readonly createDeveloperClients: () => { readonly [network: string]: DeveloperClient };
+  // tslint:disable-next-line no-require-imports
+} => require('../__data__/ico/one/generated/client');
 
 const verifySmartContractAfterMint = async (
   developerClient: DeveloperClient,
@@ -250,12 +253,7 @@ const verifySmartContractsTest = async () => {
   });
 };
 
-const verifySmartContractsManual = async (
-  client: Client,
-  developerClient: DeveloperClient,
-  accountID: UserAccountID,
-  toAccountID: UserAccountID,
-) => {
+const verifySmartContractsManual = async (accountID: UserAccountID, toAccountID: UserAccountID) => {
   const {
     abi: icoABI,
     contract: { createSmartContract: createICOSmartContract, createReadSmartContract: createICOReadSmartContract },
@@ -265,6 +263,9 @@ const verifySmartContractsManual = async (
     abi: tokenABI,
     contract: { createSmartContract: createTokenSmartContract, createReadSmartContract: createTokenReadSmartContract },
   } = getGeneratedTokenCode();
+  const { createClient, createDeveloperClients } = getGeneratedCommonCode();
+  const client = createClient();
+  const developerClient = createDeveloperClients().local;
   expect(tokenABI).toBeDefined();
 
   const ico = createICOSmartContract(client);
@@ -317,7 +318,7 @@ describe('buildCommand', () => {
     expect(networks.length).toEqual(1);
 
     const network = networks[0];
-    expect(network.name).toEqual('ico-local');
+    expect(network.name.includes('ico-local')).toBeTruthy();
     expect(network.type).toEqual('private');
     expect(network.nodes.length).toEqual(1);
     expect(network.nodes[0].live).toBeTruthy();
@@ -327,7 +328,7 @@ describe('buildCommand', () => {
     expect(wallets.length).toEqual(1);
     const wallet = wallets[0];
 
-    const { client, developerClient } = await getClients(network, wallet);
+    const { client } = await getClients(network, wallet);
 
     const contracts = await getContracts(client, LOCAL);
     verifyICOContract(contracts.find((contract) => contract.name === 'ICO'));
@@ -336,13 +337,11 @@ describe('buildCommand', () => {
     await Promise.all([
       verifySmartContractsTest(),
       verifySmartContractsManual(
-        client,
-        developerClient,
         { ...wallet.accountID, network: LOCAL },
         { network: LOCAL, address: privateKeyToAddress(TO_PRIVATE_KEY) },
       ),
     ]);
 
-    await one.execute('build', { cwd: path.resolve(__dirname, '..', '__data__', 'ico') });
+    await one.execute('build --reset', { cwd: path.resolve(__dirname, '..', '__data__', 'ico') });
   });
 });

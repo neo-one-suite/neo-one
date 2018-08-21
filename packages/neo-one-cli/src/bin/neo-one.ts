@@ -1,6 +1,7 @@
 import {
   CLI,
   DIR_OPTION,
+  HTTP_SERVER_PORT_OPTION,
   InteractiveCLI,
   MIN_PORT_OPTION,
   SERVER_PORT_OPTION,
@@ -58,6 +59,11 @@ result = extractOption(argv, SERVER_PORT_OPTION);
 const serverPortOut = result[1];
 const serverPort = serverPortOut === undefined ? undefined : parseInt(serverPortOut, 10);
 
+result = extractOption(argv, HTTP_SERVER_PORT_OPTION);
+[argv] = result;
+const httpServerPortOut = result[1];
+const httpServerPort = httpServerPortOut === undefined ? undefined : parseInt(httpServerPortOut, 10);
+
 result = extractOption(argv, MIN_PORT_OPTION);
 [argv] = result;
 const minPortOut = result[1];
@@ -69,6 +75,7 @@ if (isStatic) {
     debug,
     dir,
     serverPort,
+    httpServerPort,
     minPort,
   }).start(quoteArgs(argv));
 } else {
@@ -77,6 +84,7 @@ if (isStatic) {
     debug,
     dir,
     serverPort,
+    httpServerPort,
     minPort,
   }).start(quoteArgs(argv));
 }

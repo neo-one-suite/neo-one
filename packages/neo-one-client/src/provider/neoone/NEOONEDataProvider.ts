@@ -52,9 +52,9 @@ import {
   InputOutput,
   NetworkSettings,
   NetworkType,
-  Options,
   Output,
   Peer,
+  PrivateNetworkSettings,
   RawAction,
   RawCallReceipt,
   RawInvocationData,
@@ -328,8 +328,12 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     return this.mutableClient.runConsensusNow(monitor);
   }
 
-  public async updateSettings(options: Options, monitor?: Monitor): Promise<void> {
+  public async updateSettings(options: Partial<PrivateNetworkSettings>, monitor?: Monitor): Promise<void> {
     return this.mutableClient.updateSettings(options, monitor);
+  }
+
+  public async getSettings(monitor?: Monitor): Promise<PrivateNetworkSettings> {
+    return this.mutableClient.getSettings(monitor);
   }
 
   public async fastForwardOffset(seconds: number, monitor?: Monitor): Promise<void> {

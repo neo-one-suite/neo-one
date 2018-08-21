@@ -1,7 +1,7 @@
 import convict from 'convict';
 import cosmiconfig from 'cosmiconfig';
 import * as path from 'path';
-import { ProjectConfig, projectConfigSchema } from './types';
+import { ProjectConfig, projectConfigSchema } from '../types';
 
 const validateConfig = (rootDir: string, configIn: cosmiconfig.Config): ProjectConfig => {
   const config = convict<ProjectConfig>(projectConfigSchema);
@@ -19,7 +19,7 @@ const validateConfig = (rootDir: string, configIn: cosmiconfig.Config): ProjectC
   };
 };
 
-export const loadProject = async (rootDir: string): Promise<ProjectConfig> => {
+export const loadProjectConfig = async (rootDir: string): Promise<ProjectConfig> => {
   const explorer = cosmiconfig('one');
 
   const result = await explorer.search(rootDir);

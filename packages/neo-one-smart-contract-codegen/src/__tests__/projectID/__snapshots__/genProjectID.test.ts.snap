@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`genProjectID Token 1`] = `
+Object {
+  "js": "
+export const projectID = 'foobar';
+",
+  "ts": "
+export const projectID = 'foobar';
+",
+}
+`;

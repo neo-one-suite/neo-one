@@ -9,6 +9,7 @@ export interface DescribeCRUDOptions<Resource extends BaseResource, ResourceOpti
   readonly aliases?: ReadonlyArray<string>;
   readonly options?: ReadonlyArray<CLIOption>;
   readonly autocomplete?: ReadonlyArray<string>;
+  readonly hidden?: boolean;
 }
 
 export class DescribeCRUD<
@@ -21,6 +22,7 @@ export class DescribeCRUD<
     aliases,
     options,
     autocomplete,
+    hidden,
   }: DescribeCRUDOptions<Resource, ResourceOptions>) {
     super({
       name: 'describe',
@@ -29,6 +31,7 @@ export class DescribeCRUD<
       aliases,
       options,
       autocomplete,
+      hidden,
     });
   }
 }

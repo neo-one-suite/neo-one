@@ -9,7 +9,6 @@ export interface CLIOption {
 export interface NamesIn {
   readonly ing: string;
   readonly ingUpper: string;
-
   readonly ed: string;
   readonly edUpper: string;
 }
@@ -25,17 +24,13 @@ export interface CRUDBaseOptions<
 > {
   readonly name: string;
   readonly names?: NamesIn;
-
   readonly command: string;
   readonly resourceType: ResourceType<Resource, ResourceOptions>;
-
   readonly help: string;
-
   readonly aliases?: ReadonlyArray<string>;
-
   readonly options?: ReadonlyArray<CLIOption>;
-
   readonly autocomplete?: ReadonlyArray<string>;
+  readonly hidden?: boolean;
 }
 
 export interface GetCLIResourceOptions {
@@ -58,6 +53,7 @@ export class CRUDBase<
   public readonly aliases: ReadonlyArray<string>;
   public readonly options: ReadonlyArray<CLIOption>;
   public readonly autocomplete: ReadonlyArray<string>;
+  public readonly hidden: boolean;
 
   public constructor({
     name: nameIn,
@@ -68,6 +64,7 @@ export class CRUDBase<
     aliases = [],
     options = [],
     autocomplete = [],
+    hidden = false,
   }: CRUDBaseOptions<Resource, ResourceOptions>) {
     this.name = nameIn;
     const name = nameIn.endsWith('e') ? nameIn.slice(0, -1) : nameIn;
@@ -90,13 +87,13 @@ export class CRUDBase<
       ed: names.ed,
       edUpper: names.edUpper,
     };
-
     this.command = command;
     this.resourceType = resourceType;
     this.help = help;
     this.aliases = aliases;
     this.options = options;
     this.autocomplete = autocomplete;
+    this.hidden = hidden;
   }
 
   public async getCLIResourceOptions({ options }: GetCLIResourceOptions): Promise<ResourceOptions> {

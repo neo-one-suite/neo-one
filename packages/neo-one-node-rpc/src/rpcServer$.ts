@@ -1,36 +1,17 @@
+import { context, cors, createServer$, onError as appOnError } from '@neo-one/http';
 import { Monitor } from '@neo-one/monitor';
 import { Blockchain, Node } from '@neo-one/node-core';
-import { finalize, mergeScanLatest } from '@neo-one/utils';
 import * as http from 'http';
 import * as https from 'https';
 import Application from 'koa';
 import Router from 'koa-router';
-import { combineLatest, defer, Observable } from 'rxjs';
+import { combineLatest, Observable, of as _of } from 'rxjs';
 import { distinctUntilChanged, map, publishReplay, refCount } from 'rxjs/operators';
-import {
-  context,
-  cors,
-  liveHealthCheck,
-  LiveHealthCheckOptions,
-  onError as appOnError,
-  readyHealthCheck,
-  ReadyHealthCheckOptions,
-  rpc,
-} from './middleware';
+import { liveHealthCheck, LiveHealthCheckOptions, readyHealthCheck, ReadyHealthCheckOptions, rpc } from './middleware';
+
 export interface ServerOptions {
   readonly keepAliveTimeout?: number;
 }
-type ListenOptions =
-  | {
-      readonly port: number;
-      readonly host: string;
-    }
-  | {
-      readonly key: string;
-      readonly cert: string;
-      readonly port: number;
-      readonly host: string;
-    };
 export interface Environment {
   readonly http?: {
     readonly port: number;
@@ -49,77 +30,6 @@ export interface Options {
   readonly liveHealthCheck?: LiveHealthCheckOptions;
   readonly readyHealthCheck?: ReadyHealthCheckOptions;
 }
-type Listener = ((request: http.IncomingMessage, response: http.ServerResponse) => void);
-
-interface HandleServerResult<T extends http.Server | https.Server> {
-  readonly server: T | undefined;
-  readonly listener: Listener | undefined;
-  readonly app: Application | undefined;
-}
-
-async function handleServer<T extends http.Server | https.Server, TOptions extends ListenOptions>({
-  monitor,
-  createServer,
-  options,
-  app,
-  keepAliveTimeout,
-  prevResult: { app: prevApp, listener: prevListener, server: prevServer } = {
-    app: undefined,
-    listener: undefined,
-    server: undefined,
-  },
-}: {
-  readonly monitor: Monitor;
-  readonly createServer: ((options: TOptions) => T);
-  readonly options?: TOptions | undefined;
-  readonly app: Application;
-  readonly keepAliveTimeout: number;
-  readonly prevResult: HandleServerResult<T> | undefined;
-}): Promise<HandleServerResult<T>> {
-  let server = prevServer;
-  let listener = prevListener;
-  if (options !== undefined) {
-    const startServer = server === undefined;
-    const safeServer = server === undefined ? createServer(options) : server;
-    server = safeServer;
-
-    if (app !== prevApp || prevListener === undefined) {
-      if (prevListener !== undefined) {
-        server.removeListener('request', prevListener);
-      }
-
-      listener = app.callback();
-      server.on('request', listener);
-    }
-
-    // tslint:disable-next-line no-object-mutation
-    server.keepAliveTimeout = keepAliveTimeout;
-
-    if (startServer) {
-      const { host, port } = options;
-      await new Promise<void>((resolve) => safeServer.listen(port, host, 511, resolve));
-
-      monitor
-        .withLabels({
-          [monitor.labels.SPAN_KIND]: 'server',
-        })
-        .log({
-          name: 'server_listen',
-          message: `Server listening on ${host}:${port}`,
-          level: 'verbose',
-        });
-    }
-  }
-
-  return { server, listener, app };
-}
-
-const finalizeServer = async (result: HandleServerResult<http.Server | https.Server> | undefined) => {
-  if (result !== undefined && result.server !== undefined) {
-    const { server } = result;
-    await new Promise<void>((resolve) => server.close(resolve));
-  }
-};
 
 export const rpcServer$ = ({
   monitor: monitorIn,
@@ -190,48 +100,21 @@ export const rpcServer$ = ({
     refCount(),
   );
 
-  function createServer$<TOptions extends ListenOptions>(
-    createServer: ((options: TOptions) => http.Server | https.Server),
-    options?: TOptions,
-  ) {
-    return combineLatest(
-      app$,
-      options$.pipe(
-        map(({ server = {} }) => {
-          const { keepAliveTimeout = 60000 } = server;
-
-          return keepAliveTimeout;
-        }),
-        distinctUntilChanged(),
-      ),
-    ).pipe(
-      mergeScanLatest<[Application, number], HandleServerResult<http.Server | https.Server> | undefined>(
-        (prevResult, [app, keepAliveTimeout]) =>
-          defer(async () =>
-            handleServer({
-              monitor,
-              createServer,
-              options,
-              app,
-              keepAliveTimeout,
-              prevResult,
-            }),
-          ),
-        undefined,
-      ),
-      finalize<HandleServerResult<http.Server | https.Server> | undefined>(finalizeServer),
-    );
-  }
+  const keepAliveTimeout$ = options$.pipe(
+    map((options) => (options.server === undefined ? undefined : options.server.keepAliveTimeout)),
+  );
 
   return combineLatest(
-    createServer$(() => http.createServer(), environment.http),
-    createServer$(
-      (options) =>
-        https.createServer({
-          cert: options.cert,
-          key: options.key,
-        }),
-      environment.https,
-    ),
+    environment.http === undefined
+      ? _of(undefined)
+      : createServer$(monitor, app$, keepAliveTimeout$, environment.http, () => http.createServer()),
+    environment.https === undefined
+      ? _of(undefined)
+      : createServer$(monitor, app$, keepAliveTimeout$, environment.https, (options) =>
+          https.createServer({
+            cert: options.cert,
+            key: options.key,
+          }),
+        ),
   );
 };

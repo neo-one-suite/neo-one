@@ -1,17 +1,17 @@
 import { scriptHashToAddress, SmartContractNetworksDefinition, SourceMaps } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
 import { PluginManager, TaskList } from '@neo-one/server-plugin';
-import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
-import { constants as walletConstants, Wallet } from '@neo-one/server-plugin-wallet';
+import { getNetworkResourceManager, Network } from '@neo-one/server-plugin-network';
+import { constants as walletConstants, getWalletResourceManager, Wallet } from '@neo-one/server-plugin-wallet';
 import { NetworkDefinition } from '@neo-one/smart-contract-codegen';
 import { Contracts as ContractPaths } from '@neo-one/smart-contract-compiler';
 import { utils } from '@neo-one/utils';
-import * as path from 'path';
 import { filter, take } from 'rxjs/operators';
 import { DiagnosticCategory } from 'typescript';
+import v4 from 'uuid/v4';
 import { constants } from '../constants';
-import { loadProject } from '../loadProject';
 import { BuildTaskListOptions, ProjectConfig } from '../types';
+import { getLocalNetworkName, getProjectResourceManager, loadProjectConfig, loadProjectID } from '../utils';
 import { compileContract } from './compileContract';
 import { deployContract } from './deployContract';
 import { findContracts } from './findContracts';
@@ -26,8 +26,8 @@ interface SmartContractNetworksDefinitions {
 }
 
 // tslint:disable no-any
-const getProject = (ctx: any): ProjectConfig => ctx.project;
-const getProjectName = (ctx: any): string => ctx.projectName;
+const getProjectConfig = (ctx: any): ProjectConfig => ctx.projectConfig;
+const getProjectID = (ctx: any): string => ctx.projectID;
 const getContractPaths = (ctx: any): ContractPaths => ctx.contractPaths;
 const getContracts = (ctx: any): Contracts => ctx.contracts;
 const getSmartContractNetworksDefinitions = (ctx: any): SmartContractNetworksDefinitions =>
@@ -38,18 +38,6 @@ const getNetworkMaybe = (ctx: any): Network | undefined => ctx.networkMaybe;
 const getNetwork = (ctx: any): Network => ctx.network;
 // tslint:enable no-any
 
-const getNetworkName = (projectName: string) => `${projectName}-local`;
-const getNetworkResourceManager = (pluginManager: PluginManager) =>
-  pluginManager.getResourcesManager({
-    plugin: networkConstants.PLUGIN,
-    resourceType: networkConstants.NETWORK_RESOURCE_TYPE,
-  });
-const getWalletResourceManager = (pluginManager: PluginManager) =>
-  pluginManager.getResourcesManager({
-    plugin: walletConstants.PLUGIN,
-    resourceType: walletConstants.WALLET_RESOURCE_TYPE,
-  });
-
 // tslint:disable-next-line export-name
 export const build = (pluginManager: PluginManager, options: BuildTaskListOptions): TaskList =>
   new TaskList({
@@ -57,14 +45,27 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
       {
         title: 'Load project configuration',
         task: async (ctx) => {
-          ctx.project = await loadProject(options.rootDir);
-          ctx.projectName = path.basename(options.rootDir);
+          const projectConfig = await loadProjectConfig(options.rootDir);
+          let projectID = await loadProjectID(pluginManager, projectConfig, options);
+          if (projectID === undefined) {
+            projectID = v4();
+          } else {
+            await getProjectResourceManager(pluginManager)
+              .delete(projectID, options)
+              .toPromise();
+          }
+          await getProjectResourceManager(pluginManager)
+            .create(projectID, options)
+            .toPromise();
+
+          ctx.projectConfig = projectConfig;
+          ctx.projectID = projectID;
         },
       },
       {
         title: 'Find contracts',
         task: async (ctx) => {
-          ctx.contractPaths = await findContracts(getProject(ctx));
+          ctx.contractPaths = await findContracts(getProjectConfig(ctx));
         },
       },
       {
@@ -81,9 +82,18 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                         title: 'Check for existing network',
                         task: async (ctx) => {
                           const network = await getNetworkResourceManager(pluginManager)
-                            .getResource$({ name: getNetworkName(getProjectName(ctx)), options: {} })
+                            .getResource$({
+                              name: getLocalNetworkName(options.rootDir, getProjectID(ctx)),
+                              options: {},
+                            })
                             .pipe(take(1))
                             .toPromise();
+
+                          if (network !== undefined) {
+                            await getNetworkResourceManager(pluginManager)
+                              .start(getLocalNetworkName(options.rootDir, getProjectID(ctx)), {})
+                              .toPromise();
+                          }
 
                           ctx.networkMaybe = network;
                         },
@@ -98,12 +108,15 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                           return false;
                         },
                         task: (ctx) =>
-                          getNetworkResourceManager(pluginManager).create(getNetworkName(getProjectName(ctx)), {}),
+                          getNetworkResourceManager(pluginManager).create(
+                            getLocalNetworkName(options.rootDir, getProjectID(ctx)),
+                            {},
+                          ),
                       },
                       {
                         title: 'Gather network information',
                         task: async (ctx) => {
-                          const networkName = getNetworkName(getProjectName(ctx));
+                          const networkName = getLocalNetworkName(options.rootDir, getProjectID(ctx));
                           const [network, wallet] = await Promise.all([
                             getNetworkResourceManager(pluginManager)
                               .getResource$({ name: networkName, options: {} })
@@ -111,7 +124,7 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                                 filter(utils.notNull),
                                 take(1),
                               )
-                              .toPromise() as Promise<Network>,
+                              .toPromise(),
                             getWalletResourceManager(pluginManager)
                               .getResource$({
                                 name: walletConstants.makeMasterWallet(networkName),
@@ -121,7 +134,7 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                                 filter(utils.notNull),
                                 take(1),
                               )
-                              .toPromise() as Promise<Network>,
+                              .toPromise(),
                           ]);
 
                           ctx.network = network;
@@ -212,10 +225,10 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                       .map((contract) => ({
                         title: `Generate ${contract.name} code`,
                         task: async () => {
-                          const project = getProject(ctx);
+                          const project = getProjectConfig(ctx);
                           const networksDefinition = getSmartContractNetworksDefinitions(ctx)[contract.name];
 
-                          await generateCode(project, contract, networksDefinition, options.javascript);
+                          await generateCode(project, contract, networksDefinition);
                         },
                       }))
                       .concat([
@@ -223,13 +236,14 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                           title: 'Generate common code',
                           task: async () => {
                             await generateCommonCode(
-                              getProject(ctx),
+                              getProjectConfig(ctx),
+                              getProjectID(ctx),
                               getContracts(ctx),
                               constants.LOCAL_NETWORK_NAME,
                               // tslint:disable-next-line no-non-null-assertion
                               getWallet(ctx).wif!,
                               getNetworkDefinitions(ctx),
-                              options.javascript,
+                              pluginManager.httpServerPort,
                             );
                           },
                         },

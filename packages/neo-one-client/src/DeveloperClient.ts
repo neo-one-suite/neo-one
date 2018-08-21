@@ -1,4 +1,4 @@
-import { DeveloperProvider, Options } from './types';
+import { DeveloperProvider, PrivateNetworkSettings } from './types';
 
 export class DeveloperClient {
   private readonly developerProvider: DeveloperProvider;
@@ -11,8 +11,12 @@ export class DeveloperClient {
     await this.developerProvider.runConsensusNow();
   }
 
-  public async updateSettings(options: Options): Promise<void> {
+  public async updateSettings(options: Partial<PrivateNetworkSettings>): Promise<void> {
     await this.developerProvider.updateSettings(options);
+  }
+
+  public async getSettings(): Promise<PrivateNetworkSettings> {
+    return this.developerProvider.getSettings();
   }
 
   public async fastForwardOffset(seconds: number): Promise<void> {

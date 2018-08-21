@@ -1,8 +1,9 @@
+// tslint:disable member-ordering
 import { ScriptBuilderParam } from '@neo-one/client-core';
 import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
-import { combineLatest, Observable, Observer, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Observer, ReplaySubject } from 'rxjs';
 import { distinctUntilChanged, map, multicast, refCount, switchMap } from 'rxjs/operators';
 import * as args from './args';
 import { ClientBase } from './ClientBase';
@@ -43,14 +44,20 @@ export class Client<
     mutableClients.forEach((client) => client.inject(provider));
   }
 
+  private readonly reset$ = new BehaviorSubject<void>(undefined);
+
   public readonly block$: Observable<{
     readonly block: Block;
     readonly network: NetworkType;
-  }> = this.currentNetwork$.pipe(
-    switchMap((network) =>
-      Observable.create((observer: Observer<Block>) =>
-        toObservable(this.read(network).iterBlocks()).subscribe(observer),
-      ).pipe(map((block) => ({ block, network }))),
+  }> = this.reset$.pipe(
+    switchMap(() =>
+      this.currentNetwork$.pipe(
+        switchMap((network) =>
+          Observable.create((observer: Observer<Block>) =>
+            toObservable(this.read(network).iterBlocks()).subscribe(observer),
+          ).pipe(map((block) => ({ block, network }))),
+        ),
+      ),
     ),
     multicast(() => new ReplaySubject(1)),
     refCount(),
@@ -198,6 +205,10 @@ export class Client<
     options?: TransactionOptions,
   ): Promise<RawCallReceipt> {
     return this.getProvider(options).call(contract, method, params, options);
+  }
+
+  public reset(): void {
+    this.reset$.next(undefined);
   }
 
   private getTransfersOptions(

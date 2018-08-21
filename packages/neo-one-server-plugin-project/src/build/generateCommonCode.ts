@@ -1,8 +1,8 @@
 import { genCommonFiles, NetworkDefinition } from '@neo-one/smart-contract-codegen';
 import fs from 'fs-extra';
 import { ProjectConfig } from '../types';
+import { getCommonPaths, getContractPaths, getTSPath } from '../utils';
 import { ContractResult } from './compileContract';
-import { getCommonPaths, getContractPaths, getTSPath } from './paths';
 
 export type CommonCodeContract = ContractResult & {
   readonly addresses: ReadonlyArray<string>;
@@ -10,11 +10,12 @@ export type CommonCodeContract = ContractResult & {
 
 export const generateCommonCode = async (
   project: ProjectConfig,
+  projectID: string,
   contracts: ReadonlyArray<CommonCodeContract>,
-  devNetworkName: string,
+  localDevNetworkName: string,
   masterPrivateKey: string,
   networks: ReadonlyArray<NetworkDefinition>,
-  javascript: boolean,
+  httpServerPort: number,
 ) => {
   const contractsPaths = contracts.map(({ name, filePath, sourceMap, addresses }) => ({
     ...getContractPaths(project, { name, filePath }),
@@ -23,27 +24,39 @@ export const generateCommonCode = async (
     addresses,
     contractPath: filePath,
   }));
-  const { sourceMapsPath, testPath, commonTypesPath, reactPath, clientPath, generatedPath } = getCommonPaths(project);
-  const { sourceMaps, test, commonTypes, react, client, generated } = genCommonFiles({
+  const {
+    sourceMapsPath,
+    testPath,
+    commonTypesPath,
+    reactPath,
+    clientPath,
+    generatedPath,
+    projectIDPath,
+  } = getCommonPaths(project);
+  const { sourceMaps, test, commonTypes, react, client, generated, projectID: projectIDFile } = genCommonFiles({
     contractsPaths,
     testPath,
     commonTypesPath,
     reactPath,
     clientPath,
     generatedPath,
-    devNetworkName,
+    localDevNetworkName,
     masterPrivateKey,
     networks,
+    httpServerPort,
+    projectID,
+    projectIDPath,
   });
 
   await fs.ensureDir(project.paths.generated);
-  if (javascript) {
+  if (project.codegen.javascript) {
     await Promise.all([
       fs.writeFile(sourceMapsPath, sourceMaps.js),
       fs.writeFile(testPath, test.js),
       fs.writeFile(reactPath, react.js),
       fs.writeFile(clientPath, client.js),
       fs.writeFile(generatedPath, generated.js),
+      fs.writeFile(projectIDPath, projectIDFile.js),
     ]);
   } else {
     await Promise.all([
@@ -52,6 +65,7 @@ export const generateCommonCode = async (
       fs.writeFile(getTSPath(reactPath), react.ts),
       fs.writeFile(getTSPath(clientPath), client.ts),
       fs.writeFile(getTSPath(generatedPath), generated.ts),
+      fs.writeFile(getTSPath(projectIDPath), projectIDFile.ts),
       fs.writeFile(getTSPath(commonTypesPath), commonTypes.ts),
     ]);
   }

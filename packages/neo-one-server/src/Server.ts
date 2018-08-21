@@ -1,14 +1,18 @@
+import { context as httpContext, cors, createServer$, onError as appOnError } from '@neo-one/http';
 import { Monitor } from '@neo-one/monitor';
 import { ServerConfig, ServerManager } from '@neo-one/server-client';
 import { proto } from '@neo-one/server-grpc';
 import { Binary, Config, DescribeTable } from '@neo-one/server-plugin';
 import { finalize } from '@neo-one/utils';
+import * as http from 'http';
+import Application from 'koa';
+import Router from 'koa-router';
 import Mali, { Context } from 'mali';
 import * as path from 'path';
-import { combineLatest, defer, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, defer, Observable, of as _of } from 'rxjs';
 import { distinctUntilChanged, map, mergeScan, switchMap } from 'rxjs/operators';
 import { ServerRunningError } from './errors';
-import { context, services as servicesMiddleware } from './middleware';
+import { context, rpc, services as servicesMiddleware } from './middleware';
 import { PluginManager } from './PluginManager';
 import { PortAllocator } from './PortAllocator';
 
@@ -49,14 +53,22 @@ export class Server {
       ),
     );
 
-    const pluginManager$ = combineLatest(dataPath$, portAllocator$).pipe(
-      switchMap(([dataPath, portAllocator]) =>
+    const pluginManager$ = combineLatest(
+      dataPath$,
+      portAllocator$,
+      serverConfig.config$.pipe(
+        map((config) => config.httpServer.port),
+        distinctUntilChanged(),
+      ),
+    ).pipe(
+      switchMap(([dataPath, portAllocator, httpServerPort]) =>
         defer(async () => {
           const pluginManager = new PluginManager({
             monitor,
             binary,
             portAllocator,
             dataPath: path.resolve(dataPath, PLUGIN_PATH),
+            httpServerPort,
           });
 
           await pluginManager.init();
@@ -115,8 +127,9 @@ export class Server {
     this.mutableServerDebug = {};
   }
 
-  public start$(): Observable<void> {
-    return this.serverConfig.config$.pipe(
+  // tslint:disable-next-line no-any
+  public start$(): Observable<any> {
+    const grpc$ = this.serverConfig.config$.pipe(
       map((config) => config.server),
       distinctUntilChanged(),
       mergeScan<ServerConfig['server'], Mali | undefined>(
@@ -165,7 +178,7 @@ export class Server {
             app.start(`0.0.0.0:${serverConfig.port}`);
             this.monitor.log({
               name: 'server_listen',
-              message: 'Server started.',
+              message: `GRPC Server listening on 0.0.0.0:${serverConfig.port}.`,
               level: 'info',
             });
 
@@ -180,6 +193,37 @@ export class Server {
         }
       }),
     );
+
+    const app$ = new BehaviorSubject(
+      (() => {
+        const app = new Application();
+        app.silent = true;
+
+        app.on('error', appOnError({ monitor: this.monitor }));
+
+        const router = new Router();
+
+        const rpcMiddleware = rpc({ server: this });
+        router.use(httpContext({ monitor: this.monitor }));
+        router.use(cors).post(rpcMiddleware.name, rpcMiddleware.path, rpcMiddleware.middleware);
+
+        app.use(router.routes());
+        app.use(cors);
+        app.use(router.allowedMethods());
+
+        return app;
+      })(),
+    );
+
+    const http$ = this.serverConfig.config$.pipe(
+      switchMap((config) =>
+        createServer$(this.monitor, app$, _of(60000), { host: '0.0.0.0', port: config.httpServer.port }, () =>
+          http.createServer(),
+        ),
+      ),
+    );
+
+    return combineLatest(grpc$, http$);
   }
 
   public async reset(): Promise<void> {

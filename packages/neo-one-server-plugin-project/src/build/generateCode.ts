@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import * as path from 'path';
 import { RawSourceMap } from 'source-map';
 import { ProjectConfig } from '../types';
-import { getCommonPaths, getContractPaths, getTSPath } from './paths';
+import { getCommonPaths, getContractPaths, getTSPath } from '../utils';
 
 export const generateCode = async (
   project: ProjectConfig,
@@ -15,7 +15,6 @@ export const generateCode = async (
     readonly sourceMap: RawSourceMap;
   },
   networksDefinition: SmartContractNetworksDefinition,
-  javascript: boolean,
 ) => {
   const base = path.resolve(project.paths.generated, contractResult.name);
   const sourceMapsPath = getCommonPaths(project).sourceMapsPath;
@@ -32,7 +31,7 @@ export const generateCode = async (
   });
 
   await fs.ensureDir(base);
-  if (javascript) {
+  if (project.codegen.javascript) {
     await Promise.all([fs.writeFile(abiPath, abi.js), fs.writeFile(createContractPath, contract.js)]);
   } else {
     await Promise.all([

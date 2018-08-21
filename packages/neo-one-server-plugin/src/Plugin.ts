@@ -94,4 +94,9 @@ export class Plugin {
   public executeTaskList(_pluginManager: PluginManager, _options: string): TaskList {
     throw new Error('Plugin does not define a way to execute task lists.');
   }
+
+  // tslint:disable-next-line no-any
+  public async request(_pluginManager: PluginManager, _options: string): Promise<any> {
+    throw new Error('Plugin does not define a way to handle requests.');
+  }
 }

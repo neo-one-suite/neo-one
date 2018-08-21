@@ -40,6 +40,7 @@ interface Plugins {
 }
 
 export class PluginManager {
+  public readonly httpServerPort: number;
   public readonly allResources$: Observable<AllResources>;
   public mutablePlugins: Plugins;
   public readonly plugins$: ReplaySubject<string>;
@@ -56,16 +57,19 @@ export class PluginManager {
     binary,
     portAllocator,
     dataPath,
+    httpServerPort,
   }: {
     readonly monitor: Monitor;
     readonly binary: Binary;
     readonly portAllocator: PortAllocator;
     readonly dataPath: string;
+    readonly httpServerPort: number;
   }) {
     this.monitor = monitor.at('plugin_manager');
     this.binary = binary;
     this.portAllocator = portAllocator;
     this.dataPath = dataPath;
+    this.httpServerPort = httpServerPort;
 
     this.mutableResourceManagers = {};
     this.mutablePlugins = {};

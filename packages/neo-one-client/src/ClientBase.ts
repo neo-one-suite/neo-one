@@ -111,6 +111,19 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
     this.selectedProvider$.next(provider);
   }
 
+  public async selectNetwork(networkIn: NetworkType): Promise<void> {
+    const network = args.assertString('network', networkIn);
+    const provider = this.getNetworkProvider(network);
+    const account = provider.getCurrentAccount();
+    if (account === undefined) {
+      const accounts = provider.getAccounts();
+      if (accounts.length > 0) {
+        await provider.selectAccount(accounts[0].id);
+      }
+    }
+    this.selectedProvider$.next(provider);
+  }
+
   public async deleteAccount(idIn: UserAccountID): Promise<void> {
     const id = args.assertUserAccountID('id', idIn);
     await this.getProvider({ from: id }).deleteAccount(id);

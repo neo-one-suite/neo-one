@@ -28,12 +28,12 @@ export class CRUD<Resource extends BaseResource, ResourceOptions extends BaseRes
 
   public constructor({
     resourceType,
-    start = new StartCRUD({ resourceType }),
-    stop = new StopCRUD({ resourceType }),
-    delete: del = new DeleteCRUD({ resourceType }),
-    create = new CreateCRUD({ resourceType }),
-    get = new GetCRUD({ resourceType }),
-    describe = new DescribeCRUD({ resourceType }),
+    start = new StartCRUD({ resourceType, hidden: true }),
+    stop = new StopCRUD({ resourceType, hidden: true }),
+    delete: del = new DeleteCRUD({ resourceType, hidden: true }),
+    create = new CreateCRUD({ resourceType, hidden: true }),
+    get = new GetCRUD({ resourceType, hidden: true }),
+    describe = new DescribeCRUD({ resourceType, hidden: true }),
   }: CRUDOptions<Resource, ResourceOptions>) {
     this.resourceType = resourceType;
     this.start = start;

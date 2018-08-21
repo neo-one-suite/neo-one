@@ -76,7 +76,8 @@
       true,
       "rxjs",
       "@reactivex/ix-es2015-cjs",
-      "@reactivex"
+      "@reactivex",
+      "uuid"
     ],
     "strict-boolean-expressions": [
       true,

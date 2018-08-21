@@ -17,7 +17,7 @@ import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { RelayTransactionError } from '../../errors';
 import { addressToScriptHash } from '../../helpers';
-import { AddressString, BufferString, GetOptions, Hash256String, Options, Peer } from '../../types';
+import { AddressString, BufferString, GetOptions, Hash256String, Peer, PrivateNetworkSettings } from '../../types';
 import { JSONRPCProvider } from './JSONRPCProvider';
 
 export class JSONRPCClient {
@@ -239,11 +239,20 @@ export class JSONRPCClient {
     );
   }
 
-  public async updateSettings(options: Options, monitor?: Monitor): Promise<void> {
+  public async updateSettings(options: Partial<PrivateNetworkSettings>, monitor?: Monitor): Promise<void> {
     return this.provider.request(
       {
         method: 'updatesettings',
         params: [options],
+      },
+      monitor,
+    );
+  }
+
+  public async getSettings(monitor?: Monitor): Promise<PrivateNetworkSettings> {
+    return this.provider.request(
+      {
+        method: 'getsettings',
       },
       monitor,
     );

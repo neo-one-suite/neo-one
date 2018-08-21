@@ -1,7 +1,7 @@
+import { getMonitor } from '@neo-one/http';
 import { Blockchain } from '@neo-one/node-core';
 import { Context } from 'koa';
 import { checkReady, Options as CheckReadyOptions } from './checkReady';
-import { getMonitor } from './common';
 
 export type Options = CheckReadyOptions;
 

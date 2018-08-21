@@ -7,6 +7,7 @@ describe('@neo-one/client', () => {
     'ReadClient',
     'DeveloperClient',
     'Hash256',
+    'OneClient',
     'nep5',
     'typeGuards',
     // ./user
@@ -16,6 +17,7 @@ describe('@neo-one/client', () => {
     'LocalStringStore',
     // ./provider
     'NEOONEDataProvider',
+    'NEOONEOneDataProvider',
     'NEOONEProvider',
     // ./helpers
     'addressToScriptHash',

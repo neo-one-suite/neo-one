@@ -22,6 +22,7 @@ export interface CRUDResourceOptions<Resource extends BaseResource, ResourceOpti
   readonly extraArgs?: ReadonlyArray<string>;
   readonly options?: ReadonlyArray<CLIOption>;
   readonly autocomplete?: ReadonlyArray<string>;
+  readonly hidden?: boolean;
 }
 
 export interface GetCLINameOptions<ResourceOptions extends BaseResourceOptions> {
@@ -43,6 +44,7 @@ export class CRUDResourceBase<
     extraArgs,
     options,
     autocomplete,
+    hidden,
   }: CRUDResourceOptions<Resource, ResourceOptions>) {
     const commandBase = `${name} ${resourceType.name} <name>`;
     const command = extraArgs === undefined ? commandBase : `${commandBase} ${extraArgs.join(' ')}`;
@@ -56,6 +58,7 @@ export class CRUDResourceBase<
       aliases,
       options,
       autocomplete,
+      hidden,
     });
   }
 

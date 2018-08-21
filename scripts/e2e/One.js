@@ -51,7 +51,8 @@ class One {
     this.dir = tmp.dirSync();
     this.dirName = this.dir.name;
     this.serverPort = _.random(10000, 50000);
-    this.minPort = this.serverPort + 1;
+    this.httpServerPort = this.serverPort + 1;
+    this.minPort = this.serverPort + 2;
     const [cmd, args] = this._createCommand('start server --static-neo-one');
     this.server = execa(cmd, args, this._getEnv());
 
@@ -143,9 +144,9 @@ class One {
 
   _createCommand(commandIn) {
     const cmd = path.resolve(process.cwd(), 'dist', 'neo-one', 'node_modules', '.bin', 'neo-one');
-    const command = `${cmd} ${commandIn} --dir ${this.dirName} --server-port ${this.serverPort} --min-port ${
-      this.minPort
-    }`;
+    const command = `${cmd} ${commandIn} --dir ${this.dirName} --server-port ${this.serverPort} --http-server-port ${
+      this.httpServerPort
+    } --min-port ${this.minPort}`;
     let additionalArgs = [];
     if (commandIn.startsWith('create') || commandIn.startsWith('delete')) {
       additionalArgs = ['--no-progress'];

@@ -9,6 +9,7 @@ describe('genReact', () => {
         commonTypesPath: '/foo/bar/one/generated/types.js',
         reactPath: '/foo/bar/one/generated/react.js',
         clientPath: '/foo/bar/one/generated/client.js',
+        projectIDPath: '/foo/bar/one/generated/projectID.js',
       }),
     ).toMatchSnapshot();
   });

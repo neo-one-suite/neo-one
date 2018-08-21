@@ -7,10 +7,10 @@ export const setupServer = (
   name: string,
   { monitor, shutdown, logConfig$, mutableShutdownFuncs, serverArgs, paths }: CLIArgs,
 ) => {
+  const { dir: _dir, ...serverArgsWithoutDir } = serverArgs;
   const serverConfig = createServerConfig({
     paths,
-    serverPort: serverArgs.serverPort,
-    minPort: serverArgs.minPort,
+    ...serverArgsWithoutDir,
   });
 
   const logSubscription = combineLatest(

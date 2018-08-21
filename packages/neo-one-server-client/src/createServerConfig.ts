@@ -6,13 +6,14 @@ export interface ServerConfig {
   readonly server: {
     readonly port: number;
   };
-
+  readonly httpServer: {
+    readonly port: number;
+  };
   readonly log: {
     readonly level: string;
     readonly maxSize: number;
     readonly maxFiles: number;
   };
-
   readonly ports: {
     readonly min: number;
     readonly max: number;
@@ -22,10 +23,12 @@ export interface ServerConfig {
 export const createServerConfig = ({
   paths,
   serverPort,
+  httpServerPort,
   minPort,
 }: {
   readonly paths: Paths;
   readonly serverPort?: number;
+  readonly httpServerPort?: number;
   readonly minPort?: number;
 }): Config<ServerConfig> =>
   new Config({
@@ -35,6 +38,9 @@ export const createServerConfig = ({
       paths,
       server: {
         port: serverPort === undefined ? 40100 : serverPort,
+      },
+      httpServer: {
+        port: httpServerPort === undefined ? 40101 : httpServerPort,
       },
       log: {
         level: 'info',
@@ -62,6 +68,13 @@ export const createServerConfig = ({
           },
         },
         server: {
+          type: 'object',
+          required: ['port'],
+          properties: {
+            port: { type: 'number' },
+          },
+        },
+        httpServer: {
           type: 'object',
           required: ['port'],
           properties: {

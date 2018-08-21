@@ -53,6 +53,7 @@ export {
   PortAllocator,
   ReadResponse,
   ReadRequest,
+  ResourcesManager,
   ResourceState,
   Session,
   SubDescribeTable,

@@ -12,14 +12,14 @@ import {
   TransactionType,
   utils,
 } from '@neo-one/client-core';
+import { bodyParser, getMonitor } from '@neo-one/http';
 import { KnownLabel, metrics, Monitor } from '@neo-one/monitor';
 import { Blockchain, getEndpointConfig, Node } from '@neo-one/node-core';
 import { Context, Middleware } from 'koa';
 import compose from 'koa-compose';
 import compress from 'koa-compress';
 import { filter, switchMap, take, timeout, toArray } from 'rxjs/operators';
-import { bodyParser } from './bodyParser';
-import { getMonitor } from './common';
+
 export type HandlerPrimitive = string | number | boolean;
 export type HandlerResult =
   | object
@@ -85,6 +85,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   getnetworksettings: 'getnetworksettings',
   runconsensusnow: 'runconsensusnow',
   updatesettings: 'updatesettings',
+  getsettings: 'getsettings',
   fastforwardoffset: 'fastforwardoffset',
   fastforwardtotime: 'fastforwardtotime',
   reset: 'reset',
@@ -599,6 +600,9 @@ export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; rea
 
       return true;
     },
+    [RPC_METHODS.getsettings]: async () => ({
+      secondsPerBlock: blockchain.settings.secondsPerBlock,
+    }),
     [RPC_METHODS.fastforwardoffset]: async (args) => {
       if (node.consensus) {
         await node.consensus.fastForwardOffset(args[0]);

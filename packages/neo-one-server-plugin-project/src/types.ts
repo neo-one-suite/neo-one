@@ -3,15 +3,30 @@ import * as path from 'path';
 export interface BuildTaskListOptions {
   readonly command: 'build';
   readonly rootDir: string;
-  readonly javascript: boolean;
 }
 
-export type ExecuteTaskListOptions = BuildTaskListOptions;
+export interface ResetTaskListOptions {
+  readonly command: 'reset';
+  readonly projectID?: string;
+  readonly rootDir?: string;
+}
+
+export type ExecuteTaskListOptions = BuildTaskListOptions | ResetTaskListOptions;
+
+export interface NetworkRequestOptions {
+  readonly type: 'network';
+  readonly projectID: string;
+}
+
+export type RequestOptions = NetworkRequestOptions;
 
 export interface ProjectConfig {
   readonly paths: {
     readonly contracts: string;
     readonly generated: string;
+  };
+  readonly codegen: {
+    readonly javascript: boolean;
   };
 }
 
@@ -24,6 +39,12 @@ export const projectConfigSchema = {
     generated: {
       format: String,
       default: path.join('one', 'generated'),
+    },
+  },
+  codegen: {
+    javascript: {
+      format: Boolean,
+      default: false,
     },
   },
 };

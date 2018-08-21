@@ -1,0 +1,73 @@
+import fetch from 'cross-fetch';
+
+interface RPCRequest {
+  readonly method: string;
+  // tslint:disable-next-line no-any
+  readonly [key: string]: any;
+}
+
+interface RPCResult {
+  readonly type: 'ok' | 'error';
+  // tslint:disable-next-line no-any
+  readonly [key: string]: any;
+}
+
+export class Client {
+  private readonly port: number;
+
+  public constructor(port: number) {
+    this.port = port;
+  }
+
+  public async request({ plugin, options }: { readonly plugin: string; readonly options: object }): Promise<RPCResult> {
+    return this.requestInternal({
+      method: 'request',
+      plugin,
+      options,
+    });
+  }
+
+  public async executeTaskList({
+    plugin,
+    options,
+  }: {
+    readonly plugin: string;
+    readonly options: object;
+  }): Promise<RPCResult> {
+    return this.requestInternal({
+      method: 'executeTaskList',
+      plugin,
+      options,
+    });
+  }
+
+  private async requestInternal(req: RPCRequest): Promise<RPCResult> {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    const response = await fetch(`http://localhost:${this.port}/rpc`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(req),
+    });
+
+    if (!response.ok) {
+      let text;
+      try {
+        // eslint-disable-next-line
+        text = await response.text();
+      } catch {
+        // Ignore errors
+      }
+      throw new Error(`${response.status}: ${text}`);
+    }
+    // eslint-disable-next-line
+    const result = await response.json();
+
+    if (result.type === 'error') {
+      throw new Error(result.message);
+    }
+
+    return result;
+  }
+}

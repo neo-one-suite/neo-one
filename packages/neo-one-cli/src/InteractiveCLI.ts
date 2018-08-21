@@ -82,6 +82,7 @@ export class InteractiveCLI {
   private readonly serverConfig: {
     readonly dir?: string;
     readonly serverPort?: number;
+    readonly httpServerPort?: number;
     readonly minPort?: number;
   };
   private mutableLogPath: string | undefined;
@@ -91,11 +92,13 @@ export class InteractiveCLI {
     debug,
     dir,
     serverPort,
+    httpServerPort,
     minPort,
   }: {
     readonly debug: boolean;
     readonly dir?: string;
     readonly serverPort?: number;
+    readonly httpServerPort?: number;
     readonly minPort?: number;
   }) {
     this.vorpal = new Vorpal().version('1.0.0-alpha');
@@ -106,7 +109,7 @@ export class InteractiveCLI {
     this.mutablePostHooks = {};
     this.mutableDelimiter = [];
     this.mutablePlugins = {};
-    this.serverConfig = { dir, serverPort, minPort };
+    this.serverConfig = { dir, serverPort, httpServerPort, minPort };
   }
 
   public get throwError(): boolean {
@@ -227,10 +230,10 @@ export class InteractiveCLI {
       .subscribe(logConfig$);
     mutableShutdownFuncs.push(() => logSubscription.unsubscribe());
 
+    const { dir: _dir, ...serverConfigWithoutDir } = this.serverConfig;
     const serverConfig = createServerConfig({
       paths,
-      serverPort: this.serverConfig.serverPort,
-      minPort: this.serverConfig.minPort,
+      ...serverConfigWithoutDir,
     });
 
     const start$ = combineLatest(

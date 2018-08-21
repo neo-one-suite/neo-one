@@ -758,7 +758,7 @@ export interface GetOptions {
   readonly monitor?: Monitor;
 }
 
-export interface Options {
+export interface PrivateNetworkSettings {
   readonly secondsPerBlock: number;
 }
 
@@ -810,7 +810,8 @@ export interface DataProvider {
 export interface DeveloperProvider {
   readonly network: NetworkType;
   readonly runConsensusNow: (monitor?: Monitor) => Promise<void>;
-  readonly updateSettings: (options: Options, monitor?: Monitor) => Promise<void>;
+  readonly updateSettings: (options: Partial<PrivateNetworkSettings>, monitor?: Monitor) => Promise<void>;
+  readonly getSettings: (monitor?: Monitor) => Promise<PrivateNetworkSettings>;
   readonly fastForwardOffset: (seconds: number, monitor?: Monitor) => Promise<void>;
   readonly fastForwardToTime: (seconds: number, monitor?: Monitor) => Promise<void>;
   readonly reset: (monitor?: Monitor) => Promise<void>;

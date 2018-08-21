@@ -248,16 +248,24 @@ export const createCRUD = ({ cli, plugin }: { readonly cli: InteractiveCLI; read
   const mutableCommands: Command[] = [];
   plugin.resourceTypes.forEach((resourceType) => {
     const crud = resourceType.getCRUD();
-    mutableCommands.push(createResource({ cli, crud: crud.create }));
-    mutableCommands.push(createResource({ cli, crud: crud.delete }));
-    if (crud.start !== undefined) {
+    if (!crud.create.hidden) {
+      mutableCommands.push(createResource({ cli, crud: crud.create }));
+    }
+    if (!crud.delete.hidden) {
+      mutableCommands.push(createResource({ cli, crud: crud.delete }));
+    }
+    if (crud.start !== undefined && !crud.start.hidden) {
       mutableCommands.push(createResource({ cli, crud: crud.start }));
     }
-    if (crud.stop !== undefined) {
+    if (crud.stop !== undefined && !crud.stop.hidden) {
       mutableCommands.push(createResource({ cli, crud: crud.stop }));
     }
-    mutableCommands.push(createGet({ cli, crud: crud.get }));
-    mutableCommands.push(createDescribe({ cli, crud: crud.describe }));
+    if (!crud.get.hidden) {
+      mutableCommands.push(createGet({ cli, crud: crud.get }));
+    }
+    if (!crud.describe.hidden) {
+      mutableCommands.push(createDescribe({ cli, crud: crud.describe }));
+    }
   });
 
   return mutableCommands;

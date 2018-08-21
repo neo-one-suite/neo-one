@@ -1,12 +1,13 @@
+import { Client as OneClient } from '@neo-one/server-http-client';
 import * as nep5 from './nep5';
 import * as typeGuards from './typeGuards';
 
 export { Client } from './Client';
 export { ReadClient } from './ReadClient';
 export { DeveloperClient } from './DeveloperClient';
-export { nep5, typeGuards };
+export { OneClient, nep5, typeGuards };
 export { LocalKeyStore, LocalMemoryStore, LocalStringStore, LocalUserAccountProvider } from './user';
-export { NEOONEDataProvider, NEOONEProvider } from './provider';
+export { NEOONEDataProvider, NEOONEProvider, NEOONEOneDataProvider, NEOONEDataProviderOptions } from './provider';
 export {
   addressToScriptHash,
   createPrivateKey,

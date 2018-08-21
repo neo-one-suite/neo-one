@@ -1,5 +1,6 @@
 import { NetworkPlugin } from './NetworkPlugin';
 
+export { getNetworkResourceManager } from './getNetworkResourceManager';
 export { constants } from './constants';
 export { NEOONENodeConfig } from './node';
 export { Network } from './NetworkResourceType';

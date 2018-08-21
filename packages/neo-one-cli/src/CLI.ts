@@ -11,6 +11,7 @@ import { createBinary, setupCLI } from './utils';
 export class CLI {
   public readonly serverConfig: {
     readonly dir?: string;
+    readonly httpServerPort?: number;
     readonly serverPort?: number;
     readonly minPort?: number;
   };
@@ -22,16 +23,18 @@ export class CLI {
     debug,
     dir,
     serverPort,
+    httpServerPort,
     minPort,
   }: {
     readonly debug: boolean;
     readonly dir?: string;
     readonly serverPort?: number;
+    readonly httpServerPort?: number;
     readonly minPort?: number;
   }) {
     this.debug = debug;
     this.plugins = new Set();
-    this.serverConfig = { dir, serverPort, minPort };
+    this.serverConfig = { dir, serverPort, httpServerPort, minPort };
     this.paths = {
       data: dir === undefined ? defaultPaths.data : path.join(dir, 'data'),
       config: dir === undefined ? defaultPaths.config : path.join(dir, 'config'),

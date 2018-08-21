@@ -247,7 +247,11 @@ export class TaskList {
   }
 
   public async toPromise(): Promise<void> {
-    await this.status$.toPromise();
+    const result = await this.status$.toPromise();
+    const error = getTasksError(result);
+    if (error !== undefined) {
+      throw new Error(error);
+    }
   }
 
   public async abort(): Promise<void> {

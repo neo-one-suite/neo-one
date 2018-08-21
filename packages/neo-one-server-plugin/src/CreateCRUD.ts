@@ -14,6 +14,7 @@ export interface CreateCRUDOptions<Resource extends BaseResource, ResourceOption
   readonly options?: ReadonlyArray<CLIOption>;
   readonly autocomplete?: ReadonlyArray<string>;
   readonly startOnCreate?: boolean;
+  readonly hidden?: boolean;
 }
 
 function nameToUpper(name: string): string {
@@ -39,6 +40,7 @@ export class CreateCRUD<
     options,
     autocomplete,
     startOnCreate = false,
+    hidden,
   }: CreateCRUDOptions<Resource, ResourceOptions>) {
     super({
       name,
@@ -48,6 +50,7 @@ export class CreateCRUD<
       extraArgs,
       options,
       autocomplete,
+      hidden,
     });
 
     this.startOnCreate = startOnCreate;

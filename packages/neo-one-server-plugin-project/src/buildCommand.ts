@@ -8,16 +8,15 @@ export const buildCommand = ({ cli }: InteractiveCLIArgs) => {
   return cli.vorpal
     .command('build', 'Build NEO•ONE project.')
     .option('--no-progress', "Don't output progress. Typically used for CI scenarios")
-    .option('--javascript', 'Output JavaScript generated code rather than TypeScript')
+    .option('--reset', "Reset the local development environment of a NEO•ONE project to it's original state.")
     .action(async (args) => {
       cancel$ = new ReplaySubject<void>();
-      const javascript = args.options.javascript !== undefined && args.options.javascript;
+      const reset = args.options.reset !== undefined && args.options.reset;
       const response$ = cli.client.executeTaskList$({
         plugin: constants.PLUGIN,
         options: {
-          command: 'build',
+          command: reset ? 'reset' : 'build',
           rootDir: process.cwd(),
-          javascript,
         },
         cancel$,
       });

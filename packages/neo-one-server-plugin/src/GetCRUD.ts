@@ -20,6 +20,7 @@ export interface GetCRUDOptions<Resource extends BaseResource, ResourceOptions e
   readonly aliases?: ReadonlyArray<string>;
   readonly options?: ReadonlyArray<CLIOption>;
   readonly autocomplete?: ReadonlyArray<string>;
+  readonly hidden?: boolean;
 }
 
 export class GetCRUD<
@@ -32,6 +33,7 @@ export class GetCRUD<
     aliases,
     options,
     autocomplete,
+    hidden,
   }: GetCRUDOptions<Resource, ResourceOptions>) {
     super({
       name: 'get',
@@ -41,6 +43,7 @@ export class GetCRUD<
       aliases,
       options,
       autocomplete,
+      hidden,
     });
   }
 

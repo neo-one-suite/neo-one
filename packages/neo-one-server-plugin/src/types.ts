@@ -279,9 +279,12 @@ export interface ResourcesManager<
   readonly masterResourceAdapter: any;
   readonly addDependent: (name: string, dependent: ResourceDependency) => void;
   readonly create: (name: string, options: ResourceOptions) => TaskList;
+  readonly delete: (name: string, options: ResourceOptions) => TaskList;
+  readonly start: (name: string, options: ResourceOptions) => TaskList;
 }
 
 export interface PluginManager {
+  readonly httpServerPort: number;
   readonly getResourcesManager: (
     options: { readonly plugin: string; readonly resourceType: string },
   ) => ResourcesManager;

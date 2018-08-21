@@ -11,6 +11,7 @@ export interface StopCRUDOptions<Resource extends BaseResource, ResourceOptions 
   readonly aliases?: ReadonlyArray<string>;
   readonly options?: ReadonlyArray<CLIOption>;
   readonly autocomplete?: ReadonlyArray<string>;
+  readonly hidden?: boolean;
 }
 
 function nameToUpper(name: string): string {
@@ -32,6 +33,7 @@ export class StopCRUD<Resource extends BaseResource, ResourceOptions extends Bas
     aliases,
     options,
     autocomplete,
+    hidden,
   }: StopCRUDOptions<Resource, ResourceOptions>) {
     super({
       name,
@@ -49,6 +51,7 @@ export class StopCRUD<Resource extends BaseResource, ResourceOptions extends Bas
       aliases,
       options,
       autocomplete,
+      hidden,
     });
   }
 

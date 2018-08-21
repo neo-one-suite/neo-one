@@ -10,6 +10,7 @@ export interface DeleteCRUDOptions<Resource extends BaseResource, ResourceOption
   readonly aliases?: ReadonlyArray<string>;
   readonly options?: ReadonlyArray<CLIOption>;
   readonly autocomplete?: ReadonlyArray<string>;
+  readonly hidden?: boolean;
 }
 
 export class DeleteCRUD<
@@ -22,6 +23,7 @@ export class DeleteCRUD<
     aliases,
     options,
     autocomplete,
+    hidden,
   }: DeleteCRUDOptions<Resource, ResourceOptions>) {
     super({
       name: 'delete',
@@ -30,6 +32,7 @@ export class DeleteCRUD<
       aliases,
       options,
       autocomplete,
+      hidden,
     });
   }
 

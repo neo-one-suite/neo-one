@@ -134,6 +134,7 @@
     "@types/source-map": "0.5.7",
     "@types/tar": "4.0.0",
     "@types/through": "0.0.29",
+    "@types/uuid": "^3.4.3",
     "@types/yargs": "11.1.1",
     "all-contributors-cli": "5.4.0",
     "app-root-dir": "1.0.2",

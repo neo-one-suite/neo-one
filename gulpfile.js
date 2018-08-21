@@ -270,9 +270,10 @@ const compileTypescript = ((cache) =>
         .pipe(gulpSourcemaps.init())
         .pipe(
           gulpBabel({
+            presets: [],
             plugins: [
               '@babel/plugin-syntax-numeric-separator',
-              '@babel/plugin-syntax-typescript',
+              ['@babel/plugin-syntax-typescript', { isTSX: true }],
               '@babel/plugin-syntax-optional-catch-binding',
               '@babel/plugin-syntax-dynamic-import',
               ['babel-plugin-lodash', { id: ['lodash'] }],
@@ -300,8 +301,8 @@ const compileTypescript = ((cache) =>
           }),
         )
         .pipe(
-          gulpRename((file) => {
-            file.extname = file.extname === '.js' ? '.ts' : '.tsx';
+          gulpRename((parsedPath, file) => {
+            parsedPath.extname = path.extname(file.history[0]);
           }),
         )
         .pipe(type === 'fast' ? format.fastProject() : format.project())
@@ -379,8 +380,8 @@ const copyRootTSConfig = ((cache) =>
 
 const gulpBin = () =>
   gulpReplaceModule(MAIN_FORMAT, gulp.src(globs.bin)).pipe(
-    gulpRename((file) => {
-      file.dirname = file.dirname.slice(0, -'/src/bin'.length) + '/bin';
+    gulpRename((parsedPath) => {
+      parsedPath.dirname = parsedPath.dirname.slice(0, -'/src/bin'.length) + '/bin';
     }),
   );
 
