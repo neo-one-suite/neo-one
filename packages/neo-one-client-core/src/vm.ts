@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 import _ from 'lodash';
 import { UInt160 } from './common';
 import { ScriptContainer } from './ScriptContainer';
@@ -313,16 +313,10 @@ export enum SysCall {
 
 export type SysCallName = keyof typeof SysCall;
 
-export class InvalidSysCallError extends CustomError {
-  public static readonly code = 'INVALID_SYS_CALL_NAME';
-  public readonly code = InvalidSysCallError.code;
-  public readonly value: string;
-
-  public constructor(value: string) {
-    super(`Expected sys call name, found: ${value}`);
-    this.value = value;
-  }
-}
+export const InvalidSysCallError = makeErrorWithCode(
+  'INVALID_SYS_CALL_NAME',
+  (value: string) => `Expected sys call name, found: ${value}`,
+);
 
 const isSysCall = (value: string): value is SysCall =>
   // tslint:disable-next-line strict-type-predicates no-any
@@ -335,14 +329,10 @@ export const assertSysCall = (value: string): SysCall => {
   throw new InvalidSysCallError(value);
 };
 
-export class InvalidVMStateError extends CustomError {
-  public static readonly code = 'INVALID_VM_STATE';
-  public readonly code = InvalidVMStateError.code;
-
-  public constructor(state: number) {
-    super(`Invalid VM State: ${state}`);
-  }
-}
+export const InvalidVMStateError = makeErrorWithCode(
+  'INVALID_VM_STATE',
+  (state: number) => `Invalid VM State: ${state}`,
+);
 
 export enum VMState {
   None = 0x00,

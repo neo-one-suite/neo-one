@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`createSmartContract createInvoke - no network 1`] = `[Error: Contract has not been deployed to network local]`;
+exports[`createSmartContract createInvoke - no network 1`] = `[Error [NO_CONTRACT_DEPLOYED]: Contract has not been deployed to network local]`;
 
 exports[`createSmartContract read 1`] = `
 Array [

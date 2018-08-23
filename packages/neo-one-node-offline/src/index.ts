@@ -1,20 +1,16 @@
 /// <reference types="@neo-one/types" />
 import { BinaryReader, Block, DeserializeWireContext } from '@neo-one/client-core';
 import { Blockchain } from '@neo-one/node-core';
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 import * as fs from 'fs';
 import _ from 'lodash';
 import { Readable, Transform, Writable } from 'stream';
 import * as zlib from 'zlib';
 
-export class InvalidBlockTransformEncodingError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Invalid Block Transform Encoding.');
-    this.code = 'INVALID_BLOCK_TRANSFORM_ENCODING';
-  }
-}
+export const InvalidBlockTransformEncodingError = makeErrorWithCode(
+  'INVALID_BLOCK_TRANSFORM_ENCODING',
+  () => 'Invalid Block Transform Encoding.',
+);
 
 const SIZE_OF_INT32 = 4;
 

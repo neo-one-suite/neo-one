@@ -1292,7 +1292,7 @@ Array [
 ]
 `;
 
-exports[`LocalUserAccountProvider consolidation + multi-inputs throws on reused inputs 1`] = `[Error: Found 0 funds, required: 1; You have 2 input(s) on the current block, try transfer again on the next]`;
+exports[`LocalUserAccountProvider consolidation + multi-inputs throws on reused inputs 1`] = `[Error [FUNDS_IN_USE]: Found 0 funds, required: 1; You have 2 input(s) on the current block, try transfer again on the next]`;
 
 exports[`LocalUserAccountProvider consolidation + multi-inputs transfer - consolidate all 1`] = `
 Array [
@@ -5151,7 +5151,7 @@ Array [
 ]
 `;
 
-exports[`LocalUserAccountProvider issue - nothing to issue 1`] = `[Error: Nothing to issue.]`;
+exports[`LocalUserAccountProvider issue - nothing to issue 1`] = `[Error [NOTHING_TO_ISSUE]: Nothing to issue.]`;
 
 exports[`LocalUserAccountProvider issue 1`] = `
 Array [
@@ -5620,7 +5620,7 @@ Array [
 ]
 `;
 
-exports[`LocalUserAccountProvider publish invoke fault 1`] = `[Error: Failure!]`;
+exports[`LocalUserAccountProvider publish invoke fault 1`] = `[Error [INVOKE]: Failure!]`;
 
 exports[`LocalUserAccountProvider publish with return type Address 1`] = `
 Array [
@@ -12241,11 +12241,11 @@ Array [
 ]
 `;
 
-exports[`LocalUserAccountProvider transfer - insufficient funds 1`] = `[Error: Found 0 funds, required: 10.]`;
+exports[`LocalUserAccountProvider transfer - insufficient funds 1`] = `[Error [INSUFFICIENT_FUNDS]: Found 0 funds, required: 10.]`;
 
-exports[`LocalUserAccountProvider transfer - no account 1`] = `[Error: No account exists.]`;
+exports[`LocalUserAccountProvider transfer - no account 1`] = `[Error [NO_ACCOUNT]: No account exists.]`;
 
-exports[`LocalUserAccountProvider transfer - nothing to transfer 1`] = `[Error: Nothing to transfer.]`;
+exports[`LocalUserAccountProvider transfer - nothing to transfer 1`] = `[Error [NOTHING_TO_TRANSFER]: Nothing to transfer.]`;
 
 exports[`LocalUserAccountProvider transfer 1`] = `
 Array [

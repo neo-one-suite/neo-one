@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 import { Block } from './Block';
 import { ConsensusPayload } from './payload';
 import { Transaction } from './transaction';
@@ -23,16 +23,10 @@ export type ScriptContainer =
       readonly value: ConsensusPayload;
     };
 
-export class InvalidScriptContainerTypeError extends CustomError {
-  public readonly value: number;
-  public readonly code: string;
-
-  public constructor(value: number) {
-    super(`Expected script container type, found: ${value.toString(16)}`);
-    this.value = value;
-    this.code = 'INVALID_SCRIPT_CONTAINER_TYPE';
-  }
-}
+export const InvalidScriptContainerTypeError = makeErrorWithCode(
+  'INVALID_SCRIPT_CONTAINER_TYPE',
+  (value: number) => `Expected script container type, found: ${value.toString(16)}`,
+);
 
 const isScriptContainerType = (value: number): value is ScriptContainerType =>
   // tslint:disable-next-line strict-type-predicates

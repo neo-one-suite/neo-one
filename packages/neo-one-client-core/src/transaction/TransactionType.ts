@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
 export enum TransactionType {
   Miner = 0x00,
@@ -12,16 +12,10 @@ export enum TransactionType {
   Invocation = 0xd1,
 }
 
-export class InvalidTransactionTypeError extends CustomError {
-  public readonly transactionType: number;
-  public readonly code: string;
-
-  public constructor(transactionType: number) {
-    super(`Expected transaction type, found: ${transactionType.toString(16)}`);
-    this.transactionType = transactionType;
-    this.code = 'INVALID_TRANSACTION_TYPE';
-  }
-}
+export const InvalidTransactionTypeError = makeErrorWithCode(
+  'INVALID_TRANSACTION_TYPE',
+  (transactionType: number) => `Expected transaction type, found: ${transactionType.toString(16)}`,
+);
 
 const isTransactionType = (value: number): value is TransactionType =>
   // tslint:disable-next-line strict-type-predicates

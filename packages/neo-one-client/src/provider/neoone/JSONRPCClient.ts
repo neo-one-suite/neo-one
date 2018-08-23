@@ -137,8 +137,9 @@ export class JSONRPCClient {
         monitor,
       )
       .catch((error) => {
-        if (error.code === 'JSON_RPC' && error.responseError.code === -110) {
-          throw new RelayTransactionError(error.responseError.message);
+        const [message, code]: [string, string] = error.message.split(':');
+        if (error.code === 'JSON_RPC' && code === '-110') {
+          throw new RelayTransactionError(message);
         }
 
         throw error;

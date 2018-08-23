@@ -1,37 +1,9 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
-export class NotFoundError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Not found');
-    this.code = 'NOT_FOUND';
-  }
-}
-
-export class UnknownTypeError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Unknown type');
-    this.code = 'UNKNOWN_TYPE';
-  }
-}
-
-export class KeyNotFoundError extends CustomError {
-  public readonly code: string;
-
-  public constructor(keyString: string) {
-    super(`Key ${keyString} not found in database`);
-    this.code = 'KEY_NOT_FOUND';
-  }
-}
-
-export class UnknownChangeTypeError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Unknown change type');
-    this.code = 'UNKNOWN_CHANGE_TYPE';
-  }
-}
+export const NotFoundError = makeErrorWithCode('NOT_FOUND', () => 'Not found');
+export const UnknownTypeError = makeErrorWithCode('UNKNOWN_TYPE', () => 'Unknown type');
+export const KeyNotFoundError = makeErrorWithCode(
+  'KEY_NOT_FOUND',
+  (keyString: string) => `Key ${keyString} not found in database`,
+);
+export const UnknownChangeTypeError = makeErrorWithCode('UNKNOWN_CHANGE_TYPE', () => 'Unknown change type');

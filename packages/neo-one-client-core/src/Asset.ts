@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { assertAssetType, AssetType, AssetTypeJSON, toJSONAssetType } from './AssetType';
 import { BaseState } from './BaseState';
@@ -16,14 +16,7 @@ import {
 } from './Serializable';
 import { BinaryReader, BinaryWriter, IOHelper, JSONHelper, utils } from './utils';
 
-export class InvalidAssetError extends CustomError {
-  public readonly code: string;
-
-  public constructor(message: string) {
-    super(message);
-    this.code = 'INVALID_ASSET';
-  }
-}
+export const InvalidAssetError = makeErrorWithCode('INVALID_ASSET', (message: string) => message);
 
 export interface AssetKey {
   readonly hash: UInt256;

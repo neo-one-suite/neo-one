@@ -158,7 +158,8 @@ describe('JSONRPCClient', () => {
 
   test('relayTransaction - relay error', async () => {
     const message = 'error';
-    mockRequest.mockImplementationOnce(async () => Promise.reject(new JSONRPCError({ message, code: -110 })));
+    const rpcErr = new JSONRPCError({ message, code: -110 });
+    mockRequest.mockImplementationOnce(async () => Promise.reject(rpcErr));
 
     const result = client.relayTransaction(data.buffers.a);
 

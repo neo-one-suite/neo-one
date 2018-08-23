@@ -1,6 +1,6 @@
 // tslint:disable no-any no-array-mutation
 import ECKey from '@neo-one/ec-key';
-import { CustomError, utils } from '@neo-one/utils';
+import { makeErrorWithCode, utils } from '@neo-one/utils';
 import base58 from 'bs58';
 import xor from 'buffer-xor';
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
@@ -24,25 +24,12 @@ const ec = () => {
   return ecCache;
 };
 
-export class Base58CheckError extends CustomError {
-  public readonly code: string;
+export const Base58CheckError = makeErrorWithCode('BASE_58_CHECK', () => 'Base58 Check Decode Error.');
 
-  public constructor() {
-    super('Base58 Check Decode Error.');
-    this.code = 'BASE_58_CHECK';
-  }
-}
-
-export class InvalidAddressError extends CustomError {
-  public readonly address: string;
-  public readonly code: string;
-
-  public constructor(address: string) {
-    super(`Invalid Address: ${address}`);
-    this.address = address;
-    this.code = 'INVALID_ADDRESS';
-  }
-}
+export const InvalidAddressError = makeErrorWithCode(
+  'INVALID_ADDRESS',
+  (address: string) => `Invalid Address: ${address}`,
+);
 
 const sha1 = (value: Buffer): Buffer =>
   createHash('sha1')
@@ -69,14 +56,7 @@ const sign = ({ message, privateKey }: { readonly message: Buffer; readonly priv
   return Buffer.concat([sig.r.toArrayLike(Buffer, 'be', 32), sig.s.toArrayLike(Buffer, 'be', 32)]);
 };
 
-class InvalidSignatureError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Invalid Signature');
-    this.code = 'INVALID_SIGNATURE';
-  }
-}
+export const InvalidSignatureError = makeErrorWithCode('INVALID_SIGNATURE', () => 'Invalid Signature');
 
 // tslint:disable readonly-array
 const rmPadding = (buf: number[]): number[] => {
@@ -166,14 +146,7 @@ const verify = ({
 };
 // tslint:enable readonly-array
 
-class InvalidPrivateKeyError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Invalid Private Key');
-    this.code = 'INVALID_PRIVATE_KEY';
-  }
-}
+export const InvalidPrivateKeyError = makeErrorWithCode('INVALID_PRIVATE_KEY', () => 'Invalid Private Key');
 
 const toECPointFromKeyPair = (pair: KeyPair): ECPoint =>
   common.bufferToECPoint(Buffer.from(pair.getPublic(true, 'hex'), 'hex'));

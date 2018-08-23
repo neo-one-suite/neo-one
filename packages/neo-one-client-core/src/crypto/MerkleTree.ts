@@ -1,16 +1,9 @@
 // tslint:disable readonly-keyword no-object-mutation no-array-mutation
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 import { common, UInt256 } from '../common';
 import { crypto } from './crypto';
 
-class InvalidMerkleTreeException extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Invalid Merkle tree.');
-    this.code = 'INVALID_MERKLE_TREE';
-  }
-}
+export const InvalidMerkleTreeException = makeErrorWithCode('INVALID_MERKLE_TREE', () => 'Invalid Merkle tree.');
 
 class MerkleTreeNode {
   public readonly hash: UInt256;

@@ -16,7 +16,7 @@ import {
   SerializeWire,
   Transaction,
 } from '@neo-one/client-core';
-import { CustomError, utils } from '@neo-one/utils';
+import { makeErrorWithCode, utils } from '@neo-one/utils';
 import { Transform } from 'stream';
 import { assertCommand, Command } from './Command';
 import {
@@ -317,14 +317,10 @@ export class Message implements SerializableWire<Message> {
   }
 }
 
-export class InvalidMessageTransformEncodingError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Invalid Message Transform Encoding.');
-    this.code = 'INVALID_MESSAGE_TRANSFORM_ENCODING';
-  }
-}
+export const InvalidMessageTransformEncodingError = makeErrorWithCode(
+  'INVALID_MESSAGE_TRANSFORM_ENCODING',
+  () => 'Invalid Message Transform Encoding.',
+);
 
 const SIZE_OF_MESSAGE_HEADER =
   IOHelper.sizeOfUInt32LE +

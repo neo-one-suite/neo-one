@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
 export enum InventoryType {
   Transaction = 0x01,
@@ -6,16 +6,10 @@ export enum InventoryType {
   Consensus = 0xe0,
 }
 
-export class InvalidInventoryTypeError extends CustomError {
-  public readonly inventoryType: number;
-  public readonly code: string;
-
-  public constructor(inventoryType: number) {
-    super(`Expected inventory type, found: ${inventoryType}`);
-    this.inventoryType = inventoryType;
-    this.code = 'INVALID_INVENTORY_TYPE';
-  }
-}
+export const InvalidInventoryTypeError = makeErrorWithCode(
+  'INVALID_INVENTORY_TYPE',
+  (inventoryType: number) => `Expected inventory type, found: ${inventoryType}`,
+);
 
 const isInventoryType = (inventoryType: number): inventoryType is InventoryType =>
   // tslint:disable-next-line strict-type-predicates

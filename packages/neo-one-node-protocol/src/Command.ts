@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
 export enum Command {
   addr = 'addr',
@@ -25,16 +25,10 @@ export enum Command {
   reject = 'reject',
 }
 
-export class InvalidCommandError extends CustomError {
-  public readonly command: string;
-  public readonly code: string;
-
-  public constructor(command: string) {
-    super(`Expected command, found: ${command}`);
-    this.command = command;
-    this.code = 'INVALID_COMMAND';
-  }
-}
+export const InvalidCommandError = makeErrorWithCode(
+  'INVALID_COMMAND',
+  (command: string) => `Expected command, found: ${command}`,
+);
 
 const isCommand = (command: string): command is Command =>
   // tslint:disable-next-line strict-type-predicates no-any

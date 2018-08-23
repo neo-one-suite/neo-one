@@ -1,28 +1,15 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
-export class ReadError extends CustomError {
-  public readonly code: string;
-
-  public constructor(code: string, message: string) {
-    super(message);
-    this.code = code;
-  }
-}
-
-export class UnknownPluginResourceType extends CustomError {
-  public readonly code: string;
-
-  public constructor({ plugin, resourceType }: { readonly plugin: string; readonly resourceType: string }) {
-    super(`Plugin ${plugin} does not have resource ${resourceType}`);
-    this.code = 'UNKNOWN_PLUGIN_RESOURCE_TYPE';
-  }
-}
-
-export class PluginNotInstalledError extends CustomError {
-  public readonly code: string;
-
-  public constructor(nameIn: string) {
-    super(`Plugin ${nameIn} is not installed`);
-    this.code = 'PLUGIN_NOT_INSTALLED';
-  }
-}
+export const ReadError = makeErrorWithCode(
+  'READ_ERROR',
+  (code: number, message: string) => `${message}, code: ${code}`,
+);
+export const UnknownPluginResourceType = makeErrorWithCode(
+  'UNKNOWN_PLUGIN_RESOURCE_TYPE',
+  ({ plugin, resourceType }: { readonly plugin: string; readonly resourceType: string }) =>
+    `Plugin ${plugin} does not have resource ${resourceType}`,
+);
+export const PluginNotInstalledError = makeErrorWithCode(
+  'PLUGIN_NOT_INSTALLED',
+  (nameIn: string) => `Plugin ${nameIn} is not installed`,
+);

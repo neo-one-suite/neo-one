@@ -1,20 +1,14 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
 export enum ActionType {
   Log = 0x00,
   Notification = 0x01,
 }
 
-export class InvalidActionTypeError extends CustomError {
-  public readonly type: number;
-  public readonly code: string;
-
-  public constructor(type: number) {
-    super(`Expected action type, found: ${type}`);
-    this.type = type;
-    this.code = 'INVALID_ACTION_TYPE';
-  }
-}
+export const InvalidActionTypeError = makeErrorWithCode(
+  'INVALID_ACTION_TYPE',
+  (type: number) => `Expected action type, found: ${type}`,
+);
 
 const isActionType = (value: number): value is ActionType =>
   // tslint:disable-next-line strict-type-predicates

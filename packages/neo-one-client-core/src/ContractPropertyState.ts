@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
 export enum ContractPropertyState {
   NoProperty = 0x00,
@@ -35,17 +35,11 @@ export const HasPayable = new Set([
   ContractPropertyState.HasStorageDynamicInvokePayable,
 ]);
 
-export class InvalidContractPropertyStateError extends CustomError {
-  public readonly code: string;
-  public readonly contractParameterType: number;
-
-  public constructor(contractParameterType: number) {
-    super(`Expected contract parameter type, ` + `found: ${contractParameterType.toString(16)}`);
-
-    this.contractParameterType = contractParameterType;
-    this.code = 'INVALID_ContractPropertyState';
-  }
-}
+export const InvalidContractPropertyStateError = makeErrorWithCode(
+  'INVALID_ContractPropertyState',
+  (contractParameterType: number) =>
+    `Expected contract parameter type, ` + `found: ${contractParameterType.toString(16)}`,
+);
 
 const isContractPropertyState = (value: number): value is ContractPropertyState =>
   // tslint:disable-next-line strict-type-predicates

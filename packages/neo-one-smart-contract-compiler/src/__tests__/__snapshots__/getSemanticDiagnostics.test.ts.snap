@@ -11,7 +11,7 @@ Array [
     "line": 40,
     "messageText": "Argument to Address.from must be a string literal address.",
     "source": "neo-one",
-    "start": 1000,
+    "start": 1040,
   },
 ]
 `;
@@ -27,7 +27,7 @@ Array [
     "line": 2,
     "messageText": "Argument to Address.from must be a string literal address.",
     "source": "neo-one",
-    "start": 52,
+    "start": 54,
   },
 ]
 `;
