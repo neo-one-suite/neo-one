@@ -6,16 +6,21 @@ export interface NetworkDefinition {
   readonly dev: boolean;
 }
 
+export interface Wallet {
+  readonly name: string;
+  readonly privateKey: string;
+}
+
 export const genClient = ({
   localDevNetworkName,
-  masterPrivateKey,
+  wallets,
   networks,
   clientPath,
   projectIDPath,
   httpServerPort,
 }: {
   readonly localDevNetworkName: string;
-  readonly masterPrivateKey: string;
+  readonly wallets: ReadonlyArray<Wallet>;
   readonly networks: ReadonlyArray<NetworkDefinition>;
   readonly clientPath: string;
   readonly projectIDPath: string;
@@ -71,11 +76,14 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
-        localKeyStore.addAccount({
-          network: '${localDevNetworkName}',
-          name: 'master',
-          privateKey: '${masterPrivateKey}',
-        }).catch(() => {
+        Promise.all([
+          ${wallets
+            .map(
+              ({ name, privateKey }) =>
+                `localKeyStore.addAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${privateKey}' }),`,
+            )
+            .join('\n          ')}
+        ]).catch(() => {
           // do nothing
         });
       }
@@ -140,11 +148,14 @@ export const createClient = <TUserAccountProviders extends { readonly [K: string
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
-        localKeyStore.addAccount({
-          network: '${localDevNetworkName}',
-          name: 'master',
-          privateKey: '${masterPrivateKey}',
-        }).catch(() => {
+        Promise.all([
+          ${wallets
+            .map(
+              ({ name, privateKey }) =>
+                `localKeyStore.addAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${privateKey}' }),`,
+            )
+            .join('\n          ')}
+        ]).catch(() => {
           // do nothing
         });
       }

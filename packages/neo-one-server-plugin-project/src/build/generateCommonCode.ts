@@ -1,4 +1,4 @@
-import { genCommonFiles, NetworkDefinition } from '@neo-one/smart-contract-codegen';
+import { genCommonFiles, NetworkDefinition, Wallet } from '@neo-one/smart-contract-codegen';
 import fs from 'fs-extra';
 import { ProjectConfig } from '../types';
 import { getCommonPaths, getContractPaths, getTSPath } from '../utils';
@@ -13,7 +13,7 @@ export const generateCommonCode = async (
   projectID: string,
   contracts: ReadonlyArray<CommonCodeContract>,
   localDevNetworkName: string,
-  masterPrivateKey: string,
+  wallets: ReadonlyArray<Wallet>,
   networks: ReadonlyArray<NetworkDefinition>,
   httpServerPort: number,
 ) => {
@@ -41,7 +41,7 @@ export const generateCommonCode = async (
     clientPath,
     generatedPath,
     localDevNetworkName,
-    masterPrivateKey,
+    wallets,
     networks,
     httpServerPort,
     projectID,

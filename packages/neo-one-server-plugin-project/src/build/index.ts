@@ -1,6 +1,6 @@
-import { scriptHashToAddress, SmartContractNetworksDefinition, SourceMaps } from '@neo-one/client';
+import { scriptHashToAddress, SmartContractNetworksDefinition, SourceMaps, wifToPrivateKey } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
-import { PluginManager, TaskList } from '@neo-one/server-plugin';
+import { PluginManager, Task, TaskList } from '@neo-one/server-plugin';
 import { getNetworkResourceManager, Network } from '@neo-one/server-plugin-network';
 import { constants as walletConstants, getWalletResourceManager, Wallet } from '@neo-one/server-plugin-wallet';
 import { NetworkDefinition } from '@neo-one/smart-contract-codegen';
@@ -17,6 +17,7 @@ import { deployContract } from './deployContract';
 import { findContracts } from './findContracts';
 import { generateCode } from './generateCode';
 import { CommonCodeContract, generateCommonCode } from './generateCommonCode';
+import { setupWallets, WALLETS } from './setupWallets';
 
 // tslint:disable-next-line readonly-array
 type Contracts = CommonCodeContract[];
@@ -114,6 +115,33 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                           ),
                       },
                       {
+                        title: 'Create wallets',
+                        skip: (ctx) => {
+                          if (getNetworkMaybe(ctx) !== undefined) {
+                            return 'Wallets already exist';
+                          }
+
+                          return false;
+                        },
+                        task: () =>
+                          new TaskList({
+                            concurrent: true,
+                            tasks: WALLETS.map(
+                              (wallet): Task => ({
+                                title: `Create ${wallet.name} wallet`,
+                                task: (ctx) => {
+                                  const networkName = getLocalNetworkName(options.rootDir, getProjectID(ctx));
+
+                                  return getWalletResourceManager(pluginManager).create(
+                                    walletConstants.makeWallet({ network: networkName, name: wallet.name }),
+                                    { network: networkName, privateKey: wifToPrivateKey(wallet.privateKey) },
+                                  );
+                                },
+                              }),
+                            ),
+                          }),
+                      },
+                      {
                         title: 'Gather network information',
                         task: async (ctx) => {
                           const networkName = getLocalNetworkName(options.rootDir, getProjectID(ctx));
@@ -145,6 +173,20 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                               rpcURL: network.nodes[0].rpcAddress,
                             },
                           ];
+                        },
+                      },
+                      {
+                        title: 'Transfer to wallets',
+                        skip: (ctx) => {
+                          if (getNetworkMaybe(ctx) !== undefined) {
+                            return 'Wallets already exist';
+                          }
+
+                          return false;
+                        },
+                        task: async (ctx) => {
+                          // tslint:disable-next-line no-non-null-assertion
+                          await setupWallets(getNetwork(ctx), getWallet(ctx).wif!);
                         },
                       },
                     ],
@@ -240,8 +282,13 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                               getProjectID(ctx),
                               getContracts(ctx),
                               constants.LOCAL_NETWORK_NAME,
-                              // tslint:disable-next-line no-non-null-assertion
-                              getWallet(ctx).wif!,
+                              [
+                                {
+                                  name: 'master',
+                                  // tslint:disable-next-line no-non-null-assertion
+                                  privateKey: getWallet(ctx).wif!,
+                                },
+                              ].concat(WALLETS),
                               getNetworkDefinitions(ctx),
                               pluginManager.httpServerPort,
                             );

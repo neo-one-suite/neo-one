@@ -41,15 +41,15 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
-        localKeyStore
-          .addAccount({
+        Promise.all([
+          localKeyStore.addAccount({
             network: 'local',
             name: 'master',
             privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
-          })
-          .catch(() => {
-            // do nothing
-          });
+          }),
+        ]).catch(() => {
+          // do nothing
+        });
       }
     }
   }
@@ -116,15 +116,15 @@ export const createClient = <
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
-        localKeyStore
-          .addAccount({
+        Promise.all([
+          localKeyStore.addAccount({
             network: 'local',
             name: 'master',
             privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
-          })
-          .catch(() => {
-            // do nothing
-          });
+          }),
+        ]).catch(() => {
+          // do nothing
+        });
       }
     }
   }

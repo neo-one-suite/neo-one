@@ -14,7 +14,12 @@ describe('genCommonFiles', () => {
         generatedPath: '/foo/bar/one/generated/index.js',
         projectIDPath: '/foo/bar/one/generated/projectID.js',
         localDevNetworkName: 'local',
-        masterPrivateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
+        wallets: [
+          {
+            name: 'master',
+            privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
+          },
+        ],
         networks: [
           {
             name: 'local',
