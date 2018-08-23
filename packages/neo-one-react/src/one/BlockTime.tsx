@@ -1,3 +1,4 @@
+import { ActionMap } from 'constate';
 import { formatDistanceStrict } from 'date-fns';
 import * as React from 'react';
 import { MdFastForward } from 'react-icons/md';
@@ -94,9 +95,12 @@ function TimeAgo({ time, ...props }: TimeAgoProps) {
 interface State {
   readonly date: Date;
 }
+interface Actions {
+  readonly onChangeDate: (date: Date) => void;
+}
 
-const actions = {
-  onChangeDate: (date: Date) => () => ({ date }),
+const actions: ActionMap<State, Actions> = {
+  onChangeDate: (date) => () => ({ date }),
 };
 
 export function BlockTime() {
@@ -130,7 +134,7 @@ export function BlockTime() {
                   >
                     {(minTime) => (
                       <Container initialState={{ date: new Date(minTime) }} actions={actions}>
-                        {({ date, onChangeDate }: State & typeof actions) => (
+                        {({ date, onChangeDate }) => (
                           <>
                             <Paragraph marginTop={16} marginBottom={16}>
                               Set the next block's timestamp.

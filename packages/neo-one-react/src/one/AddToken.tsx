@@ -1,7 +1,8 @@
 import { Client, nep5 } from '@neo-one/client';
+import { EffectMap } from 'constate';
 import * as React from 'react';
 import { Container, Flex, styled } from 'reakit';
-import { EffectsProps, ReactSyntheticEvent } from '../types';
+import { ReactSyntheticEvent } from '../types';
 import { Button } from './Button';
 import { DeveloperToolsContext, Token, WithOnChangeTokens, WithTokens } from './DeveloperToolsContext';
 import { WithAddError } from './ErrorsContainer';
@@ -10,6 +11,11 @@ import { TextInput } from './TextInput';
 interface State {
   readonly disabled: boolean;
   readonly address: string;
+}
+
+interface Effects {
+  readonly onChangeAddress: (event: ReactSyntheticEvent) => void;
+  readonly submit: () => void;
 }
 
 const INITIAL_STATE = {
@@ -22,15 +28,15 @@ const makeEffects = (
   tokens: ReadonlyArray<Token>,
   onChange: (tokens: ReadonlyArray<Token>) => void,
   addError: (error: Error) => void,
-) => ({
-  onChangeAddress: (event: ReactSyntheticEvent) => {
+): EffectMap<State, Effects> => ({
+  onChangeAddress: (event) => {
     const address = event.currentTarget.value;
 
-    return ({ setState }: EffectsProps<State>) => {
+    return ({ setState }) => {
       setState({ address });
     };
   },
-  submit: () => ({ state, setState }: EffectsProps<State>) => {
+  submit: () => ({ state, setState }) => {
     setState({ disabled: true });
     Promise.resolve()
       .then(async () => {
@@ -68,8 +74,8 @@ export function AddToken() {
               {(onChange) => (
                 <WithAddError>
                   {(addError) => (
-                    <Container state={INITIAL_STATE} effects={makeEffects(client, tokens, onChange, addError)}>
-                      {({ address, disabled, submit, onChangeAddress }: State & ReturnType<typeof makeEffects>) => (
+                    <Container initialState={INITIAL_STATE} effects={makeEffects(client, tokens, onChange, addError)}>
+                      {({ address, disabled, submit, onChangeAddress }) => (
                         <Wrapper>
                           <TextInput placeholder="Token Address" value={address} onChange={onChangeAddress} />
                           <StyledButton onClick={submit} disabled={disabled}>

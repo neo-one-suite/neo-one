@@ -1,6 +1,7 @@
 import { nep5 } from '@neo-one/client';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
+import { ActionMap } from 'constate';
 import * as React from 'react';
 import { Container, Flex, styled } from 'reakit';
 import { of } from 'rxjs';
@@ -16,7 +17,11 @@ interface State {
   readonly asset: Asset;
 }
 
-const actions = {
+interface Actions {
+  readonly onChangeAsset: (asset: Asset) => void;
+}
+
+const actions: ActionMap<State, Actions> = {
   onChangeAsset: (asset: Asset) => ({ asset }),
 };
 
@@ -40,7 +45,7 @@ export function BalanceSelector() {
     <WithAddError>
       {(addError) => (
         <Container initialState={{ asset: ASSETS[0] }} actions={actions}>
-          {({ asset, onChangeAsset }: State & typeof actions) => (
+          {({ asset, onChangeAsset }) => (
             <>
               <DeveloperToolsContext.Consumer>
                 {({ client }) => (

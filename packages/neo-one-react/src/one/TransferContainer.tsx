@@ -1,6 +1,7 @@
 // tslint:disable no-null-keyword
 import { Client, DeveloperClient, Hash256, nep5, TransactionResult, UserAccount } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
+import { ActionMap, ComposableContainer, EffectMap } from 'constate';
 import _ from 'lodash';
 import * as React from 'react';
 import { Container } from 'reakit';
@@ -8,8 +9,26 @@ import { ReactSyntheticEvent } from '../types';
 import { Token, WithNetworkClient } from './DeveloperToolsContext';
 import { WithAddError } from './ErrorsContainer';
 
-const actions = {
-  onChangeAmount: (event: ReactSyntheticEvent) => {
+interface State {
+  readonly text: string;
+  readonly to: ReadonlyArray<UserAccount>;
+  readonly asset: Asset;
+  readonly amount: BigNumber | undefined;
+  readonly loading: boolean;
+}
+
+interface Actions {
+  readonly onChangeAmount: (event: ReactSyntheticEvent) => void;
+  readonly onChangeAsset: (asset: Asset) => void;
+  readonly onChangeTo: (to: ReadonlyArray<UserAccount>) => void;
+}
+
+interface Effects {
+  readonly send: () => void;
+}
+
+const actions: ActionMap<State, Actions> = {
+  onChangeAmount: (event) => {
     const text = event.currentTarget.value;
 
     let amount: BigNumber | undefined;
@@ -24,8 +43,8 @@ const actions = {
 
     return { text, amount };
   },
-  onChangeAsset: (asset: Asset) => ({ asset }),
-  onChangeTo: (to: ReadonlyArray<UserAccount>) => ({ to }),
+  onChangeAsset: (asset) => ({ asset }),
+  onChangeTo: (to) => ({ to }),
 };
 
 export const TOKEN = 'token';
@@ -34,7 +53,7 @@ const makeEffects = (
   addError: (error: Error) => void,
   client: Client,
   developerClient: DeveloperClient | undefined,
-) => ({
+): EffectMap<State, Effects> => ({
   send: () => ({
     state: { asset, to, amount },
     setState,
@@ -96,8 +115,6 @@ const makeEffects = (
   },
 });
 
-type Effects = ReturnType<typeof makeEffects>;
-
 export interface AssetAsset {
   readonly type: 'asset';
   readonly value: string;
@@ -124,25 +141,7 @@ export const ASSETS: ReadonlyArray<Asset> = [
   },
 ];
 
-interface State {
-  readonly text: string;
-  readonly to: ReadonlyArray<UserAccount>;
-  readonly asset: Asset;
-  readonly amount: BigNumber | undefined;
-  readonly loading: boolean;
-}
-
-interface RenderProps extends State {
-  readonly onChangeAmount: (typeof actions)['onChangeAmount'];
-  readonly onChangeAsset: (typeof actions)['onChangeAsset'];
-  readonly send: Effects['send'];
-  readonly onChangeTo: (typeof actions)['onChangeTo'];
-}
-
-interface Props {
-  readonly children: (props: RenderProps) => React.ReactNode;
-}
-export const TransferContainer = ({ children }: Props) => (
+export const TransferContainer: ComposableContainer<State, Actions, {}, Effects> = (props) => (
   <WithAddError>
     {(addError) => (
       <WithNetworkClient>
@@ -151,13 +150,12 @@ export const TransferContainer = ({ children }: Props) => (
 
           return (
             <Container
+              {...props}
               context="transfer"
               actions={actions}
               effects={effects}
               shouldUpdate={({ state, nextState }: { state: State; nextState: State }) => !_.isEqual(state, nextState)}
-            >
-              {children}
-            </Container>
+            />
           );
         }}
       </WithNetworkClient>

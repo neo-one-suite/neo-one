@@ -13,11 +13,6 @@ export interface NetworkClients<T> {
   readonly [network: string]: T | undefined;
 }
 
-export interface EffectsProps<T> {
-  readonly state: T;
-  readonly setState: (value: Partial<T>) => void;
-}
-
 export type ChildrenProps<C extends React.ComponentType<any> | React.Component<any>> = C extends React.ComponentType<{
   readonly children: (p: infer P) => any;
 }>

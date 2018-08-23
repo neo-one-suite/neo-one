@@ -22,7 +22,7 @@ const AssetInput = styled(Selector)`
   width: 144px;
 ` as React.ComponentType<ComponentProps<Select<Asset>>>;
 
-export const TransferAmount = (props: ComponentProps<Flex>) => (
+export const TransferAmount = (props: ComponentProps<typeof Flex>) => (
   <TransferContainer>
     {({ text, asset, amount, to, loading, onChangeAmount, onChangeAsset, send }) => (
       <StyledFlex {...props}>

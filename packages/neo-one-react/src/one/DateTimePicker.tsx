@@ -1,9 +1,10 @@
 // tslint:disable no-null-keyword
+import { EffectMap } from 'constate';
 import { format, isBefore, parse } from 'date-fns';
 import * as React from 'react';
 import { Base, Container, Flex, Input, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { EffectsProps, ReactSyntheticEvent } from '../types';
+import { ReactSyntheticEvent } from '../types';
 
 const ErrorText = styled(Base)`
   color: ${prop('theme.error')};
@@ -20,6 +21,10 @@ interface State {
   readonly error: string | undefined;
 }
 
+interface Effects {
+  readonly onChange: (event: ReactSyntheticEvent) => void;
+}
+
 const FORMAT = 'yyyy/MM/dd hh:mm:ss a';
 
 export function DateTimePicker({ initialValue, minDate, onChange }: Props) {
@@ -31,24 +36,24 @@ export function DateTimePicker({ initialValue, minDate, onChange }: Props) {
     }
   };
 
-  const onError = (error: string, setState: EffectsProps<State>['setState']) => {
-    editingTimeout = setTimeout(() => {
-      setState({ error });
-    }, 2000);
-  };
-
-  const effects = {
-    onChange: (event: ReactSyntheticEvent) => {
+  const effects: EffectMap<State, Effects> = {
+    onChange: (event) => {
       const text = event.currentTarget.value;
       clearEditingTimeout();
 
-      return ({ setState }: EffectsProps<State>) => {
+      return ({ setState }) => {
+        const onError = (error: string) => {
+          editingTimeout = setTimeout(() => {
+            setState({ error });
+          }, 2000);
+        };
+
         setState({ text, error: undefined });
         const parsedDate = parse(text, FORMAT, new Date());
         if (Number.isNaN(parsedDate.valueOf())) {
-          onError(`Invalid date. Expected format ${FORMAT}`, setState);
+          onError(`Invalid date. Expected format ${FORMAT}`);
         } else if (isBefore(parsedDate, minDate)) {
-          onError('Date must be a future point in time after the current block time.', setState);
+          onError('Date must be a future point in time after the current block time.');
         } else {
           onChange(parsedDate);
         }
@@ -59,7 +64,7 @@ export function DateTimePicker({ initialValue, minDate, onChange }: Props) {
   return (
     <Flex column>
       <Container initialState={{ text: format(initialValue, FORMAT), error: undefined }} effects={effects}>
-        {({ text, error, onChange: onChangeInput }: State & typeof effects) => (
+        {({ text, error, onChange: onChangeInput }) => (
           <>
             <Input value={text} onChange={onChangeInput} />
             {error === undefined ? null : <ErrorText>{error}</ErrorText>}

@@ -5,7 +5,7 @@
   "main": "./src/index.ts",
   "browser": "./src/index.browser.ts",
   "dependencies": {
-    "@babel/code-frame": "^7.0.0-rc.1",
+    "@babel/code-frame": "^7.0.0-rc.2",
     "@neo-one/client-core": "^1.0.0-alpha.70",
     "@neo-one/node-vm": "^1.0.0-alpha.72",
     "@neo-one/types": "^1.0.0-alpha.41",

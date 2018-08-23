@@ -1,3 +1,4 @@
+import { ActionMap, ComposableContainer } from 'constate';
 import _ from 'lodash';
 import * as React from 'react';
 import { Container } from 'reakit';
@@ -6,15 +7,15 @@ interface State {
   readonly errors: ReadonlyArray<string>;
 }
 
-type AddError = (error: Error) => void;
-
-interface RenderProps extends State {
-  readonly addError: AddError;
+interface Actions {
+  readonly addError: (error: Error) => void;
   readonly removeError: (error: string) => void;
 }
 
-const actions = {
-  addError: (error: Error) => ({ errors }: State) => {
+type AddError = (error: Error) => void;
+
+const actions: ActionMap<State, Actions> = {
+  addError: (error) => ({ errors }) => {
     // tslint:disable-next-line no-console
     console.error(error);
 
@@ -22,23 +23,17 @@ const actions = {
       errors: errors.includes(error.message) ? errors : [...errors, error.message],
     };
   },
-  removeError: (error: string) => ({ errors }: State) => ({ errors: errors.filter((err) => err !== error) }),
+  removeError: (error) => ({ errors }) => ({ errors: errors.filter((err) => err !== error) }),
 };
 
-interface Props {
-  readonly children: (props: RenderProps) => React.ReactNode;
-}
-export function ErrorsContainer({ children }: Props) {
-  return (
-    <Container
-      context="errors"
-      actions={actions}
-      shouldUpdate={({ state, nextState }: { state: State; nextState: State }) => !_.isEqual(state, nextState)}
-    >
-      {children}
-    </Container>
-  );
-}
+export const ErrorsContainer: ComposableContainer<State, Actions> = (props) => (
+  <Container
+    {...props}
+    context="errors"
+    actions={actions}
+    shouldUpdate={({ state, nextState }: { state: State; nextState: State }) => !_.isEqual(state, nextState)}
+  />
+);
 
 interface WithAddErrorPureProps {
   readonly addError: AddError;

@@ -8,6 +8,6 @@ interface Props {
   readonly onChange?: (value: ReactSyntheticEvent) => void;
   readonly placeholder?: string;
 }
-export function TextInput({ value, ...props }: Props & ComponentProps<Input>) {
+export function TextInput({ value, ...props }: Props & ComponentProps<typeof Input>) {
   return <Input value={value === undefined ? '' : value} {...props} />;
 }

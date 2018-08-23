@@ -1,4 +1,5 @@
 import { AddressString, Client, DeveloperClient, OneClient } from '@neo-one/client';
+import { ActionMap } from 'constate';
 import * as localforage from 'localforage';
 import * as React from 'react';
 import { Container } from 'reakit';
@@ -78,11 +79,15 @@ interface LocalStateProviderState {
   readonly localState: LocalState;
 }
 
+interface LocalStateProviderActions {
+  readonly onChange: (state: Partial<LocalState>) => void;
+}
+
 export function LocalStateProvider({ children }: { readonly children: React.ReactNode }) {
   const localStatePromise = store.getItem<LocalState | null>('localState');
 
-  const actions = {
-    onChange: (state: Partial<LocalState>) => ({ localState }: LocalStateProviderState) => {
+  const actions: ActionMap<LocalStateProviderState, LocalStateProviderActions> = {
+    onChange: (state) => ({ localState }) => {
       const nextLocalState = { ...localState, ...state };
       store.setItem('localState', nextLocalState).catch((error) => {
         // tslint:disable-next-line no-console
@@ -100,7 +105,7 @@ export function LocalStateProvider({ children }: { readonly children: React.Reac
           initialState={{ localState: localStateIn === null ? INITIAL_LOCAL_STATE : localStateIn }}
           actions={actions}
         >
-          {({ localState, onChange }: LocalStateProviderState & typeof actions) => (
+          {({ localState, onChange }) => (
             <LocalStateContext.Provider
               value={{
                 localState,

@@ -1,11 +1,12 @@
 import { DeveloperClient, PrivateNetworkSettings } from '@neo-one/client';
+import { EffectMap } from 'constate';
 import * as React from 'react';
 import { Container, styled } from 'reakit';
 import { BehaviorSubject, combineLatest, concat, of, of as _of } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { prop } from 'styled-tools';
 import { FromStream } from '../FromStream';
-import { ComponentProps, EffectsProps, ReactSyntheticEvent } from '../types';
+import { ComponentProps, ReactSyntheticEvent } from '../types';
 import { WithNetworkClient } from './DeveloperToolsContext';
 import { WithAddError } from './ErrorsContainer';
 import { TextInput } from './TextInput';
@@ -14,6 +15,10 @@ import { ToolbarTooltip, ToolbarTooltipArrow } from './ToolbarTooltip';
 interface State {
   readonly secondsPerBlockText: string | undefined;
   readonly editing: boolean;
+}
+
+interface Effects {
+  readonly onChange: (event: ReactSyntheticEvent) => void;
 }
 
 const StyledTextInput = styled(TextInput)`
@@ -34,9 +39,17 @@ const DEFAULT = { editable: false, secondsPerBlock: 15 };
 
 export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextInput>>) {
   const refresh$ = new BehaviorSubject<PrivateNetworkSettings | undefined>(undefined);
-  const makeEffects = (addError: (error: Error) => void, developerClient: DeveloperClient | undefined) => {
+
+  const makeEffects = (
+    addError: (error: Error) => void,
+    developerClient: DeveloperClient | undefined,
+  ): EffectMap<State, Effects> => {
     if (developerClient === undefined) {
-      return { onChange: undefined };
+      return {
+        onChange: () => () => {
+          // do nothing
+        },
+      };
     }
 
     let updateSecondsPerBlockTimer: NodeJS.Timer | undefined;
@@ -56,12 +69,12 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
     };
 
     return {
-      onChange: (event: ReactSyntheticEvent) => {
+      onChange: (event) => {
         clearUpdateSecondsPerBlock();
         clearEditSecondsPerBlock();
         const secondsPerBlockText = event.currentTarget.value;
 
-        return ({ setState }: EffectsProps<State>) => {
+        return ({ setState }) => {
           const secondsPerBlockMaybe = Number(secondsPerBlockText);
           const secondsPerBlock =
             Number.isNaN(secondsPerBlockMaybe) || !Number.isInteger(secondsPerBlockMaybe)
@@ -121,12 +134,12 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
 
             return (
               <Container initialState={INITIAL_STATE} effects={makeEffects(addError, developerClient)}>
-                {({ secondsPerBlockText, editing, onChange }: State & ReturnType<typeof makeEffects>) => (
+                {({ secondsPerBlockText, editing, onChange }) => (
                   <FromStream props$={props$}>
                     {({ editable, secondsPerBlock }) => (
                       <div>
                         <StyledTextInput
-                          disabled={!editable}
+                          disabled={!editable || developerClient === undefined}
                           value={
                             secondsPerBlockText === undefined || !editing ? `${secondsPerBlock}` : secondsPerBlockText
                           }

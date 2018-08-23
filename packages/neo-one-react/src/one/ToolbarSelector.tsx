@@ -1,3 +1,4 @@
+import { ActionMap } from 'constate';
 import * as React from 'react';
 import Select from 'react-select';
 import { Container, styled } from 'reakit';
@@ -13,7 +14,14 @@ interface State {
   readonly hover: boolean;
 }
 
-const actions = {
+interface Actions {
+  readonly onMenuOpen: () => void;
+  readonly onMenuClose: () => void;
+  readonly onMouseEnter: () => void;
+  readonly onMouseLeave: () => void;
+}
+
+const actions: ActionMap<State, Actions> = {
   onMenuOpen: () => ({ menuOpen: true, hover: false }),
   onMenuClose: () => ({ menuOpen: false, hover: false }),
   onMouseEnter: () => ({ hover: true }),
@@ -30,7 +38,7 @@ const StyledSelector: React.ComponentType<ComponentProps<Select<any>>> = styled(
 export function ToolbarSelector<OptionType>({ help, ...rest }: Props & ComponentProps<Select<OptionType>>) {
   return (
     <Container initialState={{ menuOpen: false, hover: false }} actions={actions}>
-      {({ menuOpen, onMenuOpen, onMenuClose, hover, onMouseEnter, onMouseLeave }: State & typeof actions) => (
+      {({ menuOpen, onMenuOpen, onMenuClose, hover, onMouseEnter, onMouseLeave }) => (
         <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
           <StyledSelector menuPlacement="top" {...rest} onMenuOpen={onMenuOpen} onMenuClose={onMenuClose} />
           <ToolbarTooltip visible={menuOpen ? false : hover} placement="top">
