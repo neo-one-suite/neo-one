@@ -34,7 +34,7 @@ export class Consensus {
   private mutableTimer: NodeJS.Timer | undefined;
   private readonly options$: Observable<InternalOptions>;
   private readonly node: Node;
-  private readonly consensusContext: ConsensusContext;
+  private mutableConsensusContext: ConsensusContext;
   private readonly monitor: Monitor;
   private mutableStartPromise: Promise<void> | undefined;
 
@@ -64,7 +64,7 @@ export class Consensus {
     );
 
     this.node = node;
-    this.consensusContext = new ConsensusContext();
+    this.mutableConsensusContext = new ConsensusContext();
     this.monitor = monitor.at('node_consensus');
   }
 
@@ -108,13 +108,13 @@ export class Consensus {
   }
 
   public nowSeconds(): number {
-    return this.consensusContext.nowSeconds();
+    return this.mutableConsensusContext.nowSeconds();
   }
 
   public async fastForwardOffset(seconds: number): Promise<void> {
     const options = await this.options$.pipe(take(1)).toPromise();
     if (options.privateNet) {
-      this.consensusContext.fastForwardOffset(seconds);
+      this.mutableConsensusContext.fastForwardOffset(seconds);
     } else {
       throw new Error('Can only fast forward on a private network.');
     }
@@ -123,7 +123,7 @@ export class Consensus {
   public async fastForwardToTime(seconds: number): Promise<void> {
     const options = await this.options$.pipe(take(1)).toPromise();
     if (options.privateNet) {
-      this.consensusContext.fastForwardToTime(seconds);
+      this.mutableConsensusContext.fastForwardToTime(seconds);
     } else {
       throw new Error('Can only fast forward on a private network.');
     }
@@ -136,6 +136,10 @@ export class Consensus {
     if (this.mutableStartPromise !== undefined) {
       await this.mutableStartPromise;
     }
+  }
+
+  public async reset(): Promise<void> {
+    this.mutableConsensusContext = new ConsensusContext();
   }
 
   public async resume(): Promise<void> {
@@ -166,7 +170,7 @@ export class Consensus {
     const initialResult = await initializeNewConsensus({
       blockchain: this.node.blockchain,
       publicKey: options.publicKey,
-      consensusContext: this.consensusContext,
+      consensusContext: this.mutableConsensusContext,
     });
 
     await AsyncIterableX.from(this.mutableQueue)
@@ -178,7 +182,7 @@ export class Consensus {
               result = await handlePersistBlock({
                 blockchain: this.node.blockchain,
                 publicKey: options.publicKey,
-                consensusContext: this.consensusContext,
+                consensusContext: this.mutableConsensusContext,
               });
 
               break;
@@ -188,7 +192,7 @@ export class Consensus {
                 node: this.node,
                 privateKey: options.privateKey,
                 payload: event.payload,
-                consensusContext: this.consensusContext,
+                consensusContext: this.mutableConsensusContext,
               });
 
               break;
@@ -198,7 +202,7 @@ export class Consensus {
                 node: this.node,
                 privateKey: options.privateKey,
                 transaction: event.transaction,
-                consensusContext: this.consensusContext,
+                consensusContext: this.mutableConsensusContext,
               });
 
               break;
@@ -207,7 +211,7 @@ export class Consensus {
                 context,
                 node: this.node,
                 options,
-                consensusContext: this.consensusContext,
+                consensusContext: this.mutableConsensusContext,
               });
 
               break;

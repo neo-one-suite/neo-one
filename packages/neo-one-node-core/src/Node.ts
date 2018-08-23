@@ -7,6 +7,7 @@ export interface Consensus {
   readonly fastForwardToTime: (seconds: number) => Promise<void>;
   readonly nowSeconds: () => number;
   readonly pause: () => Promise<void>;
+  readonly reset: () => Promise<void>;
   readonly resume: () => Promise<void>;
 }
 

@@ -91,6 +91,7 @@ export {
   Output,
   Param,
   Peer,
+  PrivateNetworkSettings,
   PublicKeyAttributeUsage,
   PublicKeyContractParameter,
   PublicKeyString,

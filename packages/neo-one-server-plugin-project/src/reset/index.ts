@@ -70,6 +70,7 @@ export const reset = (pluginManager: PluginManager, options: ResetTaskListOption
             new NEOONEDataProvider({ network: 'local', rpcURL: network.nodes[0].rpcAddress }),
           );
           await developerClient.reset();
+          await developerClient.updateSettings({ secondsPerBlock: 15 });
         },
       },
       {

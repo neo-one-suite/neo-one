@@ -7,3 +7,4 @@ declare interface ReadonlyArray<T> {
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 type Modifiable<T> = { -readonly [P in keyof T]: T[P] };
+type PromiseReturnType<T extends (...args: any[]) => any> = T extends (...args: any[]) => Promise<infer R> ? R : any;

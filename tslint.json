@@ -77,7 +77,8 @@
       "rxjs",
       "@reactivex/ix-es2015-cjs",
       "@reactivex",
-      "uuid"
+      "uuid",
+      "react-icons"
     ],
     "strict-boolean-expressions": [
       true,

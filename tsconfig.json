@@ -47,7 +47,28 @@
     "noUnusedParameters": false,
     "allowUnreachableCode": false,
     "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+
+    "plugins": [
+      {
+        "name": "typescript-styled-plugin",
+        "lint": {
+          "duplicateProperties": "error",
+          "importStatement": "error",
+          "boxModel": "ignore",
+          "universalSelector": "error",
+          "zeroUnits": "error",
+          "fontFaceProperties": "error",
+          "argumentsInColorFunction": "error",
+          "unknownProperties": "error",
+          "ieHack": "error",
+          "propertyIgnoredDueToDisplay": "error",
+          "important": "error",
+          "float": "error",
+          "idSelector": "error"
+        }
+      }
+    ]
   },
   "exclude": [
     "dist",
@@ -55,6 +76,7 @@
     "packages/neo-one-smart-contract/src/*.d.ts",
     "packages/neo-one-smart-contract-lib/src/*.ts",
     "packages/*/src/__data__/contracts/*.ts",
-    "packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts/*.ts"
+    "packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts/*.ts",
+    "packages/neo-one-playground"
   ]
 }

@@ -20,6 +20,6 @@ export class ConsensusContext {
   }
 
   public fastForwardToTime(seconds: number) {
-    this.fastForwardOffset(seconds - utils.nowSeconds());
+    this.fastForwardOffset(seconds - this.nowSeconds());
   }
 }

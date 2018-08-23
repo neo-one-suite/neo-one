@@ -11,6 +11,9 @@
 /reports
 .nyc_output
 
+# Playground
+/packages/neo-one-playground
+
 # Logs
 logs
 *.log

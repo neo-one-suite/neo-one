@@ -624,6 +624,7 @@ export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; rea
     [RPC_METHODS.reset]: async () => {
       if (node.consensus !== undefined) {
         await node.consensus.pause();
+        await node.consensus.reset();
       }
       await blockchain.reset();
       if (node.consensus !== undefined) {
