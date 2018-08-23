@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/types" />
 import { ProjectPlugin } from './ProjectPlugin';
 
 export { constants } from './constants';

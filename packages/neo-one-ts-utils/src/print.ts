@@ -1,4 +1,4 @@
-import commonDir from 'commondir';
+import commondir from 'commondir';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import * as file_ from './file';
@@ -32,7 +32,7 @@ export const print = (programIn: ts.Program, original: ts.SourceFile, file: ts.S
   const writer = compiler.createTextWriter('\n');
   const sourceMap = compiler.createSourceMapWriter(host, writer, {
     ...program.getCompilerOptions(),
-    sourceRoot: commonDir(programIn.getRootFileNames()),
+    sourceRoot: commondir([...programIn.getRootFileNames()]),
     sourceMap: true,
   });
   sourceMap.initialize(file.fileName, `${file.fileName}.map`);

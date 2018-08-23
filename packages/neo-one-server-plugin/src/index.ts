@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/types" />
 import * as displayUtils from './displayUtils';
 
 export { Config } from './Config';

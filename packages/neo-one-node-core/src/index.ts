@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/types" />
 export * from './AccountInput';
 export * from './AccountUnclaimed';
 export * from './AccountUnspent';

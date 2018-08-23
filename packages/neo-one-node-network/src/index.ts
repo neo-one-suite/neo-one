@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/types" />
 export * from './ConnectedPeer';
 export * from './errors';
 export * from './event';

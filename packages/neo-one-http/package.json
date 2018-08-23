@@ -5,6 +5,7 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/monitor": "^1.0.0-alpha.54",
+    "@neo-one/types": "^1.0.0-alpha.41",
     "@neo-one/utils": "^1.0.0-alpha.59",
     "koa": "^2.5.2",
     "koa-better-body": "^3.0.4",

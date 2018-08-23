@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/types" />
 export { Client } from './Client';
 export { ServerManager } from './ServerManager';
 

@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/types" />
 import { BinaryReader, Block, DeserializeWireContext } from '@neo-one/client-core';
 import { Blockchain } from '@neo-one/node-core';
 import { CustomError } from '@neo-one/utils';

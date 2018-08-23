@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/types" />
 import * as path from 'path';
 import ts from 'typescript';
 import { LinkedContracts } from './compile/types';

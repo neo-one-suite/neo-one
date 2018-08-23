@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/types" />
 import { CompilerPlugin } from './CompilerPlugin';
 
 export { constants } from './constants';

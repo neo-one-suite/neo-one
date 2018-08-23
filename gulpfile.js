@@ -109,6 +109,7 @@ const globs = {
     `!${getDistBase(format)}/packages/*/src/__e2e__/**/*`,
     `!${getDistBase(format)}/packages/*/src/bin/**/*`,
   ],
+  types: ['packages/neo-one-types/**/*', '!packages/neo-one-types/package.json'],
   bin: ['packages/*/src/bin/*.ts'],
   pkg: ['packages/*/package.json'],
   pkgFiles: ['packages/*/tsconfig.json'],
@@ -211,12 +212,19 @@ const transformBrowserPackageJSON = (format, orig, file) => ({
   browser: 'src/index.browser.js',
 });
 
+const transformTypesPackageJSON = (format, orig, file) => ({
+  ...transformBasePackageJSON(format, orig, file),
+  main: 'index.d.ts',
+});
+
 const transformPackageJSON = (format, orig, file) =>
-  smartContractPkgNames.some((p) => orig.name === p)
-    ? transformSmartContractPackageJSON(format, orig, file)
-    : browserPkgNames.some((p) => orig.name === p)
-      ? transformBrowserPackageJSON(format, orig, file)
-      : transformSrcPackageJSON(format, orig, file);
+  orig.name === '@neo-one/types'
+    ? transformTypesPackageJSON(format, orig, file)
+    : smartContractPkgNames.some((p) => orig.name === p)
+      ? transformSmartContractPackageJSON(format, orig, file)
+      : browserPkgNames.some((p) => orig.name === p)
+        ? transformBrowserPackageJSON(format, orig, file)
+        : transformSrcPackageJSON(format, orig, file);
 
 const copyPkg = ((cache) =>
   memoizeTask(cache, function copyPkg(format) {
@@ -229,6 +237,11 @@ const copyPkg = ((cache) =>
 const copyPkgFiles = ((cache) =>
   memoizeTask(cache, function copyPkgFiles(format) {
     return gulp.src(globs.pkgFiles).pipe(gulp.dest(getDest(format)));
+  }))({});
+
+const copyTypes = ((cache) =>
+  memoizeTask(cache, function copyTypes(format) {
+    return gulp.src(globs.types).pipe(gulp.dest(path.join(getDest(format), 'neo-one-types')));
   }))({});
 
 const copyMetadata = ((cache) =>
@@ -323,6 +336,7 @@ const buildAll = ((cache) =>
       ...[
         copyPkg(format),
         copyPkgFiles(format),
+        copyTypes(format),
         copyMetadata(format),
         copyFiles(format),
         copyRootPkg(format),
@@ -428,6 +442,7 @@ gulp.task('buildBin', gulp.parallel('compileBin', 'createBin', 'copyBin'));
 gulp.task('clean', () => fs.remove(DIST));
 gulp.task('copyPkg', gulp.parallel(FORMATS.map((format) => copyPkg(format))));
 gulp.task('copyPkgFiles', gulp.parallel(FORMATS.map((format) => copyPkgFiles(format))));
+gulp.task('copyTypes', gulp.parallel(FORMATS.map((format) => copyTypes(format))));
 gulp.task('copyMetadata', gulp.parallel(FORMATS.map((format) => copyMetadata(format))));
 gulp.task('copyFiles', gulp.parallel(FORMATS.map((format) => copyFiles(format))));
 gulp.task('copyRootPkg', gulp.parallel(FORMATS.map((format) => copyRootPkg(format))));

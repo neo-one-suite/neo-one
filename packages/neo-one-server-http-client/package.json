@@ -4,6 +4,7 @@
   "description": "NEO•ONE Server http client api.",
   "main": "./src/index.ts",
   "dependencies": {
+    "@neo-one/types": "^1.0.0-alpha.41",
     "@neo-one/utils": "^1.0.0-alpha.59",
     "cross-fetch": "^2.2.2",
     "tslib": "^1.9.3"

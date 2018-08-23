@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/types" />
 import * as accessor from './accessor';
 import * as base from './base';
 import * as class_ from './class_';

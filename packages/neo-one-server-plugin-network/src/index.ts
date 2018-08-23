@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/types" />
 import { NetworkPlugin } from './NetworkPlugin';
 
 export { getNetworkResourceManager } from './getNetworkResourceManager';

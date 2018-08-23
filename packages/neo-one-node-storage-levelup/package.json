@@ -7,6 +7,7 @@
     "@neo-one/client-core": "^1.0.0-alpha.70",
     "@neo-one/node-core": "^1.0.0-alpha.71",
     "@neo-one/node-storage-common": "^1.0.0-alpha.73",
+    "@neo-one/types": "^1.0.0-alpha.41",
     "@neo-one/utils": "^1.0.0-alpha.59",
     "bytewise": "^1.1.0",
     "rxjs": "^6.2.2",
