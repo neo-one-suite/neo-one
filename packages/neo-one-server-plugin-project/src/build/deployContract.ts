@@ -51,7 +51,13 @@ export const deployContract = async (
     // do nothing
   }
 
-  const result = await client.publishAndDeploy(contract.contract, contract.abi, [], undefined, sourceMaps);
+  const result = await client.publishAndDeploy(
+    contract.contract,
+    contract.abi,
+    [],
+    undefined,
+    Promise.resolve(sourceMaps),
+  );
   const [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
 
   if (receipt.result.state === 'FAULT') {

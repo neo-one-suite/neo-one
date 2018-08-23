@@ -7,7 +7,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 const getMessages = async (receiptIn: CallReceiptJSON, sourceMaps: SourceMaps): Promise<ReadonlyArray<string>> => {
   const receipt = convertCallReceipt(receiptIn);
 
-  return createConsoleLogMessages(receipt.actions, sourceMaps, { onlyFileName: true });
+  return createConsoleLogMessages(receipt.actions, Promise.resolve(sourceMaps), { onlyFileName: true });
 };
 
 describe('console.log', () => {
@@ -181,7 +181,9 @@ describe('console.log', () => {
       console.log('done');
     `);
 
-    const messages = await createConsoleLogMessages(receipt.actions, sourceMaps, { onlyFileName: true });
+    const messages = await createConsoleLogMessages(receipt.actions, Promise.resolve(sourceMaps), {
+      onlyFileName: true,
+    });
 
     expect(messages).toMatchSnapshot();
   });

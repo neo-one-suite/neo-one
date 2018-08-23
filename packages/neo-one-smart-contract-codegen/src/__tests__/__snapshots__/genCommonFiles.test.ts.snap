@@ -313,55 +313,41 @@ export const DeveloperTools = () => (
   "sourceMaps": Object {
     "js": "// tslint:disable
 /* eslint-disable */
-let sourceMapsIn = {};
+import { OneClient } from '@neo-one/client';
+import { projectID } from './projectID';
+
+let sourceMapsIn = Promise.resolve({});
 
 if (process.env.NODE_ENV !== 'production') {
-  const token = {
-    file: 'file',
-    mappings: 'sourcemap',
-    names: [],
-    sources: [],
-    version: 0,
-  };
-  const ico = {
-    file: 'file',
-    mappings: 'sourcemap',
-    names: [],
-    sources: [],
-    version: 0,
-  };
-  sourceMapsIn = {
-    AV6PhAq1FHBeCMsNUPMWzpUFxvXRFwHoLn: token,
-    ATfAohZQ5iuGDXWjcHxLAj8WXwQchGLXhi: ico,
-  };
+  sourceMapsIn = Promise.resolve().then(async () => {
+    const client = new OneClient(40100);
+    const result = await client.request({
+      plugin: '@neo-one/server-plugin-project',
+      options: { type: 'sourceMaps', projectID },
+    });
+
+    return result.response;
+  });
 }
 
 export const sourceMaps = sourceMapsIn;
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
-import { SourceMaps } from '@neo-one/client';
+import { OneClient, SourceMaps } from '@neo-one/client';
+import { projectID } from './projectID';
 
-let sourceMapsIn: SourceMaps = {};
+let sourceMapsIn: Promise<SourceMaps> = Promise.resolve({});
 if (process.env.NODE_ENV !== 'production') {
-  const token: any = {
-    file: 'file',
-    mappings: 'sourcemap',
-    names: [],
-    sources: [],
-    version: 0,
-  };
-  const ico: any = {
-    file: 'file',
-    mappings: 'sourcemap',
-    names: [],
-    sources: [],
-    version: 0,
-  };
-  sourceMapsIn = {
-    AV6PhAq1FHBeCMsNUPMWzpUFxvXRFwHoLn: token,
-    ATfAohZQ5iuGDXWjcHxLAj8WXwQchGLXhi: ico,
-  };
+  sourceMapsIn = Promise.resolve().then(async () => {
+    const client = new OneClient(40100);
+    const result = await client.request({
+      plugin: '@neo-one/server-plugin-project',
+      options: { type: 'sourceMaps', projectID },
+    });
+
+    return result.response;
+  });
 }
 
 export const sourceMaps = sourceMapsIn;

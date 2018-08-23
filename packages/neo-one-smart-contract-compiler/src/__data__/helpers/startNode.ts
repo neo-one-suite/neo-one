@@ -164,7 +164,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       const result = await userAccountProviders.memory.__execute(
         code.toString('hex'),
         { from: masterWallet.account.id, ...options },
-        mutableSourceMaps,
+        Promise.resolve(mutableSourceMaps),
       );
 
       const [invokeReceipt] = await Promise.all([

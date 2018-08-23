@@ -168,10 +168,11 @@ class TaskWrapper {
         });
       }
     } catch (error) {
+      const message = error.stack == undefined ? error.message : error.stack;
       this.status$.next({
         ...status,
         pending: false,
-        error: error.message == undefined || error.message === '' ? 'Something went wrong.' : error.message,
+        error: message == undefined || message === '' ? 'Something went wrong.' : message,
       });
 
       onError(error);
@@ -294,6 +295,12 @@ export class TaskList {
   }
 
   private async runTasks(ctx: TaskContext): Promise<void> {
+    if (this.tasks.length === 0) {
+      this.statusInternal$.next([]);
+
+      return;
+    }
+
     if (this.concurrent) {
       await Promise.all(this.tasks.map(async (task) => task.run(ctx)));
     } else {

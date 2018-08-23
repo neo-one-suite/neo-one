@@ -13,7 +13,7 @@ export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: Source
     const message = await processActionsAndMessage({
       actions: receipt.actions,
       message: receipt.result.message,
-      sourceMaps,
+      sourceMaps: Promise.resolve(sourceMaps),
     });
 
     throw new Error(message);
@@ -21,6 +21,6 @@ export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: Source
 
   await processConsoleLogMessages({
     actions: receipt.actions,
-    sourceMaps,
+    sourceMaps: Promise.resolve(sourceMaps),
   });
 };

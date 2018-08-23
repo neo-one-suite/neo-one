@@ -37,6 +37,7 @@ const getNetworkDefinitions = (ctx: any): ReadonlyArray<NetworkDefinition> => ct
 const getWallet = (ctx: any): Wallet => ctx.wallet;
 const getNetworkMaybe = (ctx: any): Network | undefined => ctx.networkMaybe;
 const getNetwork = (ctx: any): Network => ctx.network;
+const getSourceMaps = (ctx: any): SourceMaps => ctx.sourceMaps;
 // tslint:enable no-any
 
 // tslint:disable-next-line export-name
@@ -50,14 +51,7 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
           let projectID = await loadProjectID(pluginManager, projectConfig, options);
           if (projectID === undefined) {
             projectID = v4();
-          } else {
-            await getProjectResourceManager(pluginManager)
-              .delete(projectID, options)
-              .toPromise();
           }
-          await getProjectResourceManager(pluginManager)
-            .create(projectID, options)
-            .toPromise();
 
           ctx.projectConfig = projectConfig;
           ctx.projectID = projectID;
@@ -67,6 +61,9 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
         title: 'Find contracts',
         task: async (ctx) => {
           ctx.contractPaths = await findContracts(getProjectConfig(ctx));
+          if (ctx.contractPaths.length === 0) {
+            throw new Error(`${JSON.stringify(getProjectConfig(ctx))}`);
+          }
         },
       },
       {
@@ -199,6 +196,7 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                   ctx.contracts = [];
                   const mutableLinked: { [filePath: string]: { [name: string]: string } } = {};
                   const mutableSourceMaps: Modifiable<SourceMaps> = {};
+                  ctx.sourceMaps = mutableSourceMaps;
 
                   return new TaskList({
                     tasks: getContractPaths(ctx).map((contractPath) => ({
@@ -296,6 +294,23 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                         },
                       ]),
                   }),
+              },
+              {
+                title: 'Save project info',
+                task: async (ctx) => {
+                  const projectID = getProjectID(ctx);
+                  const sourceMaps = getSourceMaps(ctx);
+                  const projectOptions = {
+                    rootDir: options.rootDir,
+                    sourceMaps,
+                  };
+                  await getProjectResourceManager(pluginManager)
+                    .delete(projectID, projectOptions)
+                    .toPromise();
+                  await getProjectResourceManager(pluginManager)
+                    .create(projectID, projectOptions)
+                    .toPromise();
+                },
               },
             ],
           }),

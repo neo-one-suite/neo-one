@@ -4,7 +4,7 @@ import { initializeSourceMap } from './initializeSourceMap';
 
 export const createConsoleLogMessages = async (
   actions: ReadonlyArray<RawAction>,
-  sourceMaps: SourceMaps,
+  sourceMaps: Promise<SourceMaps>,
   options: LogOptions,
 ): Promise<ReadonlyArray<string>> => {
   if (process.env.NODE_ENV === 'production') {

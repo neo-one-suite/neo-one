@@ -31,6 +31,7 @@ export const genCommonFiles = ({
   wallets,
   networks,
   httpServerPort,
+  sourceMapsPath,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly projectID: string;
@@ -44,10 +45,11 @@ export const genCommonFiles = ({
   readonly wallets: ReadonlyArray<Wallet>;
   readonly networks: ReadonlyArray<NetworkDefinition>;
   readonly httpServerPort: number;
+  readonly sourceMapsPath: string;
 }) => {
   const testFile = formatFile(genTest({ contractsPaths, testPath, commonTypesPath }));
   const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }));
-  const sourceMapsFile = formatFile(genSourceMaps({ contractsPaths }));
+  const sourceMapsFile = formatFile(genSourceMaps({ httpServerPort, sourceMapsPath, projectIDPath }));
   const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath, projectIDPath }));
   const clientFile = formatFile(
     genClient({ localDevNetworkName, wallets, networks, clientPath, projectIDPath, httpServerPort }),

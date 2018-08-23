@@ -841,7 +841,7 @@ export interface UserAccountProvider {
     abi: ABI,
     params: ReadonlyArray<Param>,
     options?: TransactionOptions,
-    sourceMaps?: SourceMaps,
+    sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<PublishReceipt>>;
   readonly registerAsset: (
     asset: AssetRegister,
@@ -855,7 +855,7 @@ export interface UserAccountProvider {
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
     options?: InvokeTransactionOptions,
-    sourceMaps?: SourceMaps,
+    sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<RawInvokeReceipt>>;
   readonly call: (
     contract: AddressString,
@@ -881,13 +881,13 @@ export interface SmartContractNetworksDefinition {
 export interface SmartContractDefinition {
   readonly networks: SmartContractNetworksDefinition;
   readonly abi: ABI;
-  readonly sourceMaps?: SourceMaps;
+  readonly sourceMaps?: Promise<SourceMaps>;
 }
 
 export interface ReadSmartContractDefinition {
   readonly address: AddressString;
   readonly abi: ABI;
-  readonly sourceMaps?: SourceMaps;
+  readonly sourceMaps?: Promise<SourceMaps>;
 }
 
 // tslint:disable-next-line no-any

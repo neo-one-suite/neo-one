@@ -20,7 +20,7 @@ Array [
     Array [],
     true,
     undefined,
-    Object {},
+    Promise {},
   ],
 ]
 `;
@@ -155,7 +155,7 @@ Array [
     },
     Array [],
     undefined,
-    Object {},
+    Promise {},
   ],
 ]
 `;

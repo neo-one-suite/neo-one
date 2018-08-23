@@ -85,7 +85,7 @@ const getSmartContract = async ({
 
   const address = tokens[token.name];
 
-  return client.smartContract({ address, abi, sourceMaps: { [address]: sourceMap } });
+  return client.smartContract({ address, abi, sourceMaps: Promise.resolve({ [address]: sourceMap }) });
 };
 
 const getSmartContracts = async ({ client, tokens }: { readonly client: ReadClient; readonly tokens: Tokens }) =>

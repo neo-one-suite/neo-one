@@ -1,3 +1,4 @@
+import { SourceMaps } from '@neo-one/client';
 import { DescribeTable } from '@neo-one/server-plugin';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -8,6 +9,7 @@ interface ProjectResourceOptions {
   readonly resourceType: ProjectResourceType;
   readonly name: string;
   readonly rootDir: string;
+  readonly sourceMaps: SourceMaps;
   readonly dataPath: string;
   readonly projectPath: string;
 }
@@ -16,6 +18,7 @@ interface NewProjectResourceOptions {
   readonly resourceType: ProjectResourceType;
   readonly name: string;
   readonly rootDir: string;
+  readonly sourceMaps: SourceMaps;
   readonly dataPath: string;
 }
 
@@ -32,6 +35,7 @@ export class ProjectResource {
     resourceType,
     name,
     rootDir,
+    sourceMaps,
     dataPath,
   }: NewProjectResourceOptions): Promise<ProjectResource> {
     const projectPath = this.getProjectPath(dataPath);
@@ -40,6 +44,7 @@ export class ProjectResource {
       resourceType,
       name,
       rootDir,
+      sourceMaps,
       dataPath,
       projectPath,
     });
@@ -51,12 +56,13 @@ export class ProjectResource {
     dataPath,
   }: ExistingProjectResourceOptions): Promise<ProjectResource> {
     const projectPath = this.getProjectPath(dataPath);
-    const { rootDir } = await fs.readJSON(projectPath);
+    const { rootDir, sourceMaps } = await fs.readJSON(projectPath);
 
     return new ProjectResource({
       resourceType,
       name,
       rootDir,
+      sourceMaps,
       dataPath,
       projectPath,
     });
@@ -70,14 +76,16 @@ export class ProjectResource {
   private readonly resourceType: ProjectResourceType;
   private readonly name: string;
   private readonly rootDir: string;
+  private readonly sourceMaps: SourceMaps;
   private readonly dataPath: string;
   private readonly projectPath: string;
 
-  public constructor({ resourceType, name, rootDir, dataPath, projectPath }: ProjectResourceOptions) {
+  public constructor({ resourceType, name, rootDir, sourceMaps, dataPath, projectPath }: ProjectResourceOptions) {
     this.resourceType = resourceType;
     this.name = name;
     this.rootDir = rootDir;
     this.dataPath = dataPath;
+    this.sourceMaps = sourceMaps;
     this.projectPath = projectPath;
 
     this.resource$ = new BehaviorSubject(this.toResource());
@@ -85,7 +93,7 @@ export class ProjectResource {
 
   public async create(): Promise<void> {
     await fs.ensureDir(path.dirname(this.projectPath));
-    await fs.writeJSON(this.projectPath, { rootDir: this.rootDir });
+    await fs.writeJSON(this.projectPath, { rootDir: this.rootDir, sourceMaps: this.sourceMaps });
   }
 
   public async delete(): Promise<void> {
@@ -114,6 +122,7 @@ export class ProjectResource {
       baseName: this.name,
       state: 'started',
       rootDir: this.rootDir,
+      sourceMaps: this.sourceMaps,
     };
   }
 }

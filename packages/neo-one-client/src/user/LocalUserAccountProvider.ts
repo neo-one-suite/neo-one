@@ -382,7 +382,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     abi: ABI,
     params: ReadonlyArray<Param>,
     options?: TransactionOptions,
-    sourceMaps: SourceMaps = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<PublishReceipt>> {
     return this.publishBase(
       'publish',
@@ -508,7 +508,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
     options: InvokeTransactionOptions = {},
-    sourceMaps: SourceMaps = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<RawInvokeReceipt>> {
     const { attributes = [] } = options;
 
@@ -630,7 +630,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   public async __execute(
     script: BufferString,
     options?: InvokeTransactionOptions,
-    sourceMaps: SourceMaps = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     return this.invokeRaw({
       script: Buffer.from(script, 'hex'),
@@ -671,7 +671,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   private async getInvocationResultError(
     data: RawInvocationData,
     result: RawInvocationResultError,
-    sourceMaps: SourceMaps = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<InvocationResultError> {
     const message = await processActionsAndMessage({
       actions: data.actions,
@@ -691,7 +691,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     data: RawInvocationData,
     result: RawInvocationResultSuccess,
     value: T,
-    sourceMaps: SourceMaps = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<InvocationResultSuccess<T>> {
     await processConsoleLogMessages({
       actions: data.actions,
@@ -710,7 +710,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     method: string,
     contractIn: ContractRegister,
     emit: (sb: ScriptBuilder) => void,
-    sourceMaps: SourceMaps = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
     options?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt>> {
     const contract = new ContractModel({
@@ -795,7 +795,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly method: string;
     readonly scripts?: ReadonlyArray<WitnessModel>;
     readonly labels?: Labels;
-    readonly sourceMaps?: SourceMaps;
+    readonly sourceMaps?: Promise<SourceMaps>;
   }): Promise<TransactionResult<T, InvocationTransaction>> {
     const { from, attributes: attributesIn, networkFee, monitor } = this.getTransactionOptions(options);
 
@@ -839,8 +839,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           });
           throw new InvokeError(message);
         }
-
-        await processConsoleLogMessages({ actions: callReceipt.actions, sourceMaps });
 
         const gas = callReceipt.result.gasConsumed.integerValue(BigNumber.ROUND_UP);
         const { inputs, outputs } = await this.getTransfersInputOutputs({

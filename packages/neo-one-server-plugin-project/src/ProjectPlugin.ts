@@ -60,11 +60,10 @@ export class ProjectPlugin extends Plugin {
   // tslint:disable-next-line no-any
   public async request(pluginManager: PluginManager, optionsIn: string): Promise<any> {
     const options = this.parseRequestOptions(optionsIn);
+    const { projectID } = options;
+    const project = await getProject(pluginManager, options.projectID);
     switch (options.type) {
       case 'network':
-        const { projectID } = options;
-        const project = await getProject(pluginManager, options.projectID);
-
         return getNetworkResourceManager(pluginManager)
           .getResource$({
             name: getLocalNetworkName(project.rootDir, projectID),
@@ -75,8 +74,10 @@ export class ProjectPlugin extends Plugin {
             take(1),
           )
           .toPromise();
+      case 'sourceMaps':
+        return project.sourceMaps;
       default:
-        utils.assertNever(options.type);
+        utils.assertNever(options);
         throw new Error('Unknown command');
     }
   }

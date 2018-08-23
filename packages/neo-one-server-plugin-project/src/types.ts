@@ -18,7 +18,12 @@ export interface NetworkRequestOptions {
   readonly projectID: string;
 }
 
-export type RequestOptions = NetworkRequestOptions;
+export interface SourceMapsRequestOptions {
+  readonly type: 'sourceMaps';
+  readonly projectID: string;
+}
+
+export type RequestOptions = NetworkRequestOptions | SourceMapsRequestOptions;
 
 export interface ProjectConfig {
   readonly paths: {

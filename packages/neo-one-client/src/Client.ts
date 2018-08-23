@@ -122,7 +122,7 @@ export class Client<
     abi: ABI,
     params: ReadonlyArray<Param> = [],
     options?: TransactionOptions,
-    sourceMaps: SourceMaps = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<PublishReceipt>> {
     return this.getProvider(options).publishAndDeploy(
       args.assertContractRegister('contract', contract),
@@ -193,7 +193,7 @@ export class Client<
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
     options?: InvokeTransactionOptions,
-    sourceMaps: SourceMaps = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<RawInvokeReceipt>> {
     return this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMaps);
   }

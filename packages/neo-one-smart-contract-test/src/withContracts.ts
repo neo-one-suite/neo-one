@@ -55,7 +55,7 @@ export const withContracts = async <T>(
       let result: TransactionResult<PublishReceipt>;
       // tslint:disable-next-line prefer-conditional-expression
       if (deploy) {
-        result = await client.publishAndDeploy(contract, abi, [], undefined, mutableSourceMaps);
+        result = await client.publishAndDeploy(contract, abi, [], undefined, Promise.resolve(mutableSourceMaps));
       } else {
         result = await client.publish(contract);
       }
@@ -68,7 +68,7 @@ export const withContracts = async <T>(
       const smartContract = client.smartContract({
         networks: { [networkName]: { address } },
         abi,
-        sourceMaps: mutableSourceMaps,
+        sourceMaps: Promise.resolve(mutableSourceMaps),
       });
       mutableLinked[filePath] = { [name]: address };
 

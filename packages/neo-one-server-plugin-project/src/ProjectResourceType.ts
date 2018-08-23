@@ -1,3 +1,4 @@
+import { SourceMaps } from '@neo-one/client';
 import {
   CRUD,
   DescribeTable,
@@ -24,10 +25,12 @@ export interface Project {
   readonly baseName: string;
   readonly state: ResourceState;
   readonly rootDir: string;
+  readonly sourceMaps: SourceMaps;
 }
 
 export interface ProjectResourceOptions {
   readonly rootDir?: string;
+  readonly sourceMaps?: SourceMaps;
 }
 
 export class ProjectResourceType extends ResourceType<Project, ProjectResourceOptions> {

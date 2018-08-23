@@ -59,7 +59,7 @@ const createCall = ({
   readonly address: AddressString;
   readonly client: ReadClient;
   readonly func: ABIFunction;
-  readonly sourceMaps?: SourceMaps;
+  readonly sourceMaps?: Promise<SourceMaps>;
   // tslint:disable-next-line no-any
 }) => async (...args: any[]): Promise<Param | undefined> => {
   const { params, monitor } = getParams({

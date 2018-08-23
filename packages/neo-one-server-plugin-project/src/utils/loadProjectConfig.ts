@@ -20,7 +20,7 @@ const validateConfig = (rootDir: string, configIn: cosmiconfig.Config): ProjectC
 };
 
 export const loadProjectConfig = async (rootDir: string): Promise<ProjectConfig> => {
-  const explorer = cosmiconfig('one');
+  const explorer = cosmiconfig('one', { stopDir: rootDir });
 
   const result = await explorer.search(rootDir);
 

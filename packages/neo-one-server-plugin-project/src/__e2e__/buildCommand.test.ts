@@ -325,8 +325,12 @@ describe('buildCommand', () => {
     expect(network.nodes[0].ready).toBeTruthy();
 
     const wallets = await getWallets(LOCAL);
-    expect(wallets.length).toEqual(1);
-    const wallet = wallets[0];
+    expect(wallets.length).toEqual(11);
+    const wallet = wallets.find((localWallet) => localWallet.name.includes('master'));
+    if (wallet === undefined) {
+      expect(wallet).toBeDefined();
+      throw new Error('For TS');
+    }
 
     const { client } = await getClients(network, wallet);
 

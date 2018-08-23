@@ -46,6 +46,7 @@ export const generateCommonCode = async (
     httpServerPort,
     projectID,
     projectIDPath,
+    sourceMapsPath,
   });
 
   await fs.ensureDir(project.paths.generated);

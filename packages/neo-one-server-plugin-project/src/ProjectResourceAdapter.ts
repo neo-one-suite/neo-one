@@ -18,7 +18,7 @@ export interface ProjectResourceAdapterOptions {
 export class ProjectResourceAdapter {
   public static create(
     { resourceType, name, dataPath }: ProjectResourceAdapterInitOptions,
-    { rootDir }: ProjectResourceOptions,
+    { rootDir, sourceMaps }: ProjectResourceOptions,
   ): TaskList {
     return new TaskList({
       tasks: [
@@ -28,11 +28,15 @@ export class ProjectResourceAdapter {
             if (rootDir === undefined) {
               throw new Error('Root directory of the project must be defined.');
             }
+            if (sourceMaps === undefined) {
+              throw new Error('Source maps of the project must be defined.');
+            }
             const projectResource = await ProjectResource.createNew({
               resourceType,
               name,
               dataPath,
               rootDir,
+              sourceMaps,
             });
 
             ctx.resourceAdapter = new this({ projectResource });
