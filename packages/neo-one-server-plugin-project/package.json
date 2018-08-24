@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/server-plugin-project",
-  "version": "1.0.0-alpha.8",
+  "version": "1.0.0-alpha.9",
   "description": "NEO•ONE server plugin for project functionality.",
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/client": "^1.0.0-alpha.91",
     "@neo-one/client-core": "^1.0.0-alpha.71",
     "@neo-one/server-plugin": "^1.0.0-alpha.69",
-    "@neo-one/server-plugin-neotracker": "^1.0.0-alpha.8",
+    "@neo-one/server-plugin-neotracker": "^1.0.0-alpha.9",
     "@neo-one/server-plugin-network": "^1.0.0-alpha.111",
     "@neo-one/smart-contract-codegen": "^1.0.0-alpha.48",
     "@neo-one/smart-contract-compiler": "^1.0.0-alpha.48",
