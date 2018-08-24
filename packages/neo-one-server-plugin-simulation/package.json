@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-simulation",
-  "version": "1.0.0-alpha.115",
+  "version": "1.0.0-alpha.116",
   "description": "NEO•ONE Server simulation plugin.",
   "main": "./src/index.ts",
   "dependencies": {
@@ -8,8 +8,8 @@
     "@neo-one/client-core": "^1.0.0-alpha.71",
     "@neo-one/server-plugin": "^1.0.0-alpha.69",
     "@neo-one/server-plugin-compiler": "^1.0.0-alpha.92",
-    "@neo-one/server-plugin-network": "^1.0.0-alpha.110",
-    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.115",
+    "@neo-one/server-plugin-network": "^1.0.0-alpha.111",
+    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.116",
     "@neo-one/types": "^1.0.0-alpha.42",
     "@neo-one/utils": "^1.0.0-alpha.60",
     "@types/execa": "^0.9.0",

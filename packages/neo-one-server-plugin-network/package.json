@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/server-plugin-network",
-  "version": "1.0.0-alpha.110",
+  "version": "1.0.0-alpha.111",
   "description": "NEO•ONE Server network plugin.",
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/client": "^1.0.0-alpha.91",
     "@neo-one/client-core": "^1.0.0-alpha.71",
     "@neo-one/monitor": "^1.0.0-alpha.55",
-    "@neo-one/node": "^1.0.0-alpha.109",
+    "@neo-one/node": "^1.0.0-alpha.110",
     "@neo-one/node-core": "^1.0.0-alpha.72",
     "@neo-one/node-data-backup": "^1.0.0-alpha.69",
     "@neo-one/node-neo-settings": "^1.0.0-alpha.71",

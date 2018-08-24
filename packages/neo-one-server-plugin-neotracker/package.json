@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/server-plugin-neotracker",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "description": "NEO•ONE server plugin for NEO Tracker functionality.",
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/monitor": "^1.0.0-alpha.55",
     "@neo-one/server-plugin": "^1.0.0-alpha.69",
-    "@neo-one/server-plugin-network": "^1.0.0-alpha.110",
+    "@neo-one/server-plugin-network": "^1.0.0-alpha.111",
     "@neo-one/utils": "^1.0.0-alpha.60",
     "@neotracker/core": "^1.0.3",
     "cross-fetch": "^2.2.2",

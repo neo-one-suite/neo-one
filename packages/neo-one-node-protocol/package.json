@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-protocol",
-  "version": "1.0.0-alpha.96",
+  "version": "1.0.0-alpha.97",
   "description": "NEO•ONE NEO node and consensus protocol.",
   "main": "./src/index.ts",
   "dependencies": {
