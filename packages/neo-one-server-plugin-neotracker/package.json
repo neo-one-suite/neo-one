@@ -8,7 +8,7 @@
     "@neo-one/server-plugin": "^1.0.0-alpha.69",
     "@neo-one/server-plugin-network": "^1.0.0-alpha.111",
     "@neo-one/utils": "^1.0.0-alpha.60",
-    "@neotracker/core": "^1.0.4",
+    "@neotracker/core": "^1.0.5",
     "cross-fetch": "^2.2.2",
     "execa": "^0.11.0",
     "fs-extra": "^7.0.0",
