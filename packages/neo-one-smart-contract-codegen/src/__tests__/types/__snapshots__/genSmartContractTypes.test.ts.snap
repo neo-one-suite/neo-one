@@ -8,8 +8,8 @@ import BigNumber from 'bignumber.js';
 export type TokenEvent = TokenTransferEvent
 
 export interface TokenTransferEventParameters {
-  readonly from: AddressString;
-  readonly to: AddressString;
+  readonly from: AddressString | undefined;
+  readonly to: AddressString | undefined;
   readonly amount: BigNumber;
 }
 export interface TokenTransferEvent extends Event<'transfer', TokenTransferEventParameters> {}

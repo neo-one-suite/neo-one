@@ -21,10 +21,12 @@ Array [
             "parameters": Array [
               Object {
                 "name": "from",
+                "optional": true,
                 "type": "Address",
               },
               Object {
                 "name": "to",
+                "optional": true,
                 "type": "Address",
               },
               Object {

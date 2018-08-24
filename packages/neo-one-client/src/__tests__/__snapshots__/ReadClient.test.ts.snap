@@ -158,12 +158,12 @@ Object {
           "parameters": Array [
             Object {
               "name": "from",
-              "optional": undefined,
+              "optional": true,
               "type": "Address",
             },
             Object {
               "name": "to",
-              "optional": undefined,
+              "optional": true,
               "type": "Address",
             },
             Object {

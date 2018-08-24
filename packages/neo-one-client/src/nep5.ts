@@ -73,7 +73,6 @@ export const abi = (decimals: number): ABI => ({
       name: 'totalSupply',
       constant: true,
       parameters: [],
-
       returnType: { type: 'Integer', decimals },
     },
     {
@@ -93,7 +92,6 @@ export const abi = (decimals: number): ABI => ({
           decimals,
         },
       ],
-
       returnType: { type: 'Boolean' },
     },
     {
@@ -105,7 +103,6 @@ export const abi = (decimals: number): ABI => ({
           name: 'account',
         },
       ],
-
       returnType: { type: 'Integer', decimals },
     },
   ],
@@ -116,10 +113,12 @@ export const abi = (decimals: number): ABI => ({
         {
           type: 'Address',
           name: 'from',
+          optional: true,
         },
         {
           type: 'Address',
           name: 'to',
+          optional: true,
         },
         {
           type: 'Integer',

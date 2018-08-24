@@ -9,10 +9,12 @@ Object {
       \\"parameters\\": [
         {
           \\"name\\": \\"from\\",
+          \\"optional\\": true,
           \\"type\\": \\"Address\\"
         },
         {
           \\"name\\": \\"to\\",
+          \\"optional\\": true,
           \\"type\\": \\"Address\\"
         },
         {
@@ -104,10 +106,12 @@ export const tokenABI: ABI = {
       \\"parameters\\": [
         {
           \\"name\\": \\"from\\",
+          \\"optional\\": true,
           \\"type\\": \\"Address\\"
         },
         {
           \\"name\\": \\"to\\",
+          \\"optional\\": true,
           \\"type\\": \\"Address\\"
         },
         {
