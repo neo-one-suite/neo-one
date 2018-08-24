@@ -179,10 +179,18 @@ export * from './ICO/abi';
   "projectID": Object {
     "js": "// tslint:disable
 /* eslint-disable */
+/**
+ * @projectID foobar
+ */
+
 export const projectID = 'foobar';
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
+/**
+ * @projectID foobar
+ */
+
 export const projectID = 'foobar';
 ",
   },

@@ -3,9 +3,17 @@
 exports[`genProjectID Token 1`] = `
 Object {
   "js": "
+/**
+ * @projectID foobar
+ */
+
 export const projectID = 'foobar';
 ",
   "ts": "
+/**
+ * @projectID foobar
+ */
+
 export const projectID = 'foobar';
 ",
 }

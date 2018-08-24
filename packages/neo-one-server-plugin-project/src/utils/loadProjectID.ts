@@ -6,6 +6,8 @@ import { ProjectConfig } from '../types';
 import { getProjectResourceManager } from './getProjectResourceManager';
 import { getCommonPaths, getTSPath } from './paths';
 
+const projectIDRegex = /@projectID ([0-9a-z-]+)/;
+
 const loadProjectIDFromFile = async (projectConfig: ProjectConfig): Promise<string | undefined> => {
   const { projectIDPath: projectIDPathIn } = getCommonPaths(projectConfig);
 
@@ -14,11 +16,9 @@ const loadProjectIDFromFile = async (projectConfig: ProjectConfig): Promise<stri
   const exists = await fs.pathExists(projectIDPath);
   if (exists) {
     const contents = await fs.readFile(projectIDPath, 'utf8');
-    const lineStart = "export const projectID = '";
-    const projectIDLine = contents.split('\n').find((line) => line.startsWith(lineStart));
-
-    if (projectIDLine !== undefined) {
-      return projectIDLine.slice(lineStart.length, -2);
+    const match = projectIDRegex.exec(contents);
+    if (match !== null) {
+      return match[1];
     }
   }
 
