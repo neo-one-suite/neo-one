@@ -4,7 +4,7 @@
   "description": "NEO•ONE TypeScript smart contract compiler.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@babel/code-frame": "^7.0.0-rc.2",
+    "@babel/code-frame": "^7.0.0-rc.3",
     "@neo-one/client": "^1.0.0-alpha.90",
     "@neo-one/client-core": "^1.0.0-alpha.70",
     "@neo-one/smart-contract": "^1.0.0-alpha.23",
