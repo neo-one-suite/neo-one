@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@neo-one/cli": "1.0.0-alpha.110",
-    "@neo-one/smart-contract-compiler": "1.0.0-alpha.43",
+    "@neo-one/smart-contract-compiler": "1.0.0-alpha.48",
     "@types/jest": "23.3.1",
     "@types/react": "16.4.11",
     "cross-env": "5.2.0",
