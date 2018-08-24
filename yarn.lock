@@ -1047,9 +1047,9 @@
   dependencies:
     asn1.js "^1.0.4"
 
-"@neotracker/core@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@neotracker/core/-/core-1.0.2.tgz#7ddbf6696381e423752e9795570a5b6faef41e06"
+"@neotracker/core@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@neotracker/core/-/core-1.0.3.tgz#c5381acc60255aab8508ace8e91db2b02c0ccfa7"
   dependencies:
     "@material-ui/core" "^1.5.1"
     apollo-cache-inmemory "^1.3.0-beta.6"
@@ -1111,7 +1111,7 @@
     react-router-dom "^4.3.1"
     react-tippy "^1.2.2"
     react-transition-group "^2.3.1"
-    reakit "^0.14.4"
+    reakit "^0.14.5"
     recompose "^0.28.2"
     redux "^4.0.0"
     redux-actions "^2.6.1"
@@ -8916,18 +8916,6 @@ readline2@^1.0.1:
     is-fullwidth-code-point "^1.0.0"
     mute-stream "0.0.5"
 
-reakit@^0.14.4:
-  version "0.14.4"
-  resolved "https://registry.yarnpkg.com/reakit/-/reakit-0.14.4.tgz#5e0c7fd371f8b5dc47053b1645c4027c55821793"
-  dependencies:
-    "@emotion/is-prop-valid" "^0.6.6"
-    constate "^0.8.0"
-    hoist-non-react-statics "^3.0.1"
-    popper.js "^1.14.4"
-    prop-types "^15.6.2"
-    styled-components "^3.4.4"
-    styled-tools "^1.3.1"
-
 reakit@^0.14.5:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/reakit/-/reakit-0.14.5.tgz#26534af25ee75a32c28f73b217af3aa70faf4c6e"
@@ -9912,7 +9900,7 @@ stubs@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/stubs/-/stubs-3.0.0.tgz#e8d2ba1fa9c90570303c030b6900f7d5f89abe5b"
 
-styled-components@^3.0.0, styled-components@^3.4.4, styled-components@^3.4.5:
+styled-components@^3.0.0, styled-components@^3.4.5:
   version "3.4.5"
   resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.4.5.tgz#6cbfde7c9189c868b9fd01fee40f5330dbd0cc8d"
   dependencies:

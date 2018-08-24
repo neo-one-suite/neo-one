@@ -1,6 +1,6 @@
 import { AddressString, Client, DeveloperClient, OneClient } from '@neo-one/client';
 import { ActionMap } from 'constate';
-import * as localforage from 'localforage';
+import localforage from 'localforage';
 import * as React from 'react';
 import { Container } from 'reakit';
 import { from } from 'rxjs';
