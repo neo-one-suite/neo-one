@@ -101,7 +101,7 @@ aliases:
 
 node10: &node10
   docker:
-    - image: circleci/node:10.9.0
+    - image: neotracker/neo-one-circleci-node:10.9.0
 
 version: 2
 jobs:
