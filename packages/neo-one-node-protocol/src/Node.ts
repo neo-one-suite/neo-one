@@ -71,6 +71,11 @@ const NEO_PROTOCOL_MESSAGES_FAILURES_TOTAL = metrics.createCounter({
 const NEO_PROTOCOL_MEMPOOL_SIZE = metrics.createGauge({
   name: 'neo_protocol_mempool_size',
 });
+export interface TransactionAndFee {
+  readonly transaction: Transaction;
+  readonly networkFee: BN;
+}
+
 export interface Environment {
   readonly network?: NetworkEnvironment;
 }
@@ -104,6 +109,19 @@ const createScalingBloomFilter = () =>
     initial_capacity: 100000,
     scaling: 4,
   });
+
+const compareTransactionAndFees = (val1: TransactionAndFee, val2: TransactionAndFee) => {
+  const a = val1.networkFee.divn(val1.transaction.size);
+  const b = val2.networkFee.divn(val2.transaction.size);
+  if (a.lt(b)) {
+    return -1;
+  }
+  if (b.lt(a)) {
+    return 1;
+  }
+
+  return val1.transaction.hash.compare(val2.transaction.hash);
+};
 
 const MEM_POOL_SIZE = 5000;
 const GET_ADDR_PEER_COUNT = 200;
@@ -202,8 +220,8 @@ export class Node implements INode {
     if (memPool.length > MEM_POOL_SIZE) {
       await monitor.captureSpan(
         async () => {
-          const transactionAndFee = await Promise.all(
-            memPool.map<Promise<[Transaction, BN]>>(async (transaction) => {
+          const transactionAndFees = await Promise.all(
+            memPool.map<Promise<TransactionAndFee>>(async (transaction) => {
               const networkFee = await transaction.getNetworkFee({
                 getOutput: this.blockchain.output.get,
                 governingToken: this.blockchain.settings.governingToken,
@@ -212,17 +230,15 @@ export class Node implements INode {
                 registerValidatorFee: this.blockchain.settings.registerValidatorFee,
               });
 
-              return [transaction, networkFee];
+              return { transaction, networkFee };
             }),
           );
 
-          const hashesToRemove = _.take<[Transaction, BN]>(
-            _.sortBy(transactionAndFee, [
-              ([transaction, networkFee]: [Transaction, BN]) => networkFee.divn(transaction.size).toNumber(),
-              ([transaction]: [Transaction]) => transaction.hashHex,
-            ]) as ReadonlyArray<[Transaction, BN]>,
+          const hashesToRemove = _.take<TransactionAndFee>(
+            // tslint:disable-next-line no-array-mutation
+            transactionAndFees.slice().sort(compareTransactionAndFees),
             this.blockchain.settings.memPoolSize,
-          ).map(([transaction]: [Transaction, BN]) => transaction.hashHex);
+          ).map((transactionAndFee) => transactionAndFee.transaction.hashHex);
           hashesToRemove.forEach((hash) => {
             // tslint:disable-next-line no-dynamic-delete
             delete this.mutableMemPool[hash];
