@@ -1,11 +1,16 @@
 import { DeveloperClient, NEOONEDataProvider } from '@neo-one/client';
 import { PluginManager, TaskList } from '@neo-one/server-plugin';
+import { getNEOTrackerResourceManager } from '@neo-one/server-plugin-neotracker';
 import { getNetworkResourceManager } from '@neo-one/server-plugin-network';
-import { utils } from '@neo-one/utils';
-import { filter, take } from 'rxjs/operators';
 import { build } from '../build';
 import { BuildTaskListOptions, ResetTaskListOptions } from '../types';
-import { getLocalNetworkName, getProject as loadProject, loadProjectConfig, loadProjectID } from '../utils';
+import {
+  getLocalNEOTrackerName,
+  getLocalNetworkName,
+  getProject as loadProject,
+  loadProjectConfig,
+  loadProjectID,
+} from '../utils';
 
 // tslint:disable no-any
 const getBuildOptions = (ctx: any): BuildTaskListOptions => ctx.buildOptions;
@@ -52,13 +57,14 @@ export const reset = (pluginManager: PluginManager, options: ResetTaskListOption
           return false;
         },
         task: async (ctx) => {
-          const network = await getNetworkResourceManager(pluginManager)
-            .getResource$({ name: getLocalNetworkName(getBuildOptions(ctx).rootDir, getProjectID(ctx)), options: {} })
-            .pipe(
-              filter(utils.notNull),
-              take(1),
-            )
-            .toPromise();
+          const networkName = getLocalNetworkName(getBuildOptions(ctx).rootDir, getProjectID(ctx));
+          const [network, neotracker] = await Promise.all([
+            getNetworkResourceManager(pluginManager).getResource({ name: networkName, options: {} }),
+            getNEOTrackerResourceManager(pluginManager).getResource({
+              name: getLocalNEOTrackerName(networkName),
+              options: {},
+            }),
+          ]);
 
           if (network.state !== 'started') {
             await getNetworkResourceManager(pluginManager)
@@ -71,6 +77,7 @@ export const reset = (pluginManager: PluginManager, options: ResetTaskListOption
           );
           await developerClient.reset();
           await developerClient.updateSettings({ secondsPerBlock: 15 });
+          await neotracker.reset();
         },
       },
       {

@@ -20,7 +20,7 @@ import * as fs from 'fs-extra';
 import _ from 'lodash';
 import * as path from 'path';
 import { BehaviorSubject, combineLatest, Observable, of as _of } from 'rxjs';
-import { filter, map, shareReplay, switchMap, take } from 'rxjs/operators';
+import { filter, map, shareReplay, switchMap, take, timeout } from 'rxjs/operators';
 import { ResourceNoStartError, ResourceNoStopError } from './errors';
 import { PluginManager } from './PluginManager';
 import { PortAllocator } from './PortAllocator';
@@ -182,6 +182,22 @@ export class ResourcesManager<
     readonly options: ResourceOptions;
   }): Observable<Resource | undefined> {
     return this.getResources$(options).pipe(map((resources) => resources.find((resource) => resource.name === name)));
+  }
+
+  public async getResource({
+    name,
+    options,
+  }: {
+    readonly name: string;
+    readonly options: ResourceOptions;
+  }): Promise<Resource> {
+    return this.getResource$({ name, options })
+      .pipe(
+        filter(utils.notNull),
+        take(1),
+        timeout(500),
+      )
+      .toPromise();
   }
 
   public create(name: string, options: ResourceOptions): TaskList {

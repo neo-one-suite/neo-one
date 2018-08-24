@@ -270,6 +270,7 @@ export interface ResourcesManager<
   Resource extends BaseResource = BaseResource,
   ResourceOptions extends BaseResourceOptions = BaseResourceOptions
 > {
+  readonly getResource: (options: { readonly name: string; readonly options: ResourceOptions }) => Promise<Resource>;
   readonly getResources$: (options: ResourceOptions) => Observable<ReadonlyArray<Resource>>;
   readonly getResource$: (
     options: { readonly name: string; readonly options: ResourceOptions },

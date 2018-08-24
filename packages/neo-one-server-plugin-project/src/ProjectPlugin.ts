@@ -1,4 +1,5 @@
 import { InteractiveCommand, Plugin, PluginManager, ResourceType, TaskList } from '@neo-one/server-plugin';
+import { constants as neotrackerConstants, getNEOTrackerResourceManager } from '@neo-one/server-plugin-neotracker';
 import { constants as networkConstants, getNetworkResourceManager } from '@neo-one/server-plugin-network';
 import { constants as walletConstants } from '@neo-one/server-plugin-wallet';
 import { utils } from '@neo-one/utils';
@@ -9,7 +10,7 @@ import { constants } from './constants';
 import { ProjectResourceType } from './ProjectResourceType';
 import { reset } from './reset';
 import { ExecuteTaskListOptions, RequestOptions } from './types';
-import { getLocalNetworkName, getProject } from './utils';
+import { getLocalNEOTrackerName, getLocalNetworkName, getProject } from './utils';
 
 export class ProjectPlugin extends Plugin {
   public readonly projectResourceType = new ProjectResourceType({ plugin: this });
@@ -33,7 +34,7 @@ export class ProjectPlugin extends Plugin {
   }
 
   public get dependencies(): ReadonlyArray<string> {
-    return [networkConstants.PLUGIN, walletConstants.PLUGIN];
+    return [networkConstants.PLUGIN, walletConstants.PLUGIN, neotrackerConstants.PLUGIN];
   }
 
   public get resourceTypes(): ReadonlyArray<ResourceType> {
@@ -62,11 +63,12 @@ export class ProjectPlugin extends Plugin {
     const options = this.parseRequestOptions(optionsIn);
     const { projectID } = options;
     const project = await getProject(pluginManager, options.projectID);
+    const networkName = getLocalNetworkName(project.rootDir, projectID);
     switch (options.type) {
       case 'network':
         return getNetworkResourceManager(pluginManager)
           .getResource$({
-            name: getLocalNetworkName(project.rootDir, projectID),
+            name: networkName,
             options: {},
           })
           .pipe(
@@ -76,6 +78,13 @@ export class ProjectPlugin extends Plugin {
           .toPromise();
       case 'sourceMaps':
         return project.sourceMaps;
+      case 'neotracker':
+        const neotracker = await getNEOTrackerResourceManager(pluginManager).getResource({
+          name: getLocalNEOTrackerName(networkName),
+          options: {},
+        });
+
+        return neotracker.url;
       default:
         utils.assertNever(options);
         throw new Error('Unknown command');

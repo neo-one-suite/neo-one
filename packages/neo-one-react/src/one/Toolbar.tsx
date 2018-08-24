@@ -7,6 +7,7 @@ import { BlockIndex } from './BlockIndex';
 import { BlockTime } from './BlockTime';
 import { ErrorToasts } from './ErrorToasts';
 import { Monogram } from './Monogram';
+import { NEOTrackerButton } from './NEOTrackerButton';
 import { NetworkSelector } from './NetworkSelector';
 import { ResetButton } from './ResetButton';
 import { SecondsPerBlockInput } from './SecondsPerBlockInput';
@@ -83,6 +84,7 @@ export function Toolbar() {
             <WalletButton />
             <BalanceSelector />
             <SettingsButton />
+            <NEOTrackerButton />
           </Hidden>
           <Hidden.Toggle as={MonogramButton(hidden.visible)} {...hidden} />
           <ErrorToasts />

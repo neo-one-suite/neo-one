@@ -1,6 +1,7 @@
 import { scriptHashToAddress, SmartContractNetworksDefinition, SourceMaps, wifToPrivateKey } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
 import { PluginManager, Task, TaskList } from '@neo-one/server-plugin';
+import { getNEOTrackerResourceManager } from '@neo-one/server-plugin-neotracker';
 import { getNetworkResourceManager, Network } from '@neo-one/server-plugin-network';
 import { constants as walletConstants, getWalletResourceManager, Wallet } from '@neo-one/server-plugin-wallet';
 import { NetworkDefinition } from '@neo-one/smart-contract-codegen';
@@ -11,7 +12,13 @@ import { DiagnosticCategory } from 'typescript';
 import v4 from 'uuid/v4';
 import { constants } from '../constants';
 import { BuildTaskListOptions, ProjectConfig } from '../types';
-import { getLocalNetworkName, getProjectResourceManager, loadProjectConfig, loadProjectID } from '../utils';
+import {
+  getLocalNEOTrackerName,
+  getLocalNetworkName,
+  getProjectResourceManager,
+  loadProjectConfig,
+  loadProjectID,
+} from '../utils';
 import { compileContract } from './compileContract';
 import { deployContract } from './deployContract';
 import { findContracts } from './findContracts';
@@ -171,6 +178,16 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                             },
                           ];
                         },
+                      },
+                      {
+                        title: 'Setup NEO Tracker',
+                        task: (ctx) =>
+                          getNEOTrackerResourceManager(pluginManager).create(
+                            getLocalNEOTrackerName(getLocalNetworkName(options.rootDir, getProjectID(ctx))),
+                            {
+                              network: getNetwork(ctx).name,
+                            },
+                          ),
                       },
                       {
                         title: 'Transfer to wallets',

@@ -428,7 +428,6 @@ export class InteractiveCLI {
   public getDebug(): DescribeTable {
     return [
       ['Interactive CLI Log Path', this.mutableLogPath === undefined ? 'Unknown' : this.mutableLogPath],
-
       ['Interactive CLI Config Path', this.clientConfig.configPath],
     ];
   }

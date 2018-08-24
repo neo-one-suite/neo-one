@@ -21,6 +21,8 @@ interface Props {
   readonly delay?: string;
   readonly onClick?: () => void;
   readonly children?: React.ReactNode;
+  readonly href?: string;
+  readonly target?: string;
 }
 export function ToolbarButton({ children, help, delay, ...props }: Props) {
   return (

@@ -1,3 +1,4 @@
+export * from './getLocalNEOTrackerName';
 export * from './getLocalNetworkName';
 export * from './getProject';
 export * from './getProjectResourceManager';

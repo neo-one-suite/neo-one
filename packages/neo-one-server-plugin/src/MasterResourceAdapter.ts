@@ -4,7 +4,6 @@ import { BaseResource, BaseResourceOptions } from './types';
 
 export interface ResourceAdapterOptions {
   readonly name: string;
-
   readonly dataPath: string;
 }
 

@@ -23,7 +23,12 @@ export interface SourceMapsRequestOptions {
   readonly projectID: string;
 }
 
-export type RequestOptions = NetworkRequestOptions | SourceMapsRequestOptions;
+export interface NEOTrackerRequestOptions {
+  readonly type: 'neotracker';
+  readonly projectID: string;
+}
+
+export type RequestOptions = NetworkRequestOptions | SourceMapsRequestOptions | NEOTrackerRequestOptions;
 
 export interface ProjectConfig {
   readonly paths: {

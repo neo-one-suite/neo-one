@@ -10,6 +10,7 @@
     "@neo-one/server-client": "^1.0.0-alpha.69",
     "@neo-one/server-plugin": "^1.0.0-alpha.68",
     "@neo-one/server-plugin-compiler": "^1.0.0-alpha.91",
+    "@neo-one/server-plugin-neotracker": "^1.0.0-alpha.5",
     "@neo-one/server-plugin-network": "^1.0.0-alpha.109",
     "@neo-one/server-plugin-project": "^1.0.0-alpha.5",
     "@neo-one/server-plugin-simulation": "^1.0.0-alpha.114",
