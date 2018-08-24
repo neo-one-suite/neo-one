@@ -44,7 +44,7 @@
     "typescript": "3.0.1"
   },
   "dependencies": {
-    "@neo-one/smart-contract": "1.0.0-alpha.22",
+    "@neo-one/smart-contract": "1.0.0-alpha.23",
     "react": "16.4.2"
   }
 }
