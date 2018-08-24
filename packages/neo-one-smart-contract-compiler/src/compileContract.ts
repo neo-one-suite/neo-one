@@ -23,9 +23,10 @@ export interface CompileContractResult {
 export const compileContract = ({
   filePath: filePathIn,
   name,
-  linked,
+  linked: linkedIn = {},
 }: CompileContractOptions): CompileContractResult => {
   const filePath = normalizePath(filePathIn);
+  const linked = _.fromPairs(Object.entries(linkedIn).map(([key, value]) => [normalizePath(key), value]));
   const transpileContext = createContextForPath(filePath);
   const smartContract = tsUtils.statement.getClassOrThrow(
     tsUtils.file.getSourceFileOrThrow(transpileContext.program, filePath),
