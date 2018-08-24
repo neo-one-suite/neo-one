@@ -6,7 +6,7 @@ import { projectID } from './projectID';
 let sourceMapsIn: Promise<SourceMaps> = Promise.resolve({});
 if (process.env.NODE_ENV !== 'production') {
   sourceMapsIn = Promise.resolve().then(async () => {
-    const client = new OneClient(21426);
+    const client = new OneClient(23864);
     const result = await client.request({
       plugin: '@neo-one/server-plugin-project',
       options: { type: 'sourceMaps', projectID },
