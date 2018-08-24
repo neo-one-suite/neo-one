@@ -412,7 +412,7 @@ export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; rea
       });
 
       try {
-        await node.relayTransaction(transaction, true);
+        await node.relayTransaction(transaction, { throwVerifyError: true, forceAdd: true });
 
         return true;
       } catch {
@@ -453,7 +453,7 @@ export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; rea
       try {
         const [transactionJSON] = await Promise.all<TransactionJSON, void>([
           transaction.serializeJSON(blockchain.serializeJSONContext),
-          node.relayTransaction(transaction, true),
+          node.relayTransaction(transaction, { throwVerifyError: true, forceAdd: true }),
         ]);
 
         return transactionJSON;

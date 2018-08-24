@@ -105,13 +105,14 @@ const createScalingBloomFilter = () =>
     scaling: 4,
   });
 
-const MEM_POOL_SIZE = 30000;
+const MEM_POOL_SIZE = 5000;
 const GET_ADDR_PEER_COUNT = 200;
 const GET_BLOCKS_COUNT = 500;
 // Assume that we get 500 back, but if not, at least request every 10 seconds
 const GET_BLOCKS_BUFFER = GET_BLOCKS_COUNT / 3;
 const GET_BLOCKS_TIME_MS = 10000;
 const GET_BLOCKS_THROTTLE_MS = 1000;
+const TRIM_MEMPOOL_THROTTLE = 5000;
 const GET_BLOCKS_CLOSE_COUNT = 2;
 const UNHEALTHY_PEER_SECONDS = 300;
 const LOCAL_HOST_ADDRESSES = new Set(['', '0.0.0.0', 'localhost', '127.0.0.1', '::', '::1']);
@@ -123,6 +124,17 @@ interface PeerHealth {
 }
 
 export class Node implements INode {
+  public get consensus(): Consensus | undefined {
+    return this.mutableConsensus;
+  }
+
+  public get connectedPeers(): ReadonlyArray<Endpoint> {
+    return this.network.connectedPeers.map((peer) => peer.endpoint);
+  }
+
+  public get memPool(): { readonly [hash: string]: Transaction } {
+    return this.mutableMemPool;
+  }
   public readonly blockchain: Blockchain;
   // tslint:disable-next-line readonly-keyword
   private readonly mutableMemPool: { [hash: string]: Transaction };
@@ -184,6 +196,46 @@ export class Node implements INode {
     this.fetchEndpointsFromRPC();
   }, 5000);
 
+  // tslint:disable-next-line no-unnecessary-type-annotation
+  private readonly trimMemPool = _.throttle(async (monitor: Monitor): Promise<void> => {
+    const memPool = Object.values(this.mutableMemPool);
+    if (memPool.length > MEM_POOL_SIZE) {
+      await monitor.captureSpan(
+        async () => {
+          const transactionAndFee = await Promise.all(
+            memPool.map<Promise<[Transaction, BN]>>(async (transaction) => {
+              const networkFee = await transaction.getNetworkFee({
+                getOutput: this.blockchain.output.get,
+                governingToken: this.blockchain.settings.governingToken,
+                utilityToken: this.blockchain.settings.utilityToken,
+                fees: this.blockchain.settings.fees,
+                registerValidatorFee: this.blockchain.settings.registerValidatorFee,
+              });
+
+              return [transaction, networkFee];
+            }),
+          );
+
+          const hashesToRemove = _.take<[Transaction, BN]>(
+            _.sortBy(transactionAndFee, [
+              ([transaction, networkFee]: [Transaction, BN]) => networkFee.divn(transaction.size).toNumber(),
+              ([transaction]: [Transaction]) => transaction.hashHex,
+            ]) as ReadonlyArray<[Transaction, BN]>,
+            this.blockchain.settings.memPoolSize,
+          ).map(([transaction]: [Transaction, BN]) => transaction.hashHex);
+          hashesToRemove.forEach((hash) => {
+            // tslint:disable-next-line no-dynamic-delete
+            delete this.mutableMemPool[hash];
+          });
+          NEO_PROTOCOL_MEMPOOL_SIZE.set(Object.keys(this.mutableMemPool).length);
+        },
+        {
+          name: 'neo_protocol_trim_mempool',
+        },
+      );
+    }
+  }, TRIM_MEMPOOL_THROTTLE);
+
   public constructor({
     monitor,
     blockchain,
@@ -232,18 +284,6 @@ export class Node implements INode {
     this.mutableGetBlocksRequestsCount = 1;
     this.consensusCache = LRU(10000);
     this.mutableBlockIndex = {};
-  }
-
-  public get consensus(): Consensus | undefined {
-    return this.mutableConsensus;
-  }
-
-  public get connectedPeers(): ReadonlyArray<Endpoint> {
-    return this.network.connectedPeers.map((peer) => peer.endpoint);
-  }
-
-  public get memPool(): { readonly [hash: string]: Transaction } {
-    return this.mutableMemPool;
   }
 
   // tslint:disable-next-line no-any
@@ -305,7 +345,16 @@ export class Node implements INode {
     return combineLatest(network$, consensus$, options$);
   }
 
-  public async relayTransaction(transaction: Transaction, throwVerifyError = false): Promise<void> {
+  public async relayTransaction(
+    transaction: Transaction,
+    {
+      throwVerifyError = false,
+      forceAdd = false,
+    }: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean } = {
+      throwVerifyError: false,
+      forceAdd: false,
+    },
+  ): Promise<void> {
     if (
       transaction.type === TransactionType.Miner ||
       (this.mutableMemPool[transaction.hashHex] as Transaction | undefined) !== undefined ||
@@ -318,6 +367,13 @@ export class Node implements INode {
       this.tempKnownTransactionHashes.add(transaction.hashHex);
 
       try {
+        const memPool = Object.values(this.mutableMemPool);
+        if (memPool.length > MEM_POOL_SIZE / 2 && !forceAdd) {
+          this.knownTransactionHashes.add(transaction.hash);
+
+          return;
+        }
+
         await this.monitor.withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex }).captureSpanLog(
           async (span) => {
             let foundTransaction;
@@ -1122,45 +1178,6 @@ export class Node implements INode {
         this.blockchain.header.get({ hashOrIndex: index }),
       ),
     );
-  }
-
-  private async trimMemPool(monitor: Monitor): Promise<void> {
-    const memPool = Object.values(this.mutableMemPool);
-    if (memPool.length > MEM_POOL_SIZE) {
-      await monitor.captureSpan(
-        async () => {
-          const transactionAndFee = await Promise.all(
-            memPool.map<Promise<[Transaction, BN]>>(async (transaction) => {
-              const networkFee = await transaction.getNetworkFee({
-                getOutput: this.blockchain.output.get,
-                governingToken: this.blockchain.settings.governingToken,
-                utilityToken: this.blockchain.settings.utilityToken,
-                fees: this.blockchain.settings.fees,
-                registerValidatorFee: this.blockchain.settings.registerValidatorFee,
-              });
-
-              return [transaction, networkFee];
-            }),
-          );
-
-          const hashesToRemove = _.take<[Transaction, BN]>(
-            _.sortBy(transactionAndFee, [
-              ([transaction, networkFee]: [Transaction, BN]) => networkFee.divn(transaction.size).toNumber(),
-              ([transaction]: [Transaction]) => transaction.hashHex,
-            ]) as ReadonlyArray<[Transaction, BN]>,
-            this.blockchain.settings.memPoolSize,
-          ).map(([transaction]: [Transaction, BN]) => transaction.hashHex);
-          hashesToRemove.forEach((hash) => {
-            // tslint:disable-next-line no-dynamic-delete
-            delete this.mutableMemPool[hash];
-          });
-          NEO_PROTOCOL_MEMPOOL_SIZE.set(Object.keys(this.mutableMemPool).length);
-        },
-        {
-          name: 'neo_protocol_trim_mempool',
-        },
-      );
-    }
   }
 
   private testFilter(bloomFilterIn: BloomFilter | undefined, transaction: Transaction): boolean {
