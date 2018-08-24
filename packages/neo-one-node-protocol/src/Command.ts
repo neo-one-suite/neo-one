@@ -27,7 +27,7 @@ export enum Command {
 
 export const InvalidCommandError = makeErrorWithCode(
   'INVALID_COMMAND',
-  (command: string) => `Expected command, found: ${command}`,
+  (command: string) => `Invalid Command. Found: ${command}`,
 );
 
 const isCommand = (command: string): command is Command =>

@@ -151,7 +151,7 @@ export abstract class BlockBase implements Equatable {
 
   public get script(): Witness {
     if (this.scriptInternal === undefined) {
-      throw new UnsignedBlockError();
+      throw new UnsignedBlockError(common.uInt256ToString(this.hash));
     }
 
     return this.scriptInternal;

@@ -8,7 +8,7 @@ import { utils } from './utils';
 export const UnknownOpError = makeErrorWithCode('UNKNOWN_OP', (byteCode: string) => `Unknown op: ${byteCode}`);
 export const InvalidParamError = makeErrorWithCode(
   'INVALID_PARAM',
-  (paramType?: string) => `Invalid Param${paramType === undefined ? '' : `: ${paramType}`}`,
+  (paramType?: string) => `Invalid Param${paramType === undefined ? '.' : `: ${paramType}`}`,
 );
 
 export interface ParamArray extends Array<Param | undefined> {}

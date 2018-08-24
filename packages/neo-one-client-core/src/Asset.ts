@@ -270,16 +270,16 @@ export const verifyAsset = ({
   readonly precision: AssetAdd['precision'];
 }) => {
   if (type === AssetType.CreditFlag || type === AssetType.DutyFlag) {
-    throw new InvalidAssetError('Asset type cannot be CREDIT_FLAG or DUTY_FLAG');
+    throw new InvalidAssetError(`Asset type cannot be CREDIT_FLAG or DUTY_FLAG, received: ${type}`);
   }
 
   const nameBuffer = Buffer.from(name, 'utf8');
   if (nameBuffer.length > NAME_MAX_LENGTH) {
-    throw new InvalidAssetError('Name too long');
+    throw new InvalidAssetError(`Name too long. Max: ${NAME_MAX_LENGTH}, Received: ${nameBuffer.length}`);
   }
 
   if (amount.lte(utils.ZERO) && !amount.eq(common.NEGATIVE_SATOSHI_FIXED8)) {
-    throw new InvalidAssetError('Amount must be greater than 0');
+    throw new InvalidAssetError(`Amount must be greater than 0. (received ${amount})`);
   }
 
   if (type === AssetType.Invoice && !amount.eq(common.NEGATIVE_SATOSHI_FIXED8)) {
@@ -287,7 +287,7 @@ export const verifyAsset = ({
   }
 
   if (precision > PRECISION_MAX) {
-    throw new InvalidAssetError('Max precision is 8.');
+    throw new InvalidAssetError(`Max precision is 8. Received: ${precision}`);
   }
 
   if (!amount.eq(utils.NEGATIVE_SATOSHI) && !amount.mod(utils.TEN.pow(utils.EIGHT.subn(precision))).eq(utils.ZERO)) {

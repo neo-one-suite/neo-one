@@ -12,7 +12,7 @@ export enum StackItemType {
 
 export const InvalidStackItemTypeError = makeErrorWithCode(
   'INVALID_STACK_ITEM_TYPE',
-  (stackItemType: number) => `Expected stack item type, found: ${stackItemType.toString(16)}`,
+  (stackItemType: number) => `Expected StackItemType, found: ${stackItemType.toString(16)}`,
 );
 
 const isStackItemType = (value: number): value is StackItemType =>

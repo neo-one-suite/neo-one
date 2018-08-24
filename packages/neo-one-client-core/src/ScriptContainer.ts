@@ -25,7 +25,7 @@ export type ScriptContainer =
 
 export const InvalidScriptContainerTypeError = makeErrorWithCode(
   'INVALID_SCRIPT_CONTAINER_TYPE',
-  (value: number) => `Expected script container type, found: ${value.toString(16)}`,
+  (value: number) => `Expected ScriptContainerType, found: ${value.toString(16)}`,
 );
 
 const isScriptContainerType = (value: number): value is ScriptContainerType =>

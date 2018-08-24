@@ -319,7 +319,7 @@ export class Message implements SerializableWire<Message> {
 
 export const InvalidMessageTransformEncodingError = makeErrorWithCode(
   'INVALID_MESSAGE_TRANSFORM_ENCODING',
-  () => 'Invalid Message Transform Encoding.',
+  (message: string) => message,
 );
 
 const SIZE_OF_MESSAGE_HEADER =
@@ -343,8 +343,15 @@ export class MessageTransform extends Transform {
     encoding: string,
     callback: (error: Error | undefined, data?: Buffer | string) => void,
   ): void {
-    if (typeof chunk === 'string' || encoding !== 'buffer') {
-      throw new InvalidMessageTransformEncodingError();
+    if (typeof chunk === 'string') {
+      throw new InvalidMessageTransformEncodingError(
+        `Invalid Message Transform Chunk Type. Expected chunk type to be 'string', found: ${typeof chunk}`,
+      );
+    }
+    if (encoding !== 'buffer') {
+      throw new InvalidMessageTransformEncodingError(
+        `Invalid Message Transform Encoding. Expected: 'buffer', found: ${encoding}`,
+      );
     }
 
     this.mutableBuffer = Buffer.concat([this.mutableBuffer, chunk]);

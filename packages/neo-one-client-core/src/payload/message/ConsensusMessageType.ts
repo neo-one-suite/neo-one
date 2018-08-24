@@ -9,8 +9,8 @@ export enum ConsensusMessageType {
 // PrepareResponse
 
 export const InvalidConsensusMessageTypeError = makeErrorWithCode(
-  'INVALID_ACTION_TYPE',
-  (type: number) => `Expected action type, found: ${type}`,
+  'INVALID_CONSENSUS_MESSAGE_TYPE',
+  (value: number) => `Expected ConsensusMessageType, found: ${value.toString(16)}`,
 );
 
 const isConsensusMessageType = (value: number): value is ConsensusMessageType =>

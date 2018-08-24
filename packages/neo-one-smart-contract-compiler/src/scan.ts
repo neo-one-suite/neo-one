@@ -130,7 +130,7 @@ const topographicalSort = (contracts: Contracts): Contracts => {
   }
 
   if (mutableOut.length !== contracts.length) {
-    throw new CircularLinkedDependencyError();
+    throw new CircularLinkedDependencyError(contracts.map((contract) => contract.name));
   }
 
   return mutableOut;

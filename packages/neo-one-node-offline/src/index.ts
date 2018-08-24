@@ -9,7 +9,7 @@ import * as zlib from 'zlib';
 
 export const InvalidBlockTransformEncodingError = makeErrorWithCode(
   'INVALID_BLOCK_TRANSFORM_ENCODING',
-  () => 'Invalid Block Transform Encoding.',
+  (message: string) => message,
 );
 
 const SIZE_OF_INT32 = 4;
@@ -29,8 +29,15 @@ class BlockTransform extends Transform {
     encoding: string,
     callback: ((error: Error | undefined, data?: Buffer | string) => void),
   ): void {
-    if (typeof chunk === 'string' || encoding !== 'buffer') {
-      throw new InvalidBlockTransformEncodingError();
+    if (typeof chunk === 'string') {
+      throw new InvalidBlockTransformEncodingError(
+        `Invalid Block Transform Chunk Type. Expected chunk type to be 'string', found: ${typeof chunk}`,
+      );
+    }
+    if (encoding !== 'buffer') {
+      throw new InvalidBlockTransformEncodingError(
+        `Invalid Block Transform Encoding. Expected: 'buffer', found: ${encoding}`,
+      );
     }
 
     this.mutableBuffer = Buffer.concat([this.mutableBuffer, chunk]);

@@ -3,7 +3,10 @@ import { makeErrorWithCode } from '@neo-one/utils';
 import { common, UInt256 } from '../common';
 import { crypto } from './crypto';
 
-export const InvalidMerkleTreeException = makeErrorWithCode('INVALID_MERKLE_TREE', () => 'Invalid Merkle tree.');
+export const InvalidMerkleTreeException = makeErrorWithCode(
+  'INVALID_MERKLE_TREE',
+  () => 'Invalid Merkle tree. (no nodes found)',
+);
 
 class MerkleTreeNode {
   public readonly hash: UInt256;

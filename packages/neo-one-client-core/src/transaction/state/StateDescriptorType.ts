@@ -7,7 +7,7 @@ export enum StateDescriptorType {
 
 export const InvalidStateDescriptorTypeError = makeErrorWithCode(
   'INVALID_STATE_DESCRIPTOR_TYPE',
-  (stateDescriptorType: number) => `Expected state descriptor type, found: ${stateDescriptorType.toString(16)}`,
+  (stateDescriptorType: number) => `Expected StateDescriptorType, found: ${stateDescriptorType.toString(16)}`,
 );
 
 const isStateDescriptorType = (value: number): value is StateDescriptorType =>

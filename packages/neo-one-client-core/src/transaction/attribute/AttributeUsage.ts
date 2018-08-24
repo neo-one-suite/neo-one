@@ -44,7 +44,7 @@ export enum AttributeUsage {
 export const InvalidAttributeUsageError = makeErrorWithCode(
   'INVALID_ATTRIBUTE_USAGE',
   (transactionAttributeUsage: number) =>
-    `Expected transaction attribute usage, ` + `found: ${transactionAttributeUsage.toString(16)}`,
+    `Expected transaction attribute usage, found: ${transactionAttributeUsage.toString(16)}`,
 );
 
 const isAttributeUsage = (value: number): value is AttributeUsage =>
@@ -61,8 +61,7 @@ export const assertAttributeUsage = (value: number): AttributeUsage => {
 
 export const InvalidAttributeUsageJSONError = makeErrorWithCode(
   'INVALID_ATTRIBUTE_USAGE_JSON',
-  (transactionAttributeUsage: string) =>
-    `Expected transaction attribute usage, ` + `found: ${transactionAttributeUsage}`,
+  (transactionAttributeUsage: string) => `Expected transaction attribute usage, found: ${transactionAttributeUsage}`,
 );
 
 export type AttributeUsageJSON = keyof typeof AttributeUsage;

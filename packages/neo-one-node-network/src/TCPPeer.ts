@@ -45,7 +45,7 @@ export class TCPPeer<Message> extends Peer<Message> {
         if (!handled) {
           handled = true;
           this.socket.setTimeout(this.timeoutMS, () => {
-            this.onError(new SocketTimeoutError());
+            this.onError(new SocketTimeoutError(this.socket.localAddress, this.socket.localPort));
           });
           resolve();
         }

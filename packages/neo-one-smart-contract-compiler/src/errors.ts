@@ -8,5 +8,5 @@ export const MultipleContractsInFileError = makeErrorWithCode(
 
 export const CircularLinkedDependencyError = makeErrorWithCode(
   'CIRCULAR_LINKED_DEPENDENCY',
-  () => 'Linked smart contracts have a circular dependency.',
+  (contracts: ReadonlyArray<string>) => `Circular Dependency found in linked-contracts: ${contracts.join(`\n`)}`,
 );

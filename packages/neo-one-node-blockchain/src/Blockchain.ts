@@ -546,20 +546,27 @@ export class Blockchain {
       async () => {
         const spentCoins = await Promise.all(claims.map(async (claim) => this.tryGetSpentCoin(claim)));
 
-        const filteredSpentCoins = spentCoins.filter(commonUtils.notNull);
-        if (spentCoins.length !== filteredSpentCoins.length) {
-          throw new CoinUnspentError();
+        const filteredSpentCoinsIn = spentCoins.filter(commonUtils.notNull);
+        if (spentCoins.length !== filteredSpentCoinsIn.length) {
+          throw new CoinUnspentError(spentCoins.length - filteredSpentCoinsIn.length);
         }
 
-        if (filteredSpentCoins.some((coin) => coin.claimed)) {
-          throw new CoinClaimedError();
-        }
+        const filteredSpentCoins = filteredSpentCoinsIn.filter((spentCoin) => {
+          if (spentCoin.claimed) {
+            throw new CoinClaimedError(
+              common.uInt256ToString(spentCoin.output.asset),
+              spentCoin.output.value.toString(10),
+            );
+          }
+          if (!common.uInt256Equal(spentCoin.output.asset, this.settings.governingToken.hash)) {
+            throw new InvalidClaimError(
+              common.uInt256ToString(spentCoin.output.asset),
+              common.uInt256ToString(this.settings.governingToken.hash),
+            );
+          }
 
-        if (
-          filteredSpentCoins.some((coin) => !common.uInt256Equal(coin.output.asset, this.settings.governingToken.hash))
-        ) {
-          throw new InvalidClaimError();
-        }
+          return true;
+        });
 
         return utils.calculateClaimAmount({
           coins: filteredSpentCoins.map((coin) => ({

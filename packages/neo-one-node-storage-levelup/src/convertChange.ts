@@ -195,7 +195,7 @@ const convertAddChange = (changeIn: AddChange): ReadonlyArray<AbstractBatch> => 
 
     default:
       utils.assertNever(change);
-      throw new UnknownTypeError();
+      throw new UnknownTypeError(changeIn.type);
   }
 };
 

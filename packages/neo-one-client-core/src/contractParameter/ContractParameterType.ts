@@ -21,8 +21,7 @@ export const InvalidContractParameterTypeJSONError = makeErrorWithCode(
 
 export const InvalidContractParameterTypeError = makeErrorWithCode(
   'INVALID_CONTRACT_PARAMETER_TYPE',
-  (contractParameterType: number) =>
-    `Expected contract parameter type, ` + `found: ${contractParameterType.toString(16)}`,
+  (contractParameterType: number) => `Expected contract parameter type, found: ${contractParameterType.toString(16)}`,
 );
 
 const isContractParameterType = (value: number): value is ContractParameterType =>

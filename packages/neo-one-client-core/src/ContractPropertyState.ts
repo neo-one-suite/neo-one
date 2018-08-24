@@ -36,9 +36,8 @@ export const HasPayable = new Set([
 ]);
 
 export const InvalidContractPropertyStateError = makeErrorWithCode(
-  'INVALID_ContractPropertyState',
-  (contractParameterType: number) =>
-    `Expected contract parameter type, ` + `found: ${contractParameterType.toString(16)}`,
+  'INVALID_CONTRACT_PROPERTY_STATE',
+  (contractParameterType: number) => `Expected contract parameter type, found: ${contractParameterType.toString(16)}`,
 );
 
 const isContractPropertyState = (value: number): value is ContractPropertyState =>
