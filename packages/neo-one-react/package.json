@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/react",
-  "version": "1.0.0-alpha.8",
+  "version": "1.0.0-alpha.9",
   "description": "NEO•ONE React utilities.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.94",
-    "@neo-one/server-http-client": "^1.0.0-alpha.72",
+    "@neo-one/client": "^1.0.0-alpha.95",
+    "@neo-one/server-http-client": "^1.0.0-alpha.73",
     "@neo-one/types": "^1.0.0-alpha.43",
-    "@neo-one/utils": "^1.0.0-alpha.62",
+    "@neo-one/utils": "^1.0.0-alpha.63",
     "@types/lodash": "^4.14.116",
     "@types/react": "^16.4.11",
     "@types/react-select": "^2.0.2",
