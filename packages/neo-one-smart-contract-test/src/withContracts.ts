@@ -88,7 +88,15 @@ export const withContracts = async <T>(
     });
 
     await test(contractOptions);
-  } finally {
     await node.stop();
+  } catch (error) {
+    // Give a chance for in-flight operations to complete before attempting to stop the node
+    await new Promise<void>((resolve) =>
+      setTimeout(async () => {
+        await node.stop();
+        resolve();
+      }, 500),
+    );
+    throw error;
   }
 };

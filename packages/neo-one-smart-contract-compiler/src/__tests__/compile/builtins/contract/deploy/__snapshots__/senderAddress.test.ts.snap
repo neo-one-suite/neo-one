@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Deploy.senderAddress cannot be referenced 1`] = `
+"snippetCode.ts (4,17): Deploy.senderAddress may only be used as the default value for a constructor parameter.
+
+      2 |       import { Deploy } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const x = Deploy.senderAddress;
+        |                 ^
+      5 |     
+"
+`;
+
+exports[`Deploy.senderAddress cannot be used in a function 1`] = `
+"snippetCode.ts (4,36): Deploy.senderAddress may only be used as the default value for a constructor parameter.
+
+      2 |       import { Deploy } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       function foo(value: number = Deploy.senderAddress) {
+        |                                    ^
+      5 |         return value;
+      6 |       }
+      7 |     
+"
+`;

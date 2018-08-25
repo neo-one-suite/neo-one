@@ -1,10 +1,18 @@
 // tslint:disable ban-types
-import { ABIEvent, ABIFunction, ABIParameter, ABIReturn, ContractParameterType } from '@neo-one/client';
+import {
+  ABIEvent,
+  ABIFunction,
+  ABIParameter,
+  ABIReturn,
+  ContractParameterType,
+  SenderAddressABIDefault,
+} from '@neo-one/client';
 import { ClassInstanceMemberType, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
+import { DEPLOY_METHOD } from '../../constants';
 import { Context } from '../../Context';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
@@ -407,7 +415,9 @@ export class NEOTranspiler implements Transpiler {
     if (ctor !== undefined) {
       const ctorType = this.context.getTypeOfSymbol(this.context.getSymbol(ctor.parent), ctor.parent);
       if (ctorType !== undefined) {
-        methods = methods.concat(this.processMethodProperty('deploy', ctor, ctorType.getConstructSignatures(), false));
+        methods = methods.concat(
+          this.processMethodProperty(DEPLOY_METHOD, ctor, ctorType.getConstructSignatures(), false),
+        );
       }
     }
 
@@ -468,7 +478,7 @@ export class NEOTranspiler implements Transpiler {
     const mutableFunctions: ABIFunction[] = [];
     methods.forEach(([method, func]) => {
       const name = ts.isConstructorDeclaration(method)
-        ? 'deploy'
+        ? DEPLOY_METHOD
         : tsUtils.guards.isParameterDeclaration(method)
           ? tsUtils.node.getNameOrThrow(method)
           : tsUtils.node.getName(method);
@@ -930,12 +940,34 @@ export class NEOTranspiler implements Transpiler {
     const decls = tsUtils.symbol.getDeclarations(param);
     const decl = utils.nullthrows(decls[0]);
 
-    return this.toABIParameter(
+    const initializer = tsUtils.initializer.getInitializer(decl);
+    const parameter = this.toABIParameter(
       tsUtils.symbol.getName(param),
       decl,
       this.context.getTypeOfSymbol(param, decl),
-      tsUtils.initializer.getInitializer(decl) !== undefined,
+      initializer !== undefined,
     );
+
+    if (
+      parameter === undefined ||
+      initializer === undefined ||
+      (!ts.isPropertyAccessExpression(initializer) && !ts.isCallExpression(initializer))
+    ) {
+      return parameter;
+    }
+
+    if (ts.isPropertyAccessExpression(initializer)) {
+      const symbol = this.context.getSymbol(initializer, { error: true });
+      const senderAddress = this.context.builtins.getOnlyMemberSymbol('DeployConstructor', 'senderAddress');
+
+      if (symbol === senderAddress) {
+        const sender: SenderAddressABIDefault = { type: 'sender' };
+
+        return { ...parameter, default: sender };
+      }
+    }
+
+    return parameter;
   }
 
   private toABIParameter(

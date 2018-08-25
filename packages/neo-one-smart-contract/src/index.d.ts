@@ -819,6 +819,24 @@ export interface BlockchainConstructor {
  */
 export const Blockchain: BlockchainConstructor;
 
+export interface DeployConstructor {
+  /**
+   * Use the sender `Address` for the constructor parameter.
+   *
+   * @example
+   * import { Address, Deploy, SmartContract } from '@neo-one/smart-contract';
+   *
+   * class Token implements SmartContract {
+   *  public constructor(public readonly owner: Address = Deploy.senderAddress) {}
+   * }
+   */
+  readonly senderAddress: Address;
+}
+/**
+ * Injects values at deployment time. Can only be used for default constructor parameters.
+ */
+export const Deploy: DeployConstructor;
+
 export interface SmartContractValueArray extends Array<SmartContractValue> {}
 type SmartContractValue =
   | void

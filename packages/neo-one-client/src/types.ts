@@ -1,6 +1,8 @@
 // tslint:disable deprecation
 import {
   ABI,
+  ABIDefault,
+  ABIDefaultType,
   ABIEvent,
   ABIFunction,
   ABIParameter,
@@ -52,6 +54,7 @@ import {
   RawLog,
   RawNotification,
   ScriptBuilderParam,
+  SenderAddressABIDefault,
   SignatureABI,
   SignatureABIParameter,
   SignatureABIReturn,
@@ -75,6 +78,8 @@ export interface Peer {
 
 export {
   ABI,
+  ABIDefault,
+  ABIDefaultType,
   ABIEvent,
   ABIFunction,
   ABIParameter,
@@ -125,6 +130,7 @@ export {
   RawInvocationResultError,
   RawInvocationResultSuccess,
   RawInvokeReceipt,
+  SenderAddressABIDefault,
   SignatureABI,
   SignatureABIParameter,
   SignatureABIReturn,

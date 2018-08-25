@@ -24,8 +24,10 @@ export class TestToken extends Token<4> {
 
   public constructor(owner: Address) {
     super();
+    if (!Address.verifySender(owner)) {
+      throw new Error('Sender was not the owner.');
+    }
     this.owner = owner;
-    Address.verifySender(owner);
     this.issue(owner, 100_0000);
   }
 

@@ -1,4 +1,4 @@
-import { Address, Fixed } from '@neo-one/smart-contract';
+import { Address, Deploy, Fixed } from '@neo-one/smart-contract';
 import { SimpleToken } from './SimpleToken';
 
 export class RedToken extends SimpleToken {
@@ -12,10 +12,7 @@ export class RedToken extends SimpleToken {
     payable: false,
   };
 
-  public constructor(
-    owner: Address = Address.from('AXNajBTQLxWHwc9sKyXcc4UdbJvp3arYDG'),
-    amount: Fixed<8> = 1_000_000_00000000,
-  ) {
+  public constructor(owner: Address = Deploy.senderAddress, amount: Fixed<8> = 1_000_000_00000000) {
     super(owner, amount);
   }
 }

@@ -27,7 +27,6 @@ describe('NEOTranspiler', () => {
       applicationSwitch,
       verifyWitness,
       getConstructorValueResult,
-      getConstructorValue,
     } = await SourceMapConsumer.with(sourceMap, undefined, async (consumer) => ({
       deployMethod: consumer.originalPositionFor({ line: 20, column: 4 }),
       ctorStatement: consumer.originalPositionFor({ line: 22, column: 8 }),
@@ -38,28 +37,25 @@ describe('NEOTranspiler', () => {
       applicationSwitch: consumer.originalPositionFor({ line: 28, column: 4 }),
       verifyWitness: consumer.originalPositionFor({ line: 41, column: 14 }),
       getConstructorValueResult: consumer.originalPositionFor({ line: 31, column: 14 }),
-      getConstructorValue: consumer.originalPositionFor({ line: 32, column: 8 }),
     }));
 
-    expect(deployMethod.line).toEqual(14);
+    expect(deployMethod.line).toEqual(21);
     expect(deployMethod.column).toEqual(2);
-    expect(ctorStatement.line).toEqual(16);
-    expect(ctorStatement.column).toEqual(4);
+    expect(ctorStatement.line).toEqual(14);
+    expect(ctorStatement.column).toEqual(2);
     expect(get.line).toEqual(4);
     expect(get.column).toEqual(2);
     expect(set.line).toEqual(4);
     expect(set.column).toEqual(2);
-    expect(newResult.line).toEqual(3);
-    expect(newResult.column).toEqual(0);
-    expect(method.line).toEqual(3);
-    expect(method.column).toEqual(0);
+    expect(newResult.line).toEqual(22);
+    expect(newResult.column).toEqual(1);
+    expect(method.line).toEqual(22);
+    expect(method.column).toEqual(1);
     expect(applicationSwitch.line).toEqual(3);
     expect(applicationSwitch.column).toEqual(0);
-    expect(verifyWitness.line).toEqual(5);
-    expect(verifyWitness.column).toEqual(2);
-    expect(getConstructorValueResult.line).toEqual(19);
+    expect(verifyWitness.line).toEqual(3);
+    expect(verifyWitness.column).toEqual(0);
+    expect(getConstructorValueResult.line).toEqual(4);
     expect(getConstructorValueResult.column).toEqual(2);
-    expect(getConstructorValue.line).toEqual(19);
-    expect(getConstructorValue.column).toEqual(2);
   });
 });

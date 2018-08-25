@@ -1,6 +1,6 @@
 import { data, factory, keys } from '../../__data__';
 import * as common from '../../sc/common';
-import { ABIParameter, ContractParameter } from '../../types';
+import { ABIParameter, ContractParameter, SenderAddressABIDefault } from '../../types';
 
 describe('common', () => {
   const name = 'firstArg';
@@ -201,6 +201,23 @@ describe('common', () => {
     expect(zipped).toHaveLength(2);
     expect(zipped[0]).toEqual([parameter.name, param.value]);
     expect(zipped[1]).toEqual([optionalParam.name, undefined]);
+  });
+
+  test('convertParams - default sender', () => {
+    const sender: SenderAddressABIDefault = { type: 'sender' };
+    const optionalParam = factory.createStringABIParameter({ optional: true, default: sender });
+    const { converted, zipped } = common.convertParams({
+      parameters: [parameter, optionalParam],
+      params: [param.value],
+      senderAddress: keys[0].address,
+    });
+
+    expect(converted).toHaveLength(2);
+    expect(converted[0]).toEqual(param.value);
+    expect(converted[1]).toEqual(keys[0].address);
+    expect(zipped).toHaveLength(2);
+    expect(zipped[0]).toEqual([parameter.name, param.value]);
+    expect(zipped[1]).toEqual([optionalParam.name, keys[0].address]);
   });
 
   test('convertParams - missing param', () => {

@@ -35,7 +35,7 @@ export const createClient = <
 ): Client<TUserAccountProviders> => {
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [];
   if (process.env.NODE_ENV !== 'production') {
-    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 23864 }));
+    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 10110 }));
   }
   const provider = new NEOONEProvider(providers);
 
@@ -115,9 +115,9 @@ export const createClient = <
 };
 
 export const createDeveloperClients = (): { [network: string]: DeveloperClient } => ({
-  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 23864 })),
+  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 10110 })),
 });
 
 export const createOneClients = (): { [network: string]: OneClient } => ({
-  local: new OneClient(23864),
+  local: new OneClient(10110),
 });

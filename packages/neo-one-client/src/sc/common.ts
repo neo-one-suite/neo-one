@@ -1,12 +1,14 @@
 import { contractParameters, converters, ScriptBuilderParam } from '@neo-one/client-core';
 import { processActionsAndMessage, processConsoleLogMessages } from '@neo-one/client-switch';
+import { utils } from '@neo-one/utils';
 import _ from 'lodash';
-import { InvalidContractArgumentCountError, InvalidEventError, InvocationCallError } from '../errors';
+import { InvalidContractArgumentCountError, InvalidEventError, InvocationCallError, NoAccountError } from '../errors';
 import {
   ABIEvent,
   ABIParameter,
   ABIReturn,
   Action,
+  AddressString,
   ContractParameter,
   EventParameters,
   InvocationResult,
@@ -148,12 +150,38 @@ export const convertCallResult = async ({
   return result.value;
 };
 
+const getDefault = ({
+  parameter,
+  senderAddress,
+}: {
+  readonly parameter: ABIParameter;
+  readonly senderAddress?: AddressString;
+}): Param => {
+  if (parameter.default === undefined) {
+    return undefined;
+  }
+
+  switch (parameter.default.type) {
+    case 'sender':
+      if (senderAddress === undefined) {
+        throw new NoAccountError();
+      }
+
+      return senderAddress;
+    default:
+      utils.assertNever(parameter.default.type);
+      throw new Error('Unknown default type');
+  }
+};
+
 export const convertParams = ({
   parameters,
   params,
+  senderAddress,
 }: {
   readonly parameters: ReadonlyArray<ABIParameter>;
   readonly params: ReadonlyArray<Param | undefined>;
+  readonly senderAddress?: AddressString;
 }): {
   readonly converted: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly zipped: ReadonlyArray<[string, Param | undefined]>;
@@ -165,9 +193,14 @@ export const convertParams = ({
 
   const additionalParams = parameters.length - params.length;
 
-  const zip = _.zip(parameters, params.concat(_.range(0, additionalParams).map(() => undefined))) as Array<
-    [ABIParameter, Param]
-  >;
+  const zip = _.zip(
+    parameters,
+    params.concat(
+      _.range(0, additionalParams).map((idx) =>
+        getDefault({ parameter: parameters[params.length + idx], senderAddress }),
+      ),
+    ),
+  ) as Array<[ABIParameter, Param]>;
   const converted = zip.map(([parameter, param]) =>
     // tslint:disable-next-line no-any
     (paramCheckers[parameter.type] as any)(parameter.name, param, parameter),

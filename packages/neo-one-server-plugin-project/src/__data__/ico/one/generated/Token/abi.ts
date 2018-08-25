@@ -145,6 +145,9 @@ export const tokenABI: ABI = {
       name: 'deploy',
       parameters: [
         {
+          default: {
+            type: 'sender',
+          },
           name: 'owner',
           optional: true,
           type: 'Address',

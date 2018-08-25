@@ -70,7 +70,11 @@ const getParamsAndOptions = ({
     throw new NoContractDeployedError(network);
   }
 
-  const { converted, zipped } = common.convertParams({ params, parameters });
+  const { converted, zipped } = common.convertParams({
+    params,
+    parameters,
+    senderAddress: currentAccount === undefined ? undefined : currentAccount.id.address,
+  });
 
   return {
     params: converted,

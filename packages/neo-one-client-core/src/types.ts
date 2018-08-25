@@ -397,6 +397,16 @@ export interface ArrayABIReturn extends ABIReturnBase {
 }
 
 /**
+ * Default value is the `Transaction` sender `Address`
+ */
+export interface SenderAddressABIDefault {
+  readonly type: 'sender';
+}
+
+export type ABIDefault = SenderAddressABIDefault;
+export type ABIDefaultType = ABIDefault['type'];
+
+/**
  * `ABIParameter`s are the same as `ABIReturn`s with an additional `name` property for the parameter name.
  */
 export interface ABIParameterBase {
@@ -404,6 +414,10 @@ export interface ABIParameterBase {
    * Name of the parameter.
    */
   readonly name: string;
+  /**
+   * Runtime default value.
+   */
+  readonly default?: ABIDefault;
 }
 
 /**

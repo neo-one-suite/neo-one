@@ -7,6 +7,8 @@ import { InvalidArgumentError } from './errors';
 import { addressToScriptHash, privateKeyToPublicKey, scriptHashToAddress, wifToPrivateKey } from './helpers';
 import {
   ABI,
+  ABIDefault,
+  ABIDefaultType,
   ABIEvent,
   ABIFunction,
   ABIParameter,
@@ -449,6 +451,34 @@ const assertABIReturn = (name: string, value?: unknown): ABIReturn => {
   }
 };
 
+const assertABIDefaultType = (name: string, valueIn?: unknown): ABIDefaultType => {
+  const value = assertString(name, valueIn);
+  switch (value) {
+    case 'sender':
+      return 'sender';
+    default:
+      throw new InvalidArgumentError('ABIDefaultType', name, value);
+  }
+};
+
+const assertNullableABIDefault = (name: string, value?: unknown): ABIDefault | undefined => {
+  if (value == undefined) {
+    return undefined;
+  }
+
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ABIDefault', name, value);
+  }
+
+  const type = assertProperty(value, 'ABIDefault', 'type', assertABIDefaultType);
+  switch (type) {
+    case 'sender':
+      return { type: 'sender' };
+    default:
+      throw new InvalidArgumentError('ABIDefaultType', name, value);
+  }
+};
+
 const assertABIParameter = (propName: string, value?: unknown): ABIParameter => {
   if (!isObject(value)) {
     throw new InvalidArgumentError('ABIParameter', propName, value);
@@ -457,27 +487,41 @@ const assertABIParameter = (propName: string, value?: unknown): ABIParameter => 
   const type = assertProperty(value, 'ABIParameter', 'type', assertABIType);
   const name = assertProperty(value, 'ABIParameter', 'name', assertString);
   const optional = assertProperty(value, 'ABIParameter', 'optional', assertNullableBoolean);
+  const defaultValue = assertProperty(value, 'ABIParameter', 'default', assertNullableABIDefault);
+
   switch (type) {
     case 'Signature':
-      return { type, name, optional };
+      return { type, name, optional, default: defaultValue };
     case 'Boolean':
-      return { type, name, optional };
+      return { type, name, optional, default: defaultValue };
     case 'Address':
-      return { type, name, optional };
+      return { type, name, optional, default: defaultValue };
     case 'Hash256':
-      return { type, name, optional };
+      return { type, name, optional, default: defaultValue };
     case 'Buffer':
-      return { type, name, optional };
+      return { type, name, optional, default: defaultValue };
     case 'PublicKey':
-      return { type, name, optional };
+      return { type, name, optional, default: defaultValue };
     case 'String':
-      return { type, name, optional };
+      return { type, name, optional, default: defaultValue };
     case 'Array':
-      return { type, name, optional, value: assertProperty(value, 'ABIParameter', 'value', assertABIReturn) };
+      return {
+        type,
+        name,
+        optional,
+        default: defaultValue,
+        value: assertProperty(value, 'ABIParameter', 'value', assertABIReturn),
+      };
     case 'Void':
-      return { type, name, optional };
+      return { type, name, optional, default: defaultValue };
     case 'Integer':
-      return { type, name, optional, decimals: assertProperty(value, 'ABIParameter', 'decimals', assertNumber) };
+      return {
+        type,
+        name,
+        optional,
+        default: defaultValue,
+        decimals: assertProperty(value, 'ABIParameter', 'decimals', assertNumber),
+      };
     default:
       /* istanbul ignore next */
       utils.assertNever(type);

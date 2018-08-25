@@ -35,6 +35,8 @@ export * from './utils';
 export * from './vm';
 export {
   ABI,
+  ABIDefault,
+  ABIDefaultType,
   ABIEvent,
   ABIFunction,
   ABIParameter,
@@ -82,6 +84,7 @@ export {
   RawInvocationResultError,
   RawInvocationResultSuccess,
   RawInvokeReceipt,
+  SenderAddressABIDefault,
   SignatureABI,
   SignatureABIParameter,
   SignatureABIReturn,

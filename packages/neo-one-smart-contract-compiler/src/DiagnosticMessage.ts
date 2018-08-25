@@ -34,4 +34,7 @@ export enum DiagnosticMessage {
   InvalidBuiltinAssignment = 'Assignment (%s => %s) is ambiguous in relation to the provided expression.',
   InvalidLinkedSmartContractDeclaration = 'Expected a valid declaration for a linked smart contract.',
   InvalidLinkedSmartContractMissing = 'Missing linked smart contract dependency %s',
+  InvalidCurrentTimeOffsetNumericLiteral = 'Deploy.currentTime must have a numeric literal for the offset.',
+  InvalidCurrentTimeParameterUsage = 'Deploy.currentTime may only be used as the default value for a constructor parameter.',
+  InvalidSenderAddressParameterUsage = 'Deploy.senderAddress may only be used as the default value for a constructor parameter.',
 }

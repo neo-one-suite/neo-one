@@ -394,7 +394,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     return this.publishBase(
       'publish',
       contract,
-      (sb) => {
+      (sb, from) => {
         const deployFunc = abi.functions.find((func) => func.name === 'deploy');
         if (deployFunc !== undefined) {
           // []
@@ -403,8 +403,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           sb.emitAppCall(
             hash,
             'deploy',
-            ...convertParams({ parameters: deployFunc.parameters === undefined ? [] : deployFunc.parameters, params })
-              .converted,
+            ...convertParams({
+              parameters: deployFunc.parameters === undefined ? [] : deployFunc.parameters,
+              params,
+              senderAddress: from.address,
+            }).converted,
           );
           sb.emitOp('THROWIFNOT');
         }
@@ -683,7 +686,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   private async publishBase(
     method: string,
     contractIn: ContractRegister,
-    emit: (sb: ScriptBuilder) => void,
+    emit: (sb: ScriptBuilder, from: UserAccountID) => void,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
     options?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt>> {
@@ -716,7 +719,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       contract.email,
       contract.description,
     );
-    emit(sb);
+    const { from } = this.getTransactionOptions(options);
+    emit(sb, from);
 
     return this.invokeRaw({
       script: sb.build(),
