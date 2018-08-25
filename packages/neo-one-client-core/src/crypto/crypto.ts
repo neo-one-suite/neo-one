@@ -1,6 +1,6 @@
 // tslint:disable no-any no-array-mutation
 import ECKey from '@neo-one/ec-key';
-import { CustomError, utils } from '@neo-one/utils';
+import { makeErrorWithCode, utils } from '@neo-one/utils';
 import base58 from 'bs58';
 import xor from 'buffer-xor';
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
@@ -24,25 +24,15 @@ const ec = () => {
   return ecCache;
 };
 
-export class Base58CheckError extends CustomError {
-  public readonly code: string;
+export const Base58CheckError = makeErrorWithCode(
+  'BASE_58_CHECK',
+  (value: string) => `Base58 Check Decode Error on decoding: ${value}`,
+);
 
-  public constructor() {
-    super('Base58 Check Decode Error.');
-    this.code = 'BASE_58_CHECK';
-  }
-}
-
-export class InvalidAddressError extends CustomError {
-  public readonly address: string;
-  public readonly code: string;
-
-  public constructor(address: string) {
-    super(`Invalid Address: ${address}`);
-    this.address = address;
-    this.code = 'INVALID_ADDRESS';
-  }
-}
+export const InvalidAddressError = makeErrorWithCode(
+  'INVALID_ADDRESS',
+  (address: string) => `Invalid Address: ${address}`,
+);
 
 const sha1 = (value: Buffer): Buffer =>
   createHash('sha1')
@@ -69,14 +59,10 @@ const sign = ({ message, privateKey }: { readonly message: Buffer; readonly priv
   return Buffer.concat([sig.r.toArrayLike(Buffer, 'be', 32), sig.s.toArrayLike(Buffer, 'be', 32)]);
 };
 
-class InvalidSignatureError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Invalid Signature');
-    this.code = 'INVALID_SIGNATURE';
-  }
-}
+export const InvalidSignatureError = makeErrorWithCode(
+  'INVALID_SIGNATURE',
+  (length: number) => `Invalid Signature length. Found: ${length}, Max: 64`,
+);
 
 // tslint:disable readonly-array
 const rmPadding = (buf: number[]): number[] => {
@@ -121,7 +107,7 @@ const verify = ({
   readonly publicKey: ECPoint;
 }) => {
   if (signatureIn.length !== 64) {
-    throw new InvalidSignatureError();
+    throw new InvalidSignatureError(signatureIn.length);
   }
   let r = [...signatureIn.slice(0, 32)];
   let s = [...signatureIn.slice(32)];
@@ -166,14 +152,10 @@ const verify = ({
 };
 // tslint:enable readonly-array
 
-class InvalidPrivateKeyError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Invalid Private Key');
-    this.code = 'INVALID_PRIVATE_KEY';
-  }
-}
+export const InvalidPrivateKeyError = makeErrorWithCode(
+  'INVALID_PRIVATE_KEY',
+  (privateKey: PrivateKey) => `Invalid Private Key, found: ${common.privateKeyToString(privateKey)}`,
+);
 
 const toECPointFromKeyPair = (pair: KeyPair): ECPoint =>
   common.bufferToECPoint(Buffer.from(pair.getPublic(true, 'hex'), 'hex'));
@@ -190,7 +172,7 @@ const privateKeyToPublicKey = (privateKey: PrivateKey): ECPoint => {
     key.getPublic(true, 'hex');
     const { result } = key.validate();
     if (!result) {
-      throw new InvalidPrivateKeyError();
+      throw new InvalidPrivateKeyError(privateKey);
     }
 
     mutablePublicKeyCache[privateKeyHex] = publicKey = toECPointFromKeyPair(key);
@@ -235,7 +217,7 @@ const base58CheckDecode = (value: string): Buffer => {
   const checksum = buffer.slice(-4);
   const payloadChecksum = base58Checksum(payload);
   if (!checksum.equals(payloadChecksum)) {
-    throw new Base58CheckError();
+    throw new Base58CheckError(value);
   }
 
   return payload;
@@ -319,12 +301,12 @@ const sortKeys = (publicKeys: ReadonlyArray<ECPoint>): ReadonlyArray<ECPoint> =>
 
 const createMultiSignatureVerificationScript = (mIn: number, publicKeys: ReadonlyArray<ECPoint>) => {
   const m = Math.floor(mIn);
-  if (!(m >= 1 && m <= publicKeys.length && publicKeys.length <= 1024)) {
-    throw new InvalidNumberOfKeysError();
+  if (m < 1 || m > publicKeys.length) {
+    throw new InvalidNumberOfKeysError(m, publicKeys.length);
   }
 
   if (publicKeys.length > 1024) {
-    throw new TooManyPublicKeysError();
+    throw new TooManyPublicKeysError(publicKeys.length);
   }
 
   const builder = new ScriptBuilder();

@@ -131,7 +131,7 @@ export abstract class Peer<Message> {
       this.buffer.resume();
 
       if (timeoutMS !== undefined) {
-        setTimeout(() => onError(new ReceiveMessageTimeoutError()), timeoutMS);
+        setTimeout(() => onError(new ReceiveMessageTimeoutError(this.endpoint)), timeoutMS);
       }
     });
   }

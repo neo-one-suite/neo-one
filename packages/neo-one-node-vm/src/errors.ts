@@ -1,5 +1,5 @@
 import { common, disassembleByteCode, OpCode } from '@neo-one/client-core';
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { ExecutionContext } from './constants';
 
@@ -22,304 +22,159 @@ const getMessage = (context: ExecutionContext, message: string): string => {
   )}`;
 };
 
-export class VMError extends CustomError {
-  public readonly code = 'VM_ERROR';
+export const ThrowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Script execution threw an Error'),
+);
+export const UnknownOpError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, byteCode: string) =>
+  getMessage(context, `Unknown op: ${byteCode}`),
+);
+export const StackUnderflowError = makeErrorWithCode(
+  'VM_ERROR',
+  (context: ExecutionContext, op: OpCode, stackLength: number, expected: number) =>
+    getMessage(context, `Stack Underflow. Op: ${op}. Stack Length: ${stackLength}. ` + `Expected: ${expected}`),
+);
+export const NumberTooLargeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, value: BN) =>
+  getMessage(context, `Number too large to be represented in Javascript: ${value.toString(10)}`),
+);
+export const AltStackUnderflowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, `Stack Underflow.`),
+);
+export const StackOverflowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Stack Overflow'),
+);
+export const InvocationStackOverflowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Invocation Stack Overflow'),
+);
+export const ArrayOverflowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Array Overflow'),
+);
+export const ItemOverflowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Item Overflow'),
+);
+export const OutOfGASError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Out of GAS'),
+);
+export const CodeOverflowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Code Overflow'),
+);
+export const UnknownSysCallError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, sysCall: string) =>
+  getMessage(context, `Unknown SysCall: ${sysCall}`),
+);
+export const UnknownOPError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Unnown Op'),
+);
+export const UnknownError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Unknown Error'),
+);
+export const XTuckNegativeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'XTUCK Negative Index'),
+);
+export const XSwapNegativeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'XSWAP Negative Index'),
+);
+export const XDropNegativeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'XDROP Negative Index'),
+);
+export const PickNegativeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'PICK Negative Index'),
+);
+export const RollNegativeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'ROLL Negative Index'),
+);
+export const SubstrNegativeEndError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'SUBSTR Negative End'),
+);
+export const SubstrNegativeStartError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'SUBSTR Negative Start'),
+);
+export const LeftNegativeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'LEFT Negative Index'),
+);
+export const RightNegativeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'RIGHT Negative Index'),
+);
+export const RightLengthError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'RIGHT Length Less Than Index'),
+);
+export const InvalidAssetTypeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Invalid Asset Type.'),
+);
+export const InvalidCheckMultisigArgumentsError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Invalid CHECKMULTISIG Arguments'),
+);
+export const InvalidPackCountError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Invalid PACK Count'),
+);
+export const InvalidPickItemKeyError = makeErrorWithCode(
+  'VM_ERROR',
+  (context: ExecutionContext, key: string, value: string) =>
+    getMessage(context, `Invalid PICKITEM Index: ${key}. Value: ${value}`),
+);
+export const InvalidRemoveIndexError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, index: number) =>
+  getMessage(context, `Invalid REMOVE Index: ${index}`),
+);
+export const InvalidHasKeyIndexError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Invalid HASKEY Index'),
+);
+export const InvalidSetItemIndexError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Invalid SETITEM Index'),
+);
+export const InvalidCheckWitnessArgumentsError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Invalid CheckWitness Arguments'),
+);
+export const InvalidGetHeaderArgumentsError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Invalid GETHEADER Arguments'),
+);
+export const InvalidGetBlockArgumentsError = makeErrorWithCode(
+  'VM_ERROR',
+  (context: ExecutionContext, arg: Buffer | undefined) =>
+    getMessage(context, `Invalid GETBLOCK Argument: ` + `${arg === undefined ? 'null' : arg.toString('hex')}`),
+);
+export const InvalidIndexError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Invalid Index.'),
+);
+export const InvalidInvocationTransactionError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Expected InvocationTransaction.'),
+);
+export const ContractNoStorageError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: string) =>
+  getMessage(context, `Contract Does Not Have Storage: ${hash}`),
+);
+export const ContractNoDynamicInvokeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: string) =>
+  getMessage(context, `Contract Does Not Have Dynamic Invoke: ${hash}`),
+);
+export const TooManyVotesError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Too Many Votes'),
+);
+export const AccountFrozenError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Account Frozen'),
+);
+export const NotEligibleVoteError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Ineligible To Vote'),
+);
+export const BadWitnessCheckError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Bad Witness'),
+);
+export const UnexpectedScriptContainerError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Unexpected Script Container'),
+);
+export const InvalidGetStorageContextError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Invalid Get Storage Context'),
+);
+export const InvalidContractGetStorageContextError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Invalid Contract.GetStorageContext context'),
+);
+export const ReadOnlyStorageContextError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'StorageContext is read only'),
+);
+export const InsufficientReturnValueError = makeErrorWithCode(
+  'VM_ERROR',
+  (context: ExecutionContext, stackSize: number, count: number) =>
+    getMessage(context, `Insufficient return values. Found ${stackSize}, expected ${count}`),
+);
+export const InvalidTailCallReturnValueError = makeErrorWithCode(
+  'VM_ERROR',
+  (context: ExecutionContext, found: number, expected: number) =>
+    getMessage(context, `Invalid tail call return value count. Found ${found}, expected ${expected}`),
+);
 
-  public constructor(context: ExecutionContext, message: string) {
-    super(getMessage(context, message));
-  }
-}
-
-export class ThrowError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Script execution threw an Error');
-  }
-}
-
-export class UnknownOpError extends VMError {
-  public readonly byteCode: string;
-
-  public constructor(context: ExecutionContext, byteCode: string) {
-    super(context, `Unknown op: ${byteCode}`);
-    this.byteCode = byteCode;
-  }
-}
-
-export class StackUnderflowError extends VMError {
-  public constructor(context: ExecutionContext, op: OpCode, stackLength: number, expected: number) {
-    super(context, `Stack Underflow. Op: ${op}. Stack Length: ${stackLength}. ` + `Expected: ${expected}`);
-  }
-}
-
-export class NumberTooLargeError extends VMError {
-  public constructor(context: ExecutionContext, value: BN) {
-    super(context, `Number too large to be represented in Javascript: ${value.toString(10)}`);
-  }
-}
-
-export class AltStackUnderflowError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, `Stack Underflow.`);
-  }
-}
-
-export class StackOverflowError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Stack Overflow');
-  }
-}
-
-export class InvocationStackOverflowError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invocation Stack Overflow');
-  }
-}
-
-export class ArrayOverflowError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Array Overflow');
-  }
-}
-
-export class ItemOverflowError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Item Overflow');
-  }
-}
-
-export class OutOfGASError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Out of GAS');
-  }
-}
-
-export class CodeOverflowError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Code Overflow');
-  }
-}
-
-export class UnknownSysCallError extends VMError {
-  public readonly sysCall: string;
-
-  public constructor(context: ExecutionContext, sysCall: string) {
-    super(context, `Unknown SysCall: ${sysCall}`);
-    this.sysCall = sysCall;
-  }
-}
-
-export class UnknownOPError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Unnown Op');
-  }
-}
-
-export class UnknownError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Unknown Error');
-  }
-}
-
-export class XTuckNegativeError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'XTUCK Negative Index');
-  }
-}
-
-export class XSwapNegativeError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'XSWAP Negative Index');
-  }
-}
-
-export class XDropNegativeError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'XDROP Negative Index');
-  }
-}
-
-export class PickNegativeError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'PICK Negative Index');
-  }
-}
-
-export class RollNegativeError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'ROLL Negative Index');
-  }
-}
-
-export class SubstrNegativeEndError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'SUBSTR Negative End');
-  }
-}
-
-export class SubstrNegativeStartError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'SUBSTR Negative Start');
-  }
-}
-
-export class LeftNegativeError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'LEFT Negative Index');
-  }
-}
-
-export class RightNegativeError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'RIGHT Negative Index');
-  }
-}
-
-export class RightLengthError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'RIGHT Length Less Than Index');
-  }
-}
-
-export class InvalidAssetTypeError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid Asset Type.');
-  }
-}
-
-export class InvalidCheckMultisigArgumentsError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid CHECKMULTISIG Arguments');
-  }
-}
-
-export class InvalidPackCountError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid PACK Count');
-  }
-}
-
-export class InvalidPickItemKeyError extends VMError {
-  public constructor(context: ExecutionContext, key: string, value: string) {
-    super(context, `Invalid PICKITEM Index: ${key}. Value: ${value}`);
-  }
-}
-
-export class InvalidRemoveIndexError extends VMError {
-  public constructor(context: ExecutionContext, index: number) {
-    super(context, `Invalid REMOVE Index: ${index}`);
-  }
-}
-
-export class InvalidHasKeyIndexError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid HASKEY Index');
-  }
-}
-
-export class InvalidSetItemIndexError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid SETITEM Index');
-  }
-}
-
-export class InvalidCheckWitnessArgumentsError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid CheckWitness Arguments');
-  }
-}
-
-export class InvalidGetHeaderArgumentsError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid GETHEADER Arguments');
-  }
-}
-
-export class InvalidGetBlockArgumentsError extends VMError {
-  public constructor(context: ExecutionContext, arg: Buffer | undefined) {
-    super(context, `Invalid GETBLOCK Argument: ` + `${arg === undefined ? 'null' : arg.toString('hex')}`);
-  }
-}
-
-export class InvalidIndexError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid Index.');
-  }
-}
-
-export class InvalidInvocationTransactionError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Expected InvocationTransaction.');
-  }
-}
-
-export class ContractNoStorageError extends VMError {
-  public constructor(context: ExecutionContext, hash: string) {
-    super(context, `Contract Does Not Have Storage: ${hash}`);
-  }
-}
-
-export class ContractNoDynamicInvokeError extends VMError {
-  public constructor(context: ExecutionContext, hash: string) {
-    super(context, `Contract Does Not Have Dynamic Invoke: ${hash}`);
-  }
-}
-
-export class TooManyVotesError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Too Many Votes');
-  }
-}
-
-export class AccountFrozenError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Account Frozen');
-  }
-}
-
-export class NotEligibleVoteError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Ineligible To Vote');
-  }
-}
-
-export class BadWitnessCheckError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Bad Witness');
-  }
-}
-
-export class UnexpectedScriptContainerError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Unexpected Script Container');
-  }
-}
-
-export class InvalidGetStorageContextError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid Get Storage Context');
-  }
-}
-
-export class InvalidContractGetStorageContextError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'Invalid Contract.GetStorageContext context');
-  }
-}
-
-export class ReadOnlyStorageContextError extends VMError {
-  public constructor(context: ExecutionContext) {
-    super(context, 'StorageContext is read only');
-  }
-}
-
-export class InsufficientReturnValueError extends VMError {
-  public constructor(context: ExecutionContext, stackSize: number, count: number) {
-    super(context, `Insufficient return values. Found ${stackSize}, expected ${count}`);
-  }
-}
-
-export class InvalidTailCallReturnValueError extends VMError {
-  public constructor(context: ExecutionContext, found: number, expected: number) {
-    super(context, `Invalid tail call return value count. Found ${found}, expected ${expected}`);
-  }
-}
+export const TemplateVMError = makeErrorWithCode('VM_ERROR', getMessage);

@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
 export enum AssetType {
   CreditFlag = 0x40,
@@ -17,16 +17,10 @@ export const hasFlag = (
   // tslint:disable-next-line
 ): boolean => (assetType & flag) === flag;
 
-export class InvalidAssetTypeError extends CustomError {
-  public readonly assetType: number;
-  public readonly code: string;
-
-  public constructor(assetType: number) {
-    super(`Expected asset type, found: ${assetType.toString(16)}`);
-    this.assetType = assetType;
-    this.code = 'INVALID_ASSET_TYPE';
-  }
-}
+export const InvalidAssetTypeError = makeErrorWithCode(
+  'INVALID_ASSET_TYPE',
+  (assetType: number) => `Expected asset type, found: ${assetType.toString(16)}`,
+);
 
 const isAssetType = (assetType: number): assetType is AssetType =>
   // tslint:disable-next-line strict-type-predicates
@@ -44,16 +38,10 @@ export type AssetTypeJSON = keyof typeof AssetType;
 
 export const toJSONAssetType = (type: AssetType): AssetTypeJSON => assertAssetTypeJSON(AssetType[type]);
 
-export class InvalidAssetTypeJSONError extends CustomError {
-  public readonly code: string;
-  public readonly type: string;
-
-  public constructor(type: string) {
-    super(`Invalid AssetType: ${type}`);
-    this.type = type;
-    this.code = 'INVALID_ASSET_TYPE_JSON';
-  }
-}
+export const InvalidAssetTypeJSONError = makeErrorWithCode(
+  'INVALID_ASSET_TYPE_JSON',
+  (type: string) => `Invalid AssetType: ${type}`,
+);
 
 const isAssetTypeJSON = (assetType: string): assetType is AssetTypeJSON =>
   // tslint:disable-next-line strict-type-predicates no-any

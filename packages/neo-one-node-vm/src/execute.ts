@@ -28,8 +28,8 @@ import {
   OutOfGASError,
   StackOverflowError,
   StackUnderflowError,
+  TemplateVMError,
   UnknownError,
-  VMError,
 } from './errors';
 import { lookupOp } from './opcodes';
 
@@ -104,7 +104,7 @@ const executeNext = async ({
     if (error.code === 'VM_ERROR') {
       throw error;
     }
-    const newError = new VMError(context, `VM Error: ${error.message}`);
+    const newError = new TemplateVMError(context, `VM Error: ${error.message}`);
     // tslint:disable-next-line no-object-mutation
     newError.stack = error.stack;
     throw newError;

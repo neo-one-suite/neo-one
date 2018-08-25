@@ -1,29 +1,15 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { common, ECPoint, UInt160, UInt256 } from '../common';
 import { ByteBuffer, ByteCode, Op, OpCode, SysCallName } from '../vm';
 import { BinaryWriter } from './BinaryWriter';
 import { utils } from './utils';
 
-export class UnknownOpError extends CustomError {
-  public readonly byteCode: string;
-  public readonly code: string;
-
-  public constructor(byteCode: string) {
-    super(`Unknown op: ${byteCode}`);
-    this.byteCode = byteCode;
-    this.code = 'UNKNOWN_OP';
-  }
-}
-
-export class InvalidParamError extends CustomError {
-  public readonly code: string;
-
-  public constructor(paramType?: string) {
-    super(`Invalid Param${paramType === undefined ? '' : `: ${paramType}`}`);
-    this.code = 'INVALID_PARAM';
-  }
-}
+export const UnknownOpError = makeErrorWithCode('UNKNOWN_OP', (byteCode: string) => `Unknown op: ${byteCode}`);
+export const InvalidParamError = makeErrorWithCode(
+  'INVALID_PARAM',
+  (paramType?: string) => `Invalid Param${paramType === undefined ? '.' : `: ${paramType}`}`,
+);
 
 export interface ParamArray extends Array<Param | undefined> {}
 export type Param = BN | number | UInt160 | UInt256 | ECPoint | string | Buffer | boolean | ParamArray;

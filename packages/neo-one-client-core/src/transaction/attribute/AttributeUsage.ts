@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
 export enum AttributeUsage {
   ContractHash = 0x00,
@@ -41,17 +41,11 @@ export enum AttributeUsage {
   Remark15 = 0xff,
 }
 
-export class InvalidAttributeUsageError extends CustomError {
-  public readonly transactionAttributeUsage: number;
-  public readonly code: string;
-
-  public constructor(transactionAttributeUsage: number) {
-    super(`Expected transaction attribute usage, ` + `found: ${transactionAttributeUsage.toString(16)}`);
-
-    this.transactionAttributeUsage = transactionAttributeUsage;
-    this.code = 'INVALID_ATTRIBUTE_USAGE';
-  }
-}
+export const InvalidAttributeUsageError = makeErrorWithCode(
+  'INVALID_ATTRIBUTE_USAGE',
+  (transactionAttributeUsage: number) =>
+    `Expected transaction attribute usage, found: ${transactionAttributeUsage.toString(16)}`,
+);
 
 const isAttributeUsage = (value: number): value is AttributeUsage =>
   // tslint:disable-next-line strict-type-predicates
@@ -65,17 +59,10 @@ export const assertAttributeUsage = (value: number): AttributeUsage => {
   throw new InvalidAttributeUsageError(value);
 };
 
-export class InvalidAttributeUsageJSONError extends CustomError {
-  public readonly code: string;
-  public readonly transactionAttributeUsage: string;
-
-  public constructor(transactionAttributeUsage: string) {
-    super(`Expected transaction attribute usage, ` + `found: ${transactionAttributeUsage}`);
-
-    this.code = 'INVALID_ATTRIBUTE_USAGE_JSON';
-    this.transactionAttributeUsage = transactionAttributeUsage;
-  }
-}
+export const InvalidAttributeUsageJSONError = makeErrorWithCode(
+  'INVALID_ATTRIBUTE_USAGE_JSON',
+  (transactionAttributeUsage: string) => `Expected transaction attribute usage, found: ${transactionAttributeUsage}`,
+);
 
 export type AttributeUsageJSON = keyof typeof AttributeUsage;
 

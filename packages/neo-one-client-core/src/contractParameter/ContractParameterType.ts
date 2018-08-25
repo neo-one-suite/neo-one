@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
 export enum ContractParameterType {
   Signature = 0x00,
@@ -14,17 +14,15 @@ export enum ContractParameterType {
   Void = 0xff,
 }
 
-export class InvalidContractParameterTypeError extends CustomError {
-  public readonly code: string;
-  public readonly contractParameterType: number;
+export const InvalidContractParameterTypeJSONError = makeErrorWithCode(
+  'INVALID_CONTRACT_PARAMETER_TYPE_JSON',
+  (value: string) => `Invalid ContractParameterType: ${value}`,
+);
 
-  public constructor(contractParameterType: number) {
-    super(`Expected contract parameter type, ` + `found: ${contractParameterType.toString(16)}`);
-
-    this.contractParameterType = contractParameterType;
-    this.code = 'INVALID_CONTRACT_PARAMETER_TYPE';
-  }
-}
+export const InvalidContractParameterTypeError = makeErrorWithCode(
+  'INVALID_CONTRACT_PARAMETER_TYPE',
+  (contractParameterType: number) => `Expected contract parameter type, found: ${contractParameterType.toString(16)}`,
+);
 
 const isContractParameterType = (value: number): value is ContractParameterType =>
   // tslint:disable-next-line strict-type-predicates
@@ -36,17 +34,6 @@ export const assertContractParameterType = (value: number): ContractParameterTyp
   }
   throw new InvalidContractParameterTypeError(value);
 };
-
-export class InvalidContractParameterTypeJSONError extends CustomError {
-  public readonly code: string;
-  public readonly value: string;
-
-  public constructor(value: string) {
-    super(`Invalid ContractParameterType: ${value}`);
-    this.value = value;
-    this.code = 'INVALID_CONTRACT_PARAMETER_TYPE_JSON';
-  }
-}
 
 export type ContractParameterTypeJSON = keyof typeof ContractParameterType;
 

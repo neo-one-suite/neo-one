@@ -1,30 +1,15 @@
-import { Endpoint } from '@neo-one/node-core';
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 import { Message } from './Message';
 
-export class NegotiationError extends CustomError {
-  public readonly messageObj: Message;
-  public readonly code: string;
+export const NegotiationError = makeErrorWithCode(
+  'NEGOTIATION',
+  (message: Message, reason?: string) =>
+    `Negotiation failed. Unexpected message received: ${message.value.command}${
+      reason === undefined ? '' : `. ${reason}`
+    }`,
+);
 
-  public constructor(message: Message, reason?: string) {
-    super(
-      `Negotiation failed. Unexpected message received: ${message.value.command}${
-        reason === undefined ? '' : `. ${reason}`
-      }`,
-    );
-
-    this.messageObj = message;
-    this.code = 'NEGOTIATION';
-  }
-}
-
-export class AlreadyConnectedError extends CustomError {
-  public readonly code: string;
-  public readonly endpoint: Endpoint;
-
-  public constructor(endpoint: Endpoint, reason: string) {
-    super(`Negotiation failed: ${reason}`);
-    this.code = 'ALREADY_CONNECTED';
-    this.endpoint = endpoint;
-  }
-}
+export const AlreadyConnectedError = makeErrorWithCode(
+  'ALREADY_CONNECTED',
+  (reason: string) => `Negotiation failed: ${reason}`,
+);

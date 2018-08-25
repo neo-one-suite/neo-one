@@ -634,7 +634,7 @@ export class Node implements INode {
     const connectedPeer = this.network.connectedPeers.find((otherPeer) => version.nonce === otherPeer.data.nonce);
 
     if (connectedPeer !== undefined) {
-      throw new AlreadyConnectedError(connectedPeer.endpoint, 'Already connected to nonce.');
+      throw new AlreadyConnectedError('Already connected to nonce.');
     }
   }
 

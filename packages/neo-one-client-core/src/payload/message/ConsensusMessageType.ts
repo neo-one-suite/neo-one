@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
 export enum ConsensusMessageType {
   ChangeView = 0x00,
@@ -8,16 +8,10 @@ export enum ConsensusMessageType {
 
 // PrepareResponse
 
-export class InvalidConsensusMessageTypeError extends CustomError {
-  public readonly type: number;
-  public readonly code: string;
-
-  public constructor(type: number) {
-    super(`Expected action type, found: ${type}`);
-    this.type = type;
-    this.code = 'INVALID_ACTION_TYPE';
-  }
-}
+export const InvalidConsensusMessageTypeError = makeErrorWithCode(
+  'INVALID_CONSENSUS_MESSAGE_TYPE',
+  (value: number) => `Expected ConsensusMessageType, found: ${value.toString(16)}`,
+);
 
 const isConsensusMessageType = (value: number): value is ConsensusMessageType =>
   // tslint:disable-next-line strict-type-predicates

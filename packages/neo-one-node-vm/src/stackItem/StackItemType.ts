@@ -1,4 +1,4 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 
 export enum StackItemType {
   ByteArray = 0x00,
@@ -10,16 +10,10 @@ export enum StackItemType {
   Map = 0x82,
 }
 
-export class InvalidStackItemTypeError extends CustomError {
-  public readonly stackItemType: number;
-  public readonly code: string;
-
-  public constructor(stackItemType: number) {
-    super(`Expected stack item type, found: ${stackItemType.toString(16)}`);
-    this.stackItemType = stackItemType;
-    this.code = 'INVALID_STACK_ITEM_TYPE';
-  }
-}
+export const InvalidStackItemTypeError = makeErrorWithCode(
+  'INVALID_STACK_ITEM_TYPE',
+  (stackItemType: number) => `Expected StackItemType, found: ${stackItemType.toString(16)}`,
+);
 
 const isStackItemType = (value: number): value is StackItemType =>
   // tslint:disable-next-line strict-type-predicates

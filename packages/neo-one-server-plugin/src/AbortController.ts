@@ -1,14 +1,7 @@
-import { CustomError } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 import { EventEmitter } from 'events';
 
-export class AbortError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Operation aborted');
-    this.code = 'ABORT';
-  }
-}
+export const AbortError = makeErrorWithCode('ABORT', () => 'Operation Aborted.');
 
 export class AbortSignal extends EventEmitter {
   protected mutableAborted: boolean;

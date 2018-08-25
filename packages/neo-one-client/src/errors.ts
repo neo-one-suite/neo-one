@@ -1,4 +1,4 @@
-import { CustomError, makeErrorWithCode } from '@neo-one/utils';
+import { makeErrorWithCode } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { UserAccountID } from './types';
 
@@ -11,157 +11,46 @@ export const InvalidArgumentError = makeErrorWithCode(
 
 export const InvalidContractArgumentCountError = makeErrorWithCode(
   'INVALID_CONTRACT_ARGUMENT_COUNT',
-  // tslint:disable-next-line no-any
   (expectedLength: number, foundLength: number) => `Expected ${expectedLength} parameters, found ${foundLength}.`,
 );
 
-export class InvocationCallError extends CustomError {
-  public readonly code: string;
+export const InvocationCallError = makeErrorWithCode('INVOCATION_CALL', (message: string) => message);
+export const InvalidEventError = makeErrorWithCode('INVALID_EVENT', (message: string) => message);
+export const InsufficientFundsError = makeErrorWithCode(
+  'INSUFFICIENT_FUNDS',
+  (total: BigNumber, expected: BigNumber) => `Found ${total.toString()} funds, required: ${expected.toString()}.`,
+);
 
-  public constructor(message: string) {
-    super(message);
-    this.code = 'INVOCATION_CALL';
-  }
-}
-
-export class InvalidEventError extends CustomError {
-  public readonly code: string;
-
-  public constructor(message: string) {
-    super(message);
-    this.code = 'INVALID_EVENT';
-  }
-}
-
-export class InsufficientFundsError extends CustomError {
-  public readonly code: string;
-
-  public constructor(total: BigNumber, expected: BigNumber) {
-    super(`Found ${total.toString()} funds, required: ${expected.toString()}.`);
-    this.code = 'INSUFFICIENT_FUNDS';
-  }
-}
-
-export class FundsInUseError extends CustomError {
-  public readonly code: string;
-
-  public constructor(total: BigNumber, expected: BigNumber, numInputs: number) {
-    super(
-      `Found ${total.toString()} funds, required: ${expected.toString()}; You have ${numInputs} input(s) on the current block, try transfer again on the next`,
-    );
-    this.code = 'FUNDS_IN_USE';
-  }
-}
-
+export const FundsInUseError = makeErrorWithCode(
+  'FUNDS_IN_USE',
+  (total: BigNumber, expected: BigNumber, numInputs: number) =>
+    `Found ${total.toString()} funds, required: ${expected.toString()}; You have ${numInputs} input(s) on the current block, try transfer again on the next`,
+);
+export const NothingToIssueError = makeErrorWithCode('NOTHING_TO_ISSUE', () => 'Nothing to issue.');
+export const NothingToTransferError = makeErrorWithCode('NOTHING_TO_TRANSFER', () => 'Nothing to transfer.');
+export const NoAccountError = makeErrorWithCode('NO_ACCOUNT', () => 'No account exists.');
+export const NoContractDeployedError = makeErrorWithCode(
+  'NO_CONTRACT_DEPLOYED',
+  (networkType: string) => `Contract has not been deployed to network ${networkType}`,
+);
+export const InvalidTransactionError = makeErrorWithCode('INVALID_TRANSACTION', (message: string) => message);
+export const InvokeError = makeErrorWithCode('INVOKE', (message: string) => message);
+export const UnknownBlockError = makeErrorWithCode('UNKNOWN_BLOCK', () => 'Unknown block');
+export const RelayTransactionError = makeErrorWithCode('RELAY_TRANSACTION', (message: string) => message);
+export const UnknownNetworkError = makeErrorWithCode('UNKNOWN_NETWORK', (name: string) => `Unknown network ${name}`);
+export const UnknownAccountError = makeErrorWithCode(
+  'UNKNOWN_ACCOUNT',
+  (address: string) => `Unknown account ${address}`,
+);
+export const LockedAccountError = makeErrorWithCode(
+  'LOCKED_ACCOUNT',
+  (address: string) => `Account ${address} is locked`,
+);
+export const PasswordRequiredError = makeErrorWithCode(
+  'PASSWORD_REQUIRED',
+  () => 'A password is required when creating accounts on the MainNet.',
+);
 export const NothingToClaimError = makeErrorWithCode(
   'NEO_NOTHING_TO_CLAIM',
   (id: UserAccountID) => `Address ${id.address} on network ${id.network} has nothing to claim.`,
 );
-
-export class NothingToIssueError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Nothing to issue.');
-    this.code = 'NOTHING_TO_ISSUE';
-  }
-}
-
-export class NothingToTransferError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Nothing to transfer.');
-    this.code = 'NOTHING_TO_TRANSFER';
-  }
-}
-
-export class NoAccountError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('No account exists.');
-    this.code = 'NO_ACCOUNT';
-  }
-}
-
-export class NoContractDeployedError extends CustomError {
-  public readonly code: string;
-
-  public constructor(networkType: string) {
-    super(`Contract has not been deployed to network ${networkType}`);
-    this.code = 'NO_CONTRACT_DEPLOYED';
-  }
-}
-
-export class InvalidTransactionError extends CustomError {
-  public readonly code: string;
-
-  public constructor(message: string) {
-    super(message);
-    this.code = 'INVALID_TRANSACTION';
-  }
-}
-
-export class InvokeError extends CustomError {
-  public readonly code: string;
-
-  public constructor(message: string) {
-    super(message);
-    this.code = 'INVOKE';
-  }
-}
-
-export class UnknownBlockError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('Unknown block');
-    this.code = 'UNKNOWN_BLOCK';
-  }
-}
-
-export class RelayTransactionError extends CustomError {
-  public readonly code: string;
-
-  public constructor(message: string) {
-    super(message);
-    this.code = 'RELAY_TRANSACTION';
-  }
-}
-
-export class UnknownNetworkError extends CustomError {
-  public readonly code: string;
-
-  public constructor(name: string) {
-    super(`Unknown network ${name}`);
-    this.code = 'UNKNOWN_NETWORK';
-  }
-}
-
-export class UnknownAccountError extends CustomError {
-  public readonly code: string;
-
-  public constructor(address: string) {
-    super(`Unknown account ${address}`);
-    this.code = 'UNKNOWN_ACCOUNT';
-  }
-}
-
-export class LockedAccountError extends CustomError {
-  public readonly code: string;
-
-  public constructor(address: string) {
-    super(`Account ${address} is locked`);
-    this.code = 'LOCKED_ACCOUNT';
-  }
-}
-
-export class PasswordRequiredError extends CustomError {
-  public readonly code: string;
-
-  public constructor() {
-    super('A password is required when creating accounts on the MainNet.');
-    this.code = 'PASSWORD_REQUIRED';
-  }
-}
