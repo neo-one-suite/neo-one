@@ -22,6 +22,7 @@ export interface Contract {
 export interface WithContractsOptions {
   readonly ignoreWarnings?: boolean;
   readonly deploy?: boolean;
+  readonly autoConsensus?: boolean;
 }
 
 export interface TestOptions {
@@ -37,11 +38,20 @@ export interface TestOptions {
 export const withContracts = async <T>(
   contracts: ReadonlyArray<Contract>,
   test: (contracts: T & TestOptions) => Promise<void>,
-  { ignoreWarnings = false, deploy = true }: WithContractsOptions = { ignoreWarnings: false, deploy: true },
+  { ignoreWarnings = false, deploy = true, autoConsensus = true }: WithContractsOptions = {
+    ignoreWarnings: false,
+    deploy: true,
+    autoConsensus: true,
+  },
 ): Promise<void> => {
   const { client, masterWallet, provider, networkName, privateKey, node } = await setupTestNode();
   try {
     const developerClient = new DeveloperClient(provider.read(networkName));
+    if (autoConsensus) {
+      client.hooks.beforeConfirmed.tapPromise('DeveloperClient', async () => {
+        await developerClient.runConsensusNow();
+      });
+    }
     const mutableLinked: { [filePath: string]: { [contractName: string]: string } } = {};
     const mutableSourceMaps: Modifiable<SourceMaps> = {};
 

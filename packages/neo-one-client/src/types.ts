@@ -836,24 +836,30 @@ export interface UserAccountProvider {
   readonly selectAccount: (id?: UserAccountID) => Promise<void>;
   readonly deleteAccount: (id: UserAccountID) => Promise<void>;
   readonly updateAccountName: (options: UpdateAccountNameOptions) => Promise<void>;
-  readonly transfer: (transfers: ReadonlyArray<Transfer>, options?: TransactionOptions) => Promise<TransactionResult>;
-  readonly claim: (options?: TransactionOptions) => Promise<TransactionResult>;
+  readonly transfer: (
+    transfers: ReadonlyArray<Transfer>,
+    options?: TransactionOptions,
+  ) => Promise<TransactionResult<TransactionReceipt, ContractTransaction>>;
+  readonly claim: (options?: TransactionOptions) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   readonly publish: (
     contract: ContractRegister,
     options?: TransactionOptions,
-  ) => Promise<TransactionResult<PublishReceipt>>;
+  ) => Promise<TransactionResult<PublishReceipt, InvocationTransaction>>;
   readonly publishAndDeploy: (
     contract: ContractRegister,
     abi: ABI,
     params: ReadonlyArray<Param>,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
-  ) => Promise<TransactionResult<PublishReceipt>>;
+  ) => Promise<TransactionResult<PublishReceipt, InvocationTransaction>>;
   readonly registerAsset: (
     asset: AssetRegister,
     options?: TransactionOptions,
-  ) => Promise<TransactionResult<RegisterAssetReceipt>>;
-  readonly issue: (transfers: ReadonlyArray<Transfer>, options?: TransactionOptions) => Promise<TransactionResult>;
+  ) => Promise<TransactionResult<RegisterAssetReceipt, InvocationTransaction>>;
+  readonly issue: (
+    transfers: ReadonlyArray<Transfer>,
+    options?: TransactionOptions,
+  ) => Promise<TransactionResult<TransactionReceipt, IssueTransaction>>;
   readonly invoke: (
     contract: AddressString,
     method: string,
@@ -862,7 +868,7 @@ export interface UserAccountProvider {
     verify: boolean,
     options?: InvokeTransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
-  ) => Promise<TransactionResult<RawInvokeReceipt>>;
+  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
   readonly call: (
     network: NetworkType,
     contract: AddressString,

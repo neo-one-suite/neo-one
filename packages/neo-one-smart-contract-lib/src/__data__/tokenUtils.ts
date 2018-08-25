@@ -63,7 +63,7 @@ export const testToken = async ({
       },
     ],
     async (options) => {
-      const { client, networkName, developerClient, masterAccountID, masterPrivateKey } = options;
+      const { client, networkName, masterAccountID, masterPrivateKey } = options;
       // tslint:disable-next-line no-any
       const smartContract: SmartContractAny = (options as any)[smartContractName];
       const [nameResult, decimalsResult, symbolResult, wallet0, deployResult] = await Promise.all([
@@ -91,10 +91,7 @@ export const testToken = async ({
 
       let event: Event;
       if (deployResult !== undefined) {
-        const [deployReceipt] = await Promise.all([
-          deployResult.confirmed({ timeoutMS: 2500 }),
-          developerClient.runConsensusNow(),
-        ]);
+        const deployReceipt = await deployResult.confirmed({ timeoutMS: 2500 });
 
         if (deployReceipt.result.state !== 'HALT') {
           throw new Error(deployReceipt.result.message);
@@ -123,10 +120,7 @@ export const testToken = async ({
       expect(issueBalance.toString()).toEqual(issueValue.toString());
       expect(issueTotalSupply.toString()).toEqual(issueValue.toString());
 
-      const [transferReceipt] = await Promise.all([
-        transferResult.confirmed({ timeoutMS: 2500 }),
-        developerClient.runConsensusNow(),
-      ]);
+      const transferReceipt = await transferResult.confirmed({ timeoutMS: 2500 });
 
       if (transferReceipt.result.state !== 'HALT') {
         throw new Error(transferReceipt.result.message);

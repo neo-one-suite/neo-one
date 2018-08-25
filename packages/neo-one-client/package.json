@@ -13,6 +13,7 @@
     "@neo-one/utils": "^1.0.0-alpha.61",
     "@reactivex/ix-es2015-cjs": "^2.3.5",
     "@types/lodash": "^4.14.116",
+    "@types/tapable": "^1.0.4",
     "bignumber.js": "^7.2.1",
     "bn.js": "^4.11.8",
     "cross-fetch": "^2.2.2",
@@ -21,6 +22,7 @@
     "rxjs": "^6.2.2",
     "safe-stable-stringify": "^1.0.1",
     "source-map": "^0.7.3",
+    "tapable": "^1.0.0",
     "tslib": "^1.9.3"
   }
 }

@@ -126,11 +126,11 @@ const getGeneratedCommonCode = (): {
 } => require('../__data__/ico/one/generated/client');
 
 const verifySmartContractAfterMint = async (
-  developerClient: DeveloperClient,
   ico: ICOSmartContract,
   token: TokenSmartContract,
   accountID: UserAccountID,
   toAccountID: UserAccountID,
+  developerClient?: DeveloperClient,
 ): Promise<void> => {
   const [totalSupply, remaining, balance, toBalance] = await Promise.all([
     token.totalSupply(),
@@ -144,7 +144,10 @@ const verifySmartContractAfterMint = async (
   expect(toBalance.toString()).toEqual('0');
 
   const result = await token.transfer(accountID.address, toAccountID.address, new BigNumber('25'));
-  const [receipt] = await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
+  const [receipt] = await Promise.all([
+    result.confirmed({ timeoutMS: 2500 }),
+    developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+  ]);
   if (receipt.result.state === 'FAULT') {
     throw new Error(receipt.result.message);
   }
@@ -160,7 +163,6 @@ const verifySmartContractAfterMint = async (
 };
 
 const verifySmartContracts = async (
-  developerClient: DeveloperClient,
   ico: ICOSmartContract,
   token: TokenSmartContract,
   icoRead: ICOReadSmartContract,
@@ -168,6 +170,7 @@ const verifySmartContracts = async (
   accountID: UserAccountID,
   toAccountID: UserAccountID,
   nowSeconds: number,
+  developerClient?: DeveloperClient,
 ): Promise<void> => {
   const [
     name,
@@ -214,7 +217,10 @@ const verifySmartContracts = async (
     ],
   });
 
-  const [mintReceipt] = await Promise.all([mintResult.confirmed(), developerClient.runConsensusNow()]);
+  const [mintReceipt] = await Promise.all([
+    mintResult.confirmed(),
+    developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+  ]);
   if (mintReceipt.result.state === 'FAULT') {
     throw new Error(mintReceipt.result.message);
   }
@@ -233,7 +239,7 @@ const verifySmartContracts = async (
   expect(event.parameters.to).toEqual(accountID.address);
   expect(event.parameters.amount.toString()).toEqual('100');
 
-  await verifySmartContractAfterMint(developerClient, ico, token, accountID, toAccountID);
+  await verifySmartContractAfterMint(ico, token, accountID, toAccountID, developerClient);
 };
 
 type WithContracts = (test: (contracts: Contracts & TestOptions) => Promise<void>) => Promise<void>;
@@ -241,9 +247,8 @@ const verifySmartContractsTest = async (nowSeconds: number) => {
   // tslint:disable-next-line no-require-imports
   const test = require('../__data__/ico/one/generated/test');
   const withContracts: WithContracts = test.withContracts;
-  await withContracts(async ({ ico, token, developerClient, masterAccountID, networkName }) => {
+  await withContracts(async ({ ico, token, masterAccountID, networkName }) => {
     await verifySmartContracts(
-      developerClient,
       ico,
       token,
       ico.read(networkName),
@@ -275,7 +280,7 @@ const verifySmartContractsManual = async (accountID: UserAccountID, toAccountID:
   const token = createTokenSmartContract(client);
   const tokenRead = createTokenReadSmartContract(client.read(accountID.network));
 
-  await verifySmartContracts(developerClient, ico, token, icoRead, tokenRead, accountID, toAccountID, nowSeconds);
+  await verifySmartContracts(ico, token, icoRead, tokenRead, accountID, toAccountID, nowSeconds, developerClient);
 };
 
 const verifyICOContract = (contract?: Contract): void => {

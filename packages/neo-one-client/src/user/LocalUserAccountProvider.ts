@@ -4,16 +4,16 @@ import {
   Attribute as AttributeModel,
   AttributeUsage,
   bigNumberToBN,
-  ClaimTransaction,
+  ClaimTransaction as CoreClaimTransaction,
   common,
   Contract as ContractModel,
   ContractParameterType as CoreContractParameterType,
-  ContractTransaction,
+  ContractTransaction as CoreContractTransaction,
   crypto,
   getContractProperties,
   Input as InputModel,
-  InvocationTransaction as InvocationTransactionModel,
-  IssueTransaction,
+  InvocationTransaction as CoreInvocationTransaction,
+  IssueTransaction as CoreIssueTransaction,
   Output as OutputModel,
   ScriptBuilder,
   ScriptBuilderParam,
@@ -46,9 +46,11 @@ import {
   AssetType,
   Attribute,
   BufferString,
+  ClaimTransaction,
   Contract,
   ContractParameterType,
   ContractRegister,
+  ContractTransaction,
   DataProvider,
   GetOptions,
   Hash256String,
@@ -58,6 +60,7 @@ import {
   InvocationResultSuccess,
   InvocationTransaction,
   InvokeTransactionOptions,
+  IssueTransaction,
   NetworkSettings,
   NetworkType,
   Output,
@@ -273,7 +276,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     return this.provider.getNetworks();
   }
 
-  public async transfer(transfers: ReadonlyArray<Transfer>, options?: TransactionOptions): Promise<TransactionResult> {
+  public async transfer(
+    transfers: ReadonlyArray<Transfer>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt, ContractTransaction>> {
     const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
@@ -289,13 +295,13 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           throw new NothingToTransferError();
         }
 
-        const transaction = new ContractTransaction({
+        const transaction = new CoreContractTransaction({
           inputs: this.convertInputs(inputs),
           outputs: this.convertOutputs(outputs),
           attributes: this.convertAttributes(attributes),
         });
 
-        return this.sendTransaction({
+        return this.sendTransaction<ContractTransaction>({
           from,
           transaction,
           inputs,
@@ -310,12 +316,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           error: NEO_TRANSFER_FAILURES_TOTAL,
         },
       },
-
       monitor,
     );
   }
 
-  public async claim(options?: TransactionOptions): Promise<TransactionResult> {
+  public async claim(options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
     const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
@@ -334,7 +339,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           throw new NothingToClaimError(from);
         }
 
-        const transaction = new ClaimTransaction({
+        const transaction = new CoreClaimTransaction({
           inputs: this.convertInputs(inputs),
           claims: this.convertInputs(unclaimed),
           outputs: this.convertOutputs(
@@ -349,7 +354,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           attributes: this.convertAttributes(attributes),
         });
 
-        return this.sendTransaction({
+        return this.sendTransaction<ClaimTransaction>({
           inputs,
           from,
           transaction,
@@ -364,7 +369,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           error: NEO_CLAIM_FAILURES_TOTAL,
         },
       },
-
       monitor,
     );
   }
@@ -372,7 +376,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   public async publish(
     contract: ContractRegister,
     options?: TransactionOptions,
-  ): Promise<TransactionResult<PublishReceipt>> {
+  ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
     return this.publishBase(
       'publish',
       contract,
@@ -390,7 +394,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     params: ReadonlyArray<Param>,
     options?: TransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
-  ): Promise<TransactionResult<PublishReceipt>> {
+  ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
     return this.publishBase(
       'publish',
       contract,
@@ -420,7 +424,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   public async registerAsset(
     asset: AssetRegister,
     options?: TransactionOptions,
-  ): Promise<TransactionResult<RegisterAssetReceipt>> {
+  ): Promise<TransactionResult<RegisterAssetReceipt, InvocationTransaction>> {
     const sb = new ScriptBuilder();
 
     sb.emitSysCall(
@@ -464,7 +468,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     });
   }
 
-  public async issue(transfers: ReadonlyArray<Transfer>, options?: TransactionOptions): Promise<TransactionResult> {
+  public async issue(
+    transfers: ReadonlyArray<Transfer>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt, IssueTransaction>> {
     const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
@@ -489,13 +496,13 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           })),
         );
 
-        const transaction = new IssueTransaction({
+        const transaction = new CoreIssueTransaction({
           inputs: this.convertInputs(inputs),
           outputs: this.convertOutputs(issueOutputs),
           attributes: this.convertAttributes(attributes),
         });
 
-        return this.sendTransaction({
+        return this.sendTransaction<IssueTransaction>({
           inputs,
           from,
           transaction,
@@ -519,7 +526,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     verify: boolean,
     options: InvokeTransactionOptions = {},
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
-  ): Promise<TransactionResult<RawInvokeReceipt>> {
+  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const { attributes = [] } = options;
 
     return this.invokeRaw({
@@ -689,7 +696,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     emit: (sb: ScriptBuilder, from: UserAccountID) => void,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
     options?: TransactionOptions,
-  ): Promise<TransactionResult<PublishReceipt>> {
+  ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
     const contract = new ContractModel({
       script: Buffer.from(contractIn.script, 'hex'),
       parameterList: contractIn.parameters.map(toContractParameterType),
@@ -793,7 +800,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           data: Buffer.from(`${utils.randomUInt()}`, 'utf8').toString('hex'),
         });
 
-        const testTransaction = new InvocationTransactionModel({
+        const testTransaction = new CoreInvocationTransaction({
           version: 1,
           inputs: this.convertInputs(testInputs),
           outputs: this.convertOutputs(testOutputs),
@@ -826,7 +833,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           monitor: span,
         });
 
-        const invokeTransaction = new InvocationTransactionModel({
+        const invokeTransaction = new CoreInvocationTransaction({
           version: 1,
           inputs: this.convertInputs(inputs),
           outputs: this.convertOutputs(outputs),
@@ -838,7 +845,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
         try {
           // tslint:disable-next-line prefer-immediate-return
-          const result = await this.sendTransaction<T, InvocationTransaction>({
+          const result = await this.sendTransaction<InvocationTransaction, T>({
             from,
             inputs,
             transaction: invokeTransaction,
@@ -878,7 +885,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     );
   }
 
-  private async sendTransaction<T extends TransactionReceipt, TTransaction extends Transaction = Transaction>({
+  private async sendTransaction<TTransaction extends Transaction, T extends TransactionReceipt = TransactionReceipt>({
     inputs,
     transaction: transactionUnsignedIn,
     from,
