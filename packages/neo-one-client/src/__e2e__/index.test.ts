@@ -45,6 +45,6 @@ describe('@neo-one/client', () => {
 
   test('time to require', async () => {
     const time = await one.measureRequire('@neo-one/client');
-    expect(time).toBeLessThan(1300);
+    expect(time).toBeLessThan(2500);
   });
 });

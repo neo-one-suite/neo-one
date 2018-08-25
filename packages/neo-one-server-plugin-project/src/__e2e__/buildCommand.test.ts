@@ -321,7 +321,7 @@ describe('buildCommand', () => {
 
     const nowSeconds = Math.round(Date.now() / 1000);
 
-    await one.execute('build', { cwd: path.resolve(__dirname, '..', '__data__', 'ico') });
+    await one.execute('build --no-progress', { cwd: path.resolve(__dirname, '..', '__data__', 'ico') });
 
     const networks = await getNetworks();
     expect(networks.length).toEqual(1);
@@ -356,6 +356,6 @@ describe('buildCommand', () => {
       ),
     ]);
 
-    await one.execute('build --reset', { cwd: path.resolve(__dirname, '..', '__data__', 'ico') });
+    await one.execute('build --no-progress --reset', { cwd: path.resolve(__dirname, '..', '__data__', 'ico') });
   });
 });

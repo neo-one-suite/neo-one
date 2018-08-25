@@ -97,11 +97,7 @@ aliases:
       - save-cache: *save-yarn-cache-8
       - run:
           name: Test
-          command: yarn test-ci-8 $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
-      - run:
-          name: Upload Unit Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json -F unit
-          when: always
+          command: yarn test-ci-8 $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings)
       - store_test_results:
           path: reports
     parallelism: 2
@@ -114,11 +110,7 @@ aliases:
           at: ./
       - run:
           name: E2E
-          command: yarn nyc --reporter json yarn e2e-ci-8 $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
-      - run:
-          name: Upload E2E Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json -F e2e
-          when: always
+          command: yarn e2e-ci-8 $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
       - store_test_results:
           path: reports
     parallelism: 2
@@ -148,11 +140,7 @@ aliases:
       - save-cache: *save-yarn-cache-9
       - run:
           name: Test
-          command: yarn test-ci-9 $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
-      - run:
-          name: Upload Unit Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json -F unit
-          when: always
+          command: yarn test-ci-9 $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings)
       - store_test_results:
           path: reports
     parallelism: 2
@@ -165,11 +153,7 @@ aliases:
           at: ./
       - run:
           name: E2E
-          command: yarn nyc --reporter json yarn e2e-ci-9 $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
-      - run:
-          name: Upload E2E Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json -F e2e
-          when: always
+          command: yarn e2e-ci-9 $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
       - store_test_results:
           path: reports
     parallelism: 2

@@ -11,6 +11,6 @@ describe('@neo-one/smart-contract-test', () => {
 
   test('time to require', async () => {
     const time = await one.measureRequire('@neo-one/smart-contract-test');
-    expect(time).toBeLessThan(3750);
+    expect(time).toBeLessThan(7500);
   });
 });
