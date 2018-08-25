@@ -112,7 +112,7 @@ const globs = {
   types: ['packages/neo-one-types/**/*', '!packages/neo-one-types/package.json'],
   bin: ['packages/*/src/bin/*.ts'],
   pkg: ['packages/*/package.json'],
-  pkgFiles: ['packages/*/tsconfig.json'],
+  pkgFiles: ['packages/*/tsconfig.json', 'packages/*/static/**/*'],
   files: ['lerna.json', 'yarn.lock', 'tsconfig.json'],
   metadata: ['LICENSE', 'README.md', 'CHANGELOG.md'],
 };
