@@ -143,9 +143,9 @@ aliases:
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-yarn-cache
+      - restore-cache: *restore-yarn-cache-9
       - run: *yarn
-      - save-cache: *save-yarn-cache
+      - save-cache: *save-yarn-cache-9
       - run:
           name: Test
           command: yarn test-ci-9 $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
@@ -194,9 +194,9 @@ aliases:
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-yarn-cache
+      - restore-cache: *restore-yarn-cache-10
       - run: *yarn
-      - save-cache: *save-yarn-cache
+      - save-cache: *save-yarn-cache-10
       - run:
           name: Test
           command: yarn test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
@@ -279,9 +279,9 @@ jobs:
     steps:
       - checkout:
           path: ~/neo-one
-      - restore-cache: *restore-yarn-cache
+      - restore-cache: *restore-yarn-cache-10
       - run: *yarn
-      - save-cache: *save-yarn-cache
+      - save-cache: *save-yarn-cache-10
       - run:
           name: Install Dependencies
           command: sudo apt install rsync
