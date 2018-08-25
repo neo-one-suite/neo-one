@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/client-core",
-  "version": "1.0.0-alpha.71",
+  "version": "1.0.0-alpha.72",
   "description": "NEO•ONE core types implementation.",
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/ec-key": "^0.0.3",
-    "@neo-one/types": "^1.0.0-alpha.42",
-    "@neo-one/utils": "^1.0.0-alpha.60",
+    "@neo-one/types": "^1.0.0-alpha.43",
+    "@neo-one/utils": "^1.0.0-alpha.61",
     "@types/bs58": "^3.0.30",
     "@types/lodash": "^4.14.116",
     "bignumber.js": "^7.2.1",

@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/node-core",
-  "version": "1.0.0-alpha.72",
+  "version": "1.0.0-alpha.73",
   "description": "NEO•ONE core node types.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.71",
-    "@neo-one/monitor": "^1.0.0-alpha.55",
-    "@neo-one/types": "^1.0.0-alpha.42",
-    "@neo-one/utils": "^1.0.0-alpha.60",
+    "@neo-one/client-core": "^1.0.0-alpha.72",
+    "@neo-one/monitor": "^1.0.0-alpha.56",
+    "@neo-one/types": "^1.0.0-alpha.43",
+    "@neo-one/utils": "^1.0.0-alpha.61",
     "bn.js": "^4.11.8",
     "rxjs": "^6.2.2",
     "tslib": "^1.9.3"
