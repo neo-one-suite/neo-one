@@ -129,6 +129,13 @@ export interface Provider {
     monitor?: Monitor,
   ) => Promise<RawInvocationData>;
   readonly testInvoke: (network: NetworkType, transaction: string, monitor?: Monitor) => Promise<RawCallReceipt>;
+  readonly call: (
+    network: NetworkType,
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    monitor?: Monitor,
+  ) => Promise<RawCallReceipt>;
   readonly getNetworkSettings: (network: NetworkType, monitor?: Monitor) => Promise<NetworkSettings>;
   readonly getBlockCount: (network: NetworkType, monitor?: Monitor) => Promise<number>;
   readonly read: (network: NetworkType) => DataProvider;
@@ -569,46 +576,13 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }
 
   public async call(
+    network: NetworkType,
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    options: TransactionOptions = {},
+    monitor?: Monitor,
   ): Promise<RawCallReceipt> {
-    const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
-
-    return this.capture(
-      async (span) => {
-        const { inputs, outputs } = await this.getTransfersInputOutputs({
-          transfers: [],
-          from,
-          gas: networkFee,
-          monitor: span,
-        });
-
-        const testTransaction = new InvocationTransactionModel({
-          version: 1,
-          inputs: this.convertInputs(inputs),
-          outputs: this.convertOutputs(outputs),
-          attributes: this.convertAttributes(attributes),
-          gas: common.TEN_THOUSAND_FIXED8,
-          script: clientUtils.getInvokeMethodScript({
-            address: contract,
-            method,
-            params,
-          }),
-        });
-
-        return this.provider.testInvoke(from.network, testTransaction.serializeWire().toString('hex'), span);
-      },
-      {
-        name: 'neo_call',
-        labels: {
-          [labelNames.CALL_METHOD]: method,
-        },
-      },
-
-      monitor,
-    );
+    return this.provider.call(network, contract, method, params, monitor);
   }
 
   public async selectAccount(id?: UserAccountID, monitor?: Monitor): Promise<void> {

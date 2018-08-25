@@ -300,7 +300,7 @@ describe('Client', () => {
   });
 
   test('__call', async () => {
-    const result = await client.__call(keys[0].address, 'deploy', []);
+    const result = await client.__call(unlockedWallet.account.id.network, keys[0].address, 'deploy', []);
 
     expect(call.mock.calls).toMatchSnapshot();
     expect(result).toEqual(commonRawCallReceipt);

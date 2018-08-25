@@ -1,5 +1,6 @@
 // tslint:disable member-ordering
 import { ScriptBuilderParam } from '@neo-one/client-core';
+import { Monitor } from '@neo-one/monitor';
 import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -199,12 +200,13 @@ export class Client<
   }
 
   public async __call(
+    network: NetworkType,
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    options?: TransactionOptions,
+    monitor?: Monitor,
   ): Promise<RawCallReceipt> {
-    return this.getProvider(options).call(contract, method, params, options);
+    return this.getNetworkProvider(network).call(network, contract, method, params, monitor);
   }
 
   public reset(): void {

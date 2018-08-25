@@ -858,10 +858,11 @@ export interface UserAccountProvider {
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<RawInvokeReceipt>>;
   readonly call: (
+    network: NetworkType,
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    options?: TransactionOptions,
+    monitor?: Monitor,
   ) => Promise<RawCallReceipt>;
   readonly read: (network: NetworkType) => DataProvider;
 }

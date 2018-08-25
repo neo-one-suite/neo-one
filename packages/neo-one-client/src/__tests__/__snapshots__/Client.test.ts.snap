@@ -3,6 +3,7 @@
 exports[`Client __call 1`] = `
 Array [
   Array [
+    "main",
     "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
     "deploy",
     Array [],

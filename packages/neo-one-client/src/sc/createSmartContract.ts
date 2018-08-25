@@ -13,6 +13,7 @@ import {
   Event,
   InvokeReceipt,
   Log,
+  NetworkType,
   Param,
   RawAction,
   SmartContractAny,
@@ -38,6 +39,7 @@ const getParamsAndOptions = ({
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly paramsZipped: ReadonlyArray<[string, Param | undefined]>;
   readonly options: TransactionOptions;
+  readonly network: NetworkType;
   readonly address: AddressString;
 } => {
   const finalArg = args[args.length - 1] as {} | undefined;
@@ -74,6 +76,7 @@ const getParamsAndOptions = ({
     params: converted,
     paramsZipped: zipped,
     options,
+    network,
     address: contractNetwork.address,
   };
 };
@@ -111,14 +114,14 @@ const createCall = ({
   readonly func: ABIFunction;
   // tslint:disable-next-line no-any
 }) => async (...args: any[]): Promise<Param | undefined> => {
-  const { params, options, address } = getParamsAndOptions({
+  const { params, network, address, options } = getParamsAndOptions({
     definition,
     parameters,
     args,
     client,
   });
 
-  const receipt = await client.__call(address, name, params, options);
+  const receipt = await client.__call(network, address, name, params, options.monitor);
 
   return common.convertCallResult({
     returnType,

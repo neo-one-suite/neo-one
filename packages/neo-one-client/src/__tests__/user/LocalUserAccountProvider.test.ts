@@ -42,6 +42,7 @@ describe('LocalUserAccountProvider', () => {
   const getNetworkSettings = jest.fn();
   const getBlockCount = jest.fn();
   const read = jest.fn();
+  const call = jest.fn();
   const dataProvider: Modifiable<Provider> = {
     networks$: _of(networks),
     getNetworks,
@@ -54,6 +55,7 @@ describe('LocalUserAccountProvider', () => {
     getNetworkSettings,
     getBlockCount,
     read,
+    call,
   };
 
   const gasInputOutput = factory.createInputOutput({
@@ -449,13 +451,13 @@ describe('LocalUserAccountProvider', () => {
 
   test('call', async () => {
     const receipt = factory.createRawCallReceipt();
-    testInvoke.mockImplementation(async () => Promise.resolve(receipt));
+    call.mockImplementation(async () => Promise.resolve(receipt));
 
-    const result = await provider.call(keys[0].address, 'foo', [true]);
+    const result = await provider.call(network, keys[0].address, 'foo', [true]);
 
     expect(result).toEqual(receipt);
 
-    expect(testInvoke.mock.calls).toMatchSnapshot();
+    expect(call.mock.calls).toMatchSnapshot();
   });
 
   test('selectAccount', async () => {
