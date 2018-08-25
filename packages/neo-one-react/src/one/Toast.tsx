@@ -2,7 +2,7 @@ import * as React from 'react';
 import { MdClose } from 'react-icons/md';
 import { Base, Box, Button, Flex, Hidden, Shadow, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { Toast } from './ToastsContainer';
+import { Toast as ToastType } from './ToastsContainer';
 
 // tslint:disable-next-line no-any
 type HiddenProps = any;
@@ -26,7 +26,7 @@ const ToastHeading = styled(Flex)`
 `;
 
 interface Props {
-  readonly toast: Toast;
+  readonly toast: ToastType;
   readonly removeToast: (toast: string) => void;
 }
 export function Toast({ toast, removeToast }: Props) {

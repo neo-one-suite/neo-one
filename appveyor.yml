@@ -1,6 +1,14 @@
 environment:
   matrix:
+    - nodejs_version: "8.9.0"
+      test_command: test-ci
+      e2e_command: e2e-ci
+    - nodejs_version: "9.11.2"
+      test_command: test-ci-8
+      e2e_command: e2e-ci-8
     - nodejs_version: "10.9.0"
+      test_command: test-ci-9
+      e2e_command: e2e-ci-9
 
 branches:
   only:
@@ -24,8 +32,8 @@ cache:
   - "%LOCALAPPDATA%\\Yarn"
 
 test_script:
-  - yarn run test-ci
-  - yarn run e2e-ci
+  - yarn run $env:test_command
+  - yarn run $env:e2e_command
 
 # Don't actually build.
 build: off

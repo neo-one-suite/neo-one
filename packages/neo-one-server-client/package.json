@@ -4,7 +4,6 @@
   "description": "NEO•ONE Server client api.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@grpc/grpc-js": "^0.2.0",
     "@grpc/proto-loader": "^0.3.0",
     "@neo-one/server-grpc": "^1.0.0-alpha.27",
     "@neo-one/server-plugin": "^1.0.0-alpha.70",
@@ -15,6 +14,7 @@
     "env-paths": "^1.0.0",
     "execa": "^0.11.0",
     "fs-extra": "^7.0.0",
+    "grpc": "^1.14.1",
     "is-running": "^2.1.0",
     "rxjs": "^6.2.2",
     "tslib": "^1.9.3"

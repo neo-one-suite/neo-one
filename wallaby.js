@@ -29,7 +29,7 @@ module.exports = function(wallaby) {
         ...require('./tsconfig.json').compilerOptions,
         ...require('./tsconfig/tsconfig.build.json').compilerOptions,
         ...require('./tsconfig/tsconfig.cjs.json').compilerOptions,
-        ...require('./tsconfig/tsconfig.es2018.cjs.json').compilerOptions,
+        ...require('./tsconfig/tsconfig.es2017.cjs.json').compilerOptions,
         ...require('./tsconfig.jest.json').compilerOptions,
       }),
     },
