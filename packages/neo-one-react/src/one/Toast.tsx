@@ -2,6 +2,7 @@ import * as React from 'react';
 import { MdClose } from 'react-icons/md';
 import { Base, Box, Button, Flex, Hidden, Shadow, styled } from 'reakit';
 import { prop } from 'styled-tools';
+import { Toast } from './ToastsContainer';
 
 // tslint:disable-next-line no-any
 type HiddenProps = any;
@@ -12,11 +13,11 @@ const StyledBox = styled(Box)`
   width: 320px;
 `;
 
-const ErrorWrapper = styled(Base)`
+const ToastWrapper = styled(Base)`
   margin: 8px;
 `;
 
-const ErrorHeading = styled(Flex)`
+const ToastHeading = styled(Flex)`
   align-items: center;
   justify-content: space-between;
   margin: 8px;
@@ -24,40 +25,46 @@ const ErrorHeading = styled(Flex)`
   padding-bottom: 8px;
 `;
 
-const ErrorText = styled(Base)`
-  color: ${prop('theme.error')};
-`;
-
 interface Props {
-  readonly error: string;
-  readonly removeError: (error: string) => void;
+  readonly toast: Toast;
+  readonly removeToast: (toast: string) => void;
 }
-export function ErrorToast({ error, removeError }: Props) {
+export function Toast({ toast, removeToast }: Props) {
   let once = false;
+  let autoHideTimer: NodeJS.Timer | undefined;
 
   return (
     <Hidden.Container>
       {(hidden: HiddenProps) => {
+        const hide = () => {
+          hidden.hide();
+          setTimeout(() => removeToast(toast.id), 250);
+
+          if (autoHideTimer !== undefined) {
+            clearTimeout(autoHideTimer);
+          }
+        };
         if (!hidden.visible && !once) {
           once = true;
-          setTimeout(hidden.show, 500);
+          autoHideTimer = setTimeout(() => {
+            hidden.show();
+            if (toast.autoHide !== undefined) {
+              setTimeout(() => {
+                hide();
+              }, toast.autoHide);
+            }
+          }, 500);
         }
 
         return (
           <Hidden fade {...hidden}>
             <StyledBox>
               <Shadow />
-              <ErrorHeading>
-                <span>
-                  <ErrorText as="span">Error.&nbsp;</ErrorText>
-                  <span>See console for more info.</span>
-                </span>
+              <ToastHeading>
+                {toast.title}
                 <Button
                   fontSize={14}
-                  onClick={() => {
-                    hidden.hide();
-                    setTimeout(() => removeError(error), 250);
-                  }}
+                  onClick={hide}
                   border="none"
                   backgroundColor="transparent"
                   borderRadius={35}
@@ -66,8 +73,8 @@ export function ErrorToast({ error, removeError }: Props) {
                 >
                   <MdClose />
                 </Button>
-              </ErrorHeading>
-              <ErrorWrapper>{error}</ErrorWrapper>
+              </ToastHeading>
+              <ToastWrapper>{toast.message}</ToastWrapper>
             </StyledBox>
           </Hidden>
         );

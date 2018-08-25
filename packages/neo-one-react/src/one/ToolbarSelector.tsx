@@ -4,7 +4,7 @@ import Select from 'react-select';
 import { Container, styled } from 'reakit';
 import { ComponentProps } from '../types';
 import { Selector } from './Selector';
-import { ToolbarTooltip, ToolbarTooltipArrow } from './ToolbarTooltip';
+import { Tooltip, TooltipArrow } from './Tooltip';
 
 interface Props {
   readonly help: string;
@@ -41,10 +41,10 @@ export function ToolbarSelector<OptionType>({ help, ...rest }: Props & Component
       {({ menuOpen, onMenuOpen, onMenuClose, hover, onMouseEnter, onMouseLeave }) => (
         <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
           <StyledSelector menuPlacement="top" {...rest} onMenuOpen={onMenuOpen} onMenuClose={onMenuClose} />
-          <ToolbarTooltip visible={menuOpen ? false : hover} placement="top">
-            <ToolbarTooltipArrow />
+          <Tooltip visible={menuOpen ? false : hover} placement="top">
+            <TooltipArrow />
             {help}
-          </ToolbarTooltip>
+          </Tooltip>
         </div>
       )}
     </Container>

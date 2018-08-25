@@ -5,8 +5,8 @@ import { Container, Flex, styled } from 'reakit';
 import { ReactSyntheticEvent } from '../types';
 import { Button } from './Button';
 import { DeveloperToolsContext, Token, WithOnChangeTokens, WithTokens } from './DeveloperToolsContext';
-import { WithAddError } from './ErrorsContainer';
 import { TextInput } from './TextInput';
+import { WithAddError } from './WithAddError';
 
 interface State {
   readonly disabled: boolean;

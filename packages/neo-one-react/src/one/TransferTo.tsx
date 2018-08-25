@@ -3,9 +3,9 @@ import { Base, Label, styled } from 'reakit';
 import { FromStream } from '../FromStream';
 import { ComponentProps } from '../types';
 import { DeveloperToolsContext, WithTokens } from './DeveloperToolsContext';
-import { WithAddError } from './ErrorsContainer';
 import { TransferContainer } from './TransferContainer';
 import { getOptions$, makeValueOption, WalletSelectorBase } from './WalletSelectorBase';
+import { WithAddError } from './WithAddError';
 
 const Wrapper = styled(Base)`
   border-top: 1px solid rgba(0, 0, 0, 0.3);

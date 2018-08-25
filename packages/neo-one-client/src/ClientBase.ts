@@ -36,11 +36,11 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
 
   public constructor(providersIn: TUserAccountProviders) {
     this.hooks = {
-      relayError: new AsyncParallelHook(),
-      afterRelay: new AsyncParallelHook(),
-      beforeConfirmed: new AsyncParallelHook(),
-      confirmedError: new AsyncParallelHook(),
-      afterConfirmed: new AsyncParallelHook(),
+      relayError: new AsyncParallelHook(['error']),
+      afterRelay: new AsyncParallelHook(['transaction']),
+      beforeConfirmed: new AsyncParallelHook(['transaction']),
+      confirmedError: new AsyncParallelHook(['transaction', 'error']),
+      afterConfirmed: new AsyncParallelHook(['transaction', 'receipt']),
     };
     const providersArray = Object.values(providersIn);
     const providerIn =

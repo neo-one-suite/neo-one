@@ -5,13 +5,13 @@ import { ComponentProps } from '../types';
 import { BalanceSelector } from './BalanceSelector';
 import { BlockIndex } from './BlockIndex';
 import { BlockTime } from './BlockTime';
-import { ErrorToasts } from './ErrorToasts';
 import { Monogram } from './Monogram';
 import { NEOTrackerButton } from './NEOTrackerButton';
 import { NetworkSelector } from './NetworkSelector';
 import { ResetButton } from './ResetButton';
 import { SecondsPerBlockInput } from './SecondsPerBlockInput';
 import { SettingsButton } from './SettingsButton';
+import { Toasts } from './Toasts';
 import { ToolbarButton } from './ToolbarButton';
 import { WalletButton } from './WalletButton';
 
@@ -87,7 +87,7 @@ export function Toolbar() {
             <NEOTrackerButton />
           </Hidden>
           <Hidden.Toggle as={MonogramButton(hidden.visible)} {...hidden} />
-          <ErrorToasts />
+          <Toasts />
         </>
       )}
     </Hidden.Container>

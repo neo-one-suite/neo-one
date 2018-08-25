@@ -234,20 +234,36 @@ export class Client<
   ): Promise<TTransactionResult> {
     return res
       .then(async (result) => {
-        await this.hooks.afterRelay.promise(result.transaction);
+        try {
+          await this.hooks.afterRelay.promise(result.transaction);
+        } catch {
+          // do nothing
+        }
 
         // tslint:disable-next-line prefer-object-spread
         return Object.assign({}, result, {
           // tslint:disable-next-line no-unnecessary-type-annotation
           confirmed: async (options?: GetOptions) => {
-            await this.hooks.beforeConfirmed.promise(result.transaction);
+            try {
+              await this.hooks.beforeConfirmed.promise(result.transaction);
+            } catch {
+              // do nothing
+            }
             try {
               const receipt = await result.confirmed(options);
-              await this.hooks.afterConfirmed.promise(result.transaction, receipt);
+              try {
+                await this.hooks.afterConfirmed.promise(result.transaction, receipt);
+              } catch {
+                // do nothing
+              }
 
               return receipt;
             } catch (error) {
-              await this.hooks.confirmedError.promise(result.transaction, error);
+              try {
+                await this.hooks.confirmedError.promise(result.transaction, error);
+              } catch {
+                // do nothing
+              }
 
               throw error;
             }
