@@ -232,21 +232,33 @@ export class Client<
   private async addTransactionHooks<TTransactionResult extends TransactionResult>(
     res: Promise<TTransactionResult>,
   ): Promise<TTransactionResult> {
-    return res.then(async (result) => {
-      await this.hooks.afterRelay.promise(result.transaction);
+    return res
+      .then(async (result) => {
+        await this.hooks.afterRelay.promise(result.transaction);
 
-      // tslint:disable-next-line prefer-object-spread
-      return Object.assign({}, result, {
-        // tslint:disable-next-line no-unnecessary-type-annotation
-        confirmed: async (options?: GetOptions) => {
-          await this.hooks.beforeConfirmed.promise(result.transaction);
-          const receipt = await result.confirmed(options);
-          await this.hooks.afterConfirmed.promise(result.transaction, receipt);
+        // tslint:disable-next-line prefer-object-spread
+        return Object.assign({}, result, {
+          // tslint:disable-next-line no-unnecessary-type-annotation
+          confirmed: async (options?: GetOptions) => {
+            await this.hooks.beforeConfirmed.promise(result.transaction);
+            try {
+              const receipt = await result.confirmed(options);
+              await this.hooks.afterConfirmed.promise(result.transaction, receipt);
 
-          return receipt;
-        },
+              return receipt;
+            } catch (error) {
+              await this.hooks.confirmedError.promise(result.transaction, error);
+
+              throw error;
+            }
+          },
+        });
+      })
+      .catch(async (error) => {
+        await this.hooks.relayError.promise(error);
+
+        throw error;
       });
-    });
   }
 
   private getTransfersOptions(

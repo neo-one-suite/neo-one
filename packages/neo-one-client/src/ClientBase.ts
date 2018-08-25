@@ -17,8 +17,10 @@ import {
 } from './types';
 
 export interface ClientHooks {
+  readonly relayError: AsyncParallelHook<Error>;
   readonly afterRelay: AsyncParallelHook<Transaction>;
   readonly beforeConfirmed: AsyncParallelHook<Transaction>;
+  readonly confirmedError: AsyncParallelHook<Transaction, Error>;
   readonly afterConfirmed: AsyncParallelHook<Transaction, TransactionReceipt>;
 }
 
@@ -34,8 +36,10 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
 
   public constructor(providersIn: TUserAccountProviders) {
     this.hooks = {
+      relayError: new AsyncParallelHook(),
       afterRelay: new AsyncParallelHook(),
       beforeConfirmed: new AsyncParallelHook(),
+      confirmedError: new AsyncParallelHook(),
       afterConfirmed: new AsyncParallelHook(),
     };
     const providersArray = Object.values(providersIn);
