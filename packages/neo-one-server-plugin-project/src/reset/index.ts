@@ -82,7 +82,7 @@ export const reset = (pluginManager: PluginManager, options: ResetTaskListOption
       },
       {
         title: 'Build',
-        task: (ctx) => build(pluginManager, getBuildOptions(ctx)),
+        task: (ctx) => build(pluginManager, getBuildOptions(ctx), { forceTransfer: true }),
       },
     ],
   });

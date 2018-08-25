@@ -11,7 +11,8 @@ export const isConstructorParameterDefault = (node: ts.Node) => {
 
   const parentParent = tsUtils.node.getParent(parent);
   if (!ts.isMethodDeclaration(parentParent)) {
-    return false;
+    // To support getSemanticDiagnostics
+    return ts.isConstructorDeclaration(parentParent);
   }
 
   const name = tsUtils.node.getName(parentParent);

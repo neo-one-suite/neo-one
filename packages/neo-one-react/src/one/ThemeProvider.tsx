@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { injectGlobal, ThemeProvider as ThemeProviderBase } from 'reakit';
-import bold from '../../static/font/Axiforma-Bold.woff';
-import bold2 from '../../static/font/Axiforma-Bold.woff2';
-import book from '../../static/font/Axiforma-Book.woff';
-import book2 from '../../static/font/Axiforma-Book.woff2';
-import medium from '../../static/font/Axiforma-Medium.woff';
-import medium2 from '../../static/font/Axiforma-Medium.woff2';
-import regular from '../../static/font/Axiforma-Regular.woff';
-import regular2 from '../../static/font/Axiforma-Regular.woff2';
-import semiBold from '../../static/font/Axiforma-SemiBold.woff';
-import semiBold2 from '../../static/font/Axiforma-SemiBold.woff2';
+import bold from '../../static/Axiforma-Bold.woff';
+import bold2 from '../../static/Axiforma-Bold.woff2';
+import book from '../../static/Axiforma-Book.woff';
+import book2 from '../../static/Axiforma-Book.woff2';
+import medium from '../../static/Axiforma-Medium.woff';
+import medium2 from '../../static/Axiforma-Medium.woff2';
+import regular from '../../static/Axiforma-Regular.woff';
+import regular2 from '../../static/Axiforma-Regular.woff2';
+import semiBold from '../../static/Axiforma-SemiBold.woff';
+import semiBold2 from '../../static/Axiforma-SemiBold.woff2';
 import { theme } from './theme';
 
 interface Props {

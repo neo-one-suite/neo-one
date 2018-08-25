@@ -47,8 +47,16 @@ const getNetwork = (ctx: any): Network => ctx.network;
 const getSourceMaps = (ctx: any): SourceMaps => ctx.sourceMaps;
 // tslint:enable no-any
 
+interface Options {
+  readonly forceTransfer?: boolean;
+}
+
 // tslint:disable-next-line export-name
-export const build = (pluginManager: PluginManager, options: BuildTaskListOptions): TaskList =>
+export const build = (
+  pluginManager: PluginManager,
+  options: BuildTaskListOptions,
+  { forceTransfer = false }: Options = { forceTransfer: false },
+): TaskList =>
   new TaskList({
     tasks: [
       {
@@ -192,7 +200,7 @@ export const build = (pluginManager: PluginManager, options: BuildTaskListOption
                       {
                         title: 'Transfer to wallets',
                         skip: (ctx) => {
-                          if (getNetworkMaybe(ctx) !== undefined) {
+                          if (!forceTransfer && getNetworkMaybe(ctx) !== undefined) {
                             return 'Wallets already exist';
                           }
 
