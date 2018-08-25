@@ -1,39 +1,66 @@
-environment:
-  matrix:
-    - nodejs_version: "8.9.0"
-      test_command: test-ci
-      e2e_command: e2e-ci
-    - nodejs_version: "9.11.2"
-      test_command: test-ci-8
-      e2e_command: e2e-ci-8
-    - nodejs_version: "10.9.0"
-      test_command: test-ci-9
-      e2e_command: e2e-ci-9
+configuration:
+  - node8
+  - node9
+  - node10
 
-branches:
-  only:
-  - master
-
-init:
-  # debugging Appveyor build. More info:
-  # https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
-install:
-  # - ps: Install-Product node $env:nodejs_version x64
-  - ps: Update-NodeJsInstallation $env:nodejs_version x64
-  - node --version
-  - yarn --version
-  - yarn install --non-interactive
-  - yarn run build
-
-cache:
-  - node_modules
-  - "%LOCALAPPDATA%\\Yarn"
-
-test_script:
-  - yarn run $env:test_command
-  - yarn run $env:e2e_command
-
-# Don't actually build.
-build: off
+for:
+  -
+    matrix:
+      only:
+        - configuration: node8
+    branches:
+      only:
+      - master
+    init:
+      - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    install:
+      - ps: Update-NodeJsInstallation 8.9.0 x64
+      - node --version
+      - yarn --version
+      - yarn install --non-interactive
+      - yarn run build
+    test_script:
+      - yarn run test-ci-8
+      - yarn run e2e-ci-8
+    # Don't actually build.
+    build: off
+  -
+    matrix:
+      only:
+        - configuration: node9
+    branches:
+      only:
+      - master
+    init:
+      - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    install:
+      - ps: Update-NodeJsInstallation 9.11.2 x64
+      - node --version
+      - yarn --version
+      - yarn install --non-interactive
+      - yarn run build
+    test_script:
+      - yarn run test-ci-9
+      - yarn run e2e-ci-9
+    # Don't actually build.
+    build: off
+  -
+    matrix:
+      only:
+        - configuration: node10
+    branches:
+      only:
+      - master
+    init:
+      - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    install:
+      - ps: Update-NodeJsInstallation 10.9.0 x64
+      - node --version
+      - yarn --version
+      - yarn install --non-interactive
+      - yarn run build
+    test_script:
+      - yarn run test-ci
+      - yarn run e2e-ci
+    # Don't actually build.
+    build: off
