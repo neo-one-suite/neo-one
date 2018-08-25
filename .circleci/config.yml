@@ -227,7 +227,7 @@ aliases:
 
 node8: &node8
   docker:
-    - image: neotracker/neo-one-circleci-node:8.9.0-0
+    - image: neotracker/neo-one-circleci-node:8.11.4-0
 
 node9: &node9
   docker:
