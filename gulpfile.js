@@ -191,7 +191,7 @@ const transformBasePackageJSON = (format, orig, file) => {
     publishConfig: {
       access: 'public',
     },
-    engines: pkgs.engines,
+    engines: pkg.engines,
   };
 };
 
