@@ -183,6 +183,21 @@ export abstract class NodeAdapter {
     throw new Error(`Node ${this.name} did not start.`);
   }
 
+  public async ready(timeoutSeconds: number): Promise<void> {
+    const start = utils.nowSeconds();
+    // tslint:disable-next-line no-loop-statement
+    while (utils.nowSeconds() - start < timeoutSeconds) {
+      const isLive = await this.isReady();
+      if (isLive) {
+        return;
+      }
+
+      await new Promise<void>((resolve) => setTimeout(resolve, 50));
+    }
+
+    throw new Error(`Node ${this.name} is not ready.`);
+  }
+
   protected abstract async isLive(): Promise<boolean>;
   protected abstract async isReady(): Promise<boolean>;
   protected abstract async createInternal(): Promise<void>;

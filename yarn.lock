@@ -983,9 +983,9 @@
   dependencies:
     asn1.js "^1.0.4"
 
-"@neotracker/core@^1.0.8":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@neotracker/core/-/core-1.0.8.tgz#32a5da163192120cf400e12579f50e90d1a4376f"
+"@neotracker/core@^1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@neotracker/core/-/core-1.0.9.tgz#1bef7180ef8bddc2ca2060c256e66b19bc2c5b01"
   dependencies:
     "@material-ui/core" "^1.5.1"
     apollo-cache-inmemory "^1.3.0-beta.6"
@@ -1058,6 +1058,7 @@
     rxjs "^6.2.2"
     safe-stable-stringify "^1.0.1"
     scrypt-js "^2.0.3"
+    semver "^5.5.1"
     serialize-javascript "^1.5.0"
     sitemap "^1.13.0"
     sql-summary "^1.0.1"
@@ -4349,8 +4350,8 @@ fecha@^2.3.3:
   resolved "https://registry.yarnpkg.com/fecha/-/fecha-2.3.3.tgz#948e74157df1a32fd1b12c3a3c3cdcb6ec9d96cd"
 
 figgy-pudding@^3.1.0, figgy-pudding@^3.2.1, figgy-pudding@^3.4.1:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/figgy-pudding/-/figgy-pudding-3.5.0.tgz#50f18167ffb8d6ff199463f2c25e8875753d79bb"
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/figgy-pudding/-/figgy-pudding-3.5.1.tgz#862470112901c727a0e495a80744bd5baa1d6790"
 
 figures@^1.3.5, figures@^1.7.0:
   version "1.7.0"

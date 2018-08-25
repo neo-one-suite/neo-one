@@ -155,18 +155,18 @@ export class Node implements INode {
   }
   public readonly blockchain: Blockchain;
   // tslint:disable-next-line readonly-keyword
-  private readonly mutableMemPool: { [hash: string]: Transaction };
+  private mutableMemPool: { [hash: string]: Transaction };
   private readonly monitor: Monitor;
   private readonly network: Network<Message, PeerData, PeerHealth>;
   private readonly options$: Observable<Options>;
   private readonly externalPort: number;
   private readonly nonce: number;
   private readonly userAgent: string;
-  private readonly knownBlockHashes: ScalingBloem;
+  private mutableKnownBlockHashes: ScalingBloem;
   private readonly tempKnownBlockHashes: Set<UInt256Hex>;
-  private readonly knownTransactionHashes: ScalingBloem;
+  private mutableKnownTransactionHashes: ScalingBloem;
   private readonly tempKnownTransactionHashes: Set<UInt256Hex>;
-  private readonly knownHeaderHashes: ScalingBloem;
+  private mutableKnownHeaderHashes: ScalingBloem;
   private readonly tempKnownHeaderHashes: Set<UInt256Hex>;
   private mutableGetBlocksRequestsIndex: number | undefined;
   private mutableGetBlocksRequestTime: number | undefined;
@@ -175,7 +175,7 @@ export class Node implements INode {
   private mutableUnhealthyPeerSeconds = UNHEALTHY_PEER_SECONDS;
   private readonly consensusCache: LRU.Cache<string, ConsensusPayload>;
   // tslint:disable-next-line readonly-keyword
-  private readonly mutableBlockIndex: { [endpoint: string]: number };
+  private mutableBlockIndex: { [endpoint: string]: number };
   private mutableConsensus: Consensus | undefined;
   private readonly requestBlocks = _.debounce(() => {
     const peer = this.mutableBestPeer;
@@ -291,14 +291,27 @@ export class Node implements INode {
     this.userAgent = `NEO:neo-one-js:1.0.0-alpha`;
 
     this.mutableMemPool = {};
-    this.knownBlockHashes = createScalingBloomFilter();
+    this.mutableKnownBlockHashes = createScalingBloomFilter();
     this.tempKnownBlockHashes = new Set();
-    this.knownTransactionHashes = createScalingBloomFilter();
+    this.mutableKnownTransactionHashes = createScalingBloomFilter();
     this.tempKnownTransactionHashes = new Set();
-    this.knownHeaderHashes = createScalingBloomFilter();
+    this.mutableKnownHeaderHashes = createScalingBloomFilter();
     this.tempKnownHeaderHashes = new Set();
     this.mutableGetBlocksRequestsCount = 1;
     this.consensusCache = LRU(10000);
+    this.mutableBlockIndex = {};
+  }
+
+  public async reset(): Promise<void> {
+    this.mutableMemPool = {};
+    this.mutableKnownBlockHashes = createScalingBloomFilter();
+    this.tempKnownBlockHashes.clear();
+    this.mutableKnownTransactionHashes = createScalingBloomFilter();
+    this.tempKnownTransactionHashes.clear();
+    this.mutableKnownHeaderHashes = createScalingBloomFilter();
+    this.tempKnownHeaderHashes.clear();
+    this.mutableGetBlocksRequestsCount = 1;
+    this.consensusCache.reset();
     this.mutableBlockIndex = {};
   }
 
@@ -379,13 +392,13 @@ export class Node implements INode {
       return;
     }
 
-    if (!this.knownTransactionHashes.has(transaction.hash)) {
+    if (!this.mutableKnownTransactionHashes.has(transaction.hash)) {
       this.tempKnownTransactionHashes.add(transaction.hashHex);
 
       try {
         const memPool = Object.values(this.mutableMemPool);
         if (memPool.length > MEM_POOL_SIZE / 2 && !forceAdd) {
-          this.knownTransactionHashes.add(transaction.hash);
+          this.mutableKnownTransactionHashes.add(transaction.hash);
 
           return;
         }
@@ -418,7 +431,7 @@ export class Node implements INode {
               await this.trimMemPool(span);
             }
 
-            this.knownTransactionHashes.add(transaction.hash);
+            this.mutableKnownTransactionHashes.add(transaction.hash);
           },
           {
             name: 'neo_relay_transaction',
@@ -840,7 +853,7 @@ export class Node implements INode {
       return;
     }
 
-    if (!this.knownBlockHashes.has(block.hash)) {
+    if (!this.mutableKnownBlockHashes.has(block.hash)) {
       this.tempKnownBlockHashes.add(block.hashHex);
 
       try {
@@ -877,12 +890,12 @@ export class Node implements INode {
           );
         }
 
-        this.knownBlockHashes.add(block.hash);
-        this.knownHeaderHashes.add(block.hash);
+        this.mutableKnownBlockHashes.add(block.hash);
+        this.mutableKnownHeaderHashes.add(block.hash);
         block.transactions.forEach((transaction) => {
           // tslint:disable-next-line no-dynamic-delete
           delete this.mutableMemPool[transaction.hashHex];
-          this.knownTransactionHashes.add(transaction.hash);
+          this.mutableKnownTransactionHashes.add(transaction.hash);
         });
         NEO_PROTOCOL_MEMPOOL_SIZE.set(Object.keys(this.mutableMemPool).length);
       } finally {
@@ -1064,7 +1077,7 @@ export class Node implements INode {
     headersPayload: HeadersPayload,
   ): Promise<void> {
     const headers = headersPayload.headers.filter(
-      (header) => !this.knownHeaderHashes.has(header.hash) && !this.tempKnownHeaderHashes.has(header.hashHex),
+      (header) => !this.mutableKnownHeaderHashes.has(header.hash) && !this.tempKnownHeaderHashes.has(header.hashHex),
     );
 
     if (headers.length > 0) {
@@ -1074,7 +1087,7 @@ export class Node implements INode {
       try {
         await this.blockchain.persistHeaders(headers);
         headers.forEach((header) => {
-          this.knownHeaderHashes.add(header.hash);
+          this.mutableKnownHeaderHashes.add(header.hash);
         });
       } finally {
         headers.forEach((header) => {
@@ -1102,13 +1115,15 @@ export class Node implements INode {
       case InventoryType.Transaction: // Transaction
         hashes = inv.hashes.filter(
           (hash) =>
-            !this.knownTransactionHashes.has(hash) && !this.tempKnownTransactionHashes.has(common.uInt256ToHex(hash)),
+            !this.mutableKnownTransactionHashes.has(hash) &&
+            !this.tempKnownTransactionHashes.has(common.uInt256ToHex(hash)),
         );
 
         break;
       case InventoryType.Block: // Block
         hashes = inv.hashes.filter(
-          (hash) => !this.knownBlockHashes.has(hash) && !this.tempKnownBlockHashes.has(common.uInt256ToHex(hash)),
+          (hash) =>
+            !this.mutableKnownBlockHashes.has(hash) && !this.tempKnownBlockHashes.has(common.uInt256ToHex(hash)),
         );
 
         break;

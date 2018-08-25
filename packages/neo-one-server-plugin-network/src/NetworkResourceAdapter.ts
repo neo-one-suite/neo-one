@@ -448,6 +448,8 @@ export class NetworkResourceAdapter {
                 height,
                 peers: peers === undefined ? peers : peers.length,
                 nodes: currentNodes,
+                live: this.live,
+                ready: this.ready,
               };
             },
           ),
@@ -516,33 +518,46 @@ export class NetworkResourceAdapter {
         },
         {
           title: 'Wait for network to be alive',
-          task: () =>
-            new TaskList({
-              tasks: this.nodes.map((node) => ({
-                title: `Waiting for node ${node.name}`,
-                task: async () => {
-                  const start = utils.nowSeconds();
-                  try {
-                    await node.live(30);
-                  } catch {
-                    await node.stop();
-                    await node.start();
-                    await node.live(30);
-                  }
-
-                  this.resourceType.plugin.monitor.log({
-                    name: 'neo_network_resource_adapter_node_live',
-                    message: `Started in ${utils.nowSeconds() - start} seconds`,
-                  });
-                },
-              })),
-
-              concurrent: true,
-            }),
+          task: async () => {
+            const start = utils.nowSeconds();
+            await this.live();
+            this.resourceType.plugin.monitor.log({
+              name: 'neo_network_resource_adapter_node_live',
+              message: `Started in ${utils.nowSeconds() - start} seconds`,
+            });
+          },
         },
       ],
     });
   }
+
+  public readonly live = async () => {
+    await Promise.all(
+      this.nodes.map(async (node) => {
+        try {
+          await node.live(30);
+        } catch {
+          await node.stop();
+          await node.start();
+          await node.live(30);
+        }
+      }),
+    );
+  };
+
+  public readonly ready = async () => {
+    await Promise.all(
+      this.nodes.map(async (node) => {
+        try {
+          await node.ready(30);
+        } catch {
+          await node.stop();
+          await node.start();
+          await node.ready(30);
+        }
+      }),
+    );
+  };
 
   public stop(_options: NetworkResourceOptions): TaskList {
     return new TaskList({

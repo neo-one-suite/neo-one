@@ -149,7 +149,6 @@ export class Consensus {
   }
 
   private doStart(options: InternalOptions): void {
-    this.mutableQueue = new ConsensusQueue();
     let completed = false;
     const mutableStartPromise = this.start(options).then(() => {
       completed = true;

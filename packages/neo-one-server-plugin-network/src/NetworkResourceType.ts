@@ -28,6 +28,8 @@ export interface Network {
   readonly height: number | undefined;
   readonly peers: number | undefined;
   readonly nodes: ReadonlyArray<Node>;
+  readonly live: () => Promise<void>;
+  readonly ready: () => Promise<void>;
 }
 
 export interface NetworkResourceOptions {

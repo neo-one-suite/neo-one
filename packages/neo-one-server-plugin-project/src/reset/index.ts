@@ -77,6 +77,8 @@ export const reset = (pluginManager: PluginManager, options: ResetTaskListOption
           );
           await developerClient.reset();
           await developerClient.updateSettings({ secondsPerBlock: 15 });
+          await network.live();
+          await network.ready();
           await neotracker.reset();
         },
       },

@@ -181,7 +181,7 @@ export class NEOTrackerResource {
         {
           // @ts-ignore
           windowsHide: true,
-          stdio: 'ignore',
+          stdio: 'pipe',
           localDir: __dirname,
         },
       );
@@ -196,6 +196,20 @@ export class NEOTrackerResource {
           });
         }
       };
+
+      child.stdout.on('data', (value: Buffer) => {
+        this.monitor.log({
+          name: 'neotracker_stdout',
+          message: value.toString('utf8'),
+        });
+      });
+
+      child.stderr.on('data', (value: Buffer) => {
+        this.monitor.log({
+          name: 'neotracker_stderr',
+          message: value.toString('utf8'),
+        });
+      });
 
       // tslint:disable-next-line no-floating-promises
       child

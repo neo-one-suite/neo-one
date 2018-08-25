@@ -85,13 +85,19 @@
     "contributors:add": "all-contributors add",
     "contributors:generate": "all-contributors generate",
     "jest-8": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node --harmony-async-iteration ./node_modules/.bin/jest",
+    "jest-windows-8": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node --harmony-async-iteration ./node_modules/jest/bin/jest.js",
     "jest-9": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node --harmony ./node_modules/.bin/jest",
+    "jest-windows-9": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node --harmony ./node_modules/jest/bin/jest.js",
     "test-8": "yarn run jest-8 --config jest/unit.js",
     "test-ci-8": "yarn run jest-8 --config jest/unit-ci.js --ci -w 1",
+    "test-ci-windows-8": "yarn run jest-windows-8 --config jest/unit-ci.js --ci -w 1",
     "test-9": "yarn run jest-9 --config jest/unit.js",
     "test-ci-9": "yarn run jest-9 --config jest/unit-ci.js --ci -w 1",
+    "test-ci-windows-9": "yarn run jest-windows-9 --config jest/unit-ci.js --ci -w 1",
     "e2e-ci-8": "yarn run jest-8 --config jest/e2e-ci.js --ci -w 1",
-    "e2e-ci-9": "yarn run jest-9 --config jest/e2e-ci.js --ci -w 1"
+    "e2e-ci-windows-8": "yarn run jest-windows-8 --config jest/e2e-ci.js --ci -w 1",
+    "e2e-ci-9": "yarn run jest-9 --config jest/e2e-ci.js --ci -w 1",
+    "e2e-ci-windows-9": "yarn run jest-windows-9 --config jest/e2e-ci.js --ci -w 1"
   },
   "husky": {
     "hooks": {

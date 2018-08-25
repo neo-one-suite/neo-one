@@ -19,4 +19,5 @@ export interface Node {
   readonly connectedPeers: ReadonlyArray<Endpoint>;
   readonly memPool: { readonly [hash: string]: Transaction };
   readonly consensus: Consensus | undefined;
+  readonly reset: () => Promise<void>;
 }

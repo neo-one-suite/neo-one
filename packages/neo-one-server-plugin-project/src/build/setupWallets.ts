@@ -103,5 +103,5 @@ export const setupWallets = async (network: Network, masterPrivateKey: string) =
   const result = await client.transfer(
     WALLETS.reduce<ReadonlyArray<Transfer>>((acc, wallet) => acc.concat(createWalletTransfers(wallet)), []),
   );
-  await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
+  await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
 };

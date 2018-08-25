@@ -20,8 +20,8 @@ for:
       - yarn install --non-interactive
       - yarn run build
     test_script:
-      - yarn run test-ci-8
-      - yarn run e2e-ci-8
+      - yarn run test-ci-windows-8
+      - yarn run e2e-ci-windows-8
     # Don't actually build.
     build: off
   -
@@ -40,8 +40,8 @@ for:
       - yarn install --non-interactive
       - yarn run build
     test_script:
-      - yarn run test-ci-9
-      - yarn run e2e-ci-9
+      - yarn run test-ci-windows-9
+      - yarn run e2e-ci-windows-9
     # Don't actually build.
     build: off
   -
