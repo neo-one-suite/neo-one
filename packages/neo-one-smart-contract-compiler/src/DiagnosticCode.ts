@@ -20,4 +20,6 @@ export enum DiagnosticCode {
   UnknownModule,
   ReferenceError,
   InvalidLinkedSmartContract,
+  InvalidCurrentTime,
+  InvalidSenderAddress,
 }

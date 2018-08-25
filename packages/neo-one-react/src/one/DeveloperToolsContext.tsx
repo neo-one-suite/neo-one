@@ -1,6 +1,6 @@
 import { AddressString, Client, DeveloperClient, OneClient } from '@neo-one/client';
 import { ActionMap } from 'constate';
-import * as localforage from 'localforage';
+import localforage from 'localforage';
 import * as React from 'react';
 import { Container } from 'reakit';
 import { from } from 'rxjs';
@@ -56,13 +56,15 @@ export interface Token {
   readonly decimals: number;
 }
 export interface LocalState {
+  readonly autoConsensus: boolean;
   readonly tokens: ReadonlyArray<Token>;
 }
 export interface LocalStateContextType {
   readonly localState: LocalState;
   readonly onChange: (state: Partial<LocalState>) => void;
 }
-const INITIAL_LOCAL_STATE = {
+const INITIAL_LOCAL_STATE: LocalState = {
+  autoConsensus: true,
   tokens: [],
 };
 
@@ -151,6 +153,23 @@ export function WithResetLocalState({ children }: WithResetLocalStateProps) {
   return (
     <LocalStateContext.Consumer>
       {({ onChange }) => children(() => onChange(INITIAL_LOCAL_STATE))}
+    </LocalStateContext.Consumer>
+  );
+}
+
+interface WithAutoConsensusProps {
+  readonly children: (options: { readonly toggle: () => void; readonly autoConsensus: boolean }) => React.ReactNode;
+}
+
+export function WithAutoConsensus({ children }: WithAutoConsensusProps) {
+  return (
+    <LocalStateContext.Consumer>
+      {({ localState, onChange }) =>
+        children({
+          autoConsensus: localState.autoConsensus,
+          toggle: () => onChange({ autoConsensus: !localState.autoConsensus }),
+        })
+      }
     </LocalStateContext.Consumer>
   );
 }

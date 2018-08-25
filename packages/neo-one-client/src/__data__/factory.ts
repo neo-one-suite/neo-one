@@ -1025,6 +1025,7 @@ export const factory = {
   createIntegerContractParameter,
   createStringContractParameter,
   createStringABIReturn,
+  createIntegerABIParameter,
   createIntegerABIReturn,
   createStringABIParameter,
   createRawTransferNotification,

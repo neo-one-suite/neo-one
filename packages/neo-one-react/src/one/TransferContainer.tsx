@@ -7,7 +7,7 @@ import * as React from 'react';
 import { Container } from 'reakit';
 import { ReactSyntheticEvent } from '../types';
 import { Token, WithNetworkClient } from './DeveloperToolsContext';
-import { WithAddError } from './ErrorsContainer';
+import { WithAddError } from './WithAddError';
 
 interface State {
   readonly text: string;

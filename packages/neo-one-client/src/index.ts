@@ -30,6 +30,8 @@ export { Hash256 } from './Hash256';
 export { UnlockedWallet, Wallet as LocalWallet } from './user';
 export {
   ABI,
+  ABIDefault,
+  ABIDefaultType,
   ABIEvent,
   ABIFunction,
   ABIParameter,
@@ -110,6 +112,7 @@ export {
   ReadSmartContractAny,
   RegisterAssetReceipt,
   RegisterTransaction,
+  SenderAddressABIDefault,
   SignatureContractParameter,
   SmartContract,
   SmartContractAny,

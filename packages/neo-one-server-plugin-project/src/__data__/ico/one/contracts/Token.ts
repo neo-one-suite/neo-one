@@ -3,6 +3,7 @@ import {
   constant,
   Contract,
   createEventNotifier,
+  Deploy,
   Fixed,
   MapStorage,
   SmartContract,
@@ -29,7 +30,7 @@ export class Token implements SmartContract {
   private mutableSupply: Fixed<8> = 0;
   private readonly balances = new MapStorage<Address, Fixed<8>>();
 
-  public constructor(public readonly owner: Address = Address.from('AXNajBTQLxWHwc9sKyXcc4UdbJvp3arYDG')) {
+  public constructor(public readonly owner: Address = Deploy.senderAddress) {
     if (!Address.verifySender(owner)) {
       throw new Error('Sender was not the owner.');
     }

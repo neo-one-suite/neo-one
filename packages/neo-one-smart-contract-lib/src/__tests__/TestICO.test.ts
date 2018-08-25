@@ -18,7 +18,7 @@ describe('TestICO', () => {
           name: 'TestICO',
         },
       ],
-      async ({ client, networkName, developerClient, testIco: smartContract, masterAccountID }) => {
+      async ({ client, networkName, testIco: smartContract, masterAccountID }) => {
         crypto.addPublicKey(common.stringToPrivateKey(MINTER.PRIVATE_KEY), common.stringToECPoint(MINTER.PUBLIC_KEY));
         const [nameResult, decimalsResult, symbolResult, minter, deployResult] = await Promise.all([
           smartContract.name(),
@@ -35,11 +35,7 @@ describe('TestICO', () => {
         expect(decimalsResult.toString()).toEqual('8');
         expect(symbolResult).toEqual('TT');
 
-        const [deployReceipt] = await Promise.all([
-          deployResult.confirmed({ timeoutMS: 2500 }),
-          developerClient.runConsensusNow(),
-        ]);
-
+        const deployReceipt = await deployResult.confirmed({ timeoutMS: 2500 });
         if (deployReceipt.result.state !== 'HALT') {
           throw new Error(deployReceipt.result.message);
         }
@@ -70,7 +66,7 @@ describe('TestICO', () => {
         ]);
         expect(initialTotalSupply.toString()).toEqual('0');
 
-        await Promise.all([transferResult.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
+        await transferResult.confirmed({ timeoutMS: 2500 });
 
         const firstMint = new BigNumber('10');
         const mintResult = await smartContract.mintTokens({
@@ -84,11 +80,7 @@ describe('TestICO', () => {
           ],
         });
 
-        const [mintReceipt] = await Promise.all([
-          mintResult.confirmed({ timeoutMS: 2500 }),
-          developerClient.runConsensusNow(),
-        ]);
-
+        const mintReceipt = await mintResult.confirmed({ timeoutMS: 2500 });
         expect(mintReceipt.result.gasConsumed.toString()).toMatchSnapshot('mint consumed');
         expect(mintReceipt.result.gasCost.toString()).toMatchSnapshot('mint cost');
         expect(mintReceipt.result.value).toEqual(true);

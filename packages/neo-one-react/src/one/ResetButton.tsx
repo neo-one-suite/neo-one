@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { MdRefresh } from 'react-icons/md';
 import { WithNetworkClient } from './DeveloperToolsContext';
-import { WithAddError } from './ErrorsContainer';
 import { ToolbarButton } from './ToolbarButton';
+import { WithAddError } from './WithAddError';
 
 export function ResetButton() {
   return (

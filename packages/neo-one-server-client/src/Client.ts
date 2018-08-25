@@ -1,5 +1,4 @@
 // tslint:disable no-any
-import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { proto } from '@neo-one/server-grpc';
 import {
@@ -10,6 +9,7 @@ import {
   ExecuteTaskListResponse,
   getTasksError,
 } from '@neo-one/server-plugin';
+import * as grpc from 'grpc';
 import { Observable, Observer, Subject } from 'rxjs';
 import { filter, map, publishReplay, refCount, take } from 'rxjs/operators';
 import { ReadError } from './errors';

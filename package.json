@@ -23,7 +23,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=10.9.0"
+    "node": ">=8.9.0"
   },
   "lint-staged": {
     "linters": {
@@ -65,7 +65,7 @@
     "e2e": "yarn run jest --config jest/e2e.js",
     "e2e-ci": "yarn run jest --config jest/e2e-ci.js --ci -w 1",
     "tsc": "tsc && tsc -p packages/neo-one-smart-contract && tsc -p packages/neo-one-smart-contract-lib && tsc -p packages/neo-one-smart-contract-lib/src/__data__/contracts && tsc -p packages/neo-one-smart-contract-compiler/src/__data__/contracts && tsc -p packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts",
-    "ts-node": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" TS_NODE_PROJECT=tsconfig/tsconfig.es2018.cjs.json node -r ts-node/register/transpile-only",
+    "ts-node": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json node -r ts-node/register/transpile-only",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.{ts,tsx}\"",
     "nit:scripts:ts": "prettier --config .prettierrc --list-different \"scripts/**/*.{ts,tsx}\"",
     "nit:scripts:js": "prettier --config .prettierrc --list-different \"scripts/**/*.js\" --parser flow",
@@ -83,7 +83,15 @@
     "verify-storage": "yarn run ts-node ./scripts/verify/storage.ts",
     "create-guards": "yarn run ts-node ./scripts/ts/createGuards.ts",
     "contributors:add": "all-contributors add",
-    "contributors:generate": "all-contributors generate"
+    "contributors:generate": "all-contributors generate",
+    "jest-8": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node --harmony-async-iteration ./node_modules/.bin/jest",
+    "jest-9": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node --harmony ./node_modules/.bin/jest",
+    "test-8": "yarn run jest-8 --config jest/unit.js",
+    "test-ci-8": "yarn run jest-8 --config jest/unit-ci.js --ci -w 1",
+    "test-9": "yarn run jest-9 --config jest/unit.js",
+    "test-ci-9": "yarn run jest-9 --config jest/unit-ci.js --ci -w 1",
+    "e2e-ci-8": "yarn run jest-8 --config jest/e2e-ci.js --ci -w 1",
+    "e2e-ci-9": "yarn run jest-9 --config jest/e2e-ci.js --ci -w 1"
   },
   "husky": {
     "hooks": {
@@ -146,7 +154,7 @@
     "tslint-config-prettier": "1.15.0",
     "tslint-consistent-codestyle": "1.13.3",
     "tslint-immutable": "4.7.0",
-    "tslint-microsoft-contrib": "5.2.0",
+    "tslint-microsoft-contrib": "5.2.1",
     "tslint-sonarts": "1.7.0",
     "typescript": "3.0.1",
     "typescript-styled-plugin": "0.10.0"

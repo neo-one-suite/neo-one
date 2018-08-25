@@ -10,8 +10,8 @@ import { Button } from './Button';
 import { DateTimePicker } from './DateTimePicker';
 import { WithNetworkClient } from './DeveloperToolsContext';
 import { Dialog } from './Dialog';
-import { WithAddError } from './ErrorsContainer';
 import { ToolbarButton } from './ToolbarButton';
+import { WithAddError } from './WithAddError';
 
 const StyledTime = styled('time')`
   min-width: ${({ value }: { readonly value: string }) => Math.max(30, value.length * 8)}px;

@@ -1,5 +1,6 @@
 // tslint:disable member-ordering
 import { ScriptBuilderParam } from '@neo-one/client-core';
+import { Monitor } from '@neo-one/monitor';
 import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -16,8 +17,12 @@ import {
   AssetRegister,
   Block,
   ContractRegister,
+  ContractTransaction,
+  GetOptions,
   Hash256String,
+  InvocationTransaction,
   InvokeTransactionOptions,
+  IssueTransaction,
   NetworkType,
   Param,
   PublishReceipt,
@@ -29,6 +34,7 @@ import {
   SmartContractDefinition,
   SourceMaps,
   TransactionOptions,
+  TransactionReceipt,
   TransactionResult,
   Transfer,
   UserAccount,
@@ -94,13 +100,13 @@ export class Client<
     asset: Hash256String,
     to: AddressString,
     options?: TransactionOptions,
-  ): Promise<TransactionResult>;
+  ): Promise<TransactionResult<TransactionReceipt, ContractTransaction>>;
   public async transfer(transfers: ReadonlyArray<Transfer>, options?: TransactionOptions): Promise<TransactionResult>;
   // tslint:disable-next-line readonly-array no-any
   public async transfer(...argsIn: any[]): Promise<TransactionResult> {
     const { transfers, options } = this.getTransfersOptions(argsIn);
 
-    return this.getProvider(options).transfer(transfers, options);
+    return this.addTransactionHooks(this.getProvider(options).transfer(transfers, options));
   }
 
   public async claim(options?: TransactionOptions): Promise<TransactionResult> {
@@ -110,10 +116,12 @@ export class Client<
   public async publish(
     contract: ContractRegister,
     options?: TransactionOptions,
-  ): Promise<TransactionResult<PublishReceipt>> {
-    return this.getProvider(options).publish(
-      args.assertContractRegister('contract', contract),
-      args.assertTransactionOptions('options', options),
+  ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
+    return this.addTransactionHooks(
+      this.getProvider(options).publish(
+        args.assertContractRegister('contract', contract),
+        args.assertTransactionOptions('options', options),
+      ),
     );
   }
 
@@ -123,23 +131,27 @@ export class Client<
     params: ReadonlyArray<Param> = [],
     options?: TransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
-  ): Promise<TransactionResult<PublishReceipt>> {
-    return this.getProvider(options).publishAndDeploy(
-      args.assertContractRegister('contract', contract),
-      args.assertABI('abi', abi),
-      params,
-      args.assertTransactionOptions('options', options),
-      sourceMaps,
+  ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
+    return this.addTransactionHooks(
+      this.getProvider(options).publishAndDeploy(
+        args.assertContractRegister('contract', contract),
+        args.assertABI('abi', abi),
+        params,
+        args.assertTransactionOptions('options', options),
+        sourceMaps,
+      ),
     );
   }
 
   public async registerAsset(
     asset: AssetRegister,
     options?: TransactionOptions,
-  ): Promise<TransactionResult<RegisterAssetReceipt>> {
-    return this.getProvider(options).registerAsset(
-      args.assertAssetRegister('asset', asset),
-      args.assertTransactionOptions('options', options),
+  ): Promise<TransactionResult<RegisterAssetReceipt, InvocationTransaction>> {
+    return this.addTransactionHooks(
+      this.getProvider(options).registerAsset(
+        args.assertAssetRegister('asset', asset),
+        args.assertTransactionOptions('options', options),
+      ),
     );
   }
 
@@ -148,13 +160,16 @@ export class Client<
     asset: Hash256String,
     to: AddressString,
     options?: TransactionOptions,
-  ): Promise<TransactionResult>;
-  public async issue(transfers: ReadonlyArray<Transfer>, options?: TransactionOptions): Promise<TransactionResult>;
+  ): Promise<TransactionResult<TransactionReceipt, IssueTransaction>>;
+  public async issue(
+    transfers: ReadonlyArray<Transfer>,
+    options?: TransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt, IssueTransaction>>;
   // tslint:disable-next-line readonly-array no-any
-  public async issue(...argsIn: any[]): Promise<TransactionResult> {
+  public async issue(...argsIn: any[]): Promise<TransactionResult<TransactionReceipt, IssueTransaction>> {
     const { transfers, options } = this.getTransfersOptions(argsIn);
 
-    return this.getProvider(options).issue(transfers, options);
+    return this.addTransactionHooks(this.getProvider(options).issue(transfers, options));
   }
 
   public read(network: NetworkType): ReadClient {
@@ -194,21 +209,72 @@ export class Client<
     verify: boolean,
     options?: InvokeTransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
-  ): Promise<TransactionResult<RawInvokeReceipt>> {
-    return this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMaps);
+  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+    return this.addTransactionHooks(
+      this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMaps),
+    );
   }
 
   public async __call(
+    network: NetworkType,
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    options?: TransactionOptions,
+    monitor?: Monitor,
   ): Promise<RawCallReceipt> {
-    return this.getProvider(options).call(contract, method, params, options);
+    return this.getNetworkProvider(network).call(network, contract, method, params, monitor);
   }
 
   public reset(): void {
     this.reset$.next(undefined);
+  }
+
+  private async addTransactionHooks<TTransactionResult extends TransactionResult>(
+    res: Promise<TTransactionResult>,
+  ): Promise<TTransactionResult> {
+    return res
+      .then(async (result) => {
+        try {
+          await this.hooks.afterRelay.promise(result.transaction);
+        } catch {
+          // do nothing
+        }
+
+        // tslint:disable-next-line prefer-object-spread
+        return Object.assign({}, result, {
+          // tslint:disable-next-line no-unnecessary-type-annotation
+          confirmed: async (options?: GetOptions) => {
+            try {
+              await this.hooks.beforeConfirmed.promise(result.transaction);
+            } catch {
+              // do nothing
+            }
+            try {
+              const receipt = await result.confirmed(options);
+              try {
+                await this.hooks.afterConfirmed.promise(result.transaction, receipt);
+              } catch {
+                // do nothing
+              }
+
+              return receipt;
+            } catch (error) {
+              try {
+                await this.hooks.confirmedError.promise(result.transaction, error);
+              } catch {
+                // do nothing
+              }
+
+              throw error;
+            }
+          },
+        });
+      })
+      .catch(async (error) => {
+        await this.hooks.relayError.promise(error);
+
+        throw error;
+      });
   }
 
   private getTransfersOptions(

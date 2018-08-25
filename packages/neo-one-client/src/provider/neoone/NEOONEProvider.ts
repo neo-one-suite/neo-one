@@ -1,3 +1,4 @@
+import { ScriptBuilderParam } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -91,6 +92,16 @@ export class NEOONEProvider {
 
   public async testInvoke(network: NetworkType, transaction: string, monitor?: Monitor): Promise<RawCallReceipt> {
     return this.getProvider(network).testInvoke(transaction, monitor);
+  }
+
+  public async call(
+    network: NetworkType,
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    monitor?: Monitor,
+  ): Promise<RawCallReceipt> {
+    return this.getProvider(network).call(contract, method, params, monitor);
   }
 
   public async getNetworkSettings(network: NetworkType, monitor?: Monitor): Promise<NetworkSettings> {

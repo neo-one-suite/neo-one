@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/monitor",
-  "version": "1.0.0-alpha.55",
+  "version": "1.0.0-alpha.56",
   "description": "NEO•ONE monitoring.",
   "main": "./src/index.ts",
   "browser": "./src/index.browser.ts",
   "dependencies": {
-    "@neo-one/types": "^1.0.0-alpha.42",
-    "@neo-one/utils": "^1.0.0-alpha.60",
+    "@neo-one/types": "^1.0.0-alpha.43",
+    "@neo-one/utils": "^1.0.0-alpha.61",
     "@types/koa": "^2.0.46",
     "@types/koa-mount": "^3.0.1",
     "@types/lodash": "^4.14.116",

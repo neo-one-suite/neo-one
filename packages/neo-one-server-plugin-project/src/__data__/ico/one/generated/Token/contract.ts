@@ -8,7 +8,7 @@ import { TokenReadSmartContract, TokenSmartContract } from './types';
 const definition: SmartContractDefinition = {
   networks: {
     local: {
-      address: 'AeWd2717kC8QtwfoWZSbGwMFBCT6EsQw1V',
+      address: 'AVnZJT5eD2G5CEE9ncoscHU1cTN7b9SX6Z',
     },
   },
   abi: tokenABI,

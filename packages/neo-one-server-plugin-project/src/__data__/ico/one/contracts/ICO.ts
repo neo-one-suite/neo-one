@@ -3,6 +3,7 @@ import {
   Blockchain,
   constant,
   createEventNotifier,
+  Deploy,
   Fixed,
   Hash256,
   Integer,
@@ -26,8 +27,8 @@ export class ICO implements SmartContract {
   private mutableRemaining: Fixed<8> = 10_000_000_000_00000000;
 
   public constructor(
-    public readonly owner: Address = Address.from('AXNajBTQLxWHwc9sKyXcc4UdbJvp3arYDG'),
-    public readonly startTimeSeconds: Integer = 1534108415,
+    public readonly owner: Address = Deploy.senderAddress,
+    public readonly startTimeSeconds: Integer = Blockchain.currentBlockTime,
     public readonly icoDurationSeconds: Integer = 157700000,
   ) {
     if (!Address.verifySender(owner)) {

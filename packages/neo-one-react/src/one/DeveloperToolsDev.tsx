@@ -2,19 +2,11 @@ import { Hash256 } from '@neo-one/client';
 import * as React from 'react';
 import { Provider } from 'reakit';
 import { Props } from '../DeveloperTools';
+import { ClientHook } from './ClientHook';
 import { DeveloperToolsContext, LocalStateProvider } from './DeveloperToolsContext';
+import { Pure } from './Pure';
 import { ThemeProvider } from './ThemeProvider';
 import { Toolbar } from './Toolbar';
-
-class Pure extends React.Component {
-  public shouldComponentUpdate() {
-    return false;
-  }
-
-  public render() {
-    return this.props.children;
-  }
-}
 
 export function DeveloperToolsDev(props: Props) {
   return (
@@ -29,13 +21,14 @@ export function DeveloperToolsDev(props: Props) {
                 loading: false,
                 to: [],
               },
-              errors: {
-                errors: [],
+              toasts: {
+                toasts: [],
               },
             }}
           >
             <Pure>
               <Toolbar />
+              <ClientHook />
             </Pure>
           </Provider>
         </ThemeProvider>

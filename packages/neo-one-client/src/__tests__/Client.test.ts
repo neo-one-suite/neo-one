@@ -17,28 +17,28 @@ describe('Client', () => {
   const deleteAccount = jest.fn();
   const updateAccountName = jest.fn();
   const commonTransactionResult = factory.createTransactionResult();
-  const claim = jest.fn(() => commonTransactionResult);
-  const publish = jest.fn(() => commonTransactionResult);
-  const publishAndDeploy = jest.fn(() => commonTransactionResult);
-  const registerAsset = jest.fn(() => commonTransactionResult);
+  const claim = jest.fn(async () => commonTransactionResult);
+  const publish = jest.fn(async () => commonTransactionResult);
+  const publishAndDeploy = jest.fn(async () => commonTransactionResult);
+  const registerAsset = jest.fn(async () => commonTransactionResult);
   const readClient = {};
   const read = jest.fn(() => readClient);
-  const invoke = jest.fn(() => commonTransactionResult);
+  const invoke = jest.fn(async () => commonTransactionResult);
   const commonRawCallReceipt = factory.createRawCallReceipt();
-  const call = jest.fn(() => commonRawCallReceipt);
-  let transfer: jest.Mock<TransactionResult>;
-  let transfer1: jest.Mock<TransactionResult>;
-  let issue: jest.Mock<TransactionResult>;
-  let issue1: jest.Mock<TransactionResult>;
+  const call = jest.fn(async () => commonRawCallReceipt);
+  let transfer: jest.Mock<Promise<TransactionResult>>;
+  let transfer1: jest.Mock<Promise<TransactionResult>>;
+  let issue: jest.Mock<Promise<TransactionResult>>;
+  let issue1: jest.Mock<Promise<TransactionResult>>;
 
   let provider: UserAccountProvider;
   let provider1: UserAccountProvider;
   let client: Client;
   beforeEach(() => {
-    transfer = jest.fn(() => factory.createTransactionResult());
-    transfer1 = jest.fn(() => factory.createTransactionResult());
-    issue = jest.fn(() => factory.createTransactionResult());
-    issue1 = jest.fn(() => factory.createTransactionResult());
+    transfer = jest.fn(async () => factory.createTransactionResult());
+    transfer1 = jest.fn(async () => factory.createTransactionResult());
+    issue = jest.fn(async () => factory.createTransactionResult());
+    issue1 = jest.fn(async () => factory.createTransactionResult());
 
     provider = {
       type,
@@ -73,13 +73,13 @@ describe('Client', () => {
       deleteAccount: jest.fn(),
       updateAccountName: jest.fn(),
       transfer: transfer1,
-      claim: jest.fn(),
-      publish: jest.fn(),
-      publishAndDeploy: jest.fn(),
-      registerAsset: jest.fn(),
+      claim: jest.fn(async () => Promise.resolve()),
+      publish: jest.fn(async () => Promise.resolve()),
+      publishAndDeploy: jest.fn(async () => Promise.resolve()),
+      registerAsset: jest.fn(async () => Promise.resolve()),
       issue: issue1,
       read: jest.fn(),
-      invoke: jest.fn(),
+      invoke: jest.fn(async () => Promise.resolve()),
       call: jest.fn(),
     };
     client = new Client({ [type]: provider, [type1]: provider1 });
@@ -200,31 +200,31 @@ describe('Client', () => {
 
   test('transfer - simple', async () => {
     const transactionResult = factory.createTransactionResult();
-    transfer.mockImplementation(() => transactionResult);
+    transfer.mockImplementation(async () => transactionResult);
 
     const result = await client.transfer(data.bigNumbers.a, Hash256.NEO, keys[0].address);
 
     expect(transfer.mock.calls).toMatchSnapshot();
-    expect(result).toEqual(transactionResult);
+    expect(result.transaction).toEqual(transactionResult.transaction);
   });
 
   test('transfer - array', async () => {
     const transactionResult = factory.createTransactionResult();
-    transfer1.mockImplementation(() => transactionResult);
+    transfer1.mockImplementation(async () => transactionResult);
 
     const result = await client.transfer([{ amount: data.bigNumbers.a, asset: Hash256.NEO, to: keys[0].address }], {
       from: unlockedWallet1.account.id,
     });
 
     expect(transfer1.mock.calls).toMatchSnapshot();
-    expect(result).toEqual(transactionResult);
+    expect(result.transaction).toEqual(transactionResult.transaction);
   });
 
   test('claim', async () => {
     const result = await client.claim();
 
     expect(transfer.mock.calls).toMatchSnapshot();
-    expect(result).toEqual(commonTransactionResult);
+    expect(result.transaction).toEqual(commonTransactionResult.transaction);
   });
 
   test('publish', async () => {
@@ -232,7 +232,7 @@ describe('Client', () => {
     const result = await client.publish(contract);
 
     expect(publish.mock.calls).toMatchSnapshot();
-    expect(result).toEqual(commonTransactionResult);
+    expect(result.transaction).toEqual(commonTransactionResult.transaction);
   });
 
   test('publishAndDeploy', async () => {
@@ -240,7 +240,7 @@ describe('Client', () => {
     const result = await client.publishAndDeploy(contract, { functions: [factory.createDeployABIFunction()] });
 
     expect(publishAndDeploy.mock.calls).toMatchSnapshot();
-    expect(result).toEqual(commonTransactionResult);
+    expect(result.transaction).toEqual(commonTransactionResult.transaction);
   });
 
   test('registerAsset', async () => {
@@ -248,29 +248,29 @@ describe('Client', () => {
     const result = await client.registerAsset(asset);
 
     expect(registerAsset.mock.calls).toMatchSnapshot();
-    expect(result).toEqual(commonTransactionResult);
+    expect(result.transaction).toEqual(commonTransactionResult.transaction);
   });
 
   test('issue - simple', async () => {
     const transactionResult = factory.createTransactionResult();
-    issue.mockImplementation(() => transactionResult);
+    issue.mockImplementation(async () => transactionResult);
 
     const result = await client.issue(data.bigNumbers.a, Hash256.NEO, keys[0].address);
 
     expect(issue.mock.calls).toMatchSnapshot();
-    expect(result).toEqual(transactionResult);
+    expect(result.transaction).toEqual(transactionResult.transaction);
   });
 
   test('issue - array', async () => {
     const transactionResult = factory.createTransactionResult();
-    issue1.mockImplementation(() => transactionResult);
+    issue1.mockImplementation(async () => transactionResult);
 
     const result = await client.issue([{ amount: data.bigNumbers.a, asset: Hash256.NEO, to: keys[0].address }], {
       from: unlockedWallet1.account.id,
     });
 
     expect(issue1.mock.calls).toMatchSnapshot();
-    expect(result).toEqual(transactionResult);
+    expect(result.transaction).toEqual(transactionResult.transaction);
   });
 
   test('read', () => {
@@ -296,11 +296,11 @@ describe('Client', () => {
     const result = await client.__invoke(keys[0].address, 'deploy', [], [], true);
 
     expect(invoke.mock.calls).toMatchSnapshot();
-    expect(result).toEqual(commonTransactionResult);
+    expect(result.transaction).toEqual(commonTransactionResult.transaction);
   });
 
   test('__call', async () => {
-    const result = await client.__call(keys[0].address, 'deploy', []);
+    const result = await client.__call(unlockedWallet.account.id.network, keys[0].address, 'deploy', []);
 
     expect(call.mock.calls).toMatchSnapshot();
     expect(result).toEqual(commonRawCallReceipt);

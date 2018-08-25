@@ -8,8 +8,8 @@ import { FromStream } from '../FromStream';
 import { ComponentProps } from '../types';
 import { Button } from './Button';
 import { DeveloperToolsContext, WithTokens } from './DeveloperToolsContext';
-import { WithAddError } from './ErrorsContainer';
 import { getOptions$, makeValueOption, OptionType, WalletSelectorBase } from './WalletSelectorBase';
+import { WithAddError } from './WithAddError';
 
 const NewWalletButton = styled(Button)`
   margin-left: 8px;

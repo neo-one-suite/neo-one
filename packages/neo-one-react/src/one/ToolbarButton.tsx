@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { ToolbarTooltip, ToolbarTooltipArrow } from './ToolbarTooltip';
+import { Tooltip, TooltipArrow } from './Tooltip';
 
 const StyledButton = styled(Button)`
   background-color: ${prop('theme.gray0')};
@@ -28,10 +28,10 @@ export function ToolbarButton({ children, help, delay, ...props }: Props) {
   return (
     <StyledButton {...props}>
       {children}
-      <ToolbarTooltip placement="top" delay={delay}>
-        <ToolbarTooltipArrow />
+      <Tooltip placement="top" delay={delay}>
+        <TooltipArrow />
         {help}
-      </ToolbarTooltip>
+      </Tooltip>
     </StyledButton>
   );
 }

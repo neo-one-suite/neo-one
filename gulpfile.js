@@ -112,7 +112,7 @@ const globs = {
   types: ['packages/neo-one-types/**/*', '!packages/neo-one-types/package.json'],
   bin: ['packages/*/src/bin/*.ts'],
   pkg: ['packages/*/package.json'],
-  pkgFiles: ['packages/*/tsconfig.json'],
+  pkgFiles: ['packages/*/tsconfig.json', 'packages/*/static/**/*'],
   files: ['lerna.json', 'yarn.lock', 'tsconfig.json'],
   metadata: ['LICENSE', 'README.md', 'CHANGELOG.md'],
 };
@@ -191,6 +191,7 @@ const transformBasePackageJSON = (format, orig, file) => {
     publishConfig: {
       access: 'public',
     },
+    engines: pkgs.engines,
   };
 };
 
@@ -351,7 +352,7 @@ const buildAll = ((cache) =>
 
 const install = ((cache) =>
   memoizeTask(cache, async function install(format) {
-    await execa.shell('yarn install --non-interactive --no-progress --frozen-lockfile', {
+    await execa.shell('yarn install --non-interactive --no-progress', {
       cwd: getDistBaseCWD(format),
       stdio: ['ignore', 'inherit', 'inherit'],
     });
@@ -415,10 +416,34 @@ gulp.task('compileBin', () =>
     .pipe(gulp.dest(getDest(MAIN_FORMAT))),
 );
 const bin = (name) => `#!/usr/bin/env node
-const crossEnv = require('cross-env');
+const execa = require('execa');
 const path = require('path');
+const semver = require('semver');
 
-crossEnv(['NODE_NO_WARNINGS=1', path.resolve(__dirname, '${name}')].concat(process.argv.slice(2)));
+let args = [];
+if (semver.satisfies(process.version, '8.x')) {
+  args = ['--harmony-async-iteration'];
+} else if (semver.satisfies(process.version, '9.x')) {
+  args = ['--harmony'];
+}
+
+const proc = execa('node', args.concat([path.resolve(__dirname, '${name}')]).concat(process.argv.slice(2)), {
+  stdio: 'inherit',
+  env: {
+    NODE_NO_WARNINGS: '1',
+  },
+});
+process.on('SIGTERM', () => proc.kill('SIGTERM'));
+process.on('SIGINT', () => proc.kill('SIGINT'));
+process.on('SIGBREAK', () => proc.kill('SIGBREAK'));
+process.on('SIGHUP', () => proc.kill('SIGHUP'));
+proc.on('exit', (code, signal) => {
+  let exitCode = code;
+  if (exitCode === null) {
+    exitCode = signal === 'SIGINT' ? 0 : 1;
+  }
+  process.exit(exitCode);
+});
 `;
 gulp.task('createBin', () =>
   gulp

@@ -2,8 +2,8 @@ import * as React from 'react';
 import { combineLatest } from 'rxjs';
 import { FromStream } from '../FromStream';
 import { DeveloperToolsContext } from './DeveloperToolsContext';
-import { WithAddError } from './ErrorsContainer';
 import { ToolbarSelector } from './ToolbarSelector';
+import { WithAddError } from './WithAddError';
 
 export function NetworkSelector() {
   return (

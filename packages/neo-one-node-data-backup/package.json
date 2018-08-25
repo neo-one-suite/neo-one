@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/node-data-backup",
-  "version": "1.0.0-alpha.69",
+  "version": "1.0.0-alpha.70",
   "description": "NEO•ONE node data path backup and restore.",
   "main": "./src/index.ts",
   "dependencies": {
     "@google-cloud/storage": "^1.7.0",
-    "@neo-one/monitor": "^1.0.0-alpha.55",
-    "@neo-one/types": "^1.0.0-alpha.42",
-    "@neo-one/utils": "^1.0.0-alpha.60",
+    "@neo-one/monitor": "^1.0.0-alpha.56",
+    "@neo-one/types": "^1.0.0-alpha.43",
+    "@neo-one/utils": "^1.0.0-alpha.61",
     "@types/fs-extra": "^5.0.4",
     "@types/google-cloud__storage": "^1.7.1",
     "@types/tar": "^4.0.0",

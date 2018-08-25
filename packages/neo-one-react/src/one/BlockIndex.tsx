@@ -5,8 +5,8 @@ import { of } from 'rxjs';
 import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { FromStream } from '../FromStream';
 import { WithNetworkClient } from './DeveloperToolsContext';
-import { WithAddError } from './ErrorsContainer';
 import { ToolbarButton } from './ToolbarButton';
+import { WithAddError } from './WithAddError';
 
 const IndexWrapper = styled(Base)`
   width: ${({ index }: { readonly index: number }) => index.toString().length * 10}px;

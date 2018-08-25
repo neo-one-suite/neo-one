@@ -1,19 +1,31 @@
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { distinctUntilChanged, filter, map, switchMap, take } from 'rxjs/operators';
+import { AsyncParallelHook } from 'tapable';
 import * as args from './args';
 import { UnknownAccountError, UnknownNetworkError } from './errors';
 import * as networksConstant from './networks';
 import {
   InvokeTransactionOptions,
   NetworkType,
+  Transaction,
   TransactionOptions,
+  TransactionReceipt,
   UpdateAccountNameOptions,
   UserAccount,
   UserAccountID,
   UserAccountProvider,
 } from './types';
 
+export interface ClientHooks {
+  readonly relayError: AsyncParallelHook<Error>;
+  readonly afterRelay: AsyncParallelHook<Transaction>;
+  readonly beforeConfirmed: AsyncParallelHook<Transaction>;
+  readonly confirmedError: AsyncParallelHook<Transaction, Error>;
+  readonly afterConfirmed: AsyncParallelHook<Transaction, TransactionReceipt>;
+}
+
 export class ClientBase<TUserAccountProviders extends { readonly [K in string]: UserAccountProvider }> {
+  public readonly hooks: ClientHooks;
   public readonly currentAccount$: Observable<UserAccount | undefined>;
   public readonly accounts$: Observable<ReadonlyArray<UserAccount>>;
   public readonly currentNetwork$: Observable<NetworkType>;
@@ -23,6 +35,13 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
   private readonly currentNetworkInternal$: BehaviorSubject<NetworkType>;
 
   public constructor(providersIn: TUserAccountProviders) {
+    this.hooks = {
+      relayError: new AsyncParallelHook(['error']),
+      afterRelay: new AsyncParallelHook(['transaction']),
+      beforeConfirmed: new AsyncParallelHook(['transaction']),
+      confirmedError: new AsyncParallelHook(['transaction', 'error']),
+      afterConfirmed: new AsyncParallelHook(['transaction', 'receipt']),
+    };
     const providersArray = Object.values(providersIn);
     const providerIn =
       providersArray.find((provider) => provider.getCurrentAccount() !== undefined) ||

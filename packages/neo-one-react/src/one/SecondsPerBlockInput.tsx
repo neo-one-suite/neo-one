@@ -8,9 +8,9 @@ import { prop } from 'styled-tools';
 import { FromStream } from '../FromStream';
 import { ComponentProps, ReactSyntheticEvent } from '../types';
 import { WithNetworkClient } from './DeveloperToolsContext';
-import { WithAddError } from './ErrorsContainer';
 import { TextInput } from './TextInput';
-import { ToolbarTooltip, ToolbarTooltipArrow } from './ToolbarTooltip';
+import { Tooltip, TooltipArrow } from './Tooltip';
+import { WithAddError } from './WithAddError';
 
 interface State {
   readonly secondsPerBlockText: string | undefined;
@@ -146,10 +146,10 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
                           onChange={onChange}
                           {...props}
                         />
-                        <ToolbarTooltip placement="top">
-                          <ToolbarTooltipArrow />
+                        <Tooltip placement="top">
+                          <TooltipArrow />
                           Seconds Per Block
-                        </ToolbarTooltip>
+                        </Tooltip>
                       </div>
                     )}
                   </FromStream>

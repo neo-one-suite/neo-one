@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/ts-utils",
-  "version": "1.0.0-alpha.42",
+  "version": "1.0.0-alpha.43",
   "description": "NEO•ONE TypeScript utils.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/types": "^1.0.0-alpha.42",
+    "@neo-one/types": "^1.0.0-alpha.43",
     "@types/commondir": "^1.0.0",
     "@types/lodash": "^4.14.116",
     "commondir": "^1.0.1",
