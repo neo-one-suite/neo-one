@@ -21,10 +21,12 @@ export class DeveloperClient {
 
   public async fastForwardOffset(seconds: number): Promise<void> {
     await this.developerProvider.fastForwardOffset(seconds);
+    await this.developerProvider.runConsensusNow();
   }
 
   public async fastForwardToTime(seconds: number): Promise<void> {
     await this.developerProvider.fastForwardToTime(seconds);
+    await this.developerProvider.runConsensusNow();
   }
 
   public async reset(): Promise<void> {

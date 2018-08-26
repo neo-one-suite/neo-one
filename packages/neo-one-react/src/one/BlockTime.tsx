@@ -156,9 +156,6 @@ export function BlockTime() {
                                     overlay.hide();
                                     developerClient
                                       .fastForwardToTime(Math.round(date.valueOf() / 1000))
-                                      .then(async () => {
-                                        await developerClient.runConsensusNow();
-                                      })
                                       .catch(addError);
                                   }
                                 }}
