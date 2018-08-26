@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/client",
-  "version": "1.0.0-alpha.95",
+  "version": "1.0.0-alpha.96",
   "description": "NEO•ONE client APIs for interacting with the NEO blockchain.",
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/client-core": "^1.0.0-alpha.74",
-    "@neo-one/client-switch": "^1.0.0-alpha.87",
+    "@neo-one/client-switch": "^1.0.0-alpha.88",
     "@neo-one/monitor": "^1.0.0-alpha.58",
     "@neo-one/node-neo-settings": "^1.0.0-alpha.74",
     "@neo-one/server-http-client": "^1.0.0-alpha.73",

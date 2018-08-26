@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/smart-contract-compiler",
-  "version": "1.0.0-alpha.52",
+  "version": "1.0.0-alpha.53",
   "description": "NEO•ONE TypeScript smart contract compiler.",
   "main": "./src/index.ts",
   "dependencies": {
     "@babel/code-frame": "^7.0.0-rc.3",
-    "@neo-one/client": "^1.0.0-alpha.95",
+    "@neo-one/client": "^1.0.0-alpha.96",
     "@neo-one/client-core": "^1.0.0-alpha.74",
     "@neo-one/smart-contract": "^1.0.0-alpha.24",
     "@neo-one/ts-utils": "^1.0.0-alpha.44",
@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@neo-one/client-core": "^1.0.0-alpha.74",
-    "@neo-one/client-switch": "^1.0.0-alpha.87",
+    "@neo-one/client-switch": "^1.0.0-alpha.88",
     "@neo-one/monitor": "^1.0.0-alpha.58",
     "@neo-one/node-blockchain": "^1.0.0-alpha.81",
     "@neo-one/node-neo-settings": "^1.0.0-alpha.74",
