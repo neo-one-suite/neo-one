@@ -8,6 +8,7 @@ import { Server } from '../Server';
 const RPC_METHODS: { readonly [key: string]: string } = {
   executeTaskList: 'executeTaskList',
   request: 'request',
+  ready: 'ready',
   UNKNOWN: 'UNKNOWN',
   INVALID: 'INVALID',
 };
@@ -93,6 +94,9 @@ export const rpc = ({ server }: { readonly server: Server }) => {
               .request(server.pluginManager, JSON.stringify(request.options));
             result = { type: 'ok', response };
             break;
+          case 'ready':
+            result = { type: 'ok' };
+            break;
           default:
             throw new Error('Method not found');
         }
@@ -153,6 +157,7 @@ export const rpc = ({ server }: { readonly server: Server }) => {
         const monitor = getMonitor(ctx);
         const result = await handleRequestSafe(monitor.withLabels({ [monitor.labels.RPC_TYPE]: 'http' }), fields);
 
+        ctx.status = 200;
         ctx.body = result;
       },
     ]),

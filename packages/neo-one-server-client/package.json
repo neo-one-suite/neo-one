@@ -6,6 +6,7 @@
   "dependencies": {
     "@grpc/proto-loader": "^0.3.0",
     "@neo-one/server-grpc": "^1.0.0-alpha.28",
+    "@neo-one/server-http-client": "^1.0.0-alpha.73",
     "@neo-one/server-plugin": "^1.0.0-alpha.72",
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.63",

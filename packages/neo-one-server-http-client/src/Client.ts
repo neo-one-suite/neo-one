@@ -19,6 +19,10 @@ export class Client {
     this.port = port;
   }
 
+  public async ready(): Promise<RPCResult> {
+    return this.requestInternal({ method: 'ready' });
+  }
+
   public async request({ plugin, options }: { readonly plugin: string; readonly options: object }): Promise<RPCResult> {
     return this.requestInternal({
       method: 'request',

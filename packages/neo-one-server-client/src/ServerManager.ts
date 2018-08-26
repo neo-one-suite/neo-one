@@ -1,3 +1,4 @@
+import { Client as HTTPClient } from '@neo-one/server-http-client';
 import { Binary, killProcess } from '@neo-one/server-plugin';
 import { utils } from '@neo-one/utils';
 import execa from 'execa';
@@ -40,13 +41,13 @@ const waitRunning = async ({ pid }: { readonly pid: number }) => {
 };
 
 const waitReachable = async ({ port }: { readonly port: number }) => {
-  const client = new Client({ port });
+  const client = new HTTPClient(port);
   const startTime = utils.nowSeconds();
   let lastError;
   // tslint:disable-next-line no-loop-statement
   while (utils.nowSeconds() - startTime <= 30) {
     try {
-      await client.wait();
+      await client.ready();
 
       return;
     } catch (error) {
@@ -131,10 +132,12 @@ export class ServerManager {
 
   public async start({
     port,
+    httpPort,
     binary,
     onStart,
   }: {
     readonly port: number;
+    readonly httpPort: number;
     readonly binary: Binary;
     readonly onStart?: () => void;
   }): Promise<{ readonly pid: number; readonly started: boolean }> {
@@ -158,7 +161,7 @@ export class ServerManager {
     child.unref();
 
     await waitRunning({ pid: child.pid });
-    await waitReachable({ port });
+    await waitReachable({ port: httpPort });
 
     return { pid: child.pid, started: true };
   }

@@ -241,14 +241,17 @@ export class InteractiveCLI {
         map((conf) => conf.paths.data),
         distinctUntilChanged(),
       ),
-
       serverConfig.config$.pipe(
         map((conf) => conf.server.port),
         distinctUntilChanged(),
       ),
+      serverConfig.config$.pipe(
+        map((conf) => conf.httpServer.port),
+        distinctUntilChanged(),
+      ),
     ).pipe(
       mergeScan(
-        (managerIn, [dataPath, port]) =>
+        (managerIn, [dataPath, port, httpPort]) =>
           defer(async () => {
             let manager = managerIn as ServerManager | undefined;
             const first = manager === undefined;
@@ -262,6 +265,7 @@ export class InteractiveCLI {
             try {
               const { pid } = await manager.start({
                 port,
+                httpPort,
                 binary: createBinary(argv, this.serverConfig),
                 onStart: () => {
                   if (first) {
