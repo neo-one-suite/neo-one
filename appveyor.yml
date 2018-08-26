@@ -17,11 +17,13 @@ for:
       - ps: Update-NodeJsInstallation 8.9.0 x64
       - node --version
       - yarn --version
+      - git clone git@github.com:neo-one-suite/neo-one-playground.git packages/neo-one-playground
       - yarn install --non-interactive
       - yarn run build
     test_script:
       - yarn run test-ci-windows-8
       - yarn run e2e-ci-windows-8
+      - yarn run test:playground
     # Don't actually build.
     build: off
   -
@@ -37,11 +39,13 @@ for:
       - ps: Update-NodeJsInstallation 9.11.2 x64
       - node --version
       - yarn --version
+      - git clone git@github.com:neo-one-suite/neo-one-playground.git packages/neo-one-playground
       - yarn install --non-interactive
       - yarn run build
     test_script:
       - yarn run test-ci-windows-9
       - yarn run e2e-ci-windows-9
+      - yarn run test:playground
     # Don't actually build.
     build: off
   -
@@ -57,10 +61,12 @@ for:
       - ps: Update-NodeJsInstallation 10.9.0 x64
       - node --version
       - yarn --version
+      - git clone git@github.com:neo-one-suite/neo-one-playground.git packages/neo-one-playground
       - yarn install --non-interactive
       - yarn run build
     test_script:
       - yarn run test-ci
       - yarn run e2e-ci
+      - yarn run test:playground
     # Don't actually build.
     build: off
