@@ -26,10 +26,10 @@ export function TransferTo(props: ComponentProps<typeof StyledLabel>) {
     <WithAddError>
       {(addError) => (
         <WithTokens>
-          {(tokens) => (
+          {(tokens$) => (
             <DeveloperToolsContext.Consumer>
               {({ client }) => {
-                const props$ = getOptions$(addError, client, tokens);
+                const props$ = getOptions$(addError, client, tokens$);
 
                 return (
                   <Wrapper>

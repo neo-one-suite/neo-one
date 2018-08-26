@@ -1,9 +1,10 @@
 import { DeveloperClient, PrivateNetworkSettings } from '@neo-one/client';
+import { mergeScanLatest } from '@neo-one/utils';
 import { EffectMap } from 'constate';
 import * as React from 'react';
 import { Container, styled } from 'reakit';
-import { BehaviorSubject, combineLatest, concat, of, of as _of } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, concat, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { prop } from 'styled-tools';
 import { FromStream } from '../FromStream';
 import { ComponentProps, ReactSyntheticEvent } from '../types';
@@ -35,7 +36,12 @@ const INITIAL_STATE: State = {
   editing: false,
 };
 
-const DEFAULT = { editable: false, secondsPerBlock: 15 };
+interface SecondsPerBlock {
+  readonly editable: boolean;
+  readonly secondsPerBlock: number;
+  readonly prevSecondsPerBlock?: number;
+}
+const DEFAULT: SecondsPerBlock = { editable: false, secondsPerBlock: 15 };
 
 export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextInput>>) {
   const refresh$ = new BehaviorSubject<PrivateNetworkSettings | undefined>(undefined);
@@ -109,20 +115,25 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
         <WithNetworkClient>
           {({ client, developerClient }) => {
             const props$ = concat(
-              _of(DEFAULT),
+              of(DEFAULT),
               combineLatest(refresh$, client.block$).pipe(
-                switchMap(async ([settingsIn]) => {
+                // tslint:disable-next-line no-unnecessary-type-annotation
+                mergeScanLatest(async (prev: SecondsPerBlock | undefined, [settingsIn]) => {
+                  let prevSecondsPerBlock: number | undefined;
+                  if (prev !== undefined) {
+                    prevSecondsPerBlock = prev.secondsPerBlock;
+                  }
                   if (developerClient === undefined) {
                     return DEFAULT;
                   }
 
                   if (settingsIn !== undefined) {
-                    return { editable: true, secondsPerBlock: settingsIn.secondsPerBlock };
+                    return { editable: true, secondsPerBlock: settingsIn.secondsPerBlock, prevSecondsPerBlock };
                   }
 
                   const settings = await developerClient.getSettings();
 
-                  return { editable: true, secondsPerBlock: settings.secondsPerBlock };
+                  return { editable: true, secondsPerBlock: settings.secondsPerBlock, prevSecondsPerBlock };
                 }),
                 catchError((error) => {
                   addError(error);
@@ -136,12 +147,16 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
               <Container initialState={INITIAL_STATE} effects={makeEffects(addError, developerClient)}>
                 {({ secondsPerBlockText, editing, onChange }) => (
                   <FromStream props$={props$}>
-                    {({ editable, secondsPerBlock }) => (
+                    {({ editable, secondsPerBlock, prevSecondsPerBlock }) => (
                       <div>
                         <StyledTextInput
                           disabled={!editable || developerClient === undefined}
                           value={
-                            secondsPerBlockText === undefined || !editing ? `${secondsPerBlock}` : secondsPerBlockText
+                            secondsPerBlockText === undefined ||
+                            !editing ||
+                            (prevSecondsPerBlock !== undefined && secondsPerBlock !== prevSecondsPerBlock)
+                              ? `${secondsPerBlock}`
+                              : secondsPerBlockText
                           }
                           onChange={onChange}
                           {...props}

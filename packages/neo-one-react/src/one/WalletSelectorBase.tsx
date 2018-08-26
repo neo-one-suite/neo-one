@@ -6,8 +6,8 @@ import Select from 'react-select';
 // tslint:disable-next-line no-submodule-imports
 import { FormatOptionLabelMeta } from 'react-select/lib/Select';
 import { Grid, styled } from 'reakit';
-import { combineLatest, of, ReplaySubject } from 'rxjs';
-import { catchError, distinctUntilChanged, multicast, refCount, switchMap } from 'rxjs/operators';
+import { combineLatest, concat, Observable, of, ReplaySubject } from 'rxjs';
+import { catchError, distinctUntilChanged, map, multicast, refCount, switchMap, take } from 'rxjs/operators';
 import { ComponentProps } from '../types';
 import { Token } from './DeveloperToolsContext';
 import { Selector } from './Selector';
@@ -97,29 +97,39 @@ export const makeValueOption = ({ userAccount }: { readonly userAccount: UserAcc
 
 export type OptionType = PromiseReturnType<typeof makeOption> | ReturnType<typeof makeValueOption>;
 
-export const getOptions$ = (addError: (error: Error) => void, client: Client, tokens: ReadonlyArray<Token>) =>
-  combineLatest(client.accounts$.pipe(distinctUntilChanged()), client.block$).pipe(
-    switchMap(async ([userAccounts]) =>
-      Promise.all(
-        userAccounts.map(async (userAccount) => {
-          const account = await client.read(userAccount.id.network).getAccount(userAccount.id.address);
-
-          return makeOption({
-            client,
-            tokens,
-            userAccount,
-            account,
-          });
-        }),
-      ),
+export const getOptions$ = (
+  addError: (error: Error) => void,
+  client: Client,
+  tokens$: Observable<ReadonlyArray<Token>>,
+) =>
+  concat(
+    client.accounts$.pipe(
+      take(1),
+      map((userAccounts) => userAccounts.map((userAccount) => makeValueOption({ userAccount }))),
     ),
-    multicast(() => new ReplaySubject(1)),
-    refCount(),
-    catchError((error: Error) => {
-      addError(error);
+    combineLatest(client.accounts$.pipe(distinctUntilChanged()), tokens$, client.block$).pipe(
+      switchMap(async ([userAccounts, tokens]) =>
+        Promise.all(
+          userAccounts.map(async (userAccount) => {
+            const account = await client.read(userAccount.id.network).getAccount(userAccount.id.address);
 
-      return of([]);
-    }),
+            return makeOption({
+              client,
+              tokens,
+              userAccount,
+              account,
+            });
+          }),
+        ),
+      ),
+      multicast(() => new ReplaySubject(1)),
+      refCount(),
+      catchError((error: Error) => {
+        addError(error);
+
+        return of([]);
+      }),
+    ),
   );
 
 const AddressGrid = styled(Grid)`

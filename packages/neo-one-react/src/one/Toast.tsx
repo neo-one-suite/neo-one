@@ -10,7 +10,7 @@ type HiddenProps = any;
 const StyledBox = styled(Box)`
   background-color: ${prop('theme.gray0')};
   margin-top: 8px;
-  width: 320px;
+  width: 400px;
 `;
 
 const ToastWrapper = styled(Base)`
@@ -46,10 +46,10 @@ export function Toast({ toast, removeToast }: Props) {
         };
         if (!hidden.visible && !once) {
           once = true;
-          autoHideTimer = setTimeout(() => {
+          setTimeout(() => {
             hidden.show();
             if (toast.autoHide !== undefined) {
-              setTimeout(() => {
+              autoHideTimer = setTimeout(() => {
                 hide();
               }, toast.autoHide);
             }

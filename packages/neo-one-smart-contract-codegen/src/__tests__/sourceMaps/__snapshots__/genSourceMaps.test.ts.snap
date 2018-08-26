@@ -2,7 +2,8 @@
 
 exports[`genSourceMaps Token 1`] = `
 Object {
-  "js": "import { OneClient } from '@neo-one/client';
+  "js": "/* @source-map-hash 6654c734ccab8f440ff0825eb443dc7f */
+import { OneClient } from '@neo-one/client';
 import { projectID } from './projectID';
 
 let sourceMapsIn = Promise.resolve({});
@@ -21,7 +22,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 export const sourceMaps = sourceMapsIn;
 ",
-  "ts": "import { OneClient, SourceMaps } from '@neo-one/client';
+  "ts": "/* @source-map-hash 6654c734ccab8f440ff0825eb443dc7f */
+import { OneClient, SourceMaps } from '@neo-one/client';
 import { projectID } from './projectID';
 
 let sourceMapsIn: Promise<SourceMaps> = Promise.resolve({});

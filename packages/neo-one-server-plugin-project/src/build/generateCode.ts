@@ -1,10 +1,11 @@
 import { ABI, SmartContractNetworksDefinition } from '@neo-one/client';
 import { genFiles } from '@neo-one/smart-contract-codegen';
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import { RawSourceMap } from 'source-map';
 import { ProjectConfig } from '../types';
 import { getCommonPaths, getContractPaths, getTSPath } from '../utils';
+import { writeFile } from './writeFile';
 
 export const generateCode = async (
   project: ProjectConfig,
@@ -32,12 +33,12 @@ export const generateCode = async (
 
   await fs.ensureDir(base);
   if (project.codegen.javascript) {
-    await Promise.all([fs.writeFile(abiPath, abi.js), fs.writeFile(createContractPath, contract.js)]);
+    await Promise.all([writeFile(abiPath, abi.js), writeFile(createContractPath, contract.js)]);
   } else {
     await Promise.all([
-      fs.writeFile(getTSPath(abiPath), abi.ts),
-      fs.writeFile(getTSPath(createContractPath), contract.ts),
-      fs.writeFile(getTSPath(typesPath), types.ts),
+      writeFile(getTSPath(abiPath), abi.ts),
+      writeFile(getTSPath(createContractPath), contract.ts),
+      writeFile(getTSPath(typesPath), types.ts),
     ]);
   }
 };

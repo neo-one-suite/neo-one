@@ -25,7 +25,7 @@ export function WalletSelector(props: ComponentProps<Select<OptionType>>) {
     <WithAddError>
       {(addError) => (
         <WithTokens>
-          {(tokens) => (
+          {(tokens$) => (
             <DeveloperToolsContext.Consumer>
               {({ client }) => (
                 <FromStream
@@ -34,7 +34,7 @@ export function WalletSelector(props: ComponentProps<Select<OptionType>>) {
                       distinctUntilChanged(),
                       map((value) => (value === undefined ? value : makeValueOption({ userAccount: value }))),
                     ),
-                    getOptions$(addError, client, tokens),
+                    getOptions$(addError, client, tokens$),
                   )}
                 >
                   {([value, options]) => {

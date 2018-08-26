@@ -27,7 +27,7 @@ export function BlockIndex() {
 
             return (
               <ToolbarButton help="Run Consensus" onClick={onClick}>
-                <FromStream<number>
+                <FromStream
                   props$={client.block$.pipe(
                     map(({ block }) => block.index),
                     distinctUntilChanged(),

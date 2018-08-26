@@ -39,7 +39,7 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
       return stackItem
         .asArray()[1]
         .asBigInteger()
-        .toNumber();
+        .toString(10);
     case 6:
       return _.fromPairs(
         utils.zip(

@@ -1,3 +1,4 @@
+/* @hash 747902d18c1c5f7c8db6362f4af8165c */
 // tslint:disable
 /* eslint-disable */
 import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';

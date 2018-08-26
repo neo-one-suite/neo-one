@@ -3,7 +3,7 @@ import { Base, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { WithAddToast } from './ToastsContainer';
 
-type AddError = (error: Error) => void;
+export type AddError = (error: Error) => void;
 
 const ErrorText = styled(Base)`
   color: ${prop('theme.error')};
@@ -16,13 +16,17 @@ interface WithAddErrorProps {
 // tslint:disable-next-line no-let
 let mutableID = 0;
 
+const StyledPre = styled.pre`
+  white-space: pre-wrap;
+`;
+
 export function WithAddError({ children }: WithAddErrorProps) {
   return (
     <WithAddToast>
       {(addToast) =>
         children((error) => {
           // tslint:disable-next-line no-console
-          console.error(error);
+          console.error(error.stack === undefined ? error : error.stack);
           addToast({
             id: `error:${mutableID}`,
             title: (
@@ -31,7 +35,7 @@ export function WithAddError({ children }: WithAddErrorProps) {
                 <span>See console for more info.</span>
               </span>
             ),
-            message: error.message,
+            message: <StyledPre>{error.message}</StyledPre>,
           });
           mutableID += 1;
         })

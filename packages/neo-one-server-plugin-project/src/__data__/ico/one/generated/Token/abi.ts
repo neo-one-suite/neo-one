@@ -1,3 +1,4 @@
+/* @hash a040edcd79045266d8da1b3091c34bb9 */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';

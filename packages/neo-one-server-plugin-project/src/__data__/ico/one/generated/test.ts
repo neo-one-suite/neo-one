@@ -1,3 +1,4 @@
+/* @hash a8a7001e0532d7acbf3a0666fbf80799 */
 // tslint:disable
 /* eslint-disable */
 import { TestOptions, withContracts as withContractsBase, WithContractsOptions } from '@neo-one/smart-contract-test';

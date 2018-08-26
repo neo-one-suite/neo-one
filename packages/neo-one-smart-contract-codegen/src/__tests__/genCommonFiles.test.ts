@@ -29,6 +29,7 @@ describe('genCommonFiles', () => {
         ],
         httpServerPort: 40100,
         sourceMapsPath: '/foo/bar/one/generated/sourceMaps.js',
+        sourceMaps: {},
       }),
     ).toMatchSnapshot();
   });

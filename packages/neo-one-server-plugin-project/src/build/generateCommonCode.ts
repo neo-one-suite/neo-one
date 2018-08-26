@@ -1,8 +1,10 @@
+import { SourceMaps } from '@neo-one/client';
 import { genCommonFiles, NetworkDefinition, Wallet } from '@neo-one/smart-contract-codegen';
-import fs from 'fs-extra';
+import * as fs from 'fs-extra';
 import { ProjectConfig } from '../types';
 import { getCommonPaths, getContractPaths, getTSPath } from '../utils';
 import { ContractResult } from './compileContract';
+import { writeFile } from './writeFile';
 
 export type CommonCodeContract = ContractResult & {
   readonly addresses: ReadonlyArray<string>;
@@ -16,6 +18,7 @@ export const generateCommonCode = async (
   wallets: ReadonlyArray<Wallet>,
   networks: ReadonlyArray<NetworkDefinition>,
   httpServerPort: number,
+  sourceMapsIn: SourceMaps,
 ) => {
   const contractsPaths = contracts.map(({ name, filePath, sourceMap, addresses }) => ({
     ...getContractPaths(project, { name, filePath }),
@@ -47,27 +50,28 @@ export const generateCommonCode = async (
     projectID,
     projectIDPath,
     sourceMapsPath,
+    sourceMaps: sourceMapsIn,
   });
 
   await fs.ensureDir(project.paths.generated);
   if (project.codegen.javascript) {
     await Promise.all([
-      fs.writeFile(sourceMapsPath, sourceMaps.js),
-      fs.writeFile(testPath, test.js),
-      fs.writeFile(reactPath, react.js),
-      fs.writeFile(clientPath, client.js),
-      fs.writeFile(generatedPath, generated.js),
-      fs.writeFile(projectIDPath, projectIDFile.js),
+      writeFile(sourceMapsPath, sourceMaps.js),
+      writeFile(testPath, test.js),
+      writeFile(reactPath, react.js),
+      writeFile(clientPath, client.js),
+      writeFile(generatedPath, generated.js),
+      writeFile(projectIDPath, projectIDFile.js),
     ]);
   } else {
     await Promise.all([
-      fs.writeFile(getTSPath(sourceMapsPath), sourceMaps.ts),
-      fs.writeFile(getTSPath(testPath), test.ts),
-      fs.writeFile(getTSPath(reactPath), react.ts),
-      fs.writeFile(getTSPath(clientPath), client.ts),
-      fs.writeFile(getTSPath(generatedPath), generated.ts),
-      fs.writeFile(getTSPath(projectIDPath), projectIDFile.ts),
-      fs.writeFile(getTSPath(commonTypesPath), commonTypes.ts),
+      writeFile(getTSPath(sourceMapsPath), sourceMaps.ts),
+      writeFile(getTSPath(testPath), test.ts),
+      writeFile(getTSPath(reactPath), react.ts),
+      writeFile(getTSPath(clientPath), client.ts),
+      writeFile(getTSPath(generatedPath), generated.ts),
+      writeFile(getTSPath(projectIDPath), projectIDFile.ts),
+      writeFile(getTSPath(commonTypesPath), commonTypes.ts),
     ]);
   }
 };

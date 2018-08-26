@@ -1,11 +1,6 @@
-import { ActionMap, ComposableContainer } from 'constate';
-import _ from 'lodash';
 import * as React from 'react';
-import { Container } from 'reakit';
-
-interface State {
-  readonly toasts: ReadonlyArray<Toast>;
-}
+import { BehaviorSubject, Observable } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
 
 export interface Toast {
   readonly id: string;
@@ -14,52 +9,30 @@ export interface Toast {
   readonly autoHide?: number;
 }
 
-interface Actions {
+export type AddToast = (toast: Toast) => void;
+
+interface ToastsContextType {
+  readonly toasts$: Observable<ReadonlyArray<Toast>>;
   readonly addToast: AddToast;
   readonly removeToast: (id: string) => void;
 }
 
-export type AddToast = (toast: Toast) => void;
-
-const actions: ActionMap<State, Actions> = {
-  addToast: (toast) => ({ toasts }) => ({
-    toasts: toasts.some((localToast) => localToast.id === toast.id) ? toasts : [...toasts, toast],
-  }),
-  removeToast: (id) => ({ toasts }) => ({ toasts: toasts.filter((localToast) => localToast.id !== id) }),
-};
-
-export const ToastsContainer: ComposableContainer<State, Actions> = (props) => (
-  <Container
-    {...props}
-    context="toasts"
-    actions={actions}
-    shouldUpdate={({ state, nextState }: { state: State; nextState: State }) => !_.isEqual(state, nextState)}
-  />
-);
-
-interface WithAddToastPureProps {
-  readonly addToast: AddToast;
-  readonly children: (addToast: AddToast) => React.ReactNode;
-}
-
-export class WithAddToastPure extends React.Component<WithAddToastPureProps> {
-  public shouldComponentUpdate(nextProps: WithAddToastPureProps) {
-    return this.props.children !== nextProps.children;
-  }
-
-  public render() {
-    return this.props.children(this.props.addToast);
-  }
-}
+const toasts$ = new BehaviorSubject<ReadonlyArray<Toast>>([]);
+export const ToastsContext = React.createContext<ToastsContextType>({
+  toasts$: toasts$.pipe(distinctUntilChanged()),
+  addToast: (toast) => {
+    const toasts = toasts$.getValue();
+    toasts$.next(toasts.some((localToast) => localToast.id === toast.id) ? toasts : [...toasts, toast]);
+  },
+  removeToast: (id) => {
+    toasts$.next(toasts$.getValue().filter((localToast) => localToast.id !== id));
+  },
+});
 
 interface WithAddToastProps {
   readonly children: (addToast: AddToast) => React.ReactNode;
 }
 
 export function WithAddToast({ children }: WithAddToastProps) {
-  return (
-    <ToastsContainer>
-      {({ addToast }) => <WithAddToastPure addToast={addToast}>{children}</WithAddToastPure>}
-    </ToastsContainer>
-  );
+  return <ToastsContext.Consumer>{({ addToast }) => children(addToast)}</ToastsContext.Consumer>;
 }

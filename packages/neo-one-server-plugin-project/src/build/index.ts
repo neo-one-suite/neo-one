@@ -275,6 +275,23 @@ export const build = (
             concurrent: true,
             tasks: [
               {
+                title: 'Save project info',
+                task: async (ctx) => {
+                  const projectID = getProjectID(ctx);
+                  const sourceMaps = getSourceMaps(ctx);
+                  const projectOptions = {
+                    rootDir: options.rootDir,
+                    sourceMaps,
+                  };
+                  await getProjectResourceManager(pluginManager)
+                    .delete(projectID, projectOptions)
+                    .toPromise();
+                  await getProjectResourceManager(pluginManager)
+                    .create(projectID, projectOptions)
+                    .toPromise();
+                },
+              },
+              {
                 title: 'Generate code',
                 task: (ctx) =>
                   new TaskList({
@@ -314,28 +331,12 @@ export const build = (
                               ].concat(WALLETS),
                               getNetworkDefinitions(ctx),
                               pluginManager.httpServerPort,
+                              getSourceMaps(ctx),
                             );
                           },
                         },
                       ]),
                   }),
-              },
-              {
-                title: 'Save project info',
-                task: async (ctx) => {
-                  const projectID = getProjectID(ctx);
-                  const sourceMaps = getSourceMaps(ctx);
-                  const projectOptions = {
-                    rootDir: options.rootDir,
-                    sourceMaps,
-                  };
-                  await getProjectResourceManager(pluginManager)
-                    .delete(projectID, projectOptions)
-                    .toPromise();
-                  await getProjectResourceManager(pluginManager)
-                    .create(projectID, projectOptions)
-                    .toPromise();
-                },
               },
             ],
           }),

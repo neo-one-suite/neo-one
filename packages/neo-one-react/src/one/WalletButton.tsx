@@ -13,8 +13,8 @@ export function WalletButton() {
         <DeveloperToolsContext.Consumer>
           {({ client }) => (
             <Overlay.Show as={ToolbarButton} help="Open Wallet..." {...overlay}>
-              <FromStream props$={client.currentAccount$}>
-                {(value) => <Base>{value === undefined ? 'Select Wallet' : value.name}</Base>}
+              <FromStream props$={client.accountState$}>
+                {(value) => <Base>{value === undefined ? 'Select Wallet' : value.currentAccount.name}</Base>}
               </FromStream>
               <MdAccountBalance />
             </Overlay.Show>

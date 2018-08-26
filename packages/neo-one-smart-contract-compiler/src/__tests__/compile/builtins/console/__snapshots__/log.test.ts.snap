@@ -54,7 +54,7 @@ Array [
 
 exports[`console.log should log arrays 1`] = `
 Array [
-  "[[1,2,3],[\\"a\\"],[[\\"Symbol(b)\\"]]]
+  "[[\\"1\\",\\"2\\",\\"3\\"],[\\"a\\"],[[\\"Symbol(b)\\"]]]
   at console.log([[1, 2, 3], ['a'], [[Symbol.for('b')]]]) (snippetCode.ts:2:6)",
 ]
 `;

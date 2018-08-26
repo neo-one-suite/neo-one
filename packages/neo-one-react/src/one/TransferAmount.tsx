@@ -2,11 +2,12 @@ import * as React from 'react';
 // tslint:disable-next-line no-submodule-imports
 import Select from 'react-select/lib/Select';
 import { Flex, Input, styled } from 'reakit';
+import { FromStream } from '../FromStream';
 import { ComponentProps } from '../types';
 import { Button } from './Button';
 import { WithTokens } from './DeveloperToolsContext';
 import { Selector } from './Selector';
-import { Asset, ASSETS, TokenAsset, TransferContainer } from './TransferContainer';
+import { Asset, ASSETS, getTokenAsset, TransferContainer } from './TransferContainer';
 
 const StyledFlex = styled(Flex)`
   align-items: center;
@@ -28,23 +29,20 @@ export const TransferAmount = (props: ComponentProps<typeof Flex>) => (
       <StyledFlex {...props}>
         <StyledInput value={text} placeholder="Amount" onChange={onChangeAmount} />
         <WithTokens>
-          {(tokens) => (
-            <AssetInput
-              value={asset}
-              options={ASSETS.concat(
-                tokens.map<TokenAsset>((token) => ({
-                  type: 'token',
-                  token,
-                  label: token.symbol,
-                  value: token.address,
-                })),
+          {(tokens$) => (
+            <FromStream props$={tokens$}>
+              {(tokens) => (
+                <AssetInput
+                  value={asset}
+                  options={ASSETS.concat(tokens.map(getTokenAsset))}
+                  onChange={(option) => {
+                    if (option != undefined && !Array.isArray(option)) {
+                      onChangeAsset(option);
+                    }
+                  }}
+                />
               )}
-              onChange={(option) => {
-                if (option != undefined && !Array.isArray(option)) {
-                  onChangeAsset(option);
-                }
-              }}
-            />
+            </FromStream>
           )}
         </WithTokens>
         <Button disabled={to.length === 0 || amount === undefined || loading} onClick={send}>

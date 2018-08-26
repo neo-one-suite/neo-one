@@ -1,3 +1,4 @@
+import { SourceMaps } from '@neo-one/client';
 import { genClient, NetworkDefinition, Wallet } from './client';
 import { genCommonTypes } from './commonTypes';
 import { formatFile } from './formatFile';
@@ -32,6 +33,7 @@ export const genCommonFiles = ({
   networks,
   httpServerPort,
   sourceMapsPath,
+  sourceMaps,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly projectID: string;
@@ -46,10 +48,11 @@ export const genCommonFiles = ({
   readonly networks: ReadonlyArray<NetworkDefinition>;
   readonly httpServerPort: number;
   readonly sourceMapsPath: string;
+  readonly sourceMaps: SourceMaps;
 }) => {
   const testFile = formatFile(genTest({ contractsPaths, testPath, commonTypesPath }));
   const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }));
-  const sourceMapsFile = formatFile(genSourceMaps({ httpServerPort, sourceMapsPath, projectIDPath }));
+  const sourceMapsFile = formatFile(genSourceMaps({ httpServerPort, sourceMapsPath, projectIDPath, sourceMaps }));
   const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath, projectIDPath }));
   const clientFile = formatFile(
     genClient({ localDevNetworkName, wallets, networks, clientPath, projectIDPath, httpServerPort }),

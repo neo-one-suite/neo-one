@@ -16,8 +16,8 @@ export function SettingsDialog({ children }: Props) {
       renderDialog={() => (
         <Base>
           <AddToken />
-          <ResetLocalStateButton />
           <AutoConsensusOption />
+          <ResetLocalStateButton />
         </Base>
       )}
     >

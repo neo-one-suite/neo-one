@@ -2,6 +2,8 @@ import { Client, nep5 } from '@neo-one/client';
 import { EffectMap } from 'constate';
 import * as React from 'react';
 import { Container, Flex, styled } from 'reakit';
+import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { ReactSyntheticEvent } from '../types';
 import { Button } from './Button';
 import { DeveloperToolsContext, Token, WithOnChangeTokens, WithTokens } from './DeveloperToolsContext';
@@ -25,7 +27,7 @@ const INITIAL_STATE = {
 
 const makeEffects = (
   client: Client,
-  tokens: ReadonlyArray<Token>,
+  tokens$: Observable<ReadonlyArray<Token>>,
   onChange: (tokens: ReadonlyArray<Token>) => void,
   addError: (error: Error) => void,
 ): EffectMap<State, Effects> => ({
@@ -45,6 +47,7 @@ const makeEffects = (
         const decimals = await nep5.getDecimals(readClient, state.address);
         const smartContract = nep5.createNEP5ReadSmartContract(readClient, state.address, decimals);
         const symbol = await smartContract.symbol();
+        const tokens = await tokens$.pipe(take(1)).toPromise();
 
         onChange(tokens.concat({ network, address: state.address, decimals, symbol }));
         setState({ disabled: false, address: '' });
@@ -69,12 +72,12 @@ export function AddToken() {
     <DeveloperToolsContext.Consumer>
       {({ client }) => (
         <WithTokens>
-          {(tokens) => (
+          {(tokens$) => (
             <WithOnChangeTokens>
               {(onChange) => (
                 <WithAddError>
                   {(addError) => (
-                    <Container initialState={INITIAL_STATE} effects={makeEffects(client, tokens, onChange, addError)}>
+                    <Container initialState={INITIAL_STATE} effects={makeEffects(client, tokens$, onChange, addError)}>
                       {({ address, disabled, submit, onChangeAddress }) => (
                         <Wrapper>
                           <TextInput placeholder="Token Address" value={address} onChange={onChangeAddress} />

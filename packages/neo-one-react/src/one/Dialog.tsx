@@ -26,7 +26,7 @@ export function Dialog({ children, renderDialog, title }: Props) {
         <>
           {children(overlay)}
           <Backdrop as={[Portal, Overlay.Hide]} {...overlay} />
-          <Overlay as={[Portal, Card]} slide fade gutter={16} {...overlay}>
+          <Overlay unmount as={[Portal, Card]} slide fade gutter={16} {...overlay}>
             <Shadow />
             <Card.Fit as={StyledHeader}>
               <Heading as="h3" margin="0">

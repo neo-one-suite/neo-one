@@ -24,7 +24,7 @@
     "typescript": "^3.0.1"
   },
   "devDependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.69",
+    "@neo-one/client-core": "^1.0.0-alpha.74",
     "@neo-one/client-switch": "^1.0.0-alpha.87",
     "@neo-one/monitor": "^1.0.0-alpha.58",
     "@neo-one/node-blockchain": "^1.0.0-alpha.81",

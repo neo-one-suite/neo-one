@@ -128,6 +128,13 @@ export interface TokenAsset {
 }
 export type Asset = AssetAsset | TokenAsset;
 
+export const getTokenAsset = (token: Token): TokenAsset => ({
+  type: 'token',
+  token,
+  label: token.symbol,
+  value: token.address,
+});
+
 export const ASSETS: ReadonlyArray<Asset> = [
   {
     type: 'asset',
@@ -154,7 +161,7 @@ export const TransferContainer: ComposableContainer<State, Actions, {}, Effects>
               context="transfer"
               actions={actions}
               effects={effects}
-              shouldUpdate={({ state, nextState }: { state: State; nextState: State }) => !_.isEqual(state, nextState)}
+              shouldUpdate={({ state, nextState }) => !_.isEqual(state, nextState)}
             />
           );
         }}

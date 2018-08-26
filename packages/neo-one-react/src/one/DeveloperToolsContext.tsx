@@ -1,10 +1,8 @@
 import { AddressString, Client, DeveloperClient, OneClient } from '@neo-one/client';
-import { ActionMap } from 'constate';
 import localforage from 'localforage';
 import * as React from 'react';
-import { Container } from 'reakit';
-import { from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { FromStream } from '../FromStream';
 import { NetworkClients } from '../types';
 
@@ -60,7 +58,7 @@ export interface LocalState {
   readonly tokens: ReadonlyArray<Token>;
 }
 export interface LocalStateContextType {
-  readonly localState: LocalState;
+  readonly localState$: BehaviorSubject<LocalState>;
   readonly onChange: (state: Partial<LocalState>) => void;
 }
 const INITIAL_LOCAL_STATE: LocalState = {
@@ -77,60 +75,42 @@ const store = localforage.createInstance({
 // tslint:disable-next-line no-any
 const LocalStateContext = React.createContext<LocalStateContextType>(undefined as any);
 
-interface LocalStateProviderState {
-  readonly localState: LocalState;
-}
-
-interface LocalStateProviderActions {
-  readonly onChange: (state: Partial<LocalState>) => void;
-}
-
 export function LocalStateProvider({ children }: { readonly children: React.ReactNode }) {
-  const localStatePromise = store.getItem<LocalState | null>('localState');
+  const localState$ = new BehaviorSubject<LocalState>(INITIAL_LOCAL_STATE);
+  store
+    .getItem<LocalState | null>('localState')
+    .then((localState) => {
+      if (localState !== null) {
+        localState$.next(localState);
+      }
+    })
+    .catch((error) => {
+      // tslint:disable-next-line no-console
+      console.error(error);
+    });
 
-  const actions: ActionMap<LocalStateProviderState, LocalStateProviderActions> = {
-    onChange: (state) => ({ localState }) => {
-      const nextLocalState = { ...localState, ...state };
-      store.setItem('localState', nextLocalState).catch((error) => {
-        // tslint:disable-next-line no-console
-        console.error(error);
-      });
-
-      return { localState: nextLocalState };
-    },
+  const onChange = (state: Partial<LocalState>) => {
+    const nextLocalState = { ...localState$.getValue(), ...state };
+    localState$.next(nextLocalState);
+    store.setItem('localState', nextLocalState).catch((error) => {
+      // tslint:disable-next-line no-console
+      console.error(error);
+    });
   };
 
-  return (
-    <FromStream props$={from(localStatePromise)}>
-      {(localStateIn) => (
-        <Container
-          initialState={{ localState: localStateIn === null ? INITIAL_LOCAL_STATE : localStateIn }}
-          actions={actions}
-        >
-          {({ localState, onChange }) => (
-            <LocalStateContext.Provider
-              value={{
-                localState,
-                onChange: (state) => {
-                  onChange(state);
-                },
-              }}
-            >
-              {children}
-            </LocalStateContext.Provider>
-          )}
-        </Container>
-      )}
-    </FromStream>
-  );
+  return <LocalStateContext.Provider value={{ localState$, onChange }}>{children}</LocalStateContext.Provider>;
 }
 
 interface WithTokensProps {
-  readonly children: (tokens: ReadonlyArray<Token>) => React.ReactNode;
+  readonly children: (tokens$: Observable<ReadonlyArray<Token>>) => React.ReactNode;
 }
 
 export function WithTokens({ children }: WithTokensProps) {
-  return <LocalStateContext.Consumer>{({ localState }) => children(localState.tokens)}</LocalStateContext.Consumer>;
+  return (
+    <LocalStateContext.Consumer>
+      {({ localState$ }) => children(localState$.pipe(map((localState) => localState.tokens, distinctUntilChanged())))}
+    </LocalStateContext.Consumer>
+  );
 }
 
 interface WithOnChangeTokensProps {
@@ -158,16 +138,21 @@ export function WithResetLocalState({ children }: WithResetLocalStateProps) {
 }
 
 interface WithAutoConsensusProps {
-  readonly children: (options: { readonly toggle: () => void; readonly autoConsensus: boolean }) => React.ReactNode;
+  readonly children: (
+    options: { readonly toggle: () => void; readonly autoConsensus$: Observable<boolean> },
+  ) => React.ReactNode;
 }
 
 export function WithAutoConsensus({ children }: WithAutoConsensusProps) {
   return (
     <LocalStateContext.Consumer>
-      {({ localState, onChange }) =>
+      {({ localState$, onChange }) =>
         children({
-          autoConsensus: localState.autoConsensus,
-          toggle: () => onChange({ autoConsensus: !localState.autoConsensus }),
+          autoConsensus$: localState$.pipe(
+            map((localState) => localState.autoConsensus),
+            distinctUntilChanged(),
+          ),
+          toggle: () => onChange({ autoConsensus: !localState$.getValue().autoConsensus }),
         })
       }
     </LocalStateContext.Consumer>

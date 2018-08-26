@@ -321,6 +321,7 @@ export const DeveloperTools = () => (
   "sourceMaps": Object {
     "js": "// tslint:disable
 /* eslint-disable */
+/* @source-map-hash 6654c734ccab8f440ff0825eb443dc7f */
 import { OneClient } from '@neo-one/client';
 import { projectID } from './projectID';
 
@@ -342,6 +343,7 @@ export const sourceMaps = sourceMapsIn;
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
+/* @source-map-hash 6654c734ccab8f440ff0825eb443dc7f */
 import { OneClient, SourceMaps } from '@neo-one/client';
 import { projectID } from './projectID';
 

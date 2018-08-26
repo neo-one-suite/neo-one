@@ -23,7 +23,8 @@ export interface ProcessErrorOptions {
   readonly sourceMaps?: SourceMaps;
 }
 
-const MESSAGE_INDENT = '  ';
+const CALLSITE_INDENT = '    ';
+const MESSAGE_INDENT = `${CALLSITE_INDENT}  `;
 
 const getRenderedCallsite = (fileContent: string, line: number, column?: number) => {
   let renderedCallsite = codeFrameColumns(fileContent, { start: { column, line } }, { highlightCode: true });
@@ -130,7 +131,7 @@ const processTraceError = async (
       );
     }
 
-    return `Error: ${error.message}\n${positionMessage}${mutableTraceLines.join('\n')}\n\n`;
+    return `${error.message}\n${positionMessage}${mutableTraceLines.join('\n')}`;
   });
 };
 
