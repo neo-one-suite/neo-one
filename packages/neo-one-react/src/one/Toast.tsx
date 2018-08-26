@@ -60,9 +60,10 @@ export function Toast({ toast, removeToast }: Props) {
           <Hidden fade {...hidden}>
             <StyledBox>
               <Shadow />
-              <ToastHeading>
+              <ToastHeading data-test="neo-one-toast-heading">
                 {toast.title}
                 <Button
+                  data-test="neo-one-toast-close-button"
                   fontSize={14}
                   onClick={hide}
                   border="none"
@@ -74,7 +75,7 @@ export function Toast({ toast, removeToast }: Props) {
                   <MdClose />
                 </Button>
               </ToastHeading>
-              <ToastWrapper>{toast.message}</ToastWrapper>
+              <ToastWrapper data-test="neo-one-toast-wrapper">{toast.message}</ToastWrapper>
             </StyledBox>
           </Hidden>
         );

@@ -78,12 +78,15 @@ export function WalletSelector(props: ComponentProps<Select<OptionType>>) {
                     const newWalletButton =
                       // tslint:disable-next-line no-null-keyword
                       newWalletOnClick === undefined ? null : (
-                        <NewWalletButton onClick={newWalletOnClick}>New Wallet</NewWalletButton>
+                        <NewWalletButton data-test="neo-one-wallet-selector-new-button" onClick={newWalletOnClick}>
+                          New Wallet
+                        </NewWalletButton>
                       );
 
                     return (
                       <Wrapper>
                         <WalletSelectorBase
+                          data-test="neo-one-wallet-selector-selector"
                           {...props}
                           value={value}
                           options={options}

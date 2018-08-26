@@ -61,7 +61,13 @@ const StyledToolbarButton = styled(ToolbarButton)`
 
 function MonogramButton(visible: boolean) {
   return (props: ComponentProps<typeof ToolbarButton>) => (
-    <StyledToolbarButton help={visible ? 'Hide Toolbar' : 'Show Toolbar'} delay="1s" {...props}>
+    <StyledToolbarButton
+      data-test-button="neo-one-toolbar-toggle-button"
+      data-test-tooltip="neo-one-toolbar-toggle-tooltip"
+      help={visible ? 'Hide Toolbar' : 'Show Toolbar'}
+      delay="1s"
+      {...props}
+    >
       <Shadow />
       <Block width={32} height={32}>
         <StyledMonogram width={32} height={32} />

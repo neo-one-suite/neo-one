@@ -30,12 +30,12 @@ export function WithAddError({ children }: WithAddErrorProps) {
           addToast({
             id: `error:${mutableID}`,
             title: (
-              <span>
+              <span data-test="neo-one-error-toast-title">
                 <ErrorText as="span">Error.&nbsp;</ErrorText>
                 <span>See console for more info.</span>
               </span>
             ),
-            message: <StyledPre>{error.message}</StyledPre>,
+            message: <StyledPre data-test="neo-one-error-toast-message">{error.message}</StyledPre>,
           });
           mutableID += 1;
         })

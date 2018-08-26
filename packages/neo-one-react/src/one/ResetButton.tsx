@@ -31,7 +31,12 @@ export function ResetButton() {
             };
 
             return (
-              <ToolbarButton help="Reset Network" onClick={onClick}>
+              <ToolbarButton
+                data-test-button="neo-one-reset-button"
+                data-test-tooltip="neo-one-reset-tooltip"
+                help="Reset Network"
+                onClick={onClick}
+              >
                 <div>
                   <MdRefresh />
                 </div>

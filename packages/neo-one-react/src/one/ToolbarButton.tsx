@@ -23,12 +23,21 @@ interface Props {
   readonly children?: React.ReactNode;
   readonly href?: string;
   readonly target?: string;
+  readonly 'data-test-button': string;
+  readonly 'data-test-tooltip': string;
 }
-export function ToolbarButton({ children, help, delay, ...props }: Props) {
+export function ToolbarButton({
+  'data-test-button': dataTestButton,
+  'data-test-tooltip': dataTestTooltip,
+  children,
+  help,
+  delay,
+  ...props
+}: Props) {
   return (
-    <StyledButton {...props}>
+    <StyledButton data-test={dataTestButton} {...props}>
       {children}
-      <Tooltip placement="top" delay={delay}>
+      <Tooltip data-test={dataTestTooltip} placement="top" delay={delay}>
         <TooltipArrow />
         {help}
       </Tooltip>

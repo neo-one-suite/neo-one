@@ -55,6 +55,13 @@ const StyledSelect: React.ComponentType<ComponentProps<Select<any>>> = styled(Se
   }
 `;
 
-export function Selector<OptionType>(props: ComponentProps<Select<OptionType>>) {
-  return <StyledSelect classNamePrefix="react-select" {...props} />;
+export function Selector<OptionType>({
+  'data-test': dataTest,
+  ...props
+}: ComponentProps<Select<OptionType>> & { readonly 'data-test': string }) {
+  return (
+    <div data-test={dataTest}>
+      <StyledSelect classNamePrefix="react-select" {...props} />
+    </div>
+  );
 }

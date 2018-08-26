@@ -26,7 +26,12 @@ export function BlockIndex() {
                   };
 
             return (
-              <ToolbarButton help="Run Consensus" onClick={onClick}>
+              <ToolbarButton
+                data-test-button="neo-one-block-index-button"
+                data-test-tooltip="neo-one-block-index-tooltip"
+                help="Run Consensus"
+                onClick={onClick}
+              >
                 <FromStream
                   props$={client.block$.pipe(
                     map(({ block }) => block.index),
@@ -38,7 +43,11 @@ export function BlockIndex() {
                     }),
                   )}
                 >
-                  {(index) => <IndexWrapper index={index}>{index}</IndexWrapper>}
+                  {(index) => (
+                    <IndexWrapper data-test="neo-one-block-index-value" index={index}>
+                      {index}
+                    </IndexWrapper>
+                  )}
                 </FromStream>
                 <MdPlayArrow />
               </ToolbarButton>

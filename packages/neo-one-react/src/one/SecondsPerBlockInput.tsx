@@ -150,6 +150,7 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
                     {({ editable, secondsPerBlock, prevSecondsPerBlock }) => (
                       <div>
                         <StyledTextInput
+                          data-test="neo-one-seconds-per-block-input"
                           disabled={!editable || developerClient === undefined}
                           value={
                             secondsPerBlockText === undefined ||
@@ -161,7 +162,7 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
                           onChange={onChange}
                           {...props}
                         />
-                        <Tooltip placement="top">
+                        <Tooltip data-test="neo-one-seconds-per-block-tooltip" placement="top">
                           <TooltipArrow />
                           Seconds Per Block
                         </Tooltip>

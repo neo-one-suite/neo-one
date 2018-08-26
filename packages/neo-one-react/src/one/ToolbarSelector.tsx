@@ -8,6 +8,9 @@ import { Tooltip, TooltipArrow } from './Tooltip';
 
 interface Props {
   readonly help: string;
+  readonly 'data-test-selector': string;
+  readonly 'data-test-container': string;
+  readonly 'data-test-tooltip': string;
 }
 interface State {
   readonly menuOpen: boolean;
@@ -29,19 +32,33 @@ const actions: ActionMap<State, Actions> = {
 };
 
 // tslint:disable-next-line no-any
-const StyledSelector: React.ComponentType<ComponentProps<Select<any>>> = styled(Selector)`
+const StyledSelector: React.ComponentType<{ readonly 'data-test': string } & ComponentProps<Select<any>>> = styled(
+  Selector,
+)`
   border-right: 0;
   width: 100px;
   height: 40px;
 `;
 
-export function ToolbarSelector<OptionType>({ help, ...rest }: Props & ComponentProps<Select<OptionType>>) {
+export function ToolbarSelector<OptionType>({
+  'data-test-container': dataTestContainer,
+  'data-test-selector': dataTestSelector,
+  'data-test-tooltip': dataTestTooltip,
+  help,
+  ...rest
+}: Props & ComponentProps<Select<OptionType>>) {
   return (
     <Container initialState={{ menuOpen: false, hover: false }} actions={actions}>
       {({ menuOpen, onMenuOpen, onMenuClose, hover, onMouseEnter, onMouseLeave }) => (
-        <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-          <StyledSelector menuPlacement="top" {...rest} onMenuOpen={onMenuOpen} onMenuClose={onMenuClose} />
-          <Tooltip visible={menuOpen ? false : hover} placement="top">
+        <div data-test={dataTestContainer} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+          <StyledSelector
+            data-test={dataTestSelector}
+            menuPlacement="top"
+            {...rest}
+            onMenuOpen={onMenuOpen}
+            onMenuClose={onMenuClose}
+          />
+          <Tooltip data-test={dataTestTooltip} visible={menuOpen ? false : hover} placement="top">
             <TooltipArrow />
             {help}
           </Tooltip>

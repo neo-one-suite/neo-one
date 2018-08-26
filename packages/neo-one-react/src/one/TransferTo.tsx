@@ -34,12 +34,15 @@ export function TransferTo(props: ComponentProps<typeof StyledLabel>) {
                 return (
                   <Wrapper>
                     <StyledLabel {...props}>
-                      <Base marginRight={8}>Transfer To</Base>
+                      <Base data-test="neo-one-transfer-to-text" marginRight={8}>
+                        Transfer To
+                      </Base>
                       <TransferContainer>
                         {({ to, onChangeTo }) => (
                           <FromStream props$={props$}>
                             {(options) => (
                               <WalletSelectorBase
+                                data-test="neo-one-transfer-to-selector"
                                 value={to.map((userAccount) => makeValueOption({ userAccount }))}
                                 options={options}
                                 onChange={(option) => {

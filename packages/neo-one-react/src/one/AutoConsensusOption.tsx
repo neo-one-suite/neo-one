@@ -19,10 +19,15 @@ export function AutoConsensusOption() {
       {({ autoConsensus$, toggle }) => (
         <FromStream props$={autoConsensus$}>
           {(autoConsensus) => (
-            <Wrapper onClick={toggle}>
+            <Wrapper data-test="neo-one-auto-consensus-container" onClick={toggle}>
               Automatic Consensus
-              <Input type="checkbox" checked={autoConsensus} onChange={toggle} />
-              <Tooltip placement="right">
+              <Input
+                data-test="neo-one-auto-consensus-checkbox"
+                type="checkbox"
+                checked={autoConsensus}
+                onChange={toggle}
+              />
+              <Tooltip data-test="neo-one-auto-consensus-tooltip" placement="right">
                 <TooltipArrow />
                 Automatically run consensus when a transaction is relayed.
               </Tooltip>

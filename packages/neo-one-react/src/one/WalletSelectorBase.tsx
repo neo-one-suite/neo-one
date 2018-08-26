@@ -173,9 +173,9 @@ const formatOptionLabel = createFormatOptionLabel(false);
 
 const StyledSelector = styled(Selector)`
   width: 424px;
-` as React.ComponentType<ComponentProps<Select<OptionType>>>;
+` as React.ComponentType<{ readonly 'data-test': string } & ComponentProps<Select<OptionType>>>;
 
-export function WalletSelectorBase(props: ComponentProps<Select<OptionType>>) {
+export function WalletSelectorBase(props: { readonly 'data-test': string } & ComponentProps<Select<OptionType>>) {
   return (
     <StyledSelector
       menuPlacement="bottom"

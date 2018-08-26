@@ -17,9 +17,17 @@ interface Props {
   readonly title: string;
   readonly renderDialog: (overlay: OverlayProps) => React.ReactNode;
   readonly children: (overlay: OverlayProps) => React.ReactNode;
+  readonly 'data-test-heading': string;
+  readonly 'data-test-close-button': string;
 }
 
-export function Dialog({ children, renderDialog, title }: Props) {
+export function Dialog({
+  'data-test-heading': dataTestHeading,
+  'data-test-close-button': dataTestCloseButton,
+  children,
+  renderDialog,
+  title,
+}: Props) {
   return (
     <Overlay.Container>
       {(overlay: OverlayProps) => (
@@ -29,10 +37,11 @@ export function Dialog({ children, renderDialog, title }: Props) {
           <Overlay unmount as={[Portal, Card]} slide fade gutter={16} {...overlay}>
             <Shadow />
             <Card.Fit as={StyledHeader}>
-              <Heading as="h3" margin="0">
+              <Heading data-test={dataTestHeading} as="h3" margin="0">
                 {title}
               </Heading>
               <Button
+                data-test={dataTestCloseButton}
                 fontSize={20}
                 onClick={overlay.hide}
                 border="none"

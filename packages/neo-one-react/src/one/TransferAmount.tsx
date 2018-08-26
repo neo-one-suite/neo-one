@@ -21,18 +21,24 @@ const StyledInput = styled(Input)`
 const AssetInput = styled(Selector)`
   margin-right: 8px;
   width: 144px;
-` as React.ComponentType<ComponentProps<Select<Asset>>>;
+` as React.ComponentType<{ readonly 'data-test': string } & ComponentProps<Select<Asset>>>;
 
 export const TransferAmount = (props: ComponentProps<typeof Flex>) => (
   <TransferContainer>
     {({ text, asset, amount, to, loading, onChangeAmount, onChangeAsset, send }) => (
       <StyledFlex {...props}>
-        <StyledInput value={text} placeholder="Amount" onChange={onChangeAmount} />
+        <StyledInput
+          data-test="neo-one-transfer-amount-input"
+          value={text}
+          placeholder="Amount"
+          onChange={onChangeAmount}
+        />
         <WithTokens>
           {(tokens$) => (
             <FromStream props$={tokens$}>
               {(tokens) => (
                 <AssetInput
+                  data-test="neo-one-transfer-amount-asset-selector"
                   value={asset}
                   options={ASSETS.concat(tokens.map(getTokenAsset))}
                   onChange={(option) => {
@@ -45,7 +51,11 @@ export const TransferAmount = (props: ComponentProps<typeof Flex>) => (
             </FromStream>
           )}
         </WithTokens>
-        <Button disabled={to.length === 0 || amount === undefined || loading} onClick={send}>
+        <Button
+          data-test="neo-one-transfer-amount-send-button"
+          disabled={to.length === 0 || amount === undefined || loading}
+          onClick={send}
+        >
           Send
         </Button>
       </StyledFlex>

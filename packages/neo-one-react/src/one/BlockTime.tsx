@@ -62,7 +62,7 @@ function TimeAgo({ time, ...props }: TimeAgoProps) {
 
     lastTime = (
       <>
-        <StyledTime value={value} {...props}>
+        <StyledTime data-test="neo-one-block-time-last-time-value" value={value} {...props}>
           {value}
         </StyledTime>
         <StyledDivider vertical />
@@ -82,7 +82,7 @@ function TimeAgo({ time, ...props }: TimeAgoProps) {
       {(value) => (
         <>
           {lastTime}
-          <StyledTime value={value} {...props}>
+          <StyledTime data-test="neo-one-block-time-time-value" value={value} {...props}>
             {value}
           </StyledTime>
         </>
@@ -124,6 +124,8 @@ export function BlockTime() {
 
             return (
               <Dialog
+                data-test-heading="neo-one-block-time-dialog-heading"
+                data-test-close-button="neo-one-block-time-dialog-close-button"
                 title="Fast Forward"
                 renderDialog={(overlay) => (
                   <FromStream
@@ -136,12 +138,19 @@ export function BlockTime() {
                       <Container initialState={{ date: new Date(minTime) }} actions={actions}>
                         {({ date, onChangeDate }) => (
                           <>
-                            <Paragraph marginTop={16} marginBottom={16}>
+                            <Paragraph data-test="neo-one-block-time-dialog-text" marginTop={16} marginBottom={16}>
                               Set the next block's timestamp.
                             </Paragraph>
-                            <DateTimePicker onChange={onChangeDate} initialValue={date} minDate={new Date(minTime)} />
+                            <DateTimePicker
+                              data-test-input="neo-one-block-time-dialog-date-time-picker-input"
+                              data-test-error="neo-one-block-time-dialog-date-time-picker-error"
+                              onChange={onChangeDate}
+                              initialValue={date}
+                              minDate={new Date(minTime)}
+                            />
                             <Flex justifyContent="flex-end" margin={16}>
                               <Button
+                                data-test="neo-one-block-time-dialog-button"
                                 onClick={() => {
                                   if (developerClient !== undefined) {
                                     overlay.hide();
@@ -165,7 +174,13 @@ export function BlockTime() {
                 )}
               >
                 {(overlay) => (
-                  <ToolbarButton as={Overlay.Show} help="Fast Forward..." {...overlay}>
+                  <ToolbarButton
+                    data-test-button="neo-one-block-time-button"
+                    data-test-tooltip="neo-one-block-time-tooltip"
+                    as={Overlay.Show}
+                    help="Fast Forward..."
+                    {...overlay}
+                  >
                     <FromStream props$={props$}>{(time) => <TimeAgo time={time} />}</FromStream>
                     <MdFastForward />
                   </ToolbarButton>

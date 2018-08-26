@@ -106,13 +106,16 @@ export function BalanceSelector() {
                           }),
                         )}
                       >
-                        {(value) => <Wrapper>{value}</Wrapper>}
+                        {(value) => <Wrapper data-test="neo-one-balance-selector-value">{value}</Wrapper>}
                       </FromStream>
                     )}
                   </DeveloperToolsContext.Consumer>
                   <FromStream props$={currentAssetTokens$}>
                     {({ tokens, asset }) => (
                       <AssetInput
+                        data-test-selector="neo-one-balance-selector-selector"
+                        data-test-container="neo-one-balance-selector-container"
+                        data-test-tooltip="neo-one-balance-selector-tooltip"
                         help="Select Coin"
                         value={asset}
                         options={ASSETS.concat(tokens.map(getTokenAsset))}

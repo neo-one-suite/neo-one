@@ -13,7 +13,9 @@ export function ResetLocalStateButton() {
     <WithResetLocalState>
       {(resetLocalState) => (
         <Wrapper>
-          <Button onClick={resetLocalState}>Reset Local Storage</Button>
+          <Button data-test="neo-one-reset-local-state-button" onClick={resetLocalState}>
+            Reset Local Storage
+          </Button>
         </Wrapper>
       )}
     </WithResetLocalState>

@@ -80,8 +80,13 @@ export function AddToken() {
                     <Container initialState={INITIAL_STATE} effects={makeEffects(client, tokens$, onChange, addError)}>
                       {({ address, disabled, submit, onChangeAddress }) => (
                         <Wrapper>
-                          <TextInput placeholder="Token Address" value={address} onChange={onChangeAddress} />
-                          <StyledButton onClick={submit} disabled={disabled}>
+                          <TextInput
+                            data-test="neo-one-add-token-input"
+                            placeholder="Token Address"
+                            value={address}
+                            onChange={onChangeAddress}
+                          />
+                          <StyledButton data-test="neo-one-add-token-button" onClick={submit} disabled={disabled}>
                             Add Token
                           </StyledButton>
                         </Wrapper>

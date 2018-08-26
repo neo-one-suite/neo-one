@@ -12,6 +12,8 @@ interface Props {
 export function SettingsDialog({ children }: Props) {
   return (
     <Dialog
+      data-test-heading="neo-one-settings-dialog-heading"
+      data-test-close-button="neo-one-settings-dialog-close-button"
       title="Settings"
       renderDialog={() => (
         <Base>

@@ -11,6 +11,8 @@ interface Props {
 export function WalletDialog({ children }: Props) {
   return (
     <Dialog
+      data-test-heading="neo-one-wallet-dialog-heading"
+      data-test-close-button="neo-one-wallet-dialog-close-button"
       title="Wallet"
       renderDialog={() => (
         <Base>

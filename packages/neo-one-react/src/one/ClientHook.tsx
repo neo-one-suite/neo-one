@@ -59,14 +59,18 @@ class Hooker {
       if (this.mutableAddToast !== undefined && this.mutableNEOTrackerURL !== undefined) {
         this.mutableAddToast({
           id: transaction.hash,
-          title: 'Transaction Confirmed',
+          title: <span data-test="neo-one-transaction-toast-title">Transaction Confirmed</span>,
           message: (
-            <>
+            <span data-test="neo-one-transaction-toast-message">
               View on&nbsp;
-              <StyledLink href={`${this.mutableNEOTrackerURL}/tx/${transaction.hash.slice(2)}`} target="_blank">
+              <StyledLink
+                data-test="neo-one-transaction-toast-link"
+                href={`${this.mutableNEOTrackerURL}/tx/${transaction.hash.slice(2)}`}
+                target="_blank"
+              >
                 NEO Tracker
               </StyledLink>
-            </>
+            </span>
           ),
           autoHide: 5000,
         });

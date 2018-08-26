@@ -12,9 +12,19 @@ export function WalletButton() {
       {(overlay) => (
         <DeveloperToolsContext.Consumer>
           {({ client }) => (
-            <Overlay.Show as={ToolbarButton} help="Open Wallet..." {...overlay}>
+            <Overlay.Show
+              data-test-button="neo-one-wallet-button"
+              data-test-tooltip="neo-one-wallet-tooltip"
+              as={ToolbarButton}
+              help="Open Wallet..."
+              {...overlay}
+            >
               <FromStream props$={client.accountState$}>
-                {(value) => <Base>{value === undefined ? 'Select Wallet' : value.currentAccount.name}</Base>}
+                {(value) => (
+                  <Base data-test="neo-one-wallet-value">
+                    {value === undefined ? 'Select Wallet' : value.currentAccount.name}
+                  </Base>
+                )}
               </FromStream>
               <MdAccountBalance />
             </Overlay.Show>

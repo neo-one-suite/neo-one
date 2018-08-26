@@ -14,6 +14,8 @@ interface Props {
   readonly initialValue: Date;
   readonly minDate: Date;
   readonly onChange: (date: Date) => void;
+  readonly 'data-test-input': string;
+  readonly 'data-test-error': string;
 }
 
 interface State {
@@ -27,7 +29,13 @@ interface Effects {
 
 const FORMAT = 'yyyy/MM/dd hh:mm:ss a';
 
-export function DateTimePicker({ initialValue, minDate, onChange }: Props) {
+export function DateTimePicker({
+  'data-test-error': dataTestError,
+  'data-test-input': dataTestInput,
+  initialValue,
+  minDate,
+  onChange,
+}: Props) {
   let editingTimeout: NodeJS.Timer | undefined;
   const clearEditingTimeout = () => {
     if (editingTimeout !== undefined) {
@@ -66,8 +74,8 @@ export function DateTimePicker({ initialValue, minDate, onChange }: Props) {
       <Container initialState={{ text: format(initialValue, FORMAT), error: undefined }} effects={effects}>
         {({ text, error, onChange: onChangeInput }) => (
           <>
-            <Input value={text} onChange={onChangeInput} />
-            {error === undefined ? null : <ErrorText>{error}</ErrorText>}
+            <Input data-test={dataTestInput} value={text} onChange={onChangeInput} />
+            {error === undefined ? null : <ErrorText data-test={dataTestError}>{error}</ErrorText>}
           </>
         )}
       </Container>
