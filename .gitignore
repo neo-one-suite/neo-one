@@ -10,6 +10,7 @@
 .rpt2_cache
 /reports
 .nyc_output
+.awcache
 
 # Playground
 /packages/neo-one-playground
@@ -60,3 +61,7 @@ flow-coverage/
 
 # Template lock files
 /packages/*/template/yarn.lock
+
+# Cypress
+cypress/videos
+cypress/screenshots

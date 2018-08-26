@@ -76,6 +76,7 @@ const getPackageJSON = (pkg) => {
 const pkgs = fs
   .readdirSync('packages')
   .filter((file) => !file.startsWith('.'))
+  .filter((file) => file !== 'neo-one-playground')
   .filter((pkg) => fs.pathExistsSync(path.resolve('packages', pkg, 'package.json')));
 const pkgJSONs = pkgs.map((pkg) => [pkg, getPackageJSON(pkg)]);
 const smartContractPkgs = pkgJSONs.filter(([_p, pkgJSON]) => pkgJSON.smartContract).map(([p]) => p);
@@ -94,6 +95,7 @@ const globs = {
   originalSrc: [
     'packages/*/src/**/*.{ts,tsx}',
     'packages/*/proto/**/*.proto',
+    '!packages/neo-one-playground/**/*',
     '!packages/*/src/**/*.test.{ts,tsx}',
     '!packages/*/src/__data__/**/*',
     '!packages/*/src/__tests__/**/*',
@@ -110,9 +112,9 @@ const globs = {
     `!${getDistBase(format)}/packages/*/src/bin/**/*`,
   ],
   types: ['packages/neo-one-types/**/*', '!packages/neo-one-types/package.json'],
-  bin: ['packages/*/src/bin/*.ts'],
-  pkg: ['packages/*/package.json'],
-  pkgFiles: ['packages/*/tsconfig.json', 'packages/*/static/**/*'],
+  bin: ['packages/*/src/bin/*.ts', '!packages/neo-one-playground/**/*'],
+  pkg: ['packages/*/package.json', '!packages/neo-one-playground/**/*'],
+  pkgFiles: ['packages/*/tsconfig.json', 'packages/*/static/**/*', '!packages/neo-one-playground/**/*'],
   files: ['lerna.json', 'yarn.lock', 'tsconfig.json'],
   metadata: ['LICENSE', 'README.md', 'CHANGELOG.md'],
 };

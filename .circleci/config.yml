@@ -35,6 +35,45 @@ aliases:
       - ~/.cache/yarn
     key: v2-yarn-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
+  - &restore-yarn-playground-cache-8
+    keys:
+      - v2-yarn-playground-8-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      # Fallback in case checksum fails
+      - v2-yarn-playground-8-{{ .Branch }}-
+
+  - &save-yarn-playground-cache-8
+    paths:
+      - node_modules
+      - ~/.cache/yarn
+      - ~/.cache/Cypress
+    key: v2-yarn-playground-8-{{ .Branch }}-{{ checksum "yarn.lock" }}
+
+  - &restore-yarn-playground-cache-9
+    keys:
+      - v2-yarn-playground-9-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      # Fallback in case checksum fails
+      - v2-yarn-playground-9-{{ .Branch }}-
+
+  - &save-yarn-playground-cache-9
+    paths:
+      - node_modules
+      - ~/.cache/yarn
+      - ~/.cache/Cypress
+    key: v2-yarn-playground-9-{{ .Branch }}-{{ checksum "yarn.lock" }}
+
+  - &restore-yarn-playground-cache-10
+    keys:
+      - v2-yarn-playground-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      # Fallback in case checksum fails
+      - v2-yarn-playground-10-{{ .Branch }}-
+
+  - &save-yarn-playground-cache-10
+    paths:
+      - node_modules
+      - ~/.cache/yarn
+      - ~/.cache/Cypress
+    key: v2-yarn-playground-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
+
   - &filter-only-master
     branches:
       only:
@@ -115,6 +154,28 @@ aliases:
           path: reports
     parallelism: 2
 
+  - &playground8
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - run:
+          name: Clone
+          command: git clone git@github.com:neo-one-suite/neo-one-playground.git
+          working_directory: ~/neo-one/packages
+      - restore-cache: *restore-yarn-playground-cache-8
+      - run: *yarn
+      - save-cache: *save-yarn-playground-cache-8
+      - run:
+          name: Build
+          command: yarn build:e2e
+      - run:
+          name: Test
+          command: yarn test:playground
+      - store_artifacts:
+          path: packages/neo-one-playground/cypress/videos
+      - store_artifacts:
+          path: packages/neo-one-playground/cypress/screenshots
+
   - &build-e2e9
     working_directory: ~/neo-one
     steps:
@@ -157,6 +218,28 @@ aliases:
       - store_test_results:
           path: reports
     parallelism: 2
+
+  - &playground9
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - run:
+          name: Clone
+          command: git clone git@github.com:neo-one-suite/neo-one-playground.git
+          working_directory: ~/neo-one/packages
+      - restore-cache: *restore-yarn-playground-cache-9
+      - run: *yarn
+      - save-cache: *save-yarn-playground-cache-9
+      - run:
+          name: Build
+          command: yarn build:e2e
+      - run:
+          name: Test
+          command: yarn test:playground
+      - store_artifacts:
+          path: packages/neo-one-playground/cypress/videos
+      - store_artifacts:
+          path: packages/neo-one-playground/cypress/screenshots
 
   - &build-e2e10
     working_directory: ~/neo-one
@@ -209,6 +292,36 @@ aliases:
           path: reports
     parallelism: 2
 
+  - &playground10
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - run:
+          name: Clone
+          command: git clone git@github.com:neo-one-suite/neo-one-playground.git
+          working_directory: ~/neo-one/packages
+      - restore-cache: *restore-yarn-playground-cache-10
+      - run: *yarn
+      - save-cache: *save-yarn-playground-cache-10
+      - run:
+          name: Build
+          command: yarn build:e2e
+      - run:
+          name: Test
+          command: yarn test:playground --coverage --neo-one-coverage
+      - run:
+          name: Coverage Report
+          command: yarn nyc report --reporter=json
+          when: always
+      - run:
+          name: Upload Unit Test Coverage
+          command: yarn run codecov -f coverage/coverage-final.json -F playground
+          when: always
+      - store_artifacts:
+          path: packages/neo-one-playground/cypress/videos
+      - store_artifacts:
+          path: packages/neo-one-playground/cypress/screenshots
+
 node8: &node8
   docker:
     - image: neotracker/neo-one-circleci-node:8.9.0-0
@@ -232,6 +345,9 @@ jobs:
   build-e2e8:
     <<: *node8
     <<: *build-e2e8
+  playground8:
+    <<: *node8
+    <<: *playground8
 
   test9:
     <<: *node9
@@ -242,6 +358,9 @@ jobs:
   build-e2e9:
     <<: *node9
     <<: *build-e2e9
+  playground9:
+    <<: *node9
+    <<: *playground9
 
   test10:
     <<: *node10
@@ -252,6 +371,9 @@ jobs:
   build-e2e10:
     <<: *node10
     <<: *build-e2e10
+  playground10:
+    <<: *node10
+    <<: *playground10
 
   lint:
     <<: *node10
@@ -290,6 +412,8 @@ workflows:
           filters: *filter-ignore-gh-pages
       - test8:
           filters: *filter-ignore-gh-pages
+      - playground8:
+          filters: *filter-ignore-gh-pages
       - e2e8:
           requires:
             - build-e2e8
@@ -300,6 +424,8 @@ workflows:
           filters: *filter-ignore-gh-pages
       - test9:
           filters: *filter-ignore-gh-pages
+      - playground9:
+          filters: *filter-ignore-gh-pages
       - e2e9:
           requires:
             - build-e2e9
@@ -309,6 +435,8 @@ workflows:
       - build-e2e10:
           filters: *filter-ignore-gh-pages
       - test10:
+          filters: *filter-ignore-gh-pages
+      - playground10:
           filters: *filter-ignore-gh-pages
       - lint:
           filters: *filter-ignore-gh-pages
