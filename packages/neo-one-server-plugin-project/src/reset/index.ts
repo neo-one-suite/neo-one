@@ -59,27 +59,36 @@ export const reset = (pluginManager: PluginManager, options: ResetTaskListOption
         task: async (ctx) => {
           const networkName = getLocalNetworkName(getBuildOptions(ctx).rootDir, getProjectID(ctx));
           const [network, neotracker] = await Promise.all([
-            getNetworkResourceManager(pluginManager).getResource({ name: networkName, options: {} }),
-            getNEOTrackerResourceManager(pluginManager).getResource({
-              name: getLocalNEOTrackerName(networkName),
-              options: {},
-            }),
+            getNetworkResourceManager(pluginManager)
+              .getResource({ name: networkName, options: {} })
+              .catch(() => undefined),
+            getNEOTrackerResourceManager(pluginManager)
+              .getResource({
+                name: getLocalNEOTrackerName(networkName),
+                options: {},
+              })
+              .catch(() => undefined),
           ]);
 
-          if (network.state !== 'started') {
-            await getNetworkResourceManager(pluginManager)
-              .start(getLocalNetworkName(getBuildOptions(ctx).rootDir, getProjectID(ctx)), {})
-              .toPromise();
-          }
+          if (network !== undefined) {
+            if (network.state !== 'started') {
+              await getNetworkResourceManager(pluginManager)
+                .start(getLocalNetworkName(getBuildOptions(ctx).rootDir, getProjectID(ctx)), {})
+                .toPromise();
+            }
 
-          const developerClient = new DeveloperClient(
-            new NEOONEDataProvider({ network: 'local', rpcURL: network.nodes[0].rpcAddress }),
-          );
-          await developerClient.reset();
-          await developerClient.updateSettings({ secondsPerBlock: 15 });
-          await network.live();
-          await network.ready();
-          await neotracker.reset();
+            const developerClient = new DeveloperClient(
+              new NEOONEDataProvider({ network: 'local', rpcURL: network.nodes[0].rpcAddress }),
+            );
+            await developerClient.reset();
+            await developerClient.updateSettings({ secondsPerBlock: 15 });
+            await network.live();
+            await network.ready();
+
+            if (neotracker !== undefined) {
+              await neotracker.reset();
+            }
+          }
         },
       },
       {
