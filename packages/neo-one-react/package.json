@@ -9,7 +9,7 @@
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.63",
     "@types/lodash": "^4.14.116",
-    "@types/react": "^16.4.11",
+    "@types/react": "^16.4.12",
     "@types/react-select": "^2.0.2",
     "bignumber.js": "^7.2.1",
     "constate": "^0.8.0",
