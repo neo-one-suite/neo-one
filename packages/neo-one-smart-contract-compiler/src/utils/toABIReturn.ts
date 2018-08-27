@@ -16,6 +16,10 @@ export function toABIReturn(
     return undefined;
   }
 
+  if (tsUtils.type_.isOnlyVoidish(resolvedType)) {
+    return { type: 'Void', optional: false };
+  }
+
   let optional = optionalIn;
   if (tsUtils.type_.hasUndefinedish(resolvedType)) {
     resolvedType = tsUtils.type_.getNonNullableType(resolvedType);
@@ -36,10 +40,6 @@ export function toABIReturn(
 
   if (context.builtins.isInterface(node, resolvedType, 'PublicKey')) {
     return { type: 'PublicKey', optional };
-  }
-
-  if (tsUtils.type_.isOnlyVoidish(resolvedType)) {
-    return { type: 'Void', optional };
   }
 
   if (isOnlyString(context, node, resolvedType)) {
