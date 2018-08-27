@@ -55,6 +55,11 @@ class Hooker {
         this.mutableAddError(error);
       }
     });
+    client.hooks.callError.tap('CallErrorToast', (error) => {
+      if (this.mutableAddError !== undefined) {
+        this.mutableAddError(error);
+      }
+    });
     client.hooks.afterConfirmed.tap('TransactionToast', (transaction) => {
       if (this.mutableAddToast !== undefined && this.mutableNEOTrackerURL !== undefined) {
         this.mutableAddToast({

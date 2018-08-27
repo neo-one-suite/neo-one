@@ -7,6 +7,7 @@ import * as networksConstant from './networks';
 import {
   InvokeTransactionOptions,
   NetworkType,
+  RawCallReceipt,
   Transaction,
   TransactionOptions,
   TransactionReceipt,
@@ -22,6 +23,8 @@ export interface ClientHooks {
   readonly beforeConfirmed: AsyncParallelHook<Transaction>;
   readonly confirmedError: AsyncParallelHook<Transaction, Error>;
   readonly afterConfirmed: AsyncParallelHook<Transaction, TransactionReceipt>;
+  readonly afterCall: AsyncParallelHook<RawCallReceipt>;
+  readonly callError: AsyncParallelHook<Error>;
 }
 
 export class ClientBase<TUserAccountProviders extends { readonly [K in string]: UserAccountProvider }> {
@@ -41,6 +44,8 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
       beforeConfirmed: new AsyncParallelHook(['transaction']),
       confirmedError: new AsyncParallelHook(['transaction', 'error']),
       afterConfirmed: new AsyncParallelHook(['transaction', 'receipt']),
+      afterCall: new AsyncParallelHook(['receipt']),
+      callError: new AsyncParallelHook(['error']),
     };
     const providersArray = Object.values(providersIn);
     const providerIn =

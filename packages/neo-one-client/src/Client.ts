@@ -222,7 +222,16 @@ export class Client<
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     monitor?: Monitor,
   ): Promise<RawCallReceipt> {
-    return this.getNetworkProvider(network).call(network, contract, method, params, monitor);
+    try {
+      const receipt = await this.getNetworkProvider(network).call(network, contract, method, params, monitor);
+      await this.hooks.afterCall.promise(receipt);
+
+      return receipt;
+    } catch (error) {
+      await this.hooks.callError.promise(error);
+
+      throw error;
+    }
   }
 
   public reset(): void {
