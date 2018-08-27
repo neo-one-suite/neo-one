@@ -17,7 +17,8 @@ interface WithAddErrorProps {
 let mutableID = 0;
 
 const StyledPre = styled.pre`
-  white-space: pre-wrap;
+  white-space: pre;
+  overflow-x: auto;
 `;
 
 export function WithAddError({ children }: WithAddErrorProps) {
