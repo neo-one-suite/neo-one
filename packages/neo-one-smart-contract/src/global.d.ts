@@ -70,6 +70,7 @@ interface Buffer {
    */
   readonly length: number;
   equals(otherBuffer: Buffer): boolean;
+  toString(encoding: 'utf8'): string;
 }
 interface BufferConstructor {
   /**
