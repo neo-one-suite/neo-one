@@ -1,7 +1,8 @@
+// tslint:disable no-null-keyword
 import { createPrivateKey, LocalKeyStore } from '@neo-one/client';
 import * as React from 'react';
 import Select from 'react-select';
-import { Flex, styled } from 'reakit';
+import { Grid, styled } from 'reakit';
 import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { FromStream } from '../FromStream';
@@ -11,11 +12,7 @@ import { DeveloperToolsContext, WithTokens } from './DeveloperToolsContext';
 import { getOptions$, makeValueOption, OptionType, WalletSelectorBase } from './WalletSelectorBase';
 import { WithAddError } from './WithAddError';
 
-const NewWalletButton = styled(Button)`
-  margin-left: 8px;
-`;
-
-const Wrapper = styled(Flex)`
+const Wrapper = styled(Grid)`
   align-items: center;
   margin: 16px 0;
 `;
@@ -78,25 +75,33 @@ export function WalletSelector(props: ComponentProps<Select<OptionType>>) {
                     const newWalletButton =
                       // tslint:disable-next-line no-null-keyword
                       newWalletOnClick === undefined ? null : (
-                        <NewWalletButton data-test="neo-one-wallet-selector-new-button" onClick={newWalletOnClick}>
+                        <Button data-test="neo-one-wallet-selector-new-button" onClick={newWalletOnClick}>
                           New Wallet
-                        </NewWalletButton>
+                        </Button>
                       );
 
                     return (
-                      <Wrapper>
-                        <WalletSelectorBase
-                          data-test="neo-one-wallet-selector-selector"
-                          {...props}
-                          value={value}
-                          options={options}
-                          onChange={(option) => {
-                            if (option != undefined && !Array.isArray(option)) {
-                              client.selectAccount(option.id).catch(addError);
-                            }
-                          }}
-                        />
-                        {newWalletButton}
+                      <Wrapper gap={8}>
+                        <Grid gap={8} gridAutoFlow="column">
+                          <WalletSelectorBase
+                            data-test="neo-one-wallet-selector-selector"
+                            {...props}
+                            value={value}
+                            options={options}
+                            onChange={(option) => {
+                              if (option != undefined && !Array.isArray(option)) {
+                                client.selectAccount(option.id).catch(addError);
+                              }
+                            }}
+                          />
+                          {newWalletButton}
+                        </Grid>
+                        {value === undefined ? null : (
+                          <Grid columns="auto 1fr" gap={8}>
+                            <Grid.Item>Address:</Grid.Item>
+                            <Grid.Item>{value.address}</Grid.Item>
+                          </Grid>
+                        )}
                       </Wrapper>
                     );
                   }}
