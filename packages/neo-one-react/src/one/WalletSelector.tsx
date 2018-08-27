@@ -82,7 +82,7 @@ export function WalletSelector(props: ComponentProps<Select<OptionType>>) {
 
                     return (
                       <Wrapper gap={8}>
-                        <Grid gap={8} gridAutoFlow="column">
+                        <Grid gap={16} gridAutoFlow="column">
                           <WalletSelectorBase
                             data-test="neo-one-wallet-selector-selector"
                             {...props}
