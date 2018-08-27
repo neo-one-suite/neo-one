@@ -205,6 +205,11 @@ export class ToStringHelper extends TypedHelper {
       sb.emitPushString(node, '');
     };
 
+    const convertBuffer = (innerOptions: VisitOptions) => {
+      // [buffer]
+      sb.emitHelper(node, innerOptions, sb.helpers.unwrapBuffer);
+    };
+
     const doConvert = (options: VisitOptions, initial = true) => {
       sb.emitHelper(
         node,
@@ -214,7 +219,7 @@ export class ToStringHelper extends TypedHelper {
           knownType: initial ? this.knownType : undefined,
           array: initial ? convertArray : throwTypeError,
           boolean: convertBoolean,
-          buffer: convertEmptyString,
+          buffer: convertBuffer,
           null: convertNull,
           number: convertNumber,
           object: initial ? convertObject : throwTypeError,

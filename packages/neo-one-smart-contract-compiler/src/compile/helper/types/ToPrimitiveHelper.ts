@@ -53,8 +53,9 @@ export class ToPrimitiveHelper extends Helper {
     };
 
     const convertBuffer = (options: VisitOptions) => {
-      sb.emitOp(node, 'DROP');
-      sb.emitPushString(node, '');
+      // [buffer]
+      sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
+      // [val]
       sb.emitHelper(node, options, sb.helpers.wrapString);
     };
 
