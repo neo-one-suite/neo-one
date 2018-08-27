@@ -109,11 +109,11 @@
     }
   },
   "devDependencies": {
-    "@babel/core": "7.0.0-rc.3",
-    "@babel/plugin-syntax-dynamic-import": "7.0.0-rc.3",
-    "@babel/plugin-syntax-numeric-separator": "7.0.0-rc.3",
-    "@babel/plugin-syntax-optional-catch-binding": "7.0.0-rc.3",
-    "@babel/plugin-syntax-typescript": "7.0.0-rc.3",
+    "@babel/core": "7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "7.0.0",
+    "@babel/plugin-syntax-numeric-separator": "7.0.0",
+    "@babel/plugin-syntax-optional-catch-binding": "7.0.0",
+    "@babel/plugin-syntax-typescript": "7.0.0",
     "@reactivex/ix-esnext-esm": "2.3.5",
     "@types/jest": "23.3.1",
     "all-contributors-cli": "5.4.0",
