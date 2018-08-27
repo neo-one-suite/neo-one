@@ -61,7 +61,7 @@ ${genSmartContract(name, abi)}${genReadSmartContract(name, abi)}`;
 
   const importDecl = `import { ${importClauses.join(', ')} } from '@neo-one/client';${bigNumberImport}`;
   const eventType = `export type ${getEventName(name)} = ${
-    events.length === 0 ? '{}' : events.map((event) => getSingleEventName(name, event.name)).join(' | ')
+    events.length === 0 ? 'never' : events.map((event) => getSingleEventName(name, event.name)).join(' | ')
   }`;
 
   return {
