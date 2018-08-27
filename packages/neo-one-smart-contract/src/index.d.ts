@@ -35,13 +35,13 @@ export interface AddressConstructor {
    *
    * @example
    *
-   * if (!Address.verifySender(address)) {
+   * if (!Address.isSender(address)) {
    *   return false;
    * }
    *
    * @returns true if `Address` approved this `Transaction`
    */
-  readonly verifySender: (address: Address) => boolean;
+  readonly isSender: (address: Address) => boolean;
 }
 export const Address: AddressConstructor;
 

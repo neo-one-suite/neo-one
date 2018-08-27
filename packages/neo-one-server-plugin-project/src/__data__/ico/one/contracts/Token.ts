@@ -31,7 +31,7 @@ export class Token implements SmartContract {
   private readonly balances = new MapStorage<Address, Fixed<8>>();
 
   public constructor(public readonly owner: Address = Deploy.senderAddress) {
-    if (!Address.verifySender(owner)) {
+    if (!Address.isSender(owner)) {
       throw new Error('Sender was not the owner.');
     }
   }
@@ -53,7 +53,7 @@ export class Token implements SmartContract {
       throw new Error(`Amount must be greater than 0: ${amount}`);
     }
 
-    if (!Address.verifySender(from)) {
+    if (!Address.isSender(from)) {
       return false;
     }
 

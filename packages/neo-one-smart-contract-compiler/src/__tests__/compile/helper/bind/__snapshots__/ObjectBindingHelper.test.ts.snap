@@ -40,12 +40,12 @@ exports[`ObjectBindingHelper variable builtin value instance computed property 1
 `;
 
 exports[`ObjectBindingHelper variable builtin value method property 1`] = `
-"snippetCode.ts (3,34): Builtins cannot be referenced
+"snippetCode.ts (3,30): Builtins cannot be referenced
 
       1 | 
       2 |         import { Address } from '@neo-one/smart-contract';
-    > 3 |         const { verifySender } = Address;
-        |                                  ^
+    > 3 |         const { isSender } = Address;
+        |                              ^
       4 | 
       5 |         assertEqual(currentTransaction !== undefined, true);
       6 |       

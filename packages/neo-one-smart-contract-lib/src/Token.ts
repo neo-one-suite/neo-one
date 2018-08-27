@@ -35,7 +35,7 @@ export abstract class Token<Decimals extends number> implements SmartContract {
       throw new Error(`Amount must be greater than 0: ${amount}`);
     }
 
-    if (!Address.verifySender(from)) {
+    if (!Address.isSender(from)) {
       return false;
     }
 

@@ -7,7 +7,7 @@ import { BuiltinMemberCall } from '../../BuiltinMemberCall';
 import { MemberLikeExpression } from '../../types';
 
 // tslint:disable-next-line export-name
-export class AddressVerifySender extends BuiltinMemberCall {
+export class AddressIsSender extends BuiltinMemberCall {
   public emitCall(
     sb: ScriptBuilder,
     _func: MemberLikeExpression,

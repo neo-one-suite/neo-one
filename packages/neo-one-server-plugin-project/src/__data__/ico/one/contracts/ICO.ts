@@ -31,7 +31,7 @@ export class ICO implements SmartContract {
     public readonly startTimeSeconds: Integer = Blockchain.currentBlockTime,
     public readonly icoDurationSeconds: Integer = 157700000,
   ) {
-    if (!Address.verifySender(owner)) {
+    if (!Address.isSender(owner)) {
       throw new Error('Sender was not the owner.');
     }
   }

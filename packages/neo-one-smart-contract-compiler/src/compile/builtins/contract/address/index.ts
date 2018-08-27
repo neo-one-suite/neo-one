@@ -2,7 +2,7 @@ import { BuiltinBase } from '../../BuiltinBase';
 import { BuiltinInterface } from '../../BuiltinInterface';
 import { Builtins } from '../../Builtins';
 import { AddressFrom } from './from';
-import { AddressVerifySender } from './verifySender';
+import { AddressIsSender } from './isSender';
 
 class AddressInterface extends BuiltinInterface {}
 class AddressValue extends BuiltinBase {}
@@ -14,5 +14,5 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractValue('Address', new AddressValue());
   builtins.addContractInterface('AddressConstructor', new AddressConstructorInterface());
   builtins.addContractMember('AddressConstructor', 'from', new AddressFrom());
-  builtins.addContractMember('AddressConstructor', 'verifySender', new AddressVerifySender());
+  builtins.addContractMember('AddressConstructor', 'isSender', new AddressIsSender());
 };

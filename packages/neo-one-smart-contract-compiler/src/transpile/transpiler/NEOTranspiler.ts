@@ -573,7 +573,7 @@ export class NEOTranspiler implements Transpiler {
           ts.createCall(
             ts.createPropertyAccess(
               ts.createIdentifier(this.getContractIdentifier(this.smartContract, 'Address')),
-              'verifySender',
+              'isSender',
             ),
             undefined,
             [ts.createPropertyAccess(ts.createIdentifier(contractIdentifier), 'owner')],

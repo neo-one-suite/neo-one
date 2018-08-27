@@ -14,7 +14,7 @@ export abstract class SimpleToken extends Token<8> {
 
   public constructor(owner: Address, amount: Fixed<8>) {
     super();
-    if (!Address.verifySender(owner)) {
+    if (!Address.isSender(owner)) {
       throw new Error('Sender was not the owner.');
     }
     this.owner = owner;

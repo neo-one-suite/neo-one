@@ -76,7 +76,7 @@ describe('ObjectBindingHelper', () => {
       helpers.compileString(
         `
         import { Address } from '@neo-one/smart-contract';
-        const { verifySender } = Address;
+        const { isSender } = Address;
 
         assertEqual(currentTransaction !== undefined, true);
       `,

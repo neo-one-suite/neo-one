@@ -42,7 +42,7 @@ export class ICO implements SmartContract {
     public readonly startTimeSeconds: Integer = 1000000,
     public readonly icoDurationSeconds: Integer = 100000,
   ) {
-    if (!Address.verifySender(owner)) {
+    if (!Address.isSender(owner)) {
       throw new Error('Sender was not the owner.');
     }
   }
@@ -62,7 +62,7 @@ export class ICO implements SmartContract {
       throw new Error(`Amount must be greater than 0: ${amount}`);
     }
 
-    if (!Address.verifySender(from)) {
+    if (!Address.isSender(from)) {
       return false;
     }
 
