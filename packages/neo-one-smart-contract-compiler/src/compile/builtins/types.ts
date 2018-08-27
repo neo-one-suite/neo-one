@@ -70,10 +70,11 @@ export function isBuiltinTemplate(value: Builtin): value is BuiltinTemplate {
   return value.types.has(BuiltinType.Template);
 }
 
+export type CallMemberLikeExpression = ts.PropertyAccessExpression | ts.ElementAccessExpression;
 export interface BuiltinMemberTemplate extends Builtin {
   readonly emitCall: (
     sb: ScriptBuilder,
-    func: MemberLikeExpression,
+    func: CallMemberLikeExpression,
     node: ts.TaggedTemplateExpression,
     options: VisitOptions,
   ) => void;
@@ -86,13 +87,13 @@ export function isBuiltinMemberTemplate(value: Builtin): value is BuiltinMemberT
 export interface BuiltinInstanceMemberTemplate extends Builtin {
   readonly canCall: (
     sb: ScriptBuilder,
-    func: MemberLikeExpression,
+    func: CallMemberLikeExpression,
     node: ts.TaggedTemplateExpression,
     options: VisitOptions,
   ) => boolean;
   readonly emitCall: (
     sb: ScriptBuilder,
-    func: MemberLikeExpression,
+    func: CallMemberLikeExpression,
     node: ts.TaggedTemplateExpression,
     options: VisitOptions,
     visited: boolean,
@@ -106,7 +107,7 @@ export function isBuiltinInstanceMemberTemplate(value: Builtin): value is Builti
 export interface BuiltinMemberCall extends Builtin {
   readonly emitCall: (
     sb: ScriptBuilder,
-    func: MemberLikeExpression,
+    func: CallMemberLikeExpression,
     node: ts.CallExpression,
     options: VisitOptions,
   ) => void;
@@ -119,13 +120,13 @@ export function isBuiltinMemberCall(value: Builtin): value is BuiltinMemberCall 
 export interface BuiltinInstanceMemberCall extends Builtin {
   readonly canCall: (
     sb: ScriptBuilder,
-    func: MemberLikeExpression,
+    func: CallMemberLikeExpression,
     node: ts.CallExpression,
     options: VisitOptions,
   ) => boolean;
   readonly emitCall: (
     sb: ScriptBuilder,
-    func: MemberLikeExpression,
+    func: CallMemberLikeExpression,
     node: ts.CallExpression,
     options: VisitOptions,
     visited: boolean,

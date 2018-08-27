@@ -4,14 +4,25 @@ import { VisitOptions } from '../../types';
 import { BuiltinInstanceOf } from '../BuiltinInstanceOf';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
+import { Builtin } from '../types';
+import { ArrayConcat } from './concat';
+import { ArrayEntries } from './entries';
+import { ArrayEvery } from './every';
 import { ArrayFilter } from './filter';
 import { ArrayForEach } from './forEach';
 import { ArrayIterator } from './iterator';
+import { ArrayJoin } from './join';
 import { ArrayLength } from './length';
 import { ArrayMap } from './map';
+import { ArrayPop } from './pop';
+import { ArrayPush } from './push';
 import { ArrayReduce } from './reduce';
+import { ArraySlice } from './slice';
+import { ArraySome } from './some';
+import { ArrayToString } from './toString';
 
 class ArrayInterface extends BuiltinInterface {}
+class ReadonlyArrayInterface extends BuiltinInterface {}
 class ArrayValue extends BuiltinInstanceOf {
   public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
@@ -31,15 +42,32 @@ class ArrayValue extends BuiltinInstanceOf {
 }
 class ArrayConstructorInterface extends BuiltinInterface {}
 
+const COMMON: ReadonlyArray<[string, Builtin]> = [
+  ['filter', new ArrayFilter()],
+  ['forEach', new ArrayForEach()],
+  ['__@iterator', new ArrayIterator()],
+  ['length', new ArrayLength()],
+  ['map', new ArrayMap()],
+  ['reduce', new ArrayReduce()],
+  ['toString', new ArrayToString()],
+  ['concat', new ArrayConcat()],
+  ['join', new ArrayJoin()],
+  ['slice', new ArraySlice()],
+  ['some', new ArraySome()],
+  ['every', new ArrayEvery()],
+  ['entries', new ArrayEntries()],
+];
+
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addInterface('Array', new ArrayInterface());
+  builtins.addInterface('ReadonlyArray', new ReadonlyArrayInterface());
   builtins.addValue('Array', new ArrayValue());
-  builtins.addMember('Array', 'filter', new ArrayFilter());
-  builtins.addMember('Array', 'forEach', new ArrayForEach());
-  builtins.addMember('Array', '__@iterator', new ArrayIterator());
-  builtins.addMember('Array', 'length', new ArrayLength());
-  builtins.addMember('Array', 'map', new ArrayMap());
-  builtins.addMember('Array', 'reduce', new ArrayReduce());
+  COMMON.forEach(([name, builtin]) => {
+    builtins.addMember('Array', name, builtin);
+    builtins.addMember('ReadonlyArray', name, builtin);
+  });
+  builtins.addMember('Array', 'pop', new ArrayPop());
+  builtins.addMember('Array', 'push', new ArrayPush());
   builtins.addInterface('ArrayConstructor', new ArrayConstructorInterface());
 };

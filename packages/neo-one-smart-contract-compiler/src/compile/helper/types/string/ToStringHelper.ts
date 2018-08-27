@@ -1,12 +1,23 @@
-import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { Types } from '../../../constants';
 import { ScriptBuilder } from '../../../sb';
 import { VisitOptions } from '../../../types';
-import { TypedHelper } from '../TypedHelper';
+import { TypedHelper, TypedHelperOptions } from '../TypedHelper';
+
+export interface ToStringHelperOptions extends TypedHelperOptions {
+  readonly initial?: boolean;
+}
 
 // Input: [val]
 // Output: [string]
 export class ToStringHelper extends TypedHelper {
+  private readonly initial: boolean;
+
+  public constructor({ initial = true, type, knownType }: ToStringHelperOptions) {
+    super({ type, knownType });
+
+    this.initial = initial;
+  }
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
@@ -138,64 +149,10 @@ export class ToStringHelper extends TypedHelper {
     };
 
     const convertArray = (options: VisitOptions) => {
-      const types = this.type === undefined ? [] : tsUtils.type_.getArrayTypes(this.type);
-      const type = types.length === 1 ? tsUtils.type_.getArrayType(types[0]) : undefined;
       // [arr]
       sb.emitHelper(node, options, sb.helpers.unwrapArray);
-      // [accum, arr]
-      sb.emitPushString(node, '');
-      // [accum]
-      sb.emitHelper(
-        node,
-        options,
-        sb.helpers.arrReduce({
-          withIndex: true,
-          each: (innerOptions) => {
-            sb.emitHelper(
-              node,
-              options,
-              sb.helpers.if({
-                condition: () => {
-                  // [idx, accum, val]
-                  sb.emitOp(node, 'ROT');
-                  // [0, idx, accum, val]
-                  sb.emitPushInt(node, 0);
-                  // [idx === 0, accum, val]
-                  sb.emitOp(node, 'NUMEQUAL');
-                },
-                whenTrue: () => {
-                  // [val]
-                  sb.emitOp(node, 'DROP');
-                  if (type === undefined) {
-                    // [accum]
-                    doConvert(innerOptions, false);
-                  } else {
-                    // [accum]
-                    sb.emitHelper(node, innerOptions, sb.helpers.toString({ type }));
-                  }
-                },
-                whenFalse: () => {
-                  // [string, accum, val]
-                  sb.emitPushString(node, ',');
-                  // [accum, val]
-                  sb.emitOp(node, 'CAT');
-                  // [val, accum]
-                  sb.emitOp(node, 'SWAP');
-                  if (type === undefined) {
-                    // [string, accum]
-                    doConvert(innerOptions, false);
-                  } else {
-                    // [string, accum]
-                    sb.emitHelper(node, innerOptions, sb.helpers.toString({ type }));
-                  }
-                  // [accum]
-                  sb.emitOp(node, 'CAT');
-                },
-              }),
-            );
-          },
-        }),
-      );
+      // [string]
+      sb.emitHelper(node, options, sb.helpers.arrToString({ type: this.type, knownType: Types.Array }));
     };
 
     const convertEmptyString = () => {
@@ -210,7 +167,7 @@ export class ToStringHelper extends TypedHelper {
       sb.emitHelper(node, innerOptions, sb.helpers.unwrapBuffer);
     };
 
-    const doConvert = (options: VisitOptions, initial = true) => {
+    const doConvert = (options: VisitOptions, initial: boolean) => {
       sb.emitHelper(
         node,
         options,
@@ -239,6 +196,6 @@ export class ToStringHelper extends TypedHelper {
       );
     };
 
-    doConvert(optionsIn, true);
+    doConvert(optionsIn, this.initial);
   }
 }

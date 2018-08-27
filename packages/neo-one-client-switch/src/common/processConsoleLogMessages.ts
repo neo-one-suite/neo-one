@@ -13,6 +13,10 @@ export const disableConsoleLogForTest = () => {
   disabled = true;
 };
 
+export const enableConsoleLogForTest = () => {
+  disabled = false;
+};
+
 export const processConsoleLogMessages = async ({ actions, sourceMaps }: ProcessConsoleLogOptions): Promise<void> => {
   if (!disabled) {
     const logs = await createConsoleLogMessages(actions, sourceMaps);

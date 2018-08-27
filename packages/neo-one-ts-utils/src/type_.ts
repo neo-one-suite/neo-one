@@ -507,7 +507,10 @@ export function isArray(type: ts.Type): boolean {
     return false;
   }
 
-  return symbol_.getName(typeSymbol) === 'Array' && typeArguments.length === 1;
+  return (
+    (symbol_.getName(typeSymbol) === 'Array' || symbol_.getName(typeSymbol) === 'ReadonlyArray') &&
+    typeArguments.length === 1
+  );
 }
 export function isOnlyArray(type: ts.Type): boolean {
   return isOnlyType(type, isArray);

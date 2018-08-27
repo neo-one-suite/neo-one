@@ -1,4 +1,7 @@
 import {
+  ArrCloneHelper,
+  ArrConcatHelper,
+  ArrEveryFuncHelper,
   ArrFilterFuncHelper,
   ArrFilterHelper,
   ArrFilterHelperOptions,
@@ -13,8 +16,11 @@ import {
   ArrReduceFuncHelper,
   ArrReduceHelper,
   ArrReduceHelperOptions,
+  ArrSomeFuncHelper,
   ArrSomeHelper,
   ArrSomeHelperOptions,
+  ArrToStringHelper,
+  ArrToStringHelperOptions,
   ExtendArrHelper,
 } from './arr';
 import { CreateArrayIterableIteratorHelper, GetArrayIterableIteratorClassHelper } from './arrayIterableIterator';
@@ -76,6 +82,12 @@ import {
   GetGlobalPropertyHelperOptions,
 } from './global';
 import { Helper } from './Helper';
+import {
+  CreateArrayEntriesIterableIteratorHelper,
+  GetArrayEntriesIterableIteratorClassHelper,
+  IteratorForEachHelper,
+  IteratorForEachHelperOptions,
+} from './iterator';
 import { KeyedHelper } from './KeyedHelper';
 import { GetMapClassHelper } from './map';
 import {
@@ -175,6 +187,7 @@ import {
   ToPrimitiveHelper,
   ToPrimitiveHelperOptions,
   ToStringHelper,
+  ToStringHelperOptions,
   TypedHelperOptions,
   UnwrapArrayHelper,
   UnwrapAttributeHelper,
@@ -224,6 +237,9 @@ export interface Helpers {
   readonly unwrapAccount: UnwrapAccountHelper;
 
   // arr
+  readonly arrClone: ArrCloneHelper;
+  readonly arrConcat: ArrConcatHelper;
+  readonly arrEveryFunc: ArrEveryFuncHelper;
   readonly arrFilter: (options: ArrFilterHelperOptions) => ArrFilterHelper;
   readonly arrFilterFunc: ArrFilterFuncHelper;
   readonly arrMap: (options: ArrMapHelperOptions) => ArrMapHelper;
@@ -233,7 +249,9 @@ export interface Helpers {
   readonly arrRange: (options: ArrRangeHelperOptions) => ArrRangeHelper;
   readonly arrReduce: (options: ArrReduceHelperOptions) => ArrReduceHelper;
   readonly arrReduceFunc: ArrReduceFuncHelper;
+  readonly arrSomeFunc: ArrSomeFuncHelper;
   readonly arrSome: (options: ArrSomeHelperOptions) => ArrSomeHelper;
+  readonly arrToString: (options: ArrToStringHelperOptions) => ArrToStringHelper;
   readonly extendArr: ExtendArrHelper;
 
   // arrayIterableIterator
@@ -329,7 +347,7 @@ export interface Helpers {
   readonly unwrapSymbol: UnwrapSymbolHelper;
   readonly getObject: GetObjectHelper;
   readonly toBoolean: (options: TypedHelperOptions) => ToBooleanHelper;
-  readonly toString: (options: TypedHelperOptions) => ToStringHelper;
+  readonly toString: (options: ToStringHelperOptions) => ToStringHelper;
   readonly toNumber: (options: TypedHelperOptions) => ToNumberHelper;
   readonly toObject: (options: TypedHelperOptions) => ToObjectHelper;
   readonly toPrimitive: (options: ToPrimitiveHelperOptions) => ToPrimitiveHelper;
@@ -375,6 +393,11 @@ export interface Helpers {
   readonly isHeader: IsHeaderHelper;
   readonly wrapHeader: WrapHeaderHelper;
   readonly unwrapHeader: UnwrapHeaderHelper;
+
+  // iterator
+  readonly createArrayEntriesIterableIterator: CreateArrayEntriesIterableIteratorHelper;
+  readonly getArrayEntriesIterableIteratorClass: GetArrayEntriesIterableIteratorClassHelper;
+  readonly iteratorForEach: (options: IteratorForEachHelperOptions) => IteratorForEachHelper;
 
   // map
   readonly getMapClass: GetMapClassHelper;
@@ -466,6 +489,9 @@ export const createHelpers = (): Helpers => {
     unwrapAccount: new UnwrapAccountHelper(),
 
     // arr
+    arrClone: new ArrCloneHelper(),
+    arrConcat: new ArrConcatHelper(),
+    arrEveryFunc: new ArrEveryFuncHelper(),
     arrFilter: (options) => new ArrFilterHelper(options),
     arrFilterFunc: new ArrFilterFuncHelper(),
     arrMap: (options) => new ArrMapHelper(options),
@@ -475,7 +501,9 @@ export const createHelpers = (): Helpers => {
     arrRange: (options) => new ArrRangeHelper(options),
     arrReduce: (options) => new ArrReduceHelper(options),
     arrReduceFunc: new ArrReduceFuncHelper(),
+    arrSomeFunc: new ArrSomeFuncHelper(),
     arrSome: (options) => new ArrSomeHelper(options),
+    arrToString: (options) => new ArrToStringHelper(options),
     extendArr: new ExtendArrHelper(),
 
     // arrayIterableIterator
@@ -613,6 +641,11 @@ export const createHelpers = (): Helpers => {
     isHeader: new IsHeaderHelper(),
     wrapHeader: new WrapHeaderHelper(),
     unwrapHeader: new UnwrapHeaderHelper(),
+
+    // iterator
+    createArrayEntriesIterableIterator: new CreateArrayEntriesIterableIteratorHelper(),
+    getArrayEntriesIterableIteratorClass: new GetArrayEntriesIterableIteratorClassHelper(),
+    iteratorForEach: (options) => new IteratorForEachHelper(options),
 
     // map
     getMapClass: new GetMapClassHelper(),

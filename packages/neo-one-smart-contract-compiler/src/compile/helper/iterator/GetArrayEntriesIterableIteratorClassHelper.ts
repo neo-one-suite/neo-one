@@ -6,14 +6,14 @@ import { Helper } from '../Helper';
 
 // Input: [val]
 // Output: [val]
-export class GetArrayIterableIteratorClassHelper extends Helper {
+export class GetArrayEntriesIterableIteratorClassHelper extends Helper {
   public readonly needsGlobal: boolean = true;
 
   public emitGlobal(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const outerOptions = sb.pushValueOptions(optionsIn);
 
     // [number, globalObject]
-    sb.emitPushInt(node, GlobalProperty.ArrayIterableIterator);
+    sb.emitPushInt(node, GlobalProperty.ArrayEntriesIterableIterator);
     // [classVal, number, globalObjectVal]
     sb.emitHelper(
       node,
@@ -99,14 +99,26 @@ export class GetArrayIterableIteratorClassHelper extends Helper {
                   sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
                 },
                 whenFalse: () => {
-                  // [arrayVal, idx]
-                  sb.emitOp(node, 'SWAP');
-                  // [arr, idx]
+                  // [idx, idx, arrayVal]
+                  sb.emitOp(node, 'DUP');
+                  // [idxVal, idx, arrayVal]
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapNumber);
+                  // [arrayVal, idxVal, idx]
+                  sb.emitOp(node, 'ROT');
+                  // [arr, idxVal, idx]
                   sb.emitHelper(node, innerOptions, sb.helpers.unwrapArray);
-                  // [idx, arr]
-                  sb.emitOp(node, 'SWAP');
-                  // [val]
+                  // [idx, arr, idxVal]
+                  sb.emitOp(node, 'ROT');
+                  // [val, idxVal]
                   sb.emitOp(node, 'PICKITEM');
+                  // [idxVal, val]
+                  sb.emitOp(node, 'SWAP');
+                  // [2, idxVal, val]
+                  sb.emitPushInt(node, 2);
+                  // [arr]
+                  sb.emitOp(node, 'PACK');
+                  // [val]
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapArray);
                   // [done, val]
                   sb.emitPushBoolean(node, false);
                   // [done, val]
@@ -154,6 +166,10 @@ export class GetArrayIterableIteratorClassHelper extends Helper {
       return;
     }
     // [classVal]
-    sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: GlobalProperty.ArrayIterableIterator }));
+    sb.emitHelper(
+      node,
+      options,
+      sb.helpers.getGlobalProperty({ property: GlobalProperty.ArrayEntriesIterableIterator }),
+    );
   }
 }

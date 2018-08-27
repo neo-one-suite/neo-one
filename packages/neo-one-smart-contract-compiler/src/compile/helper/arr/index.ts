@@ -1,3 +1,6 @@
+export * from './ArrCloneHelper';
+export * from './ArrConcatHelper';
+export * from './ArrEveryFuncHelper';
 export * from './ArrFilterFuncHelper';
 export * from './ArrFilterHelper';
 export * from './ArrForEachFuncHelper';
@@ -7,5 +10,7 @@ export * from './ArrMapHelper';
 export * from './ArrRangeHelper';
 export * from './ArrReduceFuncHelper';
 export * from './ArrReduceHelper';
+export * from './ArrSomeFuncHelper';
 export * from './ArrSomeHelper';
+export * from './ArrToStringHelper';
 export * from './ExtendArrHelper';

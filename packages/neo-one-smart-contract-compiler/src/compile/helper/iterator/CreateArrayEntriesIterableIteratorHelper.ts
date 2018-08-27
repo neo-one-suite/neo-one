@@ -6,7 +6,7 @@ import { Helper } from '../Helper';
 
 // Input: [arrayVal]
 // Output: [val]
-export class CreateArrayIterableIteratorHelper extends Helper {
+export class CreateArrayEntriesIterableIteratorHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [1, val]
@@ -14,7 +14,7 @@ export class CreateArrayIterableIteratorHelper extends Helper {
     // [argsarr]
     sb.emitOp(node, 'PACK');
     // [classVal, argsarr]
-    sb.emitHelper(node, options, sb.helpers.getArrayIterableIteratorClass);
+    sb.emitHelper(node, options, sb.helpers.getArrayEntriesIterableIteratorClass);
     // [thisVal]
     sb.emitHelper(node, options, sb.helpers.new());
 

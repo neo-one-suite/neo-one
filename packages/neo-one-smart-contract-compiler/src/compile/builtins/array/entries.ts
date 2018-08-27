@@ -6,7 +6,7 @@ import { BuiltinInstanceMemberCall } from '../BuiltinInstanceMemberCall';
 import { CallMemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
-export class ArrayIterator extends BuiltinInstanceMemberCall {
+export class ArrayEntries extends BuiltinInstanceMemberCall {
   public canCall(): boolean {
     return true;
   }
@@ -32,6 +32,6 @@ export class ArrayIterator extends BuiltinInstanceMemberCall {
     }
 
     // [val]
-    sb.emitHelper(node, options, sb.helpers.createArrayIterableIterator);
+    sb.emitHelper(node, options, sb.helpers.createArrayEntriesIterableIterator);
   }
 }

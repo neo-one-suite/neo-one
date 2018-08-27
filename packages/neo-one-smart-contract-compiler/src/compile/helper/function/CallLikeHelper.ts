@@ -6,13 +6,13 @@ import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import {
   Builtin,
   BuiltinInstanceMemberTemplate,
+  CallMemberLikeExpression,
   isBuiltinCall,
   isBuiltinInstanceMemberCall,
   isBuiltinInstanceMemberTemplate,
   isBuiltinMemberCall,
   isBuiltinMemberTemplate,
   isBuiltinTemplate,
-  MemberLikeExpression,
 } from '../../builtins';
 import { BuiltinInstanceMemberCall } from '../../builtins/BuiltinInstanceMemberCall';
 import { Types } from '../../constants';
@@ -129,7 +129,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       }
     };
 
-    const handleBuiltinMemberCall = (builtinProp: Builtin, memberLike: MemberLikeExpression, visited: boolean) => {
+    const handleBuiltinMemberCall = (builtinProp: Builtin, memberLike: CallMemberLikeExpression, visited: boolean) => {
       if (ts.isCallExpression(expression)) {
         if (isBuiltinMemberCall(builtinProp)) {
           builtinProp.emitCall(sb, memberLike, expression, optionsIn);

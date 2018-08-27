@@ -40,7 +40,6 @@ export class ArrSliceHelper extends Helper {
       sb.emitOp(node, 'SWAP');
     }
 
-    // [end, start, arr]
     sb.emitHelper(
       node,
       options,
@@ -50,10 +49,12 @@ export class ArrSliceHelper extends Helper {
           sb.emitOp(node, 'TUCK');
           // [0, start, end, start, arr]
           sb.emitPushInt(node, 0);
-          // [start < 0, start, end, arr]
+          // [start < 0, end, start, arr]
           sb.emitOp(node, 'LT');
         },
         whenTrue: () => {
+          // [start, end, arr]
+          sb.emitOp(node, 'SWAP');
           // [arr, start, end]
           sb.emitOp(node, 'ROT');
           // [arr, start, arr, end]
@@ -68,7 +69,6 @@ export class ArrSliceHelper extends Helper {
       }),
     );
 
-    // [end, start, arr]
     sb.emitHelper(
       node,
       options,

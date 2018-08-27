@@ -10,4 +10,5 @@ export enum GlobalProperty {
   SetStorage = 8,
   CallingScriptHash = 9,
   GenericLogSerialize = 10,
+  ArrayEntriesIterableIterator = 11,
 }

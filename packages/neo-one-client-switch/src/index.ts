@@ -4,5 +4,6 @@ export {
   ProcessActionsAndMessageOptions,
   ProcessConsoleLogOptions,
   disableConsoleLogForTest,
+  enableConsoleLogForTest,
 } from './common';
 export * from './node';
