@@ -23,6 +23,7 @@ interface Props {
   readonly children?: React.ReactNode;
   readonly href?: string;
   readonly target?: string;
+  readonly disabled?: boolean;
   readonly 'data-test-button': string;
   readonly 'data-test-tooltip': string;
 }
