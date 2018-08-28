@@ -5060,9 +5060,9 @@ gtoken@^2.3.0:
     mime "^2.2.0"
     pify "^3.0.0"
 
-gulp-babel@8.0.0-beta.2:
-  version "8.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/gulp-babel/-/gulp-babel-8.0.0-beta.2.tgz#0ceed820eeece53da75bbb466b56db336c4136dd"
+gulp-babel@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/gulp-babel/-/gulp-babel-8.0.0.tgz#e0da96f4f2ec4a88dd3a3030f476e38ab2126d87"
   dependencies:
     plugin-error "^1.0.1"
     replace-ext "^1.0.0"
