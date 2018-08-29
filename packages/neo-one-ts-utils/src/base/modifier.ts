@@ -13,7 +13,12 @@ export function getFirstModifierByKind<Token extends ts.Modifier>(
   node: ts.Node,
   kind: Token extends ts.Token<infer TKind> ? TKind : never,
 ): Token | undefined {
-  return getModifiers(node).find((modifier): modifier is Token => modifier.kind === kind);
+  const modifier = getModifiers(node).find((mod): mod is Token => mod.kind === kind);
+  if (modifier !== undefined) {
+    return modifier;
+  }
+
+  return node.getChildren().find((mod): mod is Token => mod.kind === kind);
 }
 
 export function getAbstractKeyword(node: ts.Node): ts.Token<ts.SyntaxKind.AbstractKeyword> | undefined {

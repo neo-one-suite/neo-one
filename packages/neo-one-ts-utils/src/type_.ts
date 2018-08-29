@@ -205,7 +205,8 @@ export function isErrorType(type: ts.Type): boolean {
 }
 
 export function isUnion(type: ts.Type): type is ts.UnionType {
-  return type.isUnion();
+  // tslint:disable-next-line no-any
+  return (type as any).isUnion === undefined ? false : type.isUnion();
 }
 
 export function getUnionTypes(type: ts.Type): ReadonlyArray<ts.Type> | undefined {
@@ -216,7 +217,8 @@ export function getUnionTypesArray(type: ts.Type): ReadonlyArray<ts.Type> {
 }
 
 export function isIntersection(type: ts.Type): type is ts.IntersectionType {
-  return type.isIntersection();
+  // tslint:disable-next-line no-any
+  return (type as any).isIntersection === undefined ? false : type.isIntersection();
 }
 
 export function getIntersectionTypes(type: ts.Type): ReadonlyArray<ts.Type> | undefined {
