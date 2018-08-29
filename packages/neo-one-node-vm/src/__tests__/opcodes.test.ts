@@ -66,6 +66,8 @@ const reverseRef = new ArrayStackItem([
   new IntegerStackItem(new BN(3)),
 ]);
 
+const simpleStruct = new StructStackItem([new IntegerStackItem(new BN(1))]);
+
 const removeRef = new ArrayStackItem([new IntegerStackItem(new BN(1)), new IntegerStackItem(new BN(2))]);
 
 const mapStatic = new MapStackItem({
@@ -1355,6 +1357,19 @@ const OPCODES = ([
       },
 
       {
+        op: 'PICKITEM',
+        stackItems: [
+          new IntegerStackItem(new BN(1)),
+          new StructStackItem([
+            new IntegerStackItem(new BN(1)),
+            new StructStackItem([new IntegerStackItem(new BN(1))]),
+          ]),
+        ],
+        result: [new StructStackItem([new IntegerStackItem(new BN(1))])],
+        gas: FEES.ONE,
+      },
+
+      {
         op: 'SETITEM',
         ref: setRef,
         stackItems: [new IntegerStackItem(new BN(5)), new IntegerStackItem(new BN(0)), setRef],
@@ -1426,6 +1441,18 @@ const OPCODES = ([
         ref: appendRef,
         stackItems: [new IntegerStackItem(new BN(3)), appendRef],
         result: [new ArrayStackItem([new IntegerStackItem(new BN(3))])],
+        gas: FEES.ONE,
+      },
+
+      {
+        op: 'APPEND',
+        stackItems: [simpleStruct, simpleStruct, simpleStruct],
+        result: [
+          new StructStackItem([
+            new IntegerStackItem(new BN(1)),
+            new StructStackItem([new IntegerStackItem(new BN(1))]),
+          ]),
+        ],
         gas: FEES.ONE,
       },
 

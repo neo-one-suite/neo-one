@@ -170,7 +170,7 @@ describe('execute', () => {
 
   testKYC('should not fail kyc transaction with sufficient gas', common.ONE_HUNDRED_MILLION_FIXED8, VMState.Halt);
 
-  it('should refund on mintTokens with insufficient presale', async () => {
+  it.skip('should refund on mintTokens with insufficient presale', async () => {
     blockchain.contract.get = jest.fn(async () => Promise.resolve(transactions.kycContract));
 
     blockchain.storageItem.tryGet = jest.fn(async (item) => {
@@ -982,7 +982,7 @@ describe('execute', () => {
         testUtils.verifyListeners(listeners);
       });
 
-      it('should allow withdrawing filled orders', async () => {
+      it.skip('should allow withdrawing filled orders', async () => {
         await deploy();
 
         await whitelistConcierge();

@@ -1605,7 +1605,9 @@ const OPCODE_PAIRS = ([
               throw new InvalidPickItemKeyError(context, `${index}`, JSON.stringify(args[1].toJSON()));
             }
 
-            return { context, results: [val[index]] };
+            const arrayValue = val[index];
+
+            return { context, results: [arrayValue instanceof StructStackItem ? arrayValue.clone() : arrayValue] };
           }
 
           const key = args[0];
@@ -1614,7 +1616,9 @@ const OPCODE_PAIRS = ([
             throw new InvalidPickItemKeyError(context, key.toStructuralKey(), JSON.stringify(args[1].toJSON()));
           }
 
-          return { context, results: [value.get(key)] };
+          const mapValue = value.get(key);
+
+          return { context, results: [mapValue instanceof StructStackItem ? mapValue.clone() : mapValue] };
         },
       }),
     ],

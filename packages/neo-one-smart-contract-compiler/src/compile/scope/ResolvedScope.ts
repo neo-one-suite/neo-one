@@ -193,7 +193,7 @@ export class ResolvedScope implements Scope {
       // [0, this, global]
       sb.emitPushInt(node, 0);
       // [scopes, this, global]
-      sb.emitOp(node, 'NEWSTRUCT');
+      sb.emitOp(node, 'NEWARRAY');
       // [3, scopes, this, global]
       sb.emitPushInt(node, 3);
       // [[scopes, this, global]]
