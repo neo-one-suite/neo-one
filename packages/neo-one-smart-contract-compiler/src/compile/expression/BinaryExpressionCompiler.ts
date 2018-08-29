@@ -187,8 +187,8 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
   ): void {
     const options = sb.pushValueOptions(optionsIn);
 
-    const leftType = sb.context.getType(left);
-    const rightType = sb.context.getType(right);
+    const leftType = sb.context.analysis.getType(left);
+    const rightType = sb.context.analysis.getType(right);
 
     const visit = (
       leftHelper: (options: TypedHelperOptions) => Helper,
@@ -271,11 +271,11 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
               },
               whenTrue: () => {
                 // [string0, left]
-                sb.emitHelper(node, options, sb.helpers.toString({ type: sb.context.getType(right) }));
+                sb.emitHelper(node, options, sb.helpers.toString({ type: sb.context.analysis.getType(right) }));
                 // [left, string0]
                 sb.emitOp(node, 'SWAP');
                 // [string1, string0]
-                sb.emitHelper(node, options, sb.helpers.toString({ type: sb.context.getType(left) }));
+                sb.emitHelper(node, options, sb.helpers.toString({ type: sb.context.analysis.getType(left) }));
                 // [string0, string1]
                 sb.emitOp(node, 'SWAP');
                 // [string]
@@ -285,11 +285,11 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
               },
               whenFalse: () => {
                 // [number0, left]
-                sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.getType(right) }));
+                sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.analysis.getType(right) }));
                 // [left, number0]
                 sb.emitOp(node, 'SWAP');
                 // [number1, number0]
-                sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.getType(left) }));
+                sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.analysis.getType(left) }));
                 // [number0, number1]
                 sb.emitOp(node, 'SWAP');
                 //  [number]
@@ -441,7 +441,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
               sb.emitHelper(
                 left,
                 sb.pushValueOptions(options),
-                sb.helpers.toBoolean({ type: sb.context.getType(left) }),
+                sb.helpers.toBoolean({ type: sb.context.analysis.getType(left) }),
               );
             },
             whenTrue: () => {
@@ -470,7 +470,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
               sb.emitHelper(
                 left,
                 sb.pushValueOptions(options),
-                sb.helpers.toBoolean({ type: sb.context.getType(left) }),
+                sb.helpers.toBoolean({ type: sb.context.analysis.getType(left) }),
               );
             },
             whenFalse: () => {

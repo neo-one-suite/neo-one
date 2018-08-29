@@ -15,14 +15,14 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
     optionsIn: VisitOptions,
   ): void {
     const options = sb.pushValueOptions(optionsIn);
-    const returnType = sb.context.getType(node, { error: true });
+    const returnType = sb.context.analysis.getType(node);
     if (returnType === undefined) {
       return;
     }
 
     const properties = tsUtils.type_.getProperties(returnType);
     const props = properties.map((prop) => {
-      const propType = sb.context.getTypeOfSymbol(prop, node, { error: true });
+      const propType = sb.context.analysis.getTypeOfSymbol(prop, node);
       if (propType === undefined) {
         return undefined;
       }

@@ -183,7 +183,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       sb.emitHelper(expression, sb.noPushValueOptions(options), sb.helpers.invokeConstruct());
     } else if (ts.isPropertyAccessExpression(expr)) {
       const value = tsUtils.expression.getExpression(expr);
-      const valueType = sb.context.getType(value);
+      const valueType = sb.context.analysis.getType(value);
       const name = tsUtils.node.getNameNode(expr);
       const nameValue = tsUtils.node.getName(expr);
 
@@ -252,9 +252,9 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       );
     } else if (ts.isElementAccessExpression(expr)) {
       const value = tsUtils.expression.getExpression(expr);
-      const valueType = sb.context.getType(value);
+      const valueType = sb.context.analysis.getType(value);
       const prop = tsUtils.expression.getArgumentExpressionOrThrow(expr);
-      const propType = sb.context.getType(prop);
+      const propType = sb.context.analysis.getType(prop);
 
       const builtinProp = sb.context.builtins.getMember(value, prop);
       if (builtinProp !== undefined) {

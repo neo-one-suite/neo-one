@@ -2,11 +2,9 @@ import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
-import { Context, DiagnosticOptions } from '../../Context';
+import { Context } from '../../Context';
 import { createMemoized, nodeKey, pathResolve, symbolKey, typeKey } from '../../utils';
 import { Builtin, isBuiltinValueObject } from './types';
-
-const NO_WARNING_ERROR = { error: false, warning: false };
 
 const getMember = (sym: ts.Symbol, name: string) => tsUtils.symbol.getMemberOrThrow(sym, name);
 
@@ -29,15 +27,15 @@ export class Builtins {
 
   public constructor(private readonly context: Context) {}
 
-  public getMember(value: ts.Node, prop: ts.Node, options: DiagnosticOptions = NO_WARNING_ERROR): Builtin | undefined {
+  public getMember(value: ts.Node, prop: ts.Node): Builtin | undefined {
     return this.memoized('get-member', `${nodeKey(value)}:${nodeKey(prop)}`, () => {
-      const propSymbol = this.context.getSymbol(prop, options);
+      const propSymbol = this.context.analysis.getSymbol(prop);
 
       if (propSymbol === undefined) {
         return undefined;
       }
 
-      const valueSymbol = this.context.getTypeSymbol(value, options);
+      const valueSymbol = this.context.analysis.getTypeSymbol(value);
       if (valueSymbol === undefined) {
         return undefined;
       }
@@ -53,7 +51,7 @@ export class Builtins {
             for (const clause of tsUtils.heritage.getHeritageClauses(decl)) {
               // tslint:disable-next-line no-loop-statement
               for (const type of tsUtils.heritage.getTypeNodes(clause)) {
-                const foundMember = this.getMember(tsUtils.expression.getExpression(type), prop, options);
+                const foundMember = this.getMember(tsUtils.expression.getExpression(type), prop);
                 if (foundMember !== undefined) {
                   return foundMember;
                 }
@@ -105,8 +103,8 @@ export class Builtins {
     return mutableMembers;
   }
 
-  public getInterface(value: ts.Node, options: DiagnosticOptions = NO_WARNING_ERROR): Builtin | undefined {
-    const valueSymbol = this.context.getSymbol(value, options);
+  public getInterface(value: ts.Node): Builtin | undefined {
+    const valueSymbol = this.context.analysis.getSymbol(value);
     if (valueSymbol === undefined) {
       return undefined;
     }
@@ -118,8 +116,8 @@ export class Builtins {
     return this.getAnyInterfaceSymbol(value);
   }
 
-  public getValue(value: ts.Node, options: DiagnosticOptions = NO_WARNING_ERROR): Builtin | undefined {
-    const valueSymbol = this.context.getSymbol(value, options);
+  public getValue(value: ts.Node): Builtin | undefined {
+    const valueSymbol = this.context.analysis.getSymbol(value);
     if (valueSymbol === undefined) {
       return undefined;
     }
@@ -127,8 +125,8 @@ export class Builtins {
     return this.builtinValues.get(valueSymbol);
   }
 
-  public getValueInterface(value: ts.Node, options: DiagnosticOptions = NO_WARNING_ERROR): string | undefined {
-    const builtinValue = this.getValue(value, options);
+  public getValueInterface(value: ts.Node): string | undefined {
+    const builtinValue = this.getValue(value);
 
     return builtinValue === undefined || !isBuiltinValueObject(builtinValue) ? undefined : builtinValue.type;
   }
@@ -145,14 +143,9 @@ export class Builtins {
     return tsUtils.type_.hasType(type, (testType) => this.isInterface(node, testType, name));
   }
 
-  public isInterface(
-    node: ts.Node,
-    testType: ts.Type,
-    name: string,
-    options: DiagnosticOptions = NO_WARNING_ERROR,
-  ): boolean {
+  public isInterface(node: ts.Node, testType: ts.Type, name: string): boolean {
     return this.memoized('is-interface', `${typeKey(testType)}:${name}`, () => {
-      const symbol = this.context.getSymbolForType(node, testType, options);
+      const symbol = this.context.analysis.getSymbolForType(node, testType);
       if (symbol === undefined) {
         return false;
       }
@@ -168,14 +161,9 @@ export class Builtins {
     });
   }
 
-  public isType(
-    node: ts.Node,
-    testType: ts.Type,
-    name: string,
-    options: DiagnosticOptions = NO_WARNING_ERROR,
-  ): boolean {
+  public isType(node: ts.Node, testType: ts.Type, name: string): boolean {
     return this.memoized('is-type', `${typeKey(testType)}:${name}`, () => {
-      const symbol = this.context.getSymbolForType(node, testType, options);
+      const symbol = this.context.analysis.getSymbolForType(node, testType);
       if (symbol === undefined) {
         return false;
       }
@@ -186,9 +174,9 @@ export class Builtins {
     });
   }
 
-  public isValue(node: ts.Node, name: string, options: DiagnosticOptions = NO_WARNING_ERROR): boolean {
+  public isValue(node: ts.Node, name: string): boolean {
     return this.memoized('is-value', `${nodeKey(node)}:${name}`, () => {
-      const symbol = this.context.getSymbol(node, options);
+      const symbol = this.context.analysis.getSymbol(node);
       if (symbol === undefined) {
         return false;
       }

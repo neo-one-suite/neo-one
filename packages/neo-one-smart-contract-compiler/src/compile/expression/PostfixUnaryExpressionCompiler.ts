@@ -39,7 +39,7 @@ export class PostfixUnaryExpressionCompiler extends NodeCompiler<ts.PostfixUnary
           expr,
           sb.pushValueOptions(options),
           sb.helpers.toNumber({
-            type: sb.context.getType(expr),
+            type: sb.context.analysis.getType(expr),
           }),
         );
         sb.emitOp(expr, 'INC');
@@ -50,7 +50,7 @@ export class PostfixUnaryExpressionCompiler extends NodeCompiler<ts.PostfixUnary
           expr,
           sb.pushValueOptions(options),
           sb.helpers.toNumber({
-            type: sb.context.getType(expr),
+            type: sb.context.analysis.getType(expr),
           }),
         );
         sb.emitOp(expr, 'DEC');

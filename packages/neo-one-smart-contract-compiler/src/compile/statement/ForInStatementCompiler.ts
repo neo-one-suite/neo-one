@@ -30,7 +30,7 @@ export class ForInStatementCompiler extends NodeCompiler<ts.ForInStatement> {
     const variable = variables[0];
     const expression = tsUtils.expression.getExpression(node);
     const statement = tsUtils.statement.getStatement(node);
-    const expressionType = sb.context.getType(expression);
+    const expressionType = sb.context.analysis.getType(expression);
 
     const handleArray = () => {
       // [arr]

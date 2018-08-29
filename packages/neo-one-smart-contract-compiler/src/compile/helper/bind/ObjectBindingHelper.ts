@@ -66,7 +66,7 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
         const nameNode = tsUtils.node.getNameNode(element);
         const propertyName = tsUtils.node.getPropertyNameNode(element);
         const initializer = tsUtils.initializer.getInitializer(element);
-        const elementType = sb.context.getType(nameNode);
+        const elementType = sb.context.analysis.getType(nameNode);
 
         if (ts.isIdentifier(nameNode)) {
           sb.scope.add(tsUtils.node.getText(nameNode));
@@ -182,7 +182,7 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
         const nameNode = tsUtils.node.getNameNode(element);
         const propertyName = tsUtils.node.getPropertyNameNode(element);
         const initializer = tsUtils.initializer.getInitializer(element);
-        const elementType = sb.context.getType(nameNode);
+        const elementType = sb.context.analysis.getType(nameNode);
 
         if (ts.isIdentifier(nameNode)) {
           sb.scope.add(tsUtils.node.getText(nameNode));
@@ -204,7 +204,7 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
           sb.emitHelper(element, innerOptions, sb.helpers.getPropertyObjectProperty);
         } else if (ts.isComputedPropertyName(propertyName)) {
           const expr = tsUtils.expression.getExpression(propertyName);
-          const propertyNameType = sb.context.getType(expr);
+          const propertyNameType = sb.context.analysis.getType(expr);
 
           // [propVal, objectVal, objectVal]
           sb.visit(expr, innerOptions);

@@ -15,7 +15,7 @@ export class IfStatementCompiler extends NodeCompiler<ts.IfStatement> {
         cond,
         sb.pushValueOptions(options),
         sb.helpers.toBoolean({
-          type: sb.context.getType(cond),
+          type: sb.context.analysis.getType(cond),
         }),
       );
     };

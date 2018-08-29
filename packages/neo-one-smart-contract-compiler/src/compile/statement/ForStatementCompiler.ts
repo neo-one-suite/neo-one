@@ -25,7 +25,7 @@ export class ForStatementCompiler extends NodeCompiler<ts.ForStatement> {
           exprCondition,
           sb.pushValueOptions(options),
           sb.helpers.toBoolean({
-            type: sb.context.getType(exprCondition),
+            type: sb.context.analysis.getType(exprCondition),
           }),
         );
       };

@@ -80,7 +80,7 @@ export class ObjectKeys extends BuiltinMemberCall {
       node,
       options,
       sb.helpers.forBuiltinType({
-        type: sb.context.getType(arg),
+        type: sb.context.analysis.getType(arg),
         array: processArray,
         boolean: emptyArray,
         buffer: emptyArray,

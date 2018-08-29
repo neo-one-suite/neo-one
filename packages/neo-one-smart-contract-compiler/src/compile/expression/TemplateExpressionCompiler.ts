@@ -17,7 +17,7 @@ export class TemplateExpressionCompiler extends NodeCompiler<ts.TemplateExpressi
       // [val, accumString]
       sb.visit(expr, options);
       // [string, accumString]
-      sb.emitHelper(expr, options, sb.helpers.toString({ type: sb.context.getType(expr) }));
+      sb.emitHelper(expr, options, sb.helpers.toString({ type: sb.context.analysis.getType(expr) }));
       // [accumString]
       sb.emitOp(expr, 'CAT');
       const spanLiteral = tsUtils.template.getLiteral(span);

@@ -54,7 +54,7 @@ export class ArrayConcat extends BuiltinInstanceMemberCall {
         node,
         options,
         sb.helpers.forBuiltinType({
-          type: sb.context.getType(arg, { warning: true }),
+          type: sb.context.analysis.getType(arg),
           array: handleArray,
           boolean: handleOther,
           buffer: handleOther,

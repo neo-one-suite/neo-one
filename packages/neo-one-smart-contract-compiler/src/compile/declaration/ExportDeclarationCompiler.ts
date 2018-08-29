@@ -35,7 +35,7 @@ export class ExportDeclarationCompiler extends NodeCompiler<ts.ExportDeclaration
             .some((decl) => !tsUtils.declaration.isAmbient(decl)),
         )
         .filter((namedExport) => {
-          const symbol = sb.context.getSymbol(namedExport);
+          const symbol = sb.context.analysis.getSymbol(namedExport);
 
           return (
             symbol !== undefined &&

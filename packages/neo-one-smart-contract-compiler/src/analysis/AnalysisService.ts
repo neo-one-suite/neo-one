@@ -3,10 +3,23 @@ import { common, ECPoint, UInt160, UInt256 } from '@neo-one/client-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
-import { Context, DEFAULT_DIAGNOSTIC_OPTIONS, DiagnosticOptions } from '../Context';
+import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
-import { createMemoized, nodeKey } from '../utils';
+import { createMemoized, nodeKey, symbolKey, typeKey } from '../utils';
+
+export interface ErrorDiagnosticOptions {
+  readonly error?: boolean;
+}
+
+export interface DiagnosticOptions extends ErrorDiagnosticOptions {
+  readonly warning?: boolean;
+}
+
+export const DEFAULT_DIAGNOSTIC_OPTIONS = {
+  error: false,
+  warning: true,
+};
 
 export interface SignatureTypes {
   readonly paramDecls: ReadonlyArray<ts.ParameterDeclaration>;
@@ -23,7 +36,7 @@ export class AnalysisService {
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ts.Type | undefined {
     if (ts.isAccessor(node)) {
-      return this.context.getType(node, options);
+      return this.getType(node);
     }
 
     const typeNode = tsUtils.type_.getTypeNode(node) as ts.TypeNode | undefined;
@@ -40,19 +53,16 @@ export class AnalysisService {
     node: ts.Node,
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): SignatureTypes | undefined {
-    return this.extractSignatureForType(node, this.context.getType(node, options), options);
+    return this.extractSignatureForType(node, this.getType(node), options);
   }
 
-  public getSignatures(
-    node: ts.CallLikeExpression,
-    options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
-  ): ReadonlyArray<ts.Signature> | undefined {
+  public getSignatures(node: ts.CallLikeExpression): ReadonlyArray<ts.Signature> | undefined {
     const signature = this.context.typeChecker.getResolvedSignature(node);
     if (signature !== undefined && !tsUtils.signature.isFailure(signature)) {
       return [signature];
     }
     const expr = tsUtils.expression.getExpressionForCall(node);
-    const type = this.context.getType(expr, options);
+    const type = this.getType(expr);
     if (type === undefined) {
       return undefined;
     }
@@ -87,7 +97,7 @@ export class AnalysisService {
     node: ts.CallLikeExpression,
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ReadonlyArray<SignatureTypes> | undefined {
-    const signatures = this.getSignatures(node, options);
+    const signatures = this.getSignatures(node);
     if (signatures === undefined) {
       return undefined;
     }
@@ -101,7 +111,7 @@ export class AnalysisService {
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): SignatureTypes | undefined {
     const params = tsUtils.signature.getParameters(signature);
-    const paramTypes = params.map((param) => this.context.getTypeOfSymbol(param, node, { error: true }));
+    const paramTypes = params.map((param) => this.context.analysis.getTypeOfSymbol(param, node));
     const paramDeclsNullable = params.map((param) => tsUtils.symbol.getValueDeclaration(param));
     const nullParamIndex = paramDeclsNullable.indexOf(undefined);
     if (nullParamIndex !== -1) {
@@ -131,7 +141,7 @@ export class AnalysisService {
     return {
       paramDecls,
       paramTypes: declToType,
-      returnType: this.context.getNotAnyType(node, tsUtils.signature.getReturnType(signature), { error: true }),
+      returnType: this.getNotAnyType(node, tsUtils.signature.getReturnType(signature)),
     };
   }
 
@@ -160,6 +170,93 @@ export class AnalysisService {
     return this.extractLiteral(original, 'PublicKeyConstructor', common.stringToECPoint, common.bufferToECPoint);
   }
 
+  public getType(node: ts.Node, options: ErrorDiagnosticOptions = {}): ts.Type | undefined {
+    return this.memoized('get-type', nodeKey(node), () =>
+      this.getNotAnyType(node, tsUtils.type_.getType(this.context.typeChecker, node), options),
+    );
+  }
+
+  public getTypeOfSymbol(symbol: ts.Symbol | undefined, node: ts.Node): ts.Type | undefined {
+    if (symbol === undefined) {
+      return undefined;
+    }
+
+    return this.memoized('get-type-of-symbol', `${symbolKey(symbol)}:${nodeKey(node)}`, () =>
+      this.getNotAnyType(node, tsUtils.type_.getTypeAtLocation(this.context.typeChecker, symbol, node)),
+    );
+  }
+
+  public getSymbol(node: ts.Node): ts.Symbol | undefined {
+    return this.memoized('symbol', nodeKey(node), () => {
+      const symbol = tsUtils.node.getSymbol(this.context.typeChecker, node);
+      if (symbol === undefined) {
+        return undefined;
+      }
+
+      const aliased = tsUtils.symbol.getAliasedSymbol(this.context.typeChecker, symbol);
+      if (aliased !== undefined) {
+        return aliased;
+      }
+
+      return symbol;
+    });
+  }
+
+  public getTypeSymbol(node: ts.Node): ts.Symbol | undefined {
+    return this.memoized('get-type-symbol', nodeKey(node), () => {
+      const type = this.getType(node);
+
+      return this.getSymbolForType(node, type);
+    });
+  }
+
+  public getSymbolForType(_node: ts.Node, type: ts.Type | undefined): ts.Symbol | undefined {
+    if (type === undefined) {
+      return undefined;
+    }
+
+    return this.memoized('get-symbol-for-type', typeKey(type), () => {
+      let symbol = tsUtils.type_.getSymbol(type);
+      if (symbol === undefined) {
+        symbol = tsUtils.type_.getAliasSymbol(type);
+      }
+
+      if (symbol === undefined) {
+        return undefined;
+      }
+
+      const aliased = tsUtils.symbol.getAliasedSymbol(this.context.typeChecker, symbol);
+      if (aliased !== undefined) {
+        return aliased;
+      }
+
+      return symbol;
+    });
+  }
+
+  public getNotAnyType(
+    node: ts.Node,
+    type: ts.Type | undefined,
+    { error = true }: ErrorDiagnosticOptions = {},
+  ): ts.Type | undefined {
+    if (type !== undefined && tsUtils.type_.isAny(type)) {
+      if (error && !tsUtils.type_.isErrorType(type)) {
+        this.context.reportTypeError(node);
+      }
+
+      return undefined;
+    }
+
+    if (type !== undefined) {
+      const constraintType = tsUtils.type_.getConstraint(type);
+      if (constraintType !== undefined) {
+        return constraintType;
+      }
+    }
+
+    return type;
+  }
+
   private extractLiteral<T>(
     original: ts.Expression,
     name: string,
@@ -172,7 +269,7 @@ export class AnalysisService {
       }
 
       const expr = ts.isCallExpression(node) ? tsUtils.expression.getExpression(node) : tsUtils.template.getTag(node);
-      const symbol = this.context.getSymbol(expr);
+      const symbol = this.getSymbol(expr);
       const hash256From = this.context.builtins.getOnlyMemberSymbol(name, 'from');
       const bufferFrom = this.context.builtins.getOnlyMemberSymbol('BufferConstructor', 'from');
 
@@ -233,7 +330,7 @@ export class AnalysisService {
     const node = this.unwrapExpression(nodeIn);
 
     if (ts.isIdentifier(node)) {
-      const symbol = this.context.getSymbol(node);
+      const symbol = this.getSymbol(node);
       if (symbol === undefined) {
         return undefined;
       }

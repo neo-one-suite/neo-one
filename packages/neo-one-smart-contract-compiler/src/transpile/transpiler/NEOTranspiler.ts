@@ -192,7 +192,7 @@ export class NEOTranspiler implements Transpiler {
     }
 
     const isSmartContract = tsUtils.class_.getImplementsArray(node).some((implType) => {
-      const testType = this.context.getType(tsUtils.expression.getExpression(implType));
+      const testType = this.context.analysis.getType(tsUtils.expression.getExpression(implType));
 
       return testType !== undefined && this.context.builtins.isInterface(node, testType, 'SmartContract');
     });
@@ -395,7 +395,7 @@ export class NEOTranspiler implements Transpiler {
 
         const paramName = tsUtils.literal.getLiteralValue(paramNameArg);
 
-        return this.toABIParameter(paramName, paramNameArg, this.context.getType(paramTypeNode));
+        return this.toABIParameter(paramName, paramNameArg, this.context.analysis.getType(paramTypeNode));
       })
       .filter(utils.notNull);
 
@@ -413,7 +413,7 @@ export class NEOTranspiler implements Transpiler {
       .reduce((acc, values) => acc.concat(values), []);
     const ctor = tsUtils.class_.getFirstConcreteConstructor(this.context.typeChecker, this.smartContract);
     if (ctor !== undefined) {
-      const ctorType = this.context.getTypeOfSymbol(this.context.getSymbol(ctor.parent), ctor.parent);
+      const ctorType = this.context.analysis.getTypeOfSymbol(this.context.analysis.getSymbol(ctor.parent), ctor.parent);
       if (ctorType !== undefined) {
         methods = methods.concat(
           this.processMethodProperty(DEPLOY_METHOD, ctor, ctorType.getConstructSignatures(), false),
@@ -434,7 +434,9 @@ export class NEOTranspiler implements Transpiler {
       if (tsUtils.parametered.getParameters(parametered).length > 0) {
         const argsTypes = tsUtils.parametered
           .getParameters(parametered)
-          .map((param) => this.getParamTypeNode(param, this.context.getType(param), tsUtils.type_.getTypeNode(param)));
+          .map((param) =>
+            this.getParamTypeNode(param, this.context.analysis.getType(param), tsUtils.type_.getTypeNode(param)),
+          );
         const argsIdentifier = ts.createIdentifier('args');
         argsStatement = ts.createVariableStatement(
           undefined,
@@ -495,7 +497,7 @@ export class NEOTranspiler implements Transpiler {
       );
 
       if (ts.isMethodDeclaration(method)) {
-        const returnType = this.context.getType(method);
+        const returnType = this.context.analysis.getType(method);
         const shouldReturn = returnType !== undefined && !tsUtils.type_.isVoidish(returnType);
         methodStatement = processMethod(method, name, shouldReturn);
       } else if (ts.isConstructorDeclaration(method)) {
@@ -537,7 +539,11 @@ export class NEOTranspiler implements Transpiler {
                   ts.createIdentifier(this.getInternalIdentifier(method, 'getArgument')),
                   [
                     ts.createTupleTypeNode([
-                      this.getParamTypeNode(param, this.context.getType(param), tsUtils.type_.getTypeNode(param)),
+                      this.getParamTypeNode(
+                        param,
+                        this.context.analysis.getType(param),
+                        tsUtils.type_.getTypeNode(param),
+                      ),
                     ]),
                   ],
                   [ts.createNumericLiteral('1')],
@@ -810,7 +816,7 @@ export class NEOTranspiler implements Transpiler {
     }
 
     const name = symbol.getName();
-    const type = this.context.getTypeOfSymbol(symbol, decl);
+    const type = this.context.analysis.getTypeOfSymbol(symbol, decl);
     if (type === undefined) {
       return [];
     }
@@ -944,7 +950,7 @@ export class NEOTranspiler implements Transpiler {
     const parameter = this.toABIParameter(
       tsUtils.symbol.getName(param),
       decl,
-      this.context.getTypeOfSymbol(param, decl),
+      this.context.analysis.getTypeOfSymbol(param, decl),
       initializer !== undefined,
     );
 
@@ -957,7 +963,7 @@ export class NEOTranspiler implements Transpiler {
     }
 
     if (ts.isPropertyAccessExpression(initializer)) {
-      const symbol = this.context.getSymbol(initializer, { error: true });
+      const symbol = this.context.analysis.getSymbol(initializer);
       const senderAddress = this.context.builtins.getOnlyMemberSymbol('DeployConstructor', 'senderAddress');
 
       if (symbol === senderAddress) {

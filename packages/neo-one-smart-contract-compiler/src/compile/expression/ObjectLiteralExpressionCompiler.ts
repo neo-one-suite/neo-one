@@ -137,7 +137,7 @@ export class ObjectLiteralExpressionCompiler extends NodeCompiler<ts.ObjectLiter
 
         if (ts.isComputedPropertyName(propertyName)) {
           const expr = tsUtils.expression.getExpression(propertyName);
-          const propertyNameType = sb.context.getType(expr);
+          const propertyNameType = sb.context.analysis.getType(expr);
 
           // [propVal, objectVal, objectVal]
           sb.visit(expr, options);

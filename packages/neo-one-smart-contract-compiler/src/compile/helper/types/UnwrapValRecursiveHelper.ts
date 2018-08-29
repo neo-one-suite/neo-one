@@ -45,7 +45,7 @@ export class UnwrapValRecursiveHelper extends Helper {
                     type:
                       this.type === undefined
                         ? undefined
-                        : sb.context.getNotAnyType(node, tsUtils.type_.getArrayTypeOrThrow(this.type)),
+                        : sb.context.analysis.getNotAnyType(node, tsUtils.type_.getArrayTypeOrThrow(this.type)),
                   }),
                 );
               },

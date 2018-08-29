@@ -36,7 +36,7 @@ export class ArrayJoin extends BuiltinInstanceMemberCall {
       sb.emitHelper(node, options, sb.helpers.unwrapString);
     }
     // [string]
-    sb.emitHelper(node, options, sb.helpers.arrToString({ type: sb.context.getType(expr), hasJoinString }));
+    sb.emitHelper(node, options, sb.helpers.arrToString({ type: sb.context.analysis.getType(expr), hasJoinString }));
 
     if (optionsIn.pushValue) {
       // [val]

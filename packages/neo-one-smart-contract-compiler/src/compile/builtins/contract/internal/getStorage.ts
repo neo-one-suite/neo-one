@@ -14,7 +14,7 @@ export class GetStorage extends BuiltinCall {
       return;
     }
 
-    const type = sb.context.getType(node, { error: true });
+    const type = sb.context.analysis.getType(node);
     const key = args[0];
     const options = sb.pushValueOptions(optionsIn);
 

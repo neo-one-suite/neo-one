@@ -40,7 +40,7 @@ export class ArrayBindingHelper extends TypedHelper<ts.ArrayBindingPattern> {
 
       const name = tsUtils.node.getNameNode(element);
       const initializer = tsUtils.initializer.getInitializer(element);
-      const elementType = sb.context.getType(name);
+      const elementType = sb.context.analysis.getType(name);
 
       if (ts.isIdentifier(name)) {
         sb.scope.add(tsUtils.node.getText(name));

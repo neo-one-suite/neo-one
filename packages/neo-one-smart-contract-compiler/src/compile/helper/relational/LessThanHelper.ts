@@ -38,8 +38,8 @@ export class LessThanHelper extends Helper {
       return;
     }
 
-    const leftType = sb.context.getType(this.left);
-    const rightType = sb.context.getType(this.right);
+    const leftType = sb.context.analysis.getType(this.left);
+    const rightType = sb.context.analysis.getType(this.right);
 
     if (this.leftFirst) {
       // [left]

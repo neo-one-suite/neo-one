@@ -22,7 +22,7 @@ export class SymbolFor extends BuiltinMemberCall {
     // [stringVal]
     sb.visit(arg, sb.pushValueOptions(options));
     // [string]
-    sb.emitHelper(arg, sb.pushValueOptions(options), sb.helpers.toString({ type: sb.context.getType(arg) }));
+    sb.emitHelper(arg, sb.pushValueOptions(options), sb.helpers.toString({ type: sb.context.analysis.getType(arg) }));
     // [symbolVal]
     sb.emitHelper(node, options, sb.helpers.wrapSymbol);
   }

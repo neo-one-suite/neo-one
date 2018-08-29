@@ -32,7 +32,7 @@ export class IdentifierCompiler extends NodeCompiler<ts.Identifier> {
       return;
     }
 
-    const symbol = sb.context.getSymbol(expr);
+    const symbol = sb.context.analysis.getSymbol(expr);
     if (symbol !== undefined && tsUtils.symbol.isArgumentsSymbol(sb.context.typeChecker, symbol)) {
       sb.context.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltin);
 

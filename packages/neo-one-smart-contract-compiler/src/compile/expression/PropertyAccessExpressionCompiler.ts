@@ -12,7 +12,7 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
 
   public visitNode(sb: ScriptBuilder, expr: ts.PropertyAccessExpression, optionsIn: VisitOptions): void {
     const value = tsUtils.expression.getExpression(expr);
-    const valueType = sb.context.getType(value);
+    const valueType = sb.context.analysis.getType(value);
     const name = tsUtils.node.getNameNode(expr);
     const nameValue = tsUtils.node.getName(expr);
 

@@ -32,13 +32,19 @@ export class VariableDeclarationCompiler extends NodeCompiler<ts.VariableDeclara
       sb.emitHelper(
         nameNode,
         options,
-        sb.helpers.arrayBinding({ type: expr === undefined ? undefined : sb.context.getType(expr), value: expr }),
+        sb.helpers.arrayBinding({
+          type: expr === undefined ? undefined : sb.context.analysis.getType(expr),
+          value: expr,
+        }),
       );
     } else {
       sb.emitHelper(
         nameNode,
         options,
-        sb.helpers.objectBinding({ type: expr === undefined ? undefined : sb.context.getType(expr), value: expr }),
+        sb.helpers.objectBinding({
+          type: expr === undefined ? undefined : sb.context.analysis.getType(expr),
+          value: expr,
+        }),
       );
     }
   }

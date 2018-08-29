@@ -18,7 +18,7 @@ export class ArgumentsHelper extends Helper<ts.CallExpression | ts.NewExpression
 
       if (signatureTypes !== undefined) {
         args.forEach((arg, idx) => {
-          const argType = sb.context.getType(arg, { error: true });
+          const argType = sb.context.analysis.getType(arg);
           if (argType !== undefined) {
             const mismatch = signatureTypes.some(({ paramDecls, paramTypes }) => {
               const paramDecl = paramDecls[Math.min(idx, paramDecls.length - 1)];

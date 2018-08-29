@@ -20,14 +20,14 @@ export class GetArgument extends BuiltinCall {
     sb.visit(arg, options);
     if (optionsIn.pushValue) {
       // [value]
-      sb.emitHelper(node, options, sb.helpers.getArgument({ type: sb.context.getType(arg) }));
+      sb.emitHelper(node, options, sb.helpers.getArgument({ type: sb.context.analysis.getType(arg) }));
       // [val]
       sb.emitHelper(
         node,
         options,
         sb.helpers.wrapValRecursive({
           checkValue: true,
-          type: sb.context.getType(node, { error: true }),
+          type: sb.context.analysis.getType(node),
         }),
       );
     } else {

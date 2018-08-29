@@ -24,7 +24,7 @@ export class TypeOfExpressionCompiler extends NodeCompiler<ts.TypeOfExpression> 
       node,
       options,
       sb.helpers.forBuiltinType({
-        type: sb.context.getType(expr),
+        type: sb.context.analysis.getType(expr),
         array: pushObject,
         boolean: createPushString('boolean'),
         buffer: pushObject,

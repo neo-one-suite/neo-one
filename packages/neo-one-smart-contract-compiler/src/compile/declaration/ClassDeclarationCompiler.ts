@@ -78,7 +78,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
           expr,
           innerOptions,
           sb.helpers.forBuiltinType({
-            type: sb.context.getType(expr),
+            type: sb.context.analysis.getType(expr),
             array: throwTypeError,
             boolean: throwTypeError,
             buffer: throwTypeError,
@@ -251,9 +251,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       const decorators =
         ts.isMethodDeclaration(member) || ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member)
           ? tsUtils.decoratable.getDecoratorsArray(member).filter((decorator) => {
-              const decoratorSymbol = sb.context.getSymbol(tsUtils.expression.getExpression(decorator), {
-                error: true,
-              });
+              const decoratorSymbol = sb.context.analysis.getSymbol(tsUtils.expression.getExpression(decorator));
 
               return decoratorSymbol !== verifySymbol && decoratorSymbol !== constantSymbol;
             })

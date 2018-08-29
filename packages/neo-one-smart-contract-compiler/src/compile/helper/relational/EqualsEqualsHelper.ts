@@ -30,8 +30,8 @@ export class EqualsEqualsHelper extends Helper {
       return;
     }
 
-    const leftType = sb.context.getType(this.left);
-    const rightType = sb.context.getType(this.right);
+    const leftType = sb.context.analysis.getType(this.left);
+    const rightType = sb.context.analysis.getType(this.right);
     if (leftType !== undefined && rightType !== undefined) {
       this.equalsEqualsType(sb, node, options, leftType, rightType);
     } else {
@@ -79,7 +79,7 @@ export class EqualsEqualsHelper extends Helper {
       // [left]
       sb.visit(this.left, options);
       // [leftNumber]
-      sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.context.getType(this.left) }));
+      sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.context.analysis.getType(this.left) }));
       // [leftNumberVal]
       sb.emitHelper(this.left, options, sb.helpers.wrapNumber);
       // [right, leftNumberVal]
@@ -105,7 +105,7 @@ export class EqualsEqualsHelper extends Helper {
       // [right, left]
       sb.visit(this.right, options);
       // [rightNumber, left]
-      sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.context.getType(this.right) }));
+      sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.context.analysis.getType(this.right) }));
       // [rightNumberVal, left]
       sb.emitHelper(this.right, options, sb.helpers.wrapNumber);
       // [equals]
@@ -117,7 +117,7 @@ export class EqualsEqualsHelper extends Helper {
 
   public equalsEqualsLeftNumberRightBooleanOrString(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [rightNumber, left]
-    sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.context.getType(this.right) }));
+    sb.emitHelper(this.right, options, sb.helpers.toNumber({ type: sb.context.analysis.getType(this.right) }));
     // [rightNumber, left]
     sb.emitHelper(this.right, options, sb.helpers.wrapNumber);
     // [equals]
@@ -137,7 +137,7 @@ export class EqualsEqualsHelper extends Helper {
     // [left, right]
     sb.emitOp(node, 'SWAP');
     // [leftNumber, right]
-    sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.context.getType(this.left) }));
+    sb.emitHelper(this.left, options, sb.helpers.toNumber({ type: sb.context.analysis.getType(this.left) }));
     // [leftNumber, right]
     sb.emitHelper(this.left, options, sb.helpers.wrapNumber);
     // [right, leftNumber]
@@ -245,7 +245,7 @@ export class EqualsEqualsHelper extends Helper {
           // [left, right]
           sb.emitOp(node, 'SWAP');
           // [leftNumber, right]
-          sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.getType(this.left) }));
+          sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.analysis.getType(this.left) }));
           // [leftNumber, right]
           sb.emitHelper(node, options, sb.helpers.wrapNumber);
           // [right, leftNumber]
@@ -285,7 +285,7 @@ export class EqualsEqualsHelper extends Helper {
         },
         whenTrue: () => {
           // [rightNumber, left]
-          sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.getType(this.right) }));
+          sb.emitHelper(node, options, sb.helpers.toNumber({ type: sb.context.analysis.getType(this.right) }));
           // [rightNumber, left]
           sb.emitHelper(node, options, sb.helpers.wrapNumber);
           this.equalsEqualsRightNumberLeftBooleanOrString(sb, node, options);
@@ -298,11 +298,11 @@ export class EqualsEqualsHelper extends Helper {
       options,
       sb.helpers.case(cases, () => {
         // [rightPrim, left]
-        sb.emitHelper(node, options, sb.helpers.toPrimitive({ type: sb.context.getType(this.right) }));
+        sb.emitHelper(node, options, sb.helpers.toPrimitive({ type: sb.context.analysis.getType(this.right) }));
         // [left, rightPrim]
         sb.emitOp(node, 'SWAP');
         // [leftPrim, rightPrim]
-        sb.emitHelper(node, options, sb.helpers.toPrimitive({ type: sb.context.getType(this.left) }));
+        sb.emitHelper(node, options, sb.helpers.toPrimitive({ type: sb.context.analysis.getType(this.left) }));
         // [rightPrim, leftPrim]
         sb.emitOp(node, 'SWAP');
         sb.emitHelper(

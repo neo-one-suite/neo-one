@@ -31,10 +31,10 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
 
     const variable = variables[0];
     const nameNode = tsUtils.node.getNameNode(variable);
-    const variableType = sb.context.getType(nameNode, { warning: true });
+    const variableType = sb.context.analysis.getType(nameNode);
     const expression = tsUtils.expression.getExpression(node);
     const statement = tsUtils.statement.getStatement(node);
-    const expressionType = sb.context.getType(expression, { warning: true });
+    const expressionType = sb.context.analysis.getType(expression);
 
     const each = (innerOptions: VisitOptions) => {
       if (ts.isIdentifier(nameNode)) {
@@ -119,7 +119,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
       node,
       options,
       sb.helpers.forBuiltinType({
-        type: sb.context.getType(expression, { warning: true }),
+        type: sb.context.analysis.getType(expression),
         array: handleArray,
         boolean: handleOther,
         buffer: handleOther,

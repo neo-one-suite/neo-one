@@ -17,7 +17,7 @@ export class DoReturn extends BuiltinCall {
       // [val]
       sb.visit(arg, options);
       // [value]
-      sb.emitHelper(node, options, sb.helpers.unwrapValRecursive({ type: sb.context.getType(arg) }));
+      sb.emitHelper(node, options, sb.helpers.unwrapValRecursive({ type: sb.context.analysis.getType(arg) }));
       // Hack to make sure we only have one return value on the stack.
       // [number, value]
       sb.emitOp(node, 'DEPTH');

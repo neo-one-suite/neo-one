@@ -13,9 +13,9 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
 
   public visitNode(sb: ScriptBuilder, expr: ts.ElementAccessExpression, optionsIn: VisitOptions): void {
     const value = tsUtils.expression.getExpression(expr);
-    const valueType = sb.context.getType(value);
+    const valueType = sb.context.analysis.getType(value);
     const prop = tsUtils.expression.getArgumentExpressionOrThrow(expr);
-    const propType = sb.context.getType(prop);
+    const propType = sb.context.analysis.getType(prop);
 
     const handleBuiltin = (member: Builtin, visited: boolean) => {
       if (isBuiltinInstanceMemberValue(member)) {

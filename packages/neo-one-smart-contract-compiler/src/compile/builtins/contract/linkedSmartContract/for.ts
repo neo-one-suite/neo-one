@@ -39,14 +39,14 @@ export class LinkedSmartContractFor extends SmartContractForBase {
     callBuffer: Buffer,
     _options: VisitOptions,
   ): void {
-    const type = sb.context.getType(node, { error: true });
+    const type = sb.context.analysis.getType(node);
     if (type === undefined) {
       /* istanbul ignore next */
       return;
     }
 
     const smartContractType = tsUtils.type_.getIntersectionTypesArray(type)[0];
-    const symbol = sb.context.getSymbolForType(node, smartContractType, { error: true });
+    const symbol = sb.context.analysis.getSymbolForType(prop, smartContractType);
     if (symbol === undefined) {
       /* istanbul ignore next */
       return;
@@ -75,14 +75,14 @@ export class LinkedSmartContractFor extends SmartContractForBase {
   }
 
   private getScriptHash(sb: ScriptBuilder, node: ts.CallExpression): UInt160 | undefined {
-    const type = sb.context.getType(node, { error: true });
+    const type = sb.context.analysis.getType(node);
     if (type === undefined) {
       /* istanbul ignore next */
       return undefined;
     }
 
     const smartContractType = tsUtils.type_.getIntersectionTypesArray(type)[0];
-    const symbol = sb.context.getSymbolForType(node, smartContractType, { error: true });
+    const symbol = sb.context.analysis.getSymbolForType(node, smartContractType);
     if (symbol === undefined) {
       /* istanbul ignore next */
       return undefined;

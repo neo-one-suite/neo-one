@@ -28,7 +28,7 @@ class CreateEventNotifier extends BuiltinCall {
     }
 
     const eventName = tsUtils.literal.getLiteralValue(arg);
-    const type = sb.context.getType(node, { error: true });
+    const type = sb.context.analysis.getType(node);
     const result = sb.context.analysis.extractSignatureForType(node, type, { error: true });
     if (result === undefined) {
       /* istanbul ignore next */

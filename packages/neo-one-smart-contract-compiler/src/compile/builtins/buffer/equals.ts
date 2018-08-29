@@ -15,7 +15,7 @@ export class BufferEquals extends BuiltinInstanceMemberCall {
       return false;
     }
 
-    const type = sb.context.getType(arg, { error: true });
+    const type = sb.context.analysis.getType(arg);
 
     return type !== undefined && isBuffer(sb.context, arg, type);
   }

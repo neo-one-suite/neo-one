@@ -70,7 +70,7 @@ export class WrapValRecursiveHelper extends Helper {
                       type:
                         this.type === undefined
                           ? undefined
-                          : sb.context.getNotAnyType(node, tsUtils.type_.getArrayType(this.type)),
+                          : sb.context.analysis.getNotAnyType(node, tsUtils.type_.getArrayType(this.type)),
                     }),
                   );
                 },
@@ -80,9 +80,7 @@ export class WrapValRecursiveHelper extends Helper {
             const tupleElements = elements.map((element) => {
               const constraintType = tsUtils.type_.getConstraint(element);
 
-              return sb.context.getNotAnyType(node, constraintType === undefined ? element : constraintType, {
-                error: true,
-              });
+              return sb.context.analysis.getNotAnyType(node, constraintType === undefined ? element : constraintType);
             });
             _.reverse([...tupleElements]).forEach((element, idx) => {
               // [arr, arr]
