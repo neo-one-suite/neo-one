@@ -77,24 +77,11 @@ export const createGet = (sb: ScriptBuilder, node: ts.Node, getKey: Emit, handle
   sb.emitHelper(
     node,
     innerOptions,
-    sb.helpers.if({
-      condition: () => {
-        // [buffer, buffer]
-        sb.emitOp(node, 'DUP');
-        // [number, buffer]
-        sb.emitOp(node, 'SIZE');
-        // [0, number, buffer]
-        sb.emitPushInt(node, 0);
-        // [number === 0, buffer]
-        sb.emitOp(node, 'NUMEQUAL');
-      },
-      whenTrue: () => {
-        // []
-        sb.emitOp(node, 'DROP');
+    sb.helpers.handleUndefinedStorage({
+      handleUndefined: () => {
         handleMissing(innerOptions);
       },
-      whenFalse: () => {
-        // [val]
+      handleDefined: () => {
         sb.emitSysCall(node, 'Neo.Runtime.Deserialize');
       },
     }),
@@ -131,10 +118,24 @@ export const createDelete = (sb: ScriptBuilder, node: ts.Node, getKey: Emit) => 
   sb.emitOp(node, 'PICKITEM');
   // [buffer]
   getKey(innerOptions);
-  // [context, buffer]
-  sb.emitSysCall(node, 'Neo.Storage.GetContext');
-  // []
-  sb.emitSysCall(node, 'Neo.Storage.Delete');
+  sb.emitHelper(
+    node,
+    innerOptions,
+    sb.helpers.if({
+      condition: () => {
+        // [boolean, buffer]
+        sb.emitHelper(node, innerOptions, sb.helpers.deleteStorage);
+      },
+      whenTrue: () => {
+        // [boolean]
+        sb.emitPushBoolean(node, true);
+      },
+      whenFalse: () => {
+        // [boolean]
+        sb.emitPushBoolean(node, false);
+      },
+    }),
+  );
   // [val]
-  sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
+  sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
 };

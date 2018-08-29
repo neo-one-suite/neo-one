@@ -87,6 +87,8 @@ import {
   GetArrayEntriesIterableIteratorClassHelper,
   IteratorForEachHelper,
   IteratorForEachHelperOptions,
+  RawIteratorForEachHelper,
+  RawIteratorForEachHelperOptions,
 } from './iterator';
 import { KeyedHelper } from './KeyedHelper';
 import { GetMapClassHelper } from './map';
@@ -118,7 +120,19 @@ import {
   ProcessStatementsHelper,
   ProcessStatementsHelperOptions,
 } from './statement';
-import { GetMapStorageClassHelper, GetSetStorageClassHelper, GetStorageHelper, PutStorageHelper } from './storage';
+import {
+  CommonStorageHelper,
+  DeleteStorageHelper,
+  GetCommonStorageHelper,
+  GetMapStorageClassHelper,
+  GetSetStorageClassHelper,
+  GetStorageBaseHelper,
+  GetStorageHelper,
+  HandleUndefinedStorageHelper,
+  HandleUndefinedStorageHelperOptions,
+  PutCommonStorageHelper,
+  PutStorageHelper,
+} from './storage';
 import {
   ArrayLengthHelper,
   BufferLengthHelper,
@@ -398,6 +412,7 @@ export interface Helpers {
   readonly createArrayEntriesIterableIterator: CreateArrayEntriesIterableIteratorHelper;
   readonly getArrayEntriesIterableIteratorClass: GetArrayEntriesIterableIteratorClassHelper;
   readonly iteratorForEach: (options: IteratorForEachHelperOptions) => IteratorForEachHelper;
+  readonly rawIteratorForEach: (options: RawIteratorForEachHelperOptions) => RawIteratorForEachHelper;
 
   // map
   readonly getMapClass: GetMapClassHelper;
@@ -405,8 +420,14 @@ export interface Helpers {
   // storage
   readonly getMapStorageClass: GetMapStorageClassHelper;
   readonly getSetStorageClass: GetSetStorageClassHelper;
+  readonly putCommonStorage: PutCommonStorageHelper;
+  readonly handleUndefinedStorage: (options: HandleUndefinedStorageHelperOptions) => HandleUndefinedStorageHelper;
+  readonly commonStorage: CommonStorageHelper;
+  readonly deleteStorage: DeleteStorageHelper;
   readonly putStorage: PutStorageHelper;
+  readonly getStorageBase: GetStorageBaseHelper;
   readonly getStorage: GetStorageHelper;
+  readonly getCommonStorage: GetCommonStorageHelper;
 
   // types
   readonly forBuiltinType: (options: ForBuiltinTypeHelperOptions) => ForBuiltinTypeHelper;
@@ -646,6 +667,7 @@ export const createHelpers = (): Helpers => {
     createArrayEntriesIterableIterator: new CreateArrayEntriesIterableIteratorHelper(),
     getArrayEntriesIterableIteratorClass: new GetArrayEntriesIterableIteratorClassHelper(),
     iteratorForEach: (options) => new IteratorForEachHelper(options),
+    rawIteratorForEach: (options) => new RawIteratorForEachHelper(options),
 
     // map
     getMapClass: new GetMapClassHelper(),
@@ -653,8 +675,14 @@ export const createHelpers = (): Helpers => {
     // set
     getMapStorageClass: new GetMapStorageClassHelper(),
     getSetStorageClass: new GetSetStorageClassHelper(),
+    putCommonStorage: new PutCommonStorageHelper(),
+    handleUndefinedStorage: (options) => new HandleUndefinedStorageHelper(options),
+    commonStorage: new CommonStorageHelper(),
+    deleteStorage: new DeleteStorageHelper(),
     putStorage: new PutStorageHelper(),
+    getStorageBase: new GetStorageBaseHelper(),
     getStorage: new GetStorageHelper(),
+    getCommonStorage: new GetCommonStorageHelper(),
 
     // types
     forBuiltinType: (options) => new ForBuiltinTypeHelper(options),

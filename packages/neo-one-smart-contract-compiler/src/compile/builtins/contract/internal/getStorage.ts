@@ -27,24 +27,11 @@ export class GetStorage extends BuiltinCall {
       sb.emitHelper(
         node,
         options,
-        sb.helpers.if({
-          condition: () => {
-            // [value, value]
-            sb.emitOp(node, 'DUP');
-            // [length, value]
-            sb.emitOp(node, 'SIZE');
-            // [0, length, value]
-            sb.emitPushInt(node, 0);
-            // [length === 0, value]
-            sb.emitOp(node, 'NUMEQUAL');
-          },
-          whenTrue: () => {
-            // []
-            sb.emitOp(node, 'DROP');
-            // [val]
+        sb.helpers.handleUndefinedStorage({
+          handleUndefined: () => {
             sb.emitHelper(node, options, sb.helpers.wrapUndefined);
           },
-          whenFalse: () => {
+          handleDefined: () => {
             handleValue();
           },
         }),
@@ -59,7 +46,7 @@ export class GetStorage extends BuiltinCall {
       // [keyBuffer]
       sb.emitSysCall(key, 'Neo.Runtime.Serialize');
       // [value]
-      sb.emitHelper(node, optionsIn, sb.helpers.getStorage);
+      sb.emitHelper(node, optionsIn, sb.helpers.getCommonStorage);
       if (shouldHandleNull()) {
         handleNull();
       } else {

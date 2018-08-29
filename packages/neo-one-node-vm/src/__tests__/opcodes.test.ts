@@ -1582,7 +1582,7 @@ describe('opcodes', () => {
       mockTransaction,
       returnValueCount,
     } = testCase;
-    test.only(op, async () => {
+    test(op, async () => {
       const sb = new ScriptBuilder();
       for (const { op: preOp, buffer: preBuffer } of preOps) {
         sb.emitOp(preOp, preBuffer);

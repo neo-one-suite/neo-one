@@ -105,15 +105,15 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
       const options = {};
       this.mutableCurrentScope.emit(this, sourceFile, options, (innerOptions) => {
         // [globalObject]
-        this.emitHelper(sourceFile, this.pushValueOptions(options), this.helpers.createGlobalObject);
+        this.emitHelper(sourceFile, this.pushValueOptions(innerOptions), this.helpers.createGlobalObject);
         // [globalObject, globalObject]
         this.emitOp(sourceFile, 'DUP');
         // [globalObject]
-        this.scope.setGlobal(this, sourceFile, this.pushValueOptions(options));
+        this.scope.setGlobal(this, sourceFile, this.pushValueOptions(innerOptions));
         // [globalObject, globalObject]
         this.emitOp(sourceFile, 'DUP');
         // [globalObject]
-        this.emitHelper(sourceFile, this.pushValueOptions(options), this.helpers.addEmptyModule);
+        this.emitHelper(sourceFile, this.pushValueOptions(innerOptions), this.helpers.addEmptyModule);
         // [globalObject]
         this.allHelpers.forEach((helper) => {
           if (helper.needsGlobal) {
@@ -126,6 +126,18 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         // []
         this.emitOp(sourceFile, 'DROP');
         this.visit(sourceFile, innerOptions);
+        // [globalObject]
+        this.scope.getGlobal(this, sourceFile, options);
+        this.allHelpers.forEach((helper) => {
+          if (helper.needsGlobalOut) {
+            // [globalObject, globalObject]
+            this.emitOp(sourceFile, 'DUP');
+          }
+          // [globalObject]
+          helper.emitGlobalOut(this, sourceFile, innerOptions);
+        });
+        // []
+        this.emitOp(sourceFile, 'DROP');
       });
     });
 
