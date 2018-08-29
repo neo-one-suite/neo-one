@@ -229,6 +229,8 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
             scriptHash: context.scriptHash,
             entryScriptHash: context.entryScriptHash,
             returnValueCount: -1,
+            callerStackCount: context.callerStackCount,
+            callerStackAltCount: context.callerStackAltCount,
           },
         });
 
@@ -253,6 +255,8 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
             pc: pc + 20,
             depth: context.depth,
             returnValueCount: context.returnValueCount,
+            callerStackCount: context.callerStackCount,
+            callerStackAltCount: context.callerStackAltCount,
             ...getResultContext(resultContext),
           },
         };
@@ -319,6 +323,8 @@ const callIsolated = ({
             scriptHash: context.scriptHash,
             entryScriptHash: context.entryScriptHash,
             returnValueCount,
+            callerStackCount: context.callerStackCount + context.stack.length,
+            callerStackAltCount: context.callerStackAltCount + context.stackAlt.length,
           },
         });
 
@@ -354,6 +360,8 @@ const callIsolated = ({
             pc: nextPC,
             depth: context.depth,
             returnValueCount: context.returnValueCount,
+            callerStackCount: context.callerStackCount,
+            callerStackAltCount: context.callerStackAltCount,
             stack: stack.concat(context.stack),
             stackAlt: context.stackAlt,
             gasLeft: resultContext.gasLeft,
@@ -401,6 +409,8 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
             entryScriptHash: context.entryScriptHash,
             returnValueCount,
             pc: pc - 1,
+            callerStackCount: context.callerStackCount + context.stack.length,
+            callerStackAltCount: context.callerStackAltCount + context.stackAlt.length,
           },
         });
 
@@ -434,6 +444,8 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
             pc: nextPC + 2,
             depth: context.depth,
             returnValueCount: context.returnValueCount,
+            callerStackCount: context.callerStackCount,
+            callerStackAltCount: context.callerStackAltCount,
             stack,
             stackAlt: context.stackAlt,
             gasLeft: resultContext.gasLeft,

@@ -66,7 +66,16 @@ const executeNext = async ({
   }
 
   const stackSize =
-    context.stack.length + context.stackAlt.length + op.out + op.outAlt + op.modify + op.modifyAlt - op.in - op.inAlt;
+    context.stack.length +
+    context.stackAlt.length +
+    op.out +
+    op.outAlt +
+    op.modify +
+    op.modifyAlt -
+    op.in -
+    op.inAlt +
+    context.callerStackCount +
+    context.callerStackAltCount;
   if (stackSize > MAX_STACK_SIZE) {
     throw new StackOverflowError(context);
   }
@@ -172,6 +181,8 @@ const run = async ({
         gasLeft: context.gasLeft,
         createdContracts: context.createdContracts,
         returnValueCount: context.returnValueCount,
+        callerStackCount: context.callerStackCount,
+        callerStackAltCount: context.callerStackAltCount,
       };
     }
   }
@@ -196,6 +207,8 @@ export const executeScript = async ({
     stackAlt = [],
     createdContracts = {},
     returnValueCount = -1,
+    callerStackCount = 0,
+    callerStackAltCount = 0,
     pc = 0,
   } = {},
 }: {
@@ -227,6 +240,8 @@ export const executeScript = async ({
     gasLeft,
     createdContracts,
     returnValueCount,
+    callerStackCount,
+    callerStackAltCount,
   };
 
   return monitor.captureSpanLog(async (span) => run({ monitor: span, context }), {
@@ -299,6 +314,8 @@ export const execute = async ({
         scriptHash,
         entryScriptHash,
         returnValueCount,
+        callerStackCount: 0,
+        callerStackAltCount: 0,
       };
 
       if (context !== undefined) {
@@ -310,6 +327,8 @@ export const execute = async ({
           scriptHash,
           entryScriptHash,
           returnValueCount,
+          callerStackCount: context.callerStackCount,
+          callerStackAltCount: context.callerStackAltCount,
         };
       }
 

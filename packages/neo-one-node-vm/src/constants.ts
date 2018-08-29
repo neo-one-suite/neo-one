@@ -46,6 +46,8 @@ export interface Options {
   readonly scriptHash: UInt160 | undefined;
   readonly entryScriptHash: UInt160;
   readonly returnValueCount: number;
+  readonly callerStackCount: number;
+  readonly callerStackAltCount: number;
   readonly pc?: number;
 }
 export interface ExecutionContext {
@@ -79,6 +81,8 @@ export interface ExecutionContext {
   readonly gasLeft: BN;
   readonly createdContracts: CreatedContracts;
   readonly returnValueCount: number;
+  readonly callerStackCount: number;
+  readonly callerStackAltCount: number;
 }
 
 export const getResultContext = (context: ExecutionContext) => ({
