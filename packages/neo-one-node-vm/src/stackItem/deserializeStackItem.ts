@@ -33,17 +33,17 @@ const deserializeStackItemBase = (reader: BinaryReader): StackItem => {
     case StackItemType.Map: {
       // MAP
       const count = reader.readVarUIntLE().toNumber();
-      const mutableKeys: { [key: string]: StackItem } = {};
-      const mutableValues: { [key: string]: StackItem } = {};
+      const referenceKeys = new Map<string, StackItem>();
+      const referenceValues = new Map<string, StackItem>();
       _.range(count).forEach(() => {
         const key = deserializeStackItemBase(reader);
         const value = deserializeStackItemBase(reader);
-        const keyString = key.toKeyString();
-        mutableKeys[keyString] = key;
-        mutableValues[keyString] = value;
+        const referenceKey = key.toStructuralKey();
+        referenceKeys.set(referenceKey, key);
+        referenceValues.set(referenceKey, value);
       });
 
-      return new MapStackItem({ keys: mutableKeys, values: mutableValues });
+      return new MapStackItem({ referenceKeys, referenceValues });
     }
     default:
       commonUtils.assertNever(type);

@@ -6,7 +6,7 @@ import { Asset, AssetKey } from '../Asset';
 import { AssetType, hasFlag } from '../AssetType';
 import { common, ECPoint, PrivateKey, UInt160, UInt160Hex, UInt256, UInt256Hex } from '../common';
 import { crypto } from '../crypto';
-import { Equals, Equatable } from '../Equatable';
+import { Equals, EquatableKey } from '../Equatable';
 import { InvalidFormatError, VerifyError } from '../errors';
 import { ScriptContainerType } from '../ScriptContainer';
 import {
@@ -117,7 +117,7 @@ export const MAX_TRANSACTION_ATTRIBUTES = 16;
 export abstract class TransactionBase<
   Type extends TransactionType = TransactionType,
   TransactionJSON = TransactionBaseJSON
-> implements Equatable, SerializableWire<Transaction>, SerializableJSON<TransactionJSON> {
+> implements EquatableKey, SerializableWire<Transaction>, SerializableJSON<TransactionJSON> {
   public static readonly VERSION: number = 0;
   public static deserializeTransactionBaseStartWireBase({
     reader,
@@ -172,6 +172,7 @@ export abstract class TransactionBase<
     this,
     (other: TransactionBase<Type, TransactionJSON>) => common.uInt256Equal(this.hash, other.hash),
   );
+  public readonly toKeyString = utils.toKeyString(TransactionBase, () => this.hashHex);
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly serializeUnsigned: SerializeWire = createSerializeWire(this.serializeUnsignedBase.bind(this));
   private readonly sizeInternal = utils.lazy(

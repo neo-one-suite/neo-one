@@ -1,7 +1,7 @@
 import { Block, BlockBase, Header } from '@neo-one/client-core';
-import { ObjectStackItem } from './ObjectStackItem';
+import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
-export class BlockStackItem extends ObjectStackItem<Block> {
+export class BlockStackItem extends EquatableKeyStackItem<Block> {
   public asBlock(): Block {
     return this.value;
   }

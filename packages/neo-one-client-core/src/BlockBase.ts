@@ -1,7 +1,7 @@
 import { BN } from 'bn.js';
 import { common, UInt160, UInt256, UInt256Hex } from './common';
 import { crypto } from './crypto';
-import { Equals, Equatable } from './Equatable';
+import { Equals, EquatableKey } from './Equatable';
 import { InvalidFormatError, UnsignedBlockError } from './errors';
 import { Header, HeaderKey } from './Header';
 import { createSerializeWire, DeserializeWireBaseOptions, SerializeJSONContext, SerializeWire } from './Serializable';
@@ -38,7 +38,7 @@ export interface BlockBaseJSON {
   readonly confirmations: number;
 }
 
-export abstract class BlockBase implements Equatable {
+export abstract class BlockBase implements EquatableKey {
   public static deserializeBlockBaseWireBase(options: DeserializeWireBaseOptions): BlockBaseAdd {
     const { reader } = options;
 
@@ -77,6 +77,7 @@ export abstract class BlockBase implements Equatable {
   public readonly equals: Equals = utils.equals(this.constructor as any, this, (other: any) =>
     common.uInt256Equal(this.hash, other.hash),
   );
+  public readonly toKeyString = utils.toKeyString(BlockBase, () => this.hashHex);
   public readonly getScriptHashesForVerifying = utils.lazyAsync(
     async ({ getHeader }: BlockGetScriptHashesForVerifyingOptions) => {
       if (this.index === 0) {

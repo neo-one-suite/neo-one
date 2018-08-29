@@ -1108,11 +1108,18 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     in: 1,
     out: 1,
     invoke: async ({ context, args }) => {
-      const iterable = AsyncIterableX.from(
-        commonUtils
-          .zip(args[0].asMapStackItem().keysArray(), args[0].asMapStackItem().valuesArray())
-          .map(([key, value]) => ({ key, value })),
-      );
+      const iterable = args[0].isArray()
+        ? AsyncIterableX.from(
+            args[0].asArray().map((value, idx) => ({
+              key: new IntegerStackItem(new BN(idx)),
+              value,
+            })),
+          )
+        : AsyncIterableX.from(
+            commonUtils
+              .zip(args[0].asMapStackItem().keysArray(), args[0].asMapStackItem().valuesArray())
+              .map(([key, value]) => ({ key, value })),
+          );
 
       return {
         context,
@@ -1150,6 +1157,16 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     invoke: async ({ context, args }) => ({
       context,
       results: [new EnumeratorStackItem(args[0].asEnumerator().concat(args[1].asEnumerator()))],
+    }),
+  }),
+
+  'Neo.Iterator.Concat': createSysCall({
+    name: 'Neo.Iterator.Concat',
+    in: 2,
+    out: 1,
+    invoke: async ({ context, args }) => ({
+      context,
+      results: [new IteratorStackItem(args[0].asIterator().concatIterator(args[1].asIterator()))],
     }),
   }),
 

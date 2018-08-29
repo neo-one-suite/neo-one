@@ -1,8 +1,7 @@
-import { common, UInt160 } from '../../common';
-import { Equals } from '../../Equatable';
+import { UInt160 } from '../../common';
 import { InvalidFormatError } from '../../errors';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../../Serializable';
-import { BinaryWriter, IOHelper, JSONHelper, utils } from '../../utils';
+import { BinaryWriter, IOHelper, JSONHelper } from '../../utils';
 import { AttributeBase, AttributeJSON } from './AttributeBase';
 import { AttributeUsage, toJSONAttributeUsage } from './AttributeUsage';
 
@@ -28,11 +27,6 @@ export class UInt160Attribute extends AttributeBase<UInt160AttributeUsage, UInt1
   public readonly usage: UInt160AttributeUsage;
   public readonly value: UInt160;
   public readonly size: number;
-  public readonly equals: Equals = utils.equals(
-    UInt160Attribute,
-    this,
-    (other) => this.usage === other.usage && common.uInt160Equal(this.value, other.value),
-  );
 
   public constructor({ usage, value }: UInt160AttributeAdd) {
     super();

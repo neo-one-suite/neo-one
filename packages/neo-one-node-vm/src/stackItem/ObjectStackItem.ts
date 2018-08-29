@@ -1,26 +1,13 @@
-import { ContractParameter, Equatable, InteropInterfaceContractParameter } from '@neo-one/client-core';
+import { ContractParameter, InteropInterfaceContractParameter } from '@neo-one/client-core';
 import { InvalidValueBufferError, UnsupportedStackItemSerdeError } from './errors';
 import { StackItemBase } from './StackItemBase';
 
-export class ObjectStackItem<Value extends Equatable> extends StackItemBase {
+export class ObjectStackItem<Value> extends StackItemBase {
   public readonly value: Value;
 
   public constructor(value: Value) {
     super();
     this.value = value;
-  }
-
-  // tslint:disable-next-line no-any
-  public equals(other: any): boolean {
-    if (other === undefined) {
-      return false;
-    }
-
-    if (this === other) {
-      return true;
-    }
-
-    return other instanceof ObjectStackItem && this.value.equals(other.value);
   }
 
   public serialize(): Buffer {

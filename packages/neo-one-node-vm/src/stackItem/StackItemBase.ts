@@ -56,9 +56,29 @@ export interface AsStorageContextStackItemOptions {
 }
 
 export class StackItemBase implements Equatable {
+  public toStructuralKey(): string {
+    return this.asBuffer().toString('hex');
+  }
+
   // tslint:disable-next-line no-any
   public equals(other: any): boolean {
-    return this === other;
+    if (other === undefined) {
+      return false;
+    }
+
+    if (this === other) {
+      return true;
+    }
+
+    if (other instanceof StackItemBase) {
+      // Note that we don't use serialize here because
+      const thisValue = this.asBufferMaybe();
+      const otherValue = other.asBufferMaybe();
+
+      return thisValue !== undefined && otherValue !== undefined && thisValue.equals(otherValue);
+    }
+
+    return false;
   }
 
   public serialize(): Buffer {
@@ -210,10 +230,6 @@ export class StackItemBase implements Equatable {
 
   public get size(): number {
     return this.asBuffer().length;
-  }
-
-  public toKeyString(): string {
-    return `${this.constructor.name}:${this.asBuffer().toString('hex')}`;
   }
 
   public toString(): string {

@@ -1,6 +1,6 @@
 import { common, ECPoint, PrivateKey, UInt256, UInt256Hex } from '../common';
 import { crypto } from '../crypto';
-import { Equals, Equatable } from '../Equatable';
+import { Equals, EquatableKey } from '../Equatable';
 import { InvalidFormatError, VerifyError } from '../errors';
 import { ScriptContainerType } from '../ScriptContainer';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableWire } from '../Serializable';
@@ -24,7 +24,7 @@ export interface ConsensusPayloadVerifyOptions extends ConsensusPayloadGetScript
 }
 
 export class ConsensusPayload extends UnsignedConsensusPayload
-  implements SerializableWire<ConsensusPayload>, Equatable {
+  implements SerializableWire<ConsensusPayload>, EquatableKey {
   public static sign(payload: UnsignedConsensusPayload, key: PrivateKey): ConsensusPayload {
     return new ConsensusPayload({
       version: payload.version,
@@ -71,6 +71,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
   }
 
   public readonly script: Witness;
+  public readonly toKeyString = utils.toKeyString(this.constructor as typeof ConsensusPayload, () => this.hashHex);
   public readonly equals: Equals = utils.equals(this.constructor as typeof ConsensusPayload, this, (other) =>
     common.uInt256Equal(this.hash, other.hash),
   );

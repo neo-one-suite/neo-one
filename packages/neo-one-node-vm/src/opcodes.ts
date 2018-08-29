@@ -1611,7 +1611,7 @@ const OPCODE_PAIRS = ([
           const key = args[0];
           const value = args[1].asMapStackItem();
           if (!value.has(key)) {
-            throw new InvalidPickItemKeyError(context, key.toKeyString(), JSON.stringify(args[1].toJSON()));
+            throw new InvalidPickItemKeyError(context, key.toStructuralKey(), JSON.stringify(args[1].toJSON()));
           }
 
           return { context, results: [value.get(key)] };

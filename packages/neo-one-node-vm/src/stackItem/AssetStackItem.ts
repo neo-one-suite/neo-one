@@ -1,7 +1,7 @@
 import { Asset } from '@neo-one/client-core';
-import { ObjectStackItem } from './ObjectStackItem';
+import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
-export class AssetStackItem extends ObjectStackItem<Asset> {
+export class AssetStackItem extends EquatableKeyStackItem<Asset> {
   public asAsset(): Asset {
     return this.value;
   }

@@ -1,7 +1,7 @@
 import { Account } from '@neo-one/client-core';
-import { ObjectStackItem } from './ObjectStackItem';
+import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
-export class AccountStackItem extends ObjectStackItem<Account> {
+export class AccountStackItem extends EquatableKeyStackItem<Account> {
   public asAccount(): Account {
     return this.value;
   }

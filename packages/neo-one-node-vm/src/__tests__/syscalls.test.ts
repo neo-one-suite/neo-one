@@ -318,17 +318,18 @@ const SYSCALLS = [
     name: 'Neo.Runtime.Deserialize',
     result: [
       new MapStackItem({
-        keys: {
-          [new BufferStackItem(Buffer.from('key', 'utf8')).toKeyString()]: new BufferStackItem(
-            Buffer.from('key', 'utf8'),
-          ),
-        },
-
-        values: {
-          [new BufferStackItem(Buffer.from('key', 'utf8')).toKeyString()]: new BufferStackItem(
-            Buffer.from('value', 'utf8'),
-          ),
-        },
+        referenceKeys: new Map([
+          [
+            new BufferStackItem(Buffer.from('key', 'utf8')).toStructuralKey(),
+            new BufferStackItem(Buffer.from('key', 'utf8')),
+          ],
+        ]),
+        referenceValues: new Map([
+          [
+            new BufferStackItem(Buffer.from('key', 'utf8')).toStructuralKey(),
+            new BufferStackItem(Buffer.from('value', 'utf8')),
+          ],
+        ]),
       }),
     ],
 
@@ -1822,6 +1823,210 @@ const SYSCALLS = [
   },
 
   {
+    name: 'Neo.Enumerator.Value',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Iterator.Create',
+            type: 'sys',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'NEWMAP',
+                    type: 'op',
+                  },
+
+                  {
+                    name: 'DUP',
+                    type: 'op',
+                  },
+
+                  {
+                    name: 'SETITEM',
+                    type: 'op',
+                    args: [Buffer.from('value2', 'utf8'), Buffer.from('key2', 'utf8')],
+                  },
+                ],
+              },
+            ],
+          },
+
+          {
+            name: 'Neo.Iterator.Create',
+            type: 'sys',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'NEWMAP',
+                    type: 'op',
+                  },
+
+                  {
+                    name: 'DUP',
+                    type: 'op',
+                  },
+
+                  {
+                    name: 'SETITEM',
+                    type: 'op',
+                    args: [Buffer.from('value1', 'utf8'), Buffer.from('key1', 'utf8')],
+                  },
+                ],
+              },
+            ],
+          },
+
+          {
+            name: 'Neo.Iterator.Concat',
+            type: 'sys',
+          },
+
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+
+    result: [new BufferStackItem(Buffer.from('value2', 'utf8'))],
+    gas: FEES.ONE,
+  },
+
+  {
+    name: 'Neo.Iterator.Key',
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'Neo.Iterator.Create',
+            type: 'sys',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'NEWMAP',
+                    type: 'op',
+                  },
+
+                  {
+                    name: 'DUP',
+                    type: 'op',
+                  },
+
+                  {
+                    name: 'SETITEM',
+                    type: 'op',
+                    args: [Buffer.from('value2', 'utf8'), Buffer.from('key2', 'utf8')],
+                  },
+                ],
+              },
+            ],
+          },
+
+          {
+            name: 'Neo.Iterator.Create',
+            type: 'sys',
+            args: [
+              {
+                type: 'calls',
+                calls: [
+                  {
+                    name: 'NEWMAP',
+                    type: 'op',
+                  },
+
+                  {
+                    name: 'DUP',
+                    type: 'op',
+                  },
+
+                  {
+                    name: 'SETITEM',
+                    type: 'op',
+                    args: [Buffer.from('value1', 'utf8'), Buffer.from('key1', 'utf8')],
+                  },
+                ],
+              },
+            ],
+          },
+
+          {
+            name: 'Neo.Iterator.Concat',
+            type: 'sys',
+          },
+
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+
+          {
+            name: 'DUP',
+            type: 'op',
+          },
+
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+
+          {
+            name: 'Neo.Enumerator.Next',
+            type: 'sys',
+          },
+
+          {
+            name: 'DROP',
+            type: 'op',
+          },
+        ],
+      },
+    ],
+
+    result: [new BufferStackItem(Buffer.from('key2', 'utf8'))],
+    gas: FEES.ONE,
+  },
+
+  {
     name: 'Neo.Enumerator.Next',
     args: [
       {
@@ -2541,7 +2746,9 @@ describe('syscalls', () => {
       const result: { [key: string]: any } = {};
       // tslint:disable-next-line no-loop-statement
       for (const [key, val] of Object.entries(value)) {
-        result[key] = filterMethods(val);
+        if (key !== 'referenceID') {
+          result[key] = filterMethods(val);
+        }
       }
 
       return result;

@@ -1,7 +1,7 @@
 import { Validator } from '@neo-one/client-core';
-import { ObjectStackItem } from './ObjectStackItem';
+import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
-export class ValidatorStackItem extends ObjectStackItem<Validator> {
+export class ValidatorStackItem extends EquatableKeyStackItem<Validator> {
   public asValidator(): Validator {
     return this.value;
   }

@@ -1,7 +1,7 @@
 import { BN } from 'bn.js';
 import { BaseState } from './BaseState';
 import { common, ECPoint } from './common';
-import { Equals, Equatable } from './Equatable';
+import { Equals, EquatableKey } from './Equatable';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -37,7 +37,7 @@ export interface ValidatorJSON {
 }
 
 export class Validator extends BaseState
-  implements SerializableWire<Validator>, Equatable, SerializableJSON<ValidatorJSON> {
+  implements SerializableWire<Validator>, EquatableKey, SerializableJSON<ValidatorJSON> {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): Validator {
     const version = reader.readUInt8();
     const publicKey = reader.readECPoint();
@@ -60,6 +60,7 @@ export class Validator extends BaseState
   public readonly equals: Equals = utils.equals(Validator, this, (other) =>
     common.ecPointEqual(this.publicKey, other.publicKey),
   );
+  public readonly toKeyString = utils.toKeyString(Validator, () => common.ecPointToString(this.publicKey));
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 

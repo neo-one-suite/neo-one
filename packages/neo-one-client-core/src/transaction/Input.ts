@@ -1,5 +1,5 @@
 import { common, UInt256 } from '../common';
-import { Equals, Equatable } from '../Equatable';
+import { Equals, EquatableKey } from '../Equatable';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -22,7 +22,7 @@ export interface InputJSON {
 }
 
 const SIZE = IOHelper.sizeOfUInt256 + IOHelper.sizeOfUInt16LE;
-export class Input implements SerializableWire<Input>, Equatable, SerializableJSON<InputJSON> {
+export class Input implements SerializableWire<Input>, EquatableKey, SerializableJSON<InputJSON> {
   public static readonly size: number = SIZE;
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): Input {
     const hash = reader.readUInt256();
@@ -39,6 +39,7 @@ export class Input implements SerializableWire<Input>, Equatable, SerializableJS
   }
 
   public readonly hash: UInt256;
+  public readonly hashHex: string;
   public readonly index: number;
   public readonly size: number = SIZE;
   public readonly equals: Equals = utils.equals(
@@ -46,10 +47,12 @@ export class Input implements SerializableWire<Input>, Equatable, SerializableJS
     this,
     (other) => common.uInt256Equal(this.hash, other.hash) && other.index === this.index,
   );
+  public readonly toKeyString = utils.toKeyString(Input, () => `${this.hashHex}:${this.index}`);
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ hash, index }: InputAdd) {
     this.hash = hash;
+    this.hashHex = common.uInt256ToHex(hash);
     this.index = index;
   }
 

@@ -1,7 +1,6 @@
-import { Equals } from '../../Equatable';
 import { InvalidFormatError } from '../../errors';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../../Serializable';
-import { BinaryWriter, IOHelper, JSONHelper, utils } from '../../utils';
+import { BinaryWriter, IOHelper, JSONHelper } from '../../utils';
 import { AttributeBase, AttributeJSON } from './AttributeBase';
 import { AttributeUsage, toJSONAttributeUsage } from './AttributeUsage';
 
@@ -67,11 +66,6 @@ export class BufferAttribute extends AttributeBase<BufferAttributeUsage, Buffer>
   public readonly usage: BufferAttributeUsage;
   public readonly value: Buffer;
   public readonly size: number;
-  public readonly equals: Equals = utils.equals(
-    BufferAttribute,
-    this,
-    (other) => this.usage === other.usage && this.value.equals(other.value),
-  );
 
   public constructor({ usage, value }: BufferAttributeAdd) {
     super();

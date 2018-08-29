@@ -1,8 +1,7 @@
 import { common, ECPoint } from '../../common';
-import { Equals } from '../../Equatable';
 import { InvalidFormatError } from '../../errors';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../../Serializable';
-import { BinaryWriter, IOHelper, JSONHelper, utils } from '../../utils';
+import { BinaryWriter, IOHelper, JSONHelper } from '../../utils';
 import { AttributeBase, AttributeJSON } from './AttributeBase';
 import { AttributeUsage, toJSONAttributeUsage } from './AttributeUsage';
 
@@ -28,11 +27,6 @@ export class ECPointAttribute extends AttributeBase<ECPointAttributeUsage, ECPoi
   public readonly usage: ECPointAttributeUsage;
   public readonly value: ECPoint;
   public readonly size: number;
-  public readonly equals: Equals = utils.equals(
-    ECPointAttribute,
-    this,
-    (other) => this.usage === other.usage && common.ecPointEqual(this.value, other.value),
-  );
 
   public constructor({ usage, value }: ECPointAttributeAdd) {
     super();

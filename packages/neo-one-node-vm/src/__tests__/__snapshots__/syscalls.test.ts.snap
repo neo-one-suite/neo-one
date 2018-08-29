@@ -932,65 +932,73 @@ exports[`syscalls Neo.Enumerator.Value 7`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Value 8`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Value 9`] = `
-Array [
-  Array [
-    Object {
-      "hash": "fb29c2128c2a8645fe1a11e977363792c9cc696b",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Enumerator.Value 9`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Value 10`] = `
-Array [
-  Array [
-    Object {
-      "hash": "fb29c2128c2a8645fe1a11e977363792c9cc696b",
-      "prefix": "01",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Enumerator.Value 10`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Value 11`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Value 12`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Value 13`] = `Array []`;
-
-exports[`syscalls Neo.Enumerator.Value 14`] = `Array []`;
-
-exports[`syscalls Neo.Enumerator.Value 15`] = `
+exports[`syscalls Neo.Enumerator.Value 13`] = `
 Array [
   Array [
     Object {
-      "hash": "c15282d46710612b313ee0e1fc642e12a237f861",
+      "hash": "fb29c2128c2a8645fe1a11e977363792c9cc696b",
     },
   ],
 ]
 `;
 
-exports[`syscalls Neo.Enumerator.Value 16`] = `
+exports[`syscalls Neo.Enumerator.Value 14`] = `
 Array [
   Array [
     Object {
-      "hash": "c15282d46710612b313ee0e1fc642e12a237f861",
+      "hash": "fb29c2128c2a8645fe1a11e977363792c9cc696b",
       "prefix": "01",
     },
   ],
 ]
 `;
+
+exports[`syscalls Neo.Enumerator.Value 15`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Value 16`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Value 17`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Value 18`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Value 19`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Value 19`] = `
+Array [
+  Array [
+    Object {
+      "hash": "c15282d46710612b313ee0e1fc642e12a237f861",
+    },
+  ],
+]
+`;
 
-exports[`syscalls Neo.Enumerator.Value 20`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Value 20`] = `
+Array [
+  Array [
+    Object {
+      "hash": "c15282d46710612b313ee0e1fc642e12a237f861",
+      "prefix": "01",
+    },
+  ],
+]
+`;
 
-exports[`syscalls Neo.Enumerator.Value 21`] = `
+exports[`syscalls Neo.Enumerator.Value 21`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Value 22`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Value 23`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Value 24`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Value 25`] = `
 Array [
   Array [
     Object {
@@ -1000,7 +1008,7 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Enumerator.Value 22`] = `
+exports[`syscalls Neo.Enumerator.Value 26`] = `
 Array [
   Array [
     Object {
@@ -1011,13 +1019,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Enumerator.Value 23`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Value 27`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Value 24`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Value 28`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Value 25`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Value 29`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Value 26`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Value 30`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetConsensusData 1`] = `
 Array [
@@ -1217,7 +1225,15 @@ exports[`syscalls Neo.InvocationTransaction.GetScript 4`] = `Array []`;
 
 exports[`syscalls Neo.InvocationTransaction.GetScript 5`] = `Array []`;
 
-exports[`syscalls Neo.Iterator.Key 1`] = `
+exports[`syscalls Neo.Iterator.Key 1`] = `Array []`;
+
+exports[`syscalls Neo.Iterator.Key 2`] = `Array []`;
+
+exports[`syscalls Neo.Iterator.Key 3`] = `Array []`;
+
+exports[`syscalls Neo.Iterator.Key 4`] = `Array []`;
+
+exports[`syscalls Neo.Iterator.Key 5`] = `
 Array [
   Array [
     Object {
@@ -1227,7 +1243,7 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Iterator.Key 2`] = `
+exports[`syscalls Neo.Iterator.Key 6`] = `
 Array [
   Array [
     Object {
@@ -1238,13 +1254,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Iterator.Key 3`] = `Array []`;
+exports[`syscalls Neo.Iterator.Key 7`] = `Array []`;
 
-exports[`syscalls Neo.Iterator.Key 4`] = `Array []`;
+exports[`syscalls Neo.Iterator.Key 8`] = `Array []`;
 
-exports[`syscalls Neo.Iterator.Key 5`] = `Array []`;
+exports[`syscalls Neo.Iterator.Key 9`] = `Array []`;
 
-exports[`syscalls Neo.Iterator.Key 6`] = `Array []`;
+exports[`syscalls Neo.Iterator.Key 10`] = `Array []`;
 
 exports[`syscalls Neo.Output.GetAssetId 1`] = `
 Array [
@@ -1843,6 +1859,7 @@ Array [
     Object {
       "__$type": "Input",
       "hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hashHex": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "index": 0,
       "size": 34,
     },

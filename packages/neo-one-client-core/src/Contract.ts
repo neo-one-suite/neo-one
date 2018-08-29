@@ -14,7 +14,7 @@ import {
   HasStorage,
 } from './ContractPropertyState';
 import { crypto } from './crypto';
-import { Equals, Equatable } from './Equatable';
+import { Equals, EquatableKey } from './Equatable';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -62,7 +62,7 @@ export interface ContractJSON {
 }
 
 export class Contract extends BaseState
-  implements SerializableWire<Contract>, SerializableJSON<ContractJSON>, Equatable {
+  implements SerializableWire<Contract>, SerializableJSON<ContractJSON>, EquatableKey {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Contract {
     return deserializeContractWireBase({
       context: options.context,
@@ -90,6 +90,7 @@ export class Contract extends BaseState
   public readonly hasDynamicInvoke: boolean;
   public readonly payable: boolean;
   public readonly equals: Equals = utils.equals(Contract, this, (other) => common.uInt160Equal(this.hash, other.hash));
+  public readonly toKeyString = utils.toKeyString(Contract, () => this.hashHex);
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly hashInternal = utils.lazy(() => crypto.toScriptHash(this.script));
   private readonly hashHexInternal = utils.lazy(() => common.uInt160ToHex(this.hash));

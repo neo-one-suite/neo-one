@@ -4,7 +4,7 @@ import { assertAssetType, AssetType, AssetTypeJSON, toJSONAssetType } from './As
 import { BaseState } from './BaseState';
 import { common, ECPoint, UInt160, UInt256, UInt256Hex } from './common';
 import { crypto } from './crypto';
-import { Equals, Equatable } from './Equatable';
+import { Equals, EquatableKey } from './Equatable';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -65,7 +65,7 @@ export interface AssetJSON {
 const NAME_MAX_LENGTH = 1024;
 const PRECISION_MAX = 8;
 
-export class Asset extends BaseState implements SerializableWire<Asset>, SerializableJSON<AssetJSON>, Equatable {
+export class Asset extends BaseState implements SerializableWire<Asset>, SerializableJSON<AssetJSON>, EquatableKey {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): Asset {
     const version = reader.readUInt8();
     const hash = reader.readUInt256();
@@ -124,6 +124,7 @@ export class Asset extends BaseState implements SerializableWire<Asset>, Seriali
   public readonly expiration: number;
   public readonly isFrozen: boolean;
   public readonly equals: Equals = utils.equals(Asset, this, (other) => common.uInt256Equal(this.hash, other.hash));
+  public readonly toKeyString = utils.toKeyString(Asset, () => this.hashHex);
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 

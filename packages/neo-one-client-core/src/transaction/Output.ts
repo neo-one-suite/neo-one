@@ -1,7 +1,7 @@
 import { BN } from 'bn.js';
 import { common, UInt160, UInt256 } from '../common';
 import { crypto } from '../crypto';
-import { Equals, Equatable } from '../Equatable';
+import { Equals, EquatableKey } from '../Equatable';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -31,7 +31,7 @@ export interface OutputJSON {
 }
 
 const SIZE = IOHelper.sizeOfUInt256 + IOHelper.sizeOfFixed8 + IOHelper.sizeOfUInt160;
-export class Output implements SerializableWire<Output>, Equatable {
+export class Output implements SerializableWire<Output>, EquatableKey {
   public static readonly size: number = SIZE;
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): Output {
     const asset = reader.readUInt256();
@@ -60,6 +60,10 @@ export class Output implements SerializableWire<Output>, Equatable {
       common.uInt256Equal(this.asset, other.asset) &&
       this.value.eq(other.value) &&
       common.uInt160Equal(this.address, other.address),
+  );
+  public readonly toKeyString = utils.toKeyString(
+    Output,
+    () => `${common.uInt256ToString(this.asset)}:${this.value.toString(10)}:${common.uInt160ToString(this.address)}`,
   );
 
   public constructor({ asset, value, address }: OutputAdd) {

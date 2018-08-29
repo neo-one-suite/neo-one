@@ -120,6 +120,8 @@ const randomUInt = (): number => Math.floor(Math.random() * UINT_MAX_NUMBER);
 
 const randomUInt64 = (): BN => new BN(randomBytes(8).toString('hex'), 16);
 
+const toKeyString = (clazz: { readonly name: string }, toKey: () => string) => () => `${clazz.name}:${toKey()}`;
+
 export const utils = {
   FD: new BN(0xfd),
   FFFF: new BN(0xffff),
@@ -152,6 +154,7 @@ export const utils = {
   calculateClaimAmount,
   randomUInt,
   randomUInt64,
+  toKeyString,
   equals,
   lazy,
   lazyAsync,

@@ -1,7 +1,7 @@
 import { Contract } from '@neo-one/client-core';
-import { ObjectStackItem } from './ObjectStackItem';
+import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
-export class ContractStackItem extends ObjectStackItem<Contract> {
+export class ContractStackItem extends EquatableKeyStackItem<Contract> {
   public asContract(): Contract {
     return this.value;
   }

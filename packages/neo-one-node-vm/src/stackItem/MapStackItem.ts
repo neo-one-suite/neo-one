@@ -1,35 +1,37 @@
 // tslint:disable readonly-array
 import { BinaryWriter, ContractParameter, InteropInterfaceContractParameter } from '@neo-one/client-core';
+import { utils } from '@neo-one/utils';
+import _ from 'lodash';
 import { ArrayStackItem } from './ArrayStackItem';
-import { InvalidValueBufferError } from './errors';
+import { InvalidValueBufferError, MissingStackItemKeyError } from './errors';
+import { getNextID } from './referenceCounter';
 import { StackItem } from './StackItem';
 import { StackItemBase } from './StackItemBase';
 import { StackItemType } from './StackItemType';
 
-interface MapKeys {
-  // tslint:disable-next-line readonly-keyword
-  [key: string]: StackItem;
-}
-interface MapValues {
-  // tslint:disable-next-line readonly-keyword
-  [key: string]: StackItem;
-}
 export class MapStackItem extends StackItemBase {
-  private readonly mutableKeys: MapKeys;
-  private readonly mutableValues: MapValues;
+  private readonly referenceKeys: Map<string, StackItem>;
+  private readonly referenceValues: Map<string, StackItem>;
+  private readonly referenceID = getNextID();
 
-  public constructor({ keys = {}, values = {} }: { readonly keys?: MapKeys; readonly values?: MapValues } = {}) {
+  public constructor({
+    referenceKeys = new Map(),
+    referenceValues = new Map(),
+  }: {
+    readonly referenceKeys?: Map<string, StackItem>;
+    readonly referenceValues?: Map<string, StackItem>;
+  } = {}) {
     super();
-    this.mutableKeys = keys;
-    this.mutableValues = values;
+    this.referenceKeys = referenceKeys;
+    this.referenceValues = referenceValues;
+  }
+
+  public toStructuralKey(): string {
+    return `${this.referenceID}`;
   }
 
   // tslint:disable-next-line no-any
   public equals(other: any): boolean {
-    if (other === undefined) {
-      return false;
-    }
-
     return this === other;
   }
 
@@ -59,35 +61,38 @@ export class MapStackItem extends StackItemBase {
   }
 
   public get size(): number {
-    return Object.keys(this.mutableValues).length;
+    return this.referenceKeys.size;
   }
 
   public has(item: StackItem): boolean {
-    const key = item.toKeyString();
+    const referenceKey = item.toStructuralKey();
 
-    return (this.mutableKeys[key] as StackItem | undefined) !== undefined;
+    return this.referenceKeys.get(referenceKey) !== undefined;
   }
 
   public get(item: StackItem): StackItem {
-    const key = item.toKeyString();
+    const referenceKey = item.toStructuralKey();
+    const value = this.referenceValues.get(referenceKey);
 
-    return this.mutableValues[key];
+    if (value === undefined) {
+      throw new MissingStackItemKeyError();
+    }
+
+    return value;
   }
 
   public set(key: StackItem, value: StackItem): this {
-    const keyValue = key.toKeyString();
-    this.mutableKeys[keyValue] = key;
-    this.mutableValues[keyValue] = value;
+    const referenceKey = key.toStructuralKey();
+    this.referenceKeys.set(referenceKey, key);
+    this.referenceValues.set(referenceKey, value);
 
     return this;
   }
 
   public delete(item: StackItem): this {
-    const key = item.toKeyString();
-    // tslint:disable-next-line no-dynamic-delete
-    delete this.mutableKeys[key];
-    // tslint:disable-next-line no-dynamic-delete
-    delete this.mutableValues[key];
+    const referenceKey = item.toStructuralKey();
+    this.referenceKeys.delete(referenceKey);
+    this.referenceValues.delete(referenceKey);
 
     return this;
   }
@@ -97,11 +102,11 @@ export class MapStackItem extends StackItemBase {
   }
 
   public keysArray(): StackItem[] {
-    return Object.values(this.mutableKeys);
+    return [...this.referenceKeys.values()];
   }
 
   public valuesArray(): StackItem[] {
-    return Object.values(this.mutableValues);
+    return [...this.referenceValues.values()];
   }
 
   public asMapStackItem(): MapStackItem {
@@ -110,6 +115,8 @@ export class MapStackItem extends StackItemBase {
 
   // tslint:disable-next-line no-any
   public toJSON(): any {
-    return Object.keys(this.mutableKeys);
+    return _.fromPairs(
+      utils.zip(this.keysArray(), this.valuesArray()).map(([key, value]) => [JSON.stringify(key.toJSON()), value]),
+    );
   }
 }

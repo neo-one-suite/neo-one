@@ -1,8 +1,7 @@
-import { common, UInt256 } from '../../common';
-import { Equals } from '../../Equatable';
+import { UInt256 } from '../../common';
 import { InvalidFormatError } from '../../errors';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../../Serializable';
-import { BinaryWriter, IOHelper, JSONHelper, utils } from '../../utils';
+import { BinaryWriter, IOHelper, JSONHelper } from '../../utils';
 import { AttributeBase, AttributeJSON } from './AttributeBase';
 import { AttributeUsage, toJSONAttributeUsage } from './AttributeUsage';
 
@@ -65,11 +64,6 @@ export class UInt256Attribute extends AttributeBase<UInt256AttributeUsage, UInt2
   public readonly usage: UInt256AttributeUsage;
   public readonly value: UInt256;
   public readonly size: number;
-  public readonly equals: Equals = utils.equals(
-    UInt256Attribute,
-    this,
-    (other) => this.usage === other.usage && common.uInt256Equal(this.value, other.value),
-  );
 
   public constructor({ usage, value }: UInt256AttributeAdd) {
     super();

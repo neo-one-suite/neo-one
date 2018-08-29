@@ -14,15 +14,6 @@ export class ArrayLikeStackItem extends StackItemBase {
     this.value = value;
   }
 
-  // tslint:disable-next-line no-any
-  public equals(other: any): boolean {
-    if (other === undefined) {
-      return false;
-    }
-
-    return this === other;
-  }
-
   public serialize(): Buffer {
     const writer = new BinaryWriter();
     writer.writeUInt8((this.constructor as typeof ArrayLikeStackItem).type);

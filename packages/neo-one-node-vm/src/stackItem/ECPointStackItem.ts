@@ -9,25 +9,6 @@ export class ECPointStackItem extends StackItemBase {
     this.value = value;
   }
 
-  // tslint:disable-next-line no-any
-  public equals(other: any): boolean {
-    if (other === undefined) {
-      return false;
-    }
-
-    if (this === other) {
-      return true;
-    }
-
-    if (other instanceof StackItemBase) {
-      const point = other.asECPointMaybe();
-
-      return point !== undefined && common.ecPointEqual(this.value, point);
-    }
-
-    return false;
-  }
-
   public asECPoint(): ECPoint {
     return this.value;
   }

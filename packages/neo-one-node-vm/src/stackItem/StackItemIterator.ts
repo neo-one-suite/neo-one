@@ -1,4 +1,5 @@
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+import { concat } from '@reactivex/ix-es2015-cjs/asynciterable/concat';
 import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import { InvalidStorageStackItemIteratorError } from './errors';
 import { StackItemBase } from './StackItemBase';
@@ -33,5 +34,14 @@ export class StackItemIterator extends StackItemEnumerator<Value> {
     );
 
     return new StackItemEnumerator(iterable[Symbol.asyncIterator]());
+  }
+
+  public concatIterator(other: StackItemIterator): StackItemIterator {
+    const iterable = concat(
+      AsyncIterableX.from(this.enumerator as AsyncIterableIterator<Value>),
+      AsyncIterableX.from(other.enumerator as AsyncIterableIterator<Value>),
+    );
+
+    return new StackItemIterator(iterable[Symbol.asyncIterator]());
   }
 }

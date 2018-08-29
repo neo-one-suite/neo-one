@@ -10,13 +10,13 @@ import {
 } from '@neo-one/client-core';
 import { BufferStackItem } from './BufferStackItem';
 import { ECPointStackItem } from './ECPointStackItem';
-import { ObjectStackItem } from './ObjectStackItem';
+import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 import { StackItem } from './StackItem';
 import { StackItemBase } from './StackItemBase';
 import { UInt160StackItem } from './UInt160StackItem';
 import { UInt256StackItem } from './UInt256StackItem';
 
-export class AttributeStackItem extends ObjectStackItem<Attribute> {
+export class AttributeStackItem extends EquatableKeyStackItem<Attribute> {
   public asAttribute(): Attribute {
     return this.value;
   }

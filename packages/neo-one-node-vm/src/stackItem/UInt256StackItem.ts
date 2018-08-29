@@ -9,25 +9,6 @@ export class UInt256StackItem extends StackItemBase {
     this.value = value;
   }
 
-  // tslint:disable-next-line no-any
-  public equals(other: any): boolean {
-    if (other === undefined) {
-      return false;
-    }
-
-    if (this === other) {
-      return true;
-    }
-
-    if (other instanceof StackItemBase) {
-      const value = other.asUInt256Maybe();
-
-      return value !== undefined && common.uInt256Equal(this.value, value);
-    }
-
-    return false;
-  }
-
   public asUInt256(): UInt256 {
     return this.value;
   }

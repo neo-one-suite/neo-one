@@ -2,7 +2,7 @@ import { BN } from 'bn.js';
 import _ from 'lodash';
 import { BaseState } from './BaseState';
 import { common, ECPoint, UInt160, UInt160Hex, UInt256Hex } from './common';
-import { Equals, Equatable } from './Equatable';
+import { Equals, EquatableKey } from './Equatable';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -42,7 +42,8 @@ export interface AccountJSON {
   readonly unclaimed: ReadonlyArray<InputJSON>;
 }
 
-export class Account extends BaseState implements SerializableWire<Account>, SerializableJSON<AccountJSON>, Equatable {
+export class Account extends BaseState
+  implements SerializableWire<Account>, SerializableJSON<AccountJSON>, EquatableKey {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Account {
     const { reader } = options;
     const version = reader.readUInt8();
@@ -78,6 +79,7 @@ export class Account extends BaseState implements SerializableWire<Account>, Ser
   public readonly votes: ReadonlyArray<ECPoint>;
   public readonly balances: { readonly [AssetHash in string]?: BN };
   public readonly equals: Equals = utils.equals(Account, this, (other) => common.uInt160Equal(this.hash, other.hash));
+  public readonly toKeyString = utils.toKeyString(Account, () => this.hashHex);
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 

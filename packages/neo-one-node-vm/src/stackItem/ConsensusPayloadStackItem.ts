@@ -1,7 +1,7 @@
 import { ConsensusPayload } from '@neo-one/client-core';
-import { ObjectStackItem } from './ObjectStackItem';
+import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
-export class ConsensusPayloadStackItem extends ObjectStackItem<ConsensusPayload> {
+export class ConsensusPayloadStackItem extends EquatableKeyStackItem<ConsensusPayload> {
   public asConsensusPayload(): ConsensusPayload {
     return this.value;
   }

@@ -1,7 +1,7 @@
 import { Input } from '@neo-one/client-core';
-import { ObjectStackItem } from './ObjectStackItem';
+import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
-export class InputStackItem extends ObjectStackItem<Input> {
+export class InputStackItem extends EquatableKeyStackItem<Input> {
   public asInput(): Input {
     return this.value;
   }

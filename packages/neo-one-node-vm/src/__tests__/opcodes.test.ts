@@ -69,39 +69,54 @@ const reverseRef = new ArrayStackItem([
 const removeRef = new ArrayStackItem([new IntegerStackItem(new BN(1)), new IntegerStackItem(new BN(2))]);
 
 const mapStatic = new MapStackItem({
-  keys: {
-    'BufferStackItem:aaaa': new BufferStackItem(Buffer.from('aaaa', 'hex')),
-    'BufferStackItem:bbbb': new BufferStackItem(Buffer.from('bbbb', 'hex')),
-  },
-
-  values: {
-    'BufferStackItem:aaaa': new IntegerStackItem(new BN(1)),
-    'BufferStackItem:bbbb': new IntegerStackItem(new BN(2)),
-  },
+  referenceKeys: new Map([
+    [
+      new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
+      new BufferStackItem(Buffer.from('aaaa', 'hex')),
+    ],
+    [
+      new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
+      new BufferStackItem(Buffer.from('bbbb', 'hex')),
+    ],
+  ]),
+  referenceValues: new Map([
+    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
+    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
+  ]),
 });
 
 const mapSetRef = new MapStackItem({
-  keys: {
-    'BufferStackItem:aaaa': new BufferStackItem(Buffer.from('aaaa', 'hex')),
-    'BufferStackItem:bbbb': new BufferStackItem(Buffer.from('bbbb', 'hex')),
-  },
-
-  values: {
-    'BufferStackItem:aaaa': new IntegerStackItem(new BN(1)),
-    'BufferStackItem:bbbb': new IntegerStackItem(new BN(2)),
-  },
+  referenceKeys: new Map([
+    [
+      new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
+      new BufferStackItem(Buffer.from('aaaa', 'hex')),
+    ],
+    [
+      new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
+      new BufferStackItem(Buffer.from('bbbb', 'hex')),
+    ],
+  ]),
+  referenceValues: new Map([
+    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
+    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
+  ]),
 });
 
 const mapRemoveRef = new MapStackItem({
-  keys: {
-    'BufferStackItem:aaaa': new BufferStackItem(Buffer.from('aaaa', 'hex')),
-    'BufferStackItem:bbbb': new BufferStackItem(Buffer.from('bbbb', 'hex')),
-  },
-
-  values: {
-    'BufferStackItem:aaaa': new IntegerStackItem(new BN(1)),
-    'BufferStackItem:bbbb': new IntegerStackItem(new BN(2)),
-  },
+  referenceKeys: new Map([
+    [
+      new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
+      new BufferStackItem(Buffer.from('aaaa', 'hex')),
+    ],
+    [
+      new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
+      new BufferStackItem(Buffer.from('bbbb', 'hex')),
+    ],
+  ]),
+  referenceValues: new Map([
+    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
+    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
+  ]),
 });
 
 const contractSB = new ScriptBuilder();
@@ -1355,19 +1370,25 @@ const OPCODES = ([
 
         result: [
           new MapStackItem({
-            keys: {
-              'BufferStackItem:aaaa': new BufferStackItem(Buffer.from('aaaa', 'hex')),
-
-              'BufferStackItem:bbbb': new BufferStackItem(Buffer.from('bbbb', 'hex')),
-
-              'BufferStackItem:dddd': new BufferStackItem(Buffer.from('dddd', 'hex')),
-            },
-
-            values: {
-              'BufferStackItem:aaaa': new IntegerStackItem(new BN(1)),
-              'BufferStackItem:bbbb': new IntegerStackItem(new BN(2)),
-              'BufferStackItem:dddd': new IntegerStackItem(new BN(5)),
-            },
+            referenceKeys: new Map([
+              [
+                new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
+                new BufferStackItem(Buffer.from('aaaa', 'hex')),
+              ],
+              [
+                new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
+                new BufferStackItem(Buffer.from('bbbb', 'hex')),
+              ],
+              [
+                new BufferStackItem(Buffer.from('dddd', 'hex')).toStructuralKey(),
+                new BufferStackItem(Buffer.from('dddd', 'hex')),
+              ],
+            ]),
+            referenceValues: new Map([
+              [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
+              [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
+              [new BufferStackItem(Buffer.from('dddd', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(5))],
+            ]),
           }),
         ],
 
@@ -1438,13 +1459,15 @@ const OPCODES = ([
 
         result: [
           new MapStackItem({
-            keys: {
-              'BufferStackItem:aaaa': new BufferStackItem(Buffer.from('aaaa', 'hex')),
-            },
-
-            values: {
-              'BufferStackItem:aaaa': new IntegerStackItem(new BN(1)),
-            },
+            referenceKeys: new Map([
+              [
+                new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
+                new BufferStackItem(Buffer.from('aaaa', 'hex')),
+              ],
+            ]),
+            referenceValues: new Map([
+              [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
+            ]),
           }),
         ],
 
@@ -1532,7 +1555,7 @@ describe('opcodes', () => {
       mockTransaction,
       returnValueCount,
     } = testCase;
-    it(op, async () => {
+    test.only(op, async () => {
       const sb = new ScriptBuilder();
       for (const { op: preOp, buffer: preBuffer } of preOps) {
         sb.emitOp(preOp, preBuffer);
@@ -1637,7 +1660,9 @@ describe('opcodes', () => {
       }
 
       if (stackItems.length && ref) {
-        expect(ref).toEqual(result[0]);
+        const { referenceID: _refReferenceID, ...restRef } = ref as any;
+        const { referenceID: _resultReferenceID, ...restOther } = result[0] as any;
+        expect(restRef).toEqual(restOther);
       } else {
         expect(context.stack.length).toEqual(result.length);
         for (const [idx, item] of context.stack.entries()) {
@@ -1645,7 +1670,9 @@ describe('opcodes', () => {
           if (item instanceof IntegerStackItem && resultItem instanceof IntegerStackItem) {
             expect(item.asBigInteger().toString(10)).toEqual(resultItem.asBigInteger().toString(10));
           } else {
-            expect(item).toEqual(resultItem);
+            const { referenceID: _itemReferenceID, ...restItem } = item as any;
+            const { referenceID: _resultItemReferenceID, ...restResultItem } = resultItem as any;
+            expect(restItem).toEqual(restResultItem);
           }
         }
       }

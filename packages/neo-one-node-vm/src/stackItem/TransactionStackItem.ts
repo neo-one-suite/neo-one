@@ -1,7 +1,7 @@
 import { Transaction } from '@neo-one/client-core';
-import { ObjectStackItem } from './ObjectStackItem';
+import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
-export class TransactionStackItem extends ObjectStackItem<Transaction> {
+export class TransactionStackItem extends EquatableKeyStackItem<Transaction> {
   public asTransaction(): Transaction {
     return this.value;
   }

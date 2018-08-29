@@ -293,6 +293,7 @@ export enum SysCall {
   'Neo.Iterator.Key' = 'Neo.Iterator.Key',
   'Neo.Enumerator.Value' = 'Neo.Enumerator.Value',
   'Neo.Enumerator.Concat' = 'Neo.Enumerator.Concat',
+  'Neo.Iterator.Concat' = 'Neo.Iterator.Concat',
   'Neo.Iterator.Keys' = 'Neo.Iterator.Keys',
   'Neo.Iterator.Values' = 'Neo.Iterator.Values',
   'Neo.Account.SetVotes' = 'Neo.Account.SetVotes',
