@@ -9,7 +9,7 @@
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.63",
     "@types/fs-extra": "^5.0.4",
-    "@types/google-cloud__storage": "^1.7.1",
+    "@types/google-cloud__storage": "^1.7.2",
     "@types/tar": "^4.0.0",
     "fs-extra": "^7.0.0",
     "leveldown": "^4.0.1",
