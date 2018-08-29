@@ -22,6 +22,7 @@ import {
 import { BN } from 'bn.js';
 import { AttributeStackItem } from './AttributeStackItem';
 import {
+  InvalidRecursiveSerializeError,
   InvalidValueAccountError,
   InvalidValueArrayError,
   InvalidValueAssetError,
@@ -81,12 +82,13 @@ export class StackItemBase implements Equatable {
     return false;
   }
 
-  public serialize(): Buffer {
-    const writer = new BinaryWriter();
-    writer.writeUInt8(StackItemType.ByteArray);
-    writer.writeVarBytesLE(this.asBuffer());
+  public serialize(seen = new Set<StackItemBase>()): Buffer {
+    if (seen.has(this)) {
+      throw new InvalidRecursiveSerializeError();
+    }
+    seen.add(this);
 
-    return writer.toBuffer();
+    return this.serializeInternal(seen);
   }
 
   // tslint:disable-next-line readonly-array
@@ -243,5 +245,13 @@ export class StackItemBase implements Equatable {
     } catch {
       return 'UNKNOWN';
     }
+  }
+
+  protected serializeInternal(_seen: Set<StackItemBase>): Buffer {
+    const writer = new BinaryWriter();
+    writer.writeUInt8(StackItemType.ByteArray);
+    writer.writeVarBytesLE(this.asBuffer());
+
+    return writer.toBuffer();
   }
 }

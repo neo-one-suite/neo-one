@@ -13,14 +13,6 @@ export class IntegerStackItem extends StackItemBase {
     this.value = value;
   }
 
-  public serialize(): Buffer {
-    const writer = new BinaryWriter();
-    writer.writeUInt8(StackItemType.Integer);
-    writer.writeVarBytesLE(utils.toSignedBuffer(this.value));
-
-    return writer.toBuffer();
-  }
-
   public asBigInteger(): BN {
     return this.value;
   }
@@ -66,5 +58,13 @@ export class IntegerStackItem extends StackItemBase {
 
   public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
     return new IntegerContractParameter(this.value);
+  }
+
+  protected serializeInternal(): Buffer {
+    const writer = new BinaryWriter();
+    writer.writeUInt8(StackItemType.Integer);
+    writer.writeVarBytesLE(utils.toSignedBuffer(this.value));
+
+    return writer.toBuffer();
   }
 }

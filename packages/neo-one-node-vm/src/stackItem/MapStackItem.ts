@@ -35,19 +35,6 @@ export class MapStackItem extends StackItemBase {
     return this === other;
   }
 
-  public serialize(): Buffer {
-    const writer = new BinaryWriter();
-    writer.writeUInt8(StackItemType.Map);
-    const keys = this.keysArray();
-    writer.writeVarUIntLE(keys.length);
-    keys.forEach((key) => {
-      writer.writeBytes(key.serialize());
-      writer.writeBytes(this.get(key).serialize());
-    });
-
-    return writer.toBuffer();
-  }
-
   public asBoolean(): boolean {
     return true;
   }
@@ -118,5 +105,18 @@ export class MapStackItem extends StackItemBase {
     return _.fromPairs(
       utils.zip(this.keysArray(), this.valuesArray()).map(([key, value]) => [JSON.stringify(key.toJSON()), value]),
     );
+  }
+
+  protected serializeInternal(seen: Set<StackItemBase>): Buffer {
+    const writer = new BinaryWriter();
+    writer.writeUInt8(StackItemType.Map);
+    const keys = this.keysArray();
+    writer.writeVarUIntLE(keys.length);
+    keys.forEach((key) => {
+      writer.writeBytes(key.serialize(seen));
+      writer.writeBytes(this.get(key).serialize(seen));
+    });
+
+    return writer.toBuffer();
   }
 }

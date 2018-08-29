@@ -74,3 +74,7 @@ export const InvalidStorageStackItemIteratorError = makeErrorWithCode(
   () => 'Current is not set. The iterator has been fully consumed or has not ' + 'been initialized',
 );
 export const MissingStackItemKeyError = makeErrorWithCode('MISSING_STACK_ITEM_KEY', () => 'Map does not contain key.');
+export const InvalidRecursiveSerializeError = makeErrorWithCode(
+  'INVALID_RECURSIVE_SERIALIZE',
+  () => 'Attempted to serialize a recursive structure.',
+);

@@ -10,10 +10,6 @@ export class ObjectStackItem<Value> extends StackItemBase {
     this.value = value;
   }
 
-  public serialize(): Buffer {
-    throw new UnsupportedStackItemSerdeError();
-  }
-
   public asBoolean(): boolean {
     return this.value !== undefined;
   }
@@ -29,5 +25,9 @@ export class ObjectStackItem<Value> extends StackItemBase {
   // tslint:disable-next-line no-any
   public toJSON(): any {
     return JSON.stringify(this.value);
+  }
+
+  protected serializeInternal(): Buffer {
+    throw new UnsupportedStackItemSerdeError();
   }
 }

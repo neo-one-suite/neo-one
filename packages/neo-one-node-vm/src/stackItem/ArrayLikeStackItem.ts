@@ -14,17 +14,6 @@ export class ArrayLikeStackItem extends StackItemBase {
     this.value = value;
   }
 
-  public serialize(): Buffer {
-    const writer = new BinaryWriter();
-    writer.writeUInt8((this.constructor as typeof ArrayLikeStackItem).type);
-    writer.writeVarUIntLE(this.value.length);
-    this.value.forEach((item) => {
-      writer.writeBytes(item.serialize());
-    });
-
-    return writer.toBuffer();
-  }
-
   public isArray(): boolean {
     return true;
   }
@@ -58,5 +47,16 @@ export class ArrayLikeStackItem extends StackItemBase {
   // tslint:disable-next-line no-any
   public toJSON(): any {
     return this.value.map((val) => val.toJSON());
+  }
+
+  protected serializeInternal(seen: Set<StackItemBase>): Buffer {
+    const writer = new BinaryWriter();
+    writer.writeUInt8((this.constructor as typeof ArrayLikeStackItem).type);
+    writer.writeVarUIntLE(this.value.length);
+    this.value.forEach((item) => {
+      writer.writeBytes(item.serialize(seen));
+    });
+
+    return writer.toBuffer();
   }
 }

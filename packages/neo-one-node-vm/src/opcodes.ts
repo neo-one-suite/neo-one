@@ -1401,6 +1401,7 @@ const OPCODE_PAIRS = ([
         name: 'VERIFY',
         in: 3,
         out: 1,
+        fee: FEES.ONE_HUNDRED,
         invoke: async ({ context, args }) => {
           const publicKey = args[0].asECPoint();
           const signature = args[1].asBuffer();

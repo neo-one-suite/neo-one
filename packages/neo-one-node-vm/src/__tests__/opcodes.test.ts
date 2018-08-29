@@ -1242,14 +1242,14 @@ const OPCODES = ([
         op: 'VERIFY',
         args: [keys[0].publicKey, signature0, Buffer.alloc(32, 10)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES.ONE_HUNDRED,
       },
 
       {
         op: 'VERIFY',
         args: [keys[0].publicKey, signature0, Buffer.alloc(32, 1)],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES.ONE_HUNDRED,
       },
 
       {
