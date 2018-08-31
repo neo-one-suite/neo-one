@@ -1,6 +1,5 @@
 import { common } from '@neo-one/client-core';
 import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Asset', () => {
   test('properties', async () => {
@@ -32,18 +31,7 @@ describe('Asset', () => {
       class MyAsset implements Asset {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
-    );
-  });
-
-  test('cannot be referenced', async () => {
-    helpers.compileString(
-      `
-      import { Asset } from '@neo-one/smart-contract';
-
-      const x = Asset;
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
   });
 });

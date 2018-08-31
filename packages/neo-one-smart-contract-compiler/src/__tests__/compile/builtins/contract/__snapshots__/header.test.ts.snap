@@ -1,24 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Header cannot be implemented 1`] = `
-"snippetCode.ts (4,7): Built-ins cannot be implemented.
+"snippetCode.ts (4,13): Class 'MyHeader' incorrectly implements interface 'Header'.
+  Property 'hash' is missing in type 'MyHeader'.
 
       2 |       import { Header } from '@neo-one/smart-contract';
       3 | 
     > 4 |       class MyHeader implements Header {
-        |       ^
+        |             ^
       5 |       }
       6 |     
-"
-`;
-
-exports[`Header cannot be referenced 1`] = `
-"snippetCode.ts (4,17): Builtins cannot be referenced
-
-      2 |       import { Header } from '@neo-one/smart-contract';
-      3 | 
-    > 4 |       const x = Header;
-        |                 ^
-      5 |     
 "
 `;

@@ -13,10 +13,13 @@ import {
 export abstract class BuiltinInstanceMemberValue implements BuiltinInstanceMemberValueType {
   public readonly types = new Set([BuiltinType.InstanceMemberValue]);
   protected readonly canSet: boolean = false;
+  protected readonly isReadonly: boolean = true;
 
   public emitValue(sb: ScriptBuilder, node: MemberLikeExpression, options: VisitOptions, visited = false): void {
     if (!this.canSet && options.setValue) {
-      sb.context.reportError(node, DiagnosticCode.InvalidBuiltinModify, DiagnosticMessage.CannotModifyBuiltin);
+      if (!this.isReadonly) {
+        sb.context.reportError(node, DiagnosticCode.InvalidBuiltinModify, DiagnosticMessage.CannotModifyBuiltin);
+      }
 
       return;
     }

@@ -1,22 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Boolean cannot be implemented 1`] = `
-"snippetCode.ts (2,7): Built-ins cannot be implemented.
+exports[`Boolean cannot be extended 1`] = `
+"snippetCode.ts (2,31): Type 'BooleanConstructor' is not a constructor function type.
 
       1 | 
-    > 2 |       class MyBoolean implements Boolean {
-        |       ^
+    > 2 |       class MyBoolean extends Boolean {
+        |                               ^
       3 |       }
       4 |     
 "
 `;
 
-exports[`Boolean cannot be referenced 1`] = `
-"snippetCode.ts (2,17): Builtins cannot be referenced
+exports[`Boolean cannot be implemented 1`] = `
+"snippetCode.ts (2,13): Class 'MyBoolean' incorrectly implements interface 'Boolean'.
+  Property '[one0]' is missing in type 'MyBoolean'.
 
       1 | 
-    > 2 |       const x = Boolean;
-        |                 ^
-      3 |     
+    > 2 |       class MyBoolean implements Boolean {
+        |             ^
+      3 |       }
+      4 |     
 "
 `;

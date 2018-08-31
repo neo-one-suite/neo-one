@@ -22,6 +22,6 @@ export abstract class WrapHelper extends Helper {
     // [2, type, value]
     sb.emitPushInt(node, this.length);
     // [[type, value]]
-    sb.emitOp(node, 'PACK');
+    sb.emitOp(node, 'PACKSTRUCT');
   }
 }

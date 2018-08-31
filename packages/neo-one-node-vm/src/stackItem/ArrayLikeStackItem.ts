@@ -45,8 +45,8 @@ export class ArrayLikeStackItem extends StackItemBase {
   }
 
   // tslint:disable-next-line no-any
-  public toJSON(): any {
-    return this.value.map((val) => val.toJSON());
+  protected convertJSONInternal(seen: Set<StackItemBase>): any {
+    return this.value.map((val) => val.convertJSON(seen));
   }
 
   protected serializeInternal(seen: Set<StackItemBase>): Buffer {

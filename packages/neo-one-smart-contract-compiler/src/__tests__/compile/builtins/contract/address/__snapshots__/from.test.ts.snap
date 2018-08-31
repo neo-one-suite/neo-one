@@ -12,23 +12,23 @@ exports[`Address.from Reports error on invalid address 1`] = `
 `;
 
 exports[`Address.from cannot be element referenced 1`] = `
-"snippetCode.ts (3,20): Builtin properties cannot be referenced
+"snippetCode.ts (3,28): Builtin properties cannot be referenced
 
       1 | 
       2 |       import { Address } from '@neo-one/smart-contract';
     > 3 |       const keys = Address['from'];
-        |                    ^
+        |                            ^
       4 |     
 "
 `;
 
 exports[`Address.from cannot be referenced 1`] = `
-"snippetCode.ts (3,20): Builtin properties cannot be referenced
+"snippetCode.ts (3,28): Builtin properties cannot be referenced
 
       1 | 
       2 |       import { Address } from '@neo-one/smart-contract';
     > 3 |       const keys = Address.from;
-        |                    ^
+        |                            ^
       4 |     
 "
 `;

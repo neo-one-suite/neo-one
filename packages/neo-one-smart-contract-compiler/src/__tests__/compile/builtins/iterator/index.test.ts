@@ -1,18 +1,17 @@
 import { helpers } from '../../../../__data__';
 
 describe('Iterator', () => {
-  test('can be implemented', async () => {
-    await helpers.executeString(`
+  test('cannot be implemented', async () => {
+    helpers.compileString(
+      `
       class MyIterator implements Iterator<number> {
-        readonly next = () => ({
+        public readonly next: any = () => ({
           done: true,
-          value: 0,
+          value: 10,
         });
       }
-
-      const x = new MyIterator();
-      assertEqual(x.next().done, true);
-      assertEqual(x.next().value, 0);
-    `);
+    `,
+      { type: 'error' },
+    );
   });
 });

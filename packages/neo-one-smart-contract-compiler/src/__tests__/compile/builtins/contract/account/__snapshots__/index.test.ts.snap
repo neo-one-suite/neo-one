@@ -1,24 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Account cannot be implemented 1`] = `
-"snippetCode.ts (4,7): Built-ins cannot be implemented.
+"snippetCode.ts (4,13): Class 'MyAccount' incorrectly implements interface 'Account'.
+  Property 'address' is missing in type 'MyAccount'.
 
       2 |       import { Account } from '@neo-one/smart-contract';
       3 | 
     > 4 |       class MyAccount implements Account {
-        |       ^
+        |             ^
       5 |       }
       6 |     
-"
-`;
-
-exports[`Account cannot be referenced 1`] = `
-"snippetCode.ts (4,17): Builtins cannot be referenced
-
-      2 |       import { Account } from '@neo-one/smart-contract';
-      3 | 
-    > 4 |       const x = Account;
-        |                 ^
-      5 |     
 "
 `;

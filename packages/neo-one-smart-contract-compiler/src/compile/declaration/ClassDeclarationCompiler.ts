@@ -1,8 +1,5 @@
 import { PropertyNamedNode, tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { DiagnosticCode } from '../../DiagnosticCode';
-import { DiagnosticMessage } from '../../DiagnosticMessage';
-import { isBuiltinInterface } from '../builtins';
 import { InternalObjectProperty } from '../constants';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -26,19 +23,6 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       sb.scope.set(sb, extendsExpr, options, superClassIn);
     }
     const superClass = superClassIn;
-
-    const impl = tsUtils.class_.getImplementsArray(decl);
-    const implementsBuiltin = impl.find((implType) => {
-      const builtin = sb.context.builtins.getInterface(tsUtils.expression.getExpression(implType));
-
-      return builtin !== undefined && (!isBuiltinInterface(builtin) || !builtin.canImplement);
-    });
-
-    if (implementsBuiltin !== undefined) {
-      sb.context.reportError(decl, DiagnosticCode.InvalidBuiltinImplement, DiagnosticMessage.CannotImplementBuiltin);
-
-      return;
-    }
 
     const switchProperty = (
       node: PropertyNamedNode,
@@ -80,6 +64,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
           sb.helpers.forBuiltinType({
             type: sb.context.analysis.getType(expr),
             array: throwTypeError,
+            arrayStorage: throwTypeError,
             boolean: throwTypeError,
             buffer: throwTypeError,
             null: throwTypeError,
@@ -88,6 +73,14 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
             string: processString,
             symbol: processSymbol,
             undefined: throwTypeError,
+            map: throwTypeError,
+            mapStorage: throwTypeError,
+            set: throwTypeError,
+            setStorage: throwTypeError,
+            error: throwTypeError,
+            iteratorResult: throwTypeError,
+            iterable: throwTypeError,
+            iterableIterator: throwTypeError,
             transaction: throwTypeError,
             output: throwTypeError,
             attribute: throwTypeError,

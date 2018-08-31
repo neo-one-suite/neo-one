@@ -5,6 +5,7 @@ export * from './ArrFilterFuncHelper';
 export * from './ArrFilterHelper';
 export * from './ArrForEachFuncHelper';
 export * from './ArrForEachHelper';
+export * from './ArrLeftHelper';
 export * from './ArrMapFuncHelper';
 export * from './ArrMapHelper';
 export * from './ArrRangeHelper';

@@ -78,7 +78,7 @@ describe('ObjectBindingHelper', () => {
         import { Address } from '@neo-one/smart-contract';
         const { isSender } = Address;
 
-        assertEqual(currentTransaction !== undefined, true);
+        assertEqual(isSender !== undefined, true);
       `,
         { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
       );

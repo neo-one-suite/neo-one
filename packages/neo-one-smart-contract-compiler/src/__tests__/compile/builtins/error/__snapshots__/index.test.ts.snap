@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Error cannot be extended 1`] = `
+"snippetCode.ts (2,29): Builtins cannot be referenced
+
+      1 | 
+    > 2 |       class MyError extends Error {
+        |                             ^
+      3 |         public readonly message: string = 'foo';
+      4 |       }
+      5 |     
+"
+`;
+
+exports[`Error cannot be implemented 1`] = `
+"snippetCode.ts (2,13): Class 'MyError' incorrectly implements interface 'Error'.
+  Property '[one0]' is missing in type 'MyError'.
+
+      1 | 
+    > 2 |       class MyError implements Error {
+        |             ^
+      3 |         public readonly message: string = 'foo';
+      4 |       }
+      5 |     
+"
+`;
+
+exports[`Error cannot be mixin extended complex 1`] = `
+"snippetCode.ts (8,33): Builtins cannot be referenced
+
+       6 |       }
+       7 | 
+    >  8 |       class MyError extends foo(Error) {
+         |                                 ^
+       9 |         public readonly message: string = 'foo';
+      10 |       }
+      11 |     
+"
+`;

@@ -1,7 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ArrayEntries } from '../builtins/array/entries';
-import { WellKnownSymbol } from '../constants';
+import { Types } from '../constants';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -34,12 +34,11 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
     const variableType = sb.context.analysis.getType(nameNode);
     const expression = tsUtils.expression.getExpression(node);
     const statement = tsUtils.statement.getStatement(node);
-    const expressionType = sb.context.analysis.getType(expression);
 
     const each = (innerOptions: VisitOptions) => {
       if (ts.isIdentifier(nameNode)) {
         sb.scope.add(tsUtils.node.getText(nameNode));
-        sb.scope.set(sb, node, innerOptions, tsUtils.node.getText(nameNode));
+        sb.scope.set(sb, nameNode, innerOptions, tsUtils.node.getText(nameNode));
       } else if (ts.isArrayBindingPattern(nameNode)) {
         sb.emitHelper(nameNode, innerOptions, sb.helpers.arrayBinding({ type: variableType }));
       } else {
@@ -49,24 +48,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
     };
 
     const handleOther = (innerOptions: VisitOptions) => {
-      // [objectVal]
-      sb.emitHelper(expression, innerOptions, sb.helpers.toObject({ type: expressionType }));
-      // [objectVal, objectVal]
-      sb.emitOp(expression, 'DUP');
-      // [string, objectVal, objectVal]
-      sb.emitPushString(expression, WellKnownSymbol.iterator);
-      // [objectVal, objectVal]
-      sb.emitHelper(expression, innerOptions, sb.helpers.getSymbolObjectProperty);
-      // [objectVal]
-      sb.emitHelper(expression, innerOptions, sb.helpers.invokeCall({ bindThis: true, noArgs: true }));
-      // []
-      sb.emitHelper(
-        node,
-        innerOptions,
-        sb.helpers.iteratorForEach({
-          each,
-        }),
-      );
+      sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
     };
 
     const handleArray = (innerOptions: VisitOptions, withIndex = false, arrEach = each) => {
@@ -79,6 +61,110 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
         sb.helpers.arrForEach({
           withIndex,
           each: arrEach,
+        }),
+      );
+    };
+
+    const handleArrayStorage = (innerOptions: VisitOptions) => {
+      sb.emitHelper(
+        node,
+        sb.noPushValueOptions(innerOptions),
+        sb.helpers.forEachValStructuredStorage({
+          type: Types.ArrayStorage,
+          each,
+        }),
+      );
+    };
+
+    const handleMap = (innerOptions: VisitOptions) => {
+      // [map]
+      sb.emitHelper(expression, innerOptions, sb.helpers.unwrapMap);
+      // [iterator]
+      sb.emitSysCall(expression, 'Neo.Iterator.Create');
+      // []
+      sb.emitHelper(
+        node,
+        innerOptions,
+        sb.helpers.rawIteratorForEach({
+          each: (innerInnerOptionsIn) => {
+            const innerInnerOptions = sb.pushValueOptions(innerInnerOptionsIn);
+            // [2, key, val]
+            sb.emitPushInt(node, 2);
+            // [arr]
+            sb.emitOp(node, 'PACK');
+            // [val]
+            sb.emitHelper(node, innerInnerOptions, sb.helpers.wrapArray);
+            // []
+            each(innerInnerOptions);
+          },
+        }),
+      );
+    };
+
+    const handleMapStorage = (innerOptions: VisitOptions) => {
+      sb.emitHelper(
+        node,
+        sb.noPushValueOptions(innerOptions),
+        sb.helpers.forEachStructuredStorage({
+          type: Types.MapStorage,
+          each: (innerInnerOptionsIn) => {
+            const innerInnerOptions = sb.pushValueOptions(innerInnerOptionsIn);
+            // [number, keyVal, valueVal]
+            sb.emitPushInt(node, 2);
+            // [arr]
+            sb.emitOp(node, 'PACK');
+            // [val]
+            sb.emitHelper(node, innerInnerOptions, sb.helpers.wrapArray);
+            // []
+            each(innerInnerOptions);
+          },
+        }),
+      );
+    };
+
+    const handleSet = (innerOptions: VisitOptions) => {
+      // [map]
+      sb.emitHelper(expression, innerOptions, sb.helpers.unwrapSet);
+      // [iterator]
+      sb.emitSysCall(expression, 'Neo.Iterator.Create');
+      // []
+      sb.emitHelper(node, innerOptions, sb.helpers.rawIteratorForEachKey({ each }));
+    };
+
+    const handleSetStorage = (innerOptions: VisitOptions) => {
+      sb.emitHelper(
+        node,
+        sb.noPushValueOptions(innerOptions),
+        sb.helpers.forEachKeyStructuredStorage({
+          type: Types.SetStorage,
+          each,
+        }),
+      );
+    };
+
+    const handleIterableIterator = (innerOptions: VisitOptions) => {
+      sb.emitHelper(
+        node,
+        sb.noPushValueOptions(innerOptions),
+        sb.helpers.iterableIteratorForEach({
+          each,
+        }),
+      );
+    };
+
+    const handleIterable = (innerOptions: VisitOptions) => {
+      sb.emitHelper(
+        node,
+        innerOptions,
+        sb.helpers.forIterableType({
+          array: handleArray,
+          map: handleMap,
+          set: handleSet,
+          arrayStorage: handleArrayStorage,
+          mapStorage: handleMapStorage,
+          setStorage: handleSetStorage,
+          iterableIterator: handleIterableIterator,
+          defaultCase: handleOther,
         }),
       );
     };
@@ -121,6 +207,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
       sb.helpers.forBuiltinType({
         type: sb.context.analysis.getType(expression),
         array: handleArray,
+        arrayStorage: handleArrayStorage,
         boolean: handleOther,
         buffer: handleOther,
         null: handleOther,
@@ -129,6 +216,14 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
         string: handleOther,
         symbol: handleOther,
         undefined: handleOther,
+        map: handleMap,
+        mapStorage: handleMapStorage,
+        set: handleSet,
+        setStorage: handleSetStorage,
+        error: handleOther,
+        iteratorResult: handleOther,
+        iterable: handleIterable,
+        iterableIterator: handleIterableIterator,
         transaction: handleOther,
         output: handleOther,
         attribute: handleOther,

@@ -1,11 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`IArguments cannot be implemented 1`] = `
-"snippetCode.ts (2,7): Built-ins cannot be implemented.
+"snippetCode.ts (2,13): Class 'MyArray' incorrectly implements interface 'IArguments'.
+  Property '[one0]' is missing in type 'MyArray'.
 
       1 | 
     > 2 |       class MyArray implements IArguments {
-        |       ^
+        |             ^
       3 |       }
       4 |     
 "

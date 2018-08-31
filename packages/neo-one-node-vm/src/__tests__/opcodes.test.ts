@@ -1334,6 +1334,19 @@ const OPCODES = ([
       },
 
       {
+        op: 'PACKSTRUCT',
+        args: [new BN(1), Buffer.alloc(1, 0), Buffer.alloc(1, 1), Buffer.alloc(1, 2)],
+
+        result: [
+          new StructStackItem([new BufferStackItem(Buffer.alloc(1, 0))]),
+          new BufferStackItem(Buffer.alloc(1, 1)),
+          new BufferStackItem(Buffer.alloc(1, 2)),
+        ],
+
+        gas: FEES.ONE,
+      },
+
+      {
         op: 'UNPACK',
         args: [[new BN(4), new BN(5)]],
         result: [new IntegerStackItem(new BN(2)), new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(5))],

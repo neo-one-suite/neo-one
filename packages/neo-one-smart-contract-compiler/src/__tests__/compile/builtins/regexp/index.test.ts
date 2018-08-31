@@ -1,5 +1,4 @@
 import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('RegExp', () => {
   test('cannot be implemented', async () => {
@@ -8,16 +7,29 @@ describe('RegExp', () => {
       class MyRegExp implements RegExp {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
+      { type: 'error' },
     );
   });
 
-  test('cannot be referenced', async () => {
+  test('cannot be extended', async () => {
     helpers.compileString(
       `
-      const x = RegExp;
+      class MyRegExp extends RegExp {
+      }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
+  });
+
+  test('can be referenced and passed to functions', async () => {
+    await helpers.executeString(`
+      const x: [typeof RegExp] = [RegExp];
+
+      const foo = (value: [typeof RegExp]) => {
+        // do nothing
+      };
+
+      foo(x);
+    `);
   });
 });

@@ -7,6 +7,8 @@ import { CallMemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
 export class ArrayPush extends BuiltinInstanceMemberCall {
+  protected readonly isReadonly = false;
+
   public canCall(_sb: ScriptBuilder, _func: CallMemberLikeExpression, _node: ts.CallExpression): boolean {
     return true;
   }

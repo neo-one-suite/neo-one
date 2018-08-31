@@ -52,6 +52,10 @@ export class UnwrapValRecursiveHelper extends Helper {
             }),
           );
         },
+        arrayStorage: (innerOptions) => {
+          sb.emitOp(node, 'DROP');
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        },
         boolean: (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.unwrapBoolean);
         },
@@ -77,6 +81,38 @@ export class UnwrapValRecursiveHelper extends Helper {
         undefined: () => {
           sb.emitOp(node, 'DROP');
           sb.emitPushBuffer(node, Buffer.from([]));
+        },
+        map: (innerOptions) => {
+          sb.emitOp(node, 'DROP');
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        },
+        mapStorage: (innerOptions) => {
+          sb.emitOp(node, 'DROP');
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        },
+        set: (innerOptions) => {
+          sb.emitOp(node, 'DROP');
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        },
+        setStorage: (innerOptions) => {
+          sb.emitOp(node, 'DROP');
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        },
+        error: (innerOptions) => {
+          sb.emitOp(node, 'DROP');
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        },
+        iteratorResult: (innerOptions) => {
+          sb.emitOp(node, 'DROP');
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        },
+        iterableIterator: (innerOptions) => {
+          sb.emitOp(node, 'DROP');
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        },
+        iterable: (innerOptions) => {
+          sb.emitOp(node, 'DROP');
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
         },
         transaction: (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.unwrapTransaction);

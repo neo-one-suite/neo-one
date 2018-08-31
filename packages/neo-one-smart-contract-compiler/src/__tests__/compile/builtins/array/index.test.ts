@@ -11,22 +11,13 @@ describe('Array', () => {
     `);
   });
 
-  test('cannot be implemented', async () => {
+  test('cannot be extended', async () => {
     helpers.compileString(
       `
-      class MyArray implements Array<number> {
+      class MyArray extends Array<number> {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
-    );
-  });
-
-  test('cannot be referenced', async () => {
-    helpers.compileString(
-      `
-      const x = Array;
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
   });
 
@@ -59,10 +50,10 @@ describe('Array', () => {
       }
       const foo = (value: Arr): number => value.length;
       const x = [1, 2, 3]
-
-      assertEqual(foo(x), 3);
+      x.length;
+      foo(x);
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinUsage },
+      { type: 'error' },
     );
   });
 
@@ -73,10 +64,9 @@ describe('Array', () => {
         readonly length: number;
       }
       const x: Arr = [1, 2, 3]
-
-      assertEqual(x.length, 3);
+      x.length;
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinUsage },
+      { type: 'error' },
     );
   });
 
@@ -88,10 +78,8 @@ describe('Array', () => {
       }
       let x: Arr | undefined;
       x = [1, 2, 3]
-
-      assertEqual(x.length, 3);
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinUsage },
+      { type: 'error' },
     );
   });
 

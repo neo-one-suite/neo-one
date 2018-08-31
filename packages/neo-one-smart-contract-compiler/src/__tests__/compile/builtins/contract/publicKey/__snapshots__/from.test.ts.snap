@@ -12,23 +12,23 @@ exports[`PublicKey.from Reports error on invalid public key 1`] = `
 `;
 
 exports[`PublicKey.from cannot be element referenced 1`] = `
-"snippetCode.ts (3,20): Builtin properties cannot be referenced
+"snippetCode.ts (3,30): Builtin properties cannot be referenced
 
       1 | 
       2 |       import { PublicKey } from '@neo-one/smart-contract';
     > 3 |       const keys = PublicKey['from'];
-        |                    ^
+        |                              ^
       4 |     
 "
 `;
 
 exports[`PublicKey.from cannot be referenced 1`] = `
-"snippetCode.ts (3,20): Builtin properties cannot be referenced
+"snippetCode.ts (3,30): Builtin properties cannot be referenced
 
       1 | 
       2 |       import { PublicKey } from '@neo-one/smart-contract';
     > 3 |       const keys = PublicKey.from;
-        |                    ^
+        |                              ^
       4 |     
 "
 `;

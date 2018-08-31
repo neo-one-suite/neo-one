@@ -1,5 +1,4 @@
 import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('String', () => {
   test('cannot be implemented', async () => {
@@ -8,16 +7,29 @@ describe('String', () => {
       class MyString implements String {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
+      { type: 'error' },
     );
   });
 
-  test('cannot be referenced', async () => {
+  test('cannot be extended', async () => {
     helpers.compileString(
       `
-      const x = String;
+      class MyString extends String {
+      }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
+  });
+
+  test('can be referenced and passed to functions', async () => {
+    await helpers.executeString(`
+      const x = [String];
+
+      const foo = (value: ReadonlyArray<typeof String>) => {
+        // do nothing
+      };
+
+      foo(x);
+    `);
   });
 });

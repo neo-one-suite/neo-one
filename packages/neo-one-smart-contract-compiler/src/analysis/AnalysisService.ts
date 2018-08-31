@@ -257,6 +257,40 @@ export class AnalysisService {
     return type;
   }
 
+  public extractStorageKey(node: ts.Node): string | undefined {
+    return this.memoized('extract-storage-key', nodeKey(node), () => {
+      const smartContract = tsUtils.node.getFirstAncestorByTest(node, ts.isClassDeclaration);
+      if (smartContract === undefined || !this.isSmartContract(smartContract)) {
+        return undefined;
+      }
+
+      const decl = tsUtils.node.getFirstAncestorByTest(node, ts.isPropertyDeclaration);
+      if (decl === undefined) {
+        return undefined;
+      }
+
+      return tsUtils.node.getName(decl);
+    });
+  }
+
+  public isSmartContract(node: ts.ClassDeclaration): boolean {
+    return this.memoized('is-smart-contract', nodeKey(node), () => {
+      const isSmartContract = tsUtils.class_.getImplementsArray(node).some((implType) => {
+        const testType = this.getType(tsUtils.expression.getExpression(implType));
+
+        return testType !== undefined && this.context.builtins.isInterface(node, testType, 'SmartContract');
+      });
+
+      if (isSmartContract) {
+        return true;
+      }
+
+      const baseClass = tsUtils.class_.getBaseClass(this.context.typeChecker, node);
+
+      return baseClass !== undefined && this.isSmartContract(baseClass);
+    });
+  }
+
   private extractLiteral<T>(
     original: ts.Expression,
     name: string,

@@ -1,6 +1,5 @@
 import { common } from '@neo-one/client-core';
 import { helpers } from '../../../../../__data__';
-import { DiagnosticCode } from '../../../../../DiagnosticCode';
 
 describe('Hash256', () => {
   test('cannot be implemented', async () => {
@@ -10,17 +9,7 @@ describe('Hash256', () => {
       class MyHash256 implements Hash256 {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
-    );
-  });
-
-  test('cannot be referenced', async () => {
-    helpers.compileString(
-      `
-      import { Hash256 } from '@neo-one/smart-contract';
-      const x = Hash256;
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
   });
 

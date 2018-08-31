@@ -1,11 +1,13 @@
-import { BuiltinBase } from '../../BuiltinBase';
 import { BuiltinInterface } from '../../BuiltinInterface';
 import { Builtins } from '../../Builtins';
+import { BuiltinValueObject } from '../../BuiltinValueObject';
 import { AddressFrom } from './from';
 import { AddressIsSender } from './isSender';
 
 class AddressInterface extends BuiltinInterface {}
-class AddressValue extends BuiltinBase {}
+class AddressValue extends BuiltinValueObject {
+  public readonly type = 'AddressConstructor';
+}
 class AddressConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name

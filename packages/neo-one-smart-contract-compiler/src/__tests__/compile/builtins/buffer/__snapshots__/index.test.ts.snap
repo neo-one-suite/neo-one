@@ -1,22 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Buffer cannot be implemented 1`] = `
-"snippetCode.ts (2,7): Built-ins cannot be implemented.
+exports[`Buffer cannot be extended 1`] = `
+"snippetCode.ts (2,30): Type 'BufferConstructor' is not a constructor function type.
 
       1 | 
-    > 2 |       class MyBuffer implements Buffer {
-        |       ^
+    > 2 |       class MyBuffer extends Buffer {
+        |                              ^
       3 |       }
       4 |     
 "
 `;
 
-exports[`Buffer cannot be referenced 1`] = `
-"snippetCode.ts (2,17): Builtins cannot be referenced
+exports[`Buffer cannot be implemented 1`] = `
+"snippetCode.ts (2,13): Class 'MyBuffer' incorrectly implements interface 'Buffer'.
+  Property 'length' is missing in type 'MyBuffer'.
 
       1 | 
-    > 2 |       const x = Buffer;
-        |                 ^
-      3 |     
+    > 2 |       class MyBuffer implements Buffer {
+        |             ^
+      3 |       }
+      4 |     
 "
 `;

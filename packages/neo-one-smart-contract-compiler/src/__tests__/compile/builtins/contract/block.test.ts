@@ -1,5 +1,4 @@
 import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Block', () => {
   test('properties', async () => {
@@ -39,18 +38,7 @@ describe('Block', () => {
       class MyBlock implements Block {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
-    );
-  });
-
-  test('cannot be referenced', async () => {
-    helpers.compileString(
-      `
-      import { Block } from '@neo-one/smart-contract';
-
-      const x = Block;
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
   });
 });

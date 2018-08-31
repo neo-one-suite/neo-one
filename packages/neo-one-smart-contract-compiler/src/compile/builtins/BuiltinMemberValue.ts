@@ -7,10 +7,13 @@ import { BuiltinMemberValue as BuiltinMemberValueType, BuiltinType, MemberLikeEx
 export abstract class BuiltinMemberValue implements BuiltinMemberValueType {
   public readonly types = new Set([BuiltinType.MemberValue]);
   protected readonly canSet: boolean = false;
+  protected readonly isReadonly: boolean = true;
 
   public emitValue(sb: ScriptBuilder, node: MemberLikeExpression, options: VisitOptions): void {
     if (!this.canSet && options.setValue) {
-      sb.context.reportError(node, DiagnosticCode.InvalidBuiltinModify, DiagnosticMessage.CannotModifyBuiltin);
+      if (!this.isReadonly) {
+        sb.context.reportError(node, DiagnosticCode.InvalidBuiltinModify, DiagnosticMessage.CannotModifyBuiltin);
+      }
 
       return;
     }

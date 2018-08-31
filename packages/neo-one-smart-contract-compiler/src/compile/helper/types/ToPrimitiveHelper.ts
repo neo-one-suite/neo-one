@@ -43,11 +43,6 @@ export class ToPrimitiveHelper extends Helper {
       throwTypeError(options);
     };
 
-    const convertArray = (options: VisitOptions) => {
-      sb.emitHelper(node, options, sb.helpers.toString({ type: this.type, knownType: Types.Array }));
-      sb.emitHelper(node, options, sb.helpers.wrapString);
-    };
-
     const convertPrimitive = () => {
       // do nothing
     };
@@ -108,6 +103,7 @@ export class ToPrimitiveHelper extends Helper {
               type: undefined,
               knownType: undefined,
               array: throwTypeError,
+              arrayStorage: throwTypeError,
               boolean: convertPrimitive,
               buffer: throwTypeError,
               null: convertPrimitive,
@@ -116,6 +112,14 @@ export class ToPrimitiveHelper extends Helper {
               string: convertPrimitive,
               symbol: convertPrimitive,
               undefined: convertPrimitive,
+              map: throwTypeError,
+              mapStorage: throwTypeError,
+              set: throwTypeError,
+              setStorage: throwTypeError,
+              error: throwTypeError,
+              iteratorResult: throwTypeError,
+              iterable: throwTypeError,
+              iterableIterator: throwTypeError,
               transaction: throwTypeError,
               output: throwTypeError,
               attribute: throwTypeError,
@@ -145,6 +149,7 @@ export class ToPrimitiveHelper extends Helper {
             type: undefined,
             knownType: undefined,
             array: nextConvertObject,
+            arrayStorage: throwInnerTypeError,
             boolean: convertObjectDone,
             buffer: nextConvertObject,
             null: convertObjectDone,
@@ -153,6 +158,14 @@ export class ToPrimitiveHelper extends Helper {
             string: convertObjectDone,
             symbol: convertObjectDone,
             undefined: convertObjectDone,
+            map: throwInnerTypeError,
+            mapStorage: throwInnerTypeError,
+            set: throwInnerTypeError,
+            setStorage: throwInnerTypeError,
+            error: throwInnerTypeError,
+            iteratorResult: throwInnerTypeError,
+            iterable: throwInnerTypeError,
+            iterableIterator: throwInnerTypeError,
             transaction: throwInnerTypeError,
             output: throwInnerTypeError,
             attribute: throwInnerTypeError,
@@ -207,13 +220,21 @@ export class ToPrimitiveHelper extends Helper {
       );
     };
 
+    const toString = (knownType: Types) => (options: VisitOptions) => {
+      // [string]
+      sb.emitHelper(node, options, sb.helpers.toString({ type: this.type, knownType }));
+      // [val]
+      sb.emitHelper(node, options, sb.helpers.wrapString);
+    };
+
     sb.emitHelper(
       node,
       optionsIn,
       sb.helpers.forBuiltinType({
         type: this.type,
         knownType: this.knownType,
-        array: convertArray,
+        array: toString(Types.Array),
+        arrayStorage: toString(Types.Array),
         boolean: convertPrimitive,
         buffer: convertBuffer,
         null: convertPrimitive,
@@ -222,15 +243,23 @@ export class ToPrimitiveHelper extends Helper {
         string: convertPrimitive,
         symbol: convertPrimitive,
         undefined: convertPrimitive,
-        transaction: throwTypeError,
-        output: throwTypeError,
-        attribute: throwTypeError,
-        input: throwTypeError,
-        account: throwTypeError,
-        asset: throwTypeError,
-        contract: throwTypeError,
-        header: throwTypeError,
-        block: throwTypeError,
+        map: toString(Types.Array),
+        mapStorage: toString(Types.Array),
+        set: toString(Types.Array),
+        setStorage: toString(Types.Array),
+        error: toString(Types.Error),
+        iteratorResult: toString(Types.IteratorResult),
+        iterable: toString(Types.Iterable),
+        iterableIterator: toString(Types.IterableIterator),
+        transaction: toString(Types.Transaction),
+        output: toString(Types.Output),
+        attribute: toString(Types.Attribute),
+        input: toString(Types.Input),
+        account: toString(Types.Account),
+        asset: toString(Types.Asset),
+        contract: toString(Types.Contract),
+        header: toString(Types.Header),
+        block: toString(Types.Block),
       }),
     );
   }

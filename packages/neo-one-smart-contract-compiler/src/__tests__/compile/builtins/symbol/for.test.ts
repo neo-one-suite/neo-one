@@ -13,8 +13,9 @@ describe('Symbol.for', () => {
 
   test('should create equivalent symbols', async () => {
     await helpers.executeString(`
-      const x: symbol = Symbol.for('hello');
-      const y: symbol = Symbol.for('hello');
+      const s = Symbol;
+      const x: symbol = s.for('hello');
+      const y: symbol = s.for('hello');
 
       assertEqual(x, y);
     `);

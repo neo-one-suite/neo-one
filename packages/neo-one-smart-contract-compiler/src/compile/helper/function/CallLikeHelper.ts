@@ -1,8 +1,6 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts from 'typescript';
-import { DiagnosticCode } from '../../../DiagnosticCode';
-import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import {
   Builtin,
   BuiltinInstanceMemberTemplate,
@@ -155,12 +153,6 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           return;
         }
       }
-
-      sb.context.reportError(
-        memberLike,
-        DiagnosticCode.InvalidBuiltinReference,
-        DiagnosticMessage.CannotReferenceBuiltinProperty,
-      );
     };
 
     if (
@@ -231,6 +223,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
         sb.helpers.forBuiltinType({
           type: valueType,
           array: createProcessBuiltin('Array'),
+          arrayStorage: createProcessBuiltin('ArrayStorage'),
           boolean: createProcessBuiltin('Boolean'),
           buffer: createProcessBuiltin('Buffer'),
           null: throwTypeError,
@@ -239,6 +232,14 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           string: createProcessBuiltin('String'),
           symbol: createProcessBuiltin('Symbol'),
           undefined: throwTypeError,
+          map: createProcessBuiltin('Map'),
+          mapStorage: createProcessBuiltin('MapStorage'),
+          set: createProcessBuiltin('Set'),
+          setStorage: createProcessBuiltin('SetStorage'),
+          error: createProcessBuiltin('Error'),
+          iteratorResult: createProcessBuiltin('IteratorResult'),
+          iterable: createProcessBuiltin('Iterable'),
+          iterableIterator: createProcessBuiltin('IterableIterator'),
           transaction: createProcessBuiltin('TransactionBase'),
           output: createProcessBuiltin('Output'),
           attribute: createProcessBuiltin('AttributeBase'),
@@ -318,6 +319,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           sb.helpers.forBuiltinType({
             type: propType,
             array: throwInnerTypeError,
+            arrayStorage: throwInnerTypeError,
             boolean: throwInnerTypeError,
             buffer: throwInnerTypeError,
             null: throwInnerTypeError,
@@ -326,6 +328,14 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
             string: handleString,
             symbol: handleSymbol,
             undefined: throwInnerTypeError,
+            map: throwInnerTypeError,
+            mapStorage: throwInnerTypeError,
+            set: throwInnerTypeError,
+            setStorage: throwInnerTypeError,
+            error: throwInnerTypeError,
+            iteratorResult: throwInnerTypeError,
+            iterable: throwInnerTypeError,
+            iterableIterator: throwInnerTypeError,
             transaction: throwInnerTypeError,
             output: throwInnerTypeError,
             attribute: throwInnerTypeError,
@@ -474,6 +484,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           sb.helpers.forBuiltinType({
             type: propType,
             array: throwInnerTypeError,
+            arrayStorage: throwInnerTypeError,
             boolean: throwInnerTypeError,
             buffer: throwInnerTypeError,
             null: throwInnerTypeError,
@@ -482,6 +493,14 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
             string: handleString,
             symbol: handleSymbol,
             undefined: throwInnerTypeError,
+            map: throwInnerTypeError,
+            mapStorage: throwInnerTypeError,
+            set: throwInnerTypeError,
+            setStorage: throwInnerTypeError,
+            error: throwInnerTypeError,
+            iteratorResult: throwInnerTypeError,
+            iterable: throwInnerTypeError,
+            iterableIterator: throwInnerTypeError,
             transaction: throwInnerTypeError,
             output: throwInnerTypeError,
             attribute: throwInnerTypeError,
@@ -504,6 +523,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
         sb.helpers.forBuiltinType({
           type: valueType,
           array: createProcessArray(),
+          arrayStorage: createProcessBuiltin('ArrayStorage'),
           boolean: createProcessBuiltin('Boolean'),
           buffer: createProcessBuiltin('Buffer'),
           null: throwTypeError,
@@ -512,6 +532,14 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           string: createProcessBuiltin('String'),
           symbol: createProcessBuiltin('Symbol'),
           undefined: throwTypeError,
+          map: createProcessBuiltin('Map'),
+          mapStorage: createProcessBuiltin('MapStorage'),
+          set: createProcessBuiltin('Set'),
+          setStorage: createProcessBuiltin('SetStorage'),
+          error: createProcessBuiltin('Error'),
+          iteratorResult: createProcessBuiltin('IteratorResult'),
+          iterable: createProcessBuiltin('Iterable'),
+          iterableIterator: createProcessBuiltin('IterableIterator'),
           transaction: createProcessBuiltin('TransactionBase'),
           output: createProcessBuiltin('Output'),
           attribute: createProcessBuiltin('AttributeBase'),

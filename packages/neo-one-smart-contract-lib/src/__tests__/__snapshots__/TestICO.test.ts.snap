@@ -2,8 +2,8 @@
 
 exports[`TestICO smart contract: deploy consumed 1`] = `"0"`;
 
-exports[`TestICO smart contract: deploy cost 1`] = `"5.835"`;
+exports[`TestICO smart contract: deploy cost 1`] = `"5.332"`;
 
 exports[`TestICO smart contract: mint consumed 1`] = `"0"`;
 
-exports[`TestICO smart contract: mint cost 1`] = `"8.611"`;
+exports[`TestICO smart contract: mint cost 1`] = `"7.851"`;

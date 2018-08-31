@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Map cannot be extended 1`] = `
+"snippetCode.ts (2,27): Builtins cannot be referenced
+
+      1 | 
+    > 2 |       class MyMap extends Map<string, number> {
+        |                           ^
+      3 |       }
+      4 |     
+"
+`;

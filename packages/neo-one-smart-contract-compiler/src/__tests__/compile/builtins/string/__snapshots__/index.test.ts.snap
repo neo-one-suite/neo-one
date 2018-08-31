@@ -1,22 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`String cannot be implemented 1`] = `
-"snippetCode.ts (2,7): Built-ins cannot be implemented.
+exports[`String cannot be extended 1`] = `
+"snippetCode.ts (2,30): Type 'StringConstructor' is not a constructor function type.
 
       1 | 
-    > 2 |       class MyString implements String {
-        |       ^
+    > 2 |       class MyString extends String {
+        |                              ^
       3 |       }
       4 |     
 "
 `;
 
-exports[`String cannot be referenced 1`] = `
-"snippetCode.ts (2,17): Builtins cannot be referenced
+exports[`String cannot be implemented 1`] = `
+"snippetCode.ts (2,13): Class 'MyString' incorrectly implements interface 'String'.
+  Property '[one0]' is missing in type 'MyString'.
 
       1 | 
-    > 2 |       const x = String;
-        |                 ^
-      3 |     
+    > 2 |       class MyString implements String {
+        |             ^
+      3 |       }
+      4 |     
 "
 `;

@@ -1,6 +1,5 @@
 import { common } from '@neo-one/client-core';
 import { helpers } from '../../../../../__data__';
-import { DiagnosticCode } from '../../../../../DiagnosticCode';
 
 describe('Account', () => {
   test('Account properties', async () => {
@@ -34,18 +33,7 @@ describe('Account', () => {
       class MyAccount implements Account {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
-    );
-  });
-
-  test('cannot be referenced', async () => {
-    helpers.compileString(
-      `
-      import { Account } from '@neo-one/smart-contract';
-
-      const x = Account;
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
   });
 });

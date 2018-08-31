@@ -20,19 +20,17 @@ exports[`Array cannot be ambiguously referenced - assignment 1`] = `
       5 |       let x: Arr | undefined;
     > 6 |       x = [1, 2, 3]
         |           ^
-      7 | 
-      8 |       assertEqual(x.length, 3);
-      9 |     
+      7 |     
 "
 `;
 
 exports[`Array cannot be ambiguously referenced - call 1`] = `
-"snippetCode.ts (8,23): Call parameter is ambiguous in relation to the provided argument.
+"snippetCode.ts (8,11): Call parameter is ambiguous in relation to the provided argument.
 
       6 |       const x = [1, 2, 3]
-      7 | 
-    > 8 |       assertEqual(foo(x), 3);
-        |                       ^
+      7 |       x.length;
+    > 8 |       foo(x);
+        |           ^
       9 |     
 "
 `;
@@ -57,29 +55,18 @@ exports[`Array cannot be ambiguously referenced - variable 1`] = `
       4 |       }
     > 5 |       const x: Arr = [1, 2, 3]
         |                      ^
-      6 | 
-      7 |       assertEqual(x.length, 3);
-      8 |     
+      6 |       x.length;
+      7 |     
 "
 `;
 
-exports[`Array cannot be implemented 1`] = `
-"snippetCode.ts (2,7): Built-ins cannot be implemented.
+exports[`Array cannot be extended 1`] = `
+"snippetCode.ts (2,29): Type 'ArrayConstructor' is not a constructor function type.
 
       1 | 
-    > 2 |       class MyArray implements Array<number> {
-        |       ^
+    > 2 |       class MyArray extends Array<number> {
+        |                             ^
       3 |       }
       4 |     
-"
-`;
-
-exports[`Array cannot be referenced 1`] = `
-"snippetCode.ts (2,17): Builtins cannot be referenced
-
-      1 | 
-    > 2 |       const x = Array;
-        |                 ^
-      3 |     
 "
 `;

@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`IteratorResult cannot be implemented 1`] = `
+"snippetCode.ts (2,13): Class 'MyIteratorResult' incorrectly implements interface 'IteratorResult<number>'.
+  Property '[one0]' is missing in type 'MyIteratorResult'.
+
+      1 | 
+    > 2 |       class MyIteratorResult implements IteratorResult<number> {
+        |             ^
+      3 |         public readonly done = true;
+      4 |         public readonly value = 10;
+      5 |       }
+"
+`;

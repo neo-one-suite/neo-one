@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Buffer.prototype.toString cannot be referenced 1`] = `
-"snippetCode.ts (3,17): Builtin properties cannot be referenced
+"snippetCode.ts (3,19): Builtin properties cannot be referenced
 
       1 | 
       2 |       const x = Buffer.from('5946158ab93f5f4fd6ba230f1c6c235117eec5f83e65275ac6f93ada9ca60477', 'hex');
     > 3 |       const y = x.toString;
-        |                 ^
+        |                   ^
       4 |     
 "
 `;

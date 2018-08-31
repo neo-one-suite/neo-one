@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Set cannot be extended 1`] = `
+"snippetCode.ts (2,27): Builtins cannot be referenced
+
+      1 | 
+    > 2 |       class MySet extends Set<string> {
+        |                           ^
+      3 |       }
+      4 |     
+"
+`;

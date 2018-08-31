@@ -12,4 +12,13 @@ describe('Symbol.iterator', () => {
       assertEqual(Symbol.iterator, Symbol.iterator);
     `);
   });
+
+  test('cannot be set', async () => {
+    helpers.compileString(
+      `
+      Symbol.iterator = Symbol.for('foo');
+    `,
+      { type: 'error' },
+    );
+  });
 });

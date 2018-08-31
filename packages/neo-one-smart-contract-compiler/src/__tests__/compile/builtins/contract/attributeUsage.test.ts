@@ -1,11 +1,11 @@
 import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('AttributeUsage', () => {
   test('properties', async () => {
     await helpers.executeString(`
       import { AttributeUsage } from '@neo-one/smart-contract';
-      assertEqual(AttributeUsage.ContractHash, 0x00);
+      const x = AttributeUsage;
+      assertEqual(x.ContractHash, 0x00);
       assertEqual(AttributeUsage.ECDH02, 0x02);
       assertEqual(AttributeUsage.ECDH03, 0x03);
       assertEqual(AttributeUsage.Script, 0x20);
@@ -44,16 +44,5 @@ describe('AttributeUsage', () => {
       assertEqual(AttributeUsage.Remark14, 0xfe);
       assertEqual(AttributeUsage.Remark15, 0xff);
     `);
-  });
-
-  test('cannot be referenced', async () => {
-    helpers.compileString(
-      `
-      import { AttributeUsage } from '@neo-one/smart-contract';
-
-      const x = AttributeUsage;
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
-    );
   });
 });

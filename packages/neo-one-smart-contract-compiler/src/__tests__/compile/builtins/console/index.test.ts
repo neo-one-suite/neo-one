@@ -1,5 +1,4 @@
 import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('console', () => {
   test('cannot be implemented', async () => {
@@ -8,16 +7,17 @@ describe('console', () => {
       class MyConsole implements Console {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
+      { type: 'error' },
     );
   });
 
-  test('cannot be referenced', async () => {
+  test('cannot be extended', async () => {
     helpers.compileString(
       `
-      const x = console;
+      class MyFunction extends Console {
+      }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
   });
 });

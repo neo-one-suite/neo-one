@@ -15,6 +15,7 @@ export enum BuiltinType {
   InstanceMemberTemplate = 'InstanceMemberTemplate',
   InstanceOf = 'InstanceOf',
   Interface = 'Interface',
+  New = 'New',
 }
 
 export interface Builtin {
@@ -143,6 +144,14 @@ export interface BuiltinInstanceOf extends Builtin {
 
 export function isBuiltinInstanceOf(value: Builtin): value is BuiltinInstanceOf {
   return value.types.has(BuiltinType.InstanceOf);
+}
+
+export interface BuiltinNew extends BuiltinInstanceOf {
+  readonly emitNew: (sb: ScriptBuilder, node: ts.NewExpression, options: VisitOptions) => void;
+}
+
+export function isBuiltinNew(value: Builtin): value is BuiltinNew {
+  return value.types.has(BuiltinType.New);
 }
 
 export interface BuiltinValueObject extends Builtin {

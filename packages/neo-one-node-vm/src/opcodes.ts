@@ -1615,7 +1615,7 @@ const OPCODE_PAIRS = ([
             const index = vmUtils.toNumber(context, args[0].asBigInteger());
             const val = args[1].asArray();
             if (index < 0 || index >= val.length) {
-              throw new InvalidPickItemKeyError(context, `${index}`, JSON.stringify(args[1].toJSON()));
+              throw new InvalidPickItemKeyError(context, `${index}`, JSON.stringify(args[1].convertJSON()));
             }
 
             const arrayValue = val[index];
@@ -1626,7 +1626,7 @@ const OPCODE_PAIRS = ([
           const key = args[0];
           const value = args[1].asMapStackItem();
           if (!value.has(key)) {
-            throw new InvalidPickItemKeyError(context, key.toStructuralKey(), JSON.stringify(args[1].toJSON()));
+            throw new InvalidPickItemKeyError(context, key.toStructuralKey(), JSON.stringify(args[1].convertJSON()));
           }
 
           const mapValue = value.get(key);
@@ -1820,6 +1820,39 @@ const OPCODE_PAIRS = ([
           return { context, results: [new ArrayStackItem(newValues)] };
         },
       }),
+    ],
+    [
+      0xce,
+      {
+        type: 'create',
+        create: ({ context: contextIn }) => {
+          const { stack } = contextIn;
+          const top = stack[0] as StackItem | undefined;
+          let _in;
+          if (top === undefined) {
+            // This will cause the op to throw once it's executed.
+            _in = 1;
+          } else {
+            _in = vmUtils.toNumber(contextIn, top.asBigInteger()) + 1;
+
+            if (_in < 0) {
+              throw new InvalidPackCountError(contextIn);
+            }
+          }
+
+          const { op } = createOp({
+            name: 'PACKSTRUCT',
+            in: _in,
+            out: 1,
+            invoke: ({ context, args }) => ({
+              context,
+              results: [new StructStackItem(args.slice(1))],
+            }),
+          });
+
+          return { op, context: contextIn };
+        },
+      },
     ],
     [0xe0, functionCallIsolated({ name: 'CALL_I' })],
     [0xe1, callIsolated({ name: 'CALL_E' })],

@@ -17,34 +17,22 @@ export class RawIteratorForEachHelper extends Helper {
     this.each = options.each;
   }
 
-  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
-    const options = sb.pushValueOptions(optionsIn);
-
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     sb.emitHelper(
       node,
       options,
-      sb.helpers.forLoop({
-        condition: () => {
-          // [iterator, iterator]
-          sb.emitOp(node, 'DUP');
-          // [boolean, iterator]
-          sb.emitSysCall(node, 'Neo.Enumerator.Next');
-        },
+      sb.helpers.rawIteratorForEachBase({
         each: (innerOptions) => {
-          // [iterator, iterator]
-          sb.emitOp(node, 'DUP');
-          // [key, iterator]
-          sb.emitSysCall(node, 'Neo.Iterator.Key');
-          // [iterator, key, iterator]
-          sb.emitOp(node, 'OVER');
-          // [value, key, iterator]
+          // [val]
           sb.emitSysCall(node, 'Neo.Enumerator.Value');
-          // [iterator]
+          // [iterator, val]
+          sb.emitOp(node, 'OVER');
+          // [key, val]
+          sb.emitSysCall(node, 'Neo.Iterator.Key');
+          // []
           this.each(innerOptions);
         },
       }),
     );
-    // []
-    sb.emitOp(node, 'DROP');
   }
 }

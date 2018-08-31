@@ -1,5 +1,4 @@
 import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Buffer', () => {
   test('cannot be implemented', async () => {
@@ -8,17 +7,30 @@ describe('Buffer', () => {
       class MyBuffer implements Buffer {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
+      { type: 'error' },
     );
   });
 
-  test('cannot be referenced', async () => {
+  test('cannot be extended', async () => {
     helpers.compileString(
       `
-      const x = Buffer;
+      class MyBuffer extends Buffer {
+      }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
+  });
+
+  test('can be referenced and passed to functions', async () => {
+    await helpers.executeString(`
+      const x: [typeof Buffer] = [Buffer];
+
+      const foo = (value: [typeof Buffer]) => {
+        // do nothing
+      };
+
+      foo(x);
+    `);
   });
 
   test('can be instanceof', async () => {

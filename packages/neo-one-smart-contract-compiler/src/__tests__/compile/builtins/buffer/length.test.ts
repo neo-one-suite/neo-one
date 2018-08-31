@@ -1,6 +1,6 @@
 import { helpers } from '../../../../__data__';
 
-describe('Array.prototype.length', () => {
+describe('Buffer.prototype.length', () => {
   test('should return the length of the buffer', async () => {
     await helpers.executeString(`
       const x = Buffer.from('3030', 'hex');

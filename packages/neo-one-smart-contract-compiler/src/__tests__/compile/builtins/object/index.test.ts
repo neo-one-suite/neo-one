@@ -1,23 +1,51 @@
 import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Object', () => {
-  test('cannot be implemented', async () => {
-    helpers.compileString(
-      `
+  test('can be implemented', async () => {
+    await helpers.executeString(`
       class MyObject implements Object {
       }
+    `);
+  });
+
+  test('cannot be extended', async () => {
+    helpers.compileString(
+      `
+      class MyObject extends Object {
+      }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
+      { type: 'error' },
     );
   });
 
-  test('cannot be referenced', async () => {
+  test('cannot match shape and pass to function', async () => {
     helpers.compileString(
       `
-      const x = Object;
+      const Obj = {
+        keys: (o: {}): string[] => [],
+      }
+
+      const x = (foo: typeof Object) => {
+        // do nothing
+      }
+
+      x(Obj);
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
+  });
+
+  test('can be referenced and passed to functions', async () => {
+    await helpers.executeString(`
+      const x: [typeof Object] = [Object];
+
+      const foo = (value: [typeof Object]) => {
+        const x = value[0].keys({ a: 0, b: 1 });
+        assertEqual(x[0], 'a');
+        assertEqual(x[1], 'b');
+      };
+
+      foo(x);
+    `);
   });
 });

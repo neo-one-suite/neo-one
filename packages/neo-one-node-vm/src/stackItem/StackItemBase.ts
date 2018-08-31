@@ -235,16 +235,17 @@ export class StackItemBase implements Equatable {
   }
 
   public toString(): string {
-    return JSON.stringify(this.toJSON());
+    return JSON.stringify(this.convertJSON());
   }
 
   // tslint:disable-next-line no-any
-  public toJSON(): any {
-    try {
-      return this.asBuffer().toString('hex');
-    } catch {
-      return 'UNKNOWN';
+  public convertJSON(seen = new Set<StackItemBase>()): any {
+    if (seen.has(this)) {
+      return '<circular>';
     }
+    seen.add(this);
+
+    return this.convertJSONInternal(seen);
   }
 
   protected serializeInternal(_seen: Set<StackItemBase>): Buffer {
@@ -253,5 +254,14 @@ export class StackItemBase implements Equatable {
     writer.writeVarBytesLE(this.asBuffer());
 
     return writer.toBuffer();
+  }
+
+  // tslint:disable-next-line no-any
+  protected convertJSONInternal(_seen: Set<StackItemBase>): any {
+    try {
+      return this.asBuffer().toString('hex');
+    } catch {
+      return 'UNKNOWN';
+    }
   }
 }

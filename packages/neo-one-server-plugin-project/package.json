@@ -24,7 +24,7 @@
     "lodash": "^4.17.10",
     "rxjs": "^6.2.2",
     "source-map": "^0.7.3",
-    "typescript": "^3.0.1",
+    "typescript": "^3.0.3",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

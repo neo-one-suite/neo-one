@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Set.prototype.size cannot set the "size" of an set 1`] = `
+"snippetCode.ts (6,11): Cannot assign to 'size' because it is a constant or a read-only property.
+
+      4 |       let error: string | undefined;
+      5 |       try {
+    > 6 |         x[a] = 10;
+        |           ^
+      7 |       } catch (err) {
+      8 |         error = err;
+      9 |       }
+"
+`;
+
+exports[`Set.prototype.size cannot set the size of an set 1`] = `
+"snippetCode.ts (3,9): Cannot assign to 'size' because it is a constant or a read-only property.
+
+      1 | 
+      2 |       const x = new Set<string>();
+    > 3 |       x.size = 4;
+        |         ^
+      4 |     
+"
+`;

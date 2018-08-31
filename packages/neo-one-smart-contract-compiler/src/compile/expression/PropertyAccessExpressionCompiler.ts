@@ -29,11 +29,15 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
         return;
       }
 
-      sb.context.reportError(
-        expr,
-        DiagnosticCode.InvalidBuiltinReference,
-        DiagnosticMessage.CannotReferenceBuiltinProperty,
-      );
+      if (optionsIn.setValue) {
+        sb.context.reportError(name, DiagnosticCode.InvalidBuiltinModify, DiagnosticMessage.CannotModifyBuiltin);
+      } else {
+        sb.context.reportError(
+          name,
+          DiagnosticCode.InvalidBuiltinReference,
+          DiagnosticMessage.CannotReferenceBuiltinProperty,
+        );
+      }
     };
 
     const builtin = sb.context.builtins.getMember(value, name);
@@ -104,6 +108,7 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
       sb.helpers.forBuiltinType({
         type: valueType,
         array: createProcessBuiltin('Array'),
+        arrayStorage: createProcessBuiltin('ArrayStorage'),
         boolean: createProcessBuiltin('Boolean'),
         buffer: createProcessBuiltin('Buffer'),
         null: throwTypeError,
@@ -112,6 +117,14 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
         string: createProcessBuiltin('String'),
         symbol: createProcessBuiltin('Symbol'),
         undefined: throwTypeError,
+        map: createProcessBuiltin('Map'),
+        mapStorage: createProcessBuiltin('MapStorage'),
+        set: createProcessBuiltin('Set'),
+        setStorage: createProcessBuiltin('SetStorage'),
+        error: createProcessBuiltin('Error'),
+        iteratorResult: createProcessBuiltin('IteratorResult'),
+        iterable: createProcessBuiltin('Iterable'),
+        iterableIterator: createProcessBuiltin('IterableIterator'),
         transaction: createProcessBuiltin('TransactionBase'),
         output: createProcessBuiltin('Output'),
         attribute: createProcessBuiltin('AttributeBase'),

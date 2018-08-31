@@ -1,24 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Contract cannot be implemented 1`] = `
-"snippetCode.ts (4,7): Built-ins cannot be implemented.
+"snippetCode.ts (4,13): Class 'MyContract' incorrectly implements interface 'Contract'.
+  Property 'script' is missing in type 'MyContract'.
 
       2 |       import { Contract } from '@neo-one/smart-contract';
       3 | 
     > 4 |       class MyContract implements Contract {
-        |       ^
+        |             ^
       5 |       }
       6 |     
-"
-`;
-
-exports[`Contract cannot be referenced 1`] = `
-"snippetCode.ts (4,17): Builtins cannot be referenced
-
-      2 |       import { Contract } from '@neo-one/smart-contract';
-      3 | 
-    > 4 |       const x = Contract;
-        |                 ^
-      5 |     
 "
 `;

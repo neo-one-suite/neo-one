@@ -16,7 +16,7 @@ export abstract class Token<Decimals extends number> implements SmartContract {
   public abstract readonly decimals: Decimals;
   public abstract readonly symbol: string;
   protected mutableSupply: Fixed<Decimals> = 0;
-  protected readonly balances = new MapStorage<Address, Fixed<Decimals>>();
+  protected readonly balances = MapStorage.for<Address, Fixed<Decimals>>();
 
   @constant
   public get totalSupply(): Fixed<Decimals> {

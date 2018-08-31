@@ -2,7 +2,7 @@ import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
 
 class IteratorInterface extends BuiltinInterface {
-  public readonly canImplement = true;
+  public readonly canImplement = false;
 }
 
 // tslint:disable-next-line export-name

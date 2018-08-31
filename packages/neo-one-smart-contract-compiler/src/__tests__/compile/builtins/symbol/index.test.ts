@@ -1,5 +1,4 @@
 import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Symbol', () => {
   test('cannot be implemented', async () => {
@@ -8,16 +7,29 @@ describe('Symbol', () => {
       class MySymbol implements Symbol {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
+      { type: 'error' },
     );
   });
 
-  test('cannot be referenced', async () => {
+  test('cannot be extended', async () => {
     helpers.compileString(
       `
-      const x = Symbol;
+      class MySymbol extends Symbol {
+      }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
+  });
+
+  test('can be referenced and passed to functions', async () => {
+    await helpers.executeString(`
+      const x: [typeof Symbol] = [Symbol];
+
+      const foo = (value: [typeof Symbol]) => {
+        // do nothing
+      };
+
+      foo(x);
+    `);
   });
 });

@@ -2,7 +2,14 @@
 /// <reference path="./global.d.ts" />
 /// <reference path="./internal.d.ts" />
 
-declare const OpaqueTagSymbol: unique symbol;
+/**
+ * Marks an interface or class as not implementable or extendable.
+ *
+ * Makes it an error to pass values that would otherwise match the shape of the interface.
+ *
+ * See <fill_me_in> for more info.
+ */
+declare const OpaqueTagSymbol0: unique symbol;
 
 /**
  * `Buffer` that represents a NEO address.
@@ -10,7 +17,7 @@ declare const OpaqueTagSymbol: unique symbol;
  * Stored as a script hash (Hash160) internally.
  */
 export interface Address extends Buffer {
-  readonly [OpaqueTagSymbol]: unique symbol;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface AddressConstructor {
   /**
@@ -42,6 +49,7 @@ export interface AddressConstructor {
    * @returns true if `Address` approved this `Transaction`
    */
   readonly isSender: (address: Address) => boolean;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const Address: AddressConstructor;
 
@@ -51,7 +59,7 @@ export const Address: AddressConstructor;
  * Examples of `Hash256` include `Block` hashes and `Transaction` hashes.
  */
 export interface Hash256 extends Buffer {
-  readonly [OpaqueTagSymbol]: unique symbol;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface Hash256Constructor {
   /**
@@ -73,6 +81,7 @@ export interface Hash256Constructor {
    * `Hash256` of the GAS `Asset`.
    */
   readonly GAS: Hash256;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const Hash256: Hash256Constructor;
 
@@ -80,7 +89,7 @@ export const Hash256: Hash256Constructor;
  * `Buffer` that represents a public key.
  */
 export interface PublicKey extends Buffer {
-  readonly [OpaqueTagSymbol]: unique symbol;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface PublicKeyConstructor {
   /**
@@ -94,6 +103,7 @@ export interface PublicKeyConstructor {
    * @returns `PublicKey` for the specified `value`
    */
   readonly from: (value: string) => PublicKey;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const PublicKey: PublicKeyConstructor;
 
@@ -285,8 +295,11 @@ export type Hash256AttributeUsage =
 export interface AttributeBase {
   readonly usage: AttributeUsage;
   readonly data: Buffer;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export interface AttributeBaseConstructor {}
+export interface AttributeBaseConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
 export const AttributeBase: AttributeBaseConstructor;
 
 /**
@@ -342,8 +355,11 @@ export interface Output {
    * Amount transferred.
    */
   readonly value: Fixed8;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export interface OutputConstructor {}
+export interface OutputConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
 export const Output: OutputConstructor;
 
 /**
@@ -358,8 +374,11 @@ export interface Input {
    * `Output` index within the `Transaction` this input references.
    */
   readonly index: Integer;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export interface InputConstructor {}
+export interface InputConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
 export const Input: InputConstructor;
 
 /**
@@ -405,6 +424,7 @@ export interface TransactionBase {
    * @see Output
    */
   readonly unspentOutputs: Output[];
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface TransactionBaseConstructor {}
 export const TransactionBase: TransactionBaseConstructor;
@@ -496,6 +516,7 @@ export interface TransactionConstructor {
    * @returns `Transaction` for the specified `hash`.
    */
   readonly for: (hash: Hash256) => Transaction;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const Transaction: TransactionConstructor;
 
@@ -518,12 +539,14 @@ export interface Account {
    * Retrieve the balance for a first class `Asset`.
    */
   readonly getBalance: (asset: Hash256) => Fixed8;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface AccountConstructor {
   /**
    * @returns `Account` for the specified `address`.
    */
   readonly for: (address: Address) => Account;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const Account: AccountConstructor;
 
@@ -589,12 +612,14 @@ export interface Asset {
    * Issuer of the `Asset`.
    */
   readonly issuer: Address;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface AssetConstructor {
   /**
    * @returns `Asset` for the specified `hash`.
    */
   readonly for: (hash: Hash256) => Asset;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const Asset: AssetConstructor;
 
@@ -617,6 +642,7 @@ export interface Contract {
    * Flag that indicates if the `Contract` supports receiving `Asset`s and NEP-5 tokens.
    */
   readonly payable: boolean;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface ContractConstructor {
   /**
@@ -625,6 +651,7 @@ export interface ContractConstructor {
    * @returns `Contract` for the specified `address.
    */
   readonly for: (address: Address) => Contract | undefined;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const Contract: ContractConstructor;
 
@@ -663,6 +690,7 @@ export interface Header {
    * Next consensus address.
    */
   readonly nextConsensus: Address;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface HeaderConstructor {
   /**
@@ -671,6 +699,7 @@ export interface HeaderConstructor {
    * @returns `Header` for the specified `hashOrIndex`.
    */
   readonly for: (hashOrIndex: Hash256 | Integer) => Header;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const Header: HeaderConstructor;
 /**
@@ -694,30 +723,96 @@ export interface BlockConstructor {
    * @returns `Header` for the specified `hashOrIndex`.
    */
   readonly for: (hashOrIndex: Hash256 | Integer) => Block;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const Block: BlockConstructor;
 
-export type SerializableKey =
+export type SerializableKeySingle = number | string | boolean | Buffer;
+type SK = SerializableKeySingle;
+export type SerializableKey = SK | [SK, SK] | [SK, SK, SK] | [SK, SK, SK, SK];
+interface SerializableValueArray extends ReadonlyArray<SerializableValue> {}
+interface SerializableValueMap extends ReadonlyMap<SerializableKeySingle, SerializableValue> {}
+interface SerializableValueSet extends ReadonlySet<SerializableValue> {}
+export type SerializableValue =
   | undefined
   | number
   | string
   | boolean
   | Buffer
-  | Array<undefined | number | string | boolean | Buffer>;
-interface SerializableValueArray extends Array<SerializableValue> {}
-export type SerializableValue = undefined | number | string | boolean | Buffer | SerializableValueArray;
+  | SerializableValueArray
+  | SerializableValueMap
+  | SerializableValueSet;
 
 /**
- * Persistent smart contract storage. When used as a `SmartContract` property the prefix is automatically set to the property name.
+ * Persistent smart contract set storage. Only usable as a `SmartContract` property.
+ *
+ * @example
+ *
+ * class MySmartContract implements SmartContract {
+ *  private readonly pendingAddresses =
+ *    ArrayStorage.for<Address>();
+ *
+ *  public addPendingAddress(address: Address): void {
+ *    this.pendingAddresses.push(address);
+ *  }
+ * }
+ *
+ */
+export interface ArrayStorage<T extends SerializableValue> extends Iterable<T> {
+  readonly [Symbol.iterator]: () => IterableIterator<T>;
+  /**
+   * Gets the length of the array. This is a number one higher than the highest element defined in an array.
+   */
+  readonly length: number;
+  /**
+   * Executes a provided function once per each value in storage.
+   * @param callback function to execute for each element.
+   * @returns `undefined`
+   */
+  readonly forEach: (callback: (value: T, idx: number) => void) => void;
+  /**
+   * Appends new elements to storage, and returns the new length of the array.
+   * @param items New elements to add.
+   */
+  readonly push: (...items: T[]) => number;
+  /**
+   * Removes the last element from an array and returns it.
+   */
+  readonly pop: () => T | undefined;
+  [n: number]: T;
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+export interface ArrayStorageConstructor {
+  /**
+   * Constructs a new `ArrayStorage` instance. Only usable as a `SmartContract` property.
+   */
+  for<T extends SerializableValue>(): ArrayStorage<T>;
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+export const ArrayStorage: ArrayStorageConstructor;
+
+type SKMapAtTwo<K extends [SK, SK], V extends SerializableValue> = {
+  (prefix: K[0]): MapStorage<K[1], V>;
+};
+type SKMapAtThree<K extends [SK, SK, SK], V extends SerializableValue> = {
+  (prefix: K[0]): MapStorage<[K[1], K[2]], V>;
+  (prefix: [K[0], K[1]]): MapStorage<K[2], V>;
+};
+type SKMapAtFour<K extends [SK, SK, SK, SK], V extends SerializableValue> = {
+  (prefix: K[0]): MapStorage<[K[1], K[2], K[3]], V>;
+  (prefix: [K[0], K[1]]): MapStorage<[K[2], K[3]], V>;
+  (prefix: [K[0], K[1], K[2]]): MapStorage<K[3], V>;
+};
+
+/**
+ * Persistent smart contract storage. Only usable as a `SmartContract` property.
  *
  * @example
  *
  * class Token implements SmartContract {
  *  private readonly balances =
- *    new MapStorage<Address, Fixed<8>>();
+ *    MapStorage.for<Address, Fixed<8>>();
  *
- *   // Note this is not how one should implement token transfer
- *   // and is meant for illustration purposes only.
  *  public transfer(
  *    from: Address,
  *    to: Address,
@@ -732,64 +827,126 @@ export type SerializableValue = undefined | number | string | boolean | Buffer |
  * }
  *
  */
-export interface MapStorage<K extends SerializableKey, V extends SerializableValue> {
+export interface MapStorage<K extends SerializableKey, V extends SerializableValue> extends Iterable<[K, V]> {
+  readonly [Symbol.iterator]: () => IterableIterator<[K, V]>;
   /**
-   * Retrieve `key` from storage.
-   *
-   * @returns `V` or undefined if the key does not exist.
+   * Executes a provided function once per each key/value pair in storage.
+   * @param callback function to execute for each element.
+   * @returns `undefined`
+   */
+  readonly forEach: (callback: (value: V, key: K) => void) => void;
+  /**
+   * Returns a specified element from storage.
+   * @param key the key of the element to return from storage.
+   * @returns the element associated with the specified key or undefined if the key can't be found in storage.
    */
   readonly get: (key: K) => V | undefined;
   /**
-   * Set `key` to `value` in storage.
+   * Returns a boolean indicating whether an element with the specified key exists or not.
+   * @param key the key of the element to test for presence in storage.
+   * @returns `true` if an element with the specified key exists in storage; otherwise `false`.
    */
-  readonly set: (key: K, v: V) => void;
+  readonly has: (key: K) => boolean;
   /**
-   * Delete `key` from storage.
+   * Removes the specified element from storage.
+   * @returns `true` if an element in storage existed and has been removed, or `false` if the element does not exist.
    */
-  readonly delete: (key: K) => void;
+  readonly delete: (key: K) => boolean;
+  /**
+   * Adds or updates an element with a specified key and value in storage.
+   * @param key The key of the element to add to storage.
+   * @param value The value of the element to add to storage.
+   * @returns the `MapStorage` object.
+   */
+  readonly set: (key: K, value: V) => MapStorage<K, V>;
+  /**
+   * Returns the elements from storage with the specified prefix.
+   * @param key The prefix key of desired elements from storage.
+   * @returns a `MapStorage` object representing the elements associated with the specified prefix.
+   */
+  readonly at: K extends [SK, SK]
+    ? SKMapAtTwo<K, V>
+    : K extends [SK, SK, SK] ? SKMapAtThree<K, V> : K extends [SK, SK, SK, SK] ? SKMapAtFour<K, V> : never;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface MapStorageConstructor {
   /**
-   * Constructs a new `MapStorage` instance. When used as a `SmartContract` property the `prefix` is automatically set to the property name. Otherwise, `prefix` is mandatory and should be unique within a smart contract.
+   * Constructs a new `MapStorage` instance. Only usable as a `SmartContract` property.
    */
-  new <K extends SerializableKey, V extends SerializableValue>(prefix?: Buffer): MapStorage<K, V>;
+  for<K extends SerializableKey, V extends SerializableValue>(): MapStorage<K, V>;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const MapStorage: MapStorageConstructor;
 
+type SKSetAtTwo<V extends [SK, SK]> = {
+  (prefix: V[0]): SetStorage<V[1]>;
+};
+type SKSetAtThree<V extends [SK, SK, SK]> = {
+  (prefix: V[0]): SetStorage<[V[1], V[2]]>;
+  (prefix: [V[0], V[1]]): SetStorage<V[2]>;
+};
+type SKSetAtFour<V extends [SK, SK, SK, SK]> = {
+  (prefix: V[0]): SetStorage<[V[1], V[2], V[3]]>;
+  (prefix: [V[0], V[1]]): SetStorage<[V[2], V[3]]>;
+  (prefix: [V[0], V[1], V[2]]): SetStorage<V[3]>;
+};
+
 /**
- * Persistent smart contract set storage. When used as a `SmartContract` property the prefix is automatically set to the property name.
+ * Persistent smart contract set storage. Only usable as a `SmartContract` property.
  *
  * @example
  *
  * class ICO implements SmartContract {
  *  private readonly whitelistedAddresses =
- *    new SetStorage<Address>();
+ *    SetStorage.for<Address>();
  *
- *  public isWhitelisted(adress: Address): boolean {
+ *  public isWhitelisted(address: Address): boolean {
  *    return this.whitelistedAddresses.has(address);
  *  }
  * }
  *
  */
-export interface SetStorage<V extends SerializableKey> {
+export interface SetStorage<V extends SerializableKey> extends Iterable<V> {
+  readonly [Symbol.iterator]: () => IterableIterator<V>;
   /**
-   * @returns true if `value` exists in storage.
+   * Executes a provided function once per each value in storage.
+   * @param callback function to execute for each element.
+   * @returns `undefined`
+   */
+  readonly forEach: (callback: (value: V) => void) => void;
+  /**
+   * Returns a boolean indicating whether an element with the specified value exists or not.
+   * @param value the value to test for presence in storage.
+   * @returns `true` if an element with the specified value exists in storage; otherwise `false`.
    */
   readonly has: (value: V) => boolean;
   /**
-   * Add `value` to storage.
+   * Removes the specified element from storage.
+   * @returns `true` if an element in storage existed and has been removed, or `false` if the element does not exist.
    */
-  readonly add: (value: V) => void;
+  readonly delete: (value: V) => boolean;
   /**
-   * Delete `value` from storage.
+   * Adds an element with the specified value in storage.
+   * @param value The value of the element to add to storage.
+   * @returns the `SetStorage` object.
    */
-  readonly delete: (value: V) => void;
+  readonly add: (value: V) => SetStorage<V>;
+  /**
+   * Returns the elements from storage with the specified prefix.
+   * @param key The prefix key of desired elements from storage.
+   * @returns a `SetStorage` object representing the elements associated with the specified prefix.
+   */
+  readonly at: V extends [SK, SK]
+    ? SKSetAtTwo<V>
+    : V extends [SK, SK, SK] ? SKSetAtThree<V> : V extends [SK, SK, SK, SK] ? SKSetAtFour<V> : never;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface SetStorageConstructor {
   /**
-   * Constructs a new `SetStorage` instance. When used as a `SmartContract` property the `prefix` is automatically set to the property name. Otherwise, `prefix` is mandatory and should be unique within a smart contract.
+   * Constructs a new `SetStorage` instance. Only usable as a `SmartContract` property.
    */
-  new <K extends SerializableKey>(prefix?: Buffer): SetStorage<K>;
+  for<K extends SerializableKey>(): SetStorage<K>;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const SetStorage: SetStorageConstructor;
 
@@ -813,6 +970,7 @@ export interface BlockchainConstructor {
    * `Address` of the smart contract.
    */
   readonly contractAddress: Address;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 /**
  * Information about the current state of the blockchain and the current execution.
@@ -831,6 +989,7 @@ export interface DeployConstructor {
    * }
    */
   readonly senderAddress: Address;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 /**
  * Injects values at deployment time. Can only be used for default constructor parameters.
@@ -958,6 +1117,7 @@ export interface SmartContractConstructor {
    * @returns an object representing the underlying smart contract
    */
   readonly for: <T>(hash: T extends IsValidSmartContract<T> ? Address : never) => T;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const SmartContract: SmartContractConstructor;
 
@@ -969,6 +1129,7 @@ export interface LinkedSmartContract {
    * `Address` of the `LinkedSmartContract`.
    */
   readonly address: Address;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface LinkedSmartContractConstructor {
   /**
@@ -987,6 +1148,7 @@ export interface LinkedSmartContractConstructor {
    * @returns an object representing the underlying smart contract
    */
   readonly for: <T extends SmartContract>() => T extends IsValidSmartContract<T> ? T & LinkedSmartContract : never;
+  readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const LinkedSmartContract: LinkedSmartContractConstructor;
 

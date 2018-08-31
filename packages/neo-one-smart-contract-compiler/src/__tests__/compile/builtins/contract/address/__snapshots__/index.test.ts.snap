@@ -1,24 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Address cannot be implemented 1`] = `
-"snippetCode.ts (3,7): Built-ins cannot be implemented.
+"snippetCode.ts (3,13): Class 'MyAddress' incorrectly implements interface 'Address'.
+  Property '[OpaqueTagSymbol0]' is missing in type 'MyAddress'.
 
       1 | 
       2 |       import { Address } from '@neo-one/smart-contract';
     > 3 |       class MyAddress implements Address {
-        |       ^
+        |             ^
       4 |       }
       5 |     
-"
-`;
-
-exports[`Address cannot be referenced 1`] = `
-"snippetCode.ts (3,17): Builtins cannot be referenced
-
-      1 | 
-      2 |       import { Address } from '@neo-one/smart-contract';
-    > 3 |       const x = Address;
-        |                 ^
-      4 |     
 "
 `;

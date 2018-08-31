@@ -7,6 +7,8 @@ import { MemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
 export class ArrayReduce extends BuiltinInstanceMemberCall {
+  protected readonly isReadonly = false;
+
   public canCall(_sb: ScriptBuilder, _func: MemberLikeExpression, node: ts.CallExpression): boolean {
     return ts.isCallExpression(node) && tsUtils.argumented.getArguments(node).length === 2;
   }

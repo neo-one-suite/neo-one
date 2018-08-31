@@ -49,7 +49,11 @@ describe('Array.prototype.concat', () => {
   test('should concat values to array as possible object', async () => {
     await helpers.executeString(`
       interface Arr<T> {
-        concat(...items: (T | ConcatArray<T>)[]): T[];
+        readonly concat: {
+          <T>(...items: ConcatArray<T>[]): T[];
+          <T>(...items: T[]): T[];
+          <T>(...items: (T | ConcatArray<T>)[]): T[];
+        };
       }
       const x: ReadonlyArray<number> | Arr<number> = [1, 2] as ReadonlyArray<number> | Arr<number>;
       const y = 3;

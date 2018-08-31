@@ -12,4 +12,13 @@ describe('Symbol.toPrimitive', () => {
       assertEqual(Symbol.toPrimitive, Symbol.toPrimitive);
     `);
   });
+
+  test('cannot be set', async () => {
+    helpers.compileString(
+      `
+      Symbol.toPrimitive = Symbol.for('foo');
+    `,
+      { type: 'error' },
+    );
+  });
 });

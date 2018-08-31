@@ -24,10 +24,11 @@ describe('Buffer.concat', () => {
 
   test('should concat two buffers', async () => {
     await helpers.executeString(`
-      const x = Buffer.from('5946', 'hex');
-      const y = Buffer.from('158a', 'hex');
-      const z = Buffer.concat([x, y]);
-      const expected = Buffer.from('5946158a', 'hex');
+      const b = Buffer;
+      const x = b.from('5946', 'hex');
+      const y = b.from('158a', 'hex');
+      const z = b.concat([x, y]);
+      const expected = b.from('5946158a', 'hex');
 
       assertEqual(z.equals(expected), true);
     `);
@@ -39,6 +40,15 @@ describe('Buffer.concat', () => {
       const keys = Buffer.concat;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('cannot be set', async () => {
+    helpers.compileString(
+      `
+      Buffer.concat = (list: Buffer[]) => Buffer.from('', 'hex');
+    `,
+      { type: 'error' },
     );
   });
 

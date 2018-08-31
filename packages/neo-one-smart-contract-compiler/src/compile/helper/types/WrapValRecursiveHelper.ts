@@ -107,6 +107,9 @@ export class WrapValRecursiveHelper extends Helper {
           }
           sb.emitHelper(node, innerOptions, sb.helpers.wrapArray);
         }),
+        arrayStorage: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        }),
         boolean: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
         }),
@@ -165,6 +168,30 @@ export class WrapValRecursiveHelper extends Helper {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapSymbol);
         }),
         undefined: handleUndefined,
+        map: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        }),
+        mapStorage: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        }),
+        set: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        }),
+        setStorage: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        }),
+        error: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        }),
+        iteratorResult: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        }),
+        iterable: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        }),
+        iterableIterator: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        }),
         transaction: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapTransaction);
         }),

@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Set.prototype.hasAddDelete add cannot be referenced 1`] = `
+"snippetCode.ts (3,19): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       const x = new Set<string>();
+    > 3 |       const y = x.add;
+        |                   ^
+      4 |     
+"
+`;
+
+exports[`Set.prototype.hasAddDelete delete cannot be referenced 1`] = `
+"snippetCode.ts (3,19): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       const x = new Set<string>();
+    > 3 |       const y = x.delete;
+        |                   ^
+      4 |     
+"
+`;
+
+exports[`Set.prototype.hasAddDelete has cannot be referenced 1`] = `
+"snippetCode.ts (3,19): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       const x = new Set<string>();
+    > 3 |       const y = x.has;
+        |                   ^
+      4 |     
+"
+`;

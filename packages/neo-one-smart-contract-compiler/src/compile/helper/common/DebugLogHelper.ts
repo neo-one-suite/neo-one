@@ -33,8 +33,5 @@ export class DebugLogHelper extends Helper {
     // []
     /* istanbul ignore next */
     sb.emitHelper(node, options, sb.helpers.consoleLog);
-    // []
-    /* istanbul ignore next */
-    sb.emitOp(node, 'THROW');
   }
 }

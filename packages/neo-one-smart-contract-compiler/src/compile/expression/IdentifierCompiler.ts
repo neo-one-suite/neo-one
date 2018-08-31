@@ -2,7 +2,7 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
-import { isBuiltinValue } from '../builtins';
+import { isBuiltinNew, isBuiltinValue } from '../builtins';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -14,16 +14,22 @@ export class IdentifierCompiler extends NodeCompiler<ts.Identifier> {
     const builtin = sb.context.builtins.getValue(expr);
     if (builtin !== undefined) {
       if (!isBuiltinValue(builtin)) {
-        sb.context.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotReferenceBuiltin);
+        if (
+          (isBuiltinNew(builtin) && options.superClass !== undefined) ||
+          sb.context.builtins.isValue(expr, 'one0') ||
+          sb.context.builtins.isValue(expr, 'one1')
+        ) {
+          sb.context.reportError(
+            expr,
+            DiagnosticCode.InvalidBuiltinReference,
+            DiagnosticMessage.CannotReferenceBuiltin,
+          );
+        }
 
-        return;
-      }
+        if (options.pushValue) {
+          sb.emitHelper(expr, options, sb.helpers.wrapUndefined);
+        }
 
-      if (options.setValue) {
-        /* istanbul ignore next */
-        sb.context.reportError(expr, DiagnosticCode.InvalidBuiltinReference, DiagnosticMessage.CannotModifyBuiltin);
-
-        /* istanbul ignore next */
         return;
       }
 

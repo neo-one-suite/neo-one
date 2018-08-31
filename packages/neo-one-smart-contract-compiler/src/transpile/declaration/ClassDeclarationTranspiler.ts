@@ -85,18 +85,6 @@ const createAccessors = (transpiler: Transpiler, property: ts.Declaration): Read
   ].filter(utils.notNull);
 };
 
-const getPropertyTypeNode = (transpiler: Transpiler, property: ts.PropertyDeclaration, type: ts.Type) => {
-  let typeNode = property.type;
-  if (typeNode === undefined) {
-    const newTypeNode = transpiler.context.typeChecker.typeToTypeNode(type, property);
-    if (newTypeNode !== undefined) {
-      typeNode = transpiler.getFinalTypeNode(property, type, newTypeNode);
-    }
-  }
-
-  return typeNode;
-};
-
 export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclaration> {
   public readonly kind = ts.SyntaxKind.ClassDeclaration;
 
@@ -201,48 +189,11 @@ export class ClassDeclarationTranspiler extends NodeTranspiler<ts.ClassDeclarati
           const name = tsUtils.node.getName(property);
           const type = tsUtils.type_.getType(transpiler.context.typeChecker, property);
 
-          if (transpiler.context.builtins.isInterface(property, type, 'MapStorage')) {
-            return tsUtils.setOriginal(
-              ts.createProperty(
-                property.decorators,
-                property.modifiers,
-                property.name,
-                property.questionToken === undefined ? property.exclamationToken : property.questionToken,
-                getPropertyTypeNode(transpiler, property, type),
-                tsUtils.setOriginalRecursive(
-                  ts.createNew(ts.createIdentifier('MapStorage'), undefined, [
-                    ts.createCall(ts.createPropertyAccess(ts.createIdentifier('Buffer'), 'from'), undefined, [
-                      ts.createStringLiteral(name),
-                      ts.createStringLiteral('utf8'),
-                    ]),
-                  ]),
-                  property,
-                ),
-              ),
-              property,
-            );
-          }
-
-          if (transpiler.context.builtins.isInterface(property, type, 'SetStorage')) {
-            return tsUtils.setOriginal(
-              ts.createProperty(
-                property.decorators,
-                property.modifiers,
-                property.name,
-                property.questionToken === undefined ? property.exclamationToken : property.questionToken,
-                getPropertyTypeNode(transpiler, property, type),
-                tsUtils.setOriginalRecursive(
-                  ts.createNew(ts.createIdentifier('SetStorage'), undefined, [
-                    ts.createCall(ts.createPropertyAccess(ts.createIdentifier('Buffer'), 'from'), undefined, [
-                      ts.createStringLiteral(name),
-                      ts.createStringLiteral('utf8'),
-                    ]),
-                  ]),
-                  property,
-                ),
-              ),
-              property,
-            );
+          if (
+            transpiler.context.builtins.isInterface(property, type, 'MapStorage') ||
+            transpiler.context.builtins.isInterface(property, type, 'SetStorage')
+          ) {
+            return property;
           }
 
           const init = tsUtils.initializer.getInitializer(property);

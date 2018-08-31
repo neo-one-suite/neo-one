@@ -23,6 +23,9 @@ export class UnwrapValHelper extends Helper {
       case Types.Array:
         sb.emitHelper(node, options, sb.helpers.unwrapArray);
         break;
+      case Types.ArrayStorage:
+        sb.emitHelper(node, options, sb.helpers.unwrapArrayStorage);
+        break;
       case Types.Attribute:
         sb.emitHelper(node, options, sb.helpers.unwrapAttribute);
         break;
@@ -32,8 +35,23 @@ export class UnwrapValHelper extends Helper {
       case Types.Buffer:
         sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
         break;
+      case Types.Error:
+        sb.emitHelper(node, options, sb.helpers.unwrapError);
+        break;
       case Types.Input:
         sb.emitHelper(node, options, sb.helpers.unwrapInput);
+        break;
+      case Types.IterableIterator:
+        sb.emitHelper(node, options, sb.helpers.unwrapIterableIterator);
+        break;
+      case Types.IteratorResult:
+        sb.emitHelper(node, options, sb.helpers.unwrapIteratorResult);
+        break;
+      case Types.Map:
+        sb.emitHelper(node, options, sb.helpers.unwrapMap);
+        break;
+      case Types.MapStorage:
+        sb.emitHelper(node, options, sb.helpers.unwrapMapStorage);
         break;
       case Types.Number:
         sb.emitHelper(node, options, sb.helpers.unwrapNumber);
@@ -43,6 +61,12 @@ export class UnwrapValHelper extends Helper {
         break;
       case Types.Output:
         sb.emitHelper(node, options, sb.helpers.unwrapOutput);
+        break;
+      case Types.Set:
+        sb.emitHelper(node, options, sb.helpers.unwrapSet);
+        break;
+      case Types.SetStorage:
+        sb.emitHelper(node, options, sb.helpers.unwrapSetStorage);
         break;
       case Types.String:
         sb.emitHelper(node, options, sb.helpers.unwrapString);

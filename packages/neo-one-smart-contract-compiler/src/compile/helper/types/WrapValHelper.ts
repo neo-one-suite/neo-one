@@ -23,6 +23,9 @@ export class WrapValHelper extends Helper {
       case Types.Array:
         sb.emitHelper(node, options, sb.helpers.wrapArray);
         break;
+      case Types.ArrayStorage:
+        sb.emitHelper(node, options, sb.helpers.wrapArrayStorage);
+        break;
       case Types.Attribute:
         sb.emitHelper(node, options, sb.helpers.wrapAttribute);
         break;
@@ -32,8 +35,23 @@ export class WrapValHelper extends Helper {
       case Types.Buffer:
         sb.emitHelper(node, options, sb.helpers.wrapBuffer);
         break;
+      case Types.Error:
+        sb.emitHelper(node, options, sb.helpers.wrapError);
+        break;
       case Types.Input:
         sb.emitHelper(node, options, sb.helpers.wrapInput);
+        break;
+      case Types.IteratorResult:
+        sb.emitHelper(node, options, sb.helpers.wrapIteratorResult);
+        break;
+      case Types.IterableIterator:
+        sb.emitHelper(node, options, sb.helpers.wrapIterableIterator);
+        break;
+      case Types.Map:
+        sb.emitHelper(node, options, sb.helpers.wrapMap);
+        break;
+      case Types.MapStorage:
+        sb.emitHelper(node, options, sb.helpers.wrapMapStorage);
         break;
       case Types.Number:
         sb.emitHelper(node, options, sb.helpers.wrapNumber);
@@ -43,6 +61,12 @@ export class WrapValHelper extends Helper {
         break;
       case Types.Output:
         sb.emitHelper(node, options, sb.helpers.wrapOutput);
+        break;
+      case Types.Set:
+        sb.emitHelper(node, options, sb.helpers.wrapSet);
+        break;
+      case Types.SetStorage:
+        sb.emitHelper(node, options, sb.helpers.wrapSetStorage);
         break;
       case Types.String:
         sb.emitHelper(node, options, sb.helpers.wrapString);

@@ -3,9 +3,6 @@ export enum DiagnosticCode {
   UnknownType,
   UnknownSymbol,
   InvalidBuiltinReference,
-  InvalidBuiltinIndex,
-  InvalidBuiltinInstanceof,
-  InvalidBuiltinImplement,
   InvalidBuiltinModify,
   InvalidBuiltinUsage,
   InvalidContractEvent,
@@ -22,4 +19,5 @@ export enum DiagnosticCode {
   InvalidLinkedSmartContract,
   InvalidCurrentTime,
   InvalidSenderAddress,
+  InvalidStructuredStorageFor,
 }

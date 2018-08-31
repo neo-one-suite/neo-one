@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`one cannot be referenced - one0 1`] = `
+"snippetCode.ts (2,17): Builtins cannot be referenced
+
+      1 | 
+    > 2 |       const x = one0;
+        |                 ^
+      3 |     
+"
+`;
+
+exports[`one cannot be referenced - one1 1`] = `
+"snippetCode.ts (2,17): Builtins cannot be referenced
+
+      1 | 
+    > 2 |       const x = one1;
+        |                 ^
+      3 |     
+"
+`;
+
+exports[`one cannot be referenced in property - one0 1`] = `
+"snippetCode.ts (2,20): Builtins cannot be referenced
+
+      1 | 
+    > 2 |       const x = { [one0]: 'hello' };
+        |                    ^
+      3 |     
+"
+`;
+
+exports[`one cannot be referenced in property - one1 1`] = `
+"snippetCode.ts (2,20): Builtins cannot be referenced
+
+      1 | 
+    > 2 |       const x = { [one1]: 'hello' };
+        |                    ^
+      3 |     
+"
+`;
+
+exports[`one cannot be referenced in property access - one0 1`] = `
+"snippetCode.ts (3,23): Builtins cannot be referenced
+
+      1 | 
+      2 |       const error = new Error();
+    > 3 |       const x = error[one0];
+        |                       ^
+      4 |     
+"
+`;
+
+exports[`one cannot be referenced in property access - one1 1`] = `
+"snippetCode.ts (3,23): Builtins cannot be referenced
+
+      1 | 
+      2 |       const error = new Error();
+    > 3 |       const x = error[one1];
+        |                       ^
+      4 |     
+"
+`;

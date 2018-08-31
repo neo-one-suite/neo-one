@@ -1,24 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Deploy cannot be implemented 1`] = `
-"snippetCode.ts (4,7): Built-ins cannot be implemented.
+"snippetCode.ts (4,13): Class 'MyDeploy' incorrectly implements interface 'DeployConstructor'.
+  Property 'senderAddress' is missing in type 'MyDeploy'.
 
       2 |       import { DeployConstructor } from '@neo-one/smart-contract';
       3 | 
     > 4 |       class MyDeploy implements DeployConstructor {
-        |       ^
+        |             ^
       5 |       }
       6 |     
-"
-`;
-
-exports[`Deploy cannot be referenced 1`] = `
-"snippetCode.ts (4,17): Builtins cannot be referenced
-
-      2 |       import { Deploy } from '@neo-one/smart-contract';
-      3 | 
-    > 4 |       const x = Deploy;
-        |                 ^
-      5 |     
 "
 `;

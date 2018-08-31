@@ -1,16 +1,15 @@
 import { helpers } from '../../../../__data__';
 
 describe('IteratorResult', () => {
-  test('can be implemented', async () => {
-    await helpers.executeString(`
+  test('cannot be implemented', async () => {
+    helpers.compileString(
+      `
       class MyIteratorResult implements IteratorResult<number> {
-        readonly done: boolean = true;
-        readonly value: number = 0;
+        public readonly done = true;
+        public readonly value = 10;
       }
-
-      const x = new MyIteratorResult();
-      assertEqual(x.done, true);
-      assertEqual(x.value, 0);
-    `);
+    `,
+      { type: 'error' },
+    );
   });
 });

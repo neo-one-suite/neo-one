@@ -1,22 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Number cannot be implemented 1`] = `
-"snippetCode.ts (2,7): Built-ins cannot be implemented.
+exports[`Number cannot be extended 1`] = `
+"snippetCode.ts (2,30): Type 'NumberConstructor' is not a constructor function type.
 
       1 | 
-    > 2 |       class MyNumber implements Number {
-        |       ^
+    > 2 |       class MyNumber extends Number {
+        |                              ^
       3 |       }
       4 |     
 "
 `;
 
-exports[`Number cannot be referenced 1`] = `
-"snippetCode.ts (2,17): Builtins cannot be referenced
+exports[`Number cannot be implemented 1`] = `
+"snippetCode.ts (2,13): Class 'MyNumber' incorrectly implements interface 'Number'.
+  Property '[one0]' is missing in type 'MyNumber'.
 
       1 | 
-    > 2 |       const x = Number;
-        |                 ^
-      3 |     
+    > 2 |       class MyNumber implements Number {
+        |             ^
+      3 |       }
+      4 |     
 "
 `;

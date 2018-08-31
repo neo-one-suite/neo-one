@@ -30,11 +30,15 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         return;
       }
 
-      sb.context.reportError(
-        expr,
-        DiagnosticCode.InvalidBuiltinReference,
-        DiagnosticMessage.CannotReferenceBuiltinProperty,
-      );
+      if (optionsIn.setValue) {
+        sb.context.reportError(prop, DiagnosticCode.InvalidBuiltinModify, DiagnosticMessage.CannotModifyBuiltin);
+      } else {
+        sb.context.reportError(
+          prop,
+          DiagnosticCode.InvalidBuiltinReference,
+          DiagnosticMessage.CannotReferenceBuiltinProperty,
+        );
+      }
     };
 
     const builtinProp = sb.context.builtins.getMember(value, prop);
@@ -88,6 +92,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         sb.helpers.forBuiltinType({
           type: propType,
           array: throwInnerTypeError,
+          arrayStorage: throwInnerTypeError,
           boolean: throwInnerTypeError,
           buffer: throwInnerTypeError,
           null: throwInnerTypeError,
@@ -96,6 +101,14 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
           string: handleString,
           symbol: handleSymbol,
           undefined: throwInnerTypeError,
+          map: throwInnerTypeError,
+          mapStorage: throwInnerTypeError,
+          set: throwInnerTypeError,
+          setStorage: throwInnerTypeError,
+          error: throwInnerTypeError,
+          iteratorResult: throwInnerTypeError,
+          iterable: throwInnerTypeError,
+          iterableIterator: throwInnerTypeError,
           transaction: throwInnerTypeError,
           output: throwInnerTypeError,
           attribute: throwInnerTypeError,
@@ -209,6 +222,78 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
       return createHandleProp(handleString, handleNumber, handleSymbol);
     };
 
+    const createProcessArrayStorage = () => {
+      const handleNumberBase = (innerInnerOptions: VisitOptions) => {
+        if (optionsIn.pushValue && optionsIn.setValue) {
+          // [number, number, objectVal, val]
+          sb.emitPushInt(expr, 2);
+          // [val, number, objectVal, val]
+          sb.emitOp(expr, 'PICK');
+          // [val]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.setArrayStorage);
+        } else if (optionsIn.pushValue) {
+          // [numberVal, val]
+          sb.emitHelper(expr, options, sb.helpers.wrapNumber);
+          // [val]
+          sb.emitHelper(
+            expr,
+            innerInnerOptions,
+            sb.helpers.getStructuredStorage({
+              type: Types.ArrayStorage,
+              keyType: undefined,
+              knownKeyType: Types.Number,
+            }),
+          );
+        } else if (optionsIn.setValue) {
+          // [val, number, objectVal]
+          sb.emitOp(expr, 'ROT');
+          // []
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.setArrayStorage);
+        } else {
+          // [objectVal]
+          sb.emitOp(expr, 'DROP');
+          // []
+          sb.emitOp(expr, 'DROP');
+        }
+      };
+
+      const handleString = (innerInnerOptions: VisitOptions) => {
+        // [string, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapString);
+        sb.emitHelper(
+          expr,
+          innerInnerOptions,
+          sb.helpers.case(getValueCases('ArrayStorage', false), () => {
+            // [stringVal, objectVal]
+            sb.emitHelper(prop, innerInnerOptions, sb.helpers.wrapString);
+            // [number, objectVal]
+            sb.emitHelper(prop, innerInnerOptions, sb.helpers.toNumber({ type: propType, knownType: Types.String }));
+            handleNumberBase(innerInnerOptions);
+          }),
+        );
+      };
+
+      const handleNumber = (innerInnerOptions: VisitOptions) => {
+        // [number, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapNumber);
+        handleNumberBase(innerInnerOptions);
+      };
+
+      const handleSymbol = (innerInnerOptions: VisitOptions) => {
+        // [string, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapSymbol);
+        sb.emitHelper(
+          expr,
+          innerInnerOptions,
+          sb.helpers.case(getValueCases('ArrayStorage', true), () => {
+            throwInnerTypeError(innerInnerOptions);
+          }),
+        );
+      };
+
+      return createHandleProp(handleString, handleNumber, handleSymbol);
+    };
+
     const processObject = (innerOptions: VisitOptions) => {
       const handleStringBase = (innerInnerOptions: VisitOptions) => {
         if (optionsIn.pushValue && optionsIn.setValue) {
@@ -290,6 +375,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         sb.helpers.forBuiltinType({
           type: propType,
           array: throwInnerTypeError,
+          arrayStorage: throwInnerTypeError,
           boolean: throwInnerTypeError,
           buffer: throwInnerTypeError,
           null: throwInnerTypeError,
@@ -298,6 +384,14 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
           string: handleString,
           symbol: handleSymbol,
           undefined: throwInnerTypeError,
+          map: throwInnerTypeError,
+          mapStorage: throwInnerTypeError,
+          set: throwInnerTypeError,
+          setStorage: throwInnerTypeError,
+          error: throwInnerTypeError,
+          iteratorResult: throwInnerTypeError,
+          iterable: throwInnerTypeError,
+          iterableIterator: throwInnerTypeError,
           transaction: throwInnerTypeError,
           output: throwInnerTypeError,
           attribute: throwInnerTypeError,
@@ -320,6 +414,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
       sb.helpers.forBuiltinType({
         type: valueType,
         array: createProcessArray(),
+        arrayStorage: createProcessArrayStorage(),
         boolean: createProcessBuiltin('Boolean'),
         buffer: createProcessBuiltin('Buffer'),
         null: throwTypeError,
@@ -328,6 +423,14 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         string: createProcessBuiltin('String'),
         symbol: createProcessBuiltin('Symbol'),
         undefined: throwTypeError,
+        map: createProcessBuiltin('Map'),
+        mapStorage: createProcessBuiltin('MapStorage'),
+        set: createProcessBuiltin('Set'),
+        setStorage: createProcessBuiltin('SetStorage'),
+        error: createProcessBuiltin('Error'),
+        iteratorResult: createProcessBuiltin('IteratorResult'),
+        iterable: createProcessBuiltin('Iterable'),
+        iterableIterator: createProcessBuiltin('IterableIterator'),
         transaction: createProcessBuiltin('TransactionBase'),
         output: createProcessBuiltin('Output'),
         attribute: createProcessBuiltin('AttributeBase'),

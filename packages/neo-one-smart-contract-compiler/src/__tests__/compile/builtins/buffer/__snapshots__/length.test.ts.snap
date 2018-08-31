@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Array.prototype.length cannot set the "length" of a buffer 1`] = `
+exports[`Buffer.prototype.length cannot set the "length" of a buffer 1`] = `
 "snippetCode.ts (6,11): Cannot assign to 'length' because it is a constant or a read-only property.
 
       4 |       let error: string | undefined;
@@ -13,7 +13,7 @@ exports[`Array.prototype.length cannot set the "length" of a buffer 1`] = `
 "
 `;
 
-exports[`Array.prototype.length cannot set the length of a buffer 1`] = `
+exports[`Buffer.prototype.length cannot set the length of a buffer 1`] = `
 "snippetCode.ts (3,9): Cannot assign to 'length' because it is a constant or a read-only property.
 
       1 | 

@@ -1,6 +1,5 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-
 import { handleTypeAssignment } from '../helper/types';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';

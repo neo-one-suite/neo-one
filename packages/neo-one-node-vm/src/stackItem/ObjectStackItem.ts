@@ -23,7 +23,7 @@ export class ObjectStackItem<Value> extends StackItemBase {
   }
 
   // tslint:disable-next-line no-any
-  public toJSON(): any {
+  protected toJSONInternal(): any {
     return JSON.stringify(this.value);
   }
 

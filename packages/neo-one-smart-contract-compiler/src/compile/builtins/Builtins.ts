@@ -151,13 +151,8 @@ export class Builtins {
       }
 
       const interfaceSymbol = this.getAnyInterfaceSymbol(name);
-      if (symbol === interfaceSymbol) {
-        return true;
-      }
 
-      const inheritedInterfaceSymbols = this.getInheritedInterfaceSymbols(interfaceSymbol);
-
-      return inheritedInterfaceSymbols.has(symbol);
+      return symbol === interfaceSymbol;
     });
   }
 
@@ -275,7 +270,7 @@ export class Builtins {
     members.set(memberSymbol, builtin);
     const memberSymbolName = tsUtils.symbol.getName(memberSymbol);
     if (memberSymbolName.startsWith('__@')) {
-      const symbolSymbol = this.getInterfaceSymbolBase('SymbolConstructor', file);
+      const symbolSymbol = this.getInterfaceSymbolBase('SymbolConstructor', this.getGlobals());
       members.set(getMember(symbolSymbol, memberSymbolName.slice(3)), builtin);
     }
   }

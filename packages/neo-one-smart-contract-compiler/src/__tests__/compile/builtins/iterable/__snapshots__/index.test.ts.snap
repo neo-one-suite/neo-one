@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Iterable cannot be implemented 1`] = `
+"snippetCode.ts (2,13): Class 'MyIterable' incorrectly implements interface 'Iterable<number>'.
+  Property '[one0]' is missing in type 'MyIterable'.
+
+      1 | 
+    > 2 |       class MyIterable implements Iterable<number> {
+        |             ^
+      3 |         public readonly [Symbol.iterator]: any = 10;
+      4 |       }
+      5 |     
+"
+`;

@@ -37,4 +37,6 @@ export enum DiagnosticMessage {
   InvalidCurrentTimeOffsetNumericLiteral = 'Deploy.currentTime must have a numeric literal for the offset.',
   InvalidCurrentTimeParameterUsage = 'Deploy.currentTime may only be used as the default value for a constructor parameter.',
   InvalidSenderAddressParameterUsage = 'Deploy.senderAddress may only be used as the default value for a constructor parameter.',
+  InvalidStructuredStorageForProperty = 'Persistent storage classes may only be used as SmartContract properties.',
+  InvalidStructuredStorageForLength = 'Could not statically analyze structured storage key length.',
 }

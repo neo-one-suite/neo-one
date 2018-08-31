@@ -4,7 +4,7 @@ exports[`getSemanticDiagnostics reports errors for a complex single file 1`] = `
 Array [
   Object {
     "category": 1,
-    "code": 110015,
+    "code": 110012,
     "column": 37,
     "file": "complex.ts",
     "length": 19,
@@ -20,7 +20,7 @@ exports[`getSemanticDiagnostics reports errors for a simple single file 1`] = `
 Array [
   Object {
     "category": 1,
-    "code": 110015,
+    "code": 110012,
     "column": 0,
     "file": "simple.ts",
     "length": 19,

@@ -1,7 +1,6 @@
 import { common } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Blockchain', () => {
   test('currentHeight', async () => {
@@ -10,8 +9,8 @@ describe('Blockchain', () => {
     await node.executeString(`
       import { Blockchain } from '@neo-one/smart-contract';
 
-      Blockchain.currentHeight;
-      assertEqual(Blockchain.currentHeight === 0 || Blockchain.currentHeight === 1, true);
+      const x = Blockchain;
+      assertEqual(x.currentHeight === 0 || x.currentHeight === 1, true);
     `);
   });
 
@@ -22,7 +21,7 @@ describe('Blockchain', () => {
 
       Blockchain.currentHeight = 10;
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinModify },
+      { type: 'error' },
     );
   });
 
@@ -44,7 +43,7 @@ describe('Blockchain', () => {
 
       Blockchain.currentBlockTime = 10;
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinModify },
+      { type: 'error' },
     );
   });
 
@@ -99,7 +98,7 @@ describe('Blockchain', () => {
 
       Blockchain.currentTransaction = Blockchain.currentTransaction;
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinModify },
+      { type: 'error' },
     );
   });
 });

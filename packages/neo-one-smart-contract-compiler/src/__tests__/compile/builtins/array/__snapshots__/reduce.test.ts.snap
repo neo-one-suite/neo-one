@@ -1,12 +1,34 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Array.prototype.map cannot be referenced 1`] = `
-"snippetCode.ts (3,17): Builtin properties cannot be referenced
+exports[`Array.prototype.reduce cannot be "set" 1`] = `
+"snippetCode.ts (3,9): Builtins cannot be modified
+
+      1 | 
+      2 |       const x = [0, 1, 2];
+    > 3 |       x['reduce'] = () => 0;
+        |         ^
+      4 |     
+"
+`;
+
+exports[`Array.prototype.reduce cannot be referenced 1`] = `
+"snippetCode.ts (3,19): Builtin properties cannot be referenced
 
       1 | 
       2 |       const x = [0, 1, 2];
     > 3 |       const y = x.reduce;
-        |                 ^
+        |                   ^
+      4 |     
+"
+`;
+
+exports[`Array.prototype.reduce cannot be set 1`] = `
+"snippetCode.ts (3,9): Builtins cannot be modified
+
+      1 | 
+      2 |       const x = [0, 1, 2];
+    > 3 |       x.reduce = () => 0;
+        |         ^
       4 |     
 "
 `;

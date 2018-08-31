@@ -1,7 +1,7 @@
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
-describe('Array.prototype.map', () => {
+describe('Array.prototype.reduce', () => {
   test('should apply a function over an array with an accumulator', async () => {
     await helpers.executeString(`
       const x = [1, 2, 3];
@@ -42,6 +42,26 @@ describe('Array.prototype.map', () => {
       const y = x.reduce;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('cannot be set', async () => {
+    helpers.compileString(
+      `
+      const x = [0, 1, 2];
+      x.reduce = () => 0;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinModify },
+    );
+  });
+
+  test('cannot be "set"', async () => {
+    helpers.compileString(
+      `
+      const x = [0, 1, 2];
+      x['reduce'] = () => 0;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinModify },
     );
   });
 });

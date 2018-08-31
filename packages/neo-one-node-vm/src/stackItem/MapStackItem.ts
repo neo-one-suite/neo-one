@@ -101,9 +101,11 @@ export class MapStackItem extends StackItemBase {
   }
 
   // tslint:disable-next-line no-any
-  public toJSON(): any {
+  protected convertJSONInternal(seen: Set<StackItemBase>): any {
     return _.fromPairs(
-      utils.zip(this.keysArray(), this.valuesArray()).map(([key, value]) => [JSON.stringify(key.toJSON()), value]),
+      utils
+        .zip(this.keysArray(), this.valuesArray())
+        .map(([key, value]) => [JSON.stringify(key.convertJSON(seen)), value.convertJSON(seen)]),
     );
   }
 

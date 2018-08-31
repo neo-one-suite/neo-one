@@ -8,6 +8,7 @@ import {
   ArrForEachFuncHelper,
   ArrForEachHelper,
   ArrForEachHelperOptions,
+  ArrLeftHelper,
   ArrMapFuncHelper,
   ArrMapHelper,
   ArrMapHelperOptions,
@@ -23,7 +24,6 @@ import {
   ArrToStringHelperOptions,
   ExtendArrHelper,
 } from './arr';
-import { CreateArrayIterableIteratorHelper, GetArrayIterableIteratorClassHelper } from './arrayIterableIterator';
 import { ArrayBindingHelper, ArrayBindingHelperOptions, ObjectBindingHelper, ObjectBindingHelperOptions } from './bind';
 import { CreateClassHelper, CreateClassHelperOptions } from './class';
 import {
@@ -34,9 +34,7 @@ import {
   DebugLogHelper,
   DebugLogHelperOptions,
   ExpHelper,
-  GenericDeserializeHelper,
   GenericLogSerializeHelper,
-  GenericSerializeHelper,
 } from './common';
 import {
   BreakHelper,
@@ -46,7 +44,7 @@ import {
   ThrowCompletionHelper,
   ThrowHelper,
 } from './completionRecord';
-import { GetErrorClassHelper, ThrowTypeErrorHelper } from './error';
+import { ThrowTypeErrorHelper } from './error';
 import {
   ArgumentsHelper,
   BindFunctionThisHelper,
@@ -83,15 +81,34 @@ import {
 } from './global';
 import { Helper } from './Helper';
 import {
-  CreateArrayEntriesIterableIteratorHelper,
-  GetArrayEntriesIterableIteratorClassHelper,
-  IteratorForEachHelper,
-  IteratorForEachHelperOptions,
+  CreateEnumeratorIterableIteratorHelper,
+  CreateEnumeratorIterableIteratorHelperOptions,
+  CreateIterableIteratorBaseHelper,
+  CreateIterableIteratorBaseHelperOptions,
+  CreateIteratorIterableIteratorHelper,
+  CreateIteratorIterableIteratorHelperOptions,
+  CreateIteratorKVIterableIteratorHelper,
+  CreateIteratorKVIterableIteratorHelperOptions,
+  IterableIteratorForEachHelper,
+  IterableIteratorForEachHelperOptions,
+} from './iterableIterator';
+import {
+  RawEnumeratorForEachFuncHelper,
+  RawIteratorFilterHelper,
+  RawIteratorFilterHelperOptions,
+  RawIteratorForEachBaseHelper,
+  RawIteratorForEachBaseHelperOptions,
+  RawIteratorForEachFuncBaseHelper,
+  RawIteratorForEachFuncBaseHelperOptions,
+  RawIteratorForEachFuncHelper,
   RawIteratorForEachHelper,
   RawIteratorForEachHelperOptions,
+  RawIteratorForEachKeyHelper,
+  RawIteratorForEachKeyHelperOptions,
 } from './iterator';
+import { CreateIteratorResultHelper } from './iteratorResult';
 import { KeyedHelper } from './KeyedHelper';
-import { GetMapClassHelper } from './map';
+import { MapDeleteHelper } from './map';
 import {
   AddEmptyModuleHelper,
   ExportHelper,
@@ -121,17 +138,53 @@ import {
   ProcessStatementsHelperOptions,
 } from './statement';
 import {
+  AtStructuredStorageHelper,
   CommonStorageHelper,
+  CreateIterableIteratorStructuredStorageBaseHelper,
+  CreateIterableIteratorStructuredStorageBaseHelperOptions,
+  CreateIterableIteratorStructuredStorageHelper,
+  CreateIteratorStructuredStorageHelper,
+  CreateKeyIterableIteratorStructuredStorageHelper,
+  CreateStructuredStorageHelper,
+  CreateStructuredStorageHelperOptions,
+  CreateValIterableIteratorStructuredStorageHelper,
   DeleteStorageHelper,
+  DeleteStructuredStorageHelper,
+  ForEachFuncStructuredStorageBaseHelper,
+  ForEachFuncStructuredStorageBaseHelperOptions,
+  ForEachFuncStructuredStorageHelper,
+  ForEachKeyFuncStructuredStorageHelper,
+  ForEachKeyStructuredStorageHelper,
+  ForEachKeyStructuredStorageHelperOptions,
+  ForEachStructuredStorageBaseHelper,
+  ForEachStructuredStorageBaseHelperOptions,
+  ForEachStructuredStorageHelper,
+  ForEachStructuredStorageHelperOptions,
+  ForEachValStructuredStorageHelper,
+  ForEachValStructuredStorageHelperOptions,
+  GetArrayStorageLengthHelper,
   GetCommonStorageHelper,
-  GetMapStorageClassHelper,
-  GetSetStorageClassHelper,
+  GetKeyStructuredStorageHelper,
   GetStorageBaseHelper,
   GetStorageHelper,
+  GetStructuredStorageHelper,
+  GetStructuredStorageSizeHelper,
+  HandlePrefixArrayStructuredStorageHelper,
+  HandlePrefixKeyStructuredStorageHelper,
   HandleUndefinedStorageHelper,
   HandleUndefinedStorageHelperOptions,
+  HandleValueStructuredStorageHelper,
+  HandleValValueStructuredStorageHelper,
+  HasStructuredStorageHelper,
+  IterStorageHelper,
+  KeyStructuredStorageBaseHelperOptions,
+  PutArrayStorageLengthHelper,
   PutCommonStorageHelper,
   PutStorageHelper,
+  SetArrayStorageHelper,
+  SetStructuredStorageHelper,
+  StructuredStorageBaseHelperOptions,
+  UnwrapKeyStructuredStorageHelper,
 } from './storage';
 import {
   ArrayLengthHelper,
@@ -146,6 +199,8 @@ import {
   FindObjectPropertyHelperOptions,
   ForBuiltinTypeHelper,
   ForBuiltinTypeHelperOptions,
+  ForIterableTypeHelper,
+  ForIterableTypeHelperOptions,
   ForTypeHelper,
   ForTypeHelperOptions,
   GetArrayIndexHelper,
@@ -164,15 +219,24 @@ import {
   InstanceofHelper,
   InSymbolObjectPropertyHelper,
   IsArrayHelper,
+  IsArrayStorageHelper,
   IsAttributeHelper,
   IsBooleanHelper,
   IsBufferHelper,
+  IsErrorHelper,
   IsInputHelper,
+  IsIterableHelper,
+  IsIterableIteratorHelper,
+  IsIteratorResultHelper,
+  IsMapHelper,
+  IsMapStorageHelper,
   IsNullHelper,
   IsNullOrUndefinedHelper,
   IsNumberHelper,
   IsObjectHelper,
   IsOutputHelper,
+  IsSetHelper,
+  IsSetStorageHelper,
   IsStringHelper,
   IsSymbolHelper,
   IsTransactionHelper,
@@ -204,13 +268,21 @@ import {
   ToStringHelperOptions,
   TypedHelperOptions,
   UnwrapArrayHelper,
+  UnwrapArrayStorageHelper,
   UnwrapAttributeHelper,
   UnwrapBooleanHelper,
   UnwrapBufferHelper,
+  UnwrapErrorHelper,
   UnwrapInputHelper,
+  UnwrapIterableIteratorHelper,
+  UnwrapIteratorResultHelper,
+  UnwrapMapHelper,
+  UnwrapMapStorageHelper,
   UnwrapNumberHelper,
   UnwrapObjectHelper,
   UnwrapOutputHelper,
+  UnwrapSetHelper,
+  UnwrapSetStorageHelper,
   UnwrapStringHelper,
   UnwrapSymbolHelper,
   UnwrapTransactionHelper,
@@ -219,16 +291,24 @@ import {
   UnwrapValRecursiveHelper,
   UnwrapValRecursiveHelperOptions,
   WrapArrayHelper,
+  WrapArrayStorageHelper,
   WrapArrayValHelper,
   WrapArrayValHelperOptions,
   WrapAttributeHelper,
   WrapBooleanHelper,
   WrapBufferHelper,
+  WrapErrorHelper,
   WrapInputHelper,
+  WrapIterableIteratorHelper,
+  WrapIteratorResultHelper,
+  WrapMapHelper,
+  WrapMapStorageHelper,
   WrapNullHelper,
   WrapNumberHelper,
   WrapObjectHelper,
   WrapOutputHelper,
+  WrapSetHelper,
+  WrapSetStorageHelper,
   WrapStringHelper,
   WrapSymbolHelper,
   WrapTransactionHelper,
@@ -256,6 +336,7 @@ export interface Helpers {
   readonly arrEveryFunc: ArrEveryFuncHelper;
   readonly arrFilter: (options: ArrFilterHelperOptions) => ArrFilterHelper;
   readonly arrFilterFunc: ArrFilterFuncHelper;
+  readonly arrLeft: ArrLeftHelper;
   readonly arrMap: (options: ArrMapHelperOptions) => ArrMapHelper;
   readonly arrMapFunc: ArrMapFuncHelper;
   readonly arrForEach: (options: ArrForEachHelperOptions) => ArrForEachHelper;
@@ -267,10 +348,6 @@ export interface Helpers {
   readonly arrSome: (options: ArrSomeHelperOptions) => ArrSomeHelper;
   readonly arrToString: (options: ArrToStringHelperOptions) => ArrToStringHelper;
   readonly extendArr: ExtendArrHelper;
-
-  // arrayIterableIterator
-  readonly createArrayIterableIterator: CreateArrayIterableIteratorHelper;
-  readonly getArrayIterableIteratorClass: GetArrayIterableIteratorClassHelper;
 
   // asset
   readonly isAsset: IsAssetHelper;
@@ -298,15 +375,10 @@ export interface Helpers {
   readonly arrSlice: (options?: ArrSliceHelperOptions) => ArrSliceHelper;
   readonly cloneArray: CloneArrayHelper;
   readonly forType: (options: ForTypeHelperOptions) => ForTypeHelper;
-  readonly genericDeserialize: GenericDeserializeHelper;
   readonly genericLogSerialize: GenericLogSerializeHelper;
-  readonly genericSerialize: GenericSerializeHelper;
   readonly exp: ExpHelper;
   readonly consoleLog: ConsoleLogHelper;
   readonly debugLog: (options: DebugLogHelperOptions) => DebugLogHelper;
-
-  // error
-  readonly getErrorClass: GetErrorClassHelper;
 
   readonly equalsEqualsEquals: (options: EqualsEqualsEqualsHelperOptions) => EqualsEqualsEqualsHelper;
   readonly equalsEquals: (options: EqualsEqualsHelperOptions) => EqualsEqualsHelper;
@@ -408,29 +480,102 @@ export interface Helpers {
   readonly wrapHeader: WrapHeaderHelper;
   readonly unwrapHeader: UnwrapHeaderHelper;
 
+  // iterableIterator
+  readonly iterableIteratorForEach: (options: IterableIteratorForEachHelperOptions) => IterableIteratorForEachHelper;
+  readonly createEnumeratorIterableIterator: (
+    options: CreateEnumeratorIterableIteratorHelperOptions,
+  ) => CreateEnumeratorIterableIteratorHelper;
+  readonly createIterableIteratorBase: (
+    options: CreateIterableIteratorBaseHelperOptions,
+  ) => CreateIterableIteratorBaseHelper;
+  readonly createIteratorIterableIterator: (
+    options: CreateIteratorIterableIteratorHelperOptions,
+  ) => CreateIteratorIterableIteratorHelper;
+  readonly createIteratorKVIterableIterator: (
+    options: CreateIteratorKVIterableIteratorHelperOptions,
+  ) => CreateIteratorKVIterableIteratorHelper;
+
   // iterator
-  readonly createArrayEntriesIterableIterator: CreateArrayEntriesIterableIteratorHelper;
-  readonly getArrayEntriesIterableIteratorClass: GetArrayEntriesIterableIteratorClassHelper;
-  readonly iteratorForEach: (options: IteratorForEachHelperOptions) => IteratorForEachHelper;
+  readonly rawIteratorFilter: (options: RawIteratorFilterHelperOptions) => RawIteratorFilterHelper;
   readonly rawIteratorForEach: (options: RawIteratorForEachHelperOptions) => RawIteratorForEachHelper;
+  readonly rawIteratorForEachKey: (options: RawIteratorForEachKeyHelperOptions) => RawIteratorForEachKeyHelper;
+  readonly rawIteratorForEachBase: (options: RawIteratorForEachBaseHelperOptions) => RawIteratorForEachBaseHelper;
+  readonly rawIteratorForEachFunc: RawIteratorForEachFuncHelper;
+  readonly rawIteratorForEachFuncBase: (
+    options: RawIteratorForEachFuncBaseHelperOptions,
+  ) => RawIteratorForEachFuncBaseHelper;
+  readonly rawEnumeratorForEachFunc: RawEnumeratorForEachFuncHelper;
+
+  // iteratorResult
+  readonly createIteratorResult: CreateIteratorResultHelper;
 
   // map
-  readonly getMapClass: GetMapClassHelper;
+  readonly mapDelete: MapDeleteHelper;
 
   // storage
-  readonly getMapStorageClass: GetMapStorageClassHelper;
-  readonly getSetStorageClass: GetSetStorageClassHelper;
   readonly putCommonStorage: PutCommonStorageHelper;
   readonly handleUndefinedStorage: (options: HandleUndefinedStorageHelperOptions) => HandleUndefinedStorageHelper;
   readonly commonStorage: CommonStorageHelper;
   readonly deleteStorage: DeleteStorageHelper;
+  readonly iterStorage: IterStorageHelper;
   readonly putStorage: PutStorageHelper;
   readonly getStorageBase: GetStorageBaseHelper;
   readonly getStorage: GetStorageHelper;
   readonly getCommonStorage: GetCommonStorageHelper;
+  readonly atStructuredStorage: (options: KeyStructuredStorageBaseHelperOptions) => AtStructuredStorageHelper;
+  readonly createIteratorStructuredStorage: (
+    options: StructuredStorageBaseHelperOptions,
+  ) => CreateIteratorStructuredStorageHelper;
+  readonly createStructuredStorage: (options: CreateStructuredStorageHelperOptions) => CreateStructuredStorageHelper;
+  readonly deleteStructuredStorage: (options: KeyStructuredStorageBaseHelperOptions) => DeleteStructuredStorageHelper;
+  readonly getKeyStructuredStorage: (options: KeyStructuredStorageBaseHelperOptions) => GetKeyStructuredStorageHelper;
+  readonly getStructuredStorage: (options: KeyStructuredStorageBaseHelperOptions) => GetStructuredStorageHelper;
+  readonly hasStructuredStorage: (options: KeyStructuredStorageBaseHelperOptions) => HasStructuredStorageHelper;
+  readonly setStructuredStorage: (options: KeyStructuredStorageBaseHelperOptions) => SetStructuredStorageHelper;
+  readonly setArrayStorage: SetArrayStorageHelper;
+  readonly forEachFuncStructuredStorageBase: (
+    options: ForEachFuncStructuredStorageBaseHelperOptions,
+  ) => ForEachFuncStructuredStorageBaseHelper;
+  readonly forEachKeyFuncStructuredStorage: (
+    options: StructuredStorageBaseHelperOptions,
+  ) => ForEachKeyFuncStructuredStorageHelper;
+  readonly forEachFuncStructuredStorage: (
+    options: StructuredStorageBaseHelperOptions,
+  ) => ForEachFuncStructuredStorageHelper;
+  readonly forEachStructuredStorageBase: (
+    options: ForEachStructuredStorageBaseHelperOptions,
+  ) => ForEachStructuredStorageBaseHelper;
+  readonly forEachKeyStructuredStorage: (
+    options: ForEachKeyStructuredStorageHelperOptions,
+  ) => ForEachKeyStructuredStorageHelper;
+  readonly forEachStructuredStorage: (options: ForEachStructuredStorageHelperOptions) => ForEachStructuredStorageHelper;
+  readonly forEachValStructuredStorage: (
+    options: ForEachValStructuredStorageHelperOptions,
+  ) => ForEachValStructuredStorageHelper;
+  readonly getStructuredStorageSize: (options: StructuredStorageBaseHelperOptions) => GetStructuredStorageSizeHelper;
+  readonly handleValueStructuredStorage: HandleValueStructuredStorageHelper;
+  readonly handleValValueStructuredStorage: HandleValValueStructuredStorageHelper;
+  readonly handlePrefixKeyStructuredStorage: HandlePrefixKeyStructuredStorageHelper;
+  readonly createIterableIteratorStructuredStorageBase: (
+    options: CreateIterableIteratorStructuredStorageBaseHelperOptions,
+  ) => CreateIterableIteratorStructuredStorageBaseHelper;
+  readonly createIterableIteratorStructuredStorage: (
+    options: StructuredStorageBaseHelperOptions,
+  ) => CreateIterableIteratorStructuredStorageHelper;
+  readonly createKeyIterableIteratorStructuredStorage: (
+    options: StructuredStorageBaseHelperOptions,
+  ) => CreateKeyIterableIteratorStructuredStorageHelper;
+  readonly createValIterableIteratorStructuredStorage: (
+    options: StructuredStorageBaseHelperOptions,
+  ) => CreateValIterableIteratorStructuredStorageHelper;
+  readonly getArrayStorageLength: GetArrayStorageLengthHelper;
+  readonly putArrayStorageLength: PutArrayStorageLengthHelper;
+  readonly handlePrefixArrayStructuredStorage: HandlePrefixArrayStructuredStorageHelper;
+  readonly unwrapKeyStructuredStorage: (options: TypedHelperOptions) => UnwrapKeyStructuredStorageHelper;
 
   // types
   readonly forBuiltinType: (options: ForBuiltinTypeHelperOptions) => ForBuiltinTypeHelper;
+  readonly forIterableType: (options: ForIterableTypeHelperOptions) => ForIterableTypeHelper;
   readonly unwrapVal: (options: UnwrapValHelperOptions) => UnwrapValHelper;
   readonly wrapVal: (options: WrapValHelperOptions) => WrapValHelper;
   readonly wrapArrayVal: (options: WrapArrayValHelperOptions) => WrapArrayValHelper;
@@ -446,6 +591,11 @@ export interface Helpers {
   readonly unwrapArray: UnwrapArrayHelper;
   readonly isArray: IsArrayHelper;
 
+  // types/arrayStorage
+  readonly wrapArrayStorage: WrapArrayStorageHelper;
+  readonly unwrapArrayStorage: UnwrapArrayStorageHelper;
+  readonly isArrayStorage: IsArrayStorageHelper;
+
   // types/attribute
   readonly wrapAttribute: WrapAttributeHelper;
   readonly unwrapAttribute: UnwrapAttributeHelper;
@@ -459,15 +609,53 @@ export interface Helpers {
   readonly unwrapBuffer: UnwrapBufferHelper;
   readonly wrapBuffer: WrapBufferHelper;
 
+  // types/error
+  readonly wrapError: WrapErrorHelper;
+  readonly unwrapError: UnwrapErrorHelper;
+  readonly isError: IsErrorHelper;
+
   // types/input
   readonly wrapInput: WrapInputHelper;
   readonly unwrapInput: UnwrapInputHelper;
   readonly isInput: IsInputHelper;
 
+  // types/iterable
+  readonly isIterable: IsIterableHelper;
+
+  // types/iteratorResult
+  readonly wrapIteratorResult: WrapIteratorResultHelper;
+  readonly unwrapIteratorResult: UnwrapIteratorResultHelper;
+  readonly isIteratorResult: IsIteratorResultHelper;
+
+  // types/iterableIterator
+  readonly wrapIterableIterator: WrapIterableIteratorHelper;
+  readonly unwrapIterableIterator: UnwrapIterableIteratorHelper;
+  readonly isIterableIterator: IsIterableIteratorHelper;
+
+  // types/map
+  readonly wrapMap: WrapMapHelper;
+  readonly unwrapMap: UnwrapMapHelper;
+  readonly isMap: IsMapHelper;
+
+  // types/mapStorage
+  readonly wrapMapStorage: WrapMapStorageHelper;
+  readonly unwrapMapStorage: UnwrapMapStorageHelper;
+  readonly isMapStorage: IsMapStorageHelper;
+
   // types/output
   readonly wrapOutput: WrapOutputHelper;
   readonly unwrapOutput: UnwrapOutputHelper;
   readonly isOutput: IsOutputHelper;
+
+  // types/set
+  readonly wrapSet: WrapSetHelper;
+  readonly unwrapSet: UnwrapSetHelper;
+  readonly isSet: IsSetHelper;
+
+  // types/setStorage
+  readonly wrapSetStorage: WrapSetStorageHelper;
+  readonly unwrapSetStorage: UnwrapSetStorageHelper;
+  readonly isSetStorage: IsSetStorageHelper;
 
   // types/transaction
   readonly wrapTransaction: WrapTransactionHelper;
@@ -515,6 +703,7 @@ export const createHelpers = (): Helpers => {
     arrEveryFunc: new ArrEveryFuncHelper(),
     arrFilter: (options) => new ArrFilterHelper(options),
     arrFilterFunc: new ArrFilterFuncHelper(),
+    arrLeft: new ArrLeftHelper(),
     arrMap: (options) => new ArrMapHelper(options),
     arrMapFunc: new ArrMapFuncHelper(),
     arrForEach: (options) => new ArrForEachHelper(options),
@@ -526,10 +715,6 @@ export const createHelpers = (): Helpers => {
     arrSome: (options) => new ArrSomeHelper(options),
     arrToString: (options) => new ArrToStringHelper(options),
     extendArr: new ExtendArrHelper(),
-
-    // arrayIterableIterator
-    createArrayIterableIterator: new CreateArrayIterableIteratorHelper(),
-    getArrayIterableIteratorClass: new GetArrayIterableIteratorClassHelper(),
 
     // asset
     isAsset: new IsAssetHelper(),
@@ -557,15 +742,10 @@ export const createHelpers = (): Helpers => {
     arrSlice: (options = {}) => new ArrSliceHelper(options),
     cloneArray: new CloneArrayHelper(),
     forType: (options) => new ForTypeHelper(options),
-    genericDeserialize: new GenericDeserializeHelper(),
     genericLogSerialize: new GenericLogSerializeHelper(),
-    genericSerialize: new GenericSerializeHelper(),
     exp: new ExpHelper(),
     consoleLog: new ConsoleLogHelper(),
     debugLog: (options) => new DebugLogHelper(options),
-
-    // error
-    getErrorClass: new GetErrorClassHelper(),
 
     equalsEqualsEquals: (options) => new EqualsEqualsEqualsHelper(options),
     equalsEquals: (options) => new EqualsEqualsHelper(options),
@@ -663,29 +843,73 @@ export const createHelpers = (): Helpers => {
     wrapHeader: new WrapHeaderHelper(),
     unwrapHeader: new UnwrapHeaderHelper(),
 
+    // iterableIterator
+    iterableIteratorForEach: (options) => new IterableIteratorForEachHelper(options),
+    createEnumeratorIterableIterator: (options) => new CreateEnumeratorIterableIteratorHelper(options),
+    createIterableIteratorBase: (options) => new CreateIterableIteratorBaseHelper(options),
+    createIteratorIterableIterator: (options) => new CreateIteratorIterableIteratorHelper(options),
+    createIteratorKVIterableIterator: (options) => new CreateIteratorKVIterableIteratorHelper(options),
+
     // iterator
-    createArrayEntriesIterableIterator: new CreateArrayEntriesIterableIteratorHelper(),
-    getArrayEntriesIterableIteratorClass: new GetArrayEntriesIterableIteratorClassHelper(),
-    iteratorForEach: (options) => new IteratorForEachHelper(options),
+    rawIteratorFilter: (options) => new RawIteratorFilterHelper(options),
     rawIteratorForEach: (options) => new RawIteratorForEachHelper(options),
+    rawIteratorForEachKey: (options) => new RawIteratorForEachKeyHelper(options),
+    rawIteratorForEachBase: (options) => new RawIteratorForEachBaseHelper(options),
+    rawIteratorForEachFunc: new RawIteratorForEachFuncHelper(),
+    rawIteratorForEachFuncBase: (options) => new RawIteratorForEachFuncBaseHelper(options),
+    rawEnumeratorForEachFunc: new RawEnumeratorForEachFuncHelper(),
+
+    // iteratorResult
+    createIteratorResult: new CreateIteratorResultHelper(),
 
     // map
-    getMapClass: new GetMapClassHelper(),
+    mapDelete: new MapDeleteHelper(),
 
-    // set
-    getMapStorageClass: new GetMapStorageClassHelper(),
-    getSetStorageClass: new GetSetStorageClassHelper(),
+    // storage
     putCommonStorage: new PutCommonStorageHelper(),
     handleUndefinedStorage: (options) => new HandleUndefinedStorageHelper(options),
     commonStorage: new CommonStorageHelper(),
     deleteStorage: new DeleteStorageHelper(),
+    iterStorage: new IterStorageHelper(),
     putStorage: new PutStorageHelper(),
     getStorageBase: new GetStorageBaseHelper(),
     getStorage: new GetStorageHelper(),
     getCommonStorage: new GetCommonStorageHelper(),
+    atStructuredStorage: (options) => new AtStructuredStorageHelper(options),
+    createIteratorStructuredStorage: (options) => new CreateIteratorStructuredStorageHelper(options),
+    createStructuredStorage: (options) => new CreateStructuredStorageHelper(options),
+    deleteStructuredStorage: (options) => new DeleteStructuredStorageHelper(options),
+    getKeyStructuredStorage: (options) => new GetKeyStructuredStorageHelper(options),
+    getStructuredStorage: (options) => new GetStructuredStorageHelper(options),
+    hasStructuredStorage: (options) => new HasStructuredStorageHelper(options),
+    setStructuredStorage: (options) => new SetStructuredStorageHelper(options),
+    setArrayStorage: new SetArrayStorageHelper(),
+    forEachFuncStructuredStorageBase: (options) => new ForEachFuncStructuredStorageBaseHelper(options),
+    forEachFuncStructuredStorage: (options) => new ForEachFuncStructuredStorageHelper(options),
+    forEachKeyFuncStructuredStorage: (options) => new ForEachKeyFuncStructuredStorageHelper(options),
+    forEachStructuredStorageBase: (options) => new ForEachStructuredStorageBaseHelper(options),
+    forEachKeyStructuredStorage: (options) => new ForEachKeyStructuredStorageHelper(options),
+    forEachStructuredStorage: (options) => new ForEachStructuredStorageHelper(options),
+    forEachValStructuredStorage: (options) => new ForEachValStructuredStorageHelper(options),
+    getStructuredStorageSize: (options) => new GetStructuredStorageSizeHelper(options),
+    handleValueStructuredStorage: new HandleValueStructuredStorageHelper(),
+    handleValValueStructuredStorage: new HandleValValueStructuredStorageHelper(),
+    handlePrefixKeyStructuredStorage: new HandlePrefixKeyStructuredStorageHelper(),
+    createIterableIteratorStructuredStorageBase: (options) =>
+      new CreateIterableIteratorStructuredStorageBaseHelper(options),
+    createIterableIteratorStructuredStorage: (options) => new CreateIterableIteratorStructuredStorageHelper(options),
+    createKeyIterableIteratorStructuredStorage: (options) =>
+      new CreateKeyIterableIteratorStructuredStorageHelper(options),
+    createValIterableIteratorStructuredStorage: (options) =>
+      new CreateValIterableIteratorStructuredStorageHelper(options),
+    getArrayStorageLength: new GetArrayStorageLengthHelper(),
+    putArrayStorageLength: new PutArrayStorageLengthHelper(),
+    handlePrefixArrayStructuredStorage: new HandlePrefixArrayStructuredStorageHelper(),
+    unwrapKeyStructuredStorage: (options) => new UnwrapKeyStructuredStorageHelper(options),
 
     // types
     forBuiltinType: (options) => new ForBuiltinTypeHelper(options),
+    forIterableType: (options) => new ForIterableTypeHelper(options),
     unwrapVal: (options) => new UnwrapValHelper(options),
     wrapVal: (options) => new WrapValHelper(options),
     wrapArrayVal: (options) => new WrapArrayValHelper(options),
@@ -701,6 +925,11 @@ export const createHelpers = (): Helpers => {
     unwrapArray: new UnwrapArrayHelper(),
     isArray: new IsArrayHelper(),
 
+    // types/arrayStorage
+    wrapArrayStorage: new WrapArrayStorageHelper(),
+    unwrapArrayStorage: new UnwrapArrayStorageHelper(),
+    isArrayStorage: new IsArrayStorageHelper(),
+
     // types/attribute
     wrapAttribute: new WrapAttributeHelper(),
     unwrapAttribute: new UnwrapAttributeHelper(),
@@ -714,15 +943,53 @@ export const createHelpers = (): Helpers => {
     unwrapBuffer: new UnwrapBufferHelper(),
     wrapBuffer: new WrapBufferHelper(),
 
+    // types/error
+    wrapError: new WrapErrorHelper(),
+    unwrapError: new UnwrapErrorHelper(),
+    isError: new IsErrorHelper(),
+
     // types/input
     wrapInput: new WrapInputHelper(),
     unwrapInput: new UnwrapInputHelper(),
     isInput: new IsInputHelper(),
 
+    // types/iterable
+    isIterable: new IsIterableHelper(),
+
+    // types/iteratorResult
+    wrapIteratorResult: new WrapIteratorResultHelper(),
+    unwrapIteratorResult: new UnwrapIteratorResultHelper(),
+    isIteratorResult: new IsIteratorResultHelper(),
+
+    // types/error
+    wrapIterableIterator: new WrapIterableIteratorHelper(),
+    unwrapIterableIterator: new UnwrapIterableIteratorHelper(),
+    isIterableIterator: new IsIterableIteratorHelper(),
+
+    // types/map
+    wrapMap: new WrapMapHelper(),
+    unwrapMap: new UnwrapMapHelper(),
+    isMap: new IsMapHelper(),
+
+    // types/mapStorage
+    wrapMapStorage: new WrapMapStorageHelper(),
+    unwrapMapStorage: new UnwrapMapStorageHelper(),
+    isMapStorage: new IsMapStorageHelper(),
+
     // types/output
     wrapOutput: new WrapOutputHelper(),
     unwrapOutput: new UnwrapOutputHelper(),
     isOutput: new IsOutputHelper(),
+
+    // types/set
+    wrapSet: new WrapSetHelper(),
+    unwrapSet: new UnwrapSetHelper(),
+    isSet: new IsSetHelper(),
+
+    // types/setStorage
+    wrapSetStorage: new WrapSetStorageHelper(),
+    unwrapSetStorage: new UnwrapSetStorageHelper(),
+    isSetStorage: new IsSetStorageHelper(),
 
     // types/transaction
     wrapTransaction: new WrapTransactionHelper(),

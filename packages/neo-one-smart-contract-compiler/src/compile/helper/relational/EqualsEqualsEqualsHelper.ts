@@ -61,6 +61,15 @@ export class EqualsEqualsEqualsHelper extends Helper {
       sb.emitOp(node, 'EQUAL');
     };
 
+    const compareStorageValue = () => {
+      sb.emitPushInt(node, 1);
+      sb.emitOp(node, 'PICKITEM');
+      sb.emitOp(node, 'SWAP');
+      sb.emitPushInt(node, 1);
+      sb.emitOp(node, 'PICKITEM');
+      sb.emitOp(node, 'EQUAL');
+    };
+
     const compareNumber = (innerOptions: VisitOptions) => {
       sb.emitHelper(node, innerOptions, sb.helpers.unwrapNumber);
       sb.emitOp(node, 'SWAP');
@@ -81,6 +90,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
           type: this.leftType,
           knownType: this.leftKnownType,
           array: pushFalse,
+          arrayStorage: pushFalse,
           boolean: pushFalse,
           buffer: pushFalse,
           null: pushFalse,
@@ -89,6 +99,14 @@ export class EqualsEqualsEqualsHelper extends Helper {
           string: pushFalse,
           symbol: pushFalse,
           undefined: pushFalse,
+          map: pushFalse,
+          mapStorage: pushFalse,
+          set: pushFalse,
+          setStorage: pushFalse,
+          error: pushFalse,
+          iteratorResult: pushFalse,
+          iterable: pushFalse,
+          iterableIterator: pushFalse,
           transaction: pushFalse,
           output: pushFalse,
           attribute: pushFalse,
@@ -103,6 +121,46 @@ export class EqualsEqualsEqualsHelper extends Helper {
       );
     };
 
+    const createProcessStorage = (value: keyof ForBuiltinTypeHelperOptions) => (innerOptions: VisitOptions) => {
+      sb.emitOp(node, 'SWAP');
+      sb.emitHelper(
+        node,
+        innerOptions,
+        sb.helpers.forBuiltinType({
+          type: this.leftType,
+          knownType: this.leftKnownType,
+          array: pushFalse,
+          arrayStorage: pushFalse,
+          boolean: pushFalse,
+          buffer: pushFalse,
+          null: pushFalse,
+          number: pushFalse,
+          object: pushFalse,
+          string: pushFalse,
+          symbol: pushFalse,
+          undefined: pushFalse,
+          map: pushFalse,
+          mapStorage: pushFalse,
+          set: pushFalse,
+          setStorage: pushFalse,
+          error: pushFalse,
+          iteratorResult: pushFalse,
+          iterable: pushFalse,
+          iterableIterator: pushFalse,
+          transaction: pushFalse,
+          output: pushFalse,
+          attribute: pushFalse,
+          input: pushFalse,
+          account: pushFalse,
+          asset: pushFalse,
+          contract: pushFalse,
+          header: pushFalse,
+          block: pushFalse,
+          [value]: compareStorageValue,
+        }),
+      );
+    };
+
     const createProcessNullOrUndefined = (value: keyof ForBuiltinTypeHelperOptions) => (innerOptions: VisitOptions) => {
       sb.emitOp(node, 'SWAP');
       sb.emitHelper(
@@ -112,6 +170,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
           type: this.leftType,
           knownType: this.leftKnownType,
           array: pushFalse,
+          arrayStorage: pushFalse,
           boolean: pushFalse,
           buffer: pushFalse,
           null: pushFalse,
@@ -120,6 +179,14 @@ export class EqualsEqualsEqualsHelper extends Helper {
           string: pushFalse,
           symbol: pushFalse,
           undefined: pushFalse,
+          map: pushFalse,
+          mapStorage: pushFalse,
+          set: pushFalse,
+          setStorage: pushFalse,
+          error: pushFalse,
+          iteratorResult: pushFalse,
+          iterable: pushFalse,
+          iterableIterator: pushFalse,
           transaction: pushFalse,
           output: pushFalse,
           attribute: pushFalse,
@@ -134,6 +201,10 @@ export class EqualsEqualsEqualsHelper extends Helper {
       );
     };
 
+    const createProcessIterable = () => (innerOptions: VisitOptions) => {
+      sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+    };
+
     sb.emitHelper(
       node,
       options,
@@ -141,6 +212,7 @@ export class EqualsEqualsEqualsHelper extends Helper {
         type: this.rightType,
         knownType: this.rightKnownType,
         array: createProcess('array', Types.Array),
+        arrayStorage: createProcessStorage('arrayStorage'),
         boolean: createProcess('boolean', Types.Boolean),
         buffer: createProcess('buffer', Types.Buffer),
         null: createProcessNullOrUndefined('null'),
@@ -149,6 +221,14 @@ export class EqualsEqualsEqualsHelper extends Helper {
         string: createProcess('string', Types.String),
         symbol: createProcess('symbol', Types.Symbol),
         undefined: createProcessNullOrUndefined('undefined'),
+        map: createProcess('map', Types.Map),
+        mapStorage: createProcessStorage('mapStorage'),
+        set: createProcess('set', Types.Set),
+        setStorage: createProcessStorage('setStorage'),
+        error: createProcess('error', Types.Error),
+        iteratorResult: createProcess('iteratorResult', Types.IteratorResult),
+        iterable: createProcessIterable(),
+        iterableIterator: createProcess('iterableIterator', Types.IterableIterator),
         transaction: createProcess('transaction', Types.Transaction),
         output: createProcess('output', Types.Output),
         attribute: createProcess('attribute', Types.Attribute),

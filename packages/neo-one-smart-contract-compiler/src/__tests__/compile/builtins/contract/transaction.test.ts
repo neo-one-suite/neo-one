@@ -2,7 +2,6 @@ import { Attribute, Input, Output } from '@neo-one/client';
 import { AttributeUsage, common } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Transaction', () => {
   test('properties', async () => {
@@ -110,18 +109,7 @@ describe('Transaction', () => {
       class MyTransaction implements TransactionBase {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
-    );
-  });
-
-  test('cannot be referenced', async () => {
-    helpers.compileString(
-      `
-      import { Transaction } from '@neo-one/smart-contract';
-
-      const x = Transaction;
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+      { type: 'error' },
     );
   });
 });

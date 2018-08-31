@@ -8,7 +8,7 @@ describe('IArguments', () => {
       class MyArray implements IArguments {
       }
     `,
-      { type: 'error', code: DiagnosticCode.InvalidBuiltinImplement },
+      { type: 'error' },
     );
   });
 

@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Map.prototype.get/set/has/delete delete cannot be referenced 1`] = `
+"snippetCode.ts (3,19): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       const x = new Map<string, number>();
+    > 3 |       const y = x.delete;
+        |                   ^
+      4 |     
+"
+`;
+
+exports[`Map.prototype.get/set/has/delete get cannot be referenced 1`] = `
+"snippetCode.ts (3,19): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       const x = new Map<string, number>();
+    > 3 |       const y = x.get;
+        |                   ^
+      4 |     
+"
+`;
+
+exports[`Map.prototype.get/set/has/delete has cannot be referenced 1`] = `
+"snippetCode.ts (3,19): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       const x = new Map<string, number>();
+    > 3 |       const y = x.has;
+        |                   ^
+      4 |     
+"
+`;
+
+exports[`Map.prototype.get/set/has/delete set cannot be referenced 1`] = `
+"snippetCode.ts (3,19): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       const x = new Map<string, number>();
+    > 3 |       const y = x.set;
+        |                   ^
+      4 |     
+"
+`;

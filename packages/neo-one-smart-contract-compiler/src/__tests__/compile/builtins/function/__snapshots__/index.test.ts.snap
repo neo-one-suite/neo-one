@@ -1,22 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Function cannot be implemented 1`] = `
-"snippetCode.ts (2,7): Built-ins cannot be implemented.
+exports[`Function cannot be extended 1`] = `
+"snippetCode.ts (2,32): Type 'FunctionConstructor' is not a constructor function type.
 
       1 | 
-    > 2 |       class MyFunction implements Function {
-        |       ^
+    > 2 |       class MyFunction extends Function {
+        |                                ^
       3 |       }
       4 |     
-"
-`;
-
-exports[`Function cannot be referenced 1`] = `
-"snippetCode.ts (2,17): Builtins cannot be referenced
-
-      1 | 
-    > 2 |       const x = Function;
-        |                 ^
-      3 |     
 "
 `;

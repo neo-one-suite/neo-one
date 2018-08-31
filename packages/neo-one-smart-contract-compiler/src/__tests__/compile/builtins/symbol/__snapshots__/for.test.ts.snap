@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Symbol.for cannot be referenced 1`] = `
-"snippetCode.ts (2,21): Builtin properties cannot be referenced
+"snippetCode.ts (2,28): Builtin properties cannot be referenced
 
       1 | 
     > 2 |       const value = Symbol.for;
-        |                     ^
+        |                            ^
       3 |     
 "
 `;
