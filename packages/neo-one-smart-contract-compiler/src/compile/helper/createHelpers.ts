@@ -87,15 +87,11 @@ import {
   CreateIterableIteratorBaseHelperOptions,
   CreateIteratorIterableIteratorHelper,
   CreateIteratorIterableIteratorHelperOptions,
-  CreateIteratorKVIterableIteratorHelper,
-  CreateIteratorKVIterableIteratorHelperOptions,
   IterableIteratorForEachHelper,
   IterableIteratorForEachHelperOptions,
 } from './iterableIterator';
 import {
   RawEnumeratorForEachFuncHelper,
-  RawIteratorFilterHelper,
-  RawIteratorFilterHelperOptions,
   RawIteratorForEachBaseHelper,
   RawIteratorForEachBaseHelperOptions,
   RawIteratorForEachFuncBaseHelper,
@@ -491,12 +487,8 @@ export interface Helpers {
   readonly createIteratorIterableIterator: (
     options: CreateIteratorIterableIteratorHelperOptions,
   ) => CreateIteratorIterableIteratorHelper;
-  readonly createIteratorKVIterableIterator: (
-    options: CreateIteratorKVIterableIteratorHelperOptions,
-  ) => CreateIteratorKVIterableIteratorHelper;
 
   // iterator
-  readonly rawIteratorFilter: (options: RawIteratorFilterHelperOptions) => RawIteratorFilterHelper;
   readonly rawIteratorForEach: (options: RawIteratorForEachHelperOptions) => RawIteratorForEachHelper;
   readonly rawIteratorForEachKey: (options: RawIteratorForEachKeyHelperOptions) => RawIteratorForEachKeyHelper;
   readonly rawIteratorForEachBase: (options: RawIteratorForEachBaseHelperOptions) => RawIteratorForEachBaseHelper;
@@ -848,10 +840,8 @@ export const createHelpers = (): Helpers => {
     createEnumeratorIterableIterator: (options) => new CreateEnumeratorIterableIteratorHelper(options),
     createIterableIteratorBase: (options) => new CreateIterableIteratorBaseHelper(options),
     createIteratorIterableIterator: (options) => new CreateIteratorIterableIteratorHelper(options),
-    createIteratorKVIterableIterator: (options) => new CreateIteratorKVIterableIteratorHelper(options),
 
     // iterator
-    rawIteratorFilter: (options) => new RawIteratorFilterHelper(options),
     rawIteratorForEach: (options) => new RawIteratorForEachHelper(options),
     rawIteratorForEachKey: (options) => new RawIteratorForEachKeyHelper(options),
     rawIteratorForEachBase: (options) => new RawIteratorForEachBaseHelper(options),

@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MapStorage invalid "reference" 1`] = `
+"snippetCode.ts (4,30): Builtin properties cannot be referenced
+
+      2 |       import { MapStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const for = MapStorage['for'];
+        |                              ^
+      5 |     
+"
+`;
+
+exports[`MapStorage invalid create 1`] = `
+"snippetCode.ts (4,23): Persistent storage classes may only be used as SmartContract properties.
+
+      2 |       import { MapStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const storage = MapStorage.for<string, number>();
+        |                       ^
+      5 |     
+"
+`;
+
+exports[`MapStorage invalid reference - object 1`] = `
+"snippetCode.ts (4,15): Builtin properties cannot be referenced
+
+      2 |       import { MapStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const { for } = MapStorage;
+        |               ^
+      5 |     
+"
+`;
+
+exports[`MapStorage invalid reference 1`] = `
+"snippetCode.ts (4,30): Builtin properties cannot be referenced
+
+      2 |       import { MapStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const for = MapStorage.for;
+        |                              ^
+      5 |     
+"
+`;

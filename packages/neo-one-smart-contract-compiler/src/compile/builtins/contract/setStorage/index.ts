@@ -12,6 +12,8 @@ import { SetStorageIterator } from './iterator';
 
 class SetStorageInterface extends BuiltinInterface {}
 class SetStorageValue extends BuiltinInstanceOf {
+  public readonly type = 'SetStorageConstructor';
+
   public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [val]

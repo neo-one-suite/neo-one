@@ -1,4 +1,5 @@
 import { helpers } from '../../../../__data__';
+import { ArrayEntries } from '../../../../compile/builtins/array/entries';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Array.prototype.entries', () => {
@@ -94,5 +95,9 @@ describe('Array.prototype.entries', () => {
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
+  });
+
+  test('canCall', () => {
+    expect(new ArrayEntries().canCall()).toEqual(true);
   });
 });

@@ -1,12 +1,14 @@
-import { BuiltinBase } from '../../BuiltinBase';
 import { BuiltinInterface } from '../../BuiltinInterface';
 import { Builtins } from '../../Builtins';
+import { BuiltinValueObject } from '../../BuiltinValueObject';
 import { SmartContractFor } from './for';
 
 class SmartContractInterface extends BuiltinInterface {
   public readonly canImplement = true;
 }
-class SmartContractValue extends BuiltinBase {}
+class SmartContractValue extends BuiltinValueObject {
+  public readonly type = 'SmartContractConstructor';
+}
 class SmartContractConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name

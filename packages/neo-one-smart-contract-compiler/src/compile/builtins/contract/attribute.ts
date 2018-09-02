@@ -15,7 +15,10 @@ class Hash256AttributeInterface extends BuiltinInterface {}
 export const add = (builtins: Builtins): void => {
   builtins.addContractInterface('AttributeBase', new AttributeBaseInterface());
   builtins.addContractInterface('AttributeBaseConstructor', new AttributeBaseConstructorInterface());
-  builtins.addContractValue('AttributeBase', new ValueInstanceOf((sb) => sb.helpers.isAttribute));
+  builtins.addContractValue(
+    'AttributeBase',
+    new ValueInstanceOf('AttributeConstructor', (sb) => sb.helpers.isAttribute),
+  );
   builtins.addContractMember(
     'AttributeBase',
     'usage',

@@ -5,6 +5,7 @@ describe('Set', () => {
     await helpers.executeString(`
       const x = new Set<string>();
 
+      new Set<string>();
       x instanceof Set;
       assertEqual(x instanceof Set, true);
     `);

@@ -1,4 +1,8 @@
 import { helpers } from '../../../../__data__';
+import { ArrayStorageIterator } from '../../../../compile/builtins/contract/arrayStorage/iterator';
+import { ArrayStoragePop } from '../../../../compile/builtins/contract/arrayStorage/pop';
+import { ArrayStoragePush } from '../../../../compile/builtins/contract/arrayStorage/push';
+import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('ArrayStorage', () => {
   test('length, push, pop, index', async () => {
@@ -21,6 +25,7 @@ describe('ArrayStorage', () => {
       }
 
       const storage = new StorageContract().prefix;
+      assertEqual(storage instanceof ArrayStorage, true);
       assertEqual(storage.length, 0);
 
       storage[0] = '10';
@@ -28,7 +33,8 @@ describe('ArrayStorage', () => {
       assertEqual(storage[1] as string | undefined, undefined);
       assertEqual(storage.length, 1);
 
-      storage.push('11', '12', '13');
+      const result = storage.push('11', '12', '13');
+      assertEqual(result, 4);
       assertEqual(storage[0], '10');
       assertEqual(storage[1], '11');
       assertEqual(storage[2], '12');
@@ -44,6 +50,25 @@ describe('ArrayStorage', () => {
       assertEqual(storage.length, 0);
       assertEqual(storage.pop(), undefined);
       assertEqual(storage.length, 0);
+
+      interface Storage<T> {
+        readonly [Symbol.iterator]: () => IterableIterator<T>;
+        readonly length: number;
+        readonly push: (...items: T[]) => number;
+        readonly pop: () => T | undefined;
+        [n: number]: T;
+      }
+
+      const storageLike: Storage<string> | ArrayStorage<string> =
+        storage as Storage<string> | ArrayStorage<string>;
+
+      storageLike['push']('foo');
+      assertEqual(storageLike[0], 'foo');
+      assertEqual(storageLike['length'], 1);
+      storageLike['pop']();
+      assertEqual(storageLike[0] as string | undefined, undefined);
+      assertEqual(storageLike['length'], 0);
+      storageLike[Symbol.iterator]();
     `);
 
     await node.executeString(`
@@ -109,7 +134,13 @@ describe('ArrayStorage', () => {
       assertEqual(count, 4);
       assertEqual(keys, keyA + keyB + keyC + keyD);
 
-      storage[Symbol.iterator]();
+      interface StorageLike<T> {
+        [Symbol.iterator](): IterableIterator<T>;
+      }
+
+      const storageLike: StorageLike<string> | ArrayStorage<string> = storage as StorageLike<string> | ArrayStorage<string>;
+
+      storageLike[Symbol.iterator]();
       const firstIterator = storage[Symbol.iterator]();
 
       let firstResult = firstIterator.next();
@@ -138,5 +169,55 @@ describe('ArrayStorage', () => {
       const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
       contract.run();
     `);
+  });
+
+  test('canCall', () => {
+    expect(new ArrayStorageIterator().canCall()).toEqual(true);
+    expect(new ArrayStoragePush().canCall()).toEqual(true);
+    expect(new ArrayStoragePop().canCall()).toEqual(true);
+  });
+
+  test('invalid create', () => {
+    helpers.compileString(
+      `
+      import { ArrayStorage } from '@neo-one/smart-contract';
+
+      const storage = ArrayStorage.for<number>();
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidStructuredStorageFor },
+    );
+  });
+
+  test('invalid reference', () => {
+    helpers.compileString(
+      `
+      import { ArrayStorage } from '@neo-one/smart-contract';
+
+      const for = ArrayStorage.for;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid "reference"', () => {
+    helpers.compileString(
+      `
+      import { ArrayStorage } from '@neo-one/smart-contract';
+
+      const for = ArrayStorage['for'];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid reference - object', () => {
+    helpers.compileString(
+      `
+      import { ArrayStorage } from '@neo-one/smart-contract';
+
+      const { for } = ArrayStorage;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
   });
 });

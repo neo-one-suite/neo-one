@@ -1,5 +1,6 @@
 import { common } from '@neo-one/client-core';
 import { helpers, keys } from '../../../../__data__';
+import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('MapStorage', () => {
   test('get, set, delete, has', async () => {
@@ -22,20 +23,42 @@ describe('MapStorage', () => {
       }
 
       const storage = new StorageContract().prefix;
+
       storage.get('foo');
       assertEqual(storage.get('foo'), undefined);
       assertEqual(storage.has('foo'), false);
+      assertEqual(storage instanceof MapStorage, true);
 
       assertEqual(storage.delete('foo'), false);
       storage.delete('foo');
-      storage.set('foo', 10);
+      storage.set('foo', 10).set('bar', 5);
       assertEqual(storage.get('foo'), 10);
+      assertEqual(storage.get('bar'), 5);
       assertEqual(storage.has('foo'), true);
+      assertEqual(storage.has('bar'), true);
 
+      storage.delete('bar');
       assertEqual(storage.delete('foo'), true);
       assertEqual(storage.delete('foo'), false);
       assertEqual(storage.get('foo'), undefined);
       assertEqual(storage.has('foo'), false);
+
+      interface Storage<K, V> {
+        get(key: K): V | undefined;
+        has(key: K): boolean;
+        set(key: K, value: V): this;
+        delete(key: K): boolean;
+        [Symbol.iterator](): IterableIterator<[K, V]>;
+      }
+
+      const storageLike: Storage<string, number> | MapStorage<string, number> =
+        storage as Storage<string, number> | MapStorage<string, number>;
+
+      storageLike['get']('foo');
+      storageLike['has']('foo');
+      storageLike['set']('foo', 9);
+      storageLike['delete']('foo');
+      storageLike[Symbol.iterator]();
     `);
 
     await node.executeString(`
@@ -446,5 +469,49 @@ describe('MapStorage', () => {
       const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
       contract.run();
     `);
+  });
+
+  test('invalid create', () => {
+    helpers.compileString(
+      `
+      import { MapStorage } from '@neo-one/smart-contract';
+
+      const storage = MapStorage.for<string, number>();
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidStructuredStorageFor },
+    );
+  });
+
+  test('invalid reference', () => {
+    helpers.compileString(
+      `
+      import { MapStorage } from '@neo-one/smart-contract';
+
+      const for = MapStorage.for;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid "reference"', () => {
+    helpers.compileString(
+      `
+      import { MapStorage } from '@neo-one/smart-contract';
+
+      const for = MapStorage['for'];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid reference - object', () => {
+    helpers.compileString(
+      `
+      import { MapStorage } from '@neo-one/smart-contract';
+
+      const { for } = MapStorage;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
   });
 });

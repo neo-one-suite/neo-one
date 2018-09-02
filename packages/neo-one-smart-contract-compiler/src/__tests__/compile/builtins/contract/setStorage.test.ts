@@ -1,5 +1,6 @@
 import { common } from '@neo-one/client-core';
 import { helpers, keys } from '../../../../__data__';
+import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('SetStorage', () => {
   test('add, delete, has', async () => {
@@ -24,15 +25,34 @@ describe('SetStorage', () => {
       const storage = new StorageContract().prefix;
       storage.has('foo');
       assertEqual(storage.has('foo'), false);
+      assertEqual(storage instanceof SetStorage, true);
 
       assertEqual(storage.delete('foo'), false);
       storage.delete('foo');
-      storage.add('foo');
+      storage.add('foo').add('bar');
       assertEqual(storage.has('foo'), true);
+      assertEqual(storage.has('bar'), true);
 
+      storage.delete('bar')
       assertEqual(storage.delete('foo'), true);
       assertEqual(storage.delete('foo'), false);
       assertEqual(storage.has('foo'), false);
+      assertEqual(storage.has('bar'), false);
+
+      interface Storage<V> {
+        has(value: V): boolean;
+        add(value: V): this;
+        delete(value: V): boolean;
+        [Symbol.iterator](): IterableIterator<[V]>;
+      }
+
+      const storageLike: Storage<string> | SetStorage<string> =
+        storage as Storage<string> | SetStorage<string>;
+
+      storageLike['has']('foo');
+      storageLike['add']('foo');
+      storageLike['delete']('foo');
+      storageLike[Symbol.iterator]();
     `);
 
     await node.executeString(`
@@ -377,5 +397,49 @@ describe('SetStorage', () => {
       const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
       contract.run();
     `);
+  });
+
+  test('invalid create', () => {
+    helpers.compileString(
+      `
+      import { SetStorage } from '@neo-one/smart-contract';
+
+      const storage = SetStorage.for<number>();
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidStructuredStorageFor },
+    );
+  });
+
+  test('invalid reference', () => {
+    helpers.compileString(
+      `
+      import { SetStorage } from '@neo-one/smart-contract';
+
+      const for = SetStorage.for;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid "reference"', () => {
+    helpers.compileString(
+      `
+      import { SetStorage } from '@neo-one/smart-contract';
+
+      const for = SetStorage['for'];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid reference - object', () => {
+    helpers.compileString(
+      `
+      import { SetStorage } from '@neo-one/smart-contract';
+
+      const { for } = SetStorage;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
   });
 });

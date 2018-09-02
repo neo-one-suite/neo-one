@@ -27,12 +27,21 @@ export class VariableDeclarationCompiler extends NodeCompiler<ts.VariableDeclara
       }
 
       sb.scope.set(sb, node, options, tsUtils.node.getText(nameNode));
-    } else if (ts.isArrayBindingPattern(nameNode)) {
+
+      return;
+    }
+
+    if (expr === undefined) {
+      /* istanbul ignore next */
+      return;
+    }
+
+    if (ts.isArrayBindingPattern(nameNode)) {
       sb.emitHelper(
         nameNode,
         options,
         sb.helpers.arrayBinding({
-          type: expr === undefined ? undefined : sb.context.analysis.getType(expr),
+          type: sb.context.analysis.getType(expr),
           value: expr,
         }),
       );
@@ -41,7 +50,7 @@ export class VariableDeclarationCompiler extends NodeCompiler<ts.VariableDeclara
         nameNode,
         options,
         sb.helpers.objectBinding({
-          type: expr === undefined ? undefined : sb.context.analysis.getType(expr),
+          type: sb.context.analysis.getType(expr),
           value: expr,
         }),
       );

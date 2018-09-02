@@ -20,6 +20,9 @@ describe('Hash256', () => {
 
       Hash256.NEO;
       assertEqual(x.equals(Hash256.NEO), true);
+
+      const { NEO } = Hash256;
+      assertEqual(NEO.equals(Hash256.NEO), true);
     `);
   });
 
@@ -30,6 +33,9 @@ describe('Hash256', () => {
 
       Hash256.GAS;
       assertEqual(x.equals(Hash256.GAS), true);
+
+      const { GAS } = Hash256;
+      assertEqual(GAS.equals(Hash256.GAS), true);
     `);
   });
 });

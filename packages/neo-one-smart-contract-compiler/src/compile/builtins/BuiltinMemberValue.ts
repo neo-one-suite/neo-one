@@ -12,6 +12,7 @@ export abstract class BuiltinMemberValue implements BuiltinMemberValueType {
   public emitValue(sb: ScriptBuilder, node: MemberLikeExpression, options: VisitOptions): void {
     if (!this.canSet && options.setValue) {
       if (!this.isReadonly) {
+        /* istanbul ignore next */
         sb.context.reportError(node, DiagnosticCode.InvalidBuiltinModify, DiagnosticMessage.CannotModifyBuiltin);
       }
 

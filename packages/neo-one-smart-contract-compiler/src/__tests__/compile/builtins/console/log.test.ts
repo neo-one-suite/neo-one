@@ -196,4 +196,13 @@ describe('console.log', () => {
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
+
+  test('cannot be referenced - object literal', async () => {
+    helpers.compileString(
+      `
+      const { log } = console;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
 });

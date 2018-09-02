@@ -17,6 +17,7 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
     const options = sb.pushValueOptions(optionsIn);
     const returnType = sb.context.analysis.getType(node);
     if (returnType === undefined) {
+      /* istanbul ignore next */
       return;
     }
 
@@ -24,6 +25,7 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
     const props = properties.map((prop) => {
       const propType = sb.context.analysis.getTypeOfSymbol(prop, node);
       if (propType === undefined) {
+        /* istanbul ignore next */
         return undefined;
       }
 

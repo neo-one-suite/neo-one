@@ -12,7 +12,7 @@ class AccountConstructorInterface extends BuiltinInterface {}
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addContractInterface('Account', new AccountInterface());
-  builtins.addContractValue('Account', new ValueInstanceOf((sb) => sb.helpers.isAccount));
+  builtins.addContractValue('Account', new ValueInstanceOf('AccountConstructor', (sb) => sb.helpers.isAccount));
   builtins.addContractMember(
     'Account',
     'address',

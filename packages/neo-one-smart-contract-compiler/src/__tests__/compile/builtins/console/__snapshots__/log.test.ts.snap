@@ -1,5 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`console.log cannot be referenced - object literal 1`] = `
+"snippetCode.ts (2,15): Builtin properties cannot be referenced
+
+      1 | 
+    > 2 |       const { log } = console;
+        |               ^
+      3 |     
+"
+`;
+
 exports[`console.log cannot be referenced 1`] = `
 "snippetCode.ts (2,27): Builtin properties cannot be referenced
 

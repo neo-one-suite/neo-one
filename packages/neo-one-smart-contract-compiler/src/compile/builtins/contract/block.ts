@@ -11,7 +11,7 @@ class BlockConstructorInterface extends BuiltinInterface {}
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addContractInterface('Block', new BlockInterface());
-  builtins.addContractValue('Block', new ValueInstanceOf((sb) => sb.helpers.isBlock));
+  builtins.addContractValue('Block', new ValueInstanceOf('BlockConstructor', (sb) => sb.helpers.isBlock));
   builtins.addContractMember(
     'Block',
     'transactions',

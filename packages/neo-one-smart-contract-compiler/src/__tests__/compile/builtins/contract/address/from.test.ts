@@ -34,6 +34,16 @@ describe('Address.from', () => {
     );
   });
 
+  test('cannot be referenced - object literal', async () => {
+    helpers.compileString(
+      `
+      import { Address } from '@neo-one/smart-contract';
+      const { from } = Address;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
   test('cannot be element referenced', async () => {
     helpers.compileString(
       `

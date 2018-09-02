@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SetStorage invalid "reference" 1`] = `
+"snippetCode.ts (4,30): Builtin properties cannot be referenced
+
+      2 |       import { SetStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const for = SetStorage['for'];
+        |                              ^
+      5 |     
+"
+`;
+
+exports[`SetStorage invalid create 1`] = `
+"snippetCode.ts (4,23): Persistent storage classes may only be used as SmartContract properties.
+
+      2 |       import { SetStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const storage = SetStorage.for<number>();
+        |                       ^
+      5 |     
+"
+`;
+
+exports[`SetStorage invalid reference - object 1`] = `
+"snippetCode.ts (4,15): Builtin properties cannot be referenced
+
+      2 |       import { SetStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const { for } = SetStorage;
+        |               ^
+      5 |     
+"
+`;
+
+exports[`SetStorage invalid reference 1`] = `
+"snippetCode.ts (4,30): Builtin properties cannot be referenced
+
+      2 |       import { SetStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const for = SetStorage.for;
+        |                              ^
+      5 |     
+"
+`;

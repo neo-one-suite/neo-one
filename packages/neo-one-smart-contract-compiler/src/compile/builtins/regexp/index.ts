@@ -1,9 +1,11 @@
-import { BuiltinBase } from '../BuiltinBase';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
+import { BuiltinValueObject } from '../BuiltinValueObject';
 
 class RegExpInterface extends BuiltinInterface {}
-class RegExpValue extends BuiltinBase {}
+class RegExpValue extends BuiltinValueObject {
+  public readonly type = 'RegExpConstructor';
+}
 class RegExpConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name

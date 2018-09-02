@@ -2,6 +2,7 @@ import { Attribute, Input, Output } from '@neo-one/client';
 import { AttributeUsage, common } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
+import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Transaction', () => {
   test('properties', async () => {
@@ -110,6 +111,39 @@ describe('Transaction', () => {
       }
     `,
       { type: 'error' },
+    );
+  });
+
+  test('invalid reference', () => {
+    helpers.compileString(
+      `
+      import { Transaction } from '@neo-one/smart-contract';
+
+      const for = Transaction.for;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid "reference"', () => {
+    helpers.compileString(
+      `
+      import { Transaction } from '@neo-one/smart-contract';
+
+      const for = Transaction['for'];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid reference - object', () => {
+    helpers.compileString(
+      `
+      import { Transaction } from '@neo-one/smart-contract';
+
+      const { for } = Transaction;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 });

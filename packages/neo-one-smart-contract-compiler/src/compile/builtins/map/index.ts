@@ -16,6 +16,8 @@ import { MapSize } from './size';
 class MapInterface extends BuiltinInterface {}
 class ReadonlyMapInterface extends BuiltinInterface {}
 class MapValue extends BuiltinNew {
+  public readonly type = 'MapConstructor';
+
   public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [val]

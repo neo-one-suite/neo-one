@@ -12,6 +12,8 @@ import { MapStorageSet } from './set';
 
 class MapStorageInterface extends BuiltinInterface {}
 class MapStorageValue extends BuiltinInstanceOf {
+  public readonly type = 'MapStorageConstructor';
+
   public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [val]

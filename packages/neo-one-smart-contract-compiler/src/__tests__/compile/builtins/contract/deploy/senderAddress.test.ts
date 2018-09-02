@@ -25,4 +25,15 @@ describe('Deploy.senderAddress', () => {
       { type: 'error', code: DiagnosticCode.InvalidSenderAddress },
     );
   });
+
+  test('cannot be referenced - object literal', async () => {
+    helpers.compileString(
+      `
+      import { Deploy } from '@neo-one/smart-contract';
+
+      const { senderAddress } = Deploy;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidSenderAddress },
+    );
+  });
 });

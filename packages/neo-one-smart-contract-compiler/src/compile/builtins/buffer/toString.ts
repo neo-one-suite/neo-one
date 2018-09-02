@@ -3,13 +3,13 @@ import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { BuiltinInstanceMemberCall } from '../BuiltinInstanceMemberCall';
-import { MemberLikeExpression } from '../types';
+import { CallMemberLikeExpression } from '../types';
 
 const isUTF8 = (node: ts.Node) => ts.isStringLiteral(node) && tsUtils.literal.getLiteralValue(node) === 'utf8';
 
 // tslint:disable-next-line export-name
 export class BufferToString extends BuiltinInstanceMemberCall {
-  public canCall(_sb: ScriptBuilder, _func: MemberLikeExpression, node: ts.CallExpression): boolean {
+  public canCall(_sb: ScriptBuilder, _func: CallMemberLikeExpression, node: ts.CallExpression): boolean {
     const arg = tsUtils.argumented.getArguments(node)[0] as ts.Expression | undefined;
     if (arg === undefined) {
       /* istanbul ignore next */
@@ -21,13 +21,13 @@ export class BufferToString extends BuiltinInstanceMemberCall {
 
   public emitCall(
     sb: ScriptBuilder,
-    func: MemberLikeExpression,
+    func: CallMemberLikeExpression,
     node: ts.CallExpression,
     optionsIn: VisitOptions,
     visited: boolean,
   ): void {
     const options = sb.pushValueOptions(optionsIn);
-    if (!visited && (ts.isPropertyAccessExpression(func) || ts.isElementAccessExpression(func))) {
+    if (!visited) {
       // [arrayVal]
       sb.visit(tsUtils.expression.getExpression(func), options);
     }

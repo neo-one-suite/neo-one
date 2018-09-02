@@ -1,7 +1,5 @@
 import { AnyNameableNode, tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { DiagnosticCode } from '../../DiagnosticCode';
-import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -13,14 +11,7 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
     const options = sb.pushValueOptions(optionsIn);
     const sourceFile = tsUtils.importExport.getModuleSpecifierSourceFile(sb.context.typeChecker, node);
     if (sourceFile === undefined) {
-      const specifier = tsUtils.importExport.getModuleSpecifier(node);
-      sb.context.reportError(
-        node,
-        DiagnosticCode.UnknownModule,
-        DiagnosticMessage.UnknownModule,
-        specifier === undefined ? 'unknown' : tsUtils.literal.getLiteralValue(specifier),
-      );
-
+      /* istanbul ignore next */
       return;
     }
 

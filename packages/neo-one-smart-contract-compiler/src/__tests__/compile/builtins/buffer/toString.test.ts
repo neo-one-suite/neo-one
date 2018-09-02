@@ -10,6 +10,26 @@ describe('Buffer.prototype.toString', () => {
     `);
   });
 
+  test('should equal equivalent string with "toString"', async () => {
+    await helpers.executeString(`
+      const x = Buffer.from('hello', 'utf8');
+
+      assertEqual(x['toString']('utf8'), 'hello');
+    `);
+  });
+
+  test('should equal equivalent string with "toString" as object or Buffer', async () => {
+    await helpers.executeString(`
+      interface Buf {
+        toString(encoding: 'utf8'): string;
+      }
+      const x: Buffer | Buf = Buffer.from('hello', 'utf8') as Buffer | Buf;
+
+      x['toString']('utf8');
+      assertEqual(x['toString']('utf8'), 'hello');
+    `);
+  });
+
   test('cannot be referenced', async () => {
     helpers.compileString(
       `

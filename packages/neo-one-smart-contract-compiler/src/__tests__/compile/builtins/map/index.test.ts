@@ -5,6 +5,7 @@ describe('Map', () => {
     await helpers.executeString(`
       const x = new Map<string, number>();
 
+      new Map<string, number>();
       x instanceof Map;
       assertEqual(x instanceof Map, true);
     `);

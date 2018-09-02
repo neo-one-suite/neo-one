@@ -56,7 +56,7 @@ describe('Blockchain', () => {
       `
       import { AttributeUsage, Blockchain, TransactionType } from '@neo-one/smart-contract';
 
-      const transaction = Blockchain.currentTransaction;
+      const { currentTransaction: transaction } = Blockchain;
 
       assertEqual(transaction.type, TransactionType.Invocation);
 

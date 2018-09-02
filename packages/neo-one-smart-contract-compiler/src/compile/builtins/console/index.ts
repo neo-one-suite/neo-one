@@ -1,10 +1,12 @@
-import { BuiltinBase } from '../BuiltinBase';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
+import { BuiltinValueObject } from '../BuiltinValueObject';
 import { ConsoleLog } from './log';
 
 class ConsoleInterface extends BuiltinInterface {}
-class ConsoleValue extends BuiltinBase {}
+class ConsoleValue extends BuiltinValueObject {
+  public readonly type = 'Console';
+}
 
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {

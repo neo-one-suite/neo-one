@@ -11,6 +11,17 @@ exports[`Map.prototype.forEach cannot be "referenced" 1`] = `
 "
 `;
 
+exports[`Map.prototype.forEach cannot be referenced - object literal 1`] = `
+"snippetCode.ts (3,15): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       const x = new Map<string, number>();
+    > 3 |       const { forEach } = x;
+        |               ^
+      4 |     
+"
+`;
+
 exports[`Map.prototype.forEach cannot be referenced 1`] = `
 "snippetCode.ts (3,19): Builtin properties cannot be referenced
 

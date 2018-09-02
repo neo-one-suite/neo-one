@@ -8,6 +8,8 @@ describe('Map.prototype.get/set/has/delete', () => {
       x.set('foo', 'bar');
       const result = x.set('foo', 'baz');
 
+      x.get('foo');
+      x.has('foo');
       assertEqual(result, x);
       assertEqual(x.get('foo'), 'baz');
       assertEqual(x.has('foo'), true);

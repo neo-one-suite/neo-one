@@ -33,6 +33,16 @@ describe('PublicKey.from', () => {
     );
   });
 
+  test('cannot be referenced - object', async () => {
+    helpers.compileString(
+      `
+      import { PublicKey } from '@neo-one/smart-contract';
+      const { from } = PublicKey;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
   test('cannot be element referenced', async () => {
     helpers.compileString(
       `

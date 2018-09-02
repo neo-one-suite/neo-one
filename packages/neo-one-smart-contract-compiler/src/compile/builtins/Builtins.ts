@@ -79,23 +79,31 @@ export class Builtins {
     isEligible: (builtin: T) => boolean,
     symbolMembers = false,
   ): ReadonlyArray<[string, T]> {
-    let testKey = (key: string) => !key.startsWith('__@');
+    const filterPseudoSymbol = (symbol: ts.Symbol, key: string) => {
+      const symbolSymbol = this.getInterfaceSymbolBase('SymbolConstructor', this.getGlobals());
+
+      return tsUtils.symbol.getMember(symbolSymbol, key) !== symbol;
+    };
+    const isSymbolKey = (key: string) => key.startsWith('__@');
+
+    let testKey = (key: string) => !isSymbolKey(key);
     let modifyKey = (key: string) => key;
     if (symbolMembers) {
-      testKey = (key) => key.startsWith('__@');
+      testKey = isSymbolKey;
       modifyKey = (key) => key.slice(3);
     }
 
-    const interfaceSymbol = this.getAnyInterfaceSymbol(name);
-    const members = this.builtinMembers.get(interfaceSymbol);
-    if (members === undefined) {
-      return [];
-    }
+    const members = this.getAllMembers(name);
 
     const mutableMembers: Array<[string, T]> = [];
     members.forEach((builtin, memberSymbol) => {
       const memberName = tsUtils.symbol.getName(memberSymbol);
-      if (isMember(builtin) && testKey(memberName) && isEligible(builtin)) {
+      if (
+        isMember(builtin) &&
+        filterPseudoSymbol(memberSymbol, memberName) &&
+        testKey(memberName) &&
+        isEligible(builtin)
+      ) {
         mutableMembers.push([modifyKey(memberName), builtin]);
       }
     });
@@ -225,36 +233,30 @@ export class Builtins {
     getValue: (value: [ts.Symbol, Builtin]) => T,
   ): T | undefined {
     return this.memoized('only-member-base', `${value}$${name}`, () => {
-      const interfaceSymbol = this.getAnyInterfaceSymbol(value);
-      const members = this.builtinMembers.get(interfaceSymbol);
-      if (members === undefined) {
-        return undefined;
-      }
-
+      const members = this.getAllMembers(value);
       const result = [...members.entries()].find(([symbol]) => tsUtils.symbol.getName(symbol) === name);
 
-      if (result === undefined) {
-        // tslint:disable-next-line no-loop-statement
-        for (const decl of tsUtils.symbol.getDeclarations(interfaceSymbol)) {
-          if (ts.isInterfaceDeclaration(decl)) {
-            // tslint:disable-next-line no-loop-statement
-            for (const clause of tsUtils.heritage.getHeritageClauses(decl)) {
-              // tslint:disable-next-line no-loop-statement
-              for (const type of tsUtils.heritage.getTypeNodes(clause)) {
-                const expr = tsUtils.expression.getExpression(type);
-                if (ts.isIdentifier(expr)) {
-                  const member = this.getOnlyMemberBase(tsUtils.node.getText(expr), name, getValue);
-                  if (member !== undefined) {
-                    return member;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
       return result === undefined ? undefined : getValue(result);
+    });
+  }
+
+  private getAllMembers(value: string): Map<ts.Symbol, Builtin> {
+    return this.memoized('get-all-members', value, () => {
+      const interfaceSymbol = this.getAnyInterfaceSymbol(value);
+      const interfaceMembers = this.builtinMembers.get(interfaceSymbol);
+      const memberEntries = [...this.getInheritedInterfaceSymbols(interfaceSymbol)].reduce(
+        (acc, parentInterfaceSymbol) => {
+          const parentInterfaceMembers = this.builtinMembers.get(parentInterfaceSymbol);
+          if (parentInterfaceMembers === undefined) {
+            return acc;
+          }
+
+          return [...parentInterfaceMembers.entries()].concat(acc);
+        },
+        interfaceMembers === undefined ? [] : [...interfaceMembers.entries()],
+      );
+
+      return new Map(memberEntries);
     });
   }
 
@@ -358,6 +360,7 @@ export class Builtins {
               const expr = tsUtils.expression.getExpression(type);
               if (ts.isIdentifier(expr)) {
                 const interfaceSymbol = this.getAnyInterfaceSymbol(tsUtils.node.getText(expr));
+                symbols.add(interfaceSymbol);
                 this.getInheritedInterfaceSymbols(interfaceSymbol).forEach((inheritedSymbol) => {
                   symbols.add(inheritedSymbol);
                 });

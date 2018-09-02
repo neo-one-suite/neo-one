@@ -21,7 +21,7 @@ export class ValueFor extends BuiltinMemberCall {
     optionsIn: VisitOptions,
   ): void {
     if (tsUtils.argumented.getArguments(node).length < 1) {
-      /* instanbul ignore next */
+      /* istanbul ignore next */
       return;
     }
 

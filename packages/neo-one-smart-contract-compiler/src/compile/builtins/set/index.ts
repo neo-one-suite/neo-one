@@ -15,6 +15,8 @@ import { SetIterator } from './iterator';
 class SetInterface extends BuiltinInterface {}
 class ReadonlySetInterface extends BuiltinInterface {}
 class SetValue extends BuiltinNew {
+  public readonly type = 'SetConstructor';
+
   public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [val]

@@ -12,6 +12,8 @@ import { BufferToString } from './toString';
 
 class BufferInterface extends BuiltinInterface {}
 class BufferValue extends BuiltinInstanceOf {
+  public readonly type = 'BufferConstructor';
+
   public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [val]

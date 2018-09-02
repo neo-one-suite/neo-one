@@ -15,6 +15,7 @@ export class Bar implements SmartContract {
   };
 
   public getFoo(): string {
+    LinkedSmartContract.for<Foo>();
     const foo = LinkedSmartContract.for<Foo>();
 
     const expected = getArgument<[Address]>(1)[0];

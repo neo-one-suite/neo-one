@@ -1,4 +1,5 @@
 import { helpers } from '../../../../__data__';
+import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Contract', () => {
   test('properties', async () => {
@@ -17,6 +18,7 @@ describe('Contract', () => {
         throw new Error('For TS');
       }
 
+      assertEqual(contract instanceof Contract, true);
       assertEqual(contract.script, ${helpers.getBufferHash(contract.script)});
       assertEqual(contract.payable, true);
     `);
@@ -31,6 +33,39 @@ describe('Contract', () => {
       }
     `,
       { type: 'error' },
+    );
+  });
+
+  test('invalid reference', () => {
+    helpers.compileString(
+      `
+      import { Contract } from '@neo-one/smart-contract';
+
+      const for = Contract.for;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid "reference"', () => {
+    helpers.compileString(
+      `
+      import { Contract } from '@neo-one/smart-contract';
+
+      const for = Contract['for'];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid reference - object', () => {
+    helpers.compileString(
+      `
+      import { Contract } from '@neo-one/smart-contract';
+
+      const { for } = Contract;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 });

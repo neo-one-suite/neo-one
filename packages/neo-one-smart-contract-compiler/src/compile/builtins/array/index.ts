@@ -24,6 +24,7 @@ import { ArrayToString } from './toString';
 class ArrayInterface extends BuiltinInterface {}
 class ReadonlyArrayInterface extends BuiltinInterface {}
 class ArrayValue extends BuiltinInstanceOf {
+  public readonly type = 'ArrayConstructor';
   public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [val]

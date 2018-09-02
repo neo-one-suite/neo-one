@@ -33,6 +33,16 @@ describe('Hash256.from', () => {
     );
   });
 
+  test('cannot be referenced - object literal', async () => {
+    helpers.compileString(
+      `
+      import { Hash256 } from '@neo-one/smart-contract';
+      const { from } = Hash256;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
   test('cannot be element referenced', async () => {
     helpers.compileString(
       `

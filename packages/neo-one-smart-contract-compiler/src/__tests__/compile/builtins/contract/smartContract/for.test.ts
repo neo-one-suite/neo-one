@@ -193,6 +193,7 @@ describe('SmartContract.for', () => {
       interface Contract {
         run(value: Address): void;
       }
+      SmartContract.for<Contract>(Address.from('${callingContract.address}'));
       const contract = SmartContract.for<Contract>(Address.from('${callingContract.address}'));
       contract.run(Address.from('${dynamicContract.address}'));
     `);

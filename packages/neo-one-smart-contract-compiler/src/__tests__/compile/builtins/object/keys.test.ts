@@ -113,6 +113,15 @@ describe('Object.keys', () => {
     );
   });
 
+  test('cannot be property referenced - object literal', async () => {
+    helpers.compileString(
+      `
+      const { keys } = Object;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
   test('cannot be element referenced', async () => {
     helpers.compileString(
       `
