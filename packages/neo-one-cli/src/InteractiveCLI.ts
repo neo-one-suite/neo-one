@@ -250,10 +250,10 @@ export class InteractiveCLI {
         distinctUntilChanged(),
       ),
     ).pipe(
-      mergeScan(
+      mergeScan<[string, number, number], ServerManager | undefined>(
         (managerIn, [dataPath, port, httpPort]) =>
           defer(async () => {
-            let manager = managerIn as ServerManager | undefined;
+            let manager = managerIn;
             const first = manager === undefined;
             if (manager !== undefined) {
               await manager.kill();

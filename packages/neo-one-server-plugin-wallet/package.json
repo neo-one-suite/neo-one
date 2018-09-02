@@ -22,7 +22,7 @@
     "lodash": "^4.17.10",
     "ora": "^3.0.0",
     "redux-persist-node-storage": "^2.0.0",
-    "rxjs": "^6.2.2",
+    "rxjs": "^6.3.1",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3"
   }

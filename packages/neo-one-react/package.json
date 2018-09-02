@@ -9,8 +9,8 @@
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.63",
     "@types/lodash": "^4.14.116",
-    "@types/react": "^16.4.12",
-    "@types/react-select": "^2.0.2",
+    "@types/react": "^16.4.13",
+    "@types/react-select": "^2.0.3",
     "bignumber.js": "^7.2.1",
     "constate": "^0.8.0",
     "date-fns": "^2.0.0-alpha.16",
@@ -21,8 +21,8 @@
     "react-icons": "^3.0.5",
     "react-select": "^2.0.0",
     "reakit": "^0.14.5",
-    "rxjs": "^6.2.2",
-    "styled-tools": "^1.4.1",
+    "rxjs": "^6.3.1",
+    "styled-tools": "^1.4.3",
     "tslib": "^1.9.3"
   }
 }

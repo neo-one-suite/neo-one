@@ -361,7 +361,7 @@ export class Node implements INode {
           return mutableConsensus.start$();
         }
 
-        return _of(0);
+        return _of(undefined);
       }),
     );
 

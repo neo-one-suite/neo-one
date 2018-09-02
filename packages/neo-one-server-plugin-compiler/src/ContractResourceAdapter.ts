@@ -205,8 +205,8 @@ export class ContractResourceAdapter {
 
     this.update$ = new ReplaySubject(1);
     this.resource$ = this.update$.pipe(
-      switchMap<void, Contract>(() =>
-        _of({
+      switchMap(() =>
+        _of<Contract>({
           plugin: this.resourceType.plugin.name,
           resourceType: this.resourceType.name,
           name: this.name,
@@ -220,7 +220,7 @@ export class ContractResourceAdapter {
           payable: this.payable,
         }),
       ),
-      shareReplay<Contract>(1),
+      shareReplay(1),
     );
 
     this.update$.next();
