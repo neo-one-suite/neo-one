@@ -110,6 +110,8 @@ const globs = {
     `!${getDistBase(format)}/packages/*/src/__tests__/**/*`,
     `!${getDistBase(format)}/packages/*/src/__e2e__/**/*`,
     `!${getDistBase(format)}/packages/*/src/bin/**/*`,
+    `!${getDistBase(format)}/packages/neo-one-smart-contract-lib/src/*.ts`,
+    `!${getDistBase(format)}/packages/neo-one-server-plugin-wallet/src/contracts/*.ts`,
   ],
   types: ['packages/neo-one-types/**/*', '!packages/neo-one-types/package.json'],
   bin: ['packages/*/src/bin/*.ts', '!packages/neo-one-playground/**/*'],
