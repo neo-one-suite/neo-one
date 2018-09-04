@@ -47,7 +47,7 @@ export class ArrSomeHelper extends Helper {
           // [boolean, !result, result, enumerator]
           sb.emitSysCall(node, 'Neo.Enumerator.Next');
           // [boolean, result, enumerator]
-          sb.emitOp(node, 'AND');
+          sb.emitOp(node, 'BOOLAND');
         },
         each: (innerOptions) => {
           // [enumerator]

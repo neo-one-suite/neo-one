@@ -45,7 +45,7 @@ export class Token extends SmartContract {
       throw new Error(`Amount must be greater than 0: ${amount}`);
     }
 
-    if (!Address.isSender(from)) {
+    if (!Address.isCaller(from)) {
       return false;
     }
 

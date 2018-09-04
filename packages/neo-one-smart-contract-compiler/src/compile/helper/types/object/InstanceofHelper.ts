@@ -60,7 +60,7 @@ export class InstanceofHelper extends Helper {
           // [hasPrototype, notSamePrototype, samePrototype, nextPrototypeVal, prototypeVal]
           sb.emitOp(node, 'NOT');
           // [hasPrototypeAndNotSame, samePrototype, nextPrototypeVal, prototypeVal]
-          sb.emitOp(node, 'AND');
+          sb.emitOp(node, 'BOOLAND');
         },
         each: () => {
           // [nextPrototypeVal, prototypeVal]

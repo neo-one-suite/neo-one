@@ -31,7 +31,7 @@ export class ICO extends SmartContract {
     public readonly icoDurationSeconds: Integer = 157700000,
   ) {
     super();
-    if (!Address.isSender(owner)) {
+    if (!Address.isCaller(owner)) {
       throw new Error('Sender was not the owner.');
     }
   }

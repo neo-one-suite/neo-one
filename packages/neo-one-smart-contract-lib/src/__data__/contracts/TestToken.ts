@@ -23,7 +23,7 @@ export class TestToken extends Token<4> {
 
   public constructor(owner: Address) {
     super();
-    if (!Address.isSender(owner)) {
+    if (!Address.isCaller(owner)) {
       throw new Error('Sender was not the owner.');
     }
     this.owner = owner;

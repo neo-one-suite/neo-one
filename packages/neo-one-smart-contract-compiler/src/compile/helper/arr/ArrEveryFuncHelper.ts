@@ -33,7 +33,7 @@ export class ArrEveryFuncHelper extends Helper {
           // [boolean, result, enumerator, result, idx, callable]
           sb.emitSysCall(node, 'Neo.Enumerator.Next');
           // [boolean, enumerator, result, idx, callable]
-          sb.emitOp(node, 'AND');
+          sb.emitOp(node, 'BOOLAND');
         },
         each: (innerOptions) => {
           // [enumerator, idx, callable]

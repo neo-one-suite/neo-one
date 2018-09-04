@@ -35,9 +35,23 @@ export interface AddressConstructor {
    */
   readonly from: (value: string) => Address;
   /**
+   * Verifies that the invocation was directly called AND approved by `Address`.
+   *
+   * Smart contracts should invoke this function before taking transferring items for `Address`es, like transferring tokens, that require the permission of the `Address`.
+   *
+   * @example
+   *
+   * if (!Address.isCaller(address)) {
+   *   return false;
+   * }
+   *
+   * @returns true if `Address` approves this invocation.
+   */
+  readonly isCaller: (address: Address) => boolean;
+  /**
    * Verifies that the `Transaction` was signed by the `address`.
    *
-   * Smart contracts should invoke this function before taking actions on `Address`es, like transferring tokens, that require the permission of the `Address`.
+   * In most cases, smart contracts should instead use `Address.isCaller`.
    *
    * @example
    *
@@ -45,7 +59,7 @@ export interface AddressConstructor {
    *   return false;
    * }
    *
-   * @returns true if `Address` approved this `Transaction`
+   * @returns true if `Address` signed this `Transaction`
    */
   readonly isSender: (address: Address) => boolean;
   readonly [OpaqueTagSymbol0]: unique symbol;
