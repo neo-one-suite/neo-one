@@ -95,6 +95,8 @@ import {
   CreateIteratorIterableIteratorHelperOptions,
   IterableIteratorForEachHelper,
   IterableIteratorForEachHelperOptions,
+  IterableIteratorReduceHelper,
+  IterableIteratorReduceHelperOptions,
 } from './iterableIterator';
 import {
   RawEnumeratorForEachFuncHelper,
@@ -107,10 +109,14 @@ import {
   RawIteratorForEachHelperOptions,
   RawIteratorForEachKeyHelper,
   RawIteratorForEachKeyHelperOptions,
+  RawIteratorReduceBaseHelper,
+  RawIteratorReduceBaseHelperOptions,
+  RawIteratorReduceHelper,
+  RawIteratorReduceHelperOptions,
 } from './iterator';
 import { CreateIteratorResultHelper } from './iteratorResult';
 import { KeyedHelper } from './KeyedHelper';
-import { MapDeleteHelper } from './map';
+import { MapDeleteHelper, MapReduceHelper, MapReduceHelperOptions } from './map';
 import {
   AddEmptyModuleHelper,
   ExportHelper,
@@ -186,6 +192,12 @@ import {
   SetArrayStorageHelper,
   SetStructuredStorageHelper,
   StructuredStorageBaseHelperOptions,
+  StructuredStorageReduceBaseHelper,
+  StructuredStorageReduceBaseHelperOptions,
+  StructuredStorageReduceHelper,
+  StructuredStorageReduceHelperOptions,
+  StructuredStorageReduceValHelper,
+  StructuredStorageReduceValHelperOptions,
   UnwrapKeyStructuredStorageHelper,
 } from './storage';
 import {
@@ -490,6 +502,7 @@ export interface Helpers {
 
   // iterableIterator
   readonly iterableIteratorForEach: (options: IterableIteratorForEachHelperOptions) => IterableIteratorForEachHelper;
+  readonly iterableIteratorReduce: (options: IterableIteratorReduceHelperOptions) => IterableIteratorReduceHelper;
   readonly createEnumeratorIterableIterator: (
     options: CreateEnumeratorIterableIteratorHelperOptions,
   ) => CreateEnumeratorIterableIteratorHelper;
@@ -509,12 +522,15 @@ export interface Helpers {
     options: RawIteratorForEachFuncBaseHelperOptions,
   ) => RawIteratorForEachFuncBaseHelper;
   readonly rawEnumeratorForEachFunc: RawEnumeratorForEachFuncHelper;
+  readonly rawIteratorReduce: (options: RawIteratorReduceHelperOptions) => RawIteratorReduceHelper;
+  readonly rawIteratorReduceBase: (options: RawIteratorReduceBaseHelperOptions) => RawIteratorReduceBaseHelper;
 
   // iteratorResult
   readonly createIteratorResult: CreateIteratorResultHelper;
 
   // map
   readonly mapDelete: MapDeleteHelper;
+  readonly mapReduce: (options: MapReduceHelperOptions) => MapReduceHelper;
 
   // storage
   readonly putCommonStorage: PutCommonStorageHelper;
@@ -576,6 +592,13 @@ export interface Helpers {
   readonly putArrayStorageLength: PutArrayStorageLengthHelper;
   readonly handlePrefixArrayStructuredStorage: HandlePrefixArrayStructuredStorageHelper;
   readonly unwrapKeyStructuredStorage: (options: TypedHelperOptions) => UnwrapKeyStructuredStorageHelper;
+  readonly structuredStorageReduceBase: (
+    options: StructuredStorageReduceBaseHelperOptions,
+  ) => StructuredStorageReduceBaseHelper;
+  readonly structuredStorageReduce: (options: StructuredStorageReduceHelperOptions) => StructuredStorageReduceHelper;
+  readonly structuredStorageReduceVal: (
+    options: StructuredStorageReduceValHelperOptions,
+  ) => StructuredStorageReduceValHelper;
 
   // types
   readonly forBuiltinType: (options: ForBuiltinTypeHelperOptions) => ForBuiltinTypeHelper;
@@ -853,6 +876,7 @@ export const createHelpers = (): Helpers => {
 
     // iterableIterator
     iterableIteratorForEach: (options) => new IterableIteratorForEachHelper(options),
+    iterableIteratorReduce: (options) => new IterableIteratorReduceHelper(options),
     createEnumeratorIterableIterator: (options) => new CreateEnumeratorIterableIteratorHelper(options),
     createIterableIteratorBase: (options) => new CreateIterableIteratorBaseHelper(options),
     createIteratorIterableIterator: (options) => new CreateIteratorIterableIteratorHelper(options),
@@ -864,12 +888,15 @@ export const createHelpers = (): Helpers => {
     rawIteratorForEachFunc: new RawIteratorForEachFuncHelper(),
     rawIteratorForEachFuncBase: (options) => new RawIteratorForEachFuncBaseHelper(options),
     rawEnumeratorForEachFunc: new RawEnumeratorForEachFuncHelper(),
+    rawIteratorReduce: (options) => new RawIteratorReduceHelper(options),
+    rawIteratorReduceBase: (options) => new RawIteratorReduceBaseHelper(options),
 
     // iteratorResult
     createIteratorResult: new CreateIteratorResultHelper(),
 
     // map
     mapDelete: new MapDeleteHelper(),
+    mapReduce: (options) => new MapReduceHelper(options),
 
     // storage
     putCommonStorage: new PutCommonStorageHelper(),
@@ -912,6 +939,9 @@ export const createHelpers = (): Helpers => {
     putArrayStorageLength: new PutArrayStorageLengthHelper(),
     handlePrefixArrayStructuredStorage: new HandlePrefixArrayStructuredStorageHelper(),
     unwrapKeyStructuredStorage: (options) => new UnwrapKeyStructuredStorageHelper(options),
+    structuredStorageReduceBase: (options) => new StructuredStorageReduceBaseHelper(options),
+    structuredStorageReduce: (options) => new StructuredStorageReduceHelper(options),
+    structuredStorageReduceVal: (options) => new StructuredStorageReduceValHelper(options),
 
     // types
     forBuiltinType: (options) => new ForBuiltinTypeHelper(options),

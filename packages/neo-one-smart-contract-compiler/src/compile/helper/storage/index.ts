@@ -36,4 +36,7 @@ export * from './PutStorageHelper';
 export * from './SetArrayStorageHelper';
 export * from './SetStructuredStorageHelper';
 export * from './StructuredStorageBaseHelper';
+export * from './StructuredStorageReduceBaseHelper';
+export * from './StructuredStorageReduceHelper';
+export * from './StructuredStorageReduceValHelper';
 export * from './UnwrapKeyStructuredStorageHelper';
