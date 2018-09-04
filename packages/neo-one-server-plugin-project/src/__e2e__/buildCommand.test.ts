@@ -178,7 +178,6 @@ const verifySmartContracts = async (
     decimals,
     amountPerNEO,
     icoOwner,
-    owner,
     startTimeSeconds,
     icoDurationSeconds,
     initialTotalSupply,
@@ -189,7 +188,6 @@ const verifySmartContracts = async (
     tokenRead.decimals(),
     icoRead.amountPerNEO(),
     icoRead.owner(),
-    tokenRead.owner(),
     icoRead.startTimeSeconds(),
     icoRead.icoDurationSeconds(),
     tokenRead.totalSupply(),
@@ -200,7 +198,6 @@ const verifySmartContracts = async (
   expect(decimals.toString()).toEqual('8');
   expect(amountPerNEO.toString()).toEqual('10');
   expect(icoOwner).toEqual(accountID.address);
-  expect(owner).toEqual(accountID.address);
   expect(startTimeSeconds.gte(new BigNumber(nowSeconds))).toBeTruthy();
   expect(icoDurationSeconds.toString()).toEqual('157700000');
   expect(initialTotalSupply.toString()).toEqual('0');

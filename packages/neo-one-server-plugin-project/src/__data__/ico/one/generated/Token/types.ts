@@ -1,4 +1,4 @@
-/* @hash 7eeca6f7616dd8b2ad7191fc3a8e7e57 */
+/* @hash ba3414cc02a76dce98b23ae0175d60b4 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -26,7 +26,6 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
   readonly balanceOf: (address: AddressString) => Promise<BigNumber>;
   readonly decimals: () => Promise<BigNumber>;
   readonly deploy: (
-    owner?: AddressString,
     options?: TransactionOptions,
   ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
   readonly issue: (
@@ -35,7 +34,6 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
     options?: TransactionOptions,
   ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
   readonly name: () => Promise<string>;
-  readonly owner: () => Promise<AddressString>;
   readonly symbol: () => Promise<string>;
   readonly totalSupply: () => Promise<BigNumber>;
   readonly transfer: (
@@ -50,7 +48,6 @@ export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {
   readonly balanceOf: (address: AddressString) => Promise<BigNumber>;
   readonly decimals: () => Promise<BigNumber>;
   readonly name: () => Promise<string>;
-  readonly owner: () => Promise<AddressString>;
   readonly symbol: () => Promise<string>;
   readonly totalSupply: () => Promise<BigNumber>;
 }

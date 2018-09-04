@@ -699,7 +699,9 @@ export class Blockchain {
     if (stack.length !== 1) {
       throw new ScriptVerifyError(
         `Verification did not return one result. This may be a bug in the ` +
-          `smart contract. Found ${stack.length} results.`,
+          `smart contract compiler or the smart contract itself. If you are using the NEO•ONE compiler please see <insert_url>. Found ${
+            stack.length
+          } results.`,
       );
     }
 

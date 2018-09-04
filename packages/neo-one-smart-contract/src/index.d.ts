@@ -747,7 +747,7 @@ export type SerializableValue =
  *
  * @example
  *
- * class MySmartContract implements SmartContract {
+ * class MySmartContract extends SmartContract {
  *  private readonly pendingAddresses =
  *    ArrayStorage.for<Address>();
  *
@@ -808,7 +808,7 @@ type SKMapAtFour<K extends [SK, SK, SK, SK], V extends SerializableValue> = {
  *
  * @example
  *
- * class Token implements SmartContract {
+ * class Token extends SmartContract {
  *  private readonly balances =
  *    MapStorage.for<Address, Fixed<8>>();
  *
@@ -895,7 +895,7 @@ type SKSetAtFour<V extends [SK, SK, SK, SK]> = {
  *
  * @example
  *
- * class ICO implements SmartContract {
+ * class ICO extends SmartContract {
  *  private readonly whitelistedAddresses =
  *    SetStorage.for<Address>();
  *
@@ -965,10 +965,6 @@ export interface BlockchainConstructor {
    * `InvocationTransaction` this smart contract is executed in.
    */
   readonly currentTransaction: InvocationTransaction;
-  /**
-   * `Address` of the smart contract.
-   */
-  readonly contractAddress: Address;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 /**
@@ -983,8 +979,10 @@ export interface DeployConstructor {
    * @example
    * import { Address, Deploy, SmartContract } from '@neo-one/smart-contract';
    *
-   * class Token implements SmartContract {
-   *  public constructor(public readonly owner: Address = Deploy.senderAddress) {}
+   * class Token extends SmartContract {
+   *  public constructor(public readonly owner: Address = Deploy.senderAddress) {
+   *    super();
+   *  }
    * }
    */
   readonly senderAddress: Address;
@@ -1015,7 +1013,7 @@ type IsValidSmartContract<T> = {
     ? Parameters<T[K]> extends SmartContractValue[]
       ? ReturnType<T[K]> extends SmartContractValue ? T[K] : never
       : never
-    : T[K]
+    : T[K] extends SmartContractValue ? T[K] : never
 };
 
 export function createEventNotifier(name: string): () => void;
@@ -1081,59 +1079,33 @@ export interface ContractProperties {
   readonly email: string;
   readonly description: string;
 }
+
 /**
  * Marks a class as a `SmartContract`.
  */
-export interface SmartContract {
-  /**
-   * Owner of the `SmartContract`
-   */
-  owner: Address;
+export abstract class SmartContract {
   /**
    * Properties used for deployment of the `SmartContract`
    */
-  readonly properties: ContractProperties;
-}
-export interface SmartContractConstructor {
+  public abstract readonly properties: ContractProperties;
   /**
-   * Returns an object representing a contract at `address` with the given type `T`.
-   *
-   * `T` is checked for validity and `getSmartContract` will report an error during compilation if the interface is invalid.
-   *
-   * @example
-   *
-   * interface TransferContract {
-   *   transfer(from: Address, to: Address, value: Fixed<8>): boolean;
-   * }
-   * const contractAddress = Address.from('0xcef0c0fdcfe7838eff6ff104f9cdec2922297537');
-   * const contract = SmartContract.for<TransferContract>(contractAddress);
-   * const from = Address.from('ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s');
-   * const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
-   * contract.transfer(from, to, 10);
-   *
-   * @param hash `Address` of the smart contract
-   * @returns an object representing the underlying smart contract
+   * `Address` of the `SmartContract`.
    */
-  readonly for: <T>(hash: T extends IsValidSmartContract<T> ? Address : never) => T;
-  readonly [OpaqueTagSymbol0]: unique symbol;
+  public readonly address: Address;
+  /**
+   * Stores `Transaction` hashes that have been processed by a method marked with `@receive` or `@send`.
+   *
+   * Used to enforce that a `Transaction` with native `Asset`s is only ever processed once by an appropriate `@receive` or `@send` method.
+   */
+  protected readonly processedTransactions: SetStorage<Hash256>;
+  static readonly for: <T>(hash: T extends IsValidSmartContract<T> ? Address : never) => T;
 }
-export const SmartContract: SmartContractConstructor;
 
-/**
- * Additonal properties available for linked smart contracts.
- */
-export interface LinkedSmartContract {
-  /**
-   * `Address` of the `LinkedSmartContract`.
-   */
-  readonly address: Address;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
 export interface LinkedSmartContractConstructor {
   /**
    * Returns an object representing a statically linked contract `T`.
    *
-   * `T` is checked for validity and `getLinkedSmartContract` will report an error during compilation if the interface is invalid.
+   * `T` is checked for validity and `LinkedSmartContract.for` will report an error during compilation if the interface is invalid.
    *
    * @example
    *
@@ -1145,7 +1117,7 @@ export interface LinkedSmartContractConstructor {
    *
    * @returns an object representing the underlying smart contract
    */
-  readonly for: <T extends SmartContract>() => T extends IsValidSmartContract<T> ? T & LinkedSmartContract : never;
+  readonly for: <T extends SmartContract>() => T extends IsValidSmartContract<T> ? T : never;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const LinkedSmartContract: LinkedSmartContractConstructor;

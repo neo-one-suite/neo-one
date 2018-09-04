@@ -43,4 +43,5 @@ export enum DiagnosticMessage {
   InvalidSenderAddressParameterUsage = 'Deploy.senderAddress may only be used as the default value for a constructor parameter.',
   InvalidStructuredStorageForProperty = 'Persistent storage classes may only be used as SmartContract properties.',
   InvalidStructuredStorageForLength = 'Could not statically analyze structured storage key length.',
+  CompilationFailedPleaseReport = 'Compilation failed for an unknown error, please report',
 }

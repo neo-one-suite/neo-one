@@ -22,4 +22,5 @@ export enum DiagnosticCode {
   InvalidCurrentTime,
   InvalidSenderAddress,
   InvalidStructuredStorageFor,
+  SomethingWentWrong,
 }

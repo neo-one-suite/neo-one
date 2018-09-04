@@ -21,7 +21,7 @@ const notifyTransfer = createEventNotifier<Address | undefined, Address | undefi
 const notifyRefund = createEventNotifier('refund');
 
 // tslint:disable-next-line export-name
-export class ICO implements SmartContract {
+export class ICO extends SmartContract {
   public readonly properties = {
     codeVersion: '1.0',
     author: 'dicarlo2',
@@ -41,6 +41,7 @@ export class ICO implements SmartContract {
     public readonly startTimeSeconds: Integer = 1000000,
     public readonly icoDurationSeconds: Integer = 100000,
   ) {
+    super();
     if (!Address.isSender(owner)) {
       throw new Error('Sender was not the owner.');
     }

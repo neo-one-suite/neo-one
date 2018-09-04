@@ -293,6 +293,47 @@ export function getImplementors(
   return getImplementorsWorker(program, languageService, node);
 }
 
+function getExtendorsWorker(
+  program: ts.Program,
+  languageService: ts.LanguageService,
+  node: ts.ClassDeclaration,
+  seen = new Set<ts.ClassDeclaration>(),
+): ReadonlyArray<ts.ClassDeclaration> {
+  if (seen.has(node)) {
+    return [];
+  }
+
+  return reference
+    .findReferencesAsNodes(program, languageService, node)
+    .reduce<ReadonlyArray<ts.ClassDeclaration>>((acc, ref) => {
+      const parent = node_.getParent(ref) as ts.Node | undefined;
+      if (parent === undefined) {
+        return acc;
+      }
+
+      const clause = node_.getParent(parent) as ts.Node | undefined;
+      if (clause === undefined || !ts.isHeritageClause(clause) || !heritage.isExtends(clause)) {
+        return acc;
+      }
+
+      const derived: ts.ClassDeclaration | undefined = node_.getFirstAncestorByTestOrThrow(
+        clause,
+        ts.isClassDeclaration,
+      );
+
+      return acc.concat(getImplementorsWorker(program, languageService, derived, seen));
+    }, [])
+    .concat(ts.isClassDeclaration(node) ? [node] : []);
+}
+
+export function getExtendors(
+  program: ts.Program,
+  languageService: ts.LanguageService,
+  node: ts.ClassDeclaration,
+): ReadonlyArray<ts.ClassDeclaration> {
+  return getExtendorsWorker(program, languageService, node);
+}
+
 export function getBaseTypes(typeChecker: ts.TypeChecker, node: ts.ClassDeclaration): ReadonlyArray<ts.Type> {
   return type_.getBaseTypesArray(type_.getType(typeChecker, node));
 }

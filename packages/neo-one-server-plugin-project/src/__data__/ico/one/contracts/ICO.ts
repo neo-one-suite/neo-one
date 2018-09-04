@@ -15,7 +15,7 @@ import { Token } from './Token';
 
 const notifyRefund = createEventNotifier('refund');
 
-export class ICO implements SmartContract {
+export class ICO extends SmartContract {
   public readonly properties = {
     codeVersion: '1.0',
     author: 'dicarlo2',
@@ -30,6 +30,7 @@ export class ICO implements SmartContract {
     public readonly startTimeSeconds: Integer = Blockchain.currentBlockTime,
     public readonly icoDurationSeconds: Integer = 157700000,
   ) {
+    super();
     if (!Address.isSender(owner)) {
       throw new Error('Sender was not the owner.');
     }
@@ -57,7 +58,7 @@ export class ICO implements SmartContract {
     let amount = 0;
     // tslint:disable-next-line no-loop-statement
     for (const output of Blockchain.currentTransaction.outputs) {
-      if (output.address.equals(Blockchain.contractAddress)) {
+      if (output.address.equals(this.address)) {
         if (!output.asset.equals(Hash256.NEO)) {
           notifyRefund();
 

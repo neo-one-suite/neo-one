@@ -97,6 +97,7 @@ describe('LocalUserAccountProvider', () => {
   test('transfer', async () => {
     const transfer = factory.createTransfer();
     getUnspentOutputs.mockImplementation(async () => Promise.resolve([factory.createInputOutput()]));
+    getOutput.mockImplementation(async () => Promise.resolve(factory.createInputOutput()));
     sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
     const transaction = factory.createContractTransaction();
     relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
@@ -434,7 +435,7 @@ describe('LocalUserAccountProvider', () => {
       const invocationData = factory.createRawInvocationData();
       getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-      const result = await provider.invoke(keys[0].address, 'foo', [true], [['firstArg', true]], verify);
+      const result = await provider.invoke(keys[1].address, 'foo', [true], [['firstArg', true]], verify);
       const confirmResult = await result.confirmed();
 
       expect(result.transaction).toEqual(transaction);
@@ -459,7 +460,7 @@ describe('LocalUserAccountProvider', () => {
     const receipt = factory.createRawCallReceipt();
     call.mockImplementation(async () => Promise.resolve(receipt));
 
-    const result = await provider.call(network, keys[0].address, 'foo', [true]);
+    const result = await provider.call(network, keys[1].address, 'foo', [true]);
 
     expect(result).toEqual(receipt);
 
@@ -492,6 +493,7 @@ describe('LocalUserAccountProvider', () => {
 
   test('__execute', async () => {
     getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+    getOutput.mockImplementation(async () => Promise.resolve(gasInputOutput));
     testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
     sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
     const transaction = factory.createRegisterTransaction();
@@ -526,63 +528,63 @@ describe('LocalUserAccountProvider', () => {
       oneNEO: {
         asset: Hash256.NEO,
         value: new BigNumber('1'),
-        address: keys[1].address,
+        address: keys[0].address,
         hash: data.hash256s.a,
         index: 1,
       },
       twoNEO: {
         asset: Hash256.NEO,
         value: new BigNumber('2'),
-        address: keys[1].address,
+        address: keys[0].address,
         hash: data.hash256s.a,
         index: 2,
       },
       sevenNEO: {
         asset: Hash256.NEO,
         value: new BigNumber('7'),
-        address: keys[1].address,
+        address: keys[0].address,
         hash: data.hash256s.a,
         index: 3,
       },
       oneGAS: {
         asset: Hash256.GAS,
         value: new BigNumber('1'),
-        address: keys[1].address,
+        address: keys[0].address,
         hash: data.hash256s.b,
         index: 4,
       },
       twoGAS: {
         asset: Hash256.GAS,
         value: new BigNumber('2'),
-        address: keys[1].address,
+        address: keys[0].address,
         hash: data.hash256s.c,
         index: 5,
       },
       elevenGAS: {
         asset: Hash256.GAS,
         value: new BigNumber('11'),
-        address: keys[1].address,
+        address: keys[0].address,
         hash: data.hash256s.c,
         index: 6,
       },
       oneTKY: {
         asset: data.hash256s.d,
         value: new BigNumber('1'),
-        address: keys[1].address,
+        address: keys[0].address,
         hash: data.hash256s.e,
         index: 7,
       },
       twoTKY: {
         asset: data.hash256s.d,
         value: new BigNumber('2'),
-        address: keys[1].address,
+        address: keys[0].address,
         hash: data.hash256s.e,
         index: 8,
       },
       threeTKY: {
         asset: data.hash256s.d,
         value: new BigNumber('3'),
-        address: keys[1].address,
+        address: keys[0].address,
         hash: data.hash256s.e,
         index: 9,
       },
@@ -613,7 +615,7 @@ describe('LocalUserAccountProvider', () => {
           {
             amount: new BigNumber('6'),
             asset: Hash256.NEO,
-            to: keys[0].address,
+            to: keys[1].address,
           },
         ],
         { networkFee: new BigNumber('1') },
@@ -623,7 +625,7 @@ describe('LocalUserAccountProvider', () => {
           {
             amount: new BigNumber('1'),
             asset: Hash256.NEO,
-            to: keys[0].address,
+            to: keys[1].address,
           },
         ],
         { networkFee: new BigNumber('1') },
@@ -645,7 +647,7 @@ describe('LocalUserAccountProvider', () => {
           {
             amount: new BigNumber('6'),
             asset: Hash256.NEO,
-            to: keys[0].address,
+            to: keys[1].address,
           },
         ],
         { networkFee: new BigNumber('1') },
@@ -658,7 +660,7 @@ describe('LocalUserAccountProvider', () => {
           {
             amount: new BigNumber('1'),
             asset: Hash256.NEO,
-            to: keys[0].address,
+            to: keys[1].address,
           },
         ],
         { networkFee: new BigNumber('1') },
@@ -672,9 +674,17 @@ describe('LocalUserAccountProvider', () => {
       const transfer = {
         amount: new BigNumber('3'),
         asset: Hash256.NEO,
-        to: keys[0].address,
+        to: keys[1].address,
       };
       getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      getOutput.mockImplementation(async (_network, input) =>
+        Promise.resolve(
+          unspent.find(
+            (inputOutput) =>
+              inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
+          ),
+        ),
+      );
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
@@ -717,6 +727,13 @@ describe('LocalUserAccountProvider', () => {
           amount: new BigNumber('3'),
         }),
       );
+      getOutput.mockImplementation(async () =>
+        Promise.resolve({
+          hash: data.hash256s.a,
+          index: 2,
+          address: keys[0].address,
+        }),
+      );
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createClaimTransaction();
       relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
@@ -755,6 +772,14 @@ describe('LocalUserAccountProvider', () => {
         outputs.elevenGAS,
       ];
       getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      getOutput.mockImplementation(async (_network, input) =>
+        Promise.resolve(
+          unspent.find(
+            (inputOutput) =>
+              inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
+          ),
+        ),
+      );
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
@@ -787,7 +812,7 @@ describe('LocalUserAccountProvider', () => {
       const transfer = {
         amount: new BigNumber('2'),
         asset: outputs.oneTKY.asset,
-        to: keys[0].address,
+        to: keys[1].address,
       };
       const unspent = [
         outputs.oneTKY,
@@ -800,6 +825,14 @@ describe('LocalUserAccountProvider', () => {
         outputs.elevenGAS,
       ];
       getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      getOutput.mockImplementation(async (_network, input) =>
+        Promise.resolve(
+          unspent.find(
+            (inputOutput) =>
+              inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
+          ),
+        ),
+      );
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
@@ -849,6 +882,14 @@ describe('LocalUserAccountProvider', () => {
         outputs.elevenGAS,
       ];
       getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      getOutput.mockImplementation(async (_network, input) =>
+        Promise.resolve(
+          unspent.find(
+            (inputOutput) =>
+              inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
+          ),
+        ),
+      );
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
@@ -889,10 +930,18 @@ describe('LocalUserAccountProvider', () => {
       const transfer = {
         amount: new BigNumber('1'),
         asset: Hash256.NEO,
-        to: keys[0].address,
+        to: keys[1].address,
       };
       const unspent = [outputs.oneNEO, outputs.oneGAS, outputs.elevenGAS];
       getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
+      getOutput.mockImplementation(async (_network, input) =>
+        Promise.resolve(
+          unspent.find(
+            (inputOutput) =>
+              inputOutput.hash === common.uInt256ToString(input.hash) && inputOutput.index === input.index,
+          ),
+        ),
+      );
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createContractTransaction();
       relayTransaction.mockImplementation(async (_network, transactionSerialized) => {

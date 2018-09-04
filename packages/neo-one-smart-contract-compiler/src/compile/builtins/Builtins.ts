@@ -7,6 +7,11 @@ import { createMemoized, nodeKey, pathResolve, symbolKey, typeKey } from '../../
 import { Builtin, isBuiltinValueObject } from './types';
 
 const getMember = (sym: ts.Symbol, name: string) => tsUtils.symbol.getMemberOrThrow(sym, name);
+const getExportOrMember = (sym: ts.Symbol, name: string) => {
+  const member = tsUtils.symbol.getMember(sym, name);
+
+  return member === undefined ? tsUtils.symbol.getExportOrThrow(sym, name) : member;
+};
 
 const findNonNull = <T>(value: ReadonlyArray<T | undefined>): T | undefined => value.find((val) => val !== undefined);
 
@@ -277,9 +282,9 @@ export class Builtins {
     getValue: (value: [ts.Symbol, Builtin]) => T,
   ): T | undefined {
     return this.memoized('only-member-base', `${value}$${name}`, () => {
-      const interfaceSymbol = this.getAnyInterfaceSymbol(value);
-      const members = this.getAllMembers(interfaceSymbol);
-      const result = [...members.entries()].find(([symbol]) => tsUtils.symbol.getName(symbol) === name);
+      const symbol = this.getAnyInterfaceOrValueSymbol(value);
+      const members = this.getAllMembers(symbol);
+      const result = [...members.entries()].find(([memberSymbol]) => tsUtils.symbol.getName(memberSymbol) === name);
 
       return result === undefined ? undefined : getValue(result);
     });
@@ -302,8 +307,22 @@ export class Builtins {
   }
 
   private addMemberBase(value: string, member: string, builtin: Builtin, file: ts.SourceFile): void {
-    const valueSymbol = this.getInterfaceSymbolBase(value, file);
-    this.addMember(valueSymbol, getMember(valueSymbol, member), builtin);
+    let valueSymbol = this.getInterfaceSymbolMaybe(value, file);
+    let memberSymbol: ts.Symbol;
+    if (valueSymbol === undefined) {
+      valueSymbol = this.getValueSymbolBase(value, file);
+      memberSymbol = getExportOrMember(valueSymbol, member);
+    } else {
+      memberSymbol = getMember(valueSymbol, member);
+    }
+
+    this.addMember(valueSymbol, memberSymbol, builtin);
+  }
+
+  private getAnyInterfaceOrValueSymbol(value: string): ts.Symbol {
+    const valueSymbol = this.getAnyInterfaceSymbolMaybe(value);
+
+    return valueSymbol === undefined ? this.getAnyValueSymbol(value) : valueSymbol;
   }
 
   private addInterfaceBase(value: string, builtin: Builtin, file: ts.SourceFile): void {
@@ -336,6 +355,10 @@ export class Builtins {
 
     if (decl === undefined) {
       decl = tsUtils.statement.getEnum(file, name);
+    }
+
+    if (decl === undefined) {
+      decl = tsUtils.statement.getClass(file, name);
     }
 
     if (decl === undefined) {

@@ -26,8 +26,8 @@ export class Context {
     public readonly smartContractDir: string,
     private readonly mutableDiagnostics: ts.Diagnostic[] = ts.getPreEmitDiagnostics(program),
   ) {
-    this.builtins = createBuiltins(this);
     this.analysis = new AnalysisService(this);
+    this.builtins = createBuiltins(this);
   }
 
   public get diagnostics(): ReadonlyArray<ts.Diagnostic> {

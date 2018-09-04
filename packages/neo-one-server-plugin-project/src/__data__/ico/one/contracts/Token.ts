@@ -3,7 +3,6 @@ import {
   constant,
   Contract,
   createEventNotifier,
-  Deploy,
   Fixed,
   MapStorage,
   SmartContract,
@@ -16,7 +15,7 @@ const notifyTransfer = createEventNotifier<Address | undefined, Address | undefi
   'amount',
 );
 
-export class Token implements SmartContract {
+export class Token extends SmartContract {
   public readonly properties = {
     codeVersion: '1.0',
     author: 'dicarlo2',
@@ -28,12 +27,6 @@ export class Token implements SmartContract {
   public readonly decimals = 8;
   private mutableSupply: Fixed<8> = 0;
   private readonly balances = MapStorage.for<Address, Fixed<8>>();
-
-  public constructor(public readonly owner: Address = Deploy.senderAddress) {
-    if (!Address.isSender(owner)) {
-      throw new Error('Sender was not the owner.');
-    }
-  }
 
   @constant
   public get totalSupply(): Fixed<8> {

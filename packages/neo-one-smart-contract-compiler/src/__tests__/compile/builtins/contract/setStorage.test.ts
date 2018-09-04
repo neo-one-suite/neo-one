@@ -7,9 +7,9 @@ describe('SetStorage', () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`
-      import { SetStorage, SmartContract, Deploy } from '@neo-one/smart-contract';
+      import { SetStorage, SmartContract } from '@neo-one/smart-contract';
 
-      export class StorageContract implements SmartContract {
+      export class StorageContract extends SmartContract {
         public readonly properties = {
           codeVersion: '1.0',
           author: 'dicarlo2',
@@ -17,8 +17,6 @@ describe('SetStorage', () => {
           description: 'StorageContract',
         };
         public readonly storage = SetStorage.for<string>();
-
-        public constructor(public readonly owner = Deploy.senderAddress) {}
 
         public run(): void {
           const storage = this.storage;
@@ -71,7 +69,7 @@ describe('SetStorage', () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`
-      import { SetStorage, SmartContract, Deploy, Address, Hash256 } from '@neo-one/smart-contract';
+      import { SetStorage, SmartContract, Address, Hash256 } from '@neo-one/smart-contract';
 
       const addressA = Address.from('${keys[0].address}');
       const addressB = Address.from('${keys[1].address}');
@@ -382,7 +380,7 @@ describe('SetStorage', () => {
         assertEqual(keys, keyB + keyC);
       }
 
-      export class StorageContract implements SmartContract {
+      export class StorageContract extends SmartContract {
         public readonly properties = {
           codeVersion: '1.0',
           author: 'dicarlo2',
@@ -390,8 +388,6 @@ describe('SetStorage', () => {
           description: 'StorageContract',
         };
         public readonly storage = SetStorage.for<[Address, Hash256, string]>();
-
-        public constructor(public readonly owner = Deploy.senderAddress) {}
 
         public run(): void {
           testAtAddHasDelete(this.storage);

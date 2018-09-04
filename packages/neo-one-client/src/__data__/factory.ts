@@ -812,7 +812,7 @@ const createNetworkSettings = (options: Partial<NetworkSettings> = {}): NetworkS
 
 const createUserAccountID = (options: Partial<UserAccountID> = {}): UserAccountID => ({
   network: 'main',
-  address: keys[0].address,
+  address: keys[1].address,
   ...options,
 });
 
@@ -820,7 +820,7 @@ const createUserAccount = (options: Partial<UserAccount> = {}): UserAccount => (
   type: 'mock',
   id: createUserAccountID(),
   name: 'Mock',
-  publicKey: keys[0].publicKeyString,
+  publicKey: keys[1].publicKeyString,
   configurableName: true,
   deletable: true,
   ...options,
@@ -829,7 +829,7 @@ const createUserAccount = (options: Partial<UserAccount> = {}): UserAccount => (
 const createLockedWallet = (options: Partial<LockedWallet> = {}): LockedWallet => ({
   type: 'locked',
   account: createUserAccount(),
-  nep2: keys[0].encryptedWIF,
+  nep2: keys[1].encryptedWIF,
   ...options,
 });
 
@@ -837,12 +837,12 @@ const createUnlockedWallet = (options: Partial<UnlockedWallet> = {}): UnlockedWa
   type: 'unlocked',
   account: createUserAccount({
     id: createUserAccountID({
-      address: keys[1].address,
+      address: keys[0].address,
     }),
-    publicKey: keys[1].publicKeyString,
+    publicKey: keys[0].publicKeyString,
   }),
-  privateKey: keys[1].privateKeyString,
-  nep2: keys[1].encryptedWIF,
+  privateKey: keys[0].privateKeyString,
+  nep2: keys[0].encryptedWIF,
   ...options,
 });
 

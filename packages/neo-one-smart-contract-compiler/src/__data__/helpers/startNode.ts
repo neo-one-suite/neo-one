@@ -57,6 +57,7 @@ export interface TestNode {
   readonly client: Client;
   readonly readClient: ReadClient;
   readonly developerClient: DeveloperClient;
+  readonly sourceMaps: SourceMaps;
 }
 
 export interface Options {
@@ -120,6 +121,9 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
   const { client, masterWallet, provider, networkName, userAccountProviders } = await setupTestNode(false);
   const developerClient = new DeveloperClient(provider.read(networkName));
   const mutableSourceMaps: Modifiable<SourceMaps> = {};
+  client.hooks.beforeConfirmed.tapPromise('DeveloperClient', async () => {
+    await developerClient.runConsensusNow();
+  });
 
   return {
     async addContract(script, options = {}): Promise<Contract> {
@@ -193,5 +197,6 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
     readClient: client.read(networkName),
     masterWallet,
     developerClient,
+    sourceMaps: mutableSourceMaps,
   };
 };

@@ -275,11 +275,11 @@ export class AnalysisService {
 
   public isSmartContract(node: ts.ClassDeclaration): boolean {
     return this.memoized('is-smart-contract', nodeKey(node), () => {
-      const isSmartContract = tsUtils.class_.getImplementsArray(node).some((implType) => {
-        const testType = this.getType(tsUtils.expression.getExpression(implType));
+      const extendsExpr = tsUtils.class_.getExtends(node);
 
-        return testType !== undefined && this.context.builtins.isInterface(node, testType, 'SmartContract');
-      });
+      const isSmartContract =
+        extendsExpr !== undefined &&
+        this.context.builtins.isValue(tsUtils.expression.getExpression(extendsExpr), 'SmartContract');
 
       if (isSmartContract) {
         return true;
@@ -288,6 +288,21 @@ export class AnalysisService {
       const baseClass = tsUtils.class_.getBaseClass(this.context.typeChecker, node);
 
       return baseClass !== undefined && this.isSmartContract(baseClass);
+    });
+  }
+
+  public getSymbolAndAllInheritedSymbols(node: ts.Node): ReadonlyArray<ts.Symbol> {
+    return this.memoized('get-symbol-and-all-inherited-symbols', nodeKey(node), () => {
+      const symbol = this.getSymbol(node);
+      const symbols = [symbol].filter(utils.notNull);
+      if (ts.isClassDeclaration(node)) {
+        const extendsExpr = tsUtils.class_.getExtends(node);
+        if (extendsExpr !== undefined) {
+          return this.getSymbolAndAllInheritedSymbols(tsUtils.expression.getExpression(extendsExpr)).concat(symbols);
+        }
+      }
+
+      return symbols;
     });
   }
 

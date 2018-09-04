@@ -175,14 +175,24 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     const buffers = bytecode.map(([node, tags, value], idx) => {
       let finalValue: Buffer;
       if (value instanceof Jump) {
+        let jumpPCBuffer = Buffer.alloc(2, 0);
         const offsetPC = new BN(value.pc.getPC()).sub(new BN(pc));
         const jumpPC = offsetPC.toTwos(16);
-        if (jumpPC.fromTwos(16).toNumber() !== value.pc.getPC() - pc) {
-          /* istanbul ignore next */
-          throw new Error(
-            `Something went wrong, expected 2's complement of ${value.pc.getPC() - pc}, found: ${jumpPC
-              .fromTwos(16)
-              .toNumber()}`,
+        try {
+          if (jumpPC.fromTwos(16).toNumber() !== value.pc.getPC() - pc) {
+            /* istanbul ignore next */
+            throw new Error(
+              `Something went wrong, expected 2's complement of ${value.pc.getPC() - pc}, found: ${jumpPC
+                .fromTwos(16)
+                .toNumber()}`,
+            );
+          }
+          jumpPCBuffer = jumpPC.toArrayLike(Buffer, 'le', 2);
+        } catch {
+          this.context.reportError(
+            node,
+            DiagnosticCode.SomethingWentWrong,
+            DiagnosticMessage.CompilationFailedPleaseReport,
           );
         }
         const byteCodeBuffer = ByteBuffer[Op[value.op]] as Buffer | undefined;
@@ -190,7 +200,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
           /* istanbul ignore next */
           throw new Error('Something went wrong, could not find bytecode buffer');
         }
-        finalValue = Buffer.concat([byteCodeBuffer, jumpPC.toArrayLike(Buffer, 'le', 2)]);
+        finalValue = Buffer.concat([byteCodeBuffer, jumpPCBuffer]);
       } else if (value instanceof Line) {
         const currentLine = new BN(idx + 1);
         const byteCodeBuffer = ByteBuffer[Op.PUSHBYTES4];
@@ -357,6 +367,27 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   public emitLine(node: ts.Node): void {
     this.emitLineRaw(node, new Line());
+  }
+
+  public isCurrentSmartContract(node: ts.Node): boolean {
+    if (this.contractInfo === undefined) {
+      return false;
+    }
+
+    const symbol = this.context.analysis.getSymbol(node);
+    if (symbol === undefined) {
+      return false;
+    }
+
+    const symbols = this.context.analysis.getSymbolAndAllInheritedSymbols(this.contractInfo.smartContract);
+
+    if (symbols.some((smartContractSymbol) => smartContractSymbol === symbol)) {
+      return true;
+    }
+
+    const typeSymbol = this.context.analysis.getTypeSymbol(node);
+
+    return typeSymbol !== undefined && symbols.some((smartContractSymbol) => smartContractSymbol === typeSymbol);
   }
 
   public loadModule(sourceFile: ts.SourceFile): void {

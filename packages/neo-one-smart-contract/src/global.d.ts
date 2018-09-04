@@ -373,7 +373,7 @@ interface Set<T> extends Iterable<T> {
   readonly [one1]: ReadonlySet<T>[typeof one1];
 }
 interface SetConstructor {
-  new <T = any>(values?: ReadonlyArray<T> | null): Set<T>;
+  new <T = any>(values?: ReadonlyArray<T>): Set<T>;
   readonly prototype: Set<any>;
 }
 declare var Set: SetConstructor;

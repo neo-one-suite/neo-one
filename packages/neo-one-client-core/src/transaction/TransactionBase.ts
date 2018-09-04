@@ -545,7 +545,7 @@ export abstract class TransactionBase<
     });
 
     if (hashesSet.size !== this.scripts.length) {
-      throw new VerifyError('Invalid witnesses');
+      throw new VerifyError(`Invalid witnesses. Found ${hashesSet.size} hashes and ${this.scripts.length} scripts.`);
     }
 
     // tslint:disable-next-line no-array-mutation

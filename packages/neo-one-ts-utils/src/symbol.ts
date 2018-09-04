@@ -47,6 +47,24 @@ export function getMemberOrThrow(node: ts.Symbol, name: string): ts.Symbol {
   return utils.throwIfNullOrUndefined(getMember(node, name), 'symbol member');
 }
 
+export function getExports(node: ts.Symbol): ts.SymbolTable | undefined {
+  return utils.getValueOrUndefined(node.exports);
+}
+
+export function getExportsOrThrow(node: ts.Symbol): ts.SymbolTable {
+  return utils.throwIfNullOrUndefined(getExports(node), 'exports');
+}
+
+export function getExport(node: ts.Symbol, name: string): ts.Symbol | undefined {
+  const exports = getExports(node);
+
+  return exports === undefined ? undefined : exports.get(name as ts.__String);
+}
+
+export function getExportOrThrow(node: ts.Symbol, name: string): ts.Symbol {
+  return utils.throwIfNullOrUndefined(getExport(node, name), 'symbol export');
+}
+
 export function isArgumentsSymbol(typeChecker: ts.TypeChecker, node: ts.Symbol): boolean {
   return typeChecker.isArgumentsSymbol(node);
 }
@@ -55,5 +73,12 @@ export function getTarget(symbol: ts.Symbol): ts.Symbol {
   // tslint:disable-next-line no-any
   const symbolAny: any = symbol;
 
-  return symbolAny.target === undefined ? symbol : symbolAny.target;
+  return symbolAny.target == undefined ? symbol : symbolAny.target;
+}
+
+export function getParent(symbol: ts.Symbol): ts.Symbol | undefined {
+  // tslint:disable-next-line no-any
+  const symbolAny: any = symbol;
+
+  return symbolAny.parent == undefined ? undefined : symbolAny.parent;
 }

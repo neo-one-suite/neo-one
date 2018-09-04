@@ -9,8 +9,7 @@ import {
   SmartContract,
 } from '@neo-one/smart-contract';
 
-export abstract class Token<Decimals extends number> implements SmartContract {
-  public abstract owner: Address;
+export abstract class Token<Decimals extends number> extends SmartContract {
   public abstract readonly properties: ContractProperties;
   public abstract readonly name: string;
   public abstract readonly decimals: Decimals;

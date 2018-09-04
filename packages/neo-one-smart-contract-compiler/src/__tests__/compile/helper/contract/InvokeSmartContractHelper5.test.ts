@@ -1,4 +1,4 @@
-import { helpers, keys } from '../../../../__data__';
+import { helpers } from '../../../../__data__';
 
 const properties = `
 public readonly properties = {
@@ -13,15 +13,11 @@ describe('InvokeSmartContractHelper', () => {
   test('basic class extended and extended with property dependent on another property initializer', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
-      import { Address, ContractProperties, SmartContract } from '@neo-one/smart-contract';
+      import { SmartContract } from '@neo-one/smart-contract';
 
-      abstract class TestSmartContractBaseBase implements SmartContract {
-        public abstract readonly properties: ContractProperties;
+      abstract class TestSmartContractBaseBase extends SmartContract {
         protected baz: string = 'foo';
         protected foo: string = this.baz;
-
-        public constructor(public readonly owner: Address) {
-        }
 
         public getBar(): string {
           return this.baz;
@@ -39,10 +35,6 @@ describe('InvokeSmartContractHelper', () => {
       export class TestSmartContract extends TestSmartContractBase {
         ${properties}
         protected baz: string = 'baz';
-
-        public constructor(owner: Address = Address.from('${keys[0].address}')) {
-          super(owner);
-        }
       }
     `);
 
@@ -50,8 +42,7 @@ describe('InvokeSmartContractHelper', () => {
       import { Address, SmartContract } from '@neo-one/smart-contract';
 
       interface Contract {
-        readonly owner: Address;
-        deploy(owner?: Address): boolean;
+        deploy(): boolean;
         getBar(): string;
         getFoo(): string;
       }
@@ -66,14 +57,14 @@ describe('InvokeSmartContractHelper', () => {
   test('basic class extended, extended, no constructor with parameter', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
-      import { Address, ContractProperties, SmartContract } from '@neo-one/smart-contract';
+      import { SmartContract } from '@neo-one/smart-contract';
 
-      abstract class TestSmartContractBaseBase implements SmartContract {
-        public abstract readonly properties: ContractProperties;
+      abstract class TestSmartContractBaseBase extends SmartContract {
         protected abstract baz: string;
         protected bar: string;
 
-        public constructor(bar: string, public readonly owner: Address) {
+        public constructor(bar: string) {
+          super();
           this.bar = bar;
         }
 
@@ -87,8 +78,8 @@ describe('InvokeSmartContractHelper', () => {
       }
 
       abstract class TestSmartContractBase extends TestSmartContractBaseBase {
-        public constructor(bar: string, owner: Address = Address.from('${keys[0].address}')) {
-          super(bar, owner);
+        public constructor(bar: string) {
+          super(bar);
         }
       }
 
@@ -103,8 +94,7 @@ describe('InvokeSmartContractHelper', () => {
       import { Address, SmartContract } from '@neo-one/smart-contract';
 
       interface Contract {
-        readonly owner: Address;
-        deploy(baz: string, owner?: Address): boolean;
+        deploy(baz: string): boolean;
         getBar(): string;
         getBaz(): string;
       }
@@ -119,21 +109,15 @@ describe('InvokeSmartContractHelper', () => {
   test('basic class extended with overriden abstract property', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
-      import { Address, ContractProperties, SmartContract } from '@neo-one/smart-contract';
+      import { SmartContract } from '@neo-one/smart-contract';
 
-      abstract class TestSmartContractBase implements SmartContract {
-        public abstract readonly owner: Address;
-        public abstract readonly properties: ContractProperties;
+      abstract class TestSmartContractBase extends SmartContract {
         public abstract readonly baz: string;
       }
 
       export class TestSmartContract extends TestSmartContractBase {
         ${properties}
         public readonly baz: string = 'foo';
-
-        public constructor(public readonly owner: Address = Address.from('${keys[0].address}')) {
-          super();
-        }
       }
     `);
 
@@ -141,8 +125,7 @@ describe('InvokeSmartContractHelper', () => {
       import { Address, SmartContract } from '@neo-one/smart-contract';
 
       interface Contract {
-        readonly owner: Address;
-        deploy(owner?: Address): boolean;
+        deploy(): boolean;
         readonly baz: string;
       }
       const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
@@ -155,12 +138,9 @@ describe('InvokeSmartContractHelper', () => {
   test('basic class extended, extended, with middle implementation', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
-      import { Address, ContractProperties, SmartContract } from '@neo-one/smart-contract';
+      import { SmartContract } from '@neo-one/smart-contract';
 
-      abstract class TestSmartContractBaseBase implements SmartContract {
-        public abstract readonly owner: Address;
-        public abstract readonly properties: ContractProperties;
-
+      abstract class TestSmartContractBaseBase extends SmartContract {
         public getBar(): string {
           return this.getBaz();
         }
@@ -169,10 +149,6 @@ describe('InvokeSmartContractHelper', () => {
       }
 
       abstract class TestSmartContractBase extends TestSmartContractBaseBase {
-        public constructor(public readonly owner: Address) {
-          super();
-        }
-
         protected getBaz(): string {
           return 'baz';
         }
@@ -180,10 +156,6 @@ describe('InvokeSmartContractHelper', () => {
 
       export class TestSmartContract extends TestSmartContractBase {
         ${properties}
-
-        public constructor(owner: Address = Address.from('${keys[0].address}')) {
-          super(owner);
-        }
       }
     `);
 
@@ -191,8 +163,7 @@ describe('InvokeSmartContractHelper', () => {
       import { Address, SmartContract } from '@neo-one/smart-contract';
 
       interface Contract {
-        readonly owner: Address;
-        deploy(owner?: Address): boolean;
+        deploy(): boolean;
         getBar(): string;
       }
       const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
@@ -205,12 +176,9 @@ describe('InvokeSmartContractHelper', () => {
   test('basic class extended, extended, with final implementation', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
-      import { Address, ContractProperties, SmartContract } from '@neo-one/smart-contract';
+      import { SmartContract } from '@neo-one/smart-contract';
 
-      abstract class TestSmartContractBaseBase implements SmartContract {
-        public abstract readonly owner: Address;
-        public abstract readonly properties: ContractProperties;
-
+      abstract class TestSmartContractBaseBase extends SmartContract {
         public getBar(): string {
           return this.getBaz();
         }
@@ -219,17 +187,10 @@ describe('InvokeSmartContractHelper', () => {
       }
 
       abstract class TestSmartContractBase extends TestSmartContractBaseBase {
-        public constructor(public readonly owner: Address) {
-          super();
-        }
       }
 
       export class TestSmartContract extends TestSmartContractBase {
         ${properties}
-
-        public constructor(owner: Address = Address.from('${keys[0].address}')) {
-          super(owner);
-        }
 
         protected getBaz(): string {
           return 'baz';
@@ -241,8 +202,7 @@ describe('InvokeSmartContractHelper', () => {
       import { Address, SmartContract } from '@neo-one/smart-contract';
 
       interface Contract {
-        readonly owner: Address;
-        deploy(owner?: Address): boolean;
+        deploy(): boolean;
         getBar(): string;
       }
       const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));

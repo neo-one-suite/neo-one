@@ -9,7 +9,7 @@ describe('ArrayStorage', () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`
-      import { ArrayStorage, SmartContract, Deploy } from '@neo-one/smart-contract';
+      import { ArrayStorage, SmartContract } from '@neo-one/smart-contract';
 
       const test = (storage: ArrayStorage<string>) => {
         assertEqual(storage instanceof ArrayStorage, true);
@@ -58,7 +58,7 @@ describe('ArrayStorage', () => {
         storageLike[Symbol.iterator]();
       }
 
-      export class StorageContract implements SmartContract {
+      export class StorageContract extends SmartContract {
         public readonly properties = {
           codeVersion: '1.0',
           author: 'dicarlo2',
@@ -66,8 +66,6 @@ describe('ArrayStorage', () => {
           description: 'StorageContract',
         };
         public readonly storage = ArrayStorage.for<string>();
-
-        public constructor(public readonly owner = Deploy.senderAddress) {}
 
         public run(): void {
           test(this.storage);
@@ -90,9 +88,9 @@ describe('ArrayStorage', () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`
-      import { ArrayStorage, SmartContract, Deploy } from '@neo-one/smart-contract';
+      import { ArrayStorage, SmartContract } from '@neo-one/smart-contract';
 
-      export class StorageContract implements SmartContract {
+      export class StorageContract extends SmartContract {
         public readonly properties = {
           codeVersion: '1.0',
           author: 'dicarlo2',
@@ -100,8 +98,6 @@ describe('ArrayStorage', () => {
           description: 'StorageContract',
         };
         public readonly prefix = ArrayStorage.for<string>();
-
-        public constructor(public readonly owner = Deploy.senderAddress) {}
 
         public run(): void {
           const keyA = 'keyA';

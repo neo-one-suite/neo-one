@@ -2,7 +2,13 @@ import { ClassInstanceMemberType, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
 import { STRUCTURED_STORAGE_TYPES, StructuredStorageType } from '../compile/constants';
-import { ContractPropertyName, Decorator, PROPERTIES_PROPERTY } from '../constants';
+import {
+  BUILTIN_PROPERTIES,
+  ContractPropertyName,
+  Decorator,
+  IGNORED_PROPERTIES,
+  RESERVED_PROPERTIES,
+} from '../constants';
 import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
@@ -149,7 +155,9 @@ export class ContractInfoProcessor {
           const decls = tsUtils.symbol.getDeclarations(extendSymbol);
           const decl = decls[0];
           if (decls.length === 1 && ts.isClassDeclaration(decl)) {
-            superSmartContract = this.processClass(decl, extendType);
+            if (!this.context.builtins.isValue(decl, 'SmartContract')) {
+              superSmartContract = this.processClass(decl, extendType);
+            }
           } else {
             this.context.reportError(
               expr,
@@ -209,7 +217,23 @@ export class ContractInfoProcessor {
     }
 
     const name = tsUtils.symbol.getName(symbol);
-    if (name === PROPERTIES_PROPERTY) {
+    if (IGNORED_PROPERTIES.has(name)) {
+      return undefined;
+    }
+    if (BUILTIN_PROPERTIES.has(name)) {
+      const memberSymbol = this.context.builtins.getOnlyMemberSymbol('SmartContract', name);
+      if (symbol !== memberSymbol) {
+        this.context.reportUnsupported(decl);
+      }
+
+      return undefined;
+    }
+    if (RESERVED_PROPERTIES.has(name)) {
+      const memberSymbol = this.context.builtins.getOnlyMemberSymbol('SmartContract', name);
+      if (symbol !== memberSymbol) {
+        this.context.reportUnsupported(decl);
+      }
+
       return undefined;
     }
 

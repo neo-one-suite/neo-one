@@ -41,6 +41,8 @@ export class RawEnumeratorForEachFuncHelper extends Helper {
         },
       }),
     );
+    // [callable]
+    sb.emitOp(node, 'DROP');
     // []
     sb.emitOp(node, 'DROP');
   }

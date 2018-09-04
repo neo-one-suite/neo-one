@@ -76,6 +76,8 @@ export class ToNumberHelper extends TypedHelper {
             sb.emitOp(node, 'EQUAL');
           },
           whenTrue: () => {
+            // []
+            sb.emitOp(node, 'DROP');
             // We don't support NaN
             // []
             sb.emitHelper(node, options, sb.helpers.throwTypeError);

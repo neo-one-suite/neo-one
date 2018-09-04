@@ -1,5 +1,6 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import * as constants from '../../constants';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -8,13 +9,17 @@ export class DoStatementCompiler extends NodeCompiler<ts.DoStatement> {
   public readonly kind = ts.SyntaxKind.DoStatement;
 
   public visitNode(sb: ScriptBuilder, node: ts.DoStatement, options: VisitOptions): void {
-    sb.withProgramCounter((pc) => {
-      sb.withProgramCounter((innerPC) => {
+    sb.withProgramCounter((breakPC) => {
+      sb.withProgramCounter((continuePC) => {
         sb.visit(
           tsUtils.statement.getStatement(node),
-          sb.breakPCOptions(sb.continuePCOptions(options, innerPC.getLast()), pc.getLast()),
+          sb.breakPCOptions(sb.continuePCOptions(options, continuePC.getLast()), breakPC.getLast()),
         );
+
+        sb.emitPushInt(node, constants.CONTINUE_COMPLETION);
       });
+      // []
+      sb.emitOp(node, 'DROP');
 
       sb.emitHelper(
         tsUtils.expression.getExpression(node),
@@ -30,10 +35,15 @@ export class DoStatementCompiler extends NodeCompiler<ts.DoStatement> {
             );
           },
           whenTrue: () => {
-            sb.emitJmp(node, 'JMP', pc.getFirst());
+            sb.emitJmp(node, 'JMP', breakPC.getFirst());
           },
         }),
       );
+
+      sb.emitPushInt(node, constants.BREAK_COMPLETION);
     });
+
+    // []
+    sb.emitOp(node, 'DROP');
   }
 }

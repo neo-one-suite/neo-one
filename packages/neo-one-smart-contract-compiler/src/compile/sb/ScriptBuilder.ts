@@ -40,6 +40,7 @@ export interface ScriptBuilder {
   readonly emitCall: (node: ts.Node) => void;
   readonly emitSysCall: (node: ts.Node, name: SysCallName) => void;
   readonly emitLine: (node: ts.Node) => void;
+  readonly isCurrentSmartContract: (node: ts.Node) => boolean;
   readonly getLinkedScriptHash: (node: ts.Node, filePath: string, smartContractClass: string) => UInt160 | undefined;
   readonly loadModule: (node: ts.SourceFile) => void;
   readonly capture: (func: () => void) => CaptureResult;

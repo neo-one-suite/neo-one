@@ -1,4 +1,4 @@
-import { helpers, keys } from '../../../__data__';
+import { helpers } from '../../../__data__';
 
 const properties = `
 public readonly properties = {
@@ -130,11 +130,10 @@ describe('ArrayLiteralExpressionCompiler', () => {
   test('array storage spread', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
-      import { Address, SmartContract, ArrayStorage } from '@neo-one/smart-contract';
+      import { SmartContract, ArrayStorage } from '@neo-one/smart-contract';
 
-      export class Storage implements SmartContract {
+      export class Storage extends SmartContract {
         ${properties}
-        public readonly owner: Address = Address.from('${keys[0].address}')
         private readonly storage = ArrayStorage.for<number>();
 
         public run(): boolean {
@@ -171,11 +170,10 @@ describe('ArrayLiteralExpressionCompiler', () => {
   test('map storage', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
-      import { Address, SmartContract, MapStorage } from '@neo-one/smart-contract';
+      import { SmartContract, MapStorage } from '@neo-one/smart-contract';
 
-      export class Storage implements SmartContract {
+      export class Storage extends SmartContract {
         ${properties}
-        public readonly owner: Address = Address.from('${keys[0].address}')
         private readonly storage = MapStorage.for<string, number>();
 
         public run(): boolean {
@@ -217,11 +215,10 @@ describe('ArrayLiteralExpressionCompiler', () => {
   test('set storage spread', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
-      import { Address, SmartContract, SetStorage } from '@neo-one/smart-contract';
+      import { SmartContract, SetStorage } from '@neo-one/smart-contract';
 
-      export class Storage implements SmartContract {
+      export class Storage extends SmartContract {
         ${properties}
-        public readonly owner: Address = Address.from('${keys[0].address}')
         private readonly storage = SetStorage.for<number>();
 
         public run(): boolean {

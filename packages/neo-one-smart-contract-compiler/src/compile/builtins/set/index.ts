@@ -1,3 +1,4 @@
+import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -33,15 +34,44 @@ class SetValue extends BuiltinNew {
     }
   }
 
-  public emitNew(sb: ScriptBuilder, node: ts.NewExpression, options: VisitOptions): void {
-    if (!options.pushValue) {
-      return;
-    }
+  public emitNew(sb: ScriptBuilder, node: ts.NewExpression, optionsIn: VisitOptions): void {
+    const options = sb.pushValueOptions(optionsIn);
+    const args = tsUtils.argumented.getArgumentsArray(node);
 
     // [map]
     sb.emitOp(node, 'NEWMAP');
+    if (args.length > 0) {
+      // [val, map]
+      sb.visit(args[0], options);
+      // [arr, map]
+      sb.emitHelper(node, options, sb.helpers.unwrapArray);
+      // [map, arr]
+      sb.emitOp(node, 'SWAP');
+      // [map]
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.arrReduce({
+          each: () => {
+            // [map, val, map]
+            sb.emitOp(node, 'TUCK');
+            // [val, map, map]
+            sb.emitOp(node, 'SWAP');
+            // [boolean, val, map, map]
+            sb.emitPushBoolean(node, true);
+            // [map]
+            sb.emitOp(node, 'SETITEM');
+          },
+        }),
+      );
+    }
     // [val]
     sb.emitHelper(node, options, sb.helpers.wrapSet);
+
+    if (!optionsIn.pushValue) {
+      // []
+      sb.emitOp(node, 'DROP');
+    }
   }
 }
 class SetConstructorInterface extends BuiltinInterface {}

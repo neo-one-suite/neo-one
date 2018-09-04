@@ -20,7 +20,7 @@ const execute = async (
     sourceMap,
   } = compile({ context, sourceFile });
   const { receipt, sourceMaps } = await executeScript(monitor, context.diagnostics, compiledCode, sourceMap, options);
-  await checkResult(receipt, sourceMaps);
+  await checkResult(receipt, sourceMaps, true);
 
   return { receipt, sourceMaps };
 };

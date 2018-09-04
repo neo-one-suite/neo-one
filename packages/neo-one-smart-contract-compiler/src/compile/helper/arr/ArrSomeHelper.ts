@@ -34,20 +34,24 @@ export class ArrSomeHelper extends Helper {
       options,
       sb.helpers.forLoop({
         condition: () => {
-          // [result, enumerator, result]
+          // [enumerator, result]
+          sb.emitOp(node, 'SWAP');
+          // [enumerator, result, enumerator]
           sb.emitOp(node, 'TUCK');
-          // [!result, enumerator, result]
-          sb.emitOp(node, 'NOT');
-          // [enumerator, !result, enumerator, result]
+          // [result, enumerator, result, enumerator]
           sb.emitOp(node, 'OVER');
-          // [boolean, !result, enumerator, result]
+          // [!result, enumerator, result, enumerator]
+          sb.emitOp(node, 'NOT');
+          // [enumerator, !result, result, enumerator]
+          sb.emitOp(node, 'SWAP');
+          // [boolean, !result, result, enumerator]
           sb.emitSysCall(node, 'Neo.Enumerator.Next');
-          // [boolean, enumerator, result]
+          // [boolean, result, enumerator]
           sb.emitOp(node, 'AND');
         },
         each: (innerOptions) => {
           // [enumerator]
-          sb.emitOp(node, 'NIP');
+          sb.emitOp(node, 'DROP');
           // [enumerator, enumerator]
           sb.emitOp(node, 'DUP');
           // [value, enumerator]
@@ -59,6 +63,11 @@ export class ArrSomeHelper extends Helper {
       }),
     );
     // [result]
-    sb.emitOp(node, 'DROP');
+    sb.emitOp(node, 'NIP');
+
+    if (!optionsIn.pushValue) {
+      // []
+      sb.emitOp(node, 'DROP');
+    }
   }
 }

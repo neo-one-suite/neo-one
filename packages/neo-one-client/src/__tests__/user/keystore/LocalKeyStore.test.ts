@@ -254,7 +254,7 @@ describe('LocalKeyStore', () => {
   });
 
   test('unlockWallet', async () => {
-    await keystore.unlockWallet({ id: lockedWallet.account.id, password: keys[0].password });
+    await keystore.unlockWallet({ id: lockedWallet.account.id, password: keys[1].password });
 
     expect(keystore.wallets).toHaveLength(2);
     expect(keystore.wallets[0].type).toBe('unlocked');
@@ -262,7 +262,7 @@ describe('LocalKeyStore', () => {
   });
 
   test('unlockWallet - already unlocked', async () => {
-    await keystore.unlockWallet({ id: unlockedWallet.account.id, password: keys[1].password });
+    await keystore.unlockWallet({ id: unlockedWallet.account.id, password: keys[0].password });
 
     expect(keystore.wallets).toHaveLength(2);
     expect(keystore.wallets[0].type).toBe('locked');

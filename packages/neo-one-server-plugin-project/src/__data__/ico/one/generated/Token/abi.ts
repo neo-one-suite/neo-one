@@ -1,4 +1,4 @@
-/* @hash 81c4b85b488ac85bbe7e7a3c70d82bd4 */
+/* @hash 8a30f3da518a8c8ef0cca8b3771832be */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -54,15 +54,6 @@ export const tokenABI: ABI = {
         decimals: 0,
         optional: false,
         type: 'Integer',
-      },
-    },
-    {
-      constant: true,
-      name: 'owner',
-      parameters: [],
-      returnType: {
-        optional: false,
-        type: 'Address',
       },
     },
     {
@@ -149,16 +140,7 @@ export const tokenABI: ABI = {
     },
     {
       name: 'deploy',
-      parameters: [
-        {
-          default: {
-            type: 'sender',
-          },
-          name: 'owner',
-          optional: true,
-          type: 'Address',
-        },
-      ],
+      parameters: [],
       returnType: {
         type: 'Boolean',
       },

@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
+import { BUILTIN_PROPERTIES, IGNORED_PROPERTIES } from '../../../constants';
 import { getSetterName } from '../../../utils';
 import { InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
@@ -32,7 +33,21 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
       }
 
       const propName = tsUtils.symbol.getName(prop);
+      if (IGNORED_PROPERTIES.has(propName)) {
+        return undefined;
+      }
+      if (BUILTIN_PROPERTIES.has(propName)) {
+        return undefined;
+      }
       const propNode = tsUtils.symbol.getValueDeclarationOrThrow(prop);
+      if (
+        tsUtils.modifier.isStatic(propNode) ||
+        tsUtils.modifier.isProtected(propNode) ||
+        tsUtils.modifier.isPrivate(propNode)
+      ) {
+        return undefined;
+      }
+
       const result = sb.context.analysis.extractSignatureForType(propNode, propType, { error: true });
       if (result === undefined) {
         // Must be a property, not a method

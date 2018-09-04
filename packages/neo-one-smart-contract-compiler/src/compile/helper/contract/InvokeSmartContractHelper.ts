@@ -148,8 +148,8 @@ export class InvokeSmartContractHelper extends Helper {
               decl,
               options,
               sb.helpers.createStructuredStorage({
-                prefix: ContractPropertyName.processedTransaction,
-                type: Types.MapStorage,
+                prefix: ContractPropertyName.processedTransactions,
+                type: Types.SetStorage,
               }),
             );
             // [val, val]
@@ -166,8 +166,8 @@ export class InvokeSmartContractHelper extends Helper {
             sb.emitHelper(
               decl,
               options,
-              sb.helpers.getStructuredStorage({
-                type: Types.MapStorage,
+              sb.helpers.hasStructuredStorage({
+                type: Types.SetStorage,
                 keyType: undefined,
                 knownKeyType: Types.Buffer,
               }),
@@ -178,9 +178,17 @@ export class InvokeSmartContractHelper extends Helper {
               sb.helpers.if({
                 condition: () => {
                   // [boolean]
-                  sb.emitHelper(node, options, sb.helpers.isUndefined);
+                  sb.emitHelper(node, options, sb.helpers.unwrapBoolean);
                 },
                 whenTrue: () => {
+                  // [val]
+                  sb.emitOp(node, 'DROP');
+                  // []
+                  sb.emitOp(node, 'DROP');
+                  // [boolean]
+                  sb.emitPushBoolean(node, false);
+                },
+                whenFalse: () => {
                   // [boolean, hashVal, val]
                   sb.emitPushBoolean(node, true);
                   // [booleanVal, hashVal, val]
@@ -197,14 +205,6 @@ export class InvokeSmartContractHelper extends Helper {
                   );
                   // [boolean]
                   rest();
-                },
-                whenFalse: () => {
-                  // [val]
-                  sb.emitOp(node, 'DROP');
-                  // []
-                  sb.emitOp(node, 'DROP');
-                  // [boolean]
-                  sb.emitPushBoolean(node, false);
                 },
               }),
             );
@@ -260,9 +260,11 @@ export class InvokeSmartContractHelper extends Helper {
                     options,
                     sb.helpers.if({
                       condition: () => {
+                        // [boolean]
                         sb.emitOp(decl, 'EQUAL');
                       },
                       whenTrue: () => {
+                        // [boolean]
                         rest();
                       },
                       whenFalse: () => {

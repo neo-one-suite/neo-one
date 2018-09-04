@@ -24,13 +24,13 @@ interface FilePathToDependencies {
 }
 
 export const scanContext = (context: Context): Contracts => {
-  const smartContract = tsUtils.symbol.getDeclarations(context.builtins.getInterfaceSymbol('SmartContract'))[0];
-  if (!ts.isInterfaceDeclaration(smartContract)) {
+  const smartContract = tsUtils.symbol.getDeclarations(context.builtins.getValueSymbol('SmartContract'))[0];
+  if (!ts.isClassDeclaration(smartContract)) {
     throw new Error('Something went wrong!');
   }
 
   const { contracts, dependencies } = tsUtils.class_
-    .getImplementors(context.program, context.languageService, smartContract)
+    .getExtendors(context.program, context.languageService, smartContract)
     .reduce<{ contracts: FilePathToContract; dependencies: FilePathToDependencies }>(
       (acc, derived) => {
         if (!tsUtils.modifier.isAbstract(derived)) {

@@ -2,8 +2,7 @@
 import { Address, LinkedSmartContract, SmartContract } from '@neo-one/smart-contract';
 import { Foo } from './Foo';
 
-export class Bar implements SmartContract {
-  public readonly owner = Address.from('AXNajBTQLxWHwc9sKyXcc4UdbJvp3arYDG');
+export class Bar extends SmartContract {
   public readonly properties = {
     codeVersion: '1.0',
     author: 'dicarlo2',

@@ -37,5 +37,14 @@ export const DECORATORS: Set<Decorator> = new Set(Object.values(Decorator));
 
 export enum ContractPropertyName {
   deploy = 'deploy',
-  processedTransaction = 'processedTransaction',
+  processedTransactions = 'processedTransactions',
+  address = 'address',
+  properties = 'properties',
 }
+
+export const RESERVED_PROPERTIES: Set<string> = new Set([ContractPropertyName.deploy]);
+export const BUILTIN_PROPERTIES: Set<string> = new Set([
+  ContractPropertyName.processedTransactions,
+  ContractPropertyName.address,
+]);
+export const IGNORED_PROPERTIES: Set<string> = new Set([ContractPropertyName.properties]);

@@ -40,7 +40,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
     let amount = 0;
     // tslint:disable-next-line no-loop-statement
     for (const output of Blockchain.currentTransaction.outputs) {
-      if (output.address.equals(Blockchain.contractAddress)) {
+      if (output.address.equals(this.address)) {
         if (!output.asset.equals(Hash256.NEO)) {
           notifyRefund();
 

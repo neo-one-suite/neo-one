@@ -170,10 +170,9 @@ describe('SmartContract.for', () => {
   test('dynamic call', async () => {
     const node = await helpers.startNode();
     const dynamicContract = await node.addContract(`
-      import { Address, SmartContract } from '@neo-one/smart-contract';
+      import { SmartContract } from '@neo-one/smart-contract';
 
-      export class Dynamic implements SmartContract {
-        public readonly owner = Address.from('AXNajBTQLxWHwc9sKyXcc4UdbJvp3arYDG');
+      export class Dynamic extends SmartContract {
         public readonly properties = {
           codeVersion: '1.0',
           author: 'dicarlo2',
@@ -196,8 +195,7 @@ describe('SmartContract.for', () => {
         run(value: number): string;
       }
 
-      export class DynamicCall implements SmartContract {
-        public readonly owner = Address.from('AXNajBTQLxWHwc9sKyXcc4UdbJvp3arYDG');
+      export class DynamicCall extends SmartContract {
         public readonly properties = {
           codeVersion: '1.0',
           author: 'dicarlo2',

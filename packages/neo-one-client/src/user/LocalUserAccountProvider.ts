@@ -537,12 +537,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const { attributes = [] } = options;
-    const transactionOptions = {
-      from: options.from,
-      attributes: attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, verify)),
-      networkFee: options.networkFee,
-    };
-    const { from } = this.getTransactionOptions(transactionOptions);
+    const transactionOptions = this.getTransactionOptions(options);
+    const { from } = transactionOptions;
 
     const send = options.sendFrom === undefined ? [] : options.sendFrom;
     const receive = options.sendTo === undefined ? [] : options.sendTo;
@@ -560,7 +556,21 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       transfers: send
         .map((transfer) => ({ ...transfer, from: contractID }))
         .concat(receive.map((transfer) => ({ ...transfer, from, to: contract }))),
-      options: transactionOptions,
+      options: {
+        ...transactionOptions,
+        attributes: attributes.concat(
+          this.getInvokeAttributes(
+            contract,
+            method,
+            paramsZipped,
+            // If we are sending from the contract, the script is already added as an input
+            verify && options.sendFrom === undefined && options.sendTo !== undefined,
+            // If we are sending to the contract, the script is already added as an input
+            // If we are sending from the contract, the script will not be automatically added in sendTransaction
+            options.sendTo === undefined && options.sendFrom !== undefined ? from.address : undefined,
+          ),
+        ),
+      },
       onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
         blockIndex: receipt.blockIndex,
         blockHash: receipt.blockHash,
@@ -568,7 +578,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         result: data.result,
         actions: data.actions,
       }),
-      scripts: this.getInvokeScripts(method, params, verify),
+      scripts: this.getInvokeScripts(
+        method,
+        params,
+        verify && (options.sendFrom !== undefined || options.sendTo !== undefined),
+      ),
       method: 'invoke',
       labels: {
         [labelNames.INVOKE_METHOD]: method,
@@ -625,8 +639,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             ]),
           ),
           attributes: this.convertAttributes(
-            attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, true)),
+            // By definition, the contract address is a claim input so the script hash is already included
+            // By definition, the from address is not an input or a claim, so we need to add it
+            attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, false, from.address)),
           ),
+          // Since the contract address is an input, we must add a witness for it.
           scripts: this.getInvokeScripts(method, params, true),
         });
 
@@ -724,6 +741,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     method: string,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
+    from?: AddressString,
   ): ReadonlyArray<Attribute> {
     return [
       {
@@ -740,6 +758,13 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             // tslint:disable-next-line no-any
           } as any)
         : undefined,
+      from === undefined
+        ? undefined
+        : ({
+            usage: 'Script',
+            data: from,
+            // tslint:disable-next-line no-any
+          } as any),
     ].filter(commonUtils.notNull);
   }
 
@@ -755,7 +780,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
               method,
               params,
             }),
-
             verification: Buffer.alloc(0, 0),
           })
         : undefined,
@@ -999,6 +1023,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             message: error.message,
             sourceMaps,
           });
+          if (message === error.message) {
+            throw error;
+          }
 
           throw new Error(message);
         }
@@ -1070,16 +1097,34 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           });
         }
 
-        const witness = await this.keystore.sign({
-          account: from,
-          message: transactionUnsigned.serializeUnsigned().toString('hex'),
-          monitor: span,
-        });
+        const [witness, inputOutputs, claimOutputs] = await Promise.all([
+          this.keystore.sign({
+            account: from,
+            message: transactionUnsigned.serializeUnsigned().toString('hex'),
+            monitor: span,
+          }),
+          Promise.all(
+            transactionUnsigned.inputs.map(async (input) =>
+              this.provider.getOutput(from.network, { hash: common.uInt256ToString(input.hash), index: input.index }),
+            ),
+          ),
+          transactionUnsigned instanceof CoreClaimTransaction
+            ? Promise.all(
+                transactionUnsigned.claims.map(async (input) =>
+                  this.provider.getOutput(from.network, {
+                    hash: common.uInt256ToString(input.hash),
+                    index: input.index,
+                  }),
+                ),
+              )
+            : Promise.resolve([]),
+        ]);
 
         const transaction = await this.provider.relayTransaction(
           from.network,
           this.addWitness({
             transaction: transactionUnsigned,
+            inputOutputs: inputOutputs.concat(claimOutputs),
             address,
             witness: this.convertWitness(witness),
           })
@@ -1289,10 +1334,12 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     */
   private addWitness({
     transaction,
+    inputOutputs,
     address,
     witness,
   }: {
     readonly transaction: TransactionModel;
+    readonly inputOutputs: ReadonlyArray<Output>;
     readonly address: AddressString;
     readonly witness: WitnessModel;
   }): TransactionModel {
@@ -1300,23 +1347,20 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       (attribute): attribute is UInt160Attribute => attribute.usage === AttributeUsage.Script,
     );
     const scriptHash = addressToScriptHash(address);
-    const scriptHashes = scriptAttributes.map((attribute) => common.uInt160ToString(attribute.value));
+    const scriptHashes = [
+      ...new Set(
+        inputOutputs
+          .map((inputOutput) => addressToScriptHash(inputOutput.address))
+          .concat(scriptAttributes.map((attribute) => common.uInt160ToString(attribute.value))),
+      ),
+    ].filter((otherHash) => otherHash !== scriptHash);
 
-    if (scriptHashes.length === 2 || (scriptHashes.length === 1 && scriptHashes[0] !== scriptHash)) {
-      let otherHash = scriptHashes[0];
-      if (scriptHashes.length === 2) {
-        const [first, second] = scriptHashes;
-        if (!(first === scriptHash || second === scriptHash)) {
-          throw new InvalidTransactionError('Something went wrong!');
-        }
-
-        otherHash = first === scriptHash ? second : first;
-      }
-
+    if (scriptHashes.length === 1) {
       if (transaction.scripts.length !== 1) {
-        throw new InvalidTransactionError('Something went wrong!');
+        throw new InvalidTransactionError('Something went wrong! Expected 1 script.');
       }
 
+      const otherHash = scriptHashes[0];
       const otherScript = transaction.scripts[0];
 
       return transaction.clone({
@@ -1327,9 +1371,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       });
     }
 
-    if (scriptHashes.length === 0 || (scriptHashes.length === 1 && scriptHashes[0] === scriptHash)) {
+    if (scriptHashes.length === 0) {
       if (transaction.scripts.length !== 0) {
-        throw new InvalidTransactionError('Something went wrong!');
+        throw new InvalidTransactionError('Something went wrong! Expected 0 scripts.');
       }
 
       return transaction.clone({ scripts: [witness] });

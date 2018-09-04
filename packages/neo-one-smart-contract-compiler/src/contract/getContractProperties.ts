@@ -1,6 +1,6 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { ContractProperties, DEFAULT_CONTRACT_PROPERTIES, PROPERTIES_PROPERTY } from '../constants';
+import { ContractProperties, ContractPropertyName, DEFAULT_CONTRACT_PROPERTIES } from '../constants';
 import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
@@ -13,7 +13,7 @@ export const getContractProperties = (context: Context, smartContract: ts.ClassD
 
   const properties = tsUtils.type_
     .getProperties(type)
-    .find((symbol) => tsUtils.symbol.getName(symbol) === PROPERTIES_PROPERTY);
+    .find((symbol) => tsUtils.symbol.getName(symbol) === ContractPropertyName.properties);
 
   if (properties === undefined) {
     return DEFAULT_CONTRACT_PROPERTIES;

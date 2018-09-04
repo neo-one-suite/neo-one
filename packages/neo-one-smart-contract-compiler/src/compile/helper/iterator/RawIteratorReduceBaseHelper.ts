@@ -27,7 +27,7 @@ export class RawIteratorReduceBaseHelper extends Helper {
         condition: () => {
           // [iterator, accum, iterator]
           sb.emitOp(node, 'OVER');
-          // [boolean, iterator]
+          // [boolean, accum, iterator]
           sb.emitSysCall(node, 'Neo.Enumerator.Next');
         },
         each: (innerOptions) => {
@@ -40,6 +40,8 @@ export class RawIteratorReduceBaseHelper extends Helper {
         },
       }),
     );
+    // [accum]
+    sb.emitOp(node, 'NIP');
 
     if (!optionsIn.pushValue) {
       // []

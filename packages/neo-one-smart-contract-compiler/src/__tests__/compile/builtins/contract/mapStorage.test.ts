@@ -7,7 +7,7 @@ describe('MapStorage', () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`
-      import { MapStorage, SmartContract, Deploy } from '@neo-one/smart-contract';
+      import { MapStorage, SmartContract } from '@neo-one/smart-contract';
 
       const test = (storage: MapStorage<string, number>) => {
         storage.get('foo');
@@ -47,7 +47,7 @@ describe('MapStorage', () => {
         storageLike[Symbol.iterator]();
       }
 
-      export class StorageContract implements SmartContract {
+      export class StorageContract extends SmartContract {
         public readonly properties = {
           codeVersion: '1.0',
           author: 'dicarlo2',
@@ -55,8 +55,6 @@ describe('MapStorage', () => {
           description: 'StorageContract',
         };
         private readonly storage = MapStorage.for<string, number>();
-
-        public constructor(public readonly owner = Deploy.senderAddress) {}
 
         public run(): void {
           test(this.storage);
@@ -79,7 +77,7 @@ describe('MapStorage', () => {
     const node = await helpers.startNode();
 
     const contract = await node.addContract(`
-      import { MapStorage, SmartContract, Deploy, Address, Hash256 } from '@neo-one/smart-contract';
+      import { MapStorage, SmartContract, Address, Hash256 } from '@neo-one/smart-contract';
 
       const addressA = Address.from('${keys[0].address}');
       const addressB = Address.from('${keys[1].address}');
@@ -457,7 +455,7 @@ describe('MapStorage', () => {
         assertEqual(keys, keyB + keyC);
       }
 
-      export class StorageContract implements SmartContract {
+      export class StorageContract extends SmartContract {
         public readonly properties = {
           codeVersion: '1.0',
           author: 'dicarlo2',
@@ -465,8 +463,6 @@ describe('MapStorage', () => {
           description: 'StorageContract',
         };
         private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
-
-        public constructor(public readonly owner = Deploy.senderAddress) {}
 
         public run(): void {
           testAtGetSetHasDelete(this.storage);

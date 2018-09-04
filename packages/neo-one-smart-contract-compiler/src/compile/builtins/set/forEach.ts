@@ -38,7 +38,7 @@ export class SetForEach extends BuiltinInstanceMemberCall {
     // [objectVal, iterator]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
     // []
-    sb.emitHelper(node, options, sb.helpers.rawEnumeratorForEachFunc);
+    sb.emitHelper(node, sb.noPushValueOptions(options), sb.helpers.rawEnumeratorForEachFunc);
 
     if (optionsIn.pushValue) {
       // [val]
