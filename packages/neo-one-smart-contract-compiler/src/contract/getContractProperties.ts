@@ -61,7 +61,7 @@ export const getContractProperties = (context: Context, smartContract: ts.ClassD
 
     const key = tsUtils.node.getName(property);
     const value = tsUtils.initializer.getInitializer(property);
-    if (!ts.isLiteralExpression(value) && !tsUtils.guards.isBooleanLiteral(value)) {
+    if (!ts.isLiteralExpression(value)) {
       context.reportError(
         value,
         DiagnosticCode.InvalidContractProperties,
@@ -71,14 +71,15 @@ export const getContractProperties = (context: Context, smartContract: ts.ClassD
       return DEFAULT_CONTRACT_PROPERTIES;
     }
 
-    if (ts.isLiteralExpression(value)) {
-      // tslint:disable-next-line no-object-mutation
-      contract[key] = tsUtils.literal.getLiteralValue(value);
-    }
+    // tslint:disable-next-line no-object-mutation
+    contract[key] = tsUtils.literal.getLiteralValue(value);
   }
+
+  const name = tsUtils.node.getName(smartContract);
 
   return {
     ...DEFAULT_CONTRACT_PROPERTIES,
+    name: name === undefined ? DEFAULT_CONTRACT_PROPERTIES.name : name,
     ...contract,
   };
 };

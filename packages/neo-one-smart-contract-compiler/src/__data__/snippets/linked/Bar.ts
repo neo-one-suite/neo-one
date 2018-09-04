@@ -9,7 +9,6 @@ export class Bar implements SmartContract {
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'Bar',
-    payable: true,
   };
 
   public getFoo(expected: Address): string {

@@ -2,7 +2,12 @@ import { ScriptBuilderParam } from '@neo-one/client-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { Client } from '../Client';
-import { NoContractDeployedError } from '../errors';
+import {
+  CannotClaimContractError,
+  CannotSendFromContractError,
+  CannotSendToContractError,
+  NoContractDeployedError,
+} from '../errors';
 import { events as traceEvents } from '../trace';
 import {
   ABIEvent,
@@ -10,8 +15,12 @@ import {
   ABIParameter,
   Action,
   AddressString,
+  ClaimTransaction,
   Event,
+  InvocationTransaction,
+  InvokeClaimTransactionOptions,
   InvokeReceipt,
+  InvokeSendReceiveTransactionOptions,
   Log,
   NetworkType,
   Param,
@@ -19,7 +28,7 @@ import {
   SmartContractAny,
   SmartContractDefinition,
   SmartContractNetworkDefinition,
-  TransactionOptions,
+  TransactionReceipt,
   TransactionResult,
 } from '../types';
 import * as common from './common';
@@ -28,23 +37,29 @@ const getParamsAndOptions = ({
   definition: { networks },
   parameters,
   args,
+  send,
+  receive,
+  claim,
   client,
 }: {
   readonly definition: SmartContractDefinition;
   readonly parameters: ReadonlyArray<ABIParameter>;
   // tslint:disable-next-line no-any
   readonly args: ReadonlyArray<any>;
+  readonly send: boolean;
+  readonly receive: boolean;
+  readonly claim: boolean;
   readonly client: Client;
 }): {
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly paramsZipped: ReadonlyArray<[string, Param | undefined]>;
-  readonly options: TransactionOptions;
+  readonly options: InvokeSendReceiveTransactionOptions | InvokeClaimTransactionOptions;
   readonly network: NetworkType;
   readonly address: AddressString;
 } => {
   const finalArg = args[args.length - 1] as {} | undefined;
   let params = args;
-  let optionsIn: TransactionOptions = {};
+  let optionsIn: InvokeSendReceiveTransactionOptions | InvokeClaimTransactionOptions = {};
   if (
     finalArg !== undefined &&
     typeof finalArg === 'object' &&
@@ -68,6 +83,18 @@ const getParamsAndOptions = ({
   const contractNetwork = networks[network] as SmartContractNetworkDefinition | undefined;
   if (contractNetwork === undefined) {
     throw new NoContractDeployedError(network);
+  }
+  // tslint:disable-next-line no-any
+  if ((options as any).sendFrom !== undefined && !send) {
+    throw new CannotSendFromContractError(contractNetwork.address);
+  }
+  // tslint:disable-next-line no-any
+  if ((options as any).sendTo !== undefined && !receive) {
+    throw new CannotSendToContractError(contractNetwork.address);
+  }
+  // tslint:disable-next-line no-any
+  if ((options as any).claimAll && !claim) {
+    throw new CannotClaimContractError(contractNetwork.address);
   }
 
   const { converted, zipped } = common.convertParams({
@@ -122,6 +149,9 @@ const createCall = ({
     definition,
     parameters,
     args,
+    send: false,
+    receive: false,
+    claim: false,
     client,
   });
 
@@ -143,21 +173,40 @@ const filterLogs = (actions: ReadonlyArray<Event | Log>): ReadonlyArray<Log> =>
 const createInvoke = ({
   definition,
   client,
-  func: { name, parameters = [], returnType, verify = false },
+  func: { name, parameters = [], returnType, send = false, receive = false, claim = false },
 }: {
   readonly definition: SmartContractDefinition;
   readonly client: Client;
   readonly func: ABIFunction;
+}) => async (
   // tslint:disable-next-line no-any
-}) => async (...args: any[]): Promise<TransactionResult<InvokeReceipt>> => {
+  ...args: any[]
+): Promise<
+  TransactionResult<InvokeReceipt, InvocationTransaction> | TransactionResult<TransactionReceipt, ClaimTransaction>
+> => {
   const { params, paramsZipped, options, address } = getParamsAndOptions({
     definition,
     parameters,
     args,
+    send,
+    receive,
+    claim,
     client,
   });
 
-  const result = await client.__invoke(address, name, params, paramsZipped, verify, options, definition.sourceMaps);
+  if (claim) {
+    return client.__invokeClaim(address, name, params, paramsZipped, options);
+  }
+
+  const result = await client.__invoke(
+    address,
+    name,
+    params,
+    paramsZipped,
+    send || receive,
+    options,
+    definition.sourceMaps,
+  );
 
   return {
     transaction: result.transaction,

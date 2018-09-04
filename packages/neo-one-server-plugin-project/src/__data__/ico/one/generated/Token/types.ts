@@ -1,13 +1,14 @@
-/* @hash 714cc81c5cdfb6bb301fb3c3f952e815 */
+/* @hash 7eeca6f7616dd8b2ad7191fc3a8e7e57 */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
   Event,
+  InvocationTransaction,
   InvokeReceipt,
-  InvokeTransactionOptions,
   ReadSmartContract,
   SmartContract,
+  TransactionOptions,
   TransactionResult,
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
@@ -26,13 +27,13 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
   readonly decimals: () => Promise<BigNumber>;
   readonly deploy: (
     owner?: AddressString,
-    options?: InvokeTransactionOptions,
-  ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>>>;
+    options?: TransactionOptions,
+  ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
   readonly issue: (
     to: AddressString,
     amount: BigNumber,
-    options?: InvokeTransactionOptions,
-  ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>>>;
+    options?: TransactionOptions,
+  ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
   readonly name: () => Promise<string>;
   readonly owner: () => Promise<AddressString>;
   readonly symbol: () => Promise<string>;
@@ -41,8 +42,8 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
     from: AddressString,
     to: AddressString,
     amount: BigNumber,
-    options?: InvokeTransactionOptions,
-  ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>>>;
+    options?: TransactionOptions,
+  ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
 }
 
 export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {

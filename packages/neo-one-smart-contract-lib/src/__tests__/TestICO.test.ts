@@ -74,11 +74,10 @@ describe('TestICO', () => {
         const firstMint = new BigNumber('10');
         const mintResult = await smartContract.mintTokens({
           from: minter.account.id,
-          transfers: [
+          sendTo: [
             {
               amount: firstMint,
               asset: Hash256.NEO,
-              to: smartContract.definition.networks[client.providers.memory.getNetworks()[0]].address,
             },
           ],
         });

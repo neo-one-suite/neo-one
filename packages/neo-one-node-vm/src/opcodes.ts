@@ -339,7 +339,7 @@ const callIsolated = ({
         if (returnValueCount === -1) {
           stack = resultContext.stack;
         } else if (returnValueCount > 0) {
-          if (resultContext.stack.length < returnValueCount) {
+          if (resultContext.state === VMState.Halt && resultContext.stack.length < returnValueCount) {
             throw new InsufficientReturnValueError(context, resultContext.stack.length, returnValueCount);
           }
 

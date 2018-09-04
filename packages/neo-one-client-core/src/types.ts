@@ -546,21 +546,29 @@ export interface ABIFunction {
    */
   readonly name: string;
   /**
-   * True if the function is constant or read-only.
-   */
-  readonly constant?: boolean;
-  /**
    * Parameters of the function.
    */
   readonly parameters?: ReadonlyArray<ABIParameter>;
   /**
-   * True if the function expects to be run during verification.
-   */
-  readonly verify?: boolean;
-  /**
    * Return type of the function.
    */
   readonly returnType: ABIReturn;
+  /**
+   * True if the function is constant or read-only.
+   */
+  readonly constant?: boolean;
+  /**
+   * True if the function is used for sending native assets.
+   */
+  readonly send?: boolean;
+  /**
+   * True if the function is used for receiving native assets.
+   */
+  readonly receive?: boolean;
+  /**
+   * True if the function is used for claiming GAS.
+   */
+  readonly claim?: boolean;
 }
 
 /**

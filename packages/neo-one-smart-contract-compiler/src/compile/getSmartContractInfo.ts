@@ -116,6 +116,10 @@ export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile
   const contractInfo = smartContract === undefined ? undefined : getContractInfo(context, smartContract);
   const properties =
     smartContract === undefined ? DEFAULT_CONTRACT_PROPERTIES : getContractProperties(context, smartContract);
+  const payable =
+    contractInfo === undefined
+      ? true
+      : contractInfo.propInfos.some((propInfo) => propInfo.type === 'function' && propInfo.receive);
   if (contractInfo !== undefined) {
     addContractInfo(context, contractInfo);
 
@@ -128,7 +132,7 @@ export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile
         ...properties,
         storage: true,
         dynamicInvoke: true,
-        payable: true,
+        payable,
       },
     };
   }
@@ -145,7 +149,7 @@ export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile
       ...properties,
       storage: true,
       dynamicInvoke: true,
-      payable: true,
+      payable,
     },
   };
 };

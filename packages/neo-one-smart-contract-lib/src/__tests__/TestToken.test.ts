@@ -18,7 +18,7 @@ describe('TestToken', () => {
       issueValue: new BigNumber('100'),
       transferValue: new BigNumber('10'),
       description: 'The TestToken',
-      payable: true,
+      payable: false,
     });
   });
 });

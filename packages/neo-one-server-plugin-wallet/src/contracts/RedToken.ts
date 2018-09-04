@@ -9,7 +9,6 @@ export class RedToken extends SimpleToken {
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'The RedToken',
-    payable: true,
   };
 
   public constructor(owner: Address, amount: Fixed<8>) {

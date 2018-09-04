@@ -22,3 +22,20 @@ export const DEFAULT_CONTRACT_PROPERTIES = {
   email: 'unknown',
   description: 'unknown',
 };
+
+export enum Decorator {
+  constant = 'constant',
+  send = 'send',
+  receive = 'receive',
+  claim = 'claim',
+}
+
+// tslint:disable-next-line no-any
+export const isDecorator = (value: string): value is Decorator => (Decorator as any)[value] !== undefined;
+
+export const DECORATORS: Set<Decorator> = new Set(Object.values(Decorator));
+
+export enum ContractPropertyName {
+  deploy = 'deploy',
+  processedTransaction = 'processedTransaction',
+}

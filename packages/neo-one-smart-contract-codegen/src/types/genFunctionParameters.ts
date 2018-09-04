@@ -7,6 +7,30 @@ interface ParamAcc {
   readonly acc: ReadonlyArray<string>;
 }
 
+const getOptions = (abi: ABIFunction) => {
+  if (abi.constant) {
+    return [];
+  }
+
+  if (abi.send && abi.receive) {
+    return ['options?: InvokeSendReceiveTransactionOptions'];
+  }
+
+  if (abi.send) {
+    return ['options?: InvokeSendTransactionOptions'];
+  }
+
+  if (abi.receive) {
+    return ['options?: InvokeReceiveTransactionOptions'];
+  }
+
+  if (abi.claim) {
+    return ['options?: InvokeClaimTransactionOptions'];
+  }
+
+  return ['options?: TransactionOptions'];
+};
+
 export const genFunctionParameters = (abi: ABIFunction): string =>
   _.reverse(
     _.reverse([...(abi.parameters === undefined ? [] : abi.parameters)]).reduce<ParamAcc>(
@@ -19,5 +43,5 @@ export const genFunctionParameters = (abi: ABIFunction): string =>
       { hasRequired: false, acc: [] },
     ).acc,
   )
-    .concat(abi.constant ? [] : ['options?: InvokeTransactionOptions'])
+    .concat(getOptions(abi))
     .join(', ');

@@ -179,7 +179,6 @@ describe('SmartContract.for', () => {
           author: 'dicarlo2',
           email: 'alex.dicarlo@neotracker.io',
           description: 'Foo',
-          payable: true,
         };
 
         public run(value: number): string {
@@ -204,7 +203,6 @@ describe('SmartContract.for', () => {
           author: 'dicarlo2',
           email: 'alex.dicarlo@neotracker.io',
           description: 'Foo',
-          payable: true,
         };
 
         public run(value: Address): string {

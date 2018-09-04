@@ -1,4 +1,4 @@
-/* @hash a040edcd79045266d8da1b3091c34bb9 */
+/* @hash 81c4b85b488ac85bbe7e7a3c70d82bd4 */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -31,51 +31,52 @@ export const tokenABI: ABI = {
     {
       constant: true,
       name: 'name',
+      parameters: [],
       returnType: {
         optional: false,
         type: 'String',
       },
-      verify: false,
     },
     {
       constant: true,
       name: 'symbol',
+      parameters: [],
       returnType: {
         optional: false,
         type: 'String',
       },
-      verify: false,
     },
     {
       constant: true,
       name: 'decimals',
+      parameters: [],
       returnType: {
         decimals: 0,
         optional: false,
         type: 'Integer',
       },
-      verify: false,
     },
     {
       constant: true,
       name: 'owner',
+      parameters: [],
       returnType: {
         optional: false,
         type: 'Address',
       },
-      verify: false,
     },
     {
       constant: true,
       name: 'totalSupply',
+      parameters: [],
       returnType: {
         decimals: 8,
         optional: false,
         type: 'Integer',
       },
-      verify: false,
     },
     {
+      claim: false,
       constant: true,
       name: 'balanceOf',
       parameters: [
@@ -85,14 +86,16 @@ export const tokenABI: ABI = {
           type: 'Address',
         },
       ],
+      receive: false,
       returnType: {
         decimals: 8,
         optional: false,
         type: 'Integer',
       },
-      verify: false,
+      send: false,
     },
     {
+      claim: false,
       constant: false,
       name: 'transfer',
       parameters: [
@@ -113,13 +116,15 @@ export const tokenABI: ABI = {
           type: 'Integer',
         },
       ],
+      receive: false,
       returnType: {
         optional: false,
         type: 'Boolean',
       },
-      verify: false,
+      send: false,
     },
     {
+      claim: false,
       constant: false,
       name: 'issue',
       parameters: [
@@ -135,14 +140,14 @@ export const tokenABI: ABI = {
           type: 'Integer',
         },
       ],
+      receive: false,
       returnType: {
         optional: false,
         type: 'Boolean',
       },
-      verify: false,
+      send: false,
     },
     {
-      constant: false,
       name: 'deploy',
       parameters: [
         {
@@ -157,7 +162,6 @@ export const tokenABI: ABI = {
       returnType: {
         type: 'Boolean',
       },
-      verify: false,
     },
   ],
 };

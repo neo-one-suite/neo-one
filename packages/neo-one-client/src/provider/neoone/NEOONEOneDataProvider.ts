@@ -75,6 +75,12 @@ export class NEOONEOneDataProvider implements DataProvider, DeveloperProvider {
     return provider.getUnclaimed(address, monitor);
   }
 
+  public async getClaimAmount(input: Input, monitor?: Monitor): Promise<BigNumber> {
+    const provider = await this.getProvider();
+
+    return provider.getClaimAmount(input, monitor);
+  }
+
   public async getUnspentOutputs(address: AddressString, monitor?: Monitor): Promise<ReadonlyArray<InputOutput>> {
     const provider = await this.getProvider();
 

@@ -36,7 +36,6 @@ export class ABISmartContractProcessor {
               {
                 name: propInfo.name,
                 parameters: this.getParameters(propInfo.callSignature),
-                verify: propInfo.verify,
                 returnType: BOOLEAN_RETURN,
               },
             ];
@@ -45,9 +44,11 @@ export class ABISmartContractProcessor {
               {
                 name: propInfo.name,
                 parameters: this.getParameters(propInfo.callSignature),
-                verify: propInfo.verify,
                 returnType: this.toABIReturn(propInfo.decl, propInfo.returnType),
                 constant: propInfo.constant,
+                send: propInfo.send,
+                receive: propInfo.receive,
+                claim: propInfo.claim,
               },
             ];
           case 'property':

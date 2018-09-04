@@ -7,8 +7,8 @@ import {
   Hash256,
   Integer,
   MapStorage,
+  receive,
   SmartContract,
-  verify,
 } from '@neo-one/smart-contract';
 
 const notifyTransfer = createEventNotifier<Address | undefined, Address | undefined, Fixed<8>>(
@@ -27,7 +27,6 @@ export class ICO implements SmartContract {
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'NEO•ONE ICO',
-    payable: true,
   };
   public readonly name = 'One';
   public readonly symbol = 'ONE';
@@ -88,7 +87,7 @@ export class ICO implements SmartContract {
     return this.mutableRemaining;
   }
 
-  @verify
+  @receive
   public mintTokens(): boolean {
     if (!this.hasStarted() || this.hasEnded()) {
       notifyRefund();

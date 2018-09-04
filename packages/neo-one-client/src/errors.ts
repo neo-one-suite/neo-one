@@ -1,6 +1,6 @@
 import { makeErrorWithCode } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import { UserAccountID } from './types';
+import { AddressString, UserAccountID } from './types';
 
 export const InvalidArgumentError = makeErrorWithCode(
   'INVALID_ARGUMENT',
@@ -53,4 +53,16 @@ export const PasswordRequiredError = makeErrorWithCode(
 export const NothingToClaimError = makeErrorWithCode(
   'NEO_NOTHING_TO_CLAIM',
   (id: UserAccountID) => `Address ${id.address} on network ${id.network} has nothing to claim.`,
+);
+export const CannotSendToContractError = makeErrorWithCode(
+  'CANNOT_SEND_TO_CONTRACT',
+  (address: AddressString) => `Contract ${address} does not accept native assets`,
+);
+export const CannotSendFromContractError = makeErrorWithCode(
+  'CANNOT_SEND_FROM_CONTRACT',
+  (address: AddressString) => `Contract ${address} does not allow sending native assets`,
+);
+export const CannotClaimContractError = makeErrorWithCode(
+  'CANNOT_CLAIM_CONTRACT',
+  (address: AddressString) => `Contract ${address} does not allow claiming GAS`,
 );

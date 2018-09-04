@@ -5,7 +5,7 @@ import {
   DeveloperClient,
   InvocationResult,
   InvocationTransaction,
-  InvokeTransactionOptions,
+  InvokeExecuteTransactionOptions,
   LocalKeyStore,
   LocalWallet,
   ReadClient,
@@ -46,7 +46,7 @@ export interface TestNode {
   // tslint:disable-next-line no-any
   readonly executeString: (
     script: string,
-    options?: InvokeTransactionOptions,
+    options?: InvokeExecuteTransactionOptions,
   ) => Promise<{
     readonly receipt: RawInvokeReceipt;
     readonly transaction: InvocationTransaction;

@@ -120,10 +120,8 @@ const createProgram = (
 ) => {
   const smartContractDir = path.dirname(require.resolve('@neo-one/smart-contract'));
   const smartContractModule = pathResolve(smartContractDir, 'index.d.ts');
-  const smartContractInternalModule = pathResolve(smartContractDir, 'internal.d.ts');
   const smartContractFiles = [
     pathResolve(smartContractDir, 'global.d.ts'),
-    smartContractInternalModule,
     smartContractModule,
     withTestHarness ? pathResolve(smartContractDir, 'harness.d.ts') : undefined,
   ].filter(utils.notNull);
@@ -168,9 +166,7 @@ const createProgram = (
     // tslint:disable-next-line no-loop-statement
     for (const moduleName of moduleNames) {
       // tslint:disable-next-line prefer-switch
-      if (moduleName === '@neo-one/smart-contract-internal') {
-        mutableResolvedModules.push({ resolvedFileName: smartContractInternalModule });
-      } else if (moduleName === '@neo-one/smart-contract') {
+      if (moduleName === '@neo-one/smart-contract') {
         mutableResolvedModules.push({ resolvedFileName: smartContractModule });
       } else if (moduleName === '@neo-one/smart-contract-lib') {
         mutableResolvedModules.push({ resolvedFileName: smartContractLibModule });

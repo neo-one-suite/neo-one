@@ -113,6 +113,14 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     );
   }
 
+  public async getClaimAmount(input: Input, monitor?: Monitor): Promise<BigNumber> {
+    return this.capture(
+      async (span) => this.mutableClient.getClaimAmount({ txid: input.hash, vout: input.index }, span),
+      'neo_get_claim_amount',
+      monitor,
+    );
+  }
+
   public async getUnspentOutputs(address: AddressString, monitor?: Monitor): Promise<ReadonlyArray<InputOutput>> {
     return this.capture(
       async (span) => {

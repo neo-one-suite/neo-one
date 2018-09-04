@@ -1,6 +1,5 @@
 // tslint:disable
 /// <reference path="./global.d.ts" />
-/// <reference path="./internal.d.ts" />
 
 /**
  * Marks an interface or class as not implementable or extendable.
@@ -1081,7 +1080,6 @@ export interface ContractProperties {
   readonly author: string;
   readonly email: string;
   readonly description: string;
-  readonly payable: boolean;
 }
 /**
  * Marks a class as a `SmartContract`.
@@ -1153,10 +1151,30 @@ export interface LinkedSmartContractConstructor {
 export const LinkedSmartContract: LinkedSmartContractConstructor;
 
 /**
- * Marks a `SmartContract` method to be verified before execution.
+ * Marks a `SmartContract` method that verifies `Asset` transfers from the `SmartContract`.
+ *
+ * Method must return a boolean indicating whether the `SmartContract` wishes to send the transferred `Asset`s.
+ *
+ * May be used in combination with `@receive`
  */
-export function verify(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
+export function send(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
 /**
- * Marks a `SmartContract` method as constant.
+ * Marks a `SmartContract` method that verifies receiving `Asset`s to the `SmartContract`.
+ *
+ * Method must return a boolean indicating whether the `SmartContract` wishes to receive the transferred `Asset`s.
+ *
+ * May be used in combination with `@send`.
+ */
+export function receive(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
+/**
+ * Marks a `SmartContract` method that verifies GAS claims from the `SmartContract`.
+ *
+ * Method must return a boolean indicating whether the `SmartContract` wishes to allow GAS to be claimed.
+ *
+ * May optionally take the `ClaimTransaction` this `SmartContract` is executed in as the last argument. Accessing `Blockchain.currentTransaction` will result in an error.
+ */
+export function claim(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
+/**
+ * Marks a `SmartContract` method as not modifying storage.
  */
 export function constant(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;

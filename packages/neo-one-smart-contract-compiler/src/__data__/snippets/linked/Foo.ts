@@ -8,7 +8,6 @@ export class Foo implements SmartContract {
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'Foo',
-    payable: true,
   };
 
   public getFoo(): string {

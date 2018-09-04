@@ -40,8 +40,36 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('Event');
   }
 
-  if (text.includes('InvokeTransactionOptions')) {
-    mutableClauses.push('InvokeTransactionOptions');
+  if (text.includes('InvokeSendTransactionOptions')) {
+    mutableClauses.push('InvokeSendTransactionOptions');
+  }
+
+  if (text.includes('InvokeReceiveTransactionOptions')) {
+    mutableClauses.push('InvokeReceiveTransactionOptions');
+  }
+
+  if (text.includes('InvokeSendReceiveTransactionOptions')) {
+    mutableClauses.push('InvokeSendReceiveTransactionOptions');
+  }
+
+  if (text.includes('InvokeClaimTransactionOptions')) {
+    mutableClauses.push('InvokeClaimTransactionOptions');
+  }
+
+  if (text.includes('TransactionReceipt')) {
+    mutableClauses.push('TransactionReceipt');
+  }
+
+  if (text.includes('ClaimTransaction')) {
+    mutableClauses.push('ClaimTransaction');
+  }
+
+  if (text.includes('InvocationTransaction')) {
+    mutableClauses.push('InvocationTransaction');
+  }
+
+  if (text.includes('TransactionOptions')) {
+    mutableClauses.push('TransactionOptions');
   }
 
   return mutableClauses;

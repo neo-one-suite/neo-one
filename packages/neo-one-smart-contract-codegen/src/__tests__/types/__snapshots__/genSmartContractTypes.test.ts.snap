@@ -2,7 +2,7 @@
 
 exports[`genSmartContractTypes NEP5 1`] = `
 Object {
-  "ts": "import { AddressString, Event, InvokeReceipt, InvokeTransactionOptions, ReadSmartContract, SmartContract, TransactionResult } from '@neo-one/client';
+  "ts": "import { AddressString, Event, InvocationTransaction, InvokeReceipt, ReadSmartContract, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
 export type TokenEvent = TokenTransferEvent
@@ -20,7 +20,7 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
   readonly name: () => Promise<string>;
   readonly symbol: () => Promise<string>;
   readonly totalSupply: () => Promise<BigNumber>;
-  readonly transfer: (from: AddressString, to: AddressString, value: BigNumber, options?: InvokeTransactionOptions) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>>>;
+  readonly transfer: (from: AddressString, to: AddressString, value: BigNumber, options?: TransactionOptions) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
 }
 
 export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {

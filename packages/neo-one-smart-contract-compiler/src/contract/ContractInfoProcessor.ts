@@ -2,7 +2,7 @@ import { ClassInstanceMemberType, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
 import { STRUCTURED_STORAGE_TYPES, StructuredStorageType } from '../compile/constants';
-import { DEPLOY_METHOD, PROPERTIES_PROPERTY } from '../constants';
+import { ContractPropertyName, Decorator, PROPERTIES_PROPERTY } from '../constants';
 import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
@@ -18,7 +18,6 @@ export interface DeployPropInfo extends PropInfoBase {
   readonly name: string;
   readonly decl?: ts.ConstructorDeclaration;
   readonly callSignature?: ts.Signature;
-  readonly verify?: boolean;
 }
 
 export interface FunctionPropInfo extends PropInfoBase {
@@ -27,9 +26,12 @@ export interface FunctionPropInfo extends PropInfoBase {
   readonly symbol: ts.Symbol;
   readonly decl: ts.MethodDeclaration;
   readonly callSignature: ts.Signature | undefined;
-  readonly verify: boolean;
-  readonly returnType: ts.Type | undefined;
+  readonly send: boolean;
+  readonly receive: boolean;
+  readonly claim: boolean;
   readonly constant: boolean;
+  readonly acceptsClaim: boolean;
+  readonly returnType: ts.Type | undefined;
   readonly isAbstract: boolean;
 }
 
@@ -86,8 +88,7 @@ export class ContractInfoProcessor {
       propInfos: result.propInfos.concat([
         {
           type: 'deploy',
-          name: DEPLOY_METHOD,
-          verify: false,
+          name: ContractPropertyName.deploy,
           classDecl: this.smartContract,
           isPublic: true,
         },
@@ -128,10 +129,9 @@ export class ContractInfoProcessor {
       propInfos = propInfos.concat([
         {
           type: 'deploy',
-          name: DEPLOY_METHOD,
+          name: ContractPropertyName.deploy,
           classDecl,
           decl: ctor,
-          verify: this.hasVerify(ctor),
           isPublic: true,
           callSignature,
         },
@@ -175,8 +175,7 @@ export class ContractInfoProcessor {
         propInfos: contractInfo.propInfos.concat([
           {
             type: 'deploy',
-            name: DEPLOY_METHOD,
-            verify: false,
+            name: ContractPropertyName.deploy,
             classDecl: this.smartContract,
             isPublic: true,
           },
@@ -273,7 +272,10 @@ export class ContractInfoProcessor {
         classDecl,
         symbol: tsUtils.symbol.getTarget(symbol),
         decl,
-        verify: this.hasVerify(decl),
+        send: this.hasSend(decl),
+        receive: this.hasReceive(decl),
+        claim: this.hasClaim(decl),
+        acceptsClaim: callSignatures.length >= 1 && this.isLastParamClaim(decl, callSignatures[0]),
         isPublic,
         callSignature,
         returnType: callSignatures.length >= 1 ? tsUtils.signature.getReturnType(callSignature) : undefined,
@@ -299,24 +301,45 @@ export class ContractInfoProcessor {
   }
 
   private hasConstant(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
-    return this.hasDecorator(decl, 'constant');
+    return this.hasDecorator(decl, Decorator.constant);
   }
 
-  private hasVerify(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
-    return this.hasDecorator(decl, 'verify');
+  private hasSend(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
+    return this.hasDecorator(decl, Decorator.send);
   }
 
-  private hasDecorator(
-    decl: ClassInstanceMemberType | ts.ConstructorDeclaration,
-    name: 'verify' | 'constant',
-  ): boolean {
+  private hasReceive(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
+    return this.hasDecorator(decl, Decorator.receive);
+  }
+
+  private hasClaim(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
+    return this.hasDecorator(decl, Decorator.claim);
+  }
+
+  private hasDecorator(decl: ClassInstanceMemberType | ts.ConstructorDeclaration, name: Decorator): boolean {
     const decorators = tsUtils.decoratable.getDecorators(decl);
 
     return decorators === undefined ? false : decorators.some((decorator) => this.isDecorator(decorator, name));
   }
 
-  private isDecorator(decorator: ts.Decorator, name: 'verify' | 'constant'): boolean {
+  private isDecorator(decorator: ts.Decorator, name: Decorator): boolean {
     return this.context.builtins.isValue(tsUtils.expression.getExpression(decorator), name);
+  }
+
+  private isLastParamClaim(node: ts.Node, callSignature: ts.Signature): boolean {
+    const signatureTypes = this.context.analysis.extractSignatureTypes(node, callSignature);
+    if (signatureTypes === undefined) {
+      return false;
+    }
+
+    if (signatureTypes.paramDecls.length === 0) {
+      return false;
+    }
+
+    const param = signatureTypes.paramDecls[signatureTypes.paramDecls.length - 1];
+    const paramType = signatureTypes.paramTypes.get(signatureTypes.paramDecls[signatureTypes.paramDecls.length - 1]);
+
+    return paramType !== undefined && this.context.builtins.isInterface(param, paramType, 'ClaimTransaction');
   }
 
   private hasDeployInfo(contractInfo: ContractInfo): boolean {

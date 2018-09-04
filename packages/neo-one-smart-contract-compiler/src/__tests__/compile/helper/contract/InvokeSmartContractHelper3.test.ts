@@ -6,7 +6,6 @@ public readonly properties = {
   author: 'dicarlo2',
   email: 'alex.dicarlo@neotracker.io',
   description: 'The TestSmartContract',
-  payable: true,
 };
 `;
 

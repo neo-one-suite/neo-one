@@ -34,6 +34,9 @@ describe('LocalUserAccountProvider', () => {
   const networks = [network];
   const getNetworks = jest.fn(() => networks);
   const getUnclaimed = jest.fn();
+  const getClaimAmount = jest.fn();
+  const getOutput = jest.fn();
+  const getTransaction = jest.fn();
   const getUnspentOutputs = jest.fn();
   const relayTransaction = jest.fn();
   const getTransactionReceipt = jest.fn();
@@ -47,6 +50,9 @@ describe('LocalUserAccountProvider', () => {
     networks$: _of(networks),
     getNetworks,
     getUnclaimed,
+    getClaimAmount,
+    getOutput,
+    getTransaction,
     getUnspentOutputs,
     relayTransaction,
     getTransactionReceipt,

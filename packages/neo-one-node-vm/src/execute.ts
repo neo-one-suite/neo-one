@@ -297,7 +297,7 @@ export const execute = async ({
 
   let err;
   try {
-    const entryScriptHash = crypto.hash160(scripts[scripts.length - 1].code);
+    const entryScriptHash = crypto.hash160(scripts[0].code);
     // tslint:disable-next-line no-loop-statement
     for (let idx = 0; idx < scripts.length && (context === undefined || context.state === VMState.Halt); idx += 1) {
       const script = scripts[idx];
@@ -305,7 +305,7 @@ export const execute = async ({
       //       to callingScriptHash within executeScript. executeScript
       //       automatically hashes the input code to determine the current
       //       scriptHash.
-      const scriptHash = idx + 1 < scripts.length ? crypto.hash160(scripts[idx + 1].code) : undefined;
+      const scriptHash = idx - 1 > 0 ? crypto.hash160(scripts[idx - 1].code) : undefined;
       let options: Options = {
         depth: scripts.length - idx,
         stack: [],

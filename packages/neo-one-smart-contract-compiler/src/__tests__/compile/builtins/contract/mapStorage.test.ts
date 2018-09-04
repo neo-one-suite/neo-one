@@ -53,7 +53,6 @@ describe('MapStorage', () => {
           author: 'dicarlo2',
           email: 'alex.dicarlo@neotracker.io',
           description: 'StorageContract',
-          payable: true,
         };
         private readonly storage = MapStorage.for<string, number>();
 
@@ -464,7 +463,6 @@ describe('MapStorage', () => {
           author: 'dicarlo2',
           email: 'alex.dicarlo@neotracker.io',
           description: 'StorageContract',
-          payable: true,
         };
         private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
 

@@ -723,7 +723,23 @@ export interface TransactionOptions {
   readonly monitor?: Monitor;
 }
 
-export interface InvokeTransactionOptions extends TransactionOptions {
+export interface InvokeClaimTransactionOptions extends TransactionOptions {
+  readonly claimAll?: boolean;
+}
+
+export interface InvokeSendTransactionOptions extends TransactionOptions {
+  readonly sendFrom?: ReadonlyArray<Transfer>;
+}
+
+export interface InvokeReceiveTransactionOptions extends TransactionOptions {
+  readonly sendTo?: ReadonlyArray<Omit<Transfer, 'to'>>;
+}
+
+export interface InvokeSendReceiveTransactionOptions
+  extends InvokeSendTransactionOptions,
+    InvokeReceiveTransactionOptions {}
+
+export interface InvokeExecuteTransactionOptions extends TransactionOptions {
   readonly transfers?: ReadonlyArray<Transfer>;
 }
 
@@ -866,9 +882,16 @@ export interface UserAccountProvider {
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
-    options?: InvokeTransactionOptions,
+    options?: InvokeSendReceiveTransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  readonly invokeClaim: (
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    options?: InvokeClaimTransactionOptions,
+  ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   readonly call: (
     network: NetworkType,
     contract: AddressString,

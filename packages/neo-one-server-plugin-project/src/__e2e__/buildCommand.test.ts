@@ -208,9 +208,8 @@ const verifySmartContracts = async (
   expect(initialBalance.toString()).toEqual('0');
 
   const mintResult = await ico.mintTokens({
-    transfers: [
+    sendTo: [
       {
-        to: ico.definition.networks[accountID.network].address,
         amount: new BigNumber(10),
         asset: Hash256.NEO,
       },

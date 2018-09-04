@@ -5,7 +5,6 @@ import * as args from './args';
 import { UnknownAccountError, UnknownNetworkError } from './errors';
 import * as networksConstant from './networks';
 import {
-  InvokeTransactionOptions,
   NetworkType,
   RawCallReceipt,
   Transaction,
@@ -179,7 +178,7 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
     return [...new Set(providers.reduce((acc: NetworkType[], provider) => acc.concat(provider.getNetworks()), []))];
   }
 
-  protected getProvider(options: TransactionOptions | InvokeTransactionOptions = {}): UserAccountProvider {
+  protected getProvider(options: TransactionOptions = {}): UserAccountProvider {
     const { from } = options;
     if (from === undefined) {
       return this.selectedProvider$.getValue();

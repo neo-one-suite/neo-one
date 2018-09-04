@@ -242,17 +242,8 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       addMethod(method);
     });
 
-    const verifySymbol = sb.context.builtins.getValueSymbol('verify');
-    const constantSymbol = sb.context.builtins.getValueSymbol('constant');
     tsUtils.class_.getConcreteMembers(decl).forEach((member) => {
-      const decorators =
-        ts.isMethodDeclaration(member) || ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member)
-          ? tsUtils.decoratable.getDecoratorsArray(member).filter((decorator) => {
-              const decoratorSymbol = sb.context.analysis.getSymbol(tsUtils.expression.getExpression(decorator));
-
-              return decoratorSymbol !== verifySymbol && decoratorSymbol !== constantSymbol;
-            })
-          : tsUtils.decoratable.getDecoratorsArray(member);
+      const decorators = tsUtils.decoratable.getDecoratorsArray(member);
       if (decorators.length > 0) {
         sb.context.reportUnsupported(decorators[0]);
       }

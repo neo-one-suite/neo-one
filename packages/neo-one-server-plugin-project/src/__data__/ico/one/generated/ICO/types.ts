@@ -1,13 +1,15 @@
-/* @hash 032fcef50c558d2df1b56d2e38c55e5c */
+/* @hash 8a5cd2b88fbdfc8d6284a100768d67d0 */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
   Event,
+  InvocationTransaction,
   InvokeReceipt,
-  InvokeTransactionOptions,
+  InvokeReceiveTransactionOptions,
   ReadSmartContract,
   SmartContract,
+  TransactionOptions,
   TransactionResult,
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
@@ -29,12 +31,12 @@ export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
     owner?: AddressString,
     startTimeSeconds?: BigNumber,
     icoDurationSeconds?: BigNumber,
-    options?: InvokeTransactionOptions,
-  ) => Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>>>;
+    options?: TransactionOptions,
+  ) => Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>>;
   readonly icoDurationSeconds: () => Promise<BigNumber>;
   readonly mintTokens: (
-    options?: InvokeTransactionOptions,
-  ) => Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>>>;
+    options?: InvokeReceiveTransactionOptions,
+  ) => Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>>;
   readonly owner: () => Promise<AddressString>;
   readonly remaining: () => Promise<BigNumber>;
   readonly startTimeSeconds: () => Promise<BigNumber>;

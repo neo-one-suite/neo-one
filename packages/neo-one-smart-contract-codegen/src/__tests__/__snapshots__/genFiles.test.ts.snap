@@ -262,10 +262,11 @@ export const createTokenReadSmartContract = (client: ReadClient): TokenReadSmart
 import {
   AddressString,
   Event,
+  InvocationTransaction,
   InvokeReceipt,
-  InvokeTransactionOptions,
   ReadSmartContract,
   SmartContract,
+  TransactionOptions,
   TransactionResult,
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
@@ -289,8 +290,8 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
     from: AddressString,
     to: AddressString,
     value: BigNumber,
-    options?: InvokeTransactionOptions,
-  ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>>>;
+    options?: TransactionOptions,
+  ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
 }
 
 export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {

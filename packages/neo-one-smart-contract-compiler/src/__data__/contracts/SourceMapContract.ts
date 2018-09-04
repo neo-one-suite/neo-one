@@ -7,7 +7,6 @@ export class SourceMapContract implements SmartContract {
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'SourceMapContract',
-    payable: false,
   };
   private readonly constructorValue: number;
 

@@ -64,7 +64,6 @@ describe('ArrayStorage', () => {
           author: 'dicarlo2',
           email: 'alex.dicarlo@neotracker.io',
           description: 'StorageContract',
-          payable: true,
         };
         public readonly storage = ArrayStorage.for<string>();
 
@@ -99,7 +98,6 @@ describe('ArrayStorage', () => {
           author: 'dicarlo2',
           email: 'alex.dicarlo@neotracker.io',
           description: 'StorageContract',
-          payable: true,
         };
         public readonly prefix = ArrayStorage.for<string>();
 

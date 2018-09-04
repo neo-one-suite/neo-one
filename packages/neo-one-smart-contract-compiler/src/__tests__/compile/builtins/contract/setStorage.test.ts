@@ -15,7 +15,6 @@ describe('SetStorage', () => {
           author: 'dicarlo2',
           email: 'alex.dicarlo@neotracker.io',
           description: 'StorageContract',
-          payable: true,
         };
         public readonly storage = SetStorage.for<string>();
 
@@ -389,7 +388,6 @@ describe('SetStorage', () => {
           author: 'dicarlo2',
           email: 'alex.dicarlo@neotracker.io',
           description: 'StorageContract',
-          payable: true,
         };
         public readonly storage = SetStorage.for<[Address, Hash256, string]>();
 

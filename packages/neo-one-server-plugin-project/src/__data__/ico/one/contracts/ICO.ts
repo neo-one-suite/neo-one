@@ -8,8 +8,8 @@ import {
   Hash256,
   Integer,
   LinkedSmartContract,
+  receive,
   SmartContract,
-  verify,
 } from '@neo-one/smart-contract';
 import { Token } from './Token';
 
@@ -21,7 +21,6 @@ export class ICO implements SmartContract {
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'NEO•ONE ICO',
-    payable: true,
   };
   public readonly amountPerNEO = 10;
   private mutableRemaining: Fixed<8> = 10_000_000_000_00000000;
@@ -41,7 +40,7 @@ export class ICO implements SmartContract {
     return this.mutableRemaining;
   }
 
-  @verify
+  @receive
   public mintTokens(): boolean {
     if (!this.hasStarted() || this.hasEnded()) {
       notifyRefund();

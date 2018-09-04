@@ -1,4 +1,4 @@
-/* @hash d3f467e782352c86ada29ee4961bacb5 */
+/* @hash 5fb19db8b7dc9293cac5821ae2148641 */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -35,64 +35,65 @@ export const icoABI: ABI = {
     {
       constant: true,
       name: 'amountPerNEO',
+      parameters: [],
       returnType: {
         decimals: 0,
         optional: false,
         type: 'Integer',
       },
-      verify: false,
     },
     {
       constant: true,
       name: 'owner',
+      parameters: [],
       returnType: {
         optional: false,
         type: 'Address',
       },
-      verify: false,
     },
     {
       constant: true,
       name: 'startTimeSeconds',
+      parameters: [],
       returnType: {
         decimals: 0,
         optional: false,
         type: 'Integer',
       },
-      verify: false,
     },
     {
       constant: true,
       name: 'icoDurationSeconds',
+      parameters: [],
       returnType: {
         decimals: 0,
         optional: false,
         type: 'Integer',
       },
-      verify: false,
     },
     {
       constant: true,
       name: 'remaining',
+      parameters: [],
       returnType: {
         decimals: 8,
         optional: false,
         type: 'Integer',
       },
-      verify: false,
     },
     {
+      claim: false,
       constant: false,
       name: 'mintTokens',
       parameters: [],
+      receive: true,
       returnType: {
         optional: false,
         type: 'Boolean',
       },
-      verify: true,
+      send: false,
     },
     {
-      constant: false,
       name: 'deploy',
       parameters: [
         {
@@ -119,7 +120,6 @@ export const icoABI: ABI = {
       returnType: {
         type: 'Boolean',
       },
-      verify: false,
     },
   ],
 };

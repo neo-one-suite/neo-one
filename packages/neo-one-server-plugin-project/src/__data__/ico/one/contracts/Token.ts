@@ -22,7 +22,6 @@ export class Token implements SmartContract {
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'NEO•ONE Token',
-    payable: false,
   };
   public readonly name = 'One';
   public readonly symbol = 'ONE';

@@ -537,12 +537,14 @@ const assertABIFunction = (name: string, value?: unknown): ABIFunction => {
 
   return {
     name: assertProperty(value, 'ABIFunction', 'name', assertString),
-    constant: assertProperty(value, 'ABIFunction', 'constant', assertNullableBoolean),
     parameters: assertProperty(value, 'ABIFunction', 'parameters', assertNullableArray).map((parameter) =>
       assertABIParameter('ABIFunction.parameters', parameter),
     ),
-    verify: assertProperty(value, 'ABIFunction', 'verify', assertNullableBoolean),
     returnType: assertProperty(value, 'ABIFunction', 'returnType', assertABIReturn),
+    constant: assertProperty(value, 'ABIFunction', 'constant', assertNullableBoolean),
+    send: assertProperty(value, 'ABIFunction', 'send', assertNullableBoolean),
+    receive: assertProperty(value, 'ABIFunction', 'receive', assertNullableBoolean),
+    claim: assertProperty(value, 'ABIFunction', 'claim', assertNullableBoolean),
   };
 };
 

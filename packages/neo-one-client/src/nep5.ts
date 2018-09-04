@@ -7,10 +7,10 @@ import {
   AddressString,
   Event,
   InvokeReceipt,
-  InvokeTransactionOptions,
   ReadSmartContract,
   SmartContract,
   SmartContractNetworksDefinition,
+  TransactionOptions,
   TransactionResult,
 } from './types';
 
@@ -34,7 +34,7 @@ export interface NEP5SmartContract extends SmartContract<NEP5ReadSmartContract> 
     from: AddressString,
     to: AddressString,
     amount: BigNumber,
-    options?: InvokeTransactionOptions,
+    options?: TransactionOptions,
   ) => TransactionResult<InvokeReceipt<boolean, NEP5Event>>;
 }
 

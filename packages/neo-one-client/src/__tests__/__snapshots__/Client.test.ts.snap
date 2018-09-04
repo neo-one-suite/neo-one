@@ -143,14 +143,16 @@ Array [
       "events": Array [],
       "functions": Array [
         Object {
+          "claim": undefined,
           "constant": undefined,
           "name": "deploy",
           "parameters": Array [],
+          "receive": undefined,
           "returnType": Object {
             "optional": undefined,
             "type": "Boolean",
           },
-          "verify": undefined,
+          "send": undefined,
         },
       ],
     },
@@ -230,48 +232,57 @@ Object {
       ],
       "functions": Array [
         Object {
+          "claim": undefined,
           "constant": true,
           "name": "name",
           "parameters": Array [],
+          "receive": undefined,
           "returnType": Object {
             "optional": undefined,
             "type": "String",
           },
-          "verify": undefined,
+          "send": undefined,
         },
         Object {
+          "claim": undefined,
           "constant": true,
           "name": "symbol",
           "parameters": Array [],
+          "receive": undefined,
           "returnType": Object {
             "optional": undefined,
             "type": "String",
           },
-          "verify": undefined,
+          "send": undefined,
         },
         Object {
+          "claim": undefined,
           "constant": true,
           "name": "decimals",
           "parameters": Array [],
+          "receive": undefined,
           "returnType": Object {
             "decimals": 0,
             "optional": undefined,
             "type": "Integer",
           },
-          "verify": undefined,
+          "send": undefined,
         },
         Object {
+          "claim": undefined,
           "constant": true,
           "name": "totalSupply",
           "parameters": Array [],
+          "receive": undefined,
           "returnType": Object {
             "decimals": 8,
             "optional": undefined,
             "type": "Integer",
           },
-          "verify": undefined,
+          "send": undefined,
         },
         Object {
+          "claim": undefined,
           "constant": undefined,
           "name": "transfer",
           "parameters": Array [
@@ -295,13 +306,15 @@ Object {
               "type": "Integer",
             },
           ],
+          "receive": undefined,
           "returnType": Object {
             "optional": undefined,
             "type": "Boolean",
           },
-          "verify": undefined,
+          "send": undefined,
         },
         Object {
+          "claim": undefined,
           "constant": true,
           "name": "balanceOf",
           "parameters": Array [
@@ -312,12 +325,13 @@ Object {
               "type": "Address",
             },
           ],
+          "receive": undefined,
           "returnType": Object {
             "decimals": 8,
             "optional": undefined,
             "type": "Integer",
           },
-          "verify": undefined,
+          "send": undefined,
         },
       ],
     },

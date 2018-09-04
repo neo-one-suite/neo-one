@@ -8,7 +8,7 @@ describe('Transaction', () => {
   test('properties', async () => {
     const node = await helpers.startNode();
     const block = await node.readClient.getBlock(0);
-    const { transaction } = await node.executeString(
+    const { transaction: invocationTransaction } = await node.executeString(
       `
       import { Hash256, TransactionType, Transaction, } from '@neo-one/smart-contract';
 
@@ -16,14 +16,16 @@ describe('Transaction', () => {
 
       assertEqual(transaction.type, TransactionType.Miner);
     `,
+    );
+    const { transaction, confirmed } = await node.client.transfer(
+      [
+        {
+          to: keys[0].address,
+          amount: new BigNumber(10),
+          asset: common.NEO_ASSET_HASH,
+        },
+      ],
       {
-        transfers: [
-          {
-            to: keys[0].address,
-            amount: new BigNumber(10),
-            asset: common.NEO_ASSET_HASH,
-          },
-        ],
         attributes: [
           {
             usage: 'Description',
@@ -32,6 +34,7 @@ describe('Transaction', () => {
         ],
       },
     );
+    await confirmed();
 
     const getUsage = (attribute: Attribute) => AttributeUsage[attribute.usage];
 
@@ -63,12 +66,16 @@ describe('Transaction', () => {
     const references = await Promise.all(transaction.inputs.map(async (input) => node.readClient.getOutput(input)));
 
     await node.executeString(`
-      import { TransactionBase, TransactionType, Transaction, Address, Hash256, Attribute, Output, Input, InvocationTransaction, AttributeBase } from '@neo-one/smart-contract';
+      import { TransactionBase, TransactionType, Transaction, Address, Hash256, Attribute, Output, Input, InvocationTransaction, ContractTransaction, AttributeBase } from '@neo-one/smart-contract';
 
-      const transaction = Transaction.for(Hash256.from('${transaction.hash}')) as InvocationTransaction;
+      const invocationTransaction = Transaction.for(Hash256.from('${
+        invocationTransaction.hash
+      }')) as InvocationTransaction;
+      assertEqual(invocationTransaction.script.equals(${helpers.getBufferHash(invocationTransaction.script)}), true);
 
-      assertEqual(transaction.type, TransactionType.Invocation);
-      assertEqual(transaction.script.equals(${helpers.getBufferHash(transaction.script)}), true);
+      const transaction = Transaction.for(Hash256.from('${transaction.hash}')) as ContractTransaction;
+
+      assertEqual(transaction.type, TransactionType.Contract);
 
       const attributes = transaction.attributes;
       assertEqual(attributes.length, ${transaction.attributes.length});

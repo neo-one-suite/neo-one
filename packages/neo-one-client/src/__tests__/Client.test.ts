@@ -24,6 +24,7 @@ describe('Client', () => {
   const readClient = {};
   const read = jest.fn(() => readClient);
   const invoke = jest.fn(async () => commonTransactionResult);
+  const invokeClaim = jest.fn(async () => commonTransactionResult);
   const commonRawCallReceipt = factory.createRawCallReceipt();
   const call = jest.fn(async () => commonRawCallReceipt);
   let transfer: jest.Mock<Promise<TransactionResult>>;
@@ -59,6 +60,7 @@ describe('Client', () => {
       issue,
       read,
       invoke,
+      invokeClaim,
       call,
     };
     provider1 = {
@@ -80,6 +82,7 @@ describe('Client', () => {
       issue: issue1,
       read: jest.fn(),
       invoke: jest.fn(async () => Promise.resolve()),
+      invokeClaim: jest.fn(async () => Promise.resolve()),
       call: jest.fn(),
     };
     client = new Client({ [type]: provider, [type1]: provider1 });

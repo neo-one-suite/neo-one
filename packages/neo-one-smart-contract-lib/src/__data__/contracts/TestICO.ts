@@ -18,7 +18,6 @@ export class TestICO extends ICO<8> {
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'The TestICO',
-    payable: true,
   };
 
   public constructor(public readonly owner: Address, startTimeSeconds: Integer) {

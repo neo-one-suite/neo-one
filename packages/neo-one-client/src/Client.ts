@@ -16,12 +16,14 @@ import {
   AddressString,
   AssetRegister,
   Block,
+  ClaimTransaction,
   ContractRegister,
   ContractTransaction,
   GetOptions,
   Hash256String,
   InvocationTransaction,
-  InvokeTransactionOptions,
+  InvokeClaimTransactionOptions,
+  InvokeSendReceiveTransactionOptions,
   IssueTransaction,
   NetworkType,
   Param,
@@ -207,11 +209,23 @@ export class Client<
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
-    options?: InvokeTransactionOptions,
+    options?: InvokeSendReceiveTransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     return this.addTransactionHooks(
       this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMaps),
+    );
+  }
+
+  public async __invokeClaim(
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    options?: InvokeClaimTransactionOptions,
+  ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
+    return this.addTransactionHooks(
+      this.getProvider(options).invokeClaim(contract, method, params, paramsZipped, options),
     );
   }
 

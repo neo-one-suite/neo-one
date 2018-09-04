@@ -11,6 +11,7 @@ import {
   InputOutput,
   NetworkSettings,
   NetworkType,
+  Output,
   RawCallReceipt,
   RawInvocationData,
   Transaction,
@@ -110,6 +111,18 @@ export class NEOONEProvider {
 
   public async getBlockCount(network: NetworkType, monitor?: Monitor): Promise<number> {
     return this.getProvider(network).getBlockCount(monitor);
+  }
+
+  public async getTransaction(network: NetworkType, hash: Hash256String, monitor?: Monitor): Promise<Transaction> {
+    return this.getProvider(network).getTransaction(hash, monitor);
+  }
+
+  public async getOutput(network: NetworkType, input: Input, monitor?: Monitor): Promise<Output> {
+    return this.getProvider(network).getOutput(input, monitor);
+  }
+
+  public async getClaimAmount(network: NetworkType, input: Input, monitor?: Monitor): Promise<BigNumber> {
+    return this.getProvider(network).getClaimAmount(input, monitor);
   }
 
   public read(network: NetworkType): NEOONEDataProvider | NEOONEOneDataProvider {
