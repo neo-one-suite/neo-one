@@ -1,12 +1,9 @@
 import ts from 'typescript';
-import { DiagnosticCode } from '../../DiagnosticCode';
+import * as constants from '../../constants';
 import { ProgramCounter } from '../pc';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 import { Name, Scope } from './Scope';
-
-import * as constants from '../../constants';
-import { DiagnosticMessage } from '../../DiagnosticMessage';
 
 class IdentifierName implements Name {
   public readonly nameBrand = 0;
@@ -76,10 +73,7 @@ export class ResolvedScope implements Scope {
     const options = sb.pushValueOptions(optionsIn);
     const position = this.getPosition(name);
     if (position === undefined) {
-      if (this.parent === undefined) {
-        /* istanbul ignore next */
-        sb.context.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
-      } else {
+      if (this.parent !== undefined) {
         this.parent.set(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }
     } else {
@@ -104,9 +98,7 @@ export class ResolvedScope implements Scope {
   ): void {
     const position = this.getPosition(name);
     if (position === undefined) {
-      if (this.parent === undefined) {
-        sb.context.reportError(node, DiagnosticCode.ReferenceError, DiagnosticMessage.UnknownReference, name);
-      } else {
+      if (this.parent !== undefined) {
         this.parent.get(sb, node, options, name, scopeLength, scopePosition + this.scopeCount);
       }
     } else {

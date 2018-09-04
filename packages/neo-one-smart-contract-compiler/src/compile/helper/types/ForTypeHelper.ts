@@ -21,6 +21,7 @@ export interface ForTypeHelperOptions {
   readonly types: ReadonlyArray<ForType>;
   readonly single?: boolean;
   readonly singleUndefined?: (options: VisitOptions) => void;
+  readonly optional?: boolean;
   readonly defaultCase?: (options: VisitOptions) => void;
 }
 
@@ -31,14 +32,16 @@ export class ForTypeHelper extends Helper {
   private readonly types: ReadonlyArray<ForType>;
   private readonly single: boolean;
   private readonly singleUndefined: ((options: VisitOptions) => void) | undefined;
+  private readonly optional: boolean;
   private readonly defaultCase: ((options: VisitOptions) => void) | undefined;
 
-  public constructor({ type, types, single, singleUndefined, defaultCase }: ForTypeHelperOptions) {
+  public constructor({ type, types, single, singleUndefined, defaultCase, optional = false }: ForTypeHelperOptions) {
     super();
     this.type = type;
     this.types = types;
     this.single = single === undefined ? false : single;
     this.singleUndefined = singleUndefined;
+    this.optional = optional;
     this.defaultCase = defaultCase;
   }
 
@@ -51,7 +54,7 @@ export class ForTypeHelper extends Helper {
     if (
       typeIn !== undefined &&
       this.single &&
-      hasUndefined(sb.context, node, typeIn) &&
+      (this.optional || hasUndefined(sb.context, node, typeIn)) &&
       this.singleUndefined !== undefined
     ) {
       typeIn = tsUtils.type_.getNonNullableType(typeIn);

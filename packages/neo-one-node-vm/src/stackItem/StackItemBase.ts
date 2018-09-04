@@ -86,9 +86,10 @@ export class StackItemBase implements Equatable {
     if (seen.has(this)) {
       throw new InvalidRecursiveSerializeError();
     }
-    seen.add(this);
+    const nextSeen = new Set(seen);
+    nextSeen.add(this);
 
-    return this.serializeInternal(seen);
+    return this.serializeInternal(nextSeen);
   }
 
   // tslint:disable-next-line readonly-array
@@ -243,9 +244,10 @@ export class StackItemBase implements Equatable {
     if (seen.has(this)) {
       return '<circular>';
     }
-    seen.add(this);
+    const nextSeen = new Set(seen);
+    nextSeen.add(this);
 
-    return this.convertJSONInternal(seen);
+    return this.convertJSONInternal(nextSeen);
   }
 
   protected serializeInternal(_seen: Set<StackItemBase>): Buffer {

@@ -86,13 +86,13 @@ const publish = async (
   client: Client,
   developerClient: DeveloperClient,
   context: Context,
-  code: Buffer,
+  code: string,
   ignoreWarnings?: boolean,
 ): Promise<Contract> => {
   throwOnDiagnosticErrorOrWarning(context.diagnostics, ignoreWarnings);
 
   const result = await client.publish({
-    script: code.toString('hex'),
+    script: code,
     parameters: ['String', 'Array'],
     returnType: 'Buffer',
     name: 'TestContract',
@@ -123,10 +123,14 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
 
   return {
     async addContract(script, options = {}): Promise<Contract> {
-      const { code, context, sourceMap } = getCompiledScript(script, options.fileName);
+      const {
+        contract: { script: outputScript },
+        context,
+        sourceMap,
+      } = getCompiledScript(script, options.fileName);
 
       const [result, resolvedSourceMap] = await Promise.all([
-        publish(client, developerClient, context, code, outerOptions.ignoreWarnings),
+        publish(client, developerClient, context, outputScript, outerOptions.ignoreWarnings),
         sourceMap,
       ]);
       mutableSourceMaps[result.address] = resolvedSourceMap;
@@ -145,10 +149,13 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       );
       const context = createContextForPath(filePath, { withTestHarness: true });
       const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, filePath);
-      const { code, sourceMap } = compile({ context, sourceFile, linked });
+      const {
+        contract: { script: outputScript },
+        sourceMap,
+      } = compile({ context, sourceFile, linked });
 
       const [result, resolvedSourceMap] = await Promise.all([
-        publish(client, developerClient, context, code, outerOptions.ignoreWarnings),
+        publish(client, developerClient, context, outputScript, outerOptions.ignoreWarnings),
         sourceMap,
       ]);
       mutableSourceMaps[result.address] = resolvedSourceMap;
@@ -156,13 +163,19 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       return result;
     },
     async executeString(script, options = {}) {
-      const { code, sourceMap, context } = getCompiledScript(script);
+      const {
+        contract: { script: outputScript },
+        sourceMap,
+        context,
+      } = getCompiledScript(script);
 
       throwOnDiagnosticErrorOrWarning(context.diagnostics, outerOptions.ignoreWarnings);
 
-      mutableSourceMaps[scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(code)))] = await sourceMap;
+      mutableSourceMaps[
+        scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(Buffer.from(outputScript, 'hex'))))
+      ] = await sourceMap;
       const result = await userAccountProviders.memory.__execute(
-        code.toString('hex'),
+        outputScript,
         { from: masterWallet.account.id, ...options },
         Promise.resolve(mutableSourceMaps),
       );

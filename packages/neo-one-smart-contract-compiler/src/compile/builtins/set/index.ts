@@ -59,10 +59,10 @@ export const add = (builtins: Builtins): void => {
   builtins.addInterface('ReadonlySet', new ReadonlySetInterface());
   builtins.addValue('Set', new SetValue());
   COMMON.forEach(([name, builtin]) => {
-    builtins.addMember('Set', name, builtin);
-    builtins.addMember('ReadonlySet', name, builtin);
+    builtins.addGlobalMember('Set', name, builtin);
+    builtins.addGlobalMember('ReadonlySet', name, builtin);
   });
-  builtins.addMember('Set', 'delete', new MapDelete());
-  builtins.addMember('Set', 'add', new SetAdd());
+  builtins.addGlobalMember('Set', 'delete', new MapDelete());
+  builtins.addGlobalMember('Set', 'add', new SetAdd());
   builtins.addInterface('SetConstructor', new SetConstructorInterface());
 };

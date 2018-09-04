@@ -28,11 +28,11 @@ describe('LinkedSmartContract.for', () => {
       import { Address, SmartContract } from '@neo-one/smart-contract';
 
       interface Contract {
-        run(address: Address): void;
+        getFoo(address: Address): string;
       }
       const expected = Address.from('${fooContract.address}');
       const contract = SmartContract.for<Contract>(Address.from('${barContract.address}'));
-      contract.run(expected);
+      assertEqual(contract.getFoo(expected), 'foo');
     `);
   });
 });

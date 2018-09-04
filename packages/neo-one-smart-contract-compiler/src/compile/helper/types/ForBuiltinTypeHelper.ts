@@ -39,6 +39,7 @@ export interface ForBuiltinTypeHelperOptions {
   readonly knownType?: Types;
   readonly single?: boolean;
   readonly singleUndefined?: ProcessType;
+  readonly optional?: boolean;
   readonly array: ProcessType;
   readonly map: ProcessType;
   readonly set: ProcessType;
@@ -75,6 +76,7 @@ export class ForBuiltinTypeHelper extends Helper {
   private readonly knownType?: Types;
   private readonly single?: boolean;
   private readonly singleUndefined?: ProcessType;
+  private readonly optional?: boolean;
   private readonly array: ProcessType;
   private readonly map: ProcessType;
   private readonly set: ProcessType;
@@ -108,6 +110,7 @@ export class ForBuiltinTypeHelper extends Helper {
     knownType,
     single,
     singleUndefined,
+    optional,
     array,
     map,
     set,
@@ -141,6 +144,7 @@ export class ForBuiltinTypeHelper extends Helper {
     this.knownType = knownType;
     this.single = single;
     this.singleUndefined = singleUndefined;
+    this.optional = optional;
     this.array = array;
     this.map = map;
     this.set = set;
@@ -184,6 +188,7 @@ export class ForBuiltinTypeHelper extends Helper {
         type: this.type,
         single: this.single,
         singleUndefined: this.singleUndefined,
+        optional: this.optional,
         types: [
           {
             hasType: (type) => hasUndefined(sb.context, node, type),

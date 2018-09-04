@@ -50,3 +50,10 @@ export function getMemberOrThrow(node: ts.Symbol, name: string): ts.Symbol {
 export function isArgumentsSymbol(typeChecker: ts.TypeChecker, node: ts.Symbol): boolean {
   return typeChecker.isArgumentsSymbol(node);
 }
+
+export function getTarget(symbol: ts.Symbol): ts.Symbol {
+  // tslint:disable-next-line no-any
+  const symbolAny: any = symbol;
+
+  return symbolAny.target === undefined ? symbol : symbolAny.target;
+}

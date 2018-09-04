@@ -8,6 +8,7 @@ export interface ParametersHelperOptions {
   readonly params: ReadonlyArray<ts.ParameterDeclaration>;
   readonly onStack?: boolean;
   readonly map?: (param: ts.ParameterDeclaration, options: VisitOptions) => void;
+  readonly mapParam?: (param: ts.ParameterDeclaration, options: VisitOptions) => void;
 }
 
 // Input: [argsArray]
@@ -16,12 +17,14 @@ export class ParametersHelper extends Helper {
   private readonly params: ReadonlyArray<ts.ParameterDeclaration>;
   private readonly onStack: boolean;
   private readonly map?: (param: ts.ParameterDeclaration, options: VisitOptions) => void;
+  private readonly mapParam?: (param: ts.ParameterDeclaration, options: VisitOptions) => void;
 
   public constructor(options: ParametersHelperOptions) {
     super();
     this.params = options.params;
     this.onStack = options.onStack === undefined ? false : options.onStack;
     this.map = options.map;
+    this.mapParam = options.mapParam;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
@@ -67,6 +70,9 @@ export class ParametersHelper extends Helper {
               sb.emitPushInt(param, idx);
               // [arg, argsarr]
               sb.emitOp(param, 'PICKITEM');
+              if (this.mapParam !== undefined) {
+                this.mapParam(param, options);
+              }
               // [arg, arg, argsarr]
               sb.emitOp(param, 'DUP');
               sb.emitHelper(
@@ -114,6 +120,9 @@ export class ParametersHelper extends Helper {
               sb.emitPushInt(param, idx);
               // [arg, argsarr]
               sb.emitOp(param, 'PICKITEM');
+              if (this.mapParam !== undefined) {
+                this.mapParam(param, options);
+              }
             },
           }),
         );
@@ -124,6 +133,9 @@ export class ParametersHelper extends Helper {
         sb.emitPushInt(param, idx);
         // [arg, argsarr]
         sb.emitOp(param, 'PICKITEM');
+        if (this.mapParam !== undefined) {
+          this.mapParam(param, options);
+        }
       }
 
       if (this.map !== undefined) {
@@ -160,6 +172,16 @@ export class ParametersHelper extends Helper {
       sb.emitPushInt(restElement, parameters.length);
       // [arr]
       sb.emitHelper(restElement, options, sb.helpers.arrSlice({ hasEnd: false }));
+      const mapParam = this.mapParam;
+      if (mapParam !== undefined) {
+        sb.emitHelper(
+          restElement,
+          options,
+          sb.helpers.arrMap({
+            map: (innerOptions) => mapParam(restElement, innerOptions),
+          }),
+        );
+      }
       // [arrayVal]
       sb.emitHelper(restElement, options, sb.helpers.wrapArray);
 

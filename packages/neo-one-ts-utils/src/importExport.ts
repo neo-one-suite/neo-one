@@ -29,16 +29,23 @@ export function getModuleSpecifier(node: ts.ImportDeclaration | ts.ExportDeclara
   return moduleSpecifier;
 }
 
-export function getModuleSpecifierSourceFile(
+export function getModuleSpecifierSymbol(
   typeChecker: ts.TypeChecker,
   node: ts.ImportDeclaration | ts.ExportDeclaration,
-): ts.SourceFile | undefined {
+): ts.Symbol | undefined {
   const moduleSpecifier = getModuleSpecifier(node);
   if (moduleSpecifier === undefined) {
     return undefined;
   }
 
-  const nodeSymbol = node_.getSymbol(typeChecker, moduleSpecifier);
+  return node_.getSymbol(typeChecker, moduleSpecifier);
+}
+
+export function getModuleSpecifierSourceFile(
+  typeChecker: ts.TypeChecker,
+  node: ts.ImportDeclaration | ts.ExportDeclaration,
+): ts.SourceFile | undefined {
+  const nodeSymbol = getModuleSpecifierSymbol(typeChecker, node);
   if (nodeSymbol === undefined) {
     return undefined;
   }

@@ -41,7 +41,7 @@ export class AnalysisService {
 
     const typeNode = tsUtils.type_.getTypeNode(node) as ts.TypeNode | undefined;
     if (typeNode !== undefined) {
-      return tsUtils.type_.getTypeFromTypeNode(this.context.typeChecker, typeNode);
+      return this.getNotAnyType(typeNode, tsUtils.type_.getTypeFromTypeNode(this.context.typeChecker, typeNode));
     }
 
     const signatureTypes = this.extractSignature(node, options);
@@ -111,7 +111,7 @@ export class AnalysisService {
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): SignatureTypes | undefined {
     const params = tsUtils.signature.getParameters(signature);
-    const paramTypes = params.map((param) => this.context.analysis.getTypeOfSymbol(param, node));
+    const paramTypes = params.map((param) => this.getTypeOfSymbol(param, node));
     const paramDeclsNullable = params.map((param) => tsUtils.symbol.getValueDeclaration(param));
     const nullParamIndex = paramDeclsNullable.indexOf(undefined);
     if (nullParamIndex !== -1) {
@@ -216,9 +216,9 @@ export class AnalysisService {
     }
 
     return this.memoized('get-symbol-for-type', typeKey(type), () => {
-      let symbol = tsUtils.type_.getSymbol(type);
+      let symbol = tsUtils.type_.getAliasSymbol(type);
       if (symbol === undefined) {
-        symbol = tsUtils.type_.getAliasSymbol(type);
+        symbol = tsUtils.type_.getSymbol(type);
       }
 
       if (symbol === undefined) {

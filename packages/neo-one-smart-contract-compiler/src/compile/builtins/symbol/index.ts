@@ -16,7 +16,7 @@ export const add = (builtins: Builtins): void => {
   builtins.addInterface('Symbol', new SymbolInterface());
   builtins.addValue('Symbol', new SymbolValue());
   builtins.addInterface('SymbolConstructor', new SymbolConstructorInterface());
-  builtins.addMember('SymbolConstructor', 'for', new SymbolFor());
-  builtins.addMember('SymbolConstructor', 'iterator', new SymbolIterator());
-  builtins.addMember('SymbolConstructor', 'toPrimitive', new SymbolToPrimitive());
+  builtins.addGlobalMember('SymbolConstructor', 'for', new SymbolFor());
+  builtins.addGlobalMember('SymbolConstructor', 'iterator', new SymbolIterator());
+  builtins.addGlobalMember('SymbolConstructor', 'toPrimitive', new SymbolToPrimitive());
 };

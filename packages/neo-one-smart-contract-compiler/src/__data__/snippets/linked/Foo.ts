@@ -1,7 +1,5 @@
 // tslint:disable no-implicit-dependencies
 import { Address, SmartContract } from '@neo-one/smart-contract';
-// @ts-ignore
-import { doReturn } from '@neo-one/smart-contract-internal';
 
 export class Foo implements SmartContract {
   public readonly owner = Address.from('AXNajBTQLxWHwc9sKyXcc4UdbJvp3arYDG');
@@ -17,6 +15,3 @@ export class Foo implements SmartContract {
     return 'foo';
   }
 }
-
-const foo = new Foo();
-doReturn(foo.getFoo());

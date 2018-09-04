@@ -44,6 +44,12 @@ import {
   ThrowCompletionHelper,
   ThrowHelper,
 } from './completionRecord';
+import {
+  InvokeSmartContractHelper,
+  InvokeSmartContractHelperOptions,
+  InvokeSmartContractMethodHelper,
+  InvokeSmartContractMethodHelperOptions,
+} from './contract';
 import { ThrowTypeErrorHelper } from './error';
 import {
   ArgumentsHelper,
@@ -363,6 +369,12 @@ export interface Helpers {
   readonly createClass: (options: CreateClassHelperOptions) => CreateClassHelper;
 
   // contract
+  readonly invokeSmartContract: (options: InvokeSmartContractHelperOptions) => InvokeSmartContractHelper;
+  readonly invokeSmartContractMethod: (
+    options: InvokeSmartContractMethodHelperOptions,
+  ) => InvokeSmartContractMethodHelper;
+
+  // types/contract
   readonly isContract: IsContractHelper;
   readonly wrapContract: WrapContractHelper;
   readonly unwrapContract: UnwrapContractHelper;
@@ -662,7 +674,7 @@ export interface Helpers {
   readonly addEmptyModule: AddEmptyModuleHelper;
 
   readonly createGlobalObject: CreateGlobalObjectHelper;
-  readonly getArgument: (options: TypedHelperOptions) => GetArgumentHelper;
+  readonly getArgument: GetArgumentHelper;
   readonly getGlobalProperty: (options: GetGlobalPropertyHelperOptions) => GetGlobalPropertyHelper;
 }
 
@@ -726,6 +738,10 @@ export const createHelpers = (): Helpers => {
     createClass: (options) => new CreateClassHelper(options),
 
     // contract
+    invokeSmartContract: (options) => new InvokeSmartContractHelper(options),
+    invokeSmartContractMethod: (options) => new InvokeSmartContractMethodHelper(options),
+
+    // types/contract
     isContract: new IsContractHelper(),
     wrapContract: new WrapContractHelper(),
     unwrapContract: new UnwrapContractHelper(),
@@ -994,7 +1010,7 @@ export const createHelpers = (): Helpers => {
     addEmptyModule: new AddEmptyModuleHelper(),
 
     createGlobalObject: new CreateGlobalObjectHelper(),
-    getArgument: (options) => new GetArgumentHelper(options),
+    getArgument: new GetArgumentHelper(),
     getGlobalProperty: (options) => new GetGlobalPropertyHelper(options),
   };
 };

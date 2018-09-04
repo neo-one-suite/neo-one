@@ -5,3 +5,4 @@ export * from './neverComplete';
 export * from './onComplete';
 export * from './utils';
 export * from './makeErrorWithCode';
+export * from './upperCaseFirst';

@@ -14,7 +14,6 @@ import { add as addDeploy } from './deploy';
 import { add as addHash256 } from './hash256';
 import { add as addHeader } from './header';
 import { add as addInput } from './input';
-import { add as addInternal } from './internal';
 import { add as addLinkedSmartContract } from './linkedSmartContract';
 import { add as addMapStorage } from './mapStorage';
 import { add as addOutput } from './output';
@@ -41,7 +40,6 @@ export const add = (builtins: Builtins): void => {
   addHash256(builtins);
   addHeader(builtins);
   addInput(builtins);
-  addInternal(builtins);
   addLinkedSmartContract(builtins);
   addMapStorage(builtins);
   addOutput(builtins);

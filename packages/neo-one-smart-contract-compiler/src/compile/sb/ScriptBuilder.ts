@@ -6,7 +6,7 @@ import { Context } from '../../Context';
 import { Helper, Helpers } from '../helper';
 import { Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
-import { VisitOptions } from '../types';
+import { HandleSuperConstruct, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 
 export type SingleBytecodeValue = Buffer | Jump | Line;
@@ -53,6 +53,11 @@ export interface ScriptBuilder {
   readonly catchPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
   readonly noCatchPCOptions: (options: VisitOptions) => VisitOptions;
   readonly finallyPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
+  readonly rootPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
+  readonly handleSuperConstructOptions: (
+    options: VisitOptions,
+    handleSuperConstruct: HandleSuperConstruct,
+  ) => VisitOptions;
   readonly castOptions: (options: VisitOptions, type?: ts.Type) => VisitOptions;
   readonly noCastOptions: (options: VisitOptions) => VisitOptions;
   readonly superClassOptions: (options: VisitOptions, superClass: Name) => VisitOptions;

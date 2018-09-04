@@ -25,3 +25,7 @@ export function isFailure(signature: ts.Signature): boolean {
     !sig.hasLiteralTypes
   );
 }
+
+export function getDeclaration(signature: ts.Signature): ts.SignatureDeclaration {
+  return signature.getDeclaration();
+}

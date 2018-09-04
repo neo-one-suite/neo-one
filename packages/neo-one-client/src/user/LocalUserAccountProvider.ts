@@ -755,6 +755,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           result,
         };
       },
+      sourceMaps,
       method,
     });
   }

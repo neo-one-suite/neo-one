@@ -15,7 +15,7 @@ import * as literal from './literal';
 import * as node from './node';
 import * as object_ from './object_';
 import * as parameter from './parameter';
-import { markOriginal, print, setOriginal, setOriginalRecursive } from './print';
+import { isOriginal, markOriginal, print, printBundle, setOriginal, setOriginalRecursive } from './print';
 import * as reference from './reference';
 import * as signature from './signature';
 import * as statement from './statement';
@@ -50,7 +50,9 @@ export const tsUtils = {
   object_,
   parameter,
   print,
+  printBundle,
   reference,
+  isOriginal,
   setOriginal,
   setOriginalRecursive,
   signature,

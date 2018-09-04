@@ -61,10 +61,10 @@ export const add = (builtins: Builtins): void => {
   builtins.addInterface('ReadonlyMap', new ReadonlyMapInterface());
   builtins.addValue('Map', new MapValue());
   COMMON.forEach(([name, builtin]) => {
-    builtins.addMember('Map', name, builtin);
-    builtins.addMember('ReadonlyMap', name, builtin);
+    builtins.addGlobalMember('Map', name, builtin);
+    builtins.addGlobalMember('ReadonlyMap', name, builtin);
   });
-  builtins.addMember('Map', 'delete', new MapDelete());
-  builtins.addMember('Map', 'set', new MapSet());
+  builtins.addGlobalMember('Map', 'delete', new MapDelete());
+  builtins.addGlobalMember('Map', 'set', new MapSet());
   builtins.addInterface('MapConstructor', new MapConstructorInterface());
 };

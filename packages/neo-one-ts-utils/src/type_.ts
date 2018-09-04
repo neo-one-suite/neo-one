@@ -94,6 +94,10 @@ export function getProperties(type: ts.Type): ReadonlyArray<ts.Symbol> {
   return type.getProperties();
 }
 
+export function getConstructSignatures(type: ts.Type): ReadonlyArray<ts.Signature> {
+  return type.getConstructSignatures();
+}
+
 export function getProperty(type: ts.Type, name: string): ts.Symbol | undefined {
   return utils.getValueOrUndefined(type.getProperty(name));
 }

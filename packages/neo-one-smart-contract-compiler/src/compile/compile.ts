@@ -1,6 +1,7 @@
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../Context';
+import { getSmartContractInfo } from './getSmartContractInfo';
 import { createHelpers } from './helper';
 import {
   DiagnosticScriptBuilder,
@@ -24,20 +25,24 @@ export interface CompileOptions extends DiagnosticCompileOptions, WithLinked {}
 
 export const compileForDiagnostics = ({ context, sourceFile }: DiagnosticCompileOptions): void => {
   const helpers = createHelpers();
-  const scriptBuilder = new DiagnosticScriptBuilder(context, helpers, sourceFile);
+  const { contractInfo } = getSmartContractInfo(context, sourceFile);
+
+  const scriptBuilder = new DiagnosticScriptBuilder(context, helpers, sourceFile, contractInfo);
   scriptBuilder.process();
 };
 
 export const compile = ({ context, sourceFile, linked = {}, sourceMaps = {} }: CompileOptions): CompileResult => {
   const helpers = createHelpers();
+  const { contractInfo, abi, contract } = getSmartContractInfo(context, sourceFile);
 
-  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, sourceFile, linked);
+  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, sourceFile, contractInfo, linked);
   helperScriptBuilder.process();
 
   const scopeScriptBuilder = new ScopeCapturingScriptBuilder(
     context,
     helpers,
     sourceFile,
+    contractInfo,
     linked,
     helperScriptBuilder.getHelpers(),
   );
@@ -50,13 +55,20 @@ export const compile = ({ context, sourceFile, linked = {}, sourceMaps = {} }: C
     helpers,
     linked,
     allHelpers: helperScriptBuilder.getHelpers(),
+    contractInfo,
   });
   emittingScriptBuilder.process();
 
   const finalResult = emittingScriptBuilder.getFinalResult(sourceMaps);
 
   return {
-    ...finalResult,
+    contract: {
+      script: finalResult.code.toString('hex'),
+      ...contract,
+      ...finalResult.features,
+    },
+    abi,
     context,
+    sourceMap: finalResult.sourceMap,
   };
 };

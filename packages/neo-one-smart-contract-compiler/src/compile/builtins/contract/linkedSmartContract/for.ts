@@ -4,6 +4,7 @@ import ts from 'typescript';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 import { DiagnosticMessage } from '../../../../DiagnosticMessage';
 import { ScriptBuilder } from '../../../sb';
+import { Name } from '../../../scope';
 import { VisitOptions } from '../../../types';
 import { MemberLikeExpression } from '../../types';
 import { SmartContractForBase } from '../SmartContractForBase';
@@ -36,6 +37,7 @@ export class LinkedSmartContractFor extends SmartContractForBase {
     _func: MemberLikeExpression,
     node: ts.CallExpression,
     prop: ts.Declaration,
+    _addressName: Name,
     callBuffer: Buffer,
     _options: VisitOptions,
   ): void {

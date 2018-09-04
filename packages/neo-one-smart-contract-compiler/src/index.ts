@@ -14,11 +14,11 @@ export const getSemanticDiagnostics = (
 
 export const compileContract = (
   filePath: string,
-  contractName: string,
+  _contractName: string,
   linked: LinkedContracts = {},
   ignoreWarnings = false,
 ): CompileContractResult => {
-  const result = compileContractBase({ filePath, name: contractName, linked });
+  const result = compileContractBase({ filePath, linked });
 
   throwOnDiagnosticErrorOrWarning(result.diagnostics, ignoreWarnings);
 

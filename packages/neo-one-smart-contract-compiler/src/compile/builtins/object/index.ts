@@ -14,5 +14,5 @@ export const add = (builtins: Builtins): void => {
   builtins.addInterface('Object', new ObjectInterface());
   builtins.addValue('Object', new ObjectValue());
   builtins.addInterface('ObjectConstructor', new ObjectConstructorInterface());
-  builtins.addMember('ObjectConstructor', 'keys', new ObjectKeys());
+  builtins.addGlobalMember('ObjectConstructor', 'keys', new ObjectKeys());
 };

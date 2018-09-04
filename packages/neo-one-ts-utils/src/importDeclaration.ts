@@ -41,7 +41,8 @@ export function getNamedImports(node: ts.ImportDeclaration): ReadonlyArray<ts.Im
     return [];
   }
 
-  const namedImports = node_.getFirstChildByKind<ts.NamedImports>(clause, ts.SyntaxKind.NamedImports);
+  const namedImports =
+    clause.namedBindings === undefined || !ts.isNamedImports(clause.namedBindings) ? undefined : clause.namedBindings;
   if (namedImports === undefined) {
     return [];
   }

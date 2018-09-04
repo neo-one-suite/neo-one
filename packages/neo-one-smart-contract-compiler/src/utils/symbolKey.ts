@@ -8,10 +8,12 @@ const getID = (symbol: ts.Symbol) => {
   if (symbolAny.id == undefined && symbolAny.__id === undefined) {
     id += 1;
 
-    // tslint:disable-next-line no-object-mutation
-    symbolAny.__id = id;
+    const symbolID = `c${id}`;
 
-    return id;
+    // tslint:disable-next-line no-object-mutation
+    symbolAny.__id = symbolID;
+
+    return symbolID;
   }
 
   return symbolAny.id || symbolAny.__id;

@@ -10,6 +10,7 @@ import { isAddress, isHash256, isPublicKey } from './buffer';
 export interface WrapValRecursiveHelperOptions {
   readonly checkValue?: boolean;
   readonly type: ts.Type | undefined;
+  readonly optional?: boolean;
 }
 
 // Input: [val]
@@ -17,10 +18,13 @@ export interface WrapValRecursiveHelperOptions {
 export class WrapValRecursiveHelper extends Helper {
   private readonly checkValue: boolean;
   private readonly type: ts.Type | undefined;
+  private readonly optional?: boolean;
+
   public constructor(options: WrapValRecursiveHelperOptions) {
     super();
     this.checkValue = options.checkValue === undefined ? false : options.checkValue;
     this.type = options.type;
+    this.optional = options.optional;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -54,6 +58,7 @@ export class WrapValRecursiveHelper extends Helper {
         type: this.type,
         single: true,
         singleUndefined: handleUndefined,
+        optional: this.optional,
         array: createHandleValue(true, (innerOptions) => {
           const elements = this.type === undefined ? undefined : tsUtils.type_.getTupleElements(this.type);
           if (elements === undefined) {

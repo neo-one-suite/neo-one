@@ -36,10 +36,10 @@ class BufferConstructorInterface extends BuiltinInterface {}
 export const add = (builtins: Builtins): void => {
   builtins.addInterface('Buffer', new BufferInterface());
   builtins.addValue('Buffer', new BufferValue());
-  builtins.addMember('Buffer', 'equals', new BufferEquals());
-  builtins.addMember('Buffer', 'length', new BufferLength());
-  builtins.addMember('Buffer', 'toString', new BufferToString());
+  builtins.addGlobalMember('Buffer', 'equals', new BufferEquals());
+  builtins.addGlobalMember('Buffer', 'length', new BufferLength());
+  builtins.addGlobalMember('Buffer', 'toString', new BufferToString());
   builtins.addInterface('BufferConstructor', new BufferConstructorInterface());
-  builtins.addMember('BufferConstructor', 'concat', new BufferConcat());
-  builtins.addMember('BufferConstructor', 'from', new BufferFrom());
+  builtins.addGlobalMember('BufferConstructor', 'concat', new BufferConcat());
+  builtins.addGlobalMember('BufferConstructor', 'from', new BufferFrom());
 };

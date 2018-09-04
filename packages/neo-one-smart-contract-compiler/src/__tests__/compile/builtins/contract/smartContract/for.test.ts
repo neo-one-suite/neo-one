@@ -170,32 +170,61 @@ describe('SmartContract.for', () => {
   test('dynamic call', async () => {
     const node = await helpers.startNode();
     const dynamicContract = await node.addContract(`
-      import { doReturn, getArgument } from '@neo-one/smart-contract-internal';
+      import { Address, SmartContract } from '@neo-one/smart-contract';
 
-      assertEqual(getArgument<[number]>(1)[0], 10);
-      doReturn(true);
+      export class Dynamic implements SmartContract {
+        public readonly owner = Address.from('AXNajBTQLxWHwc9sKyXcc4UdbJvp3arYDG');
+        public readonly properties = {
+          codeVersion: '1.0',
+          author: 'dicarlo2',
+          email: 'alex.dicarlo@neotracker.io',
+          description: 'Foo',
+          payable: true,
+        };
+
+        public run(value: number): string {
+          assertEqual(value, 10);
+
+          return 'dynamic';
+        }
+      }
     `);
 
     const callingContract = await node.addContract(`
       import { Address, SmartContract } from '@neo-one/smart-contract';
-      import { getArgument } from '@neo-one/smart-contract-internal';
 
       interface Contract {
-        run(value: number): boolean;
+        run(value: number): string;
       }
-      const contract = SmartContract.for<Contract>(getArgument<[Address]>(1)[0]);
-      assertEqual(contract.run(10), true);
+
+      export class DynamicCall implements SmartContract {
+        public readonly owner = Address.from('AXNajBTQLxWHwc9sKyXcc4UdbJvp3arYDG');
+        public readonly properties = {
+          codeVersion: '1.0',
+          author: 'dicarlo2',
+          email: 'alex.dicarlo@neotracker.io',
+          description: 'Foo',
+          payable: true,
+        };
+
+        public run(value: Address): string {
+          const contract = SmartContract.for<Contract>(value);
+          assertEqual(contract.run(10), 'dynamic');
+
+          return 'dynamicCall';
+        }
+      }
     `);
 
     await node.executeString(`
       import { Address, SmartContract } from '@neo-one/smart-contract';
 
       interface Contract {
-        run(value: Address): void;
+        run(value: Address): string;
       }
       SmartContract.for<Contract>(Address.from('${callingContract.address}'));
       const contract = SmartContract.for<Contract>(Address.from('${callingContract.address}'));
-      contract.run(Address.from('${dynamicContract.address}'));
+      assertEqual(contract.run(Address.from('${dynamicContract.address}')), 'dynamicCall');
     `);
   });
 });

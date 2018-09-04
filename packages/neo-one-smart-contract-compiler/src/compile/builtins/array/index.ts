@@ -65,10 +65,10 @@ export const add = (builtins: Builtins): void => {
   builtins.addInterface('ReadonlyArray', new ReadonlyArrayInterface());
   builtins.addValue('Array', new ArrayValue());
   COMMON.forEach(([name, builtin]) => {
-    builtins.addMember('Array', name, builtin);
-    builtins.addMember('ReadonlyArray', name, builtin);
+    builtins.addGlobalMember('Array', name, builtin);
+    builtins.addGlobalMember('ReadonlyArray', name, builtin);
   });
-  builtins.addMember('Array', 'pop', new ArrayPop());
-  builtins.addMember('Array', 'push', new ArrayPush());
+  builtins.addGlobalMember('Array', 'pop', new ArrayPop());
+  builtins.addGlobalMember('Array', 'push', new ArrayPush());
   builtins.addInterface('ArrayConstructor', new ArrayConstructorInterface());
 };

@@ -9,10 +9,15 @@ import { Helper } from '../Helper';
 export class ReturnHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     const finallyPC = options.finallyPC;
+    const rootPC = options.rootPC;
     if (finallyPC === undefined) {
-      // [completionType, val]
-      sb.emitPushInt(node, constants.NORMAL_COMPLETION);
-      sb.emitOp(node, 'RET');
+      if (rootPC === undefined) {
+        // [completionType, val]
+        sb.emitPushInt(node, constants.NORMAL_COMPLETION);
+        sb.emitOp(node, 'RET');
+      } else {
+        sb.emitJmp(node, 'JMP', rootPC);
+      }
     } else {
       // [normal, val]
       sb.emitPushInt(node, constants.NORMAL_COMPLETION);

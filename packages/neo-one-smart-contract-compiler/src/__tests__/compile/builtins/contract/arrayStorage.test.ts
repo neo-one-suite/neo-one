@@ -11,7 +11,54 @@ describe('ArrayStorage', () => {
     const contract = await node.addContract(`
       import { ArrayStorage, SmartContract, Deploy } from '@neo-one/smart-contract';
 
-      class StorageContract implements SmartContract {
+      const test = (storage: ArrayStorage<string>) => {
+        assertEqual(storage instanceof ArrayStorage, true);
+        assertEqual(storage.length, 0);
+
+        storage[0] = '10';
+        assertEqual(storage[0], '10');
+        assertEqual(storage[1] as string | undefined, undefined);
+        assertEqual(storage.length, 1);
+
+        const result = storage.push('11', '12', '13');
+        assertEqual(result, 4);
+        assertEqual(storage[0], '10');
+        assertEqual(storage[1], '11');
+        assertEqual(storage[2], '12');
+        assertEqual(storage[3], '13');
+        assertEqual(storage.length, 4);
+        assertEqual(storage.pop(), '13');
+        assertEqual(storage.length, 3);
+        assertEqual(storage.pop(), '12');
+        assertEqual(storage.length, 2);
+        storage.pop();
+        assertEqual(storage.length, 1);
+        assertEqual(storage.pop(), '10');
+        assertEqual(storage.length, 0);
+        assertEqual(storage.pop(), undefined);
+        assertEqual(storage.length, 0);
+
+        interface Storage<T> {
+          readonly [Symbol.iterator]: () => IterableIterator<T>;
+          readonly length: number;
+          readonly push: (...items: T[]) => number;
+          readonly pop: () => T | undefined;
+          [n: number]: T;
+        }
+
+        const storageLike: Storage<string> | ArrayStorage<string> =
+          storage as Storage<string> | ArrayStorage<string>;
+
+        storageLike['push']('foo');
+        assertEqual(storageLike[0], 'foo');
+        assertEqual(storageLike['length'], 1);
+        storageLike['pop']();
+        assertEqual(storageLike[0] as string | undefined, undefined);
+        assertEqual(storageLike['length'], 0);
+        storageLike[Symbol.iterator]();
+      }
+
+      export class StorageContract implements SmartContract {
         public readonly properties = {
           codeVersion: '1.0',
           author: 'dicarlo2',
@@ -19,56 +66,14 @@ describe('ArrayStorage', () => {
           description: 'StorageContract',
           payable: true,
         };
-        public readonly prefix = ArrayStorage.for<string>();
+        public readonly storage = ArrayStorage.for<string>();
 
         public constructor(public readonly owner = Deploy.senderAddress) {}
+
+        public run(): void {
+          test(this.storage);
+        }
       }
-
-      const storage = new StorageContract().prefix;
-      assertEqual(storage instanceof ArrayStorage, true);
-      assertEqual(storage.length, 0);
-
-      storage[0] = '10';
-      assertEqual(storage[0], '10');
-      assertEqual(storage[1] as string | undefined, undefined);
-      assertEqual(storage.length, 1);
-
-      const result = storage.push('11', '12', '13');
-      assertEqual(result, 4);
-      assertEqual(storage[0], '10');
-      assertEqual(storage[1], '11');
-      assertEqual(storage[2], '12');
-      assertEqual(storage[3], '13');
-      assertEqual(storage.length, 4);
-      assertEqual(storage.pop(), '13');
-      assertEqual(storage.length, 3);
-      assertEqual(storage.pop(), '12');
-      assertEqual(storage.length, 2);
-      storage.pop();
-      assertEqual(storage.length, 1);
-      assertEqual(storage.pop(), '10');
-      assertEqual(storage.length, 0);
-      assertEqual(storage.pop(), undefined);
-      assertEqual(storage.length, 0);
-
-      interface Storage<T> {
-        readonly [Symbol.iterator]: () => IterableIterator<T>;
-        readonly length: number;
-        readonly push: (...items: T[]) => number;
-        readonly pop: () => T | undefined;
-        [n: number]: T;
-      }
-
-      const storageLike: Storage<string> | ArrayStorage<string> =
-        storage as Storage<string> | ArrayStorage<string>;
-
-      storageLike['push']('foo');
-      assertEqual(storageLike[0], 'foo');
-      assertEqual(storageLike['length'], 1);
-      storageLike['pop']();
-      assertEqual(storageLike[0] as string | undefined, undefined);
-      assertEqual(storageLike['length'], 0);
-      storageLike[Symbol.iterator]();
     `);
 
     await node.executeString(`
@@ -88,7 +93,7 @@ describe('ArrayStorage', () => {
     const contract = await node.addContract(`
       import { ArrayStorage, SmartContract, Deploy } from '@neo-one/smart-contract';
 
-      class StorageContract implements SmartContract {
+      export class StorageContract implements SmartContract {
         public readonly properties = {
           codeVersion: '1.0',
           author: 'dicarlo2',
@@ -99,65 +104,67 @@ describe('ArrayStorage', () => {
         public readonly prefix = ArrayStorage.for<string>();
 
         public constructor(public readonly owner = Deploy.senderAddress) {}
+
+        public run(): void {
+          const keyA = 'keyA';
+          const keyB = 'keyB';
+          const keyC = 'keyC';
+          const keyD = 'keyD';
+
+          const storage = new StorageContract().prefix;
+          storage.push(keyA, keyB);
+          const result = storage.push(keyC);
+          storage.push(keyD);
+
+          assertEqual(result, 3);
+
+          let count = 0;
+          let indices = 0;
+          let keys = '';
+          storage.forEach((key, idx) => {
+            count += 1;
+            indices += idx;
+            keys += key;
+          });
+          assertEqual(count, 4);
+          assertEqual(indices, 6);
+          assertEqual(keys, keyA + keyB + keyC + keyD);
+
+          count = 0;
+          keys = '';
+          for (const key of storage) {
+            count += 1;
+            keys += key;
+          }
+          assertEqual(count, 4);
+          assertEqual(keys, keyA + keyB + keyC + keyD);
+
+          interface StorageLike<T> {
+            [Symbol.iterator](): IterableIterator<T>;
+          }
+
+          const storageLike: StorageLike<string> | ArrayStorage<string> = storage as StorageLike<string> | ArrayStorage<string>;
+
+          storageLike[Symbol.iterator]();
+          const firstIterator = storage[Symbol.iterator]();
+
+          let firstResult = firstIterator.next();
+          assertEqual(firstResult.value, keyA);
+          assertEqual(firstResult.done, false);
+          firstResult = firstIterator.next();
+          assertEqual(firstResult.value, keyB);
+          assertEqual(firstResult.done, false);
+          firstResult = firstIterator.next();
+          assertEqual(firstResult.value, keyC);
+          assertEqual(firstResult.done, false);
+          firstResult = firstIterator.next();
+          assertEqual(firstResult.value, keyD);
+          assertEqual(firstResult.done, false);
+          firstResult = firstIterator.next();
+          assertEqual(firstResult.value as string | undefined, undefined);
+          assertEqual(firstResult.done, true);
+        }
       }
-
-      const keyA = 'keyA';
-      const keyB = 'keyB';
-      const keyC = 'keyC';
-      const keyD = 'keyD';
-
-      const storage = new StorageContract().prefix;
-      storage.push(keyA, keyB);
-      const result = storage.push(keyC);
-      storage.push(keyD);
-
-      assertEqual(result, 3);
-
-      let count = 0;
-      let indices = 0;
-      let keys = '';
-      storage.forEach((key, idx) => {
-        count += 1;
-        indices += idx;
-        keys += key;
-      });
-      assertEqual(count, 4);
-      assertEqual(indices, 6);
-      assertEqual(keys, keyA + keyB + keyC + keyD);
-
-      count = 0;
-      keys = '';
-      for (const key of storage) {
-        count += 1;
-        keys += key;
-      }
-      assertEqual(count, 4);
-      assertEqual(keys, keyA + keyB + keyC + keyD);
-
-      interface StorageLike<T> {
-        [Symbol.iterator](): IterableIterator<T>;
-      }
-
-      const storageLike: StorageLike<string> | ArrayStorage<string> = storage as StorageLike<string> | ArrayStorage<string>;
-
-      storageLike[Symbol.iterator]();
-      const firstIterator = storage[Symbol.iterator]();
-
-      let firstResult = firstIterator.next();
-      assertEqual(firstResult.value, keyA);
-      assertEqual(firstResult.done, false);
-      firstResult = firstIterator.next();
-      assertEqual(firstResult.value, keyB);
-      assertEqual(firstResult.done, false);
-      firstResult = firstIterator.next();
-      assertEqual(firstResult.value, keyC);
-      assertEqual(firstResult.done, false);
-      firstResult = firstIterator.next();
-      assertEqual(firstResult.value, keyD);
-      assertEqual(firstResult.done, false);
-      firstResult = firstIterator.next();
-      assertEqual(firstResult.value as string | undefined, undefined);
-      assertEqual(firstResult.done, true);
     `);
 
     await node.executeString(`

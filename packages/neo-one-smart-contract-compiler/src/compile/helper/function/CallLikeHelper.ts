@@ -155,10 +155,17 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       }
     };
 
+    const superExpression = ts.isCallExpression(expression) ? tsUtils.expression.getExpression(expression) : undefined;
     if (
       ts.isCallExpression(expression) &&
-      tsUtils.guards.isSuperExpression(tsUtils.expression.getExpression(expression))
+      superExpression !== undefined &&
+      tsUtils.guards.isSuperExpression(superExpression)
     ) {
+      if (optionsIn.handleSuperConstruct !== undefined) {
+        optionsIn.handleSuperConstruct(expression, superExpression, optionsIn);
+
+        return;
+      }
       const superClass = optionsIn.superClass;
       if (superClass === undefined) {
         /* istanbul ignore next */

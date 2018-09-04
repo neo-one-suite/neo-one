@@ -4,13 +4,10 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 // Input: [keyBuffer, valBuffer]
-// Output: [value]
+// Output: []
 export class PutCommonStorageHelper extends Helper {
-  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    if (!options.pushValue) {
-      /* istanbul ignore next */
-      return;
-    }
+  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
+    const options = sb.pushValueOptions(optionsIn);
     // [valBuffer, keyBuffer]
     sb.emitOp(node, 'SWAP');
     // [map, valBuffer, keyBuffer]

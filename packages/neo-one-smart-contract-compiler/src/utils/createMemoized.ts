@@ -1,3 +1,6 @@
+// tslint:disable-next-line no-null-keyword
+const UNDEFINED_VALUE = Object.create(null);
+
 export const createMemoized = () => {
   // tslint:disable-next-line no-any readonly-keyword
   const caches: { [key: string]: Map<any, any> } = {};
@@ -14,7 +17,12 @@ export const createMemoized = () => {
     let value = cache.get(name);
     if (value === undefined) {
       value = getValue();
-      cache.set(name, value);
+      cache.set(name, value === undefined ? UNDEFINED_VALUE : value);
+    }
+
+    if (value === UNDEFINED_VALUE) {
+      // tslint:disable-next-line no-any
+      return undefined as any;
     }
 
     return value;

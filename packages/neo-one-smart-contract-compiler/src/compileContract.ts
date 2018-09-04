@@ -10,7 +10,6 @@ import { normalizePath } from './utils';
 
 export interface CompileContractOptions extends WithLinked {
   readonly filePath: string;
-  readonly name: string;
 }
 
 export interface CompileContractResult {
@@ -22,36 +21,31 @@ export interface CompileContractResult {
 
 export const compileContract = ({
   filePath: filePathIn,
-  name,
   linked: linkedIn = {},
 }: CompileContractOptions): CompileContractResult => {
   const filePath = normalizePath(filePathIn);
   const linked = _.fromPairs(Object.entries(linkedIn).map(([key, value]) => [normalizePath(key), value]));
   const transpileContext = createContextForPath(filePath);
-  const smartContract = tsUtils.statement.getClassOrThrow(
-    tsUtils.file.getSourceFileOrThrow(transpileContext.program, filePath),
-    name,
-  );
-  const { sourceFiles, abi, contract } = transpile({ smartContract, context: transpileContext });
-  const context = updateContext(transpileContext, _.mapValues(sourceFiles, ({ text }) => text));
+  const transpileResult = transpile({
+    sourceFile: tsUtils.file.getSourceFileOrThrow(transpileContext.program, filePath),
+    context: transpileContext,
+  });
+  const context =
+    transpileResult === undefined
+      ? transpileContext
+      : updateContext(transpileContext, { [filePath]: transpileResult.text });
 
-  const { code, sourceMap: finalSourceMap, features } = compile({
+  const { abi, sourceMap: finalSourceMap, contract } = compile({
     sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
     context,
     linked,
-    sourceMaps: _.mapValues(sourceFiles, ({ sourceMap }) => sourceMap),
+    sourceMaps: transpileResult === undefined ? {} : { [filePath]: transpileResult.sourceMap },
   });
 
   return {
     diagnostics: context.diagnostics,
     sourceMap: finalSourceMap,
     abi,
-    contract: {
-      ...contract,
-      script: code.toString('hex'),
-      storage: features.storage,
-      dynamicInvoke: features.dynamicInvoke,
-      payable: contract.payable,
-    },
+    contract,
   };
 };

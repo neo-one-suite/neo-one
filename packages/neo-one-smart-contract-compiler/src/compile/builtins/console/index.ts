@@ -11,6 +11,6 @@ class ConsoleValue extends BuiltinValueObject {
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addInterface('Console', new ConsoleInterface());
-  builtins.addMember('Console', 'log', new ConsoleLog());
+  builtins.addGlobalMember('Console', 'log', new ConsoleLog());
   builtins.addValue('console', new ConsoleValue());
 };

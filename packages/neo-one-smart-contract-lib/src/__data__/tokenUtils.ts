@@ -66,31 +66,14 @@ export const testToken = async ({
       const { client, networkName, masterAccountID, masterPrivateKey } = options;
       // tslint:disable-next-line no-any
       const smartContract: SmartContractAny = (options as any)[smartContractName];
-      const [nameResult, decimalsResult, symbolResult, wallet0, deployResult] = await Promise.all([
-        smartContract.name(),
-        smartContract.decimals(),
-        smartContract.symbol(),
-        client.providers.memory.keystore.addAccount({
-          network: networkName,
-          name: 'wallet0',
-          privateKey: TO.PRIVATE_KEY,
-        }),
-        deploy === undefined
-          ? Promise.resolve(undefined)
-          : deploy({
-              masterPrivateKey,
-              masterAccountID,
-              smartContract,
-            }),
-      ]);
-      expect(nameResult).toEqual(name);
-      expect(decimalsResult.toString()).toEqual(`${decimals}`);
-      expect(symbolResult).toEqual(symbol);
-
-      const account0 = wallet0.account.id;
-
       let event: Event;
-      if (deployResult !== undefined) {
+      if (deploy !== undefined) {
+        const deployResult = await deploy({
+          masterPrivateKey,
+          masterAccountID,
+          smartContract,
+        });
+
         const deployReceipt = await deployResult.confirmed({ timeoutMS: 2500 });
 
         if (deployReceipt.result.state !== 'HALT') {
@@ -111,6 +94,22 @@ export const testToken = async ({
         }
         expect(event.parameters.amount.toString()).toEqual(issueValue.toString());
       }
+
+      const [nameResult, decimalsResult, symbolResult, wallet0] = await Promise.all([
+        smartContract.name(),
+        smartContract.decimals(),
+        smartContract.symbol(),
+        client.providers.memory.keystore.addAccount({
+          network: networkName,
+          name: 'wallet0',
+          privateKey: TO.PRIVATE_KEY,
+        }),
+      ]);
+      expect(nameResult).toEqual(name);
+      expect(decimalsResult.toString()).toEqual(`${decimals}`);
+      expect(symbolResult).toEqual(symbol);
+
+      const account0 = wallet0.account.id;
 
       const [issueBalance, issueTotalSupply, transferResult] = await Promise.all([
         smartContract.balanceOf(masterAccountID.address),

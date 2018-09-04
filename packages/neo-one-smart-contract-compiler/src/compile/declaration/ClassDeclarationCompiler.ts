@@ -9,6 +9,10 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
   public readonly kind = ts.SyntaxKind.ClassDeclaration;
 
   public visitNode(sb: ScriptBuilder, decl: ts.ClassDeclaration, optionsIn: VisitOptions): void {
+    if (sb.context.analysis.isSmartContract(decl)) {
+      return;
+    }
+
     let options = sb.pushValueOptions(sb.noSuperClassOptions(optionsIn));
     const name = sb.scope.add(tsUtils.node.getNameOrThrow(decl));
     const extendsExpr = tsUtils.class_.getExtends(decl);

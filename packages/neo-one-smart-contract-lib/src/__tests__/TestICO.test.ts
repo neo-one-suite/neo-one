@@ -20,21 +20,10 @@ describe('TestICO', () => {
       ],
       async ({ client, networkName, testIco: smartContract, masterAccountID }) => {
         crypto.addPublicKey(common.stringToPrivateKey(MINTER.PRIVATE_KEY), common.stringToECPoint(MINTER.PUBLIC_KEY));
-        const [nameResult, decimalsResult, symbolResult, minter, deployResult] = await Promise.all([
-          smartContract.name(),
-          smartContract.decimals(),
-          smartContract.symbol(),
-          client.providers.memory.keystore.addAccount({
-            network: networkName,
-            name: 'minter',
-            privateKey: MINTER.PRIVATE_KEY,
-          }),
-          smartContract.deploy(masterAccountID.address, new BigNumber(Math.round(Date.now() / 1000))),
-        ]);
-        expect(nameResult).toEqual('TestToken');
-        expect(decimalsResult.toString()).toEqual('8');
-        expect(symbolResult).toEqual('TT');
-
+        const deployResult = await smartContract.deploy(
+          masterAccountID.address,
+          new BigNumber(Math.round(Date.now() / 1000)),
+        );
         const deployReceipt = await deployResult.confirmed({ timeoutMS: 2500 });
         if (deployReceipt.result.state !== 'HALT') {
           throw new Error(deployReceipt.result.message);
@@ -43,6 +32,20 @@ describe('TestICO', () => {
         expect(deployReceipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
         expect(deployReceipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
         expect(deployReceipt.result.value).toBeTruthy();
+
+        const [nameResult, decimalsResult, symbolResult, minter] = await Promise.all([
+          smartContract.name(),
+          smartContract.decimals(),
+          smartContract.symbol(),
+          client.providers.memory.keystore.addAccount({
+            network: networkName,
+            name: 'minter',
+            privateKey: MINTER.PRIVATE_KEY,
+          }),
+        ]);
+        expect(nameResult).toEqual('TestToken');
+        expect(decimalsResult.toString()).toEqual('8');
+        expect(symbolResult).toEqual('TT');
 
         const [initialTotalSupply, transferResult] = await Promise.all([
           smartContract.totalSupply(),

@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import * as appRootDir from 'app-root-dir';
 import ts from 'typescript';
+import { compile } from '../../compile';
 import { Context } from '../../Context';
 import { createContextForPath, createContextForSnippet } from '../../createContext';
 import { pathResolve } from '../../utils';
@@ -14,7 +15,11 @@ const execute = async (
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
 ) => {
   const monitor = getMonitor();
-  const { receipt, sourceMaps } = await executeScript(monitor, context, sourceFile, options);
+  const {
+    contract: { script: compiledCode },
+    sourceMap,
+  } = compile({ context, sourceFile });
+  const { receipt, sourceMaps } = await executeScript(monitor, context.diagnostics, compiledCode, sourceMap, options);
   await checkResult(receipt, sourceMaps);
 
   return { receipt, sourceMaps };

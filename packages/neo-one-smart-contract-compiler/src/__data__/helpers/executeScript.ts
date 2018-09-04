@@ -7,9 +7,8 @@ import { storage } from '@neo-one/node-storage-levelup';
 import { vm } from '@neo-one/node-vm';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
+import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
-import { compile } from '../../compile';
-import { Context } from '../../Context';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 
 export interface ExecuteOptions {
@@ -24,8 +23,9 @@ export const EXECUTE_OPTIONS_DEFAULT = {
 
 export const executeScript = async (
   monitor: Monitor,
-  context: Context,
-  sourceFile: ts.SourceFile,
+  diagnostics: ReadonlyArray<ts.Diagnostic>,
+  compiledCode: string,
+  sourceMap: Promise<RawSourceMap>,
   { prelude = Buffer.alloc(0, 0), ignoreWarnings = false }: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
 ): Promise<{
   readonly receipt: CallReceiptJSON;
@@ -40,11 +40,10 @@ export const executeScript = async (
     vm,
     monitor,
   });
-  const { code: compiledCode, sourceMap } = compile({ context, sourceFile });
 
-  throwOnDiagnosticErrorOrWarning(context.diagnostics, ignoreWarnings);
+  throwOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);
 
-  const code = Buffer.concat([prelude, compiledCode]);
+  const code = Buffer.concat([prelude, Buffer.from(compiledCode, 'hex')]);
   const [receipt, resolvedSourceMap] = await Promise.all([blockchain.invokeScript(code, monitor), sourceMap]);
 
   const address = scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(code)));

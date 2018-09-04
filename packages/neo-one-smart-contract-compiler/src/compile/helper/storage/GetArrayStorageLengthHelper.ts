@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { StructuredStorageSlots } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -8,10 +9,12 @@ import { Helper } from '../Helper';
 export class GetArrayStorageLengthHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
-    // [prefix]
+    // [map]
     sb.emitHelper(node, options, sb.helpers.unwrapArrayStorage);
-    // [buffer]
-    sb.emitSysCall(node, 'Neo.Runtime.Serialize');
+    // [number, map]
+    sb.emitPushInt(node, StructuredStorageSlots.prefix);
+    // [prefix]
+    sb.emitOp(node, 'PICKITEM');
     // [idx]
     sb.emitHelper(node, options, sb.helpers.getCommonStorage);
     // [idx]

@@ -1,8 +1,10 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
+import { getSetterName } from '../../../utils';
 import { InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
+import { Name } from '../../scope';
 import { VisitOptions } from '../../types';
 import { BuiltinMemberCall } from '../BuiltinMemberCall';
 import { MemberLikeExpression } from '../types';
@@ -40,84 +42,152 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
           returnType: propType,
           prop: propNode,
           propName,
+          accessor: true,
+          isReadonly: tsUtils.modifier.isReadonly(propNode),
         };
       }
 
-      return { ...result, prop: propNode, propName };
+      return { ...result, prop: propNode, propName, accessor: false, isReadonly: false };
     });
+
+    const handleParams = (
+      prop: ts.Declaration,
+      paramDecls: ReadonlyArray<ts.ParameterDeclaration>,
+      paramTypes: Map<ts.ParameterDeclaration, ts.Type | undefined>,
+      innerOptions: VisitOptions,
+    ) => {
+      // [...params]
+      sb.emitHelper(
+        prop,
+        innerOptions,
+        sb.helpers.parameters({
+          params: paramDecls,
+          onStack: true,
+          map: (param, innerInnerOptions) => {
+            // [value]
+            sb.emitHelper(param, innerInnerOptions, sb.helpers.unwrapValRecursive({ type: paramTypes.get(param) }));
+          },
+        }),
+      );
+      // [length, ...params]
+      sb.emitPushInt(prop, paramDecls.length);
+      // [params]
+      sb.emitOp(prop, 'PACK');
+    };
+
+    const addressName = sb.scope.addUnique();
+    this.emitInitial(sb, func, node, addressName, options);
 
     // [objectVal]
     sb.emitHelper(node, options, sb.helpers.createObject);
     // [objectVal]
-    props.filter(utils.notNull).forEach(({ prop, propName, paramDecls, paramTypes, returnType: propReturnType }) => {
-      // [objectVal, objectVal]
-      sb.emitOp(prop, 'DUP');
-      // [string, objectVal, objectVal]
-      sb.emitPushString(prop, propName);
-      // [farr, string, objectVal, objectVal]
-      sb.emitHelper(
-        prop,
-        options,
-        sb.helpers.createFunctionArray({
-          body: (innerOptionsIn) => {
-            const innerOptions = sb.pushValueOptions(innerOptionsIn);
-            // [...params]
-            sb.emitHelper(
-              prop,
-              innerOptions,
-              sb.helpers.parameters({
-                params: paramDecls,
-                onStack: true,
-                map: (param, innerInnerOptions) => {
-                  // [value]
-                  sb.emitHelper(
-                    param,
-                    innerInnerOptions,
-                    sb.helpers.unwrapValRecursive({ type: paramTypes.get(param) }),
-                  );
-                },
-              }),
-            );
-            // [length, ...params]
-            sb.emitPushInt(prop, paramDecls.length);
-            // [params]
-            sb.emitOp(prop, 'PACK');
-            // [string, params]
-            sb.emitPushString(prop, propName);
+    props
+      .filter(utils.notNull)
+      .forEach(({ prop, propName, paramDecls, paramTypes, returnType: propReturnType, accessor, isReadonly }) => {
+        // [objectVal, objectVal]
+        sb.emitOp(prop, 'DUP');
+        // [string, objectVal, objectVal]
+        sb.emitPushString(prop, propName);
+        if (accessor && !isReadonly) {
+          sb.emitHelper(
+            prop,
+            options,
+            sb.helpers.createFunctionArray({
+              body: (innerOptionsIn) => {
+                const innerOptions = sb.pushValueOptions(innerOptionsIn);
+                // [0, argsarr]
+                sb.emitPushInt(prop, 0);
+                // [val]
+                sb.emitOp(prop, 'PICKITEM');
+                // [value]
+                sb.emitHelper(prop, innerOptions, sb.helpers.unwrapValRecursive({ type: propReturnType }));
+                // [1, value]
+                sb.emitPushInt(prop, 1);
+                // [params]
+                sb.emitOp(prop, 'PACK');
+                // [string, params]
+                sb.emitPushString(prop, getSetterName(propName));
 
-            const isVoidReturn = propReturnType !== undefined && tsUtils.type_.isVoid(propReturnType);
-            const callBuffer = Buffer.from([isVoidReturn ? 0 : 1, 2]);
-            this.emitInvoke(sb, func, node, prop, callBuffer, innerOptions);
+                const callBuffer = Buffer.from([0, 2]);
+                this.emitInvoke(sb, func, node, prop, addressName, callBuffer, sb.noPushValueOptions(innerOptions));
+                // [val]
+                sb.emitHelper(prop, innerOptions, sb.helpers.wrapUndefined);
+                // []
+                sb.emitHelper(prop, innerOptions, sb.helpers.return);
+              },
+            }),
+          );
+          sb.emitHelper(
+            prop,
+            options,
+            sb.helpers.createFunctionObject({
+              property: InternalObjectProperty.Call,
+            }),
+          );
+        }
+        // [farr, string, objectVal, objectVal]
+        sb.emitHelper(
+          prop,
+          options,
+          sb.helpers.createFunctionArray({
+            body: (innerOptionsIn) => {
+              const innerOptions = sb.pushValueOptions(innerOptionsIn);
+              if (accessor) {
+                // []
+                sb.emitOp(prop, 'DROP');
+                // [number]
+                sb.emitPushInt(prop, 0);
+                // [params]
+                sb.emitOp(prop, 'NEWARRAY');
+              } else {
+                // [params]
+                handleParams(prop, paramDecls, paramTypes, innerOptions);
+              }
+              // [string, params]
+              sb.emitPushString(prop, propName);
 
-            if (isVoidReturn) {
-              sb.emitHelper(prop, innerOptions, sb.helpers.wrapUndefined);
-            } else {
-              // [val]
-              sb.emitHelper(
-                prop,
-                innerOptions,
-                sb.helpers.wrapValRecursive({
-                  type: propReturnType,
-                }),
-              );
-            }
+              const isVoidReturn = propReturnType !== undefined && tsUtils.type_.isVoid(propReturnType);
+              const callBuffer = Buffer.from([isVoidReturn ? 0 : 1, 2]);
+              this.emitInvoke(sb, func, node, prop, addressName, callBuffer, innerOptions);
 
-            // []
-            sb.emitHelper(prop, innerOptions, sb.helpers.return);
-          },
-        }),
-      );
-      // [fobj, string, objectVal, objectVal]
-      sb.emitHelper(
-        prop,
-        options,
-        sb.helpers.createFunctionObject({
-          property: InternalObjectProperty.Call,
-        }),
-      );
-      // [objectVal]
-      sb.emitHelper(prop, options, sb.helpers.setDataPropertyObjectProperty);
-    });
+              if (isVoidReturn) {
+                sb.emitHelper(prop, innerOptions, sb.helpers.wrapUndefined);
+              } else {
+                // [val]
+                sb.emitHelper(
+                  prop,
+                  innerOptions,
+                  sb.helpers.wrapValRecursive({
+                    type: propReturnType,
+                  }),
+                );
+              }
+
+              // []
+              sb.emitHelper(prop, innerOptions, sb.helpers.return);
+            },
+          }),
+        );
+        // [fobj, string, objectVal, objectVal]
+        sb.emitHelper(
+          prop,
+          options,
+          sb.helpers.createFunctionObject({
+            property: InternalObjectProperty.Call,
+          }),
+        );
+        if (accessor) {
+          // [objectVal]
+          sb.emitHelper(
+            prop,
+            options,
+            sb.helpers.setAccessorPropertyObjectProperty({ hasGet: true, hasSet: !isReadonly }),
+          );
+        } else {
+          // [objectVal]
+          sb.emitHelper(prop, options, sb.helpers.setDataPropertyObjectProperty);
+        }
+      });
 
     // [objectVal]
     this.emitAdditionalProperties(sb, func, node, options);
@@ -125,6 +195,16 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
     if (!optionsIn.pushValue) {
       sb.emitOp(node, 'DROP');
     }
+  }
+
+  protected emitInitial(
+    _sb: ScriptBuilder,
+    _func: MemberLikeExpression,
+    _node: ts.CallExpression,
+    _addressName: Name,
+    _options: VisitOptions,
+  ): void {
+    // do nothing
   }
 
   protected emitAdditionalProperties(
@@ -141,6 +221,7 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
     func: MemberLikeExpression,
     node: ts.CallExpression,
     prop: ts.Declaration,
+    addressName: Name,
     callBuffer: Buffer,
     optionsIn: VisitOptions,
   ): void;

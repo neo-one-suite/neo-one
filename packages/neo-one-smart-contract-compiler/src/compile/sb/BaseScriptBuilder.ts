@@ -18,6 +18,7 @@ import { BN } from 'bn.js';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../../Context';
+import { ContractInfo } from '../../contract';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { declarations } from '../declaration';
@@ -28,7 +29,7 @@ import { NodeCompiler } from '../NodeCompiler';
 import { Call, DeferredProgramCounter, Jmp, Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
 import { statements } from '../statement';
-import { Features, LinkedContracts, ScriptBuilderResult, VisitOptions } from '../types';
+import { Features, HandleSuperConstruct, LinkedContracts, ScriptBuilderResult, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 import { resolveJumps } from './resolveJumps';
 import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode, SingleBytecodeValue, Tags } from './ScriptBuilder';
@@ -60,6 +61,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     public readonly context: Context,
     public readonly helpers: Helpers,
     private readonly sourceFile: ts.SourceFile,
+    private readonly contractInfo?: ContractInfo,
     private readonly linked: LinkedContracts = {},
     private readonly allHelpers: ReadonlyArray<Helper> = [],
   ) {
@@ -126,6 +128,16 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         // []
         this.emitOp(sourceFile, 'DROP');
         this.visit(sourceFile, innerOptions);
+        const contractInfo = this.contractInfo;
+        if (contractInfo !== undefined) {
+          this.emitHelper(
+            contractInfo.smartContract,
+            innerOptions,
+            this.helpers.invokeSmartContract({
+              contractInfo,
+            }),
+          );
+        }
         // [globalObject]
         this.scope.getGlobal(this, sourceFile, options);
         this.allHelpers.forEach((helper) => {
@@ -467,6 +479,14 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   public finallyPCOptions(options: VisitOptions, pc: ProgramCounter): VisitOptions {
     return { ...options, finallyPC: pc };
+  }
+
+  public rootPCOptions(options: VisitOptions, pc: ProgramCounter): VisitOptions {
+    return { ...options, rootPC: pc };
+  }
+
+  public handleSuperConstructOptions(options: VisitOptions, handleSuperConstruct: HandleSuperConstruct): VisitOptions {
+    return { ...options, handleSuperConstruct };
   }
 
   public castOptions(options: VisitOptions, cast?: ts.Type | undefined): VisitOptions {

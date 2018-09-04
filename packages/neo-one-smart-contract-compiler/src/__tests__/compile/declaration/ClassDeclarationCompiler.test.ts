@@ -238,6 +238,27 @@ describe('ClassDeclarationCompiler', () => {
     `);
   });
 
+  test('basic class with method calling another instance method', async () => {
+    await helpers.executeString(`
+      class Foo {
+        x: string = 'bar';
+
+        bar(): string {
+          return this.x;
+        }
+
+        baz(): string {
+          return this.bar();
+        }
+      }
+
+      const f = new Foo();
+      if (f.baz() !== 'bar') {
+        throw 'Failure';
+      }
+    `);
+  });
+
   test('basic class extended with inherited property', async () => {
     await helpers.executeString(`
       class Foo {
