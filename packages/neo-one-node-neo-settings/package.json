@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/node-neo-settings",
-  "version": "1.0.0-alpha.74",
+  "version": "1.0.0-alpha.75",
   "description": "NEO•ONE standard MainNet and TestNet blockchain settings.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.74",
+    "@neo-one/client-core": "^1.0.0-alpha.75",
     "@neo-one/types": "^1.0.0-alpha.43",
-    "@neo-one/utils": "^1.0.0-alpha.63",
+    "@neo-one/utils": "^1.0.0-alpha.64",
     "bn.js": "^4.11.8",
     "tslib": "^1.9.3"
   }
