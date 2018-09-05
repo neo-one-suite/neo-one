@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { Context } from '../Context';
 import { ContractInfoProcessor } from './ContractInfoProcessor';
 

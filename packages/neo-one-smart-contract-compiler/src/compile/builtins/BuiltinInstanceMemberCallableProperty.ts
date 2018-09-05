@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 import {

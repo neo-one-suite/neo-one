@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { Types } from '../../constants';
 import { StructuredStorageBaseHelper, StructuredStorageBaseHelperOptions } from './StructuredStorageBaseHelper';
 

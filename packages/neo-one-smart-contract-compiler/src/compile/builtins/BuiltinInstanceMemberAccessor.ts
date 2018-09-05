@@ -1,4 +1,5 @@
 import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
 import { BuiltinInstanceMemberValue, BuiltinType, MemberLikeExpression } from './types';
