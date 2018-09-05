@@ -1,12 +1,14 @@
-/* @hash 8a5cd2b88fbdfc8d6284a100768d67d0 */
+/* @hash 3a554fffa44f92714db946a9e453525d */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
   Event,
+  Hash256String,
   InvocationTransaction,
   InvokeReceipt,
   InvokeReceiveTransactionOptions,
+  InvokeSendTransactionOptions,
   ReadSmartContract,
   SmartContract,
   TransactionOptions,
@@ -14,7 +16,7 @@ import {
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
-export type ICOEvent = ICOTransferEvent | ICORefundEvent;
+export type ICOEvent = ICOTransferEvent;
 
 export interface ICOTransferEventParameters {
   readonly from: AddressString | undefined;
@@ -22,8 +24,6 @@ export interface ICOTransferEventParameters {
   readonly amount: BigNumber;
 }
 export interface ICOTransferEvent extends Event<'transfer', ICOTransferEventParameters> {}
-export interface ICORefundEventParameters {}
-export interface ICORefundEvent extends Event<'refund', ICORefundEventParameters> {}
 
 export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
   readonly amountPerNEO: () => Promise<BigNumber>;
@@ -38,6 +38,10 @@ export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
     options?: InvokeReceiveTransactionOptions,
   ) => Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>>;
   readonly owner: () => Promise<AddressString>;
+  readonly refundAssets: (
+    transactionHash: Hash256String,
+    options?: InvokeSendTransactionOptions,
+  ) => Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>>;
   readonly remaining: () => Promise<BigNumber>;
   readonly startTimeSeconds: () => Promise<BigNumber>;
 }

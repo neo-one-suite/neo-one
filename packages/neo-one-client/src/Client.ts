@@ -223,9 +223,10 @@ export class Client<
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     options?: InvokeClaimTransactionOptions,
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
     return this.addTransactionHooks(
-      this.getProvider(options).invokeClaim(contract, method, params, paramsZipped, options),
+      this.getProvider(options).invokeClaim(contract, method, params, paramsZipped, options, sourceMaps),
     );
   }
 

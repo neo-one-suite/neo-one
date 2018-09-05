@@ -1112,6 +1112,14 @@ export abstract class SmartContract {
    * Used to enforce that a `Transaction` with native `Asset`s is only ever processed once by an appropriate `@receive` or `@send` method.
    */
   protected readonly processedTransactions: SetStorage<Hash256>;
+  /**
+   * Stores `Transaction` hashes that can be refunded.
+   */
+  protected readonly allowedRefunds: SetStorage<Hash256>;
+  /**
+   * Method automatically added for refunding native `Asset`s.
+   */
+  readonly refundAssets: (transactionHash: Hash256) => boolean;
   static readonly for: <T>(hash: T extends IsValidSmartContract<T> ? Address : never) => T;
 }
 

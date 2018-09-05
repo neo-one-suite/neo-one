@@ -1,4 +1,4 @@
-/* @hash 5fb19db8b7dc9293cac5821ae2148641 */
+/* @hash 1ff73ab1a22b594ce82ee249c7bbff9c */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -25,10 +25,6 @@ export const icoABI: ABI = {
           type: 'Integer',
         },
       ],
-    },
-    {
-      name: 'refund',
-      parameters: [],
     },
   ],
   functions: [
@@ -92,6 +88,19 @@ export const icoABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+    },
+    {
+      name: 'refundAssets',
+      parameters: [
+        {
+          name: 'transactionHash',
+          type: 'Hash256',
+        },
+      ],
+      returnType: {
+        type: 'Boolean',
+      },
+      send: true,
     },
     {
       name: 'deploy',

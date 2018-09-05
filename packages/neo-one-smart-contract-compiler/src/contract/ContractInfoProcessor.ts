@@ -26,11 +26,16 @@ export interface DeployPropInfo extends PropInfoBase {
   readonly callSignature?: ts.Signature;
 }
 
+export interface RefundAssetsPropInfo extends PropInfoBase {
+  readonly type: 'refundAssets';
+  readonly name: string;
+}
+
 export interface FunctionPropInfo extends PropInfoBase {
   readonly type: 'function';
   readonly name: string;
   readonly symbol: ts.Symbol;
-  readonly decl: ts.MethodDeclaration;
+  readonly decl: ts.PropertyDeclaration | ts.MethodDeclaration;
   readonly callSignature: ts.Signature | undefined;
   readonly send: boolean;
   readonly receive: boolean;
@@ -68,7 +73,7 @@ export interface AccessorPropInfo extends PropInfoBase {
   readonly propertyType: ts.Type | undefined;
 }
 
-export type PropInfo = PropertyPropInfo | AccessorPropInfo | FunctionPropInfo | DeployPropInfo;
+export type PropInfo = PropertyPropInfo | AccessorPropInfo | FunctionPropInfo | DeployPropInfo | RefundAssetsPropInfo;
 
 export interface ContractInfo {
   readonly smartContract: ts.ClassDeclaration;
@@ -84,14 +89,25 @@ export class ContractInfoProcessor {
       this.context.reportUnsupported(this.smartContract);
     }
     const result = this.processClass(this.smartContract, this.context.analysis.getType(this.smartContract));
+    const finalPropInfos = result.propInfos.concat([
+      {
+        type: 'refundAssets',
+        name: ContractPropertyName.refundAssets,
+        classDecl: this.smartContract,
+        isPublic: true,
+      },
+    ]);
 
     if (this.hasDeployInfo(result)) {
-      return result;
+      return {
+        ...result,
+        propInfos: finalPropInfos,
+      };
     }
 
     return {
       ...result,
-      propInfos: result.propInfos.concat([
+      propInfos: finalPropInfos.concat([
         {
           type: 'deploy',
           name: ContractPropertyName.deploy,
@@ -229,8 +245,9 @@ export class ContractInfoProcessor {
       return undefined;
     }
     if (RESERVED_PROPERTIES.has(name)) {
-      const memberSymbol = this.context.builtins.getOnlyMemberSymbol('SmartContract', name);
-      if (symbol !== memberSymbol) {
+      const valueSymbol = this.context.builtins.getValueSymbol('SmartContract');
+      const memberSymbol = tsUtils.symbol.getMemberOrThrow(valueSymbol, name);
+      if (tsUtils.symbol.getTarget(symbol) !== memberSymbol) {
         this.context.reportUnsupported(decl);
       }
 
@@ -279,8 +296,8 @@ export class ContractInfoProcessor {
       };
     }
 
-    if (ts.isMethodDeclaration(decl)) {
-      const callSignatures = type.getCallSignatures();
+    const callSignatures = type.getCallSignatures();
+    if (ts.isMethodDeclaration(decl) || (ts.isPropertyDeclaration(decl) && callSignatures.length > 0)) {
       if (callSignatures.length !== 1) {
         this.context.reportError(
           decl,

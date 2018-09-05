@@ -195,7 +195,7 @@ const createInvoke = ({
   });
 
   if (claim) {
-    return client.__invokeClaim(address, name, params, paramsZipped, options);
+    return client.__invokeClaim(address, name, params, paramsZipped, options, definition.sourceMaps);
   }
 
   const result = await client.__invoke(

@@ -265,11 +265,15 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
       throw new VerifyError('Previous timestamp is greater than block.');
     }
 
-    await verifyScript({
+    const { failureMessage } = await verifyScript({
       scriptContainer: { type: ScriptContainerType.Block, value: this },
       hash: previousHeader.nextConsensus,
       witness: this.script,
     });
+
+    if (failureMessage !== undefined) {
+      throw new VerifyError(failureMessage);
+    }
   }
 
   private async verifyComplete(options: BlockVerifyOptions): Promise<void> {
@@ -288,7 +292,7 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
   }
 
   private async verifyTransactions(options: BlockVerifyOptions): Promise<void> {
-    await Promise.all(
+    const results = await Promise.all(
       this.transactions.map(async (transaction) =>
         transaction.verify({
           isSpent: options.isSpent,
@@ -307,6 +311,15 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
         }),
       ),
     );
+    const failureResults = results.filter((verifyResults) =>
+      verifyResults.some(({ failureMessage }) => failureMessage !== undefined),
+    );
+    if (failureResults.length > 0) {
+      const failureResult = failureResults[0].find(({ failureMessage }) => failureMessage !== undefined);
+      if (failureResult !== undefined && failureResult.failureMessage !== undefined) {
+        throw new VerifyError(failureResult.failureMessage);
+      }
+    }
   }
 
   private async verifyNetworkFee(options: BlockVerifyOptions): Promise<void> {

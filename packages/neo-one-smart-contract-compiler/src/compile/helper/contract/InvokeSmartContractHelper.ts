@@ -6,7 +6,6 @@ import _ from 'lodash';
 import ts from 'typescript';
 import { ContractPropertyName } from '../../../constants';
 import { AccessorPropInfo, ContractInfo, DeployPropInfo, FunctionPropInfo, PropertyPropInfo } from '../../../contract';
-import { Types } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -76,12 +75,18 @@ export class InvokeSmartContractHelper extends Helper {
 
     const getFunctionLikeCase = (
       name: string,
-      decl: ts.SetAccessorDeclaration | ts.MethodDeclaration | ts.GetAccessorDeclaration,
+      decl: ts.SetAccessorDeclaration | ts.MethodDeclaration | ts.GetAccessorDeclaration | ts.PropertyDeclaration,
       returnType?: ts.Type,
       acceptsClaim?: boolean,
       prelude?: (rest: () => void) => (trigger: Trigger) => void,
     ) => {
       const handleCase = () => {
+        if (ts.isPropertyDeclaration(decl)) {
+          sb.context.reportUnsupported(decl);
+
+          return;
+        }
+
         // [number]
         sb.emitPushInt(decl, 1);
         // [arg]
@@ -140,72 +145,37 @@ export class InvokeSmartContractHelper extends Helper {
         propInfo.returnType,
         propInfo.acceptsClaim,
         (rest) => (trigger) => {
+          const checkReceive = () => {
+            // [boolean]
+            sb.emitHelper(decl, options, sb.helpers.didSendAssets);
+          };
+          const shouldCheckReceive = !propInfo.send && propInfo.receive;
+
+          const checkSend = () => {
+            // [boolean]
+            sb.emitHelper(decl, options, sb.helpers.isValidSend);
+            // [boolean]
+            sb.emitOp(node, 'NOT');
+          };
+
+          const shouldCheckSend = propInfo.send && !propInfo.receive;
+
           const decl = propInfo.decl;
           // Check and store that we've already processed this transaction
           if (trigger === Trigger.application && (propInfo.send || propInfo.receive)) {
-            // [val]
+            const check = shouldCheckSend
+              ? checkSend
+              : shouldCheckReceive
+                ? checkReceive
+                : () => {
+                    sb.emitPushBoolean(node, false);
+                  };
             sb.emitHelper(
               decl,
               options,
-              sb.helpers.createStructuredStorage({
-                prefix: ContractPropertyName.processedTransactions,
-                type: Types.SetStorage,
-              }),
-            );
-            // [val, val]
-            sb.emitOp(decl, 'DUP');
-            // [transaction, val, val]
-            sb.emitSysCall(decl, 'System.ExecutionEngine.GetScriptContainer');
-            // [hash, val, val]
-            sb.emitSysCall(decl, 'Neo.Transaction.GetHash');
-            // [hashVal, val, val]
-            sb.emitHelper(decl, options, sb.helpers.wrapBuffer);
-            // [hashVal, val, hashVal, val]
-            sb.emitOp(decl, 'TUCK');
-            // [val, hashVal, val]
-            sb.emitHelper(
-              decl,
-              options,
-              sb.helpers.hasStructuredStorage({
-                type: Types.SetStorage,
-                keyType: undefined,
-                knownKeyType: Types.Buffer,
-              }),
-            );
-            sb.emitHelper(
-              node,
-              options,
-              sb.helpers.if({
-                condition: () => {
-                  // [boolean]
-                  sb.emitHelper(node, options, sb.helpers.unwrapBoolean);
-                },
-                whenTrue: () => {
-                  // [val]
-                  sb.emitOp(node, 'DROP');
-                  // []
-                  sb.emitOp(node, 'DROP');
-                  // [boolean]
-                  sb.emitPushBoolean(node, false);
-                },
-                whenFalse: () => {
-                  // [boolean, hashVal, val]
-                  sb.emitPushBoolean(node, true);
-                  // [booleanVal, hashVal, val]
-                  sb.emitHelper(node, options, sb.helpers.wrapBoolean);
-                  // []
-                  sb.emitHelper(
-                    node,
-                    options,
-                    sb.helpers.setStructuredStorage({
-                      type: Types.MapStorage,
-                      keyType: undefined,
-                      knownKeyType: Types.Buffer,
-                    }),
-                  );
-                  // [boolean]
-                  rest();
-                },
+              sb.helpers.markRefund({
+                isInvalid: check,
+                execute: rest,
               }),
             );
 
@@ -213,6 +183,7 @@ export class InvokeSmartContractHelper extends Helper {
           }
 
           // Check that the verification script is the same as the application script
+          // And also do basic verification of received/sent assets
           if (trigger === Trigger.verification && (propInfo.send || propInfo.receive)) {
             // [transaction]
             sb.emitSysCall(decl, 'System.ExecutionEngine.GetScriptContainer');
@@ -264,8 +235,26 @@ export class InvokeSmartContractHelper extends Helper {
                         sb.emitOp(decl, 'EQUAL');
                       },
                       whenTrue: () => {
-                        // [boolean]
-                        rest();
+                        if (shouldCheckSend || shouldCheckReceive) {
+                          sb.emitHelper(
+                            decl,
+                            options,
+                            sb.helpers.if({
+                              condition: shouldCheckSend ? checkSend : checkReceive,
+                              whenTrue: () => {
+                                // [boolean]
+                                sb.emitPushBoolean(decl, false);
+                              },
+                              whenFalse: () => {
+                                // [boolean]
+                                rest();
+                              },
+                            }),
+                          );
+                        } else {
+                          // [boolean]
+                          rest();
+                        }
                       },
                       whenFalse: () => {
                         // [boolean]
@@ -423,6 +412,11 @@ export class InvokeSmartContractHelper extends Helper {
       return mutableCases;
     };
 
+    const getRefundAssetsCase = () =>
+      getCaseBase(node, ContractPropertyName.refundAssets, () => {
+        sb.emitHelper(node, options, sb.helpers.refundAssets);
+      });
+
     const allCases = _.flatMap(
       this.contractInfo.propInfos
         .filter((propInfo) => propInfo.isPublic && propInfo.type !== 'deploy')
@@ -436,6 +430,10 @@ export class InvokeSmartContractHelper extends Helper {
                 receive: propInfo.receive,
               },
             ];
+          }
+
+          if (propInfo.type === 'refundAssets') {
+            return [{ propCase: getRefundAssetsCase(), claim: false, send: true, receive: false }];
           }
 
           if (propInfo.type === 'property') {
@@ -482,74 +480,30 @@ export class InvokeSmartContractHelper extends Helper {
     const handleDefaultVerify = () => {
       // []
       sb.emitOp(node, 'DROP');
-      // [transaction]
-      sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
-      // [references]
-      sb.emitSysCall(node, 'Neo.Transaction.GetReferences');
+      // [boolean]
+      sb.emitHelper(node, options, sb.helpers.didReceiveAssets);
+      // [boolean, boolean]
+      sb.emitHelper(node, options, sb.helpers.didSendAssets);
       sb.emitHelper(
         node,
         options,
         sb.helpers.if({
           condition: () => {
-            sb.emitHelper(
-              node,
-              options,
-              sb.helpers.arrSome({
-                map: () => {
-                  // [address]
-                  sb.emitSysCall(node, 'Neo.Output.GetScriptHash');
-                  // [address, address]
-                  sb.emitSysCall(node, 'System.ExecutionEngine.GetExecutingScriptHash');
-                  // [boolean]
-                  sb.emitOp(node, 'EQUAL');
-                },
-              }),
-            );
+            // [boolean]
+            sb.emitOp(node, 'BOOLOR');
           },
           whenTrue: () => {
             sb.emitOp(node, 'THROW');
           },
           whenFalse: () => {
-            // [transaction]
-            sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
-            // [outputs]
-            sb.emitSysCall(node, 'Neo.Transaction.GetOutputs');
+            // [number]
+            sb.emitPushInt(node, 0);
+            // [arg]
+            sb.emitHelper(node, options, sb.helpers.getArgument);
             sb.emitHelper(
               node,
               options,
-              sb.helpers.if({
-                condition: () => {
-                  sb.emitHelper(
-                    node,
-                    options,
-                    sb.helpers.arrSome({
-                      map: () => {
-                        // [address]
-                        sb.emitSysCall(node, 'Neo.Output.GetScriptHash');
-                        // [address, address]
-                        sb.emitSysCall(node, 'System.ExecutionEngine.GetExecutingScriptHash');
-                        // [boolean]
-                        sb.emitOp(node, 'EQUAL');
-                      },
-                    }),
-                  );
-                },
-                whenTrue: () => {
-                  sb.emitOp(node, 'THROW');
-                },
-                whenFalse: () => {
-                  // No inputs or outputs relevant to this contract, go ahead and run as if it's an application trigger.
-                  // [number]
-                  sb.emitPushInt(node, 0);
-                  // [arg]
-                  sb.emitHelper(node, options, sb.helpers.getArgument);
-                  sb.emitHelper(
-                    node,
-                    options,
-                    sb.helpers.case(nonVerifyCases.map((propCase) => propCase(Trigger.application)), throwDefault),
-                  );
-                },
-              }),
+              sb.helpers.case(nonVerifyCases.map((propCase) => propCase(Trigger.application)), throwDefault),
             );
           },
         }),

@@ -2,7 +2,6 @@ import {
   Address,
   Blockchain,
   constant,
-  createEventNotifier,
   Deploy,
   Fixed,
   Hash256,
@@ -12,8 +11,6 @@ import {
   SmartContract,
 } from '@neo-one/smart-contract';
 import { Token } from './Token';
-
-const notifyRefund = createEventNotifier('refund');
 
 export class ICO extends SmartContract {
   public readonly properties = {
@@ -44,8 +41,6 @@ export class ICO extends SmartContract {
   @receive
   public mintTokens(): boolean {
     if (!this.hasStarted() || this.hasEnded()) {
-      notifyRefund();
-
       return false;
     }
 
@@ -60,8 +55,6 @@ export class ICO extends SmartContract {
     for (const output of Blockchain.currentTransaction.outputs) {
       if (output.address.equals(this.address)) {
         if (!output.asset.equals(Hash256.NEO)) {
-          notifyRefund();
-
           return false;
         }
 
@@ -70,8 +63,6 @@ export class ICO extends SmartContract {
     }
 
     if (amount > this.remaining) {
-      notifyRefund();
-
       return false;
     }
 
@@ -85,8 +76,6 @@ export class ICO extends SmartContract {
 
       return true;
     }
-
-    notifyRefund();
 
     return false;
   }

@@ -26,6 +26,7 @@ import {
   RawAction,
   RawCallReceipt,
   RawInvocationData,
+  RelayTransactionResult,
   StorageItem,
   Transaction,
   TransactionReceipt,
@@ -87,7 +88,7 @@ export class NEOONEOneDataProvider implements DataProvider, DeveloperProvider {
     return provider.getUnspentOutputs(address, monitor);
   }
 
-  public async relayTransaction(transaction: string, monitor?: Monitor): Promise<Transaction> {
+  public async relayTransaction(transaction: string, monitor?: Monitor): Promise<RelayTransactionResult> {
     const provider = await this.getProvider();
 
     return provider.relayTransaction(transaction, monitor);

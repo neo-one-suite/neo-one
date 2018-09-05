@@ -1,15 +1,12 @@
-// tslint:disable readonly-keyword readonly-array no-object-mutation strict-boolean-expressions
-import { Blockchain, constant, createEventNotifier, Fixed, Hash256, Integer, receive } from '@neo-one/smart-contract';
+import { Blockchain, constant, Fixed, Hash256, Integer, receive } from '@neo-one/smart-contract';
 
 import { Token } from './Token';
-
-const notifyRefund = createEventNotifier('refund');
 
 export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   private mutableRemaining: Fixed<Decimals>;
 
   public constructor(
-    public readonly startTimeSeconds: Integer,
+    public readonly icoStartTimeSeconds: Integer,
     public readonly icoDurationSeconds: Integer,
     public readonly icoAmount: Fixed<Decimals>,
     public readonly amountPerNEO: Fixed<Decimals>,
@@ -26,13 +23,15 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   @receive
   public mintTokens(): boolean {
     if (!this.hasStarted() || this.hasEnded()) {
-      notifyRefund();
+      this.allowedRefunds.add(Blockchain.currentTransaction.hash);
 
       return false;
     }
 
     const { references } = Blockchain.currentTransaction;
     if (references.length === 0) {
+      this.allowedRefunds.add(Blockchain.currentTransaction.hash);
+
       return false;
     }
     const sender = references[0].address;
@@ -42,7 +41,7 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
     for (const output of Blockchain.currentTransaction.outputs) {
       if (output.address.equals(this.address)) {
         if (!output.asset.equals(Hash256.NEO)) {
-          notifyRefund();
+          this.allowedRefunds.add(Blockchain.currentTransaction.hash);
 
           return false;
         }
@@ -52,24 +51,22 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
     }
 
     if (amount > this.remaining) {
-      notifyRefund();
+      this.allowedRefunds.add(Blockchain.currentTransaction.hash);
 
       return false;
     }
 
-    this.balances.set(sender, this.balanceOf(sender) + amount);
     this.mutableRemaining -= amount;
-    this.mutableSupply += amount;
-    this.notifyTransfer(undefined, sender, amount);
+    this.issue(sender, amount);
 
     return true;
   }
 
   private hasStarted(): boolean {
-    return Blockchain.currentBlockTime >= this.startTimeSeconds;
+    return Blockchain.currentBlockTime >= this.icoStartTimeSeconds;
   }
 
   private hasEnded(): boolean {
-    return Blockchain.currentBlockTime > this.startTimeSeconds + this.icoDurationSeconds;
+    return Blockchain.currentBlockTime > this.icoStartTimeSeconds + this.icoDurationSeconds;
   }
 }

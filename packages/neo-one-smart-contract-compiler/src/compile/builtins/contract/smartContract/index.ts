@@ -21,4 +21,12 @@ export const add = (builtins: Builtins): void => {
       ContractPropertyName.processedTransactions,
     ),
   );
+  builtins.addContractMember(
+    'SmartContract',
+    'allowedRefunds',
+    new BuiltinInstanceMemberStructuredStorageProperty(
+      StructuredStorageType.SetStorage,
+      ContractPropertyName.allowedRefunds,
+    ),
+  );
 };

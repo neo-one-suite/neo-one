@@ -161,7 +161,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
       value: this,
     };
 
-    await Promise.all(
+    const results = await Promise.all(
       [...scriptHashes].map(async (hash) =>
         verifyScript({
           scriptContainer,
@@ -170,5 +170,11 @@ export class ConsensusPayload extends UnsignedConsensusPayload
         }),
       ),
     );
+
+    results.forEach(({ failureMessage }) => {
+      if (failureMessage !== undefined) {
+        throw new VerifyError(failureMessage);
+      }
+    });
   }
 }

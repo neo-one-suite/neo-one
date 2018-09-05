@@ -9,6 +9,7 @@ import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
 import {
   BuiltinInstanceMemberAccessor,
+  BuiltinInstanceMemberCallableProperty,
   BuiltinInstanceMemberMethod,
   BuiltinInstanceMemberStorageProperty,
   BuiltinInstanceMemberStructuredStorageProperty,
@@ -58,11 +59,15 @@ const addContractInfo = (context: Context, contractInfo: ContractInfo) => {
   const propertyNameToOverride = new Map<string, ts.Symbol>();
   getAllPropInfos(contractInfo).forEach((propInfo) => {
     const symbol = context.analysis.getSymbol(propInfo.classDecl);
-    if (symbol !== undefined && propInfo.type !== 'deploy') {
+    if (symbol !== undefined && propInfo.type !== 'deploy' && propInfo.type !== 'refundAssets') {
       const memberSymbol = propInfo.symbol;
       switch (propInfo.type) {
         case 'function':
-          context.builtins.addMember(symbol, memberSymbol, new BuiltinInstanceMemberMethod(propInfo.decl));
+          if (ts.isPropertyDeclaration(propInfo.decl)) {
+            context.builtins.addMember(symbol, memberSymbol, new BuiltinInstanceMemberCallableProperty(propInfo.decl));
+          } else {
+            context.builtins.addMember(symbol, memberSymbol, new BuiltinInstanceMemberMethod(propInfo.decl));
+          }
           break;
         case 'accessor':
           context.builtins.addMember(

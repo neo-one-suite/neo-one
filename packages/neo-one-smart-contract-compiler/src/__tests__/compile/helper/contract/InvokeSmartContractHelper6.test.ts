@@ -1,4 +1,5 @@
 import { Hash256 } from '@neo-one/client';
+import { enableConsoleLogForTest } from '@neo-one/client-switch';
 import BigNumber from 'bignumber.js';
 import { helpers } from '../../../../__data__';
 
@@ -13,10 +14,11 @@ public readonly properties = {
 
 describe('InvokeSmartContractHelper', () => {
   test('class that used processedTransactions, send, receive and claim', async () => {
+    enableConsoleLogForTest();
     const node = await helpers.startNode();
     const accountID = node.masterWallet.account.id;
     const contract = await node.addContract(`
-      import { Address, Hash256, Transaction, Deploy, SmartContract, Blockchain, send, receive, claim } from '@neo-one/smart-contract';
+      import { Address, Deploy, SmartContract, send, receive, claim } from '@neo-one/smart-contract';
 
       export class TestSmartContract extends SmartContract {
         ${properties}
@@ -27,63 +29,23 @@ describe('InvokeSmartContractHelper', () => {
 
         @send
         public send(): boolean {
-          return Address.isSender(this.owner);
+          return Address.isCaller(this.owner);
         }
 
         @receive
         public receive(): boolean {
-          return Address.isSender(this.owner);
+          return Address.isCaller(this.owner);
         }
 
         @send
         @receive
         public sendReceive(): boolean {
-          return Address.isSender(this.owner);
+          return Address.isCaller(this.owner);
         }
 
         @claim
         public claim(): boolean {
-          return Address.isSender(this.owner);
-        }
-
-        @send
-        public refundAssets(transactionHash: Hash256): boolean {
-          if (this.processedTransactions.has(transactionHash)) {
-            return false;
-          }
-
-          const refundTransaction = Transaction.for(transactionHash);
-          const addresses = [...new Set(refundTransaction.references.map(({ address }) => address))];
-          let inValue = 0;
-          for (const output of refundTransaction.outputs) {
-            if (output.address.equals(this.address)) {
-              inValue += output.value;
-            }
-          }
-
-          const transaction = Blockchain.currentTransaction;
-          let outValue = 0;
-          for (const output of transaction.references) {
-            if (output.address.equals(this.address)) {
-              outValue += output.value;
-            }
-          }
-
-          for (const output of transaction.outputs) {
-            if (output.address.equals(this.address)) {
-              outValue -= output.value;
-            }
-          }
-
-          if (inValue === 0) {
-            return false;
-          }
-
-          if (inValue !== outValue) {
-            return false;
-          }
-
-          return addresses.every((address) => Address.isSender(address));
+          return Address.isCaller(this.owner);
         }
       }
     `);
@@ -107,6 +69,9 @@ describe('InvokeSmartContractHelper', () => {
       },
     ]);
     await transferResult.confirmed();
+
+    let account = await node.client.read(accountID.network).getAccount(contract.address);
+    expect(account.balances[Hash256.NEO].toString()).toEqual('10');
 
     const smartContract = node.client.smartContract({
       networks: {
@@ -164,8 +129,15 @@ describe('InvokeSmartContractHelper', () => {
       }),
     ).rejects.toBeDefined();
 
-    await node.developerClient.runConsensusNow();
-    await node.developerClient.runConsensusNow();
+    const count = await node.client.read(accountID.network).getBlockCount();
+    await Promise.all([
+      node.client.read(accountID.network).getBlock(count, { timeoutMS: 2500 }),
+      node.developerClient.runConsensusNow(),
+    ]);
+
+    account = await node.client.read(accountID.network).getAccount(contract.address);
+    expect(account.balances[Hash256.NEO].toString()).toEqual('10');
+
     const refundResult = await smartContract.refundAssets(transferResult.transaction.hash, {
       sendFrom: [
         {
@@ -229,7 +201,7 @@ describe('InvokeSmartContractHelper', () => {
       }),
     ).rejects.toBeDefined();
 
-    let account = await node.client.read(accountID.network).getAccount(contract.address);
+    account = await node.client.read(accountID.network).getAccount(contract.address);
     expect(account.balances[Hash256.NEO].toString()).toEqual('10');
 
     const sendReceiveResult = await smartContract.sendReceive({

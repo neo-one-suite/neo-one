@@ -100,7 +100,7 @@ describe('LocalUserAccountProvider', () => {
     getOutput.mockImplementation(async () => Promise.resolve(factory.createInputOutput()));
     sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
     const transaction = factory.createContractTransaction();
-    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
     const receipt = factory.createTransactionReceipt();
     getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
 
@@ -142,7 +142,7 @@ describe('LocalUserAccountProvider', () => {
     );
     sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
     const transaction = factory.createClaimTransaction();
-    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
     const receipt = factory.createTransactionReceipt();
     getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
 
@@ -169,7 +169,7 @@ describe('LocalUserAccountProvider', () => {
     testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
     sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
     const transaction = factory.createPublishTransaction();
-    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
     const receipt = factory.createTransactionReceipt();
     getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
     const invocationData = factory.createRawInvocationData({
@@ -234,7 +234,7 @@ describe('LocalUserAccountProvider', () => {
       testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createPublishTransaction();
-      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+      relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
       const invocationData = factory.createRawInvocationData();
@@ -285,7 +285,7 @@ describe('LocalUserAccountProvider', () => {
       testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createPublishTransaction();
-      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+      relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
       const invocationData = factory.createRawInvocationData();
@@ -334,7 +334,7 @@ describe('LocalUserAccountProvider', () => {
       testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createRegisterTransaction();
-      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+      relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
       const invocationData = factory.createRawInvocationData();
@@ -366,7 +366,7 @@ describe('LocalUserAccountProvider', () => {
     getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
     sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
     const transaction = factory.createRegisterTransaction();
-    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
     const receipt = factory.createTransactionReceipt();
     getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
     testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
@@ -401,7 +401,7 @@ describe('LocalUserAccountProvider', () => {
     getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
     sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
     const transaction = factory.createIssueTransaction();
-    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
     const receipt = factory.createTransactionReceipt();
     getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
 
@@ -429,7 +429,7 @@ describe('LocalUserAccountProvider', () => {
       testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createRegisterTransaction();
-      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+      relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
       const invocationData = factory.createRawInvocationData();
@@ -497,7 +497,7 @@ describe('LocalUserAccountProvider', () => {
     testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
     sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
     const transaction = factory.createRegisterTransaction();
-    relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+    relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
     const receipt = factory.createTransactionReceipt();
     getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
     const invocationData = factory.createRawInvocationData();
@@ -608,7 +608,7 @@ describe('LocalUserAccountProvider', () => {
       getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createContractTransaction();
-      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+      relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
 
       await provider.transfer(
         [
@@ -639,7 +639,7 @@ describe('LocalUserAccountProvider', () => {
       getUnspentOutputs.mockImplementation(async () => Promise.resolve(unspent));
       sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
       const transaction = factory.createContractTransaction();
-      relayTransaction.mockImplementation(async () => Promise.resolve(transaction));
+      relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
       getBlockCount.mockImplementation(async () => Promise.resolve(0));
 
       await provider.transfer(
@@ -696,7 +696,7 @@ describe('LocalUserAccountProvider', () => {
         expect(coreTransaction.inputs.length).toEqual(unspent.length);
         expect(coreTransaction.outputs.length).toEqual(3);
 
-        return Promise.resolve(transaction);
+        return Promise.resolve({ transaction });
       });
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
@@ -745,7 +745,7 @@ describe('LocalUserAccountProvider', () => {
         expect(coreTransaction.inputs.length).toEqual(unspent.length);
         expect(coreTransaction.outputs.length).toEqual(1);
 
-        return Promise.resolve(transaction);
+        return Promise.resolve({ transaction });
       });
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
@@ -791,7 +791,7 @@ describe('LocalUserAccountProvider', () => {
         expect(coreTransaction.inputs.length).toEqual(unspent.length);
         expect(coreTransaction.outputs.length).toEqual(2);
 
-        return Promise.resolve(transaction);
+        return Promise.resolve({ transaction });
       });
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
@@ -848,7 +848,7 @@ describe('LocalUserAccountProvider', () => {
         expect(coreTransaction.outputs[0].value.toString(10)).toEqual('200000000');
         expect(coreTransaction.outputs[1].value.toString(10)).toEqual('200000000');
 
-        return Promise.resolve(transaction);
+        return Promise.resolve({ transaction });
       });
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
@@ -909,7 +909,7 @@ describe('LocalUserAccountProvider', () => {
         expect(coreTransaction.outputs[0].value.toString(10)).toEqual('1000000000');
         expect(coreTransaction.outputs[1].value.toString(10)).toEqual('1400000000');
 
-        return Promise.resolve(transaction);
+        return Promise.resolve({ transaction });
       });
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
@@ -958,7 +958,7 @@ describe('LocalUserAccountProvider', () => {
         expect(coreTransaction.outputs[0].value.toString(10)).toEqual('100000000');
         expect(coreTransaction.outputs[1].value.toString(10)).toEqual('1000000000');
 
-        return Promise.resolve(transaction);
+        return Promise.resolve({ transaction });
       });
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));

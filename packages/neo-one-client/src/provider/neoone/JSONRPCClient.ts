@@ -9,6 +9,7 @@ import {
   InvocationResultJSON,
   NetworkSettingsJSON,
   OutputJSON,
+  RelayTransactionResultJSON,
   StorageItemJSON,
   TransactionJSON,
   TransactionReceiptJSON,
@@ -127,7 +128,7 @@ export class JSONRPCClient {
     );
   }
 
-  public async relayTransaction(value: BufferString, monitor?: Monitor): Promise<TransactionJSON> {
+  public async relayTransaction(value: BufferString, monitor?: Monitor): Promise<RelayTransactionResultJSON> {
     return this.provider
       .request(
         {

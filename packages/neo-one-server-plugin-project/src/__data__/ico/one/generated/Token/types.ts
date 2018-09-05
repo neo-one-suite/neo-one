@@ -1,11 +1,13 @@
-/* @hash ba3414cc02a76dce98b23ae0175d60b4 */
+/* @hash 42453b9c8595819fb8a8f7c09430a1a5 */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
   Event,
+  Hash256String,
   InvocationTransaction,
   InvokeReceipt,
+  InvokeSendTransactionOptions,
   ReadSmartContract,
   SmartContract,
   TransactionOptions,
@@ -34,6 +36,10 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
     options?: TransactionOptions,
   ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
   readonly name: () => Promise<string>;
+  readonly refundAssets: (
+    transactionHash: Hash256String,
+    options?: InvokeSendTransactionOptions,
+  ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
   readonly symbol: () => Promise<string>;
   readonly totalSupply: () => Promise<BigNumber>;
   readonly transfer: (

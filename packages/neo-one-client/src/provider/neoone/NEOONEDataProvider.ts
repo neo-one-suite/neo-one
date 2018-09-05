@@ -17,10 +17,12 @@ import {
   JSONHelper,
   NetworkSettingsJSON,
   OutputJSON,
+  RelayTransactionResultJSON,
   ScriptBuilderParam,
   StorageItemJSON,
   TransactionJSON,
   utils,
+  VerifyTransactionResultJSON,
 } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
@@ -58,10 +60,12 @@ import {
   RawAction,
   RawCallReceipt,
   RawInvocationData,
+  RelayTransactionResult,
   StorageItem,
   Transaction,
   TransactionBase,
   TransactionReceipt,
+  VerifyTransactionResult,
 } from '../../types';
 import * as clientUtils from '../../utils';
 import { MissingTransactionDataError } from './errors';
@@ -154,10 +158,10 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
     );
   }
 
-  public async relayTransaction(transaction: string, monitor?: Monitor): Promise<Transaction> {
+  public async relayTransaction(transaction: string, monitor?: Monitor): Promise<RelayTransactionResult> {
     const result = await this.mutableClient.relayTransaction(transaction, monitor);
 
-    return this.convertTransaction(result);
+    return this.convertRelayTransactionResult(result);
   }
 
   public async getTransactionReceipt(hash: Hash256String, options?: GetOptions): Promise<TransactionReceipt> {
@@ -685,6 +689,34 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
   private convertNetworkSettings(settings: NetworkSettingsJSON): NetworkSettings {
     return {
       issueGASFee: new BigNumber(settings.issueGASFee),
+    };
+  }
+
+  private convertRelayTransactionResult(result: RelayTransactionResultJSON): RelayTransactionResult {
+    const transaction = this.convertTransaction(result.transaction);
+    const verifyResult =
+      result.verifyResult === undefined ? undefined : this.convertVerifyResult(transaction.hash, result.verifyResult);
+
+    return { transaction, verifyResult };
+  }
+
+  private convertVerifyResult(transactionHash: string, result: VerifyTransactionResultJSON): VerifyTransactionResult {
+    return {
+      verifications: result.verifications.map((verification) => ({
+        failureMessage: verification.failureMessage,
+        witness: verification.witness,
+        address: scriptHashToAddress(verification.hash),
+        actions: verification.actions.map((action, idx) =>
+          convertAction(
+            common.uInt256ToString(common.bufferToUInt256(Buffer.alloc(32, 0))),
+            -1,
+            transactionHash,
+            -1,
+            idx,
+            action,
+          ),
+        ),
+      })),
     };
   }
 

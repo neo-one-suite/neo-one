@@ -3,6 +3,7 @@ import { common } from '../common';
 import { InvalidFormatError, VerifyError } from '../errors';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, utils } from '../utils';
+import { VerifyScriptResult } from '../vm';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
 import { Input } from './Input';
@@ -108,8 +109,10 @@ export class MinerTransaction extends TransactionBase<TransactionType.Miner, Min
     return utils.ZERO;
   }
 
-  public async verify(options: TransactionVerifyOptions): Promise<void> {
-    await Promise.all([super.verify(options), this.verifyInternal(options)]);
+  public async verify(options: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
+    const [results] = await Promise.all([super.verify(options), this.verifyInternal(options)]);
+
+    return results;
   }
 
   private async verifyInternal(options: TransactionVerifyOptions): Promise<void> {

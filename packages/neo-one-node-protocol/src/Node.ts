@@ -12,7 +12,15 @@ import {
   utils,
 } from '@neo-one/client-core';
 import { metrics, Monitor } from '@neo-one/monitor';
-import { Blockchain, createEndpoint, Endpoint, getEndpointConfig, Node as INode } from '@neo-one/node-core';
+import {
+  Blockchain,
+  createEndpoint,
+  Endpoint,
+  getEndpointConfig,
+  Node as INode,
+  RelayTransactionResult,
+  VerifyTransactionResult,
+} from '@neo-one/node-core';
 import {
   ConnectedPeer,
   EventMessage as NetworkEventMessage,
@@ -383,13 +391,15 @@ export class Node implements INode {
       throwVerifyError: false,
       forceAdd: false,
     },
-  ): Promise<void> {
+  ): Promise<RelayTransactionResult> {
+    const result = {};
+
     if (
       transaction.type === TransactionType.Miner ||
       (this.mutableMemPool[transaction.hashHex] as Transaction | undefined) !== undefined ||
       this.tempKnownTransactionHashes.has(transaction.hashHex)
     ) {
-      return;
+      return result;
     }
 
     if (!this.mutableKnownTransactionHashes.has(transaction.hash)) {
@@ -400,45 +410,57 @@ export class Node implements INode {
         if (memPool.length > MEM_POOL_SIZE / 2 && !forceAdd) {
           this.mutableKnownTransactionHashes.add(transaction.hash);
 
-          return;
+          return result;
         }
 
-        await this.monitor.withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex }).captureSpanLog(
-          async (span) => {
-            let foundTransaction;
-            try {
-              foundTransaction = await this.blockchain.transaction.tryGet({
-                hash: transaction.hash,
-              });
-            } finally {
-              span.setLabels({
-                [labels.NEO_TRANSACTION_FOUND]: foundTransaction !== undefined,
-              });
-            }
-            if (foundTransaction === undefined) {
-              await this.blockchain.verifyTransaction({
-                monitor: span,
-                transaction,
-                memPool: Object.values(this.mutableMemPool),
-              });
-
-              this.mutableMemPool[transaction.hashHex] = transaction;
-              NEO_PROTOCOL_MEMPOOL_SIZE.inc();
-              if (this.mutableConsensus !== undefined) {
-                this.mutableConsensus.onTransactionReceived(transaction);
+        // tslint:disable-next-line prefer-immediate-return
+        const finalResult = await this.monitor
+          .withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex })
+          .captureSpanLog(
+            async (span) => {
+              let foundTransaction;
+              try {
+                foundTransaction = await this.blockchain.transaction.tryGet({
+                  hash: transaction.hash,
+                });
+              } finally {
+                span.setLabels({
+                  [labels.NEO_TRANSACTION_FOUND]: foundTransaction !== undefined,
+                });
               }
-              this.relayTransactionInternal(transaction);
-              await this.trimMemPool(span);
-            }
+              let verifyResult: VerifyTransactionResult | undefined;
+              if (foundTransaction === undefined) {
+                verifyResult = await this.blockchain.verifyTransaction({
+                  monitor: span,
+                  transaction,
+                  memPool: Object.values(this.mutableMemPool),
+                });
+                const verified = verifyResult.verifications.every(({ failureMessage }) => failureMessage === undefined);
 
-            this.mutableKnownTransactionHashes.add(transaction.hash);
-          },
-          {
-            name: 'neo_relay_transaction',
-            level: { log: 'verbose', span: 'info' },
-            trace: true,
-          },
-        );
+                if (verified) {
+                  this.mutableMemPool[transaction.hashHex] = transaction;
+                  NEO_PROTOCOL_MEMPOOL_SIZE.inc();
+                  if (this.mutableConsensus !== undefined) {
+                    this.mutableConsensus.onTransactionReceived(transaction);
+                  }
+                  this.relayTransactionInternal(transaction);
+                  await this.trimMemPool(span);
+                }
+              }
+
+              this.mutableKnownTransactionHashes.add(transaction.hash);
+
+              return { verifyResult };
+            },
+            {
+              name: 'neo_relay_transaction',
+              level: { log: 'verbose', span: 'info' },
+              trace: true,
+            },
+          );
+
+        // tslint:disable-next-line no-var-before-return
+        return finalResult;
       } catch (error) {
         if (
           error.code === undefined ||
@@ -452,6 +474,8 @@ export class Node implements INode {
         this.tempKnownTransactionHashes.delete(transaction.hashHex);
       }
     }
+
+    return result;
   }
 
   public async relayBlock(block: Block, monitor?: Monitor): Promise<void> {

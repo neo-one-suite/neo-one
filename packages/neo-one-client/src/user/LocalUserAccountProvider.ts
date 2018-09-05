@@ -15,6 +15,7 @@ import {
   InvocationTransaction as CoreInvocationTransaction,
   IssueTransaction as CoreIssueTransaction,
   Output as OutputModel,
+  RawAction,
   ScriptBuilder,
   ScriptBuilderParam,
   Transaction as TransactionModel,
@@ -75,6 +76,7 @@ import {
   RawInvocationResultSuccess,
   RawInvokeReceipt,
   RegisterAssetReceipt,
+  RelayTransactionResult,
   SourceMaps,
   Transaction,
   TransactionOptions,
@@ -122,7 +124,11 @@ export interface Provider {
     address: AddressString,
     monitor?: Monitor,
   ) => Promise<ReadonlyArray<InputOutput>>;
-  readonly relayTransaction: (network: NetworkType, transaction: string, monitor?: Monitor) => Promise<Transaction>;
+  readonly relayTransaction: (
+    network: NetworkType,
+    transaction: string,
+    monitor?: Monitor,
+  ) => Promise<RelayTransactionResult>;
   readonly getTransactionReceipt: (
     network: NetworkType,
     hash: Hash256String,
@@ -597,6 +603,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     options: InvokeClaimTransactionOptions = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
     const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
 
@@ -653,6 +660,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           transaction,
           onConfirm: async ({ receipt }) => receipt,
           monitor: span,
+          sourceMaps,
         });
       },
       {
@@ -1012,6 +1020,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
               return onConfirm({ transaction, receipt, data });
             },
+            sourceMaps,
             monitor: span,
           });
 
@@ -1051,6 +1060,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     transaction: transactionUnsignedIn,
     from,
     onConfirm,
+    sourceMaps,
     monitor,
   }: {
     readonly inputs: ReadonlyArray<InputOutput>;
@@ -1062,6 +1072,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         readonly receipt: TransactionReceipt;
       },
     ) => Promise<T>;
+    readonly sourceMaps?: Promise<SourceMaps>;
     readonly monitor?: Monitor;
   }): Promise<TransactionResult<T, TTransaction>> {
     return this.capture(
@@ -1120,7 +1131,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             : Promise.resolve([]),
         ]);
 
-        const transaction = await this.provider.relayTransaction(
+        const result = await this.provider.relayTransaction(
           from.network,
           this.addWitness({
             transaction: transactionUnsigned,
@@ -1132,10 +1143,28 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             .toString('hex'),
           span,
         );
+        const failures =
+          result.verifyResult === undefined
+            ? []
+            : result.verifyResult.verifications.filter(({ failureMessage }) => failureMessage !== undefined);
+        if (failures.length > 0) {
+          const message = await processActionsAndMessage({
+            actions: failures.reduce<ReadonlyArray<RawAction>>((acc, { actions }) => acc.concat(actions), []),
+            message: failures
+              .map(({ failureMessage }) => failureMessage)
+              .filter(commonUtils.notNull)
+              .join(' '),
+            sourceMaps,
+          });
+
+          throw new InvokeError(message);
+        }
 
         transactionUnsigned.inputs.forEach((transfer) =>
           this.mutableUsedOutputs.add(`${common.uInt256ToString(transfer.hash)}:${transfer.index}`),
         );
+
+        const { transaction } = result;
 
         return {
           transaction: transaction as TTransaction,

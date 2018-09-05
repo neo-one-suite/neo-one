@@ -6,6 +6,7 @@ import { crypto } from '../crypto';
 import { InvalidFormatError, VerifyError } from '../errors';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
+import { VerifyScriptResult } from '../vm';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
 import { Input } from './Input';
@@ -204,7 +205,7 @@ export class RegisterTransaction extends TransactionBase<typeof TransactionType.
     return this.registerGetScriptHashesForVerifyingInternal(options);
   }
 
-  public async verify(_options: TransactionVerifyOptions): Promise<void> {
+  public async verify(_options: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
     throw new VerifyError('Enrollment transactions are obsolete');
   }
 }

@@ -1,8 +1,10 @@
 import { makeErrorWithCode } from '@neo-one/utils';
 import _ from 'lodash';
+import { Action, ActionJSON } from './action';
 import { UInt160 } from './common';
 import { ScriptContainer } from './ScriptContainer';
-import { Witness } from './Witness';
+import { TransactionJSON } from './transaction';
+import { Witness, WitnessJSON } from './Witness';
 
 export interface VerifyScriptOptions {
   readonly scriptContainer: ScriptContainer;
@@ -10,7 +12,30 @@ export interface VerifyScriptOptions {
   readonly witness: Witness;
 }
 
-export type VerifyScript = (options: VerifyScriptOptions) => Promise<void>;
+export interface VerifyScriptResult {
+  readonly failureMessage?: string;
+  readonly hash: UInt160;
+  readonly witness: Witness;
+  readonly actions: ReadonlyArray<Action>;
+}
+
+export type VerifyScript = (options: VerifyScriptOptions) => Promise<VerifyScriptResult>;
+
+export interface VerifyScriptResultJSON {
+  readonly failureMessage?: string;
+  readonly hash: string;
+  readonly witness: WitnessJSON;
+  readonly actions: ReadonlyArray<ActionJSON>;
+}
+
+export interface VerifyTransactionResultJSON {
+  readonly verifications: ReadonlyArray<VerifyScriptResultJSON>;
+}
+
+export interface RelayTransactionResultJSON {
+  readonly transaction: TransactionJSON;
+  readonly verifyResult?: VerifyTransactionResultJSON;
+}
 
 export enum Op {
   PUSH0 = 0x0,

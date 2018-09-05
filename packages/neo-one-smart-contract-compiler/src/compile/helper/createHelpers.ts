@@ -25,6 +25,7 @@ import {
   ExtendArrHelper,
 } from './arr';
 import { ArrayBindingHelper, ArrayBindingHelperOptions, ObjectBindingHelper, ObjectBindingHelperOptions } from './bind';
+import { GetCachedValueHelper, GetCachedValueHelperOptions, GetCacheHelper } from './cache';
 import { CreateClassHelper, CreateClassHelperOptions } from './class';
 import {
   ArrSliceHelper,
@@ -45,10 +46,26 @@ import {
   ThrowHelper,
 } from './completionRecord';
 import {
+  DidReceiveAssetsHelper,
+  DidSendAssetsHelper,
+  GetOutputAssetValueMapHelper,
+  GetSmartContractPropertyHelper,
+  GetSmartContractPropertyHelperOptions,
   InvokeSmartContractHelper,
   InvokeSmartContractHelperOptions,
   InvokeSmartContractMethodHelper,
   InvokeSmartContractMethodHelperOptions,
+  IsAllowedRefundHelper,
+  IsCallerHelper,
+  IsProcessedTransactionHelper,
+  IsValidAssetValueMapForRefundHelper,
+  IsValidAssetValueMapForSendHelper,
+  IsValidSendHelper,
+  MarkRefundHelper,
+  MarkRefundHelperOptions,
+  MergeAssetValueMapsHelper,
+  MergeAssetValueMapsHelperOptions,
+  RefundAssetsHelper,
 } from './contract';
 import { ThrowTypeErrorHelper } from './error';
 import {
@@ -100,6 +117,10 @@ import {
 } from './iterableIterator';
 import {
   RawEnumeratorForEachFuncHelper,
+  RawIteratorEveryBaseHelper,
+  RawIteratorEveryBaseHelperOptions,
+  RawIteratorEveryHelper,
+  RawIteratorEveryHelperOptions,
   RawIteratorForEachBaseHelper,
   RawIteratorForEachBaseHelperOptions,
   RawIteratorForEachFuncBaseHelper,
@@ -113,10 +134,22 @@ import {
   RawIteratorReduceBaseHelperOptions,
   RawIteratorReduceHelper,
   RawIteratorReduceHelperOptions,
+  RawIteratorSomeBaseHelper,
+  RawIteratorSomeBaseHelperOptions,
+  RawIteratorSomeHelper,
+  RawIteratorSomeHelperOptions,
 } from './iterator';
 import { CreateIteratorResultHelper } from './iteratorResult';
 import { KeyedHelper } from './KeyedHelper';
-import { MapDeleteHelper, MapReduceHelper, MapReduceHelperOptions } from './map';
+import {
+  MapDeleteHelper,
+  MapEveryHelper,
+  MapEveryHelperOptions,
+  MapReduceHelper,
+  MapReduceHelperOptions,
+  MapSomeHelper,
+  MapSomeHelperOptions,
+} from './map';
 import {
   AddEmptyModuleHelper,
   ExportHelper,
@@ -377,14 +410,31 @@ export interface Helpers {
   readonly wrapBlock: WrapBlockHelper;
   readonly unwrapBlock: UnwrapBlockHelper;
 
+  // cache
+  readonly getCachedValue: (options: GetCachedValueHelperOptions) => GetCachedValueHelper;
+  readonly getCache: GetCacheHelper;
+
   // class
   readonly createClass: (options: CreateClassHelperOptions) => CreateClassHelper;
 
   // contract
+  readonly didReceiveAssets: DidReceiveAssetsHelper;
+  readonly didSendAssets: DidSendAssetsHelper;
   readonly invokeSmartContract: (options: InvokeSmartContractHelperOptions) => InvokeSmartContractHelper;
   readonly invokeSmartContractMethod: (
     options: InvokeSmartContractMethodHelperOptions,
   ) => InvokeSmartContractMethodHelper;
+  readonly markRefund: (options: MarkRefundHelperOptions) => MarkRefundHelper;
+  readonly getOutputAssetValueMap: GetOutputAssetValueMapHelper;
+  readonly isAllowedRefund: IsAllowedRefundHelper;
+  readonly isCaller: IsCallerHelper;
+  readonly isProcessedTransaction: IsProcessedTransactionHelper;
+  readonly isValidAssetValueMapForRefund: IsValidAssetValueMapForRefundHelper;
+  readonly isValidAssetValueMapForSend: IsValidAssetValueMapForSendHelper;
+  readonly isValidSend: IsValidSendHelper;
+  readonly refundAssets: RefundAssetsHelper;
+  readonly mergeAssetValueMaps: (options: MergeAssetValueMapsHelperOptions) => MergeAssetValueMapsHelper;
+  readonly getSmartContractProperty: (options: GetSmartContractPropertyHelperOptions) => GetSmartContractPropertyHelper;
 
   // types/contract
   readonly isContract: IsContractHelper;
@@ -514,6 +564,10 @@ export interface Helpers {
   ) => CreateIteratorIterableIteratorHelper;
 
   // iterator
+  readonly rawIteratorEvery: (options: RawIteratorEveryHelperOptions) => RawIteratorEveryHelper;
+  readonly rawIteratorEveryBase: (options: RawIteratorEveryBaseHelperOptions) => RawIteratorEveryBaseHelper;
+  readonly rawIteratorSome: (options: RawIteratorSomeHelperOptions) => RawIteratorSomeHelper;
+  readonly rawIteratorSomeBase: (options: RawIteratorSomeBaseHelperOptions) => RawIteratorSomeBaseHelper;
   readonly rawIteratorForEach: (options: RawIteratorForEachHelperOptions) => RawIteratorForEachHelper;
   readonly rawIteratorForEachKey: (options: RawIteratorForEachKeyHelperOptions) => RawIteratorForEachKeyHelper;
   readonly rawIteratorForEachBase: (options: RawIteratorForEachBaseHelperOptions) => RawIteratorForEachBaseHelper;
@@ -530,7 +584,9 @@ export interface Helpers {
 
   // map
   readonly mapDelete: MapDeleteHelper;
+  readonly mapEvery: (options: MapEveryHelperOptions) => MapEveryHelper;
   readonly mapReduce: (options: MapReduceHelperOptions) => MapReduceHelper;
+  readonly mapSome: (options: MapSomeHelperOptions) => MapSomeHelper;
 
   // storage
   readonly putCommonStorage: PutCommonStorageHelper;
@@ -757,12 +813,29 @@ export const createHelpers = (): Helpers => {
     wrapBlock: new WrapBlockHelper(),
     unwrapBlock: new UnwrapBlockHelper(),
 
+    // cache
+    getCachedValue: (options) => new GetCachedValueHelper(options),
+    getCache: new GetCacheHelper(),
+
     // class
     createClass: (options) => new CreateClassHelper(options),
 
     // contract
+    didReceiveAssets: new DidReceiveAssetsHelper(),
+    didSendAssets: new DidSendAssetsHelper(),
     invokeSmartContract: (options) => new InvokeSmartContractHelper(options),
     invokeSmartContractMethod: (options) => new InvokeSmartContractMethodHelper(options),
+    markRefund: (options) => new MarkRefundHelper(options),
+    getOutputAssetValueMap: new GetOutputAssetValueMapHelper(),
+    isAllowedRefund: new IsAllowedRefundHelper(),
+    isCaller: new IsCallerHelper(),
+    isProcessedTransaction: new IsProcessedTransactionHelper(),
+    isValidAssetValueMapForRefund: new IsValidAssetValueMapForRefundHelper(),
+    isValidAssetValueMapForSend: new IsValidAssetValueMapForSendHelper(),
+    isValidSend: new IsValidSendHelper(),
+    refundAssets: new RefundAssetsHelper(),
+    mergeAssetValueMaps: (options) => new MergeAssetValueMapsHelper(options),
+    getSmartContractProperty: (options) => new GetSmartContractPropertyHelper(options),
 
     // types/contract
     isContract: new IsContractHelper(),
@@ -882,6 +955,10 @@ export const createHelpers = (): Helpers => {
     createIteratorIterableIterator: (options) => new CreateIteratorIterableIteratorHelper(options),
 
     // iterator
+    rawIteratorEvery: (options) => new RawIteratorEveryHelper(options),
+    rawIteratorEveryBase: (options) => new RawIteratorEveryBaseHelper(options),
+    rawIteratorSome: (options) => new RawIteratorSomeHelper(options),
+    rawIteratorSomeBase: (options) => new RawIteratorSomeBaseHelper(options),
     rawIteratorForEach: (options) => new RawIteratorForEachHelper(options),
     rawIteratorForEachKey: (options) => new RawIteratorForEachKeyHelper(options),
     rawIteratorForEachBase: (options) => new RawIteratorForEachBaseHelper(options),
@@ -896,7 +973,9 @@ export const createHelpers = (): Helpers => {
 
     // map
     mapDelete: new MapDeleteHelper(),
+    mapEvery: (options) => new MapEveryHelper(options),
     mapReduce: (options) => new MapReduceHelper(options),
+    mapSome: (options) => new MapSomeHelper(options),
 
     // storage
     putCommonStorage: new PutCommonStorageHelper(),

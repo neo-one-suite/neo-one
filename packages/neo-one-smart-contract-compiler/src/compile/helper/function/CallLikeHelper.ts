@@ -127,6 +127,18 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       }
     };
 
+    const isValidBuiltinCall = (builtinProp: Builtin) => {
+      if (ts.isCallExpression(expression)) {
+        return isBuiltinMemberCall(builtinProp) || isBuiltinInstanceMemberCall(builtinProp);
+      }
+
+      if (ts.isTaggedTemplateExpression(expression)) {
+        return isBuiltinMemberTemplate(builtinProp) || isBuiltinInstanceMemberTemplate(builtinProp);
+      }
+
+      return false;
+    };
+
     const handleBuiltinMemberCall = (builtinProp: Builtin, memberLike: CallMemberLikeExpression, visited: boolean) => {
       if (ts.isCallExpression(expression)) {
         if (isBuiltinMemberCall(builtinProp)) {
@@ -187,7 +199,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       const nameValue = tsUtils.node.getName(expr);
 
       const builtinProp = sb.context.builtins.getMember(value, name);
-      if (builtinProp !== undefined) {
+      if (builtinProp !== undefined && isValidBuiltinCall(builtinProp)) {
         handleBuiltinMemberCall(builtinProp, expr, false);
 
         return;
@@ -265,7 +277,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       const propType = sb.context.analysis.getType(prop);
 
       const builtinProp = sb.context.builtins.getMember(value, prop);
-      if (builtinProp !== undefined) {
+      if (builtinProp !== undefined && isValidBuiltinCall(builtinProp)) {
         handleBuiltinMemberCall(builtinProp, expr, false);
 
         return;

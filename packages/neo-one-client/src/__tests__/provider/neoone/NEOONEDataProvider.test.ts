@@ -319,11 +319,11 @@ describe('NEOONEDataProvider', () => {
 
   test('relayTransaction', async () => {
     const transactionJSON = factory.createInvocationTransactionJSON();
-    client.relayTransaction = jest.fn(async () => Promise.resolve(transactionJSON));
+    client.relayTransaction = jest.fn(async () => Promise.resolve({ transaction: transactionJSON }));
 
     const result = await provider.relayTransaction(data.serializedTransaction.valid);
 
-    verifyInvocationTransaction(result, transactionJSON);
+    verifyInvocationTransaction(result.transaction, transactionJSON);
   });
 
   test('getTransactionReceipt', async () => {

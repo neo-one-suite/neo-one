@@ -1,13 +1,6 @@
-import { Address, createEventNotifier, Fixed } from '@neo-one/smart-contract';
+import { Address } from '@neo-one/smart-contract';
 // tslint:disable-next-line no-implicit-dependencies
 import { Token } from '@neo-one/smart-contract-lib';
-
-const notifyTransfer = createEventNotifier<Address | undefined, Address | undefined, Fixed<4>>(
-  'transfer',
-  'from',
-  'to',
-  'amount',
-);
 
 export class TestToken extends Token<4> {
   public readonly owner: Address;
@@ -28,9 +21,5 @@ export class TestToken extends Token<4> {
     }
     this.owner = owner;
     this.issue(owner, 100_0000);
-  }
-
-  protected notifyTransfer(from: Address | undefined, to: Address | undefined, amount: Fixed<4>): void {
-    notifyTransfer(from, to, amount);
   }
 }

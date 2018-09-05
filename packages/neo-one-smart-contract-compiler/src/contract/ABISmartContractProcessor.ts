@@ -39,6 +39,15 @@ export class ABISmartContractProcessor {
                 returnType: BOOLEAN_RETURN,
               },
             ];
+          case 'refundAssets':
+            return [
+              {
+                name: propInfo.name,
+                send: true,
+                parameters: [{ name: 'transactionHash', type: 'Hash256' }],
+                returnType: BOOLEAN_RETURN,
+              },
+            ];
           case 'function':
             return [
               {
@@ -150,7 +159,26 @@ export class ABISmartContractProcessor {
 
   private toABIEvent(call: ts.CallExpression): ABIEvent | undefined {
     const callArguments = tsUtils.argumented.getArguments(call);
-    const typeArguments = tsUtils.argumented.getTypeArguments(call);
+    const parent = tsUtils.node.getParent(call);
+
+    let typeArguments = tsUtils.argumented
+      .getTypeArgumentsArray(call)
+      .map((typeNode) => this.context.analysis.getType(typeNode));
+    if (ts.isPropertyDeclaration(parent)) {
+      const propertyName = tsUtils.node.getName(parent);
+      const smartContractType = this.context.analysis.getType(this.contractInfo.smartContract);
+      if (smartContractType !== undefined) {
+        const member = tsUtils.type_.getProperty(smartContractType, propertyName);
+        if (member !== undefined) {
+          const type = this.context.analysis.getTypeOfSymbol(member, this.contractInfo.smartContract);
+          const signatureTypes = this.context.analysis.extractSignatureForType(call, type);
+          if (signatureTypes !== undefined) {
+            typeArguments = signatureTypes.paramDecls.map((paramDecl) => signatureTypes.paramTypes.get(paramDecl));
+          }
+        }
+      }
+    }
+
     const nameArg = callArguments[0] as ts.Node | undefined;
     if (nameArg === undefined) {
       return undefined;
@@ -167,9 +195,9 @@ export class ABISmartContractProcessor {
     }
 
     const name = tsUtils.literal.getLiteralValue(nameArg);
-    const parameters = _.zip(callArguments.slice(1), typeArguments === undefined ? [] : typeArguments)
-      .map(([paramNameArg, paramTypeNode]) => {
-        if (paramNameArg === undefined || paramTypeNode === undefined) {
+    const parameters = _.zip(callArguments.slice(1), typeArguments)
+      .map(([paramNameArg, paramType]) => {
+        if (paramNameArg === undefined || paramType === undefined) {
           return undefined;
         }
 
@@ -185,7 +213,7 @@ export class ABISmartContractProcessor {
 
         const paramName = tsUtils.literal.getLiteralValue(paramNameArg);
 
-        return this.toABIParameter(paramName, paramTypeNode, this.context.analysis.getType(paramTypeNode));
+        return this.toABIParameter(paramName, paramNameArg, paramType);
       })
       .filter(utils.notNull);
 
@@ -227,11 +255,12 @@ export class ABISmartContractProcessor {
   }
 
   private toABIParameter(
-    name: string,
+    nameIn: string,
     node: ts.Node,
     resolvedType: ts.Type | undefined,
     optional = false,
   ): ABIParameter | undefined {
+    const name = nameIn.startsWith('_') ? nameIn.slice(1) : nameIn;
     const type = this.toABIReturn(node, resolvedType, optional);
     if (type === undefined) {
       return undefined;

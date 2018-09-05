@@ -14,6 +14,7 @@ import {
   Output,
   RawCallReceipt,
   RawInvocationData,
+  RelayTransactionResult,
   Transaction,
   TransactionReceipt,
 } from '../../types';
@@ -71,7 +72,11 @@ export class NEOONEProvider {
     return this.getProvider(network).getUnspentOutputs(address, monitor);
   }
 
-  public async relayTransaction(network: NetworkType, transaction: string, monitor?: Monitor): Promise<Transaction> {
+  public async relayTransaction(
+    network: NetworkType,
+    transaction: string,
+    monitor?: Monitor,
+  ): Promise<RelayTransactionResult> {
     return this.getProvider(network).relayTransaction(transaction, monitor);
   }
 

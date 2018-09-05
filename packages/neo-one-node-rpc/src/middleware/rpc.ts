@@ -6,6 +6,7 @@ import {
   Input,
   InvocationTransaction,
   JSONHelper,
+  RelayTransactionResultJSON,
   Transaction,
   TransactionData,
   TransactionJSON,
@@ -14,7 +15,7 @@ import {
 } from '@neo-one/client-core';
 import { bodyParser, getMonitor } from '@neo-one/http';
 import { KnownLabel, metrics, Monitor } from '@neo-one/monitor';
-import { Blockchain, getEndpointConfig, Node } from '@neo-one/node-core';
+import { Blockchain, getEndpointConfig, Node, RelayTransactionResult } from '@neo-one/node-core';
 import { Context, Middleware } from 'koa';
 import compose from 'koa-compose';
 import compress from 'koa-compress';
@@ -444,19 +445,37 @@ export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; rea
     }),
 
     // Extended
-    [RPC_METHODS.relaytransaction]: async (args) => {
+    [RPC_METHODS.relaytransaction]: async (args): Promise<RelayTransactionResultJSON> => {
       const transaction = deserializeTransactionWire({
         context: blockchain.deserializeWireContext,
         buffer: JSONHelper.readBuffer(args[0]),
       });
 
       try {
-        const [transactionJSON] = await Promise.all<TransactionJSON, void>([
+        const [transactionJSON, result] = await Promise.all<TransactionJSON, RelayTransactionResult>([
           transaction.serializeJSON(blockchain.serializeJSONContext),
-          node.relayTransaction(transaction, { throwVerifyError: true, forceAdd: true }),
+          node.relayTransaction(transaction, { forceAdd: true }),
         ]);
+        const resultJSON =
+          result.verifyResult === undefined
+            ? {}
+            : {
+                verifyResult: {
+                  verifications: result.verifyResult.verifications.map((verification) => ({
+                    hash: JSONHelper.writeUInt160(verification.hash),
+                    witness: verification.witness.serializeJSON(blockchain.serializeJSONContext),
+                    actions: verification.actions.map((action) =>
+                      action.serializeJSON(blockchain.serializeJSONContext),
+                    ),
+                    failureMessage: verification.failureMessage,
+                  })),
+                },
+              };
 
-        return transactionJSON;
+        return {
+          ...resultJSON,
+          transaction: transactionJSON,
+        };
       } catch (error) {
         throw new JSONRPCError(-110, `Relay transaction failed: ${error.message}`);
       }

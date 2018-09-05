@@ -1,13 +1,6 @@
-import { Address, createEventNotifier, Fixed, Integer } from '@neo-one/smart-contract';
+import { Address, Integer } from '@neo-one/smart-contract';
 
 import { ICO } from '../../ICO';
-
-const notifyTransfer = createEventNotifier<Address | undefined, Address | undefined, Fixed<8>>(
-  'transfer',
-  'from',
-  'to',
-  'amount',
-);
 
 export class TestICO extends ICO<8> {
   public readonly name: string = 'TestToken';
@@ -27,9 +20,5 @@ export class TestICO extends ICO<8> {
       5000_00000000,
       10,
     );
-  }
-
-  protected notifyTransfer(from: Address | undefined, to: Address | undefined, amount: Fixed<8>): void {
-    notifyTransfer(from, to, amount);
   }
 }

@@ -343,10 +343,11 @@ export const addTransaction = async ({
   if (verify) {
     let verified = true;
     try {
-      await blockchain.verifyTransaction({
+      const { verifications } = await blockchain.verifyTransaction({
         transaction,
         memPool: Object.values(context.transactions).filter(commonUtils.notNull),
       });
+      verified = verifications.every(({ failureMessage }) => failureMessage === undefined);
     } catch {
       verified = false;
     }

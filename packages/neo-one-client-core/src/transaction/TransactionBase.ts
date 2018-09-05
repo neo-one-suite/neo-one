@@ -20,7 +20,7 @@ import {
 } from '../Serializable';
 import { BinaryReader, BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
 import { Validator } from '../Validator';
-import { VerifyScript } from '../vm';
+import { VerifyScript, VerifyScriptResult } from '../vm';
 import { Witness, WitnessJSON } from '../Witness';
 import { Attribute, AttributeJSON, AttributeUsage, deserializeAttributeWireBase, UInt160Attribute } from './attribute';
 import { hasDuplicateInputs } from './common';
@@ -411,7 +411,7 @@ export abstract class TransactionBase<
     return this.baseGetScriptHashesForVerifyingInternal(options);
   }
 
-  public async verify(options: TransactionVerifyOptions): Promise<void> {
+  public async verify(options: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
     const { memPool = [] } = options;
     if (hasDuplicateInputs(this.inputs)) {
       throw new VerifyError('Duplicate inputs');
@@ -433,12 +433,14 @@ export abstract class TransactionBase<
       throw new VerifyError('Too many ECDH attributes.');
     }
 
-    await Promise.all([
+    const [results] = await Promise.all([
+      this.verifyScripts(options),
       this.verifyDoubleSpend(options),
       this.verifyOutputs(options),
       this.verifyTransactionResults(options),
-      this.verifyScripts(options),
     ]);
+
+    return results;
   }
 
   protected readonly sizeExclusive: () => number = () => 0;
@@ -538,7 +540,11 @@ export abstract class TransactionBase<
     }
   }
 
-  private async verifyScripts({ getAsset, getOutput, verifyScript }: TransactionVerifyOptions): Promise<void> {
+  private async verifyScripts({
+    getAsset,
+    getOutput,
+    verifyScript,
+  }: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
     const hashesSet = await this.getScriptHashesForVerifying({
       getAsset,
       getOutput,
@@ -550,7 +556,8 @@ export abstract class TransactionBase<
 
     // tslint:disable-next-line no-array-mutation
     const hashes = [...hashesSet].sort().map((value) => common.hexToUInt160(value));
-    await Promise.all(
+
+    return Promise.all(
       _.zip(hashes, this.scripts).map(async ([hash, witness]) =>
         verifyScript({
           scriptContainer: {

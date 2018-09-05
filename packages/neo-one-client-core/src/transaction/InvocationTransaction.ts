@@ -8,6 +8,7 @@ import { InvalidFormatError, VerifyError } from '../errors';
 import { InvocationResultJSON } from '../invocationResult';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, JSONHelper, utils } from '../utils';
+import { VerifyScriptResult } from '../vm';
 import { Witness } from '../Witness';
 import { Attribute } from './attribute';
 import { Input } from './Input';
@@ -182,11 +183,11 @@ export class InvocationTransaction extends TransactionBase<TransactionType.Invoc
     return this.gas;
   }
 
-  public async verify(options: TransactionVerifyOptions): Promise<void> {
+  public async verify(options: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
     if (!this.gas.mod(utils.ONE_HUNDRED_MILLION).eq(utils.ZERO)) {
       throw new VerifyError('Invalid GAS amount');
     }
 
-    await super.verify(options);
+    return super.verify(options);
   }
 }

@@ -1,4 +1,5 @@
 import { Transaction } from '@neo-one/client-core';
+import { VerifyTransactionResult } from './Blockchain';
 import { Endpoint } from './Network';
 
 export interface Consensus {
@@ -11,11 +12,15 @@ export interface Consensus {
   readonly resume: () => Promise<void>;
 }
 
+export interface RelayTransactionResult {
+  readonly verifyResult?: VerifyTransactionResult;
+}
+
 export interface Node {
   readonly relayTransaction: (
     transaction: Transaction,
     options?: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean },
-  ) => Promise<void>;
+  ) => Promise<RelayTransactionResult>;
   readonly connectedPeers: ReadonlyArray<Endpoint>;
   readonly memPool: { readonly [hash: string]: Transaction };
   readonly consensus: Consensus | undefined;

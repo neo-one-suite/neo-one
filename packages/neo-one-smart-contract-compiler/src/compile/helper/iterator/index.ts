@@ -1,4 +1,6 @@
 export * from './RawEnumeratorForEachFuncHelper';
+export * from './RawIteratorEveryBaseHelper';
+export * from './RawIteratorEveryHelper';
 export * from './RawIteratorForEachBaseHelper';
 export * from './RawIteratorForEachFuncBaseHelper';
 export * from './RawIteratorForEachFuncHelper';
@@ -6,3 +8,5 @@ export * from './RawIteratorForEachHelper';
 export * from './RawIteratorForEachKeyHelper';
 export * from './RawIteratorReduceBaseHelper';
 export * from './RawIteratorReduceHelper';
+export * from './RawIteratorSomeBaseHelper';
+export * from './RawIteratorSomeHelper';

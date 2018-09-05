@@ -891,6 +891,7 @@ export interface UserAccountProvider {
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     options?: InvokeClaimTransactionOptions,
+    sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   readonly call: (
     network: NetworkType,
@@ -904,6 +905,22 @@ export interface UserAccountProvider {
 
 export interface UserAccountProviders {
   readonly [type: string]: UserAccountProvider;
+}
+
+export interface VerifyScriptResult {
+  readonly failureMessage?: string;
+  readonly address: AddressString;
+  readonly witness: Witness;
+  readonly actions: ReadonlyArray<RawAction>;
+}
+
+export interface VerifyTransactionResult {
+  readonly verifications: ReadonlyArray<VerifyScriptResult>;
+}
+
+export interface RelayTransactionResult {
+  readonly transaction: Transaction;
+  readonly verifyResult?: VerifyTransactionResult;
 }
 
 export interface SmartContractNetworkDefinition {
