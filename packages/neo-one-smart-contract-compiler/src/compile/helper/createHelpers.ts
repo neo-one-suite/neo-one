@@ -57,6 +57,7 @@ import {
   InvokeSmartContractMethodHelperOptions,
   IsAllowedRefundHelper,
   IsCallerHelper,
+  IsDeployedHelper,
   IsProcessedTransactionHelper,
   IsValidAssetValueMapForRefundHelper,
   IsValidAssetValueMapForSendHelper,
@@ -66,6 +67,7 @@ import {
   MergeAssetValueMapsHelper,
   MergeAssetValueMapsHelperOptions,
   RefundAssetsHelper,
+  SetDeployedHelper,
 } from './contract';
 import { ThrowTypeErrorHelper } from './error';
 import {
@@ -435,6 +437,8 @@ export interface Helpers {
   readonly refundAssets: RefundAssetsHelper;
   readonly mergeAssetValueMaps: (options: MergeAssetValueMapsHelperOptions) => MergeAssetValueMapsHelper;
   readonly getSmartContractProperty: (options: GetSmartContractPropertyHelperOptions) => GetSmartContractPropertyHelper;
+  readonly isDeployed: IsDeployedHelper;
+  readonly setDeployed: SetDeployedHelper;
 
   // types/contract
   readonly isContract: IsContractHelper;
@@ -836,6 +840,8 @@ export const createHelpers = (): Helpers => {
     refundAssets: new RefundAssetsHelper(),
     mergeAssetValueMaps: (options) => new MergeAssetValueMapsHelper(options),
     getSmartContractProperty: (options) => new GetSmartContractPropertyHelper(options),
+    isDeployed: new IsDeployedHelper(),
+    setDeployed: new SetDeployedHelper(),
 
     // types/contract
     isContract: new IsContractHelper(),

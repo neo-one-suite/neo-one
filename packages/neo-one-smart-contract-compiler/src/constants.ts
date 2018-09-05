@@ -42,6 +42,7 @@ export enum ContractPropertyName {
   address = 'address',
   properties = 'properties',
   refundAssets = 'refundAssets',
+  deployed = 'deployed',
 }
 
 export const RESERVED_PROPERTIES: Set<string> = new Set([
@@ -52,5 +53,6 @@ export const BUILTIN_PROPERTIES: Set<string> = new Set([
   ContractPropertyName.processedTransactions,
   ContractPropertyName.allowedRefunds,
   ContractPropertyName.address,
+  ContractPropertyName.deployed,
 ]);
 export const IGNORED_PROPERTIES: Set<string> = new Set([ContractPropertyName.properties]);

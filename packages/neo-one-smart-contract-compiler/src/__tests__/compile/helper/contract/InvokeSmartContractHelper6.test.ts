@@ -1,5 +1,4 @@
 import { Hash256 } from '@neo-one/client';
-import { enableConsoleLogForTest } from '@neo-one/client-switch';
 import BigNumber from 'bignumber.js';
 import { helpers } from '../../../../__data__';
 
@@ -14,7 +13,6 @@ public readonly properties = {
 
 describe('InvokeSmartContractHelper', () => {
   test('class that used processedTransactions, send, receive and claim', async () => {
-    enableConsoleLogForTest();
     const node = await helpers.startNode();
     const accountID = node.masterWallet.account.id;
     const contract = await node.addContract(`
@@ -59,6 +57,7 @@ describe('InvokeSmartContractHelper', () => {
       const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
 
       assertEqual(contract.deploy(Address.from('${accountID.address}')), true);
+      assertEqual(contract.deploy(Address.from('${accountID.address}')), false);
     `);
 
     const transferResult = await node.client.transfer([

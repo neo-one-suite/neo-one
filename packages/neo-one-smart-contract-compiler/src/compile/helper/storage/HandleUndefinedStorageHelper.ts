@@ -8,7 +8,7 @@ export interface HandleUndefinedStorageHelperOptions {
   readonly handleDefined: () => void;
 }
 
-// Input: [buffer]
+// Input: [value]
 // Output: [value]
 export class HandleUndefinedStorageHelper extends Helper {
   private readonly handleUndefined: () => void;
@@ -28,14 +28,12 @@ export class HandleUndefinedStorageHelper extends Helper {
       options,
       sb.helpers.if({
         condition: () => {
-          // [buffer, buffer]
+          // [value, value]
           sb.emitOp(node, 'DUP');
-          // [number, buffer]
-          sb.emitOp(node, 'SIZE');
-          // [0, number, buffer]
-          sb.emitPushInt(node, 0);
-          // [number === 0, buffer]
-          sb.emitOp(node, 'NUMEQUAL');
+          // [buffer, value, value]
+          sb.emitPushBuffer(node, Buffer.alloc(0, 0));
+          // [boolean]
+          sb.emitOp(node, 'EQUAL');
         },
         whenTrue: () => {
           // []

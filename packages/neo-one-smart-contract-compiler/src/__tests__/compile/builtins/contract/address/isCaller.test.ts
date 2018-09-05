@@ -1,4 +1,3 @@
-import { enableConsoleLogForTest } from '@neo-one/client-switch';
 import { helpers, keys } from '../../../../../__data__';
 
 const properties = `
@@ -11,8 +10,6 @@ public readonly properties = {
 `;
 
 describe('Address.isCaller', () => {
-  enableConsoleLogForTest();
-
   test('isCaller', async () => {
     const node = await helpers.startNode();
     const isCallerContract = await node.addContract(`

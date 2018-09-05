@@ -1117,6 +1117,10 @@ export abstract class SmartContract {
    */
   protected readonly allowedRefunds: SetStorage<Hash256>;
   /**
+   * Property primarily used internally to validate that the smart contract is deployed only once.
+   */
+  protected readonly deployed: true;
+  /**
    * Method automatically added for refunding native `Asset`s.
    */
   readonly refundAssets: (transactionHash: Hash256) => boolean;

@@ -381,8 +381,28 @@ export class InvokeSmartContractHelper extends Helper {
       const decl = propInfo.decl === undefined ? propInfo.classDecl : propInfo.decl;
 
       return getCaseBase(decl, propInfo.name, () => {
-        handleDeploy(contractInfo, propInfo, options);
-        sb.emitPushBoolean(decl, true);
+        sb.emitHelper(
+          node,
+          options,
+          sb.helpers.if({
+            condition: () => {
+              // [boolean]
+              sb.emitHelper(propInfo.decl === undefined ? node : propInfo.decl, options, sb.helpers.isDeployed);
+            },
+            whenTrue: () => {
+              // [boolean]
+              sb.emitPushBoolean(decl, false);
+            },
+            whenFalse: () => {
+              // []
+              handleDeploy(contractInfo, propInfo, options);
+              // []
+              sb.emitHelper(propInfo.decl === undefined ? node : propInfo.decl, options, sb.helpers.setDeployed);
+              // [boolean]
+              sb.emitPushBoolean(decl, true);
+            },
+          }),
+        );
       });
     };
 
