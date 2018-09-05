@@ -23,15 +23,11 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
   @receive
   public mintTokens(): boolean {
     if (!this.hasStarted() || this.hasEnded()) {
-      this.allowedRefunds.add(Blockchain.currentTransaction.hash);
-
       return false;
     }
 
     const { references } = Blockchain.currentTransaction;
     if (references.length === 0) {
-      this.allowedRefunds.add(Blockchain.currentTransaction.hash);
-
       return false;
     }
     const sender = references[0].address;
@@ -41,8 +37,6 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
     for (const output of Blockchain.currentTransaction.outputs) {
       if (output.address.equals(this.address)) {
         if (!output.asset.equals(Hash256.NEO)) {
-          this.allowedRefunds.add(Blockchain.currentTransaction.hash);
-
           return false;
         }
 
@@ -51,8 +45,6 @@ export abstract class ICO<Decimals extends number> extends Token<Decimals> {
     }
 
     if (amount > this.remaining) {
-      this.allowedRefunds.add(Blockchain.currentTransaction.hash);
-
       return false;
     }
 

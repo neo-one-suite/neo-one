@@ -12,7 +12,7 @@
     "@types/lodash": "^4.14.116",
     "@types/through": "^0.0.29",
     "lodash": "^4.17.10",
-    "rxjs": "^6.3.1",
+    "rxjs": "^6.3.2",
     "through": "^2.3.8",
     "tslib": "^1.9.3"
   }

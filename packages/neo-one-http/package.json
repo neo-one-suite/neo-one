@@ -11,7 +11,7 @@
     "koa-better-body": "^3.0.4",
     "koa-convert": "^1.2.0",
     "koa-cors": "^0.0.16",
-    "rxjs": "^6.3.1",
+    "rxjs": "^6.3.2",
     "tslib": "^1.9.3"
   }
 }

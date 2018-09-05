@@ -1,5 +1,5 @@
 import ts from 'typescript';
-
+import { ErrorSlots } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -23,10 +23,12 @@ export class ThrowHelper extends Helper {
           sb.emitHelper(node, options, sb.helpers.isString);
         },
         whenFalse: () => {
-          // ['message', errorVal, errorVal]
-          sb.emitPushString(node, 'message');
+          // [map, errorVal]
+          sb.emitHelper(node, options, sb.helpers.unwrapError);
+          // [number, map, errorVal]
+          sb.emitPushInt(node, ErrorSlots.message);
           // [stringVal, errorVal]
-          sb.emitHelper(node, options, sb.helpers.getPropertyObjectProperty);
+          sb.emitOp(node, 'PICKITEM');
         },
       }),
     );

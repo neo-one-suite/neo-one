@@ -24,7 +24,6 @@ export interface VisitOptions {
   readonly breakPC?: ProgramCounter | undefined;
   readonly continuePC?: ProgramCounter | undefined;
   readonly finallyPC?: ProgramCounter | undefined;
-  readonly rootPC?: ProgramCounter | undefined;
   readonly switchExpressionType?: ts.Type | undefined;
   readonly cast?: ts.Type | undefined;
   readonly superClass?: Name | undefined;

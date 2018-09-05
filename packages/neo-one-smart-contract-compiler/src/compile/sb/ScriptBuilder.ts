@@ -54,7 +54,6 @@ export interface ScriptBuilder {
   readonly catchPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
   readonly noCatchPCOptions: (options: VisitOptions) => VisitOptions;
   readonly finallyPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
-  readonly rootPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
   readonly handleSuperConstructOptions: (
     options: VisitOptions,
     handleSuperConstruct: HandleSuperConstruct,

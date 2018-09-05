@@ -512,10 +512,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     return { ...options, finallyPC: pc };
   }
 
-  public rootPCOptions(options: VisitOptions, pc: ProgramCounter): VisitOptions {
-    return { ...options, rootPC: pc };
-  }
-
   public handleSuperConstructOptions(options: VisitOptions, handleSuperConstruct: HandleSuperConstruct): VisitOptions {
     return { ...options, handleSuperConstruct };
   }
