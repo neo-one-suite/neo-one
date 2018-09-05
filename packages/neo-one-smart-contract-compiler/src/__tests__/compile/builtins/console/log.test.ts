@@ -82,6 +82,31 @@ describe('console.log', () => {
     expect(messages).toMatchSnapshot();
   });
 
+  test('should log maps', async () => {
+    const { receipt, sourceMaps } = await helpers.executeString(`
+      const map = new Map();
+      map.set('a', 1);
+      map.set('b', 2);
+      map.set('c', 3);
+      console.log(map);
+    `);
+
+    const messages = await getMessages(receipt, sourceMaps);
+
+    expect(messages).toMatchSnapshot();
+  });
+
+  test('should log sets', async () => {
+    const { receipt, sourceMaps } = await helpers.executeString(`
+      const set = new Set([1, 2, 3]);
+      console.log(set);
+    `);
+
+    const messages = await getMessages(receipt, sourceMaps);
+
+    expect(messages).toMatchSnapshot();
+  });
+
   test('should log buffers', async () => {
     const { receipt, sourceMaps } = await helpers.executeString(`
       console.log(Buffer.from('ab', 'hex'));

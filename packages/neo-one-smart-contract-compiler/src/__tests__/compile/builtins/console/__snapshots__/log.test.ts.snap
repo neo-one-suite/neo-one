@@ -83,6 +83,13 @@ Array [
 ]
 `;
 
+exports[`console.log should log maps 1`] = `
+Array [
+  "\\"Map { 'a' => '1', 'b' => '2', 'c' => '3' }\\"
+  at console.log(map) (snippetCode.ts:6:6)",
+]
+`;
+
 exports[`console.log should log null 1`] = `
 Array [
   "null
@@ -101,6 +108,13 @@ exports[`console.log should log objects 1`] = `
 Array [
   "{\\"a\\":\\"a\\",\\"b\\":[{\\"a\\":\\"a\\"}]}
   at console.log({ (snippetCode.ts:2:6)",
+]
+`;
+
+exports[`console.log should log sets 1`] = `
+Array [
+  "\\"Set { '1', '2', '3' }\\"
+  at console.log(set) (snippetCode.ts:3:6)",
 ]
 `;
 
