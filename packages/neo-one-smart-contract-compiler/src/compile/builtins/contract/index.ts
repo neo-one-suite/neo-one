@@ -10,6 +10,7 @@ import { add as addBlock } from './block';
 import { add as addBlockchain } from './blockchain';
 import { add as addContract } from './contract';
 import { add as addCreateEventNotifier } from './createEventNotifier';
+import { add as addCrypto } from './crypto';
 import { add as addDeploy } from './deploy';
 import { add as addHash256 } from './hash256';
 import { add as addHeader } from './header';
@@ -36,6 +37,7 @@ export const add = (builtins: Builtins): void => {
   addBlockchain(builtins);
   addContract(builtins);
   addCreateEventNotifier(builtins);
+  addCrypto(builtins);
   addDeploy(builtins);
   addHash256(builtins);
   addHeader(builtins);

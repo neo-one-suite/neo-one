@@ -8,6 +8,7 @@ import { BufferConcat } from './concat';
 import { BufferEquals } from './equals';
 import { BufferFrom } from './from';
 import { BufferLength } from './length';
+import { BufferToInteger } from './toInteger';
 import { BufferToString } from './toString';
 
 class BufferInterface extends BuiltinInterface {}
@@ -38,6 +39,7 @@ export const add = (builtins: Builtins): void => {
   builtins.addValue('Buffer', new BufferValue());
   builtins.addGlobalMember('Buffer', 'equals', new BufferEquals());
   builtins.addGlobalMember('Buffer', 'length', new BufferLength());
+  builtins.addGlobalMember('Buffer', 'toInteger', new BufferToInteger());
   builtins.addGlobalMember('Buffer', 'toString', new BufferToString());
   builtins.addInterface('BufferConstructor', new BufferConstructorInterface());
   builtins.addGlobalMember('BufferConstructor', 'concat', new BufferConcat());

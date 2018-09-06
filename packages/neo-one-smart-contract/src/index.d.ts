@@ -1148,6 +1148,15 @@ export interface LinkedSmartContractConstructor {
 }
 export const LinkedSmartContract: LinkedSmartContractConstructor;
 
+type Hashable = number | string | boolean | Buffer;
+export interface Crypto {
+  readonly sha1: (value: Hashable) => Buffer;
+  readonly sha256: (value: Hashable) => Buffer;
+  readonly hash160: (value: Hashable) => Buffer;
+  readonly hash256: (value: Hashable) => Buffer;
+}
+export const crypto: Crypto;
+
 /**
  * Marks a `SmartContract` method that verifies `Asset` transfers from the `SmartContract`.
  *

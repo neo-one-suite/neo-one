@@ -112,6 +112,7 @@ interface Buffer {
   readonly length: number;
   readonly equals: (otherBuffer: Buffer) => boolean;
   readonly toString: (encoding: 'utf8') => string;
+  readonly toInteger: () => number;
   readonly [one0]: unique symbol;
 }
 interface BufferConstructor {
