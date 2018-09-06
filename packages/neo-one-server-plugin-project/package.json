@@ -33,6 +33,6 @@
     "@neo-one/smart-contract-test": "^1.0.0-alpha.44",
     "@types/react": "16.4.13",
     "bignumber.js": "7.2.1",
-    "react": "16.4.2"
+    "react": "16.5.0"
   }
 }
