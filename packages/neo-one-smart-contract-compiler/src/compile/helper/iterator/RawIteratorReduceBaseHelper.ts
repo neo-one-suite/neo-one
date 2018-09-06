@@ -38,14 +38,22 @@ export class RawIteratorReduceBaseHelper extends Helper {
           // [accum, iterator]
           this.each(sb.pushValueOptions(innerOptions));
         },
+        handleReturn: () => {
+          // [iterator]
+          sb.emitOp(node, 'DROP');
+          // []
+          sb.emitOp(node, 'DROP');
+        },
+        cleanup: () => {
+          // [accum]
+          sb.emitOp(node, 'NIP');
+
+          if (!optionsIn.pushValue) {
+            // []
+            sb.emitOp(node, 'DROP');
+          }
+        },
       }),
     );
-    // [accum]
-    sb.emitOp(node, 'NIP');
-
-    if (!optionsIn.pushValue) {
-      // []
-      sb.emitOp(node, 'DROP');
-    }
   }
 }

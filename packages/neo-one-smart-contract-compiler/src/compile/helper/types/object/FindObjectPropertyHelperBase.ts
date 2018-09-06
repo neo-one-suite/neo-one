@@ -88,7 +88,9 @@ export class FindObjectPropertyHelperBase extends Helper {
           // [prop, obj, obj, pobj, pobj, prop]
           prepareLoop();
         },
-        withScope: false,
+        cleanup: () => {
+          // do nothing
+        },
       }),
     );
     // [obj, prop]

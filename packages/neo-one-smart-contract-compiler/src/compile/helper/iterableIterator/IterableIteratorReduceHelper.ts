@@ -85,16 +85,26 @@ export class IterableIteratorReduceHelper extends Helper {
           // [accum, argsarr, callable]
           this.each(sb.noPushValueOptions(innerOptions));
         },
+        handleReturn: () => {
+          // [argsarr, callable]
+          sb.emitOp(node, 'DROP');
+          // [callable]
+          sb.emitOp(node, 'DROP');
+          // []
+          sb.emitOp(node, 'DROP');
+        },
+        cleanup: () => {
+          // [accum, callable]
+          sb.emitOp(node, 'NIP');
+          // [accum]
+          sb.emitOp(node, 'NIP');
+
+          if (!optionsIn.pushValue) {
+            // []
+            sb.emitOp(node, 'DROP');
+          }
+        },
       }),
     );
-    // [accum, callable]
-    sb.emitOp(node, 'NIP');
-    // [accum]
-    sb.emitOp(node, 'NIP');
-
-    if (!optionsIn.pushValue) {
-      // []
-      sb.emitOp(node, 'DROP');
-    }
   }
 }

@@ -48,14 +48,22 @@ export class RawIteratorEveryBaseHelper extends Helper {
           // [result, iterator]
           this.each(sb.pushValueOptions(innerOptions));
         },
+        handleReturn: () => {
+          // [iterator]
+          sb.emitOp(node, 'DROP');
+          // []
+          sb.emitOp(node, 'DROP');
+        },
+        cleanup: () => {
+          // [result]
+          sb.emitOp(node, 'NIP');
+
+          if (!optionsIn.pushValue) {
+            // []
+            sb.emitOp(node, 'DROP');
+          }
+        },
       }),
     );
-    // [result]
-    sb.emitOp(node, 'NIP');
-
-    if (!optionsIn.pushValue) {
-      // []
-      sb.emitOp(node, 'DROP');
-    }
   }
 }

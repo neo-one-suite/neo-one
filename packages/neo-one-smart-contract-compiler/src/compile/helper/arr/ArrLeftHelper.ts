@@ -63,14 +63,15 @@ export class ArrLeftHelper extends Helper {
           // [size, idx, outputArr, arr]
           sb.emitOp(node, 'SWAP');
         },
+        cleanup: () => {
+          // [idx, outputArr, arr]
+          sb.emitOp(node, 'DROP');
+          // [outputArr, arr]
+          sb.emitOp(node, 'DROP');
+          // [outputArr]
+          sb.emitOp(node, 'NIP');
+        },
       }),
     );
-
-    // [idx, outputArr, arr]
-    sb.emitOp(node, 'DROP');
-    // [outputArr, arr]
-    sb.emitOp(node, 'DROP');
-    // [outputArr]
-    sb.emitOp(node, 'NIP');
   }
 }

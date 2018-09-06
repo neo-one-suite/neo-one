@@ -61,11 +61,13 @@ export class ArrRangeHelper extends Helper {
           // [number, enumerator, arr]
           sb.emitOp(node, 'INC');
         },
+        cleanup: () => {
+          // [enumerator, arr]
+          sb.emitOp(node, 'DROP');
+          // [arr]
+          sb.emitOp(node, 'DROP');
+        },
       }),
     );
-    // [enumerator, arr]
-    sb.emitOp(node, 'DROP');
-    // [arr]
-    sb.emitOp(node, 'DROP');
   }
 }

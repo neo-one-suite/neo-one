@@ -42,6 +42,7 @@ import {
   ContinueHelper,
   HandleCompletionHelper,
   ReturnHelper,
+  ThrowCompletionBaseHelper,
   ThrowCompletionHelper,
   ThrowHelper,
 } from './completionRecord';
@@ -118,7 +119,15 @@ import {
   IterableIteratorReduceHelperOptions,
 } from './iterableIterator';
 import {
+  RawEnumeratorEveryHelper,
+  RawEnumeratorEveryHelperOptions,
   RawEnumeratorForEachFuncHelper,
+  RawEnumeratorForEachHelper,
+  RawEnumeratorForEachHelperOptions,
+  RawEnumeratorReduceHelper,
+  RawEnumeratorReduceHelperOptions,
+  RawEnumeratorSomeHelper,
+  RawEnumeratorSomeHelperOptions,
   RawIteratorEveryBaseHelper,
   RawIteratorEveryBaseHelperOptions,
   RawIteratorEveryHelper,
@@ -306,8 +315,6 @@ import {
   SetObjectAccessorPropertyHelperBaseOptions,
   SetPropertyObjectPropertyHelper,
   SetSymbolObjectPropertyHelper,
-  ShallowCloneObjectHelper,
-  ShallowCloneObjHelper,
   ToBooleanHelper,
   ToNumberHelper,
   ToObjectHelper,
@@ -485,6 +492,7 @@ export interface Helpers {
   readonly break: BreakHelper;
   readonly continue: ContinueHelper;
   readonly throwCompletion: ThrowCompletionHelper;
+  readonly throwCompletionBase: ThrowCompletionBaseHelper;
   readonly throwTypeError: ThrowTypeErrorHelper;
   readonly wrapBoolean: WrapBooleanHelper;
   readonly wrapNull: WrapNullHelper;
@@ -530,8 +538,6 @@ export interface Helpers {
   readonly getInternalObject: GetInternalObjectHelper;
   readonly getInternalObjectProperty: GetInternalObjectPropertyHelper;
   readonly setInternalObjectProperty: SetInternalObjectPropertyHelper;
-  readonly shallowCloneObject: ShallowCloneObjectHelper;
-  readonly shallowCloneObj: ShallowCloneObjHelper;
   readonly packObject: PackObjectHelper;
   readonly pickObjectProperties: PickObjectPropertiesHelper;
   readonly pickPropertyObjectProperties: PickPropertyObjectPropertiesHelper;
@@ -580,6 +586,10 @@ export interface Helpers {
     options: RawIteratorForEachFuncBaseHelperOptions,
   ) => RawIteratorForEachFuncBaseHelper;
   readonly rawEnumeratorForEachFunc: RawEnumeratorForEachFuncHelper;
+  readonly rawEnumeratorForEach: (options: RawEnumeratorForEachHelperOptions) => RawEnumeratorForEachHelper;
+  readonly rawEnumeratorReduce: (options: RawEnumeratorReduceHelperOptions) => RawEnumeratorReduceHelper;
+  readonly rawEnumeratorEvery: (options: RawEnumeratorEveryHelperOptions) => RawEnumeratorEveryHelper;
+  readonly rawEnumeratorSome: (options: RawEnumeratorSomeHelperOptions) => RawEnumeratorSomeHelper;
   readonly rawIteratorReduce: (options: RawIteratorReduceHelperOptions) => RawIteratorReduceHelper;
   readonly rawIteratorReduceBase: (options: RawIteratorReduceBaseHelperOptions) => RawIteratorReduceBaseHelper;
 
@@ -888,6 +898,7 @@ export const createHelpers = (): Helpers => {
     break: new BreakHelper(),
     continue: new ContinueHelper(),
     throwCompletion: new ThrowCompletionHelper(),
+    throwCompletionBase: new ThrowCompletionBaseHelper(),
     throwTypeError: new ThrowTypeErrorHelper(),
     wrapBoolean: new WrapBooleanHelper(),
     wrapNull: new WrapNullHelper(),
@@ -929,8 +940,6 @@ export const createHelpers = (): Helpers => {
     getInternalObject: new GetInternalObjectHelper(),
     getInternalObjectProperty: new GetInternalObjectPropertyHelper(),
     setInternalObjectProperty: new SetInternalObjectPropertyHelper(),
-    shallowCloneObject: new ShallowCloneObjectHelper(),
-    shallowCloneObj: new ShallowCloneObjHelper(),
     packObject: new PackObjectHelper(),
     pickObjectProperties: new PickObjectPropertiesHelper(),
     pickPropertyObjectProperties: new PickPropertyObjectPropertiesHelper(),
@@ -971,6 +980,10 @@ export const createHelpers = (): Helpers => {
     rawIteratorForEachFunc: new RawIteratorForEachFuncHelper(),
     rawIteratorForEachFuncBase: (options) => new RawIteratorForEachFuncBaseHelper(options),
     rawEnumeratorForEachFunc: new RawEnumeratorForEachFuncHelper(),
+    rawEnumeratorForEach: (options) => new RawEnumeratorForEachHelper(options),
+    rawEnumeratorReduce: (options) => new RawEnumeratorReduceHelper(options),
+    rawEnumeratorEvery: (options) => new RawEnumeratorEveryHelper(options),
+    rawEnumeratorSome: (options) => new RawEnumeratorSomeHelper(options),
     rawIteratorReduce: (options) => new RawIteratorReduceHelper(options),
     rawIteratorReduceBase: (options) => new RawIteratorReduceBaseHelper(options),
 

@@ -99,17 +99,19 @@ export class ArrFilterFuncHelper extends Helper {
           // [size, idx, arr, callable, ...arr]
           sb.emitOp(node, 'ROT');
         },
+        cleanup: () => {
+          // [idx, arr, callable]
+          sb.emitOp(node, 'DROP');
+          // [arr, callable]
+          sb.emitOp(node, 'DROP');
+          // [arr]
+          sb.emitOp(node, 'NIP');
+
+          if (!optionsIn.pushValue) {
+            sb.emitOp(node, 'DROP');
+          }
+        },
       }),
     );
-    // [idx, arr, callable]
-    sb.emitOp(node, 'DROP');
-    // [arr, callable]
-    sb.emitOp(node, 'DROP');
-    // [arr]
-    sb.emitOp(node, 'NIP');
-
-    if (!optionsIn.pushValue) {
-      sb.emitOp(node, 'DROP');
-    }
   }
 }

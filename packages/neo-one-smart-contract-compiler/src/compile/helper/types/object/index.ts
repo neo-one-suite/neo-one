@@ -31,8 +31,6 @@ export * from './SetInternalObjectPropertyHelper';
 export * from './SetObjectAccessorPropertyHelperBase';
 export * from './SetPropertyObjectPropertyHelper';
 export * from './SetSymbolObjectPropertyHelper';
-export * from './ShallowCloneObjectHelper';
-export * from './ShallowCloneObjHelper';
 export * from './ToObjectHelper';
 export * from './UnwrapObjectHelper';
 export * from './WrapObjectHelper';

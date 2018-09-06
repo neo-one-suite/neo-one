@@ -98,7 +98,9 @@ describe('SetStorage', () => {
         assertEqual(storage.at(addressA).at(hashA).has(keyB), true);
         storage.delete([addressA, hashB, keyA]);
         storage.delete([addressA, hashA, keyB]);
+      };
 
+      const testAtAddHasDelete1 = (storage: Storage) => {
         storage.add([addressA, hashA, keyA]);
         assertEqual(storage.has([addressA, hashA, keyA]), true);
         assertEqual(storage.at([addressA, hashA]).has(keyA), true);
@@ -129,7 +131,7 @@ describe('SetStorage', () => {
         assertEqual(storage.at([addressA, hashA]).has(keyA), false);
         assertEqual(storage.at(addressA).has([hashA, keyA]), false);
         assertEqual(storage.at(addressA).at(hashA).has(keyA), false);
-      };
+      }
 
       const testLevel0 = (storage: Storage) => {
         storage.add([addressA, hashA, keyA]);
@@ -391,6 +393,7 @@ describe('SetStorage', () => {
 
         public run(): void {
           testAtAddHasDelete(this.storage);
+          testAtAddHasDelete1(this.storage);
           testLevel0(this.storage);
           testLevel1(this.storage);
           testLevel2(this.storage);

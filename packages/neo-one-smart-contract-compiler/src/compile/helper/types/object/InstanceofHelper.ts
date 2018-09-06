@@ -68,6 +68,9 @@ export class InstanceofHelper extends Helper {
           // [prototypeVal, objectVal, nextPrototypeVal, nextPrototypeVal, prototypeVal]
           prepareLoop();
         },
+        cleanup: () => {
+          // do nothing
+        },
       }),
     );
 

@@ -22,52 +22,16 @@ export class ArrSomeHelper extends Helper {
         : options.map;
   }
 
-  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
-    const options = sb.pushValueOptions(optionsIn);
-
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [enumerator]
     sb.emitSysCall(node, 'Neo.Enumerator.Create');
-    // [result, enumerator]
-    sb.emitPushBoolean(node, false);
+    // [val]
     sb.emitHelper(
       node,
       options,
-      sb.helpers.forLoop({
-        condition: () => {
-          // [enumerator, result]
-          sb.emitOp(node, 'SWAP');
-          // [enumerator, result, enumerator]
-          sb.emitOp(node, 'TUCK');
-          // [result, enumerator, result, enumerator]
-          sb.emitOp(node, 'OVER');
-          // [!result, enumerator, result, enumerator]
-          sb.emitOp(node, 'NOT');
-          // [enumerator, !result, result, enumerator]
-          sb.emitOp(node, 'SWAP');
-          // [boolean, !result, result, enumerator]
-          sb.emitSysCall(node, 'Neo.Enumerator.Next');
-          // [boolean, result, enumerator]
-          sb.emitOp(node, 'BOOLAND');
-        },
-        each: (innerOptions) => {
-          // [enumerator]
-          sb.emitOp(node, 'DROP');
-          // [enumerator, enumerator]
-          sb.emitOp(node, 'DUP');
-          // [value, enumerator]
-          sb.emitSysCall(node, 'Neo.Enumerator.Value');
-          // [result, enumerator]
-          // tslint:disable-next-line no-map-without-usage
-          this.map(innerOptions);
-        },
+      sb.helpers.rawEnumeratorSome({
+        each: this.map,
       }),
     );
-    // [result]
-    sb.emitOp(node, 'NIP');
-
-    if (!optionsIn.pushValue) {
-      // []
-      sb.emitOp(node, 'DROP');
-    }
   }
 }

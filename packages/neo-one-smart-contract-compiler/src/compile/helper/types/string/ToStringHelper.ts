@@ -122,6 +122,9 @@ export class ToStringHelper extends TypedHelper {
                   // []
                   sb.scope.set(sb, node, options, accum);
                 },
+                cleanup: () => {
+                  // do nothing
+                },
               }),
             );
             // [string]

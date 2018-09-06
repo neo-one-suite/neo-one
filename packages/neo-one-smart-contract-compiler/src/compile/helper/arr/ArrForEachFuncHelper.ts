@@ -64,19 +64,21 @@ export class ArrForEachFuncHelper extends Helper {
           // [idx, size, arr, callable]
           sb.emitOp(node, 'INC');
         },
+        cleanup: () => {
+          // [size, arr, callable]
+          sb.emitOp(node, 'DROP');
+          // [arr, callable]
+          sb.emitOp(node, 'DROP');
+          // [callable]
+          sb.emitOp(node, 'DROP');
+          // []
+          sb.emitOp(node, 'DROP');
+
+          if (optionsIn.pushValue) {
+            sb.emitHelper(node, options, sb.helpers.wrapUndefined);
+          }
+        },
       }),
     );
-    // [size, arr, callable]
-    sb.emitOp(node, 'DROP');
-    // [arr, callable]
-    sb.emitOp(node, 'DROP');
-    // [callable]
-    sb.emitOp(node, 'DROP');
-    // []
-    sb.emitOp(node, 'DROP');
-
-    if (optionsIn.pushValue) {
-      sb.emitHelper(node, options, sb.helpers.wrapUndefined);
-    }
   }
 }

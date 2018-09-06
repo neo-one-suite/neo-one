@@ -36,9 +36,11 @@ export class RawIteratorForEachBaseHelper extends Helper {
           // [iterator]
           this.each(sb.noPushValueOptions(innerOptions));
         },
+        cleanup: () => {
+          // []
+          sb.emitOp(node, 'DROP');
+        },
       }),
     );
-    // []
-    sb.emitOp(node, 'DROP');
   }
 }

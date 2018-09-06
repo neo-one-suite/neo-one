@@ -39,11 +39,13 @@ export class RawEnumeratorForEachFuncHelper extends Helper {
           // [enumerator, callable]
           sb.emitHelper(node, sb.noPushValueOptions(innerOptions), sb.helpers.call);
         },
+        cleanup: () => {
+          // [callable]
+          sb.emitOp(node, 'DROP');
+          // []
+          sb.emitOp(node, 'DROP');
+        },
       }),
     );
-    // [callable]
-    sb.emitOp(node, 'DROP');
-    // []
-    sb.emitOp(node, 'DROP');
   }
 }

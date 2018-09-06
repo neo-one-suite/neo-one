@@ -14,10 +14,6 @@ export const checkResult = async (receiptIn: CallReceiptJSON, sourceMaps: Source
 };
 
 export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: SourceMaps, checkStack = false) => {
-  if (checkStack && receipt.result.stack.length !== 0) {
-    throw new Error(`Found leftover stack items, length: ${receipt.result.stack.length}`);
-  }
-
   if (receipt.result.state === 'FAULT') {
     enableConsoleLogForTest();
     try {
@@ -37,4 +33,8 @@ export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: Source
     actions: receipt.actions,
     sourceMaps: Promise.resolve(sourceMaps),
   });
+
+  if (checkStack && receipt.result.stack.length !== 0) {
+    throw new Error(`Found leftover stack items, length: ${receipt.result.stack.length}`);
+  }
 };

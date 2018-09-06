@@ -192,6 +192,9 @@ export class ToNumberHelper extends TypedHelper {
                   // []
                   sb.scope.set(sb, node, innerOptions, accum);
                 },
+                cleanup: () => {
+                  // do nothing
+                },
               }),
             );
             // [number]

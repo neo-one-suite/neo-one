@@ -39,7 +39,7 @@ export class RawIteratorSomeBaseHelper extends Helper {
           sb.emitOp(node, 'SWAP');
           // [boolean, !result, result, iterator]
           sb.emitSysCall(node, 'Neo.Enumerator.Next');
-          // [boolean, !result, result, iterator]
+          // [boolean, result, iterator]
           sb.emitOp(node, 'BOOLAND');
         },
         each: (innerOptions) => {
@@ -50,14 +50,22 @@ export class RawIteratorSomeBaseHelper extends Helper {
           // [result, iterator]
           this.each(sb.pushValueOptions(innerOptions));
         },
+        handleReturn: () => {
+          // [iterator]
+          sb.emitOp(node, 'DROP');
+          // []
+          sb.emitOp(node, 'DROP');
+        },
+        cleanup: () => {
+          // [result]
+          sb.emitOp(node, 'NIP');
+
+          if (!optionsIn.pushValue) {
+            // []
+            sb.emitOp(node, 'DROP');
+          }
+        },
       }),
     );
-    // [result]
-    sb.emitOp(node, 'NIP');
-
-    if (!optionsIn.pushValue) {
-      // []
-      sb.emitOp(node, 'DROP');
-    }
   }
 }

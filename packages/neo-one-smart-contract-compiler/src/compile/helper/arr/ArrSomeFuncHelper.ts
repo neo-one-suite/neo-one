@@ -73,13 +73,15 @@ export class ArrSomeFuncHelper extends Helper {
           // [enumerator, result, idx, callable]
           sb.emitOp(node, 'ROT');
         },
+        cleanup: () => {
+          // [result, idx, callable]
+          sb.emitOp(node, 'DROP');
+          // [result, callable]
+          sb.emitOp(node, 'NIP');
+          // [result]
+          sb.emitOp(node, 'NIP');
+        },
       }),
     );
-    // [result, idx, callable]
-    sb.emitOp(node, 'DROP');
-    // [result, callable]
-    sb.emitOp(node, 'NIP');
-    // [result]
-    sb.emitOp(node, 'NIP');
   }
 }

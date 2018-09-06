@@ -162,6 +162,9 @@ export class ArrSliceHelper extends Helper {
           // [end, idx, outputArr, arr]
           sb.emitOp(node, 'ROT');
         },
+        cleanup: () => {
+          // do nothing
+        },
       }),
     );
 
