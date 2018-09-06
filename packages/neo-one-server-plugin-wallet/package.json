@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-wallet",
-  "version": "1.0.0-alpha.125",
+  "version": "1.0.0-alpha.126",
   "description": "NEO•ONE Server wallet plugin.",
   "main": "./src/index.ts",
   "dependencies": {
@@ -9,9 +9,9 @@
     "@neo-one/server-plugin": "^1.0.0-alpha.73",
     "@neo-one/server-plugin-compiler": "^1.0.0-alpha.100",
     "@neo-one/server-plugin-network": "^1.0.0-alpha.119",
-    "@neo-one/smart-contract": "^1.0.0-alpha.26",
-    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.57",
-    "@neo-one/smart-contract-lib": "^1.0.0-alpha.59",
+    "@neo-one/smart-contract": "^1.0.0-alpha.27",
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.58",
+    "@neo-one/smart-contract-lib": "^1.0.0-alpha.60",
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.64",
     "@types/fs-extra": "^5.0.4",
