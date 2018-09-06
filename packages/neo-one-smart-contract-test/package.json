@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-test",
-  "version": "1.0.0-alpha.57",
+  "version": "1.0.0-alpha.58",
   "description": "NEO•ONE TypeScript smart contract test harness.",
   "main": "./src/index.ts",
   "dependencies": {
@@ -9,7 +9,7 @@
     "@neo-one/monitor": "^1.0.0-alpha.59",
     "@neo-one/node": "^1.0.0-alpha.114",
     "@neo-one/node-neo-settings": "^1.0.0-alpha.75",
-    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.56",
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.57",
     "@neo-one/types": "^1.0.0-alpha.43",
     "@types/lodash": "^4.14.116",
     "change-case": "^3.0.2",

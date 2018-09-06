@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-project",
-  "version": "1.0.0-alpha.17",
+  "version": "1.0.0-alpha.18",
   "description": "NEO•ONE server plugin for project functionality.",
   "main": "./src/index.ts",
   "dependencies": {
@@ -10,8 +10,8 @@
     "@neo-one/server-plugin-neotracker": "^1.0.0-alpha.17",
     "@neo-one/server-plugin-network": "^1.0.0-alpha.119",
     "@neo-one/smart-contract-codegen": "^1.0.0-alpha.56",
-    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.56",
-    "@neo-one/smart-contract-test": "^1.0.0-alpha.57",
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.57",
+    "@neo-one/smart-contract-test": "^1.0.0-alpha.58",
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.64",
     "@types/convict": "^4.2.0",
@@ -28,7 +28,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.124",
+    "@neo-one/server-plugin-wallet": "^1.0.0-alpha.125",
     "@neo-one/smart-contract": "^1.0.0-alpha.26",
     "@neo-one/smart-contract-test": "^1.0.0-alpha.44",
     "@types/react": "16.4.13",
