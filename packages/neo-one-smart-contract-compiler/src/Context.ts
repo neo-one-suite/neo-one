@@ -1,4 +1,5 @@
 // tslint:disable ban-types
+import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts, { DiagnosticCategory } from 'typescript';
 import { format } from 'util';
@@ -63,16 +64,20 @@ export class Context {
     // tslint:disable-next-line no-any readonly-array
     ...args: any[]
   ): void {
-    this.mutableDiagnostics.push(
-      new CompilerDiagnostic(node, this.getDiagnosticMessage(message, ...args), code, ts.DiagnosticCategory.Error),
-    );
+    if (!this.isDeclarationFile(node)) {
+      this.mutableDiagnostics.push(
+        new CompilerDiagnostic(node, this.getDiagnosticMessage(message, ...args), code, ts.DiagnosticCategory.Error),
+      );
+    }
   }
 
   // tslint:disable-next-line no-any readonly-array
   public reportWarning(node: ts.Node, code: DiagnosticCode, message: DiagnosticMessage, ...args: any[]): void {
-    this.mutableDiagnostics.push(
-      new CompilerDiagnostic(node, this.getDiagnosticMessage(message, ...args), code, ts.DiagnosticCategory.Warning),
-    );
+    if (!this.isDeclarationFile(node)) {
+      this.mutableDiagnostics.push(
+        new CompilerDiagnostic(node, this.getDiagnosticMessage(message, ...args), code, ts.DiagnosticCategory.Warning),
+      );
+    }
   }
 
   public reportUnsupported(node: ts.Node): void {
@@ -104,5 +109,9 @@ export class Context {
     }
 
     return format(message, ...args);
+  }
+
+  private isDeclarationFile(node: ts.Node): boolean {
+    return tsUtils.file.isDeclarationFile(tsUtils.node.getSourceFile(node));
   }
 }
