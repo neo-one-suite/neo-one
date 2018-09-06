@@ -121,6 +121,16 @@ export function getInstanceMethods(
   return getInstanceMembers(node).filter(ts.isMethodDeclaration);
 }
 
+export function getMethods(node: ts.ClassDeclaration | ts.ClassExpression): ReadonlyArray<ts.MethodDeclaration> {
+  return getMembers(node).filter(ts.isMethodDeclaration);
+}
+
+export function getSetAccessors(
+  node: ts.ClassDeclaration | ts.ClassExpression,
+): ReadonlyArray<ts.SetAccessorDeclaration> {
+  return getMembers(node).filter(ts.isSetAccessor);
+}
+
 export function getInstanceMethod(
   node: ts.ClassDeclaration | ts.ClassExpression,
   name: string,

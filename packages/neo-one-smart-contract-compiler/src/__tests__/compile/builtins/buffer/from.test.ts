@@ -43,7 +43,7 @@ describe('Buffer.from', () => {
       `
       Buffer.from([]);
     `,
-      { type: 'error', code: DiagnosticCode.GenericUnsupportedSyntax },
+      { type: 'error', code: DiagnosticCode.UnsupportedSyntax },
     );
   });
 });

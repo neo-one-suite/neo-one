@@ -27,7 +27,7 @@ describe('ArrayBindingHelper', () => {
         assertEqual(a, 0);
         assertEqual(b, 1);
       `,
-        { type: 'error', code: DiagnosticCode.GenericUnsupportedSyntax },
+        { type: 'error', code: DiagnosticCode.UnsupportedSyntax },
       );
     });
 

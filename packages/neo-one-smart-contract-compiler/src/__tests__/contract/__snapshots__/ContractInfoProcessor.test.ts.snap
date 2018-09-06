@@ -1,0 +1,128 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContractInfoProcessor no computed methods 1`] = `
+"snippetCode.ts (13,16): SmartContracts cannot have computed methods or properties.
+
+      11 | };
+      12 | 
+    > 13 |         public ['foo'](): string {
+         |                ^
+      14 |           return 'foo';
+      15 |         }
+      16 |       }
+"
+`;
+
+exports[`ContractInfoProcessor no computed properties 1`] = `
+"snippetCode.ts (13,25): SmartContracts cannot have computed methods or properties.
+
+      11 | };
+      12 | 
+    > 13 |         public readonly ['foo']: string = 'foo';
+         |                         ^
+      14 |       }
+      15 |     
+"
+`;
+
+exports[`ContractInfoProcessor no get accessor method decorators 1`] = `
+"snippetCode.ts (19,9): Custom decorators are not supported
+
+      17 |         private x: string = 'foo';
+      18 | 
+    > 19 |         @dec
+         |         ^
+      20 |         public get foo(): string {
+      21 |           return this.x;
+      22 |         }
+"
+`;
+
+exports[`ContractInfoProcessor no method decorators 1`] = `
+"snippetCode.ts (18,9): Custom decorators are not supported
+
+      16 | 
+      17 | 
+    > 18 |         @dec
+         |         ^
+      19 |         public foo() {
+      20 |           return 'foo';
+      21 |         }
+"
+`;
+
+exports[`ContractInfoProcessor no method parameter decorators 1`] = `
+"snippetCode.ts (18,20): Custom decorators are not supported
+
+      16 | 
+      17 | 
+    > 18 |         public foo(@dec value: string) {
+         |                    ^
+      19 |           return 'foo';
+      20 |         }
+      21 |       }
+"
+`;
+
+exports[`ContractInfoProcessor no set accessor method decorators 1`] = `
+"snippetCode.ts (23,9): Custom decorators are not supported
+
+      21 |         }
+      22 | 
+    > 23 |         @dec
+         |         ^
+      24 |         public set foo(value: string) {
+      25 |           this.x = value;
+      26 |         }
+"
+`;
+
+exports[`ContractInfoProcessor no set accessor parameter decorators 1`] = `
+"snippetCode.ts (23,24): Custom decorators are not supported
+
+      21 |         }
+      22 | 
+    > 23 |         public set foo(@dec value: string) {
+         |                        ^
+      24 |           this.x = value;
+      25 |         }
+      26 |       }
+"
+`;
+
+exports[`ContractInfoProcessor no static methods 1`] = `
+"snippetCode.ts (13,16): SmartContracts cannot have static methods or properties.
+
+      11 | };
+      12 | 
+    > 13 |         public static foo() {
+         |                ^
+      14 |           return 'foo';
+      15 |         }
+      16 |       }
+"
+`;
+
+exports[`ContractInfoProcessor no static properties 1`] = `
+"snippetCode.ts (13,16): SmartContracts cannot have static methods or properties.
+
+      11 | };
+      12 | 
+    > 13 |         public static readonly foo = 'foo';
+         |                ^
+      14 |       }
+      15 |     
+"
+`;
+
+exports[`ContractInfoProcessor no symbol properties 1`] = `
+"snippetCode.ts (13,25): SmartContracts cannot have computed methods or properties.
+
+      11 | };
+      12 | 
+    > 13 |         public readonly [Symbol.iterator]: string = 'foo';
+         |                         ^
+      14 |       }
+      15 |     
+"
+`;

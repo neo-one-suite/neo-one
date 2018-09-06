@@ -76,11 +76,11 @@ export class Context {
   }
 
   public reportUnsupported(node: ts.Node): void {
-    this.reportError(node, DiagnosticCode.GenericUnsupportedSyntax, DiagnosticMessage.GenericUnsupportedSyntax);
+    this.reportError(node, DiagnosticCode.UnsupportedSyntax, DiagnosticMessage.UnsupportedSyntax);
   }
 
   public reportUnsupportedEfficiency(node: ts.Node): void {
-    this.reportError(node, DiagnosticCode.GenericUnsupportedSyntax, DiagnosticMessage.EfficiencyUnsupportedSyntax);
+    this.reportError(node, DiagnosticCode.UnsupportedSyntax, DiagnosticMessage.EfficiencyUnsupportedSyntax);
   }
 
   public reportTypeError(node: ts.Node): void {

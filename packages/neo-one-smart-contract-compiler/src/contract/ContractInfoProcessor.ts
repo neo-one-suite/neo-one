@@ -1,11 +1,13 @@
 import { ClassInstanceMemberType, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
+import _ from 'lodash';
 import ts from 'typescript';
 import { STRUCTURED_STORAGE_TYPES, StructuredStorageType } from '../compile/constants';
 import {
   BUILTIN_PROPERTIES,
   ContractPropertyName,
   Decorator,
+  DECORATORS_ARRAY,
   IGNORED_PROPERTIES,
   RESERVED_PROPERTIES,
 } from '../constants';
@@ -123,9 +125,51 @@ export class ContractInfoProcessor {
       return { smartContract: classDecl, propInfos: [] };
     }
 
-    tsUtils.class_.getStaticMembers(classDecl).forEach((member) => {
-      this.context.reportUnsupported(member);
-    });
+    tsUtils.class_
+      .getStaticMembers(classDecl)
+      .map((member) => tsUtils.modifier.getStaticKeyword(member))
+      .filter(utils.notNull)
+      .forEach((keyword) => {
+        this.context.reportError(
+          keyword,
+          DiagnosticCode.InvalidContractMethod,
+          DiagnosticMessage.InvalidContractPropertyOrMethodStatic,
+        );
+      });
+
+    _.flatMap(tsUtils.class_.getMembers(classDecl).map((member) => tsUtils.decoratable.getDecoratorsArray(member)))
+      .filter((decorator) => !this.isValidDecorator(decorator))
+      .forEach((decorator) => {
+        this.context.reportError(decorator, DiagnosticCode.UnsupportedSyntax, DiagnosticMessage.UnsupportedDecorator);
+      });
+
+    _.flatMap(
+      tsUtils.class_
+        .getMethods(classDecl)
+        .map((method) =>
+          _.flatMap(
+            tsUtils.parametered.getParameters(method).map((param) => tsUtils.decoratable.getDecoratorsArray(param)),
+          ),
+        ),
+    )
+      .filter((decorator) => !this.isValidDecorator(decorator))
+      .forEach((decorator) => {
+        this.context.reportError(decorator, DiagnosticCode.UnsupportedSyntax, DiagnosticMessage.UnsupportedDecorator);
+      });
+
+    _.flatMap(
+      tsUtils.class_
+        .getSetAccessors(classDecl)
+        .map((method) =>
+          _.flatMap(
+            tsUtils.parametered.getParameters(method).map((param) => tsUtils.decoratable.getDecoratorsArray(param)),
+          ),
+        ),
+    )
+      .filter((decorator) => !this.isValidDecorator(decorator))
+      .forEach((decorator) => {
+        this.context.reportError(decorator, DiagnosticCode.UnsupportedSyntax, DiagnosticMessage.UnsupportedDecorator);
+      });
 
     let propInfos = tsUtils.type_
       .getProperties(classType)
@@ -229,6 +273,16 @@ export class ContractInfoProcessor {
         ts.isParameterPropertyDeclaration(decl)
       )
     ) {
+      return undefined;
+    }
+    const nameNode = tsUtils.node.getNameNode(decl);
+    if (!ts.isIdentifier(nameNode)) {
+      this.context.reportError(
+        nameNode,
+        DiagnosticCode.InvalidContractProperty,
+        DiagnosticMessage.InvalidContractPropertyIdentifier,
+      );
+
       return undefined;
     }
 
@@ -361,6 +415,10 @@ export class ContractInfoProcessor {
     const decorators = tsUtils.decoratable.getDecorators(decl);
 
     return decorators === undefined ? false : decorators.some((decorator) => this.isDecorator(decorator, name));
+  }
+
+  private isValidDecorator(decorator: ts.Decorator): boolean {
+    return DECORATORS_ARRAY.some((valid) => this.isDecorator(decorator, valid));
   }
 
   private isDecorator(decorator: ts.Decorator, name: Decorator): boolean {

@@ -1,5 +1,5 @@
 export enum DiagnosticMessage {
-  GenericUnsupportedSyntax = 'Unsupported syntax.',
+  UnsupportedSyntax = 'Unsupported syntax.',
   EfficiencyUnsupportedSyntax = 'Unsupported syntax. This is not supported because it would result in inefficient smart contract code',
   CouldNotInferType = 'Could not infer type. Please add an explicit type annotation.',
   CouldNotInferTypeDeopt = 'Could not infer type. Deoptimized implementation will be used. Add an explicit type annotation ',
@@ -44,4 +44,7 @@ export enum DiagnosticMessage {
   InvalidStructuredStorageForProperty = 'Persistent storage classes may only be used as SmartContract properties.',
   InvalidStructuredStorageForLength = 'Could not statically analyze structured storage key length.',
   CompilationFailedPleaseReport = 'Compilation failed for an unknown error, please report',
+  InvalidContractPropertyIdentifier = 'SmartContracts cannot have computed methods or properties.',
+  InvalidContractPropertyOrMethodStatic = 'SmartContracts cannot have static methods or properties.',
+  UnsupportedDecorator = 'Custom decorators are not supported',
 }

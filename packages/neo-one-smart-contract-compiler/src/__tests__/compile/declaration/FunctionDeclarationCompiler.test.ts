@@ -166,7 +166,7 @@ describe('FunctionDeclarationCompiler', () => {
       assertEqual(b, 3);
       assertEqual(c, 4);
     `,
-      { type: 'error', code: DiagnosticCode.GenericUnsupportedSyntax },
+      { type: 'error', code: DiagnosticCode.UnsupportedSyntax },
     );
   });
 });

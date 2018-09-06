@@ -1,5 +1,5 @@
 export enum DiagnosticCode {
-  GenericUnsupportedSyntax = 110000,
+  UnsupportedSyntax = 110000,
   UnknownType,
   UnknownSymbol,
   InvalidBuiltinReference,
@@ -23,4 +23,5 @@ export enum DiagnosticCode {
   InvalidSenderAddress,
   InvalidStructuredStorageFor,
   SomethingWentWrong,
+  InvalidContractProperty,
 }

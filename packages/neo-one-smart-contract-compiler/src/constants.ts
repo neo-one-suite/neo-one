@@ -34,6 +34,7 @@ export enum Decorator {
 export const isDecorator = (value: string): value is Decorator => (Decorator as any)[value] !== undefined;
 
 export const DECORATORS: Set<Decorator> = new Set(Object.values(Decorator));
+export const DECORATORS_ARRAY = Object.values(Decorator);
 
 export enum ContractPropertyName {
   deploy = 'deploy',
