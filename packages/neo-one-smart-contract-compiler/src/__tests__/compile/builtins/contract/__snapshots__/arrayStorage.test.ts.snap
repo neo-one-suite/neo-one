@@ -11,13 +11,25 @@ exports[`ArrayStorage invalid "reference" 1`] = `
 "
 `;
 
+exports[`ArrayStorage invalid create - class 1`] = `
+"snippetCode.ts (5,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
+
+      3 | 
+      4 |       export class Foo {
+    > 5 |         private readonly storage = ArrayStorage.for<number>();
+        |         ^
+      6 |       }
+      7 |     
+"
+`;
+
 exports[`ArrayStorage invalid create 1`] = `
-"snippetCode.ts (4,23): Persistent storage classes may only be used as SmartContract properties.
+"snippetCode.ts (4,13): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
 
       2 |       import { ArrayStorage } from '@neo-one/smart-contract';
       3 | 
     > 4 |       const storage = ArrayStorage.for<number>();
-        |                       ^
+        |             ^
       5 |     
 "
 `;

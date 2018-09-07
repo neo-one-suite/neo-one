@@ -3,6 +3,7 @@ import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
+import { DEFAULT_DIAGNOSTIC_OPTIONS, DiagnosticOptions } from '../analysis';
 import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
@@ -72,7 +73,9 @@ export class ABISmartContractProcessor {
                 ? undefined
                 : {
                     name: getSetterName(propInfo.name),
-                    parameters: [this.toABIParameter(propInfo.name, propInfo.decl, propInfo.propertyType)],
+                    parameters: [
+                      this.toABIParameter(propInfo.name, propInfo.decl, propInfo.propertyType, false, { error: false }),
+                    ],
                     returnType: VOID_RETURN,
                   },
             ].filter(utils.notNull);
@@ -95,6 +98,8 @@ export class ABISmartContractProcessor {
                         propInfo.name,
                         propInfo.getter === undefined ? propInfo.setter.decl : propInfo.getter.decl,
                         propInfo.propertyType,
+                        false,
+                        propInfo.getter === undefined ? { error: true } : undefined,
                       ),
                     ],
                     returnType: VOID_RETURN,
@@ -154,10 +159,14 @@ export class ABISmartContractProcessor {
       })
       .filter(utils.notNull);
 
-    return calls.map((call) => this.toABIEvent(call)).filter(utils.notNull);
+    return calls.reduce<ReadonlyArray<ABIEvent>>((events, call) => {
+      const event = this.toABIEvent(call, events);
+
+      return event === undefined ? events : [...events, event];
+    }, []);
   }
 
-  private toABIEvent(call: ts.CallExpression): ABIEvent | undefined {
+  private toABIEvent(call: ts.CallExpression, events: ReadonlyArray<ABIEvent>): ABIEvent | undefined {
     const callArguments = tsUtils.argumented.getArguments(call);
     const parent = tsUtils.node.getParent(call);
 
@@ -193,8 +202,8 @@ export class ABISmartContractProcessor {
 
       return undefined;
     }
-
     const name = tsUtils.literal.getLiteralValue(nameArg);
+
     const parameters = _.zip(callArguments.slice(1), typeArguments)
       .map(([paramNameArg, paramType]) => {
         if (paramNameArg === undefined || paramType === undefined) {
@@ -217,7 +226,20 @@ export class ABISmartContractProcessor {
       })
       .filter(utils.notNull);
 
-    return { name, parameters };
+    const event = { name, parameters };
+
+    const dupeEvent = events.find((otherEvent) => otherEvent.name === event.name && !_.isEqual(event, otherEvent));
+    if (dupeEvent === undefined) {
+      return event;
+    }
+
+    this.context.reportError(
+      nameArg,
+      DiagnosticCode.InvalidContractEvent,
+      DiagnosticMessage.InvalidContractEventDuplicate,
+    );
+
+    return undefined;
   }
 
   private paramToABIParameter(param: ts.Symbol): ABIParameter | undefined {
@@ -259,9 +281,10 @@ export class ABISmartContractProcessor {
     node: ts.Node,
     resolvedType: ts.Type | undefined,
     optional = false,
+    options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ABIParameter | undefined {
     const name = nameIn.startsWith('_') ? nameIn.slice(1) : nameIn;
-    const type = this.toABIReturn(node, resolvedType, optional);
+    const type = this.toABIReturn(node, resolvedType, optional, options);
     if (type === undefined) {
       return undefined;
     }
@@ -269,7 +292,12 @@ export class ABISmartContractProcessor {
     return { ...type, name };
   }
 
-  private toABIReturn(node: ts.Node, resolvedType: ts.Type | undefined, optional = false): ABIReturn | undefined {
-    return toABIReturn(this.context, node, resolvedType, optional);
+  private toABIReturn(
+    node: ts.Node,
+    resolvedType: ts.Type | undefined,
+    optional = false,
+    options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
+  ): ABIReturn | undefined {
+    return toABIReturn(this.context, node, resolvedType, optional, options);
   }
 }

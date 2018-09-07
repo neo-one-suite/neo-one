@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ABISmartContractProcessor invalid getter + setter 1`] = `
+"snippetCode.ts (20,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
+
+      18 | 
+      19 | 
+    > 20 |         public get foo(): Foo {
+         |         ^
+      21 |           return new Foo();
+      22 |         }
+      23 | 
+"
+`;
+
+exports[`ABISmartContractProcessor invalid getter 1`] = `
+"snippetCode.ts (16,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
+
+      14 | 
+      15 | 
+    > 16 |         public get foo(): Foo {
+         |         ^
+      17 |           return new Foo();
+      18 |         }
+      19 |       }
+"
+`;
+
+exports[`ABISmartContractProcessor invalid method parameter 1`] = `
+"snippetCode.ts (16,21): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
+
+      14 | 
+      15 | 
+    > 16 |         public test(value: Foo): void {
+         |                     ^
+      17 |           // do nothing
+      18 |         }
+      19 |       }
+"
+`;
+
+exports[`ABISmartContractProcessor invalid method return 1`] = `
+"snippetCode.ts (16,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
+
+      14 | 
+      15 | 
+    > 16 |         public test(): Foo {
+         |         ^
+      17 |           // do nothing
+      18 |         }
+      19 |       }
+"
+`;
+
+exports[`ABISmartContractProcessor invalid setter 1`] = `
+"snippetCode.ts (20,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
+
+      18 | 
+      19 | 
+    > 20 |         public set foo(value: Foo): void {
+         |         ^
+      21 |           value.doSomething();
+      22 |         }
+      23 |       }
+"
+`;
+
+exports[`ABISmartContractProcessor no duplicate events 1`] = `
+"snippetCode.ts (5,50): Duplicate event. Only one event is allowed per name.
+
+      3 | 
+      4 |       const first = createEventNotifier('foo');
+    > 5 |       const second = createEventNotifier<number>('foo', 'arg');
+        |                                                  ^
+      6 | 
+      7 |       first();
+      8 |       second(1);
+"
+`;

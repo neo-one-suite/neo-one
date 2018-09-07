@@ -1,5 +1,168 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ContractInfoProcessor @claim with @constant 1`] = `
+"snippetCode.ts (15,9): SmartContract methods marked with @send, @receive or @claim cannot be @constant.
+
+      13 | 
+      14 |         @claim
+    > 15 |         @constant
+         |         ^
+      16 |         public verify(): boolean {
+      17 |           return true;
+      18 |         }
+"
+`;
+
+exports[`ContractInfoProcessor @receive with @constant 1`] = `
+"snippetCode.ts (15,9): SmartContract methods marked with @send, @receive or @claim cannot be @constant.
+
+      13 | 
+      14 |         @receive
+    > 15 |         @constant
+         |         ^
+      16 |         public verify(): boolean {
+      17 |           return true;
+      18 |         }
+"
+`;
+
+exports[`ContractInfoProcessor @receive with incorrect return type 1`] = `
+"snippetCode.ts (14,9): SmartContract methods marked with @send, @receive or @claim must return a boolean.
+
+      12 | 
+      13 | 
+    > 14 |         @receive
+         |         ^
+      15 |         public verify(): number {
+      16 |           return 20;
+      17 |         }
+"
+`;
+
+exports[`ContractInfoProcessor @send with @constant 1`] = `
+"snippetCode.ts (15,9): SmartContract methods marked with @send, @receive or @claim cannot be @constant.
+
+      13 | 
+      14 |         @send
+    > 15 |         @constant
+         |         ^
+      16 |         public verify(): boolean {
+      17 |           return true;
+      18 |         }
+"
+`;
+
+exports[`ContractInfoProcessor abstract smart contracts 1`] = `
+"snippetCode.ts (4,7): Cannot compile abstract SmartContract.
+
+      2 |       import { SmartContract } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       export abstract class TestSmartContract extends SmartContract {
+        |       ^
+      5 |         
+      6 | public readonly properties = {
+      7 |   codeVersion: '1.0',
+"
+`;
+
+exports[`ContractInfoProcessor invalid property function not readonly 1`] = `
+"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+
+      13 | };
+      14 | 
+    > 15 |         private foo = () => {
+         |         ^
+      16 |           // do nothing
+      17 |         }
+      18 |       }
+"
+`;
+
+exports[`ContractInfoProcessor invalid property function set in constructor 1`] = `
+"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+
+      13 | };
+      14 | 
+    > 15 |         private readonly foo: () => void;
+         |         ^
+      16 | 
+      17 |         public constructor() {
+      18 |           super();
+"
+`;
+
+exports[`ContractInfoProcessor invalid storage structured array type 1`] = `
+"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+
+      13 | };
+      14 | 
+    > 15 |         private readonly foo: Array<Foo> = [new Foo()];
+         |         ^
+      16 |       }
+      17 |     
+"
+`;
+
+exports[`ContractInfoProcessor invalid storage structured map type 1`] = `
+"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+
+      13 | };
+      14 | 
+    > 15 |         private readonly foo: Array<Map<string, Foo>> = [new Map<string, Foo>().set('foo', new Foo())];
+         |         ^
+      16 |       }
+      17 |     
+"
+`;
+
+exports[`ContractInfoProcessor invalid storage structured set type 1`] = `
+"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+
+      13 | };
+      14 | 
+    > 15 |         private readonly foo: Set<Map<string, Foo>> = new Set([new Map<string, Foo>().set('foo', new Foo())]);
+         |         ^
+      16 |       }
+      17 |     
+"
+`;
+
+exports[`ContractInfoProcessor invalid storage type 1`] = `
+"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+
+      13 | };
+      14 | 
+    > 15 |         private readonly foo: Foo = new Foo();
+         |         ^
+      16 |       }
+      17 |     
+"
+`;
+
+exports[`ContractInfoProcessor multiple smart contracts 1`] = `
+"snippetCode.ts (15,7): Multiple exported SmartContracts in one file is not supported.
+
+      13 |       }
+      14 | 
+    > 15 |       export class TestSmartContract2 extends SmartContract {
+         |       ^
+      16 |         
+      17 | public readonly properties = {
+      18 |   codeVersion: '1.0',
+"
+`;
+
+exports[`ContractInfoProcessor new SmartContract() 1`] = `
+"snippetCode.ts (15,7): Cannot construct a SmartContract
+
+      13 |       }
+      14 | 
+    > 15 |       new TestSmartContract();
+         |       ^
+      16 |     
+"
+`;
+
 exports[`ContractInfoProcessor no computed methods 1`] = `
 "snippetCode.ts (13,16): SmartContracts cannot have computed methods or properties.
 
@@ -22,6 +185,19 @@ exports[`ContractInfoProcessor no computed properties 1`] = `
          |                         ^
       14 |       }
       15 |     
+"
+`;
+
+exports[`ContractInfoProcessor no deploy method 1`] = `
+"snippetCode.ts (14,16): deploy is a reserved method name in SmartContracts.
+
+      12 | 
+      13 | 
+    > 14 |         public deploy(): void {
+         |                ^
+      15 |           // do nothing
+      16 |         }
+      17 |       }
 "
 `;
 
@@ -122,6 +298,55 @@ exports[`ContractInfoProcessor no symbol properties 1`] = `
       12 | 
     > 13 |         public readonly [Symbol.iterator]: string = 'foo';
          |                         ^
+      14 |       }
+      15 |     
+"
+`;
+
+exports[`ContractInfoProcessor structured storage private modifiable 1`] = `
+"snippetCode.ts (13,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
+
+      11 | };
+      12 | 
+    > 13 |         private foo = MapStorage.for<string, string>();
+         |         ^
+      14 |       }
+      15 |     
+"
+`;
+
+exports[`ContractInfoProcessor structured storage protected abstract 1`] = `
+"snippetCode.ts (13,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
+
+      11 | };
+      12 | 
+    > 13 |         protected abstract readonly foo: MapStorage<string, string>;
+         |         ^
+      14 |       }
+      15 |     
+"
+`;
+
+exports[`ContractInfoProcessor structured storage set in constructor 1`] = `
+"snippetCode.ts (13,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
+
+      11 | };
+      12 | 
+    > 13 |         private readonly foo: MapStorage<string, string>;
+         |         ^
+      14 |         public constructor() {
+      15 |           super();
+      16 |           this.foo = MapStorage.for<string, string>();
+"
+`;
+
+exports[`ContractInfoProcessor structured storage set public 1`] = `
+"snippetCode.ts (13,9): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
+
+      11 | };
+      12 | 
+    > 13 |         public readonly foo = MapStorage.for<string, string>();
+         |         ^
       14 |       }
       15 |     
 "

@@ -46,10 +46,8 @@ export enum ContractPropertyName {
   deployed = 'deployed',
 }
 
-export const RESERVED_PROPERTIES: Set<string> = new Set([
-  ContractPropertyName.deploy,
-  ContractPropertyName.refundAssets,
-]);
+export const VIRTUAL_PROPERTIES: Set<string> = new Set([ContractPropertyName.deploy]);
+export const RESERVED_PROPERTIES: Set<string> = new Set([ContractPropertyName.refundAssets]);
 export const BUILTIN_PROPERTIES: Set<string> = new Set([
   ContractPropertyName.processedTransactions,
   ContractPropertyName.allowedRefunds,

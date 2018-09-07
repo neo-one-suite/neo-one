@@ -3,6 +3,7 @@ import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { STRUCTURED_STORAGE_TYPES, StructuredStorageType } from '../compile/constants';
+import { isOnlyBoolean } from '../compile/helper/types';
 import {
   BUILTIN_PROPERTIES,
   ContractPropertyName,
@@ -10,6 +11,7 @@ import {
   DECORATORS_ARRAY,
   IGNORED_PROPERTIES,
   RESERVED_PROPERTIES,
+  VIRTUAL_PROPERTIES,
 } from '../constants';
 import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
@@ -88,7 +90,11 @@ export class ContractInfoProcessor {
 
   public process(): ContractInfo {
     if (tsUtils.modifier.isAbstract(this.smartContract)) {
-      this.context.reportUnsupported(this.smartContract);
+      this.context.reportError(
+        this.smartContract,
+        DiagnosticCode.InvalidContract,
+        DiagnosticMessage.InvalidContractAbstract,
+      );
     }
     const result = this.processClass(this.smartContract, this.context.analysis.getType(this.smartContract));
     const finalPropInfos = result.propInfos.concat([
@@ -293,7 +299,12 @@ export class ContractInfoProcessor {
     if (BUILTIN_PROPERTIES.has(name)) {
       const memberSymbol = this.context.builtins.getOnlyMemberSymbol('SmartContract', name);
       if (symbol !== memberSymbol) {
-        this.context.reportUnsupported(decl);
+        this.context.reportError(
+          nameNode,
+          DiagnosticCode.InvalidContractProperty,
+          DiagnosticMessage.InvalidContractPropertyReserved,
+          name,
+        );
       }
 
       return undefined;
@@ -302,8 +313,23 @@ export class ContractInfoProcessor {
       const valueSymbol = this.context.builtins.getValueSymbol('SmartContract');
       const memberSymbol = tsUtils.symbol.getMemberOrThrow(valueSymbol, name);
       if (tsUtils.symbol.getTarget(symbol) !== memberSymbol) {
-        this.context.reportUnsupported(decl);
+        this.context.reportError(
+          nameNode,
+          DiagnosticCode.InvalidContractProperty,
+          DiagnosticMessage.InvalidContractPropertyReserved,
+          name,
+        );
       }
+
+      return undefined;
+    }
+    if (VIRTUAL_PROPERTIES.has(name)) {
+      this.context.reportError(
+        nameNode,
+        DiagnosticCode.InvalidContractMethod,
+        DiagnosticMessage.InvalidContractMethodReserved,
+        name,
+      );
 
       return undefined;
     }
@@ -352,14 +378,72 @@ export class ContractInfoProcessor {
 
     const callSignatures = type.getCallSignatures();
     if (ts.isMethodDeclaration(decl) || (ts.isPropertyDeclaration(decl) && callSignatures.length > 0)) {
-      if (callSignatures.length !== 1) {
+      if (callSignatures.length > 1) {
         this.context.reportError(
           decl,
           DiagnosticCode.InvalidContractMethod,
           DiagnosticMessage.InvalidContractMethodMultipleSignatures,
         );
+
+        return undefined;
       }
+      if (callSignatures.length === 0) {
+        return undefined;
+      }
+
+      if (ts.isPropertyDeclaration(decl)) {
+        const initializerProp = tsUtils.initializer.getInitializer(decl);
+        const isReadonlyProp = tsUtils.modifier.isReadonly(decl);
+        if (initializerProp === undefined || tsUtils.type_.getCallSignatures(type).length === 0 || !isReadonlyProp) {
+          this.context.reportError(
+            decl,
+            DiagnosticCode.InvalidContractStorageType,
+            DiagnosticMessage.InvalidContractStorageType,
+          );
+
+          return undefined;
+        }
+      }
+
       const callSignature = callSignatures[0];
+
+      const send = this.hasSend(decl);
+      const receive = this.hasReceive(decl);
+      const claim = this.hasClaim(decl);
+      const constant = this.hasConstant(decl);
+      const requiresBoolean = send || receive || claim;
+
+      if (requiresBoolean && constant) {
+        const decorator = tsUtils.decoratable
+          .getDecoratorsArray(decl)
+          .find((dec) => this.isDecorator(dec, Decorator.constant));
+        this.context.reportError(
+          decorator === undefined ? decl : decorator,
+          DiagnosticCode.InvalidContractMethod,
+          DiagnosticMessage.InvalidContractMethodConstantNative,
+        );
+
+        return undefined;
+      }
+
+      const returnType = callSignatures.length >= 1 ? tsUtils.signature.getReturnType(callSignature) : undefined;
+      if (returnType !== undefined && requiresBoolean && !isOnlyBoolean(this.context, decl, returnType)) {
+        const decorator = tsUtils.decoratable
+          .getDecoratorsArray(decl)
+          .find(
+            (dec) =>
+              this.isDecorator(dec, Decorator.send) ||
+              this.isDecorator(dec, Decorator.receive) ||
+              this.isDecorator(dec, Decorator.claim),
+          );
+        this.context.reportError(
+          decorator === undefined ? decl : decorator,
+          DiagnosticCode.InvalidContractMethod,
+          DiagnosticMessage.InvalidContractMethodNativeReturn,
+        );
+
+        return undefined;
+      }
 
       return {
         type: 'function',
@@ -367,16 +451,42 @@ export class ContractInfoProcessor {
         classDecl,
         symbol: tsUtils.symbol.getTarget(symbol),
         decl,
-        send: this.hasSend(decl),
-        receive: this.hasReceive(decl),
-        claim: this.hasClaim(decl),
+        send,
+        receive,
+        claim,
         acceptsClaim: callSignatures.length >= 1 && this.isLastParamClaim(decl, callSignatures[0]),
         isPublic,
         callSignature,
-        returnType: callSignatures.length >= 1 ? tsUtils.signature.getReturnType(callSignature) : undefined,
-        constant: this.hasConstant(decl),
+        returnType,
+        constant,
         isAbstract: !tsUtils.overload.isImplementation(decl),
       };
+    }
+
+    const structuredStorageType = STRUCTURED_STORAGE_TYPES.find((testType) =>
+      this.context.builtins.isInterface(decl, type, testType),
+    );
+    const isReadonly = tsUtils.modifier.isReadonly(decl);
+    const isAbstract = tsUtils.modifier.isAbstract(decl);
+    const initializer = tsUtils.initializer.getInitializer(decl);
+    if (structuredStorageType !== undefined && (isPublic || isAbstract || !isReadonly || initializer === undefined)) {
+      this.context.reportError(
+        decl,
+        DiagnosticCode.InvalidStructuredStorageFor,
+        DiagnosticMessage.InvalidStructuredStorageForProperty,
+      );
+
+      return undefined;
+    }
+
+    if (structuredStorageType === undefined && !this.context.analysis.isValidStorageType(decl, type)) {
+      this.context.reportError(
+        decl,
+        DiagnosticCode.InvalidContractStorageType,
+        DiagnosticMessage.InvalidContractStorageType,
+      );
+
+      return undefined;
     }
 
     return {
@@ -387,11 +497,9 @@ export class ContractInfoProcessor {
       decl,
       isPublic,
       propertyType: type,
-      isReadonly: tsUtils.modifier.isReadonly(decl),
-      isAbstract: !tsUtils.overload.isImplementation(decl),
-      structuredStorageType: STRUCTURED_STORAGE_TYPES.find((structuredStorageType) =>
-        this.context.builtins.isInterface(decl, type, structuredStorageType),
-      ),
+      isReadonly,
+      isAbstract,
+      structuredStorageType,
     };
   }
 

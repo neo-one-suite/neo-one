@@ -748,6 +748,7 @@ interface SerializableValueMap extends ReadonlyMap<SerializableKeySingle, Serial
 interface SerializableValueSet extends ReadonlySet<SerializableValue> {}
 export type SerializableValue =
   | undefined
+  | null
   | number
   | string
   | boolean
@@ -1010,6 +1011,7 @@ export const Deploy: DeployConstructor;
 export interface SmartContractValueArray extends Array<SmartContractValue> {}
 type SmartContractValue =
   | void
+  | null
   | undefined
   | number
   | Fixed<any>

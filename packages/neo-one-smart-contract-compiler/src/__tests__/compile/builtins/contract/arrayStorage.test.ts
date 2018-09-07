@@ -65,7 +65,7 @@ describe('ArrayStorage', () => {
           email: 'alex.dicarlo@neotracker.io',
           description: 'StorageContract',
         };
-        public readonly storage = ArrayStorage.for<string>();
+        private readonly storage = ArrayStorage.for<string>();
 
         public run(): void {
           test(this.storage);
@@ -97,7 +97,7 @@ describe('ArrayStorage', () => {
           email: 'alex.dicarlo@neotracker.io',
           description: 'StorageContract',
         };
-        public readonly prefix = ArrayStorage.for<string>();
+        private readonly prefix = ArrayStorage.for<string>();
 
         public run(): void {
           const keyA = 'keyA';
@@ -105,7 +105,7 @@ describe('ArrayStorage', () => {
           const keyC = 'keyC';
           const keyD = 'keyD';
 
-          const storage = new StorageContract().prefix;
+          const storage = this.prefix;
           storage.push(keyA, keyB);
           const result = storage.push(keyC);
           storage.push(keyD);
@@ -184,6 +184,19 @@ describe('ArrayStorage', () => {
       import { ArrayStorage } from '@neo-one/smart-contract';
 
       const storage = ArrayStorage.for<number>();
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidStructuredStorageFor },
+    );
+  });
+
+  test('invalid create - class', () => {
+    helpers.compileString(
+      `
+      import { ArrayStorage } from '@neo-one/smart-contract';
+
+      export class Foo {
+        private readonly storage = ArrayStorage.for<number>();
+      }
     `,
       { type: 'error', code: DiagnosticCode.InvalidStructuredStorageFor },
     );

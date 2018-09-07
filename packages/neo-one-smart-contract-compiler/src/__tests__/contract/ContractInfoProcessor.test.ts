@@ -1,4 +1,5 @@
 import { helpers } from '../../__data__';
+import { DiagnosticCode } from '../../DiagnosticCode';
 
 const properties = `
 public readonly properties = {
@@ -215,6 +216,308 @@ describe('ContractInfoProcessor', () => {
       }
     `,
       { type: 'error' },
+    );
+  });
+
+  test('no deploy method', () => {
+    helpers.compileString(
+      `
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+
+        public deploy(): void {
+          // do nothing
+        }
+      }
+    `,
+      { type: 'error' },
+    );
+  });
+
+  test('multiple smart contracts', () => {
+    helpers.compileString(
+      `
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+      }
+
+      export class TestSmartContract2 extends SmartContract {
+        ${properties}
+      }
+    `,
+      { type: 'error' },
+    );
+  });
+
+  test('abstract smart contracts', () => {
+    helpers.compileString(
+      `
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      export abstract class TestSmartContract extends SmartContract {
+        ${properties}
+      }
+    `,
+      { type: 'error' },
+    );
+  });
+
+  test('new SmartContract()', () => {
+    helpers.compileString(
+      `
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+      }
+
+      new TestSmartContract();
+    `,
+      { type: 'error' },
+    );
+  });
+
+  test('@receive with incorrect return type', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, receive } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+
+        @receive
+        public verify(): number {
+          return 20;
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractMethod },
+    );
+  });
+
+  test('@receive with @constant', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, receive, constant } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+
+        @receive
+        @constant
+        public verify(): boolean {
+          return true;
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractMethod },
+    );
+  });
+
+  test('@send with @constant', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, send, constant } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+
+        @send
+        @constant
+        public verify(): boolean {
+          return true;
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractMethod },
+    );
+  });
+
+  test('@claim with @constant', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, claim, constant } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+
+        @claim
+        @constant
+        public verify(): boolean {
+          return true;
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractMethod },
+    );
+  });
+
+  test('structured storage set in constructor', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, MapStorage } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+        private readonly foo: MapStorage<string, string>;
+        public constructor() {
+          super();
+          this.foo = MapStorage.for<string, string>();
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidStructuredStorageFor },
+    );
+  });
+
+  test('structured storage set public', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, MapStorage } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+        public readonly foo = MapStorage.for<string, string>();
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidStructuredStorageFor },
+    );
+  });
+
+  test('structured storage private modifiable', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, MapStorage } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+        private foo = MapStorage.for<string, string>();
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidStructuredStorageFor },
+    );
+  });
+
+  test('structured storage protected abstract', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, MapStorage } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+        protected abstract readonly foo: MapStorage<string, string>;
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidStructuredStorageFor },
+    );
+  });
+
+  test('invalid storage type', () => {
+    helpers.compileString(
+      `
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      class Foo {}
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+        private readonly foo: Foo = new Foo();
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractStorageType },
+    );
+  });
+
+  test('invalid storage structured array type', () => {
+    helpers.compileString(
+      `
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      class Foo {}
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+        private readonly foo: Array<Foo> = [new Foo()];
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractStorageType },
+    );
+  });
+
+  test('invalid storage structured map type', () => {
+    helpers.compileString(
+      `
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      class Foo {}
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+        private readonly foo: Array<Map<string, Foo>> = [new Map<string, Foo>().set('foo', new Foo())];
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractStorageType },
+    );
+  });
+
+  test('invalid storage structured set type', () => {
+    helpers.compileString(
+      `
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      class Foo {}
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+        private readonly foo: Set<Map<string, Foo>> = new Set([new Map<string, Foo>().set('foo', new Foo())]);
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractStorageType },
+    );
+  });
+
+  test('invalid property function not readonly', () => {
+    helpers.compileString(
+      `
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      class Foo {}
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+        private foo = () => {
+          // do nothing
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractStorageType },
+    );
+  });
+
+  test('invalid property function set in constructor', () => {
+    helpers.compileString(
+      `
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      class Foo {}
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+        private readonly foo: () => void;
+
+        public constructor() {
+          super();
+          this.foo = () => {
+            // do nothing
+          }
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractStorageType },
     );
   });
 });

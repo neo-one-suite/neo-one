@@ -1,8 +1,11 @@
 import { ABIReturn } from '@neo-one/client';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { DEFAULT_DIAGNOSTIC_OPTIONS, DiagnosticOptions } from '../analysis';
 import { isOnlyArray, isOnlyBoolean, isOnlyBuffer, isOnlyString } from '../compile/helper/types';
 import { Context } from '../Context';
+import { DiagnosticCode } from '../DiagnosticCode';
+import { DiagnosticMessage } from '../DiagnosticMessage';
 import { getFixedDecimals } from './getFixedDecimals';
 
 export function toABIReturn(
@@ -10,6 +13,7 @@ export function toABIReturn(
   node: ts.Node,
   type: ts.Type | undefined,
   optionalIn = false,
+  options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
 ): ABIReturn | undefined {
   let resolvedType = type;
   if (resolvedType === undefined) {
@@ -72,6 +76,12 @@ export function toABIReturn(
 
   if (isOnlyBuffer(context, node, resolvedType)) {
     return { type: 'Buffer', optional };
+  }
+
+  if (options.error) {
+    context.reportError(node, DiagnosticCode.InvalidContractType, DiagnosticMessage.InvalidContractType);
+  } else if (options.warning) {
+    context.reportWarning(node, DiagnosticCode.InvalidContractType, DiagnosticMessage.InvalidContractType);
   }
 
   return undefined;

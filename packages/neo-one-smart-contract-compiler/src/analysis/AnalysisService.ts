@@ -3,6 +3,18 @@ import { common, ECPoint, UInt160, UInt256 } from '@neo-one/client-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
+import {
+  isOnlyArray,
+  isOnlyBoolean,
+  isOnlyBuffer,
+  isOnlyMap,
+  isOnlyNull,
+  isOnlyNumber,
+  isOnlySet,
+  isOnlyString,
+  isOnlySymbol,
+  isOnlyUndefined,
+} from '../compile/helper/types';
 import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
@@ -17,8 +29,8 @@ export interface DiagnosticOptions extends ErrorDiagnosticOptions {
 }
 
 export const DEFAULT_DIAGNOSTIC_OPTIONS = {
-  error: false,
-  warning: true,
+  error: true,
+  warning: false,
 };
 
 export interface SignatureTypes {
@@ -291,6 +303,24 @@ export class AnalysisService {
     });
   }
 
+  public isSmartContractNode(node: ts.Node): boolean {
+    return this.memoized('is-smart-contract-node', nodeKey(node), () => {
+      const symbol = this.getSymbol(node);
+      if (symbol === undefined) {
+        return false;
+      }
+
+      const decls = tsUtils.symbol.getDeclarations(symbol);
+      if (decls.length === 0) {
+        return false;
+      }
+
+      const decl = decls[0];
+
+      return ts.isClassDeclaration(decl) && this.isSmartContract(decl);
+    });
+  }
+
   public getSymbolAndAllInheritedSymbols(node: ts.Node): ReadonlyArray<ts.Symbol> {
     return this.memoized('get-symbol-and-all-inherited-symbols', nodeKey(node), () => {
       const symbol = this.getSymbol(node);
@@ -304,6 +334,66 @@ export class AnalysisService {
 
       return symbols;
     });
+  }
+
+  public isValidStorageType(node: ts.Node, type: ts.Type): boolean {
+    return !tsUtils.type_.hasType(
+      type,
+      (tpe) =>
+        !tsUtils.type_.isOnlyType(
+          tpe,
+          (tp) =>
+            isOnlyUndefined(this.context, node, tp) ||
+            isOnlyNull(this.context, node, tp) ||
+            isOnlyBoolean(this.context, node, tp) ||
+            isOnlyNumber(this.context, node, tp) ||
+            isOnlyString(this.context, node, tp) ||
+            isOnlySymbol(this.context, node, tp) ||
+            isOnlyBuffer(this.context, node, tp) ||
+            this.isValidStorageArray(node, tp) ||
+            this.isValidStorageMap(node, tp) ||
+            this.isValidStorageSet(node, tp),
+        ),
+    );
+  }
+
+  private isValidStorageArray(node: ts.Node, type: ts.Type): boolean {
+    if (!isOnlyArray(this.context, node, type)) {
+      return false;
+    }
+
+    const typeArguments = tsUtils.type_.getTypeArgumentsArray(type);
+    if (typeArguments.length !== 1) {
+      return true;
+    }
+
+    return this.isValidStorageType(node, typeArguments[0]);
+  }
+
+  private isValidStorageMap(node: ts.Node, type: ts.Type): boolean {
+    if (!isOnlyMap(this.context, node, type)) {
+      return false;
+    }
+
+    const typeArguments = tsUtils.type_.getTypeArgumentsArray(type);
+    if (typeArguments.length !== 2) {
+      return true;
+    }
+
+    return this.isValidStorageType(node, typeArguments[0]) && this.isValidStorageType(node, typeArguments[1]);
+  }
+
+  private isValidStorageSet(node: ts.Node, type: ts.Type): boolean {
+    if (!isOnlySet(this.context, node, type)) {
+      return false;
+    }
+
+    const typeArguments = tsUtils.type_.getTypeArgumentsArray(type);
+    if (typeArguments.length !== 1) {
+      return true;
+    }
+
+    return this.isValidStorageType(node, typeArguments[0]);
   }
 
   private extractLiteral<T>(

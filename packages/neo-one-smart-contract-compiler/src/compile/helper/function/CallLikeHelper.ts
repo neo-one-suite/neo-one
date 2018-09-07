@@ -1,6 +1,8 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts from 'typescript';
+import { DiagnosticCode } from '../../../DiagnosticCode';
+import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import {
   Builtin,
   BuiltinInstanceMemberTemplate,
@@ -35,13 +37,17 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       // Otherwise, already reported as an error by typescript checker
       if (ts.isCallExpression(expression) && isBuiltinCall(valueBuiltin)) {
         valueBuiltin.emitCall(sb, expression, optionsIn);
+
+        return;
       }
 
       if (ts.isTaggedTemplateExpression(expression) && isBuiltinTemplate(valueBuiltin)) {
         valueBuiltin.emitCall(sb, expression, optionsIn);
+
+        return;
       }
 
-      return;
+      sb.context.reportError(expr, DiagnosticCode.InvalidBuiltinCall, DiagnosticMessage.InvalidBuiltinCall);
     }
 
     const throwTypeError = (innerOptions: VisitOptions) => {

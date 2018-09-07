@@ -195,6 +195,10 @@ export function getTypeArguments(type: ts.Type): ReadonlyArray<ts.Type> | undefi
   return isTypeReference(type) ? utils.getValueOrUndefined(type.typeArguments) : undefined;
 }
 
+export function getTypeArgumentsArray(type: ts.Type): ReadonlyArray<ts.Type> {
+  return utils.getArray(getTypeArguments(type));
+}
+
 export function getTypeArgumentsOrThrow(type: ts.Type): ReadonlyArray<ts.Type> {
   return utils.throwIfNullOrUndefined(getTypeArguments(type), 'type arguments');
 }

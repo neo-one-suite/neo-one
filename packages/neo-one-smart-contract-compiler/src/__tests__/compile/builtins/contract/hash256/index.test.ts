@@ -1,5 +1,6 @@
 import { common } from '@neo-one/client-core';
 import { helpers } from '../../../../../__data__';
+import { DiagnosticCode } from '../../../../../DiagnosticCode';
 
 describe('Hash256', () => {
   test('cannot be implemented', async () => {
@@ -10,6 +11,17 @@ describe('Hash256', () => {
       }
     `,
       { type: 'error' },
+    );
+  });
+
+  test('cannot be called', async () => {
+    helpers.compileString(
+      `
+      import { Hash256 } from '@neo-one/smart-contract';
+
+      Hash256();
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinCall },
     );
   });
 

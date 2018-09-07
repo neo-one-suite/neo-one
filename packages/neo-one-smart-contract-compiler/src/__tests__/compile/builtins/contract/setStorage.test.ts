@@ -16,7 +16,7 @@ describe('SetStorage', () => {
           email: 'alex.dicarlo@neotracker.io',
           description: 'StorageContract',
         };
-        public readonly storage = SetStorage.for<string>();
+        private readonly storage = SetStorage.for<string>();
 
         public run(): void {
           const storage = this.storage;
@@ -389,7 +389,7 @@ describe('SetStorage', () => {
           email: 'alex.dicarlo@neotracker.io',
           description: 'StorageContract',
         };
-        public readonly storage = SetStorage.for<[Address, Hash256, string]>();
+        private readonly storage = SetStorage.for<[Address, Hash256, string]>();
 
         public run(): void {
           testAtAddHasDelete(this.storage);

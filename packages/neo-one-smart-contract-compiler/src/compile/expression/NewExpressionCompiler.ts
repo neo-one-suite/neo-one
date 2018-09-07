@@ -1,5 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { isBuiltinNew } from '../builtins';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -14,6 +16,12 @@ export class NewExpressionCompiler extends NodeCompiler<ts.NewExpression> {
     const builtin = sb.context.builtins.getValue(newExpr);
     if (builtin !== undefined && isBuiltinNew(builtin)) {
       builtin.emitNew(sb, expr, optionsIn);
+
+      return;
+    }
+
+    if (sb.context.analysis.isSmartContractNode(newExpr)) {
+      sb.context.reportError(expr, DiagnosticCode.InvalidContractNew, DiagnosticMessage.InvalidContractNew);
 
       return;
     }
