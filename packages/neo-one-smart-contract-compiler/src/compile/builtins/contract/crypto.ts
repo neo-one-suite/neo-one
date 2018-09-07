@@ -1,4 +1,5 @@
 import { tsUtils } from '@neo-one/ts-utils';
+import ts from 'typescript';
 import { Types, WrappableType } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
