@@ -2,7 +2,7 @@
 import { data, factory, keys } from '../../__data__';
 import { Client } from '../../Client';
 import { createSmartContract } from '../../sc';
-import { Action, InvokeReceipt } from '../../types';
+import { Action, InvokeReceipt, Transaction } from '../../types';
 
 describe('createSmartContract', () => {
   const wallet = factory.createUnlockedWallet();
@@ -80,6 +80,41 @@ describe('createSmartContract', () => {
     const confirmResult: InvokeReceipt = await result.confirmed();
 
     expect(result.transaction).toEqual(transaction);
+    expect(confirmResult.result.state).toEqual('HALT');
+    if (confirmResult.result.state !== 'HALT') {
+      throw new Error('For TS');
+    }
+    expect(confirmResult.result.value).toEqual(true);
+    expect(confirmResult.events).toHaveLength(1);
+    verifyEvent(confirmResult.events[0]);
+    expect(confirmResult.logs).toHaveLength(1);
+    verifyLog(confirmResult.logs[0]);
+    expect(confirmResult.blockHash).toEqual(receipt.blockHash);
+    expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
+    expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
+  });
+
+  test('createInvoke - confirmed', async () => {
+    const transaction = factory.createInvocationTransaction();
+    const receipt = factory.createRawInvokeReceipt({
+      actions: [factory.createRawTransferNotification(), rawLog],
+      result: factory.createRawInvocationResultSuccess({
+        stack: [factory.createBooleanContractParameter({ value: true })],
+      }),
+    });
+    const transactionResult = {
+      transaction,
+      confirmed: async () => receipt,
+    };
+    __invoke.mockImplementationOnce(async () => Promise.resolve(transactionResult));
+
+    const confirmResult: InvokeReceipt & { transaction: Transaction } = await contract.transfer.confirmed(
+      keys[0].address,
+      keys[1].address,
+      data.bigNumbers.a,
+    );
+
+    expect(confirmResult.transaction).toEqual(transaction);
     expect(confirmResult.result.state).toEqual('HALT');
     if (confirmResult.result.state !== 'HALT') {
       throw new Error('For TS');

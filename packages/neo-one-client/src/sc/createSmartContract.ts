@@ -17,6 +17,7 @@ import {
   AddressString,
   ClaimTransaction,
   Event,
+  GetOptions,
   InvocationTransaction,
   InvokeClaimTransactionOptions,
   InvokeReceipt,
@@ -32,6 +33,13 @@ import {
   TransactionResult,
 } from '../types';
 import * as common from './common';
+
+// tslint:disable-next-line no-any
+const isOptionsArg = (finalArg: any) =>
+  finalArg !== undefined &&
+  typeof finalArg === 'object' &&
+  !Array.isArray(finalArg) &&
+  !BigNumber.isBigNumber(finalArg);
 
 const getParamsAndOptions = ({
   definition: { networks },
@@ -60,14 +68,10 @@ const getParamsAndOptions = ({
   const finalArg = args[args.length - 1] as {} | undefined;
   let params = args;
   let optionsIn: InvokeSendReceiveTransactionOptions | InvokeClaimTransactionOptions = {};
-  if (
-    finalArg !== undefined &&
-    typeof finalArg === 'object' &&
-    !Array.isArray(finalArg) &&
-    !BigNumber.isBigNumber(finalArg)
-  ) {
+  if (isOptionsArg(finalArg)) {
     params = args.slice(0, -1);
-    optionsIn = finalArg;
+    // tslint:disable-next-line no-any
+    optionsIn = finalArg as any;
   }
 
   const currentAccount = client.getCurrentAccount();
@@ -178,63 +182,80 @@ const createInvoke = ({
   readonly definition: SmartContractDefinition;
   readonly client: Client;
   readonly func: ABIFunction;
-}) => async (
-  // tslint:disable-next-line no-any
-  ...args: any[]
-): Promise<
-  TransactionResult<InvokeReceipt, InvocationTransaction> | TransactionResult<TransactionReceipt, ClaimTransaction>
-> => {
-  const { params, paramsZipped, options, address } = getParamsAndOptions({
-    definition,
-    parameters,
-    args,
-    send,
-    receive,
-    claim,
-    client,
-  });
+}) => {
+  const invoke = async (
+    // tslint:disable-next-line no-any
+    ...args: any[]
+  ): Promise<
+    TransactionResult<InvokeReceipt, InvocationTransaction> | TransactionResult<TransactionReceipt, ClaimTransaction>
+  > => {
+    const { params, paramsZipped, options, address } = getParamsAndOptions({
+      definition,
+      parameters,
+      args,
+      send,
+      receive,
+      claim,
+      client,
+    });
 
-  if (claim) {
-    return client.__invokeClaim(address, name, params, paramsZipped, options, definition.sourceMaps);
-  }
+    if (claim) {
+      return client.__invokeClaim(address, name, params, paramsZipped, options, definition.sourceMaps);
+    }
 
-  const result = await client.__invoke(
-    address,
-    name,
-    params,
-    paramsZipped,
-    send || receive,
-    options,
-    definition.sourceMaps,
-  );
+    const result = await client.__invoke(
+      address,
+      name,
+      params,
+      paramsZipped,
+      send || receive,
+      options,
+      definition.sourceMaps,
+    );
 
-  return {
-    transaction: result.transaction,
-    confirmed: async (getOptions?): Promise<InvokeReceipt> => {
-      const receipt = await result.confirmed(getOptions);
-      const { events = [] } = definition.abi;
-      const actions = convertActions({
-        actions: receipt.actions,
-        events,
-      });
+    return {
+      transaction: result.transaction,
+      confirmed: async (getOptions?): Promise<InvokeReceipt> => {
+        const receipt = await result.confirmed(getOptions);
+        const { events = [] } = definition.abi;
+        const actions = convertActions({
+          actions: receipt.actions,
+          events,
+        });
 
-      const invocationResult = await common.convertInvocationResult({
-        returnType,
-        result: receipt.result,
-        actions: receipt.actions,
-        sourceMaps: definition.sourceMaps,
-      });
+        const invocationResult = await common.convertInvocationResult({
+          returnType,
+          result: receipt.result,
+          actions: receipt.actions,
+          sourceMaps: definition.sourceMaps,
+        });
 
-      return {
-        blockIndex: receipt.blockIndex,
-        blockHash: receipt.blockHash,
-        transactionIndex: receipt.transactionIndex,
-        result: invocationResult,
-        events: filterEvents(actions),
-        logs: filterLogs(actions),
-      };
-    },
+        return {
+          blockIndex: receipt.blockIndex,
+          blockHash: receipt.blockHash,
+          transactionIndex: receipt.transactionIndex,
+          result: invocationResult,
+          events: filterEvents(actions),
+          logs: filterLogs(actions),
+        };
+      },
+    };
   };
+  // tslint:disable-next-line no-any no-object-mutation
+  (invoke as any).confirmed = async (...args: any[]) => {
+    // tslint:disable-next-line no-any
+    const finalArg = args[args.length - 1];
+    let options: GetOptions | undefined;
+    if (isOptionsArg(finalArg)) {
+      options = finalArg;
+    }
+    const result = await invoke(...args);
+    const receipt = await result.confirmed(options);
+
+    return { ...receipt, transaction: result.transaction };
+  };
+
+  return invoke;
 };
 
 export const createSmartContract = ({

@@ -18,6 +18,7 @@
     "@types/cosmiconfig": "^5.0.3",
     "@types/lodash": "^4.14.116",
     "@types/uuid": "^3.4.4",
+    "chokidar": "^2.0.4",
     "convict": "^4.3.2",
     "cosmiconfig": "^5.0.6",
     "fs-extra": "^7.0.0",
@@ -33,6 +34,6 @@
     "@neo-one/smart-contract-test": "^1.0.0-alpha.44",
     "@types/react": "16.4.13",
     "bignumber.js": "7.2.1",
-    "react": "16.4.2"
+    "react": "16.5.0"
   }
 }

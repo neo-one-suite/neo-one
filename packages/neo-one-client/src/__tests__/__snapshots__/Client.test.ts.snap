@@ -20,7 +20,7 @@ Array [
     Array [],
     Array [],
     true,
-    undefined,
+    Object {},
     Promise {},
   ],
 ]
@@ -76,6 +76,7 @@ Array [
       },
       "monitor": undefined,
       "networkFee": undefined,
+      "systemFee": undefined,
     },
   ],
 ]
@@ -91,7 +92,7 @@ Array [
         "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
       },
     ],
-    undefined,
+    Object {},
   ],
 ]
 `;
@@ -115,7 +116,7 @@ Array [
       "script": "5f8d70",
       "storage": true,
     },
-    undefined,
+    Object {},
   ],
 ]
 `;
@@ -157,7 +158,7 @@ Array [
       ],
     },
     Array [],
-    undefined,
+    Object {},
     Promise {},
   ],
 ]
@@ -191,7 +192,7 @@ Array [
       "precision": 8,
       "type": "Token",
     },
-    undefined,
+    Object {},
   ],
 ]
 `;
@@ -368,6 +369,7 @@ Array [
       },
       "monitor": undefined,
       "networkFee": undefined,
+      "systemFee": undefined,
     },
   ],
 ]
@@ -383,7 +385,7 @@ Array [
         "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
       },
     ],
-    undefined,
+    Object {},
   ],
 ]
 `;

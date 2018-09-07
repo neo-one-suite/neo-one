@@ -145,6 +145,7 @@ export const utils = {
   TEN: new BN(10),
   SIXTEEN: new BN(16),
   ZERO_BIG_NUMBER: new BigNumber(0),
+  NEGATIVE_ONE_BIG_NUMBER: new BigNumber(-1),
   toSignedBuffer,
   fromSignedBuffer,
   unwrapBoolean,

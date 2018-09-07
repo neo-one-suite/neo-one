@@ -4,7 +4,7 @@ import * as React from 'react';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { FromStream } from '../FromStream';
-import { NetworkClients } from '../types';
+import { NetworkClients, ReactSyntheticEvent } from '../types';
 
 interface DeveloperToolsContextType {
   readonly client: Client;
@@ -55,6 +55,7 @@ export interface Token {
 }
 export interface LocalState {
   readonly autoConsensus: boolean;
+  readonly autoSystemFee: boolean;
   readonly tokens: ReadonlyArray<Token>;
 }
 export interface LocalStateContextType {
@@ -63,6 +64,7 @@ export interface LocalStateContextType {
 }
 const INITIAL_LOCAL_STATE: LocalState = {
   autoConsensus: true,
+  autoSystemFee: true,
   tokens: [],
 };
 
@@ -139,7 +141,7 @@ export function WithResetLocalState({ children }: WithResetLocalStateProps) {
 
 interface WithAutoConsensusProps {
   readonly children: (
-    options: { readonly toggle: () => void; readonly autoConsensus$: Observable<boolean> },
+    options: { readonly toggle: (event: ReactSyntheticEvent) => void; readonly autoConsensus$: Observable<boolean> },
   ) => React.ReactNode;
 }
 
@@ -152,7 +154,35 @@ export function WithAutoConsensus({ children }: WithAutoConsensusProps) {
             map((localState) => localState.autoConsensus),
             distinctUntilChanged(),
           ),
-          toggle: () => onChange({ autoConsensus: !localState$.getValue().autoConsensus }),
+          toggle: (event) => {
+            onChange({ autoConsensus: !localState$.getValue().autoConsensus });
+            event.stopPropagation();
+          },
+        })
+      }
+    </LocalStateContext.Consumer>
+  );
+}
+
+interface WithAutoSystemFeeProps {
+  readonly children: (
+    options: { readonly toggle: (event: ReactSyntheticEvent) => void; readonly autoSystemFee$: Observable<boolean> },
+  ) => React.ReactNode;
+}
+
+export function WithAutoSystemFee({ children }: WithAutoSystemFeeProps) {
+  return (
+    <LocalStateContext.Consumer>
+      {({ localState$, onChange }) =>
+        children({
+          autoSystemFee$: localState$.pipe(
+            map((localState) => localState.autoSystemFee),
+            distinctUntilChanged(),
+          ),
+          toggle: (event) => {
+            onChange({ autoSystemFee: !localState$.getValue().autoSystemFee });
+            event.stopPropagation();
+          },
         })
       }
     </LocalStateContext.Consumer>

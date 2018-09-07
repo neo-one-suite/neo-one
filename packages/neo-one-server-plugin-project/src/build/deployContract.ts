@@ -11,6 +11,7 @@ import {
 } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
+import BigNumber from 'bignumber.js';
 import { ContractResult } from './compileContract';
 
 export const deployContract = async (
@@ -55,7 +56,7 @@ export const deployContract = async (
     contract.contract,
     contract.abi,
     [],
-    undefined,
+    { systemFee: new BigNumber(-1) },
     Promise.resolve(sourceMaps),
   );
   const [receipt] = await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);

@@ -72,6 +72,10 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('TransactionOptions');
   }
 
+  if (text.includes('GetOptions')) {
+    mutableClauses.push('GetOptions');
+  }
+
   return mutableClauses;
 };
 

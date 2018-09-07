@@ -7,31 +7,37 @@ interface ParamAcc {
   readonly acc: ReadonlyArray<string>;
 }
 
-const getOptions = (abi: ABIFunction) => {
+interface Options {
+  readonly withConfirmedOptions?: boolean;
+}
+
+const getOptions = (abi: ABIFunction, { withConfirmedOptions = false }: Options = {}) => {
   if (abi.constant) {
-    return [];
+    return withConfirmedOptions ? ['options?: GetOptions'] : [];
   }
 
+  const type = withConfirmedOptions ? '& GetOptions' : '';
+
   if (abi.send && abi.receive) {
-    return ['options?: InvokeSendReceiveTransactionOptions'];
+    return [`options?: InvokeSendReceiveTransactionOptions${type}`];
   }
 
   if (abi.send) {
-    return ['options?: InvokeSendTransactionOptions'];
+    return [`options?: InvokeSendTransactionOptions${type}`];
   }
 
   if (abi.receive) {
-    return ['options?: InvokeReceiveTransactionOptions'];
+    return [`options?: InvokeReceiveTransactionOptions${type}`];
   }
 
   if (abi.claim) {
-    return ['options?: InvokeClaimTransactionOptions'];
+    return [`options?: InvokeClaimTransactionOptions${type}`];
   }
 
-  return ['options?: TransactionOptions'];
+  return [`options?: TransactionOptions${type}`];
 };
 
-export const genFunctionParameters = (abi: ABIFunction): string =>
+export const genFunctionParameters = (abi: ABIFunction, options: Options = {}): string =>
   _.reverse(
     _.reverse([...(abi.parameters === undefined ? [] : abi.parameters)]).reduce<ParamAcc>(
       (acc, param) => ({
@@ -43,5 +49,5 @@ export const genFunctionParameters = (abi: ABIFunction): string =>
       { hasRequired: false, acc: [] },
     ).acc,
   )
-    .concat(getOptions(abi))
+    .concat(getOptions(abi, options))
     .join(', ');

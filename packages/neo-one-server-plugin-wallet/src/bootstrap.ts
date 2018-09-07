@@ -1005,6 +1005,9 @@ export const bootstrap = (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs)
           memory: localUserAccountProvider,
         };
         const client = new Client(providers);
+        client.hooks.beforeRelay.tapPromise('bootstrap', async (mutableOptions) => {
+          mutableOptions.systemFee = new BigNumber(-1);
+        });
 
         await client.selectAccount(master.accountID);
 

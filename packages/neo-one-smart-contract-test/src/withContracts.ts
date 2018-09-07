@@ -12,6 +12,7 @@ import {
 } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
 import { compileContract } from '@neo-one/smart-contract-compiler';
+import BigNumber from 'bignumber.js';
 import { camel } from 'change-case';
 import { setupTestNode } from './setupTestNode';
 
@@ -23,6 +24,7 @@ export interface WithContractsOptions {
   readonly ignoreWarnings?: boolean;
   readonly deploy?: boolean;
   readonly autoConsensus?: boolean;
+  readonly autoSystemFee?: boolean;
 }
 
 export interface TestOptions {
@@ -38,15 +40,22 @@ export interface TestOptions {
 export const withContracts = async <T>(
   contracts: ReadonlyArray<Contract>,
   test: (contracts: T & TestOptions) => Promise<void>,
-  { ignoreWarnings = false, deploy = true, autoConsensus = true }: WithContractsOptions = {
+  { ignoreWarnings = false, deploy = true, autoConsensus = true, autoSystemFee = true }: WithContractsOptions = {
     ignoreWarnings: false,
     deploy: true,
     autoConsensus: true,
+    autoSystemFee: true,
   },
 ): Promise<void> => {
   const { client, masterWallet, provider, networkName, privateKey, node } = await setupTestNode();
   try {
     const developerClient = new DeveloperClient(provider.read(networkName));
+    if (autoSystemFee) {
+      client.hooks.beforeRelay.tapPromise('AutoConsensus', async (options) => {
+        // tslint:disable-next-line no-object-mutation
+        options.systemFee = new BigNumber(-1);
+      });
+    }
     if (autoConsensus) {
       client.hooks.beforeConfirmed.tapPromise('DeveloperClient', async () => {
         await developerClient.runConsensusNow();
@@ -65,9 +74,15 @@ export const withContracts = async <T>(
       let result: TransactionResult<PublishReceipt>;
       // tslint:disable-next-line prefer-conditional-expression
       if (deploy) {
-        result = await client.publishAndDeploy(contract, abi, [], undefined, Promise.resolve(mutableSourceMaps));
+        result = await client.publishAndDeploy(
+          contract,
+          abi,
+          [],
+          { systemFee: new BigNumber(-1) },
+          Promise.resolve(mutableSourceMaps),
+        );
       } else {
-        result = await client.publish(contract);
+        result = await client.publish(contract, { systemFee: new BigNumber(-1) });
       }
 
       const [receipt] = await Promise.all([result.confirmed({ timeoutMS: 2500 }), developerClient.runConsensusNow()]);
@@ -105,7 +120,7 @@ export const withContracts = async <T>(
       setTimeout(async () => {
         await node.stop();
         resolve();
-      }, 500),
+      }, 100),
     );
     throw error;
   }

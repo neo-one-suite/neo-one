@@ -177,7 +177,7 @@ describe('LocalUserAccountProvider', () => {
     });
     getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-    const result = await provider.publish(contract);
+    const result = await provider.publish(contract, { systemFee: new BigNumber(-1) });
     const confirmResult = await result.confirmed();
 
     expect(result.transaction).toEqual(transaction);
@@ -208,7 +208,7 @@ describe('LocalUserAccountProvider', () => {
       ),
     );
 
-    const result = provider.publish(contract);
+    const result = provider.publish(contract, { systemFee: new BigNumber(-1) });
 
     await expect(result).rejects.toMatchSnapshot();
   });
@@ -240,7 +240,7 @@ describe('LocalUserAccountProvider', () => {
       const invocationData = factory.createRawInvocationData();
       getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-      const result = await provider.publish(contract);
+      const result = await provider.publish(contract, { systemFee: new BigNumber(-1) });
       const confirmResult = await result.confirmed();
 
       expect(result.transaction).toEqual(transaction);
@@ -295,6 +295,7 @@ describe('LocalUserAccountProvider', () => {
         contract,
         { functions: [factory.createDeployABIFunction({ parameters })] },
         params,
+        { systemFee: new BigNumber(-1) },
       );
       const confirmResult = await result.confirmed();
 
@@ -340,7 +341,7 @@ describe('LocalUserAccountProvider', () => {
       const invocationData = factory.createRawInvocationData();
       getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-      const result = await provider.registerAsset(asset);
+      const result = await provider.registerAsset(asset, { systemFee: new BigNumber(-1) });
       const confirmResult = await result.confirmed();
 
       expect(result.transaction).toEqual(transaction);
@@ -373,7 +374,7 @@ describe('LocalUserAccountProvider', () => {
     const invocationData = factory.createRawInvocationData({ result: factory.createRawInvocationResultError() });
     getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-    const result = await provider.registerAsset(asset);
+    const result = await provider.registerAsset(asset, { systemFee: new BigNumber(-1) });
     const confirmResult = await result.confirmed();
 
     expect(result.transaction).toEqual(transaction);
@@ -435,7 +436,9 @@ describe('LocalUserAccountProvider', () => {
       const invocationData = factory.createRawInvocationData();
       getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-      const result = await provider.invoke(keys[1].address, 'foo', [true], [['firstArg', true]], verify);
+      const result = await provider.invoke(keys[1].address, 'foo', [true], [['firstArg', true]], verify, {
+        systemFee: new BigNumber(-1),
+      });
       const confirmResult = await result.confirmed();
 
       expect(result.transaction).toEqual(transaction);
@@ -503,7 +506,7 @@ describe('LocalUserAccountProvider', () => {
     const invocationData = factory.createRawInvocationData();
     getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-    const result = await provider.__execute(data.buffers.a);
+    const result = await provider.__execute(data.buffers.a, { systemFee: new BigNumber(-1) });
     const confirmResult = await result.confirmed();
 
     expect(result.transaction).toEqual(transaction);

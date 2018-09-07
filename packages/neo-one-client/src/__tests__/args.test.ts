@@ -447,7 +447,7 @@ describe('arg assertions', () => {
   test('assertTransactionOptions - undefined', () => {
     const value = undefined;
 
-    expect(args.assertTransactionOptions('value', value)).toEqual(value);
+    expect(args.assertTransactionOptions('value', value)).toEqual({});
   });
 
   test('assertTransactionOptions - non object', () => {

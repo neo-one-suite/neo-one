@@ -17,6 +17,7 @@ import {
 import { common, crypto, RawInvokeReceipt } from '@neo-one/client-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import * as appRootDir from 'app-root-dir';
+import BigNumber from 'bignumber.js';
 import ts from 'typescript';
 import { setupTestNode } from '../../../../neo-one-smart-contract-test/src/setupTestNode';
 import { compile } from '../../compile';
@@ -124,6 +125,10 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
   client.hooks.beforeConfirmed.tapPromise('DeveloperClient', async () => {
     await developerClient.runConsensusNow();
   });
+  client.hooks.beforeRelay.tapPromise('DeveloperClient', async (options) => {
+    // tslint:disable-next-line no-object-mutation
+    options.systemFee = new BigNumber(-1);
+  });
 
   return {
     async addContract(script, options = {}): Promise<Contract> {
@@ -180,7 +185,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       ] = await sourceMap;
       const result = await userAccountProviders.memory.__execute(
         outputScript,
-        { from: masterWallet.account.id, ...options },
+        { from: masterWallet.account.id, systemFee: new BigNumber(-1), ...options },
         Promise.resolve(mutableSourceMaps),
       );
 

@@ -147,7 +147,7 @@
     "jest-environment-node": "23.4.0",
     "jest-junit": "5.1.0",
     "json": "9.0.6",
-    "lerna": "3.2.1",
+    "lerna": "3.3.0",
     "lint-staged": "7.2.2",
     "lodash": "4.17.10",
     "nyc": "13.0.1",
@@ -174,7 +174,7 @@
     "ajv": "6.5.3",
     "babel-core": "7.0.0-bridge.0",
     "bn.js": "4.11.8",
-    "grpc": "1.14.1"
+    "grpc": "1.14.2"
   },
   "one": {
     "paths": {

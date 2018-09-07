@@ -717,10 +717,13 @@ export interface UserAccount {
 }
 
 export interface TransactionOptions {
-  readonly from?: UserAccountID;
-  readonly attributes?: ReadonlyArray<Attribute>;
-  readonly networkFee?: BigNumber;
-  readonly monitor?: Monitor;
+  // tslint:disable readonly-keyword
+  from?: UserAccountID;
+  attributes?: ReadonlyArray<Attribute>;
+  networkFee?: BigNumber;
+  systemFee?: BigNumber;
+  monitor?: Monitor;
+  // tslint:enable readonly-keyword
 }
 
 export interface InvokeClaimTransactionOptions extends TransactionOptions {

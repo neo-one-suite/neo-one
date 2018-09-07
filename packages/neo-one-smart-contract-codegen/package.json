@@ -13,7 +13,7 @@
     "change-case": "^3.0.2",
     "lodash": "^4.17.10",
     "prettier": "^1.14.2",
-    "safe-stable-stringify": "^1.0.1",
+    "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3"
   }
 }

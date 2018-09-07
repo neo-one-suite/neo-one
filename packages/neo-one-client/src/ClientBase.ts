@@ -17,6 +17,7 @@ import {
 } from './types';
 
 export interface ClientHooks {
+  readonly beforeRelay: AsyncParallelHook<TransactionOptions>;
   readonly relayError: AsyncParallelHook<Error>;
   readonly afterRelay: AsyncParallelHook<Transaction>;
   readonly beforeConfirmed: AsyncParallelHook<Transaction>;
@@ -38,6 +39,7 @@ export class ClientBase<TUserAccountProviders extends { readonly [K in string]: 
 
   public constructor(providersIn: TUserAccountProviders) {
     this.hooks = {
+      beforeRelay: new AsyncParallelHook(['beforeRelay']),
       relayError: new AsyncParallelHook(['error']),
       afterRelay: new AsyncParallelHook(['transaction']),
       beforeConfirmed: new AsyncParallelHook(['transaction']),

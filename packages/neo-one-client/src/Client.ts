@@ -111,19 +111,22 @@ export class Client<
     return this.addTransactionHooks(this.getProvider(options).transfer(transfers, options));
   }
 
-  public async claim(options?: TransactionOptions): Promise<TransactionResult> {
-    return this.getProvider(options).claim(args.assertTransactionOptions('options', options));
+  public async claim(optionsIn?: TransactionOptions): Promise<TransactionResult> {
+    const options = args.assertTransactionOptions('options', optionsIn);
+    await this.applyBeforeRelayHook(options);
+
+    return this.getProvider(options).claim(options);
   }
 
   public async publish(
     contract: ContractRegister,
-    options?: TransactionOptions,
+    optionsIn?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
+    const options = args.assertTransactionOptions('options', optionsIn);
+    await this.applyBeforeRelayHook(options);
+
     return this.addTransactionHooks(
-      this.getProvider(options).publish(
-        args.assertContractRegister('contract', contract),
-        args.assertTransactionOptions('options', options),
-      ),
+      this.getProvider(options).publish(args.assertContractRegister('contract', contract), options),
     );
   }
 
@@ -131,15 +134,18 @@ export class Client<
     contract: ContractRegister,
     abi: ABI,
     params: ReadonlyArray<Param> = [],
-    options?: TransactionOptions,
+    optionsIn?: TransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
+    const options = args.assertTransactionOptions('options', optionsIn);
+    await this.applyBeforeRelayHook(options);
+
     return this.addTransactionHooks(
       this.getProvider(options).publishAndDeploy(
         args.assertContractRegister('contract', contract),
         args.assertABI('abi', abi),
         params,
-        args.assertTransactionOptions('options', options),
+        options,
         sourceMaps,
       ),
     );
@@ -147,13 +153,13 @@ export class Client<
 
   public async registerAsset(
     asset: AssetRegister,
-    options?: TransactionOptions,
+    optionsIn?: TransactionOptions,
   ): Promise<TransactionResult<RegisterAssetReceipt, InvocationTransaction>> {
+    const options = args.assertTransactionOptions('options', optionsIn);
+    await this.applyBeforeRelayHook(options);
+
     return this.addTransactionHooks(
-      this.getProvider(options).registerAsset(
-        args.assertAssetRegister('asset', asset),
-        args.assertTransactionOptions('options', options),
-      ),
+      this.getProvider(options).registerAsset(args.assertAssetRegister('asset', asset), options),
     );
   }
 
@@ -170,6 +176,7 @@ export class Client<
   // tslint:disable-next-line readonly-array no-any
   public async issue(...argsIn: any[]): Promise<TransactionResult<TransactionReceipt, IssueTransaction>> {
     const { transfers, options } = this.getTransfersOptions(argsIn);
+    await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(this.getProvider(options).issue(transfers, options));
   }
@@ -209,9 +216,11 @@ export class Client<
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
-    options?: InvokeSendReceiveTransactionOptions,
+    optionsIn?: InvokeSendReceiveTransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+    const options = optionsIn === undefined ? {} : optionsIn;
+
     return this.addTransactionHooks(
       this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMaps),
     );
@@ -222,9 +231,12 @@ export class Client<
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
-    options?: InvokeClaimTransactionOptions,
+    optionsIn?: InvokeClaimTransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
+    const options = optionsIn === undefined ? {} : optionsIn;
+    await this.applyBeforeRelayHook(options);
+
     return this.addTransactionHooks(
       this.getProvider(options).invokeClaim(contract, method, params, paramsZipped, options, sourceMaps),
     );
@@ -251,6 +263,14 @@ export class Client<
 
   public reset(): void {
     this.reset$.next(undefined);
+  }
+
+  private async applyBeforeRelayHook(options: TransactionOptions): Promise<void> {
+    try {
+      await this.hooks.beforeRelay.promise(options);
+    } catch {
+      // do nothing
+    }
   }
 
   private async addTransactionHooks<TTransactionResult extends TransactionResult>(
@@ -306,7 +326,7 @@ export class Client<
     argsIn: ReadonlyArray<any>,
   ): {
     readonly transfers: ReadonlyArray<Transfer>;
-    readonly options?: TransactionOptions;
+    readonly options: TransactionOptions;
   } {
     let transfers;
     let options;

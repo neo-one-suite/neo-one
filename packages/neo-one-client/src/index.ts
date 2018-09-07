@@ -74,6 +74,7 @@ export {
   ContractTransaction,
   EnrollmentTransaction,
   Event,
+  GetOptions,
   Hash256AttributeUsage,
   Hash256ContractParameter,
   Hash256String,

@@ -1,9 +1,11 @@
 import { Client, DeveloperClient } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
 import * as React from 'react';
 import { Link, styled } from 'reakit';
+import { combineLatest } from 'rxjs';
 import { prop } from 'styled-tools';
 import { FromStream } from '../FromStream';
-import { WithAutoConsensus, WithNetworkClient } from './DeveloperToolsContext';
+import { WithAutoConsensus, WithAutoSystemFee, WithNetworkClient } from './DeveloperToolsContext';
 import { AddToast, WithAddToast } from './ToastsContainer';
 import { AddError, WithAddError } from './WithAddError';
 import { WithNEOTrackerURL } from './WithNEOTrackerURL';
@@ -34,12 +36,19 @@ class Hooker {
   }
 
   private mutableAutoConsensus = false;
+  private mutableAutoSystemFee = false;
   private mutableDeveloperClient: DeveloperClient | undefined;
   private mutableAddToast: AddToast | undefined;
   private mutableAddError: AddError | undefined;
   private mutableNEOTrackerURL: string | undefined;
 
   private constructor(client: Client) {
+    client.hooks.beforeRelay.tapPromise('AutoConsensus', async (options) => {
+      if (this.mutableAutoSystemFee && this.mutableDeveloperClient !== undefined) {
+        // tslint:disable-next-line no-object-mutation
+        options.systemFee = new BigNumber(-1);
+      }
+    });
     client.hooks.beforeConfirmed.tapPromise('AutoConsensus', async () => {
       if (this.mutableAutoConsensus && this.mutableDeveloperClient !== undefined) {
         await this.mutableDeveloperClient.runConsensusNow();
@@ -87,6 +96,10 @@ class Hooker {
     this.mutableAutoConsensus = value;
   }
 
+  public set autoSystemFee(value: boolean) {
+    this.mutableAutoSystemFee = value;
+  }
+
   public set developerClient(value: DeveloperClient | undefined) {
     this.mutableDeveloperClient = value;
   }
@@ -116,19 +129,24 @@ export function ClientHook() {
                   {(neotrackerURL) => (
                     <WithAutoConsensus>
                       {({ autoConsensus$ }) => (
-                        <FromStream props$={autoConsensus$}>
-                          {(autoConsensus) => {
-                            const mutableHooker = Hooker.get(client);
-                            mutableHooker.autoConsensus = autoConsensus;
-                            mutableHooker.developerClient = developerClient;
-                            mutableHooker.addToast = addToast;
-                            mutableHooker.neotrackerURL = neotrackerURL;
-                            mutableHooker.addError = addError;
+                        <WithAutoSystemFee>
+                          {({ autoSystemFee$ }) => (
+                            <FromStream props$={combineLatest(autoConsensus$, autoSystemFee$)}>
+                              {([autoConsensus, autoSystemFee]) => {
+                                const mutableHooker = Hooker.get(client);
+                                mutableHooker.autoConsensus = autoConsensus;
+                                mutableHooker.autoSystemFee = autoSystemFee;
+                                mutableHooker.developerClient = developerClient;
+                                mutableHooker.addToast = addToast;
+                                mutableHooker.neotrackerURL = neotrackerURL;
+                                mutableHooker.addError = addError;
 
-                            // tslint:disable-next-line no-null-keyword
-                            return null;
-                          }}
-                        </FromStream>
+                                // tslint:disable-next-line no-null-keyword
+                                return null;
+                              }}
+                            </FromStream>
+                          )}
+                        </WithAutoSystemFee>
                       )}
                     </WithAutoConsensus>
                   )}

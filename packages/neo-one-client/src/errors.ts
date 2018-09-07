@@ -20,6 +20,11 @@ export const InsufficientFundsError = makeErrorWithCode(
   'INSUFFICIENT_FUNDS',
   (total: BigNumber, expected: BigNumber) => `Found ${total.toString()} funds, required: ${expected.toString()}.`,
 );
+export const InsufficientSystemFeeError = makeErrorWithCode(
+  'INSUFFICIENT_SYSTEM_FEE',
+  (total: BigNumber, expected: BigNumber) =>
+    `Found ${total.toString()} allowed system fee, required: ${expected.toString()}.`,
+);
 
 export const FundsInUseError = makeErrorWithCode(
   'FUNDS_IN_USE',

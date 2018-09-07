@@ -23,7 +23,7 @@
     "@types/koa-router": "^7.0.31",
     "@types/lodash": "^4.14.116",
     "fs-extra": "^7.0.0",
-    "grpc": "^1.13.1",
+    "grpc": "^1.14.2",
     "grpc-error": "^1.0.0",
     "koa": "^2.5.2",
     "koa-compose": "^4.1.0",

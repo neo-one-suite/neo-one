@@ -32,6 +32,7 @@ import { Observable } from 'rxjs';
 import {
   FundsInUseError,
   InsufficientFundsError,
+  InsufficientSystemFeeError,
   InvalidTransactionError,
   InvokeError,
   NoAccountError,
@@ -159,6 +160,7 @@ interface TransactionOptionsFull {
   readonly from: UserAccountID;
   readonly attributes: ReadonlyArray<Attribute>;
   readonly networkFee: BigNumber;
+  readonly systemFee: BigNumber;
   readonly monitor?: Monitor;
 }
 
@@ -724,7 +726,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }
 
   private getTransactionOptions(options: TransactionOptions = {}): TransactionOptionsFull {
-    const { attributes = [], networkFee = utils.ZERO_BIG_NUMBER } = options;
+    const { attributes = [], networkFee = utils.ZERO_BIG_NUMBER, systemFee = utils.ZERO_BIG_NUMBER } = options;
 
     const { from: fromIn } = options;
     let from = fromIn;
@@ -740,6 +742,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       from,
       attributes: attributes.concat([NEO_ONE_ATTRIBUTE]),
       networkFee,
+      systemFee,
       monitor: options.monitor,
     };
   }
@@ -950,7 +953,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly labels?: Labels;
     readonly sourceMaps?: Promise<SourceMaps>;
   }): Promise<TransactionResult<T, InvocationTransaction>> {
-    const { from, attributes: attributesIn, networkFee, monitor } = this.getTransactionOptions(options);
+    const { from, attributes: attributesIn, networkFee, systemFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
       async (span) => {
@@ -992,6 +995,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         }
 
         const gas = callReceipt.result.gasConsumed.integerValue(BigNumber.ROUND_UP);
+        if (gas.gt(utils.ZERO_BIG_NUMBER) && systemFee.lt(gas) && !systemFee.eq(utils.NEGATIVE_ONE_BIG_NUMBER)) {
+          throw new InsufficientSystemFeeError(systemFee, gas);
+        }
+
         const { inputs, outputs } = await this.getTransfersInputOutputs({
           transfers,
           from,

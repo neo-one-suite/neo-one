@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Block, Fit, Input, Label, styled } from 'reakit';
 import { FromStream } from '../FromStream';
-import { WithAutoConsensus } from './DeveloperToolsContext';
+import { WithAutoSystemFee } from './DeveloperToolsContext';
 import { Tooltip, TooltipArrow } from './Tooltip';
 
 const Wrapper = styled(Label)`
@@ -17,33 +17,33 @@ const StyledFit = styled(Fit)`
   cursor: pointer;
 `;
 
-export function AutoConsensusOption() {
+export function AutoSystemFeeOption() {
   return (
-    <WithAutoConsensus>
-      {({ autoConsensus$, toggle }) => (
-        <FromStream props$={autoConsensus$}>
-          {(autoConsensus) => (
+    <WithAutoSystemFee>
+      {({ autoSystemFee$, toggle }) => (
+        <FromStream props$={autoSystemFee$}>
+          {(autoSystemFee) => (
             <Block relative>
-              <Wrapper data-test="neo-one-auto-consensus-container">
-                Automatic Consensus
+              <Wrapper data-test="neo-one-auto-system-fee-container">
+                Automatic System Fee
                 <Input
-                  data-test="neo-one-auto-consensus-checkbox"
+                  data-test="neo-one-auto-system-fee-checkbox"
                   type="checkbox"
-                  checked={autoConsensus}
+                  checked={autoSystemFee}
                   onChange={() => {
                     // do nothing
                   }}
                 />
-                <Tooltip data-test="neo-one-auto-consensus-tooltip" placement="right">
+                <Tooltip data-test="neo-one-auto-system-fee-tooltip" placement="right">
                   <TooltipArrow />
-                  Automatically run consensus when a transaction is relayed.
+                  Automatically execute all transactions with the required system fee.
                 </Tooltip>
               </Wrapper>
-              <StyledFit data-test="neo-one-auto-consensus-click" onClick={toggle} />
+              <StyledFit data-test="neo-one-auto-system-fee-click" onClick={toggle} />
             </Block>
           )}
         </FromStream>
       )}
-    </WithAutoConsensus>
+    </WithAutoSystemFee>
   );
 }

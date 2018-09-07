@@ -300,9 +300,9 @@ export const assertAttribute = (name: string, attribute?: unknown): Attribute =>
   }
 };
 
-export const assertTransactionOptions = (name: string, options?: unknown): TransactionOptions | undefined => {
+export const assertTransactionOptions = (name: string, options?: unknown): TransactionOptions => {
   if (options == undefined) {
-    return undefined;
+    return {};
   }
 
   if (!isObject(options)) {
@@ -315,6 +315,7 @@ export const assertTransactionOptions = (name: string, options?: unknown): Trans
       assertAttribute('TransactionOption.attributes', value),
     ),
     networkFee: assertProperty(options, 'TransactionOptions', 'networkFee', assertNullableBigNumber),
+    systemFee: assertProperty(options, 'TransactionOptions', 'systemFee', assertNullableBigNumber),
     // tslint:disable-next-line no-any
     monitor: (options as any).monitor,
   };
