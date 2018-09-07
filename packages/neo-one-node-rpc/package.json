@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/node-rpc",
-  "version": "1.0.0-alpha.95",
+  "version": "1.0.0-alpha.96",
   "description": "NEO•ONE RPC server.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.75",
+    "@neo-one/client-core": "^1.0.0-alpha.76",
     "@neo-one/http": "^1.0.0-alpha.95",
     "@neo-one/monitor": "^1.0.0-alpha.59",
-    "@neo-one/node-core": "^1.0.0-alpha.76",
+    "@neo-one/node-core": "^1.0.0-alpha.77",
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.64",
     "@types/koa": "^2.0.46",

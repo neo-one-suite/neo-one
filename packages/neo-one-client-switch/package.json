@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/client-switch",
-  "version": "1.0.0-alpha.89",
+  "version": "1.0.0-alpha.90",
   "description": "NEO•ONE client library for browser/node differences.",
   "main": "./src/index.ts",
   "browser": "./src/index.browser.ts",
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
-    "@neo-one/client-core": "^1.0.0-alpha.75",
-    "@neo-one/node-vm": "^1.0.0-alpha.77",
+    "@neo-one/client-core": "^1.0.0-alpha.76",
+    "@neo-one/node-vm": "^1.0.0-alpha.78",
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.64",
     "@types/babel__code-frame": "^7.0.0",

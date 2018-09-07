@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/smart-contract-typescript-plugin",
-  "version": "1.0.0-alpha.15",
+  "version": "1.0.0-alpha.16",
   "description": "NEO•ONE TypeScript typescript plugin.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.58",
+    "@neo-one/smart-contract-compiler": "^1.0.0-alpha.59",
     "@neo-one/types": "^1.0.0-alpha.43",
     "typescript": "^3.0.3"
   }

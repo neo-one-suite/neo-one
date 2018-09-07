@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/node-core",
-  "version": "1.0.0-alpha.76",
+  "version": "1.0.0-alpha.77",
   "description": "NEO•ONE core node types.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.75",
+    "@neo-one/client-core": "^1.0.0-alpha.76",
     "@neo-one/monitor": "^1.0.0-alpha.59",
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.64",
