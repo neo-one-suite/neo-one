@@ -9,7 +9,12 @@ import { FromStream } from '../FromStream';
 import { ComponentProps } from '../types';
 import { Button } from './Button';
 import { DeveloperToolsContext, WithTokens } from './DeveloperToolsContext';
-import { getOptions$, makeValueOption, OptionType, WalletSelectorBase } from './WalletSelectorBase';
+import {
+  getWalletSelectorOptions$,
+  makeWalletSelectorValueOption,
+  WalletSelectorBase,
+  WalletSelectorOptionType,
+} from './WalletSelectorBase';
 import { WithAddError } from './WithAddError';
 
 const Wrapper = styled(Grid)`
@@ -17,7 +22,7 @@ const Wrapper = styled(Grid)`
   margin: 16px 0;
 `;
 
-export function WalletSelector(props: ComponentProps<Select<OptionType>>) {
+export function WalletSelector(props: ComponentProps<Select<WalletSelectorOptionType>>) {
   return (
     <WithAddError>
       {(addError) => (
@@ -29,9 +34,12 @@ export function WalletSelector(props: ComponentProps<Select<OptionType>>) {
                   props$={combineLatest(
                     client.currentAccount$.pipe(
                       distinctUntilChanged(),
-                      map((value) => (value === undefined ? value : makeValueOption({ userAccount: value }))),
+                      map(
+                        (value) =>
+                          value === undefined ? value : makeWalletSelectorValueOption({ userAccount: value }),
+                      ),
                     ),
-                    getOptions$(addError, client, tokens$),
+                    getWalletSelectorOptions$(addError, client, tokens$),
                   )}
                 >
                   {([value, options]) => {

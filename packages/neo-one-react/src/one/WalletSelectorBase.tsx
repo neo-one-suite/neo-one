@@ -87,7 +87,7 @@ export const makeOption = async ({
   };
 };
 
-export const makeValueOption = ({ userAccount }: { readonly userAccount: UserAccount }) => ({
+export const makeWalletSelectorValueOption = ({ userAccount }: { readonly userAccount: UserAccount }) => ({
   value: `${userAccount.id.network}:${userAccount.id.address}`,
   label: userAccount.name,
   address: userAccount.id.address,
@@ -95,9 +95,11 @@ export const makeValueOption = ({ userAccount }: { readonly userAccount: UserAcc
   userAccount,
 });
 
-export type OptionType = PromiseReturnType<typeof makeOption> | ReturnType<typeof makeValueOption>;
+export type WalletSelectorOptionType =
+  | PromiseReturnType<typeof makeOption>
+  | ReturnType<typeof makeWalletSelectorValueOption>;
 
-export const getOptions$ = (
+export const getWalletSelectorOptions$ = (
   addError: (error: Error) => void,
   client: Client,
   tokens$: Observable<ReadonlyArray<Token>>,
@@ -105,7 +107,7 @@ export const getOptions$ = (
   concat(
     client.accounts$.pipe(
       take(1),
-      map((userAccounts) => userAccounts.map((userAccount) => makeValueOption({ userAccount }))),
+      map((userAccounts) => userAccounts.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))),
     ),
     combineLatest(client.accounts$.pipe(distinctUntilChanged()), tokens$, client.block$).pipe(
       switchMap(async ([userAccounts, tokens]) =>
@@ -137,8 +139,8 @@ const AddressGrid = styled(Grid)`
 `;
 
 const createFormatOptionLabel = (isMulti?: boolean) => (
-  option: OptionType,
-  { context }: FormatOptionLabelMeta<OptionType>,
+  option: WalletSelectorOptionType,
+  { context }: FormatOptionLabelMeta<WalletSelectorOptionType>,
 ): React.ReactNode => {
   if (context === 'value') {
     return isMulti && option.label === option.address ? option.address.slice(0, 4) : option.label;
@@ -173,9 +175,11 @@ const formatOptionLabel = createFormatOptionLabel(false);
 
 const StyledSelector = styled(Selector)`
   width: 424px;
-` as React.ComponentType<{ readonly 'data-test': string } & ComponentProps<Select<OptionType>>>;
+` as React.ComponentType<{ readonly 'data-test': string } & ComponentProps<Select<WalletSelectorOptionType>>>;
 
-export function WalletSelectorBase(props: { readonly 'data-test': string } & ComponentProps<Select<OptionType>>) {
+export function WalletSelectorBase(
+  props: { readonly 'data-test': string } & ComponentProps<Select<WalletSelectorOptionType>>,
+) {
   return (
     <StyledSelector
       menuPlacement="bottom"

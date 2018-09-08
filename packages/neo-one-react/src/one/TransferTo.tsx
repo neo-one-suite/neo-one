@@ -4,7 +4,7 @@ import { FromStream } from '../FromStream';
 import { ComponentProps } from '../types';
 import { DeveloperToolsContext, WithTokens } from './DeveloperToolsContext';
 import { TransferContainer } from './TransferContainer';
-import { getOptions$, makeValueOption, WalletSelectorBase } from './WalletSelectorBase';
+import { getWalletSelectorOptions$, makeWalletSelectorValueOption, WalletSelectorBase } from './WalletSelectorBase';
 import { WithAddError } from './WithAddError';
 
 const Wrapper = styled(Base)`
@@ -29,7 +29,7 @@ export function TransferTo(props: ComponentProps<typeof StyledLabel>) {
           {(tokens$) => (
             <DeveloperToolsContext.Consumer>
               {({ client }) => {
-                const props$ = getOptions$(addError, client, tokens$);
+                const props$ = getWalletSelectorOptions$(addError, client, tokens$);
 
                 return (
                   <Wrapper>
@@ -43,7 +43,7 @@ export function TransferTo(props: ComponentProps<typeof StyledLabel>) {
                             {(options) => (
                               <WalletSelectorBase
                                 data-test="neo-one-transfer-to-selector"
-                                value={to.map((userAccount) => makeValueOption({ userAccount }))}
+                                value={to.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))}
                                 options={options}
                                 onChange={(option) => {
                                   if (option != undefined) {
