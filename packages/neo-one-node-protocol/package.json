@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/node-protocol",
-  "version": "1.0.0-alpha.102",
+  "version": "1.0.0-alpha.103",
   "description": "NEO•ONE NEO node and consensus protocol.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-alpha.76",
+    "@neo-one/client-core": "^1.0.0-alpha.77",
     "@neo-one/monitor": "^1.0.0-alpha.59",
-    "@neo-one/node-core": "^1.0.0-alpha.77",
-    "@neo-one/node-network": "^1.0.0-alpha.81",
+    "@neo-one/node-core": "^1.0.0-alpha.78",
+    "@neo-one/node-network": "^1.0.0-alpha.82",
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.64",
     "@reactivex/ix-es2015-cjs": "^2.3.5",

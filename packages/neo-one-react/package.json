@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/react",
-  "version": "1.0.0-alpha.16",
+  "version": "1.0.0-alpha.17",
   "description": "NEO•ONE React utilities.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.100",
+    "@neo-one/client": "^1.0.0-alpha.101",
     "@neo-one/server-http-client": "^1.0.0-alpha.75",
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.64",
