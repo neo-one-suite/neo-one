@@ -65,29 +65,107 @@ exports[`ContractInfoProcessor abstract smart contracts 1`] = `
 "
 `;
 
-exports[`ContractInfoProcessor invalid property function not readonly 1`] = `
-"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+exports[`ContractInfoProcessor invalid @claim method with ForwardValue 1`] = `
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
 
-      13 | };
-      14 | 
-    > 15 |         private foo = () => {
-         |         ^
-      16 |           // do nothing
+      13 | 
+      14 |         @claim
+    > 15 |         public foo(value: ForwardValue): boolean {
+         |                    ^
+      16 |           return true;
       17 |         }
       18 |       }
 "
 `;
 
-exports[`ContractInfoProcessor invalid property function set in constructor 1`] = `
-"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+exports[`ContractInfoProcessor invalid @claim method with ForwardedValue 1`] = `
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
 
-      13 | };
-      14 | 
-    > 15 |         private readonly foo: () => void;
+      13 | 
+      14 |         @claim
+    > 15 |         public foo(value: ForwardedValue<number>): boolean {
+         |                    ^
+      16 |           return true;
+      17 |         }
+      18 |       }
+"
+`;
+
+exports[`ContractInfoProcessor invalid @receive method with ForwardValue 1`] = `
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
+
+      13 | 
+      14 |         @receive
+    > 15 |         public foo(value: ForwardValue): boolean {
+         |                    ^
+      16 |           return true;
+      17 |         }
+      18 |       }
+"
+`;
+
+exports[`ContractInfoProcessor invalid @receive method with ForwardedValue 1`] = `
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
+
+      13 | 
+      14 |         @receive
+    > 15 |         public foo(value: ForwardedValue<number>): boolean {
+         |                    ^
+      16 |           return true;
+      17 |         }
+      18 |       }
+"
+`;
+
+exports[`ContractInfoProcessor invalid @send method with ForwardValue 1`] = `
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
+
+      13 | 
+      14 |         @send
+    > 15 |         public foo(value: ForwardValue): boolean {
+         |                    ^
+      16 |           return true;
+      17 |         }
+      18 |       }
+"
+`;
+
+exports[`ContractInfoProcessor invalid @send method with ForwardedValue 1`] = `
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
+
+      13 | 
+      14 |         @send
+    > 15 |         public foo(value: ForwardedValue<number>): boolean {
+         |                    ^
+      16 |           return true;
+      17 |         }
+      18 |       }
+"
+`;
+
+exports[`ContractInfoProcessor invalid property function not readonly 1`] = `
+"snippetCode.ts (13,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+
+      11 | };
+      12 | 
+    > 13 |         private foo = () => {
          |         ^
-      16 | 
-      17 |         public constructor() {
-      18 |           super();
+      14 |           // do nothing
+      15 |         }
+      16 |       }
+"
+`;
+
+exports[`ContractInfoProcessor invalid property function set in constructor 1`] = `
+"snippetCode.ts (13,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+
+      11 | };
+      12 | 
+    > 13 |         private readonly foo: () => void;
+         |         ^
+      14 | 
+      15 |         public constructor() {
+      16 |           super();
 "
 `;
 

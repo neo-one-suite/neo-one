@@ -1,4 +1,4 @@
-/* @hash 4aed8d8214d2c12587200a9fc15e09a0 */
+/* @hash 61ce3fad2b95a91935671fee4e9fb3eb */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -36,7 +36,7 @@ export const createClient = <
 ): Client<TUserAccountProviders> => {
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [];
   if (process.env.NODE_ENV !== 'production') {
-    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 11838 }));
+    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 29093 }));
   }
   const provider = new NEOONEProvider(providers);
 
@@ -116,9 +116,9 @@ export const createClient = <
 };
 
 export const createDeveloperClients = (): { [network: string]: DeveloperClient } => ({
-  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 11838 })),
+  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 29093 })),
 });
 
 export const createOneClients = (): { [network: string]: OneClient } => ({
-  local: new OneClient(11838),
+  local: new OneClient(29093),
 });

@@ -3,7 +3,7 @@ import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { STRUCTURED_STORAGE_TYPES, StructuredStorageType } from '../compile/constants';
-import { isOnlyBoolean } from '../compile/helper/types';
+import { hasForwardValue, isOnlyBoolean } from '../compile/helper/types';
 import {
   BUILTIN_PROPERTIES,
   ContractPropertyName,
@@ -443,6 +443,33 @@ export class ContractInfoProcessor {
         );
 
         return undefined;
+      }
+
+      if (requiresBoolean && callSignatures.length >= 1) {
+        const signatureTypes = this.context.analysis.extractSignatureTypes(decl, callSignatures[0]);
+        if (signatureTypes !== undefined) {
+          const invalidParams = signatureTypes.paramDecls.filter((param) => {
+            const paramType = signatureTypes.paramTypes.get(param);
+
+            return (
+              paramType !== undefined &&
+              (hasForwardValue(this.context, param, paramType) ||
+                tsUtils.type_.hasType(paramType, (tpe) => this.context.builtins.isType(param, tpe, 'ForwardedValue')))
+            );
+          });
+
+          invalidParams.forEach((param) => {
+            this.context.reportError(
+              param,
+              DiagnosticCode.InvalidContractType,
+              DiagnosticMessage.InvalidContractTypeForwardNative,
+            );
+          });
+
+          if (invalidParams.length > 0) {
+            return undefined;
+          }
+        }
       }
 
       return {

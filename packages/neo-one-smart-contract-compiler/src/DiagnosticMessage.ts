@@ -31,6 +31,7 @@ export enum DiagnosticMessage {
   InvalidContractAbstract = 'Cannot compile abstract SmartContract.',
   InvalidContractNew = 'Cannot construct a SmartContract',
   InvalidContractMethodNativeReturn = 'SmartContract methods marked with @send, @receive or @claim must return a boolean.',
+  InvalidContractTypeForwardNative = 'Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.',
   SyscallReturnTypeExplicitCast = 'Syscall return type must be explicitly casted to expected type.',
   UnknownReference = 'Unknown reference %s',
   UnknownModule = 'Unknown module %s',

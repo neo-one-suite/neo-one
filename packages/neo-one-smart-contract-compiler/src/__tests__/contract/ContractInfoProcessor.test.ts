@@ -485,8 +485,6 @@ describe('ContractInfoProcessor', () => {
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
-      class Foo {}
-
       export class TestSmartContract extends SmartContract {
         ${properties}
         private foo = () => {
@@ -503,8 +501,6 @@ describe('ContractInfoProcessor', () => {
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
-      class Foo {}
-
       export class TestSmartContract extends SmartContract {
         ${properties}
         private readonly foo: () => void;
@@ -518,6 +514,114 @@ describe('ContractInfoProcessor', () => {
       }
     `,
       { type: 'error', code: DiagnosticCode.InvalidContractStorageType },
+    );
+  });
+
+  test('invalid @send method with ForwardValue', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, ForwardValue, send } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+
+        @send
+        public foo(value: ForwardValue): boolean {
+          return true;
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractType },
+    );
+  });
+
+  test('invalid @receive method with ForwardValue', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, ForwardValue, receive } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+
+        @receive
+        public foo(value: ForwardValue): boolean {
+          return true;
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractType },
+    );
+  });
+
+  test('invalid @claim method with ForwardValue', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, ForwardValue, claim } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+
+        @claim
+        public foo(value: ForwardValue): boolean {
+          return true;
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractType },
+    );
+  });
+
+  test('invalid @send method with ForwardedValue', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, ForwardedValue, send } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+
+        @send
+        public foo(value: ForwardedValue<number>): boolean {
+          return true;
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractType },
+    );
+  });
+
+  test('invalid @receive method with ForwardedValue', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, ForwardedValue, receive } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+
+        @receive
+        public foo(value: ForwardedValue<number>): boolean {
+          return true;
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractType },
+    );
+  });
+
+  test('invalid @claim method with ForwardedValue', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, ForwardedValue, claim } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+
+        @claim
+        public foo(value: ForwardedValue<number>): boolean {
+          return true;
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractType },
     );
   });
 });
