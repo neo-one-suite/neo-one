@@ -11,12 +11,13 @@ import {
   BufferABI,
   BufferString,
   ContractParameter,
+  ForwardValueABI,
   Hash256ABI,
   Hash256String,
   IntegerABI,
-  Param,
   PublicKeyABI,
   PublicKeyString,
+  Return,
   SignatureABI,
   SignatureString,
   StringABI,
@@ -171,7 +172,7 @@ const toSignature = (contractParameter: ContractParameter): SignatureString => {
   throw new InvalidContractParameterError(contractParameter, ['Signature']);
 };
 
-const toArray = (contractParameter: ContractParameter, parameter: ArrayABI): ReadonlyArray<Param | undefined> => {
+const toArray = (contractParameter: ContractParameter, parameter: ArrayABI): ReadonlyArray<Return | undefined> => {
   if (contractParameter.type !== 'Array') {
     throw new InvalidContractParameterError(contractParameter, ['Array']);
   }
@@ -186,6 +187,8 @@ const toArray = (contractParameter: ContractParameter, parameter: ArrayABI): Rea
 const toInteropInterface = (_contractParameter: ContractParameter): undefined => undefined;
 
 const toVoid = (_contractParameter: ContractParameter): undefined => undefined;
+
+const toForwardValue = (contractParameter: ContractParameter): ContractParameter => contractParameter;
 
 function wrapNullable<Result>(
   func: (contractParameter: ContractParameter) => Result,
@@ -247,33 +250,36 @@ const toBufferNullable = wrapNullable(toBuffer) as (param: ContractParameter) =>
 const toArrayNullable = wrapNullableABI(toArray) as (
   param: ContractParameter,
   abi: ArrayABI,
-) => ReadonlyArray<Param | undefined> | undefined;
+) => ReadonlyArray<Return | undefined> | undefined;
 const toInteropInterfaceNullable = wrapNullable(toInteropInterface) as (
   param: ContractParameter,
 ) => undefined | undefined;
 const toVoidNullable = wrapNullable(toVoid) as (param: ContractParameter) => undefined | undefined;
+const toForwardValueNullable = wrapNullable(toForwardValue) as (param: ContractParameter) => undefined | undefined;
 
 export const contractParameters = {
-  String: (contractParameter: ContractParameter, parameter: StringABI): Param | undefined =>
+  String: (contractParameter: ContractParameter, parameter: StringABI): Return | undefined =>
     parameter.optional ? toStringNullable(contractParameter) : toString(contractParameter),
-  Address: (contractParameter: ContractParameter, parameter: AddressABI): Param | undefined =>
+  Address: (contractParameter: ContractParameter, parameter: AddressABI): Return | undefined =>
     parameter.optional ? toAddressNullable(contractParameter) : toAddress(contractParameter),
-  Hash256: (contractParameter: ContractParameter, parameter: Hash256ABI): Param | undefined =>
+  Hash256: (contractParameter: ContractParameter, parameter: Hash256ABI): Return | undefined =>
     parameter.optional ? toHash256Nullable(contractParameter) : toHash256(contractParameter),
-  PublicKey: (contractParameter: ContractParameter, parameter: PublicKeyABI): Param | undefined =>
+  PublicKey: (contractParameter: ContractParameter, parameter: PublicKeyABI): Return | undefined =>
     parameter.optional ? toPublicKeyNullable(contractParameter) : toPublicKey(contractParameter),
-  Integer: (contractParameter: ContractParameter, parameter: IntegerABI): Param | undefined =>
+  Integer: (contractParameter: ContractParameter, parameter: IntegerABI): Return | undefined =>
     parameter.optional ? toIntegerNullable(contractParameter, parameter) : toInteger(contractParameter, parameter),
-  Boolean: (contractParameter: ContractParameter, parameter: BooleanABI): Param | undefined =>
+  Boolean: (contractParameter: ContractParameter, parameter: BooleanABI): Return | undefined =>
     parameter.optional ? toBooleanNullable(contractParameter) : toBoolean(contractParameter),
-  Signature: (contractParameter: ContractParameter, parameter: SignatureABI): Param | undefined =>
+  Signature: (contractParameter: ContractParameter, parameter: SignatureABI): Return | undefined =>
     parameter.optional ? toSignatureNullable(contractParameter) : toSignature(contractParameter),
-  Buffer: (contractParameter: ContractParameter, parameter: BufferABI): Param | undefined =>
+  Buffer: (contractParameter: ContractParameter, parameter: BufferABI): Return | undefined =>
     parameter.optional ? toBufferNullable(contractParameter) : toBuffer(contractParameter),
-  Array: (contractParameter: ContractParameter, parameter: ArrayABI): Param | undefined =>
+  Array: (contractParameter: ContractParameter, parameter: ArrayABI): Return | undefined =>
     parameter.optional ? toArrayNullable(contractParameter, parameter) : toArray(contractParameter, parameter),
-  Void: (contractParameter: ContractParameter, parameter: VoidABI): Param | undefined =>
+  Void: (contractParameter: ContractParameter, parameter: VoidABI): Return | undefined =>
     parameter.optional ? toVoidNullable(contractParameter) : toVoid(contractParameter),
+  ForwardValue: (contractParameter: ContractParameter, parameter: ForwardValueABI): Return | undefined =>
+    parameter.optional ? toForwardValueNullable(contractParameter) : toForwardValue(contractParameter),
 };
 
 export const converters = {
@@ -299,4 +305,6 @@ export const converters = {
   toInteropInterfaceNullable,
   toVoid,
   toVoidNullable,
+  toForwardValue,
+  toForwardValueNullable,
 };

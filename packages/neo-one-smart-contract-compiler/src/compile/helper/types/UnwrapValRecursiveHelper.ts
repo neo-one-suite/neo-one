@@ -38,16 +38,13 @@ export class UnwrapValRecursiveHelper extends Helper {
             innerOptions,
             sb.helpers.arrMap({
               map: (innerInnerOptions) => {
-                sb.emitHelper(
-                  node,
-                  innerInnerOptions,
-                  sb.helpers.unwrapValRecursive({
-                    type:
-                      this.type === undefined
-                        ? undefined
-                        : sb.context.analysis.getNotAnyType(node, tsUtils.type_.getArrayTypeOrThrow(this.type)),
-                  }),
-                );
+                let arrayType: ts.Type | undefined;
+                if (this.type !== undefined) {
+                  const localArrayType = tsUtils.type_.getArrayType(this.type);
+                  arrayType =
+                    localArrayType === undefined ? undefined : sb.context.analysis.getNotAnyType(node, localArrayType);
+                }
+                sb.emitHelper(node, innerInnerOptions, sb.helpers.unwrapValRecursive({ type: arrayType }));
               },
             }),
           );
@@ -101,6 +98,9 @@ export class UnwrapValRecursiveHelper extends Helper {
         error: (innerOptions) => {
           sb.emitOp(node, 'DROP');
           sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        },
+        forwardValue: (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.unwrapForwardValue);
         },
         iteratorResult: (innerOptions) => {
           sb.emitOp(node, 'DROP');

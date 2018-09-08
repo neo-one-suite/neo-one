@@ -178,8 +178,8 @@
   },
   "one": {
     "paths": {
-      "contracts": "./packages/neo-one-playground/one/contracts",
-      "generated": "./packages/neo-one-playground/one/generated"
+      "contracts": "./packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts",
+      "generated": "./packages/neo-one-server-plugin-project/src/__data__/ico/one/generated"
     }
   }
 }

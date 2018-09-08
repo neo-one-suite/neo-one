@@ -264,7 +264,7 @@ const testContract = async ({
   expect(contract.author).toEqual('dicarlo2');
   expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
   expect(contract.description).toEqual(`The ${name}`);
-  expect(contract.dynamicInvoke).toBeFalsy();
+  expect(contract.dynamicInvoke).toBeTruthy();
   expect(contract.payable).toBeFalsy();
   expect(contract.storage).toBeTruthy();
 };

@@ -192,6 +192,7 @@ export class ToStringHelper extends TypedHelper {
           set: convertEmptyString,
           setStorage: convertEmptyString,
           error: convertEmptyString,
+          forwardValue: convertEmptyString,
           iteratorResult: convertEmptyString,
           iterable: convertEmptyString,
           iterableIterator: convertEmptyString,

@@ -44,23 +44,31 @@ class CreateEventNotifier extends BuiltinCall {
         body: (innerOptionsIn) => {
           const innerOptions = sb.pushValueOptions(innerOptionsIn);
 
-          // [...params]
+          // [params]
           sb.emitHelper(
             node,
             innerOptions,
             sb.helpers.parameters({
               params: paramDecls,
-              onStack: true,
-              map: (param, innerInnerOptions) => {
+              asArgsArr: true,
+              map: (param, innerInnerOptions, isRestElement) => {
+                let tpe = paramTypes.get(param);
+                if (type !== undefined && isRestElement) {
+                  tpe = tsUtils.type_.getArrayType(type);
+                }
                 // [value]
-                sb.emitHelper(node, innerInnerOptions, sb.helpers.unwrapValRecursive({ type: paramTypes.get(param) }));
+                sb.emitHelper(node, innerInnerOptions, sb.helpers.unwrapValRecursive({ type: tpe }));
               },
             }),
           );
-          // [eventName, ...params]
+          // [length, ...params]
+          sb.emitOp(node, 'UNPACK');
+          // [eventName, length, ...params]
           sb.emitPushString(node, eventName);
-          // [number, eventName, ...params]
-          sb.emitPushInt(node, paramDecls.length + 1);
+          // [length, eventName, ...params]
+          sb.emitOp(node, 'SWAP');
+          // [length, eventName, ...params]
+          sb.emitOp(node, 'INC');
           // [arr]
           sb.emitOp(node, 'PACK');
           // []

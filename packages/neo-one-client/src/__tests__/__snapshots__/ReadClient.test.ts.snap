@@ -158,19 +158,24 @@ Object {
           "parameters": Array [
             Object {
               "default": undefined,
+              "forwardedValue": undefined,
               "name": "from",
               "optional": true,
+              "rest": undefined,
               "type": "Address",
             },
             Object {
               "default": undefined,
+              "forwardedValue": undefined,
               "name": "to",
               "optional": true,
+              "rest": undefined,
               "type": "Address",
             },
             Object {
               "decimals": 8,
               "default": undefined,
+              "forwardedValue": undefined,
               "name": "amount",
               "optional": undefined,
               "type": "Integer",
@@ -186,6 +191,7 @@ Object {
           "parameters": Array [],
           "receive": undefined,
           "returnType": Object {
+            "forwardedValue": undefined,
             "optional": undefined,
             "type": "String",
           },
@@ -198,6 +204,7 @@ Object {
           "parameters": Array [],
           "receive": undefined,
           "returnType": Object {
+            "forwardedValue": undefined,
             "optional": undefined,
             "type": "String",
           },
@@ -211,6 +218,7 @@ Object {
           "receive": undefined,
           "returnType": Object {
             "decimals": 0,
+            "forwardedValue": undefined,
             "optional": undefined,
             "type": "Integer",
           },
@@ -224,6 +232,7 @@ Object {
           "receive": undefined,
           "returnType": Object {
             "decimals": 8,
+            "forwardedValue": undefined,
             "optional": undefined,
             "type": "Integer",
           },
@@ -236,19 +245,24 @@ Object {
           "parameters": Array [
             Object {
               "default": undefined,
+              "forwardedValue": undefined,
               "name": "from",
               "optional": undefined,
+              "rest": undefined,
               "type": "Address",
             },
             Object {
               "default": undefined,
+              "forwardedValue": undefined,
               "name": "to",
               "optional": undefined,
+              "rest": undefined,
               "type": "Address",
             },
             Object {
               "decimals": 8,
               "default": undefined,
+              "forwardedValue": undefined,
               "name": "value",
               "optional": undefined,
               "type": "Integer",
@@ -256,6 +270,7 @@ Object {
           ],
           "receive": undefined,
           "returnType": Object {
+            "forwardedValue": undefined,
             "optional": undefined,
             "type": "Boolean",
           },
@@ -268,14 +283,17 @@ Object {
           "parameters": Array [
             Object {
               "default": undefined,
+              "forwardedValue": undefined,
               "name": "account",
               "optional": undefined,
+              "rest": undefined,
               "type": "Address",
             },
           ],
           "receive": undefined,
           "returnType": Object {
             "decimals": 8,
+            "forwardedValue": undefined,
             "optional": undefined,
             "type": "Integer",
           },

@@ -70,6 +70,7 @@ export class ArrayConcat extends BuiltinInstanceMemberCall {
           set: handleOther,
           setStorage: handleOther,
           error: handleOther,
+          forwardValue: handleOther,
           iteratorResult: handleOther,
           iterable: handleOther,
           iterableIterator: handleOther,

@@ -10,6 +10,7 @@ import {
   ContractParameterType as CoreContractParameterType,
   ContractTransaction as CoreContractTransaction,
   crypto,
+  ForwardValue,
   getContractProperties,
   Input as InputModel,
   InvocationTransaction as CoreInvocationTransaction,
@@ -1659,6 +1660,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
     if (BigNumber.isBigNumber(param) || param instanceof BigNumber) {
       return param.toString();
+    }
+
+    if (typeof param === 'object') {
+      return this.paramToJSON((param as ForwardValue).param);
     }
 
     return param;

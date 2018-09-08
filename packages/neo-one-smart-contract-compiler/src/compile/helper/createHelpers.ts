@@ -25,6 +25,7 @@ import {
   ExtendArrHelper,
 } from './arr';
 import { ArrayBindingHelper, ArrayBindingHelperOptions, ObjectBindingHelper, ObjectBindingHelperOptions } from './bind';
+import { BufferSliceHelper, BufferSliceHelperOptions } from './buffer';
 import { GetCachedValueHelper, GetCachedValueHelperOptions, GetCacheHelper } from './cache';
 import { CreateClassHelper, CreateClassHelperOptions } from './class';
 import {
@@ -262,6 +263,7 @@ import {
   ForTypeHelper,
   ForTypeHelperOptions,
   GetArrayIndexHelper,
+  GetBufferIndexHelper,
   GetInternalObjectHelper,
   GetInternalObjectPropertyHelper,
   GetObjectHelper,
@@ -282,6 +284,7 @@ import {
   IsBooleanHelper,
   IsBufferHelper,
   IsErrorHelper,
+  IsForwardValueHelper,
   IsInputHelper,
   IsIterableHelper,
   IsIterableIteratorHelper,
@@ -329,6 +332,7 @@ import {
   UnwrapBooleanHelper,
   UnwrapBufferHelper,
   UnwrapErrorHelper,
+  UnwrapForwardValueHelper,
   UnwrapInputHelper,
   UnwrapIterableIteratorHelper,
   UnwrapIteratorResultHelper,
@@ -354,6 +358,7 @@ import {
   WrapBooleanHelper,
   WrapBufferHelper,
   WrapErrorHelper,
+  WrapForwardValueHelper,
   WrapInputHelper,
   WrapIterableIteratorHelper,
   WrapIteratorResultHelper,
@@ -413,6 +418,9 @@ export interface Helpers {
   // bind
   readonly arrayBinding: (options: ArrayBindingHelperOptions) => ArrayBindingHelper;
   readonly objectBinding: (options: ObjectBindingHelperOptions) => ObjectBindingHelper;
+
+  // buffer
+  readonly bufferSlice: (options: BufferSliceHelperOptions) => BufferSliceHelper;
 
   // block
   readonly isBlock: IsBlockHelper;
@@ -701,6 +709,7 @@ export interface Helpers {
   // types/buffer
   readonly bufferLength: BufferLengthHelper;
   readonly concatBuffer: ConcatBufferHelper;
+  readonly getBufferIndex: GetBufferIndexHelper;
   readonly createBuffer: WrapBufferHelper;
   readonly isBuffer: IsBufferHelper;
   readonly unwrapBuffer: UnwrapBufferHelper;
@@ -710,6 +719,11 @@ export interface Helpers {
   readonly wrapError: WrapErrorHelper;
   readonly unwrapError: UnwrapErrorHelper;
   readonly isError: IsErrorHelper;
+
+  // types/forwardValue
+  readonly wrapForwardValue: WrapForwardValueHelper;
+  readonly unwrapForwardValue: UnwrapForwardValueHelper;
+  readonly isForwardValue: IsForwardValueHelper;
 
   // types/input
   readonly wrapInput: WrapInputHelper;
@@ -821,6 +835,9 @@ export const createHelpers = (): Helpers => {
     // bind
     arrayBinding: (options) => new ArrayBindingHelper(options),
     objectBinding: (options) => new ObjectBindingHelper(options),
+
+    // buffer
+    bufferSlice: (options) => new BufferSliceHelper(options),
 
     // block
     isBlock: new IsBlockHelper(),
@@ -1072,6 +1089,7 @@ export const createHelpers = (): Helpers => {
     // types/buffer
     bufferLength: new BufferLengthHelper(),
     concatBuffer: new ConcatBufferHelper(),
+    getBufferIndex: new GetBufferIndexHelper(),
     createBuffer: new WrapBufferHelper(),
     isBuffer: new IsBufferHelper(),
     unwrapBuffer: new UnwrapBufferHelper(),
@@ -1081,6 +1099,11 @@ export const createHelpers = (): Helpers => {
     wrapError: new WrapErrorHelper(),
     unwrapError: new UnwrapErrorHelper(),
     isError: new IsErrorHelper(),
+
+    // types/forwardValue
+    wrapForwardValue: new WrapForwardValueHelper(),
+    unwrapForwardValue: new UnwrapForwardValueHelper(),
+    isForwardValue: new IsForwardValueHelper(),
 
     // types/input
     wrapInput: new WrapInputHelper(),

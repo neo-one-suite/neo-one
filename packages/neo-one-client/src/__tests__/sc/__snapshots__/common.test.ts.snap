@@ -2,8 +2,6 @@
 
 exports[`common convertAction - missing args event 1`] = `"Notification had no arguments"`;
 
-exports[`common convertAction - unknown event 1`] = `"Unknown event something-transfer"`;
-
 exports[`common convertCallResult - error 1`] = `[Error [INVOCATION_CALL]: Failure!]`;
 
 exports[`common convertParams - missing param 1`] = `"Expected 2 parameters, found 1."`;

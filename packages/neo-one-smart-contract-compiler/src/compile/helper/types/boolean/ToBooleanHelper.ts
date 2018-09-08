@@ -63,6 +63,7 @@ export class ToBooleanHelper extends TypedHelper {
         set: convertOther,
         setStorage: convertOther,
         error: convertOther,
+        forwardValue: convertOther,
         iteratorResult: convertOther,
         iterable: convertOther,
         iterableIterator: convertOther,

@@ -1,4 +1,4 @@
-/* @hash a8a7001e0532d7acbf3a0666fbf80799 */
+/* @hash 816917fb6584e4ed8ab33801bbd6d200 */
 // tslint:disable
 /* eslint-disable */
 import { TestOptions, withContracts as withContractsBase, WithContractsOptions } from '@neo-one/smart-contract-test';
@@ -11,6 +11,7 @@ export const withContracts = async (
 ): Promise<void> =>
   withContractsBase<Contracts>(
     [
+      { name: 'Escrow', filePath: path.resolve(__dirname, '../contracts/Escrow.ts') },
       { name: 'Token', filePath: path.resolve(__dirname, '../contracts/Token.ts') },
       { name: 'ICO', filePath: path.resolve(__dirname, '../contracts/ICO.ts') },
     ],

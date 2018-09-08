@@ -71,23 +71,23 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
       paramTypes: Map<ts.ParameterDeclaration, ts.Type | undefined>,
       innerOptions: VisitOptions,
     ) => {
-      // [...params]
+      // [params]
       sb.emitHelper(
         prop,
         innerOptions,
         sb.helpers.parameters({
           params: paramDecls,
-          onStack: true,
-          map: (param, innerInnerOptions) => {
+          asArgsArr: true,
+          map: (param, innerInnerOptions, isRestElement) => {
+            let type = paramTypes.get(param);
+            if (type !== undefined && isRestElement) {
+              type = tsUtils.type_.getArrayType(type);
+            }
             // [value]
-            sb.emitHelper(param, innerInnerOptions, sb.helpers.unwrapValRecursive({ type: paramTypes.get(param) }));
+            sb.emitHelper(param, innerInnerOptions, sb.helpers.unwrapValRecursive({ type }));
           },
         }),
       );
-      // [length, ...params]
-      sb.emitPushInt(prop, paramDecls.length);
-      // [params]
-      sb.emitOp(prop, 'PACK');
     };
 
     const addressName = sb.scope.addUnique();

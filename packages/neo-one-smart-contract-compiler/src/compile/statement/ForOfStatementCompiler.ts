@@ -222,6 +222,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
         set: handleSet,
         setStorage: handleSetStorage,
         error: handleOther,
+        forwardValue: handleOther,
         iteratorResult: handleOther,
         iterable: handleIterable,
         iterableIterator: handleIterableIterator,

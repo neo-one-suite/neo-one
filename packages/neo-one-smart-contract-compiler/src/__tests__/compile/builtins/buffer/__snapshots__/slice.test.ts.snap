@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Buffer.prototype.slice cannot be referenced 1`] = `
+"snippetCode.ts (3,19): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       const x = Buffer.from('01020304', 'hex');
+    > 3 |       const y = x.slice;
+        |                   ^
+      4 |     
+"
+`;

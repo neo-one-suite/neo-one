@@ -113,6 +113,13 @@ interface Buffer {
   readonly equals: (otherBuffer: Buffer) => boolean;
   readonly toString: (encoding: 'utf8') => string;
   readonly toInteger: () => number;
+  /**
+   * Returns a section of a buffer.
+   * @param start The beginning of the specified portion of the buffer.
+   * @param end The end of the specified portion of the buffer.
+   */
+  readonly slice: (start?: number, end?: number) => Buffer;
+  readonly [n: number]: number;
   readonly [one0]: unique symbol;
 }
 interface BufferConstructor {

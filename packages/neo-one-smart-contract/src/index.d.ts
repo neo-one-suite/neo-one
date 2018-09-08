@@ -1008,30 +1008,6 @@ export interface DeployConstructor {
  */
 export const Deploy: DeployConstructor;
 
-export interface SmartContractValueArray extends Array<SmartContractValue> {}
-type SmartContractValue =
-  | void
-  | null
-  | undefined
-  | number
-  | Fixed<any>
-  | string
-  | boolean
-  | Buffer
-  | Address
-  | Hash256
-  | PublicKey
-  | SmartContractValueArray;
-type Parameters<T extends Function> = T extends (...args: infer U) => any ? U : never;
-type ReturnType<T extends Function> = T extends (...args: any[]) => infer R ? R : never;
-type IsValidSmartContract<T> = {
-  [K in keyof T]: T[K] extends Function
-    ? Parameters<T[K]> extends SmartContractValue[]
-      ? ReturnType<T[K]> extends SmartContractValue ? T[K] : never
-      : never
-    : T[K] extends SmartContractValue ? T[K] : never
-};
-
 export function createEventNotifier(name: string): () => void;
 export function createEventNotifier<A0>(name: string, arg0Name: string): (arg0: A0) => void;
 export function createEventNotifier<A0, A1>(
@@ -1095,6 +1071,60 @@ export interface ContractProperties {
   readonly email: string;
   readonly description: string;
 }
+
+export interface ForwardValue {
+  readonly asString: () => string;
+  readonly asStringNullable: () => string | undefined;
+  readonly asNumber: () => number;
+  readonly asNumberNullable: () => number | undefined;
+  readonly asBoolean: () => boolean;
+  readonly asBuffer: () => Buffer;
+  readonly asBufferNullable: () => Buffer | undefined;
+  readonly asAddress: () => Address;
+  readonly asAddressNullable: () => Address | undefined;
+  readonly asHash256: () => Hash256;
+  readonly asHash256Nullable: () => Hash256 | undefined;
+  readonly asPublicKey: () => PublicKey;
+  readonly asPublicKeyNullable: () => PublicKey | undefined;
+  readonly asArray: () => Array<ForwardValue>;
+  readonly asArrayNullable: () => Array<ForwardValue> | undefined;
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+export interface ForwardValueConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+export const ForwardValue: ForwardValueConstructor;
+
+interface ForwardedValueTag<T extends SmartContractValue> {}
+/**
+ * Marks a parameter or return type of a public `SmartContract` method as expecting a forwarded value.
+ */
+export type ForwardedValue<T extends SmartContractValue> = T | (T & ForwardedValueTag<T>);
+
+interface SmartContractValueArray extends Array<SmartContractValue> {}
+interface SmartContractValueReadonlyArray extends ReadonlyArray<SmartContractValue> {}
+type SmartContractValue =
+  | void
+  | null
+  | undefined
+  | number
+  | Fixed<any>
+  | string
+  | boolean
+  | Buffer
+  | Address
+  | Hash256
+  | PublicKey
+  | SmartContractValueArray
+  | SmartContractValueReadonlyArray;
+type SmartContractArg = SmartContractValue | ForwardValue;
+type Parameters<T extends Function> = T extends (...args: infer U) => any ? U : never;
+type ReturnType<T extends Function> = T extends (...args: any[]) => infer R ? R : never;
+type IsValidSmartContract<T> = {
+  [K in keyof T]: T[K] extends Function
+    ? Parameters<T[K]> extends SmartContractArg[] ? (ReturnType<T[K]> extends SmartContractArg ? T[K] : never) : never
+    : T[K] extends SmartContractValue ? T[K] : never
+};
 
 /**
  * Marks a class as a `SmartContract`.

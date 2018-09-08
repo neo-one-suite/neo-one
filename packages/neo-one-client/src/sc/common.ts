@@ -1,10 +1,18 @@
-import { contractParameters, converters, ScriptBuilderParam } from '@neo-one/client-core';
+import {
+  contractParameters,
+  converters,
+  createForwardedValueFuncArgsName,
+  createForwardedValueFuncReturnName,
+  ForwardValue,
+  ScriptBuilderParam,
+} from '@neo-one/client-core';
 import { processActionsAndMessage, processConsoleLogMessages } from '@neo-one/client-switch';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { InvalidContractArgumentCountError, InvalidEventError, InvocationCallError, NoAccountError } from '../errors';
 import {
   ABIEvent,
+  ABIFunction,
   ABIParameter,
   ABIReturn,
   Action,
@@ -12,21 +20,78 @@ import {
   ContractParameter,
   EventParameters,
   InvocationResult,
+  InvokeReceipt,
   Param,
   RawAction,
   RawInvocationResult,
+  Return,
   SourceMaps,
 } from '../types';
 import { params as paramCheckers } from './params';
 
-export const convertParameter = ({
+export const convertContractParameter = ({
   type,
   parameter,
 }: {
   readonly type: ABIParameter | ABIReturn;
   readonly parameter: ContractParameter;
   // tslint:disable-next-line no-any
-}): Param | undefined => (contractParameters[type.type] as any)(parameter, type);
+}): Return | undefined => (contractParameters[type.type] as any)(parameter, type);
+
+export const getForwardValues = ({
+  parameters,
+  args,
+}: {
+  readonly parameters: ReadonlyArray<ABIParameter>;
+  // tslint:disable-next-line no-any
+  readonly args: ReadonlyArray<any>;
+}): ReadonlyArray<ForwardValue> => {
+  const params = args;
+
+  const { converted, zipped } = convertParams({
+    params,
+    parameters,
+    senderAddress: undefined,
+  });
+
+  return utils.zip(zipped, converted).map(
+    ([[name, param], convertedParam]) =>
+      ({
+        name,
+        param,
+        converted: convertedParam,
+        // tslint:disable-next-line no-any
+      } as any),
+  );
+};
+
+// tslint:disable-next-line no-any readonly-array
+const createForwardValueArgs = (parameters: ReadonlyArray<ABIParameter>) => (...args: any[]) =>
+  getForwardValues({ parameters, args });
+
+// tslint:disable-next-line no-any
+const isInvokeReceipt = (value: any): value is InvokeReceipt<ContractParameter> => value.result !== undefined;
+
+const createForwardValueReturn = (returnType: ABIReturn) => (
+  receiptOrValue: InvokeReceipt<ContractParameter> | ContractParameter,
+  // tslint:disable-next-line no-any
+): any => {
+  if (isInvokeReceipt(receiptOrValue)) {
+    if (receiptOrValue.result.state === 'HALT') {
+      return {
+        ...receiptOrValue,
+        result: {
+          ...receiptOrValue,
+          value: convertContractParameter({ type: returnType, parameter: receiptOrValue.result.value }),
+        },
+      };
+    }
+
+    return receiptOrValue;
+  }
+
+  return convertContractParameter({ type: returnType, parameter: receiptOrValue });
+};
 
 export const getParametersObject = ({
   abiParameters,
@@ -44,10 +109,10 @@ export const getParametersObject = ({
   return zipped.reduce<EventParameters>(
     (acc, [abiParameter, parameter]) => ({
       ...acc,
-      [abiParameter.name]: convertParameter({
+      [abiParameter.name]: convertContractParameter({
         type: abiParameter,
         parameter,
-      }),
+      }) as Param | undefined,
     }),
     {},
   );
@@ -59,7 +124,7 @@ export const convertAction = ({
 }: {
   readonly action: RawAction;
   readonly events: { readonly [K in string]?: ABIEvent };
-}): Action => {
+}): Action | string => {
   if (action.type === 'Log') {
     return action;
   }
@@ -72,7 +137,7 @@ export const convertAction = ({
   const event = converters.toString(args[0]);
   const eventSpec = events[event];
   if (eventSpec === undefined) {
-    throw new InvalidEventError(`Unknown event ${event}`);
+    return event;
   }
 
   return {
@@ -103,7 +168,7 @@ export const convertInvocationResult = async ({
   readonly result: RawInvocationResult;
   readonly actions: ReadonlyArray<RawAction>;
   readonly sourceMaps?: Promise<SourceMaps>;
-}): Promise<InvocationResult<Param | undefined>> => {
+}): Promise<InvocationResult<Return | undefined>> => {
   const { gasConsumed, gasCost } = result;
   if (result.state === 'FAULT') {
     const message = await processActionsAndMessage({
@@ -123,7 +188,7 @@ export const convertInvocationResult = async ({
   await processConsoleLogMessages({ actions, sourceMaps });
 
   const contractParameter = result.stack[0];
-  const value = convertParameter({
+  const value = convertContractParameter({
     type: returnType,
     parameter: contractParameter,
   });
@@ -141,7 +206,7 @@ export const convertCallResult = async ({
   readonly result: RawInvocationResult;
   readonly actions: ReadonlyArray<RawAction>;
   readonly sourceMaps?: Promise<SourceMaps>;
-}): Promise<Param | undefined> => {
+}): Promise<Return | undefined> => {
   const result = await convertInvocationResult({ returnType, result: resultIn, actions, sourceMaps });
   if (result.state === 'FAULT') {
     throw new InvocationCallError(result.message);
@@ -175,7 +240,7 @@ const getDefault = ({
 };
 
 export const convertParams = ({
-  parameters,
+  parameters: parametersIn,
   params,
   senderAddress,
 }: {
@@ -186,15 +251,23 @@ export const convertParams = ({
   readonly converted: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly zipped: ReadonlyArray<[string, Param | undefined]>;
 } => {
+  const parameters =
+    parametersIn.length === 0 || !parametersIn[parametersIn.length - 1].rest ? parametersIn : parametersIn.slice(0, -1);
+  const restParameter =
+    parametersIn.length === 0 || !parametersIn[parametersIn.length - 1].rest
+      ? undefined
+      : parametersIn[parametersIn.length - 1];
+
   const nonOptionalParameters = parameters.filter((param) => !param.optional);
   if (params.length < nonOptionalParameters.length) {
     throw new InvalidContractArgumentCountError(nonOptionalParameters.length, params.length);
   }
 
-  const additionalParams = parameters.length - params.length;
+  const additionalParams = Math.max(parameters.length - params.length, 0);
+  const additionalParameters = Math.max(params.length - parameters.length, 0);
 
   const zip = _.zip(
-    parameters,
+    parameters.concat(restParameter === undefined ? [] : _.range(0, additionalParameters).map(() => restParameter)),
     params.concat(
       _.range(0, additionalParams).map((idx) =>
         getDefault({ parameter: parameters[params.length + idx], senderAddress }),
@@ -206,7 +279,31 @@ export const convertParams = ({
     (paramCheckers[parameter.type] as any)(parameter.name, param, parameter),
   );
   // tslint:disable-next-line no-useless-cast
-  const zipped = zip.map(([parameter, param]) => [parameter.name, param] as [string, Param | undefined]);
+  const zipped = zip.map<[string, Param | undefined]>(([parameter, param]) => [
+    parameter.name,
+    parameter.type === 'ForwardValue' ? (param as ForwardValue).param : param,
+  ]);
 
   return { converted, zipped };
+};
+
+// tslint:disable-next-line no-any
+export const addForward = (func: ABIFunction, value: any): any => {
+  let result = value;
+  const forwardedValues = func.parameters === undefined ? [] : func.parameters.filter((param) => param.forwardedValue);
+  if (forwardedValues.length > 0) {
+    result = {
+      ...result,
+      [createForwardedValueFuncArgsName(func)]: createForwardValueArgs(forwardedValues),
+    };
+  }
+
+  if (func.returnType.forwardedValue) {
+    result = {
+      ...result,
+      [createForwardedValueFuncReturnName(func)]: createForwardValueReturn(func.returnType),
+    };
+  }
+
+  return result;
 };

@@ -31,6 +31,10 @@ import {
   ClientSignatureContractParameter,
   ClientStringContractParameter,
   ClientVoidContractParameter,
+  ForwardValue,
+  ForwardValueABI,
+  ForwardValueABIParameter,
+  ForwardValueABIReturn,
   Hash256ABI,
   Hash256ABIParameter,
   Hash256ABIReturn,
@@ -53,6 +57,7 @@ import {
   RawInvokeReceipt,
   RawLog,
   RawNotification,
+  Return,
   ScriptBuilderParam,
   SenderAddressABIDefault,
   SignatureABI,
@@ -110,6 +115,10 @@ export {
   ClientSignatureContractParameter as SignatureContractParameter,
   ClientStringContractParameter as StringContractParameter,
   ClientVoidContractParameter as VoidContractParameter,
+  ForwardValue,
+  ForwardValueABI,
+  ForwardValueABIParameter,
+  ForwardValueABIReturn,
   Hash256ABI,
   Hash256ABIParameter,
   Hash256ABIReturn,
@@ -125,6 +134,7 @@ export {
   PublicKeyABIParameter,
   PublicKeyABIReturn,
   PublicKeyString,
+  Return,
   RawCallReceipt,
   RawInvocationResult,
   RawInvocationResultError,
@@ -763,9 +773,9 @@ export interface InvocationResultError {
 export type InvocationResult<TValue> = InvocationResultSuccess<TValue> | InvocationResultError;
 
 // tslint:disable-next-line no-any
-export interface InvokeReceipt<TParam extends Param = Param, TEvent extends Event<string, any> = Event>
+export interface InvokeReceipt<TReturn extends Return = Return, TEvent extends Event<string, any> = Event>
   extends TransactionReceipt {
-  readonly result: InvocationResult<TParam>;
+  readonly result: InvocationResult<TReturn>;
   readonly events: ReadonlyArray<TEvent>;
   readonly logs: ReadonlyArray<Log>;
 }

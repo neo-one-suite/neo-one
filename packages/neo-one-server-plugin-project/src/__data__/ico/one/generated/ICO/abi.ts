@@ -1,4 +1,4 @@
-/* @hash 1ff73ab1a22b594ce82ee249c7bbff9c */
+/* @hash b3ab34f478808cb1829ece1bfd4fc3df */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -9,13 +9,61 @@ export const icoABI: ABI = {
       name: 'transfer',
       parameters: [
         {
+          forwardedValue: false,
           name: 'from',
           optional: true,
           type: 'Address',
         },
         {
+          forwardedValue: false,
           name: 'to',
           optional: true,
+          type: 'Address',
+        },
+        {
+          decimals: 8,
+          name: 'amount',
+          optional: false,
+          type: 'Integer',
+        },
+      ],
+    },
+    {
+      name: 'approveSendTransfer',
+      parameters: [
+        {
+          forwardedValue: false,
+          name: 'from',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          forwardedValue: false,
+          name: 'to',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          decimals: 8,
+          name: 'amount',
+          optional: false,
+          type: 'Integer',
+        },
+      ],
+    },
+    {
+      name: 'revokeSendTransfer',
+      parameters: [
+        {
+          forwardedValue: false,
+          name: 'from',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          forwardedValue: false,
+          name: 'to',
+          optional: false,
           type: 'Address',
         },
         {
@@ -43,6 +91,7 @@ export const icoABI: ABI = {
       name: 'owner',
       parameters: [],
       returnType: {
+        forwardedValue: false,
         optional: false,
         type: 'Address',
       },
@@ -84,6 +133,7 @@ export const icoABI: ABI = {
       parameters: [],
       receive: true,
       returnType: {
+        forwardedValue: false,
         optional: false,
         type: 'Boolean',
       },
@@ -109,6 +159,7 @@ export const icoABI: ABI = {
           default: {
             type: 'sender',
           },
+          forwardedValue: false,
           name: 'owner',
           optional: true,
           type: 'Address',

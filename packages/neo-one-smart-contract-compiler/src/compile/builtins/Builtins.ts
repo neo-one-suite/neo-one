@@ -186,6 +186,13 @@ export class Builtins {
         }
       }
 
+      if (name === 'ForwardedValue') {
+        const forwardedValueTagSymbol = this.getAnyInterfaceSymbol('ForwardedValueTag');
+        if (symbol === forwardedValueTagSymbol) {
+          return true;
+        }
+      }
+
       return symbol === typeSymbol;
     });
   }

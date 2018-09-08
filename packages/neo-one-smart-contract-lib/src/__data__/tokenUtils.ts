@@ -165,7 +165,7 @@ export const testToken = async ({
       expect(contract.parameters).toEqual(['String', 'Array']);
       expect(contract.returnType).toEqual('Buffer');
       expect(contract.storage).toBeTruthy();
-      expect(contract.dynamicInvoke).toBeFalsy();
+      expect(contract.dynamicInvoke).toBeTruthy();
       expect(contract.payable).toEqual(payable);
     },
     { deploy: deploy === undefined },

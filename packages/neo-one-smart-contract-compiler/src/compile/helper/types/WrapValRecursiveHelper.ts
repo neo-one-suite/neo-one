@@ -188,6 +188,9 @@ export class WrapValRecursiveHelper extends Helper {
         error: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
         }),
+        forwardValue: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapForwardValue);
+        }),
         iteratorResult: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
         }),

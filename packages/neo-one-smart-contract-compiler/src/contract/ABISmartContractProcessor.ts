@@ -222,7 +222,19 @@ export class ABISmartContractProcessor {
 
         const paramName = tsUtils.literal.getLiteralValue(paramNameArg);
 
-        return this.toABIParameter(paramName, paramNameArg, paramType);
+        const param = this.toABIParameter(paramName, paramNameArg, paramType);
+
+        if (param !== undefined && param.type === 'ForwardValue') {
+          this.context.reportError(
+            paramNameArg,
+            DiagnosticCode.InvalidContractType,
+            DiagnosticMessage.InvalidContractType,
+          );
+
+          return undefined;
+        }
+
+        return param;
       })
       .filter(utils.notNull);
 
@@ -279,14 +291,23 @@ export class ABISmartContractProcessor {
   private toABIParameter(
     nameIn: string,
     node: ts.Node,
-    resolvedType: ts.Type | undefined,
+    resolvedTypeIn: ts.Type | undefined,
     optional = false,
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): ABIParameter | undefined {
     const name = nameIn.startsWith('_') ? nameIn.slice(1) : nameIn;
+    let resolvedType = resolvedTypeIn;
+    if (ts.isParameter(node) && tsUtils.parameter.isRestParameter(node) && resolvedType !== undefined) {
+      resolvedType = tsUtils.type_.getTypeArgumentsArray(resolvedType)[0];
+    }
+
     const type = this.toABIReturn(node, resolvedType, optional, options);
     if (type === undefined) {
       return undefined;
+    }
+
+    if (ts.isParameter(node) && tsUtils.parameter.isRestParameter(node)) {
+      return { ...type, name, rest: true };
     }
 
     return { ...type, name };

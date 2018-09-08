@@ -44,4 +44,30 @@ describe('createEventNotifier', () => {
       { type: 'error', code: DiagnosticCode.InvalidLiteral },
     );
   });
+
+  test('invalid event parameter type', async () => {
+    helpers.compileString(
+      `
+      import { createEventNotifier } from '@neo-one/smart-contract';
+
+      class Foo {}
+      const onTransfer = createEventNotifier<Foo>('foo');
+      const foo = new Foo();
+      onTransfer(foo);
+    `,
+      { type: 'error' },
+    );
+  });
+
+  test('invalid event parameter type - forward value', async () => {
+    helpers.compileString(
+      `
+      import { createEventNotifier } from '@neo-one/smart-contract';
+
+      const onTransfer = createEventNotifier<ForwardValue<string>>('foo');
+      onTransfer('foo');
+    `,
+      { type: 'error' },
+    );
+  });
 });

@@ -284,7 +284,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitOp(node: ts.Node, code: OpCode, buffer?: Buffer | undefined): void {
-    if ((code === 'APPCALL' || code === 'TAILCALL') && buffer !== undefined && buffer.equals(Buffer.alloc(20, 0))) {
+    if (
+      ((code === 'APPCALL' || code === 'TAILCALL') && buffer !== undefined && buffer.equals(Buffer.alloc(20, 0))) ||
+      code === 'CALL_ED'
+    ) {
       this.mutableFeatures = { ...this.mutableFeatures, dynamicInvoke: true };
     }
 

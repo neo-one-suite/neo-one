@@ -1,5 +1,4 @@
 import { helpers } from '../../../__data__';
-import { DiagnosticCode } from '../../../DiagnosticCode';
 
 describe('FunctionDeclarationCompiler', () => {
   test('basic function', async () => {
@@ -150,23 +149,5 @@ describe('FunctionDeclarationCompiler', () => {
         throw 'Failure';
       }
     `);
-  });
-
-  test('spread arguments unsupported', async () => {
-    helpers.compileString(
-      `
-      function foo(x: number, ...y: number[]): number[] {
-        return y;
-      }
-
-      const x: [number, number, number, number] = [1, 2, 3, 4]
-      const [a, b, c] = foo(...x);
-
-      assertEqual(a, 2);
-      assertEqual(b, 3);
-      assertEqual(c, 4);
-    `,
-      { type: 'error', code: DiagnosticCode.UnsupportedSyntax },
-    );
   });
 });

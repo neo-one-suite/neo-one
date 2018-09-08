@@ -73,6 +73,26 @@ export class InvokeSmartContractHelper extends Helper {
       },
     });
 
+    const wrapParam = (
+      param: ts.ParameterDeclaration | ts.ParameterPropertyDeclaration,
+      innerOptions: VisitOptions,
+    ) => {
+      let type = sb.context.analysis.getType(param);
+      if (type !== undefined && tsUtils.parameter.isRestParameter(param)) {
+        type = tsUtils.type_.getArrayType(type);
+      }
+
+      sb.emitHelper(
+        param,
+        innerOptions,
+        sb.helpers.wrapValRecursive({
+          type,
+          checkValue: true,
+          optional: tsUtils.initializer.getInitializer(param) !== undefined,
+        }),
+      );
+    };
+
     const getFunctionLikeCase = (
       name: string,
       decl: ts.SetAccessorDeclaration | ts.MethodDeclaration | ts.GetAccessorDeclaration | ts.PropertyDeclaration,
@@ -107,17 +127,7 @@ export class InvokeSmartContractHelper extends Helper {
             innerOptions,
             sb.helpers.parameters({
               params: tsUtils.parametered.getParameters(decl),
-              mapParam: (param, innerInnerOptions) => {
-                sb.emitHelper(
-                  decl,
-                  innerInnerOptions,
-                  sb.helpers.wrapValRecursive({
-                    type: sb.context.analysis.getType(param),
-                    checkValue: true,
-                    optional: tsUtils.initializer.getInitializer(param) !== undefined,
-                  }),
-                );
-              },
+              mapParam: wrapParam,
             }),
           );
 
@@ -340,29 +350,18 @@ export class InvokeSmartContractHelper extends Helper {
             innerInnerOptions,
             sb.helpers.parameters({
               params: tsUtils.parametered.getParameters(decl),
-              mapParam: (param, innerInnerInnerOptions) => {
-                if (entry) {
-                  sb.emitHelper(
-                    decl,
-                    innerInnerInnerOptions,
-                    sb.helpers.wrapValRecursive({
-                      type: sb.context.analysis.getType(param),
-                      checkValue: true,
-                      optional: tsUtils.initializer.getInitializer(param) !== undefined,
-                    }),
-                  );
-                }
-              },
+              mapParam: entry ? wrapParam : undefined,
             }),
           );
 
           const invokeOptions = sb.handleSuperConstructOptions(
             sb.noPushValueOptions(innerInnerOptions),
-            (expr, _superExpr, innerInnerInnerOptions) => {
+            (expr, _superExpr, innerInnerInnerOptionsIn) => {
               if (superDeploy === undefined) {
                 return;
               }
 
+              const innerInnerInnerOptions = sb.pushValueOptions(innerInnerInnerOptionsIn);
               // [argsarr]
               sb.emitHelper(expr, innerInnerInnerOptions, sb.helpers.args);
               handleDeploy(superDeploy[0], superDeploy[1], innerInnerInnerOptions, false);

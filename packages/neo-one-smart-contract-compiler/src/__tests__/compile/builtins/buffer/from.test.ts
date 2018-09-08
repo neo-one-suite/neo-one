@@ -20,6 +20,18 @@ describe('Buffer.from', () => {
     `);
   });
 
+  test('should allow dynamic utf8 strings', async () => {
+    await helpers.executeString(`
+      const x = 'hello';
+      const y = Buffer.from(x);
+      const z = Buffer.from(x, 'utf8');
+
+      assertEqual(y.toString('utf8'), x);
+      assertEqual(z.toString('utf8'), x);
+      assertEqual(y.equals(z), true);
+    `);
+  });
+
   test('cannot be referenced', async () => {
     helpers.compileString(
       `

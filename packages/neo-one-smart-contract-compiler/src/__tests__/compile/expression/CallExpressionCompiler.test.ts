@@ -19,6 +19,34 @@ describe('CallExpressionCompiler', () => {
     `);
   });
 
+  test('call with rest arguments', async () => {
+    await helpers.executeString(`
+      const foo = (...x: number[]): number => x.reduce((acc, value) => acc + value, 0);
+
+      assertEqual(foo(), 0);
+      assertEqual(foo(2), 2);
+      assertEqual(foo(2, 3), 5);
+
+      const tuple = [2, 3];
+      assertEqual(foo(...tuple), 5);
+      assertEqual(foo(1, ...tuple), 6);
+    `);
+  });
+
+  test('call with arguments and rest arguments', async () => {
+    await helpers.executeString(`
+      const foo = (x: number, ...y: number[]): number => y.reduce((acc, value) => acc + value, x);
+
+      assertEqual(foo(10), 10);
+      assertEqual(foo(10, 2), 12);
+      assertEqual(foo(10, 2, 3), 15);
+
+      const tuple = [2, 3];
+      assertEqual(foo(10, ...tuple), 15);
+      assertEqual(foo(10, 1, ...tuple), 16);
+    `);
+  });
+
   test('call that throws', async () => {
     await helpers.executeString(`
       const foo = () => {

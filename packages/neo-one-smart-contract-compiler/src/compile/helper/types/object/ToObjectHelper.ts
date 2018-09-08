@@ -49,6 +49,7 @@ export class ToObjectHelper extends TypedHelper {
         set: emptyObject,
         setStorage: emptyObject,
         error: emptyObject,
+        forwardValue: emptyObject,
         iteratorResult: emptyObject,
         iterable: emptyObject,
         iterableIterator: emptyObject,

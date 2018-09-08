@@ -72,6 +72,14 @@ export function getAliasSymbol(type: ts.Type): ts.Symbol | undefined {
   return utils.getValueOrUndefined(type.aliasSymbol);
 }
 
+export function getAliasTypeArguments(type: ts.Type): ReadonlyArray<ts.Type> | undefined {
+  return utils.getValueOrUndefined(type.aliasTypeArguments);
+}
+
+export function getAliasTypeArgumentsArray(type: ts.Type): ReadonlyArray<ts.Type> {
+  return utils.getArray(getAliasTypeArguments(type));
+}
+
 export function getSymbolOrThrow(type: ts.Type): ts.Symbol {
   return utils.throwIfNullOrUndefined(getSymbol(type), 'symbol');
 }

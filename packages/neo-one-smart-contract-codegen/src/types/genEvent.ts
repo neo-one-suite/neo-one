@@ -7,7 +7,9 @@ export const genEvent = (name: string, event: ABIEvent): string => {
   const eventNameParameters = `${eventName}Parameters`;
 
   return `export interface ${eventNameParameters} {
-  ${event.parameters.map((param) => `readonly ${param.name}: ${toTypeScriptType(param)};`).join('\n  ')}
+  ${event.parameters
+    .map((param) => `readonly ${param.name}: ${toTypeScriptType(param, { isParameter: true })};`)
+    .join('\n  ')}
 }
 export interface ${eventName} extends Event<'${event.name}', ${eventNameParameters}> {}`;
 };

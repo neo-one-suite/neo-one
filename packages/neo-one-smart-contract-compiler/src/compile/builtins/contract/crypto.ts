@@ -64,6 +64,7 @@ class HashOp extends BuiltinMemberCall {
         mapStorage: throwTypeError,
         setStorage: throwTypeError,
         error: throwTypeError,
+        forwardValue: throwTypeError,
         iteratorResult: throwTypeError,
         iterable: throwTypeError,
         iterableIterator: throwTypeError,

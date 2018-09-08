@@ -4,6 +4,7 @@ export * from './attribute';
 export * from './boolean';
 export * from './buffer';
 export * from './error';
+export * from './forwardValue';
 export * from './input';
 export * from './iterable';
 export * from './iteratorResult';

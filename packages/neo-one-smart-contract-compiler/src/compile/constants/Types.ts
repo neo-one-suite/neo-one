@@ -10,23 +10,24 @@ export enum Types {
   Buffer = 8,
   Map = 9,
   Set = 10,
-  ArrayStorage = 11,
-  MapStorage = 12,
-  SetStorage = 13,
+  ForwardValue = 11,
+  IteratorResult = 12,
+  IterableIterator = 13,
   Error = 14,
-  IteratorResult = 15,
-  IterableIterator = 16,
-  Transaction = 17,
-  Output = 18,
-  Attribute = 19,
-  Input = 20,
-  Account = 21,
-  Asset = 22,
-  Contract = 23,
-  Header = 24,
-  Block = 25,
+  ArrayStorage = 15,
+  MapStorage = 16,
+  SetStorage = 17,
+  Transaction = 18,
+  Output = 19,
+  Attribute = 20,
+  Input = 21,
+  Account = 22,
+  Asset = 23,
+  Contract = 24,
+  Header = 25,
+  Block = 26,
   // Fake type, never appears
-  Iterable = 26,
+  Iterable = 27,
 }
 
 export type WrappableType =
@@ -39,12 +40,13 @@ export type WrappableType =
   | Types.Buffer
   | Types.Map
   | Types.Set
+  | Types.ForwardValue
+  | Types.IteratorResult
+  | Types.IterableIterator
+  | Types.Error
   | Types.ArrayStorage
   | Types.MapStorage
   | Types.SetStorage
-  | Types.Error
-  | Types.IteratorResult
-  | Types.IterableIterator
   | Types.Transaction
   | Types.Output
   | Types.Attribute

@@ -1,4 +1,4 @@
-import { ABIFunction } from '@neo-one/client-core';
+import { ABIFunction, ABIParameter } from '@neo-one/client-core';
 import _ from 'lodash';
 import { toTypeScriptType } from '../utils';
 
@@ -37,17 +37,49 @@ const getOptions = (abi: ABIFunction, { withConfirmedOptions = false }: Options 
   return [`options?: TransactionOptions${type}`];
 };
 
-export const genFunctionParameters = (abi: ABIFunction, options: Options = {}): string =>
-  _.reverse(
-    _.reverse([...(abi.parameters === undefined ? [] : abi.parameters)]).reduce<ParamAcc>(
+const getRestParameter = (param: ABIParameter) =>
+  `...${param.name}: ${toTypeScriptType(param, { isParameter: true, includeOptional: false })}[]`;
+
+export const genFunctionParameters = (
+  abi: ABIFunction,
+  parameters: ReadonlyArray<ABIParameter> = abi.parameters === undefined ? [] : abi.parameters,
+  options: Options = {},
+): ReadonlyArray<string> => {
+  const [otherParameters, restParameter]: [ReadonlyArray<ABIParameter>, ABIParameter | undefined] =
+    parameters.length > 0 && parameters[parameters.length - 1].rest
+      ? [parameters.slice(0, -1), parameters[parameters.length - 1]]
+      : [parameters.slice(), undefined];
+  const paramStrings = _.reverse(
+    _.reverse([...otherParameters]).reduce<ParamAcc>(
       (acc, param) => ({
         hasRequired: acc.hasRequired || !param.optional,
         acc: acc.acc.concat(
-          `${param.name}${!acc.hasRequired && param.optional ? '?' : ''}: ${toTypeScriptType(param, false)}`,
+          `${param.name}${!acc.hasRequired && param.optional ? '?' : ''}: ${toTypeScriptType(param, {
+            isParameter: true,
+            includeOptional: false,
+          })}`,
         ),
       }),
       { hasRequired: false, acc: [] },
     ).acc,
-  )
-    .concat(getOptions(abi, options))
+  );
+
+  const paramOptions = getOptions(abi, options);
+  const withOptions = paramStrings
+    .concat(paramOptions)
+    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter)])
     .join(', ');
+  const withoutOptions = paramStrings
+    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter)])
+    .join(', ');
+
+  if (restParameter === undefined) {
+    return [withOptions];
+  }
+
+  if (paramOptions.length === 0) {
+    return [withoutOptions];
+  }
+
+  return [withOptions, withoutOptions];
+};

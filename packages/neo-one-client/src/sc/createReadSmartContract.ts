@@ -4,6 +4,7 @@ import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciter
 import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/filter';
 import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import BigNumber from 'bignumber.js';
+import { InvalidEventError } from '../errors';
 import { ReadClient } from '../ReadClient';
 import { events as traceEvents } from '../trace';
 import {
@@ -15,10 +16,10 @@ import {
   BlockFilter,
   Event,
   Log,
-  Param,
   RawAction,
   ReadSmartContractAny,
   ReadSmartContractDefinition,
+  Return,
   SourceMaps,
   StorageItem,
 } from '../types';
@@ -61,7 +62,7 @@ const createCall = ({
   readonly func: ABIFunction;
   readonly sourceMaps?: Promise<SourceMaps>;
   // tslint:disable-next-line no-any
-}) => async (...args: any[]): Promise<Param | undefined> => {
+}) => async (...args: any[]): Promise<Return | undefined> => {
   const { params, monitor } = getParams({
     parameters,
     params: args,
@@ -95,7 +96,14 @@ export const createReadSmartContract = ({
   const iterActionsRaw = (blockFilter: BlockFilter = {}): AsyncIterable<RawAction> =>
     AsyncIterableX.from(client.__iterActionsRaw(blockFilter)).pipe(filter((action) => action.address === address));
 
-  const convertAction = (action: RawAction): Action => common.convertAction({ action, events });
+  const convertAction = (action: RawAction): Action => {
+    const converted = common.convertAction({ action, events });
+    if (typeof converted === 'string') {
+      throw new InvalidEventError(`Unknown event ${converted}`);
+    }
+
+    return converted;
+  };
 
   const iterActions = (filterIn?: BlockFilter): AsyncIterable<Action> =>
     AsyncIterableX.from(iterActionsRaw(filterIn)).pipe(map(convertAction));
@@ -129,10 +137,10 @@ export const createReadSmartContract = ({
   return functions.reduce<ReadSmartContractAny>(
     (acc, func) =>
       func.constant === true
-        ? {
+        ? common.addForward(func, {
             ...acc,
             [func.name]: createCall({ client, address, func, sourceMaps }),
-          }
+          })
         : acc,
     {
       definition,

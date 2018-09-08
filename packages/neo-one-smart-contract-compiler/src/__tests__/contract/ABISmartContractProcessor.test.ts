@@ -68,6 +68,28 @@ describe('ABISmartContractProcessor', () => {
     );
   });
 
+  test('invalid method return - union', () => {
+    helpers.compileString(
+      `
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        ${properties}
+        private foo: boolean = true;
+
+        public test() {
+          if (this.foo) {
+            return '';
+          }
+
+          return 0;
+        }
+      }
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidContractType },
+    );
+  });
+
   test('invalid getter', () => {
     helpers.compileString(
       `

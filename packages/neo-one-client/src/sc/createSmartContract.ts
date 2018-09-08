@@ -1,5 +1,5 @@
 import { ScriptBuilderParam } from '@neo-one/client-core';
-import { utils as commonUtils } from '@neo-one/utils';
+import { utils, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { Client } from '../Client';
 import {
@@ -26,6 +26,7 @@ import {
   NetworkType,
   Param,
   RawAction,
+  Return,
   SmartContractAny,
   SmartContractDefinition,
   SmartContractNetworkDefinition,
@@ -39,7 +40,9 @@ const isOptionsArg = (finalArg: any) =>
   finalArg !== undefined &&
   typeof finalArg === 'object' &&
   !Array.isArray(finalArg) &&
-  !BigNumber.isBigNumber(finalArg);
+  !BigNumber.isBigNumber(finalArg) &&
+  // tslint:disable-next-line no-any
+  finalArg.name === undefined;
 
 const getParamsAndOptions = ({
   definition: { networks },
@@ -65,13 +68,15 @@ const getParamsAndOptions = ({
   readonly network: NetworkType;
   readonly address: AddressString;
 } => {
-  const finalArg = args[args.length - 1] as {} | undefined;
+  const hasRest = parameters.length > 0 && parameters[parameters.length - 1].rest;
+  const optionsArgIndex = hasRest ? parameters.length - 1 : parameters.length;
+  const maybeOptionsArg = args[optionsArgIndex] as {} | undefined;
   let params = args;
   let optionsIn: InvokeSendReceiveTransactionOptions | InvokeClaimTransactionOptions = {};
-  if (isOptionsArg(finalArg)) {
-    params = args.slice(0, -1);
+  if (isOptionsArg(maybeOptionsArg)) {
+    params = args.slice(0, optionsArgIndex).concat(args.slice(optionsArgIndex + 1));
     // tslint:disable-next-line no-any
-    optionsIn = finalArg as any;
+    optionsIn = maybeOptionsArg as any;
   }
 
   const currentAccount = client.getCurrentAccount();
@@ -131,12 +136,16 @@ const convertActions = ({
     {},
   );
 
-  return actions.map((action) =>
-    common.convertAction({
-      action,
-      events: eventsObj,
-    }),
-  );
+  return actions
+    .map((action) => {
+      const converted = common.convertAction({
+        action,
+        events: eventsObj,
+      });
+
+      return typeof converted === 'string' ? undefined : converted;
+    })
+    .filter(utils.notNull);
 };
 
 const createCall = ({
@@ -148,7 +157,7 @@ const createCall = ({
   readonly client: Client;
   readonly func: ABIFunction;
   // tslint:disable-next-line no-any
-}) => async (...args: any[]): Promise<Param | undefined> => {
+}) => async (...args: any[]): Promise<Return | undefined> => {
   const { params, network, address, options } = getParamsAndOptions({
     definition,
     parameters,
@@ -266,21 +275,22 @@ export const createSmartContract = ({
   readonly client: Client;
 }): SmartContractAny =>
   definition.abi.functions.reduce<SmartContractAny>(
-    (acc, func) => ({
-      ...acc,
-      [func.name]:
-        func.constant === true
-          ? createCall({
-              definition,
-              client,
-              func,
-            })
-          : createInvoke({
-              definition,
-              client,
-              func,
-            }),
-    }),
+    (acc, func) =>
+      common.addForward(func, {
+        ...acc,
+        [func.name]:
+          func.constant === true
+            ? createCall({
+                definition,
+                client,
+                func,
+              })
+            : createInvoke({
+                definition,
+                client,
+                func,
+              }),
+      }),
     {
       read: (network) =>
         client.read(network).smartContract({

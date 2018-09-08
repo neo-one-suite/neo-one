@@ -4,6 +4,6 @@ exports[`buildCommand build: mint consumed 1`] = `"0"`;
 
 exports[`buildCommand build: mint consumed 2`] = `"0"`;
 
-exports[`buildCommand build: mint cost 1`] = `"6.04"`;
+exports[`buildCommand build: mint cost 1`] = `"6.31"`;
 
-exports[`buildCommand build: mint cost 2`] = `"6.04"`;
+exports[`buildCommand build: mint cost 2`] = `"6.31"`;

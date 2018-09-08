@@ -38,6 +38,9 @@ export class UnwrapValHelper extends Helper {
       case Types.Error:
         sb.emitHelper(node, options, sb.helpers.unwrapError);
         break;
+      case Types.ForwardValue:
+        sb.emitHelper(node, options, sb.helpers.unwrapForwardValue);
+        break;
       case Types.Input:
         sb.emitHelper(node, options, sb.helpers.unwrapInput);
         break;

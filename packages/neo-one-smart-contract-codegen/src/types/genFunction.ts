@@ -8,7 +8,7 @@ const getFunctionReturnReceipt = (name: string, abi: ABIFunction) => {
     return 'TransactionReceipt';
   }
 
-  return `InvokeReceipt<${toTypeScriptType(abi.returnType)}, ${getEventName(name)}>`;
+  return `InvokeReceipt<${toTypeScriptType(abi.returnType, { isParameter: false })}, ${getEventName(name)}>`;
 };
 
 const getFunctionReturnTransaction = (abi: ABIFunction) => (abi.claim ? 'ClaimTransaction' : 'InvocationTransaction');
@@ -17,15 +17,25 @@ const getFunctionReturnType = (name: string, abi: ABIFunction) =>
   `TransactionResult<${getFunctionReturnReceipt(name, abi)}, ${getFunctionReturnTransaction(abi)}>`;
 
 const getFunctionType = (name: string, abi: ABIFunction) =>
-  `(${genFunctionParameters(abi)}): Promise<${getFunctionReturnType(name, abi)}>;`;
+  genFunctionParameters(abi)
+    .map((params) => `(${params}): Promise<${getFunctionReturnType(name, abi)}>;`)
+    .join('  \n');
 const getConfirmedType = (name: string, abi: ABIFunction) =>
-  `readonly confirmed: (${genFunctionParameters(abi, {
+  genFunctionParameters(abi, abi.parameters, {
     withConfirmedOptions: true,
-  })}) => Promise<${getFunctionReturnReceipt(name, abi)} & { readonly transaction: ${getFunctionReturnTransaction(
-    abi,
-  )}}>;`;
+  })
+    .map(
+      (params) =>
+        `(${params}): Promise<${getFunctionReturnReceipt(
+          name,
+          abi,
+        )} & { readonly transaction: ${getFunctionReturnTransaction(abi)}}>;`,
+    )
+    .join('    \n');
 
 export const genFunction = (name: string, abi: ABIFunction): string => `{
   ${getFunctionType(name, abi)}
-  ${getConfirmedType(name, abi)}
+  readonly confirmed: {
+    ${getConfirmedType(name, abi)}
+  },
 }`;

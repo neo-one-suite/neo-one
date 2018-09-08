@@ -1,4 +1,4 @@
-/* @hash 366be91182eca8a3d48967cd8e9e1548 */
+/* @hash 8740646f5942249afa310e16437295ef */
 // tslint:disable
 /* eslint-disable */
 import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';
@@ -9,7 +9,7 @@ import { TokenReadSmartContract, TokenSmartContract } from './types';
 const definition: SmartContractDefinition = {
   networks: {
     local: {
-      address: 'AV2tGjmenM7byGqMBn3A98gVb9h4PjFqqK',
+      address: 'AeLoKEFyhzLscd8nmYFcU3Vw5ktspJ3qEz',
     },
   },
   abi: tokenABI,

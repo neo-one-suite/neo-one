@@ -76,6 +76,14 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('GetOptions');
   }
 
+  if (text.includes('ContractParameter')) {
+    mutableClauses.push('ContractParameter');
+  }
+
+  if (text.includes('ForwardValue')) {
+    mutableClauses.push('ForwardValue');
+  }
+
   return mutableClauses;
 };
 

@@ -1,4 +1,4 @@
-/* @hash 09e6a453cccd4373c5b7f40bb58a21ec */
+/* @hash bee49bef6cb3cdfdf3eb10ce7e0fd484 */
 // tslint:disable
 /* eslint-disable */
 import { DeveloperTools as DeveloperToolsBase } from '@neo-one/react';
@@ -7,6 +7,7 @@ import * as React from 'react';
 import { Contracts } from './types';
 import { createClient, createDeveloperClients, createOneClients } from './client';
 import { projectID } from './projectID';
+import { createEscrowSmartContract } from './Escrow/contract';
 import { createTokenSmartContract } from './Token/contract';
 import { createICOSmartContract } from './ICO/contract';
 
@@ -41,6 +42,7 @@ export const ContractsProvider = <TClient extends Client>({
         client,
         developerClients,
         oneClients,
+        escrow: createEscrowSmartContract(client),
         token: createTokenSmartContract(client),
         ico: createICOSmartContract(client),
       }}

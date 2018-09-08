@@ -11,3 +11,28 @@ exports[`createEventNotifier invalid event name 1`] = `
       7 |     
 "
 `;
+
+exports[`createEventNotifier invalid event parameter type - forward value 1`] = `
+"snippetCode.ts (4,26): Expected 1-7 arguments, but got 1.
+
+      2 |       import { createEventNotifier } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const onTransfer = createEventNotifier<ForwardValue<string>>('foo');
+        |                          ^
+      5 |       onTransfer('foo');
+      6 |     
+"
+`;
+
+exports[`createEventNotifier invalid event parameter type 1`] = `
+"snippetCode.ts (5,26): Expected 1-7 arguments, but got 1.
+
+      3 | 
+      4 |       class Foo {}
+    > 5 |       const onTransfer = createEventNotifier<Foo>('foo');
+        |                          ^
+      6 |       const foo = new Foo();
+      7 |       onTransfer(foo);
+      8 |     
+"
+`;

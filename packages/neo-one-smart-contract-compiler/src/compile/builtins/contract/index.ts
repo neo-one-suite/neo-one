@@ -12,6 +12,7 @@ import { add as addContract } from './contract';
 import { add as addCreateEventNotifier } from './createEventNotifier';
 import { add as addCrypto } from './crypto';
 import { add as addDeploy } from './deploy';
+import { add as addForwardValue } from './forwardValue';
 import { add as addHash256 } from './hash256';
 import { add as addHeader } from './header';
 import { add as addInput } from './input';
@@ -39,6 +40,7 @@ export const add = (builtins: Builtins): void => {
   addCreateEventNotifier(builtins);
   addCrypto(builtins);
   addDeploy(builtins);
+  addForwardValue(builtins);
   addHash256(builtins);
   addHeader(builtins);
   addInput(builtins);

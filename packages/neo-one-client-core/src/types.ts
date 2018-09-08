@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
+import { ScriptBuilderParam } from './utils';
 
 /**
  * Base64 encoded string that represents a NEO address.
@@ -304,6 +305,7 @@ export interface RawCallReceipt {
  */
 export interface ABIReturnBase {
   readonly optional?: boolean;
+  readonly forwardedValue?: boolean;
 }
 
 /**
@@ -395,6 +397,12 @@ export interface ArrayABIReturn extends ABIReturnBase {
    */
   readonly value: ABIReturn;
 }
+/**
+ * `ForwardValue` return type.
+ */
+export interface ForwardValueABIReturn extends ABIReturnBase {
+  readonly type: 'ForwardValue';
+}
 
 /**
  * Default value is the `Transaction` sender `Address`
@@ -418,6 +426,10 @@ export interface ABIParameterBase {
    * Runtime default value.
    */
   readonly default?: ABIDefault;
+  /**
+   * Represents a rest parameter
+   */
+  readonly rest?: boolean;
 }
 
 /**
@@ -496,6 +508,13 @@ export interface IntegerABIParameter extends ABIParameterBase, IntegerABIReturn 
  * @see ArrayABIReturn
  */
 export interface ArrayABIParameter extends ABIParameterBase, ArrayABIReturn {}
+/**
+ * `ForwardValue` parameter type.
+ *
+ * @see ABIParameter
+ * @see ForwardValueABIReturn
+ */
+export interface ForwardValueABIParameter extends ABIParameterBase, ForwardValueABIReturn {}
 
 /**
  * Return type specification of a function in the `ABI` of a smart contract.
@@ -510,7 +529,8 @@ export type ABIReturn =
   | StringABIReturn
   | ArrayABIReturn
   | VoidABIReturn
-  | IntegerABIReturn;
+  | IntegerABIReturn
+  | ForwardValueABIReturn;
 /**
  * Parameter specification of a function or event in the `ABI` of a smart contract.
  */
@@ -524,7 +544,8 @@ export type ABIParameter =
   | StringABIParameter
   | ArrayABIParameter
   | VoidABIParameter
-  | IntegerABIParameter;
+  | IntegerABIParameter
+  | ForwardValueABIParameter;
 
 export type ArrayABI = ArrayABIParameter | ArrayABIReturn;
 export type SignatureABI = SignatureABIParameter | SignatureABIReturn;
@@ -536,6 +557,7 @@ export type PublicKeyABI = PublicKeyABIParameter | PublicKeyABIReturn;
 export type StringABI = StringABIParameter | StringABIReturn;
 export type VoidABI = VoidABIParameter | VoidABIReturn;
 export type IntegerABI = IntegerABIParameter | IntegerABIReturn;
+export type ForwardValueABI = ForwardValueABIParameter | ForwardValueABIReturn;
 
 /**
  * Function specification in the `ABI` of a smart contract.
@@ -593,6 +615,14 @@ export interface ABI {
   readonly events?: ReadonlyArray<ABIEvent>;
 }
 
+declare const OpaqueTagSymbol: unique symbol;
+export interface ForwardValue {
+  readonly name: string;
+  readonly converted: ScriptBuilderParam | undefined;
+  readonly param: Param | undefined;
+  readonly [OpaqueTagSymbol]: unique symbol;
+}
+
 export interface ParamArray extends ReadonlyArray<Param> {}
 /**
  * Valid parameter types for a smart contract function.
@@ -606,4 +636,17 @@ export type Param =
   | AddressString
   | PublicKeyString
   | boolean
-  | ParamArray;
+  | ParamArray
+  | ForwardValue;
+export interface ReturnArray extends ReadonlyArray<Return> {}
+export type Return =
+  | undefined
+  | BigNumber
+  | BufferString
+  | AddressString
+  | Hash256String
+  | AddressString
+  | PublicKeyString
+  | boolean
+  | ReturnArray
+  | ContractParameter;

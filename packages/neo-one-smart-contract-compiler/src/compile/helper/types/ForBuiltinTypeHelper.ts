@@ -1,6 +1,7 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
+import { getForwardedValueType } from '../../../utils';
 import { Types } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -15,6 +16,7 @@ import { hasBoolean, isOnlyBoolean } from './boolean';
 import { hasBuffer, isOnlyBuffer } from './buffer';
 import { hasContract } from './contract';
 import { hasError, isOnlyError } from './error';
+import { hasForwardValue, isOnlyForwardValue } from './forwardValue';
 import { hasHeader } from './header';
 import { hasInput, isOnlyInput } from './input';
 import { hasIterable, isOnlyIterable } from './iterable';
@@ -67,6 +69,7 @@ export interface ForBuiltinTypeHelperOptions {
   readonly contract: ProcessType;
   readonly header: ProcessType;
   readonly block: ProcessType;
+  readonly forwardValue: ProcessType;
 }
 
 // Input: [val]
@@ -104,6 +107,7 @@ export class ForBuiltinTypeHelper extends Helper {
   private readonly contract: ProcessType;
   private readonly header: ProcessType;
   private readonly block: ProcessType;
+  private readonly forwardValue: ProcessType;
 
   public constructor({
     type,
@@ -138,6 +142,7 @@ export class ForBuiltinTypeHelper extends Helper {
     contract,
     header,
     block,
+    forwardValue,
   }: ForBuiltinTypeHelperOptions) {
     super();
     this.type = type;
@@ -172,6 +177,7 @@ export class ForBuiltinTypeHelper extends Helper {
     this.contract = contract;
     this.header = header;
     this.block = block;
+    this.forwardValue = forwardValue;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -181,11 +187,16 @@ export class ForBuiltinTypeHelper extends Helper {
       return;
     }
 
+    let tpe = this.type;
+    if (tpe !== undefined && sb.context.builtins.isType(node, tpe, 'ForwardedValue')) {
+      tpe = getForwardedValueType(tpe);
+    }
+
     sb.emitHelper(
       node,
       options,
       sb.helpers.forType({
-        type: this.type,
+        type: tpe,
         single: this.single,
         singleUndefined: this.singleUndefined,
         optional: this.optional,
@@ -303,6 +314,13 @@ export class ForBuiltinTypeHelper extends Helper {
             process: this.iterableIterator,
           },
           {
+            hasType: (type) => hasForwardValue(sb.context, node, type),
+            isRuntimeType: (innerOptions) => {
+              sb.emitHelper(node, innerOptions, sb.helpers.isForwardValue);
+            },
+            process: this.forwardValue,
+          },
+          {
             hasType: (type) => hasTransaction(sb.context, node, type),
             isRuntimeType: (innerOptions) => {
               sb.emitHelper(node, innerOptions, sb.helpers.isTransaction);
@@ -376,9 +394,9 @@ export class ForBuiltinTypeHelper extends Helper {
             hasType: (type) =>
               tsUtils.type_.hasType(
                 type,
-                (tpe) =>
+                (hasTpe) =>
                   !tsUtils.type_.isOnlyType(
-                    tpe,
+                    hasTpe,
                     (tp) =>
                       isOnlyUndefined(sb.context, node, tp) ||
                       isOnlyNull(sb.context, node, tp) ||
@@ -394,6 +412,7 @@ export class ForBuiltinTypeHelper extends Helper {
                       isOnlySet(sb.context, node, tp) ||
                       isOnlySetStorage(sb.context, node, tp) ||
                       isOnlyError(sb.context, node, tp) ||
+                      isOnlyForwardValue(sb.context, node, tp) ||
                       isOnlyIteratorResult(sb.context, node, tp) ||
                       isOnlyIterable(sb.context, node, tp) ||
                       isOnlyIterableIterator(sb.context, node, tp) ||
@@ -451,6 +470,9 @@ export class ForBuiltinTypeHelper extends Helper {
         break;
       case Types.Buffer:
         this.buffer(options);
+        break;
+      case Types.ForwardValue:
+        this.forwardValue(options);
         break;
       case Types.Null:
         this.null(options);

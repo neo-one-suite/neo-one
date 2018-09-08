@@ -2,11 +2,12 @@ import { ABIReturn } from '@neo-one/client';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DEFAULT_DIAGNOSTIC_OPTIONS, DiagnosticOptions } from '../analysis';
-import { isOnlyArray, isOnlyBoolean, isOnlyBuffer, isOnlyString } from '../compile/helper/types';
+import { isOnlyArray, isOnlyBoolean, isOnlyBuffer, isOnlyForwardValue, isOnlyString } from '../compile/helper/types';
 import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
 import { getFixedDecimals } from './getFixedDecimals';
+import { getForwardedValueType } from './getForwardedValueType';
 
 export function toABIReturn(
   context: Context,
@@ -30,24 +31,38 @@ export function toABIReturn(
     optional = true;
   }
 
+  let forwardedValue = false;
+  if (context.builtins.isType(node, resolvedType, 'ForwardedValue')) {
+    resolvedType = getForwardedValueType(resolvedType);
+    if (resolvedType === undefined) {
+      return undefined;
+    }
+    forwardedValue = true;
+  }
+
+  if (tsUtils.type_.hasUndefinedish(resolvedType)) {
+    resolvedType = tsUtils.type_.getNonNullableType(resolvedType);
+    optional = true;
+  }
+
   if (isOnlyBoolean(context, node, resolvedType)) {
-    return { type: 'Boolean', optional };
+    return { type: 'Boolean', optional, forwardedValue };
   }
 
   if (context.builtins.isInterface(node, resolvedType, 'Address')) {
-    return { type: 'Address', optional };
+    return { type: 'Address', optional, forwardedValue };
   }
 
   if (context.builtins.isInterface(node, resolvedType, 'Hash256')) {
-    return { type: 'Hash256', optional };
+    return { type: 'Hash256', optional, forwardedValue };
   }
 
   if (context.builtins.isInterface(node, resolvedType, 'PublicKey')) {
-    return { type: 'PublicKey', optional };
+    return { type: 'PublicKey', optional, forwardedValue };
   }
 
   if (isOnlyString(context, node, resolvedType)) {
-    return { type: 'String', optional };
+    return { type: 'String', optional, forwardedValue };
   }
 
   if (tsUtils.type_.isOnlyNumberLiteral(resolvedType)) {
@@ -57,7 +72,7 @@ export function toABIReturn(
   if (context.builtins.isType(node, resolvedType, 'Fixed')) {
     const decimals = getFixedDecimals(resolvedType);
 
-    return { type: 'Integer', optional, decimals };
+    return { type: 'Integer', optional, decimals: decimals === undefined ? 0 : decimals };
   }
 
   if (tsUtils.type_.isOnlyNumberish(resolvedType)) {
@@ -75,7 +90,11 @@ export function toABIReturn(
   }
 
   if (isOnlyBuffer(context, node, resolvedType)) {
-    return { type: 'Buffer', optional };
+    return { type: 'Buffer', optional, forwardedValue };
+  }
+
+  if (isOnlyForwardValue(context, node, resolvedType)) {
+    return { type: 'ForwardValue', optional, forwardedValue };
   }
 
   if (options.error) {

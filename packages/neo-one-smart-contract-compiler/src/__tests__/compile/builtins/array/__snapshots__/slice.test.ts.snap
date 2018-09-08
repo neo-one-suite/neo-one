@@ -4,7 +4,7 @@ exports[`Array.prototype.slice cannot be referenced 1`] = `
 "snippetCode.ts (3,19): Builtin properties cannot be referenced
 
       1 | 
-      2 |       const x: ReadonlyArray<number> = [0, 1, 2];
+      2 |       const x = [1, 2, 3, 4];
     > 3 |       const y = x.slice;
         |                   ^
       4 |     

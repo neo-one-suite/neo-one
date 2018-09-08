@@ -82,6 +82,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
             set: throwTypeError,
             setStorage: throwTypeError,
             error: throwTypeError,
+            forwardValue: throwTypeError,
             iteratorResult: throwTypeError,
             iterable: throwTypeError,
             iterableIterator: throwTypeError,

@@ -19,6 +19,7 @@ import { Wallet } from '@neo-one/server-plugin-wallet';
 import { TestOptions } from '@neo-one/smart-contract-test';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
+import { EscrowReadSmartContract, EscrowSmartContract } from '../__data__/ico/one/generated';
 import { ICOReadSmartContract, ICOSmartContract } from '../__data__/ico/one/generated/ICO/types';
 import { TokenReadSmartContract, TokenSmartContract } from '../__data__/ico/one/generated/Token/types';
 import { Contracts } from '../__data__/ico/one/generated/types';
@@ -75,7 +76,7 @@ const getContracts = async (client: Client, networkName: string): Promise<Readon
       if (transaction.type === 'InvocationTransaction' && transaction.invocationData.contracts.length > 0) {
         mutableContracts.push(transaction.invocationData.contracts[0]);
 
-        if (mutableContracts.length === 2) {
+        if (mutableContracts.length === 3) {
           return mutableContracts;
         }
       }
@@ -119,6 +120,23 @@ const getGeneratedTokenCode = (): {
   return { abi, contract: { createSmartContract, createReadSmartContract } };
 };
 
+const getGeneratedEscrowCode = (): {
+  readonly abi: ABI;
+  readonly contract: {
+    readonly createSmartContract: (client: Client) => EscrowSmartContract;
+    readonly createReadSmartContract: (readClient: ReadClient) => EscrowReadSmartContract;
+  };
+} => {
+  // tslint:disable-next-line no-require-imports
+  const abi = require('../__data__/ico/one/generated/Escrow/abi').escrowABI;
+  // tslint:disable-next-line no-require-imports
+  const contract = require('../__data__/ico/one/generated/Escrow/contract');
+  const createSmartContract = contract.createEscrowSmartContract;
+  const createReadSmartContract = contract.createEscrowReadSmartContract;
+
+  return { abi, contract: { createSmartContract, createReadSmartContract } };
+};
+
 const getGeneratedCommonCode = (): {
   readonly createClient: () => Client;
   readonly createDeveloperClients: () => { readonly [network: string]: DeveloperClient };
@@ -128,6 +146,7 @@ const getGeneratedCommonCode = (): {
 const verifySmartContractAfterMint = async (
   ico: ICOSmartContract,
   token: TokenSmartContract,
+  escrow: EscrowSmartContract,
   accountID: UserAccountID,
   toAccountID: UserAccountID,
   developerClient?: DeveloperClient,
@@ -160,11 +179,65 @@ const verifySmartContractAfterMint = async (
   expect(totalSupplyAfter.toString()).toEqual('100');
   expect(balanceAfter.toString()).toEqual('75');
   expect(toBalanceAfter.toString()).toEqual('25');
+
+  const escrowAddress = escrow.definition.networks[accountID.network].address;
+  const [escrowTransferReceipt] = await Promise.all([
+    token.transfer.confirmed(
+      accountID.address,
+      escrowAddress,
+      new BigNumber('25'),
+      ...escrow.forwardApproveReceiveTransferArgs(toAccountID.address),
+    ),
+    developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+  ]);
+  if (escrowTransferReceipt.result.state === 'FAULT') {
+    throw new Error(escrowTransferReceipt.result.message);
+  }
+
+  const tokenAddress = token.definition.networks[accountID.network].address;
+  const [escrowBalanceAfterEscrow, balanceAfterEscrow, toBalanceAfterEscrow, escrowPairBalance] = await Promise.all([
+    token.balanceOf(escrowAddress),
+    token.balanceOf(accountID.address),
+    token.balanceOf(toAccountID.address),
+    escrow.balanceOf(accountID.address, toAccountID.address, tokenAddress),
+  ]);
+  expect(escrowBalanceAfterEscrow.toString()).toEqual('25');
+  expect(balanceAfterEscrow.toString()).toEqual('50');
+  expect(toBalanceAfterEscrow.toString()).toEqual('25');
+  expect(escrowPairBalance.toString()).toEqual('25');
+
+  const [escrowClaimReceipt] = await Promise.all([
+    escrow.claim.confirmed(accountID.address, toAccountID.address, tokenAddress, new BigNumber('10'), {
+      from: toAccountID,
+    }),
+    developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+  ]);
+  if (escrowClaimReceipt.result.state === 'FAULT') {
+    throw new Error(escrowClaimReceipt.result.message);
+  }
+  expect(escrowClaimReceipt.result.value).toEqual(true);
+
+  const [
+    escrowBalanceAfterClaim,
+    balanceAfterClaim,
+    toBalanceAfterClaim,
+    escrowPairBalanceAfterClaim,
+  ] = await Promise.all([
+    token.balanceOf(escrowAddress),
+    token.balanceOf(accountID.address),
+    token.balanceOf(toAccountID.address),
+    escrow.balanceOf(accountID.address, toAccountID.address, tokenAddress),
+  ]);
+  expect(escrowBalanceAfterClaim.toString()).toEqual('15');
+  expect(balanceAfterClaim.toString()).toEqual('50');
+  expect(toBalanceAfterClaim.toString()).toEqual('35');
+  expect(escrowPairBalanceAfterClaim.toString()).toEqual('15');
 };
 
 const verifySmartContracts = async (
   ico: ICOSmartContract,
   token: TokenSmartContract,
+  escrow: EscrowSmartContract,
   icoRead: ICOReadSmartContract,
   tokenRead: TokenReadSmartContract,
   accountID: UserAccountID,
@@ -235,7 +308,7 @@ const verifySmartContracts = async (
   expect(event.parameters.to).toEqual(accountID.address);
   expect(event.parameters.amount.toString()).toEqual('100');
 
-  await verifySmartContractAfterMint(ico, token, accountID, toAccountID, developerClient);
+  await verifySmartContractAfterMint(ico, token, escrow, accountID, toAccountID, developerClient);
 };
 
 type WithContracts = (test: (contracts: Contracts & TestOptions) => Promise<void>) => Promise<void>;
@@ -243,10 +316,15 @@ const verifySmartContractsTest = async (nowSeconds: number) => {
   // tslint:disable-next-line no-require-imports
   const test = require('../__data__/ico/one/generated/test');
   const withContracts: WithContracts = test.withContracts;
-  await withContracts(async ({ ico, token, masterAccountID, networkName }) => {
+  await withContracts(async ({ ico, token, escrow, masterAccountID, networkName, client }) => {
+    await client.providers.memory.keystore.addAccount({
+      network: networkName,
+      privateKey: TO_PRIVATE_KEY,
+    });
     await verifySmartContracts(
       ico,
       token,
+      escrow,
       ico.read(networkName),
       token.read(networkName),
       masterAccountID,
@@ -266,17 +344,39 @@ const verifySmartContractsManual = async (accountID: UserAccountID, toAccountID:
     abi: tokenABI,
     contract: { createSmartContract: createTokenSmartContract, createReadSmartContract: createTokenReadSmartContract },
   } = getGeneratedTokenCode();
+  expect(tokenABI).toBeDefined();
+  const {
+    abi: escrowABI,
+    contract: { createSmartContract: createEscrowSmartContract },
+  } = getGeneratedEscrowCode();
+  expect(escrowABI).toBeDefined();
+
   const { createClient, createDeveloperClients } = getGeneratedCommonCode();
   const client = createClient();
   const developerClient = createDeveloperClients().local;
-  expect(tokenABI).toBeDefined();
 
   const ico = createICOSmartContract(client);
   const icoRead = createICOReadSmartContract(client.read(accountID.network));
   const token = createTokenSmartContract(client);
   const tokenRead = createTokenReadSmartContract(client.read(accountID.network));
+  const escrow = createEscrowSmartContract(client);
 
-  await verifySmartContracts(ico, token, icoRead, tokenRead, accountID, toAccountID, nowSeconds, developerClient);
+  await client.providers.memory.keystore.addAccount({
+    network: accountID.network,
+    privateKey: TO_PRIVATE_KEY,
+  });
+
+  await verifySmartContracts(
+    ico,
+    token,
+    escrow,
+    icoRead,
+    tokenRead,
+    accountID,
+    toAccountID,
+    nowSeconds,
+    developerClient,
+  );
 };
 
 const verifyICOContract = (contract?: Contract): void => {
@@ -308,7 +408,23 @@ const verifyTokenContract = (contract?: Contract): void => {
   expect(contract.returnType).toEqual('Buffer');
   expect(contract.payable).toBeFalsy();
   expect(contract.storage).toBeTruthy();
-  expect(contract.dynamicInvoke).toBeFalsy();
+  expect(contract.dynamicInvoke).toBeTruthy();
+};
+
+const verifyEscrowContract = (contract?: Contract): void => {
+  expect(contract).toBeDefined();
+  if (contract === undefined) {
+    throw new Error('For TS');
+  }
+  expect(contract.codeVersion).toEqual('1.0');
+  expect(contract.author).toEqual('dicarlo2');
+  expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
+  expect(contract.description).toEqual('Escrow');
+  expect(contract.parameters).toEqual(['String', 'Array']);
+  expect(contract.returnType).toEqual('Buffer');
+  expect(contract.payable).toBeFalsy();
+  expect(contract.storage).toBeTruthy();
+  expect(contract.dynamicInvoke).toBeTruthy();
 };
 
 describe('buildCommand', () => {
@@ -342,6 +458,7 @@ describe('buildCommand', () => {
     const contracts = await getContracts(client, LOCAL);
     verifyICOContract(contracts.find((contract) => contract.name === 'ICO'));
     verifyTokenContract(contracts.find((contract) => contract.name === 'Token'));
+    verifyEscrowContract(contracts.find((contract) => contract.name === 'Escrow'));
 
     await Promise.all([
       verifySmartContractsTest(nowSeconds),

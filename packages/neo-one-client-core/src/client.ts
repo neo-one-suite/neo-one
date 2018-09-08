@@ -1,4 +1,4 @@
-import { utils } from '@neo-one/utils';
+import { upperCaseFirst, utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import { ActionJSON } from './action';
@@ -7,7 +7,7 @@ import { common } from './common';
 import { ContractParameterJSON } from './contractParameter';
 import { crypto } from './crypto';
 import { InvocationResultJSON } from './invocationResult';
-import { AddressString, ContractParameter, RawAction, RawCallReceipt, RawInvocationResult } from './types';
+import { ABIFunction, AddressString, ContractParameter, RawAction, RawCallReceipt, RawInvocationResult } from './types';
 import { JSONHelper } from './utils';
 import { VMState } from './vm';
 
@@ -142,3 +142,6 @@ export const bigNumberToBN = (value: BigNumber, decimals: number): BN => {
 
   return new BN(value.times(dBigNumber).toString(), 10);
 };
+
+export const createForwardedValueFuncArgsName = (func: ABIFunction) => `forward${upperCaseFirst(func.name)}Args`;
+export const createForwardedValueFuncReturnName = (func: ABIFunction) => `forward${upperCaseFirst(func.name)}Return`;

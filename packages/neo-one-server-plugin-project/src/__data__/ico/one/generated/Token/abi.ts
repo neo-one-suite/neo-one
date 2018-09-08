@@ -1,4 +1,4 @@
-/* @hash 3bd31af98a6e466afc898056e930d904 */
+/* @hash 335ce599ffa4671cda5ac2d17dcd73d8 */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -9,13 +9,61 @@ export const tokenABI: ABI = {
       name: 'transfer',
       parameters: [
         {
+          forwardedValue: false,
           name: 'from',
           optional: true,
           type: 'Address',
         },
         {
+          forwardedValue: false,
           name: 'to',
           optional: true,
+          type: 'Address',
+        },
+        {
+          decimals: 8,
+          name: 'amount',
+          optional: false,
+          type: 'Integer',
+        },
+      ],
+    },
+    {
+      name: 'approveSendTransfer',
+      parameters: [
+        {
+          forwardedValue: false,
+          name: 'from',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          forwardedValue: false,
+          name: 'to',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          decimals: 8,
+          name: 'amount',
+          optional: false,
+          type: 'Integer',
+        },
+      ],
+    },
+    {
+      name: 'revokeSendTransfer',
+      parameters: [
+        {
+          forwardedValue: false,
+          name: 'from',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          forwardedValue: false,
+          name: 'to',
+          optional: false,
           type: 'Address',
         },
         {
@@ -33,6 +81,7 @@ export const tokenABI: ABI = {
       name: 'name',
       parameters: [],
       returnType: {
+        forwardedValue: false,
         optional: false,
         type: 'String',
       },
@@ -42,6 +91,7 @@ export const tokenABI: ABI = {
       name: 'symbol',
       parameters: [],
       returnType: {
+        forwardedValue: false,
         optional: false,
         type: 'String',
       },
@@ -72,7 +122,34 @@ export const tokenABI: ABI = {
       name: 'balanceOf',
       parameters: [
         {
+          forwardedValue: false,
           name: 'address',
+          optional: false,
+          type: 'Address',
+        },
+      ],
+      receive: false,
+      returnType: {
+        decimals: 8,
+        optional: false,
+        type: 'Integer',
+      },
+      send: false,
+    },
+    {
+      claim: false,
+      constant: true,
+      name: 'approvedTransfer',
+      parameters: [
+        {
+          forwardedValue: false,
+          name: 'from',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          forwardedValue: false,
+          name: 'to',
           optional: false,
           type: 'Address',
         },
@@ -91,11 +168,116 @@ export const tokenABI: ABI = {
       name: 'transfer',
       parameters: [
         {
+          forwardedValue: false,
           name: 'from',
           optional: false,
           type: 'Address',
         },
         {
+          forwardedValue: false,
+          name: 'to',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          decimals: 8,
+          name: 'amount',
+          optional: false,
+          type: 'Integer',
+        },
+        {
+          forwardedValue: false,
+          name: 'approveArgs',
+          optional: false,
+          rest: true,
+          type: 'ForwardValue',
+        },
+      ],
+      receive: false,
+      returnType: {
+        forwardedValue: false,
+        optional: false,
+        type: 'Boolean',
+      },
+      send: false,
+    },
+    {
+      claim: false,
+      constant: false,
+      name: 'approveSendTransfer',
+      parameters: [
+        {
+          forwardedValue: false,
+          name: 'from',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          forwardedValue: false,
+          name: 'to',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          decimals: 0,
+          name: 'amount',
+          optional: false,
+          type: 'Integer',
+        },
+      ],
+      receive: false,
+      returnType: {
+        forwardedValue: false,
+        optional: false,
+        type: 'Boolean',
+      },
+      send: false,
+    },
+    {
+      claim: false,
+      constant: false,
+      name: 'approveReceiveTransfer',
+      parameters: [
+        {
+          forwardedValue: false,
+          name: 'from',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          decimals: 8,
+          name: 'amount',
+          optional: false,
+          type: 'Integer',
+        },
+        {
+          forwardedValue: false,
+          name: 'asset',
+          optional: false,
+          type: 'Address',
+        },
+      ],
+      receive: false,
+      returnType: {
+        forwardedValue: false,
+        optional: false,
+        type: 'Boolean',
+      },
+      send: false,
+    },
+    {
+      claim: false,
+      constant: false,
+      name: 'revokeSendTransfer',
+      parameters: [
+        {
+          forwardedValue: false,
+          name: 'from',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          forwardedValue: false,
           name: 'to',
           optional: false,
           type: 'Address',
@@ -109,8 +291,40 @@ export const tokenABI: ABI = {
       ],
       receive: false,
       returnType: {
+        forwardedValue: false,
         optional: false,
         type: 'Boolean',
+      },
+      send: false,
+    },
+    {
+      claim: false,
+      constant: false,
+      name: 'onRevokeSendTransfer',
+      parameters: [
+        {
+          forwardedValue: false,
+          name: 'from',
+          optional: false,
+          type: 'Address',
+        },
+        {
+          decimals: 8,
+          name: 'amount',
+          optional: false,
+          type: 'Integer',
+        },
+        {
+          forwardedValue: false,
+          name: 'asset',
+          optional: false,
+          type: 'Address',
+        },
+      ],
+      receive: false,
+      returnType: {
+        optional: false,
+        type: 'Void',
       },
       send: false,
     },
@@ -120,6 +334,7 @@ export const tokenABI: ABI = {
       name: 'issue',
       parameters: [
         {
+          forwardedValue: false,
           name: 'to',
           optional: false,
           type: 'Address',
@@ -133,6 +348,7 @@ export const tokenABI: ABI = {
       ],
       receive: false,
       returnType: {
+        forwardedValue: false,
         optional: false,
         type: 'Boolean',
       },

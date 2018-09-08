@@ -12,7 +12,7 @@ describe('common', () => {
   };
 
   test('convertParameter', () => {
-    const result = common.convertParameter({
+    const result = common.convertContractParameter({
       type: parameter,
       parameter: param,
     });
@@ -67,7 +67,7 @@ describe('common', () => {
       events: { [event.name]: event },
     });
 
-    if (result.type !== 'Event') {
+    if (typeof result === 'string' || result.type !== 'Event') {
       throw new Error('For TS');
     }
     expect(result.parameters.from).toEqual(keys[0].address);
@@ -94,17 +94,16 @@ describe('common', () => {
 
   test('convertAction - unknown event', () => {
     const event = factory.createABIEvent();
+    const eventName = `something-${event.name}`;
     const action = factory.createRawNotification({
-      args: [factory.createStringContractParameter({ value: `something-${event.name}` })],
+      args: [factory.createStringContractParameter({ value: eventName })],
     });
 
-    const result = () =>
-      common.convertAction({
-        action,
-        events: { [event.name]: event },
-      });
-
-    expect(result).toThrowErrorMatchingSnapshot();
+    const result = common.convertAction({
+      action,
+      events: { [event.name]: event },
+    });
+    expect(result).toEqual(eventName);
   });
 
   test('convertInvocationResult - error', async () => {

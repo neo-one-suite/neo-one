@@ -1,5 +1,5 @@
 // tslint:disable strict-type-predicates
-import { assertAttributeUsageJSON, common } from '@neo-one/client-core';
+import { assertAttributeUsageJSON, common, ForwardValue, Param, ScriptBuilderParam } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -404,6 +404,7 @@ const ABI_TYPES = new Set([
   'Array',
   'Void',
   'Integer',
+  'ForwardValue',
 ]);
 
 const assertABIType = (name: string, valueIn?: unknown): ABIReturn['type'] => {
@@ -422,28 +423,31 @@ const assertABIReturn = (name: string, value?: unknown): ABIReturn => {
   }
 
   const type = assertProperty(value, 'ABIReturn', 'type', assertABIType);
-  const optional = assertProperty(value, 'ABIParameter', 'optional', assertNullableBoolean);
+  const optional = assertProperty(value, 'ABIReturn', 'optional', assertNullableBoolean);
+  const forwardedValue = assertProperty(value, 'ABIReturn', 'forwardedValue', assertNullableBoolean);
   switch (type) {
     case 'Signature':
-      return { type, optional };
+      return { type, optional, forwardedValue };
     case 'Boolean':
-      return { type, optional };
+      return { type, optional, forwardedValue };
     case 'Address':
-      return { type, optional };
+      return { type, optional, forwardedValue };
     case 'Hash256':
-      return { type, optional };
+      return { type, optional, forwardedValue };
     case 'Buffer':
-      return { type, optional };
+      return { type, optional, forwardedValue };
     case 'PublicKey':
-      return { type, optional };
+      return { type, optional, forwardedValue };
     case 'String':
-      return { type, optional };
+      return { type, optional, forwardedValue };
     case 'Array':
-      return { type, value: assertProperty(value, 'ABIReturn', 'value', assertABIReturn), optional };
+      return { type, value: assertProperty(value, 'ABIReturn', 'value', assertABIReturn), optional, forwardedValue };
     case 'Void':
-      return { type, optional };
+      return { type, optional, forwardedValue };
     case 'Integer':
-      return { type, decimals: assertProperty(value, 'ABIReturn', 'decimals', assertNumber), optional };
+      return { type, decimals: assertProperty(value, 'ABIReturn', 'decimals', assertNumber), optional, forwardedValue };
+    case 'ForwardValue':
+      return { type, optional, forwardedValue };
     default:
       /* istanbul ignore next */
       utils.assertNever(type);
@@ -488,23 +492,25 @@ const assertABIParameter = (propName: string, value?: unknown): ABIParameter => 
   const type = assertProperty(value, 'ABIParameter', 'type', assertABIType);
   const name = assertProperty(value, 'ABIParameter', 'name', assertString);
   const optional = assertProperty(value, 'ABIParameter', 'optional', assertNullableBoolean);
+  const rest = assertProperty(value, 'ABIParameter', 'rest', assertNullableBoolean);
   const defaultValue = assertProperty(value, 'ABIParameter', 'default', assertNullableABIDefault);
+  const forwardedValue = assertProperty(value, 'ABIParameter', 'forwardedValue', assertNullableBoolean);
 
   switch (type) {
     case 'Signature':
-      return { type, name, optional, default: defaultValue };
+      return { type, name, optional, default: defaultValue, forwardedValue, rest };
     case 'Boolean':
-      return { type, name, optional, default: defaultValue };
+      return { type, name, optional, default: defaultValue, forwardedValue, rest };
     case 'Address':
-      return { type, name, optional, default: defaultValue };
+      return { type, name, optional, default: defaultValue, forwardedValue, rest };
     case 'Hash256':
-      return { type, name, optional, default: defaultValue };
+      return { type, name, optional, default: defaultValue, forwardedValue, rest };
     case 'Buffer':
-      return { type, name, optional, default: defaultValue };
+      return { type, name, optional, default: defaultValue, forwardedValue, rest };
     case 'PublicKey':
-      return { type, name, optional, default: defaultValue };
+      return { type, name, optional, default: defaultValue, forwardedValue, rest };
     case 'String':
-      return { type, name, optional, default: defaultValue };
+      return { type, name, optional, default: defaultValue, forwardedValue, rest };
     case 'Array':
       return {
         type,
@@ -512,9 +518,11 @@ const assertABIParameter = (propName: string, value?: unknown): ABIParameter => 
         optional,
         default: defaultValue,
         value: assertProperty(value, 'ABIParameter', 'value', assertABIReturn),
+        forwardedValue,
+        rest,
       };
     case 'Void':
-      return { type, name, optional, default: defaultValue };
+      return { type, name, optional, default: defaultValue, forwardedValue, rest };
     case 'Integer':
       return {
         type,
@@ -522,7 +530,10 @@ const assertABIParameter = (propName: string, value?: unknown): ABIParameter => 
         optional,
         default: defaultValue,
         decimals: assertProperty(value, 'ABIParameter', 'decimals', assertNumber),
+        forwardedValue,
       };
+    case 'ForwardValue':
+      return { type, name, optional, default: defaultValue, forwardedValue, rest };
     default:
       /* istanbul ignore next */
       utils.assertNever(type);
@@ -699,4 +710,51 @@ export const assertPrivateKey = (name: string, valueIn?: unknown): PrivateKeyStr
       throw new InvalidArgumentError('PrivateKey', name, value);
     }
   }
+};
+
+const assertScriptBuilderParam = (name: string, value?: unknown): ScriptBuilderParam => {
+  if (value == undefined) {
+    throw new InvalidArgumentError('ScriptBuilderParam', name, value);
+  }
+
+  // tslint:disable-next-line no-any
+  return value as any;
+};
+
+const assertNullableScriptBuilderParam = (name: string, value?: unknown): ScriptBuilderParam | undefined => {
+  if (value == undefined) {
+    return undefined;
+  }
+
+  return assertScriptBuilderParam(name, value);
+};
+
+const assertParam = (name: string, value?: unknown): Param => {
+  if (value == undefined) {
+    throw new InvalidArgumentError('Param', name, value);
+  }
+
+  // tslint:disable-next-line no-any
+  return value as any;
+};
+
+const assertNullableParam = (name: string, value?: unknown): Param | undefined => {
+  if (value == undefined) {
+    return undefined;
+  }
+
+  return assertParam(name, value);
+};
+
+export const assertForwardValue = (name: string, value?: unknown): ForwardValue => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('UserAccountID', name, value);
+  }
+
+  return {
+    name: assertProperty(value, 'ForwardValue', 'name', assertString),
+    converted: assertProperty(value, 'ForwardValue', 'converted', assertNullableScriptBuilderParam),
+    param: assertProperty(value, 'ForwardValue', 'param', assertNullableParam),
+    // tslint:disable-next-line no-any
+  } as any;
 };

@@ -7,6 +7,7 @@ import {
   ArrayABI,
   BooleanABI,
   BufferABI,
+  ForwardValueABI,
   Hash256ABI,
   IntegerABI,
   Param,
@@ -62,4 +63,6 @@ export const params = {
 
     return param;
   },
+  ForwardValue: (name: string, param: Param, parameter: ForwardValueABI): ScriptBuilderParam | undefined =>
+    parameter.optional && param === undefined ? undefined : args.assertForwardValue(name, param).converted,
 };

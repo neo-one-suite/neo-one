@@ -180,6 +180,7 @@ export class GenericLogSerializeHelper extends Helper {
               set: handleSet,
               setStorage: throwTypeError,
               error: throwTypeError,
+              forwardValue: throwTypeError,
               iteratorResult: throwTypeError,
               iterable: throwTypeError,
               iterableIterator: throwTypeError,

@@ -39,6 +39,19 @@ exports[`ABISmartContractProcessor invalid method parameter 1`] = `
 "
 `;
 
+exports[`ABISmartContractProcessor invalid method return - union 1`] = `
+"snippetCode.ts (15,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
+
+      13 |         private foo: boolean = true;
+      14 | 
+    > 15 |         public test() {
+         |         ^
+      16 |           if (this.foo) {
+      17 |             return '';
+      18 |           }
+"
+`;
+
 exports[`ABISmartContractProcessor invalid method return 1`] = `
 "snippetCode.ts (16,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
 
