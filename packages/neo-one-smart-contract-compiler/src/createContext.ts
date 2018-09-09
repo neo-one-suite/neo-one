@@ -7,15 +7,16 @@ import glob from 'glob';
 import * as path from 'path';
 import ts from 'typescript';
 import { Context } from './Context';
-import { normalizePath, pathResolve } from './utils';
+import { getAllSourceFiles, normalizePath, pathResolve } from './utils';
 
 function createContext(
+  sourceFiles: Set<ts.SourceFile>,
   program: ts.Program,
   typeChecker: ts.TypeChecker,
   languageService: ts.LanguageService,
   smartContractDir: string,
 ): Context {
-  return new Context(program, typeChecker, languageService, smartContractDir);
+  return new Context(sourceFiles, program, typeChecker, languageService, smartContractDir);
 }
 
 export function updateContext(context: Context, files: { readonly [fileName: string]: string | undefined }): Context {
@@ -29,7 +30,12 @@ export function updateContext(context: Context, files: { readonly [fileName: str
     },
   );
 
-  return context.update(program, typeChecker, languageService, smartContractDir);
+  const sourceFiles = getAllSourceFiles(
+    Object.keys(files).map((rootName) => tsUtils.file.getSourceFileOrThrow(program, rootName)),
+    typeChecker,
+  );
+
+  return context.update(sourceFiles, program, typeChecker, languageService, smartContractDir);
 }
 
 const doGlob = async (value: string) =>
@@ -85,7 +91,12 @@ const makeContext = (
 
   const { program, typeChecker, languageService, smartContractDir } = createProgram(parsed.options, rootNames, options);
 
-  return createContext(program, typeChecker, languageService, smartContractDir);
+  const sourceFiles = getAllSourceFiles(
+    rootNames.map((rootName) => tsUtils.file.getSourceFileOrThrow(program, rootName)),
+    typeChecker,
+  );
+
+  return createContext(sourceFiles, program, typeChecker, languageService, smartContractDir);
 };
 
 const createModifyHostFiles = (files: { readonly [fileName: string]: string | undefined }) => (
@@ -241,6 +252,7 @@ export const createContextForSnippet = (
 };
 
 export const createContextForLanguageService = (
+  filePath: string,
   languageService: ts.LanguageService,
   smartContractDir: string,
 ): Context => {
@@ -249,5 +261,9 @@ export const createContextForLanguageService = (
     throw new Error('Something went wrong');
   }
 
-  return createContext(program, program.getTypeChecker(), languageService, smartContractDir);
+  const sourceFile = tsUtils.file.getSourceFileOrThrow(program, filePath);
+  const typeChecker = program.getTypeChecker();
+  const sourceFiles = getAllSourceFiles([sourceFile], typeChecker);
+
+  return createContext(sourceFiles, program, typeChecker, languageService, smartContractDir);
 };

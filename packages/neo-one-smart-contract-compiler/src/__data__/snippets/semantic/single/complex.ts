@@ -18,6 +18,8 @@ const notifyTransfer = createEventNotifier<Address | undefined, Address | undefi
   'amount',
 );
 
+const notifyTransfer2 = createEventNotifier<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
+
 const notifyRefund = createEventNotifier('refund');
 
 // tslint:disable-next-line export-name
@@ -79,7 +81,7 @@ export class ICO extends SmartContract {
     const toBalance = this.balanceOf(to);
     this.balances.set(from, fromBalance - amount);
     this.balances.set(to, toBalance + amount);
-    notifyTransfer(from, to, amount);
+    notifyTransfer2(from, to, amount);
 
     return true;
   }

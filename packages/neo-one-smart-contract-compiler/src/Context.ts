@@ -21,6 +21,7 @@ export class Context {
   public readonly analysis: AnalysisService;
 
   public constructor(
+    public readonly sourceFiles: Set<ts.SourceFile>,
     public readonly program: ts.Program,
     public readonly typeChecker: ts.TypeChecker,
     public readonly languageService: ts.LanguageService,
@@ -49,12 +50,15 @@ export class Context {
   }
 
   public update(
+    sourceFiles: Set<ts.SourceFile>,
     program: ts.Program,
     typeChecker: ts.TypeChecker,
     languageService: ts.LanguageService,
     smartContractDir: string,
   ): Context {
-    return new Context(program, typeChecker, languageService, smartContractDir, [...this.mutableDiagnostics]);
+    return new Context(sourceFiles, program, typeChecker, languageService, smartContractDir, [
+      ...this.mutableDiagnostics,
+    ]);
   }
 
   public reportError(

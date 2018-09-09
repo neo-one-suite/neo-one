@@ -145,8 +145,8 @@ export class ABISmartContractProcessor {
   private processEvents(): ReadonlyArray<ABIEvent> {
     const decl = tsUtils.symbol.getDeclarations(this.context.builtins.getValueSymbol('createEventNotifier'))[0];
 
-    const calls = tsUtils.reference
-      .findReferencesAsNodes(this.context.program, this.context.languageService, decl)
+    const calls = this.context.analysis
+      .findReferencesAsNodes(decl)
       .map((node) => {
         if (ts.isIdentifier(node)) {
           const parent = tsUtils.node.getParent(node);

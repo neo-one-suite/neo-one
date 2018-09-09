@@ -1,6 +1,6 @@
 import { addressToScriptHash } from '@neo-one/client';
 import { common, ECPoint, UInt160, UInt256 } from '@neo-one/client-core';
-import { tsUtils } from '@neo-one/ts-utils';
+import { AnyNameableNode, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
 import {
@@ -354,6 +354,14 @@ export class AnalysisService {
             this.isValidStorageMap(node, tp) ||
             this.isValidStorageSet(node, tp),
         ),
+    );
+  }
+
+  public findReferencesAsNodes(node: AnyNameableNode | ts.Identifier): ReadonlyArray<ts.Node> {
+    return this.memoized('find-references-as-nodes', nodeKey(node), () =>
+      tsUtils.reference
+        .findReferencesAsNodes(this.context.program, this.context.languageService, node)
+        .filter((found) => this.context.sourceFiles.has(tsUtils.node.getSourceFile(found))),
     );
   }
 

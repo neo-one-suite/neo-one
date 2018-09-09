@@ -2,7 +2,7 @@ import * as appRootDir from 'app-root-dir';
 import * as path from 'path';
 import ts from 'typescript';
 import { CompilerDiagnostic } from '../CompilerDiagnostic';
-import { createContextForPath } from '../createContext';
+import { createContextForDir } from '../createContext';
 import { getSemanticDiagnostics } from '../getSemanticDiagnostics';
 import { pathResolve } from '../utils';
 
@@ -29,7 +29,7 @@ const serializeDiagnostic = (diagnostic: ts.Diagnostic) => {
 };
 
 // tslint:disable-next-line readonly-array
-const verifySnippet = (...snippetPath: string[]) => {
+const verifySnippet = async (...snippetPath: string[]) => {
   const filePath = pathResolve(
     appRootDir.get(),
     'packages',
@@ -40,7 +40,7 @@ const verifySnippet = (...snippetPath: string[]) => {
     'semantic',
     ...snippetPath,
   );
-  const context = createContextForPath(filePath, { withTestHarness: true });
+  const context = await createContextForDir(path.dirname(filePath), { withTestHarness: true });
 
   const diagnostics = getSemanticDiagnostics({
     filePath,
@@ -53,10 +53,14 @@ const verifySnippet = (...snippetPath: string[]) => {
 
 describe('getSemanticDiagnostics', () => {
   test('reports errors for a simple single file', async () => {
-    verifySnippet('single', 'simple.ts');
+    await verifySnippet('single', 'simple.ts');
   });
 
   test('reports errors for a complex single file', async () => {
-    verifySnippet('single', 'complex.ts');
+    await verifySnippet('single', 'complex.ts');
+  });
+
+  test('reports no errors for a complex valid single file', async () => {
+    await verifySnippet('single', 'valid.ts');
   });
 });

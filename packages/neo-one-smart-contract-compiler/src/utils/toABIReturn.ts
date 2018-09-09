@@ -34,15 +34,21 @@ export function toABIReturn(
   let forwardedValue = false;
   if (context.builtins.isType(node, resolvedType, 'ForwardedValue')) {
     resolvedType = getForwardedValueType(resolvedType);
-    if (resolvedType === undefined) {
-      return undefined;
-    }
     forwardedValue = true;
+  }
+
+  if (resolvedType === undefined) {
+    return undefined;
   }
 
   if (tsUtils.type_.hasUndefinedish(resolvedType)) {
     resolvedType = tsUtils.type_.getNonNullableType(resolvedType);
     optional = true;
+  }
+
+  resolvedType = context.analysis.getNotAnyType(node, resolvedType);
+  if (resolvedType === undefined) {
+    return undefined;
   }
 
   if (isOnlyBoolean(context, node, resolvedType)) {
