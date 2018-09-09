@@ -5,7 +5,6 @@ Object {
   "ts": "import { AddressString, ContractParameter, Event, ForwardValue, GetOptions, InvocationTransaction, InvokeReceipt, ReadSmartContract, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
-export type TokenEvent = TokenTransferEvent
 
 export interface TokenTransferEventParameters {
   readonly from: AddressString | undefined;
@@ -13,6 +12,7 @@ export interface TokenTransferEventParameters {
   readonly amount: BigNumber;
 }
 export interface TokenTransferEvent extends Event<'transfer', TokenTransferEventParameters> {}
+export type TokenEvent = TokenTransferEvent
 
 export interface TokenSmartContract extends SmartContract<TokenReadSmartContract> {
   readonly balanceOf: (account: AddressString) => Promise<BigNumber>;

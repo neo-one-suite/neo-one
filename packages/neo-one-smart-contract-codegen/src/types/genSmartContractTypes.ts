@@ -84,30 +84,37 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('ForwardValue');
   }
 
+  if (text.includes('SmartContract')) {
+    mutableClauses.push('SmartContract');
+  }
+
+  if (text.includes('ReadSmartContract')) {
+    mutableClauses.push('ReadSmartContract');
+  }
+
   return mutableClauses;
 };
 
 export const genSmartContractTypes = (name: string, abi: ABI) => {
   const events = abi.events === undefined ? [] : abi.events;
+  const eventType = `export type ${getEventName(name)} = ${
+    events.length === 0 ? 'never' : events.map((event) => getSingleEventName(name, event.name)).join(' | ')
+  }`;
   const text = `
 ${events.map((event) => genEvent(name, event)).join('\n')}
+${eventType}
 ${genSmartContract(name, abi)}${genReadSmartContract(name, abi)}`;
 
-  const importClauses = getImportClauses(text).concat(['SmartContract', 'ReadSmartContract']);
+  const importClauses = getImportClauses(text);
   // tslint:disable-next-line no-array-mutation
   importClauses.sort();
 
   const bigNumberImport = text.includes('BigNumber') ? "\nimport BigNumber from 'bignumber.js';" : '';
-
   const importDecl = `import { ${importClauses.join(', ')} } from '@neo-one/client';${bigNumberImport}`;
-  const eventType = `export type ${getEventName(name)} = ${
-    events.length === 0 ? 'never' : events.map((event) => getSingleEventName(name, event.name)).join(' | ')
-  }`;
 
   return {
     ts: `${importDecl}
 
-${eventType}
 ${text}`,
   };
 };
