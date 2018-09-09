@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node",
-  "version": "1.0.0-alpha.116",
+  "version": "1.0.0-alpha.117",
   "description": "NEO•ONE NEO full node.",
   "main": "./src/index.ts",
   "dependencies": {
@@ -10,7 +10,7 @@
     "@neo-one/node-core": "^1.0.0-alpha.78",
     "@neo-one/node-data-backup": "^1.0.0-alpha.72",
     "@neo-one/node-offline": "^1.0.0-alpha.78",
-    "@neo-one/node-protocol": "^1.0.0-alpha.103",
+    "@neo-one/node-protocol": "^1.0.0-alpha.104",
     "@neo-one/node-rpc": "^1.0.0-alpha.97",
     "@neo-one/node-storage-levelup": "^1.0.0-alpha.80",
     "@neo-one/node-vm": "^1.0.0-alpha.79",

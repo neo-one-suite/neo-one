@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-grpc",
-  "version": "1.0.0-alpha.28",
+  "version": "1.0.0-alpha.29",
   "description": "NEO•ONE Server GRPC.",
   "main": "./src/index.ts",
   "dependencies": {

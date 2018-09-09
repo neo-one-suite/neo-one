@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin",
-  "version": "1.0.0-alpha.73",
+  "version": "1.0.0-alpha.74",
   "description": "NEO•ONE Server plugin API.",
   "main": "./src/index.ts",
   "dependencies": {

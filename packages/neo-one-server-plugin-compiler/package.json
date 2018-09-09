@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-compiler",
-  "version": "1.0.0-alpha.102",
+  "version": "1.0.0-alpha.103",
   "description": "NEO•ONE Server compiler plugin.",
   "main": "./src/index.ts",
   "dependencies": {
@@ -8,7 +8,7 @@
     "@neo-one/client": "^1.0.0-alpha.101",
     "@neo-one/client-core": "^1.0.0-alpha.77",
     "@neo-one/csharp": "^0.0.1",
-    "@neo-one/server-plugin": "^1.0.0-alpha.73",
+    "@neo-one/server-plugin": "^1.0.0-alpha.74",
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.64",
     "@types/execa": "^0.9.0",
