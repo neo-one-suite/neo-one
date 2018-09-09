@@ -1,5 +1,5 @@
 import { Monitor } from '@neo-one/monitor';
-import { plugins as pluginsUtil, VERSION } from '@neo-one/server';
+import { plugins as pluginsUtil } from '@neo-one/server';
 import {
   Client,
   createServerConfig,
@@ -17,6 +17,7 @@ import {
   Plugin,
   ResourceType,
   Session,
+  VERSION,
 } from '@neo-one/server-plugin';
 // tslint:disable-next-line match-default-export-name
 import Table from 'cli-table2';
@@ -101,7 +102,7 @@ export class InteractiveCLI {
     readonly httpServerPort?: number;
     readonly minPort?: number;
   }) {
-    this.vorpal = new Vorpal().version('1.0.0-alpha');
+    this.vorpal = new Vorpal().version(VERSION);
     this.debug = debug;
     this.mutableSessions = {};
     this.sessions$ = new BehaviorSubject<Session>({});

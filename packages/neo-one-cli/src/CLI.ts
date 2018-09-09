@@ -1,6 +1,6 @@
 import { plugins as pluginsUtil } from '@neo-one/server';
 import { Client, createServerConfig } from '@neo-one/server-client';
-import { CLIArgs, paths as defaultPaths } from '@neo-one/server-plugin';
+import { CLIArgs, paths as defaultPaths, VERSION } from '@neo-one/server-plugin';
 import { Paths } from 'env-paths';
 import * as path from 'path';
 import { map, take } from 'rxjs/operators';
@@ -46,7 +46,7 @@ export class CLI {
 
   public async start(argv: ReadonlyArray<string>): Promise<void> {
     const vorpal = new Vorpal();
-    vorpal.version('1.0.0-alpha');
+    vorpal.version(VERSION);
 
     const { monitor, config$: logConfig$, mutableShutdownFuncs, shutdown } = setupCLI({
       logConsole: false,

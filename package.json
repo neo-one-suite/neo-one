@@ -30,7 +30,6 @@
       "packages/*/src/**/*.{ts,tsx}": [
         "yarn run prettier --write --config .prettierrc",
         "git add",
-        "yarn test --findRelatedTests --ci --passWithNoTests -w 4",
         "yarn run lint-files"
       ],
       "scripts/**/*.js": [

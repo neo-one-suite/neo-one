@@ -3,6 +3,7 @@ syntax = "proto3";
 service Server {
   rpc reset(ResetRequest) returns (ResetResponse) {}
   rpc getVersion(GetVersionRequest) returns (GetVersionResponse) {}
+  rpc verify(VerifyRequest) returns (VerifyResponse) {}
   rpc getDebug(GetDebugRequest) returns (GetDebugResponse) {}
   rpc getAllPlugins(GetAllPluginsRequest) returns (GetAllPluginsResponse) {}
   rpc getPlugins(stream GetPluginsRequest) returns (stream GetPluginsResponse) {}
@@ -27,6 +28,13 @@ message GetVersionRequest {
 
 message GetVersionResponse {
   string version = 1;
+}
+
+message VerifyRequest {
+}
+
+message VerifyResponse {
+  bool version = 1;
 }
 
 message GetDebugRequest {

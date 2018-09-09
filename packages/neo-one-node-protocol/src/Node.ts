@@ -296,7 +296,7 @@ export class Node implements INode {
     const { network: { listenTCP: { port = 0 } = {} } = {} } = environment;
     this.externalPort = port;
     this.nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
-    this.userAgent = `NEO:neo-one-js:1.0.0-alpha`;
+    this.userAgent = `NEO:neo-one-js:1.0.0-preview`;
 
     this.mutableMemPool = {};
     this.mutableKnownBlockHashes = createScalingBloomFilter();

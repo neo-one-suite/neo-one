@@ -2,7 +2,7 @@ import { context as httpContext, cors, createServer$, onError as appOnError } fr
 import { Monitor } from '@neo-one/monitor';
 import { ServerConfig, ServerManager } from '@neo-one/server-client';
 import { proto } from '@neo-one/server-grpc';
-import { Binary, Config, DescribeTable } from '@neo-one/server-plugin';
+import { Binary, Config, DescribeTable, VERSION } from '@neo-one/server-plugin';
 import { finalize } from '@neo-one/utils';
 import * as http from 'http';
 import Application from 'koa';
@@ -16,7 +16,6 @@ import { context, rpc, services as servicesMiddleware } from './middleware';
 import { PluginManager } from './PluginManager';
 import { PortAllocator } from './PortAllocator';
 
-export const VERSION = '1.0.0-alpha';
 const PLUGIN_PATH = 'plugin';
 
 export class Server {

@@ -45,6 +45,10 @@ export class Client {
     return this.unary<void>(this.client.reset);
   }
 
+  public async verify(): Promise<boolean> {
+    return this.unary(this.client.verify, {}, (response) => response.ready);
+  }
+
   public async getVersion(): Promise<string> {
     return this.unary(this.client.getVersion, {}, (response) => response.version);
   }

@@ -1,8 +1,8 @@
-import { CLIArgs, name } from '@neo-one/server-plugin';
+import { CLIArgs, name, VERSION } from '@neo-one/server-plugin';
 
 export const version = ({ vorpal, shutdown }: CLIArgs) => {
   vorpal.command('version', `Prints the ${name.title} version and exits.`).action(async () => {
-    vorpal.activeCommand.log('1.0.0-alpha');
+    vorpal.activeCommand.log(VERSION);
 
     shutdown({ exitCode: 0 });
   });

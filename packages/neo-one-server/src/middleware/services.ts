@@ -8,6 +8,7 @@ import {
   ReadResponse,
   TaskList,
   TaskStatus,
+  VERSION,
 } from '@neo-one/server-plugin';
 import { Context } from 'mali';
 import { EMPTY, Observable, Observer, of as _of } from 'rxjs';
@@ -147,7 +148,10 @@ export const services = ({ server }: { readonly server: Server }) => {
       ctx.res = {};
     },
     getVersion: async (ctx: Context) => {
-      ctx.res = { version: '1.0.0-alpha' };
+      ctx.res = { version: VERSION };
+    },
+    verify: async (ctx: Context) => {
+      ctx.res = { ready: true };
     },
     getDebug: async (ctx: Context) => {
       ctx.res = { debug: JSON.stringify(server.getDebug()) };
