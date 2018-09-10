@@ -1,7 +1,7 @@
 {
   "name": "@neo-one/react-template",
   "author": "Alex DiCarlo <alexdicarlo@gmail.com>",
-  "version": "1.0.0",
+  "version": "1.0.1-alpha.0",
   "description": "React template app.",
   "homepage": "https://neo-one.io",
   "repository": {
@@ -33,7 +33,7 @@
     "start": "yarn run ts-node ./scripts/start.ts"
   },
   "devDependencies": {
-    "@neo-one/cli": "1.0.0-alpha.132",
+    "@neo-one/cli": "^1.0.0-alpha.133",
     "@neo-one/smart-contract-test": "1.0.0-alpha.63",
     "@neo-one/smart-contract-typescript-plugin": "1.0.0-alpha.18",
     "@types/jest": "23.3.2",
@@ -63,7 +63,7 @@
   },
   "dependencies": {
     "@neo-one/client": "1.0.0-alpha.101",
-    "@neo-one/react": "1.0.0-alpha.18",
+    "@neo-one/react": "^1.0.0-alpha.19",
     "@neo-one/smart-contract": "1.0.0-alpha.29",
     "bignumber.js": "7.2.1",
     "core-js": "2.5.7",
