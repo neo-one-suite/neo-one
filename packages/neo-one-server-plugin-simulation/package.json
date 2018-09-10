@@ -6,6 +6,7 @@
   "dependencies": {
     "@neo-one/server-plugin": "^1.0.0-alpha.74",
     "@neo-one/server-plugin-project": "^1.0.0-alpha.24",
+    "@neo-one/simulation-react-template": "^1.0.0-alpha.150",
     "@neo-one/types": "^1.0.0-alpha.43",
     "@neo-one/utils": "^1.0.0-alpha.64",
     "@types/fs-extra": "^5.0.4",
