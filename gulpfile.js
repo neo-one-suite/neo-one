@@ -498,7 +498,7 @@ gulp.task(
 gulp.task('prepareRelease', async () => {
   await execa(
     'yarn',
-    ['lerna', 'publish', '--skip-npm', '--cd-version=prerelease', '--preid=alpha', '--npm-tag=latest', '--yes'],
+    ['lerna', 'publish', '--skip-npm', '--cd-version=prerelease', '--preid=preview', '--npm-tag=latest', '--yes'],
     {
       stdio: ['ignore', 'inherit', 'inherit'],
     },
