@@ -1,0 +1,75 @@
+{
+  "name": "@neo-one/react-template",
+  "author": "Alex DiCarlo <alexdicarlo@gmail.com>",
+  "version": "1.0.0",
+  "description": "React template app.",
+  "homepage": "https://neo-one.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neo-one-suite/neo-one.git"
+  },
+  "bugs": {
+    "url": "https://github.com/neo-one-suite/neo-one/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "neo",
+    "blockchain",
+    "neo-one",
+    "dapp"
+  ],
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "scripts": {
+    "jest": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest",
+    "test": "yarn run ts-node ./scripts/test.ts",
+    "tsc": "tsc && tsc -p one/contracts",
+    "ts-node": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json node -r ts-node/register/transpile-only",
+    "lint-files": "tslint --project . --format codeFrame",
+    "lint:contracts": "yarn run lint-files 'contracts/**/*.ts'",
+    "lint:source": "yarn run lint-files 'src/**/*.ts'",
+    "lint": "yarn run lint:contracts && yarn run lint:source",
+    "start": "yarn run ts-node ./scripts/start.ts"
+  },
+  "devDependencies": {
+    "@neo-one/cli": "1.0.0-alpha.132",
+    "@neo-one/smart-contract-test": "1.0.0-alpha.63",
+    "@neo-one/smart-contract-typescript-plugin": "1.0.0-alpha.18",
+    "@types/jest": "23.3.2",
+    "@types/react": "16.4.13",
+    "@types/react-dom": "16.0.7",
+    "@types/semver": "5.5.0",
+    "@types/webpack": "4.4.11",
+    "awesome-typescript-loader": "5.2.1",
+    "connect-history-api-fallback": "1.5.0",
+    "cross-env": "5.2.0",
+    "css-loader": "1.0.0",
+    "execa": "1.0.0",
+    "file-loader": "2.0.0",
+    "jest": "23.5.0",
+    "jest-environment-node": "23.4.0",
+    "koa-connect": "2.0.1",
+    "mini-html-webpack-plugin": "0.2.3",
+    "semver": "5.5.1",
+    "style-loader": "0.23.0",
+    "ts-jest": "23.1.4",
+    "ts-node": "7.0.1",
+    "tslint": "5.11.0",
+    "typescript": "3.0.3",
+    "webpack": "4.17.2",
+    "webpack-cli": "3.1.0",
+    "webpack-serve": "2.0.2"
+  },
+  "dependencies": {
+    "@neo-one/client": "1.0.0-alpha.101",
+    "@neo-one/react": "1.0.0-alpha.18",
+    "@neo-one/smart-contract": "1.0.0-alpha.29",
+    "bignumber.js": "7.2.1",
+    "core-js": "2.5.7",
+    "react": "16.5.0",
+    "react-dom": "16.5.0",
+    "react-hot-loader": "4.3.6",
+    "rxjs": "6.3.2"
+  }
+}

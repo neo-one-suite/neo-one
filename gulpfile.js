@@ -94,6 +94,7 @@ const pkgNamesSet = new Set(pkgNames);
 const globs = {
   originalSrc: [
     'packages/*/src/**/*.{ts,tsx}',
+    'packages/*/template/**/*',
     'packages/*/proto/**/*.proto',
     '!packages/neo-one-playground/**/*',
     '!packages/*/src/**/*.test.{ts,tsx}',
@@ -104,7 +105,6 @@ const globs = {
   ],
   src: (format) => [
     `${getDistBase(format)}/packages/*/src/**/*.{ts,tsx}`,
-    `${getDistBase(format)}/packages/*/proto/**/*.proto`,
     `!${getDistBase(format)}/packages/*/src/**/*.test.{ts,tsx}`,
     `!${getDistBase(format)}/packages/*/src/__data__/**/*`,
     `!${getDistBase(format)}/packages/*/src/__tests__/**/*`,

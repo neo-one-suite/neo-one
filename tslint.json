@@ -13,7 +13,9 @@
   ],
   "linterOptions": {
     "exclude": [
-      "./packages/*/package.json"
+      "./packages/*/package.json",
+      "./packages/*/template/**/*.ts",
+      "./packages/*/template/**/*.tsx"
     ]
   },
   "rules": {

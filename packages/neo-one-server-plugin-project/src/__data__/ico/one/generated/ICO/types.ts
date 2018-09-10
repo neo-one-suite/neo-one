@@ -1,4 +1,4 @@
-/* @hash 6811f11b9e627cc6bba5601bf203e9dd */
+/* @hash 7e1cb7e0855d08a573f98c370ecefd73 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -16,8 +16,6 @@ import {
   TransactionResult,
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
-
-export type ICOEvent = ICOTransferEvent | ICOApproveSendTransferEvent | ICORevokeSendTransferEvent;
 
 export interface ICOTransferEventParameters {
   readonly from: AddressString | undefined;
@@ -38,6 +36,7 @@ export interface ICORevokeSendTransferEventParameters {
   readonly amount: BigNumber;
 }
 export interface ICORevokeSendTransferEvent extends Event<'revokeSendTransfer', ICORevokeSendTransferEventParameters> {}
+export type ICOEvent = ICOTransferEvent | ICOApproveSendTransferEvent | ICORevokeSendTransferEvent;
 
 export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
   readonly amountPerNEO: () => Promise<BigNumber>;

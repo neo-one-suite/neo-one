@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+
+    "noLib": true,
+    "typeRoots": [],
+
+    "pretty": true,
+
+    "noEmit": true,
+    "declaration": false,
+
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": false,
+    "experimentalDecorators": true,
+
+    "alwaysStrict": true,
+    "strict": true,
+    "skipLibCheck": false,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "allowUnusedLabels": false,
+    "noUnusedParameters": false,
+    "allowUnreachableCode": false,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "plugins": [
+      {
+        "name": "@neo-one/smart-contract-typescript-plugin"
+      }
+    ]
+  }
+}

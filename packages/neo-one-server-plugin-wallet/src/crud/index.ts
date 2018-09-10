@@ -6,9 +6,3 @@ export {
   GetWalletCRUD,
   DescribeWalletCRUD,
 } from './wallet';
-export {
-  DeleteSmartContractCRUD,
-  CreateSmartContractCRUD,
-  GetSmartContractCRUD,
-  DescribeSmartContractCRUD,
-} from './smartContract';

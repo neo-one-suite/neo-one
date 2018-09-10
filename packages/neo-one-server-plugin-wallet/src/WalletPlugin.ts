@@ -7,20 +7,15 @@ import {
   Plugin,
   ResourceType,
 } from '@neo-one/server-plugin';
-import { constants as compilerConstants } from '@neo-one/server-plugin-compiler';
 import { constants as networkConstants } from '@neo-one/server-plugin-network';
 import { activateWallet } from './activateWallet';
 import { bootstrap } from './bootstrap';
 import { constants } from './constants';
 import { deactivateWallet } from './deactivateWallet';
-import { SmartContractResourceType } from './SmartContractResourceType';
 import { WalletResourceType } from './WalletResourceType';
 
 export class WalletPlugin extends Plugin {
   public readonly walletResourceType: WalletResourceType = new WalletResourceType({
-    plugin: this,
-  });
-  public readonly smartContractResourceType: SmartContractResourceType = new SmartContractResourceType({
     plugin: this,
   });
 
@@ -43,11 +38,11 @@ export class WalletPlugin extends Plugin {
   }
 
   public get dependencies(): ReadonlyArray<string> {
-    return [networkConstants.PLUGIN, compilerConstants.PLUGIN];
+    return [networkConstants.PLUGIN];
   }
 
   public get resourceTypes(): ReadonlyArray<ResourceType> {
-    return [this.walletResourceType, this.smartContractResourceType];
+    return [this.walletResourceType];
   }
 
   public get interactive(): ReadonlyArray<InteractiveCommand> {

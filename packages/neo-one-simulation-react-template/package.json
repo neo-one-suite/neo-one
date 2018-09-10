@@ -1,0 +1,9 @@
+{
+  "name": "@neo-one/simulation-react-template",
+  "version": "1.0.0-alpha.1",
+  "description": "NEO•ONE React Template Simulation.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "tslib": "^1.9.3"
+  }
+}

@@ -5,7 +5,6 @@ import { labels } from '@neo-one/utils';
 const DEFAULT_PLUGINS: ReadonlyArray<string> = [
   '@neo-one/server-plugin-network',
   '@neo-one/server-plugin-wallet',
-  '@neo-one/server-plugin-compiler',
   '@neo-one/server-plugin-simulation',
   '@neo-one/server-plugin-project',
   '@neo-one/server-plugin-neotracker',

@@ -1,14 +1,10 @@
-import { InteractiveCommand, Plugin, ResourceType } from '@neo-one/server-plugin';
-import { constants as compilerConstants } from '@neo-one/server-plugin-compiler';
-import { constants as networkConstants } from '@neo-one/server-plugin-network';
-import { constants as walletConstants } from '@neo-one/server-plugin-wallet';
+import { InteractiveCommand, Plugin } from '@neo-one/server-plugin';
+import { constants as projectConstants } from '@neo-one/server-plugin-project';
 import { constants } from './constants';
+import { createCommand } from './createCommand';
 import { goCommand } from './goCommand';
-import { SimulationResourceType } from './SimulationResourceType';
 
 export class SimulationPlugin extends Plugin {
-  public readonly simulationResourceType = new SimulationResourceType({ plugin: this });
-
   public get name(): string {
     return constants.PLUGIN;
   }
@@ -28,14 +24,10 @@ export class SimulationPlugin extends Plugin {
   }
 
   public get dependencies(): ReadonlyArray<string> {
-    return [networkConstants.PLUGIN, compilerConstants.PLUGIN, walletConstants.PLUGIN];
-  }
-
-  public get resourceTypes(): ReadonlyArray<ResourceType> {
-    return [this.simulationResourceType];
+    return [projectConstants.PLUGIN];
   }
 
   public get interactive(): ReadonlyArray<InteractiveCommand> {
-    return [goCommand];
+    return [createCommand, goCommand];
   }
 }

@@ -20,7 +20,8 @@
   ],
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/*/template"
   ],
   "engines": {
     "node": ">=8.9.0"
@@ -177,8 +178,8 @@
   },
   "one": {
     "paths": {
-      "contracts": "./packages/neo-one-playground/one/contracts",
-      "generated": "./packages/neo-one-playground/one/generated"
+      "contracts": "./packages/neo-one-simulation-react-template/template/one/contracts",
+      "generated": "./packages/neo-one-simulation-react-template/template/one/generated"
     }
   }
 }

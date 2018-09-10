@@ -7,7 +7,6 @@
     "@neo-one/client": "^1.0.0-alpha.101",
     "@neo-one/client-core": "^1.0.0-alpha.77",
     "@neo-one/server-plugin": "^1.0.0-alpha.74",
-    "@neo-one/server-plugin-compiler": "^1.0.0-alpha.103",
     "@neo-one/server-plugin-network": "^1.0.0-alpha.122",
     "@neo-one/smart-contract": "^1.0.0-alpha.29",
     "@neo-one/smart-contract-compiler": "^1.0.0-alpha.61",

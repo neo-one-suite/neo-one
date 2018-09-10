@@ -1,4 +1,4 @@
-/* @hash f18e529fec9346fe9495de5c7dcf153a */
+/* @hash b4d2f6bc186a4dd82008c775f5438e48 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -16,8 +16,6 @@ import {
   TransactionResult,
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
-
-export type TokenEvent = TokenTransferEvent | TokenApproveSendTransferEvent | TokenRevokeSendTransferEvent;
 
 export interface TokenTransferEventParameters {
   readonly from: AddressString | undefined;
@@ -39,6 +37,7 @@ export interface TokenRevokeSendTransferEventParameters {
 }
 export interface TokenRevokeSendTransferEvent
   extends Event<'revokeSendTransfer', TokenRevokeSendTransferEventParameters> {}
+export type TokenEvent = TokenTransferEvent | TokenApproveSendTransferEvent | TokenRevokeSendTransferEvent;
 
 export interface TokenSmartContract extends SmartContract<TokenReadSmartContract> {
   readonly approveReceiveTransfer: {
