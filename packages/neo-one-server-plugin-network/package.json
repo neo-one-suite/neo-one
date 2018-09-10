@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/server-plugin-network",
-  "version": "1.0.0-alpha.123",
+  "version": "1.0.0-alpha.124",
   "description": "NEO•ONE Server network plugin.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.102",
+    "@neo-one/client": "^1.0.0-alpha.103",
     "@neo-one/client-core": "^1.0.0-alpha.78",
     "@neo-one/monitor": "^1.0.0-alpha.60",
     "@neo-one/node": "^1.0.0-alpha.118",

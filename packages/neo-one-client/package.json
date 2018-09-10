@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client",
-  "version": "1.0.0-alpha.102",
+  "version": "1.0.0-alpha.103",
   "description": "NEO•ONE client APIs for interacting with the NEO blockchain.",
   "main": "./src/index.ts",
   "dependencies": {

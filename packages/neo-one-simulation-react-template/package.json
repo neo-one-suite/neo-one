@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/simulation-react-template",
-  "version": "1.0.0-alpha.151",
+  "version": "1.0.0-alpha.152",
   "description": "NEO•ONE React Template Simulation.",
   "main": "./src/index.ts",
   "dependencies": {

@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/server-plugin-simulation",
-  "version": "1.0.0-alpha.132",
+  "version": "1.0.0-alpha.133",
   "description": "NEO•ONE Server simulation plugin.",
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/server-plugin": "^1.0.0-alpha.75",
-    "@neo-one/server-plugin-project": "^1.0.0-alpha.25",
-    "@neo-one/simulation-react-template": "^1.0.0-alpha.151",
+    "@neo-one/server-plugin-project": "^1.0.0-alpha.26",
+    "@neo-one/simulation-react-template": "^1.0.0-alpha.152",
     "@neo-one/types": "^1.0.0-alpha.44",
     "@neo-one/utils": "^1.0.0-alpha.65",
     "@types/fs-extra": "^5.0.4",
