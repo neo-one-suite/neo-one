@@ -165,7 +165,7 @@
     "tslint-consistent-codestyle": "1.13.3",
     "tslint-immutable": "4.7.0",
     "tslint-microsoft-contrib": "5.2.1",
-    "tslint-sonarts": "1.7.0",
+    "tslint-sonarts": "1.8.0",
     "typescript": "3.0.3",
     "typescript-styled-plugin": "0.10.0"
   },
