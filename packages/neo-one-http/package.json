@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/http",
-  "version": "1.0.0-alpha.95",
+  "version": "1.0.0-alpha.96",
   "description": "NEO•ONE http utilities.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0-alpha.59",
-    "@neo-one/types": "^1.0.0-alpha.43",
-    "@neo-one/utils": "^1.0.0-alpha.64",
+    "@neo-one/monitor": "^1.0.0-alpha.60",
+    "@neo-one/types": "^1.0.0-alpha.44",
+    "@neo-one/utils": "^1.0.0-alpha.65",
     "koa": "^2.5.2",
     "koa-better-body": "^3.0.4",
     "koa-convert": "^1.2.0",
