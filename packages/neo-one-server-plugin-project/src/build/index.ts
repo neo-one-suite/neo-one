@@ -65,7 +65,7 @@ export const build = (
           const projectConfig = await loadProjectConfig(options.rootDir);
           let projectID = await loadProjectID(pluginManager, projectConfig, options);
           if (projectID === undefined) {
-            projectID = v4();
+            projectID = v4().replace(/\-/g, '');
           }
 
           ctx.projectConfig = projectConfig;
