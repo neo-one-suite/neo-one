@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Base } from 'reakit';
 import { AddToken } from './AddToken';
 import { AutoConsensusOption } from './AutoConsensusOption';
+import { AutoSystemFeeOption } from './AutoSystemFeeOption';
 import { Dialog, OverlayProps } from './Dialog';
 import { ResetLocalStateButton } from './ResetLocalStateButton';
 
@@ -19,6 +20,7 @@ export function SettingsDialog({ children }: Props) {
         <Base>
           <AddToken />
           <AutoConsensusOption />
+          <AutoSystemFeeOption />
           <ResetLocalStateButton />
         </Base>
       )}
