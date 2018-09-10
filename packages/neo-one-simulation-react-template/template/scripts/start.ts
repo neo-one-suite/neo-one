@@ -24,7 +24,7 @@ const createWebpackConfig = (): webpack.Configuration => ({
   plugins: [
     new MiniHtmlWebpackPlugin({
       context: {
-        title: 'NEO•ONE Playground',
+        title: 'NEO•ONE',
       },
       // tslint:disable-next-line no-any
       template: ({ css, js, title, publicPath }: any) =>

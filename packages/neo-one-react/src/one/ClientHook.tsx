@@ -43,7 +43,7 @@ class Hooker {
   private mutableNEOTrackerURL: string | undefined;
 
   private constructor(client: Client) {
-    client.hooks.beforeRelay.tapPromise('AutoConsensus', async (options) => {
+    client.hooks.beforeRelay.tapPromise('AutoSystemFee', async (options) => {
       if (this.mutableAutoSystemFee && this.mutableDeveloperClient !== undefined) {
         // tslint:disable-next-line no-object-mutation
         options.systemFee = new BigNumber(-1);

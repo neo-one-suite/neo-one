@@ -51,7 +51,7 @@ export const withContracts = async <T>(
   try {
     const developerClient = new DeveloperClient(provider.read(networkName));
     if (autoSystemFee) {
-      client.hooks.beforeRelay.tapPromise('AutoConsensus', async (options) => {
+      client.hooks.beforeRelay.tapPromise('AutoSystemFee', async (options) => {
         // tslint:disable-next-line no-object-mutation
         options.systemFee = new BigNumber(-1);
       });

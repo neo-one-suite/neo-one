@@ -107,6 +107,7 @@ export class Client<
   // tslint:disable-next-line readonly-array no-any
   public async transfer(...argsIn: any[]): Promise<TransactionResult> {
     const { transfers, options } = this.getTransfersOptions(argsIn);
+    await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(this.getProvider(options).transfer(transfers, options));
   }
@@ -115,7 +116,7 @@ export class Client<
     const options = args.assertTransactionOptions('options', optionsIn);
     await this.applyBeforeRelayHook(options);
 
-    return this.getProvider(options).claim(options);
+    return this.addTransactionHooks(this.getProvider(options).claim(options));
   }
 
   public async publish(
@@ -220,6 +221,7 @@ export class Client<
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const options = optionsIn === undefined ? {} : optionsIn;
+    await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(
       this.getProvider(options).invoke(contract, method, params, paramsZipped, verify, options, sourceMaps),
