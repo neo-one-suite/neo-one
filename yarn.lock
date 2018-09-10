@@ -7800,9 +7800,11 @@ node-abi@^2.2.0:
   dependencies:
     semver "^5.4.1"
 
-node-cron@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/node-cron/-/node-cron-1.2.1.tgz#8c90bc5dc723a56289b0786655ab4a1c4cb60368"
+node-cron@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/node-cron/-/node-cron-2.0.0.tgz#a02f0313722c573f28703bc948aabdf8b2bf4d33"
+  dependencies:
+    tz-offset "0.0.1"
 
 node-fetch-npm@^2.0.2:
   version "2.0.2"
@@ -10706,6 +10708,10 @@ typewise@^1.0.3:
   resolved "https://registry.yarnpkg.com/typewise/-/typewise-1.0.3.tgz#1067936540af97937cc5dcf9922486e9fa284651"
   dependencies:
     typewise-core "^1.2.0"
+
+tz-offset@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/tz-offset/-/tz-offset-0.0.1.tgz#fef920257024d3583ed9072a767721a18bdb8a76"
 
 ua-parser-js@^0.7.17, ua-parser-js@^0.7.18:
   version "0.7.18"
