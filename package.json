@@ -167,7 +167,7 @@
     "tslint-microsoft-contrib": "5.2.1",
     "tslint-sonarts": "1.7.0",
     "typescript": "3.0.3",
-    "typescript-styled-plugin": "0.10.0"
+    "typescript-styled-plugin": "0.11.0"
   },
   "resolutions": {
     "ajv": "6.5.3",
