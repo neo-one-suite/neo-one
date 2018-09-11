@@ -111,7 +111,7 @@
     }
   },
   "devDependencies": {
-    "@babel/core": "7.0.0",
+    "@babel/core": "7.0.1",
     "@babel/plugin-syntax-dynamic-import": "7.0.0",
     "@babel/plugin-syntax-numeric-separator": "7.0.0",
     "@babel/plugin-syntax-optional-catch-binding": "7.0.0",
