@@ -25,15 +25,9 @@ const backup = [
   'sans-serif',
 ];
 
-const axiforma = (font) => [
-  font,
-  'Questrial',
-].concat(backup);
+const axiforma = (font) => [font, 'Questrial'].concat(backup);
 
-const decima = (font) => [
-  font,
-  'Cutive Mono',
-].concat(backup);
+const decima = (font) => [font, 'Cutive Mono'].concat(backup);
 
 const siteConfig = {
   title: 'NEO•ONE',
@@ -43,7 +37,7 @@ const siteConfig = {
   organizationName: 'neo-one-suite',
   projectName: 'neo-one',
   headerLinks: [
-    { doc: 'installation', label: 'Docs' },
+    { doc: 'getting-started', label: 'Docs' },
     { page: 'help', label: 'Help' },
     { blog: true, label: 'Blog' },
     { href: repoUrl, label: 'GitHub' },
@@ -78,9 +72,7 @@ const siteConfig = {
   },
   copyright:
     // eslint-disable-next-line
-    'Copyright © ' +
-    new Date().getFullYear() +
-    ' NEO•ONE',
+    'Copyright © ' + new Date().getFullYear() + ' NEO•ONE',
   highlight: {
     theme: 'default',
   },
@@ -98,7 +90,7 @@ const siteConfig = {
     axiformaSemiBold: axiforma('Axiforma-SemiBold'),
     axiformaBook: axiforma('Axiforma-Book'),
     decimaMonoProLt: decima('DecimaMonoProLt'),
-  }
+  },
 };
 
 module.exports = siteConfig;
