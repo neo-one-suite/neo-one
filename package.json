@@ -148,7 +148,7 @@
     "json": "9.0.6",
     "lerna": "3.3.0",
     "lint-staged": "7.2.2",
-    "lodash": "4.17.10",
+    "lodash": "4.17.11",
     "nyc": "13.0.1",
     "prettier": "1.14.2",
     "rxjs-tslint-rules": "4.8.0",
