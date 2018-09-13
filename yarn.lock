@@ -3233,6 +3233,10 @@ constate@^0.8.0, constate@^0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/constate/-/constate-0.8.1.tgz#46670b73fcd221620ee285efd5e4e6be2e897cef"
 
+constate@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/constate/-/constate-0.8.2.tgz#36974aa47d5243f0f07a92da46eb8c3df40179d8"
+
 content-disposition@~0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/content-disposition/-/content-disposition-0.5.2.tgz#0cf68bb9ddf5f2be7961c3a85178cb85dba78cb4"
@@ -9199,6 +9203,18 @@ reakit@^0.14.5:
     prop-types "^15.6.2"
     styled-components "^3.0.0"
     styled-tools "^1.4.1"
+
+reakit@^0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/reakit/-/reakit-0.15.0.tgz#de783302fdfbebe4c6a0c734edd0b5f6042de36d"
+  dependencies:
+    "@emotion/is-prop-valid" "^0.6.6"
+    constate "^0.8.2"
+    hoist-non-react-statics "^3.0.1"
+    popper.js "^1.14.4"
+    prop-types "^15.6.2"
+    styled-components "^3.0.0"
+    styled-tools "^1.5.1"
 
 realpath-native@^1.0.0:
   version "1.0.2"

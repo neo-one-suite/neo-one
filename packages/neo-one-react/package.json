@@ -20,7 +20,7 @@
     "react-dom": "^16.5.0",
     "react-icons": "^3.0.5",
     "react-select": "^2.0.0",
-    "reakit": "^0.14.5",
+    "reakit": "^0.15.0",
     "rxjs": "^6.3.2",
     "styled-tools": "^1.5.1",
     "tslib": "^1.9.3"
