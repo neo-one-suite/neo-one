@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { Base, styled } from 'reakit';
+import { Box, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { WithAddToast } from './ToastsContainer';
 
 export type AddError = (error: Error) => void;
 
-const ErrorText = styled(Base)`
+const ErrorText = styled(Box)`
   color: ${prop('theme.error')};
 `;
 

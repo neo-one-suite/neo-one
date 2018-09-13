@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Base, Label, styled } from 'reakit';
+import { Box, Label, styled } from 'reakit';
 import { FromStream } from '../FromStream';
 import { ComponentProps } from '../types';
 import { DeveloperToolsContext, WithTokens } from './DeveloperToolsContext';
@@ -7,7 +7,7 @@ import { TransferContainer } from './TransferContainer';
 import { getWalletSelectorOptions$, makeWalletSelectorValueOption, WalletSelectorBase } from './WalletSelectorBase';
 import { WithAddError } from './WithAddError';
 
-const Wrapper = styled(Base)`
+const Wrapper = styled(Box)`
   border-top: 1px solid rgba(0, 0, 0, 0.3);
   margin: 16px 0;
   padding-top: 16px;
@@ -34,9 +34,9 @@ export function TransferTo(props: ComponentProps<typeof StyledLabel>) {
                 return (
                   <Wrapper>
                     <StyledLabel {...props}>
-                      <Base data-test="neo-one-transfer-to-text" marginRight={8}>
+                      <Box data-test="neo-one-transfer-to-text" marginRight={8}>
                         Transfer To
-                      </Base>
+                      </Box>
                       <TransferContainer>
                         {({ to, onChangeTo }) => (
                           <FromStream props$={props$}>

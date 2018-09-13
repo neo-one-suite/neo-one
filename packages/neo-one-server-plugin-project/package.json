@@ -22,7 +22,7 @@
     "convict": "^4.3.2",
     "cosmiconfig": "^5.0.6",
     "fs-extra": "^7.0.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "rxjs": "^6.3.2",
     "source-map": "^0.7.3",
     "typescript": "^3.0.3",
@@ -32,8 +32,8 @@
     "@neo-one/server-plugin-wallet": "^1.0.0-preview.0",
     "@neo-one/smart-contract": "^1.0.0-preview.0",
     "@neo-one/smart-contract-test": "^1.0.0-alpha.44",
-    "@types/react": "16.4.13",
+    "@types/react": "16.4.14",
     "bignumber.js": "7.2.1",
-    "react": "16.5.0"
+    "react": "16.5.1"
   }
 }

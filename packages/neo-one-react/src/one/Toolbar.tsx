@@ -1,5 +1,6 @@
+// tslint:disable no-any
 import * as React from 'react';
-import { Block, Flex, Hidden, Shadow, styled } from 'reakit';
+import { Block, Flex, Hidden, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { ComponentProps } from '../types';
 import { BalanceSelector } from './BalanceSelector';
@@ -11,6 +12,7 @@ import { NetworkSelector } from './NetworkSelector';
 import { ResetButton } from './ResetButton';
 import { SecondsPerBlockInput } from './SecondsPerBlockInput';
 import { SettingsButton } from './SettingsButton';
+import { Shadow } from './Shadow';
 import { Toasts } from './Toasts';
 import { ToolbarButton } from './ToolbarButton';
 import { WalletButton } from './WalletButton';
@@ -22,10 +24,6 @@ const Wrapper = styled(Flex)`
   position: fixed;
   right: 16px;
 `;
-
-interface HiddenProps {
-  readonly visible: boolean;
-}
 
 const StyledMonogram = styled(Monogram)`
   /* stylelint-disable-next-line */
@@ -79,9 +77,9 @@ function MonogramButton(visible: boolean) {
 export function Toolbar() {
   return (
     <Hidden.Container>
-      {(hidden: HiddenProps) => (
+      {(hidden) => (
         <>
-          <Hidden as={Wrapper} slide="top" {...hidden}>
+          <Hidden as={Wrapper as any} slide="top" {...hidden}>
             <NetworkSelector />
             <BlockIndex />
             <BlockTime />
@@ -92,7 +90,7 @@ export function Toolbar() {
             <SettingsButton />
             <NEOTrackerButton />
           </Hidden>
-          <Hidden.Toggle as={MonogramButton(hidden.visible)} {...hidden} />
+          <Hidden.Toggle as={MonogramButton(hidden.visible) as any} {...hidden} />
           <Toasts />
         </>
       )}

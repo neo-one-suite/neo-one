@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { MdPlayArrow } from 'react-icons/md';
-import { Base, styled } from 'reakit';
+import { Box, styled } from 'reakit';
 import { of } from 'rxjs';
 import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { FromStream } from '../FromStream';
@@ -8,7 +8,7 @@ import { WithNetworkClient } from './DeveloperToolsContext';
 import { ToolbarButton } from './ToolbarButton';
 import { WithAddError } from './WithAddError';
 
-const IndexWrapper = styled(Base)`
+const IndexWrapper = styled(Box)`
   width: ${({ index }: { readonly index: number }) => index.toString().length * 10}px;
 `;
 

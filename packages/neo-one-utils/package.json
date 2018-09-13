@@ -7,7 +7,7 @@
     "@neo-one/monitor": "^1.0.0-preview.0",
     "@types/lodash": "^4.14.116",
     "change-case": "^3.0.2",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "rxjs": "^6.3.2",
     "tslib": "^1.9.3"
   }

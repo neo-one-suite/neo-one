@@ -7,7 +7,7 @@
     "@neo-one/monitor": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
     "@neo-one/utils": "^1.0.0-preview.0",
-    "koa": "^2.5.2",
+    "koa": "^2.5.3",
     "koa-better-body": "^3.0.4",
     "koa-convert": "^1.2.0",
     "koa-cors": "^0.0.16",

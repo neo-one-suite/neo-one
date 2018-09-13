@@ -2,11 +2,11 @@
 import { EffectMap } from 'constate';
 import { format, isBefore, parse } from 'date-fns';
 import * as React from 'react';
-import { Base, Container, Flex, Input, styled } from 'reakit';
+import { Box, Container, Flex, Input, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { ReactSyntheticEvent } from '../types';
 
-const ErrorText = styled(Base)`
+const ErrorText = styled(Box)`
   color: ${prop('theme.error')};
 `;
 

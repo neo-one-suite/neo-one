@@ -18,11 +18,11 @@
     "bn.js": "^4.11.8",
     "cross-fetch": "^2.2.2",
     "dataloader": "^1.4.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "rxjs": "^6.3.2",
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
-    "tapable": "^1.0.0",
+    "tapable": "^1.1.0",
     "tslib": "^1.9.3"
   }
 }

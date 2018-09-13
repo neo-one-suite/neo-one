@@ -111,7 +111,7 @@
     }
   },
   "devDependencies": {
-    "@babel/core": "7.0.0",
+    "@babel/core": "7.0.1",
     "@babel/plugin-syntax-dynamic-import": "7.0.0",
     "@babel/plugin-syntax-numeric-separator": "7.0.0",
     "@babel/plugin-syntax-optional-catch-binding": "7.0.0",
@@ -142,13 +142,13 @@
     "gulp-sourcemaps": "2.6.4",
     "gulp-typescript": "5.0.0-alpha.3",
     "husky": "1.0.0-rc.13",
-    "jest": "23.5.0",
+    "jest": "23.6.0",
     "jest-environment-node": "23.4.0",
     "jest-junit": "5.1.0",
     "json": "9.0.6",
-    "lerna": "3.3.0",
+    "lerna": "3.3.2",
     "lint-staged": "7.2.2",
-    "lodash": "4.17.10",
+    "lodash": "4.17.11",
     "nyc": "13.0.1",
     "prettier": "1.14.2",
     "rxjs-tslint-rules": "4.8.0",
@@ -165,20 +165,20 @@
     "tslint-consistent-codestyle": "1.13.3",
     "tslint-immutable": "4.7.0",
     "tslint-microsoft-contrib": "5.2.1",
-    "tslint-sonarts": "1.7.0",
+    "tslint-sonarts": "1.8.0",
     "typescript": "3.0.3",
-    "typescript-styled-plugin": "0.10.0"
+    "typescript-styled-plugin": "0.11.0"
   },
   "resolutions": {
     "ajv": "6.5.3",
     "babel-core": "7.0.0-bridge.0",
     "bn.js": "4.11.8",
-    "grpc": "1.14.2"
+    "grpc": "1.15.0"
   },
   "one": {
     "paths": {
-      "contracts": "./packages/neo-one-simulation-react-template/template/one/contracts",
-      "generated": "./packages/neo-one-simulation-react-template/template/one/generated"
+      "contracts": "./packages/neo-one-playground/one/contracts",
+      "generated": "./packages/neo-one-playground/one/generated"
     }
   }
 }
