@@ -1,7 +1,9 @@
+// tslint:disable no-any
 import * as React from 'react';
 import { MdClose } from 'react-icons/md';
-import { Backdrop, Button, Card, Flex, Heading, Overlay, Portal, Shadow, styled } from 'reakit';
+import { Backdrop, Button, Card, Flex, Heading, Overlay, Portal, styled } from 'reakit';
 import { prop } from 'styled-tools';
+import { Shadow } from './Shadow';
 // tslint:disable-next-line no-any
 export type OverlayProps = any;
 
@@ -36,7 +38,7 @@ export function Dialog({
           <Backdrop as={[Portal, Overlay.Hide]} {...overlay} />
           <Overlay unmount as={[Portal, Card]} slide fade gutter={16} {...overlay}>
             <Shadow />
-            <Card.Fit as={StyledHeader}>
+            <Card.Fit as={StyledHeader as any}>
               <Heading data-test={dataTestHeading} as="h3" margin="0">
                 {title}
               </Heading>

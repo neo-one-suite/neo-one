@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Base } from 'reakit';
+import { Box } from 'reakit';
 import { AddToken } from './AddToken';
 import { AutoConsensusOption } from './AutoConsensusOption';
 import { AutoSystemFeeOption } from './AutoSystemFeeOption';
@@ -17,12 +17,12 @@ export function SettingsDialog({ children }: Props) {
       data-test-close-button="neo-one-settings-dialog-close-button"
       title="Settings"
       renderDialog={() => (
-        <Base>
+        <Box>
           <AddToken />
           <AutoConsensusOption />
           <AutoSystemFeeOption />
           <ResetLocalStateButton />
-        </Base>
+        </Box>
       )}
     >
       {children}

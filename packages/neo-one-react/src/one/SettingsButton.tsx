@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { MdSettings } from 'react-icons/md';
-import { Base, Overlay } from 'reakit';
+import { Box, Overlay } from 'reakit';
 import { SettingsDialog } from './SettingsDialog';
 import { ToolbarButton } from './ToolbarButton';
 
@@ -15,9 +15,9 @@ export function SettingsButton() {
           help="Open Settings..."
           {...overlay}
         >
-          <Base>
+          <Box>
             <MdSettings />
-          </Base>
+          </Box>
         </Overlay.Show>
       )}
     </SettingsDialog>

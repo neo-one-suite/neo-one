@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Base } from 'reakit';
+import { Box } from 'reakit';
 import { Dialog, OverlayProps } from './Dialog';
 import { WalletSelector } from './WalletSelector';
 import { WalletTransfer } from './WalletTransfer';
@@ -15,10 +15,10 @@ export function WalletDialog({ children }: Props) {
       data-test-close-button="neo-one-wallet-dialog-close-button"
       title="Wallet"
       renderDialog={() => (
-        <Base>
+        <Box>
           <WalletSelector />
           <WalletTransfer />
-        </Base>
+        </Box>
       )}
     >
       {children}

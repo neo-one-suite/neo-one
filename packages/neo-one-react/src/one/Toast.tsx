@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { MdClose } from 'react-icons/md';
-import { Base, Box, Button, Flex, Hidden, Shadow, styled } from 'reakit';
+import { Box, Button, Flex, Hidden, styled } from 'reakit';
 import { prop } from 'styled-tools';
+import { BoxWithBorder } from './BoxWithBorder';
+import { Shadow } from './Shadow';
 import { Toast as ToastType } from './ToastsContainer';
 
 // tslint:disable-next-line no-any
@@ -13,7 +15,7 @@ const StyledBox = styled(Box)`
   width: 400px;
 `;
 
-const ToastWrapper = styled(Base)`
+const ToastWrapper = styled(BoxWithBorder)`
   margin: 8px;
 `;
 

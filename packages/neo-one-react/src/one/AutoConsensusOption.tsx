@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Block, Fit, Input, Label, styled } from 'reakit';
+import { Block, Input, Label, styled } from 'reakit';
 import { FromStream } from '../FromStream';
 import { WithAutoConsensus } from './DeveloperToolsContext';
+import { Fit } from './Fit';
 import { Tooltip, TooltipArrow } from './Tooltip';
 
 const Wrapper = styled(Label)`

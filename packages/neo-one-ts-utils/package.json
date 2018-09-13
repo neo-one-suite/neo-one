@@ -8,7 +8,7 @@
     "@types/commondir": "^1.0.0",
     "@types/lodash": "^4.14.116",
     "commondir": "^1.0.1",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "source-map": "^0.7.3",
     "typescript": "^3.0.3"
   }

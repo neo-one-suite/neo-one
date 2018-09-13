@@ -324,15 +324,15 @@ aliases:
 
 node8: &node8
   docker:
-    - image: neotracker/neo-one-circleci-node:8.9.0-1
+    - image: neotracker/neo-one-circleci-node:8.9.0-2
 
 node9: &node9
   docker:
-    - image: neotracker/neo-one-circleci-node:9.11.2-1
+    - image: neotracker/neo-one-circleci-node:9.11.2-2
 
 node10: &node10
   docker:
-    - image: neotracker/neo-one-circleci-node:10.9.0-1
+    - image: neotracker/neo-one-circleci-node:10.10.0-4
 
 version: 2
 jobs:

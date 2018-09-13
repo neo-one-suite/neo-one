@@ -9,7 +9,7 @@
     "@neo-one/types": "^1.0.0-preview.0",
     "@neo-one/utils": "^1.0.0-preview.0",
     "@types/lodash": "^4.14.116",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "tslib": "^1.9.3"
   }
 }

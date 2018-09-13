@@ -1,11 +1,11 @@
 // tslint:disable no-array-mutation
 import * as React from 'react';
-import { Base, styled } from 'reakit';
+import { Box, styled } from 'reakit';
 import { FromStream } from '../FromStream';
 import { Toast } from './Toast';
 import { ToastsContext } from './ToastsContainer';
 
-const Wrapper = styled(Base)`
+const Wrapper = styled(Box)`
   bottom: 8px;
   left: 80px;
   position: fixed;

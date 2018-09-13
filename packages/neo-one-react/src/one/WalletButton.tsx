@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { MdAccountBalance } from 'react-icons/md';
-import { Base, Overlay } from 'reakit';
+import { Box, Overlay } from 'reakit';
 import { FromStream } from '../FromStream';
 import { DeveloperToolsContext } from './DeveloperToolsContext';
 import { ToolbarButton } from './ToolbarButton';
@@ -21,9 +21,9 @@ export function WalletButton() {
             >
               <FromStream props$={client.accountState$}>
                 {(value) => (
-                  <Base data-test="neo-one-wallet-value">
+                  <Box data-test="neo-one-wallet-value">
                     {value === undefined ? 'Select Wallet' : value.currentAccount.name}
-                  </Base>
+                  </Box>
                 )}
               </FromStream>
               <MdAccountBalance />
