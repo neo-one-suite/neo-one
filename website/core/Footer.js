@@ -21,11 +21,9 @@ class FooterLink extends React.Component {
           src={this.props.config.baseUrl + 'img/footer/' + this.props.hoverImage}
           alt={this.props.title}
         />
-        <div className="body1 gray0 footerLinkText axiformaRegular">
-          {this.props.title}
-        </div>
+        <div className="body1 gray0 footerLinkText axiformaRegular">{this.props.title}</div>
       </a>
-    )
+    );
   }
 }
 
@@ -48,24 +46,14 @@ class Footer extends React.Component {
               <h5 className="body1 footerTitle axiformaBold">DOCS</h5>
               <FooterLink
                 config={this.props.config}
-                link={
-                  this.props.config.baseUrl +
-                  'docs/' +
-                  this.props.language +
-                  '/installation.html'
-                }
+                link={this.props.config.baseUrl + 'docs/' + this.props.language + '/getting-started.html'}
                 title="Getting Started"
                 image="getting-started.svg"
                 hoverImage="getting-started-hover.svg"
               />
               <FooterLink
                 config={this.props.config}
-                link={
-                  this.props.config.baseUrl +
-                  'docs/' +
-                  this.props.language +
-                  '/contributing.html'
-                }
+                link={this.props.config.baseUrl + 'docs/' + this.props.language + '/contributing.html'}
                 title="Contribute"
                 image="contribute.svg"
                 hoverImage="contribute-hover.svg"
@@ -77,11 +65,7 @@ class Footer extends React.Component {
               <h5 className="body1 footerTitle axiformaBold">COMMUNITY</h5>
               <FooterLink
                 config={this.props.config}
-                link={
-                  this.props.config.baseUrl +
-                  this.props.language +
-                  '/users.html'
-                }
+                link={this.props.config.baseUrl + this.props.language + '/users.html'}
                 title="User Showcase"
                 image="user-showcase.svg"
                 hoverImage="user-showcase-hover.svg"
@@ -137,16 +121,15 @@ class Footer extends React.Component {
                   data-count-href="/neo-one-suite/neo-one/stargazers"
                   data-show-count={true}
                   data-count-aria-label="# stargazers on GitHub"
-                  aria-label="Star this project on GitHub">
+                  aria-label="Star this project on GitHub"
+                >
                   Star
                 </a>
               </div>
             </div>
           </div>
         </section>
-        <section className="copyright">
-          COPYRIGHT &copy; {currentYear} NEO•ONE.
-        </section>
+        <section className="copyright">COPYRIGHT &copy; {currentYear} NEO•ONE.</section>
       </footer>
     );
   }

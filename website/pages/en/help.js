@@ -19,9 +19,8 @@ class Help extends React.Component {
       {
         content: (
           <translate>
-            Find what you're looking for in our detailed documentation and
-            guides.\n\n- Learn how to [get
-            started](/docs/en/installation.html).
+            Find what you're looking for in our detailed documentation and guides.\n\n- Learn how to [get
+            started](/docs/en/getting-started.html).
           </translate>
         ),
         title: <translate>Browse the docs</translate>,
@@ -29,26 +28,23 @@ class Help extends React.Component {
       {
         content: (
           <translate>
-            Ask questions and find answers from other NEO•ONE users.\n\n-
-            Join the
-            [#support](https://discord.gg/S86PqDE)
-            channel on the NEO•ONE Discord community.\n- Many members of the community use Stack Overflow. Read
-            through [existing
-            questions](https://stackoverflow.com/questions/tagged/neo-one) tagged
-            with **neo-one** or [ask your
+            Ask questions and find answers from other NEO•ONE users.\n\n- Join the
+            [#support](https://discord.gg/S86PqDE) channel on the NEO•ONE Discord community.\n- Many members of the
+            community use Stack Overflow. Read through [existing
+            questions](https://stackoverflow.com/questions/tagged/neo-one) tagged with **neo-one** or [ask your
             own](https://stackoverflow.com/questions/ask)!
           </translate>
         ),
         title: <translate>Join the community</translate>,
       },
       {
-        content:
-        <translate>
-          Find out what's new with NEO•ONE.\n\n- Follow
-          [NEO•ONE](https://twitter.com/neo_one_suite) on Twitter.\n- Subscribe to the
-          [NEO•ONE blog](/blog/).\n- Look at the
-          [changelog](https://github.com/neo-one-suite/neo-one/blob/master/CHANGELOG.md).
-        </translate>,
+        content: (
+          <translate>
+            Find out what's new with NEO•ONE.\n\n- Follow [NEO•ONE](https://twitter.com/neo_one_suite) on Twitter.\n-
+            Subscribe to the [NEO•ONE blog](/blog/).\n- Look at the
+            [changelog](https://github.com/neo-one-suite/neo-one/blob/master/CHANGELOG.md).
+          </translate>
+        ),
         title: <translate>Stay up to date</translate>,
       },
     ];
@@ -64,7 +60,8 @@ class Help extends React.Component {
             </header>
             <p>
               <translate desc="statement made to reader">
-                NEO•ONE is developed by community members just like you. Contributors are often around and available for questions.
+                NEO•ONE is developed by community members just like you. Contributors are often around and available for
+                questions.
               </translate>
             </p>
             <GridBlock contents={supportLinks} layout="threeColumn" />

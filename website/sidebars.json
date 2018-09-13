@@ -8,8 +8,13 @@
     ]
   },
   "docs": {
-    "Getting Started": [
-      "installation"
+    "Documentation": [
+      "getting-started",
+      "playground-tutorial",
+      "writing-a-smart-contract",
+      "testing",
+      "front-end",
+      "client"
     ]
   }
 }

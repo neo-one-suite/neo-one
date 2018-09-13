@@ -30,7 +30,7 @@ class GetStartedButton extends React.Component {
     return (
       <Button
         className={'heroButton ' + (this.props.className || '')}
-        href={siteConfig.baseUrl + 'docs/' + this.props.language + '/installation.html'}
+        href={siteConfig.baseUrl + 'docs/' + this.props.language + '/getting-started.html'}
       >
         <translate>Get Started</translate>
       </Button>
