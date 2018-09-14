@@ -11,7 +11,7 @@
     "@neo-one/node-data-backup": "^1.0.0-preview.0",
     "@neo-one/node-offline": "^1.0.0-preview.0",
     "@neo-one/node-protocol": "^1.0.0-preview.0",
-    "@neo-one/node-rpc": "^1.0.0-preview.0",
+    "@neo-one/node-http-rpc": "^1.0.0-preview.0",
     "@neo-one/node-storage-levelup": "^1.0.0-preview.0",
     "@neo-one/node-vm": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",

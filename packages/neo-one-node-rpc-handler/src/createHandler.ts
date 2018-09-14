@@ -13,12 +13,8 @@ import {
   TransactionType,
   utils,
 } from '@neo-one/client-core';
-import { bodyParser, getMonitor } from '@neo-one/http';
 import { KnownLabel, metrics, Monitor } from '@neo-one/monitor';
 import { Blockchain, getEndpointConfig, Node, RelayTransactionResult } from '@neo-one/node-core';
-import { Context, Middleware } from 'koa';
-import compose from 'koa-compose';
-import compress from 'koa-compress';
 import { filter, switchMap, take, timeout, toArray } from 'rxjs/operators';
 
 export type HandlerPrimitive = string | number | boolean;
@@ -31,7 +27,7 @@ export type HandlerResult =
   | undefined
   | void;
 // tslint:disable-next-line no-any
-export type Handler = ((args: ReadonlyArray<any>, monitor: Monitor, ctx: Context) => Promise<HandlerResult>);
+export type Handler = ((args: ReadonlyArray<any>, monitor: Monitor) => Promise<HandlerResult>);
 
 interface Handlers {
   readonly [method: string]: Handler;
@@ -100,20 +96,20 @@ const rpcLabels = Object.values(RPC_METHODS).map((method) => ({
 }));
 
 const SINGLE_REQUESTS_HISTOGRAM = metrics.createHistogram({
-  name: 'http_jsonrpc_server_single_request_duration_seconds',
+  name: 'jsonrpc_server_single_request_duration_seconds',
   labelNames: rpcLabelNames,
   labels: rpcLabels,
 });
 
 const SINGLE_REQUEST_ERRORS_COUNTER = metrics.createCounter({
-  name: 'http_jsonrpc_server_single_request_failures_total',
+  name: 'jsonrpc_server_single_request_failures_total',
   labelNames: rpcLabelNames,
   labels: rpcLabels,
 });
 
-const jsonrpc = (handlers: Handlers): Middleware => {
+const createJSONRPCHandler = (handlers: Handlers) => {
   // tslint:disable-next-line no-any
-  const validateRequest = (_ctx: Context, request: any): JSONRPCRequest => {
+  const validateRequest = (request: any): JSONRPCRequest => {
     if (
       request !== undefined &&
       typeof request === 'object' &&
@@ -130,12 +126,12 @@ const jsonrpc = (handlers: Handlers): Middleware => {
   };
 
   // tslint:disable-next-line no-any
-  const handleSingleRequest = async (monitor: Monitor, ctx: Context, requestIn: any) =>
+  const handleSingleRequest = async (monitor: Monitor, requestIn: any) =>
     monitor.captureSpanLog(
       async (span) => {
         let request;
         try {
-          request = validateRequest(ctx, requestIn);
+          request = validateRequest(requestIn);
         } finally {
           let method = RPC_METHODS.UNKNOWN;
           if (request !== undefined) {
@@ -165,7 +161,7 @@ const jsonrpc = (handlers: Handlers): Middleware => {
           handlerParams = [params];
         }
 
-        const result = await handler(handlerParams, monitor, ctx);
+        const result = await handler(handlerParams, monitor);
 
         return {
           jsonrpc: '2.0',
@@ -174,7 +170,7 @@ const jsonrpc = (handlers: Handlers): Middleware => {
         };
       },
       {
-        name: 'http_jsonrpc_server_single_request',
+        name: 'jsonrpc_server_single_request',
         metric: {
           total: SINGLE_REQUESTS_HISTOGRAM,
           error: SINGLE_REQUEST_ERRORS_COUNTER,
@@ -184,19 +180,19 @@ const jsonrpc = (handlers: Handlers): Middleware => {
       },
     );
 
-  const handleRequest = (monitor: Monitor, ctx: Context, request: {}) => {
+  const handleRequest = (monitor: Monitor, request: unknown) => {
     if (Array.isArray(request)) {
-      return Promise.all(request.map(async (batchRequest) => handleSingleRequest(monitor, ctx, batchRequest)));
+      return Promise.all(request.map(async (batchRequest) => handleSingleRequest(monitor, batchRequest)));
     }
 
-    return handleSingleRequest(monitor, ctx, request);
+    return handleSingleRequest(monitor, request);
   };
 
-  const handleRequestSafe = async (monitor: Monitor, ctx: Context, request: {}): Promise<object | object[]> => {
+  const handleRequestSafe = async (monitor: Monitor, request: unknown): Promise<object | object[]> => {
     try {
       // tslint:disable-next-line prefer-immediate-return
-      const result = await monitor.captureSpanLog(async (span) => handleRequest(span, ctx, request), {
-        name: 'http_jsonrpc_server_request',
+      const result = await monitor.captureSpanLog(async (span) => handleRequest(span, request), {
+        name: 'jsonrpc_server_request',
         level: { log: 'verbose', span: 'info' },
         error: {},
       });
@@ -226,22 +222,8 @@ const jsonrpc = (handlers: Handlers): Middleware => {
     }
   };
 
-  return compose([
-    compress(),
-    bodyParser(),
-    async (ctx: Context): Promise<void> => {
-      if (!ctx.is('application/json')) {
-        return ctx.throw(415);
-      }
-
-      // tslint:disable-next-line no-any
-      const { fields } = ctx.request as any;
-      const monitor = getMonitor(ctx);
-      const result = await handleRequestSafe(monitor.withLabels({ [monitor.labels.RPC_TYPE]: 'jsonrpc' }), ctx, fields);
-
-      ctx.body = result;
-    },
-  ]);
+  return async (request: unknown, monitor: Monitor) =>
+    handleRequestSafe(monitor.withLabels({ [monitor.labels.RPC_TYPE]: 'jsonrpc' }), request);
 };
 
 const getTransactionReceipt = (value: TransactionData) => ({
@@ -250,9 +232,9 @@ const getTransactionReceipt = (value: TransactionData) => ({
   transactionIndex: value.index,
 });
 
-export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; readonly node: Node }) => {
+export const createHandler = ({ blockchain, node }: { readonly blockchain: Blockchain; readonly node: Node }) => {
   const checkHeight = (height: number) => {
-    if (height < 0 && height > blockchain.currentBlockIndex) {
+    if (height < 0 || height > blockchain.currentBlockIndex) {
       throw new JSONRPCError(-100, 'Invalid Height');
     }
   };
@@ -655,9 +637,5 @@ export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; rea
     },
   };
 
-  return {
-    name: 'rpc',
-    path: '/rpc',
-    middleware: jsonrpc(handlers),
-  };
+  return createJSONRPCHandler(handlers);
 };
