@@ -4,7 +4,7 @@ import { makeErrorWithCode, utils } from '@neo-one/utils';
 import base58 from 'bs58';
 import xor from 'buffer-xor';
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
-import { ec as EC, KeyPair } from 'elliptic';
+import { ec as EC } from 'elliptic';
 import scrypt from 'scrypt-js';
 import WIF from 'wif';
 import { common, ECPoint, PrivateKey, UInt160, UInt256 } from '../common';
@@ -157,7 +157,7 @@ export const InvalidPrivateKeyError = makeErrorWithCode(
   (privateKey: PrivateKey) => `Invalid Private Key, found: ${common.privateKeyToString(privateKey)}`,
 );
 
-const toECPointFromKeyPair = (pair: KeyPair): ECPoint =>
+const toECPointFromKeyPair = (pair: EC.KeyPair): ECPoint =>
   common.bufferToECPoint(Buffer.from(pair.getPublic(true, 'hex'), 'hex'));
 
 const mutablePublicKeyCache: { [K in string]?: ECPoint } = {};
@@ -282,7 +282,7 @@ const createWitness = (message: Buffer, privateKey: PrivateKey): Witness =>
 
 const getVerificationScriptHash = (publicKey: ECPoint): UInt160 => toScriptHash(createVerificationScript(publicKey));
 
-const compareKeys = (a: KeyPair, b: KeyPair): number => {
+const compareKeys = (a: EC.KeyPair, b: EC.KeyPair): number => {
   const aPublic = a.getPublic();
   const bPublic = b.getPublic();
   const result = aPublic.getX().cmp(bPublic.getX());

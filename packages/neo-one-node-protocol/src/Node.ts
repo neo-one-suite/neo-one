@@ -32,6 +32,7 @@ import {
 } from '@neo-one/node-network';
 import { finalize, labels, neverComplete, utils as commonUtils } from '@neo-one/utils';
 import { ScalingBloem } from 'bloem';
+// tslint:disable-next-line:match-default-export-name
 import BloomFilter from 'bloom-filter';
 import { BN } from 'bn.js';
 import fetch from 'cross-fetch';
@@ -731,7 +732,7 @@ export class Node implements INode {
         .map((peer) => {
           const { address, port } = peer;
           const host = new Address6(address);
-          const canonicalForm = host.canonicalForm();
+          const canonicalForm = host.canonicalForm() as string | undefined | null;
 
           return { host: canonicalForm == undefined ? '' : canonicalForm, port };
         })

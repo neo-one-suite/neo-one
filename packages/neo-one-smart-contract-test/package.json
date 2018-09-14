@@ -12,6 +12,7 @@
     "@neo-one/smart-contract-compiler": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
     "@types/lodash": "^4.14.116",
+    "@types/memdown": "^3.0",
     "bignumber.js": "^7.2.1",
     "change-case": "^3.0.2",
     "lodash": "^4.17.11",
