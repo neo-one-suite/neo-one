@@ -24,10 +24,10 @@ export class NetworkAddress implements SerializableWire<NetworkAddress> {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): NetworkAddress {
     const timestamp = reader.readUInt32LE();
     const services = reader.readUInt64LE();
-    const address = Address6.fromByteArray([...reader.readBytes(16)]);
+    const address = Address6.fromByteArray([...reader.readBytes(16)]) as Address6 | undefined | null;
     const port = reader.readUInt16BE();
 
-    const canonical = address == undefined ? '' : address.canonicalForm();
+    const canonical = address == undefined ? '' : (address.canonicalForm() as string | undefined | null);
 
     return new this({
       timestamp,

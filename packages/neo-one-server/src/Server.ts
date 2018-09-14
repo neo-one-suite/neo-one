@@ -160,10 +160,12 @@ export class Server {
             }
             const app = new Mali(proto);
             app.silent = false;
-            app.on('error', (error: Error, ctx: Context) => {
+            app.on('error', (error: Error, ctx: Context | undefined | null) => {
               let monitor = this.monitor;
-              if (ctx != undefined && ctx.state != undefined && ctx.state.monitor != undefined) {
-                ({ monitor } = ctx.state);
+              // tslint:disable-next-line:no-any
+              if (ctx != undefined && (ctx as any).state != undefined && (ctx as any).state.monitor != undefined) {
+                // tslint:disable-next-line:no-any
+                ({ monitor } = (ctx as any).state);
               }
               monitor.logError({
                 name: 'grpc_server_request_uncaught_error',

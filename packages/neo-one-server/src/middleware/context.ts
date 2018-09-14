@@ -6,7 +6,8 @@ import { getMonitor } from './common';
 export const context = ({ monitor }: { readonly monitor: Monitor }) =>
   compose([
     async (ctx, next) => {
-      ctx.state = {};
+      // tslint:disable-next-line:no-any no-object-mutation
+      (ctx as any).state = {};
       await monitor
         .withLabels({
           [monitor.labels.RPC_TYPE]: 'grpc',
@@ -14,7 +15,8 @@ export const context = ({ monitor }: { readonly monitor: Monitor }) =>
         })
         .captureSpanLog(
           async (span) => {
-            ctx.monitor = span;
+            // tslint:disable-next-line:no-any no-object-mutation
+            (ctx as any).monitor = span;
             await next();
           },
           {
