@@ -2736,9 +2736,9 @@ bitbuffer@0.1.x:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/bitbuffer/-/bitbuffer-0.1.3.tgz#780feb1297caaf0fac9e48cfab946d6efd2bd397"
 
-bitwise@^1.5.2:
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/bitwise/-/bitwise-1.5.2.tgz#eba9d1d097a39b12032e55dfdd12a1e32e1d0d65"
+bitwise@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/bitwise/-/bitwise-2.0.0.tgz#887aaccf328179571a862688d1fa4c23c1ca529b"
 
 bl@^1.0.0:
   version "1.2.2"
