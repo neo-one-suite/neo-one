@@ -17,7 +17,7 @@ between your smart contract definition file and the front-end API.
   * For example, Integers and Fixed point numbers are converted to [BigNumbers](https://github.com/MikeMcl/bignumber.js/).
 
 As a concrete example, take a method which returns a contract's token balance for a given address. In the smart contract definition file, it might look like this:
-```
+```ts
 import { Address, constant, Integer, SmartContract } from '@neo-one/smart-contract'
 
 export class MyContract extends SmartContract {
@@ -32,7 +32,7 @@ export class MyContract extends SmartContract {
   ...
 ```
 The front-end api will look like this:
-```
+```ts
 import { AddressString, SmartContract } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
@@ -49,7 +49,7 @@ This file serves both as a reference for your smart contract's front-end api as 
 ## Testing with Jest
 NEO•ONE was built to allow your smart contracts to be tested with the [jest](https://jestjs.io/) testing framework.  In the NEO•ONE Playground, you can find the test files [here](https://github.com/neo-one-suite/neo-one-playground/tree/master/one/tests).
 To setup your smart contract test, you will need to import the generated testing helper, `withContracts`:
-```
+```ts
 import { withContracts } from '../generated/test'
 ```
 This helper resets and redeploys your contracts to a local private network and gives you access to some helpful tools to help you interact with your smart contract and the blockchain in your test:
@@ -66,7 +66,7 @@ This helper resets and redeploys your contracts to a local private network and g
 
 To use `withContracts` in your test, simply call it at the top of your test.  Its only argument is an asynchronous callback which forwards all of the above tools.  Then, your test is written like a standard jest test inside of this callback.
 To give an example, lets look at how you would write a test to check that `checkBalance` is working.
-```
+```ts
 import { createPrivateKey } from '@neo-one/client';
 import { withContracts } from '../generated/test';
 

@@ -686,7 +686,6 @@ export type ParamJSON =
   | BufferString
   | AddressString
   | Hash256String
-  | AddressString
   | PublicKeyString
   | boolean
   | ParamJSONArray;
