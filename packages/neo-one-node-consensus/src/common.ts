@@ -10,10 +10,9 @@ import {
   Transaction,
   UnsignedConsensusPayload,
 } from '@neo-one/client-core';
-import { Blockchain } from '@neo-one/node-core';
+import { Blockchain, Node } from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import _ from 'lodash';
-import { Node } from '../Node';
 import { ConsensusContext } from './ConsensusContext';
 import {
   BlockSentContext,

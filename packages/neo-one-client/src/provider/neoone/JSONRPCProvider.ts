@@ -1,4 +1,6 @@
 import { Monitor } from '@neo-one/monitor';
+import { UnknownBlockError } from '../../errors';
+import { JSONRPCError } from './errors';
 
 export interface JSONRPCRequest {
   readonly method: string;
@@ -10,6 +12,17 @@ export interface JSONRPCRequest {
 // tslint:disable-next-line no-any
 export type JSONRPCResponse = any;
 
-export interface JSONRPCProvider {
-  readonly request: (req: JSONRPCRequest, monitor?: Monitor) => Promise<JSONRPCResponse>;
+export abstract class JSONRPCProvider {
+  public abstract request(req: JSONRPCRequest, monitor?: Monitor): Promise<JSONRPCResponse>;
+  // tslint:disable-next-line no-any
+  protected readonly handleResponse = (responseJSON: any): any => {
+    if (responseJSON.error !== undefined) {
+      if (responseJSON.error.code === -100 && responseJSON.error.message === 'Unknown block') {
+        throw new UnknownBlockError();
+      }
+      throw new JSONRPCError(responseJSON.error);
+    }
+
+    return responseJSON.result;
+  };
 }

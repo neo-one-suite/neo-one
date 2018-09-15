@@ -10,11 +10,11 @@ import {
   UInt160,
   utils,
 } from '@neo-one/client-core';
+import { Node } from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
 import _ from 'lodash';
-import { Node } from '../Node';
 import {
   checkExpectedView,
   checkSignatures,

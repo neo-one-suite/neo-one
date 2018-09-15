@@ -5,7 +5,7 @@
     "module": "esnext",
     "moduleResolution": "node",
 
-    "lib": ["dom", "esnext"],
+    "lib": ["esnext", "dom"],
     "paths": {
       "@neo-one/types": [
         "./neo-one-types/"

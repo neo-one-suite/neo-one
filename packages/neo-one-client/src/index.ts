@@ -8,7 +8,15 @@ export { ReadClient } from './ReadClient';
 export { DeveloperClient } from './DeveloperClient';
 export { OneClient, nep5, typeGuards };
 export { LocalKeyStore, LocalMemoryStore, LocalStringStore, LocalUserAccountProvider } from './user';
-export { NEOONEDataProvider, NEOONEProvider, NEOONEOneDataProvider, NEOONEDataProviderOptions } from './provider';
+export {
+  NEOONEDataProvider,
+  NEOONEProvider,
+  NEOONEOneDataProvider,
+  NEOONEDataProviderOptions,
+  JSONRPCProvider,
+  JSONRPCResponse,
+  JSONRPCRequest,
+} from './provider';
 export {
   addressToScriptHash,
   createPrivateKey,

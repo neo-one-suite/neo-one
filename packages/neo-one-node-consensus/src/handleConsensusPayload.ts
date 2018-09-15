@@ -9,8 +9,8 @@ import {
   PrivateKey,
   Transaction,
 } from '@neo-one/client-core';
+import { Node } from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
-import { Node } from '../Node';
 import { addTransaction, checkExpectedView, checkSignatures, initializeConsensus } from './common';
 import { ConsensusContext } from './ConsensusContext';
 import { Context, HeaderContext, RequestReceivedContext } from './context';

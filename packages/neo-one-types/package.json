@@ -3,5 +3,8 @@
   "version": "1.0.0-preview.0",
   "description": "NEO•ONE TypeScript types.",
   "main": "index.d.ts",
-  "types": "index.d.ts"
+  "types": "index.d.ts",
+  "dependencies": {
+    "@types/sharedworker": "^0.0.28"
+  }
 }

@@ -73,10 +73,18 @@ const getPackageJSON = (pkg) => {
   }
 };
 
+const SKIP_PACKAGES = new Set([
+  'neo-one-playground',
+  'neo-one-website',
+  'neo-one-worker-loader',
+  'neo-one-node-browser',
+]);
+const SKIP_PACKAGES_LIST = [...SKIP_PACKAGES];
+
 const pkgs = fs
   .readdirSync('packages')
   .filter((file) => !file.startsWith('.'))
-  .filter((file) => file !== 'neo-one-playground')
+  .filter((file) => !SKIP_PACKAGES.has(file))
   .filter((pkg) => fs.pathExistsSync(path.resolve('packages', pkg, 'package.json')));
 const pkgJSONs = pkgs.map((pkg) => [pkg, getPackageJSON(pkg)]);
 const smartContractPkgs = pkgJSONs.filter(([_p, pkgJSON]) => pkgJSON.smartContract).map(([p]) => p);
@@ -91,18 +99,19 @@ const indexPkgs = pkgs.filter((p) => !smartContractPkgs.includes(p));
 const pkgNames = pkgJSONs.map(([_p, pkgJSON]) => pkgJSON.name);
 const pkgNamesSet = new Set(pkgNames);
 
+const skipGlobs = SKIP_PACKAGES_LIST.map((pkg) => `!packages/${pkg}/**/*`);
+
 const globs = {
   originalSrc: [
-    'packages/*/src/**/*.{ts,tsx}',
+    'packages/*/src/**/*.{ts,tsx,js}',
     'packages/*/template/**/*',
     'packages/*/proto/**/*.proto',
-    '!packages/neo-one-playground/**/*',
     '!packages/*/src/**/*.test.{ts,tsx}',
     '!packages/*/src/__data__/**/*',
     '!packages/*/src/__tests__/**/*',
     '!packages/*/src/__e2e__/**/*',
     '!packages/*/src/bin/**/*',
-  ],
+  ].concat(skipGlobs),
   src: (format) => [
     `${getDistBase(format)}/packages/*/src/**/*.{ts,tsx}`,
     `!${getDistBase(format)}/packages/*/src/**/*.test.{ts,tsx}`,
@@ -114,9 +123,9 @@ const globs = {
     `!${getDistBase(format)}/packages/neo-one-server-plugin-wallet/src/contracts/*.ts`,
   ],
   types: ['packages/neo-one-types/**/*', '!packages/neo-one-types/package.json'],
-  bin: ['packages/*/src/bin/*.ts', '!packages/neo-one-playground/**/*'],
-  pkg: ['packages/*/package.json', '!packages/neo-one-playground/**/*'],
-  pkgFiles: ['packages/*/tsconfig.json', 'packages/*/static/**/*', '!packages/neo-one-playground/**/*'],
+  bin: ['packages/*/src/bin/*.ts'].concat(skipGlobs),
+  pkg: ['packages/*/package.json'].concat(skipGlobs),
+  pkgFiles: ['packages/*/tsconfig.json', 'packages/*/static/**/*'].concat(skipGlobs),
   files: ['lerna.json', 'yarn.lock', 'tsconfig.json'],
   metadata: ['LICENSE', 'README.md', 'CHANGELOG.md'],
 };

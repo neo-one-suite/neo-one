@@ -7,9 +7,9 @@ import {
   UnsignedConsensusPayload,
 } from '@neo-one/client-core';
 import { context } from '../../__data__';
-import { ConsensusContext } from '../../consensus/ConsensusContext';
-import { Context } from '../../consensus/context';
-import { handleConsensusPayload } from '../../consensus/handleConsensusPayload';
+import { ConsensusContext } from '../../ConsensusContext';
+import { Context } from '../../context';
+import { handleConsensusPayload } from '../../handleConsensusPayload';
 
 const consensusContext = new ConsensusContext();
 

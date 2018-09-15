@@ -1,7 +1,7 @@
-import { Endpoint } from '@neo-one/node-core';
 import { Duplex } from 'stream';
 import through from 'through';
-import { ReceiveMessageTimeoutError } from './errors';
+import { ReceiveMessageTimeoutError } from '../errors';
+import { Endpoint } from './types';
 
 export interface PeerOptions<Message> {
   readonly endpoint: Endpoint;

@@ -71,10 +71,11 @@ import * as clientUtils from '../../utils';
 import { MissingTransactionDataError } from './errors';
 import { JSONRPCClient } from './JSONRPCClient';
 import { JSONRPCHTTPProvider } from './JSONRPCHTTPProvider';
+import { JSONRPCProvider } from './JSONRPCProvider';
 
 export interface NEOONEDataProviderOptions {
   readonly network: NetworkType;
-  readonly rpcURL: string;
+  readonly rpcURL: string | JSONRPCProvider;
   readonly iterBlocksFetchTimeoutMS?: number;
   readonly iterBlocksBatchSize?: number;
 }
@@ -87,7 +88,7 @@ export class NEOONEDataProvider implements DataProvider, DeveloperProvider {
 
   public constructor({ network, rpcURL, iterBlocksFetchTimeoutMS, iterBlocksBatchSize }: NEOONEDataProviderOptions) {
     this.network = network;
-    this.mutableClient = new JSONRPCClient(new JSONRPCHTTPProvider(rpcURL));
+    this.mutableClient = new JSONRPCClient(typeof rpcURL === 'string' ? new JSONRPCHTTPProvider(rpcURL) : rpcURL);
     this.iterBlocksFetchTimeoutMS = iterBlocksFetchTimeoutMS;
     this.iterBlocksBatchSize = iterBlocksBatchSize;
   }

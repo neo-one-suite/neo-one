@@ -232,7 +232,16 @@ const getTransactionReceipt = (value: TransactionData) => ({
   transactionIndex: value.index,
 });
 
-export const createHandler = ({ blockchain, node }: { readonly blockchain: Blockchain; readonly node: Node }) => {
+// tslint:disable-next-line no-any
+export type RPCHandler = (request: unknown, monitor: Monitor) => Promise<any>;
+
+export const createHandler = ({
+  blockchain,
+  node,
+}: {
+  readonly blockchain: Blockchain;
+  readonly node: Node;
+}): RPCHandler => {
   const checkHeight = (height: number) => {
     if (height < 0 || height > blockchain.currentBlockIndex) {
       throw new JSONRPCError(-100, 'Invalid Height');

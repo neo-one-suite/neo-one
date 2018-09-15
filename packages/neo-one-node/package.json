@@ -9,6 +9,7 @@
     "@neo-one/node-blockchain": "^1.0.0-preview.0",
     "@neo-one/node-core": "^1.0.0-preview.0",
     "@neo-one/node-data-backup": "^1.0.0-preview.0",
+    "@neo-one/node-network": "^1.0.0-preview.0",
     "@neo-one/node-offline": "^1.0.0-preview.0",
     "@neo-one/node-protocol": "^1.0.0-preview.0",
     "@neo-one/node-http-rpc": "^1.0.0-preview.0",

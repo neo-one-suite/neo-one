@@ -1,5 +1,5 @@
-import { Endpoint } from '@neo-one/node-core';
 import { Peer } from './Peer';
+import { Endpoint } from './types';
 
 interface ConnectedPeerOptions<Message, PeerData> {
   readonly peer: Peer<Message>;

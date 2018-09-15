@@ -4,7 +4,6 @@ import { labels, utils } from '@neo-one/utils';
 import _fetch from 'cross-fetch';
 import DataLoader from 'dataloader';
 import stringify from 'safe-stable-stringify';
-import { UnknownBlockError } from '../../errors';
 import { HTTPError, InvalidRPCResponseError, JSONRPCError } from './errors';
 import { JSONRPCProvider, JSONRPCRequest } from './JSONRPCProvider';
 
@@ -180,24 +179,13 @@ const watchSingle = async ({
   return response.json();
 };
 
-// tslint:disable-next-line no-any
-const handleResponse = (responseJSON: any): any => {
-  if (responseJSON.error !== undefined) {
-    if (responseJSON.error.code === -100 && responseJSON.error.message === 'Unknown block') {
-      throw new UnknownBlockError();
-    }
-    throw new JSONRPCError(responseJSON.error);
-  }
-
-  return responseJSON.result;
-};
-
-export class JSONRPCHTTPProvider implements JSONRPCProvider {
+export class JSONRPCHTTPProvider extends JSONRPCProvider {
   public readonly endpoint: string;
   // tslint:disable-next-line no-any
   public readonly batcher: DataLoader<{ readonly monitor?: Monitor; readonly request: any }, any>;
 
   public constructor(endpoint: string) {
+    super();
     this.endpoint = endpoint;
     this.batcher = new DataLoader(
       async (requests) => {
@@ -267,6 +255,6 @@ export class JSONRPCHTTPProvider implements JSONRPCProvider {
       });
     }
 
-    return handleResponse(response);
+    return this.handleResponse(response);
   }
 }

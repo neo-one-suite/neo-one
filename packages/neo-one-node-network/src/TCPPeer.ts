@@ -1,8 +1,7 @@
-import { Endpoint, getEndpointConfig } from '@neo-one/node-core';
+import { Endpoint, getEndpointConfig, Peer } from '@neo-one/node-core';
 import * as net from 'net';
 import { Duplex } from 'stream';
 import { SocketTimeoutError } from './errors';
-import { Peer } from './Peer';
 
 interface TCPPeerOptions<Message> {
   readonly endpoint: Endpoint;

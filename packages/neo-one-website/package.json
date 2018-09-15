@@ -1,0 +1,14 @@
+{
+  "name": "@neo-one/website",
+  "version": "1.0.0-preview.0",
+  "description": "NEO•ONE website.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@neo-one/client": "^1.0.0-preview.0",
+    "@neo-one/node-browser": "^1.0.0-preview.0",
+    "react": "^16.5.1",
+    "react-dom": "^16.5.1",
+    "react-hot-loader": "^4.3.7",
+    "tslib": "^1.9.3"
+  }
+}

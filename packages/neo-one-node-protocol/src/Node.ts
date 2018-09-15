@@ -12,24 +12,22 @@ import {
   utils,
 } from '@neo-one/client-core';
 import { metrics, Monitor } from '@neo-one/monitor';
+import { Consensus, ConsensusOptions } from '@neo-one/node-consensus';
 import {
   Blockchain,
+  ConnectedPeer,
   createEndpoint,
+  CreateNetwork,
   Endpoint,
   getEndpointConfig,
+  NegotiateResult,
+  Network,
+  NetworkEventMessage,
   Node as INode,
+  Peer,
   RelayTransactionResult,
   VerifyTransactionResult,
 } from '@neo-one/node-core';
-import {
-  ConnectedPeer,
-  EventMessage as NetworkEventMessage,
-  NegotiateResult,
-  Network,
-  NetworkEnvironment,
-  NetworkOptions,
-  Peer,
-} from '@neo-one/node-network';
 import { finalize, labels, neverComplete, utils as commonUtils } from '@neo-one/utils';
 import { ScalingBloem } from 'bloem';
 // tslint:disable-next-line:match-default-export-name
@@ -42,7 +40,6 @@ import LRU from 'lru-cache';
 import { combineLatest, defer, Observable, of as _of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
 import { Command } from './Command';
-import { Consensus, ConsensusOptions } from './consensus';
 import { AlreadyConnectedError, NegotiationError } from './errors';
 import { Message, MessageTransform, MessageValue } from './Message';
 import {
@@ -86,14 +83,13 @@ export interface TransactionAndFee {
 }
 
 export interface Environment {
-  readonly network?: NetworkEnvironment;
+  readonly externalPort?: number;
 }
 export interface Options {
   readonly consensus?: {
     readonly enabled: boolean;
     readonly options: ConsensusOptions;
   };
-  readonly network?: NetworkOptions;
   readonly rpcURLs?: ReadonlyArray<string>;
   readonly unhealthyPeerSeconds?: number;
 }
@@ -166,7 +162,7 @@ export class Node implements INode {
   // tslint:disable-next-line readonly-keyword
   private mutableMemPool: { [hash: string]: Transaction };
   private readonly monitor: Monitor;
-  private readonly network: Network<Message, PeerData, PeerHealth>;
+  private readonly network: Network<Message, PeerData>;
   private readonly options$: Observable<Options>;
   private readonly externalPort: number;
   private readonly nonce: number;
@@ -264,24 +260,19 @@ export class Node implements INode {
   public constructor({
     monitor,
     blockchain,
+    createNetwork,
     environment = {},
     options$,
   }: {
     readonly monitor: Monitor;
     readonly blockchain: Blockchain;
+    readonly createNetwork: CreateNetwork;
     readonly environment?: Environment;
     readonly options$: Observable<Options>;
   }) {
     this.blockchain = blockchain;
     this.monitor = monitor.at('node_protocol');
-    this.network = new Network({
-      monitor,
-      environment: environment.network,
-      options$: options$.pipe(
-        map(({ network = {} }) => network),
-        distinctUntilChanged(),
-      ),
-
+    this.network = createNetwork({
       negotiate: this.negotiate,
       checkPeerHealth: this.checkPeerHealth,
       createMessageTransform: () => new MessageTransform(this.blockchain.deserializeWireContext),
@@ -294,8 +285,8 @@ export class Node implements INode {
 
     this.options$ = options$;
 
-    const { network: { listenTCP: { port = 0 } = {} } = {} } = environment;
-    this.externalPort = port;
+    const { externalPort = 0 } = environment;
+    this.externalPort = externalPort;
     this.nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
     this.userAgent = `NEO:neo-one-js:1.0.0-preview`;
 

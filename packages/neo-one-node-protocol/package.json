@@ -6,6 +6,7 @@
   "dependencies": {
     "@neo-one/client-core": "^1.0.0-preview.0",
     "@neo-one/monitor": "^1.0.0-preview.0",
+    "@neo-one/node-consensus": "^1.0.0-preview.0",
     "@neo-one/node-core": "^1.0.0-preview.0",
     "@neo-one/node-network": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",

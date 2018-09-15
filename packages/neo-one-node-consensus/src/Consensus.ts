@@ -1,11 +1,11 @@
 import { common, ConsensusPayload, crypto, ECPoint, PrivateKey, Transaction, UInt160 } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
+import { Node } from '@neo-one/node-core';
 import { finalize, mergeScanLatest, utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { scan } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/scan';
 import { Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
-import { Node } from '../Node';
 import { initializeNewConsensus } from './common';
 import { ConsensusContext } from './ConsensusContext';
 import { ConsensusQueue } from './ConsensusQueue';

@@ -3,6 +3,7 @@ import { Monitor } from '@neo-one/monitor';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { backup, BackupRestoreOptions, restore } from '@neo-one/node-data-backup';
 import { rpcServer$, RPCServerEnvironment, RPCServerOptions } from '@neo-one/node-http-rpc';
+import { Network, NetworkEnvironment, NetworkOptions } from '@neo-one/node-network';
 import { dumpChain, loadChain } from '@neo-one/node-offline';
 import { Node, NodeEnvironment, NodeOptions } from '@neo-one/node-protocol';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
@@ -39,13 +40,14 @@ export interface Environment {
   readonly dataPath: string;
   readonly rpc: RPCServerEnvironment;
   readonly levelDownOptions?: LevelDownOpenOptions;
-
   readonly node?: NodeEnvironment;
+  readonly network?: NetworkEnvironment;
   readonly backup?: BackupEnvironment;
   readonly telemetry?: TelemetryEnvironment;
 }
 export interface Options {
   readonly node?: NodeOptions;
+  readonly network?: NetworkOptions;
   readonly rpc?: RPCServerOptions;
   readonly backup?: BackupOptions;
 }
@@ -149,6 +151,16 @@ FullNodeOptions): Observable<any> => {
           map(({ node: nodeOptions = {} }) => nodeOptions),
           distinctUntilChanged(),
         ),
+        createNetwork: (options) =>
+          new Network({
+            monitor,
+            environment: environment.network,
+            options$: options$.pipe(
+              map(({ network: networkOptions = {} }) => networkOptions),
+              distinctUntilChanged(),
+            ),
+            ...options,
+          }),
       });
 
       return node.start$().pipe(map(() => ({ blockchain, node })));

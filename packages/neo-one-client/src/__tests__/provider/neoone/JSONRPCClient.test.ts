@@ -3,9 +3,14 @@ import { data, factory, keys } from '../../../__data__';
 import { RelayTransactionError } from '../../../errors';
 import { JSONRPCClient, JSONRPCError, JSONRPCProvider } from '../../../provider';
 
+const mockRequest = jest.fn();
+class MockJSONRPCProvider extends JSONRPCProvider {
+  // tslint:disable-next-line readonly-keyword
+  public request = mockRequest;
+}
+
 describe('JSONRPCClient', () => {
-  const mockRequest = jest.fn();
-  const provider: Modifiable<JSONRPCProvider> = { request: mockRequest };
+  const provider = new MockJSONRPCProvider();
   const client = new JSONRPCClient(provider);
 
   beforeEach(() => {
