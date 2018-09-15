@@ -18,13 +18,13 @@ dapp up and running quickly.
 
 Install NEO•ONE using [npm](https://www.npmjs.com/):
 
-```
+```ts
 npm install -g @neo-one/cli
 ```
 
 Or via [yarn](https://yarnpkg.com/):
 
-```
+```ts
 yarn global add @neo-one/cli
 ```
 
@@ -40,7 +40,7 @@ Here you will see how NEO•ONE can take you through the full journey of dapp de
 Once your have installed the above requirements, simply clone the [NEO•ONE Playground](https://github.com/neo-one-suite/neo-one-playground) and run the following command
 from the playground's root directory:
 
-```
+```ts
 yarn neo-one build
 ```
 That single command does all the following:
@@ -49,7 +49,7 @@ That single command does all the following:
 * Compiles and deploys the playground smart contracts to the private network
 
 To interact with these dapps in your browser, run:
-```
+```ts
 yarn start
 ```
 That's it!  Start playing with some dapps running on a local private network, right in your browser!  If you want to learn more, check out our tutorials and documentation (in progress...).

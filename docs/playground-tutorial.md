@@ -7,11 +7,11 @@ This guide will walk you through the [NEO•ONE Playground](https://github.com/n
 ## Tutorial
 
 First, to get the playground smart contracts deployed to a private network, run:
-```
+```ts
 yarn neo-one build
 ```
 To interact with the dapps in your browser, run:
-```
+```ts
 yarn start
 ```
 
@@ -41,8 +41,8 @@ Getting a smart contract up and running on a private network is easier than ever
 
 Beyond this, any code which would cause errors running on the NEO-VM will show up as inline errors caught by the
 NEO•ONE compiler.  To see this in action, try adding the following line to one of the smart contracts:
-```
+```ts
 Address.from('abc')
 ```
-The compiler should tell you that 'abc' is not an address string.  Neat, huh?  The goal is for you to write your smart contracts in the most natural way possible.  NEO•ONE will let you know when your code won't
+The compiler should tell you that 'abc' is not an address string. The goal is for you to write your smart contracts in the most natural way possible.  NEO•ONE will let you know when your code won't
 compile or will produce malformed results.  Note that this feature only works when using one of the major IDEs.  We recommend [VSCode](https://code.visualstudio.com/) for the best experience with Typescript.

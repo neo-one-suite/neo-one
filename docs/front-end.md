@@ -12,7 +12,7 @@ used for testing. In addition to these tools, you also have access to some tools
 Like what is generated for testing, a `WithContracts` react component is also generated to give you access to a similar tool set inside of your react app.
 `WithContracts` is imported from the generated folder and functions as a React Container.  It is used to forward your smart contract and the the client
 into your react app.  Here is how you might use WithContracts to forward these to your other components.
-```
+```ts
 import { AddressString } from '@neo-one/client`;
 import { WithContracts } from '../../../one/generated';
 

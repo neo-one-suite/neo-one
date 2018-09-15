@@ -633,7 +633,6 @@ export type Param =
   | BufferString
   | AddressString
   | Hash256String
-  | AddressString
   | PublicKeyString
   | boolean
   | ParamArray
@@ -645,7 +644,6 @@ export type Return =
   | BufferString
   | AddressString
   | Hash256String
-  | AddressString
   | PublicKeyString
   | boolean
   | ReturnArray
