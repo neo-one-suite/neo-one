@@ -10,6 +10,8 @@
     "@neo-one/utils": "^1.0.0-preview.0",
     "@types/fs-extra": "^5.0.4",
     "@types/google-cloud__storage": "^1.7.2",
+    "@types/megajs": "^0.14",
+    "@types/stream-throttle": "^0.1",
     "@types/tar": "^4.0.0",
     "fs-extra": "^7.0.0",
     "leveldown": "^4.0.1",

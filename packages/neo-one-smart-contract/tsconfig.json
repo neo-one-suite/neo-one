@@ -3,19 +3,14 @@
     "target": "esnext",
     "module": "commonjs",
     "moduleResolution": "node",
-
     "noLib": true,
     "typeRoots": [],
-
     "pretty": true,
-
     "noEmit": true,
     "declaration": false,
-
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": false,
     "experimentalDecorators": true,
-
     "alwaysStrict": true,
     "strict": true,
     "skipLibCheck": false,

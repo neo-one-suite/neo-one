@@ -1,3 +1,4 @@
+// tslint:disable-next-line:match-default-export-name
 import body from 'koa-better-body';
 import convert from 'koa-convert';
 

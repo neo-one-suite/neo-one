@@ -38,10 +38,10 @@ export class MegaProvider extends Provider {
 
     const { id, key } = download;
     const mega = await this.getMega();
-    const file = new mega.File({ downloadID: id, key });
+    const file = new mega.File({ downloadId: id, key });
 
     return new Promise<boolean>((resolve) => {
-      file.loadAttributes((err) => {
+      file.loadAttributes((err?: Error) => {
         if (err) {
           resolve(false);
         } else {
@@ -68,7 +68,7 @@ export class MegaProvider extends Provider {
 
         return new Promise<void>((resolve, reject) => {
           const read = new mega.File({
-            downloadID: id,
+            downloadId: id,
             key,
           }).download();
           const write = fs.createWriteStream(downloadPath);
@@ -136,7 +136,7 @@ export class MegaProvider extends Provider {
         });
 
         await new Promise<void>((resolve, reject) =>
-          storage.login((innerErr) => {
+          storage.login((innerErr?: Error) => {
             if (innerErr) {
               reject(innerErr);
             } else {
