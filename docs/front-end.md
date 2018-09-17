@@ -30,4 +30,4 @@ In addition to these tools, NEO•ONE also gives you a whole host of handy react
 [here]().
 
 ## Further Reading
-Hopefully these guides have given you a quick introduction to what is possible with NEO•ONE.  To find more details on the apis, see our documentation [here]().
+Hopefully these guides have given you a quick introduction to what is possible with NEO•ONE.  Continue reading to find more specific details on the apis.

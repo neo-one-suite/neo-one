@@ -1,6 +1,6 @@
 ---
-id: client
-title: Client
+id: client-api
+title: Client API
 ---
 This is the API documentation for the NEO•ONE Client.
 

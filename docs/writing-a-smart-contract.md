@@ -27,7 +27,7 @@ smart contract:
 Besides including this property, you just need to write your class and methods like you would a normal typescript class.  Anything that won't compile
 should be caught by NEO•ONE's inline error checking.
 
-All available types should be imported from [@neo-one/smart-contract](https://github.com/neo-one-suite/neo-one/blob/master/packages/neo-one-smart-contract/src/index.d.ts).  As an example, say you want to write a method that takes in an Address
+All available types should be imported from [@neo-one/smart-contract](https://github.com/neo-one-suite/neo-one/blob/master/packages/neo-one-smart-contract/src/index.d.ts). Learn about everything available over in our [Smart Contract API](#/docs/en/smart-contract-api.html) page. As an example, say you want to write a method that takes in an Address
 and returns an Integer.  This might be a method which checks the contract's token balance of an Address:
 ```ts
 import { Address, constant, Integer, SmartContract } from '@neo-one/smart-contract'
