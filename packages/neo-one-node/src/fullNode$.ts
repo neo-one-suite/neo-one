@@ -102,7 +102,9 @@ FullNodeOptions): Observable<any> => {
     }
 
     const storage = levelupStorage({
-      db: LevelUp(customLeveldown === undefined ? LevelDOWN(dataPath, environment.levelDownOptions) : customLeveldown),
+      db: LevelUp(
+        customLeveldown === undefined ? LevelDOWN(dataPath /*, environment.levelDownOptions*/) : customLeveldown,
+      ),
 
       context: { messageMagic: settings.messageMagic },
     });

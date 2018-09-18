@@ -1,6 +1,6 @@
 import { upperCaseFirst, utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { ActionJSON } from './action';
 import { CallReceiptJSON } from './CallReceipt';
 import { common } from './common';

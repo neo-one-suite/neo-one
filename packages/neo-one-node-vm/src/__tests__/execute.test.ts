@@ -16,7 +16,7 @@ import {
 } from '@neo-one/client-core';
 import { DefaultMonitor } from '@neo-one/monitor';
 import { ExecuteScriptsResult, NULL_ACTION, TriggerType, VMListeners } from '@neo-one/node-core';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import _ from 'lodash';
 import { assets, createBlockchain, testUtils, transactions } from '../__data__';
 import { execute } from '../execute';

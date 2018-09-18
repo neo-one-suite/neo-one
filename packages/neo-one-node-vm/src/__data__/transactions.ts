@@ -11,7 +11,7 @@ import {
   utils,
   Witness,
 } from '@neo-one/client-core';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { keys } from './keys';
 
 export const createInvocation = ({

@@ -1,4 +1,4 @@
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { UInt160 } from '../common';
 import {
   createSerializeWire,

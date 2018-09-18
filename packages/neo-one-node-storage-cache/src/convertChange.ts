@@ -201,7 +201,7 @@ const convertAddChange = (changeIn: AddChange): ReadonlyArray<CacheChange> => {
         {
           type: 'add',
           model: 'validatorsCount',
-          key: keys.validatorsCountKey,
+          key: keys.validatorsCountKey.toString(),
           value: change.value,
         },
       ];

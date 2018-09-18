@@ -14,7 +14,7 @@ import {
 } from '@neo-one/client-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils as commonUtils } from '@neo-one/utils';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../../Context';

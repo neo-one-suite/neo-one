@@ -1,5 +1,5 @@
 import { makeErrorWithCode } from '@neo-one/utils';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { common, ECPoint, UInt160, UInt256 } from '../common';
 import { ByteBuffer, ByteCode, Op, OpCode, SysCallName } from '../vm';
 import { BinaryWriter } from './BinaryWriter';

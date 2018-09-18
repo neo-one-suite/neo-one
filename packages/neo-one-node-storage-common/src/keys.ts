@@ -10,7 +10,7 @@ import {
   ValidatorKey,
 } from '@neo-one/client-core';
 import { AccountInputKey, AccountInputsKey } from '@neo-one/node-core';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import bytewise from 'bytewise';
 
 const accountKeyPrefix = 'account';
@@ -37,8 +37,8 @@ const validatorsCountKey = bytewise.encode([validatorsCountKeyString]);
 const serializeHeaderIndexHashKey = (index: number): Buffer => bytewise.encode([headerHashKeyPrefix, index]);
 const serializeHeaderIndexHashKeyString = (index: number): string => `${headerHashKeyPrefix}:${index}`;
 
-const maxHeaderHashKey = bytewise.encode([settingsPrefix, 'max-header-hash']) as Buffer;
-const maxBlockHashKey = bytewise.encode([settingsPrefix, 'max-block-hash']) as Buffer;
+const maxHeaderHashKey = bytewise.encode([settingsPrefix, 'max-header-hash']);
+const maxBlockHashKey = bytewise.encode([settingsPrefix, 'max-block-hash']);
 
 const createSerializeAccountInputKey = (prefix: string) => ({ hash, input }: AccountInputKey): Buffer =>
   bytewise.encode([prefix, common.uInt160ToBuffer(hash), common.uInt256ToBuffer(input.hash), input.index]);

@@ -9,6 +9,7 @@
     "@neo-one/node-storage-common": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
     "@neo-one/utils": "^1.0.0-preview.0",
+    "@types/bytewise": "^1.1",
     "@types/lru-cache": "^4.1.1",
     "bytewise": "^1.1.0",
     "lru-cache": "^4.1.3",

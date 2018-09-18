@@ -41,7 +41,7 @@ import {
   VerifyScriptResult,
 } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { Observable } from 'rxjs';
 import { AccountUnclaimed, AccountUnclaimedKey, AccountUnclaimedsKey } from './AccountUnclaimed';
 import { AccountUnspent, AccountUnspentKey, AccountUnspentsKey } from './AccountUnspent';

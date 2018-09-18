@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { randomBytes } from 'crypto';
 import _ from 'lodash';
 import { equals } from './equals';

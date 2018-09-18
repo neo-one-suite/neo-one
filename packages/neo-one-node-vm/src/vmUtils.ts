@@ -1,6 +1,9 @@
 import { utils } from '@neo-one/client-core';
+// tslint:disable-next-line:match-default-export-name
 import bitwise from 'bitwise';
-import { BN } from 'bn.js';
+// tslint:disable-next-line:no-submodule-imports
+import { Bit, UInt8 as bitwiseUInt8 } from 'bitwise/types';
+import BN from 'bn.js';
 import _ from 'lodash';
 import { ExecutionContext } from './constants';
 import { NumberTooLargeError, ReadOnlyStorageContextError } from './errors';
@@ -61,14 +64,14 @@ const leftPad = (value: Buffer, length: number): Buffer => {
     return Buffer.alloc(0, length);
   }
 
-  const lastByte = bitwise.byte.read(value[value.length - 1]);
+  const lastByte = bitwise.byte.read(value[value.length - 1] as bitwiseUInt8);
 
   return Buffer.concat([
     value.slice(0, -1),
     bitwise.buffer.create(
       lastByte
         .slice(0, -1)
-        .concat(_.range((length - value.length) * 8).map(() => 0))
+        .concat(_.range((length - value.length) * 8).map(() => 0 as Bit))
         .concat([lastByte[7]]),
     ),
   ]);

@@ -1,4 +1,4 @@
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { common, UInt160, UInt256, UInt256Hex } from './common';
 import { crypto } from './crypto';
 import { Equals, EquatableKey } from './Equatable';

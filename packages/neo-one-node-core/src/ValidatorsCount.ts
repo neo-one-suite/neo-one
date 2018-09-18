@@ -10,7 +10,7 @@ import {
   SerializeWire,
   utils,
 } from '@neo-one/client-core';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 type Votes = ReadonlyArray<BN | undefined>;
 export interface ValidatorsCountUpdate {
   readonly votes?: Votes;

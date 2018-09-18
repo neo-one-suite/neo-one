@@ -24,7 +24,7 @@ import {
 import { DefaultMonitor } from '@neo-one/monitor';
 import { NULL_ACTION, TriggerType, WriteBlockchain } from '@neo-one/node-core';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { of } from 'rxjs';
 import { keys, testUtils, transactions } from '../__data__';
 import { BLOCK_HEIGHT_YEAR, ExecutionInit, FEES, Options } from '../constants';
