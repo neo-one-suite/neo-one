@@ -14,8 +14,12 @@
       "writing-a-smart-contract",
       "testing",
       "front-end",
-      "client",
-      "client-types"
+      "smart-contract-api",
+      "client-api",
+      "client-types",
+      "read-client-api",
+      "keystore-api",
+      "developer-client-api"
     ]
   }
 }

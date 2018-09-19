@@ -1,6 +1,6 @@
 ---
-id: client
-title: Client
+id: client-api
+title: Client API
 ---
 This is the API documentation for the NEO•ONE Client.
 
@@ -65,6 +65,16 @@ This is the API documentation for the NEO•ONE Client.
 #### providers
 - type: UserAccountProviders
 - Returns the User Account Providers.
+- Primarily used to access the [Keystore](/docs/en/keystore-api.html) to manage Accounts.
+- Example:
+  ```ts
+  const keystore = client.providers.memory.keystore;
+
+  await keystore.addAccount({
+    network: 'private',
+    privateKey: createPrivateKey(),
+  })
+  ```
 
 #### hooks
 - type: ClientHooks
@@ -135,7 +145,7 @@ The selected account will now be the default account from which transactions wil
   - Issues a given amount of a given asset identified by its [Hash256String](/docs/en/client-types.html#Hash256String) to a given address.
 
 <a id="read"></a>
-#### read([NetworkType](/docs/en/client-types.html#NetworkType)): [ReadClient]()
+#### read([NetworkType](/docs/en/client-types.html#NetworkType)): [ReadClient](/docs/en/read-client-api.html)
   - Returns a ReadClient for the given network.  The ReadClient is used to obtain information about the blockchain.
 
 <a id="smartContract"></a>

@@ -56,9 +56,9 @@ This helper resets and redeploys your contracts to a local private network and g
 * yourSmartContract
   * Your smart contract will be available by its name in camel case and gives you full access to your smart contract api.
 * client
-  * The NEO•ONE client api is your main resource for interfacing with the blockchain.  You can create wallets, scrape blocks, and much more.  Learn about the client api in detail [here](/docs/en/client.html).
+  * The NEO•ONE client api is your main resource for interfacing with the blockchain.  You can create wallets, scrape blocks, and much more.  Learn about the client api in detail [here](/docs/en/client-api.html).
 * developerClient
-  * The developerClient allows you to interface with the blockchain in ways that only make sense during development.  You can force consensus, fast forward the network, and much more.  Learn about the developerClient api in detail [here]().
+  * The developerClient allows you to interface with the blockchain in ways that only make sense during development.  You can force consensus, fast forward the network, and much more. Learn about the developer client api in detail [here](/docs/en/developer-client-api.html).
 * masterAccountID
   * A master wallet with plenty of NEO and GAS for you to play with.
 * networkName

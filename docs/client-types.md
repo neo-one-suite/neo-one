@@ -19,7 +19,7 @@ This is the API documentation for the NEO•ONE Client Types.
     - [Output](#Output)
     - [PrivateKeyString](#PrivateKeyString)
     - [PublicKeyString](#PublicKeyString)
-    - [SignatureString](#SignautreString)
+    - [SignatureString](#SignatureString)
     - [Transfer](#Transfer)
     - [UserAccount](#UserAccount)
     - [UserAccountID](#UserAccountID)
@@ -169,8 +169,8 @@ These are the types you will need for most common used cases.
 #### GetOptions
   - Generic options used for different operations.
   - Properties:
-    -  timeoutMS (optional): number
-      - Time before operation timeout
+    - timeoutMS (optional): number
+        - Time before operation timeout
 
 #### Hash256String
   - Hex encoded string prefixed by '0x' that represents a NEO 256 bit hash.
@@ -393,6 +393,7 @@ Types related to Smart Contracts.
   - ReadonlyArray<[Return](#Return)>
 
 #### StorageItem
+  - An element in persistent [Conract](#Contract) storage.
   - Properties:
     - address: [AddressString](#AddressString)
       - [Contract](#Contract) Address for this StorageItem.
