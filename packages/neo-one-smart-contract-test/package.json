@@ -10,6 +10,7 @@
     "@neo-one/node": "^1.0.0-preview.0",
     "@neo-one/node-neo-settings": "^1.0.0-preview.0",
     "@neo-one/smart-contract-compiler": "^1.0.0-preview.0",
+    "@neo-one/smart-contract-compiler-node": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
     "@types/lodash": "^4.14.116",
     "@types/memdown": "^3.0",

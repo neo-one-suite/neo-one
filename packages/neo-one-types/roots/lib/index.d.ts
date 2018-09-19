@@ -16,3 +16,7 @@ declare module '*.woff' {
 declare module '*.woff2' {
   export default '';
 }
+
+declare module '*.svg' {
+  export default '';
+}

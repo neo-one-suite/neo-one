@@ -8,6 +8,7 @@ import { Builtins, createBuiltins } from './compile/builtins';
 import { CompilerDiagnostic } from './CompilerDiagnostic';
 import { DiagnosticCode } from './DiagnosticCode';
 import { DiagnosticMessage } from './DiagnosticMessage';
+import { CompilerHost } from './types';
 
 const getErrorKey = (diagnostic: ts.Diagnostic) =>
   `${diagnostic.file}:${diagnostic.start}:${diagnostic.length}:${diagnostic.code}`;
@@ -25,7 +26,7 @@ export class Context {
     public readonly program: ts.Program,
     public readonly typeChecker: ts.TypeChecker,
     public readonly languageService: ts.LanguageService,
-    public readonly smartContractDir: string,
+    public readonly host: CompilerHost,
     private readonly mutableDiagnostics: ts.Diagnostic[] = ts.getPreEmitDiagnostics(program),
   ) {
     this.analysis = new AnalysisService(this);
@@ -54,11 +55,8 @@ export class Context {
     program: ts.Program,
     typeChecker: ts.TypeChecker,
     languageService: ts.LanguageService,
-    smartContractDir: string,
   ): Context {
-    return new Context(sourceFiles, program, typeChecker, languageService, smartContractDir, [
-      ...this.mutableDiagnostics,
-    ]);
+    return new Context(sourceFiles, program, typeChecker, languageService, this.host, [...this.mutableDiagnostics]);
   }
 
   public reportError(

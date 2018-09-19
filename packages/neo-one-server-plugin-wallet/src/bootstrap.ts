@@ -21,6 +21,7 @@ import { common, crypto } from '@neo-one/client-core';
 import { GetCLIResourceOptions, InteractiveCLI, InteractiveCLIArgs } from '@neo-one/server-plugin';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import { compileContract, CompileContractResult } from '@neo-one/smart-contract-compiler';
+import { createCompilerHost } from '@neo-one/smart-contract-compiler-node';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as fs from 'fs-extra';
@@ -779,7 +780,7 @@ type ContractResult = Omit<CompileContractResult, 'sourceMap'> & {
 export const compileSmartContract = async (contractName: string): Promise<ContractResult> => {
   const dir = await findContracts(require.resolve('@neo-one/server-plugin-wallet'));
 
-  const result = compileContract(path.resolve(dir, `${contractName}.ts`), contractName);
+  const result = compileContract(path.resolve(dir, `${contractName}.ts`), contractName, createCompilerHost());
 
   const sourceMap = await result.sourceMap;
 

@@ -4,6 +4,7 @@ import ts from 'typescript';
 import { Context } from './Context';
 import { createContextForDir } from './createContext';
 import { CircularLinkedDependencyError, MultipleContractsInFileError } from './errors';
+import { CompilerHost } from './types';
 
 export interface ContractDependency {
   readonly filePath: string;
@@ -136,8 +137,8 @@ const topographicalSort = (contracts: Contracts): Contracts => {
   return mutableOut;
 };
 
-export const scan = async (dir: string): Promise<Contracts> => {
-  const context = await createContextForDir(dir);
+export const scan = async (dir: string, host: CompilerHost): Promise<Contracts> => {
+  const context = await createContextForDir(dir, host);
 
   return scanContext(context);
 };

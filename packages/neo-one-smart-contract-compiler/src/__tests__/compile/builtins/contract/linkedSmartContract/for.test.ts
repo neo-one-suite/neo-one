@@ -1,7 +1,8 @@
+import { pathResolve } from '@neo-one/smart-contract-compiler-node';
+import { normalizePath } from '@neo-one/utils';
 import * as appRootDir from 'app-root-dir';
 import * as path from 'path';
 import { helpers } from '../../../../../__data__';
-import { normalizePath, pathResolve } from '../../../../../utils';
 
 describe('LinkedSmartContract.for', () => {
   test('linked call', async () => {

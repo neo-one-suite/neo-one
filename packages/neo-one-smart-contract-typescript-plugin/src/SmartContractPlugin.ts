@@ -1,5 +1,6 @@
 // tslint:disable no-object-mutation
 import { getSemanticDiagnostics } from '@neo-one/smart-contract-compiler';
+import { createCompilerHost } from '@neo-one/smart-contract-compiler-node';
 import * as path from 'path';
 // tslint:disable-next-line no-submodule-imports
 import ts from 'typescript/lib/tsserverlibrary';
@@ -19,7 +20,15 @@ export class SmartContractPlugin {
       // tslint:disable-next-line no-non-null-assertion
       const [result] = info.languageServiceHost.resolveModuleNames!(['@neo-one/smart-contract'], fileName);
 
-      return [...getSemanticDiagnostics(fileName, info.languageService, path.dirname(result.resolvedFileName))];
+      return [
+        ...getSemanticDiagnostics(
+          fileName,
+          info.languageService,
+          createCompilerHost({
+            smartContractDir: path.dirname(result.resolvedFileName),
+          }),
+        ),
+      ];
     };
 
     return proxy;

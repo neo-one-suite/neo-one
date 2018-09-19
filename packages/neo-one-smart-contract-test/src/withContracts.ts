@@ -12,6 +12,7 @@ import {
 } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-core';
 import { compileContract } from '@neo-one/smart-contract-compiler';
+import { createCompilerHost } from '@neo-one/smart-contract-compiler-node';
 import BigNumber from 'bignumber.js';
 import { camel } from 'change-case';
 import { setupTestNode } from './setupTestNode';
@@ -66,7 +67,13 @@ export const withContracts = async <T>(
 
     const deployedContracts = await contracts.reduce<Promise<T>>(async (accIn, { filePath, name }) => {
       const acc = await accIn;
-      const { contract, sourceMap, abi } = compileContract(filePath, name, mutableLinked, ignoreWarnings);
+      const { contract, sourceMap, abi } = compileContract(
+        filePath,
+        name,
+        createCompilerHost(),
+        mutableLinked,
+        ignoreWarnings,
+      );
       const address = scriptHashToAddress(
         common.uInt160ToString(crypto.toScriptHash(Buffer.from(contract.script, 'hex'))),
       );

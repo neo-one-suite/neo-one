@@ -1,6 +1,6 @@
+import { createCompilerHost, pathResolve } from '@neo-one/smart-contract-compiler-node';
 import * as appRootDir from 'app-root-dir';
 import { compileContract } from '../../compileContract';
-import { pathResolve } from '../../utils';
 import { EXECUTE_OPTIONS_DEFAULT, ExecuteOptions, executeScript } from './executeScript';
 import { checkResult } from './extractors';
 import { getMonitor } from './getMonitor';
@@ -23,7 +23,7 @@ export const transpileAndExecuteSnippet = async (
     contract: { script: compiledCode },
     sourceMap,
     diagnostics,
-  } = compileContract({ filePath });
+  } = compileContract({ filePath, host: createCompilerHost() });
 
   const monitor = getMonitor();
   const { receipt, sourceMaps } = await executeScript(monitor, diagnostics, compiledCode, sourceMap, options);

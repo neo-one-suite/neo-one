@@ -10,6 +10,7 @@
     "@neo-one/server-plugin-network": "^1.0.0-preview.0",
     "@neo-one/smart-contract": "^1.0.0-preview.0",
     "@neo-one/smart-contract-compiler": "^1.0.0-preview.0",
+    "@neo-one/smart-contract-compiler-node": "^1.0.0-preview.0",
     "@neo-one/smart-contract-lib": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
     "@neo-one/utils": "^1.0.0-preview.0",

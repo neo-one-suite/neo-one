@@ -5,6 +5,7 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/smart-contract-compiler": "^1.0.0-preview.0",
+    "@neo-one/smart-contract-compiler-node": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
     "typescript": "^3.0.3"
   }

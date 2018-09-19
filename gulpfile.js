@@ -73,12 +73,7 @@ const getPackageJSON = (pkg) => {
   }
 };
 
-const SKIP_PACKAGES = new Set([
-  'neo-one-playground',
-  'neo-one-website',
-  'neo-one-worker-loader',
-  'neo-one-node-browser',
-]);
+const SKIP_PACKAGES = new Set(['neo-one-playground', 'neo-one-website', 'neo-one-node-browser']);
 const SKIP_PACKAGES_LIST = [...SKIP_PACKAGES];
 
 const pkgs = fs

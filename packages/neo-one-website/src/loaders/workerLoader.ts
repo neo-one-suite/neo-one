@@ -22,7 +22,8 @@ export namespace workerLoader {
 }
 
 export function compile(loader: webpack.loader.LoaderContext, request: string) {
-  const options = loaderUtils.getOptions(loader);
+  const optionsIn = loaderUtils.getOptions(loader) as loaderUtils.OptionObject | null | undefined;
+  const options = optionsIn == undefined ? {} : optionsIn;
 
   loader.cacheable(false);
 
@@ -116,6 +117,7 @@ const getWorker = (file: string, options: Options) => {
   }
 
   return `module.exports = function() {
+    console.log('hello world');
   return new Worker(${publicWorkerPath});
 };`;
 };

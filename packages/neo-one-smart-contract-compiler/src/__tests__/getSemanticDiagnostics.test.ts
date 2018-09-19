@@ -1,10 +1,10 @@
+import { createCompilerHost, pathResolve } from '@neo-one/smart-contract-compiler-node';
 import * as appRootDir from 'app-root-dir';
 import * as path from 'path';
 import ts from 'typescript';
 import { CompilerDiagnostic } from '../CompilerDiagnostic';
 import { createContextForDir } from '../createContext';
 import { getSemanticDiagnostics } from '../getSemanticDiagnostics';
-import { pathResolve } from '../utils';
 
 const serializeDiagnostic = (diagnostic: ts.Diagnostic) => {
   let line: number | undefined;
@@ -40,12 +40,12 @@ const verifySnippet = async (...snippetPath: string[]) => {
     'semantic',
     ...snippetPath,
   );
-  const context = await createContextForDir(path.dirname(filePath), { withTestHarness: true });
+  const context = await createContextForDir(path.dirname(filePath), createCompilerHost(), { withTestHarness: true });
 
   const diagnostics = getSemanticDiagnostics({
     filePath,
-    smartContractDir: path.dirname(require.resolve('@neo-one/smart-contract')),
     languageService: context.languageService,
+    host: createCompilerHost(),
   });
 
   expect(diagnostics.map(serializeDiagnostic)).toMatchSnapshot();

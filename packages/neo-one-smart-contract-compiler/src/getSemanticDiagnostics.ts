@@ -2,17 +2,18 @@ import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { compileForDiagnostics } from './compile';
 import { createContextForLanguageService } from './createContext';
+import { CompilerHost } from './types';
 
 export const getSemanticDiagnostics = ({
   filePath,
-  smartContractDir,
+  host,
   languageService,
 }: {
   readonly filePath: string;
-  readonly smartContractDir: string;
+  readonly host: CompilerHost;
   readonly languageService: ts.LanguageService;
 }): ReadonlyArray<ts.Diagnostic> => {
-  const context = createContextForLanguageService(filePath, languageService, smartContractDir);
+  const context = createContextForLanguageService(filePath, languageService, host);
   let sourceFile: ts.SourceFile | undefined;
   try {
     sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, filePath);

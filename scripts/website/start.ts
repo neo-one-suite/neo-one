@@ -14,6 +14,14 @@ yargs.describe('ci', 'Running as part of continuous integration.').default('ci',
 yargs.describe('coverage', 'Instrument code for coverage.').default('coverage', false);
 
 const createWebpackConfig = (): webpack.Configuration => {
+  const mutablePlugins = ['@babel/plugin-syntax-dynamic-import'];
+  if (yargs.argv.ci && yargs.argv.coverage) {
+    mutablePlugins.push('babel-plugin-istanbul');
+  }
+  if (!yargs.argv.ci) {
+    // mutablePlugins.push('react-hot-loader/babel');
+  }
+
   const atl = {
     loader: 'awesome-typescript-loader',
     options: {
@@ -22,18 +30,33 @@ const createWebpackConfig = (): webpack.Configuration => {
       useCache: true,
       useBabel: true,
       babelOptions: {
-        plugins: yargs.argv.ci ? (yargs.argv.coverage ? ['babel-plugin-istanbul'] : []) : ['react-hot-loader/babel'],
+        plugins: mutablePlugins,
       },
       configFileName: path.resolve(__dirname, '..', '..', 'tsconfig', 'tsconfig.es2017.esm.json'),
     },
   };
 
+  const workerLoader = path.resolve(
+    __dirname,
+    '..',
+    '..',
+    'packages',
+    'neo-one-website',
+    'src',
+    'loaders',
+    'workerLoaderEntry.js',
+  );
+
   return {
     mode: 'development',
-    entry: [
-      'core-js/modules/es7.symbol.async-iterator',
-      path.resolve(__dirname, '..', '..', 'packages', 'neo-one-website', 'src', 'entry.tsx'),
-    ],
+    entry: {
+      app: [
+        'core-js/modules/es7.symbol.async-iterator',
+        path.resolve(__dirname, '..', '..', 'packages', 'neo-one-website', 'src', 'entry.tsx'),
+      ],
+      'editor.worker': 'monaco-editor-core/esm/vs/editor/editor.worker.js',
+      'ts.worker': path.resolve(__dirname, '..', '..', 'packages', 'neo-one-website', 'src', 'monaco', 'ts.worker.ts'),
+    },
     resolve: {
       mainFields: ['browser', 'main'],
       aliasFields: ['browser'],
@@ -86,22 +109,10 @@ const createWebpackConfig = (): webpack.Configuration => {
           use: atl,
         },
         {
-          test: /\.service-worker\.ts$/,
-          use: [
-            {
-              loader: path.resolve(__dirname, '..', '..', 'packages', 'neo-one-worker-loader', 'src', 'index.js'),
-              options: {
-                mode: 'service',
-              },
-            },
-            atl,
-          ],
-        },
-        {
           test: /\.shared-worker\.ts$/,
           use: [
             {
-              loader: path.resolve(__dirname, '..', '..', 'packages', 'neo-one-worker-loader', 'src', 'index.js'),
+              loader: workerLoader,
               options: {
                 mode: 'shared',
               },
@@ -144,6 +155,10 @@ const createWebpackConfig = (): webpack.Configuration => {
     node: {
       fs: 'empty',
       path: 'empty',
+      module: 'empty',
+    },
+    optimization: {
+      splitChunks: false,
     },
   };
 };

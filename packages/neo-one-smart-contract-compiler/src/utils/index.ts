@@ -5,8 +5,6 @@ export * from './getFixedDecimals';
 export * from './getForwardedValueType';
 export * from './getSetterName';
 export * from './nodeKey';
-export * from './normalizePath';
-export * from './pathResolve';
 export * from './symbolKey';
 export * from './throwOnDiagnosticErrorOrWarning';
 export * from './toABIReturn';

@@ -16,6 +16,7 @@ describe('@neo-one/client', () => {
     'LocalMemoryStore',
     'LocalStringStore',
     // ./provider
+    'JSONRPCProvider',
     'NEOONEDataProvider',
     'NEOONEOneDataProvider',
     'NEOONEProvider',

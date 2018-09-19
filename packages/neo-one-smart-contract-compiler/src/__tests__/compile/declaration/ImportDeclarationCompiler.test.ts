@@ -1,6 +1,6 @@
+import { normalizePath } from '@neo-one/utils';
 import * as path from 'path';
 import { helpers } from '../../../__data__';
-import { normalizePath } from '../../../utils';
 
 describe('ImportDeclarationCompiler', () => {
   test('basic imports at import/entry.ts', async () => {

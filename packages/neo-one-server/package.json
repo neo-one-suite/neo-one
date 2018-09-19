@@ -29,7 +29,7 @@
     "@types/mali-onerror": "^0.1",
     "@types/toposort": "^2.0",
     "fs-extra": "^7.0.0",
-    "grpc": "^1.15.0",
+    "grpc": "^1.15.1",
     "grpc-error": "^1.0.0",
     "koa": "^2.5.3",
     "koa-compose": "^4.1.0",

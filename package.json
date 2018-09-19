@@ -112,7 +112,7 @@
     }
   },
   "devDependencies": {
-    "@babel/core": "7.0.1",
+    "@babel/core": "7.1.0",
     "@babel/plugin-syntax-dynamic-import": "7.0.0",
     "@babel/plugin-syntax-numeric-separator": "7.0.0",
     "@babel/plugin-syntax-optional-catch-binding": "7.0.0",
@@ -120,7 +120,7 @@
     "@reactivex/ix-esnext-esm": "2.3.5",
     "@types/jest": "23.3.2",
     "@types/webpack": "4.4.11",
-    "@types/yargs": "^11.1.1",
+    "@types/yargs": "^12.0.0",
     "all-contributors-cli": "5.4.0",
     "app-root-dir": "1.0.2",
     "awesome-typescript-loader": "5.2.1",
@@ -155,13 +155,13 @@
     "jest-junit": "5.1.0",
     "json": "9.0.6",
     "koa-connect": "2.0.1",
-    "lerna": "3.3.2",
+    "lerna": "3.4.0",
     "lint-staged": "7.2.2",
     "lodash": "4.17.11",
     "mini-html-webpack-plugin": "0.2.3",
     "nyc": "13.0.1",
     "prettier": "1.14.2",
-    "react-hot-loader": "4.3.7",
+    "react-hot-loader": "4.3.8",
     "rxjs-tslint-rules": "4.8.0",
     "style-loader": "0.23.0",
     "stylelint-config-standard": "18.2.0",
@@ -180,7 +180,7 @@
     "tslint-sonarts": "1.8.0",
     "typescript": "3.0.3",
     "typescript-styled-plugin": "0.11.0",
-    "webpack": "4.19.0",
+    "webpack": "4.19.1",
     "webpack-serve": "2.0.2",
     "yargs": "12.0.2"
   },
@@ -188,7 +188,7 @@
     "ajv": "6.5.3",
     "babel-core": "7.0.0-bridge.0",
     "bn.js": "4.11.8",
-    "grpc": "1.15.0"
+    "grpc": "1.15.1"
   },
   "one": {
     "paths": {

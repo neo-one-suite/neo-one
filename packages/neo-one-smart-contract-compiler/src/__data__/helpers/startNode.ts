@@ -15,6 +15,7 @@ import {
   UserAccountID,
 } from '@neo-one/client';
 import { common, crypto, RawInvokeReceipt } from '@neo-one/client-core';
+import { createCompilerHost, pathResolve } from '@neo-one/smart-contract-compiler-node';
 import { tsUtils } from '@neo-one/ts-utils';
 import * as appRootDir from 'app-root-dir';
 import BigNumber from 'bignumber.js';
@@ -24,7 +25,7 @@ import { compile } from '../../compile';
 import { CompileResult, LinkedContracts } from '../../compile/types';
 import { Context } from '../../Context';
 import { createContextForPath, createContextForSnippet } from '../../createContext';
-import { pathResolve, throwOnDiagnosticErrorOrWarning } from '../../utils';
+import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { checkRawResult } from './extractors';
 
 export interface Result {
@@ -79,7 +80,10 @@ export interface InvokeValidateResultOptions {
 }
 
 const getCompiledScript = (script: string, fileName?: string): CompileResult => {
-  const { context, sourceFile } = createContextForSnippet(script, { fileName, withTestHarness: true });
+  const { context, sourceFile } = createContextForSnippet(script, createCompilerHost(), {
+    fileName,
+    withTestHarness: true,
+  });
 
   return compile({ context, sourceFile });
 };
@@ -156,7 +160,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
         'snippets',
         snippetPath,
       );
-      const context = createContextForPath(filePath, { withTestHarness: true });
+      const context = createContextForPath(filePath, createCompilerHost(), { withTestHarness: true });
       const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, filePath);
       const {
         contract: { script: outputScript },

@@ -1,3 +1,4 @@
+import { createCompilerHost, pathResolve } from '@neo-one/smart-contract-compiler-node';
 import { tsUtils } from '@neo-one/ts-utils';
 import * as appRootDir from 'app-root-dir';
 import ts from 'typescript';
@@ -5,7 +6,7 @@ import { compile as compileScript } from '../../compile';
 import { Context } from '../../Context';
 import { createContextForPath, createContextForSnippet } from '../../createContext';
 import { DiagnosticCode } from '../../DiagnosticCode';
-import { getDiagnosticMessage, pathResolve } from '../../utils';
+import { getDiagnosticMessage } from '../../utils';
 
 type ExpectOptions =
   | { readonly type: 'error'; readonly code?: DiagnosticCode }
@@ -36,7 +37,7 @@ const compile = (context: Context, sourceFile: ts.SourceFile, options: ExpectOpt
 };
 
 export const compileString = (code: string, options: ExpectOptions): void => {
-  const { context, sourceFile } = createContextForSnippet(code);
+  const { context, sourceFile } = createContextForSnippet(code, createCompilerHost());
 
   compile(context, sourceFile, options);
 };
@@ -50,7 +51,7 @@ export const compileSnippet = (snippetPath: string, options: ExpectOptions): voi
     '__data__',
     'snippets',
   );
-  const context = createContextForPath(snippetPath);
+  const context = createContextForPath(snippetPath, createCompilerHost());
   const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, pathResolve(dir, snippetPath));
 
   compile(context, sourceFile, options);

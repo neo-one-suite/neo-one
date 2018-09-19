@@ -3,7 +3,7 @@ import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { Context } from '../../Context';
-import { createMemoized, nodeKey, pathResolve, symbolKey, typeKey } from '../../utils';
+import { createMemoized, nodeKey, symbolKey, typeKey } from '../../utils';
 import { Builtin, isBuiltinValueObject } from './types';
 
 const getMember = (sym: ts.Symbol, name: string) => tsUtils.symbol.getMemberOrThrow(sym, name);
@@ -481,22 +481,19 @@ export class Builtins {
 
   private getGlobals(): ts.SourceFile {
     return this.memoized('file-cache', 'globals', () =>
-      tsUtils.file.getSourceFileOrThrow(
-        this.context.program,
-        pathResolve(this.context.smartContractDir, 'global.d.ts'),
-      ),
+      tsUtils.file.getSourceFileOrThrow(this.context.program, this.context.host.getSmartContractPath('global.d.ts')),
     );
   }
 
   private getContract(): ts.SourceFile {
     return this.memoized('file-cache', 'contract', () =>
-      tsUtils.file.getSourceFileOrThrow(this.context.program, pathResolve(this.context.smartContractDir, 'index.d.ts')),
+      tsUtils.file.getSourceFileOrThrow(this.context.program, this.context.host.getSmartContractPath('index.d.ts')),
     );
   }
 
   private getTestGlobals(): ts.SourceFile | undefined {
     return this.memoized('file-cache', 'test', () =>
-      tsUtils.file.getSourceFile(this.context.program, pathResolve(this.context.smartContractDir, 'harness.d.ts')),
+      tsUtils.file.getSourceFile(this.context.program, this.context.host.getSmartContractPath('harness.d.ts')),
     );
   }
 }

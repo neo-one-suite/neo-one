@@ -1,10 +1,10 @@
+import { createCompilerHost, pathResolve } from '@neo-one/smart-contract-compiler-node';
 import { tsUtils } from '@neo-one/ts-utils';
 import * as appRootDir from 'app-root-dir';
 import ts from 'typescript';
 import { compile } from '../../compile';
 import { Context } from '../../Context';
 import { createContextForPath, createContextForSnippet } from '../../createContext';
-import { pathResolve } from '../../utils';
 import { EXECUTE_OPTIONS_DEFAULT, ExecuteOptions, executeScript } from './executeScript';
 import { checkResult } from './extractors';
 import { getMonitor } from './getMonitor';
@@ -26,7 +26,7 @@ const execute = async (
 };
 
 export const executeString = async (code: string, options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT) => {
-  const { context, sourceFile } = createContextForSnippet(code, { withTestHarness: true });
+  const { context, sourceFile } = createContextForSnippet(code, createCompilerHost(), { withTestHarness: true });
 
   return execute(context, sourceFile, options);
 };
@@ -41,7 +41,7 @@ export const executeSnippet = async (snippetPath: string, options: ExecuteOption
     'snippets',
     snippetPath,
   );
-  const context = createContextForPath(filePath, { withTestHarness: true });
+  const context = createContextForPath(filePath, createCompilerHost(), { withTestHarness: true });
   const sourceFile = tsUtils.file.getSourceFileOrThrow(context.program, filePath);
 
   return execute(context, sourceFile, options);
