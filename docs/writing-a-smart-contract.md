@@ -4,7 +4,7 @@ title: Writing a Smart Contract
 ---
 This guide will help you get started writing your own Smart Contract with NEO•ONE.
 
-## Smart Contracts in Typescrit
+## Smart Contracts in Typescript
 
 To write a smart contract, you must export a class which extends the SmartContract base class:
 ```ts
