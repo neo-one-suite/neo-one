@@ -344,22 +344,49 @@ export function getExtendors(
   return getExtendorsWorker(program, languageService, node);
 }
 
-export function getBaseTypes(typeChecker: ts.TypeChecker, node: ts.ClassDeclaration): ReadonlyArray<ts.Type> {
+export function getBaseTypes(
+  typeChecker: ts.TypeChecker,
+  node: ts.ClassDeclaration | ts.ClassExpression | ts.InterfaceDeclaration,
+): ReadonlyArray<ts.Type> {
   return type_.getBaseTypesArray(type_.getType(typeChecker, node));
 }
 
-export function getBaseClass(typeChecker: ts.TypeChecker, node: ts.ClassDeclaration): ts.ClassDeclaration | undefined {
-  const baseTypes = _.flatMap(
-    getBaseTypes(typeChecker, node).map(
-      (type) => (type_.isIntersection(type) ? type_.getIntersectionTypesArray(type) : [type]),
-    ),
-  );
-  const declarations = baseTypes
+export function getBaseTypesFlattened(
+  typeChecker: ts.TypeChecker,
+  node: ts.ClassDeclaration | ts.ClassExpression | ts.InterfaceDeclaration,
+): ReadonlyArray<ts.Type> {
+  function getBaseTypesWorker(type: ts.Type): ReadonlyArray<ts.Type> {
+    if (type_.isIntersection(type)) {
+      return _.flatMap(type_.getIntersectionTypesArray(type).map(getBaseTypesWorker));
+    }
+
+    const baseTypes = type_.getBaseTypesArray(type);
+
+    return [type].concat(_.flatMap(baseTypes.map(getBaseTypesWorker)));
+  }
+
+  return _.flatMap(getBaseTypes(typeChecker, node).map(getBaseTypesWorker));
+}
+
+export function getBaseClasses(
+  typeChecker: ts.TypeChecker,
+  node: ts.ClassDeclaration | ts.ClassExpression,
+): ReadonlyArray<ts.ClassDeclaration> {
+  const baseTypes = getBaseTypesFlattened(typeChecker, node);
+
+  return baseTypes
     .map((type) => type_.getSymbol(type))
     .filter(utils.notNull)
     .map((symbol) => symbol_.getDeclarations(symbol))
     .reduce<ReadonlyArray<ts.Declaration>>((a, b) => a.concat(b), [])
     .filter(ts.isClassDeclaration);
+}
+
+export function getBaseClass(
+  typeChecker: ts.TypeChecker,
+  node: ts.ClassDeclaration | ts.ClassExpression,
+): ts.ClassDeclaration | undefined {
+  const declarations = getBaseClasses(typeChecker, node);
 
   return declarations.length === 1 ? declarations[0] : undefined;
 }

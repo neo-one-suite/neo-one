@@ -61,6 +61,13 @@ export class AnalysisService {
     return signatureTypes === undefined ? undefined : signatureTypes.returnType;
   }
 
+  public extractAllSignatures(
+    node: ts.Node,
+    options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
+  ): ReadonlyArray<SignatureTypes> {
+    return this.extractAllSignaturesForType(node, this.getType(node), options);
+  }
+
   public extractSignature(
     node: ts.Node,
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
@@ -82,27 +89,36 @@ export class AnalysisService {
     return tsUtils.type_.getCallSignatures(type);
   }
 
+  public extractAllSignaturesForType(
+    node: ts.Node,
+    type: ts.Type | undefined,
+    options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
+  ): ReadonlyArray<SignatureTypes> {
+    const signatures = type === undefined ? undefined : tsUtils.type_.getCallSignatures(type);
+    if (signatures === undefined) {
+      return [];
+    }
+
+    return signatures.map((signature) => this.extractSignatureTypes(node, signature, options)).filter(utils.notNull);
+  }
+
   public extractSignatureForType(
     node: ts.Node,
     type: ts.Type | undefined,
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): SignatureTypes | undefined {
-    const signatures = type === undefined ? undefined : tsUtils.type_.getCallSignatures(type);
-    if (signatures === undefined) {
+    const signatureTypes = this.extractAllSignaturesForType(node, type, options);
+    if (signatureTypes.length === 0) {
       return undefined;
     }
 
-    if (signatures.length === 0) {
-      return undefined;
-    }
-
-    if (signatures.length !== 1) {
+    if (signatureTypes.length !== 1) {
       this.report(options, node, DiagnosticCode.MultipleSignatures, DiagnosticMessage.MultipleSignatures);
 
       return undefined;
     }
 
-    return this.extractSignatureTypes(node, signatures[0], options);
+    return signatureTypes[0];
   }
 
   public extractSignaturesForCall(
@@ -297,6 +313,11 @@ export class AnalysisService {
         return true;
       }
 
+      const baseClasses = tsUtils.class_.getBaseClasses(this.context.typeChecker, node);
+      if (baseClasses.some((value) => this.context.builtins.isValue(value, 'SmartContract'))) {
+        return true;
+      }
+
       const baseClass = tsUtils.class_.getBaseClass(this.context.typeChecker, node);
 
       return baseClass !== undefined && this.isSmartContract(baseClass);
@@ -325,11 +346,10 @@ export class AnalysisService {
     return this.memoized('get-symbol-and-all-inherited-symbols', nodeKey(node), () => {
       const symbol = this.getSymbol(node);
       const symbols = [symbol].filter(utils.notNull);
-      if (ts.isClassDeclaration(node)) {
-        const extendsExpr = tsUtils.class_.getExtends(node);
-        if (extendsExpr !== undefined) {
-          return this.getSymbolAndAllInheritedSymbols(tsUtils.expression.getExpression(extendsExpr)).concat(symbols);
-        }
+      if (ts.isClassDeclaration(node) || ts.isClassExpression(node) || ts.isInterfaceDeclaration(node)) {
+        const baseTypes = tsUtils.class_.getBaseTypesFlattened(this.context.typeChecker, node);
+
+        return symbols.concat(baseTypes.map((baseType) => this.getSymbolForType(node, baseType)).filter(utils.notNull));
       }
 
       return symbols;
@@ -363,6 +383,37 @@ export class AnalysisService {
         .findReferencesAsNodes(this.context.program, this.context.languageService, node)
         .filter((found) => this.context.sourceFiles.has(tsUtils.node.getSourceFile(found))),
     );
+  }
+
+  public isSmartContractMixinFunction(node: ts.FunctionDeclaration | ts.FunctionExpression): boolean {
+    const parameters = tsUtils.parametered.getParameters(node);
+    if (parameters.length !== 1) {
+      return false;
+    }
+
+    const signatureTypess = this.extractAllSignatures(node);
+    if (signatureTypess.length !== 1) {
+      return false;
+    }
+
+    const signatureTypes = signatureTypess[0];
+    const firstParam = signatureTypes.paramDecls[0];
+    const firstParamType = signatureTypes.paramTypes.get(firstParam);
+    if (firstParamType === undefined || tsUtils.type_.getConstructSignatures(firstParamType).length !== 1) {
+      return false;
+    }
+
+    const constructSignatureTypes = this.extractSignatureTypes(
+      firstParam,
+      tsUtils.type_.getConstructSignatures(firstParamType)[0],
+    );
+    if (constructSignatureTypes === undefined) {
+      return false;
+    }
+
+    const returnTypeSymbol = this.getSymbolForType(firstParam, constructSignatureTypes.returnType);
+
+    return returnTypeSymbol !== undefined && returnTypeSymbol === this.context.builtins.getValueSymbol('SmartContract');
   }
 
   private isValidStorageArray(node: ts.Node, type: ts.Type): boolean {

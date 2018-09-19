@@ -19,13 +19,14 @@ import { DiagnosticMessage } from '../DiagnosticMessage';
 import { getSetterName } from '../utils';
 
 export interface PropInfoBase {
-  readonly classDecl: ts.ClassDeclaration;
+  readonly classDecl: ts.ClassDeclaration | ts.ClassExpression;
   readonly isPublic: boolean;
 }
 
 export interface DeployPropInfo extends PropInfoBase {
   readonly type: 'deploy';
   readonly name: string;
+  readonly isMixinDeploy: boolean;
   readonly decl?: ts.ConstructorDeclaration;
   readonly callSignature?: ts.Signature;
 }
@@ -80,7 +81,7 @@ export interface AccessorPropInfo extends PropInfoBase {
 export type PropInfo = PropertyPropInfo | AccessorPropInfo | FunctionPropInfo | DeployPropInfo | RefundAssetsPropInfo;
 
 export interface ContractInfo {
-  readonly smartContract: ts.ClassDeclaration;
+  readonly smartContract: ts.ClassDeclaration | ts.ClassExpression;
   readonly propInfos: ReadonlyArray<PropInfo>;
   readonly superSmartContract?: ContractInfo;
 }
@@ -121,12 +122,17 @@ export class ContractInfoProcessor {
           name: ContractPropertyName.deploy,
           classDecl: this.smartContract,
           isPublic: true,
+          isMixinDeploy: false,
         },
       ]),
     };
   }
 
-  private processClass(classDecl: ts.ClassDeclaration, classType: ts.Type | undefined): ContractInfo {
+  private processClass(
+    classDecl: ts.ClassDeclaration | ts.ClassExpression,
+    classType: ts.Type | undefined,
+    baseTypes: ReadonlyArray<ts.Type> = [],
+  ): ContractInfo {
     if (classType === undefined) {
       return { smartContract: classDecl, propInfos: [] };
     }
@@ -197,6 +203,11 @@ export class ContractInfoProcessor {
         );
       }
       const callSignature = callSignatures[0];
+      const maybeFunc = tsUtils.node.getFirstAncestorByTest(
+        ctor,
+        (value): value is ts.FunctionDeclaration | ts.FunctionExpression =>
+          ts.isFunctionDeclaration(value) || ts.isFunctionExpression(value),
+      );
 
       propInfos = propInfos.concat([
         {
@@ -206,6 +217,7 @@ export class ContractInfoProcessor {
           decl: ctor,
           isPublic: true,
           callSignature,
+          isMixinDeploy: maybeFunc !== undefined && this.context.analysis.isSmartContractMixinFunction(maybeFunc),
         },
       ]);
     }
@@ -213,27 +225,27 @@ export class ContractInfoProcessor {
     const extend = tsUtils.class_.getExtends(classDecl);
     let superSmartContract: ContractInfo | undefined;
     if (extend !== undefined) {
-      const expr = tsUtils.expression.getExpression(extend);
-      if (ts.isIdentifier(expr)) {
-        const extendSymbol = this.context.analysis.getSymbol(expr);
-        const extendType = this.context.analysis.getType(extend);
-        if (extendSymbol !== undefined && extendType !== undefined) {
-          const decls = tsUtils.symbol.getDeclarations(extendSymbol);
+      let baseType = baseTypes[0] as ts.Type | undefined;
+      let nextBaseTypes = baseTypes.slice(1);
+      if (baseTypes.length === 0) {
+        const currentBaseTypes = tsUtils.class_.getBaseTypesFlattened(this.context.typeChecker, classDecl);
+        baseType = currentBaseTypes[0];
+        nextBaseTypes = currentBaseTypes.slice(1);
+      }
+
+      if (baseType !== undefined) {
+        const baseSymbol = this.context.analysis.getSymbolForType(classDecl, baseType);
+        if (baseSymbol !== undefined) {
+          const decls = tsUtils.symbol.getDeclarations(baseSymbol);
           const decl = decls[0];
-          if (decls.length === 1 && ts.isClassDeclaration(decl)) {
-            if (!this.context.builtins.isValue(decl, 'SmartContract')) {
-              superSmartContract = this.processClass(decl, extendType);
-            }
-          } else {
-            this.context.reportError(
-              expr,
-              DiagnosticCode.InvalidContractType,
-              DiagnosticMessage.InvalidContractExtends,
-            );
+          if (
+            decls.length === 1 &&
+            (ts.isClassDeclaration(decl) || ts.isClassExpression(decl)) &&
+            !this.context.builtins.isValue(decl, 'SmartContract')
+          ) {
+            superSmartContract = this.processClass(decl, baseType, nextBaseTypes);
           }
         }
-      } else {
-        this.context.reportUnsupported(extend);
       }
     }
 
@@ -252,6 +264,7 @@ export class ContractInfoProcessor {
             name: ContractPropertyName.deploy,
             classDecl: this.smartContract,
             isPublic: true,
+            isMixinDeploy: false,
           },
         ]),
       };
@@ -269,8 +282,9 @@ export class ContractInfoProcessor {
         (!ts.isPropertyDeclaration(symbolDecl) || !tsUtils.modifier.isAbstract(symbolDecl)),
     );
 
-    const decl = implDecls.length > 0 ? implDecls[0] : decls[0];
+    const decl = implDecls.length > 0 ? implDecls[0] : (decls[0] as ts.Declaration | undefined);
     if (
+      decl === undefined ||
       !(
         ts.isMethodDeclaration(decl) ||
         ts.isPropertyDeclaration(decl) ||
@@ -339,7 +353,9 @@ export class ContractInfoProcessor {
       return undefined;
     }
 
-    const classDecl = tsUtils.node.getFirstAncestorByTest(decl, ts.isClassDeclaration);
+    const maybeClassDecl = tsUtils.node.getFirstAncestorByTest(decl, ts.isClassDeclaration);
+    const maybeClassExpr = tsUtils.node.getFirstAncestorByTest(decl, ts.isClassExpression);
+    const classDecl = maybeClassDecl === undefined ? maybeClassExpr : maybeClassDecl;
     if (classDecl === undefined) {
       this.context.reportUnsupported(decl);
 

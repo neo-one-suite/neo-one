@@ -34,7 +34,10 @@ export const scanContext = (context: Context): Contracts => {
     .getExtendors(context.program, context.languageService, smartContract)
     .reduce<{ contracts: FilePathToContract; dependencies: FilePathToDependencies }>(
       (acc, derived) => {
-        if (!tsUtils.modifier.isAbstract(derived)) {
+        if (
+          !tsUtils.modifier.isAbstract(derived) &&
+          !tsUtils.file.isDeclarationFile(tsUtils.node.getSourceFile(derived))
+        ) {
           const filePath = tsUtils.file.getFilePath(tsUtils.node.getSourceFile(derived));
           const name = tsUtils.node.getNameOrThrow(derived);
           const existing = acc.contracts[filePath] as Contract | undefined;

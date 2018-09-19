@@ -36,7 +36,7 @@ export class ABISmartContractProcessor {
             return [
               {
                 name: propInfo.name,
-                parameters: this.getParameters(propInfo.callSignature),
+                parameters: propInfo.isMixinDeploy ? [] : this.getParameters(propInfo.callSignature),
                 returnType: BOOLEAN_RETURN,
               },
             ];

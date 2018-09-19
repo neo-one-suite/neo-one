@@ -1,11 +1,11 @@
-import { Address } from '@neo-one/smart-contract';
+import { Address, SmartContract } from '@neo-one/smart-contract';
 // tslint:disable-next-line no-implicit-dependencies
 import { Token } from '@neo-one/smart-contract-lib';
 
-export class TestToken extends Token<4> {
+export class TestToken extends Token(SmartContract) {
   public readonly owner: Address;
   public readonly name: string = 'TestToken';
-  public readonly decimals: 4 = 4;
+  public readonly decimals: 8 = 8;
   public readonly symbol: string = 'TT';
   public readonly properties = {
     codeVersion: '1.0',
@@ -20,6 +20,6 @@ export class TestToken extends Token<4> {
       throw new Error('Sender was not the owner.');
     }
     this.owner = owner;
-    this.issue(owner, 100_0000);
+    this.issue(owner, 100_00000000);
   }
 }

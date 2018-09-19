@@ -1118,8 +1118,6 @@ type SmartContractValue =
   | SmartContractValueArray
   | SmartContractValueReadonlyArray;
 type SmartContractArg = SmartContractValue | ForwardValue;
-type Parameters<T extends Function> = T extends (...args: infer U) => any ? U : never;
-type ReturnType<T extends Function> = T extends (...args: any[]) => infer R ? R : never;
 type IsValidSmartContract<T> = {
   [K in keyof T]: T[K] extends Function
     ? Parameters<T[K]> extends SmartContractArg[] ? (ReturnType<T[K]> extends SmartContractArg ? T[K] : never) : never
@@ -1129,11 +1127,11 @@ type IsValidSmartContract<T> = {
 /**
  * Marks a class as a `SmartContract`.
  */
-export abstract class SmartContract {
+export class SmartContract {
   /**
    * Properties used for deployment of the `SmartContract`
    */
-  public abstract readonly properties: ContractProperties;
+  public readonly properties: ContractProperties;
   /**
    * `Address` of the `SmartContract`.
    */
@@ -1155,8 +1153,8 @@ export abstract class SmartContract {
   /**
    * Method automatically added for refunding native `Asset`s.
    */
-  readonly refundAssets: (transactionHash: Hash256) => boolean;
-  static readonly for: <T>(hash: T extends IsValidSmartContract<T> ? Address : never) => T;
+  public readonly refundAssets: (transactionHash: Hash256) => boolean;
+  public static readonly for: <T>(hash: T extends IsValidSmartContract<T> ? Address : never) => T;
 }
 
 export interface LinkedSmartContractConstructor {

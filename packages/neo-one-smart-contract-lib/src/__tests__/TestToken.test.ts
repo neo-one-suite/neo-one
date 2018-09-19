@@ -10,7 +10,7 @@ describe('TestToken', () => {
       filePath: path.resolve(__dirname, '..', '__data__', 'contracts', 'TestToken.ts'),
       smartContractName: 'testToken',
       symbol: 'TT',
-      decimals: 4,
+      decimals: 8,
       deploy: async ({ masterAccountID, smartContract }) =>
         smartContract.deploy(masterAccountID.address, {
           from: masterAccountID,

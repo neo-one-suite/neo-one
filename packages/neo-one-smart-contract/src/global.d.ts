@@ -413,3 +413,7 @@ interface TypedPropertyDescriptor<T> {
 }
 
 interface TemplateStringsArray extends Array<string> {}
+
+type Constructor<T> = new (...args: any[]) => T;
+type Parameters<T extends Function> = T extends (...args: infer U) => any ? U : never;
+type ReturnType<T extends Function> = T extends (...args: any[]) => infer R ? R : never;

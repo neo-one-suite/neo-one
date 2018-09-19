@@ -16,11 +16,11 @@ export interface ContractProperties {
 }
 
 export const DEFAULT_CONTRACT_PROPERTIES = {
-  name: 'unknown',
-  codeVersion: 'unknown',
-  author: 'unknown',
-  email: 'unknown',
-  description: 'unknown',
+  name: '',
+  codeVersion: '1.0',
+  author: '',
+  email: '',
+  description: '',
 };
 
 export enum Decorator {

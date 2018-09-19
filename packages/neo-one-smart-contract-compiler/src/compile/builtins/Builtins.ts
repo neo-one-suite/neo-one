@@ -26,6 +26,7 @@ const throwIfNull = <T>(value: T | undefined | null): T => {
 
 export class Builtins {
   private readonly builtinMembers: Map<ts.Symbol, Map<ts.Symbol, Builtin>> = new Map();
+  private readonly allBuiltinMembers: Map<ts.Symbol, Builtin> = new Map();
   private readonly builtinInterfaces: Map<ts.Symbol, Builtin> = new Map();
   private readonly builtinValues: Map<ts.Symbol, Builtin> = new Map();
   private readonly builtinOverrides: Map<ts.Symbol, ts.Symbol> = new Map();
@@ -58,7 +59,7 @@ export class Builtins {
 
       const valueSymbol = this.context.analysis.getTypeSymbol(value);
       if (valueSymbol === undefined) {
-        return undefined;
+        return this.allBuiltinMembers.get(propSymbol);
       }
 
       // Super hacky - only works for the special way smart contracts are compiled.
@@ -218,10 +219,13 @@ export class Builtins {
     }
 
     members.set(memberSymbol, builtin);
+    this.allBuiltinMembers.set(memberSymbol, builtin);
     const memberSymbolName = tsUtils.symbol.getName(memberSymbol);
     if (memberSymbolName.startsWith('__@')) {
       const symbolSymbol = this.getInterfaceSymbolBase('SymbolConstructor', this.getGlobals());
-      members.set(getMember(symbolSymbol, memberSymbolName.slice(3)), builtin);
+      const memberSymbolSymbol = getMember(symbolSymbol, memberSymbolName.slice(3));
+      members.set(memberSymbolSymbol, builtin);
+      this.allBuiltinMembers.set(memberSymbolSymbol, builtin);
     }
   }
 
@@ -410,30 +414,27 @@ export class Builtins {
     });
   }
 
-  private getInheritedSymbols(symbol: ts.Symbol): Set<ts.Symbol> {
+  private getInheritedSymbols(symbol: ts.Symbol, baseTypes: ReadonlyArray<ts.Type> = []): Set<ts.Symbol> {
     return this.memoized('get-inherited-symbols', symbolKey(symbol), () => {
       const symbols = new Set();
       // tslint:disable-next-line no-loop-statement
       for (const decl of tsUtils.symbol.getDeclarations(symbol)) {
-        if (ts.isInterfaceDeclaration(decl) || ts.isClassDeclaration(decl)) {
-          // tslint:disable-next-line no-loop-statement
-          for (const clause of tsUtils.heritage.getHeritageClauses(decl)) {
-            // tslint:disable-next-line no-loop-statement
-            for (const type of tsUtils.heritage.getTypeNodes(clause)) {
-              const expr = tsUtils.expression.getExpression(type);
-              if (ts.isIdentifier(expr)) {
-                let nextSymbol = this.getAnyInterfaceSymbolMaybe(tsUtils.node.getText(expr));
-                if (nextSymbol === undefined) {
-                  nextSymbol = this.context.analysis.getSymbol(expr);
-                }
+        if (ts.isInterfaceDeclaration(decl) || ts.isClassDeclaration(decl) || ts.isClassExpression(decl)) {
+          let baseType = baseTypes[0] as ts.Type | undefined;
+          let nextBaseTypes = baseTypes.slice(1);
+          if (baseTypes.length === 0) {
+            const currentBaseTypes = tsUtils.class_.getBaseTypesFlattened(this.context.typeChecker, decl);
+            baseType = currentBaseTypes[0];
+            nextBaseTypes = currentBaseTypes.slice(1);
+          }
 
-                if (nextSymbol !== undefined) {
-                  symbols.add(nextSymbol);
-                  this.getInheritedSymbols(nextSymbol).forEach((inheritedSymbol) => {
-                    symbols.add(inheritedSymbol);
-                  });
-                }
-              }
+          if (baseType !== undefined) {
+            const baseSymbol = this.context.analysis.getSymbolForType(decl, baseType);
+            if (baseSymbol !== undefined) {
+              symbols.add(baseSymbol);
+              this.getInheritedSymbols(baseSymbol, nextBaseTypes).forEach((inheritedSymbol) => {
+                symbols.add(inheritedSymbol);
+              });
             }
           }
         }
