@@ -15,7 +15,7 @@ import {
 } from '@neo-one/client-core';
 import { DefaultMonitor } from '@neo-one/monitor';
 import { NULL_ACTION, TriggerType } from '@neo-one/node-core';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import _ from 'lodash';
 import { keys, transactions } from '../__data__';
 import { ExecutionInit, FEES } from '../constants';

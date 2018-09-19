@@ -1,4 +1,4 @@
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import _ from 'lodash';
 import { common, ECPoint, UInt160, UInt256 } from '../common';
 import { InvalidFormatError } from '../errors';

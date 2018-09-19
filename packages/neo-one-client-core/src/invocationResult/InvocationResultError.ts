@@ -1,4 +1,4 @@
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { ContractParameter, ContractParameterJSON } from '../contractParameter';
 import { InvalidFormatError } from '../errors';
 import { DeserializeWireBaseOptions, SerializableJSON, SerializeJSONContext } from '../Serializable';

@@ -1,5 +1,5 @@
 import { makeErrorWithCode } from '@neo-one/utils';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { assertAssetType, AssetType, AssetTypeJSON, toJSONAssetType } from './AssetType';
 import { BaseState } from './BaseState';
 import { common, ECPoint, UInt160, UInt256, UInt256Hex } from './common';

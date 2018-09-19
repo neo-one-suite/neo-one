@@ -1,4 +1,4 @@
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryWriter, IOHelper, utils } from '../utils';
 import { ContractParameterBase } from './ContractParameterBase';

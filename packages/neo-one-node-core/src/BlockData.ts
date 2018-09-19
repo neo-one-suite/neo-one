@@ -14,7 +14,7 @@ import {
   UInt256Hex,
   utils,
 } from '@neo-one/client-core';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 
 export interface BlockDataKey {
   readonly hash: UInt256;

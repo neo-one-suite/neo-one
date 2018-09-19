@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { Hash256 } from '../Hash256';
 import { ABIParameter, ABIReturn, AssetType } from '../types';
 import { keys } from './keys';

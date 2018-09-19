@@ -9,7 +9,7 @@ import {
   VMState,
 } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { WriteBlockchain } from './Blockchain';
 
 export enum TriggerType {

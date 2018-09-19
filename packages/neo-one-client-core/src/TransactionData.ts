@@ -1,4 +1,4 @@
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { BaseState } from './BaseState';
 import { UInt256 } from './common';
 import {

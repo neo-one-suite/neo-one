@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { InvalidFormatError } from './errors';
 
 const add0x = (value: string) => `0x${value}`;

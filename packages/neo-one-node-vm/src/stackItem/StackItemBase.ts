@@ -19,7 +19,7 @@ import {
   Validator,
   VMSettings,
 } from '@neo-one/client-core';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { AttributeStackItem } from './AttributeStackItem';
 import {
   InvalidRecursiveSerializeError,

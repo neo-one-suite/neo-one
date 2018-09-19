@@ -1,4 +1,4 @@
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import _ from 'lodash';
 import { BaseState } from './BaseState';
 import { common, ECPoint, UInt160, UInt160Hex, UInt256Hex } from './common';

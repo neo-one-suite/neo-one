@@ -1,5 +1,5 @@
 import { Block, ECPoint, UInt160, UInt256, UInt256Hex } from '@neo-one/client-core';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { HeaderContext } from './HeaderContext';
 import { Transactions } from './types';
 

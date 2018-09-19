@@ -43,7 +43,7 @@ import {
   WitnessJSON,
 } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { Hash256 } from '../Hash256';
 import * as nep5 from '../nep5';
 import {

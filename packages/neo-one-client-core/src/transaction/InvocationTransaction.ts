@@ -1,4 +1,4 @@
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { ActionJSON } from '../action';
 import { AssetJSON } from '../Asset';
 import { common } from '../common';
