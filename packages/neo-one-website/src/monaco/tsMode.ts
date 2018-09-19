@@ -2,7 +2,7 @@
 import * as languageFeatures from './languageFeatures';
 import { LanguageServiceDefaultsImpl } from './monaco.contribution';
 import { TypeScriptWorker } from './tsWorker';
-import { WorkerManager } from './workerManager';
+import { WorkerManager } from './WorkerManager';
 
 import Promise = monaco.Promise;
 import Uri = monaco.Uri;

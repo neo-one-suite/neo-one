@@ -9,8 +9,8 @@
     "@neo-one/node-storage-common": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
     "@neo-one/utils": "^1.0.0-preview.0",
-    "@types/abstract-leveldown": "^5.0",
-    "@types/bytewise": "^1.1",
+    "@types/abstract-leveldown": "^5.0.1",
+    "@types/bytewise": "^1.1.0",
     "bytewise": "^1.1.0",
     "rxjs": "^6.3.2",
     "tslib": "^1.9.3"

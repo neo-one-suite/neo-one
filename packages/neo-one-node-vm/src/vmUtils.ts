@@ -2,7 +2,7 @@ import { utils } from '@neo-one/client-core';
 // tslint:disable-next-line:match-default-export-name
 import bitwise from 'bitwise';
 // tslint:disable-next-line:no-submodule-imports
-import { Bit, UInt8 as bitwiseUInt8 } from 'bitwise/types';
+import { Bit, UInt8 } from 'bitwise/types';
 import BN from 'bn.js';
 import _ from 'lodash';
 import { ExecutionContext } from './constants';
@@ -64,7 +64,7 @@ const leftPad = (value: Buffer, length: number): Buffer => {
     return Buffer.alloc(0, length);
   }
 
-  const lastByte = bitwise.byte.read(value[value.length - 1] as bitwiseUInt8);
+  const lastByte = bitwise.byte.read(value[value.length - 1] as UInt8);
 
   return Buffer.concat([
     value.slice(0, -1),

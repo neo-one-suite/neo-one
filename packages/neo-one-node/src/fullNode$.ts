@@ -103,11 +103,26 @@ FullNodeOptions): Observable<any> => {
       monitor.serveMetrics(environment.telemetry.port);
     }
 
-    const storage = levelupStorage({
-      db: LevelUp(
-        customLeveldown === undefined ? LevelDOWN(dataPath /*, environment.levelDownOptions*/) : customLeveldown,
-      ),
+    let levelDown = customLeveldown;
+    if (levelDown === undefined) {
+      const levelDownToOpen = LevelDOWN(dataPath);
+      const { levelDownOptions } = environment;
+      if (levelDownOptions !== undefined) {
+        await new Promise<void>((resolve, reject) => {
+          levelDownToOpen.open(levelDownOptions, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        });
+      }
+      levelDown = levelDownToOpen;
+    }
 
+    const storage = levelupStorage({
+      db: LevelUp(levelDown),
       context: { messageMagic: settings.messageMagic },
     });
 
